@@ -281,7 +281,10 @@ NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp);
  * >> return WAS_SIGNALED;
  * The sleeping thread should then be woken as follows:
  * >> SET_SHOULD_WAIT(false);
- * >> task_wake(waiting_thread); */
+ * >> task_wake(waiting_thread);
+ *
+ * @return: true:  Sporadic interrupt received (probably `task_wake()', but see other situations above)
+ * @return: false: The given `abs_timeout' expired. */
 FUNDEF BLOCKING __BOOL
 NOTHROW(FCALL task_sleep)(ktime_t abs_timeout DFL(KTIME_INFINITE));
 

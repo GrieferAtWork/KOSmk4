@@ -1022,7 +1022,10 @@ NOTHROW(FCALL waitfor_ktime_or_interrupt)(struct cpu *__restrict me,
  * >> return WAS_SIGNALED;
  * The sleeping thread should then be woken as follows:
  * >> SET_SHOULD_WAIT(false);
- * >> task_wake(waiting_thread); */
+ * >> task_wake(waiting_thread);
+ *
+ * @return: true:  Sporadic interrupt received (probably `task_wake()', but see other situations above)
+ * @return: false: The given `abs_timeout' expired. */
 PUBLIC bool NOTHROW(FCALL task_sleep)(ktime_t abs_timeout) {
 	struct task *next;
 	struct task *caller;
@@ -1122,7 +1125,7 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(ktime_t abs_timeout) {
 	                                    priority_boost, now,
 	                                    tsc_now, false);
 
-	/* Continue execution in the next thread. */
+	/* Continue execution in the `next' thread. */
 	assert(next->t_flags & TASK_FRUNNING);
 
 	/* Check  for  special  case:  The  switch  wasn't  actually   done.
@@ -1149,13 +1152,34 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(ktime_t abs_timeout) {
 	} else {
 		sched_assert();
 		PREEMPTION_ENABLE();
+
+		/* Special case: we never got de-scheduled, but the caller still gave a timeout.
+		 * -> In this case, the hardware TSC never will have set the `TASK_FTIMEOUT' flag,
+		 *    but there's still a (good) chance that the caller's timeout has expired,  so
+		 *    we must check for that case. */
+		if (now > abs_timeout) {
+			/* For  the sake of consistency, still make sure that the FTIMEOUT
+			 * doesn't remain set (even though it shouldn't be set right now). */
+#ifndef __OPTIMIZE_SIZE__
+			if unlikely(ATOMIC_READ(caller->t_flags) & TASK_FTIMEOUT)
+#endif /* !__OPTIMIZE_SIZE__ */
+			{
+				ATOMIC_AND(caller->t_flags, ~TASK_FTIMEOUT);
+			}
+			return false; /* Timeout */
+		}
 	}
 
 	/* Check if we got timed out. */
-	if (ATOMIC_FETCHAND(caller->t_flags, ~TASK_FTIMEOUT) & TASK_FTIMEOUT) {
-		assertf(abs_timeout != KTIME_INFINITE,
-		        "TASK_FTIMEOUT set, but no timeout given?");
-		return false; /* Timeout... */
+#ifndef __OPTIMIZE_SIZE__
+	if (ATOMIC_READ(caller->t_flags) & TASK_FTIMEOUT)
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		if (ATOMIC_FETCHAND(caller->t_flags, ~TASK_FTIMEOUT) & TASK_FTIMEOUT) {
+			assertf(abs_timeout != KTIME_INFINITE,
+			        "TASK_FTIMEOUT set, but no timeout given?");
+			return false; /* Timeout... */
+		}
 	}
 	return true;
 }
