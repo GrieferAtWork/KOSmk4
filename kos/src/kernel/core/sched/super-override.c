@@ -219,7 +219,7 @@ again:
  * since other CPUs can only receive super-override-suspend requests when they
  * have preemption enabled, meaning that if 2 CPUs were to call this  function
  * at the same time, one  of them would have to  wait for the other's  suspend
- * IPI, which in turn requires preemption to be enabled.
+ * IPI, which in turn requires preemption to be enabled for both.
  *
  * So as a result, a function like this one can only be implemented safely
  * by forcing the  caller to  have preemption enabled  before calling  it.

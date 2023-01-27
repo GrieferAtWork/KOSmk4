@@ -281,12 +281,12 @@ PUBLIC ATTR_PERCPU struct scheduler thiscpu_scheduler = {
 
 /* [0..1][lock(PRIVATE(THIS_CPU))]
  * [if(!= NULL, [== FORCPU(., thiscpu_sched_current)])]
- * A  scheduling  override  for  this  CPU.  When  non-NULL,  the   specified
- * thread must  be  the  calling  thread,  in  which  case  the  caller  will
- * never  be  preempted  until  this  field  is  once  again  set  to   NULL.
- * Note  however  that  this variable  should  not be  written  directly, but
- * rather through use of `sched_override_start()' and `sched_override_end()',
- * which  will  automatically  account for  the  TSC deadline  and  the like. */
+ * A scheduling override for this CPU. When non-NULL, the specified thread
+ * must be the  calling thread,  in which case  the caller  will never  be
+ * preempted until this field is once again set to NULL. Note however that
+ * this variable should not be written directly, but rather through use of
+ * `sched_override_start()' and `sched_override_end()', which will account
+ * for the TSC deadline and the like automatically. */
 PUBLIC ATTR_PERCPU struct task *thiscpu_sched_override = NULL;
 
 

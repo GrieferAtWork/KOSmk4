@@ -281,12 +281,12 @@ NOTHROW(FCALL sched_intern_yield_onexit)(struct cpu *__restrict me,
 
 /* [0..1][lock(PRIVATE(THIS_CPU))]
  * [if(!= NULL, [== FORCPU(., thiscpu_sched_current)])]
- * A  scheduling  override  for  this  CPU.  When  non-NULL,  the   specified
- * thread must  be  the  calling  thread,  in  which  case  the  caller  will
- * never  be  preempted  until  this  field  is  once  again  set  to   NULL.
- * Note  however  that  this variable  should  not be  written  directly, but
- * rather through use of `sched_override_start()' and `sched_override_end()',
- * which  will  automatically  account for  the  TSC deadline  and  the like. */
+ * A scheduling override for this CPU. When non-NULL, the specified thread
+ * must be the  calling thread,  in which case  the caller  will never  be
+ * preempted until this field is once again set to NULL. Note however that
+ * this variable should not be written directly, but rather through use of
+ * `sched_override_start()' and `sched_override_end()', which will account
+ * for the TSC deadline and the like automatically. */
 DATDEF ATTR_PERCPU struct task *thiscpu_sched_override;
 
 /* Acquire/release the scheduler override lock for the calling  CPU,
@@ -354,7 +354,7 @@ NOTHROW(FCALL sched_override_yieldto)(struct task *__restrict thread);
  * since other CPUs can only receive super-override-suspend requests when they
  * have preemption enabled, meaning that if 2 CPUs were to call this  function
  * at the same time, one  of them would have to  wait for the other's  suspend
- * IPI, which in turn requires preemption to be enabled.
+ * IPI, which in turn requires preemption to be enabled for both.
  *
  * So as a result, a function like this one can only be implemented safely
  * by forcing the  caller to  have preemption enabled  before calling  it.

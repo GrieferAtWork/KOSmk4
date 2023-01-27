@@ -39,7 +39,8 @@ DECL_BEGIN
 
 #ifdef DEFINE_task_waitfor
 /* Wait for the first signal to be delivered, unconditionally
- * disconnecting   all    connected    signals    thereafter.
+ * disconnecting all connected signals thereafter  (including
+ * in the case of a timeout).
  * NOTE: Prior to fully starting to block, this function will call `task_serve()'
  * @param: abs_timeout:  The `ktime()' timeout for the wait.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked.

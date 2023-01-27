@@ -556,7 +556,7 @@ NOTHROW(FCALL task_popconnections)(void);
 
 
 /* Connect the calling thread to a given signal.
- * NOTE: It  the caller was already connected to `target', a second connection
+ * NOTE: If  the caller was already connected to `target', a second connection
  *       will be established, and `task_disconnect()' must be called more than
  *       once. However, aside  from this, having  multiple connections to  the
  *       same signal has no other adverse side-effects.
@@ -590,12 +590,12 @@ task_connect(struct sig *__restrict target)
  * of lock with the intend to release  it eventually, where the act of  releasing
  * said lock includes a call to `sig_send()'.
  *
- * This connect() function is  only required for signals  that may be delivered  via
- * `sig_send()',  meaning that only a single thread  would be informed of the signal
- * event having taken  place. If  in this scenario,  the recipient  thread (i.e  the
- * thread that called  `task_connect()') then  decides not  to act  upon the  signal
- * in question, but rather to do something else, the original intent of `sig_send()'
- * will become lost, that intent  being for some (single)  thread to try to  acquire
+ * This connect() function is only required for signals that may be delivered  via
+ * `sig_send()', meaning that only a single thread would be informed of the signal
+ * event having taken place.  If in this scenario,  the recipient thread (i.e  the
+ * thread  that called `task_connect()')  then decides not to  act upon the signal
+ * in question, but rather do something else, the original intent of  `sig_send()'
+ * will  become lost, that intent being for some (single) thread to try to acquire
  * an accompanying lock (for example: `<kos/sched/shared-lock.h>')
  *
  * As  far as semantics go, a signal  connection established with this function will
@@ -710,7 +710,8 @@ FUNDEF NOBLOCK WUNUSED struct sig *
 NOTHROW(FCALL task_trywait)(void);
 
 /* Wait for the first signal to be delivered, unconditionally
- * disconnecting   all    connected    signals    thereafter.
+ * disconnecting all connected signals thereafter  (including
+ * in the case of a timeout).
  * NOTE: Prior to fully starting to block, this function will call `task_serve()'
  * @param: abs_timeout:  The `ktime()' timeout for the wait.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked.

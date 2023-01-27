@@ -80,10 +80,10 @@ task_rpc_userunwind(prpc_exec_callback_t func, void *cookie DFL(__NULLPTR))
 
 /* Arch-specific function:
  * Serve pending, synchronous (and asynchronous) RPCs.
- * NOTE: If the caller was previously  disabled preemption, it will  remain
- *       disabled  if  there  were no  RPC  functions had  to  be executed.
- *       Otherwise, preemption will become enabled, and `true' is returned,
- *       or an exception thrown by an RPC function gets propagated.
+ * NOTE: If the caller has previously  disabled preemption, it will  remain
+ *       disabled if no RPC functions were executed. Otherwise,  preemption
+ *       will always be re-enabled, and `true' is returned, or an exception
+ *       thrown by an RPC function gets propagated.
  * WARNING: Do not call this function unconditionally!
  *          Only call it if you're certain to be about to start  blocking
  *          in a context where a reset of your current context would have

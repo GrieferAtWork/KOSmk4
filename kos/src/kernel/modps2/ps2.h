@@ -26,7 +26,7 @@
 #include <kernel/except.h>  /* THROW() */
 #include <kernel/x86/pic.h> /* TODO: Non-portable! */
 #include <sched/cpu.h>      /* jiffies */
-#include <sched/sig.h>   /* struct sig */
+#include <sched/sig.h>      /* struct sig */
 #include <sched/task.h>     /* task_tryyield_or_pause */
 
 #include <hw/hid/ps2.h>           /* PS2_* */

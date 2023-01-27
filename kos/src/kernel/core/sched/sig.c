@@ -282,7 +282,7 @@ NOTHROW(FCALL task_connection_free)(struct task_connections *__restrict self,
 			task_pause();                          \
 	}	__WHILE0
 #define sig_smplock_release_nopr(self) \
-	__hybrid_atomic_fetchand((self)->s_ctl, ~SIG_CONTROL_SMPLOCK, __ATOMIC_RELEASE)
+	__hybrid_atomic_and((self)->s_ctl, ~SIG_CONTROL_SMPLOCK, __ATOMIC_RELEASE)
 #else /* SIG_CONTROL_SMPLOCK != 0 */
 #define sig_smplock_set(con)              con
 #define sig_smplock_clr(con)              con
@@ -305,6 +305,28 @@ NOTHROW(FCALL task_connection_free)(struct task_connections *__restrict self,
 
 
 /* Connect the calling thread to a given signal.
+ * NOTE: If  the caller was already connected to `target', a second connection
+ *       will be established, and `task_disconnect()' must be called more than
+ *       once. However, aside  from this, having  multiple connections to  the
+ *       same signal has no other adverse side-effects.
+ * NOTE: When  the signal  test expression is  able to throw  an exception, the
+ *       caller of this function is  responsible to disconnect from the  signal
+ *       afterwards. However, exceptions that may be thrown by `task_waitfor()'
+ *       always guaranty that _all_ established connections have been  removed.
+ * >> if (test())
+ * >>     return true;
+ * >> task_connect(s);
+ * >> TRY {
+ * >>     if (test()) {
+ * >>         task_disconnectall();
+ * >>         return true;
+ * >>     }
+ * >> } EXCEPT {
+ * >>     task_disconnectall();
+ * >>     RETHROW();
+ * >> }
+ * >> task_waitfor();
+ *
  * @throw: E_BADALLOC: Insufficient  memory  (only  when there  are  at least
  *                     `CONFIG_TASK_STATIC_CONNECTIONS' connections already). */
 PUBLIC NONNULL((1)) void FCALL
@@ -350,12 +372,12 @@ task_connect(struct sig *__restrict target) THROWS(E_BADALLOC) {
  * of lock with the intend to release  it eventually, where the act of  releasing
  * said lock includes a call to `sig_send()'.
  *
- * This connect() function is  only required for signals  that may be delivered  via
- * `sig_send()',  meaning that only a single thread  would be informed of the signal
- * event having taken  place. If  in this scenario,  the recipient  thread (i.e  the
- * thread that called  `task_connect()') then  decides not  to act  upon the  signal
- * in question, but rather to do something else, the original intent of `sig_send()'
- * will become lost, that intent  being for some (single)  thread to try to  acquire
+ * This connect() function is only required for signals that may be delivered  via
+ * `sig_send()', meaning that only a single thread would be informed of the signal
+ * event having taken place.  If in this scenario,  the recipient thread (i.e  the
+ * thread  that called `task_connect()')  then decides not to  act upon the signal
+ * in question, but rather do something else, the original intent of  `sig_send()'
+ * will  become lost, that intent being for some (single) thread to try to acquire
  * an accompanying lock (for example: `<kos/sched/shared-lock.h>')
  *
  * As  far as semantics go, a signal  connection established with this function will
@@ -1964,9 +1986,7 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 			if unlikely(status & TASK_CONNECTION_STAT_FLOCK) {
 				/* Pausing w/ preemption may  do better than pausing  w/o
 				 * As such, try to re-enable preemption while we do this. */
-				preemption_pop(&was);
-				task_tryyield_or_pause();
-				preemption_pushoff(&was);
+				preemption_tryyield_f(&was);
 				continue;
 			}
 
@@ -2126,9 +2146,7 @@ NOTHROW(FCALL sig_send_select_as)(struct sig *__restrict self,
 		if (!sig_con)
 			goto done;
 		if unlikely((uintptr_t)sig_con & SIG_CONTROL_SMPLOCK) {
-			preemption_pop(&was);
-			task_tryyield_or_pause();
-			preemption_pushoff(&was);
+			preemption_tryyield_f(&was);
 			continue;
 		}
 		if (ATOMIC_CMPXCH_WEAK(self->s_con, sig_con,

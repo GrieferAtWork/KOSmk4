@@ -355,7 +355,7 @@ timer_haselapsed(struct timer *__restrict self)
 
 /* Same as `timer_getoverrun_locked()', but when the timer has
  * an  interval, increase `t_expire' by `N * t_interval', such
- * that it is still less than `now', and return `N'
+ * that it barely becomes greater than `now', then return `N'.
  *
  * When the timer has no interval, return `0' if the timer has
  * not  yet expired, or `1' (alongside disarming it) if it has

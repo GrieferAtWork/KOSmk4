@@ -80,22 +80,22 @@ DECL_BEGIN
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL sig_send)(struct sig *__restrict self)
 #elif defined(DEFINE_sig_altsend)
-#define HAVE_SENDER
+#define LOCAL_HAVE_SENDER
 PUBLIC NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(FCALL sig_altsend)(struct sig *self,
                            struct sig *sender)
 #elif defined(DEFINE_sig_send_nopr)
-#define HAVE_NOPREEMPT
+#define LOCAL_HAVE_NOPREEMPT
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) bool
 NOTHROW(FCALL sig_send_nopr)(struct sig *__restrict self)
 #elif defined(DEFINE_sig_altsend_nopr)
-#define HAVE_SENDER
-#define HAVE_NOPREEMPT
+#define LOCAL_HAVE_SENDER
+#define LOCAL_HAVE_NOPREEMPT
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) bool
 NOTHROW(FCALL sig_altsend_nopr)(struct sig *self,
                                 struct sig *sender)
 #elif defined(DEFINE_sig_sendto)
-#define HAVE_TARGET_THREAD
+#define LOCAL_HAVE_TARGET_THREAD
 /* Send signal `self' to the given thread `target'
  *  - Behaves  the same as `sig_send()', however signal completion
  *    callbacks  and task_connection's that point to threads other
@@ -109,55 +109,55 @@ FUNDEF NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL sig_sendto)(struct sig *__restrict self,
                           struct task *__restrict target)
 #elif defined(DEFINE_sig_altsendto)
-#define HAVE_TARGET_THREAD
-#define HAVE_SENDER
+#define LOCAL_HAVE_TARGET_THREAD
+#define LOCAL_HAVE_SENDER
 FUNDEF NOBLOCK NONNULL((1, 2, 3)) bool
 NOTHROW(FCALL sig_altsendto)(struct sig *self,
                              struct task *__restrict target,
                              struct sig *sender)
 #elif defined(DEFINE_sig_sendto_nopr)
-#define HAVE_TARGET_THREAD
-#define HAVE_NOPREEMPT
+#define LOCAL_HAVE_TARGET_THREAD
+#define LOCAL_HAVE_NOPREEMPT
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) bool
 NOTHROW(FCALL sig_sendto_nopr)(struct sig *__restrict self,
                                struct task *__restrict target)
 #elif defined(DEFINE_sig_altsendto_nopr)
-#define HAVE_TARGET_THREAD
-#define HAVE_SENDER
-#define HAVE_NOPREEMPT
+#define LOCAL_HAVE_TARGET_THREAD
+#define LOCAL_HAVE_SENDER
+#define LOCAL_HAVE_NOPREEMPT
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) bool
 NOTHROW(FCALL sig_altsendto_nopr)(struct sig *self,
                                   struct task *__restrict target,
                                   struct sig *sender)
 #elif defined(DEFINE_sig_broadcast)
-#define HAVE_BROADCAST
+#define LOCAL_HAVE_BROADCAST
 /* Send signal to all connected threads.
  * @return: * : The actual number of threads notified,
  *              not  counting  poll-based connections. */
 PUBLIC NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast)(struct sig *__restrict self)
 #elif defined(DEFINE_sig_altbroadcast)
-#define HAVE_BROADCAST
-#define HAVE_SENDER
+#define LOCAL_HAVE_BROADCAST
+#define LOCAL_HAVE_SENDER
 PUBLIC NOBLOCK NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_altbroadcast)(struct sig *self,
                                 struct sig *sender)
 #elif defined(DEFINE_sig_broadcast_nopr)
-#define HAVE_BROADCAST
-#define HAVE_NOPREEMPT
+#define LOCAL_HAVE_BROADCAST
+#define LOCAL_HAVE_NOPREEMPT
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast_nopr)(struct sig *__restrict self)
 #elif defined(DEFINE_sig_altbroadcast_nopr)
-#define HAVE_BROADCAST
-#define HAVE_NOPREEMPT
-#define HAVE_SENDER
+#define LOCAL_HAVE_BROADCAST
+#define LOCAL_HAVE_NOPREEMPT
+#define LOCAL_HAVE_SENDER
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_altbroadcast_nopr)(struct sig *self,
                                      struct sig *sender)
 #elif defined(DEFINE_sig_broadcast_as_nopr)
-#define HAVE_BROADCAST
-#define HAVE_SENDER_THREAD
-#define HAVE_NOPREEMPT
+#define LOCAL_HAVE_BROADCAST
+#define LOCAL_HAVE_SENDER_THREAD
+#define LOCAL_HAVE_NOPREEMPT
 /* Same as `sig_broadcast()', but impersonate `caller', and
  * wake up thread through use of `task_wake_as()'. The same
  * rules apply, meaning that the (true) caller must  ensure
@@ -167,9 +167,9 @@ PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast_as_nopr)(struct sig *__restrict self,
                                      struct task *__restrict caller)
 #elif defined(DEFINE_sig_broadcast_cleanup_nopr)
-#define HAVE_BROADCAST
-#define HAVE_CLEANUP
-#define HAVE_NOPREEMPT
+#define LOCAL_HAVE_BROADCAST
+#define LOCAL_HAVE_CLEANUP
+#define LOCAL_HAVE_NOPREEMPT
 /* Same as `sig_broadcast()', but invoke a given `cleanup' prior to doing any  other
  * kind of cleanup, but after having released all internal SMP-locks. May be used to
  * release further SMP-locks  which may have  been used to  guard `self' from  being
@@ -180,17 +180,17 @@ PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_broadcast_cleanup_nopr)(struct sig *__restrict self,
                                           struct sig_cleanup_callback *__restrict cleanup)
 #elif defined(DEFINE_sig_broadcast_as_cleanup_nopr)
-#define HAVE_BROADCAST
-#define HAVE_CLEANUP
-#define HAVE_SENDER_THREAD
-#define HAVE_NOPREEMPT
+#define LOCAL_HAVE_BROADCAST
+#define LOCAL_HAVE_CLEANUP
+#define LOCAL_HAVE_SENDER_THREAD
+#define LOCAL_HAVE_NOPREEMPT
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
 NOTHROW(FCALL sig_broadcast_as_cleanup_nopr)(struct sig *__restrict self,
                                              struct task *__restrict caller,
                                              struct sig_cleanup_callback *__restrict cleanup)
 #elif defined(DEFINE_sig_broadcast_for_fini)
-#define HAVE_BROADCAST
-#define HAVE_FOR_FINI
+#define LOCAL_HAVE_BROADCAST
+#define LOCAL_HAVE_FOR_FINI
 /* Same  as the regular `sig_broadcast' function, but must be used if
  * `self'  is being broadcast one last time prior to being destroyed.
  * When these functions are used, signal completion callbacks are not
@@ -201,48 +201,48 @@ NOTHROW(FCALL sig_broadcast_as_cleanup_nopr)(struct sig *__restrict self,
 PUBLIC NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast_for_fini)(struct sig *__restrict self)
 #elif defined(DEFINE_sig_altbroadcast_for_fini)
-#define HAVE_BROADCAST
-#define HAVE_FOR_FINI
-#define HAVE_SENDER
+#define LOCAL_HAVE_BROADCAST
+#define LOCAL_HAVE_FOR_FINI
+#define LOCAL_HAVE_SENDER
 PUBLIC NOBLOCK NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_altbroadcast_for_fini)(struct sig *self,
                                          struct sig *sender)
 #elif defined(DEFINE_sig_broadcast_for_fini_nopr)
-#define HAVE_BROADCAST
-#define HAVE_FOR_FINI
-#define HAVE_NOPREEMPT
+#define LOCAL_HAVE_BROADCAST
+#define LOCAL_HAVE_FOR_FINI
+#define LOCAL_HAVE_NOPREEMPT
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast_for_fini_nopr)(struct sig *__restrict self)
 #elif defined(DEFINE_sig_altbroadcast_for_fini_nopr)
-#define HAVE_BROADCAST
-#define HAVE_FOR_FINI
-#define HAVE_NOPREEMPT
-#define HAVE_SENDER
+#define LOCAL_HAVE_BROADCAST
+#define LOCAL_HAVE_FOR_FINI
+#define LOCAL_HAVE_NOPREEMPT
+#define LOCAL_HAVE_SENDER
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_altbroadcast_for_fini_nopr)(struct sig *self,
                                               struct sig *sender)
 #elif defined(DEFINE_sig_broadcast_as_for_fini_nopr)
-#define HAVE_BROADCAST
-#define HAVE_FOR_FINI
-#define HAVE_SENDER_THREAD
-#define HAVE_NOPREEMPT
+#define LOCAL_HAVE_BROADCAST
+#define LOCAL_HAVE_FOR_FINI
+#define LOCAL_HAVE_SENDER_THREAD
+#define LOCAL_HAVE_NOPREEMPT
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast_as_for_fini_nopr)(struct sig *__restrict self,
                                               struct task *__restrict caller)
 #elif defined(DEFINE_sig_broadcast_for_fini_cleanup_nopr)
-#define HAVE_BROADCAST
-#define HAVE_FOR_FINI
-#define HAVE_CLEANUP
-#define HAVE_NOPREEMPT
+#define LOCAL_HAVE_BROADCAST
+#define LOCAL_HAVE_FOR_FINI
+#define LOCAL_HAVE_CLEANUP
+#define LOCAL_HAVE_NOPREEMPT
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_broadcast_for_fini_cleanup_nopr)(struct sig *__restrict self,
                                                    struct sig_cleanup_callback *__restrict cleanup)
 #elif defined(DEFINE_sig_broadcast_as_for_fini_cleanup_nopr)
-#define HAVE_BROADCAST
-#define HAVE_FOR_FINI
-#define HAVE_CLEANUP
-#define HAVE_SENDER_THREAD
-#define HAVE_NOPREEMPT
+#define LOCAL_HAVE_BROADCAST
+#define LOCAL_HAVE_FOR_FINI
+#define LOCAL_HAVE_CLEANUP
+#define LOCAL_HAVE_SENDER_THREAD
+#define LOCAL_HAVE_NOPREEMPT
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
 NOTHROW(FCALL sig_broadcast_as_for_fini_cleanup_nopr)(struct sig *__restrict self,
                                                       struct task *__restrict caller,
@@ -252,7 +252,7 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_cleanup_nopr)(struct sig *__restrict sel
 	struct task_connection *con;
 	struct task_connection *receiver;
 	struct task_connections *target_cons;
-#ifdef HAVE_BROADCAST
+#ifdef LOCAL_HAVE_BROADCAST
 	/* FIXME: Broadcasting to a large number other threads running on another CPU
 	 *        can lead to  a (not-really?) soft-lock  scenario that can  randomly
 	 *        resolve itself after an arbitrary amount of time.
@@ -269,66 +269,84 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_cleanup_nopr)(struct sig *__restrict sel
 	 */
 	struct task_connection *next;
 	size_t result = 0;
-#endif /* HAVE_BROADCAST */
-#ifdef HAVE_SENDER
+#endif /* LOCAL_HAVE_BROADCAST */
+#ifdef LOCAL_HAVE_SENDER
 #define LOCAL_sender sender
 	assert(sender);
-#else /* HAVE_SENDER */
+#else /* LOCAL_HAVE_SENDER */
 #define LOCAL_sender self
-#endif /* !HAVE_SENDER */
-#ifdef HAVE_NOPREEMPT
+#endif /* !LOCAL_HAVE_SENDER */
+#ifdef LOCAL_HAVE_NOPREEMPT
 	assert(!preemption_ison());
 #define LOCAL_preemption_pushoff() (void)0
 #define LOCAL_preemption_pop()     (void)0
 #define LOCAL_was                  PREEMPTION_OFF_VALUE
-#else /* HAVE_NOPREEMPT */
+#else /* LOCAL_HAVE_NOPREEMPT */
 	preemption_flag_t was;
 #define LOCAL_preemption_pushoff() preemption_pushoff(&was)
 #define LOCAL_preemption_pop()     preemption_pop(&was)
 #define LOCAL_was                  was
-#endif /* !HAVE_NOPREEMPT */
-#ifdef HAVE_SENDER_THREAD
+#endif /* !LOCAL_HAVE_NOPREEMPT */
+#ifdef LOCAL_HAVE_SENDER_THREAD
 #define LOCAL_caller            caller
 #define LOCAL_task_wake(thread) task_wake_as(thread, caller)
-#else /* HAVE_SENDER_THREAD */
+#else /* LOCAL_HAVE_SENDER_THREAD */
 #define LOCAL_caller            THIS_TASK
 #define LOCAL_task_wake(thread) task_wake(thread)
-#endif /* !HAVE_SENDER_THREAD */
-#ifdef HAVE_CLEANUP
+#endif /* !LOCAL_HAVE_SENDER_THREAD */
+#ifdef LOCAL_HAVE_CLEANUP
 #define LOCAL_exec_cleanup() (*cleanup->scc_cb)(cleanup)
 #define LOCAL_cleanup        cleanup
-#else /* HAVE_CLEANUP */
+#else /* LOCAL_HAVE_CLEANUP */
 #define LOCAL_exec_cleanup() (void)0
-#define LOCAL_cleanup NULL
-#endif /* !HAVE_CLEANUP */
-#ifdef HAVE_FOR_FINI
+#define LOCAL_cleanup        NULL
+#endif /* !LOCAL_HAVE_CLEANUP */
+#ifdef LOCAL_HAVE_FOR_FINI
 #define LOCAL_TASK_CONNECTION_STAT_FFINI TASK_CONNECTION_STAT_FFINI
-#else /* HAVE_FOR_FINI */
+#else /* LOCAL_HAVE_FOR_FINI */
 #define LOCAL_TASK_CONNECTION_STAT_FFINI 0
-#endif /* !HAVE_FOR_FINI */
+#endif /* !LOCAL_HAVE_FOR_FINI */
 #ifndef CONFIG_NO_SMP
 again_disable_preemption:
 #endif /* !CONFIG_NO_SMP */
+
+	/* Optimization:
+	 * If nothing is connected to the signal, we don't have to disable
+	 * preemption (though the extra check after preemption was  turned
+	 * off is still  required so that  the connections-exist check  is
+	 * interlocked with preemption being off). */
+#if !defined(__OPTIMIZE_SIZE__) && !defined(LOCAL_HAVE_NOPREEMPT)
+	if (!ATOMIC_READ(self->s_con)) {
+		LOCAL_exec_cleanup();
+#ifdef LOCAL_HAVE_BROADCAST
+		return result;
+#else /* LOCAL_HAVE_BROADCAST */
+		return false;
+#endif /* !LOCAL_HAVE_BROADCAST */
+	}
+#endif /* !__OPTIMIZE_SIZE__ && !LOCAL_HAVE_NOPREEMPT */
+
+	/* Make sure that preemption is disabled. */
 	LOCAL_preemption_pushoff();
 #ifdef CONFIG_NO_SMP
 again:
 #endif /* CONFIG_NO_SMP */
 	con = ATOMIC_READ(self->s_con);
 	if (!con) {
-#if !defined(CONFIG_NO_SMP) || defined(HAVE_TARGET_THREAD)
+#if !defined(CONFIG_NO_SMP) || defined(LOCAL_HAVE_TARGET_THREAD)
 done_exec_cleanup:
-#endif /* !CONFIG_NO_SMP || HAVE_TARGET_THREAD */
+#endif /* !CONFIG_NO_SMP || LOCAL_HAVE_TARGET_THREAD */
 		LOCAL_exec_cleanup();
 		LOCAL_preemption_pop();
-#ifdef HAVE_BROADCAST
+#ifdef LOCAL_HAVE_BROADCAST
 		return result;
-#else /* HAVE_BROADCAST */
+#else /* LOCAL_HAVE_BROADCAST */
 		return false;
-#endif /* !HAVE_BROADCAST */
+#endif /* !LOCAL_HAVE_BROADCAST */
 	}
 
-#ifndef CONFIG_NO_SMP
 	/* Wait if the SMP lock isn't available at the moment. */
+#ifndef CONFIG_NO_SMP
 	if unlikely((uintptr_t)con & SIG_CONTROL_SMPLOCK) {
 		LOCAL_preemption_pop();
 		task_tryyield_or_pause();
@@ -352,7 +370,7 @@ again:
 #endif /* !CONFIG_NO_SMP */
 
 
-#ifdef HAVE_BROADCAST
+#ifdef LOCAL_HAVE_BROADCAST
 again_select_receiver:
 	/* Find a suitable candidate:
 	 *    During broadcast:
@@ -483,10 +501,10 @@ again_read_target_cons:
 		}
 	}
 	goto again;
-#else /* HAVE_BROADCAST */
+#else /* LOCAL_HAVE_BROADCAST */
 	receiver = sig_smplock_clr(con);
 
-#ifdef HAVE_TARGET_THREAD
+#ifdef LOCAL_HAVE_TARGET_THREAD
 	/* Find a suitable receiver: Just pick the first true-task  connection
 	 *                           that points to the caller-given `target'.
 	 * NOTE: Assuming that `target' isn't connected more than once, we don't
@@ -509,7 +527,7 @@ again_read_target_cons:
 			goto done_exec_cleanup; /* No receiver found... */
 		goto again_read_target_cons;
 	}
-#else /* HAVE_TARGET_THREAD */
+#else /* LOCAL_HAVE_TARGET_THREAD */
 
 	/* Find a suitable candidate:
 	 *    During send:
@@ -602,7 +620,7 @@ again_read_target_cons:
 		}
 		return true;
 	}
-#endif /* !HAVE_TARGET_THREAD */
+#endif /* !LOCAL_HAVE_TARGET_THREAD */
 
 	if (TASK_CONNECTION_STAT_ISPOLL(target_cons)) {
 		REF struct task *thread;
@@ -677,7 +695,7 @@ again_read_target_cons:
 		}
 	}
 	return true;
-#endif /* !HAVE_BROADCAST */
+#endif /* !LOCAL_HAVE_BROADCAST */
 #undef LOCAL_TASK_CONNECTION_STAT_FFINI
 #undef LOCAL_exec_cleanup
 #undef LOCAL_cleanup
@@ -690,13 +708,13 @@ again_read_target_cons:
 #undef LOCAL_sender
 }
 
-#undef HAVE_SENDER_THREAD
-#undef HAVE_TARGET_THREAD
-#undef HAVE_CLEANUP
-#undef HAVE_BROADCAST
-#undef HAVE_FOR_FINI
-#undef HAVE_SENDER
-#undef HAVE_NOPREEMPT
+#undef LOCAL_HAVE_SENDER_THREAD
+#undef LOCAL_HAVE_TARGET_THREAD
+#undef LOCAL_HAVE_CLEANUP
+#undef LOCAL_HAVE_BROADCAST
+#undef LOCAL_HAVE_FOR_FINI
+#undef LOCAL_HAVE_SENDER
+#undef LOCAL_HAVE_NOPREEMPT
 
 
 DECL_END

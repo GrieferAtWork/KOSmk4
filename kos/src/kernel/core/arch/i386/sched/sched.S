@@ -409,6 +409,10 @@ END(task_tryyield)
 
 
 .section .text
+/* Save the current CPU context and store it in `caller->t_state'.
+ * Then, switch context to `PERCPU(thiscpu_sched_current)' and continue by executing it.
+ * NOTE: Preemption must be disabled before this function may be called!
+ * NOTE: Upon return, preemption will have been re-enabled! */
 PUBLIC_FUNCTION(cpu_run_current_and_remember_nopr)
 	/* %R_fcall0P: <struct task *__restrict caller> */
 	.cfi_startproc
@@ -447,6 +451,10 @@ END(cpu_run_current_and_remember_nopr)
 
 
 .section .text
+/* Similar to `cpu_run_current_and_remember_nopr()',
+ * but  don't   remember   the   caller's   context.
+ * This  function is used to implement `task_exit()'
+ * NOTE: Preemption must be disabled before this function may be called! */
 PUBLIC_FUNCTION(cpu_run_current_nopr)
 	.cfi_startproc
 	/* Load the CPU state of the task set as current. */

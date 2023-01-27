@@ -584,9 +584,9 @@ FUNDEF ATTR_NORETURN void NOTHROW(FCALL cpu_idlemain)(void);
 	DEFINE_CALLBACK(".rodata.callback.idle_job", func)
 
 
-/* Save the current CPU context and store it in `caller->s_state'.
+/* Save the current CPU context and store it in `caller->t_state'.
  * Then, switch context to `PERCPU(thiscpu_sched_current)' and continue by executing it.
- * NOTE:   Preemption   must  be   disabled  before   this   function  may   be  called!
+ * NOTE: Preemption must be disabled before this function may be called!
  * NOTE: Upon return, preemption will have been re-enabled! */
 FUNDEF NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL cpu_run_current_and_remember_nopr)(struct task *__restrict caller);
