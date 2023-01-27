@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8718da2e */
+/* HASH CRC-32:0xc9aff292 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2008,13 +2008,14 @@ DEFINE_PUBLIC_ALIAS(DOS$stty, libd_stty);
 /* shadow */
 DEFINE_PUBLIC_ALIAS(DOS$__getspnam, libd_getspnam);
 DEFINE_PUBLIC_ALIAS(DOS$getspnam, libd_getspnam);
-DEFINE_PUBLIC_ALIAS(DOS$sgetspent, libd_sgetspent);
 DEFINE_PUBLIC_ALIAS(DOS$fgetspent, libd_fgetspent);
+DEFINE_PUBLIC_ALIAS(DOS$sgetspent, libd_sgetspent);
 DEFINE_PUBLIC_ALIAS(DOS$putspent, libd_putspent);
 DEFINE_PUBLIC_ALIAS(DOS$getspent_r, libd_getspent_r);
 DEFINE_PUBLIC_ALIAS(DOS$getspnam_r, libd_getspnam_r);
 DEFINE_PUBLIC_ALIAS(DOS$sgetspent_r, libd_sgetspent_r);
 DEFINE_PUBLIC_ALIAS(DOS$fgetspent_r, libd_fgetspent_r);
+DEFINE_PUBLIC_ALIAS(DOS$fgetspnam_r, libd_fgetspnam_r);
 
 /* signal */
 DEFINE_PUBLIC_ALIAS(DOS$tgkill, libd_tgkill);

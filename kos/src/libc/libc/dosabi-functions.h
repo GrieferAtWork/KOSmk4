@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe08bfac3 */
+/* HASH CRC-32:0x83cef162 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2077,13 +2077,14 @@ DFUN(".text.crt.dos.database.utmpx", libd_stty, libc_stty, TD, 2, TIn(__SIZEOF_F
 
 /* shadow */
 DFUN(".text.crt.dos.database.shadow", libd_getspnam, libc_getspnam, TP, 1, TP)
-DFUN(".text.crt.dos.database.shadow", libd_sgetspent, libc_sgetspent, TP, 1, TP)
 DFUN(".text.crt.dos.database.shadow", libd_fgetspent, libc_fgetspent, TP, 1, TP)
+DFUN(".text.crt.dos.database.shadow", libd_sgetspent, libc_sgetspent, TP, 1, TP)
 DFUN(".text.crt.dos.database.shadow", libd_putspent, libc_putspent, TD, 2, TP, TP)
-DFUN(".text.crt.dos.database.shadow", libd_getspent_r, libc_getspent_r, TD, 4, TP, TP, TI, TP)
-DFUN(".text.crt.dos.database.shadow", libd_getspnam_r, libc_getspnam_r, TD, 5, TP, TP, TP, TI, TP)
-DFUN(".text.crt.dos.database.shadow", libd_sgetspent_r, libc_sgetspent_r, TD, 5, TP, TP, TP, TI, TP)
-DFUN(".text.crt.dos.database.shadow", libd_fgetspent_r, libc_fgetspent_r, TD, 5, TP, TP, TP, TI, TP)
+DFUN(".text.crt.dos.database.shadow", libd_getspent_r, libc_getspent_r, TIn(__SIZEOF_ERRNO_T__), 4, TP, TP, TI, TP)
+DFUN(".text.crt.dos.database.shadow", libd_getspnam_r, libc_getspnam_r, TIn(__SIZEOF_ERRNO_T__), 5, TP, TP, TP, TI, TP)
+DFUN(".text.crt.dos.database.shadow", libd_sgetspent_r, libc_sgetspent_r, TIn(__SIZEOF_ERRNO_T__), 5, TP, TP, TP, TI, TP)
+DFUN(".text.crt.dos.database.shadow", libd_fgetspent_r, libc_fgetspent_r, TIn(__SIZEOF_ERRNO_T__), 5, TP, TP, TP, TI, TP)
+DFUN(".text.crt.dos.database.shadow", libd_fgetspnam_r, libc_fgetspnam_r, TIn(__SIZEOF_ERRNO_T__), 6, TP, TP, TP, TP, TI, TP)
 
 /* signal */
 DFUN(".text.crt.dos.sched.signal", libd_tgkill, libc_tgkill, TD, 3, TIn(__SIZEOF_PID_T__), TIn(__SIZEOF_PID_T__), TIn(__SIZEOF_SIGNO_T__))

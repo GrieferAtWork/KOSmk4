@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf1b99ed */
+/* HASH CRC-32:0xb6f99480 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,22 +32,22 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getpwuid(3)
  * Search for an entry with a matching user ID
- * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) No entry for `uid' exists
- * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
+ * @return: * :                         A pointer to the read password entry
+ * @return: NULL: (errno = <unchanged>) No entry for `uid' exists
+ * @return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 INTDEF WUNUSED struct passwd *NOTHROW_RPC(LIBDCALL libd_getpwuid)(uid_t uid);
 /* >> getpwnam(3)
  * Search for an entry with a matching username
- * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) No entry for `name' exists
- * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
+ * @return: * :                         A pointer to the read password entry
+ * @return: NULL: (errno = <unchanged>) No entry for `name' exists
+ * @return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 INTDEF WUNUSED ATTR_IN(1) struct passwd *NOTHROW_RPC(LIBDCALL libd_getpwnam)(char const *name);
 /* >> fgetpwent(3)
  * Read an entry from `stream'
- * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) The last entry has already been read
- *                                     (use `rewind(stream)' to rewind the database)
- * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
+ * @return: * :                         A pointer to the read password entry
+ * @return: NULL: (errno = <unchanged>) The last entry has already been read
+ *                                      (use `rewind(stream)' to rewind the database)
+ * @return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 INTDEF WUNUSED ATTR_INOUT(1) struct passwd *NOTHROW_RPC(LIBDCALL libd_fgetpwent)(FILE *__restrict stream);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__

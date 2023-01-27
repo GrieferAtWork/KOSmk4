@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x334b94bd */
+/* HASH CRC-32:0x999427ad */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -107,52 +107,52 @@ __CDECLARE_VOID_OPT(,__NOTHROW_RPC,setpwent,(void),())
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC_NOKOS,endpwent,(void),())
 /* >> getpwent(3)
  * Read an entry from the password-file stream, opening it if necessary
- * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) The last  entry  has  already  been  read
- *                                     (use `setpwent()' to rewind the database)
- * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
+ * @return: * :                         A pointer to the read password entry
+ * @return: NULL: (errno = <unchanged>) The last  entry  has  already  been  read
+ *                                      (use `setpwent()' to rewind the database)
+ * @return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 __CDECLARE_OPT(,struct passwd *,__NOTHROW_RPC,getpwent,(void),())
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 #ifdef __CRT_HAVE_getpwuid
 /* >> getpwuid(3)
  * Search for an entry with a matching user ID
- * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) No entry for `uid' exists
- * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
+ * @return: * :                         A pointer to the read password entry
+ * @return: NULL: (errno = <unchanged>) No entry for `uid' exists
+ * @return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 __CDECLARE(__ATTR_WUNUSED,struct passwd *,__NOTHROW_RPC,getpwuid,(__uid_t __uid),(__uid))
 #elif defined(__CRT_HAVE_setpwent) && defined(__CRT_HAVE_getpwent)
 #include <libc/local/pwd/getpwuid.h>
 /* >> getpwuid(3)
  * Search for an entry with a matching user ID
- * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) No entry for `uid' exists
- * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
+ * @return: * :                         A pointer to the read password entry
+ * @return: NULL: (errno = <unchanged>) No entry for `uid' exists
+ * @return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getpwuid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED struct passwd *__NOTHROW_RPC(__LIBCCALL getpwuid)(__uid_t __uid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpwuid))(__uid); })
 #endif /* ... */
 #ifdef __CRT_HAVE_getpwnam
 /* >> getpwnam(3)
  * Search for an entry with a matching username
- * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) No entry for `name' exists
- * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
+ * @return: * :                         A pointer to the read password entry
+ * @return: NULL: (errno = <unchanged>) No entry for `name' exists
+ * @return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 __CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),struct passwd *,__NOTHROW_RPC,getpwnam,(char const *__name),(__name))
 #elif defined(__CRT_HAVE_setpwent) && defined(__CRT_HAVE_getpwent)
 #include <libc/local/pwd/getpwnam.h>
 /* >> getpwnam(3)
  * Search for an entry with a matching username
- * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) No entry for `name' exists
- * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
+ * @return: * :                         A pointer to the read password entry
+ * @return: NULL: (errno = <unchanged>) No entry for `name' exists
+ * @return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getpwnam, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) struct passwd *__NOTHROW_RPC(__LIBCCALL getpwnam)(char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpwnam))(__name); })
 #endif /* ... */
 
 #ifdef __USE_MISC
 /* >> fgetpwent(3)
  * Read an entry from `stream'
- * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) The last entry has already been read
- *                                     (use `rewind(stream)' to rewind the database)
- * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
+ * @return: * :                         A pointer to the read password entry
+ * @return: NULL: (errno = <unchanged>) The last entry has already been read
+ *                                      (use `rewind(stream)' to rewind the database)
+ * @return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_INOUT(1),struct passwd *,__NOTHROW_RPC,fgetpwent,(__FILE *__restrict __stream),(__stream))
 #ifdef __CRT_HAVE_putpwent
 /* >> putpwent(3)

@@ -2975,6 +2975,7 @@
 #define __CRT_HAVE_fgets_unlocked
 #define __CRT_HAVE_fgetspent
 #define __CRT_HAVE_fgetspent_r
+#define __CRT_HAVE_fgetspnam_r
 #define __CRT_HAVE_fgetwc
 #define __CRT_HAVE_fgetwc_unlocked
 #define __CRT_HAVE_fgetwln

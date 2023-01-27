@@ -34,6 +34,10 @@
 
 DECL_BEGIN
 
+#ifndef _PATH_PASSWD
+#define _PATH_PASSWD "/etc/passwd"
+#endif /* !_PATH_PASSWD */
+
 /* [0..1][lock(ATOMIC)]
  * A stream to the password database file. (when non-NULL, opened for reading) */
 PRIVATE ATTR_SECTION(".bss.crt.database.pwd") FILE *passwd_database = NULL;
@@ -189,13 +193,13 @@ err:
 }
 
 
-/*[[[head:libc_fgetpwent,hash:CRC-32=0x7f74ce22]]]*/
+/*[[[head:libc_fgetpwent,hash:CRC-32=0xa30c703f]]]*/
 /* >> fgetpwent(3)
  * Read an entry from `stream'
- * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) The last entry has already been read
- *                                     (use `rewind(stream)' to rewind the database)
- * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
+ * @return: * :                         A pointer to the read password entry
+ * @return: NULL: (errno = <unchanged>) The last entry has already been read
+ *                                      (use `rewind(stream)' to rewind the database)
+ * @return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.database.pwd") WUNUSED ATTR_INOUT(1) struct passwd *
 NOTHROW_RPC(LIBCCALL libc_fgetpwent)(FILE *__restrict stream)
 /*[[[body:libc_fgetpwent]]]*/
@@ -204,12 +208,12 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwent)(FILE *__restrict stream)
 }
 /*[[[end:libc_fgetpwent]]]*/
 
-/*[[[head:libc_getpwuid,hash:CRC-32=0xb8247153]]]*/
+/*[[[head:libc_getpwuid,hash:CRC-32=0xff8835cb]]]*/
 /* >> getpwuid(3)
  * Search for an entry with a matching user ID
- * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) No entry for `uid' exists
- * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
+ * @return: * :                         A pointer to the read password entry
+ * @return: NULL: (errno = <unchanged>) No entry for `uid' exists
+ * @return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.database.pwd") WUNUSED struct passwd *
 NOTHROW_RPC(LIBCCALL libc_getpwuid)(uid_t uid)
 /*[[[body:libc_getpwuid]]]*/
@@ -224,12 +228,12 @@ NOTHROW_RPC(LIBCCALL libc_getpwuid)(uid_t uid)
 }
 /*[[[end:libc_getpwuid]]]*/
 
-/*[[[head:libc_getpwnam,hash:CRC-32=0xa479e868]]]*/
+/*[[[head:libc_getpwnam,hash:CRC-32=0x9900970a]]]*/
 /* >> getpwnam(3)
  * Search for an entry with a matching username
- * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) No entry for `name' exists
- * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
+ * @return: * :                         A pointer to the read password entry
+ * @return: NULL: (errno = <unchanged>) No entry for `name' exists
+ * @return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.database.pwd") WUNUSED ATTR_IN(1) struct passwd *
 NOTHROW_RPC(LIBCCALL libc_getpwnam)(char const *name)
 /*[[[body:libc_getpwnam]]]*/
@@ -244,13 +248,13 @@ NOTHROW_RPC(LIBCCALL libc_getpwnam)(char const *name)
 }
 /*[[[end:libc_getpwnam]]]*/
 
-/*[[[head:libc_getpwent,hash:CRC-32=0x68f5cca7]]]*/
+/*[[[head:libc_getpwent,hash:CRC-32=0xa18c3b90]]]*/
 /* >> getpwent(3)
  * Read an entry from the password-file stream, opening it if necessary
- * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) The last  entry  has  already  been  read
- *                                     (use `setpwent()' to rewind the database)
- * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
+ * @return: * :                         A pointer to the read password entry
+ * @return: NULL: (errno = <unchanged>) The last  entry  has  already  been  read
+ *                                      (use `setpwent()' to rewind the database)
+ * @return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.database.pwd") struct passwd *
 NOTHROW_RPC(LIBCCALL libc_getpwent)(void)
 /*[[[body:libc_getpwent]]]*/

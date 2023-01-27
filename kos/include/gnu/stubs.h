@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa17ebcf9 */
+/* HASH CRC-32:0xc503fc3e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -146,8 +146,6 @@
 #define __stub_endprotoent
 #define __stub_endrpcent
 #define __stub_endservent
-#define __stub___endspent
-#define __stub_endspent
 #define __stub_endutent
 #define __stub_endutxent
 #define __stub_erand48
@@ -160,8 +158,6 @@
 #define __stub_fesetexcept
 #define __stub_fesetmode
 #define __stub_fetestexceptflag
-#define __stub_fgetspent
-#define __stub_fgetspent_r
 #define __stub_fgetwln
 #define __stub_fmaxmag
 #define __stub_fminmag
@@ -249,12 +245,6 @@
 #define __stub_getservent
 #define __stub_getservent_r
 #define __stub_getsourcefilter
-#define __stub___getspent
-#define __stub_getspent
-#define __stub_getspent_r
-#define __stub___getspnam
-#define __stub_getspnam
-#define __stub_getspnam_r
 #define __stub_getutent
 #define __stub_getutent_r
 #define __stub_getutid
@@ -433,7 +423,6 @@
 #define __stub_ptsname_r
 #define __stub_putmsg
 #define __stub_putpmsg
-#define __stub_putspent
 #define __stub__pututline
 #define __stub_pututline
 #define __stub_pututxline
@@ -519,15 +508,11 @@
 #define __stub_setrpcent
 #define __stub_setservent
 #define __stub_setsourcefilter
-#define __stub___setspent
-#define __stub_setspent
 #define __stub___setstate
 #define __stub_setstate
 #define __stub_setstate_r
 #define __stub_setutent
 #define __stub_setutxent
-#define __stub_sgetspent
-#define __stub_sgetspent_r
 #define __stub_shmat
 #define __stub_shmctl
 #define __stub_shmdt

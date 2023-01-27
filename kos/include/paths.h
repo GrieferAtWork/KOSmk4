@@ -125,8 +125,9 @@
 #define _PATH_KMEM       "/dev/kmem"         /* Supported! */
 #define _PATH_KLOG       "/dev/klog"         /* Supported! */
 #define _PATH_PASSWD     "/etc/passwd"       /* Supported! */
-#define _PATH_GROUP      "/etc/group"        /* TODO */
-#define _PATH_MNTTAB     "/etc/fstab"        /* TODO */
+#define _PATH_SHADOW     "/etc/shadow"       /* Supported! */
+#define _PATH_GROUP      "/etc/group"        /* Supported! */
+#define _PATH_MNTTAB     "/etc/fstab"        /* Supported! */
 #define _PATH_MAN        "/usr/share/man"    /* Ignored */
 #define _PATH_TEXTDOMAIN "/usr/share/locale" /* Supported! */
 /*efine _PATH_LASTLOG    "/var/log/lastlog"*/

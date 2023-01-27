@@ -2821,6 +2821,7 @@
 #define __CRT_HAVE_fgets_unlocked
 #define __CRT_HAVE_fgetspent
 #define __CRT_HAVE_fgetspent_r
+#define __CRT_HAVE_fgetspnam_r
 #define __CRT_HAVE_fgetwc
 #define __CRT_HAVE_fgetwc_unlocked
 #define __CRT_HAVE_fgetwln
@@ -8722,6 +8723,7 @@
 #define __CRT_HAVE_KOS$fgets_unlocked
 #define __CRT_HAVE_KOS$fgetspent
 #define __CRT_HAVE_KOS$fgetspent_r
+#define __CRT_HAVE_KOS$fgetspnam_r
 #define __CRT_HAVE_KOS$fgetwc
 #define __CRT_HAVE_KOS$fgetwc_unlocked
 #define __CRT_HAVE_KOS$fgetwln
@@ -13401,6 +13403,7 @@
 #define __CRT_HAVE_DOS$fgets_unlocked
 #define __CRT_HAVE_DOS$fgetspent
 #define __CRT_HAVE_DOS$fgetspent_r
+#define __CRT_HAVE_DOS$fgetspnam_r
 #define __CRT_HAVE_DOS$fgetwc
 #define __CRT_HAVE_DOS$fgetwc_unlocked
 #define __CRT_HAVE_DOS$fgetwln
