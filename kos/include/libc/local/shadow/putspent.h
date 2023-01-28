@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e62ed52 */
+/* HASH CRC-32:0x3ec436ee */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,13 +114,13 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(putspent) __ATTR_IN(1) __ATTR_INOUT(2) int
 (__LIBCCALL __LIBC_LOCAL_NAME(putspent))(struct spwd const *__restrict __ent, __FILE *__restrict __stream) __THROWS(...) {
 	__STDC_INT_AS_SSIZE_T __error;
-#if __SIZEOF_POINTER__ == 1
+#if __SIZEOF_POINTER__ <= 1
 #define __STR_LONGPTR_MAX  "127"
 #define __STR_ULONGPTR_MAX "255"
-#elif __SIZEOF_POINTER__ == 2
+#elif __SIZEOF_POINTER__ <= 2
 #define __STR_LONGPTR_MAX  "32767"
 #define __STR_ULONGPTR_MAX "65535"
-#elif __SIZEOF_POINTER__ == 4
+#elif __SIZEOF_POINTER__ <= 4
 #define __STR_LONGPTR_MAX  "2147483647"
 #define __STR_ULONGPTR_MAX "4294967295"
 #else /* ... */
@@ -144,8 +144,6 @@ __LOCAL_LIBC(putspent) __ATTR_IN(1) __ATTR_INOUT(2) int
 	if __unlikely(!__stream)
 		goto __err_inval;
 	if __unlikely(!__ent->sp_namp)
-		goto __err_inval;
-	if __unlikely(!__ent->sp_pwdp)
 		goto __err_inval;
 	if __unlikely(__ent->sp_min < 0)
 		goto __err_inval;
@@ -193,7 +191,7 @@ __LOCAL_LIBC(putspent) __ATTR_IN(1) __ATTR_INOUT(2) int
 	__error = (__NAMESPACE_LOCAL_SYM __localdep_fprintf_unlocked)(__stream,
 	                         "%s:%s:%s:%s:%s:%s:%s:%s:%s\n",
 	                         __ent->sp_namp,
-	                         __ent->sp_pwdp,
+	                         __ent->sp_pwdp ? __ent->sp_pwdp : "",
 	                         __ent_sp_lstchg,
 	                         __ent_sp_min,
 	                         __ent_sp_max,

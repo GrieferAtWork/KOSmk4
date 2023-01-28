@@ -130,13 +130,13 @@ struct spwd *sgetspent([[in]] char const *__restrict string) {
 int putspent([[in]] struct spwd const *__restrict ent,
              [[inout]] $FILE *__restrict stream) {
 	__STDC_INT_AS_SSIZE_T error;
-@@pp_if __SIZEOF_POINTER__ == 1@@
+@@pp_if __SIZEOF_POINTER__ <= 1@@
 #define STR_LONGPTR_MAX  "127"
 #define STR_ULONGPTR_MAX "255"
-@@pp_elif __SIZEOF_POINTER__ == 2@@
+@@pp_elif __SIZEOF_POINTER__ <= 2@@
 #define STR_LONGPTR_MAX  "32767"
 #define STR_ULONGPTR_MAX "65535"
-@@pp_elif __SIZEOF_POINTER__ == 4@@
+@@pp_elif __SIZEOF_POINTER__ <= 4@@
 #define STR_LONGPTR_MAX  "2147483647"
 #define STR_ULONGPTR_MAX "4294967295"
 @@pp_else@@
@@ -160,8 +160,6 @@ int putspent([[in]] struct spwd const *__restrict ent,
 	if unlikely(!stream)
 		goto err_inval;
 	if unlikely(!ent->@sp_namp@)
-		goto err_inval;
-	if unlikely(!ent->@sp_pwdp@)
 		goto err_inval;
 	if unlikely(ent->@sp_min@ < 0)
 		goto err_inval;
@@ -209,7 +207,7 @@ int putspent([[in]] struct spwd const *__restrict ent,
 	error = fprintf_unlocked(stream,
 	                         "%s:%s:%s:%s:%s:%s:%s:%s:%s\n",
 	                         ent->@sp_namp@,
-	                         ent->@sp_pwdp@,
+	                         ent->@sp_pwdp@ ? ent->@sp_pwdp@ : "",
 	                         ent_sp_lstchg,
 	                         ent_sp_min,
 	                         ent_sp_max,

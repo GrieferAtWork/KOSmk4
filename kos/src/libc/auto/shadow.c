@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ac35a9e */
+/* HASH CRC-32:0x9ab6e5bf */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,13 +54,13 @@ INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_IN(1) ATTR_INOUT(2) int
 (LIBCCALL libc_putspent)(struct spwd const *__restrict ent,
                          FILE *__restrict stream) THROWS(...) {
 	__STDC_INT_AS_SSIZE_T error;
-#if __SIZEOF_POINTER__ == 1
+#if __SIZEOF_POINTER__ <= 1
 #define STR_LONGPTR_MAX  "127"
 #define STR_ULONGPTR_MAX "255"
-#elif __SIZEOF_POINTER__ == 2
+#elif __SIZEOF_POINTER__ <= 2
 #define STR_LONGPTR_MAX  "32767"
 #define STR_ULONGPTR_MAX "65535"
-#elif __SIZEOF_POINTER__ == 4
+#elif __SIZEOF_POINTER__ <= 4
 #define STR_LONGPTR_MAX  "2147483647"
 #define STR_ULONGPTR_MAX "4294967295"
 #else /* ... */
@@ -84,8 +84,6 @@ INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_IN(1) ATTR_INOUT(2) int
 	if unlikely(!stream)
 		goto err_inval;
 	if unlikely(!ent->sp_namp)
-		goto err_inval;
-	if unlikely(!ent->sp_pwdp)
 		goto err_inval;
 	if unlikely(ent->sp_min < 0)
 		goto err_inval;
@@ -133,7 +131,7 @@ INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_IN(1) ATTR_INOUT(2) int
 	error = libc_fprintf_unlocked(stream,
 	                         "%s:%s:%s:%s:%s:%s:%s:%s:%s\n",
 	                         ent->sp_namp,
-	                         ent->sp_pwdp,
+	                         ent->sp_pwdp ? ent->sp_pwdp : "",
 	                         ent_sp_lstchg,
 	                         ent_sp_min,
 	                         ent_sp_max,
