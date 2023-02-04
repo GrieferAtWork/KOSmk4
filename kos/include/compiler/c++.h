@@ -101,6 +101,15 @@
 #define __CXX_NOEXCEPT_IFNX(expr) /* nothing */
 #endif /* !... */
 
+#if (__has_feature(cxx_override_control) || \
+     (defined(_MSC_VER) && _MSC_VER >= 1600) || \
+     (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GCC_VERSION_NUM >= 40700))
+#define __COMPILER_HAVE_CXX11_OVERRIDE
+#define __CXX_OVERRIDE override
+#else /* ... */
+#define __CXX_OVERRIDE /* nothing */
+#endif /* !... */
+
 #if !defined(__KOS__) || !defined(__KERNEL__)
 #define __COMPILER_PREFERR_ENUMS
 #endif /* !__KOS__ || !__KERNEL__ */

@@ -31,8 +31,6 @@
  *       types, as well as endian-restricted integers.
  */
 
-#include "intellisense-common.h"
-
 /* This  adds auto-completion for stuff like `#ifdef __INTELLISENSE__',
  * as VS only auto completes macros that are defined somewhere (luckily
  * even when only defined in "#if 0"-blocks) */
@@ -161,6 +159,8 @@ static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__, "WTF Intellisense?");
 #define __SEG_GS 1
 #endif /* __x86_64__ || __i386__ */
 
+
+#include "intellisense-common.h"
 
 #ifndef __cplusplus
 #define __builtin_choose_expr(c, tt, ff) ((c) ? (tt) : (ff))

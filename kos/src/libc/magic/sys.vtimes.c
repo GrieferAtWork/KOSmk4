@@ -73,9 +73,9 @@ int vtimes([[out_opt]] struct vtimes *current,
 		slot->@vm_idsrss@ = ru.@ru_idrss@ + ru.@ru_isrss@;
 		slot->@vm_majflt@ = ru.@ru_majflt@;
 		slot->@vm_minflt@ = ru.@ru_minflt@;
-		slot->@vm_nswap@ = ru.@ru_nswap@;
-		slot->@vm_inblk@ = ru.@ru_inblock@;
-		slot->@vm_oublk@ = ru.@ru_oublock@;
+		slot->@vm_nswap@  = ru.@ru_nswap@;
+		slot->@vm_inblk@  = ru.@ru_inblock@;
+		slot->@vm_oublk@  = ru.@ru_oublock@;
 	}
 	return result;
 }

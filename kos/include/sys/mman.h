@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74d2d5c5 */
+/* HASH CRC-32:0x64226d10 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -282,7 +282,7 @@
 
 
 /************************************************************************/
-/* Flags accepted by `msync()'.                                         */
+/* Flags accepted by `msync(2)'                                         */
 /************************************************************************/
 
 /* Perform the operation asynchronously. */
@@ -302,7 +302,7 @@
 
 
 /************************************************************************/
-/* Flags for 'mremap'.                                                  */
+/* Flags for `mremap(2)'                                                */
 /************************************************************************/
 #ifdef __USE_GNU
 /* Allowed to move to a different location */
@@ -354,7 +354,7 @@
 
 
 /************************************************************************/
-/* Advice to `madvise(2)'.                                              */
+/* Advice to `madvise(2)'                                               */
 /************************************************************************/
 #ifdef __USE_MISC
 /* ??? */
@@ -468,7 +468,7 @@
 
 
 /************************************************************************/
-/* Flags for `mlockall()'.                                              */
+/* Flags for `mlockall(2)'.                                             */
 /************************************************************************/
 
 /* ??? */
@@ -489,7 +489,7 @@
 
 
 /************************************************************************/
-/* Flags for `memfd_create()'                                           */
+/* Flags for `memfd_create(2)'                                          */
 /************************************************************************/
 
 /* Close-on-exec */
@@ -517,7 +517,7 @@
 
 
 /************************************************************************/
-/* Flags for `mlock2()'                                                 */
+/* Flags for `mlock2(2)'                                                */
 /************************************************************************/
 
 /* Delegate population of locked memory until the first access. */
@@ -528,7 +528,7 @@
 
 
 /************************************************************************/
-/* `ACCESS_RIGHTS' for `pkey_alloc()' and `pkey_set()'                  */
+/* `ACCESS_RIGHTS' for `pkey_alloc(2)' and `pkey_set(2)'                */
 /************************************************************************/
 
 /* ... */
@@ -573,7 +573,7 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 #if defined(__CRT_HAVE_mmap) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> mmap(2), mmap64(2)
  * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
- * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
+ * @param flags: One of `MAP_SHARED', 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
@@ -581,7 +581,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__NOTHROW_NCX,mmap,(void 
 #elif defined(__CRT_HAVE___mmap) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> mmap(2), mmap64(2)
  * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
- * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
+ * @param flags: One of `MAP_SHARED', 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
@@ -589,7 +589,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__NOTHROW_NCX,mmap,(void
 #elif defined(__CRT_HAVE_mmap64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> mmap(2), mmap64(2)
  * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
- * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
+ * @param flags: One of `MAP_SHARED', 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
@@ -598,7 +598,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__NOTHROW_NCX,mmap,(void
 #include <libc/local/sys.mman/mmap.h>
 /* >> mmap(2), mmap64(2)
  * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
- * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
+ * @param flags: One of `MAP_SHARED', 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
@@ -729,7 +729,7 @@ __CDECLARE_OPT(__ATTR_ACCESS_NONE(1),int,__NOTHROW_NCX,mincore,(void *__start, s
 #if defined(__CRT_HAVE_mmap) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> mmap(2), mmap64(2)
  * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
- * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
+ * @param flags: One of `MAP_SHARED', 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
@@ -737,7 +737,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__NOTHROW_NCX,mmap64,(vo
 #elif defined(__CRT_HAVE___mmap) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> mmap(2), mmap64(2)
  * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
- * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
+ * @param flags: One of `MAP_SHARED', 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
@@ -745,7 +745,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__NOTHROW_NCX,mmap64,(vo
 #elif defined(__CRT_HAVE_mmap64)
 /* >> mmap(2), mmap64(2)
  * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
- * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
+ * @param flags: One of `MAP_SHARED', 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
@@ -754,7 +754,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__NOTHROW_NCX,mmap64,(voi
 #include <libc/local/sys.mman/mmap64.h>
 /* >> mmap(2), mmap64(2)
  * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
- * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
+ * @param flags: One of `MAP_SHARED', 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
@@ -883,7 +883,7 @@ __SYSDECL_BEGIN
  * @param: flags:     Set of `FMAPFILE_*'
  * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
  * @return: -1: [errno=EINVAL]  The given `flags' contains invalid bits.
- * @return: -1: [errno=EINVAL]  `FMAPFILE_MAPSHARED'  as  set, an  mmap was
+ * @return: -1: [errno=EINVAL]  `FMAPFILE_MAPSHARED' was set,  an mmap  was
  *                              attempted, and `num_trailing_nulbytes != 0'
  * @return: -1: [errno=EPERM]   `fd' doesn't support read(2)ing
  * @return: -1: [errno=ENOMEM]  Out of memory
@@ -935,7 +935,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_OUT(1),int,__NOTHROW_NCX,fmapfile,(struct mapfi
  * @param: flags:     Set of `FMAPFILE_*'
  * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
  * @return: -1: [errno=EINVAL]  The given `flags' contains invalid bits.
- * @return: -1: [errno=EINVAL]  `FMAPFILE_MAPSHARED'  as  set, an  mmap was
+ * @return: -1: [errno=EINVAL]  `FMAPFILE_MAPSHARED' was set,  an mmap  was
  *                              attempted, and `num_trailing_nulbytes != 0'
  * @return: -1: [errno=EPERM]   `fd' doesn't support read(2)ing
  * @return: -1: [errno=ENOMEM]  Out of memory

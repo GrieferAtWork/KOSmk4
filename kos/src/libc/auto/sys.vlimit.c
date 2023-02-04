@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72c89b5a */
+/* HASH CRC-32:0x850c09c3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,7 +90,7 @@ NOTHROW_NCX(LIBCCALL libc_vlimit)(int resource,
 #endif /* !__LIM_TO_RLIMIT */
 	result = libc_getrlimit((__rlimit_resource_t)rlimit_resource, &rlim);
 	if likely(result == 0) {
-		rlim.rlim_cur = (__rlim_t)                     /* Cast to correct type. */
+		rlim.rlim_cur = (__rlim_t)                              /* Cast to correct type. */
 		                  (__CRT_PRIVATE_SINT(__SIZEOF_RLIM_T__)) /* Sign expansion... */
 		                  (int)value;
 		result = libc_setrlimit((__rlimit_resource_t)rlimit_resource, &rlim);

@@ -32,6 +32,7 @@
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
+#include <sched/timer.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
@@ -215,6 +216,7 @@ NOTHROW(LOCKOP_CC taskpid_remove_from_group_postlop)(Tobpostlockop(procgrp) *__r
 #else
 	decref_nokill(obj); /* nokill, because caller still got a reference. */
 #endif
+	_procctl_finicommon(ctl);
 	_procctl_free(ctl);
 	taskpid_remove_from_namespaces_and_free(me);
 }
@@ -278,6 +280,7 @@ NOTHROW(FCALL taskpid_destroy)(struct taskpid *__restrict self) {
 #else
 		decref(grp);
 #endif
+		_procctl_finicommon(ctl);
 		_procctl_free(ctl);
 	} else {
 		COMPILER_READ_BARRIER();

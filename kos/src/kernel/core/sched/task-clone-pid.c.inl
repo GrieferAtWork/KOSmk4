@@ -23,6 +23,8 @@
 //#define DEFINE_task_clone_procpid
 #endif /* __INTELLISENSE__ */
 
+#include <sched/timer.h>
+
 #include <kos/nopf.h>
 
 #if (defined(DEFINE_task_clone_thrdpid) + \
@@ -129,19 +131,6 @@ again_determine_parent:
 		RETHROW();
 	}
 
-	/* Allocate process information. */
-#ifndef CONFIG_NO_SMP
-	atomic_lock_init(&result_ctl->pc_thrds_lock);
-#endif /* !CONFIG_NO_SMP */
-	LIST_INIT(&result_ctl->pc_thrds_list);
-	atomic_rwlock_init(&result_ctl->pc_chlds_lock);
-	LIST_INIT(&result_ctl->pc_chlds_list);
-	sig_init(&result_ctl->pc_chld_changed);
-	atomic_rwlock_init(&result_ctl->pc_sig_lock);
-	SLIST_INIT(&result_ctl->pc_sig_list);
-	result_ctl->pc_sig_pend = 0;
-	sig_init(&result_ctl->pc_sig_more);
-
 	/* Select who should be the process's parent. */
 again_determine_parent:
 	if (clone_flags & CLONE_DETACHED) {
@@ -174,6 +163,21 @@ use_boottask_as_parent:
 			THROW(E_EXIT_THREAD, ATOMIC_READ(taskpid_getprocpid(caller_pid)->tp_status));
 		}
 	}
+
+	/* Initialize simple fields of the process controller. */
+#ifndef CONFIG_NO_SMP
+	atomic_lock_init(&result_ctl->pc_thrds_lock);
+#endif /* !CONFIG_NO_SMP */
+	LIST_INIT(&result_ctl->pc_thrds_list);
+	atomic_rwlock_init(&result_ctl->pc_chlds_lock);
+	LIST_INIT(&result_ctl->pc_chlds_list);
+	sig_init(&result_ctl->pc_chld_changed);
+	atomic_rwlock_init(&result_ctl->pc_sig_lock);
+	SLIST_INIT(&result_ctl->pc_sig_list);
+	result_ctl->pc_sig_pend = 0;
+	sig_init(&result_ctl->pc_sig_more);
+	_procctl_initcommon(result_ctl);
+
 	parent_pid = task_gettaskpid_of(parent_proc);
 	arref_init(&result_ctl->pc_parent, parent_proc); /* Inherit reference (upon success) */
 	result_pid->tp_proc = result_pid;                /* New process */
@@ -552,6 +556,7 @@ unlock_everything_and_do_load_userprocmask:
 #undef LOCAL_RELEASE_ALL_LOCKS
 	} EXCEPT {
 #ifdef LOCAL_IS_PROC
+		_procctl_finicommon(result_ctl);
 		_procctl_free(result_ctl);
 		decref_unlikely(result_pid->tp_ns);
 #endif /* LOCAL_IS_PROC */

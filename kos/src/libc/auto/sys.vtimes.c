@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf71183b4 */
+/* HASH CRC-32:0x505027de */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,9 +63,9 @@ NOTHROW_NCX(LIBCCALL libc_vtimes)(struct vtimes *current,
 		slot->vm_idsrss = ru.ru_idrss + ru.ru_isrss;
 		slot->vm_majflt = ru.ru_majflt;
 		slot->vm_minflt = ru.ru_minflt;
-		slot->vm_nswap = ru.ru_nswap;
-		slot->vm_inblk = ru.ru_inblock;
-		slot->vm_oublk = ru.ru_oublock;
+		slot->vm_nswap  = ru.ru_nswap;
+		slot->vm_inblk  = ru.ru_inblock;
+		slot->vm_oublk  = ru.ru_oublock;
 	}
 	return result;
 }

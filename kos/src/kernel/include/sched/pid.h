@@ -62,13 +62,13 @@ DECL_BEGIN
  * PID (or rather TID) data layout
  *
  * ```
- *           +------1..1---------+
- *           |                   v
- *       [taskpid] <--0..N--- [pidns] --+
- *        |    ^                 ^      |
- * weakref|    |                 |      | 0..1 (nested namespaces)
- *        |    | 1..1            +------+
- *        v    |
+ *           ┌──────1..1─────────┐
+ *           │                   v
+ *       [taskpid] <──0..N─── [pidns] ──┐
+ *        │    ^                 ^      │
+ * weakref│    │                 │      │ 0..1 (nested namespaces)
+ *        │    │ 1..1            └──────┘
+ *        v    │
  *        [task]
  * ```
  *

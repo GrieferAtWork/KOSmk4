@@ -265,6 +265,11 @@ template<> struct ____INTELLISENSE_issigned<long> { enum { __value = true }; };
 template<> struct ____INTELLISENSE_isunsigned<unsigned long> { enum { __value = true }; };
 template<> struct ____INTELLISENSE_issigned<long long> { enum { __value = true }; };
 template<> struct ____INTELLISENSE_isunsigned<unsigned long long> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isunsigned<wchar_t> { enum { __value = true }; };
+#if defined(_WCHAR_T_DEFINED) || defined(__GNUC__)
+template<> struct ____INTELLISENSE_isunsigned<char16_t> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isunsigned<char32_t> { enum { __value = true }; };
+#endif /* _WCHAR_T_DEFINED || __GNUC__ */
 template<> struct ____INTELLISENSE_isfloat<float> { enum { __value = true }; };
 template<> struct ____INTELLISENSE_isfloat<double> { enum { __value = true }; };
 template<> struct ____INTELLISENSE_isfloat<long double> { enum { __value = true }; };

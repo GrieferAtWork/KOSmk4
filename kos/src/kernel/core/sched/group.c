@@ -297,7 +297,7 @@ PUBLIC struct procctl boottask_procctl = {
 	.pc_sig_more  = SIG_INIT,
 	.pc_grp       = ARREF_INIT(&boottask_procgrp),
 	.pc_grpmember = { .le_next = NULL, .le_prev = &boottask_procgrp.pgr_memb_list.lh_first },
-
+	.pc_timers    = NULL,
 };
 
 

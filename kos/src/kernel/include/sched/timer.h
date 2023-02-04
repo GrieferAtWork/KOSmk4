@@ -23,6 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
+#include <sched/rpc-internal.h>
 
 #include <hybrid/__assert.h>
 #include <hybrid/sched/atomic-rwlock.h>
@@ -398,6 +399,41 @@ timerfd_waitfor(struct timerfd *__restrict self)
 		THROWS(E_WOULDBLOCK, ...);
 
 
+
+/************************************************************************/
+/* PROCESS TIMER CONTROL                                                */
+/************************************************************************/
+
+struct signal_timer {
+	struct pending_rpc_head st_rpc; /* RPC scheduled for the process when the timer expires.
+	                                 * We set the `_RPC_CONTEXT_DONTFREE' flag so it can  be
+	                                 * re-used all the time. */
+};
+
+struct proctimerctl {
+	/* TODO: Default timers (for `getitimer(2)') */
+	/* TODO: Dynamically allocated timers (from `timer_create(2)') */
+	int placeholder;
+};
+
+#define _proctimerctl_alloc()      ((struct proctimerctl *)kmalloc(sizeof(struct proctimerctl), GFP_NORMAL))
+#define _proctimerctl_free(self)   kfree(self)
+#define proctimerctl_destroy(self) _proctimerctl_free(self)
+
+struct procctl;
+
+/* Get or (lazily) allocate the process timer controller of `self' */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct proctimerctl *FCALL
+procctl_reqtimerctl(struct procctl *__restrict self) THROWS(E_BADALLOC);
+
+/* Get the process timer controller of `self', returning `NULL' if not yet allocated. */
+#ifdef __INTELLISENSE__
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct proctimerctl *
+NOTHROW(FCALL procctl_gettimerctl)(struct procctl *__restrict self);
+#else /* __INTELLISENSE__ */
+#define procctl_gettimerctl(self) \
+	__hybrid_atomic_load((self)->pc_timers, __ATOMIC_ACQUIRE)
+#endif /* !__INTELLISENSE__ */
 
 
 DECL_END

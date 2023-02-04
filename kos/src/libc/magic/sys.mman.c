@@ -289,7 +289,7 @@
 
 
 /************************************************************************/
-/* Flags accepted by `msync()'.                                         */
+/* Flags accepted by `msync(2)'                                         */
 /************************************************************************/
 
 /* Perform the operation asynchronously. */
@@ -309,7 +309,7 @@
 
 
 /************************************************************************/
-/* Flags for 'mremap'.                                                  */
+/* Flags for `mremap(2)'                                                */
 /************************************************************************/
 #ifdef __USE_GNU
 /* Allowed to move to a different location */
@@ -361,7 +361,7 @@
 
 
 /************************************************************************/
-/* Advice to `madvise(2)'.                                              */
+/* Advice to `madvise(2)'                                               */
 /************************************************************************/
 #ifdef __USE_MISC
 /* ??? */
@@ -475,7 +475,7 @@
 
 
 /************************************************************************/
-/* Flags for `mlockall()'.                                              */
+/* Flags for `mlockall(2)'.                                             */
 /************************************************************************/
 
 /* ??? */
@@ -496,7 +496,7 @@
 
 
 /************************************************************************/
-/* Flags for `memfd_create()'                                           */
+/* Flags for `memfd_create(2)'                                          */
 /************************************************************************/
 
 /* Close-on-exec */
@@ -524,7 +524,7 @@
 
 
 /************************************************************************/
-/* Flags for `mlock2()'                                                 */
+/* Flags for `mlock2(2)'                                                */
 /************************************************************************/
 
 /* Delegate population of locked memory until the first access. */
@@ -535,7 +535,7 @@
 
 
 /************************************************************************/
-/* `ACCESS_RIGHTS' for `pkey_alloc()' and `pkey_set()'                  */
+/* `ACCESS_RIGHTS' for `pkey_alloc(2)' and `pkey_set(2)'                */
 /************************************************************************/
 
 /* ... */
@@ -670,7 +670,7 @@ void *mmap32([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 
 @@>> mmap(2), mmap64(2)
 @@@param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
-@@@param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
+@@@param flags: One of `MAP_SHARED', 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
 @@              with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
 @@              MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
 @@              MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
@@ -1011,7 +1011,7 @@ int pkey_mprotect([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T 
 @@@param: flags:     Set of `FMAPFILE_*'
 @@@return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
 @@@return: -1: [errno=EINVAL]  The given `flags' contains invalid bits.
-@@@return: -1: [errno=EINVAL]  `FMAPFILE_MAPSHARED'  as  set, an  mmap was
+@@@return: -1: [errno=EINVAL]  `FMAPFILE_MAPSHARED' was set,  an mmap  was
 @@                             attempted, and `num_trailing_nulbytes != 0'
 @@@return: -1: [errno=EPERM]   `fd' doesn't support read(2)ing
 @@@return: -1: [errno=ENOMEM]  Out of memory

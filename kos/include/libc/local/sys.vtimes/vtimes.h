@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe8515e9 */
+/* HASH CRC-32:0xb30736c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,9 +75,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vtimes))(struct vtimes *__current, st
 		__slot->vm_idsrss = __ru.ru_idrss + __ru.ru_isrss;
 		__slot->vm_majflt = __ru.ru_majflt;
 		__slot->vm_minflt = __ru.ru_minflt;
-		__slot->vm_nswap = __ru.ru_nswap;
-		__slot->vm_inblk = __ru.ru_inblock;
-		__slot->vm_oublk = __ru.ru_oublock;
+		__slot->vm_nswap  = __ru.ru_nswap;
+		__slot->vm_inblk  = __ru.ru_inblock;
+		__slot->vm_oublk  = __ru.ru_oublock;
 	}
 	return __result;
 }

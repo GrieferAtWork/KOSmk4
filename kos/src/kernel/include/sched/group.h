@@ -345,6 +345,7 @@ NOTHROW(FCALL procgrp_orphaned)(struct procgrp const *__restrict self);
 ARREF(procgrp_arref, procgrp);
 #endif /* !__procgrp_arref_defined */
 
+struct proctimerctl;
 struct procctl {
 #ifndef CONFIG_NO_SMP
 	struct atomic_lock       pc_thrds_lock;   /* SMP-lock for `pc_thrds_list' (needs to be
@@ -413,6 +414,7 @@ struct procctl {
 	                                           *                                 NEW->pgr_memb_lock))]
 	                                           * Process group controller. */
 	LIST_ENTRY(taskpid)      pc_grpmember;    /* [1..1][lock(pc_grp->pgr_memb_lock)] Process group member link. */
+	struct proctimerctl     *pc_timers;       /* [0..1][lock(WRITE_OCNE)] Process timer controller (s.a. `<sched/timer.h>') */
 };
 
 /* Enumerate threads (other than the main thread) of `self' */
@@ -428,6 +430,12 @@ struct procctl {
 /* Allocate/Free a `struct procctl' */
 #define _procctl_alloc()    ((struct procctl *)kmalloc(sizeof(struct procctl), GFP_NORMAL))
 #define _procctl_free(self) kfree(self)
+
+/* Helpers for init/fini of extended context fields in `struct procctl'. */
+#define _procctl_initcommon(self) \
+	(void)((self)->pc_timers = __NULLPTR)
+#define _procctl_finicommon(self) \
+	((self)->pc_timers ? proctimerctl_destroy((self)->pc_timers) : (void)0)
 
 /* Helper macros for working with `struct procgrp::pc_thrds_lock' */
 #ifndef CONFIG_NO_SMP

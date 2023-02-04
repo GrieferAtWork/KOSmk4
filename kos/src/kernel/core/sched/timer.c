@@ -33,6 +33,7 @@
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/async.h>
+#include <sched/group.h>
 #include <sched/rpc.h>
 #include <sched/sig.h>
 #include <sched/task.h>
@@ -877,6 +878,43 @@ handle_timerfd_polltest(struct timerfd *__restrict self,
 
 
 
+/************************************************************************/
+/* PROCESS TIMER CONTROL                                                */
+/************************************************************************/
+
+PRIVATE ATTR_RETNONNULL WUNUSED struct proctimerctl *FCALL
+proctimerctl_new(void) THROWS(E_BADALLOC) {
+	struct proctimerctl *result;
+	result = _proctimerctl_alloc();
+	/* TODO: init */
+	return result;
+}
+
+/* Get or (lazily) allocate the process timer controller of `self' */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct proctimerctl *FCALL
+procctl_reqtimerctl(struct procctl *__restrict self) THROWS(E_BADALLOC) {
+	struct proctimerctl *result;
+	result = procctl_gettimerctl(self);
+	if (result == NULL) {
+		result = proctimerctl_new();
+		if unlikely(!ATOMIC_CMPXCH(self->pc_timers, NULL, result)) {
+			proctimerctl_destroy(result);
+			result = procctl_gettimerctl(self);
+			assert(result != NULL);
+		}
+	}
+	return result;
+}
+
+
+
+
+
+
+/************************************************************************/
+/* SYSTEM CALLS                                                         */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_TIMERFD_CREATE
 DEFINE_SYSCALL2(fd_t, timerfd_create,
                 clockid_t, clock_id, syscall_ulong_t, flags) {
 	iomode_t mode;
@@ -903,6 +941,7 @@ DEFINE_SYSCALL2(fd_t, timerfd_create,
 	handles_install_commit_inherit(&install, tfd, mode);
 	return result;
 }
+#endif /* __ARCH_WANT_SYSCALL_TIMERFD_CREATE */
 
 #ifdef __ARCH_WANT_SYSCALL_TIMERFD_SETTIME
 DEFINE_SYSCALL4(errno_t, timerfd_settime,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf50bbc8 */
+/* HASH CRC-32:0xb6614e45 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -203,7 +203,7 @@ badkey:
  * @param: flags:     Set of `FMAPFILE_*'
  * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
  * @return: -1: [errno=EINVAL]  The given `flags' contains invalid bits.
- * @return: -1: [errno=EINVAL]  `FMAPFILE_MAPSHARED'  as  set, an  mmap was
+ * @return: -1: [errno=EINVAL]  `FMAPFILE_MAPSHARED' was set,  an mmap  was
  *                              attempted, and `num_trailing_nulbytes != 0'
  * @return: -1: [errno=EPERM]   `fd' doesn't support read(2)ing
  * @return: -1: [errno=ENOMEM]  Out of memory
