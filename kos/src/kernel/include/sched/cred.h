@@ -423,43 +423,43 @@ require(syscall_slong_t capno)
 
 /* Get the calling thread's real user ID */
 EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED, uid_t, NOTHROW, FCALL, cred_getruid, (void), {
-	return __hybrid_atomic_load(THIS_CRED->c_ruid, __ATOMIC_ACQUIRE);
+	return __hybrid_atomic_load(&THIS_CRED->c_ruid, __ATOMIC_ACQUIRE);
 })
 
 /* Get the calling thread's real group ID */
 EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED, gid_t, NOTHROW, FCALL, cred_getrgid, (void), {
-	return __hybrid_atomic_load(THIS_CRED->c_rgid, __ATOMIC_ACQUIRE);
+	return __hybrid_atomic_load(&THIS_CRED->c_rgid, __ATOMIC_ACQUIRE);
 })
 
 /* Get the calling thread's effective user ID */
 EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED, uid_t, NOTHROW, FCALL, cred_geteuid, (void), {
-	return __hybrid_atomic_load(THIS_CRED->c_euid, __ATOMIC_ACQUIRE);
+	return __hybrid_atomic_load(&THIS_CRED->c_euid, __ATOMIC_ACQUIRE);
 })
 
 /* Get the calling thread's effective group ID */
 EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED, gid_t, NOTHROW, FCALL, cred_getegid, (void), {
-	return __hybrid_atomic_load(THIS_CRED->c_egid, __ATOMIC_ACQUIRE);
+	return __hybrid_atomic_load(&THIS_CRED->c_egid, __ATOMIC_ACQUIRE);
 })
 
 
 /* Get the calling thread's saved user ID */
 EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED, uid_t, NOTHROW, FCALL, cred_getsuid, (void), {
-	return __hybrid_atomic_load(THIS_CRED->c_suid, __ATOMIC_ACQUIRE);
+	return __hybrid_atomic_load(&THIS_CRED->c_suid, __ATOMIC_ACQUIRE);
 })
 
 /* Get the calling thread's saved group ID */
 EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED, gid_t, NOTHROW, FCALL, cred_getsgid, (void), {
-	return __hybrid_atomic_load(THIS_CRED->c_sgid, __ATOMIC_ACQUIRE);
+	return __hybrid_atomic_load(&THIS_CRED->c_sgid, __ATOMIC_ACQUIRE);
 })
 
 /* Get the calling thread's filesystem user ID */
 EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED, uid_t, NOTHROW, FCALL, cred_getfsuid, (void), {
-	return __hybrid_atomic_load(THIS_CRED->c_fsuid, __ATOMIC_ACQUIRE);
+	return __hybrid_atomic_load(&THIS_CRED->c_fsuid, __ATOMIC_ACQUIRE);
 })
 
 /* Get the calling thread's filesystem group ID */
 EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED, gid_t, NOTHROW, FCALL, cred_getfsgid, (void), {
-	return __hybrid_atomic_load(THIS_CRED->c_fsgid, __ATOMIC_ACQUIRE);
+	return __hybrid_atomic_load(&THIS_CRED->c_fsgid, __ATOMIC_ACQUIRE);
 })
 
 /* Set user IDs. IDs that should not be set may be passed as `(uid_t)-1'.
@@ -490,7 +490,7 @@ EIDECLARE(NOBLOCK ATTR_PURE WUNUSED, __BOOL, NOTHROW, FCALL,
 	REF struct cred_groups *groups;
 
 	/* Check for simple case: `gid' is the actual, current filesystem group ID */
-	if (__hybrid_atomic_load(self->c_fsgid, __ATOMIC_ACQUIRE) == gid)
+	if (__hybrid_atomic_load(&self->c_fsgid, __ATOMIC_ACQUIRE) == gid)
 		return 1;
 
 	/* Check supplementary groups. */

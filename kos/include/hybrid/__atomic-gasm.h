@@ -34,68 +34,68 @@
 
 /* Atomic base implementation using GCC inline assembly. */
 
-__DECL_BEGIN
-
-#if defined(__x86_64__)
-#define __impl_hybrid_atomic_cmpxch_val_seqcst(x, oldv, newv)  \
+#if defined(__x86_64__) || defined(__i386__)
+#define __hybrid_atomic_cmpxch_val8(x, oldval, newval, order) \
+	__hybrid_atomic_cmpxch_val8_seq_cst(x, oldval, newval)
+#define __hybrid_atomic_cmpxch_val8_seq_cst(x, oldval, newval) \
 	__XBLOCK({                                                 \
-		register __typeof__(x) __ix_res;                       \
-		if __untraced(sizeof(__ix_res) == 1) {                 \
-			__asm__ __volatile__("lock; cmpxchgb %2, %0\n"     \
-			                     : "+g" (x), "=a" (__ix_res)   \
-			                     : "r" (newv), "1" (oldv)      \
-			                     : "memory");                  \
-		} else if __untraced(sizeof(__ix_res) == 2) {          \
-			__asm__ __volatile__("lock; cmpxchgw %2, %0\n"     \
-			                     : "+g" (x), "=a" (__ix_res)   \
-			                     : "r" (newv), "1" (oldv)      \
-			                     : "memory");                  \
-		} else if __untraced(sizeof(__ix_res) == 4) {          \
-			__asm__ __volatile__("lock; cmpxchgl %2, %0\n"     \
-			                     : "+g" (x), "=a" (__ix_res)   \
-			                     : "r" (newv), "1" (oldv)      \
-			                     : "memory");                  \
-		} else {                                               \
-			__asm__ __volatile__("lock; cmpxchgq %2, %0\n"     \
-			                     : "+g" (x), "=a" (__ix_res)   \
-			                     : "r" (newv), "1" (oldv)      \
-			                     : "memory");                  \
-		}                                                      \
-		__XRETURN __ix_res;                                    \
+		register __UINT8_TYPE__ __hacx8_res;                   \
+		__asm__ __volatile__("lock; cmpxchgb %2, %0\n"         \
+		                     : "+m" (*(x)), "=a" (__hacx8_res) \
+		                     : "r" (newval), "1" (oldval)      \
+		                     : "memory", "cc");                \
+		__XRETURN __hacx8_res;                                 \
 	})
-#elif defined(__i386__)
-#define __impl_hybrid_atomic_cmpxch_val_seqcst(x, oldv, newv)                             \
-	__XBLOCK({                                                                            \
-		register __typeof__(x) __ix_res;                                                  \
-		if __untraced(sizeof(__ix_res) == 1) {                                            \
-			__asm__ __volatile__("lock; cmpxchgb %2, %0\n"                                \
-			                     : "+g" (x), "=a" (__ix_res)                              \
-			                     : "r" (newv), "1" (oldv)                                 \
-			                     : "memory");                                             \
-		} else if __untraced(sizeof(__ix_res) == 2) {                                     \
-			__asm__ __volatile__("lock; cmpxchgw %2, %0\n"                                \
-			                     : "+g" (x), "=a" (__ix_res)                              \
-			                     : "r" (newv), "1" (oldv)                                 \
-			                     : "memory");                                             \
-		} else if __untraced(sizeof(__ix_res) == 4) {                                     \
-			__asm__ __volatile__("lock; cmpxchgl %2, %0\n"                                \
-			                     : "+g" (x), "=a" (__ix_res)                              \
-			                     : "r" (newv), "1" (oldv)                                 \
-			                     : "memory");                                             \
-		} else {                                                                          \
-			__asm__ __volatile__("lock; cmpxchg8b %0\n"                                   \
-			                     : "+m" (x), "=A" (__ix_res)                              \
-			                     : "A" (oldv)                                             \
-			                     , "c" ((__UINT32_TYPE__)((__UINT64_TYPE__)(newv) >> 32)) \
-			                     , "b" ((__UINT32_TYPE__)(__UINT64_TYPE__)(newv))         \
-			                     : "memory");                                             \
-		}                                                                                 \
-		__XRETURN __ix_res;                                                               \
+#define __hybrid_atomic_cmpxch_val16(x, oldval, newval, order) \
+	__hybrid_atomic_cmpxch_val16_seq_cst(x, oldval, newval)
+#define __hybrid_atomic_cmpxch_val16_seq_cst(x, oldval, newval) \
+	__XBLOCK({                                                  \
+		register __UINT16_TYPE__ __hacx16_res;                  \
+		__asm__ __volatile__("lock; cmpxchgw %2, %0\n"          \
+		                     : "+m" (*(x)), "=a" (__hacx16_res) \
+		                     : "r" (newval), "1" (oldval)       \
+		                     : "memory", "cc");                 \
+		__XRETURN __hacx16_res;                                 \
 	})
-#else
+#define __hybrid_atomic_cmpxch_val32(x, oldval, newval, order) \
+	__hybrid_atomic_cmpxch_val32_seq_cst(x, oldval, newval)
+#define __hybrid_atomic_cmpxch_val32_seq_cst(x, oldval, newval) \
+	__XBLOCK({                                                  \
+		register __UINT32_TYPE__ __hacx32_res;                  \
+		__asm__ __volatile__("lock; cmpxchgl %2, %0\n"          \
+		                     : "+m" (*(x)), "=a" (__hacx32_res) \
+		                     : "r" (newval), "1" (oldval)       \
+		                     : "memory", "cc");                 \
+		__XRETURN __hacx32_res;                                 \
+	})
+#define __hybrid_atomic_cmpxch_val64(x, oldval, newval, order) \
+	__hybrid_atomic_cmpxch_val64_seq_cst(x, oldval, newval)
+#ifdef __x86_64__
+#define __hybrid_atomic_cmpxch_val64_seq_cst(x, oldval, newval) \
+	__XBLOCK({                                                  \
+		register __UINT64_TYPE__ __hacx64_res;                  \
+		__asm__ __volatile__("lock; cmpxchgq %2, %0\n"          \
+		                     : "+m" (*(x)), "=a" (__hacx64_res) \
+		                     : "r" (newval), "1" (oldval)       \
+		                     : "memory", "cc");                 \
+		__XRETURN __hacx64_res;                                 \
+	})
+#else /* __x86_64__ */
+#define __hybrid_atomic_cmpxch_val64_seq_cst(x, oldval, newval)                            \
+	__XBLOCK({                                                                             \
+		register __UINT64_TYPE__ __hacx64_res;                                             \
+		register __UINT64_TYPE__ __hacx64_nv = (newval);                                   \
+		__asm__ __volatile__("lock; cmpxchg8b %0\n"                                        \
+		                     : "+m" (x), "=A" (__hacx64_res)                               \
+		                     : "A" (oldval)                                                \
+		                     , "c" ((__UINT32_TYPE__)((__UINT64_TYPE__)__hacx64_nv >> 32)) \
+		                     , "b" ((__UINT32_TYPE__)(__UINT64_TYPE__)__hacx64_nv)         \
+		                     : "memory", "cc");                                            \
+		__XRETURN __hacx64_res;                                                            \
+	})
+#endif /* !__x86_64__ */
+#else /* ... */
 #error "Unsupported Architecture"
-#endif
-
-__DECL_END
+#endif /* !... */
 
 #endif /* !__GUARD_HYBRID___ATOMIC_MSVC_H */

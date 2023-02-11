@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa286c5b1 */
+/* HASH CRC-32:0xc251d529 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __again:
 	/* NOTE: If there suddenly were more than UINT_MAX threads trying to acquire the same
 	 *       lock  all at the same time, this could overflow. -- But I think that's not a
 	 *       thing that could ever happen... */
-	while ((__lockword = __hybrid_atomic_fetchinc(__self->sl_lock, __ATOMIC_ACQUIRE)) != 0) {
+	while ((__lockword = __hybrid_atomic_fetchinc(&__self->sl_lock, __ATOMIC_ACQUIRE)) != 0) {
 		if __unlikely(__lockword != 1) {
 			/* This can happen if multiple threads try to acquire the lock at the same time.
 			 * In  this case, we must normalize the  lock-word back to `state = 2', but only
@@ -42,9 +42,9 @@ __again:
 			 * This code right here is also carefully written such that it always does
 			 * the  right thing, no  matter how many  threads execute it concurrently. */
 			++__lockword;
-			while (!__hybrid_atomic_cmpxch(__self->sl_lock, __lockword, 2,
+			while (!__hybrid_atomic_cmpxch(&__self->sl_lock, __lockword, 2,
 			                               __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
-				__lockword = __hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE);
+				__lockword = __hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE);
 				if __unlikely(__lockword == 0)
 					goto __again; /* Lock suddenly become available */
 				if __unlikely(__lockword == 2)

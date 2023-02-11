@@ -98,9 +98,9 @@ struct video_font {
 
 #define video_font_destroy(self) (*(self)->vf_ops->vfo_destroy)(self)
 #define video_font_incref(self) \
-	__hybrid_atomic_inc((self)->vf_refcnt, __ATOMIC_SEQ_CST)
-#define video_font_decref(self)                                             \
-	(void)(__hybrid_atomic_decfetch((self)->vf_refcnt, __ATOMIC_SEQ_CST) || \
+	__hybrid_atomic_inc(&(self)->vf_refcnt, __ATOMIC_SEQ_CST)
+#define video_font_decref(self)                                              \
+	(void)(__hybrid_atomic_decfetch(&(self)->vf_refcnt, __ATOMIC_SEQ_CST) || \
 	       (video_font_destroy(self), 0))
 __DEFINE_REFCNT_FUNCTIONS(struct video_font, vf_refcnt, video_font_destroy)
 

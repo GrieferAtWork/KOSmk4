@@ -128,11 +128,11 @@ rpc_syscall_info_get32_sysenter_icpustate(struct rpc_syscall_info *__restrict se
 		USER u32 *ebp;
 		ebp = (USER u32 *)(uintptr_t)(u32)gpregs_getpbp(&state->ics_gpregs);
 		validate_readable(ebp, 4);
-		self->rsi_regs[4] = __hybrid_atomic_load(ebp[0], __ATOMIC_ACQUIRE);
+		self->rsi_regs[4] = __hybrid_atomic_load(&ebp[0], __ATOMIC_ACQUIRE);
 		self->rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(4);
 		if (regcount >= 6) {
 			self->rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(5);
-			self->rsi_regs[5] = __hybrid_atomic_load(ebp[1], __ATOMIC_ACQUIRE);
+			self->rsi_regs[5] = __hybrid_atomic_load(&ebp[1], __ATOMIC_ACQUIRE);
 		}
 	}
 }
@@ -160,11 +160,11 @@ NOTHROW(FCALL rpc_syscall_info_get32_sysenter_ucpustate_nx)(struct rpc_syscall_i
 #ifndef __INTELLISENSE__
 		if (ADDR_ISUSER(ebp)) {
 			NESTED_TRY {
-				self->rsi_regs[4] = __hybrid_atomic_load(ebp[0], __ATOMIC_ACQUIRE);
+				self->rsi_regs[4] = __hybrid_atomic_load(&ebp[0], __ATOMIC_ACQUIRE);
 				self->rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(4);
 				if (regcount >= 6) {
 					self->rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(5);
-					self->rsi_regs[5] = __hybrid_atomic_load(ebp[1], __ATOMIC_ACQUIRE);
+					self->rsi_regs[5] = __hybrid_atomic_load(&ebp[1], __ATOMIC_ACQUIRE);
 				}
 			} EXCEPT {
 				except_class_t cls = except_class();
@@ -193,7 +193,7 @@ rpc_syscall_info_get32_cdecl_icpustate(struct rpc_syscall_info *__restrict self,
 		esp = (USER u32 *)(uintptr_t)(u32)icpustate_getuserpsp(state);
 		validate_readable(esp, (size_t)regcount * 4);
 		for (i = 0; i < regcount; ++i) {
-			self->rsi_regs[i] = __hybrid_atomic_load(esp[i], __ATOMIC_ACQUIRE);
+			self->rsi_regs[i] = __hybrid_atomic_load(&esp[i], __ATOMIC_ACQUIRE);
 			self->rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(i);
 		}
 	}
@@ -233,7 +233,7 @@ NOTHROW(FCALL rpc_syscall_info_get32_lcall7_ucpustate_nx)(struct rpc_syscall_inf
 			NESTED_TRY {
 				unsigned int i;
 				for (i = 0; i < argc; ++i) {
-					self->rsi_regs[i] = __hybrid_atomic_load(sp[i], __ATOMIC_ACQUIRE);
+					self->rsi_regs[i] = __hybrid_atomic_load(&sp[i], __ATOMIC_ACQUIRE);
 					self->rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(i);
 				}
 			} EXCEPT {

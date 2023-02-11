@@ -266,7 +266,7 @@ struct handrange {
 /* Check if reallocation of `self' is currently allowed.
  * The caller  must be  holding  a lock  to  `:hm_lock'! */
 #define handrange_canrealloc(self) \
-	(__hybrid_atomic_load((self)->hr_nlops, __ATOMIC_ACQUIRE) == 0)
+	(__hybrid_atomic_load(&(self)->hr_nlops, __ATOMIC_ACQUIRE) == 0)
 
 /* Return the # of handles contained in this handle-range's range. */
 #define handrange_count(self) \
@@ -288,32 +288,32 @@ struct handrange {
 	(((self)->hr_hand[relative_fd].mh_hand.h_mode & IO_CLOEXEC)          \
 	 ? (void)0                                                           \
 	 : (void)((self)->hr_hand[relative_fd].mh_hand.h_mode |= IO_CLOEXEC, \
-	          __hybrid_atomic_inc((self)->hr_cexec, __ATOMIC_SEQ_CST)))
+	          __hybrid_atomic_inc(&(self)->hr_cexec, __ATOMIC_SEQ_CST)))
 #define handrange_cl_cloexec(self, relative_fd)                           \
 	(((self)->hr_hand[relative_fd].mh_hand.h_mode & IO_CLOEXEC)           \
 	 ? (void)((self)->hr_hand[relative_fd].mh_hand.h_mode &= ~IO_CLOEXEC, \
-	          __hybrid_atomic_dec((self)->hr_cexec, __ATOMIC_SEQ_CST))    \
+	          __hybrid_atomic_dec(&(self)->hr_cexec, __ATOMIC_SEQ_CST))   \
 	 : (void)0)
 #define handrange_xl_cloexec(self, relative_fd)                 \
 	((self)->hr_hand[relative_fd].mh_hand.h_mode ^= IO_CLOEXEC, \
 	 ((self)->hr_hand[relative_fd].mh_hand.h_mode & IO_CLOEXEC) \
-	 ? __hybrid_atomic_inc((self)->hr_cexec, __ATOMIC_SEQ_CST)  \
-	 : __hybrid_atomic_dec((self)->hr_cexec, __ATOMIC_SEQ_CST))
+	 ? __hybrid_atomic_inc(&(self)->hr_cexec, __ATOMIC_SEQ_CST) \
+	 : __hybrid_atomic_dec(&(self)->hr_cexec, __ATOMIC_SEQ_CST))
 #define handrange_st_clofork(self, relative_fd)                          \
 	(((self)->hr_hand[relative_fd].mh_hand.h_mode & IO_CLOFORK)          \
 	 ? (void)0                                                           \
 	 : (void)((self)->hr_hand[relative_fd].mh_hand.h_mode |= IO_CLOFORK, \
-	          __hybrid_atomic_inc((self)->hr_cfork, __ATOMIC_SEQ_CST)))
+	          __hybrid_atomic_inc(&(self)->hr_cfork, __ATOMIC_SEQ_CST)))
 #define handrange_cl_clofork(self, relative_fd)                           \
 	(((self)->hr_hand[relative_fd].mh_hand.h_mode & IO_CLOFORK)           \
 	 ? (void)((self)->hr_hand[relative_fd].mh_hand.h_mode &= ~IO_CLOFORK, \
-	          __hybrid_atomic_dec((self)->hr_cfork, __ATOMIC_SEQ_CST))    \
+	          __hybrid_atomic_dec(&(self)->hr_cfork, __ATOMIC_SEQ_CST))   \
 	 : (void)0)
 #define handrange_xl_clofork(self, relative_fd)                 \
 	((self)->hr_hand[relative_fd].mh_hand.h_mode ^= IO_CLOFORK, \
 	 ((self)->hr_hand[relative_fd].mh_hand.h_mode & IO_CLOFORK) \
-	 ? __hybrid_atomic_inc((self)->hr_cfork, __ATOMIC_SEQ_CST)  \
-	 : __hybrid_atomic_dec((self)->hr_cfork, __ATOMIC_SEQ_CST))
+	 ? __hybrid_atomic_inc(&(self)->hr_cfork, __ATOMIC_SEQ_CST) \
+	 : __hybrid_atomic_dec(&(self)->hr_cfork, __ATOMIC_SEQ_CST))
 #define handrange_setcloexec(self, relative_fd, new_cloexec_flag)                     \
 	(((self)->hr_hand[relative_fd].mh_hand.h_mode & IO_CLOEXEC) == (new_cloexec_flag) \
 	 ? (void)0                                                                        \
@@ -359,40 +359,40 @@ struct handrange {
  *    purpose what-so-ever, but the primary  consumer is `dup2()', which  blocks
  *    if  the target handle is used by a  LOP handle (meaning that us changing a
  *    LOP handle to a regular handle have to wake such a consumer) */
-#define _handslot_commit_inherit(man, range, self, data, mode, type)      \
-	(__hybrid_atomic_store((self)->_mh_words[0], data, __ATOMIC_RELEASE), \
+#define _handslot_commit_inherit(man, range, self, data, mode, type)       \
+	(__hybrid_atomic_store(&(self)->_mh_words[0], data, __ATOMIC_RELEASE), \
 	 _handslot_commit_inherit_with_preset_data(man, range, self, mode, type))
-#define _handslot_commit_inherit_with_preset_data(man, range, self, mode, type)                              \
-	(__hybrid_assert((self)->mh_hand.h_type == _MANHANDLE_LOADMARKER),                                       \
-	 ((mode)&IO_CLOEXEC) ? (void)__hybrid_atomic_inc((range)->hr_cexec, __ATOMIC_RELEASE) : (void)0,         \
-	 ((mode)&IO_CLOFORK) ? (void)__hybrid_atomic_inc((range)->hr_cfork, __ATOMIC_RELEASE) : (void)0,         \
-	 __hybrid_atomic_store((self)->_mh_words[1], _handslot_private_makeword2(mode, type), __ATOMIC_SEQ_CST), \
-	 handrange_dec_nlops_and_maybe_rejoin(range, man, 0),                                                    \
+#define _handslot_commit_inherit_with_preset_data(man, range, self, mode, type)                               \
+	(__hybrid_assert((self)->mh_hand.h_type == _MANHANDLE_LOADMARKER),                                        \
+	 ((mode)&IO_CLOEXEC) ? (void)__hybrid_atomic_inc(&(range)->hr_cexec, __ATOMIC_RELEASE) : (void)0,         \
+	 ((mode)&IO_CLOFORK) ? (void)__hybrid_atomic_inc(&(range)->hr_cfork, __ATOMIC_RELEASE) : (void)0,         \
+	 __hybrid_atomic_store(&(self)->_mh_words[1], _handslot_private_makeword2(mode, type), __ATOMIC_SEQ_CST), \
+	 handrange_dec_nlops_and_maybe_rejoin(range, man, 0),                                                     \
 	 sig_broadcast(&(man)->hm_changed))
 
 /* Similar to `_handslot_commit()', but rather than commit handles,
  * this  one is used to mark pre-allocated handles as unused. (such
  * as due to a failure at creating the kernel object the handle was
  * supposed to point to) */
-#define _handslot_rollback(man, range, self)                                                \
-	do {                                                                                    \
-		unsigned int _mha_ohint, _mha_nhint;                                                \
-		__hybrid_assert((self)->mh_hand.h_type == _MANHANDLE_LOADMARKER);                   \
-		/*__hybrid_atomic_store((self)->_mh_words[0], INVALID_POINTER, __ATOMIC_RELEASE);*/ \
-		__hybrid_atomic_store((self)->_mh_words[1],                                         \
-		                      _handslot_private_makeword2(0, HANDLE_TYPE_UNDEFINED),        \
-		                      __ATOMIC_SEQ_CST);                                            \
-		_mha_nhint = (unsigned int)(size_t)((self) - (range)->hr_hand);                     \
-		/* Update `hr_nhint' to reflect our slot having become free. */                     \
-		do {                                                                                \
-			_mha_ohint = __hybrid_atomic_load((range)->hr_nhint, __ATOMIC_ACQUIRE);         \
-			if (_mha_ohint <= _mha_nhint)                                                   \
-				break; /* Only ever lower the hint; never raise it! */                      \
-		} while (!__hybrid_atomic_cmpxch_weak((range)->hr_nhint, _mha_ohint, _mha_nhint,    \
-		                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));         \
-		__hybrid_atomic_dec((man)->hm_handles, __ATOMIC_SEQ_CST);                           \
-		handrange_dec_nlops_and_maybe_rejoin(range, man, 1);                                \
-		sig_broadcast(&(man)->hm_changed);                                                  \
+#define _handslot_rollback(man, range, self)                                                 \
+	do {                                                                                     \
+		unsigned int _mha_ohint, _mha_nhint;                                                 \
+		__hybrid_assert((self)->mh_hand.h_type == _MANHANDLE_LOADMARKER);                    \
+		/*__hybrid_atomic_store(&(self)->_mh_words[0], INVALID_POINTER, __ATOMIC_RELEASE);*/ \
+		__hybrid_atomic_store(&(self)->_mh_words[1],                                         \
+		                      _handslot_private_makeword2(0, HANDLE_TYPE_UNDEFINED),         \
+		                      __ATOMIC_SEQ_CST);                                             \
+		_mha_nhint = (unsigned int)(size_t)((self) - (range)->hr_hand);                      \
+		/* Update `hr_nhint' to reflect our slot having become free. */                      \
+		do {                                                                                 \
+			_mha_ohint = __hybrid_atomic_load(&(range)->hr_nhint, __ATOMIC_ACQUIRE);         \
+			if (_mha_ohint <= _mha_nhint)                                                    \
+				break; /* Only ever lower the hint; never raise it! */                       \
+		} while (!__hybrid_atomic_cmpxch_weak(&(range)->hr_nhint, _mha_ohint, _mha_nhint,    \
+		                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));          \
+		__hybrid_atomic_dec(&(man)->hm_handles, __ATOMIC_SEQ_CST);                           \
+		handrange_dec_nlops_and_maybe_rejoin(range, man, 1);                                 \
+		sig_broadcast(&(man)->hm_changed);                                                   \
 	}	__WHILE0
 
 /* Asynchronously try to rejoin `self' with its neighboring ranges.
@@ -890,8 +890,8 @@ HANDLE_FOREACH_TYPE(__FOREACH_HANDLES_INSTALL_COMMIT)
 } /* extern "C++" */
 #endif /* __cplusplus */
 #else /* __INTELLISENSE__ */
-#define _handman_private_install_commit_inherit4(self, h_data, h_mode, h_type)        \
-	(__hybrid_atomic_store((self)->hid_slot->_mh_words[0], h_data, __ATOMIC_RELEASE), \
+#define _handman_private_install_commit_inherit4(self, h_data, h_mode, h_type)         \
+	(__hybrid_atomic_store(&(self)->hid_slot->_mh_words[0], h_data, __ATOMIC_RELEASE), \
 	 _handman_install_commit_inherit(self, h_mode, h_type))
 #define _handman_private_install_commit4(self, h_data, h_mode, h_type) \
 	((*handle_type_db.h_incref[h_type])(h_data),                       \

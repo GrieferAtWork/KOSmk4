@@ -651,7 +651,7 @@ NOTHROW(FCALL mpart_assert_integrity)(struct mpart *__restrict self);
  *       the  reason why `_mpart_init_asanon()'  still fills in  `rb_rhs' as NULL, as
  *       this is a requirement for `mpart_trim()' to function correctly. */
 #define mpart_isanon(self)        ((self)->mp_filent.rb_par == (struct mpart *)-1)
-#define mpart_isanon_atomic(self) (__hybrid_atomic_load((self)->mp_filent.rb_par, __ATOMIC_ACQUIRE) == (struct mpart *)-1)
+#define mpart_isanon_atomic(self) (__hybrid_atomic_load(&(self)->mp_filent.rb_par, __ATOMIC_ACQUIRE) == (struct mpart *)-1)
 
 /* Fill in `self->mp_filent' such that `self' is marked as an anonymous mem-part.
  * NOTE: `rb_rhs' must be filled in with `NULL' as an indicator for `mpart_trim()'! */
@@ -684,7 +684,7 @@ DEFINE_REFCNT_FUNCTIONS(struct mpart, mp_refcnt, mpart_destroy)
 
 /* Reap lock operations enqueued for execution when `self' can be locked. */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mpart_lockops_reap)(struct mpart *__restrict self);
-#define mpart_lockops_mustreap(self) (__hybrid_atomic_load((self)->mp_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
+#define mpart_lockops_mustreap(self) (__hybrid_atomic_load(&(self)->mp_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 #ifdef __OPTIMIZE_SIZE__
 #define mpart_lockops_reap(self) _mpart_lockops_reap(self)
 #else /* __OPTIMIZE_SIZE__ */
@@ -693,14 +693,14 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mpart_lockops_reap)(struct mpart
 
 /* Lock accessor helpers for `struct mpart' */
 #define mpart_lock_tryacquire(self) \
-	(!(__hybrid_atomic_fetchor((self)->mp_flags, MPART_F_LOCKBIT, __ATOMIC_SEQ_CST) & MPART_F_LOCKBIT))
-#define mpart_lock_release(self)                                                \
-	(__hybrid_atomic_and((self)->mp_flags, ~MPART_F_LOCKBIT, __ATOMIC_SEQ_CST), \
+	(!(__hybrid_atomic_fetchor(&(self)->mp_flags, MPART_F_LOCKBIT, __ATOMIC_SEQ_CST) & MPART_F_LOCKBIT))
+#define mpart_lock_release(self)                                                 \
+	(__hybrid_atomic_and(&(self)->mp_flags, ~MPART_F_LOCKBIT, __ATOMIC_SEQ_CST), \
 	 mpart_lockops_reap(self))
 #define _mpart_lock_release(self) \
-	(__hybrid_atomic_and((self)->mp_flags, ~MPART_F_LOCKBIT, __ATOMIC_SEQ_CST))
-#define mpart_lock_acquired(self)  (__hybrid_atomic_load((self)->mp_flags, __ATOMIC_ACQUIRE) & MPART_F_LOCKBIT)
-#define mpart_lock_available(self) (!(__hybrid_atomic_load((self)->mp_flags, __ATOMIC_ACQUIRE) & MPART_F_LOCKBIT))
+	(__hybrid_atomic_and(&(self)->mp_flags, ~MPART_F_LOCKBIT, __ATOMIC_SEQ_CST))
+#define mpart_lock_acquired(self)  (__hybrid_atomic_load(&(self)->mp_flags, __ATOMIC_ACQUIRE) & MPART_F_LOCKBIT)
+#define mpart_lock_available(self) (!(__hybrid_atomic_load(&(self)->mp_flags, __ATOMIC_ACQUIRE) & MPART_F_LOCKBIT))
 
 FORCELOCAL NONNULL((1)) void
 mpart_lock_acquire(struct mpart *__restrict self)
@@ -1641,7 +1641,7 @@ DATDEF size_t mpart_all_size;
 	})
 #else /* CONFIG_NO_MPART_ALL_SIZE */
 #define _mpart_all_getsize() ((size_t)mpart_all_size)
-#define mpart_all_getsize()  __hybrid_atomic_load(mpart_all_size, __ATOMIC_ACQUIRE)
+#define mpart_all_getsize()  __hybrid_atomic_load(&mpart_all_size, __ATOMIC_ACQUIRE)
 #endif /* !CONFIG_NO_MPART_ALL_SIZE */
 
 

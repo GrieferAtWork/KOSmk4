@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0df7bba */
+/* HASH CRC-32:0x6974d73 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,13 +30,13 @@ __LOCAL_LIBC(shared_lock_waitfor_with_timeout) __ATTR_WUNUSED __BLOCKING __ATTR_
 (__FCALL __LIBC_LOCAL_NAME(shared_lock_waitfor_with_timeout))(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+	while (__hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) == 0)
+			if (__hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE) == 0)
 				goto __success;
 		});
 		task_connect_for_poll(&__self->sl_sig);
-		if __unlikely(__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
+		if __unlikely(__hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
 			task_disconnectall();
 			break;
 		}
@@ -45,7 +45,7 @@ __LOCAL_LIBC(shared_lock_waitfor_with_timeout) __ATTR_WUNUSED __BLOCKING __ATTR_
 	}
 __success:
 #else /* __KERNEL__ */
-	if (__hybrid_atomic_cmpxch(__self->sl_lock, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+	if (__hybrid_atomic_cmpxch(&__self->sl_lock, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
 		return __shared_lock_wait_timeout(__self, __abs_timeout);
 #endif /* !__KERNEL__ */
 	return 1;

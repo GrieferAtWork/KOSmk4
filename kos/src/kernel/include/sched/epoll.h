@@ -335,9 +335,9 @@ epoll_controller_wait_with_sigmask(struct epoll_controller *__restrict self,
 
 
 /* Quickly check if there are pending events that can be waited upon. */
-#define epoll_controller_canwait(self)                                         \
-	(__hybrid_atomic_load((self)->ec_raised, __ATOMIC_ACQUIRE) != __NULLPTR || \
-	 __hybrid_atomic_load((self)->ec_pending, __ATOMIC_ACQUIRE) != __NULLPTR)
+#define epoll_controller_canwait(self)                                          \
+	(__hybrid_atomic_load(&(self)->ec_raised, __ATOMIC_ACQUIRE) != __NULLPTR || \
+	 __hybrid_atomic_load(&(self)->ec_pending, __ATOMIC_ACQUIRE) != __NULLPTR)
 #define epoll_controller_pollconnect_ex(self, cb) cb(&(self)->ec_avail)
 #define epoll_controller_pollconnect(self)        epoll_controller_pollconnect_ex(self, task_connect_for_poll)
 

@@ -619,13 +619,13 @@ DATDEF ATTR_PERMMAN struct mnode thismman_kernel_reservation;
  * For more information on the data race solved by this counter, see the detailed explanation
  * of `mman_kernel_hintinit_inuse' within `mman_unmap_kram_locked()' */
 DATDEF WEAK unsigned int mman_kernel_hintinit_inuse;
-#define mman_kernel_hintinit_inuse_inc() __hybrid_atomic_inc(mman_kernel_hintinit_inuse, __ATOMIC_ACQUIRE)
-#define mman_kernel_hintinit_inuse_dec() __hybrid_atomic_dec(mman_kernel_hintinit_inuse, __ATOMIC_RELEASE)
-#define mman_kernel_hintinit_inuse_waitfor()                    \
-	do {                                                        \
-		while (__hybrid_atomic_load(mman_kernel_hintinit_inuse, \
-		                            __ATOMIC_ACQUIRE) != 0)     \
-			__hybrid_preemption_tryyield_nopr();                \
+#define mman_kernel_hintinit_inuse_inc() __hybrid_atomic_inc(&mman_kernel_hintinit_inuse, __ATOMIC_ACQUIRE)
+#define mman_kernel_hintinit_inuse_dec() __hybrid_atomic_dec(&mman_kernel_hintinit_inuse, __ATOMIC_RELEASE)
+#define mman_kernel_hintinit_inuse_waitfor()                     \
+	do {                                                         \
+		while (__hybrid_atomic_load(&mman_kernel_hintinit_inuse, \
+		                            __ATOMIC_ACQUIRE) != 0)      \
+			__hybrid_preemption_tryyield_nopr();                 \
 	}	__WHILE0
 #else /* !CONFIG_NO_SMP */
 #define mman_kernel_hintinit_inuse_inc()     (void)0

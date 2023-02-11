@@ -1008,14 +1008,14 @@ struct mfile {
  * requirements are imposed, and  use of these functions  becomes
  * optional. */
 #define mfile_trunclock_inc(self) \
-	__hybrid_atomic_inc((self)->mf_trunclock, __ATOMIC_ACQUIRE)
-#define mfile_trunclock_dec(self)                                        \
-	(__hybrid_assert((self)->mf_trunclock != 0),                         \
-	 __hybrid_atomic_decfetch((self)->mf_trunclock, __ATOMIC_RELEASE) || \
+	__hybrid_atomic_inc(&(self)->mf_trunclock, __ATOMIC_ACQUIRE)
+#define mfile_trunclock_dec(self)                                         \
+	(__hybrid_assert((self)->mf_trunclock != 0),                          \
+	 __hybrid_atomic_decfetch(&(self)->mf_trunclock, __ATOMIC_RELEASE) || \
 	 (sig_broadcast(&(self)->mf_initdone), 0))
 #define mfile_trunclock_dec_nosignal(self)       \
 	(__hybrid_assert((self)->mf_trunclock != 0), \
-	 __hybrid_atomic_dec((self)->mf_trunclock, __ATOMIC_RELEASE))
+	 __hybrid_atomic_dec(&(self)->mf_trunclock, __ATOMIC_RELEASE))
 
 #ifdef CONFIG_NO_SMP
 #define mfile_tslock_tryacquire(self)   1
@@ -1023,7 +1023,7 @@ struct mfile {
 #define mfile_tslock_release_nopr(self) (void)0
 #else /* CONFIG_NO_SMP */
 #define mfile_tslock_tryacquire(self)               \
-	(!(__hybrid_atomic_fetchor((self)->mf_flags,    \
+	(!(__hybrid_atomic_fetchor(&(self)->mf_flags,   \
 	                           _MFILE_F_SMP_TSLOCK, \
 	                           __ATOMIC_ACQUIRE) &  \
 	   _MFILE_F_SMP_TSLOCK))
@@ -1033,7 +1033,7 @@ struct mfile {
 			task_pause();                      \
 	}	__WHILE0
 #define mfile_tslock_release_nopr(self) \
-	__hybrid_atomic_and((self)->mf_flags, ~_MFILE_F_SMP_TSLOCK, __ATOMIC_RELEASE)
+	__hybrid_atomic_and(&(self)->mf_flags, ~_MFILE_F_SMP_TSLOCK, __ATOMIC_RELEASE)
 #endif /* !CONFIG_NO_SMP */
 
 /* Helper macros for working with the TSLOCK of `self' */
@@ -1050,7 +1050,7 @@ struct mfile {
 EIDECLARE(NOBLOCK NONNULL((1)), void, NOTHROW, FCALL,
           mfile_changed, (struct mfile *__restrict self, uintptr_t what), {
 	uintptr_t old_flags, new_flags;
-	old_flags = __hybrid_atomic_fetchor(self->mf_flags, what, __ATOMIC_SEQ_CST);
+	old_flags = __hybrid_atomic_fetchor(&self->mf_flags, what, __ATOMIC_SEQ_CST);
 	new_flags = old_flags | what;
 	if (old_flags != new_flags && self->mf_ops->mo_changed)
 		(*self->mf_ops->mo_changed)(self, old_flags, new_flags);
@@ -1156,7 +1156,7 @@ DEFINE_REFCNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 /* Reap lock operations of `self' */
 #define _mfile_lockops_reap(self)    _oblockop_reap_atomic_rwlock(&(self)->mf_lockops, &(self)->mf_lock, (struct mfile *)(self))
 #define mfile_lockops_reap(self)     oblockop_reap_atomic_rwlock(&(self)->mf_lockops, &(self)->mf_lock, (struct mfile *)(self))
-#define mfile_lockops_mustreap(self) (__hybrid_atomic_load((self)->mf_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
+#define mfile_lockops_mustreap(self) (__hybrid_atomic_load(&(self)->mf_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 
 /* Lock accessor helpers for `struct mfile' */
 #ifdef CONFIG_KERNEL_MFILE_TRACES_LOCKPC
@@ -1247,7 +1247,7 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_delete_impl)(/*inherit(always)*/ REF struct mfile *__restrict self);
 
 /* Check if a given file has been marked as deleted. */
-#define mfile_wasdeleted(self) (__hybrid_atomic_load((self)->mf_flags, __ATOMIC_ACQUIRE) & MFILE_F_DELETED)
+#define mfile_wasdeleted(self) (__hybrid_atomic_load(&(self)->mf_flags, __ATOMIC_ACQUIRE) & MFILE_F_DELETED)
 
 
 /* Change  the size of the given file. If the new size is smaller than
@@ -1273,7 +1273,7 @@ mfile_sync(struct mfile *__restrict self)
 
 /* Check if there are unwritten changes made to any of the parts of `self' */
 #define mfile_haschanged(self) \
-	(((uintptr_t)__hybrid_atomic_load((self)->mf_changed.slh_first, __ATOMIC_ACQUIRE) - 1) < (uintptr_t)-2)
+	(((uintptr_t)__hybrid_atomic_load(&(self)->mf_changed.slh_first, __ATOMIC_ACQUIRE) - 1) < (uintptr_t)-2)
 
 
 /* Check `self' for a known mem-part that contains `addr', and (if

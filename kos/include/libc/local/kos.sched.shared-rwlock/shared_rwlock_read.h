@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b7c6c89 */
+/* HASH CRC-32:0xec58446 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,11 +59,11 @@ __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1),__BOOL,__NOTHROW
 	__UINTPTR_TYPE__ __temp;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	do {
-		__temp = __hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE);
+		__temp = __hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE);
 		if (__temp == (__UINTPTR_TYPE__)-1)
 			return 0;
 		__hybrid_assert(__temp != (__UINTPTR_TYPE__)-2);
-	} while (!__hybrid_atomic_cmpxch_weak(__self->sl_lock, __temp, __temp + 1,
+	} while (!__hybrid_atomic_cmpxch_weak(&__self->sl_lock, __temp, __temp + 1,
 	                                      __ATOMIC_ACQUIRE, __ATOMIC_RELAXED));
 	__COMPILER_READ_BARRIER();
 	return 1;
@@ -76,11 +76,11 @@ __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1) __BOOL __NOTHROW(__FCALL __loca
 	__UINTPTR_TYPE__ __temp;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	do {
-		__temp = __hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE);
+		__temp = __hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE);
 		if (__temp == (__UINTPTR_TYPE__)-1)
 			return 0;
 		__hybrid_assert(__temp != (__UINTPTR_TYPE__)-2);
-	} while (!__hybrid_atomic_cmpxch_weak(__self->sl_lock, __temp, __temp + 1,
+	} while (!__hybrid_atomic_cmpxch_weak(&__self->sl_lock, __temp, __temp + 1,
 	                                      __ATOMIC_ACQUIRE, __ATOMIC_RELAXED));
 	__COMPILER_READ_BARRIER();
 	return 1;
@@ -127,7 +127,7 @@ __LOCAL_LIBC(shared_rwlock_read) __BLOCKING __ATTR_INOUT(1) void
 __success:
 #else /* __KERNEL__ */
 	while (!(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_tryread)(__self)) {
-		__hybrid_atomic_store(__self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
+		__hybrid_atomic_store(&__self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
 		(__NAMESPACE_LOCAL_SYM __localdep_LFutexExprI64_except)(&__self->sl_rdwait, __self,
 		                     __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
 		                     __NULLPTR, 0);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6746b488 */
+/* HASH CRC-32:0xbc37769f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,8 +65,8 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(shared_rwlock_waitwrite_with_timeout64) __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL
 (__FCALL __LIBC_LOCAL_NAME(shared_rwlock_waitwrite_with_timeout64))(struct shared_rwlock *__restrict __self, struct __timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
-	while (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(__self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
+	while (__hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(&__self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
 		if ((__NAMESPACE_LOCAL_SYM __localdep_LFutexExprI64_except)(&__self->sl_wrwait, __self,
 		                         __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
 		                         __abs_timeout,

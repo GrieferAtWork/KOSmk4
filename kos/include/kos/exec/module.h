@@ -206,20 +206,20 @@ __NOTHROW_NCX(__DLFCN_CC dlinflatesection)(struct dl_section *__sect,
 /* Module section reference count control. */
 #ifdef _module_section_refcnt
 #define module_section_incref(self) \
-	__hybrid_atomic_inc(_module_section_refcnt(self), __ATOMIC_SEQ_CST)
+	__hybrid_atomic_inc(&_module_section_refcnt(self), __ATOMIC_SEQ_CST)
 #ifdef module_section_destroy
-#define module_section_decref(self)                                                    \
-	(void)(__hybrid_atomic_decfetch(_module_section_refcnt(self), __ATOMIC_SEQ_CST) || \
+#define module_section_decref(self)                                                     \
+	(void)(__hybrid_atomic_decfetch(&_module_section_refcnt(self), __ATOMIC_SEQ_CST) || \
 	       (module_section_destroy(self), 0))
-#define module_section_decref_likely(self)                                                       \
-	(void)(unlikely(__hybrid_atomic_decfetch(_module_section_refcnt(self), __ATOMIC_SEQ_CST)) || \
+#define module_section_decref_likely(self)                                                        \
+	(void)(unlikely(__hybrid_atomic_decfetch(&_module_section_refcnt(self), __ATOMIC_SEQ_CST)) || \
 	       (module_section_destroy(self), 0))
-#define module_section_decref_unlikely(self)                                                   \
-	(void)(likely(__hybrid_atomic_decfetch(_module_section_refcnt(self), __ATOMIC_SEQ_CST)) || \
+#define module_section_decref_unlikely(self)                                                    \
+	(void)(likely(__hybrid_atomic_decfetch(&_module_section_refcnt(self), __ATOMIC_SEQ_CST)) || \
 	       (module_section_destroy(self), 0))
 #endif /* module_section_destroy */
 #define module_section_decref_nokill(self) \
-	__hybrid_atomic_dec(_module_section_refcnt(self), __ATOMIC_SEQ_CST)
+	__hybrid_atomic_dec(&_module_section_refcnt(self), __ATOMIC_SEQ_CST)
 #endif /* _module_section_refcnt */
 #if !defined(module_section_xincref) && defined(module_section_incref)
 #define module_section_xincref(self) (void)(!(self) || (module_section_incref(self), 0))
@@ -240,20 +240,20 @@ __NOTHROW_NCX(__DLFCN_CC dlunlocksection)(/*REF*/ struct dl_section *__sect);
 /* Module reference count control. */
 #ifdef _module_refcnt
 #define module_incref(self) \
-	__hybrid_atomic_inc(_module_refcnt(self), __ATOMIC_SEQ_CST)
+	__hybrid_atomic_inc(&_module_refcnt(self), __ATOMIC_SEQ_CST)
 #ifdef module_destroy
-#define module_decref(self)                                                    \
-	(void)(__hybrid_atomic_decfetch(_module_refcnt(self), __ATOMIC_SEQ_CST) || \
+#define module_decref(self)                                                     \
+	(void)(__hybrid_atomic_decfetch(&_module_refcnt(self), __ATOMIC_SEQ_CST) || \
 	       (module_destroy(self), 0))
-#define module_decref_likely(self)                                                       \
-	(void)(unlikely(__hybrid_atomic_decfetch(_module_refcnt(self), __ATOMIC_SEQ_CST)) || \
+#define module_decref_likely(self)                                                        \
+	(void)(unlikely(__hybrid_atomic_decfetch(&_module_refcnt(self), __ATOMIC_SEQ_CST)) || \
 	       (module_destroy(self), 0))
-#define module_decref_unlikely(self)                                                   \
-	(void)(likely(__hybrid_atomic_decfetch(_module_refcnt(self), __ATOMIC_SEQ_CST)) || \
+#define module_decref_unlikely(self)                                                    \
+	(void)(likely(__hybrid_atomic_decfetch(&_module_refcnt(self), __ATOMIC_SEQ_CST)) || \
 	       (module_destroy(self), 0))
 #endif /* module_destroy */
 #define module_decref_nokill(self) \
-	__hybrid_atomic_dec(_module_refcnt(self), __ATOMIC_SEQ_CST)
+	__hybrid_atomic_dec(&_module_refcnt(self), __ATOMIC_SEQ_CST)
 #endif /* _module_refcnt */
 #if !defined(module_xincref) && defined(module_incref)
 #define module_xincref(self) (void)(!(self) || (module_incref(self), 0))

@@ -86,13 +86,13 @@ DATDEF struct x86_cmos_struct x86_cmos;
  *                  the state was changed)
  * @return: * :     The NMI-enabled state prior to the call being made. */
 #define x86_get_nmi_enabled() \
-	((__hybrid_atomic_load(x86_cmos.cr_nmi, __ATOMIC_ACQUIRE) & CMOS_ADDR_NONMI) == 0)
+	((__hybrid_atomic_load(&x86_cmos.cr_nmi, __ATOMIC_ACQUIRE) & CMOS_ADDR_NONMI) == 0)
 LOCAL NOBLOCK NOPREEMPT __BOOL
 NOTHROW(KCALL x86_set_nmi_enabled_nopr)(__BOOL enabled) {
 	u8 old_nmi, new_nmi;
 	new_nmi = enabled ? 0 : CMOS_ADDR_NONMI;
 	x86_cmos_lock_acquire_nopr();
-	old_nmi = __hybrid_atomic_xch(x86_cmos.cr_nmi, new_nmi, __ATOMIC_SEQ_CST);
+	old_nmi = __hybrid_atomic_xch(&x86_cmos.cr_nmi, new_nmi, __ATOMIC_SEQ_CST);
 	if (old_nmi != new_nmi)
 		outb(CMOS_ADDR, new_nmi); /* Update hardware */
 	x86_cmos_lock_release_nopr();
@@ -103,7 +103,7 @@ NOTHROW(KCALL x86_set_nmi_enabled)(__BOOL enabled) {
 	u8 old_nmi, new_nmi;
 	new_nmi = enabled ? 0 : CMOS_ADDR_NONMI;
 	x86_cmos_lock_acquire();
-	old_nmi = __hybrid_atomic_xch(x86_cmos.cr_nmi, new_nmi, __ATOMIC_SEQ_CST);
+	old_nmi = __hybrid_atomic_xch(&x86_cmos.cr_nmi, new_nmi, __ATOMIC_SEQ_CST);
 	if (old_nmi != new_nmi)
 		outb(CMOS_ADDR, new_nmi); /* Update hardware */
 	x86_cmos_lock_release();

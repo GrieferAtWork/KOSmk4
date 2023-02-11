@@ -228,9 +228,9 @@ __CXXDECL_END
 
 #define video_buffer_destroy(self) (*(self)->vb_ops->vi_destroy)(self)
 #define video_buffer_incref(self) \
-	__hybrid_atomic_inc((self)->vb_refcnt, __ATOMIC_SEQ_CST)
-#define video_buffer_decref(self)                                           \
-	(void)(__hybrid_atomic_decfetch((self)->vb_refcnt, __ATOMIC_SEQ_CST) || \
+	__hybrid_atomic_inc(&(self)->vb_refcnt, __ATOMIC_SEQ_CST)
+#define video_buffer_decref(self)                                            \
+	(void)(__hybrid_atomic_decfetch(&(self)->vb_refcnt, __ATOMIC_SEQ_CST) || \
 	       (video_buffer_destroy(self), 0))
 __DEFINE_REFCNT_FUNCTIONS(struct video_buffer, vb_refcnt, video_buffer_destroy)
 #endif /* __CC__ */

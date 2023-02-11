@@ -184,15 +184,15 @@ typedef enum {
 
 
 #ifndef __COMPILER_NO_STDC_ATOMICS
-#define __atomic_var_field(x)   *(x)
+#define __atomic_var_field(x)   (x)
 #define ATOMIC_VAR_INIT(x)      (x)
 #define __COMPILER_ATOMIC(T)    _Atomic(T)
 #elif 1
-#define __atomic_var_field(x)   (x)->__std_atom
+#define __atomic_var_field(x)   &(x)->__std_atom
 #define ATOMIC_VAR_INIT(x)      { x }
 #define __COMPILER_ATOMIC(T)    struct { T __std_atom; }
 #else
-#define __atomic_var_field(x)   *(x)
+#define __atomic_var_field(x)   (x)
 #define ATOMIC_VAR_INIT(x)      (x)
 #define __COMPILER_ATOMIC(T)    T
 #endif
@@ -244,7 +244,7 @@ typedef __COMPILER_ATOMIC(__UINTMAX_TYPE__) atomic_uintmax_t;
 #define atomic_init(ptr, val) __hybrid_atomic_store(__atomic_var_field(ptr), val, __ATOMIC_RELAXED)
 #define atomic_thread_fence(mo) __hybrid_atomic_thread_fence(mo)
 #define atomic_signal_fence(mo) __hybrid_atomic_signal_fence(mo)
-#define atomic_is_lock_free(obj) __hybrid_atomic_lockfree(__atomic_var_field(&(obj)))
+#define atomic_is_lock_free(obj) __hybrid_atomic_lockfree(__atomic_var_field(obj))
 
 #define atomic_store_explicit(ptr, val, mo)     __hybrid_atomic_store(__atomic_var_field(ptr), val, mo)
 #define atomic_store(ptr, val)                  __hybrid_atomic_store(__atomic_var_field(ptr), val, __ATOMIC_SEQ_CST)

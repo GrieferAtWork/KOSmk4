@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31afba99 */
+/* HASH CRC-32:0x6695904c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,7 +79,7 @@ NOTHROW(__FCALL libc_shared_recursive_rwlock_endwrite)(struct shared_recursive_r
 	if (self->srr_wrcnt == 0) {
 		self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
-		__hybrid_atomic_store(self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
+		__hybrid_atomic_store(&self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
 		if (!__shared_rwlock_wrwait_send(&self->srr_lock))
 			__shared_rwlock_rdwait_broadcast(&self->srr_lock);
 		return true;
@@ -102,7 +102,7 @@ NOTHROW(__FCALL libc_shared_recursive_rwlock_endread)(struct shared_recursive_rw
 	if (self->srr_lock.sl_lock == (uintptr_t)-1)
 		return libc_shared_recursive_rwlock_endwrite(self);
 	__hybrid_assertf(self->srr_lock.sl_lock != 0, "Lock isn't held by anyone");
-	result = __hybrid_atomic_decfetch(self->srr_lock.sl_lock, __ATOMIC_RELEASE);
+	result = __hybrid_atomic_decfetch(&self->srr_lock.sl_lock, __ATOMIC_RELEASE);
 	if (result == 0)
 		__shared_rwlock_wrwait_send(&self->srr_lock);
 	return result == 0;
@@ -132,7 +132,7 @@ NOTHROW(__FCALL libc_shared_recursive_rwlock_downgrade)(struct shared_recursive_
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_recursive_rwlock_upgrade)(struct shared_recursive_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(self);
-	if (__hybrid_atomic_cmpxch(self->srr_lock.sl_lock, 1, (uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED)) {
+	if (__hybrid_atomic_cmpxch(&self->srr_lock.sl_lock, 1, (uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED)) {
 		__shared_recursive_rwlock_setown(self);
 		return true; /* Lock wasn't lost */
 	}

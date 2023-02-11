@@ -265,7 +265,7 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
 
 /* Check if `self' is part of the list of changed superblocks, or is being added to it asynchronously. */
 #define fsuper_haschanged(self) \
-	(__hybrid_atomic_load((self)->fs_changedsuper.le_prev, __ATOMIC_ACQUIRE) != __NULLPTR)
+	(__hybrid_atomic_load(&(self)->fs_changedsuper.le_prev, __ATOMIC_ACQUIRE) != __NULLPTR)
 
 
 /* Read/Write whole filesystem sectors

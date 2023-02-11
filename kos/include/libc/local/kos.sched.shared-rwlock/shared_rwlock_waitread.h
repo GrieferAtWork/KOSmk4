@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb169164 */
+/* HASH CRC-32:0x1332e6a0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,13 +74,13 @@ __LOCAL_LIBC(shared_rwlock_waitread) __BLOCKING __ATTR_INOUT(1) void
 (__FCALL __LIBC_LOCAL_NAME(shared_rwlock_waitread))(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) == (__UINTPTR_TYPE__)-1) {
+	while (__hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE) == (__UINTPTR_TYPE__)-1) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) != (__UINTPTR_TYPE__)-1)
+			if (__hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE) != (__UINTPTR_TYPE__)-1)
 				goto __success;
 		});
 		task_connect_for_poll(&__self->sl_rdwait);
-		if __unlikely(__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) != (__UINTPTR_TYPE__)-1) {
+		if __unlikely(__hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE) != (__UINTPTR_TYPE__)-1) {
 			task_disconnectall();
 			break;
 		}
@@ -88,8 +88,8 @@ __LOCAL_LIBC(shared_rwlock_waitread) __BLOCKING __ATTR_INOUT(1) void
 	}
 __success:
 #else /* __KERNEL__ */
-	while (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) == (__UINTPTR_TYPE__)-1) {
-		__hybrid_atomic_store(__self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
+	while (__hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE) == (__UINTPTR_TYPE__)-1) {
+		__hybrid_atomic_store(&__self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
 		(__NAMESPACE_LOCAL_SYM __localdep_LFutexExprI64_except)(&__self->sl_rdwait, __self, __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
 		                     __NULLPTR, LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL);
 	}

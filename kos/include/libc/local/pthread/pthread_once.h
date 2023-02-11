@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47cf616e */
+/* HASH CRC-32:0xd34116e5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -100,7 +100,7 @@ __LOCAL_LIBC(pthread_once) __ATTR_INOUT(1) __ATTR_NONNULL((2)) __errno_t
 	 */
 	__pthread_once_t __status;
 __again:
-	__status = __hybrid_atomic_cmpxch_val(*__once_control,
+	__status = __hybrid_atomic_cmpxch_val(__once_control,
 	                                    __PTHREAD_ONCE_INIT,
 	                                    __PTHREAD_ONCE_INIT + 1,
 	                                    __ATOMIC_SEQ_CST,
@@ -114,11 +114,11 @@ __again:
 		} catch (...) {
 			/* roll-back... */
 #ifdef __PRIVATE_PTHREAD_ONCE_USES_FUTEX
-			if (__hybrid_atomic_xch(*__once_control, __PTHREAD_ONCE_INIT,
+			if (__hybrid_atomic_xch(__once_control, __PTHREAD_ONCE_INIT,
 			                        __ATOMIC_RELEASE) == __PTHREAD_ONCE_INIT + 3)
 				(__NAMESPACE_LOCAL_SYM __localdep_futex_wakeall)((__uintptr_t *)__once_control);
 #else /* __PRIVATE_PTHREAD_ONCE_USES_FUTEX */
-			__hybrid_atomic_store(*__once_control,
+			__hybrid_atomic_store(__once_control,
 			                      __PTHREAD_ONCE_INIT,
 			                      __ATOMIC_RELEASE);
 #endif /* !__PRIVATE_PTHREAD_ONCE_USES_FUTEX */
@@ -134,11 +134,11 @@ __again:
 
 		/* Remember that the function was called. */
 #if defined(__PRIVATE_PTHREAD_ONCE_USES_FUTEX) && (defined(__CRT_HAVE_futex_wakeall) || defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex))
-		if (__hybrid_atomic_xch(*__once_control, __PTHREAD_ONCE_INIT + 2,
+		if (__hybrid_atomic_xch(__once_control, __PTHREAD_ONCE_INIT + 2,
 		                        __ATOMIC_RELEASE) == __PTHREAD_ONCE_INIT + 3)
 			(__NAMESPACE_LOCAL_SYM __localdep_futex_wakeall)((__uintptr_t *)__once_control);
 #else /* __PRIVATE_PTHREAD_ONCE_USES_FUTEX && (__CRT_HAVE_futex_wakeall || __CRT_HAVE_futex_wake || __CRT_HAVE_lfutex64 || __CRT_HAVE_lfutex) */
-		__hybrid_atomic_store(*__once_control,
+		__hybrid_atomic_store(__once_control,
 		                      __PTHREAD_ONCE_INIT + 2,
 		                      __ATOMIC_RELEASE);
 #endif /* !__PRIVATE_PTHREAD_ONCE_USES_FUTEX || (!__CRT_HAVE_futex_wakeall && !__CRT_HAVE_futex_wake && !__CRT_HAVE_lfutex64 && !__CRT_HAVE_lfutex) */
@@ -171,7 +171,7 @@ __again:
 		if (__status == __PTHREAD_ONCE_INIT + 1) {
 			/* Request a futex-wake call once initialization
 			 * completes  in  whatever thread  is  doing it. */
-			if (!__hybrid_atomic_cmpxch(*__once_control,
+			if (!__hybrid_atomic_cmpxch(__once_control,
 			                            __PTHREAD_ONCE_INIT + 1,
 			                            __PTHREAD_ONCE_INIT + 3,
 			                            __ATOMIC_SEQ_CST,
@@ -191,7 +191,7 @@ __again:
 #else /* __PRIVATE_PTHREAD_ONCE_USES_FUTEX */
 		do {
 			__hybrid_yield();
-		} while (__hybrid_atomic_load(*__once_control, __ATOMIC_ACQUIRE) ==
+		} while (__hybrid_atomic_load(__once_control, __ATOMIC_ACQUIRE) ==
 		         __PTHREAD_ONCE_INIT + 1);
 #endif /* !__PRIVATE_PTHREAD_ONCE_USES_FUTEX */
 

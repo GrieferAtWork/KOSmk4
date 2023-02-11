@@ -250,7 +250,7 @@ DATDEF ATTR_PERCPU pagedir_phys_t thiscpu_pdir;
 #ifndef CONFIG_NO_SMP
 /* Set the current MMan, and update the MMan pointer of `self' */
 #define cpu_setmman_ex(me, current_mm)                 \
-	(__hybrid_atomic_store((me)->c_pdir,               \
+	(__hybrid_atomic_store(&(me)->c_pdir,              \
 	                       (current_mm)->mm_pagedir_p, \
 	                       __ATOMIC_RELEASE),          \
 	 pagedir_set((current_mm)->mm_pagedir_p))
@@ -522,7 +522,7 @@ NOTHROW_T(FCALL *cpu_ipi_t)(struct icpustate *__restrict state,
 
 /* Check if  `self' is  running, and  sending  an IPI  without `CPU_IPI_FWAKEUP'  should  succeed.
  * Note however the race condition where a CPU might stop running before/after this check is made. */
-#define cpu_isrunning(self) (__hybrid_atomic_load((self)->c_state, __ATOMIC_ACQUIRE) == CPU_STATE_RUNNING)
+#define cpu_isrunning(self) (__hybrid_atomic_load(&(self)->c_state, __ATOMIC_ACQUIRE) == CPU_STATE_RUNNING)
 
 
 /* The size of the buffer used to contain pending IPIs. */

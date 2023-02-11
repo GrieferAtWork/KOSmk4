@@ -377,7 +377,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_postfsdirevent)(struct mfi
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_postfsdirevent2)(struct mfile *__restrict self, uint16_t mask, uint16_t cookie) ASMNAME("mfile_postfsdirevent2");
 /* Same as `_mfile_postfsevent()', but use different masks for `inc_listeners' and `inc_dirs' */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_postfsevent_ex)(struct mfile *__restrict self, uint16_t fil_mask, uint16_t dir_mask) ASMNAME("mfile_postfsevent_ex");
-#define _mfile_canpostfsevents(self) (__hybrid_atomic_load((self)->mf_notify, __ATOMIC_ACQUIRE) != __NULLPTR)
+#define _mfile_canpostfsevents(self) (__hybrid_atomic_load(&(self)->mf_notify, __ATOMIC_ACQUIRE) != __NULLPTR)
 #ifdef __OPTIMIZE_SIZE__
 #define _mfile_maybepostfsevent(self, expr_) expr_
 #else /* __OPTIMIZE_SIZE__ */

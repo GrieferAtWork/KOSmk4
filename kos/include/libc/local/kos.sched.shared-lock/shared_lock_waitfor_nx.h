@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27ed8cbd */
+/* HASH CRC-32:0x95507714 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,13 +30,13 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(shared_lock_waitfor_nx) __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL
 (__FCALL __LIBC_LOCAL_NAME(shared_lock_waitfor_nx))(struct shared_lock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+	while (__hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) == 0)
+			if (__hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE) == 0)
 				goto __success;
 		});
 		task_connect_for_poll(&__self->sl_sig);
-		if __unlikely(__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
+		if __unlikely(__hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
 			task_disconnectall();
 			break;
 		}

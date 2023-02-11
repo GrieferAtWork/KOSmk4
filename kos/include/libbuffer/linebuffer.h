@@ -137,8 +137,8 @@ struct linebuffer {
 
 /* Poll for writing to become possible. */
 #define linebuffer_canwrite(self)                                      \
-	(__hybrid_atomic_load((self)->lb_line.lc_size, __ATOMIC_ACQUIRE) < \
-	 __hybrid_atomic_load((self)->lb_limt, __ATOMIC_ACQUIRE))
+	(__hybrid_atomic_load(&(self)->lb_line.lc_size, __ATOMIC_ACQUIRE) < \
+	 __hybrid_atomic_load(&(self)->lb_limt, __ATOMIC_ACQUIRE))
 #define linebuffer_pollconnect_write_ex(self, cb) cb(&(self)->lb_nful)
 #ifdef __OPTIMIZE_SIZE__
 #define linebuffer_pollwrite_ex(self, cb)       \
@@ -162,7 +162,7 @@ LIBBUFFER_DECL __NOBLOCK __ATTR_NONNULL((1)) void
 __NOTHROW(LIBBUFFER_CC linebuffer_close)(struct linebuffer *__restrict __self);
 #else /* __INTELLISENSE__ */
 #define linebuffer_close(self)                                    \
-	(__hybrid_atomic_store((self)->lb_limt, 0, __ATOMIC_RELEASE), \
+	(__hybrid_atomic_store(&(self)->lb_limt, 0, __ATOMIC_RELEASE), \
 	 sched_signal_broadcast(&(self)->lb_nful))
 #endif /* !__INTELLISENSE__ */
 
@@ -360,7 +360,7 @@ __free_capture:
 __LOCAL __ATTR_NONNULL((1)) void
 __NOTHROW(LIBBUFFER_CC linebuffer_clear)(struct linebuffer *__restrict __self) {
 	/* Just override the line-size field with 0, thus clearing its effective size. */
-	__hybrid_atomic_store(__self->lb_line.lc_size, 0, __ATOMIC_RELEASE);
+	__hybrid_atomic_store(&__self->lb_line.lc_size, 0, __ATOMIC_RELEASE);
 }
 
 #endif /* !__INTELLISENSE__ */

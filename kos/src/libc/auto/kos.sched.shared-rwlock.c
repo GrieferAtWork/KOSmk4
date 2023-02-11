@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6401e3b7 */
+/* HASH CRC-32:0x414ffb25 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,11 +37,11 @@ NOTHROW(__FCALL libc_shared_rwlock_tryread)(struct shared_rwlock *__restrict sel
 	uintptr_t temp;
 	__COMPILER_WORKAROUND_GCC_105689(self);
 	do {
-		temp = __hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE);
+		temp = __hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE);
 		if (temp == (uintptr_t)-1)
 			return false;
 		__hybrid_assert(temp != (uintptr_t)-2);
-	} while (!__hybrid_atomic_cmpxch_weak(self->sl_lock, temp, temp + 1,
+	} while (!__hybrid_atomic_cmpxch_weak(&self->sl_lock, temp, temp + 1,
 	                                      __ATOMIC_ACQUIRE, __ATOMIC_RELAXED));
 	__COMPILER_READ_BARRIER();
 	return true;
@@ -51,7 +51,7 @@ NOTHROW(__FCALL libc_shared_rwlock_tryread)(struct shared_rwlock *__restrict sel
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __NOBLOCK ATTR_INOUT(1) bool
 NOTHROW(__FCALL libc_shared_rwlock_trywrite)(struct shared_rwlock *__restrict self) {
 	__COMPILER_WORKAROUND_GCC_105689(self);
-	if (!__hybrid_atomic_cmpxch(self->sl_lock, 0, (uintptr_t)-1,
+	if (!__hybrid_atomic_cmpxch(&self->sl_lock, 0, (uintptr_t)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return false;
 	__COMPILER_BARRIER();
@@ -66,7 +66,7 @@ NOTHROW(__FCALL libc_shared_rwlock_endwrite)(struct shared_rwlock *__restrict se
 	__COMPILER_WORKAROUND_GCC_105689(self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(self->sl_lock == (uintptr_t)-1, "Lock isn't in write-mode (%x)", self->sl_lock);
-	__hybrid_atomic_store(self->sl_lock, 0, __ATOMIC_RELEASE);
+	__hybrid_atomic_store(&self->sl_lock, 0, __ATOMIC_RELEASE);
 	if (!__shared_rwlock_wrwait_send(self))
 		__shared_rwlock_rdwait_broadcast(self);
 }
@@ -81,7 +81,7 @@ NOTHROW(__FCALL libc_shared_rwlock_endread)(struct shared_rwlock *__restrict sel
 	__COMPILER_READ_BARRIER();
 	__hybrid_assertf(self->sl_lock != (uintptr_t)-1, "Lock is in write-mode (%x)", self->sl_lock);
 	__hybrid_assertf(self->sl_lock != 0, "Lock isn't held by anyone");
-	__result = __hybrid_atomic_decfetch(self->sl_lock, __ATOMIC_RELEASE);
+	__result = __hybrid_atomic_decfetch(&self->sl_lock, __ATOMIC_RELEASE);
 	if (__result == 0)
 		__shared_rwlock_wrwait_send(self);
 	return __result == 0;
@@ -98,13 +98,13 @@ NOTHROW(__FCALL libc_shared_rwlock_end)(struct shared_rwlock *__restrict self) {
 		/* Read-lock */
 		uintptr_t __result;
 		__hybrid_assertf(self->sl_lock != 0, "No remaining read-locks");
-		__result = __hybrid_atomic_decfetch(self->sl_lock, __ATOMIC_RELEASE);
+		__result = __hybrid_atomic_decfetch(&self->sl_lock, __ATOMIC_RELEASE);
 		if (__result == 0)
 			__shared_rwlock_wrwait_send(self);
 		return __result == 0;
 	}
 	/* Write-lock */
-	__hybrid_atomic_store(self->sl_lock, 0, __ATOMIC_RELEASE);
+	__hybrid_atomic_store(&self->sl_lock, 0, __ATOMIC_RELEASE);
 	if (!__shared_rwlock_wrwait_send(self))
 		__shared_rwlock_rdwait_broadcast(self);
 	return true;
@@ -116,7 +116,7 @@ NOTHROW(__FCALL libc_shared_rwlock_downgrade)(struct shared_rwlock *__restrict s
 	__COMPILER_WORKAROUND_GCC_105689(self);
 	__COMPILER_WRITE_BARRIER();
 	__hybrid_assertf(self->sl_lock == (uintptr_t)-1, "Lock isn't in write-mode (%x)", self->sl_lock);
-	__hybrid_atomic_store(self->sl_lock, 1, __ATOMIC_RELEASE);
+	__hybrid_atomic_store(&self->sl_lock, 1, __ATOMIC_RELEASE);
 	__shared_rwlock_rdwait_broadcast(self); /* Allow for more readers. */
 }
 /* >> shared_rwlock_upgrade(3)
@@ -129,7 +129,7 @@ NOTHROW(__FCALL libc_shared_rwlock_downgrade)(struct shared_rwlock *__restrict s
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_rwlock_upgrade)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(self);
-	if (__hybrid_atomic_cmpxch(self->sl_lock, 1, (uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+	if (__hybrid_atomic_cmpxch(&self->sl_lock, 1, (uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
 		return true; /* Lock wasn't lost */
 	libc_shared_rwlock_endread(self);
 	libc_shared_rwlock_write(self);
@@ -175,7 +175,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 success:
 #else /* __KERNEL__ */
 	while (!libc_shared_rwlock_tryread(self)) {
-		__hybrid_atomic_store(self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
+		__hybrid_atomic_store(&self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
 		libc_LFutexExprI64(&self->sl_rdwait, self,
 		                     __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
 		                     NULL, 0);
@@ -223,7 +223,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 success:
 #else /* __KERNEL__ */
 	while (!libc_shared_rwlock_trywrite(self)) {
-		__hybrid_atomic_store(self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
+		__hybrid_atomic_store(&self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
 		libc_LFutexExprI64(&self->sl_wrwait, self,
 		                     __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
 		                     NULL, 0);
@@ -256,7 +256,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 success:
 #else /* __KERNEL__ */
 	while (!libc_shared_rwlock_tryread(self)) {
-		__hybrid_atomic_store(self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
+		__hybrid_atomic_store(&self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
 		if (libc_LFutexExprI(&self->sl_rdwait, self,
 		                       __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
 		                       abs_timeout, 0) < 0)
@@ -291,7 +291,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 success:
 #else /* __KERNEL__ */
 	while (!libc_shared_rwlock_trywrite(self)) {
-		__hybrid_atomic_store(self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
+		__hybrid_atomic_store(&self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
 		if (libc_LFutexExprI(&self->sl_wrwait, self,
 		                       __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
 		                       abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
@@ -307,13 +307,13 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 (__FCALL libc_shared_rwlock_waitread)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
+	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1)
+			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1)
 				goto success;
 		});
 		task_connect_for_poll(&self->sl_rdwait);
-		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1) {
+		if unlikely(__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1) {
 			task_disconnectall();
 			break;
 		}
@@ -321,8 +321,8 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 	}
 success:
 #else /* __KERNEL__ */
-	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
-		__hybrid_atomic_store(self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
+	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
+		__hybrid_atomic_store(&self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
 		libc_LFutexExprI64(&self->sl_rdwait, self, __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
 		                     NULL, LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL);
 	}
@@ -335,13 +335,13 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 (__FCALL libc_shared_rwlock_waitwrite)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0)
+			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0)
 				goto success;
 		});
 		task_connect_for_poll(&self->sl_wrwait);
-		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
 			task_disconnectall();
 			break;
 		}
@@ -349,8 +349,8 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 	}
 success:
 #else /* __KERNEL__ */
-	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
+	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(&self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
 		libc_LFutexExprI64(&self->sl_wrwait, self, __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
 		                     NULL, LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL);
 	}
@@ -366,13 +366,13 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
                                                    __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
+	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1)
+			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1)
 				goto success;
 		});
 		task_connect_for_poll(&self->sl_rdwait);
-		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1) {
+		if unlikely(__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1) {
 			task_disconnectall();
 			break;
 		}
@@ -381,8 +381,8 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 	}
 success:
 #else /* __KERNEL__ */
-	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
-		__hybrid_atomic_store(self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
+	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
+		__hybrid_atomic_store(&self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
 		if (libc_LFutexExprI(&self->sl_rdwait, self,
 		                       __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
 		                       abs_timeout,
@@ -403,13 +403,13 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
                                                     __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0)
+			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0)
 				goto success;
 		});
 		task_connect_for_poll(&self->sl_wrwait);
-		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
 			task_disconnectall();
 			break;
 		}
@@ -418,8 +418,8 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 	}
 success:
 #else /* __KERNEL__ */
-	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
+	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(&self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
 		if (libc_LFutexExprI(&self->sl_wrwait, self,
 		                       __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
 		                       abs_timeout,
@@ -457,7 +457,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) AT
 (__FCALL libc_shared_rwlock_read_with_timeout64)(struct shared_rwlock *__restrict self,
                                                  struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	while (!libc_shared_rwlock_tryread(self)) {
-		__hybrid_atomic_store(self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
+		__hybrid_atomic_store(&self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
 		if (libc_LFutexExprI64(&self->sl_rdwait, self,
 		                         __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
 		                         abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
@@ -492,7 +492,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) AT
 (__FCALL libc_shared_rwlock_write_with_timeout64)(struct shared_rwlock *__restrict self,
                                                   struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	while (!libc_shared_rwlock_trywrite(self)) {
-		__hybrid_atomic_store(self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
+		__hybrid_atomic_store(&self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
 		if (libc_LFutexExprI64(&self->sl_wrwait, self,
 		                         __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
 		                         abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
@@ -526,8 +526,8 @@ __NAMESPACE_LOCAL_END
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2) bool
 (__FCALL libc_shared_rwlock_waitread_with_timeout64)(struct shared_rwlock *__restrict self,
                                                      struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
-	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
-		__hybrid_atomic_store(self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
+	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
+		__hybrid_atomic_store(&self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
 		if (libc_LFutexExprI64(&self->sl_rdwait, self,
 		                         __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
 		                         abs_timeout,
@@ -563,8 +563,8 @@ __NAMESPACE_LOCAL_END
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2) bool
 (__FCALL libc_shared_rwlock_waitwrite_with_timeout64)(struct shared_rwlock *__restrict self,
                                                       struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
-	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
+	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(&self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
 		if (libc_LFutexExprI64(&self->sl_wrwait, self,
 		                         __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
 		                         abs_timeout,
@@ -696,13 +696,13 @@ success:
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_rwlock_waitread_nx)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
+	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1)
+			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1)
 				goto success;
 		});
 		task_connect_for_poll(&self->sl_rdwait);
-		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1) {
+		if unlikely(__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1) {
 			task_disconnectall();
 			break;
 		}
@@ -723,13 +723,13 @@ success:
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_rwlock_waitwrite_nx)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0)
+			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0)
 				goto success;
 		});
 		task_connect_for_poll(&self->sl_wrwait);
-		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
 			task_disconnectall();
 			break;
 		}
@@ -751,13 +751,13 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 (__FCALL libc_shared_rwlock_waitread_with_timeout_nx)(struct shared_rwlock *__restrict self,
                                                       __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
+	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1)
+			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1)
 				goto success;
 		});
 		task_connect_for_poll(&self->sl_rdwait);
-		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1) {
+		if unlikely(__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1) {
 			task_disconnectall();
 			break;
 		}
@@ -779,13 +779,13 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 (__FCALL libc_shared_rwlock_waitwrite_with_timeout_nx)(struct shared_rwlock *__restrict self,
                                                        __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0)
+			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0)
 				goto success;
 		});
 		task_connect_for_poll(&self->sl_wrwait);
-		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
 			task_disconnectall();
 			break;
 		}

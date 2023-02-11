@@ -222,9 +222,9 @@ DEFINE_REFCNT_FUNCTIONS(struct path, p_refcnt, path_destroy)
 /* Helpers for working with the PLOCK (ParentLOCK) of paths. */
 #ifndef CONFIG_NO_SMP
 #define path_plock_tryacquire_nopr(self) \
-	(!(__hybrid_atomic_fetchor((self)->p_flags, _PATH_F_PLOCK, __ATOMIC_SEQ_CST) & _PATH_F_PLOCK))
+	(!(__hybrid_atomic_fetchor(&(self)->p_flags, _PATH_F_PLOCK, __ATOMIC_SEQ_CST) & _PATH_F_PLOCK))
 #define path_plock_release_nopr(self) \
-	__hybrid_atomic_and((self)->p_flags, ~_PATH_F_PLOCK, __ATOMIC_SEQ_CST)
+	__hybrid_atomic_and(&(self)->p_flags, ~_PATH_F_PLOCK, __ATOMIC_SEQ_CST)
 LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(path_plock_acquire_nopr)(struct path *__restrict self) {
 #ifndef __INTELLISENSE__

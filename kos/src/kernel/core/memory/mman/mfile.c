@@ -132,7 +132,7 @@ NOTHROW(FCALL mfile_alloc_physmem)(struct mfile *__restrict self,
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 	uintptr_t old_flags, new_flags;
-	old_flags = __hybrid_atomic_fetchor(self->mf_flags, what, __ATOMIC_SEQ_CST);
+	old_flags = ATOMIC_FETCHOR(self->mf_flags, what);
 	new_flags = old_flags | what;
 	if (old_flags != new_flags && self->mf_ops->mo_changed)
 		(*self->mf_ops->mo_changed)(self, old_flags, new_flags);

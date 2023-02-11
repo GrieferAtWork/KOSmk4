@@ -432,7 +432,7 @@ FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct proctimerctl *
 NOTHROW(FCALL procctl_gettimerctl)(struct procctl *__restrict self);
 #else /* __INTELLISENSE__ */
 #define procctl_gettimerctl(self) \
-	__hybrid_atomic_load((self)->pc_timers, __ATOMIC_ACQUIRE)
+	__hybrid_atomic_load(&(self)->pc_timers, __ATOMIC_ACQUIRE)
 #endif /* !__INTELLISENSE__ */
 
 

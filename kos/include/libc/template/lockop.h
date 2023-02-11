@@ -73,7 +73,7 @@ __intellisense_lockop_template(struct lockop_slist *__restrict __LOCAL_self,
 	__post_list.slh_first = __NULLPTR; /*SLIST_INIT(&__post_list);*/
 
 again_steal_and_service_lops:
-	__lops_list.slh_first = __hybrid_atomic_xch(__LOCAL_self->slh_first, __NULLPTR, __ATOMIC_SEQ_CST); /* SLIST_ATOMIC_CLEAR(__LOCAL_self) */
+	__lops_list.slh_first = __hybrid_atomic_xch(&__LOCAL_self->slh_first, __NULLPTR, __ATOMIC_SEQ_CST); /* SLIST_ATOMIC_CLEAR(__LOCAL_self) */
 again_service_lops:
 	__iter = __lops_list.slh_first; /* SLIST_FIRST(&__lops_list) */
 	while (__iter != __NULLPTR) {
@@ -107,7 +107,7 @@ again_service_lops:
 	__LOCAL_unlock();
 
 	/* Check for more operations. */
-	__lops_list.slh_first = __hybrid_atomic_xch(__LOCAL_self->slh_first, __NULLPTR, __ATOMIC_SEQ_CST); /* SLIST_ATOMIC_CLEAR(__LOCAL_self) */
+	__lops_list.slh_first = __hybrid_atomic_xch(&__LOCAL_self->slh_first, __NULLPTR, __ATOMIC_SEQ_CST); /* SLIST_ATOMIC_CLEAR(__LOCAL_self) */
 	if __unlikely(__lops_list.slh_first != __NULLPTR) { /* !SLIST_EMPTY(&__lops_list) */
 		if __likely(__LOCAL_trylock())
 			goto again_service_lops;
@@ -119,9 +119,9 @@ again_service_lops:
 
 		/* SLIST_ATOMIC_INSERT_R(__LOCAL_self, SLIST_FIRST(&__lops_list), __iter, __LOCAL_lo_link) */
 		do {
-			__iter->__LOCAL_lo_link.sle_next = __hybrid_atomic_load(__LOCAL_self->slh_first, __ATOMIC_ACQUIRE);
+			__iter->__LOCAL_lo_link.sle_next = __hybrid_atomic_load(&__LOCAL_self->slh_first, __ATOMIC_ACQUIRE);
 			__COMPILER_WRITE_BARRIER();
-		} while (!__hybrid_atomic_cmpxch(__LOCAL_self->slh_first, __iter->__LOCAL_lo_link.sle_next,
+		} while (!__hybrid_atomic_cmpxch(&__LOCAL_self->slh_first, __iter->__LOCAL_lo_link.sle_next,
 		                                 __lops_list.slh_first, __ATOMIC_RELEASE, __ATOMIC_RELAXED));
 
 		if __unlikely(__LOCAL_trylock())

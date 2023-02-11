@@ -89,9 +89,9 @@ __SYSDECL_BEGIN
 $bool shared_recursive_lock_tryacquire([[inout]] struct shared_recursive_lock *__restrict self) {
 	__COMPILER_WORKAROUND_GCC_105689(self);
 @@pp_ifdef __KERNEL__@@
-	if (__hybrid_atomic_xch(self->@sr_lock@.@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0)
+	if (__hybrid_atomic_xch(&self->@sr_lock@.@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0)
 @@pp_else@@
-	if (__hybrid_atomic_cmpxch(self->@sr_lock@.@sl_lock@, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+	if (__hybrid_atomic_cmpxch(&self->@sr_lock@.@sl_lock@, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
 @@pp_endif@@
 	{
 		__shared_recursive_lock_setown(self);
@@ -122,14 +122,14 @@ $bool shared_recursive_lock_release([[inout]] struct shared_recursive_lock *__re
 @@pp_ifdef __KERNEL__@@
 		self->@sr_owner@ = __SHARED_RECURSIVE_LOCK_BADTID;
 		__COMPILER_BARRIER();
-		__hybrid_atomic_store(self->@sr_lock@.@sl_lock@, 0, __ATOMIC_RELEASE);
+		__hybrid_atomic_store(&self->@sr_lock@.@sl_lock@, 0, __ATOMIC_RELEASE);
 		__shared_lock_send(&self->@sr_lock@);
 @@pp_else@@
 		unsigned int lockstate;
 		self->@sr_owner@ = __SHARED_RECURSIVE_LOCK_BADTID;
 		lockstate        = self->@sr_lock@.@sl_lock@;
 		__COMPILER_BARRIER();
-		__hybrid_atomic_store(self->@sr_lock@.@sl_lock@, 0, __ATOMIC_RELEASE);
+		__hybrid_atomic_store(&self->@sr_lock@.@sl_lock@, 0, __ATOMIC_RELEASE);
 		if (lockstate >= 2)
 			__shared_lock_send(&self->@sr_lock@);
 @@pp_endif@@

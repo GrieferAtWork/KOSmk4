@@ -406,19 +406,19 @@
 #else /* __HYBRID_PREEMPTION_NO_SMP */
 #define __PRIVATE_arref_init_smp(self)  , (self)->arr_cnt = 0
 #define __PRIVATE_arref_cinit_smp(self) , __hybrid_assert((self)->arr_cnt == 0)
-#define __PRIVATE_arref_inccnt(self)    __hybrid_atomic_inc((self)->arr_cnt, __ATOMIC_ACQUIRE);
-#define __PRIVATE_arref_deccnt(self)    __hybrid_atomic_dec((self)->arr_cnt, __ATOMIC_RELEASE);
-#define __PRIVATE_arref_waitfor(self)   while (__hybrid_atomic_load((self)->arr_cnt, __ATOMIC_ACQUIRE) != 0) __hybrid_preemption_tryyield_nopr();
+#define __PRIVATE_arref_inccnt(self)    __hybrid_atomic_inc(&(self)->arr_cnt, __ATOMIC_ACQUIRE);
+#define __PRIVATE_arref_deccnt(self)    __hybrid_atomic_dec(&(self)->arr_cnt, __ATOMIC_RELEASE);
+#define __PRIVATE_arref_waitfor(self)   while (__hybrid_atomic_load(&(self)->arr_cnt, __ATOMIC_ACQUIRE) != 0) __hybrid_preemption_tryyield_nopr();
 #define __PRIVATE_axref_init_smp(self)  , (self)->axr_cnt = 0
 #define __PRIVATE_axref_cinit_smp(self) , __hybrid_assert((self)->axr_cnt == 0)
-#define __PRIVATE_axref_inccnt(self)    __hybrid_atomic_inc((self)->axr_cnt, __ATOMIC_ACQUIRE);
-#define __PRIVATE_axref_deccnt(self)    __hybrid_atomic_dec((self)->axr_cnt, __ATOMIC_RELEASE);
-#define __PRIVATE_axref_waitfor(self)   while (__hybrid_atomic_load((self)->axr_cnt, __ATOMIC_ACQUIRE) != 0) __hybrid_preemption_tryyield_nopr();
+#define __PRIVATE_axref_inccnt(self)    __hybrid_atomic_inc(&(self)->axr_cnt, __ATOMIC_ACQUIRE);
+#define __PRIVATE_axref_deccnt(self)    __hybrid_atomic_dec(&(self)->axr_cnt, __ATOMIC_RELEASE);
+#define __PRIVATE_axref_waitfor(self)   while (__hybrid_atomic_load(&(self)->axr_cnt, __ATOMIC_ACQUIRE) != 0) __hybrid_preemption_tryyield_nopr();
 #define __PRIVATE_awref_init_smp(self)  , (self)->awr_cnt = 0
 #define __PRIVATE_awref_cinit_smp(self) , __hybrid_assert((self)->awr_cnt == 0)
-#define __PRIVATE_awref_inccnt(self)    __hybrid_atomic_inc((self)->awr_cnt, __ATOMIC_ACQUIRE);
-#define __PRIVATE_awref_deccnt(self)    __hybrid_atomic_dec((self)->awr_cnt, __ATOMIC_RELEASE);
-#define __PRIVATE_awref_waitfor(self)   while (__hybrid_atomic_load((self)->awr_cnt, __ATOMIC_ACQUIRE) != 0) __hybrid_preemption_tryyield_nopr();
+#define __PRIVATE_awref_inccnt(self)    __hybrid_atomic_inc(&(self)->awr_cnt, __ATOMIC_ACQUIRE);
+#define __PRIVATE_awref_deccnt(self)    __hybrid_atomic_dec(&(self)->awr_cnt, __ATOMIC_RELEASE);
+#define __PRIVATE_awref_waitfor(self)   while (__hybrid_atomic_load(&(self)->awr_cnt, __ATOMIC_ACQUIRE) != 0) __hybrid_preemption_tryyield_nopr();
 #endif /* !__HYBRID_PREEMPTION_NO_SMP */
 
 /************************************************************************/
@@ -427,26 +427,26 @@
 
 /* >> T *arref_ptr(ARREF(T) *self); */
 #define arref_ptr(self) \
-	__hybrid_atomic_load((self)->arr_obj, __ATOMIC_ACQUIRE)
+	__hybrid_atomic_load(&(self)->arr_obj, __ATOMIC_ACQUIRE)
 
 /* ========== arref_get ========== */
 #define __PRIVATE_arref_get_2(self, p_result) \
 	__PRIVATE_arref_get_3(self, p_result, incref)
 #define __PRIVATE_arref_get_nopr_2(self, p_result) \
 	__PRIVATE_arref_get_nopr_3(self, p_result, incref)
-#define __PRIVATE_arref_get_3(self, p_result, incref)                      \
-	__PRIVATE_AR_INTR_PUSHOFF();                                           \
-	__PRIVATE_arref_inccnt(self)                                           \
-	*(p_result) = __hybrid_atomic_load((self)->arr_obj, __ATOMIC_SEQ_CST); \
-	incref(*(p_result));                                                   \
-	__PRIVATE_arref_deccnt(self)                                           \
+#define __PRIVATE_arref_get_3(self, p_result, incref)                       \
+	__PRIVATE_AR_INTR_PUSHOFF();                                            \
+	__PRIVATE_arref_inccnt(self)                                            \
+	*(p_result) = __hybrid_atomic_load(&(self)->arr_obj, __ATOMIC_SEQ_CST); \
+	incref(*(p_result));                                                    \
+	__PRIVATE_arref_deccnt(self)                                            \
 	__PRIVATE_AR_INTR_POP()
-#define __PRIVATE_arref_get_nopr_3(self, p_result, incref)                 \
-	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                      \
-	__PRIVATE_arref_inccnt(self)                                           \
-	*(p_result) = __hybrid_atomic_load((self)->arr_obj, __ATOMIC_SEQ_CST); \
-	incref(*(p_result));                                                   \
-	__PRIVATE_arref_deccnt(self)                                           \
+#define __PRIVATE_arref_get_nopr_3(self, p_result, incref)                  \
+	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                       \
+	__PRIVATE_arref_inccnt(self)                                            \
+	*(p_result) = __hybrid_atomic_load(&(self)->arr_obj, __ATOMIC_SEQ_CST); \
+	incref(*(p_result));                                                    \
+	__PRIVATE_arref_deccnt(self)                                            \
 	__PRIVATE_AR_INTR_POP_NOPR()
 #if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
 #define __PRIVATE_arref_get_1(self)                 \
@@ -491,15 +491,15 @@
 #endif /* !... */
 
 /* ========== arref_xch_inherit ========== */
-#define __PRIVATE_arref_xch_inherit_3(self, newobj, p_oldobj)  \
-	__PRIVATE_AR_INTR_PUSHOFF();                               \
-	*(p_oldobj) = __hybrid_atomic_xch((self)->arr_obj, newobj, \
-	                                  __ATOMIC_SEQ_CST);       \
-	__PRIVATE_arref_waitfor(self)                              \
+#define __PRIVATE_arref_xch_inherit_3(self, newobj, p_oldobj)   \
+	__PRIVATE_AR_INTR_PUSHOFF();                                \
+	*(p_oldobj) = __hybrid_atomic_xch(&(self)->arr_obj, newobj, \
+	                                  __ATOMIC_SEQ_CST);        \
+	__PRIVATE_arref_waitfor(self)                               \
 	__PRIVATE_AR_INTR_POP()
 #define __PRIVATE_arref_xch_inherit_nopr_3(self, newobj, p_oldobj) \
 	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                              \
-	*(p_oldobj) = __hybrid_atomic_xch((self)->arr_obj, newobj,     \
+	*(p_oldobj) = __hybrid_atomic_xch(&(self)->arr_obj, newobj,    \
 	                                  __ATOMIC_SEQ_CST);           \
 	__PRIVATE_arref_waitfor(self)                                  \
 	__PRIVATE_AR_INTR_POP_NOPR()
@@ -704,25 +704,25 @@
 #ifdef __HYBRID_PREEMPTION_NO_SMP
 #define __PRIVATE_arref_cmpxch_inherit_4(self, oldobj, newobj, p_ok)      \
 	__PRIVATE_AR_INTR_PUSHOFF();                                          \
-	*(p_ok) = __hybrid_atomic_cmpxch((self)->arr_obj, oldobj, newobj,     \
+	*(p_ok) = __hybrid_atomic_cmpxch(&(self)->arr_obj, oldobj, newobj,    \
 	                                 __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST); \
 	__PRIVATE_AR_INTR_POP()
 #define __PRIVATE_arref_cmpxch_inherit_nopr_4(self, oldobj, newobj, p_ok)  \
 	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                      \
-	*(p_ok) = __hybrid_atomic_cmpxch((self)->arr_obj, oldobj, newobj,      \
+	*(p_ok) = __hybrid_atomic_cmpxch(&(self)->arr_obj, oldobj, newobj,     \
 	                                 __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);  \
 	__PRIVATE_AR_INTR_POP_NOPR()
 #else /* __HYBRID_PREEMPTION_NO_SMP */
 #define __PRIVATE_arref_cmpxch_inherit_4(self, oldobj, newobj, p_ok)                   \
 	__PRIVATE_AR_INTR_PUSHOFF();                                                       \
-	if ((*(p_ok) = __hybrid_atomic_cmpxch((self)->arr_obj, oldobj, newobj,             \
+	if ((*(p_ok) = __hybrid_atomic_cmpxch(&(self)->arr_obj, oldobj, newobj,            \
 	                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) != 0) { \
 		__PRIVATE_arref_waitfor(self)                                                  \
 	}                                                                                  \
 	__PRIVATE_AR_INTR_POP()
 #define __PRIVATE_arref_cmpxch_inherit_nopr_4(self, oldobj, newobj, p_ok)              \
 	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                                  \
-	if ((*(p_ok) = __hybrid_atomic_cmpxch((self)->arr_obj, oldobj, newobj,             \
+	if ((*(p_ok) = __hybrid_atomic_cmpxch(&(self)->arr_obj, oldobj, newobj,            \
 	                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) != 0) { \
 		__PRIVATE_arref_waitfor(self)                                                  \
 	}                                                                                  \
@@ -765,7 +765,7 @@
  * NOTE: The reference to `newobj' is only inherited on success! */
 #define __PRIVATE_arref_cmpxch_inherit_new_5(self, oldobj, newobj, p_ok, decref)       \
 	__PRIVATE_AR_INTR_PUSHOFF();                                                       \
-	if ((*(p_ok) = __hybrid_atomic_cmpxch((self)->arr_obj, oldobj, newobj,             \
+	if ((*(p_ok) = __hybrid_atomic_cmpxch(&(self)->arr_obj, oldobj, newobj,            \
 	                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) != 0) { \
 		__PRIVATE_arref_waitfor(self)                                                  \
 		__PRIVATE_AR_INTR_BREAK();                                                     \
@@ -776,7 +776,7 @@
 	__PRIVATE_AR_INTR_END()
 #define __PRIVATE_arref_cmpxch_inherit_new_nopr_5(self, oldobj, newobj, p_ok, decref)  \
 	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                                  \
-	if ((*(p_ok) = __hybrid_atomic_cmpxch((self)->arr_obj, oldobj, newobj,             \
+	if ((*(p_ok) = __hybrid_atomic_cmpxch(&(self)->arr_obj, oldobj, newobj,            \
 	                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) != 0) { \
 		__PRIVATE_arref_waitfor(self)                                                  \
 		__PRIVATE_AR_INTR_BREAK_NOPR();                                                \
@@ -874,7 +874,7 @@
 	do {                                                                                    \
 		incref(newobj);                                                                     \
 		__PRIVATE_AR_INTR_PUSHOFF();                                                        \
-		if ((*(p_ok) = __hybrid_atomic_cmpxch((self)->arr_obj, oldobj, newobj,              \
+		if ((*(p_ok) = __hybrid_atomic_cmpxch(&(self)->arr_obj, oldobj, newobj,             \
 		                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) != 0) {  \
 			__PRIVATE_AR_INTR_BREAK();                                                      \
 			decref(oldobj);                                                                 \
@@ -888,7 +888,7 @@
 	do {                                                                                         \
 		incref(newobj);                                                                          \
 		__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                                        \
-		if ((*(p_ok) = __hybrid_atomic_cmpxch((self)->arr_obj, oldobj, newobj,                   \
+		if ((*(p_ok) = __hybrid_atomic_cmpxch(&(self)->arr_obj, oldobj, newobj,                  \
 		                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) != 0) {       \
 			__PRIVATE_AR_INTR_BREAK_NOPR();                                                      \
 			decref(oldobj);                                                                      \
@@ -962,28 +962,28 @@
 
 /* >> T *axref_ptr(AXREF(T) *self); */
 #define axref_ptr(self) \
-	__hybrid_atomic_load((self)->axr_obj, __ATOMIC_ACQUIRE)
+	__hybrid_atomic_load(&(self)->axr_obj, __ATOMIC_ACQUIRE)
 
 /* ========== axref_get ========== */
 #define __PRIVATE_axref_get_2(self, p_result) \
 	__PRIVATE_axref_get_3(self, p_result, incref)
 #define __PRIVATE_axref_get_nopr_2(self, p_result) \
 	__PRIVATE_axref_get_nopr_3(self, p_result, incref)
-#define __PRIVATE_axref_get_3(self, p_result, incref)                      \
-	__PRIVATE_AR_INTR_PUSHOFF();                                           \
-	__PRIVATE_axref_inccnt(self)                                           \
-	*(p_result) = __hybrid_atomic_load((self)->axr_obj, __ATOMIC_SEQ_CST); \
-	if (*(p_result) != __NULLPTR)                                          \
-		incref(*(p_result));                                               \
-	__PRIVATE_axref_deccnt(self)                                           \
+#define __PRIVATE_axref_get_3(self, p_result, incref)                       \
+	__PRIVATE_AR_INTR_PUSHOFF();                                            \
+	__PRIVATE_axref_inccnt(self)                                            \
+	*(p_result) = __hybrid_atomic_load(&(self)->axr_obj, __ATOMIC_SEQ_CST); \
+	if (*(p_result) != __NULLPTR)                                           \
+		incref(*(p_result));                                                \
+	__PRIVATE_axref_deccnt(self)                                            \
 	__PRIVATE_AR_INTR_POP()
-#define __PRIVATE_axref_get_nopr_3(self, p_result, incref)                 \
-	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                      \
-	__PRIVATE_axref_inccnt(self)                                           \
-	*(p_result) = __hybrid_atomic_load((self)->axr_obj, __ATOMIC_SEQ_CST); \
-	if (*(p_result) != __NULLPTR)                                          \
-		incref(*(p_result));                                               \
-	__PRIVATE_axref_deccnt(self)                                           \
+#define __PRIVATE_axref_get_nopr_3(self, p_result, incref)                  \
+	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                       \
+	__PRIVATE_axref_inccnt(self)                                            \
+	*(p_result) = __hybrid_atomic_load(&(self)->axr_obj, __ATOMIC_SEQ_CST); \
+	if (*(p_result) != __NULLPTR)                                           \
+		incref(*(p_result));                                                \
+	__PRIVATE_axref_deccnt(self)                                            \
 	__PRIVATE_AR_INTR_POP_NOPR()
 #if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
 #define __PRIVATE_axref_get_1(self)                 \
@@ -1028,15 +1028,15 @@
 #endif /* !... */
 
 /* ========== axref_xch_inherit ========== */
-#define __PRIVATE_axref_xch_inherit_3(self, newobj, p_oldobj)  \
-	__PRIVATE_AR_INTR_PUSHOFF();                               \
-	*(p_oldobj) = __hybrid_atomic_xch((self)->axr_obj, newobj, \
-	                                  __ATOMIC_SEQ_CST);       \
-	__PRIVATE_axref_waitfor(self)                              \
+#define __PRIVATE_axref_xch_inherit_3(self, newobj, p_oldobj)   \
+	__PRIVATE_AR_INTR_PUSHOFF();                                \
+	*(p_oldobj) = __hybrid_atomic_xch(&(self)->axr_obj, newobj, \
+	                                  __ATOMIC_SEQ_CST);        \
+	__PRIVATE_axref_waitfor(self)                               \
 	__PRIVATE_AR_INTR_POP()
 #define __PRIVATE_axref_xch_inherit_nopr_3(self, newobj, p_oldobj) \
 	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                              \
-	*(p_oldobj) = __hybrid_atomic_xch((self)->axr_obj, newobj,     \
+	*(p_oldobj) = __hybrid_atomic_xch(&(self)->axr_obj, newobj,    \
 	                                  __ATOMIC_SEQ_CST);           \
 	__PRIVATE_axref_waitfor(self)                                  \
 	__PRIVATE_AR_INTR_POP_NOPR()
@@ -1074,17 +1074,17 @@
 #endif /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
 
 /* ========== axref_steal ========== */
-#define __PRIVATE_axref_steal_2(self, p_oldobj)                   \
-	__PRIVATE_AR_INTR_PUSHOFF();                                  \
-	*(p_oldobj) = __hybrid_atomic_xch((self)->axr_obj, __NULLPTR, \
-	                                  __ATOMIC_SEQ_CST);          \
-	__PRIVATE_axref_waitfor(self)                                 \
+#define __PRIVATE_axref_steal_2(self, p_oldobj)                    \
+	__PRIVATE_AR_INTR_PUSHOFF();                                   \
+	*(p_oldobj) = __hybrid_atomic_xch(&(self)->axr_obj, __NULLPTR, \
+	                                  __ATOMIC_SEQ_CST);           \
+	__PRIVATE_axref_waitfor(self)                                  \
 	__PRIVATE_AR_INTR_POP()
-#define __PRIVATE_axref_steal_nopr_2(self, p_oldobj)              \
-	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                             \
-	*(p_oldobj) = __hybrid_atomic_xch((self)->axr_obj, __NULLPTR, \
-	                                  __ATOMIC_SEQ_CST);          \
-	__PRIVATE_axref_waitfor(self)                                 \
+#define __PRIVATE_axref_steal_nopr_2(self, p_oldobj)               \
+	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                              \
+	*(p_oldobj) = __hybrid_atomic_xch(&(self)->axr_obj, __NULLPTR, \
+	                                  __ATOMIC_SEQ_CST);           \
+	__PRIVATE_axref_waitfor(self)                                  \
 	__PRIVATE_AR_INTR_POP_NOPR()
 #if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
 #define __PRIVATE_axref_steal_1(self)                  \
@@ -1356,25 +1356,25 @@
 #ifdef __HYBRID_PREEMPTION_NO_SMP
 #define __PRIVATE_axref_cmpxch_inherit_4(self, oldobj, newobj, p_ok)      \
 	__PRIVATE_AR_INTR_PUSHOFF();                                          \
-	*(p_ok) = __hybrid_atomic_cmpxch((self)->axr_obj, oldobj, newobj,     \
+	*(p_ok) = __hybrid_atomic_cmpxch(&(self)->axr_obj, oldobj, newobj,    \
 	                                 __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST); \
 	__PRIVATE_AR_INTR_POP()
 #define __PRIVATE_axref_cmpxch_inherit_nopr_4(self, oldobj, newobj, p_ok) \
 	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                     \
-	*(p_ok) = __hybrid_atomic_cmpxch((self)->axr_obj, oldobj, newobj,     \
+	*(p_ok) = __hybrid_atomic_cmpxch(&(self)->axr_obj, oldobj, newobj,    \
 	                                 __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST); \
 	__PRIVATE_AR_INTR_POP_NOPR()
 #else /* __HYBRID_PREEMPTION_NO_SMP */
 #define __PRIVATE_axref_cmpxch_inherit_4(self, oldobj, newobj, p_ok)                   \
 	__PRIVATE_AR_INTR_PUSHOFF();                                                       \
-	if ((*(p_ok) = __hybrid_atomic_cmpxch((self)->axr_obj, oldobj, newobj,             \
+	if ((*(p_ok) = __hybrid_atomic_cmpxch(&(self)->axr_obj, oldobj, newobj,            \
 	                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) != 0) { \
 		__PRIVATE_axref_waitfor(self)                                                  \
 	}                                                                                  \
 	__PRIVATE_AR_INTR_POP()
 #define __PRIVATE_axref_cmpxch_inherit_nopr_4(self, oldobj, newobj, p_ok)              \
 	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                                  \
-	if ((*(p_ok) = __hybrid_atomic_cmpxch((self)->axr_obj, oldobj, newobj,             \
+	if ((*(p_ok) = __hybrid_atomic_cmpxch(&(self)->axr_obj, oldobj, newobj,            \
 	                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) != 0) { \
 		__PRIVATE_axref_waitfor(self)                                                  \
 	}                                                                                  \
@@ -1417,7 +1417,7 @@
  * NOTE: The reference to `newobj' is only inherited on success! */
 #define __PRIVATE_axref_cmpxch_inherit_new_5(self, oldobj, newobj, p_ok, decref)       \
 	__PRIVATE_AR_INTR_PUSHOFF();                                                       \
-	if ((*(p_ok) = __hybrid_atomic_cmpxch((self)->axr_obj, oldobj, newobj,             \
+	if ((*(p_ok) = __hybrid_atomic_cmpxch(&(self)->axr_obj, oldobj, newobj,            \
 	                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) != 0) { \
 		__PRIVATE_axref_waitfor(self)                                                  \
 		__PRIVATE_AR_INTR_BREAK();                                                     \
@@ -1429,7 +1429,7 @@
 	__PRIVATE_AR_INTR_END()
 #define __PRIVATE_axref_cmpxch_inherit_new_nopr_5(self, oldobj, newobj, p_ok, decref)  \
 	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                                  \
-	if ((*(p_ok) = __hybrid_atomic_cmpxch((self)->axr_obj, oldobj, newobj,             \
+	if ((*(p_ok) = __hybrid_atomic_cmpxch(&(self)->axr_obj, oldobj, newobj,            \
 	                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) != 0) { \
 		__PRIVATE_axref_waitfor(self)                                                  \
 		__PRIVATE_AR_INTR_BREAK();                                                     \
@@ -1529,7 +1529,7 @@
 		if ((newobj) != __NULLPTR)                                                          \
 			incref(__PRIVATE_axref_cast(self, newobj));                                     \
 		__PRIVATE_AR_INTR_PUSHOFF();                                                        \
-		if ((*(p_ok) = __hybrid_atomic_cmpxch((self)->axr_obj, oldobj, newobj,              \
+		if ((*(p_ok) = __hybrid_atomic_cmpxch(&(self)->axr_obj, oldobj, newobj,             \
 		                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) != 0) {  \
 			__PRIVATE_AR_INTR_BREAK();                                                      \
 			if ((oldobj) != __NULLPTR)                                                      \
@@ -1546,7 +1546,7 @@
 		if ((newobj) != __NULLPTR)                                                               \
 			incref(__PRIVATE_axref_cast(self, newobj));                                          \
 		__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                                        \
-		if ((*(p_ok) = __hybrid_atomic_cmpxch((self)->axr_obj, oldobj, newobj,                   \
+		if ((*(p_ok) = __hybrid_atomic_cmpxch(&(self)->axr_obj, oldobj, newobj,                  \
 		                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) != 0) {       \
 			__PRIVATE_AR_INTR_BREAK_NOPR();                                                      \
 			if ((oldobj) != __NULLPTR)                                                           \
@@ -1621,23 +1621,23 @@
 /************************************************************************/
 /* >> T *awref_ptr(AWREF(T) *self); */
 #define awref_ptr(self) \
-	__hybrid_atomic_load((self)->awr_obj, __ATOMIC_ACQUIRE)
+	__hybrid_atomic_load(&(self)->awr_obj, __ATOMIC_ACQUIRE)
 
-#define __PRIVATE_awref_get_3(self, p_result, tryincref)                   \
-	__PRIVATE_AR_INTR_PUSHOFF();                                           \
-	__PRIVATE_awref_inccnt(self)                                           \
-	*(p_result) = __hybrid_atomic_load((self)->awr_obj, __ATOMIC_SEQ_CST); \
-	if (*(p_result) != __NULLPTR && !tryincref(*(p_result)))               \
-		*(p_result) = __NULLPTR;                                           \
-	__PRIVATE_awref_deccnt(self)                                           \
+#define __PRIVATE_awref_get_3(self, p_result, tryincref)                    \
+	__PRIVATE_AR_INTR_PUSHOFF();                                            \
+	__PRIVATE_awref_inccnt(self)                                            \
+	*(p_result) = __hybrid_atomic_load(&(self)->awr_obj, __ATOMIC_SEQ_CST); \
+	if (*(p_result) != __NULLPTR && !tryincref(*(p_result)))                \
+		*(p_result) = __NULLPTR;                                            \
+	__PRIVATE_awref_deccnt(self)                                            \
 	__PRIVATE_AR_INTR_POP()
-#define __PRIVATE_awref_get_nopr_3(self, p_result, tryincref)              \
-	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                      \
-	__PRIVATE_awref_inccnt(self)                                           \
-	*(p_result) = __hybrid_atomic_load((self)->awr_obj, __ATOMIC_SEQ_CST); \
-	if (*(p_result) != __NULLPTR && !tryincref(*(p_result)))               \
-		*(p_result) = __NULLPTR;                                           \
-	__PRIVATE_awref_deccnt(self)                                           \
+#define __PRIVATE_awref_get_nopr_3(self, p_result, tryincref)               \
+	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                       \
+	__PRIVATE_awref_inccnt(self)                                            \
+	*(p_result) = __hybrid_atomic_load(&(self)->awr_obj, __ATOMIC_SEQ_CST); \
+	if (*(p_result) != __NULLPTR && !tryincref(*(p_result)))                \
+		*(p_result) = __NULLPTR;                                            \
+	__PRIVATE_awref_deccnt(self)                                            \
 	__PRIVATE_AR_INTR_POP_NOPR()
 #define __PRIVATE_awref_get_2(self, p_result) \
 	__PRIVATE_awref_get_3(self, p_result, tryincref)
@@ -1686,19 +1686,19 @@
 #endif /* !... */
 
 /* >> void awref_set(AWREF(T) *self, T *newobj); */
-#define awref_set(self, newobj)                                       \
-	__PRIVATE_AR_INTR_PUSHOFF();                                      \
-	__hybrid_atomic_store((self)->awr_obj, newobj, __ATOMIC_SEQ_CST); \
-	__PRIVATE_awref_waitfor(self)                                     \
+#define awref_set(self, newobj)                                        \
+	__PRIVATE_AR_INTR_PUSHOFF();                                       \
+	__hybrid_atomic_store(&(self)->awr_obj, newobj, __ATOMIC_SEQ_CST); \
+	__PRIVATE_awref_waitfor(self)                                      \
 	__PRIVATE_AR_INTR_POP()
-#define awref_set_nopr(self, newobj)                                  \
-	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                 \
-	__hybrid_atomic_store((self)->awr_obj, newobj, __ATOMIC_SEQ_CST); \
-	__PRIVATE_awref_waitfor(self)                                     \
+#define awref_set_nopr(self, newobj)                                   \
+	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                  \
+	__hybrid_atomic_store(&(self)->awr_obj, newobj, __ATOMIC_SEQ_CST); \
+	__PRIVATE_awref_waitfor(self)                                      \
 	__PRIVATE_AR_INTR_POP_NOPR()
 #define __PRIVATE_awref_xch_4(self, newobj, p_oldobj, tryincref) \
 	__PRIVATE_AR_INTR_PUSHOFF();                                 \
-	*(p_oldobj) = __hybrid_atomic_xch((self)->awr_obj, newobj,   \
+	*(p_oldobj) = __hybrid_atomic_xch(&(self)->awr_obj, newobj,  \
 	                                  __ATOMIC_SEQ_CST);         \
 	if (*(p_oldobj) != __NULLPTR && !tryincref(*(p_oldobj)))     \
 		*(p_oldobj) = __NULLPTR;                                 \
@@ -1706,7 +1706,7 @@
 	__PRIVATE_AR_INTR_POP()
 #define __PRIVATE_awref_xch_nopr_4(self, newobj, p_oldobj, tryincref) \
 	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                 \
-	*(p_oldobj) = __hybrid_atomic_xch((self)->awr_obj, newobj,        \
+	*(p_oldobj) = __hybrid_atomic_xch(&(self)->awr_obj, newobj,       \
 	                                  __ATOMIC_SEQ_CST);              \
 	if (*(p_oldobj) != __NULLPTR && !tryincref(*(p_oldobj)))          \
 		*(p_oldobj) = __NULLPTR;                                      \
@@ -1759,28 +1759,28 @@
 #endif /* !... */
 
 /* >> void awref_clear(AWREF(T) *self); */
-#define awref_clear(self)                                                \
-	__PRIVATE_AR_INTR_PUSHOFF();                                         \
-	__hybrid_atomic_store((self)->awr_obj, __NULLPTR, __ATOMIC_SEQ_CST); \
-	__PRIVATE_awref_waitfor(self)                                        \
+#define awref_clear(self)                                                 \
+	__PRIVATE_AR_INTR_PUSHOFF();                                          \
+	__hybrid_atomic_store(&(self)->awr_obj, __NULLPTR, __ATOMIC_SEQ_CST); \
+	__PRIVATE_awref_waitfor(self)                                         \
 	__PRIVATE_AR_INTR_POP()
 
 /* >> void awref_clear_nopr(AWREF(T) *self); */
-#define awref_clear_nopr(self)                                           \
-	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                    \
-	__hybrid_atomic_store((self)->awr_obj, __NULLPTR, __ATOMIC_SEQ_CST); \
-	__PRIVATE_awref_waitfor(self)                                        \
+#define awref_clear_nopr(self)                                            \
+	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                     \
+	__hybrid_atomic_store(&(self)->awr_obj, __NULLPTR, __ATOMIC_SEQ_CST); \
+	__PRIVATE_awref_waitfor(self)                                         \
 	__PRIVATE_AR_INTR_POP_NOPR()
 
 #define __PRIVATE_awref_cmpxch_4(self, oldobj, newobj, p_ok)              \
 	__PRIVATE_AR_INTR_PUSHOFF();                                          \
-	*(p_ok) = __hybrid_atomic_cmpxch((self)->awr_obj, oldobj, newobj,     \
+	*(p_ok) = __hybrid_atomic_cmpxch(&(self)->awr_obj, oldobj, newobj,    \
 	                                 __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST); \
 	__PRIVATE_awref_waitfor(self)                                         \
 	__PRIVATE_AR_INTR_POP()
 #define __PRIVATE_awref_cmpxch_nopr_4(self, oldobj, newobj, p_ok)         \
 	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                     \
-	*(p_ok) = __hybrid_atomic_cmpxch((self)->awr_obj, oldobj, newobj,     \
+	*(p_ok) = __hybrid_atomic_cmpxch(&(self)->awr_obj, oldobj, newobj,    \
 	                                 __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST); \
 	__PRIVATE_awref_waitfor(self)                                         \
 	__PRIVATE_AR_INTR_POP_NOPR()
@@ -1817,31 +1817,31 @@
 #define awref_cmpxch_nopr __PRIVATE_awref_cmpxch_nopr_4
 #endif /* !... */
 
-#define __PRIVATE_awref_replacedead_5(self, newobj, p_ok, T, wasdestroyed)        \
-	__PRIVATE_AR_INTR_PUSHOFF();                                                  \
-	T *__awrrd_oldobj;                                                            \
-	for (;;) {                                                                    \
-		__awrrd_oldobj = __hybrid_atomic_load((self)->awr_obj, __ATOMIC_ACQUIRE); \
-		if (!(*(p_ok) = (!__awrrd_oldobj || wasdestroyed(__awrrd_oldobj))))       \
-			break;                                                                \
-		if (__hybrid_atomic_cmpxch((self)->awr_obj, __awrrd_oldobj, newobj,       \
-		                           __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))           \
-			break;                                                                \
-	}                                                                             \
-	__PRIVATE_awref_waitfor(self)                                                 \
+#define __PRIVATE_awref_replacedead_5(self, newobj, p_ok, T, wasdestroyed)         \
+	__PRIVATE_AR_INTR_PUSHOFF();                                                   \
+	T *__awrrd_oldobj;                                                             \
+	for (;;) {                                                                     \
+		__awrrd_oldobj = __hybrid_atomic_load(&(self)->awr_obj, __ATOMIC_ACQUIRE); \
+		if (!(*(p_ok) = (!__awrrd_oldobj || wasdestroyed(__awrrd_oldobj))))        \
+			break;                                                                 \
+		if (__hybrid_atomic_cmpxch(&(self)->awr_obj, __awrrd_oldobj, newobj,       \
+		                           __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))            \
+			break;                                                                 \
+	}                                                                              \
+	__PRIVATE_awref_waitfor(self)                                                  \
 	__PRIVATE_AR_INTR_POP()
-#define __PRIVATE_awref_replacedead_nopr_5(self, newobj, p_ok, T, wasdestroyed)   \
-	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                             \
-	T *__awrrd_oldobj;                                                            \
-	for (;;) {                                                                    \
-		__awrrd_oldobj = __hybrid_atomic_load((self)->awr_obj, __ATOMIC_ACQUIRE); \
-		if (!(*(p_ok) = (!__awrrd_oldobj || wasdestroyed(__awrrd_oldobj))))       \
-			break;                                                                \
-		if (__hybrid_atomic_cmpxch((self)->awr_obj, __awrrd_oldobj, newobj,       \
-		                           __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))           \
-			break;                                                                \
-	}                                                                             \
-	__PRIVATE_awref_waitfor(self)                                                 \
+#define __PRIVATE_awref_replacedead_nopr_5(self, newobj, p_ok, T, wasdestroyed)    \
+	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                              \
+	T *__awrrd_oldobj;                                                             \
+	for (;;) {                                                                     \
+		__awrrd_oldobj = __hybrid_atomic_load(&(self)->awr_obj, __ATOMIC_ACQUIRE); \
+		if (!(*(p_ok) = (!__awrrd_oldobj || wasdestroyed(__awrrd_oldobj))))        \
+			break;                                                                 \
+		if (__hybrid_atomic_cmpxch(&(self)->awr_obj, __awrrd_oldobj, newobj,       \
+		                           __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))            \
+			break;                                                                 \
+	}                                                                              \
+	__PRIVATE_awref_waitfor(self)                                                  \
 	__PRIVATE_AR_INTR_POP_NOPR()
 #define __PRIVATE_awref_replacedead_4(self, newobj, p_ok, T) \
 	__PRIVATE_awref_replacedead_5(self, newobj, p_ok, T, wasdestroyed)

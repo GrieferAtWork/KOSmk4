@@ -28,18 +28,6 @@
 #error "Never include this file directly. - Always include `<hybrid/__atomic.h>' instead"
 #endif /* !__GUARD_HYBRID___ATOMIC_H */
 
-
-#define __GCC_ATOMIC_BOOL_LOCK_FREE     1
-#define __GCC_ATOMIC_CHAR_LOCK_FREE     1
-#define __GCC_ATOMIC_CHAR16_T_LOCK_FREE 1
-#define __GCC_ATOMIC_CHAR32_T_LOCK_FREE 1
-#define __GCC_ATOMIC_WCHAR_T_LOCK_FREE  1
-#define __GCC_ATOMIC_SHORT_LOCK_FREE    1
-#define __GCC_ATOMIC_INT_LOCK_FREE      1
-#define __GCC_ATOMIC_LONG_LOCK_FREE     1
-#define __GCC_ATOMIC_LLONG_LOCK_FREE    1
-#define __GCC_ATOMIC_POINTER_LOCK_FREE  1
-
 #ifdef __x86_64__
 #define __CDECL_OR_DEFAULT /* Nothing */
 #else /* __x86_64__ */
@@ -47,6 +35,8 @@
 #endif /* !__x86_64__ */
 
 __DECL_BEGIN
+
+#define __HYBRID_ATOMIC_LOCKFREE_MAX 8
 
 #ifndef _InterlockedCompareExchange8
 #define _InterlockedCompareExchange8 _InterlockedCompareExchange8
@@ -69,38 +59,14 @@ extern __int64 (_InterlockedCompareExchange64)(__int64 volatile *__px, __int64 _
 #pragma intrinsic(_InterlockedCompareExchange64)
 #endif /* !_InterlockedCompareExchange64 */
 
-#ifdef __cplusplus
-extern "C++" {
-
-template<class __T, class __OV, class __NV>
-#define __impl_hybrid_atomic_cmpxch_val_seqcst __impl_hybrid_atomic_cmpxch_val_seqcst
-__T __FORCELOCAL __ATTR_ARTIFICIAL __NOTHROW_NCX(__impl_hybrid_atomic_cmpxch_val_seqcst)(__T &__x, __OV __oldv, __NV __newv) {
-	__STATIC_IF(sizeof(__T) == 1) {
-		return (__T)_InterlockedCompareExchange8((char volatile *)&__x, (char)__newv, (char)__oldv);
-	}
-	__STATIC_ELSE(sizeof(__T) == 1) {
-		__STATIC_IF(sizeof(__T) == 2) {
-			return (__T)_InterlockedCompareExchange16((short volatile *)&__x, (short)__newv, (short)__oldv);
-		}
-		__STATIC_ELSE(sizeof(__T) == 2) {
-			__STATIC_IF(sizeof(__T) == 4) {
-				return (__T)_InterlockedCompareExchange((long volatile *)&__x, (long)__newv, (long)__oldv);
-			}
-			__STATIC_ELSE(sizeof(__T) == 4) {
-				return (__T)_InterlockedCompareExchange64((__int64 volatile *)&__x, (__int64)__newv, (__int64)__oldv);
-			}
-		}
-	}
-}
-
-} /* extern "C++" */
-#else /* __cplusplus */
-#define __impl_hybrid_atomic_cmpxch_val_seqcst(x, oldv, newv)                                                                                  \
-	__ATOMIC_RECAST(x, sizeof(x) == 1 ? (__UINT8_TYPE__)_InterlockedCompareExchange8((char volatile *)&(x), (char)(newv), (char)(oldv)) :      \
-	                   sizeof(x) == 2 ? (__UINT16_TYPE__)_InterlockedCompareExchange16((short volatile *)&(x), (short)(newv), (short)(oldv)) : \
-	                   sizeof(x) == 4 ? (__UINT32_TYPE__)_InterlockedCompareExchange((long volatile *)&(x), (long)(newv), (long)(oldv)) :      \
-	                                    (__UINT64_TYPE__)_InterlockedCompareExchange64((__int64 volatile *)&(x), (__int64)(newv), (__int64)(oldv)))
-#endif /* !__cplusplus */
+#define __hybrid_atomic_cmpxch_val8_seq_cst(p, oldval, newval) \
+	((__UINT8_TYPE__)_InterlockedCompareExchange8((char volatile *)(p), (char)(newval), (char)(oldval)))
+#define __hybrid_atomic_cmpxch_val16_seq_cst(p, oldval, newval) \
+	((__UINT16_TYPE__)_InterlockedCompareExchange16((short volatile *)(p), (short)(newval), (short)(oldval)))
+#define __hybrid_atomic_cmpxch_val32_seq_cst(p, oldval, newval) \
+	((__UINT32_TYPE__)_InterlockedCompareExchange((long volatile *)(p), (long)(newval), (long)(oldval)))
+#define __hybrid_atomic_cmpxch_val64_seq_cst(p, oldval, newval) \
+	((__UINT64_TYPE__)_InterlockedCompareExchange64((__int64 volatile *)(p), (__int64)(newval), (__int64)(oldval)))
 
 #ifdef __arm__
 #ifndef _InterlockedCompareExchange8_acq
@@ -164,60 +130,50 @@ extern __int64 (_InterlockedCompareExchange64_rel)(__int64 volatile *__px, __int
 #pragma intrinsic(_InterlockedCompareExchange64_rel) /* __ATOMIC_RELEASE */
 #endif /* !_InterlockedCompareExchange64_rel */
 
-__NAMESPACE_INT_BEGIN
-#define __DEFINE_WRAPPER(n, y, T)                                                                                     \
-	__FORCELOCAL __ATTR_ARTIFICIAL __UINT##n##_TYPE__                                                                 \
-	__NOTHROW_NCX(__impl_hybrid_atomic_cmpxch_val##n)(void *__x, __UINT##n##_TYPE__ __oldv,                           \
-	                                                  __UINT##n##_TYPE__ __newv, int __succ, int __fail) {            \
-		int const __order = __MAX(__succ, __fail);                                                                    \
-		if (__order >= __ATOMIC_ACQ_REL)                                                                              \
-			return (__UINT##n##_TYPE__)_InterlockedCompareExchange##y((T volatile *)__x, (T)__newv, (T)__oldv);       \
-		if (__order >= __ATOMIC_RELEASE)                                                                              \
-			return (__UINT##n##_TYPE__)_InterlockedCompareExchange##y##_rel((T volatile *)__x, (T)__newv, (T)__oldv); \
-		if (__order >= __ATOMIC_CONSUME)                                                                              \
-			return (__UINT##n##_TYPE__)_InterlockedCompareExchange##y##_acq((T volatile *)__x, (T)__newv, (T)__oldv); \
-		return (__UINT##n##_TYPE__)_InterlockedCompareExchange##y##_nf((T volatile *)__x, (T)__newv, (T)__oldv);      \
-	}
-__DEFINE_WRAPPER(8, 8, char)
-__DEFINE_WRAPPER(16, 16, short)
-__DEFINE_WRAPPER(32, , long)
-__DEFINE_WRAPPER(64, 64, __int64)
-__NAMESPACE_INT_END
-#undef __DEFINE_WRAPPER
+#define __hybrid_atomic_cmpxch_val8_relaxed(p, oldval, newval) \
+	((__UINT8_TYPE__)_InterlockedCompareExchange8_nf((char volatile *)(p), (char)(newval), (char)(oldval)))
+#define __hybrid_atomic_cmpxch_val16_relaxed(p, oldval, newval) \
+	((__UINT16_TYPE__)_InterlockedCompareExchange16_nf((short volatile *)(p), (short)(newval), (short)(oldval)))
+#define __hybrid_atomic_cmpxch_val32_relaxed(p, oldval, newval) \
+	((__UINT32_TYPE__)_InterlockedCompareExchange_nf((long volatile *)(p), (long)(newval), (long)(oldval)))
+#define __hybrid_atomic_cmpxch_val64_relaxed(p, oldval, newval) \
+	((__UINT64_TYPE__)_InterlockedCompareExchange64_nf((__int64 volatile *)(p), (__int64)(newval), (__int64)(oldval)))
+#define __hybrid_atomic_cmpxch_val8_acquire(p, oldval, newval) \
+	((__UINT8_TYPE__)_InterlockedCompareExchange8_acq((char volatile *)(p), (char)(newval), (char)(oldval)))
+#define __hybrid_atomic_cmpxch_val16_acquire(p, oldval, newval) \
+	((__UINT16_TYPE__)_InterlockedCompareExchange16_acq((short volatile *)(p), (short)(newval), (short)(oldval)))
+#define __hybrid_atomic_cmpxch_val32_acquire(p, oldval, newval) \
+	((__UINT32_TYPE__)_InterlockedCompareExchange_acq((long volatile *)(p), (long)(newval), (long)(oldval)))
+#define __hybrid_atomic_cmpxch_val64_acquire(p, oldval, newval) \
+	((__UINT64_TYPE__)_InterlockedCompareExchange64_acq((__int64 volatile *)(p), (__int64)(newval), (__int64)(oldval)))
+#define __hybrid_atomic_cmpxch_val8_release(p, oldval, newval) \
+	((__UINT8_TYPE__)_InterlockedCompareExchange8_rel((char volatile *)(p), (char)(newval), (char)(oldval)))
+#define __hybrid_atomic_cmpxch_val16_release(p, oldval, newval) \
+	((__UINT16_TYPE__)_InterlockedCompareExchange16_rel((short volatile *)(p), (short)(newval), (short)(oldval)))
+#define __hybrid_atomic_cmpxch_val32_release(p, oldval, newval) \
+	((__UINT32_TYPE__)_InterlockedCompareExchange_rel((long volatile *)(p), (long)(newval), (long)(oldval)))
+#define __hybrid_atomic_cmpxch_val64_release(p, oldval, newval) \
+	((__UINT64_TYPE__)_InterlockedCompareExchange64_rel((__int64 volatile *)(p), (__int64)(newval), (__int64)(oldval)))
 
-#ifdef __cplusplus
-extern "C++" {
-template<class __T, class __OV, class __NV>
-#define __hybrid_atomic_cmpxch_val __hybrid_atomic_cmpxch_val
-__T __FORCELOCAL __ATTR_ARTIFICIAL __NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T &__x, __OV __oldv, __NV __newv, int __fail, int __succ) {
-	__STATIC_IF(sizeof(__T) == 1) {
-		return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_cmpxch_val8(&__x, (__UINT8_TYPE__)__newv, (__UINT8_TYPE__)__oldv, __fail, __succ);
-	}
-	__STATIC_ELSE(sizeof(__T) == 1) {
-		__STATIC_IF(sizeof(__T) == 2) {
-			return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_cmpxch_val16(&__x, (__UINT16_TYPE__)__newv, (__UINT16_TYPE__)__oldv, __fail, __succ);
-		}
-		__STATIC_ELSE(sizeof(__T) == 2) {
-			__STATIC_IF(sizeof(__T) == 4) {
-				return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_cmpxch_val32(&__x, (__UINT32_TYPE__)__newv, (__UINT32_TYPE__)__oldv, __fail, __succ);
-			}
-			__STATIC_ELSE(sizeof(__T) == 4) {
-				return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_cmpxch_val64(&__x, (__UINT64_TYPE__)__newv, (__UINT64_TYPE__)__oldv, __fail, __succ);
-			}
-		}
-	}
-}
-}
-#else /* __cplusplus */
-#define __hybrid_atomic_cmpxch_val(x, oldv, newv, fail, succ)                                                                                                                        \
-	__ATOMIC_RECAST(x, sizeof(x) == 1 ? (__UINT8_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_cmpxch_val8(&(x), (__UINT8_TYPE__)(newv), (__UINT8_TYPE__)(oldv), fail, succ) :     \
-	                   sizeof(x) == 2 ? (__UINT16_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_cmpxch_val16(&(x), (__UINT16_TYPE__)(newv), (__UINT16_TYPE__)(oldv), fail, succ) : \
-	                   sizeof(x) == 4 ? (__UINT32_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_cmpxch_val32(&(x), (__UINT32_TYPE__)(newv), (__UINT32_TYPE__)(oldv), fail, succ) : \
-	                                    (__UINT64_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_cmpxch_val64(&(x), (__UINT64_TYPE__)(newv), (__UINT64_TYPE__)(oldv), fail, succ))
-#endif /* !__cplusplus */
-
-#endif /* __arm__ */
-
+#define __HYBRID_PRIVATE_ARM_ATOMIC(order, func, args)   \
+	((order) >= __ATOMIC_ACQ_REL ? func##_seq_cst args : \
+	 (order) >= __ATOMIC_RELEASE ? func##_release args : \
+	 (order) >= __ATOMIC_CONSUME ? func##_acquire args : \
+	                               func##_relaxed args)
+#define __hybrid_atomic_cmpxch_val8_p(p, oldval, newval, order)     __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_cmpxch_val8, (p, oldval, newval, order))
+#define __hybrid_atomic_cmpxch_val16_p(p, oldval, newval, order)    __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_cmpxch_val16, (p, oldval, newval, order))
+#define __hybrid_atomic_cmpxch_val32_p(p, oldval, newval, order)    __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_cmpxch_val32, (p, oldval, newval, order))
+#define __hybrid_atomic_cmpxch_val64_p(p, oldval, newval, order)    __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_cmpxch_val64, (p, oldval, newval, order))
+#define __hybrid_atomic_cmpxch_val8(p, oldval, newval, succ, fail)  __hybrid_atomic_cmpxch_val8_p(p, oldval, newval, (succ) > (fail) ? (succ) : (fail))
+#define __hybrid_atomic_cmpxch_val16(p, oldval, newval, succ, fail) __hybrid_atomic_cmpxch_val16_p(p, oldval, newval, (succ) > (fail) ? (succ) : (fail))
+#define __hybrid_atomic_cmpxch_val32(p, oldval, newval, succ, fail) __hybrid_atomic_cmpxch_val32_p(p, oldval, newval, (succ) > (fail) ? (succ) : (fail))
+#define __hybrid_atomic_cmpxch_val64(p, oldval, newval, succ, fail) __hybrid_atomic_cmpxch_val64_p(p, oldval, newval, (succ) > (fail) ? (succ) : (fail))
+#else /* __arm__ */
+#define __hybrid_atomic_cmpxch_val8(p, oldval, newval, succ, fail)  __hybrid_atomic_cmpxch_val8_seq_cst(p, oldval, newval)
+#define __hybrid_atomic_cmpxch_val16(p, oldval, newval, succ, fail) __hybrid_atomic_cmpxch_val16_seq_cst(p, oldval, newval)
+#define __hybrid_atomic_cmpxch_val32(p, oldval, newval, succ, fail) __hybrid_atomic_cmpxch_val32_seq_cst(p, oldval, newval)
+#define __hybrid_atomic_cmpxch_val64(p, oldval, newval, succ, fail) __hybrid_atomic_cmpxch_val64_seq_cst(p, oldval, newval)
+#endif /* !__arm__ */
 
 /* Implement these for much faster atomic operations. */
 #ifndef _InterlockedIncrement8
@@ -429,150 +385,40 @@ __NOTHROW_NCX(_InterlockedXor64)(__int64 volatile *__px, __int64 __v) {
 #endif /* !_InterlockedXor64 */
 
 #ifndef _InterlockedIncrement64
-#define _InterlockedIncrement64(px) _InterlockedExchangeAdd64(px,  1)
+#define _InterlockedIncrement64(px) _InterlockedExchangeAdd64(px, 1)
 #endif /* !_InterlockedIncrement64 */
 #ifndef _InterlockedDecrement64
 #define _InterlockedDecrement64(px) _InterlockedExchangeAdd64(px, -1)
 #endif /* !_InterlockedDecrement64 */
 
-
-/* Wrap extended intrinsic atomic arithmetic */
-#ifdef __cplusplus
-extern "C++" {
-
-template<class __T, class __V>
-#define __impl_hybrid_atomic_xch_seqcst __impl_hybrid_atomic_xch_seqcst
-__FORCELOCAL __ATTR_ARTIFICIAL __T __NOTHROW_NCX(__impl_hybrid_atomic_xch_seqcst)(__T &__x, __V __v) {
-	__STATIC_IF(sizeof(__T) == 1) {
-		return (__T)_InterlockedExchange8((char volatile *)&__x, (char)__v);
-	}
-	__STATIC_ELSE(sizeof(__T) == 1) {
-		__STATIC_IF(sizeof(__T) == 2) {
-			return (__T)_InterlockedExchange16((short volatile *)&__x, (short)__v);
-		}
-		__STATIC_ELSE(sizeof(__T) == 2) {
-			__STATIC_IF(sizeof(__T) == 4) {
-				return (__T)_InterlockedExchange((long volatile *)&__x, (long)__v);
-			}
-			__STATIC_ELSE(sizeof(__T) == 4) {
-				return (__T)_InterlockedExchange64((__int64 volatile *)&__x, (__int64)__v);
-			}
-		}
-	}
-}
-
-template<class __T, class __V>
-#define __impl_hybrid_atomic_fetchadd_seqcst __impl_hybrid_atomic_fetchadd_seqcst
-__FORCELOCAL __ATTR_ARTIFICIAL __T __NOTHROW_NCX(__impl_hybrid_atomic_fetchadd_seqcst)(__T &__x, __V __v) {
-	__STATIC_IF(sizeof(__T) == 1) {
-		return (__T)_InterlockedExchangeAdd8((char volatile *)&__x, (char)__v);
-	}
-	__STATIC_ELSE(sizeof(__T) == 1) {
-		__STATIC_IF(sizeof(__T) == 2) {
-			return (__T)_InterlockedExchangeAdd16((short volatile *)&__x, (short)__v);
-		}
-		__STATIC_ELSE(sizeof(__T) == 2) {
-			__STATIC_IF(sizeof(__T) == 4) {
-				return (__T)_InterlockedExchangeAdd((long volatile *)&__x, (long)__v);
-			}
-			__STATIC_ELSE(sizeof(__T) == 4) {
-				return (__T)_InterlockedExchangeAdd64((__int64 volatile *)&__x, (__int64)__v);
-			}
-		}
-	}
-}
-
-template<class __T, class __V>
-#define __impl_hybrid_atomic_fetchand_seqcst __impl_hybrid_atomic_fetchand_seqcst
-__FORCELOCAL __ATTR_ARTIFICIAL __T __NOTHROW_NCX(__impl_hybrid_atomic_fetchand_seqcst)(__T &__x, __V __v) {
-	__STATIC_IF(sizeof(__T) == 1) {
-		return (__T)_InterlockedAnd8((char volatile *)&__x, (char)__v);
-	}
-	__STATIC_ELSE(sizeof(__T) == 1) {
-		__STATIC_IF(sizeof(__T) == 2) {
-			return (__T)_InterlockedAnd16((short volatile *)&__x, (short)__v);
-		}
-		__STATIC_ELSE(sizeof(__T) == 2) {
-			__STATIC_IF(sizeof(__T) == 4) {
-				return (__T)_InterlockedAnd((long volatile *)&__x, (long)__v);
-			}
-			__STATIC_ELSE(sizeof(__T) == 4) {
-				return (__T)_InterlockedAnd64((__int64 volatile *)&__x, (__int64)__v);
-			}
-		}
-	}
-}
-
-template<class __T, class __V>
-#define __impl_hybrid_atomic_fetchor_seqcst __impl_hybrid_atomic_fetchor_seqcst
-__FORCELOCAL __ATTR_ARTIFICIAL __T __NOTHROW_NCX(__impl_hybrid_atomic_fetchor_seqcst)(__T &__x, __V __v) {
-	__STATIC_IF(sizeof(__T) == 1) {
-		return (__T)_InterlockedOr8((char volatile *)&__x, (char)__v);
-	}
-	__STATIC_ELSE(sizeof(__T) == 1) {
-		__STATIC_IF(sizeof(__T) == 2) {
-			return (__T)_InterlockedOr16((short volatile *)&__x, (short)__v);
-		}
-		__STATIC_ELSE(sizeof(__T) == 2) {
-			__STATIC_IF(sizeof(__T) == 4) {
-				return (__T)_InterlockedOr((long volatile *)&__x, (long)__v);
-			}
-			__STATIC_ELSE(sizeof(__T) == 4) {
-				return (__T)_InterlockedOr64((__int64 volatile *)&__x, (__int64)__v);
-			}
-		}
-	}
-}
-
-template<class __T, class __V>
-#define __impl_hybrid_atomic_fetchxor_seqcst __impl_hybrid_atomic_fetchxor_seqcst
-__FORCELOCAL __ATTR_ARTIFICIAL __T __NOTHROW_NCX(__impl_hybrid_atomic_fetchxor_seqcst)(__T &__x, __V __v) {
-	__STATIC_IF(sizeof(__T) == 1) {
-		return (__T)_InterlockedXor8((char volatile *)&__x, (char)__v);
-	}
-	__STATIC_ELSE(sizeof(__T) == 1) {
-		__STATIC_IF(sizeof(__T) == 2) {
-			return (__T)_InterlockedXor16((short volatile *)&__x, (short)__v);
-		}
-		__STATIC_ELSE(sizeof(__T) == 2) {
-			__STATIC_IF(sizeof(__T) == 4) {
-				return (__T)_InterlockedXor((long volatile *)&__x, (long)__v);
-			}
-			__STATIC_ELSE(sizeof(__T) == 4) {
-				return (__T)_InterlockedXor64((__int64 volatile *)&__x, (__int64)__v);
-			}
-		}
-	}
-}
-
-} /* extern "C++" */
-#else /* __cplusplus */
-#define __impl_hybrid_atomic_xch_seqcst(x, v)                                                                         \
-	__ATOMIC_RECAST(x, sizeof(x) == 1 ? (__UINT8_TYPE__ )_InterlockedExchange8((char volatile *)&(x), (char)(v)) :    \
-	                   sizeof(x) == 2 ? (__UINT16_TYPE__)_InterlockedExchange16((short volatile *)&(x), (short)(v)) : \
-	                   sizeof(x) == 4 ? (__UINT32_TYPE__)_InterlockedExchange((long volatile *)&(x), (long)(v)) :     \
-	                                    (__UINT64_TYPE__)_InterlockedExchange64((__int64 volatile *)&(x), (__int64)(v)))
-#define __impl_hybrid_atomic_fetchadd_seqcst(x, v)                                                                       \
-	__ATOMIC_RECAST(x, sizeof(x) == 1 ? (__UINT8_TYPE__ )_InterlockedExchangeAdd8((char volatile *)&(x), (char)(v)) :    \
-	                   sizeof(x) == 2 ? (__UINT16_TYPE__)_InterlockedExchangeAdd16((short volatile *)&(x), (short)(v)) : \
-	                   sizeof(x) == 4 ? (__UINT32_TYPE__)_InterlockedExchangeAdd((long volatile *)&(x), (long)(v)) :     \
-	                                    (__UINT64_TYPE__)_InterlockedExchangeAdd64((__int64 volatile *)&(x), (__int64)(v)))
-#define __impl_hybrid_atomic_fetchand_seqcst(x, v)                                                               \
-	__ATOMIC_RECAST(x, sizeof(x) == 1 ? (__UINT8_TYPE__ )_InterlockedAnd8((char volatile *)&(x), (char)(v)) :    \
-	                   sizeof(x) == 2 ? (__UINT16_TYPE__)_InterlockedAnd16((short volatile *)&(x), (short)(v)) : \
-	                   sizeof(x) == 4 ? (__UINT32_TYPE__)_InterlockedAnd((long volatile *)&(x), (long)(v)) :     \
-	                                    (__UINT64_TYPE__)_InterlockedAnd64((__int64 volatile *)&(x), (__int64)(v)))
-#define __impl_hybrid_atomic_fetchor_seqcst(x, v)                                                               \
-	__ATOMIC_RECAST(x, sizeof(x) == 1 ? (__UINT8_TYPE__ )_InterlockedOr8((char volatile *)&(x), (char)(v)) :    \
-	                   sizeof(x) == 2 ? (__UINT16_TYPE__)_InterlockedOr16((short volatile *)&(x), (short)(v)) : \
-	                   sizeof(x) == 4 ? (__UINT32_TYPE__)_InterlockedOr((long volatile *)&(x), (long)(v)) :     \
-	                                    (__UINT64_TYPE__)_InterlockedOr64((__int64 volatile *)&(x), (__int64)(v)))
-#define __impl_hybrid_atomic_fetchxor_seqcst(x, v)                                                               \
-	__ATOMIC_RECAST(x, sizeof(x) == 1 ? (__UINT8_TYPE__ )_InterlockedXor8((char volatile *)&(x), (char)(v)) :    \
-	                   sizeof(x) == 2 ? (__UINT16_TYPE__)_InterlockedXor16((short volatile *)&(x), (short)(v)) : \
-	                   sizeof(x) == 4 ? (__UINT32_TYPE__)_InterlockedXor((long volatile *)&(x), (long)(v)) :     \
-	                                    (__UINT64_TYPE__)_InterlockedXor64((__int64 volatile *)&(x), (__int64)(v)))
-#endif /* !__cplusplus */
+#define __hybrid_atomic_xch8_seq_cst(p, val)       ((__UINT8_TYPE__)_InterlockedExchange8((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_xch16_seq_cst(p, val)      ((__UINT16_TYPE__)_InterlockedExchange16((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_xch32_seq_cst(p, val)      ((__UINT32_TYPE__)_InterlockedExchange((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_xch64_seq_cst(p, val)      ((__UINT64_TYPE__)_InterlockedExchange64((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_fetchadd8_seq_cst(p, val)  ((__UINT8_TYPE__)_InterlockedExchangeAdd8((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_fetchadd16_seq_cst(p, val) ((__UINT16_TYPE__)_InterlockedExchangeAdd16((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_fetchadd32_seq_cst(p, val) ((__UINT32_TYPE__)_InterlockedExchangeAdd((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_fetchadd64_seq_cst(p, val) ((__UINT64_TYPE__)_InterlockedExchangeAdd64((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_fetchand8_seq_cst(p, val)  ((__UINT8_TYPE__)_InterlockedAnd8((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_fetchand16_seq_cst(p, val) ((__UINT16_TYPE__)_InterlockedAnd16((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_fetchand32_seq_cst(p, val) ((__UINT32_TYPE__)_InterlockedAnd((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_fetchand64_seq_cst(p, val) ((__UINT64_TYPE__)_InterlockedAnd64((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_fetchor8_seq_cst(p, val)   ((__UINT8_TYPE__)_InterlockedOr8((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_fetchor16_seq_cst(p, val)  ((__UINT16_TYPE__)_InterlockedOr16((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_fetchor32_seq_cst(p, val)  ((__UINT32_TYPE__)_InterlockedOr((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_fetchor64_seq_cst(p, val)  ((__UINT64_TYPE__)_InterlockedOr64((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_fetchxor8_seq_cst(p, val)  ((__UINT8_TYPE__)_InterlockedXor8((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_fetchxor16_seq_cst(p, val) ((__UINT16_TYPE__)_InterlockedXor16((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_fetchxor32_seq_cst(p, val) ((__UINT32_TYPE__)_InterlockedXor((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_fetchxor64_seq_cst(p, val) ((__UINT64_TYPE__)_InterlockedXor64((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_incfetch8_seq_cst(p)       ((__UINT8_TYPE__)_InterlockedIncrement8((char volatile *)(p)))
+#define __hybrid_atomic_incfetch16_seq_cst(p)      ((__UINT16_TYPE__)_InterlockedIncrement16((short volatile *)(p)))
+#define __hybrid_atomic_incfetch32_seq_cst(p)      ((__UINT32_TYPE__)_InterlockedIncrement((long volatile *)(p)))
+#define __hybrid_atomic_incfetch64_seq_cst(p)      ((__UINT64_TYPE__)_InterlockedIncrement64((__int64 volatile *)(p)))
+#define __hybrid_atomic_decfetch8_seq_cst(p)       ((__UINT8_TYPE__)_InterlockedDecrement8((char volatile *)(p)))
+#define __hybrid_atomic_decfetch16_seq_cst(p)      ((__UINT16_TYPE__)_InterlockedDecrement16((short volatile *)(p)))
+#define __hybrid_atomic_decfetch32_seq_cst(p)      ((__UINT32_TYPE__)_InterlockedDecrement((long volatile *)(p)))
+#define __hybrid_atomic_decfetch64_seq_cst(p)      ((__UINT64_TYPE__)_InterlockedDecrement64((__int64 volatile *)(p)))
 
 
 /* Fix ARM atomics. */
@@ -992,222 +838,163 @@ extern __int64 (_InterlockedXor64_rel)(__int64 volatile *__px, __int64 __v);
 #pragma intrinsic(_InterlockedXor64_rel)
 #endif /* !_InterlockedXor64_rel */
 
-#define __DEFINE_WRAPPER(n, y, T)                                                                     \
-	__FORCELOCAL __ATTR_ARTIFICIAL __UINT##n##_TYPE__                                                 \
-	__NOTHROW_NCX(__impl_hybrid_atomic_xch##n)(void *__x, __UINT##n##_TYPE__ __v, int __order) {      \
-		if (__order >= __ATOMIC_ACQ_REL)                                                              \
-			return (__UINT##n##_TYPE__)_InterlockedExchange##y((T volatile *)__x, (T)__v);            \
-		if (__order >= __ATOMIC_RELEASE)                                                              \
-			return (__UINT##n##_TYPE__)_InterlockedExchange##y##_rel((T volatile *)__x, (T)__v);      \
-		if (__order >= __ATOMIC_CONSUME)                                                              \
-			return (__UINT##n##_TYPE__)_InterlockedExchange##y##_acq((T volatile *)__x, (T)__v);      \
-		return (__UINT##n##_TYPE__)_InterlockedExchange##y##_nf((T volatile *)__x, (T)__v);           \
-	}                                                                                                 \
-	__FORCELOCAL __ATTR_ARTIFICIAL __UINT##n##_TYPE__                                                 \
-	__NOTHROW_NCX(__impl_hybrid_atomic_fetchadd##n)(void *__x, __UINT##n##_TYPE__ __v, int __order) { \
-		if (__order >= __ATOMIC_ACQ_REL)                                                              \
-			return (__UINT##n##_TYPE__)_InterlockedExchangeAdd##y((T volatile *)__x, (T)__v);         \
-		if (__order >= __ATOMIC_RELEASE)                                                              \
-			return (__UINT##n##_TYPE__)_InterlockedExchangeAdd##y##_rel((T volatile *)__x, (T)__v);   \
-		if (__order >= __ATOMIC_CONSUME)                                                              \
-			return (__UINT##n##_TYPE__)_InterlockedExchangeAdd##y##_acq((T volatile *)__x, (T)__v);   \
-		return (__UINT##n##_TYPE__)_InterlockedExchangeAdd##y##_nf((T volatile *)__x, (T)__v);        \
-	}                                                                                                 \
-	__FORCELOCAL __ATTR_ARTIFICIAL __UINT##n##_TYPE__                                                 \
-	__NOTHROW_NCX(__impl_hybrid_atomic_fetchand##n)(void *__x, __UINT##n##_TYPE__ __v, int __order) { \
-		if (__order >= __ATOMIC_ACQ_REL)                                                              \
-			return (__UINT##n##_TYPE__)_InterlockedAnd##y((T volatile *)__x, (T)__v);                 \
-		if (__order >= __ATOMIC_RELEASE)                                                              \
-			return (__UINT##n##_TYPE__)_InterlockedAnd##y##_rel((T volatile *)__x, (T)__v);           \
-		if (__order >= __ATOMIC_CONSUME)                                                              \
-			return (__UINT##n##_TYPE__)_InterlockedAnd##y##_acq((T volatile *)__x, (T)__v);           \
-		return (__UINT##n##_TYPE__)_InterlockedAnd##y##_nf((T volatile *)__x, (T)__v);                \
-	}                                                                                                 \
-	__FORCELOCAL __ATTR_ARTIFICIAL __UINT##n##_TYPE__                                                 \
-	__NOTHROW_NCX(__impl_hybrid_atomic_fetchor##n)(void *__x, __UINT##n##_TYPE__ __v, int __order) {  \
-		if (__order >= __ATOMIC_ACQ_REL)                                                              \
-			return (__UINT##n##_TYPE__)_InterlockedOr##y((T volatile *)__x, (T)__v);                  \
-		if (__order >= __ATOMIC_RELEASE)                                                              \
-			return (__UINT##n##_TYPE__)_InterlockedOr##y##_rel((T volatile *)__x, (T)__v);            \
-		if (__order >= __ATOMIC_CONSUME)                                                              \
-			return (__UINT##n##_TYPE__)_InterlockedOr##y##_acq((T volatile *)__x, (T)__v);            \
-		return (__UINT##n##_TYPE__)_InterlockedOr##y##_nf((T volatile *)__x, (T)__v);                 \
-	}                                                                                                 \
-	__FORCELOCAL __ATTR_ARTIFICIAL __UINT##n##_TYPE__                                                 \
-	__NOTHROW_NCX(__impl_hybrid_atomic_fetchxor##n)(void *__x, __UINT##n##_TYPE__ __v, int __order) { \
-		if (__order >= __ATOMIC_ACQ_REL)                                                              \
-			return (__UINT##n##_TYPE__)_InterlockedXor##y((T volatile *)__x, (T)__v);                 \
-		if (__order >= __ATOMIC_RELEASE)                                                              \
-			return (__UINT##n##_TYPE__)_InterlockedXor##y##_rel((T volatile *)__x, (T)__v);           \
-		if (__order >= __ATOMIC_CONSUME)                                                              \
-			return (__UINT##n##_TYPE__)_InterlockedXor##y##_acq((T volatile *)__x, (T)__v);           \
-		return (__UINT##n##_TYPE__)_InterlockedXor##y##_nf((T volatile *)__x, (T)__v);                \
-	}
-__NAMESPACE_INT_BEGIN
-__DEFINE_WRAPPER(8, 8, char)
-__DEFINE_WRAPPER(16, 16, short)
-__DEFINE_WRAPPER(32, , long)
-__DEFINE_WRAPPER(64, 64, __int64)
-__NAMESPACE_INT_END
-#undef __DEFINE_WRAPPER
+#define __hybrid_atomic_xch8_release(p, val)       ((__UINT8_TYPE__)_InterlockedExchange8_rel((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_xch16_release(p, val)      ((__UINT16_TYPE__)_InterlockedExchange16_rel((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_xch32_release(p, val)      ((__UINT32_TYPE__)_InterlockedExchange_rel((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_xch64_release(p, val)      ((__UINT64_TYPE__)_InterlockedExchange64_rel((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_fetchadd8_release(p, val)  ((__UINT8_TYPE__)_InterlockedExchangeAdd8_rel((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_fetchadd16_release(p, val) ((__UINT16_TYPE__)_InterlockedExchangeAdd16_rel((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_fetchadd32_release(p, val) ((__UINT32_TYPE__)_InterlockedExchangeAdd_rel((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_fetchadd64_release(p, val) ((__UINT64_TYPE__)_InterlockedExchangeAdd64_rel((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_fetchand8_release(p, val)  ((__UINT8_TYPE__)_InterlockedAnd8_rel((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_fetchand16_release(p, val) ((__UINT16_TYPE__)_InterlockedAnd16_rel((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_fetchand32_release(p, val) ((__UINT32_TYPE__)_InterlockedAnd_rel((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_fetchand64_release(p, val) ((__UINT64_TYPE__)_InterlockedAnd64_rel((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_fetchor8_release(p, val)   ((__UINT8_TYPE__)_InterlockedOr8_rel((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_fetchor16_release(p, val)  ((__UINT16_TYPE__)_InterlockedOr16_rel((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_fetchor32_release(p, val)  ((__UINT32_TYPE__)_InterlockedOr_rel((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_fetchor64_release(p, val)  ((__UINT64_TYPE__)_InterlockedOr64_rel((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_fetchxor8_release(p, val)  ((__UINT8_TYPE__)_InterlockedXor8_rel((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_fetchxor16_release(p, val) ((__UINT16_TYPE__)_InterlockedXor16_rel((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_fetchxor32_release(p, val) ((__UINT32_TYPE__)_InterlockedXor_rel((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_fetchxor64_release(p, val) ((__UINT64_TYPE__)_InterlockedXor64_rel((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_incfetch8_release(p)       ((__UINT8_TYPE__)_InterlockedIncrement8_rel((char volatile *)(p)))
+#define __hybrid_atomic_incfetch16_release(p)      ((__UINT16_TYPE__)_InterlockedIncrement16_rel((short volatile *)(p)))
+#define __hybrid_atomic_incfetch32_release(p)      ((__UINT32_TYPE__)_InterlockedIncrement_rel((long volatile *)(p)))
+#define __hybrid_atomic_incfetch64_release(p)      ((__UINT64_TYPE__)_InterlockedIncrement64_rel((__int64 volatile *)(p)))
+#define __hybrid_atomic_decfetch8_release(p)       ((__UINT8_TYPE__)_InterlockedDecrement8_rel((char volatile *)(p)))
+#define __hybrid_atomic_decfetch16_release(p)      ((__UINT16_TYPE__)_InterlockedDecrement16_rel((short volatile *)(p)))
+#define __hybrid_atomic_decfetch32_release(p)      ((__UINT32_TYPE__)_InterlockedDecrement_rel((long volatile *)(p)))
+#define __hybrid_atomic_decfetch64_release(p)      ((__UINT64_TYPE__)_InterlockedDecrement64_rel((__int64 volatile *)(p)))
 
-#ifdef __cplusplus
-extern "C++" {
+#define __hybrid_atomic_xch8_acquire(p, val)       ((__UINT8_TYPE__)_InterlockedExchange8_acq((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_xch16_acquire(p, val)      ((__UINT16_TYPE__)_InterlockedExchange16_acq((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_xch32_acquire(p, val)      ((__UINT32_TYPE__)_InterlockedExchange_acq((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_xch64_acquire(p, val)      ((__UINT64_TYPE__)_InterlockedExchange64_acq((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_fetchadd8_acquire(p, val)  ((__UINT8_TYPE__)_InterlockedExchangeAdd8_acq((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_fetchadd16_acquire(p, val) ((__UINT16_TYPE__)_InterlockedExchangeAdd16_acq((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_fetchadd32_acquire(p, val) ((__UINT32_TYPE__)_InterlockedExchangeAdd_acq((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_fetchadd64_acquire(p, val) ((__UINT64_TYPE__)_InterlockedExchangeAdd64_acq((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_fetchand8_acquire(p, val)  ((__UINT8_TYPE__)_InterlockedAnd8_acq((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_fetchand16_acquire(p, val) ((__UINT16_TYPE__)_InterlockedAnd16_acq((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_fetchand32_acquire(p, val) ((__UINT32_TYPE__)_InterlockedAnd_acq((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_fetchand64_acquire(p, val) ((__UINT64_TYPE__)_InterlockedAnd64_acq((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_fetchor8_acquire(p, val)   ((__UINT8_TYPE__)_InterlockedOr8_acq((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_fetchor16_acquire(p, val)  ((__UINT16_TYPE__)_InterlockedOr16_acq((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_fetchor32_acquire(p, val)  ((__UINT32_TYPE__)_InterlockedOr_acq((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_fetchor64_acquire(p, val)  ((__UINT64_TYPE__)_InterlockedOr64_acq((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_fetchxor8_acquire(p, val)  ((__UINT8_TYPE__)_InterlockedXor8_acq((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_fetchxor16_acquire(p, val) ((__UINT16_TYPE__)_InterlockedXor16_acq((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_fetchxor32_acquire(p, val) ((__UINT32_TYPE__)_InterlockedXor_acq((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_fetchxor64_acquire(p, val) ((__UINT64_TYPE__)_InterlockedXor64_acq((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_incfetch8_acquire(p)       ((__UINT8_TYPE__)_InterlockedIncrement8_acq((char volatile *)(p)))
+#define __hybrid_atomic_incfetch16_acquire(p)      ((__UINT16_TYPE__)_InterlockedIncrement16_acq((short volatile *)(p)))
+#define __hybrid_atomic_incfetch32_acquire(p)      ((__UINT32_TYPE__)_InterlockedIncrement_acq((long volatile *)(p)))
+#define __hybrid_atomic_incfetch64_acquire(p)      ((__UINT64_TYPE__)_InterlockedIncrement64_acq((__int64 volatile *)(p)))
+#define __hybrid_atomic_decfetch8_acquire(p)       ((__UINT8_TYPE__)_InterlockedDecrement8_acq((char volatile *)(p)))
+#define __hybrid_atomic_decfetch16_acquire(p)      ((__UINT16_TYPE__)_InterlockedDecrement16_acq((short volatile *)(p)))
+#define __hybrid_atomic_decfetch32_acquire(p)      ((__UINT32_TYPE__)_InterlockedDecrement_acq((long volatile *)(p)))
+#define __hybrid_atomic_decfetch64_acquire(p)      ((__UINT64_TYPE__)_InterlockedDecrement64_acq((__int64 volatile *)(p)))
 
-template<class __T, class __V>
-#define __hybrid_atomic_xch __hybrid_atomic_xch
-__FORCELOCAL __ATTR_ARTIFICIAL __T __NOTHROW_NCX(__hybrid_atomic_xch)(__T &__x, __V __v, int __order) {
-	__STATIC_IF(sizeof(__T) == 1) {
-		return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_xch8(&__x, (__UINT8_TYPE__)__v, __order);
-	}
-	__STATIC_ELSE(sizeof(__T) == 1) {
-		__STATIC_IF(sizeof(__T) == 2) {
-			return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_xch16(&__x, (__UINT16_TYPE__)__v, __order);
-		}
-		__STATIC_ELSE(sizeof(__T) == 2) {
-			__STATIC_IF(sizeof(__T) == 4) {
-				return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_xch32(&__x, (__UINT32_TYPE__)__v, __order);
-			}
-			__STATIC_ELSE(sizeof(__T) == 4) {
-				return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_xch64(&__x, (__UINT64_TYPE__)__v, __order);
-			}
-		}
-	}
-}
+#define __hybrid_atomic_xch8_relaxed(p, val)       ((__UINT8_TYPE__)_InterlockedExchange8_nf((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_xch16_relaxed(p, val)      ((__UINT16_TYPE__)_InterlockedExchange16_nf((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_xch32_relaxed(p, val)      ((__UINT32_TYPE__)_InterlockedExchange_nf((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_xch64_relaxed(p, val)      ((__UINT64_TYPE__)_InterlockedExchange64_nf((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_fetchadd8_relaxed(p, val)  ((__UINT8_TYPE__)_InterlockedExchangeAdd8_nf((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_fetchadd16_relaxed(p, val) ((__UINT16_TYPE__)_InterlockedExchangeAdd16_nf((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_fetchadd32_relaxed(p, val) ((__UINT32_TYPE__)_InterlockedExchangeAdd_nf((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_fetchadd64_relaxed(p, val) ((__UINT64_TYPE__)_InterlockedExchangeAdd64_nf((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_fetchand8_relaxed(p, val)  ((__UINT8_TYPE__)_InterlockedAnd8_nf((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_fetchand16_relaxed(p, val) ((__UINT16_TYPE__)_InterlockedAnd16_nf((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_fetchand32_relaxed(p, val) ((__UINT32_TYPE__)_InterlockedAnd_nf((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_fetchand64_relaxed(p, val) ((__UINT64_TYPE__)_InterlockedAnd64_nf((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_fetchor8_relaxed(p, val)   ((__UINT8_TYPE__)_InterlockedOr8_nf((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_fetchor16_relaxed(p, val)  ((__UINT16_TYPE__)_InterlockedOr16_nf((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_fetchor32_relaxed(p, val)  ((__UINT32_TYPE__)_InterlockedOr_nf((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_fetchor64_relaxed(p, val)  ((__UINT64_TYPE__)_InterlockedOr64_nf((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_fetchxor8_relaxed(p, val)  ((__UINT8_TYPE__)_InterlockedXor8_nf((char volatile *)(p), (char)(val)))
+#define __hybrid_atomic_fetchxor16_relaxed(p, val) ((__UINT16_TYPE__)_InterlockedXor16_nf((short volatile *)(p), (short)(val)))
+#define __hybrid_atomic_fetchxor32_relaxed(p, val) ((__UINT32_TYPE__)_InterlockedXor_nf((long volatile *)(p), (long)(val)))
+#define __hybrid_atomic_fetchxor64_relaxed(p, val) ((__UINT64_TYPE__)_InterlockedXor64_nf((__int64 volatile *)(p), (__int64)(val)))
+#define __hybrid_atomic_incfetch8_relaxed(p)       ((__UINT8_TYPE__)_InterlockedIncrement8_nf((char volatile *)(p)))
+#define __hybrid_atomic_incfetch16_relaxed(p)      ((__UINT16_TYPE__)_InterlockedIncrement16_nf((short volatile *)(p)))
+#define __hybrid_atomic_incfetch32_relaxed(p)      ((__UINT32_TYPE__)_InterlockedIncrement_nf((long volatile *)(p)))
+#define __hybrid_atomic_incfetch64_relaxed(p)      ((__UINT64_TYPE__)_InterlockedIncrement64_nf((__int64 volatile *)(p)))
+#define __hybrid_atomic_decfetch8_relaxed(p)       ((__UINT8_TYPE__)_InterlockedDecrement8_nf((char volatile *)(p)))
+#define __hybrid_atomic_decfetch16_relaxed(p)      ((__UINT16_TYPE__)_InterlockedDecrement16_nf((short volatile *)(p)))
+#define __hybrid_atomic_decfetch32_relaxed(p)      ((__UINT32_TYPE__)_InterlockedDecrement_nf((long volatile *)(p)))
+#define __hybrid_atomic_decfetch64_relaxed(p)      ((__UINT64_TYPE__)_InterlockedDecrement64_nf((__int64 volatile *)(p)))
 
-template<class __T, class __V>
-#define __hybrid_atomic_fetchadd __hybrid_atomic_fetchadd
-__FORCELOCAL __ATTR_ARTIFICIAL __T __NOTHROW_NCX(__hybrid_atomic_fetchadd)(__T &__x, __V __v, int __order) {
-	__STATIC_IF(sizeof(__T) == 1) {
-		return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchadd8(&__x, (__UINT8_TYPE__)__v, __order);
-	}
-	__STATIC_ELSE(sizeof(__T) == 1) {
-		__STATIC_IF(sizeof(__T) == 2) {
-			return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchadd16(&__x, (__UINT16_TYPE__)__v, __order);
-		}
-		__STATIC_ELSE(sizeof(__T) == 2) {
-			__STATIC_IF(sizeof(__T) == 4) {
-				return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchadd32(&__x, (__UINT32_TYPE__)__v, __order);
-			}
-			__STATIC_ELSE(sizeof(__T) == 4) {
-				return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchadd64(&__x, (__UINT64_TYPE__)__v, __order);
-			}
-		}
-	}
-}
-
-template<class __T, class __V>
-#define __hybrid_atomic_fetchand __hybrid_atomic_fetchand
-__FORCELOCAL __ATTR_ARTIFICIAL __T __NOTHROW_NCX(__hybrid_atomic_fetchand)(__T &__x, __V __v, int __order) {
-	__STATIC_IF(sizeof(__T) == 1) {
-		return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchand8(&__x, (__UINT8_TYPE__)__v, __order);
-	}
-	__STATIC_ELSE(sizeof(__T) == 1) {
-		__STATIC_IF(sizeof(__T) == 2) {
-			return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchand16(&__x, (__UINT16_TYPE__)__v, __order);
-		}
-		__STATIC_ELSE(sizeof(__T) == 2) {
-			__STATIC_IF(sizeof(__T) == 4) {
-				return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchand32(&__x, (__UINT32_TYPE__)__v, __order);
-			}
-			__STATIC_ELSE(sizeof(__T) == 4) {
-				return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchand64(&__x, (__UINT64_TYPE__)__v, __order);
-			}
-		}
-	}
-}
-
-template<class __T, class __V>
-#define __hybrid_atomic_fetchor __hybrid_atomic_fetchor
-__FORCELOCAL __ATTR_ARTIFICIAL __T __NOTHROW_NCX(__hybrid_atomic_fetchor)(__T &__x, __V __v, int __order) {
-	__STATIC_IF(sizeof(__T) == 1) {
-		return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchor8(&__x, (__UINT8_TYPE__)__v, __order);
-	}
-	__STATIC_ELSE(sizeof(__T) == 1) {
-		__STATIC_IF(sizeof(__T) == 2) {
-			return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchor16(&__x, (__UINT16_TYPE__)__v, __order);
-		}
-		__STATIC_ELSE(sizeof(__T) == 2) {
-			__STATIC_IF(sizeof(__T) == 4) {
-				return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchor32(&__x, (__UINT32_TYPE__)__v, __order);
-			}
-			__STATIC_ELSE(sizeof(__T) == 4) {
-				return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchor64(&__x, (__UINT64_TYPE__)__v, __order);
-			}
-		}
-	}
-}
-
-template<class __T, class __V>
-#define __hybrid_atomic_fetchxor __hybrid_atomic_fetchxor
-__FORCELOCAL __ATTR_ARTIFICIAL __T __NOTHROW_NCX(__hybrid_atomic_fetchxor)(__T &__x, __V __v, int __order) {
-	__STATIC_IF(sizeof(__T) == 1) {
-		return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchxor8(&__x, (__UINT8_TYPE__)__v, __order);
-	}
-	__STATIC_ELSE(sizeof(__T) == 1) {
-		__STATIC_IF(sizeof(__T) == 2) {
-			return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchxor16(&__x, (__UINT16_TYPE__)__v, __order);
-		}
-		__STATIC_ELSE(sizeof(__T) == 2) {
-			__STATIC_IF(sizeof(__T) == 4) {
-				return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchxor32(&__x, (__UINT32_TYPE__)__v, __order);
-			}
-			__STATIC_ELSE(sizeof(__T) == 4) {
-				return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchxor64(&__x, (__UINT64_TYPE__)__v, __order);
-			}
-		}
-	}
-}
-
-}
-#else /* __cplusplus */
-#define __hybrid_atomic_xch(x, v, order)                                                                                                     \
-	__ATOMIC_RECAST(x, sizeof(x) == 1 ? (__UINT8_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_xch8(&(x), (__UINT8_TYPE__)(v), order) :    \
-	                   sizeof(x) == 2 ? (__UINT16_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_xch16(&(x), (__UINT16_TYPE__)(v), order) : \
-	                   sizeof(x) == 4 ? (__UINT32_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_xch32(&(x), (__UINT32_TYPE__)(v), order) : \
-	                                    (__UINT64_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_xch64(&(x), (__UINT64_TYPE__)(v), order))
-#define __hybrid_atomic_fetchadd(x, v, order)                                                                                                     \
-	__ATOMIC_RECAST(x, sizeof(x) == 1 ? (__UINT8_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchadd8(&(x), (__UINT8_TYPE__)(v), order) :    \
-	                   sizeof(x) == 2 ? (__UINT16_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchadd16(&(x), (__UINT16_TYPE__)(v), order) : \
-	                   sizeof(x) == 4 ? (__UINT32_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchadd32(&(x), (__UINT32_TYPE__)(v), order) : \
-	                                    (__UINT64_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchadd64(&(x), (__UINT64_TYPE__)(v), order))
-#define __hybrid_atomic_fetchand(x, v, order)                                                                                                     \
-	__ATOMIC_RECAST(x, sizeof(x) == 1 ? (__UINT8_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchand8(&(x), (__UINT8_TYPE__)(v), order) :    \
-	                   sizeof(x) == 2 ? (__UINT16_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchand16(&(x), (__UINT16_TYPE__)(v), order) : \
-	                   sizeof(x) == 4 ? (__UINT32_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchand32(&(x), (__UINT32_TYPE__)(v), order) : \
-	                                    (__UINT64_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchand64(&(x), (__UINT64_TYPE__)(v), order))
-#define __hybrid_atomic_fetchor(x, v, order)                                                                                                     \
-	__ATOMIC_RECAST(x, sizeof(x) == 1 ? (__UINT8_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchor8(&(x), (__UINT8_TYPE__)(v), order) :    \
-	                   sizeof(x) == 2 ? (__UINT16_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchor16(&(x), (__UINT16_TYPE__)(v), order) : \
-	                   sizeof(x) == 4 ? (__UINT32_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchor32(&(x), (__UINT32_TYPE__)(v), order) : \
-	                                    (__UINT64_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchor64(&(x), (__UINT64_TYPE__)(v), order))
-#define __hybrid_atomic_fetchxor(x, v, order)                                                                                                     \
-	__ATOMIC_RECAST(x, sizeof(x) == 1 ? (__UINT8_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchxor8(&(x), (__UINT8_TYPE__)(v), order) :    \
-	                   sizeof(x) == 2 ? (__UINT16_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchxor16(&(x), (__UINT16_TYPE__)(v), order) : \
-	                   sizeof(x) == 4 ? (__UINT32_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchxor32(&(x), (__UINT32_TYPE__)(v), order) : \
-	                                    (__UINT64_TYPE__)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetchxor64(&(x), (__UINT64_TYPE__)(v), order))
-#endif /* !__cplusplus */
-
+#define __hybrid_atomic_xch8(p, val, order)       __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_xch8, (p, val))
+#define __hybrid_atomic_xch16(p, val, order)      __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_xch16, (p, val))
+#define __hybrid_atomic_xch32(p, val, order)      __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_xch32, (p, val))
+#define __hybrid_atomic_xch64(p, val, order)      __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_xch64, (p, val))
+#define __hybrid_atomic_fetchadd8(p, val, order)  __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_fetchadd8, (p, val))
+#define __hybrid_atomic_fetchadd16(p, val, order) __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_fetchadd16, (p, val))
+#define __hybrid_atomic_fetchadd32(p, val, order) __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_fetchadd32, (p, val))
+#define __hybrid_atomic_fetchadd64(p, val, order) __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_fetchadd64, (p, val))
+#define __hybrid_atomic_fetchand8(p, val, order)  __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_fetchand8, (p, val))
+#define __hybrid_atomic_fetchand16(p, val, order) __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_fetchand16, (p, val))
+#define __hybrid_atomic_fetchand32(p, val, order) __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_fetchand32, (p, val))
+#define __hybrid_atomic_fetchand64(p, val, order) __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_fetchand64, (p, val))
+#define __hybrid_atomic_fetchor8(p, val, order)   __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_fetchor8, (p, val))
+#define __hybrid_atomic_fetchor16(p, val, order)  __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_fetchor16, (p, val))
+#define __hybrid_atomic_fetchor32(p, val, order)  __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_fetchor32, (p, val))
+#define __hybrid_atomic_fetchor64(p, val, order)  __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_fetchor64, (p, val))
+#define __hybrid_atomic_fetchxor8(p, val, order)  __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_fetchxor8, (p, val))
+#define __hybrid_atomic_fetchxor16(p, val, order) __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_fetchxor16, (p, val))
+#define __hybrid_atomic_fetchxor32(p, val, order) __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_fetchxor32, (p, val))
+#define __hybrid_atomic_fetchxor64(p, val, order) __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_fetchxor64, (p, val))
+#define __hybrid_atomic_incfetch8(p, order)       __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_incfetch8, (p))
+#define __hybrid_atomic_incfetch16(p, order)      __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_incfetch16, (p))
+#define __hybrid_atomic_incfetch32(p, order)      __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_incfetch32, (p))
+#define __hybrid_atomic_incfetch64(p, order)      __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_incfetch64, (p))
+#define __hybrid_atomic_decfetch8(p, order)       __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_decfetch8, (p))
+#define __hybrid_atomic_decfetch16(p, order)      __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_decfetch16, (p))
+#define __hybrid_atomic_decfetch32(p, order)      __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_decfetch32, (p))
+#define __hybrid_atomic_decfetch64(p, order)      __HYBRID_PRIVATE_ARM_ATOMIC(order, __hybrid_atomic_decfetch64, (p))
 #define __hybrid_atomic_thread_fence(order) \
-	(__NAMESPACE_INT_SYM __impl_hybrid_atomic_thread_fence(order))
-__NAMESPACE_INT_BEGIN
-__FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_NCX(__impl_hybrid_atomic_thread_fence)(int __order) {
-	if (__order != __ATOMIC_RELAXED)
-		__dmb(_ARM_BARRIER_ISH);
-}
-__NAMESPACE_INT_END
-
+	((order != __ATOMIC_RELAXED) ? __dmb(_ARM_BARRIER_ISH) : (void)0)
 #else /* __arm__ */
+
+#define __hybrid_atomic_xch8(p, val, order)       __hybrid_atomic_xch8_seq_cst(p, val)
+#define __hybrid_atomic_xch16(p, val, order)      __hybrid_atomic_xch16_seq_cst(p, val)
+#define __hybrid_atomic_xch32(p, val, order)      __hybrid_atomic_xch32_seq_cst(p, val)
+#define __hybrid_atomic_xch64(p, val, order)      __hybrid_atomic_xch64_seq_cst(p, val)
+#define __hybrid_atomic_fetchadd8(p, val, order)  __hybrid_atomic_fetchadd8_seq_cst(p, val)
+#define __hybrid_atomic_fetchadd16(p, val, order) __hybrid_atomic_fetchadd16_seq_cst(p, val)
+#define __hybrid_atomic_fetchadd32(p, val, order) __hybrid_atomic_fetchadd32_seq_cst(p, val)
+#define __hybrid_atomic_fetchadd64(p, val, order) __hybrid_atomic_fetchadd64_seq_cst(p, val)
+#define __hybrid_atomic_fetchand8(p, val, order)  __hybrid_atomic_fetchand8_seq_cst(p, val)
+#define __hybrid_atomic_fetchand16(p, val, order) __hybrid_atomic_fetchand16_seq_cst(p, val)
+#define __hybrid_atomic_fetchand32(p, val, order) __hybrid_atomic_fetchand32_seq_cst(p, val)
+#define __hybrid_atomic_fetchand64(p, val, order) __hybrid_atomic_fetchand64_seq_cst(p, val)
+#define __hybrid_atomic_fetchor8(p, val, order)   __hybrid_atomic_fetchor8_seq_cst(p, val)
+#define __hybrid_atomic_fetchor16(p, val, order)  __hybrid_atomic_fetchor16_seq_cst(p, val)
+#define __hybrid_atomic_fetchor32(p, val, order)  __hybrid_atomic_fetchor32_seq_cst(p, val)
+#define __hybrid_atomic_fetchor64(p, val, order)  __hybrid_atomic_fetchor64_seq_cst(p, val)
+#define __hybrid_atomic_fetchxor8(p, val, order)  __hybrid_atomic_fetchxor8_seq_cst(p, val)
+#define __hybrid_atomic_fetchxor16(p, val, order) __hybrid_atomic_fetchxor16_seq_cst(p, val)
+#define __hybrid_atomic_fetchxor32(p, val, order) __hybrid_atomic_fetchxor32_seq_cst(p, val)
+#define __hybrid_atomic_fetchxor64(p, val, order) __hybrid_atomic_fetchxor64_seq_cst(p, val)
+#define __hybrid_atomic_incfetch8(p, order)       __hybrid_atomic_incfetch8_seq_cst(p)
+#define __hybrid_atomic_incfetch16(p, order)      __hybrid_atomic_incfetch16_seq_cst(p)
+#define __hybrid_atomic_incfetch32(p, order)      __hybrid_atomic_incfetch32_seq_cst(p)
+#define __hybrid_atomic_incfetch64(p, order)      __hybrid_atomic_incfetch64_seq_cst(p)
+#define __hybrid_atomic_decfetch8(p, order)       __hybrid_atomic_decfetch8_seq_cst(p)
+#define __hybrid_atomic_decfetch16(p, order)      __hybrid_atomic_decfetch16_seq_cst(p)
+#define __hybrid_atomic_decfetch32(p, order)      __hybrid_atomic_decfetch32_seq_cst(p)
+#define __hybrid_atomic_decfetch64(p, order)      __hybrid_atomic_decfetch64_seq_cst(p)
+
 #define __hybrid_atomic_thread_fence(order) \
-	(__NAMESPACE_INT_SYM __impl_hybrid_atomic_thread_fence(order))
+	((__NAMESPACE_INT_SYM __impl_hybrid_atomic_thread_fence)(order))
 __NAMESPACE_INT_BEGIN
 __FORCELOCAL __ATTR_ARTIFICIAL void
 __NOTHROW_NCX(__impl_hybrid_atomic_thread_fence)(int __order) {
 	if (__order >= __ATOMIC_SEQ_CST) {
 		volatile __UINT32_TYPE__ __guard;
 		__COMPILER_BARRIER();
-		__impl_hybrid_atomic_xch_seqcst(__guard, 0);
+		__hybrid_atomic_xch32_seq_cst(&__guard, 0);
 		__COMPILER_BARRIER();
 	} else if (__order >= __ATOMIC_ACQ_REL) {
 		__COMPILER_BARRIER();
@@ -1218,7 +1005,6 @@ __NOTHROW_NCX(__impl_hybrid_atomic_thread_fence)(int __order) {
 	}
 }
 __NAMESPACE_INT_END
-
 #endif /* __arm__ */
 
 __DECL_END

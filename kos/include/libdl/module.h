@@ -132,9 +132,9 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(DlSection_Incref)(__USER DlSection *self) _
 INTDEF NONNULL((1)) void NOTHROW_NCX(DlSection_Decref)(__USER DlSection *self) __THROWS(E_SEGFAULT);
 #else /* __INTELLISENSE__ */
 #define DlSection_Incref(self) \
-	__hybrid_atomic_inc((self)->ds_refcnt, __ATOMIC_SEQ_CST)
-#define DlSection_Decref(self)                                              \
-	(void)(__hybrid_atomic_decfetch((self)->ds_refcnt, __ATOMIC_SEQ_CST) || \
+	__hybrid_atomic_inc(&(self)->ds_refcnt, __ATOMIC_SEQ_CST)
+#define DlSection_Decref(self)                                               \
+	(void)(__hybrid_atomic_decfetch(&(self)->ds_refcnt, __ATOMIC_SEQ_CST) || \
 	       (DL_API_SYMBOL(DlSection_Destroy)(self), 0))
 #endif /* !__INTELLISENSE__ */
 
@@ -142,10 +142,10 @@ LOCAL ATTR_ARTIFICIAL NONNULL((1)) __BOOL
 NOTHROW_NCX(LIBDL_CC DlSection_TryIncref)(__USER DlSection *self) __THROWS(E_SEGFAULT) {
 	refcnt_t refcnt;
 	do {
-		refcnt = __hybrid_atomic_load(self->ds_refcnt, __ATOMIC_ACQUIRE);
+		refcnt = __hybrid_atomic_load(&self->ds_refcnt, __ATOMIC_ACQUIRE);
 		if (!refcnt)
 			return 0;
-	} while (!__hybrid_atomic_cmpxch_weak(self->ds_refcnt, refcnt, refcnt + 1,
+	} while (!__hybrid_atomic_cmpxch_weak(&self->ds_refcnt, refcnt, refcnt + 1,
 	                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
 	return 1;
 }

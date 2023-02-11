@@ -237,7 +237,7 @@ DEFINE_REFCNT_FUNCTIONS(struct usb_interrupt, ui_refcnt, usb_interrupt_destroy)
  *          deleted. */
 LOCAL NOBLOCK void
 NOTHROW(KCALL usb_interrupt_delete)(REF struct usb_interrupt *__restrict self) {
-	__hybrid_atomic_or(self->ui_flags,
+	__hybrid_atomic_or(&self->ui_flags,
 	                   USB_INTERRUPT_FLAG_DELETED,
 	                   __ATOMIC_ACQ_REL);
 	decref(self);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4a7baf3 */
+/* HASH CRC-32:0x4babadc6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_key_create_once_np))(__pthrea
 	__pthread_key_t __kv;
 	__errno_t __error;
 __again:
-	__kv = __hybrid_atomic_load(*__key, __ATOMIC_ACQUIRE);
+	__kv = __hybrid_atomic_load(__key, __ATOMIC_ACQUIRE);
 #ifdef __PTHREAD_ONCE_KEY_NP
 	if (__kv != __PTHREAD_ONCE_KEY_NP)
 #else /* __PTHREAD_ONCE_KEY_NP */
@@ -70,10 +70,10 @@ __again:
 
 	/* Try to save the results. */
 #ifdef __PTHREAD_ONCE_KEY_NP
-	if __unlikely(!__hybrid_atomic_cmpxch(*__key, __PTHREAD_ONCE_KEY_NP, __kv,
+	if __unlikely(!__hybrid_atomic_cmpxch(__key, __PTHREAD_ONCE_KEY_NP, __kv,
 	                                    __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
 #else /* __PTHREAD_ONCE_KEY_NP */
-	if __unlikely(!__hybrid_atomic_cmpxch(*__key, (__pthread_key_t)-1, __kv,
+	if __unlikely(!__hybrid_atomic_cmpxch(__key, (__pthread_key_t)-1, __kv,
 	                                    __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
 #endif /* !__PTHREAD_ONCE_KEY_NP */
 	{

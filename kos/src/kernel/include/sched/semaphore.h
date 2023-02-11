@@ -47,17 +47,17 @@ struct semaphore {
 	 ? (__hybrid_assert((x)->s_count == 0)) \
 	 : (void)((x)->s_count = (n)))
 #define semaphore_count(x) \
-	__hybrid_atomic_load((x)->s_count, __ATOMIC_ACQUIRE)
+	__hybrid_atomic_load(&(x)->s_count, __ATOMIC_ACQUIRE)
 
 /* Try to acquire a tick to the given semaphore. */
 LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOBLOCK(FCALL semaphore_trywait)(struct semaphore *__restrict self) {
 	uintptr_t count;
 	do {
-		count = __hybrid_atomic_load(self->s_count, __ATOMIC_ACQUIRE);
+		count = __hybrid_atomic_load(&self->s_count, __ATOMIC_ACQUIRE);
 		if (!count)
 			return 0;
-	} while (!__hybrid_atomic_cmpxch_weak(self->s_count, count, count - 1,
+	} while (!__hybrid_atomic_cmpxch_weak(&self->s_count, count, count - 1,
 	                                      __ATOMIC_SEQ_CST,
 	                                      __ATOMIC_SEQ_CST));
 	return 1;
@@ -87,7 +87,7 @@ NOTHROW(FCALL semaphore_wait_nx)(struct semaphore *__restrict self,
  * @return: false: There were no waiting threads, but the ticket was added. */
 LOCAL NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL semaphore_post)(struct semaphore *__restrict self) {
-	__hybrid_atomic_inc(self->s_count, __ATOMIC_SEQ_CST);
+	__hybrid_atomic_inc(&self->s_count, __ATOMIC_SEQ_CST);
 
 	/* Wake up exactly one thread for every ticket added. */
 	return sig_send(&self->s_avail);
@@ -97,7 +97,7 @@ NOTHROW(FCALL semaphore_post)(struct semaphore *__restrict self) {
  * @return: * : The # of tickets that will (likely) be consumed immediately. */
 LOCAL NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL semaphore_postmany)(struct semaphore *__restrict self, size_t count) {
-	__hybrid_atomic_add(self->s_count, count, __ATOMIC_SEQ_CST);
+	__hybrid_atomic_add(&self->s_count, count, __ATOMIC_SEQ_CST);
 	/* Wake up exactly one thread for every ticket added. */
 	return sig_sendmany(&self->s_avail, count);
 }

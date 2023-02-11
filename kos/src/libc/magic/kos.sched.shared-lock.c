@@ -73,8 +73,8 @@ __SYSDECL_BEGIN
 #define shared_lock_cinit(self)        (void)(__hybrid_assert((self)->sl_lock == 0))
 #define shared_lock_cinit_locked(self) (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1)
 #endif /* !__KERNEL__ */
-#define shared_lock_acquired(self)  (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) != 0)
-#define shared_lock_available(self) (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) == 0)
+#define shared_lock_acquired(self)  (__hybrid_atomic_load(&(self)->sl_lock, __ATOMIC_ACQUIRE) != 0)
+#define shared_lock_available(self) (__hybrid_atomic_load(&(self)->sl_lock, __ATOMIC_ACQUIRE) == 0)
 #ifdef __KERNEL__
 #define shared_lock_broadcast_for_fini(self) \
 	sig_broadcast_for_fini(&(self)->sl_sig)
@@ -90,18 +90,18 @@ __SYSDECL_BEGIN
 #ifdef __KERNEL__
 #ifdef __COMPILER_WORKAROUND_GCC_105689_MAC
 #define shared_lock_tryacquire(self) \
-	__COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_xch(__cw_105689_self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
+	__COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_xch(&__cw_105689_self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
 #else /* __COMPILER_WORKAROUND_GCC_105689_MAC */
 #define shared_lock_tryacquire(self) \
-	(__hybrid_atomic_xch((self)->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
+	(__hybrid_atomic_xch(&(self)->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
 #endif /* !__COMPILER_WORKAROUND_GCC_105689_MAC */
 #else /* __KERNEL__ */
 #ifdef __COMPILER_WORKAROUND_GCC_105689_MAC
 #define shared_lock_tryacquire(self) \
-	__COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_cmpxch(__cw_105689_self->sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+	__COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_cmpxch(&__cw_105689_self->sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
 #else /* __COMPILER_WORKAROUND_GCC_105689_MAC */
 #define shared_lock_tryacquire(self) \
-	__hybrid_atomic_cmpxch((self)->sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE)
+	__hybrid_atomic_cmpxch(&(self)->sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE)
 #endif /* !__COMPILER_WORKAROUND_GCC_105689_MAC */
 #endif /* !__KERNEL__ */
 
@@ -111,14 +111,14 @@ __SYSDECL_BEGIN
  *                 lock remains held by the calling thread. */
 #ifdef __shared_lock_send
 #ifdef __KERNEL__
-#define shared_lock_release(self)                                 \
-	(__shared_lock_release_assert_(self)                          \
-	 __hybrid_atomic_store((self)->sl_lock, 0, __ATOMIC_RELEASE), \
+#define shared_lock_release(self)                                  \
+	(__shared_lock_release_assert_(self)                           \
+	 __hybrid_atomic_store(&(self)->sl_lock, 0, __ATOMIC_RELEASE), \
 	 __shared_lock_send(self))
 #else /* __KERNEL__ */
-#define shared_lock_release(self)                                        \
-	(__shared_lock_release_assert_(self)                                 \
-	 (__hybrid_atomic_xch((self)->sl_lock, 0, __ATOMIC_RELEASE) >= 2) && \
+#define shared_lock_release(self)                                         \
+	(__shared_lock_release_assert_(self)                                  \
+	 (__hybrid_atomic_xch(&(self)->sl_lock, 0, __ATOMIC_RELEASE) >= 2) && \
 	 __shared_lock_send(self))
 #endif /* !__KERNEL__ */
 #if defined(NDEBUG) || defined(NDEBUG_SYNC)
@@ -145,13 +145,13 @@ __SYSDECL_BEGIN
 void shared_lock_acquire([[inout]] struct shared_lock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
-	while (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
+	while (__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
 		@TASK_POLL_BEFORE_CONNECT@({
-			if (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0)
+			if (__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0)
 				goto success;
 		});
 		@task_connect@(&self->@sl_sig@);
-		if unlikely(__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0) {
 			@task_disconnectall@();
 			break;
 		}
@@ -164,7 +164,7 @@ again:
 	/* NOTE: If there suddenly were more than UINT_MAX threads trying to acquire the same
 	 *       lock  all at the same time, this could overflow. -- But I think that's not a
 	 *       thing that could ever happen... */
-	while ((lockword = __hybrid_atomic_fetchinc(self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
+	while ((lockword = __hybrid_atomic_fetchinc(&self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
 		if unlikely(lockword != 1) {
 			/* This can happen if multiple threads try to acquire the lock at the same time.
 			 * In  this case, we must normalize the  lock-word back to `state = 2', but only
@@ -173,9 +173,9 @@ again:
 			 * This code right here is also carefully written such that it always does
 			 * the  right thing, no  matter how many  threads execute it concurrently. */
 			++lockword;
-			while (!__hybrid_atomic_cmpxch(self->@sl_lock@, lockword, 2,
+			while (!__hybrid_atomic_cmpxch(&self->@sl_lock@, lockword, 2,
 			                               __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
-				lockword = __hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE);
+				lockword = __hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE);
 				if unlikely(lockword == 0)
 					goto again; /* Lock suddenly become available */
 				if unlikely(lockword == 2)
@@ -204,13 +204,13 @@ $bool shared_lock_acquire_with_timeout([[inout]] struct shared_lock *__restrict 
                                        __shared_lock_timespec abs_timeout) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
-	while (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
+	while (__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
 		@TASK_POLL_BEFORE_CONNECT@({
-			if (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0)
+			if (__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0)
 				goto success;
 		});
 		@task_connect@(&self->@sl_sig@);
-		if unlikely(__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0) {
 			@task_disconnectall@();
 			break;
 		}
@@ -224,7 +224,7 @@ again:
 	/* NOTE: If there suddenly were more than UINT_MAX threads trying to acquire the same
 	 *       lock  all at the same time, this could overflow. -- But I think that's not a
 	 *       thing that could ever happen... */
-	while ((lockword = __hybrid_atomic_fetchinc(self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
+	while ((lockword = __hybrid_atomic_fetchinc(&self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
 		if unlikely(lockword != 1) {
 			/* This can happen if multiple threads try to acquire the lock at the same time.
 			 * In  this case, we must normalize the  lock-word back to `state = 2', but only
@@ -233,9 +233,9 @@ again:
 			 * This code right here is also carefully written such that it always does
 			 * the  right thing, no  matter how many  threads execute it concurrently. */
 			++lockword;
-			while (!__hybrid_atomic_cmpxch(self->@sl_lock@, lockword, 2,
+			while (!__hybrid_atomic_cmpxch(&self->@sl_lock@, lockword, 2,
 			                               __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
-				lockword = __hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE);
+				lockword = __hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE);
 				if unlikely(lockword == 0)
 					goto again; /* Lock suddenly become available */
 				if unlikely(lockword == 2)
@@ -261,20 +261,20 @@ again:
 void shared_lock_waitfor([[inout]] struct shared_lock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
-	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+	while (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		@TASK_POLL_BEFORE_CONNECT@({
-			if (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
+			if (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
 				return;
 		});
 		@task_connect_for_poll@(&self->@sl_sig@);
-		if unlikely(__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
 			@task_disconnectall@();
 			break;
 		}
 		@task_waitfor@(@KTIME_INFINITE@);
 	}
 @@pp_else@@
-	if (__hybrid_atomic_cmpxch(self->@sl_lock@, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+	if (__hybrid_atomic_cmpxch(&self->@sl_lock@, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
 		__shared_lock_wait(self);
 @@pp_endif@@
 }
@@ -295,13 +295,13 @@ $bool shared_lock_waitfor_with_timeout([[inout]] struct shared_lock *__restrict 
                                        __shared_lock_timespec abs_timeout) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
-	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+	while (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		@TASK_POLL_BEFORE_CONNECT@({
-			if (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
+			if (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
 				goto success;
 		});
 		@task_connect_for_poll@(&self->@sl_sig@);
-		if unlikely(__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
 			@task_disconnectall@();
 			break;
 		}
@@ -310,7 +310,7 @@ $bool shared_lock_waitfor_with_timeout([[inout]] struct shared_lock *__restrict 
 	}
 success:
 @@pp_else@@
-	if (__hybrid_atomic_cmpxch(self->@sl_lock@, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+	if (__hybrid_atomic_cmpxch(&self->@sl_lock@, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
 		return __shared_lock_wait_timeout(self, abs_timeout);
 @@pp_endif@@
 	return true;
@@ -333,7 +333,7 @@ again:
 	/* NOTE: If there suddenly were more than UINT_MAX threads trying to acquire the same
 	 *       lock  all at the same time, this could overflow. -- But I think that's not a
 	 *       thing that could ever happen... */
-	while ((lockword = __hybrid_atomic_fetchinc(self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
+	while ((lockword = __hybrid_atomic_fetchinc(&self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
 		if unlikely(lockword != 1) {
 			/* This can happen if multiple threads try to acquire the lock at the same time.
 			 * In  this case, we must normalize the  lock-word back to `state = 2', but only
@@ -342,9 +342,9 @@ again:
 			 * This code right here is also carefully written such that it always does
 			 * the  right thing, no  matter how many  threads execute it concurrently. */
 			++lockword;
-			while (!__hybrid_atomic_cmpxch(self->@sl_lock@, lockword, 2,
+			while (!__hybrid_atomic_cmpxch(&self->@sl_lock@, lockword, 2,
 			                               __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
-				lockword = __hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE);
+				lockword = __hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE);
 				if unlikely(lockword == 0)
 					goto again; /* Lock suddenly become available */
 				if unlikely(lockword == 2)
@@ -366,7 +366,7 @@ again:
 [[impl_include("<kos/bits/shared-lock.h>")]]
 $bool shared_lock_waitfor_with_timeout64([[inout]] struct shared_lock *__restrict self,
                                          [[in_opt]] struct timespec64 const *abs_timeout) {
-	if (__hybrid_atomic_cmpxch(self->@sl_lock@, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+	if (__hybrid_atomic_cmpxch(&self->@sl_lock@, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
 		return __shared_lock_wait_timeout64(self, abs_timeout);
 	return true;
 }
@@ -390,13 +390,13 @@ $bool shared_lock_waitfor_with_timeout64([[inout]] struct shared_lock *__restric
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_lock_acquire_nx([[inout]] struct shared_lock *__restrict self) {
 	__hybrid_assert(!@task_wasconnected@());
-	while (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
+	while (__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
 		@TASK_POLL_BEFORE_CONNECT@({
-			if (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0)
+			if (__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0)
 				goto success;
 		});
 		@task_connect@(&self->@sl_sig@);
-		if unlikely(__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0) {
 			@task_disconnectall@();
 			break;
 		}
@@ -422,13 +422,13 @@ success:
 $bool shared_lock_acquire_with_timeout_nx([[inout]] struct shared_lock *__restrict self,
                                           __shared_lock_timespec abs_timeout) {
 	__hybrid_assert(!@task_wasconnected@());
-	while (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
+	while (__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
 		@TASK_POLL_BEFORE_CONNECT@({
-			if (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0)
+			if (__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0)
 				goto success;
 		});
 		@task_connect@(&self->@sl_sig@);
-		if unlikely(__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0) {
 			@task_disconnectall@();
 			break;
 		}
@@ -452,13 +452,13 @@ success:
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_lock_waitfor_nx([[inout]] struct shared_lock *__restrict self) {
 	__hybrid_assert(!@task_wasconnected@());
-	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+	while (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		@TASK_POLL_BEFORE_CONNECT@({
-			if (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
+			if (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
 				goto success;
 		});
 		@task_connect_for_poll@(&self->@sl_sig@);
-		if unlikely(__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
 			@task_disconnectall@();
 			break;
 		}
@@ -484,13 +484,13 @@ success:
 $bool shared_lock_waitfor_with_timeout_nx([[inout]] struct shared_lock *__restrict self,
                                           __shared_lock_timespec abs_timeout) {
 	__hybrid_assert(!@task_wasconnected@());
-	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+	while (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		@TASK_POLL_BEFORE_CONNECT@({
-			if (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
+			if (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
 				goto success;
 		});
 		@task_connect_for_poll@(&self->@sl_sig@);
-		if unlikely(__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
 			@task_disconnectall@();
 			break;
 		}

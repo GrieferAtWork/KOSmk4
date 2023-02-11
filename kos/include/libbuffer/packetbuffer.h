@@ -450,13 +450,13 @@ struct pb_buffer {
 #define pb_buffer_psta_broadcast_for_fini(self) sig_broadcast_for_fini(&(self)->pb_psta)
 #define pb_buffer_psta_send(self)               sig_send(&(self)->pb_psta)
 #else /* __KERNEL__ */
-#define pb_buffer_psta_broadcast(self)                       \
-	(__hybrid_atomic_inc((self)->pb_psta, __ATOMIC_SEQ_CST), \
+#define pb_buffer_psta_broadcast(self)                        \
+	(__hybrid_atomic_inc(&(self)->pb_psta, __ATOMIC_SEQ_CST), \
 	 sched_signal_broadcast(&(self)->pb_psta))
 #define pb_buffer_psta_broadcast_for_fini(self) \
 	sched_signal_broadcast_for_fini(&(self)->pb_psta)
-#define pb_buffer_psta_send(self)                            \
-	(__hybrid_atomic_inc((self)->pb_psta, __ATOMIC_SEQ_CST), \
+#define pb_buffer_psta_send(self)                             \
+	(__hybrid_atomic_inc(&(self)->pb_psta, __ATOMIC_SEQ_CST), \
 	 sched_signal_send(&(self)->pb_psta))
 #endif /* !__KERNEL__ */
 
@@ -546,8 +546,8 @@ __NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(pb_buffer_cinit_ex)(struct pb_buffe
 __NOBLOCK __ATTR_NONNULL((1)) void
 __NOTHROW(pb_buffer_close)(struct pb_buffer *__restrict self);
 #else /* __INTELLISENSE__ */
-#define pb_buffer_close(self)                                     \
-	(__hybrid_atomic_store((self)->pb_limt, 0, __ATOMIC_RELEASE), \
+#define pb_buffer_close(self)                                      \
+	(__hybrid_atomic_store(&(self)->pb_limt, 0, __ATOMIC_RELEASE), \
 	 pb_buffer_psta_broadcast(self))
 #endif /* !__INTELLISENSE__ */
 
@@ -558,7 +558,7 @@ __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 __NOTHROW(pb_buffer_closed)(struct pb_buffer const *__restrict self);
 #else /* __INTELLISENSE__ */
 #define pb_buffer_closed(self) \
-	(__hybrid_atomic_load((self)->pb_limt, __ATOMIC_ACQUIRE) == 0)
+	(__hybrid_atomic_load(&(self)->pb_limt, __ATOMIC_ACQUIRE) == 0)
 #endif /* !__INTELLISENSE__ */
 
 
@@ -650,8 +650,8 @@ __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW(pb_buffer_endwrite_commit)(struct pb_buffer *__restrict self,
                                      struct pb_packet *__restrict packet);
 #else /* __INTELLISENSE__ */
-#define pb_buffer_endwrite_commit(self, packet)                                            \
-	(__hybrid_atomic_store((packet)->p_state, PB_PACKET_STATE_READABLE, __ATOMIC_RELEASE), \
+#define pb_buffer_endwrite_commit(self, packet)                                             \
+	(__hybrid_atomic_store(&(packet)->p_state, PB_PACKET_STATE_READABLE, __ATOMIC_RELEASE), \
 	 pb_buffer_psta_send(self))
 #endif /* !__INTELLISENSE__ */
 
@@ -776,7 +776,7 @@ __NOTHROW_NCX(pb_buffer_endread_restore)(struct pb_buffer *__restrict self,
 #define pb_buffer_endread_restore(self, packet)                                                 \
 	(__hybrid_assertf((packet) == (self)->pb_rptr, "%p != %p", (packet), (self)->pb_rptr),      \
 	 __hybrid_assertf((packet)->p_state == PB_PACKET_STATE_READING, "%I8u", (packet)->p_state), \
-	 __hybrid_atomic_store((packet)->p_state, PB_PACKET_STATE_READABLE, __ATOMIC_RELEASE),      \
+	 __hybrid_atomic_store(&(packet)->p_state, PB_PACKET_STATE_READABLE, __ATOMIC_RELEASE),     \
 	 pb_buffer_psta_broadcast(self))
 #endif /* !__INTELLISENSE__ */
 

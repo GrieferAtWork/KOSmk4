@@ -49,16 +49,16 @@ struct atomic_lock {
 #define atomic_lock_cinit(self)          __hybrid_assert((self)->a_lock == 0)
 #define atomic_lock_cinit_acquired(self) (void)((self)->a_lock = 1)
 
-#define atomic_lock_acquired(self)   (__hybrid_atomic_load((self)->a_lock, __ATOMIC_ACQUIRE) != 0)
-#define atomic_lock_available(self)  (__hybrid_atomic_load((self)->a_lock, __ATOMIC_ACQUIRE) == 0)
-#define atomic_lock_tryacquire(self) (__hybrid_atomic_xch((self)->a_lock, 1, __ATOMIC_ACQUIRE) == 0)
+#define atomic_lock_acquired(self)   (__hybrid_atomic_load(&(self)->a_lock, __ATOMIC_ACQUIRE) != 0)
+#define atomic_lock_available(self)  (__hybrid_atomic_load(&(self)->a_lock, __ATOMIC_ACQUIRE) == 0)
+#define atomic_lock_tryacquire(self) (__hybrid_atomic_xch(&(self)->a_lock, 1, __ATOMIC_ACQUIRE) == 0)
 #if defined(NDEBUG) || defined(NDEBUG_SYNC)
 #define atomic_lock_release(self) \
-	__hybrid_atomic_store((self)->a_lock, 0, __ATOMIC_RELEASE)
+	__hybrid_atomic_store(&(self)->a_lock, 0, __ATOMIC_RELEASE)
 #else /* NDEBUG || NDEBUG_SYNC */
 #define atomic_lock_release(self)          \
 	(__hybrid_assert((self)->a_lock != 0), \
-	 __hybrid_atomic_store((self)->a_lock, 0, __ATOMIC_RELEASE))
+	 __hybrid_atomic_store(&(self)->a_lock, 0, __ATOMIC_RELEASE))
 #endif /* !NDEBUG || !NDEBUG_SYNC */
 
 
@@ -95,7 +95,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW(atomic_lock_waitfor_
 #ifndef __INTELLISENSE__
 #ifndef __NO_builtin_expect
 #undef atomic_lock_tryacquire
-#define atomic_lock_tryacquire(self) __builtin_expect(__hybrid_atomic_xch((self)->a_lock, 1, __ATOMIC_ACQUIRE) == 0, 1)
+#define atomic_lock_tryacquire(self) __builtin_expect(__hybrid_atomic_xch(&(self)->a_lock, 1, __ATOMIC_ACQUIRE) == 0, 1)
 #endif /* !__NO_builtin_expect */
 
 #ifndef __HYBRID_PREEMPTION_TRYYIELD_IS_HYBRID_YIELD

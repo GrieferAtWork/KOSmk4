@@ -251,8 +251,8 @@ FORCELOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(mpart_dma_addlock)(struct mpart *__restrict self) {
 	struct mpartmeta *meta = self->mp_meta;
 	__hybrid_assert(meta != __NULLPTR);
-	__hybrid_assert(mpart_lock_acquired(self) || __hybrid_atomic_load(meta->mpm_dmalocks, __ATOMIC_ACQUIRE) != 0);
-	__hybrid_atomic_inc(meta->mpm_dmalocks, __ATOMIC_SEQ_CST);
+	__hybrid_assert(mpart_lock_acquired(self) || __hybrid_atomic_load(&meta->mpm_dmalocks, __ATOMIC_ACQUIRE) != 0);
+	__hybrid_atomic_inc(&meta->mpm_dmalocks, __ATOMIC_SEQ_CST);
 }
 
 /* Release  a DMA-lock from `self'. Note that this may result in
@@ -267,7 +267,7 @@ NOTHROW(mpart_dma_dellock)(REF struct mpart *__restrict self) {
 	refcnt_t old_count;
 	struct mpartmeta *meta = self->mp_meta;
 	__hybrid_assert(meta != __NULLPTR);
-	old_count = __hybrid_atomic_fetchdec(meta->mpm_dmalocks, __ATOMIC_SEQ_CST);
+	old_count = __hybrid_atomic_fetchdec(&meta->mpm_dmalocks, __ATOMIC_SEQ_CST);
 	__hybrid_assert(old_count >= 1);
 	if (old_count == 1)
 		self = _mpart_dma_donelock(self);

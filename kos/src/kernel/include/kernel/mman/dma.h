@@ -63,8 +63,8 @@ NOTHROW(mdma_lock_release)(/*inherit(always)*/ mdma_lock_t self);
 NOBLOCK NONNULL((1)) void
 NOTHROW(mdma_lock_release_nokill)(/*inherit(always)*/ mdma_lock_t self);
 #else /* __INTELLISENSE__ */
-#define mdma_lock_release_nokill(self)                                     \
-	(__hybrid_atomic_dec((self)->mp_meta->mpm_dmalocks, __ATOMIC_SEQ_CST), \
+#define mdma_lock_release_nokill(self)                                      \
+	(__hybrid_atomic_dec(&(self)->mp_meta->mpm_dmalocks, __ATOMIC_SEQ_CST), \
 	 decref_nokill(self))
 #endif /* !__INTELLISENSE__ */
 

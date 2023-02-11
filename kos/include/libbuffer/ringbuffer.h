@@ -140,12 +140,12 @@ struct ringbuffer {
 
 /* Polling API */
 #define ringbuffer_canread(self)                                      \
-	(__hybrid_atomic_load((self)->rb_avail, __ATOMIC_ACQUIRE) != 0 || \
-	 __hybrid_atomic_load((self)->rb_limit, __ATOMIC_ACQUIRE) == 0)
+	(__hybrid_atomic_load(&(self)->rb_avail, __ATOMIC_ACQUIRE) != 0 || \
+	 __hybrid_atomic_load(&(self)->rb_limit, __ATOMIC_ACQUIRE) == 0)
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 __NOTHROW(LIBBUFFER_CC ringbuffer_canwrite)(struct ringbuffer const *__restrict __self) {
-	__size_t __limit = __hybrid_atomic_load(__self->rb_limit, __ATOMIC_ACQUIRE);
-	return __limit == 0 || __hybrid_atomic_load(__self->rb_avail, __ATOMIC_ACQUIRE) < __limit;
+	__size_t __limit = __hybrid_atomic_load(&__self->rb_limit, __ATOMIC_ACQUIRE);
+	return __limit == 0 || __hybrid_atomic_load(&__self->rb_avail, __ATOMIC_ACQUIRE) < __limit;
 }
 #define ringbuffer_pollconnect_read_ex(self, cb)  cb(&(self)->rb_nempty)
 #define ringbuffer_pollconnect_write_ex(self, cb) cb(&(self)->rb_nfull)
@@ -189,12 +189,12 @@ __NOTHROW(ringbuffer_close)(struct ringbuffer *__restrict self);
 __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 __NOTHROW(ringbuffer_closed)(struct ringbuffer *__restrict self);
 #else /* __INTELLISENSE__ */
-#define ringbuffer_close(self)                                     \
-	(__hybrid_atomic_store((self)->rb_limit, 0, __ATOMIC_RELEASE), \
-	 sched_signal_broadcast(&(self)->rb_nempty),                   \
+#define ringbuffer_close(self)                                      \
+	(__hybrid_atomic_store(&(self)->rb_limit, 0, __ATOMIC_RELEASE), \
+	 sched_signal_broadcast(&(self)->rb_nempty),                    \
 	 sched_signal_broadcast(&(self)->rb_nfull))
 #define ringbuffer_closed(self) \
-	(__hybrid_atomic_load((self)->rb_limit, __ATOMIC_ACQUIRE) == 0)
+	(__hybrid_atomic_load(&(self)->rb_limit, __ATOMIC_ACQUIRE) == 0)
 #endif /* !__INTELLISENSE__ */
 
 #ifdef __KERNEL__

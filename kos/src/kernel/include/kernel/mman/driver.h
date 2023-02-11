@@ -465,7 +465,7 @@ struct driver
 
 /* Check if the given driver is/was finalized. */
 #define driver_isfinalizing(self) \
-	(__hybrid_atomic_load((self)->d_state, __ATOMIC_ACQUIRE) >= DRIVER_STATE_FINI_DT_FINIARR)
+	(__hybrid_atomic_load(&(self)->d_state, __ATOMIC_ACQUIRE) >= DRIVER_STATE_FINI_DT_FINIARR)
 
 
 #undef _driver_as_module

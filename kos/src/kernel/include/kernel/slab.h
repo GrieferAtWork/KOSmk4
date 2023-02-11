@@ -254,7 +254,7 @@ struct slab_descriptor {
 /* Helper macros for `struct slab_descriptor::sd_lock' */
 #define _slab_descriptor_reap(self)      LOCAL_slab_descriptor_service_pending() /* Define locally to clear our `sd_pend' */
 #define slab_descriptor_reap(self)       (!slab_descriptor_mustreap(self) || (_slab_descriptor_reap(self), 0))
-#define slab_descriptor_mustreap(self)   (__hybrid_atomic_load((self)->sd_pend.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
+#define slab_descriptor_mustreap(self)   (__hybrid_atomic_load(&(self)->sd_pend.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 #define slab_descriptor_tryacquire(self) atomic_lock_tryacquire(&(self)->sd_lock)
 #define slab_descriptor_acquire(self)    atomic_lock_acquire(&(self)->sd_lock)
 #define slab_descriptor_acquire_nx(self) atomic_lock_acquire_nx(&(self)->sd_lock)

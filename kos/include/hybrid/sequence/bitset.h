@@ -59,13 +59,13 @@ __DECL_BEGIN
 
 /* Atomic bitset helper functions */
 #define BITSET_ATOMIC_GET(self, bit) \
-	((__hybrid_atomic_load((self)->_bs_bits[BITSET_WORDOF(bit)], __ATOMIC_ACQUIRE) & BITSET_MASKOF(bit)) != 0)
+	((__hybrid_atomic_load(&(self)->_bs_bits[BITSET_WORDOF(bit)], __ATOMIC_ACQUIRE) & BITSET_MASKOF(bit)) != 0)
 #define BITSET_ATOMIC_FETCH_TURNON(self, bit) \
-	((__hybrid_atomic_fetchor((self)->_bs_bits[BITSET_WORDOF(bit)], BITSET_MASKOF(bit), __ATOMIC_SEQ_CST) & BITSET_MASKOF(bit)) != 0)
+	((__hybrid_atomic_fetchor(&(self)->_bs_bits[BITSET_WORDOF(bit)], BITSET_MASKOF(bit), __ATOMIC_SEQ_CST) & BITSET_MASKOF(bit)) != 0)
 #define BITSET_ATOMIC_FETCH_TURNOFF(self, bit) \
-	((__hybrid_atomic_fetchand((self)->_bs_bits[BITSET_WORDOF(bit)], ~BITSET_MASKOF(bit), __ATOMIC_SEQ_CST) & BITSET_MASKOF(bit)) != 0)
+	((__hybrid_atomic_fetchand(&(self)->_bs_bits[BITSET_WORDOF(bit)], ~BITSET_MASKOF(bit), __ATOMIC_SEQ_CST) & BITSET_MASKOF(bit)) != 0)
 #define BITSET_ATOMIC_FETCH_TOGGLE(self, bit) \
-	((__hybrid_atomic_fetchxor((self)->_bs_bits[BITSET_WORDOF(bit)], BITSET_MASKOF(bit), __ATOMIC_SEQ_CST) & BITSET_MASKOF(bit)) != 0)
+	((__hybrid_atomic_fetchxor(&(self)->_bs_bits[BITSET_WORDOF(bit)], BITSET_MASKOF(bit), __ATOMIC_SEQ_CST) & BITSET_MASKOF(bit)) != 0)
 #define BITSET_ATOMIC_XCH(self, bit, turn_on) \
 	((turn_on) ? BITSET_ATOMIC_FETCH_TURNON(self, bit) : BITSET_ATOMIC_FETCH_TURNOFF(self, bit))
 #define BITSET_ATOMIC_CMPXCH(self, bit, old_ison, new_ison)             \
@@ -83,10 +83,10 @@ __NOTHROW_NCX(__hybrid_bitset_atomic_cmpxch)(BITSET_WORDTYPE *__restrict __pword
 	if (__new_ison)
 		__newval = __mask;
 	do {
-		__oldword = __hybrid_atomic_load(*__pword, __ATOMIC_ACQUIRE);
+		__oldword = __hybrid_atomic_load(__pword, __ATOMIC_ACQUIRE);
 		if ((__oldword & __mask) != __oldval)
 			return 0;
-	} while (!__hybrid_atomic_cmpxch_weak(*__pword, __oldword,
+	} while (!__hybrid_atomic_cmpxch_weak(__pword, __oldword,
 	                                      (__oldword & ~__mask) | __newval,
 	                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
 	return 1;

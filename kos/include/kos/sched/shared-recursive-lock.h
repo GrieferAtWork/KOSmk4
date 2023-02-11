@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9b749c5 */
+/* HASH CRC-32:0x13de39c8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,9 +77,9 @@ __SYSDECL_BEGIN
 __COMPILER_CEIDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1),__BOOL,__NOTHROW,__FCALL,shared_recursive_lock_tryacquire,(struct shared_recursive_lock *__restrict __self),{
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 #ifdef __KERNEL__
-	if (__hybrid_atomic_xch(__self->sr_lock.sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
+	if (__hybrid_atomic_xch(&__self->sr_lock.sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
 #else /* __KERNEL__ */
-	if (__hybrid_atomic_cmpxch(__self->sr_lock.sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+	if (__hybrid_atomic_cmpxch(&__self->sr_lock.sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
 #endif /* !__KERNEL__ */
 	{
 		__shared_recursive_lock_setown(__self);
@@ -97,9 +97,9 @@ __COMPILER_CEIDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1),__BOOL,__NOTHROW,
 __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1) __BOOL __NOTHROW(__FCALL shared_recursive_lock_tryacquire)(struct shared_recursive_lock *__restrict __self) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 #ifdef __KERNEL__
-	if (__hybrid_atomic_xch(__self->sr_lock.sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
+	if (__hybrid_atomic_xch(&__self->sr_lock.sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
 #else /* __KERNEL__ */
-	if (__hybrid_atomic_cmpxch(__self->sr_lock.sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+	if (__hybrid_atomic_cmpxch(&__self->sr_lock.sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
 #endif /* !__KERNEL__ */
 	{
 		__shared_recursive_lock_setown(__self);
@@ -126,14 +126,14 @@ __COMPILER_CEIDECLARE(__NOBLOCK __ATTR_INOUT(1),__BOOL,__NOTHROW,__FCALL,shared_
 #ifdef __KERNEL__
 		__self->sr_owner = __SHARED_RECURSIVE_LOCK_BADTID;
 		__COMPILER_BARRIER();
-		__hybrid_atomic_store(__self->sr_lock.sl_lock, 0, __ATOMIC_RELEASE);
+		__hybrid_atomic_store(&__self->sr_lock.sl_lock, 0, __ATOMIC_RELEASE);
 		__shared_lock_send(&__self->sr_lock);
 #else /* __KERNEL__ */
 		unsigned int __lockstate;
 		__self->sr_owner = __SHARED_RECURSIVE_LOCK_BADTID;
 		__lockstate        = __self->sr_lock.sl_lock;
 		__COMPILER_BARRIER();
-		__hybrid_atomic_store(__self->sr_lock.sl_lock, 0, __ATOMIC_RELEASE);
+		__hybrid_atomic_store(&__self->sr_lock.sl_lock, 0, __ATOMIC_RELEASE);
 		if (__lockstate >= 2)
 			__shared_lock_send(&__self->sr_lock);
 #endif /* !__KERNEL__ */
@@ -162,14 +162,14 @@ __LOCAL __NOBLOCK __ATTR_INOUT(1) __BOOL __NOTHROW(__FCALL shared_recursive_lock
 #ifdef __KERNEL__
 		__self->sr_owner = __SHARED_RECURSIVE_LOCK_BADTID;
 		__COMPILER_BARRIER();
-		__hybrid_atomic_store(__self->sr_lock.sl_lock, 0, __ATOMIC_RELEASE);
+		__hybrid_atomic_store(&__self->sr_lock.sl_lock, 0, __ATOMIC_RELEASE);
 		__shared_lock_send(&__self->sr_lock);
 #else /* __KERNEL__ */
 		unsigned int __lockstate;
 		__self->sr_owner = __SHARED_RECURSIVE_LOCK_BADTID;
 		__lockstate        = __self->sr_lock.sl_lock;
 		__COMPILER_BARRIER();
-		__hybrid_atomic_store(__self->sr_lock.sl_lock, 0, __ATOMIC_RELEASE);
+		__hybrid_atomic_store(&__self->sr_lock.sl_lock, 0, __ATOMIC_RELEASE);
 		if (__lockstate >= 2)
 			__shared_lock_send(&__self->sr_lock);
 #endif /* !__KERNEL__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb47287 */
+/* HASH CRC-32:0xba5977d4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,7 +77,7 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) NONNULL((2)) errno_
 	 */
 	pthread_once_t status;
 again:
-	status = __hybrid_atomic_cmpxch_val(*once_control,
+	status = __hybrid_atomic_cmpxch_val(once_control,
 	                                    __PTHREAD_ONCE_INIT,
 	                                    __PTHREAD_ONCE_INIT + 1,
 	                                    __ATOMIC_SEQ_CST,
@@ -91,11 +91,11 @@ again:
 		} catch (...) {
 			/* roll-back... */
 #ifdef __PRIVATE_PTHREAD_ONCE_USES_FUTEX
-			if (__hybrid_atomic_xch(*once_control, __PTHREAD_ONCE_INIT,
+			if (__hybrid_atomic_xch(once_control, __PTHREAD_ONCE_INIT,
 			                        __ATOMIC_RELEASE) == __PTHREAD_ONCE_INIT + 3)
 				libc_futex_wakeall((lfutex_t *)once_control);
 #else /* __PRIVATE_PTHREAD_ONCE_USES_FUTEX */
-			__hybrid_atomic_store(*once_control,
+			__hybrid_atomic_store(once_control,
 			                      __PTHREAD_ONCE_INIT,
 			                      __ATOMIC_RELEASE);
 #endif /* !__PRIVATE_PTHREAD_ONCE_USES_FUTEX */
@@ -111,11 +111,11 @@ again:
 
 		/* Remember that the function was called. */
 #ifdef __PRIVATE_PTHREAD_ONCE_USES_FUTEX
-		if (__hybrid_atomic_xch(*once_control, __PTHREAD_ONCE_INIT + 2,
+		if (__hybrid_atomic_xch(once_control, __PTHREAD_ONCE_INIT + 2,
 		                        __ATOMIC_RELEASE) == __PTHREAD_ONCE_INIT + 3)
 			libc_futex_wakeall((lfutex_t *)once_control);
 #else /* __PRIVATE_PTHREAD_ONCE_USES_FUTEX */
-		__hybrid_atomic_store(*once_control,
+		__hybrid_atomic_store(once_control,
 		                      __PTHREAD_ONCE_INIT + 2,
 		                      __ATOMIC_RELEASE);
 #endif /* !__PRIVATE_PTHREAD_ONCE_USES_FUTEX */
@@ -148,7 +148,7 @@ again:
 		if (status == __PTHREAD_ONCE_INIT + 1) {
 			/* Request a futex-wake call once initialization
 			 * completes  in  whatever thread  is  doing it. */
-			if (!__hybrid_atomic_cmpxch(*once_control,
+			if (!__hybrid_atomic_cmpxch(once_control,
 			                            __PTHREAD_ONCE_INIT + 1,
 			                            __PTHREAD_ONCE_INIT + 3,
 			                            __ATOMIC_SEQ_CST,
@@ -168,7 +168,7 @@ again:
 #else /* __PRIVATE_PTHREAD_ONCE_USES_FUTEX */
 		do {
 			__hybrid_yield();
-		} while (__hybrid_atomic_load(*once_control, __ATOMIC_ACQUIRE) ==
+		} while (__hybrid_atomic_load(once_control, __ATOMIC_ACQUIRE) ==
 		         __PTHREAD_ONCE_INIT + 1);
 #endif /* !__PRIVATE_PTHREAD_ONCE_USES_FUTEX */
 
@@ -198,7 +198,7 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *self,
                                              int pshared) {
 	(void)pshared;
-	__hybrid_atomic_store(*self, 0, __ATOMIC_RELAXED);
+	__hybrid_atomic_store(self, 0, __ATOMIC_RELAXED);
 	return 0;
 }
 /* >> pthread_spin_destroy(3)
@@ -229,7 +229,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *self) {
  * @return: EBUSY: Lock has already been acquired */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *self) {
-	if (__hybrid_atomic_xch(*self, 1, __ATOMIC_ACQUIRE) == 0)
+	if (__hybrid_atomic_xch(self, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;
 
 	return EBUSY;
@@ -247,7 +247,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *self) {
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *self) {
-	__hybrid_atomic_store(*self, 0, __ATOMIC_RELEASE);
+	__hybrid_atomic_store(self, 0, __ATOMIC_RELEASE);
 	return 0;
 }
 #include <hybrid/__atomic.h>
@@ -266,7 +266,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_key_create_once_np)(pthread_key_t *key,
 	pthread_key_t kv;
 	errno_t error;
 again:
-	kv = __hybrid_atomic_load(*key, __ATOMIC_ACQUIRE);
+	kv = __hybrid_atomic_load(key, __ATOMIC_ACQUIRE);
 #ifdef __PTHREAD_ONCE_KEY_NP
 	if (kv != __PTHREAD_ONCE_KEY_NP)
 #else /* __PTHREAD_ONCE_KEY_NP */
@@ -283,10 +283,10 @@ again:
 
 	/* Try to save the results. */
 #ifdef __PTHREAD_ONCE_KEY_NP
-	if unlikely(!__hybrid_atomic_cmpxch(*key, __PTHREAD_ONCE_KEY_NP, kv,
+	if unlikely(!__hybrid_atomic_cmpxch(key, __PTHREAD_ONCE_KEY_NP, kv,
 	                                    __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
 #else /* __PTHREAD_ONCE_KEY_NP */
-	if unlikely(!__hybrid_atomic_cmpxch(*key, (pthread_key_t)-1, kv,
+	if unlikely(!__hybrid_atomic_cmpxch(key, (pthread_key_t)-1, kv,
 	                                    __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
 #endif /* !__PTHREAD_ONCE_KEY_NP */
 	{

@@ -1295,7 +1295,7 @@ $errno_t pthread_once([[inout]] pthread_once_t *once_control,
 	 */
 	pthread_once_t status;
 again:
-	status = __hybrid_atomic_cmpxch_val(*once_control,
+	status = __hybrid_atomic_cmpxch_val(once_control,
 	                                    __PTHREAD_ONCE_INIT,
 	                                    __PTHREAD_ONCE_INIT + 1,
 	                                    __ATOMIC_SEQ_CST,
@@ -1309,11 +1309,11 @@ again:
 		} @catch@ (...) {
 			/* roll-back... */
 @@pp_ifdef __PRIVATE_PTHREAD_ONCE_USES_FUTEX@@
-			if (__hybrid_atomic_xch(*once_control, __PTHREAD_ONCE_INIT,
+			if (__hybrid_atomic_xch(once_control, __PTHREAD_ONCE_INIT,
 			                        __ATOMIC_RELEASE) == __PTHREAD_ONCE_INIT + 3)
 				futex_wakeall((lfutex_t *)once_control);
 @@pp_else@@
-			__hybrid_atomic_store(*once_control,
+			__hybrid_atomic_store(once_control,
 			                      __PTHREAD_ONCE_INIT,
 			                      __ATOMIC_RELEASE);
 @@pp_endif@@
@@ -1329,11 +1329,11 @@ again:
 
 		/* Remember that the function was called. */
 @@pp_if defined(__PRIVATE_PTHREAD_ONCE_USES_FUTEX) && $has_function(futex_wakeall)@@
-		if (__hybrid_atomic_xch(*once_control, __PTHREAD_ONCE_INIT + 2,
+		if (__hybrid_atomic_xch(once_control, __PTHREAD_ONCE_INIT + 2,
 		                        __ATOMIC_RELEASE) == __PTHREAD_ONCE_INIT + 3)
 			futex_wakeall((lfutex_t *)once_control);
 @@pp_else@@
-		__hybrid_atomic_store(*once_control,
+		__hybrid_atomic_store(once_control,
 		                      __PTHREAD_ONCE_INIT + 2,
 		                      __ATOMIC_RELEASE);
 @@pp_endif@@
@@ -1366,7 +1366,7 @@ again:
 		if (status == __PTHREAD_ONCE_INIT + 1) {
 			/* Request a futex-wake call once initialization
 			 * completes  in  whatever thread  is  doing it. */
-			if (!__hybrid_atomic_cmpxch(*once_control,
+			if (!__hybrid_atomic_cmpxch(once_control,
 			                            __PTHREAD_ONCE_INIT + 1,
 			                            __PTHREAD_ONCE_INIT + 3,
 			                            __ATOMIC_SEQ_CST,
@@ -1386,7 +1386,7 @@ again:
 @@pp_else@@
 		do {
 			__hybrid_yield();
-		} while (__hybrid_atomic_load(*once_control, __ATOMIC_ACQUIRE) ==
+		} while (__hybrid_atomic_load(once_control, __ATOMIC_ACQUIRE) ==
 		         __PTHREAD_ONCE_INIT + 1);
 @@pp_endif@@
 
@@ -2528,7 +2528,7 @@ $errno_t pthread_condattr_setclock([[inout]] pthread_condattr_t *self,
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_spin_init([[out]] pthread_spinlock_t *self, int pshared) {
 	(void)pshared;
-	__hybrid_atomic_store(*self, 0, __ATOMIC_RELAXED);
+	__hybrid_atomic_store(self, 0, __ATOMIC_RELAXED);
 	return 0;
 }
 
@@ -2560,7 +2560,7 @@ $errno_t pthread_spin_lock([[inout]] pthread_spinlock_t *self) {
 [[wunused, impl_include("<hybrid/__atomic.h>", "<libc/errno.h>")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_spin_trylock([[inout]] pthread_spinlock_t *self) {
-	if (__hybrid_atomic_xch(*self, 1, __ATOMIC_ACQUIRE) == 0)
+	if (__hybrid_atomic_xch(self, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;
 @@pp_ifdef EBUSY@@
 	return EBUSY;
@@ -2579,7 +2579,7 @@ $errno_t pthread_spin_trylock([[inout]] pthread_spinlock_t *self) {
 [[impl_include("<hybrid/__atomic.h>")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_spin_unlock([[inout]] pthread_spinlock_t *self) {
-	__hybrid_atomic_store(*self, 0, __ATOMIC_RELEASE);
+	__hybrid_atomic_store(self, 0, __ATOMIC_RELEASE);
 	return 0;
 }
 
@@ -2707,7 +2707,7 @@ $errno_t pthread_key_create_once_np([[out]] pthread_key_t *key,
 	pthread_key_t kv;
 	errno_t error;
 again:
-	kv = __hybrid_atomic_load(*key, __ATOMIC_ACQUIRE);
+	kv = __hybrid_atomic_load(key, __ATOMIC_ACQUIRE);
 @@pp_ifdef __PTHREAD_ONCE_KEY_NP@@
 	if (kv != __PTHREAD_ONCE_KEY_NP)
 @@pp_else@@
@@ -2724,10 +2724,10 @@ again:
 
 	/* Try to save the results. */
 @@pp_ifdef __PTHREAD_ONCE_KEY_NP@@
-	if unlikely(!__hybrid_atomic_cmpxch(*key, __PTHREAD_ONCE_KEY_NP, kv,
+	if unlikely(!__hybrid_atomic_cmpxch(key, __PTHREAD_ONCE_KEY_NP, kv,
 	                                    __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
 @@pp_else@@
-	if unlikely(!__hybrid_atomic_cmpxch(*key, (pthread_key_t)-1, kv,
+	if unlikely(!__hybrid_atomic_cmpxch(key, (pthread_key_t)-1, kv,
 	                                    __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
 @@pp_endif@@
 	{

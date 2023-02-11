@@ -50,9 +50,9 @@ struct video_palette {
 
 #define video_palette_destroy(self) (*(self)->vp_destroy)(self)
 #define video_palette_incref(self) \
-	__hybrid_atomic_inc((self)->vp_refcnt, __ATOMIC_SEQ_CST)
-#define video_palette_decref(self)                                          \
-	(void)(__hybrid_atomic_decfetch((self)->vp_refcnt, __ATOMIC_SEQ_CST) || \
+	__hybrid_atomic_inc(&(self)->vp_refcnt, __ATOMIC_SEQ_CST)
+#define video_palette_decref(self)                                           \
+	(void)(__hybrid_atomic_decfetch(&(self)->vp_refcnt, __ATOMIC_SEQ_CST) || \
 	       (video_palette_destroy(self), 0))
 __DEFINE_REFCNT_FUNCTIONS(struct video_palette, vp_refcnt, video_palette_destroy)
 

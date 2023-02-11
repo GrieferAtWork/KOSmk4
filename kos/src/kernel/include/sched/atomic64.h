@@ -89,59 +89,59 @@ typedef u64 atomic64_t;
 
 /* Atomically read a 64-bit data word from `self' */
 #define atomic64_read(self) \
-	__hybrid_atomic_load(_atomic64_val(*(self)), __ATOMIC_SEQ_CST)
+	__hybrid_atomic_load(&_atomic64_val(*(self)), __ATOMIC_SEQ_CST)
 
 /* Atomically write a 64-bit data word to `self' */
 #define atomic64_write(self, value) \
-	__hybrid_atomic_store(_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
+	__hybrid_atomic_store(&_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
 
 /* Atomically compare-exchange a 64-bit data word from `self' */
 #define atomic64_cmpxch(self, oldval, newval) \
-	__hybrid_atomic_cmpxch(_atomic64_val(*(self)), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+	__hybrid_atomic_cmpxch(&_atomic64_val(*(self)), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 
 /* Atomically compare-exchange a 64-bit data word from `self' */
 #define atomic64_cmpxch_weak(self, oldval, newval) \
-	__hybrid_atomic_cmpxch_weak(_atomic64_val(*(self)), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+	__hybrid_atomic_cmpxch_weak(&_atomic64_val(*(self)), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 
 /* Atomically compare-exchange a 64-bit data word from `self' */
 #define atomic64_cmpxch_val(self, oldval, newval) \
-	__hybrid_atomic_cmpxch_val(_atomic64_val(*(self)), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+	__hybrid_atomic_cmpxch_val(&_atomic64_val(*(self)), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 
 /* Atomically exchange a 64-bit data word from `self' */
 #define atomic64_xch(self, value) \
-	__hybrid_atomic_xch(_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
+	__hybrid_atomic_xch(&_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
 
 /* Atomically fetch-and-add a 64-bit data word from `self' */
 #define atomic64_fetchadd(self, value) \
-	__hybrid_atomic_fetchadd(_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
+	__hybrid_atomic_fetchadd(&_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
 
 /* Atomically fetch-and-and a 64-bit data word from `self' */
 #define atomic64_fetchand(self, value) \
-	__hybrid_atomic_fetchand(_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
+	__hybrid_atomic_fetchand(&_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
 
 /* Atomically fetch-and-or a 64-bit data word from `self' */
 #define atomic64_fetchor(self, value) \
-	__hybrid_atomic_fetchor(_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
+	__hybrid_atomic_fetchor(&_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
 
 /* Atomically fetch-and-xor a 64-bit data word from `self' */
 #define atomic64_fetchxor(self, value) \
-	__hybrid_atomic_fetchxor(_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
+	__hybrid_atomic_fetchxor(&_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
 
 /* Atomically add a 64-bit data word from `self' */
 #define atomic64_add(self, value) \
-	__hybrid_atomic_add(_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
+	__hybrid_atomic_add(&_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
 
 /* Atomically and a 64-bit data word from `self' */
 #define atomic64_and(self, value) \
-	__hybrid_atomic_and(_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
+	__hybrid_atomic_and(&_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
 
 /* Atomically or a 64-bit data word from `self' */
 #define atomic64_or(self, value) \
-	__hybrid_atomic_or(_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
+	__hybrid_atomic_or(&_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
 
 /* Atomically xor a 64-bit data word from `self' */
 #define atomic64_xor(self, value) \
-	__hybrid_atomic_xor(_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
+	__hybrid_atomic_xor(&_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
 
 #else /* ARCH_HAVE_ATOMIC64_SUPPORT_ALWAYS */
 

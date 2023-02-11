@@ -79,9 +79,8 @@ struct __ATTR_PACKED atomic_owner_rwlock {
 #define atomic_owner_rwlock_init(self)       (void)((self)->aorw_lock = 0, (self)->aorw_owner = __HYBRID_GETTID_INVALID)
 #define atomic_owner_rwlock_init_read(self)  (void)((self)->aorw_lock = 1, (self)->aorw_owner = __HYBRID_GETTID_INVALID)
 
-#define atomic_owner_rwlock_reading(x)   (__hybrid_atomic_load((x)->aorw_lock, __ATOMIC_ACQUIRE) != 0)
-#define atomic_owner_rwlock_writing(x)   (__hybrid_atomic_load((x)->aorw_lock, __ATOMIC_ACQUIRE) & __ATOMIC_OWNER_RWLOCK_WFLAG && \
-                                          __hybrid_gettid_iscaller((x)->aorw_owner))
+#define atomic_owner_rwlock_reading(x)   (__hybrid_atomic_load(&(x)->aorw_lock, __ATOMIC_ACQUIRE) != 0)
+#define atomic_owner_rwlock_writing(x)   (__hybrid_atomic_load(&(x)->aorw_lock, __ATOMIC_ACQUIRE) & __ATOMIC_OWNER_RWLOCK_WFLAG && __hybrid_gettid_iscaller((x)->aorw_owner))
 
 
 /* Acquire an exclusive read/write lock. */
@@ -147,7 +146,7 @@ __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_endwrite)(struct atomic_owner_rwloc
 	                 __HYBRID_GETTID_PRINTF_ARG(__hybrid_gettid()),
 	                 __HYBRID_GETTID_PRINTF_ARG(__self->aorw_owner));
 	do {
-		__f = __hybrid_atomic_load(__self->aorw_lock, __ATOMIC_ACQUIRE);
+		__f = __hybrid_atomic_load(&__self->aorw_lock, __ATOMIC_ACQUIRE);
 		__hybrid_assertf(__f & __ATOMIC_OWNER_RWLOCK_WFLAG,
 		                 "Lock isn't in write-mode (%#lx)"
 		                 "Caller: " __HYBRID_GETTID_PRINTF_FMT "\n"
@@ -159,7 +158,7 @@ __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_endwrite)(struct atomic_owner_rwloc
 		if (!(__f & __ATOMIC_OWNER_RWLOCK_NMASK))
 			__self->aorw_owner = __HYBRID_GETTID_INVALID;
 #endif /* !NDEBUG && !NDEBUG_SYNC */
-	} while (!__hybrid_atomic_cmpxch_weak(__self->aorw_lock, __f, __f & __ATOMIC_OWNER_RWLOCK_NMASK ? __f - 1 : 0,
+	} while (!__hybrid_atomic_cmpxch_weak(&__self->aorw_lock, __f, __f & __ATOMIC_OWNER_RWLOCK_NMASK ? __f - 1 : 0,
 	                                      __ATOMIC_RELEASE, __ATOMIC_RELAXED));
 	return __f & __ATOMIC_OWNER_RWLOCK_NMASK ? 0 : 1; /* Return `true' if the lock was released */
 }
@@ -167,11 +166,11 @@ __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_endwrite)(struct atomic_owner_rwloc
 __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_endread)(struct atomic_owner_rwlock *__restrict __self) {
 #if defined(NDEBUG) || defined(NDEBUG_SYNC)
 	__COMPILER_READ_BARRIER();
-	return __hybrid_atomic_fetchdec(__self->aorw_lock, __ATOMIC_RELEASE) == 1;
+	return __hybrid_atomic_fetchdec(&__self->aorw_lock, __ATOMIC_RELEASE) == 1;
 #else /* NDEBUG || NDEBUG_SYNC */
 	__UINTPTR_TYPE__ __f;
 	do {
-		__f = __hybrid_atomic_load(__self->aorw_lock, __ATOMIC_ACQUIRE);
+		__f = __hybrid_atomic_load(&__self->aorw_lock, __ATOMIC_ACQUIRE);
 		__hybrid_assertf(__f != 0, "Lock isn't held by anyone");
 		if (__f & __ATOMIC_OWNER_RWLOCK_WFLAG) {
 			__hybrid_assertf(__f != __ATOMIC_OWNER_RWLOCK_WFLAG,
@@ -183,7 +182,7 @@ __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_endread)(struct atomic_owner_rwlock
 			                 __HYBRID_GETTID_PRINTF_ARG(__hybrid_gettid()),
 			                 __HYBRID_GETTID_PRINTF_ARG(__self->aorw_owner));
 		}
-	} while (!__hybrid_atomic_cmpxch_weak(__self->aorw_lock, __f, __f - 1,
+	} while (!__hybrid_atomic_cmpxch_weak(&__self->aorw_lock, __f, __f - 1,
 	                                      __ATOMIC_RELEASE, __ATOMIC_RELAXED));
 	return __f == 1;
 #endif /* !NDEBUG && !NDEBUG_SYNC */
@@ -193,7 +192,7 @@ __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_end)(struct atomic_owner_rwlock *__
 	__UINTPTR_TYPE__ __f, __newval;
 	__COMPILER_BARRIER();
 	do {
-		__f = __hybrid_atomic_load(__self->aorw_lock, __ATOMIC_ACQUIRE);
+		__f = __hybrid_atomic_load(&__self->aorw_lock, __ATOMIC_ACQUIRE);
 		__hybrid_assertf(__f != 0, "Lock isn't held by anyone");
 		__newval = __f - 1;
 		if (__f & __ATOMIC_OWNER_RWLOCK_WFLAG) {
@@ -214,7 +213,7 @@ __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_end)(struct atomic_owner_rwlock *__
 				__newval = 0;
 			}
 		}
-	} while (!__hybrid_atomic_cmpxch_weak(__self->aorw_lock, __f, __newval,
+	} while (!__hybrid_atomic_cmpxch_weak(&__self->aorw_lock, __f, __newval,
 	                                      __ATOMIC_RELEASE, __ATOMIC_RELAXED));
 	return __newval == 0;
 }
@@ -222,13 +221,13 @@ __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_end)(struct atomic_owner_rwlock *__
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_owner_rwlock_tryread)(struct atomic_owner_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __f;
 	do {
-		__f = __hybrid_atomic_load(__self->aorw_lock, __ATOMIC_ACQUIRE);
+		__f = __hybrid_atomic_load(&__self->aorw_lock, __ATOMIC_ACQUIRE);
 		if (__f & __ATOMIC_OWNER_RWLOCK_WFLAG &&
 		    !__hybrid_gettid_iscaller(__self->aorw_owner))
 			return 0;
 		__hybrid_assertf((__f & __ATOMIC_OWNER_RWLOCK_NMASK) != __ATOMIC_OWNER_RWLOCK_NMASK,
 		                 "Too many locks (recursion?)");
-	} while (!__hybrid_atomic_cmpxch_weak(__self->aorw_lock, __f, __f + 1,
+	} while (!__hybrid_atomic_cmpxch_weak(&__self->aorw_lock, __f, __f + 1,
 	                                      __ATOMIC_SEQ_CST, __ATOMIC_RELAXED));
 	__COMPILER_READ_BARRIER();
 	return 1;
@@ -238,7 +237,7 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_owner_rwlock_trywrite)(struct ato
 	__UINTPTR_TYPE__ __f, __newval;
 	__hybrid_tid_t __mytid = __hybrid_gettid();
 	do {
-		__f = __hybrid_atomic_load(__self->aorw_lock, __ATOMIC_ACQUIRE);
+		__f = __hybrid_atomic_load(&__self->aorw_lock, __ATOMIC_ACQUIRE);
 		if (__f & __ATOMIC_OWNER_RWLOCK_WFLAG) {
 			if (!__hybrid_gettid_equal(__self->aorw_owner, __mytid))
 				return 0;
@@ -250,7 +249,7 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_owner_rwlock_trywrite)(struct ato
 		}
 		__hybrid_assertf(__newval & __ATOMIC_OWNER_RWLOCK_WFLAG,
 		                 "Too many write-locks");
-	} while (!__hybrid_atomic_cmpxch_weak(__self->aorw_lock, __f, __newval,
+	} while (!__hybrid_atomic_cmpxch_weak(&__self->aorw_lock, __f, __newval,
 	                                      __ATOMIC_SEQ_CST, __ATOMIC_RELAXED));
 	if (__newval == __ATOMIC_OWNER_RWLOCK_WFLAG)
 		__self->aorw_owner = __mytid;
@@ -262,7 +261,7 @@ __LOCAL __ATTR_WUNUSED __BOOL
 __NOTHROW(atomic_owner_rwlock_trywrite_r)(struct atomic_owner_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __f;
 	do {
-		__f = __hybrid_atomic_load(__self->aorw_lock, __ATOMIC_ACQUIRE);
+		__f = __hybrid_atomic_load(&__self->aorw_lock, __ATOMIC_ACQUIRE);
 		__hybrid_assertf(!(__f & __ATOMIC_OWNER_RWLOCK_WFLAG) ||
 		                 !__hybrid_gettid_iscaller(__self->aorw_owner),
 		                 "atomic_owner_rwlock_trywrite_r() cannot be used if you're "
@@ -275,7 +274,7 @@ __NOTHROW(atomic_owner_rwlock_trywrite_r)(struct atomic_owner_rwlock *__restrict
 		                 __HYBRID_GETTID_PRINTF_ARG(__self->aorw_owner));
 		if (__f)
 			return 0;
-	} while (!__hybrid_atomic_cmpxch_weak(__self->aorw_lock, __f, __ATOMIC_OWNER_RWLOCK_WFLAG,
+	} while (!__hybrid_atomic_cmpxch_weak(&__self->aorw_lock, __f, __ATOMIC_OWNER_RWLOCK_WFLAG,
 	                                      __ATOMIC_SEQ_CST, __ATOMIC_RELAXED));
 	__self->aorw_owner = __hybrid_gettid();
 	__COMPILER_BARRIER();
@@ -338,19 +337,19 @@ __NOTHROW(atomic_owner_rwlock_tryupgrade)(struct atomic_owner_rwlock *__restrict
 	__hybrid_tid_t __mytid = __hybrid_gettid();
 __again:
 	do {
-		__f = __hybrid_atomic_load(__self->aorw_lock, __ATOMIC_ACQUIRE);
+		__f = __hybrid_atomic_load(&__self->aorw_lock, __ATOMIC_ACQUIRE);
 		if (__f != 1) {
 			if (__f & __ATOMIC_OWNER_RWLOCK_WFLAG &&
 			    __hybrid_gettid_equal(__self->aorw_owner, __mytid)) {
 				/* Do nothing when upgrading a read-lock ontop of a write-lock. */
-				if (__hybrid_atomic_cmpxch_weak(__self->aorw_lock, __f, __f,
+				if (__hybrid_atomic_cmpxch_weak(&__self->aorw_lock, __f, __f,
 				                                __ATOMIC_RELEASE, __ATOMIC_RELAXED))
 					goto __success;
 				goto __again;
 			}
 			return 0;
 		}
-	} while (!__hybrid_atomic_cmpxch_weak(__self->aorw_lock, __f, __ATOMIC_OWNER_RWLOCK_WFLAG,
+	} while (!__hybrid_atomic_cmpxch_weak(&__self->aorw_lock, __f, __ATOMIC_OWNER_RWLOCK_WFLAG,
 	                                      __ATOMIC_SEQ_CST, __ATOMIC_RELAXED));
 	__self->aorw_owner = __mytid;
 __success:
@@ -394,7 +393,7 @@ __NOTHROW(atomic_owner_rwlock_downgrade)(struct atomic_owner_rwlock *__restrict 
 	                 __HYBRID_GETTID_PRINTF_ARG(__hybrid_gettid()),
 	                 __HYBRID_GETTID_PRINTF_ARG(__self->aorw_owner));
 	do {
-		__f = __hybrid_atomic_load(__self->aorw_lock, __ATOMIC_ACQUIRE);
+		__f = __hybrid_atomic_load(&__self->aorw_lock, __ATOMIC_ACQUIRE);
 		__hybrid_assertf(__f & __ATOMIC_OWNER_RWLOCK_WFLAG,
 		                 "Lock not in write-mode (%#lx)"
 		                 "Caller: " __HYBRID_GETTID_PRINTF_FMT "\n"
@@ -409,21 +408,21 @@ __NOTHROW(atomic_owner_rwlock_downgrade)(struct atomic_owner_rwlock *__restrict 
 		                 (unsigned long)__f,
 		                 __HYBRID_GETTID_PRINTF_ARG(__hybrid_gettid()),
 		                 __HYBRID_GETTID_PRINTF_ARG(__self->aorw_owner));
-	} while (!__hybrid_atomic_cmpxch_weak(__self->aorw_lock, __f, 1,
+	} while (!__hybrid_atomic_cmpxch_weak(&__self->aorw_lock, __f, 1,
 	                                      __ATOMIC_RELEASE, __ATOMIC_RELAXED));
 #endif /* !NDEBUG && !NDEBUG_SYNC */
 }
 
 __LOCAL __ATTR_WUNUSED __BOOL
 __NOTHROW(atomic_owner_rwlock_canread)(struct atomic_owner_rwlock const *__restrict __self) {
-	return !(__hybrid_atomic_load(__self->aorw_lock, __ATOMIC_ACQUIRE) & __ATOMIC_OWNER_RWLOCK_WFLAG) ||
+	return !(__hybrid_atomic_load(&__self->aorw_lock, __ATOMIC_ACQUIRE) & __ATOMIC_OWNER_RWLOCK_WFLAG) ||
 	       __hybrid_gettid_iscaller(__self->aorw_owner);
 }
 
 __LOCAL __ATTR_WUNUSED __BOOL
 __NOTHROW(atomic_owner_rwlock_canwrite)(struct atomic_owner_rwlock const *__restrict __self) {
 	__UINTPTR_TYPE__ __f;
-	__f = __hybrid_atomic_load(__self->aorw_lock, __ATOMIC_ACQUIRE);
+	__f = __hybrid_atomic_load(&__self->aorw_lock, __ATOMIC_ACQUIRE);
 	return !__f || ((__f & __ATOMIC_OWNER_RWLOCK_WFLAG) && __hybrid_gettid_iscaller(__self->aorw_owner));
 }
 #endif /* !__INTELLISENSE__ */

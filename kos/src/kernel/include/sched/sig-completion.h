@@ -136,7 +136,7 @@ struct sig_completion
 
 /* Check if the given signal completion controller `self' was connected. */
 #define sig_completion_wasconnected(self) \
-	(!TASK_CONNECTION_STAT_ISDONE(__hybrid_atomic_load((self)->_sig_completion_con_ tc_stat, __ATOMIC_ACQUIRE)))
+	(!TASK_CONNECTION_STAT_ISDONE(__hybrid_atomic_load(&(self)->_sig_completion_con_ tc_stat, __ATOMIC_ACQUIRE)))
 
 /* Connect the given signal completion controller to the specified signal.
  * The caller must  ensure that `completion'  hasn't been connected,  yet. */

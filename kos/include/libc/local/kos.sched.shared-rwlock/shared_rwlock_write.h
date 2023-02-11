@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a928d36 */
+/* HASH CRC-32:0x6b839886 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_trywrite,(struct shared_rwlock *__restrict __self),shared_rwlock_trywrite,{
 	__COMPILER_WORKAROUND_GCC_105689(__self);
-	if (!__hybrid_atomic_cmpxch(__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
+	if (!__hybrid_atomic_cmpxch(&__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return 0;
 	__COMPILER_BARRIER();
@@ -69,7 +69,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1) __BOOL __NOTHROW(__FCALL __localdep_shared_rwlock_trywrite)(struct shared_rwlock *__restrict __self) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
-	if (!__hybrid_atomic_cmpxch(__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
+	if (!__hybrid_atomic_cmpxch(&__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return 0;
 	__COMPILER_BARRIER();
@@ -117,7 +117,7 @@ __LOCAL_LIBC(shared_rwlock_write) __BLOCKING __ATTR_INOUT(1) void
 __success:
 #else /* __KERNEL__ */
 	while (!(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_trywrite)(__self)) {
-		__hybrid_atomic_store(__self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
+		__hybrid_atomic_store(&__self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
 		(__NAMESPACE_LOCAL_SYM __localdep_LFutexExprI64_except)(&__self->sl_wrwait, __self,
 		                     __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
 		                     __NULLPTR, 0);

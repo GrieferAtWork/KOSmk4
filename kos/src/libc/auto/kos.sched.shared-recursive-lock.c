@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcef1f7f6 */
+/* HASH CRC-32:0xf9baa6ea */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ NOTHROW(__FCALL libc_shared_recursive_lock_tryacquire)(struct shared_recursive_l
 
 
 
-	if (__hybrid_atomic_cmpxch(self->sr_lock.sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+	if (__hybrid_atomic_cmpxch(&self->sr_lock.sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
 
 	{
 		__shared_recursive_lock_setown(self);
@@ -75,7 +75,7 @@ NOTHROW(__FCALL libc_shared_recursive_lock_release)(struct shared_recursive_lock
 		self->sr_owner = __SHARED_RECURSIVE_LOCK_BADTID;
 		lockstate        = self->sr_lock.sl_lock;
 		__COMPILER_BARRIER();
-		__hybrid_atomic_store(self->sr_lock.sl_lock, 0, __ATOMIC_RELEASE);
+		__hybrid_atomic_store(&self->sr_lock.sl_lock, 0, __ATOMIC_RELEASE);
 		if (lockstate >= 2)
 			__shared_lock_send(&self->sr_lock);
 

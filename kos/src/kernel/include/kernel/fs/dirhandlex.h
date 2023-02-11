@@ -114,10 +114,10 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL dirhandlex_setnotify)(struct dirhandlex *__restrict self,
                                     syscall_ulong_t flags);
 
-#define dirhandlex_hdr_getsigio(self)         __hybrid_atomic_load((self)->dxh_sigio, __ATOMIC_ACQUIRE)         /* F_GETSIG */
-#define dirhandlex_hdr_setsigio(self, sigio)  __hybrid_atomic_store((self)->dxh_sigio, sigio, __ATOMIC_RELEASE) /* F_SETSIG */
-#define dirhandlex_hdr_gettaskpid(self)       arref_get(&(self)->dxh_thrio)                                     /* F_GETOWN */
-#define dirhandlex_hdr_settaskpid(self, tpid) arref_set(&(self)->dxh_thrio, tpid)                               /* F_SETOWN */
+#define dirhandlex_hdr_getsigio(self)         __hybrid_atomic_load(&(self)->dxh_sigio, __ATOMIC_ACQUIRE)         /* F_GETSIG */
+#define dirhandlex_hdr_setsigio(self, sigio)  __hybrid_atomic_store(&(self)->dxh_sigio, sigio, __ATOMIC_RELEASE) /* F_SETSIG */
+#define dirhandlex_hdr_gettaskpid(self)       arref_get(&(self)->dxh_thrio)                                      /* F_GETOWN */
+#define dirhandlex_hdr_settaskpid(self, tpid) arref_set(&(self)->dxh_thrio, tpid)                                /* F_SETOWN */
 #define dirhandlex_getsigio(self)             dirhandlex_hdr_getsigio(dirhandlex_ashdr(self))
 #define dirhandlex_setsigio(self, sigio)      dirhandlex_hdr_setsigio(dirhandlex_ashdr(self), sigio)
 #define dirhandlex_gettaskpid(self)           dirhandlex_hdr_gettaskpid(dirhandlex_ashdr(self))

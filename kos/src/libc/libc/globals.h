@@ -53,7 +53,7 @@ DECL_BEGIN
 	INTERN ATTR_CONST ATTR_SECTION(".text" section) T *(LIBCCALL libc_bind_##name)(void) { \
 		T *ptr = (T *)dlsym(RTLD_DEFAULT, libc_name_##name);                               \
 		__hybrid_assert(ptr);                                                              \
-		__hybrid_atomic_store(libc_pdyn_##name, ptr, __ATOMIC_RELEASE);                    \
+		__hybrid_atomic_store(&libc_pdyn_##name, ptr, __ATOMIC_RELEASE);                   \
 		return ptr;                                                                        \
 	}
 #endif /* !__INTELLISENSE__ */

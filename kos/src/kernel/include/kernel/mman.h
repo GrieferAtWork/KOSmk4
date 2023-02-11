@@ -199,15 +199,15 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self);
 #ifdef __NO_builtin_constant_p
 #define mman_lockops_mustreap(self) \
-	(__hybrid_atomic_load(FORMMAN(self, thismman_lockops.slh_first), __ATOMIC_ACQUIRE) != __NULLPTR)
+	(__hybrid_atomic_load(&FORMMAN(self, thismman_lockops.slh_first), __ATOMIC_ACQUIRE) != __NULLPTR)
 #else /* __NO_builtin_constant_p */
 /* By directly accessing `mman_kernel_lockops' if known at compile-time, generated
  * assembly doesn't have to do the otherwise necessary addition between two known-
  * link-time-constant values. */
-#define mman_lockops_mustreap(self)                                                       \
-	((__builtin_constant_p((self) == &mman_kernel) && (self) == &mman_kernel)             \
-	 ? __hybrid_atomic_load(mman_kernel_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR \
-	 : __hybrid_atomic_load(FORMMAN(self, thismman_lockops.slh_first), __ATOMIC_ACQUIRE) != __NULLPTR)
+#define mman_lockops_mustreap(self)                                                        \
+	((__builtin_constant_p((self) == &mman_kernel) && (self) == &mman_kernel)              \
+	 ? __hybrid_atomic_load(&mman_kernel_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR \
+	 : __hybrid_atomic_load(&FORMMAN(self, thismman_lockops.slh_first), __ATOMIC_ACQUIRE) != __NULLPTR)
 #endif /* !__NO_builtin_constant_p */
 #ifdef __OPTIMIZE_SIZE__
 #define mman_lockops_reap(self) _mman_lockops_reap(self)

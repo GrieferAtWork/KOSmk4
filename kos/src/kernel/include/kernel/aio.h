@@ -344,7 +344,7 @@ struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle {
  *           only allowed to do so after already having called  `aio_handle_release()',
  *           or when the object being decref'd doesn't actually end up being destroyed. */
 #define aio_handle_release(self)                      \
-	(__hybrid_atomic_store((self)->ah_next,           \
+	(__hybrid_atomic_store(&(self)->ah_next,          \
 	                       AIO_HANDLE_NEXT_COMPLETED, \
 	                       __ATOMIC_RELEASE))
 
@@ -398,7 +398,7 @@ LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_handle_fini)(struct aio_handle *__restrict self) {
 #ifndef CONFIG_NO_SMP
 	/* Make sure that no other thread is still inside of `ah_func' */
-	while (__hybrid_atomic_load(self->ah_next, __ATOMIC_ACQUIRE) != AIO_HANDLE_NEXT_COMPLETED)
+	while (__hybrid_atomic_load(&self->ah_next, __ATOMIC_ACQUIRE) != AIO_HANDLE_NEXT_COMPLETED)
 		__hybrid_preemption_tryyield();
 #endif /* !CONFIG_NO_SMP */
 	(*self->ah_type->ht_fini)(self);
@@ -407,7 +407,7 @@ NOTHROW(KCALL aio_handle_fini)(struct aio_handle *__restrict self) {
 /* Check if the given AIO handle's callback has already been invoked. */
 LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL aio_handle_completed)(struct aio_handle const *__restrict self) {
-	return __hybrid_atomic_load(self->ah_next, __ATOMIC_ACQUIRE) == AIO_HANDLE_NEXT_COMPLETED;
+	return __hybrid_atomic_load(&self->ah_next, __ATOMIC_ACQUIRE) == AIO_HANDLE_NEXT_COMPLETED;
 }
 
 /* Cancel  an   in-progress  or   finished  AIO   operation.
@@ -520,7 +520,7 @@ NOTHROW(KCALL aio_handle_generic_init)(struct aio_handle_generic *__restrict sel
 }
 
 #define aio_handle_generic_hascompleted(self) \
-	(__hybrid_atomic_load((self)->hg_status, __ATOMIC_ACQUIRE) != 0)
+	(__hybrid_atomic_load(&(self)->hg_status, __ATOMIC_ACQUIRE) != 0)
 
 /* Check if the AIO operation failed, and propagate the error if it did. */
 LOCAL NONNULL((1)) void KCALL
@@ -642,7 +642,7 @@ struct aio_multihandle {
  *
  * This is the multihandle analog for `aio_handle_release()' */
 #define aio_multihandle_release(self)                    \
-	(__hybrid_atomic_or((self)->am_status,               \
+	(__hybrid_atomic_or(&(self)->am_status,              \
 	                    AIO_MULTIHANDLE_STATUS_RELEASED, \
 	                    __ATOMIC_SEQ_CST))
 

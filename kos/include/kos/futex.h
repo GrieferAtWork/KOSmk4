@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33819be5 */
+/* HASH CRC-32:0x942ca5ee */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1068,133 +1068,133 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_allbits64, __FORCELOCAL __A
 /* Check if `futex_waitwhile()' would block
  * @return: 0: `futex_waitwhile()' would block
  * @return: 1: `futex_waitwhile()' wouldn't block */
-__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile,(lfutex_t *__uaddr, lfutex_t __equal_to_value),{ return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) == __equal_to_value ? 0 : 1; })
+__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile,(lfutex_t *__uaddr, lfutex_t __equal_to_value),{ return __hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) == __equal_to_value ? 0 : 1; })
 #else /* __CRT_HAVE_futex_trywaitwhile */
 /* Check if `futex_waitwhile()' would block
  * @return: 0: `futex_waitwhile()' would block
  * @return: 1: `futex_waitwhile()' wouldn't block */
-__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile)(lfutex_t *__uaddr, lfutex_t __equal_to_value) { return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) == __equal_to_value ? 0 : 1; }
+__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile)(lfutex_t *__uaddr, lfutex_t __equal_to_value) { return __hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) == __equal_to_value ? 0 : 1; }
 #endif /* !__CRT_HAVE_futex_trywaitwhile */
 #ifdef __CRT_HAVE_futex_trywaituntil
 /* Check if `futex_waituntil()' would block
  * @return: 0: `futex_waituntil()' would block
  * @return: 1: `futex_waituntil()' wouldn't block */
-__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaituntil,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value),{ return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) != __not_equal_to_value ? 0 : 1; })
+__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaituntil,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value),{ return __hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) != __not_equal_to_value ? 0 : 1; })
 #else /* __CRT_HAVE_futex_trywaituntil */
 /* Check if `futex_waituntil()' would block
  * @return: 0: `futex_waituntil()' would block
  * @return: 1: `futex_waituntil()' wouldn't block */
-__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaituntil)(lfutex_t *__uaddr, lfutex_t __not_equal_to_value) { return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) != __not_equal_to_value ? 0 : 1; }
+__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaituntil)(lfutex_t *__uaddr, lfutex_t __not_equal_to_value) { return __hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) != __not_equal_to_value ? 0 : 1; }
 #endif /* !__CRT_HAVE_futex_trywaituntil */
 #ifdef __CRT_HAVE_futex_trywaitwhile_equal
 /* Check if `futex_waitwhile_equal()' would block
  * @return: 0: `futex_waitwhile_equal()' would block
  * @return: 1: `futex_waitwhile_equal()' wouldn't block */
-__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile_equal,(lfutex_t *__uaddr, lfutex_t __equal_to_value),{ return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) == __equal_to_value ? 0 : 1; })
+__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile_equal,(lfutex_t *__uaddr, lfutex_t __equal_to_value),{ return __hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) == __equal_to_value ? 0 : 1; })
 #else /* __CRT_HAVE_futex_trywaitwhile_equal */
 /* Check if `futex_waitwhile_equal()' would block
  * @return: 0: `futex_waitwhile_equal()' would block
  * @return: 1: `futex_waitwhile_equal()' wouldn't block */
-__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_equal)(lfutex_t *__uaddr, lfutex_t __equal_to_value) { return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) == __equal_to_value ? 0 : 1; }
+__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_equal)(lfutex_t *__uaddr, lfutex_t __equal_to_value) { return __hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) == __equal_to_value ? 0 : 1; }
 #endif /* !__CRT_HAVE_futex_trywaitwhile_equal */
 #ifdef __CRT_HAVE_futex_trywaitwhile_notequal
 /* Check if `futex_waitwhile_notequal()' would block
  * @return: 0: `futex_waitwhile_notequal()' would block
  * @return: 1: `futex_waitwhile_notequal()' wouldn't block */
-__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile_notequal,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value),{ return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) != __not_equal_to_value ? 0 : 1; })
+__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile_notequal,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value),{ return __hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) != __not_equal_to_value ? 0 : 1; })
 #else /* __CRT_HAVE_futex_trywaitwhile_notequal */
 /* Check if `futex_waitwhile_notequal()' would block
  * @return: 0: `futex_waitwhile_notequal()' would block
  * @return: 1: `futex_waitwhile_notequal()' wouldn't block */
-__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_notequal)(lfutex_t *__uaddr, lfutex_t __not_equal_to_value) { return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) != __not_equal_to_value ? 0 : 1; }
+__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_notequal)(lfutex_t *__uaddr, lfutex_t __not_equal_to_value) { return __hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) != __not_equal_to_value ? 0 : 1; }
 #endif /* !__CRT_HAVE_futex_trywaitwhile_notequal */
 #ifdef __CRT_HAVE_futex_trywaitwhile_above
 /* Check if `futex_waitwhile_above()' would block
  * @return: 0: `futex_waitwhile_above()' would block
  * @return: 1: `futex_waitwhile_above()' wouldn't block */
-__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile_above,(lfutex_t *__uaddr, lfutex_t __above_value),{ return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) > __above_value ? 0 : 1; })
+__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile_above,(lfutex_t *__uaddr, lfutex_t __above_value),{ return __hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) > __above_value ? 0 : 1; })
 #else /* __CRT_HAVE_futex_trywaitwhile_above */
 /* Check if `futex_waitwhile_above()' would block
  * @return: 0: `futex_waitwhile_above()' would block
  * @return: 1: `futex_waitwhile_above()' wouldn't block */
-__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_above)(lfutex_t *__uaddr, lfutex_t __above_value) { return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) > __above_value ? 0 : 1; }
+__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_above)(lfutex_t *__uaddr, lfutex_t __above_value) { return __hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) > __above_value ? 0 : 1; }
 #endif /* !__CRT_HAVE_futex_trywaitwhile_above */
 #ifdef __CRT_HAVE_futex_trywaitwhile_below
 /* Check if `futex_waitwhile_below()' would block
  * @return: 0: `futex_waitwhile_below()' would block
  * @return: 1: `futex_waitwhile_below()' wouldn't block */
-__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile_below,(lfutex_t *__uaddr, lfutex_t __below_value),{ return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) < __below_value ? 0 : 1; })
+__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile_below,(lfutex_t *__uaddr, lfutex_t __below_value),{ return __hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) < __below_value ? 0 : 1; })
 #else /* __CRT_HAVE_futex_trywaitwhile_below */
 /* Check if `futex_waitwhile_below()' would block
  * @return: 0: `futex_waitwhile_below()' would block
  * @return: 1: `futex_waitwhile_below()' wouldn't block */
-__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_below)(lfutex_t *__uaddr, lfutex_t __below_value) { return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) < __below_value ? 0 : 1; }
+__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_below)(lfutex_t *__uaddr, lfutex_t __below_value) { return __hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) < __below_value ? 0 : 1; }
 #endif /* !__CRT_HAVE_futex_trywaitwhile_below */
 #ifdef __CRT_HAVE_futex_trywaitwhile_aboveequal
 /* Check if `futex_waitwhile_aboveequal()' would block
  * @return: 0: `futex_waitwhile_aboveequal()' would block
  * @return: 1: `futex_waitwhile_aboveequal()' wouldn't block */
-__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile_aboveequal,(lfutex_t *__uaddr, lfutex_t __above_or_equal_value),{ return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) >= __above_or_equal_value ? 0 : 1; })
+__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile_aboveequal,(lfutex_t *__uaddr, lfutex_t __above_or_equal_value),{ return __hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) >= __above_or_equal_value ? 0 : 1; })
 #else /* __CRT_HAVE_futex_trywaitwhile_aboveequal */
 /* Check if `futex_waitwhile_aboveequal()' would block
  * @return: 0: `futex_waitwhile_aboveequal()' would block
  * @return: 1: `futex_waitwhile_aboveequal()' wouldn't block */
-__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_aboveequal)(lfutex_t *__uaddr, lfutex_t __above_or_equal_value) { return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) >= __above_or_equal_value ? 0 : 1; }
+__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_aboveequal)(lfutex_t *__uaddr, lfutex_t __above_or_equal_value) { return __hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) >= __above_or_equal_value ? 0 : 1; }
 #endif /* !__CRT_HAVE_futex_trywaitwhile_aboveequal */
 #ifdef __CRT_HAVE_futex_trywaitwhile_belowequal
 /* Check if `futex_waitwhile_belowequal()' would block
  * @return: 0: `futex_waitwhile_belowequal()' would block
  * @return: 1: `futex_waitwhile_belowequal()' wouldn't block */
-__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile_belowequal,(lfutex_t *__uaddr, lfutex_t __below_or_equal_value),{ return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) <= __below_or_equal_value ? 0 : 1; })
+__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile_belowequal,(lfutex_t *__uaddr, lfutex_t __below_or_equal_value),{ return __hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) <= __below_or_equal_value ? 0 : 1; })
 #else /* __CRT_HAVE_futex_trywaitwhile_belowequal */
 /* Check if `futex_waitwhile_belowequal()' would block
  * @return: 0: `futex_waitwhile_belowequal()' would block
  * @return: 1: `futex_waitwhile_belowequal()' wouldn't block */
-__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_belowequal)(lfutex_t *__uaddr, lfutex_t __below_or_equal_value) { return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) <= __below_or_equal_value ? 0 : 1; }
+__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_belowequal)(lfutex_t *__uaddr, lfutex_t __below_or_equal_value) { return __hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) <= __below_or_equal_value ? 0 : 1; }
 #endif /* !__CRT_HAVE_futex_trywaitwhile_belowequal */
 #ifdef __CRT_HAVE_futex_trywaitwhile_exactbits
 /* Check if `futex_waitwhile_exactbits()' would block
  * @return: 0: `futex_waitwhile_exactbits()' would block
  * @return: 1: `futex_waitwhile_exactbits()' wouldn't block */
-__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask),{ return (__hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) & __bitmask) == __setmask ? 0 : 1; })
+__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask),{ return (__hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) & __bitmask) == __setmask ? 0 : 1; })
 #else /* __CRT_HAVE_futex_trywaitwhile_exactbits */
 /* Check if `futex_waitwhile_exactbits()' would block
  * @return: 0: `futex_waitwhile_exactbits()' would block
  * @return: 1: `futex_waitwhile_exactbits()' wouldn't block */
-__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_exactbits)(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask) { return (__hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) & __bitmask) == __setmask ? 0 : 1; }
+__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_exactbits)(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask) { return (__hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) & __bitmask) == __setmask ? 0 : 1; }
 #endif /* !__CRT_HAVE_futex_trywaitwhile_exactbits */
 #ifdef __CRT_HAVE_futex_trywaituntil_exactbits
 /* Check if `futex_waituntil_exactbits()' would block
  * @return: 0: `futex_waituntil_exactbits()' would block
  * @return: 1: `futex_waituntil_exactbits()' wouldn't block */
-__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaituntil_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask),{ return (__hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) & __bitmask) != __setmask ? 0 : 1; })
+__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaituntil_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask),{ return (__hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) & __bitmask) != __setmask ? 0 : 1; })
 #else /* __CRT_HAVE_futex_trywaituntil_exactbits */
 /* Check if `futex_waituntil_exactbits()' would block
  * @return: 0: `futex_waituntil_exactbits()' would block
  * @return: 1: `futex_waituntil_exactbits()' wouldn't block */
-__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaituntil_exactbits)(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask) { return (__hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) & __bitmask) != __setmask ? 0 : 1; }
+__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaituntil_exactbits)(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask) { return (__hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) & __bitmask) != __setmask ? 0 : 1; }
 #endif /* !__CRT_HAVE_futex_trywaituntil_exactbits */
 #ifdef __CRT_HAVE_futex_trywaitwhile_anybit
 /* Check if `futex_waitwhile_anybit()' would block
  * @return: 0: `futex_waitwhile_anybit()' would block
  * @return: 1: `futex_waitwhile_anybit()' wouldn't block */
-__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile_anybit,(lfutex_t *__uaddr, lfutex_t __bitmask),{ return (__hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) & __bitmask) != 0 ? 0 : 1; })
+__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile_anybit,(lfutex_t *__uaddr, lfutex_t __bitmask),{ return (__hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) & __bitmask) != 0 ? 0 : 1; })
 #else /* __CRT_HAVE_futex_trywaitwhile_anybit */
 /* Check if `futex_waitwhile_anybit()' would block
  * @return: 0: `futex_waitwhile_anybit()' would block
  * @return: 1: `futex_waitwhile_anybit()' wouldn't block */
-__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_anybit)(lfutex_t *__uaddr, lfutex_t __bitmask) { return (__hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) & __bitmask) != 0 ? 0 : 1; }
+__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_anybit)(lfutex_t *__uaddr, lfutex_t __bitmask) { return (__hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) & __bitmask) != 0 ? 0 : 1; }
 #endif /* !__CRT_HAVE_futex_trywaitwhile_anybit */
 #ifdef __CRT_HAVE_futex_trywaitwhile_allbits
 /* Check if `futex_waitwhile_allbits()' would block
  * @return: 0: `futex_waitwhile_allbits()' would block
  * @return: 1: `futex_waitwhile_allbits()' wouldn't block */
-__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile_allbits,(lfutex_t *__uaddr, lfutex_t __bitmask),{ return (__hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) & __bitmask) == __bitmask ? 0 : 1; })
+__CEIDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,futex_trywaitwhile_allbits,(lfutex_t *__uaddr, lfutex_t __bitmask),{ return (__hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) & __bitmask) == __bitmask ? 0 : 1; })
 #else /* __CRT_HAVE_futex_trywaitwhile_allbits */
 /* Check if `futex_waitwhile_allbits()' would block
  * @return: 0: `futex_waitwhile_allbits()' would block
  * @return: 1: `futex_waitwhile_allbits()' wouldn't block */
-__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_allbits)(lfutex_t *__uaddr, lfutex_t __bitmask) { return (__hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) & __bitmask) == __bitmask ? 0 : 1; }
+__LOCAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_allbits)(lfutex_t *__uaddr, lfutex_t __bitmask) { return (__hybrid_atomic_load(__uaddr, __ATOMIC_ACQUIRE) & __bitmask) == __bitmask ? 0 : 1; }
 #endif /* !__CRT_HAVE_futex_trywaitwhile_allbits */
 
 

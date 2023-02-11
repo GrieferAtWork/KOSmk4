@@ -346,10 +346,10 @@ struct page_usage_struct {
 /* Usage information. */
 DATDEF struct page_usage_struct page_usage;
 
-#define page_usage_inc(field)    __hybrid_atomic_inc(field, __ATOMIC_SEQ_CST)
-#define page_usage_dec(field)    __hybrid_atomic_dec(field, __ATOMIC_SEQ_CST)
-#define page_usage_add(field, v) __hybrid_atomic_add(field, v, __ATOMIC_SEQ_CST)
-#define page_usage_sub(field, v) __hybrid_atomic_sub(field, v, __ATOMIC_SEQ_CST)
+#define page_usage_inc(field)    __hybrid_atomic_inc(&(field), __ATOMIC_SEQ_CST)
+#define page_usage_dec(field)    __hybrid_atomic_dec(&(field), __ATOMIC_SEQ_CST)
+#define page_usage_add(field, v) __hybrid_atomic_add(&(field), v, __ATOMIC_SEQ_CST)
+#define page_usage_sub(field, v) __hybrid_atomic_sub(&(field), v, __ATOMIC_SEQ_CST)
 #define page_mallocone_for(usage_field)           \
 	__XBLOCK({                                    \
 		physpage_t _pmof_page = page_mallocone(); \

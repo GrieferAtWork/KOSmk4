@@ -881,7 +881,7 @@
 #ifndef __HYBRID_LIST_RESTRICT_API
 #define SLIST_HEAD_P(T)  struct { T *slh_first; /* [0..1] List head */ }
 #define SLIST_ENTRY_P(T) struct { T *sle_next; /* [0..1] Next-link */ }
-#define SLIST_ATOMIC_CLEAR(self)                                                           __hybrid_atomic_xch((self)->slh_first, __NULLPTR, __ATOMIC_SEQ_CST)
+#define SLIST_ATOMIC_CLEAR(self)                                                           __hybrid_atomic_xch(&(self)->slh_first, __NULLPTR, __ATOMIC_SEQ_CST)
 #define SLIST_ATOMIC_INSERT(self, elem, key)                                               __HYBRID_SLIST_ATOMIC_INSERT(self, elem, __HYBRID_Q_KEY, key)
 #define SLIST_ATOMIC_INSERT_P(self, elem, getpath)                                         __HYBRID_SLIST_ATOMIC_INSERT(self, elem, __HYBRID_Q_PTH, getpath)
 #define SLIST_ATOMIC_INSERT_R(self, lo_elem, hi_elem, key)                                 __HYBRID_SLIST_ATOMIC_INSERT_R(self, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
@@ -1135,12 +1135,12 @@
 	       (self)->slh_first      = (lo_elem))
 #define __HYBRID_SLIST_ATOMIC_INSERT(self, elem, X, _) \
 	__HYBRID_SLIST_ATOMIC_INSERT_R(self, elem, elem, X, _)
-#define __HYBRID_SLIST_ATOMIC_INSERT_R(self, lo_elem, hi_elem, X, _)                        \
-	/* Sorry, this one must be a statement */                                               \
-	do {                                                                                    \
-		X(_, hi_elem).sle_next = __hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE); \
-		__COMPILER_WRITE_BARRIER();                                                         \
-	} while (!__hybrid_atomic_cmpxch((self)->slh_first, X(_, hi_elem).sle_next, lo_elem,    \
+#define __HYBRID_SLIST_ATOMIC_INSERT_R(self, lo_elem, hi_elem, X, _)                         \
+	/* Sorry, this one must be a statement */                                                \
+	do {                                                                                     \
+		X(_, hi_elem).sle_next = __hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE); \
+		__COMPILER_WRITE_BARRIER();                                                          \
+	} while (!__hybrid_atomic_cmpxch(&(self)->slh_first, X(_, hi_elem).sle_next, lo_elem,    \
 	                                 __ATOMIC_RELEASE, __ATOMIC_RELAXED))
 #define __HYBRID_SLIST_REMOVE_HEAD(self, X, _) \
 	(void)((self)->slh_first = X(_, (self)->slh_first).sle_next)

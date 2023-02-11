@@ -1529,9 +1529,9 @@ do_atomic_cmpxchx(struct icpustate **__restrict pstate,
 #if EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B
 #ifdef __x86_64__
 #define EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEQ(addr, oldval, newval, force_atomic) \
-	__hybrid_atomic_cmpxch(*(u64 *)(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+	__hybrid_atomic_cmpxch((u64 *)(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #define EMU86_MEM_ATOMIC_CMPXCHQ(addr, oldval, newval, force_atomic)      \
-	__hybrid_atomic_cmpxch_val(*(u64 *)(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+	__hybrid_atomic_cmpxch_val((u64 *)(addr), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #elif defined(ARCH_X86_HAVE_EMULOCK_CMPXCHQ)
 #define EMU86_MEM_ATOMIC_CMPXCHQ(addr, oldval, newval, force_atomic) \
 	do_atomic_cmpxchq((struct icpustate **)&_state, (u64 *)(addr), (u64)(oldval), (u64)(newval), force_atomic)

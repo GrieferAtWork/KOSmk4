@@ -263,11 +263,11 @@ struct shared_rwlock;
  *       which is  equivalent  to  `SLIST_ATOMIC_INSERT(self, lop, lo_link)' */
 #define lockop_enqueue(self, lop)   __lockop_enqueue(self, lop, (lop)->lo_link)
 #define oblockop_enqueue(self, lop) __lockop_enqueue(self, lop, (lop)->olo_link)
-#define __lockop_enqueue(self, lop, lop_link)                                          \
-	do {                                                                               \
-		lop_link.sle_next = __hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE); \
-		__COMPILER_WRITE_BARRIER();                                                    \
-	} while (!__hybrid_atomic_cmpxch((self)->slh_first, lop_link.sle_next, lop,        \
+#define __lockop_enqueue(self, lop, lop_link)                                           \
+	do {                                                                                \
+		lop_link.sle_next = __hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE); \
+		__COMPILER_WRITE_BARRIER();                                                     \
+	} while (!__hybrid_atomic_cmpxch(&(self)->slh_first, lop_link.sle_next, lop,        \
 	                                 __ATOMIC_RELEASE, __ATOMIC_RELAXED))
 
 
@@ -278,7 +278,7 @@ struct shared_rwlock;
  * >> ATTR_PURE WUNUSED bool lockop_mustreap(struct Toblockop_slist(T) const *__restrict self);
  * Check if the given lockop-list `self' must  be reaped (that is: contains pending  callbacks) */
 #define lockop_mustreap(self) \
-	(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
+	(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 #define oblockop_mustreap(self) lockop_mustreap(self)
 
 /* >> void lockop_reap_ex(struct lockop_slist *__restrict self, bool (LOCKOP_CC *trylock)(void *cookie), void (LOCKOP_CC *unlock)(void *cookie), void *cookie);
@@ -292,9 +292,9 @@ struct shared_rwlock;
 	_oblockop_reap_ex(self, trylock, unlock, cookie, obj)
 #else /* __OPTIMIZE_SIZE__ */
 #define lockop_reap_ex(self, trylock, unlock, cookie) \
-	(void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_ex(self, trylock, unlock, cookie), 0))
+	(void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_ex(self, trylock, unlock, cookie), 0))
 #define oblockop_reap_ex(self, trylock, unlock, cookie, obj) \
-	(void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_ex(self, trylock, unlock, cookie, obj), 0))
+	(void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_ex(self, trylock, unlock, cookie, obj), 0))
 #endif /* !__OPTIMIZE_SIZE__ */
 
 }
@@ -362,14 +362,14 @@ void _oblockop_reap_ex([[inout]] struct oblockop_slist *__restrict self,
 #define oblockop_reap_shared_lock(self, lock, obj)   _oblockop_reap_shared_lock(self, lock, obj)
 #define oblockop_reap_shared_rwlock(self, lock, obj) _oblockop_reap_shared_rwlock(self, lock, obj)
 #else /* __OPTIMIZE_SIZE__ */
-#define lockop_reap_atomic_lock(self, lock)          (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_atomic_lock(self, lock), 0))
-#define lockop_reap_atomic_rwlock(self, lock)        (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_atomic_rwlock(self, lock), 0))
-#define oblockop_reap_atomic_lock(self, lock, obj)   (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_atomic_lock(self, lock, obj), 0))
-#define oblockop_reap_atomic_rwlock(self, lock, obj) (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_atomic_rwlock(self, lock, obj), 0))
-#define lockop_reap_shared_lock(self, lock)          (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_shared_lock(self, lock), 0))
-#define lockop_reap_shared_rwlock(self, lock)        (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_shared_rwlock(self, lock), 0))
-#define oblockop_reap_shared_lock(self, lock, obj)   (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_shared_lock(self, lock, obj), 0))
-#define oblockop_reap_shared_rwlock(self, lock, obj) (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_shared_rwlock(self, lock, obj), 0))
+#define lockop_reap_atomic_lock(self, lock)          (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_atomic_lock(self, lock), 0))
+#define lockop_reap_atomic_rwlock(self, lock)        (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_atomic_rwlock(self, lock), 0))
+#define oblockop_reap_atomic_lock(self, lock, obj)   (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_atomic_lock(self, lock, obj), 0))
+#define oblockop_reap_atomic_rwlock(self, lock, obj) (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_atomic_rwlock(self, lock, obj), 0))
+#define lockop_reap_shared_lock(self, lock)          (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_shared_lock(self, lock), 0))
+#define lockop_reap_shared_rwlock(self, lock)        (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_shared_rwlock(self, lock), 0))
+#define oblockop_reap_shared_lock(self, lock, obj)   (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_shared_lock(self, lock, obj), 0))
+#define oblockop_reap_shared_rwlock(self, lock, obj) (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_shared_rwlock(self, lock, obj), 0))
 #endif /* !__OPTIMIZE_SIZE__ */
 
 }
@@ -545,8 +545,8 @@ void _oblockop_reap_shared_rwlock([[inout]] struct oblockop_slist *__restrict se
 #define lockop_reap(self, lock)        _lockop_reap(self, lock)
 #define oblockop_reap(self, lock, obj) _oblockop_reap(self, lock, obj)
 #else /* __OPTIMIZE_SIZE__ */
-#define lockop_reap(self, lock)        (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap(self, lock), 0))
-#define oblockop_reap(self, lock, obj) (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap(self, lock, obj), 0))
+#define lockop_reap(self, lock)        (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap(self, lock), 0))
+#define oblockop_reap(self, lock, obj) (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap(self, lock, obj), 0))
 #endif /* !__OPTIMIZE_SIZE__ */
 
 }

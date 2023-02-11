@@ -159,9 +159,9 @@ DATDEF USER CHECKED void *mman_getunmapped_user_stkbase;
 DATDEF unsigned int mman_findunmapped_extflags;
 
 /* Helper macros to enable/disable ASLR globally. */
-#define mman_findunmapped_aslr_enable()      __hybrid_atomic_and(mman_findunmapped_extflags, ~MAP_NOASLR, __ATOMIC_SEQ_CST)
-#define mman_findunmapped_aslr_disable()     __hybrid_atomic_or(mman_findunmapped_extflags, MAP_NOASLR, __ATOMIC_SEQ_CST)
-#define mman_findunmapped_aslr_getenabled()  (!(__hybrid_atomic_load(mman_findunmapped_extflags, __ATOMIC_ACQUIRE) & MAP_NOASLR))
+#define mman_findunmapped_aslr_enable()      __hybrid_atomic_and(&mman_findunmapped_extflags, ~MAP_NOASLR, __ATOMIC_SEQ_CST)
+#define mman_findunmapped_aslr_disable()     __hybrid_atomic_or(&mman_findunmapped_extflags, MAP_NOASLR, __ATOMIC_SEQ_CST)
+#define mman_findunmapped_aslr_getenabled()  (!(__hybrid_atomic_load(&mman_findunmapped_extflags, __ATOMIC_ACQUIRE) & MAP_NOASLR))
 #define mman_findunmapped_aslr_setenabled(v) ((v) ? mman_findunmapped_aslr_enable() : mman_findunmapped_aslr_disable())
 
 

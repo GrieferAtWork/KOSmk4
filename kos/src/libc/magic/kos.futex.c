@@ -748,7 +748,7 @@ int futex_timedwaitwhile_allbits64([[in]] lfutex_t *uaddr, lfutex_t bitmask,
 @@@return: 1: `futex_waitwhile()' wouldn't block
 [[extern_inline, decl_include("<bits/types.h>"), impl_include("<hybrid/__atomic.h>")]]
 int futex_trywaitwhile([[in]] lfutex_t *uaddr, lfutex_t equal_to_value) {
-	return __hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) == equal_to_value ? 0 : 1;
+	return __hybrid_atomic_load(uaddr, __ATOMIC_ACQUIRE) == equal_to_value ? 0 : 1;
 }
 
 @@Check if `futex_waituntil()' would block
@@ -756,7 +756,7 @@ int futex_trywaitwhile([[in]] lfutex_t *uaddr, lfutex_t equal_to_value) {
 @@@return: 1: `futex_waituntil()' wouldn't block
 [[extern_inline, decl_include("<bits/types.h>"), impl_include("<hybrid/__atomic.h>")]]
 int futex_trywaituntil([[in]] lfutex_t *uaddr, lfutex_t not_equal_to_value) {
-	return __hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) != not_equal_to_value ? 0 : 1;
+	return __hybrid_atomic_load(uaddr, __ATOMIC_ACQUIRE) != not_equal_to_value ? 0 : 1;
 }
 
 @@Check if `futex_waitwhile_equal()' would block
@@ -764,7 +764,7 @@ int futex_trywaituntil([[in]] lfutex_t *uaddr, lfutex_t not_equal_to_value) {
 @@@return: 1: `futex_waitwhile_equal()' wouldn't block
 [[extern_inline, decl_include("<bits/types.h>"), impl_include("<hybrid/__atomic.h>")]]
 int futex_trywaitwhile_equal([[in]] lfutex_t *uaddr, lfutex_t equal_to_value) {
-	return __hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) == equal_to_value ? 0 : 1;
+	return __hybrid_atomic_load(uaddr, __ATOMIC_ACQUIRE) == equal_to_value ? 0 : 1;
 }
 
 @@Check if `futex_waitwhile_notequal()' would block
@@ -772,7 +772,7 @@ int futex_trywaitwhile_equal([[in]] lfutex_t *uaddr, lfutex_t equal_to_value) {
 @@@return: 1: `futex_waitwhile_notequal()' wouldn't block
 [[extern_inline, decl_include("<bits/types.h>"), impl_include("<hybrid/__atomic.h>")]]
 int futex_trywaitwhile_notequal([[in]] lfutex_t *uaddr, lfutex_t not_equal_to_value) {
-	return __hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) != not_equal_to_value ? 0 : 1;
+	return __hybrid_atomic_load(uaddr, __ATOMIC_ACQUIRE) != not_equal_to_value ? 0 : 1;
 }
 
 @@Check if `futex_waitwhile_above()' would block
@@ -780,7 +780,7 @@ int futex_trywaitwhile_notequal([[in]] lfutex_t *uaddr, lfutex_t not_equal_to_va
 @@@return: 1: `futex_waitwhile_above()' wouldn't block
 [[extern_inline, decl_include("<bits/types.h>"), impl_include("<hybrid/__atomic.h>")]]
 int futex_trywaitwhile_above([[in]] lfutex_t *uaddr, lfutex_t above_value) {
-	return __hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) > above_value ? 0 : 1;
+	return __hybrid_atomic_load(uaddr, __ATOMIC_ACQUIRE) > above_value ? 0 : 1;
 }
 
 @@Check if `futex_waitwhile_below()' would block
@@ -788,7 +788,7 @@ int futex_trywaitwhile_above([[in]] lfutex_t *uaddr, lfutex_t above_value) {
 @@@return: 1: `futex_waitwhile_below()' wouldn't block
 [[extern_inline, decl_include("<bits/types.h>"), impl_include("<hybrid/__atomic.h>")]]
 int futex_trywaitwhile_below([[in]] lfutex_t *uaddr, lfutex_t below_value) {
-	return __hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) < below_value ? 0 : 1;
+	return __hybrid_atomic_load(uaddr, __ATOMIC_ACQUIRE) < below_value ? 0 : 1;
 }
 
 @@Check if `futex_waitwhile_aboveequal()' would block
@@ -796,7 +796,7 @@ int futex_trywaitwhile_below([[in]] lfutex_t *uaddr, lfutex_t below_value) {
 @@@return: 1: `futex_waitwhile_aboveequal()' wouldn't block
 [[extern_inline, decl_include("<bits/types.h>"), impl_include("<hybrid/__atomic.h>")]]
 int futex_trywaitwhile_aboveequal([[in]] lfutex_t *uaddr, lfutex_t above_or_equal_value) {
-	return __hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) >= above_or_equal_value ? 0 : 1;
+	return __hybrid_atomic_load(uaddr, __ATOMIC_ACQUIRE) >= above_or_equal_value ? 0 : 1;
 }
 
 @@Check if `futex_waitwhile_belowequal()' would block
@@ -804,7 +804,7 @@ int futex_trywaitwhile_aboveequal([[in]] lfutex_t *uaddr, lfutex_t above_or_equa
 @@@return: 1: `futex_waitwhile_belowequal()' wouldn't block
 [[extern_inline, decl_include("<bits/types.h>"), impl_include("<hybrid/__atomic.h>")]]
 int futex_trywaitwhile_belowequal([[in]] lfutex_t *uaddr, lfutex_t below_or_equal_value) {
-	return __hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) <= below_or_equal_value ? 0 : 1;
+	return __hybrid_atomic_load(uaddr, __ATOMIC_ACQUIRE) <= below_or_equal_value ? 0 : 1;
 }
 
 @@Check if `futex_waitwhile_exactbits()' would block
@@ -812,7 +812,7 @@ int futex_trywaitwhile_belowequal([[in]] lfutex_t *uaddr, lfutex_t below_or_equa
 @@@return: 1: `futex_waitwhile_exactbits()' wouldn't block
 [[extern_inline, decl_include("<bits/types.h>"), impl_include("<hybrid/__atomic.h>")]]
 int futex_trywaitwhile_exactbits([[in]] lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask) {
-	return (__hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) & bitmask) == setmask ? 0 : 1;
+	return (__hybrid_atomic_load(uaddr, __ATOMIC_ACQUIRE) & bitmask) == setmask ? 0 : 1;
 }
 
 @@Check if `futex_waituntil_exactbits()' would block
@@ -820,7 +820,7 @@ int futex_trywaitwhile_exactbits([[in]] lfutex_t *uaddr, lfutex_t bitmask, lfute
 @@@return: 1: `futex_waituntil_exactbits()' wouldn't block
 [[extern_inline, decl_include("<bits/types.h>"), impl_include("<hybrid/__atomic.h>")]]
 int futex_trywaituntil_exactbits([[in]] lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask) {
-	return (__hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) & bitmask) != setmask ? 0 : 1;
+	return (__hybrid_atomic_load(uaddr, __ATOMIC_ACQUIRE) & bitmask) != setmask ? 0 : 1;
 }
 
 @@Check if `futex_waitwhile_anybit()' would block
@@ -828,7 +828,7 @@ int futex_trywaituntil_exactbits([[in]] lfutex_t *uaddr, lfutex_t bitmask, lfute
 @@@return: 1: `futex_waitwhile_anybit()' wouldn't block
 [[extern_inline, decl_include("<bits/types.h>"), impl_include("<hybrid/__atomic.h>")]]
 int futex_trywaitwhile_anybit([[in]] lfutex_t *uaddr, lfutex_t bitmask) {
-	return (__hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) & bitmask) != 0 ? 0 : 1;
+	return (__hybrid_atomic_load(uaddr, __ATOMIC_ACQUIRE) & bitmask) != 0 ? 0 : 1;
 }
 
 @@Check if `futex_waitwhile_allbits()' would block
@@ -836,7 +836,7 @@ int futex_trywaitwhile_anybit([[in]] lfutex_t *uaddr, lfutex_t bitmask) {
 @@@return: 1: `futex_waitwhile_allbits()' wouldn't block
 [[extern_inline, decl_include("<bits/types.h>"), impl_include("<hybrid/__atomic.h>")]]
 int futex_trywaitwhile_allbits([[in]] lfutex_t *uaddr, lfutex_t bitmask) {
-	return (__hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) & bitmask) == bitmask ? 0 : 1;
+	return (__hybrid_atomic_load(uaddr, __ATOMIC_ACQUIRE) & bitmask) == bitmask ? 0 : 1;
 }
 
 %

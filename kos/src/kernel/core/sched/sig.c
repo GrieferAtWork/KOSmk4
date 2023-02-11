@@ -275,14 +275,14 @@ NOTHROW(FCALL task_connection_free)(struct task_connections *__restrict self,
 #define sig_smplock_tst(con)      ((uintptr_t)(con) & SIG_CONTROL_SMPLOCK)
 #define sig_smplock_cpy(to, from) (struct task_connection *)((uintptr_t)(to) | ((uintptr_t)(from) & SIG_CONTROL_SMPLOCK))
 #define sig_smplock_tryacquire_nopr(self) \
-	(!(__hybrid_atomic_fetchor((self)->s_ctl, SIG_CONTROL_SMPLOCK, __ATOMIC_ACQUIRE) & SIG_CONTROL_SMPLOCK))
+	(!(OATOMIC_FETCHOR((self)->s_ctl, SIG_CONTROL_SMPLOCK, __ATOMIC_ACQUIRE) & SIG_CONTROL_SMPLOCK))
 #define sig_smplock_acquire_nopr(self)             \
 	do {                                           \
 		while (!sig_smplock_tryacquire_nopr(self)) \
 			task_pause();                          \
 	}	__WHILE0
 #define sig_smplock_release_nopr(self) \
-	__hybrid_atomic_and((self)->s_ctl, ~SIG_CONTROL_SMPLOCK, __ATOMIC_RELEASE)
+	OATOMIC_AND((self)->s_ctl, ~SIG_CONTROL_SMPLOCK, __ATOMIC_RELEASE)
 #else /* SIG_CONTROL_SMPLOCK != 0 */
 #define sig_smplock_set(con)              con
 #define sig_smplock_clr(con)              con

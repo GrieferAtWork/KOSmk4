@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0f10c28 */
+/* HASH CRC-32:0x8a0256d2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,11 +35,11 @@ __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1),__BOOL,__NOTHROW
 	__UINTPTR_TYPE__ __temp;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	do {
-		__temp = __hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE);
+		__temp = __hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE);
 		if (__temp == (__UINTPTR_TYPE__)-1)
 			return 0;
 		__hybrid_assert(__temp != (__UINTPTR_TYPE__)-2);
-	} while (!__hybrid_atomic_cmpxch_weak(__self->sl_lock, __temp, __temp + 1,
+	} while (!__hybrid_atomic_cmpxch_weak(&__self->sl_lock, __temp, __temp + 1,
 	                                      __ATOMIC_ACQUIRE, __ATOMIC_RELAXED));
 	__COMPILER_READ_BARRIER();
 	return 1;
@@ -52,11 +52,11 @@ __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1) __BOOL __NOTHROW(__FCALL __loca
 	__UINTPTR_TYPE__ __temp;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	do {
-		__temp = __hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE);
+		__temp = __hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE);
 		if (__temp == (__UINTPTR_TYPE__)-1)
 			return 0;
 		__hybrid_assert(__temp != (__UINTPTR_TYPE__)-2);
-	} while (!__hybrid_atomic_cmpxch_weak(__self->sl_lock, __temp, __temp + 1,
+	} while (!__hybrid_atomic_cmpxch_weak(&__self->sl_lock, __temp, __temp + 1,
 	                                      __ATOMIC_ACQUIRE, __ATOMIC_RELAXED));
 	__COMPILER_READ_BARRIER();
 	return 1;

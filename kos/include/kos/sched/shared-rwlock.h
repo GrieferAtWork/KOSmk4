@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ded21ce */
+/* HASH CRC-32:0xaf4a24aa */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,25 +86,25 @@ __SYSDECL_BEGIN
 
 /* Check if reading/writing is possible, or a read/write lock is being held. */
 #ifdef __COMPILER_WORKAROUND_GCC_105689_MAC
-#define shared_rwlock_reading(self)  __COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_load(__cw_105689_self->sl_lock, __ATOMIC_ACQUIRE) != 0)
-#define shared_rwlock_writing(self)  __COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_load(__cw_105689_self->sl_lock, __ATOMIC_ACQUIRE) == (__uintptr_t)-1)
-#define shared_rwlock_canread(self)  __COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_load(__cw_105689_self->sl_lock, __ATOMIC_ACQUIRE) != (__uintptr_t)-1)
-#define shared_rwlock_canwrite(self) __COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_load(__cw_105689_self->sl_lock, __ATOMIC_ACQUIRE) == 0)
+#define shared_rwlock_reading(self)  __COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_load(&__cw_105689_self->sl_lock, __ATOMIC_ACQUIRE) != 0)
+#define shared_rwlock_writing(self)  __COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_load(&__cw_105689_self->sl_lock, __ATOMIC_ACQUIRE) == (__uintptr_t)-1)
+#define shared_rwlock_canread(self)  __COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_load(&__cw_105689_self->sl_lock, __ATOMIC_ACQUIRE) != (__uintptr_t)-1)
+#define shared_rwlock_canwrite(self) __COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_load(&__cw_105689_self->sl_lock, __ATOMIC_ACQUIRE) == 0)
 #else /* __COMPILER_WORKAROUND_GCC_105689_MAC */
-#define shared_rwlock_reading(self)  (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) != 0)
-#define shared_rwlock_writing(self)  (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) == (__uintptr_t)-1)
-#define shared_rwlock_canread(self)  (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) != (__uintptr_t)-1)
-#define shared_rwlock_canwrite(self) (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) == 0)
+#define shared_rwlock_reading(self)  (__hybrid_atomic_load(&(self)->sl_lock, __ATOMIC_ACQUIRE) != 0)
+#define shared_rwlock_writing(self)  (__hybrid_atomic_load(&(self)->sl_lock, __ATOMIC_ACQUIRE) == (__uintptr_t)-1)
+#define shared_rwlock_canread(self)  (__hybrid_atomic_load(&(self)->sl_lock, __ATOMIC_ACQUIRE) != (__uintptr_t)-1)
+#define shared_rwlock_canwrite(self) (__hybrid_atomic_load(&(self)->sl_lock, __ATOMIC_ACQUIRE) == 0)
 #endif /* !__COMPILER_WORKAROUND_GCC_105689_MAC */
 
 /* >> shared_rwlock_tryupgrade(3)
  * Try to upgrade a read-lock to a write-lock. Return `false' upon failure. */
 #ifdef __COMPILER_WORKAROUND_GCC_105689_MAC
 #define shared_rwlock_tryupgrade(self) \
-	__COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_cmpxch(__cw_105689_self->sl_lock, 1, (__uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+	__COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_cmpxch(&__cw_105689_self->sl_lock, 1, (__uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
 #else /* __COMPILER_WORKAROUND_GCC_105689_MAC */
 #define shared_rwlock_tryupgrade(self) \
-	__hybrid_atomic_cmpxch((self)->sl_lock, 1, (__uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED)
+	__hybrid_atomic_cmpxch(&(self)->sl_lock, 1, (__uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED)
 #endif /* !__COMPILER_WORKAROUND_GCC_105689_MAC */
 
 #ifdef __CRT_HAVE_shared_rwlock_tryread
@@ -114,11 +114,11 @@ __COMPILER_CEIDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1),__BOOL,__NOTHROW,
 	__UINTPTR_TYPE__ __temp;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	do {
-		__temp = __hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE);
+		__temp = __hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE);
 		if (__temp == (__UINTPTR_TYPE__)-1)
 			return 0;
 		__hybrid_assert(__temp != (__UINTPTR_TYPE__)-2);
-	} while (!__hybrid_atomic_cmpxch_weak(__self->sl_lock, __temp, __temp + 1,
+	} while (!__hybrid_atomic_cmpxch_weak(&__self->sl_lock, __temp, __temp + 1,
 	                                      __ATOMIC_ACQUIRE, __ATOMIC_RELAXED));
 	__COMPILER_READ_BARRIER();
 	return 1;
@@ -130,11 +130,11 @@ __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1) __BOOL __NOTHROW(__FCALL shared
 	__UINTPTR_TYPE__ __temp;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	do {
-		__temp = __hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE);
+		__temp = __hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE);
 		if (__temp == (__UINTPTR_TYPE__)-1)
 			return 0;
 		__hybrid_assert(__temp != (__UINTPTR_TYPE__)-2);
-	} while (!__hybrid_atomic_cmpxch_weak(__self->sl_lock, __temp, __temp + 1,
+	} while (!__hybrid_atomic_cmpxch_weak(&__self->sl_lock, __temp, __temp + 1,
 	                                      __ATOMIC_ACQUIRE, __ATOMIC_RELAXED));
 	__COMPILER_READ_BARRIER();
 	return 1;
@@ -145,7 +145,7 @@ __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1) __BOOL __NOTHROW(__FCALL shared
  * Try to acquire a write-lock to `self' */
 __COMPILER_CEIDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1),__BOOL,__NOTHROW,__FCALL,shared_rwlock_trywrite,(struct shared_rwlock *__restrict __self),{
 	__COMPILER_WORKAROUND_GCC_105689(__self);
-	if (!__hybrid_atomic_cmpxch(__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
+	if (!__hybrid_atomic_cmpxch(&__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return 0;
 	__COMPILER_BARRIER();
@@ -156,7 +156,7 @@ __COMPILER_CEIDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1),__BOOL,__NOTHROW,
  * Try to acquire a write-lock to `self' */
 __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1) __BOOL __NOTHROW(__FCALL shared_rwlock_trywrite)(struct shared_rwlock *__restrict __self) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
-	if (!__hybrid_atomic_cmpxch(__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
+	if (!__hybrid_atomic_cmpxch(&__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return 0;
 	__COMPILER_BARRIER();
@@ -170,7 +170,7 @@ __COMPILER_CEIDECLARE(__NOBLOCK __ATTR_INOUT(1),void,__NOTHROW,__FCALL,shared_rw
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->sl_lock == (__UINTPTR_TYPE__)-1, "Lock isn't in write-mode (%x)", __self->sl_lock);
-	__hybrid_atomic_store(__self->sl_lock, 0, __ATOMIC_RELEASE);
+	__hybrid_atomic_store(&__self->sl_lock, 0, __ATOMIC_RELEASE);
 	if (!__shared_rwlock_wrwait_send(__self))
 		__shared_rwlock_rdwait_broadcast(__self);
 })
@@ -185,7 +185,7 @@ __LOCAL __NOBLOCK __ATTR_INOUT(1) void __NOTHROW(__FCALL shared_rwlock_endwrite)
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->sl_lock == (__UINTPTR_TYPE__)-1, "Lock isn't in write-mode (%x)", __self->sl_lock);
-	__hybrid_atomic_store(__self->sl_lock, 0, __ATOMIC_RELEASE);
+	__hybrid_atomic_store(&__self->sl_lock, 0, __ATOMIC_RELEASE);
 	if (!__shared_rwlock_wrwait_send(__self))
 		__shared_rwlock_rdwait_broadcast(__self);
 }
@@ -201,7 +201,7 @@ __COMPILER_CEIDECLARE(__NOBLOCK __ATTR_INOUT(1),__BOOL,__NOTHROW,__FCALL,shared_
 	__COMPILER_READ_BARRIER();
 	__hybrid_assertf(__self->sl_lock != (__UINTPTR_TYPE__)-1, "Lock is in write-mode (%x)", __self->sl_lock);
 	__hybrid_assertf(__self->sl_lock != 0, "Lock isn't held by anyone");
-	__result = __hybrid_atomic_decfetch(__self->sl_lock, __ATOMIC_RELEASE);
+	__result = __hybrid_atomic_decfetch(&__self->sl_lock, __ATOMIC_RELEASE);
 	if (__result == 0)
 		__shared_rwlock_wrwait_send(__self);
 	return __result == 0;
@@ -223,7 +223,7 @@ __LOCAL __NOBLOCK __ATTR_INOUT(1) __BOOL __NOTHROW(__FCALL shared_rwlock_endread
 	__COMPILER_READ_BARRIER();
 	__hybrid_assertf(__self->sl_lock != (__UINTPTR_TYPE__)-1, "Lock is in write-mode (%x)", __self->sl_lock);
 	__hybrid_assertf(__self->sl_lock != 0, "Lock isn't held by anyone");
-	__result = __hybrid_atomic_decfetch(__self->sl_lock, __ATOMIC_RELEASE);
+	__result = __hybrid_atomic_decfetch(&__self->sl_lock, __ATOMIC_RELEASE);
 	if (__result == 0)
 		__shared_rwlock_wrwait_send(__self);
 	return __result == 0;
@@ -241,13 +241,13 @@ __COMPILER_CEIDECLARE(__NOBLOCK __ATTR_INOUT(1),__BOOL,__NOTHROW,__FCALL,shared_
 		/* Read-lock */
 		__UINTPTR_TYPE__ __result;
 		__hybrid_assertf(__self->sl_lock != 0, "No remaining read-locks");
-		__result = __hybrid_atomic_decfetch(__self->sl_lock, __ATOMIC_RELEASE);
+		__result = __hybrid_atomic_decfetch(&__self->sl_lock, __ATOMIC_RELEASE);
 		if (__result == 0)
 			__shared_rwlock_wrwait_send(__self);
 		return __result == 0;
 	}
 	/* Write-lock */
-	__hybrid_atomic_store(__self->sl_lock, 0, __ATOMIC_RELEASE);
+	__hybrid_atomic_store(&__self->sl_lock, 0, __ATOMIC_RELEASE);
 	if (!__shared_rwlock_wrwait_send(__self))
 		__shared_rwlock_rdwait_broadcast(__self);
 	return 1;
@@ -270,13 +270,13 @@ __LOCAL __NOBLOCK __ATTR_INOUT(1) __BOOL __NOTHROW(__FCALL shared_rwlock_end)(st
 		/* Read-lock */
 		__UINTPTR_TYPE__ __result;
 		__hybrid_assertf(__self->sl_lock != 0, "No remaining read-locks");
-		__result = __hybrid_atomic_decfetch(__self->sl_lock, __ATOMIC_RELEASE);
+		__result = __hybrid_atomic_decfetch(&__self->sl_lock, __ATOMIC_RELEASE);
 		if (__result == 0)
 			__shared_rwlock_wrwait_send(__self);
 		return __result == 0;
 	}
 	/* Write-lock */
-	__hybrid_atomic_store(__self->sl_lock, 0, __ATOMIC_RELEASE);
+	__hybrid_atomic_store(&__self->sl_lock, 0, __ATOMIC_RELEASE);
 	if (!__shared_rwlock_wrwait_send(__self))
 		__shared_rwlock_rdwait_broadcast(__self);
 	return 1;
@@ -289,7 +289,7 @@ __COMPILER_CEIDECLARE(__NOBLOCK __ATTR_INOUT(1),void,__NOTHROW,__FCALL,shared_rw
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_WRITE_BARRIER();
 	__hybrid_assertf(__self->sl_lock == (__UINTPTR_TYPE__)-1, "Lock isn't in write-mode (%x)", __self->sl_lock);
-	__hybrid_atomic_store(__self->sl_lock, 1, __ATOMIC_RELEASE);
+	__hybrid_atomic_store(&__self->sl_lock, 1, __ATOMIC_RELEASE);
 	__shared_rwlock_rdwait_broadcast(__self); /* Allow for more readers. */
 })
 #elif defined(__CRT_HAVE_shared_rwlock_downgrade)
@@ -303,7 +303,7 @@ __LOCAL __NOBLOCK __ATTR_INOUT(1) void __NOTHROW(__FCALL shared_rwlock_downgrade
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_WRITE_BARRIER();
 	__hybrid_assertf(__self->sl_lock == (__UINTPTR_TYPE__)-1, "Lock isn't in write-mode (%x)", __self->sl_lock);
-	__hybrid_atomic_store(__self->sl_lock, 1, __ATOMIC_RELEASE);
+	__hybrid_atomic_store(&__self->sl_lock, 1, __ATOMIC_RELEASE);
 	__shared_rwlock_rdwait_broadcast(__self); /* Allow for more readers. */
 }
 #endif /* ... */
@@ -322,7 +322,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_INOUT(1),__BOOL,__NOTHROW,__FCALL,__loca
 	__COMPILER_READ_BARRIER();
 	__hybrid_assertf(__self->sl_lock != (__UINTPTR_TYPE__)-1, "Lock is in write-mode (%x)", __self->sl_lock);
 	__hybrid_assertf(__self->sl_lock != 0, "Lock isn't held by anyone");
-	__result = __hybrid_atomic_decfetch(__self->sl_lock, __ATOMIC_RELEASE);
+	__result = __hybrid_atomic_decfetch(&__self->sl_lock, __ATOMIC_RELEASE);
 	if (__result == 0)
 		__shared_rwlock_wrwait_send(__self);
 	return __result == 0;
@@ -344,7 +344,7 @@ __LOCAL __NOBLOCK __ATTR_INOUT(1) __BOOL __NOTHROW(__FCALL __localdep_shared_rwl
 	__COMPILER_READ_BARRIER();
 	__hybrid_assertf(__self->sl_lock != (__UINTPTR_TYPE__)-1, "Lock is in write-mode (%x)", __self->sl_lock);
 	__hybrid_assertf(__self->sl_lock != 0, "Lock isn't held by anyone");
-	__result = __hybrid_atomic_decfetch(__self->sl_lock, __ATOMIC_RELEASE);
+	__result = __hybrid_atomic_decfetch(&__self->sl_lock, __ATOMIC_RELEASE);
 	if (__result == 0)
 		__shared_rwlock_wrwait_send(__self);
 	return __result == 0;
@@ -380,7 +380,7 @@ __NAMESPACE_LOCAL_END
  * @return: false: The read-lock had to be released before a write-lock was acquired */
 __COMPILER_CEIDECLARE(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_rwlock_upgrade,(struct shared_rwlock *__restrict __self),{
 	__COMPILER_WORKAROUND_GCC_105689(__self);
-	if (__hybrid_atomic_cmpxch(__self->sl_lock, 1, (__UINTPTR_TYPE__)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+	if (__hybrid_atomic_cmpxch(&__self->sl_lock, 1, (__UINTPTR_TYPE__)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
 		return 1; /* Lock wasn't lost */
 	(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_endread)(__self);
 	(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_write)(__self);
@@ -410,7 +410,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_INOUT(1),__BOOL,__NOTHROW,__FCALL,__loca
 	__COMPILER_READ_BARRIER();
 	__hybrid_assertf(__self->sl_lock != (__UINTPTR_TYPE__)-1, "Lock is in write-mode (%x)", __self->sl_lock);
 	__hybrid_assertf(__self->sl_lock != 0, "Lock isn't held by anyone");
-	__result = __hybrid_atomic_decfetch(__self->sl_lock, __ATOMIC_RELEASE);
+	__result = __hybrid_atomic_decfetch(&__self->sl_lock, __ATOMIC_RELEASE);
 	if (__result == 0)
 		__shared_rwlock_wrwait_send(__self);
 	return __result == 0;
@@ -432,7 +432,7 @@ __LOCAL __NOBLOCK __ATTR_INOUT(1) __BOOL __NOTHROW(__FCALL __localdep_shared_rwl
 	__COMPILER_READ_BARRIER();
 	__hybrid_assertf(__self->sl_lock != (__UINTPTR_TYPE__)-1, "Lock is in write-mode (%x)", __self->sl_lock);
 	__hybrid_assertf(__self->sl_lock != 0, "Lock isn't held by anyone");
-	__result = __hybrid_atomic_decfetch(__self->sl_lock, __ATOMIC_RELEASE);
+	__result = __hybrid_atomic_decfetch(&__self->sl_lock, __ATOMIC_RELEASE);
 	if (__result == 0)
 		__shared_rwlock_wrwait_send(__self);
 	return __result == 0;
@@ -468,7 +468,7 @@ __NAMESPACE_LOCAL_END
  * @return: false: The read-lock had to be released before a write-lock was acquired */
 __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_rwlock_upgrade)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
-	if (__hybrid_atomic_cmpxch(__self->sl_lock, 1, (__UINTPTR_TYPE__)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+	if (__hybrid_atomic_cmpxch(&__self->sl_lock, 1, (__UINTPTR_TYPE__)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
 		return 1; /* Lock wasn't lost */
 	(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_endread)(__self);
 	(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_write)(__self);

@@ -95,9 +95,9 @@ FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
 #define sighand_destroy(self) __os_free(self)
 
 #define sighand_incshare(self) \
-	__hybrid_atomic_inc((self)->sh_share, __ATOMIC_SEQ_CST)
-#define sighand_decshare(self)                                             \
-	(void)(__hybrid_atomic_decfetch((self)->sh_share, __ATOMIC_SEQ_CST) || \
+	__hybrid_atomic_inc(&(self)->sh_share, __ATOMIC_SEQ_CST)
+#define sighand_decshare(self)                                              \
+	(void)(__hybrid_atomic_decfetch(&(self)->sh_share, __ATOMIC_SEQ_CST) || \
 	       (sighand_destroy(self), 0))
 
 struct sighand_ptr {

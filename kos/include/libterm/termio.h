@@ -213,8 +213,8 @@ terminal_flush_icanon(struct terminal *__restrict self, iomode_t mode)
 
 
 /* Poll for `terminal_iread()' to become non-blocking. */
-#define terminal_caniread(self)                                                     \
-	((__hybrid_atomic_load((self)->t_ios.c_lflag, __ATOMIC_ACQUIRE) & __IEOFING) || \
+#define terminal_caniread(self)                                                      \
+	((__hybrid_atomic_load(&(self)->t_ios.c_lflag, __ATOMIC_ACQUIRE) & __IEOFING) || \
 	 ringbuffer_canread(&(self)->t_ibuf))
 #define terminal_pollconnect_iread_ex(self, cb) \
 	ringbuffer_pollconnect_read_ex(&(self)->t_ibuf, cb)
@@ -247,14 +247,14 @@ terminal_flush_icanon(struct terminal *__restrict self, iomode_t mode)
 
 
 /* Poll for `terminal_owrite()' to become non-blocking. */
-#define terminal_canowrite(self, t_oprint_canwrite)                            \
-	((__hybrid_atomic_load((self)->t_ios.c_iflag, __ATOMIC_ACQUIRE) & __IXOFF) \
-	 ? linebuffer_canwrite(&(self)->t_opend)                                   \
+#define terminal_canowrite(self, t_oprint_canwrite)                             \
+	((__hybrid_atomic_load(&(self)->t_ios.c_iflag, __ATOMIC_ACQUIRE) & __IXOFF) \
+	 ? linebuffer_canwrite(&(self)->t_opend)                                    \
 	 : (t_oprint_canwrite))
-#define terminal_pollconnect_owrite_ex(self, t_oprint_connect_ex, cb)          \
-	((__hybrid_atomic_load((self)->t_ios.c_iflag, __ATOMIC_ACQUIRE) & __IXOFF) \
-	 ? linebuffer_pollconnect_write_ex(&(self)->t_opend, cb)                   \
-	 : (cb(&(self)->t_ioschange), /* Listen for `IXOFF' being set */           \
+#define terminal_pollconnect_owrite_ex(self, t_oprint_connect_ex, cb)           \
+	((__hybrid_atomic_load(&(self)->t_ios.c_iflag, __ATOMIC_ACQUIRE) & __IXOFF) \
+	 ? linebuffer_pollconnect_write_ex(&(self)->t_opend, cb)                    \
+	 : (cb(&(self)->t_ioschange), /* Listen for `IXOFF' being set */            \
 	    t_oprint_connect_ex(cb) /* Listen for the underlying device */))
 #ifdef __OPTIMIZE_SIZE__
 #define terminal_pollowrite_ex(self, t_oprint_canwrite, t_oprint_connect_ex, cb) \
@@ -276,24 +276,24 @@ terminal_flush_icanon(struct terminal *__restrict self, iomode_t mode)
 
 
 /* Poll for `terminal_iwrite()' to become non-blocking. */
-#define terminal_caniwrite(self, t_oprint_canwrite)                               \
-	((__hybrid_atomic_load((self)->t_ios.c_iflag, __ATOMIC_ACQUIRE) & __IIOFF)    \
-	 ? linebuffer_canwrite(&(self)->t_ipend)                                      \
-	 : (__hybrid_atomic_load((self)->t_ios.c_lflag, __ATOMIC_ACQUIRE) & __ICANON) \
-	   ? linebuffer_canwrite(&(self)->t_canon)                                    \
-	   : (ringbuffer_canwrite(&(self)->t_ibuf) &&                                 \
-	      ((__hybrid_atomic_load((self)->t_ios.c_lflag, __ATOMIC_ACQUIRE) &       \
-	        (__ECHO | __EXTPROC)) != __ECHO ||                                    \
+#define terminal_caniwrite(self, t_oprint_canwrite)                                \
+	((__hybrid_atomic_load(&(self)->t_ios.c_iflag, __ATOMIC_ACQUIRE) & __IIOFF)    \
+	 ? linebuffer_canwrite(&(self)->t_ipend)                                       \
+	 : (__hybrid_atomic_load(&(self)->t_ios.c_lflag, __ATOMIC_ACQUIRE) & __ICANON) \
+	   ? linebuffer_canwrite(&(self)->t_canon)                                     \
+	   : (ringbuffer_canwrite(&(self)->t_ibuf) &&                                  \
+	      ((__hybrid_atomic_load(&(self)->t_ios.c_lflag, __ATOMIC_ACQUIRE) &       \
+	        (__ECHO | __EXTPROC)) != __ECHO ||                                     \
 	       terminal_canowrite(self, t_oprint_canwrite) /* For echo */)))
-#define terminal_pollconnect_iwrite_ex(self, t_oprint_connect_ex, cb)             \
-	((__hybrid_atomic_load((self)->t_ios.c_iflag, __ATOMIC_ACQUIRE) & __IIOFF)    \
-	 ? (void)linebuffer_pollconnect_write_ex(&(self)->t_ipend, cb)                \
-	 : (__hybrid_atomic_load((self)->t_ios.c_lflag, __ATOMIC_ACQUIRE) & __ICANON) \
-	   ? (void)linebuffer_pollconnect_write_ex(&(self)->t_canon, cb)              \
-	   : (ringbuffer_pollconnect_write_ex(&(self)->t_ibuf, cb),                   \
-	      ((__hybrid_atomic_load((self)->t_ios.c_lflag, __ATOMIC_ACQUIRE) &       \
-	        (__ECHO | __EXTPROC)) == __ECHO                                       \
-	       ? (void)terminal_pollconnect_owrite_ex(self, t_oprint_connect_ex, cb)  \
+#define terminal_pollconnect_iwrite_ex(self, t_oprint_connect_ex, cb)              \
+	((__hybrid_atomic_load(&(self)->t_ios.c_iflag, __ATOMIC_ACQUIRE) & __IIOFF)    \
+	 ? (void)linebuffer_pollconnect_write_ex(&(self)->t_ipend, cb)                 \
+	 : (__hybrid_atomic_load(&(self)->t_ios.c_lflag, __ATOMIC_ACQUIRE) & __ICANON) \
+	   ? (void)linebuffer_pollconnect_write_ex(&(self)->t_canon, cb)               \
+	   : (ringbuffer_pollconnect_write_ex(&(self)->t_ibuf, cb),                    \
+	      ((__hybrid_atomic_load(&(self)->t_ios.c_lflag, __ATOMIC_ACQUIRE) &       \
+	        (__ECHO | __EXTPROC)) == __ECHO                                        \
+	       ? (void)terminal_pollconnect_owrite_ex(self, t_oprint_connect_ex, cb)   \
 	       : (void)0)))
 #define terminal_polliwrite_unlikely_ex(self, t_oprint_canwrite, t_oprint_connect_ex, cb) \
 	(terminal_pollconnect_iwrite_ex(self, t_oprint_connect_ex, cb),                       \

@@ -26,75 +26,75 @@
 
 #ifdef __CC__
 
-#define OATOMIC_LOAD        __hybrid_atomic_load
-#define OATOMIC_STORE       __hybrid_atomic_store
-#define OATOMIC_XCH         __hybrid_atomic_xch
-#define OATOMIC_CMPXCH      __hybrid_atomic_cmpxch
-#define OATOMIC_CMPXCH_WEAK __hybrid_atomic_cmpxch_weak
-#define OATOMIC_CMPXCH_VAL  __hybrid_atomic_cmpxch_val
-#define OATOMIC_ADDFETCH    __hybrid_atomic_addfetch
-#define OATOMIC_SUBFETCH    __hybrid_atomic_subfetch
-#define OATOMIC_ANDFETCH    __hybrid_atomic_andfetch
-#define OATOMIC_ORFETCH     __hybrid_atomic_orfetch
-#define OATOMIC_XORFETCH    __hybrid_atomic_xorfetch
-#define OATOMIC_NANDFETCH   __hybrid_atomic_nandfetch
-#define OATOMIC_INCFETCH    __hybrid_atomic_incfetch
-#define OATOMIC_DECFETCH    __hybrid_atomic_decfetch
-#define OATOMIC_FETCHADD    __hybrid_atomic_fetchadd
-#define OATOMIC_FETCHSUB    __hybrid_atomic_fetchsub
-#define OATOMIC_FETCHAND    __hybrid_atomic_fetchand
-#define OATOMIC_FETCHOR     __hybrid_atomic_fetchor
-#define OATOMIC_FETCHXOR    __hybrid_atomic_fetchxor
-#define OATOMIC_FETCHNAND   __hybrid_atomic_fetchnand
-#define OATOMIC_FETCHINC    __hybrid_atomic_fetchinc
-#define OATOMIC_FETCHDEC    __hybrid_atomic_fetchdec
-#define OATOMIC_ADD         __hybrid_atomic_add
-#define OATOMIC_SUB         __hybrid_atomic_sub
-#define OATOMIC_AND         __hybrid_atomic_and
-#define OATOMIC_OR          __hybrid_atomic_or
-#define OATOMIC_XOR         __hybrid_atomic_xor
-#define OATOMIC_NAND        __hybrid_atomic_nand
-#define OATOMIC_INC         __hybrid_atomic_inc
-#define OATOMIC_DEC         __hybrid_atomic_dec
+#define OATOMIC_LOAD(var, order)                             __hybrid_atomic_load(&(var), order)
+#define OATOMIC_STORE(var, value, order)                     __hybrid_atomic_store(&(var), value, order)
+#define OATOMIC_XCH(var, value, order)                       __hybrid_atomic_xch(&(var), value, order)
+#define OATOMIC_CMPXCH(var, oldval, newval, succ, fail)      __hybrid_atomic_cmpxch(&(var), oldval, newval, succ, fail)
+#define OATOMIC_CMPXCH_WEAK(var, oldval, newval, succ, fail) __hybrid_atomic_cmpxch_weak(&(var), oldval, newval, succ, fail)
+#define OATOMIC_CMPXCH_VAL(var, oldval, newval, succ, fail)  __hybrid_atomic_cmpxch_val(&(var), oldval, newval, succ, fail)
+#define OATOMIC_ADDFETCH(var, value, order)                  __hybrid_atomic_addfetch(&(var), value, order)
+#define OATOMIC_SUBFETCH(var, value, order)                  __hybrid_atomic_subfetch(&(var), value, order)
+#define OATOMIC_ANDFETCH(var, value, order)                  __hybrid_atomic_andfetch(&(var), value, order)
+#define OATOMIC_ORFETCH(var, value, order)                   __hybrid_atomic_orfetch(&(var), value, order)
+#define OATOMIC_XORFETCH(var, value, order)                  __hybrid_atomic_xorfetch(&(var), value, order)
+#define OATOMIC_NANDFETCH(var, value, order)                 __hybrid_atomic_nandfetch(&(var), value, order)
+#define OATOMIC_INCFETCH(var, order)                         __hybrid_atomic_incfetch(&(var), order)
+#define OATOMIC_DECFETCH(var, order)                         __hybrid_atomic_decfetch(&(var), order)
+#define OATOMIC_FETCHADD(var, value, order)                  __hybrid_atomic_fetchadd(&(var), value, order)
+#define OATOMIC_FETCHSUB(var, value, order)                  __hybrid_atomic_fetchsub(&(var), value, order)
+#define OATOMIC_FETCHAND(var, value, order)                  __hybrid_atomic_fetchand(&(var), value, order)
+#define OATOMIC_FETCHOR(var, value, order)                   __hybrid_atomic_fetchor(&(var), value, order)
+#define OATOMIC_FETCHXOR(var, value, order)                  __hybrid_atomic_fetchxor(&(var), value, order)
+#define OATOMIC_FETCHNAND(var, value, order)                 __hybrid_atomic_fetchnand(&(var), value, order)
+#define OATOMIC_FETCHINC(var, order)                         __hybrid_atomic_fetchinc(&(var), order)
+#define OATOMIC_FETCHDEC(var, order)                         __hybrid_atomic_fetchdec(&(var), order)
+#define OATOMIC_ADD(var, value, order)                       __hybrid_atomic_add(&(var), value, order)
+#define OATOMIC_SUB(var, value, order)                       __hybrid_atomic_sub(&(var), value, order)
+#define OATOMIC_AND(var, value, order)                       __hybrid_atomic_and(&(var), value, order)
+#define OATOMIC_OR(var, value, order)                        __hybrid_atomic_or(&(var), value, order)
+#define OATOMIC_XOR(var, value, order)                       __hybrid_atomic_xor(&(var), value, order)
+#define OATOMIC_NAND(var, value, order)                      __hybrid_atomic_nand(&(var), value, order)
+#define OATOMIC_INC(var, order)                              __hybrid_atomic_inc(&(var), order)
+#define OATOMIC_DEC(var, order)                              __hybrid_atomic_dec(&(var), order)
 
-#define ATOMIC_LOAD(x)                    OATOMIC_LOAD(x, __ATOMIC_SEQ_CST)
-#define ATOMIC_STORE(x, v)                OATOMIC_STORE(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_XCH(x, v)                  OATOMIC_XCH(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_CMPXCH(x, oldv, newv)      OATOMIC_CMPXCH(x, oldv, newv, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
-#define ATOMIC_CMPXCH_WEAK(x, oldv, newv) OATOMIC_CMPXCH_WEAK(x, oldv, newv, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
-#define ATOMIC_CMPXCH_VAL(x, oldv, newv)  OATOMIC_CMPXCH_VAL(x, oldv, newv, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
-#define ATOMIC_ADDFETCH(x, v)             OATOMIC_ADDFETCH(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_SUBFETCH(x, v)             OATOMIC_SUBFETCH(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_ANDFETCH(x, v)             OATOMIC_ANDFETCH(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_ORFETCH(x, v)              OATOMIC_ORFETCH(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_XORFETCH(x, v)             OATOMIC_XORFETCH(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_NANDFETCH(x, v)            OATOMIC_NANDFETCH(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_INCFETCH(x)                OATOMIC_INCFETCH(x, __ATOMIC_SEQ_CST)
-#define ATOMIC_DECFETCH(x)                OATOMIC_DECFETCH(x, __ATOMIC_SEQ_CST)
-#define ATOMIC_FETCHADD(x, v)             OATOMIC_FETCHADD(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_FETCHSUB(x, v)             OATOMIC_FETCHSUB(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_FETCHAND(x, v)             OATOMIC_FETCHAND(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_FETCHOR(x, v)              OATOMIC_FETCHOR(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_FETCHXOR(x, v)             OATOMIC_FETCHXOR(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_FETCHNAND(x, v)            OATOMIC_FETCHNAND(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_FETCHINC(x)                OATOMIC_FETCHINC(x, __ATOMIC_SEQ_CST)
-#define ATOMIC_FETCHDEC(x)                OATOMIC_FETCHDEC(x, __ATOMIC_SEQ_CST)
-#define ATOMIC_ADD(x, v)                  OATOMIC_ADD(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_SUB(x, v)                  OATOMIC_SUB(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_AND(x, v)                  OATOMIC_AND(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_OR(x, v)                   OATOMIC_OR(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_XOR(x, v)                  OATOMIC_XOR(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_NAND(x, v)                 OATOMIC_NAND(x, v, __ATOMIC_SEQ_CST)
-#define ATOMIC_INC(x)                     OATOMIC_INC(x, __ATOMIC_SEQ_CST)
-#define ATOMIC_DEC(x)                     OATOMIC_DEC(x, __ATOMIC_SEQ_CST)
+#define ATOMIC_LOAD(var)                    OATOMIC_LOAD(var, __ATOMIC_SEQ_CST)
+#define ATOMIC_STORE(var, value)            OATOMIC_STORE(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_XCH(var, value)              OATOMIC_XCH(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_CMPXCH(var, oldv, newv)      OATOMIC_CMPXCH(var, oldv, newv, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#define ATOMIC_CMPXCH_WEAK(var, oldv, newv) OATOMIC_CMPXCH_WEAK(var, oldv, newv, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#define ATOMIC_CMPXCH_VAL(var, oldv, newv)  OATOMIC_CMPXCH_VAL(var, oldv, newv, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#define ATOMIC_ADDFETCH(var, value)         OATOMIC_ADDFETCH(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_SUBFETCH(var, value)         OATOMIC_SUBFETCH(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_ANDFETCH(var, value)         OATOMIC_ANDFETCH(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_ORFETCH(var, value)          OATOMIC_ORFETCH(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_XORFETCH(var, value)         OATOMIC_XORFETCH(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_NANDFETCH(var, value)        OATOMIC_NANDFETCH(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_INCFETCH(var)                OATOMIC_INCFETCH(var, __ATOMIC_SEQ_CST)
+#define ATOMIC_DECFETCH(var)                OATOMIC_DECFETCH(var, __ATOMIC_SEQ_CST)
+#define ATOMIC_FETCHADD(var, value)         OATOMIC_FETCHADD(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_FETCHSUB(var, value)         OATOMIC_FETCHSUB(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_FETCHAND(var, value)         OATOMIC_FETCHAND(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_FETCHOR(var, value)          OATOMIC_FETCHOR(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_FETCHXOR(var, value)         OATOMIC_FETCHXOR(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_FETCHNAND(var, value)        OATOMIC_FETCHNAND(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_FETCHINC(var)                OATOMIC_FETCHINC(var, __ATOMIC_SEQ_CST)
+#define ATOMIC_FETCHDEC(var)                OATOMIC_FETCHDEC(var, __ATOMIC_SEQ_CST)
+#define ATOMIC_ADD(var, value)              OATOMIC_ADD(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_SUB(var, value)              OATOMIC_SUB(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_AND(var, value)              OATOMIC_AND(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_OR(var, value)               OATOMIC_OR(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_XOR(var, value)              OATOMIC_XOR(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_NAND(var, value)             OATOMIC_NAND(var, value, __ATOMIC_SEQ_CST)
+#define ATOMIC_INC(var)                     OATOMIC_INC(var, __ATOMIC_SEQ_CST)
+#define ATOMIC_DEC(var)                     OATOMIC_DEC(var, __ATOMIC_SEQ_CST)
 
 /* Simplified atomic read/write  functions that only  guaranty correct  ordering
  * of  reads/writes respectively,  as well as  that reads and  writes are always
  * completed  as a whole (i.e. reading a 64-bit value is always done in a single
  * instruction, preventing  the possibility  of some  part of  a value  changing
  * after it had already been read, but before all other parts were read as well) */
-#define ATOMIC_READ(x)     OATOMIC_LOAD(x, __ATOMIC_ACQUIRE)
-#define ATOMIC_WRITE(x, v) OATOMIC_STORE(x, v, __ATOMIC_RELEASE)
+#define ATOMIC_READ(var)         OATOMIC_LOAD(var, __ATOMIC_ACQUIRE)
+#define ATOMIC_WRITE(var, value) OATOMIC_STORE(var, value, __ATOMIC_RELEASE)
 
 #endif /* __CC__ */
 

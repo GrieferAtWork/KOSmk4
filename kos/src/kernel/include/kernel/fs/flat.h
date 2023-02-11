@@ -82,7 +82,7 @@ DEFINE_REFCNT_FUNCTIONS(struct flatdirent, fde_ent.fd_refcnt, flatdirent_destroy
 
 /* Check if `self' was deleted. */
 #define flatdirent_wasdeleted(self)        (!TAILQ_ISBOUND(self, fde_bypos))
-#define flatdirent_wasdeleted_atomic(self) (__hybrid_atomic_load((self)->fde_bypos.tqe_prev, __ATOMIC_ACQUIRE) == NULL)
+#define flatdirent_wasdeleted_atomic(self) (__hybrid_atomic_load(&(self)->fde_bypos.tqe_prev, __ATOMIC_ACQUIRE) == NULL)
 
 
 /* Operators for `struct flatdirent'. These are implemented

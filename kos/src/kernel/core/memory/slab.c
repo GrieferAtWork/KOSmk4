@@ -70,7 +70,7 @@ struct slab_pool {
 
 /* Helper macros for `struct slab_pool::sp_lock' */
 #define slab_pool_reap(self)       (!slab_pool_mustreap(self) || (_slab_pool_reap(self), 0))
-#define slab_pool_mustreap(self)   (__hybrid_atomic_load((self)->sp_pend.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
+#define slab_pool_mustreap(self)   (ATOMIC_READ((self)->sp_pend.slh_first) != __NULLPTR)
 #define slab_pool_tryacquire(self) atomic_lock_tryacquire(&(self)->sp_lock)
 #define slab_pool_acquire(self)    atomic_lock_acquire(&(self)->sp_lock)
 #define slab_pool_acquire_nx(self) atomic_lock_acquire_nx(&(self)->sp_lock)

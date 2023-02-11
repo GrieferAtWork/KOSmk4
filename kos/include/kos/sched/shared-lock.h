@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37a9d0e3 */
+/* HASH CRC-32:0x74fca6b7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,8 +71,8 @@ __SYSDECL_BEGIN
 #define shared_lock_cinit(self)        (void)(__hybrid_assert((self)->sl_lock == 0))
 #define shared_lock_cinit_locked(self) (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1)
 #endif /* !__KERNEL__ */
-#define shared_lock_acquired(self)  (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) != 0)
-#define shared_lock_available(self) (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) == 0)
+#define shared_lock_acquired(self)  (__hybrid_atomic_load(&(self)->sl_lock, __ATOMIC_ACQUIRE) != 0)
+#define shared_lock_available(self) (__hybrid_atomic_load(&(self)->sl_lock, __ATOMIC_ACQUIRE) == 0)
 #ifdef __KERNEL__
 #define shared_lock_broadcast_for_fini(self) \
 	sig_broadcast_for_fini(&(self)->sl_sig)
@@ -88,18 +88,18 @@ __SYSDECL_BEGIN
 #ifdef __KERNEL__
 #ifdef __COMPILER_WORKAROUND_GCC_105689_MAC
 #define shared_lock_tryacquire(self) \
-	__COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_xch(__cw_105689_self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
+	__COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_xch(&__cw_105689_self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
 #else /* __COMPILER_WORKAROUND_GCC_105689_MAC */
 #define shared_lock_tryacquire(self) \
-	(__hybrid_atomic_xch((self)->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
+	(__hybrid_atomic_xch(&(self)->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
 #endif /* !__COMPILER_WORKAROUND_GCC_105689_MAC */
 #else /* __KERNEL__ */
 #ifdef __COMPILER_WORKAROUND_GCC_105689_MAC
 #define shared_lock_tryacquire(self) \
-	__COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_cmpxch(__cw_105689_self->sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+	__COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_cmpxch(&__cw_105689_self->sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
 #else /* __COMPILER_WORKAROUND_GCC_105689_MAC */
 #define shared_lock_tryacquire(self) \
-	__hybrid_atomic_cmpxch((self)->sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE)
+	__hybrid_atomic_cmpxch(&(self)->sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE)
 #endif /* !__COMPILER_WORKAROUND_GCC_105689_MAC */
 #endif /* !__KERNEL__ */
 
@@ -109,14 +109,14 @@ __SYSDECL_BEGIN
  *                 lock remains held by the calling thread. */
 #ifdef __shared_lock_send
 #ifdef __KERNEL__
-#define shared_lock_release(self)                                 \
-	(__shared_lock_release_assert_(self)                          \
-	 __hybrid_atomic_store((self)->sl_lock, 0, __ATOMIC_RELEASE), \
+#define shared_lock_release(self)                                  \
+	(__shared_lock_release_assert_(self)                           \
+	 __hybrid_atomic_store(&(self)->sl_lock, 0, __ATOMIC_RELEASE), \
 	 __shared_lock_send(self))
 #else /* __KERNEL__ */
-#define shared_lock_release(self)                                        \
-	(__shared_lock_release_assert_(self)                                 \
-	 (__hybrid_atomic_xch((self)->sl_lock, 0, __ATOMIC_RELEASE) >= 2) && \
+#define shared_lock_release(self)                                         \
+	(__shared_lock_release_assert_(self)                                  \
+	 (__hybrid_atomic_xch(&(self)->sl_lock, 0, __ATOMIC_RELEASE) >= 2) && \
 	 __shared_lock_send(self))
 #endif /* !__KERNEL__ */
 #if defined(NDEBUG) || defined(NDEBUG_SYNC)
