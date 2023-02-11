@@ -486,8 +486,11 @@ __NOTHROW_NCX(__hybrid_atomic_store)(__T &__x, __V __v, int __order) {
 }
 }
 #else /* __cplusplus */
-#define __hybrid_atomic_store(x, v, order) \
-	(sizeof(x) == 1 ? __NAMESPACE_INT_SYM __impl_hybrid_atomic_store8((void *)&(x), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(v), order) : sizeof(x) == 2 ? __NAMESPACE_INT_SYM __impl_hybrid_atomic_store16((void *)&(x), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(v), order) : sizeof(x) == 4 ? __NAMESPACE_INT_SYM __impl_hybrid_atomic_store32((void *)&(x), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(v), order) : __NAMESPACE_INT_SYM __impl_hybrid_atomic_store64((void *)&(x), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(v), order))
+#define __hybrid_atomic_store(x, v, order)                                                                                           \
+	(sizeof(x) == 1 ? __NAMESPACE_INT_SYM __impl_hybrid_atomic_store8((void *)&(x), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(v), order) :   \
+	 sizeof(x) == 2 ? __NAMESPACE_INT_SYM __impl_hybrid_atomic_store16((void *)&(x), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(v), order) : \
+	 sizeof(x) == 4 ? __NAMESPACE_INT_SYM __impl_hybrid_atomic_store32((void *)&(x), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(v), order) : \
+	                  __NAMESPACE_INT_SYM __impl_hybrid_atomic_store64((void *)&(x), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(v), order))
 #endif /* !__cplusplus */
 #endif /* __NO_XBLOCK */
 #endif /* !__hybrid_atomic_store */

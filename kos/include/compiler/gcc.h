@@ -590,8 +590,9 @@
 #endif /* !... */
 
 #if __has_attribute(__nonnull__)
-#define __ATTR_NONNULL(ppars)     __attribute__((__nonnull__ ppars))
-#define __ATTR_NONNULL_CXX(ppars) __attribute__((__nonnull__ ppars))
+#define __ATTR_NONNULL(ppars) __attribute__((__nonnull__ ppars))
+/* Parameter IDs are offset by 1, which is dumb */
+#define __ATTR_NONNULL_CXX(ppars) /* Nothing */
 #else /* ... */
 #define __NO_ATTR_NONNULL
 #define __ATTR_NONNULL(ppars)     /* Nothing */

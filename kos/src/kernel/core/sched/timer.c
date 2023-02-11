@@ -90,7 +90,7 @@ clock_default_connect(clockid_t clockid) {
 
 
 /************************************************************************/
-/* REALTIME CLOCK (nanoseconds time 1970-01-01)                         */
+/* REALTIME CLOCK (nanoseconds since 1970-01-01)                        */
 /************************************************************************/
 #define clock_realtime_getres  clock_default_getres
 #define clock_realtime_connect clock_default_connect
