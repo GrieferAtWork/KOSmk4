@@ -36,7 +36,7 @@
 
 DECL_BEGIN
 
-PRIVATE sig_atomic_t handler_called = 0;
+PRIVATE sig_atomic_t volatile handler_called = 0;
 
 PRIVATE void myhandler(signo_t signo) {
 	EQ(SIGUSR1, signo);

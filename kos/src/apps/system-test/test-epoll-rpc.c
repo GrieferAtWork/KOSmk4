@@ -38,7 +38,7 @@
 
 DECL_BEGIN
 
-PRIVATE sig_atomic_t myrpc_called = 0;
+PRIVATE sig_atomic_t volatile myrpc_called = 0;
 
 PRIVATE NONNULL((1)) void
 myrpc(struct rpc_context *__restrict ctx, void *cookie) {

@@ -37,7 +37,7 @@
 
 DECL_BEGIN
 
-PRIVATE sig_atomic_t hand_called = 0;
+PRIVATE sig_atomic_t volatile hand_called = 0;
 
 PRIVATE void myhand(signo_t signo) {
 	EQ(SIGUSR1, signo);
