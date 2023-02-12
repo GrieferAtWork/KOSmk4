@@ -28,6 +28,9 @@
 #error "Never include this file directly. - Always include `<hybrid/__atomic.h>' instead"
 #endif /* !__GUARD_HYBRID___ATOMIC_H */
 
+#define __HYBRID_ATOMIC_LOCKFREE_MAX 8
+
+#ifdef __CC__
 #ifdef __x86_64__
 #define __CDECL_OR_DEFAULT /* Nothing */
 #else /* __x86_64__ */
@@ -35,8 +38,6 @@
 #endif /* !__x86_64__ */
 
 __DECL_BEGIN
-
-#define __HYBRID_ATOMIC_LOCKFREE_MAX 8
 
 #ifndef _InterlockedCompareExchange8
 #define _InterlockedCompareExchange8 _InterlockedCompareExchange8
@@ -1008,5 +1009,6 @@ __NAMESPACE_INT_END
 #endif /* __arm__ */
 
 __DECL_END
+#endif /* __CC__ */
 
 #endif /* !__GUARD_HYBRID___ATOMIC_MSVC_H */

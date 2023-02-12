@@ -203,7 +203,6 @@
 #define __hybrid_atomic_lockfree(p)                                __atomic_is_lock_free(sizeof(*(p)), p)
 #elif defined(__GNUC__) || defined(__DCC_VERSION__)
 /* __sync_xxx() */
-/* XXX: clang has a builtin `__sync_swap()' that is basically `__hybrid_atomic_xch()' */
 #define __hybrid_atomic_addfetch_seq_cst(p, val)                  __sync_add_and_fetch(p, val)
 #define __hybrid_atomic_subfetch_seq_cst(p, val)                  __sync_sub_and_fetch(p, val)
 #define __hybrid_atomic_orfetch_seq_cst(p, val)                   __sync_or_and_fetch(p, val)
@@ -216,6 +215,7 @@
 #define __hybrid_atomic_fetchxor_seq_cst(p, val)                  __sync_fetch_and_xor(p, val)
 #define __hybrid_atomic_cmpxch_seq_cst(p, oldval, newval)         __sync_bool_compare_and_swap(p, oldval, newval)
 #define __hybrid_atomic_cmpxch_val_seq_cst(p, oldval, newval)     __sync_val_compare_and_swap(p, oldval, newval)
+#define __hybrid_atomic_thread_fence_seq_cst()                    __sync_synchronize()
 #define __hybrid_atomic_addfetch(p, val, order)                   __hybrid_atomic_addfetch_seq_cst(p, val)
 #define __hybrid_atomic_subfetch(p, val, order)                   __hybrid_atomic_subfetch_seq_cst(p, val)
 #define __hybrid_atomic_orfetch(p, val, order)                    __hybrid_atomic_orfetch_seq_cst(p, val)
@@ -228,13 +228,115 @@
 #define __hybrid_atomic_fetchxor(p, val, order)                   __hybrid_atomic_fetchxor_seq_cst(p, val)
 #define __hybrid_atomic_cmpxch(p, oldval, newval, succ, fail)     __hybrid_atomic_cmpxch_seq_cst(p, oldval, newval)
 #define __hybrid_atomic_cmpxch_val(p, oldval, newval, succ, fail) __hybrid_atomic_cmpxch_val_seq_cst(p, oldval, newval)
+#define __hybrid_atomic_thread_fence(order)                       __hybrid_atomic_thread_fence_seq_cst()
 #if !defined(__GNUC__) || __GCC_VERSION_NUM >= 40400
 #define __hybrid_atomic_fetchnand_seq_cst(p, val) __sync_fetch_and_nand(p, val)
 #define __hybrid_atomic_nandfetch_seq_cst(p, val) __sync_nand_and_fetch(p, val)
 #define __hybrid_atomic_fetchnand(p, val, order)  __hybrid_atomic_fetchnand_seq_cst(p, val)
 #define __hybrid_atomic_nandfetch(p, val, order)  __hybrid_atomic_nandfetch_seq_cst(p, val)
 #endif /* GCC 4.4 */
+/**/
+#include "__atomic-complete.h"
+#elif __has_builtin(__sync_bool_compare_and_swap) || __has_builtin(__sync_val_compare_and_swap)
+/* __sync_xxx()  (compiler-detected)
+ * Note that  for full  support, the  compiler must  at least  provide
+ * `__sync_bool_compare_and_swap()' or `__sync_val_compare_and_swap()' */
+#if __has_builtin(__sync_bool_compare_and_swap)
+#define __hybrid_atomic_cmpxch_seq_cst(p, oldval, newval) \
+	__sync_bool_compare_and_swap(p, oldval, newval)
+#endif /* __has_builtin(__sync_bool_compare_and_swap) */
+#if __has_builtin(__sync_val_compare_and_swap)
+#define __hybrid_atomic_cmpxch_val_seq_cst(p, oldval, newval) \
+	__sync_val_compare_and_swap(p, oldval, newval)
+#endif /* __has_builtin(__sync_val_compare_and_swap) */
+
+#if __has_builtin(__sync_swap)
+#define __hybrid_atomic_xch_seq_cst(p, val) __sync_swap(p, val)
+#endif /* __has_builtin(__sync_swap) */
+#if __has_builtin(__sync_add_and_fetch)
+#define __hybrid_atomic_addfetch_seq_cst(p, val) __sync_add_and_fetch(p, val)
+#endif /* __has_builtin(__sync_add_and_fetch) */
+#if __has_builtin(__sync_sub_and_fetch)
+#define __hybrid_atomic_subfetch_seq_cst(p, val) __sync_sub_and_fetch(p, val)
+#endif /* __has_builtin(__sync_sub_and_fetch) */
+#if __has_builtin(__sync_or_and_fetch)
+#define __hybrid_atomic_orfetch_seq_cst(p, val) __sync_or_and_fetch(p, val)
+#endif /* __has_builtin(__sync_or_and_fetch) */
+#if __has_builtin(__sync_and_and_fetch)
+#define __hybrid_atomic_andfetch_seq_cst(p, val) __sync_and_and_fetch(p, val)
+#endif /* __has_builtin(__sync_and_and_fetch) */
+#if __has_builtin(__sync_xor_and_fetch)
+#define __hybrid_atomic_xorfetch_seq_cst(p, val) __sync_xor_and_fetch(p, val)
+#endif /* __has_builtin(__sync_xor_and_fetch) */
+#if __has_builtin(__sync_fetch_and_add)
+#define __hybrid_atomic_fetchadd_seq_cst(p, val) __sync_fetch_and_add(p, val)
+#endif /* __has_builtin(__sync_fetch_and_add) */
+#if __has_builtin(__sync_fetch_and_sub)
+#define __hybrid_atomic_fetchsub_seq_cst(p, val) __sync_fetch_and_sub(p, val)
+#endif /* __has_builtin(__sync_fetch_and_sub) */
+#if __has_builtin(__sync_fetch_and_or)
+#define __hybrid_atomic_fetchor_seq_cst(p, val) __sync_fetch_and_or(p, val)
+#endif /* __has_builtin(__sync_fetch_and_or) */
+#if __has_builtin(__sync_fetch_and_and)
+#define __hybrid_atomic_fetchand_seq_cst(p, val) __sync_fetch_and_and(p, val)
+#endif /* __has_builtin(__sync_fetch_and_and) */
+#if __has_builtin(__sync_fetch_and_xor)
+#define __hybrid_atomic_fetchxor_seq_cst(p, val) __sync_fetch_and_xor(p, val)
+#endif /* __has_builtin(__sync_fetch_and_xor) */
+#if __has_builtin(__sync_fetch_and_nand)
+#define __hybrid_atomic_fetchnand_seq_cst(p, val) __sync_fetch_and_nand(p, val)
+#endif /* __has_builtin(__sync_fetch_and_nand) */
+#if __has_builtin(__sync_nand_and_fetch)
+#define __hybrid_atomic_nandfetch_seq_cst(p, val) __sync_nand_and_fetch(p, val)
+#endif /* __has_builtin(__sync_nand_and_fetch) */
+#if __has_builtin(__sync_synchronize)
 #define __hybrid_atomic_thread_fence(order) __sync_synchronize()
+#endif /* __has_builtin(__sync_synchronize) */
+
+#ifdef __hybrid_atomic_cmpxch_seq_cst
+#define __hybrid_atomic_cmpxch(p, oldval, newval, succ, fail) \
+	__hybrid_atomic_cmpxch_seq_cst(p, oldval, newval)
+#endif /* __hybrid_atomic_cmpxch_seq_cst */
+#ifdef __hybrid_atomic_cmpxch_val_seq_cst
+#define __hybrid_atomic_cmpxch_val(p, oldval, newval, succ, fail) \
+	__hybrid_atomic_cmpxch_val_seq_cst(p, oldval, newval)
+#endif /* __hybrid_atomic_cmpxch_val_seq_cst */
+#ifdef __hybrid_atomic_addfetch_seq_cst
+#define __hybrid_atomic_addfetch(p, val, order) __hybrid_atomic_addfetch_seq_cst(p, val)
+#endif /* __hybrid_atomic_addfetch_seq_cst */
+#ifdef __hybrid_atomic_subfetch_seq_cst
+#define __hybrid_atomic_subfetch(p, val, order) __hybrid_atomic_subfetch_seq_cst(p, val)
+#endif /* __hybrid_atomic_subfetch_seq_cst */
+#ifdef __hybrid_atomic_orfetch_seq_cst
+#define __hybrid_atomic_orfetch(p, val, order) __hybrid_atomic_orfetch_seq_cst(p, val)
+#endif /* __hybrid_atomic_orfetch_seq_cst */
+#ifdef __hybrid_atomic_andfetch_seq_cst
+#define __hybrid_atomic_andfetch(p, val, order) __hybrid_atomic_andfetch_seq_cst(p, val)
+#endif /* __hybrid_atomic_andfetch_seq_cst */
+#ifdef __hybrid_atomic_xorfetch_seq_cst
+#define __hybrid_atomic_xorfetch(p, val, order) __hybrid_atomic_xorfetch_seq_cst(p, val)
+#endif /* __hybrid_atomic_xorfetch_seq_cst */
+#ifdef __hybrid_atomic_fetchadd_seq_cst
+#define __hybrid_atomic_fetchadd(p, val, order) __hybrid_atomic_fetchadd_seq_cst(p, val)
+#endif /* __hybrid_atomic_fetchadd_seq_cst */
+#ifdef __hybrid_atomic_fetchsub_seq_cst
+#define __hybrid_atomic_fetchsub(p, val, order) __hybrid_atomic_fetchsub_seq_cst(p, val)
+#endif /* __hybrid_atomic_fetchsub_seq_cst */
+#ifdef __hybrid_atomic_fetchor_seq_cst
+#define __hybrid_atomic_fetchor(p, val, order) __hybrid_atomic_fetchor_seq_cst(p, val)
+#endif /* __hybrid_atomic_fetchor_seq_cst */
+#ifdef __hybrid_atomic_fetchand_seq_cst
+#define __hybrid_atomic_fetchand(p, val, order) __hybrid_atomic_fetchand_seq_cst(p, val)
+#endif /* __hybrid_atomic_fetchand_seq_cst */
+#ifdef __hybrid_atomic_fetchxor_seq_cst
+#define __hybrid_atomic_fetchxor(p, val, order) __hybrid_atomic_fetchxor_seq_cst(p, val)
+#endif /* __hybrid_atomic_fetchxor_seq_cst */
+#ifdef __hybrid_atomic_fetchnand_seq_cst
+#define __hybrid_atomic_fetchnand(p, val, order) __hybrid_atomic_fetchnand_seq_cst(p, val)
+#endif /* __hybrid_atomic_fetchnand_seq_cst */
+#ifdef __hybrid_atomic_nandfetch_seq_cst
+#define __hybrid_atomic_nandfetch(p, val, order) __hybrid_atomic_nandfetch_seq_cst(p, val)
+#endif /* __hybrid_atomic_nandfetch_seq_cst */
 /**/
 #include "__atomic-complete.h"
 #elif defined(_MSC_VER)
@@ -290,69 +392,74 @@
 #endif /* !__hybrid_atomic_thread_fence */
 
 #ifndef __hybrid_atomic_lockfree
-#define __hybrid_atomic_lockfree(p) __HYBRID_ATOMIC_LOCKFREE(sizeof(*(p)))
+#define __hybrid_atomic_lockfree(p) (__HYBRID_ATOMIC_LOCKFREE(sizeof(*(p))) == 2)
 #endif /* !__hybrid_atomic_lockfree */
 #endif /* __CC__ */
 
+/* Determine the lock-free-ness of a type with size `x'
+ * @return: 0: Never lock-free
+ * @return: 1: Sometimes lock-free
+ * @return: 2: Always lock-free */
 #ifndef __HYBRID_ATOMIC_LOCKFREE
 #ifndef __HYBRID_ATOMIC_LOCKFREE_MAX
 #define __HYBRID_ATOMIC_LOCKFREE_MAX __SIZEOF_POINTER__
+#if defined(__GCC_ATOMIC_LLONG_LOCK_FREE) && defined(__SIZEOF_LONG_LONG__)
+#if __HYBRID_ATOMIC_LOCKFREE_MAX < __SIZEOF_LONG_LONG__
+#undef __HYBRID_ATOMIC_LOCKFREE_MAX
+#define __HYBRID_ATOMIC_LOCKFREE_MAX __SIZEOF_LONG_LONG__
+#endif /* __HYBRID_ATOMIC_LOCKFREE_MAX < __SIZEOF_LONG_LONG__ */
+#endif /* __GCC_ATOMIC_LLONG_LOCK_FREE && __SIZEOF_LONG_LONG__ */
 #endif /* !__HYBRID_ATOMIC_LOCKFREE_MAX */
-#define __HYBRID_ATOMIC_LOCKFREE(x) ((x) <= __HYBRID_ATOMIC_LOCKFREE_MAX)
+#define __HYBRID_ATOMIC_LOCKFREE(x) ((x) <= __HYBRID_ATOMIC_LOCKFREE_MAX ? 2 : 0)
 #endif /* !__HYBRID_ATOMIC_LOCKFREE */
 
 #ifndef __GCC_ATOMIC_BOOL_LOCK_FREE
 #ifndef __SIZEOF_BOOL__
 #define __SIZEOF_BOOL__ __SIZEOF_CHAR__
 #endif /* !__SIZEOF_BOOL__ */
-#if __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_BOOL__)
-#define __GCC_ATOMIC_BOOL_LOCK_FREE 1
-#endif /* __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_BOOL__) */
+#define __GCC_ATOMIC_BOOL_LOCK_FREE __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_BOOL__)
 #endif /* !__GCC_ATOMIC_BOOL_LOCK_FREE */
+
 #ifndef __GCC_ATOMIC_CHAR_LOCK_FREE
-#if __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_CHAR__)
-#define __GCC_ATOMIC_CHAR_LOCK_FREE 1
-#endif /* __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_CHAR__) */
+#define __GCC_ATOMIC_CHAR_LOCK_FREE __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_CHAR__)
 #endif /* !__GCC_ATOMIC_CHAR_LOCK_FREE */
+
+#ifndef __GCC_ATOMIC_CHAR8_T_LOCK_FREE
+#define __GCC_ATOMIC_CHAR8_T_LOCK_FREE __HYBRID_ATOMIC_LOCKFREE(1)
+#endif /* !__GCC_ATOMIC_CHAR8_T_LOCK_FREE */
+
 #ifndef __GCC_ATOMIC_CHAR16_T_LOCK_FREE
-#if __HYBRID_ATOMIC_LOCKFREE(2)
-#define __GCC_ATOMIC_CHAR16_T_LOCK_FREE 1
-#endif /* __HYBRID_ATOMIC_LOCKFREE(2) */
+#define __GCC_ATOMIC_CHAR16_T_LOCK_FREE __HYBRID_ATOMIC_LOCKFREE(2)
 #endif /* !__GCC_ATOMIC_CHAR16_T_LOCK_FREE */
+
 #ifndef __GCC_ATOMIC_CHAR32_T_LOCK_FREE
-#if __HYBRID_ATOMIC_LOCKFREE(4)
-#define __GCC_ATOMIC_CHAR32_T_LOCK_FREE 1
-#endif /* __HYBRID_ATOMIC_LOCKFREE(4) */
+#define __GCC_ATOMIC_CHAR32_T_LOCK_FREE __HYBRID_ATOMIC_LOCKFREE(4)
 #endif /* !__GCC_ATOMIC_CHAR32_T_LOCK_FREE */
+
 #ifndef __GCC_ATOMIC_WCHAR_T_LOCK_FREE
-#if __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_WCHAR_T__)
-#define __GCC_ATOMIC_WCHAR_T_LOCK_FREE 1
-#endif /* __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_WCHAR_T__) */
+#define __GCC_ATOMIC_WCHAR_T_LOCK_FREE __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_WCHAR_T__)
 #endif /* !__GCC_ATOMIC_WCHAR_T_LOCK_FREE */
+
 #ifndef __GCC_ATOMIC_SHORT_LOCK_FREE
-#if __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_SHORT__)
-#define __GCC_ATOMIC_SHORT_LOCK_FREE 1
-#endif /* __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_SHORT__) */
+#define __GCC_ATOMIC_SHORT_LOCK_FREE __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_SHORT__)
 #endif /* !__GCC_ATOMIC_SHORT_LOCK_FREE */
+
 #ifndef __GCC_ATOMIC_INT_LOCK_FREE
-#if __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_INT__)
-#define __GCC_ATOMIC_INT_LOCK_FREE 1
-#endif /* __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_INT__) */
+#define __GCC_ATOMIC_INT_LOCK_FREE __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_INT__)
 #endif /* !__GCC_ATOMIC_INT_LOCK_FREE */
+
 #ifndef __GCC_ATOMIC_LONG_LOCK_FREE
-#if __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_LONG__)
-#define __GCC_ATOMIC_LONG_LOCK_FREE 1
-#endif /* __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_LONG__) */
+#define __GCC_ATOMIC_LONG_LOCK_FREE __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_LONG__)
 #endif /* !__GCC_ATOMIC_LONG_LOCK_FREE */
+
 #ifndef __GCC_ATOMIC_LLONG_LOCK_FREE
-#if defined(__SIZEOF_LONG_LONG__) && __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_LONG_LONG__)
-#define __GCC_ATOMIC_LLONG_LOCK_FREE 1
-#endif /* __SIZEOF_LONG_LONG__ && __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_LONG_LONG__) */
+#ifdef __SIZEOF_LONG_LONG__
+#define __GCC_ATOMIC_LLONG_LOCK_FREE __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_LONG_LONG__)
+#endif /* __SIZEOF_LONG_LONG__ */
 #endif /* !__GCC_ATOMIC_LLONG_LOCK_FREE */
+
 #ifndef __GCC_ATOMIC_POINTER_LOCK_FREE
-#if __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_POINTER__)
-#define __GCC_ATOMIC_POINTER_LOCK_FREE 1
-#endif /* __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_POINTER__) */
+#define __GCC_ATOMIC_POINTER_LOCK_FREE __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_POINTER__)
 #endif /* !__GCC_ATOMIC_POINTER_LOCK_FREE */
 
 #endif /* !__GUARD_HYBRID___ATOMIC_H */

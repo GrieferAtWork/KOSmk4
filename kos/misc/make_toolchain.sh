@@ -73,6 +73,10 @@ CXX_COMPAT_HEADER_NAMES=(
 CXX_COMPAT_HEADER_FILES=(
 	"bits/std_abs.h"
 )
+CXX_KOS_SPECIFIC_HEADER_FILES=(
+	"atomic"
+	"stdatomic.h"
+)
 
 
 BINUTILS_VERSION="binutils-${BINUTILS_VERSION_NUMBER}"
@@ -817,6 +821,9 @@ for HEADER_NAME in "${CXX_COMPAT_HEADER_NAMES[@]}"; do
 	delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/$HEADER_NAME.h"
 done
 for HEADER_NAME in "${CXX_COMPAT_HEADER_FILES[@]}"; do
+	delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/$HEADER_NAME"
+done
+for HEADER_NAME in "${CXX_KOS_SPECIFIC_HEADER_FILES[@]}"; do
 	delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/$HEADER_NAME"
 done
 

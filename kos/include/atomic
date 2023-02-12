@@ -40,10 +40,180 @@ typedef __CHAR16_TYPE__ char16_t;
 typedef __CHAR32_TYPE__ char32_t;
 #endif /* !__char16_t_defined */
 
-__NAMESPACE_STD_BEGIN
+#define __PRIVATE_CXX_DEFINE_COMPARE_EXCHANGE_STD(T)                                                                        \
+	__CXX_CLASSMEMBER bool                                                                                                  \
+	compare_exchange_weak(T &__exp, T __val,                                                                                \
+	                      __NAMESPACE_STD_SYM memory_order __succ,                                                          \
+	                      __NAMESPACE_STD_SYM memory_order __fail) __CXX_NOEXCEPT {                                         \
+		bool __result = __hybrid_atomic_cmpxch_weak(&__m_val, __val, __exp, __succ, __fail);                                \
+		if (!__result)                                                                                                      \
+			__exp = __hybrid_atomic_load(&__m_val, __ATOMIC_ACQUIRE);                                                       \
+		return __result;                                                                                                    \
+	}                                                                                                                       \
+	__CXX_CLASSMEMBER bool                                                                                                  \
+	compare_exchange_weak(T &__exp, T __val,                                                                                \
+	                      __NAMESPACE_STD_SYM memory_order __succ,                                                          \
+	                      __NAMESPACE_STD_SYM memory_order __fail) volatile __CXX_NOEXCEPT {                                \
+		bool __result = __hybrid_atomic_cmpxch_weak(&__m_val, __val, __exp, __succ, __fail);                                \
+		if (!__result)                                                                                                      \
+			__exp = __hybrid_atomic_load(&__m_val, __ATOMIC_ACQUIRE);                                                       \
+		return __result;                                                                                                    \
+	}                                                                                                                       \
+	__CXX_CLASSMEMBER bool                                                                                                  \
+	compare_exchange_weak(T &__exp, T __val,                                                                                \
+	                      __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {            \
+		return compare_exchange_weak(__exp, __val, __order,                                                                 \
+		                             __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                  \
+	}                                                                                                                       \
+	__CXX_CLASSMEMBER bool                                                                                                  \
+	compare_exchange_weak(T &__exp, T __val,                                                                                \
+	                      __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {   \
+		return compare_exchange_weak(__exp, __val, __order,                                                                 \
+		                             __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                  \
+	}                                                                                                                       \
+	__CXX_CLASSMEMBER bool                                                                                                  \
+	compare_exchange_strong(T &__exp, T __val,                                                                              \
+	                        __NAMESPACE_STD_SYM memory_order __succ,                                                        \
+	                        __NAMESPACE_STD_SYM memory_order __fail) __CXX_NOEXCEPT {                                       \
+		T __oldval;                                                                                                         \
+		bool __result;                                                                                                      \
+		__oldval = __hybrid_atomic_cmpxch_val(&__m_val,                                                                     \
+		                                      __val, __exp,                                                                 \
+		                                      __succ, __fail);                                                              \
+		__result = __exp == __oldval;                                                                                       \
+		__exp    = __oldval;                                                                                                \
+		return __result;                                                                                                    \
+	}                                                                                                                       \
+	__CXX_CLASSMEMBER bool                                                                                                  \
+	compare_exchange_strong(T &__exp, T __val,                                                                              \
+	                        __NAMESPACE_STD_SYM memory_order __succ,                                                        \
+	                        __NAMESPACE_STD_SYM memory_order __fail) volatile __CXX_NOEXCEPT {                              \
+		T __oldval;                                                                                                         \
+		bool __result;                                                                                                      \
+		__oldval = __hybrid_atomic_cmpxch_val(&__m_val,                                                                     \
+		                                      __val, __exp,                                                                 \
+		                                      __succ, __fail);                                                              \
+		__result = __exp == __oldval;                                                                                       \
+		__exp    = __oldval;                                                                                                \
+		return __result;                                                                                                    \
+	}                                                                                                                       \
+	__CXX_CLASSMEMBER bool                                                                                                  \
+	compare_exchange_strong(T &__exp, T __val,                                                                              \
+	                        __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {          \
+		return compare_exchange_strong(__exp, __val, __order,                                                               \
+		                               __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                \
+	}                                                                                                                       \
+	__CXX_CLASSMEMBER bool                                                                                                  \
+	compare_exchange_strong(T &__exp, T __val,                                                                              \
+	                        __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT { \
+		return compare_exchange_strong(__exp, __val, __order,                                                               \
+		                               __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                \
+	}
+
+/* KOS Extensions. */
+#ifdef __USE_KOS
+#define __PRIVATE_CXX_DEFINE_COMPARE_EXCHANGE(T)                                                                    \
+	__PRIVATE_CXX_DEFINE_COMPARE_EXCHANGE_STD(T)                                                                    \
+	__CXX_CLASSMEMBER bool                                                                                          \
+	cmpxch(T __oldv, T __newv,                                                                                      \
+	       __NAMESPACE_STD_SYM memory_order __succ,                                                                 \
+	       __NAMESPACE_STD_SYM memory_order __fail) __CXX_NOEXCEPT {                                                \
+		return __hybrid_atomic_cmpxch(&__m_val,                                                                     \
+		                              __oldv, __newv,                                                               \
+		                              __succ, __fail);                                                              \
+	}                                                                                                               \
+	__CXX_CLASSMEMBER bool                                                                                          \
+	cmpxch(T __oldv, T __newv,                                                                                      \
+	       __NAMESPACE_STD_SYM memory_order __succ,                                                                 \
+	       __NAMESPACE_STD_SYM memory_order __fail) volatile __CXX_NOEXCEPT {                                       \
+		return __hybrid_atomic_cmpxch(&__m_val,                                                                     \
+		                              __oldv, __newv,                                                               \
+		                              __succ, __fail);                                                              \
+	}                                                                                                               \
+	__CXX_CLASSMEMBER bool                                                                                          \
+	cmpxch(T __oldv, T __newv,                                                                                      \
+	       __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {                   \
+		return cmpxch(__oldv, __newv, __order,                                                                      \
+		              __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                         \
+	}                                                                                                               \
+	__CXX_CLASSMEMBER bool                                                                                          \
+	cmpxch(T __oldv, T __newv,                                                                                      \
+	       __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {          \
+		return cmpxch(__oldv, __newv, __order,                                                                      \
+		              __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                         \
+	}                                                                                                               \
+	__CXX_CLASSMEMBER T                                                                                             \
+	cmpxch_val(T __oldv, T __newv,                                                                                  \
+	           __NAMESPACE_STD_SYM memory_order __succ,                                                             \
+	           __NAMESPACE_STD_SYM memory_order __fail) __CXX_NOEXCEPT {                                            \
+		return __hybrid_atomic_cmpxch_val(&__m_val,                                                                 \
+		                                  __oldv, __newv,                                                           \
+		                                  __succ, __fail);                                                          \
+	}                                                                                                               \
+	__CXX_CLASSMEMBER T                                                                                             \
+	cmpxch_val(T __oldv, T __newv,                                                                                  \
+	           __NAMESPACE_STD_SYM memory_order __succ,                                                             \
+	           __NAMESPACE_STD_SYM memory_order __fail) volatile __CXX_NOEXCEPT {                                   \
+		return __hybrid_atomic_cmpxch_val(&__m_val,                                                                 \
+		                                  __oldv, __newv,                                                           \
+		                                  __succ, __fail);                                                          \
+	}                                                                                                               \
+	__CXX_CLASSMEMBER T                                                                                             \
+	cmpxch_val(T __oldv, T __newv,                                                                                  \
+	           __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {               \
+		return cmpxch_val(__oldv, __newv, __order,                                                                  \
+		                  __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                     \
+	}                                                                                                               \
+	__CXX_CLASSMEMBER T                                                                                             \
+	cmpxch_val(T __oldv, T __newv,                                                                                  \
+	           __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {      \
+		return cmpxch_val(__oldv, __newv, __order,                                                                  \
+		                  __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                     \
+	}                                                                                                               \
+	__CXX_CLASSMEMBER bool                                                                                          \
+	cmpxch_weak(T __oldv, T __newv,                                                                                 \
+	            __NAMESPACE_STD_SYM memory_order __succ,                                                            \
+	            __NAMESPACE_STD_SYM memory_order __fail) __CXX_NOEXCEPT {                                           \
+		return __hybrid_atomic_cmpxch_weak(&__m_val, __oldv, __newv, __succ, __fail);                               \
+	}                                                                                                               \
+	__CXX_CLASSMEMBER bool                                                                                          \
+	cmpxch_weak(T __oldv, T __newv,                                                                                 \
+	            __NAMESPACE_STD_SYM memory_order __succ,                                                            \
+	            __NAMESPACE_STD_SYM memory_order __fail) volatile __CXX_NOEXCEPT {                                  \
+		return __hybrid_atomic_cmpxch_weak(&__m_val, __oldv, __newv, __succ, __fail);                               \
+	}                                                                                                               \
+	__CXX_CLASSMEMBER bool                                                                                          \
+	cmpxch_weak(T __oldv, T __newv,                                                                                 \
+	            __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {              \
+		return cmpxch_weak(__oldv, __newv, __order,                                                                 \
+		                   __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                    \
+	}                                                                                                               \
+	__CXX_CLASSMEMBER bool                                                                                          \
+	cmpxch_weak(T __oldv, T __newv,                                                                                 \
+	            __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {     \
+		return cmpxch_weak(__oldv, __newv, __order,                                                                 \
+		                   __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                    \
+	}                                                                                                               \
+	__CXX_CLASSMEMBER T                                                                                             \
+	cmpxch_val_weak(T __oldv, T __newv,                                                                             \
+	                __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {          \
+		return cmpxch_val_weak(__oldv, __newv, __order,                                                             \
+		                       __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                \
+	}                                                                                                               \
+	__CXX_CLASSMEMBER T                                                                                             \
+	cmpxch_val_weak(T __oldv, T __newv,                                                                             \
+	                __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT { \
+		return cmpxch_val_weak(__oldv, __newv, __order,                                                             \
+		                       __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                \
+	}
+#else /* __USE_KOS */
+#define __PRIVATE_CXX_DEFINE_COMPARE_EXCHANGE(T) \
+	__PRIVATE_CXX_DEFINE_COMPARE_EXCHANGE_STD(T)
+#endif /* !__USE_KOS */
 
 #ifndef __std_memory_order_defined
 #define __std_memory_order_defined
+__NAMESPACE_STD_BEGIN
 typedef enum {
 	memory_order_relaxed = __ATOMIC_RELAXED,
 	memory_order_consume = __ATOMIC_CONSUME,
@@ -52,196 +222,25 @@ typedef enum {
 	memory_order_acq_rel = __ATOMIC_ACQ_REL,
 	memory_order_seq_cst = __ATOMIC_SEQ_CST
 } memory_order;
+__NAMESPACE_STD_END
 #endif /* !__std_memory_order_defined */
 
-
-#define __PRIVATE_CXX_DEFINE_COMPARE_EXCHANGE_STD(T)                                                    \
-	__CXX_CLASSMEMBER bool                                                                              \
-	compare_exchange_weak(T &__exp, T __val,                                                            \
-	                      memory_order __succ,                                                          \
-	                      memory_order __fail) __CXX_NOEXCEPT {                                         \
-		bool __result = __hybrid_atomic_cmpxch_weak(&__m_val, __val, __exp, __succ, __fail);            \
-		if (!__result)                                                                                  \
-			__exp = __hybrid_atomic_load(&__m_val, __ATOMIC_ACQUIRE);                                   \
-		return __result;                                                                                \
-	}                                                                                                   \
-	__CXX_CLASSMEMBER bool                                                                              \
-	compare_exchange_weak(T &__exp, T __val,                                                            \
-	                      memory_order __succ,                                                          \
-	                      memory_order __fail) volatile __CXX_NOEXCEPT {                                \
-		bool __result = __hybrid_atomic_cmpxch_weak(&__m_val, __val, __exp, __succ, __fail);            \
-		if (!__result)                                                                                  \
-			__exp = __hybrid_atomic_load(&__m_val, __ATOMIC_ACQUIRE);                                   \
-		return __result;                                                                                \
-	}                                                                                                   \
-	__CXX_CLASSMEMBER bool                                                                              \
-	compare_exchange_weak(T &__exp, T __val,                                                            \
-	                      memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {            \
-		return compare_exchange_weak(__exp, __val, __order,                                             \
-		                             ::std::__intern::__cmpxch_failure_order(__order));                 \
-	}                                                                                                   \
-	__CXX_CLASSMEMBER bool                                                                              \
-	compare_exchange_weak(T &__exp, T __val,                                                            \
-	                      memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {   \
-		return compare_exchange_weak(__exp, __val, __order,                                             \
-		                             ::std::__intern::__cmpxch_failure_order(__order));                 \
-	}                                                                                                   \
-	__CXX_CLASSMEMBER bool                                                                              \
-	compare_exchange_strong(T &__exp, T __val,                                                          \
-	                        memory_order __succ,                                                        \
-	                        memory_order __fail) __CXX_NOEXCEPT {                                       \
-		T __oldval;                                                                                     \
-		bool __result;                                                                                  \
-		__oldval = __hybrid_atomic_cmpxch_val(&__m_val,                                                 \
-		                                      __val, __exp,                                             \
-		                                      __succ, __fail);                                          \
-		__result = __exp == __oldval;                                                                   \
-		__exp    = __oldval;                                                                            \
-		return __result;                                                                                \
-	}                                                                                                   \
-	__CXX_CLASSMEMBER bool                                                                              \
-	compare_exchange_strong(T &__exp, T __val,                                                          \
-	                        memory_order __succ,                                                        \
-	                        memory_order __fail) volatile __CXX_NOEXCEPT {                              \
-		T __oldval;                                                                                     \
-		bool __result;                                                                                  \
-		__oldval = __hybrid_atomic_cmpxch_val(&__m_val,                                                 \
-		                                      __val, __exp,                                             \
-		                                      __succ, __fail);                                          \
-		__result = __exp == __oldval;                                                                   \
-		__exp    = __oldval;                                                                            \
-		return __result;                                                                                \
-	}                                                                                                   \
-	__CXX_CLASSMEMBER bool                                                                              \
-	compare_exchange_strong(T &__exp, T __val,                                                          \
-	                        memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {          \
-		return compare_exchange_strong(__exp, __val, __order,                                           \
-		                               ::std::__intern::__cmpxch_failure_order(__order));               \
-	}                                                                                                   \
-	__CXX_CLASSMEMBER bool                                                                              \
-	compare_exchange_strong(T &__exp, T __val,                                                          \
-	                        memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT { \
-		return compare_exchange_strong(__exp, __val, __order,                                           \
-		                               ::std::__intern::__cmpxch_failure_order(__order));               \
-	}
-
-/* KOS Extensions. */
-#ifdef __USE_KOS
-#define __PRIVATE_CXX_DEFINE_COMPARE_EXCHANGE(T)                                                \
-	__PRIVATE_CXX_DEFINE_COMPARE_EXCHANGE_STD(T)                                                \
-	__CXX_CLASSMEMBER bool                                                                      \
-	cmpxch(T __oldv, T __newv,                                                                  \
-	       memory_order __succ,                                                                 \
-	       memory_order __fail) __CXX_NOEXCEPT {                                                \
-		return __hybrid_atomic_cmpxch(&__m_val,                                                 \
-		                              __oldv, __newv,                                           \
-		                              __succ, __fail);                                          \
-	}                                                                                           \
-	__CXX_CLASSMEMBER bool                                                                      \
-	cmpxch(T __oldv, T __newv,                                                                  \
-	       memory_order __succ,                                                                 \
-	       memory_order __fail) volatile __CXX_NOEXCEPT {                                       \
-		return __hybrid_atomic_cmpxch(&__m_val,                                                 \
-		                              __oldv, __newv,                                           \
-		                              __succ, __fail);                                          \
-	}                                                                                           \
-	__CXX_CLASSMEMBER bool                                                                      \
-	cmpxch(T __oldv, T __newv,                                                                  \
-	       memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {                   \
-		return cmpxch(__oldv, __newv, __order,                                                  \
-		              ::std::__intern::__cmpxch_failure_order(__order));                        \
-	}                                                                                           \
-	__CXX_CLASSMEMBER bool                                                                      \
-	cmpxch(T __oldv, T __newv,                                                                  \
-	       memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {          \
-		return cmpxch(__oldv, __newv, __order,                                                  \
-		              ::std::__intern::__cmpxch_failure_order(__order));                        \
-	}                                                                                           \
-	__CXX_CLASSMEMBER T                                                                         \
-	cmpxch_val(T __oldv, T __newv,                                                              \
-	           memory_order __succ,                                                             \
-	           memory_order __fail) __CXX_NOEXCEPT {                                            \
-		return __hybrid_atomic_cmpxch_val(&__m_val,                                             \
-		                                  __oldv, __newv,                                       \
-		                                  __succ, __fail);                                      \
-	}                                                                                           \
-	__CXX_CLASSMEMBER T                                                                         \
-	cmpxch_val(T __oldv, T __newv,                                                              \
-	           memory_order __succ,                                                             \
-	           memory_order __fail) volatile __CXX_NOEXCEPT {                                   \
-		return __hybrid_atomic_cmpxch_val(&__m_val,                                             \
-		                                  __oldv, __newv,                                       \
-		                                  __succ, __fail);                                      \
-	}                                                                                           \
-	__CXX_CLASSMEMBER T                                                                         \
-	cmpxch_val(T __oldv, T __newv,                                                              \
-	           memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {               \
-		return cmpxch_val(__oldv, __newv, __order,                                              \
-		                  ::std::__intern::__cmpxch_failure_order(__order));                    \
-	}                                                                                           \
-	__CXX_CLASSMEMBER T                                                                         \
-	cmpxch_val(T __oldv, T __newv,                                                              \
-	           memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {      \
-		return cmpxch_val(__oldv, __newv, __order,                                              \
-		                  ::std::__intern::__cmpxch_failure_order(__order));                    \
-	}                                                                                           \
-	__CXX_CLASSMEMBER bool                                                                      \
-	cmpxch_weak(T __oldv, T __newv,                                                             \
-	            memory_order __succ,                                                            \
-	            memory_order __fail) __CXX_NOEXCEPT {                                           \
-		return __hybrid_atomic_cmpxch_weak(&__m_val, __oldv, __newv, __succ, __fail);           \
-	}                                                                                           \
-	__CXX_CLASSMEMBER bool                                                                      \
-	cmpxch_weak(T __oldv, T __newv,                                                             \
-	            memory_order __succ,                                                            \
-	            memory_order __fail) volatile __CXX_NOEXCEPT {                                  \
-		return __hybrid_atomic_cmpxch_weak(&__m_val, __oldv, __newv, __succ, __fail);           \
-	}                                                                                           \
-	__CXX_CLASSMEMBER bool                                                                      \
-	cmpxch_weak(T __oldv, T __newv,                                                             \
-	            memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {              \
-		return cmpxch_weak(__oldv, __newv, __order,                                             \
-		                   ::std::__intern::__cmpxch_failure_order(__order));                   \
-	}                                                                                           \
-	__CXX_CLASSMEMBER bool                                                                      \
-	cmpxch_weak(T __oldv, T __newv,                                                             \
-	            memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {     \
-		return cmpxch_weak(__oldv, __newv, __order,                                             \
-		                   ::std::__intern::__cmpxch_failure_order(__order));                   \
-	}                                                                                           \
-	__CXX_CLASSMEMBER T                                                                         \
-	cmpxch_val_weak(T __oldv, T __newv,                                                         \
-	                memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {          \
-		return cmpxch_val_weak(__oldv, __newv, __order,                                         \
-		                       ::std::__intern::__cmpxch_failure_order(__order));               \
-	}                                                                                           \
-	__CXX_CLASSMEMBER T                                                                         \
-	cmpxch_val_weak(T __oldv, T __newv,                                                         \
-	                memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT { \
-		return cmpxch_val_weak(__oldv, __newv, __order,                                         \
-		                       ::std::__intern::__cmpxch_failure_order(__order));               \
-	}
-#else /* __USE_KOS */
-#define __PRIVATE_CXX_DEFINE_COMPARE_EXCHANGE(T) \
-	__PRIVATE_CXX_DEFINE_COMPARE_EXCHANGE_STD(T)
-#endif /* !__USE_KOS */
-
 __NAMESPACE_INT_BEGIN
-
-__CXX_CLASSMEMBER __CXX11_CONSTEXPR memory_order
-__cmpxch_failure_order2(memory_order __order) __CXX_NOEXCEPT {
-	return __order == memory_order_acq_rel
-	       ? memory_order_acquire
-	       : __order == memory_order_release
-	         ? memory_order_relaxed
+__CXX_CLASSMEMBER __CXX11_CONSTEXPR __NAMESPACE_STD_SYM memory_order
+__cmpxch_failure_order2(__NAMESPACE_STD_SYM memory_order __order) __CXX_NOEXCEPT {
+	return __order == __NAMESPACE_STD_SYM memory_order_acq_rel
+	       ? __NAMESPACE_STD_SYM memory_order_acquire
+	       : __order == __NAMESPACE_STD_SYM memory_order_release
+	         ? __NAMESPACE_STD_SYM memory_order_relaxed
 	         : __order;
 }
 
-__CXX_CLASSMEMBER __CXX11_CONSTEXPR memory_order
-__cmpxch_failure_order(memory_order __order) __CXX_NOEXCEPT {
-	return memory_order(__cmpxch_failure_order2(memory_order(__order & 0xffff)) |
-	                    (__order & 0xffff0000));
+__CXX_CLASSMEMBER __CXX11_CONSTEXPR __NAMESPACE_STD_SYM memory_order
+__cmpxch_failure_order(__NAMESPACE_STD_SYM memory_order __order) __CXX_NOEXCEPT {
+	return __NAMESPACE_STD_SYM memory_order(__cmpxch_failure_order2(__NAMESPACE_STD_SYM memory_order(__order & 0xffff)) |
+	                                        (__order & 0xffff0000));
 }
+
 
 template<class __T> struct __atomic_int {
 private:
@@ -280,92 +279,92 @@ public:
 
 	__CXX_CLASSMEMBER __T
 	operator++(int) __CXX_NOEXCEPT {
-		return __hybrid_atomic_fetchinc(&__m_val, memory_order_seq_cst);
+		return __hybrid_atomic_fetchinc(&__m_val, __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __T
 	operator++(int) volatile __CXX_NOEXCEPT {
-		return __hybrid_atomic_fetchinc(&__m_val, memory_order_seq_cst);
+		return __hybrid_atomic_fetchinc(&__m_val, __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __T
 	operator--(int) __CXX_NOEXCEPT {
-		return __hybrid_atomic_fetchdec(&__m_val, memory_order_seq_cst);
+		return __hybrid_atomic_fetchdec(&__m_val, __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __T
 	operator--(int) volatile __CXX_NOEXCEPT {
-		return __hybrid_atomic_fetchdec(&__m_val, memory_order_seq_cst);
+		return __hybrid_atomic_fetchdec(&__m_val, __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __T
 	operator++() __CXX_NOEXCEPT {
-		return __hybrid_atomic_incfetch(&__m_val, memory_order_seq_cst);
+		return __hybrid_atomic_incfetch(&__m_val, __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __T
 	operator++() volatile __CXX_NOEXCEPT {
-		return __hybrid_atomic_incfetch(&__m_val, memory_order_seq_cst);
+		return __hybrid_atomic_incfetch(&__m_val, __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __T
 	operator--() __CXX_NOEXCEPT {
-		return __hybrid_atomic_decfetch(&__m_val, memory_order_seq_cst);
+		return __hybrid_atomic_decfetch(&__m_val, __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __T
 	operator--() volatile __CXX_NOEXCEPT {
-		return __hybrid_atomic_decfetch(&__m_val, memory_order_seq_cst);
+		return __hybrid_atomic_decfetch(&__m_val, __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __T
 	operator+=(__T __val) __CXX_NOEXCEPT {
-		return __hybrid_atomic_addfetch(&__m_val, __val, memory_order_seq_cst);
+		return __hybrid_atomic_addfetch(&__m_val, __val, __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __T
 	operator+=(__T __val) volatile __CXX_NOEXCEPT {
-		return __hybrid_atomic_addfetch(&__m_val, __val, memory_order_seq_cst);
+		return __hybrid_atomic_addfetch(&__m_val, __val, __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __T
 	operator-=(__T __val) __CXX_NOEXCEPT {
-		return __hybrid_atomic_subfetch(&__m_val, __val, memory_order_seq_cst);
+		return __hybrid_atomic_subfetch(&__m_val, __val, __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __T
 	operator-=(__T __val) volatile __CXX_NOEXCEPT {
-		return __hybrid_atomic_subfetch(&__m_val, __val, memory_order_seq_cst);
+		return __hybrid_atomic_subfetch(&__m_val, __val, __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __T
 	operator&=(__T __val) __CXX_NOEXCEPT {
-		return __hybrid_atomic_andfetch(&__m_val, __val, memory_order_seq_cst);
+		return __hybrid_atomic_andfetch(&__m_val, __val, __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __T
 	operator&=(__T __val) volatile __CXX_NOEXCEPT {
-		return __hybrid_atomic_andfetch(&__m_val, __val, memory_order_seq_cst);
+		return __hybrid_atomic_andfetch(&__m_val, __val, __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __T
 	operator|=(__T __val) __CXX_NOEXCEPT {
-		return __hybrid_atomic_orfetch(&__m_val, __val, memory_order_seq_cst);
+		return __hybrid_atomic_orfetch(&__m_val, __val, __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __T
 	operator|=(__T __val) volatile __CXX_NOEXCEPT {
-		return __hybrid_atomic_orfetch(&__m_val, __val, memory_order_seq_cst);
+		return __hybrid_atomic_orfetch(&__m_val, __val, __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __T
 	operator^=(__T __val) __CXX_NOEXCEPT {
-		return __hybrid_atomic_xorfetch(&__m_val, __val, memory_order_seq_cst);
+		return __hybrid_atomic_xorfetch(&__m_val, __val, __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __T
 	operator^=(__T __val) volatile __CXX_NOEXCEPT {
-		return __hybrid_atomic_xorfetch(&__m_val, __val, memory_order_seq_cst);
+		return __hybrid_atomic_xorfetch(&__m_val, __val, __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER bool
@@ -379,82 +378,82 @@ public:
 	}
 
 	__CXX_CLASSMEMBER void
-	store(__T __val, memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	store(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
 		__hybrid_atomic_store(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER void
-	store(__T __val, memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	store(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		__hybrid_atomic_store(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	load(memory_order __order __DFL(memory_order_seq_cst)) const __CXX_NOEXCEPT {
+	load(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) const __CXX_NOEXCEPT {
 		return __hybrid_atomic_load(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	load(memory_order __order __DFL(memory_order_seq_cst)) const volatile __CXX_NOEXCEPT {
+	load(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) const volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_load(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	exchange(__T __val, memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	exchange(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_xch(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	exchange(__T __val, memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	exchange(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_xch(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_add(__T __val, memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	fetch_add(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchadd(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_add(__T __val, memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	fetch_add(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchadd(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_sub(__T __val, memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	fetch_sub(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchsub(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_sub(__T __val, memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	fetch_sub(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchsub(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_and(__T __val, memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	fetch_and(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchand(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_and(__T __val, memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	fetch_and(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchand(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_or(__T __val, memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	fetch_or(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchor(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_or(__T __val, memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	fetch_or(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchor(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_xor(__T __val, memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	fetch_xor(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchxor(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_xor(__T __val, memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	fetch_xor(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchxor(&__m_val, __val, __order);
 	}
 
@@ -462,69 +461,68 @@ public:
 
 #ifdef __USE_KOS
 	__CXX_CLASSMEMBER __T
-	fetch_inc(memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	fetch_inc(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchinc(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_inc(memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	fetch_inc(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchinc(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	inc_fetch(memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	inc_fetch(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_incfetch(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	inc_fetch(memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	inc_fetch(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_incfetch(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_dec(memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	fetch_dec(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchdec(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_dec(memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	fetch_dec(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchdec(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	dec_fetch(memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	dec_fetch(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_decfetch(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	dec_fetch(memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	dec_fetch(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_decfetch(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_nand(__T __val, memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	fetch_nand(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchnand(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_nand(__T __val, memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	fetch_nand(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchnand(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	nand_fetch(__T __val, memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	nand_fetch(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_nandfetch(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	nand_fetch(__T __val, memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	nand_fetch(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_nandfetch(&__m_val, __val, __order);
 	}
 #endif /* __USE_KOS */
 };
-
 __NAMESPACE_INT_END
-
+__NAMESPACE_STD_BEGIN
 #define ATOMIC_VAR_INIT(x) { x }
 
 template<class __T> struct atomic {
@@ -645,77 +643,77 @@ public:
 	__CXX_CLASSMEMBER __pointer_type
 	operator++(int) __CXX_NOEXCEPT {
 		return (__pointer_type)(sizeof(__T) == 1
-		                        ? __hybrid_atomic_fetchinc(&__m_val, memory_order_seq_cst)
-		                        : __hybrid_atomic_fetchadd(&__m_val, sizeof(__T), memory_order_seq_cst));
+		                        ? __hybrid_atomic_fetchinc(&__m_val, __ATOMIC_SEQ_CST)
+		                        : __hybrid_atomic_fetchadd(&__m_val, sizeof(__T), __ATOMIC_SEQ_CST));
 	}
 
 	__CXX_CLASSMEMBER __pointer_type
 	operator++(int) volatile __CXX_NOEXCEPT {
 		return (__pointer_type)(sizeof(__T) == 1
-		                        ? __hybrid_atomic_fetchinc(&__m_val, memory_order_seq_cst)
-		                        : __hybrid_atomic_fetchadd(&__m_val, sizeof(__T), memory_order_seq_cst));
+		                        ? __hybrid_atomic_fetchinc(&__m_val, __ATOMIC_SEQ_CST)
+		                        : __hybrid_atomic_fetchadd(&__m_val, sizeof(__T), __ATOMIC_SEQ_CST));
 	}
 
 	__CXX_CLASSMEMBER __pointer_type
 	operator--(int) __CXX_NOEXCEPT {
 		return (__pointer_type)(sizeof(__T) == 1
-		                        ? __hybrid_atomic_fetchdec(&__m_val, memory_order_seq_cst)
-		                        : __hybrid_atomic_fetchsub(&__m_val, sizeof(__T), memory_order_seq_cst));
+		                        ? __hybrid_atomic_fetchdec(&__m_val, __ATOMIC_SEQ_CST)
+		                        : __hybrid_atomic_fetchsub(&__m_val, sizeof(__T), __ATOMIC_SEQ_CST));
 	}
 
 	__CXX_CLASSMEMBER __pointer_type
 	operator--(int) volatile __CXX_NOEXCEPT {
 		return (__pointer_type)(sizeof(__T) == 1
-		                        ? __hybrid_atomic_fetchdec(&__m_val, memory_order_seq_cst)
-		                        : __hybrid_atomic_fetchsub(&__m_val, sizeof(__T), memory_order_seq_cst));
+		                        ? __hybrid_atomic_fetchdec(&__m_val, __ATOMIC_SEQ_CST)
+		                        : __hybrid_atomic_fetchsub(&__m_val, sizeof(__T), __ATOMIC_SEQ_CST));
 	}
 
 	__CXX_CLASSMEMBER __pointer_type
 	operator++() __CXX_NOEXCEPT {
 		return (__pointer_type)(sizeof(__T) == 1
-		                        ? __hybrid_atomic_incfetch(&__m_val, memory_order_seq_cst)
-		                        : __hybrid_atomic_addfetch(&__m_val, sizeof(__T), memory_order_seq_cst));
+		                        ? __hybrid_atomic_incfetch(&__m_val, __ATOMIC_SEQ_CST)
+		                        : __hybrid_atomic_addfetch(&__m_val, sizeof(__T), __ATOMIC_SEQ_CST));
 	}
 
 	__CXX_CLASSMEMBER __pointer_type
 	operator++() volatile __CXX_NOEXCEPT {
 		return (__pointer_type)(sizeof(__T) == 1
-		                        ? __hybrid_atomic_incfetch(&__m_val, memory_order_seq_cst)
-		                        : __hybrid_atomic_addfetch(&__m_val, sizeof(__T), memory_order_seq_cst));
+		                        ? __hybrid_atomic_incfetch(&__m_val, __ATOMIC_SEQ_CST)
+		                        : __hybrid_atomic_addfetch(&__m_val, sizeof(__T), __ATOMIC_SEQ_CST));
 	}
 
 	__CXX_CLASSMEMBER __pointer_type
 	operator--() __CXX_NOEXCEPT {
 		return (__pointer_type)(sizeof(__T) == 1
-		                        ? __hybrid_atomic_decfetch(&__m_val, memory_order_seq_cst)
-		                        : __hybrid_atomic_subfetch(&__m_val, sizeof(__T), memory_order_seq_cst));
+		                        ? __hybrid_atomic_decfetch(&__m_val, __ATOMIC_SEQ_CST)
+		                        : __hybrid_atomic_subfetch(&__m_val, sizeof(__T), __ATOMIC_SEQ_CST));
 	}
 
 	__CXX_CLASSMEMBER __pointer_type
 	operator--() volatile __CXX_NOEXCEPT {
 		return (__pointer_type)(sizeof(__T) == 1
-		                        ? __hybrid_atomic_decfetch(&__m_val, memory_order_seq_cst)
-		                        : __hybrid_atomic_subfetch(&__m_val, sizeof(__T), memory_order_seq_cst));
+		                        ? __hybrid_atomic_decfetch(&__m_val, __ATOMIC_SEQ_CST)
+		                        : __hybrid_atomic_subfetch(&__m_val, sizeof(__T), __ATOMIC_SEQ_CST));
 	}
 
 	__CXX_CLASSMEMBER __pointer_type
 	operator+=(__PTRDIFF_TYPE__ __val) __CXX_NOEXCEPT {
-		return (__pointer_type)__hybrid_atomic_addfetch(&__m_val, __val * sizeof(__T), memory_order_seq_cst);
+		return (__pointer_type)__hybrid_atomic_addfetch(&__m_val, __val * sizeof(__T), __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __pointer_type
 	operator+=(__PTRDIFF_TYPE__ __val) volatile __CXX_NOEXCEPT {
-		return (__pointer_type)__hybrid_atomic_addfetch(&__m_val, __val * sizeof(__T), memory_order_seq_cst);
+		return (__pointer_type)__hybrid_atomic_addfetch(&__m_val, __val * sizeof(__T), __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __pointer_type
 	operator-=(__PTRDIFF_TYPE__ __val) __CXX_NOEXCEPT {
-		return (__pointer_type)__hybrid_atomic_subfetch(&__m_val, __val * sizeof(__T), memory_order_seq_cst);
+		return (__pointer_type)__hybrid_atomic_subfetch(&__m_val, __val * sizeof(__T), __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __pointer_type
 	operator-=(__PTRDIFF_TYPE__ __val) volatile __CXX_NOEXCEPT {
-		return (__pointer_type)__hybrid_atomic_subfetch(&__m_val, __val * sizeof(__T), memory_order_seq_cst);
+		return (__pointer_type)__hybrid_atomic_subfetch(&__m_val, __val * sizeof(__T), __ATOMIC_SEQ_CST);
 	}
 
 	__CXX_CLASSMEMBER __pointer_type
@@ -811,9 +809,9 @@ public:
 #undef __PRIVATE_CXX_DEFINE_COMPARE_EXCHANGE
 
 #define __PRIVATE_CXX_ATOMIC_SPECIALIZE_INTEGRAL(T)                                      \
-	template<> struct atomic<T>: public __intern::__atomic_int<T> {                      \
-		typedef T                         __integral_type;                               \
-		typedef __intern::__atomic_int<T> __base_type;                                   \
+	template<> struct atomic<T>: public __NAMESPACE_INT_SYM __atomic_int<T> {            \
+		typedef T __integral_type;                                                       \
+		typedef __NAMESPACE_INT_SYM __atomic_int<T> __base_type;                         \
 	public:                                                                              \
 		__CXX_DEFAULT_CTOR_NOEXCEPT(atomic);                                             \
 		__CXX_DEFAULT_DTOR_NOEXCEPT(atomic);                                             \
@@ -822,7 +820,7 @@ public:
 		__CXX_DELETE_VOLATILE_COPY_ASSIGN(atomic);                                       \
 	public:                                                                              \
 		__CXX_CLASSMEMBER __CXX11_CONSTEXPR atomic(__integral_type __val) __CXX_NOEXCEPT \
-		    : __base_type(__val) { }                                                     \
+			: __base_type(__val) { }                                                     \
 		using __base_type::operator __integral_type;                                     \
 		using __base_type::operator=;                                                    \
 	};
@@ -921,506 +919,479 @@ public:
 	__CXX_DELETE_VOLATILE_COPY_ASSIGN(atomic_flag);
 
 public:
-	__CXX_CLASSMEMBER __CXX11_CONSTEXPR atomic_flag(bool __val) __CXX_NOEXCEPT
-	    : __m_val((__BYTE_TYPE__)__val) { }
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __CXX11_CONSTEXPR atomic_flag(bool __val) __CXX_NOEXCEPT
+		: __m_val((__BYTE_TYPE__)__val) { }
 
-	__CXX_CLASSMEMBER bool
-	test_and_set(memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL bool
+	(test_and_set)(memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return !!__hybrid_atomic_xch(&__m_val, 1, __order);
 	}
 
-	__CXX_CLASSMEMBER bool
-	test_and_set(memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL bool
+	(test_and_set)(memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return !!__hybrid_atomic_xch(&__m_val, 1, __order);
 	}
 
-	__CXX_CLASSMEMBER void
-	clear(memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL void
+	(clear)(memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
 		__hybrid_atomic_store(&__m_val, 0, __order);
 	}
 
-	__CXX_CLASSMEMBER void
-	clear(memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL void
+	(clear)(memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		__hybrid_atomic_store(&__m_val, 0, __order);
 	}
 };
 
 
-__CXX_CLASSMEMBER void
-atomic_thread_fence(int __order) {
+__CXX_CLASSMEMBER __ATTR_ARTIFICIAL void
+(atomic_thread_fence)(int __order) {
 	__hybrid_atomic_thread_fence(__order);
 }
 
-__CXX_CLASSMEMBER void
-atomic_signal_fence(int __order) {
+__CXX_CLASSMEMBER __ATTR_ARTIFICIAL void
+(atomic_signal_fence)(int __order) {
 	__hybrid_atomic_signal_fence(__order);
 }
 
-__CXX_CLASSMEMBER bool
-atomic_flag_test_and_set_explicit(atomic_flag *__ato,
-                                  memory_order __order) __CXX_NOEXCEPT {
+__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_flag_test_and_set_explicit)(atomic_flag *__ato,
+                                    memory_order __order) __CXX_NOEXCEPT {
 	return __ato->test_and_set(__order);
 }
 
-__CXX_CLASSMEMBER bool
-atomic_flag_test_and_set_explicit(atomic_flag volatile *__ato,
-                                  memory_order __order) __CXX_NOEXCEPT {
+__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_flag_test_and_set_explicit)(atomic_flag volatile *__ato,
+                                    memory_order __order) __CXX_NOEXCEPT {
 	return __ato->test_and_set(__order);
 }
 
-__CXX_CLASSMEMBER void
-atomic_flag_clear_explicit(atomic_flag *__ato,
-                           memory_order __order) __CXX_NOEXCEPT {
+__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void
+(atomic_flag_clear_explicit)(atomic_flag *__ato,
+                             memory_order __order) __CXX_NOEXCEPT {
 	__ato->clear(__order);
 }
 
-__CXX_CLASSMEMBER void
-atomic_flag_clear_explicit(atomic_flag volatile *__ato,
-                           memory_order __order) __CXX_NOEXCEPT {
+__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void
+(atomic_flag_clear_explicit)(atomic_flag volatile *__ato,
+                             memory_order __order) __CXX_NOEXCEPT {
 	__ato->clear(__order);
 }
 
-__CXX_CLASSMEMBER bool
-atomic_flag_test_and_set(atomic_flag *__ato) __CXX_NOEXCEPT {
-	return atomic_flag_test_and_set_explicit(__ato, memory_order_seq_cst);
+__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_flag_test_and_set)(atomic_flag *__ato) __CXX_NOEXCEPT {
+	return __ato->test_and_set();
 }
 
-__CXX_CLASSMEMBER bool
-atomic_flag_test_and_set(atomic_flag volatile *__ato) __CXX_NOEXCEPT {
-	return atomic_flag_test_and_set_explicit(__ato, memory_order_seq_cst);
+__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_flag_test_and_set)(atomic_flag volatile *__ato) __CXX_NOEXCEPT {
+	return __ato->test_and_set();
 }
 
-__CXX_CLASSMEMBER void
-atomic_flag_clear(atomic_flag *__ato) __CXX_NOEXCEPT {
-	atomic_flag_clear_explicit(__ato, memory_order_seq_cst);
+__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void
+(atomic_flag_clear)(atomic_flag *__ato) __CXX_NOEXCEPT {
+	__ato->clear();
 }
 
-__CXX_CLASSMEMBER void
-atomic_flag_clear(atomic_flag volatile *__ato) __CXX_NOEXCEPT {
-	atomic_flag_clear_explicit(__ato, memory_order_seq_cst);
+__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void
+(atomic_flag_clear)(atomic_flag volatile *__ato) __CXX_NOEXCEPT {
+	__ato->clear();
 }
 
-template<class __T> __CXX_CLASSMEMBER bool
-atomic_is_lock_free(atomic<__T> const *__ato) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_is_lock_free)(atomic<__T> const *__ato) __CXX_NOEXCEPT {
 	return __ato->is_lock_free();
 }
 
-template<class __T> __CXX_CLASSMEMBER bool
-atomic_is_lock_free(atomic<__T> const volatile *__ato) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_is_lock_free)(atomic<__T> const volatile *__ato) __CXX_NOEXCEPT {
 	return __ato->is_lock_free();
 }
 
-template<class __T> __CXX_CLASSMEMBER void
-atomic_init(atomic<__T> *__ato, __T __val) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void
+(atomic_init)(atomic<__T> *__ato, __T __val) __CXX_NOEXCEPT {
 	__ato->store(__val, memory_order_relaxed);
 }
 
-template<class __T> __CXX_CLASSMEMBER void
-atomic_init(atomic<__T> volatile *__ato, __T __val) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void
+(atomic_init)(atomic<__T> volatile *__ato, __T __val) __CXX_NOEXCEPT {
 	__ato->store(__val, memory_order_relaxed);
 }
 
-template<class __T> __CXX_CLASSMEMBER void
-atomic_store_explicit(atomic<__T> *__ato, __T __val,
-                      memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void
+(atomic_store_explicit)(atomic<__T> *__ato, __T __val,
+                        memory_order __order) __CXX_NOEXCEPT {
 	__ato->store(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER void
-atomic_store_explicit(atomic<__T> volatile *__ato, __T __val,
-                      memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void
+(atomic_store_explicit)(atomic<__T> volatile *__ato, __T __val,
+                        memory_order __order) __CXX_NOEXCEPT {
 	__ato->store(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_load_explicit(atomic<__T> const *__ato,
-                     memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_load_explicit)(atomic<__T> const *__ato,
+                       memory_order __order) __CXX_NOEXCEPT {
 	return __ato->load(__order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_load_explicit(atomic<__T> const volatile *__ato,
-                     memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_load_explicit)(atomic<__T> const volatile *__ato,
+                       memory_order __order) __CXX_NOEXCEPT {
 	return __ato->load(__order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_exchange_explicit(atomic<__T> *__ato, __T __val,
-                         memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_exchange_explicit)(atomic<__T> *__ato, __T __val,
+                           memory_order __order) __CXX_NOEXCEPT {
 	return __ato->exchange(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_exchange_explicit(atomic<__T> volatile *__ato, __T __val,
-                         memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_exchange_explicit)(atomic<__T> volatile *__ato, __T __val,
+                           memory_order __order) __CXX_NOEXCEPT {
 	return __ato->exchange(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER bool
-atomic_compare_exchange_weak_explicit(atomic<__T> *__ato, __T *__exp, __T __replace,
-                                      memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_compare_exchange_weak_explicit)(atomic<__T> *__ato, __T *__exp, __T __replace,
+                                        memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
 	return __ato->compare_exchange_weak(*__exp, __replace, __succ, __fail);
 }
 
-template<class __T> __CXX_CLASSMEMBER bool
-atomic_compare_exchange_weak_explicit(atomic<__T> volatile *__ato, __T *__exp, __T __replace,
-                                      memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_compare_exchange_weak_explicit)(atomic<__T> volatile *__ato, __T *__exp, __T __replace,
+                                        memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
 	return __ato->compare_exchange_weak(*__exp, __replace, __succ, __fail);
 }
 
-template<class __T> __CXX_CLASSMEMBER bool
-atomic_compare_exchange_strong_explicit(atomic<__T> *__ato, __T *__exp, __T __replace,
-                                        memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_compare_exchange_strong_explicit)(atomic<__T> *__ato, __T *__exp, __T __replace,
+                                          memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
 	return __ato->compare_exchange_strong(*__exp, __replace, __succ, __fail);
 }
 
-template<class __T> __CXX_CLASSMEMBER bool
-atomic_compare_exchange_strong_explicit(atomic<__T> volatile *__ato, __T *__exp, __T __replace,
-                                        memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_compare_exchange_strong_explicit)(atomic<__T> volatile *__ato, __T *__exp, __T __replace,
+                                          memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
 	return __ato->compare_exchange_strong(*__exp, __replace, __succ, __fail);
 }
 
-template<class __T> __CXX_CLASSMEMBER void
-atomic_store(atomic<__T> *__ato, __T __val) __CXX_NOEXCEPT {
-	atomic_store_explicit(__ato, __val, memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void
+(atomic_store)(atomic<__T> *__ato, __T __val) __CXX_NOEXCEPT {
+	atomic_store_explicit(__ato, __val, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER void
-atomic_store(atomic<__T> volatile *__ato, __T __val) __CXX_NOEXCEPT {
-	atomic_store_explicit(__ato, __val, memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void
+(atomic_store)(atomic<__T> volatile *__ato, __T __val) __CXX_NOEXCEPT {
+	atomic_store_explicit(__ato, __val, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_load(atomic<__T> const *__ato) __CXX_NOEXCEPT {
-	return atomic_load_explicit(__ato, memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_load)(atomic<__T> const *__ato) __CXX_NOEXCEPT {
+	return atomic_load_explicit(__ato, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_load(atomic<__T> const volatile *__ato) __CXX_NOEXCEPT {
-	return atomic_load_explicit(__ato, memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_load)(atomic<__T> const volatile *__ato) __CXX_NOEXCEPT {
+	return atomic_load_explicit(__ato, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_exchange(atomic<__T> *__ato, __T __val) __CXX_NOEXCEPT {
-	return atomic_exchange_explicit(__ato, __val, memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_exchange)(atomic<__T> *__ato, __T __val) __CXX_NOEXCEPT {
+	return atomic_exchange_explicit(__ato, __val, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_exchange(atomic<__T> volatile *__ato, __T __val) __CXX_NOEXCEPT {
-	return atomic_exchange_explicit(__ato, __val, memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_exchange)(atomic<__T> volatile *__ato, __T __val) __CXX_NOEXCEPT {
+	return atomic_exchange_explicit(__ato, __val, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER bool
-atomic_compare_exchange_weak(atomic<__T> *__ato, __T *__exp, __T __replace) __CXX_NOEXCEPT {
-	return atomic_compare_exchange_weak_explicit(__ato, __exp, __replace,
-	                                             memory_order_seq_cst,
-	                                             memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_compare_exchange_weak)(atomic<__T> *__ato, __T *__exp, __T __replace) __CXX_NOEXCEPT {
+	return atomic_compare_exchange_weak_explicit(__ato, __exp, __replace, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER bool
-atomic_compare_exchange_weak(atomic<__T> volatile *__ato, __T *__exp, __T __replace) __CXX_NOEXCEPT {
-	return atomic_compare_exchange_weak_explicit(__ato, __exp, __replace,
-	                                             memory_order_seq_cst,
-	                                             memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_compare_exchange_weak)(atomic<__T> volatile *__ato, __T *__exp, __T __replace) __CXX_NOEXCEPT {
+	return atomic_compare_exchange_weak_explicit(__ato, __exp, __replace, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER bool
-atomic_compare_exchange_strong(atomic<__T> *__ato, __T *__exp, __T __replace) __CXX_NOEXCEPT {
-	return atomic_compare_exchange_strong_explicit(__ato, __exp, __replace,
-	                                               memory_order_seq_cst,
-	                                               memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_compare_exchange_strong)(atomic<__T> *__ato, __T *__exp, __T __replace) __CXX_NOEXCEPT {
+	return atomic_compare_exchange_strong_explicit(__ato, __exp, __replace, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER bool
-atomic_compare_exchange_strong(atomic<__T> volatile *__ato, __T *__exp, __T __replace) __CXX_NOEXCEPT {
-	return atomic_compare_exchange_strong_explicit(__ato, __exp, __replace,
-	                                               memory_order_seq_cst,
-	                                               memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_compare_exchange_strong)(atomic<__T> volatile *__ato, __T *__exp, __T __replace) __CXX_NOEXCEPT {
+	return atomic_compare_exchange_strong_explicit(__ato, __exp, __replace, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_add_explicit(atomic<__T> *__ato, __T __val, memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_add_explicit)(atomic<__T> *__ato, __T __val, memory_order __order) __CXX_NOEXCEPT {
 	return __ato->fetch_add(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_add_explicit(atomic<__T> volatile *__ato, __T __val,
-                          memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_add_explicit)(atomic<__T> volatile *__ato, __T __val,
+                            memory_order __order) __CXX_NOEXCEPT {
 	return __ato->fetch_add(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_sub_explicit(atomic<__T> *__ato, __T __val,
-                          memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_sub_explicit)(atomic<__T> *__ato, __T __val,
+                            memory_order __order) __CXX_NOEXCEPT {
 	return __ato->fetch_sub(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_sub_explicit(atomic<__T> volatile *__ato, __T __val,
-                          memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_sub_explicit)(atomic<__T> volatile *__ato, __T __val,
+                            memory_order __order) __CXX_NOEXCEPT {
 	return __ato->fetch_sub(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_and_explicit(atomic<__T> *__ato, __T __val,
-                          memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_and_explicit)(atomic<__T> *__ato, __T __val,
+                            memory_order __order) __CXX_NOEXCEPT {
 	return __ato->fetch_and(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_and_explicit(atomic<__T> volatile *__ato, __T __val,
-                          memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_and_explicit)(atomic<__T> volatile *__ato, __T __val,
+                            memory_order __order) __CXX_NOEXCEPT {
 	return __ato->fetch_and(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_or_explicit(atomic<__T> *__ato, __T __val,
-                         memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_or_explicit)(atomic<__T> *__ato, __T __val,
+                           memory_order __order) __CXX_NOEXCEPT {
 	return __ato->fetch_or(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_or_explicit(atomic<__T> volatile *__ato, __T __val,
-                         memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_or_explicit)(atomic<__T> volatile *__ato, __T __val,
+                           memory_order __order) __CXX_NOEXCEPT {
 	return __ato->fetch_or(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_xor_explicit(atomic<__T> *__ato, __T __val,
-                          memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_xor_explicit)(atomic<__T> *__ato, __T __val,
+                            memory_order __order) __CXX_NOEXCEPT {
 	return __ato->fetch_xor(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_xor_explicit(atomic<__T> volatile *__ato, __T __val,
-                          memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_xor_explicit)(atomic<__T> volatile *__ato, __T __val,
+                            memory_order __order) __CXX_NOEXCEPT {
 	return __ato->fetch_xor(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_add(atomic<__T> *__ato, __T __val) __CXX_NOEXCEPT {
-	return atomic_fetch_add_explicit(__ato, __val, memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_add)(atomic<__T> *__ato, __T __val) __CXX_NOEXCEPT {
+	return atomic_fetch_add_explicit(__ato, __val, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_add(atomic<__T> volatile *__ato, __T __val) __CXX_NOEXCEPT {
-	return atomic_fetch_add_explicit(__ato, __val, memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_add)(atomic<__T> volatile *__ato, __T __val) __CXX_NOEXCEPT {
+	return atomic_fetch_add_explicit(__ato, __val, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_sub(atomic<__T> *__ato, __T __val) __CXX_NOEXCEPT {
-	return atomic_fetch_sub_explicit(__ato, __val, memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_sub)(atomic<__T> *__ato, __T __val) __CXX_NOEXCEPT {
+	return atomic_fetch_sub_explicit(__ato, __val, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_sub(atomic<__T> volatile *__ato, __T __val) __CXX_NOEXCEPT {
-	return atomic_fetch_sub_explicit(__ato, __val, memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_sub)(atomic<__T> volatile *__ato, __T __val) __CXX_NOEXCEPT {
+	return atomic_fetch_sub_explicit(__ato, __val, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_and(atomic<__T> *__ato, __T __val) __CXX_NOEXCEPT {
-	return atomic_fetch_and_explicit(__ato, __val, memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_and)(atomic<__T> *__ato, __T __val) __CXX_NOEXCEPT {
+	return atomic_fetch_and_explicit(__ato, __val, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_and(atomic<__T> volatile *__ato, __T __val) __CXX_NOEXCEPT {
-	return atomic_fetch_and_explicit(__ato, __val, memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_and)(atomic<__T> volatile *__ato, __T __val) __CXX_NOEXCEPT {
+	return atomic_fetch_and_explicit(__ato, __val, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_or(atomic<__T> *__ato, __T __val) __CXX_NOEXCEPT {
-	return atomic_fetch_or_explicit(__ato, __val, memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_or)(atomic<__T> *__ato, __T __val) __CXX_NOEXCEPT {
+	return atomic_fetch_or_explicit(__ato, __val, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_or(atomic<__T> volatile *__ato, __T __val) __CXX_NOEXCEPT {
-	return atomic_fetch_or_explicit(__ato, __val, memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_or)(atomic<__T> volatile *__ato, __T __val) __CXX_NOEXCEPT {
+	return atomic_fetch_or_explicit(__ato, __val, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_xor(atomic<__T> *__ato, __T __val) __CXX_NOEXCEPT {
-	return atomic_fetch_xor_explicit(__ato, __val, memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_xor)(atomic<__T> *__ato, __T __val) __CXX_NOEXCEPT {
+	return atomic_fetch_xor_explicit(__ato, __val, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_xor(atomic<__T> volatile *__ato, __T __val) __CXX_NOEXCEPT {
-	return atomic_fetch_xor_explicit(__ato, __val, memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_xor)(atomic<__T> volatile *__ato, __T __val) __CXX_NOEXCEPT {
+	return atomic_fetch_xor_explicit(__ato, __val, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T *
-atomic_fetch_add_explicit(atomic<__T *> *__ato, __PTRDIFF_TYPE__ __val,
-                          memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T *
+(atomic_fetch_add_explicit)(atomic<__T *> *__ato, __PTRDIFF_TYPE__ __val,
+                            memory_order __order) __CXX_NOEXCEPT {
 	return __ato->fetch_add(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T *
-atomic_fetch_add_explicit(atomic<__T *> volatile *__ato, __PTRDIFF_TYPE__ __val,
-                          memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T *
+(atomic_fetch_add_explicit)(atomic<__T *> volatile *__ato, __PTRDIFF_TYPE__ __val,
+                            memory_order __order) __CXX_NOEXCEPT {
 	return __ato->fetch_add(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T *
-atomic_fetch_add(atomic<__T *> volatile *__ato, __PTRDIFF_TYPE__ __val) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T *
+(atomic_fetch_add)(atomic<__T *> volatile *__ato, __PTRDIFF_TYPE__ __val) __CXX_NOEXCEPT {
 	return __ato->fetch_add(__val);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T *
-atomic_fetch_add(atomic<__T *> *__ato, __PTRDIFF_TYPE__ __val) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T *
+(atomic_fetch_add)(atomic<__T *> *__ato, __PTRDIFF_TYPE__ __val) __CXX_NOEXCEPT {
 	return __ato->fetch_add(__val);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T *
-atomic_fetch_sub_explicit(atomic<__T *> volatile *__ato, __PTRDIFF_TYPE__ __val,
-                          memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T *
+(atomic_fetch_sub_explicit)(atomic<__T *> volatile *__ato, __PTRDIFF_TYPE__ __val,
+                            memory_order __order) __CXX_NOEXCEPT {
 	return __ato->fetch_sub(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T *
-atomic_fetch_sub_explicit(atomic<__T *> *__ato, __PTRDIFF_TYPE__ __val,
-                          memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T *
+(atomic_fetch_sub_explicit)(atomic<__T *> *__ato, __PTRDIFF_TYPE__ __val,
+                            memory_order __order) __CXX_NOEXCEPT {
 	return __ato->fetch_sub(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T *
-atomic_fetch_sub(atomic<__T *> volatile *__ato, __PTRDIFF_TYPE__ __val) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T *
+(atomic_fetch_sub)(atomic<__T *> volatile *__ato, __PTRDIFF_TYPE__ __val) __CXX_NOEXCEPT {
 	return __ato->fetch_sub(__val);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T *
-atomic_fetch_sub(atomic<__T *> *__ato, __PTRDIFF_TYPE__ __val) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T *
+(atomic_fetch_sub)(atomic<__T *> *__ato, __PTRDIFF_TYPE__ __val) __CXX_NOEXCEPT {
 	return __ato->fetch_sub(__val);
 }
 
 #ifdef __USE_KOS
-template<class __T> __CXX_CLASSMEMBER bool
-atomic_cmpxch_explicit(atomic<__T> *__ato, __T __oldv, __T __newv,
-                       memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_cmpxch_explicit)(atomic<__T> *__ato, __T __oldv, __T __newv,
+                         memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
 	return __ato->cmpxch(__oldv, __newv, __succ, __fail);
 }
 
-template<class __T> __CXX_CLASSMEMBER bool
-atomic_cmpxch_explicit(atomic<__T> volatile *__ato, __T __oldv, __T __newv,
-                       memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_cmpxch_explicit)(atomic<__T> volatile *__ato, __T __oldv, __T __newv,
+                         memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
 	return __ato->cmpxch(__oldv, __newv, __succ, __fail);
 }
 
-template<class __T> __CXX_CLASSMEMBER bool
-atomic_cmpxch(atomic<__T> *__ato, __T __oldv, __T __newv) __CXX_NOEXCEPT {
-	return __ato->cmpxch(__oldv, __newv,
-	                     memory_order_seq_cst,
-	                     memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_cmpxch)(atomic<__T> *__ato, __T __oldv, __T __newv) __CXX_NOEXCEPT {
+	return __ato->cmpxch(__oldv, __newv, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER bool
-atomic_cmpxch(atomic<__T> volatile *__ato, __T __oldv, __T __newv) __CXX_NOEXCEPT {
-	return __ato->cmpxch(__oldv, __newv,
-	                     memory_order_seq_cst,
-	                     memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_cmpxch)(atomic<__T> volatile *__ato, __T __oldv, __T __newv) __CXX_NOEXCEPT {
+	return __ato->cmpxch(__oldv, __newv, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_cmpxch_val_explicit(atomic<__T> *__ato, __T __oldv, __T __newv,
-                           memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_cmpxch_val_explicit)(atomic<__T> *__ato, __T __oldv, __T __newv,
+                             memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
 	return __ato->cmpxch_val(__oldv, __newv, __succ, __fail);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_cmpxch_val_explicit(atomic<__T> volatile *__ato, __T __oldv, __T __newv,
-                           memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_cmpxch_val_explicit)(atomic<__T> volatile *__ato, __T __oldv, __T __newv,
+                             memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
 	return __ato->cmpxch_val(__oldv, __newv, __succ, __fail);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_cmpxch_val(atomic<__T> *__ato, __T __oldv, __T __newv) __CXX_NOEXCEPT {
-	return __ato->cmpxch_val(__oldv, __newv,
-	                         memory_order_seq_cst,
-	                         memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_cmpxch_val)(atomic<__T> *__ato, __T __oldv, __T __newv) __CXX_NOEXCEPT {
+	return __ato->cmpxch_val(__oldv, __newv, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_cmpxch_val(atomic<__T> volatile *__ato, __T __oldv, __T __newv) __CXX_NOEXCEPT {
-	return __ato->cmpxch_val(__oldv, __newv,
-	                         memory_order_seq_cst,
-	                         memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_cmpxch_val)(atomic<__T> volatile *__ato, __T __oldv, __T __newv) __CXX_NOEXCEPT {
+	return __ato->cmpxch_val(__oldv, __newv, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER bool
-atomic_cmpxch_weak_explicit(atomic<__T> *__ato, __T __oldv, __T __newv,
-                            memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_cmpxch_weak_explicit)(atomic<__T> *__ato, __T __oldv, __T __newv,
+                              memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
 	return __ato->cmpxch_weak(__oldv, __newv, __succ, __fail);
 }
 
-template<class __T> __CXX_CLASSMEMBER bool
-atomic_cmpxch_weak_explicit(atomic<__T> volatile *__ato, __T __oldv, __T __newv,
-                            memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_cmpxch_weak_explicit)(atomic<__T> volatile *__ato, __T __oldv, __T __newv,
+                              memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
 	return __ato->cmpxch_weak(__oldv, __newv, __succ, __fail);
 }
 
-template<class __T> __CXX_CLASSMEMBER bool
-atomic_cmpxch_weak(atomic<__T> *__ato, __T __oldv, __T __newv) __CXX_NOEXCEPT {
-	return __ato->cmpxch_weak(__oldv, __newv,
-	                          memory_order_seq_cst,
-	                          memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_cmpxch_weak)(atomic<__T> *__ato, __T __oldv, __T __newv) __CXX_NOEXCEPT {
+	return __ato->cmpxch_weak(__oldv, __newv, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER bool
-atomic_cmpxch_weak(atomic<__T> volatile *__ato, __T __oldv, __T __newv) __CXX_NOEXCEPT {
-	return __ato->cmpxch_weak(__oldv, __newv,
-	                          memory_order_seq_cst,
-	                          memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) bool
+(atomic_cmpxch_weak)(atomic<__T> volatile *__ato, __T __oldv, __T __newv) __CXX_NOEXCEPT {
+	return __ato->cmpxch_weak(__oldv, __newv, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_cmpxch_val_weak_explicit(atomic<__T> *__ato, __T __oldv, __T __newv,
-                                memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_cmpxch_val_weak_explicit)(atomic<__T> *__ato, __T __oldv, __T __newv,
+                                  memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
 	return __ato->cmpxch_val_weak(__oldv, __newv, __succ, __fail);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_cmpxch_val_weak_explicit(atomic<__T> volatile *__ato, __T __oldv, __T __newv,
-                                memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_cmpxch_val_weak_explicit)(atomic<__T> volatile *__ato, __T __oldv, __T __newv,
+                                  memory_order __succ, memory_order __fail) __CXX_NOEXCEPT {
 	return __ato->cmpxch_val_weak(__oldv, __newv, __succ, __fail);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_cmpxch_val_weak(atomic<__T> *__ato, __T __oldv, __T __newv) __CXX_NOEXCEPT {
-	return __ato->cmpxch_val_weak(__oldv, __newv,
-	                              memory_order_seq_cst,
-	                              memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_cmpxch_val_weak)(atomic<__T> *__ato, __T __oldv, __T __newv) __CXX_NOEXCEPT {
+	return __ato->cmpxch_val_weak(__oldv, __newv, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_cmpxch_val_weak(atomic<__T> volatile *__ato, __T __oldv, __T __newv) __CXX_NOEXCEPT {
-	return __ato->cmpxch_val_weak(__oldv, __newv,
-	                              memory_order_seq_cst,
-	                              memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_cmpxch_val_weak)(atomic<__T> volatile *__ato, __T __oldv, __T __newv) __CXX_NOEXCEPT {
+	return __ato->cmpxch_val_weak(__oldv, __newv, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_nand_explicit(atomic<__T> *__ato, __T __val,
-                           memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_nand_explicit)(atomic<__T> *__ato, __T __val,
+                             memory_order __order) __CXX_NOEXCEPT {
 	return __ato->fetch_nand(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_nand_explicit(atomic<__T> volatile *__ato, __T __val,
-                           memory_order __order) __CXX_NOEXCEPT {
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_nand_explicit)(atomic<__T> volatile *__ato, __T __val,
+                             memory_order __order) __CXX_NOEXCEPT {
 	return __ato->fetch_nand(__val, __order);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_nand(atomic<__T> *__ato, __T __val) __CXX_NOEXCEPT {
-	return atomic_fetch_nand_explicit(__ato, __val,
-	                                  memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_nand)(atomic<__T> *__ato, __T __val) __CXX_NOEXCEPT {
+	return atomic_fetch_nand_explicit(__ato, __val, __ATOMIC_SEQ_CST);
 }
 
-template<class __T> __CXX_CLASSMEMBER __T
-atomic_fetch_nand(atomic<__T> volatile *__ato, __T __val) __CXX_NOEXCEPT {
-	return atomic_fetch_nand_explicit(__ato, __val,
-	                                  memory_order_seq_cst);
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __T
+(atomic_fetch_nand)(atomic<__T> volatile *__ato, __T __val) __CXX_NOEXCEPT {
+	return atomic_fetch_nand_explicit(__ato, __val, __ATOMIC_SEQ_CST);
 }
 #endif /* __USE_KOS */
-
 
 __NAMESPACE_STD_END
 __CXXDECL_END

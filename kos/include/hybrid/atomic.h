@@ -26,6 +26,10 @@
 
 #ifdef __CC__
 
+/* TODO: Once nothing uses these macros anymore:
+ * - Rename `OATOMIC_*' to `ATOMIC_*_EXPLICIT'
+ * - Change all macros to take pointers instead of l-values
+ */
 #define OATOMIC_LOAD(var, order)                             __hybrid_atomic_load(&(var), order)
 #define OATOMIC_STORE(var, value, order)                     __hybrid_atomic_store(&(var), value, order)
 #define OATOMIC_XCH(var, value, order)                       __hybrid_atomic_xch(&(var), value, order)

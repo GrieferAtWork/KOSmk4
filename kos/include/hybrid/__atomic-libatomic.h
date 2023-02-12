@@ -23,6 +23,10 @@
 #include "../__stdinc.h"
 #include "typecore.h"
 
+/* Without knowing how they're implemented, the best we can  do
+ * is indicate that atomic functions are *sometimes* lock-free. */
+#define __HYBRID_ATOMIC_LOCKFREE(x) 1
+
 #ifdef __CC__
 __SYSDECL_BEGIN
 

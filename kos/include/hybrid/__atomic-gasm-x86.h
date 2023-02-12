@@ -34,6 +34,11 @@
 #error "GCC Inline assembly is not supported"
 #endif /* !__COMPILER_HAVE_GCC_ASM */
 
+#define __HYBRID_ATOMIC_LOCKFREE_MAX 8
+
+#ifdef __CC__
+__DECL_BEGIN
+
 /* clang-format off */
 /*[[[deemon
 import * from deemon;
@@ -1238,5 +1243,8 @@ __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 #endif /* !__x86_64__ */
 /*[[[end]]]*/
 /* clang-format on */
+
+__DECL_END
+#endif /* __CC__ */
 
 #endif /* !__GUARD_HYBRID___ATOMIC_GASM_X86_H */

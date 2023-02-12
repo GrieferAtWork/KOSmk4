@@ -303,6 +303,7 @@ incdir("");
 #include <asm-generic/types.h>
 #include <asm-generic/ucontext.h>
 #include <assert.h>
+#include <atomic.h>
 #include <attr/asm/attributes.h>
 #include <attr/asm/libattr.h>
 #include <attr/attributes.h>
@@ -328,6 +329,7 @@ incdir("");
 #include <bits/crt/db/utmp.h>
 #include <bits/crt/db/utmpx.h>
 #include <bits/crt/div.h>
+#include <bits/crt/dlfcn.h>
 #include <bits/crt/dos/_CrtMemState.h>
 #include <bits/crt/dos/corecrt_startup.h>
 #include <bits/crt/dyn-string.h>
@@ -667,6 +669,8 @@ incdir("");
 #include <hybrid/__asm.h>
 #include <hybrid/__assembly.h>
 #include <hybrid/__assert.h>
+#include <hybrid/__atomic-complete.h>
+#include <hybrid/__atomic-gasm-x86.h>
 #include <hybrid/__atomic.h>
 #include <hybrid/__bit.h>
 #include <hybrid/__bitfield.h>
@@ -1187,6 +1191,7 @@ incdir("");
 #include <linux/swab.h>
 #include <linux/sysinfo.h>
 #include <linux/termios.h>
+#include <linux/timerfd.h>
 #include <linux/types.h>
 #include <linux/unistd.h>
 #include <linux/vt.h>
@@ -1565,6 +1570,7 @@ incdir("");
 #ifndef __KERNEL__
 #undef min
 #undef max
+#if 0 /* FIXME: Currently broken because libstdc++ tries to re-define memory_order */
 #include <__stdcxx.h>
 #include <atomic>
 #include <cassert>
@@ -1600,6 +1606,7 @@ incdir("");
 #include <type_traits>
 #include <typeinfo>
 #include <utility>
+#endif
 #endif /* !__KERNEL__ */
 #endif /* _GNU_SOURCE */
 #endif /* !__CRT_FREESTANDING */
