@@ -658,23 +658,47 @@ struct $tm *normalize_struct_tm([[inout]] struct $tm *__restrict tp) {
 [[requires_include("<asm/os/clock.h>")]]
 [[requires((defined(__CLOCK_PROCESS_CPUTIME_ID) && $has_function(clock_gettime64)) ||
            $has_function(times))]]
-[[impl_include("<bits/os/timespec.h>", "<bits/os/tms.h>")]]
+[[impl_include("<bits/os/timespec.h>", "<bits/os/tms.h>", "<hybrid/__overflow.h>")]]
 clock_t clock() {
 	clock_t result;
 @@pp_if defined(__CLOCK_PROCESS_CPUTIME_ID) && $has_function(clock_gettime64)@@
 	struct timespec64 ts;
 	if unlikely(clock_gettime64(__CLOCK_PROCESS_CPUTIME_ID, &ts))
 		return -1;
-	result  = ts.@tv_sec@ * __CLOCKS_PER_SEC;
-	result += ts.@tv_nsec@ / (1000000000 / __CLOCKS_PER_SEC);
+	__STATIC_IF((clock_t)-1 < 0) {
+		if (__hybrid_overflow_scast(ts.@tv_sec@, &result))
+			goto overflow;
+		if (__hybrid_overflow_smul(result, __CLOCKS_PER_SEC, &result))
+			goto overflow;
+		if (__hybrid_overflow_sadd(result, ts.@tv_nsec@ / (1000000000 / __CLOCKS_PER_SEC), &result))
+			goto overflow;
+	} __STATIC_ELSE((clock_t)-1 < 0) {
+		if (__hybrid_overflow_ucast(ts.@tv_sec@, &result))
+			goto overflow;
+		if (__hybrid_overflow_umul(result, __CLOCKS_PER_SEC, &result))
+			goto overflow;
+		if (__hybrid_overflow_uadd(result, ts.@tv_nsec@ / (1000000000 / __CLOCKS_PER_SEC), &result))
+			goto overflow;
+	}
 @@pp_else@@
 	struct tms ts;
 	if unlikely(times(&ts))
 		return -1;
-	result  = ts.@tms_utime@;
-	result += ts.@tms_stime@;
+	__STATIC_IF((clock_t)-1 < 0) {
+		if (__hybrid_overflow_scast(ts.@tms_utime@, &result))
+			goto overflow;
+		if (__hybrid_overflow_sadd(result, ts.@tms_stime@, &result))
+			goto overflow;
+	} __STATIC_ELSE((clock_t)-1 < 0) {
+		if (__hybrid_overflow_ucast(ts.@tms_utime@, &result))
+			goto overflow;
+		if (__hybrid_overflow_uadd(result, ts.@tms_stime@, &result))
+			goto overflow;
+	}
 @@pp_endif@@
 	return result;
+overflow:
+	return (clock_t)-1;
 }
 
 @@>> time(2), time64(2)

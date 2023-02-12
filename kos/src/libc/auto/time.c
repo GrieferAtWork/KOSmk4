@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a9ffa9b */
+/* HASH CRC-32:0xaf25fd81 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -176,6 +176,7 @@ NOTHROW_NCX(LIBCCALL libc_normalize_struct_tm)(struct tm *__restrict tp) {
 }
 #include <bits/os/timespec.h>
 #include <bits/os/tms.h>
+#include <hybrid/__overflow.h>
 /* >> clock(3)
  * Time used by the program so  far (user time + system  time)
  * The `result / CLOCKS_PER_SECOND' is program time in seconds */
@@ -186,16 +187,40 @@ NOTHROW_NCX(LIBCCALL libc_clock)(void) {
 	struct timespec64 ts;
 	if unlikely(libc_clock_gettime64(__CLOCK_PROCESS_CPUTIME_ID, &ts))
 		return -1;
-	result  = ts.tv_sec * __CLOCKS_PER_SEC;
-	result += ts.tv_nsec / (1000000000 / __CLOCKS_PER_SEC);
+	__STATIC_IF((clock_t)-1 < 0) {
+		if (__hybrid_overflow_scast(ts.tv_sec, &result))
+			goto overflow;
+		if (__hybrid_overflow_smul(result, __CLOCKS_PER_SEC, &result))
+			goto overflow;
+		if (__hybrid_overflow_sadd(result, ts.tv_nsec / (1000000000 / __CLOCKS_PER_SEC), &result))
+			goto overflow;
+	} __STATIC_ELSE((clock_t)-1 < 0) {
+		if (__hybrid_overflow_ucast(ts.tv_sec, &result))
+			goto overflow;
+		if (__hybrid_overflow_umul(result, __CLOCKS_PER_SEC, &result))
+			goto overflow;
+		if (__hybrid_overflow_uadd(result, ts.tv_nsec / (1000000000 / __CLOCKS_PER_SEC), &result))
+			goto overflow;
+	}
 #else /* __CLOCK_PROCESS_CPUTIME_ID */
 	struct tms ts;
 	if unlikely(libc_times(&ts))
 		return -1;
-	result  = ts.tms_utime;
-	result += ts.tms_stime;
+	__STATIC_IF((clock_t)-1 < 0) {
+		if (__hybrid_overflow_scast(ts.tms_utime, &result))
+			goto overflow;
+		if (__hybrid_overflow_sadd(result, ts.tms_stime, &result))
+			goto overflow;
+	} __STATIC_ELSE((clock_t)-1 < 0) {
+		if (__hybrid_overflow_ucast(ts.tms_utime, &result))
+			goto overflow;
+		if (__hybrid_overflow_uadd(result, ts.tms_stime, &result))
+			goto overflow;
+	}
 #endif /* !__CLOCK_PROCESS_CPUTIME_ID */
 	return result;
+overflow:
+	return (clock_t)-1;
 }
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */

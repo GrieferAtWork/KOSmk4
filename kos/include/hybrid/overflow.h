@@ -23,7 +23,13 @@
 #include <__stdinc.h>
 #include "__overflow.h"
 
-/* @return: true:  Overflow  occurred (unlikely; `*res' contains the truncated result)
+/* >> bool OVERFLOW_UADD(S lhs, U rhs, T *res);
+ * >> bool OVERFLOW_SADD(S lhs, U rhs, T *res);
+ * >> bool OVERFLOW_USUB(S lhs, U rhs, T *res);
+ * >> bool OVERFLOW_SSUB(S lhs, U rhs, T *res);
+ * >> bool OVERFLOW_UMUL(S lhs, U rhs, T *res);
+ * >> bool OVERFLOW_SMUL(S lhs, U rhs, T *res);
+ * @return: true:  Overflow  occurred (unlikely; `*res' contains the truncated result)
  *                 Overflow here means that the finite result stored in `*res' doesn't
  *                 match a value that would have been produced when infinite precision
  *                 was available.
@@ -46,5 +52,14 @@
 #define OVERFLOW_SENG     __hybrid_overflow_sneg
 #define OVERFLOW_SENG_P2N __hybrid_overflow_sneg_p2n
 #define OVERFLOW_SENG_N2P __hybrid_overflow_sneg_n2p
+
+
+/* >> bool OVERFLOW_SCAST(V x, T *p_result);
+ * >> bool OVERFLOW_UCAST(V x, T *p_result);
+ * Do the operation `*p_result = (T)x'
+ * @return: true:  Overflow happened
+ * @return: false: Overflow didn't happen */
+#define OVERFLOW_UCAST __hybrid_overflow_ucast
+#define OVERFLOW_SCAST __hybrid_overflow_scast
 
 #endif /* !__GUARD_HYBRID_OVERFLOW_H */

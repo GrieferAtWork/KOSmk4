@@ -37,7 +37,7 @@
 #include "typecore.h"
 /* The C  standard  implies  a minimal  alignment  for  int-types.
  * With this in mind (and so-as not to do something wrong), assume
- * integer alignment an all other cases */
+ * integer alignment in all other cases */
 #define __VA_SIZE __SIZEOF_INT__
 #endif /* !... */
 #endif /* !__VA_SIZE */

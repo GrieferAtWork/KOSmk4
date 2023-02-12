@@ -32,6 +32,7 @@
 #include <sys/mman.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <malloc.h>
@@ -166,7 +167,7 @@ libvideo_buffer_screen(void) {
 	                                 driver, 0);
 	if (result->vb_data == (byte_t *)MAP_FAILED)
 		goto err_r;
-	if (!ATOMIC_CMPXCH(screen_buffer, NULL, result)) { /* TODO: This needs a lock! */
+	if (!atomic_cmpxch(&screen_buffer, NULL, result)) { /* TODO: This needs a lock! */
 		(*result->vb_ops->vi_destroy)(result);
 		result = screen_buffer;
 	}
@@ -235,7 +236,7 @@ INTERN WUNUSED fd_t LIBVIDEO_GFX_CC libvideo_driver(void) {
 	 * be the default video driver. */
 	result = STDIN_FILENO;
 done:
-	if (!ATOMIC_CMPXCH(libvideo_driver_fd, -1, result)) {
+	if (!atomic_cmpxch(&libvideo_driver_fd, -1, result)) {
 		close(result);
 		COMPILER_READ_BARRIER();
 		result = libvideo_driver_fd;

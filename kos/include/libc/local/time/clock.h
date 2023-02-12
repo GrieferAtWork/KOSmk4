@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8900d311 */
+/* HASH CRC-32:0xde7ac8aa */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,6 +75,7 @@ __CREDIRECT(__ATTR_OUT_OPT(1),__clock_t,__NOTHROW_NCX,__localdep_times,(struct t
 __NAMESPACE_LOCAL_END
 #include <bits/os/timespec.h>
 #include <bits/os/tms.h>
+#include <hybrid/__overflow.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(clock) __ATTR_WUNUSED __clock_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock))(void) {
@@ -83,16 +84,40 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock))(void) {
 	struct __timespec64 __ts;
 	if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_clock_gettime64)(__CLOCK_PROCESS_CPUTIME_ID, &__ts))
 		return -1;
-	__result  = __ts.tv_sec * __CLOCKS_PER_SEC;
-	__result += __ts.tv_nsec / (1000000000 / __CLOCKS_PER_SEC);
+	__STATIC_IF((__clock_t)-1 < 0) {
+		if (__hybrid_overflow_scast(__ts.tv_sec, &__result))
+			goto __overflow;
+		if (__hybrid_overflow_smul(__result, __CLOCKS_PER_SEC, &__result))
+			goto __overflow;
+		if (__hybrid_overflow_sadd(__result, __ts.tv_nsec / (1000000000 / __CLOCKS_PER_SEC), &__result))
+			goto __overflow;
+	} __STATIC_ELSE((__clock_t)-1 < 0) {
+		if (__hybrid_overflow_ucast(__ts.tv_sec, &__result))
+			goto __overflow;
+		if (__hybrid_overflow_umul(__result, __CLOCKS_PER_SEC, &__result))
+			goto __overflow;
+		if (__hybrid_overflow_uadd(__result, __ts.tv_nsec / (1000000000 / __CLOCKS_PER_SEC), &__result))
+			goto __overflow;
+	}
 #else /* __CLOCK_PROCESS_CPUTIME_ID && (__CRT_HAVE_clock_gettime64 || __CRT_HAVE_clock_gettime || __CRT_HAVE___clock_gettime) */
 	struct tms __ts;
 	if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_times)(&__ts))
 		return -1;
-	__result  = __ts.tms_utime;
-	__result += __ts.tms_stime;
+	__STATIC_IF((__clock_t)-1 < 0) {
+		if (__hybrid_overflow_scast(__ts.tms_utime, &__result))
+			goto __overflow;
+		if (__hybrid_overflow_sadd(__result, __ts.tms_stime, &__result))
+			goto __overflow;
+	} __STATIC_ELSE((__clock_t)-1 < 0) {
+		if (__hybrid_overflow_ucast(__ts.tms_utime, &__result))
+			goto __overflow;
+		if (__hybrid_overflow_uadd(__result, __ts.tms_stime, &__result))
+			goto __overflow;
+	}
 #endif /* !__CLOCK_PROCESS_CPUTIME_ID || (!__CRT_HAVE_clock_gettime64 && !__CRT_HAVE_clock_gettime && !__CRT_HAVE___clock_gettime) */
 	return __result;
+__overflow:
+	return (__clock_t)-1;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_clock_defined

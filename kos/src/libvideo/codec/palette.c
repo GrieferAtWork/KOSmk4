@@ -30,6 +30,7 @@
 #include <kos/types.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <malloc.h>
 #include <stddef.h>
 #include <string.h>
@@ -134,7 +135,7 @@ libvideo_palette_getpixel(struct video_palette *__restrict self,
 		                     [b >> (8 - VPC_SIGBBITS)];
 		for (i = 0; i < VPC_SIZE; ++i) {
 			union video_palette_cachepair ent;
-			ent.cp_word = ATOMIC_READ(cs->cs_pairs[i].cp_word);
+			ent.cp_word = atomic_read(&cs->cs_pairs[i].cp_word);
 			if (ent.cp_r == r &&
 			    ent.cp_g == g &&
 			    ent.cp_b == b)
@@ -147,7 +148,7 @@ libvideo_palette_getpixel(struct video_palette *__restrict self,
 			goto done;
 		}
 		COMPILER_WRITE_BARRIER();
-		if unlikely(!ATOMIC_CMPXCH(self->vp_cache, NULL, cache)) {
+		if unlikely(!atomic_cmpxch(&self->vp_cache, NULL, cache)) {
 			free(cache);
 			cache = self->vp_cache;
 			assert(cache);
@@ -166,7 +167,7 @@ libvideo_palette_getpixel(struct video_palette *__restrict self,
 		ent.cp_i = (uint8_t)result;
 		memmoveup(cs->cs_pairs + 1, cs->cs_pairs, VPC_SIZE - 1,
 		          sizeof(union video_palette_cachepair));
-		ATOMIC_WRITE(cs->cs_pairs[0].cp_word, ent.cp_word);
+		atomic_write(&cs->cs_pairs[0].cp_word, ent.cp_word);
 	}
 done:
 	return result;

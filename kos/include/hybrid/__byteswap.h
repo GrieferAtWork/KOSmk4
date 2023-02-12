@@ -60,7 +60,7 @@ __NOTHROW(__impl_hybrid_bswap16)(__UINT16_TYPE__ __x) {
 __LOCAL __ATTR_CONST __ATTR_ARTIFICIAL __UINT32_TYPE__
 __NOTHROW(__impl_hybrid_bswap32)(__UINT32_TYPE__ __x) {
 	return ((__UINT32_TYPE__)__impl_hybrid_bswap16((__UINT16_TYPE__)__x) << 16) |
-	       (__UINT32_TYPE__)__impl_hybrid_bswap16((__UINT16_TYPE__)((__x) >> 16));
+	       (__UINT32_TYPE__)__impl_hybrid_bswap16((__UINT16_TYPE__)(__x >> 16));
 }
 #endif /* !__GNUC__ && !__has_builtin(__builtin_bswap32) */
 #ifdef __UINT64_TYPE__
@@ -70,7 +70,7 @@ __NOTHROW(__impl_hybrid_bswap32)(__UINT32_TYPE__ __x) {
 __LOCAL __ATTR_CONST __ATTR_ARTIFICIAL __UINT64_TYPE__
 __NOTHROW(__impl_hybrid_bswap64)(__UINT64_TYPE__ __x) {
 	return ((__UINT64_TYPE__)__impl_hybrid_bswap32((__UINT32_TYPE__)__x) << 32) |
-	       (__UINT64_TYPE__)__impl_hybrid_bswap32((__UINT32_TYPE__)((__x) >> 32));
+	       (__UINT64_TYPE__)__impl_hybrid_bswap32((__UINT32_TYPE__)(__x >> 32));
 }
 #endif /* !__GNUC__ && !__has_builtin(__builtin_bswap64) */
 #endif /* __UINT64_TYPE__ */
@@ -83,7 +83,7 @@ __NOTHROW(__impl_hybrid_bswap64)(__UINT64_TYPE__ __x) {
 __LOCAL __ATTR_CONST __ATTR_ARTIFICIAL __UINT128_TYPE__
 __NOTHROW(__impl_hybrid_bswap128)(__UINT128_TYPE__ __x) {
 	return ((__UINT128_TYPE__)__impl_hybrid_bswap64((__UINT64_TYPE__)__x) << 64) |
-	       (__UINT128_TYPE__)__impl_hybrid_bswap64((__UINT64_TYPE__)((__x) >> 64));
+	       (__UINT128_TYPE__)__impl_hybrid_bswap64((__UINT64_TYPE__)(__x >> 64));
 }
 #endif /* !__GNUC__ && !__has_builtin(__builtin_bswap128) */
 #endif /* __UINT128_TYPE__ */
