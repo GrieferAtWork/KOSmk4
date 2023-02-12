@@ -41,13 +41,13 @@
 #include <kernel/swap.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
 #include <kos/lockop.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stdalign.h>
 #include <stddef.h>
@@ -201,7 +201,7 @@ NOTHROW(FCALL mpart_assert_integrity)(struct mpart *__restrict self) {
 				mpart_reladdr_t part_maxaddr;
 				size_t node_size;
 				REF struct mman *mm;
-				if (ATOMIC_READ(node->mn_flags) & MNODE_F_UNMAPPED)
+				if (atomic_read(&node->mn_flags) & MNODE_F_UNMAPPED)
 					continue; /* Allow bad values for unmapped nodes. */
 				mm = node->mn_mman;
 				if (!tryincref(mm))
@@ -528,10 +528,10 @@ DECL_END
 #define RBTREE_GETNODE(self)   (self)->mp_filent
 #define RBTREE_GETMINKEY(self) mpart_getminaddr(self)
 #define RBTREE_GETMAXKEY(self) mpart_getmaxaddr(self)
-#define RBTREE_ISRED(self)     ((self)->mp_flags & MPART_F__RBRED)
-#define RBTREE_SETRED(self)    ATOMIC_OR((self)->mp_flags, MPART_F__RBRED)
-#define RBTREE_SETBLACK(self)  ATOMIC_AND((self)->mp_flags, ~MPART_F__RBRED)
-#define RBTREE_FLIPCOLOR(self) ATOMIC_XOR((self)->mp_flags, MPART_F__RBRED)
+#define RBTREE_ISRED(self)     (atomic_read(&(self)->mp_flags) & MPART_F__RBRED)
+#define RBTREE_SETRED(self)    atomic_or(&(self)->mp_flags, MPART_F__RBRED)
+#define RBTREE_SETBLACK(self)  atomic_and(&(self)->mp_flags, ~MPART_F__RBRED)
+#define RBTREE_FLIPCOLOR(self) atomic_xor(&(self)->mp_flags, MPART_F__RBRED)
 #define RBTREE_CC              FCALL
 #define RBTREE_NOTHROW         NOTHROW
 #define RBTREE_DECL            FUNDEF
@@ -597,9 +597,9 @@ NOTHROW(FCALL mpart_setblockstate)(struct mpart *__restrict self,
 		pword = &self->mp_blkst_ptr[index];
 	}
 	do {
-		oldval = ATOMIC_READ(*pword);
+		oldval = atomic_read(pword);
 		newval = (oldval & ~mask) | val;
-	} while (!ATOMIC_CMPXCH_WEAK(*pword, oldval, newval));
+	} while (!atomic_cmpxch_weak(pword, oldval, newval));
 }
 
 
@@ -627,7 +627,7 @@ NOTHROW(FCALL mpart_hasblocksstate_init)(struct mpart *__restrict self) {
 	}
 
 	/* No INIT-part found (just clear the MAYBE_BLK_INIT flag) */
-	ATOMIC_AND(self->mp_flags, ~MPART_F_MAYBE_BLK_INIT);
+	atomic_and(&self->mp_flags, ~MPART_F_MAYBE_BLK_INIT);
 	return false;
 }
 
@@ -691,7 +691,7 @@ again:
 		if (block_count <= MPART_BLKST_BLOCKS_PER_WORD) {
 			/* Just use the in-line bitset. */
 			self->mp_blkst_inl = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_CHNG);
-			ATOMIC_OR(self->mp_flags, MPART_F_BLKST_INL);
+			atomic_or(&self->mp_flags, MPART_F_BLKST_INL);
 		} else {
 			size_t bitset_words;
 			size_t bitset_size;
@@ -785,7 +785,7 @@ again:
 		/* Now to do the actual work: */
 		incref(file);
 		mfile_trunclock_inc(file);
-		ATOMIC_OR(self->mp_flags, MPART_F_MAYBE_BLK_INIT);
+		atomic_or(&self->mp_flags, MPART_F_MAYBE_BLK_INIT);
 		_mpart_lock_release(self);
 		TRY {
 			pos_t addr, filesize;
@@ -882,10 +882,10 @@ done_writeback:
 	 * Also  clear the the `MPART_F_MAYBE_BLK_INIT' flag, since
 	 * we're handling that case as well (see above) */
 	if (keep_lock) {
-		ATOMIC_AND(self->mp_flags, ~(MPART_F_CHANGED | MPART_F_MAYBE_BLK_INIT));
+		atomic_and(&self->mp_flags, ~(MPART_F_CHANGED | MPART_F_MAYBE_BLK_INIT));
 		return result;
 	}
-	ATOMIC_AND(self->mp_flags, ~(MPART_F_LOCKBIT | MPART_F_CHANGED |
+	atomic_and(&self->mp_flags, ~(MPART_F_LOCKBIT | MPART_F_CHANGED |
 	                             MPART_F_MAYBE_BLK_INIT));
 	mpart_lockops_reap(self);
 	return result;
@@ -1005,7 +1005,7 @@ PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
 NOTHROW(FCALL async_add2all_mpart_lop_cb)(struct lockop *__restrict self) {
 	REF struct mpart *me;
 	me = container_of(self, struct mpart, _mp_lopall);
-	if unlikely(ATOMIC_DECFETCH(me->mp_refcnt) == 0) {
+	if unlikely(atomic_decfetch(&me->mp_refcnt) == 0) {
 		/* Destroy the part in a post-lockop to improve throughput! */
 		me->_mp_plopall.plo_func = &async_add2all_mpart_destroy_postlop_cb;
 		return &me->_mp_plopall;

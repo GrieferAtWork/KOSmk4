@@ -54,7 +54,6 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sched/atomic-lock.h>
 
@@ -66,6 +65,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <atomic.h>
 #include <dirent.h>
 #include <limits.h>
 #include <stddef.h>
@@ -122,7 +122,7 @@ uem_shdrs(struct userelf_module *__restrict self) {
 		kfree(UM_any(result));
 		RETHROW();
 	}
-	if unlikely(!ATOMIC_CMPXCH(UM_any(self->um_shdrs),
+	if unlikely(!atomic_cmpxch(&UM_any(self->um_shdrs),
 	                           NULL, UM_any(result)))
 		kfree(UM_any(result));
 	return self->um_shdrs;
@@ -153,7 +153,7 @@ uem_shstrtab(struct userelf_module *__restrict self) {
 		RETHROW();
 	}
 	shstrtab_str[shstrtab_siz] = '\0';
-	if (!ATOMIC_CMPXCH(self->um_shstrtab, NULL, shstrtab_str))
+	if (!atomic_cmpxch(&self->um_shstrtab, NULL, shstrtab_str))
 		kfree(shstrtab_str);
 	return self->um_shstrtab;
 }
@@ -384,7 +384,7 @@ uems_getaddr_alias(struct userelf_module_section *__restrict self) {
 	if (self->ums_kernaddr != (KERNEL byte_t *)-1)
 		return self->ums_kernaddr;
 	result = uems_create_kernaddr(self);
-	if unlikely(!ATOMIC_CMPXCH(self->ums_kernaddr, (KERNEL byte_t *)-1, result)) {
+	if unlikely(!atomic_cmpxch(&self->ums_kernaddr, (KERNEL byte_t *)-1, result)) {
 		/* Race condition: some other thread already did this in the mean time... */
 		mman_unmap_kram(result, self->ms_size);
 	}
@@ -406,8 +406,8 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 	if (!(self->ms_flags & SHF_COMPRESSED)) {
 		/* Section isn't actually compressed! */
 		dst_data = uems_getaddr_alias(self);
-		ATOMIC_WRITE(self->ums_inflsize, self->ms_size);
-		ATOMIC_CMPXCH(self->ums_infladdr, (KERNEL byte_t *)-1, dst_data);
+		atomic_write(&self->ums_inflsize, self->ms_size);
+		atomic_cmpxch(&self->ums_infladdr, (KERNEL byte_t *)-1, dst_data);
 		*psize = self->ms_size;
 		return dst_data;
 	}
@@ -497,8 +497,8 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 			RETHROW();
 		}
 	}
-	ATOMIC_WRITE(self->ums_inflsize, dst_size);
-	ATOMIC_CMPXCH(self->ums_infladdr, (KERNEL byte_t *)-1, dst_data);
+	atomic_write(&self->ums_inflsize, dst_size);
+	atomic_cmpxch(&self->ums_infladdr, (KERNEL byte_t *)-1, dst_data);
 	*psize = dst_size;
 	return dst_data;
 }
@@ -551,7 +551,7 @@ NOTHROW(FCALL uem_unbind_sections_and_destroy_lop)(struct lockop *__restrict sel
 		/* Drop the reference we got from `awref_get()'
 		 * If this ends up destroying the section, then enqueue said
 		 * destruction to be performed  as part of the  post-lockop. */
-		if (ATOMIC_DECFETCH(sect->ms_refcnt) == 0)
+		if (atomic_decfetch(&sect->ms_refcnt) == 0)
 			SLIST_INSERT(&me->_um_deadsect, sect, _ms_dead);
 	}
 
@@ -668,10 +668,11 @@ NOTHROW(FCALL uem_nonodes)(struct userelf_module *__restrict self) {
 		 * to the associated mman's mappings tree.
 		 *
 		 * We can do this by enqueuing a lockop->postlockop wrapper. */
-		if (ATOMIC_DECFETCH(self->md_refcnt) == 0) {
+		if (atomic_decfetch(&self->md_refcnt) == 0) {
 			self->_um_cc_lop.olo_func = &uem_nonodes_cleanup_lop;
 			SLIST_ATOMIC_INSERT(&FORMMAN(self->md_mman, thismman_lockops),
 			                    &self->_um_cc_lop, olo_link);
+
 			/* DONT REAP LOCKOPS HERE!
 			 *
 			 * It won't work since our caller still holds a lock to
@@ -910,7 +911,7 @@ NOTHROW(FCALL system_cc_mman_module_cache)(struct mman *__restrict self,
 		 * Modules that end up dying are added to the dead-list,
 		 * where they will be destroyed once we've released  our
 		 * lock to the mman. */
-		if (ATOMIC_DECFETCH(mod->md_refcnt) == 0) {
+		if (atomic_decfetch(&mod->md_refcnt) == 0) {
 			/* Add to the dead-list. */
 			SLIST_INSERT(&dead, mod, _um_dead);
 		}
@@ -1188,7 +1189,7 @@ something_changed:
 				kfree(UM_any(phdrv));
 				return UEM_TRYCREATE_UNLOCKED;
 			}
-			if unlikely(ATOMIC_READ(part->mp_file) != file)
+			if unlikely(atomic_read(&part->mp_file) != file)
 				goto something_changed;
 
 			/* Calculate the current file-position mapped at `node_addr',
@@ -1266,7 +1267,7 @@ something_changed:
 				 * zero-initialized .bss-style file. */
 				if unlikely(!node->mn_part)
 					goto not_an_elf_file_phdrv_result_mmlock;
-				node_file = ATOMIC_READ(node->mn_part->mp_file);
+				node_file = atomic_read(&node->mn_part->mp_file);
 				if (node_file == file) {
 					/* Verify file-offsets */
 					pos_t expected_fpos, actual_fpos;
@@ -1741,7 +1742,7 @@ something_changed:
 					decref_unlikely(file);
 					return UEM_TRYCREATE_UNLOCKED;
 				}
-				if unlikely(ATOMIC_READ(part->mp_file) != rtld_file)
+				if unlikely(atomic_read(&part->mp_file) != rtld_file)
 					goto something_changed;
 				real_node_fpos = mnode_getfileaddrat(node, node_addr);
 				if unlikely(real_node_fpos != node_fpos)
@@ -1906,13 +1907,13 @@ INTERN NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_rtld_fsfile)(struct ccinfo *__restrict info) {
 	REF struct mfile *mf;
 	mf = axref_xch_inherit(&system_rtld_fsfile, NULL);
-	if (mf && ATOMIC_DECFETCH(mf->mf_refcnt) == 0) {
+	if (mf && atomic_decfetch(&mf->mf_refcnt) == 0) {
 		ccinfo_account(info, sizeof(struct mfile));
 		mfile_destroy(mf);
 	}
 #ifdef __ARCH_HAVE_COMPAT
 	mf = axref_xch_inherit(&compat_system_rtld_fsfile, NULL);
-	if (mf && ATOMIC_DECFETCH(mf->mf_refcnt) == 0) {
+	if (mf && atomic_decfetch(&mf->mf_refcnt) == 0) {
 		ccinfo_account(info, sizeof(struct mfile));
 		mfile_destroy(mf);
 	}

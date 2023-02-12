@@ -38,7 +38,6 @@
 #include <sched/task-clone.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/byteswap.h>
 #include <hybrid/unaligned.h>
@@ -51,6 +50,7 @@
 #include <kos/kernel/cpu-state.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <sched.h>
 #include <stddef.h>
 #include <string.h>
@@ -84,7 +84,7 @@ again:
 		/* NOTE: cast ARGV to u32, thus truncating the pointer (this is intentional!) */
 		argv = (u32 *)((uintptr_t)(u32)icpustate_getuserpsp(state));
 		for (i = 0; i < __NR32RC_clone; ++i) {
-			u32 arg = ATOMIC_READ(argv[i]);
+			u32 arg = read_once(&argv[i]);
 			sc_info.rsi_regs[i] = (syscall_ulong_t)arg;
 			sc_info.rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(i);
 		}
@@ -158,7 +158,7 @@ again:
 			/* Load system call arguments. */
 			validate_readable(argv, (size_t)argc * 4);
 			for (i = 0; i < argc; ++i) {
-				u32 arg = ATOMIC_READ(argv[i]);
+				u32 arg = read_once(&argv[i]);
 				sc_info.rsi_regs[i] = (syscall_ulong_t)arg;
 				sc_info.rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(i);
 			}
@@ -193,7 +193,7 @@ again:
 			/* Load system call arguments. */
 			validate_readable(argv, (size_t)argc * 8);
 			for (i = 0; i < argc; ++i) {
-				u64 arg = ATOMIC_READ(argv[i]);
+				u64 arg = read_once(&argv[i]);
 				sc_info.rsi_regs[i] = (syscall_ulong_t)arg;
 				sc_info.rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(i);
 			}

@@ -32,11 +32,10 @@
 #include <sched/sig.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -134,7 +133,7 @@ DECL_BEGIN
  * NOTE: As far as the implementation goes, it might be suitable to define
  *       a global async worker who's sole purpose is to reap a global list
  *       of mem-parts that are  supposed to be unloaded.  `mpart_unload()'
- *       is then implemented by ATOMIC_FETCHOR-setting a flag to  indicate
+ *       is then implemented by atomic_fetchor-setting a flag to  indicate
  *       that the part was added to said list, before SLIST_ATOMIC_INSERT-
  *       ing the part into said list  (the list also inherits a  reference
  *       to the part during this process).
@@ -268,7 +267,7 @@ again:
 
 	/* Merge the part if the caller requested us to do so. */
 	if (part->mp_xflags & MPART_XF_WILLMERGE) {
-		ATOMIC_AND(part->mp_xflags, ~MPART_XF_WILLMERGE);
+		atomic_and(&part->mp_xflags, ~MPART_XF_WILLMERGE);
 
 		/* TODO: `mpart_merge_locked()' includes calls to kmalloc(),  but
 		 *       if  those  fail, it  will set  `MPART_XF_WILLMERGE' once
@@ -290,14 +289,14 @@ again:
 	}
 
 	if (part->mp_xflags & MPART_XF_WILLUNLOAD) {
-		ATOMIC_AND(part->mp_xflags, ~MPART_XF_WILLUNLOAD);
+		atomic_and(&part->mp_xflags, ~MPART_XF_WILLUNLOAD);
 		/* TODO */
 	}
 
 	if (part->mp_xflags & MPART_XF_WILLTRIM) {
 		/* TODO: Just like with `MPART_XF_WILLMERGE', we really
 		 *       need a  new function:  `mpart_trim_or_unlock'! */
-		ATOMIC_AND(part->mp_xflags, ~MPART_XF_WILLTRIM);
+		atomic_and(&part->mp_xflags, ~MPART_XF_WILLTRIM);
 		mpart_trim(incref(part));
 	}
 
@@ -306,11 +305,11 @@ again:
 	 * as may be the case if another thread re-set  them. */
 	for (;;) {
 		uintptr_quarter_t xflags;
-		xflags = ATOMIC_READ(part->mp_xflags);
+		xflags = atomic_read(&part->mp_xflags);
 		assert(xflags & MPART_XF_INJOBLIST);
 		if (xflags & MPART_XF_WILLMASK)
 			goto again;
-		if (ATOMIC_CMPXCH_WEAK(part->mp_xflags, xflags,
+		if (atomic_cmpxch_weak(&part->mp_xflags, xflags,
 		                       xflags & ~MPART_XF_INJOBLIST))
 			break;
 	}
@@ -367,7 +366,7 @@ NOTHROW(FCALL mpart_start_asyncjob)(/*inherit(always)*/ REF struct mpart *__rest
 	uintptr_quarter_t old_flags;
 	assert((what & ~(MPART_XF_WILLMERGE | MPART_XF_WILLTRIM | MPART_XF_WILLUNLOAD)) == 0);
 	assert((what & (MPART_XF_WILLMERGE | MPART_XF_WILLTRIM | MPART_XF_WILLUNLOAD)) != 0);
-	old_flags = ATOMIC_FETCHOR(self->mp_xflags, what | MPART_XF_INJOBLIST);
+	old_flags = atomic_fetchor(&self->mp_xflags, what | MPART_XF_INJOBLIST);
 	if (!(old_flags & MPART_XF_INJOBLIST)) {
 		/* It  falls on us to either allocate an async job to do the work,
 		 * or (if that fails) to add `self' to the global fallback-list of
@@ -419,7 +418,7 @@ mpart_ajob_fallback_v_test(struct async *__restrict self) {
 		return mpart_ajob_v_test(&me->mpaj_async);
 
 	/* Check if there are more async jobs. */
-	return ATOMIC_READ(mpart_ajob_fallback_list.slh_first) != NULL;
+	return atomic_read(&mpart_ajob_fallback_list.slh_first) != NULL;
 }
 
 PRIVATE WUNUSED NONNULL((1)) unsigned int FCALL

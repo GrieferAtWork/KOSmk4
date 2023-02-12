@@ -693,12 +693,12 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mpart_lockops_reap)(struct mpart
 
 /* Lock accessor helpers for `struct mpart' */
 #define mpart_lock_tryacquire(self) \
-	(!(__hybrid_atomic_fetchor(&(self)->mp_flags, MPART_F_LOCKBIT, __ATOMIC_SEQ_CST) & MPART_F_LOCKBIT))
+	(!(__hybrid_atomic_fetchor(&(self)->mp_flags, MPART_F_LOCKBIT, __ATOMIC_ACQUIRE) & MPART_F_LOCKBIT))
 #define mpart_lock_release(self)                                                 \
-	(__hybrid_atomic_and(&(self)->mp_flags, ~MPART_F_LOCKBIT, __ATOMIC_SEQ_CST), \
+	(__hybrid_atomic_and(&(self)->mp_flags, ~MPART_F_LOCKBIT, __ATOMIC_ACQUIRE), \
 	 mpart_lockops_reap(self))
 #define _mpart_lock_release(self) \
-	(__hybrid_atomic_and(&(self)->mp_flags, ~MPART_F_LOCKBIT, __ATOMIC_SEQ_CST))
+	(__hybrid_atomic_and(&(self)->mp_flags, ~MPART_F_LOCKBIT, __ATOMIC_ACQUIRE))
 #define mpart_lock_acquired(self)  (__hybrid_atomic_load(&(self)->mp_flags, __ATOMIC_ACQUIRE) & MPART_F_LOCKBIT)
 #define mpart_lock_available(self) (!(__hybrid_atomic_load(&(self)->mp_flags, __ATOMIC_ACQUIRE) & MPART_F_LOCKBIT))
 

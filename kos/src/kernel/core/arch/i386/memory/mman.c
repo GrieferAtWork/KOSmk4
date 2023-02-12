@@ -42,8 +42,6 @@
 #include <sched/task.h>
 #include <sched/x86/tss.h>
 
-#include <hybrid/atomic.h>
-
 #include <asm/farptr.h>
 #include <asm/intrin.h>
 
@@ -51,7 +49,6 @@
 #include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
-
 
 DECL_BEGIN
 

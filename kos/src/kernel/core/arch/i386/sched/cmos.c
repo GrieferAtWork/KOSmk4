@@ -35,7 +35,6 @@ macros["__DATE_YEAR__"] = str(import("time").Time.now().year)[#"Years ":];
 #include <sched/tsc.h>
 #include <sched/x86/cmos.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/atomic-rwlock.h>
 
 #include <hw/rtc/cmos.h>

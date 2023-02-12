@@ -63,8 +63,6 @@
 #include <sched/task.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
-
 #include <bits/os/statfs-convert.h>
 #include <compat/config.h>
 #include <kos/compat/linux-stat-convert.h>
@@ -78,6 +76,7 @@
 #include <sys/time.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <format-printer.h>
@@ -277,7 +276,7 @@ DEFINE_SYSCALL2(ssize_t, getcwd,
 	cwd  = incref(myfs->fs_cwd);
 	root = incref(myfs->fs_root);
 	fs_pathlock_endread(myfs);
-	atflags = ATOMIC_READ(myfs->fs_mode.f_atflag) & AT_DOSPATH;
+	atflags = atomic_read_relaxed(&myfs->fs_mode.f_atflag) & AT_DOSPATH;
 	{
 		FINALLY_DECREF_UNLIKELY(cwd);
 		FINALLY_DECREF_UNLIKELY(root);
@@ -309,7 +308,7 @@ sys_fmknodat_impl(fd_t dirfd, USER UNCHECKED char const *nodename,
 	                 E_INVALID_ARGUMENT_CONTEXT_FMKNODAT_FLAGS);
 	validate_readable(nodename, 1);
 	atflags = fs_atflags(atflags);
-	mode &= ~ATOMIC_READ(THIS_FS->fs_umask);
+	mode &= ~atomic_read_relaxed(&THIS_FS->fs_umask);
 	VALIDATE_FLAGSET(mode, 07777 | S_IFMT,
 	                 E_INVALID_ARGUMENT_CONTEXT_MKNOD_MODE);
 	/* sys_mknod() can only be used to create files of the following types. */
@@ -391,7 +390,7 @@ sys_fmkdirat_impl(fd_t dirfd, USER UNCHECKED char const *pathname,
 	atflags = fs_atflags(atflags);
 	if (has_personality(KP_MKDIR_CHECK_MODE))
 		VALIDATE_FLAGSET(mode, 07777, E_INVALID_ARGUMENT_CONTEXT_MKDIR_MODE);
-	mode &= 07777 & ~ATOMIC_READ(THIS_FS->fs_umask);
+	mode &= 07777 & ~atomic_read_relaxed(&THIS_FS->fs_umask);
 	pathname_path = path_traverse_r(dirfd, pathname, &mkinfo.mkf_name,
 	                                &mkinfo.mkf_namelen,
 	                                atflags | AT_IGNORE_TRAILING_SLASHES);
@@ -521,7 +520,7 @@ sys_fsymlinkat_impl(USER UNCHECKED char const *link_text, fd_t target_dirfd,
 		fnode_access(pathname_path->p_dir, W_OK);
 		mkinfo.mkf_flags         = atflags;
 		mkinfo.mkf_hash          = FLOOKUP_INFO_HASH_UNSET;
-		mkinfo.mkf_fmode         = S_IFLNK | (07777 & ~ATOMIC_READ(THIS_FS->fs_umask));
+		mkinfo.mkf_fmode         = S_IFLNK | (07777 & ~atomic_read_relaxed(&THIS_FS->fs_umask));
 		mkinfo.mkf_creat.c_owner = cred_getfsuid();
 		mkinfo.mkf_creat.c_group = cred_getfsgid();
 		mkinfo.mkf_creat.c_atime = realtime();
@@ -802,7 +801,7 @@ super_set_mount_flags(struct fsuper *__restrict self,
                       syscall_ulong_t mountflags) {
 	uintptr_t old_flags, new_flags;
 	do {
-		old_flags = ATOMIC_READ(self->fs_root.mf_flags);
+		old_flags = atomic_read_relaxed(&self->fs_root.mf_flags);
 		new_flags = old_flags & ~(MFILE_F_NOATIME | MFILE_FS_NOEXEC |
 		                          MFILE_FS_NOSUID | MFILE_F_READONLY |
 		                          MFILE_FN_NODIRATIME | MFILE_F_STRICTATIME |
@@ -827,7 +826,7 @@ super_set_mount_flags(struct fsuper *__restrict self,
 		/* TODO: MS_NODEV */
 		/* TODO: MS_SYNCHRONOUS */
 		/* TODO: MS_DIRSYNC */
-	} while (!ATOMIC_CMPXCH_WEAK(self->fs_root.mf_flags,
+	} while (!atomic_cmpxch_weak(&self->fs_root.mf_flags,
 	                             old_flags, new_flags));
 }
 
@@ -1389,7 +1388,7 @@ DEFINE_SYSCALL3(errno_t, chown,
 #ifdef __ARCH_WANT_SYSCALL_UMASK
 DEFINE_SYSCALL1(mode_t, umask, mode_t, mode) {
 	struct fs *myfs = THIS_FS;
-	return ATOMIC_XCH(myfs->fs_umask, mode & 0777);
+	return atomic_xch(&myfs->fs_umask, mode & 0777);
 }
 #endif /* __ARCH_WANT_SYSCALL_UMASK */
 
@@ -2174,7 +2173,7 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 #ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 		{
 			uintptr_t old_flags;
-			old_flags = ATOMIC_FETCHAND(THIS_TASK->t_flags,
+			old_flags = atomic_fetchand(&THIS_TASK->t_flags,
 			                            ~(TASK_FVFORK | TASK_FUSERPROCMASK |
 			                              TASK_FUSERPROCMASK_AFTER_VFORK));
 			/* Special case: If  userprocmask  was enabled  after  vfork(), then
@@ -2192,7 +2191,7 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 				um = PERTASK_GET(this_userprocmask_address);
 				printk(KERN_DEBUG "[userprocmask:%p] Uninstall during exec after vfork\n", um);
 				TRY {
-					ATOMIC_WRITE(um->pm_sigmask, NULL);
+					atomic_write(&um->pm_sigmask, NULL);
 				} EXCEPT {
 					except_class_t cls = except_class();
 					if (EXCEPTCLASS_ISRTLPRIORITY(cls))
@@ -2202,7 +2201,7 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 			}
 		}
 #else /* CONFIG_HAVE_KERNEL_USERPROCMASK */
-		ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FVFORK);
+		atomic_and(&THIS_TASK->t_flags, ~TASK_FVFORK);
 #endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 		{
 			struct taskpid *mypid = THIS_TASKPID;
@@ -2221,12 +2220,12 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 			 * This is necessary so the task_serve() below, as well as any such
 			 * called made from  within `mman_exec()' use  the kernel's  signal
 			 * mask, rather than the user's! */
-			ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FUSERPROCMASK);
+			atomic_and(&THIS_TASK->t_flags, ~TASK_FUSERPROCMASK);
 			TRY {
 				mman_exec(args);
 			} EXCEPT {
 				/* Re-enable USERPROCMASK if the exec() failed. */
-				ATOMIC_OR(THIS_TASK->t_flags, TASK_FUSERPROCMASK);
+				atomic_or(&THIS_TASK->t_flags, TASK_FUSERPROCMASK);
 				RETHROW();
 			}
 

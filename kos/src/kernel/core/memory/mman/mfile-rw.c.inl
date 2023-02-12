@@ -68,13 +68,13 @@
 #include <sched/task.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -1127,11 +1127,11 @@ handle_write_impossible_too_big:
 		 * file's size in the mean time. - This can be ensured by holding
 		 * a lock to the file's `mf_lock', and waiting for `mf_trunclock'
 		 * to become ZERO. */
-		if (ATOMIC_READ(self->mf_trunclock) != 0) {
+		if (atomic_read(&self->mf_trunclock) != 0) {
 			mfile_lock_endwrite(self);
 			decref_unlikely(part);
 			task_connect(&self->mf_initdone);
-			if unlikely(ATOMIC_READ(self->mf_trunclock) == 0) {
+			if unlikely(atomic_read(&self->mf_trunclock) == 0) {
 				task_disconnectall();
 				goto again;
 			}
@@ -1294,7 +1294,7 @@ part_setcore:
 				if (oldsize == filesize) {
 					/* Successfully altered the file's size. */
 					uintptr_t old_flags, new_flags;
-					old_flags = ATOMIC_FETCHOR(self->mf_flags, MFILE_F_ATTRCHANGED);
+					old_flags = atomic_fetchor(&self->mf_flags, MFILE_F_ATTRCHANGED);
 					new_flags = old_flags | MFILE_F_ATTRCHANGED;
 					if (old_flags != new_flags && self->mf_ops->mo_changed)
 						(*self->mf_ops->mo_changed)(self, old_flags, new_flags);
@@ -1386,10 +1386,10 @@ restart_after_extendpart_tail:
 		 * file's size in the mean time. - This can be ensured by holding
 		 * a lock to the file's `mf_lock', and waiting for `mf_trunclock'
 		 * to become ZERO. */
-		if (ATOMIC_READ(self->mf_trunclock) != 0) {
+		if (atomic_read(&self->mf_trunclock) != 0) {
 			mpart_truncate_undo(self, part, old_part_size);
 			task_connect(&self->mf_initdone);
-			if unlikely(ATOMIC_READ(self->mf_trunclock) == 0) {
+			if unlikely(atomic_read(&self->mf_trunclock) == 0) {
 				task_disconnectall();
 				goto again;
 			}
@@ -1488,7 +1488,7 @@ restart_after_extendpart_tail:
 		/* Because we altered the file's size, we must also set the ATTRCHANGED flag. */
 		{
 			uintptr_t old_flags;
-			old_flags = ATOMIC_FETCHOR(self->mf_flags, MFILE_F_ATTRCHANGED);
+			old_flags = atomic_fetchor(&self->mf_flags, MFILE_F_ATTRCHANGED);
 			if (!(old_flags & MFILE_F_ATTRCHANGED) && self->mf_ops->mo_changed)
 				(*self->mf_ops->mo_changed)(self, old_flags, old_flags | MFILE_F_ATTRCHANGED);
 		}

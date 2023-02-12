@@ -33,7 +33,6 @@
 #include <sched/cred.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
@@ -43,6 +42,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <stddef.h>
 #include <string.h>
@@ -607,7 +607,7 @@ vidtty_v_getcursor(struct ansitty *__restrict self,
 	union vidtty_cursor cur;
 	REF struct vidttyaccess *me;
 	me = ansitty_getvidttyaccess(self);
-	cur.vtc_word = ATOMIC_READ(me->vta_cursor.vtc_word);
+	cur.vtc_word = atomic_read(&me->vta_cursor.vtc_word);
 	ppos[0]      = cur.vtc_cellx;
 	ppos[1]      = cur.vtc_celly;
 	decref_unlikely(me);

@@ -35,7 +35,6 @@
 #include <kernel/handle.h>
 #include <kernel/mman/driver.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
 
 #include <kos/except.h>
@@ -45,6 +44,7 @@
 #include <sys/mount.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <fcntl.h>
 #include <format-printer.h>
 #include <stddef.h>
@@ -1464,7 +1464,7 @@ NOTHROW(FCALL path_umount_subtree)(struct path *__restrict self,
 			assert(fsuper_mounts_writing(super));
 			LIST_UNBIND(me, pm_fsmount);
 			if (LIST_EMPTY(&super->fs_mounts)) {
-				ATOMIC_WRITE(super->fs_mounts.lh_first, FSUPER_MOUNTS_DELETED);
+				atomic_write(&super->fs_mounts.lh_first, FSUPER_MOUNTS_DELETED);
 
 				/* Last mounting point removed -> must delete this superblock. */
 				if (fsuper_delete_strt(super)) {

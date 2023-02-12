@@ -208,8 +208,8 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			LOCAL_lfutex_t _oldval;                             \
 			COMPILER_WRITE_BARRIER();                           \
 			do {                                                \
-				_oldval = ATOMIC_READ(*uaddr);                  \
-			} while (!ATOMIC_CMPXCH_WEAK(*uaddr, _oldval,       \
+				_oldval = atomic_read(uaddr);                   \
+			} while (!atomic_cmpxch_weak(uaddr, _oldval,        \
 			                             (_oldval & mask_and) | \
 			                             mask_or));             \
 			COMPILER_WRITE_BARRIER();                           \
@@ -219,14 +219,14 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 		do {                                                        \
 			COMPILER_WRITE_BARRIER();                               \
 			if likely(!mask_or) {                                   \
-				ATOMIC_AND(*uaddr, mask_and);                       \
+				atomic_and(uaddr, mask_and);                        \
 			} else if (mask_and == (LOCAL_lfutex_t)-1) {            \
-				ATOMIC_OR(*uaddr, mask_or);                         \
+				atomic_or(uaddr, mask_or);                          \
 			} else {                                                \
 				LOCAL_lfutex_t _oldval;                             \
 				do {                                                \
-					_oldval = ATOMIC_READ(*uaddr);                  \
-				} while (!ATOMIC_CMPXCH_WEAK(*uaddr, _oldval,       \
+					_oldval = atomic_read(uaddr);                   \
+				} while (!atomic_cmpxch_weak(uaddr, _oldval,        \
 				                             (_oldval & mask_and) | \
 				                             mask_or));             \
 			}                                                       \
@@ -310,12 +310,12 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 		task_disconnectall();                                         \
 		result = 1;                                                   \
 	}	break
-	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE, ATOMIC_READ(*uaddr) == val);
-	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL, ATOMIC_READ(*uaddr) != val);
-	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_ABOVE, ATOMIC_READ(*uaddr) > val);
-	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_BELOW, ATOMIC_READ(*uaddr) < val);
-	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_BITMASK, (ATOMIC_READ(*uaddr) & val) == val2);
-	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL_BITMASK, (ATOMIC_READ(*uaddr) & val) != val2);
+	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE, atomic_read(uaddr) == val);
+	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL, atomic_read(uaddr) != val);
+	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_ABOVE, atomic_read(uaddr) > val);
+	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_BELOW, atomic_read(uaddr) < val);
+	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_BITMASK, (atomic_read(uaddr) & val) == val2);
+	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL_BITMASK, (atomic_read(uaddr) & val) != val2);
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_EX, bcmp(uaddr, (USER CHECKED void const *)(uintptr_t)val, val2) == 0, LOCAL_validate_readable((USER UNCHECKED void const *)(uintptr_t)val, val2));
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL_EX, bcmp(uaddr, (USER CHECKED void const *)(uintptr_t)val, val2) != 0, LOCAL_validate_readable((USER UNCHECKED void const *)(uintptr_t)val, val2));
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_ABOVE_EX, memcmp(uaddr, (USER CHECKED void const *)(uintptr_t)val, val2) > 0, LOCAL_validate_readable((USER UNCHECKED void const *)(uintptr_t)val, val2));
@@ -403,9 +403,9 @@ DEFINE_SYSCALL5(errno_t, lfutexexpr,
 			errno_t expr_result;
 			syscall_ulong_t cond;
 			USER CHECKED LOCAL_uintptr_t *uaddr;
-			cond  = ATOMIC_READ(iter->fe_condition);
+			cond  = atomic_read(&iter->fe_condition);
 			uaddr = (USER UNCHECKED LOCAL_uintptr_t *)((USER UNCHECKED byte_t *)base +
-			                                           ATOMIC_READ(iter->fe_offset));
+			                                           atomic_read(&iter->fe_offset));
 			/* !!! Don't use LOCAL_validate_readable here -- (base+fe_offset might produce large pointers) */
 			validate_readable(uaddr, sizeof(*uaddr));
 			switch (cond) {
@@ -424,17 +424,17 @@ DEFINE_SYSCALL5(errno_t, lfutexexpr,
 				expr_result = !(should_wait); \
 				break
 			DEFINE_CASE(LFUTEX_WAIT_WHILE, /* >> if (*uaddr == val) return waitfor(uaddr); return 1; */
-			            ATOMIC_READ(*uaddr) == iter->fe_val);
+			            atomic_read(uaddr) == iter->fe_val);
 			DEFINE_CASE(LFUTEX_WAIT_UNTIL, /* >> if (*uaddr != val) return waitfor(uaddr); return 1; */
-			            ATOMIC_READ(*uaddr) != iter->fe_val);
+			            atomic_read(uaddr) != iter->fe_val);
 			DEFINE_CASE(LFUTEX_WAIT_WHILE_ABOVE, /* >> if ((unsigned)*uaddr > val) return waitfor(uaddr); return 1; */
-			            ATOMIC_READ(*uaddr) > iter->fe_val);
+			            atomic_read(uaddr) > iter->fe_val);
 			DEFINE_CASE(LFUTEX_WAIT_WHILE_BELOW, /* >> if ((unsigned)*uaddr < val) return waitfor(uaddr); return 1; */
-			            ATOMIC_READ(*uaddr) < iter->fe_val);
+			            atomic_read(uaddr) < iter->fe_val);
 			DEFINE_CASE(LFUTEX_WAIT_WHILE_BITMASK, /* >> if ((*uaddr & val) == val2) return waitfor(uaddr); return 1; */
-			            (ATOMIC_READ(*uaddr) & iter->fe_val) == iter->fe_val2);
+			            (atomic_read(uaddr) & iter->fe_val) == iter->fe_val2);
 			DEFINE_CASE(LFUTEX_WAIT_UNTIL_BITMASK, /* >> if ((*uaddr & val) != val2) return waitfor(uaddr); return 1; */
-			            (ATOMIC_READ(*uaddr) & iter->fe_val) != iter->fe_val2);
+			            (atomic_read(uaddr) & iter->fe_val) != iter->fe_val2);
 #undef DEFINE_CASE
 
 			case LFUTEX_WAIT_WHILE_EX:

@@ -37,7 +37,6 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
@@ -45,6 +44,7 @@
 #include <sys/param.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stdalign.h>
 #include <stddef.h>
@@ -132,7 +132,7 @@ NOTHROW(FCALL mfile_alloc_physmem)(struct mfile *__restrict self,
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 	uintptr_t old_flags, new_flags;
-	old_flags = ATOMIC_FETCHOR(self->mf_flags, what);
+	old_flags = atomic_fetchor(&self->mf_flags, what);
 	new_flags = old_flags | what;
 	if (old_flags != new_flags && self->mf_ops->mo_changed)
 		(*self->mf_ops->mo_changed)(self, old_flags, new_flags);
@@ -226,7 +226,7 @@ PRIVATE NONNULL((1)) void
 NOTHROW(FCALL restore_changed_parts)(struct mfile *__restrict self,
                                      REF struct mpart *chain) {
 	struct mpart *other_changes, **p_last, *more_changes;
-	other_changes = ATOMIC_CMPXCH_VAL(self->mf_changed.slh_first,
+	other_changes = atomic_cmpxch_val(&self->mf_changed.slh_first,
 	                                  NULL, chain);
 	if (other_changes == NULL)
 		return; /* Success */
@@ -251,7 +251,7 @@ clear_chain:
 	for (;;) {
 		*p_last = other_changes;
 		COMPILER_WRITE_BARRIER();
-		more_changes = ATOMIC_CMPXCH_VAL(self->mf_changed.slh_first,
+		more_changes = atomic_cmpxch_val(&self->mf_changed.slh_first,
 		                                 other_changes,
 		                                 chain);
 		if (more_changes == other_changes)
@@ -278,20 +278,20 @@ mfile_sync(struct mfile *__restrict self)
 	 * no changed parts at all. */
 	for (;;) {
 		uintptr_t flags;
-		flags = ATOMIC_READ(self->mf_flags);
+		flags = atomic_read(&self->mf_flags);
 		if (flags & MFILE_F_DELETED)
 			break;
 		if (!(flags & MFILE_F_CHANGED))
 			break;
-		if (ATOMIC_CMPXCH_WEAK(self->mf_flags, flags, flags & ~MFILE_F_CHANGED))
+		if (atomic_cmpxch_weak(&self->mf_flags, flags, flags & ~MFILE_F_CHANGED))
 			break;
 	}
 	do {
-		changes = ATOMIC_READ(self->mf_changed.slh_first);
+		changes = atomic_read(&self->mf_changed.slh_first);
 		if (/*changes == NULL || */ /* The NULL-case is implicitly handled below */
 		    changes == MFILE_PARTS_ANONYMOUS)
 			return 0;
-	} while (!ATOMIC_CMPXCH_WEAK(self->mf_changed.slh_first,
+	} while (!atomic_cmpxch_weak(&self->mf_changed.slh_first,
 	                             changes, NULL));
 	TRY {
 		/* Sync all parts. */

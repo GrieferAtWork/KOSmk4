@@ -40,12 +40,11 @@
 #include <sched/task.h>
 #include <sched/userkern.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <sys/wait.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -61,7 +60,7 @@ DECL_BEGIN
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mnode_tree_foreach_set_unmapped)(struct mnode *__restrict root) {
 again:
-	ATOMIC_OR(root->mn_flags, MNODE_F_UNMAPPED);
+	atomic_or(&root->mn_flags, MNODE_F_UNMAPPED);
 
 	/* Keep track of how many nodes are mapping a particular module. */
 	if (root->mn_module)

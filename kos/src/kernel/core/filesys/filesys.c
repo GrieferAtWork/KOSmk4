@@ -36,7 +36,6 @@
 #include <sched/sig.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 #include <hybrid/sched/atomic-lock.h>
 
@@ -44,6 +43,7 @@
 #include <kos/except.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -120,13 +120,13 @@ PRIVATE NOBLOCK WUNUSED NONNULL((1)) REF struct fsuper *
 NOTHROW(FCALL find_existing_superblock)(struct mfile *__restrict dev) {
 	struct fsuper *iter;
 	LIST_FOREACH (iter, &fallsuper_list, fs_root.fn_allsuper) {
-		if (ATOMIC_READ(iter->fs_dev) != dev)
+		if (atomic_read(&iter->fs_dev) != dev)
 			continue;
 
 		/* Make sure that this superblock hasn't been destroyed yet,
 		 * and also hasn't  been marked as  unmounted. If either  of
 		 * these  is the case, then act like we didn't see anything. */
-		if (ATOMIC_READ(iter->fs_mounts.lh_first) == FSUPER_MOUNTS_DELETED)
+		if (atomic_read(&iter->fs_mounts.lh_first) == FSUPER_MOUNTS_DELETED)
 			continue; /* Can no longer be mounted. */
 
 		if unlikely(!tryincref(iter)) {
@@ -359,7 +359,7 @@ ffilesys_open(struct ffilesys *__restrict self, bool *__restrict pnewly_created,
 	/* Check for special case: singleton */
 	if (self->ffs_flags & FFILESYS_F_SINGLE) {
 		*pnewly_created = false;
-		assertf(ATOMIC_READ(self->ffs_single->fs_mounts.lh_first) != FSUPER_MOUNTS_DELETED,
+		assertf(atomic_read(&self->ffs_single->fs_mounts.lh_first) != FSUPER_MOUNTS_DELETED,
 		        "Singleton superblocks shouldn't be able to get marked as mounts-DELETED");
 		return incref(self->ffs_single);
 	}
@@ -676,7 +676,7 @@ NOTHROW(LOCKOP_CC ffilesys_unregister_lop)(struct lockop *__restrict self) {
  * @return: false: The format wasn't registered. */
 PUBLIC NONNULL((1)) bool
 NOTHROW(FCALL ffilesys_unregister)(struct ffilesys *__restrict self) {
-	if (!ATOMIC_CMPXCH(self->_ffs_lop.lo_func, NULL, &ffilesys_unregister_lop))
+	if (!atomic_cmpxch(&self->_ffs_lop.lo_func, NULL, &ffilesys_unregister_lop))
 		return false;
 	if (ffilesys_formats_tryacquire()) {
 		SLIST_REMOVE(&ffilesys_formats_list, self, ffs_link);

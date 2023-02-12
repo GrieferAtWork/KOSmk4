@@ -35,14 +35,13 @@
 #include <sched/cpu.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/x86/segment.h>
 #include <kos/sched/shared-lock.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
@@ -149,7 +148,7 @@ PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL x86_idt_setcurrent_ipi)(struct icpustate *__restrict state,
                                       void *args[CPU_IPI_ARGCOUNT]) {
 	__lidt_p(args[0]);
-	ATOMIC_INC(x86_idt_setcurrent_ack);
+	atomic_inc(&x86_idt_setcurrent_ack);
 	printk(KERN_DEBUG "[idt#%u] Acknowledge new IDT\n",
 	       THIS_CPU->c_id);
 	return state;
@@ -177,7 +176,7 @@ NOTHROW(FCALL x86_idt_setcurrent)(struct desctab const *__restrict ptr) {
 	{
 		unsigned int count;
 		void *args[CPU_IPI_ARGCOUNT];
-		ATOMIC_WRITE(x86_idt_setcurrent_ack, 0);
+		atomic_write(&x86_idt_setcurrent_ack, 0);
 		args[0] = (void *)ptr;
 		/* NOTE: We always set the `CPU_IPI_FWAKEUP' flag, even though  doing
 		 *       so is kind-of excessive, simply because we don't want to run
@@ -188,7 +187,7 @@ NOTHROW(FCALL x86_idt_setcurrent)(struct desctab const *__restrict ptr) {
 		 *       old (original) IDT base address being restored. */
 		count = cpu_broadcastipi_notthis(&x86_idt_setcurrent_ipi, args,
 		                                 CPU_IPI_FWAKEUP | CPU_IPI_FWAITFOR);
-		while (ATOMIC_READ(x86_idt_setcurrent_ack) < count)
+		while (atomic_read(&x86_idt_setcurrent_ack) < count)
 			task_pause();
 	}
 #endif /* !CONFIG_NO_SMP */

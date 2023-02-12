@@ -42,8 +42,6 @@
 #include <sched/sig.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except/reason/inval.h>
 #include <sys/ioctl.h>
 #include <sys/mkdev.h>

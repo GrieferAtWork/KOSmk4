@@ -27,12 +27,12 @@
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/msync.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 
+#include <atomic.h>
 #include <stddef.h>
 
 DECL_BEGIN
@@ -94,10 +94,10 @@ mman_msync(struct mman *__restrict self, void *addr,
 		minaddr = (byte_t *)mnode_getendaddr(mima.mm_min);
 
 		/* Sync all SHARED nodes bound to non-anonymous mem-parts. */
-		if ((mima.mm_min->mn_flags & MNODE_F_SHARED) &&             /* Must be a SHARED mapping! */
-		    (part = mima.mm_min->mn_part) != NULL &&                /* Node needs to be bound to a part */
-		    (ATOMIC_READ(part->mp_flags) & MPART_F_CHANGED) != 0 && /* Part must have been changed */
-		    !mpart_isanon(part)) {                                  /* Part mustn't be anonymous */
+		if ((mima.mm_min->mn_flags & MNODE_F_SHARED) &&              /* Must be a SHARED mapping! */
+		    (part = mima.mm_min->mn_part) != NULL &&                 /* Node needs to be bound to a part */
+		    (atomic_read(&part->mp_flags) & MPART_F_CHANGED) != 0 && /* Part must have been changed */
+		    !mpart_isanon(part)) {                                   /* Part mustn't be anonymous */
 			/* Yes: _do_ sync this part! */
 			incref(part);
 			mman_lock_release(self);

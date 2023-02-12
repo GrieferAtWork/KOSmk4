@@ -39,13 +39,13 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <string.h>
 
@@ -148,14 +148,14 @@ mpart_nodma_or_unlock(struct mpart *__restrict self,
                       struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, ...) {
 	struct mpartmeta *meta = self->mp_meta;
-	if (meta != NULL && ATOMIC_READ(meta->mpm_dmalocks) != 0) {
+	if (meta != NULL && atomic_read(&meta->mpm_dmalocks) != 0) {
 		/* Must blocking-wait until all DMA locks have been released. */
 		incref(self);
 		UNLOCK(self, unlock);
 		{
 			FINALLY_DECREF_UNLIKELY(self);
 			task_connect(&meta->mpm_dma_done);
-			if unlikely(ATOMIC_READ(meta->mpm_dmalocks) == 0) {
+			if unlikely(atomic_read(&meta->mpm_dmalocks) == 0) {
 				task_disconnectall();
 				return false;
 			}
@@ -652,7 +652,7 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 
 			/* All blocks are undefined by default! */
 			self->mp_blkst_inl = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_NDEF);
-			ATOMIC_OR(self->mp_flags, MPART_F_BLKST_INL);
+			atomic_or(&self->mp_flags, MPART_F_BLKST_INL);
 		} else if (self->mp_blkst_ptr == NULL) {
 			/* Must actually allocate the block-status bitset! */
 			if (!setcore_ex_makebitset_or_unlock(self, unlock, data, num_blocks, GFP_CALLOC))
@@ -661,7 +661,7 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 			/* NOTE: Because we've used GFP_CALLOC, all blocks will have
 			 *       already been initialized to  `MPART_BLOCK_ST_NDEF'! */
 			self->mp_blkst_ptr = data->scd_bitset;
-			ATOMIC_AND(self->mp_flags, ~MPART_F_BLKST_INL);
+			atomic_and(&self->mp_flags, ~MPART_F_BLKST_INL);
 			DBG_memset(&data->scd_bitset, 0xcc, sizeof(data->scd_bitset));
 		}
 #ifndef NDEBUG
@@ -721,7 +721,7 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 			goto done_swap;
 
 		/* Set the flag to indicate that there are INIT-blocks! */
-		ATOMIC_OR(self->mp_flags, MPART_F_MAYBE_BLK_INIT);
+		atomic_or(&self->mp_flags, MPART_F_MAYBE_BLK_INIT);
 
 		/* At this point, we know  that _all_ INIT-entries within the  bitset
 		 * of  `self' originate from  our doing. As  such, copy the constants
@@ -931,7 +931,7 @@ mpart_load_or_unlock(struct mpart *__restrict self,
 				break; /* The next block is no longer marked as UNDEF. */
 			++end;
 		}
-		ATOMIC_OR(self->mp_flags, MPART_F_MAYBE_BLK_INIT);
+		atomic_or(&self->mp_flags, MPART_F_MAYBE_BLK_INIT);
 		incref(self);
 		incref(file);
 		mfile_trunclock_inc(file);

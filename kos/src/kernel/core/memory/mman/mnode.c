@@ -41,12 +41,11 @@
 #include <kernel/panic.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <kos/lockop.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -119,7 +118,7 @@ NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self) {
 
 	/* Clear the lock-flag for our part, since there are no
 	 * more nodes that could keep our part locked  in-core! */
-	ATOMIC_AND(self->mp_flags, ~MPART_F_MLOCK);
+	atomic_and_release(&self->mp_flags, ~MPART_F_MLOCK);
 }
 
 

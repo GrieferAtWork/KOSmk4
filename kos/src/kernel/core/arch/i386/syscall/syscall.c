@@ -47,7 +47,6 @@
 #include <sched/task.h>
 #include <sched/x86/tss.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/host.h>
 
 #include <asm/cpu-cpuid.h>
@@ -56,10 +55,10 @@
 #include <asm/intrin.h>
 #include <kos/bits/exception_data-convert.h>
 #include <kos/bits/exception_data32.h>
+#include <kos/kernel/bits/cpu-state32.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/bits/cpu-state32.h>
 #include <kos/kernel/x86/gdt.h>
 #include <kos/kernel/x86/tss-compat.h>
 #include <kos/kernel/x86/tss.h>
@@ -67,6 +66,7 @@
 #include <sys/wait.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <signal.h>
 #include <stdint.h>
@@ -277,7 +277,7 @@ PUBLIC bool KCALL arch_syscall_tracing_setenabled(bool enable, bool nx) {
 /* Check if system call tracing is enabled. */
 PUBLIC WUNUSED bool
 NOTHROW(KCALL arch_syscall_tracing_getenabled)(void) {
-	return ATOMIC_READ(syscall_tracing_enabled);
+	return atomic_read(&syscall_tracing_enabled);
 }
 #endif /* !CONFIG_NO_KERNEL_SYSCALL_TRACING */
 

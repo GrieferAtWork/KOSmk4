@@ -32,11 +32,10 @@
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <stddef.h>
@@ -221,7 +220,7 @@ dirhandle_xdel(struct dirhandlex *__restrict self) {
 	result = dirhandle_new(self->dh_enum.de_dir,
 	                       self->dh_path,
 	                       self->dh_dirent);
-	result->dh_dots = ATOMIC_READ(self->dh_dots);
+	result->dh_dots = atomic_read(&self->dh_dots);
 
 	/* Try to copy directory enumerator positions. */
 	TRY {

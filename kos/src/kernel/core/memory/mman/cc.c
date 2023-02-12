@@ -59,7 +59,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <sched/pid.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/kernel/handle.h>
@@ -67,6 +66,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <alloca.h>
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -154,14 +154,14 @@ NOTHROW(KCALL system_cc_drivers)(struct ccinfo *__restrict info) {
 		if (!tryincref(drv))
 			continue; /* Dead driver... */
 		system_cc_perdriver(drv, info);
-		if (ATOMIC_DECFETCH(drv->md_refcnt) == 0) {
+		if (atomic_decfetch(&drv->md_refcnt) == 0) {
 			ccinfo_account(info, sizeof(struct driver));
 			destroy(drv);
 		}
 		if (ccinfo_isdone(info))
 			break;
 	}
-	if (ATOMIC_DECFETCH(ll->dll_refcnt) == 0) {
+	if (atomic_decfetch(&ll->dll_refcnt) == 0) {
 		ccinfo_account(info, offsetof(struct driver_loadlist, dll_drivers));
 		ccinfo_account(info, ll->dll_count * sizeof(REF struct driver *));
 		driver_loadlist_destroy(ll);
@@ -314,7 +314,7 @@ again:
 	/* Recursively clear caches of parent paths. */
 	if (!path_isroot(self)) {
 		REF struct path *parent = path_getparent(self);
-		if (ATOMIC_DECFETCH(self->p_refcnt) == 0) {
+		if (atomic_decfetch(&self->p_refcnt) == 0) {
 			ccinfo_account(info, sizeof(struct path));
 			path_destroy(self);
 		}
@@ -322,7 +322,7 @@ again:
 		goto again;
 	}
 done:
-	if (ATOMIC_DECFETCH(self->p_refcnt) == 0) {
+	if (atomic_decfetch(&self->p_refcnt) == 0) {
 		ccinfo_account(info, sizeof(struct path));
 		path_destroy(self);
 	}
@@ -353,7 +353,7 @@ NOTHROW(FCALL system_cc_vfs_recent_paths_unload)(struct vfs *__restrict self,
 	 * do us any good since we can only report memory having been
 	 * freed if we actually managed to destroy a path. */
 	TAILQ_FOREACH_SAFE (iter, &self->vf_recent, p_recent) {
-		if (!ATOMIC_CMPXCH(iter->p_refcnt, 1, 0))
+		if (!atomic_cmpxch(&iter->p_refcnt, 1, 0))
 			continue; /* Remove from the recent cache wouldn't kill this one... */
 
 		/* Remove from the recent cache. */
@@ -392,7 +392,7 @@ NOTHROW(FCALL system_cc_vfs_recent_paths)(struct vfs *__restrict self,
 	for (;;) {
 		xincref(iter);
 		vfs_recentlock_release(self);
-		if (prev && ATOMIC_DECFETCH(prev->p_refcnt) == 0) {
+		if (prev && atomic_decfetch(&prev->p_refcnt) == 0) {
 			ccinfo_account(info, sizeof(struct path));
 			path_destroy(prev);
 		}
@@ -427,7 +427,7 @@ NOTHROW(FCALL system_cc_vfs_recent_paths)(struct vfs *__restrict self,
 		iter = TAILQ_NEXT(iter, p_recent);
 		++index;
 	}
-	if (iter && ATOMIC_DECFETCH(iter->p_refcnt) == 0) {
+	if (iter && atomic_decfetch(&iter->p_refcnt) == 0) {
 		ccinfo_account(info, sizeof(struct path));
 		path_destroy(iter);
 	}
@@ -451,7 +451,7 @@ NOTHROW(FCALL system_cc_vfs_mounts)(struct vfs *__restrict self,
 	for (;;) {
 		xincref(iter);
 		vfs_mountslock_release(self);
-		if (prev && ATOMIC_DECFETCH(prev->p_refcnt) == 0) {
+		if (prev && atomic_decfetch(&prev->p_refcnt) == 0) {
 			ccinfo_account(info, sizeof(struct path));
 			path_destroy(prev);
 		}
@@ -486,7 +486,7 @@ NOTHROW(FCALL system_cc_vfs_mounts)(struct vfs *__restrict self,
 		iter = LIST_NEXT(iter, pm_vsmount);
 		++index;
 	}
-	if (iter && ATOMIC_DECFETCH(iter->p_refcnt) == 0) {
+	if (iter && atomic_decfetch(&iter->p_refcnt) == 0) {
 		ccinfo_account(info, sizeof(struct path));
 		path_destroy(iter);
 	}
@@ -515,7 +515,7 @@ NOTHROW(FCALL system_cc_vfs_drives)(struct vfs *__restrict self,
 			for (; i < lengthof(self->vf_drives); ++i) {
 				if (!paths[i])
 					continue;
-				if (ATOMIC_DECFETCH(paths[i]->p_refcnt) == 0) {
+				if (atomic_decfetch(&paths[i]->p_refcnt) == 0) {
 					ccinfo_account(info, sizeof(struct path));
 					path_destroy(paths[i]);
 				}
@@ -579,7 +579,7 @@ NOTHROW(FCALL system_cc_fs_paths)(struct fs *__restrict self,
 			for (; i < lengthof(paths); ++i) {
 				if (!paths[i])
 					continue;
-				if (ATOMIC_DECFETCH(paths[i]->p_refcnt) == 0) {
+				if (atomic_decfetch(&paths[i]->p_refcnt) == 0) {
 					ccinfo_account(info, sizeof(struct path));
 					path_destroy(paths[i]);
 				}
@@ -692,7 +692,7 @@ NOTHROW(FCALL system_cc_mman_execinfo)(struct mman *__restrict self,
 	mman_lock_endread(self);
 	if (exec_file) {
 		system_cc_permfile(exec_file, info);
-		if (ATOMIC_DECFETCH(exec_file->mf_refcnt) == 0) {
+		if (atomic_decfetch(&exec_file->mf_refcnt) == 0) {
 			ccinfo_account(info, sizeof(struct mfile));
 			mfile_destroy(exec_file);
 		}
@@ -701,7 +701,7 @@ NOTHROW(FCALL system_cc_mman_execinfo)(struct mman *__restrict self,
 		if (!ccinfo_isdone(info)) {
 			system_cc_perpath_inherit_reference(exec_path, info);
 		} else {
-			if (ATOMIC_DECFETCH(exec_path->p_refcnt) == 0) {
+			if (atomic_decfetch(&exec_path->p_refcnt) == 0) {
 				ccinfo_account(info, sizeof(struct path));
 				path_destroy(exec_path);
 			}
@@ -736,7 +736,7 @@ NOTHROW(FCALL system_cc_pertask)(struct task *__restrict self,
 		REF struct mman *threadmm;
 		threadmm = task_getmman(self);
 		system_cc_permman(threadmm, info);
-		if (ATOMIC_DECFETCH(threadmm->mm_refcnt) == 0) {
+		if (atomic_decfetch(&threadmm->mm_refcnt) == 0) {
 			ccinfo_account(info, sizeof(struct mman));
 			mman_destroy(threadmm);
 		}
@@ -745,11 +745,11 @@ NOTHROW(FCALL system_cc_pertask)(struct task *__restrict self,
 		return;
 
 	/* Clear per-fs caches. */
-	if (ATOMIC_READ(FORTASK(self, this_fs)) != NULL) { /* Should never be NULL (but lets be safe) */
+	if (atomic_read(&FORTASK(self, this_fs)) != NULL) { /* Should never be NULL (but lets be safe) */
 		REF struct fs *threadfs;
 		threadfs = task_getfs(self);
 		system_cc_perfs(threadfs, info);
-		if (ATOMIC_DECFETCH(threadfs->fs_refcnt) == 0) {
+		if (atomic_decfetch(&threadfs->fs_refcnt) == 0) {
 			ccinfo_account(info, sizeof(struct fs));
 			fs_destroy(threadfs);
 		}
@@ -758,11 +758,11 @@ NOTHROW(FCALL system_cc_pertask)(struct task *__restrict self,
 		return;
 
 	/* Clear per-handle-manager caches. */
-	if (ATOMIC_READ(FORTASK(self, this_handman)) != NULL) { /* Should never be NULL (but lets be safe) */
+	if (atomic_read(&FORTASK(self, this_handman)) != NULL) { /* Should never be NULL (but lets be safe) */
 		REF struct handman *threadhm;
 		threadhm = task_gethandman(self);
 		system_cc_perhman(threadhm, info);
-		if (ATOMIC_DECFETCH(threadhm->hm_refcnt) == 0) {
+		if (atomic_decfetch(&threadhm->hm_refcnt) == 0) {
 			ccinfo_account(info, sizeof(struct handman));
 			handman_destroy(threadhm);
 		}
@@ -791,7 +791,7 @@ again:
 	thread = taskpid_gettask(pid);
 	if likely(thread) {
 		system_cc_pertask(thread, info);
-		if (ATOMIC_DECFETCH(thread->t_refcnt) == 0) {
+		if (atomic_decfetch(&thread->t_refcnt) == 0) {
 			ccinfo_account(info, sizeof(struct task)); /* ... */
 			task_destroy(thread);
 		}
@@ -833,7 +833,7 @@ NOTHROW(KCALL pidns_root_gather_threads)(REF struct task **buf, size_t count,
 		if (OVERFLOW_SADD(npid->tp_pids[0].tps_pid, 1, &minpid))
 			minpid = -1;
 		thread = taskpid_gettask(npid);
-		if (ATOMIC_DECFETCH(npid->tp_refcnt) == 0) {
+		if (atomic_decfetch(&npid->tp_refcnt) == 0) {
 			ccinfo_account(info, _taskpid_sizeof(npid->tp_ns));
 			taskpid_destroy(npid);
 		}
@@ -878,7 +878,7 @@ again_gather:
 		REF struct task *thread = chunkbase[i];
 		if (!ccinfo_isdone(info))
 			system_cc_pertask(thread, info);
-		if (ATOMIC_DECFETCH(thread->t_refcnt) == 0) {
+		if (atomic_decfetch(&thread->t_refcnt) == 0) {
 			ccinfo_account(info, sizeof(struct task)); /* ... */
 			task_destroy(thread);
 		}
@@ -988,7 +988,7 @@ again:
 	LIST_FOREACH_SAFE (iter, &mpart_all_list, mp_allparts) {
 		if (!(iter->mp_flags & MPART_F_GLOBAL_REF))
 			continue; /* Can't be decref'd */
-		if (ATOMIC_READ(iter->mp_refcnt) != 1)
+		if (atomic_read(&iter->mp_refcnt) != 1)
 			continue; /* External references exist, or already destroyed. */
 
 		/* Try to unload this mem-part. */
@@ -998,7 +998,7 @@ again:
 				continue;
 			mpart_all_release();
 			waitfor_ok = mpart_lock_waitfor_nx(iter);
-			if (ATOMIC_DECFETCH(iter->mp_refcnt) == 0) {
+			if (atomic_decfetch(&iter->mp_refcnt) == 0) {
 				ccinfo_account(info, sizeof(struct mpart));
 				SLIST_INSERT(&deadlist, iter, _mp_dead);
 			}
@@ -1012,20 +1012,20 @@ again:
 		/* Only unload parts of non-persistent files. */
 		if (iter->mp_file->mf_flags & MFILE_F_PERSISTENT)
 			goto part_not_unloaded;
-		if (!(ATOMIC_FETCHAND(iter->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)) /* Inherit reference */
+		if (!(atomic_fetchand(&iter->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)) /* Inherit reference */
 			goto part_not_unloaded;
-		if (!ATOMIC_CMPXCH(iter->mp_refcnt, 1, 0)) {
-			if (!(ATOMIC_FETCHOR(iter->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)) /* Inherit reference */
+		if (!atomic_cmpxch(&iter->mp_refcnt, 1, 0)) {
+			if (!(atomic_fetchor(&iter->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)) /* Inherit reference */
 				goto part_not_unloaded;
 			/* Someone else set the GLOBAL_REF bit in the mean time?
 			 * Anyways: since they did, they're would have had to incref() the part
 			 *          to do so, so we have to decref() it since we were unable to
 			 *          have the part re-inherit its original global reference. */
-			if (ATOMIC_DECFETCH(iter->mp_refcnt) != 0)
+			if (atomic_decfetch(&iter->mp_refcnt) != 0)
 				goto part_not_unloaded;
 		}
 		/* Part got destroyed! */
-		assert(!(ATOMIC_READ(iter->mp_flags) & MPART_F_GLOBAL_REF));
+		assert(!(atomic_read(&iter->mp_flags) & MPART_F_GLOBAL_REF));
 		SLIST_INSERT(&deadlist, iter, _mp_dead);
 		ccinfo_account(info, sizeof(struct mpart));
 		if (ccinfo_isdone(info))
@@ -1073,7 +1073,7 @@ again:
 	LIST_FOREACH_SAFE (iter, &fallnodes_list, fn_allnodes) {
 		if ((iter->mf_flags & (MFILE_FN_GLOBAL_REF | MFILE_F_PERSISTENT)) != MFILE_FN_GLOBAL_REF)
 			goto nextnode; /* Can't be unloaded via decref */
-		if (ATOMIC_READ(iter->mf_refcnt) != 1)
+		if (atomic_read(&iter->mf_refcnt) != 1)
 			goto nextnode; /* External references exist, or already destroyed. */
 
 		/* Try to unload this file. */
@@ -1083,7 +1083,7 @@ again:
 				goto nextnode;
 			mpart_all_release();
 			waitfor_ok = mfile_lock_waitwrite_nx(iter);
-			if (ATOMIC_DECFETCH(iter->mf_refcnt) == 0) {
+			if (atomic_decfetch(&iter->mf_refcnt) == 0) {
 				ccinfo_account(info, sizeof(struct mfile));
 				SLIST_INSERT(&deadlist, iter, _mf_deadnod);
 			}
@@ -1094,18 +1094,18 @@ again:
 			goto again;
 		}
 		mfile_tslock_acquire(iter);
-		if (!(ATOMIC_FETCHAND(iter->mf_flags, ~MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)) { /* inherit reference */
+		if (!(atomic_fetchand(&iter->mf_flags, ~MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)) { /* inherit reference */
 			mfile_tslock_release_br(iter);
 			mfile_lock_endwrite(iter);
 			goto nextnode;
 		}
-		if (!ATOMIC_CMPXCH(iter->mf_refcnt, 1, 0)) {
-			if (!(ATOMIC_FETCHOR(iter->mf_flags, MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)) { /* inherit reference */
+		if (!atomic_cmpxch(&iter->mf_refcnt, 1, 0)) {
+			if (!(atomic_fetchor(&iter->mf_flags, MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)) { /* inherit reference */
 				mfile_tslock_release_br(iter);
 				mfile_lock_endwrite(iter);
 				goto nextnode;
 			}
-			if (ATOMIC_DECFETCH(iter->mf_refcnt) != 0) {
+			if (atomic_decfetch(&iter->mf_refcnt) != 0) {
 				mfile_tslock_release_br(iter);
 				mfile_lock_endwrite(iter);
 				goto nextnode;
@@ -1255,7 +1255,7 @@ NOTHROW(KCALL system_cc_allnodes)(struct ccinfo *__restrict info) {
 		while (node && !tryincref(node))
 			node = LIST_NEXT(node, fn_allnodes);
 		fallnodes_release();
-		if (prev && ATOMIC_DECFETCH(prev->mf_refcnt) == 0) {
+		if (prev && atomic_decfetch(&prev->mf_refcnt) == 0) {
 			ccinfo_account(info, sizeof(struct fnode));
 			mfile_destroy(prev);
 		}
@@ -1290,7 +1290,7 @@ NOTHROW(KCALL system_cc_allnodes)(struct ccinfo *__restrict info) {
 		node = LIST_NEXT(node, fn_allnodes);
 		++index;
 	}
-	if (node && ATOMIC_DECFETCH(node->mf_refcnt) == 0) {
+	if (node && atomic_decfetch(&node->mf_refcnt) == 0) {
 		ccinfo_account(info, sizeof(struct fnode));
 		mfile_destroy(node);
 	}
@@ -1314,7 +1314,7 @@ NOTHROW(KCALL system_cc_allsuper)(struct ccinfo *__restrict info) {
 		while (super && !tryincref(super))
 			super = LIST_NEXT(super, fs_root.fn_allsuper);
 		fallsuper_release();
-		if (prev && ATOMIC_DECFETCH(prev->fs_root.mf_refcnt) == 0) {
+		if (prev && atomic_decfetch(&prev->fs_root.mf_refcnt) == 0) {
 			ccinfo_account(info, sizeof(struct fsuper));
 			mfile_destroy(&prev->fs_root);
 		}
@@ -1349,7 +1349,7 @@ NOTHROW(KCALL system_cc_allsuper)(struct ccinfo *__restrict info) {
 		super = LIST_NEXT(super, fs_root.fn_allsuper);
 		++index;
 	}
-	if (super && ATOMIC_DECFETCH(super->fs_root.mf_refcnt) == 0) {
+	if (super && atomic_decfetch(&super->fs_root.mf_refcnt) == 0) {
 		ccinfo_account(info, sizeof(struct fsuper));
 		mfile_destroy(&super->fs_root);
 	}
@@ -1448,19 +1448,19 @@ NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
 	}
 
 	/* Start out by trying to clear system caches ourself. */
-	ATOMIC_INC(cc_inside);
+	atomic_inc(&cc_inside);
 	system_cc_impl(info);
 
 	/* Check if we already managed to release some memory */
 	if (info->ci_bytes != 0) {
 		/* Since something  was cleared,  indicate
 		 * that by incrementing the cache version. */
-		info->ci_version = ATOMIC_FETCHINC(cc_version);
-		ATOMIC_DEC(cc_inside);
+		info->ci_version = atomic_fetchinc(&cc_version);
+		atomic_dec(&cc_inside);
 		return true;
 	}
-	version = ATOMIC_READ(cc_version);
-	inside  = ATOMIC_DECFETCH(cc_inside);
+	version = atomic_read(&cc_version);
+	inside  = atomic_decfetch(&cc_inside);
 
 	/* If other threads are clearing caches, we try to yield to them. */
 	if (inside != 0) {
@@ -1468,7 +1468,7 @@ NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
 		for (n = 0; n < 256; ++n) {
 			unsigned int yield_error;
 			yield_error = task_tryyield_or_pause();
-			if (ATOMIC_READ(cc_inside) < inside)
+			if (atomic_read(&cc_inside) < inside)
 				break;
 			if (yield_error != TASK_TRYYIELD_SUCCESS)
 				break; /* Cannot yield... */
@@ -1478,9 +1478,9 @@ NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
 
 	/* Fix zero-version (which is used to indicate the first cc-attempt) */
 	if (version == 0) {
-		ATOMIC_INC(cc_inside);
-		version = ATOMIC_INCFETCH(cc_version);
-		ATOMIC_DEC(cc_inside);
+		atomic_inc(&cc_inside);
+		version = atomic_incfetch(&cc_version);
+		atomic_dec(&cc_inside);
 	}
 
 	/* If the cache version changed since the

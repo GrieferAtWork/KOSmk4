@@ -52,17 +52,16 @@
 #include <kernel/printk.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
-#include <kos/uuid.h>
 #include <kos/kernel/handle.h>
 #include <kos/sched/shared-rwlock.h>
+#include <kos/uuid.h>
 #include <sys/mkdev.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <format-printer.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -754,7 +753,7 @@ again_acquire_lock_for_insert:
 			} else {
 				/* Hard link -> increment the nlink counter */
 				mfile_tslock_acquire(new_node);
-				ATOMIC_INC(new_node->fn_nlink);
+				atomic_inc(&new_node->fn_nlink);
 				mfile_tslock_release(new_node);
 				mfile_inotify_attrib(new_node); /* Post `IN_ATTRIB' */
 			}
@@ -1310,7 +1309,7 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self) {
 	awref_clear(&me->dv_dirent->dd_dev);
 
 	/* Must remove `me' from `devfs_byname_tree' */
-	if (ATOMIC_READ(me->dv_byname_node.rb_lhs) != DEVICE_BYNAME_DELETED) {
+	if (atomic_read(&me->dv_byname_node.rb_lhs) != DEVICE_BYNAME_DELETED) {
 		if (devfs_byname_trywrite()) {
 			COMPILER_READ_BARRIER();
 			if (me->dv_byname_node.rb_lhs != DEVICE_BYNAME_DELETED)
@@ -1519,7 +1518,7 @@ NOTHROW(FCALL _device_register_inuse_ino)(ino_t ino) {
 	if (wasdestroyed(existing)) {
 		/* Unlink destroyed device. */
 		fsuper_nodes_removenode(&devfs, existing);
-		ATOMIC_WRITE(existing->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
+		atomic_write(&existing->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
 		return false;
 	}
 	return true;
@@ -1858,7 +1857,7 @@ NOTHROW(LOCKOP_CC device_delete_remove_from_byino_lop)(Toblockop(fsuper) *__rest
 			return NULL;
 		}
 		fsuper_nodes_removenode(&devfs, me);
-		ATOMIC_WRITE(me->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
+		atomic_write(&me->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
 	}
 	me->_mf_fsuperplop.oplo_func = &device_delete_remove_from_byino_postlop; /* Inherit reference */
 	return &me->_mf_fsuperplop;
@@ -1898,7 +1897,7 @@ NOTHROW(FCALL device_delete)(struct device *__restrict self) {
 
 	/* Mark the device as deleted (and make available use of the file fields) */
 	mfile_tslock_acquire(self);
-	old_flags = ATOMIC_FETCHOR(self->mf_flags,
+	old_flags = atomic_fetchor(&self->mf_flags,
 	                           MFILE_F_DELETED | MFILE_F_NOATIME | MFILE_FN_NODIRATIME |
 	                           MFILE_F_NOMTIME | MFILE_F_CHANGED | MFILE_F_ATTRCHANGED |
 	                           MFILE_F_FIXEDFILESIZE | MFILE_FN_ATTRREADONLY |
@@ -1907,12 +1906,12 @@ NOTHROW(FCALL device_delete)(struct device *__restrict self) {
 
 	/* Delete global reference to the device. */
 	if ((old_flags & MFILE_FN_GLOBAL_REF) &&
-	    (ATOMIC_FETCHAND(self->mf_flags, ~(MFILE_FN_GLOBAL_REF)) & MFILE_FN_GLOBAL_REF))
+	    (atomic_fetchand(&self->mf_flags, ~(MFILE_FN_GLOBAL_REF)) & MFILE_FN_GLOBAL_REF))
 		decref_nokill(self);
 
 	/* Also clear the PERSISTENT flag */
 	if (old_flags & MFILE_F_PERSISTENT)
-		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT);
+		atomic_and(&self->mf_flags, ~MFILE_F_PERSISTENT);
 
 	if (old_flags & MFILE_F_DELETED)
 		return; /* Already deleted, or deletion already in progress. */
@@ -1920,7 +1919,7 @@ NOTHROW(FCALL device_delete)(struct device *__restrict self) {
 	incref(self);
 
 	/* Remove from the /dev/ filesystem */
-	if (ATOMIC_READ(self->dv_byname_node.rb_lhs) != DEVICE_BYNAME_DELETED) {
+	if (atomic_read(&self->dv_byname_node.rb_lhs) != DEVICE_BYNAME_DELETED) {
 		if (devfs_byname_trywrite()) {
 			COMPILER_READ_BARRIER();
 			if (self->dv_byname_node.rb_lhs != DEVICE_BYNAME_DELETED) {

@@ -54,7 +54,6 @@
 #include <sched/x86/tss.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
@@ -65,6 +64,7 @@
 #include <kos/nopf.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <signal.h>
 #include <stdint.h>
@@ -177,9 +177,9 @@ handle_iob_access(struct cpu *__restrict me,
 	assert(!PREEMPTION_ENABLED());
 	iob = THIS_X86_IOPERM_BITMAP;
 	if (!iob) {
-		assertf(ATOMIC_READ(FORCPU(me, thiscpu_x86_ioperm_bitmap)) == NULL,
+		assertf(atomic_read(&FORCPU(me, thiscpu_x86_ioperm_bitmap)) == NULL,
 		        "FORCPU(me, thiscpu_x86_ioperm_bitmap) = %p",
-		        ATOMIC_READ(FORCPU(me, thiscpu_x86_ioperm_bitmap)));
+		        atomic_read(&FORCPU(me, thiscpu_x86_ioperm_bitmap)));
 		if (is_writing) {
 			iob = ioperm_bitmap_allocf_nx(GET_GFP_FLAGS());
 			if unlikely(!iob) {
@@ -188,22 +188,22 @@ handle_iob_access(struct cpu *__restrict me,
 				/* Re-attempt the allocation with preemption enabled. */
 				PREEMPTION_ENABLE();
 				iob = ioperm_bitmap_allocf(GFP_LOCKED | GFP_PREFLT);
-				assertf(ATOMIC_READ(FORCPU(me, thiscpu_x86_ioperm_bitmap)) == NULL,
+				assertf(atomic_read(&FORCPU(me, thiscpu_x86_ioperm_bitmap)) == NULL,
 				        "FORCPU(me, thiscpu_x86_ioperm_bitmap) = %p",
-				        ATOMIC_READ(FORCPU(me, thiscpu_x86_ioperm_bitmap)));
+				        atomic_read(&FORCPU(me, thiscpu_x86_ioperm_bitmap)));
 				PERTASK_SET(this_x86_ioperm_bitmap, iob);
 				return false;
 			}
 		} else {
 			iob = incref(&ioperm_bitmap_empty);
-			ATOMIC_INC(iob->ib_share);
+			atomic_inc(&iob->ib_share);
 		}
 		/* NOTE: The following line  causes an inconsistency  that is fixed  by
 		 *       assigning `FORCPU(me, thiscpu_x86_ioperm_bitmap) = iob' below.
 		 *       Because   preemption  is  currently  off,  this  inconsistency
 		 *       never becomes visible outside of this function. */
 		PERTASK_SET(this_x86_ioperm_bitmap, iob);
-	} else if (is_writing && ATOMIC_READ(iob->ib_share) > 1) {
+	} else if (is_writing && atomic_read(&iob->ib_share) > 1) {
 		/* Unshare the IOB vector prior to allowing write-access */
 		REF struct ioperm_bitmap *cow;
 		cow = ioperm_bitmap_copyf_nx(iob, GET_GFP_FLAGS());
@@ -225,7 +225,7 @@ handle_iob_access(struct cpu *__restrict me,
 			        "THIS_X86_IOPERM_BITMAP = %p\n"
 			        "iob                    = %p",
 			        THIS_X86_IOPERM_BITMAP, iob);
-			if (ATOMIC_READ(FORCPU(me, thiscpu_x86_ioperm_bitmap)) == iob) {
+			if (atomic_read(&FORCPU(me, thiscpu_x86_ioperm_bitmap)) == iob) {
 				PREEMPTION_DISABLE();
 				COMPILER_READ_BARRIER();
 				if (FORCPU(me, thiscpu_x86_ioperm_bitmap) == iob) {
@@ -235,12 +235,12 @@ handle_iob_access(struct cpu *__restrict me,
 				}
 				PREEMPTION_ENABLE();
 			} else {
-				assertf(ATOMIC_READ(FORCPU(me, thiscpu_x86_ioperm_bitmap)) == NULL,
+				assertf(atomic_read(&FORCPU(me, thiscpu_x86_ioperm_bitmap)) == NULL,
 				        "FORCPU(me, thiscpu_x86_ioperm_bitmap) = %p",
-				        ATOMIC_READ(FORCPU(me, thiscpu_x86_ioperm_bitmap)));
+				        atomic_read(&FORCPU(me, thiscpu_x86_ioperm_bitmap)));
 			}
 			PERTASK_SET(this_x86_ioperm_bitmap, cow);
-			ATOMIC_DEC(iob->ib_share);
+			atomic_dec(&iob->ib_share);
 			decref(iob);
 			return false;
 		}
@@ -249,7 +249,7 @@ handle_iob_access(struct cpu *__restrict me,
 		 *       Because   preemption  is  currently  off,  this  inconsistency
 		 *       never becomes visible outside of this function. */
 		PERTASK_SET(this_x86_ioperm_bitmap, cow);
-		ATOMIC_DEC(iob->ib_share);
+		atomic_dec(&iob->ib_share);
 		decref(iob);
 		iob = cow;
 	}
@@ -879,7 +879,7 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 					                  : ((byte_t const *)callsite_pc < (byte_t const *)KERNELSPACE_BASE))
 						goto do_normal_vio;
 					icpustate_setpc(state, callsite_pc);
-					icpustate_setsp(state, is_compat ? sp + 4 : sp + 8);
+					icpustate_setsp(state, (byte_t *)(is_compat ? sp + 4 : sp + 8));
 #else /* __x86_64__ */
 					if ((void const *)sp != (void const *)(&state->ics_irregs_k + 1) ||
 					    FAULT_IS_USER) {
@@ -1134,7 +1134,7 @@ pop_connections_and_throw_segfault:
 		                  : ((byte_t const *)callsite_pc < (byte_t const *)KERNELSPACE_BASE))
 			goto not_a_badcall;
 		icpustate_setpc(state, callsite_pc);
-		icpustate_setsp(state, is_compat ? sp + 4 : sp + 8);
+		icpustate_setsp(state, (byte_t *)(is_compat ? sp + 4 : sp + 8));
 #else /* __x86_64__ */
 		if ((void const *)sp != (void const *)(&state->ics_irregs_k + 1) || FAULT_IS_USER) {
 			if ((byte_t const *)callsite_pc >= (byte_t const *)KERNELSPACE_BASE)

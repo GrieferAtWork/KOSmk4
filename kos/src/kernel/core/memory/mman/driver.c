@@ -67,7 +67,6 @@
 #include <sched/sig.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
@@ -82,6 +81,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <atomic.h>
 #include <elf.h>
 #include <errno.h>
 #include <format-printer.h>
@@ -386,7 +386,7 @@ driver_section_getaddr(struct driver_section *__restrict self) {
 	if (self->ds_addr != (KERNEL byte_t *)-1)
 		return self->ds_addr;
 	result = driver_section_create_kernaddr(self);
-	if unlikely(!ATOMIC_CMPXCH(self->ds_addr, (KERNEL byte_t *)-1, result)) {
+	if unlikely(!atomic_cmpxch(&self->ds_addr, (KERNEL byte_t *)-1, result)) {
 		/* Race condition: some other thread already did this in the mean time... */
 		mman_unmap_kram(result, self->ds_sect.ms_size);
 	}
@@ -407,8 +407,8 @@ driver_section_getaddr_inflate(struct driver_section *__restrict self,
 	if (!(self->ds_sect.ms_flags & SHF_COMPRESSED)) {
 		/* Section isn't actually compressed! */
 		dst_data = driver_section_getaddr(self);
-		ATOMIC_WRITE(self->ds_inflsize, self->ds_sect.ms_size);
-		ATOMIC_CMPXCH(self->ds_infladdr, (KERNEL byte_t *)-1, dst_data);
+		atomic_write(&self->ds_inflsize, self->ds_sect.ms_size);
+		atomic_cmpxch(&self->ds_infladdr, (KERNEL byte_t *)-1, dst_data);
 		*psize = self->ds_sect.ms_size;
 		return dst_data;
 	}
@@ -497,8 +497,8 @@ driver_section_getaddr_inflate(struct driver_section *__restrict self,
 			RETHROW();
 		}
 	}
-	ATOMIC_WRITE(self->ds_inflsize, dst_size);
-	ATOMIC_CMPXCH(self->ds_infladdr, (KERNEL byte_t *)-1, dst_data);
+	atomic_write(&self->ds_inflsize, dst_size);
+	atomic_cmpxch(&self->ds_infladdr, (KERNEL byte_t *)-1, dst_data);
 	*psize = dst_size;
 	return dst_data;
 }
@@ -1994,7 +1994,7 @@ resolve_elf_symbol(struct driver *__restrict self,
 		THROWS(E_SEGFAULT, ...) {
 	ElfW(Addr) st_addr;
 	unsigned char st_info;
-	st_info = ATOMIC_READ(symbol->st_info);
+	st_info = read_once(&symbol->st_info);
 	if (ELFW(ST_TYPE)(st_info) == STT_GNU_IFUNC ||
 	    ELFW(ST_TYPE)(st_info) == STT_KOS_IDATA) {
 		ElfW(Addr) newaddr;
@@ -2311,7 +2311,7 @@ driver_dlsym_f(struct driver *__restrict self,
 again:
 	drv = driver_dlsym(self, &info);
 	if (drv) {
-		if unlikely(ATOMIC_DECFETCH(drv->d_module.md_refcnt) == 0) {
+		if unlikely(atomic_decfetch(&drv->d_module.md_refcnt) == 0) {
 			driver_destroy(drv);
 			goto again;
 		}
@@ -2330,7 +2330,7 @@ driver_dlsym_global_f(USER CHECKED char const *name)
 again:
 	drv = driver_dlsym_global(&info);
 	if (drv) {
-		if unlikely(ATOMIC_DECFETCH(drv->d_module.md_refcnt) == 0) {
+		if unlikely(atomic_decfetch(&drv->d_module.md_refcnt) == 0) {
 			driver_destroy(drv);
 			goto again;
 		}
@@ -2648,7 +2648,7 @@ NOTHROW(FCALL driver_runstate_fini_deps)(struct driver *__restrict self) {
 
 	/* Drop the self-reference that was held by the
 	 * driver's state being `!= DRIVER_STATE_KILL'. */
-	ATOMIC_WRITE(self->d_state, DRIVER_STATE_KILL);
+	atomic_write(&self->d_state, DRIVER_STATE_KILL);
 	decref_nokill(self);
 	sig_broadcast(driver_changesignal(self));
 }
@@ -2675,7 +2675,7 @@ driver_runstate_init_deps(struct driver *__restrict self)
 
 		/* Check  for  special case:  loading driver  dependencies before
 		 * the root filesystem has been mounted (i.e. bootloader drivers) */
-		if unlikely(!ATOMIC_READ(vfs_kernel.vf_root)) {
+		if unlikely(!atomic_read_relaxed(&vfs_kernel.vf_root)) {
 			dependency = driver_fromname(filename);
 			if unlikely(!dependency) {
 				char const *name;
@@ -3294,16 +3294,16 @@ driver_initialize(struct driver *__restrict self, unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_FSERROR, E_NOT_EXECUTABLE, ...) {
 	uintptr_t state;
 again:
-	state = ATOMIC_READ(self->d_state);
+	state = atomic_read(&self->d_state);
 	switch (state) {
 
 	case DRIVER_STATE_INIT: {
 		/* Start initialization. */
-		if (!ATOMIC_CMPXCH_WEAK(self->d_state,
+		if (!atomic_cmpxch_weak(&self->d_state,
 		                        DRIVER_STATE_INIT,
 		                        DRIVER_STATE_INIT_DEPS))
 			goto again;
-		ATOMIC_WRITE(self->_d_initthread, THIS_TASK);
+		atomic_write(&self->_d_initthread, THIS_TASK);
 		sig_broadcast(driver_changesignal(self));
 
 		/* At this point, we have exclusive authority to initialize
@@ -3322,10 +3322,10 @@ again:
 				driver_runstate_init_deps(self);
 
 			/* Step #2: service relocations. */
-			ATOMIC_WRITE(self->d_state, DRIVER_STATE_INIT_RELO);
+			atomic_write(&self->d_state, DRIVER_STATE_INIT_RELO);
 			sig_broadcast(driver_changesignal(self));
 			driver_runstate_init_relo(self);
-			if (ATOMIC_READ(self->d_state) != DRIVER_STATE_INIT_RELO) {
+			if (atomic_read(&self->d_state) != DRIVER_STATE_INIT_RELO) {
 				/* This can happen if a IFUNC/IDATA element called `driver_finalize()' */
 				assert(self->d_state == DRIVER_STATE_FINI_RDPS);
 				goto abort_init_deps;
@@ -3346,8 +3346,8 @@ again:
 			}
 
 		} EXCEPT {
-			ATOMIC_WRITE(self->_d_initthread, NULL);
-			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DEPS);
+			atomic_write(&self->_d_initthread, NULL);
+			atomic_write(&self->d_state, DRIVER_STATE_FINI_DEPS);
 			sig_broadcast(driver_changesignal(self));
 			driver_runstate_fini_deps(self);
 			RETHROW();
@@ -3355,31 +3355,31 @@ again:
 
 		TRY {
 			/* Step #3: Run driver DT_PREINIT_ARRAY constructors. */
-			ATOMIC_WRITE(self->d_state, DRIVER_STATE_INIT_CT_PREINITARR);
+			atomic_write(&self->d_state, DRIVER_STATE_INIT_CT_PREINITARR);
 			sig_broadcast(driver_changesignal(self));
 			driver_runinit_DT_PREINITARR(self);
-			if (ATOMIC_READ(self->d_state) != DRIVER_STATE_INIT_CT_PREINITARR)
+			if (atomic_read(&self->d_state) != DRIVER_STATE_INIT_CT_PREINITARR)
 				goto abort_init_DT_FINIARR;
 
 			/* Step #4: Run driver DT_INIT_ARRAY constructors. */
-			ATOMIC_WRITE(self->d_state, DRIVER_STATE_INIT_CT_INITARR);
+			atomic_write(&self->d_state, DRIVER_STATE_INIT_CT_INITARR);
 			sig_broadcast(driver_changesignal(self));
 			driver_runinit_DT_INITARR(self);
-			if (ATOMIC_READ(self->d_state) != DRIVER_STATE_INIT_CT_INITARR)
+			if (atomic_read(&self->d_state) != DRIVER_STATE_INIT_CT_INITARR)
 				goto abort_init_DT_FINIARR;
 		} EXCEPT {
-			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DT_FINIARR);
+			atomic_write(&self->d_state, DRIVER_STATE_FINI_DT_FINIARR);
 			sig_broadcast(driver_changesignal(self));
 			NESTED_TRY {
 				driver_runfini_DT_FINIARR(self, flags);
 			} EXCEPT {
-				ATOMIC_WRITE(self->_d_initthread, NULL);
-				ATOMIC_WRITE(self->d_state, DRIVER_STATE_FAIL_DT_FINIARR);
+				atomic_write(&self->_d_initthread, NULL);
+				atomic_write(&self->d_state, DRIVER_STATE_FAIL_DT_FINIARR);
 				sig_broadcast(driver_changesignal(self));
 				RETHROW();
 			}
-			ATOMIC_WRITE(self->_d_initthread, NULL);
-			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DEPS);
+			atomic_write(&self->_d_initthread, NULL);
+			atomic_write(&self->d_state, DRIVER_STATE_FINI_DEPS);
 			sig_broadcast(driver_changesignal(self));
 			driver_runstate_fini_deps(self);
 			RETHROW();
@@ -3387,45 +3387,45 @@ again:
 
 		TRY {
 			/* Step #5: Run the driver DT_INIT callback. */
-			ATOMIC_WRITE(self->d_state, DRIVER_STATE_INIT_CT_INIT);
+			atomic_write(&self->d_state, DRIVER_STATE_INIT_CT_INIT);
 			sig_broadcast(driver_changesignal(self));
 			driver_runinit_DT_INIT(self);
-			if (ATOMIC_READ(self->d_state) != DRIVER_STATE_INIT_CT_INIT)
+			if (atomic_read(&self->d_state) != DRIVER_STATE_INIT_CT_INIT)
 				goto abort_init_DT_FINI;
 		} EXCEPT {
 			{
 				NESTED_EXCEPTION;
-				ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DT_FINI);
+				atomic_write(&self->d_state, DRIVER_STATE_FINI_DT_FINI);
 				sig_broadcast(driver_changesignal(self));
 				TRY {
 					driver_runfini_DT_FINI(self, flags);
 				} EXCEPT {
-					ATOMIC_WRITE(self->_d_initthread, NULL);
-					ATOMIC_WRITE(self->d_state, DRIVER_STATE_FAIL_DT_FINI);
+					atomic_write(&self->_d_initthread, NULL);
+					atomic_write(&self->d_state, DRIVER_STATE_FAIL_DT_FINI);
 					sig_broadcast(driver_changesignal(self));
 					RETHROW();
 				}
-				ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DT_FINIARR);
+				atomic_write(&self->d_state, DRIVER_STATE_FINI_DT_FINIARR);
 				sig_broadcast(driver_changesignal(self));
 				TRY {
 					driver_runfini_DT_FINIARR(self, flags);
 				} EXCEPT {
-					ATOMIC_WRITE(self->_d_initthread, NULL);
-					ATOMIC_WRITE(self->d_state, DRIVER_STATE_FAIL_DT_FINIARR);
+					atomic_write(&self->_d_initthread, NULL);
+					atomic_write(&self->d_state, DRIVER_STATE_FAIL_DT_FINIARR);
 					sig_broadcast(driver_changesignal(self));
 					RETHROW();
 				}
 			}
-			ATOMIC_WRITE(self->_d_initthread, NULL);
-			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DEPS);
+			atomic_write(&self->_d_initthread, NULL);
+			atomic_write(&self->d_state, DRIVER_STATE_FINI_DEPS);
 			sig_broadcast(driver_changesignal(self));
 			driver_runstate_fini_deps(self);
 			RETHROW();
 		}
 
 		/* Step #6: Indicate that the driver has been initialized! */
-		ATOMIC_WRITE(self->_d_initthread, NULL);
-		ATOMIC_WRITE(self->d_state, DRIVER_STATE_LOADED);
+		atomic_write(&self->_d_initthread, NULL);
+		atomic_write(&self->d_state, DRIVER_STATE_LOADED);
 		sig_broadcast(driver_changesignal(self));
 		break;
 
@@ -3435,38 +3435,38 @@ abort_init_DT_FINI:
 		TRY {
 			driver_runfini_DT_FINI(self, flags);
 		} EXCEPT {
-			ATOMIC_WRITE(self->_d_initthread, NULL);
-			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FAIL_DT_FINI);
+			atomic_write(&self->_d_initthread, NULL);
+			atomic_write(&self->d_state, DRIVER_STATE_FAIL_DT_FINI);
 			sig_broadcast(driver_changesignal(self));
 			RETHROW();
 		}
-		ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DT_FINIARR);
+		atomic_write(&self->d_state, DRIVER_STATE_FINI_DT_FINIARR);
 		sig_broadcast(driver_changesignal(self));
 abort_init_DT_FINIARR:
 		assert(self->d_state == DRIVER_STATE_FINI_DT_FINIARR);
 		TRY {
 			driver_runfini_DT_FINIARR(self, flags);
 		} EXCEPT {
-			ATOMIC_WRITE(self->_d_initthread, NULL);
-			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FAIL_DT_FINIARR);
+			atomic_write(&self->_d_initthread, NULL);
+			atomic_write(&self->d_state, DRIVER_STATE_FAIL_DT_FINIARR);
 			sig_broadcast(driver_changesignal(self));
 			RETHROW();
 		}
-		ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_UNBINDGLOB);
+		atomic_write(&self->d_state, DRIVER_STATE_FINI_UNBINDGLOB);
 		sig_broadcast(driver_changesignal(self));
 /*abort_init_globalhooks:*/
 		assert(self->d_state == DRIVER_STATE_FINI_UNBINDGLOB);
 		TRY {
 			driver_runfini_unbindglob(self);
 		} EXCEPT {
-			ATOMIC_WRITE(self->_d_initthread, NULL);
-			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FAIL_UNBINDGLOB);
+			atomic_write(&self->_d_initthread, NULL);
+			atomic_write(&self->d_state, DRIVER_STATE_FAIL_UNBINDGLOB);
 			sig_broadcast(driver_changesignal(self));
 			RETHROW();
 		}
 abort_init_deps:
-		ATOMIC_WRITE(self->_d_initthread, NULL);
-		ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DEPS);
+		atomic_write(&self->_d_initthread, NULL);
+		atomic_write(&self->d_state, DRIVER_STATE_FINI_DEPS);
 		sig_broadcast(driver_changesignal(self));
 		driver_runstate_fini_deps(self);
 	}	break;
@@ -3480,15 +3480,15 @@ abort_init_deps:
 		 * However, make sure to deal  with the case where  it's
 		 * the calling thread that's doing the init! */
 		struct task *init_thread;
-		init_thread = ATOMIC_READ(self->_d_initthread);
-		if unlikely(state != ATOMIC_READ(self->d_state))
+		init_thread = atomic_read(&self->_d_initthread);
+		if unlikely(state != atomic_read(&self->d_state))
 			goto again;
 		if unlikely(init_thread == THIS_TASK)
 			return; /* Don't cause a deadlock by waiting for ourselves to finish init! */
 
 		/* Wait for the driver's state to change. */
 		task_connect(driver_changesignal(self));
-		if unlikely(ATOMIC_READ(self->d_state) != state) {
+		if unlikely(atomic_read(&self->d_state) != state) {
 			task_disconnectall();
 			break;
 		}
@@ -3519,12 +3519,12 @@ driver_finalize(struct driver *__restrict self, unsigned int flags)
 		THROWS(...) {
 	uintptr_t state;
 again:
-	state = ATOMIC_READ(self->d_state);
+	state = atomic_read(&self->d_state);
 	switch (state) {
 
 	case DRIVER_STATE_INIT:
 		/* Directly switch over to the FINI_TEXT state. */
-		if (!ATOMIC_CMPXCH_WEAK(self->d_state,
+		if (!atomic_cmpxch_weak(&self->d_state,
 		                        DRIVER_STATE_INIT,
 		                        DRIVER_STATE_KILL))
 			goto again;
@@ -3554,8 +3554,8 @@ again:
 		 * to finish initialization,  so we  can instigate  the
 		 * driver's finalization immediately afterwards. */
 		struct task *init_thread;
-		init_thread = ATOMIC_READ(self->_d_initthread);
-		if unlikely(state != ATOMIC_READ(self->d_state))
+		init_thread = atomic_read(&self->_d_initthread);
+		if unlikely(state != atomic_read(&self->d_state))
 			goto again;
 		if unlikely(init_thread == THIS_TASK) {
 			unsigned int new_state;
@@ -3569,7 +3569,7 @@ again:
 
 			/* Mark the driver for lazy finalization once
 			 * we return back up the stack to our caller! */
-			if (!ATOMIC_CMPXCH_WEAK(self->d_state, state, new_state))
+			if (!atomic_cmpxch_weak(&self->d_state, state, new_state))
 				goto again;
 			sig_broadcast(driver_changesignal(self));
 			return;
@@ -3577,7 +3577,7 @@ again:
 
 		/* Wait for another thread to finish initialization. */
 		task_connect(driver_changesignal(self));
-		if unlikely(state != ATOMIC_READ(self->d_state)) {
+		if unlikely(state != atomic_read(&self->d_state)) {
 			task_disconnectall();
 			goto again;
 		}
@@ -3589,71 +3589,71 @@ again:
 	case DRIVER_STATE_FAIL_DT_FINI: {
 		/* The actual heart-piece of `driver_finalize()':
 		 * Finalize a driver  that is fully  initialized. */
-		if (!ATOMIC_CMPXCH_WEAK(self->d_state, state,
+		if (!atomic_cmpxch_weak(&self->d_state, state,
 		                        DRIVER_STATE_FINI_DT_FINI))
 			goto again;
 
 		/* Run second-stage driver finalizers. */
-		ATOMIC_WRITE(self->_d_initthread, THIS_TASK);
+		atomic_write(&self->_d_initthread, THIS_TASK);
 		sig_broadcast(driver_changesignal(self));
 		TRY {
 			driver_runfini_DT_FINI(self, flags);
 		} EXCEPT {
-			ATOMIC_WRITE(self->_d_initthread, NULL);
-			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FAIL_DT_FINI);
+			atomic_write(&self->_d_initthread, NULL);
+			atomic_write(&self->d_state, DRIVER_STATE_FAIL_DT_FINI);
 			sig_broadcast(driver_changesignal(self));
 			RETHROW();
 		}
 
 		/* Run normal driver finalizers. */
-		ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DT_FINIARR);
+		atomic_write(&self->d_state, DRIVER_STATE_FINI_DT_FINIARR);
 do_handle_fini_dtors:
 		sig_broadcast(driver_changesignal(self));
 		TRY {
 			driver_runfini_DT_FINIARR(self, flags);
 		} EXCEPT {
-			ATOMIC_WRITE(self->_d_initthread, NULL);
-			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FAIL_DT_FINIARR);
+			atomic_write(&self->_d_initthread, NULL);
+			atomic_write(&self->d_state, DRIVER_STATE_FAIL_DT_FINIARR);
 			sig_broadcast(driver_changesignal(self));
 			RETHROW();
 		}
 
 		/* Unbind global driver hooks. */
-		ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_UNBINDGLOB);
+		atomic_write(&self->d_state, DRIVER_STATE_FINI_UNBINDGLOB);
 do_handle_fini_unbindglob:
 		sig_broadcast(driver_changesignal(self));
 		TRY {
 			driver_runfini_unbindglob(self);
 		} EXCEPT {
-			ATOMIC_WRITE(self->_d_initthread, NULL);
-			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FAIL_UNBINDGLOB);
+			atomic_write(&self->_d_initthread, NULL);
+			atomic_write(&self->d_state, DRIVER_STATE_FAIL_UNBINDGLOB);
 			sig_broadcast(driver_changesignal(self));
 			RETHROW();
 		}
 
 		/* Finalize driver dependencies... */
-		ATOMIC_WRITE(self->_d_initthread, NULL);
-		ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DEPS);
+		atomic_write(&self->_d_initthread, NULL);
+		atomic_write(&self->d_state, DRIVER_STATE_FINI_DEPS);
 		sig_broadcast(driver_changesignal(self));
 		driver_runstate_fini_deps(self);
 	}	break;
 
 	case DRIVER_STATE_FAIL_DT_FINIARR:
 		/* Try to restart a previously failed step. */
-		if (!ATOMIC_CMPXCH_WEAK(self->d_state,
+		if (!atomic_cmpxch_weak(&self->d_state,
 		                        DRIVER_STATE_FAIL_DT_FINIARR,
 		                        DRIVER_STATE_FINI_DT_FINIARR))
 			goto again;
-		ATOMIC_WRITE(self->_d_initthread, THIS_TASK);
+		atomic_write(&self->_d_initthread, THIS_TASK);
 		goto do_handle_fini_dtors;
 
 	case DRIVER_STATE_FAIL_UNBINDGLOB:
 		/* Try to restart a previously failed step. */
-		if (!ATOMIC_CMPXCH_WEAK(self->d_state,
+		if (!atomic_cmpxch_weak(&self->d_state,
 		                        DRIVER_STATE_FAIL_UNBINDGLOB,
 		                        DRIVER_STATE_FINI_UNBINDGLOB))
 			goto again;
-		ATOMIC_WRITE(self->_d_initthread, THIS_TASK);
+		atomic_write(&self->_d_initthread, THIS_TASK);
 		goto do_handle_fini_unbindglob;
 
 	case DRIVER_STATE_FINI_DT_FINI:
@@ -3662,8 +3662,8 @@ do_handle_fini_unbindglob:
 	case DRIVER_STATE_FINI_RDPS: {
 		/* Check if this is a recursive call (if it is, don't do anything!) */
 		struct task *fini_thread;
-		fini_thread = ATOMIC_READ(self->_d_initthread);
-		if (state != ATOMIC_READ(self->d_state))
+		fini_thread = atomic_read(&self->_d_initthread);
+		if (state != atomic_read(&self->d_state))
 			goto again;
 		if (fini_thread == THIS_TASK)
 			return; /* Ignore recursive calls. */
@@ -3671,7 +3671,7 @@ do_handle_fini_unbindglob:
 	case DRIVER_STATE_FINI_DEPS:
 		/* Wait for the state to change. */
 		task_connect(driver_changesignal(self));
-		if (state != ATOMIC_READ(self->d_state)) {
+		if (state != atomic_read(&self->d_state)) {
 			task_disconnectall();
 			goto again;
 		}
@@ -3861,7 +3861,7 @@ again_find_nodes:
 				mnode_pagedir_kernelunprepare(node);
 
 				/* Set the UNMAPPED flag for the node */
-				ATOMIC_OR(node->mn_flags, MNODE_F_UNMAPPED);
+				atomic_or(&node->mn_flags, MNODE_F_UNMAPPED);
 
 				/* Add the node to the list of dead nodes. */
 				SLIST_INSERT(deadlist, node, _mn_dead);
@@ -3994,7 +3994,7 @@ NOTHROW(FCALL driver_unbind_sections_and_destroy_lop)(struct lockop *__restrict 
 		/* Drop the reference we got from `awref_get()'
 		 * If this ends up destroying the section, then enqueue said
 		 * destruction to be performed  as part of the  post-lockop. */
-		if (ATOMIC_DECFETCH(sect->ds_sect.ms_refcnt) == 0)
+		if (atomic_decfetch(&sect->ds_sect.ms_refcnt) == 0)
 			SLIST_INSERT(&me->_d_deadsect, &sect->ds_sect, _ms_dead);
 	}
 
@@ -4017,7 +4017,7 @@ NOTHROW(FCALL driver_destroy)(struct driver *__restrict self) {
 	/* Change the driver's state from KILL to DEAD */
 	assert(self->d_module.md_mman == &mman_kernel);
 	assert(self->d_state == DRIVER_STATE_KILL);
-	ATOMIC_WRITE(self->d_state, DRIVER_STATE_DEAD);
+	atomic_write(&self->d_state, DRIVER_STATE_DEAD);
 	sig_broadcast(driver_changesignal(self));
 
 	/* Clear out members that are no longer valid for a destroyed driver. */
@@ -4139,7 +4139,7 @@ NOTHROW(FCALL driver_nonodes)(struct driver *__restrict self) {
 	/* The node-counter of drivers is always holding an implicit weak reference.
 	 * Once  all mem-nodes have  gone away, we must  simply drop that reference. */
 	assert(self->d_module.md_weakrefcnt >= 1);
-	if (ATOMIC_DECFETCH(self->d_module.md_weakrefcnt) == 0) {
+	if (atomic_decfetch(&self->d_module.md_weakrefcnt) == 0) {
 
 		/* Enqueue a lock operation for the kernel mman to-be performed
 		 * once the kernel mman lock has been released in order to free
@@ -4491,7 +4491,7 @@ NOTHROW(FCALL driver_load_image_pointers)(struct driver *__restrict self,
 	for (pt_dynamic_idx = 0;; ++pt_dynamic_idx) {
 		if (pt_dynamic_idx >= self->d_phnum)
 			return E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_DYNAMIC;
-		if (ATOMIC_READ(self->d_phdr[pt_dynamic_idx].p_type) == PT_DYNAMIC)
+		if (read_once(&self->d_phdr[pt_dynamic_idx].p_type) == PT_DYNAMIC)
 			break;
 	}
 
@@ -4986,8 +4986,8 @@ driver_create(USER CHECKED byte_t const *base, size_t num_bytes,
 	driver_verify_ElfEhdr(ehdr);
 
 	/* Validate the program header pointers. */
-	phdrv = (ElfW(Phdr) const *)(base + ATOMIC_READ(ehdr->e_phoff));
-	phnum = ATOMIC_READ(ehdr->e_phnum);
+	phdrv = (ElfW(Phdr) const *)(base + read_once(&ehdr->e_phoff));
+	phnum = read_once(&ehdr->e_phnum);
 	if unlikely(phnum > KERNEL_DRIVER_MAXPROGRAMHEADERCOUNT)
 		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS, phnum);
 	if unlikely(!phnum)
@@ -5007,12 +5007,12 @@ driver_create(USER CHECKED byte_t const *base, size_t num_bytes,
 	for (phidx = 0;; ++phidx) {
 		if (phidx >= phnum)
 			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_DYNAMIC);
-		if (ATOMIC_READ(phdrv[phidx].p_type) == PT_DYNAMIC)
+		if (read_once(&phdrv[phidx].p_type) == PT_DYNAMIC)
 			break;
 	}
 
 	/* Load the in-file range of the .dynamic program header */
-	pt_dynamic     = (ElfW(Dyn) const *)(base + ATOMIC_READ(phdrv[phidx].p_offset));
+	pt_dynamic     = (ElfW(Dyn) const *)(base + read_once(&phdrv[phidx].p_offset));
 	pt_dynamic_end = (ElfW(Dyn) const *)((byte_t const *)pt_dynamic + phdrv[phidx].p_filesz);
 
 	/* Ensure that the .dynamic program header bounds are valid. */
@@ -5031,7 +5031,7 @@ driver_create(USER CHECKED byte_t const *base, size_t num_bytes,
 		dt_needed_count = 0;
 		for (iter = pt_dynamic;
 		     iter < pt_dynamic_end; ++iter) {
-			switch (ATOMIC_READ(iter->d_tag)) {
+			switch (read_once(&iter->d_tag)) {
 
 			case DT_NULL:
 				pt_dynamic_end = iter;
@@ -5042,11 +5042,11 @@ driver_create(USER CHECKED byte_t const *base, size_t num_bytes,
 				break;
 
 			case DT_SONAME:
-				soname_offset = ATOMIC_READ(iter->d_un.d_ptr);
+				soname_offset = read_once(&iter->d_un.d_ptr);
 				break;
 
 			case DT_STRTAB:
-				dynstr_vla = ATOMIC_READ(iter->d_un.d_ptr);
+				dynstr_vla = read_once(&iter->d_un.d_ptr);
 				break;
 
 			default:
@@ -5070,12 +5070,12 @@ done_dynhdr_for_soname:
 			size_t p_filesz;
 			if (phidx >= phnum)
 				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SONAME, dynstr_vla);
-			if (ATOMIC_READ(phdrv[phidx].p_type) != PT_LOAD)
+			if (read_once(&phdrv[phidx].p_type) != PT_LOAD)
 				continue;
-			p_vaddr = ATOMIC_READ(phdrv[phidx].p_vaddr);
+			p_vaddr = read_once(&phdrv[phidx].p_vaddr);
 			if (p_vaddr > dynstr_vla)
 				continue;
-			p_filesz = ATOMIC_READ(phdrv[phidx].p_filesz);
+			p_filesz = read_once(&phdrv[phidx].p_filesz);
 
 			/* Technically p_memsz, but any pointer above would
 			 * always  be an empty string, which isn't allowed! */
@@ -5084,7 +5084,7 @@ done_dynhdr_for_soname:
 
 			/* Found the segment. */
 			dynstr_offset = dynstr_vla - p_vaddr; /* Offset of `.dynstr' in segment */
-			dynstr_base   = (char *)(base + ATOMIC_READ(phdrv[phidx].p_offset) + dynstr_offset);
+			dynstr_base   = (char *)(base + read_once(&phdrv[phidx].p_offset) + dynstr_offset);
 			dynstr_size   = p_filesz - dynstr_offset;
 
 			/* Make sure that .dynstr is in-bounds of the driver image. */
@@ -5128,11 +5128,11 @@ done_dynhdr_for_soname:
 			result->d_cmdline = (char *)kmalloc(sizeof(char), GFP_CALLOC | GFP_LOCKED | GFP_PREFLT);
 		}
 
-		shoff              = (uintptr_t)ATOMIC_READ(ehdr->e_shoff);
-		result->d_shstrndx = ATOMIC_READ(ehdr->e_shstrndx);
-		result->d_shnum    = ATOMIC_READ(ehdr->e_shnum);
+		shoff              = (uintptr_t)read_once(&ehdr->e_shoff);
+		result->d_shstrndx = read_once(&ehdr->e_shstrndx);
+		result->d_shnum    = read_once(&ehdr->e_shnum);
 		COMPILER_READ_BARRIER();
-		if unlikely(ATOMIC_READ(ehdr->e_shentsize) != sizeof(ElfW(Shdr)))
+		if unlikely(read_once(&ehdr->e_shentsize) != sizeof(ElfW(Shdr)))
 			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHENT, ehdr->e_shentsize);
 		if unlikely(result->d_shnum > ELF_ARCH_MAXSHCOUNT)
 			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSECTIONS, result->d_shnum);
@@ -5689,8 +5689,8 @@ path_equals_string(struct path *__restrict pth,
 			goto nope;
 	}
 	if (path_is_root)
-		return pth == ATOMIC_READ(vfs_kernel.vf_root);
-	return pth == ATOMIC_READ(THIS_FS->fs_cwd);
+		return pth == atomic_read_relaxed(&vfs_kernel.vf_root);
+	return pth == atomic_read_relaxed(&THIS_FS->fs_cwd);
 nope:
 	return false;
 }
@@ -5995,7 +5995,7 @@ driver_try_decref_and_delmod(/*inherit(always)*/ REF struct driver *__restrict s
 		/* Always finalize the driver */
 		driver_finalize(self);
 
-		if (ATOMIC_CMPXCH(self->d_module.md_refcnt, 1, 0))
+		if (atomic_cmpxch(&self->d_module.md_refcnt, 1, 0))
 			goto success;
 		if (!(flags & DRIVER_DELMOD_F_NODEPEND)) {
 			/* Search for, and delete modules that are using `self' */
@@ -6023,7 +6023,7 @@ again_search_for_depending_drivers:
 						 * all other drivers to give the first  one more time to come to  terms
 						 * with the fact that it is being unloaded.
 						 * If everything works out, we'll still be able to destroy our driver
-						 * in the final ATOMIC_CMPXCH() below. */
+						 * in the final atomic_cmpxch() below. */
 						goto find_next_dependent_driver;
 					} EXCEPT {
 						decref_unlikely(dll);
@@ -6047,12 +6047,12 @@ find_next_dependent_driver:
 	}
 
 	/* Check if we can get rid of the last reference */
-	if (ATOMIC_CMPXCH(self->d_module.md_refcnt, 1, 0))
+	if (atomic_cmpxch(&self->d_module.md_refcnt, 1, 0))
 		goto success;
 
 	if (flags & DRIVER_DELMOD_F_FORCE) {
 		refcnt_t remaining_references;
-		remaining_references = ATOMIC_CMPXCH_VAL(self->d_module.md_refcnt, 1, 0);
+		remaining_references = atomic_cmpxch_val(&self->d_module.md_refcnt, 1, 0);
 		if unlikely(remaining_references == 1)
 			goto success;
 		/* Forcing the kernel to do this is really bad, and the only situation
@@ -6064,9 +6064,9 @@ find_next_dependent_driver:
 		       self->d_name, remaining_references);
 		{
 			DATDEF u8 __kernel_poisoned ASMNAME("_kernel_poisoned");
-			ATOMIC_OR(__kernel_poisoned, _KERNEL_POISON_FORCEDELMOD);
+			atomic_or(&__kernel_poisoned, _KERNEL_POISON_FORCEDELMOD);
 		}
-		ATOMIC_WRITE(self->d_module.md_refcnt, 0);
+		atomic_write(&self->d_module.md_refcnt, 0);
 		goto success;
 	}
 	if (!(flags & DRIVER_DELMOD_F_NONBLOCK)) {
@@ -6194,9 +6194,9 @@ again:
 		drv = dll->dll_drivers[i];
 		if unlikely(!tryincref(drv))
 			continue;
-		old_state = ATOMIC_READ(drv->d_state);
+		old_state = atomic_read(&drv->d_state);
 		driver_initialize(drv);
-		new_state = ATOMIC_READ(drv->d_state);
+		new_state = atomic_read(&drv->d_state);
 		decref_unlikely(drv);
 		/* Keep on restarting bootloader driver init
 		 * for  as long as driver states change, and

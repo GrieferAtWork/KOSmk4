@@ -35,7 +35,7 @@
  * >> #include <kos/exec/idata.h> // DEFINE_PUBLIC_IDATA
  * >> #include <sys/types.h>      // pid_t
  * >> #include <sched.h>          // sched_yield
- * >> #include <hybrid/atomic.h>  // ATOMIC_CMPXCH, ATOMIC_WRITE
+ * >> #include <atomic.h>         // atomic_cmpxch, atomic_write
  * >>
  * >> // Export a public symbol "program_pid" from this library that
  * >> // is a data-object and will lazily invoke this function if used
@@ -45,13 +45,13 @@
  * >>     static int program_loaded = 0; // init-once barrier
  * >> again:
  * >>     if (program_loaded != 2) {
- * >>         if (!ATOMIC_CMPXCH(program_loaded, 0, 1)) {
+ * >>         if (!atomic_cmpxch(&program_loaded, 0, 1)) {
  * >>             sched_yield();
  * >>             goto again;
  * >>         }
  * >>         // Lazily initialize global data upon first access
  * >>         program_pid = getpid();
- * >>         ATOMIC_WRITE(program_loaded, 2);
+ * >>         atomic_write(&program_loaded, 2);
  * >>     }
  * >>     return &program_pid;
  * >> }

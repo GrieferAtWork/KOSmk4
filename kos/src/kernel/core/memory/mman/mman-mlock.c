@@ -31,13 +31,13 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 
 DECL_BEGIN
@@ -358,14 +358,14 @@ again_prefault:
 			if (!(node->mn_flags & MNODE_F_MLOCK)) {
 				struct mpart *part;
 				/* Set the MLOCK flag. */
-				ATOMIC_OR(node->mn_flags, MNODE_F_MLOCK);
+				atomic_or(&node->mn_flags, MNODE_F_MLOCK);
 				if ((part = node->mn_part) != NULL) {
 					assert(mpart_lock_acquired(part));
 					/* If the mem-part isn't marked as MLOCK'd, and the MLOCK
 					 * flag isn't frozen, then set it now, since the part now
 					 * has at least 1 mapping that's supposed to be locked. */
 					if ((part->mp_flags & (MPART_F_MLOCK | MPART_F_MLOCK_FROZEN)) == 0)
-						ATOMIC_OR(part->mp_flags, MPART_F_MLOCK);
+						atomic_or(&part->mp_flags, MPART_F_MLOCK);
 				}
 			}
 			if (node == rl.mrl_nodes.mm_max)
@@ -434,7 +434,7 @@ again:
 		for (node = rl.mrl_nodes.mm_min;;) {
 			if (node->mn_flags & MNODE_F_MLOCK) {
 				struct mpart *part;
-				ATOMIC_AND(node->mn_flags, ~MNODE_F_MLOCK);
+				atomic_and(&node->mn_flags, ~MNODE_F_MLOCK);
 				if ((part = node->mn_part) != NULL) {
 					assert(mpart_lock_acquired(part));
 					/* If  the mem-part is marked as MLOCK'd, and that flag isn't

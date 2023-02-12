@@ -30,10 +30,11 @@
 #include <kernel/mman/module-section-cache.h>
 #include <kernel/mman/module.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/atomic-lock.h>
 
 #include <kos/lockop.h>
+
+#include <atomic.h>
 
 DECL_BEGIN
 
@@ -75,7 +76,7 @@ NOTHROW(KCALL system_cc_module_section_cache)(struct ccinfo *__restrict info) {
 	/* Kill objects only held alive by the cache. */
 	SLIST_INIT(&dead);
 	LIST_FOREACH_SAFE(sect, &module_section_cache, ms_cache) {
-		if (!ATOMIC_CMPXCH(sect->ms_refcnt, 1, 0))
+		if (!atomic_cmpxch(&sect->ms_refcnt, 1, 0))
 			continue;
 		LIST_UNBIND(sect, ms_cache);
 		SLIST_INSERT_HEAD(&dead, sect, _ms_dead);

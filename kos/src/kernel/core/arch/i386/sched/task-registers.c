@@ -27,7 +27,6 @@
 #include <kernel/types.h>
 #include <sched/arch/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/host.h>
 #include <hybrid/sched/preemption.h>
 
@@ -35,6 +34,7 @@
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <atomic.h>
 #include <stdbool.h>
 
 DECL_BEGIN
@@ -45,14 +45,14 @@ DECL_BEGIN
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL irregs_isuser)(struct irregs_kernel const *__restrict self) {
 	uintptr_t pip;
-	u16 cs = ATOMIC_READ(self->ir_cs16);
+	u16 cs = atomic_read(&self->ir_cs16);
 	if (cs & 3)
 		return true;
 #ifndef __x86_64__
 #ifndef __I386_NO_VM86
 	{
 		u32 eflags;
-		eflags = ATOMIC_READ(self->ir_eflags);
+		eflags = atomic_read(&self->ir_eflags);
 		if unlikely(eflags & EFLAGS_VM)
 			return true;
 	}
@@ -60,7 +60,7 @@ NOTHROW(FCALL irregs_isuser)(struct irregs_kernel const *__restrict self) {
 #endif /* !__x86_64__ */
 	if (cs != SEGMENT_KERNEL_CODE)
 		return false;
-	pip = ATOMIC_READ(self->ir_Pip);
+	pip = atomic_read(&self->ir_Pip);
 	if unlikely(pip == (uintptr_t)&x86_userexcept_sysret)
 		return true;
 	return false;
@@ -69,7 +69,7 @@ NOTHROW(FCALL irregs_isuser)(struct irregs_kernel const *__restrict self) {
 /* get: `self->ir_Pip' */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdip)(struct irregs_kernel const *__restrict self) {
-	uintptr_t result = ATOMIC_READ(self->ir_Pip);
+	uintptr_t result = atomic_read(&self->ir_Pip);
 	if unlikely(result == (uintptr_t)&x86_userexcept_sysret)
 		result = PERTASK_GET(this_x86_sysret_iret.ir_Pip);
 	return result;
@@ -78,9 +78,9 @@ NOTHROW(FCALL irregs_rdip)(struct irregs_kernel const *__restrict self) {
 /* get: `self->ir_cs16' */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u16
 NOTHROW(FCALL irregs_rdcs)(struct irregs_kernel const *__restrict self) {
-	u16 result = ATOMIC_READ(self->ir_cs16);
+	u16 result = atomic_read(&self->ir_cs16);
 	if (result == SEGMENT_KERNEL_CODE) {
-		uintptr_t pip = ATOMIC_READ(self->ir_Pip);
+		uintptr_t pip = atomic_read(&self->ir_Pip);
 		if unlikely(pip == (uintptr_t)&x86_userexcept_sysret)
 			result = PERTASK_GET(this_x86_sysret_iret.ir_cs16);
 	}
@@ -90,9 +90,9 @@ NOTHROW(FCALL irregs_rdcs)(struct irregs_kernel const *__restrict self) {
 /* get: `self->ir_Pflags' */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdflags)(struct irregs_kernel const *__restrict self) {
-	uintptr_t result = ATOMIC_READ(self->ir_Pflags);
+	uintptr_t result = atomic_read(&self->ir_Pflags);
 	if unlikely(result == 0) {
-		uintptr_t pip = ATOMIC_READ(self->ir_Pip);
+		uintptr_t pip = atomic_read(&self->ir_Pip);
 		if unlikely(pip == (uintptr_t)&x86_userexcept_sysret)
 			result = PERTASK_GET(this_x86_sysret_iret.ir_Pflags);
 	}
@@ -103,25 +103,25 @@ NOTHROW(FCALL irregs_rdflags)(struct irregs_kernel const *__restrict self) {
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdsp)(struct irregs_kernel const *__restrict self) {
 #ifdef __x86_64__
-	u64 result = ATOMIC_READ(self->ir_rsp);
+	u64 result = atomic_read(&self->ir_rsp);
 	if (ADDR_ISKERN(result)) {
-		u64 rip = ATOMIC_READ(self->ir_rip);
+		u64 rip = atomic_read(&self->ir_rip);
 		if unlikely(rip == (u64)&x86_userexcept_sysret)
 			result = PERTASK_GET(this_x86_sysret_iret.ir_rsp);
 	}
 	return result;
 #else /* __x86_64__ */
 	u32 result = (u32)((byte_t *)self + SIZEOF_IRREGS32_KERNEL);
-	u16 cs = ATOMIC_READ(self->ir_cs16);
+	u16 cs = atomic_read(&self->ir_cs16);
 	if (cs & 3)
 		goto is_user_iret;
 #ifndef __I386_NO_VM86
-	if (ATOMIC_READ(self->ir_eflags) & EFLAGS_VM)
+	if (atomic_read(&self->ir_eflags) & EFLAGS_VM)
 		goto is_user_iret;
 #endif /* !__I386_NO_VM86 */
 	if (cs == SEGMENT_KERNEL_CODE) {
 		u32 eip;
-		eip = ATOMIC_READ(self->ir_eip);
+		eip = atomic_read(&self->ir_eip);
 		if unlikely(eip == (u32)&x86_userexcept_sysret) {
 is_user_iret:
 			result = *(u32 const *)result;
@@ -136,12 +136,12 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrip)(struct irregs_kernel *__restrict self, uintptr_t value) {
 	uintptr_t oldval;
 	do {
-		oldval = ATOMIC_READ(self->ir_Pip);
+		oldval = atomic_read(&self->ir_Pip);
 		if unlikely(oldval == (uintptr_t)&x86_userexcept_sysret) {
 			PERTASK_SET(this_x86_sysret_iret.ir_Pip, value);
 			break;
 		}
-	} while unlikely(!ATOMIC_CMPXCH_WEAK(self->ir_Pip, oldval, value));
+	} while unlikely(!atomic_cmpxch_weak(&self->ir_Pip, oldval, value));
 }
 
 /* set: `self->ir_cs' */
@@ -200,11 +200,11 @@ NOTHROW(FCALL irregs_mskflags)(struct irregs_kernel *__restrict self,
 /* Check if `self' returns to compatibility-mode. */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL irregs_iscompat)(struct irregs const *__restrict self) {
-	u16 cs = ATOMIC_READ(self->ir_cs16);
+	u16 cs = atomic_read(&self->ir_cs16);
 	if (SEGMENT_IS_VALID_USERCODE32(cs))
 		return true;
 	if (cs == SEGMENT_KERNEL_CODE) {
-		u64 rip = ATOMIC_READ(self->ir_rip);
+		u64 rip = atomic_read(&self->ir_rip);
 		if unlikely(rip == (u64)&x86_userexcept_sysret) {
 			cs = PERTASK_GET(this_x86_sysret_iret.ir_cs16);
 			if (SEGMENT_IS_VALID_USERCODE32(cs))
@@ -217,9 +217,9 @@ NOTHROW(FCALL irregs_iscompat)(struct irregs const *__restrict self) {
 /* get: `self->ir_ss16' */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u16
 NOTHROW(FCALL irregs_rdss)(struct irregs const *__restrict self) {
-	u16 result = ATOMIC_READ(self->ir_ss16);
+	u16 result = atomic_read(&self->ir_ss16);
 	if (result == SEGMENT_KERNEL_DATA0) {
-		u64 rip = ATOMIC_READ(self->ir_rip);
+		u64 rip = atomic_read(&self->ir_rip);
 		if unlikely(rip == (u64)&x86_userexcept_sysret)
 			result = PERTASK_GET(this_x86_sysret_iret.ir_ss16);
 	}
@@ -264,10 +264,10 @@ PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL irregs_isuser_novm86)(struct irregs_kernel const *__restrict self) {
 	u16 cs;
 	u32 eip;
-	cs = ATOMIC_READ(self->ir_cs16);
+	cs = atomic_read(&self->ir_cs16);
 	if (cs & 3)
 		return true;
-	eip = ATOMIC_READ(self->ir_eip);
+	eip = atomic_read(&self->ir_eip);
 	if unlikely(eip == (u32)&x86_userexcept_sysret)
 		return true;
 	return false;
@@ -276,10 +276,10 @@ NOTHROW(FCALL irregs_isuser_novm86)(struct irregs_kernel const *__restrict self)
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL irregs_isvm86)(struct irregs_kernel const *__restrict self) {
 	u32 eip, eflags;
-	eflags = ATOMIC_READ(self->ir_eflags);
+	eflags = atomic_read(&self->ir_eflags);
 	if (eflags & EFLAGS_VM)
 		return true;
-	eip = ATOMIC_READ(self->ir_eip);
+	eip = atomic_read(&self->ir_eip);
 	if unlikely(eip == (u32)&x86_userexcept_sysret) {
 		eflags = PERTASK_GET(this_x86_sysret_iret.ir_eflags);
 		if (eflags & EFLAGS_VM)

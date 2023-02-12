@@ -41,7 +41,6 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/list.h>
@@ -49,6 +48,7 @@
 #include <asm/defsym.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stdalign.h>
 #include <stdbool.h>
@@ -162,17 +162,17 @@ static_assert(alignof(struct heap) == ALIGNOF_HEAP);
 	          __FILE__, __LINE__, (self)->h_dangle,                                         \
 	          count, (self)->h_dangle + (count))                                            \
 	 : (void)0,                                                                             \
-	 ATOMIC_FETCHADD((self)->h_dangle, count))
+	 atomic_fetchadd(&(self)->h_dangle, count))
 #define HEAP_SUB_DANGLE(self, count)                                                        \
 	(((count) && (self) == &kernel_locked_heap)                                             \
 	 ? printk(KERN_RAW "%s(%d) : Sub dangle %" PRIuSIZ " - %" PRIuSIZ " -> %" PRIuSIZ "\n", \
 	          __FILE__, __LINE__, (self)->h_dangle,                                         \
 	          count, (self)->h_dangle - (count))                                            \
 	 : (void)0,                                                                             \
-	 ATOMIC_FETCHSUB((self)->h_dangle, count))
+	 atomic_fetchsub(&(self)->h_dangle, count))
 #else /* !NDEBUG */
-#define HEAP_ADD_DANGLE(self,count) ATOMIC_FETCHADD((self)->h_dangle,count)
-#define HEAP_SUB_DANGLE(self,count) ATOMIC_FETCHSUB((self)->h_dangle,count)
+#define HEAP_ADD_DANGLE(self,count) atomic_fetchadd(&(self)->h_dangle,count)
+#define HEAP_SUB_DANGLE(self,count) atomic_fetchsub(&(self)->h_dangle,count)
 #endif /* NDEBUG */
 
 #if 0
@@ -560,8 +560,8 @@ NOTHROW(KCALL heap_serve_pending)(struct heap *__restrict self,
 						while (pend->hpf_next)
 							pend = pend->hpf_next;
 						do {
-							pend->hpf_next = current = ATOMIC_READ(self->h_pfree);
-						} while (!ATOMIC_CMPXCH_WEAK(self->h_pfree, current, next));
+							pend->hpf_next = current = atomic_read(&self->h_pfree);
+						} while (!atomic_cmpxch_weak(&self->h_pfree, current, next));
 					}
 					/* Indicate to the caller that we lost the lock. */
 					return false;
@@ -591,7 +591,7 @@ heap_acquirelock(struct heap *__restrict self, gfp_t flags) {
 			return false;
 		atomic_lock_acquire(&self->h_lock);
 	}
-	pend = ATOMIC_XCH(self->h_pfree, NULL);
+	pend = atomic_xch(&self->h_pfree, NULL);
 	if unlikely(pend)
 		return heap_serve_pending(self, pend, flags);
 	assert(atomic_lock_acquired(&self->h_lock));
@@ -607,7 +607,7 @@ NOTHROW(KCALL heap_acquirelock_nx)(struct heap *__restrict self, gfp_t flags) {
 		if (!atomic_lock_acquire_nx(&self->h_lock))
 			return false;
 	}
-	pend = ATOMIC_XCH(self->h_pfree, NULL);
+	pend = atomic_xch(&self->h_pfree, NULL);
 	if unlikely(pend)
 		return heap_serve_pending(self, pend, flags);
 	assert(atomic_lock_acquired(&self->h_lock));
@@ -619,7 +619,7 @@ NOTHROW(KCALL heap_acquirelock_atomic)(struct heap *__restrict self) {
 	struct heap_pending_free *pend;
 	if (!atomic_lock_tryacquire(&self->h_lock))
 		return false;
-	pend = ATOMIC_XCH(self->h_pfree, NULL);
+	pend = atomic_xch(&self->h_pfree, NULL);
 	if unlikely(pend)
 		return heap_serve_pending(self, pend, GFP_ATOMIC);
 	assert(atomic_lock_acquired(&self->h_lock));
@@ -648,9 +648,9 @@ NOTHROW(KCALL heap_free_raw_lock_and_maybe_unlock_impl)(struct heap *__restrict 
 		pend->hpf_size  = num_bytes;
 		pend->hpf_flags = flags;
 		do {
-			next = ATOMIC_READ(self->h_pfree);
+			next = atomic_read(&self->h_pfree);
 			pend->hpf_next = next;
-		} while (!ATOMIC_CMPXCH_WEAK(self->h_pfree, next, pend));
+		} while (!atomic_cmpxch_weak(&self->h_pfree, next, pend));
 		return false;
 	}
 	return heap_free_raw_and_unlock_impl(self, ptr, num_bytes, flags);
@@ -1009,14 +1009,14 @@ load_new_slot:
 			 * crawling across the entire address space. */
 			if (self->h_hintmode & MAP_GROWSDOWN) {
 				do {
-					if ((old_hint = ATOMIC_READ(self->h_hintaddr)) >= free_endaddr)
+					if ((old_hint = atomic_read(&self->h_hintaddr)) >= free_endaddr)
 						break;
-				} while (!ATOMIC_CMPXCH_WEAK(self->h_hintaddr, old_hint, free_endaddr));
+				} while (!atomic_cmpxch_weak(&self->h_hintaddr, old_hint, free_endaddr));
 			} else {
 				do {
-					if ((old_hint = ATOMIC_READ(self->h_hintaddr)) <= free_minaddr)
+					if ((old_hint = atomic_read(&self->h_hintaddr)) <= free_minaddr)
 						break;
-				} while (!ATOMIC_CMPXCH_WEAK(self->h_hintaddr, old_hint, free_minaddr));
+				} while (!atomic_cmpxch_weak(&self->h_hintaddr, old_hint, free_minaddr));
 			}
 			heap_validate_all_after_free();
 			return false;

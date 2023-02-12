@@ -42,7 +42,6 @@
 #include <sched/cred.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
 
 #include <kos/except.h>
@@ -51,6 +50,7 @@
 #include <kos/lockop.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <ctype.h>
 #include <malloca.h>
 #include <stddef.h>
@@ -180,7 +180,7 @@ NOTHROW(LOCKOP_CC path_remove_from_supermounts_lop)(Toblockop(fsuper) *__restric
 
 		/* Special handling for when the list of mounting points becomes empty. */
 		if (LIST_EMPTY(&obj->fs_mounts)) {
-			ATOMIC_WRITE(obj->fs_mounts.lh_first, FSUPER_MOUNTS_DELETED);
+			atomic_write(&obj->fs_mounts.lh_first, FSUPER_MOUNTS_DELETED);
 			/* Delete the superblock & decref the backing driver (later) */
 			me->p_dir = (REF struct fdirnode *)incref(obj); /* Hacky temporary storage... */
 		} else {
@@ -228,7 +228,7 @@ NOTHROW(LOCKOP_CC path_remove_from_parent_postlop)(Tobpostlockop(path) *__restri
 					/* Special handling for when the list of mounting points becomes empty. */
 					if (LIST_EMPTY(&super->fs_mounts)) {
 						REF struct driver *drv;
-						ATOMIC_WRITE(super->fs_mounts.lh_first, FSUPER_MOUNTS_DELETED);
+						atomic_write(&super->fs_mounts.lh_first, FSUPER_MOUNTS_DELETED);
 						fsuper_mounts_endwrite(super);
 
 						/* Delete the superblock */
@@ -1347,7 +1347,7 @@ do_drive_root_rel:
 						vfs_driveslock_endread(myvfs);
 						THROW(E_FSERROR_PATH_NOT_FOUND, E_FILESYSTEM_PATH_NOT_FOUND_DRIVE);
 					}
-					ATOMIC_ADD(root_ref->p_refcnt, 2); /* +1: root_ref, +1: cwd_ref */
+					atomic_add(&root_ref->p_refcnt, 2); /* +1: root_ref, +1: cwd_ref */
 					cwd_ref = root_ref;
 					vfs_driveslock_endread(myvfs);
 				} else {
@@ -1627,7 +1627,7 @@ path_traverse(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY,
 		       E_IOERROR, E_BADALLOC, ...) {
 	REF struct path *used_cwd;
-	u32 remaining_symlinks = ATOMIC_READ(THIS_FS->fs_lnkmax);
+	u32 remaining_symlinks = atomic_read_relaxed(&THIS_FS->fs_lnkmax);
 	if likely(fd_cwd == AT_FDCWD)
 		return path_traverse_ex(NULL, &remaining_symlinks, upath, plastseg, plastlen, atflags);
 	used_cwd = handles_lookuppath(fd_cwd);
@@ -1687,7 +1687,7 @@ path_traversefull(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath, atflag_
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY,
 		       E_IOERROR, E_BADALLOC, ...) {
 	REF struct path *used_cwd;
-	u32 remaining_symlinks = ATOMIC_READ(THIS_FS->fs_lnkmax);
+	u32 remaining_symlinks = atomic_read_relaxed(&THIS_FS->fs_lnkmax);
 	if likely(fd_cwd == AT_FDCWD)
 		return path_traversefull_ex(NULL, &remaining_symlinks, upath, atflags, presult_path, presult_dirent);
 	used_cwd = handles_lookuppath(fd_cwd);
@@ -2183,7 +2183,7 @@ PUBLIC BLOCKING WUNUSED REF struct handle KCALL
 path_open(fd_t fd_cwd, USER CHECKED char const *filename,
           oflag_t oflags, mode_t mode) {
 	REF struct path *used_cwd;
-	u32 remaining_symlinks = ATOMIC_READ(THIS_FS->fs_lnkmax);
+	u32 remaining_symlinks = atomic_read_relaxed(&THIS_FS->fs_lnkmax);
 	if likely(fd_cwd == AT_FDCWD)
 		return path_open_ex(NULL, &remaining_symlinks, filename, oflags, mode);
 	used_cwd = handles_lookuppath(fd_cwd);

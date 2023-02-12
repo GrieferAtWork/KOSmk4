@@ -34,12 +34,12 @@
 #include <kernel/panic.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 
 #include <kos/except.h>
 #include <kos/io.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -278,7 +278,7 @@ again_acquire_lock:
 		/* Make  sure to set  the UNMAPPED bit,  so that other kernel
 		 * components can identify this node as having been unmapped!
 		 * This mainly effects `mpart_split()' */
-		ATOMIC_OR(node->mn_flags, MNODE_F_UNMAPPED);
+		atomic_or(&node->mn_flags, MNODE_F_UNMAPPED);
 
 		/* Remove the node from the writable-list in case it was apart of it. */
 		if (LIST_ISBOUND(node, mn_writable))

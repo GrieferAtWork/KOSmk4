@@ -31,7 +31,6 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sched/preemption.h>
 
@@ -39,6 +38,7 @@
 #include <sys/stat.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -55,26 +55,26 @@ NOTHROW(KCALL mouse_buffer_putpacket_nopr)(struct mousebuf *__restrict self,
 	assert(packet.mp_type != MOUSE_PACKET_TYPE_NONE);
 	for (;;) {
 		size_t index;
-		oldstate.bs_word = ATOMIC_READ(self->mb_bufstate.bs_word);
+		oldstate.bs_word = atomic_read(&self->mb_bufstate.bs_word);
 		if (oldstate.bs_state.s_used >= CONFIG_KERNEL_MOUSE_BUFFER_SIZE)
 			return false;
 		index = (oldstate.bs_state.s_start +
 		         oldstate.bs_state.s_used) %
 		        CONFIG_KERNEL_MOUSE_BUFFER_SIZE;
-		if (!ATOMIC_CMPXCH_WEAK(self->mb_buffer[index].mp_word, 0, packet.mp_word))
+		if (!atomic_cmpxch_weak(&self->mb_buffer[index].mp_word, 0, packet.mp_word))
 			continue;
 		newstate = oldstate;
 		++newstate.bs_state.s_used;
-		if (ATOMIC_CMPXCH_WEAK(self->mb_bufstate.bs_word,
+		if (atomic_cmpxch_weak(&self->mb_bufstate.bs_word,
 		                       oldstate.bs_word,
 		                       newstate.bs_word))
 			break;
 #ifdef NDEBUG
-		ATOMIC_WRITE(self->mb_buffer[index].mp_word, 0);
+		atomic_write(&self->mb_buffer[index].mp_word, 0);
 #else /* NDEBUG */
 		{
 			mouse_packet_t oldpacket;
-			oldpacket.mp_word = ATOMIC_XCH(self->mb_buffer[index].mp_word, 0);
+			oldpacket.mp_word = atomic_xch(&self->mb_buffer[index].mp_word, 0);
 			assert(oldpacket.mp_word == packet.mp_word);
 		}
 #endif /* !NDEBUG */
@@ -95,20 +95,20 @@ NOTHROW(KCALL mouse_buffer_putpackets_nopr)(struct mousebuf *__restrict self,
 	assert(packetv[0].mp_type != MOUSE_PACKET_TYPE_NONE);
 	for (;;) {
 		size_t i, index;
-		oldstate.bs_word = ATOMIC_READ(self->mb_bufstate.bs_word);
+		oldstate.bs_word = atomic_read(&self->mb_bufstate.bs_word);
 		if ((oldstate.bs_state.s_used + packetc) > CONFIG_KERNEL_MOUSE_BUFFER_SIZE)
 			return false;
 		for (i = 0; i < packetc; ++i) {
 			index = (oldstate.bs_state.s_start + oldstate.bs_state.s_used + i) % CONFIG_KERNEL_MOUSE_BUFFER_SIZE;
-			if (!ATOMIC_CMPXCH(self->mb_buffer[index].mp_word, 0, packetv[i].mp_word)) {
+			if (!atomic_cmpxch(&self->mb_buffer[index].mp_word, 0, packetv[i].mp_word)) {
 				while (i--) {
 					index = (oldstate.bs_state.s_start + oldstate.bs_state.s_used + i) % CONFIG_KERNEL_MOUSE_BUFFER_SIZE;
 #ifdef NDEBUG
-					ATOMIC_WRITE(self->mb_buffer[index].mp_word, 0);
+					atomic_write(&self->mb_buffer[index].mp_word, 0);
 #else /* NDEBUG */
 					{
 						mouse_packet_t oldpacket;
-						oldpacket.mp_word = ATOMIC_XCH(self->mb_buffer[index].mp_word, 0);
+						oldpacket.mp_word = atomic_xch(&self->mb_buffer[index].mp_word, 0);
 						assert(oldpacket.mp_word == packetv[i].mp_word);
 					}
 #endif /* !NDEBUG */
@@ -118,7 +118,7 @@ NOTHROW(KCALL mouse_buffer_putpackets_nopr)(struct mousebuf *__restrict self,
 		}
 		newstate = oldstate;
 		newstate.bs_state.s_used += packetc;
-		if (ATOMIC_CMPXCH_WEAK(self->mb_bufstate.bs_word,
+		if (atomic_cmpxch_weak(&self->mb_bufstate.bs_word,
 		                       oldstate.bs_word,
 		                       newstate.bs_word))
 			break;
@@ -126,11 +126,11 @@ NOTHROW(KCALL mouse_buffer_putpackets_nopr)(struct mousebuf *__restrict self,
 		while (i--) {
 			index = (oldstate.bs_state.s_start + oldstate.bs_state.s_used + i) % CONFIG_KERNEL_MOUSE_BUFFER_SIZE;
 #ifdef NDEBUG
-			ATOMIC_WRITE(self->mb_buffer[index].mp_word, 0);
+			atomic_write(&self->mb_buffer[index].mp_word, 0);
 #else /* NDEBUG */
 			{
 				mouse_packet_t oldpacket;
-				oldpacket.mp_word = ATOMIC_XCH(self->mb_buffer[index].mp_word, 0);
+				oldpacket.mp_word = atomic_xch(&self->mb_buffer[index].mp_word, 0);
 				assert(oldpacket.mp_word == packetv[i].mp_word);
 			}
 #endif /* !NDEBUG */
@@ -458,7 +458,7 @@ NOTHROW(KCALL mousebuf_trygetpacket)(struct mousebuf *__restrict self) {
 	mouse_packet_t result;
 	for (;;) {
 		union mousebuf_state oldstate, newstate;
-		oldstate.bs_word = ATOMIC_READ(self->mb_bufstate.bs_word);
+		oldstate.bs_word = atomic_read(&self->mb_bufstate.bs_word);
 		if (oldstate.bs_state.s_used == 0) {
 			result.mp_word = 0;
 			break;
@@ -473,11 +473,11 @@ NOTHROW(KCALL mousebuf_trygetpacket)(struct mousebuf *__restrict self) {
 		if (newstate.bs_state.s_start == CONFIG_KERNEL_MOUSE_BUFFER_SIZE)
 			newstate.bs_state.s_start = 0;
 #endif
-		if (!ATOMIC_CMPXCH_WEAK(self->mb_bufstate.bs_word,
+		if (!atomic_cmpxch_weak(&self->mb_bufstate.bs_word,
 		                        oldstate.bs_word,
 		                        newstate.bs_word))
 			continue;
-		result.mp_word = ATOMIC_XCH(self->mb_buffer[oldstate.bs_state.s_start].mp_word, 0);
+		result.mp_word = atomic_xch(&self->mb_buffer[oldstate.bs_state.s_start].mp_word, 0);
 		if likely(result.mp_word != 0) {
 			assert(result.mp_type != MOUSE_PACKET_TYPE_NONE);
 			break;
@@ -743,7 +743,7 @@ PUBLIC NONNULL((1)) void KCALL
 mousedev_v_stat(struct mfile *__restrict self,
                 USER CHECKED struct stat *result) THROWS(...) {
 	struct mousedev *me  = mfile_asmouse(self);
-	uintptr_half_t count = ATOMIC_READ(me->md_buf.mb_bufstate.bs_state.s_used);
+	uintptr_half_t count = atomic_read(&me->md_buf.mb_bufstate.bs_state.s_used);
 
 	/* Write info to user-space. */
 	result->st_blksize = (typeof(result->st_blksize))sizeof(mouse_packet_t);
@@ -754,7 +754,7 @@ mousedev_v_stat(struct mfile *__restrict self,
 LOCAL bool KCALL
 mouse_device_canread(struct mousedev *__restrict self) {
 	uintptr_half_t used;
-	used = ATOMIC_READ(self->md_buf.mb_bufstate.bs_state.s_used);
+	used = atomic_read(&self->md_buf.mb_bufstate.bs_state.s_used);
 	return used != 0;
 }
 
@@ -787,23 +787,22 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 	(void)mode;
 	switch (cmd) {
 
-	case MOUSEIO_GETABSMODE:
+	case MOUSEIO_GETABSMODE: {
+		int result;
 		validate_writable(arg, sizeof(int));
+		result = (me->md_flags & MOUSE_DEVICE_FLAG_GENABS) ? 1 : 0;
 		COMPILER_WRITE_BARRIER();
-		*(USER CHECKED int *)arg = (me->md_flags & MOUSE_DEVICE_FLAG_GENABS) ? 1 : 0;
-		COMPILER_WRITE_BARRIER();
-		break;
+		*(USER CHECKED int *)arg = result;
+	}	break;
 
 	case MOUSEIO_SETABSMODE: {
 		int mode;
 		validate_readable(arg, sizeof(int));
-		COMPILER_READ_BARRIER();
 		mode = *(USER CHECKED int const *)arg;
-		COMPILER_READ_BARRIER();
 		if (mode == 0) {
-			ATOMIC_AND(me->md_flags, ~MOUSE_DEVICE_FLAG_GENABS);
+			atomic_and(&me->md_flags, ~MOUSE_DEVICE_FLAG_GENABS);
 		} else if (mode == 1) {
-			ATOMIC_OR(me->md_flags, MOUSE_DEVICE_FLAG_GENABS);
+			atomic_or(&me->md_flags, MOUSE_DEVICE_FLAG_GENABS);
 		} else {
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 			      E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSE_SETABSMODE_BADMODE,
@@ -821,7 +820,6 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 		preemption_flag_t was;
 		bool was_clamped = false;
 		validate_writable(arg, sizeof(struct mouse_rect));
-		COMPILER_READ_BARRIER();
 		memcpy(&new_rect, arg, sizeof(struct mouse_rect));
 		COMPILER_READ_BARRIER();
 		/* Require:
@@ -862,7 +860,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 		/* If the cursor position was clamped, and we're in ABS mouse mode, force
 		 * the creation of a  sequence of motion packets  in order to update  the
 		 * clamped, absolute mouse position. */
-		if (was_clamped && (ATOMIC_READ(me->md_flags) & MOUSE_DEVICE_FLAG_GENABS))
+		if (was_clamped && (atomic_read(&me->md_flags) & MOUSE_DEVICE_FLAG_GENABS))
 			mouse_device_do_motion_nopr_locked(me, 0, 0);
 		mousedev_smplock_release_nopr(me);
 		preemption_pop(&was);
@@ -871,7 +869,6 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 	case MOUSEIO_PUTMOTION: {
 		struct mouse_fake_motion motion;
 		validate_readable(arg, sizeof(struct mouse_fake_motion));
-		COMPILER_READ_BARRIER();
 		memcpy(&motion, arg, sizeof(struct mouse_fake_motion));
 		COMPILER_READ_BARRIER();
 		if (!mousedev_motion(me, motion.mfm_relx, motion.mfm_rely))
@@ -881,17 +878,14 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 	case MOUSEIO_GETPOS: {
 		struct mouse_position pos;
 		validate_writable(arg, sizeof(struct mouse_position));
-		pos.mp_absx = ATOMIC_READ(me->md_state.ms_abs_x);
-		pos.mp_absy = ATOMIC_READ(me->md_state.ms_abs_y);
-		COMPILER_READ_BARRIER();
+		pos.mp_absx = atomic_read(&me->md_state.ms_abs_x);
+		pos.mp_absy = atomic_read(&me->md_state.ms_abs_y);
 		memcpy(arg, &pos, sizeof(struct mouse_position));
-		COMPILER_READ_BARRIER();
 	}	break;
 
 	case MOUSEIO_SETPOS: {
 		struct mouse_position moveto;
 		validate_readable(arg, sizeof(struct mouse_position));
-		COMPILER_READ_BARRIER();
 		memcpy(&moveto, arg, sizeof(struct mouse_position));
 		COMPILER_READ_BARRIER();
 		if (!mousedev_moveto(me, moveto.mp_absx, moveto.mp_absy))
@@ -901,16 +895,14 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 	case MOUSEIO_GETBUTTONS: {
 		u32 buttons;
 		validate_writable(arg, sizeof(u32));
-		buttons = ATOMIC_READ(me->md_state.ms_buttons);
+		buttons = atomic_read(&me->md_state.ms_buttons);
 		COMPILER_WRITE_BARRIER();
 		*(USER CHECKED u32 *)arg = buttons;
-		COMPILER_WRITE_BARRIER();
 	}	break;
 
 	case MOUSEIO_SETBUTTONS: {
 		u32 new_buttons;
 		validate_readable(arg, sizeof(u32));
-		COMPILER_READ_BARRIER();
 		new_buttons = *(USER CHECKED u32 const *)arg;
 		COMPILER_READ_BARRIER();
 		if (!mousedev_button(me, (u32)~0, new_buttons))
@@ -920,7 +912,6 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 	case MOUSEIO_PUTBUTTON: {
 		struct mouse_fake_button button;
 		validate_writable(arg, sizeof(struct mouse_fake_button));
-		COMPILER_READ_BARRIER();
 		memcpy(&button, arg, sizeof(struct mouse_fake_button));
 		COMPILER_READ_BARRIER();
 		if (!mousedev_button_ex(me,
@@ -933,13 +924,11 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 		COMPILER_WRITE_BARRIER();
 		((USER CHECKED struct mouse_fake_button *)arg)->mfb_old_buttons = button.mfb_old_buttons;
 		((USER CHECKED struct mouse_fake_button *)arg)->mfb_new_buttons = button.mfb_new_buttons;
-		COMPILER_WRITE_BARRIER();
 	}	break;
 
 	case MOUSEIO_PUTVWHEEL: {
 		s32 relmove;
 		validate_readable(arg, sizeof(s32));
-		COMPILER_READ_BARRIER();
 		relmove = *(USER CHECKED s32 const *)arg;
 		COMPILER_READ_BARRIER();
 		if (!mousedev_vwheel(me, relmove))
@@ -949,7 +938,6 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 	case MOUSEIO_PUTHWHEEL: {
 		s32 relmove;
 		validate_readable(arg, sizeof(s32));
-		COMPILER_READ_BARRIER();
 		relmove = *(USER CHECKED s32 const *)arg;
 		COMPILER_READ_BARRIER();
 		if (!mousedev_hwheel(me, relmove))

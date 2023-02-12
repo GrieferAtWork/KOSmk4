@@ -28,12 +28,11 @@
 #include <kernel/fs/node.h>
 #include <kernel/malloc.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -95,7 +94,7 @@ constdirenum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dir
 
 again:
 	/* Read current index. */
-	index = ATOMIC_READ(me->cde_index);
+	index = atomic_read(&me->cde_index);
 
 	/* Check for EOF */
 	if (index >= me->cde_entc)
@@ -108,7 +107,7 @@ again:
 		return (size_t)~result; /* Don't advance directory position. */
 
 	/* Advance directory position. */
-	if (!ATOMIC_CMPXCH(me->cde_index, index, index + 1))
+	if (!atomic_cmpxch(&me->cde_index, index, index + 1))
 		goto again;
 	return (size_t)result;
 }
@@ -126,18 +125,18 @@ constdirenum_v_seekdir(struct fdirenum *__restrict self,
 			THROW(E_OVERFLOW);
 #endif /* __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__ */
 		newpos = (size_t)(pos_t)offset;
-		ATOMIC_WRITE(me->cde_index, newpos);
+		atomic_write(&me->cde_index, newpos);
 		break;
 
 	case SEEK_CUR: {
 		size_t oldpos;
 		do {
-			oldpos = ATOMIC_READ(me->cde_index);
+			oldpos = atomic_read(&me->cde_index);
 			newpos = oldpos + (ssize_t)offset;
 			if unlikely(offset < 0 ? newpos > oldpos
 			                       : newpos < oldpos)
 				THROW(E_OVERFLOW);
-		} while (!ATOMIC_CMPXCH_WEAK(me->cde_index, oldpos, newpos));
+		} while (!atomic_cmpxch_weak(&me->cde_index, oldpos, newpos));
 	}	break;
 
 	case SEEK_END: {
@@ -147,7 +146,7 @@ constdirenum_v_seekdir(struct fdirenum *__restrict self,
 		if unlikely(offset < 0 ? newpos > dirsiz
 		                       : newpos < dirsiz)
 			THROW(E_OVERFLOW);
-		ATOMIC_WRITE(me->cde_index, newpos);
+		atomic_write(&me->cde_index, newpos);
 	}	break;
 
 	default:

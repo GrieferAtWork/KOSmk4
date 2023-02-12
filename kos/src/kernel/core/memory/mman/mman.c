@@ -39,16 +39,16 @@
 #include <sched/task.h>
 #include <sched/userkern.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
-#include <hybrid/sched/preemption.h>
 #include <hybrid/sched/atomic-lock.h>
 #include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sched/preemption.h>
 
 #include <kos/except.h>
 #include <kos/kernel/paging.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stdalign.h>
 #include <stddef.h>
 #include <string.h>
@@ -308,7 +308,7 @@ mman_new(void) THROWS(E_BADALLOC) {
 		}
 		mman_oninit_callbacks(result);
 	} EXCEPT {
-		ATOMIC_WRITE(result->mm_refcnt, 0);
+		write_once(&result->mm_refcnt, 0);
 		destroy(result);
 		RETHROW();
 	}

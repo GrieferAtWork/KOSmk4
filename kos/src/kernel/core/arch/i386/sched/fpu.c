@@ -34,7 +34,6 @@
 #include <sched/group.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
 
 #include <asm/cpu-cpuid.h>

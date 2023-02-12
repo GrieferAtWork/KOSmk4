@@ -43,7 +43,6 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 #include <hybrid/sched/preemption.h>
 
@@ -51,6 +50,7 @@
 #include <kos/lockop.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -550,13 +550,13 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 			 * s.a.: `heap_unmap_kram()' */
 			heap_validate_all();
 			preemption_pushoff(&was);
-			ATOMIC_OR(THIS_TASK->t_flags, _TASK_FDBGHEAPDMEM);
+			atomic_or(&THIS_TASK->t_flags, _TASK_FDBGHEAPDMEM);
 			do {
 				__asm__ __volatile__("" : : "r" (*tail_minaddr));
 				tail_minaddr += PAGESIZE;
 			} while (tail_minaddr < tail_endaddr);
 			preemption_pop(&was);
-			ATOMIC_AND(THIS_TASK->t_flags, ~_TASK_FDBGHEAPDMEM);
+			atomic_and(&THIS_TASK->t_flags, ~_TASK_FDBGHEAPDMEM);
 			heap_validate_all();
 		} else
 #endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
@@ -1087,7 +1087,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		struct mpart *next;
 		hipart->mp_refcnt = 2;
 		do {
-			next = ATOMIC_READ(file->mf_changed.slh_first);
+			next = atomic_read(&file->mf_changed.slh_first);
 			if unlikely(next == MFILE_PARTS_ANONYMOUS) {
 				hipart->mp_refcnt = 1;
 				hipart->mp_flags &= ~MPART_F_CHANGED;
@@ -1097,7 +1097,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 			        "MPART_F_CHANGED+mf_changed!=ANON imply the presence of this operator");
 			hipart->mp_changed.sle_next = next;
 			COMPILER_WRITE_BARRIER();
-		} while (!ATOMIC_CMPXCH_WEAK(file->mf_changed.slh_first,
+		} while (!atomic_cmpxch_weak(&file->mf_changed.slh_first,
 		                             next, hipart));
 	}
 
@@ -1394,7 +1394,7 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 			if unlikely(LIST_ISBOUND(node, mn_writable))
 				LIST_UNBIND(node, mn_writable);
 			mman_mappings_removenode(&mman_kernel, node);
-			ATOMIC_OR(node->mn_flags, MNODE_F_UNMAPPED);
+			atomic_or(&node->mn_flags, MNODE_F_UNMAPPED);
 
 			/* Keep track of how many nodes are mapping a particular module. */
 			if (node->mn_module)

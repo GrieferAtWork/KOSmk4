@@ -28,9 +28,8 @@
 #include <kernel/mman/stat.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -59,7 +58,7 @@ again:
 			uintptr_quarter_t state;
 			if (mpart_isanon_atomic(part))
 				result->msi_anon += nodesize;
-			state = ATOMIC_READ(part->mp_state);
+			state = atomic_read(&part->mp_state);
 			if (state == MPART_ST_SWP || state == MPART_ST_SWP_SC)
 				result->msi_swap += nodesize;
 		}

@@ -39,10 +39,10 @@
 #include <sched/task.h> /* _TASK_FDBGHEAPDMEM */
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -126,7 +126,7 @@ static_assert(offsetof(struct mpart, _mp_trmlop_mp.olo_func) == offsetof(struct 
               "This is assumed by `_mpart_init_asanon()', which fills in `rb_rhs' as NULL "
               "when called, which in turn must cause the `olo_func' of the lockops used to "
               "be initialized to `NULL' as well.\n"
-              "Calls to `mpart_trim()' will then do an ATOMIC_CMPXCH on `olo_func' to start "
+              "Calls to `mpart_trim()' will then do an atomic_cmpxch on `olo_func' to start "
               "an async trim operation of the mem-part!");
 
 
@@ -256,13 +256,13 @@ NOTHROW(FCALL mnode_load_mhint)(struct mnode *__restrict self) {
 		 * s.a.: `heap_unmap_kram()' */
 		heap_validate_all();
 		preemption_pushoff(&was);
-		ATOMIC_OR(THIS_TASK->t_flags, _TASK_FDBGHEAPDMEM);
+		atomic_or(&THIS_TASK->t_flags, _TASK_FDBGHEAPDMEM);
 		do {
 			__asm__ __volatile__("" : : "r" (*iter));
 			iter += PAGESIZE;
 		} while (iter < end);
 		preemption_pop(&was);
-		ATOMIC_AND(THIS_TASK->t_flags, ~_TASK_FDBGHEAPDMEM);
+		atomic_and(&THIS_TASK->t_flags, ~_TASK_FDBGHEAPDMEM);
 		heap_validate_all();
 	} else
 #endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
@@ -277,7 +277,7 @@ NOTHROW(FCALL mnode_load_mhint)(struct mnode *__restrict self) {
 	 * which may  overlap with  the address  range we've  just  loaded. */
 	mman_kernel_hintinit_inuse_waitfor();
 
-	ATOMIC_AND(self->mn_flags, ~MNODE_F_MHINT);
+	atomic_and(&self->mn_flags, ~MNODE_F_MHINT);
 }
 
 typedef NOBLOCK void
@@ -713,7 +713,7 @@ NOTHROW(FCALL async_alloc_mpart)(struct mpart **__restrict p_newpart,
 	/* We'd need a lock to the kernel mman to proceed. - As
 	 * such, enqueue `self' to wait for said lock to become
 	 * available. */
-	ATOMIC_WRITE(self->_mp_trmlop_mm.olo_func, &mpart_trim_mmlop);
+	atomic_write(&self->_mp_trmlop_mm.olo_func, &mpart_trim_mmlop);
 	incref(self); /* Inherited by `mpart_trim_mmlop()' */
 	SLIST_ATOMIC_INSERT(&mman_kernel_lockops, &self->_mp_trmlop_mm, olo_link);
 	_mman_lockops_reap(&mman_kernel);
@@ -987,7 +987,7 @@ again_enum_hipart_nodlst:
 		if (!mpart_has_mlock_nodes(lopart)) {
 			lopart->mp_flags &= ~MPART_F_MLOCK;
 		} else if (!mpart_has_mlock_nodes(hipart)) {
-			ATOMIC_AND(hipart->mp_flags, ~MPART_F_MLOCK);
+			atomic_and(&hipart->mp_flags, ~MPART_F_MLOCK);
 		}
 	}
 
@@ -1195,7 +1195,7 @@ NOTHROW(FCALL mpart_clear)(struct mpart *__restrict self) {
 	}
 
 	/* Clear the `MPART_F_GLOBAL_REF' bit. */
-	if (ATOMIC_FETCHAND(self->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
+	if (atomic_fetchand(&self->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
 		decref_nokill(self);
 }
 
@@ -1493,7 +1493,7 @@ NOTHROW(FCALL mpart_trim_mmlop)(Toblockop(mman) *__restrict _lop,
                                 struct mman *__restrict UNUSED(mm)) {
 	REF struct mpart *self;
 	self = container_of(_lop, struct mpart, _mp_trmlop_mm);
-	ATOMIC_WRITE(self->_mp_trmplop_mm.oplo_func, &mpart_trim_mmplop);
+	atomic_write(&self->_mp_trmplop_mm.oplo_func, &mpart_trim_mmplop);
 	return &self->_mp_trmplop_mm;
 }
 
@@ -1527,7 +1527,7 @@ NOTHROW(FCALL mpart_trim_locked_ftx)(struct mpart *__restrict self) {
 			mpart_decref_all_mmans(self);
 
 			/* asynchronously wait for the lock of this mman to become available. */
-			ATOMIC_WRITE(self->_mp_trmlop_mm.olo_func, &mpart_trim_mmlop);
+			atomic_write(&self->_mp_trmlop_mm.olo_func, &mpart_trim_mmlop);
 			incref(self); /* Inherited by `mpart_trim_mmlop()' */
 			SLIST_ATOMIC_INSERT(&FORMMAN(blocking_mm, thismman_lockops),
 			                    &self->_mp_trmlop_mm, olo_link);
@@ -1552,10 +1552,10 @@ trim_completed:
 		 * Once  this has been done, other threads can once again call
 		 * `mpart_trim()' in order to initiate yet another async  trim
 		 * operation! */
-		ATOMIC_WRITE(self->_mp_trmlop_mp.olo_func, NULL);
+		atomic_write(&self->_mp_trmlop_mp.olo_func, NULL);
 	} else if (status == MPART_TRIM_STATUS_NOMEM) {
 		/* Must do the trim operation via the mpart async-job system. */
-		ATOMIC_WRITE(self->_mp_trmlop_mp.olo_func, NULL);
+		atomic_write(&self->_mp_trmlop_mp.olo_func, NULL);
 		mpart_start_asyncjob(incref(self), MPART_XF_WILLTRIM);
 	}
 }
@@ -1576,7 +1576,7 @@ PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(mpart) *
 NOTHROW(FCALL mpart_trim_ftxlop)(Toblockop(mpart) *__restrict _lop,
                                  REF struct mpart *__restrict self) {
 	assert(_lop == &self->_mp_trmlop_mp);
-	ATOMIC_WRITE(self->_mp_trmplop_mp.oplo_func, &mpart_trim_ftxplop);
+	atomic_write(&self->_mp_trmplop_mp.oplo_func, &mpart_trim_ftxplop);
 	return &self->_mp_trmplop_mp;
 }
 
@@ -1602,7 +1602,7 @@ NOTHROW(FCALL mpart_trim_locked)(struct mpart *__restrict self) {
 	} else {
 		if (meta->mpm_dmalocks != 0) {
 			/* Wait for DMA-locks to go away, and _then_ re-attempt the trim! */
-			ATOMIC_OR(self->mp_xflags, MPART_XF_TRIM_AFTER_DMA);
+			atomic_or(&self->mp_xflags, MPART_XF_TRIM_AFTER_DMA);
 			COMPILER_READ_BARRIER();
 			if (meta->mpm_dmalocks != 0)
 				return;
@@ -1612,7 +1612,7 @@ NOTHROW(FCALL mpart_trim_locked)(struct mpart *__restrict self) {
 			mpartmeta_ftxlock_endwrite(meta, self);
 		} else {
 			/* Must acquire the futex-lock asynchronously. */
-			ATOMIC_WRITE(self->_mp_trmlop_mp.olo_func, &mpart_trim_ftxlop);
+			atomic_write(&self->_mp_trmlop_mp.olo_func, &mpart_trim_ftxlop);
 			incref(self); /* The reference inherited by `mpart_trim_ftxlop' */
 			/* NOTE: No need for a 2nd incref(self) to prevent `self' from being
 			 *       destroyed before we get to  reap it! Our caller is  already
@@ -1642,7 +1642,7 @@ NOTHROW(FCALL mpart_trim_mmplop)(Tobpostlockop(mman) *__restrict _lop,
                                  struct mman *__restrict UNUSED(mm)) {
 	REF struct mpart *self;
 	self = container_of(_lop, struct mpart, _mp_trmplop_mm);
-	if (ATOMIC_CMPXCH(self->mp_refcnt, 1, 0))
+	if (atomic_cmpxch(&self->mp_refcnt, 1, 0))
 		goto do_destroy;
 
 	/* The lock to  `mm' did become  available at one  point.
@@ -1658,7 +1658,7 @@ NOTHROW(FCALL mpart_trim_mmplop)(Tobpostlockop(mman) *__restrict _lop,
 		/* The part lock isn't available.
 		 * As such, we muss use `mpart_trim_mplop()' in order
 		 * to asynchronously  wait for  a lock  to the  part! */
-		ATOMIC_WRITE(self->_mp_trmlop_mp.olo_func, &mpart_trim_mplop);
+		atomic_write(&self->_mp_trmlop_mp.olo_func, &mpart_trim_mplop);
 
 		/* Prevent the part from dying while in `_mpart_lockops_reap()'
 		 * This reference is dropped further down below. */
@@ -1674,7 +1674,7 @@ NOTHROW(FCALL mpart_trim_mmplop)(Tobpostlockop(mman) *__restrict _lop,
 	 *
 	 * Note that this  decref() is  unlikely to  actually
 	 * destroy  the part, because we've already attempted
-	 * to ATOMIC_CMPXCH() the reference counter to 0, and
+	 * to atomic_cmpxch() the reference counter to 0, and
 	 * it didn't work back then. */
 	decref_unlikely(self);
 	return;
@@ -1705,7 +1705,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self) {
 
 	/* Check for special case: can we destroy the part immediately? */
-	if (ATOMIC_CMPXCH(self->mp_refcnt, 1, 0))
+	if (atomic_cmpxch(&self->mp_refcnt, 1, 0))
 		goto do_destroy;
 
 	/* Check for special case: the part isn't anonymous. */
@@ -1719,7 +1719,7 @@ NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self)
 		 * to `self'. - It can happen, and if it does, then  `mpart_lock_release()'
 		 * will reaping once we  release the lock ~should~  cause the lockop to  be
 		 * serviced. */
-		if unlikely(!ATOMIC_CMPXCH(self->_mp_trmlop_mp.olo_func,
+		if unlikely(!atomic_cmpxch(&self->_mp_trmlop_mp.olo_func,
 		                           NULL, &mpart_trim_mplop)) {
 			_mpart_lock_release(self);
 			goto reap_and_normal_decref;
@@ -1734,7 +1734,7 @@ NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self)
 		 * If such an operation is already in-progress, then don't do anything,
 		 * since someone else will already end up doing what our caller  wanted
 		 * us to kick-start! */
-		if (!ATOMIC_CMPXCH(self->_mp_trmlop_mp.olo_func, NULL, &mpart_trim_mplop))
+		if (!atomic_cmpxch(&self->_mp_trmlop_mp.olo_func, NULL, &mpart_trim_mplop))
 			goto do_normal_decref;
 
 		/* Get another reference so `self' is kept alive, even

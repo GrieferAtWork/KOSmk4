@@ -33,12 +33,12 @@
 #include <kernel/types.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
 
 #include <kos/aref.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
@@ -84,7 +84,7 @@ NOTHROW(KCALL hisr_getref_nopr)(struct hisr *__restrict self) {
 	assert(!PREEMPTION_ENABLED());
 	/* Try to acquire a reference to the handle object. */
 #ifndef CONFIG_NO_SMP
-	ATOMIC_INC(self->hi_inuse);
+	atomic_inc(&self->hi_inuse);
 #endif /* !CONFIG_NO_SMP */
 	COMPILER_READ_BARRIER();
 	obj = self->hi_obj;
@@ -93,7 +93,7 @@ NOTHROW(KCALL hisr_getref_nopr)(struct hisr *__restrict self) {
 	if (likely(obj) && unlikely(!(*handle_type_db.h_tryincref[self->hi_typ])(obj)))
 		obj = NULL;
 #ifndef CONFIG_NO_SMP
-	ATOMIC_DEC(self->hi_inuse);
+	atomic_dec(&self->hi_inuse);
 #endif /* !CONFIG_NO_SMP */
 	return obj;
 }
@@ -105,9 +105,9 @@ NOTHROW(KCALL hisr_clear)(struct hisr *__restrict self) {
 	preemption_flag_t was;
 	preemption_pushoff(&was);
 #endif /* CONFIG_NO_SMP */
-	ATOMIC_STORE(self->hi_obj, NULL);
+	atomic_store(&self->hi_obj, NULL);
 #ifndef CONFIG_NO_SMP
-	while (ATOMIC_READ(self->hi_inuse))
+	while (atomic_read(&self->hi_inuse))
 		task_tryyield_or_pause();
 #else /* !CONFIG_NO_SMP */
 	preemption_pop(&was);
@@ -132,7 +132,7 @@ PRIVATE NOBLOCK void NOTHROW(FCALL hisr_greedy_wrapper)(void *arg);
 
 /* Check if a given nullable driver/func/arg triple can be overwritten */
 #define hisr_callback_mayoverride(d, func, arg, is_greedy) \
-	(hisr_iswrapper(func) && (ATOMIC_READ(((struct hisr *)(arg))->hi_obj) == NULL))
+	(hisr_iswrapper(func) && (atomic_read(&((struct hisr *)(arg))->hi_obj) == NULL))
 
 /* Construct a new HISR descriptor. */
 PRIVATE ATTR_RETNONNULL struct hisr *KCALL
@@ -419,7 +419,7 @@ isr_try_register_at_impl(/*inherit(on_success)*/ REF struct driver *__restrict f
 	}
 	/* Remove all no-op HISR handlers. */
 	new_state = isr_vector_state_remove_noop_hisr(new_state, ignored_hisr_arg);
-	new_state->ivs_unhandled = ATOMIC_READ(old_state->ivs_unhandled);
+	new_state->ivs_unhandled = atomic_read(&old_state->ivs_unhandled);
 	/* With the new state now fully initialized, try to install it (atomically). */
 	if (arref_cmpxch(&isr_vectors[index], old_state, new_state)) {
 		void *real_func = func, *real_arg = arg;
@@ -628,7 +628,7 @@ again:
 		declaring_driver = old_state->ivs_greedy_drv;
 assign_new_state:
 		new_state = isr_vector_state_remove_noop_hisr(new_state, NULL);
-		new_state->ivs_unhandled = ATOMIC_READ(old_state->ivs_unhandled);
+		new_state->ivs_unhandled = atomic_read(&old_state->ivs_unhandled);
 		success = arref_cmpxch(&isr_vectors[index], old_state, new_state);
 		if unlikely(!success) {
 			decref(old_state);
@@ -914,7 +914,7 @@ again:
 			}
 assign_new_state:
 			new_state = isr_vector_state_remove_noop_hisr(new_state, NULL);
-			new_state->ivs_unhandled = ATOMIC_READ(old_state->ivs_unhandled);
+			new_state->ivs_unhandled = atomic_read(&old_state->ivs_unhandled);
 			success = arref_cmpxch(&isr_vectors[index], old_state, new_state);
 			if unlikely(!success) {
 				decref(old_state);
@@ -1131,7 +1131,7 @@ NOTHROW(KCALL isr_try_reorder_handlers)(size_t vector_index,
 		incref(new_state->ivs_handv[i].ivh_drv);
 	}
 	new_state = isr_vector_state_remove_noop_hisr(new_state, NULL);
-	new_state->ivs_unhandled = ATOMIC_READ(old_state->ivs_unhandled);
+	new_state->ivs_unhandled = atomic_read(&old_state->ivs_unhandled);
 	if (arref_cmpxch(&isr_vectors[i], old_state, new_state)) {
 		isr_vector_state_cleanup_noop_hisr(old_state, new_state, NULL);
 		destroy(new_state);
@@ -1154,11 +1154,11 @@ NOTHROW(KCALL isr_vector_trigger_impl)(size_t index) {
 	assert(self);
 	for (i = 0; i < self->ivs_handc; ++i) {
 		if (!(*self->ivs_handv[i].ivh_fun)(self->ivs_handv[i].ivh_arg)) {
-			ATOMIC_INC(self->ivs_handv[i].ivh_mis);
+			atomic_inc(&self->ivs_handv[i].ivh_mis);
 			continue;
 		}
 		/* Handler successfully invoked. */
-		ATOMIC_INC(self->ivs_handv[i].ivh_hit);
+		atomic_inc(&self->ivs_handv[i].ivh_hit);
 		if unlikely_untraced(i != 0) { /* Don't trace, since this should be kept as unlikely! */
 			/* Check if our hit/miss ratio is now greater than that of i-1
 			 * If so, try to allocate a new vector state with a more optimized handler order. */
@@ -1178,14 +1178,15 @@ NOTHROW(KCALL isr_vector_trigger_impl)(size_t index) {
 		decref_unlikely(self);
 		return true;
 	}
+
 	/* Fallback: Invoke the greedy handler (if defined). */
 	if (self->ivs_greedy_drv) {
 		(*self->ivs_greedy_fun)(self->ivs_greedy_arg);
-		ATOMIC_INC(self->ivs_greedy_cnt);
+		atomic_inc(&self->ivs_greedy_cnt);
 		decref_unlikely(self);
 		return true;
 	}
-	ATOMIC_INC(self->ivs_unhandled);
+	atomic_inc(&self->ivs_unhandled);
 	decref_unlikely(self);
 	return false;
 }

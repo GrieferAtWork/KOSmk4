@@ -31,13 +31,13 @@
 #include <kernel/rand.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/illop.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -158,7 +158,7 @@ NOTHROW(FCALL mfile_insert_and_merge_part_and_unlock)(struct mfile *__restrict s
 		/* Add the new part to the list of changed parts. */
 		struct mpart *next_changed;
 		do {
-			next_changed = ATOMIC_READ(self->mf_changed.slh_first);
+			next_changed = atomic_read(&self->mf_changed.slh_first);
 			if unlikely(next_changed == MFILE_PARTS_ANONYMOUS ||
 			            self->mf_ops->mo_saveblocks == NULL) {
 				assertf(self->mf_ops->mo_saveblocks == NULL ? (next_changed == MFILE_PARTS_ANONYMOUS ||
@@ -186,7 +186,7 @@ NOTHROW(FCALL mfile_insert_and_merge_part_and_unlock)(struct mfile *__restrict s
 			}
 			part->mp_changed.sle_next = next_changed;
 			COMPILER_WRITE_BARRIER();
-		} while (!ATOMIC_CMPXCH_WEAK(self->mf_changed.slh_first,
+		} while (!atomic_cmpxch_weak(&self->mf_changed.slh_first,
 		                             next_changed, part));
 	}
 

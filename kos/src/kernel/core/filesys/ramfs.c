@@ -43,14 +43,13 @@
 #include <sched/task.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
 #include <linux/magic.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -530,7 +529,7 @@ NOTHROW(FCALL ramfs_dirdata_droptree)(REF struct ramfs_dirent *__restrict tree) 
 again:
 	lhs = tree->rde_treenode.rb_lhs;
 	rhs = tree->rde_treenode.rb_rhs;
-	ATOMIC_WRITE(tree->rde_treenode.rb_lhs, RAMFS_DIRENT_TREENODE_DELETED);
+	atomic_write(&tree->rde_treenode.rb_lhs, RAMFS_DIRENT_TREENODE_DELETED);
 	decref_unlikely(tree);
 	if (lhs) {
 		if (rhs)
@@ -1318,7 +1317,7 @@ PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) bool
 NOTHROW(KCALL ramfs_delete_all_files)(struct ramfs_dirnode *dir,
                                       /*inherit(always)*/ REF struct ramfs_super *super) {
 	assert(dir->mf_flags & MFILE_F_DELETED);
-	if (ATOMIC_READ(dir->rdn_dat.rdd_tree) != NULL) {
+	if (atomic_read_relaxed(&dir->rdn_dat.rdd_tree) != NULL) {
 		if (ramfs_dirnode_trywrite(dir)) {
 			COMPILER_READ_BARRIER();
 			if (dir->rdn_dat.rdd_tree != NULL) {

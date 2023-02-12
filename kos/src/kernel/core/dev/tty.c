@@ -37,8 +37,6 @@
 #include <sched/sigmask.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <compat/config.h>
 #include <compat/kos/types.h>
 #include <kos/except/reason/illop.h>
@@ -51,6 +49,7 @@
 #include <sys/types.h>   /* loff_t */
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <signal.h>
@@ -562,20 +561,20 @@ _ttydev_tryioctl(struct mfile *__restrict self, ioctl_t cmd,
 		switch ((uintptr_t)arg) {
 
 		case TCOOFF:
-			ATOMIC_OR(me->t_term.t_ios.c_iflag, IXOFF);
+			atomic_or(&me->t_term.t_ios.c_iflag, IXOFF);
 			break;
 
 		case TCOON:
-			if (ATOMIC_FETCHAND(me->t_term.t_ios.c_iflag, ~IXOFF) & IXOFF)
+			if (atomic_fetchand(&me->t_term.t_ios.c_iflag, ~IXOFF) & IXOFF)
 				sig_broadcast(&me->t_term.t_opend.lb_nful);
 			break;
 
 		case TCIOFF:
-			ATOMIC_OR(me->t_term.t_ios.c_iflag, __IIOFF);
+			atomic_or(&me->t_term.t_ios.c_iflag, __IIOFF);
 			break;
 
 		case TCION:
-			if (ATOMIC_FETCHAND(me->t_term.t_ios.c_iflag, ~__IIOFF) & __IIOFF)
+			if (atomic_fetchand(&me->t_term.t_ios.c_iflag, ~__IIOFF) & __IIOFF)
 				sig_broadcast(&me->t_term.t_ibuf.rb_nfull);
 			break;
 
@@ -813,39 +812,39 @@ again_TIOCNOTTY:
 
 	case _IO_WITHSIZE(TIOCSETD, 0):
 	case _IO_WITHSIZE(TIOCSETD, 0) | _IOC_IN:
-		ATOMIC_WRITE(me->t_term.t_ios.c_line, ioctl_intarg_getuint(cmd, arg) & 0xff);
+		atomic_write(&me->t_term.t_ios.c_line, ioctl_intarg_getuint(cmd, arg) & 0xff);
 		/* DRIVER: UPDATE_LINE_DISCIPLINE(); */
 		return 0;
 
 	case _IO_WITHSIZE(TIOCGETD, 0):
 	case _IO_WITHSIZE(TIOCGETD, 0) | _IOC_OUT:
-		return ioctl_intarg_setuint(cmd, arg, (unsigned int)ATOMIC_READ(me->t_term.t_ios.c_line));
+		return ioctl_intarg_setuint(cmd, arg, (unsigned int)atomic_read(&me->t_term.t_ios.c_line));
 
 	case _IO_WITHSIZE(FIONREAD, 0):
 	case _IO_WITHSIZE(FIONREAD, 0) | _IOC_OUT:
-		return ioctl_intarg_setuint(cmd, arg, (unsigned int)ATOMIC_READ(me->t_term.t_ibuf.rb_avail));
+		return ioctl_intarg_setuint(cmd, arg, (unsigned int)atomic_read(&me->t_term.t_ibuf.rb_avail));
 
 	case _IO_WITHSIZE(TIOCOUTQ, 0):
 	case _IO_WITHSIZE(TIOCOUTQ, 0) | _IOC_OUT:
-		return ioctl_intarg_setuint(cmd, arg, (unsigned int)ATOMIC_READ(me->t_term.t_opend.lb_line.lc_size));
+		return ioctl_intarg_setuint(cmd, arg, (unsigned int)atomic_read(&me->t_term.t_opend.lb_line.lc_size));
 
 	case _IO_WITHSIZE(FIOQSIZE, 0):
 	case _IO_WITHSIZE(FIOQSIZE, 0) | _IOC_OUT:
 		return ioctl_intarg_setloff(cmd, arg,
-		                            ATOMIC_READ(me->t_term.t_ibuf.rb_avail) +
-		                            ATOMIC_READ(me->t_term.t_ipend.lb_line.lc_size) +
-		                            ATOMIC_READ(me->t_term.t_canon.lb_line.lc_size));
+		                            atomic_read(&me->t_term.t_ibuf.rb_avail) +
+		                            atomic_read(&me->t_term.t_ipend.lb_line.lc_size) +
+		                            atomic_read(&me->t_term.t_canon.lb_line.lc_size));
 
 	case _IO_WITHSIZE(TIOCGSOFTCAR, 0):
 	case _IO_WITHSIZE(TIOCGSOFTCAR, 0) | _IOC_OUT:
-		return ioctl_intarg_setbool(cmd, arg, (ATOMIC_READ(me->t_term.t_ios.c_cflag) & CLOCAL) != 0);
+		return ioctl_intarg_setbool(cmd, arg, (atomic_read(&me->t_term.t_ios.c_cflag) & CLOCAL) != 0);
 
 	case _IO_WITHSIZE(TIOCSSOFTCAR, 0):
 	case _IO_WITHSIZE(TIOCSSOFTCAR, 0) | _IOC_IN:
 		if (ioctl_intarg_getbool(cmd, arg)) {
-			ATOMIC_OR(me->t_term.t_ios.c_cflag, CLOCAL);
+			atomic_or(&me->t_term.t_ios.c_cflag, CLOCAL);
 		} else {
-			ATOMIC_AND(me->t_term.t_ios.c_cflag, ~CLOCAL);
+			atomic_and(&me->t_term.t_ios.c_cflag, ~CLOCAL);
 		}
 		return 0;
 
@@ -871,19 +870,19 @@ again_TIOCNOTTY:
 		switch (_IOC_NR(cmd)) {
 
 		case _IOC_NR(TTYIO_IBUF_GETLIMIT):
-			value = ATOMIC_READ(me->t_term.t_ibuf.rb_limit);
+			value = atomic_read(&me->t_term.t_ibuf.rb_limit);
 			break;
 
 		case _IOC_NR(TTYIO_CANON_GETLIMIT):
-			value = ATOMIC_READ(me->t_term.t_canon.lb_limt);
+			value = atomic_read(&me->t_term.t_canon.lb_limt);
 			break;
 
 		case _IOC_NR(TTYIO_OPEND_GETLIMIT):
-			value = ATOMIC_READ(me->t_term.t_opend.lb_limt);
+			value = atomic_read(&me->t_term.t_opend.lb_limt);
 			break;
 
 		case _IOC_NR(TTYIO_IPEND_GETLIMIT):
-			value = ATOMIC_READ(me->t_term.t_ipend.lb_limt);
+			value = atomic_read(&me->t_term.t_ipend.lb_limt);
 			break;
 
 		default: __builtin_unreachable();
@@ -905,7 +904,7 @@ again_TIOCNOTTY:
 			if (!value) {
 				ringbuffer_close(&me->t_term.t_ibuf);
 			} else {
-				ATOMIC_WRITE(me->t_term.t_ibuf.rb_limit, value);
+				atomic_write(&me->t_term.t_ibuf.rb_limit, value);
 			}
 			return 0;
 
@@ -926,7 +925,7 @@ again_TIOCNOTTY:
 		if (!value) {
 			linebuffer_close(lnbuf);
 		} else {
-			ATOMIC_WRITE(lnbuf->lb_limt, value);
+			atomic_write(&lnbuf->lb_limt, value);
 		}
 		return 0;
 	}	break;
@@ -989,9 +988,9 @@ ttydev_v_stat(struct mfile *__restrict self,
 	assert(mfile_istty(self));
 
 	/* Try to give user-space an estimate on the number of unread input bytes. */
-	result->st_size = ATOMIC_READ(me->t_term.t_ibuf.rb_avail) +
-	                  ATOMIC_READ(me->t_term.t_ipend.lb_line.lc_size) +
-	                  ATOMIC_READ(me->t_term.t_canon.lb_line.lc_size);
+	result->st_size = atomic_read(&me->t_term.t_ibuf.rb_avail) +
+	                  atomic_read(&me->t_term.t_ipend.lb_line.lc_size) +
+	                  atomic_read(&me->t_term.t_canon.lb_line.lc_size);
 }
 
 

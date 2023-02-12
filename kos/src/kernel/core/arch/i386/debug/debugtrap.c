@@ -34,7 +34,6 @@
 #include <sched/rpc.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/atomic-lock.h>
 #include <hybrid/unaligned.h>
 
@@ -43,12 +42,13 @@
 #include <kos/bits/debugtrap32.h>
 #include <kos/debugtrap.h>
 #include <kos/except/reason/inval.h>
+#include <kos/kernel/bits/cpu-state32.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state-verify.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/bits/cpu-state32.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <malloca.h>
 #include <signal.h>
@@ -121,18 +121,18 @@ NOTHROW(FCALL setpcrel)(s32 *__restrict offset, void *target) {
 	s32 disp;
 	disp = (s32)((intptr_t)(uintptr_t)target -
 	             (intptr_t)(uintptr_t)(offset + 1));
-	ATOMIC_WRITE(*offset, disp);
+	atomic_write(offset, disp);
 }
 LOCAL NOBLOCK WUNUSED NONNULL((1)) void *
 NOTHROW(FCALL getpcrel)(s32 *__restrict offset) {
 	s32 disp;
-	disp = ATOMIC_READ(*offset);
+	disp = atomic_read(offset);
 	return (void *)(uintptr_t)((intptr_t)(offset + 1) + (intptr_t)disp);
 }
 
 
 /* Simply check if the `kernel_debugtrap()' does more than return immediately. */
-#define TRAPS_ENABLED() (ATOMIC_READ(kernel_debugtrap_data[0]) != 0xc3)
+#define TRAPS_ENABLED() (atomic_read(&kernel_debugtrap_data[0]) != 0xc3)
 
 /* Check if debug traps are enabled. */
 PUBLIC NOBLOCK WUNUSED bool
@@ -175,7 +175,7 @@ kernel_debugtraps_install(struct kernel_debugtraps const *__restrict handlers)
 	setpcrel(&__x86_kernel_debugtrap_r_##cpustate##_jmp_offset, (void *)handlers->dt_trap_##cpustate);
 	FOREACH_CPUSTATE(ENABLE_TRAP)
 #undef ENABLE_TRAP
-	ATOMIC_WRITE(kernel_debugtrap_data[0], 0x90); /* nop */
+	atomic_write(&kernel_debugtrap_data[0], 0x90); /* nop */
 	kernel_debugtrap_release();
 	return true;
 }
@@ -193,11 +193,11 @@ kernel_debugtraps_uninstall(struct kernel_debugtraps const *__restrict handlers)
 	/* Uninstall traps. */
 #define DISABLE_TRAP(cpustate)                                                                           \
 	setpcrel(&__x86_trigger_debugtrap_##cpustate##_call_offset, (void *)&kernel_debugtrap_r_##cpustate); \
-	ATOMIC_WRITE(__x86_kernel_debugtrap_r_##cpustate##_jmp_offset, 0);                                   \
-	ATOMIC_WRITE(*(s32 *)(kernel_debugtrap_##cpustate##_data + 1), 0);
+	atomic_write(&__x86_kernel_debugtrap_r_##cpustate##_jmp_offset, 0);                                  \
+	atomic_write((s32 *)(kernel_debugtrap_##cpustate##_data + 1), 0);
 	FOREACH_CPUSTATE(DISABLE_TRAP)
 #undef DISABLE_TRAP
-	ATOMIC_WRITE(kernel_debugtrap_data[0], 0xc3); /* ret */
+	atomic_write(&kernel_debugtrap_data[0], 0xc3); /* ret */
 	kernel_debugtrap_release();
 	return true;
 nope:

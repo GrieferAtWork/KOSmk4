@@ -36,13 +36,13 @@
 #include <sched/tsc.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sched/preemption.h>
 
 #include <sys/io.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -845,7 +845,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_altcore_entry)(void) {
 	tsc_hz_t hz;
 
 	/* Tell the boot-cpu that we're now online. */
-	ATOMIC_AND(cpu_offline_mask[id / 8], ~(1 << (id % 8)));
+	atomic_and(&cpu_offline_mask[id / 8], ~(1 << (id % 8)));
 
 	/* Calculate our TSC frequency. */
 	hz = x86_tsc_calibrate_hz();

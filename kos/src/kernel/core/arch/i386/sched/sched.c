@@ -43,7 +43,6 @@
 #include <sched/task-clone.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
 
 #include <asm/cpu-flags.h>
@@ -55,6 +54,7 @@
 #include <sys/io.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <string.h>
@@ -237,9 +237,9 @@ DEFINE_SYSCALL32_3(syscall_slong_t, modify_ldt,
 		if (bytecount < sizeof(struct linux_user_desc))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct linux_user_desc), bytecount);
 		desc  = (struct linux_user_desc *)ptr;
-		entry = ATOMIC_READ(desc->entry_number);
+		entry = read_once(&desc->entry_number);
 		/* We ignore everything except for `base_addr' */
-		addr = ATOMIC_READ(desc->base_addr);
+		addr = read_once(&desc->base_addr);
 		if ((entry & ~7) == SEGMENT_USER_FSBASE) {
 			x86_set_user_fsbase(addr); /* %fs */
 		} else if ((entry & ~7) == SEGMENT_USER_GSBASE) {

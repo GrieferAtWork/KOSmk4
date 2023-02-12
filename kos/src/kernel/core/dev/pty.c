@@ -36,12 +36,11 @@
 #include <sched/cred.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <sys/mkdev.h>
 #include <sys/stat.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <stddef.h>
@@ -251,7 +250,7 @@ ptymaster_v_stat(struct mfile *__restrict self,
 	slave = awref_get(&me->pm_slave);
 	if (slave) {
 		FINALLY_DECREF_UNLIKELY(slave);
-		result->st_size = ATOMIC_READ(slave->ps_obuf.rb_avail);
+		result->st_size = atomic_read(&slave->ps_obuf.rb_avail);
 	} else {
 		result->st_size = 0;
 	}

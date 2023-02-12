@@ -46,7 +46,6 @@
 #include <kernel/user.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/atomic-lock.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
@@ -57,6 +56,7 @@
 #include <linux/inotify.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <limits.h>
@@ -1005,7 +1005,7 @@ NOTHROW(FCALL notifyfd_postfsevent_impl)(struct notifyfd *__restrict self,
 		 *   thread#3: ...
 		 *   thread#3: notify_lock_release();
 		 *             ...
-		 *   thread#1: ATOMIC_WRITE(notifyfd->_nf_blist.sle_next, NULL);
+		 *   thread#1: atomic_write(&notifyfd->_nf_blist.sle_next, NULL);
 		 *   thread#1: sig_broadcast(notifyfd)
 		 *   thread#1: decref(notifyfd)
 		 */
@@ -1147,7 +1147,7 @@ NOTHROW(FCALL blist_serve)(struct REF notifyfd_slist *__restrict self) {
 		COMPILER_READ_BARRIER();
 
 		/* Allow other threads to enqueue further broadcasts for this notifyfd */
-		ATOMIC_WRITE(nfd->_nf_blist.sle_next, NULL);
+		atomic_write(&nfd->_nf_blist.sle_next, NULL);
 
 		/* Perform the broadcast we are meant to perform. */
 		sig_broadcast(&nfd->nf_avail);
@@ -1404,7 +1404,7 @@ INTERN BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL
 handle_notifyfd_polltest(struct notifyfd *__restrict self,
                          poll_mode_t what) THROWS(...) {
 	poll_mode_t result = 0;
-	if (ATOMIC_READ(self->nf_eventc) != 0)
+	if (atomic_read(&self->nf_eventc) != 0)
 		result |= POLLSELECT_READFDS;
 	return result & what;
 }
@@ -1434,7 +1434,7 @@ PRIVATE fd_t KCALL sys_inotify_init_impl(syscall_ulong_t flags) {
 	result = handles_install_begin(&install);
 	TRY {
 		unsigned int maxevents;
-		maxevents = ATOMIC_READ(notifyfd_default_maxevents);
+		maxevents = atomic_read(&notifyfd_default_maxevents);
 		notfd     = notifyfd_new(maxevents);
 	} EXCEPT {
 		handles_install_rollback(&install);

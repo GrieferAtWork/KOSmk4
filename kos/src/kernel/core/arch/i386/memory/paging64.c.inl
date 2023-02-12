@@ -45,15 +45,15 @@
 #include <sched/x86/tss.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
-#include <hybrid/sched/preemption.h>
 #include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sched/preemption.h>
 
 #include <asm/cpu-cpuid.h>
 #include <asm/cpu-flags.h>
 #include <asm/farptr.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -172,7 +172,7 @@ again_calculate_vecN:
 	COMPILER_WRITE_BARRIER();
 
 	/* Set the E1-vector as being used. */
-	ATOMIC_WRITE(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word, e2_word);
+	write_once(&P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word, e2_word);
 
 	/* Return the virtual memory locations used for the
 	 * trampolines needed by `boottask', `bootidle' and `asyncwork' */
@@ -311,10 +311,10 @@ LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL p64_pagedir_set_prepared)(union p64_pdir_e1 *__restrict e1_p) {
 	u64 word;
 	for (;;) {
-		word = ATOMIC_READ(e1_p->p_word);
+		word = atomic_read(&e1_p->p_word);
 		if unlikely(P64_PDIR_E1_ISHINT(word))
 			break; /* Special case: Hint */
-		if likely(ATOMIC_CMPXCH_WEAK(e1_p->p_word, word, word | P64_PAGE_FPREPARED))
+		if likely(atomic_cmpxch_weak(&e1_p->p_word, word, word | P64_PAGE_FPREPARED))
 			break;
 	}
 }
@@ -339,7 +339,7 @@ PRIVATE ATTR_WRITEMOSTLY WEAK uintptr_t x86_pagedir_prepare_version = 0;
 	do {                                                              \
 		preemption_pushoff(&was);                                     \
 		if likely(atomic_rwlock_tryread(&x86_pagedir_prepare_lock)) { \
-			ATOMIC_INC(x86_pagedir_prepare_version);                  \
+			atomic_inc(&x86_pagedir_prepare_version);                 \
 			break;                                                    \
 		}                                                             \
 		preemption_pop(&was);                                         \
@@ -539,7 +539,7 @@ NOTHROW(FCALL p64_pagedir_prepare_impl_widen)(unsigned int vec4,
 	assert(vec1_prepare_start + vec1_prepare_size > vec1_prepare_start);
 	assert(vec1_prepare_start + vec1_prepare_size <= 512);
 again:
-	e4.p_word = ATOMIC_READ(P64_PDIR_E4_IDENTITY[vec4].p_word);
+	e4.p_word = atomic_read(&P64_PDIR_E4_IDENTITY[vec4].p_word);
 	if (!P64_PDIR_E4_ISVEC3(e4.p_word)) {
 		physpage_t e3_vector; /* 511 * P64_PAGE_ABSENT + 1 * VEC2 */
 		physpage_t e2_vector; /* 511 * P64_PAGE_ABSENT + 1 * VEC1 */
@@ -619,7 +619,7 @@ err_e3_vector:
 		/* Try to install the new E3-vector as an E4-word. */
 		new_e4_word = (u64)physpage2addr(e3_vector) | P64_PAGE_FPRESENT |
 		              P64_PAGE_FWRITE | P64_PAGE_FUSER;
-		if unlikely(!ATOMIC_CMPXCH(P64_PDIR_E4_IDENTITY[vec4].p_word,
+		if unlikely(!atomic_cmpxch(&P64_PDIR_E4_IDENTITY[vec4].p_word,
 		                           e4.p_word, new_e4_word)) {
 /*word_changed_after_e3_vector:*/
 			page_freeone_for_paging(e3_vector);
@@ -639,13 +639,13 @@ err_e3_vector:
 	if (VEC4_IS_USERSPACE) {
 		X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ(was);
 		/* Make sure that the E4 word hasn't changed. */
-		if unlikely(e4.p_word != ATOMIC_READ(P64_PDIR_E4_IDENTITY[vec4].p_word)) {
+		if unlikely(e4.p_word != atomic_read(&P64_PDIR_E4_IDENTITY[vec4].p_word)) {
 			X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was);
 			goto again;
 		}
 	}
 
-	e3.p_word = ATOMIC_READ(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word);
+	e3.p_word = atomic_read(&P64_PDIR_E3_IDENTITY[vec4][vec3].p_word);
 	if (!e3.p_vec2.v_present || e3.p_1gib.d_1gib_1) {
 		/* Convert the 1GiB mapping into
 		 *  - 511 * 2MiB mappings + 512 * 4KiB mappings (the later being `vec2') */
@@ -699,7 +699,7 @@ err_e3_vector:
 		if (VEC4_IS_USERSPACE)
 			new_e3_word |= P64_PAGE_FUSER;
 		X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ(was);
-		new_word = ATOMIC_READ(P64_PDIR_E4_IDENTITY[vec4].p_word);
+		new_word = atomic_read(&P64_PDIR_E4_IDENTITY[vec4].p_word);
 		if unlikely(e4.p_word != new_word) {
 word_changed_after_e2_vector:
 			if (VEC4_IS_USERSPACE)
@@ -710,7 +710,7 @@ word_changed_after_e2_vector:
 		}
 
 		/* Try to install the new E2-vector. */
-		if unlikely(!ATOMIC_CMPXCH(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word,
+		if unlikely(!atomic_cmpxch(&P64_PDIR_E3_IDENTITY[vec4][vec3].p_word,
 		                           e3.p_word, new_e3_word))
 			goto word_changed_after_e2_vector;
 		X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was);
@@ -723,7 +723,7 @@ word_changed_after_e2_vector:
 	 * also dynamically freed) in both kernel- and user-space. */
 	if (!VEC4_IS_USERSPACE)
 		X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ(was);
-	e2.p_word = ATOMIC_READ(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word);
+	e2.p_word = atomic_read(&P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word);
 	if (!e2.p_vec1.v_present || e2.p_2mib.d_2mib_1) {
 		/* Convert the 2MiB mapping into
 		 *  - 512 * 4KiB mappings */
@@ -743,14 +743,14 @@ word_changed_after_e2_vector:
 		/* Re-acquire the prepare lock and make sure that the  vectors
 		 * leading up to the one we've just allocated haven't changed. */
 		X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ(was);
-		new_word = ATOMIC_READ(P64_PDIR_E4_IDENTITY[vec4].p_word);
+		new_word = atomic_read(&P64_PDIR_E4_IDENTITY[vec4].p_word);
 		if unlikely(e4.p_word != new_word) {
 word_changed_after_e1_vector:
 			X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was);
 			page_freeone_for_paging(e1_vector);
 			goto again;
 		}
-		new_word = ATOMIC_READ(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word);
+		new_word = atomic_read(&P64_PDIR_E3_IDENTITY[vec4][vec3].p_word);
 		if unlikely(e3.p_word != new_word)
 			goto word_changed_after_e1_vector;
 		new_e2_word = (u64)physpage2addr(e1_vector);
@@ -761,7 +761,7 @@ word_changed_after_e1_vector:
 			new_e2_word |= P64_PAGE_FUSER;
 
 		/* Try to install the new E1-vector. */
-		if unlikely(!ATOMIC_CMPXCH(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word,
+		if unlikely(!atomic_cmpxch(&P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word,
 		                           e2.p_word, new_e2_word))
 			goto word_changed_after_e1_vector;
 		X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was);
@@ -804,7 +804,7 @@ NOTHROW(KCALL p64_pagedir_can_flatten_e1_vector)(union p64_pdir_e1 const e1_p[51
                                                  unsigned int still_prepared_vec2) {
 	unsigned int vec1;
 	union p64_pdir_e1 e1;
-	e1.p_word = ATOMIC_READ(e1_p[0].p_word);
+	e1.p_word = atomic_read(&e1_p[0].p_word);
 	if (still_prepared_vec2 == 0) {
 		assert(e1.p_word & P64_PAGE_FPREPARED || P64_PDIR_E1_ISHINT(e1.p_word));
 		if (!P64_PDIR_E1_ISHINT(e1.p_word))
@@ -825,7 +825,7 @@ NOTHROW(KCALL p64_pagedir_can_flatten_e1_vector)(union p64_pdir_e1 const e1_p[51
 		flag.p_word = 0;
 		iter.p_word = e1.p_word & ~(P64_PAGE_FACCESSED | P64_PAGE_FDIRTY);
 		for (vec1 = 1; vec1 < 512; ++vec1) {
-			e1.p_word = ATOMIC_READ(e1_p[vec1].p_word);
+			e1.p_word = atomic_read(&e1_p[vec1].p_word);
 			if (vec1 == still_prepared_vec2 && !P64_PDIR_E1_ISHINT(e1.p_word))
 				e1.p_word &= ~P64_PAGE_FPREPARED;
 			flag.p_word |= e1.p_word & (P64_PAGE_FACCESSED | P64_PAGE_FDIRTY);
@@ -852,7 +852,7 @@ NOTHROW(KCALL p64_pagedir_can_flatten_e1_vector)(union p64_pdir_e1 const e1_p[51
 
 	/* Check if all entries are marked as ABSENT */
 	for (vec1 = 1; vec1 < 512; ++vec1) {
-		e1.p_word = ATOMIC_READ(e1_p[vec1].p_word);
+		e1.p_word = atomic_read(&e1_p[vec1].p_word);
 		if (vec1 == still_prepared_vec2 && !P64_PDIR_E1_ISHINT(e1.p_word))
 			e1.p_word &= ~P64_PAGE_FPREPARED;
 		if (e1.p_word != P64_PAGE_ABSENT)
@@ -867,7 +867,7 @@ NOTHROW(KCALL p64_pagedir_can_flatten_e2_vector)(union p64_pdir_e2 const e2_p[51
                                                  u64 *__restrict new_e3_word) {
 	unsigned int vec2;
 	union p64_pdir_e2 e2;
-	e2.p_word = ATOMIC_READ(e2_p[0].p_word);
+	e2.p_word = atomic_read(&e2_p[0].p_word);
 	if (e2.p_word & P64_PAGE_FPRESENT) {
 		union p64_pdir_e2 iter, flag;
 		if __untraced(!HAVE_1GIB_PAGES)
@@ -881,7 +881,7 @@ NOTHROW(KCALL p64_pagedir_can_flatten_e2_vector)(union p64_pdir_e2 const e2_p[51
 		flag.p_word = 0;
 		iter.p_word = e2.p_word & ~(P64_PAGE_FACCESSED | P64_PAGE_FDIRTY);
 		for (vec2 = 1; vec2 < 512; ++vec2) {
-			e2.p_word = ATOMIC_READ(e2_p[vec2].p_word);
+			e2.p_word = atomic_read(&e2_p[vec2].p_word);
 			flag.p_word |= e2.p_word & (P64_PAGE_FACCESSED | P64_PAGE_FDIRTY);
 			if (iter.p_word != (e2.p_word & ~(P64_PAGE_FACCESSED | P64_PAGE_FDIRTY)))
 				return false; /* Non-linear memory, or different page attributes/meta-data */
@@ -909,7 +909,7 @@ NOTHROW(KCALL p64_pagedir_can_flatten_e2_vector)(union p64_pdir_e2 const e2_p[51
 	 *       we don't need to account for custom meta-data such
 	 *       as paging hints or the PREPARED flag. */
 	for (vec2 = 1; vec2 < 512; ++vec2) {
-		e2.p_word = ATOMIC_READ(e2_p[vec2].p_word);
+		e2.p_word = atomic_read(&e2_p[vec2].p_word);
 		if (e2.p_word & P64_PAGE_FPRESENT)
 			return false; /* Present -> Cannot flatten. */
 	}
@@ -924,7 +924,7 @@ NOTHROW(KCALL p64_pagedir_can_flatten_e3_vector)(union p64_pdir_e3 const e3_p[51
                                                  u64 *__restrict new_e4_word) {
 	unsigned int vec3;
 	union p64_pdir_e3 e3;
-	e3.p_word = ATOMIC_READ(e3_p[0].p_word);
+	e3.p_word = atomic_read(&e3_p[0].p_word);
 	if (e3.p_word & P64_PAGE_FPRESENT) {
 		/* There are no 512GiB pages, so we can't flatten this one... */
 		return false;
@@ -937,7 +937,7 @@ NOTHROW(KCALL p64_pagedir_can_flatten_e3_vector)(union p64_pdir_e3 const e3_p[51
 	 *       we don't need to account for custom meta-data such
 	 *       as paging hints or the PREPARED flag. */
 	for (vec3 = 1; vec3 < 512; ++vec3) {
-		e3.p_word = ATOMIC_READ(e3_p[vec3].p_word);
+		e3.p_word = atomic_read(&e3_p[vec3].p_word);
 		if (e3.p_word & P64_PAGE_FPRESENT)
 			return false; /* Present -> Cannot flatten. */
 	}
@@ -966,7 +966,7 @@ NOTHROW(FCALL p64_pagedir_unset_prepared)(union p64_pdir_e1 *__restrict e1_p
                                           ) {
 	u64 word;
 	for (;;) {
-		word = ATOMIC_READ(e1_p->p_word);
+		word = atomic_read(&e1_p->p_word);
 		if unlikely(P64_PDIR_E1_ISHINT(word))
 			break; /* Special case: Hint */
 #ifndef NDEBUG
@@ -978,7 +978,7 @@ NOTHROW(FCALL p64_pagedir_unset_prepared)(union p64_pdir_e1 *__restrict e1_p
 		        (byte_t *)P64_PDIR_VECADDR(vec4, vec3, vec2, vec1_unprepare_start),
 		        (byte_t *)P64_PDIR_VECADDR(vec4, vec3, vec2, vec1_unprepare_start + vec1_unprepare_size) - 1);
 #endif /* !NDEBUG */
-		if likely(ATOMIC_CMPXCH_WEAK(e1_p->p_word, word, word & ~P64_PAGE_FPREPARED))
+		if likely(atomic_cmpxch_weak(&e1_p->p_word, word, word & ~P64_PAGE_FPREPARED))
 			break;
 	}
 }
@@ -1136,7 +1136,7 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten)(unsigned int vec4,
 	        (byte_t *)P64_PDIR_VECADDR(vec4, vec3, vec2, vec1_unprepare_start),
 	        (byte_t *)P64_PDIR_VECADDR(vec4, vec3, vec2, vec1_unprepare_start + vec1_unprepare_size) - 1);
 	e2_p = &P64_PDIR_E2_IDENTITY[vec4][vec3][vec2];
-	e2.p_word = ATOMIC_READ(e2_p->p_word);
+	e2.p_word = atomic_read(&e2_p->p_word);
 	assertf(e2.p_word & P64_PAGE_FPRESENT,
 	        "E1-Vector %u:%u:%u:%u-%u (%p-%p) containing pages %p-%p is not present",
 	        vec4, vec3, vec2, vec1_unprepare_start, vec1_unprepare_start + vec1_unprepare_size - 1,
@@ -1163,7 +1163,7 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten)(unsigned int vec4,
 	/* Read  the  current prepare-version  _before_  we check  if  flattening is
 	 * possible. - That way, other threads are allowed to increment the version,
 	 * forcing us to check again further below. */
-	old_version = ATOMIC_READ(x86_pagedir_prepare_version);
+	old_version = atomic_read(&x86_pagedir_prepare_version);
 	can_flatten = p64_pagedir_can_flatten_e1_vector(e1_p, &new_e2_word, vec1_unprepare_start);
 	p64_pagedir_unset_prepared(&e1_p[vec1_unprepare_start],
 	                           vec4, vec3, vec2,
@@ -1178,9 +1178,9 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten)(unsigned int vec4,
 again_try_exchange_e2_word:
 		must_restart = false;
 		X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_WRITE(was);
-		if unlikely(old_version != ATOMIC_READ(x86_pagedir_prepare_version)) {
+		if unlikely(old_version != atomic_read(&x86_pagedir_prepare_version)) {
 			must_restart = true;
-		} else if unlikely(!ATOMIC_CMPXCH(e2_p->p_word, e2.p_word, new_e2_word)) {
+		} else if unlikely(!atomic_cmpxch(&e2_p->p_word, e2.p_word, new_e2_word)) {
 			must_restart = true;
 		}
 		X86_PAGEDIR_PREPARE_LOCK_RELEASE_WRITE(was);
@@ -1189,19 +1189,19 @@ again_try_exchange_e2_word:
 			 * Note  that  we need  a read-lock  to  to the  prepare-lock in
 			 * order to prevent the vector from being freed while we do this */
 			X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ_NOVER(was);
-			if (!P64_PDIR_E4_ISVEC3(ATOMIC_READ(P64_PDIR_E4_IDENTITY[vec4].p_word)) ||
-			    !P64_PDIR_E3_ISVEC2(ATOMIC_READ(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word))) {
+			if (!P64_PDIR_E4_ISVEC3(atomic_read(&P64_PDIR_E4_IDENTITY[vec4].p_word)) ||
+			    !P64_PDIR_E3_ISVEC2(atomic_read(&P64_PDIR_E3_IDENTITY[vec4][vec3].p_word))) {
 				can_flatten = false; /* One of the surrounding vectors was deleted */
 			} else {
 				/* Re-load the E2 control word in case it has changed. */
-				e2.p_word = ATOMIC_READ(e2_p->p_word);
+				e2.p_word = atomic_read(&e2_p->p_word);
 				if (!(e2.p_word & P64_PAGE_FPRESENT) || (e2.p_word & P64_PAGE_F2MIB)) {
 					/* !P64_PDIR_E2_ISVEC1() */
 					can_flatten = false; /* Not present, or already a 2MiB mapping */
 				} else {
 					/* Re-load the active version number before
 					 * we check if flatten is (still) possible. */
-					old_version = ATOMIC_READ(x86_pagedir_prepare_version);
+					old_version = atomic_read(&x86_pagedir_prepare_version);
 					can_flatten = p64_pagedir_can_flatten_e1_vector(e1_p, &new_e2_word, 512);
 				}
 			}
@@ -1227,8 +1227,8 @@ again_try_exchange_e2_word:
 		e2_p = P64_PDIR_E2_IDENTITY[vec4][vec3];
 		e3_p = &P64_PDIR_E3_IDENTITY[vec4][vec3];
 		X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_WRITE(was);
-		if (!P64_PDIR_E4_ISVEC3(ATOMIC_READ(P64_PDIR_E4_IDENTITY[vec4].p_word)) ||
-		    !P64_PDIR_E3_ISVEC2(ATOMIC_READ(e3_p->p_word))) {
+		if (!P64_PDIR_E4_ISVEC3(atomic_read(&P64_PDIR_E4_IDENTITY[vec4].p_word)) ||
+		    !P64_PDIR_E3_ISVEC2(atomic_read(&e3_p->p_word))) {
 			can_flatten = false; /* One of the surrounding vectors was deleted */
 		} else {
 			can_flatten = p64_pagedir_can_flatten_e2_vector(e2_p, &new_e3_word);
@@ -1239,7 +1239,7 @@ again_try_exchange_e2_word:
 		}
 
 		/* Replace the E3-word for the E2-vector with the new (flattened) control word. */
-		e3.p_word = ATOMIC_XCH(e3_p->p_word, new_e3_word);
+		e3.p_word = atomic_xch(&e3_p->p_word, new_e3_word);
 		X86_PAGEDIR_PREPARE_LOCK_RELEASE_WRITE(was);
 
 		/* Sync if necessary. */
@@ -1266,7 +1266,7 @@ again_try_exchange_e2_word:
 			e3_p = P64_PDIR_E3_IDENTITY[vec4];
 			e4_p = &P64_PDIR_E4_IDENTITY[vec4];
 			X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_WRITE(was);
-			if (!P64_PDIR_E4_ISVEC3(ATOMIC_READ(e4_p->p_word))) {
+			if (!P64_PDIR_E4_ISVEC3(atomic_read(&e4_p->p_word))) {
 				can_flatten = false; /* The E3-vector was already deleted */
 			} else {
 				can_flatten = p64_pagedir_can_flatten_e3_vector(e3_p, &new_e4_word);
@@ -1275,7 +1275,7 @@ again_try_exchange_e2_word:
 				X86_PAGEDIR_PREPARE_LOCK_RELEASE_WRITE(was);
 				return;
 			}
-			e4.p_word = ATOMIC_XCH(e4_p->p_word, new_e4_word);
+			e4.p_word = atomic_xch(&e4_p->p_word, new_e4_word);
 			X86_PAGEDIR_PREPARE_LOCK_RELEASE_WRITE(was);
 
 			/* Sync if necessary. */
@@ -1332,7 +1332,7 @@ NOTHROW(FCALL p64_pagedir_assert_prepared)(VIRT void *addr,
 	        addr, range_addr, (byte_t *)range_addr + range_num_bytes - 1,
 	        &P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word, vec4, vec3, vec2, word);
 	vec1 = P64_PDIR_VEC1INDEX(addr);
-	word = ATOMIC_READ(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word);
+	word = atomic_read(&P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word);
 	assertf((word & P64_PAGE_FPREPARED) || P64_PDIR_E1_ISHINT(word),
 	        "Page at %p of range %p...%p isn't prepared\n"
 	        "%p=P64_PDIR_E1_IDENTITY[%u][%u][%u][%u] = %#" PRIxPTR "\n",
@@ -1798,7 +1798,7 @@ NOTHROW(FCALL p64_pagedir_and_e1_word)(unsigned int vec4,
                                        unsigned int vec1,
                                        u64 e1_kept_bits_mask) {
 	p64_pagedir_assert_e1_word_prepared(vec4, vec3, vec2, vec1, e1_kept_bits_mask);
-	ATOMIC_AND(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word, e1_kept_bits_mask);
+	atomic_and(&P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word, e1_kept_bits_mask);
 }
 
 LOCAL NOBLOCK u64
@@ -1808,7 +1808,7 @@ NOTHROW(FCALL p64_pagedir_xch_e1_word)(unsigned int vec4,
                                        unsigned int vec1,
                                        u64 e1_word) {
 	p64_pagedir_assert_e1_word_prepared(vec4, vec3, vec2, vec1, e1_word);
-	return ATOMIC_XCH(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word, e1_word);
+	return atomic_xch(&P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word, e1_word);
 }
 
 
@@ -1821,7 +1821,7 @@ NOTHROW(FCALL p64_pagedir_xch_e1_word_nochk)(unsigned int vec4,
                                              unsigned int vec2,
                                              unsigned int vec1,
                                              u64 e1_word) {
-	return ATOMIC_XCH(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word, e1_word);
+	return atomic_xch(&P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word, e1_word);
 }
 #endif /* !NDEBUG */
 
@@ -1989,7 +1989,7 @@ NOTHROW(FCALL p64_pagedir_gethint)(VIRT void *addr) {
 	if unlikely(word & P64_PAGE_F2MIB)
 		return NULL; /* 2MiB page */
 	vec1 = P64_PDIR_VEC1INDEX(addr);
-	word = ATOMIC_READ(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word);
+	word = atomic_read(&P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word);
 	if unlikely(!P64_PDIR_E1_ISHINT(word))
 		return NULL;
 	return (void *)(uintptr_t)(word & (uintptr_t)P64_PAGE_FHINT);
@@ -2180,13 +2180,13 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace)(void) {
 				e2 = P64_PDIR_E2_IDENTITY[vec4][vec3][vec2];
 				if (!P64_PDIR_E2_ISVEC1(e2.p_word))
 					continue;
-				ATOMIC_WRITE(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word, P64_PAGE_ABSENT);
+				atomic_write(&P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word, P64_PAGE_ABSENT);
 				FREEPAGE((physpage_t)((e2.p_word & P64_PAGE_FVECTOR) / 4096));
 			}
-			ATOMIC_WRITE(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word, P64_PAGE_ABSENT);
+			atomic_write(&P64_PDIR_E3_IDENTITY[vec4][vec3].p_word, P64_PAGE_ABSENT);
 			FREEPAGE((physpage_t)((e3.p_word & P64_PAGE_FVECTOR) / 4096));
 		}
-		ATOMIC_WRITE(P64_PDIR_E4_IDENTITY[vec4].p_word, P64_PAGE_ABSENT);
+		atomic_write(&P64_PDIR_E4_IDENTITY[vec4].p_word, P64_PAGE_ABSENT);
 		FREEPAGE((physpage_t)((e4.p_word & P64_PAGE_FVECTOR) / 4096));
 	}
 
@@ -2223,13 +2223,13 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace_nosync)(void) {
 				e2 = P64_PDIR_E2_IDENTITY[vec4][vec3][vec2];
 				if (!P64_PDIR_E2_ISVEC1(e2.p_word))
 					continue;
-				ATOMIC_WRITE(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word, P64_PAGE_ABSENT);
+				atomic_write(&P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word, P64_PAGE_ABSENT);
 				page_freeone_for_paging((physpage_t)((e2.p_word & P64_PAGE_FVECTOR) / 4096));
 			}
-			ATOMIC_WRITE(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word, P64_PAGE_ABSENT);
+			atomic_write(&P64_PDIR_E3_IDENTITY[vec4][vec3].p_word, P64_PAGE_ABSENT);
 			page_freeone_for_paging((physpage_t)((e3.p_word & P64_PAGE_FVECTOR) / 4096));
 		}
-		ATOMIC_WRITE(P64_PDIR_E4_IDENTITY[vec4].p_word, P64_PAGE_ABSENT);
+		atomic_write(&P64_PDIR_E4_IDENTITY[vec4].p_word, P64_PAGE_ABSENT);
 		page_freeone_for_paging((physpage_t)((e4.p_word & P64_PAGE_FVECTOR) / 4096));
 	}
 }
@@ -2418,11 +2418,11 @@ NOTHROW(FCALL p64_pagedir_unsetchanged)(VIRT void *addr) {
 	vec1 = P64_PDIR_VEC1INDEX(addr);
 	do {
 		/* Allow corruption, since we do our own CMPXCH() below. */
-		word = ATOMIC_READ(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word);
+		word = atomic_read(&P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word);
 		if unlikely((word & (P64_PAGE_FPRESENT | P64_PAGE_FDIRTY)) ==
 		            /*   */ (P64_PAGE_FPRESENT | P64_PAGE_FDIRTY))
 			break;
-	} while (!ATOMIC_CMPXCH_WEAK(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word,
+	} while (!atomic_cmpxch_weak(&P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word,
 	                             word, word & ~P64_PAGE_FDIRTY));
 }
 

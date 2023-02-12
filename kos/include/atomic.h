@@ -485,11 +485,81 @@ __NAMESPACE_STD_USING(memory_order_seq_cst)
 #define atomic_cmpxch_weak(ptr, oldval, newval) atomic_cmpxch_weak_explicit(ptr, oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #define atomic_cmpxch_val(ptr, oldval, newval)  atomic_cmpxch_val_explicit(ptr, oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 
+#define atomic_xch_acquire(ptr, val)                    atomic_xch_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_fetchinc_acquire(ptr)                    atomic_fetchinc_explicit(ptr, __ATOMIC_ACQUIRE)
+#define atomic_fetchdec_acquire(ptr)                    atomic_fetchdec_explicit(ptr, __ATOMIC_ACQUIRE)
+#define atomic_fetchadd_acquire(ptr, val)               atomic_fetchadd_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_fetchsub_acquire(ptr, val)               atomic_fetchsub_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_fetchand_acquire(ptr, val)               atomic_fetchand_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_fetchxor_acquire(ptr, val)               atomic_fetchxor_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_fetchor_acquire(ptr, val)                atomic_fetchor_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_fetchnand_acquire(ptr, val)              atomic_fetchnand_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_incfetch_acquire(ptr)                    atomic_incfetch_explicit(ptr, __ATOMIC_ACQUIRE)
+#define atomic_decfetch_acquire(ptr)                    atomic_decfetch_explicit(ptr, __ATOMIC_ACQUIRE)
+#define atomic_addfetch_acquire(ptr, val)               atomic_addfetch_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_subfetch_acquire(ptr, val)               atomic_subfetch_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_andfetch_acquire(ptr, val)               atomic_andfetch_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_xorfetch_acquire(ptr, val)               atomic_xorfetch_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_orfetch_acquire(ptr, val)                atomic_orfetch_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_nandfetch_acquire(ptr, val)              atomic_nandfetch_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_inc_acquire(ptr)                         atomic_inc_explicit(ptr, __ATOMIC_ACQUIRE)
+#define atomic_dec_acquire(ptr)                         atomic_dec_explicit(ptr, __ATOMIC_ACQUIRE)
+#define atomic_add_acquire(ptr, val)                    atomic_add_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_sub_acquire(ptr, val)                    atomic_sub_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_and_acquire(ptr, val)                    atomic_and_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_xor_acquire(ptr, val)                    atomic_xor_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_or_acquire(ptr, val)                     atomic_or_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_nand_acquire(ptr, val)                   atomic_nand_explicit(ptr, val, __ATOMIC_ACQUIRE)
+#define atomic_cmpxch_acquire(ptr, oldval, newval)      atomic_cmpxch_explicit(ptr, oldval, newval, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE)
+#define atomic_cmpxch_weak_acquire(ptr, oldval, newval) atomic_cmpxch_weak_explicit(ptr, oldval, newval, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE)
+#define atomic_cmpxch_val_acquire(ptr, oldval, newval)  atomic_cmpxch_val_explicit(ptr, oldval, newval, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE)
+
+#define atomic_xch_release(ptr, val)                    atomic_xch_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_fetchinc_release(ptr)                    atomic_fetchinc_explicit(ptr, __ATOMIC_RELEASE)
+#define atomic_fetchdec_release(ptr)                    atomic_fetchdec_explicit(ptr, __ATOMIC_RELEASE)
+#define atomic_fetchadd_release(ptr, val)               atomic_fetchadd_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_fetchsub_release(ptr, val)               atomic_fetchsub_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_fetchand_release(ptr, val)               atomic_fetchand_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_fetchxor_release(ptr, val)               atomic_fetchxor_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_fetchor_release(ptr, val)                atomic_fetchor_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_fetchnand_release(ptr, val)              atomic_fetchnand_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_incfetch_release(ptr)                    atomic_incfetch_explicit(ptr, __ATOMIC_RELEASE)
+#define atomic_decfetch_release(ptr)                    atomic_decfetch_explicit(ptr, __ATOMIC_RELEASE)
+#define atomic_addfetch_release(ptr, val)               atomic_addfetch_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_subfetch_release(ptr, val)               atomic_subfetch_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_andfetch_release(ptr, val)               atomic_andfetch_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_xorfetch_release(ptr, val)               atomic_xorfetch_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_orfetch_release(ptr, val)                atomic_orfetch_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_nandfetch_release(ptr, val)              atomic_nandfetch_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_inc_release(ptr)                         atomic_inc_explicit(ptr, __ATOMIC_RELEASE)
+#define atomic_dec_release(ptr)                         atomic_dec_explicit(ptr, __ATOMIC_RELEASE)
+#define atomic_add_release(ptr, val)                    atomic_add_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_sub_release(ptr, val)                    atomic_sub_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_and_release(ptr, val)                    atomic_and_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_xor_release(ptr, val)                    atomic_xor_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_or_release(ptr, val)                     atomic_or_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_nand_release(ptr, val)                   atomic_nand_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_cmpxch_release(ptr, oldval, newval)      atomic_cmpxch_explicit(ptr, oldval, newval, __ATOMIC_RELEASE, __ATOMIC_RELEASE)
+#define atomic_cmpxch_weak_release(ptr, oldval, newval) atomic_cmpxch_weak_explicit(ptr, oldval, newval, __ATOMIC_RELEASE, __ATOMIC_RELEASE)
+#define atomic_cmpxch_val_release(ptr, oldval, newval)  atomic_cmpxch_val_explicit(ptr, oldval, newval, __ATOMIC_RELEASE, __ATOMIC_RELEASE)
+
 /* Finally, have some useful helper macros to do atomic read/write with ACQUIRE/RELEASE semantics. */
 #undef atomic_read
 #undef atomic_write
-#define atomic_read(ptr)       atomic_load_explicit(ptr, __ATOMIC_ACQUIRE)
-#define atomic_write(ptr, val) atomic_store_explicit(ptr, val, __ATOMIC_RELEASE)
+#undef atomic_read_relaxed
+#undef atomic_write_relaxed
+#define atomic_read(ptr)               atomic_load_explicit(ptr, __ATOMIC_ACQUIRE)
+#define atomic_write(ptr, val)         atomic_store_explicit(ptr, val, __ATOMIC_RELEASE)
+#define atomic_read_relaxed(ptr)       atomic_load_explicit(ptr, __ATOMIC_RELAXED)
+#define atomic_write_relaxed(ptr, val) atomic_store_explicit(ptr, val, __ATOMIC_RELAXED)
+
+/* TODO: Allowed to be non-atomic, but needs compiler read barrier! */
+#undef read_once
+#define read_once(ptr) atomic_read(ptr)
+
+/* TODO: Allowed to be non-atomic, but needs compiler write barrier! */
+#undef write_once
+#define write_once(ptr, val) atomic_write(ptr, val)
 #endif /* __CC__ */
 #endif /* __USE_KOS_PURE || __USE_KOS || __USE_KOS_KERNEL */
 

@@ -51,12 +51,11 @@
 #include <sched/rpc.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <sys/stat.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <fcntl.h>
 #include <format-printer.h>
 #include <inttypes.h>
@@ -173,14 +172,14 @@ handle_datasize(struct handle const *__restrict self,
 	case HANDLE_TYPE_PIPE: {
 		struct pipe *me;
 		me    = (struct pipe *)self->h_data;
-		value = (pos_t)ATOMIC_READ(me->p_buffer.rb_avail);
+		value = (pos_t)atomic_read(&me->p_buffer.rb_avail);
 	}	break;
 
 	case HANDLE_TYPE_PIPE_READER:
 	case HANDLE_TYPE_PIPE_WRITER: {
 		struct pipe_reader *me;
 		me    = (struct pipe_reader *)self->h_data;
-		value = (pos_t)ATOMIC_READ(me->pr_pipe->p_buffer.rb_avail);
+		value = (pos_t)atomic_read(&me->pr_pipe->p_buffer.rb_avail);
 	}	break;
 
 	case HANDLE_TYPE_DRIVER_LOADLIST: {
@@ -192,7 +191,7 @@ handle_datasize(struct handle const *__restrict self,
 	case HANDLE_TYPE_FIFOHANDLE: {
 		struct fifohandle *me;
 		me    = (struct fifohandle *)self->h_data;
-		value = (pos_t)ATOMIC_READ(me->fu_fifo->ff_buffer.rb_avail);
+		value = (pos_t)atomic_read(&me->fu_fifo->ff_buffer.rb_avail);
 	}	break;
 
 	default:

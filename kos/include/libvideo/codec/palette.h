@@ -25,7 +25,7 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <hybrid/atomic.h>
+#include <hybrid/__atomic.h>
 
 #include <bits/types.h>
 #include <kos/refcnt.h>

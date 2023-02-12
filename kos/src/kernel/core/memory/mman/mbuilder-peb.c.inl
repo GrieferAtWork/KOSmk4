@@ -42,7 +42,6 @@
 
 #include <hybrid/__pointer.h>
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
@@ -50,6 +49,7 @@
 #include <kos/kernel/paging.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -115,8 +115,8 @@ MY_MBUILDER_ALLOC_PEB(struct mbuilder_norpc *__restrict self,
                       USER UNCHECKED IN_PTR(char const) USER CHECKED const *argv,
                       USER UNCHECKED IN_PTR(char const) USER CHECKED const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
-#define ATOMIC_READ_IN_CHARP(p) \
-	(USER UNCHECKED IN_PTR(char const))ATOMIC_READ(*(IN_UIP *)&(p))
+#define read_once_in_charp(p) \
+	(USER UNCHECKED IN_PTR(char const))read_once((IN_UIP *)(p))
 #if OU_POINTERSIZE == __SIZEOF_POINTER__
 	typedef struct process_peb peb_t;
 #elif OU_POINTERSIZE == 4
@@ -144,7 +144,7 @@ again:
 	for (i = 0; i < argc_inject; ++i)
 		strings_total_size += (strlen(argv_inject[i]) + 1) * sizeof(char);
 	if likely((iter = argv) != NULL) {
-		while ((string = ATOMIC_READ_IN_CHARP(*iter)) != NULL) {
+		while ((string = read_once_in_charp(iter)) != NULL) {
 			size_t temp;
 			validate_readable(string, 1);
 			temp = (strlen(string) + 1) * sizeof(char);
@@ -155,7 +155,7 @@ again:
 		}
 	}
 	if likely((iter = envp) != NULL) {
-		while ((string = ATOMIC_READ_IN_CHARP(*iter)) != NULL) {
+		while ((string = read_once_in_charp(iter)) != NULL) {
 			size_t temp;
 			validate_readable(string, 1);
 			temp = (strlen(string) + 1) * sizeof(char);
@@ -214,7 +214,7 @@ again:
 		}
 		for (i = 0; i < argc_user; ++i) {
 			size_t temp;
-			string = ATOMIC_READ_IN_CHARP(argv[i]);
+			string = read_once_in_charp(&argv[i]);
 			validate_readable(string, 1);
 			temp = (strlen(string) + 1) * sizeof(char);
 			if unlikely(OVERFLOW_UADD(strings_total_copied, temp, &strings_total_copied) ||
@@ -226,7 +226,7 @@ again:
 		}
 		for (i = 0; i < envc_user; ++i) {
 			size_t temp;
-			string = ATOMIC_READ_IN_CHARP(envp[i]);
+			string = read_once_in_charp(&envp[i]);
 			validate_readable(string, 1);
 			temp = (strlen(string) + 1) * sizeof(char);
 			if unlikely(OVERFLOW_UADD(strings_total_copied, temp, &strings_total_copied) ||
@@ -315,7 +315,7 @@ string_size_changed:
 	mbuilder_insert_fmnode(self, stolen_node);
 
 	return result;
-#undef ATOMIC_READ_IN_CHARP
+#undef read_once_in_charp
 }
 
 DECL_END

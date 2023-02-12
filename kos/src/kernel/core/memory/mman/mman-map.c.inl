@@ -43,13 +43,13 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -462,7 +462,7 @@ again_lock_mfile_map:
 				module_dec_nodecount(removeme->mn_module);
 			DBG_memset(&removeme->mn_writable, 0xcc, sizeof(removeme->mn_writable));
 			DBG_memset(&removeme->mn_module, 0xcc, sizeof(removeme->mn_module));
-			ATOMIC_OR(removeme->mn_flags, MNODE_F_UNMAPPED);
+			atomic_or(&removeme->mn_flags, MNODE_F_UNMAPPED);
 			SLIST_INSERT(&old_mappings, removeme, _mn_alloc);
 		}
 
@@ -490,7 +490,7 @@ again_lock_mfile_map:
 			/* Set the MLOCK  flag for  the backing  mem-part when  MAP_LOCKED is  given.
 			 * Note that in this case, `node->mn_flags' already contains `MNODE_F_MLOCK'! */
 			if ((mnode_flags & MAP_LOCKED) && !(part->mp_flags & MPART_F_MLOCK_FROZEN))
-				ATOMIC_OR(part->mp_flags, MPART_F_MLOCK);
+				atomic_or(&part->mp_flags, MPART_F_MLOCK);
 
 			/* Map the backing part (as far as that is  possible)
 			 * Note that  unless `MAP_POPULATE'  was given,  this

@@ -34,11 +34,11 @@
 #include <sched/x86/tss.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 
 #include <kos/except/reason/inval.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <string.h>
 
@@ -48,7 +48,7 @@ LOCAL NONNULL((1)) void KCALL
 iob_maskbyte(byte_t *pbyte, u8 byte_mask, u8 byte_flag) {
 	u8 oldval;
 	do {
-		oldval = ATOMIC_READ(*pbyte);
+		oldval = atomic_read(pbyte);
 		/* FIXME: A rare (and random) E_SEGFAULT has been observed that originates from the following line:
 		 * >> [2022-06-19T15:19:18.457399057:trace ][16] sys_ioperm(from: 1016, num: 1, turn_on: 1)
 		 * >> [2022-06-19T15:19:18.458021345:debug ][16][segfault] Fault at FFFFFFFF8095907F (page FFFFFFFF80959000) [pc=FFFFFFFF803D7B9C,FFFFFFFF803D7BA0] [ecode=0x3]
@@ -58,7 +58,7 @@ iob_maskbyte(byte_t *pbyte, u8 byte_mask, u8 byte_flag) {
 		 * >> [2022-12-13T10:14:18.842094932:debug ][6][segfault] Fault at FFFFFFFF8097E07F (page FFFFFFFF8097E000) [pc=FFFFFFFF803D94C6,FFFFFFFF803D94CA] [ecode=0x3]
 		 * >> [2022-12-13T10:14:18.844260930:trace ][6][except] Translate exception 0xff0e:0x2,E_SEGFAULT_READONLY[0xffffffff8097e07f,0x3] into errno=-EFAULT
 		 */
-	} while (!ATOMIC_CMPXCH_WEAK(*pbyte, oldval, (oldval & byte_mask) | byte_flag));
+	} while (!atomic_cmpxch_weak(pbyte, oldval, (oldval & byte_mask) | byte_flag));
 }
 
 LOCAL NONNULL((1)) void KCALL
@@ -137,10 +137,10 @@ DEFINE_SYSCALL3(errno_t, ioperm,
 	/* Manipulate the  IOBM of  our own  thread  through use  of the  `thiscpu_x86_iob'  vector.
 	 * Access to said vector is directly granted so-long as we keep the TASK_FKEEPCORE flag set. */
 	caller           = THIS_TASK;
-	old_thread_flags = ATOMIC_FETCHOR(caller->t_flags, TASK_FKEEPCORE);
+	old_thread_flags = atomic_fetchor(&caller->t_flags, TASK_FKEEPCORE);
 	RAII_FINALLY {
 		if (!(old_thread_flags & TASK_FKEEPCORE))
-			ATOMIC_AND(caller->t_flags, ~TASK_FKEEPCORE);
+			atomic_and(&caller->t_flags, ~TASK_FKEEPCORE);
 	};
 	COMPILER_READ_BARRIER();
 	me  = caller->t_cpu;

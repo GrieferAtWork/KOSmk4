@@ -43,7 +43,6 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 #include <hybrid/unaligned.h>
 
@@ -58,6 +57,7 @@
 #include <sys/stat.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
@@ -102,7 +102,7 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		uintptr_t mfile_flags, flags = 0;
 		if unlikely(!IO_CANREAD(mode))
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_GETPROPERTY, mode);
-		mfile_flags = ATOMIC_READ(self->mf_flags);
+		mfile_flags = atomic_read(&self->mf_flags);
 		if (mfile_flags & MFILE_F_READONLY)
 			flags |= FS_IMMUTABLE_FL;
 		if (mfile_flags & MFILE_F_NOATIME)
@@ -283,7 +283,7 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		 *       any  mem-parts associated  with a  non-anonymous file,  so-long as those
 		 *       parts aren't being mapped, or otherwise externally referenced.
 		 * >> if (part->mp_flags & MPART_F_GLOBAL_REF) CLEAR(MPART_F_GLOBAL_REF);
-		 * >> if (!ATOMIC_CMPXCH(part->mp_refcnt, 1, 0)) SET(MPART_F_GLOBAL_REF);
+		 * >> if (!atomic_cmpxch(&part->mp_refcnt, 1, 0)) SET(MPART_F_GLOBAL_REF);
 		 * >> else mpart_destory(part);
 		 *
 		 * Supposedly, this command is meant to be used before `BLKRRPART' in  those
@@ -309,7 +309,7 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		return ioctl_intarg_setu64(cmd, arg, (uint64_t)mfile_getsize(self));
 
 	case _IO_WITHSIZE(FILE_IOC_DELETED, 0):
-		return ioctl_intarg_setbool(cmd, arg, (ATOMIC_READ(self->mf_flags) & MFILE_F_DELETED) != 0);
+		return ioctl_intarg_setbool(cmd, arg, (atomic_read(&self->mf_flags) & MFILE_F_DELETED) != 0);
 
 	case _IO_WITHSIZE(FILE_IOC_HASRAWIO, 0):
 		return ioctl_intarg_setbool(cmd, arg, mfile_hasrawio(self));
@@ -319,7 +319,7 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 
 	case _IO_WITHSIZE(FILE_IOC_CHANGED, 0): {
 		uintptr_t flags;
-		flags = ATOMIC_READ(self->mf_flags) & (MFILE_F_DELETED | MFILE_F_CHANGED | MFILE_F_ATTRCHANGED);
+		flags = atomic_read(&self->mf_flags) & (MFILE_F_DELETED | MFILE_F_CHANGED | MFILE_F_ATTRCHANGED);
 		return ioctl_intarg_setbool(cmd, arg, flags != 0 && !(flags & MFILE_F_DELETED));
 	}	break;
 
@@ -1169,7 +1169,7 @@ handle_mfile_stat(struct mfile *__restrict self,
 	}
 
 	/* Check if the file has been deleted. If it has, timestamps are invalid. */
-	if (ATOMIC_READ(self->mf_flags) & MFILE_F_DELETED) {
+	if (atomic_read(&self->mf_flags) & MFILE_F_DELETED) {
 		bzero(&st_atim, sizeof(struct timespec));
 		bzero(&st_mtim, sizeof(struct timespec));
 		bzero(&st_ctim, sizeof(struct timespec));

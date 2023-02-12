@@ -39,13 +39,13 @@
 #include <kernel/user.h>
 #include <sched/cred.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 #include <kos/ioctl/mod.h>
 
+#include <atomic.h>
 #include <format-printer.h>
 #include <string.h>
 
@@ -271,7 +271,7 @@ handle_module_ioctl(struct module *__restrict self, ioctl_t cmd,
 
 	case _IO_WITHSIZE(MOD_IOC_GETSTATE, 0): {
 		struct driver *me = require_driver(self);
-		uintptr_t state   = ATOMIC_READ(me->d_state);
+		uintptr_t state   = atomic_read(&me->d_state);
 		return ioctl_intarg_setint(cmd, arg, ((int)state - DRIVER_STATE_LOADED));
 	}	break;
 

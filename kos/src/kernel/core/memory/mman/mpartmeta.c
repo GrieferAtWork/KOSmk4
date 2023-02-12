@@ -31,11 +31,10 @@
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -258,10 +257,10 @@ NOTHROW(FCALL _mpart_dma_donelock)(REF struct mpart *__restrict self) {
 
 	/* Do the broadcast first, since `self' might change when `mpart_merge()' is called. */
 	sig_broadcast(&self->mp_meta->mpm_dma_done);
-	xflags = ATOMIC_READ(self->mp_xflags);
+	xflags = atomic_read(&self->mp_xflags);
 	if unlikely(xflags & (MPART_XF_TRIM_AFTER_DMA | MPART_XF_MERGE_AFTER_DMA)) {
 		xflags &= MPART_XF_TRIM_AFTER_DMA | MPART_XF_MERGE_AFTER_DMA;
-		ATOMIC_AND(self->mp_xflags, ~xflags);
+		atomic_and(&self->mp_xflags, ~xflags);
 		if (xflags & MPART_XF_MERGE_AFTER_DMA)
 			self = mpart_merge(self);
 		if (xflags & MPART_XF_TRIM_AFTER_DMA)

@@ -41,12 +41,11 @@
 #include <sched/task.h>
 #include <sched/userkern.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <kos/lockop.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -149,7 +148,7 @@ NOTHROW(FCALL forktree_mnode_destroy)(struct forktree *__restrict self,
 			Toblockop(mpart) *lop;
 
 			/* Let the mem-part know that this node has been unmapped. */
-			ATOMIC_OR(node->mn_flags, MNODE_F_UNMAPPED);
+			atomic_or(&node->mn_flags, MNODE_F_UNMAPPED);
 
 			/* Must insert the node into the part's list of deleted nodes. */
 			weakincref(node->mn_mman); /* A weak reference here is required by the ABI */

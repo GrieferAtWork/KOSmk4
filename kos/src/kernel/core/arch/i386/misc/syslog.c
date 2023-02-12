@@ -30,7 +30,6 @@
 #include <kernel/types.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/atomic-lock.h>
 #include <hybrid/sched/preemption.h>
 

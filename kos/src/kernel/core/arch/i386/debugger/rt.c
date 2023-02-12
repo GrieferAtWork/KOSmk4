@@ -53,7 +53,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <sched/x86/tss.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/host.h>
 #include <hybrid/sched/preemption.h>
 
@@ -67,6 +66,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <sys/io.h>
 
 #include <alloca.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -166,17 +166,17 @@ NOTHROW(FCALL x86_dbg_altcore_interrupt)(u8 vector) {
 		for (i = 0; i < CONFIG_KERNEL_X86_DEBUGGER_ALTCORE_MAX_INTERRUPTS; ++i) {
 			union ac_int existing;
 again_index_i:
-			existing.ai_word = ATOMIC_READ(ac_ints[i].ai_word);
+			existing.ai_word = atomic_read(&ac_ints[i].ai_word);
 			if (existing.ai_sender != 0)
 				continue; /* Already in use. */
-			if (!ATOMIC_CMPXCH_WEAK(ac_ints[i].ai_word,
+			if (!atomic_cmpxch_weak(&ac_ints[i].ai_word,
 			                        existing.ai_word,
 			                        aint.ai_word))
 				goto again_index_i;
 			/* Marked as pending! */
 			if (i == 0 && X86_HAVE_LAPIC) {
 				/* First pending interrupt -> Send an IPI to `dbg_cpu' */
-				struct cpu *target = ATOMIC_READ(dbg_cpu);
+				struct cpu *target = atomic_read(&dbg_cpu);
 				if ((uintptr_t)target >= KERNELSPACE_BASE) {
 					while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)
 						__pause();
@@ -236,7 +236,7 @@ again:
 		struct cpu *sender_cpu;
 		struct x86_dbg_cpuammend *sender_ammend;
 		bool handled;
-		job.ai_word = ATOMIC_XCH(ac_ints[i].ai_word, 0);
+		job.ai_word = atomic_xch(&ac_ints[i].ai_word, 0);
 		if (job.ai_sender == 0)
 			continue; /* Unused */
 		--job.ai_sender;
@@ -261,7 +261,7 @@ again:
 			unsigned int index;
 			mask  = (u8)1 << (job.ai_vector % 8);
 			index = job.ai_vector / 8;
-			ATOMIC_OR(sender_ammend->dca_intr[index], mask);
+			atomic_or(&sender_ammend->dca_intr[index], mask);
 		}
 		did_something = true;
 	}
@@ -276,7 +276,7 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	struct x86_dbg_cpuammend ammend;
 	unsigned int mycpuid;
 	/* Quick check: Are we even supposed to become suspended? */
-	if unlikely(ATOMIC_READ(dbg_cpu_) == NULL)
+	if unlikely(atomic_read(&dbg_cpu_) == NULL)
 		goto done;
 	PREEMPTION_DISABLE();
 	(void)args;
@@ -291,7 +291,7 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	mycpuid = ammend.dca_cpu->c_id % CONFIG_MAX_CPU_COUNT;
 
 	/* Set the KEEPCORE flag for our current thread. */
-	ammend.dca_taskflags = ATOMIC_FETCHOR(ammend.dca_thread->t_flags, TASK_FKEEPCORE);
+	ammend.dca_taskflags = atomic_fetchor(&ammend.dca_thread->t_flags, TASK_FKEEPCORE);
 
 	/* Set our own thread as the scheduling override. */
 	ammend.dca_override = FORCPU(ammend.dca_cpu, thiscpu_sched_override);
@@ -330,8 +330,8 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 
 	/* Fill in  the host-backup  area  of our  CPU,  thus
 	 * ACK-ing the fact that we're now supposed to sleep. */
-	ATOMIC_WRITE(x86_dbg_hostbackup.dhs_cpus[mycpuid].dcs_iammend, &ammend);
-	ATOMIC_WRITE(x86_dbg_hostbackup.dhs_cpus[mycpuid].dcs_istate, state);
+	atomic_write(&x86_dbg_hostbackup.dhs_cpus[mycpuid].dcs_iammend, &ammend);
+	atomic_write(&x86_dbg_hostbackup.dhs_cpus[mycpuid].dcs_istate, state);
 
 	/* Load the IDT for use by secondary CPUs while one specific CPU is hosting the debugger.
 	 * WARNING: INTERRUPT HANDLERS OF THIS IDT _DONT_ PRESERVE THE (R|E)AX REGISTER!
@@ -345,7 +345,7 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	cpu_ipi_service_nopr();
 
 	/* While for the debugger to become inactive. */
-	while (ATOMIC_READ(dbg_cpu_) != NULL) {
+	while (atomic_read(&dbg_cpu_) != NULL) {
 		COMPILER_BARRIER();
 		/* NOTE: Mark (R|E)AX as clobbered, since the interrupt handlers (which may only be
 		 *       executed during the `hlt' instruction  in this inline assembly  statement)
@@ -366,7 +366,7 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	}
 
 	/* Re-load the saved return state. */
-	state = ATOMIC_XCH(x86_dbg_hostbackup.dhs_cpus[mycpuid].dcs_istate, NULL);
+	state = atomic_xch(&x86_dbg_hostbackup.dhs_cpus[mycpuid].dcs_istate, NULL);
 
 	/* Re-load overwritten configuration variables and additional registers. */
 	__wrcr0(ammend.dca_coregs.co_cr0);
@@ -403,7 +403,7 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 
 	/* Restore the old state of the KEEPCORE flag. */
 	if (!(ammend.dca_taskflags & TASK_FKEEPCORE))
-		ATOMIC_AND(ammend.dca_thread->t_flags, ~TASK_FKEEPCORE);
+		atomic_and(&ammend.dca_thread->t_flags, ~TASK_FKEEPCORE);
 
 	/* Restore the previous override. */
 	FORCPU(ammend.dca_cpu, thiscpu_sched_override) = ammend.dca_override;
@@ -422,7 +422,7 @@ PRIVATE NOBLOCK ATTR_DBGTEXT unsigned int
 NOTHROW(KCALL x86_dbg_hostbackup_cpu_suspended_count)(void) {
 	unsigned int i, result = 0;
 	for (i = 0; i < cpu_count; ++i) {
-		if (ATOMIC_READ(x86_dbg_hostbackup.dhs_cpus[i].dcs_istate) != NULL)
+		if (atomic_read(&x86_dbg_hostbackup.dhs_cpus[i].dcs_istate) != NULL)
 			++result;
 	}
 	return result;
@@ -682,10 +682,10 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 	}
 	mythread->t_self = mythread;
 	if (!(initok & INITOK_TASKFLAGS)) {
-		x86_dbg_hostbackup.dhs_taskflags = ATOMIC_FETCHOR(mythread->t_flags, TASK_FKEEPCORE);
+		x86_dbg_hostbackup.dhs_taskflags = atomic_fetchor(&mythread->t_flags, TASK_FKEEPCORE);
 		initok |= INITOK_TASKFLAGS;
 	} else {
-		ATOMIC_OR(mythread->t_flags, TASK_FKEEPCORE);
+		atomic_or(&mythread->t_flags, TASK_FKEEPCORE);
 	}
 	if (!(initok & INITOK_PSP0)) {
 		x86_save_psp0(me, mythread);
@@ -954,7 +954,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 
 	/* Re-configure the hosting cpu/thread */
 	mythread->t_self = mythread;
-	ATOMIC_OR(mythread->t_flags, TASK_FKEEPCORE);
+	atomic_or(&mythread->t_flags, TASK_FKEEPCORE);
 	FORCPU(me, thiscpu_sched_override) = mythread;
 	x86_init_psp0(me, mythread);
 
@@ -1064,7 +1064,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 		mythread->t_self = x86_dbg_hostbackup.dhs_taskself;
 	if (initok & INITOK_TASKFLAGS) {
 		if (!(x86_dbg_hostbackup.dhs_taskflags & TASK_FKEEPCORE))
-			ATOMIC_AND(mythread->t_flags, ~TASK_FKEEPCORE);
+			atomic_and(&mythread->t_flags, ~TASK_FKEEPCORE);
 	}
 	if (initok & INITOK_PSP0)
 		x86_load_psp0(me, mythread);

@@ -42,10 +42,10 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/sched/atomic-lock.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stddef.h>
 
@@ -173,8 +173,9 @@ NOTHROW(KCALL metadata_clearall)(void) {
 			        (u64)(e3.p_word & P64_PAGE_FVECTOR),
 			        (u64)metadata_base,
 			        (u64)metadata_base + metadata_size - 1);
+
 			/* Mark the E3-vector as absent. */
-			ATOMIC_WRITE(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word, P64_PAGE_ABSENT);
+			atomic_write(&P64_PDIR_E3_IDENTITY[vec4][vec3].p_word, P64_PAGE_ABSENT);
 		}
 	}
 	COMPILER_WRITE_BARRIER();
@@ -219,7 +220,7 @@ again_read_e3_word:
 	/* Check for unlikely case:
 	 *    This is a sporadic pagefault, or some other CPU
 	 *    already allocated  the same  1GiB page  vector. */
-	e3.p_word = ATOMIC_READ(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word);
+	e3.p_word = atomic_read(&P64_PDIR_E3_IDENTITY[vec4][vec3].p_word);
 	if unlikely(e3.p_vec2.v_present)
 		goto done;
 
@@ -282,7 +283,7 @@ again_read_e3_word:
 #else /* CONFIG_NO_SMP */
 
 	/* Guard against page directory modifications from other CPUs */
-	if unlikely(!ATOMIC_CMPXCH(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word,
+	if unlikely(!atomic_cmpxch(&P64_PDIR_E3_IDENTITY[vec4][vec3].p_word,
 	                           e3.p_word, new_e3_word)) {
 		/* Release previously allocated meta-data. */
 		metadata_avail += PAGESIZE;

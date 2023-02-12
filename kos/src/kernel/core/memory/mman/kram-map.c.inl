@@ -37,7 +37,6 @@
 #include <kernel/panic.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 
 #include <kos/except.h>
 #include <kos/kernel/paging.h>

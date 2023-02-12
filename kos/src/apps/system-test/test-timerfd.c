@@ -25,8 +25,6 @@
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <kos/futex.h>
 #include <kos/rpc.h>
@@ -39,10 +37,11 @@
 #include <system-test/ctest.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <syslog.h>
 #include <string.h>
+#include <syslog.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -56,7 +55,7 @@ myrpc(struct rpc_context *__restrict ctx, void *cookie) {
 	syslog(LOG_DEBUG, "timerfd: in myrpc\n");
 	(void)ctx;
 	EQ((void *)0x1234, cookie);
-	ATOMIC_INC(myrpc_called);
+	atomic_inc(&myrpc_called);
 	futex_wake(&myrpc_called);
 }
 

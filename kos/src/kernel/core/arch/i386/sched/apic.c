@@ -57,7 +57,6 @@
 #include <sched/x86/tss.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 
 #include <asm/intrin.h>
 #include <kos/except.h>
@@ -66,6 +65,7 @@
 #include <kos/kernel/x86/tss.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -120,20 +120,21 @@ INTDEF NOBLOCK void NOTHROW(KCALL apic_send_startup)(u8 procid, u8 pageno);
 
 INTERN ATTR_FREEBSS volatile u8 cpu_offline_mask[CEILDIV(CONFIG_MAX_CPU_COUNT, 8)];
 #if CEILDIV(CONFIG_MAX_CPU_COUNT, 8) == 1
-#define CPU_ALL_ONLINE  (ATOMIC_READ(*(u8 const *)cpu_offline_mask) == 0)
+#define CPU_ALL_ONLINE (atomic_read((u8 const *)cpu_offline_mask) == 0)
 #elif CEILDIV(CONFIG_MAX_CPU_COUNT, 8) == 2
-#define CPU_ALL_ONLINE  (ATOMIC_READ(*(u16 const *)cpu_offline_mask) == 0)
+#define CPU_ALL_ONLINE (atomic_read((u16 const *)cpu_offline_mask) == 0)
 #elif CEILDIV(CONFIG_MAX_CPU_COUNT, 8) == 4
-#define CPU_ALL_ONLINE  (ATOMIC_READ(*(u32 const *)cpu_offline_mask) == 0)
+#define CPU_ALL_ONLINE (atomic_read((u32 const *)cpu_offline_mask) == 0)
 #else /* ... */
 LOCAL bool KCALL all_all_cpus_online(void) {
 	unsigned int i;
-	for (i = 0; i < lengthof(cpu_offline_mask); ++i)
-		if (ATOMIC_READ(cpu_offline_mask[i]))
+	for (i = 0; i < lengthof(cpu_offline_mask); ++i) {
+		if (atomic_read(&cpu_offline_mask[i]))
 			return false;
+	}
 	return true;
 }
-#define CPU_ALL_ONLINE   all_all_cpus_online()
+#define CPU_ALL_ONLINE all_all_cpus_online()
 #endif /* !... */
 
 INTDEF FREE void NOTHROW(KCALL x86_calibrate_boottsc)(void);
@@ -443,7 +444,7 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 	struct task *myidle;
 	myidle = &FORCPU(self, thiscpu_idle);
 #ifndef NDEBUG
-	ATOMIC_WRITE(myidle->t_refcnt, 0); /* Satisfy assertions... */
+	atomic_write(&myidle->t_refcnt, 0); /* Satisfy assertions... */
 #endif /* !NDEBUG */
 	{
 		/* Run finalizers for the IDLE task. */
@@ -883,7 +884,7 @@ done_early_altcore_init:
 
 			/* Re-send start IPIs to all APs still not online. */
 			for (i = 1; i < cpu_count_; ++i) {
-				if (!(ATOMIC_READ(cpu_offline_mask[i / 8]) & (1 << (i % 8))))
+				if (!(atomic_read(&cpu_offline_mask[i / 8]) & (1 << (i % 8))))
 					continue;
 				printk(FREESTR(KERN_WARNING "[smp] Re-attempting startup of processor #%u (LAPIC id %#.2" PRIx8 ")\n"),
 				       i, FORCPU(cpu_vector[i], thiscpu_x86_lapicid));
@@ -907,7 +908,7 @@ done_early_altcore_init:
 				struct cpu *discard_cpu;
 				discard_cpu       = cpu_vector_[i];
 				discard_cpu->c_id = i; /* Re-assign CPU IDs to reflect removed entries. */
-				if (!(ATOMIC_READ(cpu_offline_mask[i / 8]) & (1 << (i % 8)))) {
+				if (!(atomic_read(&cpu_offline_mask[i / 8]) & (1 << (i % 8)))) {
 					++i;
 					continue;
 				}

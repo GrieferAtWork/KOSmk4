@@ -32,12 +32,12 @@
 #include <kernel/x86/cpuid.h>
 #include <kernel/x86/fsgsbase.h> /* x86_fsgsbase_patch() */
 
-#include <hybrid/atomic.h>
 #include <hybrid/unaligned.h>
 
 #include <asm/cpu-cpuid.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -170,13 +170,11 @@ NOTHROW(FCALL x86_fsgsbase_patch)(void *pc, void const *real_pc) {
 		}
 		/* Use atomics to modify memory to ensure that code is always in a consistent state! */
 		do {
-			oldword.qword = ATOMIC_READ(*(u64 *)code);
+			oldword.qword = atomic_read((u64 *)code);
 			newword.qword = oldword.qword;
 			newword.bytes[patch_offset] = 0xe8;
 			UNALIGNED_SET32((u32 *)&newword.bytes[patch_offset + 1], (u32)pcrel);
-		} while (!ATOMIC_CMPXCH_WEAK(*(u64 *)code,
-		                             oldword.qword,
-		                             newword.qword));
+		} while (!atomic_cmpxch_weak((u64 *)code, oldword.qword, newword.qword));
 	}
 	return true;
 }

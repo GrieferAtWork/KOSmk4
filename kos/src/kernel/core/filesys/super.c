@@ -40,12 +40,11 @@
 #include <kernel/printk.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <sys/statfs.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -83,7 +82,7 @@ NOTHROW(FCALL fsuper_add2changed)(struct fsuper *__restrict self) {
 	{
 		static_assert(offsetof(struct fsuper, fs_changedsuper.le_prev) ==
 		              offsetof(struct fsuper, _fs_changedsuper_lop.lo_func),
-		              "This is required for the ATOMIC_CMPXCH below to "
+		              "This is required for the atomic_cmpxch below to "
 		              "be thread- and async-safe");
 
 		/* Try to acquire a lock to the list of changed superblocks */
@@ -97,7 +96,7 @@ NOTHROW(FCALL fsuper_add2changed)(struct fsuper *__restrict self) {
 			fchangedsuper_release();
 		} else {
 			/* Try to do the addition asynchronously. */
-			if (ATOMIC_CMPXCH(self->_fs_changedsuper_lop.lo_func,
+			if (atomic_cmpxch(&self->_fs_changedsuper_lop.lo_func,
 			                  NULL, &fsuper_add2changed_lop)) {
 				incref(self);
 				result = true;
@@ -160,13 +159,13 @@ fsuper_sync(struct fsuper *__restrict self)
 
 			/* Sync changed parts of `changed_node' */
 			for (;;) {
-				changes = ATOMIC_READ(changed_node->mf_flags);
+				changes = atomic_read(&changed_node->mf_flags);
 				if (changes & MFILE_F_DELETED) {
 					/* Don't handle changes for deleted files. */
 					changes = 0;
 					break;
 				}
-				if (ATOMIC_CMPXCH_WEAK(changed_node->mf_flags, changes,
+				if (atomic_cmpxch_weak(&changed_node->mf_flags, changes,
 				                       changes & ~(MFILE_F_CHANGED | MFILE_F_ATTRCHANGED)))
 					break;
 			}
@@ -400,7 +399,7 @@ again_locked:
 		}
 		fsuper_nodes_removenode(self, result);
 		DBG_memset(&result->fn_supent, 0xcc, sizeof(result->fn_supent));
-		ATOMIC_WRITE(result->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
+		atomic_write(&result->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
 		fsuper_nodes_downgrade(self);
 		goto again_locked;
 	}
@@ -423,7 +422,7 @@ NOTHROW(FCALL mfile_begin_delete)(struct mfile *__restrict self) {
 
 	/* Mark the device as deleted (and make available use of the file fields) */
 	mfile_tslock_acquire(self);
-	old_flags = ATOMIC_FETCHOR(self->mf_flags,
+	old_flags = atomic_fetchor(&self->mf_flags,
 	                           MFILE_F_DELETED | MFILE_F_NOATIME |
 	                           MFILE_F_NOMTIME | MFILE_FN_NODIRATIME |
 	                           MFILE_F_CHANGED | MFILE_F_ATTRCHANGED |
@@ -435,12 +434,12 @@ NOTHROW(FCALL mfile_begin_delete)(struct mfile *__restrict self) {
 
 	/* Delete global reference to the superblock. */
 	if ((old_flags & MFILE_FN_GLOBAL_REF) &&
-	    (ATOMIC_FETCHAND(self->mf_flags, ~(MFILE_FN_GLOBAL_REF)) & MFILE_FN_GLOBAL_REF))
+	    (atomic_fetchand(&self->mf_flags, ~(MFILE_FN_GLOBAL_REF)) & MFILE_FN_GLOBAL_REF))
 		decref_nokill(self);
 
 	/* Also clear the PERSISTENT flag */
 	if (old_flags & MFILE_F_PERSISTENT)
-		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT);
+		atomic_and(&self->mf_flags, ~MFILE_F_PERSISTENT);
 
 	/* Already deleted, or deletion already in progress. */
 	return (old_flags & MFILE_F_DELETED) == 0;
@@ -539,7 +538,7 @@ again:
 
 	/* Mark this node as deleted */
 	DBG_memset(&tree->fn_supent, 0xcc, sizeof(tree->fn_supent));
-	ATOMIC_WRITE(tree->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
+	atomic_write(&tree->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
 	mfile_inotify_unmount(tree); /* Post `IN_UNMOUNT' */
 
 	/* Try to get a reference to this tree-node. */
@@ -576,7 +575,7 @@ NOTHROW(LOCKOP_CC fsuper_clearnodes_lop)(Toblockop(fsuper) *__restrict self,
 	if (me->fs_nodes != FSUPER_NODES_DELETED) {
 		if (me->fs_nodes != NULL)
 			fsuper_clearnodes_tree(me->fs_nodes, me);
-		ATOMIC_WRITE(me->fs_nodes, FSUPER_NODES_DELETED);
+		atomic_write(&me->fs_nodes, FSUPER_NODES_DELETED);
 	}
 	me->fs_root._mf_fsuperplop.oplo_func = &fsuper_clearnodes_postlop;
 	return &me->fs_root._mf_fsuperplop;
@@ -639,7 +638,7 @@ NOTHROW(LOCKOP_CC fsuper_clear_changed_lop)(Toblockop(fsuper) *__restrict self,
 			node->_mf_delfnodes       = me->fs_root._mf_delfnodes;
 			me->fs_root._mf_delfnodes = node;
 		}
-		ATOMIC_WRITE(me->fs_changednodes.lh_first, FSUPER_NODES_DELETED);
+		atomic_write(&me->fs_changednodes.lh_first, FSUPER_NODES_DELETED);
 	}
 
 	/* Decref() (and delete) all of the other objects in the post-phase */

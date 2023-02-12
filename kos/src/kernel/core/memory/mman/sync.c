@@ -29,9 +29,9 @@
 #include <sched/cpu.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <string.h>
 
@@ -72,7 +72,7 @@ NOTHROW(FCALL __pagedir_getcpus)(pagedir_phys_t self)
 	/* Find all CPUs that make use of `self' */
 	CPUSET_CLEAR(result);
 	for (i = 0; i < cpu_count; ++i) {
-		if (ATOMIC_READ(cpu_vector[i]->c_pdir) == self)
+		if (atomic_read(&cpu_vector[i]->c_pdir) == self)
 			CPUSET_INSERT(result, i);
 	}
 #if CONFIG_MAX_CPU_COUNT <= BITS_PER_POINTER

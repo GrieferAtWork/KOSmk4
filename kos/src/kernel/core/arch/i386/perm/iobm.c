@@ -37,7 +37,7 @@
 #include <sched/x86/tss.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
+#include <atomic.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -64,7 +64,7 @@ NOTHROW(KCALL fini_this_ioperm_bitmap)(struct task *__restrict self) {
 	iob = FORTASK(self, this_x86_ioperm_bitmap);
 	if (iob) {
 		assert(iob->ib_share >= 1);
-		ATOMIC_DEC(iob->ib_share);
+		atomic_dec(&iob->ib_share);
 		decref_likely(iob);
 	}
 }
@@ -183,8 +183,8 @@ NOTHROW(KCALL ioperm_bitmap_maskbyte)(struct ioperm_bitmap *__restrict self,
 	struct mptram pt = MPTRAM_INIT;
 	byte = mptram_map(&pt, self->ib_pages + byte_index);
 	do {
-		oldval = ATOMIC_READ(*byte);
-	} while (!ATOMIC_CMPXCH_WEAK(*byte, oldval, (oldval & byte_mask) | byte_flag));
+		oldval = atomic_read(byte);
+	} while (!atomic_cmpxch_weak(byte, oldval, (oldval & byte_mask) | byte_flag));
 	mptram_fini(&pt);
 }
 

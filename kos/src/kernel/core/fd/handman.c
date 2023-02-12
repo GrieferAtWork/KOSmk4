@@ -30,12 +30,11 @@
 #include <kernel/user.h>
 #include <sched/task.h> /* get_stack_avail() */
 
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
-#include <hybrid/sched/preemption.h>
-#include <hybrid/sequence/list.h>
 #include <hybrid/sched/atomic-lock.h>
 #include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sched/preemption.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
@@ -43,6 +42,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <atomic.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -182,9 +182,9 @@ again:
 		if (trailing_free >= count) {
 			/* Range became fully empty --> Get rid of it. */
 			handman_ranges_removenode(man, self);
-			assert(ATOMIC_READ(self->hr_nlops) == 0);
-			assert(ATOMIC_READ(self->hr_cexec) == 0);
-			assert(ATOMIC_READ(self->hr_cfork) == 0);
+			assert(atomic_read(&self->hr_nlops) == 0);
+			assert(atomic_read(&self->hr_cexec) == 0);
+			assert(atomic_read(&self->hr_cfork) == 0);
 			_handrange_free(self);
 			return NULL;
 		}
@@ -198,8 +198,8 @@ again:
 
 			/* Realloc to save on some space. */
 			reqsize = _handrange_sizeof(count);
-			if ((ATOMIC_READ(self->hr_nlops) != 0) ||
-			    (check_self__hr_joinlop && ATOMIC_READ(self->_hr_joinlop.olo_func) != NULL)) {
+			if ((atomic_read(&self->hr_nlops) != 0) ||
+			    (check_self__hr_joinlop && atomic_read(&self->_hr_joinlop.olo_func) != NULL)) {
 				krealloc_in_place_nx(self, reqsize, GFP_ATOMIC);
 			} else {
 				struct handrange *newrange;
@@ -233,7 +233,7 @@ again:
 
 		/* Can only do the split if `self' doesn't contain LOP handles
 		 * above the free range. */
-		if (ATOMIC_READ(self->hr_nlops) != 0) {
+		if (atomic_read(&self->hr_nlops) != 0) {
 			unsigned int i;
 			for (i = rel_freemax + 1; i < count; ++i) {
 				if (_handslot_islop(&self->hr_hand[i]))
@@ -272,8 +272,8 @@ again:
 		       hicount, sizeof(union handslot));
 
 		/* Update accounting for cexec/cfork handles. */
-		if ((ATOMIC_READ(self->hr_cexec) != 0) ||
-		    (ATOMIC_READ(self->hr_cfork) != 0)) {
+		if ((atomic_read(&self->hr_cexec) != 0) ||
+		    (atomic_read(&self->hr_cfork) != 0)) {
 			unsigned int i;
 			for (i = 0; i < hicount; ++i) {
 				iomode_t mode;
@@ -283,11 +283,11 @@ again:
 				        "There shouldn't be any LOP handles in here!");
 				mode = newrange->hr_hand[i].mh_hand.h_mode;
 				if (mode & IO_CLOEXEC) {
-					ATOMIC_DEC(self->hr_cexec);
+					atomic_dec(&self->hr_cexec);
 					++newrange->hr_cexec;
 				}
 				if (mode & IO_CLOFORK) {
-					ATOMIC_DEC(self->hr_cfork);
+					atomic_dec(&self->hr_cfork);
 					++newrange->hr_cfork;
 				}
 			}
@@ -295,8 +295,8 @@ again:
 
 		/* Release unused memory from `self'. */
 		reqsize = _handrange_sizeof(locount);
-		if ((ATOMIC_READ(self->hr_nlops) != 0) ||
-		    (check_self__hr_joinlop && ATOMIC_READ(self->_hr_joinlop.olo_func) != NULL)) {
+		if ((atomic_read(&self->hr_nlops) != 0) ||
+		    (check_self__hr_joinlop && atomic_read(&self->_hr_joinlop.olo_func) != NULL)) {
 			/* Must  use  inplace-realloc if  there  are LOP
 			 * handles before the free-self we just removed. */
 			krealloc_in_place_nx(self, reqsize, GFP_NORMAL);
@@ -315,8 +315,8 @@ again:
 
 try_trim_leading_slots:
 	/* If `self->hr_nlops == 0', trim leading free slots from `self' */
-	if (handrange_slotisfree(self, 0) && ATOMIC_READ(self->hr_nlops) == 0 &&
-	    (!check_self__hr_joinlop || ATOMIC_READ(self->_hr_joinlop.olo_func) == NULL)) {
+	if (handrange_slotisfree(self, 0) && atomic_read(&self->hr_nlops) == 0 &&
+	    (!check_self__hr_joinlop || atomic_read(&self->_hr_joinlop.olo_func) == NULL)) {
 		struct handrange *temp;
 		unsigned int count, free_count = 1;
 		size_t reqsize;
@@ -369,10 +369,10 @@ NOTHROW(FCALL handrange_rejoin2)(struct handrange *lorange,
 	assert(lorange->hr_maxfd + 1 == hirange->hr_minfd);
 
 	/* Joining is never possible when `hirange' contains LOP handles. */
-	if (ATOMIC_READ(hirange->hr_nlops) != 0)
+	if (atomic_read(&hirange->hr_nlops) != 0)
 		return NULL;
 	if (hirange != ignore_my__hr_joinlop &&
-	    ATOMIC_READ(hirange->_hr_joinlop.olo_func) != NULL)
+	    atomic_read(&hirange->_hr_joinlop.olo_func) != NULL)
 		return NULL;
 
 	/* Figure out buffer requirements. */
@@ -385,9 +385,9 @@ NOTHROW(FCALL handrange_rejoin2)(struct handrange *lorange,
 	if (avlsize < reqsize) {
 		struct handrange *newrange;
 		/* Try to do a proper realloc of `lorange' (if allowed) */
-		if ((ATOMIC_READ(lorange->hr_nlops) != 0) ||
+		if ((atomic_read(&lorange->hr_nlops) != 0) ||
 		    (lorange != ignore_my__hr_joinlop &&
-		     ATOMIC_READ(lorange->_hr_joinlop.olo_func) != NULL)) {
+		     atomic_read(&lorange->_hr_joinlop.olo_func) != NULL)) {
 			reqsize = _handrange_sizeof(locount);
 			krealloc_in_place_nx(lorange, reqsize, GFP_ATOMIC);
 			handman_ranges_insert(man, lorange);
@@ -410,10 +410,10 @@ NOTHROW(FCALL handrange_rejoin2)(struct handrange *lorange,
 	/* All right! `lorange' is large enough to do the join! */
 	handman_ranges_removenode(man, hirange);
 	lorange->hr_maxfd = hirange->hr_maxfd;
-	if (ATOMIC_READ(lorange->hr_nhint) > locount + hirange->hr_nhint)
-		ATOMIC_WRITE(lorange->hr_nhint, locount + hirange->hr_nhint);
-	ATOMIC_ADD(lorange->hr_cexec, hirange->hr_cexec); /* non-atomic in `hirange' OK because no LOPs */
-	ATOMIC_ADD(lorange->hr_cfork, hirange->hr_cfork); /* non-atomic in `hirange' OK because no LOPs */
+	if (atomic_read(&lorange->hr_nhint) > locount + hirange->hr_nhint)
+		atomic_write(&lorange->hr_nhint, locount + hirange->hr_nhint);
+	atomic_add(&lorange->hr_cexec, hirange->hr_cexec); /* non-atomic in `hirange' OK because no LOPs */
+	atomic_add(&lorange->hr_cfork, hirange->hr_cfork); /* non-atomic in `hirange' OK because no LOPs */
 	lorange->hr_maxfd = hirange->hr_maxfd;
 	memcpy(&lorange->hr_hand[locount],
 	       &hirange->hr_hand[0],
@@ -467,7 +467,7 @@ NOTHROW(LOCKOP_CC handrange_rejoin_restart_lop)(Toblockop(handman) *__restrict s
 	me = container_of(self, struct handrange, _hr_joinlop);
 
 	/* Do the actual work. */
-	old_flags = ATOMIC_FETCHAND(me->hr_flags, ~_HANDRANGE_F_TRUNC);
+	old_flags = atomic_fetchand(&me->hr_flags, ~_HANDRANGE_F_TRUNC);
 	if (old_flags & _HANDRANGE_F_TRUNC) {
 		/* NOTE: Ignore `_hr_joinlop' restrictions because we're that lockop! */
 		me = handrange_truncate_locked(me, obj, false);
@@ -477,7 +477,7 @@ NOTHROW(LOCKOP_CC handrange_rejoin_restart_lop)(Toblockop(handman) *__restrict s
 	me = handrange_rejoin_locked(me, obj);
 
 	/* Restart support. */
-	ATOMIC_WRITE(me->_hr_joinlop.olo_func, &handrange_rejoin_lop);
+	atomic_write(&me->_hr_joinlop.olo_func, &handrange_rejoin_lop);
 	oblockop_enqueue(&obj->hm_lops, &me->_hr_joinlop); /* Caller will notice this */
 	return NULL;
 }
@@ -490,7 +490,7 @@ NOTHROW(LOCKOP_CC handrange_rejoin_lop)(Toblockop(handman) *__restrict self,
 	me = container_of(self, struct handrange, _hr_joinlop);
 
 	/* Do the actual work. */
-	old_flags = ATOMIC_FETCHAND(me->hr_flags, ~_HANDRANGE_F_TRUNC);
+	old_flags = atomic_fetchand(&me->hr_flags, ~_HANDRANGE_F_TRUNC);
 	if (old_flags & _HANDRANGE_F_TRUNC) {
 		/* NOTE: Ignore `_hr_joinlop' restrictions because we're that lockop! */
 		me = handrange_truncate_locked(me, obj, false);
@@ -500,7 +500,7 @@ NOTHROW(LOCKOP_CC handrange_rejoin_lop)(Toblockop(handman) *__restrict self,
 	me = handrange_rejoin_locked(me, obj);
 
 	/* Restart support. */
-	if (!ATOMIC_CMPXCH(me->_hr_joinlop.olo_func, &handrange_rejoin_lop, NULL)) {
+	if (!atomic_cmpxch(&me->_hr_joinlop.olo_func, &handrange_rejoin_lop, NULL)) {
 		/* We get here if `_hr_joinlop' was changed to the restart function.
 		 * In that case, we must enqueue the lockop once again to have it be
 		 * handled a second time. */
@@ -521,19 +521,19 @@ NOTHROW(FCALL handrange_dec_nlops_and_maybe_rejoin)(struct handrange *__restrict
 	 * to the handle manager. */
 	for (;;) {
 		unsigned int nlops;
-		nlops = ATOMIC_READ(self->hr_nlops);
+		nlops = atomic_read(&self->hr_nlops);
 		assertf(nlops >= 1, "Only call this if _you_ are holding a LOP handle.");
 		if (nlops < 2)
 			break;
 		/* Set rejoin flags. */
 		if (try_truncate_self)
-			ATOMIC_OR(self->hr_flags, _HANDRANGE_F_TRUNC);
-		if (ATOMIC_CMPXCH_WEAK(self->hr_nlops, nlops, nlops - 1))
+			atomic_or(&self->hr_flags, _HANDRANGE_F_TRUNC);
+		if (atomic_cmpxch_weak(&self->hr_nlops, nlops, nlops - 1))
 			return;
 	}
 	if (handman_trywrite(man)) {
-		ATOMIC_DEC(self->hr_nlops);
-		if ((ATOMIC_FETCHAND(self->hr_flags, ~_HANDRANGE_F_TRUNC) & _HANDRANGE_F_TRUNC) ||
+		atomic_dec(&self->hr_nlops);
+		if ((atomic_fetchand(&self->hr_flags, ~_HANDRANGE_F_TRUNC) & _HANDRANGE_F_TRUNC) ||
 		    (try_truncate_self)) {
 			if (!handrange_truncate_locked(self, man, true))
 				goto unlock_and_done;
@@ -546,38 +546,38 @@ unlock_and_done:
 
 	/* Set rejoin flags. */
 	if (try_truncate_self)
-		ATOMIC_OR(self->hr_flags, _HANDRANGE_F_TRUNC);
+		atomic_or(&self->hr_flags, _HANDRANGE_F_TRUNC);
 	for (;;) {
 		Toblockop_callback_t(handman) func;
-		func = ATOMIC_READ(self->_hr_joinlop.olo_func);
+		func = atomic_read(&self->_hr_joinlop.olo_func);
 		assert(func == NULL ||
 		       func == &handrange_rejoin_lop ||
 		       func == &handrange_rejoin_restart_lop);
 		if (func == NULL) {
 			/* Initial lockop request. */
-			if (!ATOMIC_CMPXCH(self->_hr_joinlop.olo_func, NULL, &handrange_rejoin_lop))
+			if (!atomic_cmpxch(&self->_hr_joinlop.olo_func, NULL, &handrange_rejoin_lop))
 				continue;
 			break;
 		}
 		if (func == &handrange_rejoin_lop) {
 			/* Force another rejoin after the current one is done. */
-			if (!ATOMIC_CMPXCH(self->_hr_joinlop.olo_func,
+			if (!atomic_cmpxch(&self->_hr_joinlop.olo_func,
 			                   &handrange_rejoin_lop,
 			                   &handrange_rejoin_restart_lop))
 				continue;
-			ATOMIC_DEC(self->hr_nlops);
+			atomic_dec(&self->hr_nlops);
 			return;
 		}
 		/* At least 1 additional rejoin will happen after the current
 		 * one, meaning the  caller request will  be served in  full! */
-		ATOMIC_DEC(self->hr_nlops);
+		atomic_dec(&self->hr_nlops);
 		return;
 	}
 
 	/* Decrement the NLOPs counter _AFTER_ we set `_hr_joinlop' to non-NULL.
 	 * This is important so that at no point in time will there be an intent
 	 * of a lock-op without some indicator. */
-	ATOMIC_DEC(self->hr_nlops);
+	atomic_dec(&self->hr_nlops);
 
 	/* Enqueue the lockop */
 	oblockop_enqueue(&man->hm_lops, &self->_hr_joinlop);
@@ -749,7 +749,7 @@ again:
 	skip = __builtin_expect(clone_minfd - srcrange->hr_minfd, 0);
 
 	/* Fill in `dstrange' */
-	if (OVERFLOW_USUB(ATOMIC_READ(srcrange->hr_nhint),
+	if (OVERFLOW_USUB(atomic_read(&srcrange->hr_nhint),
 	                  skip, &dstrange->hr_nhint))
 		dstrange->hr_nhint = 0;
 	dstrange->hr_nlops = 0;
@@ -761,7 +761,7 @@ again:
 	/* Check if `srcrange' contains LOP handles (must be done _BEFORE_ we copy
 	 * its  handle vector, since a zero value  after the copy could still mean
 	 * that it was non-zero before, and thus had us copying LOP handles) */
-	has_lop_handles = ATOMIC_READ(srcrange->hr_nlops) != 0;
+	has_lop_handles = atomic_read(&srcrange->hr_nlops) != 0;
 
 	/* Copy the actual handle vector. */
 	memcpy(&dstrange->hr_hand[0],
@@ -932,8 +932,8 @@ handman_fork(struct handman *__restrict self)
 	atomic_rwlock_init(&result->hm_lock);
 	SLIST_INIT(&result->hm_lops);
 	sig_init(&result->hm_changed);
-	result->hm_maxhand = ATOMIC_READ(self->hm_maxhand);
-	result->hm_maxfd   = ATOMIC_READ(self->hm_maxfd);
+	result->hm_maxhand = atomic_read(&self->hm_maxhand);
+	result->hm_maxfd   = atomic_read(&self->hm_maxfd);
 	return result;
 }
 
@@ -990,8 +990,8 @@ handman_fork_and_closerange(struct handman *__restrict self,
 	atomic_rwlock_init(&result->hm_lock);
 	SLIST_INIT(&result->hm_lops);
 	sig_init(&result->hm_changed);
-	result->hm_maxhand = ATOMIC_READ(self->hm_maxhand);
-	result->hm_maxfd   = ATOMIC_READ(self->hm_maxfd);
+	result->hm_maxhand = atomic_read(&self->hm_maxhand);
+	result->hm_maxfd   = atomic_read(&self->hm_maxfd);
 	return result;
 }
 
@@ -1015,12 +1015,12 @@ NOTHROW(FCALL handrange_cloexec)(struct handrange *__restrict self) {
 		/* Close this handle. */
 		handle_decref(self->hr_hand[i].mh_hand);
 		if (self->hr_hand[i].mh_hand.h_mode & IO_CLOFORK)
-			ATOMIC_DEC(self->hr_cfork);
+			atomic_dec(&self->hr_cfork);
 		DBG_memset(&self->hr_hand[i].mh_hand, 0xcc, sizeof(self->hr_hand[i].mh_hand));
 		self->hr_hand[i].mh_hand.h_type = HANDLE_TYPE_UNDEFINED;
-		ATOMIC_DEC(self->hr_cexec);
-		if (ATOMIC_READ(self->hr_nhint) > i)
-			ATOMIC_WRITE(self->hr_nhint, i);
+		atomic_dec(&self->hr_cexec);
+		if (atomic_read(&self->hr_nhint) > i)
+			atomic_write(&self->hr_nhint, i);
 		++result;
 	}
 done:
@@ -1062,7 +1062,7 @@ handman_cloexec(struct handman *__restrict self)
 		}
 	}
 	assert(self->hm_handles >= total);
-	ATOMIC_SUB(self->hm_handles, total);
+	atomic_sub(&self->hm_handles, total);
 	handman_endwrite(self);
 	if (changed)
 		sig_broadcast(&self->hm_changed);
@@ -1202,16 +1202,16 @@ handman_sethandflags(struct handman *__restrict self,
 	slot->mh_hand.h_mode = nmode;
 	if ((omode & IO_CLOEXEC) != (nmode & IO_CLOEXEC)) {
 		if (nmode & IO_CLOEXEC) {
-			ATOMIC_INC(range->hr_cexec);
+			atomic_inc(&range->hr_cexec);
 		} else {
-			ATOMIC_DEC(range->hr_cexec);
+			atomic_dec(&range->hr_cexec);
 		}
 	}
 	if ((omode & IO_CLOFORK) != (nmode & IO_CLOFORK)) {
 		if (nmode & IO_CLOFORK) {
-			ATOMIC_INC(range->hr_cfork);
+			atomic_inc(&range->hr_cfork);
 		} else {
-			ATOMIC_DEC(range->hr_cfork);
+			atomic_dec(&range->hr_cfork);
 		}
 	}
 
@@ -1360,13 +1360,13 @@ handman_close(struct handman *__restrict self, fd_t fd,
 	memcpy(ohand, &range->hr_hand[relfd].mh_hand, sizeof(struct handle));
 	DBG_memset(&range->hr_hand[relfd], 0xcc, sizeof(range->hr_hand[relfd]));
 	range->hr_hand[relfd].mh_hand.h_type = HANDLE_TYPE_UNDEFINED;
-	ATOMIC_DEC(self->hm_handles);
+	atomic_dec(&self->hm_handles);
 	if (ohand->h_mode & IO_CLOEXEC)
-		ATOMIC_DEC(range->hr_cexec);
+		atomic_dec(&range->hr_cexec);
 	if (ohand->h_mode & IO_CLOFORK)
-		ATOMIC_DEC(range->hr_cfork);
-	if (ATOMIC_READ(range->hr_nhint) > relfd)
-		ATOMIC_WRITE(range->hr_nhint, relfd);
+		atomic_dec(&range->hr_cfork);
+	if (atomic_read(&range->hr_nhint) > relfd)
+		atomic_write(&range->hr_nhint, relfd);
 
 	/* If the close'd slot was the last one, trim trailing free slots. */
 	if ((unsigned int)fd == range->hr_maxfd) {
@@ -1382,8 +1382,8 @@ do_trim_trailing_slots:
 			/* Range became empty. --> Don't re-insert, but free */
 free_empty_range:
 			handman_ranges_removenode(self, range);
-			assert(ATOMIC_READ(range->hr_nlops) == 0);
-			assert(ATOMIC_READ(range->_hr_joinlop.olo_func) == NULL);
+			assert(atomic_read(&range->hr_nlops) == 0);
+			assert(atomic_read(&range->_hr_joinlop.olo_func) == NULL);
 			assert(range->hr_cexec == 0);
 			assert(range->hr_cfork == 0);
 			handman_endwrite(self);
@@ -1399,8 +1399,8 @@ free_empty_range:
 
 			/* Reallocate to release unused memory. */
 			reqsize = _handrange_sizeof(count);
-			if (ATOMIC_READ(range->hr_nlops) != 0 ||
-			    ATOMIC_READ(range->_hr_joinlop.olo_func) != NULL) {
+			if (atomic_read(&range->hr_nlops) != 0 ||
+			    atomic_read(&range->_hr_joinlop.olo_func) != NULL) {
 				/* Can only do inplace-realloc */
 				krealloc_in_place_nx(range, reqsize, GFP_ATOMIC);
 			} else {
@@ -1416,7 +1416,7 @@ free_empty_range:
 	} else if ((unsigned int)fd == range->hr_minfd) {
 do_trim_leading_slots:
 		/* Trim unused leading slots (only possible when there are no LOP handles) */
-		if (ATOMIC_READ(range->hr_nlops) == 0) {
+		if (atomic_read(&range->hr_nlops) == 0) {
 			struct handrange *temp;
 			size_t reqsize;
 			unsigned int count;
@@ -1482,8 +1482,8 @@ again_handle_large_freecount:
 			 * marked as lop handles, that  simply means we have to  realloc_in_place
 			 * when truncating the buffer for what will become the lower bound of the
 			 * free range) */
-			if (ATOMIC_READ(range->hr_nlops) != 0 ||
-			    ATOMIC_READ(range->_hr_joinlop.olo_func) != NULL) {
+			if (atomic_read(&range->hr_nlops) != 0 ||
+			    atomic_read(&range->_hr_joinlop.olo_func) != NULL) {
 				/* There may be LOP slots above the free range. */
 				unsigned int i;
 				for (i = rel_freemax + 1; i <= rel_freemax; ++i) {
@@ -1568,8 +1568,8 @@ endwrite_and_free_newrange_and_done:
 			       hicount, sizeof(union handslot));
 
 			/* Update accounting for cexec/cfork handles. */
-			if ((ATOMIC_READ(range->hr_cexec) != 0) ||
-			    (ATOMIC_READ(range->hr_cfork) != 0)) {
+			if ((atomic_read(&range->hr_cexec) != 0) ||
+			    (atomic_read(&range->hr_cfork) != 0)) {
 				unsigned int i;
 				for (i = 0; i < hicount; ++i) {
 					iomode_t mode;
@@ -1579,11 +1579,11 @@ endwrite_and_free_newrange_and_done:
 					        "There shouldn't be any LOP handles in here!");
 					mode = newrange->hr_hand[i].mh_hand.h_mode;
 					if (mode & IO_CLOEXEC) {
-						ATOMIC_DEC(range->hr_cexec);
+						atomic_dec(&range->hr_cexec);
 						++newrange->hr_cexec;
 					}
 					if (mode & IO_CLOFORK) {
-						ATOMIC_DEC(range->hr_cfork);
+						atomic_dec(&range->hr_cfork);
 						++newrange->hr_cfork;
 					}
 				}
@@ -1591,8 +1591,8 @@ endwrite_and_free_newrange_and_done:
 
 			/* Release unused memory from `range'. */
 			reqsize = _handrange_sizeof(rel_freemin);
-			if (ATOMIC_READ(range->hr_nlops) != 0 ||
-			    ATOMIC_READ(range->_hr_joinlop.olo_func) != NULL) {
+			if (atomic_read(&range->hr_nlops) != 0 ||
+			    atomic_read(&range->_hr_joinlop.olo_func) != NULL) {
 				/* Must use  inplace-realloc  if  there  are  LOP
 				 * handles before the free-range we just removed. */
 				krealloc_in_place_nx(range, reqsize, GFP_NORMAL);
@@ -1636,13 +1636,13 @@ NOTHROW(FCALL handrange_clorange)(struct handrange *__restrict self,
 		/* Close this handle. */
 		memcpy(&decref_buf[*p_decref_len], &self->hr_hand[minfd].mh_hand, sizeof(struct handle));
 		if (self->hr_hand[minfd].mh_hand.h_mode & IO_CLOFORK)
-			ATOMIC_DEC(self->hr_cfork);
+			atomic_dec(&self->hr_cfork);
 		if (self->hr_hand[minfd].mh_hand.h_mode & IO_CLOEXEC)
-			ATOMIC_DEC(self->hr_cexec);
+			atomic_dec(&self->hr_cexec);
 		DBG_memset(&self->hr_hand[minfd].mh_hand, 0xcc, sizeof(self->hr_hand[minfd].mh_hand));
 		self->hr_hand[minfd].mh_hand.h_type = HANDLE_TYPE_UNDEFINED;
-		if (ATOMIC_READ(self->hr_nhint) > minfd)
-			ATOMIC_WRITE(self->hr_nhint, minfd);
+		if (atomic_read(&self->hr_nhint) > minfd)
+			atomic_write(&self->hr_nhint, minfd);
 		++*p_decref_len;
 		++result;
 	}
@@ -1695,7 +1695,7 @@ again_findrange:
 		                          &decref_len);
 		if (part != 0) {
 			assert(self->hm_handles >= part);
-			ATOMIC_SUB(self->hm_handles, part);
+			atomic_sub(&self->hm_handles, part);
 			handrange_truncate_locked(range, self, true);
 		}
 		result += part;
@@ -1771,7 +1771,7 @@ handman_setcloexec_range(struct handman *__restrict self,
 			if (!(range->hr_hand[i].mh_hand.h_mode & IO_CLOEXEC)) {
 				/* Mark as CLOEXEC */
 				range->hr_hand[i].mh_hand.h_mode |= IO_CLOEXEC;
-				ATOMIC_INC(range->hr_cexec);
+				atomic_inc(&range->hr_cexec);
 				changed = true;
 			}
 		}
@@ -1874,9 +1874,9 @@ NOTHROW(FCALL handrange_install_handle)(struct handrange *__restrict self, unsig
                                         struct handle const *__restrict nhand) {
 	memcpy(&self->hr_hand[relfd].mh_hand, nhand, sizeof(struct handle));
 	if (nhand->h_mode & IO_CLOFORK)
-		ATOMIC_INC(self->hr_cfork);
+		atomic_inc(&self->hr_cfork);
 	if (nhand->h_mode & IO_CLOEXEC)
-		ATOMIC_INC(self->hr_cexec);
+		atomic_inc(&self->hr_cexec);
 	handle_incref(*nhand);
 }
 
@@ -1940,16 +1940,16 @@ again_check_for_neighbor:
 		assert(!neighbor || fd < neighbor->hr_minfd);
 		if (neighbor && extend_maxfd >= neighbor->hr_minfd &&
 		    /* NOTE: The read order of the following 2 is important! */
-		    ATOMIC_READ(neighbor->hr_nlops) == 0 &&
-		    ATOMIC_READ(neighbor->_hr_joinlop.olo_func) == NULL) {
+		    atomic_read(&neighbor->hr_nlops) == 0 &&
+		    atomic_read(&neighbor->_hr_joinlop.olo_func) == NULL) {
 			unsigned int i, dst, gap;
 			/* Yes: try to merge `range' with `neighbor' */
 			reqsize = _handrange_sizeof((neighbor->hr_maxfd - range->hr_minfd) + 1);
 			krealloc_in_place_nx(range, reqsize, GFP_ATOMIC);
 			avlsize = kmalloc_usable_size(range);
 			if (avlsize < reqsize) {
-				if (ATOMIC_READ(range->hr_nlops) != 0 ||
-				    ATOMIC_READ(range->_hr_joinlop.olo_func) != NULL) {
+				if (atomic_read(&range->hr_nlops) != 0 ||
+				    atomic_read(&range->_hr_joinlop.olo_func) != NULL) {
 					/* Not allowed to expand predecessor upwards, but
 					 * maybe we can expand the successor downwards... */
 try_expand_neighbor_downwards:
@@ -1990,8 +1990,8 @@ try_expand_neighbor_downwards:
 			handman_ranges_removenode(self, neighbor);
 			dst = handrange_count(range);
 			gap = neighbor->hr_minfd - (range->hr_maxfd + 1);
-			if (ATOMIC_READ(range->hr_nhint) > dst)
-				ATOMIC_WRITE(range->hr_nhint, dst);
+			if (atomic_read(&range->hr_nhint) > dst)
+				atomic_write(&range->hr_nhint, dst);
 			for (i = 0; i < gap; ++i, ++dst) {
 				DBG_memset(&range->hr_hand[dst], 0xcc, sizeof(range->hr_hand[dst]));
 				range->hr_hand[dst].mh_hand.h_type = HANDLE_TYPE_UNDEFINED;
@@ -2000,8 +2000,8 @@ try_expand_neighbor_downwards:
 			       handrange_count(neighbor), sizeof(union handslot));
 			/* Update accounting of `range' */
 			range->hr_maxfd = neighbor->hr_maxfd;
-			ATOMIC_ADD(range->hr_cexec, neighbor->hr_cexec);
-			ATOMIC_ADD(range->hr_cfork, neighbor->hr_cfork);
+			atomic_add(&range->hr_cexec, neighbor->hr_cexec);
+			atomic_add(&range->hr_cfork, neighbor->hr_cfork);
 			handman_ranges_insert(self, range);
 			_handrange_free_unlikely(*p_newrange); /* Free any buffer previously allocated */
 			*p_newrange = neighbor;                /* Gift the caller the old neighbor */
@@ -2015,8 +2015,8 @@ try_expand_neighbor_downwards:
 			avlsize = kmalloc_usable_size(range);
 			if (reqsize > avlsize) {
 				/* Non-inplace expand only works if there are no LOP handles. */
-				if (ATOMIC_READ(range->hr_nlops) != 0 ||
-				    ATOMIC_READ(range->_hr_joinlop.olo_func) != NULL)
+				if (atomic_read(&range->hr_nlops) != 0 ||
+				    atomic_read(&range->_hr_joinlop.olo_func) != NULL)
 					goto try_expand_neighbor_downwards;
 				handman_ranges_removenode(self, range);
 				newrange = (struct handrange *)krealloc_nx(range, reqsize, GFP_ATOMIC);
@@ -2049,8 +2049,8 @@ try_expand_neighbor_downwards:
 			/* All right! -- We're allowed to do the insert. */
 			dst  = handrange_count(range);
 			more = fd - range->hr_maxfd;
-			if (ATOMIC_READ(range->hr_nhint) > dst)
-				ATOMIC_WRITE(range->hr_nhint, dst);
+			if (atomic_read(&range->hr_nhint) > dst)
+				atomic_write(&range->hr_nhint, dst);
 			for (i = 0; i < more; ++i, ++dst) {
 				DBG_memset(&range->hr_hand[dst], 0xcc, sizeof(range->hr_hand[dst]));
 				range->hr_hand[dst].mh_hand.h_type = HANDLE_TYPE_UNDEFINED;
@@ -2070,8 +2070,8 @@ try_expand_downwards:
 		assert(fd < range->hr_minfd);
 
 		/* Extend succeeding range downwards. This only works if `hr_nlops == 0' */
-		if (ATOMIC_READ(range->hr_nlops) != 0 ||
-		    ATOMIC_READ(range->_hr_joinlop.olo_func) != NULL)
+		if (atomic_read(&range->hr_nlops) != 0 ||
+		    atomic_read(&range->_hr_joinlop.olo_func) != NULL)
 			return HANDMAN_EXTENDRANGE_OR_UNLOCK_NORANGE;
 
 		handman_ranges_removenode(self, range);
@@ -2108,7 +2108,7 @@ try_expand_downwards:
 			DBG_memset(&range->hr_hand[i], 0xcc, sizeof(range->hr_hand[i]));
 			range->hr_hand[i].mh_hand.h_type = HANDLE_TYPE_UNDEFINED;
 		}
-		ATOMIC_WRITE(range->hr_nhint, 0);
+		atomic_write(&range->hr_nhint, 0);
 		range->hr_minfd = fd;
 		handman_ranges_insert(self, range);
 		return range;
@@ -2159,7 +2159,7 @@ again_check_slot:
 				THROW(E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS);
 			}
 			handrange_install_handle(range, relfd, nhand);
-			ATOMIC_INC(self->hm_handles);
+			atomic_inc(&self->hm_handles);
 			handman_endwrite(self);
 			sig_broadcast(&self->hm_changed);
 			DBG_memset(ohand, 0xcc, sizeof(*ohand));
@@ -2187,16 +2187,16 @@ again_check_slot:
 			/* Account for close-on-xxx flag changes. */
 			if ((ohand->h_mode & O_CLOEXEC) != (nhand->h_mode & O_CLOEXEC)) {
 				if (nhand->h_mode & O_CLOEXEC) {
-					ATOMIC_INC(range->hr_cexec);
+					atomic_inc(&range->hr_cexec);
 				} else {
-					ATOMIC_DEC(range->hr_cexec);
+					atomic_dec(&range->hr_cexec);
 				}
 			}
 			if ((ohand->h_mode & O_CLOFORK) != (nhand->h_mode & O_CLOFORK)) {
 				if (nhand->h_mode & O_CLOFORK) {
-					ATOMIC_INC(range->hr_cfork);
+					atomic_inc(&range->hr_cfork);
 				} else {
-					ATOMIC_DEC(range->hr_cfork);
+					atomic_dec(&range->hr_cfork);
 				}
 			}
 			handle_incref(*nhand);
@@ -2319,7 +2319,7 @@ again_lock_for_newrange:
 	handman_ranges_insert(self, range);
 
 	/* Do accounting */
-	ATOMIC_INC(self->hm_handles);
+	atomic_inc(&self->hm_handles);
 	handman_endwrite(self);
 	sig_broadcast(&self->hm_changed);
 	DBG_memset(ohand, 0xcc, sizeof(*ohand));
@@ -2381,8 +2381,8 @@ handman_joinranges_or_unlock(struct handman *__restrict self,
 	assert(lorange->hr_maxfd + 1 == hirange->hr_minfd);
 
 	/* If the high range contains LOP handles, then merging is impossible. */
-	if (ATOMIC_READ(hirange->hr_nlops) != 0 ||
-	    ATOMIC_READ(hirange->_hr_joinlop.olo_func) != NULL)
+	if (atomic_read(&hirange->hr_nlops) != 0 ||
+	    atomic_read(&hirange->_hr_joinlop.olo_func) != NULL)
 		return HANDMAN_JOINRANGES_OR_UNLOCK_UNABLE;
 
 	/* Figure our buffer requirements. */
@@ -2391,8 +2391,8 @@ handman_joinranges_or_unlock(struct handman *__restrict self,
 	reqsize = _handrange_sizeof(locount + hicount);
 	avlsize = kmalloc_usable_size(lorange);
 	if (kmalloc_usable_size(hirange) > avlsize &&
-	    ATOMIC_READ(lorange->hr_nlops) == 0 &&
-	    ATOMIC_READ(lorange->_hr_joinlop.olo_func) == NULL) {
+	    atomic_read(&lorange->hr_nlops) == 0 &&
+	    atomic_read(&lorange->_hr_joinlop.olo_func) == NULL) {
 		/* Rather than expand `lorange' upwards, expand `hirange' downwards. */
 		struct handrange *newrange;
 		handman_ranges_removenode(self, hirange);
@@ -2450,8 +2450,8 @@ handman_joinranges_or_unlock(struct handman *__restrict self,
 	avlsize = kmalloc_usable_size(lorange);
 	if (reqsize > avlsize) {
 		struct handrange *newrange;
-		if (ATOMIC_READ(lorange->hr_nlops) != 0 ||
-		    ATOMIC_READ(lorange->_hr_joinlop.olo_func) != NULL) {
+		if (atomic_read(&lorange->hr_nlops) != 0 ||
+		    atomic_read(&lorange->_hr_joinlop.olo_func) != NULL) {
 			/* Cannot join because of LOPs */
 			handman_ranges_insert(self, lorange);
 			reqsize = _handrange_sizeof(locount);
@@ -2489,10 +2489,10 @@ handman_joinranges_or_unlock(struct handman *__restrict self,
 	/* Update accounting. */
 	handman_ranges_removenode(self, lorange);
 	handman_ranges_removenode(self, hirange);
-	if (ATOMIC_READ(lorange->hr_nhint) > locount + hirange->hr_nhint)
-		ATOMIC_WRITE(lorange->hr_nhint, locount + hirange->hr_nhint);
-	ATOMIC_ADD(lorange->hr_cexec, hirange->hr_cexec); /* non-atomic in `hirange' OK because no LOPs */
-	ATOMIC_ADD(lorange->hr_cfork, hirange->hr_cfork); /* non-atomic in `hirange' OK because no LOPs */
+	if (atomic_read(&lorange->hr_nhint) > locount + hirange->hr_nhint)
+		atomic_write(&lorange->hr_nhint, locount + hirange->hr_nhint);
+	atomic_add(&lorange->hr_cexec, hirange->hr_cexec); /* non-atomic in `hirange' OK because no LOPs */
+	atomic_add(&lorange->hr_cfork, hirange->hr_cfork); /* non-atomic in `hirange' OK because no LOPs */
 	lorange->hr_maxfd = hirange->hr_maxfd;
 	memcpy(&lorange->hr_hand[locount],
 	       &hirange->hr_hand[0],
@@ -2601,14 +2601,14 @@ create_new_range_for_relfd:
 
 		/* Insert the new range into the tree. */
 		handman_ranges_insert(self, result);
-		ATOMIC_INC(self->hm_handles);
+		atomic_inc(&self->hm_handles);
 		return result;
 	}
 handle_existing_range:
 
 	/* Search for unused slots within this range. */
 insert_into_result:
-	relfd = ATOMIC_READ(result->hr_nhint);
+	relfd = atomic_read(&result->hr_nhint);
 	if unlikely((unsigned int)minfd > result->hr_minfd) {
 		/* We must only consider free slots above the caller-given `minfd' */
 		unsigned int temp;
@@ -2621,15 +2621,15 @@ insert_into_result:
 		while (relfd < count) {
 			if (handrange_slotisfree(result, relfd)) {
 				/* Found a free slot! */
-				ATOMIC_WRITE(result->hr_nhint, relfd + 1);
+				atomic_write(&result->hr_nhint, relfd + 1);
 				*p_relfd = relfd;
-				ATOMIC_INC(self->hm_handles);
+				atomic_inc(&self->hm_handles);
 				return result;
 			}
 			++relfd;
 		}
 		/* Remember that all slots are in use */
-		ATOMIC_WRITE(result->hr_nhint, relfd);
+		atomic_write(&result->hr_nhint, relfd);
 	}
 
 	/* This range is fully allocated. -- Check the next one */
@@ -2693,9 +2693,9 @@ handman_install(struct handman *__restrict self,
 	memcpy(dest, hand, sizeof(struct handle));
 	handle_incref(*dest);
 	if (dest->h_mode & IO_CLOEXEC)
-		ATOMIC_INC(range->hr_cexec);
+		atomic_inc(&range->hr_cexec);
 	if (dest->h_mode & IO_CLOFORK)
-		ATOMIC_INC(range->hr_cfork);
+		atomic_inc(&range->hr_cfork);
 
 	/* Release locks. */
 	handman_endwrite(self);
@@ -2747,7 +2747,7 @@ _handman_install_begin(struct handle_install_data *__restrict data, fd_t minfd)
 	data->hid_slot  = &range->hr_hand[relfd];
 	DBG_memset(data->hid_slot, 0xcc, sizeof(*data->hid_slot));
 	data->hid_slot->mh_hand.h_type = _MANHANDLE_LOADMARKER;
-	ATOMIC_INC(range->hr_nlops); /* Because we're a LOP handle. */
+	atomic_inc(&range->hr_nlops); /* Because we're a LOP handle. */
 
 	/* Release locks. */
 	handman_endwrite(data->hid_man);

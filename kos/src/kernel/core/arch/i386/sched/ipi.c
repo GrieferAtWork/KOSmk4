@@ -36,14 +36,14 @@
 #include <sched/x86/smp.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
-#include <hybrid/sched/preemption.h>
 #include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sched/preemption.h>
 
 #include <asm/cpu-flags.h>
 #include <sys/io.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <string.h>
 
@@ -134,7 +134,7 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 	{
 		unsigned int poll_timeout = 1000;
 		do {
-			if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
+			if (atomic_read(&target->c_state) != CPU_STATE_GETTING_UP)
 				return;
 		} while (--poll_timeout);
 	}
@@ -143,10 +143,10 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 	/* Explicitly wait for 1 millisecond. */
 	preemption_pushoff(&was);
 	while (!x86_pit_lock_tryacquire()) {
-		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
+		if (atomic_read(&target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop;
 		preemption_tryyield_f(&was);
-		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
+		if (atomic_read(&target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop;
 	}
 	outb(PIT_PCSPEAKER,
@@ -166,7 +166,7 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 		outb(PIT_PCSPEAKER, temp | PIT_PCSPEAKER_OUT);
 	}
 	while (inb(PIT_PCSPEAKER) & PIT_PCSPEAKER_FPIT2OUT) {
-		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP) {
+		if (atomic_read(&target->c_state) != CPU_STATE_GETTING_UP) {
 done_ppop_endwrite:
 			x86_pit_lock_release_nopr();
 done_ppop:
@@ -174,12 +174,12 @@ done_ppop:
 			return;
 		}
 		preemption_tryyield_nopr();
-		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
+		if (atomic_read(&target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop_endwrite;
 	}
 	x86_pit_lock_release_nopr();
 	preemption_pop(&was);
-	if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
+	if (atomic_read(&target->c_state) != CPU_STATE_GETTING_UP)
 		return;
 
 	/* Send the startup IPI again */
@@ -188,10 +188,10 @@ done_ppop:
 	/* Wait for up to 1 second. */
 	preemption_pushoff(&was);
 	while (!x86_pit_lock_tryacquire()) {
-		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
+		if (atomic_read(&target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop;
 		preemption_tryyield_f(&was);
-		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
+		if (atomic_read(&target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop;
 	}
 	outb(PIT_PCSPEAKER,
@@ -212,15 +212,15 @@ done_ppop:
 		outb(PIT_PCSPEAKER, temp | PIT_PCSPEAKER_OUT);
 	}
 	while (inb(PIT_PCSPEAKER) & PIT_PCSPEAKER_FPIT2OUT) {
-		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
+		if (atomic_read(&target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop_endwrite;
 		preemption_tryyield_nopr();
-		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
+		if (atomic_read(&target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop_endwrite;
 	}
 	x86_pit_lock_release_nopr();
 	preemption_pop(&was);
-	if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
+	if (atomic_read(&target->c_state) != CPU_STATE_GETTING_UP)
 		return;
 	kernel_panic("Failed to re-initialize previously functional CPU #%u (hardware failure?)",
 	             target->c_id);
@@ -258,7 +258,7 @@ NOTHROW(FCALL arch_cpu_swipi_pending_nopr)(struct cpu *__restrict me) {
 	unsigned int i;
 	assert(!PREEMPTION_ENABLED());
 	for (i = 0; i < CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER); ++i) {
-		if (ATOMIC_READ(FORCPU(me, thiscpu_x86_ipi_inuse[i])) != 0)
+		if (atomic_read(&FORCPU(me, thiscpu_x86_ipi_inuse[i])) != 0)
 			return true;
 	}
 	return false;
@@ -280,7 +280,7 @@ NOTHROW(FCALL x86_serve_ipi)(struct cpu *__restrict me,
 	while (i) {
 		uintptr_t bits, mask;
 		--i;
-		bits = ATOMIC_READ(FORCPU(me, thiscpu_x86_ipi_inuse[i]));
+		bits = atomic_read(&FORCPU(me, thiscpu_x86_ipi_inuse[i]));
 		if (!bits)
 			continue;
 		for (j = 0, mask = 1; bits; ++j, mask <<= 1) {
@@ -309,8 +309,8 @@ NOTHROW(FCALL x86_serve_ipi)(struct cpu *__restrict me,
 			 *       the other way  around, then  there might be  a chance  that
 			 *       the IPI get allocated immediately, and we'd end up clearing
 			 *       a in-use bit of a whole different IPI! */
-			ATOMIC_AND(FORCPU(me, thiscpu_x86_ipi_inuse[i]), ~mask);
-			ATOMIC_AND(FORCPU(me, thiscpu_x86_ipi_alloc[i]), ~mask);
+			atomic_and(&FORCPU(me, thiscpu_x86_ipi_inuse[i]), ~mask);
+			atomic_and(&FORCPU(me, thiscpu_x86_ipi_alloc[i]), ~mask);
 
 			/* Execute the IPI callback. */
 			IPI_DEBUG("x86_serve_ipi:%p [slot=%u,i=%u,mask=%#" PRIxPTR "]\n",
@@ -412,7 +412,7 @@ again:
 		uintptr_t word, mask;
 		unsigned int j;
 again_i:
-		word = ATOMIC_READ(FORCPU(target, thiscpu_x86_ipi_alloc[i]));
+		word = atomic_read(&FORCPU(target, thiscpu_x86_ipi_alloc[i]));
 		if unlikely(word == (uintptr_t)-1)
 			continue; /* Word is fully allocated. */
 		j    = 0;
@@ -421,7 +421,7 @@ again_i:
 			++j;
 			mask <<= 1;
 		}
-		if (!ATOMIC_CMPXCH_WEAK(FORCPU(target, thiscpu_x86_ipi_alloc[i]), word, word | mask)) {
+		if (!atomic_cmpxch_weak(&FORCPU(target, thiscpu_x86_ipi_alloc[i]), word, word | mask)) {
 			attempt = 0;
 			goto again_i;
 		}
@@ -438,10 +438,10 @@ again_i:
 		 *
 		 * Otherwise, we can just hi-jack whatever previous IPIs had already been there. */
 		if (i == 0 && word == 0) {
-			if (ATOMIC_READ(target->c_state) == CPU_STATE_RUNNING) {
+			if (atomic_read(&target->c_state) == CPU_STATE_RUNNING) {
 				/* Indicate that the IPI is now ready for handling by the core. */
 				IPI_DEBUG("cpu_sendipi:ipi_first [slot=%u,i=%u,mask=%#" PRIxPTR "]\n", slot, i, mask);
-				ATOMIC_OR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
+				atomic_or(&FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
 do_send_ipi:
 				IPI_DEBUG("cpu_sendipi:do_send_ipi\n");
 
@@ -464,26 +464,26 @@ do_send_ipi:
 			} else if (flags & CPU_IPI_FWAKEUP) {
 				/* Indicate that the IPI is now ready for handling by the core. */
 				IPI_DEBUG("cpu_sendipi:ipi_wakeup [slot=%u,i=%u,mask=%#" PRIxPTR "]\n", slot, i, mask);
-				ATOMIC_OR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
+				atomic_or(&FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
 do_wake_target:
 				IPI_DEBUG("cpu_sendipi:cpu_wake\n");
 				cpu_wake(target);
 			} else {
 				/* Failed to wake the task (deallocate the IPI) */
-				ATOMIC_AND(FORCPU(target, thiscpu_x86_ipi_alloc[i]), ~mask);
+				atomic_and(&FORCPU(target, thiscpu_x86_ipi_alloc[i]), ~mask);
 				goto done_failure;
 			}
 		} else {
 			/* Indicate that the IPI is now ready for handling by the core. */
 			IPI_DEBUG("cpu_sendipi:ipi_secondary [slot=%u,i=%u,mask=%#" PRIxPTR "]\n", slot, i, mask);
-			ATOMIC_OR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
+			atomic_or(&FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
 			if ((flags & CPU_IPI_FWAITFOR) ||
 			    /* Check for race condition: If the first IPI slot became available in the
 			     * mean  time, then we still have to send out a HW-IPI, just so the target
 			     * CPU will actually handle it! */
-			    !(ATOMIC_READ(FORCPU(target, thiscpu_x86_ipi_inuse[0])) & 1)) {
+			    !(atomic_read(&FORCPU(target, thiscpu_x86_ipi_inuse[0])) & 1)) {
 				/* Must still synchronize with the target CPU's reception of the IPI... */
-				if (ATOMIC_READ(target->c_state) == CPU_STATE_RUNNING)
+				if (atomic_read(&target->c_state) == CPU_STATE_RUNNING)
 					goto do_send_ipi;
 				goto do_wake_target;
 			}
@@ -512,11 +512,11 @@ done_failure:
  * those tasks to continue running on it.
  * On X86, this function is implemented as:
  * >> for (;;) {
- * >>     u16 state = ATOMIC_READ(target->c_state);
+ * >>     u16 state = atomic_read(&target->c_state);
  * >>     switch (state) {
  * >>     case CPU_STATE_DREAMING:
  * >>         // Take on the responsibility of waking up the CPU.
- * >>         if (!ATOMIC_CMPXCH_WEAK(target->c_state,state,CPU_STATE_GETTING_UP))
+ * >>         if (!atomic_cmpxch_weak(&target->c_state,state,CPU_STATE_GETTING_UP))
  * >>             continue;
  * >>         SEND_IPI(INIT,target);
  * >>         ATTR_FALLTHROUGH
@@ -555,13 +555,13 @@ done_failure:
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL cpu_wake)(struct cpu *__restrict target) {
 	for (;;) {
-		u16 state = ATOMIC_READ(target->c_state);
+		u16 state = atomic_read(&target->c_state);
 		IPI_DEBUG("cpu_wake:%" PRIu16 "\n", state);
 		switch (state) {
 
 		case CPU_STATE_DREAMING:
 			/* Take on the responsibility of waking up the CPU. */
-			if (!ATOMIC_CMPXCH_WEAK(target->c_state, state, CPU_STATE_GETTING_UP))
+			if (!atomic_cmpxch_weak(&target->c_state, state, CPU_STATE_GETTING_UP))
 				continue;
 			send_init_ipi(target);
 			ATTR_FALLTHROUGH
@@ -589,7 +589,7 @@ NOTHROW(KCALL cpu_wake)(struct cpu *__restrict target) {
 			 *       the CPU will have already gotten an interrupt (or has manually
 			 *       switched its state back to RUNNING, in which case it will have
 			 *       checked for pending IPIs) */
-			if (ATOMIC_READ(FORCPU(target, thiscpu_x86_ipi_inuse[0])) == 0) {
+			if (atomic_read(&FORCPU(target, thiscpu_x86_ipi_inuse[0])) == 0) {
 				/* Make sure that no other IPI is still pending to be delivered by our LAPIC */
 				while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)
 					task_pause();

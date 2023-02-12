@@ -84,8 +84,8 @@ LOCAL_NOTHROW(KCALL LOCAL_core_page_alloc)(struct heap *__restrict self,
 	if (mapping_target == LOCAL_CORE_PAGE_MALLOC_AUTO) {
 		void *mapping_hint;
 		unsigned int mapping_mode;
-		mapping_hint = ATOMIC_READ(self->h_hintaddr);
-		mapping_mode = ATOMIC_READ(self->h_hintmode);
+		mapping_hint = atomic_read(&self->h_hintaddr);
+		mapping_mode = atomic_read(&self->h_hintmode);
 		result = LOCAL_mman_map_kram(mapping_hint,
 		                             num_bytes,
 		                             flags | gfp_from_mapflags(mapping_mode),
@@ -95,7 +95,7 @@ LOCAL_NOTHROW(KCALL LOCAL_core_page_alloc)(struct heap *__restrict self,
 #endif /* DEFINE_HEAP_NX */
 		{
 			/* Update the hint for the next allocation to be adjacent to this one. */
-			ATOMIC_CMPXCH(self->h_hintaddr, mapping_hint,
+			atomic_cmpxch(&self->h_hintaddr, mapping_hint,
 			              mapping_mode & MAP_GROWSDOWN
 			              ? (byte_t *)result
 			              : (byte_t *)result + num_bytes);
@@ -246,7 +246,7 @@ search_heap:
 	}
 #ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
 	/* Check for dangling data and don't allocate new memory if enough exists. */
-	if (ATOMIC_READ(self->h_dangle) >= result_siz) {
+	if (atomic_read(&self->h_dangle) >= result_siz) {
 		atomic_lock_release(&self->h_lock);
 		/* Let some other thread about to release dangling
 		 * data   do  so,  then  search  the  heap  again. */

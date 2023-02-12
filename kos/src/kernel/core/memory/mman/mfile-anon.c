@@ -37,11 +37,10 @@
 #include <sched/sig-completion.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/lockop.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -126,7 +125,7 @@ again:
 	lhs = root->mp_filent.rb_lhs;
 	rhs = root->mp_filent.rb_rhs;
 	if (!wasdestroyed(root)) {
-		if (ATOMIC_DECFETCH(root->mp_refcnt) == 0)
+		if (atomic_decfetch(&root->mp_refcnt) == 0)
 			mpart_delete_postop_builder_enqueue(deadparts, root);
 	}
 	if (lhs) {
@@ -214,9 +213,9 @@ again:
 		_mpart_init_asanon(root);
 		assert(root->mp_file == file);
 		newfile = incref(&mfile_anon[file->mf_blockshift]);
-		ATOMIC_WRITE(root->mp_file, newfile);
+		atomic_write(&root->mp_file, newfile);
 		decref_nokill(file);
-		if (ATOMIC_FETCHAND(root->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
+		if (atomic_fetchand(&root->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
 			decref_nokill(root);
 
 		/* Try to merge mem-parts after changing the pointed-to file.
@@ -235,7 +234,7 @@ again:
 		}
 
 		/* Drop the reference gifted to us by the caller. */
-		if (ATOMIC_DECFETCH(root->mp_refcnt) == 0) {
+		if (atomic_decfetch(&root->mp_refcnt) == 0) {
 			assert(root != dont_unlock_me);
 			mpart_delete_postop_builder_enqueue(deadparts, root);
 		}
@@ -271,9 +270,11 @@ NOTHROW(FCALL mfile_delete_withpartlock)(Toblockop(mpart) *__restrict self,
                                          struct mpart *__restrict part) {
 	REF struct mfile *me;
 	me = container_of(self, struct mfile, _mf_mplop);
+
 	/* Also try to acquire a lock to the file. */
 	if (mfile_lock_trywrite(me)) {
 		Tobpostlockop(mfile) *pop;
+
 		/* Try to delete the file, but remember that we're already holding a lock to `part'! */
 		pop = mfile_delete_withfilelock_ex(me, part);
 		mfile_lock_endwrite(me);
@@ -282,11 +283,13 @@ NOTHROW(FCALL mfile_delete_withpartlock)(Toblockop(mpart) *__restrict self,
 		assert(pop->oplo_func == (Tobpostlockop_callback_t(mfile))&mpart_delete_postop_cb ||
 		       pop->oplo_func == &mfile_decref_and_destroy_deadparts_postop ||
 		       pop->oplo_func == &mfile_decref_postop);
+
 		/* NOTE: None of the possible callback ever make use of the `file' argument  of
 		 *       the post-operation callback, meaning that we can simply cast the mfile
 		 *       post-operation into an mpart post-operation! */
 		return (Tobpostlockop(mpart) *)pop;
 	}
+
 	/* Bounce back a lock-operation for `file'
 	 * Use `mfile_delete_withfilelock' for this purpose! */
 	me->_mf_mflop.olo_func = &mfile_delete_withfilelock;
@@ -335,6 +338,7 @@ NOTHROW(FCALL mfile_zerotrunc_completion2_cb)(struct sig_completion_context *__r
                                               void *buf) {
 	REF struct mfile *file;
 	file = *(REF struct mfile **)buf;
+
 	/* Re-start async file deletion from scratch, since
 	 * we're  not actually holding any locks right now! */
 	mfile_delete_impl(file);
@@ -348,7 +352,7 @@ NOTHROW(FCALL mfile_zerotrunc_completion_cb)(struct sig_completion *__restrict s
 	me = container_of(self, struct mfile, _mf_compl);
 
 	/* Check if the trunc-lock has been released... */
-	if (ATOMIC_READ(me->mf_trunclock) != 0) {
+	if (atomic_read(&me->mf_trunclock) != 0) {
 		sig_completion_reprime(self, true);
 		return 0;
 	}
@@ -370,9 +374,10 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 	Tobpostlockop(mfile) *result;
 	struct mpart_slist changes;
 	struct mpart_delete_postop_builder deadparts;
+
 	/* We're currently holding a write-lock to `file'!
 	 * We can start out by clearing out the list of changed parts. */
-	changes.slh_first = ATOMIC_XCH(file->mf_changed.slh_first,
+	changes.slh_first = atomic_xch(&file->mf_changed.slh_first,
 	                               MFILE_PARTS_ANONYMOUS);
 	mpart_delete_postop_builder_init(&deadparts);
 	if (changes.slh_first != NULL &&
@@ -386,12 +391,12 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 			part = SLIST_FIRST(&changes);
 			SLIST_REMOVE_HEAD(&changes, mp_changed);
 			DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
-			ATOMIC_AND(part->mp_flags, ~MPART_F_CHANGED);
+			atomic_and(&part->mp_flags, ~MPART_F_CHANGED);
 
 			/* Drop a reference from `part'. If the part dies, then
 			 * enqueue  it for later  destruction via the post-lock
 			 * operations mechanism. */
-			if (ATOMIC_DECFETCH(part->mp_refcnt) == 0)
+			if (atomic_decfetch(&part->mp_refcnt) == 0)
 				mpart_delete_postop_builder_enqueue(&deadparts, part);
 		} while (!SLIST_EMPTY(&changes));
 	}
@@ -418,7 +423,7 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 			file->_mf_mplop.olo_func = &mfile_delete_withpartlock;
 			oblockop_enqueue(&part->mp_lockops, &file->_mf_mplop);
 			_mpart_lockops_reap(part);
-			if (ATOMIC_DECFETCH(part->mp_refcnt) == 0)
+			if (atomic_decfetch(&part->mp_refcnt) == 0)
 				mpart_delete_postop_builder_enqueue(&deadparts, part);
 
 			/* The rest  of the  deletion of  `file' will  happen
@@ -442,7 +447,7 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 	}
 
 	/* Success! - All that's left now is to set the file's size to zero! */
-	if unlikely(ATOMIC_READ(file->mf_trunclock) != 0) {
+	if unlikely(atomic_read(&file->mf_trunclock) != 0) {
 		/* Use `struct sig_completion' to wait for `mf_trunclock' to
 		 * become ZERO before  setting the file  size down to  zero. */
 		sig_completion_init(&file->_mf_compl, &mfile_zerotrunc_completion_cb);
@@ -451,7 +456,7 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 		/* Make sure that the completion-callback is always invoked in case
 		 * the `mf_trunclock' counter dropped to zero before our completion
 		 * callback was connected. */
-		if unlikely(ATOMIC_READ(file->mf_trunclock) == 0)
+		if unlikely(atomic_read(&file->mf_trunclock) == 0)
 			sig_broadcast(&file->mf_initdone);
 
 		/* Cleanup... */
@@ -564,12 +569,12 @@ NOTHROW(FCALL mfile_delete)(struct mfile *__restrict self) {
 	 */
 	uintptr_t old_flags;
 	mfile_tslock_acquire(self);
-	old_flags = ATOMIC_FETCHOR(self->mf_flags,
+	old_flags = atomic_fetchor(&self->mf_flags,
 	                           MFILE_F_DELETED |
 	                           MFILE_F_NOATIME |
 	                           MFILE_F_NOMTIME);
 	if (old_flags & MFILE_F_PERSISTENT)
-		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT); /* Also clear the PERSISTENT flag */
+		atomic_and(&self->mf_flags, ~MFILE_F_PERSISTENT); /* Also clear the PERSISTENT flag */
 	mfile_tslock_release(self);
 
 	/* Check if the file has already been marked as deleted. */

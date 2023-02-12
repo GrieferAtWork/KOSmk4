@@ -41,14 +41,13 @@
 #include <sched/cred.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
 #include <kos/nopf.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -113,7 +112,7 @@ NOTHROW(FCALL fnode_add2changed)(struct fnode *__restrict self) {
 	struct fsuper *super = self->fn_super;
 	static_assert(offsetof(struct fnode, fn_changed.le_prev) ==
 	              offsetof(struct fnode, _fn_chnglop.olo_func),
-	              "This is required for the ATOMIC_CMPXCH "
+	              "This is required for the atomic_cmpxch "
 	              "below to be thread- and async-safe");
 
 	/* Try to acquire a lock to the list of changed superblocks */
@@ -133,7 +132,7 @@ NOTHROW(FCALL fnode_add2changed)(struct fnode *__restrict self) {
 		}
 	} else {
 		/* Try to do the addition asynchronously. */
-		if (ATOMIC_CMPXCH(self->_fn_chnglop.olo_func,
+		if (atomic_cmpxch(&self->_fn_chnglop.olo_func,
 		                  NULL, &fnode_add2changed_lop)) {
 			incref(self);
 			oblockop_enqueue(&super->fs_changednodes_lops, &self->_fn_chnglop);
@@ -281,7 +280,7 @@ NOTHROW(KCALL fnode_v_destroy)(struct mfile *__restrict self) {
 	} else {
 		REF struct fsuper *super = me->fn_super;
 		/* Remove from the associated superblock's list of nodes. */
-		if (ATOMIC_READ(me->fn_supent.rb_rhs) != FSUPER_NODES_DELETED) {
+		if (atomic_read(&me->fn_supent.rb_rhs) != FSUPER_NODES_DELETED) {
 			if (fsuper_nodes_trywrite(super)) {
 				COMPILER_READ_BARRIER();
 				if (me->fn_supent.rb_rhs != FSUPER_NODES_DELETED) {
@@ -344,7 +343,7 @@ fnode_getuid(struct fnode *__restrict self) {
 		(*perm_ops->npo_getown)(self, &result, &_ignored);
 	} else {
 #if 1
-		result = ATOMIC_READ(self->fn_uid);
+		result = atomic_read(&self->fn_uid);
 #else
 		mfile_tslock_acquire(self);
 		result = self->fn_uid;
@@ -364,7 +363,7 @@ fnode_getgid(struct fnode *__restrict self) {
 		(*perm_ops->npo_getown)(self, &_ignored, &result);
 	} else {
 #if 1
-		result = ATOMIC_READ(self->fn_gid);
+		result = atomic_read(&self->fn_gid);
 #else
 		mfile_tslock_acquire(self);
 		result = self->fn_gid;
@@ -402,7 +401,7 @@ NOTHROW(LOCKOP_CC fnode_addtoall_lop)(struct lockop *__restrict self) {
 	static_assert(offsetof(struct fnode, fn_allnodes.le_prev) == offsetof(struct fnode, _fn_alllop.lo_func));
 	struct fnode *me = container_of(self, struct fnode, _fn_alllop);
 	assert(me->_fn_alllop.lo_func == &fnode_addtoall_lop);
-	ATOMIC_WRITE(me->fn_allnodes.le_prev, &fallnodes_list.lh_first); /* This write needs to be atomic */
+	atomic_write(&me->fn_allnodes.le_prev, &fallnodes_list.lh_first); /* This write needs to be atomic */
 	if ((me->fn_allnodes.le_next = fallnodes_list.lh_first) != NULL)
 		me->fn_allnodes.le_next->fn_allnodes.le_prev = &me->fn_allnodes.le_next;
 	__fallnodes_size_inc();
@@ -470,7 +469,7 @@ NOTHROW(LOCKOP_CC fnode_add2sup_lop)(Toblockop(fsuper) *__restrict self,
 	/* Check for special  case: if  the node has  been marked  as
 	 * deleted, then we mustn't add it to the super's Inode tree. */
 	if unlikely(me->mf_flags & MFILE_F_DELETED) {
-		ATOMIC_WRITE(me->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
+		atomic_write(&me->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
 		return NULL;
 	}
 	if unlikely(!fsuper_nodes_tryinsert(obj, me)) {
@@ -482,7 +481,7 @@ NOTHROW(LOCKOP_CC fnode_add2sup_lop)(Toblockop(fsuper) *__restrict self,
 	}
 
 	/* Inherit one reference from `me' */
-	if unlikely(ATOMIC_DECFETCH(me->mf_refcnt) == 0) {
+	if unlikely(atomic_decfetch(&me->mf_refcnt) == 0) {
 		/* Don't do the destroy here; use a post-operator for that! */
 		me->_mf_fsuperplop.oplo_func = &destroy_node_from_super_postlop;
 		return &me->_mf_fsuperplop;
@@ -654,7 +653,7 @@ again_check_permissions:
 	old_mode = self->fn_mode;
 	new_mode = (old_mode & perm_mask) | perm_flag;
 	/* Set the new file mode. */
-	ATOMIC_WRITE(self->fn_mode, new_mode);
+	atomic_write(&self->fn_mode, new_mode);
 	if (old_mode != new_mode)
 		self->mf_ctime = now; /* Attributes-changed */
 	mfile_tslock_release(self);
@@ -786,7 +785,7 @@ again_read_old_values:
 				mask = ~(S_ISUID);
 			}
 			mode &= mask;
-			ATOMIC_WRITE(self->fn_mode, mode);
+			atomic_write(&self->fn_mode, mode);
 		}
 
 		/* Actually write the new owner/group */
@@ -873,10 +872,10 @@ fnode_syncattr(struct fnode *__restrict self)
 
 	/* Clear the `MFILE_F_ATTRCHANGED' flag. */
 	do {
-		old_flags = ATOMIC_READ(self->mf_flags);
+		old_flags = atomic_read(&self->mf_flags);
 		if (!(old_flags & MFILE_F_ATTRCHANGED) || (old_flags & MFILE_F_DELETED))
 			return;
-	} while (!ATOMIC_CMPXCH_WEAK(self->mf_flags, old_flags,
+	} while (!atomic_cmpxch_weak(&self->mf_flags, old_flags,
 	                             old_flags & ~MFILE_F_ATTRCHANGED));
 
 	if (!(old_flags & MFILE_F_CHANGED)) {
@@ -903,7 +902,7 @@ again_acquire_super_changed:
 
 		/* To prevent race conditions, re-check if the node
 		 * should  actually appear within the changed list. */
-		if (ATOMIC_READ(self->mf_flags) & MFILE_F_CHANGED)
+		if (atomic_read(&self->mf_flags) & MFILE_F_CHANGED)
 			fnode_add2changed(self);
 	}
 
@@ -932,10 +931,10 @@ fnode_syncdata(struct fnode *__restrict self)
 
 	/* Clear the `MFILE_F_CHANGED' flag. */
 	do {
-		old_flags = ATOMIC_READ(self->mf_flags);
+		old_flags = atomic_read(&self->mf_flags);
 		if (!(old_flags & MFILE_F_CHANGED) || (old_flags & MFILE_F_DELETED))
 			return;
-	} while (!ATOMIC_CMPXCH_WEAK(self->mf_flags, old_flags,
+	} while (!atomic_cmpxch_weak(&self->mf_flags, old_flags,
 	                             old_flags & ~MFILE_F_CHANGED));
 
 	if (!(old_flags & MFILE_F_ATTRCHANGED)) {
@@ -962,7 +961,7 @@ again_acquire_super_changed:
 
 		/* To prevent race conditions, re-check if the node
 		 * should  actually appear within the changed list. */
-		if (ATOMIC_READ(self->mf_flags) & MFILE_F_ATTRCHANGED)
+		if (atomic_read(&self->mf_flags) & MFILE_F_ATTRCHANGED)
 			fnode_add2changed(self);
 	}
 
@@ -993,7 +992,7 @@ PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL fnode_mayaccess)(struct fnode *__restrict self,
                                unsigned int type) {
 	unsigned int how;
-	mode_t mode = ATOMIC_READ(self->fn_mode);
+	mode_t mode = atomic_read(&self->fn_mode);
 	struct fnode_perm_ops const *perm_ops;
 	perm_ops = fnode_getops(self)->no_perm;
 	if (perm_ops && perm_ops->npo_getown) {
@@ -1026,12 +1025,12 @@ NOTHROW(FCALL fnode_mayaccess)(struct fnode *__restrict self,
 		if likely(mode & how)
 			continue; /* Access is allowed for everyone. */
 		if (mode & (how << 3)) {
-			gid_t gid = ATOMIC_READ(self->fn_gid);
+			gid_t gid = atomic_read(&self->fn_gid);
 			if likely(cred_isfsgroupmember(gid))
 				continue; /* The calling thread's user is part of the file owner's group */
 		}
 		if (mode & (how << 6)) {
-			uid_t uid = ATOMIC_READ(self->fn_uid);
+			uid_t uid = atomic_read(&self->fn_uid);
 			if likely(uid == cred_getfsuid())
 				continue; /* The calling thread's user is the file's owner */
 			/* CAP_FOWNER: ... Ignore filesystem-uid checks ... */
@@ -1176,7 +1175,7 @@ NOTHROW(LOCKOP_CC fnode_delete_remove_from_byino_lop)(Toblockop(fsuper) *__restr
 			return NULL;
 		}
 		fsuper_nodes_removenode(obj, me);
-		ATOMIC_WRITE(me->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
+		atomic_write(&me->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
 	}
 	me->_mf_fsuperplop.oplo_func = &fnode_delete_remove_from_byino_postlop; /* Inherit reference */
 	return &me->_mf_fsuperplop;
@@ -1192,7 +1191,7 @@ NOTHROW(FCALL fnode_delete_impl)(/*inherit(always)*/ REF struct fnode *__restric
 	struct fsuper *super = self->fn_super;
 
 	/* Remove from the superblock's INode tree. */
-	if (ATOMIC_READ(self->fn_supent.rb_rhs) != FSUPER_NODES_DELETED) {
+	if (atomic_read(&self->fn_supent.rb_rhs) != FSUPER_NODES_DELETED) {
 again_lock_super:
 		if (fsuper_nodes_trywrite(super)) {
 			COMPILER_READ_BARRIER();
@@ -1204,7 +1203,7 @@ again_lock_super:
 					goto again_lock_super;
 				}
 				fsuper_nodes_removenode(super, self);
-				ATOMIC_WRITE(self->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
+				atomic_write(&self->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
 			}
 			fsuper_nodes_endwrite(super);
 		} else {
@@ -1223,7 +1222,7 @@ NOTHROW(FCALL fnode_delete_strt)(struct fnode *__restrict self) {
 
 	/* Mark the file as deleted (and make available use of the timestamp fields) */
 	mfile_tslock_acquire(self);
-	old_flags = ATOMIC_FETCHOR(self->mf_flags,
+	old_flags = atomic_fetchor(&self->mf_flags,
 	                           MFILE_F_DELETED | MFILE_F_NOATIME | MFILE_FN_NODIRATIME |
 	                           MFILE_F_NOMTIME | MFILE_F_CHANGED | MFILE_F_ATTRCHANGED |
 	                           MFILE_F_FIXEDFILESIZE | MFILE_FN_ATTRREADONLY |
@@ -1232,12 +1231,12 @@ NOTHROW(FCALL fnode_delete_strt)(struct fnode *__restrict self) {
 
 	/* Delete global reference to the file-node. */
 	if ((old_flags & MFILE_FN_GLOBAL_REF) &&
-	    (ATOMIC_FETCHAND(self->mf_flags, ~(MFILE_FN_GLOBAL_REF)) & MFILE_FN_GLOBAL_REF))
+	    (atomic_fetchand(&self->mf_flags, ~(MFILE_FN_GLOBAL_REF)) & MFILE_FN_GLOBAL_REF))
 		decref_nokill(self);
 
 	/* Also clear the PERSISTENT flag */
 	if (old_flags & MFILE_F_PERSISTENT)
-		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT);
+		atomic_and(&self->mf_flags, ~MFILE_F_PERSISTENT);
 
 	return !(old_flags & MFILE_F_DELETED);
 }
@@ -1247,7 +1246,7 @@ NOTHROW(FCALL fnode_delete_strt_with_tslock)(struct fnode *__restrict self) {
 	uintptr_t old_flags;
 
 	/* Mark the file as deleted (and make available use of the timestamp fields) */
-	old_flags = ATOMIC_FETCHOR(self->mf_flags,
+	old_flags = atomic_fetchor(&self->mf_flags,
 	                           MFILE_F_DELETED | MFILE_F_NOATIME | MFILE_FN_NODIRATIME |
 	                           MFILE_F_NOMTIME | MFILE_F_CHANGED | MFILE_F_ATTRCHANGED |
 	                           MFILE_F_FIXEDFILESIZE | MFILE_FN_ATTRREADONLY |
@@ -1255,12 +1254,12 @@ NOTHROW(FCALL fnode_delete_strt_with_tslock)(struct fnode *__restrict self) {
 
 	/* Delete global reference to the file-node. */
 	if ((old_flags & MFILE_FN_GLOBAL_REF) &&
-	    (ATOMIC_FETCHAND(self->mf_flags, ~(MFILE_FN_GLOBAL_REF)) & MFILE_FN_GLOBAL_REF))
+	    (atomic_fetchand(&self->mf_flags, ~(MFILE_FN_GLOBAL_REF)) & MFILE_FN_GLOBAL_REF))
 		decref_nokill(self);
 
 	/* Also clear the PERSISTENT flag */
 	if (old_flags & MFILE_F_PERSISTENT)
-		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT);
+		atomic_and(&self->mf_flags, ~MFILE_F_PERSISTENT);
 
 	return !(old_flags & MFILE_F_DELETED);
 }

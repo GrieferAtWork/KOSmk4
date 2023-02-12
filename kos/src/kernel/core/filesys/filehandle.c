@@ -37,7 +37,6 @@
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
@@ -45,6 +44,7 @@
 #include <kos/kernel/handle.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <format-printer.h>
 #include <stddef.h>
 
@@ -351,7 +351,7 @@ NOTHROW(FCALL handle_temphandle_decref)(REF struct filehandle *__restrict self) 
 	struct mfile *file;
 
 	/* Decrement reference counter. */
-	if (ATOMIC_DECFETCH(self->fh_refcnt) != 0)
+	if (atomic_decfetch(&self->fh_refcnt) != 0)
 		return;
 
 	/* Delete the pointed-to file, using the most appropriate delete function. */

@@ -35,7 +35,6 @@
 #include <sched/tsc.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sched/preemption.h>
@@ -43,6 +42,7 @@
 #include <kos/except.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <string.h>
 
@@ -428,12 +428,12 @@ NOTHROW(FCALL mfile_add_changed_part)(struct mfile *__restrict self,
 		struct mpart *next;
 
 		/* Mark the part as changed. */
-		ATOMIC_OR(part->mp_flags, MPART_F_CHANGED);
+		atomic_or(&part->mp_flags, MPART_F_CHANGED);
 		incref(part); /* For the list of changed parts. */
 
 		/* Add the part to its file's changed-list. */
 		do {
-			next = ATOMIC_READ(self->mf_changed.slh_first);
+			next = atomic_read(&self->mf_changed.slh_first);
 
 			/* Deal with special case: The file is currently being made
 			 * anonymous. This is  quite unlikely, since  a fully  anon
@@ -442,13 +442,13 @@ NOTHROW(FCALL mfile_add_changed_part)(struct mfile *__restrict self,
 			 * already failed  had `self'  been anonymous  for a  while
 			 * longer. */
 			if unlikely(next == MFILE_PARTS_ANONYMOUS) {
-				ATOMIC_AND(part->mp_flags, ~MPART_F_CHANGED);
+				atomic_and(&part->mp_flags, ~MPART_F_CHANGED);
 				decref_nokill(part);
 				return;
 			}
 			part->mp_changed.sle_next = next;
 			COMPILER_WRITE_BARRIER();
-		} while (!ATOMIC_CMPXCH_WEAK(self->mf_changed.slh_first,
+		} while (!atomic_cmpxch_weak(&self->mf_changed.slh_first,
 		                             next, part));
 
 		/* Mark the file as changed (and update the last-modified timestamp). */
@@ -667,7 +667,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 	}
 
 	/* Set the flag to indicate that there may be INIT-blocks. */
-	ATOMIC_OR(self->mp_flags, MPART_F_MAYBE_BLK_INIT);
+	atomic_or(&self->mp_flags, MPART_F_MAYBE_BLK_INIT);
 
 	assert(max >= min);
 	assert(max <= limit);
@@ -909,11 +909,11 @@ NOTHROW(FCALL mpart_atomic_cmpxch_blockstate)(struct mpart *__restrict self,
 		pword = &self->mp_blkst_ptr[index];
 	}
 	do {
-		oldword = ATOMIC_READ(*pword);
+		oldword = atomic_read(pword);
 		if ((oldword & mask) != old_val)
 			return false;
 		newword = (oldword & ~mask) | new_val;
-	} while (!ATOMIC_CMPXCH_WEAK(*pword, oldword, newword));
+	} while (!atomic_cmpxch_weak(pword, oldword, newword));
 	return true;
 }
 #endif /* !CONFIG_NO_SMP */

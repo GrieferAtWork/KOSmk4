@@ -42,7 +42,6 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/byteswap.h>
 #include <hybrid/overflow.h>
@@ -59,6 +58,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <atomic.h>
 #include <ctype.h>
 #include <inttypes.h>
 #include <stdbool.h>
@@ -1150,7 +1150,7 @@ NOTHROW(FCALL devfs_insert_into_inode_tree)(struct blkdev *__restrict self) {
 		if (wasdestroyed(existing)) {
 			/* Unlink destroyed device. */
 			fsuper_nodes_removenode(&devfs, existing);
-			ATOMIC_WRITE(existing->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
+			atomic_write(&existing->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
 			break;
 		}
 
@@ -1251,7 +1251,7 @@ blkdev_repart(struct blkdev *__restrict self)
 	LIST_FOREACH (dev, &oldparts, bd_partinfo.bp_partlink) {
 		device_unlink_from_globals(dev);
 		/* Also clear `MFILE_FN_GLOBAL_REF' and decref_nokill(partition) if it was set */
-		if (ATOMIC_FETCHAND(dev->mf_flags, ~MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)
+		if (atomic_fetchand(&dev->mf_flags, ~MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)
 			decref_nokill(dev);
 	}
 
@@ -1262,7 +1262,7 @@ blkdev_repart(struct blkdev *__restrict self)
 	 * Note that TLSLOCK is an SMP-LOCK, so we're allowed to acquire it while
 	 * already holding atomic locks! */
 	mfile_tslock_acquire(self);
-	if unlikely(ATOMIC_READ(self->mf_flags) & MFILE_F_DELETED) {
+	if unlikely(atomic_read(&self->mf_flags) & MFILE_F_DELETED) {
 		/* Release locks */
 		mfile_tslock_release_br(self);
 		_blkdev_repart_locks_release(self);

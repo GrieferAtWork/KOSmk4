@@ -34,8 +34,6 @@
 #include <sched/group.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
-
 #include <bits/os/timespec.h>
 #include <compat/config.h>
 #include <kos/except/reason/inval.h>
@@ -44,6 +42,7 @@
 #include <linux/futex.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <stddef.h>
 
@@ -100,7 +99,7 @@ sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
 		mfutex_connect(f);
 		TRY {
 			result = 0;
-			if (ATOMIC_READ(*uaddr) == val) {
+			if (atomic_read(uaddr) == val) {
 				if (!task_waitfor(timeout))
 					result = -ETIMEDOUT;
 			} else {

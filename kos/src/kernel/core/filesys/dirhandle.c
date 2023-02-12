@@ -34,7 +34,6 @@
 #include <kernel/mman/mfile.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
@@ -43,6 +42,7 @@
 #include <kos/kernel/handle.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <format-printer.h>
 #include <stddef.h>
 #include <string.h>
@@ -135,10 +135,10 @@ handle_dirhandle_readdir(struct dirhandle *__restrict self,
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	uintptr_t dots;
 again_dots:
-	dots = ATOMIC_READ(self->dh_dots);
+	dots = atomic_read(&self->dh_dots);
 	if (dots < 2) {
 		if (readdir_mode & READDIR_SKIPREL) {
-			if (!ATOMIC_CMPXCH_WEAK(self->dh_dots, dots, 2))
+			if (!atomic_cmpxch_weak(&self->dh_dots, dots, 2))
 				goto again_dots;
 		} else {
 			ino_t ino;
@@ -163,7 +163,7 @@ again_dots:
 				                             ino, DT_DIR, 1, ".");
 				if (result < 0)
 					return (size_t)~result;
-				if (!ATOMIC_CMPXCH(self->dh_dots, dots, newdots))
+				if (!atomic_cmpxch(&self->dh_dots, dots, newdots))
 					goto again_dots;
 				return (size_t)result;
 			}
@@ -172,7 +172,7 @@ again_dots:
 			/* Try to emit ".." */
 			if unlikely(fdirnode_issuper(mydir)) {
 				/* Superblock roots don't have parent nodes, and thus no ".." entry. */
-				if (!ATOMIC_CMPXCH(self->dh_dots, dots, 2))
+				if (!atomic_cmpxch(&self->dh_dots, dots, 2))
 					goto again_dots;
 				goto read_normal_entry;
 			}
@@ -193,7 +193,7 @@ again_dots:
 			                             ino, DT_DIR, 2, "..");
 			if (result < 0)
 				return (size_t)~result;
-			if (!ATOMIC_CMPXCH(self->dh_dots, dots, 2))
+			if (!atomic_cmpxch(&self->dh_dots, dots, 2))
 				goto again_dots;
 			return (size_t)result;
 		}
@@ -219,7 +219,7 @@ handle_dirhandle_seek(struct dirhandle *__restrict self,
 	case SEEK_SET:
 		if ((pos_t)offset <= 1) {
 			/* Simple case (including rewinddir(3)): seek into guarantied dots portion. */
-			ATOMIC_WRITE(self->dh_dots, (uintptr_t)(pos_t)offset);
+			atomic_write(&self->dh_dots, (uintptr_t)(pos_t)offset);
 			fdirenum_seekdir(&self->dh_enum, 0, SEEK_SET);
 			result = (pos_t)offset;
 			break;
@@ -229,11 +229,11 @@ handle_dirhandle_seek(struct dirhandle *__restrict self,
 			if (dirhandle_isfsroot(self)) {
 				/* Seek after first "real" entry. */
 				result = fdirenum_seekdir(&self->dh_enum, (off_t)1, SEEK_SET) + 1;
-				ATOMIC_WRITE(self->dh_dots, 2);
+				atomic_write(&self->dh_dots, 2);
 				break;
 			}
 			/* Seek after ".." entry. */
-			ATOMIC_WRITE(self->dh_dots, 2);
+			atomic_write(&self->dh_dots, 2);
 			result = (pos_t)2;
 			break;
 		}
@@ -242,7 +242,7 @@ handle_dirhandle_seek(struct dirhandle *__restrict self,
 	case SEEK_CUR: {
 		uintptr_t dots;
 again_seek_cur_dots:
-		dots = ATOMIC_READ(self->dh_dots);
+		dots = atomic_read(&self->dh_dots);
 		if (dots < 2) {
 			if (offset == 0) {
 				result = (pos_t)dots;
@@ -252,7 +252,7 @@ again_seek_cur_dots:
 				/* We're  at the very start, or after "." (with ".." following),
 				 * and the seek offset is negative. In all cases, go back to the
 				 * very start! */
-				if (!ATOMIC_CMPXCH(self->dh_dots, dots, 0))
+				if (!atomic_cmpxch(&self->dh_dots, dots, 0))
 					goto again_seek_cur_dots;
 				result = (pos_t)0;
 				break;
@@ -261,14 +261,14 @@ again_seek_cur_dots:
 				bool isfsroot;
 				/* Positive offset at start of directory. */
 				if (offset <= 1) {
-					if (!ATOMIC_CMPXCH(self->dh_dots, dots, 1))
+					if (!atomic_cmpxch(&self->dh_dots, dots, 1))
 						goto again_seek_cur_dots;
 					result = (pos_t)1;
 					break;
 				}
 				/* Offset to skip the dots portion. */
 				assert(offset >= 2);
-				if (!ATOMIC_CMPXCH(self->dh_dots, dots, 2))
+				if (!atomic_cmpxch(&self->dh_dots, dots, 2))
 					goto again_seek_cur_dots;
 				--offset;
 				isfsroot = dirhandle_isfsroot(self);
@@ -286,11 +286,11 @@ again_seek_cur_dots:
 				assert(offset >= 1);
 				if (dirhandle_isfsroot(self)) {
 					/* There is no second dots-entry. */
-					ATOMIC_CMPXCH(self->dh_dots, dots, 2);
+					atomic_cmpxch(&self->dh_dots, dots, 2);
 					goto again_seek_cur_dots;
 				}
 				assert(!dirhandle_isfsroot(self));
-				if (!ATOMIC_CMPXCH(self->dh_dots, dots, 2))
+				if (!atomic_cmpxch(&self->dh_dots, dots, 2))
 					goto again_seek_cur_dots;
 				--offset;
 				if (offset == 0) {
@@ -313,7 +313,7 @@ do_normal_seek:
 		/* Unconditionally go beyond the dots.
 		 * As documented, it's impossible to seek back into
 		 * the dots portion here. */
-		ATOMIC_WRITE(self->dh_dots, 2);
+		atomic_write(&self->dh_dots, 2);
 
 		/* When not the filesystem root, ++result x2. */
 		++result;

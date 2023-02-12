@@ -33,10 +33,10 @@
 #include <sched/sig.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -153,7 +153,7 @@ NOTHROW(FCALL aio_handle_multiple_func_)(struct aio_handle_multiple *__restrict 
 	assert(hand != AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED &&
 	       hand != AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE);
 	do {
-		old_status = ATOMIC_READ(hand->am_status);
+		old_status = atomic_read(&hand->am_status);
 		new_status = (uintptr_t)status << AIO_MULTIHANDLE_STATUS_STATUSSHFT;
 		assert((old_status & AIO_MULTIHANDLE_STATUS_RUNMASK) != 0);
 		if (old_status & AIO_MULTIHANDLE_STATUS_FAILED)
@@ -162,7 +162,7 @@ NOTHROW(FCALL aio_handle_multiple_func_)(struct aio_handle_multiple *__restrict 
 			new_status = old_status & AIO_MULTIHANDLE_STATUS_STATUSMASK; /* Don't update the status */
 		new_status |= (old_status & ~(AIO_MULTIHANDLE_STATUS_STATUSMASK | AIO_MULTIHANDLE_STATUS_RUNMASK));
 		new_status |= (old_status & (AIO_MULTIHANDLE_STATUS_RUNMASK)) - 1;
-	} while (!ATOMIC_CMPXCH_WEAK(hand->am_status, old_status, new_status));
+	} while (!atomic_cmpxch_weak(&hand->am_status, old_status, new_status));
 	/* Must store the current context. */
 	if (status == AIO_COMPLETION_FAILURE && (old_status & AIO_MULTIHANDLE_STATUS_STATUSMASK) <
 	                                        ((uintptr_t)AIO_COMPLETION_FAILURE << AIO_MULTIHANDLE_STATUS_STATUSSHFT))
@@ -212,7 +212,7 @@ NOTHROW(KCALL aio_multihandle_fini)(struct aio_multihandle *__restrict self) {
 
 #ifndef CONFIG_NO_SMP
 	/* Make sure that no other thread is still inside of `am_func' */
-	while (!(ATOMIC_READ(self->am_status) & AIO_MULTIHANDLE_STATUS_RELEASED))
+	while (!(atomic_read(&self->am_status) & AIO_MULTIHANDLE_STATUS_RELEASED))
 		preemption_tryyield();
 #endif /* !CONFIG_NO_SMP */
 
@@ -229,7 +229,7 @@ aio_multihandle_allochandle(struct aio_multihandle *__restrict self)
 		THROWS(E_BADALLOC) {
 	struct aio_handle_multiple *result;
 	uintptr_t run_count;
-	run_count = ATOMIC_READ(self->am_status);
+	run_count = atomic_read(&self->am_status);
 	assert(!(run_count & AIO_MULTIHANDLE_STATUS_FAILED));
 	assert(!(run_count & AIO_MULTIHANDLE_STATUS_ALLRUNNING));
 	run_count &= AIO_MULTIHANDLE_STATUS_RUNMASK;
@@ -243,7 +243,7 @@ aio_multihandle_allochandle(struct aio_multihandle *__restrict self)
 		for (i = 0; i < AIO_MULTIHANDLE_IVECLIMIT; ++i) {
 			struct aio_multihandle *ctrl;
 			result = &self->am_ivec[i];
-			ctrl   = ATOMIC_READ(result->hg_controller);
+			ctrl   = atomic_read(&result->hg_controller);
 			if (ctrl == AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED)
 				goto fill_in_result;
 			if (ctrl == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE) {
@@ -256,7 +256,7 @@ fini_and_fill_in_result:
 			for (i = 0; i < AIO_MULTIHANDLE_XVECLIMIT; ++i) {
 				struct aio_multihandle *ctrl;
 				result = &iter->ame_handles[i];
-				ctrl   = ATOMIC_READ(result->hg_controller);
+				ctrl   = atomic_read(&result->hg_controller);
 				if (ctrl == AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED)
 					goto fill_in_result;
 				if (ctrl == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE)
@@ -282,7 +282,7 @@ fill_in_result:
 	/* Required by `aio_multihandle_cancel()'
 	 * Used to ensure that the handle was actually initialized. */
 	result->ah_type = NULL;
-	ATOMIC_INC(self->am_status); /* Increment the run counter. */
+	atomic_inc(&self->am_status); /* Increment the run counter. */
 	return result;
 }
 
@@ -290,7 +290,7 @@ PUBLIC WUNUSED NONNULL((1)) struct aio_handle *
 NOTHROW(KCALL aio_multihandle_allochandle_nx)(struct aio_multihandle *__restrict self) {
 	struct aio_handle_multiple *result;
 	uintptr_t run_count;
-	run_count = ATOMIC_READ(self->am_status);
+	run_count = atomic_read(&self->am_status);
 	assert(!(run_count & AIO_MULTIHANDLE_STATUS_FAILED));
 	assert(!(run_count & AIO_MULTIHANDLE_STATUS_ALLRUNNING));
 	run_count &= AIO_MULTIHANDLE_STATUS_RUNMASK;
@@ -304,7 +304,7 @@ NOTHROW(KCALL aio_multihandle_allochandle_nx)(struct aio_multihandle *__restrict
 		for (i = 0; i < AIO_MULTIHANDLE_IVECLIMIT; ++i) {
 			struct aio_multihandle *ctrl;
 			result = &self->am_ivec[i];
-			ctrl   = ATOMIC_READ(result->hg_controller);
+			ctrl   = atomic_read(&result->hg_controller);
 			if (ctrl == AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED)
 				goto fill_in_result;
 			if (ctrl == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE) {
@@ -317,7 +317,7 @@ fini_and_fill_in_result:
 			for (i = 0; i < AIO_MULTIHANDLE_XVECLIMIT; ++i) {
 				struct aio_multihandle *ctrl;
 				result = &iter->ame_handles[i];
-				ctrl   = ATOMIC_READ(result->hg_controller);
+				ctrl   = atomic_read(&result->hg_controller);
 				if (ctrl == AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED)
 					goto fill_in_result;
 				if (ctrl == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE)
@@ -341,7 +341,7 @@ fill_in_result:
 	/* Required by `aio_multihandle_cancel()'
 	 * Used to ensure that the handle was actually initialized. */
 	result->ah_type = NULL;
-	ATOMIC_INC(self->am_status); /* Increment the run counter. */
+	atomic_inc(&self->am_status); /* Increment the run counter. */
 	return result;
 err:
 	return NULL;
@@ -358,12 +358,12 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_multihandle_done)(struct aio_multihandle *__restrict self) {
 	uintptr_t old_status;
 	for (;;) {
-		old_status = ATOMIC_READ(self->am_status);
+		old_status = atomic_read(&self->am_status);
 		if (old_status & AIO_MULTIHANDLE_STATUS_FAILED)
 			return; /* Controller already failed */
 		assertf(!(old_status & AIO_MULTIHANDLE_STATUS_ALLRUNNING),
 		        "Cannot call `aio_multihandle_done()' more than once");
-		if (ATOMIC_CMPXCH_WEAK(self->am_status, old_status, old_status | AIO_MULTIHANDLE_STATUS_ALLRUNNING))
+		if (atomic_cmpxch_weak(&self->am_status, old_status, old_status | AIO_MULTIHANDLE_STATUS_ALLRUNNING))
 			break;
 	}
 
@@ -404,12 +404,12 @@ NOTHROW(KCALL aio_multihandle_fail)(struct aio_multihandle *__restrict self) {
 	uintptr_t old_status;
 	preemption_flag_t was;
 	do {
-		old_status = ATOMIC_READ(self->am_status);
+		old_status = atomic_read(&self->am_status);
 		if (old_status & AIO_MULTIHANDLE_STATUS_FAILED)
 			return; /* Already failed. */
 		assertf(!(old_status & AIO_MULTIHANDLE_STATUS_ALLRUNNING),
 		        "Cannot call `aio_multihandle_fail()' after `aio_multihandle_done()'");
-	} while (!ATOMIC_CMPXCH_WEAK(self->am_status, old_status,
+	} while (!atomic_cmpxch_weak(&self->am_status, old_status,
 	                             (old_status & ~AIO_MULTIHANDLE_STATUS_STATUSMASK) |
 	                             (uintptr_t)AIO_MULTIHANDLE_STATUS_FAILED |
 	                             (uintptr_t)AIO_MULTIHANDLE_STATUS_ALLRUNNING |
@@ -485,10 +485,10 @@ NOTHROW(KCALL aio_handle_async_restore_chain)(struct async_aio_handle *first,
                                               struct async_aio_handle *last) {
 	struct async_aio_handle *next;
 	do {
-		next = ATOMIC_READ(async_aio_handles);
+		next = atomic_read(&async_aio_handles);
 		last->aah_next = next;
 		COMPILER_WRITE_BARRIER();
-	} while (!ATOMIC_CMPXCH_WEAK(async_aio_handles, next, first));
+	} while (!atomic_cmpxch_weak(&async_aio_handles, next, first));
 }
 
 /* Return the first handle with `aio_handle_completed(handle) == true'
@@ -498,7 +498,7 @@ NOTHROW(KCALL aio_handle_async_restore_chain)(struct async_aio_handle *first,
 PRIVATE NOBLOCK WUNUSED struct async_aio_handle *
 NOTHROW(KCALL aio_handle_async_alloc_exising)(void) {
 	struct async_aio_handle *chain, **piter, *iter;
-	chain = ATOMIC_XCH(async_aio_handles, NULL);
+	chain = atomic_xch(&async_aio_handles, NULL);
 	for (piter = &chain; (iter = *piter) != NULL; piter = &iter->aah_next) {
 		struct async_aio_handle *result;
 		if (!aio_handle_completed(iter))

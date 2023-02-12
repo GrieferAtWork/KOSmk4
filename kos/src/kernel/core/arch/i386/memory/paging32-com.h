@@ -26,11 +26,12 @@
 #include <kernel/types.h>
 #include <kernel/x86/cpuid.h>
 
-#include <hybrid/atomic.h>
-#include <hybrid/sched/preemption.h>
 #include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sched/preemption.h>
 
 #include <asm/cpu-cpuid.h>
+
+#include <atomic.h>
 
 #if 1 /* Not used often enough to excuse taking up precious cache space */
 #define ATTR_PAGING_READMOSTLY /* nothing */
@@ -99,7 +100,7 @@ PRIVATE ATTR_WRITEMOSTLY WEAK uintptr_t x86_pagedir_prepare_version = 0;
 	do {                                                              \
 		preemption_pushoff(&(was));                                   \
 		if likely(atomic_rwlock_tryread(&x86_pagedir_prepare_lock)) { \
-			ATOMIC_INC(x86_pagedir_prepare_version);                  \
+			atomic_inc(&x86_pagedir_prepare_version);                 \
 			break;                                                    \
 		}                                                             \
 		preemption_pop(&(was));                                       \

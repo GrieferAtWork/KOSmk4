@@ -38,7 +38,6 @@
 #include <kernel/types.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/bit.h>
 #include <hybrid/overflow.h>
 

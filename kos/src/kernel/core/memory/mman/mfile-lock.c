@@ -30,12 +30,11 @@
 #include <misc/unlockinfo.h>
 #include <sched/cred.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <kos/except/reason/illop.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -133,7 +132,7 @@ again:
 				mpart_tree_removenode(&self->mf_parts, result);
 				DBG_memset(&result->mp_filent.rb_lhs, 0xcc, sizeof(result->mp_filent.rb_lhs));
 				result->mp_filent.rb_rhs = NULL; /* Indicator for `mpart_trim()' */
-				ATOMIC_WRITE(result->mp_filent.rb_par, (struct mpart *)-1);
+				atomic_write(&result->mp_filent.rb_par, (struct mpart *)-1);
 				goto again;
 			}
 		}
@@ -362,7 +361,7 @@ mfile_chflags(struct mfile *__restrict self, uintptr_t mask,
 again:
 	do {
 		mfile_lock_write(self);
-		old_flags = ATOMIC_READ(self->mf_flags);
+		old_flags = atomic_read(&self->mf_flags);
 		new_flags = (old_flags & mask) | flags;
 
 		/* Make sure that read-only flags aren't altered when ROFLAGS was set. */
@@ -421,7 +420,7 @@ again:
 		}
 
 		/* Try to atomically apply the new set of flags. */
-		cmpxch_ok = ATOMIC_CMPXCH(self->mf_flags, old_flags, new_flags);
+		cmpxch_ok = atomic_cmpxch(&self->mf_flags, old_flags, new_flags);
 
 		/* Release locks */
 		if (self->mf_parts != MFILE_PARTS_ANONYMOUS &&

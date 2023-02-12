@@ -35,7 +35,6 @@
 #include <kernel/user.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
 
 #include <kos/except/reason/inval.h>
@@ -46,6 +45,7 @@
 #include <sys/stat.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <stddef.h>
@@ -72,16 +72,16 @@ NOTHROW(FCALL kbddev_putkey_nopr)(struct kbddev *__restrict self, u16 key) {
 	if (key == KEY_F12) {
 		uintptr_t flags;
 again_read_flags:
-		flags = ATOMIC_READ(self->kd_flags);
+		flags = atomic_read(&self->kd_flags);
 		if (flags & KEYBOARD_DEVICE_FLAG_DBGF12) {
 			if ((flags & KEYBOARD_DEVICE_FLAG_DBGF12_MASK) == KEYBOARD_DEVICE_FLAG_DBGF12_THRICE)
 				dbg();
-			if (!ATOMIC_CMPXCH_WEAK(self->kd_flags, flags, flags + KEYBOARD_DEVICE_FLAG_DBGF12_ONCE))
+			if (!atomic_cmpxch_weak(&self->kd_flags, flags, flags + KEYBOARD_DEVICE_FLAG_DBGF12_ONCE))
 				goto again_read_flags;
 		}
 	} else if ((key & ~(KEY_FRELEASED | KEY_FREPEAT)) != KEY_F12) {
 		/* Clear the F12 counter mask. */
-		ATOMIC_AND(self->kd_flags, ~KEYBOARD_DEVICE_FLAG_DBGF12_MASK);
+		atomic_and(&self->kd_flags, ~KEYBOARD_DEVICE_FLAG_DBGF12_MASK);
 	}
 	return kbdbuf_putkey_nopr(&self->kd_buf, key);
 }
@@ -109,26 +109,26 @@ NOTHROW(FCALL kbdbuf_putkey_nopr)(struct kbdbuf *__restrict self, u16 key) {
 	assert(key != KEY_NONE);
 	for (;;) {
 		size_t index;
-		oldstate.bs_word = ATOMIC_READ(self->kb_bufstate.bs_word);
+		oldstate.bs_word = atomic_read(&self->kb_bufstate.bs_word);
 		if (oldstate.bs_state.s_used >= CONFIG_KERNEL_KEYBOARD_BUFFER_SIZE)
 			return false;
 		index = (oldstate.bs_state.s_start +
 		         oldstate.bs_state.s_used) %
 		        CONFIG_KERNEL_KEYBOARD_BUFFER_SIZE;
-		if (!ATOMIC_CMPXCH(self->kb_buffer[index], KEY_NONE, key))
+		if (!atomic_cmpxch(&self->kb_buffer[index], KEY_NONE, key))
 			continue;
 		newstate = oldstate;
 		++newstate.bs_state.s_used;
-		if (ATOMIC_CMPXCH_WEAK(self->kb_bufstate.bs_word,
+		if (atomic_cmpxch_weak(&self->kb_bufstate.bs_word,
 		                       oldstate.bs_word,
 		                       newstate.bs_word))
 			break;
 #ifdef NDEBUG
-		ATOMIC_WRITE(self->kb_buffer[index], KEY_NONE);
+		atomic_write(&self->kb_buffer[index], KEY_NONE);
 #else /* NDEBUG */
 		{
 			u16 oldkey;
-			oldkey = ATOMIC_XCH(self->kb_buffer[index], KEY_NONE);
+			oldkey = atomic_xch(&self->kb_buffer[index], KEY_NONE);
 			assert(oldkey == key);
 		}
 #endif /* !NDEBUG */
@@ -146,7 +146,7 @@ NOTHROW(KCALL kbdbuf_trygetkey)(struct kbdbuf *__restrict self) {
 	u16 result;
 	for (;;) {
 		union kbdbuf_state oldstate, newstate;
-		oldstate.bs_word = ATOMIC_READ(self->kb_bufstate.bs_word);
+		oldstate.bs_word = atomic_read(&self->kb_bufstate.bs_word);
 		if (oldstate.bs_state.s_used == 0)
 			return KEY_NONE;
 		assert(oldstate.bs_state.s_start < CONFIG_KERNEL_KEYBOARD_BUFFER_SIZE);
@@ -159,11 +159,11 @@ NOTHROW(KCALL kbdbuf_trygetkey)(struct kbdbuf *__restrict self) {
 		if (newstate.bs_state.s_start == CONFIG_KERNEL_KEYBOARD_BUFFER_SIZE)
 			newstate.bs_state.s_start = 0;
 #endif
-		if (!ATOMIC_CMPXCH_WEAK(self->kb_bufstate.bs_word,
+		if (!atomic_cmpxch_weak(&self->kb_bufstate.bs_word,
 		                        oldstate.bs_word,
 		                        newstate.bs_word))
 			continue;
-		result = ATOMIC_XCH(self->kb_buffer[oldstate.bs_state.s_start], KEY_NONE);
+		result = atomic_xch(&self->kb_buffer[oldstate.bs_state.s_start], KEY_NONE);
 		if likely(result != KEY_NONE)
 			break;
 	}
@@ -356,8 +356,8 @@ sync_leds(struct kbddev *__restrict self)
 		THROWS(E_IOERROR, ...) {
 	for (;;) {
 		u16 curmod, oldled, newled;
-		curmod = ATOMIC_READ(self->kd_mods);
-		oldled = ATOMIC_READ(self->kd_leds);
+		curmod = atomic_read(&self->kd_mods);
+		oldled = atomic_read(&self->kd_leds);
 		newled = (oldled & ~KEYMOD_LEDMASK) | (curmod & KEYMOD_LEDMASK);
 		if (oldled == newled)
 			break;
@@ -726,7 +726,7 @@ again_getkey:
 		if (packet.kp_key != KEY_NONE) {
 			size_t len;
 			/* Figure out how we're to encode key data for the user. */
-			switch (ATOMIC_READ(self->kd_flags) & KEYBOARD_DEVICE_FLAG_RDMODE) {
+			switch (atomic_read(&self->kd_flags) & KEYBOARD_DEVICE_FLAG_RDMODE) {
 
 			case K_RAW: {
 				/* Produce AT-style, scanset#1 scancodes. */
@@ -933,8 +933,8 @@ kbddev_v_stat(struct mfile *__restrict self,
               USER CHECKED struct stat *result) THROWS(...) {
 	struct kbddev *me = mfile_askbd(self);
 	size_t bufsize;
-	bufsize = ATOMIC_READ(me->kd_pendsz);
-	bufsize += ATOMIC_READ(me->kd_buf.kb_bufstate.bs_state.s_used); /* XXX: This is inexact */
+	bufsize = atomic_read(&me->kd_pendsz);
+	bufsize += atomic_read(&me->kd_buf.kb_bufstate.bs_state.s_used); /* XXX: This is inexact */
 	result->st_size = bufsize;
 }
 
@@ -942,9 +942,9 @@ kbddev_v_stat(struct mfile *__restrict self,
 LOCAL bool KCALL
 keyboard_device_canread(struct kbddev *__restrict self) {
 	uintptr_half_t used;
-	if (ATOMIC_READ(self->kd_pendsz) != 0)
+	if (atomic_read(&self->kd_pendsz) != 0)
 		return true;
-	used = ATOMIC_READ(self->kd_buf.kb_bufstate.bs_state.s_used);
+	used = atomic_read(&self->kd_buf.kb_bufstate.bs_state.s_used);
 	return used != 0;
 }
 
@@ -971,7 +971,7 @@ kbddev_v_polltest(struct mfile *__restrict self,
 
 LOCAL unsigned int KCALL
 linux_keyboard_getmode(struct kbddev *__restrict self) {
-	return ATOMIC_READ(self->kd_flags) & KEYBOARD_DEVICE_FLAG_RDMODE;
+	return atomic_read(&self->kd_flags) & KEYBOARD_DEVICE_FLAG_RDMODE;
 }
 
 LOCAL syscall_slong_t KCALL
@@ -980,8 +980,8 @@ linux_keyboard_setmode(struct kbddev *__restrict self,
 	if (mode >= K_RAW && mode <= K_OFF) {
 		uintptr_t flags;
 		do {
-			flags = ATOMIC_READ(self->kd_flags);
-		} while (!ATOMIC_CMPXCH_WEAK(self->kd_flags, flags,
+			flags = atomic_read(&self->kd_flags);
+		} while (!atomic_cmpxch_weak(&self->kd_flags, flags,
 		                             (flags & ~KEYBOARD_DEVICE_FLAG_RDMODE) | mode));
 	} else {
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
@@ -1033,7 +1033,6 @@ kbddev_v_ioctl(struct mfile *__restrict self,
 			return -EAGAIN;
 		COMPILER_WRITE_BARRIER();
 		memcpy(arg, &key, sizeof(struct kbd_packet));
-		COMPILER_WRITE_BARRIER();
 		return 0;
 	}	break;
 
@@ -1043,7 +1042,6 @@ kbddev_v_ioctl(struct mfile *__restrict self,
 		key = kbddev_getkey(me);
 		COMPILER_WRITE_BARRIER();
 		memcpy(arg, &key, sizeof(struct kbd_packet));
-		COMPILER_WRITE_BARRIER();
 		return 0;
 	}	break;
 
@@ -1052,11 +1050,10 @@ kbddev_v_ioctl(struct mfile *__restrict self,
 		u32 old_leds, new_mods;
 		u32 led_mask, led_flag, led_fxor;
 		validate_readable(arg, sizeof(struct kbd_ledmask));
-		data = (USER CHECKED struct kbd_ledmask *)arg;
-		COMPILER_READ_BARRIER();
-		led_mask = ATOMIC_READ(data->lm_mask);
-		led_flag = ATOMIC_READ(data->lm_flag);
-		led_fxor = ATOMIC_READ(data->lm_fxor);
+		data     = (USER CHECKED struct kbd_ledmask *)arg;
+		led_mask = data->lm_mask;
+		led_flag = data->lm_flag;
+		led_fxor = data->lm_fxor;
 		COMPILER_READ_BARRIER();
 		{
 			kbddev_leds_acquire(me);
@@ -1075,7 +1072,6 @@ kbddev_v_ioctl(struct mfile *__restrict self,
 		COMPILER_WRITE_BARRIER();
 		data->lm_oldled = old_leds;
 		data->lm_newled = new_mods;
-		COMPILER_WRITE_BARRIER();
 		return 0;
 	}	break;
 
@@ -1085,19 +1081,17 @@ kbddev_v_ioctl(struct mfile *__restrict self,
 		u32 mod_mask, mod_flag, mod_fxor;
 		validate_readable(arg, sizeof(struct kbd_ledmask));
 		data = (USER CHECKED struct kbd_ledmask *)arg;
-		COMPILER_READ_BARRIER();
-		mod_mask = ATOMIC_READ(data->lm_mask);
-		mod_flag = ATOMIC_READ(data->lm_flag);
-		mod_fxor = ATOMIC_READ(data->lm_fxor);
+		mod_mask = data->lm_mask;
+		mod_flag = data->lm_flag;
+		mod_fxor = data->lm_fxor;
 		COMPILER_READ_BARRIER();
 		do {
-			old_mods = ATOMIC_READ(me->kd_mods);
+			old_mods = atomic_read(&me->kd_mods);
 			new_mods = ((old_mods & mod_mask) | mod_flag) ^ mod_fxor;
-		} while (!ATOMIC_CMPXCH_WEAK(me->kd_mods, old_mods, new_mods));
+		} while (!atomic_cmpxch_weak(&me->kd_mods, old_mods, new_mods));
 		COMPILER_WRITE_BARRIER();
 		data->lm_oldled = old_mods;
 		data->lm_newled = new_mods;
-		COMPILER_WRITE_BARRIER();
 		return 0;
 	}	break;
 
@@ -1132,9 +1126,9 @@ continue_copy_keymap:
 				*((byte_t *)data.km_maptext + offset) = next_byte;
 				COMPILER_WRITE_BARRIER();
 				kbddev_map_read(me);
-				if unlikely(extbase != (byte_t *)ATOMIC_READ(me->kd_map.km_ext))
+				if unlikely(extbase != (byte_t *)atomic_read(&me->kd_map.km_ext))
 					goto restart_getkeymap_locked;
-				if unlikely(mapsize != ATOMIC_READ(me->kd_map_extsiz))
+				if unlikely(mapsize != atomic_read(&me->kd_map_extsiz))
 					goto restart_getkeymap_locked;
 				++offset;
 				goto continue_copy_keymap;
@@ -1145,7 +1139,6 @@ continue_copy_keymap:
 		/* Write back the required buffer size, as well as the default encoding. */
 		((struct kbd_keymap *)arg)->km_mapsize = mapsize;
 		((struct kbd_keymap *)arg)->km_defenc  = default_encoding;
-		COMPILER_WRITE_BARRIER();
 		return 0;
 	}	break;
 
@@ -1163,7 +1156,7 @@ continue_copy_keymap:
 			      E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBD_SETKEYMAP_BAD_ENCODING,
 			      data.km_defenc);
 		validate_readable(data.km_maptext, data.km_mapsize);
-		while (data.km_mapsize && ATOMIC_READ(*((byte_t *)data.km_maptext + data.km_mapsize - 1)) == 0)
+		while (data.km_mapsize && read_once(((byte_t *)data.km_maptext + data.km_mapsize - 1)) == 0)
 			--data.km_mapsize;
 		new_map = (byte_t *)kmalloc(data.km_mapsize + KEYMAP_UNTRUSTED_NUM_TRAILING_ZERO_BYTES,
 		                            GFP_NORMAL);
@@ -1214,14 +1207,13 @@ continue_copy_keymap:
 			if (packet.kp_key == KEY_NONE)
 				break; /* Buffer became empty. */
 		}
-		ATOMIC_WRITE(me->kd_pendsz, 0);
+		atomic_write(&me->kd_pendsz, 0);
 		return 0;
 	}	break;
 
 	case KBD_IOC_PUTCHAR: {
 		char ch;
 		validate_readable(arg, sizeof(char));
-		COMPILER_READ_BARRIER();
 		ch = *(char *)arg;
 		COMPILER_READ_BARRIER();
 		kbddev_map_write(me);
@@ -1242,7 +1234,6 @@ continue_copy_keymap:
 		byte_t new_buf[lengthof(me->kd_pend)];
 		size_t avail;
 		validate_readable(arg, sizeof(struct kbd_string));
-		COMPILER_READ_BARRIER();
 		memcpy(&data, arg, sizeof(struct kbd_string));
 		COMPILER_READ_BARRIER();
 		validate_readable(data.ks_text, data.ks_size);
@@ -1265,7 +1256,6 @@ continue_copy_keymap:
 	case KBD_IOC_PUTKEY: {
 		u16 key;
 		validate_readable(arg, sizeof(u16));
-		COMPILER_READ_BARRIER();
 		key = *(u16 const *)arg;
 		COMPILER_READ_BARRIER();
 		return kbddev_putkey(me, key);
@@ -1285,7 +1275,7 @@ continue_copy_keymap:
 	switch (_IO_WITHSIZE(cmd, 0)) {
 
 	case _IO_WITHSIZE(KBD_IOC_GETLED, 0):
-		return ioctl_intarg_setu32(cmd, arg, (uint32_t)ATOMIC_READ(me->kd_leds));
+		return ioctl_intarg_setu32(cmd, arg, (uint32_t)atomic_read(&me->kd_leds));
 
 	case _IO_WITHSIZE(KBD_IOC_SETLED, 0): {
 		uintptr_t new_mods;
@@ -1304,19 +1294,19 @@ continue_copy_keymap:
 	}	break;
 
 	case _IO_WITHSIZE(KBD_IOC_GETMOD, 0):
-		return ioctl_intarg_setu32(cmd, arg, (uint32_t)ATOMIC_READ(me->kd_mods));
+		return ioctl_intarg_setu32(cmd, arg, (uint32_t)atomic_read(&me->kd_mods));
 
 	case _IO_WITHSIZE(KBD_IOC_SETMOD, 0): {
 		uintptr_t new_mods;
 		new_mods = ioctl_intarg_getu32(cmd, arg);
-		ATOMIC_WRITE(me->kd_mods, new_mods);
+		atomic_write(&me->kd_mods, new_mods);
 		return 0;
 	}	break;
 
 	case _IO_WITHSIZE(KBD_IOC_GETDBGF12, 0): {
 		bool enabled;
 #ifdef KEYBOARD_DEVICE_FLAG_DBGF12
-		enabled = (ATOMIC_READ(me->kd_flags) & KEYBOARD_DEVICE_FLAG_DBGF12) != 0;
+		enabled = (atomic_read(&me->kd_flags) & KEYBOARD_DEVICE_FLAG_DBGF12) != 0;
 #else /* KEYBOARD_DEVICE_FLAG_DBGF12 */
 		enabled = false;
 #endif /* !KEYBOARD_DEVICE_FLAG_DBGF12 */
@@ -1327,10 +1317,10 @@ continue_copy_keymap:
 		int f12_mode = ioctl_intarg_getint(cmd, arg);
 		if (f12_mode == 0) {
 #ifdef KEYBOARD_DEVICE_FLAG_DBGF12
-			ATOMIC_AND(me->kd_flags, ~(KEYBOARD_DEVICE_FLAG_DBGF12 |
+			atomic_and(&me->kd_flags, ~(KEYBOARD_DEVICE_FLAG_DBGF12 |
 			                           KEYBOARD_DEVICE_FLAG_DBGF12_MASK));
 		} else if (f12_mode == 1) {
-			ATOMIC_OR(me->kd_flags, KEYBOARD_DEVICE_FLAG_DBGF12);
+			atomic_or(&me->kd_flags, KEYBOARD_DEVICE_FLAG_DBGF12);
 #endif /* KEYBOARD_DEVICE_FLAG_DBGF12 */
 		} else {
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
@@ -1346,7 +1336,7 @@ continue_copy_keymap:
 		static_assert(KEYBOARD_LED_SCROLLLOCK >> 8 == LED_SCR);
 		static_assert(KEYBOARD_LED_NUMLOCK >> 8 == LED_NUM);
 		static_assert(KEYBOARD_LED_CAPSLOCK >> 8 == LED_CAP);
-		leds = ATOMIC_READ(me->kd_leds);
+		leds = atomic_read(&me->kd_leds);
 		return ioctl_intarg_setu8(cmd, arg, (u8)((leds >> 8) & (LED_SCR | LED_NUM | LED_CAP)));
 	}	break;
 
@@ -1399,7 +1389,7 @@ continue_copy_keymap:
 		static_assert(KEYMOD_SCROLLLOCK >> 8 == K_SCROLLLOCK);
 		static_assert(KEYMOD_NUMLOCK >> 8 == K_NUMLOCK);
 		static_assert(KEYMOD_CAPSLOCK >> 8 == K_CAPSLOCK);
-		mods = ATOMIC_READ(me->kd_mods);
+		mods = atomic_read(&me->kd_mods);
 		return ioctl_intarg_setu8(cmd, arg, (u8)((mods >> 8) & (K_SCROLLLOCK | K_NUMLOCK | K_CAPSLOCK)));
 	}	break;
 
@@ -1413,9 +1403,9 @@ continue_copy_keymap:
 			      new_mask >> 8);
 		}
 		do {
-			old_mods = ATOMIC_READ(me->kd_mods);
+			old_mods = atomic_read(&me->kd_mods);
 			new_mods = (old_mods & ~((K_SCROLLLOCK | K_NUMLOCK | K_CAPSLOCK) << 8)) | new_mask;
-		} while (!ATOMIC_CMPXCH(me->kd_mods, old_mods, new_mods));
+		} while (!atomic_cmpxch(&me->kd_mods, old_mods, new_mods));
 		return 0;
 	}	break;
 

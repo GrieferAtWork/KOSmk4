@@ -51,8 +51,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/printk.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <compat/config.h>
 #include <kos/exec/rtld.h> /* RTLD_LIBDL */
 #include <sys/mkdev.h>

@@ -32,8 +32,6 @@
 #include <kernel/x86/syscall-tables.h>
 #include <sched/rpc.h>
 
-#include <hybrid/atomic.h>
-
 #include <asm/syscalls32_d.h>
 #include <asm/unistd.h>
 #include <kos/kernel/cpu-state-helpers.h>

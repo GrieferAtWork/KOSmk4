@@ -41,14 +41,13 @@
 #include <sched/group.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
-
 #include <sys/filio.h>
 #include <sys/io.h>
 #include <sys/param.h> /* NBBY */
 #include <sys/stat.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <int128.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -522,26 +521,26 @@ devkmem_v_wrq(struct vioargs *__restrict UNUSED(args), vio_addr_t addr, uint64_t
 PRIVATE NONNULL((1)) uint8_t LIBVIO_CC
 devkmem_v_cmpxchb(struct vioargs *__restrict UNUSED(args), vio_addr_t addr,
                   uint8_t oldvalue, uint8_t newvalue, bool UNUSED(atomic)) {
-	return ATOMIC_CMPXCH_VAL(*(uint8_t *)(uintptr_t)addr, oldvalue, newvalue);
+	return atomic_cmpxch_val((uint8_t *)(uintptr_t)addr, oldvalue, newvalue);
 }
 
 PRIVATE NONNULL((1)) uint16_t LIBVIO_CC
 devkmem_v_cmpxchw(struct vioargs *__restrict UNUSED(args), vio_addr_t addr,
                   uint16_t oldvalue, uint16_t newvalue, bool UNUSED(atomic)) {
-	return ATOMIC_CMPXCH_VAL(*(uint16_t *)(uintptr_t)addr, oldvalue, newvalue);
+	return atomic_cmpxch_val((uint16_t *)(uintptr_t)addr, oldvalue, newvalue);
 }
 
 PRIVATE NONNULL((1)) uint32_t LIBVIO_CC
 devkmem_v_cmpxchl(struct vioargs *__restrict UNUSED(args), vio_addr_t addr,
                   uint32_t oldvalue, uint32_t newvalue, bool UNUSED(atomic)) {
-	return ATOMIC_CMPXCH_VAL(*(uint32_t *)(uintptr_t)addr, oldvalue, newvalue);
+	return atomic_cmpxch_val((uint32_t *)(uintptr_t)addr, oldvalue, newvalue);
 }
 
 #if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 PRIVATE NONNULL((1)) uint64_t LIBVIO_CC
 devkmem_v_cmpxchq(struct vioargs *__restrict UNUSED(args), vio_addr_t addr,
                   uint64_t oldvalue, uint64_t newvalue, bool UNUSED(atomic)) {
-	return ATOMIC_CMPXCH_VAL(*(uint64_t *)(uintptr_t)addr, oldvalue, newvalue);
+	return atomic_cmpxch_val((uint64_t *)(uintptr_t)addr, oldvalue, newvalue);
 }
 #endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 
@@ -554,7 +553,7 @@ PRIVATE NONNULL((1)) uint128_t LIBVIO_CC
 devkmem_v_cmpxchx(struct vioargs *__restrict UNUSED(args), vio_addr_t addr,
                   uint128_t oldvalue, uint128_t newvalue, bool UNUSED(atomic)) {
 #ifndef __INTELLISENSE__
-	return ATOMIC_CMPXCH_VAL(*(uint128_t *)(uintptr_t)addr, oldvalue, newvalue);
+	return atomic_cmpxch_val((uint128_t *)(uintptr_t)addr, oldvalue, newvalue);
 #endif /* !__INTELLISENSE__ */
 }
 #endif
@@ -732,10 +731,10 @@ devrandom_v_pollconnect(struct mfile *__restrict UNUSED(self),
 		 * at least NBBY  bits have become  available. */
 		for (;;) {
 			size_t oldval;
-			oldval = ATOMIC_READ(entropy_request_bits);
+			oldval = atomic_read(&entropy_request_bits);
 			if (oldval <= NBBY)
 				break;
-			if (ATOMIC_CMPXCH_WEAK(entropy_request_bits,
+			if (atomic_cmpxch_weak(&entropy_request_bits,
 			                       oldval, NBBY))
 				break;
 		}
@@ -748,7 +747,7 @@ devrandom_v_polltest(struct mfile *__restrict UNUSED(self),
 		THROWS(...) {
 	/* Wait for non-deterministic random data to become available! */
 	if (what & POLLINMASK) {
-		if (ATOMIC_READ(entropy_bits) >= NBBY)
+		if (atomic_read(&entropy_bits) >= NBBY)
 			return what & POLLINMASK;
 	}
 	return 0;
@@ -759,7 +758,7 @@ devrandom_v_stat(struct mfile *__restrict self,
                  USER CHECKED struct stat *result)
 		THROWS(...) {
 	/* Expose the # of available entropy bytes via stat. */
-	result->st_size = ATOMIC_READ(entropy_bits) / NBBY;
+	result->st_size = atomic_read(&entropy_bits) / NBBY;
 
 	/* Forward to filling in timestamp information. */
 	nullfile_v_stat(self, result);

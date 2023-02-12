@@ -37,7 +37,6 @@
 #include <sched/sigmask.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/host.h>
 #include <hybrid/minmax.h>
 

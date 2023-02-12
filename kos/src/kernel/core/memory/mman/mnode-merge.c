@@ -38,11 +38,10 @@
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/printk.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/lockop.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -96,11 +95,11 @@ DECL_BEGIN
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL mpart_canmerge_chkdma)(struct mpart *__restrict self) {
 	struct mpartmeta *meta;
-	if ((meta = self->mp_meta) != NULL && ATOMIC_READ(meta->mpm_dmalocks) != 0) {
-		ATOMIC_OR(self->mp_xflags, MPART_XF_MERGE_AFTER_DMA);
-		if (ATOMIC_READ(meta->mpm_dmalocks) != 0)
+	if ((meta = self->mp_meta) != NULL && atomic_read(&meta->mpm_dmalocks) != 0) {
+		atomic_or(&self->mp_xflags, MPART_XF_MERGE_AFTER_DMA);
+		if (atomic_read(&meta->mpm_dmalocks) != 0)
 			return false;
-		ATOMIC_AND(self->mp_xflags, ~MPART_XF_MERGE_AFTER_DMA);
+		atomic_and(&self->mp_xflags, ~MPART_XF_MERGE_AFTER_DMA);
 	}
 	return true;
 }
@@ -145,7 +144,7 @@ NOTHROW(FCALL mnode_canmerge)(struct mnode *lonode,
 			goto nope;
 
 		/* Check if the 2 parts are sequentially consistent. */
-		if (ATOMIC_READ(lopart->mp_file) != ATOMIC_READ(hipart->mp_file))
+		if (atomic_read(&lopart->mp_file) != atomic_read(&hipart->mp_file))
 			goto nope;
 		if (mpart_isanon_atomic(lopart)) {
 			if unlikely(!mpart_isanon_atomic(hipart))
@@ -210,7 +209,7 @@ PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) bool
 NOTHROW(FCALL mpart_canmerge)(struct mpart *lopart,
                               struct mpart *hipart) {
 	/* Check if the 2 parts reference the same file. */
-	if (ATOMIC_READ(lopart->mp_file) != ATOMIC_READ(hipart->mp_file))
+	if (atomic_read(&lopart->mp_file) != atomic_read(&hipart->mp_file))
 		goto nope;
 
 	/* Check if the 2 parts are continuous. */
@@ -322,7 +321,7 @@ NOTHROW(FCALL mergenodes_lop_cb)(Toblockop(mman) *__restrict lop,
 	decref_nokill(self);
 
 	/* Indicate that we're now running the async-mergenodes function. */
-	ATOMIC_WRITE(lop->olo_func, MERGENODES_LOP_FUNC_RUNNING);
+	atomic_write(&lop->olo_func, MERGENODES_LOP_FUNC_RUNNING);
 
 	/* Merge nodes by use of `mman_mergenodes_locked()', however
 	 * if we get into a situation where we need to wait for  the
@@ -339,7 +338,7 @@ NOTHROW(FCALL mergenodes_lop_cb)(Toblockop(mman) *__restrict lop,
 	 * one point have  now been merged,  meaning that we  can
 	 * safely switch back to the initial INACTIVE state. */
 	if (lop->olo_func == MERGENODES_LOP_FUNC_RUNNING)
-		ATOMIC_WRITE(lop->olo_func, MERGENODES_LOP_FUNC_INACTIVE);
+		atomic_write(&lop->olo_func, MERGENODES_LOP_FUNC_INACTIVE);
 	return NULL;
 }
 
@@ -364,7 +363,7 @@ NOTHROW(FCALL mergenode_waitfor_mpart_postlop)(Tobpostlockop(mpart) *__restrict 
 	 * consistency, race  conditions,  and  simplicity,  we
 	 * temporarily  switch to INACTIVE, only to immediately
 	 * re-start. */
-	ATOMIC_WRITE(lop->mml_mm_lop.olo_func, MERGENODES_LOP_FUNC_INACTIVE);
+	atomic_write(&lop->mml_mm_lop.olo_func, MERGENODES_LOP_FUNC_INACTIVE);
 
 	/* Merge nodes of the mman. */
 	mman_mergenodes(mm);
@@ -381,7 +380,7 @@ NOTHROW(FCALL mergenode_waitfor_mpart_lop)(Toblockop(mpart) *__restrict lop,
 
 	/* Do the rest of the work from a post-lockop.
 	 * NOTE: This also inherit the reference to `self' */
-	ATOMIC_WRITE(post->oplo_func, &mergenode_waitfor_mpart_postlop);
+	atomic_write(&post->oplo_func, &mergenode_waitfor_mpart_postlop);
 	return post;
 }
 
@@ -401,7 +400,7 @@ NOTHROW(FCALL async_waitfor_part_and_mergenodes)(struct mman *__restrict self,
 	/* (try to) switch over into WAITFOR_MPART-mode. */
 	lop = &FORMMAN(self, thismman_mergenodes_lop);
 	do {
-		func = ATOMIC_READ(lop->mml_mm_lop.olo_func);
+		func = atomic_read(&lop->mml_mm_lop.olo_func);
 		if (func != MERGENODES_LOP_FUNC_INACTIVE &&
 		    func != MERGENODES_LOP_FUNC_RUNNING) {
 			/* Something that will eventually call mergenodes is already set-up!
@@ -410,7 +409,7 @@ NOTHROW(FCALL async_waitfor_part_and_mergenodes)(struct mman *__restrict self,
 			decref_nokill(blocking_part);
 			return;
 		}
-	} while (!ATOMIC_CMPXCH(lop->mml_mm_lop.olo_func, func,
+	} while (!atomic_cmpxch(&lop->mml_mm_lop.olo_func, func,
 	                        MERGENODES_LOP_FUNC_WAITFOR_MPART));
 
 	/* Enqueue the lockop into `blocking_part' */
@@ -430,7 +429,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL async_mergenodes)(struct mman *__restrict self) {
 	union mman_mergenodes_lop *lop;
 	lop = &FORMMAN(self, thismman_mergenodes_lop);
-	if (ATOMIC_CMPXCH(lop->mml_mm_lop.olo_func,
+	if (atomic_cmpxch(&lop->mml_mm_lop.olo_func,
 	                  MERGENODES_LOP_FUNC_INACTIVE,
 	                  MERGENODES_LOP_FUNC_PENDING)) {
 		incref(self); /* Inherited by `mergenodes_lop_cb()' */
@@ -948,7 +947,7 @@ NOTHROW(FCALL mnode_trymerge_with_partlock)(struct mnode *__restrict self,
 
 	/* Try to acquire a lock to the mman. */
 	if (!mman_lock_tryacquire(mm)) {
-		if unlikely(ATOMIC_READ(self->mn_flags) & MNODE_F_UNMAPPED)
+		if unlikely(atomic_read(&self->mn_flags) & MNODE_F_UNMAPPED)
 			goto done_decref;
 
 		/* Must attempt an async merge of all nodes! */
@@ -1380,7 +1379,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 					loword = lopart->mp_blkst_ptr[0];
 					kfree(lopart->mp_blkst_ptr);
 				}
-				ATOMIC_OR(lopart->mp_flags, MPART_F_BLKST_INL);
+				atomic_or(&lopart->mp_flags, MPART_F_BLKST_INL);
 			}
 			hiword = hipart->mp_blkst_inl;
 			if unlikely(!(hipart->mp_flags & MPART_F_BLKST_INL)) {
@@ -1701,10 +1700,10 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 	}
 
 	/* Deal with `hipart' having the GLOBAL_REF bit set. */
-	if (ATOMIC_FETCHAND(hipart->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF) {
+	if (atomic_fetchand(&hipart->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF) {
 		if (LIST_ISBOUND(lopart, mp_allparts) && !(lopart->mp_flags & MPART_F_GLOBAL_REF)) {
 			incref(lopart);
-			if unlikely(ATOMIC_FETCHOR(lopart->mp_flags, MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
+			if unlikely(atomic_fetchor(&lopart->mp_flags, MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
 				decref_nokill(lopart);
 		}
 		decref_nokill(hipart);
@@ -1713,7 +1712,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 	/* Destroy `hipart' */
 	decref_nokill(hipart->mp_file); /* Nokill, because `lopart' still has a REF! */
 	DBG_memset(&hipart->mp_mem_sc, 0xcc, sizeof(hipart->mp_mem_sc));
-	if (ATOMIC_CMPXCH(hipart->mp_refcnt, 1, 0)) {
+	if (atomic_cmpxch(&hipart->mp_refcnt, 1, 0)) {
 		assertf(LIST_EMPTY(&hipart->mp_copy) &&
 		        LIST_EMPTY(&hipart->mp_share),
 		        "Mem-nodes with the `MNODE_F_UNMAPPED' should use a lock-op "
@@ -1742,7 +1741,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 		hipart->mp_maxaddr   = (pos_t)lopart->mp_file->mf_part_amask;
 		hipart->mp_minaddr   = hipart->mp_maxaddr + 1;
 		hipart->mp_blkst_ptr = NULL;
-		ATOMIC_AND(hipart->mp_flags, ~MPART_F_BLKST_INL);
+		atomic_and(&hipart->mp_flags, ~MPART_F_BLKST_INL);
 		hipart->mp_file = incref(&mfile_anon[lopart->mp_file->mf_blockshift]);
 
 		/* Important: _ONLY_ re-initialize as anon when the part wasn't anon before!
@@ -2074,7 +2073,7 @@ NOTHROW(FCALL async_merge_part_post_cb)(Tobpostlockop(mpart) *__restrict self,
 	me     = container_of(self, struct async_merge_part, amp_part_post_lop);
 	merged = me->amp_mergeme; /* Inherit reference */
 	kfree(me);
-	ATOMIC_AND(merged->mp_xflags, ~MPART_XF_WILLMERGE);
+	atomic_and(&merged->mp_xflags, ~MPART_XF_WILLMERGE);
 	merged = mpart_merge(merged);
 	decref_unlikely(merged);
 }
@@ -2097,7 +2096,7 @@ PRIVATE NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(FCALL async_waitfor_part_and_mergepart)(struct mpart *part_to_wait,
                                                 struct mpart *part_to_merge) {
 	struct async_merge_part *lop;
-	if (ATOMIC_FETCHOR(part_to_merge->mp_xflags, MPART_XF_WILLMERGE) & MPART_XF_WILLMERGE)
+	if (atomic_fetchor(&part_to_merge->mp_xflags, MPART_XF_WILLMERGE) & MPART_XF_WILLMERGE)
 		return false;
 	lop = (struct async_merge_part *)merge_malloc(sizeof(struct async_merge_part), part_to_merge);
 	if (!lop)
@@ -2124,7 +2123,7 @@ NOTHROW(FCALL async_merge_ftxlck_post_cb)(Tobpostlockop(mpart) *__restrict self,
 	me     = container_of(self, struct async_merge_part, amp_file_post_lop);
 	merged = me->amp_mergeme; /* Inherit reference */
 	kfree(me);
-	ATOMIC_AND(merged->mp_xflags, ~MPART_XF_WILLMERGE);
+	atomic_and(&merged->mp_xflags, ~MPART_XF_WILLMERGE);
 	merged = mpart_merge(merged);
 	decref_unlikely(merged);
 }
@@ -2144,7 +2143,7 @@ PRIVATE NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(FCALL async_waitfor_ftxlck_and_mergepart)(struct mpart *part_to_wait,
                                                   struct mpart *part_to_merge) {
 	struct async_merge_part *lop;
-	if (ATOMIC_FETCHOR(part_to_merge->mp_xflags, MPART_XF_WILLMERGE) & MPART_XF_WILLMERGE)
+	if (atomic_fetchor(&part_to_merge->mp_xflags, MPART_XF_WILLMERGE) & MPART_XF_WILLMERGE)
 		return false;
 	lop = (struct async_merge_part *)merge_malloc(sizeof(struct async_merge_part), part_to_merge);
 	if (!lop)
@@ -2176,7 +2175,7 @@ NOTHROW(FCALL async_merge_file_post_cb)(Tobpostlockop(mfile) *__restrict self,
 	me     = container_of(self, struct async_merge_part, amp_file_post_lop);
 	merged = me->amp_mergeme; /* Inherit reference */
 	kfree(me);
-	ATOMIC_AND(merged->mp_xflags, ~MPART_XF_WILLMERGE);
+	atomic_and(&merged->mp_xflags, ~MPART_XF_WILLMERGE);
 	merged = mpart_merge(merged);
 	decref_unlikely(merged);
 }
@@ -2196,7 +2195,7 @@ PRIVATE NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(FCALL async_waitfor_file_and_mergepart)(struct mfile *file_to_wait,
                                                 struct mpart *part_to_merge) {
 	struct async_merge_part *lop;
-	if (ATOMIC_FETCHOR(part_to_merge->mp_xflags, MPART_XF_WILLMERGE) & MPART_XF_WILLMERGE)
+	if (atomic_fetchor(&part_to_merge->mp_xflags, MPART_XF_WILLMERGE) & MPART_XF_WILLMERGE)
 		return false;
 	lop = (struct async_merge_part *)merge_malloc(sizeof(struct async_merge_part), part_to_merge);
 	if (!lop)
@@ -2228,7 +2227,7 @@ NOTHROW(FCALL async_merge_mman_post_cb)(Tobpostlockop(mman) *__restrict self,
 	me     = container_of(self, struct async_merge_part, amp_mman_post_lop);
 	merged = me->amp_mergeme; /* Inherit reference */
 	kfree(me);
-	ATOMIC_AND(merged->mp_xflags, ~MPART_XF_WILLMERGE);
+	atomic_and(&merged->mp_xflags, ~MPART_XF_WILLMERGE);
 	merged = mpart_merge(merged);
 	decref_unlikely(merged);
 }
@@ -2248,7 +2247,7 @@ PRIVATE NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(FCALL async_waitfor_mman_and_mergepart)(struct mman *mman_to_wait,
                                                 struct mpart *part_to_merge) {
 	struct async_merge_part *lop;
-	if (ATOMIC_FETCHOR(part_to_merge->mp_xflags, MPART_XF_WILLMERGE) & MPART_XF_WILLMERGE)
+	if (atomic_fetchor(&part_to_merge->mp_xflags, MPART_XF_WILLMERGE) & MPART_XF_WILLMERGE)
 		return false;
 	lop = (struct async_merge_part *)merge_malloc(sizeof(struct async_merge_part), part_to_merge);
 	if (!lop)

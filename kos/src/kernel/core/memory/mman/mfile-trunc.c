@@ -33,12 +33,12 @@
 #include <sched/sig.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -103,19 +103,19 @@ mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(struct mfile *__res
 			 * do so). */
 			if (iter->mp_flags & MPART_F_CHANGED) {
 				if unlikely(self->mf_changed.slh_first == MFILE_PARTS_ANONYMOUS) {
-					ATOMIC_AND(iter->mp_flags, ~MPART_F_CHANGED);
+					atomic_and(&iter->mp_flags, ~MPART_F_CHANGED);
 					DBG_memset(&iter->mp_changed, 0xcc, sizeof(iter->mp_changed));
 				} else {
 					struct mpartmeta *meta = iter->mp_meta;
 					assert(self->mf_changed.slh_first != NULL);
-					if (meta != NULL && ATOMIC_READ(meta->mpm_dmalocks) != 0) {
+					if (meta != NULL && atomic_read(&meta->mpm_dmalocks) != 0) {
 						/* Have to wait for this one... */
 						incref(iter);
 						mfile_unlock_and_decref_parts(self);
 						mfile_lock_endwrite(self);
 						FINALLY_DECREF_UNLIKELY(iter);
 						task_connect(&meta->mpm_dma_done);
-						if unlikely(ATOMIC_READ(meta->mpm_dmalocks) == 0) {
+						if unlikely(atomic_read(&meta->mpm_dmalocks) == 0) {
 							task_disconnectall();
 							return false;
 						}
@@ -266,7 +266,7 @@ handle_newsize_ge_oldsize:
 
 		/* Verify that  the foreign  trunc-lock still  exists.
 		 * Also check that the file-size hasn't changed again. */
-		if unlikely(ATOMIC_READ(self->mf_trunclock) != 0 ||
+		if unlikely(atomic_read(&self->mf_trunclock) != 0 ||
 		            old_size != mfile_getsize(self)) {
 			task_disconnectall();
 			goto again;
@@ -398,7 +398,7 @@ again_reacquire_after_split:
 					mfile_lock_endwrite(self);
 					assert(!task_wasconnected());
 					task_connect(&self->mf_initdone);
-					if unlikely(ATOMIC_READ(self->mf_trunclock) != 0) {
+					if unlikely(atomic_read(&self->mf_trunclock) != 0) {
 						task_disconnectall();
 						goto again_reacquire_after_split;
 					}
@@ -475,7 +475,7 @@ after_file_size_changed:
 		part->mp_filent.rb_rhs = NULL; /* Indicator for `mpart_trim()' */
 
 		/* Mark the part as anonymous */
-		ATOMIC_WRITE(part->mp_filent.rb_par, (struct mpart *)-1);
+		atomic_write(&part->mp_filent.rb_par, (struct mpart *)-1);
 
 		/* Assign the relevant anonymous-memory file for use during any future access. */
 		assert(part->mp_file == self);
@@ -493,13 +493,13 @@ after_file_size_changed:
 				SLIST_REMOVE(&self->mf_changed, part, mp_changed);
 				decref_nokill(part); /* From `self->mf_changed' */
 			}
-			ATOMIC_AND(part->mp_flags, ~MPART_F_CHANGED);
+			atomic_and(&part->mp_flags, ~MPART_F_CHANGED);
 		}
 		DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
 
 		/* Anonymous parts mustn't be holding global references! */
 		if ((part->mp_flags & MPART_F_GLOBAL_REF) &&
-		    (ATOMIC_FETCHAND(part->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF))
+		    (atomic_fetchand(&part->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF))
 			decref_nokill(part);
 
 		/* And with that, this part's been marked made anonymous! */

@@ -34,11 +34,11 @@
 #include <kernel/rand.h>
 #include <sched/group.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/bit.h>
 #include <hybrid/overflow.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
@@ -153,10 +153,10 @@ NOTHROW(KCALL pmemzone_set_fmax)(struct pmemzone *__restrict self,
 	 * the zone, to-be used as a hint for the allocator. */
 	physpage_t free_max;
 	do {
-		free_max = ATOMIC_READ(self->mz_fmax);
+		free_max = atomic_read(&self->mz_fmax);
 		if (free_max > new_free_max)
 			break;
-	} while (!ATOMIC_CMPXCH_WEAK(self->mz_fmax, free_max, new_free_max));
+	} while (!atomic_cmpxch_weak(&self->mz_fmax, free_max, new_free_max));
 }
 
 PRIVATE NOBLOCK void
@@ -169,14 +169,14 @@ NOTHROW(KCALL zone_free_keepz)(struct pmemzone *__restrict self,
 	assert(num_pages);
 	assert(zone_relative_base + num_pages > zone_relative_base);
 	assert(zone_relative_base + num_pages - 1 <= self->mz_rmax);
-	ATOMIC_FETCHADD(self->mz_cfree, num_pages);
+	atomic_fetchadd(&self->mz_cfree, num_pages);
 	pmemzone_set_fmax(self, zone_relative_base + num_pages - 1);
 	i = (size_t)(zone_relative_base / PAGES_PER_WORD);
 	num_qpages = 0;
 	if (num_pages == 1) {
 		mask   = (uintptr_t)PMEMZONE_ISFREEMASK
 		       << (unsigned int)((zone_relative_base % PAGES_PER_WORD) * PMEMZONE_BITSPERPAGE);
-		oldval = ATOMIC_FETCHOR(self->mz_free[i], mask);
+		oldval = atomic_fetchor(&self->mz_free[i], mask);
 		assertf(!(oldval & mask), "Double free at %" PRIpN(__SIZEOF_PHYSPAGE_T__),
 		        (physpage_t)(self->mz_start + zone_relative_base));
 		if (oldval & (mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)))
@@ -193,7 +193,7 @@ NOTHROW(KCALL zone_free_keepz)(struct pmemzone *__restrict self,
 				mask &= (((uintptr_t)1 << (num_free * PMEMZONE_BITSPERPAGE)) - 1);
 			}
 			mask <<= misalignment * PMEMZONE_BITSPERPAGE;
-			oldval = ATOMIC_FETCHOR(self->mz_free[i], mask);
+			oldval = atomic_fetchor(&self->mz_free[i], mask);
 			assertf(!(oldval & mask),
 			        "Double free at near %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n",
 			        "oldval        = %" PRIXPTR "\n"
@@ -209,7 +209,7 @@ NOTHROW(KCALL zone_free_keepz)(struct pmemzone *__restrict self,
 		}
 		while (num_pages >= PAGES_PER_WORD) {
 			/* Free full words. */
-			oldval = ATOMIC_FETCHOR(self->mz_free[i], PMEMBITSET_FREEMASK);
+			oldval = atomic_fetchor(&self->mz_free[i], PMEMBITSET_FREEMASK);
 			assertf(!(oldval & PMEMBITSET_FREEMASK),
 			        "Double free at near %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
 			        "oldval      = %" PRIXPTR "\n"
@@ -224,7 +224,7 @@ NOTHROW(KCALL zone_free_keepz)(struct pmemzone *__restrict self,
 		if (num_pages) {
 			mask = PMEMBITSET_FREEMASK;
 			mask &= ((uintptr_t)1 << ((unsigned int)num_pages * PMEMZONE_BITSPERPAGE)) - 1;
-			oldval = ATOMIC_FETCHOR(self->mz_free[i], mask);
+			oldval = atomic_fetchor(&self->mz_free[i], mask);
 			assertf(!(oldval & mask),
 			        "Double free at near %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
 			        "oldval        = %" PRIXPTR "\n"
@@ -236,16 +236,16 @@ NOTHROW(KCALL zone_free_keepz)(struct pmemzone *__restrict self,
 		}
 	}
 	if (num_qpages)
-		ATOMIC_FETCHADD(self->mz_qfree, num_qpages);
+		atomic_fetchadd(&self->mz_qfree, num_qpages);
 }
 
 
 #ifdef NDEBUG
-#define ASSIGN_OLDVAL                /* nothing */
-#define ASSIGN_OLDVAL_ATOMIC_FETCHOR ATOMIC_OR
+#define oldval__eq                 /* nothing */
+#define oldval__eq__atomic_fetchor atomic_or
 #else /* NDEBUG */
-#define ASSIGN_OLDVAL                oldval =
-#define ASSIGN_OLDVAL_ATOMIC_FETCHOR oldval = ATOMIC_FETCHOR
+#define oldval__eq                 oldval =
+#define oldval__eq__atomic_fetchor oldval = atomic_fetchor
 #endif /* !NDEBUG */
 
 PRIVATE NOBLOCK void
@@ -260,15 +260,15 @@ NOTHROW(KCALL zone_free)(struct pmemzone *__restrict self,
 	assert(num_pages);
 	assert(zone_relative_base + num_pages > zone_relative_base);
 	assert(zone_relative_base + num_pages - 1 <= self->mz_rmax);
-	ATOMIC_FETCHADD(self->mz_cfree, num_pages);
-	ATOMIC_FETCHADD(self->mz_qfree, num_pages);
+	atomic_fetchadd(&self->mz_cfree, num_pages);
+	atomic_fetchadd(&self->mz_qfree, num_pages);
 	pmemzone_set_fmax(self, zone_relative_base + num_pages - 1);
 	i = (size_t)(zone_relative_base / PAGES_PER_WORD);
 	if (num_pages == 1) {
 		mask = (uintptr_t)(PMEMZONE_ISFREEMASK | PMEMZONE_ISUNDFBIT)
 		       << (unsigned int)((zone_relative_base % PAGES_PER_WORD) *
 		                         PMEMZONE_BITSPERPAGE);
-		ASSIGN_OLDVAL_ATOMIC_FETCHOR(self->mz_free[i], mask);
+		oldval__eq__atomic_fetchor(&self->mz_free[i], mask);
 		assertf(!(oldval & (mask & PMEMBITSET_FREEMASK)),
 		        "Double free at %" PRIpN(__SIZEOF_PHYSPAGE_T__),
 		        (physpage_t)(self->mz_start + zone_relative_base));
@@ -284,7 +284,7 @@ NOTHROW(KCALL zone_free)(struct pmemzone *__restrict self,
 				mask &= (((uintptr_t)1 << (num_free * PMEMZONE_BITSPERPAGE)) - 1);
 			}
 			mask <<= misalignment * PMEMZONE_BITSPERPAGE;
-			ASSIGN_OLDVAL_ATOMIC_FETCHOR(self->mz_free[i], mask);
+			oldval__eq__atomic_fetchor(&self->mz_free[i], mask);
 			assertf(!(oldval & (mask & PMEMBITSET_FREEMASK)),
 			        "Double free at near %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
 			        "oldval        = %" PRIXPTR "\n"
@@ -300,7 +300,7 @@ NOTHROW(KCALL zone_free)(struct pmemzone *__restrict self,
 		}
 		while (num_pages >= PAGES_PER_WORD) {
 			/* Free full words. */
-			ASSIGN_OLDVAL_ATOMIC_FETCHOR(self->mz_free[i],
+			oldval__eq__atomic_fetchor(&self->mz_free[i],
 			                             (PMEMBITSET_FREEMASK |
 			                              PMEMBITSET_UNDFMASK));
 			assertf(!(oldval & PMEMBITSET_FREEMASK),
@@ -317,7 +317,7 @@ NOTHROW(KCALL zone_free)(struct pmemzone *__restrict self,
 		if (num_pages) {
 			mask = (PMEMBITSET_FREEMASK | PMEMBITSET_UNDFMASK);
 			mask &= ((uintptr_t)1 << ((unsigned int)num_pages * PMEMZONE_BITSPERPAGE)) - 1;
-			ASSIGN_OLDVAL_ATOMIC_FETCHOR(self->mz_free[i], mask);
+			oldval__eq__atomic_fetchor(&self->mz_free[i], mask);
 			assertf(!(oldval & (mask & PMEMBITSET_FREEMASK)),
 			        "Double free at near %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
 			        "oldval        = %" PRIXPTR "\n"
@@ -330,7 +330,7 @@ NOTHROW(KCALL zone_free)(struct pmemzone *__restrict self,
 #endif
 	}
 }
-#undef ASSIGN_OLDVAL
+#undef oldval__eq
 
 #ifndef NDEBUG
 #define set_cfree_word(pword, mask) \
@@ -350,8 +350,8 @@ NOTHROW(KCALL set_cfree_word)(uintptr_t *__restrict pword,
 {
 	uintptr_t oldval;
 	do {
-		oldval = ATOMIC_READ(*pword);
-	} while (!ATOMIC_CMPXCH_WEAK(*pword, oldval,
+		oldval = atomic_read(pword);
+	} while (!atomic_cmpxch_weak(pword, oldval,
 	                             (oldval & ~mask) |
 	                             (PMEMBITSET_FREEMASK & mask)));
 	assertf(!(oldval & (mask & PMEMBITSET_FREEMASK)),
@@ -373,7 +373,7 @@ NOTHROW(KCALL zone_cfree)(struct pmemzone *__restrict self,
 	assert(num_pages);
 	assert(zone_relative_base + num_pages > zone_relative_base);
 	assert(zone_relative_base + num_pages - 1 <= self->mz_rmax);
-	ATOMIC_FETCHADD(self->mz_cfree, num_pages);
+	atomic_fetchadd(&self->mz_cfree, num_pages);
 	pmemzone_set_fmax(self, zone_relative_base + num_pages - 1);
 	i = (size_t)(zone_relative_base / PAGES_PER_WORD);
 	if (num_pages == 1) {
@@ -458,17 +458,17 @@ NOTHROW(KCALL page_freeone)(physpage_t page) {
 		page -= zone->mz_start;
 		i = (size_t)(page / PAGES_PER_WORD);
 		j = (unsigned int)(page % PAGES_PER_WORD);
-		ATOMIC_INC(zone->mz_cfree);
-		ATOMIC_INC(zone->mz_qfree);
+		atomic_inc(&zone->mz_cfree);
+		atomic_inc(&zone->mz_qfree);
 		mask = (uintptr_t)(PMEMZONE_ISFREEMASK | PMEMZONE_ISUNDFMASK)
 		       << (j * PMEMZONE_BITSPERPAGE);
 #ifndef NDEBUG
-		oldval = ATOMIC_FETCHOR(zone->mz_free[i], mask);
+		oldval = atomic_fetchor(&zone->mz_free[i], mask);
 		assertf(!(oldval & (mask & PMEMBITSET_FREEMASK)),
 		        "Double free at %" PRIpN(__SIZEOF_PHYSPAGE_T__),
 		        (physpage_t)page);
 #else /* !NDEBUG */
-		ATOMIC_OR(zone->mz_free[i], mask);
+		atomic_or(&zone->mz_free[i], mask);
 #endif /* NDEBUG */
 		assert_free(page + zone->mz_start, 1);
 		break;
@@ -682,7 +682,7 @@ again:
 		if (zone->mz_cfree < num_pages)
 			continue; /* Zone is too small. */
 		/* Search this zone. */
-		free_max = ATOMIC_READ(zone->mz_fmax);
+		free_max = atomic_read(&zone->mz_fmax);
 		if ((physpagecnt_t)free_max >= num_pages) {
 			result = zone_malloc_before(zone, free_max, num_pages);
 			if (result != PHYSPAGE_INVALID) {
@@ -690,7 +690,7 @@ again:
 				TRACE_ALLOC(zone,
 				            result + zone->mz_start,
 				            result + zone->mz_start + num_pages - 1);
-				ATOMIC_CMPXCH(zone->mz_fmax, free_max,
+				atomic_cmpxch(&zone->mz_fmax, free_max,
 				              result ? result - 1
 				                     : zone->mz_rmax);
 				return result + zone->mz_start;
@@ -704,7 +704,7 @@ again:
 			TRACE_ALLOC(zone,
 			            result + zone->mz_start,
 			            result + zone->mz_start + num_pages - 1);
-			ATOMIC_CMPXCH(zone->mz_fmax, free_max,
+			atomic_cmpxch(&zone->mz_fmax, free_max,
 			              result ? result - 1
 			                     : zone->mz_rmax);
 			return result + zone->mz_start;
@@ -735,7 +735,7 @@ again:
 		if unlikely(!zone->mz_cfree)
 			continue; /* Zone is too small. */
 		/* Search this zone. */
-		free_max = ATOMIC_READ(zone->mz_fmax);
+		free_max = atomic_read(&zone->mz_fmax);
 		if likely((physpagecnt_t)free_max >= 1) {
 			result = zone_mallocone_before(zone, free_max);
 			if likely(result != PHYSPAGE_INVALID) {
@@ -743,7 +743,7 @@ again:
 				TRACE_ALLOC(zone,
 				            result + zone->mz_start,
 				            result + zone->mz_start);
-				ATOMIC_CMPXCH(zone->mz_fmax, free_max,
+				atomic_cmpxch(&zone->mz_fmax, free_max,
 				              result ? result - 1
 				                     : zone->mz_rmax);
 				return result + zone->mz_start;
@@ -757,7 +757,7 @@ again:
 			TRACE_ALLOC(zone,
 			            result + zone->mz_start,
 			            result + zone->mz_start);
-			ATOMIC_CMPXCH(zone->mz_fmax, free_max,
+			atomic_cmpxch(&zone->mz_fmax, free_max,
 			              result ? result - 1
 			                     : zone->mz_rmax);
 			return result + zone->mz_start;
@@ -805,7 +805,7 @@ again:
 		if unlikely(zone->mz_cfree < min_pages)
 			continue; /* Zone is too small. */
 		/* Search this zone. */
-		free_max = ATOMIC_READ(zone->mz_fmax);
+		free_max = atomic_read(&zone->mz_fmax);
 		if likely((physpagecnt_t)free_max >= min_pages) {
 #ifndef NDEBUG
 			*res_pages = (physpagecnt_t)-1;
@@ -824,7 +824,7 @@ again:
 				            result + zone->mz_start,
 				            result + zone->mz_start + *res_pages - 1);
 				assert_allocation(result + zone->mz_start, *res_pages);
-				ATOMIC_CMPXCH(zone->mz_fmax, free_max,
+				atomic_cmpxch(&zone->mz_fmax, free_max,
 				              result ? result - 1
 				                     : zone->mz_rmax);
 				return result + zone->mz_start;
@@ -858,7 +858,7 @@ again:
 			            result + zone->mz_start,
 			            result + zone->mz_start + *res_pages - 1);
 			assert_allocation(result + zone->mz_start, *res_pages);
-			ATOMIC_CMPXCH(zone->mz_fmax, free_max,
+			atomic_cmpxch(&zone->mz_fmax, free_max,
 			              result ? result - 1
 			                     : zone->mz_rmax);
 			return result + zone->mz_start;
@@ -891,13 +891,13 @@ again:
 			i      = (size_t)(ptr / PAGES_PER_WORD);
 			j      = (unsigned int)(ptr % PAGES_PER_WORD);
 			mask   = (uintptr_t)PMEMZONE_ISFREEMASK << (j * PMEMZONE_BITSPERPAGE);
-			oldval = ATOMIC_FETCHAND(zone->mz_free[i], ~mask);
+			oldval = atomic_fetchand(&zone->mz_free[i], ~mask);
 			if (!(oldval & mask))
 				return PAGE_MALLOC_AT_NOTFREE; /* Page was already allocated */
 			TRACE_ALLOC(zone, ptr ,ptr);
-			ATOMIC_DEC(zone->mz_cfree);
+			atomic_dec(&zone->mz_cfree);
 			if (oldval & (mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)))
-				ATOMIC_DEC(zone->mz_qfree);
+				atomic_dec(&zone->mz_qfree);
 			return PAGE_MALLOC_AT_SUCCESS;
 		}
 	} while ((zone = zone->mz_prev) != NULL);
@@ -966,7 +966,7 @@ again:
 
 		if (relative_min_page == 0) {
 			/* Search this zone. */
-			free_max = ATOMIC_READ(zone->mz_fmax);
+			free_max = atomic_read(&zone->mz_fmax);
 			if (free_max > relative_max_page)
 				free_max = relative_max_page;
 			if ((physpagecnt_t)free_max >= min_pages) {
@@ -983,7 +983,7 @@ again:
 					            result + zone->mz_start,
 					            result + zone->mz_start + *res_pages - 1);
 					assert_allocation(result + zone->mz_start, *res_pages);
-					ATOMIC_CMPXCH(zone->mz_fmax, free_max,
+					atomic_cmpxch(&zone->mz_fmax, free_max,
 					              result ? result - 1
 					                     : zone->mz_rmax);
 					assert(result + *res_pages - 1 <= free_max);
@@ -1012,7 +1012,7 @@ again:
 				            result + zone->mz_start,
 				            result + zone->mz_start + *res_pages - 1);
 				assert_allocation(result + zone->mz_start, *res_pages);
-				ATOMIC_CMPXCH(zone->mz_fmax, free_max,
+				atomic_cmpxch(&zone->mz_fmax, free_max,
 				              result ? result - 1
 				                     : zone->mz_rmax);
 				assert(result + zone->mz_start >= min_page);
@@ -1021,7 +1021,7 @@ again:
 			}
 		} else {
 			/* Search this zone. */
-			free_max = ATOMIC_READ(zone->mz_fmax);
+			free_max = atomic_read(&zone->mz_fmax);
 			if (free_max > relative_max_page)
 				free_max = relative_max_page;
 			if ((physpagecnt_t)free_max >= min_pages) {
@@ -1038,7 +1038,7 @@ again:
 					            result + zone->mz_start,
 					            result + zone->mz_start + *res_pages - 1);
 					assert_allocation(result + zone->mz_start, *res_pages);
-					ATOMIC_CMPXCH(zone->mz_fmax, free_max,
+					atomic_cmpxch(&zone->mz_fmax, free_max,
 					              result ? result - 1
 					                     : zone->mz_rmax);
 					assert(result + zone->mz_start >= min_page);
@@ -1070,7 +1070,7 @@ again:
 				assert_allocation(result + zone->mz_start, *res_pages);
 				assert(result + zone->mz_start >= min_page);
 				assert(result + zone->mz_start + *res_pages - 1 <= max_page);
-				ATOMIC_CMPXCH(zone->mz_fmax, free_max,
+				atomic_cmpxch(&zone->mz_fmax, free_max,
 				              result ? result - 1
 				                     : zone->mz_rmax);
 				return result + zone->mz_start;
@@ -1104,7 +1104,7 @@ NOTHROW(KCALL page_isfree)(physpage_t page) {
 			i    = (size_t)(page / PAGES_PER_WORD);
 			j    = (unsigned int)(page % PAGES_PER_WORD);
 			mask = (uintptr_t)PMEMZONE_ISFREEMASK << (j * PMEMZONE_BITSPERPAGE);
-			return (ATOMIC_READ(zone->mz_free[i]) & mask) != 0;
+			return (atomic_read(&zone->mz_free[i]) & mask) != 0;
 		}
 	} while ((zone = zone->mz_prev) != NULL);
 	return false;
@@ -1119,8 +1119,8 @@ NOTHROW(KCALL page_stat)(struct pmemstat *__restrict result) {
 	result->ps_zfree = 0;
 	result->ps_used  = 0;
 	do {
-		physpagecnt_t cfree = ATOMIC_READ(zone->mz_cfree);
-		physpagecnt_t qfree = ATOMIC_READ(zone->mz_qfree);
+		physpagecnt_t cfree = atomic_read(&zone->mz_cfree);
+		physpagecnt_t qfree = atomic_read(&zone->mz_qfree);
 		result->ps_free += cfree;
 		result->ps_used += ((physpagecnt_t)zone->mz_rmax + 1) - cfree;
 		result->ps_zfree += cfree - qfree;
@@ -1165,7 +1165,7 @@ NOTHROW(KCALL page_iszero)(physpage_t page) {
 			i    = (size_t)(page / PAGES_PER_WORD);
 			j    = (unsigned int)(page % PAGES_PER_WORD);
 			mask = (uintptr_t)PMEMZONE_ISUNDFMASK << (j * PMEMZONE_BITSPERPAGE);
-			return !(ATOMIC_READ(zone->mz_free[i]) & mask);
+			return !(atomic_read(&zone->mz_free[i]) & mask);
 		}
 	} while ((zone = zone->mz_prev) != NULL);
 	return false;
@@ -1194,7 +1194,7 @@ NOTHROW(KCALL page_resetzeroone)(physpage_t page) {
 			i    = (size_t)(page / PAGES_PER_WORD);
 			j    = (unsigned int)(page % PAGES_PER_WORD);
 			mask = (uintptr_t)PMEMZONE_ISUNDFMASK << (j * PMEMZONE_BITSPERPAGE);
-			ATOMIC_OR(zone->mz_free[i], mask);
+			atomic_or(&zone->mz_free[i], mask);
 			return;
 		}
 	} while ((zone = zone->mz_prev) != NULL);

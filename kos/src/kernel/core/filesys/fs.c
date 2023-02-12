@@ -30,11 +30,10 @@
 #include <kernel/malloc.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <limits.h>
 #include <sched.h>
 #include <stddef.h>
@@ -153,8 +152,8 @@ fs_clone(struct fs *__restrict self, bool clone_vfs) THROWS(E_BADALLOC) {
 	result->fs_vfs    = incref(self->fs_vfs);
 	result->fs_refcnt = 1;
 	atomic_rwlock_init(&result->fs_pathlock);
-	result->fs_umask  = ATOMIC_READ(self->fs_umask);
-	result->fs_lnkmax = ATOMIC_READ(self->fs_lnkmax);
+	result->fs_umask  = atomic_read_relaxed(&self->fs_umask);
+	result->fs_lnkmax = atomic_read_relaxed(&self->fs_lnkmax);
 	atomic64_init(&result->fs_mode.f_atom, atomic64_read(&self->fs_mode.f_atom));
 	return result;
 }

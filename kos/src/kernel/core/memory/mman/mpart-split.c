@@ -40,12 +40,12 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
 #include <kos/except.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
@@ -1271,14 +1271,14 @@ maybe_free_unused_hibitset:
 			 *       changed parts. */
 			incref(hipart);
 			do {
-				next = ATOMIC_READ(file->mf_changed.slh_first);
+				next = atomic_read(&file->mf_changed.slh_first);
 				if unlikely(next == MFILE_PARTS_ANONYMOUS) {
 					decref_nokill(hipart);
 					goto clear_hipart_changed_bit;
 				}
 				hipart->mp_changed.sle_next = next;
 				COMPILER_WRITE_BARRIER();
-			} while (!ATOMIC_CMPXCH_WEAK(file->mf_changed.slh_first,
+			} while (!atomic_cmpxch_weak(&file->mf_changed.slh_first,
 			                             next, hipart));
 		} else {
 			/* The hi-part hasn't ~actually~ changed (so just clear the flag, and don't
@@ -1297,7 +1297,7 @@ clear_hipart_changed_bit:
 		/* Must update the MLOCK status of both the lo- and hi-parts */
 		if (!mnode_list_contains_mlocked_nodes(&lopart->mp_copy) &&
 		    !mnode_list_contains_mlocked_nodes(&lopart->mp_share))
-			ATOMIC_AND(lopart->mp_flags, ~MPART_F_MLOCK);
+			atomic_and(&lopart->mp_flags, ~MPART_F_MLOCK);
 
 		if (mnode_list_contains_mlocked_nodes(&hipart->mp_copy) ||
 		    mnode_list_contains_mlocked_nodes(&hipart->mp_share))
@@ -1419,7 +1419,7 @@ clear_hipart_changed_bit:
 		if (block_count <= MPART_BLKST_BLOCKS_PER_WORD) {
 			/* Switch over to the inline bitset. */
 			self->mp_blkst_inl = bitset[0];
-			ATOMIC_OR(self->mp_flags, MPART_F_BLKST_INL);
+			atomic_or(&self->mp_flags, MPART_F_BLKST_INL);
 			kfree(bitset);
 		} else {
 			/* Truncate the bitset. */

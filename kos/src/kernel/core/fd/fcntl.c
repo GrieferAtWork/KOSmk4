@@ -34,12 +34,11 @@
 #include <kernel/syscall.h>
 #include <sched/pid.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -217,7 +216,7 @@ sys_fcntl_impl(fd_t fd, fcntl_t command,
 		if unlikely(fdend == 0) {
 			THROW(E_INVALID_HANDLE_FILE, -1,
 			      E_INVALID_HANDLE_FILE_UNBOUND, 0,
-			      ATOMIC_READ(man->hm_maxfd));
+			      atomic_read(&man->hm_maxfd));
 		}
 		--fdend;
 		return (syscall_slong_t)(syscall_ulong_t)fdend;
@@ -400,7 +399,7 @@ sys_fcntl_impl(fd_t fd, fcntl_t command,
 				      E_INVALID_HANDLE_OPERATION_GETPROPERTY,
 				      hand->h_mode);
 			}
-			return ATOMIC_READ(rb->rb_limit);
+			return atomic_read(&rb->rb_limit);
 		} else {
 			size_t newsize;
 			if unlikely(!IO_CANWRITE(hand->h_mode)) {

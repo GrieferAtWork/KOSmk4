@@ -42,13 +42,12 @@
 #include <sched/pid.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <compat/config.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 #include <kos/ioctl/_openfd.h>
 
+#include <atomic.h>
 #include <fcntl.h>
 #include <stddef.h>
 #include <string.h>
@@ -87,7 +86,7 @@ handles_close_symbolic(fd_t fd, /*out*/ REF struct handle *__restrict ohand) {
 				}
 			}
 			if (!isdrive)
-				ATOMIC_AND(oldpath->p_flags, ~PATH_F_ISDRIVE);
+				atomic_and(&oldpath->p_flags, ~PATH_F_ISDRIVE);
 		}
 		vfs_driveslock_endwrite(myvfs);
 		ohand->h_mode = IO_RDONLY;
@@ -392,7 +391,7 @@ handles_install_symbolic(fd_t fd, struct handle const *__restrict nhand,
 				REF struct path *oldpath;
 				struct vfs *myvfs = myfs->fs_vfs;
 				require(CAP_MOUNT_DRIVES);
-				ATOMIC_OR(newpath->p_flags, PATH_F_ISDRIVE);
+				atomic_or(&newpath->p_flags, PATH_F_ISDRIVE);
 				vfs_driveslock_write(myvfs);
 				oldpath = myvfs->vf_drives[fd - AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN)]; /* Inherit reference */
 				myvfs->vf_drives[fd - AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN)] = newpath; /* Inherit reference */
@@ -407,7 +406,7 @@ handles_install_symbolic(fd_t fd, struct handle const *__restrict nhand,
 						}
 					}
 					if (!isdrive)
-						ATOMIC_AND(oldpath->p_flags, ~PATH_F_ISDRIVE);
+						atomic_and(&oldpath->p_flags, ~PATH_F_ISDRIVE);
 				}
 				vfs_driveslock_endwrite(myvfs);
 				ohand->h_data = oldpath;

@@ -27,7 +27,6 @@
 #include <hybrid/host.h>
 
 #if defined(__i386__) || defined(__x86_64__)
-#include <hybrid/atomic.h>
 #include <hybrid/typecore.h> /* __REGISTER_TYPE__ */
 
 #include <asm/intrin-arith.h>
@@ -41,6 +40,7 @@
 #include <system-test/ctest.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -105,45 +105,45 @@ test_addr_op(unsigned int op, void *addr, bool is_canon, bool is_vio) {
 		case 0x0006: WO; *(u32 *)addr = (u32)p; break;
 		case 0x0007: WO; I64(*(u64 *)addr = (u64)p); break;
 
-		case 0x0008: ATOMIC_INC(*(u8 *)addr); break;
-		case 0x0009: ATOMIC_INC(*(u16 *)addr); break;
-		case 0x000a: ATOMIC_INC(*(u32 *)addr); break;
-		case 0x000b: I64(ATOMIC_INC(*(u64 *)addr)); break;
+		case 0x0008: atomic_inc((u8 *)addr); break;
+		case 0x0009: atomic_inc((u16 *)addr); break;
+		case 0x000a: atomic_inc((u32 *)addr); break;
+		case 0x000b: I64(atomic_inc((u64 *)addr)); break;
 
-		case 0x000c: ATOMIC_DEC(*(u8 *)addr); break;
-		case 0x000d: ATOMIC_DEC(*(u16 *)addr); break;
-		case 0x000e: ATOMIC_DEC(*(u32 *)addr); break;
-		case 0x000f: I64(ATOMIC_DEC(*(u64 *)addr)); break;
+		case 0x000c: atomic_dec((u8 *)addr); break;
+		case 0x000d: atomic_dec((u16 *)addr); break;
+		case 0x000e: atomic_dec((u32 *)addr); break;
+		case 0x000f: I64(atomic_dec((u64 *)addr)); break;
 
-		case 0x0010: ATOMIC_ADD(*(u8 *)addr, (u8)p); break;
-		case 0x0011: ATOMIC_ADD(*(u16 *)addr, (u16)p); break;
-		case 0x0012: ATOMIC_ADD(*(u32 *)addr, (u32)p); break;
-		case 0x0013: I64(ATOMIC_ADD(*(u64 *)addr, (u64)p)); break;
+		case 0x0010: atomic_add((u8 *)addr, (u8)p); break;
+		case 0x0011: atomic_add((u16 *)addr, (u16)p); break;
+		case 0x0012: atomic_add((u32 *)addr, (u32)p); break;
+		case 0x0013: I64(atomic_add((u64 *)addr, (u64)p)); break;
 
-		case 0x0014: ATOMIC_SUB(*(u8 *)addr, (u8)p); break;
-		case 0x0015: ATOMIC_SUB(*(u16 *)addr, (u16)p); break;
-		case 0x0016: ATOMIC_SUB(*(u32 *)addr, (u32)p); break;
-		case 0x0017: I64(ATOMIC_SUB(*(u64 *)addr, (u64)p)); break;
+		case 0x0014: atomic_sub((u8 *)addr, (u8)p); break;
+		case 0x0015: atomic_sub((u16 *)addr, (u16)p); break;
+		case 0x0016: atomic_sub((u32 *)addr, (u32)p); break;
+		case 0x0017: I64(atomic_sub((u64 *)addr, (u64)p)); break;
 
-		case 0x0018: ATOMIC_AND(*(u8 *)addr, (u8)p); break;
-		case 0x0019: ATOMIC_AND(*(u16 *)addr, (u16)p); break;
-		case 0x001a: ATOMIC_AND(*(u32 *)addr, (u32)p); break;
-		case 0x001b: I64(ATOMIC_AND(*(u64 *)addr, (u64)p)); break;
+		case 0x0018: atomic_and((u8 *)addr, (u8)p); break;
+		case 0x0019: atomic_and((u16 *)addr, (u16)p); break;
+		case 0x001a: atomic_and((u32 *)addr, (u32)p); break;
+		case 0x001b: I64(atomic_and((u64 *)addr, (u64)p)); break;
 
-		case 0x001c: ATOMIC_OR(*(u8 *)addr, (u8)p); break;
-		case 0x001d: ATOMIC_OR(*(u16 *)addr, (u16)p); break;
-		case 0x001e: ATOMIC_OR(*(u32 *)addr, (u32)p); break;
-		case 0x001f: I64(ATOMIC_OR(*(u64 *)addr, (u64)p)); break;
+		case 0x001c: atomic_or((u8 *)addr, (u8)p); break;
+		case 0x001d: atomic_or((u16 *)addr, (u16)p); break;
+		case 0x001e: atomic_or((u32 *)addr, (u32)p); break;
+		case 0x001f: I64(atomic_or((u64 *)addr, (u64)p)); break;
 
-		case 0x0020: ATOMIC_XOR(*(u8 *)addr, (u8)p); break;
-		case 0x0021: ATOMIC_XOR(*(u16 *)addr, (u16)p); break;
-		case 0x0022: ATOMIC_XOR(*(u32 *)addr, (u32)p); break;
-		case 0x0023: I64(ATOMIC_XOR(*(u64 *)addr, (u64)p)); break;
+		case 0x0020: atomic_xor((u8 *)addr, (u8)p); break;
+		case 0x0021: atomic_xor((u16 *)addr, (u16)p); break;
+		case 0x0022: atomic_xor((u32 *)addr, (u32)p); break;
+		case 0x0023: I64(atomic_xor((u64 *)addr, (u64)p)); break;
 
-		case 0x0024: ATOMIC_XCH(*(u8 *)addr, (u8)p); break;
-		case 0x0025: ATOMIC_XCH(*(u16 *)addr, (u16)p); break;
-		case 0x0026: ATOMIC_XCH(*(u32 *)addr, (u32)p); break;
-		case 0x0027: I64(ATOMIC_XCH(*(u64 *)addr, (u64)p)); break;
+		case 0x0024: atomic_xch((u8 *)addr, (u8)p); break;
+		case 0x0025: atomic_xch((u16 *)addr, (u16)p); break;
+		case 0x0026: atomic_xch((u32 *)addr, (u32)p); break;
+		case 0x0027: I64(atomic_xch((u64 *)addr, (u64)p)); break;
 
 		case 0x0028: *(u8 *)addr <<= (shift_t)p; break;
 		case 0x0029: *(u16 *)addr <<= (shift_t)p; break;

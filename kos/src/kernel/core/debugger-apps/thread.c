@@ -47,7 +47,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <sched/scheduler.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
 #include <asm/intrin.h>
@@ -55,6 +54,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kos/kernel/cpu-state.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -173,7 +173,7 @@ PRIVATE ATTR_DBGTEXT ssize_t TASK_ENUM_CC
 task_enum_print_cb(void *UNUSED(arg), struct task *thread) {
 	unsigned int state;
 	uintptr_t flags;
-	flags = ATOMIC_READ(thread->t_flags);
+	flags = atomic_read(&thread->t_flags);
 	if (flags & TASK_FRUNNING) {
 		state = THREAD_STATE_RUNNING;
 	} else if (flags & TASK_FTERMINATING) {

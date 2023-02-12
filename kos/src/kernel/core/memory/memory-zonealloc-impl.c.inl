@@ -22,7 +22,9 @@
 //#define ALLOC_SINGLE  1
 //#define ALLOC_BETWEEN 1
 #define ALLOC_MINMAX  1
-#endif
+#endif /* !__INTELLISENSE__ */
+
+#include <atomic.h>
 
 DECL_BEGIN
 
@@ -90,13 +92,13 @@ NOTHROW(KCALL zone_malloc_before)(struct pmemzone *__restrict self,
 	if (max_pages <= 1)
 #elif !defined(ALLOC_SINGLE)
 	if (num_pages <= 1)
-#endif
+#endif /* ... */
 	{
 		/* Non-transient allocation. */
 		for (;;) {
 			uintptr_t page_mask;
 again_word_i:
-			word      = ATOMIC_READ(self->mz_free[i]);
+			word      = atomic_read(&self->mz_free[i]);
 			page_mask = (uintptr_t)PMEMZONE_ISFREEMASK << (misalignment * PMEMZONE_BITSPERPAGE);
 			for (;;) {
 				if (word & page_mask) {
@@ -113,12 +115,12 @@ again_word_i:
 					if likely(num_pages)
 #endif
 					{
-						if (!ATOMIC_CMPXCH_WEAK(self->mz_free[i], word, word & ~page_mask))
+						if (!atomic_cmpxch_weak(&self->mz_free[i], word, word & ~page_mask))
 							goto again_word_i;
 						assert(POPCOUNT(page_mask) == 1);
-						ATOMIC_DEC(self->mz_cfree);
+						atomic_dec(&self->mz_cfree);
 						if (word & (page_mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)))
-							ATOMIC_DEC(self->mz_qfree);
+							atomic_dec(&self->mz_qfree);
 					}
 #ifdef ALLOC_MINMAX
 					*res_pages = 1;
@@ -153,7 +155,7 @@ again_word_i:
 again_word_i_trans:
 			alloc_mask      = 0;
 			new_alloc_count = alloc_count;
-			word            = ATOMIC_READ(self->mz_free[i]);
+			word            = atomic_read(&self->mz_free[i]);
 			page_mask       = (uintptr_t)PMEMZONE_ISFREEMASK << (misalignment * PMEMZONE_BITSPERPAGE);
 			for (;;) {
 				if (word & page_mask) {
@@ -178,13 +180,13 @@ again_word_i_trans:
 #ifdef ALLOC_MINMAX
 min_max_allocate_current_alloc_mask:
 #endif /* ALLOC_MINMAX */
-						if (!ATOMIC_CMPXCH_WEAK(self->mz_free[i], word, word & ~alloc_mask))
+						if (!atomic_cmpxch_weak(&self->mz_free[i], word, word & ~alloc_mask))
 							goto again_word_i_trans;
-						ATOMIC_FETCHSUB(self->mz_cfree, new_alloc_count - alloc_count);
+						atomic_fetchsub(&self->mz_cfree, new_alloc_count - alloc_count);
 						qcount = POPCOUNT(word & (alloc_mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)));
 						assert(qcount <= (new_alloc_count - alloc_count));
 						if (qcount)
-							ATOMIC_FETCHSUB(self->mz_qfree, qcount);
+							atomic_fetchsub(&self->mz_qfree, qcount);
 #ifdef ALLOC_MINMAX
 						*res_pages = new_alloc_count;
 #endif /* ALLOC_MINMAX */
@@ -202,13 +204,13 @@ min_max_allocate_current_alloc_mask:
 #if 1
 							goto min_max_allocate_current_alloc_mask;
 #else
-							if (!ATOMIC_CMPXCH_WEAK(self->mz_free[i], word, word & ~alloc_mask))
+							if (!atomic_cmpxch_weak(&self->mz_free[i], word, word & ~alloc_mask))
 								goto again_word_i_trans;
-							ATOMIC_FETCHSUB(self->mz_cfree, new_alloc_count - alloc_count);
+							atomic_fetchsub(&self->mz_cfree, new_alloc_count - alloc_count);
 							qcount = POPCOUNT(word & (alloc_mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)));
 							assert(qcount <= (new_alloc_count - alloc_count));
 							if (qcount)
-								ATOMIC_FETCHSUB(self->mz_qfree, qcount);
+								atomic_fetchsub(&self->mz_qfree, qcount);
 							*res_pages = new_alloc_count;
 							return result;
 #endif
@@ -232,13 +234,13 @@ min_max_allocate_current_alloc_mask:
 			if (alloc_mask) {
 				assert(alloc_mask & PMEMZONE_ISFREEMASK);
 				assert(new_alloc_count > alloc_count);
-				if (!ATOMIC_CMPXCH_WEAK(self->mz_free[i], word, word & ~alloc_mask))
+				if (!atomic_cmpxch_weak(&self->mz_free[i], word, word & ~alloc_mask))
 					goto again_word_i_trans;
-				ATOMIC_FETCHSUB(self->mz_cfree, new_alloc_count - alloc_count);
+				atomic_fetchsub(&self->mz_cfree, new_alloc_count - alloc_count);
 				qcount = POPCOUNT(word & (alloc_mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)));
 				assert(qcount <= (new_alloc_count - alloc_count));
 				if (qcount)
-					ATOMIC_FETCHSUB(self->mz_qfree, qcount);
+					atomic_fetchsub(&self->mz_qfree, qcount);
 			} else {
 				assert(new_alloc_count == alloc_count);
 			}

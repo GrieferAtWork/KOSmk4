@@ -32,7 +32,6 @@
 #include <misc/unlockinfo.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/bit.h>
 #include <hybrid/overflow.h>
 
@@ -41,6 +40,7 @@
 #include <kos/kernel/paging.h> /* Default mapping hints */
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -201,7 +201,7 @@ NOTHROW(FCALL mman_findunmapped)(struct mman const *__restrict self,
 	/*assert(mman_lock_acquired(self));*/ /* Cannot be asserted because of `mman_findunmapped_in_usertree()' */
 
 	/* Load additional flags. */
-	flags |= ATOMIC_READ(mman_findunmapped_extflags);
+	flags |= atomic_read(&mman_findunmapped_extflags);
 
 	/* Ensure that the hinted address range is properly aligned. */
 	if unlikely(!IS_ALIGNED((uintptr_t)addr, PAGESIZE)) {

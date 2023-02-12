@@ -32,7 +32,6 @@
 #include <kernel/malloc.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 
@@ -40,6 +39,7 @@
 #include <kos/except/reason/inval.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <dirent.h>
 #include <stddef.h>
 #include <string.h>
@@ -113,7 +113,7 @@ again:
 
 		/* Unlink dead/deleted nodes... */
 		fsuper_nodes_removenode(&super->ffs_super, result);
-		ATOMIC_WRITE(result->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
+		atomic_write(&result->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
 		fsuper_nodes_downgrade(&super->ffs_super);
 	}
 
@@ -207,9 +207,10 @@ waitfor_super_nodes_lock:
 					return existing;
 				}
 			}
+
 			/* Unlink dead/deleted nodes... */
 			fsuper_nodes_removenode(&super->ffs_super, existing);
-			ATOMIC_WRITE(existing->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
+			atomic_write(&existing->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
 		} /* if (existing != NULL) */
 	} /* Scope... */
 

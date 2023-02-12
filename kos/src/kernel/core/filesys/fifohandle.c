@@ -34,14 +34,13 @@
 #include <sched/cred.h>
 #include <sched/rpc.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <kos/except/reason/illop.h>
 #include <kos/kernel/handle.h> /* HANDLE_TYPE_FIFOHANDLE */
 #include <sys/stat.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 
 DECL_BEGIN
@@ -138,11 +137,11 @@ NOTHROW(FCALL fifohandle_destroy)(struct fifohandle *__restrict self) {
 	REF struct ffifonode *fifo;
 	fifo = self->fu_fifo;
 	if (IO_CANREAD(self->fu_accmode)) {
-		if (ATOMIC_FETCHDEC(fifo->ff_rdcnt) == 1)
+		if (atomic_fetchdec(&fifo->ff_rdcnt) == 1)
 			sig_broadcast(&fifo->ff_buffer.rb_nfull);
 	}
 	if (IO_CANWRITE(self->fu_accmode)) {
-		if (ATOMIC_FETCHDEC(fifo->ff_wrcnt) == 1)
+		if (atomic_fetchdec(&fifo->ff_wrcnt) == 1)
 			sig_broadcast(&fifo->ff_buffer.rb_nempty);
 		mfile_inotify_closewr(self->fu_fifo); /* Post `IN_CLOSE_WRITE' */
 	} else {
@@ -173,26 +172,26 @@ fifohandle_new(struct ffifonode *__restrict self, iomode_t iomode,
 
 		case IO_RDONLY:
 			for (;;) {
-				if (ATOMIC_READ(self->ff_wrcnt) != 0)
+				if (atomic_read(&self->ff_wrcnt) != 0)
 					break;
 				/* Opening a fifo as non-blocking for reading always succeeds. */
 				if (iomode & IO_NONBLOCK)
 					break;
 				task_connect_for_poll(&self->ff_buffer.rb_nempty);
-				if (ATOMIC_READ(self->ff_wrcnt) != 0) {
+				if (atomic_read(&self->ff_wrcnt) != 0) {
 					task_disconnectall();
 					break;
 				}
 				/* Wait for writers to show up */
 				task_waitfor();
 			}
-			if (ATOMIC_FETCHINC(self->ff_rdcnt) == 0)
+			if (atomic_fetchinc(&self->ff_rdcnt) == 0)
 				sig_broadcast(&self->ff_buffer.rb_nfull);
 			break;
 
 		case IO_WRONLY:
 			for (;;) {
-				if (ATOMIC_READ(self->ff_rdcnt) != 0)
+				if (atomic_read(&self->ff_rdcnt) != 0)
 					break;
 				/* POSIX says that without any readers, opening a FIFO in
 				 * non-block mode should have us throw some kind of error
@@ -202,21 +201,21 @@ fifohandle_new(struct ffifonode *__restrict self, iomode_t iomode,
 					      E_ILLEGAL_OPERATION_CONTEXT_OPEN_FIFO_WRITER_WITHOUT_READERS);
 				}
 				task_connect_for_poll(&self->ff_buffer.rb_nfull);
-				if (ATOMIC_READ(self->ff_rdcnt) != 0) {
+				if (atomic_read(&self->ff_rdcnt) != 0) {
 					task_disconnectall();
 					break;
 				}
 				/* Wait for readers to show up */
 				task_waitfor();
 			}
-			if (ATOMIC_FETCHINC(self->ff_wrcnt) == 0)
+			if (atomic_fetchinc(&self->ff_wrcnt) == 0)
 				sig_broadcast(&self->ff_buffer.rb_nempty);
 			break;
 
 		default:
-			if (ATOMIC_FETCHINC(self->ff_rdcnt) == 0)
+			if (atomic_fetchinc(&self->ff_rdcnt) == 0)
 				sig_broadcast(&self->ff_buffer.rb_nfull);
-			if (ATOMIC_FETCHINC(self->ff_wrcnt) == 0)
+			if (atomic_fetchinc(&self->ff_wrcnt) == 0)
 				sig_broadcast(&self->ff_buffer.rb_nempty);
 			break;
 		}

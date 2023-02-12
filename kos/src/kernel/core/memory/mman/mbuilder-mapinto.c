@@ -34,13 +34,13 @@
 #include <misc/unlockinfo.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -582,7 +582,7 @@ NOTHROW(FCALL mman_unmap_mbuilder)(struct mman *__restrict self,
 			 * nodes without any problems! */
 			for (iter = SLIST_FIRST(deadnodes); iter != orig_deadnode;
 			     iter = SLIST_NEXT(iter, _mn_dead))
-				ATOMIC_OR(iter->mn_flags, MNODE_F_UNMAPPED);
+				atomic_or(&iter->mn_flags, MNODE_F_UNMAPPED);
 		}
 	}
 	return true;

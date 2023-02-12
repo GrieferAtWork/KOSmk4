@@ -39,8 +39,6 @@
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 
-#include <hybrid/atomic.h>
-
 #include <linux/fs.h>
 
 #include <assert.h>

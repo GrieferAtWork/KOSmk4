@@ -36,13 +36,12 @@
 #include <sched/sigaction.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 #include <linux/close_range.h>
 #include <linux/kcmp.h>
 
+#include <atomic.h>
 #include <errno.h>
 #include <stddef.h>
 
@@ -542,8 +541,8 @@ DEFINE_SYSCALL5(syscall_slong_t, kcmp,
 		FINALLY_DECREF_UNLIKELY(hand1);
 		hand2 = kcmp_get_sighand_ptr_from_pid(pid2);
 		FINALLY_DECREF_UNLIKELY(hand2);
-		result = kcmp_pointer(hand1 ? ATOMIC_READ(hand1->sp_hand) : NULL,
-		                      hand2 ? ATOMIC_READ(hand2->sp_hand) : NULL);
+		result = kcmp_pointer(hand1 ? atomic_read(&hand1->sp_hand) : NULL,
+		                      hand2 ? atomic_read(&hand2->sp_hand) : NULL);
 	}	break;
 
 	/* XXX: Support for `KCMP_IO' */

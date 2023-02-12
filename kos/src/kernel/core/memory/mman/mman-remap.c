@@ -41,7 +41,6 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
@@ -49,6 +48,7 @@
 #include <kos/except/reason/inval.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -182,7 +182,7 @@ something_changed:
 			goto something_changed;
 		if unlikely((part = node->mn_part) == NULL)
 			goto something_changed;
-		if unlikely(ATOMIC_READ(part->mp_file) != map.mmwu_map.mfm_file)
+		if unlikely(atomic_read(&part->mp_file) != map.mmwu_map.mfm_file)
 			goto something_changed;
 		if unlikely(map.mmwu_map.mfm_addr != mnode_getfileaddrat(node, old_address))
 			goto something_changed;
@@ -233,7 +233,7 @@ something_changed:
 		/* Keep track of how many nodes are mapping some given module. */
 		if (removeme->mn_module)
 			module_dec_nodecount(removeme->mn_module);
-		ATOMIC_OR(removeme->mn_flags, MNODE_F_UNMAPPED);
+		atomic_or(&removeme->mn_flags, MNODE_F_UNMAPPED);
 		DBG_memset(&removeme->mn_writable, 0xcc, sizeof(removeme->mn_writable));
 		DBG_memset(&removeme->mn_module, 0xcc, sizeof(removeme->mn_module));
 		SLIST_INSERT(&old_mappings, removeme, _mn_dead);
@@ -262,7 +262,7 @@ something_changed:
 		/* Set the MLOCK  flag for  the backing  mem-part when  MAP_LOCKED is  given.
 		 * Note that in this case, `node->mn_flags' already contains `MNODE_F_MLOCK'! */
 		if ((mnode_flags & MAP_LOCKED) && !(part->mp_flags & MPART_F_MLOCK_FROZEN))
-			ATOMIC_OR(part->mp_flags, MPART_F_MLOCK);
+			atomic_or(&part->mp_flags, MPART_F_MLOCK);
 
 		/* Map the backing part (as far as that is possible) */
 		map_prot = mpart_mmap_node_p(part, self->mm_pagedir_p,
@@ -410,7 +410,7 @@ err_noncontinuous_mapping:
 					      expected_minaddr);
 				}
 			} else {
-				if unlikely(ATOMIC_READ(part->mp_file) != result->mi_file)
+				if unlikely(atomic_read(&part->mp_file) != result->mi_file)
 					goto err_noncontinuous_mapping;
 #if 0 /* The following is implicitly check by `part->mp_file != result->mi_file',
        * since `part->mp_file' is a [1..1] field. */
@@ -467,7 +467,7 @@ NOTHROW(KCALL insert_and_maybe_map_nodes)(struct mman *__restrict self,
 			/* Set the MLOCK  flag for  the backing  mem-part when  MAP_LOCKED is  given.
 			 * Note that in this case, `node->mn_flags' already contains `MNODE_F_MLOCK'! */
 			if ((mapinfo->mi_nodeflags & MAP_LOCKED) && !(part->mp_flags & MPART_F_MLOCK_FROZEN))
-				ATOMIC_OR(part->mp_flags, MPART_F_MLOCK);
+				atomic_or(&part->mp_flags, MPART_F_MLOCK);
 
 			if (did_prepare) {
 				pagedir_prot_t map_prot;
@@ -648,7 +648,7 @@ err_cannot_prepare:
 				/* Keep track of how many nodes are mapping some given module. */
 				if (node->mn_module)
 					module_dec_nodecount(node->mn_module);
-				ATOMIC_OR(node->mn_flags, MNODE_F_UNMAPPED);
+				atomic_or(&node->mn_flags, MNODE_F_UNMAPPED);
 				DBG_memset(&node->mn_writable, 0xcc, sizeof(node->mn_writable));
 				DBG_memset(&node->mn_module, 0xcc, sizeof(node->mn_module));
 				SLIST_INSERT(&old_mappings, node, _mn_dead);

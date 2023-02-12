@@ -30,14 +30,13 @@
 #include <sched/cred.h>
 #include <sched/rpc.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 #include <kos/kernel/handle.h> /* HANDLE_TYPE_FIFOHANDLE */
 #include <sys/stat.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <stddef.h>
 
@@ -79,7 +78,7 @@ again:
 		if unlikely(!num_bytes)
 			goto done;
 		/* Buffer is empty. */
-		if (!ATOMIC_READ(me->ff_wrcnt))
+		if (!atomic_read(&me->ff_wrcnt))
 			goto done; /* End-of-file */
 		if (mode & IO_NONBLOCK) {
 			if (!(mode & IO_NODATAZERO))
@@ -100,7 +99,7 @@ again:
 			goto done;
 		}
 		/* Check if these are still readers out there. */
-		if unlikely(!ATOMIC_READ(me->ff_wrcnt)) {
+		if unlikely(!atomic_read(&me->ff_wrcnt)) {
 			task_disconnectall();
 			goto done; /* End-of-file */
 		}
@@ -134,7 +133,7 @@ again_read_ent:
 					THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No space available. */
 				break;
 			}
-			if (!ATOMIC_READ(me->ff_wrcnt))
+			if (!atomic_read(&me->ff_wrcnt))
 				break; /* End-of-file */
 			task_connect(&me->ff_buffer.rb_nempty);
 			/* Retry reading data, now that we're being interlocked. */
@@ -153,7 +152,7 @@ again_read_ent:
 				break;
 			}
 			/* Check if these are still readers out there. */
-			if unlikely(!ATOMIC_READ(me->ff_wrcnt)) {
+			if unlikely(!atomic_read(&me->ff_wrcnt)) {
 				task_disconnectall();
 				break; /* End-of-file */
 			}
@@ -174,7 +173,7 @@ ffifonode_v_write(struct mfile *__restrict self, USER CHECKED void const *src,
 	size_t result;
 	struct ffifonode *me = mfile_asfifo(self);
 again:
-	if (!ATOMIC_READ(me->ff_rdcnt)) {
+	if (!atomic_read(&me->ff_rdcnt)) {
 no_readers:
 		pipe_throw_broken_pipe();
 	}
@@ -189,7 +188,7 @@ no_readers:
 				THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No space available. */
 			goto done;
 		}
-		if (!ATOMIC_READ(me->ff_rdcnt))
+		if (!atomic_read(&me->ff_rdcnt))
 			goto no_readers;
 		task_connect(&me->ff_buffer.rb_nfull);
 		/* Retry writing data, now that we're being interlocked. */
@@ -205,7 +204,7 @@ no_readers:
 			goto done;
 		}
 		/* Check if these are still readers out there. */
-		if unlikely(!ATOMIC_READ(me->ff_rdcnt)) {
+		if unlikely(!atomic_read(&me->ff_rdcnt)) {
 			task_disconnectall();
 			goto no_readers;
 		}
@@ -224,7 +223,7 @@ ffifonode_v_writev(struct mfile *__restrict self, struct iov_buffer *__restrict 
 	struct iov_entry ent;
 	struct ffifonode *me = mfile_asfifo(self);
 	(void)num_bytes;
-	if (!ATOMIC_READ(me->ff_rdcnt)) {
+	if (!atomic_read(&me->ff_rdcnt)) {
 no_readers:
 		pipe_throw_broken_pipe();
 	}
@@ -243,7 +242,7 @@ again_write_ent:
 					THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No space available. */
 				break;
 			}
-			if (!ATOMIC_READ(me->ff_rdcnt))
+			if (!atomic_read(&me->ff_rdcnt))
 				goto no_readers;
 			task_connect(&me->ff_buffer.rb_nfull);
 			/* Retry writing data, now that we're being interlocked. */
@@ -262,14 +261,14 @@ again_write_ent:
 				break;
 			}
 			/* Check if these are still readers out there. */
-			if unlikely(!ATOMIC_READ(me->ff_rdcnt)) {
+			if unlikely(!atomic_read(&me->ff_rdcnt)) {
 				task_disconnectall();
 				goto no_readers;
 			}
 			/* Wait for space to become available. */
 			task_waitfor();
 			/* Verify that there are still readers. */
-			if unlikely(!ATOMIC_READ(me->ff_rdcnt))
+			if unlikely(!atomic_read(&me->ff_rdcnt))
 				goto no_readers;
 			goto again_write_ent;
 		}
@@ -294,7 +293,7 @@ ffifonode_v_stat(struct mfile *__restrict self,
 	struct ffifonode *me;
 	size_t avail;
 	me    = mfile_asfifo(self);
-	avail = ATOMIC_READ(me->ff_buffer.rb_avail);
+	avail = atomic_read(&me->ff_buffer.rb_avail);
 	result->st_size = (typeof(result->st_size))avail;
 }
 
