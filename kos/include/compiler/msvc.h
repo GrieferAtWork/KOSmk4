@@ -287,7 +287,7 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 #define __STATIC_ELSE(c) \
 	__if_not_exists(::__intern::__msvc_static_if<((c))>::__is_true__)
 /* Use our hacky `static_if' to emulate `__builtin_choose_expr' */
-#define __builtin_choose_expr(c,tt,ff) (__STATIC_IF(c){tt} __STATIC_ELSE(c){ff})
+#define __builtin_choose_expr(c, tt, ff) (__STATIC_IF(c){tt} __STATIC_ELSE(c){ff})
 #else /* __cplusplus */
 #define __STATIC_IF(x)   __pragma(warning(suppress : 4127)) if(x)
 #define __STATIC_ELSE(x) __pragma(warning(suppress : 4127)) if(x)
@@ -411,9 +411,9 @@ extern "C" {
 extern void (__cdecl _m_prefetch)(void *);
 #pragma intrinsic(_m_prefetch)
 #endif /* !_m_prefetch */
-#define __builtin_prefetch(addr,...) _m_prefetch(addr)
+#define __builtin_prefetch(addr, ...) _m_prefetch(addr)
 #else /* ... */
-#define __NO_builtin_prefetch    1
+#define __NO_builtin_prefetch   1
 #define __builtin_prefetch(...) (void)0
 #endif /* !... */
 #ifndef _ReadBarrier

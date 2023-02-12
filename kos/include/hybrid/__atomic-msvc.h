@@ -385,10 +385,10 @@ __NOTHROW_NCX(_InterlockedXor64)(__int64 volatile *__px, __int64 __v) {
 #endif /* !_InterlockedXor64 */
 
 #ifndef _InterlockedIncrement64
-#define _InterlockedIncrement64(px) _InterlockedExchangeAdd64(px, 1)
+#define _InterlockedIncrement64(px) (_InterlockedExchangeAdd64(px, 1) + 1)
 #endif /* !_InterlockedIncrement64 */
 #ifndef _InterlockedDecrement64
-#define _InterlockedDecrement64(px) _InterlockedExchangeAdd64(px, -1)
+#define _InterlockedDecrement64(px) (_InterlockedExchangeAdd64(px, -1) - 1)
 #endif /* !_InterlockedDecrement64 */
 
 #define __hybrid_atomic_xch8_seq_cst(p, val)       ((__UINT8_TYPE__)_InterlockedExchange8((char volatile *)(p), (char)(val)))

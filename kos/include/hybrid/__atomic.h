@@ -24,15 +24,13 @@
 #include "typecore.h"
 
 #ifndef __cplusplus
-#ifndef __COMPILER_HAVE_TYPEOF
-#if 1
-#define __ATOMIC_RECAST(p, y) (1 ? (y) : *(p))
-#else
-#define __ATOMIC_RECAST(p, y) (y)
-#endif
-#else /* !__COMPILER_HAVE_TYPEOF */
+#ifdef __COMPILER_HAVE_TYPEOF
 #define __ATOMIC_RECAST(p, y) ((__typeof__(*(p)))(y))
-#endif /* __COMPILER_HAVE_TYPEOF */
+#elif 1
+#define __ATOMIC_RECAST(p, y) (1 ? (y) : *(p))
+#else /* ... */
+#define __ATOMIC_RECAST(p, y) (y)
+#endif /* !... */
 #endif /* !__cplusplus */
 
 #if defined(_MSC_VER) && !defined(__cplusplus)
@@ -255,18 +253,21 @@
 #else /* ... */
 #ifdef __COMPILER_HAVE_GCC_ASM
 #include "host.h"
-#endif /* __COMPILER_HAVE_GCC_ASM */
-#if defined(__COMPILER_HAVE_GCC_ASM) && (defined(__x86_64__) || defined(__i386__))
+#if defined(__x86_64__) || defined(__i386__)
 /* __asm__("lock; cmpxchg") */
-#include "__atomic-gasm.h"
+#include "__atomic-gasm-x86.h"
 /**/
 #include "__atomic-complete.h"
-#else /* ... */
-/* libatomic */
+#endif /* __x86_64__ || __i386__ */
+#endif /* __COMPILER_HAVE_GCC_ASM */
+
+/* Fallback: just use libatomic. - If it's not there, we'll
+ * get  link errors, but  for now it's the  best we can do. */
+#ifndef __hybrid_atomic_cmpxch
 #include "__atomic-libatomic.h"
 /**/
 #include "__atomic-complete.h"
-#endif /* !... */
+#endif /* !__hybrid_atomic_cmpxch */
 #endif /* !... */
 
 #ifndef __hybrid_atomic_signal_fence

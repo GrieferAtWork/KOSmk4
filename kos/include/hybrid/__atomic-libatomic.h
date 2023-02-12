@@ -29,100 +29,103 @@ __SYSDECL_BEGIN
 #ifndef __HYBRID_LIBATOMIC_CC
 #define __HYBRID_LIBATOMIC_CC /* nothing */
 #endif /* !__HYBRID_LIBATOMIC_CC */
+#ifndef __HYBRID_LIBATOMIC_DECL
+#define __HYBRID_LIBATOMIC_DECL extern
+#endif /* !__HYBRID_LIBATOMIC_DECL */
 
 __NAMESPACE_INT_BEGIN
-extern __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_load_1)(__UINT8_TYPE__ const *__mptr, int __order);
-extern void (__HYBRID_LIBATOMIC_CC __atomic_store_1)(__UINT8_TYPE__ *__mptr, __UINT8_TYPE__ __val, int __order);
-extern __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_exchange_1)(__UINT8_TYPE__ *__mptr, __UINT8_TYPE__ __val, int __order);
-extern __BOOL (__HYBRID_LIBATOMIC_CC __atomic_compare_exchange_1)(__UINT8_TYPE__ *__mptr, __UINT8_TYPE__ *__p_expected, __UINT8_TYPE__ __newval, int __succ, int __fail);
-extern __BOOL (__HYBRID_LIBATOMIC_CC __atomic_test_and_set_1)(__UINT8_TYPE__ *__mptr, int __order);
-extern __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_add_1)(__UINT8_TYPE__ *__mptr, __UINT8_TYPE__ __val, int __order);
-extern __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_sub_1)(__UINT8_TYPE__ *__mptr, __UINT8_TYPE__ __val, int __order);
-extern __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_and_1)(__UINT8_TYPE__ *__mptr, __UINT8_TYPE__ __val, int __order);
-extern __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_xor_1)(__UINT8_TYPE__ *__mptr, __UINT8_TYPE__ __val, int __order);
-extern __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_or_1)(__UINT8_TYPE__ *__mptr, __UINT8_TYPE__ __val, int __order);
-extern __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_nand_1)(__UINT8_TYPE__ *__mptr, __UINT8_TYPE__ __val, int __order);
-extern __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_add_fetch_1)(__UINT8_TYPE__ *__mptr, __UINT8_TYPE__ __val, int __order);
-extern __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_sub_fetch_1)(__UINT8_TYPE__ *__mptr, __UINT8_TYPE__ __val, int __order);
-extern __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_and_fetch_1)(__UINT8_TYPE__ *__mptr, __UINT8_TYPE__ __val, int __order);
-extern __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_xor_fetch_1)(__UINT8_TYPE__ *__mptr, __UINT8_TYPE__ __val, int __order);
-extern __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_or_fetch_1)(__UINT8_TYPE__ *__mptr, __UINT8_TYPE__ __val, int __order);
-extern __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_nand_fetch_1)(__UINT8_TYPE__ *__mptr, __UINT8_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_load_1)(__UINT8_TYPE__ const *__ptr, int __order);
+__HYBRID_LIBATOMIC_DECL void (__HYBRID_LIBATOMIC_CC __atomic_store_1)(__UINT8_TYPE__ *__ptr, __UINT8_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_exchange_1)(__UINT8_TYPE__ *__ptr, __UINT8_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __BOOL (__HYBRID_LIBATOMIC_CC __atomic_compare_exchange_1)(__UINT8_TYPE__ *__ptr, __UINT8_TYPE__ *__p_expected, __UINT8_TYPE__ __newval, int __succ, int __fail);
+__HYBRID_LIBATOMIC_DECL __BOOL (__HYBRID_LIBATOMIC_CC __atomic_test_and_set_1)(__UINT8_TYPE__ *__ptr, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_add_1)(__UINT8_TYPE__ *__ptr, __UINT8_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_sub_1)(__UINT8_TYPE__ *__ptr, __UINT8_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_and_1)(__UINT8_TYPE__ *__ptr, __UINT8_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_xor_1)(__UINT8_TYPE__ *__ptr, __UINT8_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_or_1)(__UINT8_TYPE__ *__ptr, __UINT8_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_nand_1)(__UINT8_TYPE__ *__ptr, __UINT8_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_add_fetch_1)(__UINT8_TYPE__ *__ptr, __UINT8_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_sub_fetch_1)(__UINT8_TYPE__ *__ptr, __UINT8_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_and_fetch_1)(__UINT8_TYPE__ *__ptr, __UINT8_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_xor_fetch_1)(__UINT8_TYPE__ *__ptr, __UINT8_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_or_fetch_1)(__UINT8_TYPE__ *__ptr, __UINT8_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT8_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_nand_fetch_1)(__UINT8_TYPE__ *__ptr, __UINT8_TYPE__ __val, int __order);
 
-extern __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_load_2)(__UINT16_TYPE__ const *__mptr, int __order);
-extern void (__HYBRID_LIBATOMIC_CC __atomic_store_2)(__UINT16_TYPE__ *__mptr, __UINT16_TYPE__ __val, int __order);
-extern __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_exchange_2)(__UINT16_TYPE__ *__mptr, __UINT16_TYPE__ __val, int __order);
-extern __BOOL (__HYBRID_LIBATOMIC_CC __atomic_compare_exchange_2)(__UINT16_TYPE__ *__mptr, __UINT16_TYPE__ *__p_expected, __UINT16_TYPE__ __newval, int __succ, int __fail);
-extern __BOOL (__HYBRID_LIBATOMIC_CC __atomic_test_and_set_2)(__UINT16_TYPE__ *__mptr, int __order);
-extern __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_add_2)(__UINT16_TYPE__ *__mptr, __UINT16_TYPE__ __val, int __order);
-extern __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_sub_2)(__UINT16_TYPE__ *__mptr, __UINT16_TYPE__ __val, int __order);
-extern __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_and_2)(__UINT16_TYPE__ *__mptr, __UINT16_TYPE__ __val, int __order);
-extern __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_xor_2)(__UINT16_TYPE__ *__mptr, __UINT16_TYPE__ __val, int __order);
-extern __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_or_2)(__UINT16_TYPE__ *__mptr, __UINT16_TYPE__ __val, int __order);
-extern __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_nand_2)(__UINT16_TYPE__ *__mptr, __UINT16_TYPE__ __val, int __order);
-extern __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_add_fetch_2)(__UINT16_TYPE__ *__mptr, __UINT16_TYPE__ __val, int __order);
-extern __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_sub_fetch_2)(__UINT16_TYPE__ *__mptr, __UINT16_TYPE__ __val, int __order);
-extern __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_and_fetch_2)(__UINT16_TYPE__ *__mptr, __UINT16_TYPE__ __val, int __order);
-extern __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_xor_fetch_2)(__UINT16_TYPE__ *__mptr, __UINT16_TYPE__ __val, int __order);
-extern __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_or_fetch_2)(__UINT16_TYPE__ *__mptr, __UINT16_TYPE__ __val, int __order);
-extern __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_nand_fetch_2)(__UINT16_TYPE__ *__mptr, __UINT16_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_load_2)(__UINT16_TYPE__ const *__ptr, int __order);
+__HYBRID_LIBATOMIC_DECL void (__HYBRID_LIBATOMIC_CC __atomic_store_2)(__UINT16_TYPE__ *__ptr, __UINT16_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_exchange_2)(__UINT16_TYPE__ *__ptr, __UINT16_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __BOOL (__HYBRID_LIBATOMIC_CC __atomic_compare_exchange_2)(__UINT16_TYPE__ *__ptr, __UINT16_TYPE__ *__p_expected, __UINT16_TYPE__ __newval, int __succ, int __fail);
+__HYBRID_LIBATOMIC_DECL __BOOL (__HYBRID_LIBATOMIC_CC __atomic_test_and_set_2)(__UINT16_TYPE__ *__ptr, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_add_2)(__UINT16_TYPE__ *__ptr, __UINT16_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_sub_2)(__UINT16_TYPE__ *__ptr, __UINT16_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_and_2)(__UINT16_TYPE__ *__ptr, __UINT16_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_xor_2)(__UINT16_TYPE__ *__ptr, __UINT16_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_or_2)(__UINT16_TYPE__ *__ptr, __UINT16_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_nand_2)(__UINT16_TYPE__ *__ptr, __UINT16_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_add_fetch_2)(__UINT16_TYPE__ *__ptr, __UINT16_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_sub_fetch_2)(__UINT16_TYPE__ *__ptr, __UINT16_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_and_fetch_2)(__UINT16_TYPE__ *__ptr, __UINT16_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_xor_fetch_2)(__UINT16_TYPE__ *__ptr, __UINT16_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_or_fetch_2)(__UINT16_TYPE__ *__ptr, __UINT16_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT16_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_nand_fetch_2)(__UINT16_TYPE__ *__ptr, __UINT16_TYPE__ __val, int __order);
 
-extern __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_load_4)(__UINT32_TYPE__ const *__mptr, int __order);
-extern void (__HYBRID_LIBATOMIC_CC __atomic_store_4)(__UINT32_TYPE__ *__mptr, __UINT32_TYPE__ __val, int __order);
-extern __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_exchange_4)(__UINT32_TYPE__ *__mptr, __UINT32_TYPE__ __val, int __order);
-extern __BOOL (__HYBRID_LIBATOMIC_CC __atomic_compare_exchange_4)(__UINT32_TYPE__ *__mptr, __UINT32_TYPE__ *__p_expected, __UINT32_TYPE__ __newval, int __succ, int __fail);
-extern __BOOL (__HYBRID_LIBATOMIC_CC __atomic_test_and_set_4)(__UINT32_TYPE__ *__mptr, int __order);
-extern __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_add_4)(__UINT32_TYPE__ *__mptr, __UINT32_TYPE__ __val, int __order);
-extern __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_sub_4)(__UINT32_TYPE__ *__mptr, __UINT32_TYPE__ __val, int __order);
-extern __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_and_4)(__UINT32_TYPE__ *__mptr, __UINT32_TYPE__ __val, int __order);
-extern __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_xor_4)(__UINT32_TYPE__ *__mptr, __UINT32_TYPE__ __val, int __order);
-extern __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_or_4)(__UINT32_TYPE__ *__mptr, __UINT32_TYPE__ __val, int __order);
-extern __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_nand_4)(__UINT32_TYPE__ *__mptr, __UINT32_TYPE__ __val, int __order);
-extern __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_add_fetch_4)(__UINT32_TYPE__ *__mptr, __UINT32_TYPE__ __val, int __order);
-extern __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_sub_fetch_4)(__UINT32_TYPE__ *__mptr, __UINT32_TYPE__ __val, int __order);
-extern __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_and_fetch_4)(__UINT32_TYPE__ *__mptr, __UINT32_TYPE__ __val, int __order);
-extern __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_xor_fetch_4)(__UINT32_TYPE__ *__mptr, __UINT32_TYPE__ __val, int __order);
-extern __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_or_fetch_4)(__UINT32_TYPE__ *__mptr, __UINT32_TYPE__ __val, int __order);
-extern __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_nand_fetch_4)(__UINT32_TYPE__ *__mptr, __UINT32_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_load_4)(__UINT32_TYPE__ const *__ptr, int __order);
+__HYBRID_LIBATOMIC_DECL void (__HYBRID_LIBATOMIC_CC __atomic_store_4)(__UINT32_TYPE__ *__ptr, __UINT32_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_exchange_4)(__UINT32_TYPE__ *__ptr, __UINT32_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __BOOL (__HYBRID_LIBATOMIC_CC __atomic_compare_exchange_4)(__UINT32_TYPE__ *__ptr, __UINT32_TYPE__ *__p_expected, __UINT32_TYPE__ __newval, int __succ, int __fail);
+__HYBRID_LIBATOMIC_DECL __BOOL (__HYBRID_LIBATOMIC_CC __atomic_test_and_set_4)(__UINT32_TYPE__ *__ptr, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_add_4)(__UINT32_TYPE__ *__ptr, __UINT32_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_sub_4)(__UINT32_TYPE__ *__ptr, __UINT32_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_and_4)(__UINT32_TYPE__ *__ptr, __UINT32_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_xor_4)(__UINT32_TYPE__ *__ptr, __UINT32_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_or_4)(__UINT32_TYPE__ *__ptr, __UINT32_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_nand_4)(__UINT32_TYPE__ *__ptr, __UINT32_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_add_fetch_4)(__UINT32_TYPE__ *__ptr, __UINT32_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_sub_fetch_4)(__UINT32_TYPE__ *__ptr, __UINT32_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_and_fetch_4)(__UINT32_TYPE__ *__ptr, __UINT32_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_xor_fetch_4)(__UINT32_TYPE__ *__ptr, __UINT32_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_or_fetch_4)(__UINT32_TYPE__ *__ptr, __UINT32_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT32_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_nand_fetch_4)(__UINT32_TYPE__ *__ptr, __UINT32_TYPE__ __val, int __order);
 
 #ifdef __UINT64_TYPE__
-extern __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_load_8)(__UINT64_TYPE__ const *__mptr, int __order);
-extern void (__HYBRID_LIBATOMIC_CC __atomic_store_8)(__UINT64_TYPE__ *__mptr, __UINT64_TYPE__ __val, int __order);
-extern __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_exchange_8)(__UINT64_TYPE__ *__mptr, __UINT64_TYPE__ __val, int __order);
-extern __BOOL (__HYBRID_LIBATOMIC_CC __atomic_compare_exchange_8)(__UINT64_TYPE__ *__mptr, __UINT64_TYPE__ *__p_expected, __UINT64_TYPE__ __newval, int __succ, int __fail);
-extern __BOOL (__HYBRID_LIBATOMIC_CC __atomic_test_and_set_8)(__UINT64_TYPE__ *__mptr, int __order);
-extern __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_add_8)(__UINT64_TYPE__ *__mptr, __UINT64_TYPE__ __val, int __order);
-extern __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_sub_8)(__UINT64_TYPE__ *__mptr, __UINT64_TYPE__ __val, int __order);
-extern __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_and_8)(__UINT64_TYPE__ *__mptr, __UINT64_TYPE__ __val, int __order);
-extern __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_xor_8)(__UINT64_TYPE__ *__mptr, __UINT64_TYPE__ __val, int __order);
-extern __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_or_8)(__UINT64_TYPE__ *__mptr, __UINT64_TYPE__ __val, int __order);
-extern __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_nand_8)(__UINT64_TYPE__ *__mptr, __UINT64_TYPE__ __val, int __order);
-extern __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_add_fetch_8)(__UINT64_TYPE__ *__mptr, __UINT64_TYPE__ __val, int __order);
-extern __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_sub_fetch_8)(__UINT64_TYPE__ *__mptr, __UINT64_TYPE__ __val, int __order);
-extern __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_and_fetch_8)(__UINT64_TYPE__ *__mptr, __UINT64_TYPE__ __val, int __order);
-extern __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_xor_fetch_8)(__UINT64_TYPE__ *__mptr, __UINT64_TYPE__ __val, int __order);
-extern __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_or_fetch_8)(__UINT64_TYPE__ *__mptr, __UINT64_TYPE__ __val, int __order);
-extern __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_nand_fetch_8)(__UINT64_TYPE__ *__mptr, __UINT64_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_load_8)(__UINT64_TYPE__ const *__ptr, int __order);
+__HYBRID_LIBATOMIC_DECL void (__HYBRID_LIBATOMIC_CC __atomic_store_8)(__UINT64_TYPE__ *__ptr, __UINT64_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_exchange_8)(__UINT64_TYPE__ *__ptr, __UINT64_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __BOOL (__HYBRID_LIBATOMIC_CC __atomic_compare_exchange_8)(__UINT64_TYPE__ *__ptr, __UINT64_TYPE__ *__p_expected, __UINT64_TYPE__ __newval, int __succ, int __fail);
+__HYBRID_LIBATOMIC_DECL __BOOL (__HYBRID_LIBATOMIC_CC __atomic_test_and_set_8)(__UINT64_TYPE__ *__ptr, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_add_8)(__UINT64_TYPE__ *__ptr, __UINT64_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_sub_8)(__UINT64_TYPE__ *__ptr, __UINT64_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_and_8)(__UINT64_TYPE__ *__ptr, __UINT64_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_xor_8)(__UINT64_TYPE__ *__ptr, __UINT64_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_or_8)(__UINT64_TYPE__ *__ptr, __UINT64_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_nand_8)(__UINT64_TYPE__ *__ptr, __UINT64_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_add_fetch_8)(__UINT64_TYPE__ *__ptr, __UINT64_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_sub_fetch_8)(__UINT64_TYPE__ *__ptr, __UINT64_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_and_fetch_8)(__UINT64_TYPE__ *__ptr, __UINT64_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_xor_fetch_8)(__UINT64_TYPE__ *__ptr, __UINT64_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_or_fetch_8)(__UINT64_TYPE__ *__ptr, __UINT64_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT64_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_nand_fetch_8)(__UINT64_TYPE__ *__ptr, __UINT64_TYPE__ __val, int __order);
 #endif /* __UINT64_TYPE__ */
 
 #ifdef __UINT128_TYPE__
-extern __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_load_16)(__UINT128_TYPE__ const *__mptr, int __order);
-extern void (__HYBRID_LIBATOMIC_CC __atomic_store_16)(__UINT128_TYPE__ *__mptr, __UINT128_TYPE__ __val, int __order);
-extern __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_exchange_16)(__UINT128_TYPE__ *__mptr, __UINT128_TYPE__ __val, int __order);
-extern __BOOL (__HYBRID_LIBATOMIC_CC __atomic_compare_exchange_16)(__UINT128_TYPE__ *__mptr, __UINT128_TYPE__ *__p_expected, __UINT128_TYPE__ __newval, int __succ, int __fail);
-extern __BOOL (__HYBRID_LIBATOMIC_CC __atomic_test_and_set_16)(__UINT128_TYPE__ *__mptr, int __order);
-extern __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_add_16)(__UINT128_TYPE__ *__mptr, __UINT128_TYPE__ __val, int __order);
-extern __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_sub_16)(__UINT128_TYPE__ *__mptr, __UINT128_TYPE__ __val, int __order);
-extern __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_and_16)(__UINT128_TYPE__ *__mptr, __UINT128_TYPE__ __val, int __order);
-extern __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_xor_16)(__UINT128_TYPE__ *__mptr, __UINT128_TYPE__ __val, int __order);
-extern __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_or_16)(__UINT128_TYPE__ *__mptr, __UINT128_TYPE__ __val, int __order);
-extern __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_nand_16)(__UINT128_TYPE__ *__mptr, __UINT128_TYPE__ __val, int __order);
-extern __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_add_fetch_16)(__UINT128_TYPE__ *__mptr, __UINT128_TYPE__ __val, int __order);
-extern __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_sub_fetch_16)(__UINT128_TYPE__ *__mptr, __UINT128_TYPE__ __val, int __order);
-extern __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_and_fetch_16)(__UINT128_TYPE__ *__mptr, __UINT128_TYPE__ __val, int __order);
-extern __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_xor_fetch_16)(__UINT128_TYPE__ *__mptr, __UINT128_TYPE__ __val, int __order);
-extern __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_or_fetch_16)(__UINT128_TYPE__ *__mptr, __UINT128_TYPE__ __val, int __order);
-extern __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_nand_fetch_16)(__UINT128_TYPE__ *__mptr, __UINT128_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_load_16)(__UINT128_TYPE__ const *__ptr, int __order);
+__HYBRID_LIBATOMIC_DECL void (__HYBRID_LIBATOMIC_CC __atomic_store_16)(__UINT128_TYPE__ *__ptr, __UINT128_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_exchange_16)(__UINT128_TYPE__ *__ptr, __UINT128_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __BOOL (__HYBRID_LIBATOMIC_CC __atomic_compare_exchange_16)(__UINT128_TYPE__ *__ptr, __UINT128_TYPE__ *__p_expected, __UINT128_TYPE__ __newval, int __succ, int __fail);
+__HYBRID_LIBATOMIC_DECL __BOOL (__HYBRID_LIBATOMIC_CC __atomic_test_and_set_16)(__UINT128_TYPE__ *__ptr, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_add_16)(__UINT128_TYPE__ *__ptr, __UINT128_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_sub_16)(__UINT128_TYPE__ *__ptr, __UINT128_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_and_16)(__UINT128_TYPE__ *__ptr, __UINT128_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_xor_16)(__UINT128_TYPE__ *__ptr, __UINT128_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_or_16)(__UINT128_TYPE__ *__ptr, __UINT128_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_fetch_nand_16)(__UINT128_TYPE__ *__ptr, __UINT128_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_add_fetch_16)(__UINT128_TYPE__ *__ptr, __UINT128_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_sub_fetch_16)(__UINT128_TYPE__ *__ptr, __UINT128_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_and_fetch_16)(__UINT128_TYPE__ *__ptr, __UINT128_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_xor_fetch_16)(__UINT128_TYPE__ *__ptr, __UINT128_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_or_fetch_16)(__UINT128_TYPE__ *__ptr, __UINT128_TYPE__ __val, int __order);
+__HYBRID_LIBATOMIC_DECL __UINT128_TYPE__ (__HYBRID_LIBATOMIC_CC __atomic_nand_fetch_16)(__UINT128_TYPE__ *__ptr, __UINT128_TYPE__ __val, int __order);
 #endif /* __UINT128_TYPE__ */
 __NAMESPACE_INT_END
 

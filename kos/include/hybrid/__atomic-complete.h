@@ -3185,16 +3185,16 @@ function makeTypeGeneric(
 		order2: bool = false,
 		const: bool = false) {
 	print("#ifndef __hybrid_atomic_", name);
+	local minSize = SIZES < ...;
 	if (name in ["inc", "dec", "fetchinc", "fetchdec", "incfetch", "decfetch"]) {
 		local subname = "inc" in name ? name.replace("inc", "add")
 		                              : name.replace("dec", "sub");
 		print("#ifdef __hybrid_atomic_", subname);
 		print("#define __hybrid_atomic_", name, "(p, order) __hybrid_atomic_", subname, "(p, 1, order)");
-		print("#el"),;
+		print("#elif defined(__hybrid_atomic_", name, minSize, ")");
 	} else {
-		print("#"),;
+		print("#ifdef __hybrid_atomic_", name, minSize);
 	}
-	print("if ", " || ".join(for (local n: SIZES) f"defined(__hybrid_atomic_{name}{n})"));
 	print("#ifdef __cplusplus");
 	print('extern "C++" {');
 	print("#ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED");
@@ -3289,7 +3289,7 @@ function makeTypeGeneric(
 	defineCOverloadMacro([8]);
 	print("#endif /" "* !... *" "/");
 	print("#endif /" "* !__cplusplus *" "/");
-	print("#endif /" "* __hybrid_atomic_", name, "{N} *" "/");
+	print("#endif /" "* __hybrid_atomic_", name, minSize, " *" "/");
 	print("#endif /" "* !__hybrid_atomic_", name, " *" "/");
 }
 
@@ -3325,7 +3325,7 @@ makeTypeGeneric("inc",         returnType: "void", params: []);
 makeTypeGeneric("dec",         returnType: "void", params: []);
 ]]]*/
 #ifndef __hybrid_atomic_cmpxch
-#if defined(__hybrid_atomic_cmpxch8) || defined(__hybrid_atomic_cmpxch16) || defined(__hybrid_atomic_cmpxch32) || defined(__hybrid_atomic_cmpxch64) || defined(__hybrid_atomic_cmpxch128)
+#ifdef __hybrid_atomic_cmpxch8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -3400,10 +3400,10 @@ template<class __T, class __Toldval, class __Tnewval> inline __ATTR_WUNUSED __AT
 	__ATOMIC_RECAST(p, __hybrid_atomic_cmpxch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_cmpxch{N} */
+#endif /* __hybrid_atomic_cmpxch8 */
 #endif /* !__hybrid_atomic_cmpxch */
 #ifndef __hybrid_atomic_cmpxch_weak
-#if defined(__hybrid_atomic_cmpxch_weak8) || defined(__hybrid_atomic_cmpxch_weak16) || defined(__hybrid_atomic_cmpxch_weak32) || defined(__hybrid_atomic_cmpxch_weak64) || defined(__hybrid_atomic_cmpxch_weak128)
+#ifdef __hybrid_atomic_cmpxch_weak8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -3478,10 +3478,10 @@ template<class __T, class __Toldval, class __Tnewval> inline __ATTR_WUNUSED __AT
 	__ATOMIC_RECAST(p, __hybrid_atomic_cmpxch_weak8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_cmpxch_weak{N} */
+#endif /* __hybrid_atomic_cmpxch_weak8 */
 #endif /* !__hybrid_atomic_cmpxch_weak */
 #ifndef __hybrid_atomic_cmpxch_val
-#if defined(__hybrid_atomic_cmpxch_val8) || defined(__hybrid_atomic_cmpxch_val16) || defined(__hybrid_atomic_cmpxch_val32) || defined(__hybrid_atomic_cmpxch_val64) || defined(__hybrid_atomic_cmpxch_val128)
+#ifdef __hybrid_atomic_cmpxch_val8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -3556,10 +3556,10 @@ template<class __T, class __Toldval, class __Tnewval> inline __ATTR_WUNUSED __AT
 	__ATOMIC_RECAST(p, __hybrid_atomic_cmpxch_val8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_cmpxch_val{N} */
+#endif /* __hybrid_atomic_cmpxch_val8 */
 #endif /* !__hybrid_atomic_cmpxch_val */
 #ifndef __hybrid_atomic_load
-#if defined(__hybrid_atomic_load8) || defined(__hybrid_atomic_load16) || defined(__hybrid_atomic_load32) || defined(__hybrid_atomic_load64) || defined(__hybrid_atomic_load128)
+#ifdef __hybrid_atomic_load8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -3634,10 +3634,10 @@ template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPA
 	__ATOMIC_RECAST(p, __hybrid_atomic_load8((__UINT8_TYPE__ const *)(p), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_load{N} */
+#endif /* __hybrid_atomic_load8 */
 #endif /* !__hybrid_atomic_load */
 #ifndef __hybrid_atomic_store
-#if defined(__hybrid_atomic_store8) || defined(__hybrid_atomic_store16) || defined(__hybrid_atomic_store32) || defined(__hybrid_atomic_store64) || defined(__hybrid_atomic_store128)
+#ifdef __hybrid_atomic_store8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -3712,10 +3712,10 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 	__ATOMIC_RECAST(p, __hybrid_atomic_store8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_store{N} */
+#endif /* __hybrid_atomic_store8 */
 #endif /* !__hybrid_atomic_store */
 #ifndef __hybrid_atomic_xch
-#if defined(__hybrid_atomic_xch8) || defined(__hybrid_atomic_xch16) || defined(__hybrid_atomic_xch32) || defined(__hybrid_atomic_xch64) || defined(__hybrid_atomic_xch128)
+#ifdef __hybrid_atomic_xch8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -3790,10 +3790,10 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	__ATOMIC_RECAST(p, __hybrid_atomic_xch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_xch{N} */
+#endif /* __hybrid_atomic_xch8 */
 #endif /* !__hybrid_atomic_xch */
 #ifndef __hybrid_atomic_fetchadd
-#if defined(__hybrid_atomic_fetchadd8) || defined(__hybrid_atomic_fetchadd16) || defined(__hybrid_atomic_fetchadd32) || defined(__hybrid_atomic_fetchadd64) || defined(__hybrid_atomic_fetchadd128)
+#ifdef __hybrid_atomic_fetchadd8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -3868,10 +3868,10 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	__ATOMIC_RECAST(p, __hybrid_atomic_fetchadd8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_fetchadd{N} */
+#endif /* __hybrid_atomic_fetchadd8 */
 #endif /* !__hybrid_atomic_fetchadd */
 #ifndef __hybrid_atomic_fetchsub
-#if defined(__hybrid_atomic_fetchsub8) || defined(__hybrid_atomic_fetchsub16) || defined(__hybrid_atomic_fetchsub32) || defined(__hybrid_atomic_fetchsub64) || defined(__hybrid_atomic_fetchsub128)
+#ifdef __hybrid_atomic_fetchsub8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -3946,10 +3946,10 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	__ATOMIC_RECAST(p, __hybrid_atomic_fetchsub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_fetchsub{N} */
+#endif /* __hybrid_atomic_fetchsub8 */
 #endif /* !__hybrid_atomic_fetchsub */
 #ifndef __hybrid_atomic_fetchand
-#if defined(__hybrid_atomic_fetchand8) || defined(__hybrid_atomic_fetchand16) || defined(__hybrid_atomic_fetchand32) || defined(__hybrid_atomic_fetchand64) || defined(__hybrid_atomic_fetchand128)
+#ifdef __hybrid_atomic_fetchand8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -4024,10 +4024,10 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	__ATOMIC_RECAST(p, __hybrid_atomic_fetchand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_fetchand{N} */
+#endif /* __hybrid_atomic_fetchand8 */
 #endif /* !__hybrid_atomic_fetchand */
 #ifndef __hybrid_atomic_fetchxor
-#if defined(__hybrid_atomic_fetchxor8) || defined(__hybrid_atomic_fetchxor16) || defined(__hybrid_atomic_fetchxor32) || defined(__hybrid_atomic_fetchxor64) || defined(__hybrid_atomic_fetchxor128)
+#ifdef __hybrid_atomic_fetchxor8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -4102,10 +4102,10 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	__ATOMIC_RECAST(p, __hybrid_atomic_fetchxor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_fetchxor{N} */
+#endif /* __hybrid_atomic_fetchxor8 */
 #endif /* !__hybrid_atomic_fetchxor */
 #ifndef __hybrid_atomic_fetchor
-#if defined(__hybrid_atomic_fetchor8) || defined(__hybrid_atomic_fetchor16) || defined(__hybrid_atomic_fetchor32) || defined(__hybrid_atomic_fetchor64) || defined(__hybrid_atomic_fetchor128)
+#ifdef __hybrid_atomic_fetchor8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -4180,10 +4180,10 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	__ATOMIC_RECAST(p, __hybrid_atomic_fetchor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_fetchor{N} */
+#endif /* __hybrid_atomic_fetchor8 */
 #endif /* !__hybrid_atomic_fetchor */
 #ifndef __hybrid_atomic_fetchnand
-#if defined(__hybrid_atomic_fetchnand8) || defined(__hybrid_atomic_fetchnand16) || defined(__hybrid_atomic_fetchnand32) || defined(__hybrid_atomic_fetchnand64) || defined(__hybrid_atomic_fetchnand128)
+#ifdef __hybrid_atomic_fetchnand8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -4258,12 +4258,12 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	__ATOMIC_RECAST(p, __hybrid_atomic_fetchnand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_fetchnand{N} */
+#endif /* __hybrid_atomic_fetchnand8 */
 #endif /* !__hybrid_atomic_fetchnand */
 #ifndef __hybrid_atomic_fetchinc
 #ifdef __hybrid_atomic_fetchadd
 #define __hybrid_atomic_fetchinc(p, order) __hybrid_atomic_fetchadd(p, 1, order)
-#elif defined(__hybrid_atomic_fetchinc8) || defined(__hybrid_atomic_fetchinc16) || defined(__hybrid_atomic_fetchinc32) || defined(__hybrid_atomic_fetchinc64) || defined(__hybrid_atomic_fetchinc128)
+#elif defined(__hybrid_atomic_fetchinc8)
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -4338,12 +4338,12 @@ template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPA
 	__ATOMIC_RECAST(p, __hybrid_atomic_fetchinc8((__UINT8_TYPE__ *)(p), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_fetchinc{N} */
+#endif /* __hybrid_atomic_fetchinc8 */
 #endif /* !__hybrid_atomic_fetchinc */
 #ifndef __hybrid_atomic_fetchdec
 #ifdef __hybrid_atomic_fetchsub
 #define __hybrid_atomic_fetchdec(p, order) __hybrid_atomic_fetchsub(p, 1, order)
-#elif defined(__hybrid_atomic_fetchdec8) || defined(__hybrid_atomic_fetchdec16) || defined(__hybrid_atomic_fetchdec32) || defined(__hybrid_atomic_fetchdec64) || defined(__hybrid_atomic_fetchdec128)
+#elif defined(__hybrid_atomic_fetchdec8)
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -4418,10 +4418,10 @@ template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPA
 	__ATOMIC_RECAST(p, __hybrid_atomic_fetchdec8((__UINT8_TYPE__ *)(p), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_fetchdec{N} */
+#endif /* __hybrid_atomic_fetchdec8 */
 #endif /* !__hybrid_atomic_fetchdec */
 #ifndef __hybrid_atomic_addfetch
-#if defined(__hybrid_atomic_addfetch8) || defined(__hybrid_atomic_addfetch16) || defined(__hybrid_atomic_addfetch32) || defined(__hybrid_atomic_addfetch64) || defined(__hybrid_atomic_addfetch128)
+#ifdef __hybrid_atomic_addfetch8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -4496,10 +4496,10 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	__ATOMIC_RECAST(p, __hybrid_atomic_addfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_addfetch{N} */
+#endif /* __hybrid_atomic_addfetch8 */
 #endif /* !__hybrid_atomic_addfetch */
 #ifndef __hybrid_atomic_subfetch
-#if defined(__hybrid_atomic_subfetch8) || defined(__hybrid_atomic_subfetch16) || defined(__hybrid_atomic_subfetch32) || defined(__hybrid_atomic_subfetch64) || defined(__hybrid_atomic_subfetch128)
+#ifdef __hybrid_atomic_subfetch8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -4574,10 +4574,10 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	__ATOMIC_RECAST(p, __hybrid_atomic_subfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_subfetch{N} */
+#endif /* __hybrid_atomic_subfetch8 */
 #endif /* !__hybrid_atomic_subfetch */
 #ifndef __hybrid_atomic_andfetch
-#if defined(__hybrid_atomic_andfetch8) || defined(__hybrid_atomic_andfetch16) || defined(__hybrid_atomic_andfetch32) || defined(__hybrid_atomic_andfetch64) || defined(__hybrid_atomic_andfetch128)
+#ifdef __hybrid_atomic_andfetch8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -4652,10 +4652,10 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	__ATOMIC_RECAST(p, __hybrid_atomic_andfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_andfetch{N} */
+#endif /* __hybrid_atomic_andfetch8 */
 #endif /* !__hybrid_atomic_andfetch */
 #ifndef __hybrid_atomic_xorfetch
-#if defined(__hybrid_atomic_xorfetch8) || defined(__hybrid_atomic_xorfetch16) || defined(__hybrid_atomic_xorfetch32) || defined(__hybrid_atomic_xorfetch64) || defined(__hybrid_atomic_xorfetch128)
+#ifdef __hybrid_atomic_xorfetch8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -4730,10 +4730,10 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	__ATOMIC_RECAST(p, __hybrid_atomic_xorfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_xorfetch{N} */
+#endif /* __hybrid_atomic_xorfetch8 */
 #endif /* !__hybrid_atomic_xorfetch */
 #ifndef __hybrid_atomic_orfetch
-#if defined(__hybrid_atomic_orfetch8) || defined(__hybrid_atomic_orfetch16) || defined(__hybrid_atomic_orfetch32) || defined(__hybrid_atomic_orfetch64) || defined(__hybrid_atomic_orfetch128)
+#ifdef __hybrid_atomic_orfetch8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -4808,10 +4808,10 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	__ATOMIC_RECAST(p, __hybrid_atomic_orfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_orfetch{N} */
+#endif /* __hybrid_atomic_orfetch8 */
 #endif /* !__hybrid_atomic_orfetch */
 #ifndef __hybrid_atomic_nandfetch
-#if defined(__hybrid_atomic_nandfetch8) || defined(__hybrid_atomic_nandfetch16) || defined(__hybrid_atomic_nandfetch32) || defined(__hybrid_atomic_nandfetch64) || defined(__hybrid_atomic_nandfetch128)
+#ifdef __hybrid_atomic_nandfetch8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -4886,12 +4886,12 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	__ATOMIC_RECAST(p, __hybrid_atomic_nandfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_nandfetch{N} */
+#endif /* __hybrid_atomic_nandfetch8 */
 #endif /* !__hybrid_atomic_nandfetch */
 #ifndef __hybrid_atomic_incfetch
 #ifdef __hybrid_atomic_addfetch
 #define __hybrid_atomic_incfetch(p, order) __hybrid_atomic_addfetch(p, 1, order)
-#elif defined(__hybrid_atomic_incfetch8) || defined(__hybrid_atomic_incfetch16) || defined(__hybrid_atomic_incfetch32) || defined(__hybrid_atomic_incfetch64) || defined(__hybrid_atomic_incfetch128)
+#elif defined(__hybrid_atomic_incfetch8)
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -4966,12 +4966,12 @@ template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPA
 	__ATOMIC_RECAST(p, __hybrid_atomic_incfetch8((__UINT8_TYPE__ *)(p), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_incfetch{N} */
+#endif /* __hybrid_atomic_incfetch8 */
 #endif /* !__hybrid_atomic_incfetch */
 #ifndef __hybrid_atomic_decfetch
 #ifdef __hybrid_atomic_subfetch
 #define __hybrid_atomic_decfetch(p, order) __hybrid_atomic_subfetch(p, 1, order)
-#elif defined(__hybrid_atomic_decfetch8) || defined(__hybrid_atomic_decfetch16) || defined(__hybrid_atomic_decfetch32) || defined(__hybrid_atomic_decfetch64) || defined(__hybrid_atomic_decfetch128)
+#elif defined(__hybrid_atomic_decfetch8)
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -5046,10 +5046,10 @@ template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPA
 	__ATOMIC_RECAST(p, __hybrid_atomic_decfetch8((__UINT8_TYPE__ *)(p), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_decfetch{N} */
+#endif /* __hybrid_atomic_decfetch8 */
 #endif /* !__hybrid_atomic_decfetch */
 #ifndef __hybrid_atomic_add
-#if defined(__hybrid_atomic_add8) || defined(__hybrid_atomic_add16) || defined(__hybrid_atomic_add32) || defined(__hybrid_atomic_add64) || defined(__hybrid_atomic_add128)
+#ifdef __hybrid_atomic_add8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -5124,10 +5124,10 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 	__ATOMIC_RECAST(p, __hybrid_atomic_add8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_add{N} */
+#endif /* __hybrid_atomic_add8 */
 #endif /* !__hybrid_atomic_add */
 #ifndef __hybrid_atomic_sub
-#if defined(__hybrid_atomic_sub8) || defined(__hybrid_atomic_sub16) || defined(__hybrid_atomic_sub32) || defined(__hybrid_atomic_sub64) || defined(__hybrid_atomic_sub128)
+#ifdef __hybrid_atomic_sub8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -5202,10 +5202,10 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 	__ATOMIC_RECAST(p, __hybrid_atomic_sub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_sub{N} */
+#endif /* __hybrid_atomic_sub8 */
 #endif /* !__hybrid_atomic_sub */
 #ifndef __hybrid_atomic_and
-#if defined(__hybrid_atomic_and8) || defined(__hybrid_atomic_and16) || defined(__hybrid_atomic_and32) || defined(__hybrid_atomic_and64) || defined(__hybrid_atomic_and128)
+#ifdef __hybrid_atomic_and8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -5280,10 +5280,10 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 	__ATOMIC_RECAST(p, __hybrid_atomic_and8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_and{N} */
+#endif /* __hybrid_atomic_and8 */
 #endif /* !__hybrid_atomic_and */
 #ifndef __hybrid_atomic_xor
-#if defined(__hybrid_atomic_xor8) || defined(__hybrid_atomic_xor16) || defined(__hybrid_atomic_xor32) || defined(__hybrid_atomic_xor64) || defined(__hybrid_atomic_xor128)
+#ifdef __hybrid_atomic_xor8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -5358,10 +5358,10 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 	__ATOMIC_RECAST(p, __hybrid_atomic_xor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_xor{N} */
+#endif /* __hybrid_atomic_xor8 */
 #endif /* !__hybrid_atomic_xor */
 #ifndef __hybrid_atomic_or
-#if defined(__hybrid_atomic_or8) || defined(__hybrid_atomic_or16) || defined(__hybrid_atomic_or32) || defined(__hybrid_atomic_or64) || defined(__hybrid_atomic_or128)
+#ifdef __hybrid_atomic_or8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -5436,10 +5436,10 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 	__ATOMIC_RECAST(p, __hybrid_atomic_or8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_or{N} */
+#endif /* __hybrid_atomic_or8 */
 #endif /* !__hybrid_atomic_or */
 #ifndef __hybrid_atomic_nand
-#if defined(__hybrid_atomic_nand8) || defined(__hybrid_atomic_nand16) || defined(__hybrid_atomic_nand32) || defined(__hybrid_atomic_nand64) || defined(__hybrid_atomic_nand128)
+#ifdef __hybrid_atomic_nand8
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -5514,12 +5514,12 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 	__ATOMIC_RECAST(p, __hybrid_atomic_nand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_nand{N} */
+#endif /* __hybrid_atomic_nand8 */
 #endif /* !__hybrid_atomic_nand */
 #ifndef __hybrid_atomic_inc
 #ifdef __hybrid_atomic_add
 #define __hybrid_atomic_inc(p, order) __hybrid_atomic_add(p, 1, order)
-#elif defined(__hybrid_atomic_inc8) || defined(__hybrid_atomic_inc16) || defined(__hybrid_atomic_inc32) || defined(__hybrid_atomic_inc64) || defined(__hybrid_atomic_inc128)
+#elif defined(__hybrid_atomic_inc8)
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -5594,12 +5594,12 @@ template<class __T> inline __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hy
 	__ATOMIC_RECAST(p, __hybrid_atomic_inc8((__UINT8_TYPE__ *)(p), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_inc{N} */
+#endif /* __hybrid_atomic_inc8 */
 #endif /* !__hybrid_atomic_inc */
 #ifndef __hybrid_atomic_dec
 #ifdef __hybrid_atomic_sub
 #define __hybrid_atomic_dec(p, order) __hybrid_atomic_sub(p, 1, order)
-#elif defined(__hybrid_atomic_dec8) || defined(__hybrid_atomic_dec16) || defined(__hybrid_atomic_dec32) || defined(__hybrid_atomic_dec64) || defined(__hybrid_atomic_dec128)
+#elif defined(__hybrid_atomic_dec8)
 #ifdef __cplusplus
 extern "C++" {
 #ifndef __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED
@@ -5674,7 +5674,7 @@ template<class __T> inline __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hy
 	__ATOMIC_RECAST(p, __hybrid_atomic_dec8((__UINT8_TYPE__ *)(p), order))
 #endif /* !... */
 #endif /* !__cplusplus */
-#endif /* __hybrid_atomic_dec{N} */
+#endif /* __hybrid_atomic_dec8 */
 #endif /* !__hybrid_atomic_dec */
 /*[[[end]]]*/
 /* clang-format on */
