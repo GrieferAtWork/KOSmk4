@@ -23,6 +23,11 @@
 #define __unlikely /* Nothing */
 #define __P(x)     x
 
+#ifndef __STDC__
+/* We need `__STDC__' to be defined since its the indicator for a modern preprocessor to be available. */
+#define __STDC__ 1
+#endif /* !__STDC__ */
+
 #if defined(_MSC_EXTENSIONS) || _MSC_VER >= 1400
 #define __COMPILER_HAVE_LONGLONG
 #endif /* _MSC_EXTENSIONS || _MSC_VER >= 1400 */

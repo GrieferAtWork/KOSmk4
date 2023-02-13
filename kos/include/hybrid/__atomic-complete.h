@@ -3253,13 +3253,21 @@ function makeTypeGeneric(
 		for (local p: params)
 			print(", ", p),;
 		print(", ", order2 ? "succ, fail" : "order", ") \\");
-		print("	__ATOMIC_RECAST(p, "),;
+		if (returnType != "void") {
+			print("	__ATOMIC_RECAST(p, "),;
+		} else {
+			print("	("),;
+		}
 		local isFirst = true;
 		local maxSizeWidth = #str((for (local s: sizes[:-1]) s / 8) > ...);
 		for (local n: sizes) {
 			if (!isFirst) {
 				print(" \\");
-				print("	                   "),;
+				if (returnType != "void") {
+					print("	                   "),;
+				} else {
+					print("	 "),;
+				}
 			}
 			if (n != sizes.last) {
 				print("sizeof(*(p)) == ", str(n / 8).ljust(maxSizeWidth), " ? "),;
@@ -3273,6 +3281,8 @@ function makeTypeGeneric(
 			for (local p: params)
 				print(", __ATOMIC_DOWNCAST(__UINT", n, "_TYPE__)(", p, ")"),;
 			print(", ", order2 ? "succ, fail" : "order", ")"),;
+			if (n != sizes.last)
+				print(" :"),;
 			isFirst = false;
 		}
 		print(")");
@@ -3375,25 +3385,25 @@ template<class __T, class __Toldval, class __Tnewval> inline __ATTR_WUNUSED __AT
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_cmpxch128
 #define __hybrid_atomic_cmpxch(p, oldval, newval, succ, fail) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_cmpxch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_cmpxch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(newval), succ, fail) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_cmpxch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(newval), succ, fail) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_cmpxch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_cmpxch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(newval), succ, fail) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_cmpxch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(newval), succ, fail) : \
 	                                       __hybrid_atomic_cmpxch128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(newval), succ, fail))
 #elif defined(__hybrid_atomic_cmpxch64)
 #define __hybrid_atomic_cmpxch(p, oldval, newval, succ, fail) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_cmpxch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_cmpxch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(newval), succ, fail) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_cmpxch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_cmpxch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(newval), succ, fail) : \
 	                                       __hybrid_atomic_cmpxch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(newval), succ, fail))
 #elif defined(__hybrid_atomic_cmpxch32)
 #define __hybrid_atomic_cmpxch(p, oldval, newval, succ, fail) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_cmpxch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_cmpxch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail) : \
 	                                       __hybrid_atomic_cmpxch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(newval), succ, fail))
 #elif defined(__hybrid_atomic_cmpxch16)
 #define __hybrid_atomic_cmpxch(p, oldval, newval, succ, fail) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) : \
 	                                       __hybrid_atomic_cmpxch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail))
 #else /* ... */
 #define __hybrid_atomic_cmpxch(p, oldval, newval, succ, fail) \
@@ -3453,25 +3463,25 @@ template<class __T, class __Toldval, class __Tnewval> inline __ATTR_WUNUSED __AT
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_cmpxch_weak128
 #define __hybrid_atomic_cmpxch_weak(p, oldval, newval, succ, fail) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch_weak8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_cmpxch_weak16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_cmpxch_weak32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(newval), succ, fail) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_cmpxch_weak64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(newval), succ, fail) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch_weak8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_cmpxch_weak16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_cmpxch_weak32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(newval), succ, fail) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_cmpxch_weak64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(newval), succ, fail) : \
 	                                       __hybrid_atomic_cmpxch_weak128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(newval), succ, fail))
 #elif defined(__hybrid_atomic_cmpxch_weak64)
 #define __hybrid_atomic_cmpxch_weak(p, oldval, newval, succ, fail) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch_weak8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_cmpxch_weak16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_cmpxch_weak32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(newval), succ, fail) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch_weak8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_cmpxch_weak16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_cmpxch_weak32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(newval), succ, fail) : \
 	                                       __hybrid_atomic_cmpxch_weak64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(newval), succ, fail))
 #elif defined(__hybrid_atomic_cmpxch_weak32)
 #define __hybrid_atomic_cmpxch_weak(p, oldval, newval, succ, fail) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch_weak8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_cmpxch_weak16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch_weak8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_cmpxch_weak16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail) : \
 	                                       __hybrid_atomic_cmpxch_weak32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(newval), succ, fail))
 #elif defined(__hybrid_atomic_cmpxch_weak16)
 #define __hybrid_atomic_cmpxch_weak(p, oldval, newval, succ, fail) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch_weak8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch_weak8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) : \
 	                                       __hybrid_atomic_cmpxch_weak16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail))
 #else /* ... */
 #define __hybrid_atomic_cmpxch_weak(p, oldval, newval, succ, fail) \
@@ -3531,25 +3541,25 @@ template<class __T, class __Toldval, class __Tnewval> inline __ATTR_WUNUSED __AT
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_cmpxch_val128
 #define __hybrid_atomic_cmpxch_val(p, oldval, newval, succ, fail) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch_val8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_cmpxch_val16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_cmpxch_val32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(newval), succ, fail) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_cmpxch_val64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(newval), succ, fail) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch_val8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_cmpxch_val16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_cmpxch_val32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(newval), succ, fail) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_cmpxch_val64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(newval), succ, fail) : \
 	                                       __hybrid_atomic_cmpxch_val128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(newval), succ, fail))
 #elif defined(__hybrid_atomic_cmpxch_val64)
 #define __hybrid_atomic_cmpxch_val(p, oldval, newval, succ, fail) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch_val8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_cmpxch_val16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_cmpxch_val32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(newval), succ, fail) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch_val8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_cmpxch_val16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_cmpxch_val32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(newval), succ, fail) : \
 	                                       __hybrid_atomic_cmpxch_val64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(newval), succ, fail))
 #elif defined(__hybrid_atomic_cmpxch_val32)
 #define __hybrid_atomic_cmpxch_val(p, oldval, newval, succ, fail) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch_val8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_cmpxch_val16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch_val8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_cmpxch_val16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail) : \
 	                                       __hybrid_atomic_cmpxch_val32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(newval), succ, fail))
 #elif defined(__hybrid_atomic_cmpxch_val16)
 #define __hybrid_atomic_cmpxch_val(p, oldval, newval, succ, fail) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch_val8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_cmpxch_val8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newval), succ, fail) : \
 	                                       __hybrid_atomic_cmpxch_val16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldval), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newval), succ, fail))
 #else /* ... */
 #define __hybrid_atomic_cmpxch_val(p, oldval, newval, succ, fail) \
@@ -3609,25 +3619,25 @@ template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPA
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_load128
 #define __hybrid_atomic_load(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_load8((__UINT8_TYPE__ const *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_load16((__UINT16_TYPE__ const *)(p), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_load32((__UINT32_TYPE__ const *)(p), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_load64((__UINT64_TYPE__ const *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_load8((__UINT8_TYPE__ const *)(p), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_load16((__UINT16_TYPE__ const *)(p), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_load32((__UINT32_TYPE__ const *)(p), order) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_load64((__UINT64_TYPE__ const *)(p), order) : \
 	                                       __hybrid_atomic_load128((__UINT128_TYPE__ const *)(p), order))
 #elif defined(__hybrid_atomic_load64)
 #define __hybrid_atomic_load(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_load8((__UINT8_TYPE__ const *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_load16((__UINT16_TYPE__ const *)(p), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_load32((__UINT32_TYPE__ const *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_load8((__UINT8_TYPE__ const *)(p), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_load16((__UINT16_TYPE__ const *)(p), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_load32((__UINT32_TYPE__ const *)(p), order) : \
 	                                       __hybrid_atomic_load64((__UINT64_TYPE__ const *)(p), order))
 #elif defined(__hybrid_atomic_load32)
 #define __hybrid_atomic_load(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_load8((__UINT8_TYPE__ const *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_load16((__UINT16_TYPE__ const *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_load8((__UINT8_TYPE__ const *)(p), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_load16((__UINT16_TYPE__ const *)(p), order) : \
 	                                       __hybrid_atomic_load32((__UINT32_TYPE__ const *)(p), order))
 #elif defined(__hybrid_atomic_load16)
 #define __hybrid_atomic_load(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_load8((__UINT8_TYPE__ const *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_load8((__UINT8_TYPE__ const *)(p), order) : \
 	                                       __hybrid_atomic_load16((__UINT16_TYPE__ const *)(p), order))
 #else /* ... */
 #define __hybrid_atomic_load(p, order) \
@@ -3687,29 +3697,29 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_store128
 #define __hybrid_atomic_store(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_store8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_store16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_store32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_store64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
-	                                       __hybrid_atomic_store128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_store8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_store16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 4 ? __hybrid_atomic_store32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 8 ? __hybrid_atomic_store64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
+	                     __hybrid_atomic_store128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_store64)
 #define __hybrid_atomic_store(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_store8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_store16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_store32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                                       __hybrid_atomic_store64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_store8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_store16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 4 ? __hybrid_atomic_store32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                     __hybrid_atomic_store64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_store32)
 #define __hybrid_atomic_store(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_store8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_store16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                                       __hybrid_atomic_store32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_store8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_store16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                     __hybrid_atomic_store32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_store16)
 #define __hybrid_atomic_store(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_store8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                                       __hybrid_atomic_store16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_store8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                     __hybrid_atomic_store16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_store(p, val, order) \
-	__ATOMIC_RECAST(p, __hybrid_atomic_store8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
+	(__hybrid_atomic_store8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
 #endif /* __hybrid_atomic_store8 */
@@ -3765,25 +3775,25 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_xch128
 #define __hybrid_atomic_xch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_xch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_xch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_xch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_xch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_xch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_xch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_xch128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_xch64)
 #define __hybrid_atomic_xch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_xch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_xch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_xch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_xch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_xch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_xch32)
 #define __hybrid_atomic_xch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_xch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_xch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_xch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_xch16)
 #define __hybrid_atomic_xch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_xch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_xch(p, val, order) \
@@ -3843,25 +3853,25 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_fetchadd128
 #define __hybrid_atomic_fetchadd(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchadd8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchadd16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchadd32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_fetchadd64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchadd8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchadd16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchadd32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_fetchadd64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchadd128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_fetchadd64)
 #define __hybrid_atomic_fetchadd(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchadd8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchadd16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchadd32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchadd8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchadd16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchadd32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchadd64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_fetchadd32)
 #define __hybrid_atomic_fetchadd(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchadd8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchadd16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchadd8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchadd16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchadd32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_fetchadd16)
 #define __hybrid_atomic_fetchadd(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchadd8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchadd8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchadd16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_fetchadd(p, val, order) \
@@ -3921,25 +3931,25 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_fetchsub128
 #define __hybrid_atomic_fetchsub(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchsub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchsub16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchsub32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_fetchsub64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchsub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchsub16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchsub32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_fetchsub64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchsub128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_fetchsub64)
 #define __hybrid_atomic_fetchsub(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchsub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchsub16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchsub32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchsub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchsub16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchsub32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchsub64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_fetchsub32)
 #define __hybrid_atomic_fetchsub(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchsub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchsub16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchsub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchsub16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchsub32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_fetchsub16)
 #define __hybrid_atomic_fetchsub(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchsub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchsub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchsub16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_fetchsub(p, val, order) \
@@ -3999,25 +4009,25 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_fetchand128
 #define __hybrid_atomic_fetchand(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchand32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_fetchand64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchand32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_fetchand64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchand128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_fetchand64)
 #define __hybrid_atomic_fetchand(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchand32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchand32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchand64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_fetchand32)
 #define __hybrid_atomic_fetchand(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchand32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_fetchand16)
 #define __hybrid_atomic_fetchand(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_fetchand(p, val, order) \
@@ -4077,25 +4087,25 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_fetchxor128
 #define __hybrid_atomic_fetchxor(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchxor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchxor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchxor32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_fetchxor64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchxor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchxor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchxor32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_fetchxor64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchxor128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_fetchxor64)
 #define __hybrid_atomic_fetchxor(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchxor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchxor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchxor32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchxor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchxor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchxor32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchxor64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_fetchxor32)
 #define __hybrid_atomic_fetchxor(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchxor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchxor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchxor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchxor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchxor32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_fetchxor16)
 #define __hybrid_atomic_fetchxor(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchxor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchxor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchxor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_fetchxor(p, val, order) \
@@ -4155,25 +4165,25 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_fetchor128
 #define __hybrid_atomic_fetchor(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchor32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_fetchor64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchor32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_fetchor64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchor128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_fetchor64)
 #define __hybrid_atomic_fetchor(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchor32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchor32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchor64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_fetchor32)
 #define __hybrid_atomic_fetchor(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchor32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_fetchor16)
 #define __hybrid_atomic_fetchor(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_fetchor(p, val, order) \
@@ -4233,25 +4243,25 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_fetchnand128
 #define __hybrid_atomic_fetchnand(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchnand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchnand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchnand32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_fetchnand64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchnand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchnand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchnand32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_fetchnand64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchnand128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_fetchnand64)
 #define __hybrid_atomic_fetchnand(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchnand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchnand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchnand32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchnand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchnand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchnand32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchnand64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_fetchnand32)
 #define __hybrid_atomic_fetchnand(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchnand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchnand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchnand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchnand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchnand32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_fetchnand16)
 #define __hybrid_atomic_fetchnand(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchnand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchnand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_fetchnand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_fetchnand(p, val, order) \
@@ -4313,25 +4323,25 @@ template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPA
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_fetchinc128
 #define __hybrid_atomic_fetchinc(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchinc8((__UINT8_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchinc16((__UINT16_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchinc32((__UINT32_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_fetchinc64((__UINT64_TYPE__ *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchinc8((__UINT8_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchinc16((__UINT16_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchinc32((__UINT32_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_fetchinc64((__UINT64_TYPE__ *)(p), order) : \
 	                                       __hybrid_atomic_fetchinc128((__UINT128_TYPE__ *)(p), order))
 #elif defined(__hybrid_atomic_fetchinc64)
 #define __hybrid_atomic_fetchinc(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchinc8((__UINT8_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchinc16((__UINT16_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchinc32((__UINT32_TYPE__ *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchinc8((__UINT8_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchinc16((__UINT16_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchinc32((__UINT32_TYPE__ *)(p), order) : \
 	                                       __hybrid_atomic_fetchinc64((__UINT64_TYPE__ *)(p), order))
 #elif defined(__hybrid_atomic_fetchinc32)
 #define __hybrid_atomic_fetchinc(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchinc8((__UINT8_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchinc16((__UINT16_TYPE__ *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchinc8((__UINT8_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchinc16((__UINT16_TYPE__ *)(p), order) : \
 	                                       __hybrid_atomic_fetchinc32((__UINT32_TYPE__ *)(p), order))
 #elif defined(__hybrid_atomic_fetchinc16)
 #define __hybrid_atomic_fetchinc(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchinc8((__UINT8_TYPE__ *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchinc8((__UINT8_TYPE__ *)(p), order) : \
 	                                       __hybrid_atomic_fetchinc16((__UINT16_TYPE__ *)(p), order))
 #else /* ... */
 #define __hybrid_atomic_fetchinc(p, order) \
@@ -4393,25 +4403,25 @@ template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPA
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_fetchdec128
 #define __hybrid_atomic_fetchdec(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchdec8((__UINT8_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchdec16((__UINT16_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchdec32((__UINT32_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_fetchdec64((__UINT64_TYPE__ *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchdec8((__UINT8_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchdec16((__UINT16_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchdec32((__UINT32_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_fetchdec64((__UINT64_TYPE__ *)(p), order) : \
 	                                       __hybrid_atomic_fetchdec128((__UINT128_TYPE__ *)(p), order))
 #elif defined(__hybrid_atomic_fetchdec64)
 #define __hybrid_atomic_fetchdec(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchdec8((__UINT8_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchdec16((__UINT16_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchdec32((__UINT32_TYPE__ *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchdec8((__UINT8_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchdec16((__UINT16_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_fetchdec32((__UINT32_TYPE__ *)(p), order) : \
 	                                       __hybrid_atomic_fetchdec64((__UINT64_TYPE__ *)(p), order))
 #elif defined(__hybrid_atomic_fetchdec32)
 #define __hybrid_atomic_fetchdec(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchdec8((__UINT8_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchdec16((__UINT16_TYPE__ *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchdec8((__UINT8_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_fetchdec16((__UINT16_TYPE__ *)(p), order) : \
 	                                       __hybrid_atomic_fetchdec32((__UINT32_TYPE__ *)(p), order))
 #elif defined(__hybrid_atomic_fetchdec16)
 #define __hybrid_atomic_fetchdec(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchdec8((__UINT8_TYPE__ *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_fetchdec8((__UINT8_TYPE__ *)(p), order) : \
 	                                       __hybrid_atomic_fetchdec16((__UINT16_TYPE__ *)(p), order))
 #else /* ... */
 #define __hybrid_atomic_fetchdec(p, order) \
@@ -4471,25 +4481,25 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_addfetch128
 #define __hybrid_atomic_addfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_addfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_addfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_addfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_addfetch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_addfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_addfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_addfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_addfetch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_addfetch128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_addfetch64)
 #define __hybrid_atomic_addfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_addfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_addfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_addfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_addfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_addfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_addfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_addfetch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_addfetch32)
 #define __hybrid_atomic_addfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_addfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_addfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_addfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_addfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_addfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_addfetch16)
 #define __hybrid_atomic_addfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_addfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_addfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_addfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_addfetch(p, val, order) \
@@ -4549,25 +4559,25 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_subfetch128
 #define __hybrid_atomic_subfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_subfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_subfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_subfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_subfetch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_subfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_subfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_subfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_subfetch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_subfetch128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_subfetch64)
 #define __hybrid_atomic_subfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_subfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_subfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_subfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_subfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_subfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_subfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_subfetch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_subfetch32)
 #define __hybrid_atomic_subfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_subfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_subfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_subfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_subfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_subfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_subfetch16)
 #define __hybrid_atomic_subfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_subfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_subfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_subfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_subfetch(p, val, order) \
@@ -4627,25 +4637,25 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_andfetch128
 #define __hybrid_atomic_andfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_andfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_andfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_andfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_andfetch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_andfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_andfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_andfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_andfetch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_andfetch128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_andfetch64)
 #define __hybrid_atomic_andfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_andfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_andfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_andfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_andfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_andfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_andfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_andfetch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_andfetch32)
 #define __hybrid_atomic_andfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_andfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_andfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_andfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_andfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_andfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_andfetch16)
 #define __hybrid_atomic_andfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_andfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_andfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_andfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_andfetch(p, val, order) \
@@ -4705,25 +4715,25 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_xorfetch128
 #define __hybrid_atomic_xorfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xorfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_xorfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_xorfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_xorfetch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xorfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_xorfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_xorfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_xorfetch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_xorfetch128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_xorfetch64)
 #define __hybrid_atomic_xorfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xorfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_xorfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_xorfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xorfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_xorfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_xorfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_xorfetch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_xorfetch32)
 #define __hybrid_atomic_xorfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xorfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_xorfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xorfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_xorfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_xorfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_xorfetch16)
 #define __hybrid_atomic_xorfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xorfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xorfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_xorfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_xorfetch(p, val, order) \
@@ -4783,25 +4793,25 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_orfetch128
 #define __hybrid_atomic_orfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_orfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_orfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_orfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_orfetch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_orfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_orfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_orfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_orfetch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_orfetch128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_orfetch64)
 #define __hybrid_atomic_orfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_orfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_orfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_orfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_orfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_orfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_orfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_orfetch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_orfetch32)
 #define __hybrid_atomic_orfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_orfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_orfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_orfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_orfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_orfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_orfetch16)
 #define __hybrid_atomic_orfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_orfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_orfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_orfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_orfetch(p, val, order) \
@@ -4861,25 +4871,25 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_nandfetch128
 #define __hybrid_atomic_nandfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_nandfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_nandfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_nandfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_nandfetch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_nandfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_nandfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_nandfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_nandfetch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_nandfetch128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_nandfetch64)
 #define __hybrid_atomic_nandfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_nandfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_nandfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_nandfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_nandfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_nandfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_nandfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_nandfetch64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_nandfetch32)
 #define __hybrid_atomic_nandfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_nandfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_nandfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_nandfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_nandfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_nandfetch32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_nandfetch16)
 #define __hybrid_atomic_nandfetch(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_nandfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_nandfetch8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
 	                                       __hybrid_atomic_nandfetch16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_nandfetch(p, val, order) \
@@ -4941,25 +4951,25 @@ template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPA
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_incfetch128
 #define __hybrid_atomic_incfetch(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_incfetch8((__UINT8_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_incfetch16((__UINT16_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_incfetch32((__UINT32_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_incfetch64((__UINT64_TYPE__ *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_incfetch8((__UINT8_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_incfetch16((__UINT16_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_incfetch32((__UINT32_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_incfetch64((__UINT64_TYPE__ *)(p), order) : \
 	                                       __hybrid_atomic_incfetch128((__UINT128_TYPE__ *)(p), order))
 #elif defined(__hybrid_atomic_incfetch64)
 #define __hybrid_atomic_incfetch(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_incfetch8((__UINT8_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_incfetch16((__UINT16_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_incfetch32((__UINT32_TYPE__ *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_incfetch8((__UINT8_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_incfetch16((__UINT16_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_incfetch32((__UINT32_TYPE__ *)(p), order) : \
 	                                       __hybrid_atomic_incfetch64((__UINT64_TYPE__ *)(p), order))
 #elif defined(__hybrid_atomic_incfetch32)
 #define __hybrid_atomic_incfetch(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_incfetch8((__UINT8_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_incfetch16((__UINT16_TYPE__ *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_incfetch8((__UINT8_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_incfetch16((__UINT16_TYPE__ *)(p), order) : \
 	                                       __hybrid_atomic_incfetch32((__UINT32_TYPE__ *)(p), order))
 #elif defined(__hybrid_atomic_incfetch16)
 #define __hybrid_atomic_incfetch(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_incfetch8((__UINT8_TYPE__ *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_incfetch8((__UINT8_TYPE__ *)(p), order) : \
 	                                       __hybrid_atomic_incfetch16((__UINT16_TYPE__ *)(p), order))
 #else /* ... */
 #define __hybrid_atomic_incfetch(p, order) \
@@ -5021,25 +5031,25 @@ template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPA
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_decfetch128
 #define __hybrid_atomic_decfetch(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_decfetch8((__UINT8_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_decfetch16((__UINT16_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_decfetch32((__UINT32_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_decfetch64((__UINT64_TYPE__ *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_decfetch8((__UINT8_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_decfetch16((__UINT16_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_decfetch32((__UINT32_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 8 ? __hybrid_atomic_decfetch64((__UINT64_TYPE__ *)(p), order) : \
 	                                       __hybrid_atomic_decfetch128((__UINT128_TYPE__ *)(p), order))
 #elif defined(__hybrid_atomic_decfetch64)
 #define __hybrid_atomic_decfetch(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_decfetch8((__UINT8_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_decfetch16((__UINT16_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_decfetch32((__UINT32_TYPE__ *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_decfetch8((__UINT8_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_decfetch16((__UINT16_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 4 ? __hybrid_atomic_decfetch32((__UINT32_TYPE__ *)(p), order) : \
 	                                       __hybrid_atomic_decfetch64((__UINT64_TYPE__ *)(p), order))
 #elif defined(__hybrid_atomic_decfetch32)
 #define __hybrid_atomic_decfetch(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_decfetch8((__UINT8_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_decfetch16((__UINT16_TYPE__ *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_decfetch8((__UINT8_TYPE__ *)(p), order) : \
+	                   sizeof(*(p)) == 2 ? __hybrid_atomic_decfetch16((__UINT16_TYPE__ *)(p), order) : \
 	                                       __hybrid_atomic_decfetch32((__UINT32_TYPE__ *)(p), order))
 #elif defined(__hybrid_atomic_decfetch16)
 #define __hybrid_atomic_decfetch(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_decfetch8((__UINT8_TYPE__ *)(p), order) \
+	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_decfetch8((__UINT8_TYPE__ *)(p), order) : \
 	                                       __hybrid_atomic_decfetch16((__UINT16_TYPE__ *)(p), order))
 #else /* ... */
 #define __hybrid_atomic_decfetch(p, order) \
@@ -5099,29 +5109,29 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_add128
 #define __hybrid_atomic_add(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_add8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_add16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_add32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_add64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
-	                                       __hybrid_atomic_add128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_add8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_add16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 4 ? __hybrid_atomic_add32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 8 ? __hybrid_atomic_add64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
+	                     __hybrid_atomic_add128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_add64)
 #define __hybrid_atomic_add(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_add8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_add16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_add32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                                       __hybrid_atomic_add64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_add8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_add16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 4 ? __hybrid_atomic_add32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                     __hybrid_atomic_add64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_add32)
 #define __hybrid_atomic_add(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_add8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_add16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                                       __hybrid_atomic_add32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_add8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_add16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                     __hybrid_atomic_add32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_add16)
 #define __hybrid_atomic_add(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_add8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                                       __hybrid_atomic_add16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_add8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                     __hybrid_atomic_add16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_add(p, val, order) \
-	__ATOMIC_RECAST(p, __hybrid_atomic_add8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
+	(__hybrid_atomic_add8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
 #endif /* __hybrid_atomic_add8 */
@@ -5177,29 +5187,29 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_sub128
 #define __hybrid_atomic_sub(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_sub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_sub16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_sub32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_sub64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
-	                                       __hybrid_atomic_sub128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_sub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_sub16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 4 ? __hybrid_atomic_sub32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 8 ? __hybrid_atomic_sub64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
+	                     __hybrid_atomic_sub128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_sub64)
 #define __hybrid_atomic_sub(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_sub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_sub16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_sub32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                                       __hybrid_atomic_sub64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_sub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_sub16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 4 ? __hybrid_atomic_sub32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                     __hybrid_atomic_sub64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_sub32)
 #define __hybrid_atomic_sub(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_sub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_sub16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                                       __hybrid_atomic_sub32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_sub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_sub16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                     __hybrid_atomic_sub32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_sub16)
 #define __hybrid_atomic_sub(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_sub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                                       __hybrid_atomic_sub16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_sub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                     __hybrid_atomic_sub16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_sub(p, val, order) \
-	__ATOMIC_RECAST(p, __hybrid_atomic_sub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
+	(__hybrid_atomic_sub8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
 #endif /* __hybrid_atomic_sub8 */
@@ -5255,29 +5265,29 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_and128
 #define __hybrid_atomic_and(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_and8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_and16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_and32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_and64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
-	                                       __hybrid_atomic_and128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_and8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_and16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 4 ? __hybrid_atomic_and32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 8 ? __hybrid_atomic_and64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
+	                     __hybrid_atomic_and128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_and64)
 #define __hybrid_atomic_and(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_and8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_and16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_and32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                                       __hybrid_atomic_and64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_and8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_and16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 4 ? __hybrid_atomic_and32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                     __hybrid_atomic_and64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_and32)
 #define __hybrid_atomic_and(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_and8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_and16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                                       __hybrid_atomic_and32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_and8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_and16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                     __hybrid_atomic_and32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_and16)
 #define __hybrid_atomic_and(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_and8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                                       __hybrid_atomic_and16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_and8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                     __hybrid_atomic_and16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_and(p, val, order) \
-	__ATOMIC_RECAST(p, __hybrid_atomic_and8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
+	(__hybrid_atomic_and8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
 #endif /* __hybrid_atomic_and8 */
@@ -5333,29 +5343,29 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_xor128
 #define __hybrid_atomic_xor(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_xor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_xor32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_xor64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
-	                                       __hybrid_atomic_xor128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_xor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_xor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 4 ? __hybrid_atomic_xor32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 8 ? __hybrid_atomic_xor64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
+	                     __hybrid_atomic_xor128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_xor64)
 #define __hybrid_atomic_xor(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_xor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_xor32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                                       __hybrid_atomic_xor64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_xor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_xor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 4 ? __hybrid_atomic_xor32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                     __hybrid_atomic_xor64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_xor32)
 #define __hybrid_atomic_xor(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_xor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                                       __hybrid_atomic_xor32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_xor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_xor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                     __hybrid_atomic_xor32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_xor16)
 #define __hybrid_atomic_xor(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_xor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                                       __hybrid_atomic_xor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_xor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                     __hybrid_atomic_xor16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_xor(p, val, order) \
-	__ATOMIC_RECAST(p, __hybrid_atomic_xor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
+	(__hybrid_atomic_xor8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
 #endif /* __hybrid_atomic_xor8 */
@@ -5411,29 +5421,29 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_or128
 #define __hybrid_atomic_or(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_or8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_or16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_or32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_or64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
-	                                       __hybrid_atomic_or128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_or8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_or16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 4 ? __hybrid_atomic_or32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 8 ? __hybrid_atomic_or64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
+	                     __hybrid_atomic_or128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_or64)
 #define __hybrid_atomic_or(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_or8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_or16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_or32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                                       __hybrid_atomic_or64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_or8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_or16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 4 ? __hybrid_atomic_or32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                     __hybrid_atomic_or64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_or32)
 #define __hybrid_atomic_or(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_or8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_or16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                                       __hybrid_atomic_or32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_or8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_or16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                     __hybrid_atomic_or32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_or16)
 #define __hybrid_atomic_or(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_or8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                                       __hybrid_atomic_or16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_or8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                     __hybrid_atomic_or16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_or(p, val, order) \
-	__ATOMIC_RECAST(p, __hybrid_atomic_or8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
+	(__hybrid_atomic_or8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
 #endif /* __hybrid_atomic_or8 */
@@ -5489,29 +5499,29 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_nand128
 #define __hybrid_atomic_nand(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_nand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_nand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_nand32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_nand64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) \
-	                                       __hybrid_atomic_nand128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_nand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_nand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 4 ? __hybrid_atomic_nand32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 8 ? __hybrid_atomic_nand64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order) : \
+	                     __hybrid_atomic_nand128((__UINT128_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT128_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_nand64)
 #define __hybrid_atomic_nand(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_nand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_nand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_nand32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) \
-	                                       __hybrid_atomic_nand64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_nand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_nand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 4 ? __hybrid_atomic_nand32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order) : \
+	                     __hybrid_atomic_nand64((__UINT64_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_nand32)
 #define __hybrid_atomic_nand(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_nand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_nand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) \
-	                                       __hybrid_atomic_nand32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_nand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_nand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order) : \
+	                     __hybrid_atomic_nand32((__UINT32_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(val), order))
 #elif defined(__hybrid_atomic_nand16)
 #define __hybrid_atomic_nand(p, val, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_nand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) \
-	                                       __hybrid_atomic_nand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_nand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order) : \
+	                     __hybrid_atomic_nand16((__UINT16_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(val), order))
 #else /* ... */
 #define __hybrid_atomic_nand(p, val, order) \
-	__ATOMIC_RECAST(p, __hybrid_atomic_nand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
+	(__hybrid_atomic_nand8((__UINT8_TYPE__ *)(p), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(val), order))
 #endif /* !... */
 #endif /* !__cplusplus */
 #endif /* __hybrid_atomic_nand8 */
@@ -5569,29 +5579,29 @@ template<class __T> inline __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hy
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_inc128
 #define __hybrid_atomic_inc(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_inc8((__UINT8_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_inc16((__UINT16_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_inc32((__UINT32_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_inc64((__UINT64_TYPE__ *)(p), order) \
-	                                       __hybrid_atomic_inc128((__UINT128_TYPE__ *)(p), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_inc8((__UINT8_TYPE__ *)(p), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_inc16((__UINT16_TYPE__ *)(p), order) : \
+	 sizeof(*(p)) == 4 ? __hybrid_atomic_inc32((__UINT32_TYPE__ *)(p), order) : \
+	 sizeof(*(p)) == 8 ? __hybrid_atomic_inc64((__UINT64_TYPE__ *)(p), order) : \
+	                     __hybrid_atomic_inc128((__UINT128_TYPE__ *)(p), order))
 #elif defined(__hybrid_atomic_inc64)
 #define __hybrid_atomic_inc(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_inc8((__UINT8_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_inc16((__UINT16_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_inc32((__UINT32_TYPE__ *)(p), order) \
-	                                       __hybrid_atomic_inc64((__UINT64_TYPE__ *)(p), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_inc8((__UINT8_TYPE__ *)(p), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_inc16((__UINT16_TYPE__ *)(p), order) : \
+	 sizeof(*(p)) == 4 ? __hybrid_atomic_inc32((__UINT32_TYPE__ *)(p), order) : \
+	                     __hybrid_atomic_inc64((__UINT64_TYPE__ *)(p), order))
 #elif defined(__hybrid_atomic_inc32)
 #define __hybrid_atomic_inc(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_inc8((__UINT8_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_inc16((__UINT16_TYPE__ *)(p), order) \
-	                                       __hybrid_atomic_inc32((__UINT32_TYPE__ *)(p), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_inc8((__UINT8_TYPE__ *)(p), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_inc16((__UINT16_TYPE__ *)(p), order) : \
+	                     __hybrid_atomic_inc32((__UINT32_TYPE__ *)(p), order))
 #elif defined(__hybrid_atomic_inc16)
 #define __hybrid_atomic_inc(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_inc8((__UINT8_TYPE__ *)(p), order) \
-	                                       __hybrid_atomic_inc16((__UINT16_TYPE__ *)(p), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_inc8((__UINT8_TYPE__ *)(p), order) : \
+	                     __hybrid_atomic_inc16((__UINT16_TYPE__ *)(p), order))
 #else /* ... */
 #define __hybrid_atomic_inc(p, order) \
-	__ATOMIC_RECAST(p, __hybrid_atomic_inc8((__UINT8_TYPE__ *)(p), order))
+	(__hybrid_atomic_inc8((__UINT8_TYPE__ *)(p), order))
 #endif /* !... */
 #endif /* !__cplusplus */
 #endif /* __hybrid_atomic_inc8 */
@@ -5649,29 +5659,29 @@ template<class __T> inline __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hy
 #else /* __cplusplus */
 #ifdef __hybrid_atomic_dec128
 #define __hybrid_atomic_dec(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_dec8((__UINT8_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_dec16((__UINT16_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_dec32((__UINT32_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 8 ? __hybrid_atomic_dec64((__UINT64_TYPE__ *)(p), order) \
-	                                       __hybrid_atomic_dec128((__UINT128_TYPE__ *)(p), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_dec8((__UINT8_TYPE__ *)(p), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_dec16((__UINT16_TYPE__ *)(p), order) : \
+	 sizeof(*(p)) == 4 ? __hybrid_atomic_dec32((__UINT32_TYPE__ *)(p), order) : \
+	 sizeof(*(p)) == 8 ? __hybrid_atomic_dec64((__UINT64_TYPE__ *)(p), order) : \
+	                     __hybrid_atomic_dec128((__UINT128_TYPE__ *)(p), order))
 #elif defined(__hybrid_atomic_dec64)
 #define __hybrid_atomic_dec(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_dec8((__UINT8_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_dec16((__UINT16_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 4 ? __hybrid_atomic_dec32((__UINT32_TYPE__ *)(p), order) \
-	                                       __hybrid_atomic_dec64((__UINT64_TYPE__ *)(p), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_dec8((__UINT8_TYPE__ *)(p), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_dec16((__UINT16_TYPE__ *)(p), order) : \
+	 sizeof(*(p)) == 4 ? __hybrid_atomic_dec32((__UINT32_TYPE__ *)(p), order) : \
+	                     __hybrid_atomic_dec64((__UINT64_TYPE__ *)(p), order))
 #elif defined(__hybrid_atomic_dec32)
 #define __hybrid_atomic_dec(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_dec8((__UINT8_TYPE__ *)(p), order) \
-	                   sizeof(*(p)) == 2 ? __hybrid_atomic_dec16((__UINT16_TYPE__ *)(p), order) \
-	                                       __hybrid_atomic_dec32((__UINT32_TYPE__ *)(p), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_dec8((__UINT8_TYPE__ *)(p), order) : \
+	 sizeof(*(p)) == 2 ? __hybrid_atomic_dec16((__UINT16_TYPE__ *)(p), order) : \
+	                     __hybrid_atomic_dec32((__UINT32_TYPE__ *)(p), order))
 #elif defined(__hybrid_atomic_dec16)
 #define __hybrid_atomic_dec(p, order) \
-	__ATOMIC_RECAST(p, sizeof(*(p)) == 1 ? __hybrid_atomic_dec8((__UINT8_TYPE__ *)(p), order) \
-	                                       __hybrid_atomic_dec16((__UINT16_TYPE__ *)(p), order))
+	(sizeof(*(p)) == 1 ? __hybrid_atomic_dec8((__UINT8_TYPE__ *)(p), order) : \
+	                     __hybrid_atomic_dec16((__UINT16_TYPE__ *)(p), order))
 #else /* ... */
 #define __hybrid_atomic_dec(p, order) \
-	__ATOMIC_RECAST(p, __hybrid_atomic_dec8((__UINT8_TYPE__ *)(p), order))
+	(__hybrid_atomic_dec8((__UINT8_TYPE__ *)(p), order))
 #endif /* !... */
 #endif /* !__cplusplus */
 #endif /* __hybrid_atomic_dec8 */

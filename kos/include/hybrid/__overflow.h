@@ -335,7 +335,7 @@ __DECL_END
 import * from deemon;
 function define_hybrid_overflow_op_n(op: string, n: int, argSizes: {int...}, useChooseExpr: bool) {
 	local US = op.startswith("u") ? "U" : "";
-	print("#define __hybrid_overflow_", op, n, "(lhs, rhs, p_result) \\");
+	print("#define __hybrid_overflow_", op, n, "(lhs, rhs, p_result) __builtin_expect( \\");
 	if (useChooseExpr) {
 		for (local argSize: argSizes) {
 			if (argSize != argSizes.last) {
@@ -348,13 +348,12 @@ function define_hybrid_overflow_op_n(op: string, n: int, argSizes: {int...}, use
 			if (argSize != argSizes.last) {
 				print(", \\");
 			} else {
-				print(")" * (#argSizes - 1));
+				print(")" * (#argSizes - 1), ", 0)");
 			}
 		}
 	} else {
 		for (local argSize: argSizes) {
 			print("	"),;
-			print(argSize == argSizes.first ? "(" : " "),;
 			if (argSize != argSizes.last) {
 				print("__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= ", argSize / 8, " ? "),;
 			} else {
@@ -365,7 +364,7 @@ function define_hybrid_overflow_op_n(op: string, n: int, argSizes: {int...}, use
 			if (argSize != argSizes.last) {
 				print(" : \\");
 			} else {
-				print(")");
+				print(", 0)");
 			}
 		}
 	}
@@ -468,216 +467,216 @@ print("#endif /" "* !__NO_builtin_choose_expr *" "/");
 ]]]*/
 #ifndef __NO_builtin_choose_expr
 #ifdef __UINT128_TYPE__
-#define __hybrid_overflow_uadd8(lhs, rhs, p_result) \
+#define __hybrid_overflow_uadd8(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_uadd8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_uadd16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_uadd32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_uadd64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_uadd128_8((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_uadd16(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_uadd128_8((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_uadd16(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_uadd8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_uadd16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_uadd32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_uadd64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_uadd128_16((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_uadd32(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_uadd128_16((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_uadd32(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_uadd8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_uadd16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_uadd32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_uadd64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_uadd128_32((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_uadd64(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_uadd128_32((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_uadd64(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_uadd8_64((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_uadd16_64((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_uadd32_64((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_uadd64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_uadd128_64((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_uadd128(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_uadd128_64((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_uadd128(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_uadd8_128((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_uadd16_128((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_uadd32_128((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_uadd64_128((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_uadd128_128((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result)))))
+	                                                                      __PRIVATE_hybrid_overflow_uadd128_128((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))))), 0)
 #define __hybrid_overflow_uadd(lhs, rhs, p_result) \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_overflow_uadd8(lhs, rhs, (__UINT8_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_overflow_uadd16(lhs, rhs, (__UINT16_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 4, __hybrid_overflow_uadd32(lhs, rhs, (__UINT32_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 8, __hybrid_overflow_uadd64(lhs, rhs, (__UINT64_TYPE__ *)(p_result)), \
 	                                                __hybrid_overflow_uadd128(lhs, rhs, (__UINT128_TYPE__ *)(p_result))))))
-#define __hybrid_overflow_sadd8(lhs, rhs, p_result) \
+#define __hybrid_overflow_sadd8(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_sadd8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_sadd16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_sadd32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_sadd64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_sadd128_8((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_sadd16(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_sadd128_8((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_sadd16(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_sadd8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_sadd16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_sadd32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_sadd64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_sadd128_16((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_sadd32(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_sadd128_16((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_sadd32(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_sadd8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_sadd16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_sadd32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_sadd64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_sadd128_32((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_sadd64(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_sadd128_32((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_sadd64(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_sadd8_64((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_sadd16_64((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_sadd32_64((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_sadd64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_sadd128_64((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_sadd128(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_sadd128_64((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_sadd128(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_sadd8_128((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_sadd16_128((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_sadd32_128((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_sadd64_128((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_sadd128_128((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result)))))
+	                                                                      __PRIVATE_hybrid_overflow_sadd128_128((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))))), 0)
 #define __hybrid_overflow_sadd(lhs, rhs, p_result) \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_overflow_sadd8(lhs, rhs, (__INT8_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_overflow_sadd16(lhs, rhs, (__INT16_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 4, __hybrid_overflow_sadd32(lhs, rhs, (__INT32_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 8, __hybrid_overflow_sadd64(lhs, rhs, (__INT64_TYPE__ *)(p_result)), \
 	                                                __hybrid_overflow_sadd128(lhs, rhs, (__INT128_TYPE__ *)(p_result))))))
-#define __hybrid_overflow_usub8(lhs, rhs, p_result) \
+#define __hybrid_overflow_usub8(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_usub8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_usub16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_usub32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_usub64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_usub128_8((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_usub16(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_usub128_8((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_usub16(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_usub8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_usub16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_usub32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_usub64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_usub128_16((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_usub32(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_usub128_16((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_usub32(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_usub8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_usub16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_usub32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_usub64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_usub128_32((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_usub64(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_usub128_32((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_usub64(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_usub8_64((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_usub16_64((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_usub32_64((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_usub64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_usub128_64((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_usub128(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_usub128_64((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_usub128(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_usub8_128((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_usub16_128((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_usub32_128((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_usub64_128((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_usub128_128((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result)))))
+	                                                                      __PRIVATE_hybrid_overflow_usub128_128((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))))), 0)
 #define __hybrid_overflow_usub(lhs, rhs, p_result) \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_overflow_usub8(lhs, rhs, (__UINT8_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_overflow_usub16(lhs, rhs, (__UINT16_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 4, __hybrid_overflow_usub32(lhs, rhs, (__UINT32_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 8, __hybrid_overflow_usub64(lhs, rhs, (__UINT64_TYPE__ *)(p_result)), \
 	                                                __hybrid_overflow_usub128(lhs, rhs, (__UINT128_TYPE__ *)(p_result))))))
-#define __hybrid_overflow_ssub8(lhs, rhs, p_result) \
+#define __hybrid_overflow_ssub8(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_ssub8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_ssub16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_ssub32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_ssub64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_ssub128_8((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_ssub16(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_ssub128_8((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_ssub16(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_ssub8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_ssub16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_ssub32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_ssub64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_ssub128_16((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_ssub32(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_ssub128_16((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_ssub32(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_ssub8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_ssub16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_ssub32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_ssub64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_ssub128_32((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_ssub64(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_ssub128_32((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_ssub64(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_ssub8_64((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_ssub16_64((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_ssub32_64((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_ssub64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_ssub128_64((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_ssub128(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_ssub128_64((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_ssub128(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_ssub8_128((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_ssub16_128((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_ssub32_128((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_ssub64_128((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_ssub128_128((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result)))))
+	                                                                      __PRIVATE_hybrid_overflow_ssub128_128((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))))), 0)
 #define __hybrid_overflow_ssub(lhs, rhs, p_result) \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_overflow_ssub8(lhs, rhs, (__INT8_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_overflow_ssub16(lhs, rhs, (__INT16_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 4, __hybrid_overflow_ssub32(lhs, rhs, (__INT32_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 8, __hybrid_overflow_ssub64(lhs, rhs, (__INT64_TYPE__ *)(p_result)), \
 	                                                __hybrid_overflow_ssub128(lhs, rhs, (__INT128_TYPE__ *)(p_result))))))
-#define __hybrid_overflow_umul8(lhs, rhs, p_result) \
+#define __hybrid_overflow_umul8(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_umul8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_umul16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_umul32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_umul64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_umul128_8((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_umul16(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_umul128_8((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_umul16(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_umul8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_umul16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_umul32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_umul64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_umul128_16((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_umul32(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_umul128_16((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_umul32(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_umul8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_umul16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_umul32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_umul64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_umul128_32((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_umul64(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_umul128_32((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_umul64(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_umul8_64((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_umul16_64((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_umul32_64((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_umul64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_umul128_64((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_umul128(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_umul128_64((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_umul128(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_umul8_128((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_umul16_128((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_umul32_128((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_umul64_128((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_umul128_128((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result)))))
+	                                                                      __PRIVATE_hybrid_overflow_umul128_128((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))))), 0)
 #define __hybrid_overflow_umul(lhs, rhs, p_result) \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_overflow_umul8(lhs, rhs, (__UINT8_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_overflow_umul16(lhs, rhs, (__UINT16_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 4, __hybrid_overflow_umul32(lhs, rhs, (__UINT32_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 8, __hybrid_overflow_umul64(lhs, rhs, (__UINT64_TYPE__ *)(p_result)), \
 	                                                __hybrid_overflow_umul128(lhs, rhs, (__UINT128_TYPE__ *)(p_result))))))
-#define __hybrid_overflow_smul8(lhs, rhs, p_result) \
+#define __hybrid_overflow_smul8(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_smul8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_smul16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_smul32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_smul64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_smul128_8((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_smul16(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_smul128_8((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_smul16(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_smul8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_smul16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_smul32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_smul64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_smul128_16((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_smul32(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_smul128_16((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_smul32(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_smul8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_smul16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_smul32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_smul64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_smul128_32((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_smul64(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_smul128_32((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_smul64(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_smul8_64((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_smul16_64((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_smul32_64((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_smul64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_smul128_64((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result)))))
-#define __hybrid_overflow_smul128(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_smul128_64((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))))), 0)
+#define __hybrid_overflow_smul128(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_smul8_128((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_smul16_128((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_smul32_128((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8, __PRIVATE_hybrid_overflow_smul64_128((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_smul128_128((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result)))))
+	                                                                      __PRIVATE_hybrid_overflow_smul128_128((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))))), 0)
 #define __hybrid_overflow_smul(lhs, rhs, p_result) \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_overflow_smul8(lhs, rhs, (__INT8_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_overflow_smul16(lhs, rhs, (__INT16_TYPE__ *)(p_result)), \
@@ -685,249 +684,249 @@ print("#endif /" "* !__NO_builtin_choose_expr *" "/");
 	__builtin_choose_expr(sizeof(*(p_result)) <= 8, __hybrid_overflow_smul64(lhs, rhs, (__INT64_TYPE__ *)(p_result)), \
 	                                                __hybrid_overflow_smul128(lhs, rhs, (__INT128_TYPE__ *)(p_result))))))
 #elif defined(__UINT64_TYPE__)
-#define __hybrid_overflow_uadd8(lhs, rhs, p_result) \
+#define __hybrid_overflow_uadd8(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_uadd8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_uadd16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_uadd32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_uadd64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))))
-#define __hybrid_overflow_uadd16(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_uadd64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result)))), 0)
+#define __hybrid_overflow_uadd16(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_uadd8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_uadd16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_uadd32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_uadd64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))))
-#define __hybrid_overflow_uadd32(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_uadd64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result)))), 0)
+#define __hybrid_overflow_uadd32(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_uadd8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_uadd16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_uadd32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_uadd64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))))
-#define __hybrid_overflow_uadd64(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_uadd64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result)))), 0)
+#define __hybrid_overflow_uadd64(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_uadd8_64((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_uadd16_64((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_uadd32_64((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_uadd64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))))
+	                                                                      __PRIVATE_hybrid_overflow_uadd64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result)))), 0)
 #define __hybrid_overflow_uadd(lhs, rhs, p_result) \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_overflow_uadd8(lhs, rhs, (__UINT8_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_overflow_uadd16(lhs, rhs, (__UINT16_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 4, __hybrid_overflow_uadd32(lhs, rhs, (__UINT32_TYPE__ *)(p_result)), \
 	                                                __hybrid_overflow_uadd64(lhs, rhs, (__UINT64_TYPE__ *)(p_result)))))
-#define __hybrid_overflow_sadd8(lhs, rhs, p_result) \
+#define __hybrid_overflow_sadd8(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_sadd8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_sadd16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_sadd32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_sadd64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))))
-#define __hybrid_overflow_sadd16(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_sadd64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result)))), 0)
+#define __hybrid_overflow_sadd16(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_sadd8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_sadd16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_sadd32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_sadd64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))))
-#define __hybrid_overflow_sadd32(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_sadd64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result)))), 0)
+#define __hybrid_overflow_sadd32(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_sadd8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_sadd16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_sadd32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_sadd64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))))
-#define __hybrid_overflow_sadd64(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_sadd64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result)))), 0)
+#define __hybrid_overflow_sadd64(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_sadd8_64((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_sadd16_64((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_sadd32_64((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_sadd64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))))
+	                                                                      __PRIVATE_hybrid_overflow_sadd64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result)))), 0)
 #define __hybrid_overflow_sadd(lhs, rhs, p_result) \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_overflow_sadd8(lhs, rhs, (__INT8_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_overflow_sadd16(lhs, rhs, (__INT16_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 4, __hybrid_overflow_sadd32(lhs, rhs, (__INT32_TYPE__ *)(p_result)), \
 	                                                __hybrid_overflow_sadd64(lhs, rhs, (__INT64_TYPE__ *)(p_result)))))
-#define __hybrid_overflow_usub8(lhs, rhs, p_result) \
+#define __hybrid_overflow_usub8(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_usub8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_usub16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_usub32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_usub64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))))
-#define __hybrid_overflow_usub16(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_usub64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result)))), 0)
+#define __hybrid_overflow_usub16(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_usub8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_usub16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_usub32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_usub64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))))
-#define __hybrid_overflow_usub32(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_usub64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result)))), 0)
+#define __hybrid_overflow_usub32(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_usub8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_usub16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_usub32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_usub64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))))
-#define __hybrid_overflow_usub64(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_usub64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result)))), 0)
+#define __hybrid_overflow_usub64(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_usub8_64((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_usub16_64((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_usub32_64((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_usub64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))))
+	                                                                      __PRIVATE_hybrid_overflow_usub64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result)))), 0)
 #define __hybrid_overflow_usub(lhs, rhs, p_result) \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_overflow_usub8(lhs, rhs, (__UINT8_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_overflow_usub16(lhs, rhs, (__UINT16_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 4, __hybrid_overflow_usub32(lhs, rhs, (__UINT32_TYPE__ *)(p_result)), \
 	                                                __hybrid_overflow_usub64(lhs, rhs, (__UINT64_TYPE__ *)(p_result)))))
-#define __hybrid_overflow_ssub8(lhs, rhs, p_result) \
+#define __hybrid_overflow_ssub8(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_ssub8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_ssub16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_ssub32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_ssub64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))))
-#define __hybrid_overflow_ssub16(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_ssub64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result)))), 0)
+#define __hybrid_overflow_ssub16(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_ssub8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_ssub16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_ssub32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_ssub64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))))
-#define __hybrid_overflow_ssub32(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_ssub64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result)))), 0)
+#define __hybrid_overflow_ssub32(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_ssub8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_ssub16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_ssub32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_ssub64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))))
-#define __hybrid_overflow_ssub64(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_ssub64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result)))), 0)
+#define __hybrid_overflow_ssub64(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_ssub8_64((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_ssub16_64((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_ssub32_64((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_ssub64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))))
+	                                                                      __PRIVATE_hybrid_overflow_ssub64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result)))), 0)
 #define __hybrid_overflow_ssub(lhs, rhs, p_result) \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_overflow_ssub8(lhs, rhs, (__INT8_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_overflow_ssub16(lhs, rhs, (__INT16_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 4, __hybrid_overflow_ssub32(lhs, rhs, (__INT32_TYPE__ *)(p_result)), \
 	                                                __hybrid_overflow_ssub64(lhs, rhs, (__INT64_TYPE__ *)(p_result)))))
-#define __hybrid_overflow_umul8(lhs, rhs, p_result) \
+#define __hybrid_overflow_umul8(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_umul8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_umul16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_umul32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_umul64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))))
-#define __hybrid_overflow_umul16(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_umul64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result)))), 0)
+#define __hybrid_overflow_umul16(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_umul8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_umul16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_umul32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_umul64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))))
-#define __hybrid_overflow_umul32(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_umul64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result)))), 0)
+#define __hybrid_overflow_umul32(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_umul8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_umul16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_umul32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_umul64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))))
-#define __hybrid_overflow_umul64(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_umul64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result)))), 0)
+#define __hybrid_overflow_umul64(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_umul8_64((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_umul16_64((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_umul32_64((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_umul64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))))
+	                                                                      __PRIVATE_hybrid_overflow_umul64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result)))), 0)
 #define __hybrid_overflow_umul(lhs, rhs, p_result) \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_overflow_umul8(lhs, rhs, (__UINT8_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_overflow_umul16(lhs, rhs, (__UINT16_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 4, __hybrid_overflow_umul32(lhs, rhs, (__UINT32_TYPE__ *)(p_result)), \
 	                                                __hybrid_overflow_umul64(lhs, rhs, (__UINT64_TYPE__ *)(p_result)))))
-#define __hybrid_overflow_smul8(lhs, rhs, p_result) \
+#define __hybrid_overflow_smul8(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_smul8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_smul16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_smul32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_smul64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))))
-#define __hybrid_overflow_smul16(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_smul64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result)))), 0)
+#define __hybrid_overflow_smul16(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_smul8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_smul16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_smul32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_smul64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))))
-#define __hybrid_overflow_smul32(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_smul64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result)))), 0)
+#define __hybrid_overflow_smul32(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_smul8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_smul16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_smul32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_smul64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))))
-#define __hybrid_overflow_smul64(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_smul64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result)))), 0)
+#define __hybrid_overflow_smul64(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_smul8_64((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_smul16_64((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4, __PRIVATE_hybrid_overflow_smul32_64((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_smul64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))))
+	                                                                      __PRIVATE_hybrid_overflow_smul64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result)))), 0)
 #define __hybrid_overflow_smul(lhs, rhs, p_result) \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_overflow_smul8(lhs, rhs, (__INT8_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_overflow_smul16(lhs, rhs, (__INT16_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 4, __hybrid_overflow_smul32(lhs, rhs, (__INT32_TYPE__ *)(p_result)), \
 	                                                __hybrid_overflow_smul64(lhs, rhs, (__INT64_TYPE__ *)(p_result)))))
 #else /* ... */
-#define __hybrid_overflow_uadd8(lhs, rhs, p_result) \
+#define __hybrid_overflow_uadd8(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_uadd8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_uadd16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_uadd32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result)))
-#define __hybrid_overflow_uadd16(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_uadd32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result))), 0)
+#define __hybrid_overflow_uadd16(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_uadd8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_uadd16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_uadd32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result)))
-#define __hybrid_overflow_uadd32(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_uadd32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result))), 0)
+#define __hybrid_overflow_uadd32(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_uadd8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_uadd16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_uadd32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result)))
+	                                                                      __PRIVATE_hybrid_overflow_uadd32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result))), 0)
 #define __hybrid_overflow_uadd(lhs, rhs, p_result) \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_overflow_uadd8(lhs, rhs, (__UINT8_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_overflow_uadd16(lhs, rhs, (__UINT16_TYPE__ *)(p_result)), \
 	                                                __hybrid_overflow_uadd32(lhs, rhs, (__UINT32_TYPE__ *)(p_result))))
-#define __hybrid_overflow_sadd8(lhs, rhs, p_result) \
+#define __hybrid_overflow_sadd8(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_sadd8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_sadd16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_sadd32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result)))
-#define __hybrid_overflow_sadd16(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_sadd32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result))), 0)
+#define __hybrid_overflow_sadd16(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_sadd8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_sadd16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_sadd32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result)))
-#define __hybrid_overflow_sadd32(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_sadd32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result))), 0)
+#define __hybrid_overflow_sadd32(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_sadd8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_sadd16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_sadd32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result)))
+	                                                                      __PRIVATE_hybrid_overflow_sadd32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result))), 0)
 #define __hybrid_overflow_sadd(lhs, rhs, p_result) \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_overflow_sadd8(lhs, rhs, (__INT8_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_overflow_sadd16(lhs, rhs, (__INT16_TYPE__ *)(p_result)), \
 	                                                __hybrid_overflow_sadd32(lhs, rhs, (__INT32_TYPE__ *)(p_result))))
-#define __hybrid_overflow_usub8(lhs, rhs, p_result) \
+#define __hybrid_overflow_usub8(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_usub8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_usub16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_usub32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result)))
-#define __hybrid_overflow_usub16(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_usub32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result))), 0)
+#define __hybrid_overflow_usub16(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_usub8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_usub16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_usub32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result)))
-#define __hybrid_overflow_usub32(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_usub32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result))), 0)
+#define __hybrid_overflow_usub32(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_usub8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_usub16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_usub32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result)))
+	                                                                      __PRIVATE_hybrid_overflow_usub32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result))), 0)
 #define __hybrid_overflow_usub(lhs, rhs, p_result) \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_overflow_usub8(lhs, rhs, (__UINT8_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_overflow_usub16(lhs, rhs, (__UINT16_TYPE__ *)(p_result)), \
 	                                                __hybrid_overflow_usub32(lhs, rhs, (__UINT32_TYPE__ *)(p_result))))
-#define __hybrid_overflow_ssub8(lhs, rhs, p_result) \
+#define __hybrid_overflow_ssub8(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_ssub8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_ssub16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_ssub32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result)))
-#define __hybrid_overflow_ssub16(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_ssub32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result))), 0)
+#define __hybrid_overflow_ssub16(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_ssub8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_ssub16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_ssub32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result)))
-#define __hybrid_overflow_ssub32(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_ssub32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result))), 0)
+#define __hybrid_overflow_ssub32(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_ssub8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_ssub16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_ssub32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result)))
+	                                                                      __PRIVATE_hybrid_overflow_ssub32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result))), 0)
 #define __hybrid_overflow_ssub(lhs, rhs, p_result) \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_overflow_ssub8(lhs, rhs, (__INT8_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_overflow_ssub16(lhs, rhs, (__INT16_TYPE__ *)(p_result)), \
 	                                                __hybrid_overflow_ssub32(lhs, rhs, (__INT32_TYPE__ *)(p_result))))
-#define __hybrid_overflow_umul8(lhs, rhs, p_result) \
+#define __hybrid_overflow_umul8(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_umul8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_umul16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_umul32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result)))
-#define __hybrid_overflow_umul16(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_umul32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result))), 0)
+#define __hybrid_overflow_umul16(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_umul8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_umul16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_umul32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result)))
-#define __hybrid_overflow_umul32(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_umul32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result))), 0)
+#define __hybrid_overflow_umul32(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_umul8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_umul16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_umul32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result)))
+	                                                                      __PRIVATE_hybrid_overflow_umul32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result))), 0)
 #define __hybrid_overflow_umul(lhs, rhs, p_result) \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_overflow_umul8(lhs, rhs, (__UINT8_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_overflow_umul16(lhs, rhs, (__UINT16_TYPE__ *)(p_result)), \
 	                                                __hybrid_overflow_umul32(lhs, rhs, (__UINT32_TYPE__ *)(p_result))))
-#define __hybrid_overflow_smul8(lhs, rhs, p_result) \
+#define __hybrid_overflow_smul8(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_smul8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_smul16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_smul32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result)))
-#define __hybrid_overflow_smul16(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_smul32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result))), 0)
+#define __hybrid_overflow_smul16(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_smul8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_smul16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_smul32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result)))
-#define __hybrid_overflow_smul32(lhs, rhs, p_result) \
+	                                                                      __PRIVATE_hybrid_overflow_smul32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result))), 0)
+#define __hybrid_overflow_smul32(lhs, rhs, p_result) __builtin_expect( \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1, __PRIVATE_hybrid_overflow_smul8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result), \
 	__builtin_choose_expr(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2, __PRIVATE_hybrid_overflow_smul16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result), \
-	                                                                      __PRIVATE_hybrid_overflow_smul32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result)))
+	                                                                      __PRIVATE_hybrid_overflow_smul32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result))), 0)
 #define __hybrid_overflow_smul(lhs, rhs, p_result) \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_overflow_smul8(lhs, rhs, (__INT8_TYPE__ *)(p_result)), \
 	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_overflow_smul16(lhs, rhs, (__INT16_TYPE__ *)(p_result)), \
@@ -935,216 +934,216 @@ print("#endif /" "* !__NO_builtin_choose_expr *" "/");
 #endif /* !... */
 #else /* __NO_builtin_choose_expr */
 #ifdef __UINT128_TYPE__
-#define __hybrid_overflow_uadd8(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_uadd32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_uadd64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_uadd128_8((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_uadd16(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_uadd32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_uadd64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_uadd128_16((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_uadd32(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_uadd32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_uadd64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_uadd128_32((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_uadd64(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_64((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_64((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_uadd32_64((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_uadd64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_uadd128_64((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_uadd128(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_128((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_128((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_uadd32_128((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_uadd64_128((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_uadd128_128((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))
+#define __hybrid_overflow_uadd8(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_uadd32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_uadd64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_uadd128_8((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_uadd16(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_uadd32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_uadd64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_uadd128_16((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_uadd32(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_uadd32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_uadd64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_uadd128_32((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_uadd64(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_64((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_64((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_uadd32_64((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_uadd64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_uadd128_64((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_uadd128(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_128((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_128((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_uadd32_128((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_uadd64_128((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_uadd128_128((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result), 0)
 #define __hybrid_overflow_uadd(lhs, rhs, p_result) \
 	(sizeof(*(p_result)) <= 1 ? __hybrid_overflow_uadd8(lhs, rhs, (__UINT8_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 2 ? __hybrid_overflow_uadd16(lhs, rhs, (__UINT16_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 4 ? __hybrid_overflow_uadd32(lhs, rhs, (__UINT32_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 8 ? __hybrid_overflow_uadd64(lhs, rhs, (__UINT64_TYPE__ *)(p_result)) : \
 	                            __hybrid_overflow_uadd128(lhs, rhs, (__UINT128_TYPE__ *)(p_result)))
-#define __hybrid_overflow_sadd8(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_sadd32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_sadd64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_sadd128_8((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_sadd16(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_sadd32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_sadd64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_sadd128_16((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_sadd32(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_sadd32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_sadd64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_sadd128_32((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_sadd64(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_64((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_64((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_sadd32_64((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_sadd64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_sadd128_64((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_sadd128(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_128((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_128((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_sadd32_128((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_sadd64_128((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_sadd128_128((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))
+#define __hybrid_overflow_sadd8(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_sadd32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_sadd64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_sadd128_8((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_sadd16(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_sadd32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_sadd64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_sadd128_16((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_sadd32(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_sadd32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_sadd64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_sadd128_32((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_sadd64(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_64((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_64((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_sadd32_64((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_sadd64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_sadd128_64((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_sadd128(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_128((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_128((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_sadd32_128((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_sadd64_128((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_sadd128_128((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result), 0)
 #define __hybrid_overflow_sadd(lhs, rhs, p_result) \
 	(sizeof(*(p_result)) <= 1 ? __hybrid_overflow_sadd8(lhs, rhs, (__INT8_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 2 ? __hybrid_overflow_sadd16(lhs, rhs, (__INT16_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 4 ? __hybrid_overflow_sadd32(lhs, rhs, (__INT32_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 8 ? __hybrid_overflow_sadd64(lhs, rhs, (__INT64_TYPE__ *)(p_result)) : \
 	                            __hybrid_overflow_sadd128(lhs, rhs, (__INT128_TYPE__ *)(p_result)))
-#define __hybrid_overflow_usub8(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_usub32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_usub64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_usub128_8((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_usub16(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_usub32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_usub64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_usub128_16((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_usub32(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_usub32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_usub64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_usub128_32((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_usub64(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_64((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_64((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_usub32_64((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_usub64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_usub128_64((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_usub128(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_128((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_128((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_usub32_128((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_usub64_128((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_usub128_128((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))
+#define __hybrid_overflow_usub8(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_usub32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_usub64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_usub128_8((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_usub16(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_usub32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_usub64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_usub128_16((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_usub32(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_usub32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_usub64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_usub128_32((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_usub64(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_64((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_64((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_usub32_64((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_usub64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_usub128_64((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_usub128(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_128((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_128((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_usub32_128((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_usub64_128((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_usub128_128((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result), 0)
 #define __hybrid_overflow_usub(lhs, rhs, p_result) \
 	(sizeof(*(p_result)) <= 1 ? __hybrid_overflow_usub8(lhs, rhs, (__UINT8_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 2 ? __hybrid_overflow_usub16(lhs, rhs, (__UINT16_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 4 ? __hybrid_overflow_usub32(lhs, rhs, (__UINT32_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 8 ? __hybrid_overflow_usub64(lhs, rhs, (__UINT64_TYPE__ *)(p_result)) : \
 	                            __hybrid_overflow_usub128(lhs, rhs, (__UINT128_TYPE__ *)(p_result)))
-#define __hybrid_overflow_ssub8(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_ssub32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_ssub64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_ssub128_8((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_ssub16(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_ssub32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_ssub64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_ssub128_16((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_ssub32(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_ssub32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_ssub64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_ssub128_32((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_ssub64(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_64((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_64((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_ssub32_64((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_ssub64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_ssub128_64((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_ssub128(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_128((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_128((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_ssub32_128((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_ssub64_128((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_ssub128_128((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))
+#define __hybrid_overflow_ssub8(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_ssub32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_ssub64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_ssub128_8((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_ssub16(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_ssub32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_ssub64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_ssub128_16((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_ssub32(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_ssub32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_ssub64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_ssub128_32((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_ssub64(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_64((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_64((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_ssub32_64((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_ssub64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_ssub128_64((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_ssub128(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_128((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_128((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_ssub32_128((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_ssub64_128((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_ssub128_128((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result), 0)
 #define __hybrid_overflow_ssub(lhs, rhs, p_result) \
 	(sizeof(*(p_result)) <= 1 ? __hybrid_overflow_ssub8(lhs, rhs, (__INT8_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 2 ? __hybrid_overflow_ssub16(lhs, rhs, (__INT16_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 4 ? __hybrid_overflow_ssub32(lhs, rhs, (__INT32_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 8 ? __hybrid_overflow_ssub64(lhs, rhs, (__INT64_TYPE__ *)(p_result)) : \
 	                            __hybrid_overflow_ssub128(lhs, rhs, (__INT128_TYPE__ *)(p_result)))
-#define __hybrid_overflow_umul8(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_umul32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_umul64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_umul128_8((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_umul16(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_umul32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_umul64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_umul128_16((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_umul32(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_umul32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_umul64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_umul128_32((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_umul64(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_64((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_64((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_umul32_64((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_umul64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_umul128_64((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_umul128(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_128((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_128((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_umul32_128((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_umul64_128((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_umul128_128((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result))
+#define __hybrid_overflow_umul8(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_umul32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_umul64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_umul128_8((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_umul16(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_umul32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_umul64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_umul128_16((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_umul32(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_umul32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_umul64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_umul128_32((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_umul64(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_64((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_64((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_umul32_64((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_umul64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_umul128_64((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_umul128(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_128((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_128((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_umul32_128((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_umul64_128((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_umul128_128((__UINT128_TYPE__)(lhs), (__UINT128_TYPE__)(rhs), p_result), 0)
 #define __hybrid_overflow_umul(lhs, rhs, p_result) \
 	(sizeof(*(p_result)) <= 1 ? __hybrid_overflow_umul8(lhs, rhs, (__UINT8_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 2 ? __hybrid_overflow_umul16(lhs, rhs, (__UINT16_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 4 ? __hybrid_overflow_umul32(lhs, rhs, (__UINT32_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 8 ? __hybrid_overflow_umul64(lhs, rhs, (__UINT64_TYPE__ *)(p_result)) : \
 	                            __hybrid_overflow_umul128(lhs, rhs, (__UINT128_TYPE__ *)(p_result)))
-#define __hybrid_overflow_smul8(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_smul32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_smul64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_smul128_8((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_smul16(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_smul32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_smul64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_smul128_16((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_smul32(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_smul32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_smul64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_smul128_32((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_smul64(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_64((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_64((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_smul32_64((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_smul64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_smul128_64((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_smul128(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_128((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_128((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_smul32_128((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_smul64_128((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_smul128_128((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result))
+#define __hybrid_overflow_smul8(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_smul32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_smul64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_smul128_8((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_smul16(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_smul32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_smul64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_smul128_16((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_smul32(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_smul32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_smul64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_smul128_32((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_smul64(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_64((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_64((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_smul32_64((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_smul64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_smul128_64((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_smul128(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_128((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_128((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_smul32_128((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 8 ? __PRIVATE_hybrid_overflow_smul64_128((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_smul128_128((__INT128_TYPE__)(lhs), (__INT128_TYPE__)(rhs), p_result), 0)
 #define __hybrid_overflow_smul(lhs, rhs, p_result) \
 	(sizeof(*(p_result)) <= 1 ? __hybrid_overflow_smul8(lhs, rhs, (__INT8_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 2 ? __hybrid_overflow_smul16(lhs, rhs, (__INT16_TYPE__ *)(p_result)) : \
@@ -1152,249 +1151,249 @@ print("#endif /" "* !__NO_builtin_choose_expr *" "/");
 	 sizeof(*(p_result)) <= 8 ? __hybrid_overflow_smul64(lhs, rhs, (__INT64_TYPE__ *)(p_result)) : \
 	                            __hybrid_overflow_smul128(lhs, rhs, (__INT128_TYPE__ *)(p_result)))
 #elif defined(__UINT64_TYPE__)
-#define __hybrid_overflow_uadd8(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_uadd32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_uadd64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_uadd16(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_uadd32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_uadd64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_uadd32(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_uadd32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_uadd64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_uadd64(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_64((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_64((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_uadd32_64((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_uadd64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))
+#define __hybrid_overflow_uadd8(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_uadd32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_uadd64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_uadd16(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_uadd32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_uadd64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_uadd32(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_uadd32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_uadd64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_uadd64(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_64((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_64((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_uadd32_64((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_uadd64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), 0)
 #define __hybrid_overflow_uadd(lhs, rhs, p_result) \
 	(sizeof(*(p_result)) <= 1 ? __hybrid_overflow_uadd8(lhs, rhs, (__UINT8_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 2 ? __hybrid_overflow_uadd16(lhs, rhs, (__UINT16_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 4 ? __hybrid_overflow_uadd32(lhs, rhs, (__UINT32_TYPE__ *)(p_result)) : \
 	                            __hybrid_overflow_uadd64(lhs, rhs, (__UINT64_TYPE__ *)(p_result)))
-#define __hybrid_overflow_sadd8(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_sadd32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_sadd64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_sadd16(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_sadd32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_sadd64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_sadd32(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_sadd32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_sadd64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_sadd64(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_64((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_64((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_sadd32_64((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_sadd64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))
+#define __hybrid_overflow_sadd8(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_sadd32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_sadd64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_sadd16(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_sadd32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_sadd64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_sadd32(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_sadd32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_sadd64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_sadd64(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_64((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_64((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_sadd32_64((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_sadd64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), 0)
 #define __hybrid_overflow_sadd(lhs, rhs, p_result) \
 	(sizeof(*(p_result)) <= 1 ? __hybrid_overflow_sadd8(lhs, rhs, (__INT8_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 2 ? __hybrid_overflow_sadd16(lhs, rhs, (__INT16_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 4 ? __hybrid_overflow_sadd32(lhs, rhs, (__INT32_TYPE__ *)(p_result)) : \
 	                            __hybrid_overflow_sadd64(lhs, rhs, (__INT64_TYPE__ *)(p_result)))
-#define __hybrid_overflow_usub8(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_usub32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_usub64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_usub16(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_usub32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_usub64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_usub32(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_usub32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_usub64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_usub64(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_64((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_64((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_usub32_64((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_usub64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))
+#define __hybrid_overflow_usub8(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_usub32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_usub64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_usub16(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_usub32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_usub64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_usub32(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_usub32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_usub64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_usub64(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_64((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_64((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_usub32_64((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_usub64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), 0)
 #define __hybrid_overflow_usub(lhs, rhs, p_result) \
 	(sizeof(*(p_result)) <= 1 ? __hybrid_overflow_usub8(lhs, rhs, (__UINT8_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 2 ? __hybrid_overflow_usub16(lhs, rhs, (__UINT16_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 4 ? __hybrid_overflow_usub32(lhs, rhs, (__UINT32_TYPE__ *)(p_result)) : \
 	                            __hybrid_overflow_usub64(lhs, rhs, (__UINT64_TYPE__ *)(p_result)))
-#define __hybrid_overflow_ssub8(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_ssub32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_ssub64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_ssub16(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_ssub32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_ssub64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_ssub32(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_ssub32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_ssub64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_ssub64(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_64((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_64((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_ssub32_64((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_ssub64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))
+#define __hybrid_overflow_ssub8(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_ssub32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_ssub64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_ssub16(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_ssub32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_ssub64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_ssub32(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_ssub32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_ssub64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_ssub64(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_64((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_64((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_ssub32_64((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_ssub64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), 0)
 #define __hybrid_overflow_ssub(lhs, rhs, p_result) \
 	(sizeof(*(p_result)) <= 1 ? __hybrid_overflow_ssub8(lhs, rhs, (__INT8_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 2 ? __hybrid_overflow_ssub16(lhs, rhs, (__INT16_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 4 ? __hybrid_overflow_ssub32(lhs, rhs, (__INT32_TYPE__ *)(p_result)) : \
 	                            __hybrid_overflow_ssub64(lhs, rhs, (__INT64_TYPE__ *)(p_result)))
-#define __hybrid_overflow_umul8(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_umul32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_umul64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_umul16(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_umul32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_umul64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_umul32(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_umul32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_umul64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_umul64(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_64((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_64((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_umul32_64((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_umul64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result))
+#define __hybrid_overflow_umul8(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_umul32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_umul64_8((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_umul16(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_umul32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_umul64_16((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_umul32(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_umul32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_umul64_32((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_umul64(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_64((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_64((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_umul32_64((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_umul64_64((__UINT64_TYPE__)(lhs), (__UINT64_TYPE__)(rhs), p_result), 0)
 #define __hybrid_overflow_umul(lhs, rhs, p_result) \
 	(sizeof(*(p_result)) <= 1 ? __hybrid_overflow_umul8(lhs, rhs, (__UINT8_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 2 ? __hybrid_overflow_umul16(lhs, rhs, (__UINT16_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 4 ? __hybrid_overflow_umul32(lhs, rhs, (__UINT32_TYPE__ *)(p_result)) : \
 	                            __hybrid_overflow_umul64(lhs, rhs, (__UINT64_TYPE__ *)(p_result)))
-#define __hybrid_overflow_smul8(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_smul32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_smul64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_smul16(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_smul32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_smul64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_smul32(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_smul32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_smul64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_smul64(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_64((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_64((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_smul32_64((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_smul64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result))
+#define __hybrid_overflow_smul8(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_smul32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_smul64_8((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_smul16(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_smul32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_smul64_16((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_smul32(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_smul32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_smul64_32((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_smul64(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_64((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_64((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 4 ? __PRIVATE_hybrid_overflow_smul32_64((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_smul64_64((__INT64_TYPE__)(lhs), (__INT64_TYPE__)(rhs), p_result), 0)
 #define __hybrid_overflow_smul(lhs, rhs, p_result) \
 	(sizeof(*(p_result)) <= 1 ? __hybrid_overflow_smul8(lhs, rhs, (__INT8_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 2 ? __hybrid_overflow_smul16(lhs, rhs, (__INT16_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 4 ? __hybrid_overflow_smul32(lhs, rhs, (__INT32_TYPE__ *)(p_result)) : \
 	                            __hybrid_overflow_smul64(lhs, rhs, (__INT64_TYPE__ *)(p_result)))
 #else /* ... */
-#define __hybrid_overflow_uadd8(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_uadd32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_uadd16(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_uadd32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_uadd32(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_uadd32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result))
+#define __hybrid_overflow_uadd8(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_uadd32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_uadd16(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_uadd32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_uadd32(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_uadd8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_uadd16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_uadd32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), 0)
 #define __hybrid_overflow_uadd(lhs, rhs, p_result) \
 	(sizeof(*(p_result)) <= 1 ? __hybrid_overflow_uadd8(lhs, rhs, (__UINT8_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 2 ? __hybrid_overflow_uadd16(lhs, rhs, (__UINT16_TYPE__ *)(p_result)) : \
 	                            __hybrid_overflow_uadd32(lhs, rhs, (__UINT32_TYPE__ *)(p_result)))
-#define __hybrid_overflow_sadd8(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_sadd32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_sadd16(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_sadd32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_sadd32(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_sadd32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result))
+#define __hybrid_overflow_sadd8(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_sadd32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_sadd16(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_sadd32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_sadd32(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_sadd8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_sadd16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_sadd32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), 0)
 #define __hybrid_overflow_sadd(lhs, rhs, p_result) \
 	(sizeof(*(p_result)) <= 1 ? __hybrid_overflow_sadd8(lhs, rhs, (__INT8_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 2 ? __hybrid_overflow_sadd16(lhs, rhs, (__INT16_TYPE__ *)(p_result)) : \
 	                            __hybrid_overflow_sadd32(lhs, rhs, (__INT32_TYPE__ *)(p_result)))
-#define __hybrid_overflow_usub8(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_usub32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_usub16(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_usub32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_usub32(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_usub32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result))
+#define __hybrid_overflow_usub8(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_usub32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_usub16(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_usub32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_usub32(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_usub8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_usub16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_usub32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), 0)
 #define __hybrid_overflow_usub(lhs, rhs, p_result) \
 	(sizeof(*(p_result)) <= 1 ? __hybrid_overflow_usub8(lhs, rhs, (__UINT8_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 2 ? __hybrid_overflow_usub16(lhs, rhs, (__UINT16_TYPE__ *)(p_result)) : \
 	                            __hybrid_overflow_usub32(lhs, rhs, (__UINT32_TYPE__ *)(p_result)))
-#define __hybrid_overflow_ssub8(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_ssub32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_ssub16(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_ssub32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_ssub32(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_ssub32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result))
+#define __hybrid_overflow_ssub8(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_ssub32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_ssub16(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_ssub32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_ssub32(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_ssub8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_ssub16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_ssub32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), 0)
 #define __hybrid_overflow_ssub(lhs, rhs, p_result) \
 	(sizeof(*(p_result)) <= 1 ? __hybrid_overflow_ssub8(lhs, rhs, (__INT8_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 2 ? __hybrid_overflow_ssub16(lhs, rhs, (__INT16_TYPE__ *)(p_result)) : \
 	                            __hybrid_overflow_ssub32(lhs, rhs, (__INT32_TYPE__ *)(p_result)))
-#define __hybrid_overflow_umul8(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_umul32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_umul16(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_umul32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_umul32(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_umul32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result))
+#define __hybrid_overflow_umul8(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_8((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_8((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_umul32_8((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_umul16(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_16((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_16((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_umul32_16((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_umul32(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_umul8_32((__UINT8_TYPE__)(lhs), (__UINT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_umul16_32((__UINT16_TYPE__)(lhs), (__UINT16_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_umul32_32((__UINT32_TYPE__)(lhs), (__UINT32_TYPE__)(rhs), p_result), 0)
 #define __hybrid_overflow_umul(lhs, rhs, p_result) \
 	(sizeof(*(p_result)) <= 1 ? __hybrid_overflow_umul8(lhs, rhs, (__UINT8_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 2 ? __hybrid_overflow_umul16(lhs, rhs, (__UINT16_TYPE__ *)(p_result)) : \
 	                            __hybrid_overflow_umul32(lhs, rhs, (__UINT32_TYPE__ *)(p_result)))
-#define __hybrid_overflow_smul8(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_smul32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_smul16(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_smul32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result))
-#define __hybrid_overflow_smul32(lhs, rhs, p_result) \
-	(__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
-	 __PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
-	                                                  __PRIVATE_hybrid_overflow_smul32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result))
+#define __hybrid_overflow_smul8(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_8((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_8((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_smul32_8((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_smul16(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_16((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_16((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_smul32_16((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), 0)
+#define __hybrid_overflow_smul32(lhs, rhs, p_result) __builtin_expect( \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 1 ? __PRIVATE_hybrid_overflow_smul8_32((__INT8_TYPE__)(lhs), (__INT8_TYPE__)(rhs), p_result) : \
+	__PRIVATE_hybrid_overflow_size2(lhs, rhs) <= 2 ? __PRIVATE_hybrid_overflow_smul16_32((__INT16_TYPE__)(lhs), (__INT16_TYPE__)(rhs), p_result) : \
+	                                                 __PRIVATE_hybrid_overflow_smul32_32((__INT32_TYPE__)(lhs), (__INT32_TYPE__)(rhs), p_result), 0)
 #define __hybrid_overflow_smul(lhs, rhs, p_result) \
 	(sizeof(*(p_result)) <= 1 ? __hybrid_overflow_smul8(lhs, rhs, (__INT8_TYPE__ *)(p_result)) : \
 	 sizeof(*(p_result)) <= 2 ? __hybrid_overflow_smul16(lhs, rhs, (__INT16_TYPE__ *)(p_result)) : \

@@ -346,6 +346,7 @@
 #endif /* __cplusplus */
 #pragma warning(disable: 4197) /* Casting away `volatile' */
 #pragma warning(disable: 4047) /* Differing number of dereferences. */
+#pragma warning(disable: 4310) /* Cast truncates constant value */
 #include "__atomic-msvc.h"
 /**/
 #include "__atomic-complete.h"
