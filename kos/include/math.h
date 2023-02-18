@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6641dd9f */
+/* HASH CRC-32:0xea057195 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -15383,8 +15383,18 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__INTMAX_TYPE__,__NOTHROW_NCX,fromfp,(double __x, 
 __CDECLARE_OPT(__ATTR_WUNUSED,__UINTMAX_TYPE__,__NOTHROW_NCX,ufromfp,(double __x, int __round, unsigned int __width),(__x,__round,__width))
 __CDECLARE_OPT(__ATTR_WUNUSED,__INTMAX_TYPE__,__NOTHROW_NCX,fromfpx,(double __x, int __round, unsigned int __width),(__x,__round,__width))
 __CDECLARE_OPT(__ATTR_WUNUSED,__UINTMAX_TYPE__,__NOTHROW_NCX,ufromfpx,(double __x, int __round, unsigned int __width),(__x,__round,__width))
-__CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,fmaxmag,(double __x, double __y),(__x,__y))
-__CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,fminmag,(double __x, double __y),(__x,__y))
+#ifdef __CRT_HAVE_fmaxmag
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,fmaxmag,(double __x, double __y),(__x,__y))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/fmaxmag.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(fmaxmag, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL fmaxmag)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxmag))(__x, __y); })
+#endif /* ... */
+#ifdef __CRT_HAVE_fminmag
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,fminmag,(double __x, double __y),(__x,__y))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/fminmag.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(fminmag, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL fminmag)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminmag))(__x, __y); })
+#endif /* ... */
 #ifdef __CRT_HAVE_canonicalize
 /* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
  * @param: x:  Pointer to the value to canonicalize.
@@ -15441,13 +15451,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ufromfpxf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* ... */
 #ifdef __CRT_HAVE_fmaxmagf
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW_NCX,fmaxmagf,(float __x, float __y),(__x,__y))
-#elif defined(__CRT_HAVE_fmaxmag)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_fmaxmag) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/fmaxmagf.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fmaxmagf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL fmaxmagf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxmagf))(__x, __y); })
 #endif /* ... */
 #ifdef __CRT_HAVE_fminmagf
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW_NCX,fminmagf,(float __x, float __y),(__x,__y))
-#elif defined(__CRT_HAVE_fminmag)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_fminmag) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/fminmagf.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fminmagf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL fminmagf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminmagf))(__x, __y); })
 #endif /* ... */
@@ -15522,7 +15532,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ufromfpxl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,fmaxmagl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
 #elif defined(__CRT_HAVE_fmaxmag) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,fmaxmagl,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmaxmag,(__x,__y))
-#elif defined(__CRT_HAVE_fmaxmag)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_fmaxmag) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/fmaxmagl.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fmaxmagl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL fmaxmagl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxmagl))(__x, __y); })
 #endif /* ... */
@@ -15530,7 +15540,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fmaxmagl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,fminmagl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
 #elif defined(__CRT_HAVE_fminmag) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,fminmagl,(__LONGDOUBLE __x, __LONGDOUBLE __y),fminmag,(__x,__y))
-#elif defined(__CRT_HAVE_fminmag)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_fminmag) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/fminmagl.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fminmagl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL fminmagl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminmagl))(__x, __y); })
 #endif /* ... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb012ca6b */
+/* HASH CRC-32:0xb8d67b75 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4392,6 +4392,32 @@ INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_roundeven)(double x) {
 	return __LIBM_MATHFUN(roundeven, x);
 }
+#include <libm/fcomp.h>
+#include <libm/fabs.h>
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
+NOTHROW_NCX(LIBCCALL libc_fmaxmag)(double x,
+                                   double y) {
+	double x_abs = __LIBM_MATHFUN(fabs, x);
+	double y_abs = __LIBM_MATHFUN(fabs, y);
+	if (__LIBM_MATHFUN2(isgreater, x_abs, y_abs))
+		return x;
+	if (__LIBM_MATHFUN2(isless, x_abs, y_abs))
+		return y;
+	return libc_fmax(x, y);
+}
+#include <libm/fcomp.h>
+#include <libm/fabs.h>
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
+NOTHROW_NCX(LIBCCALL libc_fminmag)(double x,
+                                   double y) {
+	double x_abs = __LIBM_MATHFUN(fabs, x);
+	double y_abs = __LIBM_MATHFUN(fabs, y);
+	if (__LIBM_MATHFUN2(isless, x_abs, y_abs))
+		return x;
+	if (__LIBM_MATHFUN2(isgreater, x_abs, y_abs))
+		return y;
+	return libc_fmin(x, y);
+}
 /* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
  * @param: x:  Pointer to the value to canonicalize.
  * @param: cx: Store the canonicalized value of `*x' here.
@@ -4460,15 +4486,45 @@ NOTHROW_NCX(LIBCCALL libc_ufromfpxf)(float x,
                                      unsigned int width) {
 	return libc_ufromfpx((double)x, roundf, width);
 }
+#include <libm/fcomp.h>
+#include <libm/fabs.h>
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW_NCX(LIBCCALL libc_fmaxmagf)(float x,
                                     float y) {
-	return (float)libc_fmaxmag((double)x, (double)y);
+
+
+
+
+	float x_abs = __LIBM_MATHFUNF(fabs, x);
+	float y_abs = __LIBM_MATHFUNF(fabs, y);
+	if (__LIBM_MATHFUN2F(isgreater, x_abs, y_abs))
+		return x;
+	if (__LIBM_MATHFUN2F(isless, x_abs, y_abs))
+		return y;
+	return libc_fmaxf(x, y);
+
+
+
 }
+#include <libm/fcomp.h>
+#include <libm/fabs.h>
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW_NCX(LIBCCALL libc_fminmagf)(float x,
                                     float y) {
-	return (float)libc_fminmag((double)x, (double)y);
+
+
+
+
+	float x_abs = __LIBM_MATHFUNF(fabs, x);
+	float y_abs = __LIBM_MATHFUNF(fabs, y);
+	if (__LIBM_MATHFUN2F(isless, x_abs, y_abs))
+		return x;
+	if (__LIBM_MATHFUN2F(isgreater, x_abs, y_abs))
+		return y;
+	return libc_fminf(x, y);
+
+
+
 }
 /* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
  * @param: x:  Pointer to the value to canonicalize.
@@ -4571,20 +4627,50 @@ NOTHROW_NCX(LIBCCALL libc_ufromfpxl)(__LONGDOUBLE x,
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
 DEFINE_INTERN_ALIAS(libc_fmaxmagl, libc_fmaxmag);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <libm/fcomp.h>
+#include <libm/fabs.h>
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_fmaxmagl)(__LONGDOUBLE x,
                                     __LONGDOUBLE y) {
-	return (__LONGDOUBLE)libc_fmaxmag((double)x, (double)y);
+
+
+
+
+	__LONGDOUBLE x_abs = __LIBM_MATHFUNL(fabs, x);
+	__LONGDOUBLE y_abs = __LIBM_MATHFUNL(fabs, y);
+	if (__LIBM_MATHFUN2L(isgreater, x_abs, y_abs))
+		return x;
+	if (__LIBM_MATHFUN2L(isless, x_abs, y_abs))
+		return y;
+	return libc_fmaxl(x, y);
+
+
+
 }
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
 DEFINE_INTERN_ALIAS(libc_fminmagl, libc_fminmag);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <libm/fcomp.h>
+#include <libm/fabs.h>
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_fminmagl)(__LONGDOUBLE x,
                                     __LONGDOUBLE y) {
-	return (__LONGDOUBLE)libc_fminmag((double)x, (double)y);
+
+
+
+
+	__LONGDOUBLE x_abs = __LIBM_MATHFUNL(fabs, x);
+	__LONGDOUBLE y_abs = __LIBM_MATHFUNL(fabs, y);
+	if (__LIBM_MATHFUN2L(isless, x_abs, y_abs))
+		return x;
+	if (__LIBM_MATHFUN2L(isgreater, x_abs, y_abs))
+		return y;
+	return libc_fminl(x, y);
+
+
+
 }
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
@@ -5302,6 +5388,8 @@ DEFINE_PUBLIC_ALIAS(nextdownl, libc_nextdownl);
 DEFINE_PUBLIC_ALIAS(nextupl, libc_nextupl);
 DEFINE_PUBLIC_ALIAS(llogb, libc_llogb);
 DEFINE_PUBLIC_ALIAS(roundeven, libc_roundeven);
+DEFINE_PUBLIC_ALIAS(fmaxmag, libc_fmaxmag);
+DEFINE_PUBLIC_ALIAS(fminmag, libc_fminmag);
 DEFINE_PUBLIC_ALIAS(canonicalize, libc_canonicalize);
 DEFINE_PUBLIC_ALIAS(llogbf, libc_llogbf);
 DEFINE_PUBLIC_ALIAS(roundevenf, libc_roundevenf);

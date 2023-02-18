@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4aece098 */
+/* HASH CRC-32:0x1530bb23 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2241,7 +2241,17 @@ INTDEF WUNUSED uintmax_t NOTHROW_NCX(LIBDCALL libd_ufromfp)(double x, int round,
 INTDEF WUNUSED intmax_t NOTHROW_NCX(LIBDCALL libd_fromfpx)(double x, int round, unsigned int width);
 INTDEF WUNUSED uintmax_t NOTHROW_NCX(LIBDCALL libd_ufromfpx)(double x, int round, unsigned int width);
 INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBDCALL libd_fmaxmag)(double x, double y);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_fmaxmag)(double x, double y);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBDCALL libd_fminmag)(double x, double y);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_fminmag)(double x, double y);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
  * @param: x:  Pointer to the value to canonicalize.
  * @param: cx: Store the canonicalized value of `*x' here.

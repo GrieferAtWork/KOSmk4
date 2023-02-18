@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4543a59f */
+/* HASH CRC-32:0xeb3b1256 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,22 +21,64 @@
 #ifndef __local_fmaxmagf_defined
 #define __local_fmaxmagf_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_fmaxmag
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_fmaxmag) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_fmaxf_defined
+#define __local___localdep_fmaxf_defined
+#if __has_builtin(__builtin_fmaxf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmaxf)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_fmaxf,(float __x, float __y),fmaxf,{ return __builtin_fmaxf(__x, __y); })
+#elif defined(__CRT_HAVE_fmaxf)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_fmaxf,(float __x, float __y),fmaxf,(__x,__y))
+#elif defined(__CRT_HAVE___fmaxf)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_fmaxf,(float __x, float __y),__fmaxf,(__x,__y))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/math/fmaxf.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_fmaxf __LIBC_LOCAL_NAME(fmaxf)
+#endif /* !... */
+#endif /* !__local___localdep_fmaxf_defined */
 #ifndef __local___localdep_fmaxmag_defined
 #define __local___localdep_fmaxmag_defined
+#ifdef __CRT_HAVE_fmaxmag
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_fmaxmag,(double __x, double __y),fmaxmag,(__x,__y))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
+#include <libc/local/math/fmaxmag.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_fmaxmag __LIBC_LOCAL_NAME(fmaxmag)
+#else /* ... */
+#undef __local___localdep_fmaxmag_defined
+#endif /* !... */
 #endif /* !__local___localdep_fmaxmag_defined */
+__NAMESPACE_LOCAL_END
+#include <libm/fcomp.h>
+#include <libm/fabs.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fmaxmagf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmaxmagf))(float __x, float __y) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+
+	float __x_abs = __LIBM_MATHFUNF(fabs, __x);
+	float __y_abs = __LIBM_MATHFUNF(fabs, __y);
+	if (__LIBM_MATHFUN2F(isgreater, __x_abs, __y_abs))
+		return __x;
+	if (__LIBM_MATHFUN2F(isless, __x_abs, __y_abs))
+		return __y;
+	return (__NAMESPACE_LOCAL_SYM __localdep_fmaxf)(__x, __y);
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)(__NAMESPACE_LOCAL_SYM __localdep_fmaxmag)((double)__x, (double)__y);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fmaxmagf_defined
 #define __local___localdep_fmaxmagf_defined
 #define __localdep_fmaxmagf __LIBC_LOCAL_NAME(fmaxmagf)
 #endif /* !__local___localdep_fmaxmagf_defined */
-#else /* __CRT_HAVE_fmaxmag */
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_fmaxmag || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #undef __local_fmaxmagf_defined
-#endif /* !__CRT_HAVE_fmaxmag */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__CRT_HAVE_fmaxmag && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_fmaxmagf_defined */

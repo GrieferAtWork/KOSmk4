@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8379a4d */
+/* HASH CRC-32:0x52674fcd */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,8 +35,6 @@ INTDEF WUNUSED intmax_t NOTHROW_NCX(LIBCCALL libc_fromfp)(double x, int round, u
 INTDEF WUNUSED uintmax_t NOTHROW_NCX(LIBCCALL libc_ufromfp)(double x, int round, unsigned int width);
 INTDEF WUNUSED intmax_t NOTHROW_NCX(LIBCCALL libc_fromfpx)(double x, int round, unsigned int width);
 INTDEF WUNUSED uintmax_t NOTHROW_NCX(LIBCCALL libc_ufromfpx)(double x, int round, unsigned int width);
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_fmaxmag)(double x, double y);
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_fminmag)(double x, double y);
 #endif /* !__KERNEL__ */
 
 DECL_END

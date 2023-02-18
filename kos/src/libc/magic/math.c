@@ -2840,9 +2840,39 @@ $intmax_t fromfpx(double x, int round, unsigned int width); /* TODO */
 [[wunused, decl_include("<hybrid/typecore.h>")]]
 $uintmax_t ufromfpx(double x, int round, unsigned int width); /* TODO */
 
-[[const, wunused]] double fmaxmag(double x, double y); /* TODO */
+[[const, wunused]]
+[[requires_include("<ieee754.h>")]]
+[[requires($has_function(fmax) &&
+           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
+[[impl_include("<libm/fcomp.h>", "<libm/fabs.h>")]]
+double fmaxmag(double x, double y) {
+	double x_abs = __LIBM_MATHFUN(@fabs@, x);
+	double y_abs = __LIBM_MATHFUN(@fabs@, y);
+	if (__LIBM_MATHFUN2(@isgreater@, x_abs, y_abs))
+		return x;
+	if (__LIBM_MATHFUN2(@isless@, x_abs, y_abs))
+		return y;
+	return fmax(x, y);
+}
 
-[[const, wunused]] double fminmag(double x, double y); /* TODO */
+[[const, wunused]]
+[[requires_include("<ieee754.h>")]]
+[[requires($has_function(fmin) &&
+           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
+[[impl_include("<libm/fcomp.h>", "<libm/fabs.h>")]]
+double fminmag(double x, double y) {
+	double x_abs = __LIBM_MATHFUN(@fabs@, x);
+	double y_abs = __LIBM_MATHFUN(@fabs@, y);
+	if (__LIBM_MATHFUN2(@isless@, x_abs, y_abs))
+		return x;
+	if (__LIBM_MATHFUN2(@isgreater@, x_abs, y_abs))
+		return y;
+	return fmin(x, y);
+}
 
 
 %[define(__MAGIC_FLOAT_TYPE_IS_DOUBLE = 1)]

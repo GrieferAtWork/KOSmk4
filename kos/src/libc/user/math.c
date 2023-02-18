@@ -91,40 +91,14 @@ NOTHROW_NCX(LIBCCALL libc_ufromfpx)(double x,
 }
 /*[[[end:libc_ufromfpx]]]*/
 
-/*[[[head:libc_fmaxmag,hash:CRC-32=0xc3a28404]]]*/
-INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
-NOTHROW_NCX(LIBCCALL libc_fmaxmag)(double x,
-                                   double y)
-/*[[[body:libc_fmaxmag]]]*/
-/*AUTO*/{
-	(void)x;
-	(void)y;
-	CRT_UNIMPLEMENTEDF("fmaxmag(x: %f, y: %f)", x, y); /* TODO */
-	return (double)libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_fmaxmag]]]*/
-
-/*[[[head:libc_fminmag,hash:CRC-32=0x15e4f674]]]*/
-INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
-NOTHROW_NCX(LIBCCALL libc_fminmag)(double x,
-                                   double y)
-/*[[[body:libc_fminmag]]]*/
-/*AUTO*/{
-	(void)x;
-	(void)y;
-	CRT_UNIMPLEMENTEDF("fminmag(x: %f, y: %f)", x, y); /* TODO */
-	return (double)libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_fminmag]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0x64339966]]]*/
+
+/*[[[start:exports,hash:CRC-32=0xeb4bef0d]]]*/
 DEFINE_PUBLIC_ALIAS(fromfp, libc_fromfp);
 DEFINE_PUBLIC_ALIAS(ufromfp, libc_ufromfp);
 DEFINE_PUBLIC_ALIAS(fromfpx, libc_fromfpx);
 DEFINE_PUBLIC_ALIAS(ufromfpx, libc_ufromfpx);
-DEFINE_PUBLIC_ALIAS(fmaxmag, libc_fmaxmag);
-DEFINE_PUBLIC_ALIAS(fminmag, libc_fminmag);
 /*[[[end:exports]]]*/
 
 DECL_END
