@@ -110,8 +110,8 @@ unsigned short __cdecl _rotl16(unsigned short __val, unsigned char __shift);
 unsigned short __cdecl _rotr16(unsigned short __val, unsigned char __shift);
 #pragma intrinsic(_rotr16)
 #endif /* !_rotr16 */
-#endif /* __x86_64__ */
 #endif /* !__hybrid_ror16_r */
+#endif /* __x86_64__ */
 
 #if _MSC_VER >= 1300
 #ifndef __hybrid_rol32_r

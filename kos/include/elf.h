@@ -1208,14 +1208,14 @@ typedef struct elf64_syminfo /*[PREFIX(si_)]*/ {
  *       - rtld:  Same as `STT_GNU_IFUNC' (during relocations/symbol lookup)
  *     Fields:
  *         st_value: Pointer to a function `T *resolve(void)'
- *                   When  called, this  function should  return a  pointer to the
- *                   data-blob that  should be  linked  at runtime.  Note  however
- *                   that due to relocations such as `R_386_GLOB_DAT', the pointer
- *                   that will be returned by `dlsym(3)' for the object may differ
- *                   from the pointer  returned by `resolve()'.  When this is  the
- *                   case,  then the actual  symbol pointer will  be filled with a
- *                   copy of  the data-blob  returned by  `resolve()', where  this
- *                   copy will  have previously  been allocated  by `ld'  when  it
+ *                   When called,  this function  should return  a pointer  to  the
+ *                   data-blob that  should  be  linked at  runtime.  Note  however
+ *                   that due to relocations such as `R_386_GLOB_DAT', the  pointer
+ *                   that will be returned by `dlsym(3D)' for the object may differ
+ *                   from  the pointer  returned by  `resolve()'. When  this is the
+ *                   case, then the  actual symbol  pointer will be  filled with  a
+ *                   copy of  the data-blob  returned  by `resolve()',  where  this
+ *                   copy  will  have previously  been  allocated by  `ld'  when it
  *                   was linking against the declaring library.
  *         st_size:  The size of the lazily  initialized data blob. This size  must
  *                   match the  size  of  the data-blob  returned  by  `resolve()'!

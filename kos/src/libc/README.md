@@ -125,7 +125,7 @@ If libc contains relocations not rationalized by this document, their presence m
 	- By declaring symbols of type `STT_KOS_IDATA`, it becomes possible to associate a lazy initializer (actually: a function that returns the pointer that should become the symbol's runtime address) with a symbol. This function can now be written to do what would have normally been done in regards to initialization of the data symbol via relocations, only that using this trick, this becomes possible without the need of **any** relocations.
 	- Note that depending on the point in time programs might link against such a symbol, and because the resolver function may be invoked multiple times, it is important to ensure that the resolver function checks if it has already initialized the global data object. -- Since its use is related to preventing relocations, it should be easy to facilitate this by simply checking if pointers that would normally become `R_386_RELATIVE` relocations are still set to `NULL` or some other not-yet-initialized value.
 		- But do consider if a user-program might have reason to modify pointers within the thus-initialized data-blob, including the case where your was-already-initialized marker gets reset back to its not-yet-initialized state.
-		- In the event that this is a reasonable use case, you should make use of `pthread_once_t` in order to ensure that lazy initialization happens exactly once. (Though generally, the additional thread-safety accompanied by using this construct isn't necessary, since symbol resolution usually happens before a program gets a chance to spawn additional threads, and even in the event of use of `dlsym(3)` to do symbol resolution at a later point in time, it's unlikely that this would be done by multiple threads at the same time, for the same symbol; yet if this can be expected to happen, then yes: you'd absolutely **need** to make use of `pthread_once_t`)
+		- In the event that this is a reasonable use case, you should make use of `pthread_once_t` in order to ensure that lazy initialization happens exactly once. (Though generally, the additional thread-safety accompanied by using this construct isn't necessary, since symbol resolution usually happens before a program gets a chance to spawn additional threads, and even in the event of use of `dlsym(3D)` to do symbol resolution at a later point in time, it's unlikely that this would be done by multiple threads at the same time, for the same symbol; yet if this can be expected to happen, then yes: you'd absolutely **need** to make use of `pthread_once_t`)
 	- See file [/kos/src/libdl/README.md](../libdl/README.md) for more information on `STT_KOS_IDATA` symbols.
 
 - The "always-use-INTERN-functions" trick:
@@ -134,7 +134,7 @@ If libc contains relocations not rationalized by this document, their presence m
 	- This in turn makes it rather difficult (read: impossible) for programs to use the (badly designed and stupid if you ask me) ELF feature of overwriting library functions by simply declaring them yourself in your own program (I personally find the idea OK, but it shouldn't be the default; if you ask me: only `__attribute__((weak))` symbols should be subjugated to this special treatment). Anyways: I believe that this is a reasonable sacrifice, especially since practically no programs actually use this.
 	- However, for those cases where symbols being overridable is actually important/necessary (e.g. `matherr(3)`), additional care must be taken, which brings me to the next trick...
 
-- Use `dlsym(3)` to access global data objects, and overridable symbols.
+- Use `dlsym(3D)` to access global data objects, and overridable symbols.
 	- This might seem strange at first, but do make sure **not** to use the preceding `INTERN`-trick for PUBLIC data symbols. Because of COPY relocations (s.a. `R_386_COPY`), it is necessary to allow programs to essentially re-define these symbols to have new addresses that lie outside of libc (in particular: become part of the main program).
 	- Conceptually, you can think of `R_386_COPY` to do the following:  
 
@@ -199,7 +199,7 @@ This file is the crt-features descriptor used while building libc. Because the a
 
 - `__CRT_HAVE_foo` means that libc has a symbol `INTERN libc_foo` (*usually* exported as `foo`)
 - `__CRT_HAVE_DOS$foo` means that libc has a symbol `INTERN libd_foo` (*usually* exported as `DOS$foo`)
-- `__CRT_HAVE_KOS$foo` means a bug. -- Such a macro shouldn't be get defined in here
+- `__CRT_HAVE_KOS$foo` means a bug. -- Such a macro should never get defined in here
 
 In conjunction with this, `<__crt.h>` has special handling for when `__BUILDING_LIBC` is defined, such that it understands that `__CRT_HAVE_*` symbols in this configuration exist in a special namespace. As such, -- assuming that `defined(__CRT_HAVE_strlen)` -- a declaration like:
 

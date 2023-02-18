@@ -153,7 +153,7 @@ DEFINE_PUBLIC_IFUNC(__libc_dlopen_mode, libc_get_dlopen);
 DEFINE_PUBLIC_IFUNC(__libc_dlsym, libc_get_dlsym);
 INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc") PDLSYM
 NOTHROW_NCX(LIBCCALL libc_get_dlsym)(void) {
-	/* `dlsym(3)'  is special, in  that we obviously  can't do `dlsym(RTLD_DEFAULT, "dlsym")' in
+	/* `dlsym(3D)' is special, in that  we obviously can't do `dlsym(RTLD_DEFAULT, "dlsym")'  in
 	 * order to load its address  and thus prevent any  relocations against `dlsym'. So  instead
 	 * it's one of the  very few relocations that  our libc is allowed  to have. -- This  getter
 	 * function for it only needs to exist so we have a way by which to export  `__libc_dlsym()'

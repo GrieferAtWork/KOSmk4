@@ -95,18 +95,18 @@ struct file_blkshift {
  *  - All references to file data have `fmua_offset' added
  *    - This  affects `pread(2)', `read(2)' and `mmap(2)', this
  *      last system call being the most important of these when
- *      it comes to be uses of unaligned wrappers.
- *  - The wrapper is read-only, but (may) contain its own  I/O
- *    buffer that is distinct from the original file. In other
- *    words, modifications made to the original file *may* not
- *    be visible in the wrapper.
+ *      it comes to uses of unaligned wrappers.
+ *  - The wrapper is read-only, but (may) contain its own I/O buffer
+ *    that  is  distinct from  the  original file.  In  other words,
+ *    modifications  made to the original file *may* or *may not* be
+ *    visible in the wrapper.
  *
  * Q: Why does this exist?
  * A: Notice how there are no alignment requirements imposed  on
  *    what you can pass for  `fmua_offset', as well as the  fact
- *    that the resulting  result can still  be mmap'd. As  such,
+ *    that the  resulting file  can still  be mmap'd.  As  such,
  *    you can use  this mechanism to  create lazily  initialized
- *    file->to->memory mappings of arbitrary file positions then
+ *    file->to->memory mappings at arbitrary file positions then
  *    mapped to arbitrary memory  locations (iow: this makes  it
  *    possible to overcome `ADDR & PAGEMASK == FPOS & PAGEMASK')
  *

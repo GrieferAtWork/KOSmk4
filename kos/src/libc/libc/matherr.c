@@ -104,7 +104,7 @@ INTERN ATTR_SECTION(".bss.crt.math.math") LPMATHERR libc_pdyn_matherr = NULL;
  * This function is special in that we _need_ to allow the  main
  * program  (or some other library) to override it. As such, the
  * libc fallback is declared WEAK, and when we first want to use
- * it, we do a dlsym(3) for the symbol.
+ * it, we do a dlsym(3D) for the symbol.
  *
  * Using standard ELF conventions, we could also just reference
  * a __attribute__((visibility("default"))) symbol by the  name

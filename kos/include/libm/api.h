@@ -22,11 +22,11 @@
 
 #include <__crt.h>
 
-/* Pretty  much just  a stub header  (but required by  the general library
- * exposure  rules under KOS), as all math functions are actually exported
- * from libc. However, you can still `dlopen(3D)' `libm.so' and `dlsym(3)'
- * any math  function from  that handle  (since `dlsym(3)'  walks  library
- * dependencies, and  kos's  default  system `libm.so'  has  a  dependency
+/* Pretty much just  a stub  header (but  required by  the general  library
+ * exposure rules under KOS), as  all math functions are actually  exported
+ * from libc. However, you can still `dlopen(3D)' `libm.so' and `dlsym(3D)'
+ * any math  function from  that handle  (since `dlsym(3D)'  walks  library
+ * dependencies, and  kos's  default  system  `libm.so'  has  a  dependency
  * on `libc.so') */
 
 #define LIBM_CC   __LIBCCALL

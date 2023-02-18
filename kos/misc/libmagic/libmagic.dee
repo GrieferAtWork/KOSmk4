@@ -187,8 +187,8 @@ function normalizePath(path: string, expand_symlinks: bool = true): string {
 	for (local pfx: { "/cygdrive/", "/mnt/" }) {
 		if (path.startswith(pfx)) {
 			path = path[#pfx:];
-			path = path.partition("/");
-			path = f"{path[0]}:/{path[2]}";
+			local parts = path.partition("/");
+			path = f"{parts[0]}:/{parts[2]}";
 			break;
 		}
 	}
