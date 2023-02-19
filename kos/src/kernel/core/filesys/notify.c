@@ -1340,15 +1340,15 @@ again:
 	umask  = ne.mfe_mask;
 	if (ne.nfe_wd & NOTIFYFD_EVENT_ISDIR_FLAG)
 		umask |= IN_ISDIR;
-	UNALIGNED_SET((uint32_t *)&uevent->ine_wd, ((uint32_t)ne.nfe_wd & ~NOTIFYFD_EVENT_ISDIR_FLAG));
-	UNALIGNED_SET(&uevent->ine_mask, umask);
-	UNALIGNED_SET(&uevent->ine_cookie, (uint32_t)ne.mfe_cookie);
+	UNALIGNED_SET32(&uevent->ine_wd, ((uint32_t)ne.nfe_wd & ~NOTIFYFD_EVENT_ISDIR_FLAG));
+	UNALIGNED_SET32(&uevent->ine_mask, umask);
+	UNALIGNED_SET32(&uevent->ine_cookie, (uint32_t)ne.mfe_cookie);
 	if (ne.mfe_name) {
-		UNALIGNED_SET(&uevent->ine_len, (u32)(ne.mfe_name->fd_namelen + 1));
+		UNALIGNED_SET32(&uevent->ine_len, (u32)(ne.mfe_name->fd_namelen + 1));
 		memcpy(uevent->ine_name, ne.mfe_name->fd_name,
 		       ne.mfe_name->fd_namelen + 1, sizeof(char));
 	} else {
-		UNALIGNED_SET(&uevent->ine_len, 0);
+		UNALIGNED_SET32(&uevent->ine_len, 0);
 	}
 
 	/* Consume the entry from the pending-events list. */

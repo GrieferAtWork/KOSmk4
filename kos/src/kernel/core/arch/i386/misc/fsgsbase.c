@@ -173,7 +173,7 @@ NOTHROW(FCALL x86_fsgsbase_patch)(void *pc, void const *real_pc) {
 			oldword.qword = atomic_read((u64 *)code);
 			newword.qword = oldword.qword;
 			newword.bytes[patch_offset] = 0xe8;
-			UNALIGNED_SET32((u32 *)&newword.bytes[patch_offset + 1], (u32)pcrel);
+			UNALIGNED_SET32(&newword.bytes[patch_offset + 1], (u32)pcrel);
 		} while (!atomic_cmpxch_weak((u64 *)code, oldword.qword, newword.qword));
 	}
 	return true;

@@ -68,23 +68,23 @@ NOTHROW_NCX(CC getregval)(uintptr_t value, cpu_regno_t regno,
 
 	case X86_REGISTER_SIZEMASK_1BYTE:
 		if (buflen >= 1)
-			*(u8 *)buf = (u8)value;
+			UNALIGNED_SET8(buf, (u8)value);
 		return 1;
 
 	case X86_REGISTER_SIZEMASK_2BYTE:
 		if (buflen >= 2)
-			UNALIGNED_SET16((u16 *)buf, (u16)value);
+			UNALIGNED_SET16(buf, (u16)value);
 		return 2;
 
 	case X86_REGISTER_SIZEMASK_4BYTE:
 		if (buflen >= 4)
-			UNALIGNED_SET32((u32 *)buf, (u32)value);
+			UNALIGNED_SET32(buf, (u32)value);
 		return 4;
 
 #ifdef __x86_64__
 	case X86_REGISTER_SIZEMASK_8BYTE:
 		if (buflen >= 8)
-			UNALIGNED_SET64((u64 *)buf, (u64)value);
+			UNALIGNED_SET64(buf, (u64)value);
 		return 8;
 #endif /* __x86_64__ */
 
@@ -100,25 +100,25 @@ NOTHROW_NCX(CC setregptr)(void *__restrict pvalue, cpu_regno_t regno,
 
 	case X86_REGISTER_SIZEMASK_1BYTE:
 		if (buflen >= 1)
-			*(u8 *)pvalue = *(u8 const *)buf;
+			*(u8 *)pvalue = UNALIGNED_GET8(buf);
 		return 1;
 
 	case X86_REGISTER_SIZEMASK_2BYTE:
 		if (buflen >= 2)
-			*(u16 *)pvalue = UNALIGNED_GET16((u16 const *)buf);
+			*(u16 *)pvalue = UNALIGNED_GET16(buf);
 		return 2;
 
 	case X86_REGISTER_SIZEMASK_4BYTE:
 		if (buflen >= 4) {
 			/* Set a pointer-sized register here, thus zero-extending to 64-bit on x86_64 */
-			*(uintptr_t *)pvalue = UNALIGNED_GET32((u32 const *)buf);
+			*(uintptr_t *)pvalue = UNALIGNED_GET32(buf);
 		}
 		return 4;
 
 #ifdef __x86_64__
 	case X86_REGISTER_SIZEMASK_8BYTE:
 		if (buflen >= 8)
-			*(u64 *)pvalue = UNALIGNED_GET64((u64 const *)buf);
+			*(u64 *)pvalue = UNALIGNED_GET64(buf);
 		return 8;
 #endif /* __x86_64__ */
 
@@ -138,7 +138,7 @@ NOTHROW_NCX(CC setregptr16p)(uintptr_t *__restrict pvalue, cpu_regno_t regno,
 	case X86_REGISTER_SIZEMASK_8BYTE:
 #endif /* __x86_64__ */
 		if (buflen >= 2)
-			*pvalue = (uintptr_t)UNALIGNED_GET16((u16 const *)buf);
+			*pvalue = (uintptr_t)UNALIGNED_GET16(buf);
 		return 2;
 
 	default: break;
@@ -153,18 +153,18 @@ NOTHROW_NCX(CC setregptrp)(uintptr_t *__restrict pvalue, cpu_regno_t regno,
 
 	case X86_REGISTER_SIZEMASK_2BYTE:
 		if (buflen >= 2)
-			*pvalue = (uintptr_t)UNALIGNED_GET16((u16 const *)buf);
+			*pvalue = (uintptr_t)UNALIGNED_GET16(buf);
 		return 2;
 
 	case X86_REGISTER_SIZEMASK_4BYTE:
 		if (buflen >= 4)
-			*pvalue = (uintptr_t)UNALIGNED_GET32((u32 const *)buf);
+			*pvalue = (uintptr_t)UNALIGNED_GET32(buf);
 		return 4;
 
 #ifdef __x86_64__
 	case X86_REGISTER_SIZEMASK_8BYTE:
 		if (buflen >= 8)
-			*pvalue = (uintptr_t)UNALIGNED_GET64((u64 const *)buf);
+			*pvalue = (uintptr_t)UNALIGNED_GET64(buf);
 		return 8;
 #endif /* __x86_64__ */
 
@@ -859,43 +859,43 @@ NOTHROW_NCX(CC libcpu_register_get_ucpustate)(struct ucpustate const *__restrict
 #ifdef __x86_64__
 	case X86_REGISTER_MISC_RFLAGS:
 		if (buflen >= 8)
-			UNALIGNED_SET64((u64 *)buf, (u64)self->ucs_Pflags);
+			UNALIGNED_SET64(buf, (u64)self->ucs_Pflags);
 		return 8;
 
 	case X86_REGISTER_MISC_RIP:
 		if (buflen >= 8)
-			UNALIGNED_SET64((u64 *)buf, (u64)self->ucs_Pip);
+			UNALIGNED_SET64(buf, (u64)self->ucs_Pip);
 		return 8;
 #endif /* __x86_64__ */
 
 	case X86_REGISTER_MISC_EFLAGS:
 		if (buflen >= 4)
-			UNALIGNED_SET32((u32 *)buf, (u32)self->ucs_Pflags);
+			UNALIGNED_SET32(buf, (u32)self->ucs_Pflags);
 		return 4;
 
 	case X86_REGISTER_MISC_FLAGS:
 		if (buflen >= 2)
-			UNALIGNED_SET16((u16 *)buf, (u16)self->ucs_Pflags);
+			UNALIGNED_SET16(buf, (u16)self->ucs_Pflags);
 		return 2;
 
 	case X86_REGISTER_MISC_EIP:
 		if (buflen >= 4)
-			UNALIGNED_SET32((u32 *)buf, (u32)self->ucs_Pip);
+			UNALIGNED_SET32(buf, (u32)self->ucs_Pip);
 		return 4;
 
 	case X86_REGISTER_MISC_IP:
 		if (buflen >= 2)
-			UNALIGNED_SET16((u16 *)buf, (u16)self->ucs_Pip);
+			UNALIGNED_SET16(buf, (u16)self->ucs_Pip);
 		return 2;
 
 	case X86_REGISTER_SEGMENT_CS:
 		if (buflen >= 2)
-			UNALIGNED_SET16((u16 *)buf, self->ucs_cs16);
+			UNALIGNED_SET16(buf, self->ucs_cs16);
 		return 2;
 
 	case X86_REGISTER_SEGMENT_SS:
 		if (buflen >= 2)
-			UNALIGNED_SET16((u16 *)buf, self->ucs_ss16);
+			UNALIGNED_SET16(buf, self->ucs_ss16);
 		return 2;
 
 	default:
@@ -925,43 +925,43 @@ NOTHROW_NCX(CC libcpu_register_set_ucpustate)(struct ucpustate *__restrict self,
 #ifdef __x86_64__
 	case X86_REGISTER_MISC_RFLAGS:
 		if (buflen >= 8)
-			self->ucs_Pflags = UNALIGNED_GET64((u64 const *)buf);
+			self->ucs_Pflags = UNALIGNED_GET64(buf);
 		return 8;
 
 	case X86_REGISTER_MISC_RIP:
 		if (buflen >= 8)
-			self->ucs_Pip = UNALIGNED_GET64((u64 const *)buf);
+			self->ucs_Pip = UNALIGNED_GET64(buf);
 		return 8;
 #endif /* __x86_64__ */
 
 	case X86_REGISTER_MISC_EFLAGS:
 		if (buflen >= 4)
-			self->ucs_Pflags = UNALIGNED_GET32((u32 const *)buf);
+			self->ucs_Pflags = UNALIGNED_GET32(buf);
 		return 4;
 
 	case X86_REGISTER_MISC_FLAGS:
 		if (buflen >= 2)
-			self->ucs_Pflags = UNALIGNED_GET16((u16 const *)buf);
+			self->ucs_Pflags = UNALIGNED_GET16(buf);
 		return 2;
 
 	case X86_REGISTER_MISC_EIP:
 		if (buflen >= 4)
-			self->ucs_Pip = UNALIGNED_GET32((u32 const *)buf);
+			self->ucs_Pip = UNALIGNED_GET32(buf);
 		return 4;
 
 	case X86_REGISTER_MISC_IP:
 		if (buflen >= 2)
-			self->ucs_Pip = UNALIGNED_GET16((u16 const *)buf);
+			self->ucs_Pip = UNALIGNED_GET16(buf);
 		return 2;
 
 	case X86_REGISTER_SEGMENT_CS:
 		if (buflen >= 2)
-			self->ucs_cs = UNALIGNED_GET16((u16 const *)buf);
+			self->ucs_cs = UNALIGNED_GET16(buf);
 		return 2;
 
 	case X86_REGISTER_SEGMENT_SS:
 		if (buflen >= 2)
-			self->ucs_ss = UNALIGNED_GET16((u16 const *)buf);
+			self->ucs_ss = UNALIGNED_GET16(buf);
 		return 2;
 
 	default:
@@ -1105,33 +1105,33 @@ NOTHROW_NCX(CC libcpu_register_get_kcpustate)(struct kcpustate const *__restrict
 #ifdef __x86_64__
 	case X86_REGISTER_MISC_RFLAGS:
 		if (buflen >= 8)
-			UNALIGNED_SET64((u64 *)buf, (u64)self->kcs_Pflags);
+			UNALIGNED_SET64(buf, (u64)self->kcs_Pflags);
 		return 8;
 
 	case X86_REGISTER_MISC_RIP:
 		if (buflen >= 8)
-			UNALIGNED_SET64((u64 *)buf, (u64)self->kcs_Pip);
+			UNALIGNED_SET64(buf, (u64)self->kcs_Pip);
 		return 8;
 #endif /* __x86_64__ */
 
 	case X86_REGISTER_MISC_EFLAGS:
 		if (buflen >= 4)
-			UNALIGNED_SET32((u32 *)buf, (u32)self->kcs_Pflags);
+			UNALIGNED_SET32(buf, (u32)self->kcs_Pflags);
 		return 4;
 
 	case X86_REGISTER_MISC_FLAGS:
 		if (buflen >= 2)
-			UNALIGNED_SET16((u16 *)buf, (u16)self->kcs_Pflags);
+			UNALIGNED_SET16(buf, (u16)self->kcs_Pflags);
 		return 2;
 
 	case X86_REGISTER_MISC_EIP:
 		if (buflen >= 4)
-			UNALIGNED_SET32((u32 *)buf, (u32)self->kcs_Pip);
+			UNALIGNED_SET32(buf, (u32)self->kcs_Pip);
 		return 4;
 
 	case X86_REGISTER_MISC_IP:
 		if (buflen >= 2)
-			UNALIGNED_SET16((u16 *)buf, (u16)self->kcs_Pip);
+			UNALIGNED_SET16(buf, (u16)self->kcs_Pip);
 		return 2;
 
 	default:
@@ -1153,33 +1153,33 @@ NOTHROW_NCX(CC libcpu_register_set_kcpustate)(struct kcpustate *__restrict self,
 #ifdef __x86_64__
 	case X86_REGISTER_MISC_RFLAGS:
 		if (buflen >= 8)
-			self->kcs_Pflags = UNALIGNED_GET64((u64 const *)buf);
+			self->kcs_Pflags = UNALIGNED_GET64(buf);
 		return 8;
 
 	case X86_REGISTER_MISC_RIP:
 		if (buflen >= 8)
-			self->kcs_Pip = UNALIGNED_GET64((u64 const *)buf);
+			self->kcs_Pip = UNALIGNED_GET64(buf);
 		return 8;
 #endif /* __x86_64__ */
 
 	case X86_REGISTER_MISC_EFLAGS:
 		if (buflen >= 4)
-			self->kcs_Pflags = UNALIGNED_GET32((u32 const *)buf);
+			self->kcs_Pflags = UNALIGNED_GET32(buf);
 		return 4;
 
 	case X86_REGISTER_MISC_FLAGS:
 		if (buflen >= 2)
-			self->kcs_Pflags = UNALIGNED_GET16((u16 const *)buf);
+			self->kcs_Pflags = UNALIGNED_GET16(buf);
 		return 2;
 
 	case X86_REGISTER_MISC_EIP:
 		if (buflen >= 4)
-			self->kcs_Pip = UNALIGNED_GET32((u32 const *)buf);
+			self->kcs_Pip = UNALIGNED_GET32(buf);
 		return 4;
 
 	case X86_REGISTER_MISC_IP:
 		if (buflen >= 2)
-			self->kcs_Pip = UNALIGNED_GET16((u16 const *)buf);
+			self->kcs_Pip = UNALIGNED_GET16(buf);
 		return 2;
 
 	default:
@@ -1354,7 +1354,7 @@ do_set_reg16:
 do_set_reg16_real:
 		if ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_2BYTE) {
 			if (buflen >= 2)
-				*pvalue16 = (uintptr_t)UNALIGNED_GET16((u16 const *)buf);
+				*pvalue16 = (uintptr_t)UNALIGNED_GET16(buf);
 			result = 2;
 		}
 	}	goto done;
@@ -1433,14 +1433,14 @@ NOTHROW_NCX(CC libcpu_register_set_sfpuenv)(struct sfpuenv *__restrict self, cpu
 		result = 2;
 		if (buflen < 2)
 			goto done;
-		value = UNALIGNED_GET16((u16 const *)buf);
+		value = UNALIGNED_GET16(buf);
 		break;
 
 	case X86_REGISTER_SIZEMASK_4BYTE:
 		result = 4;
 		if (buflen < 4)
 			goto done;
-		value = UNALIGNED_GET32((u32 const *)buf);
+		value = UNALIGNED_GET32(buf);
 		break;
 
 #ifdef __x86_64__
@@ -1448,7 +1448,7 @@ NOTHROW_NCX(CC libcpu_register_set_sfpuenv)(struct sfpuenv *__restrict self, cpu
 		result = 8;
 		if (buflen < 8)
 			goto done;
-		value = UNALIGNED_GET64((u64 const *)buf);
+		value = UNALIGNED_GET64(buf);
 		break;
 #endif /* __x86_64__ */
 
@@ -1541,14 +1541,14 @@ NOTHROW_NCX(CC libcpu_register_set_sfpustate)(struct sfpustate *__restrict self,
 			result = 2;
 			if (buflen < 2)
 				goto done;
-			value = UNALIGNED_GET16((u16 const *)buf);
+			value = UNALIGNED_GET16(buf);
 			break;
 
 		case X86_REGISTER_SIZEMASK_4BYTE:
 			result = 4;
 			if (buflen < 4)
 				goto done;
-			value = UNALIGNED_GET32((u32 const *)buf);
+			value = UNALIGNED_GET32(buf);
 			break;
 
 #ifdef __x86_64__
@@ -1556,7 +1556,7 @@ NOTHROW_NCX(CC libcpu_register_set_sfpustate)(struct sfpustate *__restrict self,
 			result = 8;
 			if (buflen < 8)
 				goto done;
-			value = UNALIGNED_GET64((u64 const *)buf);
+			value = UNALIGNED_GET64(buf);
 			break;
 #endif /* __x86_64__ */
 
@@ -1700,14 +1700,14 @@ NOTHROW_NCX(CC libcpu_register_set_xfpustate)(struct xfpustate *__restrict self,
 		result = 2;
 		if (buflen < 2)
 			goto done;
-		value = UNALIGNED_GET16((u16 const *)buf);
+		value = UNALIGNED_GET16(buf);
 		break;
 
 	case X86_REGISTER_SIZEMASK_4BYTE:
 		result = 4;
 		if (buflen < 4)
 			goto done;
-		value = UNALIGNED_GET32((u32 const *)buf);
+		value = UNALIGNED_GET32(buf);
 		break;
 
 #ifdef __x86_64__
@@ -1715,7 +1715,7 @@ NOTHROW_NCX(CC libcpu_register_set_xfpustate)(struct xfpustate *__restrict self,
 		result = 8;
 		if (buflen < 8)
 			goto done;
-		value = UNALIGNED_GET64((u64 const *)buf);
+		value = UNALIGNED_GET64(buf);
 		break;
 #endif /* __x86_64__ */
 
@@ -1973,21 +1973,21 @@ NOTHROW_NCX(CC IRREGS_NAME(libcpu_register_set_icpustate))(struct icpustate IRRE
 		result = 1;
 		if (buflen < 1)
 			goto done;
-		value = *(u8 const *)buf;
+		value = UNALIGNED_GET8(buf);
 		break;
 
 	case X86_REGISTER_SIZEMASK_2BYTE:
 		result = 2;
 		if (buflen < 2)
 			goto done;
-		value = UNALIGNED_GET16((u16 const *)buf);
+		value = UNALIGNED_GET16(buf);
 		break;
 
 	case X86_REGISTER_SIZEMASK_4BYTE:
 		result = 4;
 		if (buflen < 4)
 			goto done;
-		value = UNALIGNED_GET32((u32 const *)buf);
+		value = UNALIGNED_GET32(buf);
 		break;
 
 #ifdef __x86_64__
@@ -1995,7 +1995,7 @@ NOTHROW_NCX(CC IRREGS_NAME(libcpu_register_set_icpustate))(struct icpustate IRRE
 		result = 8;
 		if (buflen < 8)
 			goto done;
-		value = UNALIGNED_GET64((u64 const *)buf);
+		value = UNALIGNED_GET64(buf);
 		break;
 #endif /* __x86_64__ */
 
@@ -2122,21 +2122,21 @@ NOTHROW_NCX(CC IRREGS_NAME(libcpu_register_set_scpustate))(struct scpustate IRRE
 		result = 1;
 		if (buflen < 1)
 			goto done;
-		value = *(u8 const *)buf;
+		value = UNALIGNED_GET8(buf);
 		break;
 
 	case X86_REGISTER_SIZEMASK_2BYTE:
 		result = 2;
 		if (buflen < 2)
 			goto done;
-		value = UNALIGNED_GET16((u16 const *)buf);
+		value = UNALIGNED_GET16(buf);
 		break;
 
 	case X86_REGISTER_SIZEMASK_4BYTE:
 		result = 4;
 		if (buflen < 4)
 			goto done;
-		value = UNALIGNED_GET32((u32 const *)buf);
+		value = UNALIGNED_GET32(buf);
 		break;
 
 #ifdef __x86_64__
@@ -2144,7 +2144,7 @@ NOTHROW_NCX(CC IRREGS_NAME(libcpu_register_set_scpustate))(struct scpustate IRRE
 		result = 8;
 		if (buflen < 8)
 			goto done;
-		value = UNALIGNED_GET64((u64 const *)buf);
+		value = UNALIGNED_GET64(buf);
 		break;
 #endif /* __x86_64__ */
 

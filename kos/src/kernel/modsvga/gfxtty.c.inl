@@ -96,11 +96,11 @@ NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cell_gfx, BPP))(struct svga_ttyacc
 #if BYTES_PER_PIXEL == 1
 #define SETPIXEL(addr, color) (*(addr) = (byte_t)(color))
 #elif BYTES_PER_PIXEL == 2
-#define SETPIXEL(addr, color) UNALIGNED_SET16((uint16_t *)(addr), (uint16_t)(color))
+#define SETPIXEL(addr, color) UNALIGNED_SET16(addr, (uint16_t)(color))
 #elif BYTES_PER_PIXEL == 3
 #define ADVPIXEL(addr, color) (byte_t *)mempcpy((addr), &(color), 3)
 #elif BYTES_PER_PIXEL == 4
-#define SETPIXEL(addr, color) UNALIGNED_SET32((uint32_t *)(addr), (uint32_t)(color))
+#define SETPIXEL(addr, color) UNALIGNED_SET32(addr, (uint32_t)(color))
 #else /* BYTES_PER_PIXEL == ... */
 #error "Unsupported BYTES_PER_PIXEL"
 #endif /* BYTES_PER_PIXEL != ... */
@@ -474,7 +474,7 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cell_gfx1)(struct svga_ttyaccess_gfx *__re
 
 #define BITMASK(n) ((1 << (n)) - 1)
 #define OVERRIDE_BITS(xoff)                                        \
-				vmem.w = UNALIGNED_GET16((u16 const *)dst);        \
+				vmem.w = UNALIGNED_GET16(dst);                     \
 				vmem.b[0] &= ~BITMASK(8 - xoff);                   \
 				vmem.b[0] |= mask >> xoff;                         \
 				vmem.b[1] &= BITMASK(8 - (xoff + 1));              \
@@ -498,7 +498,7 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cell_gfx1)(struct svga_ttyaccess_gfx *__re
 
 			default: __builtin_unreachable();
 			}
-			UNALIGNED_SET16((u16 *)dst, vmem.w);
+			UNALIGNED_SET16(dst, vmem.w);
 			dst += self->stx_scanline;
 		}
 
@@ -568,7 +568,7 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_gfx1)(struct svga_ttyaccess_gfx *__
 
 #define BITMASK(n) ((1 << (n)) - 1)
 #define OVERRIDE_BITS(xoff)                                                 \
-				vmem.w = UNALIGNED_GET16((u16 const *)dst);                 \
+				vmem.w = UNALIGNED_GET16(dst);                              \
 				vmem.b[0] &= ~BITMASK(8 - xoff);                            \
 				vmem.b[0] |= (CSHAPE >> 1) >> xoff;                         \
 				vmem.b[1] &= BITMASK(8 - (xoff + 1));                       \
@@ -592,7 +592,7 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_gfx1)(struct svga_ttyaccess_gfx *__
 
 			default: __builtin_unreachable();
 			}
-			UNALIGNED_SET16((u16 *)dst, vmem.w);
+			UNALIGNED_SET16(dst, vmem.w);
 			dst += self->stx_scanline;
 		}
 

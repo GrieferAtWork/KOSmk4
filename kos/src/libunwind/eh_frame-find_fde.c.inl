@@ -99,11 +99,11 @@ NOTHROW_NCX(CC libuw_unwind_fde_scan)(byte_t const *reader,
 again:
 	if (reader >= eh_frame_end)
 		ERROR(err_noframe);
-	length = (size_t)UNALIGNED_GET32((uint32_t const *)reader); /* eh_chunk_size */
+	length = (size_t)UNALIGNED_GET32(reader); /* eh_chunk_size */
 	reader += 4;
 	if unlikely((uint32_t)length == (uint32_t)-1) {
 #if __SIZEOF_POINTER__ > 4
-		length = (size_t)UNALIGNED_GET64((u64 const *)reader); /* eh_chunk_size64 */
+		length = (size_t)UNALIGNED_GET64(reader); /* eh_chunk_size64 */
 		reader += 8;
 #else /* __SIZEOF_POINTER__ > 4 */
 		ERROR(err_noframe); /* Too large. Impossible to represent. */
@@ -112,7 +112,7 @@ again:
 	if unlikely(!length)
 		ERROR(err_noframe);
 	next_chunk = reader + length;
-	cie_offset = UNALIGNED_GET32((uint32_t const *)reader); /* eh_cie_offset */
+	cie_offset = UNALIGNED_GET32(reader); /* eh_cie_offset */
 #ifdef DEBUG_FRAME
 	if (cie_offset == UINT32_C(0xffffffff))
 		goto do_next_chunk; /* This is a CIE, not an FDE */
@@ -132,7 +132,7 @@ again:
 	/* Load the augmentation string of the associated CIE. */
 	cie_reader = (byte_t const *)cie;
 	cie_reader += 4; /* cie_size */
-	if (UNALIGNED_GET(&((uint32_t const *)cie_reader)[-1]) == (uint32_t)-1) {
+	if (UNALIGNED_GET32(&((uint32_t const *)cie_reader)[-1]) == (uint32_t)-1) {
 #if __SIZEOF_POINTER__ > 4
 		cie_reader += 8; /* cie_size64 */
 #else /* __SIZEOF_POINTER__ > 4 */
@@ -230,7 +230,7 @@ again:
 
 	/* Figure out the max length of that instruction set. */
 	cie_reader = (byte_t const *)cie;
-	length     = UNALIGNED_GET32((uint32_t const *)cie_reader); /* cie_inittxsiz */
+	length     = UNALIGNED_GET32(cie_reader); /* cie_inittxsiz */
 	cie_reader += 4;
 
 #if __SIZEOF_POINTER__ > 4

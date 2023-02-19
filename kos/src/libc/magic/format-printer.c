@@ -791,7 +791,7 @@ $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
 				tailspace_count = (linesize / 2) * 5 + (linesize % 2) * 3;
 				buffer[4] = ' ';
 				for (; i + 2 <= line_len; i += 2) {
-					u16 w = __hybrid_unaligned_get16((u16 *)(line_data + i));
+					u16 w = __hybrid_unaligned_get16(line_data + i);
 					dst = buffer + 4;
 					while (dst > buffer) {
 						*--dst = itoa_digit(!(flags & FORMAT_HEXDUMP_FHEXLOWER), w & 0xf);
@@ -809,7 +809,7 @@ $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
 				tailspace_count = (linesize / 4) * 9 + (linesize % 4) * 3;
 				buffer[8] = ' ';
 				for (; i + 4 <= line_len; i += 4) {
-					u32 l = __hybrid_unaligned_get32((u32 *)(line_data + i));
+					u32 l = __hybrid_unaligned_get32(line_data + i);
 					dst = buffer + 8;
 					while (dst > buffer) {
 						*--dst = itoa_digit(!(flags & FORMAT_HEXDUMP_FHEXLOWER), l & 0xf);
@@ -828,7 +828,7 @@ $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
 				buffer[16] = ' ';
 				for (; i + 8 <= line_len; i += 8) {
 @@pp_if __SIZEOF_POINTER__ >= 8@@
-					u64 q = __hybrid_unaligned_get64((u64 *)(line_data + i));
+					u64 q = __hybrid_unaligned_get64(line_data + i);
 					dst = buffer + 16;
 					while (dst > buffer) {
 						*--dst = itoa_digit(!(flags & FORMAT_HEXDUMP_FHEXLOWER), q & 0xf);
@@ -837,11 +837,11 @@ $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
 @@pp_else@@
 					u32 a, b;
 @@pp_if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__@@
-					a = __hybrid_unaligned_get32((u32 *)(line_data + i + 4));
-					b = __hybrid_unaligned_get32((u32 *)(line_data + i));
+					a = __hybrid_unaligned_get32(line_data + i + 4);
+					b = __hybrid_unaligned_get32(line_data + i);
 @@pp_else@@
-					a = __hybrid_unaligned_get32((u32 *)(line_data + i));
-					b = __hybrid_unaligned_get32((u32 *)(line_data + i + 4));
+					a = __hybrid_unaligned_get32(line_data + i);
+					b = __hybrid_unaligned_get32(line_data + i + 4);
 @@pp_endif@@
 					dst = buffer + 16;
 					while (dst > buffer + 8) {

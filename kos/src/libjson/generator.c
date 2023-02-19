@@ -119,35 +119,35 @@ libjson_encode_INTO(struct json_writer *__restrict writer,
 	}	break;
 
 	case JSON_TYPE_INT8:
-		result = libjson_writer_putnumber(writer, *(int8_t const *)src);
+		result = libjson_writer_putnumber(writer, (int8_t)UNALIGNED_GET8(src));
 		break;
 
 	case JSON_TYPE_INT16:
-		result = libjson_writer_putnumber(writer, (int16_t)UNALIGNED_GET16((uint16_t const *)src));
+		result = libjson_writer_putnumber(writer, (int16_t)UNALIGNED_GET16(src));
 		break;
 
 	case JSON_TYPE_INT32:
-		result = libjson_writer_putnumber(writer, (int32_t)UNALIGNED_GET32((uint32_t const *)src));
+		result = libjson_writer_putnumber(writer, (int32_t)UNALIGNED_GET32(src));
 		break;
 
 	case JSON_TYPE_INT64:
-		result = libjson_writer_putint64(writer, (int64_t)UNALIGNED_GET64((uint64_t const *)src));
+		result = libjson_writer_putint64(writer, (int64_t)UNALIGNED_GET64(src));
 		break;
 
 	case JSON_TYPE_UINT8:
-		result = libjson_writer_putnumber(writer, (intptr_t)(uintptr_t)(*(uint8_t const *)src));
+		result = libjson_writer_putnumber(writer, (intptr_t)(uintptr_t)UNALIGNED_GET8(src));
 		break;
 
 	case JSON_TYPE_UINT16:
-		result = libjson_writer_putnumber(writer, (intptr_t)(uintptr_t)UNALIGNED_GET16((uint16_t const *)src));
+		result = libjson_writer_putnumber(writer, (intptr_t)(uintptr_t)UNALIGNED_GET16(src));
 		break;
 
 	case JSON_TYPE_UINT32:
-		result = libjson_writer_putuint64(writer, UNALIGNED_GET32((uint32_t const *)src));
+		result = libjson_writer_putuint64(writer, UNALIGNED_GET32(src));
 		break;
 
 	case JSON_TYPE_UINT64:
-		result = libjson_writer_putuint64(writer, UNALIGNED_GET64((uint64_t const *)src));
+		result = libjson_writer_putuint64(writer, UNALIGNED_GET64(src));
 		break;
 
 #ifndef __NO_FPU
@@ -175,7 +175,7 @@ libjson_encode_INTO(struct json_writer *__restrict writer,
 	case JSON_TYPE_INLINE_STRING_OP: {
 		char const *str;
 		uint16_t len;
-		len = UNALIGNED_GET16((uint16_t const *)*preader);
+		len = UNALIGNED_GET16(*preader);
 		*preader += 2;
 		str = (char const *)src;
 		/* Truncate the string to exclude trailing zeroes. */
@@ -193,7 +193,7 @@ libjson_encode_INTO(struct json_writer *__restrict writer,
 		str = (char *)UNALIGNED_GET((uintptr_t *)src);
 		if (type == JSON_TYPE_STRING_WITH_LENGTH_OP) {
 			uint16_t len_offset;
-			len_offset = UNALIGNED_GET16((uint16_t const *)*preader);
+			len_offset = UNALIGNED_GET16(*preader);
 			*preader += 2;
 			len = UNALIGNED_GET((size_t const *)((byte_t const *)src_base + len_offset));
 		} else if (type == JSON_TYPE_STRING_OR_NULL && str == NULL) {
@@ -268,7 +268,7 @@ libjson_encode_designator(struct json_writer *__restrict writer,
 	case JGEN_INTO: {
 		uint16_t offset;
 		uint8_t type;
-		offset  = UNALIGNED_GET16((uint16_t const *)reader);
+		offset  = UNALIGNED_GET16(reader);
 		reader += 2;
 		type    = *(uint8_t const *)reader;
 		reader += 1;
@@ -277,9 +277,9 @@ libjson_encode_designator(struct json_writer *__restrict writer,
 
 	case JGEN_EXTERN_OP: {
 		uint16_t offset, id;
-		offset = UNALIGNED_GET16((uint16_t const *)reader);
+		offset = UNALIGNED_GET16(reader);
 		reader += 2;
-		id = UNALIGNED_GET16((uint16_t const *)reader);
+		id = UNALIGNED_GET16(reader);
 		reader += 2;
 		result = libjson_encode(writer, ext[id], (byte_t const *)src + offset, ext);
 	}	break;
@@ -371,7 +371,7 @@ again_inner:
 
 		case JGEN_INDEX_OP: {
 			uint16_t index;
-			index = UNALIGNED_GET16((uint16_t const *)reader);
+			index = UNALIGNED_GET16(reader);
 			reader += 2;
 			/* Make sure that indices only ever increment! */
 			if unlikely(index < next_index)
@@ -393,9 +393,9 @@ again_inner:
 			uint16_t stride;
 			size_t offset;
 			byte_t const *orig_reader;
-			count   = UNALIGNED_GET16((uint16_t const *)reader) + 1;
+			count   = UNALIGNED_GET16(reader) + 1;
 			reader += 2;
-			stride  = UNALIGNED_GET16((uint16_t const *)reader);
+			stride  = UNALIGNED_GET16(reader);
 			reader += 2;
 			offset  = 0;
 			orig_reader = reader;
@@ -475,9 +475,9 @@ require_term:
 
 	case JGEN_EXTERN_OP: {
 		uint16_t offset, id;
-		offset = UNALIGNED_GET16((uint16_t const *)reader);
+		offset = UNALIGNED_GET16(reader);
 		reader += 2;
-		id = UNALIGNED_GET16((uint16_t const *)reader);
+		id = UNALIGNED_GET16(reader);
 		reader += 2;
 		result = libjson_encode(writer, ext[id], (byte_t const *)src + offset, ext);
 		goto require_term;
@@ -494,7 +494,7 @@ require_term:
 	case JGEN_INTO: {
 		uint16_t offset;
 		uint8_t type;
-		offset  = UNALIGNED_GET16((uint16_t const *)reader);
+		offset  = UNALIGNED_GET16(reader);
 		reader += 2;
 		type    = *(uint8_t const *)reader;
 		reader += 1;
@@ -606,7 +606,7 @@ require_term:
 	case JGEN_INTO: {
 		uint16_t offset;
 		uint8_t type;
-		offset  = UNALIGNED_GET16((uint16_t const *)reader);
+		offset  = UNALIGNED_GET16(reader);
 		reader += 2;
 		type    = *(uint8_t const *)reader;
 		reader += 1;
@@ -617,9 +617,9 @@ require_term:
 	case JGEN_EXTERN_OP: {
 		/* Allowed but highly unlikely: The base codec reference one that is external */
 		uint16_t offset, id;
-		offset = UNALIGNED_GET16((uint16_t const *)reader);
+		offset = UNALIGNED_GET16(reader);
 		reader += 2;
-		id = UNALIGNED_GET16((uint16_t const *)reader);
+		id = UNALIGNED_GET16(reader);
 		reader += 2;
 		/* Make sure that the base codec ends after a single primary object! */
 		if unlikely(*reader != JGEN_TERM)

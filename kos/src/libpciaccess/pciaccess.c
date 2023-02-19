@@ -1293,7 +1293,7 @@ NOTHROW_NCX(CC libpci_device_readcfg)(struct pci_device const *__restrict self,
 		}
 		while (size >= 4) {
 			uint32_t word = pci_rdaddr(self->pd_addr | offset);
-			UNALIGNED_SET32((uint32_t *)data, word);
+			UNALIGNED_SET32(data, word);
 			result += 4;
 			if (OVERFLOW_UADD(offset, 4, &offset))
 				goto done;
@@ -1340,7 +1340,7 @@ NOTHROW_NCX(CC libpci_device_writecfg)(struct pci_device *__restrict self,
 		}
 		while (size >= 4) {
 			uint32_t word;
-			word = UNALIGNED_GET32((uint32_t const *)data);
+			word = UNALIGNED_GET32(data);
 			pci_wraddr(self->pd_addr | offset, word);
 			result += 4;
 			if (OVERFLOW_UADD(offset, 4, &offset))

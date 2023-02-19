@@ -352,13 +352,13 @@ again:
 	if (reader >= text_end)
 		goto section_eof;
 	/* 6.2.4 The Line Number Program Header */
-	length = UNALIGNED_GET32((uint32_t const *)reader);
+	length = UNALIGNED_GET32(reader);
 	if (length <= 15)     /* 15: Minimum size of the DWARF LineInfo header. */
 		goto section_eof; /* Sentinel */
 	reader += 4;
 	result->dlu_ptrsize = 4;
 	if unlikely(length == UINT32_C(0xffffffff)) {
-		length = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
+		length = (uintptr_t)UNALIGNED_GET64(reader);
 		if (length <= 15)
 			goto section_eof; /* Sentinel */
 		result->dlu_ptrsize = 8;
@@ -366,7 +366,7 @@ again:
 	}
 	if (OVERFLOW_UADD((uintptr_t)reader, length, (uintptr_t *)&next_cu) || next_cu > text_end)
 		next_cu = text_end;
-	result->dlu_version = UNALIGNED_GET16((uint16_t const *)reader); /* version */
+	result->dlu_version = UNALIGNED_GET16(reader); /* version */
 	reader += 2;
 	result->dlu_addrsize = sizeof(void *);
 	if (result->dlu_version >= 5) {
@@ -377,8 +377,8 @@ again:
 	}
 
 	/* header_length */
-	length = result->dlu_ptrsize == 8 ? (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader)
-	                                  : (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader);
+	length = result->dlu_ptrsize == 8 ? (uintptr_t)UNALIGNED_GET64(reader)
+	                                  : (uintptr_t)UNALIGNED_GET32(reader);
 	reader += result->dlu_ptrsize;
 	if (OVERFLOW_UADD((uintptr_t)reader, length, (uintptr_t *)&cu_text) || cu_text > next_cu) {
 		reader = next_cu;
@@ -600,13 +600,13 @@ found_state:
 					case DW_LNE_set_address: {
 						uintptr_t new_address;
 						if ((size_t)temp - 1 >= 8) {
-							new_address = (uintptr_t)UNALIGNED_GET64((uint64_t const *)ext_data);
+							new_address = (uintptr_t)UNALIGNED_GET64(ext_data);
 						} else if ((size_t)temp - 1 >= 4) {
-							new_address = (uintptr_t)UNALIGNED_GET32((uint32_t const *)ext_data);
+							new_address = (uintptr_t)UNALIGNED_GET32(ext_data);
 						} else if ((size_t)temp - 1 >= 2) {
-							new_address = (uintptr_t)UNALIGNED_GET16((uint16_t const *)ext_data);
+							new_address = (uintptr_t)UNALIGNED_GET16(ext_data);
 						} else {
-							new_address = (uintptr_t)(*(uint8_t const *)ext_data);
+							new_address = (uintptr_t)UNALIGNED_GET8(ext_data);
 						}
 						state.address  = new_address;
 						state.op_index = 0;
@@ -684,7 +684,7 @@ found_state:
 			}	break;
 
 			case DW_LNS_fixed_advance_pc:
-				state.address += UNALIGNED_GET16((uint16_t const *)reader);
+				state.address += UNALIGNED_GET16(reader);
 				state.op_index = 0;
 				reader += 2;
 				break;

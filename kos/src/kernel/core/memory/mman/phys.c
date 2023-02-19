@@ -208,11 +208,11 @@ NOTHROW(FCALL peekphysw_unaligned)(PHYS physaddr_t addr) {
 	byte_t *map;
 	word16 result;
 	IF_PHYS_IDENTITY(addr, 2, {
-		return UNALIGNED_GET16((u16 const *)PHYS_TO_IDENTITY(addr));
+		return UNALIGNED_GET16(PHYS_TO_IDENTITY(addr));
 	});
 	map = phys_pushaddr(addr);
 	if ((addr & PAGEMASK) != PAGEMASK) {
-		result.w = UNALIGNED_GET16((u16 const *)map);
+		result.w = UNALIGNED_GET16(map);
 	} else {
 		result.b[0] = ((u8 const *)map)[0];
 		result.b[0] = ((u8 const *)phys_loadpage(addr + 1))[0];
@@ -226,12 +226,12 @@ NOTHROW(FCALL pokephysw_unaligned)(PHYS physaddr_t addr, u16 value) {
 	PHYS_VARS;
 	byte_t *map;
 	IF_PHYS_IDENTITY(addr, 2, {
-		UNALIGNED_SET16((u16 *)PHYS_TO_IDENTITY(addr), value);
+		UNALIGNED_SET16(PHYS_TO_IDENTITY(addr), value);
 		return;
 	});
 	map = phys_pushaddr(addr);
 	if ((addr & PAGEMASK) != PAGEMASK) {
-		UNALIGNED_SET16((u16 *)map, value);
+		UNALIGNED_SET16(map, value);
 	} else {
 		word16 word;
 		word.w         = value;
@@ -249,11 +249,11 @@ NOTHROW(FCALL peekphysl_unaligned)(PHYS physaddr_t addr) {
 	byte_t *map;
 	word32 result;
 	IF_PHYS_IDENTITY(addr, 4, {
-		return UNALIGNED_GET32((u32 const *)PHYS_TO_IDENTITY(addr));
+		return UNALIGNED_GET32(PHYS_TO_IDENTITY(addr));
 	});
 	map = phys_pushaddr(addr);
 	if ((addr & PAGEMASK) <= (PAGESIZE - 4)) {
-		result.l = UNALIGNED_GET32((u32 const *)map);
+		result.l = UNALIGNED_GET32(map);
 	} else {
 		void *dest;
 		size_t count;
@@ -271,12 +271,12 @@ NOTHROW(FCALL pokephysl_unaligned)(PHYS physaddr_t addr, u32 value) {
 	PHYS_VARS;
 	byte_t *map;
 	IF_PHYS_IDENTITY(addr, 4, {
-		UNALIGNED_SET32((u32 *)PHYS_TO_IDENTITY(addr), value);
+		UNALIGNED_SET32(PHYS_TO_IDENTITY(addr), value);
 		return;
 	});
 	map = phys_pushaddr(addr);
 	if ((addr & PAGEMASK) <= (PAGESIZE - 4)) {
-		UNALIGNED_SET32((u32 *)map, value);
+		UNALIGNED_SET32(map, value);
 	} else {
 		word32 word;
 		size_t count;
@@ -296,11 +296,11 @@ NOTHROW(FCALL peekphysq_unaligned)(PHYS physaddr_t addr) {
 	byte_t *map;
 	word64 result;
 	IF_PHYS_IDENTITY(addr, 8, {
-		return UNALIGNED_GET64((u64 const *)PHYS_TO_IDENTITY(addr));
+		return UNALIGNED_GET64(PHYS_TO_IDENTITY(addr));
 	});
 	map = phys_pushaddr(addr);
 	if ((addr & PAGEMASK) <= (PAGESIZE - 8)) {
-		result.q = UNALIGNED_GET64((u64 const *)map);
+		result.q = UNALIGNED_GET64(map);
 	} else {
 		void *dest;
 		size_t count;
@@ -318,12 +318,12 @@ NOTHROW(FCALL pokephysq_unaligned)(PHYS physaddr_t addr, u64 value) {
 	PHYS_VARS;
 	byte_t *map;
 	IF_PHYS_IDENTITY(addr, 8, {
-		UNALIGNED_SET64((u64 *)PHYS_TO_IDENTITY(addr), value);
+		UNALIGNED_SET64(PHYS_TO_IDENTITY(addr), value);
 		return;
 	});
 	map = phys_pushaddr(addr);
 	if ((addr & PAGEMASK) <= (PAGESIZE - 8)) {
-		UNALIGNED_SET64((u64 *)map, value);
+		UNALIGNED_SET64(map, value);
 	} else {
 		word64 word;
 		size_t count;

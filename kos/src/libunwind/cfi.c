@@ -831,12 +831,12 @@ again_switch_opcode:
 				value = UNALIGNED_GET((uintptr_t *)pc);
 #if __SIZEOF_POINTER__ > 4
 			} else if (self->ue_addrsize >= 4) {
-				value = (uintptr_t)UNALIGNED_GET32((uint32_t const *)pc);
+				value = (uintptr_t)UNALIGNED_GET32(pc);
 #endif /* __SIZEOF_POINTER__ > 4 */
 			} else if (self->ue_addrsize >= 2) {
-				value = (uintptr_t)UNALIGNED_GET16((uint16_t const *)pc);
+				value = (uintptr_t)UNALIGNED_GET16(pc);
 			} else {
-				value = (uintptr_t)(*(uint8_t const *)pc);
+				value = (uintptr_t)UNALIGNED_GET8(pc);
 			}
 
 			/* To quote a comment found within the GDB source tree:
@@ -919,21 +919,21 @@ do_make_top_const:
 			pc += size;                                           \
 			++stacksz;                                            \
 			break;
-		DEFINE_PUSH_CONSTANT(DW_OP_const1u, s_uconst, (uintptr_t)(*(uint8_t const *)pc), 1)
-		DEFINE_PUSH_CONSTANT(DW_OP_const1s, s_sconst, (intptr_t)(*(int8_t const *)pc), 1)
-		DEFINE_PUSH_CONSTANT(DW_OP_const2u, s_uconst, (uintptr_t)UNALIGNED_GET16((uint16_t const *)pc), 2)
-		DEFINE_PUSH_CONSTANT(DW_OP_const2s, s_sconst, (intptr_t)(int16_t)UNALIGNED_GET16((uint16_t const *)pc), 2)
-		DEFINE_PUSH_CONSTANT(DW_OP_const4u, s_uconst, (uintptr_t)UNALIGNED_GET32((uint32_t const *)pc), 4)
-		DEFINE_PUSH_CONSTANT(DW_OP_const4s, s_sconst, (intptr_t)(int32_t)UNALIGNED_GET32((uint32_t const *)pc), 4)
+		DEFINE_PUSH_CONSTANT(DW_OP_const1u, s_uconst, (uintptr_t)UNALIGNED_GET8(pc), 1)
+		DEFINE_PUSH_CONSTANT(DW_OP_const1s, s_sconst, (intptr_t)(int8_t)UNALIGNED_GET8(pc), 1)
+		DEFINE_PUSH_CONSTANT(DW_OP_const2u, s_uconst, (uintptr_t)UNALIGNED_GET16(pc), 2)
+		DEFINE_PUSH_CONSTANT(DW_OP_const2s, s_sconst, (intptr_t)(int16_t)UNALIGNED_GET16(pc), 2)
+		DEFINE_PUSH_CONSTANT(DW_OP_const4u, s_uconst, (uintptr_t)UNALIGNED_GET32(pc), 4)
+		DEFINE_PUSH_CONSTANT(DW_OP_const4s, s_sconst, (intptr_t)(int32_t)UNALIGNED_GET32(pc), 4)
 #if __SIZEOF_POINTER__ > 4
-		DEFINE_PUSH_CONSTANT(DW_OP_const8u, s_uconst, (uintptr_t)UNALIGNED_GET64((uint64_t const *)pc), 8)
-		DEFINE_PUSH_CONSTANT(DW_OP_const8s, s_sconst, (intptr_t)(int64_t)UNALIGNED_GET64((uint64_t const *)pc), 8)
+		DEFINE_PUSH_CONSTANT(DW_OP_const8u, s_uconst, (uintptr_t)UNALIGNED_GET64(pc), 8)
+		DEFINE_PUSH_CONSTANT(DW_OP_const8s, s_sconst, (intptr_t)(int64_t)UNALIGNED_GET64(pc), 8)
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		DEFINE_PUSH_CONSTANT(DW_OP_const8u, s_uconst, (uintptr_t)UNALIGNED_GET32((uint32_t const *)pc), 8)
-		DEFINE_PUSH_CONSTANT(DW_OP_const8s, s_sconst, (intptr_t)(int32_t)UNALIGNED_GET32((uint32_t const *)pc), 8)
+		DEFINE_PUSH_CONSTANT(DW_OP_const8u, s_uconst, (uintptr_t)UNALIGNED_GET32(pc), 8)
+		DEFINE_PUSH_CONSTANT(DW_OP_const8s, s_sconst, (intptr_t)(int32_t)UNALIGNED_GET32(pc), 8)
 #else /* ... */
-		DEFINE_PUSH_CONSTANT(DW_OP_const8u, s_uconst, (uintptr_t)UNALIGNED_GET32((uint32_t const *)(pc + 4)), 8)
-		DEFINE_PUSH_CONSTANT(DW_OP_const8s, s_sconst, (intptr_t)(int32_t)UNALIGNED_GET32((uint32_t const *)(pc + 4)), 8)
+		DEFINE_PUSH_CONSTANT(DW_OP_const8u, s_uconst, (uintptr_t)UNALIGNED_GET32(pc + 4), 8)
+		DEFINE_PUSH_CONSTANT(DW_OP_const8s, s_sconst, (intptr_t)(int32_t)UNALIGNED_GET32(pc + 4), 8)
 #endif /* !... */
 #undef DEFINE_PUSH_CONSTANT
 
@@ -1200,7 +1200,7 @@ do_make_second_const:
 
 		CASE(DW_OP_skip) {
 			int16_t offset;
-			offset = (int16_t)UNALIGNED_GET16((uint16_t const *)pc);
+			offset = (int16_t)UNALIGNED_GET16(pc);
 			pc += 2;
 			if (offset < 0) {
 				if unlikely(!self->ue_bjmprem)
@@ -1236,7 +1236,7 @@ do_make_second_const:
 				goto do_make_top_const;
 			if (TOP.s_uconst != 0) {
 				int16_t offset;
-				offset = (int16_t)UNALIGNED_GET16((uint16_t const *)pc);
+				offset = (int16_t)UNALIGNED_GET16(pc);
 				pc += 2;
 				if (offset < 0) {
 					if unlikely(!self->ue_bjmprem)
@@ -1447,16 +1447,16 @@ do_read_bit_pieces:
 			self->ue_pc = pc - 1;
 			if (opcode == DW_OP_call2) {
 				component_address = self->ue_sectinfo->ues_debug_info_start +
-					                (uintptr_t)UNALIGNED_GET16((uint16_t const *)pc);
+					                (uintptr_t)UNALIGNED_GET16(pc);
 				pc += 2;
 			} else if (opcode == DW_OP_call4 || self->ue_ptrsize == 4) {
 				component_address = self->ue_sectinfo->ues_debug_info_start +
-					                (uintptr_t)UNALIGNED_GET32((uint32_t const *)pc);
+					                (uintptr_t)UNALIGNED_GET32(pc);
 				pc += 4;
 			} else {
 				assert(self->ue_ptrsize == 8);
 				component_address = self->ue_sectinfo->ues_debug_info_start +
-					                (uintptr_t)UNALIGNED_GET64((uint64_t const *)pc);
+					                (uintptr_t)UNALIGNED_GET64(pc);
 				pc += 8;
 			}
 			if unlikely(component_address < self->ue_sectinfo->ues_debug_info_start ||
@@ -1566,12 +1566,12 @@ do_read_bit_pieces:
 				value = UNALIGNED_GET((uintptr_t *)debug_addr_loc);
 #if __SIZEOF_POINTER__ > 4
 			} else if (self->ue_addrsize >= 4) {
-				value = (uintptr_t)UNALIGNED_GET32((uint32_t const *)debug_addr_loc);
+				value = (uintptr_t)UNALIGNED_GET32(debug_addr_loc);
 #endif /* __SIZEOF_POINTER__ > 4 */
 			} else if (self->ue_addrsize >= 2) {
-				value = (uintptr_t)UNALIGNED_GET16((uint16_t const *)debug_addr_loc);
+				value = (uintptr_t)UNALIGNED_GET16(debug_addr_loc);
 			} else {
-				value = (uintptr_t)(*(uint8_t const *)debug_addr_loc);
+				value = (uintptr_t)UNALIGNED_GET8(debug_addr_loc);
 			}
 			self->ue_stack[stacksz].s_type   = UNWIND_STE_CONSTANT;
 			self->ue_stack[stacksz].s_uconst = value;
@@ -2074,11 +2074,11 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
 
 			case DW_LLE_base_address:
 				switch (addrsize) {
-				case 1: cu_base = *(uint8_t const *)iter, iter += 1; break;
-				case 2: cu_base = UNALIGNED_GET16((uint16_t const *)iter), iter += 2; break;
-				case 4: cu_base = UNALIGNED_GET32((uint32_t const *)iter), iter += 4; break;
+				case 1: cu_base = UNALIGNED_GET8(iter), iter += 1; break;
+				case 2: cu_base = UNALIGNED_GET16(iter), iter += 2; break;
+				case 4: cu_base = UNALIGNED_GET32(iter), iter += 4; break;
 #if __SIZEOF_POINTER__ > 4
-				case 8: cu_base = UNALIGNED_GET64((uint64_t const *)iter), iter += 8; break;
+				case 8: cu_base = UNALIGNED_GET64(iter), iter += 8; break;
 #endif /* __SIZEOF_POINTER__ > 4 */
 				default: __builtin_unreachable();
 				}
@@ -2088,31 +2088,31 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
 				switch (addrsize) {
 
 				case 1:
-					range_start = *(uint8_t const *)iter;
+					range_start = UNALIGNED_GET8(iter);
 					iter += 1;
-					range_end = *(uint8_t const *)iter;
+					range_end = UNALIGNED_GET8(iter);
 					iter += 1;
 					break;
 
 				case 2:
-					range_start = UNALIGNED_GET16((uint16_t const *)iter);
+					range_start = UNALIGNED_GET16(iter);
 					iter += 2;
-					range_end = UNALIGNED_GET16((uint16_t const *)iter);
+					range_end = UNALIGNED_GET16(iter);
 					iter += 2;
 					break;
 
 				case 4:
-					range_start = UNALIGNED_GET32((uint32_t const *)iter);
+					range_start = UNALIGNED_GET32(iter);
 					iter += 4;
-					range_end = UNALIGNED_GET32((uint32_t const *)iter);
+					range_end = UNALIGNED_GET32(iter);
 					iter += 4;
 					break;
 
 #if __SIZEOF_POINTER__ > 4
 				case 8:
-					range_start = UNALIGNED_GET64((uint64_t const *)iter);
+					range_start = UNALIGNED_GET64(iter);
 					iter += 8;
-					range_end = UNALIGNED_GET64((uint64_t const *)iter);
+					range_end = UNALIGNED_GET64(iter);
 					iter += 8;
 					break;
 #endif /* __SIZEOF_POINTER__ > 4 */
@@ -2124,11 +2124,11 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
 
 			case DW_LLE_start_length:
 				switch (addrsize) {
-				case 1: range_start = *(uint8_t const *)iter, iter += 1; break;
-				case 2: range_start = UNALIGNED_GET16((uint16_t const *)iter), iter += 2; break;
-				case 4: range_start = UNALIGNED_GET32((uint32_t const *)iter), iter += 4; break;
+				case 1: range_start = UNALIGNED_GET8(iter), iter += 1; break;
+				case 2: range_start = UNALIGNED_GET16(iter), iter += 2; break;
+				case 4: range_start = UNALIGNED_GET32(iter), iter += 4; break;
 #if __SIZEOF_POINTER__ > 4
-				case 8: range_start = UNALIGNED_GET64((uint64_t const *)iter), iter += 8; break;
+				case 8: range_start = UNALIGNED_GET64(iter), iter += 8; break;
 #endif /* __SIZEOF_POINTER__ > 4 */
 				default: __builtin_unreachable();
 				}
@@ -2165,31 +2165,31 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
 			switch (addrsize) {
 
 			case 1:
-				range_start = *(uint8_t const *)iter;
+				range_start = UNALIGNED_GET8(iter);
 				iter += 1;
-				range_end = *(uint8_t const *)iter;
+				range_end = UNALIGNED_GET8(iter);
 				iter += 1;
 				break;
 
 			case 2:
-				range_start = UNALIGNED_GET16((uint16_t const *)iter);
+				range_start = UNALIGNED_GET16(iter);
 				iter += 2;
-				range_end = UNALIGNED_GET16((uint16_t const *)iter);
+				range_end = UNALIGNED_GET16(iter);
 				iter += 2;
 				break;
 
 			case 4:
-				range_start = UNALIGNED_GET32((uint32_t const *)iter);
+				range_start = UNALIGNED_GET32(iter);
 				iter += 4;
-				range_end = UNALIGNED_GET32((uint32_t const *)iter);
+				range_end = UNALIGNED_GET32(iter);
 				iter += 4;
 				break;
 
 #if __SIZEOF_POINTER__ > 4
 			case 8:
-				range_start = UNALIGNED_GET64((uint64_t const *)iter);
+				range_start = UNALIGNED_GET64(iter);
 				iter += 8;
-				range_end = UNALIGNED_GET64((uint64_t const *)iter);
+				range_end = UNALIGNED_GET64(iter);
 				iter += 8;
 				break;
 #endif /* __SIZEOF_POINTER__ > 4 */
@@ -2210,10 +2210,10 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
 			range_end += cu_base;
 			TRACE("%p: RANGE(%p-%p) with %" PRIu16 "\n",
 			      iter + 2, range_start, range_end,
-			      UNALIGNED_GET16((uint16_t const *)iter));
+			      UNALIGNED_GET16(iter));
 			if (module_relative_pc >= range_start &&
 			    module_relative_pc < range_end) {
-				*pexpr_length = (size_t)UNALIGNED_GET16((uint16_t const *)iter);
+				*pexpr_length = (size_t)UNALIGNED_GET16(iter);
 				iter += 2;
 				return iter; /* Found it! */
 			}
@@ -2221,7 +2221,7 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
 			{
 				uint16_t expr_length;
 skip_entry_4:
-				expr_length = UNALIGNED_GET16((uint16_t const *)iter);
+				expr_length = UNALIGNED_GET16(iter);
 				iter += 2;
 				iter += expr_length;
 			}

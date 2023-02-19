@@ -136,10 +136,10 @@ case EMU86_OPCODE_ENCODE(0xc7):
 		/* C7 /0      MOV r/m16,imm16      Move imm16 to r/m16 */
 		/* C7 /0      MOV r/m32,imm32      Move imm32 to r/m32 */
 		if (!IS_16BIT()) {
-			value = (s32)UNALIGNED_GETLE32((u32 const *)pc);
+			value = (s32)UNALIGNED_GETLE32(pc);
 			pc += 4;
 		} else {
-			value = (s32)(u32)UNALIGNED_GETLE16((u16 const *)pc);
+			value = (s32)(u32)UNALIGNED_GETLE16(pc);
 			pc += 2;
 		}
 		IF_64BIT(if (IS_64BIT()) {
@@ -170,10 +170,10 @@ case EMU86_OPCODE_ENCODE(0xc7):
 			goto return_unknown_instruction_rmreg;
 #define NEED_return_unknown_instruction_rmreg
 		if (op_flags & EMU86_F_66) {
-			offset = (s32)(s16)UNALIGNED_GETLE16((u16 const *)pc);
+			offset = (s32)(s16)UNALIGNED_GETLE16(pc);
 			pc += 2;
 		} else {
-			offset = (s32)UNALIGNED_GETLE32((u32 const *)pc);
+			offset = (s32)UNALIGNED_GETLE32(pc);
 			pc += 4;
 		}
 		(void)offset;
@@ -272,17 +272,17 @@ case EMU86_OPCODE_ENCODE(0xb8) ... EMU86_OPCODE_ENCODE(0xbf): {
 #endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	IF_64BIT(if (IS_64BIT()) {
 		u64 value;
-		value = UNALIGNED_GETLE64((u64 const *)pc);
+		value = UNALIGNED_GETLE64(pc);
 		pc += 8;
 		EMU86_SETREGQ(regno, value);
 	} else) if (!IS_16BIT()) {
 		u32 value;
-		value = UNALIGNED_GETLE32((u32 const *)pc);
+		value = UNALIGNED_GETLE32(pc);
 		pc += 4;
 		EMU86_SETREGL(regno, value);
 	} else {
 		u16 value;
-		value = UNALIGNED_GETLE16((u16 const *)pc);
+		value = UNALIGNED_GETLE16(pc);
 		pc += 2;
 		EMU86_SETREGW(regno, value);
 	}

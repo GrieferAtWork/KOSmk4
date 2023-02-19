@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6aad950 */
+/* HASH CRC-32:0xd2c8a00 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,13 +103,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getenv))(char const *__varname) {
 		if __unlikely(!__namelen) {
 			__result = __NULLPTR;
 		} else {
-			__pattern.__word = __hybrid_unaligned_get16((__UINT16_TYPE__ const *)__varname);
+			__pattern.__word = __hybrid_unaligned_get16(__varname);
 			if __unlikely(__namelen == 1) {
 				/* Single-character variable name -> Only need to search for
 				 * that specific character,  as well as  the follow-up  '='! */
 				__pattern.__chr[1] = '=';
 				for (; (__result = *___envp) != __NULLPTR; ++___envp) {
-					if (__hybrid_unaligned_get16((__UINT16_TYPE__ const *)__result) != __pattern.__word)
+					if (__hybrid_unaligned_get16(__result) != __pattern.__word)
 						continue;
 					__result += 2;
 					break;
@@ -119,7 +119,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getenv))(char const *__varname) {
 				__varname += 2;
 				__tail_namelen = __namelen - 2;
 				for (; (__result = *___envp) != __NULLPTR; ++___envp) {
-					if (__hybrid_unaligned_get16((__UINT16_TYPE__ const *)__result) != __pattern.__word)
+					if (__hybrid_unaligned_get16(__result) != __pattern.__word)
 						continue; /* First 2 characters don't match. */
 					if ((__NAMESPACE_LOCAL_SYM __localdep_bcmpc)(__result + 2, __varname, __tail_namelen, sizeof(char)) != 0)
 						continue; /* Rest of string didn't match */

@@ -450,8 +450,8 @@ case EMU86_OPCODE_ENCODE_XOP(0xa, 0x10): {
 	 *       As such, a 2-byte read is sufficient here, so-long as we increment
 	 *       `pc' by the full 4 bytes.
 	 * HINT: If x86 was a big-endian machine, this next line would say:
-	 *       >> imm.word = UNALIGNED_GETBE16((u16 const *)(pc + 2)); */
-	imm.word = UNALIGNED_GETLE16((u16 const *)pc);
+	 *       >> imm.word = UNALIGNED_GETBE16(pc + 2); */
+	imm.word = UNALIGNED_GETLE16(pc);
 	pc += 4;
 	eflags_addend = 0;
 #if LIBEMU86_CONFIG_WANT_64BIT

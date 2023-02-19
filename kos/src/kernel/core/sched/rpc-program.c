@@ -807,7 +807,7 @@ rpc_vm_pc_rdw(struct rpc_vm *__restrict self) THROWS(E_SEGFAULT) {
 	uint16_t result;
 	if (self->rv_pcbuf_siz < 2)
 		rpc_vm_pc_filbuf(self, 2);
-	result = UNALIGNED_GET16((uint16_t const *)&self->rv_pcbuf[self->rv_pcbuf_ptr]);
+	result = UNALIGNED_GET16(&self->rv_pcbuf[self->rv_pcbuf_ptr]);
 	self->rv_pc += 2;
 	self->rv_pcbuf_ptr += 2;
 	self->rv_pcbuf_siz -= 2;
@@ -819,7 +819,7 @@ rpc_vm_pc_rdl(struct rpc_vm *__restrict self) THROWS(E_SEGFAULT) {
 	uint32_t result;
 	if (self->rv_pcbuf_siz < 4)
 		rpc_vm_pc_filbuf(self, 4);
-	result = UNALIGNED_GET32((uint32_t const *)&self->rv_pcbuf[self->rv_pcbuf_ptr]);
+	result = UNALIGNED_GET32(&self->rv_pcbuf[self->rv_pcbuf_ptr]);
 	self->rv_pc += 4;
 	self->rv_pcbuf_ptr += 4;
 	self->rv_pcbuf_siz -= 4;
@@ -832,7 +832,7 @@ rpc_vm_pc_rdq(struct rpc_vm *__restrict self) THROWS(E_SEGFAULT) {
 	uint64_t result;
 	if (self->rv_pcbuf_siz < 8)
 		rpc_vm_pc_filbuf(self, 8);
-	result = UNALIGNED_GET64((uint64_t const *)&self->rv_pcbuf[self->rv_pcbuf_ptr]);
+	result = UNALIGNED_GET64(&self->rv_pcbuf[self->rv_pcbuf_ptr]);
 	self->rv_pc += 8;
 	self->rv_pcbuf_ptr += 8;
 	self->rv_pcbuf_siz -= 8;
@@ -1062,10 +1062,11 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		rpc_vm_pc_rdx(self, buf, siz);
 #ifdef __ARCH_HAVE_COMPAT
 		TRACE_INSTRUCTION("RPC_OP_sppush_const %#" PRIxPTR "\n",
-		                  siz == sizeof(uintptr_t) ? UNALIGNED_GET((uintptr_t *)buf)
-		                                           : (uintptr_t)UNALIGNED_GET((compat_uintptr_t *)buf));
+		                  siz == sizeof(uintptr_t) ? UNALIGNED_GET((uintptr_t const *)buf)
+		                                           : (uintptr_t)UNALIGNED_GET((compat_uintptr_t const *)buf));
 #else /* __ARCH_HAVE_COMPAT */
-		TRACE_INSTRUCTION("RPC_OP_sppush_const %#" PRIxPTR "\n", UNALIGNED_GET((uintptr_t *)buf));
+		TRACE_INSTRUCTION("RPC_OP_sppush_const %#" PRIxPTR "\n",
+		                  UNALIGNED_GET((uintptr_t const *)buf));
 #endif /* !__ARCH_HAVE_COMPAT */
 		rpc_vm_push2user(self, buf, siz);
 	}	break;

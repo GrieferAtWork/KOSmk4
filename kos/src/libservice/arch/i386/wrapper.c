@@ -4692,7 +4692,7 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	/* Need at least 4 more bytes at the end of .eh_frame (for the sentinel chunk) */
 	if (!comgen_ehav(self, 4))
 		goto fail;
-	UNALIGNED_SET32((u32 *)self->cg_ehptr, 0);
+	UNALIGNED_SET32(self->cg_ehptr, 0);
 
 	/* Generate  LSDA (like it would appear in .gcc_except_table)
 	 * This data we simply put into .text (even though it doesn't

@@ -76,17 +76,17 @@ override_slab_kmalloc_x(byte_t *p_slab_kmalloc, size_t sz,
 	*p_slab_kmalloc++ = 0x89; /* movl */
 	*p_slab_kmalloc++ = 0xfe; /* %edi, %esi */
 	*p_slab_kmalloc++ = 0xbf; /* movl $..., %edi */
-	UNALIGNED_SETLE32((u32 *)p_slab_kmalloc, (u32)sz);
+	UNALIGNED_SETLE32(p_slab_kmalloc, (u32)sz);
 	p_slab_kmalloc += 4;
 #else /* __x86_64__ */
 	*p_slab_kmalloc++ = 0x58; /* popl %eax */
 	*p_slab_kmalloc++ = 0x68; /* pushl $... */
-	UNALIGNED_SETLE32((u32 *)p_slab_kmalloc, (u32)sz);
+	UNALIGNED_SETLE32(p_slab_kmalloc, (u32)sz);
 	p_slab_kmalloc += 4;
 	*p_slab_kmalloc++ = 0x50; /* pushl %eax */
 #endif /* !__x86_64__ */
 	*p_slab_kmalloc++ = 0xe9; /* jmp ... */
-	UNALIGNED_SETLE32((u32 *)p_slab_kmalloc,
+	UNALIGNED_SETLE32(p_slab_kmalloc,
 	                  (u32)(s32)((kmalloc_xnx) -
 	                             (p_slab_kmalloc + 4)));
 }

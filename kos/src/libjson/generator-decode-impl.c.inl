@@ -102,24 +102,24 @@ NOTHROW_NCX(CC LOCAL_libjson_decode_INTO)(LOCAL_IF_DECODE(struct json_parser *__
 
 			case JSON_TYPE_INT8:
 			case JSON_TYPE_UINT8:
-				*(int8_t *)dst = (int8_t)number;
+				UNALIGNED_SET8(dst, (uint8_t)(int8_t)number);
 				break;
 
 			case JSON_TYPE_INT16:
 			case JSON_TYPE_UINT16:
-				UNALIGNED_SET16((uint16_t *)dst, (uint16_t)(int16_t)number);
+				UNALIGNED_SET16(dst, (uint16_t)(int16_t)number);
 				break;
 
 			case JSON_TYPE_INT32:
 #if __SIZEOF_POINTER__ == 8
 			case JSON_TYPE_UINT32:
 #endif /* __SIZEOF_POINTER__ == 8 */
-				UNALIGNED_SET32((uint32_t *)dst, (uint32_t)(int32_t)number);
+				UNALIGNED_SET32(dst, (uint32_t)(int32_t)number);
 				break;
 
 #if __SIZEOF_POINTER__ == 8
 			case JSON_TYPE_INT64:
-				UNALIGNED_SET64((uint32_t *)dst, (int64_t)number);
+				UNALIGNED_SET64(dst, (uint64_t)(int64_t)number);
 				break;
 #endif /* __SIZEOF_POINTER__ == 8 */
 
@@ -135,9 +135,9 @@ NOTHROW_NCX(CC LOCAL_libjson_decode_INTO)(LOCAL_IF_DECODE(struct json_parser *__
 		result = libjson_parser_getint64(parser, &value);
 		if likely(result == JSON_ERROR_OK) {
 			if (type == JSON_TYPE_INT64) {
-				UNALIGNED_SET64((uint64_t *)dst, (uint64_t)value);
+				UNALIGNED_SET64(dst, (uint64_t)value);
 			} else {
-				UNALIGNED_SET32((uint32_t *)dst, (uint32_t)(uint64_t)value);
+				UNALIGNED_SET32(dst, (uint32_t)(uint64_t)value);
 			}
 		}
 	}	break;
@@ -147,7 +147,7 @@ NOTHROW_NCX(CC LOCAL_libjson_decode_INTO)(LOCAL_IF_DECODE(struct json_parser *__
 		uint64_t value;
 		result = libjson_parser_getuint64(parser, &value);
 		if likely(result == JSON_ERROR_OK) {
-			UNALIGNED_SET64((uint64_t *)dst, value);
+			UNALIGNED_SET64(dst, value);
 		}
 	}	break;
 
@@ -185,22 +185,22 @@ NOTHROW_NCX(CC LOCAL_libjson_decode_INTO)(LOCAL_IF_DECODE(struct json_parser *__
 
 	case JSON_TYPE_INT8:
 	case JSON_TYPE_UINT8:
-		*(uint8_t *)dst = 0;
+		UNALIGNED_SET8(dst, 0);
 		break;
 
 	case JSON_TYPE_INT16:
 	case JSON_TYPE_UINT16:
-		UNALIGNED_SET16((uint16_t *)dst, 0);
+		UNALIGNED_SET16(dst, 0);
 		break;
 
 	case JSON_TYPE_INT32:
 	case JSON_TYPE_UINT32:
-		UNALIGNED_SET32((uint32_t *)dst, 0);
+		UNALIGNED_SET32(dst, 0);
 		break;
 
 	case JSON_TYPE_INT64:
 	case JSON_TYPE_UINT64:
-		UNALIGNED_SET64((uint64_t *)dst, 0);
+		UNALIGNED_SET64(dst, 0);
 		break;
 
 #ifndef __NO_FPU
@@ -250,7 +250,7 @@ NOTHROW_NCX(CC LOCAL_libjson_decode_INTO)(LOCAL_IF_DECODE(struct json_parser *__
 		result = JSON_ERROR_OK;
 		if (type == JSON_TYPE_INLINE_STRING_OP) {
 			uint16_t maxlen;
-			maxlen = UNALIGNED_GET16((uint16_t const *)*preader);
+			maxlen = UNALIGNED_GET16(*preader);
 			*preader += 2;
 			/* Make sure that the given string isn't too long */
 			if unlikely(len > maxlen) {
@@ -263,7 +263,7 @@ NOTHROW_NCX(CC LOCAL_libjson_decode_INTO)(LOCAL_IF_DECODE(struct json_parser *__
 		} else {
 			if (type == JSON_TYPE_STRING_WITH_LENGTH_OP) {
 				uint16_t len_offset;
-				len_offset = UNALIGNED_GET16((uint16_t const *)*preader);
+				len_offset = UNALIGNED_GET16(*preader);
 				*preader += 2;
 				UNALIGNED_SET((size_t *)((byte_t *)dst_base + len_offset), len);
 			}
@@ -277,14 +277,14 @@ NOTHROW_NCX(CC LOCAL_libjson_decode_INTO)(LOCAL_IF_DECODE(struct json_parser *__
 
 	case JSON_TYPE_INLINE_STRING_OP: {
 		uint16_t len;
-		len = UNALIGNED_GET16((uint16_t const *)*preader);
+		len = UNALIGNED_GET16(*preader);
 		*preader += 2;
 		bzero(dst, (size_t)len);
 	}	break;
 
 	case JSON_TYPE_STRING_WITH_LENGTH_OP: {
 		uint16_t len_offset;
-		len_offset = UNALIGNED_GET16((uint16_t const *)*preader);
+		len_offset = UNALIGNED_GET16(*preader);
 		*preader += 2;
 		UNALIGNED_SET((size_t *)((byte_t *)dst_base + len_offset), 0);
 	}	ATTR_FALLTHROUGH
@@ -390,9 +390,9 @@ NOTHROW_NCX(CC LOCAL_libjson_decode_designator)(LOCAL_IF_DECODE(struct json_pars
 	case JGEN_EXTERN_OP: {
 		uint16_t offset, id;
 		byte_t const *codec;
-		offset = UNALIGNED_GET16((uint16_t const *)reader);
+		offset = UNALIGNED_GET16(reader);
 		reader += 2;
-		id = UNALIGNED_GET16((uint16_t const *)reader);
+		id = UNALIGNED_GET16(reader);
 		reader += 2;
 		codec = (byte_t const *)ext[id];
 		if unlikely(*codec == JGEN_TERM) {
@@ -413,7 +413,7 @@ NOTHROW_NCX(CC LOCAL_libjson_decode_designator)(LOCAL_IF_DECODE(struct json_pars
 	case JGEN_INTO: {
 		uint16_t offset;
 		uint8_t type;
-		offset = UNALIGNED_GET16((uint16_t const *)reader);
+		offset = UNALIGNED_GET16(reader);
 		reader += 2;
 		type = *(uint8_t const *)reader;
 		reader += 1;
@@ -554,7 +554,7 @@ again_inner:
 #else /* !MODE_DECODE */
 			uint16_t index;
 			/* parse the array element designator. */
-			index = UNALIGNED_GET16((uint16_t const *)reader);
+			index = UNALIGNED_GET16(reader);
 			reader += 2; /* Consume the index operand. */
 			if (!is_first) {
 				result = libjson_parser_yield(parser);
@@ -594,9 +594,9 @@ again_inner:
 			uint16_t stride;
 			size_t offset;
 			byte_t const *orig_reader;
-			count   = UNALIGNED_GET16((uint16_t const *)reader) + 1;
+			count   = UNALIGNED_GET16(reader) + 1;
 			reader += 2;
-			stride  = UNALIGNED_GET16((uint16_t const *)reader);
+			stride  = UNALIGNED_GET16(reader);
 			reader += 2;
 			offset  = 0;
 			orig_reader = reader;

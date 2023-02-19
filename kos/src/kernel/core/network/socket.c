@@ -1353,19 +1353,19 @@ done:
 PRIVATE socklen_t KCALL
 return_u32(USER CHECKED void *optval, socklen_t optlen, u32 value) {
 	if (optlen >= 4) {
-		UNALIGNED_SET32((u32 *)optval, value);
+		UNALIGNED_SET32(optval, value);
 		return 4;
 	}
 	if (value > UINT32_C(0xffff))
 		return 4;
 	if (optlen >= 2) {
-		UNALIGNED_SET16((u16 *)optval, (u16)value);
+		UNALIGNED_SET16(optval, (u16)value);
 		return 2;
 	}
 	if (value > UINT32_C(0xff))
 		return 2;
 	if (optlen >= 1) {
-		*(u8 *)optval = (u8)value;
+		UNALIGNED_SET8(optval, (u8)value);
 		return 1;
 	}
 	return 1;
@@ -1379,25 +1379,25 @@ return_u32(USER CHECKED void *optval, socklen_t optlen, u32 value) {
 PRIVATE socklen_t KCALL
 return_u64(USER CHECKED void *optval, socklen_t optlen, u64 value) {
 	if (optlen >= 8) {
-		UNALIGNED_SET64((u64 *)optval, value);
+		UNALIGNED_SET64(optval, value);
 		return 8;
 	}
 	if (value > UINT64_C(0xffffffff))
 		return 8;
 	if (optlen >= 4) {
-		UNALIGNED_SET32((u32 *)optval, (u32)value);
+		UNALIGNED_SET32(optval, (u32)value);
 		return 4;
 	}
 	if (value > UINT64_C(0xffff))
 		return 4;
 	if (optlen >= 2) {
-		UNALIGNED_SET16((u16 *)optval, (u16)value);
+		UNALIGNED_SET16(optval, (u16)value);
 		return 2;
 	}
 	if (value > UINT64_C(0xff))
 		return 2;
 	if (optlen >= 1) {
-		*(u8 *)optval = (u8)value;
+		UNALIGNED_SET8(optval, (u8)value);
 		return 1;
 	}
 	return 1;
@@ -1653,24 +1653,24 @@ extract_size_t_dfl_int(USER CHECKED void const *optval,
 
 #if __SIZEOF_SIZE_T__ >= 8
 	case 8:
-		result = (size_t)UNALIGNED_GET64((u64 const *)optval);
+		result = (size_t)UNALIGNED_GET64(optval);
 		break;
 #endif /* __SIZEOF_SIZE_T__ >= 8 */
 
 #if __SIZEOF_SIZE_T__ >= 4
 	case 4:
-		result = (size_t)UNALIGNED_GET32((u32 const *)optval);
+		result = (size_t)UNALIGNED_GET32(optval);
 		break;
 #endif /* __SIZEOF_SIZE_T__ >= 4 */
 
 #if __SIZEOF_SIZE_T__ >= 2
 	case 2:
-		result = (size_t)UNALIGNED_GET16((u16 const *)optval);
+		result = (size_t)UNALIGNED_GET16(optval);
 		break;
 #endif /* __SIZEOF_SIZE_T__ >= 2 */
 
 	case 1:
-		result = (size_t)(*(u8 const *)optval);
+		result = (size_t)UNALIGNED_GET8(optval);
 		break;
 
 	default:

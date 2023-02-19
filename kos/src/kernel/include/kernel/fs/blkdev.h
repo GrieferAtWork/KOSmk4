@@ -110,7 +110,7 @@ struct blkdev
 			uuid_t                  br_efi_uuid;          /* [lock(br_partslock)] EFI disk UUID (`struct efi_descriptor::gpt_uuid', or all zeroes if unknown or N/A) */
 		} bd_rootinfo; /* [valid_if(blkdev_isroot(this))] */
 #define blkdev_get_mbr_disksig(self) \
-	__hybrid_unaligned_get32((uint32_t const *)&(self)->bd_rootinfo.br_mbr_diskuid[4])
+	__hybrid_unaligned_get32(&(self)->bd_rootinfo.br_mbr_diskuid[4])
 
 		/* Device partition information. */
 		struct {

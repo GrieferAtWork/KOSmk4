@@ -894,7 +894,7 @@ search_chain:
 				++start;
 			if (*start == OPC_LONGREPR) {
 				/* Extended-length opcode representation. */
-				u16 offset = UNALIGNED_GET16((u16 const *)(start + 1));
+				u16 offset = UNALIGNED_GET16(start + 1);
 				start = longops_repr + offset;
 			}
 			p = strchrnul(start, '\t');
@@ -1026,7 +1026,7 @@ do_nextop_nocomma:
 				case OPC_S16:
 					disasm_print(self, "$", 1);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX);
-					disasm_printf(self, "%#tx", (ptrdiff_t)(s16)UNALIGNED_GET16((u16 const *)self->d_pc));
+					disasm_printf(self, "%#tx", (ptrdiff_t)(s16)UNALIGNED_GET16(self->d_pc));
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_SUFFIX);
 					self->d_pc += 2;
 					break;
@@ -1034,7 +1034,7 @@ do_nextop_nocomma:
 				case OPC_U16:
 					disasm_print(self, "$", 1);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX);
-					disasm_printf(self, "%#" PRIx16, UNALIGNED_GET16((u16 const *)self->d_pc));
+					disasm_printf(self, "%#" PRIx16, UNALIGNED_GET16(self->d_pc));
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_SUFFIX);
 					self->d_pc += 2;
 					break;
@@ -1042,7 +1042,7 @@ do_nextop_nocomma:
 				case OPC_S32:
 					disasm_print(self, "$", 1);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX);
-					disasm_printf(self, "%#tx", (ptrdiff_t)(s32)UNALIGNED_GET32((u32 const *)self->d_pc));
+					disasm_printf(self, "%#tx", (ptrdiff_t)(s32)UNALIGNED_GET32(self->d_pc));
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_SUFFIX);
 					self->d_pc += 4;
 					break;
@@ -1050,7 +1050,7 @@ do_nextop_nocomma:
 				case OPC_U32:
 					disasm_print(self, "$", 1);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX);
-					disasm_printf(self, "%#" PRIx32, UNALIGNED_GET32((u32 const *)self->d_pc));
+					disasm_printf(self, "%#" PRIx32, UNALIGNED_GET32(self->d_pc));
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_SUFFIX);
 					self->d_pc += 4;
 					break;
@@ -1058,7 +1058,7 @@ do_nextop_nocomma:
 				case OPC_U64:
 					disasm_print(self, "$", 1);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX);
-					disasm_printf(self, "%#" PRIx64, UNALIGNED_GET64((u64 const *)self->d_pc));
+					disasm_printf(self, "%#" PRIx64, UNALIGNED_GET64(self->d_pc));
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_SUFFIX);
 					self->d_pc += 8;
 					break;
@@ -1179,19 +1179,19 @@ done_escape_register:
 
 				case OPC_MOFFS8: {
 					uintptr_t addr;
-					addr = (uintptr_t)(*(u8 const *)self->d_pc);
+					addr = (uintptr_t)UNALIGNED_GET8(self->d_pc);
 					self->d_pc += 1;
 					goto do_print_moffs;
 				case OPC_MOFFS16:
-					addr = (uintptr_t)UNALIGNED_GET16((u16 const *)self->d_pc);
+					addr = (uintptr_t)UNALIGNED_GET16(self->d_pc);
 					self->d_pc += 2;
 					goto do_print_moffs;
 				case OPC_MOFFS32:
-					addr = (uintptr_t)UNALIGNED_GET32((u32 const *)self->d_pc);
+					addr = (uintptr_t)UNALIGNED_GET32(self->d_pc);
 					self->d_pc += 4;
 					goto do_print_moffs;
 				case OPC_MOFFS64:
-					addr = (uintptr_t)UNALIGNED_GET64((u64 const *)self->d_pc);
+					addr = (uintptr_t)UNALIGNED_GET64(self->d_pc);
 					self->d_pc += 8;
 do_print_moffs:
 					if (EMU86_F_HASSEG(op_flags))
@@ -1528,21 +1528,21 @@ nextop_nocomma:
 				case OPC_DISP8:
 					libda_disasm_print_symbol(self,
 					                          (self->d_pc + 1 + self->d_baseoff) +
-					                          (intptr_t)(*(s8 const *)self->d_pc));
+					                          (intptr_t)(s8)UNALIGNED_GET8(self->d_pc));
 					self->d_pc += 1;
 					break;
 
 				case OPC_DISP16:
 					libda_disasm_print_symbol(self,
 					                          (self->d_pc + 2 + self->d_baseoff) +
-					                          (intptr_t)(s16)UNALIGNED_GET16((u16 const *)self->d_pc));
+					                          (intptr_t)(s16)UNALIGNED_GET16(self->d_pc));
 					self->d_pc += 2;
 					break;
 
 				case OPC_DISP32:
 					libda_disasm_print_symbol(self,
 					                          (self->d_pc + 4 + self->d_baseoff) +
-					                          (intptr_t)(s32)UNALIGNED_GET32((u32 const *)self->d_pc));
+					                          (intptr_t)(s32)UNALIGNED_GET32(self->d_pc));
 					self->d_pc += 4;
 					break;
 
@@ -1550,13 +1550,13 @@ nextop_nocomma:
 					u16 segment;
 					u32 offset;
 					if (!!DA86_IS16(self) ^ !!(op_flags & EMU86_F_AD16)) {
-						offset = UNALIGNED_GET16((u16 const *)self->d_pc);
+						offset = UNALIGNED_GET16(self->d_pc);
 						self->d_pc += 2;
 					} else {
-						offset = UNALIGNED_GET32((u32 const *)self->d_pc);
+						offset = UNALIGNED_GET32(self->d_pc);
 						self->d_pc += 4;
 					}
-					segment = UNALIGNED_GET16((u16 const *)self->d_pc);
+					segment = UNALIGNED_GET16(self->d_pc);
 					self->d_pc += 2;
 					disasm_print(self, "$", 1);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX);

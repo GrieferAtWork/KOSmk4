@@ -438,13 +438,13 @@ NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
 		if unlikely(!namelen) {
 			result = NULL;
 		} else {
-			pattern.word = UNALIGNED_GET16((uint16_t const *)varname);
+			pattern.word = UNALIGNED_GET16(varname);
 			if unlikely(namelen == 1) {
 				/* Single-character variable name -> Only need to search for
 				 * that specific character,  as well as  the follow-up  '='! */
 				pattern.chr[1] = '=';
 				for (; (result = *envp) != NULL; ++envp) {
-					if (UNALIGNED_GET16((uint16_t const *)result) != pattern.word)
+					if (UNALIGNED_GET16(result) != pattern.word)
 						continue;
 					result += 2;
 					break;
@@ -454,7 +454,7 @@ NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
 				varname += 2;
 				tail_namelen = namelen - 2;
 				for (; (result = *envp) != NULL; ++envp) {
-					if (UNALIGNED_GET16((uint16_t const *)result) != pattern.word)
+					if (UNALIGNED_GET16(result) != pattern.word)
 						continue; /* First 2 characters don't match. */
 					if (bcmp(result + 2, varname, tail_namelen, sizeof(char)) != 0)
 						continue; /* Rest of string didn't match */

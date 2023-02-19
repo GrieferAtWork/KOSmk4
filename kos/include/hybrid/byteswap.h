@@ -85,6 +85,10 @@
 #define UNALIGNED_SETLE   __hybrid_unaligned_setle
 #define UNALIGNED_GETBE   __hybrid_unaligned_getbe
 #define UNALIGNED_SETBE   __hybrid_unaligned_setbe
+#define UNALIGNED_GETLE8  __hybrid_unaligned_getle8
+#define UNALIGNED_SETLE8  __hybrid_unaligned_setle8
+#define UNALIGNED_GETBE8  __hybrid_unaligned_getbe8
+#define UNALIGNED_SETBE8  __hybrid_unaligned_setbe8
 #define UNALIGNED_GETLE16 __hybrid_unaligned_getle16
 #define UNALIGNED_SETLE16 __hybrid_unaligned_setle16
 #define UNALIGNED_GETBE16 __hybrid_unaligned_getbe16

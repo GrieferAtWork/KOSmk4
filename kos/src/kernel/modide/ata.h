@@ -27,6 +27,7 @@
 #include <kernel/refcountable.h>
 #include <kernel/types.h>
 
+#include <hybrid/__unaligned.h>
 #include <hybrid/byteorder.h>
 
 #include <hw/disk/ata.h>
@@ -62,11 +63,10 @@ typedef struct {
 
 /* Fill in `hd_io_lbaaddr' and `hd_io_sectors' with `io_lbaaddr' and `io_sectors' */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-/* TODO: This *(u32 *)&-write isn't properly unaligned and needs to use UNALIGNED_SET()! */
-#define AtaAIOHandleData_SetLbaAndSectors(self, io_lbaaddr, io_sectors) \
-	(*(u32 *)&(self)->hd_io_lbaaddr[0] = (u32)(io_lbaaddr),             \
-	 *(u16 *)&(self)->hd_io_lbaaddr[4] = (u16)((io_lbaaddr) >> 32),     \
-	 *(u16 *)&(self)->hd_io_sectors[0] = (u16)(io_sectors))
+#define AtaAIOHandleData_SetLbaAndSectors(self, io_lbaaddr, io_sectors)              \
+	(__hybrid_unaligned_set32(&(self)->hd_io_lbaaddr[0], (u32)(io_lbaaddr)),         \
+	 __hybrid_unaligned_set16(&(self)->hd_io_lbaaddr[4], (u16)((io_lbaaddr) >> 32)), \
+	 __hybrid_unaligned_set16(&(self)->hd_io_sectors[0], (u16)(io_sectors)))
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 #define AtaAIOHandleData_SetLbaAndSectors(self, io_lbaaddr, io_sectors) \
 	((self)->hd_io_lbaaddr[0] = (u8)(io_lbaaddr),                       \

@@ -799,7 +799,7 @@ handle_timerfd_read(struct timerfd *__restrict self, USER CHECKED void *dst,
 		THROW(E_WOULDBLOCK); /* return -EAGAIN; */
 
 	/* Write-back the # of overruns */
-	UNALIGNED_SET64((USER CHECKED uint64_t *)dst, num_overruns);
+	UNALIGNED_SET64(dst, num_overruns);
 	return 8;
 }
 

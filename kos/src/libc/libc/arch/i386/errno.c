@@ -121,7 +121,7 @@ NOTHROW(LIBCCALL nontls_errno_redirect)(void) {
 	core_size = (size_t)(__libc_errno_access_core_end - __libc_errno_access_core_start);
 	MProtect(__libc_errno_access_core_start, core_size, PROT_READ | PROT_WRITE | PROT_EXEC);
 #define PUTB(b) (*writer++ = (b))
-#define PUTL(l) (UNALIGNED_SET32((u32 *)writer, (uintptr_t)(l)), writer += 4)
+#define PUTL(l) (UNALIGNED_SET32(writer, (uintptr_t)(l)), writer += 4)
 
 	/* >> libc_errno_p:
 	 * >>     movl  $<g_errno>, %eax # { 0xb8, <u32:g_errno>... }

@@ -66,20 +66,20 @@ x86_init_keepiopl(char const *__restrict arg) {
 		bool setstate = true;
 		next = strchrnul(arg, ',');
 		len  = (size_t)(next - arg);
-		if (len >= 2 && UNALIGNED_GET16((u16 const *)arg) == ENCODE_INT16('n', 'o')) {
+		if (len >= 2 && UNALIGNED_GET16(arg) == ENCODE_INT16('n', 'o')) {
 			setstate = false;
 			len -= 2;
 			arg += 2;
 		}
-		if (len == 4 && UNALIGNED_GET32((u32 const *)arg) == ENCODE_INT32('f', 'o', 'r', 'k')) {
+		if (len == 4 && UNALIGNED_GET32(arg) == ENCODE_INT32('f', 'o', 'r', 'k')) {
 			x86_iopl_keep_after_fork = setstate;
-		} else if (len == 4 && UNALIGNED_GET32((u32 const *)arg) == ENCODE_INT32('e', 'x', 'e', 'c')) {
+		} else if (len == 4 && UNALIGNED_GET32(arg) == ENCODE_INT32('e', 'x', 'e', 'c')) {
 			union x86_user_eflags_mask_union *mask;
 			mask = (union x86_user_eflags_mask_union *)&x86_exec_eflags_mask;
 			mask->uem_mask &= ~EFLAGS_IOPLMASK;
 			if (setstate) /* Keep iopl() during exec() */
 				mask->uem_mask |= EFLAGS_IOPLMASK;
-		} else if (len == 5 && UNALIGNED_GET32((u32 const *)arg) == ENCODE_INT32('c', 'l', 'o', 'n') && arg[4] == 'e') {
+		} else if (len == 5 && UNALIGNED_GET32(arg) == ENCODE_INT32('c', 'l', 'o', 'n') && arg[4] == 'e') {
 			x86_iopl_keep_after_clone = setstate;
 		} else {
 			kernel_panic(FREESTR("Unknown argument %$q for `keepiopl'"),

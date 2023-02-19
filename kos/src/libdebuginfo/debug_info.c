@@ -505,7 +505,7 @@ again:
 		return DEBUG_INFO_ERROR_NOFRAME;
 	result->dup_cu_info_hdr = reader;
 	/* 7.5.1.1   Compilation Unit Header */
-	temp = UNALIGNED_GET32((uint32_t const *)reader); /* unit_length */
+	temp = UNALIGNED_GET32(reader); /* unit_length */
 	reader += 4;
 	result->dsp_ptrsize = 4;
 	if (temp >= UINT32_C(0xfffffff0)) {
@@ -515,7 +515,7 @@ again:
 			 *  - The first 32-bits have the value 0xffffffff.
 			 *  - The following 64-bits contain the actual length represented as an unsigned 64-bit integer. */
 			result->dsp_ptrsize = 8;
-			temp = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
+			temp = (uintptr_t)UNALIGNED_GET64(reader);
 			reader += 8;
 		} else {
 			/* 7.2.2 Initial Length Values
@@ -527,7 +527,7 @@ again:
 	if (OVERFLOW_UADD((uintptr_t)reader, temp, (uintptr_t *)&result->dsp_cu_info_end) ||
 	    result->dsp_cu_info_end > debug_info_end)
 		result->dsp_cu_info_end = debug_info_end;
-	result->dsp_version = UNALIGNED_GET16((uint16_t const *)reader); /* version */
+	result->dsp_version = UNALIGNED_GET16(reader); /* version */
 	reader += 2;
 	if (result->dsp_version >= 5) {
 		unit_type = *(uint8_t const *)reader; /* unit_type */
@@ -537,10 +537,10 @@ again:
 	} else {
 		unit_type = DW_UT_compile;
 	}
-	temp = UNALIGNED_GET32((uint32_t const *)reader); /* debug_abbrev_offset */
+	temp = UNALIGNED_GET32(reader); /* debug_abbrev_offset */
 	reader += 4;
 	if (temp == 0xffffffff) {
-		temp = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
+		temp = (uintptr_t)UNALIGNED_GET64(reader);
 		reader += 8;
 	}
 	if unlikely(OVERFLOW_UADD((uintptr_t)sectinfo->cps_debug_abbrev_start, temp,
@@ -633,7 +633,7 @@ decode_form:
 
 	case DW_FORM_block2: {
 		uint16_t length;
-		length = UNALIGNED_GET16((uint16_t const *)self->dsp_cu_info_pos);
+		length = UNALIGNED_GET16(self->dsp_cu_info_pos);
 		self->dsp_cu_info_pos += 2;
 		if (OVERFLOW_UADD((uintptr_t)self->dsp_cu_info_pos, length, (uintptr_t *)&self->dsp_cu_info_pos))
 			self->dsp_cu_info_pos = (byte_t const *)-1;
@@ -641,7 +641,7 @@ decode_form:
 
 	case DW_FORM_block4: {
 		uint32_t length;
-		length = UNALIGNED_GET32((uint32_t const *)self->dsp_cu_info_pos);
+		length = UNALIGNED_GET32(self->dsp_cu_info_pos);
 		self->dsp_cu_info_pos += 4;
 		if (OVERFLOW_UADD((uintptr_t)self->dsp_cu_info_pos, length, (uintptr_t *)&self->dsp_cu_info_pos))
 			self->dsp_cu_info_pos = (byte_t const *)-1;
@@ -866,8 +866,8 @@ decode_form:
 		char *result;
 		uintptr_t offset;
 		switch (self->dsp_ptrsize) {
-		case 4: offset = (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader); break;
-		case 8: offset = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader); break;
+		case 4: offset = (uintptr_t)UNALIGNED_GET32(reader); break;
+		case 8: offset = (uintptr_t)UNALIGNED_GET64(reader); break;
 		default: __builtin_unreachable();
 		}
 		result = (char *)sections->dss_debug_str_start + offset;
@@ -886,8 +886,8 @@ decode_form:
 		char *result;
 		uintptr_t offset;
 		switch (self->dsp_ptrsize) {
-		case 4: offset = (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader); break;
-		case 8: offset = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader); break;
+		case 4: offset = (uintptr_t)UNALIGNED_GET32(reader); break;
+		case 8: offset = (uintptr_t)UNALIGNED_GET64(reader); break;
 		default: __builtin_unreachable();
 		}
 		result = (char *)sections->dss_debug_line_str_start + offset;
@@ -939,20 +939,20 @@ decode_form:
 		switch (self->dsp_addrsize) {
 
 		case 1:
-			*presult = *(uint8_t const *)reader;
+			*presult = UNALIGNED_GET8(reader);
 			break;
 
 		case 2:
-			*presult = UNALIGNED_GET16((uint16_t const *)reader);
+			*presult = UNALIGNED_GET16(reader);
 			break;
 
 		case 4:
-			*presult = UNALIGNED_GET32((uint32_t const *)reader);
+			*presult = UNALIGNED_GET32(reader);
 			break;
 
 #if __SIZEOF_POINTER__ > 4
 		case 8:
-			*presult = UNALIGNED_GET64((uint64_t const *)reader);
+			*presult = UNALIGNED_GET64(reader);
 			break;
 #endif /* __SIZEOF_POINTER__ > 4 */
 
@@ -990,34 +990,34 @@ decode_form:
 
 	case DW_FORM_sec_offset:
 		switch (self->dsp_ptrsize) {
-		case 4: *presult = (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader); break;
-		case 8: *presult = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader); break;
+		case 4: *presult = (uintptr_t)UNALIGNED_GET32(reader); break;
+		case 8: *presult = (uintptr_t)UNALIGNED_GET64(reader); break;
 		default: __builtin_unreachable();
 		}
 		return true;
 
 	case DW_FORM_data1: /* constant */
-		*presult = (uintptr_t)(*(uint8_t const *)reader);
+		*presult = (uintptr_t)UNALIGNED_GET8(reader);
 		return true;
 
 	case DW_FORM_data2: /* constant */
-		*presult = (uintptr_t)UNALIGNED_GET16((uint16_t const *)reader);
+		*presult = (uintptr_t)UNALIGNED_GET16(reader);
 		return true;
 
 	case DW_FORM_data4: /* constant */
-		*presult = (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader);
+		*presult = (uintptr_t)UNALIGNED_GET32(reader);
 		return true;
 
 	case DW_FORM_data8: /* constant */
 #if (!defined(UNALIGNED_GET128) || __SIZEOF_POINTER__ < 16) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
 	case DW_FORM_data16: /* constant */
 #endif /* (!UNALIGNED_GET128 || __SIZEOF_POINTER__ < 16) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-		*presult = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
+		*presult = (uintptr_t)UNALIGNED_GET64(reader);
 		return true;
 
 #if defined(UNALIGNED_GET128) && __SIZEOF_POINTER__ >= 16
 	case DW_FORM_data16: /* constant */
-		*presult = (uintptr_t)UNALIGNED_GET128((__UINT128_TYPE__ const *)reader);
+		*presult = (uintptr_t)UNALIGNED_GET128(reader);
 		return true;
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 	case DW_FORM_data16: /* constant */
@@ -1062,11 +1062,11 @@ decode_form:
 		switch (self->dsp_ptrsize) {
 
 		case 4:
-			*presult = (uint64_t)UNALIGNED_GET32((uint32_t const *)reader);
+			*presult = (uint64_t)UNALIGNED_GET32(reader);
 			break;
 
 		case 8:
-			*presult = UNALIGNED_GET64((uint64_t const *)reader);
+			*presult = UNALIGNED_GET64(reader);
 			break;
 
 		default:
@@ -1079,18 +1079,18 @@ decode_form:
 		return true;
 
 	case DW_FORM_data2: /* constant */
-		*presult = (uint64_t)UNALIGNED_GET16((uint16_t const *)reader);
+		*presult = (uint64_t)UNALIGNED_GET16(reader);
 		return true;
 
 	case DW_FORM_data4: /* constant */
-		*presult = (uint64_t)UNALIGNED_GET32((uint32_t const *)reader);
+		*presult = (uint64_t)UNALIGNED_GET32(reader);
 		return true;
 
 	case DW_FORM_data8: /* constant */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	case DW_FORM_data16: /* constant */
 #endif /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-		*presult = (uint64_t)UNALIGNED_GET64((uint64_t const *)reader);
+		*presult = (uint64_t)UNALIGNED_GET64(reader);
 		return true;
 
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -1134,26 +1134,26 @@ decode_form:
 	switch (form) {
 	case DW_FORM_sec_offset:
 		switch (self->dsp_ptrsize) {
-		case 4: uint128_set32(*presult, UNALIGNED_GET32((uint32_t const *)reader)); break;
-		case 8: uint128_set64(*presult, UNALIGNED_GET64((uint64_t const *)reader)); break;
+		case 4: uint128_set32(*presult, UNALIGNED_GET32(reader)); break;
+		case 8: uint128_set64(*presult, UNALIGNED_GET64(reader)); break;
 		default: __builtin_unreachable();
 		}
 		return true;
 
 	case DW_FORM_data1: /* constant */
-		uint128_set8(*presult, *(uint8_t const *)reader);
+		uint128_set8(*presult, UNALIGNED_GET8(reader));
 		return true;
 
 	case DW_FORM_data2: /* constant */
-		uint128_set16(*presult, UNALIGNED_GET16((uint16_t const *)reader));
+		uint128_set16(*presult, UNALIGNED_GET16(reader));
 		return true;
 
 	case DW_FORM_data4: /* constant */
-		uint128_set32(*presult, UNALIGNED_GET32((uint32_t const *)reader));
+		uint128_set32(*presult, UNALIGNED_GET32(reader));
 		return true;
 
 	case DW_FORM_data8: /* constant */
-		uint128_set64(*presult, UNALIGNED_GET64((uint64_t const *)reader));
+		uint128_set64(*presult, UNALIGNED_GET64(reader));
 		return true;
 
 	case DW_FORM_data16: /* constant */
@@ -1230,7 +1230,7 @@ NOTHROW_NCX(CC find_typeunit_by_signature)(byte_t const *reader,
 
 		/* 7.5.1.1   Compilation Unit Header */
 		header = reader;
-		length = UNALIGNED_GET32((uint32_t const *)reader);
+		length = UNALIGNED_GET32(reader);
 		reader += 4;
 		ptrsize = 4;
 		if (length >= UINT32_C(0xfffffff0)) {
@@ -1239,7 +1239,7 @@ NOTHROW_NCX(CC find_typeunit_by_signature)(byte_t const *reader,
 				 * In the 64-bit DWARF format, an initial length field is 96 bits in size, and has two parts:
 				 *  - The first 32-bits have the value 0xffffffff.
 				 *  - The following 64-bits contain the actual length represented as an unsigned 64-bit integer. */
-				length = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
+				length = (uintptr_t)UNALIGNED_GET64(reader);
 				reader += 8;
 				ptrsize = 8;
 			} else {
@@ -1251,7 +1251,7 @@ NOTHROW_NCX(CC find_typeunit_by_signature)(byte_t const *reader,
 		}
 		if (OVERFLOW_UADD((uintptr_t)reader, length, (uintptr_t *)&nextptr) || nextptr > end)
 			nextptr = end;
-		version = UNALIGNED_GET16((uint16_t const *)reader); /* version */
+		version = UNALIGNED_GET16(reader); /* version */
 		reader += 2;
 		if (version < 5)
 			goto next_cu; /* unit_type didn't exist yet */
@@ -1263,19 +1263,19 @@ NOTHROW_NCX(CC find_typeunit_by_signature)(byte_t const *reader,
 		/*address_size = *(uint8_t const *)reader;*/ /* address_size */
 		reader += 1;
 
-		length = (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader); /* debug_abbrev_offset */
+		length = (uintptr_t)UNALIGNED_GET32(reader); /* debug_abbrev_offset */
 		reader += 4;
 		if (length == 0xffffffff) {
-			/*length = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);*/
+			/*length = (uintptr_t)UNALIGNED_GET64(reader);*/
 			reader += 8;
 		}
-		type_signature = UNALIGNED_GET64((uint64_t const *)reader); /* type_signature */
+		type_signature = UNALIGNED_GET64(reader); /* type_signature */
 		reader += 8;
 		if (type_signature == signature) {
 			/* Found it! */
 			uintptr_t offset; /* type_offset */
-			offset = ptrsize == 4 ? (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader)
-			                      : (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
+			offset = ptrsize == 4 ? (uintptr_t)UNALIGNED_GET32(reader)
+			                      : (uintptr_t)UNALIGNED_GET64(reader);
 			reader = header + offset;
 			if (reader < header || reader >= nextptr)
 				ERROR(err_corrupt);
@@ -1303,10 +1303,10 @@ decode_form:
 		if unlikely(self->dsp_version <= 2)
 			size = self->dsp_addrsize;
 		switch (__builtin_expect(size, 4)) {
-		case 1: offset = (uintptr_t)(*(uint8_t const *)reader); break;
-		case 2: offset = (uintptr_t)UNALIGNED_GET16((uint16_t const *)reader); break;
-		case 4: offset = (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader); break;
-		case 8: offset = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader); break;
+		case 1: offset = (uintptr_t)UNALIGNED_GET8(reader); break;
+		case 2: offset = (uintptr_t)UNALIGNED_GET16(reader); break;
+		case 4: offset = (uintptr_t)UNALIGNED_GET32(reader); break;
+		case 8: offset = (uintptr_t)UNALIGNED_GET64(reader); break;
 		default: __builtin_unreachable();
 		}
 		/* Relative to the start of `.debug_info' */
@@ -1318,19 +1318,19 @@ decode_form:
 	}	break;
 
 	case DW_FORM_ref1:
-		offset = (uintptr_t)(*(uint8_t const *)reader);
+		offset = (uintptr_t)UNALIGNED_GET8(reader);
 		break;
 
 	case DW_FORM_ref2:
-		offset = (uintptr_t)UNALIGNED_GET16((uint16_t const *)reader);
+		offset = (uintptr_t)UNALIGNED_GET16(reader);
 		break;
 
 	case DW_FORM_ref4:
-		offset = (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader);
+		offset = (uintptr_t)UNALIGNED_GET32(reader);
 		break;
 
 	case DW_FORM_ref8:
-		offset = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
+		offset = (uintptr_t)UNALIGNED_GET64(reader);
 		break;
 
 	case DW_FORM_ref_udata:
@@ -1339,7 +1339,7 @@ decode_form:
 
 	case DW_FORM_ref_sig8: {
 		/* Reference to a type-unit */
-		uint64_t signature = UNALIGNED_GET64((uint64_t const *)reader);
+		uint64_t signature = UNALIGNED_GET64(reader);
 		byte_t const *ptr;
 		ptr = find_typeunit_by_signature(self->dup_sections->cps_debug_info_start,
 		                                 self->dup_sections->cps_debug_info_end,
@@ -1386,8 +1386,8 @@ decode_form:
 	case DW_FORM_sec_offset: {
 		uintptr_t offset;
 		switch (self->dsp_ptrsize) {
-		case 4: offset = (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader); break;
-		case 8: offset = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader); break;
+		case 4: offset = (uintptr_t)UNALIGNED_GET32(reader); break;
+		case 8: offset = (uintptr_t)UNALIGNED_GET64(reader); break;
 		default: __builtin_unreachable();
 		}
 		result->l_expr   = NULL;
@@ -1446,7 +1446,7 @@ decode_form:
 
 	case DW_FORM_block1: {
 		uint8_t length;
-		length = *(uint8_t const *)reader;
+		length = UNALIGNED_GET8(reader);
 		reader += 1;
 		result->b_addr = reader;
 		result->b_size = length;
@@ -1455,7 +1455,7 @@ decode_form:
 
 	case DW_FORM_block2: {
 		uint16_t length;
-		length = UNALIGNED_GET16((uint16_t const *)reader);
+		length = UNALIGNED_GET16(reader);
 		reader += 2;
 		result->b_addr = reader;
 		result->b_size = length;
@@ -1464,7 +1464,7 @@ decode_form:
 
 	case DW_FORM_block4: {
 		uint32_t length;
-		length = UNALIGNED_GET32((uint32_t const *)reader);
+		length = UNALIGNED_GET32(reader);
 		reader += 4;
 		result->b_addr = reader;
 		result->b_size = length;
@@ -2826,15 +2826,15 @@ libdi_debuginfo_do_print_value(pformatprinter printer, void *arg,
 generic_print_address:
 #if __SIZEOF_POINTER__ >= 8
 			if (datasize >= 8) {
-				addr = UNALIGNED_GET64((uint64_t const *)data);
+				addr = UNALIGNED_GET64(data);
 			} else
 #endif /* __SIZEOF_POINTER__ >= 8 */
 			if (datasize >= 4) {
-				addr = UNALIGNED_GET32((uint32_t const *)data);
+				addr = UNALIGNED_GET32(data);
 			} else if (datasize >= 2) {
-				addr = UNALIGNED_GET16((uint16_t const *)data);
+				addr = UNALIGNED_GET16(data);
 			} else if (datasize >= 1) {
-				addr = *(uint8_t const *)data;
+				addr = UNALIGNED_GET8(data);
 			} else {
 				addr = 0;
 			}
@@ -2847,13 +2847,13 @@ generic_print_address:
 		case DW_ATE_boolean: {
 			uint64_t value;
 			if (datasize >= 8) {
-				value = UNALIGNED_GET64((uint64_t const *)data);
+				value = UNALIGNED_GET64(data);
 			} else if (datasize >= 4) {
-				value = UNALIGNED_GET32((uint32_t const *)data);
+				value = UNALIGNED_GET32(data);
 			} else if (datasize >= 2) {
-				value = UNALIGNED_GET16((uint16_t const *)data);
+				value = UNALIGNED_GET16(data);
 			} else if (datasize >= 1) {
-				value = *(uint8_t const *)data;
+				value = UNALIGNED_GET8(data);
 			} else {
 				value = 0;
 			}
@@ -2918,13 +2918,13 @@ generic_print_address:
 		case DW_ATE_signed: {
 			int64_t value;
 			if (datasize >= 8) {
-				value = (int64_t)UNALIGNED_GET64((uint64_t const *)data);
+				value = (int64_t)UNALIGNED_GET64(data);
 			} else if (datasize >= 4) {
-				value = (int64_t)(int32_t)UNALIGNED_GET32((uint32_t const *)data);
+				value = (int64_t)(int32_t)UNALIGNED_GET32(data);
 			} else if (datasize >= 2) {
-				value = (int64_t)(int16_t)UNALIGNED_GET16((uint16_t const *)data);
+				value = (int64_t)(int16_t)UNALIGNED_GET16(data);
 			} else if (datasize >= 1) {
-				value = (int64_t) * (int8_t *)data;
+				value = (int64_t)(int8_t)UNALIGNED_GET8(data);
 			} else {
 				value = 0;
 			}
@@ -2937,13 +2937,13 @@ generic_print_address:
 		case DW_ATE_unsigned: {
 			uint64_t value;
 			if (datasize >= 8) {
-				value = UNALIGNED_GET64((uint64_t const *)data);
+				value = UNALIGNED_GET64(data);
 			} else if (datasize >= 4) {
-				value = (uint64_t)UNALIGNED_GET32((uint32_t const *)data);
+				value = (uint64_t)UNALIGNED_GET32(data);
 			} else if (datasize >= 2) {
-				value = (uint64_t)UNALIGNED_GET16((uint16_t const *)data);
+				value = (uint64_t)UNALIGNED_GET16(data);
 			} else if (datasize >= 1) {
-				value = (uint64_t) * (uint8_t *)data;
+				value = (uint64_t)UNALIGNED_GET8(data);
 			} else {
 				value = 0;
 			}
@@ -2960,17 +2960,17 @@ generic_print_address:
 		case DW_ATE_ASCII: {
 			uint64_t value;
 			if (datasize >= 8) {
-				value = (uint64_t)UNALIGNED_GET64((uint64_t const *)data);
+				value = (uint64_t)UNALIGNED_GET64(data);
 			} else if (datasize >= 4) {
-				value = (uint64_t)UNALIGNED_GET32((uint32_t const *)data);
+				value = (uint64_t)UNALIGNED_GET32(data);
 				if (type->t_encoding == DW_ATE_signed_char)
 					value = (uint64_t)(int64_t)(int32_t)(uint32_t)value;
 			} else if (datasize >= 2) {
-				value = (uint64_t)UNALIGNED_GET16((uint16_t const *)data);
+				value = (uint64_t)UNALIGNED_GET16(data);
 				if (type->t_encoding == DW_ATE_signed_char)
 					value = (uint64_t)(int64_t)(int16_t)(uint16_t)value;
 			} else if (datasize >= 1) {
-				value = (uint64_t) * (uint8_t *)data;
+				value = (uint64_t)UNALIGNED_GET8(data);
 				if (type->t_encoding == DW_ATE_signed_char)
 					value = (uint64_t)(int64_t)(int8_t)(uint8_t)value;
 			} else {
@@ -3091,7 +3091,7 @@ got_elem_count:
 					for (i = 0; i < elem_count; ++i) {
 						uint32_t ch;
 						if (inner_type.t_sizeof == 1) {
-							ch = *((uint8_t *)data + i);
+							ch = UNALIGNED_GET8((uint8_t const *)data + i);
 						} else if (inner_type.t_sizeof == 2) {
 							ch = UNALIGNED_GET16((uint16_t const *)data + i);
 						} else {
@@ -3172,13 +3172,13 @@ print_unknown_inner_array_type:
 		    datasize > type->t_sizeof)
 			datasize = type->t_sizeof;
 		if (datasize >= 8) {
-			value = (uintptr_t)UNALIGNED_GET64((uint64_t const *)data);
+			value = (uintptr_t)UNALIGNED_GET64(data);
 		} else if (datasize >= 4) {
-			value = (uintptr_t)UNALIGNED_GET32((uint32_t const *)data);
+			value = (uintptr_t)UNALIGNED_GET32(data);
 		} else if (datasize >= 2) {
-			value = (uintptr_t)UNALIGNED_GET16((uint16_t const *)data);
+			value = (uintptr_t)UNALIGNED_GET16(data);
 		} else if (datasize >= 1) {
-			value = (uintptr_t)(*(uint8_t const *)data);
+			value = (uintptr_t)UNALIGNED_GET8(data);
 		} else {
 			value = 0;
 		}

@@ -287,13 +287,13 @@ NOTHROW(FCALL svga_ttyaccess_v_getcelldata_txt)(struct vidttyaccess *__restrict 
                                                 uintptr_t address, byte_t buf[]) {
 	struct svga_ttyaccess_txt *me;
 	me = vidttyaccess_assvga_txt(self);
-	UNALIGNED_SET16((u16 *)buf, svga_ttyaccess_txt_dmem(me)[address]);
+	UNALIGNED_SET16(buf, svga_ttyaccess_txt_dmem(me)[address]);
 }
 
 PRIVATE NOBLOCK NONNULL((1, 3)) void
 NOTHROW(FCALL svga_ttyaccess_v_setcelldata_txt)(struct vidttyaccess *__restrict self,
                                                 uintptr_t address, byte_t const buf[]) {
-	uint16_t word = UNALIGNED_GET16((u16 const *)buf);
+	uint16_t word = UNALIGNED_GET16(buf);
 	struct svga_ttyaccess_txt *me;
 	me = vidttyaccess_assvga_txt(self);
 	svga_ttyaccess_txt_dmem(me)[address] = word;

@@ -91,7 +91,7 @@ again:
 	/* If writing has just become available, wake up writers. */
 	if (val >= (u64)UINT64_C(0xfffffffffffffffe))
 		sig_broadcast(&self->ef_signal);
-	UNALIGNED_SET64((u64 *)dst, val);
+	UNALIGNED_SET64(dst, val);
 	return 8;
 }
 
@@ -130,7 +130,7 @@ handle_eventfd_sema_read(struct eventfd *__restrict self,
 	/* If writing has just become available, wake up writers. */
 	if (val >= (u64)UINT64_C(0xfffffffffffffffe))
 		sig_broadcast(&self->ef_signal);
-	UNALIGNED_SET64((u64 *)dst, val);
+	UNALIGNED_SET64(dst, val);
 	return 8;
 }
 
@@ -145,7 +145,7 @@ handle_eventfd_fence_write(struct eventfd *__restrict self,
 		      E_INVALID_ARGUMENT_CONTEXT_EVENTFD_BUFSIZE,
 		      num_bytes);
 	}
-	val = UNALIGNED_GET64((u64 const *)src);
+	val = UNALIGNED_GET64(src);
 	for (;;) {
 		oldval = atomic64_read(&self->ef_value);
 		if (OVERFLOW_UMUL(oldval, val, &newval) ||

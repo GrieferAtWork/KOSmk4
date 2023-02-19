@@ -466,7 +466,7 @@ NOTHROW_NCX(CC libsc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
 	for (i = 0, regi = 0; i < desc->sc_argc; ++i) {
 		uint16_t word;
 		sc = (byte_t const *)(strend((char const *)sc) + 1);
-		word = UNALIGNED_GET16((uint16_t const *)sc);
+		word = UNALIGNED_GET16(sc);
 		sc += 2;
 		desc->sc_argv[i].sa_type = word & 0x1fff;
 		desc->sc_argv[i].sa_link = NULL;

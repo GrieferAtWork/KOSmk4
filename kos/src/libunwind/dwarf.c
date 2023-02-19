@@ -169,54 +169,54 @@ NOTHROW_NCX(CC libuw_dwarf_decode_pointer)(byte_t const **__restrict preader,
 			result += UNALIGNED_GET((uintptr_t const *)reader);
 #if __SIZEOF_POINTER__ > 4
 		} else if (addrsize >= 4) {
-			result += UNALIGNED_GET32((uint32_t const *)reader);
+			result += UNALIGNED_GET32(reader);
 #endif /* __SIZEOF_POINTER__ > 4 */
 		} else if (addrsize >= 2) {
-			result += UNALIGNED_GET16((uint16_t const *)reader);
+			result += UNALIGNED_GET16(reader);
 		} else if (addrsize >= 1) {
-			result += *(uint8_t const *)reader;
+			result += UNALIGNED_GET8(reader);
 		}
 		reader += addrsize;
 		break;
 
 	case DW_EH_PE_udata2:
-		result += (uintptr_t)UNALIGNED_GET16((uint16_t const *)reader);
+		result += (uintptr_t)UNALIGNED_GET16(reader);
 		reader += 2;
 		break;
 
 	case DW_EH_PE_udata4:
-		result += (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader);
+		result += (uintptr_t)UNALIGNED_GET32(reader);
 		reader += 4;
 		break;
 
 	case DW_EH_PE_udata8:
 #if __SIZEOF_POINTER__ > 4
-		result += (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
+		result += (uintptr_t)UNALIGNED_GET64(reader);
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		result += (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader);
+		result += (uintptr_t)UNALIGNED_GET32(reader);
 #else /* ... */
-		result += (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader + 1);
+		result += (uintptr_t)UNALIGNED_GET32(reader + 4);
 #endif /* !... */
 		reader += 8;
 		break;
 
 	case DW_EH_PE_sdata2:
-		result += (uintptr_t)(intptr_t)(int16_t)UNALIGNED_GET16((uint16_t const *)reader);
+		result += (uintptr_t)(intptr_t)(int16_t)UNALIGNED_GET16(reader);
 		reader += 2;
 		break;
 
 	case DW_EH_PE_sdata4:
-		result += (uintptr_t)(intptr_t)(int32_t)UNALIGNED_GET32((uint32_t const *)reader);
+		result += (uintptr_t)(intptr_t)(int32_t)UNALIGNED_GET32(reader);
 		reader += 4;
 		break;
 
 	case DW_EH_PE_sdata8:
 #if __SIZEOF_POINTER__ > 4
-		result += (uintptr_t)(intptr_t)(int64_t)UNALIGNED_GET64((uint64_t const *)reader);
+		result += (uintptr_t)(intptr_t)(int64_t)UNALIGNED_GET64(reader);
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		result += (uintptr_t)(intptr_t)(int32_t)UNALIGNED_GET32((uint32_t const *)reader);
+		result += (uintptr_t)(intptr_t)(int32_t)UNALIGNED_GET32(reader);
 #else /* ... */
-		result += (uintptr_t)(intptr_t)(int32_t)UNALIGNED_GET32((uint32_t const *)reader + 1);
+		result += (uintptr_t)(intptr_t)(int32_t)UNALIGNED_GET32(reader + 4);
 #endif /* !... */
 		reader += 8;
 		break;
@@ -238,12 +238,12 @@ NOTHROW_NCX(CC libuw_dwarf_decode_pointer)(byte_t const **__restrict preader,
 			result = (byte_t *)UNALIGNED_GET((uintptr_t const *)result);
 #if __SIZEOF_POINTER__ > 4
 		} else if (addrsize >= 4) {
-			result = (byte_t *)(uintptr_t)UNALIGNED_GET32((uint32_t const *)result);
+			result = (byte_t *)(uintptr_t)UNALIGNED_GET32(result);
 #endif /* __SIZEOF_POINTER__ > 4 */
 		} else if (addrsize >= 2) {
-			result = (byte_t *)(uintptr_t)UNALIGNED_GET16((uint16_t const *)result);
+			result = (byte_t *)(uintptr_t)UNALIGNED_GET16(result);
 		} else if (addrsize >= 1) {
-			result = (byte_t *)(uintptr_t)(*(uint8_t const *)result);
+			result = (byte_t *)(uintptr_t)UNALIGNED_GET8(result);
 		}
 	}
 	*preader = reader;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f2235e6 */
+/* HASH CRC-32:0x2b1816f2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -139,7 +139,7 @@ __LOCAL_LIBC(format_c16hexdump) __ATTR_INS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYP
 				__tailspace_count = (__linesize / 2) * 5 + (__linesize % 2) * 3;
 				__buffer[4] = ' ';
 				for (; __i + 2 <= __line_len; __i += 2) {
-					__UINT16_TYPE__ __w = __hybrid_unaligned_get16((__UINT16_TYPE__ *)(__line_data + __i));
+					__UINT16_TYPE__ __w = __hybrid_unaligned_get16(__line_data + __i);
 					__dst = __buffer + 4;
 					while (__dst > __buffer) {
 						*--__dst = __LOCAL_itoa_digit(!(__flags & 0x0001), __w & 0xf);
@@ -157,7 +157,7 @@ __LOCAL_LIBC(format_c16hexdump) __ATTR_INS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYP
 				__tailspace_count = (__linesize / 4) * 9 + (__linesize % 4) * 3;
 				__buffer[8] = ' ';
 				for (; __i + 4 <= __line_len; __i += 4) {
-					__UINT32_TYPE__ __l = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i));
+					__UINT32_TYPE__ __l = __hybrid_unaligned_get32(__line_data + __i);
 					__dst = __buffer + 8;
 					while (__dst > __buffer) {
 						*--__dst = __LOCAL_itoa_digit(!(__flags & 0x0001), __l & 0xf);
@@ -176,7 +176,7 @@ __LOCAL_LIBC(format_c16hexdump) __ATTR_INS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYP
 				__buffer[16] = ' ';
 				for (; __i + 8 <= __line_len; __i += 8) {
 #if __SIZEOF_POINTER__ >= 8
-					__UINT64_TYPE__ __q = __hybrid_unaligned_get64((__UINT64_TYPE__ *)(__line_data + __i));
+					__UINT64_TYPE__ __q = __hybrid_unaligned_get64(__line_data + __i);
 					__dst = __buffer + 16;
 					while (__dst > __buffer) {
 						*--__dst = __LOCAL_itoa_digit(!(__flags & 0x0001), __q & 0xf);
@@ -185,11 +185,11 @@ __LOCAL_LIBC(format_c16hexdump) __ATTR_INS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYP
 #else /* __SIZEOF_POINTER__ >= 8 */
 					__UINT32_TYPE__ __a, __b;
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-					__a = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i + 4));
-					__b = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i));
+					__a = __hybrid_unaligned_get32(__line_data + __i + 4);
+					__b = __hybrid_unaligned_get32(__line_data + __i);
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-					__a = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i));
-					__b = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i + 4));
+					__a = __hybrid_unaligned_get32(__line_data + __i);
+					__b = __hybrid_unaligned_get32(__line_data + __i + 4);
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 					__dst = __buffer + 16;
 					while (__dst > __buffer + 8) {

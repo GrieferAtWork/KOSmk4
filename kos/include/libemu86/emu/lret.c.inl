@@ -99,7 +99,7 @@ case EMU86_OPCODE_ENCODE(0xca): {
 	byte_t *sp;
 	u16 offset;
 	EMU86_UREG_TYPE ip;
-	offset = UNALIGNED_GETLE16((u16 const *)pc);
+	offset = UNALIGNED_GETLE16(pc);
 	pc += 2;
 	sp = EMU86_GETSTACKPTR();
 #if LIBEMU86_CONFIG_WANT_64BIT

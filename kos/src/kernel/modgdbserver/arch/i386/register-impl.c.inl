@@ -33,49 +33,49 @@ DECL_BEGIN
 
 #ifdef GET_REGISTER
 #define FUNC(x) GDB_Get##x
-#define FIELD4(field)                                \
-	do {                                             \
-		if (bufsize >= 4)                            \
-			UNALIGNED_SET32((u32 *)buf, (u32)field); \
-		return 4;                                    \
+#define FIELD4(field)                         \
+	do {                                      \
+		if (bufsize >= 4)                     \
+			UNALIGNED_SET32(buf, (u32)field); \
+		return 4;                             \
 	}	__WHILE0
-#define FIELD8(field)                                \
-	do {                                             \
-		if (bufsize >= 8)                            \
-			UNALIGNED_SET64((u64 *)buf, (u64)field); \
-		return 8;                                    \
+#define FIELD8(field)                         \
+	do {                                      \
+		if (bufsize >= 8)                     \
+			UNALIGNED_SET64(buf, (u64)field); \
+		return 8;                             \
 	}	__WHILE0
-#define GETSET4(get, set)                       \
-	do {                                        \
-		if (bufsize >= 4) {                     \
-			u32 value;                          \
-			value = get;                        \
-			UNALIGNED_SET32((u32 *)buf, value); \
-		}                                       \
-		return 4;                               \
+#define GETSET4(get, set)                \
+	do {                                 \
+		if (bufsize >= 4) {              \
+			u32 value;                   \
+			value = get;                 \
+			UNALIGNED_SET32(buf, value); \
+		}                                \
+		return 4;                        \
 	}	__WHILE0
-#define GETSET8(get, set)                       \
-	do {                                        \
-		if (bufsize >= 8) {                     \
-			u64 value;                          \
-			value = get;                        \
-			UNALIGNED_SET64((u64 *)buf, value); \
-		}                                       \
-		return 8;                               \
+#define GETSET8(get, set)                \
+	do {                                 \
+		if (bufsize >= 8) {              \
+			u64 value;                   \
+			value = get;                 \
+			UNALIGNED_SET64(buf, value); \
+		}                                \
+		return 8;                        \
 	}	__WHILE0
-#define GETSET4_NOOP()                      \
-	do {                                    \
-		if (bufsize >= 4) {                 \
-			UNALIGNED_SET32((u32 *)buf, 0); \
-		}                                   \
-		return 4;                           \
+#define GETSET4_NOOP()               \
+	do {                             \
+		if (bufsize >= 4) {          \
+			UNALIGNED_SET32(buf, 0); \
+		}                            \
+		return 4;                    \
 	}	__WHILE0
-#define GETSET8_NOOP()                      \
-	do {                                    \
-		if (bufsize >= 8) {                 \
-			UNALIGNED_SET64((u64 *)buf, 0); \
-		}                                   \
-		return 8;                           \
+#define GETSET8_NOOP()               \
+	do {                             \
+		if (bufsize >= 8) {          \
+			UNALIGNED_SET64(buf, 0); \
+		}                            \
+		return 8;                    \
 	}	__WHILE0
 #define STATE       state
 #define STATE_PARAM const *__restrict state
@@ -83,35 +83,35 @@ DECL_BEGIN
 #define BUF_CONST   /* nothing */
 #elif defined(SET_REGISTER)
 #define FUNC(x) GDB_Set##x
-#define FIELD4(field)                                                     \
-	do {                                                                  \
-		if (bufsize == 4)                                                 \
-			field = (__typeof__(field))UNALIGNED_GET32((u32 const *)buf); \
-		return 4;                                                         \
+#define FIELD4(field)                                        \
+	do {                                                     \
+		if (bufsize == 4)                                    \
+			field = (__typeof__(field))UNALIGNED_GET32(buf); \
+		return 4;                                            \
 	}	__WHILE0
-#define FIELD8(field)                                                     \
-	do {                                                                  \
-		if (bufsize == 8)                                                 \
-			field = (__typeof__(field))UNALIGNED_GET64((u64 const *)buf); \
-		return 8;                                                         \
+#define FIELD8(field)                                        \
+	do {                                                     \
+		if (bufsize == 8)                                    \
+			field = (__typeof__(field))UNALIGNED_GET64(buf); \
+		return 8;                                            \
 	}	__WHILE0
-#define GETSET4(get, set)                              \
-	do {                                               \
-		if (bufsize == 4) {                            \
-			u32 value;                                 \
-			value = UNALIGNED_GET32((u32 const *)buf); \
-			set;                                       \
-		}                                              \
-		return 4;                                      \
+#define GETSET4(get, set)                 \
+	do {                                  \
+		if (bufsize == 4) {               \
+			u32 value;                    \
+			value = UNALIGNED_GET32(buf); \
+			set;                          \
+		}                                 \
+		return 4;                         \
 	}	__WHILE0
-#define GETSET8(get, set)                              \
-	do {                                               \
-		if (bufsize == 8) {                            \
-			u64 value;                                 \
-			value = UNALIGNED_GET64((u64 const *)buf); \
-			set;                                       \
-		}                                              \
-		return 8;                                      \
+#define GETSET8(get, set)                 \
+	do {                                  \
+		if (bufsize == 8) {               \
+			u64 value;                    \
+			value = UNALIGNED_GET64(buf); \
+			set;                          \
+		}                                 \
+		return 8;                         \
 	}	__WHILE0
 #define GETSET4_NOOP() \
 	do {               \

@@ -703,19 +703,19 @@ NOTHROW_NCX(CC read_capsule_instruction)(struct cfa_parser *__restrict parser) {
 				break;
 
 			CASE(DW_CFA_advance_loc1)
-				current_pc += (uintptr_t)(*(uint8_t const *)cfa_reader *
-				                          parser->cp_fde->f_codealign);
+				current_pc += (uintptr_t)UNALIGNED_GET8(cfa_reader) *
+				              parser->cp_fde->f_codealign;
 				cfa_reader += 1;
 				break;
 
 			CASE(DW_CFA_advance_loc2)
-				current_pc += (uintptr_t)UNALIGNED_GET16((uint16_t const *)cfa_reader) *
+				current_pc += (uintptr_t)UNALIGNED_GET16(cfa_reader) *
 				              parser->cp_fde->f_codealign;
 				cfa_reader += 2;
 				break;
 
 			CASE(DW_CFA_advance_loc4)
-				current_pc += (uintptr_t)UNALIGNED_GET32((uint32_t const *)cfa_reader) *
+				current_pc += (uintptr_t)UNALIGNED_GET32(cfa_reader) *
 				              parser->cp_fde->f_codealign;
 				cfa_reader += 4;
 				break;
@@ -1020,17 +1020,17 @@ NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t *__restrict self, /* 
 				break;
 
 			CASE(DW_CFA_advance_loc1)
-				current_pc += (uintptr_t)(*(uint8_t const *)cfa_reader) * self->f_codealign;
+				current_pc += (uintptr_t)UNALIGNED_GET8(cfa_reader) * self->f_codealign;
 				cfa_reader += 1;
 				break;
 
 			CASE(DW_CFA_advance_loc2)
-				current_pc += (uintptr_t)UNALIGNED_GET16((uint16_t const *)cfa_reader) * self->f_codealign;
+				current_pc += (uintptr_t)UNALIGNED_GET16(cfa_reader) * self->f_codealign;
 				cfa_reader += 2;
 				break;
 
 			CASE(DW_CFA_advance_loc4)
-				current_pc += (uintptr_t)UNALIGNED_GET32((uint32_t const *)cfa_reader) * self->f_codealign;
+				current_pc += (uintptr_t)UNALIGNED_GET32(cfa_reader) * self->f_codealign;
 				cfa_reader += 4;
 				break;
 

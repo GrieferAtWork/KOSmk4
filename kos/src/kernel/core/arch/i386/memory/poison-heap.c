@@ -109,7 +109,7 @@ INTERN NOBLOCK ATTR_COLDTEXT void NOTHROW(KCALL ph_install)(void) {
 			buf[buflen++] = 0xe9;
 			disp = (s32)((intptr_t)(item->pi_dst) -
 			             (intptr_t)(item->pi_loc + buflen + 4));
-			UNALIGNED_SET32((u32 *)&buf[buflen], (u32)disp);
+			UNALIGNED_SET32(&buf[buflen], (u32)disp);
 			buflen += 4;
 		} else {
 			/* write a `ret' with an optional `xorP %Pax, %Pax' prefix */
@@ -125,8 +125,7 @@ INTERN NOBLOCK ATTR_COLDTEXT void NOTHROW(KCALL ph_install)(void) {
 			if (item->pi_ret >= 2) {
 				/* use a `ret imm16' instruction */
 				buf[buflen++] = 0xc2; /* ret imm16 */
-				UNALIGNED_SET16((u16 *)&buf[buflen],
-				                (u16)(item->pi_ret & ~1));
+				UNALIGNED_SET16(&buf[buflen], (u16)(item->pi_ret & ~1));
 				buflen += 2;
 			} else
 #endif /* !__x86_64__ */

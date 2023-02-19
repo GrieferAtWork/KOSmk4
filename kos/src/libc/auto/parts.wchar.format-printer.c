@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0db2566 */
+/* HASH CRC-32:0x451f40bd */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -778,7 +778,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR
 				tailspace_count = (linesize / 2) * 5 + (linesize % 2) * 3;
 				buffer[4] = ' ';
 				for (; i + 2 <= line_len; i += 2) {
-					u16 w = __hybrid_unaligned_get16((u16 *)(line_data + i));
+					u16 w = __hybrid_unaligned_get16(line_data + i);
 					dst = buffer + 4;
 					while (dst > buffer) {
 						*--dst = itoa_digit(!(flags & 0x0001), w & 0xf);
@@ -796,7 +796,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR
 				tailspace_count = (linesize / 4) * 9 + (linesize % 4) * 3;
 				buffer[8] = ' ';
 				for (; i + 4 <= line_len; i += 4) {
-					u32 l = __hybrid_unaligned_get32((u32 *)(line_data + i));
+					u32 l = __hybrid_unaligned_get32(line_data + i);
 					dst = buffer + 8;
 					while (dst > buffer) {
 						*--dst = itoa_digit(!(flags & 0x0001), l & 0xf);
@@ -815,7 +815,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR
 				buffer[16] = ' ';
 				for (; i + 8 <= line_len; i += 8) {
 #if __SIZEOF_POINTER__ >= 8
-					u64 q = __hybrid_unaligned_get64((u64 *)(line_data + i));
+					u64 q = __hybrid_unaligned_get64(line_data + i);
 					dst = buffer + 16;
 					while (dst > buffer) {
 						*--dst = itoa_digit(!(flags & 0x0001), q & 0xf);
@@ -824,11 +824,11 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR
 #else /* __SIZEOF_POINTER__ >= 8 */
 					u32 a, b;
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-					a = __hybrid_unaligned_get32((u32 *)(line_data + i + 4));
-					b = __hybrid_unaligned_get32((u32 *)(line_data + i));
+					a = __hybrid_unaligned_get32(line_data + i + 4);
+					b = __hybrid_unaligned_get32(line_data + i);
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-					a = __hybrid_unaligned_get32((u32 *)(line_data + i));
-					b = __hybrid_unaligned_get32((u32 *)(line_data + i + 4));
+					a = __hybrid_unaligned_get32(line_data + i);
+					b = __hybrid_unaligned_get32(line_data + i + 4);
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 					dst = buffer + 16;
 					while (dst > buffer + 8) {
@@ -973,7 +973,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_INS(3, 4) NONNULL((1))
 				tailspace_count = (linesize / 2) * 5 + (linesize % 2) * 3;
 				buffer[4] = ' ';
 				for (; i + 2 <= line_len; i += 2) {
-					u16 w = __hybrid_unaligned_get16((u16 *)(line_data + i));
+					u16 w = __hybrid_unaligned_get16(line_data + i);
 					dst = buffer + 4;
 					while (dst > buffer) {
 						*--dst = itoa_digit(!(flags & 0x0001), w & 0xf);
@@ -991,7 +991,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_INS(3, 4) NONNULL((1))
 				tailspace_count = (linesize / 4) * 9 + (linesize % 4) * 3;
 				buffer[8] = ' ';
 				for (; i + 4 <= line_len; i += 4) {
-					u32 l = __hybrid_unaligned_get32((u32 *)(line_data + i));
+					u32 l = __hybrid_unaligned_get32(line_data + i);
 					dst = buffer + 8;
 					while (dst > buffer) {
 						*--dst = itoa_digit(!(flags & 0x0001), l & 0xf);
@@ -1010,7 +1010,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_INS(3, 4) NONNULL((1))
 				buffer[16] = ' ';
 				for (; i + 8 <= line_len; i += 8) {
 #if __SIZEOF_POINTER__ >= 8
-					u64 q = __hybrid_unaligned_get64((u64 *)(line_data + i));
+					u64 q = __hybrid_unaligned_get64(line_data + i);
 					dst = buffer + 16;
 					while (dst > buffer) {
 						*--dst = itoa_digit(!(flags & 0x0001), q & 0xf);
@@ -1019,11 +1019,11 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_INS(3, 4) NONNULL((1))
 #else /* __SIZEOF_POINTER__ >= 8 */
 					u32 a, b;
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-					a = __hybrid_unaligned_get32((u32 *)(line_data + i + 4));
-					b = __hybrid_unaligned_get32((u32 *)(line_data + i));
+					a = __hybrid_unaligned_get32(line_data + i + 4);
+					b = __hybrid_unaligned_get32(line_data + i);
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-					a = __hybrid_unaligned_get32((u32 *)(line_data + i));
-					b = __hybrid_unaligned_get32((u32 *)(line_data + i + 4));
+					a = __hybrid_unaligned_get32(line_data + i);
+					b = __hybrid_unaligned_get32(line_data + i + 4);
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 					dst = buffer + 16;
 					while (dst > buffer + 8) {

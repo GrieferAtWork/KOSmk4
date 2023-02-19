@@ -344,7 +344,7 @@ __NOTHROW_NCX(LIBEMU86_CC emu86_modrm_decode)(__byte_t const *__restrict pc,
 				result->mi_rm    = EMU86_R_BP;
 				if ((rmbyte & EMU86_MODRM_MOD_MASK) == (0x0 << EMU86_MODRM_MOD_SHIFT)) { /* [disp16] */
 					result->mi_rm     = 0xff;
-					result->mi_offset = (__int32_t)(__uint32_t)__hybrid_unaligned_getle16((__uint16_t const *)pc);
+					result->mi_offset = (__int32_t)(__uint32_t)__hybrid_unaligned_getle16(pc);
 					pc += 2;
 				}
 				break;
@@ -362,7 +362,7 @@ __NOTHROW_NCX(LIBEMU86_CC emu86_modrm_decode)(__byte_t const *__restrict pc,
 				pc += 1;
 			} else if ((rmbyte & EMU86_MODRM_MOD_MASK) == (0x2 << EMU86_MODRM_MOD_SHIFT)) {
 				/* [... + disp16] */
-				result->mi_offset = (__int32_t)(__uint32_t)__hybrid_unaligned_getle16((__uint16_t const *)pc);
+				result->mi_offset = (__int32_t)(__uint32_t)__hybrid_unaligned_getle16(pc);
 				pc += 2;
 			}
 		}
@@ -384,7 +384,7 @@ __NOTHROW_NCX(LIBEMU86_CC emu86_modrm_decode)(__byte_t const *__restrict pc,
 			if (result->mi_rm == EMU86_R_EBP) {
 				result->mi_rm     = 0xff;
 				result->mi_index  = 0xff;
-				result->mi_offset = (__int32_t)__hybrid_unaligned_getle32((__uint32_t const *)pc);
+				result->mi_offset = (__int32_t)__hybrid_unaligned_getle32(pc);
 				pc += 4;
 #if LIBEMU86_CONFIG_WANT_64BIT
 				if (EMU86_F_IS64(flags))
@@ -406,7 +406,7 @@ parse_sib_byte:
 				if ((result->mi_rm == EMU86_R_EBP) &&
 				    (rmbyte & EMU86_MODRM_MOD_MASK) == (0x0 << EMU86_MODRM_MOD_SHIFT)) {
 					result->mi_rm     = 0xff; /* disp32 */
-					result->mi_offset = (__int32_t)__hybrid_unaligned_getle32((__uint32_t const *)pc);
+					result->mi_offset = (__int32_t)__hybrid_unaligned_getle32(pc);
 					pc += 4;
 				}
 			} else {
@@ -435,11 +435,11 @@ parse_sib_byte:
 			result->mi_index = 0xff;
 			if (result->mi_rm == EMU86_R_ESP) {
 				sibbyte           = *pc++;
-				result->mi_offset = (__int32_t)__hybrid_unaligned_getle32((__uint32_t const *)pc);
+				result->mi_offset = (__int32_t)__hybrid_unaligned_getle32(pc);
 				pc += 4;
 				goto parse_sib_byte;
 			}
-			result->mi_offset = (__int32_t)__hybrid_unaligned_getle32((__uint32_t const *)pc);
+			result->mi_offset = (__int32_t)__hybrid_unaligned_getle32(pc);
 			pc += 4;
 			break;
 

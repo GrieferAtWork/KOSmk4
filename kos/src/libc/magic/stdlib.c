@@ -613,13 +613,13 @@ char *getenv([[in]] char const *varname) {
 		if unlikely(!namelen) {
 			result = NULL;
 		} else {
-			pattern.word = __hybrid_unaligned_get16((uint16_t const *)varname);
+			pattern.word = __hybrid_unaligned_get16(varname);
 			if unlikely(namelen == 1) {
 				/* Single-character variable name -> Only need to search for
 				 * that specific character,  as well as  the follow-up  '='! */
 				pattern.chr[1] = '=';
 				for (; (result = *envp) != NULL; ++envp) {
-					if (__hybrid_unaligned_get16((uint16_t const *)result) != pattern.word)
+					if (__hybrid_unaligned_get16(result) != pattern.word)
 						continue;
 					result += 2;
 					break;
@@ -629,7 +629,7 @@ char *getenv([[in]] char const *varname) {
 				varname += 2;
 				tail_namelen = namelen - 2;
 				for (; (result = *envp) != NULL; ++envp) {
-					if (__hybrid_unaligned_get16((uint16_t const *)result) != pattern.word)
+					if (__hybrid_unaligned_get16(result) != pattern.word)
 						continue; /* First 2 characters don't match. */
 					if (bcmpc(result + 2, varname, tail_namelen, sizeof(char)) != 0)
 						continue; /* Rest of string didn't match */

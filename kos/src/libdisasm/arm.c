@@ -55,14 +55,14 @@ libda_single_arm(struct disassembler *__restrict self) {
 	if (DAARM_ISARM(self)) {
 		uint32_t opcode;
 print_32bit:
-		opcode = UNALIGNED_GET32((uint32_t const *)self->d_pc);
+		opcode = UNALIGNED_GET32(self->d_pc);
 		disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_PREFIX);
 		disasm_print(self, ".word", 5);
 		disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_SUFFIX);
 		disasm_printf(self, " %#.8" PRIx32, opcode);
 	} else {
 		uint16_t thumb_opcode;
-		thumb_opcode = UNALIGNED_GET16((uint16_t const *)self->d_pc);
+		thumb_opcode = UNALIGNED_GET16(self->d_pc);
 		if ((thumb_opcode & 0x1800) != 0x0000)
 			goto print_32bit;
 		disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_PREFIX);

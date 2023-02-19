@@ -403,23 +403,23 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, 
 				break;
 
 			CASE(DW_CFA_advance_loc1)
-				current_pc += (uintptr_t)(*(uint8_t const *)reader) * self->f_codealign;
+				current_pc += (uintptr_t)UNALIGNED_GET8(reader) * self->f_codealign;
 				reader += 1;
 				break;
 
 			CASE(DW_CFA_advance_loc2)
-				current_pc += (uintptr_t)UNALIGNED_GET16((uint16_t const *)reader) * self->f_codealign;
+				current_pc += (uintptr_t)UNALIGNED_GET16(reader) * self->f_codealign;
 				reader += 2;
 				break;
 
 			CASE(DW_CFA_advance_loc4)
-				current_pc += (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader) * self->f_codealign;
+				current_pc += (uintptr_t)UNALIGNED_GET32(reader) * self->f_codealign;
 				reader += 4;
 				break;
 
 #if __SIZEOF_POINTER__ >= 8
 			CASE(DW_CFA_MIPS_advance_loc8)
-				current_pc += (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader) * self->f_codealign;
+				current_pc += (uintptr_t)UNALIGNED_GET64(reader) * self->f_codealign;
 				reader += 8;
 				break;
 #endif /* __SIZEOF_POINTER__ >= 8 */

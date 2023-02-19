@@ -1971,7 +1971,7 @@ fat_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		/* Read attributes. */
 		attr = ent->fad_dos.f_attr;
 		mfile_tslock_release(me);
-		UNALIGNED_SET32((USER CHECKED u32 *)arg, attr);
+		UNALIGNED_SET32(arg, attr);
 	}	break;
 
 	case FAT_IOCTL_SET_ATTRIBUTES: {
@@ -1980,7 +1980,7 @@ fat_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		REF FatDirNode *dir;
 		u32 newflags;
 		validate_readable(arg, sizeof(u32));
-		newflags = UNALIGNED_GET32((u32 const *)arg);
+		newflags = UNALIGNED_GET32(arg);
 		VALIDATE_FLAGSET(newflags,
 		                 FATATTR_RO | FATATTR_HIDDEN | FATATTR_SYS |
 		                 FATATTR_VOLUME | FATATTR_DIR | FATATTR_ARCH,
@@ -2041,7 +2041,7 @@ fat_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	case FAT_IOCTL_GET_VOLUME_ID: {
 		FatSuperblock *super = fsuper_asfat(me->fn_super);
 		validate_writable(arg, sizeof(u32));
-		UNALIGNED_SET32((USER CHECKED u32 *)arg, super->ft_volid);
+		UNALIGNED_SET32(arg, super->ft_volid);
 	}	break;
 
 	case VFAT_IOCTL_READDIR_BOTH:

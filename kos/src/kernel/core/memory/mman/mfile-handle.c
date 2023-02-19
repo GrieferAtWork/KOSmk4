@@ -109,9 +109,9 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 			flags |= FS_NOATIME_FL;
 		arg = validate_writable(arg, _IOC_SIZE(cmd));
 		if (_IOC_SIZE(cmd) == sizeof(u32)) {
-			UNALIGNED_SET32((USER CHECKED u32 *)arg, (u32)flags);
+			UNALIGNED_SET32(arg, (u32)flags);
 		} else {
-			UNALIGNED_SET64((USER CHECKED u64 *)arg, (u64)flags);
+			UNALIGNED_SET64(arg, (u64)flags);
 		}
 		return 0;
 	}	break;
@@ -123,9 +123,9 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_SETPROPERTY, mode);
 		arg = (USER CHECKED void *)validate_readable(arg, _IOC_SIZE(cmd));
 		if (_IOC_SIZE(cmd) == sizeof(u32)) {
-			inode_flags = (uintptr_t)UNALIGNED_GET32((USER CHECKED u32 const *)arg);
+			inode_flags = (uintptr_t)UNALIGNED_GET32(arg);
 		} else {
-			inode_flags = (uintptr_t)UNALIGNED_GET64((USER CHECKED u64 const *)arg);
+			inode_flags = (uintptr_t)UNALIGNED_GET64(arg);
 		}
 		mask = ~(uintptr_t)(MFILE_F_READONLY | MFILE_FN_ATTRREADONLY | MFILE_F_NOATIME);
 		flag = 0;

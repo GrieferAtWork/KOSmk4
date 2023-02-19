@@ -117,20 +117,20 @@ copyfromphys(USER CHECKED void *dst,
 		if (num_bytes == 0)
 			return;
 		if (num_bytes == 1) {
-			*(u8 *)dst = peekphysb(src);
+			__hybrid_unaligned_set8(dst, peekphysb(src));
 			return;
 		}
 		if (num_bytes == 2) {
-			__hybrid_unaligned_set16((u16 *)dst, peekphysw(src));
+			__hybrid_unaligned_set16(dst, peekphysw(src));
 			return;
 		}
 		if (num_bytes == 4) {
-			__hybrid_unaligned_set32((u32 *)dst, peekphysl(src));
+			__hybrid_unaligned_set32(dst, peekphysl(src));
 			return;
 		}
 #ifdef __UINT64_TYPE__
 		if (num_bytes == 8) {
-			__hybrid_unaligned_set64((u64 *)dst, peekphysq(src));
+			__hybrid_unaligned_set64(dst, peekphysq(src));
 			return;
 		}
 #endif /* __UINT64_TYPE__ */
@@ -147,20 +147,20 @@ copytophys(PHYS physaddr_t dst,
 		if (num_bytes == 0)
 			return;
 		if (num_bytes == 1) {
-			pokephysb(dst, *(u8 const *)src);
+			pokephysb(dst, __hybrid_unaligned_get8(src));
 			return;
 		}
 		if (num_bytes == 2) {
-			pokephysw(dst, __hybrid_unaligned_get16((u16 const *)src));
+			pokephysw(dst, __hybrid_unaligned_get16(src));
 			return;
 		}
 		if (num_bytes == 4) {
-			pokephysl(dst, __hybrid_unaligned_get32((u32 const *)src));
+			pokephysl(dst, __hybrid_unaligned_get32(src));
 			return;
 		}
 #ifdef __UINT64_TYPE__
 		if (num_bytes == 8) {
-			pokephysq(dst, __hybrid_unaligned_get64((u64 const *)src));
+			pokephysq(dst, __hybrid_unaligned_get64(src));
 			return;
 		}
 #endif /* __UINT64_TYPE__ */

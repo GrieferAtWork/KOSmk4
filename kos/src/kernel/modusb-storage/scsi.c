@@ -158,9 +158,9 @@ ms_scsi_doio(struct ms_scsi_device *__restrict self,
 	/* TODO: Use higher-order read/write functions if available, and applicable. */
 	cbw.cbw_cb[0]  = is_write ? SCSI_CMD_WRITE_10 : SCSI_CMD_READ_10;
 	cbw.cbw_cb[1]  = self->msd_lun;
-	UNALIGNED_SETBE32((u32 *)(cbw.cbw_cb + 2), (u32)addr);
+	UNALIGNED_SETBE32(cbw.cbw_cb + 2, (u32)addr);
 	cbw.cbw_cb[6]  = 0;
-	UNALIGNED_SETBE16((u16 *)(cbw.cbw_cb + 7), (u16)num_sectors);
+	UNALIGNED_SETBE16(cbw.cbw_cb + 7, (u16)num_sectors);
 	cbw.cbw_cb[9]  = 0;
 	bzero(cbw.cbw_cb + 10, sizeof(cbw.cbw_cb) - 10);
 

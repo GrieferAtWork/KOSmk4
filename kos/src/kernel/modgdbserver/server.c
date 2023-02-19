@@ -1641,7 +1641,7 @@ handle_set_register_error:
 				ERROR(err_EFAULT);
 			while (search_size--) {
 				u32 value;
-				value = UNALIGNED_GET32((u32 const *)(GDBRemote_CommandBuffer + search_size));
+				value = UNALIGNED_GET32(GDBRemote_CommandBuffer + search_size);
 				if ((value & mask) != pattern)
 					continue; /* Different value... */
 				/* The docs don't say how to respond, but try to mirror `qSearch:memory' */

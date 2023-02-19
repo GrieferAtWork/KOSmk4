@@ -1513,10 +1513,8 @@ libvio_xchwithvio(struct vioargs *__restrict args,
 		return;
 	if (offset & 1) {
 		u8 temp;
-		temp = libvio_xchb(args, offset,
-		                   *(u8 const *)newbuf,
-		                   atomic);
-		*(u8 *)oldbuf = temp;
+		temp = libvio_xchb(args, offset, UNALIGNED_GET8(newbuf), atomic);
+		UNALIGNED_SET8(oldbuf, temp);
 		oldbuf = (byte_t *)oldbuf + 1;
 		newbuf = (byte_t const *)newbuf + 1;
 		--num_bytes;
@@ -1524,10 +1522,8 @@ libvio_xchwithvio(struct vioargs *__restrict args,
 	}
 	if ((offset & 2) && num_bytes >= 2) {
 		u16 temp;
-		temp = libvio_xchw(args, offset,
-		                   UNALIGNED_GET16((u16 const *)oldbuf),
-		                   atomic);
-		UNALIGNED_SET16((u16 *)newbuf, temp);
+		temp = libvio_xchw(args, offset, UNALIGNED_GET16(oldbuf), atomic);
+		UNALIGNED_SET16(oldbuf, temp);
 		oldbuf = (byte_t *)oldbuf + 2;
 		newbuf = (byte_t const *)newbuf + 2;
 		num_bytes -= 2;
@@ -1536,10 +1532,8 @@ libvio_xchwithvio(struct vioargs *__restrict args,
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 	if ((offset & 4) && num_bytes >= 4) {
 		u32 temp;
-		temp = libvio_xchl(args, offset,
-		                   UNALIGNED_GET32((u32 const *)oldbuf),
-		                   atomic);
-		UNALIGNED_SET32((u32 *)newbuf, temp);
+		temp = libvio_xchl(args, offset, UNALIGNED_GET32(oldbuf), atomic);
+		UNALIGNED_SET32(oldbuf, temp);
 		oldbuf = (byte_t *)oldbuf + 4;
 		newbuf = (byte_t const *)newbuf + 4;
 		num_bytes -= 4;
@@ -1547,10 +1541,8 @@ libvio_xchwithvio(struct vioargs *__restrict args,
 	}
 	while (num_bytes >= 8) {
 		u64 temp;
-		temp = libvio_xchq(args, offset,
-		                   UNALIGNED_GET64((u64 const *)oldbuf),
-		                   atomic);
-		UNALIGNED_SET64((u64 *)newbuf, temp);
+		temp = libvio_xchq(args, offset, UNALIGNED_GET64(oldbuf), atomic);
+		UNALIGNED_SET64(oldbuf, temp);
 		oldbuf = (byte_t *)oldbuf + 8;
 		newbuf = (byte_t const *)newbuf + 8;
 		num_bytes -= 8;
@@ -1558,10 +1550,8 @@ libvio_xchwithvio(struct vioargs *__restrict args,
 	}
 	if (num_bytes >= 4) {
 		u32 temp;
-		temp = libvio_xchl(args, offset,
-		                   UNALIGNED_GET32((u32 const *)oldbuf),
-		                   atomic);
-		UNALIGNED_SET32((u32 *)newbuf, temp);
+		temp = libvio_xchl(args, offset, UNALIGNED_GET32(oldbuf), atomic);
+		UNALIGNED_SET32(oldbuf, temp);
 		oldbuf = (byte_t *)oldbuf + 4;
 		newbuf = (byte_t const *)newbuf + 4;
 		num_bytes -= 4;
@@ -1570,10 +1560,8 @@ libvio_xchwithvio(struct vioargs *__restrict args,
 #else /* LIBVIO_CONFIG_HAVE_QWORD */
 	while (num_bytes >= 4) {
 		u32 temp;
-		temp = libvio_xchl(args, offset,
-		                   UNALIGNED_GET32((u32 const *)oldbuf),
-		                   atomic);
-		UNALIGNED_SET32((u32 *)newbuf, temp);
+		temp = libvio_xchl(args, offset, UNALIGNED_GET32(oldbuf), atomic);
+		UNALIGNED_SET32(oldbuf, temp);
 		oldbuf = (byte_t *)oldbuf + 4;
 		newbuf = (byte_t const *)newbuf + 4;
 		num_bytes -= 4;
@@ -1583,10 +1571,8 @@ libvio_xchwithvio(struct vioargs *__restrict args,
 	assert(num_bytes <= 3);
 	if (num_bytes >= 2) {
 		u16 temp;
-		temp = libvio_xchw(args, offset,
-		                   UNALIGNED_GET16((u16 const *)oldbuf),
-		                   atomic);
-		UNALIGNED_SET16((u16 *)newbuf, temp);
+		temp = libvio_xchw(args, offset, UNALIGNED_GET16(oldbuf), atomic);
+		UNALIGNED_SET16(oldbuf, temp);
 		oldbuf = (byte_t *)oldbuf + 2;
 		newbuf = (byte_t const *)newbuf + 2;
 		num_bytes -= 2;
@@ -1594,10 +1580,8 @@ libvio_xchwithvio(struct vioargs *__restrict args,
 	}
 	if (num_bytes) {
 		u8 temp;
-		temp = libvio_xchb(args, offset,
-		                   *(u8 const *)oldbuf,
-		                   atomic);
-		*(u8 *)newbuf = temp;
+		temp = libvio_xchb(args, offset, UNALIGNED_GET8(oldbuf), atomic);
+		UNALIGNED_SET8(oldbuf, temp);
 	}
 }
 
@@ -1665,7 +1649,7 @@ libvio_copyfromvio(struct vioargs *__restrict args,
 		{
 			u16 temp;
 			temp = libvio_readw_aligned(args, offset);
-			UNALIGNED_SET16((u16 *)buf, temp);
+			UNALIGNED_SET16(buf, temp);
 			buf = (byte_t *)buf + 2;
 			num_bytes -= 2;
 			offset += 2;
@@ -1674,14 +1658,14 @@ libvio_copyfromvio(struct vioargs *__restrict args,
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 	if ((offset & 4) && num_bytes >= 4) {
 		u32 temp = libvio_readl_aligned(args, offset);
-		UNALIGNED_SET32((u32 *)buf, temp);
+		UNALIGNED_SET32(buf, temp);
 		buf = (byte_t *)buf + 4;
 		num_bytes -= 4;
 		offset += 4;
 	}
 	while (num_bytes >= 8) {
 		u64 temp = libvio_readq_aligned(args, offset);
-		UNALIGNED_SET64((u64 *)buf, temp);
+		UNALIGNED_SET64(buf, temp);
 		buf = (byte_t *)buf + 8;
 		num_bytes -= 8;
 		offset += 8;
@@ -1701,7 +1685,7 @@ libvio_copyfromvio(struct vioargs *__restrict args,
 		}
 #endif /* __SIZEOF_BUSINT__ >= 8 */
 		temp = libvio_readl_aligned(args, offset);
-		UNALIGNED_SET32((u32 *)buf, temp);
+		UNALIGNED_SET32(buf, temp);
 		buf = (byte_t *)buf + 4;
 		num_bytes -= 4;
 		offset += 4;
@@ -1709,7 +1693,7 @@ libvio_copyfromvio(struct vioargs *__restrict args,
 #else /* LIBVIO_CONFIG_HAVE_QWORD */
 	while (num_bytes >= 4) {
 		u32 temp = libvio_readl_aligned(args, offset);
-		UNALIGNED_SET32((u32 *)buf, temp);
+		UNALIGNED_SET32(buf, temp);
 		buf = (byte_t *)buf + 4;
 		num_bytes -= 4;
 		offset += 4;
@@ -1728,7 +1712,7 @@ libvio_copyfromvio(struct vioargs *__restrict args,
 		}
 #endif /* __SIZEOF_BUSINT__ >= 4 */
 		temp = libvio_readw_aligned(args, offset);
-		UNALIGNED_SET16((u16 *)buf, temp);
+		UNALIGNED_SET16(buf, temp);
 		buf = (byte_t *)buf + 2;
 		num_bytes -= 2;
 		offset += 2;
@@ -1748,14 +1732,14 @@ libvio_copytovio(struct vioargs *__restrict args,
 	if (!num_bytes)
 		return;
 	if (offset & 1) {
-		u8 temp = *(u8 const *)buf;
+		u8 temp = UNALIGNED_GET8(buf);
 		libvio_writeb_aligned(args, offset, temp);
 		buf = (byte_t *)buf + 1;
 		--num_bytes;
 		++offset;
 	}
 	if ((offset & 2) && num_bytes >= 2) {
-		u16 temp = UNALIGNED_GET16((u16 const *)buf);
+		u16 temp = UNALIGNED_GET16(buf);
 		libvio_writew_aligned(args, offset, temp);
 		buf = (byte_t *)buf + 2;
 		num_bytes -= 2;
@@ -1763,21 +1747,21 @@ libvio_copytovio(struct vioargs *__restrict args,
 	}
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 	if ((offset & 4) && num_bytes >= 4) {
-		u32 temp = UNALIGNED_GET32((u32 const *)buf);
+		u32 temp = UNALIGNED_GET32(buf);
 		libvio_writel_aligned(args, offset, temp);
 		buf = (byte_t *)buf + 4;
 		num_bytes -= 4;
 		offset += 4;
 	}
 	while (num_bytes >= 8) {
-		u64 temp = UNALIGNED_GET64((u64 const *)buf);
+		u64 temp = UNALIGNED_GET64(buf);
 		libvio_writeq_aligned(args, offset, temp);
 		buf = (byte_t *)buf + 8;
 		num_bytes -= 8;
 		offset += 8;
 	}
 	if (num_bytes >= 4) {
-		u32 temp = UNALIGNED_GET32((u32 const *)buf);
+		u32 temp = UNALIGNED_GET32(buf);
 		libvio_writel_aligned(args, offset, temp);
 		buf = (byte_t *)buf + 4;
 		num_bytes -= 4;
@@ -1785,7 +1769,7 @@ libvio_copytovio(struct vioargs *__restrict args,
 	}
 #else /* LIBVIO_CONFIG_HAVE_QWORD */
 	while (num_bytes >= 4) {
-		u32 temp = UNALIGNED_GET32((u32 const *)buf);
+		u32 temp = UNALIGNED_GET32(buf);
 		libvio_writel_aligned(args, offset, temp);
 		buf = (byte_t *)buf + 4;
 		num_bytes -= 4;
@@ -1794,14 +1778,14 @@ libvio_copytovio(struct vioargs *__restrict args,
 #endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 	assert(num_bytes <= 3);
 	if (num_bytes >= 2) {
-		u16 temp = UNALIGNED_GET16((u16 const *)buf);
+		u16 temp = UNALIGNED_GET16(buf);
 		libvio_writew_aligned(args, offset, temp);
 		buf = (byte_t *)buf + 2;
 		num_bytes -= 2;
 		offset += 2;
 	}
 	if (num_bytes) {
-		u8 temp = *(u8 const *)buf;
+		u8 temp = UNALIGNED_GET8(buf);
 		libvio_writeb_aligned(args, offset, temp);
 	}
 }

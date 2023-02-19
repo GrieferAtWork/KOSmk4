@@ -154,7 +154,7 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 		return;
 	table = (MpConfigurationTable *)((uintptr_t)fps->mp_cfgtab + KERNEL_CORE_BASE);
 	/* Check signature. */
-	if (UNALIGNED_GET32((u32 const *)table->tab_sig) != ENCODE_INT32('P', 'C', 'M', 'P'))
+	if (UNALIGNED_GET32(table->tab_sig) != ENCODE_INT32('P', 'C', 'M', 'P'))
 		return;
 	/* Check checksum. */
 	if (smp_memsum(table, table->tab_length))

@@ -96,10 +96,10 @@ ioctl_intarg_getu32(ioctl_t cmd,
 		argsz = 4;
 	validate_readable(arg, argsz);
 	switch (__builtin_expect(argsz, 4)) {
-	case sizeof(u8):  result = (u32)*(USER CHECKED u8 const *)arg; break;
-	case sizeof(u16): result = (u32)UNALIGNED_GET16((USER CHECKED u16 const *)arg); break;
-	case sizeof(u32): result = (u32)UNALIGNED_GET32((USER CHECKED u32 const *)arg); break;
-	case sizeof(u64): result = (u32)UNALIGNED_GET64((USER CHECKED u64 const *)arg); break;
+	case sizeof(u8):  result = (u32)UNALIGNED_GET8(arg); break;
+	case sizeof(u16): result = (u32)UNALIGNED_GET16(arg); break;
+	case sizeof(u32): result = (u32)UNALIGNED_GET32(arg); break;
+	case sizeof(u64): result = (u32)UNALIGNED_GET64(arg); break;
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
@@ -117,10 +117,10 @@ ioctl_intarg_getu16(ioctl_t cmd, USER UNCHECKED void *arg)
 		argsz = 2;
 	validate_readable(arg, argsz);
 	switch (__builtin_expect(argsz, 2)) {
-	case sizeof(u8):  result = (u16)*(USER CHECKED u8 const *)arg; break;
-	case sizeof(u16): result = (u16)UNALIGNED_GET16((USER CHECKED u16 const *)arg); break;
-	case sizeof(u32): result = (u16)UNALIGNED_GET32((USER CHECKED u32 const *)arg); break;
-	case sizeof(u64): result = (u16)UNALIGNED_GET64((USER CHECKED u64 const *)arg); break;
+	case sizeof(u8):  result = (u16)UNALIGNED_GET8(arg); break;
+	case sizeof(u16): result = (u16)UNALIGNED_GET16(arg); break;
+	case sizeof(u32): result = (u16)UNALIGNED_GET32(arg); break;
+	case sizeof(u64): result = (u16)UNALIGNED_GET64(arg); break;
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
@@ -138,10 +138,10 @@ ioctl_intarg_getu8(ioctl_t cmd, USER UNCHECKED void *arg)
 		argsz = 1;
 	validate_readable(arg, argsz);
 	switch (__builtin_expect(argsz, 1)) {
-	case sizeof(u8):  result = *(USER CHECKED u8 const *)arg; break;
-	case sizeof(u16): result = (u8)UNALIGNED_GET16((USER CHECKED u16 const *)arg); break;
-	case sizeof(u32): result = (u8)UNALIGNED_GET32((USER CHECKED u32 const *)arg); break;
-	case sizeof(u64): result = (u8)UNALIGNED_GET64((USER CHECKED u64 const *)arg); break;
+	case sizeof(u8):  result = (u8)UNALIGNED_GET8(arg); break;
+	case sizeof(u16): result = (u8)UNALIGNED_GET16(arg); break;
+	case sizeof(u32): result = (u8)UNALIGNED_GET32(arg); break;
+	case sizeof(u64): result = (u8)UNALIGNED_GET64(arg); break;
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
@@ -165,10 +165,10 @@ ioctl_intarg_getu64(ioctl_t cmd,
 		argsz = 4;
 	validate_readable(arg, argsz);
 	switch (__builtin_expect(argsz, 4)) {
-	case sizeof(u8):  result = (u64)*(USER CHECKED u8 const *)arg; break;
-	case sizeof(u16): result = (u64)UNALIGNED_GET16((USER CHECKED u16 const *)arg); break;
-	case sizeof(u32): result = (u64)UNALIGNED_GET32((USER CHECKED u32 const *)arg); break;
-	case sizeof(u64): result = (u64)UNALIGNED_GET64((USER CHECKED u64 const *)arg); break;
+	case sizeof(u8):  result = (u64)UNALIGNED_GET8(arg); break;
+	case sizeof(u16): result = (u64)UNALIGNED_GET16(arg); break;
+	case sizeof(u32): result = (u64)UNALIGNED_GET32(arg); break;
+	case sizeof(u64): result = (u64)UNALIGNED_GET64(arg); break;
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
@@ -188,10 +188,10 @@ ioctl_intarg_setu32(ioctl_t cmd, USER UNCHECKED void *arg, u32 value)
 		argsz = 4;
 	validate_writable(arg, argsz);
 	switch (__builtin_expect(argsz, 4)) {
-	case sizeof(u8):  *(USER CHECKED u8 *)arg = (u8)value; break;
-	case sizeof(u16): UNALIGNED_SET16((USER CHECKED u16 *)arg, (u16)value); break;
-	case sizeof(u32): UNALIGNED_SET32((USER CHECKED u32 *)arg, (u32)value); break;
-	case sizeof(u64): UNALIGNED_SET64((USER CHECKED u64 *)arg, (u64)value); break;
+	case sizeof(u8):  UNALIGNED_SET8(arg, (u8)value); break;
+	case sizeof(u16): UNALIGNED_SET16(arg, (u16)value); break;
+	case sizeof(u32): UNALIGNED_SET32(arg, (u32)value); break;
+	case sizeof(u64): UNALIGNED_SET64(arg, (u64)value); break;
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
@@ -210,10 +210,10 @@ ioctl_intarg_setu64(ioctl_t cmd, USER UNCHECKED void *arg, u64 value)
 		argsz = 8;
 	validate_writable(arg, argsz);
 	switch (__builtin_expect(argsz, 8)) {
-	case sizeof(u8):  *(USER CHECKED u8 *)arg = (u8)value; break;
-	case sizeof(u16): UNALIGNED_SET16((USER CHECKED u16 *)arg, (u16)value); break;
-	case sizeof(u32): UNALIGNED_SET32((USER CHECKED u32 *)arg, (u32)value); break;
-	case sizeof(u64): UNALIGNED_SET64((USER CHECKED u64 *)arg, (u64)value); break;
+	case sizeof(u8):  UNALIGNED_SET8(arg, (u8)value); break;
+	case sizeof(u16): UNALIGNED_SET16(arg, (u16)value); break;
+	case sizeof(u32): UNALIGNED_SET32(arg, (u32)value); break;
+	case sizeof(u64): UNALIGNED_SET64(arg, (u64)value); break;
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
@@ -235,10 +235,10 @@ ioctl_intarg_sets32(ioctl_t cmd, USER UNCHECKED void *arg, s32 value)
 		argsz = 4;
 	validate_writable(arg, argsz);
 	switch (__builtin_expect(argsz, 4)) {
-	case sizeof(u8):  *(USER CHECKED u8 *)arg = (u8)(u32)value; break;
-	case sizeof(u16): UNALIGNED_SET16((USER CHECKED u16 *)arg, (u16)(u32)value); break;
-	case sizeof(u32): UNALIGNED_SET32((USER CHECKED u32 *)arg, (u32)value); break;
-	case sizeof(u64): UNALIGNED_SET64((USER CHECKED u64 *)arg, (u64)(s64)value); break;
+	case sizeof(u8):  UNALIGNED_SET8(arg, (u8)(u32)value); break;
+	case sizeof(u16): UNALIGNED_SET16(arg, (u16)(u32)value); break;
+	case sizeof(u32): UNALIGNED_SET32(arg, (u32)value); break;
+	case sizeof(u64): UNALIGNED_SET64(arg, (u64)(s64)value); break;
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
@@ -255,10 +255,10 @@ ioctl_intarg_setu16(ioctl_t cmd, USER UNCHECKED void *arg, u16 value)
 		argsz = 2;
 	validate_writable(arg, argsz);
 	switch (__builtin_expect(argsz, 2)) {
-	case sizeof(u8):  *(USER CHECKED u8 *)arg = (u8)value; break;
-	case sizeof(u16): UNALIGNED_SET16((USER CHECKED u16 *)arg, (u16)value); break;
-	case sizeof(u32): UNALIGNED_SET32((USER CHECKED u32 *)arg, (u32)value); break;
-	case sizeof(u64): UNALIGNED_SET64((USER CHECKED u64 *)arg, (u64)value); break;
+	case sizeof(u8):  UNALIGNED_SET8(arg, (u8)value); break;
+	case sizeof(u16): UNALIGNED_SET16(arg, (u16)value); break;
+	case sizeof(u32): UNALIGNED_SET32(arg, (u32)value); break;
+	case sizeof(u64): UNALIGNED_SET64(arg, (u64)value); break;
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
@@ -275,10 +275,10 @@ ioctl_intarg_sets16(ioctl_t cmd, USER UNCHECKED void *arg, s16 value)
 		argsz = 2;
 	validate_writable(arg, argsz);
 	switch (__builtin_expect(argsz, 2)) {
-	case sizeof(u8):  *(USER CHECKED u8 *)arg = (u8)(u16)value; break;
-	case sizeof(u16): UNALIGNED_SET16((USER CHECKED u16 *)arg, (u16)value); break;
-	case sizeof(u32): UNALIGNED_SET32((USER CHECKED u32 *)arg, (u32)(s32)value); break;
-	case sizeof(u64): UNALIGNED_SET64((USER CHECKED u64 *)arg, (u64)(s64)value); break;
+	case sizeof(u8):  UNALIGNED_SET8(arg, (u8)(u16)value); break;
+	case sizeof(u16): UNALIGNED_SET16(arg, (u16)value); break;
+	case sizeof(u32): UNALIGNED_SET32(arg, (u32)(s32)value); break;
+	case sizeof(u64): UNALIGNED_SET64(arg, (u64)(s64)value); break;
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
@@ -295,10 +295,10 @@ ioctl_intarg_setu8(ioctl_t cmd, USER UNCHECKED void *arg, u8 value)
 		argsz = 1;
 	validate_writable(arg, argsz);
 	switch (__builtin_expect(argsz, 1)) {
-	case sizeof(u8):  *(USER CHECKED u8 *)arg = (u8)value; break;
-	case sizeof(u16): UNALIGNED_SET16((USER CHECKED u16 *)arg, (u16)value); break;
-	case sizeof(u32): UNALIGNED_SET32((USER CHECKED u32 *)arg, (u32)value); break;
-	case sizeof(u64): UNALIGNED_SET64((USER CHECKED u64 *)arg, (u64)value); break;
+	case sizeof(u8):  UNALIGNED_SET8(arg, (u8)value); break;
+	case sizeof(u16): UNALIGNED_SET16(arg, (u16)value); break;
+	case sizeof(u32): UNALIGNED_SET32(arg, (u32)value); break;
+	case sizeof(u64): UNALIGNED_SET64(arg, (u64)value); break;
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
@@ -315,10 +315,10 @@ ioctl_intarg_sets8(ioctl_t cmd, USER UNCHECKED void *arg, s8 value)
 		argsz = 1;
 	validate_writable(arg, argsz);
 	switch (__builtin_expect(argsz, 1)) {
-	case sizeof(u8):  *(USER CHECKED u8 *)arg = (u8)value; break;
-	case sizeof(u16): UNALIGNED_SET16((USER CHECKED u16 *)arg, (u16)(s16)value); break;
-	case sizeof(u32): UNALIGNED_SET32((USER CHECKED u32 *)arg, (u32)(s32)value); break;
-	case sizeof(u64): UNALIGNED_SET64((USER CHECKED u64 *)arg, (u64)(s64)value); break;
+	case sizeof(u8):  UNALIGNED_SET8(arg, (u8)value); break;
+	case sizeof(u16): UNALIGNED_SET16(arg, (u16)(s16)value); break;
+	case sizeof(u32): UNALIGNED_SET32(arg, (u32)(s32)value); break;
+	case sizeof(u64): UNALIGNED_SET64(arg, (u64)(s64)value); break;
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
@@ -362,10 +362,10 @@ ioctl_intarg_getsize(ioctl_t cmd,
 	}
 	validate_readable(arg, argsz);
 	switch (__builtin_expect(argsz, __SIZEOF_SIZE_T__)) {
-	case sizeof(u8):  result = (size_t)*(USER CHECKED u8 const *)arg; break;
-	case sizeof(u16): result = (size_t)UNALIGNED_GET16((USER CHECKED u16 const *)arg); break;
-	case sizeof(u32): result = (size_t)UNALIGNED_GET32((USER CHECKED u32 const *)arg); break;
-	case sizeof(u64): result = (size_t)UNALIGNED_GET64((USER CHECKED u64 const *)arg); break;
+	case sizeof(u8):  result = (size_t)UNALIGNED_GET8(arg); break;
+	case sizeof(u16): result = (size_t)UNALIGNED_GET16(arg); break;
+	case sizeof(u32): result = (size_t)UNALIGNED_GET32(arg); break;
+	case sizeof(u64): result = (size_t)UNALIGNED_GET64(arg); break;
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
@@ -393,10 +393,10 @@ ioctl_intarg_setsize(ioctl_t cmd, USER UNCHECKED void *arg, size_t value)
 	}
 	validate_writable(arg, argsz);
 	switch (__builtin_expect(argsz, __SIZEOF_SIZE_T__)) {
-	case sizeof(u8):  *(USER CHECKED u8 *)arg = (u8)value; break;
-	case sizeof(u16): UNALIGNED_SET16((USER CHECKED u16 *)arg, (u16)value); break;
-	case sizeof(u32): UNALIGNED_SET32((USER CHECKED u32 *)arg, (u32)value); break;
-	case sizeof(u64): UNALIGNED_SET64((USER CHECKED u64 *)arg, (u64)value); break;
+	case sizeof(u8):  UNALIGNED_SET8(arg, (u8)value); break;
+	case sizeof(u16): UNALIGNED_SET16(arg, (u16)value); break;
+	case sizeof(u32): UNALIGNED_SET32(arg, (u32)value); break;
+	case sizeof(u64): UNALIGNED_SET64(arg, (u64)value); break;
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,

@@ -34,10 +34,10 @@ case EMU86_OPCODE_ENCODE(0xe8): {
 	s32 offset;
 	IF_16BIT_OR_32BIT(
 	if (IS_16BIT() && !EMU86_F_IS64(op_flags)) {
-		offset = (s32)(s16)UNALIGNED_GETLE16((u16 const *)pc);
+		offset = (s32)(s16)UNALIGNED_GETLE16(pc);
 		pc += 2;
 	} else) {
-		offset = (s32)UNALIGNED_GETLE32((u32 const *)pc);
+		offset = (s32)UNALIGNED_GETLE32(pc);
 		pc += 4;
 	}
 	dest_ip = REAL_IP() + offset;

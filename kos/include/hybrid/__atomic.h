@@ -129,7 +129,393 @@
 
 /* HINT: In order to have full atomic support, we need at least an cmpxch/cmpxch_weak function */
 #ifdef __CC__
-#ifdef __HYBRID_ATOMIC_USE_LIBATOMIC
+#ifdef __INTELLISENSE__
+__DECL_BEGIN
+
+#define __hybrid_atomic_load8        __hybrid_atomic_load8
+#define __hybrid_atomic_store8       __hybrid_atomic_store8
+#define __hybrid_atomic_xch8         __hybrid_atomic_xch8
+#define __hybrid_atomic_cmpxch8      __hybrid_atomic_cmpxch8
+#define __hybrid_atomic_cmpxch_weak8 __hybrid_atomic_cmpxch_weak8
+#define __hybrid_atomic_cmpxch_val8  __hybrid_atomic_cmpxch_val8
+#define __hybrid_atomic_incfetch8    __hybrid_atomic_incfetch8
+#define __hybrid_atomic_decfetch8    __hybrid_atomic_decfetch8
+#define __hybrid_atomic_addfetch8    __hybrid_atomic_addfetch8
+#define __hybrid_atomic_subfetch8    __hybrid_atomic_subfetch8
+#define __hybrid_atomic_andfetch8    __hybrid_atomic_andfetch8
+#define __hybrid_atomic_orfetch8     __hybrid_atomic_orfetch8
+#define __hybrid_atomic_xorfetch8    __hybrid_atomic_xorfetch8
+#define __hybrid_atomic_nandfetch8   __hybrid_atomic_nandfetch8
+#define __hybrid_atomic_fetchinc8    __hybrid_atomic_fetchinc8
+#define __hybrid_atomic_fetchdec8    __hybrid_atomic_fetchdec8
+#define __hybrid_atomic_fetchadd8    __hybrid_atomic_fetchadd8
+#define __hybrid_atomic_fetchsub8    __hybrid_atomic_fetchsub8
+#define __hybrid_atomic_fetchand8    __hybrid_atomic_fetchand8
+#define __hybrid_atomic_fetchor8     __hybrid_atomic_fetchor8
+#define __hybrid_atomic_fetchxor8    __hybrid_atomic_fetchxor8
+#define __hybrid_atomic_fetchnand8   __hybrid_atomic_fetchnand8
+#define __hybrid_atomic_inc8         __hybrid_atomic_inc8
+#define __hybrid_atomic_dec8         __hybrid_atomic_dec8
+#define __hybrid_atomic_add8         __hybrid_atomic_add8
+#define __hybrid_atomic_sub8         __hybrid_atomic_sub8
+#define __hybrid_atomic_and8         __hybrid_atomic_and8
+#define __hybrid_atomic_or8          __hybrid_atomic_or8
+#define __hybrid_atomic_xor8         __hybrid_atomic_xor8
+#define __hybrid_atomic_nand8        __hybrid_atomic_nand8
+extern __UINT8_TYPE__ __hybrid_atomic_load8(__UINT8_TYPE__ const volatile *__ptr, int __order);
+extern void __hybrid_atomic_store8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern __UINT8_TYPE__ __hybrid_atomic_xch8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern bool __hybrid_atomic_cmpxch8(__UINT8_TYPE__ volatile *__p, __UINT8_TYPE__ __oldval, __UINT8_TYPE__ __newval, int __succ, int __fail);
+extern bool __hybrid_atomic_cmpxch_weak8(__UINT8_TYPE__ volatile *__p, __UINT8_TYPE__ __oldval, __UINT8_TYPE__ __newval, int __succ, int __fail);
+extern __UINT8_TYPE__ __hybrid_atomic_cmpxch_val8(__UINT8_TYPE__ volatile *__p, __UINT8_TYPE__ __oldval, __UINT8_TYPE__ __newval, int __succ, int __fail);
+extern __UINT8_TYPE__ __hybrid_atomic_incfetch8(__UINT8_TYPE__ volatile *__ptr, int __order);
+extern __UINT8_TYPE__ __hybrid_atomic_decfetch8(__UINT8_TYPE__ volatile *__ptr, int __order);
+extern __UINT8_TYPE__ __hybrid_atomic_addfetch8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern __UINT8_TYPE__ __hybrid_atomic_subfetch8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern __UINT8_TYPE__ __hybrid_atomic_andfetch8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern __UINT8_TYPE__ __hybrid_atomic_orfetch8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern __UINT8_TYPE__ __hybrid_atomic_xorfetch8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern __UINT8_TYPE__ __hybrid_atomic_nandfetch8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern __UINT8_TYPE__ __hybrid_atomic_fetchinc8(__UINT8_TYPE__ volatile *__ptr, int __order);
+extern __UINT8_TYPE__ __hybrid_atomic_fetchdec8(__UINT8_TYPE__ volatile *__ptr, int __order);
+extern __UINT8_TYPE__ __hybrid_atomic_fetchadd8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern __UINT8_TYPE__ __hybrid_atomic_fetchsub8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern __UINT8_TYPE__ __hybrid_atomic_fetchand8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern __UINT8_TYPE__ __hybrid_atomic_fetchor8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern __UINT8_TYPE__ __hybrid_atomic_fetchxor8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern __UINT8_TYPE__ __hybrid_atomic_fetchnand8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern void __hybrid_atomic_inc8(__UINT8_TYPE__ volatile *__ptr, int __order);
+extern void __hybrid_atomic_dec8(__UINT8_TYPE__ volatile *__ptr, int __order);
+extern void __hybrid_atomic_add8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern void __hybrid_atomic_sub8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern void __hybrid_atomic_and8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern void __hybrid_atomic_or8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern void __hybrid_atomic_xor8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+extern void __hybrid_atomic_nand8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
+
+#define __hybrid_atomic_load16        __hybrid_atomic_load16
+#define __hybrid_atomic_store16       __hybrid_atomic_store16
+#define __hybrid_atomic_xch16         __hybrid_atomic_xch16
+#define __hybrid_atomic_cmpxch16      __hybrid_atomic_cmpxch16
+#define __hybrid_atomic_cmpxch_weak16 __hybrid_atomic_cmpxch_weak16
+#define __hybrid_atomic_cmpxch_val16  __hybrid_atomic_cmpxch_val16
+#define __hybrid_atomic_incfetch16    __hybrid_atomic_incfetch16
+#define __hybrid_atomic_decfetch16    __hybrid_atomic_decfetch16
+#define __hybrid_atomic_addfetch16    __hybrid_atomic_addfetch16
+#define __hybrid_atomic_subfetch16    __hybrid_atomic_subfetch16
+#define __hybrid_atomic_andfetch16    __hybrid_atomic_andfetch16
+#define __hybrid_atomic_orfetch16     __hybrid_atomic_orfetch16
+#define __hybrid_atomic_xorfetch16    __hybrid_atomic_xorfetch16
+#define __hybrid_atomic_nandfetch16   __hybrid_atomic_nandfetch16
+#define __hybrid_atomic_fetchinc16    __hybrid_atomic_fetchinc16
+#define __hybrid_atomic_fetchdec16    __hybrid_atomic_fetchdec16
+#define __hybrid_atomic_fetchadd16    __hybrid_atomic_fetchadd16
+#define __hybrid_atomic_fetchsub16    __hybrid_atomic_fetchsub16
+#define __hybrid_atomic_fetchand16    __hybrid_atomic_fetchand16
+#define __hybrid_atomic_fetchor16     __hybrid_atomic_fetchor16
+#define __hybrid_atomic_fetchxor16    __hybrid_atomic_fetchxor16
+#define __hybrid_atomic_fetchnand16   __hybrid_atomic_fetchnand16
+#define __hybrid_atomic_inc16         __hybrid_atomic_inc16
+#define __hybrid_atomic_dec16         __hybrid_atomic_dec16
+#define __hybrid_atomic_add16         __hybrid_atomic_add16
+#define __hybrid_atomic_sub16         __hybrid_atomic_sub16
+#define __hybrid_atomic_and16         __hybrid_atomic_and16
+#define __hybrid_atomic_or16          __hybrid_atomic_or16
+#define __hybrid_atomic_xor16         __hybrid_atomic_xor16
+#define __hybrid_atomic_nand16        __hybrid_atomic_nand16
+extern __UINT16_TYPE__ __hybrid_atomic_load16(__UINT16_TYPE__ const volatile *__ptr, int __order);
+extern void __hybrid_atomic_store16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern __UINT16_TYPE__ __hybrid_atomic_xch16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern bool __hybrid_atomic_cmpxch16(__UINT16_TYPE__ volatile *__p, __UINT16_TYPE__ __oldval, __UINT16_TYPE__ __newval, int __succ, int __fail);
+extern bool __hybrid_atomic_cmpxch_weak16(__UINT16_TYPE__ volatile *__p, __UINT16_TYPE__ __oldval, __UINT16_TYPE__ __newval, int __succ, int __fail);
+extern __UINT16_TYPE__ __hybrid_atomic_cmpxch_val16(__UINT16_TYPE__ volatile *__p, __UINT16_TYPE__ __oldval, __UINT16_TYPE__ __newval, int __succ, int __fail);
+extern __UINT16_TYPE__ __hybrid_atomic_incfetch16(__UINT16_TYPE__ volatile *__ptr, int __order);
+extern __UINT16_TYPE__ __hybrid_atomic_decfetch16(__UINT16_TYPE__ volatile *__ptr, int __order);
+extern __UINT16_TYPE__ __hybrid_atomic_addfetch16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern __UINT16_TYPE__ __hybrid_atomic_subfetch16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern __UINT16_TYPE__ __hybrid_atomic_andfetch16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern __UINT16_TYPE__ __hybrid_atomic_orfetch16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern __UINT16_TYPE__ __hybrid_atomic_xorfetch16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern __UINT16_TYPE__ __hybrid_atomic_nandfetch16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern __UINT16_TYPE__ __hybrid_atomic_fetchinc16(__UINT16_TYPE__ volatile *__ptr, int __order);
+extern __UINT16_TYPE__ __hybrid_atomic_fetchdec16(__UINT16_TYPE__ volatile *__ptr, int __order);
+extern __UINT16_TYPE__ __hybrid_atomic_fetchadd16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern __UINT16_TYPE__ __hybrid_atomic_fetchsub16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern __UINT16_TYPE__ __hybrid_atomic_fetchand16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern __UINT16_TYPE__ __hybrid_atomic_fetchor16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern __UINT16_TYPE__ __hybrid_atomic_fetchxor16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern __UINT16_TYPE__ __hybrid_atomic_fetchnand16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern void __hybrid_atomic_inc16(__UINT16_TYPE__ volatile *__ptr, int __order);
+extern void __hybrid_atomic_dec16(__UINT16_TYPE__ volatile *__ptr, int __order);
+extern void __hybrid_atomic_add16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern void __hybrid_atomic_sub16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern void __hybrid_atomic_and16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern void __hybrid_atomic_or16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern void __hybrid_atomic_xor16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+extern void __hybrid_atomic_nand16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
+
+#define __hybrid_atomic_load32        __hybrid_atomic_load32
+#define __hybrid_atomic_store32       __hybrid_atomic_store32
+#define __hybrid_atomic_xch32         __hybrid_atomic_xch32
+#define __hybrid_atomic_cmpxch32      __hybrid_atomic_cmpxch32
+#define __hybrid_atomic_cmpxch_weak32 __hybrid_atomic_cmpxch_weak32
+#define __hybrid_atomic_cmpxch_val32  __hybrid_atomic_cmpxch_val32
+#define __hybrid_atomic_incfetch32    __hybrid_atomic_incfetch32
+#define __hybrid_atomic_decfetch32    __hybrid_atomic_decfetch32
+#define __hybrid_atomic_addfetch32    __hybrid_atomic_addfetch32
+#define __hybrid_atomic_subfetch32    __hybrid_atomic_subfetch32
+#define __hybrid_atomic_andfetch32    __hybrid_atomic_andfetch32
+#define __hybrid_atomic_orfetch32     __hybrid_atomic_orfetch32
+#define __hybrid_atomic_xorfetch32    __hybrid_atomic_xorfetch32
+#define __hybrid_atomic_nandfetch32   __hybrid_atomic_nandfetch32
+#define __hybrid_atomic_fetchinc32    __hybrid_atomic_fetchinc32
+#define __hybrid_atomic_fetchdec32    __hybrid_atomic_fetchdec32
+#define __hybrid_atomic_fetchadd32    __hybrid_atomic_fetchadd32
+#define __hybrid_atomic_fetchsub32    __hybrid_atomic_fetchsub32
+#define __hybrid_atomic_fetchand32    __hybrid_atomic_fetchand32
+#define __hybrid_atomic_fetchor32     __hybrid_atomic_fetchor32
+#define __hybrid_atomic_fetchxor32    __hybrid_atomic_fetchxor32
+#define __hybrid_atomic_fetchnand32   __hybrid_atomic_fetchnand32
+#define __hybrid_atomic_inc32         __hybrid_atomic_inc32
+#define __hybrid_atomic_dec32         __hybrid_atomic_dec32
+#define __hybrid_atomic_add32         __hybrid_atomic_add32
+#define __hybrid_atomic_sub32         __hybrid_atomic_sub32
+#define __hybrid_atomic_and32         __hybrid_atomic_and32
+#define __hybrid_atomic_or32          __hybrid_atomic_or32
+#define __hybrid_atomic_xor32         __hybrid_atomic_xor32
+#define __hybrid_atomic_nand32        __hybrid_atomic_nand32
+extern __UINT32_TYPE__ __hybrid_atomic_load32(__UINT32_TYPE__ const volatile *__ptr, int __order);
+extern void __hybrid_atomic_store32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern __UINT32_TYPE__ __hybrid_atomic_xch32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern bool __hybrid_atomic_cmpxch32(__UINT32_TYPE__ volatile *__p, __UINT32_TYPE__ __oldval, __UINT32_TYPE__ __newval, int __succ, int __fail);
+extern bool __hybrid_atomic_cmpxch_weak32(__UINT32_TYPE__ volatile *__p, __UINT32_TYPE__ __oldval, __UINT32_TYPE__ __newval, int __succ, int __fail);
+extern __UINT32_TYPE__ __hybrid_atomic_cmpxch_val32(__UINT32_TYPE__ volatile *__p, __UINT32_TYPE__ __oldval, __UINT32_TYPE__ __newval, int __succ, int __fail);
+extern __UINT32_TYPE__ __hybrid_atomic_incfetch32(__UINT32_TYPE__ volatile *__ptr, int __order);
+extern __UINT32_TYPE__ __hybrid_atomic_decfetch32(__UINT32_TYPE__ volatile *__ptr, int __order);
+extern __UINT32_TYPE__ __hybrid_atomic_addfetch32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern __UINT32_TYPE__ __hybrid_atomic_subfetch32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern __UINT32_TYPE__ __hybrid_atomic_andfetch32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern __UINT32_TYPE__ __hybrid_atomic_orfetch32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern __UINT32_TYPE__ __hybrid_atomic_xorfetch32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern __UINT32_TYPE__ __hybrid_atomic_nandfetch32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern __UINT32_TYPE__ __hybrid_atomic_fetchinc32(__UINT32_TYPE__ volatile *__ptr, int __order);
+extern __UINT32_TYPE__ __hybrid_atomic_fetchdec32(__UINT32_TYPE__ volatile *__ptr, int __order);
+extern __UINT32_TYPE__ __hybrid_atomic_fetchadd32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern __UINT32_TYPE__ __hybrid_atomic_fetchsub32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern __UINT32_TYPE__ __hybrid_atomic_fetchand32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern __UINT32_TYPE__ __hybrid_atomic_fetchor32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern __UINT32_TYPE__ __hybrid_atomic_fetchxor32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern __UINT32_TYPE__ __hybrid_atomic_fetchnand32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern void __hybrid_atomic_inc32(__UINT32_TYPE__ volatile *__ptr, int __order);
+extern void __hybrid_atomic_dec32(__UINT32_TYPE__ volatile *__ptr, int __order);
+extern void __hybrid_atomic_add32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern void __hybrid_atomic_sub32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern void __hybrid_atomic_and32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern void __hybrid_atomic_or32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern void __hybrid_atomic_xor32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+extern void __hybrid_atomic_nand32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
+
+#ifdef __UINT64_TYPE__
+#define __hybrid_atomic_load64        __hybrid_atomic_load64
+#define __hybrid_atomic_store64       __hybrid_atomic_store64
+#define __hybrid_atomic_xch64         __hybrid_atomic_xch64
+#define __hybrid_atomic_cmpxch64      __hybrid_atomic_cmpxch64
+#define __hybrid_atomic_cmpxch_weak64 __hybrid_atomic_cmpxch_weak64
+#define __hybrid_atomic_cmpxch_val64  __hybrid_atomic_cmpxch_val64
+#define __hybrid_atomic_incfetch64    __hybrid_atomic_incfetch64
+#define __hybrid_atomic_decfetch64    __hybrid_atomic_decfetch64
+#define __hybrid_atomic_addfetch64    __hybrid_atomic_addfetch64
+#define __hybrid_atomic_subfetch64    __hybrid_atomic_subfetch64
+#define __hybrid_atomic_andfetch64    __hybrid_atomic_andfetch64
+#define __hybrid_atomic_orfetch64     __hybrid_atomic_orfetch64
+#define __hybrid_atomic_xorfetch64    __hybrid_atomic_xorfetch64
+#define __hybrid_atomic_nandfetch64   __hybrid_atomic_nandfetch64
+#define __hybrid_atomic_fetchinc64    __hybrid_atomic_fetchinc64
+#define __hybrid_atomic_fetchdec64    __hybrid_atomic_fetchdec64
+#define __hybrid_atomic_fetchadd64    __hybrid_atomic_fetchadd64
+#define __hybrid_atomic_fetchsub64    __hybrid_atomic_fetchsub64
+#define __hybrid_atomic_fetchand64    __hybrid_atomic_fetchand64
+#define __hybrid_atomic_fetchor64     __hybrid_atomic_fetchor64
+#define __hybrid_atomic_fetchxor64    __hybrid_atomic_fetchxor64
+#define __hybrid_atomic_fetchnand64   __hybrid_atomic_fetchnand64
+#define __hybrid_atomic_inc64         __hybrid_atomic_inc64
+#define __hybrid_atomic_dec64         __hybrid_atomic_dec64
+#define __hybrid_atomic_add64         __hybrid_atomic_add64
+#define __hybrid_atomic_sub64         __hybrid_atomic_sub64
+#define __hybrid_atomic_and64         __hybrid_atomic_and64
+#define __hybrid_atomic_or64          __hybrid_atomic_or64
+#define __hybrid_atomic_xor64         __hybrid_atomic_xor64
+#define __hybrid_atomic_nand64        __hybrid_atomic_nand64
+extern __UINT64_TYPE__ __hybrid_atomic_load64(__UINT64_TYPE__ const volatile *__ptr, int __order);
+extern void __hybrid_atomic_store64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern __UINT64_TYPE__ __hybrid_atomic_xch64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern bool __hybrid_atomic_cmpxch64(__UINT64_TYPE__ volatile *__p, __UINT64_TYPE__ __oldval, __UINT64_TYPE__ __newval, int __succ, int __fail);
+extern bool __hybrid_atomic_cmpxch_weak64(__UINT64_TYPE__ volatile *__p, __UINT64_TYPE__ __oldval, __UINT64_TYPE__ __newval, int __succ, int __fail);
+extern __UINT64_TYPE__ __hybrid_atomic_cmpxch_val64(__UINT64_TYPE__ volatile *__p, __UINT64_TYPE__ __oldval, __UINT64_TYPE__ __newval, int __succ, int __fail);
+extern __UINT64_TYPE__ __hybrid_atomic_incfetch64(__UINT64_TYPE__ volatile *__ptr, int __order);
+extern __UINT64_TYPE__ __hybrid_atomic_decfetch64(__UINT64_TYPE__ volatile *__ptr, int __order);
+extern __UINT64_TYPE__ __hybrid_atomic_addfetch64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern __UINT64_TYPE__ __hybrid_atomic_subfetch64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern __UINT64_TYPE__ __hybrid_atomic_andfetch64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern __UINT64_TYPE__ __hybrid_atomic_orfetch64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern __UINT64_TYPE__ __hybrid_atomic_xorfetch64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern __UINT64_TYPE__ __hybrid_atomic_nandfetch64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern __UINT64_TYPE__ __hybrid_atomic_fetchinc64(__UINT64_TYPE__ volatile *__ptr, int __order);
+extern __UINT64_TYPE__ __hybrid_atomic_fetchdec64(__UINT64_TYPE__ volatile *__ptr, int __order);
+extern __UINT64_TYPE__ __hybrid_atomic_fetchadd64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern __UINT64_TYPE__ __hybrid_atomic_fetchsub64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern __UINT64_TYPE__ __hybrid_atomic_fetchand64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern __UINT64_TYPE__ __hybrid_atomic_fetchor64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern __UINT64_TYPE__ __hybrid_atomic_fetchxor64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern __UINT64_TYPE__ __hybrid_atomic_fetchnand64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern void __hybrid_atomic_inc64(__UINT64_TYPE__ volatile *__ptr, int __order);
+extern void __hybrid_atomic_dec64(__UINT64_TYPE__ volatile *__ptr, int __order);
+extern void __hybrid_atomic_add64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern void __hybrid_atomic_sub64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern void __hybrid_atomic_and64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern void __hybrid_atomic_or64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern void __hybrid_atomic_xor64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+extern void __hybrid_atomic_nand64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
+#endif /* __UINT64_TYPE__ */
+
+#ifdef __UINT128_TYPE__
+#define __hybrid_atomic_load128        __hybrid_atomic_load128
+#define __hybrid_atomic_store128       __hybrid_atomic_store128
+#define __hybrid_atomic_xch128         __hybrid_atomic_xch128
+#define __hybrid_atomic_cmpxch128      __hybrid_atomic_cmpxch128
+#define __hybrid_atomic_cmpxch_weak128 __hybrid_atomic_cmpxch_weak128
+#define __hybrid_atomic_cmpxch_val128  __hybrid_atomic_cmpxch_val128
+#define __hybrid_atomic_incfetch128    __hybrid_atomic_incfetch128
+#define __hybrid_atomic_decfetch128    __hybrid_atomic_decfetch128
+#define __hybrid_atomic_addfetch128    __hybrid_atomic_addfetch128
+#define __hybrid_atomic_subfetch128    __hybrid_atomic_subfetch128
+#define __hybrid_atomic_andfetch128    __hybrid_atomic_andfetch128
+#define __hybrid_atomic_orfetch128     __hybrid_atomic_orfetch128
+#define __hybrid_atomic_xorfetch128    __hybrid_atomic_xorfetch128
+#define __hybrid_atomic_nandfetch128   __hybrid_atomic_nandfetch128
+#define __hybrid_atomic_fetchinc128    __hybrid_atomic_fetchinc128
+#define __hybrid_atomic_fetchdec128    __hybrid_atomic_fetchdec128
+#define __hybrid_atomic_fetchadd128    __hybrid_atomic_fetchadd128
+#define __hybrid_atomic_fetchsub128    __hybrid_atomic_fetchsub128
+#define __hybrid_atomic_fetchand128    __hybrid_atomic_fetchand128
+#define __hybrid_atomic_fetchor128     __hybrid_atomic_fetchor128
+#define __hybrid_atomic_fetchxor128    __hybrid_atomic_fetchxor128
+#define __hybrid_atomic_fetchnand128   __hybrid_atomic_fetchnand128
+#define __hybrid_atomic_inc128         __hybrid_atomic_inc128
+#define __hybrid_atomic_dec128         __hybrid_atomic_dec128
+#define __hybrid_atomic_add128         __hybrid_atomic_add128
+#define __hybrid_atomic_sub128         __hybrid_atomic_sub128
+#define __hybrid_atomic_and128         __hybrid_atomic_and128
+#define __hybrid_atomic_or128          __hybrid_atomic_or128
+#define __hybrid_atomic_xor128         __hybrid_atomic_xor128
+#define __hybrid_atomic_nand128        __hybrid_atomic_nand128
+extern __UINT128_TYPE__ __hybrid_atomic_load128(__UINT128_TYPE__ const volatile *__ptr, int __order);
+extern void __hybrid_atomic_store128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern __UINT128_TYPE__ __hybrid_atomic_xch128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern bool __hybrid_atomic_cmpxch128(__UINT128_TYPE__ volatile *__p, __UINT128_TYPE__ __oldval, __UINT128_TYPE__ __newval, int __succ, int __fail);
+extern bool __hybrid_atomic_cmpxch_weak128(__UINT128_TYPE__ volatile *__p, __UINT128_TYPE__ __oldval, __UINT128_TYPE__ __newval, int __succ, int __fail);
+extern __UINT128_TYPE__ __hybrid_atomic_cmpxch_val128(__UINT128_TYPE__ volatile *__p, __UINT128_TYPE__ __oldval, __UINT128_TYPE__ __newval, int __succ, int __fail);
+extern __UINT128_TYPE__ __hybrid_atomic_incfetch128(__UINT128_TYPE__ volatile *__ptr, int __order);
+extern __UINT128_TYPE__ __hybrid_atomic_decfetch128(__UINT128_TYPE__ volatile *__ptr, int __order);
+extern __UINT128_TYPE__ __hybrid_atomic_addfetch128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern __UINT128_TYPE__ __hybrid_atomic_subfetch128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern __UINT128_TYPE__ __hybrid_atomic_andfetch128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern __UINT128_TYPE__ __hybrid_atomic_orfetch128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern __UINT128_TYPE__ __hybrid_atomic_xorfetch128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern __UINT128_TYPE__ __hybrid_atomic_nandfetch128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern __UINT128_TYPE__ __hybrid_atomic_fetchinc128(__UINT128_TYPE__ volatile *__ptr, int __order);
+extern __UINT128_TYPE__ __hybrid_atomic_fetchdec128(__UINT128_TYPE__ volatile *__ptr, int __order);
+extern __UINT128_TYPE__ __hybrid_atomic_fetchadd128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern __UINT128_TYPE__ __hybrid_atomic_fetchsub128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern __UINT128_TYPE__ __hybrid_atomic_fetchand128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern __UINT128_TYPE__ __hybrid_atomic_fetchor128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern __UINT128_TYPE__ __hybrid_atomic_fetchxor128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern __UINT128_TYPE__ __hybrid_atomic_fetchnand128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern void __hybrid_atomic_inc128(__UINT128_TYPE__ volatile *__ptr, int __order);
+extern void __hybrid_atomic_dec128(__UINT128_TYPE__ volatile *__ptr, int __order);
+extern void __hybrid_atomic_add128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern void __hybrid_atomic_sub128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern void __hybrid_atomic_and128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern void __hybrid_atomic_or128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern void __hybrid_atomic_xor128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+extern void __hybrid_atomic_nand128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
+#endif /* __UINT128_TYPE__ */
+
+#define __hybrid_atomic_thread_fence __hybrid_atomic_thread_fence
+#define __hybrid_atomic_signal_fence __hybrid_atomic_signal_fence
+void __hybrid_atomic_thread_fence(int __order);
+void __hybrid_atomic_signal_fence(int __order);
+__DECL_END
+
+#ifdef __cplusplus
+#define __hybrid_atomic_load        __hybrid_atomic_load
+#define __hybrid_atomic_store       __hybrid_atomic_store
+#define __hybrid_atomic_xch         __hybrid_atomic_xch
+#define __hybrid_atomic_cmpxch      __hybrid_atomic_cmpxch
+#define __hybrid_atomic_cmpxch_weak __hybrid_atomic_cmpxch_weak
+#define __hybrid_atomic_cmpxch_val  __hybrid_atomic_cmpxch_val
+#define __hybrid_atomic_incfetch    __hybrid_atomic_incfetch
+#define __hybrid_atomic_decfetch    __hybrid_atomic_decfetch
+#define __hybrid_atomic_addfetch    __hybrid_atomic_addfetch
+#define __hybrid_atomic_subfetch    __hybrid_atomic_subfetch
+#define __hybrid_atomic_andfetch    __hybrid_atomic_andfetch
+#define __hybrid_atomic_orfetch     __hybrid_atomic_orfetch
+#define __hybrid_atomic_xorfetch    __hybrid_atomic_xorfetch
+#define __hybrid_atomic_nandfetch   __hybrid_atomic_nandfetch
+#define __hybrid_atomic_fetchinc    __hybrid_atomic_fetchinc
+#define __hybrid_atomic_fetchdec    __hybrid_atomic_fetchdec
+#define __hybrid_atomic_fetchadd    __hybrid_atomic_fetchadd
+#define __hybrid_atomic_fetchsub    __hybrid_atomic_fetchsub
+#define __hybrid_atomic_fetchand    __hybrid_atomic_fetchand
+#define __hybrid_atomic_fetchor     __hybrid_atomic_fetchor
+#define __hybrid_atomic_fetchxor    __hybrid_atomic_fetchxor
+#define __hybrid_atomic_fetchnand   __hybrid_atomic_fetchnand
+#define __hybrid_atomic_inc         __hybrid_atomic_inc
+#define __hybrid_atomic_dec         __hybrid_atomic_dec
+#define __hybrid_atomic_add         __hybrid_atomic_add
+#define __hybrid_atomic_sub         __hybrid_atomic_sub
+#define __hybrid_atomic_and         __hybrid_atomic_and
+#define __hybrid_atomic_or          __hybrid_atomic_or
+#define __hybrid_atomic_xor         __hybrid_atomic_xor
+#define __hybrid_atomic_nand        __hybrid_atomic_nand
+#define __hybrid_atomic_lockfree    __hybrid_atomic_lockfree
+extern "C++" {
+template<class T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value, T>::__type __hybrid_atomic_load(T const volatile *__ptr, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, void>::__type __hybrid_atomic_store(T volatile *__ptr, S __val, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, T>::__type __hybrid_atomic_xch(T volatile *__ptr, S __val, int __order);
+template<class T, class S, class U> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value && ::__intern::____INTELLISENSE_isarith<U>::__value, bool>::__type __hybrid_atomic_cmpxch(T volatile *__p, S __oldval, U __newval, int __succ, int __fail);
+template<class T, class S, class U> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value && ::__intern::____INTELLISENSE_isarith<U>::__value, bool>::__type __hybrid_atomic_cmpxch_weak(T volatile *__p, S __oldval, U __newval, int __succ, int __fail);
+template<class T, class S, class U> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value && ::__intern::____INTELLISENSE_isarith<U>::__value, T>::__type __hybrid_atomic_cmpxch_val(T volatile *__p, S __oldval, U __newval, int __succ, int __fail);
+template<class T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value, T>::__type __hybrid_atomic_incfetch(T volatile *__ptr, int __order);
+template<class T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value, T>::__type __hybrid_atomic_decfetch(T volatile *__ptr, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, T>::__type __hybrid_atomic_addfetch(T volatile *__ptr, S __val, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, T>::__type __hybrid_atomic_subfetch(T volatile *__ptr, S __val, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, T>::__type __hybrid_atomic_andfetch(T volatile *__ptr, S __val, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, T>::__type __hybrid_atomic_orfetch(T volatile *__ptr, S __val, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, T>::__type __hybrid_atomic_xorfetch(T volatile *__ptr, S __val, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, T>::__type __hybrid_atomic_nandfetch(T volatile *__ptr, S __val, int __order);
+template<class T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value, T>::__type __hybrid_atomic_fetchinc(T volatile *__ptr, int __order);
+template<class T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value, T>::__type __hybrid_atomic_fetchdec(T volatile *__ptr, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, T>::__type __hybrid_atomic_fetchadd(T volatile *__ptr, S __val, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, T>::__type __hybrid_atomic_fetchsub(T volatile *__ptr, S __val, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, T>::__type __hybrid_atomic_fetchand(T volatile *__ptr, S __val, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, T>::__type __hybrid_atomic_fetchor(T volatile *__ptr, S __val, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, T>::__type __hybrid_atomic_fetchxor(T volatile *__ptr, S __val, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, T>::__type __hybrid_atomic_fetchnand(T volatile *__ptr, S __val, int __order);
+template<class T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value, void>::__type __hybrid_atomic_inc(T volatile *__ptr, int __order);
+template<class T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value, void>::__type __hybrid_atomic_dec(T volatile *__ptr, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, void>::__type __hybrid_atomic_add(T volatile *__ptr, S __val, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, void>::__type __hybrid_atomic_sub(T volatile *__ptr, S __val, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, void>::__type __hybrid_atomic_and(T volatile *__ptr, S __val, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, void>::__type __hybrid_atomic_or(T volatile *__ptr, S __val, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, void>::__type __hybrid_atomic_xor(T volatile *__ptr, S __val, int __order);
+template<class T, class S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value && ::__intern::____INTELLISENSE_isarith<S>::__value, void>::__type __hybrid_atomic_nand(T volatile *__ptr, S __val, int __order);
+template<class T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<T>::__value, bool>::__type __hybrid_atomic_lockfree(T volatile *__ptr);
+} /* extern "C++" */
+#else /* __cplusplus */
+#include "__atomic-complete.h"
+#endif /* !__cplusplus */
+#elif defined(__HYBRID_ATOMIC_USE_LIBATOMIC)
 #include "__atomic-libatomic.h" /* libatomic */
 /**/
 #include "__atomic-complete.h"
@@ -169,6 +555,165 @@
 #define __hybrid_atomic_xor(p, val, order)                         (void)__hybrid_atomic_fetchxor(p, val, order)
 #define __hybrid_atomic_nand(p, val, order)                        (void)__hybrid_atomic_fetchnand(p, val, order)
 #define __hybrid_atomic_lockfree(p)                                __atomic_is_lock_free(sizeof(*(p)), p)
+
+#define __hybrid_atomic_load8(p, order)                             __hybrid_atomic_load((__UINT8_TYPE__ const *)(p), order)
+#define __hybrid_atomic_store8(p, val, order)                       __hybrid_atomic_store((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xch8(p, val, order)                         __hybrid_atomic_xch((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_cmpxch8(p, oldval, newval, succ, fail)      __hybrid_atomic_cmpxch((__UINT8_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_weak8(p, oldval, newval, succ, fail) __hybrid_atomic_cmpxch_weak((__UINT8_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_val8(p, oldval, newval, succ, fail)  __hybrid_atomic_cmpxch_val((__UINT8_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_incfetch8(p, order)                         __hybrid_atomic_incfetch((__UINT8_TYPE__ *)(p), order)
+#define __hybrid_atomic_decfetch8(p, order)                         __hybrid_atomic_decfetch((__UINT8_TYPE__ *)(p), order)
+#define __hybrid_atomic_addfetch8(p, val, order)                    __hybrid_atomic_addfetch((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_subfetch8(p, val, order)                    __hybrid_atomic_subfetch((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_andfetch8(p, val, order)                    __hybrid_atomic_andfetch((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_orfetch8(p, val, order)                     __hybrid_atomic_orfetch((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xorfetch8(p, val, order)                    __hybrid_atomic_xorfetch((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nandfetch8(p, val, order)                   __hybrid_atomic_nandfetch((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchinc8(p, order)                         __hybrid_atomic_fetchinc((__UINT8_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchdec8(p, order)                         __hybrid_atomic_fetchdec((__UINT8_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchadd8(p, val, order)                    __hybrid_atomic_fetchadd((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchsub8(p, val, order)                    __hybrid_atomic_fetchsub((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchand8(p, val, order)                    __hybrid_atomic_fetchand((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchor8(p, val, order)                     __hybrid_atomic_fetchor((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchxor8(p, val, order)                    __hybrid_atomic_fetchxor((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchnand8(p, val, order)                   __hybrid_atomic_fetchnand((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_inc8(p, order)                              __hybrid_atomic_inc((__UINT8_TYPE__ *)(p), order)
+#define __hybrid_atomic_dec8(p, order)                              __hybrid_atomic_dec((__UINT8_TYPE__ *)(p), order)
+#define __hybrid_atomic_add8(p, val, order)                         __hybrid_atomic_add((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_sub8(p, val, order)                         __hybrid_atomic_sub((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_and8(p, val, order)                         __hybrid_atomic_and((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_or8(p, val, order)                          __hybrid_atomic_or((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xor8(p, val, order)                         __hybrid_atomic_xor((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nand8(p, val, order)                        __hybrid_atomic_nand((__UINT8_TYPE__ *)(p), val, order)
+
+#define __hybrid_atomic_load16(p, order)                             __hybrid_atomic_load((__UINT16_TYPE__ const *)(p), order)
+#define __hybrid_atomic_store16(p, val, order)                       __hybrid_atomic_store((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xch16(p, val, order)                         __hybrid_atomic_xch((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_cmpxch16(p, oldval, newval, succ, fail)      __hybrid_atomic_cmpxch((__UINT16_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_weak16(p, oldval, newval, succ, fail) __hybrid_atomic_cmpxch_weak((__UINT16_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_val16(p, oldval, newval, succ, fail)  __hybrid_atomic_cmpxch_val((__UINT16_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_incfetch16(p, order)                         __hybrid_atomic_incfetch((__UINT16_TYPE__ *)(p), order)
+#define __hybrid_atomic_decfetch16(p, order)                         __hybrid_atomic_decfetch((__UINT16_TYPE__ *)(p), order)
+#define __hybrid_atomic_addfetch16(p, val, order)                    __hybrid_atomic_addfetch((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_subfetch16(p, val, order)                    __hybrid_atomic_subfetch((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_andfetch16(p, val, order)                    __hybrid_atomic_andfetch((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_orfetch16(p, val, order)                     __hybrid_atomic_orfetch((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xorfetch16(p, val, order)                    __hybrid_atomic_xorfetch((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nandfetch16(p, val, order)                   __hybrid_atomic_nandfetch((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchinc16(p, order)                         __hybrid_atomic_fetchinc((__UINT16_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchdec16(p, order)                         __hybrid_atomic_fetchdec((__UINT16_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchadd16(p, val, order)                    __hybrid_atomic_fetchadd((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchsub16(p, val, order)                    __hybrid_atomic_fetchsub((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchand16(p, val, order)                    __hybrid_atomic_fetchand((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchor16(p, val, order)                     __hybrid_atomic_fetchor((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchxor16(p, val, order)                    __hybrid_atomic_fetchxor((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchnand16(p, val, order)                   __hybrid_atomic_fetchnand((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_inc16(p, order)                              __hybrid_atomic_inc((__UINT16_TYPE__ *)(p), order)
+#define __hybrid_atomic_dec16(p, order)                              __hybrid_atomic_dec((__UINT16_TYPE__ *)(p), order)
+#define __hybrid_atomic_add16(p, val, order)                         __hybrid_atomic_add((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_sub16(p, val, order)                         __hybrid_atomic_sub((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_and16(p, val, order)                         __hybrid_atomic_and((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_or16(p, val, order)                          __hybrid_atomic_or((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xor16(p, val, order)                         __hybrid_atomic_xor((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nand16(p, val, order)                        __hybrid_atomic_nand((__UINT16_TYPE__ *)(p), val, order)
+
+#define __hybrid_atomic_load32(p, order)                             __hybrid_atomic_load((__UINT32_TYPE__ const *)(p), order)
+#define __hybrid_atomic_store32(p, val, order)                       __hybrid_atomic_store((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xch32(p, val, order)                         __hybrid_atomic_xch((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_cmpxch32(p, oldval, newval, succ, fail)      __hybrid_atomic_cmpxch((__UINT32_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_weak32(p, oldval, newval, succ, fail) __hybrid_atomic_cmpxch_weak((__UINT32_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_val32(p, oldval, newval, succ, fail)  __hybrid_atomic_cmpxch_val((__UINT32_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_incfetch32(p, order)                         __hybrid_atomic_incfetch((__UINT32_TYPE__ *)(p), order)
+#define __hybrid_atomic_decfetch32(p, order)                         __hybrid_atomic_decfetch((__UINT32_TYPE__ *)(p), order)
+#define __hybrid_atomic_addfetch32(p, val, order)                    __hybrid_atomic_addfetch((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_subfetch32(p, val, order)                    __hybrid_atomic_subfetch((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_andfetch32(p, val, order)                    __hybrid_atomic_andfetch((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_orfetch32(p, val, order)                     __hybrid_atomic_orfetch((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xorfetch32(p, val, order)                    __hybrid_atomic_xorfetch((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nandfetch32(p, val, order)                   __hybrid_atomic_nandfetch((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchinc32(p, order)                         __hybrid_atomic_fetchinc((__UINT32_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchdec32(p, order)                         __hybrid_atomic_fetchdec((__UINT32_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchadd32(p, val, order)                    __hybrid_atomic_fetchadd((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchsub32(p, val, order)                    __hybrid_atomic_fetchsub((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchand32(p, val, order)                    __hybrid_atomic_fetchand((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchor32(p, val, order)                     __hybrid_atomic_fetchor((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchxor32(p, val, order)                    __hybrid_atomic_fetchxor((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchnand32(p, val, order)                   __hybrid_atomic_fetchnand((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_inc32(p, order)                              __hybrid_atomic_inc((__UINT32_TYPE__ *)(p), order)
+#define __hybrid_atomic_dec32(p, order)                              __hybrid_atomic_dec((__UINT32_TYPE__ *)(p), order)
+#define __hybrid_atomic_add32(p, val, order)                         __hybrid_atomic_add((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_sub32(p, val, order)                         __hybrid_atomic_sub((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_and32(p, val, order)                         __hybrid_atomic_and((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_or32(p, val, order)                          __hybrid_atomic_or((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xor32(p, val, order)                         __hybrid_atomic_xor((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nand32(p, val, order)                        __hybrid_atomic_nand((__UINT32_TYPE__ *)(p), val, order)
+
+#ifdef __UINT64_TYPE__
+#define __hybrid_atomic_load64(p, order)                             __hybrid_atomic_load((__UINT64_TYPE__ const *)(p), order)
+#define __hybrid_atomic_store64(p, val, order)                       __hybrid_atomic_store((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xch64(p, val, order)                         __hybrid_atomic_xch((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_cmpxch64(p, oldval, newval, succ, fail)      __hybrid_atomic_cmpxch((__UINT64_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_weak64(p, oldval, newval, succ, fail) __hybrid_atomic_cmpxch_weak((__UINT64_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_val64(p, oldval, newval, succ, fail)  __hybrid_atomic_cmpxch_val((__UINT64_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_incfetch64(p, order)                         __hybrid_atomic_incfetch((__UINT64_TYPE__ *)(p), order)
+#define __hybrid_atomic_decfetch64(p, order)                         __hybrid_atomic_decfetch((__UINT64_TYPE__ *)(p), order)
+#define __hybrid_atomic_addfetch64(p, val, order)                    __hybrid_atomic_addfetch((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_subfetch64(p, val, order)                    __hybrid_atomic_subfetch((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_andfetch64(p, val, order)                    __hybrid_atomic_andfetch((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_orfetch64(p, val, order)                     __hybrid_atomic_orfetch((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xorfetch64(p, val, order)                    __hybrid_atomic_xorfetch((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nandfetch64(p, val, order)                   __hybrid_atomic_nandfetch((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchinc64(p, order)                         __hybrid_atomic_fetchinc((__UINT64_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchdec64(p, order)                         __hybrid_atomic_fetchdec((__UINT64_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchadd64(p, val, order)                    __hybrid_atomic_fetchadd((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchsub64(p, val, order)                    __hybrid_atomic_fetchsub((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchand64(p, val, order)                    __hybrid_atomic_fetchand((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchor64(p, val, order)                     __hybrid_atomic_fetchor((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchxor64(p, val, order)                    __hybrid_atomic_fetchxor((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchnand64(p, val, order)                   __hybrid_atomic_fetchnand((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_inc64(p, order)                              __hybrid_atomic_inc((__UINT64_TYPE__ *)(p), order)
+#define __hybrid_atomic_dec64(p, order)                              __hybrid_atomic_dec((__UINT64_TYPE__ *)(p), order)
+#define __hybrid_atomic_add64(p, val, order)                         __hybrid_atomic_add((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_sub64(p, val, order)                         __hybrid_atomic_sub((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_and64(p, val, order)                         __hybrid_atomic_and((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_or64(p, val, order)                          __hybrid_atomic_or((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xor64(p, val, order)                         __hybrid_atomic_xor((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nand64(p, val, order)                        __hybrid_atomic_nand((__UINT64_TYPE__ *)(p), val, order)
+#endif /* __UINT64_TYPE__ */
+
+#ifdef __UINT128_TYPE__
+#define __hybrid_atomic_load128(p, order)                             __hybrid_atomic_load((__UINT128_TYPE__ const *)(p), order)
+#define __hybrid_atomic_store128(p, val, order)                       __hybrid_atomic_store((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xch128(p, val, order)                         __hybrid_atomic_xch((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_cmpxch128(p, oldval, newval, succ, fail)      __hybrid_atomic_cmpxch((__UINT128_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_weak128(p, oldval, newval, succ, fail) __hybrid_atomic_cmpxch_weak((__UINT128_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_val128(p, oldval, newval, succ, fail)  __hybrid_atomic_cmpxch_val((__UINT128_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_incfetch128(p, order)                         __hybrid_atomic_incfetch((__UINT128_TYPE__ *)(p), order)
+#define __hybrid_atomic_decfetch128(p, order)                         __hybrid_atomic_decfetch((__UINT128_TYPE__ *)(p), order)
+#define __hybrid_atomic_addfetch128(p, val, order)                    __hybrid_atomic_addfetch((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_subfetch128(p, val, order)                    __hybrid_atomic_subfetch((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_andfetch128(p, val, order)                    __hybrid_atomic_andfetch((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_orfetch128(p, val, order)                     __hybrid_atomic_orfetch((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xorfetch128(p, val, order)                    __hybrid_atomic_xorfetch((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nandfetch128(p, val, order)                   __hybrid_atomic_nandfetch((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchinc128(p, order)                         __hybrid_atomic_fetchinc((__UINT128_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchdec128(p, order)                         __hybrid_atomic_fetchdec((__UINT128_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchadd128(p, val, order)                    __hybrid_atomic_fetchadd((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchsub128(p, val, order)                    __hybrid_atomic_fetchsub((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchand128(p, val, order)                    __hybrid_atomic_fetchand((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchor128(p, val, order)                     __hybrid_atomic_fetchor((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchxor128(p, val, order)                    __hybrid_atomic_fetchxor((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchnand128(p, val, order)                   __hybrid_atomic_fetchnand((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_inc128(p, order)                              __hybrid_atomic_inc((__UINT128_TYPE__ *)(p), order)
+#define __hybrid_atomic_dec128(p, order)                              __hybrid_atomic_dec((__UINT128_TYPE__ *)(p), order)
+#define __hybrid_atomic_add128(p, val, order)                         __hybrid_atomic_add((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_sub128(p, val, order)                         __hybrid_atomic_sub((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_and128(p, val, order)                         __hybrid_atomic_and((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_or128(p, val, order)                          __hybrid_atomic_or((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xor128(p, val, order)                         __hybrid_atomic_xor((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nand128(p, val, order)                        __hybrid_atomic_nand((__UINT128_TYPE__ *)(p), val, order)
+#endif /* __UINT128_TYPE__ */
 #elif __has_extension(c_atomic) || __has_extension(cxx_atomic) /* clang */
 /* __c11_atomic_xxx() */
 #define __hybrid_atomic_load(p, order)                             __c11_atomic_load(p, order)
@@ -201,6 +746,165 @@
 #define __hybrid_atomic_thread_fence(order)                        __c11_atomic_thread_fence(order)
 #define __hybrid_atomic_signal_fence(order)                        __c11_atomic_signal_fence(order)
 #define __hybrid_atomic_lockfree(p)                                __atomic_is_lock_free(sizeof(*(p)), p)
+
+#define __hybrid_atomic_load8(p, order)                             __hybrid_atomic_load((__UINT8_TYPE__ const *)(p), order)
+#define __hybrid_atomic_store8(p, val, order)                       __hybrid_atomic_store((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xch8(p, val, order)                         __hybrid_atomic_xch((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_cmpxch8(p, oldval, newval, succ, fail)      __hybrid_atomic_cmpxch((__UINT8_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_weak8(p, oldval, newval, succ, fail) __hybrid_atomic_cmpxch_weak((__UINT8_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_val8(p, oldval, newval, succ, fail)  __hybrid_atomic_cmpxch_val((__UINT8_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_incfetch8(p, order)                         __hybrid_atomic_incfetch((__UINT8_TYPE__ *)(p), order)
+#define __hybrid_atomic_decfetch8(p, order)                         __hybrid_atomic_decfetch((__UINT8_TYPE__ *)(p), order)
+#define __hybrid_atomic_addfetch8(p, val, order)                    __hybrid_atomic_addfetch((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_subfetch8(p, val, order)                    __hybrid_atomic_subfetch((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_andfetch8(p, val, order)                    __hybrid_atomic_andfetch((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_orfetch8(p, val, order)                     __hybrid_atomic_orfetch((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xorfetch8(p, val, order)                    __hybrid_atomic_xorfetch((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nandfetch8(p, val, order)                   __hybrid_atomic_nandfetch((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchinc8(p, order)                         __hybrid_atomic_fetchinc((__UINT8_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchdec8(p, order)                         __hybrid_atomic_fetchdec((__UINT8_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchadd8(p, val, order)                    __hybrid_atomic_fetchadd((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchsub8(p, val, order)                    __hybrid_atomic_fetchsub((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchand8(p, val, order)                    __hybrid_atomic_fetchand((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchor8(p, val, order)                     __hybrid_atomic_fetchor((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchxor8(p, val, order)                    __hybrid_atomic_fetchxor((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchnand8(p, val, order)                   __hybrid_atomic_fetchnand((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_inc8(p, order)                              __hybrid_atomic_inc((__UINT8_TYPE__ *)(p), order)
+#define __hybrid_atomic_dec8(p, order)                              __hybrid_atomic_dec((__UINT8_TYPE__ *)(p), order)
+#define __hybrid_atomic_add8(p, val, order)                         __hybrid_atomic_add((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_sub8(p, val, order)                         __hybrid_atomic_sub((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_and8(p, val, order)                         __hybrid_atomic_and((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_or8(p, val, order)                          __hybrid_atomic_or((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xor8(p, val, order)                         __hybrid_atomic_xor((__UINT8_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nand8(p, val, order)                        __hybrid_atomic_nand((__UINT8_TYPE__ *)(p), val, order)
+
+#define __hybrid_atomic_load16(p, order)                             __hybrid_atomic_load((__UINT16_TYPE__ const *)(p), order)
+#define __hybrid_atomic_store16(p, val, order)                       __hybrid_atomic_store((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xch16(p, val, order)                         __hybrid_atomic_xch((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_cmpxch16(p, oldval, newval, succ, fail)      __hybrid_atomic_cmpxch((__UINT16_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_weak16(p, oldval, newval, succ, fail) __hybrid_atomic_cmpxch_weak((__UINT16_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_val16(p, oldval, newval, succ, fail)  __hybrid_atomic_cmpxch_val((__UINT16_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_incfetch16(p, order)                         __hybrid_atomic_incfetch((__UINT16_TYPE__ *)(p), order)
+#define __hybrid_atomic_decfetch16(p, order)                         __hybrid_atomic_decfetch((__UINT16_TYPE__ *)(p), order)
+#define __hybrid_atomic_addfetch16(p, val, order)                    __hybrid_atomic_addfetch((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_subfetch16(p, val, order)                    __hybrid_atomic_subfetch((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_andfetch16(p, val, order)                    __hybrid_atomic_andfetch((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_orfetch16(p, val, order)                     __hybrid_atomic_orfetch((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xorfetch16(p, val, order)                    __hybrid_atomic_xorfetch((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nandfetch16(p, val, order)                   __hybrid_atomic_nandfetch((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchinc16(p, order)                         __hybrid_atomic_fetchinc((__UINT16_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchdec16(p, order)                         __hybrid_atomic_fetchdec((__UINT16_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchadd16(p, val, order)                    __hybrid_atomic_fetchadd((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchsub16(p, val, order)                    __hybrid_atomic_fetchsub((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchand16(p, val, order)                    __hybrid_atomic_fetchand((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchor16(p, val, order)                     __hybrid_atomic_fetchor((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchxor16(p, val, order)                    __hybrid_atomic_fetchxor((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchnand16(p, val, order)                   __hybrid_atomic_fetchnand((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_inc16(p, order)                              __hybrid_atomic_inc((__UINT16_TYPE__ *)(p), order)
+#define __hybrid_atomic_dec16(p, order)                              __hybrid_atomic_dec((__UINT16_TYPE__ *)(p), order)
+#define __hybrid_atomic_add16(p, val, order)                         __hybrid_atomic_add((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_sub16(p, val, order)                         __hybrid_atomic_sub((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_and16(p, val, order)                         __hybrid_atomic_and((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_or16(p, val, order)                          __hybrid_atomic_or((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xor16(p, val, order)                         __hybrid_atomic_xor((__UINT16_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nand16(p, val, order)                        __hybrid_atomic_nand((__UINT16_TYPE__ *)(p), val, order)
+
+#define __hybrid_atomic_load32(p, order)                             __hybrid_atomic_load((__UINT32_TYPE__ const *)(p), order)
+#define __hybrid_atomic_store32(p, val, order)                       __hybrid_atomic_store((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xch32(p, val, order)                         __hybrid_atomic_xch((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_cmpxch32(p, oldval, newval, succ, fail)      __hybrid_atomic_cmpxch((__UINT32_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_weak32(p, oldval, newval, succ, fail) __hybrid_atomic_cmpxch_weak((__UINT32_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_val32(p, oldval, newval, succ, fail)  __hybrid_atomic_cmpxch_val((__UINT32_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_incfetch32(p, order)                         __hybrid_atomic_incfetch((__UINT32_TYPE__ *)(p), order)
+#define __hybrid_atomic_decfetch32(p, order)                         __hybrid_atomic_decfetch((__UINT32_TYPE__ *)(p), order)
+#define __hybrid_atomic_addfetch32(p, val, order)                    __hybrid_atomic_addfetch((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_subfetch32(p, val, order)                    __hybrid_atomic_subfetch((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_andfetch32(p, val, order)                    __hybrid_atomic_andfetch((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_orfetch32(p, val, order)                     __hybrid_atomic_orfetch((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xorfetch32(p, val, order)                    __hybrid_atomic_xorfetch((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nandfetch32(p, val, order)                   __hybrid_atomic_nandfetch((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchinc32(p, order)                         __hybrid_atomic_fetchinc((__UINT32_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchdec32(p, order)                         __hybrid_atomic_fetchdec((__UINT32_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchadd32(p, val, order)                    __hybrid_atomic_fetchadd((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchsub32(p, val, order)                    __hybrid_atomic_fetchsub((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchand32(p, val, order)                    __hybrid_atomic_fetchand((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchor32(p, val, order)                     __hybrid_atomic_fetchor((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchxor32(p, val, order)                    __hybrid_atomic_fetchxor((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchnand32(p, val, order)                   __hybrid_atomic_fetchnand((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_inc32(p, order)                              __hybrid_atomic_inc((__UINT32_TYPE__ *)(p), order)
+#define __hybrid_atomic_dec32(p, order)                              __hybrid_atomic_dec((__UINT32_TYPE__ *)(p), order)
+#define __hybrid_atomic_add32(p, val, order)                         __hybrid_atomic_add((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_sub32(p, val, order)                         __hybrid_atomic_sub((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_and32(p, val, order)                         __hybrid_atomic_and((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_or32(p, val, order)                          __hybrid_atomic_or((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xor32(p, val, order)                         __hybrid_atomic_xor((__UINT32_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nand32(p, val, order)                        __hybrid_atomic_nand((__UINT32_TYPE__ *)(p), val, order)
+
+#ifdef __UINT64_TYPE__
+#define __hybrid_atomic_load64(p, order)                             __hybrid_atomic_load((__UINT64_TYPE__ const *)(p), order)
+#define __hybrid_atomic_store64(p, val, order)                       __hybrid_atomic_store((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xch64(p, val, order)                         __hybrid_atomic_xch((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_cmpxch64(p, oldval, newval, succ, fail)      __hybrid_atomic_cmpxch((__UINT64_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_weak64(p, oldval, newval, succ, fail) __hybrid_atomic_cmpxch_weak((__UINT64_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_val64(p, oldval, newval, succ, fail)  __hybrid_atomic_cmpxch_val((__UINT64_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_incfetch64(p, order)                         __hybrid_atomic_incfetch((__UINT64_TYPE__ *)(p), order)
+#define __hybrid_atomic_decfetch64(p, order)                         __hybrid_atomic_decfetch((__UINT64_TYPE__ *)(p), order)
+#define __hybrid_atomic_addfetch64(p, val, order)                    __hybrid_atomic_addfetch((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_subfetch64(p, val, order)                    __hybrid_atomic_subfetch((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_andfetch64(p, val, order)                    __hybrid_atomic_andfetch((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_orfetch64(p, val, order)                     __hybrid_atomic_orfetch((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xorfetch64(p, val, order)                    __hybrid_atomic_xorfetch((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nandfetch64(p, val, order)                   __hybrid_atomic_nandfetch((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchinc64(p, order)                         __hybrid_atomic_fetchinc((__UINT64_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchdec64(p, order)                         __hybrid_atomic_fetchdec((__UINT64_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchadd64(p, val, order)                    __hybrid_atomic_fetchadd((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchsub64(p, val, order)                    __hybrid_atomic_fetchsub((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchand64(p, val, order)                    __hybrid_atomic_fetchand((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchor64(p, val, order)                     __hybrid_atomic_fetchor((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchxor64(p, val, order)                    __hybrid_atomic_fetchxor((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchnand64(p, val, order)                   __hybrid_atomic_fetchnand((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_inc64(p, order)                              __hybrid_atomic_inc((__UINT64_TYPE__ *)(p), order)
+#define __hybrid_atomic_dec64(p, order)                              __hybrid_atomic_dec((__UINT64_TYPE__ *)(p), order)
+#define __hybrid_atomic_add64(p, val, order)                         __hybrid_atomic_add((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_sub64(p, val, order)                         __hybrid_atomic_sub((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_and64(p, val, order)                         __hybrid_atomic_and((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_or64(p, val, order)                          __hybrid_atomic_or((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xor64(p, val, order)                         __hybrid_atomic_xor((__UINT64_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nand64(p, val, order)                        __hybrid_atomic_nand((__UINT64_TYPE__ *)(p), val, order)
+#endif /* __UINT64_TYPE__ */
+
+#ifdef __UINT128_TYPE__
+#define __hybrid_atomic_load128(p, order)                             __hybrid_atomic_load((__UINT128_TYPE__ const *)(p), order)
+#define __hybrid_atomic_store128(p, val, order)                       __hybrid_atomic_store((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xch128(p, val, order)                         __hybrid_atomic_xch((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_cmpxch128(p, oldval, newval, succ, fail)      __hybrid_atomic_cmpxch((__UINT128_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_weak128(p, oldval, newval, succ, fail) __hybrid_atomic_cmpxch_weak((__UINT128_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_cmpxch_val128(p, oldval, newval, succ, fail)  __hybrid_atomic_cmpxch_val((__UINT128_TYPE__ *)(p), oldval, newval, succ, fail)
+#define __hybrid_atomic_incfetch128(p, order)                         __hybrid_atomic_incfetch((__UINT128_TYPE__ *)(p), order)
+#define __hybrid_atomic_decfetch128(p, order)                         __hybrid_atomic_decfetch((__UINT128_TYPE__ *)(p), order)
+#define __hybrid_atomic_addfetch128(p, val, order)                    __hybrid_atomic_addfetch((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_subfetch128(p, val, order)                    __hybrid_atomic_subfetch((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_andfetch128(p, val, order)                    __hybrid_atomic_andfetch((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_orfetch128(p, val, order)                     __hybrid_atomic_orfetch((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xorfetch128(p, val, order)                    __hybrid_atomic_xorfetch((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nandfetch128(p, val, order)                   __hybrid_atomic_nandfetch((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchinc128(p, order)                         __hybrid_atomic_fetchinc((__UINT128_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchdec128(p, order)                         __hybrid_atomic_fetchdec((__UINT128_TYPE__ *)(p), order)
+#define __hybrid_atomic_fetchadd128(p, val, order)                    __hybrid_atomic_fetchadd((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchsub128(p, val, order)                    __hybrid_atomic_fetchsub((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchand128(p, val, order)                    __hybrid_atomic_fetchand((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchor128(p, val, order)                     __hybrid_atomic_fetchor((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchxor128(p, val, order)                    __hybrid_atomic_fetchxor((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_fetchnand128(p, val, order)                   __hybrid_atomic_fetchnand((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_inc128(p, order)                              __hybrid_atomic_inc((__UINT128_TYPE__ *)(p), order)
+#define __hybrid_atomic_dec128(p, order)                              __hybrid_atomic_dec((__UINT128_TYPE__ *)(p), order)
+#define __hybrid_atomic_add128(p, val, order)                         __hybrid_atomic_add((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_sub128(p, val, order)                         __hybrid_atomic_sub((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_and128(p, val, order)                         __hybrid_atomic_and((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_or128(p, val, order)                          __hybrid_atomic_or((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_xor128(p, val, order)                         __hybrid_atomic_xor((__UINT128_TYPE__ *)(p), val, order)
+#define __hybrid_atomic_nand128(p, val, order)                        __hybrid_atomic_nand((__UINT128_TYPE__ *)(p), val, order)
+#endif /* __UINT128_TYPE__ */
 #elif defined(__GNUC__) || defined(__DCC_VERSION__)
 /* __sync_xxx() */
 #define __hybrid_atomic_addfetch_seq_cst(p, val)                  __sync_add_and_fetch(p, val)

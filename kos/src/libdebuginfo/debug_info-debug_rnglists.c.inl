@@ -169,11 +169,11 @@ NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t con
 
 			case DW_RLE_base_address:
 				switch (LOCAL_addrsize) {
-				case 1: LOCAL_cu_base = *(uint8_t const *)LOCAL_iter, LOCAL_iter += 1; break;
-				case 2: LOCAL_cu_base = UNALIGNED_GET16((uint16_t const *)LOCAL_iter), LOCAL_iter += 2; break;
-				case 4: LOCAL_cu_base = UNALIGNED_GET32((uint32_t const *)LOCAL_iter), LOCAL_iter += 4; break;
+				case 1: LOCAL_cu_base = UNALIGNED_GET8(LOCAL_iter), LOCAL_iter += 1; break;
+				case 2: LOCAL_cu_base = UNALIGNED_GET16(LOCAL_iter), LOCAL_iter += 2; break;
+				case 4: LOCAL_cu_base = UNALIGNED_GET32(LOCAL_iter), LOCAL_iter += 4; break;
 #if __SIZEOF_POINTER__ > 4
-				case 8: LOCAL_cu_base = UNALIGNED_GET64((uint64_t const *)LOCAL_iter), LOCAL_iter += 8; break;
+				case 8: LOCAL_cu_base = UNALIGNED_GET64(LOCAL_iter), LOCAL_iter += 8; break;
 #endif /* __SIZEOF_POINTER__ > 4 */
 				default: __builtin_unreachable();
 				}
@@ -183,31 +183,31 @@ NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t con
 				switch (LOCAL_addrsize) {
 
 				case 1:
-					range_start = *(uint8_t const *)LOCAL_iter;
+					range_start = UNALIGNED_GET8(LOCAL_iter);
 					LOCAL_iter += 1;
-					range_end = *(uint8_t const *)LOCAL_iter;
+					range_end = UNALIGNED_GET8(LOCAL_iter);
 					LOCAL_iter += 1;
 					break;
 
 				case 2:
-					range_start = UNALIGNED_GET16((uint16_t const *)LOCAL_iter);
+					range_start = UNALIGNED_GET16(LOCAL_iter);
 					LOCAL_iter += 2;
-					range_end = UNALIGNED_GET16((uint16_t const *)LOCAL_iter);
+					range_end = UNALIGNED_GET16(LOCAL_iter);
 					LOCAL_iter += 2;
 					break;
 
 				case 4:
-					range_start = UNALIGNED_GET32((uint32_t const *)LOCAL_iter);
+					range_start = UNALIGNED_GET32(LOCAL_iter);
 					LOCAL_iter += 4;
-					range_end = UNALIGNED_GET32((uint32_t const *)LOCAL_iter);
+					range_end = UNALIGNED_GET32(LOCAL_iter);
 					LOCAL_iter += 4;
 					break;
 
 #if __SIZEOF_POINTER__ > 4
 				case 8:
-					range_start = UNALIGNED_GET64((uint64_t const *)LOCAL_iter);
+					range_start = UNALIGNED_GET64(LOCAL_iter);
 					LOCAL_iter += 8;
-					range_end = UNALIGNED_GET64((uint64_t const *)LOCAL_iter);
+					range_end = UNALIGNED_GET64(LOCAL_iter);
 					LOCAL_iter += 8;
 					break;
 #endif /* __SIZEOF_POINTER__ > 4 */
@@ -218,11 +218,11 @@ NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t con
 
 			case DW_RLE_start_length:
 				switch (LOCAL_addrsize) {
-				case 1: range_start = *(uint8_t const *)LOCAL_iter, LOCAL_iter += 1; break;
-				case 2: range_start = UNALIGNED_GET16((uint16_t const *)LOCAL_iter), LOCAL_iter += 2; break;
-				case 4: range_start = UNALIGNED_GET32((uint32_t const *)LOCAL_iter), LOCAL_iter += 4; break;
+				case 1: range_start = UNALIGNED_GET8(LOCAL_iter), LOCAL_iter += 1; break;
+				case 2: range_start = UNALIGNED_GET16(LOCAL_iter), LOCAL_iter += 2; break;
+				case 4: range_start = UNALIGNED_GET32(LOCAL_iter), LOCAL_iter += 4; break;
 #if __SIZEOF_POINTER__ > 4
-				case 8: range_start = UNALIGNED_GET64((uint64_t const *)LOCAL_iter), LOCAL_iter += 8; break;
+				case 8: range_start = UNALIGNED_GET64(LOCAL_iter), LOCAL_iter += 8; break;
 #endif /* __SIZEOF_POINTER__ > 4 */
 				default: __builtin_unreachable();
 				}
@@ -250,31 +250,31 @@ NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t con
 		switch (LOCAL_addrsize) {
 
 		case 1:
-			range_start = *(uint8_t const *)LOCAL_iter;
+			range_start = UNALIGNED_GET8(LOCAL_iter);
 			LOCAL_iter += 1;
-			range_end = *(uint8_t const *)LOCAL_iter;
+			range_end = UNALIGNED_GET8(LOCAL_iter);
 			LOCAL_iter += 1;
 			break;
 
 		case 2:
-			range_start = UNALIGNED_GET16((uint16_t const *)LOCAL_iter);
+			range_start = UNALIGNED_GET16(LOCAL_iter);
 			LOCAL_iter += 2;
-			range_end = UNALIGNED_GET16((uint16_t const *)LOCAL_iter);
+			range_end = UNALIGNED_GET16(LOCAL_iter);
 			LOCAL_iter += 2;
 			break;
 
 		case 4:
-			range_start = UNALIGNED_GET32((uint32_t const *)LOCAL_iter);
+			range_start = UNALIGNED_GET32(LOCAL_iter);
 			LOCAL_iter += 4;
-			range_end = UNALIGNED_GET32((uint32_t const *)LOCAL_iter);
+			range_end = UNALIGNED_GET32(LOCAL_iter);
 			LOCAL_iter += 4;
 			break;
 
 #if __SIZEOF_POINTER__ > 4
 		case 8:
-			range_start = UNALIGNED_GET64((uint64_t const *)LOCAL_iter);
+			range_start = UNALIGNED_GET64(LOCAL_iter);
 			LOCAL_iter += 8;
-			range_end = UNALIGNED_GET64((uint64_t const *)LOCAL_iter);
+			range_end = UNALIGNED_GET64(LOCAL_iter);
 			LOCAL_iter += 8;
 			break;
 #endif /* __SIZEOF_POINTER__ > 4 */

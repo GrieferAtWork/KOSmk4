@@ -153,8 +153,8 @@ struct instruction {
  *       If this is  the case, then  the first byte  of `repr' is  consumed and  all
  *       of   the  following  encode/decode  steps  operate  as  `repr = i_repr + 1'
  *   #2: OPC_LONGREPR + "<O1><O2>":
- *       The actual representation is stored at `longops_repr + UNALIGNED_GET16((u16 const *)(repr + 1))'
- *       This is done to overcome the 12 (12+NUL=13) character limit for encoding
+ *       The actual representation is stored at `longops_repr + UNALIGNED_GET16(repr + 1)'
+ *       This is  done  to  overcome  the 12  (12+NUL=13)  character  limit  for  encoding
  *       a mnemonic and its operands.
  *       If the first character of `repr' was `OPC_LONGREPR', then all of the following
  *       encode/decode  steps  operate  using   the  string  found  in   `longops_repr'

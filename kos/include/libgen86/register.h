@@ -199,11 +199,11 @@
 
 #define _gen86_putb(p_pc, b)  (void)(*(*(p_pc))++ = (__UINT8_TYPE__)(b))
 #define _gen86_putsb(p_pc, b) (void)(*(*(p_pc))++ = (__UINT8_TYPE__)(__INT8_TYPE__)(b))
-#define _gen86_putw(p_pc, w)  (void)(__hybrid_unaligned_setle16((__UINT16_TYPE__ *)*(p_pc), (__UINT16_TYPE__)(w)), *(p_pc) += 2)
-#define _gen86_putsw(p_pc, w) (void)(__hybrid_unaligned_setle16((__UINT16_TYPE__ *)*(p_pc), (__UINT16_TYPE__)(__INT16_TYPE__)(w)), *(p_pc) += 2)
-#define _gen86_putl(p_pc, l)  (void)(__hybrid_unaligned_setle32((__UINT32_TYPE__ *)*(p_pc), (__UINT32_TYPE__)(l)), *(p_pc) += 4)
-#define _gen86_putsl(p_pc, l) (void)(__hybrid_unaligned_setle32((__UINT32_TYPE__ *)*(p_pc), (__UINT32_TYPE__)(__INT32_TYPE__)(l)), *(p_pc) += 4)
-#define _gen86_putq(p_pc, q)  (void)(__hybrid_unaligned_setle64((__UINT64_TYPE__ *)*(p_pc), (__UINT64_TYPE__)(q)), *(p_pc) += 8)
+#define _gen86_putw(p_pc, w)  (void)(__hybrid_unaligned_setle16(*(p_pc), (__UINT16_TYPE__)(w)), *(p_pc) += 2)
+#define _gen86_putsw(p_pc, w) (void)(__hybrid_unaligned_setle16(*(p_pc), (__UINT16_TYPE__)(__INT16_TYPE__)(w)), *(p_pc) += 2)
+#define _gen86_putl(p_pc, l)  (void)(__hybrid_unaligned_setle32(*(p_pc), (__UINT32_TYPE__)(l)), *(p_pc) += 4)
+#define _gen86_putsl(p_pc, l) (void)(__hybrid_unaligned_setle32(*(p_pc), (__UINT32_TYPE__)(__INT32_TYPE__)(l)), *(p_pc) += 4)
+#define _gen86_putq(p_pc, q)  (void)(__hybrid_unaligned_setle64(*(p_pc), (__UINT64_TYPE__)(q)), *(p_pc) += 8)
 #define _gen86_putb2(p_pc, b1, b2)     _gen86_putw(p_pc, (__UINT16_TYPE__)(b2) << 8 | (b1))
 #define _gen86_putb3(p_pc, b1, b2, b3) (_gen86_putb2(p_pc, b1, b2), _gen86_putb(p_pc, b3))
 
@@ -274,7 +274,7 @@
 		__g86_disp_ptr = *(p_pc);                                   \
 		*(p_pc) += 4;                                               \
 		_putimm;                                                    \
-		__hybrid_unaligned_set32((__UINT32_TYPE__ *)__g86_disp_ptr, \
+		__hybrid_unaligned_set32(__g86_disp_ptr,                    \
 		                         (__UINT32_TYPE__)(__INT32_TYPE__)  \
 		                         (__INTPTR_TYPE__)                  \
 		                         ((__UINTPTR_TYPE__)(disp) -        \

@@ -271,14 +271,14 @@ PRIVATE NOBLOCK ATTR_DBGTEXT NONNULL((1, 3)) void
 NOTHROW(FCALL vgatty_v_getcelldata)(struct vidttyaccess *__restrict UNUSED(self),
                                     uintptr_t address, byte_t buf[]) {
 	uint16_t word = VGATTY_MAP_PEEK(address);
-	UNALIGNED_SET16((uint16_t *)buf, word);
+	UNALIGNED_SET16(buf, word);
 }
 
 PRIVATE NOBLOCK ATTR_DBGTEXT NONNULL((1, 3)) void
 NOTHROW(FCALL vgatty_v_setcelldata)(struct vidttyaccess *__restrict UNUSED(self),
                                     uintptr_t address, byte_t const buf[]) {
 	uint16_t word;
-	word = UNALIGNED_GET16((uint16_t const *)buf);
+	word = UNALIGNED_GET16(buf);
 	VGATTY_MAP_POKE(address, word);
 }
 

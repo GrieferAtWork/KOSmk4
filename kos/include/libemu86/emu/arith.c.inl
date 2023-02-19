@@ -270,7 +270,7 @@ case EMU86_OPCODE_ENCODE(0x83):
 #if EMU86_EMULATE_CONFIG_WANT_ARITH
 #if LIBEMU86_CONFIG_WANT_64BIT
 	if (IS_64BIT()) {
-		op64 = (u64)(s64)(s32)UNALIGNED_GETLE32((u32 const *)pc);
+		op64 = (u64)(s64)(s32)UNALIGNED_GETLE32(pc);
 		pc += 4;
 do_op64:
 		/* 81 /0 iq      ADD r/m64,Simm32      Add Simm32 to r/m64
@@ -285,7 +285,7 @@ do_op64:
 	} else
 #endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	if (!IS_16BIT()) {
-		op32 = UNALIGNED_GETLE32((u32 const *)pc);
+		op32 = UNALIGNED_GETLE32(pc);
 		pc += 4;
 do_op32:
 		/* 81 /0 id      ADD r/m32,imm32      Add imm32 to r/m32
@@ -298,7 +298,7 @@ do_op32:
 		 * 81 /7 id      CMP r/m32,imm32      Compare imm32 with r/m32 */
 		DO_ARITH_SWITCH_rmdst_mi_reg(l, L, 4, 32, op32)
 	} else {
-		op16 = UNALIGNED_GETLE16((u16 const *)pc);
+		op16 = UNALIGNED_GETLE16(pc);
 		pc += 2;
 do_op16:
 		/* 81 /0 iw      ADD r/m16,imm16      Add imm16 to r/m16 */
@@ -393,15 +393,15 @@ case EMU86_OPCODE_ENCODE(0x83):
 		modrm.mi_type = EMU86_MODRM_REGISTER;                           \
 		modrm.mi_rm   = EMU86_R_AX;                                     \
 		IF_64BIT(if (IS_64BIT()) {                                      \
-			op64 = (u64)(s64)(s32)UNALIGNED_GETLE32((u32 const *)pc);   \
+			op64 = (u64)(s64)(s32)UNALIGNED_GETLE32(pc);                \
 			pc += 4;                                                    \
 			goto do_##name##64;                                         \
 		} else) if (!IS_16BIT()) {                                      \
-			op32 = UNALIGNED_GETLE32((u32 const *)pc);                  \
+			op32 = UNALIGNED_GETLE32(pc);                               \
 			pc += 4;                                                    \
 			goto do_##name##32;                                         \
 		} else {                                                        \
-			op16 = UNALIGNED_GETLE16((u16 const *)pc);                  \
+			op16 = UNALIGNED_GETLE16(pc);                               \
 			pc += 2;                                                    \
 			goto do_##name##16;                                         \
 		}

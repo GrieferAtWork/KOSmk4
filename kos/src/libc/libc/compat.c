@@ -947,7 +947,7 @@ NOTHROW_NCX(LIBCCALL libc___getfpucw)(void) {
 }
 
 /* >> __setfpucw(3)
- * Function called by old linux applications to set `__fpu_control()'. */
+ * Function called by old linux applications with `__fpu_control' as argument. */
 DEFINE_PUBLIC_ALIAS(__setfpucw, libc___setfpucw);
 INTERN ATTR_SECTION(".text.crt.math.float") void
 NOTHROW_NCX(LIBCCALL libc___setfpucw)(fpu_control_t ctrl) {

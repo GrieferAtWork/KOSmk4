@@ -334,7 +334,7 @@ urandom_read(USER CHECKED void *buf, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
 	while (num_bytes >= 4) {
 		u32 val = krand32();
-		UNALIGNED_SET32((uint32_t *)buf, val);
+		UNALIGNED_SET32(buf, val);
 		buf = (byte_t *)buf + 4;
 		num_bytes -= 4;
 	}

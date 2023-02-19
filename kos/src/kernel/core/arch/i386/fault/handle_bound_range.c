@@ -80,12 +80,12 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 #endif /* __x86_64__ || __I386_NO_VM86 */
 			{
 				bound_index = modrm_getregw(state, &mod, flags);
-				bound_min   = UNALIGNED_GETLE16((u16 const *)(addr + 0));
-				bound_max   = UNALIGNED_GETLE16((u16 const *)(addr + 2)) + 2;
+				bound_min   = UNALIGNED_GETLE16(addr + 0);
+				bound_max   = UNALIGNED_GETLE16(addr + 2) + 2;
 			} else {
 				bound_index = modrm_getregl(state, &mod, flags);
-				bound_min   = UNALIGNED_GETLE32((u32 const *)(addr + 0));
-				bound_max   = UNALIGNED_GETLE32((u32 const *)(addr + 4)) + 4;
+				bound_min   = UNALIGNED_GETLE32(addr + 0);
+				bound_max   = UNALIGNED_GETLE32(addr + 4) + 4;
 			}
 		} EXCEPT {
 			icpustate_setpc(state, next_pc);

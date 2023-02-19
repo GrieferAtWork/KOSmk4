@@ -24,12 +24,34 @@
 
 #include "__unaligned.h"
 
-#ifdef __cplusplus
-#define UNALIGNED_GET      __hybrid_unaligned_get
-#define UNALIGNED_GET_SWAP __hybrid_unaligned_get_swap
-#define UNALIGNED_SET      __hybrid_unaligned_set
-#define UNALIGNED_SET_SWAP __hybrid_unaligned_set_swap
-#endif /* __cplusplus */
+/* ======================== API ========================
+ * >> T       UNALIGNED_GET(T const *p);       // Only for unsigned types
+ * >> T       UNALIGNED_GET_SWAP(T const *p);  // Only for unsigned types
+ * >> void    UNALIGNED_SET(T *p, T v);
+ * >> void    UNALIGNED_SET_SWAP(T *p, T v);
+ * >> uintN_t UNALIGNED_GETN(void const *p);
+ * >> uintN_t UNALIGNED_GETN_SWAP(void const *p);
+ * >> void    UNALIGNED_SETN(void *p, uintN_t v);
+ * >> void    UNALIGNED_SETN_SWAP(void *p, uintN_t v);
+ *
+ * When also including <hybrid/byteswap.h>:
+ * >> T       UNALIGNED_GETLE(T const *p);     // Only for unsigned types
+ * >> T       UNALIGNED_GETBE(T const *p);     // Only for unsigned types
+ * >> void    UNALIGNED_SETLE(T *p, T v);
+ * >> void    UNALIGNED_SETBE(T *p, T v);
+ * >> uintN_t UNALIGNED_GETLEN(void const *p);
+ * >> uintN_t UNALIGNED_GETBEN(void const *p);
+ * >> void    UNALIGNED_SETLEN(void *p, uintN_t v);
+ * >> void    UNALIGNED_SETBEN(void *p, uintN_t v);
+ */
+#define UNALIGNED_GET        __hybrid_unaligned_get
+#define UNALIGNED_GET_SWAP   __hybrid_unaligned_get_swap
+#define UNALIGNED_SET        __hybrid_unaligned_set
+#define UNALIGNED_SET_SWAP   __hybrid_unaligned_set_swap
+#define UNALIGNED_GET8       __hybrid_unaligned_get8
+#define UNALIGNED_GET8_SWAP  __hybrid_unaligned_get8_swap
+#define UNALIGNED_SET8       __hybrid_unaligned_set8
+#define UNALIGNED_SET8_SWAP  __hybrid_unaligned_set8_swap
 #define UNALIGNED_GET16      __hybrid_unaligned_get16
 #define UNALIGNED_GET16_SWAP __hybrid_unaligned_get16_swap
 #define UNALIGNED_SET16      __hybrid_unaligned_set16
@@ -51,12 +73,15 @@
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
 
-
 #ifdef __GUARD_HYBRID_BYTESWAP_H
 #define UNALIGNED_GETLE   __hybrid_unaligned_getle
 #define UNALIGNED_SETLE   __hybrid_unaligned_setle
 #define UNALIGNED_GETBE   __hybrid_unaligned_getbe
 #define UNALIGNED_SETBE   __hybrid_unaligned_setbe
+#define UNALIGNED_GETLE8  __hybrid_unaligned_getle8
+#define UNALIGNED_SETLE8  __hybrid_unaligned_setle8
+#define UNALIGNED_GETBE8  __hybrid_unaligned_getbe8
+#define UNALIGNED_SETBE8  __hybrid_unaligned_setbe8
 #define UNALIGNED_GETLE16 __hybrid_unaligned_getle16
 #define UNALIGNED_SETLE16 __hybrid_unaligned_setle16
 #define UNALIGNED_GETBE16 __hybrid_unaligned_getbe16

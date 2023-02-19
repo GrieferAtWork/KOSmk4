@@ -503,7 +503,7 @@ print_cfi_instruction(pformatprinter printer, void *arg,
 		case DW_OP_skip: {
 			int16_t offset;
 			struct label_entry const *label;
-			offset = (int16_t)UNALIGNED_GET16((uint16_t const *)reader);
+			offset = (int16_t)UNALIGNED_GET16(reader);
 			reader += 2;
 			reader += offset;
 			label = label_buffer_locate(labels, reader);
@@ -526,34 +526,34 @@ print_cfi_instruction(pformatprinter printer, void *arg,
 			} else if (addrsize >= 8) {
 		case DW_OP_const8u:
 #define HAVE_CASE_DW_OP_const8u
-				addend = UNALIGNED_GET64((uint64_t const *)reader);
+				addend = UNALIGNED_GET64(reader);
 #endif /* __SIZEOF_INTMAX_T__ > 8 */
 #if __SIZEOF_INTMAX_T__ > 4
 			} else if (addrsize >= 4) {
 		case DW_OP_const4u:
 		case DW_OP_call4:
 #define HAVE_CASE_DW_OP_const4u
-				addend = UNALIGNED_GET32((uint32_t const *)reader);
+				addend = UNALIGNED_GET32(reader);
 #endif /* __SIZEOF_INTMAX_T__ > 4 */
 			} else if (addrsize >= 2) {
 		case DW_OP_const2u:
 		case DW_OP_call2:
-				addend = UNALIGNED_GET16((uint16_t const *)reader);
+				addend = UNALIGNED_GET16(reader);
 			} else {
 		case DW_OP_const1u:
-				addend = *(uint8_t const *)reader;
+				addend = UNALIGNED_GET8(reader);
 			}
 #ifndef HAVE_CASE_DW_OP_const8u
 			__IF0 {
 		case DW_OP_const8u:
-				addend = (uintmax_t)UNALIGNED_GET((uint64_t const *)reader);
+				addend = (uintmax_t)UNALIGNED_GET64(reader);
 			}
 #endif /* !HAVE_CASE_DW_OP_const8u */
 #ifndef HAVE_CASE_DW_OP_const4u
 			__IF0 {
 		case DW_OP_const4u:
 		case DW_OP_call4:
-				addend = (uintmax_t)UNALIGNED_GET((uint32_t const *)reader);
+				addend = (uintmax_t)UNALIGNED_GET32(reader);
 			}
 #endif /* !HAVE_CASE_DW_OP_const4u */
 			__IF0 {
@@ -571,10 +571,10 @@ print_cfi_instruction(pformatprinter printer, void *arg,
 
 		{
 			intmax_t addend;
-			__IF0 { case DW_OP_const1s: addend = (intmax_t)(*(int8_t const *)reader); }
-			__IF0 { case DW_OP_const2s: addend = (intmax_t)UNALIGNED_GET16((int16_t const *)reader); }
-			__IF0 { case DW_OP_const4s: addend = (intmax_t)UNALIGNED_GET32((int32_t const *)reader); }
-			__IF0 { case DW_OP_const8s: addend = (intmax_t)UNALIGNED_GET64((int64_t const *)reader); }
+			__IF0 { case DW_OP_const1s: addend = (intmax_t)(int8_t)UNALIGNED_GET8(reader); }
+			__IF0 { case DW_OP_const2s: addend = (intmax_t)(int16_t)UNALIGNED_GET16(reader); }
+			__IF0 { case DW_OP_const4s: addend = (intmax_t)(int32_t)UNALIGNED_GET32(reader); }
+			__IF0 { case DW_OP_const8s: addend = (intmax_t)(int64_t)UNALIGNED_GET64(reader); }
 			__IF0 {
 		case DW_OP_consts:
 		case DW_OP_breg0 ... DW_OP_breg31:
@@ -717,7 +717,7 @@ print_cfi_expression_with_label_bufsize(pformatprinter printer, void *arg,
 		if (opcode == DW_OP_skip || opcode == DW_OP_bra) {
 			int16_t offset;
 			reader += 1;
-			offset = (int16_t)UNALIGNED_GET16((uint16_t const *)reader);
+			offset = (int16_t)UNALIGNED_GET16(reader);
 			reader += 2;
 			label_buffer_insert(labels, reader + offset);
 		} else {
@@ -1073,23 +1073,23 @@ decode_form:
 								value.l_llist4 += parser.dsp_addrsize;
 #if __SIZEOF_POINTER__ > 4
 							} else if (parser.dsp_addrsize >= 4) {
-								range_start = UNALIGNED_GET32((uint32_t const *)value.l_llist4);
+								range_start = UNALIGNED_GET32(value.l_llist4);
 								value.l_llist4 += parser.dsp_addrsize;
-								range_end = UNALIGNED_GET32((uint32_t const *)value.l_llist4);
+								range_end = UNALIGNED_GET32(value.l_llist4);
 								value.l_llist4 += parser.dsp_addrsize;
 #endif /* __SIZEOF_POINTER__ > 4 */
 							} else if (parser.dsp_addrsize >= 2) {
-								range_start = UNALIGNED_GET16((uint16_t const *)value.l_llist4);
+								range_start = UNALIGNED_GET16(value.l_llist4);
 								value.l_llist4 += parser.dsp_addrsize;
-								range_end = UNALIGNED_GET16((uint16_t const *)value.l_llist4);
+								range_end = UNALIGNED_GET16(value.l_llist4);
 								value.l_llist4 += parser.dsp_addrsize;
 							} else {
-								range_start = *(uint8_t const *)value.l_llist4;
+								range_start = UNALIGNED_GET8(value.l_llist4);
 								value.l_llist4 += parser.dsp_addrsize;
-								range_end = *(uint8_t const *)value.l_llist4;
+								range_end = UNALIGNED_GET8(value.l_llist4);
 								value.l_llist4 += parser.dsp_addrsize;
 							}
-							length = UNALIGNED_GET16((uint16_t const *)value.l_llist4);
+							length = UNALIGNED_GET16(value.l_llist4);
 							value.l_llist4 += 2;
 							if (range_start == (uintptr_t)-1) {
 								/* Base address selection entry! */

@@ -77,7 +77,7 @@ NOTHROW(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
 	reader = cmodunit_di_start(self);
 	result->dup_cu_info_hdr = reader;
 	/* 7.5.1.1   Compilation Unit Header */
-	temp = UNALIGNED_GET32((uint32_t const *)reader); /* unit_length */
+	temp = UNALIGNED_GET32(reader); /* unit_length */
 	reader += 4;
 	result->dsp_ptrsize = 4;
 	if (temp == UINT32_C(0xffffffff)) {
@@ -85,7 +85,7 @@ NOTHROW(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
 		 * In the 64-bit DWARF format, an initial length field is 96 bits in size, and has two parts:
 		 *  - The first 32-bits have the value 0xffffffff.
 		 *  - The following 64-bits contain the actual length represented as an unsigned 64-bit integer. */
-		temp = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader); /* unit_length */
+		temp = (uintptr_t)UNALIGNED_GET64(reader); /* unit_length */
 		result->dsp_ptrsize = 8;
 		reader += 8;
 	}
@@ -95,7 +95,7 @@ NOTHROW(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
 	    result->dsp_cu_info_end > cmodunit_di_maxend(self))
 		result->dsp_cu_info_end = cmodunit_di_maxend(self);
 
-	result->dsp_version = UNALIGNED_GET16((uint16_t const *)reader); /* version */
+	result->dsp_version = UNALIGNED_GET16(reader); /* version */
 	reader += 2;
 	if (result->dsp_version >= 5) {
 		unit_type = *(uint8_t const *)reader; /* unit_type */
@@ -105,7 +105,7 @@ NOTHROW(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
 	} else {
 		unit_type = DW_UT_compile;
 	}
-	temp = UNALIGNED_GET32((uint32_t const *)reader); /* debug_abbrev_offset */
+	temp = UNALIGNED_GET32(reader); /* debug_abbrev_offset */
 	reader += 4;
 	if (temp == 0xffffffff)
 		reader += 8;
@@ -512,7 +512,7 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod) {
 			cu->cu_di_start         = reader;
 			cu->cu_symbols.mst_symc = 0;
 			cu->cu_symbols.mst_symv = (struct cmodsym *)-1; /* Not loaded. */
-			length = UNALIGNED_GET32((uint32_t const *)reader); /* unit_length */
+			length = UNALIGNED_GET32(reader); /* unit_length */
 			reader += 4;
 			parser.dsp_ptrsize = 4;
 			if (length >= UINT32_C(0xfffffff0)) {
@@ -521,7 +521,7 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod) {
 					 * In the 64-bit DWARF format, an initial length field is 96 bits in size, and has two parts:
 					 *  - The first 32-bits have the value 0xffffffff.
 					 *  - The following 64-bits contain the actual length represented as an unsigned 64-bit integer. */
-					length = (size_t)UNALIGNED_GET64((uint64_t const *)reader);
+					length = (size_t)UNALIGNED_GET64(reader);
 					reader += 8;
 					parser.dsp_ptrsize = 8;
 				} else {
@@ -536,7 +536,7 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod) {
 			if (OVERFLOW_UADD((uintptr_t)reader, length, (uintptr_t *)&next_cu) || next_cu > end)
 				next_cu = end;
 			cu[1].cu_di_start = next_cu; /* Set the END-pointer. */
-			parser.dsp_version = UNALIGNED_GET16((uint16_t const *)reader);
+			parser.dsp_version = UNALIGNED_GET16(reader);
 			reader += 2; /* version */
 			if (parser.dsp_version >= 5) {
 				unit_type = *(uint8_t const *)reader; /* unit_type */
@@ -550,10 +550,10 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod) {
 			} else {
 				unit_type = DW_UT_compile;
 			}
-			debug_abbrev_offset = UNALIGNED_GET32((uint32_t const *)reader); /* debug_abbrev_offset */
+			debug_abbrev_offset = UNALIGNED_GET32(reader); /* debug_abbrev_offset */
 			reader += 4;
 			if (debug_abbrev_offset == 0xffffffff) {
-				debug_abbrev_offset = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
+				debug_abbrev_offset = (uintptr_t)UNALIGNED_GET64(reader);
 				reader += 8;
 			}
 			if unlikely(OVERFLOW_UADD((uintptr_t)result->cm_sections.ds_debug_abbrev_start, debug_abbrev_offset,
@@ -1513,9 +1513,9 @@ again:
 				goto nope;
 			++loc.l_expr;
 			if (parser.dsp_addrsize == 4) {
-				*pmodule_relative_addr = (uintptr_t)UNALIGNED_GET32((uint32_t const *)loc.l_expr);
+				*pmodule_relative_addr = (uintptr_t)UNALIGNED_GET32(loc.l_expr);
 			} else if (parser.dsp_addrsize == 8) {
-				*pmodule_relative_addr = (uintptr_t)UNALIGNED_GET64((uint64_t const *)loc.l_expr);
+				*pmodule_relative_addr = (uintptr_t)UNALIGNED_GET64(loc.l_expr);
 			} else {
 				goto nope;
 			}
@@ -2657,9 +2657,9 @@ again:
 				break;
 			++loc.l_expr;
 			if (parser->dsp_addrsize == 4) {
-				module_relative_component_addr = (uintptr_t)UNALIGNED_GET32((uint32_t const *)loc.l_expr);
+				module_relative_component_addr = (uintptr_t)UNALIGNED_GET32(loc.l_expr);
 			} else if (parser->dsp_addrsize == 8) {
-				module_relative_component_addr = (uintptr_t)UNALIGNED_GET64((uint64_t const *)loc.l_expr);
+				module_relative_component_addr = (uintptr_t)UNALIGNED_GET64(loc.l_expr);
 			} else {
 				break;
 			}
