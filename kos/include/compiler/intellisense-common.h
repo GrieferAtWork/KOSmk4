@@ -431,7 +431,9 @@ unsigned long __intellisense_leswap32(__intern::____intellisense_endianint</*__O
 unsigned long __intellisense_beswap32(__intern::____intellisense_endianint</*__ORDER_BIG_ENDIAN__*/ 4321, unsigned long>);
 unsigned long long __intellisense_leswap64(__intern::____intellisense_endianint</*__ORDER_LITTLE_ENDIAN__*/ 1234, unsigned long long>);
 unsigned long long __intellisense_beswap64(__intern::____intellisense_endianint</*__ORDER_BIG_ENDIAN__*/ 4321, unsigned long long>);
-#if __BYTE_ORDER__ == /*__ORDER_LITTLE_ENDIAN__*/ 1234
+
+#define ____INTELLISENSE_BYTE_ORDER__ 1234
+#if ____INTELLISENSE_BYTE_ORDER__ == /*__ORDER_LITTLE_ENDIAN__*/ 1234
 unsigned short __intellisense_leswap16(unsigned short);
 unsigned int __intellisense_leswap32(unsigned int);
 unsigned long __intellisense_leswap32(unsigned long);
@@ -440,7 +442,7 @@ __intern::____intellisense_endianint</*__ORDER_BIG_ENDIAN__*/ 4321, unsigned sho
 __intern::____intellisense_endianint</*__ORDER_BIG_ENDIAN__*/ 4321, unsigned int> __intellisense_beswap32(unsigned int);
 __intern::____intellisense_endianint</*__ORDER_BIG_ENDIAN__*/ 4321, unsigned long> __intellisense_beswap32(unsigned long);
 __intern::____intellisense_endianint</*__ORDER_BIG_ENDIAN__*/ 4321, unsigned long long> __intellisense_beswap64(unsigned long long);
-#else /* __BYTE_ORDER__ == /*__ORDER_LITTLE_ENDIAN__*/ 1234 */
+#else /* ____INTELLISENSE_BYTE_ORDER__ == / *__ORDER_LITTLE_ENDIAN__* / 1234 */
 __intern::____intellisense_endianint</*__ORDER_BIG_ENDIAN__*/ 4321, unsigned short> __intellisense_leswap16(unsigned short);
 __intern::____intellisense_endianint</*__ORDER_BIG_ENDIAN__*/ 4321, unsigned int> __intellisense_leswap32(unsigned int);
 __intern::____intellisense_endianint</*__ORDER_BIG_ENDIAN__*/ 4321, unsigned long> __intellisense_leswap32(unsigned long);
@@ -449,9 +451,9 @@ unsigned short __intellisense_beswap16(unsigned short);
 unsigned int __intellisense_beswap32(unsigned int);
 unsigned long __intellisense_beswap32(unsigned long);
 unsigned long long __intellisense_beswap64(unsigned long long);
-#endif /* __BYTE_ORDER__ != /*__ORDER_LITTLE_ENDIAN__*/ 1234 */
+#endif /* ____INTELLISENSE_BYTE_ORDER__ != / *__ORDER_LITTLE_ENDIAN__* / 1234 */
 
-}
+} /* namespace __intern */
 #endif /* __cplusplus */
 
 #ifndef __INTELLISENSE_GCC__
@@ -551,7 +553,7 @@ ____INTELLISENSE_BOOL __builtin_umulll_overflow(unsigned long long __a, unsigned
 #if __cplusplus >= 201406L
 #undef __cpp_static_assert
 #define __cpp_static_assert 201411
-#endif
+#endif /* __cplusplus >= 201406L */
 } /* extern "C++" */
 #endif /* __cplusplus */
 

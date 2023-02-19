@@ -23,22 +23,6 @@
 #include "../__stdinc.h"
 #include "typecore.h"
 
-#ifndef __cplusplus
-#ifdef __COMPILER_HAVE_TYPEOF
-#define __ATOMIC_RECAST(p, y) ((__typeof__(*(p)))(y))
-#elif 1
-#define __ATOMIC_RECAST(p, y) (1 ? (y) : *(p))
-#else /* ... */
-#define __ATOMIC_RECAST(p, y) (y)
-#endif /* !... */
-#endif /* !__cplusplus */
-
-#if defined(_MSC_VER) && !defined(__cplusplus)
-#define __ATOMIC_DOWNCAST(T) (T)(__UINTPTR_TYPE__)
-#else /* _MSC_VER && !__cplusplus */
-#define __ATOMIC_DOWNCAST(T) (T)
-#endif /* !_MSC_VER || __cplusplus */
-
 /* Define atomic memory order constants. */
 #ifndef __ATOMIC_RELAXED
 #define __ATOMIC_RELAXED 0
