@@ -4390,16 +4390,16 @@ PRIVATE struct com_eh_frame const eh_frame_pattern = {
 #endif /* !__x86_64__ */
 	.cef_cie_lsdaenc   = DW_EH_PE_absptr,
 	.cef_cie_persoenc  = DW_EH_PE_absptr,
-	.cef_cie_persoptr  = NULL, /* Dynamically filled */
+	.cef_cie_persoptr  = (uintptr_t)NULL, /* Dynamically filled */
 	/* CIE init text would go here... */
 
 	/* FDE */
 	.cef_fde_size      = 0, /* Dynamically filled */
 	.cef_fde_cie_off   = offsetof(struct com_eh_frame, cef_fde_cie_off),
-	.cef_fde_funbase   = NULL, /* Dynamically filled */
-	.cef_fde_funsize   = 0,    /* Dynamically filled */
+	.cef_fde_funbase   = (uintptr_t)NULL, /* Dynamically filled */
+	.cef_fde_funsize   = 0,               /* Dynamically filled */
 	.cef_fde_auglen    = SIZEOF_POINTER,
-	.cef_fde_lsda      = NULL, /* Dynamically filled */
+	.cef_fde_lsda      = (uintptr_t)NULL, /* Dynamically filled */
 };
 
 
@@ -4413,9 +4413,9 @@ NOTHROW(FCALL comgen_eh_frame_setup)(struct com_generator *__restrict self) {
 }
 
 #define comgen_eh_frame(self)           ((struct com_eh_frame *)(self)->cg_ehbas)
-#define comgen_eh_frame_startproc(self) UNALIGNED_SET((uintptr_t *)&comgen_eh_frame(self)->cef_fde_funbase, (uintptr_t)(self)->cg_txptr)
+#define comgen_eh_frame_startproc(self) UNALIGNED_SET(&comgen_eh_frame(self)->cef_fde_funbase, (uintptr_t)(self)->cg_txptr)
 #define comgen_eh_frame_endproc(self)   UNALIGNED_SET(&comgen_eh_frame(self)->cef_fde_funsize, (size_t)((self)->cg_txptr - (self)->cg_txbas))
-#define comgen_eh_set_lsda(self, ptr)   UNALIGNED_SET((uintptr_t *)&comgen_eh_frame(self)->cef_fde_lsda, (uintptr_t)(ptr))
+#define comgen_eh_set_lsda(self, ptr)   UNALIGNED_SET(&comgen_eh_frame(self)->cef_fde_lsda, (uintptr_t)(ptr))
 
 __LIBC void __gcc_personality_v0(void);
 
@@ -4423,7 +4423,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL comgen_eh_frame_finish)(struct com_generator *__restrict self) {
 	/* Finalize the .eh_frame description header. */
 	struct com_eh_frame *eh_hdr = (struct com_eh_frame *)self->cg_ehbas;
-	UNALIGNED_SET((uintptr_t *)&eh_hdr->cef_cie_persoptr, (uintptr_t)(void *)&__gcc_personality_v0);
+	UNALIGNED_SET(&eh_hdr->cef_cie_persoptr, (uintptr_t)(void *)&__gcc_personality_v0);
 	UNALIGNED_SET(&eh_hdr->cef_fde_size, (uint32_t)(size_t)(self->cg_ehptr - (byte_t *)&eh_hdr->cef_fde_size));
 
 	/* After the following write has been done, other threads may _immediately_

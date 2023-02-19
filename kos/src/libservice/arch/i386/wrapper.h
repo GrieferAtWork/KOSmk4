@@ -1454,16 +1454,16 @@ struct ATTR_PACKED ATTR_ALIGNED(1) com_eh_frame {
 #endif /* !__x86_64__ */
 	uint8_t   cef_cie_lsdaenc;   /* [== DW_EH_PE_absptr]        CIE::cie_lsdaenc */
 	uint8_t   cef_cie_persoenc;  /* [== DW_EH_PE_absptr]        CIE::cie_persoenc */
-	void     *cef_cie_persoptr;  /* <Flexible>                  CIE::cie_persoptr */
+	uintptr_t cef_cie_persoptr;  /* <Flexible>                  CIE::cie_persoptr */
 	/* CIE init text would go here... */
 
 	/* FDE */
 	uint32_t  cef_fde_size;      /* <Flexible>                     FDE::fde_size */
 	uint32_t  cef_fde_cie_off;   /* [== offsetof(cef_fde_cie_off)] FDE::fde_cie_off */
-	void     *cef_fde_funbase;   /* <Flexible>                     FDE::fde_funbase */
+	uintptr_t cef_fde_funbase;   /* <Flexible>                     FDE::fde_funbase */
 	size_t    cef_fde_funsize;   /* <Flexible>                     FDE::fde_funsize */
 	uint8_t   cef_fde_auglen;    /* [== sizeof(void *)]            FDE::fde_auglen */
-	void     *cef_fde_lsda;      /* <Flexible>                     FDE::fde_lsda */
+	uintptr_t cef_fde_lsda;      /* <Flexible>                     FDE::fde_lsda */
 
 	/* FDE unwind instrumentation text */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, cef_fde_text); /* FDE::fde_text */

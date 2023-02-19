@@ -244,6 +244,7 @@ $errno_t getspnam_r([[in]] char const *__restrict name,
 
 [[cp, doc_alias("getspent_r")]]
 [[decl_include("<bits/crt/db/spwd.h>", "<bits/types.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[requires_function(fgetspent_r, fmemopen)]]
 $errno_t sgetspent_r([[in]] char const *__restrict string,
                      [[out]] struct spwd *__restrict resultbuf,
@@ -255,6 +256,12 @@ $errno_t sgetspent_r([[in]] char const *__restrict string,
 		retval = fgetspent_r(fp, resultbuf, buffer, buflen, result);
 @@pp_if $has_function(fclose)@@
 		fclose(fp);
+@@pp_endif@@
+	} else {
+@@pp_ifdef ENOMEM@@
+		retval = __libc_geterrno_or(ENOMEM);
+@@pp_else@@
+		retval = __libc_geterrno_or(1);
 @@pp_endif@@
 	}
 	return retval;

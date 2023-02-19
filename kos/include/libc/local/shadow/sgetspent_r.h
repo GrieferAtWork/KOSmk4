@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab909b6d */
+/* HASH CRC-32:0x8329989c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,6 +91,9 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
+__NAMESPACE_LOCAL_END
+#include <libc/errno.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sgetspent_r) __ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(5) __ATTR_OUTS(3, 4) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sgetspent_r))(char const *__restrict __string, struct spwd *__restrict __resultbuf, char *__restrict __buffer, __SIZE_TYPE__ __buflen, struct spwd **__restrict __result) {
 	__errno_t __retval;
@@ -100,6 +103,12 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sgetspent_r))(char const *__restrict 
 #if defined(__CRT_HAVE_fclose) || defined(__CRT_HAVE__fclose_nolock) || defined(__CRT_HAVE__IO_fclose)
 		(__NAMESPACE_LOCAL_SYM __localdep_fclose)(__fp);
 #endif /* __CRT_HAVE_fclose || __CRT_HAVE__fclose_nolock || __CRT_HAVE__IO_fclose */
+	} else {
+#ifdef __ENOMEM
+		__retval = __libc_geterrno_or(__ENOMEM);
+#else /* __ENOMEM */
+		__retval = __libc_geterrno_or(1);
+#endif /* !__ENOMEM */
 	}
 	return __retval;
 }

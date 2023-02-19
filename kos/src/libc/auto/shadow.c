@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ab6e5bf */
+/* HASH CRC-32:0x675d49ce */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -151,6 +151,7 @@ err_inval:
 
 
 }
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) errno_t
 NOTHROW_RPC(LIBCCALL libc_sgetspent_r)(char const *__restrict string,
                                        struct spwd *__restrict resultbuf,
@@ -163,6 +164,12 @@ NOTHROW_RPC(LIBCCALL libc_sgetspent_r)(char const *__restrict string,
 		retval = libc_fgetspent_r(fp, resultbuf, buffer, buflen, result);
 
 		libc_fclose(fp);
+
+	} else {
+
+		retval = __libc_geterrno_or(ENOMEM);
+
+
 
 	}
 	return retval;
