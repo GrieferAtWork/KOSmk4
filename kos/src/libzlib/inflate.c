@@ -45,7 +45,7 @@
 #include <kernel/malloc.h>
 #include <kernel/panic.h>
 
-#include <hybrid/atomic.h>
+#include <atomic.h>
 #endif /* __KERNEL__ */
 
 DECL_BEGIN
@@ -75,7 +75,7 @@ PRIVATE struct zlib_cache *CC zlib_cache_alloc(void) {
 	if (kernel_poisoned()) {
 		/* Try not to make use of the heap after being poisoned! */
 alloc_static:
-		if (ATOMIC_XCH(static_zlib_cache_inuse, true))
+		if (atomic_xch(&static_zlib_cache_inuse, true))
 			return NULL;
 		return &static_zlib_cache;
 	}
@@ -87,7 +87,7 @@ alloc_static:
 }
 PRIVATE void CC zlib_cache_free(/*nullable*/ struct zlib_cache *self) {
 	if (self == &static_zlib_cache) {
-		ATOMIC_WRITE(static_zlib_cache_inuse, false);
+		atomic_write(&static_zlib_cache_inuse, false);
 	} else {
 		kfree(self);
 	}

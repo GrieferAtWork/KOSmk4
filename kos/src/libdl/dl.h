@@ -28,7 +28,6 @@
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/host.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sched/atomic-rwlock.h>
@@ -355,7 +354,8 @@ libdl_dlsym(USER DlModule *handle, USER char const *symbol_name)
  * simple  `File or directory not found' message, but rather something along
  * the  lines  of  `Symbol "foo" could not be found in library "libfoo.so"'.
  * The implementation of this function looks like:
- * >> return ATOMIC_XCH(error_message_pointer, NULL);
+ * >> return atomic_xch(&error_message_pointer, NULL);
+ *
  * Where internally, libdl will set `error_message_pointer' to a non-NULL pointer
  * when an error happens.
  * @return: * :   A pointer  to a  volatile (as  in: the  same memory  area may  be

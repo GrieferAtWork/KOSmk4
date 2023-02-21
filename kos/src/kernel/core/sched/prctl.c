@@ -32,7 +32,6 @@
 #include <sched/pid.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
 
 #include <compat/config.h>
@@ -41,6 +40,7 @@
 #include <kos/except/reason/inval.h>
 #include <linux/prctl.h>
 
+#include <atomic.h>
 #include <errno.h>
 #include <signal.h>
 #include <string.h>
@@ -93,7 +93,7 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 
 	case PR_GET_KEEPCAPS: {
 		struct cred *mycred = FORTASK(me, this_cred);
-		return (ATOMIC_READ(mycred->c_securebits) & SECBIT_KEEP_CAPS) != 0;
+		return (atomic_read(&mycred->c_securebits) & SECBIT_KEEP_CAPS) != 0;
 	}	break;
 
 	case PR_SET_KEEPCAPS: {
@@ -290,7 +290,7 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 			      E_INVALID_ARGUMENT_CONTEXT_PRCTL_GET_NO_NEW_PRIVS_RESERVED5,
 			      arg5);
 		}
-		return ATOMIC_READ(mycred->c_no_new_privs) != 0 ? 1 : 0;
+		return atomic_read(&mycred->c_no_new_privs) != 0 ? 1 : 0;
 	}	break;
 
 	case PR_GET_TID_ADDRESS: {

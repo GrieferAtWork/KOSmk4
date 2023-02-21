@@ -329,7 +329,7 @@ $ssize_t memeq_nopf([[user, checked, in_opt(num_bytes)]] void const *lhs,
 
 
 @@>> atomic_xch[bwlq]_nopf(3)
-@@Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
+@@Try  to atomic_xch  at a  possibly faulty  `addr', storing the
 @@old value in `*poldval', and loading a new value from `newval'
 @@Return `true' on success, `false' on fault
 [[guard, kernel, noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]]
@@ -387,7 +387,7 @@ bool atomic_xchq_nopf([[user, checked, inout_opt]] void *addr, $uint64_t newval,
 
 
 @@>> atomic_fetchadd[bwlq]_nopf(3)
-@@Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing  the
+@@Try to atomic_fetchadd at a possibly faulty `addr', storing  the
 @@old value in `*poldval', and adding `newval' onto the stored val
 @@Return `true' on success, `false' on fault
 [[guard, kernel, noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]]

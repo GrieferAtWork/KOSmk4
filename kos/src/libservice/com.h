@@ -29,7 +29,6 @@
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/host.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
@@ -89,7 +88,7 @@ DECL_BEGIN
  * >>     if (futex_waitwhile(&com->sc_code, cmd) != 0) {
  * >>         // Interrupted (abort the operation)
  * >>         assert(errno == EINTR);
- * >>         if (ATOMIC_CMPXCH(com->sc_code, cmd, SERVICE_COM_ECHO)) {
+ * >>         if (atomic_cmpxch(&com->sc_code, cmd, SERVICE_COM_ECHO)) {
  * >>
  * >>             // The following sends an out-of-band command to the server which
  * >>             // will cause the thread servicing our command to receive a sporadic,
@@ -153,16 +152,16 @@ DECL_BEGIN
  * >>         com = CONSUME_PENDING_COMMAND_OR_WAITFOR_ARRIVAL();
  * >>
  * >> again:
- * >>         code = ATOMIC_READ(com->sc_code);
+ * >>         code = atomic_read(&com->sc_code);
  * >>         if unlikely(SERVICE_COM_ISSPECIAL(code)) {
  * >>             switch (code) {
  * >>             case SERVICE_COM_DLSYM:
  * >>                ...;
- * >>                ATOMIC_WRITE(com->sc_code, SERVICE_COM_ST_SUCCESS);
+ * >>                atomic_write(&com->sc_code, SERVICE_COM_ST_SUCCESS);
  * >>                futex_wakeall(&com->sc_code);
  * >>                continue;
  * >>             case SERVICE_COM_ECHO:
- * >>                ATOMIC_WRITE(com->sc_code, SERVICE_COM_ST_ECHO);
+ * >>                atomic_write(&com->sc_code, SERVICE_COM_ST_ECHO);
  * >>                futex_wakeall(&com->sc_code);
  * >>                continue;
  * >>             default:
@@ -174,14 +173,14 @@ DECL_BEGIN
  * >>         TRY {
  * >>             T result = (*func)(DECODE_ARGUMENTS(com->sc_generic.g_data));
  * >>             com->sc_retval = ENCODE_RETURN(result);
- * >>             ATOMIC_WRITE(com->sc_code, (uintptr_t)-(intptr_t)errno);
+ * >>             atomic_write(&com->sc_code, (uintptr_t)-(intptr_t)errno);
  * >>         } EXCEPT {
  * >>             if (was_throws(E_INTERRUPT)) // Thrown as the result of `INTERRUPT_SERVICE_OPERATION()'
  * >>                 goto again;
  * >>             struct exception_data *ex = except_data();
  * >>             com->sc_except.e_code = ex->e_code;
  * >>             com->sc_except.e_code = ex->e_args;
- * >>             if (!ATOMIC_CMPXCH(com->sc_code, code, SERVICE_COM_ST_EXCEPT))
+ * >>             if (!atomic_cmpxch(&com->sc_code, code, SERVICE_COM_ST_EXCEPT))
  * >>                 goto again;
  * >>         }
  * >>         futex_wakeall(&com->sc_code); // Should only be 1, but better be safe and broadcast!
@@ -324,7 +323,7 @@ struct service_shm {
 	 * >>     struct service_com *result;
 	 * >>     for (;;) {
 	 * >>         lfutex_t com, next;
-	 * >>         com = ATOMIC_READ(self->s_commands);
+	 * >>         com = atomic_read(&self->s_commands);
 	 * >>         if (com == 0)
 	 * >>             return NULL;
 	 * >>         if (com > MAPPED_SIZE_OF(self)) {
@@ -345,7 +344,7 @@ struct service_shm {
 	 * >>                                   // that `s_commands' doesn't differ from `com'
 	 * >>                                   // Only if the CMPXCH fails may this read have
 	 * >>                                   // been bogus.
-	 * >>         if (!ATOMIC_CMPXCH(self->s_commands, com, next))
+	 * >>         if (!atomic_cmpxch(&self->s_commands, com, next))
 	 * >>             continue;
 	 * >>         // Ensure that at least 1 additional thread is also waiting for
 	 * >>         // more commands to arrive (or service commands that are still
@@ -505,12 +504,12 @@ struct service {
 	 * >>             THROW(E_SERVICE_EXITED);
 	 * >>         elem->scd_active_link = next;
 	 * >>         COMPILER_WRITE_BARRIER();
-	 * >>     } while (!ATOMIC_CMPXCH_WEAK(s_active_list, next, shm_offsetof_elem_com));
+	 * >>     } while (!atomic_cmpxch_weak(&s_active_list, next, shm_offsetof_elem_com));
 	 * >> }
 	 * >>
 	 * >> REMOVE(struct service_comdesc *elem, uintptr_t shm_offsetof_elem_com) {
 	 * >>     uintptr_t next = elem->scd_active_link;
-	 * >>     if (ATOMIC_CMPXCH(s_active_list, shm_offsetof_elem_com, next))
+	 * >>     if (atomic_cmpxch(&s_active_list, shm_offsetof_elem_com, next))
 	 * >>         return;
 	 * >>     preemption_pushoff();
 	 * >>     // This acquire also waits for `ABORT_ALL_COMMANDS_ON_HOP()' to finish
@@ -520,7 +519,7 @@ struct service {
 	 * >>     uintptr_t first = s_active_list;
 	 * >>     if (first == shm_offsetof_elem_com) {
 	 * >>         next = elem->scd_active_link; // Must re-read here!
-	 * >>         if (!ATOMIC_CMPXCH(s_active_list, first, next))
+	 * >>         if (!atomic_cmpxch(&s_active_list, first, next))
 	 * >>             goto again_inner;
 	 * >>     } else if (first != 0) {
 	 * >> #define COMDESC_FROM_COM_OFFSET(offset) \
@@ -547,7 +546,7 @@ struct service {
 	 * >>     uintptr_t chain;
 	 * >>     preemption_pushoff();
 	 * >>     atomic_lock_acquire(&s_shm_lock);
-	 * >>     chain = ATOMIC_XCH(s_active_list, SERVICE_ACTIVE_LIST_SHUTDOWN);
+	 * >>     chain = atomic_xch(&s_active_list, SERVICE_ACTIVE_LIST_SHUTDOWN);
 	 * >>     while (chain) {
 	 * >>         uintptr_t next;
 	 * >>         struct service_comdesc *iter;

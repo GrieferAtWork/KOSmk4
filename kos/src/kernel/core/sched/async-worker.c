@@ -28,13 +28,13 @@
 #include <sched/async.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
 
 #include <kos/aref.h>
 #include <kos/except.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -66,9 +66,9 @@ struct aworker: async {
 #define aworker_decref_obj(self, obj) \
 	(*handle_type_db.h_decref[(self)->aw_typ])(obj);
 
-#define aworker_eq(self, ops, obj, typ)      \
-	(aworker_getops(self) == (ops) &&        \
-	 ATOMIC_READ((self)->aw_obj) == (obj) && \
+#define aworker_eq(self, ops, obj, typ)       \
+	(aworker_getops(self) == (ops) &&         \
+	 atomic_read(&(self)->aw_obj) == (obj) && \
 	 (self)->aw_typ == (typ))
 
 LOCAL NOBLOCK bool
@@ -78,9 +78,9 @@ NOTHROW(FCALL aworker_clearobj)(struct aworker *__restrict self) {
 	preemption_flag_t was;
 	preemption_pushoff(&was);
 #endif /* CONFIG_NO_SMP */
-	old_value = ATOMIC_XCH(self->aw_obj, NULL);
+	old_value = atomic_xch(&self->aw_obj, NULL);
 #ifndef CONFIG_NO_SMP
-	while (ATOMIC_READ(self->aw_inuse))
+	while (atomic_read(&self->aw_inuse))
 		task_tryyield_or_pause();
 #else /* !CONFIG_NO_SMP */
 	preemption_pop(&was);
@@ -92,14 +92,14 @@ LOCAL WUNUSED NONNULL((1)) /*nullable*/ REF void *
 NOTHROW(FCALL aworker_getref)(struct aworker *__restrict self) {
 	REF void *result;
 	PREEMPTION_DISABLE();
-	IF_SMP(ATOMIC_INC(self->aw_inuse));
+	IF_SMP(atomic_inc(&self->aw_inuse));
 	COMPILER_READ_BARRIER();
 	result = self->aw_obj;
 	COMPILER_READ_BARRIER();
 	/* Try to acquire a reference. */
 	if (likely(result) && unlikely(!(*handle_type_db.h_tryincref[self->aw_typ])(result)))
 		result = NULL;
-	IF_SMP(ATOMIC_DEC(self->aw_inuse));
+	IF_SMP(atomic_dec(&self->aw_inuse));
 	PREEMPTION_ENABLE();
 	return result;
 }

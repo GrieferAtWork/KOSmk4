@@ -27,7 +27,6 @@
 #include <hybrid/compiler.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/host.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
@@ -50,6 +49,7 @@
 #include <sys/param.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <signal.h>
@@ -597,7 +597,7 @@ service_shmbuf_increase_file_size_locked_nopr(struct service *__restrict self,
 	         MAP_SHARED | MAP_FIXED | MAP_FIXED_NOREPLACE | MAP_FILE,
 	         self->s_fd_shm, extension_fpos) != MAP_FAILED) {
 		/* Successfully inline-increased the current SHM mapping size. */
-		ATOMIC_WRITE(self->s_shm->ssh_endp,
+		atomic_write(&self->s_shm->ssh_endp,
 		             self->s_shm->ssh_endp + extension_size);
 		self->s_fd_shm_size += extension_size;
 		return true;
@@ -1195,7 +1195,7 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
 		/* TODO: Check for `SERVICE_SHM_COMMANDS_SHUTDOWN' */
 		com->scd_com.sc_link = com_nxtaddr;
 		COMPILER_WRITE_BARRIER();
-	} while (!ATOMIC_CMPXCH_WEAK(shm_ctl->s_commands,
+	} while (!atomic_cmpxch_weak(&shm_ctl->s_commands,
 	                             com_nxtaddr, com_reladdr));
 
 	/* Wake up the server. */

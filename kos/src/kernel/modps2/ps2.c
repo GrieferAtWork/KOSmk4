@@ -31,8 +31,7 @@
 #include <kernel/x86/pic.h> /* TODO: Non-portable! */
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
-
+#include <atomic.h>
 #include <inttypes.h>
 #include <string.h>
 #include <time.h>
@@ -140,11 +139,11 @@ again:
 	ps2_write_data(portno, command);
 	for (;;) {
 		ktime_t tmo;
-		status = ATOMIC_READ(probe_data[portno].pd_status);
+		status = atomic_read(&probe_data[portno].pd_status);
 		if (status != 0)
 			break;
 		task_connect_for_poll(&probe_data[portno].pd_avail);
-		status = ATOMIC_READ(probe_data[portno].pd_status);
+		status = atomic_read(&probe_data[portno].pd_status);
 		if (status != 0) {
 			task_disconnectall();
 			break;
@@ -174,13 +173,13 @@ again:
 	ps2_write_data(portno, command);
 	for (;;) {
 		ktime_t tmo;
-		state  = ATOMIC_READ(probe_data[portno].pd_state);
-		status = ATOMIC_READ(probe_data[portno].pd_status);
+		state  = atomic_read(&probe_data[portno].pd_state);
+		status = atomic_read(&probe_data[portno].pd_status);
 		if (state == PS2_PROBE_STATE_UNCONFIGURED || (status & PS2_PROBE_STATUS_FRESEND))
 			break;
 		task_connect_for_poll(&probe_data[portno].pd_avail);
-		state  = ATOMIC_READ(probe_data[portno].pd_state);
-		status = ATOMIC_READ(probe_data[portno].pd_status);
+		state  = atomic_read(&probe_data[portno].pd_state);
+		status = atomic_read(&probe_data[portno].pd_status);
 		if (state == PS2_PROBE_STATE_UNCONFIGURED || (status & PS2_PROBE_STATUS_FRESEND)) {
 			task_disconnectall();
 			break;
@@ -188,8 +187,8 @@ again:
 		tmo = ktime();
 		tmo += relktime_from_milliseconds(ps2_command_timeout);
 		if (!task_waitfor(tmo)) {
-			state  = ATOMIC_READ(probe_data[portno].pd_state);
-			status = ATOMIC_READ(probe_data[portno].pd_status);
+			state  = atomic_read(&probe_data[portno].pd_state);
+			status = atomic_read(&probe_data[portno].pd_status);
 			if (status & PS2_PROBE_STATUS_FRESEND)
 				goto try_resend;
 			THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HID);
@@ -217,13 +216,13 @@ again:
 	ps2_write_data(portno, PS2_KEYBOARD_CMD_IDENTIFY);
 	for (;;) {
 		ktime_t tmo;
-		state  = ATOMIC_READ(probe_data[portno].pd_state);
-		status = ATOMIC_READ(probe_data[portno].pd_status);
+		state  = atomic_read(&probe_data[portno].pd_state);
+		status = atomic_read(&probe_data[portno].pd_status);
 		if (state == PS2_PROBE_STATE_UNCONFIGURED || (status & PS2_PROBE_STATUS_FRESEND))
 			break;
 		task_connect_for_poll(&probe_data[portno].pd_avail);
-		state  = ATOMIC_READ(probe_data[portno].pd_state);
-		status = ATOMIC_READ(probe_data[portno].pd_status);
+		state  = atomic_read(&probe_data[portno].pd_state);
+		status = atomic_read(&probe_data[portno].pd_status);
 		if (state == PS2_PROBE_STATE_UNCONFIGURED || (status & PS2_PROBE_STATUS_FRESEND)) {
 			task_disconnectall();
 			break;
@@ -231,8 +230,8 @@ again:
 		tmo = ktime();
 		tmo += relktime_from_milliseconds(ps2_command_timeout);
 		if (!task_waitfor(tmo)) {
-			state  = ATOMIC_READ(probe_data[portno].pd_state);
-			status = ATOMIC_READ(probe_data[portno].pd_status);
+			state  = atomic_read(&probe_data[portno].pd_state);
+			status = atomic_read(&probe_data[portno].pd_status);
 			if (status & PS2_PROBE_STATUS_FRESEND)
 				goto try_resend;
 			if (state == PS2_PROBE_STATE_ID_0)

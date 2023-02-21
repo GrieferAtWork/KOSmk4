@@ -106,14 +106,14 @@ again_determine_parent:
 	caller_ctl = taskpid_getprocctl(caller_pid);
 	assert(caller_ctl == taskpid_getprocctl(parent_pid));
 	parent_proc = taskpid_gettask(parent_pid);
-	if unlikely(!parent_proc || (ATOMIC_READ(parent_proc->t_flags) & (TASK_FTERMINATING |
+	if unlikely(!parent_proc || (atomic_read(&parent_proc->t_flags) & (TASK_FTERMINATING |
 	                                                                  TASK_FTERMINATED))) {
 		/* Current process has exited. */
 		xdecref(parent_proc);
 		_taskpid_free(result_pid);
 		_task_serve(); /* Serve main thread's exit RPC */
 		/* Really shouldn't get here! */
-		THROW(E_EXIT_THREAD, ATOMIC_READ(parent_pid->tp_status));
+		THROW(E_EXIT_THREAD, atomic_read(&parent_pid->tp_status));
 	}
 	result_pid->tp_proc = parent_pid; /* Incref'd later */
 	result_pid->tp_pctl = caller_ctl;
@@ -140,7 +140,7 @@ use_boottask_as_parent:
 	} else if (clone_flags & CLONE_PARENT) {
 		/* Re-use parent of calling process as parent of child process */
 		parent_proc = taskpid_getparentprocess(caller_pid);
-		if unlikely(ATOMIC_READ(parent_proc->t_flags) & (TASK_FTERMINATING |
+		if unlikely(atomic_read(&parent_proc->t_flags) & (TASK_FTERMINATING |
 		                                                 TASK_FTERMINATED)) {
 			/* The calling process's parent has already terminated.
 			 * -> Simply use `boottask' instead, emulating what would
@@ -151,7 +151,7 @@ use_boottask_as_parent:
 	} else {
 		/* Using calling process as parent. */
 		parent_proc = taskpid_gettask(taskpid_getprocpid(caller_pid));
-		if unlikely(!parent_proc || (ATOMIC_READ(parent_proc->t_flags) & (TASK_FTERMINATING |
+		if unlikely(!parent_proc || (atomic_read(&parent_proc->t_flags) & (TASK_FTERMINATING |
 		                                                                  TASK_FTERMINATED))) {
 			/* Current process has exited. */
 			xdecref(parent_proc);
@@ -160,7 +160,7 @@ use_boottask_as_parent:
 			_taskpid_free(result_pid);
 			_task_serve(); /* Serve main thread's exit RPC */
 			/* Really shouldn't get here! */
-			THROW(E_EXIT_THREAD, ATOMIC_READ(taskpid_getprocpid(caller_pid)->tp_status));
+			THROW(E_EXIT_THREAD, atomic_read(&taskpid_getprocpid(caller_pid)->tp_status));
 		}
 	}
 
@@ -257,7 +257,7 @@ again_write_ctid_to_parent_tidptr:
 				pidns_endwriteall(result_pid->tp_ns);
 
 				/* Do a proper write, which is allowed to fault or be VIO. */
-				ATOMIC_WRITE(*parent_tidptr, ctid);
+				write_once(parent_tidptr, ctid);
 				task_serve();
 
 				/* Re-acquire locks. */
@@ -353,7 +353,7 @@ again_determine_group:
 		 * process. If we're no longer allowed to  do so, then jump back to  re-determine
 		 * the  parent process to-be used (if the then-determined process has terminated,
 		 * and /bin/init cannot be used, clone(2) will fail) */
-		if unlikely(ATOMIC_READ(parent_proc->t_flags) & (TASK_FTERMINATED |
+		if unlikely(atomic_read(&parent_proc->t_flags) & (TASK_FTERMINATED |
 		                                                 TASK_FTERMINATING)) {
 			LOCAL_RELEASE_ALL_LOCKS();
 #ifdef LOCAL_IS_PROC
@@ -399,7 +399,7 @@ again_determine_group:
 		 *           throw E_EXIT_PROCESS or E_EXIT_THREAD, which may only be thought
 		 *           of as completed _AFTER_ they set `TASK_FTERMINATING' within  the
 		 *           receiving thread. */
-		if (ATOMIC_READ(caller->t_flags) & TASK_FRPC) {
+		if (atomic_read(&caller->t_flags) & TASK_FRPC) {
 release_locks_and_do_task_serve:
 			LOCAL_RELEASE_ALL_LOCKS();
 #ifdef LOCAL_IS_PROC
@@ -420,13 +420,13 @@ release_locks_and_do_task_serve:
 			struct pending_rpc *rpc;
 			struct pending_rpc_slist pending;
 			uint32_t pending_bitset;
-			pending.slh_first = ATOMIC_READ(caller_ctl->pc_sig_list.slh_first);
-			pending_bitset    = ATOMIC_READ(caller_ctl->pc_sig_pend);
+			pending.slh_first = atomic_read(&caller_ctl->pc_sig_list.slh_first);
+			pending_bitset    = atomic_read(&caller_ctl->pc_sig_pend);
 			if (pending.slh_first != NULL || pending_bitset != 0) {
 				if unlikely((pending.slh_first == THIS_RPCS_TERMINATED) ||
 				            (pending_bitset & 1)) {
 release_locks_and_force_do_task_serve:
-					ATOMIC_OR(caller->t_flags, TASK_FRPC);
+					atomic_or(&caller->t_flags, TASK_FRPC);
 					goto release_locks_and_do_task_serve;
 				}
 
@@ -440,8 +440,8 @@ release_locks_and_force_do_task_serve:
 					_task_serve();
 					goto again_lock_ns;
 				}
-				pending.slh_first = ATOMIC_READ(caller_ctl->pc_sig_list.slh_first);
-				pending_bitset    = ATOMIC_READ(caller_ctl->pc_sig_pend);
+				pending.slh_first = atomic_read(&caller_ctl->pc_sig_list.slh_first);
+				pending_bitset    = atomic_read(&caller_ctl->pc_sig_pend);
 				if unlikely((pending.slh_first == THIS_RPCS_TERMINATED) ||
 				            (pending_bitset & 1)) {
 sig_endread_and_release_locks_and_force_do_task_serve:

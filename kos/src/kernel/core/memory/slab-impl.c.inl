@@ -119,7 +119,7 @@ again:
 		return;
 	assert(KERNEL_SLAB_CHECKPTR(pend));
 	if unlikely(!slab_descriptor_tryacquire(&LOCAL_desc)) {
-		if (!ATOMIC_CMPXCH(LOCAL_desc.sd_pend.slh_first, NULL, pend)) {
+		if (!atomic_cmpxch(&LOCAL_desc.sd_pend.slh_first, NULL, pend)) {
 			next = pend;
 			while (SLIST_NEXT(next, spf_link))
 				next = SLIST_NEXT(next, spf_link);

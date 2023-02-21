@@ -34,7 +34,6 @@
 #include <sched/task.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
 #include <hw/usb/usb.h>
@@ -42,6 +41,7 @@
 #include <kos/except/reason/io.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <format-printer.h>
 #include <stddef.h>
 #include <string.h>
@@ -110,7 +110,7 @@ PRIVATE WEAK REF struct usb_unknown_interface *usb_unknowns = NULL;
 #define USB_UNKNOWNS_CLOSED  ((REF struct usb_unknown_interface *)-1)
 PRIVATE DRIVER_FINI void KCALL usb_unknowns_fini(void) {
 	REF struct usb_unknown_interface *un, *next;
-	un = ATOMIC_XCH(usb_unknowns, USB_UNKNOWNS_CLOSED);
+	un = atomic_xch(&usb_unknowns, USB_UNKNOWNS_CLOSED);
 	if (un != USB_UNKNOWNS_CLOSED) {
 		while (un) {
 			next = un->uui_next;
@@ -130,7 +130,7 @@ NOTHROW(KCALL usb_unknowns_appendall)(/*inherit*/ REF struct usb_unknown_interfa
 		last = last->uui_next;
 	for (;;) {
 		struct usb_unknown_interface *next;
-		next = ATOMIC_READ(usb_unknowns);
+		next = atomic_read(&usb_unknowns);
 		if unlikely(next == USB_UNKNOWNS_CLOSED) {
 			/* The USB driver was closed (discard the given interface) */
 			decref(self);
@@ -138,7 +138,7 @@ NOTHROW(KCALL usb_unknowns_appendall)(/*inherit*/ REF struct usb_unknown_interfa
 		}
 		last->uui_next = next;
 		COMPILER_WRITE_BARRIER();
-		if (ATOMIC_CMPXCH_WEAK(usb_unknowns, next, self))
+		if (atomic_cmpxch_weak(&usb_unknowns, next, self))
 			break;
 	}
 }
@@ -156,13 +156,13 @@ PRIVATE bool KCALL usb_probe_unknown_acquire(void) {
 	assert(!task_wasconnected());
 	me = THIS_TASK;
 again:
-	ot = ATOMIC_CMPXCH_VAL(usb_probe_unknown_lock, NULL, me);
+	ot = atomic_cmpxch_val(&usb_probe_unknown_lock, NULL, me);
 	if (!ot)
 		return true; /* Lock acquired. */
 	if unlikely(ot == me)
 		return false; /* Don't allow recursion. */
 	task_connect(&usb_probe_unknown_unlock);
-	if (ATOMIC_CMPXCH(usb_probe_unknown_lock, NULL, me)) {
+	if (atomic_cmpxch(&usb_probe_unknown_lock, NULL, me)) {
 		task_disconnectall();
 		return true;
 	}
@@ -172,7 +172,7 @@ again:
 
 PRIVATE NOBLOCK void NOTHROW(KCALL usb_probe_unknown_release)(void) {
 	assert(usb_probe_unknown_lock == THIS_TASK);
-	ATOMIC_WRITE(usb_probe_unknown_lock, NULL);
+	atomic_write(&usb_probe_unknown_lock, NULL);
 	/* Only one thread can be holding `usb_probe_unknown_lock',
 	 * so only wake  up a single  thread by using  `sig_send()' */
 	sig_send(&usb_probe_unknown_unlock);
@@ -208,12 +208,12 @@ PRIVATE void KCALL usb_probe_identify_unknown(PUSB_INTERFACE_PROBE func) {
 		xdecref_unlikely(probes);
 	};
 	for (;;) {
-		chain = ATOMIC_READ(usb_unknowns);
+		chain = atomic_read(&usb_unknowns);
 		if (chain == USB_UNKNOWNS_CLOSED)
 			return; /* No-op after finalize */
 		if (chain == NULL)
 			return; /* Nothing to enumerate */
-		if (ATOMIC_CMPXCH_WEAK(usb_unknowns, chain, NULL))
+		if (atomic_cmpxch_weak(&usb_unknowns, chain, NULL))
 			break;
 	}
 	RAII_FINALLY { usb_unknowns_appendall(chain); };
@@ -473,7 +473,7 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 				return;
 		}
 		/* Create a descriptor to keep track of the unknown interface. */
-		if unlikely(ATOMIC_READ(usb_unknowns) == USB_UNKNOWNS_CLOSED)
+		if unlikely(atomic_read(&usb_unknowns) == USB_UNKNOWNS_CLOSED)
 			return; /* No-op after USB has been finalized. */
 
 		unknown = (REF struct usb_unknown_interface *)kmalloc(offsetof(struct usb_unknown_interface, uui_endpv) +
@@ -491,7 +491,7 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 		/* Register the unknown interface. */
 		for (;;) {
 			REF struct usb_unknown_interface *next_unknown;
-			next_unknown = ATOMIC_READ(usb_unknowns);
+			next_unknown = atomic_read(&usb_unknowns);
 			if unlikely(next_unknown == USB_UNKNOWNS_CLOSED) {
 				/* No-op after the USB driver has been finalized. */
 				destroy(unknown);
@@ -499,7 +499,7 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 			}
 			unknown->uui_next = next_unknown;
 			COMPILER_WRITE_BARRIER();
-			if (ATOMIC_CMPXCH_WEAK(usb_unknowns, next_unknown, unknown))
+			if (atomic_cmpxch_weak(&usb_unknowns, next_unknown, unknown))
 				break;
 		}
 

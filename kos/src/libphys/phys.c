@@ -19,16 +19,16 @@
  */
 #ifndef GUARD_LIBPHYS_PHYS_C
 #define GUARD_LIBPHYS_PHYS_C 1
+#define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
 #include "api.h"
 /**/
 
-#include <hybrid/atomic.h>
-
 #include <kos/unistd.h>
 #include <sys/mman.h>
 
+#include <atomic.h>
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
@@ -50,7 +50,7 @@ PRIVATE void NOTHROW(CC openmem)(void) {
 	fd_t dm;
 	dm = open("/dev/mem", O_RDWR | O_CLOEXEC);
 	if likely(dm >= 0) {
-		if unlikely(!ATOMIC_CMPXCH(dev_mem, -1, dm))
+		if unlikely(!atomic_cmpxch(&dev_mem, -1, dm))
 			close(dm);
 	}
 }

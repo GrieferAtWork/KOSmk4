@@ -33,6 +33,7 @@
 #include <kos/syscalls.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <malloc.h>
 #include <stddef.h>
@@ -530,7 +531,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dltlsfree)(USER DlModule *self)
 	 * s.a. `libdl_dltlsfreeseg()' doing a tryincref() to prevent
 	 *       modules from unloading while TLS finalizers contained within
 	 *       get invoked. */
-	while unlikely(ATOMIC_READ(self->dm_refcnt) != 1)
+	while unlikely(atomic_read(&self->dm_refcnt) != 1)
 		sys_sched_yield();
 	free((byte_t *)self->dm_tlsinit);
 	weakdecref_likely(self);

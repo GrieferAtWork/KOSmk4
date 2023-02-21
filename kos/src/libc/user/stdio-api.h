@@ -23,7 +23,6 @@
 #include "../api.h"
 /**/
 
-#include <hybrid/atomic.h>
 #include <hybrid/sequence/list.h>
 
 #include <asm/crt/stdio.h>

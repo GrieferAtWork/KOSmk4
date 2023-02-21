@@ -26,6 +26,8 @@
 #include "dl.h"
 /**/
 
+#include <atomic.h>
+
 DECL_BEGIN
 
 /* [0..1][ATOMIC(APPEND)] Chain of registered DL extensions.
@@ -56,7 +58,7 @@ NOTHROW(CC dl_getcoreops)(void) {
 #include <libdl/coreops.def>
 #undef DL_COREOPS_SKIP_DLMODULE_DESTROY
 		COMPILER_WRITE_BARRIER();
-		ATOMIC_WRITE(result->DlModule_Destroy, &DlModule_Destroy);
+		atomic_write(&result->DlModule_Destroy, &DlModule_Destroy);
 	}
 	return result;
 }

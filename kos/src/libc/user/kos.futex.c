@@ -24,13 +24,12 @@
 #include "../api.h"
 /**/
 
-#include <hybrid/atomic.h>
-
 #include <kos/futex.h>
 #include <kos/syscalls.h>
 #include <kos/types.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <unistd.h>
 
 #include "kos.futex.h"
@@ -49,7 +48,7 @@ INTERN ATTR_READMOSTLY unsigned int futex_spin_counter = 4;
 #define SPIN_WHILE(should_wait_if_this_expression_is_true) \
 	do {                                                   \
 		unsigned int _count;                               \
-		_count = ATOMIC_READ(futex_spin_counter);          \
+		_count = atomic_read(&futex_spin_counter);          \
 		for (;;) {                                         \
 			if (!(should_wait_if_this_expression_is_true)) \
 				return 1; /* Didn't wait... */             \
@@ -245,7 +244,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile)(lfutex_t *uaddr,
 /*[[[body:libc_futex_waitwhile]]]*/
 {
 	errno_t result;
-	SPIN_WHILE(ATOMIC_READ(*uaddr) == equal_to_value);
+	SPIN_WHILE(atomic_read(uaddr) == equal_to_value);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_WHILE,
 	                             (uintptr_t)equal_to_value,
@@ -267,7 +266,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_waituntil)(lfutex_t *uaddr,
 /*[[[body:libc_futex_waituntil]]]*/
 {
 	errno_t result;
-	SPIN_WHILE(ATOMIC_READ(*uaddr) != not_equal_to_value);
+	SPIN_WHILE(atomic_read(uaddr) != not_equal_to_value);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_UNTIL,
 	                             (uintptr_t)not_equal_to_value,
@@ -289,7 +288,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_above)(lfutex_t *uaddr,
 /*[[[body:libc_futex_waitwhile_above]]]*/
 {
 	errno_t result;
-	SPIN_WHILE(ATOMIC_READ(*uaddr) > above_value);
+	SPIN_WHILE(atomic_read(uaddr) > above_value);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_WHILE_ABOVE,
 	                             (uintptr_t)above_value,
@@ -311,7 +310,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_below)(lfutex_t *uaddr,
 /*[[[body:libc_futex_waitwhile_below]]]*/
 {
 	errno_t result;
-	SPIN_WHILE(ATOMIC_READ(*uaddr) < below_value);
+	SPIN_WHILE(atomic_read(uaddr) < below_value);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_WHILE_BELOW,
 	                             (uintptr_t)below_value,
@@ -334,7 +333,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_aboveequal)(lfutex_t *uaddr,
 {
 	errno_t result;
 	assert(above_or_equal_value != 0);
-	SPIN_WHILE(ATOMIC_READ(*uaddr) >= above_or_equal_value);
+	SPIN_WHILE(atomic_read(uaddr) >= above_or_equal_value);
 	result = (errno_t)sys_lfutex(uaddr, LFUTEX_WAIT_WHILE_ABOVE,
 	                             (uintptr_t)above_or_equal_value - 1,
 	                             NULL, 0);
@@ -355,7 +354,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_belowequal)(lfutex_t *uaddr,
 {
 	errno_t result;
 	assert(below_or_equal_value != (lfutex_t)-1);
-	SPIN_WHILE(ATOMIC_READ(*uaddr) <= below_or_equal_value);
+	SPIN_WHILE(atomic_read(uaddr) <= below_or_equal_value);
 	result = (errno_t)sys_lfutex(uaddr, LFUTEX_WAIT_WHILE_BELOW,
 	                             (uintptr_t)below_or_equal_value + 1,
 	                             NULL, 0);
@@ -376,7 +375,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_exactbits)(lfutex_t *uaddr,
 /*[[[body:libc_futex_waitwhile_exactbits]]]*/
 {
 	errno_t result;
-	SPIN_WHILE((ATOMIC_READ(*uaddr) & bitmask) == setmask);
+	SPIN_WHILE((atomic_read(uaddr) & bitmask) == setmask);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_WHILE_BITMASK,
 	                             (uintptr_t)bitmask,
@@ -399,7 +398,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_waituntil_exactbits)(lfutex_t *uaddr,
 /*[[[body:libc_futex_waituntil_exactbits]]]*/
 {
 	errno_t result;
-	SPIN_WHILE((ATOMIC_READ(*uaddr) & bitmask) != setmask);
+	SPIN_WHILE((atomic_read(uaddr) & bitmask) != setmask);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_UNTIL_BITMASK,
 	                             (uintptr_t)bitmask,
@@ -421,7 +420,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_anybit)(lfutex_t *uaddr,
 /*[[[body:libc_futex_waitwhile_anybit]]]*/
 {
 	errno_t result;
-	SPIN_WHILE((ATOMIC_READ(*uaddr) & bitmask) != 0);
+	SPIN_WHILE((atomic_read(uaddr) & bitmask) != 0);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_UNTIL_BITMASK,
 	                             (uintptr_t)bitmask,
@@ -443,7 +442,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_allbits)(lfutex_t *uaddr,
 /*[[[body:libc_futex_waitwhile_allbits]]]*/
 {
 	errno_t result;
-	SPIN_WHILE((ATOMIC_READ(*uaddr) & bitmask) == bitmask);
+	SPIN_WHILE((atomic_read(uaddr) & bitmask) == bitmask);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_WHILE_BITMASK,
 	                             (uintptr_t)bitmask,
@@ -688,7 +687,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile64)(lfutex_t *uaddr,
 /*[[[body:libc_futex_timedwaitwhile64]]]*/
 {
 	errno_t result;
-	SPIN_WHILE(ATOMIC_READ(*uaddr) == equal_to_value);
+	SPIN_WHILE(atomic_read(uaddr) == equal_to_value);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_WHILE |
 	                             LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE,
@@ -717,7 +716,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil64)(lfutex_t *uaddr,
 /*[[[body:libc_futex_timedwaituntil64]]]*/
 {
 	errno_t result;
-	SPIN_WHILE(ATOMIC_READ(*uaddr) != not_equal_to_value);
+	SPIN_WHILE(atomic_read(uaddr) != not_equal_to_value);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_UNTIL |
 	                             LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE,
@@ -746,7 +745,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_above64)(lfutex_t *uaddr,
 /*[[[body:libc_futex_timedwaitwhile_above64]]]*/
 {
 	errno_t result;
-	SPIN_WHILE(ATOMIC_READ(*uaddr) > above_value);
+	SPIN_WHILE(atomic_read(uaddr) > above_value);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_WHILE_ABOVE |
 	                             LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE,
@@ -775,7 +774,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_below64)(lfutex_t *uaddr,
 /*[[[body:libc_futex_timedwaitwhile_below64]]]*/
 {
 	errno_t result;
-	SPIN_WHILE(ATOMIC_READ(*uaddr) < below_value);
+	SPIN_WHILE(atomic_read(uaddr) < below_value);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_WHILE_BELOW |
 	                             LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE,
@@ -805,7 +804,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_aboveequal64)(lfutex_t *uaddr,
 {
 	errno_t result;
 	assert(above_or_equal_value != 0);
-	SPIN_WHILE(ATOMIC_READ(*uaddr) >= above_or_equal_value);
+	SPIN_WHILE(atomic_read(uaddr) >= above_or_equal_value);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_WHILE_ABOVE | LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE,
 	                             (uintptr_t)above_or_equal_value - 1,
@@ -833,7 +832,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_belowequal64)(lfutex_t *uaddr,
 {
 	errno_t result;
 	assert(below_or_equal_value != (lfutex_t)-1);
-	SPIN_WHILE(ATOMIC_READ(*uaddr) <= below_or_equal_value);
+	SPIN_WHILE(atomic_read(uaddr) <= below_or_equal_value);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_WHILE_BELOW | LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE,
 	                             (uintptr_t)below_or_equal_value + 1,
@@ -860,7 +859,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_exactbits64)(lfutex_t *uaddr,
 /*[[[body:libc_futex_timedwaitwhile_exactbits64]]]*/
 {
 	errno_t result;
-	SPIN_WHILE((ATOMIC_READ(*uaddr) & bitmask) == setmask);
+	SPIN_WHILE((atomic_read(uaddr) & bitmask) == setmask);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_WHILE_BITMASK |
 	                             LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE,
@@ -889,7 +888,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil_exactbits64)(lfutex_t *uaddr,
 /*[[[body:libc_futex_timedwaituntil_exactbits64]]]*/
 {
 	errno_t result;
-	SPIN_WHILE((ATOMIC_READ(*uaddr) & bitmask) != setmask);
+	SPIN_WHILE((atomic_read(uaddr) & bitmask) != setmask);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_UNTIL_BITMASK |
 	                             LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE,
@@ -917,7 +916,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_anybit64)(lfutex_t *uaddr,
 /*[[[body:libc_futex_timedwaitwhile_anybit64]]]*/
 {
 	errno_t result;
-	SPIN_WHILE((ATOMIC_READ(*uaddr) & bitmask) != 0);
+	SPIN_WHILE((atomic_read(uaddr) & bitmask) != 0);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_UNTIL_BITMASK |
 	                             LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE,
@@ -945,7 +944,7 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_allbits64)(lfutex_t *uaddr,
 /*[[[body:libc_futex_timedwaitwhile_allbits64]]]*/
 {
 	errno_t result;
-	SPIN_WHILE((ATOMIC_READ(*uaddr) & bitmask) == bitmask);
+	SPIN_WHILE((atomic_read(uaddr) & bitmask) == bitmask);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_WHILE_BITMASK |
 	                             LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE,
@@ -985,7 +984,7 @@ NOTHROW(LIBCCALL libc_futex_getspin)(void)
 #ifdef NO_FUTEX_SPIN
 	return 0;
 #else /* NO_FUTEX_SPIN */
-	return ATOMIC_READ(futex_spin_counter);
+	return atomic_read(&futex_spin_counter);
 #endif /* !NO_FUTEX_SPIN */
 }
 /*[[[end:libc_futex_getspin]]]*/
@@ -1019,7 +1018,7 @@ NOTHROW(LIBCCALL libc_futex_setspin)(unsigned int new_spin)
 	(void)new_spin;
 	return 0;
 #else /* NO_FUTEX_SPIN */
-	return ATOMIC_XCH(futex_spin_counter, new_spin);
+	return atomic_xch(&futex_spin_counter, new_spin);
 #endif /* !NO_FUTEX_SPIN */
 }
 /*[[[end:libc_futex_setspin]]]*/

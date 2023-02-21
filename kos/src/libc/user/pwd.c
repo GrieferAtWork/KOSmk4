@@ -23,12 +23,11 @@
 #include "../api.h"
 /**/
 
-#include <hybrid/atomic.h>
-
+#include <assert.h>
+#include <atomic.h>
 #include <malloc.h>
 #include <paths.h> /* _PATH_PASSWD */
 #include <stdio.h>
-#include <assert.h>
 
 #include "pwd.h"
 
@@ -53,13 +52,13 @@ PRIVATE ATTR_SECTION(".bss.crt.database.pwd") struct passwd passwd_entry = {};
 PRIVATE ATTR_SECTION(".text.crt.database.pwd") FILE *
 NOTHROW_RPC(LIBCCALL passwd_opendb)(void) {
 	FILE *result, *new_result;
-	result = ATOMIC_READ(passwd_database);
+	result = atomic_read(&passwd_database);
 	if (result)
 		return result;
 	result = fopen(_PATH_PASSWD, "r");
 	if unlikely(!result)
 		return NULL;
-	new_result = ATOMIC_CMPXCH_VAL(passwd_database,
+	new_result = atomic_cmpxch_val(&passwd_database,
 	                               NULL, result);
 	if unlikely(new_result != NULL) {
 		/* Race condition: Some other thread
@@ -86,7 +85,7 @@ NOTHROW_RPC(LIBCCALL libc_setpwfile)(char const *filename) {
 	nstream = fopen(filename, "r");
 	if unlikely(!nstream)
 		return -1; /* XXX: Original function didn't have error-case */
-	ostream = ATOMIC_XCH(passwd_database, nstream);
+	ostream = atomic_xch(&passwd_database, nstream);
 	if (ostream)
 		fclose(ostream);
 	return 0;
@@ -114,7 +113,7 @@ INTERN ATTR_SECTION(".text.crt.database.pwd") void
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endpwent)(void)
 /*[[[body:libc_endpwent]]]*/
 {
-	FILE *stream = ATOMIC_XCH(passwd_database, NULL);
+	FILE *stream = atomic_xch(&passwd_database, NULL);
 	if (stream)
 		fclose(stream);
 	/* Also free up the buffer used to describe the strings

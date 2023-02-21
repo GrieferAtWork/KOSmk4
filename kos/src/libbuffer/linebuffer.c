@@ -28,11 +28,10 @@
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <string.h>
 
 #include <libbuffer/linebuffer.h>
@@ -81,10 +80,10 @@ linebuffer_waitfor(struct linebuffer *__restrict self) {
 	 *  - self->lb_line.lc_size >= CACHED_LIMIT
 	 * ... where `CACHED_LIMIT' is is the lazily loaded value of `self->lb_limt' */
 	struct lfutexexpr expr[3];
-	size_t limit = ATOMIC_READ(self->lb_limt);
+	size_t limit = atomic_read(&self->lb_limt);
 	if (!limit)
 		return 1; /* Empty limit */
-	if (ATOMIC_READ(self->lb_line.lc_size) < limit)
+	if (atomic_read(&self->lb_line.lc_size) < limit)
 		return 1;
 
 	/* Verify that our read limit is still correct */
@@ -175,7 +174,7 @@ done:
 		}
 		goto again;
 	}
-	if unlikely(!ATOMIC_READ(self->lb_limt))
+	if unlikely(!atomic_read(&self->lb_limt))
 		goto done;
 	if unlikely(!num_bytes)
 		goto done; /* We weren't actually supposed to do anything... */
@@ -191,7 +190,7 @@ done:
 		RETHROW();
 	}
 	if likely(!temp) {
-		if unlikely(!ATOMIC_READ(self->lb_limt)) {
+		if unlikely(!atomic_read(&self->lb_limt)) {
 			task_disconnectall();
 			goto done;
 		}
@@ -231,7 +230,7 @@ again:
 #else /* __KERNEL__ */
 	assert(result < 0 || (size_t)result <= num_bytes);
 #endif /* !__KERNEL__ */
-	if (!result && ATOMIC_READ(self->lb_limt) != 0) {
+	if (!result && atomic_read(&self->lb_limt) != 0) {
 #ifdef __KERNEL__
 		/* Wait for the buffer */
 		task_connect(&self->lb_nful);
@@ -244,7 +243,7 @@ again:
 			RETHROW();
 		}
 		assert(result <= num_bytes);
-		if likely(!result && ATOMIC_READ(self->lb_limt)) {
+		if likely(!result && atomic_read(&self->lb_limt)) {
 			task_waitfor();
 			goto again;
 		}
@@ -277,7 +276,7 @@ again:
 	assert(result <= num_bytes);
 again_locked:
 #endif /* __KERNEL__ */
-	limit = ATOMIC_READ(self->lb_limt);
+	limit = atomic_read(&self->lb_limt);
 	if unlikely(self->lb_line.lc_size >= limit) {
 		linebuffer_lock_release(self);
 		return 0; /* Cannot write anything now... */
@@ -352,7 +351,7 @@ again_locked:
 			COMPILER_READ_BARRIER();
 			/* Check for race condition: Another thread expanded the buffer in
 			 * the mean time,  or the buffer  was closed/became more  limited. */
-			limit = ATOMIC_READ(self->lb_limt);
+			limit = atomic_read(&self->lb_limt);
 			if likely(self->lb_line.lc_alloc < heapptr_getsiz(newline) && new_size <= limit) {
 				assert(self->lb_line.lc_size <= self->lb_line.lc_alloc);
 				oldline_ptr = self->lb_line.lc_base;

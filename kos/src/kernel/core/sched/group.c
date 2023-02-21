@@ -36,8 +36,6 @@
 #include <sched/sigaction.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <bits/os/rusage-convert.h>
 #include <bits/os/rusage.h>
 #include <compat/config.h>
@@ -47,6 +45,7 @@
 #include <sys/wait.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <signal.h>
 #include <stddef.h>
@@ -793,7 +792,7 @@ DEFINE_SYSCALL1(errno_t, detach, pid_t, pid) {
 				 * manage to do that, then the  thread will remove itself from  our
 				 * process's child list as soon as it terminates. */
 				uintptr_t old_flags;
-				old_flags = ATOMIC_FETCHOR(thread->t_flags, TASK_FDETACHED);
+				old_flags = atomic_fetchor(&thread->t_flags, TASK_FDETACHED);
 				decref_unlikely(thread);
 				if unlikely(old_flags & TASK_FDETACHED)
 					THROW(E_PROCESS_EXITED, pid); /* Thread had already been detached before */
@@ -913,7 +912,7 @@ NOTHROW(KCALL taskpid_hasterminated)(struct taskpid *__restrict self) {
 		/* Destroyed thread --> thread must have terminated. */
 		return true;
 	}
-	flags = ATOMIC_READ(thread->t_flags);
+	flags = atomic_read(&thread->t_flags);
 	decref_unlikely(thread);
 
 	/* Return indicative of the TERMINATING or TERMINATED flags being set. */
@@ -1069,11 +1068,11 @@ again_read_status:
 			if (taskpid_getprocpid(child) != proc)
 				return -ECHILD; /* Not a child thread */
 		}
-		status = ATOMIC_READ(child->tp_status);
+		status = atomic_read(&child->tp_status);
 		if (((options & WSTOPPED) && WIFSTOPPED(status)) ||
 		    ((options & WCONTINUED) && WIFCONTINUED(status))) {
 again_consume_status_stop_cont:
-			if (!ATOMIC_CMPXCH_WEAK(child->tp_status, status, 0))
+			if (!atomic_cmpxch_weak(&child->tp_status, status, 0))
 				goto again_read_status;
 			/* we're dealing with an stop/continue status */
 		} else if ((options & WEXITED) && taskpid_hasterminated(child)) {
@@ -1107,7 +1106,7 @@ again_child_has_exited:
 		} else {
 			/* Wait for child to change status. */
 			task_connect_for_poll(&child->tp_changed);
-			status = ATOMIC_READ(child->tp_status);
+			status = atomic_read(&child->tp_status);
 			if (((options & WSTOPPED) && WIFSTOPPED(status)) ||
 			    ((options & WCONTINUED) && WIFCONTINUED(status))) {
 				task_disconnectall();
@@ -1148,11 +1147,12 @@ again_scan_children:
 					continue;
 			}
 again_read_status_in_nonspecific:
-			status = ATOMIC_READ(child->tp_status);
+			status = atomic_read(&child->tp_status);
 			if (((options & WSTOPPED) && WIFSTOPPED(status)) ||
 			    ((options & WCONTINUED) && WIFCONTINUED(status))) {
-				if (!ATOMIC_CMPXCH_WEAK(child->tp_status, status, 0))
+				if (!atomic_cmpxch_weak(&child->tp_status, status, 0))
 					goto again_read_status_in_nonspecific;
+
 				/* we're dealing with an stop/continue status */
 				incref(child);
 				procctl_chlds_endread(ctl);

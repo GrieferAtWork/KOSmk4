@@ -25,7 +25,6 @@
 /**/
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sched/atomic-lock.h>
@@ -37,6 +36,7 @@
 #include <sys/wait.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <fcntl.h>
 #include <format-printer.h>
 #include <limits.h>
@@ -510,12 +510,12 @@ file_destroy(FILE *__restrict self) {
 		/* The file still contains some changed data.
 		 * -> Try to flush data data. */
 		shared_recursive_rwlock_init_read(&ex->io_lock);
-		ATOMIC_WRITE(ex->io_refcnt, 1);
+		atomic_write(&ex->io_refcnt, 1);
 
 		/* NOTE: Errors during this sync are ignored! */
 		file_sync(self);
 		shared_recursive_rwlock_endread(&ex->io_lock);
-		refcnt = ATOMIC_FETCHDEC(ex->io_refcnt);
+		refcnt = atomic_fetchdec(&ex->io_refcnt);
 		assert(refcnt != 0);
 		if (refcnt != 1)
 			return; /* The file was revived. */
@@ -527,7 +527,7 @@ file_destroy(FILE *__restrict self) {
 	if (self->if_flag & IO_HASVTAB) {
 		/* In this case, we have to be careful in case the file gets revived. */
 		shared_recursive_rwlock_init_read(&ex->io_lock);
-		ATOMIC_WRITE(ex->io_refcnt, 1);
+		atomic_write(&ex->io_refcnt, 1);
 		/* NOTE: Errors during this close are ignored! */
 		if (ex->io_closefn != NULL) {
 			errno_t saved_errno;
@@ -536,7 +536,7 @@ file_destroy(FILE *__restrict self) {
 			(void)libc_seterrno(saved_errno);
 		}
 		shared_recursive_rwlock_endread(&ex->io_lock);
-		refcnt = ATOMIC_FETCHDEC(ex->io_refcnt);
+		refcnt = atomic_fetchdec(&ex->io_refcnt);
 		assert(refcnt != 0);
 		if (refcnt != 1)
 			return; /* The file was revived. */
@@ -3155,7 +3155,7 @@ NOTHROW_NCX(LIBCCALL libc_fileno)(FILE *__restrict stream)
 	stream = file_fromuser(stream);
 	if unlikely(stream->if_flag & IO_HASVTAB)
 		goto err_nostream;
-	return ATOMIC_READ(stream->if_fd);
+	return atomic_read(&stream->if_fd);
 err_nostream:
 	/* """
 	 * EBADF The stream is not associated with a file.
@@ -3892,7 +3892,7 @@ again:
 		/* !!!WARNING!!!
 		 * This is entirely unsafe, but if you think about it:
 		 * This  function could only  ever be entirely unsafe! */
-		ATOMIC_WRITE(fp->if_exdata->io_refcnt, 1);
+		atomic_write(&fp->if_exdata->io_refcnt, 1);
 		decref(fp);
 		++result;
 		goto again;
@@ -4017,7 +4017,7 @@ INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__get_printf_count_output)(void)
 /*[[[body:libc__get_printf_count_output]]]*/
 {
-	return ATOMIC_READ(libc_printf_percent_n_disabled) ? 0 : 1;
+	return atomic_read(&libc_printf_percent_n_disabled) ? 0 : 1;
 }
 /*[[[end:libc__get_printf_count_output]]]*/
 
@@ -4029,7 +4029,7 @@ NOTHROW_NCX(LIBCCALL libc__set_printf_count_output)(int val)
 /*[[[body:libc__set_printf_count_output]]]*/
 {
 	bool old_enabled;
-	old_enabled = ATOMIC_XCH(libc_printf_percent_n_disabled, val == 0);
+	old_enabled = atomic_xch(&libc_printf_percent_n_disabled, val == 0);
 	return old_enabled;
 }
 /*[[[end:libc__set_printf_count_output]]]*/

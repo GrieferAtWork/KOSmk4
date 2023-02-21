@@ -45,7 +45,6 @@
 #include <sched/tsc.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 #include <hybrid/wordbits.h>
@@ -57,6 +56,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <atomic.h>
 #include <ctype.h>
 #include <format-printer.h>
 #include <stddef.h>
@@ -1132,7 +1132,7 @@ NOTHROW(KCALL tarsuper_v_cc)(struct mfile *__restrict self,
 	for (i = 0; i < me->ts_filec;) {
 		struct tarfile *tf;
 		tf = me->ts_filev[i];
-		if (!ATOMIC_CMPXCH(tf->tf_refcnt, 1, 0)) {
+		if (!atomic_cmpxch(&tf->tf_refcnt, 1, 0)) {
 			++i;
 			continue;
 		}

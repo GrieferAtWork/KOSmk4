@@ -32,7 +32,6 @@
 #include <kernel/user.h>
 #include <sched/sig.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/bit.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/overflow.h>
@@ -46,6 +45,7 @@
 #include <sys/random.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <ctype.h>
 #include <inttypes.h>
 #include <stdbool.h>
@@ -100,7 +100,7 @@ PUBLIC struct sig entropy_request_sig = SIG_INIT;
 
 /* Check if at least `num_bits' of entropy are current available.
  * When this is the case,  return `false'. Otherwise, connect  to
- * `entropy_request_sig' and ATOMIC_CMPXCH `entropy_request_bits'
+ * `entropy_request_sig' and atomic_cmpxch `entropy_request_bits'
  * such that its value is not larger than `num_bits'. Afterwards,
  * do another check  if sufficient entropy  is available, and  if
  * that is  the  case  then,  disconnected  and  return  `false'.
@@ -111,20 +111,20 @@ PUBLIC WUNUSED bool FCALL
 entropy_connect(size_t num_bits)
 		THROWS(E_BADALLOC) {
 	size_t oldreq;
-	if (ATOMIC_READ(entropy_bits) >= num_bits)
+	if (atomic_read(&entropy_bits) >= num_bits)
 		return false; /* Enough bits are available. */
 	task_connect_for_poll(&entropy_request_sig);
 	for (;;) {
-		oldreq = ATOMIC_READ(entropy_request_bits);
+		oldreq = atomic_read(&entropy_request_bits);
 		if (oldreq < num_bits)
 			break; /* Someone already wants less that we need. */
-		if (ATOMIC_CMPXCH_WEAK(entropy_request_bits,
+		if (atomic_cmpxch_weak(&entropy_request_bits,
 		                       oldreq, num_bits))
 			break;
 	}
 
 	/* Do another check for available entropy. */
-	if unlikely(ATOMIC_READ(entropy_bits) >= num_bits) {
+	if unlikely(atomic_read(&entropy_bits) >= num_bits) {
 		task_disconnect(&entropy_request_sig);
 		return false; /* Enough bits are available. */
 	}
@@ -249,9 +249,9 @@ NOTHROW(FCALL entropy_give_nopr)(void const *buf, size_t num_bits) {
 		entropy_bits = new_entropy_bits;
 	}
 	/* Check if we should broadcast the entropy-available signal. */
-	if (entropy_bits >= ATOMIC_READ(entropy_request_bits)) {
+	if (entropy_bits >= atomic_read(&entropy_request_bits)) {
 		entropy_lock_release_nopr();
-		ATOMIC_WRITE(entropy_request_bits, (size_t)-1);
+		atomic_write(&entropy_request_bits, (size_t)-1);
 		sig_broadcast(&entropy_request_sig);
 	} else {
 		entropy_lock_release_nopr();

@@ -128,7 +128,10 @@ __DECL_END
 
 
 /* LE/BE Converter bindings */
-#ifdef ____INTELLISENSE_STDINC_COMMON_H
+#ifdef __INTELLISENSE__
+#ifndef ____INTELLISENSE_STDINC_COMMON_H
+#include "../compiler/intellisense-common.h"
+#endif /* !____INTELLISENSE_STDINC_COMMON_H */
 #define __hybrid_htole16 __intern::__intellisense_htole16
 #define __hybrid_htobe16 __intern::__intellisense_htobe16
 #define __hybrid_letoh16 __intern::__intellisense_letoh16

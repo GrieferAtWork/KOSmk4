@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c7474ed */
+/* HASH CRC-32:0xc18f4d42 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,11 +31,14 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-#include <hybrid/atomic.h>
 #include <hybrid/typecore.h>
+
 #include <kos/exec/idata.h>
+
+#include <atomic.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <libintl.h>
 
 #include "../libc/globals.h"
@@ -75,7 +78,7 @@ void libc_obstack_alloc_failed_default(void) {
 INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.heap.obstack") void *
 NOTHROW(LIBCCALL libc_obstack_alloc_failed_handler_resolve)(void) {
 	if (libc_obstack_alloc_failed_handler == NULL)
-		ATOMIC_CMPXCH(libc_obstack_alloc_failed_handler, NULL, &libc_obstack_alloc_failed_default);
+		atomic_cmpxch(&libc_obstack_alloc_failed_handler, NULL, &libc_obstack_alloc_failed_default);
 	return (void *)&libc_obstack_alloc_failed_handler;
 }
 

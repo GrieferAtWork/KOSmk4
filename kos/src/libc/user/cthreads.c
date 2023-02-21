@@ -25,12 +25,12 @@
 #include "../api.h"
 /**/
 
-#include <hybrid/atomic.h>
 #include <hybrid/host.h>
 
 #include <linux/futex.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <err.h>
 #include <malloc.h>
 #include <pthread.h>
@@ -106,14 +106,14 @@ NOTHROW_NCX(LIBCCALL libc_condition_wait)(condition_t self,
 	/************************************************************************/
 
 	/* Interlocked:begin */
-	lock = ATOMIC_READ(pcond->c_futex);
+	lock = atomic_read(&pcond->c_futex);
 
 	/* Interlocked:op */
 	mutex_unlock(mutex);
 	if (!(lock & FUTEX_WAITERS)) {
 		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
 		 *       we've released `mutex',  else there'd be  a race  condition! */
-		ATOMIC_OR(pcond->c_futex, FUTEX_WAITERS);
+		atomic_or(&pcond->c_futex, FUTEX_WAITERS);
 		lock |= FUTEX_WAITERS;
 	}
 
@@ -471,7 +471,7 @@ PRIVATE ATTR_SECTION(".text.crt.compat.hurd.cthreads")
 NONNULL((1)) struct cthread_tls_segment *
 NOTHROW_NCX(LIBCCALL get_cthread_tls_segment)(pthread_t self) {
 	void *result;
-	void *handle = ATOMIC_READ(cdata_handle);
+	void *handle = atomic_read(&cdata_handle);
 	/* Totally  overkill to create a new DL TLS segment for this, but <pthread.h> doesn't
 	 * expose a way of accessing TLS variables of threads other than the main thread, nor
 	 * could such a function even be implemented without slowing down the current impl --
@@ -493,7 +493,7 @@ NOTHROW_NCX(LIBCCALL get_cthread_tls_segment)(pthread_t self) {
 			return NULL;
 
 		/* Remember the handle. */
-		real_handle = ATOMIC_CMPXCH_VAL(cdata_handle, NULL, handle);
+		real_handle = atomic_cmpxch_val(&cdata_handle, NULL, handle);
 		if unlikely(real_handle != NULL) {
 			dltlsfree(handle);
 			handle = real_handle;

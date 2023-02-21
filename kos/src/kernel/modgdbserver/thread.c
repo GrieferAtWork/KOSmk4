@@ -36,12 +36,12 @@
 #include <sched/task.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
 
 #include <kos/debugtrap.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stddef.h>
 
@@ -91,7 +91,7 @@ again_gdb_main:
 	GDB_MainWithAlternateStack();
 
 	/* Check if we ourself are supposed to remain stopped. */
-	if (ATOMIC_READ(notif->tse_mayresume) != GDB_THREAD_MAYRESUME_RESUME)
+	if (atomic_read(&notif->tse_mayresume) != GDB_THREAD_MAYRESUME_RESUME)
 		goto again_gdb_main;
 
 	/* Resume system execution if we were in all-stop mode. */
@@ -111,7 +111,7 @@ again_gdb_main:
 #endif /* !NDEBUG */
 
 	/* Unlock the GDB server host lock */
-	ATOMIC_WRITE(GDBServer_Host, NULL);
+	atomic_write(&GDBServer_Host, NULL);
 	sig_broadcast(&GDBServer_HostUnlocked);
 }
 
@@ -152,9 +152,9 @@ NOTHROW(FCALL GDBThread_StopRPCImpl)(uintptr_t flags,
 	if (stop_event.e.tse_mayresume == GDB_THREAD_MAYRESUME_STOP) {
 		GDBThreadStopEvent *next;
 		do {
-			next = ATOMIC_READ(GDBThread_AsyncNotifStopEvents);
+			next = atomic_read(&GDBThread_AsyncNotifStopEvents);
 			stop_event.e.tse_next = next;
-		} while (!ATOMIC_CMPXCH_WEAK(GDBThread_AsyncNotifStopEvents,
+		} while (!atomic_cmpxch_weak(&GDBThread_AsyncNotifStopEvents,
 		                             stop_event.e.tse_next, &stop_event.e));
 		if (!next)
 			sig_broadcast(&GDBThread_AsyncNotifStopEventsAdded);
@@ -163,14 +163,14 @@ NOTHROW(FCALL GDBThread_StopRPCImpl)(uintptr_t flags,
 		 *       the host thread itself is currently waiting for us to become suspended,  and
 		 *       is actually expecting us to access this field ourself. */
 		do {
-			stop_event.e.tse_next = ATOMIC_READ(GDBThread_Stopped);
-		} while (!ATOMIC_CMPXCH_WEAK(GDBThread_Stopped, stop_event.e.tse_next,
+			stop_event.e.tse_next = atomic_read(&GDBThread_Stopped);
+		} while (!atomic_cmpxch_weak(&GDBThread_Stopped, stop_event.e.tse_next,
 		                             &stop_event.e));
 	}
 	COMPILER_BARRIER();
 
 	/* Set our thread's STOPPED and KEEPCORE flags */
-	old_flags = ATOMIC_FETCHOR(stop_event.e.tse_thread->t_flags,
+	old_flags = atomic_fetchor(&stop_event.e.tse_thread->t_flags,
 	                           flags & GDBTHREAD_STOPRPCIMPL_F_STOPCPU
 	                           ? (TASK_FKEEPCORE)
 	                           : (TASK_FGDB_STOPPED | TASK_FKEEPCORE));
@@ -192,8 +192,8 @@ do_cpu_stop:
 
 		PREEMPTION_ENABLE();
 		/* Wait until we're supposed to resume execution. */
-		while ((ATOMIC_READ(stop_event.e.tse_mayresume) != GDB_THREAD_MAYRESUME_RESUME)) {
-			if (!ATOMIC_READ(stop_event.e.tse_isacpu)) {
+		while ((atomic_read(&stop_event.e.tse_mayresume) != GDB_THREAD_MAYRESUME_RESUME)) {
+			if (!atomic_read(&stop_event.e.tse_isacpu)) {
 switch_to_normal_stop:
 				COMPILER_BARRIER();
 				FORCPU(me, thiscpu_sched_override) = old_override;
@@ -201,11 +201,11 @@ switch_to_normal_stop:
 				goto do_normal_stop;
 			}
 			task_connect_for_poll(&stop_event.e.tse_sigresume);
-			if (!ATOMIC_READ(stop_event.e.tse_isacpu)) {
+			if (!atomic_read(&stop_event.e.tse_isacpu)) {
 				task_disconnectall();
 				goto switch_to_normal_stop;
 			}
-			if (ATOMIC_READ(stop_event.e.tse_mayresume) == GDB_THREAD_MAYRESUME_RESUME) {
+			if (atomic_read(&stop_event.e.tse_mayresume) == GDB_THREAD_MAYRESUME_RESUME) {
 				task_disconnectall();
 				break;
 			}
@@ -234,16 +234,16 @@ switch_to_normal_stop:
 		PREEMPTION_ENABLE();
 do_normal_stop:
 		/* Wait until we're supposed to resume execution. */
-		while (ATOMIC_READ(stop_event.e.tse_mayresume) != GDB_THREAD_MAYRESUME_RESUME) {
-			if (ATOMIC_READ(stop_event.e.tse_isacpu))
+		while (atomic_read(&stop_event.e.tse_mayresume) != GDB_THREAD_MAYRESUME_RESUME) {
+			if (atomic_read(&stop_event.e.tse_isacpu))
 				goto do_cpu_stop;
 			/* Try to become the GDB host thread if we've been given a stop reason. */
-			if (ATOMIC_READ(stop_event.e.tse_reason) != NULL) {
-				if (ATOMIC_CMPXCH(GDBServer_Host, NULL, stop_event.e.tse_thread)) {
-					assert(!ATOMIC_READ(stop_event.e.tse_isacpu));
+			if (atomic_read(&stop_event.e.tse_reason) != NULL) {
+				if (atomic_cmpxch(&GDBServer_Host, NULL, stop_event.e.tse_thread)) {
+					assert(!atomic_read(&stop_event.e.tse_isacpu));
 					/* Check for race condition: We're actually supposed to resume execution */
-					if unlikely(ATOMIC_READ(stop_event.e.tse_mayresume) == GDB_THREAD_MAYRESUME_RESUME) {
-						ATOMIC_WRITE(GDBServer_Host, NULL);
+					if unlikely(atomic_read(&stop_event.e.tse_mayresume) == GDB_THREAD_MAYRESUME_RESUME) {
+						atomic_write(&GDBServer_Host, NULL);
 						sig_broadcast(&GDBServer_HostUnlocked);
 						break;
 					}
@@ -253,22 +253,22 @@ do_normal_stop:
 				task_connect_for_poll(&GDBServer_HostUnlocked);
 			}
 			task_connect_for_poll(&stop_event.e.tse_sigresume);
-			if (ATOMIC_READ(stop_event.e.tse_isacpu)) {
+			if (atomic_read(&stop_event.e.tse_isacpu)) {
 				task_disconnectall();
 				goto do_cpu_stop;
 			}
-			if (ATOMIC_READ(stop_event.e.tse_mayresume) == GDB_THREAD_MAYRESUME_RESUME) {
+			if (atomic_read(&stop_event.e.tse_mayresume) == GDB_THREAD_MAYRESUME_RESUME) {
 				task_disconnectall();
 				break;
 			}
 			/* Try to become the GDB host thread if we've been given a stop reason. */
-			if (ATOMIC_READ(stop_event.e.tse_reason) != NULL) {
-				if (ATOMIC_CMPXCH(GDBServer_Host, NULL, stop_event.e.tse_thread)) {
+			if (atomic_read(&stop_event.e.tse_reason) != NULL) {
+				if (atomic_cmpxch(&GDBServer_Host, NULL, stop_event.e.tse_thread)) {
 					task_disconnectall();
-					assert(!ATOMIC_READ(stop_event.e.tse_isacpu));
+					assert(!atomic_read(&stop_event.e.tse_isacpu));
 					/* Check for race condition: We're actually supposed to resume execution */
-					if unlikely(ATOMIC_READ(stop_event.e.tse_mayresume) == GDB_THREAD_MAYRESUME_RESUME) {
-						ATOMIC_WRITE(GDBServer_Host, NULL);
+					if unlikely(atomic_read(&stop_event.e.tse_mayresume) == GDB_THREAD_MAYRESUME_RESUME) {
+						atomic_write(&GDBServer_Host, NULL);
 						sig_broadcast(&GDBServer_HostUnlocked);
 						break;
 					}
@@ -284,7 +284,7 @@ do_normal_stop:
 
 	/* Clear our thread's KEEPCORE flags */
 	if likely(!(old_flags & TASK_FKEEPCORE))
-		ATOMIC_AND(stop_event.e.tse_thread->t_flags, ~TASK_FKEEPCORE);
+		atomic_and(&stop_event.e.tse_thread->t_flags, ~TASK_FKEEPCORE);
 	task_popconnections();
 	return (struct icpustate *)stop_event.e.tse_state;
 }
@@ -313,7 +313,7 @@ PRIVATE void NOTHROW(FCALL GDBThread_DisablePreemptionForHostCPU)(void) {
 	/* TODO: Don't directly access `thiscpu_sched_override'! */
 	preemption_pushoff(&was);
 	/* Ensure that the GDB host thread doesn't move to a different core. */
-	GDBThread_StopAll_Host_Old_flags = ATOMIC_FETCHOR(THIS_TASK->t_flags, TASK_FKEEPCORE);
+	GDBThread_StopAll_Host_Old_flags = atomic_fetchor(&THIS_TASK->t_flags, TASK_FKEEPCORE);
 	/* Set the GDB Host thread as the scheduling override */
 	GDBThread_StopAll_Host_Old_override = FORCPU(GDBServer_Host->t_cpu, thiscpu_sched_override);
 	FORCPU(GDBServer_Host->t_cpu, thiscpu_sched_override) = GDBServer_Host;
@@ -328,7 +328,7 @@ PRIVATE void NOTHROW(FCALL GDBThread_ReenablePreemptionForHostCPU)(void) {
 	FORCPU(GDBServer_Host->t_cpu, thiscpu_sched_override) = GDBThread_StopAll_Host_Old_override;
 	/* Restore the old KEEPCORE flag. */
 	if (!(GDBThread_StopAll_Host_Old_flags & TASK_FKEEPCORE))
-		ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FKEEPCORE);
+		atomic_and(&THIS_TASK->t_flags, ~TASK_FKEEPCORE);
 	preemption_pop(&was);
 }
 
@@ -354,7 +354,7 @@ INTERN void NOTHROW(FCALL GDBThread_StopAllCpus)(void) {
 		unsigned int newCount;
 		for (;;) {
 			newCount     = 0;
-			lastNewEvent = ATOMIC_READ(GDBThread_Stopped);
+			lastNewEvent = atomic_read(&GDBThread_Stopped);
 			if (lastNewEvent) {
 				++newCount;
 				assert(lastNewEvent->tse_isacpu);
@@ -388,8 +388,8 @@ NOTHROW(FCALL GDBThread_ResumeSingleStopEvent)(GDBThreadStopEvent *__restrict se
 	          task_getroottid_of(self->tse_thread));
 	assert(self->tse_mayresume == GDB_THREAD_MAYRESUME_NASYNC);
 	COMPILER_BARRIER();
-	ATOMIC_AND(self->tse_thread->t_flags, ~TASK_FGDB_STOPPED);
-	ATOMIC_WRITE(self->tse_mayresume, GDB_THREAD_MAYRESUME_RESUME);
+	atomic_and(&self->tse_thread->t_flags, ~TASK_FGDB_STOPPED);
+	atomic_write(&self->tse_mayresume, GDB_THREAD_MAYRESUME_RESUME);
 	COMPILER_BARRIER();
 	sig_broadcast(&self->tse_sigresume);
 	COMPILER_BARRIER();
@@ -401,22 +401,22 @@ NOTHROW(FCALL GDBThread_ResumeSingleStopEvent)(GDBThreadStopEvent *__restrict se
  * entire CPU. */
 PRIVATE void NOTHROW(FCALL GDBThread_DowngradeSuspendedAsyncCPUs)(void) {
 	GDBThreadStopEvent *chain, *last, *iter;
-	chain = ATOMIC_XCH(GDBThread_AsyncNotifStopEvents, NULL);
+	chain = atomic_xch(&GDBThread_AsyncNotifStopEvents, NULL);
 	if (!chain)
 		return;
 	iter = chain;
 	do {
 		if (iter->tse_isacpu) {
 			/* Downgrade to a single-thread lock. */
-			ATOMIC_WRITE(iter->tse_isacpu, 0);
+			atomic_write(&iter->tse_isacpu, 0);
 			sig_broadcast(&iter->tse_sigresume);
 		}
 		last = iter;
 	} while ((iter = iter->tse_next) != NULL);
 	do {
-		iter = ATOMIC_READ(GDBThread_AsyncNotifStopEvents);
+		iter = atomic_read(&GDBThread_AsyncNotifStopEvents);
 		last->tse_next = chain;
-	} while (!ATOMIC_CMPXCH_WEAK(GDBThread_AsyncNotifStopEvents,
+	} while (!atomic_cmpxch_weak(&GDBThread_AsyncNotifStopEvents,
 	                             iter, chain));
 }
 
@@ -478,7 +478,7 @@ INTERN NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL GDBThread_IsStopped)(struct task const *__restrict thread) {
 	if (GDBThread_IsAllStopModeActive)
 		return true; /* Everything is suspended in non-stop mode. */
-	return (ATOMIC_READ(thread->t_flags) & TASK_FGDB_STOPPED) != 0;
+	return (atomic_read(&thread->t_flags) & TASK_FGDB_STOPPED) != 0;
 }
 
 /* Same as `GDBThread_IsStopped()', but the thread doesn't count as truly
@@ -486,14 +486,14 @@ NOTHROW(FCALL GDBThread_IsStopped)(struct task const *__restrict thread) {
  * would be the case when `GDBThread_IsAllStopModeActive == true') */
 INTERN NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL GDBThread_IsStoppedExplicitly)(struct task const *__restrict thread) {
-	return (ATOMIC_READ(thread->t_flags) & TASK_FGDB_STOPPED) != 0;
+	return (atomic_read(&thread->t_flags) & TASK_FGDB_STOPPED) != 0;
 }
 
 
 /* Check if the given `thread' has terminated */
 INTERN NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL GDBThread_HasTerminated)(struct task const *__restrict thread) {
-	return (ATOMIC_READ(thread->t_flags) & (TASK_FTERMINATED | TASK_FTERMINATING)) != 0;
+	return (atomic_read(&thread->t_flags) & (TASK_FTERMINATED | TASK_FTERMINATING)) != 0;
 }
 
 
@@ -573,7 +573,7 @@ NOTHROW(FCALL GDBThread_CreateMissingAsyncStopNotification)(struct task *__restr
 			/* The stop event isn't in the set of Stopped threads, so it has to be
 			 * somewhere within  the  set  of pending  async  stop  notifications. */
 #ifndef NDEBUG
-			evt = ATOMIC_READ(GDBThread_AsyncNotifStopEvents);
+			evt = atomic_read(&GDBThread_AsyncNotifStopEvents);
 			for (;;) {
 				assertf(evt != NULL,
 				        "Missing stop notification for thread %p",
@@ -601,13 +601,13 @@ NOTHROW(FCALL GDBThread_CreateMissingAsyncStopNotification)(struct task *__restr
 			evt->tse_reason = &event_with_reason->r;
 		}
 		/* Add the event to the chain of pending async stop events. */
-		ATOMIC_WRITE(evt->tse_mayresume, GDB_THREAD_MAYRESUME_STOP);
+		atomic_write(&evt->tse_mayresume, GDB_THREAD_MAYRESUME_STOP);
 		{
 			GDBThreadStopEvent *next;
 			do {
-				next = ATOMIC_READ(GDBThread_AsyncNotifStopEvents);
+				next = atomic_read(&GDBThread_AsyncNotifStopEvents);
 				evt->tse_next = next;
-			} while (!ATOMIC_CMPXCH_WEAK(GDBThread_AsyncNotifStopEvents, next, evt));
+			} while (!atomic_cmpxch_weak(&GDBThread_AsyncNotifStopEvents, next, evt));
 			if (!next)
 				sig_broadcast(&GDBThread_AsyncNotifStopEventsAdded);
 		}
@@ -707,7 +707,7 @@ NOTHROW(FCALL GDBThread_Stop)(struct task *__restrict thread,
 		/* Make sure that  the thread is  explicitly stopped, in  case
 		 * it was implicitly stopped by a whole-cpu stop event before. */
 		if (GDBThread_FindStopEvent(thread)) {
-			ATOMIC_OR(thread->t_flags, TASK_FGDB_STOPPED);
+			atomic_or(&thread->t_flags, TASK_FGDB_STOPPED);
 		} else {
 			if (generateAsyncStopEvents)
 				GDBThread_CreateMissingAsyncStopNotification(thread);
@@ -731,7 +731,7 @@ NOTHROW(FCALL GDBThread_Stop)(struct task *__restrict thread,
 		return false; /* The given `thread' has already terminated. */
 	/* If the thread hasn't been started yet, do so now
 	 * (so that it immediately jumps into our stop RPC) */
-	if (!(ATOMIC_READ(thread->t_flags) & TASK_FSTARTED))
+	if (!(atomic_read(&thread->t_flags) & TASK_FSTARTED))
 		task_start(thread);
 	/* Until until `GDBThread_StoppedAdded' has fully stopped. */
 	while (!GDBThread_IsStopped(thread)) {
@@ -762,7 +762,7 @@ NOTHROW(FCALL GDBThread_Resume)(struct task *__restrict thread) {
 		if (iter->tse_thread != thread)
 			continue;
 		if (iter->tse_isacpu) {
-			ATOMIC_AND(iter->tse_thread->t_flags, ~TASK_FGDB_STOPPED);
+			atomic_and(&iter->tse_thread->t_flags, ~TASK_FGDB_STOPPED);
 			break; /* whole-cpu stop events are resumed later. */
 		}
 		assert(iter->tse_mayresume == GDB_THREAD_MAYRESUME_NASYNC);
@@ -777,11 +777,11 @@ LOCAL WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL decref_if_not_destroy)(struct task *__restrict thread) {
 	refcnt_t refcnt;
 	do {
-		refcnt = ATOMIC_READ(thread->t_refcnt);
+		refcnt = atomic_read(&thread->t_refcnt);
 		assert(refcnt != 0);
 		if (refcnt == 1)
 			return false;
-	} while (!ATOMIC_CMPXCH_WEAK(thread->t_refcnt, refcnt, refcnt - 1));
+	} while (!atomic_cmpxch_weak(&thread->t_refcnt, refcnt, refcnt - 1));
 	return true;
 }
 
@@ -845,7 +845,7 @@ again_piter_kern:
 			if (!GDBThread_IsKernelThread(iter->tse_thread))
 				continue; /* Different process. */
 			if (iter->tse_isacpu) {
-				ATOMIC_AND(iter->tse_thread->t_flags, ~TASK_FGDB_STOPPED);
+				atomic_and(&iter->tse_thread->t_flags, ~TASK_FGDB_STOPPED);
 				continue; /* whole-cpu stop events are resumed later. */
 			}
 			/* Unlink the stop event */
@@ -863,7 +863,7 @@ again_piter:
 			if (task_getprocpid_of(iter->tse_thread) != procpid)
 				continue; /* Different process. */
 			if (iter->tse_isacpu) {
-				ATOMIC_AND(iter->tse_thread->t_flags, ~TASK_FGDB_STOPPED);
+				atomic_and(&iter->tse_thread->t_flags, ~TASK_FGDB_STOPPED);
 				continue; /* whole-cpu stop events are resumed later. */
 			}
 			/* Unlink the stop event */

@@ -24,11 +24,11 @@
 /**/
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <atomic.h>
 #include <dlfcn.h>
 #include <format-printer.h>
 #include <stdbool.h>
@@ -76,7 +76,7 @@ err_init_failed:
 #define unwind_setreg_lcpustate (*pdyn_unwind_setreg_lcpustate)
 
 #define ENSURE_LIBUNWIND_LOADED() \
-	(ATOMIC_READ(pdyn_unwind_setreg_lcpustate) != NULL || initialize_libunwind_debug())
+	(atomic_read(&pdyn_unwind_setreg_lcpustate) != NULL || initialize_libunwind_debug())
 
 
 PRIVATE ATTR_SECTION(SECTION_DEBUG_BSS) void *pdyn_libdebuginfo                                               = NULL;
@@ -93,14 +93,14 @@ PRIVATE ATTR_NOINLINE WUNUSED ATTR_SECTION(SECTION_DEBUG_TEXT) void *
 NOTHROW(LIBCCALL get_libdebuginfo)(void) {
 	void *result;
 again:
-	result = ATOMIC_READ(pdyn_libdebuginfo);
+	result = atomic_read(&pdyn_libdebuginfo);
 	if (result == (void *)-1)
 		return NULL;
 	if (!result) {
 		result = dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LAZY | RTLD_LOCAL);
 		if (!result)
 			result = (void *)-1;
-		if (!ATOMIC_CMPXCH(pdyn_libdebuginfo, NULL, result)) {
+		if (!atomic_cmpxch(&pdyn_libdebuginfo, NULL, result)) {
 			if (result != (void *)-1)
 				dlclose(result);
 			goto again;

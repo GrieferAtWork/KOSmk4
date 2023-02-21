@@ -33,11 +33,10 @@
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <kos/except/reason/noexec.h>
 
+#include <atomic.h>
 #include <ctype.h>
 #include <string.h>
 #include <unistd.h>
@@ -150,7 +149,7 @@ shebang_exec(struct execargs *__restrict args) {
 		REF struct fdirent /**/ *interp_dentry;
 		REF struct fnode *interp_node;
 		{
-			u32 lnks = ATOMIC_READ(THIS_FS->fs_lnkmax);
+			u32 lnks = atomic_read(&THIS_FS->fs_lnkmax);
 			interp_node = path_traversefull_ex(args->ea_xpath, &lnks, execfile, 0,
 			                                   &interp_path, &interp_dentry);
 		}

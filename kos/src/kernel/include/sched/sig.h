@@ -83,7 +83,7 @@
  *     [ 3]
  *     [ 4] PRIVATE void wait_until_ready(void) {
  *     [ 5]     task_connect(&became_ready);
- *     [ 6]     if (ATOMIC_READ(is_ready)) {
+ *     [ 6]     if (atomic_read(&is_ready)) {
  *     [ 7]         task_disconnectall();
  *     [ 8]         return;
  *     [ 9]     }
@@ -91,7 +91,7 @@
  *     [11] }
  *     [12]
  *     [13] PRIVATE void become_ready(void) {
- *     [14]     ATOMIC_WRITE(is_ready, true);
+ *     [14]     atomic_write(&is_ready, true);
  *     [15]     sig_broadcast(&became_ready);
  *     [16] }
  *     Here, the read from `is_ready' on line #6 is interlocked with the  async
@@ -99,7 +99,7 @@
  *     knows that when `is_ready' isn't `true' yet, the calling thread will get
  *     notified after it becomes so (s.a. line #15) As such, all possible  race
  *     conditions are handled here:
- *        case #1: `ATOMIC_WRITE(is_ready, true);' happens before `task_connect(&became_ready)':
+ *        case #1: `atomic_write(&is_ready, true);' happens before `task_connect(&became_ready)':
  *                  - `sig_broadcast(&became_ready)' has no-one to notify
  *                  - The caller of `wait_until_ready()' will notice this in line #6
  *                  - The `wait_until_ready()' function never starts blocking
@@ -110,11 +110,11 @@
  *                 up the case  where an object  is already ready  from the get-go.  Such
  *                 models are  referred  to  as test+connect+test,  whereas  the  minimal
  *                 requirement for race-less synchronization is connect+test.
- *        case #2: `ATOMIC_WRITE(is_ready, true);' happens after `task_connect(&became_ready)',
- *                 but before `ATOMIC_READ(is_ready)'.
+ *        case #2: `atomic_write(&is_ready, true);' happens after `task_connect(&became_ready)',
+ *                 but before `atomic_read(&is_ready)'.
  *                  - Line #6 will notice this, and disconnect from the `became_ready'
  *                    signal once again, and the waiting thread never starts blocking.
- *        case #3: `ATOMIC_WRITE(is_ready, true);' happens after `if (ATOMIC_READ(is_ready))'
+ *        case #3: `atomic_write(&is_ready, true);' happens after `if (atomic_read&(&is_ready))'
  *                  - In this case, the caller of `wait_until_ready()' will end up inside of
  *                    `task_waitfor()', which will return as soon as line #15 gets executed.
  *                  - Because by this point, the waiting thread has already been connected

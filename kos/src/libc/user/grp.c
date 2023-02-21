@@ -23,11 +23,10 @@
 #include "../api.h"
 /**/
 
-#include <hybrid/atomic.h>
-
 #include <kos/syscalls.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <malloc.h>
 #include <paths.h>
 #include <stdio.h>
@@ -53,14 +52,13 @@ PRIVATE ATTR_SECTION(".bss.crt.database.grp") struct group group_entry = {};
 PRIVATE ATTR_SECTION(".text.crt.database.grp") FILE *
 NOTHROW_RPC(LIBCCALL group_opendb)(void) {
 	FILE *result, *new_result;
-	result = ATOMIC_READ(group_database);
+	result = atomic_read(&group_database);
 	if (result)
 		return result;
 	result = fopen(_PATH_GROUP, "r");
 	if unlikely(!result)
 		return NULL;
-	new_result = ATOMIC_CMPXCH_VAL(group_database,
-	                               NULL, result);
+	new_result = atomic_cmpxch_val(&group_database, NULL, result);
 	if unlikely(new_result != NULL) {
 		/* Race condition: Some other thread
 		 * opened the file in the mean time. */
@@ -148,7 +146,7 @@ INTERN ATTR_SECTION(".text.crt.database.grp") void
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endgrent)(void)
 /*[[[body:libc_endgrent]]]*/
 {
-	FILE *stream = ATOMIC_XCH(group_database, NULL);
+	FILE *stream = atomic_xch(&group_database, NULL);
 	if (stream)
 		fclose(stream);
 	/* Also free up the buffer used to describe the strings

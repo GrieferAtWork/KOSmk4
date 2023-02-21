@@ -43,7 +43,6 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/host.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/bsearch.h>
@@ -62,6 +61,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <signal.h>
@@ -139,7 +139,7 @@ NOTHROW(FCALL task_userrpc_cancelprogram)(struct pending_rpc *__restrict rpc) {
 	assert(!(rpc->pr_flags & RPC_CONTEXT_SIGNAL));
 
 	/* Indicate that the program was canceled. */
-	ATOMIC_WRITE(rpc->pr_user.pur_status, PENDING_USER_RPC_STATUS_CANCELED);
+	atomic_write(&rpc->pr_user.pur_status, PENDING_USER_RPC_STATUS_CANCELED);
 	sig_broadcast(&rpc->pr_user.pur_stchng);
 }
 
@@ -552,7 +552,7 @@ rw_bank:
 					if (++self->rm_access >= RPC_PROG_MEMORY_MAX)
 						THROW(E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED,
 						      E_ILLEGAL_OPERATION_CONTEXT_RPC_PROGRAM_MEMORY_EXCEEDED);
-					bankdat[j] = ATOMIC_READ(addr[j]);
+					bankdat[j] = atomic_read(&addr[j]);
 					st |= RPC_MEMBANK_STATUS_F_LOADED;
 					rpc_membank_setstatus(bank, reladdr, st);
 				}
@@ -1990,7 +1990,7 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 		/* Execute the RPC program VM */
 		for (;;) {
 			/* Check if the RPC should be canceled. */
-			if (ATOMIC_READ(rpc->pr_user.pur_status) != PENDING_USER_RPC_STATUS_PENDING) {
+			if (atomic_read(&rpc->pr_user.pur_status) != PENDING_USER_RPC_STATUS_PENDING) {
 				assert(rpc->pr_user.pur_status == PENDING_USER_RPC_STATUS_CANCELED);
 				state = NULL;
 				goto done;
@@ -2054,7 +2054,7 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 		 *       stuff that cannot be undone. */
 
 		/* Indicate that the RPC was successfully executed. */
-		if (!ATOMIC_CMPXCH(rpc->pr_user.pur_status,
+		if (!atomic_cmpxch(&rpc->pr_user.pur_status,
 		                   PENDING_USER_RPC_STATUS_PENDING,
 		                   PENDING_USER_RPC_STATUS_COMPLETE)) {
 			assert(rpc->pr_user.pur_status == PENDING_USER_RPC_STATUS_CANCELED);
@@ -2148,7 +2148,7 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 		 *       stuff that cannot be undone. */
 
 		/* Indicate that the RPC was successfully executed. */
-		if (!ATOMIC_CMPXCH(rpc->pr_user.pur_status,
+		if (!atomic_cmpxch(&rpc->pr_user.pur_status,
 		                   PENDING_USER_RPC_STATUS_PENDING,
 		                   PENDING_USER_RPC_STATUS_COMPLETE)) {
 			assert(rpc->pr_user.pur_status == PENDING_USER_RPC_STATUS_CANCELED);
@@ -2200,7 +2200,7 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 			RETHROW(); /* Handled by the caller (causes the RPC to be re-attempted later) */
 		if (EXCEPTCLASS_ISRTLPRIORITY(tls->ei_class)) {
 			/* Too important to discard. Instead, cancel the RPC and rethrow */
-			if (ATOMIC_CMPXCH(rpc->pr_user.pur_status,
+			if (atomic_cmpxch(&rpc->pr_user.pur_status,
 			                  PENDING_USER_RPC_STATUS_PENDING,
 			                  PENDING_USER_RPC_STATUS_CANCELED)) {
 				sig_broadcast(&rpc->pr_user.pur_stchng);
@@ -2212,7 +2212,7 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 
 		/* Propagate the exception back to the sender. */
 		if (isshared(&rpc->pr_user) &&
-		    ATOMIC_CMPXCH(rpc->pr_user.pur_status,
+		    atomic_cmpxch(&rpc->pr_user.pur_status,
 		                  PENDING_USER_RPC_STATUS_PENDING,
 		                  PENDING_USER_RPC_STATUS_ERROR)) {
 			rpc->pr_user.pur_error.e_code = tls->ei_code;

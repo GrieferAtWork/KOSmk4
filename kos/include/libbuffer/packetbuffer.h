@@ -373,11 +373,11 @@ struct pb_buffer {
 	 * >> }
 	 *
 	 * >> NOBLOCK commit_write(struct pb_packet *packet) {
-	 * >>     ATOMIC_WRITE(packet->p_state, PB_PACKET_STATE_READABLE);
+	 * >>     atomic_write(&packet->p_state, PB_PACKET_STATE_READABLE);
 	 * >> }
 	 *
 	 * >> NOBLOCK abort_write(struct pb_packet *packet) {
-	 * >>     ATOMIC_WRITE(packet->p_state, PB_PACKET_STATE_DISCARD);
+	 * >>     atomic_write(&packet->p_state, PB_PACKET_STATE_DISCARD);
 	 * >>     if (trylock()) {
 	 * >>         // Optional: Try to reclaim unused packet memory, if the one
 	 * >>         //           being discarded is still the most recent packet.
@@ -679,14 +679,14 @@ __NOTHROW(LIBBUFFER_CC pb_buffer_endwrite_abort)(struct pb_buffer *__restrict se
  * >>         break;
  * >>     }
  * >>     task_waitfor();
- * >> #else
+ * >> #else // __KERNEL__
  * >>     lfutex_t status;
- * >>     status = ATOMIC_READ(self->pb_psta);
+ * >>     status = atomic_read(&self->pb_psta);
  * >>     packet = pb_buffer_startread(self);
  * >>     if (packet)
  * >>         break;
  * >>     futex_waitwhile(&self->pb_psta, status);
- * >> #endif
+ * >> #endif // !__KERNEL__
  * >> }
  * Note that with this design, recursive- or parallel read operations
  * aren't allowed (which also wouldn't really make much sense,  since

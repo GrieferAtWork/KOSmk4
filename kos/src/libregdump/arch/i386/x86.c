@@ -36,6 +36,7 @@
 #include <kos/kernel/x86/gdt.h>
 #include <kos/types.h>
 
+#include <atomic.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stdbool.h>
@@ -52,8 +53,6 @@
 #ifdef __KERNEL__
 #include <kernel/x86/gdt.h>
 #else /* __KERNEL__ */
-#include <hybrid/atomic.h>
-
 #include <dlfcn.h>
 #endif /* !__KERNEL__ */
 
@@ -1074,12 +1073,12 @@ void fini_libraries(void) {
 	PRIVATE void *open_libname(void) {                                   \
 		void *result;                                                    \
 	again:                                                               \
-		result = ATOMIC_READ(libname);                                   \
+		result = atomic_read(&libname);                                  \
 		if (result == NULL) {                                            \
 			result = dlopen(LIBNAME_LIBRARY_NAME, RTLD_LOCAL);           \
 			if (!result)                                                 \
 				result = (void *)-1;                                     \
-			if (!ATOMIC_CMPXCH(libname, NULL, result)) {                 \
+			if (!atomic_cmpxch(&libname, NULL, result)) {                \
 				if (result != (void *)-1)                                \
 					dlclose(result);                                     \
 				goto again;                                              \

@@ -85,7 +85,7 @@ DATDEF struct sig entropy_request_sig;
 
 /* Check if at least `num_bits' of entropy are current available.
  * When this is the case,  return `false'. Otherwise, connect  to
- * `entropy_request_sig' and ATOMIC_CMPXCH `entropy_request_bits'
+ * `entropy_request_sig' and atomic_cmpxch `entropy_request_bits'
  * such that its value is not larger than `num_bits'. Afterwards,
  * do another check  if sufficient entropy  is available, and  if
  * that is  the  case  then,  disconnected  and  return  `false'.

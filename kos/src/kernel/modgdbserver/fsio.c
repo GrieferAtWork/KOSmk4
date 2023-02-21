@@ -33,13 +33,12 @@
 #include <kernel/malloc.h>
 #include <kernel/types.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <kos/io.h>
 #include <sys/stat.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdbool.h>
@@ -281,7 +280,7 @@ LOCAL ATTR_PURE WUNUSED bool
 NOTHROW(KCALL GDBFs_HasMountedFileSystem)(void) {
 	if unlikely(!GDBFs.fi_fs)
 		return false; /* No filesystem loaded. */
-	if unlikely(!ATOMIC_READ(GDBFs.fi_fs->fs_vfs->vf_root))
+	if unlikely(!atomic_read(&GDBFs.fi_fs->fs_vfs->vf_root))
 		return false; /* The root filesystem hasn't been mounted, yet. */
 	return true;
 }

@@ -30,11 +30,11 @@ if (gcc_opt.removeif([](arg1) -> arg1.startswith("-O")))
 /**/
 
 #ifndef __NO_FPU
-#include <hybrid/atomic.h>
 
 #include <bits/math-constants.h>
 #include <kos/types.h>
 
+#include <atomic.h>
 #include <dlfcn.h>
 #include <fenv.h>
 #include <float.h>
@@ -114,13 +114,16 @@ INTERN ATTR_SECTION(".bss.crt.math.math") LPMATHERR libc_pdyn_matherr = NULL;
 PRIVATE ATTR_SECTION(".rodata.crt.math.math") char const name_matherr[] = "matherr";
 PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.math.math")
 LPMATHERR NOTHROW(LIBCCALL libc_get_matherr)(void) {
-	LPMATHERR result;
-	while ((result = ATOMIC_READ(libc_pdyn_matherr)) == NULL) {
+	LPMATHERR result = atomic_read(&libc_pdyn_matherr);
+	if (result == NULL) {
+		LPMATHERR new_result;
 		/* Lazily load on first access. */
 		*(void **)&result = dlsym(RTLD_DEFAULT, name_matherr);
 		if unlikely(!result)
 			result = &libc_matherr; /* Really shouldn't happen. -- libdl should have found our version... */
-		ATOMIC_CMPXCH(libc_pdyn_matherr, NULL, result);
+		new_result = atomic_cmpxch_val(&libc_pdyn_matherr, NULL, result);
+		if (new_result != NULL)
+			result = new_result;
 	}
 	return result;
 }

@@ -32,14 +32,13 @@
 #include <sched/pid.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <bits/os/kos/rlimit.h>
 #include <compat/config.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 #include <sys/resource.h>
 
+#include <atomic.h>
 #include <limits.h>
 #include <stddef.h>
 #include <string.h>
@@ -125,13 +124,13 @@ again_lock_cred:
 			new_maxval = (unsigned int)new_rlim->rlim_cur;
 			if (new_maxval > (unsigned int)INT_MAX + 1)
 				new_maxval = (unsigned int)INT_MAX + 1;
-			old_maxval = ATOMIC_XCH(hm->hm_maxhand, new_maxval);
+			old_maxval = atomic_xch(&hm->hm_maxhand, new_maxval);
 			if (old_rlim) {
 				old_rlim->rlim_cur = (rlim64_t)old_maxval;
 				old_rlim->rlim_max = (rlim64_t)INT_MAX + 1; /* XXX: This would need to be saved in `struct procctl' */
 			}
 		} else if (old_rlim) {
-			old_rlim->rlim_cur = (rlim64_t)ATOMIC_READ(hm->hm_maxhand);
+			old_rlim->rlim_cur = (rlim64_t)atomic_read(&hm->hm_maxhand);
 			old_rlim->rlim_max = (rlim64_t)INT_MAX + 1; /* XXX: This would need to be saved in `struct procctl' */
 		}
 	}	break;
@@ -145,13 +144,13 @@ again_lock_cred:
 			new_maxval = (unsigned int)new_rlim->rlim_cur;
 			if (new_maxval > (unsigned int)INT_MAX)
 				new_maxval = (unsigned int)INT_MAX;
-			old_maxval = ATOMIC_XCH(hm->hm_maxfd, new_maxval);
+			old_maxval = atomic_xch(&hm->hm_maxfd, new_maxval);
 			if (old_rlim) {
 				old_rlim->rlim_cur = (rlim64_t)old_maxval;
 				old_rlim->rlim_max = (rlim64_t)INT_MAX; /* XXX: This would need to be saved in `struct procctl' */
 			}
 		} else if (old_rlim) {
-			old_rlim->rlim_cur = (rlim64_t)ATOMIC_READ(hm->hm_maxfd);
+			old_rlim->rlim_cur = (rlim64_t)atomic_read(&hm->hm_maxfd);
 			old_rlim->rlim_max = (rlim64_t)INT_MAX; /* XXX: This would need to be saved in `struct procctl' */
 		}
 	}	break;

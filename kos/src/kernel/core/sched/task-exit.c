@@ -38,12 +38,11 @@
 #include <sched/scheduler.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <sys/wait.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stdalign.h>
 #include <stddef.h>
 
@@ -89,12 +88,12 @@ NOTHROW(FCALL maybe_clear_tid_address)(struct task *__restrict caller) {
 				 * of that process's VM, which  is the very thing that  gets
 				 * shared  during a  call to  vfork(), meaning  that we must
 				 * uninitialize it if it wasn't the parent who did the init! */
-				ATOMIC_WRITE(um->pm_sigmask, NULL);
+				atomic_write(&um->pm_sigmask, NULL);
 			}
 			return;
 		}
 #endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
-		ATOMIC_WRITE(*addr, 0);
+		write_once(addr, 0);
 		mman_broadcastfutex(addr);
 	} EXCEPT {
 		/* Explicitly handle E_SEGFAULT:addr as a no-op */
@@ -115,9 +114,9 @@ NOTHROW(FCALL terminate_pending_rpcs)(struct task *__restrict caller) {
 	struct pending_rpc *remain;
 
 	/* Mark the RPC list as terminated and load remaining RPCs. */
-	remain = ATOMIC_XCH(FORTASK(caller, this_rpcs.slh_first),
+	remain = atomic_xch(&FORTASK(caller, this_rpcs.slh_first),
 	                    THIS_RPCS_TERMINATED);
-	ATOMIC_OR(FORTASK(caller, this_rpcs_sigpend), 1);
+	atomic_or(&FORTASK(caller, this_rpcs_sigpend), 1);
 	assertf(remain != THIS_RPCS_TERMINATED,
 	        "We're the only ones that ever set this, "
 	        "so what; did we get called twice?");
@@ -154,7 +153,7 @@ propagate_process_exit_status(struct rpc_context *__restrict ctx,
 	 * that our process leader (iow: the main thread) has exited. Now it's
 	 * our job to propagate its exit status into our own `taskpid'. */
 	procpid = task_getprocpid();
-	status  = ATOMIC_READ(procpid->tp_status);
+	status  = atomic_read(&procpid->tp_status);
 	THROW(E_EXIT_THREAD, status);
 }
 
@@ -179,7 +178,7 @@ propagate_thread_exit_status(struct rpc_context *__restrict ctx,
 	origin_pid = task_gettaskpid_of(origin);
 
 	/* And with that, we can extract the intended status */
-	status = ATOMIC_READ(origin_pid->tp_status);
+	status = atomic_read(&origin_pid->tp_status);
 
 	/* In order to  prevent `this_exitrpc' from  being free'd, child  threads
 	 * let this RPC inherit a reference to the sending thread. Now that we're
@@ -210,18 +209,18 @@ NOTHROW(FCALL process_exit)(uint16_t w_status) {
 		main_thread = taskpid_gettask(taskpid_getprocpid(pid));
 		if likely(main_thread) {
 			/* Main thread hasn't been destroyed. */
-			if (!(ATOMIC_READ(main_thread->t_flags) & (TASK_FTERMINATING | TASK_FTERMINATED))) {
+			if (!(atomic_read(&main_thread->t_flags) & (TASK_FTERMINATING | TASK_FTERMINATED))) {
 				/* Main thread hasn't terminated, yet. */
 
 				/* Send an RPC to the main thread in order to terminate it. */
-				if (ATOMIC_CMPXCH(FORTASK(caller, this_exitrpc.prh_func),
+				if (atomic_cmpxch(&FORTASK(caller, this_exitrpc.prh_func),
 				                  NULL, &propagate_thread_exit_status)) {
 
 					/* This write is repeated in `task_exit()', but that's OK.
 					 * It also has to  be done here, so  that the RPC will  be
 					 * able  to talk to  our thread in  order to determine the
 					 * exit status that should be propagated. */
-					ATOMIC_WRITE(pid->tp_status, w_status);
+					atomic_write(&pid->tp_status, w_status);
 
 					/* Inherited by `propagate_thread_exit_status()' */
 					incref(caller);
@@ -277,15 +276,15 @@ NOTHROW(FCALL task_exit)(uint16_t w_status) {
 
 	if unlikely(caller->t_flags & TASK_FCRITICAL) {
 		panic_critical_thread_exited(caller);
-		ATOMIC_AND(caller->t_flags, ~TASK_FCRITICAL);
+		atomic_and(&caller->t_flags, ~TASK_FCRITICAL);
 	}
 
 	/* Fill in the exit status.
 	 * Note that this has to happen first, even before we set `TASK_FTERMINATING'! */
-	ATOMIC_WRITE(pid->tp_status, w_status);
+	atomic_write(&pid->tp_status, w_status);
 
 	/* Set the bit to indicate that we've started termination. */
-	flags = ATOMIC_FETCHOR(caller->t_flags, TASK_FTERMINATING);
+	flags = atomic_fetchor(&caller->t_flags, TASK_FTERMINATING);
 	assertf(!(flags & TASK_FTERMINATING), "This shouldn't happen!");
 	(void)flags;
 
@@ -332,8 +331,8 @@ NOTHROW(FCALL task_exit)(uint16_t w_status) {
 			struct pending_rpc *rpcs;
 			assert(PREEMPTION_ENABLED());
 			procctl_sig_write(ctl); /* Never throws because preemption is enabled */
-			rpcs = ATOMIC_XCH(ctl->pc_sig_list.slh_first, THIS_RPCS_TERMINATED);
-			ATOMIC_OR(ctl->pc_sig_pend, 1); /* Indicate that further pending signals won't be served. */
+			rpcs = atomic_xch(&ctl->pc_sig_list.slh_first, THIS_RPCS_TERMINATED);
+			atomic_or(&ctl->pc_sig_pend, 1); /* Indicate that further pending signals won't be served. */
 			procctl_sig_endwrite(ctl);
 			task_asyncrpc_destroy_list_for_shutdown(rpcs);
 		}
@@ -390,7 +389,7 @@ again_process_children:
 			if (child_thread != NULL) {
 				/* Use the child thread's exit RPC to terminate
 				 * it, as well  as propagate  our exit  status. */
-				if (ATOMIC_CMPXCH(FORTASK(child_thread, this_exitrpc.prh_func),
+				if (atomic_cmpxch(&FORTASK(child_thread, this_exitrpc.prh_func),
 				                  NULL, &propagate_process_exit_status)) {
 					bool ok;
 					ok = task_rpc_schedule(child_thread, &FORTASK(child_thread, this_exitrpc));
@@ -472,7 +471,7 @@ again_get_ctty:
 #ifdef CONFIG_HAVE_FPU
 	/* Unset the  calling thread  potentially holding  the FPU  state.
 	 * Since the task will go away, we don't actually have to save it. */
-	ATOMIC_CMPXCH(FORCPU(mycpu, thiscpu_fputhread), caller, NULL);
+	atomic_cmpxch(&FORCPU(mycpu, thiscpu_fputhread), caller, NULL);
 #endif /* CONFIG_HAVE_FPU */
 
 	/* Account for timings and scheduler internals, as well as figure out a successor thread. */
@@ -518,7 +517,7 @@ again_get_ctty:
 				       TASK_FSUSPENDED | TASK_FGDB_STOPPED |
 				       0)
 			};
-			old_flags = ATOMIC_READ(caller->t_flags);
+			old_flags = atomic_read(&caller->t_flags);
 			new_flags = old_flags;
 			/* While this was already checked for above, some other thread may have set this
 			 * flag in the mean time (though doing  something like that would be really  bad
@@ -529,7 +528,7 @@ again_get_ctty:
 				panic_critical_thread_exited(caller);
 			new_flags |= set;
 			new_flags &= ~del;
-		} while (!ATOMIC_CMPXCH_WEAK(caller->t_flags,
+		} while (!atomic_cmpxch_weak(&caller->t_flags,
 		                             old_flags,
 		                             new_flags));
 	}
@@ -551,7 +550,7 @@ again_get_ctty:
 
 	/* Also notify our parent process that one of its children has changed state. */
 	sig_broadcast_as_nopr(&parpid->tp_pctl->pc_chld_changed, next);
-	if unlikely(ATOMIC_DECFETCH(parpid->tp_refcnt) == 0) {
+	if unlikely(atomic_decfetch(&parpid->tp_refcnt) == 0) {
 		struct scpustate *state;
 		state = FORTASK(next, this_sstate);
 		state = task_asyncrpc_push(state, &taskpid_destroy_rpc, parpid);

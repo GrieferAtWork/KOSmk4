@@ -54,7 +54,7 @@ All other RPCs are handled by (in order):
 
 - Enqueueing the RPC in the `this_rpcs` list of the target thread (using `SLIST_ATOMIC_INSERT`, but also checking that `this_rpcs` hasn't been set to `THIS_RPCS_TERMINATED`)
 	- When `THIS_RPCS_TERMINATED` was already set, RPC scheduling functions may indicate to their caller that the targeted thread has already terminated.
-- Setting the `TASK_FRPC` flag (using `ATOMIC_OR(thread->t_flags, TASK_FRPC)`)
+- Setting the `TASK_FRPC` flag (using `atomic_or(&thread->t_flags, TASK_FRPC)`)
 - Sending a sporadic interrupt to the thread (using `userexcept_sysret_inject_safe(thread)`, which both wakes the thread and forces it back into kernel-space if it was currently in user-space)
 
 The rest of the work is the done in the context of the thread. Assuming a thread that sleeps by following the suggested sleeping method (which is also implemented by `task_waitfor()`):
@@ -115,7 +115,7 @@ struct icpustate *task_serve_with_icpustate(struct icpustate *__restrict state) 
 	restore_plast  = SLIST_PFIRST(&restore);
 	did_serve_rpcs = false;
 	must_unwind    = false;
-	ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+	atomic_and(&PERTASK(this_task.t_flags), ~TASK_FRPC);
 
 	/* Load RPC functions. This must happen _AFTER_ we clear
 	 * the  pending-RPC  flag to  prevent a  race condition. */
@@ -168,7 +168,7 @@ handle_pending:
 				pending_rpc_free(rpc);
 				/* Load additional RPCs, but discard this new exception */
 				pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
-				ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+				atomic_and(&PERTASK(this_task.t_flags), ~TASK_FRPC);
 				goto handle_pending;
 			}
 			/* Prioritize errors. */
@@ -266,7 +266,7 @@ NOTHROW(FCALL userexcept_handler)(struct icpustate *__restrict state,
 	}
 	restore_plast = SLIST_PFIRST(&restore);
 	SLIST_INIT(&kernel_rpcs);
-	ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+	atomic_and(&PERTASK(this_task.t_flags), ~TASK_FRPC);
 
 	/* Load RPC functions. This must happen _AFTER_ we clear
 	 * the  pending-RPC  flag to  prevent a  race condition. */
@@ -366,7 +366,7 @@ make_inactive:
 		if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
 			/* Load additional RPCs, but discard this new exception */
 			pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
-			ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+			atomic_and(&PERTASK(this_task.t_flags), ~TASK_FRPC);
 			goto handle_pending;
 		}
 		if (except_priority(error.ei_code) < except_priority(tls->ei_code))
@@ -406,7 +406,7 @@ make_inactive:
 				*restore_plast = SLIST_FIRST(&kernel_rpcs);
 				if (!SLIST_EMPTY(&restore)) {
 					restore_pending_rpcs(SLIST_FIRST(&restore));
-					ATOMIC_OR(PERTASK(this_task.t_flags), TASK_FRPC);
+					atomic_or(&PERTASK(this_task.t_flags), TASK_FRPC);
 					assert(PREEMPTION_ENABLED());
 					PREEMPTION_DISABLE();
 					ctx.rc_state = userexcept_sysret_inject_with_state_nopr(ctx.rc_state);
@@ -429,7 +429,7 @@ make_inactive:
 				}
 				restore_plast = SLIST_PFIRST(&restore);
 				SLIST_INIT(&kernel_rpcs);
-				ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+				atomic_and(&PERTASK(this_task.t_flags), ~TASK_FRPC);
 				pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 				goto handle_pending;
 			} else {
@@ -440,7 +440,7 @@ make_inactive:
 					if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
 						pending_rpc_free(rpc);
 						/* Load additional RPCs, but discard this new exception */
-						ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+						atomic_and(&PERTASK(this_task.t_flags), ~TASK_FRPC);
 						pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 						goto handle_pending;
 					}
@@ -501,7 +501,7 @@ make_inactive:
 						pending_rpc_free(rpc);
 						/* Load additional RPCs, but discard this new exception */
 						pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
-						ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+						atomic_and(&PERTASK(this_task.t_flags), ~TASK_FRPC);
 						goto handle_pending;
 					}
 					/* Prioritize errors. */
@@ -516,7 +516,7 @@ make_inactive:
 		}
 		if (!SLIST_EMPTY(&restore)) {
 			restore_pending_rpcs(SLIST_FIRST(&restore));
-			ATOMIC_OR(PERTASK(this_task.t_flags), TASK_FRPC);
+			atomic_or(&PERTASK(this_task.t_flags), TASK_FRPC);
 		}
 	}
 
@@ -582,7 +582,7 @@ struct icpustate *userexcept_sysret(struct icpustate *state) {
 	sysret_ctx.rc_context    = RPC_REASONCTX_SYSRET;
 	sysret_error.ei_code     = EXCEPT_CODEOF(E_OK);
 	sysret_pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
-	ATOMIC_AND(PERTASK(this_task.t_flags), ~(TASK_FRPC | TASK_FWAKEONMSKRPC));
+	atomic_and(&PERTASK(this_task.t_flags), ~(TASK_FRPC | TASK_FWAKEONMSKRPC));
 	sysret_restore_plast = SLIST_PFIRST(&sysret_restore);
 	SLIST_INIT(&sysret_kernel_rpcs);
 sysret_handle_pending:
@@ -647,7 +647,7 @@ sysret_make_inactive:
 		struct exception_info *tls = except_info();
 		if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
 			/* Load additional RPCs, but discard this new exception */
-			ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+			atomic_and(&PERTASK(this_task.t_flags), ~TASK_FRPC);
 			sysret_pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 			goto sysret_handle_pending;
 		}
@@ -667,7 +667,7 @@ sysret_make_inactive:
 			if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
 				pending_rpc_free(rpc);
 				/* Load additional RPCs, but discard this new exception */
-				ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+				atomic_and(&PERTASK(this_task.t_flags), ~TASK_FRPC);
 				sysret_pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 				goto sysret_handle_pending;
 			}
@@ -683,7 +683,7 @@ sysret_make_inactive:
 	if (sysret_restore_plast != SLIST_PFIRST(&sysret_restore)) {
 		*sysret_restore_plast = NULL;
 		restore_pending_rpcs(SLIST_FIRST(&sysret_restore));
-		ATOMIC_OR(PERTASK(this_task.t_flags), TASK_FRPC);
+		atomic_or(&PERTASK(this_task.t_flags), TASK_FRPC);
 	}
 
 	/* Check if we must throw a new exception. */
@@ -723,16 +723,16 @@ bool NOTHROW(task_rpc_schedule)(struct task *__restrict thread,
 	/* Insert into `thread's pending RPC list. */
 	list = &FORTASK(thread, this_rpcs);
 	do {
-		head = ATOMIC_READ(list->slh_first);
+		head = atomic_read(&list->slh_first);
 		if unlikely(head == THIS_RPCS_TERMINATED)
 			return false; /* Already terminated */
 		rpc->pr_link.sle_next = head;
 		COMPILER_WRITE_BARRIER();
-	} while (!ATOMIC_CMPXCH_WEAK(list->slh_first, head, rpc));
+	} while (!atomic_cmpxch_weak(&list->slh_first, head, rpc));
 
 	if (rpc_flags & RPC_CONTEXT_KERN) {
 		/* Set the thread's `TASK_FRPC' flag to indicate that it's got work to do */
-		ATOMIC_OR(thread->t_flags, TASK_FRPC);
+		atomic_or(&thread->t_flags, TASK_FRPC);
 
 		/* Deal  with the case where `thread' is currently running in user-space,
 		 * which requires us to temporarily move its execution into kernel-space,
@@ -877,9 +877,9 @@ void NOTHROW(restore_pending_rpcs)(struct pending_rpc *restore) {
 		struct pending_rpc *last;
 		list = &PERTASK(this_rpcs);
 again:
-		last = ATOMIC_READ(list->slh_first);
+		last = atomic_read(&list->slh_first);
 		if (!last) {
-			if (!ATOMIC_CMPXCH_WEAK(list->slh_first, NULL, restore))
+			if (!atomic_cmpxch_weak(&list->slh_first, NULL, restore))
 				goto again;
 		} else {
 			while (SLIST_NEXT(last, pr_link))

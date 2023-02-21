@@ -23,8 +23,7 @@
 #include "../api.h"
 /**/
 
-#include <hybrid/atomic.h>
-
+#include <atomic.h>
 #include <fcntl.h>
 
 #include "kos.dosfs.h"
@@ -45,7 +44,7 @@ INTERN ATTR_SECTION(".text.crt.dos.io.access") ATTR_PURE WUNUSED unsigned int
 NOTHROW(LIBCCALL libc_dosfs_getenabled)(void)
 /*[[[body:libc_dosfs_getenabled]]]*/
 {
-	if (ATOMIC_READ(libd_O_DOSPATH) != 0)
+	if (atomic_read(&libd_O_DOSPATH) != 0)
 		return DOSFS_ENABLED;
 	return DOSFS_DISABLED;
 }
@@ -80,17 +79,17 @@ NOTHROW(LIBCCALL libc_dosfs_setenabled)(unsigned int newmode)
 	switch (newmode) {
 
 	case DOSFS_ENABLED:
-		old_oflags = ATOMIC_XCH(libd_O_DOSPATH, O_DOSPATH);
-		ATOMIC_WRITE(libd_AT_DOSPATH, AT_DOSPATH);
+		old_oflags = atomic_xch(&libd_O_DOSPATH, O_DOSPATH);
+		atomic_write(&libd_AT_DOSPATH, AT_DOSPATH);
 		break;
 
 	case DOSFS_DISABLED:
-		old_oflags = ATOMIC_XCH(libd_O_DOSPATH, 0);
-		ATOMIC_WRITE(libd_AT_DOSPATH, 0);
+		old_oflags = atomic_xch(&libd_O_DOSPATH, 0);
+		atomic_write(&libd_AT_DOSPATH, 0);
 		break;
 
 	default:
-		old_oflags = ATOMIC_READ(libd_O_DOSPATH);
+		old_oflags = atomic_read(&libd_O_DOSPATH);
 		break;
 	}
 	if (old_oflags != 0)

@@ -27,13 +27,14 @@
 /**/
 
 #include <hybrid/compiler.h>
-#include <hybrid/atomic.h>
 
-#include <kos/types.h>
 #include <kos/except.h>
 #include <kos/hybrid/sched-signal.h>
-#include <string.h>
+#include <kos/types.h>
+
 #include <assert.h>
+#include <atomic.h>
+#include <string.h>
 
 #include <libbuffer/ringbuffer.h>
 
@@ -132,7 +133,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(CC ringbuffer_trimbuf_and_endwrite)(struct ringbuffer *__restrict self) {
 	size_t limit, thresh, unused_bytes;
 	if likely(self->rb_size) {
-		limit        = ATOMIC_READ(self->rb_limit);
+		limit        = atomic_read(&self->rb_limit);
 		thresh       = RINGBUFFER_FREE_THRESHOLD(limit);
 		unused_bytes = self->rb_size - self->rb_avail;
 		if (unused_bytes >= thresh) {
@@ -202,7 +203,7 @@ libringbuffer_read(struct ringbuffer *__restrict self,
 	size_t result, temp;
 	IF_KERNEL(assert(!task_wasconnected()));
 	result = libringbuffer_read_nonblock(self, dst, num_bytes);
-	if (result || !ATOMIC_READ(self->rb_limit)) {
+	if (result || !atomic_read(&self->rb_limit)) {
 done:
 		return (KERNEL_SELECT(size_t, ssize_t))result;
 	}
@@ -223,7 +224,7 @@ again_connect:
 		task_disconnectall();
 		goto done;
 	}
-	if unlikely(!ATOMIC_READ(self->rb_limit)) {
+	if unlikely(!atomic_read(&self->rb_limit)) {
 		task_disconnectall();
 		goto done;
 	}
@@ -444,7 +445,7 @@ libringbuffer_write(struct ringbuffer *__restrict self,
 	if unlikely(result < 0)
 		goto done;
 #endif /* !__KERNEL__ */
-	if ((size_t)result >= num_bytes || !ATOMIC_READ(self->rb_limit)) {
+	if ((size_t)result >= num_bytes || !atomic_read(&self->rb_limit)) {
 done:
 		return result;
 	}
@@ -467,7 +468,7 @@ again_connect:
 			goto done;
 		}
 	} else {
-		if unlikely(!ATOMIC_READ(self->rb_limit)) {
+		if unlikely(!atomic_read(&self->rb_limit)) {
 			task_disconnectall();
 			goto done;
 		}
@@ -476,8 +477,8 @@ again_connect:
 	task_waitfor();
 #else /* __KERNEL__ */
 	{
-		size_t size  = ATOMIC_READ(self->rb_size);
-		size_t limit = ATOMIC_READ(self->rb_limit);
+		size_t size  = atomic_read(&self->rb_size);
+		size_t limit = atomic_read(&self->rb_limit);
 		if unlikely(!limit)
 			goto done;
 		/* Wait if AVAIL >= SIZE and SIZE >= LIMIT */
@@ -520,7 +521,7 @@ libringbuffer_writesome(struct ringbuffer *__restrict self,
 	if unlikely(result < 0)
 		goto done;
 #endif /* !__KERNEL__ */
-	if (result || !ATOMIC_READ(self->rb_limit)) {
+	if (result || !atomic_read(&self->rb_limit)) {
 done:
 		return result;
 	}
@@ -543,7 +544,7 @@ again_connect:
 		task_disconnectall();
 		goto done;
 	}
-	if unlikely(!ATOMIC_READ(self->rb_limit)) {
+	if unlikely(!atomic_read(&self->rb_limit)) {
 		task_disconnectall();
 		goto done;
 	}
@@ -551,8 +552,8 @@ again_connect:
 	task_waitfor();
 #else /* __KERNEL__ */
 	{
-		size_t size  = ATOMIC_READ(self->rb_size);
-		size_t limit = ATOMIC_READ(self->rb_limit);
+		size_t size  = atomic_read(&self->rb_size);
+		size_t limit = atomic_read(&self->rb_limit);
 		if unlikely(!limit)
 			goto done;
 		/* Wait if AVAIL >= SIZE and SIZE >= LIMIT */
@@ -592,13 +593,13 @@ libringbuffer_write_nonblock(struct ringbuffer *__restrict self,
 	size_t result;
 again:
 	result = libringbuffer_write_nonblock_noalloc(self, src, num_bytes);
-	if (!result && ATOMIC_READ(self->rb_limit) != 0) {
+	if (!result && atomic_read(&self->rb_limit) != 0) {
 		size_t limit;
 		if unlikely(!num_bytes)
 			goto done; /* No-op */
 		/* Check if we must allocate a new/larger buffer. */
 		ringbuffer_lock_read(self);
-		limit = ATOMIC_READ(self->rb_limit);
+		limit = atomic_read(&self->rb_limit);
 		if (self->rb_size < limit &&
 		    self->rb_avail >= self->rb_size) {
 			size_t new_bufsize;
@@ -632,7 +633,7 @@ again:
 			/* Install the new buffer (if it is larger than the current
 			 * one,   but  smaller  than  the  (now)  effective  limit) */
 			if (heapptr_getsiz(new_buffer) > self->rb_size &&
-			    heapptr_getsiz(new_buffer) <= ATOMIC_READ(self->rb_limit)) {
+			    heapptr_getsiz(new_buffer) <= atomic_read(&self->rb_limit)) {
 				/* Copy old buffer data. */
 				size_t old_buffer_size = self->rb_size;
 				if (old_buffer_size) {
@@ -713,7 +714,7 @@ again_locked:
 	assert(self->rb_avail <= self->rb_size);
 	wptr  = (self->rb_rptr + self->rb_avail) % self->rb_size;
 	temp  = self->rb_size - self->rb_avail;
-	limit = ATOMIC_READ(self->rb_limit);
+	limit = atomic_read(&self->rb_limit);
 	/* Don't exceed the currently set buffer limit! */
 	if (self->rb_size > limit) {
 		/* Current buffer size is greater than the set limit */
@@ -924,7 +925,7 @@ libringbuffer_rseek(struct ringbuffer *__restrict self, ssize_t offset)
 	} else if (offset > 0) {
 		libringbuffer_skipread(self, (size_t)offset, &result);
 	} else {
-		result = ATOMIC_READ(self->rb_rdtot);
+		result = atomic_read(&self->rb_rdtot);
 	}
 	return result;
 }

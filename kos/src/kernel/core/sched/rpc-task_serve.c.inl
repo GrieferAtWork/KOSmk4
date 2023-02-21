@@ -83,7 +83,7 @@ task_serve_with_icpustate_and_sigmask(struct icpustate *__restrict state,
 	did_serve_rpcs = false;
 	must_unwind    = false;
 #endif /* !LOCAL_NOEXCEPT */
-	ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+	atomic_and(&PERTASK(this_task.t_flags), ~TASK_FRPC);
 
 	/* Load RPC functions. This must happen _AFTER_ we clear
 	 * the  pending-RPC  flag to  prevent a  race condition. */
@@ -103,7 +103,7 @@ handle_pending:
 				*restore_plast = rpc;
 				restore_plast  = &rpc->pr_link.sle_next;
 				result |= TASK_SERVE_NX_EXCEPT;
-				ATOMIC_OR(PERTASK(this_task.t_flags), TASK_FRPC);
+				atomic_or(&PERTASK(this_task.t_flags), TASK_FRPC);
 			} else
 #endif /* LOCAL_NOEXCEPT */
 			{
@@ -234,7 +234,7 @@ handle_pending:
 				if (!(rpc_flags & _RPC_CONTEXT_DONTFREE))
 					pending_rpc_free(rpc);
 				/* Load additional RPCs, but discard this new exception */
-				ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+				atomic_and(&PERTASK(this_task.t_flags), ~TASK_FRPC);
 				pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 				goto handle_pending;
 			}
@@ -315,7 +315,7 @@ handle_pending:
 				if (func == SIG_IGN) {
 					/* Yes: discard this signal. */
 					restore_plast = SLIST_PFIRST(&restore);
-					ATOMIC_AND(PERTASK(this_rpcs_sigpend), ~signo_mask);
+					atomic_and(&PERTASK(this_rpcs_sigpend), ~signo_mask);
 					continue;
 				}
 				goto yes_have_pending_rpcs;

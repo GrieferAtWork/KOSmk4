@@ -35,11 +35,11 @@
 #include <sched/scheduler.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <alloca.h>
 #include <assert.h>
+#include <atomic.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -146,14 +146,16 @@ NOTHROW(FCALL system_enum_cputhreads_nb)(system_enum_threads_cb_t cb, void *arg,
 	args[1] = arg;
 	args[2] = (void *)&result;
 	args[3] = &completed;
+
+	/* Wait until we can send an IPI */
 	while (!cpu_sendipi(me, &system_enum_threads_ipi, args,
-	                    CPU_IPI_FWAITFOR | CPU_IPI_FWAKEUP)) {
-		/* Wait until we can send an IPI */
+	                    CPU_IPI_FWAITFOR | CPU_IPI_FWAKEUP))
 		task_pause();
-	}
+
 	/* Wait for IPI to complete. */
-	while (!ATOMIC_LOAD(completed))
+	while (!atomic_load(&completed))
 		task_pause();
+
 	/* Done! */
 	return result;
 }
@@ -183,8 +185,8 @@ NOTHROW(FCALL system_enum_threads_nb)(system_enum_threads_cb_t cb, void *arg) {
 	unsigned int i = 0;
 	ssize_t temp, result = 0;
 	struct task *caller = THIS_TASK;
-	uintptr_t old_flags = ATOMIC_FETCHOR(caller->t_flags, TASK_FKEEPCORE);
-	struct cpu *mycpu   = ATOMIC_READ(caller->t_cpu);
+	uintptr_t old_flags = atomic_fetchor(&caller->t_flags, TASK_FKEEPCORE);
+	struct cpu *mycpu   = atomic_read(&caller->t_cpu);
 	do {
 		temp = system_enum_cputhreads_nb(cb, arg, cpu_vector[i], mycpu);
 		if unlikely(temp < 0) {
@@ -195,7 +197,7 @@ NOTHROW(FCALL system_enum_threads_nb)(system_enum_threads_cb_t cb, void *arg) {
 	} while (++i < cpu_count);
 done:
 	if (!(old_flags & TASK_FKEEPCORE))
-		ATOMIC_AND(caller->t_flags, ~TASK_FKEEPCORE);
+		atomic_and(&caller->t_flags, ~TASK_FKEEPCORE);
 	return result;
 }
 
@@ -205,12 +207,12 @@ NOTHROW(FCALL system_enum_threads_cpu_nb)(system_enum_threads_cb_t cb, void *arg
                                           struct cpu *__restrict me) {
 	ssize_t result;
 	struct task *caller = THIS_TASK;
-	uintptr_t old_flags = ATOMIC_FETCHOR(caller->t_flags, TASK_FKEEPCORE);
-	struct cpu *mycpu   = ATOMIC_READ(caller->t_cpu);
+	uintptr_t old_flags = atomic_fetchor(&caller->t_flags, TASK_FKEEPCORE);
+	struct cpu *mycpu   = atomic_read(&caller->t_cpu);
 	/* Enumerate the given CPU */
 	result = system_enum_cputhreads_nb(cb, arg, me, mycpu);
 	if (!(old_flags & TASK_FKEEPCORE))
-		ATOMIC_AND(caller->t_flags, ~TASK_FKEEPCORE);
+		atomic_and(&caller->t_flags, ~TASK_FKEEPCORE);
 	return result;
 }
 #endif /* !CONFIG_NO_SMP */

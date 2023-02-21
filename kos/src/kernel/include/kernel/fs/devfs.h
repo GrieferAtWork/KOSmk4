@@ -110,7 +110,7 @@ struct device
 	 *       global references exist for devfs device nodes, so to truly unload
 	 *       a device, do:
 	 * >> REF struct device *somedev = get_device();
-	 * >> if (ATOMIC_FETCHAND(somedev->mf_flags, ~MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)
+	 * >> if (atomic_fetchand(&somedev->mf_flags, ~MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)
 	 * >>     decref(somedev);
 	 * >> mfile_delete(somedev); // This also sets the `MFILE_F_DELETED' flag
 	 * >> decref(somedev);

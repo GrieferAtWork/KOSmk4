@@ -37,10 +37,10 @@
  *
  * >> get() {
  * >>     __PRIVATE_AR_INTR_PUSHOFF();
- * >>     ATOMIC_INC(arr_cnt);
+ * >>     atomic_inc(&arr_cnt);
  * >>     result = arr_obj;
  * >>     incref(result);
- * >>     ATOMIC_DEC(arr_cnt);
+ * >>     atomic_dec(&arr_cnt);
  * >>     __PRIVATE_AR_INTR_POP();
  * >>     return result;
  * >> }
@@ -48,7 +48,7 @@
  * >> cmpxch(old, new) {
  * >>     incref(new);
  * >>     __PRIVATE_AR_INTR_PUSHOFF();
- * >>     if (!ATOMIC_CMPXCH(arr_obj, old, new)) {
+ * >>     if (!atomic_cmpxch(&arr_obj, old, new)) {
  * >>         decref_nokill(new);
  * >>         __PRIVATE_AR_INTR_BREAK();
  * >>         return false;

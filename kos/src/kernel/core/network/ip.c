@@ -34,7 +34,6 @@
 #include <sched/cpu.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/bsearch.h>
 
@@ -50,6 +49,7 @@
 #include <network/udp.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stdalign.h>
 #include <string.h>
@@ -872,7 +872,7 @@ ip_senddatagram(struct nicdev *__restrict dev,
 		 * NOTE: We  use one  datagram ID per  peer so we  get the max
 		 *       number of  unique IDs,  whilst not  leaking any  info
 		 *       about how much we've been talking to different peers. */
-		dgramid = ATOMIC_FETCHINC(peer->npa_ipgramid);
+		dgramid = atomic_fetchinc(&peer->npa_ipgramid);
 		hdr->ip_v   = IPVERSION;
 		hdr->ip_len = htons((u16)total_packet_size);
 		hdr->ip_id  = htons(dgramid);
@@ -1158,11 +1158,13 @@ ip_senddatagram_ex(struct nicdev *__restrict dev,
 				nic_packetlist_fini(&job->adj_gram);
 				RETHROW();
 			}
+
 			/* Fill in header fields that are automatically calculated.
 			 * NOTE: We  use one  datagram ID per  peer so we  get the max
 			 *       number of  unique IDs,  whilst not  leaking any  info
 			 *       about how much we've been talking to different peers. */
-			dgramid = ATOMIC_FETCHINC(peer->npa_ipgramid);
+			dgramid = atomic_fetchinc(&peer->npa_ipgramid);
+
 			/* Construct the IP headers for all of the fragments. */
 			offset = 0;
 			for (i = 0; i < job->adj_gram.npl_cnt; ++i) {
@@ -1171,11 +1173,14 @@ ip_senddatagram_ex(struct nicdev *__restrict dev,
 				u16 fraglen, used_offset;
 				pck = job->adj_gram.npl_vec[i];
 				fragment_hdr = nic_packet_tallochead(pck, struct iphdr);
+
 				/* Default-fill the IP header with the one from the original datagram. */
 				memcpy(fragment_hdr, hdr, sizeof(struct iphdr));
 				fragment_hdr->ip_v = IPVERSION;
-				if (i != 0) /* An extended IP header gets placed into the first fragment payload. */
+				if (i != 0) {
+					/* An extended IP header gets placed into the first fragment payload. */
 					fragment_hdr->ip_hl = sizeof(struct iphdr) / 4;
+				}
 				fraglen = (u16)nic_packet_size(pck);
 				fragment_hdr->ip_len = htons(fraglen);
 				fragment_hdr->ip_id  = htons(dgramid);

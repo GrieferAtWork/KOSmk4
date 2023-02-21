@@ -24,8 +24,8 @@
 #include <kernel/compiler.h>
 
 #include <dev/nic.h>
+#include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
 #include <kos/except/reason/illop.h>
@@ -39,6 +39,7 @@
 #include <network/udp.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -52,7 +53,7 @@ udp_verify_sockaddr(USER CHECKED struct sockaddr const *addr,
 	if unlikely(addr_len < sizeof(struct sockaddr_in))
 		THROW(E_BUFFER_TOO_SMALL, sizeof(struct sockaddr_in), addr_len);
 	in = (USER CHECKED struct sockaddr_in *)addr;
-	fam = ATOMIC_READ(in->sin_family);
+	fam = atomic_read(&in->sin_family);
 	if (fam != AF_INET) {
 		THROW(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY,
@@ -70,7 +71,7 @@ again:
 		result = nicdev_getdefault();
 		if unlikely(!result)
 			THROW(E_NO_SUCH_OBJECT);
-		if (!ATOMIC_CMPXCH(me->us_dev, NULL, result)) {
+		if (!atomic_cmpxch(&me->us_dev, NULL, result)) {
 			decref_unlikely(result);
 			COMPILER_READ_BARRIER();
 			goto again;
@@ -89,7 +90,7 @@ udp_autobind_impl(struct udp_socket *__restrict me) {
 	 *       We  should  also support  that file  and select
 	 *       some port out of that range here. */
 	me->us_bindip.s_addr = htonl(0);
-	me->us_bindport      = htons(ATOMIC_FETCHINC(nextport));
+	me->us_bindport      = htons(atomic_fetchinc(&nextport));
 }
 
 /* Automatically bind the given UDP socket to some unused local port. */
@@ -97,7 +98,7 @@ PRIVATE ATTR_NOINLINE void KCALL
 udp_autobind(struct udp_socket *__restrict me) {
 	uintptr_t state;
 again:
-	state = ATOMIC_FETCHOR(me->us_state, UDP_SOCKET_STATE_F_BINDING);
+	state = atomic_fetchor(&me->us_state, UDP_SOCKET_STATE_F_BINDING);
 	if (state & UDP_SOCKET_STATE_F_BOUND)
 		return; /* Already bound. */
 	if (state & UDP_SOCKET_STATE_F_BINDING) {
@@ -106,14 +107,15 @@ again:
 		COMPILER_BARRIER();
 		goto again;
 	}
+
 	/* Do the yield ourself! */
 	TRY {
 		udp_autobind_impl(me);
 	} EXCEPT {
-		ATOMIC_AND(me->us_state, ~UDP_SOCKET_STATE_F_BINDING);
+		atomic_and(&me->us_state, ~UDP_SOCKET_STATE_F_BINDING);
 		RETHROW();
 	}
-	ATOMIC_OR(me->us_state, UDP_SOCKET_STATE_F_BOUND);
+	atomic_or(&me->us_state, UDP_SOCKET_STATE_F_BOUND);
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -172,8 +174,9 @@ udp_bind(struct socket *__restrict self,
 	USER CHECKED struct sockaddr_in const *in;
 	me = (struct udp_socket *)self;
 	in = udp_verify_sockaddr(addr, addr_len);
+
 	/* Switch to binding-mode */
-	if (ATOMIC_FETCHOR(me->us_state, UDP_SOCKET_STATE_F_BINDING) & UDP_SOCKET_STATE_F_BINDING)
+	if (atomic_fetchor(&me->us_state, UDP_SOCKET_STATE_F_BINDING) & UDP_SOCKET_STATE_F_BINDING)
 		THROW(E_ILLEGAL_BECAUSE_NOT_READY, E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND);
 	TRY {
 		/* Assign a port and  */
@@ -181,6 +184,7 @@ udp_bind(struct socket *__restrict self,
 		me->us_bindip.s_addr = in->sin_addr.s_addr;
 		me->us_bindport      = in->sin_port;
 		COMPILER_BARRIER();
+
 		/* TODO: Actually register `me' as the recipient of UDP packets where:
 		 *       (PACKET.IP.DST_IP & (-1 << ffs(me->us_bindip.s_addr))) == me->us_bindip.s_addr &&
 		 *       PACKET.UDP.DST_PORT == me->us_bindport;
@@ -189,11 +193,12 @@ udp_bind(struct socket *__restrict self,
 		 *       evaluated to  `0'  (reminder:  ffs(x)  is  FindFirstSet,  such  that
 		 *       `(x & (1 << ffs(x))) != 0' so-long as `x != 0') */
 	} EXCEPT {
-		ATOMIC_AND(me->us_state, ~UDP_SOCKET_STATE_F_BINDING);
+		atomic_and(&me->us_state, ~UDP_SOCKET_STATE_F_BINDING);
 		RETHROW();
 	}
+
 	/* Indicate that the socket has now been fully bound. */
-	ATOMIC_OR(me->us_state, UDP_SOCKET_STATE_F_BOUND);
+	atomic_or(&me->us_state, UDP_SOCKET_STATE_F_BOUND);
 }
 
 
@@ -205,17 +210,19 @@ udp_connect(struct socket *__restrict self,
 	USER CHECKED struct sockaddr_in const *in;
 	me = (struct udp_socket *)self;
 	in = udp_verify_sockaddr(addr, addr_len);
+
 	/* Set the given address as peer address */
-	COMPILER_BARRIER();
-	me->us_peerip.s_addr = in->sin_addr.s_addr;
-	me->us_peerport      = in->sin_port;
-	COMPILER_BARRIER();
+	me->us_peerip.s_addr = read_once(&in->sin_addr.s_addr);
+	me->us_peerport      = read_once(&in->sin_port);
+
 	/* Mark the socket as having a peer */
-	ATOMIC_OR(me->us_state, UDP_SOCKET_STATE_F_HASPEER);
+	atomic_or(&me->us_state, UDP_SOCKET_STATE_F_HASPEER);
+
 	/* The man page for ip(7) says that connect() will also
 	 * cause the socket to become bound to some local port. */
 	if unlikely(!(me->us_state & UDP_SOCKET_STATE_F_BOUND))
 		udp_autobind(me);
+
 	/* Indicate successful AIO completion. */
 	aio_handle_init_noop(aio, AIO_COMPLETION_SUCCESS);
 }
@@ -232,6 +239,7 @@ udp_sendtov(struct socket *__restrict self,
 	USER CHECKED struct sockaddr_in const *in;
 	REF struct nic_packet *packet;
 	(void)msg_flags;
+
 	/* TODO: Support for `msg_flags & MSG_DONTROUTE' (don't use a gateway,
 	 *       but only send to directly  reachable peers; this is what  KOS
 	 *       currently does for every outbound packet; there is no concept
@@ -239,8 +247,8 @@ udp_sendtov(struct socket *__restrict self,
 	/* TODO: Support for `msg_flags & MSG_MORE' (don't immediately transmit
 	 *       the datagram. Wait for more  data for up to 200  milliseconds) */
 
-	me  = (struct udp_socket *)self;
-	in  = udp_verify_sockaddr(addr, addr_len);
+	me = (struct udp_socket *)self;
+	in = udp_verify_sockaddr(addr, addr_len);
 	/* TODO: From what I  understand, network cards  should actually  be
 	 *       selected  based on `in->sin_addr.s_addr' (i.e. the target's
 	 *       IP address). As such, there needs to be a routing table for
@@ -258,6 +266,7 @@ udp_sendtov(struct socket *__restrict self,
 		THROW(E_NOT_IMPLEMENTED_TODO); /* TODO: IP Control message packets (can be used to set IP.TOS, etc.) */
 	if unlikely(bufsize > (0xffff - sizeof(struct udphdr)))
 		THROW(E_NET_MESSAGE_TOO_LONG, bufsize, 0xffff - sizeof(struct udphdr));
+
 	/* Construct the UDP packet to-be sent. */
 	packet = nicdev_newpacketv(dev, buf,
 	                               UDP_PACKET_HEADSIZE,
@@ -271,21 +280,25 @@ udp_sendtov(struct socket *__restrict self,
 		struct udphdr *udp;
 		udp = nic_packet_tallochead(packet, struct udphdr);
 		ip  = nic_packet_tallochead(packet, struct iphdr);
+
 		/* Fill in UDP header fields. */
 		udp->uh_sport = me->us_bindport;
-		udp->uh_dport = (be16)ATOMIC_READ(*(u16 *)&in->sin_port);
+		udp->uh_dport = read_once(&in->sin_port);
 		udp->uh_ulen  = htons((u16)bufsize + sizeof(struct udphdr));
 		udp->uh_sum   = htons(0); /* TODO? */
+
 		/* Fill in IP header fields, as required by `ip_senddatagram()' */
 		ip->ip_hl         = 5;
 		ip->ip_tos        = 0; /* ??? */
 		ip->ip_off        = htons(0);
 		ip->ip_ttl        = 64;
 		ip->ip_p          = IPPROTO_UDP;
+
 		/* TODO: Wait for DHCP/zero-conf/etc. before using our IP */
 		ip->ip_src.s_addr = dev->nd_addr.na_ip;
-		ip->ip_dst.s_addr = (be32)ATOMIC_READ(*(u32 *)&in->sin_addr);
+		ip->ip_dst.s_addr = read_once(&in->sin_addr.s_addr);
 	}
+
 	/* Actually send the packet over IP */
 	ip_senddatagram(dev, packet, aio);
 }
@@ -303,6 +316,7 @@ udp_recvfromv(struct socket *__restrict self,
 		THROWS(E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT, E_WOULDBLOCK) {
 	struct udp_socket *me;
 	me = (struct udp_socket *)self;
+
 	/* TODO: Implement once we've got routing of incoming UDP packets. */
 	/* Reminder: When the received packet is larger than the given buffer,
 	 *           then  we  must  set  `*presult_flags & MSG_TRUNC'  before

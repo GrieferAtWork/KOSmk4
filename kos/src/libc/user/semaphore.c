@@ -24,8 +24,6 @@
 #include "../api.h"
 /**/
 
-#include <hybrid/atomic.h>
-
 #include <kos/futex.h>
 #include <kos/futexexpr.h>
 #include <kos/syscalls.h>
@@ -33,6 +31,7 @@
 #include <sys/time.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <fcntl.h>
 #include <inttypes.h>
 #include <limits.h>
@@ -397,15 +396,15 @@ NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *self)
 	for (;;) {
 		int error;
 		sem_count_t count;
-		count = ATOMIC_READ(self->s_count);
+		count = atomic_read(&self->s_count);
 		if (count != 0) {
-			if (ATOMIC_CMPXCH_WEAK(self->s_count, count, count - 1))
+			if (atomic_cmpxch_weak(&self->s_count, count, count - 1))
 				return 0; /* Success! */
 			continue;
 		}
 
 		/* Set the is-waiting bit the first time around. */
-		ATOMIC_STORE(self->s_wait, 1);
+		atomic_store(&self->s_wait, 1);
 
 		/* Wait until `self->s_count' becomes non-zero. */
 		error = lfutexexpr(&self->s_wait, self, sem_waitexpr, NULL, 0);
@@ -432,15 +431,15 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict self,
 	for (;;) {
 		int error;
 		sem_count_t count;
-		count = ATOMIC_READ(self->s_count);
+		count = atomic_read(&self->s_count);
 		if (count != 0) {
-			if (ATOMIC_CMPXCH_WEAK(self->s_count, count, count - 1))
+			if (atomic_cmpxch_weak(&self->s_count, count, count - 1))
 				return 0; /* Success! */
 			continue;
 		}
 
 		/* Set the is-waiting bit the first time around. */
-		ATOMIC_STORE(self->s_wait, 1);
+		atomic_store(&self->s_wait, 1);
 
 		/* Wait until `self->s_count' becomes non-zero. */
 		error = lfutexexpr(&self->s_wait, self, sem_waitexpr, abstime,
@@ -471,15 +470,15 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait64)(sem_t *__restrict self,
 	for (;;) {
 		int error;
 		sem_count_t count;
-		count = ATOMIC_READ(self->s_count);
+		count = atomic_read(&self->s_count);
 		if (count != 0) {
-			if (ATOMIC_CMPXCH_WEAK(self->s_count, count, count - 1))
+			if (atomic_cmpxch_weak(&self->s_count, count, count - 1))
 				return 0; /* Success! */
 			continue;
 		}
 
 		/* Set the is-waiting bit the first time around. */
-		ATOMIC_STORE(self->s_wait, 1);
+		atomic_store(&self->s_wait, 1);
 
 		/* Wait until `self->s_count' becomes non-zero. */
 		error = lfutexexpr64(&self->s_wait, self, sem_waitexpr, abstime,
@@ -505,10 +504,10 @@ NOTHROW_NCX(LIBCCALL libc_sem_trywait)(sem_t *self)
 {
 	for (;;) {
 		sem_count_t count;
-		count = ATOMIC_READ(self->s_count);
+		count = atomic_read(&self->s_count);
 		if (count == 0)
 			break;
-		if (ATOMIC_CMPXCH_WEAK(self->s_count, count, count - 1))
+		if (atomic_cmpxch_weak(&self->s_count, count, count - 1))
 			return 0; /* Success! */
 	}
 
@@ -529,12 +528,12 @@ NOTHROW_NCX(LIBCCALL libc_sem_post)(sem_t *self)
 {
 	sem_count_t count;
 	do {
-		count = ATOMIC_READ(self->s_count);
+		count = atomic_read(&self->s_count);
 		if unlikely(count >= SEM_VALUE_MAX)
 			return libc_seterrno(EOVERFLOW);
-	} while (!ATOMIC_CMPXCH_WEAK(self->s_count, count, count + 1));
+	} while (!atomic_cmpxch_weak(&self->s_count, count, count + 1));
 	/* If there are waiting threads, wake one of them. */
-	if (ATOMIC_READ(self->s_wait) != 0)
+	if (atomic_read(&self->s_wait) != 0)
 		sys_lfutex(&self->s_wait, LFUTEX_WAKEMASK, 1, NULL, 0);
 	return 0;
 }
@@ -549,7 +548,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_getvalue)(sem_t *__restrict self,
                                         __STDC_INT_AS_UINT_T *__restrict sval)
 /*[[[body:libc_sem_getvalue]]]*/
 {
-	*sval = (__STDC_INT_AS_UINT_T)(unsigned int)ATOMIC_READ(self->s_count);
+	*sval = (__STDC_INT_AS_UINT_T)(unsigned int)atomic_read(&self->s_count);
 	return 0;
 }
 /*[[[end:libc_sem_getvalue]]]*/

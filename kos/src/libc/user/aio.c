@@ -24,9 +24,8 @@
 #include "../api.h"
 /**/
 
-#include <hybrid/atomic.h>
-#include <hybrid/sequence/list.h>
 #include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/anno.h>
 #include <kos/futex.h>
@@ -35,6 +34,7 @@
 #include <linux/futex.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <fcntl.h>
 #include <malloc.h>
 #include <pthread.h>
@@ -171,7 +171,7 @@ struct aio_set_completion {
 
 PRIVATE NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL aio_set_completion_decref)(struct aio_set_completion *__restrict self) {
-	if (ATOMIC_DECFETCH(self->asc_refcnt) != 0)
+	if (atomic_decfetch(&self->asc_refcnt) != 0)
 		return;
 	sigevent_notify(&self->asc_event);
 	free(self);
@@ -375,7 +375,7 @@ NOTHROW_NCX(LIBCCALL aio_on_completion)(struct aio *__restrict self,
 	struct sigevent completion;
 	struct aio_set_completion *set;
 	if (self->aio_status.as_flags & AIO_FLAG_WAITERS) {
-		ATOMIC_AND(self->aio_status.as_flags, ~AIO_FLAG_WAITERS);
+		atomic_and(&self->aio_status.as_flags, ~AIO_FLAG_WAITERS);
 		sys_futex(&self->aio_status.as_word, FUTEX_WAKE, (uint32_t)-1, NULL, NULL, 0);
 	}
 
@@ -386,12 +386,12 @@ NOTHROW_NCX(LIBCCALL aio_on_completion)(struct aio *__restrict self,
 /*	DBG_memset(&self->aio_sigevent, 0xcc, sizeof(self->aio_sigevent)); */
 
 	/* Set the status to removed. */
-	ATOMIC_WRITE(self->aio_status.as_status, post_status);
+	atomic_write(&self->aio_status.as_status, post_status);
 
 	/* Increment the global completion status. */
-	ATOMIC_INC(aio_completion_signal_version);
+	atomic_inc(&aio_completion_signal_version);
 	if (aio_completion_signal_waiters != 0) {
-		ATOMIC_WRITE(aio_completion_signal_waiters, 0);
+		atomic_write(&aio_completion_signal_waiters, 0);
 		sys_lfutex(&aio_completion_signal_version,
 		           LFUTEX_WAKE, (uintptr_t)-1, NULL, 0);
 	}
@@ -419,19 +419,19 @@ again:
 		assert(aio_pending_count == 0);
 		atomic_lock_release(&aio_pending_lock);
 		/* Wait for more threads to show up. */
-		timeout.tv_sec  = ATOMIC_READ(aiolimit_timeout);
+		timeout.tv_sec  = atomic_read(&aiolimit_timeout);
 		timeout.tv_nsec = 0;
 		error = sys_lfutex(&aio_pending_count,
 		                   LFUTEX_WAIT_WHILE |
 		                   LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE,
 		                   0, &timeout, 0);
-		if (ATOMIC_READ(aio_pending_count) != 0)
+		if (atomic_read(&aio_pending_count) != 0)
 			goto again;
 		if (error == -ETIMEDOUT) {
 			/* Initiate self-termination */
-			ATOMIC_DEC(aio_thread_count);
-			if (ATOMIC_READ(aio_pending_count) != 0) {
-				ATOMIC_INC(aio_thread_count);
+			atomic_dec(&aio_thread_count);
+			if (atomic_read(&aio_pending_count) != 0) {
+				atomic_inc(&aio_thread_count);
 				goto again;
 			}
 			return NULL;
@@ -448,7 +448,7 @@ again:
 	self->aio_threadtid = mytid;
 
 	/* Try to start serving this descriptor. */
-	if (!ATOMIC_CMPXCH(self->aio_status.as_status,
+	if (!atomic_cmpxch(&self->aio_status.as_status,
 	                   AIO_STATUS_PENDING,
 	                   AIO_STATUS_RUNNING)) {
 		/* Special case: descriptor was canceled. */
@@ -513,7 +513,7 @@ again_operation:
 
 	/* Deal with interrupts. */
 	if (result == -EINTR) {
-		if (ATOMIC_READ(self->aio_status.as_status) != AIO_STATUS_INTERRUPTING)
+		if (atomic_read(&self->aio_status.as_status) != AIO_STATUS_INTERRUPTING)
 			goto again_operation; /* Sporadic interrupt */
 		/* Intentional interrupt */
 		aio_on_completion(self, AIO_STATUS_REMOVED);
@@ -524,7 +524,7 @@ again_operation:
 	self->aio_retval = result;
 
 	/* Indicate completion. */
-	ATOMIC_WRITE(self->aio_status.as_status, AIO_STATUS_FINISHED);
+	atomic_write(&self->aio_status.as_status, AIO_STATUS_FINISHED);
 	aio_on_completion(self, AIO_STATUS_COMPLETED);
 
 	/* Check for more work to be done. */
@@ -552,10 +552,10 @@ NOTHROW(LIBCCALL spawn_aio_worker_thread)(void) {
 		goto done_attr;
 
 	/* Create the new thread */
-	ATOMIC_INC(aio_thread_count);
+	atomic_inc(&aio_thread_count);
 	error = pthread_create(&pt, &attr, &aio_worker_main, NULL);
 	if unlikely(error != EOK)
-		ATOMIC_DEC(aio_thread_count);
+		atomic_dec(&aio_thread_count);
 
 done_attr:
 	pthread_attr_destroy(&attr);
@@ -582,20 +582,20 @@ NOTHROW_NCX(LIBCCALL start_aio_operation_ex)(struct aio *first,
 
 	/* spawn AIO worker threads while:
 	 * >>     // As set by libc_aio_init()::aioinit::aio_threads
-	 * >> ATOMIC_READ(aio_thread_count) < thread_limit &&
+	 * >> atomic_read(&aio_thread_count) < thread_limit &&
 	 * >>     // Note that `aio_pending_count' is constantly re-
 	 * >>     // read as threads are spawned and will already
 	 * >>     // begin to consume AIO descriptors.
-	 * >> ATOMIC_READ(aio_thread_idle) < ATOMIC_READ(aio_pending_count) &&
+	 * >> atomic_read(&aio_thread_idle) < atomic_read(&aio_pending_count) &&
 	 * >>     // Limit to spawning at most `count' threads
 	 * >> (count-- != 0); */
-	thread_limit = ATOMIC_READ(aiolimit_threads);
+	thread_limit = atomic_read(&aiolimit_threads);
 	spawn_limit  = count;
 	do {
 		errno_t error;
-		if (ATOMIC_READ(aio_thread_count) >= thread_limit)
+		if (atomic_read(&aio_thread_count) >= thread_limit)
 			break; /* Not allowed to spawn any more threads. */
-		if (ATOMIC_READ(aio_thread_idle) >= ATOMIC_READ(aio_pending_count))
+		if (atomic_read(&aio_thread_idle) >= atomic_read(&aio_pending_count))
 			break; /* Already got 1 idle thread for every pending
 			        * request, so no point in starting even more! */
 
@@ -605,7 +605,7 @@ NOTHROW_NCX(LIBCCALL start_aio_operation_ex)(struct aio *first,
 			 * thread that is still alive, then we may assume that said
 			 * thread would sooner or later get around to servicing our
 			 * descriptor. */
-			if (ATOMIC_READ(aio_thread_count) != 0)
+			if (atomic_read(&aio_thread_count) != 0)
 				break;
 
 			/* Remove our operations from the pending queue. */
@@ -613,7 +613,7 @@ NOTHROW_NCX(LIBCCALL start_aio_operation_ex)(struct aio *first,
 
 			/* Re-check  that no  other thread  was able  to spawn more
 			 * threads, and that the first descriptor is still pending. */
-			if (ATOMIC_READ(aio_thread_count) != 0 &&
+			if (atomic_read(&aio_thread_count) != 0 &&
 			    first->aio_status.as_status == AIO_STATUS_PENDING) {
 				atomic_lock_release(&aio_pending_lock);
 				break;
@@ -646,7 +646,7 @@ NOTHROW_NCX(LIBCCALL start_aio_operation_ex)(struct aio *first,
 	 * to show up. Note that this must happen after the above spawn loop so that
 	 * the number of idle threads is still correct in relation to new  requests. */
 	sys_lfutex(&aio_pending_count, LFUTEX_WAKE,
-	           ATOMIC_READ(aio_pending_count),
+	           atomic_read(&aio_pending_count),
 	           NULL, 0);
 
 	/* And with that, there should be at least 1 thread out there to do our dirty work. */
@@ -693,7 +693,7 @@ PRIVATE ATTR_SECTION(".text.crt.utility.aio") int
 NOTHROW_NCX(LIBCCALL cancel_aio)(struct aio *__restrict self) {
 	union aio_status status;
 again:
-	status.as_word = ATOMIC_READ(self->aio_status.as_word);
+	status.as_word = atomic_read(&self->aio_status.as_word);
 switch_status:
 	switch (status.as_status) {
 
@@ -701,7 +701,7 @@ switch_status:
 		union aio_status new_status;
 		new_status           = status;
 		new_status.as_status = AIO_STATUS_CANCELING;
-		if (!ATOMIC_CMPXCH(self->aio_status.as_word,
+		if (!atomic_cmpxch(&self->aio_status.as_word,
 		                   status.as_word,
 		                   new_status.as_word))
 			goto again;
@@ -712,7 +712,7 @@ switch_status:
 		 *       status to `AIO_STATUS_REMOVED' */
 		while (!atomic_lock_tryacquire(&aio_pending_lock)) {
 			sched_yield();
-			status.as_word = ATOMIC_READ(self->aio_status.as_word);
+			status.as_word = atomic_read(&self->aio_status.as_word);
 			if (status.as_status != AIO_STATUS_CANCELING)
 				goto switch_status; /* Should be `AIO_STATUS_REMOVED' at this point... */
 		}
@@ -733,7 +733,7 @@ switch_status:
 		union aio_status new_status;
 		new_status           = status;
 		new_status.as_status = AIO_STATUS_INTERRUPTING;
-		if (!ATOMIC_CMPXCH(self->aio_status.as_word,
+		if (!atomic_cmpxch(&self->aio_status.as_word,
 		                   status.as_word,
 		                   new_status.as_word))
 			goto again;
@@ -769,7 +769,7 @@ NOTHROW_NCX(LIBCCALL waitfor_single_aio)(struct aio *__restrict self,
                                          struct timespec64 const *rel_timeout) {
 	union aio_status status;
 again:
-	status.as_word = ATOMIC_READ(self->aio_status.as_word);
+	status.as_word = atomic_read(&self->aio_status.as_word);
 	switch (status.as_status) {
 
 	case AIO_STATUS_PENDING:
@@ -781,7 +781,7 @@ again:
 			union aio_status new_status;
 			new_status = status;
 			new_status.as_flags |= AIO_FLAG_WAITERS;
-			if (!ATOMIC_CMPXCH(self->aio_status.as_word,
+			if (!atomic_cmpxch(&self->aio_status.as_word,
 			                   status.as_word,
 			                   new_status.as_word))
 				goto again;
@@ -818,7 +818,7 @@ PRIVATE ATTR_SECTION(".text.crt.utility.aio") NONNULL((1)) bool
 NOTHROW_NCX(LIBCCALL trywaitfor_single_aio)(struct aio const *__restrict self) {
 	union aio_status status;
 again:
-	status.as_word = ATOMIC_READ(self->aio_status.as_word);
+	status.as_word = atomic_read(&self->aio_status.as_word);
 	switch (status.as_status) {
 
 	case AIO_STATUS_PENDING:
@@ -857,7 +857,7 @@ NOTHROW_NCX(LIBCCALL waitfor_aio)(struct aio *const list[], size_t nent,
 
 	/* Check if any of the AIO objects have already completed. */
 again:
-	version = ATOMIC_READ(aio_completion_signal_version);
+	version = atomic_read(&aio_completion_signal_version);
 	for (i = 0; i < nent; ++i) {
 		struct aio *ent = list[i];
 		if (trywaitfor_single_aio(ent))
@@ -866,9 +866,9 @@ again:
 
 	/* All operations are in progress.
 	 * Wait until `aio_completion_signal_version' changes. */
-	if (ATOMIC_READ(aio_completion_signal_version) != version)
+	if (atomic_read(&aio_completion_signal_version) != version)
 		goto again;
-	ATOMIC_WRITE(aio_completion_signal_waiters, 1);
+	atomic_write(&aio_completion_signal_waiters, 1);
 	error = sys_lfutex(&aio_completion_signal_version,
 	                   LFUTEX_WAIT_WHILE |
 	                   LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE,
@@ -1133,7 +1133,7 @@ NOTHROW_NCX(LIBCCALL libc_aio_error)(struct aiocb const *self)
 	if unlikely(!self)
 		goto err_inval;
 	me = (struct aio const *)self;
-	switch (ATOMIC_READ(me->aio_status.as_status)) {
+	switch (atomic_read(&me->aio_status.as_status)) {
 
 	case AIO_STATUS_PENDING:
 	case AIO_STATUS_RUNNING:
@@ -1175,7 +1175,7 @@ NOTHROW_NCX(LIBCCALL libc_aio_return)(struct aiocb *self)
 	if unlikely(!self)
 		goto err_inval;
 	me = aiocb_as_aio(self);
-	if (ATOMIC_READ(me->aio_status.as_status) == AIO_STATUS_COMPLETED) {
+	if (atomic_read(&me->aio_status.as_status) == AIO_STATUS_COMPLETED) {
 		ssize_t result;
 
 		/* Check the status of a completed operation. */
@@ -1186,7 +1186,7 @@ NOTHROW_NCX(LIBCCALL libc_aio_return)(struct aiocb *self)
 		/* Cause any future status/error reads to fail with EINVAL,
 		 * as  is required  by POSIX  which specifies  that the AIO
 		 * return value should only be read once. */
-		ATOMIC_WRITE(me->aio_status.as_status, AIO_STATUS_RETURN_READ);
+		atomic_write(&me->aio_status.as_status, AIO_STATUS_RETURN_READ);
 
 		/* Return the AIO return value. */
 		return result;

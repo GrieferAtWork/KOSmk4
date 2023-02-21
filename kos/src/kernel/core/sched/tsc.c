@@ -32,7 +32,6 @@
 #include <sched/scheduler.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sched/preemption.h>
 

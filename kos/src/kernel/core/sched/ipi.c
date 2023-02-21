@@ -35,10 +35,10 @@
 #include <sched/task.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <signal.h>
 #include <stddef.h>
@@ -89,6 +89,7 @@ NOTHROW(KCALL cpu_sendipi_cpuset)(cpuset_t targets, cpu_ipi_t func,
 				++result;
 			}
 		}
+
 		/* Second pass: Check  for cpus not in deep-sleep mode, that
 		 *              aren't apart of the set of CPUs successfully
 		 *              contacted. */
@@ -103,8 +104,9 @@ NOTHROW(KCALL cpu_sendipi_cpuset)(cpuset_t targets, cpu_ipi_t func,
 					continue; /* Already contacted. */
 				c = cpu_vector[i];
 again_check_cpu_state:
-				if (ATOMIC_READ(c->c_state) == CPU_STATE_DREAMING)
+				if (atomic_read(&c->c_state) == CPU_STATE_DREAMING)
 					continue; /* CPU is in deep sleep mode. */
+
 				/* Try to send the IPI.
 				 * If doing so fails, re-check the CPU's state, since it
 				 * may have entered  deep-sleep mode in  the mean  time. */
@@ -119,6 +121,7 @@ again_check_cpu_state:
 				}
 				CPUSET_INSERT(success_set, i);
 				++result;
+
 				/* Force another  pass after  this one,  since
 				 * we've managed to find more CPUs to contact. */
 				did_find_new_cpus = true;
@@ -147,17 +150,18 @@ NOTHROW(KCALL cpu_broadcastipi_notthis)(cpu_ipi_t func, void *args[CPU_IPI_ARGCO
 	uintptr_t old_flags;
 	struct task *me = THIS_TASK;
 	CPUSET_SETFULL(set);
+
 	/* Prevent our own thread from being moved to a different core,
 	 * thus  ensuring that we can guaranty that our own CPU doesn't
 	 * get the IPI.
 	 * We don't want  to do  this by disabling  preemption, since  that
 	 * could lead to unintended race conditions, since it would prevent
 	 * our own CPU from servicing interrupts send by other CPUs. */
-	old_flags = ATOMIC_FETCHOR(me->t_flags, TASK_FKEEPCORE);
+	old_flags = atomic_fetchor(&me->t_flags, TASK_FKEEPCORE);
 	CPUSET_REMOVE(set, THIS_CPU->c_id);
 	result = cpu_sendipi_cpuset(set, func, args, flags);
 	if (!(old_flags & TASK_FKEEPCORE))
-		ATOMIC_AND(me->t_flags, ~TASK_FKEEPCORE);
+		atomic_and(&me->t_flags, ~TASK_FKEEPCORE);
 	return result;
 }
 
@@ -172,13 +176,14 @@ NOTHROW(FCALL task_wake_ipi)(struct icpustate *__restrict state,
                              void *args[CPU_IPI_ARGCOUNT]) {
 	/* Check if the thread switched CPUs in the mean time. */
 	struct task *thread    = (struct task *)args[0];
-	struct cpu *thread_cpu = ATOMIC_READ(thread->t_cpu);
+	struct cpu *thread_cpu = atomic_read(&thread->t_cpu);
 	assert(!PREEMPTION_ENABLED());
 	IPI_DEBUG("task_wake_ipi:%p,%p\n", thread_cpu, THIS_CPU);
 	if likely(thread_cpu == THIS_CPU) {
 		/* We're the ones hosting the thread, so we're
 		 * responsible for doing the sporadic wake-up. */
 		struct task *caller;
+
 		/* Check if the thread has already terminated (in which case it can't be re-awoken) */
 		IPI_DEBUG("task_wake_ipi:%#" PRIxPTR "\n", state);
 		if (thread->t_flags & TASK_FTERMINATED)
@@ -230,10 +235,11 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 #endif /* !CONFIG_NO_SMP */
 	assertf(FORTASK(thread, this_sstate) != NULL,
 	        "Task hasn't been given a restore-state at which execution can start");
-	if (!(ATOMIC_FETCHOR(thread->t_flags, TASK_FSTARTING) & TASK_FSTARTING)) {
+	if (!(atomic_fetchor(&thread->t_flags, TASK_FSTARTING) & TASK_FSTARTING)) {
 		if (kernel_debugtrap_enabled()) {
 			if (!task_isaprocess(thread)) {
 				struct scpustate *state;
+
 				/* New thread.
 				 * -> In this case, we must trigger a clone()
 				 *    trap once the thread begins  execution. */
@@ -258,7 +264,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 	/* Schedule on the current CPU. */
 	for (;;) {
 		uintptr_t old_flags;
-		old_flags = ATOMIC_READ(thread->t_flags);
+		old_flags = atomic_read(&thread->t_flags);
 		if (old_flags & (TASK_FSTARTED | TASK_FRUNNING)) {
 			assertf(!(old_flags & TASK_FRUNNING) || (old_flags & TASK_FSTARTED),
 			        "old_flags = %#" PRIxPTR, old_flags);
@@ -266,7 +272,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 		}
 		FORTASK(thread, this_starttime) = ktime();
 		FORTASK(thread, this_stoptime)  = FORTASK(thread, this_starttime);
-		if (ATOMIC_CMPXCH_WEAK(thread->t_flags, old_flags,
+		if (atomic_cmpxch_weak(&thread->t_flags, old_flags,
 		                       old_flags | (TASK_FSTARTED |
 		                                    TASK_FRUNNING)))
 			break;
@@ -276,6 +282,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 	printk(KERN_TRACE "[sched:cpu#%u] Starting thread %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
 	       (unsigned int)thread->t_cpu->c_id, thread,
 	       (unsigned int)task_getroottid_of(thread));
+
 #ifndef CONFIG_NO_SMP
 	/* NOTE: Before being started, the thread's CPU shouldn't be subject to change yet,
 	 *       so we're safe in assuming that the thread's CPU won't change before  we're

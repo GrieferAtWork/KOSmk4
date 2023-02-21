@@ -230,6 +230,61 @@ public:
 #endif
 };
 
+#pragma pack(push,1)
+/* Used to implement endian-specific integers capable of
+ * emitting  warnings  when  attempted  to  be  used  as
+ * regular  integers  without prior  casting  using the.
+ * (le|be)swap_(16|32|64)  functions  from  <byteswap.h>
+ * >> Again: Only meant to highlight usage errors in visual studio. */
+template<int endian,class __T> class ____intellisense_endianint {
+	__T __v;
+
+public:
+	/*	bool operator ! () const; */
+	explicit operator bool() const throw();
+	explicit operator char() const throw();
+	explicit operator short() const throw();
+	explicit operator int() const throw();
+	explicit operator long() const throw();
+	explicit operator long long() const throw();
+	explicit operator signed char() const throw();
+	explicit operator unsigned char() const throw();
+	explicit operator unsigned short() const throw();
+	explicit operator unsigned int() const throw();
+	explicit operator unsigned long() const throw();
+	explicit operator unsigned long long() const throw();
+	//____intellisense_endianint &operator = (__T) throw();
+	____intellisense_endianint &operator=(____intellisense_endianint const &) throw() = default;
+	template<class __S> bool operator<(____intellisense_endianint<endian, __S> const &) const throw();
+	template<class __S> bool operator<=(____intellisense_endianint<endian, __S> const &) const throw();
+	template<class __S> bool operator==(____intellisense_endianint<endian, __S> const &) const throw();
+	template<class __S> bool operator!=(____intellisense_endianint<endian, __S> const &) const throw();
+	template<class __S> bool operator>(____intellisense_endianint<endian, __S> const &) const throw();
+	template<class __S> bool operator>=(____intellisense_endianint<endian, __S> const &) const throw();
+	template<class __S> ____intellisense_endianint operator|(____intellisense_endianint<endian, __S> const &) const throw();
+	template<class __S> ____intellisense_endianint operator&(____intellisense_endianint<endian, __S> const &) const throw();
+	template<class __S> ____intellisense_endianint operator^(____intellisense_endianint<endian, __S> const &) const throw();
+	template<class __S> ____intellisense_endianint &operator|=(____intellisense_endianint<endian, __S> const &) throw();
+	template<class __S> ____intellisense_endianint &operator&=(____intellisense_endianint<endian, __S> const &) throw();
+	template<class __S> ____intellisense_endianint &operator^=(____intellisense_endianint<endian, __S> const &) throw();
+	____intellisense_endianint() = default;
+	____intellisense_endianint(____intellisense_endianint const &) = default;
+	explicit ____intellisense_endianint(char) throw();
+	explicit ____intellisense_endianint(short) throw();
+	explicit ____intellisense_endianint(int) throw();
+	explicit ____intellisense_endianint(long) throw();
+	explicit ____intellisense_endianint(long long) throw();
+	explicit ____intellisense_endianint(signed char) throw();
+	explicit ____intellisense_endianint(unsigned char) throw();
+	explicit ____intellisense_endianint(unsigned short) throw();
+	explicit ____intellisense_endianint(unsigned int) throw();
+	explicit ____intellisense_endianint(unsigned long) throw();
+	explicit ____intellisense_endianint(unsigned long long) throw();
+};
+
+#pragma pack(pop)
+
+
 
 template<class __T> struct ____INTELLISENSE_isarith { enum { __value = false }; };
 template<class __T> struct ____INTELLISENSE_issigned { enum { __value = false }; };
@@ -277,6 +332,9 @@ template<> struct ____INTELLISENSE_isfloat<long double> { enum { __value = true 
 template<class __UID, bool __ALLOW_INT_OPS, class __T> struct ____INTELLISENSE_isarith<____intellisense_altint<__UID, __ALLOW_INT_OPS, __T> > { enum{__value=____INTELLISENSE_isarith<__T>::__value}; };
 template<class __UID, bool __ALLOW_INT_OPS, class __T> struct ____INTELLISENSE_issigned<____intellisense_altint<__UID, __ALLOW_INT_OPS, __T> > { enum{__value=____INTELLISENSE_issigned<__T>::__value}; };
 template<class __UID, bool __ALLOW_INT_OPS, class __T> struct ____INTELLISENSE_isunsigned<____intellisense_altint<__UID, __ALLOW_INT_OPS, __T> > { enum{__value=____INTELLISENSE_isunsigned<__T>::__value}; };
+template<int __ENDIAN, class __T> struct ____INTELLISENSE_isarith<____intellisense_endianint<__ENDIAN, __T> > { enum{__value=____INTELLISENSE_isarith<__T>::__value}; };
+template<int __ENDIAN, class __T> struct ____INTELLISENSE_issigned<____intellisense_endianint<__ENDIAN, __T> > { enum{__value=____INTELLISENSE_issigned<__T>::__value}; };
+template<int __ENDIAN, class __T> struct ____INTELLISENSE_isunsigned<____intellisense_endianint<__ENDIAN, __T> > { enum{__value=____INTELLISENSE_isunsigned<__T>::__value}; };
 
 template<bool __V, class __T> struct ____INTELLISENSE_enableif { typedef __T __type; };
 template<class __T> struct ____INTELLISENSE_enableif<false, __T> {};
@@ -335,60 +393,6 @@ template<> struct ____INTELLISENSE_promote<long> { typedef long __type; };
 template<> struct ____INTELLISENSE_promote<unsigned long> { typedef unsigned long __type; };
 template<> struct ____INTELLISENSE_promote<long long> { typedef long long __type; };
 template<> struct ____INTELLISENSE_promote<unsigned long long> { typedef unsigned long long __type; };
-
-#pragma pack(push,1)
-/* Used to implement endian-specific integers capable of
- * emitting  warnings  when  attempted  to  be  used  as
- * regular  integers  without prior  casting  using the.
- * (le|be)swap_(16|32|64)  functions  from  <byteswap.h>
- * >> Again: Only meant to highlight usage errors in visual studio. */
-template<int endian,class __T> class ____intellisense_endianint {
-	__T __v;
-
-public:
-	/*	bool operator ! () const; */
-	explicit operator bool() const throw();
-	explicit operator char() const throw();
-	explicit operator short() const throw();
-	explicit operator int() const throw();
-	explicit operator long() const throw();
-	explicit operator long long() const throw();
-	explicit operator signed char() const throw();
-	explicit operator unsigned char() const throw();
-	explicit operator unsigned short() const throw();
-	explicit operator unsigned int() const throw();
-	explicit operator unsigned long() const throw();
-	explicit operator unsigned long long() const throw();
-	//____intellisense_endianint &operator = (__T) throw();
-	____intellisense_endianint &operator=(____intellisense_endianint const &) throw() = default;
-	template<class __S> bool operator<(____intellisense_endianint<endian, __S> const &) const throw();
-	template<class __S> bool operator<=(____intellisense_endianint<endian, __S> const &) const throw();
-	template<class __S> bool operator==(____intellisense_endianint<endian, __S> const &) const throw();
-	template<class __S> bool operator!=(____intellisense_endianint<endian, __S> const &) const throw();
-	template<class __S> bool operator>(____intellisense_endianint<endian, __S> const &) const throw();
-	template<class __S> bool operator>=(____intellisense_endianint<endian, __S> const &) const throw();
-	template<class __S> ____intellisense_endianint operator|(____intellisense_endianint<endian, __S> const &) const throw();
-	template<class __S> ____intellisense_endianint operator&(____intellisense_endianint<endian, __S> const &) const throw();
-	template<class __S> ____intellisense_endianint operator^(____intellisense_endianint<endian, __S> const &) const throw();
-	template<class __S> ____intellisense_endianint &operator|=(____intellisense_endianint<endian, __S> const &) throw();
-	template<class __S> ____intellisense_endianint &operator&=(____intellisense_endianint<endian, __S> const &) throw();
-	template<class __S> ____intellisense_endianint &operator^=(____intellisense_endianint<endian, __S> const &) throw();
-	____intellisense_endianint() = default;
-	____intellisense_endianint(____intellisense_endianint const &) = default;
-	explicit ____intellisense_endianint(char) throw();
-	explicit ____intellisense_endianint(short) throw();
-	explicit ____intellisense_endianint(int) throw();
-	explicit ____intellisense_endianint(long) throw();
-	explicit ____intellisense_endianint(long long) throw();
-	explicit ____intellisense_endianint(signed char) throw();
-	explicit ____intellisense_endianint(unsigned char) throw();
-	explicit ____intellisense_endianint(unsigned short) throw();
-	explicit ____intellisense_endianint(unsigned int) throw();
-	explicit ____intellisense_endianint(unsigned long) throw();
-	explicit ____intellisense_endianint(unsigned long long) throw();
-};
-
-#pragma pack(pop)
 
 __intern::____intellisense_endianint</*__ORDER_LITTLE_ENDIAN__*/ 1234, unsigned short> __intellisense_htole16(unsigned short);
 __intern::____intellisense_endianint</*__ORDER_BIG_ENDIAN__*/ 4321, unsigned short> __intellisense_htobe16(unsigned short);

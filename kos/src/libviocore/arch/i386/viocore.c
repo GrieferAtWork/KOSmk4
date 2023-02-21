@@ -47,7 +47,6 @@ opt.append("-Os");
 
 #ifdef LIBVIO_CONFIG_ENABLED
 
-#include <hybrid/atomic.h>
 
 #include <asm/cpu-flags.h>
 #include <asm/cpu-msr.h>
@@ -61,12 +60,13 @@ opt.append("-Os");
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/paging.h>
-#include <kos/kernel/x86/segment.h>
 #include <kos/kernel/types.h>
+#include <kos/kernel/x86/segment.h>
 #include <kos/types.h>
 #include <sys/syslog.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <int128.h>
 #include <inttypes.h>
 #include <limits.h>
@@ -472,7 +472,7 @@ libviocore_atomic_xchb(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 1);
 		if (force_atomic) {
-			result = ATOMIC_XCH(*(u8 *)addr, value);
+			result = atomic_xch((u8 *)addr, value);
 		} else {
 			result      = *(u8 const *)addr;
 			*(u8 *)addr = value;
@@ -499,7 +499,7 @@ libviocore_atomic_xchw(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 2);
 		if (force_atomic) {
-			result = ATOMIC_XCH(*(u16 *)addr, value);
+			result = atomic_xch((u16 *)addr, value);
 		} else {
 			result       = *(u16 const *)addr;
 			*(u16 *)addr = value;
@@ -526,7 +526,7 @@ libviocore_atomic_xchl(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 4);
 		if (force_atomic) {
-			result = ATOMIC_XCH(*(u32 *)addr, value);
+			result = atomic_xch((u32 *)addr, value);
 		} else {
 			result       = *(u32 const *)addr;
 			*(u32 *)addr = value;
@@ -554,7 +554,7 @@ libviocore_atomic_xchq(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 8);
 		if (force_atomic) {
-			result = ATOMIC_XCH(*(u64 *)addr, value);
+			result = atomic_xch((u64 *)addr, value);
 		} else {
 			result       = *(u64 const *)addr;
 			*(u64 *)addr = value;
@@ -578,7 +578,7 @@ libviocore_atomic_fetchaddb(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 1);
 		if (force_atomic) {
-			result = ATOMIC_FETCHADD(*(u8 *)addr, value);
+			result = atomic_fetchadd((u8 *)addr, value);
 		} else {
 			result      = *(u8 const *)addr;
 			*(u8 *)addr = result + value;
@@ -608,7 +608,7 @@ libviocore_atomic_fetchaddw(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 2);
 		if (force_atomic) {
-			result = ATOMIC_FETCHADD(*(u16 *)addr, value);
+			result = atomic_fetchadd((u16 *)addr, value);
 		} else {
 			result       = *(u16 const *)addr;
 			*(u16 *)addr = result + value;
@@ -638,7 +638,7 @@ libviocore_atomic_fetchaddl(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 4);
 		if (force_atomic) {
-			result = ATOMIC_FETCHADD(*(u32 *)addr, value);
+			result = atomic_fetchadd((u32 *)addr, value);
 		} else {
 			result       = *(u32 const *)addr;
 			*(u32 *)addr = result + value;
@@ -669,7 +669,7 @@ libviocore_atomic_fetchaddq(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 8);
 		if (force_atomic) {
-			result = ATOMIC_FETCHADD(*(u64 *)addr, value);
+			result = atomic_fetchadd((u64 *)addr, value);
 		} else {
 			result       = *(u64 const *)addr;
 			*(u64 *)addr = result + value;
@@ -693,7 +693,7 @@ libviocore_atomic_fetchsubb(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 1);
 		if (force_atomic) {
-			result = ATOMIC_FETCHSUB(*(u8 *)addr, value);
+			result = atomic_fetchsub((u8 *)addr, value);
 		} else {
 			result      = *(u8 const *)addr;
 			*(u8 *)addr = result - value;
@@ -723,7 +723,7 @@ libviocore_atomic_fetchsubw(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 2);
 		if (force_atomic) {
-			result = ATOMIC_FETCHSUB(*(u16 *)addr, value);
+			result = atomic_fetchsub((u16 *)addr, value);
 		} else {
 			result       = *(u16 const *)addr;
 			*(u16 *)addr = result - value;
@@ -753,7 +753,7 @@ libviocore_atomic_fetchsubl(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 4);
 		if (force_atomic) {
-			result = ATOMIC_FETCHSUB(*(u32 *)addr, value);
+			result = atomic_fetchsub((u32 *)addr, value);
 		} else {
 			result       = *(u32 const *)addr;
 			*(u32 *)addr = result - value;
@@ -784,7 +784,7 @@ libviocore_atomic_fetchsubq(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 8);
 		if (force_atomic) {
-			result = ATOMIC_FETCHSUB(*(u64 *)addr, value);
+			result = atomic_fetchsub((u64 *)addr, value);
 		} else {
 			result       = *(u64 const *)addr;
 			*(u64 *)addr = result - value;
@@ -808,7 +808,7 @@ libviocore_atomic_fetchandb(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 1);
 		if (force_atomic) {
-			result = ATOMIC_FETCHAND(*(u8 *)addr, value);
+			result = atomic_fetchand((u8 *)addr, value);
 		} else {
 			result      = *(u8 const *)addr;
 			*(u8 *)addr = result & value;
@@ -838,7 +838,7 @@ libviocore_atomic_fetchandw(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 2);
 		if (force_atomic) {
-			result = ATOMIC_FETCHAND(*(u16 *)addr, value);
+			result = atomic_fetchand((u16 *)addr, value);
 		} else {
 			result       = *(u16 const *)addr;
 			*(u16 *)addr = result & value;
@@ -868,7 +868,7 @@ libviocore_atomic_fetchandl(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 4);
 		if (force_atomic) {
-			result = ATOMIC_FETCHAND(*(u32 *)addr, value);
+			result = atomic_fetchand((u32 *)addr, value);
 		} else {
 			result       = *(u32 const *)addr;
 			*(u32 *)addr = result & value;
@@ -899,7 +899,7 @@ libviocore_atomic_fetchandq(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 8);
 		if (force_atomic) {
-			result = ATOMIC_FETCHAND(*(u64 *)addr, value);
+			result = atomic_fetchand((u64 *)addr, value);
 		} else {
 			result       = *(u64 const *)addr;
 			*(u64 *)addr = result & value;
@@ -923,7 +923,7 @@ libviocore_atomic_fetchorb(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 1);
 		if (force_atomic) {
-			result = ATOMIC_FETCHOR(*(u8 *)addr, value);
+			result = atomic_fetchor((u8 *)addr, value);
 		} else {
 			result      = *(u8 const *)addr;
 			*(u8 *)addr = result | value;
@@ -953,7 +953,7 @@ libviocore_atomic_fetchorw(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 2);
 		if (force_atomic) {
-			result = ATOMIC_FETCHOR(*(u16 *)addr, value);
+			result = atomic_fetchor((u16 *)addr, value);
 		} else {
 			result       = *(u16 const *)addr;
 			*(u16 *)addr = result | value;
@@ -983,7 +983,7 @@ libviocore_atomic_fetchorl(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 4);
 		if (force_atomic) {
-			result = ATOMIC_FETCHOR(*(u32 *)addr, value);
+			result = atomic_fetchor((u32 *)addr, value);
 		} else {
 			result       = *(u32 const *)addr;
 			*(u32 *)addr = result | value;
@@ -1014,7 +1014,7 @@ libviocore_atomic_fetchorq(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 8);
 		if (force_atomic) {
-			result = ATOMIC_FETCHOR(*(u64 *)addr, value);
+			result = atomic_fetchor((u64 *)addr, value);
 		} else {
 			result       = *(u64 const *)addr;
 			*(u64 *)addr = result | value;
@@ -1038,7 +1038,7 @@ libviocore_atomic_fetchxorb(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 1);
 		if (force_atomic) {
-			result = ATOMIC_FETCHXOR(*(u8 *)addr, value);
+			result = atomic_fetchxor((u8 *)addr, value);
 		} else {
 			result      = *(u8 const *)addr;
 			*(u8 *)addr = result ^ value;
@@ -1068,7 +1068,7 @@ libviocore_atomic_fetchxorw(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 2);
 		if (force_atomic) {
-			result = ATOMIC_FETCHXOR(*(u16 *)addr, value);
+			result = atomic_fetchxor((u16 *)addr, value);
 		} else {
 			result       = *(u16 const *)addr;
 			*(u16 *)addr = result ^ value;
@@ -1098,7 +1098,7 @@ libviocore_atomic_fetchxorl(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 4);
 		if (force_atomic) {
-			result = ATOMIC_FETCHXOR(*(u32 *)addr, value);
+			result = atomic_fetchxor((u32 *)addr, value);
 		} else {
 			result       = *(u32 const *)addr;
 			*(u32 *)addr = result ^ value;
@@ -1129,7 +1129,7 @@ libviocore_atomic_fetchxorq(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 8);
 		if (force_atomic) {
-			result = ATOMIC_FETCHXOR(*(u64 *)addr, value);
+			result = atomic_fetchxor((u64 *)addr, value);
 		} else {
 			result       = *(u64 const *)addr;
 			*(u64 *)addr = result ^ value;
@@ -1153,7 +1153,7 @@ libviocore_atomic_cmpxchb(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 1);
 		if (force_atomic) {
-			result = ATOMIC_CMPXCH(*(u8 *)addr, oldval, newval);
+			result = atomic_cmpxch((u8 *)addr, oldval, newval);
 		} else {
 			result = *(u8 const *)addr;
 			COMPILER_READ_BARRIER();
@@ -1184,7 +1184,7 @@ libviocore_atomic_cmpxchw(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 2);
 		if (force_atomic) {
-			result = ATOMIC_CMPXCH(*(u16 *)addr, oldval, newval);
+			result = atomic_cmpxch((u16 *)addr, oldval, newval);
 		} else {
 			result = *(u16 const *)addr;
 			COMPILER_READ_BARRIER();
@@ -1215,7 +1215,7 @@ libviocore_atomic_cmpxchl(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 4);
 		if (force_atomic) {
-			result = ATOMIC_CMPXCH(*(u32 *)addr, oldval, newval);
+			result = atomic_cmpxch((u32 *)addr, oldval, newval);
 		} else {
 			result = *(u32 const *)addr;
 			COMPILER_READ_BARRIER();
@@ -1246,7 +1246,7 @@ libviocore_atomic_cmpxchq(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 8);
 		if (force_atomic) {
-			result = ATOMIC_CMPXCH(*(u64 *)addr, oldval, newval);
+			result = atomic_cmpxch((u64 *)addr, oldval, newval);
 		} else {
 			result = *(u64 const *)addr;
 			COMPILER_READ_BARRIER();
@@ -1272,7 +1272,7 @@ libviocore_atomic_cmpxch_or_writeb(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 1);
 		if (force_atomic) {
-			result = ATOMIC_CMPXCH(*(u8 *)addr, oldval, newval);
+			result = atomic_cmpxch((u8 *)addr, oldval, newval);
 		} else {
 			*(u8 *)addr = newval;
 			return true;
@@ -1303,7 +1303,7 @@ libviocore_atomic_cmpxch_or_writew(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 2);
 		if (force_atomic) {
-			result = ATOMIC_CMPXCH(*(u16 *)addr, oldval, newval);
+			result = atomic_cmpxch((u16 *)addr, oldval, newval);
 		} else {
 			*(u16 *)addr = newval;
 			return true;
@@ -1331,7 +1331,7 @@ libviocore_atomic_cmpxch_or_writel(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 4);
 		if (force_atomic) {
-			result = ATOMIC_CMPXCH(*(u32 *)addr, oldval, newval);
+			result = atomic_cmpxch((u32 *)addr, oldval, newval);
 		} else {
 			*(u32 *)addr = newval;
 			return true;
@@ -1360,7 +1360,7 @@ libviocore_atomic_cmpxch_or_writeq(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 8);
 		if (force_atomic) {
-			result = ATOMIC_CMPXCH(*(u64 *)addr, oldval, newval);
+			result = atomic_cmpxch((u64 *)addr, oldval, newval);
 		} else {
 			*(u64 *)addr = newval;
 			return true;

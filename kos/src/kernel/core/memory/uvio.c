@@ -40,14 +40,13 @@
 #include <sched/task.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except/reason/inval.h>
 #include <kos/io.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -103,12 +102,12 @@ uvio_request_impl(struct uvio *__restrict self,
 
 	/* Wait for our request to complete. */
 	for (;;) {
-		status = ATOMIC_READ(slot->kur_status);
+		status = atomic_read(&slot->kur_status);
 		if (status == KERNEL_UVIO_REQUEST_STATUS_COMPLETE ||
 		    status == KERNEL_UVIO_REQUEST_STATUS_EXCEPT)
 			break; /* Request has completed (either successfully, or with an exception) */
 		task_connect_for_poll(&self->uv_reqdone);
-		status = ATOMIC_READ(slot->kur_status);
+		status = atomic_read(&slot->kur_status);
 		if (status == KERNEL_UVIO_REQUEST_STATUS_COMPLETE ||
 		    status == KERNEL_UVIO_REQUEST_STATUS_EXCEPT) {
 			task_disconnectall();
@@ -162,7 +161,7 @@ NOTHROW(KCALL uvio_freerequest)(struct uvio *__restrict self,
 	kernel_uvio_request_write(slot);
 
 	/* Mark as free */
-	ATOMIC_WRITE(slot->kur_args, NULL);
+	atomic_write(&slot->kur_args, NULL);
 	DBG_memset(&slot->kur_orig, 0xcc,
 	           sizeof(struct kernel_uvio_request) -
 	           offsetof(struct kernel_uvio_request, kur_orig));
@@ -470,7 +469,7 @@ NOTHROW(KCALL uvio_server_has_request_with_status)(struct uvio const *__restrict
 		u8 slot_status;
 		struct kernel_uvio_request const *slot;
 		slot = &self->uv_req[i];
-		if (!ATOMIC_READ(slot->kur_args))
+		if (!atomic_read(&slot->kur_args))
 			continue; /* Unused slot */
 
 		/* NOTE: The status this following line reads may already be garbage!
@@ -481,7 +480,7 @@ NOTHROW(KCALL uvio_server_has_request_with_status)(struct uvio const *__restrict
 		 * the worst case being that ppoll(2) arbitrarily returns for a request
 		 * that has completed in  the mean time, or  has been canceled, all  of
 		 * which ppoll(2) is permitted to do! */
-		slot_status = ATOMIC_READ(slot->kur_status);
+		slot_status = atomic_read(&slot->kur_status);
 		if (slot_status == status)
 			return true; /* Found one! */
 	}
@@ -497,9 +496,9 @@ uvio_server_readone_nonblock(struct uvio *__restrict self,
 	struct kernel_uvio_request *slot;
 	for (reqid = 0; reqid < CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS; ++reqid) {
 		slot = &self->uv_req[reqid];
-		if (!ATOMIC_READ(slot->kur_args))
+		if (!atomic_read(&slot->kur_args))
 			continue; /* Unused slot. */
-		if (ATOMIC_READ(slot->kur_status) != KERNEL_UVIO_REQUEST_STATUS_PENDING)
+		if (atomic_read(&slot->kur_status) != KERNEL_UVIO_REQUEST_STATUS_PENDING)
 			continue; /* Slot isn't pending. */
 
 		/* This is likely going to be our slot. - Fill in `*req' */
@@ -533,7 +532,7 @@ uvio_server_readone_nonblock(struct uvio *__restrict self,
 			pid_t sender_pid;
 			COMPILER_READ_BARRIER();
 			kernel_uvio_request_read(slot);
-			args = ATOMIC_READ(slot->kur_args);
+			args = atomic_read(&slot->kur_args);
 			if unlikely(!args)
 				goto badslot;
 			acmap_page   = args->va_acmap_page;
@@ -549,9 +548,9 @@ uvio_server_readone_nonblock(struct uvio *__restrict self,
 
 		/* (Try to) change the status of the slot. */
 		kernel_uvio_request_read(slot);
-		if unlikely(!ATOMIC_READ(slot->kur_args))
+		if unlikely(!atomic_read(&slot->kur_args))
 			goto badslot;
-		if unlikely(!ATOMIC_CMPXCH(slot->kur_status,
+		if unlikely(!atomic_cmpxch(&slot->kur_status,
 		                           KERNEL_UVIO_REQUEST_STATUS_PENDING,
 		                           KERNEL_UVIO_REQUEST_STATUS_DELIVERED)) {
 badslot:
@@ -690,7 +689,7 @@ complete_slot_with_except:
 		/* Fill in the exception to-be re-thrown. */
 		memcpy(&slot->kur_except, &except,
 		       sizeof(struct kernel_uvio_except));
-		ATOMIC_WRITE(slot->kur_status, KERNEL_UVIO_REQUEST_STATUS_EXCEPT);
+		atomic_write(&slot->kur_status, KERNEL_UVIO_REQUEST_STATUS_EXCEPT);
 		goto complete_slot_nostatus;
 
 #ifdef __ARCH_HAVE_COMPAT
@@ -739,7 +738,7 @@ unlock_slot_and_ignore:
 			goto done;
 		}
 complete_slot:
-		ATOMIC_WRITE(slot->kur_status, KERNEL_UVIO_REQUEST_STATUS_COMPLETE);
+		atomic_write(&slot->kur_status, KERNEL_UVIO_REQUEST_STATUS_COMPLETE);
 complete_slot_nostatus:
 		kernel_uvio_request_endread(slot);
 

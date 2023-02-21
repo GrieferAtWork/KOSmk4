@@ -193,7 +193,7 @@ The interrupt vector is (conventionally) located at `(VIRT void *)0` and consist
 
 
 **\[1\]** Kernel support:
-> Implement `ATOMIC_CMPXCH` (64-bit):
+> Implement `atomic_cmpxch` (64-bit):
 > ```asm
 > .Lcritical_begin:
 >     ldmia  @BASE@, {@REAL_OLDVAL_LO32@, @REAL_OLDVAL_HI32@}
@@ -211,7 +211,7 @@ The interrupt vector is (conventionally) located at `(VIRT void *)0` and consist
 > Align address to N bits and perform an N-bit-wide atomic operation
 
 **\[3\]** `ldrex` + `strex`:
-> Implement `ATOMIC_CMPXCH_WEAK`:
+> Implement `atomic_cmpxch_weak`:
 > ```asm
 >     dmb    ish                  /* on armv6: `mcr p15, 0, r0, c7, c10, 5` */
 > 1:  ldrex* @REAL_OLDVAL@, [@BASE@]

@@ -38,8 +38,6 @@
 #include <sched/task.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
-
 #include <compat/config.h>
 #include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>

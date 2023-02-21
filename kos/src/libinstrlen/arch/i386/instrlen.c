@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBINSTRLEN_ARCH_I386_INSTRLEN_C
 #define GUARD_LIBINSTRLEN_ARCH_I386_INSTRLEN_C 1
+#define _KOS_SOURCE 1
 
 #include <hybrid/host.h>
 
@@ -37,11 +38,10 @@
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/types.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -61,12 +61,12 @@ DECL_BEGIN
 PRIVATE void *libemu86 = NULL;
 PRIVATE void *CC open_libemu86(void) {
 	void *result;
-	result = ATOMIC_READ(libemu86);
+	result = atomic_read(&libemu86);
 	if (!result) {
 		result = dlopen(LIBEMU86_LIBRARY_NAME, RTLD_LOCAL);
 		if likely(result) {
 			void *new_result;
-			new_result = ATOMIC_CMPXCH_VAL(libemu86, NULL, result);
+			new_result = atomic_cmpxch_val(&libemu86, NULL, result);
 			if unlikely(new_result != NULL) {
 				dlclose(result);
 				result = new_result;

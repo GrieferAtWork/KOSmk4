@@ -95,11 +95,11 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 #endif /* !DEFINE_task_wake_as */
 #ifndef CONFIG_NO_SMP
 	/* Read the CPU field _once_ since it might change before the next read. */
-	target = ATOMIC_READ(thread->t_cpu);
+	target = atomic_read(&thread->t_cpu);
 	if (target != me) {
 		/* Use an IPI to wake up the thread! */
 		void *args[CPU_IPI_ARGCOUNT];
-		if (ATOMIC_READ(thread->t_flags) & TASK_FTERMINATED) {
+		if (atomic_read(&thread->t_flags) & TASK_FTERMINATED) {
 			IPI_DEBUG("task_wake(%p):terminated\n", thread);
 			return false; /* The thread has already terminated. */
 		}

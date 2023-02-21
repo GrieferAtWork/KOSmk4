@@ -27,12 +27,12 @@
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
 #include <kos/except.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h> /* _POSIX_MAX_INPUT, _POSIX_MAX_CANON */
@@ -128,7 +128,8 @@ libterminal_do_iwrite_direct(struct terminal *__restrict self,
 FORCELOCAL void CC
 libterminal_do_iwrite_set_eofing(struct terminal *__restrict self) {
 	/* Set the EOFing bit */
-	ATOMIC_OR(self->t_ios.c_lflag, __IEOFING);
+	atomic_or(&self->t_ios.c_lflag, __IEOFING);
+
 	/* Broadcast the signal send when the input buffer becomes non-empty,
 	 * thus  causing  any  thread  waiting  on  input  data  to  wake up. */
 	sched_signal_broadcast(&self->t_ibuf.rb_nempty);
@@ -142,7 +143,7 @@ libterminal_do_owrite_nostop_nobuf(struct terminal *__restrict self,
                                    tcflag_t lflag) {
 	tcflag_t oflag;
 	ssize_t result, temp;
-	oflag = ATOMIC_READ(self->t_ios.c_oflag);
+	oflag = atomic_read(&self->t_ios.c_oflag);
 	if ((oflag & (OPOST | OLCUC | ONLCR | OCRNL | ONLRET)) == 0) {
 		/* Check for simple case: No pre-processing required. */
 		result = libterminal_do_owrite_direct(self, src, num_bytes, mode);
@@ -286,7 +287,7 @@ libterminal_do_owrite_nostop(struct terminal *__restrict self,
 			goto done;
 #endif /* !__KERNEL__ */
 		/* Check for race condition: IXOFF was disabled in the mean time... */
-		iflag = ATOMIC_READ(self->t_ios.c_iflag);
+		iflag = atomic_read(&self->t_ios.c_iflag);
 		if unlikely(!(iflag & IXOFF)) {
 			ssize_t temp;
 			temp = libterminal_flush_obuf(self, mode, lflag);
@@ -405,8 +406,8 @@ libterminal_do_owrite_echo(struct terminal *__restrict self,
 			/* Echo NEWLINE-characters */
 			cc_t nl1, nl2;
 			size_t i;
-			nl1 = ATOMIC_READ(self->t_ios.c_cc[VEOL]);
-			nl2 = ATOMIC_READ(self->t_ios.c_cc[VEOL2]);
+			nl1 = atomic_read(&self->t_ios.c_cc[VEOL]);
+			nl2 = atomic_read(&self->t_ios.c_cc[VEOL2]);
 			for (i = 0; i < num_bytes; ++i) {
 				byte_t ch;
 				ch = ((byte_t const *)src)[i];
@@ -443,8 +444,8 @@ libterminal_do_iwrite_canon(struct terminal *__restrict self,
 	if unlikely(result < 0)
 		goto done;
 	if ((iflag & IMAXBEL) && ((size_t)result < num_bytes) &&
-	    (!(mode & IO_NONBLOCK) || (ATOMIC_READ(self->t_canon.lb_line.lc_size) >=
-	                               ATOMIC_READ(self->t_canon.lb_limt)))) {
+	    (!(mode & IO_NONBLOCK) || (atomic_read(&self->t_canon.lb_line.lc_size) >=
+	                               atomic_read(&self->t_canon.lb_limt)))) {
 		ssize_t temp;
 		/* Print a bell-character-sequence to the output */
 		temp = libterminal_do_owrite_nostop_nobuf(self, bell, lengthof(bell), mode,
@@ -846,8 +847,8 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 	ssize_t result, temp;
 	if unlikely(!num_bytes)
 		return 0;
-	if ((ATOMIC_READ(self->t_ios.c_lflag) & __IESCAPING) &&
-	    (ATOMIC_FETCHAND(self->t_ios.c_lflag, ~__IESCAPING) & __IESCAPING)) {
+	if ((atomic_read(&self->t_ios.c_lflag) & __IESCAPING) &&
+	    (atomic_fetchand(&self->t_ios.c_lflag, ~__IESCAPING) & __IESCAPING)) {
 		byte_t ch;
 		/* Escape the first character. */
 		ch = ((byte_t const *)src)[0];
@@ -891,8 +892,8 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 		 * flag which will restore output  whenever any input is typed  out. */
 		assert(num_bytes);
 		if ((iflag & IXANY) &&
-		    (ATOMIC_READ(self->t_ios.c_iflag) & IXOFF) != 0 &&
-		    (ATOMIC_FETCHAND(self->t_ios.c_iflag, ~IXOFF) & IXOFF) != 0) {
+		    (atomic_read(&self->t_ios.c_iflag) & IXOFF) != 0 &&
+		    (atomic_fetchand(&self->t_ios.c_iflag, ~IXOFF) & IXOFF) != 0) {
 			temp = libterminal_flush_obuf(self, mode, lflag);
 			if unlikely(temp < 0)
 				goto err;
@@ -964,14 +965,14 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 						goto err;
 					result += temp;
 					if unlikely((size_t)temp < count) {
-						ATOMIC_OR(self->t_ios.c_lflag, __IESCAPING);
+						atomic_or(&self->t_ios.c_lflag, __IESCAPING);
 						goto done;
 					}
 				}
 				++result; /* Account for the control character */
 				flush_start = iter + 1;
 				if (iter == end - 1) {
-					ATOMIC_OR(self->t_ios.c_lflag, __IESCAPING);
+					atomic_or(&self->t_ios.c_lflag, __IESCAPING);
 				} else {
 					ch = *++iter;
 					/* Directly escape the next character */
@@ -1010,13 +1011,13 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 				result += temp;
 				/* Enable suspended output */
 				if unlikely((size_t)temp < count) {
-					ATOMIC_OR(self->t_ios.c_iflag, IXOFF);
+					atomic_or(&self->t_ios.c_iflag, IXOFF);
 					goto done;
 				}
 				/* If this is the last character, or not just any sort of input
 				 * can   disable  XOFF-mode  then  disable  output  processing. */
 				if (iter == end - 1 || !(iflag & IXANY))
-					ATOMIC_OR(self->t_ios.c_iflag, IXOFF);
+					atomic_or(&self->t_ios.c_iflag, IXOFF);
 				++result; /* Account for the control character */
 				flush_start = iter + 1;
 			} else if (ch == self->t_ios.c_cc[VSTART] && (iflag & IXON)) {
@@ -1029,7 +1030,7 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 				if unlikely((size_t)temp < count)
 					goto done;
 				/* Disable suspended output (and re-enable output processing) */
-				if (ATOMIC_FETCHAND(self->t_ios.c_iflag, ~IXOFF) & IXOFF) {
+				if (atomic_fetchand(&self->t_ios.c_iflag, ~IXOFF) & IXOFF) {
 					temp = libterminal_flush_obuf(self, mode, lflag);
 					if unlikely(temp < 0)
 						goto err;
@@ -1066,7 +1067,7 @@ libterminal_do_iwrite(struct terminal *__restrict self,
                       size_t num_bytes, iomode_t mode, tcflag_t iflag) {
 	tcflag_t lflag;
 	ssize_t result, temp;
-	lflag = ATOMIC_READ(self->t_ios.c_lflag);
+	lflag = atomic_read(&self->t_ios.c_lflag);
 	/* Check for special case: No formatting required. */
 	if ((iflag & (PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IUCLC)) == 0 ||
 	    ((lflag & EXTPROC) && (iflag & (ISTRIP | INLCR | IGNCR | ICRNL | IUCLC)) == 0)) {
@@ -1275,8 +1276,8 @@ switch_ch:
 			if ((lflag & (ICANON | XCASE)) == (ICANON | XCASE)) {
 				tcflag_t of;
 				do {
-					of = ATOMIC_READ(self->t_ios.c_lflag);
-				} while (!ATOMIC_CMPXCH_WEAK(self->t_ios.c_lflag, of,
+					of = atomic_read(&self->t_ios.c_lflag);
+				} while (!atomic_cmpxch_weak(&self->t_ios.c_lflag, of,
 				                             (of & ~__IXCASEING) | (lflag & __IXCASEING)));
 			}
 			RETHROW();
@@ -1284,8 +1285,8 @@ switch_ch:
 		if ((lflag & (ICANON | XCASE)) == (ICANON | XCASE)) {
 			tcflag_t of;
 			do {
-				of = ATOMIC_READ(self->t_ios.c_lflag);
-			} while (!ATOMIC_CMPXCH_WEAK(self->t_ios.c_lflag, of,
+				of = atomic_read(&self->t_ios.c_lflag);
+			} while (!atomic_cmpxch_weak(&self->t_ios.c_lflag, of,
 			                             (of & ~__IXCASEING) | (lflag & __IXCASEING)));
 		}
 	}
@@ -1348,8 +1349,8 @@ libterminal_owrite(struct terminal *__restrict self,
 		KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
 		              __THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...)) {
 	ssize_t result;
-	tcflag_t iflag = ATOMIC_READ(self->t_ios.c_iflag);
-	tcflag_t lflag = ATOMIC_READ(self->t_ios.c_lflag);
+	tcflag_t iflag = atomic_read(&self->t_ios.c_iflag);
+	tcflag_t lflag = atomic_read(&self->t_ios.c_lflag);
 	result = libterminal_do_owrite(self, src, num_bytes, mode, iflag, lflag);
 	return result;
 }
@@ -1361,7 +1362,7 @@ libterminal_iwrite(struct terminal *__restrict self,
 		KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
 		              __THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...)) {
 	ssize_t result;
-	tcflag_t iflag = ATOMIC_READ(self->t_ios.c_iflag);
+	tcflag_t iflag = atomic_read(&self->t_ios.c_iflag);
 	if unlikely(iflag & __IIOFF) {
 		result = (ssize_t)linebuffer_writef(&self->t_ipend, src, num_bytes, mode);
 #ifndef __KERNEL__
@@ -1369,7 +1370,7 @@ libterminal_iwrite(struct terminal *__restrict self,
 			goto done;
 #endif /* !__KERNEL__ */
 		/* Check for race condition: __IIOFF was disabled in the mean time... */
-		iflag = ATOMIC_READ(self->t_ios.c_iflag);
+		iflag = atomic_read(&self->t_ios.c_iflag);
 		if unlikely(!(iflag & __IIOFF)) {
 			ssize_t temp;
 			temp = libterminal_flush_ibuf(self, mode, iflag);
@@ -1396,10 +1397,10 @@ done:
 	}
 again_connect:
 	/* Check (and clear) a pending EOF indicator. */
-	if (ATOMIC_FETCHAND(self->t_ios.c_lflag, ~__IEOFING) & __IEOFING)
+	if (atomic_fetchand(&self->t_ios.c_lflag, ~__IEOFING) & __IEOFING)
 		goto done;
 	/* Check if the ring was closed. */
-	if unlikely(!ATOMIC_READ(self->t_ibuf.rb_limit))
+	if unlikely(!atomic_read(&self->t_ibuf.rb_limit))
 		goto done;
 #ifdef __KERNEL__
 	task_connect(&self->t_ibuf.rb_nempty);
@@ -1418,12 +1419,12 @@ again_connect:
 		goto done;
 	}
 	/* Check if the ring was closed. */
-	if unlikely(!ATOMIC_READ(self->t_ibuf.rb_limit)) {
+	if unlikely(!atomic_read(&self->t_ibuf.rb_limit)) {
 		task_disconnectall();
 		goto done;
 	}
 	/* Check (and clear) a pending EOF indicator. */
-	if (ATOMIC_FETCHAND(self->t_ios.c_lflag, ~__IEOFING) & __IEOFING) {
+	if (atomic_fetchand(&self->t_ios.c_lflag, ~__IEOFING) & __IEOFING) {
 		task_disconnectall();
 		goto done;
 	}
@@ -1485,7 +1486,7 @@ libterminal_iread(struct terminal *__restrict self,
 		}
 		if ((size_t)result < num_bytes && result != 0) {
 			/* Make sure to read at least `self->t_ios.c_cc[VMIN]' characters! */
-			cc_t minread = ATOMIC_READ(self->t_ios.c_cc[VMIN]);
+			cc_t minread = atomic_read(&self->t_ios.c_cc[VMIN]);
 			if ((size_t)minread > num_bytes) /* Limit by what we can even return */
 				minread = (cc_t)num_bytes;
 			while ((size_t)result < minread) {
@@ -1537,53 +1538,53 @@ libterminal_setios(struct terminal *__restrict self,
 	struct termios old;
 	bool echo_disabled;
 again:
-	old.c_iflag = ATOMIC_READ(self->t_ios.c_iflag);
+	old.c_iflag = atomic_read(&self->t_ios.c_iflag);
 	if (!(tio->c_iflag & IXOFF) && (old.c_iflag & IXOFF) &&
-	    (ATOMIC_READ(self->t_opend.lb_line.lc_size) != 0)) {
+	    (atomic_read(&self->t_opend.lb_line.lc_size) != 0)) {
 		/* Disable output text buffering (flush `t_opend') */
-		error = libterminal_flush_obuf(self, 0, ATOMIC_READ(self->t_ios.c_lflag));
+		error = libterminal_flush_obuf(self, 0, atomic_read(&self->t_ios.c_lflag));
 		if unlikely(error < 0)
 			goto err;
 		goto again;
 	}
 	if (!(tio->c_iflag & __IIOFF) && (old.c_iflag & __IIOFF) &&
-	    (ATOMIC_READ(self->t_ipend.lb_line.lc_size) != 0)) {
+	    (atomic_read(&self->t_ipend.lb_line.lc_size) != 0)) {
 		/* Disable input text buffering (flush `t_ipend') */
 		error = libterminal_flush_ibuf(self, 0, old.c_iflag);
 		if unlikely(error < 0)
 			goto err;
 		goto again;
 	}
-	old.c_iflag = ATOMIC_XCH(self->t_ios.c_iflag, tio->c_iflag);
+	old.c_iflag = atomic_xch(&self->t_ios.c_iflag, tio->c_iflag);
 	TRY {
 		if (!(tio->c_iflag & IXOFF) && (old.c_iflag & IXOFF) &&
-		    (ATOMIC_READ(self->t_opend.lb_line.lc_size) != 0)) {
+		    (atomic_read(&self->t_opend.lb_line.lc_size) != 0)) {
 			/* Disable output text buffering (flush `t_opend') */
-			error = libterminal_flush_obuf(self, 0, ATOMIC_READ(self->t_ios.c_lflag));
+			error = libterminal_flush_obuf(self, 0, atomic_read(&self->t_ios.c_lflag));
 			if unlikely(error < 0) {
-				ATOMIC_CMPXCH(self->t_ios.c_iflag, tio->c_iflag, old.c_iflag);
+				atomic_cmpxch(&self->t_ios.c_iflag, tio->c_iflag, old.c_iflag);
 				goto err;
 			}
 		}
 		if (!(tio->c_iflag & __IIOFF) && (old.c_iflag & __IIOFF) &&
-		    (ATOMIC_READ(self->t_ipend.lb_line.lc_size) != 0)) {
+		    (atomic_read(&self->t_ipend.lb_line.lc_size) != 0)) {
 			/* Disable input text buffering (flush `t_ipend') */
 			error = libterminal_flush_ibuf(self, 0, old.c_iflag);
 			if unlikely(error < 0) {
-				ATOMIC_CMPXCH(self->t_ios.c_iflag, tio->c_iflag, old.c_iflag);
+				atomic_cmpxch(&self->t_ios.c_iflag, tio->c_iflag, old.c_iflag);
 				goto err;
 			}
 		}
 	} EXCEPT {
-		ATOMIC_CMPXCH(self->t_ios.c_iflag, tio->c_iflag, old.c_iflag);
+		atomic_cmpxch(&self->t_ios.c_iflag, tio->c_iflag, old.c_iflag);
 		RETHROW();
 	}
-	old.c_oflag  = ATOMIC_XCH(self->t_ios.c_oflag, tio->c_oflag);
-	old.c_cflag  = ATOMIC_XCH(self->t_ios.c_cflag, tio->c_cflag);
-	old.c_lflag  = ATOMIC_XCH(self->t_ios.c_lflag, tio->c_lflag);
-	old.c_line   = ATOMIC_XCH(self->t_ios.c_line, tio->c_line);
-	old.c_ispeed = ATOMIC_XCH(self->t_ios.c_ispeed, tio->c_ispeed);
-	old.c_ospeed = ATOMIC_XCH(self->t_ios.c_ospeed, tio->c_ospeed);
+	old.c_oflag  = atomic_xch(&self->t_ios.c_oflag, tio->c_oflag);
+	old.c_cflag  = atomic_xch(&self->t_ios.c_cflag, tio->c_cflag);
+	old.c_lflag  = atomic_xch(&self->t_ios.c_lflag, tio->c_lflag);
+	old.c_line   = atomic_xch(&self->t_ios.c_line, tio->c_line);
+	old.c_ispeed = atomic_xch(&self->t_ios.c_ispeed, tio->c_ispeed);
+	old.c_ospeed = atomic_xch(&self->t_ios.c_ospeed, tio->c_ospeed);
 	memcpy(old.c_cc, self->t_ios.c_cc, sizeof(old.c_cc));
 	memcpy(self->t_ios.c_cc, tio->c_cc, sizeof(old.c_cc));
 	/* Broadcast signals when certain flags change. */

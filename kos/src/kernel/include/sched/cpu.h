@@ -358,7 +358,7 @@ FUNDEF void NOTHROW(KCALL cpu_deepsleep)(void);
 /* MUST ONLY BE CALLED FROM AN IDLE TASK!
  * This  function  does  the   following:
  * >> FORCPU(me, thiscpu_idle).t_state = PUSH_CPU_STATE_FOR_RETURNING_TO_CALLER();
- * >> ATOMIC_WRITE(caller->c_state, CPU_STATE_DREAMING);
+ * >> atomic_write(&caller->c_state, CPU_STATE_DREAMING);
  * >> PREEMPTION_DEEPHALT();
  * NOTE: Do not call this function directly. - Use `cpu_deepsleep()' instead,
  *       and   even  then:  Only  call  that  function  from  an  IDLE  task.
@@ -388,11 +388,11 @@ NOTHROW(FCALL arch_cpu_swipi_pending_nopr)(struct cpu *__restrict me);
  * those tasks to continue running on it.
  * On X86, this function is implemented as:
  * >> for (;;) {
- * >>     u16 state = ATOMIC_READ(target->c_state);
+ * >>     u16 state = atomic_read(&target->c_state);
  * >>     switch (state) {
  * >>     case CPU_STATE_DREAMING:
  * >>         // Take on the responsibility of waking up the CPU.
- * >>         if (!ATOMIC_CMPXCH_WEAK(target->c_state,state,CPU_STATE_GETTING_UP))
+ * >>         if (!atomic_cmpxch_weak(&target->c_state,state,CPU_STATE_GETTING_UP))
  * >>             continue;
  * >>         SEND_IPI(INIT,target);
  * >>         ATTR_FALLTHROUGH
@@ -435,12 +435,12 @@ NOTHROW(KCALL cpu_wake)(struct cpu *__restrict target);
  * The  general   sequence  of   setting  `CPU_STATE_RUNNING'   looks  like   this:
  * >>again:
  * >>    PREEMPTION_DISABLE();
- * >>    ATOMIC_WRITE(me->c_state, CPU_STATE_FALLING_ASLEEP);
+ * >>    atomic_write(&me->c_state, CPU_STATE_FALLING_ASLEEP);
  * >>    // Check for hardware IPIs which may have been delivered after `PREEMPTION_DISABLE()'
  * >>    // was called, but bfore `CPU_STATE_FALLING_ASLEEP' got set (letting other CPUs think
  * >>    // that our CPU would be able to service IPIs)
  * >>    if (arch_cpu_hwipi_pending_nopr(me)) {
- * >>        ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
+ * >>        atomic_write(&me->c_state, CPU_STATE_RUNNING);
  * >>        cpu_ipi_service_nopr();
  * >>        PREEMPTION_ENABLE_P();
  * >>        goto again;
@@ -449,7 +449,7 @@ NOTHROW(KCALL cpu_wake)(struct cpu *__restrict target);
  * >>    // Some other code
  * >>    ...
  * >>
- * >>    ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
+ * >>    atomic_write(&me->c_state, CPU_STATE_RUNNING);
  * >>    if (arch_cpu_swipi_pending_nopr(me)) {
  * >>        cpu_ipi_service_nopr();
  * >>        PREEMPTION_ENABLE();

@@ -24,7 +24,6 @@
 #include "../api.h"
 /**/
 
-#include <hybrid/atomic.h>
 #include <hybrid/bit.h>
 
 #include <kos/exec/idata.h>
@@ -32,6 +31,7 @@
 #include <sys/param.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <signal.h>
 #include <stddef.h>
 #include <string.h>
@@ -458,7 +458,7 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 
 	/* Atomically enable use of the new, updated mask
 	 * From this point forth, signals sent to our thread will be masked by `new_set' */
-	ATOMIC_WRITE(me->pt_pmask.lpm_pmask.pm_sigmask, new_set);
+	atomic_write(&me->pt_pmask.lpm_pmask.pm_sigmask, new_set);
 
 	/* Check if previously pending signals became available.
 	 *
@@ -484,7 +484,7 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 		for (i = 0; i < lengthof(me->pt_pmask.lpm_pmask.pm_pending.__val); ++i) {
 			ulongptr_t pending_word;
 			ulongptr_t newmask_word;
-			pending_word = ATOMIC_READ(me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
+			pending_word = atomic_read(&me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
 			if (!pending_word)
 				continue; /* Nothing pending in here. */
 
@@ -497,7 +497,7 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 				 * available in the mean time is still available now. - The signal may
 				 * have  been directed at  our process as a  whole, and another thread
 				 * may have already handled it. */
-				ATOMIC_AND(me->pt_pmask.lpm_pmask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
+				atomic_and(&me->pt_pmask.lpm_pmask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
 				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
 
 				/* With the signal mask having  gotten less restrictive, force  check
@@ -612,7 +612,7 @@ NOTHROW_NCX(LIBCCALL libc_setsigmaskptr)(sigset_t *sigmaskptr)
 	}
 
 	/* Atomically switch over to the new signal mask. */
-	ATOMIC_WRITE(me->pt_pmask.lpm_pmask.pm_sigmask, sigmaskptr);
+	atomic_write(&me->pt_pmask.lpm_pmask.pm_sigmask, sigmaskptr);
 
 	/* Check previously pending signals became available */
 	if (me->pt_pmask.lpm_pmask.pm_flags & USERPROCMASK_FLAG_HASPENDING) {
@@ -620,7 +620,7 @@ NOTHROW_NCX(LIBCCALL libc_setsigmaskptr)(sigset_t *sigmaskptr)
 		for (i = 0; i < lengthof(me->pt_pmask.lpm_pmask.pm_pending.__val); ++i) {
 			ulongptr_t pending_word;
 			ulongptr_t newmask_word;
-			pending_word = ATOMIC_READ(me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
+			pending_word = atomic_read(&me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
 			if (!pending_word)
 				continue; /* Nothing pending in here. */
 
@@ -633,7 +633,7 @@ NOTHROW_NCX(LIBCCALL libc_setsigmaskptr)(sigset_t *sigmaskptr)
 				 * available in the mean time is still available now. - The signal may
 				 * have  been directed at  our process as a  whole, and another thread
 				 * may have already handled it. */
-				ATOMIC_AND(me->pt_pmask.lpm_pmask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
+				atomic_and(&me->pt_pmask.lpm_pmask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
 				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
 
 				/* With the signal mask having  gotten less restrictive, force  check
@@ -688,7 +688,7 @@ NOTHROW_NCX(LIBCCALL libc_setsigmaskfullptr)(void)
 			goto do_legacy_sigprocmask;
 	}
 	/* Atomically switch over to the new signal mask. */
-	ATOMIC_WRITE(me->pt_pmask.lpm_pmask.pm_sigmask, (sigset_t *)&ss_full);
+	atomic_write(&me->pt_pmask.lpm_pmask.pm_sigmask, (sigset_t *)&ss_full);
 	/* No need to check if  anything because unmasked, since we  know
 	 * that the new signal mask doesn't contain any unmasked signals! */
 	return result;
@@ -745,7 +745,7 @@ NOTHROW(LIBCCALL libc_chkuserprocmask)(void)
 		for (i = 0; i < lengthof(me->pt_pmask.lpm_pmask.pm_pending.__val); ++i) {
 			ulongptr_t pending_word;
 			ulongptr_t newmask_word;
-			pending_word = ATOMIC_READ(me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
+			pending_word = atomic_read(&me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
 			if (!pending_word)
 				continue; /* Nothing pending in here. */
 
@@ -758,7 +758,7 @@ NOTHROW(LIBCCALL libc_chkuserprocmask)(void)
 				 * available in the mean time is still available now. - The signal may
 				 * have  been directed at  our process as a  whole, and another thread
 				 * may have already handled it. */
-				ATOMIC_AND(me->pt_pmask.lpm_pmask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
+				atomic_and(&me->pt_pmask.lpm_pmask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
 				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
 
 				/* With the signal mask having  gotten less restrictive, force  check
@@ -1150,7 +1150,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_kill)(pthread_t pthread,
 {
 	pid_t tid;
 	errno_t result;
-	tid = ATOMIC_READ(_pthread_tid(pthread));
+	tid = atomic_read(&_pthread_tid(pthread));
 	if unlikely(tid == 0)
 		return ESRCH;
 	/* No way to handle the case where `pt_tid' got set
@@ -1186,7 +1186,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_sigqueue)(pthread_t pthread,
 	bzero(&info, sizeof(siginfo_t));
 	info.si_value = val;
 	info.si_code  = SI_QUEUE;
-	tid = ATOMIC_READ(_pthread_tid(pthread));
+	tid = atomic_read(&_pthread_tid(pthread));
 	if unlikely(tid == 0)
 		return ESRCH;
 	/* No way to handle the case where `pt_tid' got set

@@ -26,7 +26,6 @@
 #include "../api.h"
 /**/
 
-#include <hybrid/atomic.h>
 #include <hybrid/host.h>
 
 #include <kos/debugtrap.h>
@@ -40,6 +39,7 @@
 #include <sys/syslog.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <malloc.h>
 #include <sched.h>
 #include <signal.h>
@@ -146,7 +146,7 @@ PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_SIGFRAME_EXEC /*      */ pdyn_unwind_fde_
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_SIGFRAME_APPLY /*     */ pdyn_unwind_cfa_sigframe_apply = NULL;
 #endif /* !CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS */
 #define ENSURE_LIBUNWIND_LOADED() \
-	(ATOMIC_READ(pdyn_libunwind) != NULL || (initialize_libunwind(), 0))
+	(atomic_read(&pdyn_libunwind) != NULL || (initialize_libunwind(), 0))
 
 PRIVATE SECTION_EXCEPT_STRING char const name_libunwind_so[] = LIBUNWIND_LIBRARY_NAME;
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_find[]                     = "unwind_fde_find";
@@ -1328,7 +1328,7 @@ PRIVATE ATTR_SECTION(".rodata.crt.compat.linux.__register_frame") char const nam
 
 /* Initialize RegisterFrame-bindings implemented in libunwind. */
 #define ENSURE_LIBUNWIND_LOADED_RF() \
-	(ATOMIC_READ(pdyn__Unwind_Find_FDE) != NULL || (initialize_libunwind_rf(), 0))
+	(atomic_read(&pdyn__Unwind_Find_FDE) != NULL || (initialize_libunwind_rf(), 0))
 INTERN ATTR_NOINLINE ATTR_SECTION(".text.crt.compat.linux.__register_frame")
 void LIBCCALL initialize_libunwind_rf(void) {
 	/* Bind normal `libunwind.so' functions (as also used during exception handling) */

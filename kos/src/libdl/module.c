@@ -31,6 +31,7 @@
 #include <kos/syscalls.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
@@ -70,7 +71,7 @@ dlmodule_finalizers_run(struct dlmodule_finalizers *__restrict self)
 	atomic_rwlock_read(&self->df_lock);
 
 	/* Ensure that only a single thread may invoke finalizers. */
-	count = ATOMIC_XCH(self->df_size, 0);
+	count = atomic_xch(&self->df_size, 0);
 	if (count) {
 		RAII_FINALLY { free(self->df_list); };
 		do {
@@ -271,7 +272,7 @@ NOTHROW_NCX(CC DlModule_GetFd)(USER DlModule *self)
 		 * to  prevent use of reserved file numbers, as used by the
 		 * standard I/O handles (aka. `STD(IN|OUT|ERR)_FILENO') */
 		result    = reopen_bigfd(result);
-		newresult = ATOMIC_CMPXCH_VAL(self->dm_file, -1, result);
+		newresult = atomic_cmpxch_val(&self->dm_file, -1, result);
 		if unlikely(newresult != -1) {
 			sys_close(result);
 			result = newresult;
@@ -319,12 +320,12 @@ NOTHROW_NCX(CC DlModule_ElfGetShdrs)(USER DlModule *self)
 			             self->dm_filename, ehdr.e_shstrndx, ehdr.e_shnum);
 			goto err;
 		}
-		ATOMIC_CMPXCH(self->dm_elf.de_shnum, (ElfW(Half))-1, ehdr.e_shnum);
-		ATOMIC_CMPXCH(self->dm_elf.de_shoff, 0, ehdr.e_shoff);
-		ATOMIC_CMPXCH(self->dm_elf.de_shstrndx, (ElfW(Half))-1, ehdr.e_shstrndx);
+		atomic_cmpxch(&self->dm_elf.de_shnum, (ElfW(Half))-1, ehdr.e_shnum);
+		atomic_cmpxch(&self->dm_elf.de_shoff, 0, ehdr.e_shoff);
+		atomic_cmpxch(&self->dm_elf.de_shstrndx, (ElfW(Half))-1, ehdr.e_shstrndx);
 	}
 	if unlikely(!self->dm_elf.de_shnum) {
-		ATOMIC_CMPXCH(self->dm_elf.de_shdr, NULL, (ElfW(Shdr) *)empty_shdr);
+		atomic_cmpxch(&self->dm_elf.de_shdr, NULL, (ElfW(Shdr) *)empty_shdr);
 		return empty_shdr;
 	}
 	/* Allocate the section header vector. */
@@ -336,7 +337,7 @@ NOTHROW_NCX(CC DlModule_ElfGetShdrs)(USER DlModule *self)
 	{
 		ElfW(Shdr) *new_result;
 		/* Save the newly loaded section header vector. */
-		new_result = ATOMIC_CMPXCH_VAL(self->dm_elf.de_shdr,
+		new_result = atomic_cmpxch_val(&self->dm_elf.de_shdr,
 		                               NULL,
 		                               result);
 		if unlikely(new_result != NULL) {
@@ -392,7 +393,7 @@ NOTHROW_NCX(CC DlModule_ElfGetShstrtab)(DlModule *self)
 	{
 		char *new_result;
 		/* Save the newly loaded section header string table. */
-		new_result = ATOMIC_CMPXCH_VAL(self->dm_elf.de_shstrtab,
+		new_result = atomic_cmpxch_val(&self->dm_elf.de_shstrtab,
 		                               NULL,
 		                               result);
 		if unlikely(new_result != NULL) {

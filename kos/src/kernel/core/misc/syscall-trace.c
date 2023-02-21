@@ -32,13 +32,13 @@
 #include <kernel/syscall.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
 
 #include <kos/aref.h>
 #include <kos/except.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <format-printer.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -73,9 +73,9 @@ NOTHROW(FCALL sct_entry_clearobj)(struct sct_entry *__restrict self) {
 	preemption_flag_t was;
 	preemption_pushoff(&was);
 #endif /* CONFIG_NO_SMP */
-	old_value = ATOMIC_XCH(self->te_object, NULL);
+	old_value = atomic_xch(&self->te_object, NULL);
 #ifndef CONFIG_NO_SMP
-	while (ATOMIC_READ(self->te_inuse))
+	while (atomic_read(&self->te_inuse))
 		task_tryyield_or_pause();
 #else /* !CONFIG_NO_SMP */
 	preemption_pop(&was);
@@ -90,14 +90,14 @@ LOCAL WUNUSED NONNULL((1)) /*nullable*/ REF void *
 NOTHROW(FCALL sct_entry_getref)(struct sct_entry *__restrict self) {
 	REF void *result;
 	PREEMPTION_DISABLE();
-	IF_SMP(ATOMIC_INC(self->te_inuse));
+	IF_SMP(atomic_inc(&self->te_inuse));
 	COMPILER_READ_BARRIER();
 	result = self->te_object;
 	COMPILER_READ_BARRIER();
 	/* Try to acquire a reference. */
 	if (likely(result) && unlikely(!(*handle_type_db.h_tryincref[self->te_obtype])(result)))
 		result = NULL;
-	IF_SMP(ATOMIC_DEC(self->te_inuse));
+	IF_SMP(atomic_dec(&self->te_inuse));
 	PREEMPTION_ENABLE();
 	return result;
 }
@@ -184,7 +184,7 @@ again_insert:
 			struct sct_entry *old_entry;
 			void *obj;
 			old_entry = old_table->tt_table[i];
-			obj       = ATOMIC_READ(old_entry->te_object);
+			obj       = atomic_read(&old_entry->te_object);
 			if (obj != NULL)
 				++new_count;
 			if (old_entry->te_obtype != ob_type)
@@ -207,7 +207,7 @@ again_insert:
 		for (i = 0, new_count = 0; i < old_table->tt_count; ++i) {
 			struct sct_entry *old_entry;
 			old_entry = old_table->tt_table[i];
-			if (!ATOMIC_READ(old_entry->te_object))
+			if (!atomic_read(&old_entry->te_object))
 				continue; /* Deleted */
 			assert(new_count < new_table->tt_count);
 			new_table->tt_table[new_count] = incref(old_entry);
@@ -272,7 +272,7 @@ NOTHROW(FCALL sct_table_truncate)(struct sct_table_struct *old_table)  {
 again:
 	/* Figure out how many entries will be required. */
 	for (i = 0, new_count = 0; i < old_table->tt_count; ++i) {
-		if (ATOMIC_READ(old_table->tt_table[i]->te_object) != NULL)
+		if (atomic_read(&old_table->tt_table[i]->te_object) != NULL)
 			++new_count;
 	}
 	assert(new_count <= old_table->tt_count);
@@ -293,7 +293,7 @@ again:
 	for (i = 0, new_count = 0; i < old_table->tt_count; ++i) {
 		struct sct_entry *entry;
 		entry = old_table->tt_table[i];
-		if (ATOMIC_READ(entry->te_object) == NULL)
+		if (atomic_read(&entry->te_object) == NULL)
 			continue;
 		new_table->tt_table[new_count] = incref(entry);
 		++new_count;
@@ -346,7 +346,7 @@ again:
 			continue; /* Wrong object type */
 		if (entry->te_callback != cb)
 			continue; /* Wrong callback */
-		if (ATOMIC_READ(entry->te_object) != ob_pointer)
+		if (atomic_read(&entry->te_object) != ob_pointer)
 			continue; /* Wrong object */
 		/* Clear this callback entry, thus nullifying it. */
 		if (!sct_entry_clearobj(entry))
@@ -400,7 +400,7 @@ syscall_trace(struct rpc_syscall_info const *__restrict info) {
 			/* Invoke the callback. */
 			RAII_FINALLY { sct_entry_decref_obj(entry, obj); };
 			(*entry->te_callback)(obj, info);
-		} else if (ATOMIC_READ(entry->te_object) == NULL) {
+		} else if (atomic_read(&entry->te_object) == NULL) {
 			/* Try to truncate the table to get rid of unused entries. */
 			sct_table_truncate(table);
 		}

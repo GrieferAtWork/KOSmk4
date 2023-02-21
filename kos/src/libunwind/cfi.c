@@ -27,7 +27,6 @@
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
@@ -41,6 +40,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <stdbool.h>
@@ -62,8 +62,6 @@
 #include "unwind.h"
 
 #ifndef __KERNEL__
-#include <hybrid/atomic.h>
-
 #include <dlfcn.h>
 #include <malloc.h>
 #else /* !__KERNEL__ */
@@ -226,16 +224,16 @@ again:
 	*(void **)&pdyn_debuginfo_cu_abbrev_fini = dlsym(pdyn_libdebuginfo, "debuginfo_cu_abbrev_fini");
 	if unlikely(!pdyn_debuginfo_cu_abbrev_fini)
 		goto err_close;
-	if (!ATOMIC_CMPXCH(pdyn_libdebuginfo, NULL, pdyn_libdebuginfo)) {
+	if (!atomic_cmpxch(&pdyn_libdebuginfo, NULL, pdyn_libdebuginfo)) {
 		dlclose(pdyn_libdebuginfo);
-		if (ATOMIC_READ(pdyn_libdebuginfo) == (void *)-1)
+		if (atomic_read(&pdyn_libdebuginfo) == (void *)-1)
 			return false;
 	}
 	return true;
 err_close:
 	dlclose(pdyn_libdebuginfo);
 err:
-	if (!ATOMIC_CMPXCH(pdyn_libdebuginfo, NULL, (void *)-1))
+	if (!atomic_cmpxch(&pdyn_libdebuginfo, NULL, (void *)-1))
 		goto again;
 	return false;
 }

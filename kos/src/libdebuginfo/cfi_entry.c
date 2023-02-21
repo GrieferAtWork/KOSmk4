@@ -31,7 +31,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sequence/bsearch.h>
 #include <hybrid/unaligned.h>
 
@@ -41,6 +40,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <sys/param.h>
 
 #include <alloca.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -60,13 +60,13 @@ DECL_BEGIN
 #ifndef __KERNEL__
 PRIVATE void *libunwind = NULL;
 PRIVATE WUNUSED void *CC dlopen_libunwind(void) {
-	void *lu = ATOMIC_READ(libunwind);
+	void *lu = atomic_read(&libunwind);
 	if (!lu) {
 		void *real_lu;
 		lu = dlopen(LIBUNWIND_LIBRARY_NAME, RTLD_LOCAL);
 		if unlikely(!lu)
 			goto done;
-		real_lu = ATOMIC_CMPXCH_VAL(libunwind, NULL, lu);
+		real_lu = atomic_cmpxch_val(&libunwind, NULL, lu);
 		if unlikely(real_lu) {
 			dlclose(lu);
 			lu = real_lu;

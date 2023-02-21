@@ -24,7 +24,6 @@
 #include "../api.h"
 /**/
 
-#include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/host.h>
 #include <hybrid/sched/atomic-rwlock.h>
@@ -44,6 +43,7 @@
 #include <sys/resource.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -181,7 +181,7 @@ NOTHROW(LIBCCALL destroy)(struct pthread *__restrict self) {
 
 LOCAL ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) void
 NOTHROW(LIBCCALL decref)(struct pthread *__restrict self) {
-	if (ATOMIC_FETCHDEC(self->pt_refcnt) == 1)
+	if (atomic_fetchdec(&self->pt_refcnt) == 1)
 		destroy(self);
 }
 
@@ -221,7 +221,7 @@ PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") struct atomic_rwlock pthread_defa
  * `pthread_self'   structure  in  case  the  thread  was  detached) */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") void
 NOTHROW(LIBCCALL libc_pthread_onexit)(struct pthread *__restrict me) {
-	if (ATOMIC_FETCHDEC(me->pt_refcnt) == 1) {
+	if (atomic_fetchdec(&me->pt_refcnt) == 1) {
 		/* At some point,  our thread got  detached from its  creator,
 		 * so  it is  left up to  us to destroy()  our own descriptor.
 		 * Because of this, we must prevent the kernel from attempting
@@ -271,7 +271,7 @@ NOTHROW(LIBCCALL pthread_exit_thread)(struct pthread *__restrict me, int exitcod
 	 * this be done by `sys_set_tid_address(2)'. */
 	if (me->pt_pmask.lpm_pmask.pm_sigmask) {
 		COMPILER_BARRIER();
-		ATOMIC_WRITE(me->pt_pmask.lpm_pmask.pm_sigmask, (sigset_t *)&fullset);
+		atomic_write(&me->pt_pmask.lpm_pmask.pm_sigmask, (sigset_t *)&fullset);
 		COMPILER_BARRIER();
 		sys_set_tid_address(&me->pt_tid);
 	} else
@@ -613,7 +613,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_getresult_np)(pthread_t self,
                                                 void **thread_return)
 /*[[[body:libc_pthread_getresult_np]]]*/
 {
-	ATOMIC_INC(self->pt_refcnt); /* Consumed by `pthread_join(3)' */
+	atomic_inc(&self->pt_refcnt); /* Consumed by `pthread_join(3)' */
 	return pthread_join(self, thread_return);
 }
 /*[[[end:libc_pthread_getresult_np]]]*/
@@ -630,7 +630,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_tryjoin_np)(pthread_t self,
                                               void **thread_return)
 /*[[[body:libc_pthread_tryjoin_np]]]*/
 {
-	if (ATOMIC_READ(self->pt_tid) == 0) {
+	if (atomic_read(&self->pt_tid) == 0) {
 		if (thread_return)
 			*thread_return = self->pt_retval;
 		decref(self);
@@ -660,7 +660,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin_np)(pthread_t self,
 		pid_t tid;
 		syscall_slong_t result;
 		/* Check if the thread already terminated. */
-		tid = ATOMIC_READ(self->pt_tid);
+		tid = atomic_read(&self->pt_tid);
 		if (tid == 0)
 			break;
 		if unlikely(self == &current)
@@ -701,7 +701,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin64_np)(pthread_t self,
 		pid_t tid;
 		syscall_slong_t result;
 		/* Check if the thread already terminated. */
-		tid = ATOMIC_READ(self->pt_tid);
+		tid = atomic_read(&self->pt_tid);
 		if (tid == 0)
 			break;
 		if unlikely(self == &current)
@@ -741,7 +741,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t self)
 {
 	refcnt_t refcnt;
 	for (;;) {
-		refcnt = ATOMIC_READ(self->pt_refcnt);
+		refcnt = atomic_read(&self->pt_refcnt);
 		assert(refcnt >= 1);
 		if (refcnt == 1) {
 			/* Special handling requiring for when this is the last reference!
@@ -754,19 +754,19 @@ NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t self)
 			 * In  this case, we must wait for it to do so, since we mustn't destroy()
 			 * the pthread structure before then, else the kernel might possibly write
 			 * to free'd memory. */
-			if (ATOMIC_READ(self->pt_tid) != 0) {
+			if (atomic_read(&self->pt_tid) != 0) {
 				sys_sched_yield();
 				continue;
 			}
 
 			/* The TID field was already set to ZERO. -> Set the  reference
 			 * counter to zero and destroy() the pthread structure ourself. */
-			if (!ATOMIC_CMPXCH_WEAK(self->pt_refcnt, 1, 0))
+			if (!atomic_cmpxch_weak(&self->pt_refcnt, 1, 0))
 				continue;
 			destroy(self);
 			break;
 		}
-		if (ATOMIC_CMPXCH_WEAK(self->pt_refcnt, refcnt, refcnt - 1))
+		if (atomic_cmpxch_weak(&self->pt_refcnt, refcnt, refcnt - 1))
 			break;
 	}
 	return EOK;
@@ -1445,7 +1445,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getattr_np)(pthread_t self,
 				                     &get_stack_pointer_rpc, &pointer_to_main_stack) != 0)
 					goto done_stack;
 				COMPILER_BARRIER();
-				while (ATOMIC_READ(pointer_to_main_stack) == (void *)-1)
+				while (atomic_read(&pointer_to_main_stack) == (void *)-1)
 					sched_yield();
 			}
 			/* Use /proc/self/maps to figure out the mapping containing `pointer_to_main_stack' */
@@ -1475,8 +1475,8 @@ done_stack:
 	 * of `1', then  that means it  got detached. Note  the order of  checks
 	 * which ensures that a thread currently exiting isn't detected as being
 	 * detached! */
-	if (ATOMIC_READ(self->pt_refcnt) == 1 &&
-	    ATOMIC_READ(self->pt_tid) != 0)
+	if (atomic_read(&self->pt_refcnt) == 1 &&
+	    atomic_read(&self->pt_tid) != 0)
 		attr->pa_flags |= PTHREAD_ATTR_FLAG_DETACHSTATE;
 	attr->pa_cpuset = (cpu_set_t *)&attr->pa_cpusetsize;
 	error = pthread_getaffinity_np(self,
@@ -1540,7 +1540,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedparam)(pthread_t self,
 /*[[[body:libc_pthread_setschedparam]]]*/
 {
 	errno_t result;
-	pid_t tid = ATOMIC_READ(self->pt_tid);
+	pid_t tid = atomic_read(&self->pt_tid);
 	syscall_slong_t old_policy;
 	struct sched_param old_param;
 	if unlikely(tid == 0)
@@ -1554,7 +1554,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedparam)(pthread_t self,
 	result = sys_sched_setscheduler(tid, policy, param);
 	if unlikely(E_ISERR(result))
 		return -result;
-	if unlikely(ATOMIC_READ(self->pt_tid) == 0) {
+	if unlikely(atomic_read(&self->pt_tid) == 0) {
 		/* The thread has terminated in the mean time, and we've accidentally
 		 * modified  the  scheduler  parameters  of  some  unrelated  thread.
 		 * Try to undo the damage we've caused...
@@ -1581,7 +1581,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getschedparam)(pthread_t self,
 	pid_t tid;
 	errno_t result;
 	syscall_slong_t sys_policy;
-	tid = ATOMIC_READ(self->pt_tid);
+	tid = atomic_read(&self->pt_tid);
 	if unlikely(tid == 0)
 		return ESRCH; /* The given thread has already terminated. */
 	sys_policy = sys_sched_getscheduler(tid);
@@ -1591,7 +1591,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getschedparam)(pthread_t self,
 	result = sys_sched_getparam(tid, param);
 	if unlikely(E_ISERR(result))
 		return (errno_t)-result;
-	if unlikely(ATOMIC_READ(self->pt_tid) == 0) {
+	if unlikely(atomic_read(&self->pt_tid) == 0) {
 		/* The thread has terminated in the mean time.
 		 * Note: This is  a race  condition that  Glibc
 		 *       doesn't even check and simply ignores! */
@@ -1616,7 +1616,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedprio)(pthread_t self,
 	errno_t error;
 	syscall_slong_t old_prio;
 	pid_t tid;
-	tid = ATOMIC_READ(self->pt_tid);
+	tid = atomic_read(&self->pt_tid);
 	if unlikely(tid == 0)
 		return ESRCH;
 	old_prio = sys_getpriority(PRIO_PROCESS, tid);
@@ -1625,7 +1625,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedprio)(pthread_t self,
 	error = sys_setpriority(PRIO_PROCESS, tid, (syscall_ulong_t)(20 - prio));
 	if unlikely(E_ISERR(error))
 		return (errno_t)-error;
-	if unlikely(ATOMIC_READ(self->pt_tid) == 0) {
+	if unlikely(atomic_read(&self->pt_tid) == 0) {
 		/* The thread has terminated in the mean time.
 		 * Note: This is  a race  condition that  Glibc
 		 *       doesn't even check and simply ignores! */
@@ -1651,7 +1651,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getname_np)(pthread_t self,
 	fd_t commfd;
 	ssize_t result;
 	char pathname[lengthof("/proc/" PRIMAXu "/comm")];
-	tid = ATOMIC_READ(self->pt_tid);
+	tid = atomic_read(&self->pt_tid);
 	if unlikely(tid == 0)
 		return ESRCH;
 	sprintf(pathname, "/proc/%u/comm", tid);
@@ -1681,7 +1681,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t self,
 {
 	pid_t tid;
 	ssize_t result;
-	tid = ATOMIC_READ(self->pt_tid);
+	tid = atomic_read(&self->pt_tid);
 	if unlikely(tid == 0)
 		return ESRCH;
 #ifndef __OPTIMIZE_SIZE__
@@ -1762,7 +1762,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setaffinity_np)(pthread_t self,
 	errno_t error;
 	size_t old_cpusetsize;
 	cpu_set_t *old_cpuset = (cpu_set_t *)&old_cpusetsize;
-	pid_t tid = ATOMIC_READ(self->pt_tid);
+	pid_t tid = atomic_read(&self->pt_tid);
 	if (tid == 0)
 		return ESRCH;
 	error = sys_sched_getaffinity(tid, sizeof(old_cpusetsize), old_cpuset);
@@ -1803,7 +1803,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setaffinity_np)(pthread_t self,
 got_old_affinity:
 	error = sys_sched_setaffinity(tid, cpusetsize, cpuset);
 	if (E_ISOK(error)) {
-		if unlikely(ATOMIC_READ(self->pt_tid) == 0) {
+		if unlikely(atomic_read(&self->pt_tid) == 0) {
 			/* The thread has terminated in the mean time.
 			 * Note: This is  a race  condition that  Glibc
 			 *       doesn't even check and simply ignores! */
@@ -1830,12 +1830,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getaffinity_np)(pthread_t self,
 /*[[[body:libc_pthread_getaffinity_np]]]*/
 {
 	errno_t error;
-	pid_t tid = ATOMIC_READ(self->pt_tid);
+	pid_t tid = atomic_read(&self->pt_tid);
 	if unlikely(tid == 0)
 		return ESRCH;
 	error = sys_sched_getaffinity(tid, cpusetsize, cpuset);
 	if (E_ISOK(error)) {
-		if unlikely(ATOMIC_READ(self->pt_tid) == 0) {
+		if unlikely(atomic_read(&self->pt_tid) == 0) {
 			/* The thread has terminated in the mean time.
 			 * Note: This is  a race  condition that  Glibc
 			 *       doesn't even check and simply ignores! */
@@ -1899,7 +1899,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cancel)(pthread_t self)
 /*[[[body:libc_pthread_cancel]]]*/
 {
 	pid_t tid;
-	tid = ATOMIC_READ(self->pt_tid);
+	tid = atomic_read(&self->pt_tid);
 	if unlikely(tid == 0)
 		return ESRCH;
 	/* NOTE: Use `RPC_JOIN_ASYNC' for joining since `pthread_cancel(3)' isn't
@@ -1977,7 +1977,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rpc_exec)(pthread_t self,
 /*[[[body:libc_pthread_rpc_exec]]]*/
 {
 	pid_t tid;
-	tid = ATOMIC_READ(self->pt_tid);
+	tid = atomic_read(&self->pt_tid);
 	if unlikely(tid == 0)
 		return ESRCH;
 	/* Schedule  an RPC in the target thread that  will cause the thread to terminate itself.
@@ -2692,10 +2692,10 @@ NOTHROW_NCX(LIBCCALL mutex_trylock)(pthread_mutex_t *__restrict self,
 	assert((mytid & ~FUTEX_TID_MASK) == 0);
 	/* Try to acquire the lock. */
 again:
-	lock = ATOMIC_READ(self->m_lock);
+	lock = atomic_read(&self->m_lock);
 	if ((lock & FUTEX_TID_MASK) == 0) {
 		/* Lock not taken. - Try to take it now! */
-		if (!ATOMIC_CMPXCH_WEAK(self->m_lock,
+		if (!atomic_cmpxch_weak(&self->m_lock,
 		                        lock,
 		                        (lock & FUTEX_WAITERS) | mytid))
 			goto again;
@@ -2724,7 +2724,7 @@ again:
 	if (result == EBUSY) {
 		/* Set the `FUTEX_WAITERS' bit if it wasn't set already. */
 		if (!(*plock & FUTEX_WAITERS)) {
-			if (!ATOMIC_CMPXCH_WEAK(self->m_lock,
+			if (!atomic_cmpxch_weak(&self->m_lock,
 			                        *plock,
 			                        *plock | FUTEX_WAITERS))
 				goto again;
@@ -2933,7 +2933,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_unlock)(pthread_mutex_t *self)
 
 	case PTHREAD_MUTEX_ERRORCHECK: {
 		/* Verify that the caller owns this mutex. */
-		lock = ATOMIC_READ(self->m_lock);
+		lock = atomic_read(&self->m_lock);
 		if ((lock & FUTEX_TID_MASK) != (uint32_t)gettid())
 			return EPERM;
 	}	break;
@@ -2950,7 +2950,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_unlock)(pthread_mutex_t *self)
 		break;
 	}
 	/* Actually unlock the mutex. */
-	lock = ATOMIC_XCH(self->m_lock, 0);
+	lock = atomic_xch(&self->m_lock, 0);
 	/* If there were any waiting threads, wake one of them now. */
 	if (lock & FUTEX_WAITERS)
 		sys_futex((uint32_t *)&self->m_lock, FUTEX_WAKE, 1, NULL, NULL, 0);
@@ -3336,7 +3336,7 @@ again:
 		error = pthread_rwlock_addreading(self);
 		if (error == EOK) {
 			do {
-				word = ATOMIC_READ(self->rw_lock);
+				word = atomic_read(&self->rw_lock);
 				if (word >= (uint32_t)-2) {
 					if (word == (uint32_t)-2) {
 						error = EAGAIN; /* Too many read-locks */
@@ -3350,12 +3350,12 @@ again:
 					pthread_rwlock_delreading(self);
 					break;
 				}
-			} while (!ATOMIC_CMPXCH_WEAK(self->rw_lock, word, word + 1));
+			} while (!atomic_cmpxch_weak(&self->rw_lock, word, word + 1));
 		}
 		return error;
 	}
 	do {
-		word = ATOMIC_READ(self->rw_lock);
+		word = atomic_read(&self->rw_lock);
 		if (word >= (uint32_t)-2) {
 			if (word == (uint32_t)-2)
 				return EAGAIN; /* Too many read-locks */
@@ -3363,11 +3363,11 @@ again:
 				return EDEADLK; /* You're already holding a write-lock */
 			goto handle_EBUSY;  /* Someone else is holding a write-lock */
 		}
-	} while (!ATOMIC_CMPXCH_WEAK(self->rw_lock, word, word + 1));
+	} while (!atomic_cmpxch_weak(&self->rw_lock, word, word + 1));
 	return EOK;
 handle_EBUSY:
 	/* Indicate that we are waiting for a read-lock */
-	ATOMIC_WRITE(self->rw_readers_wakeup, 1);
+	atomic_write(&self->rw_readers_wakeup, 1);
 
 	/* Using lfutex expressions to wait on `rw_readers_wakeup', while `rw_lock == (uint32_t)-1' */
 	{
@@ -3394,7 +3394,7 @@ NOTHROW_RPC(LIBCCALL pthread_rwlock_acquirewrite)(pthread_rwlock_t *__restrict s
                                                   struct timespec64 const *timeout,
                                                   syscall_ulong_t timeout_flags) {
 again:
-	if (ATOMIC_CMPXCH(self->rw_lock, 0, (uint32_t)-1)) {
+	if (atomic_cmpxch(&self->rw_lock, 0, (uint32_t)-1)) {
 		/* Success */
 		self->rw_writer = gettid();
 		return EOK;
@@ -3413,7 +3413,7 @@ again:
 		return EDEADLK;
 
 	/* Indicate that we are waiting for a write-lock */
-	ATOMIC_WRITE(self->rw_writer_wakeup, 1);
+	atomic_write(&self->rw_writer_wakeup, 1);
 
 	/* Using lfutex expressions to wait on `rw_writer_wakeup', until `rw_lock == 0' */
 	{
@@ -3496,13 +3496,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_tryrdlock)(pthread_rwlock_t *self)
 {
 	uint32_t word;
 	do {
-		word = ATOMIC_READ(self->rw_lock);
+		word = atomic_read(&self->rw_lock);
 		if (word >= (uint32_t)-2) {
 			if (word == (uint32_t)-1)
 				return EBUSY;
 			return EAGAIN;
 		}
-	} while (!ATOMIC_CMPXCH_WEAK(self->rw_lock, word, word + 1));
+	} while (!atomic_cmpxch_weak(&self->rw_lock, word, word + 1));
 	return EOK;
 }
 /*[[[end:libc_pthread_rwlock_tryrdlock]]]*/
@@ -3581,7 +3581,7 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_trywrlock)(pthread_rwlock_t *self)
 /*[[[body:libc_pthread_rwlock_trywrlock]]]*/
 {
-	if (!ATOMIC_CMPXCH(self->rw_lock, 0, (uint32_t)-1)) {
+	if (!atomic_cmpxch(&self->rw_lock, 0, (uint32_t)-1)) {
 		/* Check for recursive write-locks */
 		if (self->rw_flags && self->rw_writer == gettid()) {
 			if unlikely(self->rw_nr_writers == (uint32_t)-1)
@@ -3753,7 +3753,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_unlock)(pthread_rwlock_t *self)
 	errno_t error;
 	uint32_t word;
 	if (self->rw_flags) {
-		word = ATOMIC_READ(self->rw_lock);
+		word = atomic_read(&self->rw_lock);
 		if (word == (uint32_t)-1) {
 			/* Release write-lock */
 			if (self->rw_writer != gettid())
@@ -3772,13 +3772,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_unlock)(pthread_rwlock_t *self)
 		for (;;) {
 			assertf(word != 0, "But `pthread_rwlock_delreading()' "
 			                   "said we were holding a read-lock...");
-			if (ATOMIC_CMPXCH_WEAK(self->rw_lock, word, word - 1))
+			if (atomic_cmpxch_weak(&self->rw_lock, word, word - 1))
 				break;
-			word = ATOMIC_READ(self->rw_lock);
+			word = atomic_read(&self->rw_lock);
 		}
 	} else {
 		for (;;) {
-			word = ATOMIC_READ(self->rw_lock);
+			word = atomic_read(&self->rw_lock);
 			if (word == (uint32_t)-1) {
 				/* Release write-lock */
 				if (self->rw_writer != gettid())
@@ -3786,10 +3786,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_unlock)(pthread_rwlock_t *self)
 do_release_write_lock:
 				self->rw_writer = 0;
 				COMPILER_WRITE_BARRIER();
-				ATOMIC_WRITE(self->rw_lock, 0);
+				atomic_write(&self->rw_lock, 0);
 				if (self->rw_readers_wakeup) {
 					/* Wake-up readers */
-					ATOMIC_WRITE(self->rw_readers_wakeup, 0);
+					atomic_write(&self->rw_readers_wakeup, 0);
 					sys_Xfutex(&self->rw_readers_wakeup,
 					           FUTEX_WAKE, (uint32_t)-1,
 					           NULL, NULL, 0);
@@ -3798,7 +3798,7 @@ do_release_write_lock:
 			}
 			if unlikely(word == 0)
 				return EPERM; /* There aren't locks of any kind */
-			if (ATOMIC_CMPXCH_WEAK(self->rw_lock, word, word - 1))
+			if (atomic_cmpxch_weak(&self->rw_lock, word, word - 1))
 				break;
 		}
 	}
@@ -3812,7 +3812,7 @@ do_release_write_lock:
 				/* No more writers (clear the "there-may-be-writers" flag
 				 * and  broadcast anyone that  may have started listening
 				 * in the meantime, so-as to ensure consistency) */
-				ATOMIC_WRITE(self->rw_writer_wakeup, 0);
+				atomic_write(&self->rw_writer_wakeup, 0);
 				sys_Xfutex(&self->rw_writer_wakeup,
 				           FUTEX_WAKE, (uint32_t)-1,
 				           NULL, NULL, 0);
@@ -3892,11 +3892,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cond_wake)(pthread_cond_t *__restrict self,
                                              uint32_t how_many) {
 	uint32_t ctl, newctl;
 again:
-	ctl = ATOMIC_READ(self->c_futex);
+	ctl = atomic_read(&self->c_futex);
 	newctl = ((ctl & ~FUTEX_WAITERS) + 1) & ~FUTEX_WAITERS;
 	if (how_many != (uint32_t)-1)
 		newctl |= ctl & FUTEX_WAITERS; /* There may still be more waiters afterwards. */
-	if (!ATOMIC_CMPXCH_WEAK(self->c_futex, ctl, newctl))
+	if (!atomic_cmpxch_weak(&self->c_futex, ctl, newctl))
 		goto again;
 	if (ctl & FUTEX_WAITERS) {
 		/* Wake up waiting threads. */
@@ -3970,13 +3970,13 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_wait)(pthread_cond_t *__restrict self,
 {
 	uint32_t lock;
 	/* Interlocked:begin */
-	lock = ATOMIC_READ(self->c_futex);
+	lock = atomic_read(&self->c_futex);
 	/* Interlocked:op */
 	libc_pthread_mutex_unlock(mutex);
 	if (!(lock & FUTEX_WAITERS)) {
 		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
 		 *       we've released `mutex',  else there'd be  a race  condition! */
-		ATOMIC_OR(self->c_futex, FUTEX_WAITERS);
+		atomic_or(&self->c_futex, FUTEX_WAITERS);
 		lock |= FUTEX_WAITERS;
 	}
 	/* Interlocked:wait */
@@ -4005,13 +4005,13 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait)(pthread_cond_t *__restrict sel
 	errno_t result;
 	uint32_t lock;
 	/* Interlocked:begin */
-	lock = ATOMIC_READ(self->c_futex);
+	lock = atomic_read(&self->c_futex);
 	/* Interlocked:op */
 	libc_pthread_mutex_unlock(mutex);
 	if (!(lock & FUTEX_WAITERS)) {
 		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
 		 *       we've released `mutex',  else there'd be  a race  condition! */
-		ATOMIC_OR(self->c_futex, FUTEX_WAITERS);
+		atomic_or(&self->c_futex, FUTEX_WAITERS);
 		lock |= FUTEX_WAITERS;
 	}
 	/* Interlocked:wait */
@@ -4047,13 +4047,13 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64)(pthread_cond_t *__restrict s
 	errno_t result;
 	uint32_t lock;
 	/* Interlocked:begin */
-	lock = ATOMIC_READ(self->c_futex);
+	lock = atomic_read(&self->c_futex);
 	/* Interlocked:op */
 	libc_pthread_mutex_unlock(mutex);
 	if (!(lock & FUTEX_WAITERS)) {
 		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
 		 *       we've released `mutex',  else there'd be  a race  condition! */
-		ATOMIC_OR(self->c_futex, FUTEX_WAITERS);
+		atomic_or(&self->c_futex, FUTEX_WAITERS);
 		lock |= FUTEX_WAITERS;
 	}
 	/* Interlocked:wait */
@@ -4084,13 +4084,13 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_reltimedwait_np)(pthread_cond_t *__restri
 	errno_t result;
 	uint32_t lock;
 	/* Interlocked:begin */
-	lock = ATOMIC_READ(self->c_futex);
+	lock = atomic_read(&self->c_futex);
 	/* Interlocked:op */
 	libc_pthread_mutex_unlock(mutex);
 	if (!(lock & FUTEX_WAITERS)) {
 		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
 		 *       we've released `mutex',  else there'd be  a race  condition! */
-		ATOMIC_OR(self->c_futex, FUTEX_WAITERS);
+		atomic_or(&self->c_futex, FUTEX_WAITERS);
 		lock |= FUTEX_WAITERS;
 	}
 	/* Interlocked:wait */
@@ -4124,13 +4124,13 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_reltimedwait64_np)(pthread_cond_t *__rest
 	errno_t result;
 	uint32_t lock;
 	/* Interlocked:begin */
-	lock = ATOMIC_READ(self->c_futex);
+	lock = atomic_read(&self->c_futex);
 	/* Interlocked:op */
 	libc_pthread_mutex_unlock(mutex);
 	if (!(lock & FUTEX_WAITERS)) {
 		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
 		 *       we've released `mutex',  else there'd be  a race  condition! */
-		ATOMIC_OR(self->c_futex, FUTEX_WAITERS);
+		atomic_or(&self->c_futex, FUTEX_WAITERS);
 		lock |= FUTEX_WAITERS;
 	}
 	/* Interlocked:wait */
@@ -4213,10 +4213,10 @@ again:
 	/* Get the ID of the current group. This must be done before we increase
 	 * the number of waiting threads below so that the round ID we read here
 	 * is interlocked with the number of waiting threads. */
-	myround = ATOMIC_READ(self->b_current_round);
+	myround = atomic_read(&self->b_current_round);
 
 	/* Increase the # of waiting threads */
-	num_waiting = ATOMIC_INCFETCH(self->b_in);
+	num_waiting = atomic_incfetch(&self->b_in);
 
 	/* Check if we're the last thread to arrive before a new round can start. */
 	if (num_waiting == self->b_count) {
@@ -4228,7 +4228,7 @@ again:
 		 * it  will appear to them as though  the next round was already fully
 		 * filled (even though that's not true). But that's OK since they will
 		 * just `sched_yield()' below until we set `b_in = 0' next. */
-		ATOMIC_INC(self->b_current_round);
+		atomic_inc(&self->b_current_round);
 
 		/* Step #2: Set the # of waiting threads within the next round to `0'
 		 *
@@ -4236,7 +4236,7 @@ again:
 		 * would be a point in time where the current (old) round would  appear
 		 * as though it had just started, which we can't have as it would allow
 		 * additional threads to start waiting in the context of the old round. */
-		ATOMIC_WRITE(self->b_in, 0);
+		atomic_write(&self->b_in, 0);
 
 		/* Step #3: Wake up all threads that are waiting for the barrier.
 		 *
@@ -4245,7 +4245,7 @@ again:
 		 * that has just passed. Technically, more threads may already be waiting
 		 * for the next round to finish, and  those get awoken here as well,  but
 		 * that doesn't matter since those threads will just start waiting again,
-		 * because   the   `ATOMIC_READ(self->b_current_round) == myround'  check
+		 * because  the  `atomic_read(&self->b_current_round) == myround'   check
 		 * below will indicate that their (new) round isn't over, yet. */
 #ifndef __OPTIMIZE_SIZE__
 		if (num_waiting > 0)
@@ -4265,10 +4265,10 @@ again:
 
 	/* XXX: There is a race condition that goes unhandled here:
 	 *
-	 * - thread #1: myround = ATOMIC_READ(self->b_current_round);
-	 * - thread #2: ATOMIC_INC(self->b_current_round);
-	 * - thread #2: ATOMIC_WRITE(self->b_in, 0);
-	 * - thread #1: num_waiting = ATOMIC_INCFETCH(self->b_in);
+	 * - thread #1: myround = atomic_read(&self->b_current_round);
+	 * - thread #2: atomic_inc(&self->b_current_round);
+	 * - thread #2: atomic_write(&self->b_in, 0);
+	 * - thread #1: num_waiting = atomic_incfetch(&self->b_in);
 	 *
 	 * In  this scenario, we are thread #1, and have just incremented
 	 * the `b_in' counter of the wrong `b_current_round', but we have
@@ -4279,15 +4279,15 @@ again:
 	 * to think that we're still waiting on it when in fact we aren't
 	 * doing so.
 	 *
-	 * Idea: combine `b_in' and `b_current_round' into a single counter,
-	 *       such that `NUM_WAITING_THREADS = b_in % b_count'. Then, use
-	 *       ATOMIC_CMPXCH to reset the counter if it becomes too large.
+	 * Idea: combine  `b_in' and `b_current_round' into a single counter,
+	 *       such that `NUM_WAITING_THREADS = b_in % b_count'. Then,  use
+	 *       atomic_cmpxch t&o reset the counter if it becomes too large.
 	 */
 
 	/* Wait until the current round is over. */
 	do {
 		sys_Xfutex(&self->b_current_round, FUTEX_WAIT, myround, NULL, NULL, 0);
-	} while (ATOMIC_READ(self->b_current_round) == myround);
+	} while (atomic_read(&self->b_current_round) == myround);
 	return 0;
 }
 /*[[[end:libc_pthread_barrier_wait]]]*/
@@ -4316,7 +4316,7 @@ typedef void (LIBCCALL *pthread_destr_function_t)(void *arg);
  * A NULL-entry indicates a slot that was previously allocated, but has become available. */
 PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") pthread_destr_function_t *tls_dtors = NULL;
 
-/* Max allocated TLS key, plus 1. This describes the length of `tls_dtors' */
+/* [lock(tls_lock)] Max allocated TLS key, plus 1. This describes the length of `tls_dtors' */
 PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") size_t tls_count = 0;
 
 /* Check that a  given TLS-key  has been  allocated; the  caller must  be
@@ -4426,7 +4426,7 @@ pthread_tls_segment_fini(void *UNUSED(arg), void *base,
 PRIVATE WUNUSED struct pthread_tls_segment *
 NOTHROW_NCX(LIBCCALL get_pthread_tls_segment)(void) {
 	void *result;
-	void *handle = ATOMIC_READ(tls_handle);
+	void *handle = atomic_read(&tls_handle);
 	if unlikely(!handle) {
 		void *real_handle;
 		/* Allocate on first access. */
@@ -4441,7 +4441,7 @@ NOTHROW_NCX(LIBCCALL get_pthread_tls_segment)(void) {
 			return NULL;
 
 		/* Remember the handle. */
-		real_handle = ATOMIC_CMPXCH_VAL(tls_handle, NULL, handle);
+		real_handle = atomic_cmpxch_val(&tls_handle, NULL, handle);
 		if unlikely(real_handle != NULL) {
 			dltlsfree(handle);
 			handle = real_handle;
@@ -4527,12 +4527,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_key_create)(pthread_key_t *key,
 		destr_function = &noop_dtor;
 again:
 	tls_write();
-	count = ATOMIC_READ(tls_count);
+	count = tls_count;
+
 	/* Check if we can re-use a previously freed slot. */
 	for (i = 0; i < count; ++i) {
 		if (tls_dtors[i] == NULL)
 			goto use_ith_slot; /* Re-use this slot! */
 	}
+
 	/* Check if we must increase the allocated size of the TLS-destructor-vector. */
 	avail = malloc_usable_size(tls_dtors) / sizeof(pthread_destr_function_t);
 	assert(i == count);
@@ -4557,8 +4559,9 @@ again:
 			return ENOMEM;
 
 		tls_write();
+
 		/* Make sure that the TLS count didn't change in the mean time. */
-		if (ATOMIC_READ(tls_count) != count) {
+		if (tls_count != count) {
 			tls_endwrite();
 			free(new_destructors);
 			goto again;

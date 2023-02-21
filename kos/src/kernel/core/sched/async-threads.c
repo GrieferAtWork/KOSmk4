@@ -29,12 +29,12 @@
 #include <sched/rpc-internal.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sequence/bsearch.h>
 
 #include <kos/except.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 
 DECL_BEGIN
@@ -103,7 +103,7 @@ NOTHROW(FCALL async_threads_kill)(struct task *__restrict thread) {
 		struct pending_rpc *rpc;
 		dat = incref(ctl->atc_threads[i]);
 		decref_unlikely(ctl);
-		rpc = ATOMIC_XCH(dat->atd_killrpc, NULL);
+		rpc = atomic_xch(&dat->atd_killrpc, NULL);
 		if (!rpc) {
 			/* Already killed... (or not allowed to kill) */
 			decref_unlikely(dat);

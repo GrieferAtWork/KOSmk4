@@ -50,7 +50,6 @@
 #include <sched/tsc.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/bit.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/byteswap.h>
@@ -67,6 +66,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <atomic.h>
 #include <ctype.h>
 #include <inttypes.h>
 #include <stdbool.h>
@@ -759,7 +759,7 @@ again:
 		mfile_tslock_release(self);
 
 		/* Check if loaded attributes are valid */
-		if unlikely(ATOMIC_READ(self->mf_flags) & MFILE_F_DELETED)
+		if unlikely(atomic_read(&self->mf_flags) & MFILE_F_DELETED)
 			return;
 
 		/* Update the contents of `ent->fad_dos' */
@@ -885,7 +885,7 @@ fatlnk_v_readlink(struct flnknode *__restrict self,
 	 *       The  later would be the case for freshly created symlinks, as
 	 *       opposed to ones that were already present on-disk. */
 #if 1
-	if (ATOMIC_READ(me->mf_parts) == NULL) {
+	if (atomic_read(&me->mf_parts) == NULL) {
 		if likely(mfile_getblocksize(me) >= FAT_SYMLINK_FILE_TEXTOFF) {
 			pos_t diskpos;
 			size_t disksiz;
@@ -1119,12 +1119,12 @@ dos_8dot3:
 			if (usedname[0] == '.') {
 				/* The kernel implements these itself, so we don't actually want to emit them! */
 				if (usedname_len == 1) {
-					ATOMIC_CMPXCH(me->fdn_1dot, (uint32_t)-1, (uint32_t)pos);
+					atomic_cmpxch(&me->fdn_1dot, (uint32_t)-1, (uint32_t)pos);
 					pos += sizeof(struct fat_dirent);
 					goto readnext; /* Directory-self-reference. */
 				}
 				if (usedname[1] == '.') {
-					ATOMIC_CMPXCH(me->fdn_2dot, (uint32_t)-1, (uint32_t)pos);
+					atomic_cmpxch(&me->fdn_2dot, (uint32_t)-1, (uint32_t)pos);
 					pos += sizeof(struct fat_dirent);
 					goto readnext; /* Directory-parent-reference. */
 				}
@@ -1664,7 +1664,7 @@ fatdir_v_writedir(struct flatdirnode *__restrict self,
 	incref(ent);                       /* For `file->fn_fsdata->fn_ent' */
 	ent->fad_ent.fde_ent.fd_ino = ino; /* Also fill in the directory entry's INode number */
 again_check_supent:
-	if (ATOMIC_READ(file->fn_supent.rb_rhs) != FSUPER_NODES_DELETED) {
+	if (atomic_read(&file->fn_supent.rb_rhs) != FSUPER_NODES_DELETED) {
 		struct fsuper *super = file->fn_super;
 		/* Because  we're changing the Inode, we must re-insert
 		 * the file into the superblock's INode tree. Otherwise
@@ -1700,7 +1700,7 @@ again_check_supent:
 	} else {
 		mfile_tslock_acquire(file);
 		/* Interlock another check for `fn_supent' with the TSLOCK */
-		if unlikely(ATOMIC_READ(file->fn_supent.rb_rhs) != FSUPER_NODES_DELETED) {
+		if unlikely(file->fn_supent.rb_rhs != FSUPER_NODES_DELETED) {
 			mfile_tslock_release_br(file);
 			goto again_check_supent;
 		}
@@ -1866,8 +1866,8 @@ fatdir_v_allocfile(struct flatdirnode *__restrict self,
 		mfile_writeall(fdir, hdr, sizeof(hdr), 0);
 
 		/* Remember offsets of "." and ".." */
-		ATOMIC_WRITE(fdir->fdn_1dot, 0 * sizeof(struct fat_dirent));
-		ATOMIC_WRITE(fdir->fdn_2dot, 1 * sizeof(struct fat_dirent));
+		atomic_write(&fdir->fdn_1dot, 0 * sizeof(struct fat_dirent));
+		atomic_write(&fdir->fdn_2dot, 1 * sizeof(struct fat_dirent));
 	}
 #ifdef CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS
 	else if (fnode_islnk(file)) {

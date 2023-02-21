@@ -27,7 +27,6 @@
 /**/
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/sched/atomic-once.h>
 #include <hybrid/sched/atomic-rwlock.h>
 #include <hybrid/unaligned.h>
@@ -39,6 +38,7 @@
 #include <sys/wait.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <ctype.h>
 #include <direct.h>
 #include <fcntl.h>
@@ -265,10 +265,10 @@ PRIVATE ATTR_SECTION(".text.crt.random") unsigned int
 NOTHROW(LIBCCALL libc_do_random)(unsigned int *pseed) {
 	unsigned int old_seed, new_seed;
 	do {
-		new_seed = old_seed = ATOMIC_READ(*pseed);
+		new_seed = old_seed = atomic_read(pseed);
 		new_seed = (((new_seed + 7) << 1) / 3);
 		new_seed ^= rand_map[(new_seed >> (new_seed & 7)) % lengthof(rand_map)];
-	} while (!ATOMIC_CMPXCH_WEAK(*pseed, old_seed, new_seed));
+	} while (!atomic_cmpxch_weak(pseed, old_seed, new_seed));
 	return old_seed;
 }
 
@@ -1754,9 +1754,10 @@ struct atexit_vector_struct atexit_vector = {
 INTERN ATTR_SECTION(".text.crt.application.exit")
 void LIBCCALL libc_run_atexit(int status) {
 	size_t length;
-	ATOMIC_WRITE(atexit_vector.av_stat, status);
+	atomic_write(&atexit_vector.av_stat, status);
 	atomic_rwlock_read(&atexit_vector.av_lock);
-	length = ATOMIC_XCH(atexit_vector.av_size, 0);
+	length = atexit_vector.av_size;
+	atexit_vector.av_size = 0;
 	while (length) {
 		struct atexit_callback *ent;
 		--length;
@@ -1871,9 +1872,10 @@ struct at_quick_exit_vector_struct at_quick_exit_vector = {
 INTERN ATTR_SECTION(".text.crt.application.exit")
 void LIBCCALL libc_run_at_quick_exit(int status) {
 	size_t length;
-	ATOMIC_WRITE(atexit_vector.av_stat, status);
+	atomic_write(&atexit_vector.av_stat, status);
 	atomic_rwlock_read(&atexit_vector.av_lock);
-	length = ATOMIC_XCH(at_quick_exit_vector.aqv_size, 0);
+	length = at_quick_exit_vector.aqv_size;
+	at_quick_exit_vector.aqv_size = 0;
 	while (length) {
 		struct at_quick_exit_callback *ent;
 		--length;
@@ -3169,7 +3171,7 @@ NOTHROW_NCX(LIBDCALL libd__invalid_parameter)(__WCHAR16_TYPE__ const *expr, __WC
                                               __WCHAR16_TYPE__ const *file, unsigned int line,
                                               uintptr_t zero) {
 	_invalid_parameter_handler handler;
-	handler = ATOMIC_READ(libd_invalid_parameter_handler);
+	handler = atomic_read(&libd_invalid_parameter_handler);
 	if (handler) {
 		(*handler)(expr, func, file, line, zero);
 	} else {
@@ -3209,7 +3211,7 @@ INTERN ATTR_SECTION(".text.crt.dos.errno") _invalid_parameter_handler
 NOTHROW_NCX(LIBCCALL libc__set_invalid_parameter_handler)(_invalid_parameter_handler handler)
 /*[[[body:libc__set_invalid_parameter_handler]]]*/
 {
-	return ATOMIC_XCH(libd_invalid_parameter_handler, handler);
+	return atomic_xch(&libd_invalid_parameter_handler, handler);
 }
 /*[[[end:libc__set_invalid_parameter_handler]]]*/
 
@@ -3218,7 +3220,7 @@ INTERN ATTR_SECTION(".text.crt.dos.errno") _invalid_parameter_handler
 NOTHROW_NCX(LIBCCALL libc__get_invalid_parameter_handler)(void)
 /*[[[body:libc__get_invalid_parameter_handler]]]*/
 {
-	return ATOMIC_READ(libd_invalid_parameter_handler);
+	return atomic_read(&libd_invalid_parameter_handler);
 }
 /*[[[end:libc__get_invalid_parameter_handler]]]*/
 

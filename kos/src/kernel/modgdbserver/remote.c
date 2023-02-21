@@ -29,9 +29,8 @@
 #include <sched/sig.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
-
 #include <assert.h>
+#include <atomic.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -68,7 +67,7 @@ PRIVATE WEAK BufferState GDBRemote_BufferState = { 0 };
 /* Check if there are any pending bytes in the remote communications pipe. */
 INTERN NOBLOCK WUNUSED bool
 NOTHROW(FCALL GDBRemote_HasPendingBytes)(void) {
-	return ATOMIC_READ(GDBRemote_BufferState.b_state.s_used) != 0;
+	return atomic_read(&GDBRemote_BufferState.b_state.s_used) != 0;
 }
 
 /* Post a given byte `b' to the remote data input queue.
@@ -80,7 +79,7 @@ NOTHROW(FCALL GDBRemote_PostByte)(byte_t b) {
 	BufferState state, newstate;
 	assert(!PREEMPTION_ENABLED());
 	for (;;) {
-		state.b_word = ATOMIC_READ(GDBRemote_BufferState.b_word);
+		state.b_word = atomic_read(&GDBRemote_BufferState.b_word);
 		if unlikely(state.b_state.s_used >= CONFIG_MODGDBSERVER_REMOTE_BUFSIZE) {
 			printk(KERN_WARNING "[gdb] Remote buffer is full (dropping %Q)", b);
 			return;
@@ -89,7 +88,7 @@ NOTHROW(FCALL GDBRemote_PostByte)(byte_t b) {
 		                     CONFIG_MODGDBSERVER_REMOTE_BUFSIZE] = b;
 		newstate = state;
 		++newstate.b_state.s_used;
-		if (ATOMIC_CMPXCH_WEAK(GDBRemote_BufferState.b_word,
+		if (atomic_cmpxch_weak(&GDBRemote_BufferState.b_word,
 		                       state.b_word, newstate.b_word))
 			break;
 	}
@@ -161,7 +160,7 @@ INTERN NOBLOCK int NOTHROW(FCALL GDBRemote_TryGetByte)(void) {
 	byte_t result;
 	BufferState state, newstate;
 	for (;;) {
-		state.b_word = ATOMIC_READ(GDBRemote_BufferState.b_word);
+		state.b_word = atomic_read(&GDBRemote_BufferState.b_word);
 		if (state.b_state.s_used == 0)
 			return -1;
 		assert(state.b_state.s_start < CONFIG_MODGDBSERVER_REMOTE_BUFSIZE);
@@ -172,7 +171,7 @@ INTERN NOBLOCK int NOTHROW(FCALL GDBRemote_TryGetByte)(void) {
 		++newstate.b_state.s_start;
 		--newstate.b_state.s_used;
 		newstate.b_state.s_start %= CONFIG_MODGDBSERVER_REMOTE_BUFSIZE;
-		if (ATOMIC_CMPXCH_WEAK(GDBRemote_BufferState.b_word,
+		if (atomic_cmpxch_weak(&GDBRemote_BufferState.b_word,
 		                       state.b_word, newstate.b_word))
 			break;
 	}

@@ -46,10 +46,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/slab.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -188,7 +188,7 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 	part->mp_xflags = MPART_XF_NORMAL;
 	part->mp_state  = MPART_ST_MEM;
 	part->mp_file   = &mfile_ndef;
-	ATOMIC_INC(mfile_ndef.mf_refcnt);
+	atomic_inc(&mfile_ndef.mf_refcnt);
 	part->mp_copy.lh_first     = NULL;
 	part->mp_share.lh_first    = node;
 	part->mp_lockops.slh_first = NULL;
@@ -288,7 +288,7 @@ NOTHROW(KCALL phcore_unused_alloc_nx)(size_t num_bytes, gfp_t flags,
 	/* Temporarily steal the chain.
 	 * NOTE: This must be thread-safe, but not necessarily thread-efficient,  so
 	 *       it's OK if one thread can cause this to fail for all other threads! */
-	chain = ATOMIC_XCH(ph_unused_blocks, NULL);
+	chain = atomic_xch(&ph_unused_blocks, NULL);
 	for (piter = &chain; (iter = *piter) != NULL; piter = &iter->pu_next) {
 		if (iter->pu_size >= num_bytes) {
 			size_t used_size;
@@ -318,9 +318,9 @@ NOTHROW(KCALL phcore_unused_alloc_nx)(size_t num_bytes, gfp_t flags,
 		/* Restore the chain for further use.
 		 * NOTE: `piter' points to the next-field of the last chain entry. */
 		do {
-			iter = ATOMIC_READ(ph_unused_blocks);
-			ATOMIC_WRITE(*piter, iter);
-		} while (!ATOMIC_CMPXCH(ph_unused_blocks,
+			iter = atomic_read(&ph_unused_blocks);
+			atomic_write(piter, iter);
+		} while (!atomic_cmpxch(&ph_unused_blocks,
 		                        iter, chain));
 	}
 	/* Deal with calloc()-like allocations. */
@@ -337,9 +337,9 @@ NOTHROW(KCALL phcore_unused_append)(void *ptr, size_t num_bytes) {
 	ent = (struct ph_unused *)ptr;
 	ent->pu_size = num_bytes;
 	do {
-		next = ATOMIC_READ(ph_unused_blocks);
-		ATOMIC_WRITE(ent->pu_next, next);
-	} while (!ATOMIC_CMPXCH(ph_unused_blocks,
+		next = atomic_read(&ph_unused_blocks);
+		atomic_write(&ent->pu_next, next);
+	} while (!atomic_cmpxch(&ph_unused_blocks,
 	                        next, ent));
 }
 

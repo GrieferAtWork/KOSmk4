@@ -26,7 +26,6 @@
 
 #include "api.h"
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/atomic-rwlock.h>
 
 #include <kos/futex.h>
@@ -38,6 +37,7 @@
 #include <sys/poll.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <malloca.h>
@@ -57,7 +57,7 @@ DECL_BEGIN
 INTERN WINBOOL WINAPI
 libk32_TryEnterCriticalSection(LPCRITICAL_SECTION lpCriticalSection) {
 	TRACE("TryEnterCriticalSection(%p)", lpCriticalSection);
-	if (ATOMIC_CMPXCH(lpCriticalSection->LockSemaphore, 0, 1)) {
+	if (atomic_cmpxch(&lpCriticalSection->LockSemaphore, 0, 1)) {
 		/* Initial lock. */
 		lpCriticalSection->OwningThread = pthread_self();
 		return TRUE;
@@ -65,7 +65,7 @@ libk32_TryEnterCriticalSection(LPCRITICAL_SECTION lpCriticalSection) {
 
 	/* Check for lock recursion. */
 	if (lpCriticalSection->OwningThread == pthread_self()) {
-		ATOMIC_INC(lpCriticalSection->LockSemaphore);
+		atomic_inc(&lpCriticalSection->LockSemaphore);
 		return TRUE;
 	}
 
@@ -80,7 +80,7 @@ libk32_EnterCriticalSection(LPCRITICAL_SECTION lpCriticalSection) {
 again:
 	if (libk32_TryEnterCriticalSection(lpCriticalSection))
 		return;
-	for (spin = ATOMIC_READ(lpCriticalSection->SpinCount); spin; --spin) {
+	for (spin = atomic_read(&lpCriticalSection->SpinCount); spin; --spin) {
 		pthread_yield();
 		if (libk32_TryEnterCriticalSection(lpCriticalSection))
 			return;
@@ -100,10 +100,10 @@ libk32_LeaveCriticalSection(LPCRITICAL_SECTION lpCriticalSection) {
 	if (lpCriticalSection->LockSemaphore == 1) {
 		/* Last lock went away. */
 		lpCriticalSection->OwningThread = 0;
-		ATOMIC_WRITE(lpCriticalSection->LockSemaphore, 0);
+		atomic_write(&lpCriticalSection->LockSemaphore, 0);
 		futex_wake(&lpCriticalSection->LockSemaphore, 1);
 	} else {
-		ATOMIC_DEC(lpCriticalSection->LockSemaphore);
+		atomic_dec(&lpCriticalSection->LockSemaphore);
 	}
 }
 
@@ -117,7 +117,7 @@ INTERN DWORD WINAPI
 libk32_SetCriticalSectionSpinCount(LPCRITICAL_SECTION lpCriticalSection,
                                    DWORD dwSpinCount) {
 	TRACE("SetCriticalSectionSpinCount(%p, %#x)", lpCriticalSection, dwSpinCount);
-	return ATOMIC_XCH(lpCriticalSection->SpinCount, dwSpinCount);
+	return atomic_xch(&lpCriticalSection->SpinCount, dwSpinCount);
 }
 
 INTERN WINBOOL WINAPI

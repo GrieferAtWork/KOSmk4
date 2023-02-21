@@ -104,11 +104,14 @@ __CSDECLARE(,int,obstack_exit_failure)
 
 %(auto_source){
 #ifndef __KERNEL__
-#include <hybrid/atomic.h>
 #include <hybrid/typecore.h>
+
 #include <kos/exec/idata.h>
+
+#include <atomic.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <libintl.h>
 
 #include "../libc/globals.h"
@@ -148,7 +151,7 @@ void libc_obstack_alloc_failed_default(void) {
 INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.heap.obstack") void *
 NOTHROW(LIBCCALL libc_obstack_alloc_failed_handler_resolve)(void) {
 	if (libc_obstack_alloc_failed_handler == NULL)
-		ATOMIC_CMPXCH(libc_obstack_alloc_failed_handler, NULL, &libc_obstack_alloc_failed_default);
+		atomic_cmpxch(&libc_obstack_alloc_failed_handler, NULL, &libc_obstack_alloc_failed_default);
 	return (void *)&libc_obstack_alloc_failed_handler;
 }
 

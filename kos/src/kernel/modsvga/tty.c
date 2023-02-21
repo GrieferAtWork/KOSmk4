@@ -34,7 +34,6 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 

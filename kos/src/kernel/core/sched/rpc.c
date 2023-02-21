@@ -34,13 +34,12 @@
 #include <sched/sigmask.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <signal.h>
 #include <stdalign.h>
@@ -86,9 +85,9 @@ PUBLIC ATTR_PERTASK ATTR_ALIGN(struct sig) this_rpcs_sig = SIG_INIT;
  *
  * To send one of these signals to a thread, do:
  * >> assert(signo >= 1 && signo <= 31);
- * >> ATOMIC_OR(FORTASK(thread, this_rpcs_sigpend), (uint32_t)1 << signo);
+ * >> atomic_or(&FORTASK(thread, this_rpcs_sigpend), (uint32_t)1 << signo);
  * >> sig_broadcast(&FORTASK(thread, this_rpcs_sig));
- * >> ATOMIC_OR(thread->t_flags, TASK_FRPC);
+ * >> atomic_or(&thread->t_flags, TASK_FRPC);
  * >> userexcept_sysret_inject_safe(thread, flags); */
 PUBLIC ATTR_PERTASK ATTR_ALIGN(uint32_t) this_rpcs_sigpend = 0;
 
@@ -152,7 +151,7 @@ task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
 
 	rpc = pending_rpc_alloc_kern_nx(GFP_NORMAL);
 	if unlikely(!rpc) {
-		if (ATOMIC_READ(FORTASK(thread, this_rpcs.slh_first)) == THIS_RPCS_TERMINATED)
+		if (atomic_read(&FORTASK(thread, this_rpcs.slh_first)) == THIS_RPCS_TERMINATED)
 			return false; /* Thread has already terminated */
 		rpc = pending_rpc_alloc_kern(GFP_NORMAL);
 	}
@@ -165,7 +164,7 @@ task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
 	/* Insert into `thread's pending RPC list. */
 	list = &FORTASK(thread, this_rpcs);
 	do {
-		head = ATOMIC_READ(list->slh_first);
+		head = atomic_read(&list->slh_first);
 		if unlikely(head == THIS_RPCS_TERMINATED) {
 			/* Already terminated */
 			pending_rpc_free(rpc);
@@ -173,11 +172,11 @@ task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
 		}
 		rpc->pr_link.sle_next = head;
 		COMPILER_WRITE_BARRIER();
-	} while (!ATOMIC_CMPXCH_WEAK(list->slh_first, head, rpc));
+	} while (!atomic_cmpxch_weak(&list->slh_first, head, rpc));
 	sig_broadcast(&FORTASK(thread, this_rpcs_sig));
 
 	/* Set the thread's `TASK_FRPC' flag to indicate that it's got work to do */
-	ATOMIC_OR(thread->t_flags, TASK_FRPC);
+	atomic_or(&thread->t_flags, TASK_FRPC);
 
 	/* Deal  with the case where `thread' is currently running in user-space,
 	 * which requires us to temporarily move its execution into kernel-space,
@@ -301,7 +300,7 @@ again_test_signo:
 	/* NOTE: This `sigmask_ismasked()' is the only thing in here that might throw! */
 	sigaddset(sigmask_ismasked(signo) ? &known_masked : &known_unmasked, signo);
 	procctl_sig_read(proc);
-	if likely(ATOMIC_READ(proc->pc_sig_list.slh_first) != THIS_RPCS_TERMINATED) {
+	if likely(atomic_read(&proc->pc_sig_list.slh_first) != THIS_RPCS_TERMINATED) {
 		struct pending_rpc *rpc;
 		SLIST_FOREACH (rpc, &proc->pc_sig_list, pr_link) {
 			int status;
@@ -379,7 +378,7 @@ are_any_unmasked_process_rpcs_pending(void)
 {
 	struct procctl *proc = task_getprocctl();
 	procctl_sig_read(proc);
-	if likely(ATOMIC_READ(proc->pc_sig_list.slh_first) != THIS_RPCS_TERMINATED) {
+	if likely(atomic_read(&proc->pc_sig_list.slh_first) != THIS_RPCS_TERMINATED) {
 		struct pending_rpc *rpc;
 		SLIST_FOREACH (rpc, &proc->pc_sig_list, pr_link) {
 			int status;
@@ -433,7 +432,7 @@ are_any_unmasked_process_rpcs_pending_with_sigmask(sigset_t const *__restrict si
 		THROWS(E_WOULDBLOCK) {
 	struct procctl *proc = task_getprocctl();
 	procctl_sig_read(proc);
-	if (ATOMIC_READ(proc->pc_sig_list.slh_first) != THIS_RPCS_TERMINATED) {
+	if (atomic_read(&proc->pc_sig_list.slh_first) != THIS_RPCS_TERMINATED) {
 		struct pending_rpc *rpc;
 		SLIST_FOREACH (rpc, &proc->pc_sig_list, pr_link) {
 			if (sigismember(sigmask, _RPC_GETSIGNO(rpc->pr_flags)))
@@ -470,12 +469,12 @@ PRIVATE WUNUSED bool
 NOTHROW(FCALL are_any_unmasked_process_rpcs_maybe_pending_nx)(void) {
 	struct procctl *proc = task_getprocctl();
 	if (!procctl_sig_tryread(proc)) {
-		if (ATOMIC_READ(proc->pc_sig_list.slh_first) == NULL &&
-		    ATOMIC_READ(proc->pc_sig_pend) == 0)
+		if (atomic_read(&proc->pc_sig_list.slh_first) == NULL &&
+		    atomic_read(&proc->pc_sig_pend) == 0)
 			return false;
 		return true; /* Must assume that at least one of them would be unmasked in our thread. */
 	}
-	if likely(ATOMIC_READ(proc->pc_sig_list.slh_first) != THIS_RPCS_TERMINATED) {
+	if likely(atomic_read(&proc->pc_sig_list.slh_first) != THIS_RPCS_TERMINATED) {
 		struct pending_rpc *rpc;
 		SLIST_FOREACH (rpc, &proc->pc_sig_list, pr_link) {
 			int status;
@@ -546,14 +545,14 @@ NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
 	/* Insert into `thread's pending RPC list. */
 	list = &FORTASK(thread, this_rpcs);
 	do {
-		head = ATOMIC_READ(list->slh_first);
+		head = atomic_read(&list->slh_first);
 		if unlikely(head == THIS_RPCS_TERMINATED) {
 			DBG_memset(&rpc->pr_link, 0xcc, sizeof(rpc->pr_link));
 			return false; /* Already terminated */
 		}
 		rpc->pr_link.sle_next = head;
 		COMPILER_BARRIER();
-	} while (!ATOMIC_CMPXCH_WEAK(list->slh_first, head, rpc));
+	} while (!atomic_cmpxch_weak(&list->slh_first, head, rpc));
 	sig_broadcast(&FORTASK(thread, this_rpcs_sig));
 
 	if (rpc_flags & RPC_CONTEXT_KERN) {
@@ -563,7 +562,7 @@ NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
 		        "for execution within a TASK_FKERNTHREAD thread");
 
 		/* Set the thread's `TASK_FRPC' flag to indicate that it's got work to do */
-		ATOMIC_OR(thread->t_flags, TASK_FRPC);
+		atomic_or(&thread->t_flags, TASK_FRPC);
 
 		/* Deal  with the case where `thread' is currently running in user-space,
 		 * which requires us to temporarily move its execution into kernel-space,
@@ -604,7 +603,7 @@ NOTHROW(FCALL task_sig_schedule)(struct task *__restrict thread, signo_t signo) 
 	        "Cannot schedule a non-RPC_CONTEXT_KERN RPC "
 	        "for execution within a TASK_FKERNTHREAD thread");
 	assertf(signo >= 1 && signo <= 31, "Invalid signo %d", signo);
-	word = ATOMIC_FETCHOR(FORTASK(thread, this_rpcs_sigpend), (uint32_t)1 << signo);
+	word = atomic_fetchor(&FORTASK(thread, this_rpcs_sigpend), (uint32_t)1 << signo);
 	if unlikely(word & 1)
 		return false; /* Already terminated */
 	sig_broadcast(&FORTASK(thread, this_rpcs_sig));
@@ -635,14 +634,14 @@ NOTHROW(FCALL proc_rpc_schedule)(struct taskpid *__restrict proc,
 
 	/* Insert into the process's pending RPC list. */
 	do {
-		head = ATOMIC_READ(ctl->pc_sig_list.slh_first);
+		head = atomic_read(&ctl->pc_sig_list.slh_first);
 		if unlikely(head == THIS_RPCS_TERMINATED) {
 			DBG_memset(&rpc->pr_link, 0xcc, sizeof(rpc->pr_link));
 			return false; /* Already terminated */
 		}
 		rpc->pr_link.sle_next = head;
 		COMPILER_BARRIER();
-	} while (!ATOMIC_CMPXCH_WEAK(ctl->pc_sig_list.slh_first, head, rpc));
+	} while (!atomic_cmpxch_weak(&ctl->pc_sig_list.slh_first, head, rpc));
 	sig_broadcast(&ctl->pc_sig_more);
 
 	/* Wake-up threads within the process. */
@@ -666,7 +665,7 @@ NOTHROW(FCALL proc_sig_schedule)(struct taskpid *__restrict proc, signo_t signo)
 	uint32_t word;
 	struct procctl *ctl = proc->tp_pctl;
 	assertf(signo >= 1 && signo <= 31, "Invalid signo %d", signo);
-	word = ATOMIC_FETCHOR(ctl->pc_sig_pend, (uint32_t)1 << signo);
+	word = atomic_fetchor(&ctl->pc_sig_pend, (uint32_t)1 << signo);
 	if unlikely(word & 1)
 		return false; /* Already terminated */
 	sig_broadcast(&ctl->pc_sig_more);
@@ -710,10 +709,10 @@ proc_rpc_pending_sigset(/*in|out*/ sigset_t *__restrict result)
 	struct pending_rpc *first;
 	uint32_t pending_bitset;
 	procctl_sig_read(proc);
-	first = ATOMIC_READ(proc->pc_sig_list.slh_first);
+	first = atomic_read(&proc->pc_sig_list.slh_first);
 	if (first != THIS_RPCS_TERMINATED)
 		pending_signals_from_rpc_list(result, first);
-	pending_bitset = ATOMIC_READ(proc->pc_sig_pend);
+	pending_bitset = atomic_read(&proc->pc_sig_pend);
 	if (!(pending_bitset & 1))
 		result->__val[0] |= pending_bitset >> 1;
 	procctl_sig_endread(proc);
@@ -755,11 +754,11 @@ proc_rpc_pending_oneof(sigset_t const *__restrict these)
 	struct pending_rpc *first;
 	bool result = false;
 	procctl_sig_read(proc);
-	first = ATOMIC_READ(proc->pc_sig_list.slh_first);
+	first = atomic_read(&proc->pc_sig_list.slh_first);
 	if (first != THIS_RPCS_TERMINATED)
 		result = is_one_of_these_pending(these, first);
 	if (!result) {
-		uint32_t pending_bitset = ATOMIC_READ(proc->pc_sig_pend);
+		uint32_t pending_bitset = atomic_read(&proc->pc_sig_pend);
 		if (!(pending_bitset & 1))
 			result = ((pending_bitset >> 1) & (uint32_t)these->__val[0]) != 0;
 	}
@@ -775,7 +774,7 @@ NOTHROW(FCALL proc_rpc_trypending_oneof)(sigset_t const *__restrict these) {
 	int result = PROC_RPC_TRYPENDING_ONEOF_NO;
 	if (!procctl_sig_tryread(proc))
 		return PROC_RPC_TRYPENDING_ONEOF_WOULDBLOCK;
-	first = ATOMIC_READ(proc->pc_sig_list.slh_first);
+	first = atomic_read(&proc->pc_sig_list.slh_first);
 	if (first != THIS_RPCS_TERMINATED) {
 		static_assert(PROC_RPC_TRYPENDING_ONEOF_NO == (int)false);
 		static_assert(PROC_RPC_TRYPENDING_ONEOF_YES == (int)true);
@@ -784,7 +783,7 @@ NOTHROW(FCALL proc_rpc_trypending_oneof)(sigset_t const *__restrict these) {
 	if (result == PROC_RPC_TRYPENDING_ONEOF_NO) {
 		static_assert(PROC_RPC_TRYPENDING_ONEOF_NO == (int)false);
 		static_assert(PROC_RPC_TRYPENDING_ONEOF_YES == (int)true);
-		uint32_t pending_bitset = ATOMIC_READ(proc->pc_sig_pend);
+		uint32_t pending_bitset = atomic_read(&proc->pc_sig_pend);
 		if (!(pending_bitset & 1))
 			result = (int)(((pending_bitset >> 1) & (uint32_t)these->__val[0]) != 0);
 	}
@@ -818,7 +817,7 @@ again:
 #endif /* !__OPTIMIZE_SIZE__ */
 			{
 				/* Need atomics for the first list entry. */
-				if (!ATOMIC_CMPXCH(*p_rpc, rpc, rpc->pr_link.sle_next))
+				if (!atomic_cmpxch(p_rpc, rpc, rpc->pr_link.sle_next))
 					goto again;
 			}
 			return rpc;
@@ -843,7 +842,7 @@ proc_rpc_pending_steal_posix_signal(sigset_t const *__restrict these)
 		THROWS(E_WOULDBLOCK) {
 	struct pending_rpc *result;
 	struct procctl *proc = task_getprocctl();
-	result = ATOMIC_READ(proc->pc_sig_list.slh_first);
+	result = atomic_read(&proc->pc_sig_list.slh_first);
 	if (result == NULL || result == THIS_RPCS_TERMINATED)
 		return NULL;
 	/* XXX: Implement via read-lock + upgrade */
@@ -862,7 +861,7 @@ PUBLIC NOBLOCK WUNUSED NONNULL((1)) /*inherit*/ struct pending_rpc *
 NOTHROW(FCALL proc_rpc_pending_trysteal_posix_signal)(sigset_t const *__restrict these) {
 	struct pending_rpc *result;
 	struct procctl *proc = task_getprocctl();
-	result = ATOMIC_READ(proc->pc_sig_list.slh_first);
+	result = atomic_read(&proc->pc_sig_list.slh_first);
 	if (result == NULL || result == THIS_RPCS_TERMINATED)
 		return NULL;
 	/* XXX: Implement via read-lock + update */

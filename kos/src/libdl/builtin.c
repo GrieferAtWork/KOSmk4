@@ -37,6 +37,7 @@
 #include <kos/syscalls.h>
 #include <sys/mman.h>
 
+#include <atomic.h>
 #include <errno.h>
 #include <format-printer.h>
 #include <inttypes.h>
@@ -155,7 +156,8 @@ INTERN ATTR_COLD ATTR_NORETURN void
  * simple  `File or directory not found' message, but rather something along
  * the  lines  of  `Symbol "foo" could not be found in library "libfoo.so"'.
  * The implementation of this function looks like:
- * >> return ATOMIC_XCH(error_message_pointer, NULL);
+ * >> return atomic_xch(&error_message_pointer, NULL);
+ *
  * Where internally, libdl will set `error_message_pointer' to a non-NULL pointer
  * when an error happens.
  * @return: * :   A pointer  to a  volatile (as  in: the  same memory  area may  be
@@ -165,7 +167,7 @@ INTERN ATTR_COLD ATTR_NORETURN void
  *                exported from libdl.
  * @return: NULL: No error happened, or the last error has already been consumed. */
 INTERN char *NOTHROW(DLFCN_CC libdl_dlerror)(void) {
-	return ATOMIC_XCH(dl_globals.dg_errmsg, NULL);
+	return atomic_xch(&dl_globals.dg_errmsg, NULL);
 }
 
 
@@ -268,7 +270,7 @@ NOTHROW_NCX(CC dl_seterr_section_index_mmap_failed)(USER DlModule const *self,
 PRIVATE char const message_nomem[] = "Insufficient memory";
 INTERN ATTR_COLD int NOTHROW(CC dl_seterror_nomem)(void) {
 	memcpy(dl_globals.dg_errbuf, message_nomem, sizeof(message_nomem));
-	ATOMIC_WRITE(dl_globals.dg_errmsg, (char *)dl_globals.dg_errbuf);
+	atomic_write(&dl_globals.dg_errmsg, (char *)dl_globals.dg_errbuf);
 	return -1;
 }
 
@@ -287,7 +289,7 @@ INTERN ATTR_COLD NONNULL((1)) int
 NOTHROW_NCX(CC dl_vseterrorf)(char const *__restrict format, va_list args)
 		THROWS(E_SEGFAULT) {
 	vsnprintf(dl_globals.dg_errbuf, sizeof(dl_globals.dg_errbuf), format, args);
-	ATOMIC_WRITE(dl_globals.dg_errmsg, (char *)dl_globals.dg_errbuf);
+	atomic_write(&dl_globals.dg_errmsg, (char *)dl_globals.dg_errbuf);
 	return -1;
 }
 
@@ -302,11 +304,11 @@ INTERN NONNULL((1)) void
 NOTHROW(CC DlModule_UpdateFlags)(DlModule *__restrict self, int mode) {
 	uintptr_t old_flags;
 again_old_flags:
-	old_flags = ATOMIC_READ(self->dm_flags);
+	old_flags = atomic_read(&self->dm_flags);
 	if ((mode & RTLD_GLOBAL) && !(old_flags & RTLD_GLOBAL)) {
 		/* Make the module global. */
 		dlglobals_global_write(&dl_globals);
-		if (!ATOMIC_CMPXCH_WEAK(self->dm_flags, old_flags,
+		if (!atomic_cmpxch_weak(&self->dm_flags, old_flags,
 		                        old_flags | RTLD_GLOBAL)) {
 			dlglobals_global_endwrite(&dl_globals);
 			goto again_old_flags;
@@ -363,7 +365,7 @@ again:
 		if (strchr(filename, '/')) {
 			result = DlModule_FindFromFilename(filename);
 		} else {
-			ATOMIC_WRITE(dl_globals.dg_errmsg, NULL);
+			atomic_write(&dl_globals.dg_errmsg, NULL);
 			result = DlModule_FindFilenameInPathListFromAll(filename);
 		}
 		if likely(result)
@@ -374,18 +376,18 @@ again:
 			result = DlModule_OpenFilename(filename, mode);
 		} else {
 			/* Load a module using the LD-library path List */
-			ATOMIC_WRITE(dl_globals.dg_errmsg, NULL);
+			atomic_write(&dl_globals.dg_errmsg, NULL);
 			result = DlModule_OpenFilenameInPathList(dl_globals.dg_libpath,
 			                                         filename, mode, NULL);
 		}
 	}
 	if unlikely(!result) {
-		if (!ATOMIC_READ(dl_globals.dg_errmsg))
+		if (!atomic_read(&dl_globals.dg_errmsg))
 			dl_seterror_dlopen_failed(filename);
 	} else {
 		while unlikely(result->dm_flags & RTLD_LOADING) {
 			/* The library is still being initialized by another thread. */
-			if (ATOMIC_READ(result->dm_refcnt) <= 1) {
+			if (atomic_read(&result->dm_refcnt) <= 1) {
 				/* The module is supposed to go away! (try to load it again) */
 				if (!(result->dm_flags & RTLD_NODELETE))
 					decref(result);
@@ -2033,7 +2035,7 @@ again_read_section:
 				}
 				goto err;
 			}
-			if unlikely(!ATOMIC_CMPXCH(result->ds_data, (void *)-1, base))
+			if unlikely(!atomic_cmpxch(&result->ds_data, (void *)-1, base))
 				sys_munmap(base, info.dsi_size);
 		}
 	} else {
@@ -2165,7 +2167,7 @@ again_read_elf_section:
 				}
 				goto err;
 			}
-			if unlikely(!ATOMIC_CMPXCH(result->ds_data, (void *)-1, base))
+			if unlikely(!atomic_cmpxch(&result->ds_data, (void *)-1, base))
 				sys_munmap(base, sect->sh_size);
 		}
 	}
@@ -2196,11 +2198,11 @@ NOTHROW_NCX(DLFCN_CC libdl_dlunlocksection)(USER REF DlSection *sect)
 	{
 		refcnt_t refcnt;
 		do {
-			refcnt = ATOMIC_READ(sect->ds_refcnt);
+			refcnt = atomic_read(&sect->ds_refcnt);
 			assert(refcnt != 0);
 			if (refcnt == 1)
 				goto set_dangling_section;
-		} while (!ATOMIC_CMPXCH_WEAK(sect->ds_refcnt, refcnt, refcnt - 1));
+		} while (!atomic_cmpxch_weak(&sect->ds_refcnt, refcnt, refcnt - 1));
 		return 0;
 	}
 	{
@@ -2290,7 +2292,7 @@ err_mod_unloaded:
 			}
 		}
 	}
-	if unlikely(ATOMIC_DECFETCH(mod->dm_refcnt) == 0) {
+	if unlikely(atomic_decfetch(&mod->dm_refcnt) == 0) {
 		destroy(mod);
 		goto err_mod_unloaded;
 	}
@@ -2334,7 +2336,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dlsectionmodule)(USER DlSection *sect, unsigned int f
 	mod = sect->ds_module;
 	if (!mod || ((flags & DLGETHANDLE_FINCREF)
 	             ? !tryincref(mod)
-	             : !ATOMIC_READ(mod->dm_refcnt))) {
+	             : !atomic_read(&mod->dm_refcnt))) {
 		DlSection_ModuleEndRead(sect);
 		dl_seterrorf("Module associated with section was unloaded");
 		goto err;
@@ -2419,7 +2421,7 @@ NOTHROW_NCX(CC inflate_compressed_section)(USER DlSection *sect,
 	if unlikely(chdr->ch_type != ELFCOMPRESS_ZLIB)
 		goto err_wrong_chdr_type;
 	/* Allocate memory for the compressed section. */
-	*psection_csize = ATOMIC_READ(chdr->ch_size);
+	*psection_csize = atomic_read(&chdr->ch_size);
 	result = sys_mmap(NULL, *psection_csize,
 	                  PROT_READ | PROT_WRITE,
 	                  MAP_PRIVATE | MAP_ANON,
@@ -2518,8 +2520,8 @@ NOTHROW_NCX(DLFCN_CC libdl_dlinflatesection)(USER DlSection *sect,
 			if unlikely(cdata == (void *)-1)
 				goto err;
 			/* Save the results. */
-			ATOMIC_STORE(sect->ds_csize, csize); /* This must be written first! */
-			if unlikely(!ATOMIC_CMPXCH(sect->ds_cdata, (void *)-1, cdata)) {
+			atomic_store(&sect->ds_csize, csize); /* This must be written first! */
+			if unlikely(!atomic_cmpxch(&sect->ds_cdata, (void *)-1, cdata)) {
 				/* Race condition: Some  other thread also  did the  inflate,
 				 * and now we've got the inflated  data twice. - Fix this  by
 				 * simply deleting our duplicate and using the version that's
@@ -2598,13 +2600,13 @@ again_clear_modules:
 			if (DlModule_InvokeDlCacheFunctions(module_iter))
 				result = 1;
 again_try_descref_module_iter:
-			refcnt = ATOMIC_READ(module_iter->dm_refcnt);
+			refcnt = atomic_read(&module_iter->dm_refcnt);
 			if (refcnt <= 1) {
 				decref(module_iter);
 				goto again_clear_modules;
 			}
 			dlglobals_all_read(&dl_globals);
-			if (!ATOMIC_CMPXCH_WEAK(module_iter->dm_refcnt, refcnt, refcnt - 1)) {
+			if (!atomic_cmpxch_weak(&module_iter->dm_refcnt, refcnt, refcnt - 1)) {
 				dlglobals_all_endread(&dl_globals);
 				goto again_try_descref_module_iter;
 			}
@@ -2618,7 +2620,7 @@ again_lock_global:
 		dlglobals_all_read(&dl_globals);
 		DLIST_FOREACH (module_iter, &dl_globals.dg_alllist, dm_modules) {
 			REF DlSection *temp;
-			if (!ATOMIC_READ(module_iter->dm_sections_dangling))
+			if (!atomic_read(&module_iter->dm_sections_dangling))
 				continue;
 			if (!DlModule_SectionsTryWrite(module_iter)) {
 				bool hasref;
@@ -2663,7 +2665,7 @@ again:
 	DLIST_FOREACH (mod, &dl_globals.dg_alllist, dm_modules) {
 		/* Skip finalizers  if the  module was  never
 		 * initialized or has already been finalized. */
-		if (ATOMIC_FETCHOR(mod->dm_flags, (RTLD_NOINIT /*| RTLD_NODELETE*/)) & RTLD_NOINIT)
+		if (atomic_fetchor(&mod->dm_flags, (RTLD_NOINIT /*| RTLD_NODELETE*/)) & RTLD_NOINIT)
 			continue;
 		if unlikely(!tryincref(mod))
 			continue;
@@ -2909,7 +2911,7 @@ libdl_dlauxctrl(USER DlModule *self, unsigned int cmd, ...)
 		func = va_arg(args, void (DLFCN_CC *)(void *));
 		arg  = va_arg(args, void *);
 again_add_finalizer_read_list:
-		flz = ATOMIC_READ(self->dm_finalize);
+		flz = atomic_read(&self->dm_finalize);
 		if (!flz) {
 			/* Lazily allocate dynamic finalizers. */
 			flz = (struct dlmodule_finalizers *)malloc(sizeof(struct dlmodule_finalizers));
@@ -2924,7 +2926,7 @@ again_add_finalizer_read_list:
 			flz->df_list[0].df_func = func;
 			flz->df_list[0].df_arg  = arg;
 			flz->df_size            = 1;
-			if (!ATOMIC_CMPXCH(self->dm_finalize, NULL, flz)) {
+			if (!atomic_cmpxch(&self->dm_finalize, NULL, flz)) {
 				free(flz);
 				goto again_add_finalizer_read_list;
 			}
@@ -2988,7 +2990,7 @@ done_add_finalizer:
 			goto err;
 
 		/* Mark the declaring module as NODELETE. */
-		ATOMIC_OR(extmod->dm_flags, RTLD_NODELETE);
+		atomic_or(&extmod->dm_flags, RTLD_NODELETE);
 
 		/* Fill in the coreops V-table pointer. */
 		extension->df_core = dl_getcoreops();
@@ -2996,10 +2998,10 @@ done_add_finalizer:
 		/* Register the extension. */
 		COMPILER_BARRIER();
 		do {
-			next = ATOMIC_READ(dl_extensions);
+			next = atomic_read(&dl_extensions);
 			extension->df_next = next;
 			COMPILER_WRITE_BARRIER();
-		} while (!ATOMIC_CMPXCH_WEAK(dl_extensions, next, extension));
+		} while (!atomic_cmpxch_weak(&dl_extensions, next, extension));
 
 		/* Re-return a pointer to the given handle. */
 		result = self;
@@ -3450,7 +3452,7 @@ NOTHROW_NCX(FCALL dlget_p_program_invocation_short_name)(void) THROWS(E_SEGFAULT
 		                 : NULL;
 		if (progname)
 			progname = strrchrnul(progname, '/') + 1;
-		ATOMIC_CMPXCH(dl_program_invocation_short_name,
+		atomic_cmpxch(&dl_program_invocation_short_name,
 		              NULL, progname);
 	}
 	return &dl_program_invocation_short_name;

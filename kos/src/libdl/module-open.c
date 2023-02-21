@@ -36,6 +36,7 @@
 #include <kos/syscalls.h>
 #include <sys/param.h>
 
+#include <atomic.h>
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -92,15 +93,15 @@ PRIVATE WUNUSED bool CC libservice_open(void) {
 	REF DlModule *_libservice;
 	size_t count;
 again:
-	count = ATOMIC_READ(libservice_inuse);
+	count = atomic_read(&libservice_inuse);
 	if (count >= 1) {
-		if (!ATOMIC_CMPXCH_WEAK(libservice_inuse, count, count + 1))
+		if (!atomic_cmpxch_weak(&libservice_inuse, count, count + 1))
 			goto again;
 		/* Library had already been loaded. */
 		return true;
 	}
 	/* Quick check: did a previous attempt at loading libservice fail? */
-	if (ATOMIC_READ(libservice) == (REF DlModule *)-1)
+	if (atomic_read(&libservice) == (REF DlModule *)-1)
 		return false;
 	_libservice = libdl_dlopen(LIBSERVICE_LIBRARY_NAME, RTLD_LOCAL);
 	if unlikely(!_libservice)
@@ -117,7 +118,7 @@ again:
 	}
 
 	/* Write-back the libservice handle. */
-	ATOMIC_WRITE(libservice, _libservice);
+	atomic_write(&libservice, _libservice);
 
 	/* The  only reason why  this cmpxch can fail  is when another thread
 	 * has  also loaded the library at the same time we just did. In this
@@ -131,13 +132,13 @@ again:
 	 * second reference to libservice (since we also got one above), and
 	 * to increment the global in-use counter from 1 to 2 (which is done
 	 * by the normal code-path above) */
-	if (!ATOMIC_CMPXCH(libservice_inuse, 0, 1)) {
+	if (!atomic_cmpxch(&libservice_inuse, 0, 1)) {
 		decref_unlikely(_libservice);
 		goto again;
 	}
 	return true;
 failed:
-	ATOMIC_WRITE(libservice, (REF DlModule *)-1);
+	atomic_write(&libservice, (REF DlModule *)-1);
 	return false;
 }
 
@@ -149,7 +150,7 @@ PRIVATE void CC libservice_close(void) {
 	COMPILER_BARRIER();
 	_libservice = libservice;
 	COMPILER_BARRIER();
-	if (ATOMIC_DECFETCH(libservice_inuse) == 0)
+	if (atomic_decfetch(&libservice_inuse) == 0)
 		decref(_libservice);
 }
 
@@ -870,7 +871,7 @@ DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self)
 		goto err;
 
 	/* And with that, we've successfully initialize the module! */
-	ATOMIC_AND(self->dm_flags, ~RTLD_LOADING);
+	atomic_and(&self->dm_flags, ~RTLD_LOADING);
 	return 0;
 err:
 	return -1;
@@ -1072,7 +1073,7 @@ DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/ char *__restrict filenam
 	            ehdr.e_ident[EI_MAG2] != ELFMAG2 ||
 	            ehdr.e_ident[EI_MAG3] != ELFMAG3) {
 		struct dlmodule_format *ext;
-		ext = ATOMIC_READ(dl_extensions);
+		ext = atomic_read(&dl_extensions);
 		for (; ext; ext = ext->df_next) {
 			if (bcmp(&ehdr, ext->df_magic, ext->df_magsz) != 0)
 				continue; /* Non-matching magic. */

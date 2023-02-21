@@ -32,6 +32,7 @@
 #include <kos/syscalls.h>
 #include <sys/mman.h>
 
+#include <atomic.h>
 #include <errno.h>
 #include <malloc.h>
 #include <signal.h>
@@ -44,11 +45,11 @@ LOCAL NONNULL((1)) void
 NOTHROW(CC try_add2global)(DlModule *__restrict self) {
 	uintptr_t old_flags;
 again_old_flags:
-	old_flags = ATOMIC_READ(self->dm_flags);
+	old_flags = atomic_read(&self->dm_flags);
 	if (!(old_flags & RTLD_GLOBAL)) {
 		/* Make the module global. */
 		dlglobals_global_write(&dl_globals);
-		if (!ATOMIC_CMPXCH_WEAK(self->dm_flags, old_flags,
+		if (!atomic_cmpxch_weak(&self->dm_flags, old_flags,
 		                        old_flags | RTLD_GLOBAL)) {
 			dlglobals_global_endwrite(&dl_globals);
 			goto again_old_flags;
@@ -263,19 +264,19 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags)
 			assert(self->dm_depcnt < count);
 			filename = self->dm_elf.de_dynstr + self->dm_dynhdr[i].d_un.d_ptr;
 			/* Load the dependent library. */
-			ATOMIC_WRITE(dl_globals.dg_errmsg, NULL);
+			atomic_write(&dl_globals.dg_errmsg, NULL);
 			if (self->dm_elf.de_runpath) {
 				dependency = DlModule_OpenFilenameInPathList(self->dm_elf.de_runpath,
 				                                             filename, dep_flags,
 				                                             self->dm_filename);
-				if (!dependency && ATOMIC_READ(dl_globals.dg_errmsg) == NULL) {
+				if (!dependency && atomic_read(&dl_globals.dg_errmsg) == NULL) {
 					/* Before  doing more open() system calls, check to see if we've
 					 * already   loaded  a  matching   candidate  of  this  library!
 					 * We can do this because `dl_globals.dg_libpath' never changes. */
 					dependency = DlModule_FindFilenameInPathListFromAll(filename);
 					if (dependency) {
 						try_add2global(dependency);
-					} else if (ATOMIC_READ(dl_globals.dg_errmsg) == NULL) {
+					} else if (atomic_read(&dl_globals.dg_errmsg) == NULL) {
 						dependency = DlModule_OpenFilenameInPathList(dl_globals.dg_libpath,
 						                                             filename, dep_flags,
 						                                             self->dm_filename);
@@ -288,14 +289,14 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags)
 				dependency = DlModule_FindFilenameInPathListFromAll(filename);
 				if (dependency) {
 					try_add2global(dependency);
-				} else if (ATOMIC_READ(dl_globals.dg_errmsg) == NULL) {
+				} else if (atomic_read(&dl_globals.dg_errmsg) == NULL) {
 					dependency = DlModule_OpenFilenameInPathList(dl_globals.dg_libpath,
 					                                             filename, dep_flags,
 					                                             self->dm_filename);
 				}
 			}
 			if (!dependency) {
-				if (ATOMIC_READ(dl_globals.dg_errmsg) == NULL)
+				if (atomic_read(&dl_globals.dg_errmsg) == NULL)
 					dl_seterrorf("Failed to load dependency %q of %q",
 					             filename, self->dm_filename);
 				goto err;

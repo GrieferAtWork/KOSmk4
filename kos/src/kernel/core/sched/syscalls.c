@@ -38,11 +38,10 @@
 #include <sched/task.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 
+#include <atomic.h>
 #include <errno.h>
 #include <sched.h>
 #include <string.h>
@@ -63,14 +62,14 @@ DECL_BEGIN
 PRIVATE WUNUSED size_t
 NOTHROW(KCALL get_total_ram_in_pages)(void) {
 	static size_t known = 0;
-	size_t i, result;
-	result = known;
-	if (result != 0)
-		return result;
-	for (i = 0; i < mzones.pm_zonec; ++i) {
-		result += (size_t)mzones.pm_zones[i]->mz_rmax + 1;
+	size_t result = atomic_read(&known);
+	if (result == 0) {
+		size_t i;
+		for (i = 0; i < mzones.pm_zonec; ++i) {
+			result += (size_t)mzones.pm_zones[i]->mz_rmax + 1;
+		}
+		atomic_write(&known, result);
 	}
-	ATOMIC_WRITE(known, result);
 	return result;
 }
 
@@ -78,7 +77,7 @@ PRIVATE WUNUSED size_t
 NOTHROW(KCALL get_free_ram_in_pages)(void) {
 	size_t i, result = 0;
 	for (i = 0; i < mzones.pm_zonec; ++i)
-		result += (size_t)ATOMIC_READ(mzones.pm_zones[i]->mz_cfree);
+		result += (size_t)atomic_read(&mzones.pm_zones[i]->mz_cfree);
 	return result;
 }
 

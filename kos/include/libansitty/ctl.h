@@ -445,5 +445,4 @@
 #define AC_BRIGHT_GREEN(text) AC_WITHFG(ANSITTY_CL_BRIGHT_GREEN, text)
 #define AC_DARK_BLUE(text)    AC_WITHFG(ANSITTY_CL_DARK_BLUE, text)
 
-
 #endif /* !_LIBANSITTY_CTL_H */

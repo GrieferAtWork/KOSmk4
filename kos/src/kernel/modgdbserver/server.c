@@ -38,7 +38,6 @@
 #include <sched/group.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/unaligned.h>
 
 #include <kos/kernel/gdb-cpu-state.h>
@@ -46,6 +45,7 @@
 #include <sys/wait.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <limits.h>
@@ -886,9 +886,9 @@ LOCAL bool NOTHROW(FCALL GDB_GetNoAckModeEnabled)(void) {
 
 LOCAL void NOTHROW(FCALL GDB_SetNoAckModeEnabled)(bool enabled) {
 	if (enabled) {
-		ATOMIC_OR(GDBServer_Features, GDB_SERVER_FEATURE_NOACK);
+		atomic_or(&GDBServer_Features, GDB_SERVER_FEATURE_NOACK);
 	} else {
-		ATOMIC_AND(GDBServer_Features, ~GDB_SERVER_FEATURE_NOACK);
+		atomic_and(&GDBServer_Features, ~GDB_SERVER_FEATURE_NOACK);
 	}
 }
 
@@ -907,12 +907,12 @@ LOCAL bool NOTHROW(FCALL GDB_GetNonStopModeEnabled)(void) {
 LOCAL void NOTHROW(FCALL GDB_SetNonStopModeEnabled)(bool enabled) {
 	if (enabled) {
 		/* Enable non-stop mode. */
-		if (ATOMIC_FETCHOR(GDBServer_Features, GDB_SERVER_FEATURE_NONSTOP) & GDB_SERVER_FEATURE_NONSTOP)
+		if (atomic_fetchor(&GDBServer_Features, GDB_SERVER_FEATURE_NONSTOP) & GDB_SERVER_FEATURE_NONSTOP)
 			return; /* Unchanged */
 		GDBThread_ResumeAllCpus();
 	} else {
 		/* Disable non-stop mode (and enter all-stop mode) */
-		if (!(ATOMIC_FETCHAND(GDBServer_Features, ~GDB_SERVER_FEATURE_NONSTOP) & GDB_SERVER_FEATURE_NONSTOP))
+		if (!(atomic_fetchand(&GDBServer_Features, ~GDB_SERVER_FEATURE_NONSTOP) & GDB_SERVER_FEATURE_NONSTOP))
 			return; /* Unchanged */
 		GDBThread_StopAllCpus();
 	}
@@ -924,9 +924,9 @@ LOCAL bool NOTHROW(FCALL GDB_GetThreadEventsEnabled)(void) {
 
 LOCAL void NOTHROW(FCALL GDB_SetThreadEventsEnabled)(bool enabled) {
 	if (enabled) {
-		ATOMIC_OR(GDBRemote_Features, GDB_REMOTE_FEATURE_THREADEVENTS);
+		atomic_or(&GDBRemote_Features, GDB_REMOTE_FEATURE_THREADEVENTS);
 	} else {
-		ATOMIC_AND(GDBRemote_Features, ~GDB_REMOTE_FEATURE_THREADEVENTS);
+		atomic_and(&GDBRemote_Features, ~GDB_REMOTE_FEATURE_THREADEVENTS);
 	}
 }
 
@@ -2092,7 +2092,7 @@ do_return_attached_everything:
 				ERROR(err_ESRCH);
 			}
 #else /* __x86_64__ */
-			addr = ATOMIC_READ(FORTASK(newThread.ts_thread, this_x86_user_gsbase));
+			addr = atomic_read(&FORTASK(newThread.ts_thread, this_x86_user_gsbase));
 #endif /* !__x86_64__ */
 			GDBThreadSel_Fini(&newThread);
 			o += sprintf(o, "%" PRIxPTR, addr);
@@ -2187,7 +2187,7 @@ do_return_attached_everything:
 		} else if (ISNAME("Supported")) {
 			i = nameEnd;
 			GDBRemote_Features = 0;
-			ATOMIC_AND(GDBServer_Features, ~(GDB_SERVER_FEATURE_MULTIPROCESS));
+			atomic_and(&GDBServer_Features, ~(GDB_SERVER_FEATURE_MULTIPROCESS));
 			if (*i == ':') {
 				++i;
 				for (;;) {
@@ -2196,17 +2196,17 @@ do_return_attached_everything:
 					if (nameEnd[-1] == '+') {
 						--nameLen;
 						if (ISNAME("multiprocess")) {
-							ATOMIC_OR(GDBServer_Features, GDB_SERVER_FEATURE_MULTIPROCESS);
+							atomic_or(&GDBServer_Features, GDB_SERVER_FEATURE_MULTIPROCESS);
 						} else if (ISNAME("swbreak")) {
-							ATOMIC_OR(GDBRemote_Features, GDB_REMOTE_FEATURE_SWBREAK);
+							atomic_or(&GDBRemote_Features, GDB_REMOTE_FEATURE_SWBREAK);
 						} else if (ISNAME("hwbreak")) {
-							ATOMIC_OR(GDBRemote_Features, GDB_REMOTE_FEATURE_HWBREAK);
+							atomic_or(&GDBRemote_Features, GDB_REMOTE_FEATURE_HWBREAK);
 						} else if (ISNAME("fork-events")) {
-							ATOMIC_OR(GDBRemote_Features, GDB_REMOTE_FEATURE_FORKEVENTS);
+							atomic_or(&GDBRemote_Features, GDB_REMOTE_FEATURE_FORKEVENTS);
 						} else if (ISNAME("vfork-events")) {
-							ATOMIC_OR(GDBRemote_Features, GDB_REMOTE_FEATURE_VFORKEVENTS);
+							atomic_or(&GDBRemote_Features, GDB_REMOTE_FEATURE_VFORKEVENTS);
 						} else if (ISNAME("exec-events")) {
-							ATOMIC_OR(GDBRemote_Features, GDB_REMOTE_FEATURE_EXECEVENTS);
+							atomic_or(&GDBRemote_Features, GDB_REMOTE_FEATURE_EXECEVENTS);
 						}
 					}
 					i = nameEnd;
@@ -2540,9 +2540,9 @@ again:
 	} else {
 		GDBThreadStopEvent *notif;
 		/* Use the first pending stop notification, or stopped thread */
-		notif = ATOMIC_READ(GDBThread_AsyncNotifStopEvents);
+		notif = atomic_read(&GDBThread_AsyncNotifStopEvents);
 		if (!notif)
-			notif = ATOMIC_READ(GDBThread_Stopped);
+			notif = atomic_read(&GDBThread_Stopped);
 		if (notif) {
 			while (notif->tse_next)
 				notif = notif->tse_next;
@@ -2559,9 +2559,9 @@ again:
 		/* Must select a thread that isn't apart of the kernel. */
 		{
 			GDBThreadStopEvent *notif;
-			notif = ATOMIC_READ(GDBThread_AsyncNotifStopEvents);
+			notif = atomic_read(&GDBThread_AsyncNotifStopEvents);
 			if (!notif)
-				notif = ATOMIC_READ(GDBThread_Stopped);
+				notif = atomic_read(&GDBThread_Stopped);
 			/* Try to use the oldest non-kernel thread from stop notifications. */
 			for (; notif; notif = notif->tse_next) {
 				if (!GDBThread_IsKernelThread(notif->tse_thread))
@@ -2666,7 +2666,7 @@ check_for_notif_or_remote_byte:
 		if (b != '$') {
 			printk(KERN_WARNING "[gdb] Unrecognized out-of-band byte: %Q (%#.2I8x)\n", b, b);
 			if (b == '+' || b == '-') {
-				ATOMIC_AND(GDBServer_Features, ~GDB_SERVER_FEATURE_NOACK);
+				atomic_and(&GDBServer_Features, ~GDB_SERVER_FEATURE_NOACK);
 			}
 			continue;
 		}
@@ -2728,12 +2728,12 @@ send_nack_and_wait_for_next_packet:
 					GDBThreadSel_Fini(&GDB_CurrentThread_continue);
 					for (;;) {
 						/* Wait for more pending stop notifications / a response from the GDB remote. */
-						if (ATOMIC_READ(GDBThread_AsyncNotifStopEvents) != NULL ||
+						if (atomic_read(&GDBThread_AsyncNotifStopEvents) != NULL ||
 						    GDBRemote_HasPendingBytes())
 							goto again;
 						task_connect(&GDBThread_AsyncNotifStopEventsAdded);
 						task_connect(&GDBServer_RemoteDataAvailable);
-						if (ATOMIC_READ(GDBThread_AsyncNotifStopEvents) != NULL ||
+						if (atomic_read(&GDBThread_AsyncNotifStopEvents) != NULL ||
 						    GDBRemote_HasPendingBytes()) {
 							task_disconnectall();
 							goto again;

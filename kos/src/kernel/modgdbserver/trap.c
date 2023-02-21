@@ -37,9 +37,8 @@
 #include <sched/sig.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 
 #include "gdb.h"
@@ -143,13 +142,13 @@ GDBServer_TrapCpuState(void *__restrict state,
 	if (reason->dtr_reason == DEBUGTRAP_REASON_MESSAGE) {
 		size_t num_printed;
 again_message:
-		if (ATOMIC_READ(GDBServer_Features) & GDB_SERVER_FEATURE_NONSTOP) {
+		if (atomic_read(&GDBServer_Features) & GDB_SERVER_FEATURE_NONSTOP) {
 do_print_message_in_nonstop_mode:
 			num_printed = GDBServer_PrintMessageInNonStopMode(reason->dtr_strarg,
 			                                                  reason->dtr_signo);
 		} else {
 			stop_event.tse_thread = THIS_TASK;
-			oldhost = ATOMIC_CMPXCH_VAL(GDBServer_Host, NULL, stop_event.tse_thread);
+			oldhost = atomic_cmpxch_val(&GDBServer_Host, NULL, stop_event.tse_thread);
 			if (oldhost != NULL) {
 				if (oldhost == stop_event.tse_thread) {
 					/* Message from inside of GDB? ok... */
@@ -166,10 +165,10 @@ do_print_message_in_nonstop_mode:
 				}
 			} else {
 				/* Got the GDB context lock! */
-				if unlikely(ATOMIC_READ(GDBServer_Features) & GDB_SERVER_FEATURE_NONSTOP)
+				if unlikely(atomic_read(&GDBServer_Features) & GDB_SERVER_FEATURE_NONSTOP)
 					goto do_print_message_in_nonstop_mode;
 				RAII_FINALLY {
-					ATOMIC_WRITE(GDBServer_Host, NULL);
+					atomic_write(&GDBServer_Host, NULL);
 					sig_broadcast(&GDBServer_HostUnlocked);
 				};
 				num_printed = GDBServer_PrintMessageInAllStopMode(reason->dtr_strarg,
@@ -192,7 +191,7 @@ do_print_message_in_nonstop_mode:
 	stop_event.tse_mayresume = GDB_THREAD_MAYRESUME_STOP;
 	stop_event.tse_isacpu    = 0;
 	sig_init(&stop_event.tse_sigresume);
-	oldhost = ATOMIC_CMPXCH_VAL(GDBServer_Host, NULL, stop_event.tse_thread);
+	oldhost = atomic_cmpxch_val(&GDBServer_Host, NULL, stop_event.tse_thread);
 	if (oldhost != NULL) {
 		GDBThreadStopEvent *next_notif;
 		if (oldhost == stop_event.tse_thread) {
@@ -233,9 +232,9 @@ do_print_message_in_nonstop_mode:
 			kernel_panic("Recursive GDB trap\n");
 		}
 		do {
-			next_notif = ATOMIC_READ(GDBThread_AsyncNotifStopEvents);
+			next_notif = atomic_read(&GDBThread_AsyncNotifStopEvents);
 			stop_event.tse_next = next_notif;
-		} while (!ATOMIC_CMPXCH_WEAK(GDBThread_AsyncNotifStopEvents, next_notif, &stop_event));
+		} while (!atomic_cmpxch_weak(&GDBThread_AsyncNotifStopEvents, next_notif, &stop_event));
 		if (!next_notif)
 			sig_broadcast(&GDBThread_AsyncNotifStopEventsAdded);
 again_waitfor_resume:
@@ -245,7 +244,7 @@ again_waitfor_resume:
 		 * main thread, or if we should resume our execution. */
 		{
 			uintptr_half_t resume_state;
-			resume_state = ATOMIC_READ(stop_event.tse_mayresume);
+			resume_state = atomic_read(&stop_event.tse_mayresume);
 			if (resume_state == GDB_THREAD_MAYRESUME_RESUME) {
 				/* Should resume execution. */
 				task_disconnectall();
@@ -253,11 +252,11 @@ again_waitfor_resume:
 			}
 		}
 		task_connect_for_poll(&GDBServer_HostUnlocked);
-		if (ATOMIC_CMPXCH(GDBServer_Host, NULL, stop_event.tse_thread)) {
+		if (atomic_cmpxch(&GDBServer_Host, NULL, stop_event.tse_thread)) {
 			uintptr_half_t resume_state;
 			/* Now we're the GDB host thread. */
 			task_disconnectall();
-			resume_state = ATOMIC_READ(stop_event.tse_mayresume);
+			resume_state = atomic_read(&stop_event.tse_mayresume);
 			if (resume_state == GDB_THREAD_MAYRESUME_RESUME)
 				goto done_unlock; /* Should actually resume execution. */
 			if (resume_state == GDB_THREAD_MAYRESUME_NASYNC)
@@ -270,14 +269,14 @@ again_waitfor_resume:
 		PREEMPTION_POP(was_preemption_enabled);
 		{
 			uintptr_half_t resume_state;
-			resume_state = ATOMIC_READ(stop_event.tse_mayresume);
+			resume_state = atomic_read(&stop_event.tse_mayresume);
 			if (resume_state == GDB_THREAD_MAYRESUME_RESUME)
 				goto done; /* Should resume execution. */
 		}
-		if (ATOMIC_CMPXCH(GDBServer_Host, NULL, stop_event.tse_thread)) {
+		if (atomic_cmpxch(&GDBServer_Host, NULL, stop_event.tse_thread)) {
 			uintptr_half_t resume_state;
 			/* Now we're the GDB host thread. */
-			resume_state = ATOMIC_READ(stop_event.tse_mayresume);
+			resume_state = atomic_read(&stop_event.tse_mayresume);
 			if (resume_state == GDB_THREAD_MAYRESUME_RESUME)
 				goto done_unlock; /* Should actually resume execution. */
 			if (resume_state == GDB_THREAD_MAYRESUME_NASYNC)
@@ -294,13 +293,13 @@ do_become_gdb_host_notif:
 	if (!debugtrap_reason_isenabled(reason))
 		goto done_unlock;
 	do {
-		stop_event.tse_next = ATOMIC_READ(GDBThread_AsyncNotifStopEvents);
-	} while (!ATOMIC_CMPXCH_WEAK(GDBThread_AsyncNotifStopEvents,
+		stop_event.tse_next = atomic_read(&GDBThread_AsyncNotifStopEvents);
+	} while (!atomic_cmpxch_weak(&GDBThread_AsyncNotifStopEvents,
 	                             stop_event.tse_next, &stop_event));
 do_become_gdb_host:
 
 	/* Set the `TASK_FGDB_STOPPED' flag of the host thread. */
-	ATOMIC_OR(stop_event.tse_thread->t_flags, TASK_FGDB_STOPPED);
+	atomic_or(&stop_event.tse_thread->t_flags, TASK_FGDB_STOPPED);
 
 	/* Make sure that preemption is enabled while inside of GDB_Main() */
 	was_preemption_enabled = PREEMPTION_PUSHON();
@@ -339,7 +338,7 @@ again_gdb_main:
 
 done_unlock:
 	/* Unlock the GDB server host lock */
-	ATOMIC_WRITE(GDBServer_Host, NULL);
+	atomic_write(&GDBServer_Host, NULL);
 	sig_broadcast(&GDBServer_HostUnlocked);
 
 done:
@@ -354,9 +353,9 @@ INTERN void NOTHROW(KCALL GDBFallbackHost_Main)(void) {
 			/* Prefer  waiting on the HOST lock, since that one doesn't get
 			 * triggered as often as the DATA lock, meaning that we take up
 			 * less CPU cycles if we wait for it, instead. */
-			if (ATOMIC_READ(GDBServer_Host) != NULL) {
+			if (atomic_read(&GDBServer_Host) != NULL) {
 				task_connect_for_poll(&GDBServer_HostUnlocked);
-				if likely(ATOMIC_READ(GDBServer_Host) != NULL) {
+				if likely(atomic_read(&GDBServer_Host) != NULL) {
 					task_waitfor();
 					continue;
 				}
@@ -371,13 +370,13 @@ INTERN void NOTHROW(KCALL GDBFallbackHost_Main)(void) {
 			task_disconnectall();
 		}
 		/* Try to become the GDB host thread. */
-		if (!ATOMIC_CMPXCH(GDBServer_Host, NULL, GDBServer_FallbackHost)) {
+		if (!atomic_cmpxch(&GDBServer_Host, NULL, GDBServer_FallbackHost)) {
 			task_connect(&GDBServer_HostUnlocked);
 			if (!GDBRemote_HasPendingBytes()) {
 				task_disconnectall();
 				continue;
 			}
-			if (!ATOMIC_CMPXCH(GDBServer_Host, NULL, GDBServer_FallbackHost)) {
+			if (!atomic_cmpxch(&GDBServer_Host, NULL, GDBServer_FallbackHost)) {
 				task_waitfor();
 				continue;
 			}
@@ -400,7 +399,7 @@ INTERN void NOTHROW(KCALL GDBFallbackHost_Main)(void) {
 		if (!(GDBServer_Features & GDB_SERVER_FEATURE_NONSTOP))
 			GDBThread_ResumeEverything();
 		/* Unlock the GDB server host lock */
-		ATOMIC_WRITE(GDBServer_Host, NULL);
+		atomic_write(&GDBServer_Host, NULL);
 		sig_broadcast(&GDBServer_HostUnlocked);
 	}
 }
@@ -411,13 +410,13 @@ INTERN void
 NOTHROW(FCALL GDBThread_DiscardAllAsyncNotifEvents)(void) {
 	GDBThreadStopEvent *notif, *next;
 	for (;;) {
-		notif = ATOMIC_XCH(GDBThread_AsyncNotifStopEvents, NULL);
+		notif = atomic_xch(&GDBThread_AsyncNotifStopEvents, NULL);
 		if (!notif)
 			break;
 		while (notif) {
 			next = notif->tse_next;
 			assert(notif->tse_mayresume == GDB_THREAD_MAYRESUME_STOP);
-			ATOMIC_WRITE(notif->tse_mayresume, GDB_THREAD_MAYRESUME_NASYNC);
+			atomic_write(&notif->tse_mayresume, GDB_THREAD_MAYRESUME_NASYNC);
 			notif->tse_next   = GDBThread_Stopped;
 			GDBThread_Stopped = notif;
 			notif = next;
@@ -444,7 +443,7 @@ continue_piter:
 			continue;
 		}
 		/* Re-enable the stop notification of this stop event. */
-		ATOMIC_WRITE(iter->tse_mayresume, GDB_THREAD_MAYRESUME_STOP);
+		atomic_write(&iter->tse_mayresume, GDB_THREAD_MAYRESUME_STOP);
 		/* Unlink from `GDBThread_Stopped' */
 		*piter = iter->tse_next;
 		/* Append to our chain to events to-be re-added to `GDBThread_AsyncNotifStopEvents' */
@@ -459,10 +458,10 @@ continue_piter:
 	assert(pnext == &last->tse_next);
 	/* Insert all of the re-enabled notification packets into the queue. */
 	for (;;) {
-		iter = ATOMIC_READ(GDBThread_AsyncNotifStopEvents);
+		iter = atomic_read(&GDBThread_AsyncNotifStopEvents);
 		last->tse_next = iter;
 		COMPILER_WRITE_BARRIER();
-		if (!ATOMIC_CMPXCH_WEAK(GDBThread_AsyncNotifStopEvents, iter, first))
+		if (!atomic_cmpxch_weak(&GDBThread_AsyncNotifStopEvents, iter, first))
 			continue;
 		if (!iter)
 			sig_broadcast(&GDBThread_AsyncNotifStopEventsAdded);
@@ -476,13 +475,13 @@ INTERN WUNUSED GDBThreadStopEvent *
 NOTHROW(FCALL GDBThread_ConsumeAsyncNotifEvent)(void) {
 	GDBThreadStopEvent *notif;
 again_notif:
-	notif = ATOMIC_READ(GDBThread_AsyncNotifStopEvents);
+	notif = atomic_read(&GDBThread_AsyncNotifStopEvents);
 	if (notif) {
-		if (!ATOMIC_CMPXCH_WEAK(GDBThread_AsyncNotifStopEvents,
+		if (!atomic_cmpxch_weak(&GDBThread_AsyncNotifStopEvents,
 		                        notif, notif->tse_next))
 			goto again_notif;
 		assert(notif->tse_mayresume == GDB_THREAD_MAYRESUME_STOP);
-		ATOMIC_WRITE(notif->tse_mayresume, GDB_THREAD_MAYRESUME_NASYNC);
+		atomic_write(&notif->tse_mayresume, GDB_THREAD_MAYRESUME_NASYNC);
 		notif->tse_next   = GDBThread_Stopped;
 		GDBThread_Stopped = notif;
 	}

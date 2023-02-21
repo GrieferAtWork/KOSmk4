@@ -38,10 +38,10 @@
 #include <sched/scheduler.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/unaligned.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <format-printer.h>
 #include <inttypes.h>
@@ -343,7 +343,7 @@ NOTHROW(FCALL GDBInfo_PrintThreadList_Callback)(void *closure,
 	 *                    the thread's/process's TID/PID had been re-assigned
 	 *                    immediately, and that the still-terminating  thread
 	 *                    was actually an entirely different thread. */
-	if (ATOMIC_READ(thread->t_flags) & (TASK_FTERMINATED | TASK_FTERMINATING))
+	if (atomic_read(&thread->t_flags) & (TASK_FTERMINATED | TASK_FTERMINATING))
 		return 0;
 	printer = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_printer;
 	arg     = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_arg;
@@ -353,7 +353,7 @@ NOTHROW(FCALL GDBInfo_PrintThreadList_Callback)(void *closure,
 	       (size_t)(id_end - id_buf), id_buf,
 	       thread->t_cpu->c_id);
 	DO(GDBInfo_PrintThreadName(printer, arg, thread));
-	flags = ATOMIC_READ(thread->t_flags);
+	flags = atomic_read(&thread->t_flags);
 	if (flags & TASK_FTERMINATED) {
 		description = "terminated";
 	} else if (flags & TASK_FTERMINATING) {
@@ -681,7 +681,7 @@ NOTHROW(FCALL GDBInfo_PrintOSThreadList_Callback)(void *closure,
 	PRINTF("</column>"
 	       "<column name=\"core\">%u</column>"
 	       "</item>",
-	       ATOMIC_READ(thread->t_cpu)->c_id);
+	       atomic_read(&thread->t_cpu)->c_id);
 	return result;
 err:
 	return temp;

@@ -28,10 +28,10 @@
 #include "../api.h"
 /**/
 
-#include <hybrid/atomic.h>
 
 #include <kos/exec/ifunc.h>
 
+#include <atomic.h>
 #include <dlfcn.h>
 #include <elf.h>
 #include <link.h>
@@ -48,14 +48,14 @@ DECL_BEGIN
 	PRIVATE ATTR_SECTION(".rodata" section) char const name_##name[] = #name; \
 	INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text" section)   \
 	Ptype NOTHROW_NCX(LIBCCALL libc_get_##name)(void) {                       \
-		if (!pdyn_##name) {                                                   \
-			Ptype pfun;                                                       \
-			*(void **)&pfun = dlsym(RTLD_DEFAULT, name_##name);               \
-			if unlikely(!pfun)                                                \
+		Ptype result = atomic_read(&pdyn_##name);                             \
+		if (!result) {                                                        \
+			*(void **)&result = dlsym(RTLD_DEFAULT, name_##name);             \
+			if unlikely(!result)                                              \
 				abort();                                                      \
-			ATOMIC_WRITE(pdyn_##name, pfun);                                  \
+			atomic_write(&pdyn_##name, result);                               \
 		}                                                                     \
-		return pdyn_##name;                                                   \
+		return result;                                                        \
 	}
 DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLOPEN_SECTION, PDLOPEN, dlopen)
 DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLCLOSE_SECTION, PDLCLOSE, dlclose)

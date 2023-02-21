@@ -390,7 +390,7 @@ NOTHROW(FCALL red_phase1)(struct sig_completion *__restrict self,
 		return 0;
 	if (bufsize < sizeof(void *))
 		return sizeof(void *); /* Need a larger buffer */
-	if (ATOMIC_XCH(me->red_detected, true))
+	if (atomic_xch(&me->red_detected, true))
 		return 0; /* Only need phase2 if we manage to set `red_detected' to true. */
 	*(void **)buf = incref(me); /* Inherited by `red_phase2()' */
 	context->scc_post = &red_phase2;
@@ -412,9 +412,9 @@ rising_edge_detector_create(struct sig *__restrict signal) THROWS(E_BADALLOC) {
 
 PRIVATE BLOCKING NONNULL((1)) void FCALL
 rising_edge_detector_waitfor(struct rising_edge_detector *__restrict self) {
-	while (!ATOMIC_XCH(self->red_detected, false)) {
+	while (!atomic_xch(&self->red_detected, false)) {
 		task_connect(&self->red_ondetect);
-		if unlikely(ATOMIC_XCH(self->red_detected, false)) {
+		if unlikely(atomic_xch(&self->red_detected, false)) {
 			task_disconnectall();
 			break;
 		}

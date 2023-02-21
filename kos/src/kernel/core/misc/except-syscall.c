@@ -39,12 +39,11 @@
 #include <sched/sigmask.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <compat/config.h>
 #include <kos/except-handler.h>
 #include <kos/except/reason/inval.h>
 
+#include <atomic.h>
 #include <errno.h>
 #include <sched.h>
 #include <signal.h>
@@ -390,7 +389,7 @@ DEFINE_SYSCALL1(pid_t, set_tid_address,
 		/* Clear  the userprocmask flag(s), the same way a
 		 * call `sys_set_userprocmask_address(NULL)' would
 		 * have. */
-		ATOMIC_AND(PERTASK(this_task.t_flags),
+		atomic_and(&PERTASK(this_task.t_flags),
 		           ~(TASK_FUSERPROCMASK |
 		             TASK_FUSERPROCMASK_AFTER_VFORK));
 	}
@@ -420,7 +419,7 @@ DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
 	if unlikely(!ctl) {
 		/* Disable USERPROCMASK mode. */
 		PERTASK_SET(this_userprocmask_address, (struct userprocmask *)NULL);
-		ATOMIC_AND(PERTASK(this_task.t_flags),
+		atomic_and(&PERTASK(this_task.t_flags),
 		           ~(TASK_FUSERPROCMASK |
 		             TASK_FUSERPROCMASK_AFTER_VFORK));
 	} else {
@@ -492,14 +491,14 @@ DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
 			uintptr_t old_flags;
 
 			/* Turn on the USERPROCMASK bit in our thread. */
-			old_flags = ATOMIC_FETCHOR(me->t_flags, TASK_FUSERPROCMASK);
+			old_flags = atomic_fetchor(&me->t_flags, TASK_FUSERPROCMASK);
 
 			/* If USERPROCMASK wasn't enabled before, and we're a VFORK thread,
 			 * then we must also set the `TASK_FUSERPROCMASK_AFTER_VFORK' flag,
 			 * such that the process of clearing the `TASK_FVFORK' flag  during
 			 * exec() or exit() will also write NULL to `ctl->pm_sigmask' */
 			if ((old_flags & (TASK_FUSERPROCMASK | TASK_FVFORK)) == TASK_FVFORK)
-				ATOMIC_OR(me->t_flags, TASK_FUSERPROCMASK_AFTER_VFORK);
+				atomic_or(&me->t_flags, TASK_FUSERPROCMASK_AFTER_VFORK);
 		}
 
 		/* No need to call `userexcept_sysret_inject_self()' here since the

@@ -58,7 +58,6 @@
 #include <sched/tsc.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/host.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sched/preemption.h>
@@ -71,6 +70,7 @@
 #include <network/socket.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <elf.h>
 #include <format-printer.h>
 #include <inttypes.h>
@@ -271,7 +271,7 @@ procfs_modules_printer(pformatprinter printer, void *arg,
 		       drv->d_name,
 		       (size_t)(drv->md_loadmax - drv->md_loadmin) + 1,
 		       /* Subtract 1 from refcnt because we're holding one ourselves! */
-		       ATOMIC_READ(drv->md_refcnt) - 1);
+		       atomic_read(&drv->md_refcnt) - 1);
 		/* Print a list of all drivers that have dependencies on this one. */
 		got_something = false;
 		for (j = 0; j < ll->dll_count; ++j) {
@@ -292,7 +292,7 @@ procfs_modules_printer(pformatprinter printer, void *arg,
 		}
 		if (!got_something)
 			PRINT("-");
-		state = ATOMIC_READ(drv->d_state);
+		state = atomic_read(&drv->d_state);
 		if (printf(" %s %#" PRIxPTR "\n",
 		           state < DRIVER_STATE_LOADED
 		           ? "Loading"
@@ -329,7 +329,7 @@ procfs_uptime_printer(pformatprinter printer, void *arg,
 		 *        were active the entire time until they're brought back
 		 *        online and are able to update their activetime field. */
 #if __SIZEOF_POINTER__ >= __SIZEOF_KTIME_T__
-		ci_active = ATOMIC_READ(FORTASK(ci, this_activetime));
+		ci_active = atomic_read(&FORTASK(ci, this_activetime));
 #else /* __SIZEOF_POINTER__ >= __SIZEOF_KTIME_T__ */
 		{
 			preemption_flag_t was;
@@ -431,7 +431,7 @@ procfs_kos_fs_allow_fs_oob_write(USER CHECKED void const *buf,
                                  size_t bufsize) {
 	bool newval;
 	newval = ProcFS_ParseBool(buf, bufsize);
-	ATOMIC_WRITE(fsuper_allow_fs_oob, newval);
+	atomic_write(&fsuper_allow_fs_oob, newval);
 }
 
 
@@ -526,7 +526,7 @@ print_fnode_desc(struct fnode *__restrict self,
 	mode_t mode;
 	uintptr_t flags;
 	mfile_tslock_acquire(self);
-	refcnt = ATOMIC_READ(self->mf_refcnt);
+	refcnt = atomic_read(&self->mf_refcnt);
 	mode   = self->fn_mode;
 	flags  = self->mf_flags;
 	mfile_tslock_release(self);
@@ -688,7 +688,7 @@ again:
 			uintptr_quarter_t state;
 			if (mpart_isanon_atomic(part))
 				set->msi_anon += nodesize;
-			state = ATOMIC_READ(part->mp_state);
+			state = atomic_read(&part->mp_state);
 			if (state == MPART_ST_SWP || state == MPART_ST_SWP_SC)
 				set->msi_swap += nodesize;
 		} else {
@@ -879,7 +879,7 @@ print_mpart_desc(struct mpart *__restrict self,
 	refcnt_t refcnt;
 	firstcopy = NULL;
 	mpart_lock_acquire(self);
-	refcnt  = ATOMIC_READ(self->mp_refcnt) - 1;
+	refcnt  = atomic_read(&self->mp_refcnt) - 1;
 	minaddr = self->mp_minaddr;
 	maxaddr = self->mp_maxaddr;
 	state   = self->mp_state;
@@ -943,7 +943,7 @@ print_mpart_desc(struct mpart *__restrict self,
 	result = format_printf(printer, arg,
 	                       "\t%c%c%c\t",
 	                       (flags & MPART_F_GLOBAL_REF)
-	                       ? ((ATOMIC_READ(file->mf_flags) & MFILE_F_PERSISTENT)
+	                       ? ((atomic_read(&file->mf_flags) & MFILE_F_PERSISTENT)
 	                          ? 'P'  /* global+persistent */
 	                          : 'g') /* global */
 	                       : mfile_isanon(file)
@@ -1270,7 +1270,7 @@ procfs_kos_raminfo_printer(pformatprinter printer, void *arg,
 	page_stat(&dynmem_st);
 	gather_mpart_ramusage(&part_usage);
 	for (i = 0; i < sizeof(dynmem_usage) / sizeof(size_t); ++i)
-		((size_t *)&dynmem_usage)[i] = ATOMIC_READ(((size_t *)&page_usage)[i]);
+		((size_t *)&dynmem_usage)[i] = atomic_read(&((size_t *)&page_usage)[i]);
 	dynmem_total_reasons = 0;
 	for (i = 0; i < sizeof(dynmem_usage) / sizeof(size_t); ++i)
 		dynmem_total_reasons += ((size_t *)&dynmem_usage)[i];
@@ -1354,7 +1354,7 @@ procfs_kos_cc_max_attempts_write(USER CHECKED void const *buf,
                                  size_t bufsize) {
 	unsigned int newmax;
 	newmax = ProcFS_ParseUInt(buf, bufsize, 0, UINT_MAX);
-	ATOMIC_WRITE(system_cc_maxattempts, newmax);
+	atomic_write(&system_cc_maxattempts, newmax);
 }
 
 
@@ -1373,7 +1373,7 @@ procfs_kos_futexfd_maxexpr_write(USER CHECKED void const *buf,
                                  size_t bufsize) {
 	size_t newmax;
 	newmax = ProcFS_ParseSize(buf, bufsize, 1, SIZE_MAX);
-	ATOMIC_WRITE(mfutexfd_maxexpr, newmax);
+	atomic_write(&mfutexfd_maxexpr, newmax);
 }
 
 
@@ -1386,7 +1386,7 @@ KeepIopl_Write(USER CHECKED void const *buf, size_t bufsize, bool *pvalue) {
 	new_value = ProcFS_ParseBool(buf, bufsize);
 	for (;;) {
 		bool old_value;
-		old_value = ATOMIC_READ(*pvalue);
+		old_value = atomic_read(pvalue);
 		if (old_value == new_value)
 			break; /* Nothing to do here! */
 
@@ -1398,7 +1398,7 @@ KeepIopl_Write(USER CHECKED void const *buf, size_t bufsize, bool *pvalue) {
 			require(CAP_SYS_RAWIO);
 
 		/* Change the value. */
-		if (ATOMIC_CMPXCH_WEAK(*pvalue, old_value, new_value))
+		if (atomic_cmpxch_weak(pvalue, old_value, new_value))
 			break;
 	}
 }
@@ -1476,7 +1476,7 @@ ProcFS_Sys_X86_KeepIopl_Exec_Write(USER CHECKED void const *buf, size_t bufsize)
 INTERN NONNULL((1)) void KCALL
 procfs_sys_fs_pipemaxsize_print(pformatprinter printer, void *arg,
                                 pos_t UNUSED(offset_hint)) {
-	ProcFS_PrintSize(printer, arg, ATOMIC_READ(pipe_max_bufsize_unprivileged));
+	ProcFS_PrintSize(printer, arg, atomic_read(&pipe_max_bufsize_unprivileged));
 }
 
 INTERN void KCALL
@@ -1487,10 +1487,10 @@ procfs_sys_fs_pipemaxsize_write(USER CHECKED void const *buf,
 	 * limit is set regardless of what `pipe_max_bufsize_unprivileged' is set to. */
 	newsize = ProcFS_ParseSize(buf, bufsize, RINGBUFFER_DEFAULT_LIMIT, (size_t)-1);
 	do {
-		oldsize = ATOMIC_READ(pipe_max_bufsize_unprivileged);
+		oldsize = atomic_read(&pipe_max_bufsize_unprivileged);
 		if (newsize > oldsize)
 			require(CAP_SYS_RESOURCE);
-	} while (!ATOMIC_CMPXCH_WEAK(pipe_max_bufsize_unprivileged, oldsize, newsize));
+	} while (!atomic_cmpxch_weak(&pipe_max_bufsize_unprivileged, oldsize, newsize));
 }
 
 
@@ -1501,7 +1501,7 @@ procfs_sys_fs_pipemaxsize_write(USER CHECKED void const *buf,
 INTERN NONNULL((1)) void KCALL
 procfs_sys_fs_inotify_maxqueuedevents_print(pformatprinter printer, void *arg,
                                             pos_t UNUSED(offset_hint)) {
-	ProcFS_PrintUInt(printer, arg, ATOMIC_READ(notifyfd_default_maxevents));
+	ProcFS_PrintUInt(printer, arg, atomic_read(&notifyfd_default_maxevents));
 }
 
 INTERN void KCALL
@@ -1509,7 +1509,7 @@ procfs_sys_fs_inotify_maxqueuedevents_write(USER CHECKED void const *buf,
                                             size_t bufsize) {
 	unsigned int new_maxevents;
 	new_maxevents = ProcFS_ParseUInt(buf, bufsize, 1, (unsigned int)0x10000);
-	ATOMIC_WRITE(notifyfd_default_maxevents, new_maxevents);
+	atomic_write(&notifyfd_default_maxevents, new_maxevents);
 }
 #endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
@@ -1578,7 +1578,7 @@ ProcFS_Sys_Kernel_Hostname_Write(USER CHECKED void const *buf,
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_Kernel_PidMax_Print(pformatprinter printer, void *arg,
                                pos_t UNUSED(offset_hint)) {
-	ProcFS_PrintUPid(printer, arg, ATOMIC_READ(pid_recycle_threshold));
+	ProcFS_PrintUPid(printer, arg, atomic_read(&pid_recycle_threshold));
 }
 
 INTERN void KCALL
@@ -1586,7 +1586,7 @@ ProcFS_Sys_Kernel_PidMax_Write(USER CHECKED void const *buf,
                                size_t bufsize) {
 	upid_t newvalue;
 	newvalue = ProcFS_ParseUPid(buf, bufsize, PID_MIN, PID_MAX);
-	ATOMIC_WRITE(pid_recycle_threshold, newvalue);
+	atomic_write(&pid_recycle_threshold, newvalue);
 }
 
 
@@ -1623,9 +1623,9 @@ ProcFS_Sys_Kernel_SchedChildRunsFirst_Write(USER CHECKED void const *buf,
 	bool mode;
 	mode = ProcFS_ParseBool(buf, bufsize);
 	if (mode) {
-		ATOMIC_OR(task_start_default_flags, TASK_START_FHIGHPRIO);
+		atomic_or(&task_start_default_flags, TASK_START_FHIGHPRIO);
 	} else {
-		ATOMIC_AND(task_start_default_flags, ~TASK_START_FHIGHPRIO);
+		atomic_and(&task_start_default_flags, ~TASK_START_FHIGHPRIO);
 	}
 }
 
@@ -1643,7 +1643,7 @@ INTERN void KCALL
 ProcFS_Sys_Net_Core_RmemDefault_Write(USER CHECKED void const *buf, size_t bufsize) {
 	size_t newval;
 	newval = ProcFS_ParseSize(buf, bufsize, SOCKET_RCVBUFMIN, socket_default_rcvbufmax);
-	ATOMIC_WRITE(socket_default_rcvbufsiz, newval);
+	atomic_write(&socket_default_rcvbufsiz, newval);
 }
 
 
@@ -1660,7 +1660,7 @@ INTERN void KCALL
 ProcFS_Sys_Net_Core_WmemDefault_Write(USER CHECKED void const *buf, size_t bufsize) {
 	size_t newval;
 	newval = ProcFS_ParseSize(buf, bufsize, SOCKET_SNDBUFMIN, socket_default_sndbufmax);
-	ATOMIC_WRITE(socket_default_sndbufsiz, newval);
+	atomic_write(&socket_default_sndbufsiz, newval);
 }
 
 
@@ -1677,12 +1677,12 @@ INTERN void KCALL
 ProcFS_Sys_Net_Core_RmemMax_Write(USER CHECKED void const *buf, size_t bufsize) {
 	size_t newval, old_dfl;
 	newval = ProcFS_ParseSize(buf, bufsize, SOCKET_RCVBUFMIN);
-	ATOMIC_WRITE(socket_default_rcvbufmax, newval);
+	atomic_write(&socket_default_rcvbufmax, newval);
 	do {
-		old_dfl = ATOMIC_READ(socket_default_rcvbufsiz);
+		old_dfl = atomic_read(&socket_default_rcvbufsiz);
 		if (old_dfl <= newval)
 			break;
-	} while (!ATOMIC_CMPXCH_WEAK(socket_default_rcvbufsiz,
+	} while (!atomic_cmpxch_weak(&socket_default_rcvbufsiz,
 	                             old_dfl, newval));
 }
 
@@ -1700,12 +1700,12 @@ INTERN void KCALL
 ProcFS_Sys_Net_Core_WmemMax_Write(USER CHECKED void const *buf, size_t bufsize) {
 	size_t newval, old_dfl;
 	newval = ProcFS_ParseSize(buf, bufsize, SOCKET_SNDBUFMIN);
-	ATOMIC_WRITE(socket_default_sndbufmax, newval);
+	atomic_write(&socket_default_sndbufmax, newval);
 	do {
-		old_dfl = ATOMIC_READ(socket_default_sndbufsiz);
+		old_dfl = atomic_read(&socket_default_sndbufsiz);
 		if (old_dfl <= newval)
 			break;
-	} while (!ATOMIC_CMPXCH_WEAK(socket_default_sndbufsiz,
+	} while (!atomic_cmpxch_weak(&socket_default_sndbufsiz,
 	                             old_dfl, newval));
 }
 

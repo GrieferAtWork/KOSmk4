@@ -37,8 +37,6 @@
 #include <sched/rpc.h>
 #include <sched/sigmask.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except/reason/inval.h>
 #include <sys/poll.h>
 #include <sys/signalfd.h>

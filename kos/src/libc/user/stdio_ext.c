@@ -23,6 +23,7 @@
 #include "../api.h"
 /**/
 
+#include <atomic.h>
 #include <unicode.h> /* mbstate_init */
 
 #include "stdio-api.h"
@@ -181,7 +182,7 @@ NOTHROW_NCX(LIBCCALL libc___fpending)(FILE __KOS_FIXED_CONST *stream)
 	struct iofile_data *ex;
 	stream = file_fromuser(stream);
 	ex     = stream->if_exdata;
-	result = ATOMIC_READ(ex->io_chsz);
+	result = atomic_read(&ex->io_chsz);
 	return result;
 }
 /*[[[end:libc___fpending]]]*/
@@ -223,9 +224,9 @@ NOTHROW_NCX(LIBCCALL libc___fsetlocking)(FILE *stream,
 #ifdef IO_NOLOCK
 	if (type != FSETLOCKING_QUERY) {
 		if (type == FSETLOCKING_BYCALLER) {
-			ATOMIC_OR(stream->if_flag, IO_NOLOCK);
+			atomic_or(&stream->if_flag, IO_NOLOCK);
 		} else {
-			ATOMIC_AND(stream->if_flag, ~IO_NOLOCK);
+			atomic_and(&stream->if_flag, ~IO_NOLOCK);
 		}
 	}
 #endif /* IO_NOLOCK */
@@ -261,7 +262,7 @@ NOTHROW_NCX(LIBCCALL libc___freadahead)(FILE __KOS_FIXED_CONST *stream)
 {
 	size_t result;
 	stream = file_fromuser(stream);
-	result = ATOMIC_READ(stream->if_cnt);
+	result = atomic_read(&stream->if_cnt);
 	return result;
 }
 /*[[[end:libc___freadahead]]]*/

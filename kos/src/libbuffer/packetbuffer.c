@@ -28,11 +28,11 @@
 #include <hybrid/compiler.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 
 #include <kos/types.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <malloc.h>
 #include <stddef.h>
 #include <string.h>
@@ -176,7 +176,7 @@ again:
 	lock();
 again_locked:
 	/* try to rewind the packet buffer */
-	if (ATOMIC_CMPXCH(self->pb_rptr,
+	if (atomic_cmpxch(&self->pb_rptr,
 	                  self->pb_wptr,
 	                  (struct pb_packet *)self->pb_bbas))
 		self->pb_wptr = (struct pb_packet *)self->pb_bbas;
@@ -196,7 +196,7 @@ unlock_and_return_too_large:
 		packet->p_ancillary = (uint16_t)ancillary_size;
 		packet->p_state     = PB_PACKET_STATE_INIT;
 		self->pb_wptr = (struct pb_packet *)((byte_t *)self->pb_wptr + total_size);
-		ATOMIC_FETCHADD(self->pb_used, total_size);
+		atomic_fetchadd(&self->pb_used, total_size);
 		unlock();
 		return packet;
 	}
@@ -257,7 +257,7 @@ allocate_buffer_extension:
 		 *       above), but has since finished reading by calling `lib_pb_buffer_canread'
 		 *       That last call doesn't acquire any locks, so we must deal with the chance
 		 *       that the read-pointer has changed in the mean time! */
-		if (ATOMIC_READ(self->pb_rptr) == self->pb_wptr) {
+		if (atomic_read(&self->pb_rptr) == self->pb_wptr) {
 			/* Special case: old buffer was empty. */
 			self->pb_rptr = (struct pb_packet *)HEAPPTR_BASE(buf);
 			if (self->pb_bend != self->pb_bbas) {
@@ -431,12 +431,12 @@ allocate_buffer_extension:
 INTERN NOBLOCK NONNULL((1, 2)) void
 NOTHROW(CC lib_pb_buffer_endwrite_abort)(struct pb_buffer *__restrict self,
                                          struct pb_packet *__restrict packet) {
-	ATOMIC_WRITE(packet->p_state, PB_PACKET_STATE_DISCARD);
+	atomic_write(&packet->p_state, PB_PACKET_STATE_DISCARD);
 	if (trylock()) {
 		/* Optional: Try to reclaim unused packet memory, if the  one
 		 *           being discarded is still the most recent packet. */
 		if (self->pb_wptr == (struct pb_packet *)((byte_t *)packet + packet->p_total)) {
-			ATOMIC_FETCHSUB(self->pb_used, packet->p_total);
+			atomic_fetchsub(&self->pb_used, packet->p_total);
 			self->pb_wptr = packet;
 		}
 		unlock();
@@ -460,7 +460,7 @@ NOTHROW(CC lib_pb_buffer_endwrite_abort)(struct pb_buffer *__restrict self,
  * >>     task_waitfor();
  * >> #else
  * >>     lfutex_t status;
- * >>     status = ATOMIC_READ(self->pb_psta);
+ * >>     status = atomic_read(&self->pb_psta);
  * >>     packet = pb_buffer_startread(self);
  * >>     if (packet)
  * >>         break;
@@ -512,7 +512,7 @@ again_locked:
 	if (packet->p_state != PB_PACKET_STATE_READABLE) {
 		if (packet->p_state == PB_PACKET_STATE_DISCARD) {
 			/* Skip packets that were discarded */
-			ATOMIC_FETCHSUB(self->pb_used, packet->p_total);
+			atomic_fetchsub(&self->pb_used, packet->p_total);
 			self->pb_rptr = (struct pb_packet *)((byte_t *)self->pb_rptr +
 			                                     packet->p_total);
 			goto again_locked;
@@ -522,7 +522,7 @@ unlock_and_return_NULL:
 		/* Let the caller handle all of the blocking. */
 		return NULL;
 	}
-	ATOMIC_WRITE(packet->p_state, PB_PACKET_STATE_READING);
+	atomic_write(&packet->p_state, PB_PACKET_STATE_READING);
 	unlock();
 	return packet;
 }
@@ -604,16 +604,16 @@ NOTHROW(CC lib_pb_buffer_truncate_packet)(struct pb_buffer *__restrict self,
 	result->p_ancillary = packet->p_ancillary;
 
 	/* Account for all of the memory that just became unused. */
-	ATOMIC_FETCHSUB(self->pb_used, new_packet_offset);
+	atomic_fetchsub(&self->pb_used, new_packet_offset);
 
 	/* Update the  current read-pointer  to keep  on
 	 * pointing at the header of the current packet. */
 #ifdef NDEBUG
-	ATOMIC_WRITE(self->pb_rptr, result);
+	atomic_write(&self->pb_rptr, result);
 #else /* NDEBUG */
 	{
 		struct pb_packet *old_rptr;
-		old_rptr = ATOMIC_XCH(self->pb_rptr, result);
+		old_rptr = atomic_xch(&self->pb_rptr, result);
 		assertf(old_rptr == packet,
 		        "old_rptr = %p\n"
 		        "packet   = %p\n",
@@ -640,18 +640,18 @@ NOTHROW(CC lib_pb_buffer_endread_consume)(struct pb_buffer *__restrict self,
 	assert(packet->p_state == PB_PACKET_STATE_READING);
 
 	/* Note the order of read/writes here! */
-	total = ATOMIC_READ(packet->p_total);
+	total = atomic_read(&packet->p_total);
 	assert(total != 0);
 
 	/* Update the used-counter to reflect the amount of bytes that went away. */
-	ATOMIC_FETCHSUB(self->pb_used, total);
+	atomic_fetchsub(&self->pb_used, total);
 
 	/* At this point, the buffer's `pb_rptr' still points to our packet, meaning that
 	 * we  still have an  effective lock on  `pb_buffer_startread()'. We release that
 	 * locked by atomically moving the read-header  forward to the next packet  to-be
 	 * read, which will simultaneously bring the buffer as a whole into a  consistent
 	 * state. */
-	ATOMIC_FETCHADD(self->pb_rptr_uint, total);
+	atomic_fetchadd(&self->pb_rptr_uint, total);
 
 	/* Because we've moved the read-pointer ahead, `self->pb_rptr->p_state' should now
 	 * have changed away from `PB_PACKET_STATE_READING'.  In the event that there  are
@@ -696,7 +696,7 @@ again_locked:
 	if (packet->p_state != PB_PACKET_STATE_READABLE) {
 		if (packet->p_state == PB_PACKET_STATE_DISCARD) {
 			/* Skip packets that were discarded */
-			ATOMIC_FETCHSUB(self->pb_used, packet->p_total);
+			atomic_fetchsub(&self->pb_used, packet->p_total);
 			self->pb_rptr = (struct pb_packet *)((byte_t *)self->pb_rptr +
 			                                     packet->p_total);
 			goto again_locked;

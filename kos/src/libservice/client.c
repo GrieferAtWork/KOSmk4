@@ -44,6 +44,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <malloc.h>
 #include <sched.h>
@@ -96,8 +97,8 @@ NOTHROW(CC shutdown_client)(struct service *__restrict self) {
 	 * Essentially, this right here is an SMP-lock acquisition, should
 	 * you wish  to  use  terminology found  within  the  KOS  kernel. */
 	atomic_lock_acquire(&self->s_shm_lock);
-	comaddr       = ATOMIC_XCH(self->s_active_list, SERVICE_ACTIVE_LIST_SHUTDOWN);
-	pending_chain = ATOMIC_XCH(self->s_shm->ssh_shm->s_commands, 0);
+	comaddr       = atomic_xch(&self->s_active_list, SERVICE_ACTIVE_LIST_SHUTDOWN);
+	pending_chain = atomic_xch(&self->s_shm->ssh_shm->s_commands, 0);
 	shm_base      = self->s_shm->ssh_base;
 	while (comaddr) {
 		uintptr_t next;
@@ -110,12 +111,12 @@ NOTHROW(CC shutdown_client)(struct service *__restrict self) {
 		if (!com_is_pending(shm_base, pending_chain, comaddr)) {
 			uintptr_t orig_code;
 again_read_orig_code:
-			orig_code = ATOMIC_READ(com->sc_code);
+			orig_code = atomic_read(&com->sc_code);
 			if (orig_code == SERVICE_COM_ST_SUCCESS || SERVICE_COM_ISSPECIAL(orig_code))
 				goto next_command; /* Command already completed, so don't shut it down. */
 			/* When a generic COM wrapper receives `SERVICE_COM_ST_ECHO',
 			 * it  will interpret this  as an E_SERVICE_EXITED exception. */
-			if (!ATOMIC_CMPXCH(com->sc_code, orig_code, SERVICE_COM_ST_ECHO))
+			if (!atomic_cmpxch(&com->sc_code, orig_code, SERVICE_COM_ST_ECHO))
 				goto again_read_orig_code;
 		} else {
 			/* When a generic COM wrapper receives `SERVICE_COM_ST_ECHO',
@@ -125,7 +126,7 @@ again_read_orig_code:
 			 * but special `SERVICE_COM_ST_ECHO'  handling already  needs
 			 * to exist for the case where the command is currently being
 			 * executed, so might as well handle this case the same. */
-			ATOMIC_WRITE(com->sc_code, SERVICE_COM_ST_ECHO);
+			atomic_write(&com->sc_code, SERVICE_COM_ST_ECHO);
 		}
 next_command:
 		/* Wake-up  anyone listening  for this command.  Always do this  to handle the
@@ -421,7 +422,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(CC libservice_cancel_hup_rpc)(struct service *__restrict self) {
 	/* Quick check: has the HUP-RPC callback already finished running? */
 again:
-	if (ATOMIC_READ(self->s_fd_srv) == -1)
+	if (atomic_read(&self->s_fd_srv) == -1)
 		return;
 	if (epoll_ctl(self->s_fd_ephup, EPOLL_CTL_DEL, self->s_fd_srv, NULL) != 0) {
 		assert(errno == ENOENT);
@@ -438,7 +439,7 @@ again:
 		 * been set, and if it hasn't, we  yield in hopes to get the  thread
 		 * currently hosting the RPC to give it a chance to complete, before
 		 * starting over with our attempt to delete the RPC. */
-		if (ATOMIC_READ(self->s_fd_srv) == -1)
+		if (atomic_read(&self->s_fd_srv) == -1)
 			return;
 		sched_yield();
 		goto again;

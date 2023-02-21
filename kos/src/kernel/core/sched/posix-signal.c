@@ -40,13 +40,12 @@
 #include <sched/task.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
-
 #include <compat/config.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <signal.h>
 #include <string.h>
@@ -632,8 +631,8 @@ signal_waitfor(sigset_t const *__restrict these,
 	 * currently masked,  we need  to make  certain that  we  still
 	 * receive notification when such a signal arrives, even though
 	 * we're unable to handle it by "normal" means. */
-	ATOMIC_OR(THIS_TASK->t_flags, TASK_FWAKEONMSKRPC);
-	RAII_FINALLY { ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FWAKEONMSKRPC); };
+	atomic_or(&THIS_TASK->t_flags, TASK_FWAKEONMSKRPC);
+	RAII_FINALLY { atomic_and(&THIS_TASK->t_flags, ~TASK_FWAKEONMSKRPC); };
 	for (;;) {
 		struct pending_rpc *rpc;
 

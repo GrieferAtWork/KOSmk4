@@ -39,8 +39,6 @@
 #include <sched/sigmask.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 #include <kos/kernel/cpu-state-helpers.h>
@@ -48,6 +46,7 @@
 #include <kos/rpc.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <signal.h>
 #include <stddef.h>
@@ -379,11 +378,11 @@ err_target_exited:
 	if (!(mode & RPC_JOIN_F_ASYNC)) {
 		uintptr_t status;
 		for (;;) {
-			status = ATOMIC_READ(rpc->pr_user.pur_status);
+			status = atomic_read(&rpc->pr_user.pur_status);
 			if (status != PENDING_USER_RPC_STATUS_PENDING)
 				break;
 			task_connect(&rpc->pr_user.pur_stchng);
-			status = ATOMIC_READ(rpc->pr_user.pur_status);
+			status = atomic_read(&rpc->pr_user.pur_status);
 			if (status != PENDING_USER_RPC_STATUS_PENDING) {
 				task_disconnectall();
 				break;
@@ -397,7 +396,7 @@ err_target_exited:
 				 * cancel can't be performed because the RPC finished,
 				 * then we must discard the exception (unless it's  an
 				 * RT-level error) */
-				status = ATOMIC_XCH(rpc->pr_user.pur_status, PENDING_USER_RPC_STATUS_CANCELED);
+				status = atomic_xch(&rpc->pr_user.pur_status, PENDING_USER_RPC_STATUS_CANCELED);
 				if (status != PENDING_USER_RPC_STATUS_COMPLETE) {
 					if (status == PENDING_USER_RPC_STATUS_PENDING &&
 					    code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {

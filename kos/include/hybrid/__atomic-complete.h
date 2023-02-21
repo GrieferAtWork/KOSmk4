@@ -3222,7 +3222,7 @@ function makeTypeGeneric(
 	print("template<class __T"),;
 	for (local p: params)
 		print(", class __T", p),;
-	print("> inline "),;
+	print("> inline __ATTR_ARTIFICIAL "),;
 	if (returnType != "void")
 		print("__ATTR_WUNUSED "),;
 	print("__ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false");
@@ -3255,9 +3255,13 @@ function makeTypeGeneric(
 		for (local p: params)
 			print(", (__UINT", n, "_TYPE__)__", p),;
 		print(", ", order2 ? "__succ, __fail" : "__order", "); }");
+		print("	__STATIC_ELSE(sizeof(__T) == ", (n / 8), ")");
 		print("#endif /" "* __hybrid_atomic_", name, n, " *" "/");
+		print("	{"),;
+		if (n != SIZES.last)
+			print;
 	}
-	print("	__builtin_unreachable();");
+	print(" __builtin_unreachable(); ", "}" * #SIZES);
 	print("}");
 	print('} /' '* extern "C++" *' '/');
 	print("#else /" "* __cplusplus *" "/");
@@ -3360,7 +3364,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_cmpxch __hybrid_atomic_cmpxch
-template<class __T, class __Toldval, class __Tnewval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Toldval, class __Tnewval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_cmpxch8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_cmpxch8 */
@@ -3380,20 +3384,29 @@ template<class __T, class __Toldval, class __Tnewval> inline __ATTR_WUNUSED __AT
 	(void)__succ, (void)__fail;
 #ifdef __hybrid_atomic_cmpxch8
 	__STATIC_IF(sizeof(__T) == 1) { return __hybrid_atomic_cmpxch8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__oldval, (__UINT8_TYPE__)__newval, __succ, __fail); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_cmpxch8 */
+	{
 #ifdef __hybrid_atomic_cmpxch16
 	__STATIC_IF(sizeof(__T) == 2) { return __hybrid_atomic_cmpxch16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__oldval, (__UINT16_TYPE__)__newval, __succ, __fail); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_cmpxch16 */
+	{
 #ifdef __hybrid_atomic_cmpxch32
 	__STATIC_IF(sizeof(__T) == 4) { return __hybrid_atomic_cmpxch32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__oldval, (__UINT32_TYPE__)__newval, __succ, __fail); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_cmpxch32 */
+	{
 #ifdef __hybrid_atomic_cmpxch64
 	__STATIC_IF(sizeof(__T) == 8) { return __hybrid_atomic_cmpxch64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__oldval, (__UINT64_TYPE__)__newval, __succ, __fail); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_cmpxch64 */
+	{
 #ifdef __hybrid_atomic_cmpxch128
 	__STATIC_IF(sizeof(__T) == 16) { return __hybrid_atomic_cmpxch128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__oldval, (__UINT128_TYPE__)__newval, __succ, __fail); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_cmpxch128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -3438,7 +3451,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_cmpxch_weak __hybrid_atomic_cmpxch_weak
-template<class __T, class __Toldval, class __Tnewval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Toldval, class __Tnewval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_cmpxch_weak8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_cmpxch_weak8 */
@@ -3458,20 +3471,29 @@ template<class __T, class __Toldval, class __Tnewval> inline __ATTR_WUNUSED __AT
 	(void)__succ, (void)__fail;
 #ifdef __hybrid_atomic_cmpxch_weak8
 	__STATIC_IF(sizeof(__T) == 1) { return __hybrid_atomic_cmpxch_weak8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__oldval, (__UINT8_TYPE__)__newval, __succ, __fail); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_cmpxch_weak8 */
+	{
 #ifdef __hybrid_atomic_cmpxch_weak16
 	__STATIC_IF(sizeof(__T) == 2) { return __hybrid_atomic_cmpxch_weak16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__oldval, (__UINT16_TYPE__)__newval, __succ, __fail); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_cmpxch_weak16 */
+	{
 #ifdef __hybrid_atomic_cmpxch_weak32
 	__STATIC_IF(sizeof(__T) == 4) { return __hybrid_atomic_cmpxch_weak32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__oldval, (__UINT32_TYPE__)__newval, __succ, __fail); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_cmpxch_weak32 */
+	{
 #ifdef __hybrid_atomic_cmpxch_weak64
 	__STATIC_IF(sizeof(__T) == 8) { return __hybrid_atomic_cmpxch_weak64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__oldval, (__UINT64_TYPE__)__newval, __succ, __fail); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_cmpxch_weak64 */
+	{
 #ifdef __hybrid_atomic_cmpxch_weak128
 	__STATIC_IF(sizeof(__T) == 16) { return __hybrid_atomic_cmpxch_weak128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__oldval, (__UINT128_TYPE__)__newval, __succ, __fail); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_cmpxch_weak128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -3516,7 +3538,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_cmpxch_val __hybrid_atomic_cmpxch_val
-template<class __T, class __Toldval, class __Tnewval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Toldval, class __Tnewval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_cmpxch_val8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_cmpxch_val8 */
@@ -3536,20 +3558,29 @@ template<class __T, class __Toldval, class __Tnewval> inline __ATTR_WUNUSED __AT
 	(void)__succ, (void)__fail;
 #ifdef __hybrid_atomic_cmpxch_val8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_cmpxch_val8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__oldval, (__UINT8_TYPE__)__newval, __succ, __fail); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_cmpxch_val8 */
+	{
 #ifdef __hybrid_atomic_cmpxch_val16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_cmpxch_val16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__oldval, (__UINT16_TYPE__)__newval, __succ, __fail); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_cmpxch_val16 */
+	{
 #ifdef __hybrid_atomic_cmpxch_val32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_cmpxch_val32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__oldval, (__UINT32_TYPE__)__newval, __succ, __fail); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_cmpxch_val32 */
+	{
 #ifdef __hybrid_atomic_cmpxch_val64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_cmpxch_val64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__oldval, (__UINT64_TYPE__)__newval, __succ, __fail); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_cmpxch_val64 */
+	{
 #ifdef __hybrid_atomic_cmpxch_val128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_cmpxch_val128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__oldval, (__UINT128_TYPE__)__newval, __succ, __fail); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_cmpxch_val128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -3594,7 +3625,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_load __hybrid_atomic_load
-template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_load8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_load8 */
@@ -3614,20 +3645,29 @@ template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPA
 	(void)__order;
 #ifdef __hybrid_atomic_load8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_load8((__UINT8_TYPE__ const *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_load8 */
+	{
 #ifdef __hybrid_atomic_load16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_load16((__UINT16_TYPE__ const *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_load16 */
+	{
 #ifdef __hybrid_atomic_load32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_load32((__UINT32_TYPE__ const *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_load32 */
+	{
 #ifdef __hybrid_atomic_load64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_load64((__UINT64_TYPE__ const *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_load64 */
+	{
 #ifdef __hybrid_atomic_load128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_load128((__UINT128_TYPE__ const *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_load128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -3672,7 +3712,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_store __hybrid_atomic_store
-template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_store8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_store8 */
@@ -3692,20 +3732,29 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 	(void)__order;
 #ifdef __hybrid_atomic_store8
 	__STATIC_IF(sizeof(__T) == 1) { __hybrid_atomic_store8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_store8 */
+	{
 #ifdef __hybrid_atomic_store16
 	__STATIC_IF(sizeof(__T) == 2) { __hybrid_atomic_store16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_store16 */
+	{
 #ifdef __hybrid_atomic_store32
 	__STATIC_IF(sizeof(__T) == 4) { __hybrid_atomic_store32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_store32 */
+	{
 #ifdef __hybrid_atomic_store64
 	__STATIC_IF(sizeof(__T) == 8) { __hybrid_atomic_store64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_store64 */
+	{
 #ifdef __hybrid_atomic_store128
 	__STATIC_IF(sizeof(__T) == 16) { __hybrid_atomic_store128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_store128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -3750,7 +3799,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_xch __hybrid_atomic_xch
-template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_xch8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_xch8 */
@@ -3770,20 +3819,29 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	(void)__order;
 #ifdef __hybrid_atomic_xch8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_xch8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_xch8 */
+	{
 #ifdef __hybrid_atomic_xch16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_xch16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_xch16 */
+	{
 #ifdef __hybrid_atomic_xch32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_xch32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_xch32 */
+	{
 #ifdef __hybrid_atomic_xch64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_xch64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_xch64 */
+	{
 #ifdef __hybrid_atomic_xch128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_xch128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_xch128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -3828,7 +3886,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_fetchadd __hybrid_atomic_fetchadd
-template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_fetchadd8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_fetchadd8 */
@@ -3848,20 +3906,29 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	(void)__order;
 #ifdef __hybrid_atomic_fetchadd8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_fetchadd8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_fetchadd8 */
+	{
 #ifdef __hybrid_atomic_fetchadd16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_fetchadd16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_fetchadd16 */
+	{
 #ifdef __hybrid_atomic_fetchadd32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_fetchadd32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_fetchadd32 */
+	{
 #ifdef __hybrid_atomic_fetchadd64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_fetchadd64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_fetchadd64 */
+	{
 #ifdef __hybrid_atomic_fetchadd128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_fetchadd128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_fetchadd128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -3906,7 +3973,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_fetchsub __hybrid_atomic_fetchsub
-template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_fetchsub8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_fetchsub8 */
@@ -3926,20 +3993,29 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	(void)__order;
 #ifdef __hybrid_atomic_fetchsub8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_fetchsub8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_fetchsub8 */
+	{
 #ifdef __hybrid_atomic_fetchsub16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_fetchsub16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_fetchsub16 */
+	{
 #ifdef __hybrid_atomic_fetchsub32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_fetchsub32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_fetchsub32 */
+	{
 #ifdef __hybrid_atomic_fetchsub64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_fetchsub64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_fetchsub64 */
+	{
 #ifdef __hybrid_atomic_fetchsub128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_fetchsub128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_fetchsub128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -3984,7 +4060,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_fetchand __hybrid_atomic_fetchand
-template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_fetchand8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_fetchand8 */
@@ -4004,20 +4080,29 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	(void)__order;
 #ifdef __hybrid_atomic_fetchand8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_fetchand8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_fetchand8 */
+	{
 #ifdef __hybrid_atomic_fetchand16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_fetchand16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_fetchand16 */
+	{
 #ifdef __hybrid_atomic_fetchand32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_fetchand32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_fetchand32 */
+	{
 #ifdef __hybrid_atomic_fetchand64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_fetchand64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_fetchand64 */
+	{
 #ifdef __hybrid_atomic_fetchand128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_fetchand128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_fetchand128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -4062,7 +4147,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_fetchxor __hybrid_atomic_fetchxor
-template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_fetchxor8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_fetchxor8 */
@@ -4082,20 +4167,29 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	(void)__order;
 #ifdef __hybrid_atomic_fetchxor8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_fetchxor8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_fetchxor8 */
+	{
 #ifdef __hybrid_atomic_fetchxor16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_fetchxor16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_fetchxor16 */
+	{
 #ifdef __hybrid_atomic_fetchxor32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_fetchxor32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_fetchxor32 */
+	{
 #ifdef __hybrid_atomic_fetchxor64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_fetchxor64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_fetchxor64 */
+	{
 #ifdef __hybrid_atomic_fetchxor128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_fetchxor128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_fetchxor128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -4140,7 +4234,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_fetchor __hybrid_atomic_fetchor
-template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_fetchor8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_fetchor8 */
@@ -4160,20 +4254,29 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	(void)__order;
 #ifdef __hybrid_atomic_fetchor8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_fetchor8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_fetchor8 */
+	{
 #ifdef __hybrid_atomic_fetchor16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_fetchor16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_fetchor16 */
+	{
 #ifdef __hybrid_atomic_fetchor32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_fetchor32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_fetchor32 */
+	{
 #ifdef __hybrid_atomic_fetchor64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_fetchor64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_fetchor64 */
+	{
 #ifdef __hybrid_atomic_fetchor128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_fetchor128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_fetchor128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -4218,7 +4321,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_fetchnand __hybrid_atomic_fetchnand
-template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_fetchnand8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_fetchnand8 */
@@ -4238,20 +4341,29 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	(void)__order;
 #ifdef __hybrid_atomic_fetchnand8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_fetchnand8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_fetchnand8 */
+	{
 #ifdef __hybrid_atomic_fetchnand16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_fetchnand16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_fetchnand16 */
+	{
 #ifdef __hybrid_atomic_fetchnand32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_fetchnand32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_fetchnand32 */
+	{
 #ifdef __hybrid_atomic_fetchnand64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_fetchnand64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_fetchnand64 */
+	{
 #ifdef __hybrid_atomic_fetchnand128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_fetchnand128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_fetchnand128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -4298,7 +4410,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_fetchinc __hybrid_atomic_fetchinc
-template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_fetchinc8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_fetchinc8 */
@@ -4318,20 +4430,29 @@ template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPA
 	(void)__order;
 #ifdef __hybrid_atomic_fetchinc8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_fetchinc8((__UINT8_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_fetchinc8 */
+	{
 #ifdef __hybrid_atomic_fetchinc16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_fetchinc16((__UINT16_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_fetchinc16 */
+	{
 #ifdef __hybrid_atomic_fetchinc32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_fetchinc32((__UINT32_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_fetchinc32 */
+	{
 #ifdef __hybrid_atomic_fetchinc64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_fetchinc64((__UINT64_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_fetchinc64 */
+	{
 #ifdef __hybrid_atomic_fetchinc128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_fetchinc128((__UINT128_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_fetchinc128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -4378,7 +4499,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_fetchdec __hybrid_atomic_fetchdec
-template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_fetchdec8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_fetchdec8 */
@@ -4398,20 +4519,29 @@ template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPA
 	(void)__order;
 #ifdef __hybrid_atomic_fetchdec8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_fetchdec8((__UINT8_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_fetchdec8 */
+	{
 #ifdef __hybrid_atomic_fetchdec16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_fetchdec16((__UINT16_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_fetchdec16 */
+	{
 #ifdef __hybrid_atomic_fetchdec32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_fetchdec32((__UINT32_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_fetchdec32 */
+	{
 #ifdef __hybrid_atomic_fetchdec64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_fetchdec64((__UINT64_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_fetchdec64 */
+	{
 #ifdef __hybrid_atomic_fetchdec128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_fetchdec128((__UINT128_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_fetchdec128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -4456,7 +4586,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_addfetch __hybrid_atomic_addfetch
-template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_addfetch8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_addfetch8 */
@@ -4476,20 +4606,29 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	(void)__order;
 #ifdef __hybrid_atomic_addfetch8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_addfetch8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_addfetch8 */
+	{
 #ifdef __hybrid_atomic_addfetch16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_addfetch16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_addfetch16 */
+	{
 #ifdef __hybrid_atomic_addfetch32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_addfetch32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_addfetch32 */
+	{
 #ifdef __hybrid_atomic_addfetch64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_addfetch64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_addfetch64 */
+	{
 #ifdef __hybrid_atomic_addfetch128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_addfetch128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_addfetch128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -4534,7 +4673,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_subfetch __hybrid_atomic_subfetch
-template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_subfetch8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_subfetch8 */
@@ -4554,20 +4693,29 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	(void)__order;
 #ifdef __hybrid_atomic_subfetch8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_subfetch8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_subfetch8 */
+	{
 #ifdef __hybrid_atomic_subfetch16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_subfetch16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_subfetch16 */
+	{
 #ifdef __hybrid_atomic_subfetch32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_subfetch32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_subfetch32 */
+	{
 #ifdef __hybrid_atomic_subfetch64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_subfetch64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_subfetch64 */
+	{
 #ifdef __hybrid_atomic_subfetch128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_subfetch128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_subfetch128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -4612,7 +4760,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_andfetch __hybrid_atomic_andfetch
-template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_andfetch8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_andfetch8 */
@@ -4632,20 +4780,29 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	(void)__order;
 #ifdef __hybrid_atomic_andfetch8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_andfetch8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_andfetch8 */
+	{
 #ifdef __hybrid_atomic_andfetch16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_andfetch16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_andfetch16 */
+	{
 #ifdef __hybrid_atomic_andfetch32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_andfetch32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_andfetch32 */
+	{
 #ifdef __hybrid_atomic_andfetch64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_andfetch64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_andfetch64 */
+	{
 #ifdef __hybrid_atomic_andfetch128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_andfetch128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_andfetch128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -4690,7 +4847,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_xorfetch __hybrid_atomic_xorfetch
-template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_xorfetch8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_xorfetch8 */
@@ -4710,20 +4867,29 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	(void)__order;
 #ifdef __hybrid_atomic_xorfetch8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_xorfetch8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_xorfetch8 */
+	{
 #ifdef __hybrid_atomic_xorfetch16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_xorfetch16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_xorfetch16 */
+	{
 #ifdef __hybrid_atomic_xorfetch32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_xorfetch32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_xorfetch32 */
+	{
 #ifdef __hybrid_atomic_xorfetch64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_xorfetch64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_xorfetch64 */
+	{
 #ifdef __hybrid_atomic_xorfetch128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_xorfetch128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_xorfetch128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -4768,7 +4934,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_orfetch __hybrid_atomic_orfetch
-template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_orfetch8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_orfetch8 */
@@ -4788,20 +4954,29 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	(void)__order;
 #ifdef __hybrid_atomic_orfetch8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_orfetch8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_orfetch8 */
+	{
 #ifdef __hybrid_atomic_orfetch16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_orfetch16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_orfetch16 */
+	{
 #ifdef __hybrid_atomic_orfetch32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_orfetch32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_orfetch32 */
+	{
 #ifdef __hybrid_atomic_orfetch64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_orfetch64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_orfetch64 */
+	{
 #ifdef __hybrid_atomic_orfetch128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_orfetch128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_orfetch128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -4846,7 +5021,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_nandfetch __hybrid_atomic_nandfetch
-template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_nandfetch8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_nandfetch8 */
@@ -4866,20 +5041,29 @@ template<class __T, class __Tval> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) type
 	(void)__order;
 #ifdef __hybrid_atomic_nandfetch8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_nandfetch8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_nandfetch8 */
+	{
 #ifdef __hybrid_atomic_nandfetch16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_nandfetch16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_nandfetch16 */
+	{
 #ifdef __hybrid_atomic_nandfetch32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_nandfetch32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_nandfetch32 */
+	{
 #ifdef __hybrid_atomic_nandfetch64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_nandfetch64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_nandfetch64 */
+	{
 #ifdef __hybrid_atomic_nandfetch128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_nandfetch128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_nandfetch128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -4926,7 +5110,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_incfetch __hybrid_atomic_incfetch
-template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_incfetch8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_incfetch8 */
@@ -4946,20 +5130,29 @@ template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPA
 	(void)__order;
 #ifdef __hybrid_atomic_incfetch8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_incfetch8((__UINT8_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_incfetch8 */
+	{
 #ifdef __hybrid_atomic_incfetch16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_incfetch16((__UINT16_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_incfetch16 */
+	{
 #ifdef __hybrid_atomic_incfetch32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_incfetch32((__UINT32_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_incfetch32 */
+	{
 #ifdef __hybrid_atomic_incfetch64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_incfetch64((__UINT64_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_incfetch64 */
+	{
 #ifdef __hybrid_atomic_incfetch128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_incfetch128((__UINT128_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_incfetch128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -5006,7 +5199,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_decfetch __hybrid_atomic_decfetch
-template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_decfetch8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_decfetch8 */
@@ -5026,20 +5219,29 @@ template<class __T> inline __ATTR_WUNUSED __ATTR_NONNULL((1)) typename __NAMESPA
 	(void)__order;
 #ifdef __hybrid_atomic_decfetch8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_decfetch8((__UINT8_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_decfetch8 */
+	{
 #ifdef __hybrid_atomic_decfetch16
 	__STATIC_IF(sizeof(__T) == 2) { return (__T)__hybrid_atomic_decfetch16((__UINT16_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_decfetch16 */
+	{
 #ifdef __hybrid_atomic_decfetch32
 	__STATIC_IF(sizeof(__T) == 4) { return (__T)__hybrid_atomic_decfetch32((__UINT32_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_decfetch32 */
+	{
 #ifdef __hybrid_atomic_decfetch64
 	__STATIC_IF(sizeof(__T) == 8) { return (__T)__hybrid_atomic_decfetch64((__UINT64_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_decfetch64 */
+	{
 #ifdef __hybrid_atomic_decfetch128
 	__STATIC_IF(sizeof(__T) == 16) { return (__T)__hybrid_atomic_decfetch128((__UINT128_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_decfetch128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -5084,7 +5286,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_add __hybrid_atomic_add
-template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_add8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_add8 */
@@ -5104,20 +5306,29 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 	(void)__order;
 #ifdef __hybrid_atomic_add8
 	__STATIC_IF(sizeof(__T) == 1) { __hybrid_atomic_add8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_add8 */
+	{
 #ifdef __hybrid_atomic_add16
 	__STATIC_IF(sizeof(__T) == 2) { __hybrid_atomic_add16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_add16 */
+	{
 #ifdef __hybrid_atomic_add32
 	__STATIC_IF(sizeof(__T) == 4) { __hybrid_atomic_add32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_add32 */
+	{
 #ifdef __hybrid_atomic_add64
 	__STATIC_IF(sizeof(__T) == 8) { __hybrid_atomic_add64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_add64 */
+	{
 #ifdef __hybrid_atomic_add128
 	__STATIC_IF(sizeof(__T) == 16) { __hybrid_atomic_add128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_add128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -5162,7 +5373,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_sub __hybrid_atomic_sub
-template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_sub8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_sub8 */
@@ -5182,20 +5393,29 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 	(void)__order;
 #ifdef __hybrid_atomic_sub8
 	__STATIC_IF(sizeof(__T) == 1) { __hybrid_atomic_sub8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_sub8 */
+	{
 #ifdef __hybrid_atomic_sub16
 	__STATIC_IF(sizeof(__T) == 2) { __hybrid_atomic_sub16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_sub16 */
+	{
 #ifdef __hybrid_atomic_sub32
 	__STATIC_IF(sizeof(__T) == 4) { __hybrid_atomic_sub32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_sub32 */
+	{
 #ifdef __hybrid_atomic_sub64
 	__STATIC_IF(sizeof(__T) == 8) { __hybrid_atomic_sub64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_sub64 */
+	{
 #ifdef __hybrid_atomic_sub128
 	__STATIC_IF(sizeof(__T) == 16) { __hybrid_atomic_sub128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_sub128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -5240,7 +5460,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_and __hybrid_atomic_and
-template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_and8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_and8 */
@@ -5260,20 +5480,29 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 	(void)__order;
 #ifdef __hybrid_atomic_and8
 	__STATIC_IF(sizeof(__T) == 1) { __hybrid_atomic_and8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_and8 */
+	{
 #ifdef __hybrid_atomic_and16
 	__STATIC_IF(sizeof(__T) == 2) { __hybrid_atomic_and16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_and16 */
+	{
 #ifdef __hybrid_atomic_and32
 	__STATIC_IF(sizeof(__T) == 4) { __hybrid_atomic_and32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_and32 */
+	{
 #ifdef __hybrid_atomic_and64
 	__STATIC_IF(sizeof(__T) == 8) { __hybrid_atomic_and64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_and64 */
+	{
 #ifdef __hybrid_atomic_and128
 	__STATIC_IF(sizeof(__T) == 16) { __hybrid_atomic_and128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_and128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -5318,7 +5547,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_xor __hybrid_atomic_xor
-template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_xor8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_xor8 */
@@ -5338,20 +5567,29 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 	(void)__order;
 #ifdef __hybrid_atomic_xor8
 	__STATIC_IF(sizeof(__T) == 1) { __hybrid_atomic_xor8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_xor8 */
+	{
 #ifdef __hybrid_atomic_xor16
 	__STATIC_IF(sizeof(__T) == 2) { __hybrid_atomic_xor16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_xor16 */
+	{
 #ifdef __hybrid_atomic_xor32
 	__STATIC_IF(sizeof(__T) == 4) { __hybrid_atomic_xor32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_xor32 */
+	{
 #ifdef __hybrid_atomic_xor64
 	__STATIC_IF(sizeof(__T) == 8) { __hybrid_atomic_xor64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_xor64 */
+	{
 #ifdef __hybrid_atomic_xor128
 	__STATIC_IF(sizeof(__T) == 16) { __hybrid_atomic_xor128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_xor128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -5396,7 +5634,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_or __hybrid_atomic_or
-template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_or8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_or8 */
@@ -5416,20 +5654,29 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 	(void)__order;
 #ifdef __hybrid_atomic_or8
 	__STATIC_IF(sizeof(__T) == 1) { __hybrid_atomic_or8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_or8 */
+	{
 #ifdef __hybrid_atomic_or16
 	__STATIC_IF(sizeof(__T) == 2) { __hybrid_atomic_or16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_or16 */
+	{
 #ifdef __hybrid_atomic_or32
 	__STATIC_IF(sizeof(__T) == 4) { __hybrid_atomic_or32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_or32 */
+	{
 #ifdef __hybrid_atomic_or64
 	__STATIC_IF(sizeof(__T) == 8) { __hybrid_atomic_or64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_or64 */
+	{
 #ifdef __hybrid_atomic_or128
 	__STATIC_IF(sizeof(__T) == 16) { __hybrid_atomic_or128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_or128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -5474,7 +5721,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_nand __hybrid_atomic_nand
-template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_nand8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_nand8 */
@@ -5494,20 +5741,29 @@ template<class __T, class __Tval> inline __ATTR_NONNULL((1)) typename __NAMESPAC
 	(void)__order;
 #ifdef __hybrid_atomic_nand8
 	__STATIC_IF(sizeof(__T) == 1) { __hybrid_atomic_nand8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_nand8 */
+	{
 #ifdef __hybrid_atomic_nand16
 	__STATIC_IF(sizeof(__T) == 2) { __hybrid_atomic_nand16((__UINT16_TYPE__ *)__p, (__UINT16_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_nand16 */
+	{
 #ifdef __hybrid_atomic_nand32
 	__STATIC_IF(sizeof(__T) == 4) { __hybrid_atomic_nand32((__UINT32_TYPE__ *)__p, (__UINT32_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_nand32 */
+	{
 #ifdef __hybrid_atomic_nand64
 	__STATIC_IF(sizeof(__T) == 8) { __hybrid_atomic_nand64((__UINT64_TYPE__ *)__p, (__UINT64_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_nand64 */
+	{
 #ifdef __hybrid_atomic_nand128
 	__STATIC_IF(sizeof(__T) == 16) { __hybrid_atomic_nand128((__UINT128_TYPE__ *)__p, (__UINT128_TYPE__)__val, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_nand128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -5554,7 +5810,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_inc __hybrid_atomic_inc
-template<class __T> inline __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T> inline __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_inc8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_inc8 */
@@ -5574,20 +5830,29 @@ template<class __T> inline __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hy
 	(void)__order;
 #ifdef __hybrid_atomic_inc8
 	__STATIC_IF(sizeof(__T) == 1) { __hybrid_atomic_inc8((__UINT8_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_inc8 */
+	{
 #ifdef __hybrid_atomic_inc16
 	__STATIC_IF(sizeof(__T) == 2) { __hybrid_atomic_inc16((__UINT16_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_inc16 */
+	{
 #ifdef __hybrid_atomic_inc32
 	__STATIC_IF(sizeof(__T) == 4) { __hybrid_atomic_inc32((__UINT32_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_inc32 */
+	{
 #ifdef __hybrid_atomic_inc64
 	__STATIC_IF(sizeof(__T) == 8) { __hybrid_atomic_inc64((__UINT64_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_inc64 */
+	{
 #ifdef __hybrid_atomic_inc128
 	__STATIC_IF(sizeof(__T) == 16) { __hybrid_atomic_inc128((__UINT128_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_inc128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -5634,7 +5899,7 @@ template<class __T> struct __hybrid_atomic_enable_if<false, __T> {};
 __NAMESPACE_INT_END
 #endif /* __HYBRID_PRIVATE_ATOMIC_ENABLE_IF_DEFINED */
 #define __hybrid_atomic_dec __hybrid_atomic_dec
-template<class __T> inline __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
+template<class __T> inline __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hybrid_atomic_enable_if<false
 #ifdef __hybrid_atomic_dec8
 	|| sizeof(__T) == 1
 #endif /* __hybrid_atomic_dec8 */
@@ -5654,20 +5919,29 @@ template<class __T> inline __ATTR_NONNULL((1)) typename __NAMESPACE_INT_SYM __hy
 	(void)__order;
 #ifdef __hybrid_atomic_dec8
 	__STATIC_IF(sizeof(__T) == 1) { __hybrid_atomic_dec8((__UINT8_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 1)
 #endif /* __hybrid_atomic_dec8 */
+	{
 #ifdef __hybrid_atomic_dec16
 	__STATIC_IF(sizeof(__T) == 2) { __hybrid_atomic_dec16((__UINT16_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 2)
 #endif /* __hybrid_atomic_dec16 */
+	{
 #ifdef __hybrid_atomic_dec32
 	__STATIC_IF(sizeof(__T) == 4) { __hybrid_atomic_dec32((__UINT32_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 4)
 #endif /* __hybrid_atomic_dec32 */
+	{
 #ifdef __hybrid_atomic_dec64
 	__STATIC_IF(sizeof(__T) == 8) { __hybrid_atomic_dec64((__UINT64_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 8)
 #endif /* __hybrid_atomic_dec64 */
+	{
 #ifdef __hybrid_atomic_dec128
 	__STATIC_IF(sizeof(__T) == 16) { __hybrid_atomic_dec128((__UINT128_TYPE__ *)__p, __order); }
+	__STATIC_ELSE(sizeof(__T) == 16)
 #endif /* __hybrid_atomic_dec128 */
-	__builtin_unreachable();
+	{ __builtin_unreachable(); }}}}}
 }
 } /* extern "C++" */
 #else /* __cplusplus */

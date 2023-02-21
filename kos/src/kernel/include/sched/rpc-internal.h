@@ -38,7 +38,7 @@ DECL_BEGIN
 /* Possible values for `struct pending_user_rpc::pur_status' */
 #define PENDING_USER_RPC_STATUS_PENDING  0 /* RPC program is pending execution, or is currently executing */
 #define PENDING_USER_RPC_STATUS_COMPLETE 1 /* RPC program has completed successfully */
-#define PENDING_USER_RPC_STATUS_CANCELED 2 /* RPC program was canceled.  Can either be ATOMIC_CMPXCH'd  from
+#define PENDING_USER_RPC_STATUS_CANCELED 2 /* RPC program was canceled.  Can either be atomic_cmpxch'd  from
                                             * `PENDING_USER_RPC_STATUS_PENDING' by the sender, in which case
                                             * the  RPC program will be aborted and modifications it made are
                                             * silently  discarded, or set by the target thread itself as the
@@ -154,9 +154,9 @@ DATDEF ATTR_PERTASK struct pending_rpc_slist this_rpcs;
  *
  * To send one of these signals to a thread, do:
  * >> assert(signo >= 1 && signo <= 31);
- * >> ATOMIC_OR(FORTASK(thread, this_rpcs_sigpend), (uint32_t)1 << signo);
+ * >> atomic_or(&FORTASK(thread, this_rpcs_sigpend), (uint32_t)1 << signo);
  * >> sig_broadcast(&FORTASK(thread, this_rpcs_sig));
- * >> ATOMIC_OR(thread->t_flags, TASK_FRPC);
+ * >> atomic_or(&thread->t_flags, TASK_FRPC);
  * >> userexcept_sysret_inject_and_marksignal_safe(thread, flags); */
 DATDEF ATTR_PERTASK uint32_t this_rpcs_sigpend;
 

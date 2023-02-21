@@ -85,7 +85,7 @@ err_init:
 			free(init);
 			goto err;
 		}
-		new_init = (byte_t *)ATOMIC_CMPXCH_VAL(self->dm_tlsinit, NULL, init);
+		new_init = (byte_t *)atomic_cmpxch_val(&self->dm_tlsinit, NULL, init);
 		if unlikely(new_init != NULL)
 			free(init);
 	}

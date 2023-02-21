@@ -59,7 +59,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/host.h>
 #include <hybrid/sched/preemption.h>
 
@@ -67,6 +66,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kos/except.h>
 #include <kos/kernel/cpu-state-helpers.h>
 
+#include <atomic.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <signal.h>
@@ -94,7 +94,7 @@ DBG_COMMAND(unpoison,
             "unpoison\n"
             "\tClears the PANIC bit after kernel panic\n"
             "\tThe NO_WARRANTY bit is not altered\n") {
-	ATOMIC_AND(__kernel_poisoned, ~_KERNEL_POISON_PANIC);
+	atomic_and(&__kernel_poisoned, ~_KERNEL_POISON_PANIC);
 	return 0;
 }
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
@@ -158,7 +158,7 @@ NOTHROW(KCALL _kernel_poison)(void) {
 	 * inconsistent, and can no longer be trusted not to randomly
 	 * crash and burn) */
 	COMPILER_WRITE_BARRIER();
-	ATOMIC_STORE(__kernel_poisoned, 0xff); /* Set all of the poison bits! */
+	atomic_store(&__kernel_poisoned, 0xff); /* Set all of the poison bits! */
 	COMPILER_WRITE_BARRIER();
 
 	/* Redirect heap functions to use the poison heap */

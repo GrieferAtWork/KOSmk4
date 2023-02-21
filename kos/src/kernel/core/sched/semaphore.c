@@ -23,10 +23,10 @@
 
 #include <kernel/compiler.h>
 
-#include <hybrid/atomic.h>
 #include <sched/semaphore.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stdbool.h>
 
 DECL_BEGIN
@@ -41,15 +41,15 @@ semaphore_wait(struct semaphore *__restrict self, ktime_t abs_timeout)
 again:
 	assert(!task_wasconnected());
 	do {
-		count = ATOMIC_READ(self->s_count);
+		count = atomic_read(&self->s_count);
 		if (!count) {
 			TASK_POLL_BEFORE_CONNECT({
-				count = ATOMIC_READ(self->s_count);
+				count = atomic_read(&self->s_count);
 				if (count != 0)
 					goto do_exchange;
 			});
 			task_connect(&self->s_avail);
-			count = ATOMIC_READ(self->s_count);
+			count = atomic_read(&self->s_count);
 			if likely(!count) {
 				if unlikely(!task_waitfor(abs_timeout))
 					return false;
@@ -61,7 +61,7 @@ again:
 do_exchange:
 		;
 #endif /* CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT */
-	} while (!ATOMIC_CMPXCH_WEAK(self->s_count, count, count - 1));
+	} while (!atomic_cmpxch_weak(&self->s_count, count, count - 1));
 	return true;
 }
 
@@ -78,15 +78,15 @@ NOTHROW(FCALL semaphore_wait_nx)(struct semaphore *__restrict self,
 again:
 	assert(!task_wasconnected());
 	do {
-		count = ATOMIC_READ(self->s_count);
+		count = atomic_read(&self->s_count);
 		if (!count) {
 			TASK_POLL_BEFORE_CONNECT({
-				count = ATOMIC_READ(self->s_count);
+				count = atomic_read(&self->s_count);
 				if (count != 0)
 					goto do_exchange;
 			});
 			task_connect(&self->s_avail);
-			count = ATOMIC_READ(self->s_count);
+			count = atomic_read(&self->s_count);
 			if likely(!count) {
 				if unlikely(!task_waitfor_nx(abs_timeout))
 					return false;
@@ -98,7 +98,7 @@ again:
 do_exchange:
 		;
 #endif /* CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT */
-	} while (!ATOMIC_CMPXCH_WEAK(self->s_count, count, count - 1));
+	} while (!atomic_cmpxch_weak(&self->s_count, count, count - 1));
 	return true;
 }
 

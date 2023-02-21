@@ -30,10 +30,10 @@
 #include <sched/sig.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 
 DECL_BEGIN
@@ -81,7 +81,7 @@ NOTHROW(FCALL sched_super_override_ipi)(void) {
 	struct task_connections cons;
 
 	/* Report that we can now be considered to be suspended. */
-	ATOMIC_INC(super_override_ack);
+	atomic_inc(&super_override_ack);
 
 	/* Preserve active connections, so we don't interfere with
 	 * signals that may have been connected by the thread that
@@ -106,10 +106,10 @@ NOTHROW(FCALL sched_super_override_ipi)(void) {
 	 * so  we won't get  preempted by other threads) */
 	PREEMPTION_ENABLE();
 
-	while (ATOMIC_READ(super_override_cpu) != NULL) {
+	while (atomic_read(&super_override_cpu) != NULL) {
 		/* Wait for `super_override_release' */
 		task_connect_for_poll(&super_override_release);
-		if unlikely(ATOMIC_READ(super_override_cpu) == NULL) {
+		if unlikely(atomic_read(&super_override_cpu) == NULL) {
 			task_disconnectall();
 			break;
 		}
@@ -127,7 +127,7 @@ NOTHROW(FCALL sched_super_override_ipi)(void) {
 	task_popconnections();
 
 	/* Report that we've resumed execution. */
-	ATOMIC_DEC(super_override_ack);
+	atomic_dec(&super_override_ack);
 }
 
 PRIVATE BLOCKING_IF(force) ATTR_COLDTEXT bool FCALL
@@ -151,7 +151,7 @@ sched_super_override_start_impl(bool force)
 
 again:
 	/* Now try to acquire the super-override lock. */
-	while (ATOMIC_XCH(super_override_cpu, me) != NULL) {
+	while (atomic_xch(&super_override_cpu, me) != NULL) {
 		if (!force) {
 			if (!was_already_override)
 				sched_override_end();
@@ -162,7 +162,7 @@ again:
 		 * When this happens, then we must simply wait
 		 * for the lock to be released. */
 		task_connect(&super_override_release);
-		if (ATOMIC_XCH(super_override_cpu, me) == NULL) {
+		if (atomic_xch(&super_override_cpu, me) == NULL) {
 			task_disconnectall();
 			break;
 		}
@@ -177,13 +177,13 @@ again:
 	}
 
 	/* Wait for a previous SUPER-lock to be fully released. */
-	if unlikely(ATOMIC_READ(super_override_unlocking)) {
-		ATOMIC_WRITE(super_override_cpu, NULL);
+	if unlikely(atomic_read(&super_override_unlocking)) {
+		atomic_write(&super_override_cpu, NULL);
 		sig_broadcast(&super_override_release);
 		/* Wait for another thread to finish releasing the SUPER-lock. */
 		do {
 			preemption_tryyield();
-		} while (ATOMIC_READ(super_override_unlocking));
+		} while (atomic_read(&super_override_unlocking));
 		goto again;
 	}
 
@@ -191,7 +191,7 @@ again:
 	 * broadcast an IPI to all other CPUs, telling them to stop what
 	 * they're doing and  wait until our  caller releases the  super
 	 * override lock. */
-	assert(ATOMIC_READ(super_override_ack) == 0);
+	assert(atomic_read(&super_override_ack) == 0);
 
 	{
 		void *args[CPU_IPI_ARGCOUNT];
@@ -200,12 +200,12 @@ again:
 		count = cpu_broadcastipi_notthis(&arch_sched_super_override_ipi, args,
 		                                 CPU_IPI_FWAKEUP | CPU_IPI_FWAITFOR);
 		/* Wait until all other CPUs have acknowledged the request. */
-		while (ATOMIC_READ(super_override_ack) < count)
+		while (atomic_read(&super_override_ack) < count)
 			preemption_tryyield();
 	}
 
 	/* We've successfully acquired the super-lock! */
-	ATOMIC_WRITE(super_override_active, true);
+	atomic_write(&super_override_active, true);
 	return true;
 }
 
@@ -291,25 +291,25 @@ NOTHROW(FCALL sched_super_override_end)(bool release_sched_override) {
 	assert(PERCPU(thiscpu_sched_override) == THIS_TASK);
 
 	/* Set the override-unlocking flag. */
-	ATOMIC_WRITE(super_override_unlocking, true);
+	atomic_write(&super_override_unlocking, true);
 
 	/* Clear the override-active flag. */
-	ATOMIC_WRITE(super_override_active, false);
+	atomic_write(&super_override_active, false);
 
 	/* Clear the super-override CPU field, and indicate
 	 * to suspended CPUs that execution may now resume. */
-	ATOMIC_WRITE(super_override_cpu, NULL);
+	atomic_write(&super_override_cpu, NULL);
 	sig_broadcast(&super_override_release);
 
 	/* Wait for all CPUs to acknowledge resuming execution. */
-	while (ATOMIC_READ(super_override_ack) != 0)
+	while (atomic_read(&super_override_ack) != 0)
 		preemption_tryyield();
 
 	/* Clear the override-unlocking flag.
 	 * This  flag  is needed  to prevent  `super_override_ack' from
 	 * being incremented by some other CPU immediately re-acquiring
 	 * another super-lock. */
-	ATOMIC_WRITE(super_override_unlocking, false);
+	atomic_write(&super_override_unlocking, false);
 
 	if (release_sched_override)
 		sched_override_end();

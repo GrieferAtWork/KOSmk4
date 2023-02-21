@@ -42,8 +42,6 @@
 #include <sched/task.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/io.h>
@@ -53,6 +51,7 @@
 #include <sys/poll.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -132,10 +131,10 @@ NOTHROW(FCALL epoll_controller_add_to_raised)(struct epoll_controller *__restric
                                               struct epoll_handle_monitor *__restrict monitor) {
 	struct epoll_handle_monitor *rnext;
 	do {
-		rnext = ATOMIC_READ(self->ec_raised);
+		rnext = atomic_read(&self->ec_raised);
 		monitor->ehm_rnext = rnext;
 		COMPILER_WRITE_BARRIER();
-	} while (!ATOMIC_CMPXCH_WEAK(self->ec_raised,
+	} while (!atomic_cmpxch_weak(&self->ec_raised,
 	                             rnext, monitor));
 }
 
@@ -148,12 +147,12 @@ NOTHROW(FCALL epoll_controller_remove_from_raised)(struct epoll_controller *__re
 	struct epoll_handle_monitor *rq;
 	struct epoll_handle_monitor **prq;
 again:
-	rq = ATOMIC_READ(self->ec_raised);
+	rq = atomic_read(&self->ec_raised);
 	if (rq == monitor) {
 		/* Special case: `monitor'  is the most  recently raised  handle.
-		 * In this case, we must use ATOMIC_CMPXCH because other monitors
+		 * In this case, we must use atomic_cmpxch because other monitors
 		 * may have already changed `ec_raised' in the mean time. */
-		if (!ATOMIC_CMPXCH_WEAK(self->ec_raised, rq, rq->ehm_rnext))
+		if (!atomic_cmpxch_weak(&self->ec_raised, rq, rq->ehm_rnext))
 			goto again;
 		return;
 	}
@@ -202,7 +201,7 @@ NOTHROW(FCALL epoll_completion)(struct sig_completion *__restrict self,
 
 	/* Increment the raise-counter, but make sure not to overrun it. */
 	do {
-		oldraise = ATOMIC_READ(monitor->ehm_raised);
+		oldraise = atomic_read(&monitor->ehm_raised);
 #ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 		/* NOTE: `-1' mustn't be reached, either because that's
 		 *       the marker for  `epoll_handle_monitor_isrpc()' */
@@ -214,7 +213,7 @@ NOTHROW(FCALL epoll_completion)(struct sig_completion *__restrict self,
 #endif /* !CONFIG_HAVE_KERNEL_EPOLL_RPC */
 		if (oldraise == 0 && bufsize < sizeof(void *))
 			return sizeof(void *);
-	} while (!ATOMIC_CMPXCH_WEAK(monitor->ehm_raised,
+	} while (!atomic_cmpxch_weak(&monitor->ehm_raised,
 	                             oldraise, oldraise + 1));
 	/* If  this is the first time that  our monitor has been raised, then
 	 * we  must acquire a reference to the associated controller, as well
@@ -670,7 +669,7 @@ NOTHROW(FCALL epoll_controller_intern_doadd)(struct epoll_controller *__restrict
 		    emon->ehm_fdkey == monitor->ehm_fdkey) {
 #ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 			/* Special return value for already-triggered RPC monitors. */
-			if (epoll_handle_monitor_isrpc(emon) && ATOMIC_READ(emon->ehm_rpc) == NULL)
+			if (epoll_handle_monitor_isrpc(emon) && atomic_read(&emon->ehm_rpc) == NULL)
 				return EPOLL_CONTROLLER_INTERN_ADD_MUSTREAP;
 #endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
@@ -1069,9 +1068,9 @@ NOTHROW(FCALL epoll_rpc_completion)(struct sig_completion *__restrict self,
 	                       struct epoll_handle_monitor, ehm_comp);
 	assert(epoll_handle_monitor_isrpc(monitor));
 
-	if (ATOMIC_READ(monitor->ehm_rpc) != NULL && bufsize < 2 * sizeof(void *))
+	if (atomic_read(&monitor->ehm_rpc) != NULL && bufsize < 2 * sizeof(void *))
 		return 2 * sizeof(void *);
-	rpc = ATOMIC_XCH(monitor->ehm_rpc, NULL);
+	rpc = atomic_xch(&monitor->ehm_rpc, NULL);
 	if (rpc) {
 		struct epoll_controller *ctrl;
 		assert(bufsize >= 2 * sizeof(void *));
@@ -1198,7 +1197,7 @@ again_acquire:
 		} EXCEPT {
 			struct epoll_monitor_rpc *canceled_rpc;
 			/* Try to cancel delivery of the RPC. */
-			canceled_rpc = ATOMIC_XCH(newmon->ehm_rpc, NULL);
+			canceled_rpc = atomic_xch(&newmon->ehm_rpc, NULL);
 			if (canceled_rpc == NULL) {
 				except_code_t code = except_code();
 				/* RPC was already triggered. - This is bad since we can't
@@ -1231,7 +1230,7 @@ again_acquire:
 		/* If one of the monitored events already triggered, then we must immediacy */
 		if unlikely(raised != 0) {
 			struct epoll_monitor_rpc *canceled_rpc;
-			canceled_rpc = ATOMIC_XCH(newmon->ehm_rpc, NULL);
+			canceled_rpc = atomic_xch(&newmon->ehm_rpc, NULL);
 			sig_multicompletion_disconnectall(&newmon->ehm_comp);
 			if (canceled_rpc) {
 				/* Remove the monitor from the epoll controller. */
@@ -1394,7 +1393,7 @@ epoll_controller_delmonitor(struct epoll_controller *__restrict self,
 		 * there's a lockop pending for  `self' _right_ _now_ that  will get rid of  this
 		 * monitor for us) */
 		struct epoll_monitor_rpc *rpc;
-		rpc = ATOMIC_XCH(monitor->ehm_rpc, NULL);
+		rpc = atomic_xch(&monitor->ehm_rpc, NULL);
 		if (rpc == NULL) {
 			/* Cancel failed because the RPC was already send on its way... */
 			epoll_controller_intern_doadd_force(self, monitor);
@@ -1434,9 +1433,9 @@ NOTHROW(KCALL epoll_controller_requeue_events_at_back_of_chain)(struct epoll_con
                                                                 struct epoll_handle_monitor *chain) {
 	struct epoll_handle_monitor *oldchain;
 again:
-	oldchain = ATOMIC_READ(self->ec_raised);
+	oldchain = atomic_read(&self->ec_raised);
 	if (!oldchain) {
-		if (!ATOMIC_CMPXCH_WEAK(self->ec_raised, NULL, chain))
+		if (!atomic_cmpxch_weak(&self->ec_raised, NULL, chain))
 			goto again;
 		return;
 	}
@@ -1508,7 +1507,7 @@ epoll_controller_trywait(struct epoll_controller *__restrict self,
 	TRY {
 		{
 			struct epoll_handle_monitor *monitor;
-			monitor = ATOMIC_XCH(self->ec_raised, NULL);
+			monitor = atomic_xch(&self->ec_raised, NULL);
 			TRY {
 scan_monitors:
 				while (monitor) {
@@ -1547,16 +1546,16 @@ scan_monitors:
 							 * -> Handle this case by priming `monitor' once again. */
 							DBG_memset(&monitor->ehm_rnext, 0xcc, sizeof(monitor->ehm_rnext));
 							COMPILER_WRITE_BARRIER();
-							ATOMIC_WRITE(monitor->ehm_raised, 0);
+							atomic_write(&monitor->ehm_raised, 0);
 							epoll_handle_monitor_pollconnect(monitor, monitor_handptr, &epoll_completion);
 							what = epoll_handle_monitor_polltest(monitor, monitor_handptr);
 							if unlikely(what != 0) {
 								sig_multicompletion_disconnectall(&monitor->ehm_comp);
-								if (ATOMIC_READ(monitor->ehm_raised) != 0) {
+								if (atomic_read(&monitor->ehm_raised) != 0) {
 									struct epoll_handle_monitor *more_raised;
 									struct epoll_handle_monitor *more_raised_last;
 									/* Must remove `monitor' from the raised-queue. */
-									more_raised = ATOMIC_XCH(self->ec_raised, NULL);
+									more_raised = atomic_xch(&self->ec_raised, NULL);
 									assert(more_raised != NULL);
 									more_raised_last = more_raised;
 									while (more_raised_last->ehm_rnext)
@@ -1662,7 +1661,7 @@ do_destroy_result_event:
 							epoll_handle_monitor_destroy(result_events);
 						} else {
 							/* Mark the monitor as no longer raised. */
-							ATOMIC_WRITE(result_events->ehm_raised, 0);
+							atomic_write(&result_events->ehm_raised, 0);
 						}
 					} else if (result_events->ehm_events & EPOLLET) {
 						/* For this to work, we have to re-acquire a (strong) reference
@@ -1673,7 +1672,7 @@ do_destroy_result_event:
 						monitor_handptr = epoll_handle_monitor_weaklckref(result_events);
 						if unlikely(!monitor_handptr)
 							goto do_destroy_result_event;
-						ATOMIC_WRITE(result_events->ehm_raised, 0);
+						atomic_write(&result_events->ehm_raised, 0);
 						RAII_FINALLY { epoll_handle_monitor_handle_decref(result_events, monitor_handptr); };
 						epoll_handle_monitor_pollconnect(result_events, monitor_handptr, &epoll_completion);
 					} else {

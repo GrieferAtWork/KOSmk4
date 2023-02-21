@@ -27,9 +27,8 @@
 #include <sched/cpu.h>
 #include <sched/enum.h>
 
-#include <hybrid/atomic.h>
-
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 
 #include "gdb.h"
@@ -114,7 +113,7 @@ NOTHROW(FCALL GDBThread_Enumerate)(PTHREAD_ENUM_CALLBACK callback,
 	 * there's no need to stop the entire system! */
 again_check_must_stop:
 	mustStopAll = GDBThread_IsNonStopModeActive &&
-	              ATOMIC_READ(cpu_online_count) > 1;
+	              atomic_read(&cpu_online_count) > 1;
 	if (mustStopAll) {
 		GDBThread_StopAllCpus();
 	} else {
@@ -123,7 +122,7 @@ again_check_must_stop:
 		 * could break thread enumeration. */
 		if (GDBThread_IsNonStopModeActive) {
 			PREEMPTION_DISABLE();
-			if (ATOMIC_READ(cpu_online_count) > 1) {
+			if (atomic_read(&cpu_online_count) > 1) {
 				PREEMPTION_ENABLE();
 				goto again_check_must_stop;
 			}

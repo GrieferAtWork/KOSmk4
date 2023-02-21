@@ -32,12 +32,12 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/typecore.h>
 
 #include <kos/except.h>
 #include <kos/exec/module.h>
 
+#include <atomic.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
@@ -222,14 +222,14 @@ PRIVATE void *pdyn_libdebuginfo = NULL;
 PRIVATE ATTR_NOINLINE WUNUSED void *CC get_libdebuginfo(void) {
 	void *result;
 again:
-	result = ATOMIC_READ(pdyn_libdebuginfo);
+	result = atomic_read(&pdyn_libdebuginfo);
 	if (result == (void *)-1)
 		return NULL;
 	if (!result) {
 		result = dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LOCAL);
 		if (!result)
 			result = (void *)-1;
-		if (!ATOMIC_CMPXCH(pdyn_libdebuginfo, NULL, result)) {
+		if (!atomic_cmpxch(&pdyn_libdebuginfo, NULL, result)) {
 			if (result != (void *)-1)
 				dlclose(result);
 			goto again;

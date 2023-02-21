@@ -42,11 +42,11 @@
 #include <kernel/types.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sched/atomic-lock.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -70,7 +70,7 @@ struct slab_pool {
 
 /* Helper macros for `struct slab_pool::sp_lock' */
 #define slab_pool_reap(self)       (!slab_pool_mustreap(self) || (_slab_pool_reap(self), 0))
-#define slab_pool_mustreap(self)   (ATOMIC_READ((self)->sp_pend.slh_first) != __NULLPTR)
+#define slab_pool_mustreap(self)   (atomic_read(&(self)->sp_pend.slh_first) != __NULLPTR)
 #define slab_pool_tryacquire(self) atomic_lock_tryacquire(&(self)->sp_lock)
 #define slab_pool_acquire(self)    atomic_lock_acquire(&(self)->sp_lock)
 #define slab_pool_acquire_nx(self) atomic_lock_acquire_nx(&(self)->sp_lock)
@@ -127,16 +127,16 @@ again:
 	if unlikely(!pend)
 		return;
 	if unlikely(!slab_pool_tryacquire(self)) {
-		if (!ATOMIC_CMPXCH(self->sp_pend.slh_first, NULL, pend)) {
+		if (!atomic_cmpxch(&self->sp_pend.slh_first, NULL, pend)) {
 			struct slab *more;
 			next = pend;
 			while (SLIST_NEXT(next, s_slink))
 				next = SLIST_NEXT(next, s_slink);
 			do {
-				more = ATOMIC_READ(self->sp_pend.slh_first);
+				more = atomic_read(&self->sp_pend.slh_first);
 				next->s_slink.sle_next = more;
 				COMPILER_WRITE_BARRIER();
-			} while (!ATOMIC_CMPXCH_WEAK(self->sp_pend.slh_first, more, pend));
+			} while (!atomic_cmpxch_weak(&self->sp_pend.slh_first, more, pend));
 		}
 		if unlikely(slab_pool_available(self))
 			goto again;
@@ -287,7 +287,7 @@ again:
 	}
 	slab_pool_release(pool);
 	COMPILER_READ_BARRIER();
-	if unlikely(ATOMIC_READ(pool->sp_count) != 0)
+	if unlikely(atomic_read(&pool->sp_count) != 0)
 		goto again;
 
 	/* Must allocate a new slab page. */
@@ -354,17 +354,17 @@ gotaddr:
 		/* Update the slab-break end-pointer if necessary. */
 #ifdef SLAB_CONFIG_GROWS_DOWNWARDS
 		if ((byte_t *)result < (byte_t *)slab_end_addr) {
-			while (!ATOMIC_CMPXCH_WEAK(kernel_slab_break, slab_end_addr, result)) {
-				slab_end_addr = ATOMIC_READ(kernel_slab_break);
+			while (!atomic_cmpxch_weak(&kernel_slab_break, slab_end_addr, result)) {
+				slab_end_addr = atomic_read(&kernel_slab_break);
 				if ((byte_t *)result >= (byte_t *)slab_end_addr)
 					break;
 			}
 		}
 #else /* SLAB_CONFIG_GROWS_DOWNWARDS */
 		if ((byte_t *)result >= (byte_t *)slab_end_addr) {
-			while (!ATOMIC_CMPXCH_WEAK(kernel_slab_break, slab_end_addr,
+			while (!atomic_cmpxch_weak(&kernel_slab_break, slab_end_addr,
 			                           (byte_t *)result + PAGESIZE)) {
-				slab_end_addr = ATOMIC_READ(kernel_slab_break);
+				slab_end_addr = atomic_read(&kernel_slab_break);
 				if ((byte_t *)result < (byte_t *)slab_end_addr)
 					break;
 			}

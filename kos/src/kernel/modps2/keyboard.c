@@ -35,12 +35,11 @@
 #include <kernel/types.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/ioctl/kbd.h>
 #include <sys/mkdev.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <stdio.h>
 
@@ -88,9 +87,9 @@ PRIVATE NOBLOCK NOPREEMPT void
 NOTHROW(FCALL ps2_keyboard_do_handle_isr)(struct ps2_keyboard *__restrict self) {
 	u8 data = inb(PS2_DATA);
 	if (data == 0xfa) {
-		ATOMIC_OR(self->pk_errors, PS2_KEYBOARD_ERROR_ACK);
+		atomic_or(&self->pk_errors, PS2_KEYBOARD_ERROR_ACK);
 	} else if (data == 0xfe) {
-		ATOMIC_OR(self->pk_errors, PS2_KEYBOARD_ERROR_RESEND);
+		atomic_or(&self->pk_errors, PS2_KEYBOARD_ERROR_RESEND);
 	} else {
 		u16 key;
 		switch (self->pk_state) {
@@ -381,12 +380,12 @@ ps2_keyboard_send_command_byte_and_wait_for_ack(struct ps2_keyboard *__restrict 
 	u8 errors;
 	unsigned int attempt = 0;
 again:
-	ATOMIC_WRITE(self->pk_errors, 0);
+	atomic_write(&self->pk_errors, 0);
 	ps2_write_data(self->pk_portno, command_byte);
-	while ((errors = ATOMIC_READ(self->pk_errors)) == 0) {
+	while ((errors = atomic_read(&self->pk_errors)) == 0) {
 		ktime_t tmo;
 		task_connect_for_poll(&self->pk_errors_sig);
-		errors = ATOMIC_READ(self->pk_errors);
+		errors = atomic_read(&self->pk_errors);
 		if unlikely(errors != 0) {
 			task_disconnectall();
 			break;
@@ -394,7 +393,7 @@ again:
 		tmo = ktime();
 		tmo += relktime_from_milliseconds(ps2_command_timeout);
 		if (!task_waitfor(tmo)) {
-			errors = ATOMIC_READ(self->pk_errors);
+			errors = atomic_read(&self->pk_errors);
 			if (errors != 0)
 				break;
 			THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HID);

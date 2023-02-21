@@ -183,7 +183,7 @@ struct nicdev_ops {
 	                      /*out*/ struct aio_handle *__restrict aio);
 
 	/* [1..1] Set the value of `self->nd_flags' to `new_flags',
-	 *        using ATOMIC_CMPXCH() semantics with `old_flags'
+	 *        using atomic_cmpxch() semantics with `old_flags'
 	 * @return: true:  Flags were successfully updated
 	 * @return: false: `old_flags'  didn't  match  `self->nd_flags'
 	 * This is mainly used to turn on the NIC on/off using `IFF_UP' */

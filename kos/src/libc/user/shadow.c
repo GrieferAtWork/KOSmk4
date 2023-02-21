@@ -23,9 +23,8 @@
 #include "../api.h"
 /**/
 
-#include <hybrid/atomic.h>
-
 #include <assert.h>
+#include <atomic.h>
 #include <malloc.h>
 #include <paths.h>
 #include <stdio.h>
@@ -53,13 +52,13 @@ PRIVATE ATTR_SECTION(".bss.crt.database.shadow") struct spwd shadow_entry = {};
 PRIVATE ATTR_SECTION(".text.crt.database.shadow") FILE *
 NOTHROW_RPC(LIBCCALL shadow_opendb)(void) {
 	FILE *result, *new_result;
-	result = ATOMIC_READ(shadow_database);
+	result = atomic_read(&shadow_database);
 	if (result)
 		return result;
 	result = fopen(_PATH_SHADOW, "r");
 	if unlikely(!result)
 		return NULL;
-	new_result = ATOMIC_CMPXCH_VAL(shadow_database,
+	new_result = atomic_cmpxch_val(&shadow_database,
 	                               NULL, result);
 	if unlikely(new_result != NULL) {
 		/* Race condition: Some other thread
@@ -87,7 +86,7 @@ INTERN ATTR_SECTION(".text.crt.database.shadow") void
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endspent)(void)
 /*[[[body:libc_endspent]]]*/
 {
-	FILE *stream = ATOMIC_XCH(shadow_database, NULL);
+	FILE *stream = atomic_xch(&shadow_database, NULL);
 	if (stream)
 		fclose(stream);
 	/* Also free up the buffer used to describe the strings

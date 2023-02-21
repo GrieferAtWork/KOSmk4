@@ -35,7 +35,6 @@
 #include <sched/sigmask.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 #include <hybrid/sched/atomic-lock.h>
 
@@ -45,6 +44,7 @@
 #include <kos/except/reason/inval.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <signal.h>
 #include <stdalign.h>
@@ -170,7 +170,7 @@ again_read_thread_ptr:
 		result->sh_share = 1;
 		ptr->sp_refcnt = 1;
 		atomic_rwlock_init(&ptr->sp_lock);
-		if (!ATOMIC_CMPXCH(PERTASK(this_sighand_ptr), NULL, ptr)) {
+		if (!atomic_cmpxch(&PERTASK(this_sighand_ptr), NULL, ptr)) {
 			COMPILER_READ_BARRIER();
 			/* Race condition: someone else already allocated the sighand_ptr for `thread' */
 			kfree(result);
@@ -220,7 +220,7 @@ again_lock_ptr:
 	 * Now we must verify that the table isn't being shared, and
 	 * if it is being shared, we must unshare it and replace  it
 	 * with a copy. */
-	if (ATOMIC_READ(result->sh_share) > 1) {
+	if (atomic_read(&result->sh_share) > 1) {
 		struct sighand *copy;
 		sighand_endwrite(result);
 		copy = (struct sighand *)kmalloc(sizeof(struct sighand), GFP_NORMAL);
@@ -235,7 +235,7 @@ again_lock_ptr_for_copy:
 				task_yield();
 				goto again_lock_ptr_for_copy;
 			}
-			if unlikely(ATOMIC_READ(result->sh_share) <= 1) {
+			if unlikely(atomic_read(&result->sh_share) <= 1) {
 				/* The handler table already got unshared in the mean time...
 				 * No need to initialize + save our copy! */
 				sighand_ptr_endwrite(ptr);
@@ -440,7 +440,7 @@ DEFINE_PERMMAN_ONEXEC(onexec_posix_signals_reset_action);
 INTERN void KCALL onexec_posix_signals_reset_action(void) {
 	REF struct sighand_ptr *handptr;
 	/* Posix says that signals set to SIG_IGN should remain SIG_IGN after exec(). */
-	handptr = ATOMIC_XCH(PERTASK(this_sighand_ptr), NULL);
+	handptr = atomic_xch(&PERTASK(this_sighand_ptr), NULL);
 	if (handptr) {
 		struct sighand *hand;
 		REF struct sighand *newhand;

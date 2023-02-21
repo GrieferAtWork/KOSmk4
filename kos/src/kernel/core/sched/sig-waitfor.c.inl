@@ -85,7 +85,7 @@ NOTHROW(FCALL task_waitfor_norpc_nx)(ktime_t abs_timeout)
 	struct task_connections *self;
 	self = THIS_CONNECTIONS;
 again:
-	result = ATOMIC_READ(self->tcs_dlvr);
+	result = atomic_read(&self->tcs_dlvr);
 	if (result) {
 got_result:
 		task_connection_disconnect_all(self, false);
@@ -107,7 +107,7 @@ got_result:
 		}
 		PREEMPTION_DISABLE();
 		COMPILER_READ_BARRIER();
-		result = ATOMIC_READ(self->tcs_dlvr);
+		result = atomic_read(&self->tcs_dlvr);
 		if unlikely(result) {
 			PREEMPTION_ENABLE();
 			goto got_result;

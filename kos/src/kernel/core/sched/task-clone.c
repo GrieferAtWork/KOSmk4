@@ -50,7 +50,6 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/host.h>
 #include <hybrid/sched/preemption.h>
 #include <hybrid/unaligned.h>
@@ -62,6 +61,7 @@
 #include <kos/kernel/paging.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <signal.h>
 #include <stdarg.h>
 #include <stdint.h>
@@ -136,19 +136,19 @@ NOTHROW(KCALL task_unmap_stack_and_free)(struct task *__restrict self);
 
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 clone_set_child_tid(struct rpc_context *__restrict UNUSED(ctx), void *cookie) {
-	ATOMIC_WRITE(*(USER CHECKED pid_t *)cookie, task_gettid());
+	atomic_write((USER CHECKED pid_t *)cookie, task_gettid());
 }
 
 PRIVATE NONNULL((1)) void FCALL
 waitfor_vfork_completion(struct task *__restrict thread)
 		THROWS(E_INTERRUPT) {
 	/* Wait until the child thread is done vfork()-ing */
-	while ((ATOMIC_READ(thread->t_flags) & TASK_FVFORK) != 0) {
+	while ((atomic_read(&thread->t_flags) & TASK_FVFORK) != 0) {
 		struct taskpid *pid;
 		pid = FORTASK(thread, this_taskpid);
 		assert(pid);
 		task_connect(&pid->tp_changed);
-		if unlikely((ATOMIC_READ(thread->t_flags) & TASK_FVFORK) == 0) {
+		if unlikely((atomic_read(&thread->t_flags) & TASK_FVFORK) == 0) {
 			task_disconnectall();
 			break;
 		}
@@ -208,7 +208,7 @@ restore_userprocmask_after_vfork(USER CHECKED struct userprocmask *um,
 	 * prior  to the vfork(2) (just in case the child modified it,
 	 * since we want everything about the parent's signal mask  to
 	 * go back to what it was before they called vfork(2)) */
-	ATOMIC_WRITE(um->pm_sigmask, umask);
+	atomic_write(&um->pm_sigmask, umask);
 }
 #endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 
@@ -737,7 +737,7 @@ again_release_kernel_and_cc:
 				assert(iob->ib_share >= 1);
 				incref(iob);
 				/* Unset write-access if this is the first time the IOB is getting shared. */
-				if (ATOMIC_FETCHINC(iob->ib_share) == 1)
+				if (atomic_fetchinc(&iob->ib_share) == 1)
 					x86_ioperm_bitmap_unset_write_access(caller, iob);
 				FORTASK(result, this_x86_ioperm_bitmap) = iob;
 			}
@@ -811,7 +811,7 @@ do_clone_pid:
 #if defined(__i386__) || defined(__x86_64__)
 		if unlikely(FORTASK(result, this_x86_ioperm_bitmap)) {
 			assert(FORTASK(result, this_x86_ioperm_bitmap)->ib_share >= 1);
-			ATOMIC_DEC(FORTASK(result, this_x86_ioperm_bitmap)->ib_share);
+			atomic_dec(&FORTASK(result, this_x86_ioperm_bitmap)->ib_share);
 			decref_likely(FORTASK(result, this_x86_ioperm_bitmap));
 		}
 #endif /* __i386__ || __x86_64__ */

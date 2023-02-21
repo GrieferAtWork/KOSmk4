@@ -615,8 +615,8 @@ __NOTHROW(__arch_memset_nopf)(__USER __CHECKED void *__dst, int __byte, __size_t
 
 
 #ifdef __arch_atomic_xchb_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_xchgb_al_Pcx) /* lock xchgb %al, (%Pcx) -- ATOMIC_XCH(*(__uint8_t *)%Pcx, %al) */
-/* Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
+__X86_NOPF_DEFFUN(x86_nopf_lock_xchgb_al_Pcx) /* lock xchgb %al, (%Pcx) -- atomic_xch((uint8_t *)%Pcx, %al) */
+/* Try  to atomic_xch  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
@@ -635,8 +635,8 @@ __NOTHROW(__arch_atomic_xchb_nopf)(__USER __CHECKED void const *__addr,
 #endif /* __arch_atomic_xchb_nopf */
 
 #ifdef __arch_atomic_xchw_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_xchgw_ax_Pcx) /* lock xchgw %ax, (%Pcx) -- ATOMIC_XCH(*(__uint16_t *)%Pcx, %ax) */
-/* Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
+__X86_NOPF_DEFFUN(x86_nopf_lock_xchgw_ax_Pcx) /* lock xchgw %ax, (%Pcx) -- atomic_xch((uint16_t *)%Pcx, %ax) */
+/* Try  to atomic_xch  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
@@ -655,8 +655,8 @@ __NOTHROW(__arch_atomic_xchw_nopf)(__USER __CHECKED void const *__addr,
 #endif /* __arch_atomic_xchw_nopf */
 
 #ifdef __arch_atomic_xchl_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_xchgl_eax_Pcx) /* lock xchgl %eax, (%Pcx) -- ATOMIC_XCH(*(__uint32_t *)%Pcx, %eax) */
-/* Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
+__X86_NOPF_DEFFUN(x86_nopf_lock_xchgl_eax_Pcx) /* lock xchgl %eax, (%Pcx) -- atomic_xch((uint32_t *)%Pcx, %eax) */
+/* Try  to atomic_xch  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
@@ -675,8 +675,8 @@ __NOTHROW(__arch_atomic_xchl_nopf)(__USER __CHECKED void const *__addr,
 #endif /* __arch_atomic_xchl_nopf */
 
 #ifdef __arch_atomic_xchq_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_xchgq_rax_Pcx) /* lock xchgq %rax, (%Pcx) -- ATOMIC_XCH(*(__uint64_t *)%Pcx, %rax) */
-/* Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
+__X86_NOPF_DEFFUN(x86_nopf_lock_xchgq_rax_Pcx) /* lock xchgq %rax, (%Pcx) -- atomic_xch((uint64_t *)%Pcx, %rax) */
+/* Try  to atomic_xch  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
@@ -696,8 +696,8 @@ __NOTHROW(__arch_atomic_xchq_nopf)(__USER __CHECKED void const *__addr,
 
 
 #ifdef __arch_atomic_fetchaddb_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_xaddb_al_Pcx) /* lock xaddb %al, (%Pcx) -- ATOMIC_FETCHADD(*(__uint8_t *)%Pcx, %al) */
-/* Try to ATOMIC_FETCHADD  at a possibly  faulty `addr', storing  the
+__X86_NOPF_DEFFUN(x86_nopf_lock_xaddb_al_Pcx) /* lock xaddb %al, (%Pcx) -- atomic_fetchadd((uint8_t *)%Pcx, %al) */
+/* Try to atomic_fetchadd  at a possibly  faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored __val
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
@@ -716,8 +716,8 @@ __NOTHROW(__arch_atomic_fetchaddb_nopf)(__USER __CHECKED void const *__addr,
 #endif /* __arch_atomic_fetchaddb_nopf */
 
 #ifdef __arch_atomic_fetchaddw_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_xaddw_ax_Pcx) /* lock xaddw %ax, (%Pcx) -- ATOMIC_FETCHADD(*(__uint16_t *)%Pcx, %ax) */
-/* Try to ATOMIC_FETCHADD  at a possibly  faulty `addr', storing  the
+__X86_NOPF_DEFFUN(x86_nopf_lock_xaddw_ax_Pcx) /* lock xaddw %ax, (%Pcx) -- atomic_fetchadd((uint16_t *)%Pcx, %ax) */
+/* Try to atomic_fetchadd  at a possibly  faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored __val
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
@@ -736,8 +736,8 @@ __NOTHROW(__arch_atomic_fetchaddw_nopf)(__USER __CHECKED void const *__addr,
 #endif /* __arch_atomic_fetchaddw_nopf */
 
 #ifdef __arch_atomic_fetchaddl_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_xaddl_eax_Pcx) /* lock xaddl %eax, (%Pcx) -- ATOMIC_FETCHADD(*(__uint32_t *)%Pcx, %eax) */
-/* Try to ATOMIC_FETCHADD  at a possibly  faulty `addr', storing  the
+__X86_NOPF_DEFFUN(x86_nopf_lock_xaddl_eax_Pcx) /* lock xaddl %eax, (%Pcx) -- atomic_fetchadd((uint32_t *)%Pcx, %eax) */
+/* Try to atomic_fetchadd  at a possibly  faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored __val
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
@@ -756,8 +756,8 @@ __NOTHROW(__arch_atomic_fetchaddl_nopf)(__USER __CHECKED void const *__addr,
 #endif /* __arch_atomic_fetchaddl_nopf */
 
 #ifdef __arch_atomic_fetchaddq_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_xaddq_rax_Pcx) /* lock xaddq %rax, (%Pcx) -- ATOMIC_FETCHADD(*(__uint64_t *)%Pcx, %rax) */
-/* Try to ATOMIC_FETCHADD  at a possibly  faulty `addr', storing  the
+__X86_NOPF_DEFFUN(x86_nopf_lock_xaddq_rax_Pcx) /* lock xaddq %rax, (%Pcx) -- atomic_fetchadd((uint64_t *)%Pcx, %rax) */
+/* Try to atomic_fetchadd  at a possibly  faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored __val
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
@@ -776,7 +776,7 @@ __NOTHROW(__arch_atomic_fetchaddq_nopf)(__USER __CHECKED void const *__addr,
 #endif /* __arch_atomic_fetchaddq_nopf */
 
 #ifdef __arch_atomic_orb_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_orb_al_Pcx) /* lock orb %al, (%Pcx) -- ATOMIC_OR(*(__uint8_t *)%Pcx, %al) */
+__X86_NOPF_DEFFUN(x86_nopf_lock_orb_al_Pcx) /* lock orb %al, (%Pcx) -- atomic_or((uint8_t *)%Pcx, %al) */
 /* Try to atomically turn on all bits from `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
@@ -793,7 +793,7 @@ __NOTHROW(__arch_atomic_orb_nopf)(__USER __CHECKED void *__addr, __uint8_t __mas
 #endif /* __arch_atomic_orb_nopf */
 
 #ifdef __arch_atomic_orw_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_orw_ax_Pcx) /* lock orw %ax, (%Pcx) -- ATOMIC_OR(*(__uint16_t *)%Pcx, %ax) */
+__X86_NOPF_DEFFUN(x86_nopf_lock_orw_ax_Pcx) /* lock orw %ax, (%Pcx) -- atomic_or((uint16_t *)%Pcx, %ax) */
 /* Try to atomically turn on all bits from `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
@@ -810,7 +810,7 @@ __NOTHROW(__arch_atomic_orw_nopf)(__USER __CHECKED void *__addr, __uint16_t __ma
 #endif /* __arch_atomic_orw_nopf */
 
 #ifdef __arch_atomic_orl_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_orl_eax_Pcx) /* lock orl %eax, (%Pcx) -- ATOMIC_OR(*(__uint32_t *)%Pcx, %eax) */
+__X86_NOPF_DEFFUN(x86_nopf_lock_orl_eax_Pcx) /* lock orl %eax, (%Pcx) -- atomic_or((uint32_t *)%Pcx, %eax) */
 /* Try to atomically turn on all bits from `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
@@ -827,7 +827,7 @@ __NOTHROW(__arch_atomic_orl_nopf)(__USER __CHECKED void *__addr, __uint32_t __ma
 #endif /* __arch_atomic_orl_nopf */
 
 #ifdef __arch_atomic_orq_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_orq_rax_Pcx) /* lock orq %rax, (%Pcx) -- ATOMIC_OR(*(__uint64_t *)%Pcx, %rax) */
+__X86_NOPF_DEFFUN(x86_nopf_lock_orq_rax_Pcx) /* lock orq %rax, (%Pcx) -- atomic_or((uint64_t *)%Pcx, %rax) */
 /* Try to atomically turn on all bits from `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
@@ -844,7 +844,7 @@ __NOTHROW(__arch_atomic_orq_nopf)(__USER __CHECKED void *__addr, __uint64_t __ma
 #endif /* __arch_atomic_orq_nopf */
 
 #ifdef __arch_atomic_andb_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_andb_al_Pcx) /* lock andb %al, (%Pcx) -- ATOMIC_AND(*(__uint8_t *)%Pcx, %al) */
+__X86_NOPF_DEFFUN(x86_nopf_lock_andb_al_Pcx) /* lock andb %al, (%Pcx) -- atomic_and((uint8_t *)%Pcx, %al) */
 /* Try to atomically __mask all bits with `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
@@ -861,7 +861,7 @@ __NOTHROW(__arch_atomic_andb_nopf)(__USER __CHECKED void *__addr, __uint8_t __ma
 #endif /* __arch_atomic_andb_nopf */
 
 #ifdef __arch_atomic_andw_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_andw_ax_Pcx) /* lock andw %ax, (%Pcx) -- ATOMIC_AND(*(__uint16_t *)%Pcx, %ax) */
+__X86_NOPF_DEFFUN(x86_nopf_lock_andw_ax_Pcx) /* lock andw %ax, (%Pcx) -- atomic_and((uint16_t *)%Pcx, %ax) */
 /* Try to atomically __mask all bits with `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
@@ -878,7 +878,7 @@ __NOTHROW(__arch_atomic_andw_nopf)(__USER __CHECKED void *__addr, __uint16_t __m
 #endif /* __arch_atomic_andw_nopf */
 
 #ifdef __arch_atomic_andl_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_andl_eax_Pcx) /* lock andl %eax, (%Pcx) -- ATOMIC_AND(*(__uint32_t *)%Pcx, %eax) */
+__X86_NOPF_DEFFUN(x86_nopf_lock_andl_eax_Pcx) /* lock andl %eax, (%Pcx) -- atomic_and((uint32_t *)%Pcx, %eax) */
 /* Try to atomically __mask all bits with `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
@@ -895,7 +895,7 @@ __NOTHROW(__arch_atomic_andl_nopf)(__USER __CHECKED void *__addr, __uint32_t __m
 #endif /* __arch_atomic_andl_nopf */
 
 #ifdef __arch_atomic_andq_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_andq_rax_Pcx) /* lock andq %rax, (%Pcx) -- ATOMIC_AND(*(__uint64_t *)%Pcx, %rax) */
+__X86_NOPF_DEFFUN(x86_nopf_lock_andq_rax_Pcx) /* lock andq %rax, (%Pcx) -- atomic_and((uint64_t *)%Pcx, %rax) */
 /* Try to atomically __mask all bits with `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
@@ -912,7 +912,7 @@ __NOTHROW(__arch_atomic_andq_nopf)(__USER __CHECKED void *__addr, __uint64_t __m
 #endif /* __arch_atomic_andq_nopf */
 
 #ifdef __arch_atomic_xorb_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_xorb_al_Pcx) /* lock xorb %al, (%Pcx) -- ATOMIC_XOR(*(__uint8_t *)%Pcx, %al) */
+__X86_NOPF_DEFFUN(x86_nopf_lock_xorb_al_Pcx) /* lock xorb %al, (%Pcx) -- atomic_xor((uint8_t *)%Pcx, %al) */
 /* Try to atomically flip all bits from `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
@@ -929,7 +929,7 @@ __NOTHROW(__arch_atomic_xorb_nopf)(__USER __CHECKED void *__addr, __uint8_t __ma
 #endif /* __arch_atomic_xorb_nopf */
 
 #ifdef __arch_atomic_xorw_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_xorw_ax_Pcx) /* lock xorw %ax, (%Pcx) -- ATOMIC_XOR(*(__uint16_t *)%Pcx, %ax) */
+__X86_NOPF_DEFFUN(x86_nopf_lock_xorw_ax_Pcx) /* lock xorw %ax, (%Pcx) -- atomic_xor((uint16_t *)%Pcx, %ax) */
 /* Try to atomically flip all bits from `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
@@ -946,7 +946,7 @@ __NOTHROW(__arch_atomic_xorw_nopf)(__USER __CHECKED void *__addr, __uint16_t __m
 #endif /* __arch_atomic_xorw_nopf */
 
 #ifdef __arch_atomic_xorl_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_xorl_eax_Pcx) /* lock xorl %eax, (%Pcx) -- ATOMIC_XOR(*(__uint32_t *)%Pcx, %eax) */
+__X86_NOPF_DEFFUN(x86_nopf_lock_xorl_eax_Pcx) /* lock xorl %eax, (%Pcx) -- atomic_xor((uint32_t *)%Pcx, %eax) */
 /* Try to atomically flip all bits from `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
@@ -963,7 +963,7 @@ __NOTHROW(__arch_atomic_xorl_nopf)(__USER __CHECKED void *__addr, __uint32_t __m
 #endif /* __arch_atomic_xorl_nopf */
 
 #ifdef __arch_atomic_xorq_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_xorq_rax_Pcx) /* lock xorq %rax, (%Pcx) -- ATOMIC_XOR(*(__uint64_t *)%Pcx, %rax) */
+__X86_NOPF_DEFFUN(x86_nopf_lock_xorq_rax_Pcx) /* lock xorq %rax, (%Pcx) -- atomic_xor((uint64_t *)%Pcx, %rax) */
 /* Try to atomically flip all bits from `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
@@ -980,7 +980,7 @@ __NOTHROW(__arch_atomic_xorq_nopf)(__USER __CHECKED void *__addr, __uint64_t __m
 #endif /* __arch_atomic_xorq_nopf */
 
 #ifdef __arch_atomic_cmpxchb_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_cmpxchgb_dl_Pcx) /* lock cmpxchgb %dl, (%Pcx) -- ATOMIC_CMPXCH(*(__uint8_t *)%Pcx, %al, %dl) */
+__X86_NOPF_DEFFUN(x86_nopf_lock_cmpxchgb_dl_Pcx) /* lock cmpxchgb %dl, (%Pcx) -- atomic_cmpxch((uint8_t *)%Pcx, %al, %dl) */
 /* Try to do an atomic-compare-exchange at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((4)) __BOOL
@@ -1001,7 +1001,7 @@ __NOTHROW(__arch_atomic_cmpxchb_nopf)(__USER __CHECKED void *__addr,
 #endif /* __arch_atomic_cmpxchb_nopf */
 
 #ifdef __arch_atomic_cmpxchw_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_cmpxchgw_dx_Pcx) /* lock cmpxchgw %dx, (%Pcx) -- ATOMIC_CMPXCH(*(__uint16_t *)%Pcx, %ax, %dx) */
+__X86_NOPF_DEFFUN(x86_nopf_lock_cmpxchgw_dx_Pcx) /* lock cmpxchgw %dx, (%Pcx) -- atomic_cmpxch((uint16_t *)%Pcx, %ax, %dx) */
 /* Try to do an atomic-compare-exchange at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((4)) __BOOL
@@ -1022,7 +1022,7 @@ __NOTHROW(__arch_atomic_cmpxchw_nopf)(__USER __CHECKED void *__addr,
 #endif /* __arch_atomic_cmpxchw_nopf */
 
 #ifdef __arch_atomic_cmpxchl_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_cmpxchgl_edx_Pcx) /* lock cmpxchgl %edx, (%Pcx) -- ATOMIC_CMPXCH(*(__uint32_t *)%Pcx, %eax, %edx) */
+__X86_NOPF_DEFFUN(x86_nopf_lock_cmpxchgl_edx_Pcx) /* lock cmpxchgl %edx, (%Pcx) -- atomic_cmpxch((uint32_t *)%Pcx, %eax, %edx) */
 /* Try to do an atomic-compare-exchange at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((4)) __BOOL
@@ -1043,7 +1043,7 @@ __NOTHROW(__arch_atomic_cmpxchl_nopf)(__USER __CHECKED void *__addr,
 #endif /* __arch_atomic_cmpxchl_nopf */
 
 #ifdef __arch_atomic_cmpxchq_nopf
-__X86_NOPF_DEFFUN(x86_nopf_lock_cmpxchgq_rdx_Pcx) /* lock cmpxchgq %rdx, (%Pcx) -- ATOMIC_CMPXCH(*(__uint64_t *)%Pcx, %rax, %rdx) */
+__X86_NOPF_DEFFUN(x86_nopf_lock_cmpxchgq_rdx_Pcx) /* lock cmpxchgq %rdx, (%Pcx) -- atomic_cmpxch((uint64_t *)%Pcx, %rax, %rdx) */
 /* Try to do an atomic-compare-exchange at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((4)) __BOOL

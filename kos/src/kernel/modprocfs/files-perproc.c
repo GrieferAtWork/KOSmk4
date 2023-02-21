@@ -69,7 +69,6 @@ DECL_END
 #include <sched/tsc.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <compat/config.h>
@@ -84,6 +83,7 @@ DECL_END
 #include <sys/stat.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <signal.h>
@@ -173,7 +173,7 @@ print_sigset(pformatprinter printer, void *arg,
 	i = lengthof(ss->__val) - 1;
 	for (;;) {
 		ulongptr_t val;
-		val = ATOMIC_READ(ss->__val[i]);
+		val = atomic_read(&ss->__val[i]);
 		if (val != 0 || got_nonzero || i < CEILDIV(64, BITSOF(ulongptr_t))) {
 			temp = printf(got_nonzero ? "%." PP_STR(NIBBLES_PER_PTR) PRIxPTR
 			                          : "%" PRIxPTR,
@@ -208,8 +208,8 @@ procfs_perproc_v_getown(struct fnode *__restrict self,
 		FINALLY_DECREF_UNLIKELY(thread_cred);
 
 		/* NOTE: Yes, we need to use the effective U/G-id here (linux does the same) */
-		*powner = ATOMIC_READ(thread_cred->c_euid);
-		*pgroup = ATOMIC_READ(thread_cred->c_egid);
+		*powner = atomic_read(&thread_cred->c_euid);
+		*pgroup = atomic_read(&thread_cred->c_egid);
 	} else {
 		/* Fallback... */
 		*powner = 0;
@@ -737,9 +737,9 @@ procfs_pp_cmdline_print(struct printnode *__restrict self,
 		return;
 	}
 	FINALLY_DECREF_UNLIKELY(threadmm);
-	peb = ATOMIC_READ(FORMMAN(threadmm, thismman_execinfo).mei_peb);
+	peb = atomic_read(&FORMMAN(threadmm, thismman_execinfo).mei_peb);
 #ifdef __ARCH_HAVE_COMPAT
-	if (ATOMIC_READ(FORMMAN(threadmm, thismman_execinfo).mei_peb_iscompat)) {
+	if (atomic_read(&FORMMAN(threadmm, thismman_execinfo).mei_peb_iscompat)) {
 		compat_peb_print_cmdline(threadmm, printer, arg,
 		                         (USER CHECKED struct compat_process_peb const *)peb);
 	} else
@@ -872,9 +872,9 @@ procfs_pp_environ_print(struct printnode *__restrict self,
 	threadmm = task_getmman(thread);
 	decref_unlikely(thread);
 	FINALLY_DECREF_UNLIKELY(threadmm);
-	peb = ATOMIC_READ(FORMMAN(threadmm, thismman_execinfo).mei_peb);
+	peb = atomic_read(&FORMMAN(threadmm, thismman_execinfo).mei_peb);
 #ifdef __ARCH_HAVE_COMPAT
-	if (ATOMIC_READ(FORMMAN(threadmm, thismman_execinfo).mei_peb_iscompat)) {
+	if (atomic_read(&FORMMAN(threadmm, thismman_execinfo).mei_peb_iscompat)) {
 		compat_peb_print_environ(threadmm, printer, arg,
 		                         (USER CHECKED struct compat_process_peb const *)peb);
 	} else
@@ -1193,9 +1193,9 @@ print_mounting_point(struct path *__restrict fsroot,
 		goto err;
 
 	/* Filesystem flags. */
-	flags = ATOMIC_READ(super->fs_root.mf_flags);
+	flags = atomic_read(&super->fs_root.mf_flags);
 	if (super->fs_dev)
-		flags |= ATOMIC_READ(super->fs_dev->mf_flags) & MFILE_F_READONLY;
+		flags |= atomic_read(&super->fs_dev->mf_flags) & MFILE_F_READONLY;
 
 	writer = flagsbuf;
 	writer = stpcpy(writer, (flags & MFILE_F_READONLY) ? "ro" : "rw");
@@ -1349,7 +1349,7 @@ no_exec:
 		char state;
 		if (thread) {
 			uintptr_t flags;
-			flags = ATOMIC_READ(thread->t_flags);
+			flags = atomic_read(&thread->t_flags);
 			if (flags & TASK_FRUNNING) {
 				state = 'R'; /* Running */
 			} else if (flags & (TASK_FSUSPENDED | TASK_FGDB_STOPPED)) {
@@ -1582,7 +1582,7 @@ no_exec:
 	}
 	if (thread) {
 		uintptr_t flags;
-		flags = ATOMIC_READ(thread->t_flags);
+		flags = atomic_read(&thread->t_flags);
 		if (flags & TASK_FRUNNING) {
 			state = "R (running)"; /* Running */
 		} else if (flags & (TASK_FSUSPENDED | TASK_FGDB_STOPPED)) {
@@ -1618,16 +1618,16 @@ no_exec:
 	           thread ? task_getpid_of_s(thread) : 0, /* Tgid  (actually: PID) */
 	           thread ? task_gettid_of_s(thread) : 0, /* Pid   (actually: TID) */
 	           parent ? task_gettid_of_s(parent) : 0, /* PPid */
-	           thread_cred ? ATOMIC_READ(thread_cred->c_ruid) : 0,
-	           thread_cred ? ATOMIC_READ(thread_cred->c_euid) : 0,
-	           thread_cred ? ATOMIC_READ(thread_cred->c_suid) : 0,
-	           thread_cred ? ATOMIC_READ(thread_cred->c_fsuid) : 0,
-	           thread_cred ? ATOMIC_READ(thread_cred->c_rgid) : 0,
-	           thread_cred ? ATOMIC_READ(thread_cred->c_egid) : 0,
-	           thread_cred ? ATOMIC_READ(thread_cred->c_sgid) : 0,
-	           thread_cred ? ATOMIC_READ(thread_cred->c_fsgid) : 0,
-	           thread_hman ? ATOMIC_READ(thread_hman->hm_maxhand) : 0,
-	           thread_cred ? ATOMIC_READ(thread_cred->c_fsgid) : 0) < 0)
+	           thread_cred ? atomic_read(&thread_cred->c_ruid) : 0,
+	           thread_cred ? atomic_read(&thread_cred->c_euid) : 0,
+	           thread_cred ? atomic_read(&thread_cred->c_suid) : 0,
+	           thread_cred ? atomic_read(&thread_cred->c_fsuid) : 0,
+	           thread_cred ? atomic_read(&thread_cred->c_rgid) : 0,
+	           thread_cred ? atomic_read(&thread_cred->c_egid) : 0,
+	           thread_cred ? atomic_read(&thread_cred->c_sgid) : 0,
+	           thread_cred ? atomic_read(&thread_cred->c_fsgid) : 0,
+	           thread_hman ? atomic_read(&thread_hman->hm_maxhand) : 0,
+	           thread_cred ? atomic_read(&thread_cred->c_fsgid) : 0) < 0)
 		return;
 	if (thread_cred) {
 		size_t i;
@@ -1735,7 +1735,7 @@ procfs_pp_kos_peb_addr_print(struct printnode *__restrict self,
 	thread   = taskpid_gettask_srch(self->fn_fsdata);
 	threadmm = task_getmman(thread);
 	decref_unlikely(thread);
-	peb = ATOMIC_READ(FORMMAN(threadmm, thismman_execinfo).mei_peb);
+	peb = atomic_read(&FORMMAN(threadmm, thismman_execinfo).mei_peb);
 	decref_unlikely(threadmm);
 	format_printf(printer, arg, "%#" PRIxPTR, peb);
 }
@@ -1765,7 +1765,7 @@ procfs_pp_kos_peb_addr_write(struct mfile *__restrict self, USER CHECKED void co
 	peb = ProcFS_ParsePtr(src, num_bytes);
 	validate_readableaddr(peb);
 	mman_lock_acquire(threadmm);
-	ATOMIC_WRITE(FORMMAN(threadmm, thismman_execinfo).mei_peb, peb);
+	atomic_write(&FORMMAN(threadmm, thismman_execinfo).mei_peb, peb);
 	mman_lock_release(threadmm);
 	return num_bytes;
 }
@@ -1788,7 +1788,7 @@ procfs_pp_kos_peb_compat_print(struct printnode *__restrict self,
 	thread   = taskpid_gettask_srch(self->fn_fsdata);
 	threadmm = task_getmman(thread);
 	decref_unlikely(thread);
-	peb_iscompat = ATOMIC_READ(FORMMAN(threadmm, thismman_execinfo).mei_peb_iscompat);
+	peb_iscompat = atomic_read(&FORMMAN(threadmm, thismman_execinfo).mei_peb_iscompat);
 	decref_unlikely(threadmm);
 	ProcFS_PrintBool(printer, arg, peb_iscompat);
 }
@@ -1817,7 +1817,7 @@ procfs_pp_kos_peb_compat_write(struct mfile *__restrict self, USER CHECKED void 
 	}
 	peb_iscompat = ProcFS_ParseBool(src, num_bytes);
 	mman_lock_acquire(threadmm);
-	ATOMIC_WRITE(FORMMAN(threadmm, thismman_execinfo).mei_peb_iscompat, peb_iscompat);
+	atomic_write(&FORMMAN(threadmm, thismman_execinfo).mei_peb_iscompat, peb_iscompat);
 	mman_lock_release(threadmm);
 	return num_bytes;
 }
@@ -2180,7 +2180,7 @@ procfs_perproc_fd_v_lookup(struct fdirnode *__restrict self,
 	/* Decode handle number */
 	if unlikely(info->flu_namelen == 0)
 		goto notanfd;
-	ch = ATOMIC_READ(info->flu_name[0]);
+	ch = atomic_read(&info->flu_name[0]);
 	if ((ch >= '1' && ch <= '9') || (ch == '0' && info->flu_namelen == 1)) {
 		REF struct procfs_fd_dirent *result;
 		unsigned int fdno = (unsigned int)(ch - '0');
@@ -2188,7 +2188,7 @@ procfs_perproc_fd_v_lookup(struct fdirnode *__restrict self,
 		size_t i;
 
 		for (i = 1; i < info->flu_namelen; ++i) {
-			ch = ATOMIC_READ(info->flu_name[i]);
+			ch = atomic_read(&info->flu_name[i]);
 			if unlikely(!(ch >= '0' && ch <= '9'))
 				goto notanfd;
 			fdno *= 10;
@@ -2256,7 +2256,7 @@ procfs_fd_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct d
 
 again:
 	/* Read current index. */
-	index = ATOMIC_READ(me->pfe_fd);
+	index = atomic_read(&me->pfe_fd);
 
 	/* Find the next handle. */
 	newindex = (unsigned int)handman_tryfindnext(me->pfe_hman, (fd_t)index, &hdata);
@@ -2270,7 +2270,7 @@ again:
 	if (result < 0)
 		return (size_t)~result; /* Don't advance directory position. */
 	/* Advance directory position. */
-	if (!ATOMIC_CMPXCH(me->pfe_fd, index, newindex + 1))
+	if (!atomic_cmpxch(&me->pfe_fd, index, newindex + 1))
 		goto again;
 	return (size_t)result;
 }
@@ -2297,18 +2297,18 @@ procfs_fd_enum_v_seekdir(struct fdirenum *__restrict self,
 			THROW(E_OVERFLOW);
 #endif /* __SIZEOF_POS_T__ > __SIZEOF_INT__ */
 		newpos = (unsigned int)(pos_t)offset;
-		ATOMIC_WRITE(me->pfe_fd, newpos);
+		atomic_write(&me->pfe_fd, newpos);
 		break;
 
 	case SEEK_CUR: {
 		uintptr_t oldpos;
 		do {
-			oldpos = ATOMIC_READ(me->pfe_fd);
+			oldpos = atomic_read(&me->pfe_fd);
 			newpos = oldpos + (int)offset;
 			if unlikely(offset < 0 ? newpos > oldpos
 			                       : newpos < oldpos)
 				THROW(E_OVERFLOW);
-		} while (!ATOMIC_CMPXCH_WEAK(me->pfe_fd, oldpos, newpos));
+		} while (!atomic_cmpxch_weak(&me->pfe_fd, oldpos, newpos));
 	}	break;
 
 	case SEEK_END: {
@@ -2318,7 +2318,7 @@ procfs_fd_enum_v_seekdir(struct fdirenum *__restrict self,
 		if unlikely(offset < 0 ? newpos > dirsiz
 		                       : newpos < dirsiz)
 			THROW(E_OVERFLOW);
-		ATOMIC_WRITE(me->pfe_fd, newpos);
+		atomic_write(&me->pfe_fd, newpos);
 	}	break;
 
 	default:
@@ -2668,7 +2668,7 @@ procfs_perproc_fdinfo_v_lookup(struct fdirnode *__restrict self,
 	/* Decode handle number */
 	if unlikely(info->flu_namelen == 0)
 		goto notanfd;
-	ch = ATOMIC_READ(info->flu_name[0]);
+	ch = atomic_read(&info->flu_name[0]);
 	if ((ch >= '1' && ch <= '9') || (ch == '0' && info->flu_namelen == 1)) {
 		REF struct procfs_fdinfo_dirent *result;
 		unsigned int fdno = (unsigned int)(ch - '0');
@@ -2676,7 +2676,7 @@ procfs_perproc_fdinfo_v_lookup(struct fdirnode *__restrict self,
 		size_t i;
 
 		for (i = 1; i < info->flu_namelen; ++i) {
-			ch = ATOMIC_READ(info->flu_name[i]);
+			ch = atomic_read(&info->flu_name[i]);
 			if unlikely(!(ch >= '0' && ch <= '9'))
 				goto notanfd;
 			fdno *= 10;
@@ -2728,7 +2728,7 @@ procfs_fdinfo_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED stru
 
 again:
 	/* Read current index. */
-	index = ATOMIC_READ(me->pfe_fd);
+	index = atomic_read(&me->pfe_fd);
 
 	/* Find the next handle. */
 	newindex = (unsigned int)handman_tryfindnext(me->pfe_hman, (fd_t)index, &hdata);
@@ -2742,7 +2742,7 @@ again:
 	if (result < 0)
 		return (size_t)~result; /* Don't advance directory position. */
 	/* Advance directory position. */
-	if (!ATOMIC_CMPXCH(me->pfe_fd, index, newindex + 1))
+	if (!atomic_cmpxch(&me->pfe_fd, index, newindex + 1))
 		goto again;
 	return (size_t)result;
 }
@@ -2938,7 +2938,7 @@ procfs_perproc_map_files_v_lookup(struct fdirnode *__restrict self,
 	state   = STATE_MIN0;
 	while (reader < end) {
 		char ch;
-		ch = ATOMIC_READ(*reader);
+		ch = atomic_read(reader);
 		++reader;
 		if (ch >= '0' && ch <= '9') {
 			if (ch == '0' && (state == STATE_MIN0 || state == STATE_END0))
@@ -3062,7 +3062,7 @@ perproc_mapfile_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED
 	UNCHECKED void *oldaddr, *newaddr;
 
 again:
-	oldaddr = ATOMIC_READ(me->ppmd_addr);
+	oldaddr = atomic_read(&me->ppmd_addr);
 	if unlikely(oldaddr == (UNCHECKED void *)(uintptr_t)-1)
 		return 0; /* Forced end-of-directory. */
 	newaddr = oldaddr;
@@ -3095,7 +3095,7 @@ again_lookup:
 		return (size_t)~result; /* Don't advance directory position. */
 
 	/* Advance directory position. */
-	if (!ATOMIC_CMPXCH(me->ppmd_addr, oldaddr, newaddr))
+	if (!atomic_cmpxch(&me->ppmd_addr, oldaddr, newaddr))
 		goto again;
 	return (size_t)result;
 }
@@ -3114,18 +3114,18 @@ perproc_mapfile_direnum_v_seekdir(struct fdirenum *__restrict self,
 			THROW(E_OVERFLOW);
 #endif /* __SIZEOF_POS_T__ > __SIZEOF_POINTER__ */
 		newpos = (UNCHECKED void *)(uintptr_t)(pos_t)offset;
-		ATOMIC_WRITE(me->ppmd_addr, newpos);
+		atomic_write(&me->ppmd_addr, newpos);
 		break;
 
 	case SEEK_CUR: {
 		UNCHECKED void *oldpos;
 		do {
-			oldpos = ATOMIC_READ(me->ppmd_addr);
+			oldpos = atomic_read(&me->ppmd_addr);
 			newpos = (UNCHECKED byte_t *)oldpos + (intptr_t)offset;
 			if unlikely(offset < 0 ? newpos > oldpos
 			                       : newpos < oldpos)
 				THROW(E_OVERFLOW);
-		} while (!ATOMIC_CMPXCH_WEAK(me->ppmd_addr, oldpos, newpos));
+		} while (!atomic_cmpxch_weak(&me->ppmd_addr, oldpos, newpos));
 	}	break;
 
 	case SEEK_END: {
@@ -3138,7 +3138,7 @@ perproc_mapfile_direnum_v_seekdir(struct fdirenum *__restrict self,
 #else /* __SIZEOF_POS_T__ > __SIZEOF_POINTER__ */
 		newpos = (UNCHECKED void *)((uintptr_t)0 - offset);
 #endif /* __SIZEOF_POS_T__ <= __SIZEOF_POINTER__ */
-		ATOMIC_WRITE(me->ppmd_addr, newpos);
+		atomic_write(&me->ppmd_addr, newpos);
 	}	break;
 
 	default:
@@ -3207,13 +3207,13 @@ procfs_perproc_task_v_lookup(struct fdirnode *__restrict self,
 	/* Evaluate running process PIDs */
 	if unlikely(info->flu_namelen == 0)
 		goto notapid;
-	ch = ATOMIC_READ(info->flu_name[0]);
+	ch = atomic_read(&info->flu_name[0]);
 	if (ch >= '1' && ch <= '9') {
 		REF struct taskpid *pid;
 		pid_t pidno = ch - '0';
 		size_t i;
 		for (i = 1; i < info->flu_namelen; ++i) {
-			ch = ATOMIC_READ(info->flu_name[i]);
+			ch = atomic_read(&info->flu_name[i]);
 			if unlikely(!(ch >= '0' && ch <= '9'))
 				goto notapid;
 			pidno *= 10;
@@ -3337,7 +3337,7 @@ procfs_task_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED str
 
 again:
 	/* Read current index. */
-	index = ATOMIC_READ(me->ptd_index);
+	index = atomic_read(&me->ptd_index);
 
 	/* Lookup next taskpid entry. */
 	if (index == 0) {
@@ -3370,7 +3370,7 @@ gotpid:
 		return (size_t)~result; /* Don't advance directory position. */
 
 	/* Advance directory position. */
-	if (!ATOMIC_CMPXCH(me->ptd_index, index, newindex))
+	if (!atomic_cmpxch(&me->ptd_index, index, newindex))
 		goto again;
 	return (size_t)result;
 }
@@ -3389,18 +3389,18 @@ procfs_task_direnum_v_seekdir(struct fdirenum *__restrict self,
 			THROW(E_OVERFLOW);
 #endif /* __SIZEOF_POS_T__ > __SIZEOF_PID_T__ */
 		newpos = (upid_t)(pos_t)offset;
-		ATOMIC_WRITE(me->ptd_index, newpos);
+		atomic_write(&me->ptd_index, newpos);
 		break;
 
 	case SEEK_CUR: {
 		uintptr_t oldpos;
 		do {
-			oldpos = ATOMIC_READ(me->ptd_index);
+			oldpos = atomic_read(&me->ptd_index);
 			newpos = oldpos + (intptr_t)offset;
 			if unlikely(offset < 0 ? newpos > oldpos
 			                       : newpos < oldpos)
 				THROW(E_OVERFLOW);
-		} while (!ATOMIC_CMPXCH_WEAK(me->ptd_index, oldpos, newpos));
+		} while (!atomic_cmpxch_weak(&me->ptd_index, oldpos, newpos));
 	}	break;
 
 	case SEEK_END: {
@@ -3411,7 +3411,7 @@ procfs_task_direnum_v_seekdir(struct fdirenum *__restrict self,
 		if unlikely(offset < 0 ? newpos > dirsiz
 		                       : newpos < dirsiz)
 			THROW(E_OVERFLOW);
-		ATOMIC_WRITE(me->ptd_index, newpos);
+		atomic_write(&me->ptd_index, newpos);
 	}	break;
 
 	default:
@@ -3771,7 +3771,7 @@ get_driveid(struct fdirnode *__restrict self,
 	uint8_t id;
 	if (info->flu_namelen != 1)
 		return 0xff;
-	id = (uint8_t)ATOMIC_READ(info->flu_name[0]);
+	id = (uint8_t)atomic_read(&info->flu_name[0]);
 	if (id >= 'A' && id <= 'Z') {
 		id -= 'A';
 	} else if (id >= 'a' && id <= 'z' && (info->flu_flags & AT_DOSPATH)) {
@@ -3784,7 +3784,7 @@ get_driveid(struct fdirnode *__restrict self,
 		return 0xff;
 	threadfs = task_getfs(thread);
 	decref_unlikely(thread);
-	exists = ATOMIC_READ(threadfs->fs_vfs->vf_drives[id]) != NULL;
+	exists = atomic_read(&threadfs->fs_vfs->vf_drives[id]) != NULL;
 	decref_unlikely(threadfs);
 	if unlikely(!exists)
 		return 0xff;
@@ -3834,13 +3834,13 @@ procfs_perproc_drives_readdir(struct fdirenum *__restrict self, USER CHECKED str
 	me = (struct procfs_perproc_drives_enum *)self;
 again:
 	/* Read current index. */
-	oldindex = ATOMIC_READ(me->ppde_driveno);
+	oldindex = atomic_read(&me->ppde_driveno);
 	newindex = oldindex;
 
 	for (;;) {
 		if (newindex >= VFS_DRIVECOUNT)
 			return 0; /* End-of-directory */
-		if (ATOMIC_READ(me->ppde_vfs->vf_drives[newindex]) != NULL)
+		if (atomic_read(&me->ppde_vfs->vf_drives[newindex]) != NULL)
 			break; /* This one's bound! */
 		++newindex;
 	}
@@ -3859,7 +3859,7 @@ again:
 		return (size_t)~result; /* Don't advance directory position. */
 
 	/* Advance directory position. */
-	if (!ATOMIC_CMPXCH(me->ppde_driveno, oldindex, newindex + 1))
+	if (!atomic_cmpxch(&me->ppde_driveno, oldindex, newindex + 1))
 		goto again;
 	return (size_t)result;
 }
@@ -3893,18 +3893,18 @@ procfs_perproc_drives_enum_v_seekdir(struct fdirenum *__restrict self,
 			THROW(E_OVERFLOW);
 #endif /* __SIZEOF_POS_T__ > __SIZEOF_PID_T__ */
 		newpos = (uint8_t)(pos_t)offset;
-		ATOMIC_WRITE(me->ppde_driveno, newpos);
+		atomic_write(&me->ppde_driveno, newpos);
 		break;
 
 	case SEEK_CUR: {
 		uint8_t oldpos;
 		do {
-			oldpos = ATOMIC_READ(me->ppde_driveno);
+			oldpos = atomic_read(&me->ppde_driveno);
 			newpos = oldpos + (int8_t)offset;
 			if unlikely(offset < 0 ? newpos > oldpos
 			                       : newpos < oldpos)
 				THROW(E_OVERFLOW);
-		} while (!ATOMIC_CMPXCH_WEAK(me->ppde_driveno, oldpos, newpos));
+		} while (!atomic_cmpxch_weak(&me->ppde_driveno, oldpos, newpos));
 	}	break;
 
 	case SEEK_END: {
@@ -3912,7 +3912,7 @@ procfs_perproc_drives_enum_v_seekdir(struct fdirenum *__restrict self,
 		if unlikely(offset < 0 ? newpos > VFS_DRIVECOUNT
 		                       : newpos < VFS_DRIVECOUNT)
 			THROW(E_OVERFLOW);
-		ATOMIC_WRITE(me->ppde_driveno, newpos);
+		atomic_write(&me->ppde_driveno, newpos);
 	}	break;
 
 	default:

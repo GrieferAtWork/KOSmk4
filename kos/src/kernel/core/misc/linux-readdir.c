@@ -33,7 +33,6 @@
 #include <sched/sig.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 
 #include <compat/config.h>
 #include <kos/compat/linux-dirent.h>
@@ -41,6 +40,7 @@
 #include <kos/compat/linux-olddirent.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <dirent.h>
 #include <errno.h>
 #include <stdbool.h>
@@ -188,10 +188,10 @@ readdir_lock_acquire(void *h_data) {
 	 *    unwound our stack,  at which we'd  have already released  the
 	 *    readdir lock, so no dead-lock is possible. */
 	for (;;) {
-		if ((ATOMIC_FETCHOR(readdir_lockbits[word], mask) & mask) == 0)
+		if ((atomic_fetchor(&readdir_lockbits[word], mask) & mask) == 0)
 			break;
 		task_connect(&readdir_locksig);
-		if ((ATOMIC_FETCHOR(readdir_lockbits[word], mask) & mask) == 0) {
+		if ((atomic_fetchor(&readdir_lockbits[word], mask) & mask) == 0) {
 			task_disconnectall();
 			break;
 		}
@@ -208,7 +208,7 @@ NOTHROW(KCALL readdir_lock_release)(void *h_data) {
 	index = readdir_lock_index(h_data);
 	word  = readdir_lockbits_word(index);
 	mask  = readdir_lockbits_mask(index);
-	ATOMIC_AND(readdir_lockbits[word], ~mask);
+	atomic_and(&readdir_lockbits[word], ~mask);
 }
 
 

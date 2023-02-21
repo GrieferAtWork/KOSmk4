@@ -52,7 +52,7 @@ typedef struct {
 	PHYS u32             hd_bufaddr;       /* Physical  buffer base address. Set to 0 when the operation is started. This is
 	                                        * done to satisfy the atomic was-started condition (aka. `[COMMAND_DESCRIPTOR]')
 	                                        * described by <kernel/aio.h>:[async_work(device)]:[line#8]:
-	                                        * >> cmd = ATOMIC_XCH(ent->ah_data[1], NULL); */
+	                                        * >> cmd = atomic_xch(&ent->ah_data[1], NULL); */
 	u16                  hd_bufsize;       /* [const] Physical buffer size (in bytes) */
 	u8                   hd_io_lbaaddr[6]; /* [const] 48-bit starting LBA address. */
 	u8                   hd_io_sectors[2]; /* [const] 16-bit sector read count. */

@@ -26,8 +26,6 @@
 #include <dev/nic.h>
 #include <kernel/printk.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/net/printf.h>
 #include <linux/if_arp.h>
 #include <linux/if_ether.h>
@@ -35,6 +33,7 @@
 #include <network/arp.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <string.h>
 
@@ -143,7 +142,7 @@ arp_routepacket(struct nicdev *__restrict dev,
 				u8 oldmac[ETH_ALEN];
 				memcpy(oldmac, peer->npa_hwmac, ETH_ALEN);
 				memcpy(peer->npa_hwmac, hdr->ar_sha, ETH_ALEN);
-				if unlikely((ATOMIC_FETCHOR(peer->npa_flags, NET_PEERADDR_HAVE_MAC) & NET_PEERADDR_HAVE_MAC) &&
+				if unlikely((atomic_fetchor(&peer->npa_flags, NET_PEERADDR_HAVE_MAC) & NET_PEERADDR_HAVE_MAC) &&
 				            (bcmp(peer->npa_hwmac, hdr->ar_sha, ETH_ALEN, sizeof(u8)) != 0)) {
 					printk(KERN_NOTICE "[arp:%s] macaddr for " NET_PRINTF_IPADDR_FMT
 					                   " changed from " NET_PRINTF_MACADDR_FMT

@@ -164,15 +164,15 @@ NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state)
 	 * do normal polling for signals  (especially since RPCs don't  use
 	 * the normal  sig_send mechanisms, meaning that it's impossible to
 	 * wait for a thread other than THIS_TASK to receive RPCs) */
-	ATOMIC_AND(PERTASK(this_task.t_flags), ~(TASK_FRPC | TASK_FWAKEONMSKRPC));
+	atomic_and(&PERTASK(this_task.t_flags), ~(TASK_FRPC | TASK_FWAKEONMSKRPC));
 #else /* LOCAL_IS_SYSRET */
-	ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+	atomic_and(&PERTASK(this_task.t_flags), ~TASK_FRPC);
 #endif /* !LOCAL_IS_SYSRET */
 
 	/* Load RPC functions. This must happen _AFTER_ we clear
 	 * the  pending-RPC  flag to  prevent a  race condition. */
 	pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
-	pending_bitset    = ATOMIC_READ(PERTASK(this_rpcs_sigpend));
+	pending_bitset    = atomic_read(&PERTASK(this_rpcs_sigpend));
 
 handle_pending:
 	for (;;) {
@@ -288,7 +288,7 @@ make_inactive:
 		uint32_t inactive = PERTASK_GET(this_rpcs_sigpend_inactive);
 #endif /* LOCAL_IS_SYSRET */
 		signo_t signo;
-		pending_bitset = ATOMIC_XCH(PERTASK(this_rpcs_sigpend), 0);
+		pending_bitset = atomic_xch(&PERTASK(this_rpcs_sigpend), 0);
 #ifdef LOCAL_IS_SYSRET
 		PERTASK_SET(this_rpcs_sigpend_inactive, 0);
 #endif /* LOCAL_IS_SYSRET */
@@ -360,8 +360,8 @@ make_inactive:
 		struct procctl *proc = task_getprocctl();
 		struct pending_rpc *rpc;
 		uint32_t pending_bitset;
-		rpc            = ATOMIC_READ(proc->pc_sig_list.slh_first);
-		pending_bitset = ATOMIC_READ(proc->pc_sig_pend);
+		rpc            = atomic_read(&proc->pc_sig_list.slh_first);
+		pending_bitset = atomic_read(&proc->pc_sig_pend);
 		if ((rpc != NULL && rpc != THIS_RPCS_TERMINATED) || pending_bitset) {
 			struct pending_rpc **p_rpc;
 			bool has_write_lock;
@@ -458,7 +458,7 @@ again_scan_proc_rpcs:
 					/* Remove `rpc' from the list */
 					if (p_rpc == &proc->pc_sig_list.slh_first) {
 						/* Check for race condition: new RPCs were added in the mean time. */
-						if (!ATOMIC_CMPXCH(*p_rpc, rpc, rpc->pr_link.sle_next))
+						if (!atomic_cmpxch(p_rpc, rpc, rpc->pr_link.sle_next))
 							goto again_scan_proc_rpcs;
 					} else {
 						assert(*p_rpc == rpc);
@@ -489,7 +489,7 @@ check_next_proc_rpc:
 						break;
 				}
 			}
-			pending_bitset = ATOMIC_READ(proc->pc_sig_pend);
+			pending_bitset = atomic_read(&proc->pc_sig_pend);
 			if (pending_bitset) {
 				signo_t signo;
 				for (signo = 1; signo <= 31; ++signo) {
@@ -554,7 +554,7 @@ check_next_proc_rpc:
 						has_write_lock = true;
 					}
 					/* Remove `signo' from the list */
-					if (!(ATOMIC_FETCHAND(proc->pc_sig_pend, ~signo_mask) & signo_mask))
+					if (!(atomic_fetchand(&proc->pc_sig_pend, ~signo_mask) & signo_mask))
 						goto again_scan_proc_rpcs;
 					procctl_sig_endwrite(proc);
 					/* At this point, we've taken ownership of `rpc', and won't ever give it back! */
@@ -630,8 +630,8 @@ check_next_proc_rpc:
 					 *          call doesn't want that, it  has to clear the INACTIVE  flags
 					 *          itself. -- This has to be done in the case of  sigsuspend()! */
 					restore_pending_rpcs(SLIST_FIRST(&restore));
-					ATOMIC_OR(PERTASK(this_rpcs_sigpend), repeat_bitset);
-					ATOMIC_OR(PERTASK(this_task.t_flags), TASK_FRPC);
+					atomic_or(&PERTASK(this_rpcs_sigpend), repeat_bitset);
+					atomic_or(&PERTASK(this_task.t_flags), TASK_FRPC);
 					assert(PREEMPTION_ENABLED());
 					PREEMPTION_DISABLE();
 					ctx.rc_state = userexcept_sysret_inject_with_state_nopr(ctx.rc_state);
@@ -653,7 +653,7 @@ check_next_proc_rpc:
 				}
 				restore_plast = SLIST_PFIRST(&restore);
 				SLIST_INIT(&kernel_rpcs);
-				ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+				atomic_and(&PERTASK(this_task.t_flags), ~TASK_FRPC);
 				pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 				DBG_memset(&restore, 0xcc, sizeof(restore));
 				goto handle_pending;
@@ -670,7 +670,7 @@ check_next_proc_rpc:
 						if (!(rpc_flags & _RPC_CONTEXT_DONTFREE))
 							pending_rpc_free(rpc);
 						/* Load additional RPCs, but discard this new exception */
-						ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+						atomic_and(&PERTASK(this_task.t_flags), ~TASK_FRPC);
 						pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 						goto handle_pending;
 					}
@@ -697,7 +697,7 @@ check_next_proc_rpc:
 					if (!(rpc_flags & _RPC_CONTEXT_DONTFREE))
 						pending_rpc_free(rpc);
 					/* Load additional RPCs, but discard this new exception */
-					ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+					atomic_and(&PERTASK(this_task.t_flags), ~TASK_FRPC);
 					pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 					goto handle_pending;
 				}
@@ -715,7 +715,7 @@ check_next_proc_rpc:
 	/* Check if there are RPCs that need to be repeated. */
 	if unlikely(!SLIST_EMPTY(&repeat) || repeat_bitset != 0) {
 		struct pending_rpc **plast_pending, *repeat_rpc;
-		ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+		atomic_and(&PERTASK(this_task.t_flags), ~TASK_FRPC);
 		pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 		plast_pending     = SLIST_PFIRST(&pending);
 		while ((repeat_rpc = *plast_pending) != NULL)
@@ -727,7 +727,7 @@ check_next_proc_rpc:
 			plast_pending  = &repeat_rpc->pr_link.sle_next;
 		}
 		*plast_pending = NULL;
-		pending_bitset = ATOMIC_READ(PERTASK(this_rpcs_sigpend)) | repeat_bitset;
+		pending_bitset = atomic_read(&PERTASK(this_rpcs_sigpend)) | repeat_bitset;
 		repeat_bitset  = 0;
 		goto handle_pending;
 	}
@@ -795,7 +795,7 @@ check_next_proc_rpc:
 						if (!(rpc_flags & _RPC_CONTEXT_DONTFREE))
 							pending_rpc_free(rpc);
 						/* Load additional RPCs, but discard this new exception */
-						ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+						atomic_and(&PERTASK(this_task.t_flags), ~TASK_FRPC);
 						pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 						goto handle_pending;
 					}
@@ -812,10 +812,10 @@ check_next_proc_rpc:
 #endif /* !LOCAL_IS_SYSRET */
 		{
 			restore_pending_rpcs(SLIST_FIRST(&restore));
-			ATOMIC_OR(PERTASK(this_task.t_flags), TASK_FRPC);
+			atomic_or(&PERTASK(this_task.t_flags), TASK_FRPC);
 		}
 		if (restore_bitset) {
-			ATOMIC_OR(PERTASK(this_rpcs_sigpend), restore_bitset);
+			atomic_or(&PERTASK(this_rpcs_sigpend), restore_bitset);
 			/* Clear INACTIVE bits for all restored signals. */
 			PERTASK_SET(this_rpcs_sigpend_inactive, PERTASK_GET(this_rpcs_sigpend_inactive) & ~restore_bitset);
 		}

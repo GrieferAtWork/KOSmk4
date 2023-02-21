@@ -37,8 +37,6 @@
 #include <sched/task.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
-
 #include <hw/bus/pci.h>
 #include <hw/net/ne2k.h>
 #include <kos/except/reason/io.h>
@@ -48,6 +46,7 @@
 #include <sys/mkdev.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -81,9 +80,9 @@ NOTHROW(KCALL Ne2k_RestorePendingTxChain)(Ne2kDevice *__restrict self,
 	while (last_entry->ah_next)
 		last_entry = last_entry->ah_next;
 	do {
-		old_chain = ATOMIC_READ(self->nk_tranit);
-		ATOMIC_WRITE(last_entry->ah_next, old_chain);
-	} while (!ATOMIC_CMPXCH_WEAK(self->nk_tranit, old_chain, chain));
+		old_chain = atomic_read(&self->nk_tranit);
+		atomic_write(&last_entry->ah_next, old_chain);
+	} while (!atomic_cmpxch_weak(&self->nk_tranit, old_chain, chain));
 	return old_chain == NULL;
 }
 
@@ -93,9 +92,9 @@ NOTHROW(KCALL Ne2k_AddTransitAio)(Ne2kDevice *__restrict self,
                                   struct aio_handle *__restrict aio) {
 	struct aio_handle *next;
 	do {
-		next = ATOMIC_READ(self->nk_tranit);
-		ATOMIC_WRITE(aio->ah_next, next);
-	} while (!ATOMIC_CMPXCH_WEAK(self->nk_tranit, next, aio));
+		next = atomic_read(&self->nk_tranit);
+		atomic_write(&aio->ah_next, next);
+	} while (!atomic_cmpxch_weak(&self->nk_tranit, next, aio));
 	return next == NULL;
 }
 
@@ -109,11 +108,13 @@ NOTHROW(KCALL Ne2k_SwitchToIdleMode)(Ne2kDevice *__restrict self,
 	Ne2kState old_state, new_state;
 	bool tx_possible;
 	old_state.ns_word = old_state_word;
+
 	/* Always switch to IDLE-mode if there are UIO requests */
 	if ((old_state.ns_flags & NE2K_FLAG_REQUIO) != 0)
 		goto switch_to_idle;
+
 	/* Check if RX or TX (or both) are possible. */
-	tx_possible = ATOMIC_READ(self->nk_tranit) != NULL;
+	tx_possible = atomic_read(&self->nk_tranit) != NULL;
 
 	/* Try to switch to TX-mode. */
 	if (tx_possible) {
@@ -128,7 +129,7 @@ NOTHROW(KCALL Ne2k_SwitchToIdleMode)(Ne2kDevice *__restrict self,
 		new_state.ns_flags = old_state.ns_flags;
 		if (new_state.ns_flags & NE2K_FLAG_RXPEND)
 			new_state.ns_flags ^= NE2K_FLAG_RXLTCH;
-		result = ATOMIC_CMPXCH(self->nk_state.ns_word,
+		result = atomic_cmpxch(&self->nk_state.ns_word,
 		                       old_state.ns_word,
 		                       new_state.ns_word);
 		if (result) {
@@ -145,7 +146,7 @@ switch_to_rx:
 		new_state.ns_flags = old_state.ns_flags & ~NE2K_FLAG_RXPEND;
 		if (tx_possible)
 			new_state.ns_flags ^= NE2K_FLAG_RXLTCH;
-		result = ATOMIC_CMPXCH(self->nk_state.ns_word,
+		result = atomic_cmpxch(&self->nk_state.ns_word,
 		                       old_state.ns_word,
 		                       new_state.ns_word);
 		if (result) {
@@ -159,7 +160,7 @@ switch_to_idle:
 	/* Fallback: switch to the actual IDLE-mode */
 	new_state.ns_state = NE2K_STATE_IDLE;
 	new_state.ns_flags = old_state.ns_flags;
-	result = ATOMIC_CMPXCH(self->nk_state.ns_word,
+	result = atomic_cmpxch(&self->nk_state.ns_word,
 	                       old_state.ns_word,
 	                       new_state.ns_word);
 	if (result) {
@@ -175,13 +176,13 @@ switch_to_idle:
 PRIVATE bool KCALL Ne2k_TryAcquireUIO(Ne2kDevice *__restrict self) {
 	Ne2kState old_state, new_state;
 	do {
-		old_state.ns_word = ATOMIC_READ(self->nk_state.ns_word);
+		old_state.ns_word = atomic_read(&self->nk_state.ns_word);
 		if (old_state.ns_state != NE2K_STATE_IDLE &&
 		    old_state.ns_state != NE2K_STATE_OFF)
 			return false; /* Can only switch to UIO from IDLE or OFF */
 		new_state.ns_state = NE2K_STATE_UIO;
 		new_state.ns_flags = old_state.ns_flags;
-	} while (!ATOMIC_CMPXCH_WEAK(self->nk_state.ns_word,
+	} while (!atomic_cmpxch_weak(&self->nk_state.ns_word,
 	                             old_state.ns_word,
 	                             new_state.ns_word));
 	return true;
@@ -192,11 +193,11 @@ PRIVATE NOBLOCK void
 NOTHROW(KCALL Ne2k_DecrementReqUio)(Ne2kDevice *__restrict self) {
 	Ne2kState old_state, new_state;
 	do {
-		old_state.ns_word = ATOMIC_READ(self->nk_state.ns_word);
+		old_state.ns_word = atomic_read(&self->nk_state.ns_word);
 		new_state.ns_word = old_state.ns_word;
 		assert((new_state.ns_flags & NE2K_FLAG_REQUIO) != 0);
 		new_state.ns_flags -= NE2K_FLAG_REQUIO1;
-	} while (!ATOMIC_CMPXCH_WEAK(self->nk_state.ns_word,
+	} while (!atomic_cmpxch_weak(&self->nk_state.ns_word,
 	                             old_state.ns_word,
 	                             new_state.ns_word));
 }
@@ -205,13 +206,13 @@ NOTHROW(KCALL Ne2k_DecrementReqUio)(Ne2kDevice *__restrict self) {
 PRIVATE void KCALL Ne2k_AcquireUIO(Ne2kDevice *__restrict self) {
 	Ne2kState old_state, new_state;
 again:
-	old_state.ns_word = ATOMIC_READ(self->nk_state.ns_word);
+	old_state.ns_word = atomic_read(&self->nk_state.ns_word);
 	if (old_state.ns_state == NE2K_STATE_IDLE ||
 	    old_state.ns_state == NE2K_STATE_OFF) {
 		/* Can only switch to UIO from IDLE or OFF */
 		new_state.ns_state = NE2K_STATE_UIO;
 		new_state.ns_flags = old_state.ns_flags;
-		if unlikely(!ATOMIC_CMPXCH_WEAK(self->nk_state.ns_word,
+		if unlikely(!atomic_cmpxch_weak(&self->nk_state.ns_word,
 		                                old_state.ns_word,
 		                                new_state.ns_word))
 			goto again;
@@ -226,7 +227,7 @@ again:
 		goto again;
 	}
 	new_state.ns_flags += NE2K_FLAG_REQUIO1;
-	if unlikely(!ATOMIC_CMPXCH_WEAK(self->nk_state.ns_word,
+	if unlikely(!atomic_cmpxch_weak(&self->nk_state.ns_word,
 	                                old_state.ns_word,
 	                                new_state.ns_word))
 		goto again;
@@ -236,14 +237,14 @@ again:
 
 		/* Check again if we can switch into UIO-mode. */
 again_second_check:
-		old_state.ns_word = ATOMIC_READ(self->nk_state.ns_word);
+		old_state.ns_word = atomic_read(&self->nk_state.ns_word);
 		if unlikely(old_state.ns_state == NE2K_STATE_IDLE ||
 		            old_state.ns_state == NE2K_STATE_OFF) {
 			new_state.ns_state = NE2K_STATE_UIO;
 			new_state.ns_flags = old_state.ns_flags;
 			assert((new_state.ns_flags & NE2K_FLAG_REQUIO) != 0);
 			new_state.ns_flags -= NE2K_FLAG_REQUIO1;
-			if unlikely(!ATOMIC_CMPXCH_WEAK(self->nk_state.ns_word,
+			if unlikely(!atomic_cmpxch_weak(&self->nk_state.ns_word,
 			                                old_state.ns_word,
 			                                new_state.ns_word))
 				goto again_second_check;
@@ -259,14 +260,14 @@ again_second_check:
 		RETHROW();
 	}
 again_check_after:
-	old_state.ns_word = ATOMIC_READ(self->nk_state.ns_word);
+	old_state.ns_word = atomic_read(&self->nk_state.ns_word);
 	if likely(old_state.ns_state == NE2K_STATE_IDLE ||
 	          old_state.ns_state == NE2K_STATE_OFF) {
 		new_state.ns_state = NE2K_STATE_UIO;
 		new_state.ns_flags = old_state.ns_flags;
 		assert((new_state.ns_flags & NE2K_FLAG_REQUIO) != 0);
 		new_state.ns_flags -= NE2K_FLAG_REQUIO1;
-		if unlikely(!ATOMIC_CMPXCH_WEAK(self->nk_state.ns_word,
+		if unlikely(!atomic_cmpxch_weak(&self->nk_state.ns_word,
 		                                old_state.ns_word,
 		                                new_state.ns_word))
 			goto again_check_after;
@@ -276,7 +277,7 @@ again_check_after:
 	new_state.ns_word = old_state.ns_word;
 	assert((new_state.ns_flags & NE2K_FLAG_REQUIO) != 0);
 	new_state.ns_flags -= NE2K_FLAG_REQUIO1;
-	if unlikely(!ATOMIC_CMPXCH_WEAK(self->nk_state.ns_word,
+	if unlikely(!atomic_cmpxch_weak(&self->nk_state.ns_word,
 	                                old_state.ns_word,
 	                                new_state.ns_word))
 		goto again_check_after;
@@ -291,23 +292,23 @@ NOTHROW(KCALL Ne2k_ReleaseUIO)(Ne2kDevice *__restrict self) {
 	if (self->nd_ifflags & IFF_UP) {
 		Ne2kState old_state;
 		do {
-			old_state.ns_word = ATOMIC_READ(self->nk_state.ns_word);
+			old_state.ns_word = atomic_read(&self->nk_state.ns_word);
 			assert(old_state.ns_state == NE2K_STATE_UIO ||
 			       old_state.ns_state == NE2K_STATE_UIO_NOINT);
 		} while (!Ne2k_SwitchToIdleMode(self, old_state.ns_word));
 	} else {
 		/* Switch to off-mode. */
 #ifdef NDEBUG
-		ATOMIC_WRITE(self->nk_state.ns_state, NE2K_STATE_OFF);
+		atomic_write(&self->nk_state.ns_state, NE2K_STATE_OFF);
 #else /* NDEBUG */
 		Ne2kState old_state, new_state;
 		do {
-			old_state.ns_word  = ATOMIC_READ(self->nk_state.ns_word);
+			old_state.ns_word  = atomic_read(&self->nk_state.ns_word);
 			assert(old_state.ns_state == NE2K_STATE_UIO ||
 			       old_state.ns_state == NE2K_STATE_UIO_NOINT);
 			new_state.ns_state = NE2K_STATE_OFF;
 			new_state.ns_flags = old_state.ns_flags;
-		} while (!ATOMIC_CMPXCH_WEAK(self->nk_state.ns_word,
+		} while (!atomic_cmpxch_weak(&self->nk_state.ns_word,
 		                             old_state.ns_word,
 		                             new_state.ns_word));
 #endif /* !NDEBUG */
@@ -347,7 +348,7 @@ NOTHROW(FCALL Ne2k_InterruptHandler)(void *arg) {
 	Ne2kState state;
 	u8 status;
 	me = (Ne2kDevice *)arg;
-	state.ns_word = ATOMIC_READ(me->nk_state.ns_word);
+	state.ns_word = atomic_read(&me->nk_state.ns_word);
 	if unlikely(state.ns_state == NE2K_STATE_UIO_NOINT ||
 	            state.ns_state == NE2K_STATE_OFF)
 		return false; /* Must be some other device... */
@@ -378,10 +379,10 @@ switch_state_after_rx:
 			 * mode in order to have the async-worker download packet data. */
 			if (state.ns_state == NE2K_STATE_IDLE)
 				new_state.ns_state = NE2K_STATE_RX_DNLOAD;
-			if unlikely(!ATOMIC_CMPXCH(me->nk_state.ns_word,
+			if unlikely(!atomic_cmpxch(&me->nk_state.ns_word,
 			                           state.ns_word,
 			                           new_state.ns_word)) {
-				state.ns_word = ATOMIC_READ(me->nk_state.ns_word);
+				state.ns_word = atomic_read(&me->nk_state.ns_word);
 				if unlikely(state.ns_state == NE2K_STATE_UIO_NOINT ||
 				            state.ns_state == NE2K_STATE_OFF)
 					return true; /* Shouldn't happen... */
@@ -414,7 +415,7 @@ warn_tx_bad_state:
 		/* If the send operation got canceled  at any point before now,  `nk_current'
 		 * would have been set to `NULL'. By clearing it to NULL here, we essentially
 		 * force `aio_cancel()' to wait until we've signaled the exit status. */
-		aio = ATOMIC_XCH(me->nk_current, NULL);
+		aio = atomic_xch(&me->nk_current, NULL);
 		COMPILER_READ_BARRIER();
 		if likely(aio) {
 			/* Signal completion or error. */
@@ -435,7 +436,7 @@ warn_tx_bad_state:
 		/* Switch to IDLE mode. */
 		while unlikely(!Ne2k_SwitchToIdleMode(me, state.ns_word)) {
 			/* This should really only happen due to REQUIO */
-			state.ns_word = ATOMIC_READ(me->nk_state.ns_word);
+			state.ns_word = atomic_read(&me->nk_state.ns_word);
 			if unlikely(state.ns_state != NE2K_STATE_TX_PKSEND) {
 				if unlikely(state.ns_state == NE2K_STATE_UIO_NOINT ||
 				            state.ns_state == NE2K_STATE_OFF)
@@ -551,7 +552,7 @@ Ne2k_HandleSendTimeout(void *__restrict arg) {
 	Ne2kState state;
 	Ne2kDevice *me;
 	me            = (Ne2kDevice *)arg;
-	state.ns_word = ATOMIC_READ(me->nk_state.ns_word);
+	state.ns_word = atomic_read(&me->nk_state.ns_word);
 	/* Check if we're still waiting for a packet to be sent */
 	if (state.ns_state != NE2K_STATE_TX_PKSEND)
 		goto done;
@@ -591,7 +592,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL Ne2k_SwitchToTxPkSendMode)(Ne2kDevice *__restrict self) {
 	Ne2kState old_state, new_state;
 	do {
-		old_state.ns_word = ATOMIC_READ(self->nk_state.ns_word);
+		old_state.ns_word = atomic_read(&self->nk_state.ns_word);
 		assert(old_state.ns_state == NE2K_STATE_TX_UPLOAD);
 		new_state.ns_state = NE2K_STATE_TX_PKSEND;
 		new_state.ns_flags = old_state.ns_flags;
@@ -603,7 +604,7 @@ NOTHROW(KCALL Ne2k_SwitchToTxPkSendMode)(Ne2kDevice *__restrict self) {
 			self->nk_cursendtmo = send_timeout;
 			COMPILER_WRITE_BARRIER();
 		}
-	} while (!ATOMIC_CMPXCH_WEAK(self->nk_state.ns_word,
+	} while (!atomic_cmpxch_weak(&self->nk_state.ns_word,
 	                             old_state.ns_word,
 	                             new_state.ns_word));
 }
@@ -614,7 +615,7 @@ Ne2k_AsyncWork(void *__restrict arg) {
 	Ne2kDevice *me;
 	me = (Ne2kDevice *)arg;
 again:
-	state.ns_word = ATOMIC_READ(me->nk_state.ns_word);
+	state.ns_word = atomic_read(&me->nk_state.ns_word);
 	if (state.ns_state == NE2K_STATE_TX_UPLOAD) {
 		WEAK struct aio_handle *aio;
 		Ne2kAIOHandleData *aio_data;
@@ -631,7 +632,7 @@ again:
 		 * to the pending chain (so that it can remove them from that chain itself
 		 * to  prevent  any race  conditions  related to  accessing  dead handles) */
 		PREEMPTION_DISABLE();
-		aio = ATOMIC_XCH(me->nk_tranit, NULL);
+		aio = atomic_xch(&me->nk_tranit, NULL);
 		if unlikely(!aio) {
 			/* No more pending packets. ->  Try to switch to  IDLE
 			 * mode, but loop back to handle the case of RX_DNLOAD */
@@ -644,7 +645,7 @@ tx_switch_to_idle:
 		/* Find the first handle with a non-NULL packet field. */
 		aio_data = Ne2kAIOHandleData_Of(aio);
 		assert(aio_data->pd_device == me);
-		packet = ATOMIC_XCH(aio_data->pd_packet, NULL); /* Inherit reference */
+		packet = atomic_xch(&aio_data->pd_packet, NULL); /* Inherit reference */
 		if unlikely(!packet) {
 			/* This AIO handle is currently being canceled.
 			 * With that in mind, we must ensure that `aio' gets re-added to the
@@ -660,7 +661,7 @@ tx_switch_to_idle:
 					Ne2k_RestorePendingTxChain(me, aio);
 					goto tx_switch_to_idle;
 				}
-				packet = ATOMIC_XCH(aio_data->pd_packet, NULL); /* Inherit reference */
+				packet = atomic_xch(&aio_data->pd_packet, NULL); /* Inherit reference */
 				if unlikely(!packet) {
 					/* Not this one, either... */
 					pused_aio = &used_aio->ah_next;
@@ -734,7 +735,7 @@ tx_switch_to_idle:
 			 * Doing this simplifies  what has to  be done within  aio_cancel() */
 			Ne2k_SwitchToTxPkSendMode(me);
 			PREEMPTION_DISABLE();
-			aio = ATOMIC_XCH(me->nk_current, NULL);
+			aio = atomic_xch(&me->nk_current, NULL);
 			/* Indicate error-completion. */
 			if likely(aio)
 				aio_handle_complete(aio, AIO_COMPLETION_FAILURE);
@@ -742,7 +743,7 @@ tx_switch_to_idle:
 			/* Switch to IDLE mode. */
 			while unlikely(!Ne2k_SwitchToIdleMode(me, state.ns_word)) {
 				/* This should really only happen due to REQUIO */
-				state.ns_word = ATOMIC_READ(me->nk_state.ns_word);
+				state.ns_word = atomic_read(&me->nk_state.ns_word);
 				assert(state.ns_state == NE2K_STATE_TX_PKSEND);
 			}
 			goto again;
@@ -755,10 +756,10 @@ tx_switch_to_idle:
 		 * process, in which case we wouldn't want to send a packet after
 		 * it  has been canceled at a point  in time when that cancel was
 		 * still possible. */
-		if (ATOMIC_READ(me->nk_current) == NULL) {
+		if (atomic_read(&me->nk_current) == NULL) {
 			while unlikely(!Ne2k_SwitchToIdleMode(me, state.ns_word)) {
 				/* This should really only happen due to REQUIO */
-				state.ns_word = ATOMIC_READ(me->nk_state.ns_word);
+				state.ns_word = atomic_read(&me->nk_state.ns_word);
 				assert(state.ns_state == NE2K_STATE_TX_UPLOAD);
 			}
 			goto again;
@@ -893,7 +894,7 @@ tx_switch_to_idle:
 			nicdev_routepacket(me, packet, hdr.ph_count);
 		}
 		/* Clear the RX-PENDING bit. */
-		ATOMIC_AND(me->nk_state.ns_flags, ~NE2K_FLAG_RXPEND);
+		atomic_and(&me->nk_state.ns_flags, ~NE2K_FLAG_RXPEND);
 		COMPILER_BARRIER();
 		/* Re-enable packet-receive interrupts */
 		outb(E8390_CMD(me->nk_iobase), E8390_PAGE0 | E8390_NODMA | E8390_START);
@@ -903,7 +904,7 @@ tx_switch_to_idle:
 		/* Switch the card back into IDLE-mode. */
 		while unlikely(!Ne2k_SwitchToIdleMode(me, state.ns_word)) {
 			/* This should really only happen due to REQUIO */
-			state.ns_word = ATOMIC_READ(me->nk_state.ns_word);
+			state.ns_word = atomic_read(&me->nk_state.ns_word);
 			assert(state.ns_state == NE2K_STATE_RX_DNLOAD);
 		}
 		goto again;
@@ -916,7 +917,7 @@ Ne2k_AsyncTest(void *__restrict arg) {
 	Ne2kState state;
 	Ne2kDevice *me;
 	me            = (Ne2kDevice *)arg;
-	state.ns_word = ATOMIC_READ(me->nk_state.ns_word);
+	state.ns_word = atomic_read(&me->nk_state.ns_word);
 	/* The async worker responds to TX_UPLOAD and RX_DNLOAD */
 	if (state.ns_state == NE2K_STATE_TX_UPLOAD ||
 	    state.ns_state == NE2K_STATE_RX_DNLOAD)
@@ -937,7 +938,7 @@ PRIVATE NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL Ne2k_SwitchToTxUploadMode)(Ne2kDevice *__restrict self) {
 	Ne2kState old_state, new_state;
 	do {
-		old_state.ns_word = ATOMIC_READ(self->nk_state.ns_word);
+		old_state.ns_word = atomic_read(&self->nk_state.ns_word);
 		if (old_state.ns_state != NE2K_STATE_IDLE) {
 			/* Can only switch from IDLE to TX_UPLOAD
 			 * NOTE: This also covers the case of the
@@ -953,7 +954,7 @@ NOTHROW(KCALL Ne2k_SwitchToTxUploadMode)(Ne2kDevice *__restrict self) {
 		}
 		new_state.ns_state = NE2K_STATE_TX_UPLOAD;
 		new_state.ns_flags = old_state.ns_flags;
-	} while (!ATOMIC_CMPXCH_WEAK(self->nk_state.ns_word,
+	} while (!atomic_cmpxch_weak(&self->nk_state.ns_word,
 	                             old_state.ns_word,
 	                             new_state.ns_word));
 	NE2K_DEBUG("[ne2k] Switch to TX_UPLOAD\n");
@@ -988,7 +989,7 @@ NOTHROW(KCALL Ne2k_TxAioCancel)(struct aio_handle *__restrict self) {
 	 *   - If already NULL, then:
 	 *      - The AIO handle had already been canceled before
 	 *      - The packet is currently, or has already been uploaded */
-	packet = ATOMIC_XCH(aio_data->pd_packet, NULL);
+	packet = atomic_xch(&aio_data->pd_packet, NULL);
 	if (packet != NULL) {
 		bool did_find;
 		WEAK struct aio_handle *transit, **piter, *iter;
@@ -1006,7 +1007,7 @@ again_poll_transit:
 		 * Also note that we must also account of new packets having appeared after
 		 * the async-worker (temporarily) removed ours, so a non-NULL chain doesn't
 		 * necessarily mean that our packet cannot be somewhere inside! */
-		transit = ATOMIC_XCH(me->nk_tranit, NULL);
+		transit = atomic_xch(&me->nk_tranit, NULL);
 		if unlikely(!transit) {
 			/* Definite indicator that the async-worker is checking for packets! */
 			task_tryyield_or_pause();
@@ -1014,7 +1015,7 @@ again_poll_transit:
 		}
 		/* Check  if our packet can be found within the `transit' chain we've just stolen.
 		 * If  it's not in there, then `transit' is a chain of packets that were scheduled
-		 * for sending _after_ the async-worker did its ATOMIC_XCH() of AIO handles  which
+		 * for sending _after_ the async-worker did its atomic_xch() &of AIO handles which
 		 * includes ours, such that we have to wait for it to put our handle back into the
 		 * chain of those that are pending. */
 		piter    = &transit;
@@ -1046,7 +1047,7 @@ again_poll_transit:
 	/* With aio_cancel() prior to packet uploading having started  now
 	 * handled, move on to handling it for the case where uploading or
 	 * sending is currently in progress. */
-	if (ATOMIC_CMPXCH(me->nk_current, self, NULL)) {
+	if (atomic_cmpxch(&me->nk_current, self, NULL)) {
 		/* XXX: If the async-worker is currently in  the process of uploading packet  data
 		 *      to  the NIC, then we have to get  it to stop doing so. Technically, we can
 		 *      just let it do whatever in this scenario, since kernel-space packet header
@@ -1086,7 +1087,7 @@ again_poll_transit:
 	 *       either a SUCCESS or FAILURE condition. In this case, we mustn't
 	 *       do anything and return.
 	 *   #2: The Ne2k interrupt handler has already captured our AIO handle
-	 *       via  `ATOMIC_XCH(me->nk_current, NULL)', but has yet to invoke
+	 *       via `atomic_xch(&me->nk_current, NULL)', but has yet to invoke
 	 *       our AIO handle's completion function.
 	 * In either case, we know:
 	 *   - Our completion function has either  already been invoked, or is  going
@@ -1214,11 +1215,11 @@ Ne2k_SetFlags(struct nicdev *__restrict self,
 	Ne2kDevice *me = nicdev_asne2k(self);
 	assert(!(new_flags & IFF_STATUS));
 	assert((old_flags & IFF_CONST) == (new_flags & IFF_CONST));
-	if unlikely(ATOMIC_READ(self->nd_ifflags) != old_flags)
+	if unlikely(atomic_read(&self->nd_ifflags) != old_flags)
 		return false;
 	/* Acquire the UIO lock. */
 	Ne2k_AcquireUIO(me);
-	if unlikely(ATOMIC_READ(self->nd_ifflags) != old_flags) {
+	if unlikely(atomic_read(&self->nd_ifflags) != old_flags) {
 		Ne2k_ReleaseUIO(me);
 		return false;
 	}
@@ -1345,11 +1346,11 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 
 		/* Switch to OFF-mode. (the IF can be enabled via `Ne2k_SetFlags()') */
 #ifdef NDEBUG
-		ATOMIC_WRITE(self->nk_state.ns_state, NE2K_STATE_OFF);
+		atomic_write(&self->nk_state.ns_state, NE2K_STATE_OFF);
 #else /* NDEBUG */
 		{
 			uintptr_half_t old_state;
-			old_state = ATOMIC_XCH(self->nk_state.ns_state, NE2K_STATE_OFF);
+			old_state = atomic_xch(&self->nk_state.ns_state, NE2K_STATE_OFF);
 			assert(old_state == NE2K_STATE_UIO_NOINT);
 		}
 #endif /* !NDEBUG */
@@ -1391,7 +1392,7 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 	{
 		uintptr_t old_flags;
 		do {
-			old_flags = ATOMIC_READ(self->nd_ifflags);
+			old_flags = atomic_read(&self->nd_ifflags);
 			if (old_flags & IFF_UP)
 				break;
 			/* Turn the NIC on. */

@@ -33,7 +33,6 @@
 /**/
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/wordbits.h>
 
 #include <asm/intrin.h>
@@ -47,6 +46,7 @@
 #include <sys/ioctl.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <ctype.h>
 #include <dlfcn.h>
 #include <errno.h>
@@ -428,7 +428,7 @@ DlModule_PeInitializeImportTable(DlModule *__restrict self) {
 			syslog(LOG_DEBUG, "[pe] import: %q\n", filename);
 			dependency = libpe_LoadLibrary(filename, dep_flags);
 			if (!dependency) {
-				if (ATOMIC_READ(dl_globals.dg_errmsg) == NULL)
+				if (atomic_read(&dl_globals.dg_errmsg) == NULL)
 					dl.dl_seterrorf("Failed to load dependency %q of %q",
 					                filename, self->dm_filename);
 				goto err;
@@ -604,7 +604,7 @@ PRIVATE void **CC PeTls_AllocVector(bool forme) {
 	size_t count;
 	void **result;
 	DlModule *iter;
-	count  = ATOMIC_READ(pe_nexttlsindex);
+	count  = atomic_read(&pe_nexttlsindex);
 	result = (void **)calloc(count, sizeof(void *));
 	if (!result)
 		return NULL;
@@ -1140,7 +1140,7 @@ libpe_linker_main(struct peexec_info *__restrict info,
 		return NULL;
 
 	/* Mark this module as having been fully loaded. */
-	ATOMIC_AND(mod->dm_flags, ~RTLD_LOADING);
+	atomic_and(&mod->dm_flags, ~RTLD_LOADING);
 
 	/* Initial the PE TLS vector for the calling thread. */
 	if (pe_nexttlsindex != 0)

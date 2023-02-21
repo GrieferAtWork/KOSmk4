@@ -47,7 +47,6 @@
 #include <sched/sigmask.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
 
 #include <asm/intrin.h>
@@ -57,6 +56,7 @@
 #include <sys/wait.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <signal.h>
 #include <stddef.h>
@@ -88,9 +88,9 @@ NOTHROW(FCALL restore_pending_rpcs)(struct pending_rpc *restore) {
 		struct pending_rpc *last;
 		list = &PERTASK(this_rpcs);
 again:
-		last = ATOMIC_READ(list->slh_first);
+		last = atomic_read(&list->slh_first);
 		if (!last) {
-			if (!ATOMIC_CMPXCH_WEAK(list->slh_first, NULL, restore))
+			if (!atomic_cmpxch_weak(&list->slh_first, NULL, restore))
 				goto again;
 		} else {
 			while (SLIST_NEXT(last, pr_link))
@@ -822,14 +822,15 @@ NOTHROW(FCALL ipi_userexcept_sysret_inject_safe)(struct icpustate *__restrict st
 	struct cpu *mycpu, *target_cpu;
 	struct task *caller;
 	target = (REF struct task *)args[0];
+
 	/* Re-check that the target thread has yet to start terminating. */
-	if unlikely(ATOMIC_READ(target->t_flags) & (TASK_FTERMINATING | TASK_FTERMINATED)) {
+	if unlikely(atomic_read(&target->t_flags) & (TASK_FTERMINATING | TASK_FTERMINATED)) {
 		decref(target);
 		return state;
 	}
 	caller     = THIS_TASK;
 	mycpu      = caller->t_cpu;
-	target_cpu = ATOMIC_READ(target->t_cpu);
+	target_cpu = atomic_read(&target->t_cpu);
 	if unlikely(target_cpu != mycpu) {
 		/* Re-deliver the IPI to yet another CPU (letting it bounce until we get it right) */
 		while (!cpu_sendipi(target_cpu,
@@ -889,7 +890,7 @@ NOTHROW(FCALL userexcept_sysret_inject_safe)(struct task *__restrict thread,
 	struct cpu *target_cpu;
 	preemption_pushoff(&was);
 	mycpu      = THIS_CPU;
-	target_cpu = ATOMIC_READ(thread->t_cpu);
+	target_cpu = atomic_read(&thread->t_cpu);
 	if (mycpu != target_cpu) {
 		void *args[CPU_IPI_ARGCOUNT];
 		args[0] = (void *)incref(thread);
@@ -948,13 +949,14 @@ NOTHROW(FCALL userexcept_sysret_inject_and_marksignal_nopr)(struct task *__restr
 	int status;
 	assert(thread->t_cpu == THIS_CPU);
 	status = sigmask_ismasked_in(thread, signo);
+
 	/* If the signal isn't masked, or masking cannot be determined, inject a sysret.
 	 * Also  wake up the thread if it is explicitly requesting to be woken for every
 	 * signal it is send, even if that signal is being masked. Such behavior is used
 	 * to implement the `sigtimedwait(2)' and `sigsuspend(2)' system calls. */
 	if (status != SIGMASK_ISMASKED_NOPF_YES || (thread->t_flags & TASK_FWAKEONMSKRPC)) {
 		/* Set the thread's `TASK_FRPC' flag to indicate that it's got work to do */
-		ATOMIC_OR(thread->t_flags, TASK_FRPC);
+		atomic_or(&thread->t_flags, TASK_FRPC);
 		userexcept_sysret_inject_nopr(thread);
 	}
 }
@@ -968,14 +970,15 @@ NOTHROW(FCALL ipi_userexcept_sysret_inject_and_marksignal_safe)(struct icpustate
 	struct cpu *mycpu, *target_cpu;
 	struct task *caller;
 	target = (REF struct task *)args[0];
+
 	/* Re-check that the target thread has yet to start terminating. */
-	if unlikely(ATOMIC_READ(target->t_flags) & (TASK_FTERMINATING | TASK_FTERMINATED)) {
+	if unlikely(atomic_read(&target->t_flags) & (TASK_FTERMINATING | TASK_FTERMINATED)) {
 		decref(target);
 		return state;
 	}
 	caller     = THIS_TASK;
 	mycpu      = caller->t_cpu;
-	target_cpu = ATOMIC_READ(target->t_cpu);
+	target_cpu = atomic_read(&target->t_cpu);
 	if unlikely(target_cpu != mycpu) {
 		/* Re-deliver the IPI to yet another CPU (letting it bounce until we get it right) */
 		while (!cpu_sendipi(target_cpu,
@@ -1030,11 +1033,12 @@ NOTHROW(FCALL userexcept_sysret_inject_and_marksignal_safe)(struct task *__restr
 	struct cpu *target_cpu;
 	preemption_pushoff(&was);
 	mycpu      = THIS_CPU;
-	target_cpu = ATOMIC_READ(thread->t_cpu);
+	target_cpu = atomic_read(&thread->t_cpu);
 	if (mycpu != target_cpu) {
 		void *args[CPU_IPI_ARGCOUNT];
 		args[0] = (void *)incref(thread);
 		args[1] = (void *)(uintptr_t)rpc_flags;
+
 		/* Must use `CPU_IPI_FWAITFOR' to  ensure that `thread' won't  be
 		 * in user-space by the time we return. -- This is important  for
 		 * the use-case of getting threads out of user-space during exec,
@@ -1056,6 +1060,7 @@ NOTHROW(FCALL userexcept_sysret_inject_and_marksignal_safe)(struct task *__restr
 #ifdef CONFIG_NO_SMP
 		preemption_pushoff(&was);
 #endif /* CONFIG_NO_SMP */
+
 		/* check if the thread has already terminated */
 		if (thread->t_flags & (TASK_FTERMINATING | TASK_FTERMINATED)) {
 			preemption_pop(&was);

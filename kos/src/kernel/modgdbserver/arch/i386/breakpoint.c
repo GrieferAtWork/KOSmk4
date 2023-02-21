@@ -26,10 +26,9 @@
 #include <kernel/mman/rw.h>
 #include <kernel/x86/breakpoint.h>
 
-#include <hybrid/atomic.h>
-
 #include <asm/cpu-flags.h> /* DR_* */
 
+#include <atomic.h>
 #include <errno.h>
 #include <stddef.h>
 
@@ -73,10 +72,10 @@ PRIVATE NOBLOCK void
 NOTHROW(FCALL GDBBreak_SwMinFree_SetLower)(size_t newval) {
 	size_t oldval;
 	for (;;) {
-		oldval = ATOMIC_READ(GDBBreak_SwMinFree);
+		oldval = atomic_read(&GDBBreak_SwMinFree);
 		if (newval >= oldval)
 			break;
-		if (ATOMIC_CMPXCH_WEAK(GDBBreak_SwMinFree, oldval, newval))
+		if (atomic_cmpxch_weak(&GDBBreak_SwMinFree, oldval, newval))
 			break;
 	}
 }
@@ -107,7 +106,7 @@ PRIVATE NOBLOCK bool
 NOTHROW(FCALL GDBBreak_SwPush)(struct mman *effective_mm,
                                byte_t *addr, byte_t prev) {
 	size_t i, start;
-	start = ATOMIC_READ(GDBBreak_SwMinFree);
+	start = atomic_read(&GDBBreak_SwMinFree);
 again:
 	for (i = start;
 	     i < CONFIG_MODGDBSERVER_SWBREAK_MAXCNT; ++i) {
@@ -119,10 +118,10 @@ again:
 		GDBBreak_SwList[i].sb_prev = prev;
 		if (GDBBreak_SwMaxUsed < i)
 			GDBBreak_SwMaxUsed = i;
-		ATOMIC_CMPXCH(GDBBreak_SwMinFree, start, i + 1);
+		atomic_cmpxch(&GDBBreak_SwMinFree, start, i + 1);
 		return true;
 	}
-	i = ATOMIC_READ(GDBBreak_SwMinFree);
+	i = atomic_read(&GDBBreak_SwMinFree);
 	if (start != i) {
 		start = i;
 		goto again;
@@ -269,12 +268,12 @@ INTERN void
 NOTHROW(FCALL GDB_ClearAllBreakpointsOfMMan)(struct mman *__restrict effective_mm) {
 	size_t i, maxused;
 	bool isfirst = true;
-	maxused = ATOMIC_READ(GDBBreak_SwMaxUsed);
+	maxused = atomic_read(&GDBBreak_SwMaxUsed);
 	for (i = 0; i <= maxused; ++i) {
 		if (GDBBreak_SwList[i].sb_vm != effective_mm)
 			continue; /* Already in use. */
 		/* Try to delete this slot. */
-		if (!ATOMIC_CMPXCH(GDBBreak_SwList[i].sb_vm, effective_mm, NULL))
+		if (!atomic_cmpxch(&GDBBreak_SwList[i].sb_vm, effective_mm, NULL))
 			continue;
 		if (isfirst) {
 			GDBBreak_SwMinFree_SetLower(i);
@@ -288,7 +287,7 @@ INTERN void
 NOTHROW(FCALL GDB_CloneAllBreakpointsFromMMan)(struct mman *__restrict newmm,
                                                struct mman *__restrict oldmm) {
 	size_t i, maxused;
-	maxused = ATOMIC_READ(GDBBreak_SwMaxUsed);
+	maxused = atomic_read(&GDBBreak_SwMaxUsed);
 	for (i = 0; i <= maxused; ++i) {
 		byte_t *addr, prev;
 		if (GDBBreak_SwList[i].sb_vm != oldmm)

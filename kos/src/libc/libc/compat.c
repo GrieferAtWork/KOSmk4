@@ -52,6 +52,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <nt/types.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <elf.h>
 #include <fcntl.h>
 #include <format-printer.h>
@@ -1150,7 +1151,7 @@ NOTHROW_NCX(LIBCCALL libc_get_libiconv)(void) {
 		result = dlopen(LIBICONV_LIBRARY_NAME, RTLD_LAZY | RTLD_LOCAL);
 		if unlikely(!result)
 			libc_init_libiconv_failed();
-		if (!ATOMIC_CMPXCH(libc_libiconv, NULL, result)) {
+		if (!atomic_cmpxch(&libc_libiconv, NULL, result)) {
 			dlclose(result);
 			result = libc_libiconv;
 		}
@@ -1459,7 +1460,7 @@ NOTHROW(LIBDCALL libd___acrt_iob_func)(unsigned int index) {
 /************************************************************************/
 PRIVATE ATTR_SECTION(".bss.crt.dos.compat.dos") void *libkernel32 = NULL;
 PRIVATE ATTR_SECTION(".text.crt.dos.compat.dos") void *CC libd_getk32(void) {
-	void *k32 = ATOMIC_READ(libkernel32);
+	void *k32 = atomic_read(&libkernel32);
 	if (k32)
 		return k32;
 	k32 = dlopen("libkernel32.so", RTLD_LAZY | RTLD_LOCAL);
@@ -1467,9 +1468,9 @@ PRIVATE ATTR_SECTION(".text.crt.dos.compat.dos") void *CC libd_getk32(void) {
 		syslog(LOG_CRIT, "[libc] Failed to load 'libkernel32.so': %s\n", dlerror());
 		sys_exit_group(1);
 	}
-	if (!ATOMIC_CMPXCH(libkernel32, NULL, k32)) {
+	if (!atomic_cmpxch(&libkernel32, NULL, k32)) {
 		dlclose(k32);
-		k32 = ATOMIC_READ(libkernel32);
+		k32 = atomic_read(&libkernel32);
 	}
 	return k32;
 }

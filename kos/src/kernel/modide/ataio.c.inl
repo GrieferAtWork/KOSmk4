@@ -285,7 +285,7 @@ next_chunk:
 	/* Try to switch from READY --> INDMA to immediately start a DMA I/O operation. */
 	for (;;) {
 		uintptr_t state, newstate;
-		state = ATOMIC_READ(bus->ab_state);
+		state = atomic_read(&bus->ab_state);
 		if ((state & ATA_BUS_STATE_MASK) != ATA_BUS_STATE_READY)
 			break; /* The bus isn't ready to start DMAing immediately. */
 
@@ -294,8 +294,7 @@ next_chunk:
 #else /* ATA_BUS_STATE_READY == 0 */
 		newstate = (state & ~ATA_BUS_STATE_MASK) | ATA_BUS_STATE_INDMA;
 #endif /* ATA_BUS_STATE_READY != 0 */
-		if (!ATOMIC_CMPXCH_WEAK(bus->ab_state,
-		                        state, newstate))
+		if (!atomic_cmpxch_weak(&bus->ab_state, state, newstate))
 			continue;
 		assert(bus->ab_aio_current == NULL);
 
@@ -317,7 +316,7 @@ next_chunk:
 		 * NOTE: Do a direct start, since we've already initialized the PRD as in-place. */
 		bus->ab_aio_current = hand;
 		if (!AtaBus_HW_StartDirectDma(bus, hand)) {
-			assert((ATOMIC_READ(bus->ab_state) & ATA_BUS_STATE_MASK) == ATA_BUS_STATE_INDMA);
+			assert((atomic_read(&bus->ab_state) & ATA_BUS_STATE_MASK) == ATA_BUS_STATE_INDMA);
 			AtaBus_StartNextDmaOperation(bus);
 		}
 		goto done_part_sectors;

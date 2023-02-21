@@ -950,7 +950,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> 3:  cmpP   %Pdx, %Pax                                              # 3: if (first == shm_offsetof_elem_com) {
  * >>     jne    4f                                                      #     ...
  * >>     movP   service_comdesc::scd_active_link(%R_service_com), %Pcx  #     %Pcx = next = elem->scd_active_link;
- * >>     lock   cmpxchgP %Pcx, <cg_service->s_active_list>              #     if (!ATOMIC_CMPXCH(s_active_list, first, next))  # (movabs via %Pdi on x86_64)
+ * >>     lock   cmpxchgP %Pcx, <cg_service->s_active_list>              #     if (!atomic_cmpxch(&s_active_list, first, next))  # (movabs via %Pdi on x86_64)
  * >>     jz     3b                                                      #     { first = s_active_list; goto 3b; }
  * >>     jmp    6f                                                      # } else
  * >> 4:  testP  %Pax, %Pax                                              # if (first != 0) {

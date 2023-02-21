@@ -915,8 +915,8 @@ __DECL_BEGIN
 #endif /* !EMU86_EMULATE_ARGS */
 
 /* Hint at a spin-loop that may not necessarily break on its  own.
- * This is  placed  in  `do { READ(); } while (!ATOMIC_CMPXCH());'
- * loops after the  every time that  the `ATOMIC_CMPXCH()'  fails.
+ * This is  placed  in  `do { read(); } while (!atomic_cmpxch());'
+ * loops after the  every time that  the `atomic_cmpxch()'  fails.
  * For kernel-space, this should contain a call to  `task_serve()'
  * in  order to allow  the calling thread to  be terminated in the
  * event that the backing memory is set-up to return random values

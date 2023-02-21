@@ -37,7 +37,6 @@
 #include <sched/posix-signal.h> /* task_raisesignalprocessgroup() */
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/host.h>
 #include <hybrid/overflow.h>
 
@@ -49,6 +48,7 @@
 #include <sys/mkdev.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <signal.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -110,7 +110,7 @@ svgadev_ioctl_setdefmode(struct svgadev *__restrict self,
 	require(CAP_SYS_RAWIO);
 	validate_readable(modeinfo, sizeof(*modeinfo));
 	reqmode = svgadev_findmode(self, modeinfo);
-	ATOMIC_WRITE(self->svd_defmode, reqmode);
+	atomic_write(&self->svd_defmode, reqmode);
 	return 0;
 }
 
@@ -255,7 +255,7 @@ svgalck_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	case SVGA_IOC_GETMODE: {
 		struct svga_modeinfo const *mymode;
 		validate_writable(arg, sizeof(struct svga_modeinfo));
-		mymode = ATOMIC_READ(me->slc_mode);
+		mymode = atomic_read(&me->slc_mode);
 		if (!mymode) {
 			THROW(E_ILLEGAL_BECAUSE_NOT_READY,
 			      E_ILLEGAL_OPERATION_CONTEXT_SVGA_NO_MODE_SET);
@@ -288,7 +288,7 @@ svgalck_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		}
 
 		/* Remember last-set mode. */
-		ATOMIC_WRITE(me->slc_mode, newmode);
+		atomic_write(&me->slc_mode, newmode);
 		return 0;
 	}	break;
 
@@ -734,7 +734,7 @@ svgadev_vnewttyf(struct svgadev *__restrict self,
 	 *
 	 * XXX: Technically, clearing `MFILE_FN_GLOBAL_REF'  like this is  unsafe, as  someone
 	 *      else might set the flag again because of the `<WAS_SET_PREVIOUSLY>' condition. */
-	if (ATOMIC_FETCHAND(result->mf_flags, ~MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)
+	if (atomic_fetchand(&result->mf_flags, ~MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)
 		decref_nokill(result);
 	return result;
 }
@@ -802,7 +802,7 @@ svgadev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		require(CAP_SYS_RAWIO);
 		info = (USER CHECKED struct svga_maketty *)arg;
 		validate_readable(info, sizeof(*info));
-		name = ATOMIC_READ(info->smt_name);
+		name = atomic_read(&info->smt_name);
 		validate_readable(name, 1);
 		/* Create the new TTY */
 		tty = svgadev_newttyf(me, svgadev_findmode(me, &info->smt_mode),

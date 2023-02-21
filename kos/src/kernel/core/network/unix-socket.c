@@ -44,7 +44,6 @@ gcc_opt.removeif([](x) -> x.startswith("-O")); // TODO: Why are optimizations di
 #include <sched/tsc.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except/reason/illop.h>
@@ -54,6 +53,7 @@ gcc_opt.removeif([](x) -> x.startswith("-O")); // TODO: Why are optimizations di
 #include <sys/un.h> /* sockaddr_un */
 
 #include <assert.h>
+#include <atomic.h>
 #include <limits.h>
 #include <malloca.h>
 #include <stdalign.h>
@@ -142,7 +142,7 @@ NOTHROW(FCALL unix_client_destroy)(struct unix_client *__restrict self) {
 PRIVATE NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL unix_client_refuse_connection)(struct unix_client *__restrict self) {
 	/* Tell `self' that their connection request has been refused. */
-	if (!ATOMIC_CMPXCH(self->uc_status,
+	if (!atomic_cmpxch(&self->uc_status,
 	                   UNIX_CLIENT_STATUS_PENDING,
 	                   UNIX_CLIENT_STATUS_REFUSED))
 		return false;
@@ -153,7 +153,7 @@ NOTHROW(FCALL unix_client_refuse_connection)(struct unix_client *__restrict self
 PRIVATE NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL unix_client_accept_connection)(struct unix_client *__restrict self) {
 	/* Tell `self' that their connection request has been accepted. */
-	if (!ATOMIC_CMPXCH(self->uc_status,
+	if (!atomic_cmpxch(&self->uc_status,
 	                   UNIX_CLIENT_STATUS_PENDING,
 	                   UNIX_CLIENT_STATUS_ACCEPTED))
 		return false;
@@ -164,7 +164,7 @@ NOTHROW(FCALL unix_client_accept_connection)(struct unix_client *__restrict self
 PRIVATE NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL unix_client_close_connection)(struct unix_client *__restrict self) {
 	/* Tell `self' that their connection request has been closed. */
-	if (!ATOMIC_CMPXCH(self->uc_status,
+	if (!atomic_cmpxch(&self->uc_status,
 	                   UNIX_CLIENT_STATUS_ACCEPTED,
 	                   UNIX_CLIENT_STATUS_CLOSED))
 		return false;
@@ -181,8 +181,8 @@ NOTHROW(FCALL unix_client_close_connection)(struct unix_client *__restrict self)
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL unix_server_shutdown_listen)(struct unix_server *__restrict self) {
 	REF struct unix_client *pending, *next;
-	ATOMIC_WRITE(self->us_max_backlog, 0); /* Don't allow more clients. */
-	pending = ATOMIC_XCH(self->us_acceptme, UNIX_SERVER_ACCEPTME_SHUTDOWN);
+	atomic_write(&self->us_max_backlog, 0); /* Don't allow more clients. */
+	pending = atomic_xch(&self->us_acceptme, UNIX_SERVER_ACCEPTME_SHUTDOWN);
 	if (!pending || unlikely(pending == UNIX_SERVER_ACCEPTME_SHUTDOWN))
 		return;
 	for (;;) {
@@ -235,7 +235,7 @@ NOTHROW(KCALL unix_server_append_acceptme)(struct unix_server *__restrict self,
 	if (!acceptme_first)
 		goto done; /* Nothing to do here! */
 again:
-	limit = ATOMIC_READ(self->us_max_backlog);
+	limit = atomic_read(&self->us_max_backlog);
 	if unlikely(!limit) {
 		/* Refuse _all_ clients. */
 refuse_everyone:
@@ -297,11 +297,11 @@ refuse_everyone:
 	 * installed in the mean time, merge with it. */
 	for (;;) {
 		struct unix_client *chain, *iter;
-		chain = ATOMIC_READ(self->us_acceptme);
+		chain = atomic_read(&self->us_acceptme);
 		if unlikely(chain == UNIX_SERVER_ACCEPTME_SHUTDOWN)
 			goto refuse_everyone; /* Server was shut down -> Refuse _all_ clients. */
 		if likely(!chain) {
-			if (ATOMIC_CMPXCH_WEAK(self->us_acceptme, NULL, acceptme_first)) {
+			if (atomic_cmpxch_weak(&self->us_acceptme, NULL, acceptme_first)) {
 				/* Indicate that clients that need accept(2)-ing have become available. */
 				sig_broadcast(&self->us_acceptme_sig);
 
@@ -313,7 +313,7 @@ refuse_everyone:
 
 		/* Another chain was installed in the mean time.
 		 * -> Merge with it! */
-		if (!ATOMIC_CMPXCH_WEAK(self->us_acceptme, chain, NULL))
+		if (!atomic_cmpxch_weak(&self->us_acceptme, chain, NULL))
 			continue;
 		iter = chain;
 		while (iter->uc_next)
@@ -334,10 +334,10 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL unix_server_reinstall_acceptme)(struct unix_server *__restrict self) {
 	REF struct unix_client *chain, *last;
 	do {
-		chain = ATOMIC_READ(self->us_acceptme);
+		chain = atomic_read(&self->us_acceptme);
 		if unlikely(chain == UNIX_SERVER_ACCEPTME_SHUTDOWN)
 			return; /* Server was shut down. */
-	} while (!ATOMIC_CMPXCH_WEAK(self->us_acceptme,
+	} while (!atomic_cmpxch_weak(&self->us_acceptme,
 	                             chain, NULL));
 	if (!chain)
 		return;
@@ -355,10 +355,10 @@ PRIVATE NOBLOCK WUNUSED NONNULL((1)) REF struct unix_client *
 NOTHROW(FCALL unix_server_pop_acceptme)(struct unix_server *__restrict self) {
 	REF struct unix_client *result;
 	do {
-		result = ATOMIC_READ(self->us_acceptme);
+		result = atomic_read(&self->us_acceptme);
 		if unlikely(result == UNIX_SERVER_ACCEPTME_SHUTDOWN)
 			return NULL; /* Server was shut down. */
-	} while (!ATOMIC_CMPXCH_WEAK(self->us_acceptme,
+	} while (!atomic_cmpxch_weak(&self->us_acceptme,
 	                             result, NULL));
 	if (result) {
 		REF struct unix_client *next;
@@ -389,10 +389,10 @@ NOTHROW(FCALL unix_server_remove_acceptme)(struct unix_server *__restrict self,
                                            struct unix_client *__restrict client) {
 	REF struct unix_client *chain, **piter, *iter;
 	do {
-		chain = ATOMIC_READ(self->us_acceptme);
+		chain = atomic_read(&self->us_acceptme);
 		if unlikely(chain == UNIX_SERVER_ACCEPTME_SHUTDOWN)
 			return false; /* Server was shut down. */
-	} while (!ATOMIC_CMPXCH_WEAK(self->us_acceptme,
+	} while (!atomic_cmpxch_weak(&self->us_acceptme,
 	                             chain, NULL));
 
 	/* Search `chain' for `client' */
@@ -478,7 +478,7 @@ UnixSocket_GetName(UnixSocket *__restrict self,
 	struct fsocknode *node;
 	if (addr_len >= offsetafter(struct sockaddr_un, sun_family))
 		addr->sun_family = AF_UNIX;
-	node = ATOMIC_READ(self->us_node);
+	node = atomic_read(&self->us_node);
 
 	/* Check if the socket is bound/connected */
 	if (!node || node == (struct fsocknode *)-1) {
@@ -591,7 +591,7 @@ UnixSocket_Bind(struct socket *__restrict self,
 
 	/* Start the  binding process,  and ensure  that the  socket  isn't
 	 * already bound, or is currently being bound by some other thread. */
-	if unlikely(!ATOMIC_CMPXCH(me->us_node, NULL, (REF struct fsocknode *)-1)) {
+	if unlikely(!atomic_cmpxch(&me->us_node, NULL, (REF struct fsocknode *)-1)) {
 		decref_unlikely(bind_path);
 		THROW(E_ILLEGAL_BECAUSE_NOT_READY,
 		      E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND);
@@ -614,7 +614,7 @@ UnixSocket_Bind(struct socket *__restrict self,
 	} EXCEPT {
 		decref_unlikely(bind_path);
 		/* Switch back to indicating that the socket isn't bound. */
-		ATOMIC_WRITE(me->us_node, NULL);
+		atomic_write(&me->us_node, NULL);
 		RETHROW();
 	}
 
@@ -669,7 +669,7 @@ PRIVATE NONNULL((1)) bool FCALL
 UnixSocket_WaitForAccept_Test(struct async *__restrict self) {
 	struct async_accept_wait *me = (struct async_accept_wait *)self;
 	struct unix_client *client   = me->aw_client;
-	return ATOMIC_READ(client->uc_status) != UNIX_CLIENT_STATUS_PENDING;
+	return atomic_read(&client->uc_status) != UNIX_CLIENT_STATUS_PENDING;
 }
 
 PRIVATE NONNULL((1)) unsigned int FCALL
@@ -679,7 +679,7 @@ UnixSocket_WaitForAccept_Work(struct async *__restrict self) {
 	REF UnixSocket *socket;
 	me     = (struct async_accept_wait *)self;
 	client = me->aw_client;
-	if (ATOMIC_READ(client->uc_status) == UNIX_CLIENT_STATUS_PENDING)
+	if (atomic_read(&client->uc_status) == UNIX_CLIENT_STATUS_PENDING)
 		return ASYNC_RESUME; /* Still some work left to do! */
 
 	/* The connection has been established! */
@@ -688,7 +688,7 @@ UnixSocket_WaitForAccept_Work(struct async *__restrict self) {
 		/* The socket died? Ok... In that case, just force a disconnect */
 		if (!unix_client_refuse_connection(client))
 			unix_client_close_connection(client);
-		/*ATOMIC_WRITE(socket->us_node, NULL);*/ /* Don't modify because already destroyed. */
+		/*atomic_write(&socket->us_node, NULL);*/ /* Don't modify because already destroyed. */
 		return ASYNC_FINISHED;
 	}
 
@@ -705,7 +705,7 @@ UnixSocket_WaitForAccept_Work(struct async *__restrict self) {
 
 	/* Fill  in the node-pointer, thus marking the socket
 	 * as having been connected (from its own view-point) */
-	ATOMIC_WRITE(socket->us_node, me->aw_bind_node); /* Inherit reference */
+	atomic_write(&socket->us_node, me->aw_bind_node); /* Inherit reference */
 	me->aw_bind_node = NULL;
 	COMPILER_WRITE_BARRIER();
 	{
@@ -713,7 +713,7 @@ UnixSocket_WaitForAccept_Work(struct async *__restrict self) {
 		/* If the socket  wasn't accepted, tell  the caller by  throwing
 		 * an `E_NET_CONNECTION_REFUSED' exception, which will translate
 		 * to connect() returning with `errno=ECONNREFUSED' */
-		if (ATOMIC_READ(client->uc_status) != UNIX_CLIENT_STATUS_ACCEPTED)
+		if (atomic_read(&client->uc_status) != UNIX_CLIENT_STATUS_ACCEPTED)
 			THROW(E_NET_CONNECTION_REFUSED);
 	}
 	return ASYNC_FINISHED;
@@ -738,7 +738,7 @@ UnixSocket_WaitForAccept_Cancel(struct async *__restrict self) {
 		 * after it was already established. */
 		unix_client_close_connection(client);
 	}
-	ATOMIC_WRITE(me->aw_socket->us_node, NULL);
+	atomic_write(&me->aw_socket->us_node, NULL);
 }
 
 
@@ -792,7 +792,7 @@ UnixSocket_Connect(struct socket *__restrict self,
 	pathlen = strnlen(addr_un->sun_path,
 	                  addr_len -
 	                  offsetof(struct sockaddr_un, sun_path));
-	if unlikely(!ATOMIC_CMPXCH(me->us_node, NULL, (REF struct fsocknode *)-1)) {
+	if unlikely(!atomic_cmpxch(&me->us_node, NULL, (REF struct fsocknode *)-1)) {
 		THROW(E_ILLEGAL_BECAUSE_NOT_READY,
 		      E_ILLEGAL_OPERATION_CONTEXT_SOCKET_CONNECT_ALREADY_CONNECTED);
 	}
@@ -821,7 +821,7 @@ UnixSocket_Connect(struct socket *__restrict self,
 #ifndef __OPTIMIZE_SIZE__
 			/* Check that someone is listening to `bind_node'
 			 * NOTE: This check is also performed implicitly by `unix_server_append_acceptme()' */
-			if unlikely(!ATOMIC_READ(bind_node->sun_server.us_max_backlog))
+			if unlikely(!atomic_read(&bind_node->sun_server.us_max_backlog))
 				THROW(E_NET_CONNECTION_REFUSED);
 #endif /* !__OPTIMIZE_SIZE__ */
 
@@ -847,8 +847,8 @@ UnixSocket_Connect(struct socket *__restrict self,
 			 * established unix socket  connection are MAX(client,  server), which  we
 			 * implement by allowing the server to increase the limit before accepting
 			 * our connection. */
-			pb_buffer_init_ex(&client->uc_fromclient, ATOMIC_READ(me->us_sndbufsiz));
-			pb_buffer_init_ex(&client->uc_fromserver, ATOMIC_READ(me->us_rcvbufsiz));
+			pb_buffer_init_ex(&client->uc_fromclient, atomic_read(&me->us_sndbufsiz));
+			pb_buffer_init_ex(&client->uc_fromserver, atomic_read(&me->us_rcvbufsiz));
 
 			TRY {
 				/* Construct an async worker for informing the server of our
@@ -858,10 +858,10 @@ UnixSocket_Connect(struct socket *__restrict self,
 					/* Inform the server that we're trying to connect to it */
 					REF struct unix_client *next, *last;
 					do {
-						next = ATOMIC_READ(bind_node->sun_server.us_acceptme);
+						next = atomic_read(&bind_node->sun_server.us_acceptme);
 						if unlikely(next == UNIX_SERVER_ACCEPTME_SHUTDOWN)
 							THROW(E_NET_CONNECTION_REFUSED); /* The server got shut down. */
-					} while (!ATOMIC_CMPXCH_WEAK(bind_node->sun_server.us_acceptme,
+					} while (!atomic_cmpxch_weak(&bind_node->sun_server.us_acceptme,
 					                             next, NULL));
 					last = next;
 					if (last) {
@@ -903,7 +903,7 @@ UnixSocket_Connect(struct socket *__restrict self,
 			RETHROW();
 		}
 	} EXCEPT {
-		ATOMIC_WRITE(me->us_node, NULL);
+		atomic_write(&me->us_node, NULL);
 		RETHROW();
 	}
 }
@@ -916,7 +916,7 @@ UnixSocket_Listen(struct socket *__restrict self,
 	syscall_ulong_t old_max_backlog;
 	UnixSocket *me = (UnixSocket *)self;
 	struct fsocknode *server_node;
-	server_node = ATOMIC_READ(me->us_node);
+	server_node = atomic_read(&me->us_node);
 	COMPILER_READ_BARRIER();
 	/* Verify that we've been bound. */
 	if unlikely(!server_node || server_node == (struct fsocknode *)-1) {
@@ -935,7 +935,7 @@ socket_is_not_bound:
 
 	/* Save `max_backlog' within `server_node', thus indicating
 	 * that   we're   now    accepting   client    connections. */
-	old_max_backlog = ATOMIC_XCH(server_node->sun_server.us_max_backlog,
+	old_max_backlog = atomic_xch(&server_node->sun_server.us_max_backlog,
 	                             max_backlog);
 
 	/* Limit the # of pending clients. */
@@ -950,10 +950,10 @@ NOTHROW(KCALL raise_pb_buffer_limit)(struct pb_buffer *__restrict self,
                                      size_t lower_bound) {
 	size_t old_limit;
 	for (;;) {
-		old_limit = ATOMIC_READ(self->pb_limt);
+		old_limit = atomic_read(&self->pb_limt);
 		if (old_limit >= lower_bound)
 			break;
-		if (ATOMIC_CMPXCH_WEAK(self->pb_limt, old_limit, lower_bound))
+		if (atomic_cmpxch_weak(&self->pb_limt, old_limit, lower_bound))
 			break;
 	}
 }
@@ -967,7 +967,7 @@ UnixSocket_Accept(struct socket *__restrict self, iomode_t mode)
 	REF struct unix_client *result_client;
 	UnixSocket *me = (UnixSocket *)self;
 	struct fsocknode *server_node;
-	server_node = ATOMIC_READ(me->us_node);
+	server_node = atomic_read(&me->us_node);
 
 	/* Verify that we've been bound. */
 	if unlikely(!server_node || server_node == (struct fsocknode *)-1) {
@@ -985,7 +985,7 @@ socket_is_not_bound:
 		/* When in non-blocking mode, check if there are any connection requests.
 		 * Doing  this now  will safe us  the unnecessary allocation  of a socket
 		 * object in the event that we're unable to accept anyone. */
-		if (ATOMIC_READ(server_node->sun_server.us_acceptme) == NULL)
+		if (atomic_read(&server_node->sun_server.us_acceptme) == NULL)
 			return NULL; /* No pending connections. */
 	}
 #endif /* !__OPTIMIZE_SIZE__ */
@@ -1061,7 +1061,7 @@ again_wait_for_client:
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL unix_server_can_accept)(struct unix_server const *__restrict self) {
 	struct unix_client *clients;
-	clients = ATOMIC_READ(self->us_acceptme);
+	clients = atomic_read(&self->us_acceptme);
 	return clients != NULL;
 }
 
@@ -1069,7 +1069,7 @@ NOTHROW(FCALL unix_server_can_accept)(struct unix_server const *__restrict self)
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL unix_client_test_hup)(struct unix_client const *__restrict self) {
 	syscall_ulong_t status;
-	status = ATOMIC_READ(self->uc_status);
+	status = atomic_read(&self->uc_status);
 	return UNIX_CLIENT_STATUS_ISHUP(status);
 }
 
@@ -1082,7 +1082,7 @@ UnixSocket_PollConnect(struct socket *__restrict self,
 	UnixSocket *me;
 	struct fsocknode *node;
 	me   = (UnixSocket *)self;
-	node = ATOMIC_READ(me->us_node);
+	node = atomic_read(&me->us_node);
 	if (!node || node == (struct fsocknode *)-1) {
 	} else if (me->us_client) {
 		/* Client socket (poll against recv()) */
@@ -1104,7 +1104,7 @@ UnixSocket_PollTest(struct socket *__restrict self,
 	UnixSocket *me;
 	struct fsocknode *node;
 	me   = (UnixSocket *)self;
-	node = ATOMIC_READ(me->us_node);
+	node = atomic_read(&me->us_node);
 	if (!node || node == (struct fsocknode *)-1) {
 		/* Technically true, as neither will block (both
 		 * `recv()' and `accept()'  will throw  errors!) */
@@ -1153,8 +1153,8 @@ PbBuffer_Stream_Sendv_NoBlock(struct pb_buffer *__restrict self,
 	size_t used, limt, avail;
 	struct pb_packet *packet;
 again:
-	used = ATOMIC_READ(self->pb_used);
-	limt = ATOMIC_READ(self->pb_limt);
+	used = atomic_read(&self->pb_used);
+	limt = atomic_read(&self->pb_limt);
 	if unlikely(!limt) {
 		/* Connection was closed. */
 		/* TODO: if (!MSG_NOSIGNAL) raise(SIGPIPE);
@@ -1227,8 +1227,8 @@ AsyncSend_Test(struct async *__restrict self) {
 	struct async_send_job *me;
 	me   = (struct async_send_job *)self;
 	pbuf = me->as_socket->us_sendbuf;
-	used = ATOMIC_READ(pbuf->pb_used);
-	limt = ATOMIC_READ(pbuf->pb_limt);
+	used = atomic_read(&pbuf->pb_used);
+	limt = atomic_read(&pbuf->pb_limt);
 	if unlikely(!limt) {
 		/* Connection was closed. */
 		/* TODO: if (!MSG_NOSIGNAL) raise(SIGPIPE);
@@ -1298,7 +1298,7 @@ again_start_packet:
 				size_t limit, total;
 				total = pb_packet_get_totalsize_s(me->as_payload_size,
 				                                  me->as_ancillary_size);
-				limit = ATOMIC_READ(pbuf->pb_limt);
+				limit = atomic_read(&pbuf->pb_limt);
 				if (limit > UINT16_MAX)
 					limit = UINT16_MAX;
 				/* Check for race condition: The limit was raised in the mean time. */
@@ -1368,7 +1368,7 @@ UnixSocket_Sendv(struct socket *__restrict self,
 	me = (UnixSocket *)self;
 	{
 		struct fsocknode *node;
-		node = ATOMIC_READ(me->us_node);
+		node = atomic_read(&me->us_node);
 
 		/* make sure we're actually connected. */
 		if unlikely(node == NULL || node == (struct fsocknode *)-1) {
@@ -1414,7 +1414,7 @@ again_start_packet:
 			} else {
 				size_t limit, total;
 				total = pb_packet_get_totalsize_s(bufsize, ancillary_size);
-				limit = ATOMIC_READ(pbuf->pb_limt);
+				limit = atomic_read(&pbuf->pb_limt);
 				if (limit > UINT16_MAX)
 					limit = UINT16_MAX;
 				/* Check for race condition: The limit was raised in the mean time. */
@@ -1516,7 +1516,7 @@ UnixSocket_Recvv(struct socket *__restrict self,
 	me = (UnixSocket *)self;
 	{
 		struct fsocknode *node;
-		node = ATOMIC_READ(me->us_node);
+		node = atomic_read(&me->us_node);
 
 		/* make sure we're actually connected. */
 		if unlikely(node == NULL || node == (struct fsocknode *)-1) {
@@ -1541,7 +1541,7 @@ again_read_packet:
 			goto done;
 		if (msg_flags & MSG_DONTWAIT)
 			THROW(E_WOULDBLOCK);
-		if (ATOMIC_READ(pbuf->pb_limt) == 0)
+		if (atomic_read(&pbuf->pb_limt) == 0)
 			goto done; /* EOF */
 		task_connect(&pbuf->pb_psta);
 		TRY {
@@ -1554,7 +1554,7 @@ again_read_packet:
 			task_disconnectall();
 			break;
 		}
-		if unlikely(ATOMIC_READ(pbuf->pb_limt) == 0) {
+		if unlikely(atomic_read(&pbuf->pb_limt) == 0) {
 			task_disconnectall();
 			goto done; /* EOF */
 		}
@@ -1741,7 +1741,7 @@ UnixSocket_Shutdown(struct socket *__restrict self,
 	UnixSocket *me;
 	struct fsocknode *node;
 	me   = (UnixSocket *)self;
-	node = ATOMIC_READ(me->us_node);
+	node = atomic_read(&me->us_node);
 
 	/* make sure we're actually connected. */
 	if unlikely(node == NULL || node == (struct fsocknode *)-1) {
@@ -1767,7 +1767,7 @@ UnixSocket_GetClient(struct unix_socket *__restrict self,
 		THROWS(E_ILLEGAL_BECAUSE_NOT_READY) {
 	struct unix_client *result;
 	struct fsocknode *server_node;
-	server_node = ATOMIC_READ(self->us_node);
+	server_node = atomic_read(&self->us_node);
 	COMPILER_READ_BARRIER();
 
 	/* Verify that we've been bound. */
@@ -1819,12 +1819,12 @@ UnixSocket_GetRcvBuf(struct socket *__restrict self) {
 	struct unix_socket *me;
 	size_t result;
 	me     = (struct unix_socket *)self;
-	result = ATOMIC_READ(me->us_rcvbufsiz);
-	if (ATOMIC_READ(me->us_node) && ATOMIC_READ(me->us_client)) {
+	result = atomic_read(&me->us_rcvbufsiz);
+	if (atomic_read(&me->us_node) && atomic_read(&me->us_client)) {
 		/* We're a connected client socket, meaning that we must
 		 * actually return  the buffer  limit from  `us_recvbuf' */
 		COMPILER_READ_BARRIER(); /* Barrier for `us_recvbuf' */
-		result = ATOMIC_READ(me->us_recvbuf->pb_limt);
+		result = atomic_read(&me->us_recvbuf->pb_limt);
 	}
 	return result;
 }
@@ -1834,17 +1834,16 @@ UnixSocket_SetRcvBuf(struct socket *__restrict self, size_t bufsiz) {
 	struct unix_socket *me;
 	size_t old_rcv_bufsiz;
 	me = (struct unix_socket *)self;
-again:
-	old_rcv_bufsiz = ATOMIC_READ(me->us_rcvbufsiz);
-	if (ATOMIC_READ(me->us_node) && ATOMIC_READ(me->us_client)) {
-		/* We're a connected client socket, meaning that we must
-		 * actually  write  the  buffer  limit  to  `us_recvbuf' */
-		COMPILER_READ_BARRIER(); /* Barrier for `us_recvbuf' */
-		ATOMIC_WRITE(me->us_recvbuf->pb_limt, bufsiz);
-		return;
-	}
-	if (!ATOMIC_CMPXCH_WEAK(me->us_rcvbufsiz, old_rcv_bufsiz, bufsiz))
-		goto again;
+	do {
+		old_rcv_bufsiz = atomic_read(&me->us_rcvbufsiz);
+		if (atomic_read(&me->us_node) && atomic_read(&me->us_client)) {
+			/* We're a connected client socket, meaning that we must
+			 * actually  write  the  buffer  limit  to  `us_recvbuf' */
+			COMPILER_READ_BARRIER(); /* Barrier for `us_recvbuf' */
+			atomic_write(&me->us_recvbuf->pb_limt, bufsiz);
+			return;
+		}
+	} while (!atomic_cmpxch_weak(&me->us_rcvbufsiz, old_rcv_bufsiz, bufsiz));
 }
 
 PRIVATE size_t KCALL
@@ -1852,12 +1851,12 @@ UnixSocket_GetSndBuf(struct socket *__restrict self) {
 	struct unix_socket *me;
 	size_t result;
 	me     = (struct unix_socket *)self;
-	result = ATOMIC_READ(me->us_sndbufsiz);
-	if (ATOMIC_READ(me->us_node) && ATOMIC_READ(me->us_client)) {
+	result = atomic_read(&me->us_sndbufsiz);
+	if (atomic_read(&me->us_node) && atomic_read(&me->us_client)) {
 		/* We're a connected client socket, meaning that we must
 		 * actually return  the buffer  limit from  `us_sendbuf' */
 		COMPILER_READ_BARRIER(); /* Barrier for `us_sendbuf' */
-		result = ATOMIC_READ(me->us_sendbuf->pb_limt);
+		result = atomic_read(&me->us_sendbuf->pb_limt);
 	}
 	return result;
 }
@@ -1867,17 +1866,16 @@ UnixSocket_SetSndBuf(struct socket *__restrict self, size_t bufsiz) {
 	struct unix_socket *me;
 	size_t old_snd_bufsiz;
 	me = (struct unix_socket *)self;
-again:
-	old_snd_bufsiz = ATOMIC_READ(me->us_sndbufsiz);
-	if (ATOMIC_READ(me->us_node) && ATOMIC_READ(me->us_client)) {
-		/* We're a connected client socket, meaning that we must
-		 * actually  write  the  buffer  limit  to  `us_sendbuf' */
-		COMPILER_READ_BARRIER(); /* Barrier for `us_sendbuf' */
-		ATOMIC_WRITE(me->us_sendbuf->pb_limt, bufsiz);
-		return;
-	}
-	if (!ATOMIC_CMPXCH_WEAK(me->us_sndbufsiz, old_snd_bufsiz, bufsiz))
-		goto again;
+	do {
+		old_snd_bufsiz = atomic_read(&me->us_sndbufsiz);
+		if (atomic_read(&me->us_node) && atomic_read(&me->us_client)) {
+			/* We're a connected client socket, meaning that we must
+			 * actually  write  the  buffer  limit  to  `us_sendbuf' */
+			COMPILER_READ_BARRIER(); /* Barrier for `us_sendbuf' */
+			atomic_write(&me->us_sendbuf->pb_limt, bufsiz);
+			return;
+		}
+	} while (!atomic_cmpxch_weak(&me->us_sndbufsiz, old_snd_bufsiz, bufsiz));
 }
 
 
@@ -1915,8 +1913,8 @@ unix_socket_create(void) {
 	REF UnixSocket *result;
 	result = (REF UnixSocket *)kmalloc(sizeof(UnixSocket), GFP_CALLOC);
 	socket_cinit(result, &unix_socket_ops, SOCK_STREAM, PF_UNIX);
-	result->us_rcvbufsiz = ATOMIC_READ(socket_default_rcvbufsiz);
-	result->us_sndbufsiz = ATOMIC_READ(socket_default_sndbufsiz);
+	result->us_rcvbufsiz = atomic_read(&socket_default_rcvbufsiz);
+	result->us_sndbufsiz = atomic_read(&socket_default_sndbufsiz);
 	return result;
 }
 

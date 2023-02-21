@@ -34,13 +34,13 @@
 #include <sched/task.h>
 #include <sched/timer.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <signal.h>
 #include <stddef.h>
 
@@ -247,9 +247,9 @@ NOTHROW(FCALL taskpid_destroy)(struct taskpid *__restrict self) {
 		REF struct procgrp *grp;
 		assertf(LIST_EMPTY(&ctl->pc_thrds_list), "Child threads should have kept us alive");
 		assertf(LIST_EMPTY(&ctl->pc_chlds_list), "Child processes should have kept us alive");
-		assertf(ATOMIC_READ(ctl->pc_sig_list.slh_first) == THIS_RPCS_TERMINATED,
+		assertf(atomic_read(&ctl->pc_sig_list.slh_first) == THIS_RPCS_TERMINATED,
 		        "This should have happened in `task_exit()'");
-		assertf(ATOMIC_READ(ctl->pc_sig_pend) & 1,
+		assertf(atomic_read(&ctl->pc_sig_pend) & 1,
 		        "This should have happened in `task_exit()'");
 		sig_broadcast_for_fini(&ctl->pc_chld_changed);
 
@@ -711,7 +711,7 @@ NOTHROW(FCALL pidns_findpid)(struct pidns const *__restrict self,
  * This only happens when `#ifdef PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE' */
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) pid_t
 NOTHROW(FCALL pidns_nextpid)(struct pidns const *__restrict self) {
-	pid_t recycle = ATOMIC_READ(pid_recycle_threshold);
+	pid_t recycle = atomic_read(&pid_recycle_threshold);
 	pid_t result;
 
 	/* Find  the next free PID between the next to-be used, and

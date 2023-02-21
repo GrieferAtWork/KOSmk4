@@ -31,12 +31,11 @@
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/anno.h>
 #include <kos/keyboard.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <format-printer.h> /* FORMATPRINTER_CC */
 #include <inttypes.h>
 #include <stddef.h>
@@ -1191,8 +1190,8 @@ do_handle_this_ch:
 		goto do_handle_unich;
 	}
 	do {
-		count = ATOMIC_READ(self->at_escwrd[1]);
-		limit = ATOMIC_READ(self->at_escwrd[0]);
+		count = atomic_read(&self->at_escwrd[1]);
+		limit = atomic_read(&self->at_escwrd[0]);
 		if unlikely(count >= limit)
 			RACE(do_handle_this_ch); /* Shouldn't happen (race condition guard) */
 		self->at_escape[count] = (byte_t)ch;
@@ -1214,7 +1213,7 @@ do_handle_unich:
 			}
 			return;
 		}
-	} while (!ATOMIC_CMPXCH_WEAK(self->at_escwrd[1], count, count + 1));
+	} while (!atomic_cmpxch_weak(&self->at_escwrd[1], count, count + 1));
 }
 
 
@@ -3202,7 +3201,7 @@ INTERN NONNULL((1)) void CC
 libansitty_putc(struct ansitty *__restrict self, /*utf-8*/ char ch) {
 	uintptr_half_t state;
 again:
-	state = ATOMIC_READ(self->at_state);
+	state = atomic_read(&self->at_state);
 	switch (__builtin_expect(state, STATE_TEXT_UTF8)) {
 
 	case STATE_TEXT_UTF8:

@@ -23,9 +23,8 @@
 
 #include <kernel/compiler.h>
 
-#include <hybrid/atomic.h>
-
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 
 #include "gdb.h"
@@ -40,7 +39,7 @@ NOTHROW(FCALL GDBThread_FindAnyStopEvent)(struct task *__restrict thread) {
 	if (!result) {
 		/* Also search async stop notifications (in case GDB  hasn't
 		 * been informed about this thread having been stopped, yet) */
-		result = ATOMIC_READ(GDBThread_AsyncNotifStopEvents);
+		result = atomic_read(&GDBThread_AsyncNotifStopEvents);
 		for (; result; result = result->tse_next) {
 			if (result->tse_thread == thread)
 				break;

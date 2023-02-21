@@ -31,16 +31,16 @@ gcc_opt.append("-fexceptions");
 #include "../api.h"
 /**/
 
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
-#include <hybrid/sequence/rbtree.h>
 #include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sequence/rbtree.h>
 
 #include <sys/mman.h>
 #include <sys/stat.h>
 
 #include <alloca.h>
 #include <assert.h>
+#include <atomic.h>
 #include <ctype.h>
 #include <fcntl.h>
 #include <locale.h>
@@ -399,7 +399,7 @@ NOTHROW(FCALL get_language_name)(int category) {
 		} else {
 			result = unknown_language_name;
 		}
-		env_lang = ATOMIC_CMPXCH_VAL(language_names[(unsigned int)category],
+		env_lang = atomic_cmpxch_val(&language_names[(unsigned int)category],
 		                             NULL, (char *)result);
 		if unlikely(env_lang != NULL) {
 			if (result != unknown_language_name)

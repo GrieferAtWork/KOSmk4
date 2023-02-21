@@ -33,8 +33,6 @@
 #include <sched/task.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
@@ -42,6 +40,7 @@
 #include <linux/magic.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
@@ -107,7 +106,7 @@ ProcFS_ParseBool(USER CHECKED void const *buf, size_t bufsize)
 	bufsize = (size_t)(endp - (USER CHECKED char const *)buf);
 	if (bufsize != 1)
 		THROW(E_BUFFER_TOO_SMALL, 1, bufsize);
-	mode = ATOMIC_READ(*(USER CHECKED char *)buf);
+	mode = atomic_read((USER CHECKED char *)buf);
 	if (mode == '0') {
 		result = false;
 	} else if (mode == '1') {
@@ -391,13 +390,13 @@ procfs_root_v_lookup(struct fdirnode *__restrict UNUSED(self),
 	/* Evaluate running process PIDs */
 	if unlikely(info->flu_namelen == 0)
 		goto notapid;
-	ch = ATOMIC_READ(info->flu_name[0]);
+	ch = atomic_read(&info->flu_name[0]);
 	if (ch >= '1' && ch <= '9') {
 		REF struct taskpid *pid;
 		pid_t pidno = ch - '0';
 		size_t i;
 		for (i = 1; i < info->flu_namelen; ++i) {
-			ch = ATOMIC_READ(info->flu_name[i]);
+			ch = atomic_read(&info->flu_name[i]);
 			if unlikely(!(ch >= '0' && ch <= '9'))
 				goto notapid;
 			pidno *= 10;
@@ -484,7 +483,7 @@ procfs_root_direnum_ops_v_readdir(struct fdirenum *__restrict self, USER CHECKED
 
 again:
 	/* Read current index. */
-	index = ATOMIC_READ(me->prd_index);
+	index = atomic_read(&me->prd_index);
 
 	/* Check for EOF */
 	if (index < PROCFS_ROOT_COUNT) {
@@ -522,7 +521,7 @@ again:
 	}
 
 	/* Advance directory position. */
-	if (!ATOMIC_CMPXCH(me->prd_index, index, newindex))
+	if (!atomic_cmpxch(&me->prd_index, index, newindex))
 		goto again;
 	return (size_t)result;
 }
@@ -560,18 +559,18 @@ procfs_root_direnum_ops_v_seekdir(struct fdirenum *__restrict self,
 			THROW(E_OVERFLOW);
 #endif /* __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__ */
 		newpos = (uintptr_t)(pos_t)offset;
-		ATOMIC_WRITE(me->prd_index, newpos);
+		atomic_write(&me->prd_index, newpos);
 		break;
 
 	case SEEK_CUR: {
 		uintptr_t oldpos;
 		do {
-			oldpos = ATOMIC_READ(me->prd_index);
+			oldpos = atomic_read(&me->prd_index);
 			newpos = oldpos + (intptr_t)offset;
 			if unlikely(offset < 0 ? newpos > oldpos
 			                       : newpos < oldpos)
 				THROW(E_OVERFLOW);
-		} while (!ATOMIC_CMPXCH_WEAK(me->prd_index, oldpos, newpos));
+		} while (!atomic_cmpxch_weak(&me->prd_index, oldpos, newpos));
 	}	break;
 
 	case SEEK_END: {
@@ -583,7 +582,7 @@ procfs_root_direnum_ops_v_seekdir(struct fdirenum *__restrict self,
 		if unlikely(offset < 0 ? newpos > dirsiz
 		                       : newpos < dirsiz)
 			THROW(E_OVERFLOW);
-		ATOMIC_WRITE(me->prd_index, newpos);
+		atomic_write(&me->prd_index, newpos);
 	}	break;
 
 	default:

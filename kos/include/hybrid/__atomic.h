@@ -432,6 +432,9 @@ void __hybrid_atomic_signal_fence(int __order);
 __DECL_END
 
 #ifdef __cplusplus
+#ifndef ____INTELLISENSE_STDINC_COMMON_H
+#include "../compiler/intellisense-common.h"
+#endif /* !____INTELLISENSE_STDINC_COMMON_H */
 #define __hybrid_atomic_load        __hybrid_atomic_load
 #define __hybrid_atomic_store       __hybrid_atomic_store
 #define __hybrid_atomic_xch         __hybrid_atomic_xch

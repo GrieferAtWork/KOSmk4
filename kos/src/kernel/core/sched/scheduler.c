@@ -30,11 +30,11 @@
 #include <sched/task.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sched/preemption.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <time.h>
@@ -310,9 +310,9 @@ NOTHROW(FCALL sched_intern_addpending)(struct cpu *__restrict target_cpu,
 	assert(thread->t_cpu == target_cpu);
 	assert(thread->t_flags & TASK_FRUNNING);
 	do {
-		next = ATOMIC_READ(FORCPU(target_cpu, thiscpu_sched_pending));
-		ATOMIC_WRITE(KEY__thiscpu_pending_next(thread), next);
-	} while (!ATOMIC_CMPXCH_WEAK(FORCPU(target_cpu, thiscpu_sched_pending),
+		next = atomic_read(&FORCPU(target_cpu, thiscpu_sched_pending));
+		atomic_write(&KEY__thiscpu_pending_next(thread), next);
+	} while (!atomic_cmpxch_weak(&FORCPU(target_cpu, thiscpu_sched_pending),
 	                             next, thread));
 }
 
@@ -753,7 +753,7 @@ NOTHROW(FCALL sched_intern_localwake)(struct cpu *__restrict me,
 		}
 
 		/* Resume execution of the thread. */
-		ATOMIC_OR(thread->t_flags, TASK_FRUNNING);
+		atomic_or(&thread->t_flags, TASK_FRUNNING);
 
 		/* Insert the thread into the run-queue */
 		sched_intern_add_to_runqueue(me, thread);
@@ -893,7 +893,7 @@ NOTHROW(FCALL sched_intern_yield_onexit)(struct cpu *__restrict me,
 		if ((sched_next(result) = first_waiting_thread) != NULL)
 			sched_pself(first_waiting_thread) = &sched_next(result);
 		assert(!(result->t_flags & TASK_FRUNNING));
-		ATOMIC_OR(result->t_flags, TASK_FRUNNING);
+		atomic_or(&result->t_flags, TASK_FRUNNING);
 	} else {
 		/* Unlink from the run queue. */
 		assert(sched.s_runcount >= 2);
@@ -1075,7 +1075,7 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(ktime_t abs_timeout) {
 		if ((sched_next(next) = first_waiting_thread) != NULL)
 			sched_pself(first_waiting_thread) = &sched_next(next);
 		assert(!(next->t_flags & TASK_FRUNNING));
-		ATOMIC_OR(next->t_flags, TASK_FRUNNING);
+		atomic_or(&next->t_flags, TASK_FRUNNING);
 		sched_assert();
 	} else {
 		/* Unlink from the run queue. */
@@ -1117,7 +1117,7 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(ktime_t abs_timeout) {
 	move_thread_to_back_of_runqueue(me, next, now);
 
 	/* Insert `caller' into the queue of waiting threads. */
-	ATOMIC_AND(caller->t_flags, ~TASK_FRUNNING);
+	atomic_and(&caller->t_flags, ~TASK_FRUNNING);
 	sched_intern_add_to_waitqueue(me, caller, abs_timeout);
 
 	/* Reload the current deadline. */
@@ -1161,10 +1161,10 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(ktime_t abs_timeout) {
 			/* For  the sake of consistency, still make sure that the FTIMEOUT
 			 * doesn't remain set (even though it shouldn't be set right now). */
 #ifndef __OPTIMIZE_SIZE__
-			if unlikely(ATOMIC_READ(caller->t_flags) & TASK_FTIMEOUT)
+			if unlikely(atomic_read(&caller->t_flags) & TASK_FTIMEOUT)
 #endif /* !__OPTIMIZE_SIZE__ */
 			{
-				ATOMIC_AND(caller->t_flags, ~TASK_FTIMEOUT);
+				atomic_and(&caller->t_flags, ~TASK_FTIMEOUT);
 			}
 			return false; /* Timeout */
 		}
@@ -1172,10 +1172,10 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(ktime_t abs_timeout) {
 
 	/* Check if we got timed out. */
 #ifndef __OPTIMIZE_SIZE__
-	if (ATOMIC_READ(caller->t_flags) & TASK_FTIMEOUT)
+	if (atomic_read(&caller->t_flags) & TASK_FTIMEOUT)
 #endif /* !__OPTIMIZE_SIZE__ */
 	{
-		if (ATOMIC_FETCHAND(caller->t_flags, ~TASK_FTIMEOUT) & TASK_FTIMEOUT) {
+		if (atomic_fetchand(&caller->t_flags, ~TASK_FTIMEOUT) & TASK_FTIMEOUT) {
 			assertf(abs_timeout != KTIME_INFINITE,
 			        "TASK_FTIMEOUT set, but no timeout given?");
 			return false; /* Timeout... */
@@ -1234,7 +1234,7 @@ again:
 		/* Wake-up the thread. */
 do_timeout_thread:
 		sched_intern_unlink_from_waiting(me, thread);
-		ATOMIC_OR(thread->t_flags, TASK_FRUNNING | TASK_FTIMEOUT);
+		atomic_or(&thread->t_flags, TASK_FRUNNING | TASK_FTIMEOUT);
 		sched_intern_add_to_runqueue(me, thread);
 		goto again;
 	}
@@ -1369,7 +1369,7 @@ NOTHROW(FCALL idle_unload_and_switch_to)(struct cpu *__restrict me,
 		sched.s_running_last = sched_prev(caller);
 	LIST_REMOVE_P(caller, sched_link);
 	--sched.s_runcount;
-	ATOMIC_AND(caller->t_flags, ~TASK_FRUNNING);
+	atomic_and(&caller->t_flags, ~TASK_FRUNNING);
 
 	/* Mark the IDLE thread as unloaded, as documented in,
 	 * and   required   by   `struct scheduler::s_running' */
@@ -1445,8 +1445,8 @@ NOTHROW(FCALL task_transfer_thread_to_other_cpu)(struct cpu *__restrict me,
 	 * NOTE: The  order in which we set the RUNNING flag, and change
 	 *       the thread's CPU doesn't matter, but both modifications
 	 *       individually must be atomic! */
-	ATOMIC_OR(thread->t_flags, TASK_FRUNNING);
-	ATOMIC_WRITE(thread->t_cpu, target);
+	atomic_or(&thread->t_flags, TASK_FRUNNING);
+	atomic_write(&thread->t_cpu, target);
 	sched_intern_addpending(target, thread);
 	/* Schedule the target CPU to receive a wake-up once our caller is finished. */
 	CPUSET_INSERT(CPUSET_IND(pnotify_cpus), target->c_id);
@@ -1504,7 +1504,7 @@ again:
 	 * load them and directly yield to the first of them. */
 	{
 		REF struct task *chain;
-		chain = ATOMIC_XCH(FORCPU(me, thiscpu_sched_pending), NULL);
+		chain = atomic_xch(&FORCPU(me, thiscpu_sched_pending), NULL);
 		if (chain != NULL) {
 			struct task *next;
 			next = sched_intern_loadpending(me, caller, chain);
@@ -1614,7 +1614,7 @@ disable_custom_deadline_and_start_over:
 		}
 
 		/* Yes: Shut down this CPU! */
-		ATOMIC_WRITE(me->c_state, CPU_STATE_FALLING_ASLEEP);
+		atomic_write(&me->c_state, CPU_STATE_FALLING_ASLEEP);
 
 		/* Transfer all remaining sleeping threads to other CPUs. */
 		{
@@ -1637,7 +1637,7 @@ disable_custom_deadline_and_start_over:
 				 * This means that we won't be able to shut down, so
 				 * we might as well stop trying and just get back to
 				 * normal execution. */
-				ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
+				atomic_write(&me->c_state, CPU_STATE_RUNNING);
 
 				/* Must still send wake-up requests to all CPUs that
 				 * received  threads before we've failed to transfer
@@ -1660,7 +1660,7 @@ disable_custom_deadline_and_start_over:
 		if (FORCPU(me, thiscpu_sched_pending) != NULL ||
 		    arch_cpu_hwipi_pending_nopr() ||
 		    arch_cpu_swipi_pending_nopr(me)) {
-			ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
+			atomic_write(&me->c_state, CPU_STATE_RUNNING);
 			goto again;
 		}
 		printk(KERN_INFO "[sched:cpu#%u][+] Enter deep-sleep\n", me->c_id);
@@ -1755,7 +1755,7 @@ NOTHROW(FCALL sched_override_start)(void) {
 	assert(!sched_override);
 
 	/* Set the calling thread as scheduling override. */
-	ATOMIC_WRITE(sched_override, caller);
+	atomic_write(&sched_override, caller);
 
 	/* Disable any previously set deadline. */
 	tsc_nodeadline(me);
@@ -1773,7 +1773,7 @@ NOTHROW(FCALL sched_override_end)(void) {
 	me     = caller->t_cpu;
 	assert(sched_override == caller);
 	preemption_pushoff(&was);
-	ATOMIC_WRITE(sched_override, NULL);
+	atomic_write(&sched_override, NULL);
 	tsc_now = tsc_get(me);
 
 	/* Reload the TSC deadline for the calling thread, thus accounting for

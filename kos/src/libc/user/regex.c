@@ -25,12 +25,11 @@
 #include "../api.h"
 /**/
 
-#include <hybrid/atomic.h>
-
 #include <bits/os/iovec.h>
 #include <kos/exec/idata.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <malloc.h>
 #include <regex.h>
@@ -72,14 +71,14 @@ DEFINE_REGEX_BINDING(PRE_EXEC_RSEARCH, re_exec_rsearch);
 PRIVATE WUNUSED bool LIBCCALL _libregex_load(void) {
 	void *lib;
 again_read_libregex:
-	lib = ATOMIC_READ(libregex);
+	lib = atomic_read(&libregex);
 	if unlikely(lib == (void *)-1)
 		return false;
 	if (lib == NULL) {
 		lib = dlopen(LIBREGEX_LIBRARY_NAME, RTLD_LOCAL);
 		if unlikely(!lib)
 			lib = (void *)-1;
-		if unlikely(!ATOMIC_CMPXCH(libregex, NULL, lib)) {
+		if unlikely(!atomic_cmpxch(&libregex, NULL, lib)) {
 			if (lib != (void *)-1)
 				dlclose(lib);
 			goto again_read_libregex;
@@ -102,7 +101,7 @@ again_read_libregex:
 #undef BIND
 	return true;
 err:
-	if (ATOMIC_CMPXCH(libregex, lib, (void *)-1))
+	if (atomic_cmpxch(&libregex, lib, (void *)-1))
 		dlclose(lib);
 	return false;
 }

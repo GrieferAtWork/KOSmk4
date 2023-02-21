@@ -34,9 +34,9 @@
 #include <kernel/dmesg.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/atomic-rwlock.h>
 
+#include <atomic.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
@@ -124,7 +124,7 @@ NOTHROW(FCALL dmesg_compress_timestamps)(void) {
 	size_t offset_from_start, oldest_packet_start;
 	size_t read_offset, write_offset;
 again:
-	total_size          = ATOMIC_READ(dmesg_size);
+	total_size          = atomic_read(&dmesg_size);
 	offset_from_end     = 0;
 	oldest_packet_start = (size_t)-1;
 	offset_from_start   = total_size;
@@ -140,14 +140,16 @@ again:
 #undef getb
 	if unlikely(oldest_packet_start >= total_size)
 		return;
+
 	/* Decode the seconds offset of the oldest packet. */
 	decode_rel_seconds(oldest_packet_start, &seconds_diff);
 	if (seconds_diff >= -0x3f && seconds_diff <= 0x3f)
 		return;
-	if unlikely(total_size != ATOMIC_READ(dmesg_size))
+	if unlikely(total_size != atomic_read(&dmesg_size))
 		goto again;
+
 	/* Subtract `rel_seconds' form all packet timestamps and add it to `dmesg_secondsbase' */
-	ATOMIC_INC(dmesg_consistent);
+	atomic_inc(&dmesg_consistent);
 	COMPILER_BARRIER();
 	read_offset  = oldest_packet_start;
 	write_offset = oldest_packet_start;
@@ -187,7 +189,7 @@ done:
 	dmesg_size = write_offset;
 	dmesg_secondsbase += seconds_diff;
 	COMPILER_BARRIER();
-	ATOMIC_DEC(dmesg_consistent);
+	atomic_dec(&dmesg_consistent);
 }
 
 INTERN NOBLOCK void
@@ -371,12 +373,12 @@ dmesg_enum(dmesg_enum_t callback, void *arg,
 	byte_t temp, nano[5];
 	s64 rel_seconds;
 	/* Try to wait for inconsistencies to go away. */
-	while (ATOMIC_READ(dmesg_consistent)) {
+	while (atomic_read(&dmesg_consistent)) {
 		if (task_tryyield_or_pause() != TASK_TRYYIELD_SUCCESS)
 			break;
 	}
 	limit += offset;
-	message_end_offset = ATOMIC_READ(dmesg_size);
+	message_end_offset = atomic_read(&dmesg_size);
 #define getb()                                \
 	(++offset_from_end, --message_end_offset, \
 	 dmesg_buffer[message_end_offset % CONFIG_KERNEL_DMESG_BUFFER_SIZE])

@@ -39,7 +39,6 @@
 #include <sched/posix-signal.h> /* task_raisesignalthread */
 #include <sched/rpc.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except/reason/inval.h>
@@ -50,6 +49,7 @@
 #include <sys/uio.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <signal.h>
 #include <string.h>
@@ -87,7 +87,7 @@ pipe_reader_create(struct pipe *__restrict self) THROWS(E_BADALLOC) {
 	                                           GFP_NORMAL);
 	result->pr_refcnt = 1;
 	result->pr_pipe   = incref(self);
-	ATOMIC_INC(self->p_rdcnt);
+	atomic_inc(&self->p_rdcnt);
 	return result;
 }
 
@@ -98,7 +98,7 @@ pipe_writer_create(struct pipe *__restrict self) THROWS(E_BADALLOC) {
 	                                           GFP_NORMAL);
 	result->pw_refcnt = 1;
 	result->pw_pipe   = incref(self);
-	ATOMIC_INC(self->p_wrcnt);
+	atomic_inc(&self->p_wrcnt);
 	return result;
 }
 
@@ -118,7 +118,7 @@ NOTHROW(KCALL pipe_reader_destroy)(struct pipe_reader *__restrict self) {
 	/* Free the pipe wrapper. */
 	kfree(self);
 	/* Close the pipe if all readers go away */
-	if (ATOMIC_DECFETCH(p->p_rdcnt) == 0)
+	if (atomic_decfetch(&p->p_rdcnt) == 0)
 		ringbuffer_close(&p->p_buffer);
 	/* Decref() the associated pipe. */
 	decref(p);
@@ -130,7 +130,7 @@ NOTHROW(KCALL pipe_writer_destroy)(struct pipe_writer *__restrict self) {
 	/* Free the pipe wrapper. */
 	kfree(self);
 	/* Close the pipe if all writers go away */
-	if (ATOMIC_DECFETCH(p->p_wrcnt) == 0)
+	if (atomic_decfetch(&p->p_wrcnt) == 0)
 		ringbuffer_close(&p->p_buffer);
 	/* Decref() the associated pipe. */
 	decref(p);
@@ -165,17 +165,17 @@ ringbuffer_set_pipe_limit(struct ringbuffer *__restrict self,
 	size_t result;
 	if (new_lim > pipe_max_bufsize_unprivileged) {
 		for (;;) {
-			result = ATOMIC_READ(self->rb_limit);
+			result = atomic_read(&self->rb_limit);
 			/* When trying to set some limit greater than the max-unprivileged-buffer-size
 			 * limit, the caller needs `CAP_SYS_RESOURCE'  capabilities, or the new  limit
 			 * must be lower than the previous limit. */
 			if (new_lim > result)
 				require(CAP_SYS_RESOURCE);
-			if (ATOMIC_CMPXCH_WEAK(self->rb_limit, result, new_lim))
+			if (atomic_cmpxch_weak(&self->rb_limit, result, new_lim))
 				break;
 		}
 	} else {
-		result = ATOMIC_XCH(self->rb_limit, new_lim);
+		result = atomic_xch(&self->rb_limit, new_lim);
 	}
 	if (new_lim == 0) {
 		sig_broadcast(&self->rb_nempty);
@@ -296,7 +296,7 @@ INTERN void KCALL
 handle_pipe_stat(struct pipe *__restrict self,
                  USER CHECKED struct stat *result) {
 	size_t size;
-	size = ATOMIC_READ(self->p_buffer.rb_avail);
+	size = atomic_read(&self->p_buffer.rb_avail);
 	bzero(result, sizeof(*result));
 	result->st_mode    = S_IFIFO;
 	result->st_nlink   = 1;
@@ -510,7 +510,7 @@ handle_copy_error:
 	case _IO_WITHSIZE(PIPE_IOC_READABLE, 0):
 		if unlikely(!IO_CANREAD(mode))
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_READ, mode);
-		return ioctl_intarg_setsize(cmd, arg, ATOMIC_READ(self->rb_avail));
+		return ioctl_intarg_setsize(cmd, arg, atomic_read(&self->rb_avail));
 	case _IO_WITHSIZE(PIPE_IOC_DISCARD, 0): {
 		size_t count;
 		if unlikely(!IO_CANREAD(mode))

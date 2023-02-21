@@ -41,7 +41,6 @@
 #include <sched/cpu.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 #include <hybrid/sched/preemption.h>
 
@@ -52,6 +51,7 @@
 #include <sys/mkdev.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -253,8 +253,8 @@ NOTHROW(KCALL AtaDrive_DmaAioHandle_Fini)(struct aio_handle *__restrict self) {
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL AtaBus_HW_CancelDma)(AtaBus *__restrict self) {
 	u8 dma_status;
-	assert((ATOMIC_READ(self->ab_state) & ATA_BUS_STATE_MASK) == ATA_BUS_STATE_INDMA);
-	assert(ATOMIC_READ(self->ab_aio_current) == NULL);
+	assert((atomic_read(&self->ab_state) & ATA_BUS_STATE_MASK) == ATA_BUS_STATE_INDMA);
+	assert(atomic_read(&self->ab_aio_current) == NULL);
 	ATA_VERBOSE("[ata] Cancel active DMA on IDE ("
 	            "bus:%#" PRIxN(__SIZEOF_PORT_T__) ","
 	            "ctrl:%#" PRIxN(__SIZEOF_PORT_T__) ","
@@ -339,9 +339,9 @@ NOTHROW(KCALL AtaBus_RestorePendingAioHandles)(AtaBus *__restrict self,
                                                struct aio_handle *last) {
 	struct aio_handle *next;
 	do {
-		next = ATOMIC_READ(self->ab_aio_pending);
-		ATOMIC_WRITE(last->ah_next, next);
-	} while (!ATOMIC_CMPXCH_WEAK(self->ab_aio_pending,
+		next = atomic_read(&self->ab_aio_pending);
+		atomic_write(&last->ah_next, next);
+	} while (!atomic_cmpxch_weak(&self->ab_aio_pending,
 	                             next, first));
 #if 0 /* We have no AIO-avail signal, because we don't use an async-worker! */
 	if (!next)
@@ -363,7 +363,7 @@ NOTHROW(KCALL AtaBus_RemoveSpecificPendingAioHandle_NoPR)(AtaBus *__restrict sel
 #ifndef CONFIG_NO_SMP
 again:
 #endif /* !CONFIG_NO_SMP */
-	chain   = ATOMIC_XCH(self->ab_aio_pending, NULL);
+	chain   = atomic_xch(&self->ab_aio_pending, NULL);
 	removed = AioHandleChain_RemoveSpecific(&chain, &last, handle);
 	/* Restore the remaining elements. */
 	assert((chain != NULL) == (last != NULL));
@@ -393,7 +393,7 @@ NOTHROW(KCALL AtaDrive_DmaAioHandle_Cancel)(struct aio_handle *__restrict self) 
 	bus  = data->hd_drive->ad_bus;
 	/* Try to clear the command descriptor. (for which we use the PRD buffer pointer) */
 	preemption_pushoff(&was);
-	bufaddr = ATOMIC_XCH(data->hd_bufaddr, NULL);
+	bufaddr = atomic_xch(&data->hd_bufaddr, NULL);
 	if (bufaddr != 0) { /* Canceled before started */
 		/* Remove  the entry from  pending AIO. Having successfully
 		 * cleared the command-pointer, we know that our AIO handle
@@ -406,7 +406,7 @@ NOTHROW(KCALL AtaDrive_DmaAioHandle_Cancel)(struct aio_handle *__restrict self) 
 
 	/* If the cmd-pointer was already cleared, then the AIO operation
 	 * is either  current  in  progress, or  has  already  completed. */
-	if (ATOMIC_CMPXCH(bus->ab_aio_current, self, NULL)) {
+	if (atomic_cmpxch(&bus->ab_aio_current, self, NULL)) {
 
 		/* Cancel the currently in-progress AIO operation on a hardware-level. */
 		AtaBus_HW_CancelDma(bus);
@@ -452,19 +452,19 @@ NOTHROW(KCALL AtaDrive_DmaAioHandle_Progress)(struct aio_handle *__restrict self
 	                  (size_t)data->hd_io_sectors[1]) <<
 	                 AtaDrive_GetSectorShift(data->hd_drive);
 	bus = data->hd_drive->ad_bus;
-	if (ATOMIC_READ(bus->ab_aio_current) == self) {
+	if (atomic_read(&bus->ab_aio_current) == self) {
 		/* Query the hardware for how far we've already come. */
 hw_progress:
 		stat->hs_completed = AtaBus_HW_GetDmaProgress(bus);
-		if (ATOMIC_READ(bus->ab_aio_current) == self) {
+		if (atomic_read(&bus->ab_aio_current) == self) {
 			if unlikely(stat->hs_completed > stat->hs_total)
 				stat->hs_completed = stat->hs_total; /* Ensure consistency */
 			return AIO_PROGRESS_STATUS_INPROGRESS;
 		}
 	}
-	if (ATOMIC_READ(data->hd_bufaddr) == 0) {
+	if (atomic_read(&data->hd_bufaddr) == 0) {
 		/* Check for race condition: The hardware just started working with us. */
-		if (ATOMIC_READ(bus->ab_aio_current) == self)
+		if (atomic_read(&bus->ab_aio_current) == self)
 			goto hw_progress;
 		/* We're not the current handle, but we were started at one point.
 		 * This means  that  we've  either  been  completed  or  canceled. */
@@ -491,7 +491,7 @@ PRIVATE NOBLOCK NOPREEMPT struct aio_handle *
 NOTHROW(KCALL AtaBus_ActivateAioHandle_NoPR)(AtaBus *__restrict self,
                                              PHYS u32 *__restrict p_bufaddr) {
 	struct aio_handle *chain, **piter, *iter;
-	chain = ATOMIC_XCH(self->ab_aio_pending, NULL);
+	chain = atomic_xch(&self->ab_aio_pending, NULL);
 	if (!chain)
 		return NULL;
 	/* Find an AIO handle for which we can steal the command
@@ -511,8 +511,8 @@ NOTHROW(KCALL AtaBus_ActivateAioHandle_NoPR)(AtaBus *__restrict self,
 		 * that link being the first  step in canceling the operation,  while
 		 * equality  not holding  true means  that the  operation has already
 		 * completed. */
-		ATOMIC_WRITE(self->ab_aio_current, iter);
-		iter_prd = ATOMIC_XCH(data->hd_bufaddr, NULL);
+		atomic_write(&self->ab_aio_current, iter);
+		iter_prd = atomic_xch(&data->hd_bufaddr, NULL);
 		if likely(iter_prd != 0) {
 			/* Got it! */
 			*p_bufaddr = iter_prd;
@@ -538,7 +538,7 @@ NOTHROW(KCALL AtaBus_ActivateAioHandle_NoPR)(AtaBus *__restrict self,
 		iter  = *piter;
 	}
 	AtaBus_RestorePendingAioHandles(self, chain, iter);
-	ATOMIC_WRITE(self->ab_aio_current, NULL); /* Indicate a CANCEL state. */
+	atomic_write(&self->ab_aio_current, NULL); /* Indicate a CANCEL state. */
 	return NULL;
 }
 
@@ -568,11 +568,11 @@ NOTHROW(FCALL AtaBus_HW_StartDirectDma)(AtaBus *__restrict self,
 	AtaError_t error;
 	AtaAIOHandleData *data;
 	data = (AtaAIOHandleData *)handle->ah_data;
-	assert((ATOMIC_READ(self->ab_state) & ATA_BUS_STATE_MASK) == ATA_BUS_STATE_INDMA);
+	assert((atomic_read(&self->ab_state) & ATA_BUS_STATE_MASK) == ATA_BUS_STATE_INDMA);
 #ifndef NDEBUG
 	{
 		struct aio_handle *current;
-		current = ATOMIC_READ(self->ab_aio_current);
+		current = atomic_read(&self->ab_aio_current);
 		/* Can be NULL if we've already been canceled. */
 		assert(current == handle || current == NULL);
 	}
@@ -714,12 +714,12 @@ NOTHROW(FCALL AtaBus_StartNextDmaOperation)(AtaBus *__restrict self) {
 	PHYS u32 bufaddr;
 	uintptr_t state;
 again:
-	state = ATOMIC_READ(self->ab_state);
+	state = atomic_read(&self->ab_state);
 	assert((state & ATA_BUS_STATE_MASK) == ATA_BUS_STATE_INDMA);
 
 	/* Check if we're to switch to PIO mode. */
 	if ((state & ATA_BUS_STATE_WANTPIO) != 0) {
-		if (!ATOMIC_CMPXCH_WEAK(self->ab_state,
+		if (!atomic_cmpxch_weak(&self->ab_state,
 		                        state,
 		                        (state & ~ATA_BUS_STATE_MASK) |
 		                        ATA_BUS_STATE_READY))
@@ -732,7 +732,7 @@ again:
 
 	/* Check for further pending DMA handles. */
 #ifndef __OPTIMIZE_SIZE__
-	if unlikely(ATOMIC_READ(self->ab_aio_pending) == NULL)
+	if unlikely(atomic_read(&self->ab_aio_pending) == NULL)
 		goto no_handles;
 #define WANT_no_handles
 #endif /* !__OPTIMIZE_SIZE__ */
@@ -752,23 +752,23 @@ no_handles:
 		/* No available handles. -> Switch to READY
 		 * and check  for pending  AIO once  again. */
 #if ATA_BUS_STATE_READY == 0
-		ATOMIC_AND(self->ab_state, ~ATA_BUS_STATE_MASK);
+		atomic_and(&self->ab_state, ~ATA_BUS_STATE_MASK);
 #else /* ATA_BUS_STATE_READY == 0 */
 		do {
-			state = ATOMIC_READ(self->ab_state);
-		} while (!ATOMIC_CMPXCH_WEAK(self->ab_state, state,
+			state = atomic_read(&self->ab_state);
+		} while (!atomic_cmpxch_weak(&self->ab_state, state,
 		                             (state & ~ATA_BUS_STATE_MASK) |
 		                             ATA_BUS_STATE_READY));
 #endif /* ATA_BUS_STATE_READY != 0 */
-		if (ATOMIC_READ(self->ab_aio_pending) != NULL) {
+		if (atomic_read(&self->ab_aio_pending) != NULL) {
 			preemption_tryyield();
-			if (ATOMIC_READ(self->ab_aio_pending) != NULL) {
+			if (atomic_read(&self->ab_aio_pending) != NULL) {
 				for (;;) {
 					/* Try once again to start a DMA operation. */
-					state = ATOMIC_READ(self->ab_state);
+					state = atomic_read(&self->ab_state);
 					if ((state & ATA_BUS_STATE_MASK) != ATA_BUS_STATE_READY)
 						break;
-					if (ATOMIC_CMPXCH_WEAK(self->ab_state, state,
+					if (atomic_cmpxch_weak(&self->ab_state, state,
 					                       (state & ~ATA_BUS_STATE_MASK) |
 					                       ATA_BUS_STATE_INDMA))
 						goto again;
@@ -789,15 +789,15 @@ PRIVATE NOBLOCK void
 NOTHROW(KCALL AtaBus_TryStartNextDmaOperation)(AtaBus *__restrict self) {
 	uintptr_t state;
 	do {
-		state = ATOMIC_READ(self->ab_state);
+		state = atomic_read(&self->ab_state);
 		if ((state & ATA_BUS_STATE_MASK) != ATA_BUS_STATE_READY)
 			return; /* Bus isn't ready */
 	}
 #if ATA_BUS_STATE_READY == 0
-	while (!ATOMIC_CMPXCH_WEAK(self->ab_state, state,
+	while (!atomic_cmpxch_weak(&self->ab_state, state,
 	                           state | ATA_BUS_STATE_INDMA));
 #else /* ATA_BUS_STATE_READY == 0 */
-	while (!ATOMIC_CMPXCH_WEAK(self->ab_state, state,
+	while (!atomic_cmpxch_weak(&self->ab_state, state,
 	                           (state & ~ATA_BUS_STATE_MASK) |
 	                           ATA_BUS_STATE_INDMA));
 #endif /* ATA_BUS_STATE_READY != 0 */
@@ -812,9 +812,9 @@ NOTHROW(KCALL AtaBus_AppendDmaAioHandle)(AtaBus *__restrict self,
 	assert(handle->ah_type == &AtaDrive_DmaAioHandleType);
 	assert(self->ab_dmaio != (port_t)-1);
 	do {
-		next = ATOMIC_READ(self->ab_aio_pending);
-		ATOMIC_WRITE(handle->ah_next, next);
-	} while (!ATOMIC_CMPXCH_WEAK(self->ab_aio_pending,
+		next = atomic_read(&self->ab_aio_pending);
+		atomic_write(&handle->ah_next, next);
+	} while (!atomic_cmpxch_weak(&self->ab_aio_pending,
 	                             next, handle));
 	/* If this is the first pending operation, try to initiate DMA */
 	if (!next)
@@ -874,7 +874,7 @@ NOTHROW(FCALL AtaBus_HW_InterruptHandler)(AtaBus *__restrict self) {
 	            "ctrl:%#" PRIxN(__SIZEOF_PORT_T__) " "
 	            "[bus_status=%#.2" PRIx8 "]\n",
 	            self->ab_busio, self->ab_ctrlio, status);
-	switch (ATOMIC_READ(self->ab_state)) {
+	switch (atomic_read(&self->ab_state)) {
 
 	case ATA_BUS_STATE_INPIO:
 		/* Broadcast the PIO interrupt handler. */
@@ -906,12 +906,12 @@ NOTHROW(FCALL AtaBus_HW_DmaInterruptHandler)(AtaBus *__restrict self) {
 	            "[bus_status=%#.2" PRIx8 ",dma_status=%#.2" PRIx8 "]\n",
 	            self->ab_busio, self->ab_ctrlio, self->ab_dmaio,
 	            status, dma_status);
-	switch (ATOMIC_READ(self->ab_state) & ATA_BUS_STATE_MASK) {
+	switch (atomic_read(&self->ab_state) & ATA_BUS_STATE_MASK) {
 
 	case ATA_BUS_STATE_INDMA: {
 		struct aio_handle *handle;
 		/* A DMA operation has been completed. */
-		handle = ATOMIC_XCH(self->ab_aio_current, NULL);
+		handle = atomic_xch(&self->ab_aio_current, NULL);
 		if unlikely(!handle) {
 			/* This can happen if the handle is currently being  canceled,
 			 * but the cancel request itself was made before we could tell
@@ -964,17 +964,17 @@ PRIVATE NONNULL((1)) void FCALL
 AtaBus_LockPIO(AtaBus *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 	uintptr_t state;
 again:
-	state = ATOMIC_READ(self->ab_state);
+	state = atomic_read(&self->ab_state);
 
 	/* Check if we can directly switch to PIO mode. */
 	if ((state & ATA_BUS_STATE_MASK) == ATA_BUS_STATE_READY) {
 #if ATA_BUS_STATE_READY == 0
-		if (ATOMIC_CMPXCH_WEAK(self->ab_state,
+		if (atomic_cmpxch_weak(&self->ab_state,
 		                       state,
 		                       state | ATA_BUS_STATE_INPIO))
 			return;
 #else /* ATA_BUS_STATE_READY == 0 */
-		if (ATOMIC_CMPXCH_WEAK(self->ab_state,
+		if (atomic_cmpxch_weak(&self->ab_state,
 		                       state,
 		                       (state & ~ATA_BUS_STATE_MASK) |
 		                       ATA_BUS_STATE_INPIO))
@@ -983,7 +983,7 @@ again:
 	}
 
 	/* Increment the PIO request counter. */
-	if (!ATOMIC_CMPXCH_WEAK(self->ab_state,
+	if (!atomic_cmpxch_weak(&self->ab_state,
 	                        state,
 	                        state + ATA_BUS_STATE_ONEPIO))
 		goto again;
@@ -993,25 +993,25 @@ again:
 again_waitfor:
 		/* Wait for PIO to become available. */
 		task_waitwhile(&self->ab_ready,
-		               (state = ATOMIC_READ(self->ab_state),
+		               (state = atomic_read(&self->ab_state),
 		                (state & ATA_BUS_STATE_MASK) != ATA_BUS_STATE_READY));
 
 		/* Atomically switch to PIO mode, and release our PIO request ticket. */
 #if ATA_BUS_STATE_READY == 0
-		if (!ATOMIC_CMPXCH_WEAK(self->ab_state,
+		if (!atomic_cmpxch_weak(&self->ab_state,
 		                        state,
 		                        (state - ATA_BUS_STATE_ONEPIO) |
 		                        ATA_BUS_STATE_INPIO))
 			goto again_waitfor;
 #else /* ATA_BUS_STATE_READY == 0 */
-		if (!ATOMIC_CMPXCH_WEAK(self->ab_state,
+		if (!atomic_cmpxch_weak(&self->ab_state,
 		                        state,
 		                        ((state - ATA_BUS_STATE_ONEPIO) & ~ATA_BUS_STATE_MASK) |
 		                        ATA_BUS_STATE_INPIO))
 			goto again_waitfor;
 #endif /* ATA_BUS_STATE_READY != 0 */
 	} EXCEPT {
-		ATOMIC_SUB(self->ab_state, ATA_BUS_STATE_ONEPIO);
+		atomic_sub(&self->ab_state, ATA_BUS_STATE_ONEPIO);
 		RETHROW();
 	}
 }
@@ -1021,14 +1021,14 @@ NOTHROW(FCALL AtaBus_UnlockPIO)(AtaBus *__restrict self) {
 	uintptr_t state;
 	uintptr_t new_state;
 again:
-	state = ATOMIC_READ(self->ab_state);
+	state = atomic_read(&self->ab_state);
 	assert((state & ATA_BUS_STATE_MASK) == ATA_BUS_STATE_INPIO);
 
 	/* If there are more PIO requests, switch back to ready,
 	 * rather than resuming  by trying to  service more  DMA
 	 * operations. */
 	if ((state & ATA_BUS_STATE_WANTPIO) != 0) {
-		if (!ATOMIC_CMPXCH_WEAK(self->ab_state,
+		if (!atomic_cmpxch_weak(&self->ab_state,
 		                        state,
 		                        (state & ~ATA_BUS_STATE_MASK) |
 		                        ATA_BUS_STATE_READY))
@@ -1042,8 +1042,8 @@ again:
 	/* Check if there are pending AIO operations that can  be
 	 * completed using DMA. If there are, then switch the bus
 	 * into DMA-mode, and service them. */
-	if (ATOMIC_READ(self->ab_aio_pending) != NULL) {
-		if (!ATOMIC_CMPXCH_WEAK(self->ab_state,
+	if (atomic_read(&self->ab_aio_pending) != NULL) {
+		if (!atomic_cmpxch_weak(&self->ab_state,
 		                        state,
 		                        (state & ~ATA_BUS_STATE_MASK) |
 		                        ATA_BUS_STATE_INDMA))
@@ -1056,11 +1056,11 @@ do_start_dma:
 	/* Nothing to do. - Switch to READY and re-check for pending
 	 * AIO operations that may have  appeared in the mean  time. */
 	new_state = (state & ~ATA_BUS_STATE_MASK) | ATA_BUS_STATE_READY;
-	if (!ATOMIC_CMPXCH_WEAK(self->ab_state, state, new_state))
+	if (!atomic_cmpxch_weak(&self->ab_state, state, new_state))
 		goto again;
-	if unlikely(ATOMIC_READ(self->ab_aio_pending) != NULL) {
+	if unlikely(atomic_read(&self->ab_aio_pending) != NULL) {
 		/* Try to switch back to INDMA */
-		if (ATOMIC_CMPXCH(self->ab_state, new_state,
+		if (atomic_cmpxch(&self->ab_state, new_state,
 		                  (state & ~ATA_BUS_STATE_MASK) |
 		                  ATA_BUS_STATE_INDMA))
 			goto do_start_dma;

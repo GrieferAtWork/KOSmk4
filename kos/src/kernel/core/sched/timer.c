@@ -40,7 +40,6 @@
 #include <sched/timer.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 
@@ -54,6 +53,7 @@
 #include <sys/timerfd.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -755,11 +755,11 @@ timerfd_get_async_timeout_notifier(struct timerfd *__restrict self)
 		THROWS(E_BADALLOC) {
 	struct timerfd_async *result;
 again:
-	result = ATOMIC_READ(self->tfd_async);
+	result = atomic_read(&self->tfd_async);
 	if (!result) {
 		result = async_new(struct timerfd_async, &timerfd_async_ops);
 		awref_init(&result->tfa_timerfd, self);
-		if unlikely(!ATOMIC_CMPXCH(self->tfd_async, NULL, result)) {
+		if unlikely(!atomic_cmpxch(&self->tfd_async, NULL, result)) {
 			async_destroy(result);
 			goto again;
 		}
@@ -897,7 +897,7 @@ procctl_reqtimerctl(struct procctl *__restrict self) THROWS(E_BADALLOC) {
 	result = procctl_gettimerctl(self);
 	if (result == NULL) {
 		result = proctimerctl_new();
-		if unlikely(!ATOMIC_CMPXCH(self->pc_timers, NULL, result)) {
+		if unlikely(!atomic_cmpxch(&self->pc_timers, NULL, result)) {
 			proctimerctl_destroy(result);
 			result = procctl_gettimerctl(self);
 			assert(result != NULL);

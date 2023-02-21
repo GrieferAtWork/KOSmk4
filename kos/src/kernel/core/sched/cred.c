@@ -41,15 +41,15 @@
 #include <sched/cred.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
-#include <hybrid/sequence/bsearch.h>
 #include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sequence/bsearch.h>
 
 #include <compat/config.h>
 #include <sys/stat.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <sched.h>
 #include <stdbool.h>
@@ -256,50 +256,50 @@ NOTHROW(FCALL task_setcred_inherit)(/*inherit(always)*/ REF struct cred *__restr
 /* Get the calling thread's real user ID */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED uid_t
 NOTHROW(FCALL cred_getruid)(void) {
-	return ATOMIC_READ(THIS_CRED->c_ruid);
+	return atomic_read(&THIS_CRED->c_ruid);
 }
 
 /* Get the calling thread's real group ID */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED gid_t
 NOTHROW(FCALL cred_getrgid)(void) {
-	return ATOMIC_READ(THIS_CRED->c_rgid);
+	return atomic_read(&THIS_CRED->c_rgid);
 }
 
 /* Get the calling thread's effective user ID */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED uid_t
 NOTHROW(FCALL cred_geteuid)(void) {
-	return ATOMIC_READ(THIS_CRED->c_euid);
+	return atomic_read(&THIS_CRED->c_euid);
 }
 
 /* Get the calling thread's effective group ID */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED gid_t
 NOTHROW(FCALL cred_getegid)(void) {
-	return ATOMIC_READ(THIS_CRED->c_egid);
+	return atomic_read(&THIS_CRED->c_egid);
 }
 
 
 /* Get the calling thread's saved user ID */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED uid_t
 NOTHROW(FCALL cred_getsuid)(void) {
-	return ATOMIC_READ(THIS_CRED->c_suid);
+	return atomic_read(&THIS_CRED->c_suid);
 }
 
 /* Get the calling thread's saved group ID */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED gid_t
 NOTHROW(FCALL cred_getsgid)(void) {
-	return ATOMIC_READ(THIS_CRED->c_sgid);
+	return atomic_read(&THIS_CRED->c_sgid);
 }
 
 /* Get the calling thread's filesystem user ID */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED uid_t
 NOTHROW(FCALL cred_getfsuid)(void) {
-	return ATOMIC_READ(THIS_CRED->c_fsuid);
+	return atomic_read(&THIS_CRED->c_fsuid);
 }
 
 /* Get the calling thread's filesystem group ID */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED gid_t
 NOTHROW(FCALL cred_getfsgid)(void) {
-	return ATOMIC_READ(THIS_CRED->c_fsgid);
+	return atomic_read(&THIS_CRED->c_fsgid);
 }
 
 
@@ -311,7 +311,7 @@ NOTHROW(FCALL cred_isfsgroupmember)(gid_t gid) {
 	REF struct cred_groups *groups;
 
 	/* Check for simple case: `gid' is the actual, current filesystem group ID */
-	if (ATOMIC_READ(self->c_fsgid) == gid)
+	if (atomic_read(&self->c_fsgid) == gid)
 		return true;
 
 	/* Check supplementary groups. */
@@ -1471,7 +1471,7 @@ cred_groups_new(USER UNCHECKED GID_T const *groups,
 		count = 0;
 		for (i = 0; i < ngroups; ++i) {
 			size_t lo, hi;
-			gid_t newgid = ATOMIC_READ(groups[i]);
+			gid_t newgid = atomic_read(&groups[i]);
 			/* Sorted-insert into the new list, ignoring duplicates. When exceeding
 			 * `max_ngroups' during this, require that the caller has `CAP_SETGID'. */
 			lo = 0;

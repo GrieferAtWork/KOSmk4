@@ -45,8 +45,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #endif /* !REF */
 
 #ifndef HAVE_UNWIND_FOR_DEBUG_EXTERNALLY
-#include <hybrid/atomic.h>
-
 #include <dlfcn.h>
 #include <stdbool.h>
 #include <stddef.h>

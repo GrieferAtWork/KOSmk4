@@ -38,7 +38,6 @@
 #include <sched/sig.h>
 #include <sched/tsc.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 
@@ -53,6 +52,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <signal.h>
 #include <stdalign.h>
@@ -243,10 +243,11 @@ again:
 	nc = axref_get(&self->sk_ncon);
 	if unlikely(nc) {
 		/* A previous connect() is still in progress... */
-		if ((mode & IO_NONBLOCK) || (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
+		if ((mode & IO_NONBLOCK) || (atomic_read(&self->sk_msgflags) & MSG_DONTWAIT)) {
 			decref_unlikely(nc);
 			return SOCKET_CONNECT_NONBLOCK_ALREADY;
 		}
+
 		/* Wait for this current connect  to complete, then try  again.
 		 * There are  some socket  types  that allow  re-connect(),  so
 		 * doing a  blocking connect()  while a  background connect  is
@@ -268,14 +269,17 @@ again:
 			task_disconnectall();
 			goto do_blocking_connect;
 		}
+
 		/* No need  to keep  our reference  to the  background-connect
 		 * controller around: signals allow connections to be received
 		 * after the signal object itself has already been  destroyed! */
 		decref_unlikely(nc);
+
 		/* Wait for the previous connect() to complete. */
 		task_waitfor();
 		goto again;
 	}
+
 	/* No background connect attempt in progress.
 	 * -> Start one, or do a simplified blocking connect
 	 * NOTE: The situation where one thread starts a blocking  connect(),
@@ -284,11 +288,12 @@ again:
 	 *       are not  mandated by  the  general-purpose socket  API,  and
 	 *       this  really  isn't  something  that  should  be  done  by a
 	 *       proper application) */
-	if ((mode & IO_NONBLOCK) || (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
+	if ((mode & IO_NONBLOCK) || (atomic_read(&self->sk_msgflags) & MSG_DONTWAIT)) {
 		nc = (REF struct socket_connect_aio *)kmalloc(sizeof(struct socket_connect_aio),
 		                                              GFP_LOCKED | GFP_PREFLT);
 		nc->sca_refcnt = 1;
 		aio_handle_generic_init(&nc->sca_aio);
+
 		/* Start the connect() operation. */
 		TRY {
 			(*self->sk_ops->so_connect)(self, addr, addr_len, &nc->sca_aio);
@@ -296,6 +301,7 @@ again:
 			kfree(nc);
 			RETHROW();
 		}
+
 		/* If the connect wasn't completed immediately, then indicate that a
 		 * background operation was started (Posix defines `EINPROGRESS' for
 		 * this case) */
@@ -305,6 +311,7 @@ again:
 			aio_handle_generic_checkerror(&nc->sca_aio);
 			return SOCKET_CONNECT_COMPLETED;
 		}
+
 		/* Try to set the new connection controller. */
 		if unlikely(!axref_cmpxch_inherit_new(&self->sk_ncon, NULL, nc)) {
 			/* Someone else already did this... */
@@ -400,7 +407,7 @@ socket_asend(struct socket *__restrict self,
              /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_MESSAGE_TOO_LONG,
 		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN) {
-	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_SENDMASK;
+	msg_flags |= atomic_read(&self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_SENDMASK;
 	if (self->sk_ops->so_send) {
 		(*self->sk_ops->so_send)(self, buf, bufsize, msg_control, msg_flags, aio);
 	} else if (self->sk_ops->so_sendv) {
@@ -461,7 +468,7 @@ socket_asendv(struct socket *__restrict self,
               /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_MESSAGE_TOO_LONG,
 		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN) {
-	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_SENDMASK;
+	msg_flags |= atomic_read(&self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_SENDMASK;
 	if (self->sk_ops->so_sendv) {
 		if (buf->iv_entc == 1 && self->sk_ops->so_send) {
 			(*self->sk_ops->so_send)(self, buf->iv_head.ive_base, bufsize, msg_control, msg_flags, aio);
@@ -494,12 +501,14 @@ waitfor_send_aio(struct socket *__restrict self,
 	COMPILER_READ_BARRIER();
 	timeout = self->sk_sndtimeo;
 	COMPILER_READ_BARRIER();
+
 	/* Allow for send timeouts. */
 	if (timeout != KTIME_INFINITE) {
 		timeout += ktime();
 		if (!aio_handle_generic_waitfor(aio, timeout)) {
 			aio_handle_cancel(aio); /* Force AIO completion one way or another... */
 			COMPILER_READ_BARRIER();
+
 			/* Only throw an error  if we did actually  manage to cancel the  AIO
 			 * There is the small race condition where the send succeeded between
 			 * the waitfor function timing out,  and us canceling the  operation.
@@ -530,7 +539,7 @@ socket_send(struct socket *__restrict self,
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
 	TRY {
-		if ((mode & IO_NONBLOCK) || (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT))
+		if ((mode & IO_NONBLOCK) || (atomic_read(&self->sk_msgflags) & MSG_DONTWAIT))
 			msg_flags |= MSG_DONTWAIT;
 		socket_asend(self, buf, bufsize, msg_control, msg_flags, &aio);
 		if (msg_flags & MSG_DONTWAIT) {
@@ -552,12 +561,14 @@ socket_send(struct socket *__restrict self,
 		}
 	} EXCEPT {
 		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL) &&
-		    !(ATOMIC_READ(self->sk_msgflags) & MSG_NOSIGNAL))
+		    !(atomic_read(&self->sk_msgflags) & MSG_NOSIGNAL))
 			raise_sigpipe();
 		RETHROW();
 	}
+
 	/* Default-return the whole buffer size. */
 	result = bufsize;
+
 	/* Invoke the retsize operator (if defined). */
 	if (aio.ah_type->ht_retsize)
 		result = (*aio.ah_type->ht_retsize)(&aio);
@@ -576,7 +587,7 @@ socket_sendv(struct socket *__restrict self,
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
 	TRY {
-		if ((mode & IO_NONBLOCK) || (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT))
+		if ((mode & IO_NONBLOCK) || (atomic_read(&self->sk_msgflags) & MSG_DONTWAIT))
 			msg_flags |= MSG_DONTWAIT;
 		socket_asendv(self, buf, bufsize, msg_control, msg_flags, &aio);
 		if (msg_flags & MSG_DONTWAIT) {
@@ -598,12 +609,14 @@ socket_sendv(struct socket *__restrict self,
 		}
 	} EXCEPT {
 		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL) &&
-		    !(ATOMIC_READ(self->sk_msgflags) & MSG_NOSIGNAL))
+		    !(atomic_read(&self->sk_msgflags) & MSG_NOSIGNAL))
 			raise_sigpipe();
 		RETHROW();
 	}
+
 	/* Default-return the whole buffer size. */
 	result = bufsize;
+
 	/* Invoke the retsize operator (if defined). */
 	if (aio.ah_type->ht_retsize)
 		result = (*aio.ah_type->ht_retsize)(&aio);
@@ -661,6 +674,7 @@ PRIVATE NONNULL((1)) unsigned int FCALL
 connect_and_send_work(struct async *__restrict self) {
 	struct connect_and_send_job *me;
 	me = (struct connect_and_send_job *)self;
+
 	/* Check for AIO errors. */
 	assert(aio_handle_generic_hascompleted(&me->cas_aio));
 	aio_handle_generic_checkerror(&me->cas_aio);
@@ -670,6 +684,7 @@ connect_and_send_work(struct async *__restrict self) {
 	}
 	if (!tryincref(me->cas_socket))
 		THROW(E_NO_SUCH_OBJECT);
+
 	/* connect() has completed (successfully).
 	 * Move on to the send() part. */
 	aio_handle_generic_fini(&me->cas_aio);
@@ -699,6 +714,7 @@ PRIVATE NONNULL((1)) void FCALL
 connect_and_send_cancel(struct async *__restrict self) {
 	struct connect_and_send_job *me;
 	me = (struct connect_and_send_job *)self;
+
 	/* Cancel the current AIO operation. */
 	aio_handle_cancel(&me->cas_aio);
 }
@@ -741,6 +757,7 @@ socket_asendtov_connect_and_send(struct socket *__restrict self,
 	assertf(self->sk_ops->so_sendv,
 	        "At least one of `so_sendv' or `so_sendtov' "
 	        "has to be implemented by every socket type");
+
 	/* Construct an async-job for doing the connect() + send() */
 	aj = async_new_aio(struct connect_and_send_job, &connect_and_send_cb, aio);
 	TRY {
@@ -816,7 +833,7 @@ socket_asendto(struct socket *__restrict self,
                /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
 		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_BUFFER_TOO_SMALL) {
-	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_SENDMASK;
+	msg_flags |= atomic_read(&self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_SENDMASK;
 	if (self->sk_ops->so_sendto) {
 		(*self->sk_ops->so_sendto)(self, buf, bufsize, addr, addr_len,
 		                           msg_control, msg_flags, aio);
@@ -842,7 +859,7 @@ socket_asendtov(struct socket *__restrict self,
                 /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
 		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_BUFFER_TOO_SMALL) {
-	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_SENDMASK;
+	msg_flags |= atomic_read(&self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_SENDMASK;
 	if (self->sk_ops->so_sendtov) {
 		if (buf->iv_entc == 1 && self->sk_ops->so_sendto) {
 			(*self->sk_ops->so_sendto)(self, buf->iv_head.ive_base, bufsize, addr,
@@ -879,7 +896,7 @@ socket_sendto(struct socket *__restrict self,
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
 	TRY {
-		if ((mode & IO_NONBLOCK) || (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT))
+		if ((mode & IO_NONBLOCK) || (atomic_read(&self->sk_msgflags) & MSG_DONTWAIT))
 			msg_flags |= MSG_DONTWAIT;
 		socket_asendto(self, buf, bufsize, addr, addr_len, msg_control, msg_flags, &aio);
 		if (msg_flags & MSG_DONTWAIT) {
@@ -901,12 +918,14 @@ socket_sendto(struct socket *__restrict self,
 		}
 	} EXCEPT {
 		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL) &&
-		    !(ATOMIC_READ(self->sk_msgflags) & MSG_NOSIGNAL))
+		    !(atomic_read(&self->sk_msgflags) & MSG_NOSIGNAL))
 			raise_sigpipe();
 		RETHROW();
 	}
+
 	/* Default-return the whole buffer size. */
 	result = bufsize;
+
 	/* Invoke the retsize operator (if defined). */
 	if (aio.ah_type->ht_retsize)
 		result = (*aio.ah_type->ht_retsize)(&aio);
@@ -926,7 +945,7 @@ socket_sendtov(struct socket *__restrict self,
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
 	TRY {
-		if ((mode & IO_NONBLOCK) || (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT))
+		if ((mode & IO_NONBLOCK) || (atomic_read(&self->sk_msgflags) & MSG_DONTWAIT))
 			msg_flags |= MSG_DONTWAIT;
 		socket_asendtov(self, buf, bufsize, addr, addr_len, msg_control, msg_flags, &aio);
 		if (msg_flags & MSG_DONTWAIT) {
@@ -948,12 +967,14 @@ socket_sendtov(struct socket *__restrict self,
 		}
 	} EXCEPT {
 		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL) &&
-		    !(ATOMIC_READ(self->sk_msgflags) & MSG_NOSIGNAL))
+		    !(atomic_read(&self->sk_msgflags) & MSG_NOSIGNAL))
 			raise_sigpipe();
 		RETHROW();
 	}
+
 	/* Default-return the whole buffer size. */
 	result = bufsize;
+
 	/* Invoke the retsize operator (if defined). */
 	if (aio.ah_type->ht_retsize)
 		result = (*aio.ah_type->ht_retsize)(&aio);
@@ -1007,6 +1028,7 @@ again_receive:
 		assert(bufsize == buf->iv_last);
 		assert(bufsize == buf->iv_entv[0].ive_size);
 		assert(buf->iv_head.ive_base == buf->iv_entv[0].ive_base);
+
 		/* Prefer the simplified normal receive buffer. */
 		result = (*self->sk_ops->so_recvfrom)(self,
 		                                      buf->iv_head.ive_base,
@@ -1022,6 +1044,7 @@ again_receive:
 		assertf(self->sk_ops->so_recvfromv,
 		        "At least one of `so_recvv' or `so_recvfromv' "
 		        "has to be implemented by every socket type");
+
 		/* Vectored receive buffer. */
 		result = (*self->sk_ops->so_recvfromv)(self,
 		                                       buf,
@@ -1034,6 +1057,7 @@ again_receive:
 		                                       msg_flags,
 		                                       abs_timeout);
 	}
+
 	/* Skip the address-match check if the socket implementation indicates EOF
 	 * Although technically, EOF shouldn't  be possible for a  connection-less
 	 * socket like the one we seem to be dealing with here... */
@@ -1078,6 +1102,7 @@ socket_recv(struct socket *__restrict self,
 		THROWS(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_CONNECTION_REFUSED,
 		       E_NET_TIMEOUT, E_WOULDBLOCK) {
 	size_t result;
+
 	/* Use the default receive timeout if the caller didn't specify one. */
 	if (abs_timeout == KTIME_INFINITE) {
 		COMPILER_READ_BARRIER();
@@ -1086,7 +1111,7 @@ socket_recv(struct socket *__restrict self,
 		if (abs_timeout != KTIME_INFINITE)
 			abs_timeout += ktime();
 	}
-	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
+	msg_flags |= atomic_read(&self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
 	if (self->sk_ops->so_recv) {
 		result = (*self->sk_ops->so_recv)(self, buf, bufsize, presult_flags,
 		                                  msg_control, msg_flags, abs_timeout);
@@ -1114,6 +1139,7 @@ socket_recvv(struct socket *__restrict self,
 		THROWS(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_CONNECTION_REFUSED,
 		       E_NET_TIMEOUT, E_WOULDBLOCK) {
 	size_t result;
+
 	/* Use the default receive timeout if the caller didn't specify one. */
 	if (abs_timeout == KTIME_INFINITE) {
 		COMPILER_READ_BARRIER();
@@ -1122,7 +1148,7 @@ socket_recvv(struct socket *__restrict self,
 		if (abs_timeout != KTIME_INFINITE)
 			abs_timeout += ktime();
 	}
-	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
+	msg_flags |= atomic_read(&self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
 	if (self->sk_ops->so_recvv) {
 		result = (*self->sk_ops->so_recvv)(self, buf, bufsize, presult_flags,
 		                                   msg_control, msg_flags, abs_timeout);
@@ -1164,6 +1190,7 @@ socket_recvfrom(struct socket *__restrict self,
                 ktime_t abs_timeout)
 		THROWS(E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT, E_WOULDBLOCK) {
 	size_t result;
+
 	/* Use the default receive timeout if the caller didn't specify one. */
 	if (abs_timeout == KTIME_INFINITE) {
 		COMPILER_READ_BARRIER();
@@ -1172,7 +1199,7 @@ socket_recvfrom(struct socket *__restrict self,
 		if (abs_timeout != KTIME_INFINITE)
 			abs_timeout += ktime();
 	}
-	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
+	msg_flags |= atomic_read(&self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
 	if (self->sk_ops->so_recvfrom) {
 		result = (*self->sk_ops->so_recvfrom)(self, buf, bufsize, addr, addr_len,
 		                                      preq_addr_len, presult_flags,
@@ -1212,6 +1239,7 @@ socket_recvfromv(struct socket *__restrict self,
                  ktime_t abs_timeout)
 		THROWS(E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT, E_WOULDBLOCK) {
 	size_t result;
+
 	/* Use the default receive timeout if the caller didn't specify one. */
 	if (abs_timeout == KTIME_INFINITE) {
 		COMPILER_READ_BARRIER();
@@ -1220,7 +1248,7 @@ socket_recvfromv(struct socket *__restrict self,
 		if (abs_timeout != KTIME_INFINITE)
 			abs_timeout += ktime();
 	}
-	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
+	msg_flags |= atomic_read(&self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
 	if (self->sk_ops->so_recvfromv) {
 		result = (*self->sk_ops->so_recvfromv)(self, buf, bufsize, addr, addr_len,
 		                                       preq_addr_len, presult_flags,
@@ -1274,7 +1302,7 @@ socket_accept(struct socket *__restrict self, iomode_t mode)
 		      socket_getfamily(self), socket_gettype(self),
 		      socket_getprotocol(self));
 	}
-	if (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)
+	if (atomic_read(&self->sk_msgflags) & MSG_DONTWAIT)
 		mode |= IO_NONBLOCK;
 	result = (*self->sk_ops->so_accept)(self, mode);
 	return result;
@@ -1323,6 +1351,7 @@ socket_getsockopt_default(struct socket *__restrict self,
 	socklen_t result = 0;
 	(void)self;
 	(void)mode;
+
 	/* Provide default values for a couple of socket options. */
 	if (level == SOL_SOCKET) {
 		switch (optname) {
@@ -1475,6 +1504,7 @@ socket_getsockopt(struct socket *__restrict self,
                   socklen_t optlen, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_SOCKET_OPT) {
 	socklen_t result;
+
 	/* Builtin socket options. */
 	if (level == SOL_SOCKET) {
 		int intval;
@@ -1500,6 +1530,7 @@ again_read_ncon:
 					} else {
 						intval = EOK;
 					}
+
 					/* Consume the completion status. */
 					xch_ok = axref_cmpxch_inherit_new_nokill(&self->sk_ncon, ah, NULL);
 					decref_unlikely(ah);
@@ -1525,19 +1556,19 @@ return_intval:
 			goto return_intval;
 
 		case SO_NOSIGPIPE:
-			intval = ATOMIC_READ(self->sk_msgflags) & MSG_NOSIGNAL ? 1 : 0;
+			intval = atomic_read(&self->sk_msgflags) & MSG_NOSIGNAL ? 1 : 0;
 			goto return_intval;
 
 		case SO_DONTROUTE:
-			intval = ATOMIC_READ(self->sk_msgflags) & MSG_DONTROUTE ? 1 : 0;
+			intval = atomic_read(&self->sk_msgflags) & MSG_DONTROUTE ? 1 : 0;
 			goto return_intval;
 
 		case SO_OOBINLINE:
-			intval = ATOMIC_READ(self->sk_msgflags) & MSG_OOB ? 1 : 0;
+			intval = atomic_read(&self->sk_msgflags) & MSG_OOB ? 1 : 0;
 			goto return_intval;
 
 		case SO_DONTWAIT:
-			intval = ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT ? 1 : 0;
+			intval = atomic_read(&self->sk_msgflags) & MSG_DONTWAIT ? 1 : 0;
 			goto return_intval;
 
 		case SO_PEERNAME:
@@ -1639,9 +1670,9 @@ set_message_flag(struct socket *__restrict self,
                  USER CHECKED void const *optval,
                  socklen_t optlen, uintptr_t flag) {
 	if (extract_bool(optval, optlen)) {
-		ATOMIC_OR(self->sk_msgflags, flag);
+		atomic_or(&self->sk_msgflags, flag);
 	} else {
-		ATOMIC_AND(self->sk_msgflags, ~flag);
+		atomic_and(&self->sk_msgflags, ~flag);
 	}
 }
 
@@ -1775,7 +1806,7 @@ socket_setsockopt(struct socket *__restrict self,
 				newsiz = (size_t)-1;
 			if (newsiz < SOCKET_RCVBUFMIN)
 				newsiz = SOCKET_RCVBUFMIN;
-			maxsiz = ATOMIC_READ(socket_default_rcvbufmax);
+			maxsiz = atomic_read(&socket_default_rcvbufmax);
 			if (newsiz > maxsiz) {
 				if (optname != SO_RCVBUFFORCE || !capable(CAP_NET_ADMIN))
 					newsiz = maxsiz;
@@ -1793,7 +1824,7 @@ socket_setsockopt(struct socket *__restrict self,
 				newsiz = (size_t)-1;
 			if (newsiz < SOCKET_SNDBUFMIN)
 				newsiz = SOCKET_SNDBUFMIN;
-			maxsiz = ATOMIC_READ(socket_default_sndbufmax);
+			maxsiz = atomic_read(&socket_default_sndbufmax);
 			if (newsiz > maxsiz) {
 				if (optname != SO_SNDBUFFORCE || !capable(CAP_NET_ADMIN))
 					newsiz = maxsiz;

@@ -33,10 +33,10 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -67,16 +67,18 @@ NOTHROW(FCALL cpf_ipi)(struct icpustate *__restrict state,
 	func   = (cpu_private_function_t)args[CPF_IPI_FUNC];
 	thread = (struct task *)args[CPF_IPI_THREAD];
 	assert(rt->cpf_refcnt == 2);
+
 	/* Read the CPU field _once_ since it might change before the next read. */
-	target_cpu = ATOMIC_READ(thread->t_cpu);
+	target_cpu = atomic_read(&thread->t_cpu);
 	if unlikely(target_cpu != THIS_CPU) {
 		while (!cpu_sendipi(target_cpu, &cpf_ipi, args, CPU_IPI_FWAKEUP))
 			preemption_tryyield_nopr();
 	} else {
 		/* Invoke the accessor function */
 		(*func)(rt->cpf_data, thread);
+
 		/* Signal service completion. */
-		ATOMIC_WRITE(rt->cpf_finish, 1);
+		atomic_write(&rt->cpf_finish, 1);
 		sig_broadcast(&rt->cpf_done);
 		decref_unlikely(rt);
 	}
@@ -133,7 +135,7 @@ cpu_private_function_callbuf_ex(struct task *__restrict thread,
 	assert(IS_ALIGNED((uintptr_t)stack_buf, bufalign));
 	preemption_pushoff(&was);
 #ifndef CONFIG_NO_SMP
-	thread_cpu = ATOMIC_READ(thread->t_cpu);
+	thread_cpu = atomic_read(&thread->t_cpu);
 	if (thread_cpu != THIS_CPU) {
 		struct cpf_rtdata *rt;
 		void *args[CPU_IPI_ARGCOUNT];
@@ -151,9 +153,10 @@ cpu_private_function_callbuf_ex(struct task *__restrict thread,
 		args[CPF_IPI_RTDATA] = rt;
 		args[CPF_IPI_FUNC]   = (void *)func;
 		args[CPF_IPI_THREAD] = thread;
+
 		/* Re-acquire the preemption lock and check that `thread's cpu hasn't changed. */
 		preemption_pushoff(&was);
-		thread_cpu = ATOMIC_READ(thread->t_cpu);
+		thread_cpu = atomic_read(&thread->t_cpu);
 		if unlikely(thread_cpu == THIS_CPU) {
 			kfree(rt);
 			goto do_service_directly;
@@ -164,10 +167,10 @@ cpu_private_function_callbuf_ex(struct task *__restrict thread,
 		preemption_pop(&was);
 		TRY {
 			/* Now wait for the function to be serviced. */
-			while (!ATOMIC_READ(rt->cpf_finish)) {
+			while (!atomic_read(&rt->cpf_finish)) {
 				task_connect_for_poll(&rt->cpf_done);
 				/* Do the interlocked check */
-				if unlikely(ATOMIC_READ(rt->cpf_finish)) {
+				if unlikely(atomic_read(&rt->cpf_finish)) {
 					task_disconnectall();
 					break;
 				}

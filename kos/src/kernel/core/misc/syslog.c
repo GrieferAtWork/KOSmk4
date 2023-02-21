@@ -45,11 +45,10 @@
 #include <sched/group.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
 #include <kos/aref.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <ctype.h>
 #include <format-printer.h>
 #include <stddef.h>
@@ -488,11 +487,11 @@ NOTHROW(FCALL syslog_buffer_acquire)(struct syslog_buffer *__restrict self,
 		return;
 	}
 	lock->sb_flags = caller->t_flags;
-	ATOMIC_OR(caller->t_flags, TASK_FKEEPCORE);
+	atomic_or(&caller->t_flags, TASK_FKEEPCORE);
 	COMPILER_BARRIER();
 again:
 	me     = caller->t_cpu;
-	oldcpu = ATOMIC_CMPXCH_VAL(self->sb_writer, NULL, me);
+	oldcpu = atomic_cmpxch_val(&self->sb_writer, NULL, me);
 	if (oldcpu == NULL) {
 		/* Non-recursive, normal lock */
 success:
@@ -507,7 +506,7 @@ success:
 	 * crashed fatally during CPU initialization while holding this lock. */
 	if unlikely(!is_a_valid_cpu(oldcpu)) {
 		struct cpu *real_oldcpu;
-		real_oldcpu = ATOMIC_CMPXCH_VAL(self->sb_writer, oldcpu, me);
+		real_oldcpu = atomic_cmpxch_val(&self->sb_writer, oldcpu, me);
 		if (oldcpu != real_oldcpu)
 			goto again;
 		goto success;
@@ -524,7 +523,7 @@ success:
 
 	/* Try to pause ~once~ */
 	task_pause();
-	if (ATOMIC_CMPXCH(self->sb_writer, NULL, me))
+	if (atomic_cmpxch(&self->sb_writer, NULL, me))
 		goto success;
 	/* Cannot acquire lock (just write the message without syncing) */
 }
@@ -533,10 +532,10 @@ LOCAL NOBLOCK void
 NOTHROW(FCALL syslog_buffer_release)(struct syslog_buffer *__restrict self,
                                      struct syslog_buffer_lock *__restrict lock) {
 	if (lock->sb_caller != NULL)
-		ATOMIC_WRITE(self->sb_writer, NULL);
+		atomic_write(&self->sb_writer, NULL);
 	if (!(lock->sb_flags & TASK_FKEEPCORE)) {
 		struct task *caller = THIS_TASK;
-		ATOMIC_AND(caller->t_flags, ~TASK_FKEEPCORE);
+		atomic_and(&caller->t_flags, ~TASK_FKEEPCORE);
 	}
 }
 

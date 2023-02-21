@@ -28,8 +28,6 @@
 
 #ifdef LIBVIO_CONFIG_ENABLED
 #ifndef __KERNEL__
-
-#include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/sched/atomic-rwlock.h>
 

@@ -32,12 +32,12 @@
 #include <sched/rpc.h>
 #include <sched/sig.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
 
 #include <kos/except.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -92,12 +92,12 @@ NOTHROW(PRPC_EXEC_CALLBACK_CC task_setcomm_rpcfun)(struct rpc_context *__restric
 	REF struct task_setcomm_rpc *me;
 	me = (REF struct task_setcomm_rpc *)cookie;
 	if (ctx->rc_context == RPC_REASONCTX_SHUTDOWN) {
-		ATOMIC_WRITE(me->tscr_state, TASK_SETCOMM_RPC_ST_DEAD);
-	} else if (ATOMIC_CMPXCH(me->tscr_state,
+		atomic_write(&me->tscr_state, TASK_SETCOMM_RPC_ST_DEAD);
+	} else if (atomic_cmpxch(&me->tscr_state,
 	                         TASK_SETCOMM_RPC_ST_PENDING,
 	                         TASK_SETCOMM_RPC_ST_WORKING)) {
 		task_setcomm(me->tscr_name);
-		ATOMIC_WRITE(me->tscr_state, TASK_SETCOMM_RPC_ST_DONE);
+		atomic_write(&me->tscr_state, TASK_SETCOMM_RPC_ST_DONE);
 	}
 	sig_broadcast(&me->tscr_done);
 	decref(me);
@@ -152,12 +152,12 @@ task_setcomm_of(struct task *__restrict self, char const *__restrict name)
 	FINALLY_DECREF(rpc);
 	TRY {
 		task_waitwhile(&rpc->tscr_done,
-		               (status = ATOMIC_READ(rpc->tscr_state),
+		               (status = atomic_read(&rpc->tscr_state),
 		                status == TASK_SETCOMM_RPC_ST_PENDING ||
 		                status == TASK_SETCOMM_RPC_ST_WORKING));
 	} EXCEPT {
 		/* Try to abort the rename operation. */
-		if (!ATOMIC_CMPXCH(rpc->tscr_state,
+		if (!atomic_cmpxch(&rpc->tscr_state,
 		                   TASK_SETCOMM_RPC_ST_PENDING,
 		                   TASK_SETCOMM_RPC_ST_DEAD) &&
 		    was_thrown(E_INTERRUPT_USER_RPC))
@@ -169,7 +169,7 @@ task_setcomm_of(struct task *__restrict self, char const *__restrict name)
 	return status == TASK_SETCOMM_RPC_ST_DONE;
 force_wait_for:
 	task_waitwhile_norpc_small(&rpc->tscr_done,
-	                           (status = ATOMIC_READ(rpc->tscr_state),
+	                           (status = atomic_read(&rpc->tscr_state),
 	                            status == TASK_SETCOMM_RPC_ST_WORKING));
 	return true;
 }

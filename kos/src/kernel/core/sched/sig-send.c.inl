@@ -264,7 +264,7 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_cleanup_nopr)(struct sig *__restrict sel
 	 * Solution: Instead of implementing sig_broadcast() as
 	 *           `while (try_broadcast_one()) ++result',
 	 *           implement it as this instead:
-	 *           recv = ATOMIC_XCH(self->s_con, SMP_LOCK);
+	 *           recv = atomic_xch(&self->s_con, SMP_LOCK);
 	 *           while (recv) { next = ...; broadcast_to(...); ++result; recv = next; }
 	 */
 	struct task_connection *next;
@@ -316,7 +316,7 @@ again_disable_preemption:
 	 * off is still  required so that  the connections-exist check  is
 	 * interlocked with preemption being off). */
 #if !defined(__OPTIMIZE_SIZE__) && !defined(LOCAL_HAVE_NOPREEMPT)
-	if (!ATOMIC_READ(self->s_con)) {
+	if (!atomic_read(&self->s_con)) {
 		LOCAL_exec_cleanup();
 #ifdef LOCAL_HAVE_BROADCAST
 		return result;
@@ -331,7 +331,7 @@ again_disable_preemption:
 #ifdef CONFIG_NO_SMP
 again:
 #endif /* CONFIG_NO_SMP */
-	con = ATOMIC_READ(self->s_con);
+	con = atomic_read(&self->s_con);
 	if (!con) {
 #if !defined(CONFIG_NO_SMP) || defined(LOCAL_HAVE_TARGET_THREAD)
 done_exec_cleanup:
@@ -353,16 +353,16 @@ done_exec_cleanup:
 		goto again_disable_preemption;
 	}
 	/* Acquire the SMP-lock and validate that `con' is still correct. */
-	if (!ATOMIC_CMPXCH_WEAK(self->s_con, con,
+	if (!atomic_cmpxch_weak(&self->s_con, con,
 	                        sig_smplock_set(con)))
 		goto again_disable_preemption;
 	con = sig_smplock_set(con);
 	__IF0 {
 again:
-		con = ATOMIC_READ(self->s_con);
+		con = atomic_read(&self->s_con);
 		assert(sig_smplock_tst(con));
 		if (!sig_smplock_clr(con)) {
-			if (!ATOMIC_CMPXCH_WEAK(self->s_con, con, 0))
+			if (!atomic_cmpxch_weak(&self->s_con, con, 0))
 				goto again;
 			goto done_exec_cleanup;
 		}
@@ -382,9 +382,9 @@ again_select_receiver:
 	 * The later must be done  to ensure that the  signal isn't broadcast again  until
 	 * we're done, so-as to ensure that auto-re-prime completion callbacks are invoked
 	 * for every time they are selected as signal targets. */
-	if (!ATOMIC_CMPXCH_WEAK(self->s_con, con,
+	if (!atomic_cmpxch_weak(&self->s_con, con,
 	                        sig_smplock_set(receiver->tc_signext))) {
-		con = ATOMIC_READ(self->s_con);
+		con = atomic_read(&self->s_con);
 		assert(sig_smplock_tst(con));
 		assert(sig_smplock_clr(con) != NULL);
 		goto again_select_receiver;
@@ -393,7 +393,7 @@ again_select_receiver:
 	/* Acquire a lock to `receiver' */
 #ifndef CONFIG_NO_SMP
 again_read_target_cons:
-	target_cons = ATOMIC_READ(receiver->tc_cons);
+	target_cons = atomic_read(&receiver->tc_cons);
 
 	/* NOTE: Waiting until we can lock the connection here is allowed, since
 	 *       you're allowed to  (and required to)  acquire connection  locks
@@ -404,16 +404,16 @@ again_read_target_cons:
 	 * which it will because we're already holding that one! */
 	while (unlikely((uintptr_t)target_cons & TASK_CONNECTION_STAT_FLOCK)) {
 		task_pause();
-		target_cons = ATOMIC_READ(receiver->tc_cons);
+		target_cons = atomic_read(&receiver->tc_cons);
 	}
 
 	/* Mark the receiver for broadcast, and acquire a lock to it. */
-	if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,
+	if (!atomic_cmpxch_weak(&receiver->tc_cons, target_cons,
 	                        (struct task_connections *)(TASK_CONNECTION_STAT_BROADCAST |
 	                                                    TASK_CONNECTION_STAT_FLOCK_OPT)))
 		goto again_read_target_cons;
 #else /* !CONFIG_NO_SMP */
-	target_cons = ATOMIC_XCH(receiver->tc_cons,
+	target_cons = atomic_xch(&receiver->tc_cons,
 	                         (struct task_connections *)TASK_CONNECTION_STAT_BROADCAST);
 #endif /* CONFIG_NO_SMP */
 
@@ -422,7 +422,7 @@ again_read_target_cons:
 #ifndef CONFIG_NO_SMP
 	assert(!sig_smplock_tst(next));
 #endif /* !CONFIG_NO_SMP */
-	ATOMIC_WRITE(self->s_con, sig_smplock_set(next));
+	atomic_write(&self->s_con, sig_smplock_set(next));
 
 	/* Deal with special connections. */
 	if (TASK_CONNECTION_STAT_ISSPEC(target_cons)) {
@@ -448,8 +448,8 @@ again_read_target_cons:
 	target_cons = TASK_CONNECTION_STAT_ASCONS(target_cons);
 
 	/* Try to set our signal as the one delivered to `target_cons'. */
-	if (!ATOMIC_CMPXCH(target_cons->tcs_dlvr, NULL, LOCAL_sender)) {
-		ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+	if (!atomic_cmpxch(&target_cons->tcs_dlvr, NULL, LOCAL_sender)) {
+		atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
 		goto again;
 	}
 
@@ -460,13 +460,13 @@ again_read_target_cons:
 	/* Wake-up the thread attached to the connection */
 	{
 		REF struct task *thread;
-		thread = xincref(ATOMIC_READ(target_cons->tcs_thread));
-		ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+		thread = xincref(atomic_read(&target_cons->tcs_thread));
+		atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
 		if likely(thread) {
 #ifdef CONFIG_NO_SMP
 			if (!next)
 #else /* CONFIG_NO_SMP */
-			if (!next && ATOMIC_CMPXCH(self->s_ctl, SIG_CONTROL_SMPLOCK, 0))
+			if (!next && atomic_cmpxch(&self->s_ctl, SIG_CONTROL_SMPLOCK, 0))
 #endif /* !CONFIG_NO_SMP */
 			{
 				/* Special  case: No other  remaining signals. - In  this case, do the
@@ -484,7 +484,7 @@ again_read_target_cons:
 
 			/* Only destroy dead threads _after_ we've released the SMP-lock to `self' */
 			assert(thread->t_refcnt >= 1);
-			if unlikely(ATOMIC_FETCHDEC(thread->t_refcnt) == 1) {
+			if unlikely(atomic_fetchdec(&thread->t_refcnt) == 1) {
 				sig_destroylater_next(thread) = NULL;
 				result += sig_intern_broadcast(self,
 				                               LOCAL_sender,
@@ -513,15 +513,15 @@ again_read_target_cons:
 	 *       than a single connection  matching those requirements to  begin
 	 *       with! */
 again_read_target_cons:
-	target_cons = ATOMIC_READ(receiver->tc_cons);
+	target_cons = atomic_read(&receiver->tc_cons);
 #ifndef CONFIG_NO_SMP
 	while (unlikely((uintptr_t)target_cons & TASK_CONNECTION_STAT_FLOCK)) {
 		task_pause();
-		target_cons = ATOMIC_READ(receiver->tc_cons);
+		target_cons = atomic_read(&receiver->tc_cons);
 	}
 #endif /* !CONFIG_NO_SMP */
 	if (TASK_CONNECTION_STAT_ISSPEC(target_cons) ||
-	    ATOMIC_READ(TASK_CONNECTION_STAT_ASCONS(target_cons)->tcs_thread) != target) {
+	    atomic_read(&TASK_CONNECTION_STAT_ASCONS(target_cons)->tcs_thread) != target) {
 		receiver = receiver->tc_signext;
 		if (!receiver)
 			goto done_exec_cleanup; /* No receiver found... */
@@ -561,7 +561,7 @@ again_read_target_cons:
 
 	/* Acquire a lock to `receiver' */
 again_read_target_cons:
-	target_cons = ATOMIC_READ(receiver->tc_cons);
+	target_cons = atomic_read(&receiver->tc_cons);
 
 #ifndef CONFIG_NO_SMP
 	/* NOTE: Waiting until we can lock the connection here is allowed, since
@@ -573,7 +573,7 @@ again_read_target_cons:
 	 * which it will because we're already holding that one! */
 	while (unlikely((uintptr_t)target_cons & TASK_CONNECTION_STAT_FLOCK)) {
 		task_pause();
-		target_cons = ATOMIC_READ(receiver->tc_cons);
+		target_cons = atomic_read(&receiver->tc_cons);
 	}
 #endif /* !CONFIG_NO_SMP */
 
@@ -582,18 +582,18 @@ again_read_target_cons:
 		assert(!TASK_CONNECTION_STAT_ISDEAD(target_cons));
 		if unlikely(TASK_CONNECTION_STAT_ISDONE(target_cons)) {
 			/* The target is already dead. (change it to broadcast) */
-			if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,
+			if (!atomic_cmpxch_weak(&receiver->tc_cons, target_cons,
 			                        (struct task_connections *)(TASK_CONNECTION_STAT_BROADCAST |
 			                                                    TASK_CONNECTION_STAT_FLOCK_OPT)))
 				goto again_read_target_cons;
 			task_connection_unlink_from_sig(self, receiver);
 #if TASK_CONNECTION_STAT_FLOCK_OPT != 0
-			ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+			atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
 #endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
 			goto again;
 		}
 		/* Signal completion callback. */
-		if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,
+		if (!atomic_cmpxch_weak(&receiver->tc_cons, target_cons,
 		                        (struct task_connections *)(TASK_CONNECTION_STAT_BROADCAST |
 		                                                    LOCAL_TASK_CONNECTION_STAT_FFINI |
 		                                                    TASK_CONNECTION_STAT_FLOCK_OPT)))
@@ -627,7 +627,7 @@ again_read_target_cons:
 
 		/* Special case: poll-based connections don't (really) count.
 		 * Instead, those get marked for broadcast. */
-		if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,
+		if (!atomic_cmpxch_weak(&receiver->tc_cons, target_cons,
 		                        (struct task_connections *)(TASK_CONNECTION_STAT_BROADCAST |
 		                                                    TASK_CONNECTION_STAT_FLOCK_OPT)))
 			goto again_read_target_cons;
@@ -638,17 +638,17 @@ again_read_target_cons:
 
 		/* Set the delivered signal, and capture
 		 * the thread  thread, if  there is  one */
-		if (ATOMIC_CMPXCH(target_cons->tcs_dlvr, NULL, LOCAL_sender))
-			thread = xincref(ATOMIC_READ(target_cons->tcs_thread));
+		if (atomic_cmpxch(&target_cons->tcs_dlvr, NULL, LOCAL_sender))
+			thread = xincref(atomic_read(&target_cons->tcs_thread));
 
 		/* Unlock the connection. */
-		ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+		atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
 		if (thread) {
 			LOCAL_task_wake(thread);
 
 			/* Only destroy dead threads _after_ we've released the SMP-lock to `self' */
 			assert(thread->t_refcnt >= 1);
-			if unlikely(ATOMIC_FETCHDEC(thread->t_refcnt) == 1) {
+			if unlikely(atomic_fetchdec(&thread->t_refcnt) == 1) {
 				sig_destroylater_next(thread) = NULL;
 				return sig_intern_send(self,
 				                       LOCAL_sender,
@@ -663,16 +663,16 @@ again_read_target_cons:
 	}
 
 	/* Mark the receiver as sent, and acquire a lock to it. */
-	if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,
+	if (!atomic_cmpxch_weak(&receiver->tc_cons, target_cons,
 	                        (struct task_connections *)(TASK_CONNECTION_STAT_SENT |
 	                                                    TASK_CONNECTION_STAT_FLOCK_OPT)))
 		goto again_read_target_cons;
 
 	/* Set the signal sender as being delivered for the target connection set. */
-	if (!ATOMIC_CMPXCH(target_cons->tcs_dlvr, NULL, LOCAL_sender)) {
+	if (!atomic_cmpxch(&target_cons->tcs_dlvr, NULL, LOCAL_sender)) {
 		/* Unlink the signal, and mark it as broadcast. */
 		task_connection_unlink_from_sig(self, receiver);
-		ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+		atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
 		goto again;
 	}
 	sig_smplock_release_nopr(self);
@@ -681,9 +681,9 @@ again_read_target_cons:
 	 * and now we must wake-up the connected thread (if any) */
 	{
 		REF struct task *thread;
-		thread = xincref(ATOMIC_READ(target_cons->tcs_thread));
+		thread = xincref(atomic_read(&target_cons->tcs_thread));
 #if TASK_CONNECTION_STAT_FLOCK_OPT != 0
-		ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_SENT);
+		atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_SENT);
 #endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
 		LOCAL_exec_cleanup();
 		LOCAL_preemption_pop();

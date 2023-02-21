@@ -41,7 +41,6 @@
 #include <sched/task.h>
 
 #include <hybrid/__assert.h>
-#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/bsearch.h>
 
@@ -49,6 +48,7 @@
 #include <kos/nopf.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -1260,7 +1260,7 @@ do_create_far_region:
 		region->mr_addrhi = (byte_t *)addr + access_bytes - 1;
 		region->mr_part   = part; /* Inherit reference */
 		region->mr_vers = 0;
-		if (ATOMIC_READ(part->mp_meta) != NULL) {
+		if (atomic_read(&part->mp_meta) != NULL) {
 			/* Check for non-zero version counter. */
 			struct mpartmeta *ftx;
 			TRY {
@@ -1270,7 +1270,7 @@ do_create_far_region:
 				decref(part);
 				RETHROW();
 			}
-			ftx = ATOMIC_READ(part->mp_meta);
+			ftx = atomic_read(&part->mp_meta);
 			if likely(ftx != NULL)
 				region->mr_vers = ftx->mpm_rtm_vers;
 			mpart_lock_release(part);
@@ -1590,7 +1590,7 @@ again_allocate_ftx_controller_for_part:
 					if (!rtm_memory_region_waschanged_and_no_farregion(region))
 						continue; /* Not needed */
 					part = rtm_memory_region_getpart(region);
-					if (ATOMIC_READ(part->mp_meta))
+					if (atomic_read(&part->mp_meta))
 						continue; /* Already allocated */
 					/* Allocate another controller for this one! */
 					goto again_allocate_ftx_controller_for_part;

@@ -41,7 +41,6 @@
 #include <sched/sigmask.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
 #include <hybrid/typecore.h>
 #include <hybrid/unaligned.h>
@@ -53,6 +52,7 @@
 #include <sys/param.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <signal.h>
@@ -207,7 +207,7 @@ usersigmask_ismasked_chk(signo_t signo) THROWS(E_SEGFAULT) {
 	mask = __sigset_mask(signo);
 
 	/* First user-space memory access: read our current signal mask. */
-	usigset = ATOMIC_READ(umask->pm_sigmask);
+	usigset = atomic_read(&umask->pm_sigmask);
 
 	/* Make sure that the user-space pointer is valid. */
 	validate_readable(usigset, sizeof(sigset_t));
@@ -219,9 +219,9 @@ usersigmask_ismasked_chk(signo_t signo) THROWS(E_SEGFAULT) {
 	if (result) {
 		/* The is the signal is masked, we must tell user-space that we've
 		 * checked, and  that the  signal may  be pending  at this  point. */
-		if ((ATOMIC_READ(umask->pm_pending.__val[word]) & mask) == 0) {
-			ATOMIC_OR(umask->pm_pending.__val[word], mask);
-			ATOMIC_OR(umask->pm_flags, USERPROCMASK_FLAG_HASPENDING);
+		if ((atomic_read(&umask->pm_pending.__val[word]) & mask) == 0) {
+			atomic_or(&umask->pm_pending.__val[word], mask);
+			atomic_or(&umask->pm_flags, USERPROCMASK_FLAG_HASPENDING);
 			printk(KERN_DEBUG "[userprocmask:%p] Mark signal %d as pending\n",
 			       umask, signo);
 		}
@@ -477,7 +477,7 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
 #endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 {
 	int result;
-	uintptr_t thread_flags = ATOMIC_READ(self->t_flags);
+	uintptr_t thread_flags = atomic_read(&self->t_flags);
 #ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	if (thread_flags & (TASK_FVFORK | TASK_FUSERPROCMASK))
 #else /* CONFIG_HAVE_KERNEL_USERPROCMASK */
@@ -547,7 +547,7 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
 		 *       This is doable, since the  only way to change that  value is through use  of
 		 *       the set_tid_address(2) or set_userprocmask_address(2)
 		 *   - With this, we'd be able to safely do:
-		 *     ATOMIC_READ(FORTASK(self,   this_userprocmask_address)->pm_sigmask)
+		 *     atomic_read(&FORTASK(self,  this_userprocmask_address)->pm_sigmask)
 		 *     Note though that since this is a user-space memory access, we  also
 		 *     need  to deal  with VIO, meaning  that whatever is  used to prevent
 		 *     the thread from changing `FORTASK(self, this_userprocmask_address)'
@@ -576,7 +576,7 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
 		 *     pending-signal-set)
 		 */
 		result = SIGMASK_ISMASKED_NOPF_FAULT;
-		if (ATOMIC_READ(self->t_cpu) == THIS_CPU) {
+		if (atomic_read(&self->t_cpu) == THIS_CPU) {
 			/* When `self' is running on the same CPU as we are, then we can
 			 * try  to gain  insight into  their user-space  memory state by
 			 * disabling preemption, temporarily switching page directories,
@@ -584,7 +584,7 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
 			preemption_flag_t was;
 			preemption_pushoff(&was);
 			/* Check again, now that our CPU won't change. */
-			if likely(ATOMIC_READ(self->t_cpu) == THIS_CPU)
+			if likely(atomic_read(&self->t_cpu) == THIS_CPU)
 				result = sigmask_ismasked_in_userprocmask_nopf(self, signo);
 			preemption_pop(&was);
 		}
@@ -685,7 +685,7 @@ NOTHROW(FCALL sigmask_prepare_sigsuspend)(void) {
 	/* Indicate that we want to receive wake-ups for masked signals.
 	 * NOTE: We also set the RPC flag in case there are pending
 	 *       RPCs  that would normally be considered as masked! */
-	ATOMIC_OR(me->t_flags, (TASK_FWAKEONMSKRPC | TASK_FRPC));
+	atomic_or(&me->t_flags, (TASK_FWAKEONMSKRPC | TASK_FRPC));
 
 	/* This will clear `TASK_FWAKEONMSKRPC', as well as
 	 * perform a check for signals not in `these' which
@@ -725,14 +725,14 @@ NOTHROW(FCALL sigmask_prepare_sigsuspend)(void) {
 		struct pending_rpc *rpcs;
 		/* NOTE: No need to steal pending  RPCs. -- These are private  to
 		 *       our thread, and while other  threads are allowed to  add
-		 *       more (hence the  ATOMIC_READ from the  list head),  only
+		 *       more (hence the  atomic_read from the  list head),  only
 		 *       we are allowed to remove them, meaning that we know that
 		 *       (other than the list head), none of the pointers between
 		 *       elements can change.
 		 * Also note that in case another thread adds a new RPC, it will
 		 * come  without the INACTIVE  flag, so it'll  already be in the
 		 * state we want all of our RPCs to be in! */
-		rpcs = ATOMIC_READ(FORTASK(me, this_rpcs.slh_first));
+		rpcs = atomic_read(&FORTASK(me, this_rpcs.slh_first));
 		assertf(rpcs != THIS_RPCS_TERMINATED, "How did we get here from task_exit()?");
 		for (; rpcs; rpcs = SLIST_NEXT(rpcs, pr_link))
 			rpcs->pr_flags &= ~_RPC_CONTEXT_INACTIVE;

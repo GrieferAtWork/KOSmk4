@@ -27,8 +27,7 @@
 #include <kernel/rand.h>
 #include <kernel/types.h>
 
-#include <hybrid/atomic.h>
-
+#include <atomic.h>
 #include <stddef.h>
 
 DECL_BEGIN
@@ -50,10 +49,10 @@ PUBLIC NOBLOCK WUNUSED ATTR_LEAF u32
 NOTHROW(KCALL krand32)(void) {
 	u32 old_seed, new_seed;
 	do {
-		new_seed = old_seed = ATOMIC_READ(krand_seed);
+		new_seed = old_seed = atomic_read(&krand_seed);
 		new_seed = (((new_seed + 7) << 1) / 3);
 		new_seed ^= rand_map[(new_seed >> (new_seed & 7)) % lengthof(rand_map)];
-	} while (!ATOMIC_CMPXCH_WEAK(krand_seed, old_seed, new_seed));
+	} while (!atomic_cmpxch_weak(&krand_seed, old_seed, new_seed));
 	return old_seed;
 }
 

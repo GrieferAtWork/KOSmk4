@@ -32,8 +32,7 @@
 #include <sched/rpc.h>
 #include <sched/task.h>
 
-#include <hybrid/atomic.h>
-
+#include <atomic.h>
 #include <signal.h> /* SIGTRAP */
 #include <stddef.h>
 
@@ -103,7 +102,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL GDBServer_Init(void) {
 		GDBServer_FallbackHost = task_alloc(&mman_kernel);
 //		task_setup_kernel(GDBServer_FallbackHost, (thread_main_t)&GDBFallbackHost_Main, 0); /* TODO */
 		/* Set the Stopped flag to that the fallback-host can't be stopped by GDB. */
-		ATOMIC_OR(GDBServer_FallbackHost->t_flags, TASK_FGDB_STOPPED);
+		atomic_or(&GDBServer_FallbackHost->t_flags, TASK_FGDB_STOPPED);
 		task_start(GDBServer_FallbackHost, TASK_START_FNORMAL);
 
 		printk(FREESTR(KERN_INFO "[gdb] Wait for remote to attach itself\n"));
@@ -111,9 +110,9 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL GDBServer_Init(void) {
 		 * For this purpose, keep waiting on the GDB host to become
 		 * unlocked until the `GDB_SERVER_FEATURE_ATTACHED' feature
 		 * becomes set. */
-		while (!(ATOMIC_READ(GDBServer_Features) & GDB_SERVER_FEATURE_ATTACHED)) {
+		while (!(atomic_read(&GDBServer_Features) & GDB_SERVER_FEATURE_ATTACHED)) {
 			task_connect_for_poll(&GDBServer_HostUnlocked);
-			if (ATOMIC_READ(GDBServer_Features) & GDB_SERVER_FEATURE_ATTACHED) {
+			if (atomic_read(&GDBServer_Features) & GDB_SERVER_FEATURE_ATTACHED) {
 				task_disconnectall();
 				break;
 			}
@@ -133,7 +132,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL GDBServer_Init(void) {
 		 * #2:fork(): [1:kernel] -> [1:kernel,7fffffff:kernel]
 		 * #3:exec(): [1:kernel,7fffffff:kernel] -> [1:/bin/init,7fffffff:kernel]
 		 */
-		ATOMIC_OR(GDBServer_Features, GDB_SERVER_FEATURE_SHOWKERNEL);
+		atomic_or(&GDBServer_Features, GDB_SERVER_FEATURE_SHOWKERNEL);
 		{
 			struct debugtrap_reason r;
 			r.dtr_signo  = SIGTRAP;

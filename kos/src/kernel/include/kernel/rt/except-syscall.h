@@ -283,7 +283,7 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * >>
  * >>     // Atomically enable use of the new, updated mask
  * >>     // From this point forth, signals sent to our thread will be masked by `newset'
- * >>     ATOMIC_WRITE(mymask.pm_sigmask, newset);
+ * >>     atomic_write(&mymask.pm_sigmask, newset);
  * >>     COMPILER_BARRIER();
  * >>
  * >>     // Optimization: If we know that no signal became unmasked, we don't
@@ -310,7 +310,7 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * >>             // have been directed at our process as a whole, and another thread
  * >>             // may have already handled it.
  * >>             sigemptyset(&mymask.pm_pending);
- * >>             ATOMIC_AND(mymask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
+ * >>             atomic_and(&mymask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
  * >>
  * >>             // Handle all async (== sysret) RPCs (and thus posix signals)
  * >>             sys_rpc_serve_sysret();
