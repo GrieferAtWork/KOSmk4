@@ -460,11 +460,13 @@ extern void (__cdecl _ReadWriteBarrier)(void);
 #ifndef _RELEASE
 #define _RELEASE RELEASE
 #endif /* !_RELEASE */
+#ifndef __OPTIMIZE__
 #if (_RELEASE+0) >= 1
 #define __OPTIMIZE__ _RELEASE
 #else /* (_RELEASE+0) >= 1 */
 #define __OPTIMIZE__ 3
 #endif /* (_RELEASE+0) < 1 */
+#endif /* !__OPTIMIZE__ */
 #endif /* RELEASE || _RELEASE */
 
 #ifdef _NATIVE_WCHAR_T_DEFINED
