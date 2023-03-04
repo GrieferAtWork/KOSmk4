@@ -118,7 +118,7 @@ local final LOG_END_MARKER    = "<";
 local final LOG_UPDATE_MARKER = "~";
 
 
-local final JOIN_WAIT_DELAY = 100000;
+local final JOIN_WAIT_DELAY = time.milliseconds(100);
 
 @@The absolute path of the directory containing the primary deemon script
 global final ROOTDIR: string =

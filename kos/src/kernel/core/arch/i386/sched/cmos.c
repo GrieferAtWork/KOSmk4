@@ -1,7 +1,7 @@
 /*[[[magic
 local deemon = import("deemon");
 local macros = options.setdefault("COMPILE.macros", deemon.Dict(()));
-macros["__DATE_YEAR__"] = str(import("time").Time.now().year)[#"Years ":];
+macros["__DATE_YEAR__"] = str(import("time").Time.now().year).lsstrip("Years ");
 ]]]*/
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
