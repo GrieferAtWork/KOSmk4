@@ -71,14 +71,14 @@ typedef int re_errno_t;
  *     >> "\\"                   REOP_BYTE '\'
  *     >> "\<x>"                 REOP_BYTE 'x'            (caution: many characters here have special meaning!)
  *     >> "[a-z]"                REOP_BITSET "[a-z]"      (NOTE: multi-byte utf-8 characters are encoded using `REOP_CONTAINS_UTF8')
- *     >> "[^a-z]"               REOP_BITSET_NOT "[a-z]"  (NOTE: multi-byte utf-8 characters are encoded using `REOP_NCONTAINS_UTF8')
+ *     >> "[^a-z]"               REOP_BITSET "^[a-z]"     (NOTE: multi-byte utf-8 characters are encoded using `REOP_NCONTAINS_UTF8')
  *     >> "\<1-9>"               REOP_GROUP_MATCH <1-9>   // Replaced by `REOP_GROUP_MATCH_Jn' if followed by a repeat-suffix
  *     >> "\w"                   <[[:symcont:]]>          (HINT: Also allowed in []-sets when RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS && !RE_SYNTAX_NO_KOS_OPS)
  *     >> "\W"                   <[^[:symcont:]]>
  *     >> "\n"                   <[[:lf:]]>               (HINT: Also allowed in []-sets when RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)     [kos-extension]
  *     >> "\N"                   <[^[:lf:]]>                                                                                           [kos-extension]
- *     >> "[[:<foo>:]]"          REOP_UTF8_IS<foo>                                                                                     [some classes are kos extensions]
- *     >> "[^[:<foo>:]]"         REOP_UTF8_IS<foo>_NOT                                                                                 [kos-extension]
+ *     >> "[[:<foo>:]]"          REOP_CS_UTF8 RECS_IS<foo>   | REOP_BITSET [...]                                                       [some classes are kos extensions]
+ *     >> "[^[:<foo>:]]"         REOP_NCS_UTF8 RECS_IS<foo>  | REOP_BITSET [...]                                                       [kos-extension]
  *     >> "\s"                   <[[:space:]]>            (HINT: Also allowed in []-sets when RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)
  *     >> "\S"                   <[^[:space:]]>
  *     >> "\d"                   <[[:digit:]]>            (HINT: Also allowed in []-sets when RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)     [python-extension]
@@ -89,8 +89,6 @@ typedef int re_errno_t;
  *     >> "\UABCDABCD"           REOP_EXACT "\UABCDABCD"  (utf-8 encoded)                                                              [kos-extension]
  *     >> "\u{1234 5689}"        REOP_EXACT "\u1234\u5689" (utf-8 encoded)                                                             [unicode-extension] (TODO)
  *     >> "[\u{1234 5689}]"      <[\u1234\u5689]>         (utf-8 encoded)                                                              [unicode-extension]
- *
- * [1]: <OP> is one of "=" (or "=="), "!=", "<", "<=", ">", ">="
  *
  * Location assertion (note: it is a syntax error to use these before repetition expressions):
  *     >> "^"            REOP_AT_SOL

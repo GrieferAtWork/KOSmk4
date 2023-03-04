@@ -148,6 +148,20 @@ union iconv_decode_data {
 		__uint8_t ue_chr;  /* In `_ICONV_DECODE_URI_PCT_1': already-parsed hex nibble, shifted left by 4 */
 	} idd_uri; /* uri-escape */
 
+	struct {
+#define _ICONV_DECODE_BASE64_T0      0 /* Expecting first 6-bit character of triple  (......11 11112222 22333333) */
+#define _ICONV_DECODE_BASE64_T6      1 /* Expecting second 6-bit character of triple (AAAAAA.. ....2222 22333333) */
+#define _ICONV_DECODE_BASE64_T12     2 /* Expecting third 6-bit character of triple  (AAAAAABB BBBB.... 22333333) (byte "AAAAAABB" was already emit) */
+#define _ICONV_DECODE_BASE64_T18     3 /* Expecting fourth 6-bit character of triple (AAAAAABB BBBBCCCC CC......) (byte "BBBBCCCC" was already emit) */
+#define _ICONV_DECODE_BASE64_T18_1   4 /* Expecting fourth 6-bit character of triple (AAAAAABB BBBBCCCC CC......) (byte "BBBBCCCC" was NOT emit because it is a NUL-byte) */
+#define _ICONV_DECODE_BASE64_TEQ_1_1 5 /* Check for 1/1 '=' to undo 0-1 pending NUL-bytes; if next char isn't '=', emit 1 NUL-byte and treat like `_ICONV_DECODE_BASE64_T0'; else, set state `_ICONV_DECODE_BASE64_EOF' */
+#define _ICONV_DECODE_BASE64_TEQ_2_1 6 /* Check for 1/2 '=' to undo 0-2 pending NUL-bytes; if next char isn't '=', emit 1 NUL-byte and treat like `_ICONV_DECODE_BASE64_T0' */
+#define _ICONV_DECODE_BASE64_TEQ_2_2 6 /* Check for 2/2 '=' to undo 1-2 pending NUL-bytes; if next char isn't '=', refuse to consume it and emit 1 NUL-byte, then set `_ICONV_DECODE_BASE64_EOF'; else: consume '=' and set `_ICONV_DECODE_BASE64_EOF' */
+#define _ICONV_DECODE_BASE64_EOF     7 /* End-of-file (refuse to parse further input) */
+		__uint8_t b64_state;     /* Current state machine mode (one of `_ICONV_DECODE_URI_*') */
+		__uint8_t b64_chrs[3];  /* Pending characters (for `_ICONV_DECODE_BASE64_T*' states, up to 3 characters of base64 input) */
+	} idd_base64; /* base64-escape */
+
 	__uint8_t idd_hex; /* For "hex": 0x00-0xf0 when parsing the second nibble; 0x01 when parsing the first. */
 
 	struct {
@@ -193,6 +207,15 @@ union iconv_encode_data {
 				struct iconv_stateful_encode_range const *sf_encode_ranges; /* [1..1][const][== iconv_stateful_codepage__isc_encode_ranges(sf_cp)] */
 				struct iconv_stateful_2char_encode const *sf_2char;         /* [1..1][valid_if(_ICONV_ENCODE_STATEFUL_DB_2CH)] */
 			} ied_stateful; /* stateful codecs: ibm(930|933|935|937|939|1364|1371|1388|1390|1399) */
+
+			struct {
+#define _ICONV_ENCODE_BASE64_PEND_DATA 0x3f /* Mask of pending bits (starting at most significant bit) */
+#define _ICONV_ENCODE_BASE64_PEND_SIZE 0xc0 /* # of pending bits, divided by 2 (meaning 0, 2, 4 or 6) */
+#define _ICONV_ENCODE_BASE64_PEND_S0   0x00 /* 0 pending bits */
+#define _ICONV_ENCODE_BASE64_PEND_S2   0x40 /* 2 pending bits */
+#define _ICONV_ENCODE_BASE64_PEND_S4   0x80 /* 4 pending bits */
+				__uint8_t b64_pend; /* Pending byte */
+			} ied_base64; /* base64-encode */
 
 			__BOOL ied_utf_bom_printed; /* True if the UTF* BOM was printed. */
 		};
@@ -558,10 +581,10 @@ __NOTHROW_NCX(iconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict self
  * Simply  call this once you're out of input  and treat its return value like you're
  * treating the return values of the input printer returned by `iconv_encode_init(3)' */
 typedef __ATTR_NONNULL_T((1)) __ssize_t
-__NOTHROW_NCX_T(LIBICONV_CC *PICONV_ENCODE_FLUSH)(struct iconv_encode *__restrict self);
+(LIBICONV_CC *PICONV_ENCODE_FLUSH)(struct iconv_encode *__restrict self);
 #ifdef LIBICONV_WANT_PROTOTYPES
-LIBICONV_DECL __ATTR_NONNULL((1)) __ssize_t
-__NOTHROW_NCX(LIBICONV_CC iconv_encode_flush)(struct iconv_encode *__restrict self);
+LIBICONV_DECL __ATTR_NONNULL((1)) __ssize_t LIBICONV_CC
+iconv_encode_flush(struct iconv_encode *__restrict self);
 #endif /* LIBICONV_WANT_PROTOTYPES */
 
 /* Check if UTF-8 input taken by the given encoder is in its default (zero) shift
