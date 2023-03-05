@@ -99,7 +99,8 @@
  */
 
 
-import ipc, fs, time;
+import ipc, fs;
+import * from time;
 import * from deemon;
 import * from errors;
 
@@ -118,7 +119,7 @@ local final LOG_END_MARKER    = "<";
 local final LOG_UPDATE_MARKER = "~";
 
 
-local final JOIN_WAIT_DELAY = time.milliseconds(100);
+local final JOIN_WAIT_DELAY = milliseconds(100);
 
 @@The absolute path of the directory containing the primary deemon script
 global final ROOTDIR: string =
@@ -225,54 +226,16 @@ global final function createDirectoryTree(path: string) {
 
 
 
-local final _lastModfiedTimeCache: {string: time.Time} = Dict();
-global libwin32 = try import("win32") catch (...) none;
-if (!hasattr(libwin32, "CreateFile"))
-	libwin32 = none;
+local final _lastModfiedTimeCache: {string: Time} = Dict();
 
 @@Get the last-modified timestamp for the given @filename
 @@NOTE: This function keeps an internal cache that is volatime
 @@      to   changes   to  the   current   working  directory.
-function getLastModfiedTime(filename: string): time.Time | none {
+function getLastModfiedTime(filename: string): Time | none {
 	local result = _lastModfiedTimeCache.get(filename);
 	if (result is none) {
 		try {
-			if (libwin32 is none) {
-				/* FIXME: fs.stat() isn't as precise as win32.GetFileTime() is.
-				 *        In a perfect world, time.Time() would be able to hold
-				 *        timestamps of infinite precision... */
-				result = fs.stat(filename).st_mtime;
-			} else {
-				/* Hack around a bit to get UNC paths working properly... */
-				local handle = libwin32.CreateFile(
-					lpFileName: filename,
-					dwDesiredAccess: libwin32.FILE_GENERIC_READ,
-					dwCreationDisposition: libwin32.OPEN_EXISTING);
-				if (handle is none) {
-					handle = libwin32.CreateFile(
-						lpFileName: fs.abspath(filename),
-						dwDesiredAccess: libwin32.FILE_GENERIC_READ,
-						dwCreationDisposition: libwin32.OPEN_EXISTING);
-					if (handle is none) {
-						handle = libwin32.CreateFile(
-							lpFileName: r"\\.\" + fs.abspath(filename),
-							dwDesiredAccess: libwin32.FILE_GENERIC_READ,
-							dwCreationDisposition: libwin32.OPEN_EXISTING);
-					}
-				}
-				if (handle is none) {
-					result = none;
-				} else {
-					try {
-						/* GetFileTime() has a precision of 100 nanoseconds (or 0.1 microseconds)
-						 * However, time.Time() only  has microsecond-precision  (so this  method
-						 * is 10x more precise) */
-						result = libwin32.GetFileTime(handle)[2];
-					} finally {
-						libwin32.CloseHandle(handle);
-					}
-				}
-			}
+			result = fs.stat(filename).st_mtime;
 		} catch (...) {
 			result = none;
 		}
@@ -283,13 +246,8 @@ function getLastModfiedTime(filename: string): time.Time | none {
 
 @@Assume that a given file has changed by settings its last-changed field to now()
 function setForceChanged(filename: string, now: Object = none): Object {
-	if (now is none) {
-		if (libwin32 is none) {
-			now = import("time").now();
-		} else {
-			now = (int)import("time").now() * 10;
-		}
-	}
+	if (now is none)
+		now = gmtime();
 	_lastModfiedTimeCache[filename] = now;
 	return now;
 }
@@ -1501,11 +1459,9 @@ class Timed {
 	public member name: string = "Unnamed";
 	private member start;
 	operator enter() {
-		import tick from time;
 		start = tick();
 	}
 	operator leave() {
-		import tick from time;
 		local end = tick();
 		print log: ("Timed: ", name, " took ", (end - start));
 	}
@@ -1521,9 +1477,9 @@ function buildGroups(toolchainsAndGroups: {(Toolchain, {Group...})...}, maxParal
 	return executeBuildSteps(steps, recheck, maxParallelSteps);
 #else
 	local steps, recheck = (
-		with(Timed("orderGroups"))
+		with (Timed("orderGroups"))
 			orderGroups(toolchainsAndGroups)...;
-	with(Timed("executeBuildSteps"))
+	with (Timed("executeBuildSteps"))
 		return executeBuildSteps(steps, recheck, maxParallelSteps);
 #endif
 }

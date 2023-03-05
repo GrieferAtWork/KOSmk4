@@ -1551,7 +1551,7 @@ function ppParse(self: string | UserString | CParser | File): PPBranch {
 			throw;
 		if (self.tokStart !is bound)
 			throw;
-		print repr Traceback.current;
+		print Traceback.current;
 		self.err(e.message);
 	}
 }

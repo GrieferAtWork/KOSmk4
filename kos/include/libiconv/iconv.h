@@ -149,17 +149,17 @@ union iconv_decode_data {
 	} idd_uri; /* uri-escape */
 
 	struct {
-#define _ICONV_DECODE_BASE64_T0      0 /* Expecting first 6-bit character of triple  (......11 11112222 22333333) */
-#define _ICONV_DECODE_BASE64_T6      1 /* Expecting second 6-bit character of triple (AAAAAA.. ....2222 22333333) */
-#define _ICONV_DECODE_BASE64_T12     2 /* Expecting third 6-bit character of triple  (AAAAAABB BBBB.... 22333333) (byte "AAAAAABB" was already emit) */
-#define _ICONV_DECODE_BASE64_T18     3 /* Expecting fourth 6-bit character of triple (AAAAAABB BBBBCCCC CC......) (byte "BBBBCCCC" was already emit) */
-#define _ICONV_DECODE_BASE64_T18_1   4 /* Expecting fourth 6-bit character of triple (AAAAAABB BBBBCCCC CC......) (byte "BBBBCCCC" was NOT emit because it is a NUL-byte) */
-#define _ICONV_DECODE_BASE64_TEQ_1_1 5 /* Check for 1/1 '=' to undo 0-1 pending NUL-bytes; if next char isn't '=', emit 1 NUL-byte and treat like `_ICONV_DECODE_BASE64_T0'; else, set state `_ICONV_DECODE_BASE64_EOF' */
-#define _ICONV_DECODE_BASE64_TEQ_2_1 6 /* Check for 1/2 '=' to undo 0-2 pending NUL-bytes; if next char isn't '=', emit 1 NUL-byte and treat like `_ICONV_DECODE_BASE64_T0' */
-#define _ICONV_DECODE_BASE64_TEQ_2_2 6 /* Check for 2/2 '=' to undo 1-2 pending NUL-bytes; if next char isn't '=', refuse to consume it and emit 1 NUL-byte, then set `_ICONV_DECODE_BASE64_EOF'; else: consume '=' and set `_ICONV_DECODE_BASE64_EOF' */
-#define _ICONV_DECODE_BASE64_EOF     7 /* End-of-file (refuse to parse further input) */
+#define _ICONV_DECODE_BASE64_T0  0 /* Expecting first 6-bit character of triple  (......11 11112222 22333333) */
+#define _ICONV_DECODE_BASE64_T6  1 /* Expecting second 6-bit character of triple (AAAAAA.. ....2222 22333333) */
+#define _ICONV_DECODE_BASE64_T12 2 /* Expecting third 6-bit character of triple  (AAAAAABB BBBB.... 22333333) (byte "AAAAAABB" was already emit) */
+#define _ICONV_DECODE_BASE64_T18 3 /* Expecting fourth 6-bit character of triple (AAAAAABB BBBBCCCC CC......) (byte "AAAAAABB" and "BBBBCCCC" were already emit) */
+#define _ICONV_DECODE_BASE64_EQ2 4 /* Expecting second '=' after `AA=' */
+#define _ICONV_DECODE_BASE64_EOF 5 /* End-of-file (refuse to parse further input) */
 		__uint8_t b64_state;     /* Current state machine mode (one of `_ICONV_DECODE_URI_*') */
-		__uint8_t b64_chrs[3];  /* Pending characters (for `_ICONV_DECODE_BASE64_T*' states, up to 3 characters of base64 input) */
+		__uint8_t b64_vprev;     /* Partial byte data from previous character.
+		                          * _ICONV_DECODE_BASE64_T6:  v0 << 2
+		                          * _ICONV_DECODE_BASE64_T12: v1 << 4
+		                          * _ICONV_DECODE_BASE64_T18: v2 << 6 */
 	} idd_base64; /* base64-escape */
 
 	__uint8_t idd_hex; /* For "hex": 0x00-0xf0 when parsing the second nibble; 0x01 when parsing the first. */

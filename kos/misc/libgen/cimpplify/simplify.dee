@@ -568,7 +568,7 @@ function _simpPpParse(self: string | UserString | CParser | File, config: SimpCo
 			throw;
 		if (self.tokStart !is bound)
 			throw;
-		print repr Traceback.current;
+		print Traceback.current;
 		self.err(e.message);
 	}
 }

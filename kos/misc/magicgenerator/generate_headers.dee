@@ -259,7 +259,7 @@ function servicePendingTasks() {
 	} catch (e...) {
 		pendingTasks = none;
 		print repr e;
-		print repr Traceback.current;
+		print Traceback.current;
 		criticalSection.exitApplication(1);
 	}
 }
@@ -1407,7 +1407,7 @@ try {
 	waitTasks(); /* Should be a no-op! */
 } @[interrupt] catch (e...) {
 	print repr e;
-	print repr Traceback.current;
+	print Traceback.current;
 	criticalSection.exitApplication(1);
 }
 print "DONE";

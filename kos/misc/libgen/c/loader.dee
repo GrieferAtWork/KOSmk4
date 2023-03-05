@@ -3418,7 +3418,7 @@ err:
 	} catch (e...) {
 #ifdef DEBUG_DOS_CALLBACK_SERIALIZATION_FAILURE
 		print "SERIAL_FAIL:", __LINE__, repr e;
-		print repr Traceback.current;
+		print Traceback.current;
 #endif /* DEBUG_DOS_CALLBACK_SERIALIZATION_FAILURE */
 		return none;
 	}

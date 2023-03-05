@@ -21,7 +21,7 @@
 import * from deemon;
 import * from errors;
 import * from ..libgen.autom8;
-import fs;
+import fs, posix;
 import ipc;
 
 function readLines(fp: File): {Bytes...} {
@@ -115,45 +115,9 @@ if (changesMade) {
 	joinProc(addProc);
 }
 
-global libwin32 = try import("win32") catch (...) none;
-if (!hasattr(libwin32, "CreateFile"))
-	libwin32 = none;
-function getLastModfiedTime(filename: string) {
+function getLastModfiedTime(filename: string) /*: Time from time | none*/ {
 	try {
-		if (libwin32 is none) {
-			/* FIXME: fs.stat() isn't as precise as win32.GetFileTime() is.
-			 *        In a perfect world, time.Time() would be able to hold
-			 *        timestamps of infinite precision... */
-			return fs.stat(filename).st_mtime;
-		} else {
-			/* Hack around a bit to get UNC paths working properly... */
-			local handle = libwin32.CreateFile(
-				lpFileName: filename,
-				dwDesiredAccess: libwin32.FILE_GENERIC_READ,
-				dwCreationDisposition: libwin32.OPEN_EXISTING);
-			if (handle is none) {
-				handle = libwin32.CreateFile(
-					lpFileName: fs.abspath(filename),
-					dwDesiredAccess: libwin32.FILE_GENERIC_READ,
-					dwCreationDisposition: libwin32.OPEN_EXISTING);
-				if (handle is none) {
-					handle = libwin32.CreateFile(
-						lpFileName: r"\\.\" + fs.abspath(filename),
-						dwDesiredAccess: libwin32.FILE_GENERIC_READ,
-						dwCreationDisposition: libwin32.OPEN_EXISTING);
-				}
-			}
-			if (handle is none)
-				return none;
-			try {
-				/* GetFileTime() has a precision of 100 nanoseconds (or 0.1 microseconds)
-				 * However, time.Time() only  has microsecond-precision  (so this  method
-				 * is 10x more precise) */
-				return libwin32.GetFileTime(handle)[2];
-			} finally {
-				libwin32.CloseHandle(handle);
-			}
-		}
+		return posix.stat(filename).st_mtime;
 	} catch (...) {
 	}
 	return none;

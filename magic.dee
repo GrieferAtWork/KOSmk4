@@ -461,7 +461,7 @@ try {
 	main([...][1:]);
 } @[interrupt] catch (e...) {
 	print log: e;
-	print log: repr Traceback.current;
+	print log: Traceback.current;
 	File.Buffer.sync();
 	print log: "ERROR";
 	AppExit.exit(1);

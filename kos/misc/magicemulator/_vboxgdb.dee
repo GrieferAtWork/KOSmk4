@@ -1861,7 +1861,7 @@ wait_for_command:
 						} catch (e...) {
 							print "[vboxgdb] Warning: Error while handling OS request:", repr(cmd);
 							print e;
-							print repr Traceback.current;
+							print Traceback.current;
 							continue;
 						}
 						if (reason !is none) {
@@ -1971,7 +1971,7 @@ do_send_stop_reply:
 						if (CONFIG_VERBOSE) {
 							print "[vboxgdb] WARNING: Error while executing command",
 								repr(commandBuffer), ":", e;
-							print repr Traceback.current;
+							print Traceback.current;
 						}
 						resp = "E16"; /* 0x16 == 22 == EINVAL (on linux) */
 					}
@@ -2010,7 +2010,7 @@ do_send_resp:
 	} @[interrupt] catch (e...) {
 		print "GDBMain() crashed:";
 		print e;
-		print repr Traceback.current;
+		print Traceback.current;
 		virtualBoxProc.terminate(1);
 	}
 }
