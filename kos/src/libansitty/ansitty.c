@@ -1283,7 +1283,7 @@ ansi_DCS(struct ansitty *__restrict self,
 				*ptr++ = ';';
 				*ptr++ = '5';
 			}
-			if (self->at_attrib & ANSITTY_FLAG_CONCEIL) {
+			if (self->at_ttyflag & ANSITTY_FLAG_CONCEIL) {
 				*ptr++ = ';';
 				*ptr++ = '8';
 			}
