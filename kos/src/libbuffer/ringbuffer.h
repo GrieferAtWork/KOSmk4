@@ -95,7 +95,7 @@ libringbuffer_write_nonblock_noalloc(struct ringbuffer *__restrict self,
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 
 /* Try to unread up to `num_bytes' of data that had yet to be re-written
- * @param: P_RDTOT: When non-NULL, store the new number of total read bytes since the last re-size in there
+ * @param: p_rdtot: When non-NULL, store the new number of total read bytes since the last re-size in there
  * @return: * : The actual number of unread bytes. */
 INTDEF NONNULL((1)) size_t CC
 libringbuffer_unread(struct ringbuffer *__restrict self,
@@ -123,7 +123,7 @@ libringbuffer_rseek(struct ringbuffer *__restrict self,
 		THROWS(E_WOULDBLOCK);
 
 /* Try to unwrite up to `num_bytes' of data that had yet to be read
- * @param: P_WRTOT: When non-NULL, store the new number of total written bytes since the last re-size in there
+ * @param: p_wrtot: When non-NULL, store the new number of total written bytes since the last re-size in there
  * @return: * : The actual number of unwritten bytes. */
 INTDEF NONNULL((1)) size_t CC
 libringbuffer_unwrite(struct ringbuffer *__restrict self,
@@ -140,7 +140,7 @@ libringbuffer_wseek(struct ringbuffer *__restrict self, ssize_t offset)
 
 /* Set the total amount of written, but yet-to-be read bytes.
  * If `num_bytes' is larger than the previous total number of written bytes, don't truncate the buffer.
- * @return: * : The actual number of now written bytes. */
+ * @return: * : The actual number of now-written bytes. */
 INTDEF NONNULL((1)) size_t CC
 libringbuffer_setwritten(struct ringbuffer *__restrict self, size_t num_bytes)
 		THROWS(E_WOULDBLOCK);

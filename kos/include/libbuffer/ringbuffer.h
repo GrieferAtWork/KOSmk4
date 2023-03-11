@@ -139,7 +139,7 @@ struct ringbuffer {
 
 
 /* Polling API */
-#define ringbuffer_canread(self)                                      \
+#define ringbuffer_canread(self)                                       \
 	(__hybrid_atomic_load(&(self)->rb_avail, __ATOMIC_ACQUIRE) != 0 || \
 	 __hybrid_atomic_load(&(self)->rb_limit, __ATOMIC_ACQUIRE) == 0)
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
@@ -320,7 +320,7 @@ __ringbuffer_putc_nonblock_noalloc(struct ringbuffer *__restrict __self, __byte_
 #undef __KERNEL_SELECT
 
 /* Try to unread up to `num_bytes' of data that had yet to be re-written
- * @param: P_RDTOT: When non-NULL, store the new number of total read bytes since the last re-size in there
+ * @param: p_rdtot: When non-NULL, store the new number of total read bytes since the last re-size in there
  * @return: * : The actual number of unread bytes. */
 typedef __ATTR_NONNULL_T((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_UNREAD)(struct ringbuffer *__restrict __self,
@@ -367,7 +367,7 @@ ringbuffer_rseek(struct ringbuffer *__restrict __self, __ssize_t __offset)
 #endif /* LIBBUFFER_WANT_PROTOTYPES */
 
 /* Try to unwrite up to `num_bytes' of data that had yet to be read
- * @param: P_WRTOT: When non-NULL, store the new number of total written bytes since the last re-size in there
+ * @param: p_wrtot: When non-NULL, store the new number of total written bytes since the last re-size in there
  * @return: * : The actual number of unwritten bytes. */
 typedef __ATTR_NONNULL_T((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_UNWRITE)(struct ringbuffer *__restrict __self,
@@ -397,7 +397,7 @@ ringbuffer_wseek(struct ringbuffer *__restrict __self, __ssize_t __offset)
 
 /* Set the total amount of written, but yet-to-be read bytes.
  * If `num_bytes' is larger than the previous total number of written bytes, don't truncate the buffer.
- * @return: * : The actual number of now written bytes. */
+ * @return: * : The actual number of now-written bytes. */
 typedef __ATTR_NONNULL_T((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_SETWRITTEN)(struct ringbuffer *__restrict __self,
                                        __size_t __num_bytes)
