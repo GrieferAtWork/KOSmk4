@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix crash when disassembling an access to an external property"
-DEEMON_VERSION="7ab7e8b3a1ce78b100944e1d48a3b960dcb22a17"
+#     v -- "Misc. improvements to hybrid int128 API"
+DEEMON_VERSION="3d43c3684a5edfdaacd5455c4f3ab530dc882574"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
