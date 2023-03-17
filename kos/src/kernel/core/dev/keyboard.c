@@ -737,8 +737,8 @@ again_getkey:
 
 				case KEY_PAUSE:
 					self->kd_pend[0] = 0xe1;
-					self->kd_pend[0] = 0x1d | up;
-					self->kd_pend[0] = 0x45 | up;
+					self->kd_pend[1] = 0x1d | up;
+					self->kd_pend[2] = 0x45 | up;
 					len              = 3;
 					break;
 
