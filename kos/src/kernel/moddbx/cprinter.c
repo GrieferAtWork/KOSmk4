@@ -47,6 +47,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <format-printer.h>
+#include <int128.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -1496,6 +1497,180 @@ err:
 	} /* Scope */
 }
 
+/* Longest strings produced by 128-bit integer-to-string functions */
+#define PRIMAXd128 "-170141183460469231731687303715884105728"
+#define PRIMAXu128 "340282366920938463463374607431768211455"
+#define PRIMAXx128 "0xffffffffffffffffffffffffffffffff"
+
+PRIVATE WUNUSED NONNULL((1, 2)) char *KCALL
+strbuf_print_decimal_uint128(char *p, uint128_t const *__restrict value) {
+	char *endp = p + COMPILER_STRLEN(PRIMAXu128);
+	char *iter = endp;
+	uint128_t temp = *value;
+	for (;;) {
+		uint128_t new_temp;
+		uint8_t digit;
+		uint128_divmod8(temp, 10, new_temp, digit);
+		*--iter = '0' + digit;
+		temp = new_temp;
+		if (uint128_iszero(temp))
+			break;
+	}
+	p = (char *)mempmovedown(p, iter, (size_t)(endp - iter), sizeof(char));
+	return p;
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) char *KCALL
+strbuf_print_hex_uint128(char *p, uint128_t const *__restrict value) {
+	uint8_t digit;
+	size_t i = 15;
+	*p++ = '0';
+	*p++ = 'x';
+
+	/* Skip leading 0-digits */
+	for (;;) {
+		digit = uint128_vec8_significand(*value, i);
+		if (digit) {
+			if (digit & 0xf0)
+				*p++ = _itoa_lower_digits[(digit & 0xf0) >> 4];
+			*p++ = _itoa_lower_digits[(digit & 0x0f)];
+			break;
+		}
+		if (!i) {
+			/* Special case: printing a literal number '0' */
+			*p++ = '0';
+			goto done;
+		}
+		--i;
+	}
+
+	/* Following the first non-zero digit, print everything. */
+	while (i) {
+		--i;
+		digit = uint128_vec8_significand(*value, i);
+		*p++  = _itoa_lower_digits[(digit & 0xf0) >> 4];
+		*p++  = _itoa_lower_digits[(digit & 0x0f)];
+	}
+done:
+	return p;
+}
+
+PRIVATE ATTR_NOINLINE NONNULL((1, 5)) dbx_errno_t KCALL
+do_print_int128(struct cprinter const *__restrict printer,
+                void const *ptr, bool is_unsigned,
+                unsigned int flags, ssize_t *__restrict p_result) {
+	ssize_t temp, result;
+	union int128_union {
+		uint128_t u;
+		int128_t s;
+	};
+	char repr[MAX(MAX(COMPILER_STRLEN(PRIMAXd128),
+	                  COMPILER_STRLEN(PRIMAXu128)),
+	              COMPILER_STRLEN(PRIMAXx128)) +
+	          COMPILER_STRLEN("iu128")];
+	char *p = repr;
+	union int128_union value;
+	if unlikely(dbg_readmemory(ptr, &value.u, 16) != 0)
+		return DBX_EFAULT;
+	if (!is_unsigned && int128_isneg(value.s)) {
+		*p++ = '-';
+		int128_neg(value.s);
+	}
+	if (flags & CTYPE_PRINTVALUE_FLAG_FORCEHEX) {
+do_print_hex:
+		p = strbuf_print_hex_uint128(p, &value.u);
+	} else if (p != repr || uint128_is8bit(value.u)) {
+		p = strbuf_print_decimal_uint128(p, &value.u);
+	} else {
+		/* Determine later based on `use_decimal_representation()' */
+		size_t len = (size_t)(strbuf_print_decimal_uint128(p, &value.u) - p);
+		if (!use_decimal_representation(p, len))
+			goto do_print_hex;
+		p += len;
+	}
+
+	/* If the caller wants them, append a 128-bit integer suffix. */
+	if (flags & CTYPE_PRINTVALUE_FLAG_INTSUFFIX) {
+		*p++ = 'i';
+		if (is_unsigned)
+			*p++ = 'u';
+		*p++ = '1';
+		*p++ = '2';
+		*p++ = '8';
+	}
+
+	/* Output the representation. */
+	result = 0;
+	FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
+	DO((*P_PRINTER)(P_ARG, repr, (size_t)(p - repr)));
+	FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
+	*p_result = result;
+	return DBX_EOK;
+err:
+	*p_result = temp;
+	return DBX_EOK;
+}
+
+
+/* Print custom representations for special structs (like `int128_t')
+ * @return: DBX_EOK:    A custom representation was printed.
+ * @return: DBX_ENOENT: Given struct-type has no custom representation.
+ * @return: DBX_EFAULT: Segmentation fault while trying to read from `ptr' */
+PRIVATE WUNUSED NONNULL((1, 2, 4)) dbx_errno_t KCALL
+print_special_struct(struct ctyperef const *__restrict self,
+                     struct cprinter const *__restrict printer,
+                     void const *ptr, ssize_t *__restrict p_result,
+                     unsigned int flags) {
+	char const *raw_name /*= NULL*/;
+	struct ctype *typ = self->ct_typ;
+
+	/* Caller should  have already  ensured  that this  is  a
+	 * struct-type, but be fail-safe since we're the debugger */
+	if unlikely(!CTYPE_KIND_ISSTRUCT(typ->ct_kind))
+		return DBX_ENOENT;
+
+	/* Special handling for `int128_t' and `uint128_t'. For
+	 * this purpose, we (at least) want to match the types:
+	 * - `int128_t'                 (from `<int128.h>')
+	 * - `uint128_t'                (from `<int128.h>')
+	 * - `__hybrid_int128_struct'   (from `<hybrid/int128.h>')
+	 * - `__hybrid_uint128_struct'  (from `<hybrid/int128.h>')
+	 * - `__hybrid_int128_t'        (from `<hybrid/int128.h>')
+	 * - `__hybrid_uint128_t'       (from `<hybrid/int128.h>')
+	 */
+	if (typ->ct_struct.ct_sizeof == 16) {
+		char const *name;
+		bool is_unsigned;
+		/*if (raw_name == NULL)*/ {
+			raw_name = ctype_struct_getname(typ);
+			if (raw_name == NULL)
+				raw_name = self->ct_info.ci_name;
+		}
+		name = raw_name;
+		for (;;) {
+			if (*name == '_') {
+				++name;
+				continue;
+			}
+			if (memcmp(name, "hybrid_", COMPILER_STRLEN("hybrid_") * sizeof(char)) == 0) {
+				name += COMPILER_STRLEN("hybrid_");
+				continue;
+			}
+			break;
+		}
+
+		is_unsigned = false;
+		if (*name == 'u') {
+			is_unsigned = true;
+			++name;
+		}
+		if (strcmp(name, "int128_struct") == 0 || strcmp(name, "int128_t") == 0)
+			return do_print_int128(printer, ptr, is_unsigned, flags, p_result);
+	}
+
+	/* Support for other special struct-types would go here. */
+	return DBX_ENOENT;
+}
 
 
 
@@ -1734,12 +1909,29 @@ print_integer_value_as_hex:
 					DO((*P_PRINTER)(P_ARG, ptr, (size_t)(COMPILER_ENDOF(hexbuf) - ptr)));
 				}
 			}
-		} else {
+		} else
+#if __SIZEOF_INTMAX_T__ < 16
+		if (CTYPE_KIND_SIZEOF(kind) == 16 && !CTYPE_KIND_ISENUM(kind)) {
+			/* Support for (compiler-native) 128-bit integers (if not already covered by `intmax_t'). */
+			dbx_errno_t error;
+			temp  = 0;
+			error = do_print_int128(printer, buf, CTYPE_KIND_INT_ISUNSIGNED(kind), flags, &temp);
+			if (error == DBX_EFAULT)
+				goto err_segfault;
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+		} else
+#endif /* __SIZEOF_INTMAX_T__ < 16 */
+		{
 			/* Value too large to  load directly. - Instead,  write
 			 * out its contents in HEX, using the native byteorder. */
 			size_t i;
 			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
 			PRINT("0x");
+			if (!CTYPE_KIND_INT_ISUNSIGNED(kind)) {
+				/* TODO: This needs support for signed, negative integers. */
+			}
 			for (i = 0; i < CTYPE_KIND_SIZEOF(kind); ++i) {
 				char repr[2];
 				byte_t b;
@@ -1799,6 +1991,24 @@ print_integer_value_as_hex:
 			struct ctype_printstruct_data ps;
 		} data;
 		unsigned int inner_flags;
+		if (!(flags & CTYPE_PRINTVALUE_FLAG_NOSPECSTRUCT)) {
+			/* Special handling for structs that have custom representations (like `int128_t'). */
+			dbx_errno_t error;
+			error = print_special_struct(self, printer, buf, &temp, flags);
+			if (error != DBX_ENOENT) {
+				if unlikely(error == DBX_EFAULT)
+					goto err_segfault;
+				if (error == DBX_EOK) {
+					if unlikely(temp < 0)
+						goto err;
+					result += temp;
+					break;
+				}
+				/* NOTE: No other error codes are documented, but try
+				 *       to  be fail-safe since we're the debugger ;) */
+			}
+		}
+
 		inner_flags = flags;
 		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
 		PRINT("{");

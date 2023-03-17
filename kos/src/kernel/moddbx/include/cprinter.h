@@ -129,6 +129,7 @@ ctype_printvalue(struct ctyperef const *__restrict self,
                                                          * of a (potential) initial struct as given as `self', but if one
                                                          * of those fields is another structure, print it as `{...}' */
 #define CTYPE_PRINTVALUE_FLAG_NOARRAYRANGE       0x0100 /* Don't print array range `[lo ... hi] = value' expressions. */
+#define CTYPE_PRINTVALUE_FLAG_NOSPECSTRUCT       0x0200 /* Don't print special struct types (like `int128_t') by using a custom representation */
 #define CTYPE_PRINTVALUE_FLAG_INTSUFFIX          0x4000 /* Include integer type suffixes (`u', `ul', `ll', etc...) */
 #define CTYPE_PRINTVALUE_FLAG_FORCEHEX           0x8000 /* Always  use  hex  for  everything.  When  not  given,  small integer
                                                          * values are  instead  printed  in decimal,  and  larger  numbers  are

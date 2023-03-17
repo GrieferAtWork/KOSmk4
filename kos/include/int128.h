@@ -41,9 +41,6 @@ typedef __hybrid_int128_t int128_t;
 typedef __hybrid_uint128_t uint128_t;
 #endif /* !__int128_t_defined */
 
-#if defined(__INTELLISENSE__) && defined(__cplusplus)
-extern "C++" {
-
 /* Static initializers. */
 #define INT128_INIT8(val)                                                                     __HYBRID_INT128_INIT8(val)
 #define INT128_INIT16(val)                                                                    __HYBRID_INT128_INIT16(val)
@@ -68,6 +65,9 @@ extern "C++" {
 #define INT128_INIT(val)  __HYBRID_INT128_INIT32(val)
 #define UINT128_INIT(val) __HYBRID_UINT128_INIT32(val)
 #endif /* !__UINT64_TYPE__ */
+
+#if defined(__INTELLISENSE__) && defined(__cplusplus)
+extern "C++" {
 
 /* View the data of a 128-bit integer as an array of smaller integers */
 __ATTR_WUNUSED __ATTR_CONST __int8_t (&int128_vec8(int128_t &__var))[16];
