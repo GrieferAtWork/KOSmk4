@@ -17,11 +17,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifdef __WINDOWS__
-#define HOST_EXE(x)  x ".exe"
-#else
-#define HOST_EXE(x)  x
-#endif
 
 /* Build steps designed specifically for working with ELF files */
 import fs;
@@ -273,8 +268,9 @@ function enumerateSymbolsStep(elfBinary: string, callback: Callable): Step {
 		return f"Enum symbols of {repr self.group.fixFilename(elfBinary)}";
 	};
 	result.run = (self: BoundStep): {Waitable...} -> {
-		local readelf_bin = HOST_EXE(self.toolchain.config.CROSS_PREFIX + "readelf");
-		local readelf = ipc.Process(readelf_bin, { "-s", "-W", self.group.fixFilename(elfBinary) });
+		local readelf_bin = self.toolchain.config.CROSS_PREFIX + "readelf";
+		local readelf = ipc.Process(readelf_bin, {
+			readelf_bin, "-s", "-W", self.group.fixFilename(elfBinary) });
 		local r, w = ipc.Pipe.new()...;
 		r = File.Buffer(r, "ro,c,none"); /* line-buffered */
 		readelf.stdout = w;

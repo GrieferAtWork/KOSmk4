@@ -17,12 +17,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifdef __WINDOWS__
-#define HOST_EXE(x)  x ".exe"
-#else
-#define HOST_EXE(x)  x
-#endif
-
 
 import * from deemon;
 import * from errors;
@@ -124,9 +118,8 @@ class Addr2line {
 	private final member writer: File;
 
 	this(config: Config, hostFile: string) {
-		proc = ipc.Process(
-			HOST_EXE(config.CROSS_PREFIX + "addr2line"),
-			{ "-ife", hostFile });
+		local addr2lineExe = config.CROSS_PREFIX + "addr2line";
+		proc = ipc.Process(addr2lineExe, { addr2lineExe, "-ife", hostFile });
 		local proc_stdin, proc_stdout;
 		/* Create pipes for communicating with addr2line */
 		proc_stdin, writer = ipc.Pipe.new()...;

@@ -17,11 +17,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifdef __WINDOWS__
-#define HOST_EXE(x)  x ".exe"
-#else
-#define HOST_EXE(x)  x
-#endif
 
 /* Build steps designed specifically for working with ELF files */
 import fs;
@@ -158,8 +153,9 @@ link_again_with_new_guesses:
 			@@The correct section offsets and sizes
 			local correctSectionOffsetsAndSizes: {string: (int, int)} = Dict();
 			{
-				local readelfExe = HOST_EXE(config.CROSS_PREFIX + "readelf");
-				local readelf = ipc.Process(readelfExe, { "-lSW", linkAttemptOutput });
+				local readelfExe = config.CROSS_PREFIX + "readelf";
+				local readelf = ipc.Process(readelfExe, {
+					readelfExe, "-lSW", linkAttemptOutput });
 				local r, w = ipc.Pipe.new()...;
 				r = File.Buffer(r, "ro,c,none"); /* line-buffered */
 				readelf.stdout = w;

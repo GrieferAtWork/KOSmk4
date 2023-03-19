@@ -133,9 +133,9 @@ function removeSurroundingParens(s: string): string {
 
 
 function getGCCBuiltins(version: (int,int,int)): {string...} {
-	local proc = ipc.Process("cmd", { "/c",
-		"deemon -E " + fs.joinpath(GCC, "gcc/builtins.def")
-	});
+	local deemonExe = ipc.Process.current.exe;
+	local proc = ipc.Process(deemonExe, {
+		deemonExe, "-E", fs.joinpath(GCC, "gcc/builtins.def") });
 	local r,w = ipc.Pipe.new()...;
 	proc.stdout = w;
 	proc.start();
@@ -144,7 +144,7 @@ function getGCCBuiltins(version: (int,int,int)): {string...} {
 	r.close();
 	local error = proc.join();
 	//if (error != 0)
-	//	throw Error("Process " + proc + " failed with " + error);
+	//	throw Error(f"Process {repr proc} failed with {error}");
 	local i = 0;
 	local len = #data;
 	while (i < len) {
@@ -299,12 +299,12 @@ function createFeatureSetFile(feat: GCCFeatureSet) {
 
 function gitCheckout(commit: string) {
 	fs.chdir(GCC);
-	local proc = ipc.Process("git", { "checkout", commit, "-f" });
+	local proc = ipc.Process("git", { "git", "checkout", commit, "-f" });
 	proc.start();
 	local error = proc.join();
 	fs.chdir(ROOT);
 	if (error != 0)
-		throw Error("Process " + repr(proc) + " failed with " + error);
+		throw Error(f"Process {repr proc} failed with {error}");
 }
 
 function loadVersionFeatures(commit: (string, (int,int,int))) {

@@ -87,14 +87,7 @@ struct devdiskrule {
 #ifndef __WANT_FS_INLINE_STRUCTURES
 	struct fdirent             ddre_ent;  /* Underlying directory entry. */
 #else /* !__WANT_FS_INLINE_STRUCTURES */
-	/* Work-around because g++ can't init nested flexible arrays. */
-	WEAK refcnt_t                           fd_refcnt;   /* ... */
-	struct fdirent_ops const               *fd_ops;      /* ... */
-	ino_t                                   fd_ino;      /* ... */
-	uintptr_t                               fd_hash;     /* ... */
-	u16                                     fd_namelen;  /* ... */
-	unsigned char                           fd_type;     /* ... */
-	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/ char, fd_name);    /* ... */
+	_FDIRENT_FIELDS /* Work-around because g++ can't init nested flexible arrays. */
 #endif /* __WANT_FS_INLINE_STRUCTURES */
 };
 

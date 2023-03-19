@@ -49,14 +49,17 @@ function throwVBoxManageError(argv: {string...}, error: int) {
 		throw Error("`VBoxManage " + repr(argv) + "` failed with " + error);
 }
 
-function runVBoxManageCommandEx(argv: {string...}, timeout_microseconds: int = -1) {
+function makeVBoxManageProcess(argv: {string...}): ipc.Process {
 	if (EXE_VBOXMANAGE is none)
 		throw Error("Failed to locate `VBoxManage`");
-	local proc = ipc.Process(EXE_VBOXMANAGE, argv);
+	return ipc.Process(EXE_VBOXMANAGE, { EXE_VBOXMANAGE, argv... });
+}
+function runVBoxManageCommandEx(argv: {string...}, timeout_nanoseconds: int = -1) {
+	local proc = makeVBoxManageProcess(argv);
 	proc.start();
-	if (timeout_microseconds < 0)
+	if (timeout_nanoseconds < 0)
 		return proc.join();
-	local result = proc.timedjoin(timeout_microseconds);
+	local result = proc.timedjoin(timeout_nanoseconds);
 	if (result is none)
 		proc.terminate(1);
 	return result;
@@ -68,9 +71,7 @@ function runVBoxManageCommand(argv: {string...}) {
 }
 
 function runVBoxManageCommandAndCaptureOutput(argv: {string...}): {string...} {
-	if (EXE_VBOXMANAGE is none)
-		throw Error("Failed to locate `VBoxManage`");
-	local proc = ipc.Process(EXE_VBOXMANAGE, argv);
+	local proc = makeVBoxManageProcess(argv);
 	local r, w = ipc.Pipe.new()...;
 	proc.stdout = w;
 	proc.start();
@@ -396,6 +397,7 @@ function start(
 	 * from within our console. */
 //	runVBoxManageCommand({ "startvm", vmName });
 	local proc = ipc.Process(EXE_VIRTUALBOXVM, {
+		EXE_VIRTUALBOXVM,
 		"--comment", vmName,
 		"--startvm", vmName,
 		"--no-startvm-errormsgbox",

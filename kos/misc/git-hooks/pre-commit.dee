@@ -46,7 +46,7 @@ function readLines(fp: File): {Bytes...} {
 function joinProc(proc: ipc.Process) {
 	local code = proc.join();
 	if (code != 0) {
-		print File.stderr: "Process", proc.cmdline, "failed with", code;
+		print File.stderr: "Process", repr proc.argv, "failed with", code;
 		Error.AppExit.exit(code);
 	}
 }
@@ -59,7 +59,7 @@ final class PreventAutom8Writeback {}
 /* Invoke autom8 on all staged files */
 global stagedFiles: List with string = List();
 local r, w = ipc.Pipe.new()...;
-local diffProc = ipc.Process("git", { "diff", "--name-only", "--cached" });
+local diffProc = ipc.Process("git", { "git", "diff", "--name-only", "--cached" });
 diffProc.stdout = w;
 diffProc.start();
 w.close();
@@ -77,7 +77,7 @@ for (local filename: readLines(r)) {
 				/* Check if `filename' is fully staged. - If it isn't, then the fact that
 				 * we  just altered the  file's contents means that  it's no longer clear
 				 * what should actually be committed. */
-				local m8Proc = ipc.Process("git", { "diff", "--raw", "--", filename });
+				local m8Proc = ipc.Process("git", { "git", "diff", "--raw", "--", filename });
 				local r, w = ipc.Pipe.new()...;
 				m8Proc.stdout = w;
 				m8Proc.start();
@@ -110,7 +110,7 @@ r.close();
 joinProc(diffProc);
 if (changesMade) {
 	/* Run `git add -u' to update the staging status of files already put on-stage */
-	local addProc = ipc.Process("git", { "add", "-u" });
+	local addProc = ipc.Process("git", { "git", "add", "-u" });
 	addProc.start();
 	joinProc(addProc);
 }

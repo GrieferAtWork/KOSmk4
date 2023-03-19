@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc9dbc7b */
+/* HASH CRC-32:0xad42a33b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -983,8 +983,7 @@ __SYSDECL_BEGIN
 #endif /* !AT_FDROOT && __AT_FDROOT */
 
 /* Special, symbolic file numbers.
- * These descriptors cannot be overwritten,
- * and their  meaning is  context-sensible. */
+ * These descriptors cannot be overwritten, and their meaning is context-sensitive. */
 
 /* HANDLE_TYPE_PIDFD (read-only; equivalent of `pidfd_open(gettid())') */
 #if !defined(AT_FDTHRD) && defined(__AT_FDTHRD)

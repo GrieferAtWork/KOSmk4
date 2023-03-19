@@ -1113,8 +1113,7 @@ __SYSDECL_BEGIN
 #endif /* !AT_FDROOT && __AT_FDROOT */
 
 /* Special, symbolic file numbers.
- * These descriptors cannot be overwritten,
- * and their  meaning is  context-sensible. */
+ * These descriptors cannot be overwritten, and their meaning is context-sensitive. */
 
 /* HANDLE_TYPE_PIDFD (read-only; equivalent of `pidfd_open(gettid())') */
 #if !defined(AT_FDTHRD) && defined(__AT_FDTHRD)

@@ -17,11 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifdef __WINDOWS__
-#define EXE(x) x ".exe"
-#else
-#define EXE(x) x
-#endif
+
 import fs;
 import ipc;
 import * from deemon;
@@ -30,8 +26,8 @@ import * from ..libmagic.libmagic;
 
 function doRunDeemonScript(
 		filename: string, additionalArguments: {string...} = none): ipc.Process {
-	local proc = ipc.Process(EXE("./binutils/deemon/deemon"),
-		[filename, additionalArguments...]);
+	local deemonExe = ipc.Process.current.exe;
+	local proc = ipc.Process(deemonExe, { deemonExe, filename, additionalArguments... });
 	proc.start();
 	return proc;
 }

@@ -192,12 +192,12 @@ function createLintProcess(
 	});
 	if (macros)
 		args.extend(constructMacroDefinitions(macros));
-	local proc = ipc.Process(lintExe, { args..., srcFile });
+	local proc = ipc.Process(lintExe, { lintExe, args..., srcFile });
 	local r, w = ipc.Pipe.new()...;
 	proc.stdout = w;
 	proc.stderr = w;
 	if (toolchain.config.VERBOSE)
-		print log: "Exec", repr proc.cmdline;
+		print log: ("Exec ", repr proc.argv);
 	proc.start();
 	local thr;
 	try {

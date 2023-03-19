@@ -19,12 +19,6 @@ final global COPYRIGHT=
  * 3. This notice may not be removed or altered from any source distribution. *
  */";
 
-#ifdef __WINDOWS__
-#define HOST_EXE(x)  x ".exe"
-#else
-#define HOST_EXE(x)  x
-#endif
-
 import fs;
 import ipc;
 import util;
@@ -162,9 +156,7 @@ function setBinTargetLink(targetArch: string, targetName: string) {
 			}
 		}
 		print log: ("Changing libpath: `ln -s ", repr(targetName), " ", repr(selConfigFile), "`");
-		local p = ipc.Process(HOST_EXE("bash"), [ "-c",
-			f"ln -s {repr targetName} {repr selConfigFile}"
-		]);
+		local p = ipc.Process(f"ln -s {targetName} {selConfigFile}");
 		p.start();
 		joinProcess(p);
 	}
@@ -187,7 +179,7 @@ function build(reconfigure: Callable = none, binTargetName: string = none) {
 	KERNEL_BINARY  = TARGET_BINPATH + "/os/kernel.bin";
 
 	/* Configure MTOOLS build steps */
-	toolchain.options[TOOLCHAIN_MTOOLS_EXE]  = HOST_EXE("binutils/misc/bin/mtools");
+	toolchain.options[TOOLCHAIN_MTOOLS_EXE]  = "binutils/misc/bin/mtools";
 	toolchain.options[TOOLCHAIN_MTOOLS_DISK] = TARGET_BINPATH[1:] + "/disk.img";
 
 	import . as me;

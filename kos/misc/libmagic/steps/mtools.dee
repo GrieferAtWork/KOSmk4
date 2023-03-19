@@ -51,11 +51,11 @@ global final OPT_MCOPY_INPUT = "MCOPY.input";
 
 function mtoolsInvoke(self: BoundStep, cmd: string, args: {string...}): Waitable {
 	local toolchainOptions = self.toolchain.options;
-	local proc = ipc.Process(
-		toolchainOptions[TOOLCHAIN_MTOOLS_EXE],
-		["-c", cmd, "-i", toolchainOptions[TOOLCHAIN_MTOOLS_DISK], args...]);
+	local mToolsExe = toolchainOptions[TOOLCHAIN_MTOOLS_EXE];
+	local proc = ipc.Process(mToolsExe, { mToolsExe, "-c", cmd, "-i",
+		toolchainOptions[TOOLCHAIN_MTOOLS_DISK], args...});
 	if (self.toolchain.config.VERBOSE)
-		print log: "Exec", repr proc.cmdline;
+		print log: ("Exec ", repr proc.argv);
 	proc.stdout = log;
 	proc.stderr = log;
 	proc.start();

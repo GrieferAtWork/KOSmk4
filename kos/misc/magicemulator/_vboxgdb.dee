@@ -17,11 +17,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifdef __WINDOWS__
-#define HOST_EXE(x)  x ".exe"
-#else
-#define HOST_EXE(x)  x
-#endif
 
 import * from deemon;
 import * from ..libmagic.libmagic;
@@ -2063,8 +2058,8 @@ function startVboxGDBGlue(
 	if (CONFIG_VERBOSE)
 		print "[vboxgdb] Loading special kernel symbols...";
 	{
-		local readelf_bin = HOST_EXE(magic.toolchain.config.CROSS_PREFIX + "readelf");
-		local readelf = ipc.Process(readelf_bin, { "-s", "-W", KERNEL });
+		local readelf_bin = magic.toolchain.config.CROSS_PREFIX + "readelf";
+		local readelf = ipc.Process(readelf_bin, { readelf_bin, "-s", "-W", KERNEL });
 		local r, w = ipc.Pipe.new()...;
 		readelf.stdout = w;
 		readelf.start();

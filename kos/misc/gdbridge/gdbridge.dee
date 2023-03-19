@@ -45,7 +45,7 @@ import * from threading;
 
 fs.chdir(fs.joinpath(fs.headof(__FILE__), "../../.."));
 
-local gdb = ipc.Process("gdb", ["--interpreter=mi"]);
+local gdb = ipc.Process("gdb", ["gdb", "--interpreter=mi"]);
 local inr, inw = ipc.Pipe.new()...;
 local our, ouw = ipc.Pipe.new()...;
 gdb.stdin  = inr;

@@ -52,12 +52,6 @@ final function isUnrelatedGCCFlag(flag: string): bool {
 }
 
 
-#ifdef __WINDOWS__
-global final EXE_FORMAT = "{}{}.exe";
-#else /* __WINDOWS__ */
-global final EXE_FORMAT = "{}{}";
-#endif /* !__WINDOWS__ */
-
 @@Join sub-process arguments for gcc or g++
 function joinGccArguments(args: {string...}, Wx: string, Xxxx: string): {string...} {
 	local temp = "";
@@ -208,7 +202,7 @@ global class GCCToolchain: Toolchain {
 			kind: string,
 			p: ipc.Process): Waitable {
 		if (this.config.VERBOSE)
-			print log: "Exec", repr p.cmdline;
+			print log: ("Exec ", repr p.argv);
 		if (!this.config.FORMAT_ERRORS) {
 			p.stdout = log;
 			p.stderr = log;
@@ -489,9 +483,9 @@ again_handle_col:
 		if (outFile is none)
 			outFile = this.config.getPreprocessedFilename(this, srcFile);
 		local cc, langFlags = getCCForLanguageAndSrcFile(srcFile, language)...;
-		local cc = EXE_FORMAT.format({ this.config.CROSS_PREFIX, cc });
+		local cc = this.config.CROSS_PREFIX + cc;
 		local arguments = [
-			"-E", "-o", outFile, "-MMD", "-MF", depFile,
+			cc, "-E", "-o", outFile, "-MMD", "-MF", depFile,
 			options.get(OPT_GCC_OPTIONS)...];
 		if (langFlags)
 			arguments.extend(langFlags);
@@ -539,8 +533,9 @@ again_handle_col:
 			return WaitableJoin(th);
 		}
 		local cc, langFlags = getCCForLanguageAndSrcFile(srcFile, language)...;
-		local cc = EXE_FORMAT.format({ this.config.CROSS_PREFIX, cc });
+		local cc = this.config.CROSS_PREFIX + cc;
 		local arguments = [
+			cc,
 			language == "assembler-with-cpp"
 				? "-E"   /* The disassembly of a user-defined assembly
 				          * source is simply its preprocessed content. */
@@ -577,8 +572,8 @@ again_handle_col:
 	                                          macros: {string: string | none} = none,
 	                                          asFlags: {string...} = none): ipc.Process {
 		local cc, langFlags = getCCForLanguage(language)...;
-		local cc = EXE_FORMAT.format({ this.config.CROSS_PREFIX, cc });
-		local arguments = ["-c", "-o", "/dev/stdout", "-Wall", "-Werror", options.get(OPT_GCC_OPTIONS)...];
+		local cc = this.config.CROSS_PREFIX + cc;
+		local arguments = [cc, "-c", "-o", "/dev/stdout", "-Wall", "-Werror", options.get(OPT_GCC_OPTIONS)...];
 		if (langFlags)
 			arguments.extend(langFlags);
 		if (incPath) {
@@ -616,9 +611,9 @@ again_handle_col:
 		if (objFile is none)
 			objFile = this.config.getObjectFilename(srcFile);
 		local cc, langFlags = getCCForLanguageAndSrcFile(srcFile, language)...;
-		local cc = EXE_FORMAT.format({ this.config.CROSS_PREFIX, cc });
+		local cc = this.config.CROSS_PREFIX + cc;
 		local arguments = [
-			"-c", "-o", objFile, "-MMD", "-MF", depFile,
+			cc, "-c", "-o", objFile, "-MMD", "-MF", depFile,
 			options.get(OPT_GCC_OPTIONS)...];
 		if (langFlags)
 			arguments.extend(langFlags);
@@ -677,8 +672,8 @@ again_handle_col:
 			_stdlibCache[(language, gccOptions)] = result;
 			return result;
 		}
-		local cc = EXE_FORMAT.format({ this.config.CROSS_PREFIX, getCCForLanguage(language)[0] });
-		local arguments = ["-###", "-o", "testOutputFilename", simple_gcc_opt...];
+		local cc = this.config.CROSS_PREFIX + getCCForLanguage(language)[0];
+		local arguments = [cc, "-###", "-o", "testOutputFilename", simple_gcc_opt...];
 		local testObjectFile = joinpath(this.config.BUILD_PATH, "testObjectFile.o");
 		if (!fs.stat.isreg(testObjectFile)) {
 			local testSourceFile = joinpath(this.config.BUILD_PATH, "testObjectFile.c");
@@ -692,7 +687,7 @@ again_handle_col:
 					fp.write("int placeholder = 1;\n");
 				}
 			}
-			local proc = ipc.Process("gcc", { "-c", "-o", testObjectFile, testSourceFile });
+			local proc = ipc.Process("gcc", { "gcc", "-c", "-o", testObjectFile, testSourceFile });
 			proc.stdout = log;
 			proc.stderr = log;
 			proc.start();
@@ -825,8 +820,8 @@ again_handle_col:
 	                             noStdLib: bool = false): Waitable {
 		if (language is none)
 			language = getDefaultLinkerLanguage(step);
-		local cc = EXE_FORMAT.format({ this.config.CROSS_PREFIX, getCCForLanguage(language)[0] });
-		local arguments = ["-o", exeFile, options.get(OPT_GCC_OPTIONS)...];
+		local cc = this.config.CROSS_PREFIX + getCCForLanguage(language)[0];
+		local arguments = [cc, "-o", exeFile, options.get(OPT_GCC_OPTIONS)...];
 		if (noStdLib)
 			arguments.append("-nostdlib");
 		if (libPath) {
@@ -872,7 +867,8 @@ again_handle_col:
 	function createArchiveProcess(step: BoundStep,
 	                              arcFile: string,
 	                              objFiles: {string...}): Waitable {
-		local ar = EXE_FORMAT.format({ this.config.CROSS_PREFIX, "ar" });
-		return createWaitableProcess(step, none, "ar", ipc.Process(ar, { "rcs", arcFile, objFiles... }));
+		local ar = this.config.CROSS_PREFIX + "ar";
+		return createWaitableProcess(step, none, "ar",
+			ipc.Process(ar, { ar, "rcs", arcFile, objFiles... }));
 	}
 }

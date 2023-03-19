@@ -432,30 +432,24 @@ INTERN_CONST struct flnknode const perproc_mapfile_lnknode_template = {
 struct procfs_perproc_dirent {
 	struct fnode_ops const   *ppd_fops;    /* [1..1][const] File-node operators. */
 	mode_t ppd_mod;                        /* [const] File-mode for the pointed-to file. */
-#if 0                                      /* Doesn't work because g++ is lazy */
+#ifndef __WANT_FS_INLINE_STRUCTURES /* Doesn't work because g++ is lazy */
 	struct fdirent            ppd_ent;     /* Underlying directory entry. */
-#else
-	WEAK refcnt_t             ppd_refcnt;  /* Reference counter. */
-	struct fdirent_ops const *ppd_ops;     /* [1..1][const] Operators. */
-	ino_t                     ppd_ino;     /* [valid_if(false)] */
-	uintptr_t                 ppd_hash;    /* [const][== fdirent_hash(fd_name, fd_namelen)] Hash of this directory entry. */
-	u16                       ppd_namelen; /* [const][!0] Length of the directory entry name (in characters). */
-	unsigned char             ppd_type;    /* [const] Directory entry type (one of `DT_*') */
-	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/ char, ppd_name); /* [const][ppd_namelen] Directory entry name. (NUL-terminated) */
-#endif
+#else /* !__WANT_FS_INLINE_STRUCTURES */
+	_FDIRENT_FIELDS
+#endif /* __WANT_FS_INLINE_STRUCTURES */
 };
 
-/* Assert that fields of `struct procfs_perproc_dirent' are binary compatible with `fdirent' starting at `ppd_refcnt' */
-static_assert((offsetof(struct procfs_perproc_dirent, ppd_refcnt) - offsetof(struct procfs_perproc_dirent, ppd_refcnt)) == offsetof(struct fdirent, fd_refcnt));
-static_assert((offsetof(struct procfs_perproc_dirent, ppd_ops) - offsetof(struct procfs_perproc_dirent, ppd_refcnt)) == offsetof(struct fdirent, fd_ops));
-static_assert((offsetof(struct procfs_perproc_dirent, ppd_ino) - offsetof(struct procfs_perproc_dirent, ppd_refcnt)) == offsetof(struct fdirent, fd_ino));
-static_assert((offsetof(struct procfs_perproc_dirent, ppd_hash) - offsetof(struct procfs_perproc_dirent, ppd_refcnt)) == offsetof(struct fdirent, fd_hash));
-static_assert((offsetof(struct procfs_perproc_dirent, ppd_namelen) - offsetof(struct procfs_perproc_dirent, ppd_refcnt)) == offsetof(struct fdirent, fd_namelen));
-static_assert((offsetof(struct procfs_perproc_dirent, ppd_type) - offsetof(struct procfs_perproc_dirent, ppd_refcnt)) == offsetof(struct fdirent, fd_type));
-static_assert((offsetof(struct procfs_perproc_dirent, ppd_name) - offsetof(struct procfs_perproc_dirent, ppd_refcnt)) == offsetof(struct fdirent, fd_name));
+/* Assert that fields of `struct procfs_perproc_dirent' are binary compatible with `fdirent' starting at `fd_refcnt' */
+static_assert((offsetof(struct procfs_perproc_dirent, fd_refcnt) - offsetof(struct procfs_perproc_dirent, fd_refcnt)) == offsetof(struct fdirent, fd_refcnt));
+static_assert((offsetof(struct procfs_perproc_dirent, fd_ops) - offsetof(struct procfs_perproc_dirent, fd_refcnt)) == offsetof(struct fdirent, fd_ops));
+static_assert((offsetof(struct procfs_perproc_dirent, fd_ino) - offsetof(struct procfs_perproc_dirent, fd_refcnt)) == offsetof(struct fdirent, fd_ino));
+static_assert((offsetof(struct procfs_perproc_dirent, fd_hash) - offsetof(struct procfs_perproc_dirent, fd_refcnt)) == offsetof(struct fdirent, fd_hash));
+static_assert((offsetof(struct procfs_perproc_dirent, fd_namelen) - offsetof(struct procfs_perproc_dirent, fd_refcnt)) == offsetof(struct fdirent, fd_namelen));
+static_assert((offsetof(struct procfs_perproc_dirent, fd_type) - offsetof(struct procfs_perproc_dirent, fd_refcnt)) == offsetof(struct fdirent, fd_type));
+static_assert((offsetof(struct procfs_perproc_dirent, fd_name) - offsetof(struct procfs_perproc_dirent, fd_refcnt)) == offsetof(struct fdirent, fd_name));
 
-#define fdirent_asperproc(self)           container_of(&(self)->fd_refcnt, struct procfs_perproc_dirent, ppd_refcnt)
-#define procfs_perproc_dirent_asent(self) ((struct fdirent *)&(self)->ppd_refcnt)
+#define fdirent_asperproc(self)           container_of(&(self)->fd_refcnt, struct procfs_perproc_dirent, fd_refcnt)
+#define procfs_perproc_dirent_asent(self) ((struct fdirent *)&(self)->fd_refcnt)
 
 
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
@@ -538,13 +532,13 @@ PRIVATE struct fdirent_ops const procfs_perproc_dirent_ops_nomap = {
 	PRIVATE struct procfs_perproc_dirent symbol_name = {                   \
 		.ppd_fops    = (struct fnode_ops *)(fnode_ops_ptr),                \
 		.ppd_mod     = DTTOIF(type) | (perm),                              \
-		.ppd_refcnt  = 2, /* +1: symbol_name, +1: DIRECTORY_ENTRY_LIST */  \
-		.ppd_ops     = procfs_perproc_dirent_ops_for(type),                \
-		.ppd_ino     = _INVALID_INO, /* Mustn't be used */                 \
-		.ppd_hash    = hash,                                               \
-		.ppd_namelen = COMPILER_STRLEN(name),                              \
-		.ppd_type    = type,                                               \
-		/* .ppd_name = */ name                                             \
+		.fd_refcnt  = 2, /* +1: symbol_name, +1: DIRECTORY_ENTRY_LIST */   \
+		.fd_ops     = procfs_perproc_dirent_ops_for(type),                 \
+		.fd_ino     = _INVALID_INO, /* Mustn't be used */                  \
+		.fd_hash    = hash,                                                \
+		.fd_namelen = COMPILER_STRLEN(name),                               \
+		.fd_type    = type,                                                \
+		/* .fd_name = */ name                                              \
 	};
 #define ROOTENT(name, type, perm, fnode_ops_ptr, hash) \
 	_DEFINE_DIRENT(PP_CAT2(perproc_root_dirent_, __LINE__), name, type, perm, fnode_ops_ptr, hash)

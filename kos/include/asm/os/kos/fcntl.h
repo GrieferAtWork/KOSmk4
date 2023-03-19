@@ -159,8 +159,7 @@
 #define __AT_FDROOT (-101) /* Same as `__AT_FDCWD' but sets the filesystem root
                             * (using this, you  can `chroot()' with  'dup2()'!) */
 /* Special, symbolic file numbers.
- * These descriptors cannot be overwritten,
- * and their  meaning is  context-sensible. */
+ * These descriptors cannot be overwritten, and their meaning is context-sensitive. */
 #define __AT_FDTHRD    (-180) /* HANDLE_TYPE_PIDFD (read-only; equivalent of `pidfd_open(gettid())') */
 #if __KOS_VERSION__ >= 400
 #define __AT_FDPROC    (-181) /* HANDLE_TYPE_PIDFD (read-only; equivalent of `pidfd_open(getpid())') */

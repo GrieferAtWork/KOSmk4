@@ -64,15 +64,16 @@ function start(
 		throw Error("Bochs doesn't support booting KOS with additional drivers");
 	if (options.get(opt.CMDLINE))
 		throw Error("Bochs doesn't support a kernel commandline");
-	local bochs = options.get("bochs.exe");
-	if (bochs is none) {
-		bochs = common.findExecutableInPaths(
+	local bochsExe = options.get("bochs.exe");
+	if (bochsExe is none) {
+		bochsExe = common.findExecutableInPaths(
 			enumerateBochsInstallationLocations(), "bochs");
-		if (bochs is none) {
+		if (bochsExe is none) {
 			print "Failed to locate bochs executable";
 			throw Error("Cannot locate bochs executable");
 		}
 	}
+	bochsExe = fs.abspath(bochsExe);
 	local bochsBiosFilename    = options.get("bochs.bios");
 	local bochsVGABiosFilename = options.get("bochs.vgabios");
 	if (bochsBiosFilename is none || bochsVGABiosFilename is none) {
@@ -87,7 +88,7 @@ function start(
 		throw Error("Cannot locate bochs BIOS/VGA-VIOS");
 	}
 got_bios:
-	local bochs_arguments = [];
+	local bochs_arguments = [bochsExe];
 	local kernelShadowFilename = shadow.updateKernelShadow(KERNEL, TARGET_ARCH);
 	local bxrcFilename = "{fs.headof(kernelShadowFilename)}{fs.fileof(kernelShadowFilename)}.bxrc";
 	try fs.unlink(DISK_FILENAME + ".lock"); catch (...);
@@ -171,8 +172,7 @@ got_bios:
 	}
 	bochs_arguments.extend({ "-q", "-f", fs.tailof(bxrcFilename) });
 	print "Bochs arguments", repr(bochs_arguments);
-	bochs = fs.abspath(bochs);
-	local proc = ipc.Process(bochs, bochs_arguments);
+	local proc = ipc.Process(bochsExe, bochs_arguments);
 	local r, w = ipc.Pipe.new()...;
 	proc.stdout = w;
 	proc.stderr = w;

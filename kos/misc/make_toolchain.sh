@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Misc. improvements to hybrid int128 API"
-DEEMON_VERSION="3d43c3684a5edfdaacd5455c4f3ab530dc882574"
+#     v -- "Clear process exe2path cache when PWD changes on windows"
+DEEMON_VERSION="fae26a30db792b69c0757f4772e17310e58717c1"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 

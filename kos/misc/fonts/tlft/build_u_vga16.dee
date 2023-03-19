@@ -25,23 +25,19 @@ import * from ...libgen.libtlft.compiler;
 
 fs.chdir(fs.headof(__FILE__));
 
-function runBashProcess(cmdline: string) {
-#ifdef __WINDOWS__
-	local p = ipc.Process("bash.exe", ["-c", cmdline]);
-#else /* __WINDOWS__ */
-	local p = ipc.Process("bash", ["-c", cmdline]);
-#endif /* !__WINDOWS__ */
+function execCmdLine(cmdline: string) {
+	local p = ipc.Process(cmdline);
 	p.start();
 	local err = p.join();
 	if (err != 0)
-		throw Error(f"Process {repr p} returned {err}");
+		throw Error(f"Process {repr cmdline} returned {err}");
 }
 
 local bdf = try fs.stat("uni_vga/u_vga16.bdf") catch (...) none;
 if (bdf is none) {
 	if (!fs.stat.exists("uni-vga.tgz"))
-		runBashProcess("wget http://www.inp.nsk.su/~bolkhov/files/fonts/univga/uni-vga.tgz");
-	runBashProcess("tar -xvf uni-vga.tgz");
+		execCmdLine("wget http://www.inp.nsk.su/~bolkhov/files/fonts/univga/uni-vga.tgz");
+	execCmdLine("tar -xvf uni-vga.tgz");
 }
 
 local st = try fs.stat("u_vga16.tlft") catch (...) none;

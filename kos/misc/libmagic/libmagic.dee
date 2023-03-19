@@ -551,7 +551,7 @@ class Waitable {
 function joinProcess(p: ipc.Process) {
 	local error = p.join();
 	if (error != 0)
-		throw Error(f"Process {repr p.cmdline} exited with {error}");
+		throw Error(f"Process {repr p} exited with {error}");
 }
 
 function tryJoinProcess(p: ipc.Process): bool {
@@ -559,7 +559,7 @@ function tryJoinProcess(p: ipc.Process): bool {
 	if (error is none)
 		return false;
 	if (error != 0)
-		throw Error(f"Process {repr p.cmdline} exited with {error}");
+		throw Error(f"Process {repr p} exited with {error}");
 	return true;
 }
 

@@ -97,7 +97,7 @@ struct mbnode {
 	REF struct mpart                   *mbn_part;     /* [0..1][const] The bound mem-part.
 	                                                   * When set to NULL, then this node represents a reserved node. */
 	REF struct path                    *mbn_fspath;   /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
-	REF struct fdirent         *mbn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
+	REF struct fdirent                 *mbn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
 	union {
 		WEAK REF struct mman          *_mbn_mman;     /* s.a. `struct mnode::mn_mman' */
 		SLIST_ENTRY(mbnode)            _mbn_alloc;    /* Internal list of freshly allocated nodes. */

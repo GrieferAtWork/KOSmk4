@@ -90,7 +90,7 @@ function start(
 		DISK_FILENAME: string,
 		options: {string: string},
 		magic: Module) {
-	local qemu = options.get("qemu.exe");
+	local qemuExe = options.get("qemu.exe");
 	local qemuArgs = [];
 	qemuArgs.extend({ "-serial", "stdio" });
 	if (opt.getBool(options, opt.HOSTED, true)) {
@@ -180,9 +180,9 @@ did_update_x86_64_kernel:
 		case "qemu":
 			if (arg.startswith('"') && arg.endswith('"'))
 				arg = arg[1:-1].decode("c-escape");
-			qemu = arg;
-			if (fs.stat.isdir(qemu))
-				qemu = fs.joinpath(qemu, f"qemu-system-{TARGET_ARCH}");
+			qemuExe = arg;
+			if (fs.stat.isdir(qemuExe))
+				qemuExe = fs.joinpath(qemuExe, f"qemu-system-{TARGET_ARCH}");
 			break;
 		case "accel":
 			/* "-accel hax" breaks qemu's builtin GDB stub. :(
@@ -238,15 +238,16 @@ did_update_x86_64_kernel:
 		qemuArgs.append("-append");
 		qemuArgs.append(cmdline);
 	}
-	print "qemu:", repr qemuArgs;
-	if (qemu is none) {
-		qemu = common.findExecutableInPaths(
+	if (qemuExe is none) {
+		qemuExe = common.findExecutableInPaths(
 			enumerateQEmuInstallationLocations(),
 			f"qemu-system-{TARGET_ARCH}");
-		if (qemu is none)
+		if (qemuExe is none)
 			throw Error("Cannot locate qemu binary");
 	}
-	local proc = ipc.Process(qemu, qemuArgs);
+	qemuArgs.pushfront(qemuExe);
+	print "qemu:", repr qemuArgs;
+	local proc = ipc.Process(qemuExe, qemuArgs);
 	local r, w = ipc.Pipe.new()...;
 	proc.stdout = w;
 	proc.stderr = w;
