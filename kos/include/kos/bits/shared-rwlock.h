@@ -56,10 +56,16 @@ struct shared_rwlock {
 #define __shared_rwlock_rdwait_broadcast(self) sig_broadcast(&(self)->sl_rdwait)
 #elif defined(__CRT_HAVE_XSC)
 #if __CRT_HAVE_XSC(lfutex)
-#define __shared_rwlock_wrwait_send(self) \
-	((self)->sl_wrwait ? (sys_Xlfutex(&(self)->sl_wrwait, LFUTEX_WAKEMASK, 1, __NULLPTR, 0) != 0) : 0)
-#define __shared_rwlock_rdwait_broadcast(self) \
-	((self)->sl_rdwait ? sys_Xlfutex(&(self)->sl_rdwait, LFUTEX_WAKEMASK, (__uintptr_t)-1, __NULLPTR, 0) : 0)
+#define __shared_rwlock_wrwait_send(self)                                       \
+	((self)->sl_wrwait                                                          \
+	 ? (__hybrid_atomic_store(&(self)->sl_wrwait, 0, __ATOMIC_RELEASE),         \
+	    sys_Xlfutex(&(self)->sl_wrwait, LFUTEX_WAKEMASK, 1, __NULLPTR, 0) != 0) \
+	 : 0)
+#define __shared_rwlock_rdwait_broadcast(self)                                           \
+	((self)->sl_rdwait                                                                   \
+	 ? (__hybrid_atomic_store(&(self)->sl_rdwait, 0, __ATOMIC_RELEASE),                  \
+	    sys_Xlfutex(&(self)->sl_rdwait, LFUTEX_WAKEMASK, (__uintptr_t)-1, __NULLPTR, 0)) \
+	 : 0)
 #endif /* __CRT_HAVE_XSC(lfutex) */
 #endif /* ... */
 
