@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa195fef8 */
+/* HASH CRC-32:0x5dcc0638 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -150,8 +150,12 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 		task_waitfor(KTIME_INFINITE);
 	}
 #else /* __KERNEL__ */
-	if (__hybrid_atomic_cmpxch(&self->sl_lock, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+	unsigned int lockword;
+	while ((lockword = __hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE)) != 0) {
+		if (lockword == 1)
+			__hybrid_atomic_cmpxch(&self->sl_lock, 1, 2, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
 		__shared_lock_wait(self);
+	}
 #endif /* !__KERNEL__ */
 }
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
@@ -178,8 +182,13 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 	}
 success:
 #else /* __KERNEL__ */
-	if (__hybrid_atomic_cmpxch(&self->sl_lock, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
-		return __shared_lock_wait_timeout(self, abs_timeout);
+	unsigned int lockword;
+	while ((lockword = __hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE)) != 0) {
+		if (lockword == 1)
+			__hybrid_atomic_cmpxch(&self->sl_lock, 1, 2, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
+		if (!__shared_lock_wait_timeout(self, abs_timeout))
+			return false;
+	}
 #endif /* !__KERNEL__ */
 	return true;
 }
@@ -236,8 +245,13 @@ DEFINE_INTERN_ALIAS(libc_shared_lock_waitfor_with_timeout64, libc_shared_lock_wa
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2) bool
 (__FCALL libc_shared_lock_waitfor_with_timeout64)(struct shared_lock *__restrict self,
                                                   struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
-	if (__hybrid_atomic_cmpxch(&self->sl_lock, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
-		return __shared_lock_wait_timeout64(self, abs_timeout);
+	unsigned int lockword;
+	while ((lockword = __hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE)) != 0) {
+		if (lockword == 1)
+			__hybrid_atomic_cmpxch(&self->sl_lock, 1, 2, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
+		if (!__shared_lock_wait_timeout64(self, abs_timeout))
+			return false;
+	}
 	return true;
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */

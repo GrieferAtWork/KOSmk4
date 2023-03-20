@@ -274,8 +274,12 @@ void shared_lock_waitfor([[inout]] struct shared_lock *__restrict self) {
 		@task_waitfor@(@KTIME_INFINITE@);
 	}
 @@pp_else@@
-	if (__hybrid_atomic_cmpxch(&self->@sl_lock@, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+	unsigned int lockword;
+	while ((lockword = __hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
+		if (lockword == 1)
+			__hybrid_atomic_cmpxch(&self->@sl_lock@, 1, 2, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
 		__shared_lock_wait(self);
+	}
 @@pp_endif@@
 }
 
@@ -310,8 +314,13 @@ $bool shared_lock_waitfor_with_timeout([[inout]] struct shared_lock *__restrict 
 	}
 success:
 @@pp_else@@
-	if (__hybrid_atomic_cmpxch(&self->@sl_lock@, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
-		return __shared_lock_wait_timeout(self, abs_timeout);
+	unsigned int lockword;
+	while ((lockword = __hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
+		if (lockword == 1)
+			__hybrid_atomic_cmpxch(&self->@sl_lock@, 1, 2, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
+		if (!__shared_lock_wait_timeout(self, abs_timeout))
+			return false;
+	}
 @@pp_endif@@
 	return true;
 }
@@ -366,8 +375,13 @@ again:
 [[impl_include("<kos/bits/shared-lock.h>")]]
 $bool shared_lock_waitfor_with_timeout64([[inout]] struct shared_lock *__restrict self,
                                          [[in_opt]] struct timespec64 const *abs_timeout) {
-	if (__hybrid_atomic_cmpxch(&self->@sl_lock@, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
-		return __shared_lock_wait_timeout64(self, abs_timeout);
+	unsigned int lockword;
+	while ((lockword = __hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
+		if (lockword == 1)
+			__hybrid_atomic_cmpxch(&self->@sl_lock@, 1, 2, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
+		if (!__shared_lock_wait_timeout64(self, abs_timeout))
+			return false;
+	}
 	return true;
 }
 %#endif /* !__KERNEL__ && __USE_TIME64 */
