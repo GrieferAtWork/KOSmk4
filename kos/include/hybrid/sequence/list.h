@@ -4130,12 +4130,14 @@
 #define XSIMPLEQ_XOR(self, ptr)          ((__typeof__(ptr))((self)->sqx_cookie ^ (__ULONGPTR_TYPE__)(ptr)))
 #define __HYBRID_XSIMPLEQ_XOR_NULL(self) ((__typeof__((self)->sqx_first))(self)->sqx_cookie)
 #elif defined(__cplusplus)
+extern "C++" {
 __NAMESPACE_INT_BEGIN
 template<class __T> __ATTR_CONST __ATTR_WUNUSED __T *__NOTHROW(__hybrid_xsimpleq_xor)(__T *__p, __ULONGPTR_TYPE__ __cookie) { return (__T *)((__ULONGPTR_TYPE__)__p ^ __cookie); }
 template<class __T> __ATTR_CONST __ATTR_WUNUSED __T const *__NOTHROW(__hybrid_xsimpleq_xor)(__T const *__p, __ULONGPTR_TYPE__ __cookie) { return (__T const *)((__ULONGPTR_TYPE__)__p ^ __cookie); }
 #define XSIMPLEQ_XOR(self, ptr)          (__NAMESPACE_INT_SYM __hybrid_xsimpleq_xor(ptr, (self)->sqx_cookie))
 #define __HYBRID_XSIMPLEQ_XOR_NULL(self) (__NAMESPACE_INT_SYM __hybrid_xsimpleq_xor(1 ? __NULLPTR : (self)->sqx_first, (self)->sqx_cookie))
 __NAMESPACE_INT_END
+} /* extern "C++" */
 #else /* ... */
 #error "No way to implement `XSIMPLEQ_XOR()' :("
 #endif /* !... */
