@@ -174,13 +174,13 @@ __NOTHROW(atomic_once_success)(struct atomic_once *__restrict __self) {
 	__UINTPTR_TYPE__ __state;
 	do {
 		__state = __self->ao_state;
-		__hybrid_assertf(__self->ao_state == __ATOMIC_ONCE_RUNNING,
+		__hybrid_assertf(__state == __ATOMIC_ONCE_RUNNING,
 		                 "atomic_once_success(%p): Invalid state: %p", (void *)__state);
 	} while (!__hybrid_atomic_cmpxch_weak(&__self->ao_state,
 	                                      __ATOMIC_ONCE_RUNNING,
 	                                      __ATOMIC_ONCE_RUNDONE,
-	                                      __ATOMIC_RELEASE,
-	                                      __ATOMIC_RELEASE));
+	                                      __ATOMIC_SEQ_CST,
+	                                      __ATOMIC_RELAXED));
 #else /* !NDEBUG && !NDEBUG_SYNC */
 	__hybrid_atomic_store(&__self->ao_state, __ATOMIC_ONCE_RUNDONE, __ATOMIC_RELEASE);
 #endif /* NDEBUG || NDEBUG_SYNC */
@@ -193,13 +193,13 @@ __NOTHROW(atomic_once_abort)(struct atomic_once *__restrict __self) {
 	__UINTPTR_TYPE__ __state;
 	do {
 		__state = __self->ao_state;
-		__hybrid_assertf(__self->ao_state == __ATOMIC_ONCE_RUNNING,
+		__hybrid_assertf(__state == __ATOMIC_ONCE_RUNNING,
 		                 "atomic_once_success(%p): Invalid state: %p", (void *)__state);
 	} while (!__hybrid_atomic_cmpxch_weak(&__self->ao_state,
 	                                      __ATOMIC_ONCE_RUNNING,
 	                                      __ATOMIC_ONCE_PENDING,
-	                                      __ATOMIC_RELEASE,
-	                                      __ATOMIC_RELEASE));
+	                                      __ATOMIC_SEQ_CST,
+	                                      __ATOMIC_RELAXED));
 #else /* !NDEBUG && !NDEBUG_SYNC */
 	__hybrid_atomic_store(&__self->ao_state, __ATOMIC_ONCE_PENDING, __ATOMIC_RELEASE);
 #endif /* NDEBUG || NDEBUG_SYNC */
