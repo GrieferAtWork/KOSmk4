@@ -2397,7 +2397,7 @@ kmalloc_leaks_print(kmalloc_leaks_t leaks,
 			FOREACH_XREF_END();
 		}
 		if (tracesize && pc) {
-			DO(addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
+			DO(addr2line_printf(printer, arg,
 			                    instruction_trypred(pc, ISA_DEFAULT),
 			                    pc, "Allocated here"));
 			for (i = 1; i < tracesize; ++i) {
