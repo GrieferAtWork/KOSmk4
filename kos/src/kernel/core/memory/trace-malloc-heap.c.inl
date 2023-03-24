@@ -139,7 +139,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 	assertf(oldnode, "Then why did tm_nodes_tryinsert() fail for %p...%p?",
 	        umin, umax);
 	if unlikely(oldnode->tn_kind != TRACE_NODE_KIND_BITSET) {
-		lock_break();
+		tm_lock_break();
 		kernel_panic_n(n_skip + 1,
 		               "Attempted to trace region %p...%p that "
 		               "overlaps with existing node at %p...%p\n"
@@ -148,7 +148,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 		               trace_node_umin(oldnode), trace_node_umax(oldnode),
 		               &trace_node_print_traceback, oldnode);
 		trace_node_free(oldnode);
-		lock_regain();
+		tm_lock_regain();
 		goto success;
 	}
 	/* Calculate the overlapping address range. */
@@ -198,9 +198,9 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 			/* Special case: The entirety of the old node is being replaced.
 			 * With this in mind, simply don't re-insert the existing  node,
 			 * but rather free it while temporarily dropping the lock. */
-			lock_break();
+			tm_lock_break();
 			trace_node_free(oldnode);
-			lock_regain();
+			tm_lock_regain();
 			goto success;
 		}
 		/* Must shift-down the is-traced bits of `oldnode' */
@@ -250,7 +250,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 		new_node_size += offsetof(struct trace_node, tn_trace);              /* Header addend. */
 		/* Allocate the tracing node. */
 		tm_nodes_insert(oldnode);
-		lock_break();
+		tm_lock_break();
 		node_ptr = LOCAL_heap_alloc_untraced(&trace_heap, new_node_size,
 		                                     TRACE_HEAP_FLAGS |
 		                                     (gfp & GFP_INHERIT));
@@ -258,7 +258,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 		if unlikely(!heapptr_getsiz(node_ptr))
 			return false;
 #endif /* DEFINE_X_noexcept */
-		lock_regain();
+		tm_lock_regain();
 		/* Verify that the old node didn't change. */
 		oldnode = tm_nodes_rremove(umin, umax);
 #define FREE_NODE_PTR()                              \
@@ -403,7 +403,7 @@ NOTHROW(FCALL LOCAL_insert_trace_node)(struct trace_node *__restrict node,
                                        gfp_t gfp, unsigned int n_skip)
 #endif /* ... */
 {
-	lock_acquire();
+	tm_lock_acquire();
 	while unlikely(!tm_nodes_tryinsert(node)) {
 #ifdef DEFINE_X_except
 		LOCAL_insert_trace_node_resolve(trace_node_umin(node),
@@ -418,7 +418,7 @@ NOTHROW(FCALL LOCAL_insert_trace_node)(struct trace_node *__restrict node,
 			return false;
 #endif /* ... */
 	}
-	lock_release();
+	tm_lock_release();
 #ifdef DEFINE_X_noexcept
 	return true;
 #endif /* DEFINE_X_noexcept */
@@ -608,13 +608,13 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_realloc)(struct heap *__restrict self,
 		 * of a larger chunk of memory, then pointers would have to exist
 		 * that point into each individual chunk, or we'd consider  those
 		 * chunks without pointers as leaks! */
-		lock_acquire();
+		tm_lock_acquire();
 		node = tm_nodes_remove((byte_t *)old_ptr + old_bytes - 1);
 		if likely(node) {
 			if unlikely(node->tn_link.rb_max != (uintptr_t)((byte_t *)old_ptr + old_bytes - 1)) {
 				tm_nodes_insert(node);
 				node = trace_node_dupa_tb(node);
-				lock_break();
+				tm_lock_break();
 				kernel_panic_n(/* n_skip: */ 1,
 				               PP_STR(LOCAL_heap_realloc) "(%p,%" PRIuSIZ ",%" PRIuSIZ ",%#x,%#x): "
 				               "New allocation %p-%p overlaps with node %p-%p\n"
@@ -624,16 +624,16 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_realloc)(struct heap *__restrict self,
 				               (byte_t *)old_ptr + old_bytes + missing_bytes - 1,
 				               trace_node_umin(node), trace_node_umax(node),
 				               &trace_node_print_traceback, node);
-				lock_regain();
+				tm_lock_regain();
 			} else {
 				/* Expand the existing node. */
 				node->tn_link.rb_max += missing_bytes;
 				tm_nodes_insert(node);
-				lock_break();
+				tm_lock_break();
 				goto inplace_success;
 			}
 		}
-		lock_release();
+		tm_lock_release();
 
 		/* Create  a new  node for  the block  as a whole.
 		 * This is the case when the original block wasn't
@@ -688,12 +688,14 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_realign)(struct heap *__restrict self,
 		heapptr_t result;
 		if unlikely(alloc_flags & GFP_NOMOVE)
 			goto err;
+
 		/* Special case: initial allocation */
 		result = LOCAL_heap_align_untraced(self, min_alignment, offset,
 		                                   new_bytes, alloc_flags);
 		LOCAL_TRACE_OR_FAIL(result, alloc_flags, goto err;)
 		return result;
 	}
+
 	if unlikely(OVERFLOW_UADD(new_bytes, (size_t)(HEAP_ALIGNMENT - 1), &new_bytes)) {
 #ifdef DEFINE_X_except
 		THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
@@ -733,13 +735,13 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_realign)(struct heap *__restrict self,
 		 * of a larger chunk of memory, then pointers would have to exist
 		 * that point into each individual chunk, or we'd consider  those
 		 * chunks without pointers as leaks! */
-		lock_acquire();
+		tm_lock_acquire();
 		node = tm_nodes_remove((byte_t *)old_ptr + old_bytes - 1);
 		if likely(node) {
 			if unlikely(node->tn_link.rb_max != (uintptr_t)((byte_t *)old_ptr + old_bytes - 1)) {
 				tm_nodes_insert(node);
 				node = trace_node_dupa_tb(node);
-				lock_break();
+				tm_lock_break();
 				kernel_panic_n(/* n_skip: */ 1,
 				               PP_STR(LOCAL_heap_realign) "(%p,%" PRIuSIZ ",%" PRIuSIZ ",%" PRIuSIZ ",%" PRIdSIZ ",%#x,%#x): "
 				               "New allocation %p-%p overlaps with node %p-%p\n"
@@ -749,16 +751,16 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_realign)(struct heap *__restrict self,
 				               (byte_t *)old_ptr + old_bytes + missing_bytes - 1,
 				               trace_node_umin(node), trace_node_umax(node),
 				               &trace_node_print_traceback, node);
-				lock_regain();
+				tm_lock_regain();
 			} else {
 				/* Expand the existing node. */
 				node->tn_link.rb_max += missing_bytes;
 				tm_nodes_insert(node);
-				lock_break();
+				tm_lock_break();
 				goto inplace_success;
 			}
 		}
-		lock_release();
+		tm_lock_release();
 
 		/* Create  a new  node for  the block  as a whole.
 		 * This is the case when the original block wasn't

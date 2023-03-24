@@ -1039,12 +1039,25 @@ do_load_new_slot:
 
 
 
-
+/* Free the given memory, returning it to the heap.
+ * The   caller  must  ensure  that  `ptr'  and  `num_bytes'  are  aligned  by
+ * `HEAP_ALIGNMENT', and that `num_bytes' be least `HEAP_MINSIZE' bytes large.
+ * The following flags affect the behavior of this function:
+ *       - GFP_NOTRIM          -- Do not release large blocks of free data back to the core.
+ *       - GFP_CALLOC          -- The given data block is ZERO-initialized.
+ * @param: flags:     The flags that should be used when freeing data. (see above)
+ *                    NOTE: The heap flags  (`__GFP_HEAPMASK') must match  those
+ *                          passed during original allocation of the data block.
+ * @param: ptr:       The HEAP_ALIGNMENT-aligned base pointer of the block to-be freed.
+ * @param: num_bytes: The amount of bytes that should be freed.
+ *                    NOTE: This argument must be aligned by `HEAP_ALIGNMENT',
+ *                          and must not be equal to ZERO(0). */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL heap_free_untraced)(struct heap *__restrict self,
                                   VIRT void *ptr, size_t num_bytes,
                                   gfp_t flags) {
-	TRACE("heap_free_untraced(%p,%p,%" PRIuSIZ ",%#x)\n", self, ptr, num_bytes, flags);
+	TRACE("heap_free_untraced(self: %p, ptr: %p, num_bytes: %" PRIuSIZ ", flags: %#x)\n",
+	      self, ptr, num_bytes, flags);
 	HEAP_ASSERTF(num_bytes >= HEAP_MINSIZE,
 	             "Invalid heap_free(): Too few bytes (%" PRIuSIZ " < %" PRIuSIZ ")",
 	             num_bytes, HEAP_MINSIZE);
@@ -1109,7 +1122,7 @@ NOTHROW(KCALL heap_truncate_untraced)(struct heap *__restrict self,
                                       void *base, size_t old_size,
                                       size_t new_size, gfp_t free_flags) {
 	size_t free_bytes;
-	TRACE("heap_truncate_untraced(%p,%p,%" PRIuSIZ ",%" PRIuSIZ ",%#x)\n",
+	TRACE("heap_truncate_untraced(self: %p, ptr: %p, old_size: %" PRIuSIZ ", new_size: %" PRIuSIZ ", free_flags: %#x)\n",
 	      self, base, old_size, new_size, flags);
 	HEAP_ASSERTF(!old_size || old_size >= HEAP_MINSIZE,
 	             "Invalid heap_truncate(): Too few bytes (%" PRIuSIZ " < %" PRIuSIZ ")",

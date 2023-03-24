@@ -396,11 +396,11 @@ again_nonnull_ptr:
 #endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 	/* The actual meat of the krealloc() function: Resizing an existing pointer */
-	lock_acquire();
+	tm_lock_acquire();
 	/* Remove the existing node from the nodes-tree */
 	node = tm_nodes_locate(ptr);
 	if unlikely(!node) {
-		lock_break();
+		tm_lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
 		               LOCAL_realloc_PRIFMT ": No node at this address",
 		               LOCAL_realloc_PRIARG);
@@ -409,7 +409,7 @@ again_nonnull_ptr:
 
 	if unlikely(node->tn_kind != TRACE_NODE_KIND_MALL) {
 		node = trace_node_dupa_tb(node);
-		lock_break();
+		tm_lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
 		               LOCAL_realloc_PRIFMT ": Node at %p...%p wasn't created by kmalloc()\n"
 		               "%[gen:c]",
@@ -421,7 +421,7 @@ again_nonnull_ptr:
 
 	if unlikely(ptr != trace_node_uaddr(node) + CONFIG_KERNEL_MALL_HEAD_SIZE) {
 		node = trace_node_dupa_tb(node);
-		lock_break();
+		tm_lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
 		               LOCAL_realloc_PRIFMT ": Passed pointer does not match "
 		               "start of containing node %p...%p (%p...%p)\n"
@@ -438,7 +438,7 @@ again_nonnull_ptr:
 #ifdef HAVE_kmalloc_validate_node
 	if unlikely(!kmalloc_validate_node(1, node)) {
 		node = tm_nodes_remove(ptr);
-		lock_break();
+		tm_lock_break();
 		trace_node_free(node);
 		goto do_normal_malloc;
 	}
@@ -484,7 +484,7 @@ again_nonnull_ptr:
 
 			/* Re-insert the node, so-as to continue tracking it. */
 			tm_nodes_insert(node);
-			lock_break();
+			tm_lock_break();
 
 			/* Now just free trailing memory. */
 			flags = (flags & ~(__GFP_HEAPMASK | GFP_CALLOC)) |
@@ -494,7 +494,7 @@ again_nonnull_ptr:
 		} else {
 realloc_unchanged:
 			/* Don't change the allocated node size. */
-			lock_break();
+			tm_lock_break();
 		}
 		return ptr;
 	}
@@ -508,7 +508,7 @@ realloc_unchanged:
 			num_extend = HEAP_MINSIZE;
 		extension_base  = trace_node_uend(node);
 		extension_flags = (flags & ~__GFP_HEAPMASK) | (node->tn_flags & __GFP_HEAPMASK);
-		lock_break();
+		tm_lock_break();
 		/* Try to allocate the missing part. */
 		num_allocated = LOCAL_heap_allat_untraced(&kernel_heaps[extension_flags & __GFP_HEAPMASK],
 		                                          extension_base, num_extend,
@@ -534,7 +534,7 @@ realloc_unchanged:
 #endif /* DEFINE_X_noexcept */
 			INITIALIZE_USER_POINTER(heapptr_getptr(result),
 			                        heapptr_getsiz(result));
-			lock_regain();
+			tm_lock_regain();
 again_remove_node_for_newchunk:
 			node = tm_nodes_remove(ptr);
 			/* Check to make sure that the associated node hasn't changed. */
@@ -545,7 +545,7 @@ again_remove_node_for_newchunk:
 			            ((extension_flags & __GFP_HEAPMASK) != (node->tn_flags & __GFP_HEAPMASK))) {
 				if (node)
 					tm_nodes_insert(node);
-				lock_break();
+				tm_lock_break();
 				if (flags & GFP_CALLOC) {
 					BZERO_USER_POINTER_HEADTAIL(heapptr_getptr(result),
 					                            heapptr_getsiz(result));
@@ -597,7 +597,7 @@ again_remove_node_for_newchunk:
 				}
 				goto again_remove_node_for_newchunk;
 			}
-			lock_break();
+			tm_lock_break();
 
 			/* Copy all of the old data into the block. */
 			result_ptr = (byte_t *)heapptr_getptr(result) + CONFIG_KERNEL_MALL_HEAD_SIZE;
@@ -609,7 +609,7 @@ again_remove_node_for_newchunk:
 			return result_ptr;
 #endif /* !DEFINE_METHOD_kmalloc_in_place */
 		}
-		lock_regain();
+		tm_lock_regain();
 again_remove_node_for_oldchunk:
 		node = tm_nodes_remove(ptr);
 		/* Check to make sure that the associated node hasn't changed. */
@@ -620,7 +620,7 @@ again_remove_node_for_oldchunk:
 		            ((extension_flags & __GFP_HEAPMASK) != (node->tn_flags & __GFP_HEAPMASK))) {
 			if (node)
 				tm_nodes_insert(node);
-			lock_break();
+			tm_lock_break();
 			assert(!(extension_flags & GFP_CALLOC));
 			heap_free_untraced(&kernel_heaps[extension_flags & __GFP_HEAPMASK],
 			                   extension_base, num_allocated, extension_flags);
@@ -673,7 +673,7 @@ again_remove_node_for_oldchunk:
 			goto again_remove_node_for_oldchunk;
 		}
 	}
-	lock_release();
+	tm_lock_release();
 	/* Re-write the old tail into becoming ZERO-bytes, when GFP_CALLOC was set. */
 #if CONFIG_KERNEL_MALL_TAIL_SIZE != 0
 	if (flags & GFP_CALLOC) {

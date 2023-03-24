@@ -449,7 +449,7 @@ NOTHROW(KCALL heap_allat_untraced_nx)(struct heap *__restrict self,
  *       not only be ambiguous in which set of flags that flag should  appear,
  *       but it also wouldn't fit the image if this function returned anything
  *       other than a valid HEAP data block.
- *       If you want to extend a heap data block, simply use `heap_allat_untraced()'
+ *       If you want to extend a heap data block in-place, simply use `heap_allat_untraced()'
  * @assume(heapptr_getsiz(return) >= new_bytes);
  * @param: old_ptr:      [valid_if(old_bytes != 0)] Base address of the old data block.
  * @param: old_bytes:    The old size of the data block (can be ZERO(0); must be aligned to `HEAP_ALIGNMENT' by the caller)
@@ -625,7 +625,7 @@ NOTHROW(KCALL heap_realign_untraced_nx)(struct heap *__restrict self,
  *       - GFP_NOTRIM          -- Do not release large blocks of free data back to the core.
  *       - GFP_CALLOC          -- The given data block is ZERO-initialized.
  * @param: flags:     The flags that should be used when freeing data. (see above)
- *                    NOTE:  The  heap flags  (`__GFP_HEAPMASK') must  match those
+ *                    NOTE: The heap flags  (`__GFP_HEAPMASK') must match  those
  *                          passed during original allocation of the data block.
  * @param: ptr:       The HEAP_ALIGNMENT-aligned base pointer of the block to-be freed.
  * @param: num_bytes: The amount of bytes that should be freed.

@@ -121,7 +121,8 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_alloc_untraced)(struct heap *__restrict self,
 	size_t result_siz;
 	struct mfree_list *iter, *end;
 	heap_validate_all_paranoid();
-	TRACE(PP_STR(LOCAL_heap_alloc_untraced) "(%p, %" PRIuSIZ ", %#x)\n", self, num_bytes, flags);
+	TRACE(PP_STR(LOCAL_heap_alloc_untraced) "(self: %p, num_bytes: %" PRIuSIZ ", flags: %#x)\n",
+	      self, num_bytes, flags);
 	if unlikely(OVERFLOW_UADD(num_bytes, (size_t)(HEAP_ALIGNMENT - 1), &result_siz))
 		LOCAL_IF_NX_ELSE(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes));
 	result_siz &= ~(HEAP_ALIGNMENT - 1);
@@ -158,13 +159,16 @@ search_heap:
 			continue;
 		mfree_tree_removenode(&self->h_addr, chain);
 		LIST_REMOVE(chain, mf_lsize);
-#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
+
 		/* Track the potentially unused data size as dangling data. */
+#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
 		dangle_size = MFREE_SIZE(chain) - result_siz;
 		HEAP_ADD_DANGLE(self, dangle_size);
 #endif /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
+
 		atomic_lock_release(&self->h_lock);
 		HEAP_ASSERT(IS_ALIGNED(dangle_size, HEAP_ALIGNMENT));
+
 		/* We've got the memory! */
 		result_ptr  = (void *)chain;
 		chain_flags = chain->mf_flags;
@@ -179,6 +183,7 @@ search_heap:
 		} else {
 			void *unused_begin = (void *)((uintptr_t)chain + result_siz);
 			/* Free the unused portion. */
+
 #ifdef CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS
 			/* Randomize allocated memory by shifting the
 			 * resulting  pointer  somewhere  up  higher. */
@@ -188,12 +193,14 @@ search_heap:
 			if (random_offset >= HEAP_MINSIZE) {
 				/* Set the new resulting pointer. */
 				result_ptr = (void *)((uintptr_t)chain + random_offset);
+
 				/* Rather than allocating `chain...+=num_bytes', instead
 				 * allocate `chain+random_offset...+=num_bytes' and free
 				 * `chain...+=random_offset' and
 				 * `chain+random_offset+num_bytes...+=unused_size-random_offset' */
-				if (chain_flags & MFREE_FZERO)
+				if (chain_flags & MFREE_FZERO) {
 					bzero(chain, SIZEOF_MFREE);
+				}
 #ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 				else {
 					mempatl(chain, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
@@ -219,10 +226,12 @@ search_heap:
 				                         (flags & ~(GFP_CALLOC)) | chain_flags);
 			}
 		}
-#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
+
 		/* Now that it's been returned, the data is no longer dangling. */
+#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
 		HEAP_SUB_DANGLE(self, dangle_size);
 #endif /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
+
 		/* Initialize the result memory. */
 		if (flags & GFP_CALLOC) {
 			if (chain_flags & MFREE_FZERO) {
@@ -244,8 +253,9 @@ search_heap:
 		heap_validate_all_paranoid();
 		return heapptr_make(result_ptr, result_siz);
 	}
-#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
+
 	/* Check for dangling data and don't allocate new memory if enough exists. */
+#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
 	if (atomic_read(&self->h_dangle) >= result_siz) {
 		atomic_lock_release(&self->h_lock);
 		/* Let some other thread about to release dangling
@@ -256,6 +266,7 @@ search_heap:
 		goto search_heap;
 	}
 #endif /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
+
 	/* NOTE: Don't track page overflow from below as dangling  data
 	 *       here, so-as not to confuse allocators that are holding
 	 *       a lock to `mman_kernel.mm_lock'.
@@ -316,6 +327,7 @@ allocate_without_overalloc:
 		PRINTK_SYSTEM_ALLOCATION("[heap] Acquire kernel heap: %p...%p\n",
 		                         pageaddr,
 		                         (byte_t *)pageaddr + page_bytes - 1);
+
 		/* Got it! */
 		result_ptr  = pageaddr;
 		unused_size = page_bytes - result_siz;
@@ -395,7 +407,8 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_allat_partial)(struct heap *__restrict self,
 	size_t result;
 	struct mfree *slot;
 	HEAP_ASSERT(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
-	TRACE(PP_STR(LOCAL_heap_allat_partial) "(%p, %p, %#x)\n", self, ptr, flags);
+	TRACE(PP_STR(LOCAL_heap_allat_partial) "(self: %p, ptr: %p, flags: %#x)\n",
+	      self, ptr, flags);
 again:
 	if (!LOCAL_heap_acquirelock(self, flags))
 		LOCAL_IF_NX_ELSE(return 0, THROW(E_WOULDBLOCK_PREEMPTED));
@@ -443,14 +456,16 @@ again:
 		size_t free_offset = (uintptr_t)ptr - MFREE_BEGIN(slot);
 		HEAP_ASSERT(IS_ALIGNED(free_offset, HEAP_ALIGNMENT));
 		if unlikely(free_offset < HEAP_MINSIZE) {
-			/* The remaining  part  of  the  slot  is  too  small.
-			 * Ask the core  if it can  allocate the the  previous
-			 * page  for us, so  we can merge  this slot with that
-			 * page to get a chance of leaving a part large enough
-			 * for us to return to the heap.
-			 * NOTE: If  the  slot  doesn't  start  at  a  page   boundary,
-			 *       we already know  that the requested  part has  already
-			 *       been allocated (meaning this allocation is impossible) */
+			/* The remaining part of the slot is too small.
+			 *
+			 * Ask the core if it can allocate the previous  page
+			 * for us, so we can  merge this slot with that  page
+			 * to get a chance of leaving a part large enough for
+			 * us to return to the heap.
+			 *
+			 * NOTE: If the  slot doesn't  start at  a page  boundary,  we
+			 *       already know that the requested part has already been
+			 *       allocated (meaning  this  allocation  is  impossible) */
 			PAGEDIR_PAGEALIGNED void *slot_pageaddr;
 			atomic_lock_release(&self->h_lock);
 			if (MFREE_BEGIN(slot) & PAGEMASK)
@@ -461,6 +476,7 @@ again:
 			slot_pageaddr = LOCAL_core_page_alloc(self, (byte_t *)slot_pageaddr - PAGESIZE, PAGESIZE, PAGESIZE, flags);
 			if (slot_pageaddr == LOCAL_CORE_PAGE_MALLOC_ERROR)
 				return 0; /* Failed to allocate the associated core-page. */
+
 			/* Free the page, so-as to try and merge it with the slot from before.
 			 * NOTE: Set the `GFP_NOTRIM' to prevent the memory
 			 *       from be unmapped immediately. */
@@ -492,10 +508,12 @@ again:
 		}
 		mfree_tree_removenode(&self->h_addr, slot);
 		LIST_REMOVE(slot, mf_lsize);
-#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
+
 		/* Trace leading free data as dangling. */
+#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
 		HEAP_ADD_DANGLE(self, free_offset);
 #endif /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
+
 		atomic_lock_release(&self->h_lock);
 		slot_flags = (flags & (__GFP_HEAPMASK | GFP_INHERIT)) | slot->mf_flags;
 		if (slot_flags & GFP_CALLOC)
@@ -506,6 +524,7 @@ again:
 			        MIN(free_offset, SIZEOF_MFREE));
 		}
 #endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
+
 		/* Release unused memory below the requested address. */
 		heap_free_raw(self, (void *)MFREE_BEGIN(slot),
 		              free_offset, slot_flags);
@@ -513,6 +532,7 @@ again:
 		HEAP_SUB_DANGLE(self, free_offset);
 #endif /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
 	}
+
 	/* Initialize newly allocated memory according to what the caller wants. */
 #ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 	if (!(flags & GFP_CALLOC))
@@ -532,7 +552,8 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_allat_untraced)(struct heap *__restrict self,
                                                size_t num_bytes, gfp_t flags) {
 	size_t unused_size, alloc_size;
 	size_t result = 0;
-	TRACE(PP_STR(LOCAL_heap_allat_untraced) "(%p, %p, %" PRIuSIZ ", %#x)\n", self, ptr, num_bytes, flags);
+	TRACE(PP_STR(LOCAL_heap_allat_untraced) "(self: %p, ptr: %p, num_bytes: %" PRIuSIZ ", flags: %#x)\n",
+	      self, ptr, num_bytes, flags);
 	if unlikely(!IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT))
 		goto err; /* Badly aligned pointer (can't allocate anything here...) */
 	if unlikely(OVERFLOW_UADD(num_bytes, (size_t)(HEAP_ALIGNMENT - 1), &alloc_size))
@@ -540,6 +561,7 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_allat_untraced)(struct heap *__restrict self,
 	alloc_size &= ~(HEAP_ALIGNMENT - 1);
 	if unlikely(alloc_size < HEAP_MINSIZE)
 		alloc_size = HEAP_MINSIZE;
+
 	/* Allocate memory from the given range. */
 	while (result < alloc_size) {
 		size_t part;
@@ -564,6 +586,7 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_allat_untraced)(struct heap *__restrict self,
 #endif /* !DEFINE_HEAP_NX */
 		result += part;
 	}
+
 	/* With everything now allocated, free what the caller didn't ask for. */
 	HEAP_ASSERT(result >= alloc_size);
 	unused_size = result - alloc_size;
@@ -605,6 +628,7 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_align_untraced)(struct heap *__restrict self,
 	alloc_bytes &= ~(HEAP_ALIGNMENT - 1);
 	if unlikely(alloc_bytes < HEAP_MINSIZE)
 		alloc_bytes = HEAP_MINSIZE;
+
 #if 1
 	{
 		struct mfree_list *iter, *end;
@@ -617,6 +641,7 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_align_untraced)(struct heap *__restrict self,
 		             lengthof(self->h_size));
 		if (!LOCAL_heap_acquirelock(self, flags))
 			LOCAL_IF_NX_ELSE(goto err, THROW(E_WOULDBLOCK_PREEMPTED));
+
 		/* Search for  existing  free  data  that
 		 * fit the required alignment and offset. */
 		for (; iter != end; ++iter) {
@@ -628,6 +653,7 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_align_untraced)(struct heap *__restrict self,
 #ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
 			size_t dangle_size;
 #endif /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
+
 			/* Search this bucket. */
 			chain = LIST_FIRST(iter);
 			while (chain &&
@@ -638,6 +664,7 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_align_untraced)(struct heap *__restrict self,
 				chain = LIST_NEXT(chain, mf_lsize);
 			if (!chain)
 				continue;
+
 			/* Check if this chain entry can sustain our required alignment. */
 			alignment_base = (byte_t *)chain;
 			alignment_base += offset;
@@ -656,16 +683,19 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_align_untraced)(struct heap *__restrict self,
 				while ((size_t)(alignment_base - (byte_t *)chain) < HEAP_MINSIZE)
 					alignment_base += min_alignment;
 			}
+
 			/* Check if the node still contains enough memory for the requested allocation. */
 			if ((alignment_base + alloc_bytes) > (byte_t *)MFREE_END(chain))
 				continue; /* The chain entry is too small once alignment was taken into consideration. */
 			mfree_tree_removenode(&self->h_addr, chain);
 			LIST_REMOVE(chain, mf_lsize);
-#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
+
 			/* Trace potentially unused data as dangling. */
+#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
 			dangle_size = chain->mf_size - alloc_bytes;
 			HEAP_ADD_DANGLE(self, dangle_size);
 #endif /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
+
 			atomic_lock_release(&self->h_lock);
 			HEAP_ASSERT(IS_ALIGNED((uintptr_t)(alignment_base + offset), min_alignment));
 
@@ -685,6 +715,7 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_align_untraced)(struct heap *__restrict self,
 				random_offset = krand() % tkeep_size;
 				random_offset += (min_alignment - 1);
 				random_offset &= ~(min_alignment - 1);
+
 				/* Make sure to only add the offset if hkeep's size will be large enough! */
 				if ((hkeep_size + random_offset) >= HEAP_MINSIZE &&
 				    ((tkeep_size == random_offset) ||
@@ -699,6 +730,7 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_align_untraced)(struct heap *__restrict self,
 
 			if (hkeep_size) {
 				HEAP_ASSERT(hkeep_size >= HEAP_MINSIZE);
+
 				/* Reset data of the head if we're to re-free them. */
 				if (chain_flags & GFP_CALLOC)
 					bzero(hkeep, SIZEOF_MFREE);
@@ -726,10 +758,12 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_align_untraced)(struct heap *__restrict self,
 				                         (flags & ~(GFP_CALLOC)) |
 				                         chain_flags);
 			}
-#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
+
 			/* Remove dangling data. */
+#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
 			HEAP_SUB_DANGLE(self, dangle_size);
 #endif /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
+
 			/* Initialize the resulting memory. */
 			if (flags & GFP_CALLOC) {
 				if (chain_flags & MFREE_FZERO) {
@@ -762,7 +796,8 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_align_untraced)(struct heap *__restrict self,
 		}
 		atomic_lock_release(&self->h_lock);
 	}
-#endif
+#endif /* #if 1 */
+
 	/* Fallback: Use overallocation to assert alignment. */
 
 	/* Must overallocate by at least `HEAP_MINSIZE',

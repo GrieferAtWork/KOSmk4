@@ -302,13 +302,13 @@ DEFINE_DBG_BZERO_OBJECT(tm_smplock);
 #define LOCK_PARAMS preemption_flag_t _l_was
 #define LOCK_ARGS   _l_was
 
-#define lock_acquire()            \
+#define tm_lock_acquire()         \
 	do {                          \
 		preemption_flag_t _l_was; \
 		tm_smplock_acquire_smp_r(&_l_was)
-#define lock_break()  tm_smplock_release_smp_r(&_l_was)
-#define lock_regain() tm_smplock_acquire_smp_r(&_l_was)
-#define lock_release()                  \
+#define tm_lock_break()  tm_smplock_release_smp_r(&_l_was)
+#define tm_lock_regain() tm_smplock_acquire_smp_r(&_l_was)
+#define tm_lock_release()                  \
 		tm_smplock_release_smp_r(&_l_was); \
 	}	__WHILE0
 
@@ -392,10 +392,10 @@ NOTHROW(KCALL kmalloc_untrace)(void *ptr) {
 	if unlikely(!ptr)
 		return;
 	ptr = (void *)CEIL_ALIGN((uintptr_t)ptr, sizeof(void *));
-	lock_acquire();
+	tm_lock_acquire();
 	node = tm_nodes_remove(ptr);
 	if unlikely(!node) {
-		lock_break();
+		tm_lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
 		               "kmalloc_untrace(%p): No node at this location",
 		               ptr);
@@ -405,7 +405,7 @@ NOTHROW(KCALL kmalloc_untrace)(void *ptr) {
 
 	case TRACE_NODE_KIND_MALL: {
 		/* kmalloc_untrace() cannot be used to untrace internal kmalloc() tracings! */
-		lock_break();
+		tm_lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
 		               "kmalloc_untrace(%p): Cannot untrace kmalloc()-pointer %p...%p\n"
 		               "%[gen:c]",
@@ -424,7 +424,7 @@ NOTHROW(KCALL kmalloc_untrace)(void *ptr) {
 		--limit;
 		assert(ptr_index <= limit);
 		if unlikely(!trace_node_bitset_bitget(node, ptr_index)) {
-			lock_break();
+			tm_lock_break();
 			kernel_panic_n(/* n_skip: */ 1,
 			               "kmalloc_untrace(%p): Node at %p...%p was already untraced",
 			               ptr, trace_node_umin(node), trace_node_umax(node));
@@ -438,7 +438,7 @@ NOTHROW(KCALL kmalloc_untrace)(void *ptr) {
 			++maxbit;
 		if (minbit == 0 && maxbit == limit) {
 			/* Completely remove this node. */
-			lock_break();
+			tm_lock_break();
 			trace_node_free(node);
 			return;
 		}
@@ -447,7 +447,7 @@ NOTHROW(KCALL kmalloc_untrace)(void *ptr) {
 			trace_node_bitset_bitoff(node, i);
 		/* Re-insert the node into the tree */
 		tm_nodes_insert(node);
-		lock_break();
+		tm_lock_break();
 		return;
 	}	break;
 
@@ -457,7 +457,7 @@ NOTHROW(KCALL kmalloc_untrace)(void *ptr) {
 	/* Since we're supposed to get rid of the whole node, we can simply
 	 * release the trace-lock, and free  the node, since we've  already
 	 * removed it from the tree. */
-	lock_release();
+	tm_lock_release();
 	trace_node_free(node);
 }
 
@@ -480,17 +480,17 @@ NOTHROW(KCALL kmalloc_untrace_n_impl)(void *base, size_t num_bytes,
 again_while_num_bytes:
 	while (num_bytes) {
 		struct trace_node *node;
-		lock_acquire();
+		tm_lock_acquire();
 		node = tm_nodes_remove(base);
 		if unlikely(!node) {
-			lock_break();
+			tm_lock_break();
 			kernel_panic_n(/* n_skip: */ n_skip + 1,
 			               "kmalloc_untrace_n(%p...%p): No node at %p",
 			               base, endaddr - 1, base);
 			return;
 		}
 		if unlikely(node->tn_kind == TRACE_NODE_KIND_MALL) {
-			lock_break();
+			tm_lock_break();
 			kernel_panic_n(/* n_skip: */ n_skip + 1,
 			               "kmalloc_untrace_n(%p...%p): Cannot untrace kmalloc()-pointer %p...%p\n"
 			               "%[gen:c]",
@@ -521,7 +521,7 @@ again_while_num_bytes:
 				while (i < maxbit && !trace_node_bitset_bitget(node, i + 1))
 					++i;
 				untrace_max = i;
-				lock_break();
+				tm_lock_break();
 				kernel_panic_n(/* n_skip: */ n_skip + 1,
 				               "kmalloc_untrace_n(%p...%p): Data at %p...%p (of node %p...%p) was already untraced",
 				               base, endaddr - 1,
@@ -538,20 +538,20 @@ again_while_num_bytes:
 			 * -> Can either remove fully, or at least truncate the end. */
 			if ((uintptr_t)base <= trace_node_umin(node)) {
 				/* Fully remove this node! */
-				lock_break();
+				tm_lock_break();
 				base      = trace_node_uend(node);
 				num_bytes = endaddr - (uintptr_t)base;
 				trace_node_free(node);
-				goto again_while_num_bytes; /* Don't use `continue'! That one interferes with `lock_acquire()' */
+				goto again_while_num_bytes; /* Don't use `continue'! That one interferes with `tm_lock_acquire()' */
 			}
 			/* Truncate the node near its upper end. */
 			uend                 = trace_node_uend(node);
 			node->tn_link.rb_max = (uintptr_t)base - 1;
 			base                 = uend;
 			tm_nodes_insert(node);
-			lock_break();
+			tm_lock_break();
 			num_bytes = endaddr - (uintptr_t)base;
-			goto again_while_num_bytes; /* Don't use `continue'! That one interferes with `lock_acquire()' */
+			goto again_while_num_bytes; /* Don't use `continue'! That one interferes with `tm_lock_acquire()' */
 		}
 		/* Check if we can truncate the node at its base */
 		if ((uintptr_t)base <= trace_node_umin(node)) {
@@ -582,7 +582,7 @@ again_while_num_bytes:
 			}
 			node->tn_link.rb_min = endaddr;
 			tm_nodes_insert(node);
-			lock_break();
+			tm_lock_break();
 			break;
 		}
 		/* Must split the node (the caller wants us to cut a hole into the middle) */
@@ -599,7 +599,7 @@ again_while_num_bytes:
 				trace_node_bitset_bitoff(node, i);
 			}
 			tm_nodes_insert(node);
-			lock_break();
+			tm_lock_break();
 			break;
 		}
 
@@ -624,7 +624,7 @@ again_while_num_bytes:
 				trace_node_bitset_bitoff(node, i);
 		}
 		tm_nodes_insert(node);
-		lock_release();
+		tm_lock_release();
 		break;
 	}
 }
@@ -663,10 +663,10 @@ NOTHROW(KCALL kmalloc_traceback)(void *ptr, /*out*/ void **tb, size_t buflen,
                                  pid_t *p_alloc_roottid) {
 	size_t result;
 	struct trace_node *node;
-	lock_acquire();
+	tm_lock_acquire();
 	node = tm_nodes_locate(ptr);
 	if unlikely(!node) {
-		lock_break();
+		tm_lock_break();
 		return 0;
 	}
 
@@ -688,7 +688,7 @@ NOTHROW(KCALL kmalloc_traceback)(void *ptr, /*out*/ void **tb, size_t buflen,
 		memcpy(tb, trace_node_traceback_vector(node),
 		       MIN(result, buflen), sizeof(void *));
 	}
-	lock_release();
+	tm_lock_release();
 	return result;
 }
 
@@ -698,9 +698,9 @@ PUBLIC NOBLOCK ssize_t KCALL
 kmalloc_printtrace(void *ptr, pformatprinter printer, void *arg) {
 	ssize_t result = 0;
 	struct trace_node *node;
-	lock_acquire();
+	tm_lock_acquire();
 	node = tm_nodes_locate(ptr);
-	lock_release();
+	tm_lock_release();
 	if (node && TRACE_NODE_KIND_HAS_TRACEBACK(node->tn_kind))
 		result = trace_node_print_traceback(node, printer, arg);
 	return result;
@@ -795,10 +795,10 @@ again:
 PUBLIC NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL kmalloc_validate)(void) {
 #if CONFIG_KERNEL_MALL_HEAD_SIZE != 0 || CONFIG_KERNEL_MALL_TAIL_SIZE != 0
-	lock_acquire();
+	tm_lock_acquire();
 	if (tm_nodes != NULL)
 		kmalloc_validate_walktree(1, tm_nodes);
-	lock_release();
+	tm_lock_release();
 #else /* CONFIG_KERNEL_MALL_HEAD_SIZE != 0 || CONFIG_KERNEL_MALL_TAIL_SIZE != 0 */
 	/* nothing... */
 #endif /* CONFIG_KERNEL_MALL_HEAD_SIZE == 0 && CONFIG_KERNEL_MALL_TAIL_SIZE == 0 */
@@ -2487,9 +2487,9 @@ NOTHROW(KCALL kmalloc_leaks_release)(kmalloc_leaks_t leaks,
 		    node->tn_kind != TRACE_NODE_KIND_CORE &&
 		    node->tn_kind != TRACE_NODE_KIND_MNODE &&
 		    1) {
-			lock_acquire();
+			tm_lock_acquire();
 			tm_nodes_insert(node);
-			lock_release();
+			tm_lock_release();
 		} else {
 			trace_node_free(node);
 		}
@@ -2759,10 +2759,10 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 	if (KERNEL_SLAB_CHECKPTR(ptr))
 		return SLAB_GET(ptr)->s_size;
 #endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
-	lock_acquire();
+	tm_lock_acquire();
 	node = tm_nodes_locate(ptr);
 	if unlikely(!node) {
-		lock_break();
+		tm_lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
 		               "kmalloc_usable_size(%p): No node at this address",
 		               ptr);
@@ -2770,7 +2770,7 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 	}
 	if unlikely(node->tn_kind != TRACE_NODE_KIND_MALL) {
 		node = trace_node_dupa_tb(node);
-		lock_break();
+		tm_lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
 		               "kmalloc_usable_size(%p): Node at %p...%p wasn't created by kmalloc()\n"
 		               "%[gen:c]",
@@ -2780,7 +2780,7 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 	}
 	if unlikely(ptr != trace_node_uaddr(node) + CONFIG_KERNEL_MALL_HEAD_SIZE) {
 		node = trace_node_dupa_tb(node);
-		lock_break();
+		tm_lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
 		               "kmalloc_usable_size(%p): Passed pointer does not "
 		               "match start of containing node %p...%p (%p...%p)\n"
@@ -2796,15 +2796,15 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 	/* Verify head/tail integrity of `node' */
 #ifdef HAVE_kmalloc_validate_node
 	if (!kmalloc_validate_node(1, node)) {
-		lock_break();
+		tm_lock_break();
 		return 0;
 	}
 #endif /* HAVE_kmalloc_validate_node */
 
-	/* Calculate the user-payload-size from the trace-node. */
+	/* Calculate the user-payload-size of the trace-node. */
 	result = trace_node_usize(node) - (CONFIG_KERNEL_MALL_HEAD_SIZE +
 	                                   CONFIG_KERNEL_MALL_TAIL_SIZE);
-	lock_release();
+	tm_lock_release();
 	return result;
 }
 
@@ -2821,10 +2821,10 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 		return;
 	}
 #endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
-	lock_acquire();
+	tm_lock_acquire();
 	node = tm_nodes_remove(ptr);
 	if unlikely(!node) {
-		lock_break();
+		tm_lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
 		               "kffree(%p, %#x): No node at this address",
 		               ptr, flags);
@@ -2833,7 +2833,7 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 	if unlikely(node->tn_kind != TRACE_NODE_KIND_MALL) {
 		tm_nodes_insert(node);
 		node = trace_node_dupa_tb(node);
-		lock_break();
+		tm_lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
 		               "kffree(%p, %#x): Node at %p...%p wasn't created by kmalloc()\n"
 		               "%[gen:c]",
@@ -2844,7 +2844,7 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 	if unlikely(ptr != trace_node_uaddr(node) + CONFIG_KERNEL_MALL_HEAD_SIZE) {
 		tm_nodes_insert(node);
 		node = trace_node_dupa_tb(node);
-		lock_break();
+		tm_lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
 		               "kffree(%p, %#x): Passed pointer does not match "
 		               "start of containing node %p...%p (%p...%p)\n"
@@ -2863,11 +2863,11 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 #ifdef HAVE_kmalloc_validate_node
 	if (!kmalloc_validate_node(1, node)) {
 		tm_nodes_insert(node);
-		lock_break();
+		tm_lock_break();
 		return;
 	}
 #endif /* HAVE_kmalloc_validate_node */
-	lock_release();
+	tm_lock_release();
 
 	/* All right! everything checks out, so we can actually move on to
 	 * freeing the associated  node, as well  as the user-data  block. */
@@ -2909,10 +2909,10 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 		return;
 	}
 #endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
-	lock_acquire();
+	tm_lock_acquire();
 	node = tm_nodes_remove(ptr);
 	if unlikely(!node) {
-		lock_break();
+		tm_lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
 		               "kfree(%p): No node at this address",
 		               ptr);
@@ -2921,7 +2921,7 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 	if unlikely(node->tn_kind != TRACE_NODE_KIND_MALL) {
 		tm_nodes_insert(node);
 		node = trace_node_dupa_tb(node);
-		lock_break();
+		tm_lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
 		               "kfree(%p): Node at %p...%p wasn't created by kmalloc()\n"
 		               "%[gen:c]",
@@ -2932,7 +2932,7 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 	if unlikely(ptr != trace_node_uaddr(node) + CONFIG_KERNEL_MALL_HEAD_SIZE) {
 		tm_nodes_insert(node);
 		node = trace_node_dupa_tb(node);
-		lock_break();
+		tm_lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
 		               "kfree(%p): Passed pointer does not match "
 		               "start of containing node %p...%p (%p...%p)\n"
@@ -2951,11 +2951,11 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 #ifdef HAVE_kmalloc_validate_node
 	if unlikely(!kmalloc_validate_node(1, node)) {
 		tm_nodes_insert(node);
-		lock_break();
+		tm_lock_break();
 		return;
 	}
 #endif /* HAVE_kmalloc_validate_node */
-	lock_release();
+	tm_lock_release();
 
 	/* All right! everything checks out, so we can actually move on to
 	 * freeing the associated  node, as well  as the user-data  block. */
