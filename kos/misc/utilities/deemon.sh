@@ -51,17 +51,22 @@ fi
 install_file /bin/deemon "$OPTPATH/deemon"
 
 # install dex modules
-for filename in $OPTPATH/lib/*.so; do
-	install_file "/usr/$TARGET_LIBPATH/deemon/$(basename "$filename")" "$filename"
-done
+OPTPATH_LIB="$OPTPATH/lib/"
+SRCPATH_LIB="$SRCPATH/lib/"
+while IFS= read -r filename; do
+	install_file "/usr/$TARGET_LIBPATH/deemon/${filename:${#OPTPATH_LIB}}" "$filename"
+done <<< "$(find "$OPTPATH_LIB" -type f -and -name '*.so' )"
 
 # install user-code modules
-for filename in $SRCPATH/lib/*.dee; do
-	install_file "/usr/$TARGET_LIBPATH/deemon/$(basename "$filename")" "$filename"
-done
+while IFS= read -r filename; do
+	install_file "/usr/$TARGET_LIBPATH/deemon/${filename:${#SRCPATH_LIB}}" "$filename"
+done <<< "$(find "$SRCPATH_LIB" \
+	\( -type f \) -and \( \
+		\( -name '*.dee' \) -or \
+		\( \
+			\( -wholename '*/include/*' \) -and \
+			\( -not -name '*.dec' \) \
+		\) \
+	\) \
+)"
 
-for folder in _codecs net python rt; do
-	for filename in $SRCPATH/lib/$folder/*.dee; do
-		install_file "/usr/$TARGET_LIBPATH/deemon/$folder/$(basename "$filename")" "$filename"
-	done
-done
