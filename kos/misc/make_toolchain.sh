@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Clear process exe2path cache when PWD changes on windows"
-DEEMON_VERSION="fae26a30db792b69c0757f4772e17310e58717c1"
+#     v -- "Fix build error with linux-compatible futex configuration"
+DEEMON_VERSION="3df1d097b03452f8ca7cf841e82c05a9cdb670e6"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
