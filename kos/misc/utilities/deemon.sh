@@ -70,3 +70,11 @@ done <<< "$(find "$SRCPATH_LIB" \
 	\) \
 )"
 
+# Install deemon utilities (primarily tests)
+DEEMON_TESTS_PATH="/usr/src/deemon/util"
+install_file "$DEEMON_TESTS_PATH/doc-server.dee" "$SRCPATH/util/doc-server.dee"
+install_file "$DEEMON_TESTS_PATH/test.dee"       "$SRCPATH/util/test.dee"
+SRCPATH_UTIL_TEST="$SRCPATH/util/test/"
+while IFS= read -r filename; do
+	install_file "$DEEMON_TESTS_PATH/test/${filename:${#SRCPATH_UTIL_TEST}}" "$filename"
+done <<< "$(find "$SRCPATH_UTIL_TEST" -type f -and -name '*.dee' )"
