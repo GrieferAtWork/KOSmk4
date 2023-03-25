@@ -1050,8 +1050,8 @@ readnext:
 				/* Skip ahead to the next segment. */
 				off += (size_t)(src - lfn_name);
 				off += UNICODE_16TO8_MAXBUF(LFN_NAME) - 1;
-				off = off - (off % UNICODE_16TO8_MAXBUF(LFN_NAME));
-				src = lfn_name + off;
+				off -= off % UNICODE_16TO8_MAXBUF(LFN_NAME);
+				src += off;
 			}
 
 			/* Safety check: if the LFN filename ends up empty, use the 8.3 name instead! */
