@@ -178,7 +178,7 @@ handle_eventfd_fence_write(struct eventfd *__restrict self,
 
 
 LOCAL ATTR_PURE WUNUSED NONNULL((1)) poll_mode_t KCALL
-evenfd_getavail(struct eventfd *__restrict self) {
+eventfd_getavail(struct eventfd *__restrict self) {
 	u64 value;
 	poll_mode_t result = 0;
 	value = atomic64_read(&self->ef_value);
@@ -207,7 +207,7 @@ INTERN ATTR_PURE poll_mode_t KCALL
 handle_eventfd_fence_polltest(struct eventfd *__restrict self,
                               poll_mode_t what) {
 	/* Check what operations are currently available. */
-	return evenfd_getavail(self) & what;
+	return eventfd_getavail(self) & what;
 }
 
 DEFINE_INTERN_ALIAS(handle_eventfd_sema_pollconnect, handle_eventfd_fence_pollconnect);
