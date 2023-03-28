@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8d67b75 */
+/* HASH CRC-32:0x7e5f12c6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ DECL_BEGIN
  * The  reason we don't care is that all of those warnings are super-hard to get rid
  * of, and they all trigger  because of code that's not  even ours (i.e. is part  of
  * fdlibm) */
-#pragma GCC diagnostic ignored "-Wstrict-overflow"
+__pragma_GCC_diagnostic_ignored(Wstrict_overflow)
 #endif /* __GNUC__ */
 
 #ifndef __KERNEL__

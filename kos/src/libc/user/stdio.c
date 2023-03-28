@@ -3574,10 +3574,7 @@ struct popen_execve_args {
  * only returns non-0 the second time around.
  * >>> warning : variable 'child_override_fdvl' might be clobbered by 'longjmp' or 'vfork' [-Wclobbered]
  */
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wclobbered"
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_push_ignored(Wclobbered)
 
 #define LIBC_POPEN_COMMAND 0 /* arg: `[0..1] char const *command;' */
 #define LIBC_POPEN_EXECVE  1 /* arg: `[1..1] struct popen_execve_args *args;' */
@@ -3694,9 +3691,7 @@ err_r:
 	return NULL;
 }
 
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_pop_ignored(Wclobbered)
 
 
 

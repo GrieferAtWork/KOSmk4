@@ -42,8 +42,7 @@ gcc_opt.append("-fexceptions");
 
 DECL_BEGIN
 
-#pragma GCC diagnostic ignored "-Woverride-init"
-
+__pragma_GCC_diagnostic_ignored(Woverride_init)
 
 INTERN_CONST u16 const ps2_keyboard_ss1[128] = {
 	[0 ... 127] = KEY_UNKNOWN,

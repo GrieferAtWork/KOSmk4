@@ -189,7 +189,7 @@
  * The  reason we don't care is that all of those warnings are super-hard to get rid
  * of, and they all trigger  because of code that's not  even ours (i.e. is part  of
  * fdlibm) */
-#pragma GCC diagnostic ignored "-Wstrict-overflow"
+__pragma_GCC_diagnostic_ignored(Wstrict_overflow)
 #endif /* __GNUC__ */
 
 }

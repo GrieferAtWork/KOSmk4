@@ -177,8 +177,7 @@ untraced_kmalloc_leaks_print(kmalloc_leaks_t UNUSED(leaks),
 /* Even though they've already been marked as ATTR_CONST,
  * gcc keeps complaining that I should mark the as  const
  * >> WHEN THEY'RE ALREADY MARKED AS SUCH!!! << */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsuggest-attribute=const"
+__pragma_GCC_diagnostic_push_ignored(Wsuggest_attribute_const)
 INTERN NOBLOCK ATTR_CONST WUNUSED size_t
 NOTHROW(KCALL untraced_kmalloc_leaks_count)(kmalloc_leaks_t UNUSED(leaks)) {
 	return 0;
@@ -190,7 +189,7 @@ NOTHROW(FCALL untraced_memleak_next)(kmalloc_leaks_t UNUSED(leaks),
 	return NULL;
 }
 DEFINE_INTERN_ALIAS(untraced_memleak_getattr, untraced_memleak_next);
-#pragma GCC diagnostic pop
+__pragma_GCC_diagnostic_pop_ignored(Wsuggest_attribute_const)
 
 
 INTERN NOBLOCK void

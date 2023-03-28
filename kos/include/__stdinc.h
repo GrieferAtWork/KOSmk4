@@ -88,15 +88,25 @@
 #include "compiler/gcc.h"
 #elif defined(_MSC_VER)
 #include "compiler/msvc.h"
-#else
+#else /* ... */
 #include "compiler/generic.h"
-#endif
+#endif /* !... */
 #ifdef __cplusplus
 #include "compiler/c++.h"
 #else /* __cplusplus */
 #include "compiler/c.h"
 #endif /* !__cplusplus */
 #endif /* __CC__ */
+
+#ifndef __has_GCC_warning
+#define __has_GCC_warning(x) 0
+#define __pragma_GCC_diagnostic_push               /* nothing */
+#define __pragma_GCC_diagnostic_pop                /* nothing */
+#define __pragma_GCC_diagnostic_ignored(name)      /* nothing */
+#define __pragma_GCC_diagnostic_push_ignored(name) /* nothing */
+#define __pragma_GCC_diagnostic_pop_ignored(name)  /* nothing */
+#endif /* !__has_GCC_warning */
+
 
 #ifndef __SYSDECL_BEGIN
 #define __SYSDECL_BEGIN __DECL_BEGIN

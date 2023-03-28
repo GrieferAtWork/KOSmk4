@@ -937,10 +937,7 @@ NOTHROW(FCALL decode_latin1)(/*utf-8*/ char *__restrict dest,
 
 
 
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_push_ignored(Waddress_of_packed_member)
 
 PRIVATE WUNUSED struct flatdirent *KCALL
 fatdir_v_readdir(struct flatdirnode *__restrict self, pos_t pos)
@@ -1189,9 +1186,7 @@ dos_8dot3:
 	return &result->fad_ent;
 }
 
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_pop_ignored(Waddress_of_packed_member)
 
 
 PRIVATE struct fat_dirent const new_directory_pattern[3] = {

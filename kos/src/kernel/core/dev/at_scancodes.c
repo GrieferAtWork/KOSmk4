@@ -37,7 +37,7 @@ gcc_opt.append("-fexceptions");
 
 DECL_BEGIN
 
-#pragma GCC diagnostic ignored "-Woverride-init"
+__pragma_GCC_diagnostic_ignored(Woverride_init)
 
 /* AT scancode mappings  for kos's linux-compatible,  device-
  * independent keycodes (aka. `KEY_*' from  <kos/keyboard.h>)

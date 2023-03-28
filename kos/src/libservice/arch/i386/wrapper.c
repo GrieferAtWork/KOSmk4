@@ -67,14 +67,12 @@ DECL_BEGIN
 #error "Generated wrapper functions assume that userprocmask is available and supported!"
 #endif /* !__getuserprocmask_defined */
 
-#ifdef __GNUC__
 /* GCC  complains that we're "taking the address of a packed struct memory" in all of
  * the `UNALIGNED_SET()' calls below. WELL YES I'M TAKING AN UNALIGNED ADDRESS!  WHAT
  * ELSE IS NEW IN? But seriously: I wish  there was some kind of way to disable  this
  * warning when the "unaligned address" is passed to one of the macros that are there
  * only to safely deal with reading/writing unaligned addresses. *sigh* */
-#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_ignored(Waddress_of_packed_member)
 
 static_assert(SIZEOF_POINTER == sizeof(void *));
 

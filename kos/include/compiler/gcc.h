@@ -166,6 +166,8 @@
 #include "gcc-builtins.h"
 #endif /* !__has_builtin */
 
+#include "gcc-warnings.h"
+
 #ifndef __has_feature
 #define __NO_has_feature
 #define __has_feature(x) 0

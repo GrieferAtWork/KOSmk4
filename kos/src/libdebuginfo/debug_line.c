@@ -507,10 +507,7 @@ typedef struct {
  * because it doesn't understand that `old_state.address' is set to  (uintptr_t)-1
  * at the beginning, which prevents `found_state' from being reached until all  of
  * the other fields of `old_state' have also been populated. */
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_push_ignored(Wmaybe_uninitialized)
 
 
 /* Scan the given .debug_line unit `self'  for information related to the  given
@@ -716,10 +713,7 @@ done:
 	return DEBUG_INFO_ERROR_NOFRAME;
 }
 
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif /* __GNUC__ */
-
+__pragma_GCC_diagnostic_pop_ignored(Wmaybe_uninitialized)
 
 DEFINE_PUBLIC_ALIAS(debugline_loadfile, libdi_debugline_loadfile);
 DEFINE_PUBLIC_ALIAS(debugline_loadunit, libdi_debugline_loadunit);

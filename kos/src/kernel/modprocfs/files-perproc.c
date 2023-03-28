@@ -2910,13 +2910,10 @@ PRIVATE struct fdirent_ops const perproc_mapfile_dirent_ops = {
 	.fdo_opennode = &perproc_mapfile_dirent_v_opennode,
 };
 
-#ifdef __GNUC__
 /* GCC complains that `minaddr' may be used uninitialized, but it isn't because it's only
  * used when `state == STATE_END', which can only happen if it goes through `STATE_END0',
  * which it only does on a control-path that initializes `minaddr'! */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_push_ignored(Wmaybe_uninitialized)
 
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 procfs_perproc_map_files_v_lookup(struct fdirnode *__restrict self,
@@ -3027,9 +3024,7 @@ err_mminfo:
 #undef STATE_END
 }
 
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_pop_ignored(Wmaybe_uninitialized)
 
 struct perproc_mapfile_direnum
 #ifdef __cplusplus

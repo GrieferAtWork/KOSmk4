@@ -53,7 +53,7 @@ INTERN_CONST char const GDB_HexChars[16] = {
 	[0xf] = 'f',
 };
 
-#pragma GCC diagnostic ignored "-Woverride-init"
+__pragma_GCC_diagnostic_ignored(Woverride_init)
 INTERN_CONST u8 const GDB_HexValues[256] = {
 	[0 ... 255] = 0,
 

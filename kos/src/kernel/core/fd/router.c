@@ -42,9 +42,9 @@
 #include "../../include/kernel/handle-proto.h"
 
 
-#pragma GCC diagnostic ignored "-Wsuggest-attribute=pure"
-#pragma GCC diagnostic ignored "-Wsuggest-attribute=const"
-#pragma GCC diagnostic ignored "-Wsuggest-attribute=cold"
+__pragma_GCC_diagnostic_ignored(Wsuggest_attribute_pure)
+__pragma_GCC_diagnostic_ignored(Wsuggest_attribute_const)
+__pragma_GCC_diagnostic_ignored(Wsuggest_attribute_cold)
 
 DECL_BEGIN
 

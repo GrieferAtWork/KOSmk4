@@ -325,10 +325,8 @@ struct mallinfo libc_mallinfo_int(void) {
 
 DECL_END
 
-#ifdef __GNUC__
-#pragma GCC diagnostic ignored "-Wsuggest-attribute=pure"
-#pragma GCC diagnostic ignored "-Wsuggest-attribute=const"
-#pragma GCC diagnostic ignored "-Wsuggest-attribute=cold"
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_ignored(Wsuggest_attribute_pure)
+__pragma_GCC_diagnostic_ignored(Wsuggest_attribute_const)
+__pragma_GCC_diagnostic_ignored(Wsuggest_attribute_cold)
 
 #endif /* !GUARD_LIBDLMALLOC_CONFIG_H */

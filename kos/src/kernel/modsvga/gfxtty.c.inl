@@ -68,10 +68,7 @@ DECL_BEGIN
  * ME:  Nope! It definitly gets initialized. - See:
  *      >> bgfg[0] = self->stx_colors[(cell->sgc_color & 0xf0) >> 4];
  *      >> bgfg[1] = self->stx_colors[(cell->sgc_color & 0x0f)]; */
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuninitialized"
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_push_ignored(Wuninitialized)
 
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cell_gfx, BPP))(struct svga_ttyaccess_gfx *__restrict self,
@@ -133,9 +130,7 @@ NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cell_gfx, BPP))(struct svga_ttyacc
 #undef SETPIXEL
 }
 
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_pop_ignored(Wuninitialized)
 
 
 INTERN NOBLOCK NONNULL((1)) void

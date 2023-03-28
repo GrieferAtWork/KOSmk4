@@ -895,11 +895,7 @@ NOTHROW(KCALL tardirenum_v_fini)(struct fdirenum *__restrict self) {
 
 
 /* Suppress incorrect warning about `tf_basename' / `tf_baselen' being uninitialized (no: they're not!) */
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif /* __GNUC__ */
-
+__pragma_GCC_diagnostic_push_ignored(Wmaybe_uninitialized)
 
 PRIVATE BLOCKING NONNULL((1)) size_t KCALL
 tardirenum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
@@ -958,9 +954,7 @@ again_lock_super:
 	return (size_t)result;
 }
 
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_pop_ignored(Wmaybe_uninitialized)
 
 
 PRIVATE BLOCKING NONNULL((1)) pos_t KCALL

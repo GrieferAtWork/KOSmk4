@@ -130,13 +130,10 @@ LOCAL void KCALL ps2_write_cmd(u8 cmd) THROWS(E_IOERROR) {
 		THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HID);
 }
 
-#ifdef __GNUC__
 /* Silence an incorrect warning about `result'
  * being uninitialized in `ps2_read_cmddata()'
  * ~News flash~: it isn't! */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_push_ignored(Wmaybe_uninitialized)
 
 LOCAL WUNUSED u8 KCALL ps2_read_cmddata(void) THROWS(E_IOERROR) {
 	u8 result;
@@ -145,9 +142,7 @@ LOCAL WUNUSED u8 KCALL ps2_read_cmddata(void) THROWS(E_IOERROR) {
 	return result;
 }
 
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_pop_ignored(Wmaybe_uninitialized)
 
 LOCAL void KCALL ps2_write_cmddata(u8 data) THROWS(E_IOERROR) {
 	if unlikely(!ps2_write_cmddata_nx(data))

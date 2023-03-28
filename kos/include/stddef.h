@@ -159,9 +159,9 @@ typedef __WCHAR_TYPE__ wchar_t;
  * they want to take advantage of KOS-specific behavior and  extensions),
  * and includes <stddef.h> (to get access to `offsetof(3)').
  */
-#if defined(__KOS__) && defined(__cplusplus) && defined(__GNUC__) && __GNUC__ >= 6
-#pragma GCC diagnostic ignored "-Winvalid-offsetof"
-#endif /* __KOS__ && __cplusplus && __GNUC__ && __GNUC__ >= 6 */
+#if defined(__KOS__) && defined(__cplusplus)
+__pragma_GCC_diagnostic_ignored(Winvalid_offsetof)
+#endif /* __KOS__ && __cplusplus */
 
 #define offsetafter(s, m)               __COMPILER_OFFSETAFTER(s, m)
 #define container_of(ptr, type, member) __COMPILER_CONTAINER_OF(ptr, type, member)

@@ -1,0 +1,363 @@
+global final COPYRIGHT =
+"/* Copyright (c) 2019-2023 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2023 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */";
+import fs;
+import ipc;
+import * from deemon;
+import * from errors;
+
+global final ROOT = fs.headof(__FILE__);
+global final GCC = "E:\\home\\src\\gcc-git\\gcc";
+
+function getGCCVersion(): string | none {
+	local fp;
+	fp = try File.open(fs.joinpath(GCC, "gcc/BASE-VER"), "r") catch (...) none;
+	if (fp !is none) with (fp) {
+		local a, b, c = fp.read().decode("utf-8").strip().scanf("%d.%d.%d")...;
+		return (a, b, c);
+	}
+	fp = try File.open(fs.joinpath(GCC, "gcc/version.c"), "r") catch (...) none;
+	if (fp !is none) with (fp) {
+		for (local l: fp) {
+			if ("version_string" !in l)
+				continue;
+			local verstrStart = l.find("\"");
+			if (verstrStart < 0)
+				continue;
+			++verstrStart;
+			while (verstrStart < #l && !l.isnumeric(verstrStart))
+				++verstrStart;
+			l = l[verstrStart:];
+			l = l.decode("utf-8");
+			try {
+				local a, b, c = l.scanf("%d.%d.%d")...;
+				return (a, b, c);
+			} catch (...) {
+				local a, b = l.scanf("%d.%d")...;
+				return (a, b, 0);
+			}
+		}
+	}
+}
+
+
+class GCCWarning {
+	this = default;
+	@@Name of the warning (e.g. @"Wrestrict")
+	public member name: string;
+
+	@@Warning flags
+	public member flags: string;
+}
+
+
+global getCWarningOptionsFile;
+function getCWarningOptions(version: (int, int, int)): {GCCWarning...} {
+	for (local filename: [
+		"gcc/c-family/c.opt",
+		"gcc/c.opt",
+		"gcc/common.opt"
+	]) {
+		yield getCWarningOptionsFile(filename, version)...;
+	}
+}
+function getCWarningOptionsFile(filename: string, version: (int, int, int)): {GCCWarning...} {
+	local verNum = version[0] * 10000 + version[1] * 100 + version[2];
+	local fp = try File.open(fs.joinpath(GCC, filename), "r") catch (...) none;
+	if (fp is none)
+		return;
+	function readblock(): {string...} {
+		local block: {string...} = [];
+		for (;;) {
+			local l = fp.readline();
+			if (!l)
+				break;
+			l = l.strip();
+			if (!l) {
+				if (block)
+					break;
+				continue;
+			}
+			if (l.startswith(";"))
+				continue;
+			block.append(l);
+		}
+		return block;
+	}
+	for (;;) {
+		local block = readblock();
+		if (!block)
+			break;
+		if (#block < 2)
+			continue;
+		local name = block[0];
+		local flags = block[1];
+		if (name.startswith("-"))
+			continue;
+		if (verNum > 40600) {
+			if (!flags.recontains(r"\<Warning\>"))
+				continue;
+		} else {
+			if (!name.startswith("W"))
+				continue;
+		}
+		name = name.decode("utf8");
+		flags = flags.decode("utf8");
+		yield GCCWarning(name: name, flags: flags);
+	}
+}
+
+
+class GCCFeatureSet {
+	this = default;
+	public member version: (int,int,int);
+	public member warnings: {GCCWarning...};
+}
+
+function getFeatureSet(): GCCFeatureSet {
+	local version = getGCCVersion();
+	if (version is none)
+		throw Error("Unable to determine version");
+	return GCCFeatureSet(
+		version: version,
+		warnings: getCWarningOptions(version).frozen,
+	);
+}
+
+function getFeatureSetFilename(version: (int,int,int)) {
+	return "gcc_warnings/gcc.features." + ".".join(version) + ".h";
+}
+
+function createFeatureSetFile(feat: GCCFeatureSet) {
+	if (!fs.stat.isdir("gcc_warnings"))
+		fs.mkdir("gcc_warnings");
+	local filename = getFeatureSetFilename(feat.version);
+	try {
+		with (local fp = File.open(filename, "w")) {
+			for (local b: feat.warnings)
+				print fp: (b.name, ":", b.flags);
+		}
+	} catch (...) {
+		try fs.unlink(filename); catch (...);
+		throw;
+	}
+}
+
+function gitCheckout(commit: string) {
+	fs.chdir(GCC);
+	local proc = ipc.Process("git", { "git", "checkout", commit, "-f" });
+	proc.start();
+	local error = proc.join();
+	fs.chdir(ROOT);
+	if (error != 0)
+		throw Error(f"Process {repr proc} failed with {error}");
+}
+
+function loadVersionFeatures(commit: (string, (int,int,int))) {
+	print "Loading features for:", repr commit;
+	local ver = getGCCVersion();
+	if (ver is none || ver != commit[1])
+		gitCheckout(commit[0]);
+	local features = getFeatureSet();
+	assert features.version == commit[1], "Incorrect version";
+	createFeatureSetFile(features);
+}
+
+/* NOTE: Generate this list using `git log --follow -- gcc/BASE-VER' */
+local gccReleaseCommits: {(string, (int,int,int))...} = {
+	("2f81164255bf0d7605cd0651ede0063d10ec72c1", (13, 0, 1)),
+	("091e10203846812c4e98b465ddfb36d12f146be8", (13, 0, 0)),
+	("4152e4ad3f3a67ce30f5e0e01d5eba03fcff10b8", (12, 0, 1)),
+	("0cc79337ad265aabccab63882a810f9dc509a9d0", (12, 0, 0)),
+	("a21b99e8cebc990f7b62ed1ebadb582082e922b6", (11, 0, 1)),
+	("46eed414a332f7684a9d8f07c0f7e94b8cc2659e", (11, 0, 0)),
+	("a52d93219c63d38fa9a97d0eb727e7fcc935e9b3", (10, 0, 1)),
+	("68ec60c4a377b532ec2d265ea542107c36b1d15c", (10, 0, 0)),
+	("561fd08128381a5b37569b465f55cb4cac1f3b14", (9, 0, 1)),
+	("3bedd3463137d0712b72d582836a0b14c74ef620", (9, 0, 0)),
+	("a55e8b53d059fbe33c5f016d8d9aca9731322ab7", (8, 0, 1)),
+	("aa90195aedfa348284c6e4e8ce59dc1b734f1d71", (8, 0, 0)),
+	("d40036b846df9d07f679d593c55f0090f513bb24", (7, 0, 1)),
+	("70f4fdeb67fe065041a52304bb20f6ce701b1cf7", (7, 0, 0)),
+	("1a46d358050cf6964df0d8ceaffafd0cc88539b2", (6, 0, 0)),
+	("2813008eeb7057da284ed901d4c6817880da0eff", (5, 0, 0)),
+	("89eb97de15f1618bd63b6138e8a5536b935861e8", (4, 10, 0)),
+	("8a298c045dedfe40f8bc4348a772047a53c84772", (4, 9, 0)),
+	("45c29d4d5720ce566398ec4949553b9a66f7c11b", (4, 8, 0)),
+	("6bd73dd88994055cdddca4225a5305f7a9282df9", (4, 7, 0)),
+	("d3bccded30236d16e477a7bbd79aff51724234b0", (4, 6, 0)),
+	("e54d52a8fb13d13b5ec27ef02617f053267d13b9", (4, 5, 0)),
+	("8d855c3de1619284343036a4ee9fe2600c1fafe2", (4, 4, 0)),
+	("20a0da35970e790ebbcedc244f24fb0361df11c6", (4, 3, 0)),
+	("040a473fc7b07f01a30d9dff9a5735fde8d41c5e", (4, 2, 0)),
+	("a1286ef574be4a388b14de74a406dc60391a8b91", (4, 1, 0)),
+	("89029cd4d9fdd2482c20a98ea9544a633c185e99", (4, 0, 0)),
+	("79a76d653a725b128f216aaf5972c02609d58b95", (3, 5, 0)),
+	("56d3513643efd59267a4bd6825d0a3fe466b680d", (3, 4, 0)),
+};
+
+for (local x: gccReleaseCommits) {
+	if (!fs.stat.exists(getFeatureSetFilename(x[1])))
+		loadVersionFeatures(x);
+}
+
+function getFeatureSetFromFile(version: (int,int,int)): GCCFeatureSet {
+	local warnings: {GCCWarning...} = [];
+	with (local fp = File.open(getFeatureSetFilename(version), "r")) {
+		for (local l: fp) {
+			local name, none, flags = l.partition(":")...;
+			name = name.decode("utf8");
+			flags = flags.decode("utf8");
+			warnings.append(GCCWarning(name: name, flags: flags));
+		}
+	}
+	return GCCFeatureSet(
+		version: version,
+		warnings: warnings);
+}
+
+function getWarningNames(feat: GCCFeatureSet): {string: string} {
+	local result: {string: string} = Dict();
+	for (local name: feat.warnings.each.name) {
+		local fixedName = name
+			.rstrip("=")
+			.replace("-", "_")
+			.replace("=", "_")
+			.replace("+", "x");
+		local oldRes = result.get(fixedName);
+		if (oldRes is none) {
+			result[fixedName] = name;
+		} else if (oldRes.endswith("=") || !name.endswith("=")) {
+			result[fixedName] = name;
+		}
+	}
+	return result;
+}
+
+function printFeatureSetDiff(out: File, hasWarningKey: Callable, old: GCCFeatureSet, new: GCCFeatureSet) {
+	local oldWarnings: {string: string} = getWarningNames(old);
+	local newWarnings: {string: string} = getWarningNames(new);
+	local oldWarningsKeys = oldWarnings.keys.sorted().frozen;
+	local newWarningsKeys = newWarnings.keys.sorted().frozen;
+	local removed: {GCCWarning...} = [];
+	local added: {GCCWarning...} = [];
+	for (local x: oldWarningsKeys) {
+		if (x !in newWarningsKeys)
+			removed.append(x);
+	}
+	for (local x: newWarningsKeys) {
+		if (x !in oldWarningsKeys)
+			added.append(x);
+	}
+	for (local x: removed)
+		out << "#undef " << hasWarningKey(x) << "\n";
+	for (local x: added) {
+		local warn = newWarnings[x];
+		out << "#define " << hasWarningKey(x) << " "
+			<< (warn.endswith("=") ? "_X" : "_S")
+			<< "(" << repr("-" + warn) << ")\n";
+	}
+}
+
+function generateAllVersionsFeatureHistory(out: File): {GCCWarning...} {
+	local result = Dict();
+	out << COPYRIGHT << "\n\n";
+	out << "#ifndef __has_GCC_warning\n";
+	out << "#define __has_GCC_warning(x) __GCC_PRIVATE_W_IS_DEFINED(__GCC_HAS_WARNING_##x)\n";
+	out << "#define __GCC_PRIVATE_W_ARG_PLACEHOLDER__S(x) ,\n";
+	out << "#define __GCC_PRIVATE_W_ARG_PLACEHOLDER__X(x) ,\n";
+	out << "#define __GCC_PRIVATE_W_TAKE_SECOND_ARG_IMPL(x, val, ...) val\n";
+	out << "#define __GCC_PRIVATE_W_TAKE_SECOND_ARG(x) __GCC_PRIVATE_W_TAKE_SECOND_ARG_IMPL x\n";
+	out << "#define __GCC_PRIVATE_W_IS_DEFINED3(x) __GCC_PRIVATE_W_TAKE_SECOND_ARG((x 1, 0))\n";
+	out << "#define __GCC_PRIVATE_W_IS_DEFINED2(x) __GCC_PRIVATE_W_IS_DEFINED3(__GCC_PRIVATE_W_ARG_PLACEHOLDER_##x)\n";
+	out << "#define __GCC_PRIVATE_W_IS_DEFINED(x) __GCC_PRIVATE_W_IS_DEFINED2(x)\n";
+	out << "#ifndef __GNUC_MINOR__\n";
+	out << "#define __GNUC_MINOR__ 0\n";
+	out << "#endif /* !__GNUC_MINOR__ */\n";
+	out << "#ifndef __GNUC_PATCH__\n";
+	out << "#ifdef __GNUC_PATCHLEVEL__\n";
+	out << "#define __GNUC_PATCH__ __GNUC_PATCHLEVEL__\n";
+	out << "#else /* __GNUC_PATCHLEVEL__ */\n";
+	out << "#define __GNUC_PATCH__ 0\n";
+	out << "#endif /* !__GNUC_PATCHLEVEL__ */\n";
+	out << "#endif /* !__GNUC_PATCH__ */\n";
+	out << "#ifndef __GCC_VERSION_NUM\n";
+	out << "#define __GCC_VERSION_NUM (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCH__)\n";
+	out << "#endif /* !__GCC_VERSION_NUM */\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_ignored_1__S(text)   __pragma(GCC diagnostic ignored text)\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_ignored_1__X(text)   __pragma(GCC diagnostic ignored text)\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_ignored_1(decl)      __PRIVATE_pragma_GCC_diagnostic_ignored_1_##decl\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_push_ignored_1(decl) __pragma_GCC_diagnostic_push __PRIVATE_pragma_GCC_diagnostic_ignored_1_##decl\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_1(decl)  __pragma_GCC_diagnostic_pop\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_ignored_0(decl)           /* nothing */\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_push_ignored_0(decl)      /* nothing */\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_0(decl)       /* nothing */\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_ignored_(cond, decl)      __PRIVATE_pragma_GCC_diagnostic_ignored_##cond(decl)\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_push_ignored_(cond, decl) __PRIVATE_pragma_GCC_diagnostic_push_ignored_##cond(decl)\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_(cond, decl)  __PRIVATE_pragma_GCC_diagnostic_pop_ignored_##cond(decl)\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_ignored(cond, decl)       __PRIVATE_pragma_GCC_diagnostic_ignored_(cond, decl)\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_push_ignored(cond, decl)  __PRIVATE_pragma_GCC_diagnostic_push_ignored_(cond, decl)\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored(cond, decl)   __PRIVATE_pragma_GCC_diagnostic_pop_ignored_(cond, decl)\n";
+	out << "#define __pragma_GCC_diagnostic_push               _Pragma(\"GCC diagnostic push\")\n";
+	out << "#define __pragma_GCC_diagnostic_pop                _Pragma(\"GCC diagnostic pop\")\n";
+	out << "#define __pragma_GCC_diagnostic_ignored(name)      __PRIVATE_pragma_GCC_diagnostic_ignored(__GCC_PRIVATE_W_IS_DEFINED(__GCC_HAS_WARNING_##name), __GCC_HAS_WARNING_##name)\n";
+	out << "#define __pragma_GCC_diagnostic_push_ignored(name) __PRIVATE_pragma_GCC_diagnostic_push_ignored(__GCC_PRIVATE_W_IS_DEFINED(__GCC_HAS_WARNING_##name), __GCC_HAS_WARNING_##name)\n";
+	out << "#define __pragma_GCC_diagnostic_pop_ignored(name)  __PRIVATE_pragma_GCC_diagnostic_pop_ignored(__GCC_PRIVATE_W_IS_DEFINED(__GCC_HAS_WARNING_##name), __GCC_HAS_WARNING_##name)\n";
+	local prevFeatureSet: GCCFeatureSet =
+		GCCFeatureSet(version: (0,0,0), warnings: {});
+	function myHasWarningKey(name: string): string {
+		return "__GCC_HAS_WARNING_" + name;
+	}
+	local versions = List(gccReleaseCommits.each[1]);
+	versions.sort();
+	for (local ver: versions) {
+		local feat = getFeatureSetFromFile(ver);
+		for (local x: feat.warnings) {
+			local c = result.get(x.name);
+			if (c is none /*|| (!c.usesLibc && x.usesLibc === true)*/)
+				result[x.name] = x;
+		}
+		local vernum = ver[0] * 10000 + ver[1] * 100 + ver[2];
+		File.Writer tempfp;
+		printFeatureSetDiff(tempfp, myHasWarningKey, prevFeatureSet, feat);
+		tempfp = tempfp.string;
+		if (tempfp) {
+			out << "\n";
+			out << "#if __GCC_VERSION_NUM >= " << vernum << "\n";
+			out << tempfp;
+			out << "#endif /* __GCC_VERSION_NUM >= " << vernum << " */\n";
+		}
+		prevFeatureSet = feat;
+	}
+	out << "#endif /* !__has_GCC_warning */\n";
+	return result.values;
+}
+
+
+local knownBuiltins;
+with (local res = File.open("../../../include/compiler/gcc-warnings.h", "w"))
+	knownBuiltins = generateAllVersionsFeatureHistory(res);
+//knownBuiltins = List(knownBuiltins);
+//knownBuiltins.sort(GCCWarning.name);
+//with (local res = File.open("gcc_builtins_known", "w")) {
+//	for (local x: knownBuiltins) {
+//		res << x.name << ":" << x.usesLibc << "\n";
+//	}
+//}

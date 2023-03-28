@@ -37,7 +37,7 @@
 #include <unistd.h>
 #include <pthread.h>
 
-#pragma GCC diagnostic ignored "-Wstrict-overflow"
+__pragma_GCC_diagnostic_ignored(Wstrict_overflow)
 
 DECL_BEGIN
 

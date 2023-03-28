@@ -879,8 +879,7 @@ DEFINE_PUBLIC_ALIAS(__libc_init, libc___libc_init);
 
 /* Yes GCC. I know it looks like those assignments don't do anything...
  * But  trust me on this one. - Just don't try to optimize them away ;) */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-but-set-parameter"
+__pragma_GCC_diagnostic_push_ignored(Wunused_but_set_parameter)
 
 /* Prevent GCC from (rightfully) optimizing  away
  * (seemingly unnecessary) parameter assignments. */
@@ -897,7 +896,7 @@ libc___libc_init(int argc, char *argv[], char *envp[]) {
 	envp = peb->pp_envp;
 }
 
-#pragma GCC diagnostic pop
+__pragma_GCC_diagnostic_pop_ignored(Wunused_but_set_parameter)
 #endif /* __i386__ && !__x86_64__ */
 
 

@@ -39,10 +39,7 @@
  *        because `mlock(2)' is annotated  with `[[access(none)]]', but the  associated
  *        system call `sys_mlock(2)' doesn't have that annotation.
  * -> The proper solution would be to also annotate `sys_mlock(2)' as such! */
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_push_ignored(Wmaybe_uninitialized)
 
 DECL_BEGIN
 
@@ -431,8 +428,6 @@ DEFINE_PUBLIC_ALIAS(pkey_mprotect, libc_pkey_mprotect);
 
 DECL_END
 
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_pop_ignored(Wmaybe_uninitialized)
 
 #endif /* !GUARD_LIBC_USER_SYS_MMAN_C */

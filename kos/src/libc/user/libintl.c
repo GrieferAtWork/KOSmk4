@@ -109,15 +109,14 @@ for (local name: CATEGORIES) {
 	print("#define LC_COUNT (", name, " + 1)");
 	print("#endif /" "* ", name, " >= LC_COUNT *" "/");
 }
-print("#pragma GCC diagnostic push");
-print("#pragma GCC diagnostic ignored \"-Woverride-init\"");
+print("__pragma_GCC_diagnostic_push_ignored(Woverride_init)");
 print("PRIVATE ATTR_SECTION(\".rodata.crt.i18n\") u8 const category_names_offsets[LC_COUNT] = {");
 print("	[0 ... LC_COUNT - 1] = category_names__END,");
 for (local name: CATEGORIES) {
 	print("	[", name, "]", (" " * (longest_catname_len - #name)), " = category_names__OFFSET_", name, ",");
 }
 print("};");
-print("#pragma GCC diagnostic pop");
+print("__pragma_GCC_diagnostic_pop_ignored(Woverride_init)");
 ]]]*/
 PRIVATE ATTR_SECTION(".rodata.crt.i18n") char const category_names[] =
 "LC_CTYPE"
@@ -165,8 +164,7 @@ PRIVATE ATTR_SECTION(".rodata.crt.i18n") char const category_names[] =
 #undef LC_COUNT
 #define LC_COUNT (LC_ALL + 1)
 #endif /* LC_ALL >= LC_COUNT */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Woverride-init"
+__pragma_GCC_diagnostic_push_ignored(Woverride_init)
 PRIVATE ATTR_SECTION(".rodata.crt.i18n") u8 const category_names_offsets[LC_COUNT] = {
 	[0 ... LC_COUNT - 1] = category_names__END,
 	[LC_CTYPE]    = category_names__OFFSET_LC_CTYPE,
@@ -177,7 +175,7 @@ PRIVATE ATTR_SECTION(".rodata.crt.i18n") u8 const category_names_offsets[LC_COUN
 	[LC_MESSAGES] = category_names__OFFSET_LC_MESSAGES,
 	[LC_ALL]      = category_names__OFFSET_LC_ALL,
 };
-#pragma GCC diagnostic pop
+__pragma_GCC_diagnostic_pop_ignored(Woverride_init)
 /*[[[end]]]*/
 
 #define CATEGORY_NAME_OFFSET(category)              \

@@ -41,11 +41,9 @@
 
 #include <libcpustate/register.h>
 
-#ifdef __GNUC__
 /* Suppress warnings about accessing unaligned pointers in `struct desctab' */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_push_ignored(Waddress_of_packed_member)
+
 
 #ifdef __x86_64__
 #define IRREGS_LOADSELF(T) /* nothing */
@@ -2246,8 +2244,6 @@ DEFINE_PUBLIC_ALIAS(IRREGS_NAME(register_set_scpustate), IRREGS_NAME(libcpu_regi
 
 DECL_END
 
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_pop_ignored(Waddress_of_packed_member)
 
 #endif /* !GUARD_LIBCPUSTATE_ARCH_I386_REGISTER_C */

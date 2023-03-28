@@ -642,12 +642,9 @@ noinfo_fail:
 	return UNWIND_OPTIMIZED_AWAY;
 }
 
-#ifdef __GNUC__
 /* GCC  claims  that  "length" in  the  below function  is  uninitialized, when
  * clearly it is very much getting initialized by `debuginfo_location_select()' */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_push_ignored(Wmaybe_uninitialized)
 
 /* Check if the given `expr' is a simple push-register instruction for `dw_regno' */
 PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) bool
@@ -691,9 +688,7 @@ NOTHROW_NCX(CC is_cfi_expression_a_simple_register_push)(struct cfientry *__rest
 	return false;
 }
 
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_pop_ignored(Wmaybe_uninitialized)
 
 
 PRIVATE NONNULL((1, 3)) unwind_errno_t
@@ -701,12 +696,9 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
                                      unwind_regno_t dw_regno,
                                      void *__restrict dst);
 
-#ifdef __GNUC__
 /* GCC claims that "expr_length" in  the below function is uninitialized,  when
  * clearly it is very much getting initialized by `debuginfo_location_select()' */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_push_ignored(Wmaybe_uninitialized)
 
 /* @param: deref_expression_result: When true, dereference the expression result, and
  *                                  copy the  pointed-to memory  contents into  `dst' */
@@ -860,9 +852,7 @@ again_runexpr:
 	return error;
 }
 
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif /* __GNUC__ */
+__pragma_GCC_diagnostic_pop_ignored(Wmaybe_uninitialized)
 
 
 PRIVATE NONNULL((1, 3)) unwind_errno_t
