@@ -193,7 +193,7 @@ typedef __CHAR32_TYPE__ char32_t;
 @@>> unicode_readutf8(3)
 @@Read a single Unicode character from a given UTF-8 string
 @@If  you only want  to advance to  the next character, do:
-@@>> *ptext += unicode_utf8seqlen[(unsigned char)*ptext];
+@@>> *ptext += unicode_utf8seqlen[(unsigned char)**ptext];
 [[wunused, libc, kernel, impl_include("<libc/template/unicode_utf8seqlen.h>")]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char32_t unicode_readutf8([[inout]] /*utf-8*/ char const **__restrict ptext)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44253aa3 */
+/* HASH CRC-32:0xd759ab9a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ DECL_BEGIN
 /* >> unicode_readutf8(3)
  * Read a single Unicode character from a given UTF-8 string
  * If  you only want  to advance to  the next character, do:
- * >> *ptext += unicode_utf8seqlen[(unsigned char)*ptext]; */
+ * >> *ptext += unicode_utf8seqlen[(unsigned char)**ptext]; */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") WUNUSED ATTR_INOUT(1) char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf8)(char const **__restrict ptext) {
 	char32_t result;

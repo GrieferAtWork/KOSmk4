@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ed268a8 */
+/* HASH CRC-32:0xbd42399f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -146,19 +146,19 @@ extern "C++" {
 /* >> unicode_readutf8(3)
  * Read a single Unicode character from a given UTF-8 string
  * If  you only want  to advance to  the next character, do:
- * >> *ptext += unicode_utf8seqlen[(unsigned char)*ptext]; */
+ * >> *ptext += unicode_utf8seqlen[(unsigned char)**ptext]; */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),char32_t,__NOTHROW_NCX,unicode_readutf8,(char const **__restrict __ptext),unicode_readutf8,(__ptext))
 /* >> unicode_readutf8(3)
  * Read a single Unicode character from a given UTF-8 string
  * If  you only want  to advance to  the next character, do:
- * >> *ptext += unicode_utf8seqlen[(unsigned char)*ptext]; */
+ * >> *ptext += unicode_utf8seqlen[(unsigned char)**ptext]; */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),char32_t,__NOTHROW_NCX,unicode_readutf8,(char **__restrict __ptext),unicode_readutf8,(__ptext))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_UNICODE_H_PROTO */
 /* >> unicode_readutf8(3)
  * Read a single Unicode character from a given UTF-8 string
  * If  you only want  to advance to  the next character, do:
- * >> *ptext += unicode_utf8seqlen[(unsigned char)*ptext]; */
+ * >> *ptext += unicode_utf8seqlen[(unsigned char)**ptext]; */
 __CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1),char32_t,__NOTHROW_NCX,unicode_readutf8,(char const **__restrict __ptext),(__ptext))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_UNICODE_H_PROTO */
 #else /* __CRT_HAVE_unicode_readutf8 */
@@ -168,19 +168,19 @@ extern "C++" {
 /* >> unicode_readutf8(3)
  * Read a single Unicode character from a given UTF-8 string
  * If  you only want  to advance to  the next character, do:
- * >> *ptext += unicode_utf8seqlen[(unsigned char)*ptext]; */
+ * >> *ptext += unicode_utf8seqlen[(unsigned char)**ptext]; */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INOUT(1) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf8)(char const **__restrict __ptext) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8))(__ptext); }
 /* >> unicode_readutf8(3)
  * Read a single Unicode character from a given UTF-8 string
  * If  you only want  to advance to  the next character, do:
- * >> *ptext += unicode_utf8seqlen[(unsigned char)*ptext]; */
+ * >> *ptext += unicode_utf8seqlen[(unsigned char)**ptext]; */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INOUT(1) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf8)(char **__restrict __ptext) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8))((char const **)__ptext); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_UNICODE_H_PROTO */
 /* >> unicode_readutf8(3)
  * Read a single Unicode character from a given UTF-8 string
  * If  you only want  to advance to  the next character, do:
- * >> *ptext += unicode_utf8seqlen[(unsigned char)*ptext]; */
+ * >> *ptext += unicode_utf8seqlen[(unsigned char)**ptext]; */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_readutf8, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INOUT(1) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf8)(char const **__restrict __ptext) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8))(__ptext); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_UNICODE_H_PROTO */
 #endif /* !__CRT_HAVE_unicode_readutf8 */

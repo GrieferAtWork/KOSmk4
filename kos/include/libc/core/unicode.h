@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6678225b */
+/* HASH CRC-32:0xf88a7643 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,14 +34,14 @@ __SYSDECL_BEGIN
 /* >> unicode_readutf8(3)
  * Read a single Unicode character from a given UTF-8 string
  * If  you only want  to advance to  the next character, do:
- * >> *ptext += unicode_utf8seqlen[(unsigned char)*ptext]; */
+ * >> *ptext += unicode_utf8seqlen[(unsigned char)**ptext]; */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf8,(char const **__restrict __ptext),unicode_readutf8,(__ptext))
 #else /* __CRT_HAVE_unicode_readutf8 */
 #include <libc/local/unicode/unicode_readutf8.h>
 /* >> unicode_readutf8(3)
  * Read a single Unicode character from a given UTF-8 string
  * If  you only want  to advance to  the next character, do:
- * >> *ptext += unicode_utf8seqlen[(unsigned char)*ptext]; */
+ * >> *ptext += unicode_utf8seqlen[(unsigned char)**ptext]; */
 #define __libc_core_unicode_readutf8 __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8)
 #endif /* !__CRT_HAVE_unicode_readutf8 */
 #ifdef __CRT_HAVE_unicode_readutf8_rev

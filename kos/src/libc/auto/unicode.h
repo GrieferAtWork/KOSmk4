@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1b32596 */
+/* HASH CRC-32:0x8f58e640 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,13 +42,13 @@ typedef __pc32formatprinter pc32formatprinter;
 /* >> unicode_readutf8(3)
  * Read a single Unicode character from a given UTF-8 string
  * If  you only want  to advance to  the next character, do:
- * >> *ptext += unicode_utf8seqlen[(unsigned char)*ptext]; */
+ * >> *ptext += unicode_utf8seqlen[(unsigned char)**ptext]; */
 INTDEF WUNUSED ATTR_INOUT(1) char32_t NOTHROW_NCX(LIBDCALL libd_unicode_readutf8)(char const **__restrict ptext);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> unicode_readutf8(3)
  * Read a single Unicode character from a given UTF-8 string
  * If  you only want  to advance to  the next character, do:
- * >> *ptext += unicode_utf8seqlen[(unsigned char)*ptext]; */
+ * >> *ptext += unicode_utf8seqlen[(unsigned char)**ptext]; */
 INTDEF WUNUSED ATTR_INOUT(1) char32_t NOTHROW_NCX(LIBCCALL libc_unicode_readutf8)(char const **__restrict ptext);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_readutf8_rev(3)
