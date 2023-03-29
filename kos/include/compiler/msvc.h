@@ -539,19 +539,80 @@ void __builtin_va_end(__builtin_va_list &__ap);
 #pragma warning(disable: 4514) /* Unused inline function was removed. */
 #pragma warning(disable: 4574) /* Nonsensical preprocessor warning. */
 #pragma warning(disable: 4710) /* Function not inlined (Emit for local varargs functions...) */
+#pragma warning(disable: 4711) /* Function inlined despite no `inline' keyword */
+#pragma warning(disable: 4201) /* nonstandard extension used: nameless struct/union (they're standard now...) */
 #ifndef __cplusplus
 /* Disable some warnings that are caused by function redirections in system headers. */
 #define __REDIRECT_WSUPPRESS_BEGIN                                                        \
 	__pragma(warning(push))                                                               \
-	__pragma(warning(disable: /* Redirections  */ 4210 4028 4142 4565 4559 4211 4115 4996 \
-	                          /* Unnamed union */ 4201))
+	__pragma(warning(disable: /* Redirections  */ 4210 4028 4142 4565 4559 4211 4115 4996))
 #define __REDIRECT_WSUPPRESS_END __pragma(warning(pop))
 /* Suppress warnings caused by C-mode redirections in system headers. */
 #define __SYSDECL_BEGIN __DECL_BEGIN __REDIRECT_WSUPPRESS_BEGIN
 #define __SYSDECL_END   __REDIRECT_WSUPPRESS_END __DECL_END
 #else /* !__cplusplus */
-/* Disable some warnings that are caused by function redirections in system headers. */
-/* Suppress warnings caused by C-mode redirections in system headers. */
-#define __SYSDECL_BEGIN __DECL_BEGIN __pragma(warning(push)) __pragma(warning(disable: /* Unnamed union */ 4201))
-#define __SYSDECL_END   __pragma(warning(pop)) __DECL_END
+#define __SYSDECL_BEGIN __DECL_BEGIN
+#define __SYSDECL_END   __DECL_END
 #endif /* __cplusplus */
+
+
+/* Try to emulate gcc-style warning suppression directives. */
+#ifndef __has_GCC_warning
+#define __has_GCC_warning(x) __GCC_PRIVATE_W_IS_DEFINED(__GCC_HAS_WARNING_##x)
+#define __GCC_PRIVATE_W_ARG_PLACEHOLDER__xS(x) ,
+#define __GCC_PRIVATE_W_TAKE_SECOND_ARG_IMPL(x, val, ...) val
+#define __GCC_PRIVATE_W_TAKE_SECOND_ARG(x) __GCC_PRIVATE_W_TAKE_SECOND_ARG_IMPL x
+#define __GCC_PRIVATE_W_IS_DEFINED3(x) __GCC_PRIVATE_W_TAKE_SECOND_ARG((x 1, 0))
+#define __GCC_PRIVATE_W_IS_DEFINED2(x) __GCC_PRIVATE_W_IS_DEFINED3(__GCC_PRIVATE_W_ARG_PLACEHOLDER_##x)
+#define __GCC_PRIVATE_W_IS_DEFINED(x) __GCC_PRIVATE_W_IS_DEFINED2(x)
+
+#define __PRIVATE_pragma_GCC_diagnostic_ignored_1__xS(ids)   __pragma(warning(disable: ids))
+#define __PRIVATE_pragma_GCC_diagnostic_ignored_1(decl)      __PRIVATE_pragma_GCC_diagnostic_ignored_1_##decl
+#define __PRIVATE_pragma_GCC_diagnostic_push_ignored_1(decl) __pragma_GCC_diagnostic_push __PRIVATE_pragma_GCC_diagnostic_ignored_1_##decl
+#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_1(decl)  __pragma_GCC_diagnostic_pop
+#define __PRIVATE_pragma_GCC_diagnostic_ignored_0(decl)            /* nothing */
+#define __PRIVATE_pragma_GCC_diagnostic_push_ignored_0(decl)       /* nothing */
+#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_0(decl)        /* nothing */
+#define __PRIVATE_pragma_GCC_diagnostic_ignored__(cond, decl)      __PRIVATE_pragma_GCC_diagnostic_ignored_##cond(decl)
+#define __PRIVATE_pragma_GCC_diagnostic_ignored_(cond, decl)       __PRIVATE_pragma_GCC_diagnostic_ignored__(cond, decl)
+#define __PRIVATE_pragma_GCC_diagnostic_push_ignored__(cond, decl) __PRIVATE_pragma_GCC_diagnostic_push_ignored_##cond(decl)
+#define __PRIVATE_pragma_GCC_diagnostic_push_ignored_(cond, decl)  __PRIVATE_pragma_GCC_diagnostic_push_ignored__(cond, decl)
+#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored__(cond, decl)  __PRIVATE_pragma_GCC_diagnostic_pop_ignored_##cond(decl)
+#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_(cond, decl)   __PRIVATE_pragma_GCC_diagnostic_pop_ignored__(cond, decl)
+#define __PRIVATE_pragma_GCC_diagnostic_ignored(cond, decl)        __PRIVATE_pragma_GCC_diagnostic_ignored_(cond, decl)
+#define __PRIVATE_pragma_GCC_diagnostic_push_ignored(cond, decl)   __PRIVATE_pragma_GCC_diagnostic_push_ignored_(cond, decl)
+#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored(cond, decl)    __PRIVATE_pragma_GCC_diagnostic_pop_ignored_(cond, decl)
+#define __pragma_GCC_diagnostic_push               __pragma(warning(push))
+#define __pragma_GCC_diagnostic_pop                __pragma(warning(pop))
+#define __pragma_GCC_diagnostic_ignored(name)      __PRIVATE_pragma_GCC_diagnostic_ignored(__GCC_PRIVATE_W_IS_DEFINED(__GCC_HAS_WARNING_##name), __GCC_HAS_WARNING_##name)
+#define __pragma_GCC_diagnostic_push_ignored(name) __PRIVATE_pragma_GCC_diagnostic_push_ignored(__GCC_PRIVATE_W_IS_DEFINED(__GCC_HAS_WARNING_##name), __GCC_HAS_WARNING_##name)
+#define __pragma_GCC_diagnostic_pop_ignored(name)  __PRIVATE_pragma_GCC_diagnostic_pop_ignored(__GCC_PRIVATE_W_IS_DEFINED(__GCC_HAS_WARNING_##name), __GCC_HAS_WARNING_##name)
+#define __pragma_MSVC_diagnostic_ignored           __PRIVATE_pragma_GCC_diagnostic_ignored_1__xS
+#define __pragma_MSVC_diagnostic_push_ignored      __pragma_GCC_diagnostic_push __PRIVATE_pragma_GCC_diagnostic_ignored_1__xS
+#define __pragma_MSVC_diagnostic_pop_ignored(ids)  __pragma_GCC_diagnostic_pop
+
+/* Mapping of msvc warning IDs to gcc warning names */
+#define __GCC_HAS_WARNING_Wuninitialized _xS(4700)
+#define __GCC_HAS_WARNING_Wunreachable_code _xS(4702)
+#define __GCC_HAS_WARNING_Wmaybe_uninitialized _xS(4701 4703)
+#define __GCC_HAS_WARNING_Wcast_function_type _xS(4054 4152)
+#define __GCC_HAS_WARNING_MSconditional_expression_is_constant _xS(4127)
+#define __GCC_HAS_WARNING_Wdiv_by_zero _xS(4723 4724)
+#define __GCC_HAS_WARNING_Winvalid_offsetof _xS(4597 4749 4842)
+#define __GCC_HAS_WARNING_Woverflow _xS(4056 4178 4340 4427 4756 4757)
+#define __GCC_HAS_WARNING_Wunused_parameter _xS(4100)
+#define __GCC_HAS_WARNING_Wunused_variable _xS(4101 4189)
+#define __GCC_HAS_WARNING_Wunused_but_set_variable _xS(4189)
+#define __GCC_HAS_WARNING_Wunused_label _xS(4102)
+#define __GCC_HAS_WARNING_Wbuiltin_macro_redefined _xS(4117)
+#define __GCC_HAS_WARNING_Wreturn_local_addr _xS(4172)
+#define __GCC_HAS_WARNING_Wshift_count_negative _xS(4293)
+#define __GCC_HAS_WARNING_Wshift_count_overflow _xS(4293 4333)
+#define __GCC_HAS_WARNING_Wformat_extra_args _xS(4474)
+#define __GCC_HAS_WARNING_Wunused_function _xS(4505)
+#define __GCC_HAS_WARNING_Wunused_value _xS(4555)
+#define __GCC_HAS_WARNING_Wint_in_bool_context _xS(4800)
+#define __GCC_HAS_WARNING_Wswitch_bool _xS(4808)
+#define __GCC_HAS_WARNING_Wtrigraphs _xS(4837)
+#define __GCC_HAS_WARNING_Wdeprecated _xS(4973 4974)
+#endif /* !__has_GCC_warning */

@@ -114,8 +114,9 @@ __DECL_END
 #ifdef __CC__
 #include <hybrid/typecore.h>
 #ifdef _MSC_VER
+#pragma warning(disable: 4565) /* Needs to be kept off to prevent bogus warning if <Windows.h> re-declares `GetCurrentThreadId()' without `ATTR_CONST' */
 #pragma warning(push)
-#pragma warning(disable : 4559) /* Suppress warning about our addition of `ATTR_CONST' */
+#pragma warning(disable: 4559) /* Suppress warning about our addition of `ATTR_CONST' */
 #endif /* _MSC_VER */
 __DECL_BEGIN
 #define __hybrid_tid_t __ULONG32_TYPE__

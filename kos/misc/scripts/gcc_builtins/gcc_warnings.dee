@@ -271,7 +271,7 @@ function printFeatureSetDiff(out: File, hasWarningKey: Callable, old: GCCFeature
 	for (local x: added) {
 		local warn = newWarnings[x];
 		out << "#define " << hasWarningKey(x) << " "
-			<< (warn.endswith("=") ? "_X" : "_S")
+			<< (warn.endswith("=") ? "_xX" : "_xS")
 			<< "(" << repr("-" + warn) << ")\n";
 	}
 }
@@ -281,8 +281,8 @@ function generateAllVersionsFeatureHistory(out: File): {GCCWarning...} {
 	out << COPYRIGHT << "\n\n";
 	out << "#ifndef __has_GCC_warning\n";
 	out << "#define __has_GCC_warning(x) __GCC_PRIVATE_W_IS_DEFINED(__GCC_HAS_WARNING_##x)\n";
-	out << "#define __GCC_PRIVATE_W_ARG_PLACEHOLDER__S(x) ,\n";
-	out << "#define __GCC_PRIVATE_W_ARG_PLACEHOLDER__X(x) ,\n";
+	out << "#define __GCC_PRIVATE_W_ARG_PLACEHOLDER__xS(x) ,\n";
+	out << "#define __GCC_PRIVATE_W_ARG_PLACEHOLDER__xX(x) ,\n";
 	out << "#define __GCC_PRIVATE_W_TAKE_SECOND_ARG_IMPL(x, val, ...) val\n";
 	out << "#define __GCC_PRIVATE_W_TAKE_SECOND_ARG(x) __GCC_PRIVATE_W_TAKE_SECOND_ARG_IMPL x\n";
 	out << "#define __GCC_PRIVATE_W_IS_DEFINED3(x) __GCC_PRIVATE_W_TAKE_SECOND_ARG((x 1, 0))\n";
@@ -301,8 +301,8 @@ function generateAllVersionsFeatureHistory(out: File): {GCCWarning...} {
 	out << "#ifndef __GCC_VERSION_NUM\n";
 	out << "#define __GCC_VERSION_NUM (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCH__)\n";
 	out << "#endif /* !__GCC_VERSION_NUM */\n";
-	out << "#define __PRIVATE_pragma_GCC_diagnostic_ignored_1__S(text)   __pragma(GCC diagnostic ignored text)\n";
-	out << "#define __PRIVATE_pragma_GCC_diagnostic_ignored_1__X(text)   __pragma(GCC diagnostic ignored text)\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_ignored_1__xS(text)  __pragma(GCC diagnostic ignored text)\n";
+	out << "#define __PRIVATE_pragma_GCC_diagnostic_ignored_1__xX(text)  __pragma(GCC diagnostic ignored text)\n";
 	out << "#define __PRIVATE_pragma_GCC_diagnostic_ignored_1(decl)      __PRIVATE_pragma_GCC_diagnostic_ignored_1_##decl\n";
 	out << "#define __PRIVATE_pragma_GCC_diagnostic_push_ignored_1(decl) __pragma_GCC_diagnostic_push __PRIVATE_pragma_GCC_diagnostic_ignored_1_##decl\n";
 	out << "#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_1(decl)  __pragma_GCC_diagnostic_pop\n";

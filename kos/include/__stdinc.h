@@ -107,6 +107,12 @@
 #define __pragma_GCC_diagnostic_pop_ignored(name)  /* nothing */
 #endif /* !__has_GCC_warning */
 
+#ifndef __pragma_MSVC_diagnostic_ignored
+#define __pragma_MSVC_diagnostic_ignored(ids)      /* nothing */
+#define __pragma_MSVC_diagnostic_push_ignored(ids) /* nothing */
+#define __pragma_MSVC_diagnostic_pop_ignored(ids)  /* nothing */
+#endif /* !__pragma_MSVC_diagnostic_ignored */
+
 
 #ifndef __SYSDECL_BEGIN
 #define __SYSDECL_BEGIN __DECL_BEGIN
