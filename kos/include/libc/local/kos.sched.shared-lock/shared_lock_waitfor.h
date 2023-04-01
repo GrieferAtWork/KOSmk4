@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe539f9d1 */
+/* HASH CRC-32:0x4a2bd782 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,9 +44,9 @@ __LOCAL_LIBC(shared_lock_waitfor) __BLOCKING __ATTR_INOUT(1) void
 #else /* __KERNEL__ */
 	unsigned int __lockword;
 	while ((__lockword = __hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE)) != 0) {
-		if (__lockword == 1)
-			__hybrid_atomic_cmpxch(&__self->sl_lock, 1, 2, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
-		__shared_lock_wait(__self);
+		__shared_lock_beginwait(__self);
+		__shared_lock_wait(__self, __lockword);
+		__shared_lock_endwait(__self);
 	}
 #endif /* !__KERNEL__ */
 }

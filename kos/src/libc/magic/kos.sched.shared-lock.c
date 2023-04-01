@@ -66,12 +66,12 @@ __SYSDECL_BEGIN
 #define shared_lock_cinit(self)        (void)(sig_cinit(&(self)->sl_sig), __hybrid_assert((self)->sl_lock == 0))
 #define shared_lock_cinit_locked(self) (void)(sig_cinit(&(self)->sl_sig), (self)->sl_lock = 1)
 #else /* __KERNEL__ */
-#define SHARED_LOCK_INIT               { 0 }
-#define SHARED_LOCK_INIT_LOCKED        { 1 }
-#define shared_lock_init(self)         (void)((self)->sl_lock = 0)
-#define shared_lock_init_locked(self)  (void)((self)->sl_lock = 1)
-#define shared_lock_cinit(self)        (void)(__hybrid_assert((self)->sl_lock == 0))
-#define shared_lock_cinit_locked(self) (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1)
+#define SHARED_LOCK_INIT               { 0, 0 }
+#define SHARED_LOCK_INIT_LOCKED        { 1, 0 }
+#define shared_lock_init(self)         (void)((self)->sl_lock = 0, (self)->sl_waiting = 0)
+#define shared_lock_init_locked(self)  (void)((self)->sl_lock = 1, (self)->sl_waiting = 0)
+#define shared_lock_cinit(self)        (void)(__hybrid_assert((self)->sl_lock == 0), __hybrid_assert((self)->sl_waiting == 0))
+#define shared_lock_cinit_locked(self) (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1, __hybrid_assert((self)->sl_waiting == 0))
 #endif /* !__KERNEL__ */
 #define shared_lock_acquired(self)  (__hybrid_atomic_load(&(self)->sl_lock, __ATOMIC_ACQUIRE) != 0)
 #define shared_lock_available(self) (__hybrid_atomic_load(&(self)->sl_lock, __ATOMIC_ACQUIRE) == 0)
@@ -82,7 +82,7 @@ __SYSDECL_BEGIN
 #if __CRT_HAVE_XSC(futex)
 /* NOTE: we use `sys_Xfutex()', because the only possible exception is E_SEGFAULT */
 #define shared_lock_broadcast_for_fini(self) \
-	((self)->sl_lock >= 2 ? (void)sys_Xfutex(&(self)->sl_lock, /*FUTEX_WAKE*/ 1, (__UINT32_TYPE__)-1, __NULLPTR, __NULLPTR, 0) : (void)0)
+	((self)->sl_waiting >= 2 ? (void)sys_Xfutex(&(self)->sl_lock, /*FUTEX_WAKE*/ 1, (__UINT32_TYPE__)-1, __NULLPTR, __NULLPTR, 0) : (void)0)
 #endif /* __CRT_HAVE_XSC(futex) */
 #endif /* !__KERNEL__ */
 
@@ -116,10 +116,10 @@ __SYSDECL_BEGIN
 	 __hybrid_atomic_store(&(self)->sl_lock, 0, __ATOMIC_RELEASE), \
 	 __shared_lock_send(self))
 #else /* __KERNEL__ */
-#define shared_lock_release(self)                                         \
-	(__shared_lock_release_assert_(self)                                  \
-	 (__hybrid_atomic_xch(&(self)->sl_lock, 0, __ATOMIC_RELEASE) >= 2) && \
-	 __shared_lock_send(self))
+#define shared_lock_release(self)                                  \
+	(__shared_lock_release_assert_(self)                           \
+	 __hybrid_atomic_store(&(self)->sl_lock, 0, __ATOMIC_RELEASE), \
+	 __hybrid_atomic_load(&(self)->sl_waiting, __ATOMIC_ACQUIRE) != 0 && __shared_lock_send(self))
 #endif /* !__KERNEL__ */
 #if defined(NDEBUG) || defined(NDEBUG_SYNC)
 #define __shared_lock_release_assert_(self) /* nothing */
@@ -160,29 +160,10 @@ void shared_lock_acquire([[inout]] struct shared_lock *__restrict self) {
 success:
 @@pp_else@@
 	unsigned int lockword;
-again:
-	/* NOTE: If there suddenly were more than UINT_MAX threads trying to acquire the same
-	 *       lock  all at the same time, this could overflow. -- But I think that's not a
-	 *       thing that could ever happen... */
-	while ((lockword = __hybrid_atomic_fetchinc(&self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
-		if unlikely(lockword != 1) {
-			/* This can happen if multiple threads try to acquire the lock at the same time.
-			 * In  this case, we must normalize the  lock-word back to `state = 2', but only
-			 * for as long as the lock itself remains acquired by some-one.
-			 *
-			 * This code right here is also carefully written such that it always does
-			 * the  right thing, no  matter how many  threads execute it concurrently. */
-			++lockword;
-			while (!__hybrid_atomic_cmpxch(&self->@sl_lock@, lockword, 2,
-			                               __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
-				lockword = __hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE);
-				if unlikely(lockword == 0)
-					goto again; /* Lock suddenly become available */
-				if unlikely(lockword == 2)
-					break; /* Some other thread did the normalize for us! */
-			}
-		}
-		__shared_lock_wait(self);
+	while ((lockword = __hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE)) != 0) {
+		__shared_lock_beginwait(self);
+		__shared_lock_wait(self, lockword);
+		__shared_lock_endwait(self);
 	}
 @@pp_endif@@
 	COMPILER_BARRIER();
@@ -220,29 +201,12 @@ $bool shared_lock_acquire_with_timeout([[inout]] struct shared_lock *__restrict 
 success:
 @@pp_else@@
 	unsigned int lockword;
-again:
-	/* NOTE: If there suddenly were more than UINT_MAX threads trying to acquire the same
-	 *       lock  all at the same time, this could overflow. -- But I think that's not a
-	 *       thing that could ever happen... */
-	while ((lockword = __hybrid_atomic_fetchinc(&self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
-		if unlikely(lockword != 1) {
-			/* This can happen if multiple threads try to acquire the lock at the same time.
-			 * In  this case, we must normalize the  lock-word back to `state = 2', but only
-			 * for as long as the lock itself remains acquired by some-one.
-			 *
-			 * This code right here is also carefully written such that it always does
-			 * the  right thing, no  matter how many  threads execute it concurrently. */
-			++lockword;
-			while (!__hybrid_atomic_cmpxch(&self->@sl_lock@, lockword, 2,
-			                               __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
-				lockword = __hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE);
-				if unlikely(lockword == 0)
-					goto again; /* Lock suddenly become available */
-				if unlikely(lockword == 2)
-					break; /* Some other thread did the normalize for us! */
-			}
-		}
-		if (!__shared_lock_wait_timeout(self, abs_timeout))
+	while ((lockword = __hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE)) != 0) {
+		bool ok;
+		__shared_lock_beginwait(self);
+		ok = __shared_lock_wait_timeout(self, lockword, abs_timeout);
+		__shared_lock_endwait(self);
+		if (!ok)
 			return false; /* Timeout */
 	}
 @@pp_endif@@
@@ -276,9 +240,9 @@ void shared_lock_waitfor([[inout]] struct shared_lock *__restrict self) {
 @@pp_else@@
 	unsigned int lockword;
 	while ((lockword = __hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
-		if (lockword == 1)
-			__hybrid_atomic_cmpxch(&self->@sl_lock@, 1, 2, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
-		__shared_lock_wait(self);
+		__shared_lock_beginwait(self);
+		__shared_lock_wait(self, lockword);
+		__shared_lock_endwait(self);
 	}
 @@pp_endif@@
 }
@@ -316,9 +280,11 @@ success:
 @@pp_else@@
 	unsigned int lockword;
 	while ((lockword = __hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
-		if (lockword == 1)
-			__hybrid_atomic_cmpxch(&self->@sl_lock@, 1, 2, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
-		if (!__shared_lock_wait_timeout(self, abs_timeout))
+		bool ok;
+		__shared_lock_beginwait(self);
+		ok = __shared_lock_wait_timeout(self, lockword, abs_timeout);
+		__shared_lock_endwait(self);
+		if (!ok)
 			return false;
 	}
 @@pp_endif@@
@@ -338,29 +304,12 @@ success:
 $bool shared_lock_acquire_with_timeout64([[inout]] struct shared_lock *__restrict self,
                                          [[in_opt]] struct timespec64 const *abs_timeout) {
 	unsigned int lockword;
-again:
-	/* NOTE: If there suddenly were more than UINT_MAX threads trying to acquire the same
-	 *       lock  all at the same time, this could overflow. -- But I think that's not a
-	 *       thing that could ever happen... */
 	while ((lockword = __hybrid_atomic_fetchinc(&self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
-		if unlikely(lockword != 1) {
-			/* This can happen if multiple threads try to acquire the lock at the same time.
-			 * In  this case, we must normalize the  lock-word back to `state = 2', but only
-			 * for as long as the lock itself remains acquired by some-one.
-			 *
-			 * This code right here is also carefully written such that it always does
-			 * the  right thing, no  matter how many  threads execute it concurrently. */
-			++lockword;
-			while (!__hybrid_atomic_cmpxch(&self->@sl_lock@, lockword, 2,
-			                               __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
-				lockword = __hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE);
-				if unlikely(lockword == 0)
-					goto again; /* Lock suddenly become available */
-				if unlikely(lockword == 2)
-					break; /* Some other thread did the normalize for us! */
-			}
-		}
-		if (!__shared_lock_wait_timeout64(self, abs_timeout))
+		bool ok;
+		__shared_lock_beginwait(self);
+		ok = __shared_lock_wait_timeout64(self, lockword, abs_timeout);
+		__shared_lock_endwait(self);
+		if (!ok)
 			return false; /* Timeout */
 	}
 	COMPILER_BARRIER();
@@ -377,9 +326,11 @@ $bool shared_lock_waitfor_with_timeout64([[inout]] struct shared_lock *__restric
                                          [[in_opt]] struct timespec64 const *abs_timeout) {
 	unsigned int lockword;
 	while ((lockword = __hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
-		if (lockword == 1)
-			__hybrid_atomic_cmpxch(&self->@sl_lock@, 1, 2, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
-		if (!__shared_lock_wait_timeout64(self, abs_timeout))
+		bool ok;
+		__shared_lock_beginwait(self);
+		ok = __shared_lock_wait_timeout64(self, lockword, abs_timeout);
+		__shared_lock_endwait(self);
+		if (!ok)
 			return false;
 	}
 	return true;

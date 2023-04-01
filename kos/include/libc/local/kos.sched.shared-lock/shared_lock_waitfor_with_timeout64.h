@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39cf8e0a */
+/* HASH CRC-32:0xc7773c59 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,11 @@ __LOCAL_LIBC(shared_lock_waitfor_with_timeout64) __ATTR_WUNUSED __BLOCKING __ATT
 (__FCALL __LIBC_LOCAL_NAME(shared_lock_waitfor_with_timeout64))(struct shared_lock *__restrict __self, struct __timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
 	unsigned int __lockword;
 	while ((__lockword = __hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE)) != 0) {
-		if (__lockword == 1)
-			__hybrid_atomic_cmpxch(&__self->sl_lock, 1, 2, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
-		if (!__shared_lock_wait_timeout64(__self, __abs_timeout))
+		__BOOL __ok;
+		__shared_lock_beginwait(__self);
+		__ok = __shared_lock_wait_timeout64(__self, __lockword, __abs_timeout);
+		__shared_lock_endwait(__self);
+		if (!__ok)
 			return 0;
 	}
 	return 1;

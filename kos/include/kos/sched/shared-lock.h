@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74fca6b7 */
+/* HASH CRC-32:0xa97ad095 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,12 +64,12 @@ __SYSDECL_BEGIN
 #define shared_lock_cinit(self)        (void)(sig_cinit(&(self)->sl_sig), __hybrid_assert((self)->sl_lock == 0))
 #define shared_lock_cinit_locked(self) (void)(sig_cinit(&(self)->sl_sig), (self)->sl_lock = 1)
 #else /* __KERNEL__ */
-#define SHARED_LOCK_INIT               { 0 }
-#define SHARED_LOCK_INIT_LOCKED        { 1 }
-#define shared_lock_init(self)         (void)((self)->sl_lock = 0)
-#define shared_lock_init_locked(self)  (void)((self)->sl_lock = 1)
-#define shared_lock_cinit(self)        (void)(__hybrid_assert((self)->sl_lock == 0))
-#define shared_lock_cinit_locked(self) (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1)
+#define SHARED_LOCK_INIT               { 0, 0 }
+#define SHARED_LOCK_INIT_LOCKED        { 1, 0 }
+#define shared_lock_init(self)         (void)((self)->sl_lock = 0, (self)->sl_waiting = 0)
+#define shared_lock_init_locked(self)  (void)((self)->sl_lock = 1, (self)->sl_waiting = 0)
+#define shared_lock_cinit(self)        (void)(__hybrid_assert((self)->sl_lock == 0), __hybrid_assert((self)->sl_waiting == 0))
+#define shared_lock_cinit_locked(self) (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1, __hybrid_assert((self)->sl_waiting == 0))
 #endif /* !__KERNEL__ */
 #define shared_lock_acquired(self)  (__hybrid_atomic_load(&(self)->sl_lock, __ATOMIC_ACQUIRE) != 0)
 #define shared_lock_available(self) (__hybrid_atomic_load(&(self)->sl_lock, __ATOMIC_ACQUIRE) == 0)
@@ -80,7 +80,7 @@ __SYSDECL_BEGIN
 #if __CRT_HAVE_XSC(futex)
 /* NOTE: we use `sys_Xfutex()', because the only possible exception is E_SEGFAULT */
 #define shared_lock_broadcast_for_fini(self) \
-	((self)->sl_lock >= 2 ? (void)sys_Xfutex(&(self)->sl_lock, /*FUTEX_WAKE*/ 1, (__UINT32_TYPE__)-1, __NULLPTR, __NULLPTR, 0) : (void)0)
+	((self)->sl_waiting >= 2 ? (void)sys_Xfutex(&(self)->sl_lock, /*FUTEX_WAKE*/ 1, (__UINT32_TYPE__)-1, __NULLPTR, __NULLPTR, 0) : (void)0)
 #endif /* __CRT_HAVE_XSC(futex) */
 #endif /* !__KERNEL__ */
 
@@ -114,10 +114,10 @@ __SYSDECL_BEGIN
 	 __hybrid_atomic_store(&(self)->sl_lock, 0, __ATOMIC_RELEASE), \
 	 __shared_lock_send(self))
 #else /* __KERNEL__ */
-#define shared_lock_release(self)                                         \
-	(__shared_lock_release_assert_(self)                                  \
-	 (__hybrid_atomic_xch(&(self)->sl_lock, 0, __ATOMIC_RELEASE) >= 2) && \
-	 __shared_lock_send(self))
+#define shared_lock_release(self)                                  \
+	(__shared_lock_release_assert_(self)                           \
+	 __hybrid_atomic_store(&(self)->sl_lock, 0, __ATOMIC_RELEASE), \
+	 __hybrid_atomic_load(&(self)->sl_waiting, __ATOMIC_ACQUIRE) != 0 && __shared_lock_send(self))
 #endif /* !__KERNEL__ */
 #if defined(NDEBUG) || defined(NDEBUG_SYNC)
 #define __shared_lock_release_assert_(self) /* nothing */
