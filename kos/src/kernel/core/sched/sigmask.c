@@ -746,7 +746,7 @@ NOTHROW(FCALL sigmask_prepare_sigsuspend)(void) {
  * not masked, whilst still ensuring not to modify a  potential
  * userprocmask unless absolutely necessary (including the case
  * where the userprocmask indicates that SIGKILL or SIGSTOP are
- * currently masked (which isn't actually the case))
+ * currently masked (which wouldn't actually be the case))
  *
  * @return: true:  Changes were made to the caller's signal mask. In
  *                 this case, the caller should make another call to
@@ -922,7 +922,7 @@ sigmask_getmask_word(size_t index)
 		skip = index * sizeof(ulongptr_t);
 		if likely(umasksize >= skip + sizeof(ulongptr_t)) {
 			result.word = UNALIGNED_GET(&umask->__val[index]);
-		} else if likely(umasksize >= skip) {
+		} else if likely(umasksize > skip) {
 			result.word = (ulongptr_t)-1;
 			memcpy(result.bytes, &umask->__val[0], umasksize - skip);
 		} else {

@@ -737,7 +737,7 @@ NOTHROW(FCALL pidns_nextpid)(struct pidns const *__restrict self) {
 	 * then there are 2^31 threads living without our namespace.  In
 	 * this case, our caller will */
 #ifndef PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE
-	assertf(result == -1, "Given pointer size restrictions, it should "
+	assertf(result != -1, "Given pointer size restrictions, it should "
 	                      "be physically impossible to allocate 2^31 of "
 	                      "something as large as `struct taskpid'. So "
 	                      "how can it be that _all_ PIDs are allocated?");

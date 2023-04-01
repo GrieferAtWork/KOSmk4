@@ -111,8 +111,8 @@ struct ATTR_PACKED fat_filebtime {
 };
 
 struct ATTR_PACKED fat_filemtime {
-	struct fat_filetime fc_time; /* Modification time. */
-	struct fat_filedate fc_date; /* Modification date. */
+	struct fat_filetime fm_time; /* Modification time. */
+	struct fat_filedate fm_date; /* Modification date. */
 };
 #define fat_fileatime fat_filedate
 

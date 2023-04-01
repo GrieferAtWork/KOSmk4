@@ -600,7 +600,7 @@ PRIVATE void NOTHROW(CC PeTls_FreeIndex)(uintptr_t index) {
 }
 
 /* Allocate a TLS vector for use as `_GetNativePeTlsArray()'. */
-PRIVATE void **CC PeTls_AllocVector(bool forme) {
+PRIVATE void **CC PeTls_AllocVector(bool for_me) {
 	size_t count;
 	void **result;
 	DlModule *iter;
@@ -622,7 +622,7 @@ PRIVATE void **CC PeTls_AllocVector(bool forme) {
 			goto err;
 		result[iter->dm_pe.dp_tlsindex] = block;
 		if (iter->dm_pe.dp_tlscalls) {
-			if (forme) {
+			if (for_me) {
 				DlModule_PeTlsDoExec(iter, DLL_THREAD_ATTACH);
 			} else {
 				DlModule_PeTlsInit(iter, block, NULL);
@@ -644,7 +644,7 @@ err:
 		if (!block)
 			continue;
 		if (iter->dm_pe.dp_tlscalls) {
-			if (forme) {
+			if (for_me) {
 				DlModule_PeTlsDoExec(iter, DLL_THREAD_DETACH);
 			} else {
 				DlModule_PeTlsFini(iter, block, NULL);

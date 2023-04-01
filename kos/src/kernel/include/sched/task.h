@@ -56,7 +56,7 @@ DECL_BEGIN
 
 /* Task state flags. */
 #define TASK_FNORMAL       __UINT32_C(0x00000000) /* Normal task flags. */
-#define TASK_FRUNNING      __UINT32_C(0x00000001) /* [lock(PRIVATE(THIS_CPU))] The task is currently running (`s_running' is valid). */
+#define TASK_FRUNNING      __UINT32_C(0x00000001) /* [lock(PRIVATE(THIS_CPU))] The task is currently running (is apart of `s_running'). */
 #define TASK_FTIMEOUT      __UINT32_C(0x00000002) /* [lock(CLEAR(THIS_TASK))] Set by the scheduler when waking a task due to a timeout. */
 #define TASK_FRPC          __UINT32_C(0x00000004) /* [lock(CLEAR(THIS_TASK))] Set if there may be active RPCs pending in:
                                                    *  - `PERTASK(this_rpcs)' or `PERTASK(this_rpcs_sigpend)'
@@ -166,12 +166,14 @@ DEFINE_REFCNT_FUNCTIONS(struct task, t_refcnt, task_destroy)
 #endif /* __CC__ */
 
 
+/* Flags for `task_start()' */
 #define TASK_START_FNORMAL   0x0000 /* Normal task startup flags. */
 #define TASK_START_FHIGHPRIO 0x0001 /* Attempt to start  the task with  high priority,  essentially
                                      * meaning that when preemption was enabled when `task_start()'
                                      * was called, and `thread' is  scheduled for execution on  the
                                      * same CPU as the calling  thread, then `thread' will  receive
-                                     * its first quantum before `task_start()' returns. */
+                                     * its first quantum even before `task_start()' returns. */
+
 #ifdef __CC__
 /* Start executing the given task on the CPU it has been assigned.
  * @param: flags: Set of `TASK_START_F*' */

@@ -786,8 +786,8 @@ NOTHROW(LIBCCALL libc_pthread_self)(void)
 		/* Lazily initialize the thread descriptor's TID field.
 		 *
 		 * We get here if the calling thread was created by some API other
-		 * than pthread that still made proper use of dltlsallocseg(),  or
-		 * if the caller is the program's main() thread. */
+		 * than pthread that still  made proper use of  dltlsallocseg(3D),
+		 * or if the caller is the program's main() thread. */
 		result->pt_tid = sys_set_tid_address(&result->pt_tid);
 		result->pt_flags |= PTHREAD_FTIDSET;
 	}
@@ -3585,7 +3585,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_trywrlock)(pthread_rwlock_t *self)
 		/* Check for recursive write-locks */
 		if (self->rw_flags && self->rw_writer == gettid()) {
 			if unlikely(self->rw_nr_writers == (uint32_t)-1)
-				return EAGAIN;       /* Not documented, but mirror what `pthread_rwlock_tryrdlock()' does */
+				return EAGAIN;     /* Not documented, but mirror what `pthread_rwlock_tryrdlock()' does */
 			++self->rw_nr_writers; /* Recursive write-lock! */
 			return EOK;
 		}
@@ -4279,9 +4279,9 @@ again:
 	 * to think that we're still waiting on it when in fact we aren't
 	 * doing so.
 	 *
-	 * Idea: combine  `b_in' and `b_current_round' into a single counter,
-	 *       such that `NUM_WAITING_THREADS = b_in % b_count'. Then,  use
-	 *       atomic_cmpxch t&o reset the counter if it becomes too large.
+	 * Idea: combine `b_in' and `b_current_round' into a single counter,
+	 *       such that `NUM_WAITING_THREADS = b_in % b_count'. Then, use
+	 *       atomic_cmpxch to reset the counter if it becomes too large.
 	 */
 
 	/* Wait until the current round is over. */

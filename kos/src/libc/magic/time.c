@@ -2021,7 +2021,7 @@ struct $tm *gmtime_r([[in]] $time_t const *__restrict timer,
 	t /= SECONDS_PER_DAY;
 	t += __yearstodays(UNIX_TIME_START_YEAR);
 	tp->@tm_wday@ = (int)(t % DAYS_PER_WEEK);
-	tp->@tm_year@ = (int)__daystoyears(t);
+	tp->@tm_year@ = (int)__daystoyears(t); /* TODO: This doesn't work for exact dates! (s.a. `deemon:time') */
 	t -= __yearstodays(tp->@tm_year@);
 	tp->@tm_yday@ = (int)t;
 	monthvec = __NAMESPACE_LOCAL_SYM __time_monthstart_yday[__isleap(tp->@tm_year@)];
@@ -2131,7 +2131,7 @@ struct $tm *gmtime64_r([[in]] $time64_t const *__restrict timer,
 	t /= SECONDS_PER_DAY;
 	t += __yearstodays(UNIX_TIME_START_YEAR);
 	tp->@tm_wday@ = (int)(t % DAYS_PER_WEEK);
-	tp->@tm_year@ = (int)__daystoyears(t);
+	tp->@tm_year@ = (int)__daystoyears(t); /* TODO: This doesn't work for exact dates! (s.a. `deemon:time') */
 	t -= __yearstodays(tp->@tm_year@);
 	tp->@tm_yday@ = (int)t;
 	monthvec = __NAMESPACE_LOCAL_SYM __time_monthstart_yday[__isleap(tp->@tm_year@)];

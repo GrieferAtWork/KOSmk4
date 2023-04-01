@@ -216,7 +216,7 @@ static_assert(CPU_IPI_FWAITFOR == TASK_WAKE_FWAITFOR);
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 trigger_clone_trap(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	struct debugtrap_reason r;
-	r.dtr_signo   = SIGTRAP; /* New process. */
+	r.dtr_signo   = SIGTRAP; /* New thread. */
 	r.dtr_reason  = DEBUGTRAP_REASON_CLONE;
 	ctx->rc_state = kernel_debugtrap_r(ctx->rc_state, &r);
 }

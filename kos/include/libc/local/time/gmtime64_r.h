@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1354f708 */
+/* HASH CRC-32:0x21c9a574 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64_r))(__time64_t const *__rest
 	__t /= 86400;
 	__t += __yearstodays(1970);
 	__tp->tm_wday = (int)(__t % 7);
-	__tp->tm_year = (int)__daystoyears(__t);
+	__tp->tm_year = (int)__daystoyears(__t); /* TODO: This doesn't work for exact dates! (s.a. `deemon:time') */
 	__t -= __yearstodays(__tp->tm_year);
 	__tp->tm_yday = (int)__t;
 	__monthvec = __NAMESPACE_LOCAL_SYM __time_monthstart_yday[__isleap(__tp->tm_year)];

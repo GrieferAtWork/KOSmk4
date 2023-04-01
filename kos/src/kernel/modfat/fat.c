@@ -120,7 +120,7 @@ PRIVATE time_t const time_monthstart_yday[2][13] = {
 	time_monthstart_yday[!!(leap_year)][month]
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) time_t
-NOTHROW(FCALL FatFileDate_Decode)(struct fat_filedate const *__restrict self) {
+NOTHROW(FCALL fat_filedate_decode)(struct fat_filedate const *__restrict self) {
 	time_t result;
 	unsigned int year;
 	year   = self->fd_year + 1980;
@@ -131,8 +131,8 @@ NOTHROW(FCALL FatFileDate_Decode)(struct fat_filedate const *__restrict self) {
 }
 
 PRIVATE NONNULL((1)) void
-NOTHROW(KCALL FatFileDate_Encode)(struct fat_filedate *__restrict self,
-                                  time_t tmt) {
+NOTHROW(KCALL fat_filedate_encode)(struct fat_filedate *__restrict self,
+                                   time_t tmt) {
 	unsigned int year;
 	u8 i;
 	time_t const *monthvec;
@@ -142,63 +142,65 @@ NOTHROW(KCALL FatFileDate_Encode)(struct fat_filedate *__restrict self,
 	monthvec = time_monthstart_yday[ISLEAPYEAR(year)];
 	tmt -= YEARS2DAYS(year);
 	self->fd_year = year > 1980 ? year - 1980 : 0;
+
 	/* Find the appropriate month. */
-	for (i = 1; i < 12; ++i)
+	for (i = 1; i < 12; ++i) {
 		if (monthvec[i] >= tmt)
 			break;
+	}
 	self->fd_month = i;
 	self->fd_day   = (tmt - monthvec[i - 1]) + 1;
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) time_t
-NOTHROW(KCALL FatFileTime_Decode)(struct fat_filetime const *__restrict self) {
+NOTHROW(KCALL fat_filetime_decode)(struct fat_filetime const *__restrict self) {
 	return ((time_t)self->ft_hour * 60 * 60) +
 	       ((time_t)self->ft_min * 60) +
 	       ((time_t)self->ft_sec * 2);
 }
 
 PRIVATE NONNULL((1)) void
-NOTHROW(KCALL FatFileTime_Encode)(struct fat_filetime *__restrict self,
-                                  time_t tmt) {
+NOTHROW(KCALL fat_filetime_encode)(struct fat_filetime *__restrict self,
+                                   time_t tmt) {
 	self->ft_sec  = (tmt % 60) / 2;
 	self->ft_min  = ((tmt / 60) % 60);
 	self->ft_hour = ((tmt / (60 * 60)) % 24);
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL FatFileBTime_Encode)(struct fat_filebtime *__restrict self,
-                                   struct timespec const *__restrict value) {
-	FatFileDate_Encode(&self->fb_date, value->tv_sec);
-	FatFileTime_Encode(&self->fb_time, value->tv_sec);
+NOTHROW(FCALL fat_filebtime_encode)(struct fat_filebtime *__restrict self,
+                                    struct timespec const *__restrict value) {
+	fat_filedate_encode(&self->fb_date, value->tv_sec);
+	fat_filetime_encode(&self->fb_time, value->tv_sec);
 	self->fb_sectenth = (u8)(value->tv_nsec / (1000000000ul / 200ul));
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL FatFileBTime_Decode)(struct fat_filebtime const *__restrict self,
-                                   struct timespec *__restrict result) {
-	result->tv_sec  = FatFileDate_Decode(&self->fb_date);
-	result->tv_sec += FatFileTime_Decode(&self->fb_time);
+NOTHROW(FCALL fat_filebtime_decode)(struct fat_filebtime const *__restrict self,
+                                    struct timespec *__restrict result) {
+	result->tv_sec  = fat_filedate_decode(&self->fb_date);
+	result->tv_sec += fat_filetime_decode(&self->fb_time);
 	result->tv_nsec = (syscall_ulong_t)self->fb_sectenth * (1000000000ul / 200ul);
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL FatFileMTime_Encode)(struct fat_filemtime *__restrict self,
-                                   struct timespec const *__restrict value) {
-	FatFileDate_Encode(&self->fc_date, value->tv_sec);
-	FatFileTime_Encode(&self->fc_time, value->tv_sec);
+NOTHROW(FCALL fat_filemtime_encode)(struct fat_filemtime *__restrict self,
+                                    struct timespec const *__restrict value) {
+	fat_filedate_encode(&self->fm_date, value->tv_sec);
+	fat_filetime_encode(&self->fm_time, value->tv_sec);
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL FatFileMTime_Decode)(struct fat_filemtime const *__restrict self,
-                                   struct timespec *__restrict result) {
-	result->tv_sec = FatFileDate_Decode(&self->fc_date);
-	result->tv_sec += FatFileTime_Decode(&self->fc_time);
+NOTHROW(FCALL fat_filemtime_decode)(struct fat_filemtime const *__restrict self,
+                                    struct timespec *__restrict result) {
+	result->tv_sec = fat_filedate_decode(&self->fm_date);
+	result->tv_sec += fat_filetime_decode(&self->fm_time);
 	result->tv_nsec = 0;
 }
-#define FatFileATime_Encode(self, value) \
-	FatFileDate_Encode(self, (value)->tv_sec)
-#define FatFileATime_Decode(self, result) \
-	((result)->tv_sec = FatFileDate_Decode(self), (result)->tv_nsec = 0)
+#define fat_fileatime_encode(self, value) \
+	fat_filedate_encode(self, (value)->tv_sec)
+#define fat_fileatime_decode(self, result) \
+	((result)->tv_sec = fat_filedate_decode(self), (result)->tv_nsec = 0)
 
 
 
@@ -815,12 +817,12 @@ again:
 			ent->fad_dos.f_gid = (u8)gid;
 		} else {
 			/* Last-access timestamp support */
-			FatFileATime_Encode(&ent->fad_dos.f_atime, &atm);
+			fat_fileatime_encode(&ent->fad_dos.f_atime, &atm);
 		}
 
 		/* Convert timestamps. */
-		FatFileMTime_Encode(&ent->fad_dos.f_mtime, &mtm);
-		FatFileBTime_Encode(&ent->fad_dos.f_btime, &btm);
+		fat_filemtime_encode(&ent->fad_dos.f_mtime, &mtm);
+		fat_filebtime_encode(&ent->fad_dos.f_btime, &btm);
 
 		/* Set the ARCHIVE flag to indicate a file that has been modified. */
 		ent->fad_dos.f_attr |= FATATTR_ARCH;
@@ -1328,10 +1330,10 @@ Fat_GenerateFileEntries(struct fat_dirent files[FAT_DIRENT_PER_FILE_MAXCOUNT],
 		ent->fad_dos.f_uid = (u8)file->fn_uid;
 		ent->fad_dos.f_gid = (u8)file->fn_gid;
 	} else {
-		FatFileATime_Encode(&ent->fad_dos.f_atime, &file->mf_atime);
+		fat_fileatime_encode(&ent->fad_dos.f_atime, &file->mf_atime);
 	}
-	FatFileMTime_Encode(&ent->fad_dos.f_mtime, &file->mf_mtime);
-	FatFileBTime_Encode(&ent->fad_dos.f_btime, &file->mf_btime);
+	fat_filemtime_encode(&ent->fad_dos.f_mtime, &file->mf_mtime);
+	fat_filebtime_encode(&ent->fad_dos.f_btime, &file->mf_btime);
 	fmode = file->fn_mode;
 	mfile_tslock_release(file);
 
@@ -1845,14 +1847,14 @@ fatdir_v_allocfile(struct flatdirnode *__restrict self,
 			hdr[0].f_gid = (u8)fdir->fn_gid;
 		} else {
 			/* Last-access timestamp support */
-			FatFileATime_Encode(&hdr[0].f_atime, &fdir->mf_atime);
+			fat_fileatime_encode(&hdr[0].f_atime, &fdir->mf_atime);
 		}
-		FatFileMTime_Encode(&hdr[0].f_mtime, &fdir->mf_mtime);
-		FatFileBTime_Encode(&hdr[0].f_btime, &fdir->mf_btime);
+		fat_filemtime_encode(&hdr[0].f_mtime, &fdir->mf_mtime);
+		fat_filebtime_encode(&hdr[0].f_btime, &fdir->mf_btime);
 		mfile_tslock_release(fdir);
 		hdr[1].f_atime             = hdr[0].f_atime;
-		hdr[1].f_mtime.fc_date     = hdr[0].f_mtime.fc_date;
-		hdr[1].f_mtime.fc_time     = hdr[0].f_mtime.fc_time;
+		hdr[1].f_mtime.fm_date     = hdr[0].f_mtime.fm_date;
+		hdr[1].f_mtime.fm_time     = hdr[0].f_mtime.fm_time;
 		hdr[1].f_btime.fb_date     = hdr[0].f_btime.fb_date;
 		hdr[1].f_btime.fb_time     = hdr[0].f_btime.fb_time;
 		hdr[1].f_btime.fb_sectenth = hdr[0].f_btime.fb_sectenth;
@@ -2817,8 +2819,8 @@ fatsuper_v_makenode(struct flatsuper *__restrict self,
 	result->fn_nlink = 1;
 
 	/* Convert timestamps. */
-	FatFileMTime_Decode(&ent->fad_dos.f_mtime, &result->mf_mtime);
-	FatFileBTime_Decode(&ent->fad_dos.f_btime, &result->mf_btime);
+	fat_filemtime_decode(&ent->fad_dos.f_mtime, &result->mf_mtime);
+	fat_filebtime_decode(&ent->fad_dos.f_btime, &result->mf_btime);
 	if (super->ft_features & FAT_FEATURE_UGID) {
 		/* In-built user/group ID support */
 		result->fn_uid = (uid_t)ent->fad_dos.f_uid;
@@ -2829,7 +2831,7 @@ fatsuper_v_makenode(struct flatsuper *__restrict self,
 	} else {
 		result->fn_uid = super->ft_uid;
 		result->fn_gid = super->ft_gid;
-		FatFileATime_Decode(&ent->fad_dos.f_atime,
+		fat_fileatime_decode(&ent->fad_dos.f_atime,
 		                    &result->mf_atime);
 	}
 
@@ -2867,16 +2869,16 @@ NOTHROW(KCALL fatsuper_v_truncate_atime)(struct fsuper *__restrict UNUSED(self),
 	 * To support something  like this, all  timestamps
 	 * must be truncated at the same time by a singular
 	 * operator! */
-	FatFileATime_Encode(&ts, tms);
-	FatFileATime_Decode(&ts, tms);
+	fat_fileatime_encode(&ts, tms);
+	fat_fileatime_decode(&ts, tms);
 }
 
 PRIVATE NONNULL((1, 2)) void
 NOTHROW(KCALL fatsuper_v_truncate_mtime)(struct fsuper *__restrict UNUSED(self),
                                          /*in|out*/ struct timespec *__restrict tms) {
 	struct fat_filemtime ts;
-	FatFileMTime_Encode(&ts, tms);
-	FatFileMTime_Decode(&ts, tms);
+	fat_filemtime_encode(&ts, tms);
+	fat_filemtime_decode(&ts, tms);
 }
 
 PRIVATE NONNULL((1, 2)) void
@@ -2892,8 +2894,8 @@ PRIVATE NONNULL((1, 2)) void
 NOTHROW(KCALL fatsuper_v_truncate_btime)(struct fsuper *__restrict UNUSED(self),
                                          /*in|out*/ struct timespec *__restrict tms) {
 	struct fat_filebtime ts;
-	FatFileBTime_Encode(&ts, tms);
-	FatFileBTime_Decode(&ts, tms);
+	fat_filebtime_encode(&ts, tms);
+	fat_filebtime_decode(&ts, tms);
 }
 
 PRIVATE NONNULL((1)) void KCALL

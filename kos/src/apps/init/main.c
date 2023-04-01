@@ -282,6 +282,7 @@ done_tmpfs:
 		if (cpid == 0) {
 			/* Become the foreground process of /dev/console */
 			console_set_fgproc();
+
 			/* Restore default signal dispositions */
 			signal(SIGHUP, SIG_DFL);
 			signal(SIGINT, SIG_DFL);

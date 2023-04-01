@@ -43,7 +43,7 @@
  *      exception of SIGKILL and SIGSTOP)
  *    - SIG_UNBLOCK will leave signals beyond the given mask unmodified.
  *    - In case of a userprocmask, any signal beyond the range
- *      pointed-to be user-space is  assumed to be masked  (as
+ *      pointed-to by user-space is  assumed to be masked  (as
  *      always: with the exception of SIGKILL and SIGSTOP)
  *  - When user-space indicates  that its signal  mask is  larger
  *    than the  kernel's, the  kernel always  indicates that  any

@@ -59,14 +59,20 @@ libdl_dltlsaddr2(USER DlModule *self, USER struct dltls_segment *seg) THROWS(E_S
 #else /* !FAIL_ON_ERROR */
 	RD_TLS_BASE_REGISTER(*(void **)&seg);
 #endif /* FAIL_ON_ERROR */
+
 	/* Simple case: Static TLS, and special case: Empty TLS */
 	if (self->dm_tlsstoff || unlikely(!self->dm_tlsmsize))
 		return (byte_t *)seg + self->dm_tlsstoff;
+
+	/* Complicated case: search the TLS extension table (used for those modules
+	 * not part of the initial set of loaded libraries, but which were  instead
+	 * loaded by a call to `dlopen(3D)') */
 	dltls_segment_ex_read(seg);
 	extab = dtls_extension_tree_locate(seg->ts_extree, self);
 	dltls_segment_ex_endread(seg);
 	if (extab)
 		return extab->te_data;
+
 	/* Lazily allocate missing extension tables.
 	 * But first: Lazily allocate the TLS template initialize for this module. */
 	if (!self->dm_tlsinit && self->dm_tlsfsize) {
@@ -89,6 +95,7 @@ err_init:
 		if unlikely(new_init != NULL)
 			free(init);
 	}
+
 	/* Allocate the actual extension table. */
 	{
 		uintptr_t data_offset;
@@ -100,10 +107,12 @@ err_init:
 		if unlikely(!extab)
 			goto err_nomem;
 		extab->te_module = self;
+
 		/* Initialize the data contents of this extended TLS table. */
 		bzero(mempcpy(extab->te_data = (byte_t *)extab + data_offset,
 		              self->dm_tlsinit, self->dm_tlsfsize),
 		      self->dm_tlsmsize - self->dm_tlsfsize); /* .bss */
+
 		/* Invoke TLS initializers. */
 		if (self->dm_tls_init) {
 			TRY {
@@ -114,14 +123,15 @@ err_init:
 			}
 		}
 	}
+
 	/* XXX: This isn't re-entrant! - What if a signal handler accesses a TLS variable from
 	 *      from  a dynamically loaded  library, while the  calling thread was interrupted
 	 *      within the following atomic  lock? (In other words:  This lock needs to  allow
 	 *      for recursion within the same thread)
 	 * ->:  What about the fact that we're also using malloc() here? malloc() most definitely
-	 *      isn't   (and   probably  couldn't)   be   re-entrant  in   the   general  case...
-	 *      What do the  specs say  about a  signal handler being  the first  to access  some
-	 *      thread-local variable? */
+	 *      isn't (and probably couldn't)  be re-entrant in the  general case... What do  the
+	 *      specs say about  a signal  handler being the  first to  access some  thread-local
+	 *      variable? */
 	dltls_segment_ex_write(seg);
 	{
 		struct dltls_extension *newtab;
@@ -131,6 +141,7 @@ err_init:
 			 * XXX: Can this even happen? (I don't think it can, considering
 			 *      we're using lazy allocations) */
 			dltls_segment_ex_endwrite(seg);
+
 			/* Invoke TLS finalizers. */
 			RAII_FINALLY { free(extab); };
 			if (self->dm_tls_fini)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf25fd81 */
+/* HASH CRC-32:0x300afbbe */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -714,7 +714,7 @@ NOTHROW_NCX(LIBCCALL libc_gmtime_r)(time_t const *__restrict timer,
 	t /= 86400;
 	t += __yearstodays(1970);
 	tp->tm_wday = (int)(t % 7);
-	tp->tm_year = (int)__daystoyears(t);
+	tp->tm_year = (int)__daystoyears(t); /* TODO: This doesn't work for exact dates! (s.a. `deemon:time') */
 	t -= __yearstodays(tp->tm_year);
 	tp->tm_yday = (int)t;
 	monthvec = __NAMESPACE_LOCAL_SYM __time_monthstart_yday[__isleap(tp->tm_year)];
@@ -836,7 +836,7 @@ NOTHROW_NCX(LIBCCALL libc_gmtime64_r)(time64_t const *__restrict timer,
 	t /= 86400;
 	t += __yearstodays(1970);
 	tp->tm_wday = (int)(t % 7);
-	tp->tm_year = (int)__daystoyears(t);
+	tp->tm_year = (int)__daystoyears(t); /* TODO: This doesn't work for exact dates! (s.a. `deemon:time') */
 	t -= __yearstodays(tp->tm_year);
 	tp->tm_yday = (int)t;
 	monthvec = __NAMESPACE_LOCAL_SYM __time_monthstart_yday[__isleap(tp->tm_year)];
