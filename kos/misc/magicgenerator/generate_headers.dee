@@ -214,7 +214,7 @@ global completeAllTasksSem: Semaphore = Semaphore(0);
 global messagePrefix: string = "";
 
 @@Lock for @printMessage
-global messageLock: Mutex = Mutex();
+global messageLock: SharedLock = SharedLock();
 
 @@Print a status message, including a leading progress indicator
 function printMessage(msg: string) {
@@ -240,7 +240,7 @@ function servicePendingTasks() {
 	try {
 		for (;;) {
 			/* Wait for more tasks */
-			pendingTasksSem.wait();
+			pendingTasksSem.acquire();
 			/* Execute pending tasks */
 			while (pendingTasks) {
 				local task: (Callable, Tuple);
@@ -252,8 +252,9 @@ function servicePendingTasks() {
 				}
 				/* Execute the task */
 				task[0](task[1]...);
-				if (incCompletedTasks() + 1 >= numTotalTasks)
-					completeAllTasksSem.post();
+				local oldNumCompletedTasks = incCompletedTasks();
+				if (oldNumCompletedTasks + 1 >= numTotalTasks)
+					completeAllTasksSem.release();
 			}
 		}
 	} catch (e...) {
@@ -268,14 +269,14 @@ function servicePendingTasks() {
 @@Start a new task that'll execute @cb with @args
 function startTask(cb: Callable, args: {Object...} = ()) {
 	pendingTasks.append((cb, args));
-	pendingTasksSem.post();
+	pendingTasksSem.release();
 	++numTotalTasks;
 }
 
 @@Wait for all running tasks to finish
 function waitTasks() {
 	while (numCompletedTasks.value < numTotalTasks)
-		completeAllTasksSem.wait();
+		completeAllTasksSem.acquire();
 	numCompletedTasks.value = 0;
 	numTotalTasks           = 0;
 }

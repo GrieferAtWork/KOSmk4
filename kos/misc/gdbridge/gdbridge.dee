@@ -57,8 +57,8 @@ try {
 	ouw.close();
 
 	local log = File.open("kos/misc/gdbridge/io.log", "w");
-	local inw_lock = Mutex();
-	local stdout_lock = Mutex();
+	local inw_lock = SharedLock();
+	local stdout_lock = SharedLock();
 	function write2gdb(msg) {
 		print log: ("[hidden]> ", msg),;
 		log.sync();

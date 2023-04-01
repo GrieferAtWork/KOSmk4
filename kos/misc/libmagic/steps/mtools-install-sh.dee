@@ -22,10 +22,10 @@ import * from deemon;
 import * from ..libmagic;
 import .mtools as mt;
 import .c as c;
-import Mutex from threading;
+import SharedLock from threading;
 
 global INSTALL_SH_OUTFILE: File = File.stdout;
-global INSTALL_SH_OUTFILE_LOCK: Mutex = Mutex();
+global INSTALL_SH_OUTFILE_LOCK: SharedLock = SharedLock();
 global DID_PRINT_KOS_ROOT: bool = false;
 
 function MCOPY_install_sh_run(self: BoundStep): {Waitable...} {

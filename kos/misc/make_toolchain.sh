@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix build error with linux-compatible futex configuration"
-DEEMON_VERSION="3df1d097b03452f8ca7cf841e82c05a9cdb670e6"
+#     v -- "Re-write and greatly enhance the `threading` dex"
+DEEMON_VERSION="0db80e93f2b375fa90e2d3db2bf09e0120f9327a"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 

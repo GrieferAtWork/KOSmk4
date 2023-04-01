@@ -137,7 +137,7 @@ function createNamePipeAndStartLogProcessingThread(
 			if (command.startswith("vboxgdb:")) {
 				command = command[8:];
 				if (command == "startup") {
-					connectedSemaphore.post();
+					connectedSemaphore.release();
 				} else {
 					vboxcmd.append(command);
 				}
@@ -153,7 +153,7 @@ function createNamePipeAndStartLogProcessingThread(
 		try {
 			/* Wait for VBox to open what it thinks to be a log file. */
 			win32.ConnectNamedPipe(hNamedPipe);
-			connectedSemaphore.post();
+			connectedSemaphore.release();
 			local commandBuffer = Bytes();
 			for (;;) {
 readmore:
@@ -418,7 +418,7 @@ function start(
 	proc.start();
 	try {
 		if (startVboxGDBGlue !is none) {
-			connectedSemaphore.wait();
+			connectedSemaphore.acquire();
 			import . as me;
 			startVboxGDBGlue(
 				KERNEL: KERNEL,

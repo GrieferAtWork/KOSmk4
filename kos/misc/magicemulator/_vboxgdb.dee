@@ -2135,11 +2135,11 @@ function startVboxGDBGlue(
 
 	local final vboxTelnetAddr = "localhost:5000";
 	local connectResponse;
-	/* Try to  connect  20 times  with  a  delay of  0.1  seconds  in-between.
-	 * In  theory  (and  practice),  this  succeeds  on  the  first  try,  but
-	 * it only started doing so  after I added the  connectedSemaphore.wait();
-	 * call in our caller to wait for  VirtualBox to connect to the log  pipe.
-	 * And in theory, VirtualBox might open the debug server _much_ later than
+	/* Try to  connect  20  times  with a  delay  of  0.1  seconds  in-between.
+	 * In   theory  (and  practice),  this  succeeds  on  the  first  try,  but
+	 * it only started doing so after I added the connectedSemaphore.acquire();
+	 * call in our caller to  wait for VirtualBox to  connect to the log  pipe.
+	 * And in theory, VirtualBox might open the debug server _much_ later  than
 	 * the opening of the log file (so better be safe here...) */
 	if (CONFIG_VERBOSE)
 		print "[vboxgdb] Connecting to telnet under", vboxTelnetAddr, "...";
@@ -2169,7 +2169,7 @@ function startVboxGDBGlue(
 	if (CONFIG_VERBOSE)
 		print("[vboxgdb] Waiting for boot0 and _start",
 			TARGET_ARCH == "x86_64" ? "64" : "32", " to complete...");
-	connectedSemaphore.wait();
+	connectedSemaphore.acquire();
 
 	/* Pause VM execution while we wait for GDB to become connected */
 	_vmPause();
