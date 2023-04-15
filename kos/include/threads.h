@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc23d8835 */
+/* HASH CRC-32:0xae684c60 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -180,6 +180,7 @@ typedef __cnd_t cnd_t;
 /* >> thrd_create(3)
  * Create and start a new thread (s.a. `pthread_create(3)')
  * @return: thrd_success: Success
+ * @return: thrd_nomem:   Not enough memory
  * @return: thrd_error:   Error */
 __CDECLARE(__ATTR_OUT(1) __ATTR_NONNULL((2)),int,__NOTHROW_NCX,thrd_create,(thrd_t *__thr, int (__LIBCCALL *__func)(void *__arg), void *__arg),(__thr,__func,__arg))
 #elif defined(__CRT_HAVE_pthread_create)
@@ -187,6 +188,7 @@ __CDECLARE(__ATTR_OUT(1) __ATTR_NONNULL((2)),int,__NOTHROW_NCX,thrd_create,(thrd
 /* >> thrd_create(3)
  * Create and start a new thread (s.a. `pthread_create(3)')
  * @return: thrd_success: Success
+ * @return: thrd_nomem:   Not enough memory
  * @return: thrd_error:   Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_create, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL thrd_create)(thrd_t *__thr, int (__LIBCCALL *__func)(void *__arg), void *__arg) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_create))(__thr, __func, __arg); })
 #endif /* ... */

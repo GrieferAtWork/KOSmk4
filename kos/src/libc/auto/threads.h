@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x189fd823 */
+/* HASH CRC-32:0xcf51e4a2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,7 @@ DECL_BEGIN
 /* >> thrd_create(3)
  * Create and start a new thread (s.a. `pthread_create(3)')
  * @return: thrd_success: Success
+ * @return: thrd_nomem:   Not enough memory
  * @return: thrd_error:   Error */
 INTDEF ATTR_OUT(1) NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_thrd_create)(thrd_t *thr, int (LIBDCALL *func)(void *arg), void *arg);
 #endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
@@ -40,6 +41,7 @@ INTDEF ATTR_OUT(1) NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_thrd_create)(thrd_
 /* >> thrd_create(3)
  * Create and start a new thread (s.a. `pthread_create(3)')
  * @return: thrd_success: Success
+ * @return: thrd_nomem:   Not enough memory
  * @return: thrd_error:   Error */
 INTDEF ATTR_OUT(1) NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_thrd_create)(thrd_t *thr, int (LIBCCALL *func)(void *arg), void *arg);
 #endif /* !__KERNEL__ */

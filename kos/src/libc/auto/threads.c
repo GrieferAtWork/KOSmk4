@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa83c2980 */
+/* HASH CRC-32:0xf5d2d7e0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,6 +35,7 @@ STATIC_ASSERT(sizeof(int) <= sizeof(void *));
 /* >> thrd_create(3)
  * Create and start a new thread (s.a. `pthread_create(3)')
  * @return: thrd_success: Success
+ * @return: thrd_nomem:   Not enough memory
  * @return: thrd_error:   Error */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.sched.threads") ATTR_OUT(1) NONNULL((2)) int
 NOTHROW_NCX(LIBDCALL libd_thrd_create)(thrd_t *thr,
@@ -58,6 +59,7 @@ NOTHROW_NCX(LIBDCALL libd_thrd_create)(thrd_t *thr,
 /* >> thrd_create(3)
  * Create and start a new thread (s.a. `pthread_create(3)')
  * @return: thrd_success: Success
+ * @return: thrd_nomem:   Not enough memory
  * @return: thrd_error:   Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_OUT(1) NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_thrd_create)(thrd_t *thr,

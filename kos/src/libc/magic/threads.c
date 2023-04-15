@@ -213,6 +213,7 @@ typedef __cnd_t cnd_t;
 @@>> thrd_create(3)
 @@Create and start a new thread (s.a. `pthread_create(3)')
 @@@return: thrd_success: Success
+@@@return: thrd_nomem:   Not enough memory
 @@@return: thrd_error:   Error
 [[decl_include("<bits/crt/threads.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<libc/errno.h>")]]

@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+
+/* TODO: DEPRECATED MODULE -- .gitignore has been turned into a deemon standard module */
+
 import fs;
 import util;
 import * from deemon;
