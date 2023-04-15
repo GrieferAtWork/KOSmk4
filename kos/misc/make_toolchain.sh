@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Re-write and greatly enhance the `threading` dex"
-DEEMON_VERSION="0db80e93f2b375fa90e2d3db2bf09e0120f9327a"
+#     v -- "Fix a bug with mappings in constant expression `contains` operations"
+DEEMON_VERSION="6f1e97bbc5487d121d2507f5f8be3736e5f2976f"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
