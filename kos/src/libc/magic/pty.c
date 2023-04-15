@@ -32,13 +32,22 @@
 %[define_replacement(pid_t = __pid_t)]
 %[default:section(".text.crt{|.dos}.io.tty")]
 
-%{
+%[define_decl_include("<bits/os/termio.h>": ["struct winsize", "struct termio"])]
+%[define_decl_include("<bits/os/termios.h>": ["struct termios"])]
+
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <sys/ioctl.h>
+)]%{
 
+}%[insert:prefix(
 #include <termios.h>
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -66,9 +75,8 @@ struct winsize;
 @@NOTE: On KOS, this function is a system call, though in other
 @@      operating system it is often implemented via `open(2)',
 @@      possibly combined with `ioctl(2)'.
-[[guard, decl_prefix(struct termios;)]]
-[[decl_prefix(struct winsize;)]]
-[[decl_include("<bits/types.h>")]]
+[[guard]]
+[[decl_include("<bits/types.h>", "<bits/os/termios.h>", "<bits/os/termio.h>")]]
 int openpty([[out]] $fd_t *amaster,
             [[out]] $fd_t *aslave,
             [[out_opt]] char *name,
@@ -83,9 +91,8 @@ int openpty([[out]] $fd_t *amaster,
 @@it returns in  both the  parent and child  processes, returning  `0'
 @@for the child, and the child's PID for the parent (or -1 in only the
 @@parent if something went wrong)
-[[guard, decl_prefix(struct termios;)]]
-[[decl_prefix(struct winsize;)]]
-[[decl_include("<bits/types.h>")]]
+[[guard]]
+[[decl_include("<bits/types.h>", "<bits/os/termios.h>", "<bits/os/termio.h>")]]
 [[requires_function(openpty, fork, close, login_tty, _Exit)]]
 $pid_t forkpty([[out]] $fd_t *amaster,
                [[out_opt]] char *name,

@@ -375,11 +375,10 @@ global partialKeywordEscapes: {string: string} = Dict({
 });
 
 
-@@Mapping of typenames to headers that must be included to get them
-@@e.g. "__fd_t" -> "<bits/types.h>"
-@@
-@@Used for generating warnings about missing include prefixes
-global typeHeaders: {string: string} = Dict({
+@@Names that were used in lookups to @typeHeaders, but weren't found
+global usedButNotDefinedTypeHeaders: {string: {(CParser, int)...}} = Dict();
+
+global final defaultTypeHeaders: {string: string} = {
 	/* <bits/types.h> */
 	"__int8_t" : "<bits/types.h>",
 	"__int16_t" : "<bits/types.h>",
@@ -565,8 +564,13 @@ global typeHeaders: {string: string} = Dict({
 	"__timeval": "<bits/os/timeval.h>",
 	"__timeval32": "<bits/os/timeval.h>",
 	"__timeval64": "<bits/os/timeval.h>",
+};
 
-});
+@@Mapping of typenames to headers that must be included to get them
+@@e.g. "__fd_t" -> "<bits/types.h>"
+@@
+@@Used for generating warnings about missing include prefixes
+global typeHeaders: {string: string} = Dict(defaultTypeHeaders);
 
 @@Include implications.
 @@e.g. "<bits/types.h>" implies "<hybrid/typecore.h>"

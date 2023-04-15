@@ -55,6 +55,11 @@
 %[define_decl_include_implication("<bits/os/sigset.h>" => ["<hybrid/typecore.h>"])]
 %[define_decl_include("<bits/os/sigset.h>": ["struct __sigset_struct"])]
 
+%[define_decl_include_implication("<bits/crt/pthreadtypes.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/crt/pthreadtypes.h>": ["__pthread_t"])]
+
+%[define_decl_include("<bits/os/sigstack.h>": ["struct sigaltstack"])]
+
 %[define_ccompat_header("csignal")]
 %[define_replacement(longptr_t    = __LONGPTR_TYPE__)]
 %[define_replacement(ulongptr_t   = __ULONGPTR_TYPE__)]

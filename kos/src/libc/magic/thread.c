@@ -23,6 +23,12 @@
 
 %[default:section(".text.crt{|.dos}.sched.threads")]
 
+%[define_decl_include_implication("<bits/crt/pthreadtypes.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/crt/pthreadtypes.h>": [
+	"__pthread_t",
+	"__pthread_key_t",
+])]
+
 %[define_decl_include_implication("<bits/os/sigset.h>" => ["<hybrid/typecore.h>"])]
 %[define_decl_include("<bits/os/sigset.h>": ["struct __sigset_struct"])]
 %[define_replacement(sigset_t = "struct __sigset_struct")]

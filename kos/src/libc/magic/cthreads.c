@@ -22,6 +22,8 @@
 /* (#) Portability: GNU Hurd      (/usr/include/cthreads.h) */
 }
 
+%[define_decl_include("<bits/crt/pthreadtypes.h>": ["__pthread_key_t"])]
+
 %[default:section(".text.crt{|.dos}.compat.hurd.cthreads")]
 %[default:nodos]
 

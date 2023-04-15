@@ -2614,6 +2614,9 @@ again:
 		self.next();
 	}
 
+	@@Set of type names that were defiend by `@[define_decl_include]` within this compilation unit
+	public final member locallyDefinedDeclIncludeTypes: {string...} = HashSet();
+
 	@@Define headers needed for type declarations:
 	@@>> %[define_decl_include(["struct partition_def"] = "<bits/crt/partition.h>")]
 	@@>> %[define_decl_include("struct partition_def" = "<bits/crt/partition.h>")]
@@ -2664,8 +2667,18 @@ again:
 		}
 		for (local decl: decls) {
 			decl = normalizeForTypeHeader(str(decl));
+			locallyDefinedDeclIncludeTypes.insert(decl);
 			local ok, oldHeaderName = typeHeaders.setnew_ex(decl, newHeaderName)...;
-			if (!ok && oldHeaderName != newHeaderName) {
+			if (ok) {
+				local alreadyUsedLocations = usedButNotDefinedTypeHeaders.get(decl);
+				if (alreadyUsedLocations !is none) {
+					for (local usedHereParser, usedHereOffset: alreadyUsedLocations) {
+						usedHereParser.warnAt(usedHereOffset,
+							f"Declaration header for {repr decl} was not declared at time of use");
+						self.warn(f"See reference to initial definition of {repr decl}");
+					}
+				}
+			} else if (oldHeaderName != newHeaderName) {
 				self.err(
 					f"define_decl_include re-definition: "
 					f"{repr decl} defined as {repr newHeaderName} "
@@ -5374,19 +5387,29 @@ again_skip_annotation_rbracket:
 			for (local typ/*: CType*/: currentPrototype.referencedTypes) {
 				local normalType = normalizeForTypeHeader(str(typ.beforeName));
 				local neededDeclHeader: string | none = typeHeaders.get(normalType);
-				if (neededDeclHeader !is none && neededDeclHeader !in loadedHeaders) {
-					local impliedBy: none | HashSet with string =
-						getHeadersThatImply(neededDeclHeader);
-					if ((for (local x: impliedBy) x in loadedHeaders) || ...) {
-						/* Implied include */
-					} else if (neededDeclHeader in alreadyWarnedHeaders) {
-						/* Already warned once */
-					} else {
-						alreadyWarnedHeaders.insert(neededDeclHeader);
-						self.warnAt(currentNameTokStart,
-							f"Missing '[[decl_include({repr neededDeclHeader})]]' on "
-							f"{repr currentName} needed for {repr normalType} "
-							f"(in {repr typ.beforeName})");
+				if (neededDeclHeader is none) {
+					usedButNotDefinedTypeHeaders
+						.setdefault(normalType, [])
+						.append((self, self.tokStart));
+				} else {
+					if (normalType !in defaultTypeHeaders &&
+					    normalType !in context.locallyDefinedDeclIncludeTypes) {
+						self.warn(f"Declaration header for {repr normalType} was not declared in this compilation unit");
+					}
+					if (neededDeclHeader !in loadedHeaders) {
+						local impliedBy: none | HashSet with string =
+							getHeadersThatImply(neededDeclHeader);
+						if ((for (local x: impliedBy) x in loadedHeaders) || ...) {
+							/* Implied include */
+						} else if (neededDeclHeader in alreadyWarnedHeaders) {
+							/* Already warned once */
+						} else {
+							alreadyWarnedHeaders.insert(neededDeclHeader);
+							self.warnAt(currentNameTokStart,
+								f"Missing '[[decl_include({repr neededDeclHeader})]]' on "
+								f"{repr currentName} needed for {repr normalType} "
+								f"(in {repr typ.beforeName})");
+						}
 					}
 				}
 			}

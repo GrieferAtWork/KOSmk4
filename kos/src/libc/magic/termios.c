@@ -42,6 +42,7 @@
 %[define_replacement(speed_t  = __UINT32_TYPE__)]
 %[define_replacement(tcflag_t = __UINT32_TYPE__)]
 
+%[define_decl_include("<bits/os/termio.h>": ["struct winsize", "struct termio"])]
 %[define_decl_include("<bits/os/termios.h>": ["struct termios"])]
 
 %[default:section(".text.crt{|.dos}.io.tty")]

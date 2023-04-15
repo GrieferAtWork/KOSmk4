@@ -29,6 +29,8 @@
 /* (#) Portability: uClibc        (/include/sys/timex.h) */
 }
 
+%[define_decl_include("<bits/os/timex.h>": ["struct timex", "struct timex64"])]
+
 %[define_replacement(fd_t         = __fd_t)]
 %[define_replacement(time_t       = "__time_t")]
 %[define_replacement(time32_t     = __time32_t)]

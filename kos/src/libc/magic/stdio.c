@@ -69,6 +69,9 @@
 	"__fpos64_t",
 ])]
 
+%[define_decl_include_implication("<bits/crt/obstack.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/crt/obstack.h>": ["struct obstack"])]
+
 %[define_replacement(FILE     = __FILE)]
 %[define_replacement(fd_t     = __fd_t)]
 %[define_replacement(atflag_t = __atflag_t)]

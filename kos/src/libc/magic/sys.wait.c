@@ -39,6 +39,8 @@
 %[define_decl_include_implication("<bits/os/siginfo.h>" => ["<hybrid/typecore.h>"])]
 %[define_decl_include("<bits/os/siginfo.h>": ["struct __siginfo_struct"])]
 
+%[define_decl_include("<bits/os/rusage.h>": ["struct rusage", "struct rusage64"])]
+
 %[define_replacement(pid_t = __pid_t)]
 %[define_replacement(rusage32 = __rusage32)]
 %[define_replacement(rusage64 = __rusage64)]

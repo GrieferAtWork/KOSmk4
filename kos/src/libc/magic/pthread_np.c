@@ -26,6 +26,11 @@
 %[default:section(".text.crt{|.dos}.sched.pthread")]
 %[define_replacement(stack_t = "struct sigaltstack")]
 
+%[define_decl_include_implication("<bits/crt/pthreadtypes.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/crt/pthreadtypes.h>": ["__pthread_t"])]
+
+%[define_decl_include("<bits/os/sigstack.h>": ["struct sigaltstack"])]
+
 %[insert:prefix(
 #include <bits/os/sigstack.h>
 )]%[insert:prefix(
