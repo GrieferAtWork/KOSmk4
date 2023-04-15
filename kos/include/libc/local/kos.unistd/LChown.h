@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x609a2058 */
+/* HASH CRC-32:0x4b8c271b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,28 +18,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_LChown_defined
-#define __local_LChown_defined
+#ifndef __local_LChOwn_defined
+#define __local_LChOwn_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && defined(__CRT_HAVE_FChownAt)
+#if defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && defined(__CRT_HAVE_FChOwnAt)
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_FChownAt_defined
-#define __local___localdep_FChownAt_defined
-__CREDIRECT_VOID(__ATTR_IN(2),__THROWING,__localdep_FChownAt,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),FChownAt,(__dfd,__file,__owner,__group,__flags))
-#endif /* !__local___localdep_FChownAt_defined */
-__LOCAL_LIBC(LChown) __ATTR_IN(1) void
-(__LIBCCALL __LIBC_LOCAL_NAME(LChown))(char const *__file, __uid_t __owner, __gid_t __group) __THROWS(...) {
-	(__NAMESPACE_LOCAL_SYM __localdep_FChownAt)(__AT_FDCWD, __file, __owner, __group, __AT_SYMLINK_NOFOLLOW);
+#ifndef __local___localdep_FChOwnAt_defined
+#define __local___localdep_FChOwnAt_defined
+__CREDIRECT_VOID(__ATTR_IN(2),__THROWING,__localdep_FChOwnAt,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),FChOwnAt,(__dfd,__file,__owner,__group,__flags))
+#endif /* !__local___localdep_FChOwnAt_defined */
+__LOCAL_LIBC(LChOwn) __ATTR_IN(1) void
+(__LIBCCALL __LIBC_LOCAL_NAME(LChOwn))(char const *__file, __uid_t __owner, __gid_t __group) __THROWS(...) {
+	(__NAMESPACE_LOCAL_SYM __localdep_FChOwnAt)(__AT_FDCWD, __file, __owner, __group, __AT_SYMLINK_NOFOLLOW);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_LChown_defined
-#define __local___localdep_LChown_defined
-#define __localdep_LChown __LIBC_LOCAL_NAME(LChown)
-#endif /* !__local___localdep_LChown_defined */
-#else /* __AT_FDCWD && __AT_SYMLINK_NOFOLLOW && __CRT_HAVE_FChownAt */
-#undef __local_LChown_defined
-#endif /* !__AT_FDCWD || !__AT_SYMLINK_NOFOLLOW || !__CRT_HAVE_FChownAt */
-#endif /* !__local_LChown_defined */
+#ifndef __local___localdep_LChOwn_defined
+#define __local___localdep_LChOwn_defined
+#define __localdep_LChOwn __LIBC_LOCAL_NAME(LChOwn)
+#endif /* !__local___localdep_LChOwn_defined */
+#else /* __AT_FDCWD && __AT_SYMLINK_NOFOLLOW && __CRT_HAVE_FChOwnAt */
+#undef __local_LChOwn_defined
+#endif /* !__AT_FDCWD || !__AT_SYMLINK_NOFOLLOW || !__CRT_HAVE_FChOwnAt */
+#endif /* !__local_LChOwn_defined */

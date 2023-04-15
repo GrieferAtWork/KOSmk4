@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3456563 */
+/* HASH CRC-32:0x49ad0f81 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,7 +93,7 @@ INTDEF void (LIBCCALL libc_SetGid)(gid_t gid) THROWS(...);
 INTDEF WUNUSED pid_t (LIBCCALL libc_Fork)(void) THROWS(...);
 /* >> chown(2)
  * Change the ownership of a given `file' to `group:owner' */
-INTDEF ATTR_IN(1) void (LIBCCALL libc_Chown)(char const *file, uid_t owner, gid_t group) THROWS(...);
+INTDEF ATTR_IN(1) void (LIBCCALL libc_ChOwn)(char const *file, uid_t owner, gid_t group) THROWS(...);
 /* >> link(2)
  * Create a hard link from `from', leading to `to' */
 INTDEF ATTR_IN(1) ATTR_IN(2) void (LIBCCALL libc_Link)(char const *from, char const *to) THROWS(...);
@@ -134,7 +134,7 @@ INTDEF fd_t (LIBCCALL libc_Dup2)(fd_t oldfd, fd_t newfd) THROWS(...);
 INTDEF WUNUSED fd_t (LIBCCALL libc_Dup)(fd_t fd) THROWS(...);
 /* >> chdir(2)
  * Change the current working directory to `path' */
-INTDEF ATTR_IN(1) void (LIBCCALL libc_Chdir)(char const *path) THROWS(...);
+INTDEF ATTR_IN(1) void (LIBCCALL libc_ChDir)(char const *path) THROWS(...);
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 INTDEF ATTR_OUTS(1, 2) char *(LIBCCALL libc_GetCwd)(char *buf, size_t bufsize) THROWS(...);
@@ -143,10 +143,10 @@ INTDEF ATTR_OUTS(1, 2) char *(LIBCCALL libc_GetCwd)(char *buf, size_t bufsize) T
 INTDEF ATTR_IN(1) void (LIBCCALL libc_Unlink)(char const *file) THROWS(...);
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
-INTDEF ATTR_IN(1) void (LIBCCALL libc_Rmdir)(char const *path) THROWS(...);
+INTDEF ATTR_IN(1) void (LIBCCALL libc_RmDir)(char const *path) THROWS(...);
 /* >> fchownat(2)
  * Change the ownership of a given `dfd:file' to `group:owner' */
-INTDEF ATTR_IN(2) void (LIBCCALL libc_FChownAt)(fd_t dfd, char const *file, uid_t owner, gid_t group, atflag_t flags) THROWS(...);
+INTDEF ATTR_IN(2) void (LIBCCALL libc_FChOwnAt)(fd_t dfd, char const *file, uid_t owner, gid_t group, atflag_t flags) THROWS(...);
 /* >> linkat(2)
  * Create a hard link from `fromfd:from', leading to `tofd:to' */
 INTDEF ATTR_IN(2) ATTR_IN(4) void (LIBCCALL libc_LinkAt)(fd_t fromfd, char const *from, fd_t tofd, char const *to, atflag_t flags) THROWS(...);
@@ -162,11 +162,11 @@ INTDEF ATTR_IN(1) ATTR_IN(3) void (LIBCCALL libc_SymlinkAt)(char const *link_tex
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) size_t (LIBCCALL libc_ReadlinkAt)(fd_t dfd, char const *__restrict path, char *__restrict buf, size_t buflen) THROWS(...);
+INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) size_t (LIBCCALL libc_ReadLinkAt)(fd_t dfd, char const *__restrict path, char *__restrict buf, size_t buflen) THROWS(...);
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE' */
-INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) size_t (LIBCCALL libc_FReadlinkAt)(fd_t dfd, char const *__restrict path, char *__restrict buf, size_t buflen, atflag_t flags) THROWS(...);
+INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) size_t (LIBCCALL libc_FReadLinkAt)(fd_t dfd, char const *__restrict path, char *__restrict buf, size_t buflen, atflag_t flags) THROWS(...);
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
 INTDEF ATTR_IN(2) void (LIBCCALL libc_UnlinkAt)(fd_t dfd, char const *name, atflag_t flags) THROWS(...);
@@ -212,11 +212,11 @@ INTDEF fd_t (LIBCCALL libc_Dup3)(fd_t oldfd, fd_t newfd, oflag_t flags) THROWS(.
  * Due to the mandatory dependency on `getenv(3)', this function can't be
  * made thread-safe, so try not to use this one. */
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *(LIBCCALL libc_GetCurrentDirName)(void) THROWS(...);
-INTDEF void (LIBCCALL libc_SyncFs)(fd_t fd) THROWS(...);
-INTDEF ATTR_OUT_OPT(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(3) void (LIBCCALL libc_GetResUid)(uid_t *ruid, uid_t *euid, uid_t *suid) THROWS(...);
-INTDEF ATTR_OUT_OPT(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(3) void (LIBCCALL libc_GetResGid)(gid_t *rgid, gid_t *egid, gid_t *sgid) THROWS(...);
-INTDEF void (LIBCCALL libc_SetResUid)(uid_t ruid, uid_t euid, uid_t suid) THROWS(...);
-INTDEF void (LIBCCALL libc_SetResGid)(gid_t rgid, gid_t egid, gid_t sgid) THROWS(...);
+INTDEF void (LIBCCALL libc_SyncFS)(fd_t fd) THROWS(...);
+INTDEF ATTR_OUT_OPT(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(3) void (LIBCCALL libc_GetRESUid)(uid_t *ruid, uid_t *euid, uid_t *suid) THROWS(...);
+INTDEF ATTR_OUT_OPT(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(3) void (LIBCCALL libc_GetRESGid)(gid_t *rgid, gid_t *egid, gid_t *sgid) THROWS(...);
+INTDEF void (LIBCCALL libc_SetRESUid)(uid_t ruid, uid_t euid, uid_t suid) THROWS(...);
+INTDEF void (LIBCCALL libc_SetRESGid)(gid_t rgid, gid_t egid, gid_t sgid) THROWS(...);
 /* >> vfork(2)
  * Same as `fork(2)', but the child process may be executed within in the same VM
  * as the parent process, with the  parent process remaining suspended until  the
@@ -246,10 +246,10 @@ INTDEF void (LIBCCALL libc_SetResGid)(gid_t rgid, gid_t egid, gid_t sgid) THROWS
 INTDEF ATTR_RETURNS_TWICE WUNUSED pid_t (LIBCCALL libc_VFork)(void) THROWS(...);
 /* >> fchown(2)
  * Change the ownership of a given `fd' to `group:owner' */
-INTDEF void (LIBCCALL libc_FChown)(fd_t fd, uid_t owner, gid_t group) THROWS(...);
+INTDEF void (LIBCCALL libc_FChOwn)(fd_t fd, uid_t owner, gid_t group) THROWS(...);
 /* >> fchdir(2)
  * Change the current working directory to `path' */
-INTDEF void (LIBCCALL libc_FChdir)(fd_t fd) THROWS(...);
+INTDEF void (LIBCCALL libc_FChDir)(fd_t fd) THROWS(...);
 /* >> getpgid(2)
  * Return  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
@@ -263,7 +263,7 @@ INTDEF WUNUSED pid_t (LIBCCALL libc_GetSid)(pid_t pid) THROWS(...);
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if  that file is a symbolic  link */
-INTDEF ATTR_IN(1) void (LIBCCALL libc_LChown)(char const *file, uid_t owner, gid_t group) THROWS(...);
+INTDEF ATTR_IN(1) void (LIBCCALL libc_LChOwn)(char const *file, uid_t owner, gid_t group) THROWS(...);
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
 INTDEF ATTR_IN(1) void (LIBCCALL libc_Truncate)(char const *file, pos_t length) THROWS(...);
@@ -288,12 +288,12 @@ INTDEF void (LIBCCALL libc_SetPGrp)(void) THROWS(...);
  * Set the real and effective UID of the calling thread.
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF void (LIBCCALL libc_SetReUid)(uid_t ruid, uid_t euid) THROWS(...);
+INTDEF void (LIBCCALL libc_SetREUid)(uid_t ruid, uid_t euid) THROWS(...);
 /* >> setregid(2)
  * Set the real and effective GID of the calling thread.
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF void (LIBCCALL libc_SetReGid)(gid_t rgid, gid_t egid) THROWS(...);
+INTDEF void (LIBCCALL libc_SetREGid)(gid_t rgid, gid_t egid) THROWS(...);
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
@@ -320,7 +320,7 @@ INTDEF ATTR_IN(1) ATTR_IN(2) void (LIBCCALL libc_Symlink)(char const *link_text,
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-INTDEF ATTR_IN(1) ATTR_OUTS(2, 3) size_t (LIBCCALL libc_Readlink)(char const *__restrict path, char *__restrict buf, size_t buflen) THROWS(...);
+INTDEF ATTR_IN(1) ATTR_OUTS(2, 3) size_t (LIBCCALL libc_ReadLink)(char const *__restrict path, char *__restrict buf, size_t buflen) THROWS(...);
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
 INTDEF ATTR_OUTS(1, 2) void (LIBCCALL libc_GetHostName)(char *name, size_t buflen) THROWS(...);

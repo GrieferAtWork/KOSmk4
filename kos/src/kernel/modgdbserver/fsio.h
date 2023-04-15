@@ -166,7 +166,7 @@ NOTHROW(KCALL GDBFs_Unlink)(char const *filename);
  * @param: pbuflen: [IN]  Available buffer size in `buf'
  *                  [OUT] Number of bytes written to `buf' */
 INTDEF WUNUSED gdb_errno_t
-NOTHROW(KCALL GDBFs_Readlink)(char const *filename,
+NOTHROW(KCALL GDBFs_ReadLink)(char const *filename,
                               char *buf,
                               size_t *__restrict pbuflen);
 

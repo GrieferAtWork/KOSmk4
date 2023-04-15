@@ -114,11 +114,11 @@ INTERN ATTR_SECTION(".text.crt.except.heap.rare_helpers") ATTR_MALLOC ATTR_RETNO
 }
 /*[[[end:libc_Valloc]]]*/
 
-/*[[[head:libc_Memdup,hash:CRC-32=0xb38014b4]]]*/
+/*[[[head:libc_MemDup,hash:CRC-32=0x8aed701a]]]*/
 INTERN ATTR_SECTION(".text.crt.except.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_INS(1, 2) void *
-(LIBCCALL libc_Memdup)(void const *__restrict ptr,
+(LIBCCALL libc_MemDup)(void const *__restrict ptr,
                        size_t num_bytes) THROWS(E_BADALLOC)
-/*[[[body:libc_Memdup]]]*/
+/*[[[body:libc_MemDup]]]*/
 {
 	void *result;
 	result = memdup(ptr, num_bytes);
@@ -126,15 +126,15 @@ INTERN ATTR_SECTION(".text.crt.except.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_
 		THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes);
 	return result;
 }
-/*[[[end:libc_Memdup]]]*/
+/*[[[end:libc_MemDup]]]*/
 
-/*[[[head:libc_Memcdup,hash:CRC-32=0x799c7978]]]*/
+/*[[[head:libc_MemCDup,hash:CRC-32=0xc95d62d7]]]*/
 /* @throws: E_BADALLOC: ... */
 INTERN ATTR_SECTION(".text.crt.except.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_INS(1, 3) void *
-(LIBCCALL libc_Memcdup)(void const *__restrict ptr,
+(LIBCCALL libc_MemCDup)(void const *__restrict ptr,
                         int needle,
                         size_t num_bytes) THROWS(E_BADALLOC)
-/*[[[body:libc_Memcdup]]]*/
+/*[[[body:libc_MemCDup]]]*/
 {
 	if likely(num_bytes) {
 		void const *endaddr;
@@ -142,23 +142,23 @@ INTERN ATTR_SECTION(".text.crt.except.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_
 		if (endaddr)
 			num_bytes = ((uintptr_t)endaddr - (uintptr_t)ptr) + 1;
 	}
-	return Memdup(ptr, num_bytes);
+	return MemDup(ptr, num_bytes);
 }
-/*[[[end:libc_Memcdup]]]*/
+/*[[[end:libc_MemCDup]]]*/
 
 
 
 
 
-/*[[[start:exports,hash:CRC-32=0xebd79f79]]]*/
+/*[[[start:exports,hash:CRC-32=0xe468ceb4]]]*/
 DEFINE_PUBLIC_ALIAS(Malloc, libc_Malloc);
 DEFINE_PUBLIC_ALIAS(Calloc, libc_Calloc);
 DEFINE_PUBLIC_ALIAS(Realloc, libc_Realloc);
 DEFINE_PUBLIC_ALIAS(Memalign, libc_Memalign);
 DEFINE_PUBLIC_ALIAS(PValloc, libc_PValloc);
 DEFINE_PUBLIC_ALIAS(Valloc, libc_Valloc);
-DEFINE_PUBLIC_ALIAS(Memdup, libc_Memdup);
-DEFINE_PUBLIC_ALIAS(Memcdup, libc_Memcdup);
+DEFINE_PUBLIC_ALIAS(MemDup, libc_MemDup);
+DEFINE_PUBLIC_ALIAS(MemCDup, libc_MemCDup);
 /*[[[end:exports]]]*/
 
 DECL_END

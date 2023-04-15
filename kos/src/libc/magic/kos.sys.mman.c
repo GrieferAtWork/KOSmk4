@@ -121,11 +121,11 @@ $fd_t ShmOpen([[in]] char const *name,
 	       (namelen + 1) *
 	       sizeof(char));
 	result = Open(fullname, oflags, mode);
-@@pp_if defined(ENOENT) && defined(O_CREAT) && $has_function(Mkdir)@@
+@@pp_if defined(ENOENT) && defined(O_CREAT) && $has_function(MkDir)@@
 	if (result < 0 && (oflags & O_CREAT) != 0 && __libc_geterrno_or(ENOENT) == ENOENT) {
 		/* Lazily create the SHM directory (/dev/shm), if it hadn't been created already.
 		 * XXX:   This    assumes    that    `headof(__PATH_SHM)'    already    exists... */
-		Mkdir(__PATH_SHM, 0777);
+		MkDir(__PATH_SHM, 0777);
 		result = Open(fullname, oflags, mode);
 	}
 @@pp_endif@@
@@ -269,7 +269,7 @@ void PKeyFree(int pkey);
 
 [[throws, doc_alias("pkey_mprotect"), decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
-void PKeyMprotect([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
+void PKeyMProtect([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
 
 %#endif /* __USE_GNU */
 

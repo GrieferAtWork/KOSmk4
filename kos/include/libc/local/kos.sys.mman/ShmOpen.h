@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10c35498 */
+/* HASH CRC-32:0x959d4fd7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,10 +28,10 @@
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_Mkdir_defined) && defined(__CRT_HAVE_Mkdir)
-#define __local___localdep_Mkdir_defined
-__CREDIRECT_VOID(__ATTR_IN(1),__THROWING,__localdep_Mkdir,(char const *__pathname, __mode_t __mode),Mkdir,(__pathname,__mode))
-#endif /* !__local___localdep_Mkdir_defined && __CRT_HAVE_Mkdir */
+#if !defined(__local___localdep_MkDir_defined) && defined(__CRT_HAVE_MkDir)
+#define __local___localdep_MkDir_defined
+__CREDIRECT_VOID(__ATTR_IN(1),__THROWING,__localdep_MkDir,(char const *__pathname, __mode_t __mode),MkDir,(__pathname,__mode))
+#endif /* !__local___localdep_MkDir_defined && __CRT_HAVE_MkDir */
 #ifndef __local___localdep_Open_defined
 #define __local___localdep_Open_defined
 #if defined(__CRT_HAVE_Open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
@@ -128,14 +128,14 @@ __LOCAL_LIBC(ShmOpen) __ATTR_IN(1) __fd_t
 	       (__namelen + 1) *
 	       sizeof(char));
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_Open)(__fullname, __oflags, __mode);
-#if defined(__ENOENT) && defined(__O_CREAT) && defined(__CRT_HAVE_Mkdir)
+#if defined(__ENOENT) && defined(__O_CREAT) && defined(__CRT_HAVE_MkDir)
 	if (__result < 0 && (__oflags & __O_CREAT) != 0 && __libc_geterrno_or(__ENOENT) == __ENOENT) {
 		/* Lazily create the SHM directory (/dev/shm), if it hadn't been created already.
 		 * XXX:   This    assumes    that    `headof(__PATH_SHM)'    already    exists... */
-		(__NAMESPACE_LOCAL_SYM __localdep_Mkdir)(__PATH_SHM, 0777);
+		(__NAMESPACE_LOCAL_SYM __localdep_MkDir)(__PATH_SHM, 0777);
 		__result = (__NAMESPACE_LOCAL_SYM __localdep_Open)(__fullname, __oflags, __mode);
 	}
-#endif /* __ENOENT && __O_CREAT && __CRT_HAVE_Mkdir */
+#endif /* __ENOENT && __O_CREAT && __CRT_HAVE_MkDir */
 	__freea(__fullname);
 	return __result;
 }

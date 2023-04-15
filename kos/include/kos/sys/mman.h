@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77f82af0 */
+/* HASH CRC-32:0xe0621ace */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -190,7 +190,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(PKeyGet, __FORCELOCAL __ATTR_ARTIFICIAL unsigned
 /* >> pkey_free(2) */
 __CDECLARE_VOID_OPT(,__THROWING,PKeyFree,(int __pkey),(__pkey))
 /* >> pkey_mprotect(2) */
-__CDECLARE_VOID_OPT(__ATTR_ACCESS_NONE(1),__THROWING,PKeyMprotect,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, int __pkey),(__addr,__len,__prot,__pkey))
+__CDECLARE_VOID_OPT(__ATTR_ACCESS_NONE(1),__THROWING,PKeyMProtect,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, int __pkey),(__addr,__len,__prot,__pkey))
 #endif /* __USE_GNU */
 
 __SYSDECL_END

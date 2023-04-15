@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xecba208d */
+/* HASH CRC-32:0x1678fa08 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,7 +76,7 @@ INTERN ATTR_SECTION(".text.crt.except.system.mman") ATTR_IN(1) fd_t
 	if (result < 0 && (oflags & O_CREAT) != 0 && __libc_geterrno_or(ENOENT) == ENOENT) {
 		/* Lazily create the SHM directory (/dev/shm), if it hadn't been created already.
 		 * XXX:   This    assumes    that    `headof(__PATH_SHM)'    already    exists... */
-		libc_Mkdir(__PATH_SHM, 0777);
+		libc_MkDir(__PATH_SHM, 0777);
 		result = libc_Open(fullname, oflags, mode);
 	}
 

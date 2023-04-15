@@ -1195,7 +1195,7 @@ return_zero:
 			ERROR(err_syntax);
 		linktext = o + 4;
 		buflen   = CONFIG_MODGDBSERVER_PACKET_MAXLEN - 4;
-		error    = GDBFs_Readlink(filename, linktext, &buflen);
+		error    = GDBFs_ReadLink(filename, linktext, &buflen);
 		if unlikely(error != 0) {
 			o = GDBFs_EncodeErrno(o, error);
 			goto do_transmit;

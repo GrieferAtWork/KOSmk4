@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7bedc1e2 */
+/* HASH CRC-32:0xc68e39d0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,7 +86,7 @@ INTDEF int (LIBCCALL libc_PKeyAlloc)(unsigned int flags, unsigned int access_rig
 /* >> pkey_free(2) */
 INTDEF void (LIBCCALL libc_PKeyFree)(int pkey) THROWS(...);
 /* >> pkey_mprotect(2) */
-INTDEF ATTR_ACCESS_NONE(1) void (LIBCCALL libc_PKeyMprotect)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey) THROWS(...);
+INTDEF ATTR_ACCESS_NONE(1) void (LIBCCALL libc_PKeyMProtect)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey) THROWS(...);
 #endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */
 
 DECL_END

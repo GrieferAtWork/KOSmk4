@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x921ecac3 */
+/* HASH CRC-32:0xb151b679 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_Memdup_defined
-#define __local_Memdup_defined
+#ifndef __local_MemDup_defined
+#define __local_MemDup_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_Malloc
 #include <kos/anno.h>
@@ -40,19 +40,19 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
-__LOCAL_LIBC(Memdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_INS(1, 2) void *
-(__LIBCCALL __LIBC_LOCAL_NAME(Memdup))(void const *__restrict __ptr, __SIZE_TYPE__ __num_bytes) __THROWS(__E_BADALLOC) {
+__LOCAL_LIBC(MemDup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_INS(1, 2) void *
+(__LIBCCALL __LIBC_LOCAL_NAME(MemDup))(void const *__restrict __ptr, __SIZE_TYPE__ __num_bytes) __THROWS(__E_BADALLOC) {
 	void *__result;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_Malloc)(__num_bytes);
 	(__NAMESPACE_LOCAL_SYM __localdep_memcpy)(__result, __ptr, __num_bytes);
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_Memdup_defined
-#define __local___localdep_Memdup_defined
-#define __localdep_Memdup __LIBC_LOCAL_NAME(Memdup)
-#endif /* !__local___localdep_Memdup_defined */
+#ifndef __local___localdep_MemDup_defined
+#define __local___localdep_MemDup_defined
+#define __localdep_MemDup __LIBC_LOCAL_NAME(MemDup)
+#endif /* !__local___localdep_MemDup_defined */
 #else /* __CRT_HAVE_Malloc */
-#undef __local_Memdup_defined
+#undef __local_MemDup_defined
 #endif /* !__CRT_HAVE_Malloc */
-#endif /* !__local_Memdup_defined */
+#endif /* !__local_MemDup_defined */

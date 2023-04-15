@@ -26,7 +26,7 @@
 #define __CRT_HAVE_Calloc
 #define __CRT_HAVE_ChRoot
 #define __CRT_HAVE_Chdir
-#define __CRT_HAVE_Chmod
+#define __CRT_HAVE_ChMod
 #define __CRT_HAVE_Chown
 #define __CRT_HAVE_Connect
 #define __CRT_HAVE_Creat
@@ -49,8 +49,8 @@
 #define __CRT_HAVE_Execvp
 #define __CRT_HAVE_Execvpe
 #define __CRT_HAVE_FChdir
-#define __CRT_HAVE_FChmod
-#define __CRT_HAVE_FChmodAt
+#define __CRT_HAVE_FChMod
+#define __CRT_HAVE_FChModAt
 #define __CRT_HAVE_FChown
 #define __CRT_HAVE_FChownAt
 #define __CRT_HAVE_FDataSync
@@ -86,7 +86,7 @@
 #define __CRT_HAVE_KStat
 #define __CRT_HAVE_KStat64
 #define __CRT_HAVE_KSysctl
-#define __CRT_HAVE_LChmod
+#define __CRT_HAVE_LChMod
 #define __CRT_HAVE_LChown
 #define __CRT_HAVE_LFutexExpr
 #define __CRT_HAVE_LFutexExpr64

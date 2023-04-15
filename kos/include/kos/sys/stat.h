@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29c1ac56 */
+/* HASH CRC-32:0xe9ab3914 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,47 +114,47 @@ __CREDIRECT_VOID(__ATTR_IN(2) __ATTR_OUT(3),__THROWING,FStatAt64,(__fd_t __dirfd
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_ATFILE */
 /* >> mkdir(2) */
-__CDECLARE_VOID_OPT(__ATTR_IN(1),__THROWING,Mkdir,(char const *__pathname, __mode_t __mode),(__pathname,__mode))
+__CDECLARE_VOID_OPT(__ATTR_IN(1),__THROWING,MkDir,(char const *__pathname, __mode_t __mode),(__pathname,__mode))
 /* >> chmod(2) */
-__CDECLARE_VOID_OPT(__ATTR_IN(1),__THROWING,Chmod,(char const *__filename, __mode_t __mode),(__filename,__mode))
+__CDECLARE_VOID_OPT(__ATTR_IN(1),__THROWING,ChMod,(char const *__filename, __mode_t __mode),(__filename,__mode))
 
 #ifdef __USE_MISC
 /* >> lchmod(2) */
-__CDECLARE_VOID_OPT(__ATTR_IN(1),__THROWING,LChmod,(char const *__filename, __mode_t __mode),(__filename,__mode))
+__CDECLARE_VOID_OPT(__ATTR_IN(1),__THROWING,LChMod,(char const *__filename, __mode_t __mode),(__filename,__mode))
 #endif /* __USE_MISC */
 
 #if defined(__USE_KOS) && defined(__USE_ATFILE)
 /* >> fmkdirat(2)
  * @param flags: Set of `0 | AT_DOSPATH' */
-__CDECLARE_VOID_OPT(__ATTR_IN(2),__THROWING,FMkdirAt,(__fd_t __dirfd, char const *__pathname, __mode_t __mode, __atflag_t __flags),(__dirfd,__pathname,__mode,__flags))
+__CDECLARE_VOID_OPT(__ATTR_IN(2),__THROWING,FMkDirAt,(__fd_t __dirfd, char const *__pathname, __mode_t __mode, __atflag_t __flags),(__dirfd,__pathname,__mode,__flags))
 /* >> fmknodat(2)
  * @param flags: Set of `0 | AT_DOSPATH' */
-__CDECLARE_VOID_OPT(__ATTR_IN(2),__THROWING,FMknodAt,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev, __atflag_t __flags),(__dirfd,__nodename,__mode,__dev,__flags))
+__CDECLARE_VOID_OPT(__ATTR_IN(2),__THROWING,FMkNodAt,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev, __atflag_t __flags),(__dirfd,__nodename,__mode,__dev,__flags))
 #endif /* __USE_KOS && __USE_ATFILE */
 /* >> mkfifo(2) */
-__CDECLARE_VOID_OPT(__ATTR_IN(1),__THROWING,Mkfifo,(char const *__fifoname, __mode_t __mode),(__fifoname,__mode))
+__CDECLARE_VOID_OPT(__ATTR_IN(1),__THROWING,MkFiFo,(char const *__fifoname, __mode_t __mode),(__fifoname,__mode))
 
 #ifdef __USE_ATFILE
 /* >> fchmodat(2)
  * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-__CDECLARE_VOID_OPT(__ATTR_IN(2),__THROWING,FChmodAt,(__fd_t __dirfd, char const *__filename, __mode_t __mode, __atflag_t __flags),(__dirfd,__filename,__mode,__flags))
+__CDECLARE_VOID_OPT(__ATTR_IN(2),__THROWING,FChModAt,(__fd_t __dirfd, char const *__filename, __mode_t __mode, __atflag_t __flags),(__dirfd,__filename,__mode,__flags))
 /* >> mkdirat(2) */
-__CDECLARE_VOID_OPT(__ATTR_IN(2),__THROWING,MkdirAt,(__fd_t __dirfd, char const *__pathname, __mode_t __mode),(__dirfd,__pathname,__mode))
+__CDECLARE_VOID_OPT(__ATTR_IN(2),__THROWING,MkDirAt,(__fd_t __dirfd, char const *__pathname, __mode_t __mode),(__dirfd,__pathname,__mode))
 /* >> mkfifoat(2) */
-__CDECLARE_VOID_OPT(__ATTR_IN(2),__THROWING,MkfifoAt,(__fd_t __dirfd, char const *__fifoname, __mode_t __mode),(__dirfd,__fifoname,__mode))
+__CDECLARE_VOID_OPT(__ATTR_IN(2),__THROWING,MkFiFoAt,(__fd_t __dirfd, char const *__fifoname, __mode_t __mode),(__dirfd,__fifoname,__mode))
 #endif /* __USE_ATFILE */
 
 #ifdef __USE_POSIX
 /* >> fchmod(2) */
-__CDECLARE_VOID_OPT(,__THROWING,FChmod,(__fd_t __fd, __mode_t __mode),(__fd,__mode))
+__CDECLARE_VOID_OPT(,__THROWING,FChMod,(__fd_t __fd, __mode_t __mode),(__fd,__mode))
 #endif /* __USE_POSIX */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 /* >> mknod(2) */
-__CDECLARE_VOID_OPT(__ATTR_IN(1),__THROWING,Mknod,(char const *__nodename, __mode_t __mode, __dev_t __dev),(__nodename,__mode,__dev))
+__CDECLARE_VOID_OPT(__ATTR_IN(1),__THROWING,MkNod,(char const *__nodename, __mode_t __mode, __dev_t __dev),(__nodename,__mode,__dev))
 #ifdef __USE_ATFILE
 /* >> mknodat(2) */
-__CDECLARE_VOID_OPT(__ATTR_IN(2),__THROWING,MknodAt,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev),(__dirfd,__nodename,__mode,__dev))
+__CDECLARE_VOID_OPT(__ATTR_IN(2),__THROWING,MkNodAt,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev),(__dirfd,__nodename,__mode,__dev))
 #endif /* __USE_ATFILE */
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
@@ -193,28 +193,28 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(UTimensAt64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* __USE_ATFILE */
 
 #ifdef __USE_XOPEN2K8
-#if defined(__CRT_HAVE_FUtimens) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#if defined(__CRT_HAVE_FUTimens) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futimens(2), futimens64(2) */
-__CDECLARE_VOID(__ATTR_IN_OPT(2),__THROWING,FUtimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),(__fd,__times))
-#elif defined(__CRT_HAVE_FUtimens64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__CDECLARE_VOID(__ATTR_IN_OPT(2),__THROWING,FUTimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),(__fd,__times))
+#elif defined(__CRT_HAVE_FUTimens64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futimens(2), futimens64(2) */
-__CREDIRECT_VOID(__ATTR_IN_OPT(2),__THROWING,FUtimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),FUtimens64,(__fd,__times))
-#elif defined(__CRT_HAVE_FUtimens64) || defined(__CRT_HAVE_FUtimens)
-#include <libc/local/kos.sys.stat/FUtimens.h>
+__CREDIRECT_VOID(__ATTR_IN_OPT(2),__THROWING,FUTimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),FUTimens64,(__fd,__times))
+#elif defined(__CRT_HAVE_FUTimens64) || defined(__CRT_HAVE_FUTimens)
+#include <libc/local/kos.sys.stat/FUTimens.h>
 /* >> futimens(2), futimens64(2) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(FUtimens, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(2) void (__LIBCCALL FUtimens)(__fd_t __fd, struct timespec const __times[2 /*or:3*/]) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FUtimens))(__fd, __times); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(FUTimens, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(2) void (__LIBCCALL FUTimens)(__fd_t __fd, struct timespec const __times[2 /*or:3*/]) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FUTimens))(__fd, __times); })
 #endif /* ... */
 #ifdef __USE_TIME64
-#if defined(__CRT_HAVE_FUtimens) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_FUTimens) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> futimens(2), futimens64(2) */
-__CREDIRECT_VOID(__ATTR_IN_OPT(2),__THROWING,FUtimens64,(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]),FUtimens,(__fd,__times))
-#elif defined(__CRT_HAVE_FUtimens64)
+__CREDIRECT_VOID(__ATTR_IN_OPT(2),__THROWING,FUTimens64,(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]),FUTimens,(__fd,__times))
+#elif defined(__CRT_HAVE_FUTimens64)
 /* >> futimens(2), futimens64(2) */
-__CDECLARE_VOID(__ATTR_IN_OPT(2),__THROWING,FUtimens64,(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]),(__fd,__times))
-#elif defined(__CRT_HAVE_FUtimens)
-#include <libc/local/kos.sys.stat/FUtimens64.h>
+__CDECLARE_VOID(__ATTR_IN_OPT(2),__THROWING,FUTimens64,(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]),(__fd,__times))
+#elif defined(__CRT_HAVE_FUTimens)
+#include <libc/local/kos.sys.stat/FUTimens64.h>
 /* >> futimens(2), futimens64(2) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(FUtimens64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(2) void (__LIBCCALL FUtimens64)(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FUtimens64))(__fd, __times); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(FUTimens64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(2) void (__LIBCCALL FUTimens64)(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FUTimens64))(__fd, __times); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K8 */

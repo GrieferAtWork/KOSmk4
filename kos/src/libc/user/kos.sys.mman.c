@@ -47,7 +47,7 @@ DECL_BEGIN
 /*[[[skip:libc_MLock2]]]*/
 /*[[[skip:libc_PKeyAlloc]]]*/
 /*[[[skip:libc_PKeyFree]]]*/
-/*[[[skip:libc_PKeyMprotect]]]*/
+/*[[[skip:libc_PKeyMProtect]]]*/
 
 #if __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__
 DEFINE_PUBLIC_ALIAS(MMap64, libc_MMap64);

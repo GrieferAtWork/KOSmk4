@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf048782 */
+/* HASH CRC-32:0xaf291fc */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -190,19 +190,19 @@ __CDECLARE_VOID_OPT(,__THROWING,SetGid,(__gid_t __gid),(__gid))
  * @return: 0 : You're the new process that was created
  * @return: * : The `return' value is the pid of your new child process */
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,Fork,(void),())
-#ifdef __CRT_HAVE_Chown
+#ifdef __CRT_HAVE_ChOwn
 /* >> chown(2)
  * Change the ownership of a given `file' to `group:owner' */
-__CDECLARE_VOID(__ATTR_IN(1),__THROWING,Chown,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
-#else /* __CRT_HAVE_Chown */
+__CDECLARE_VOID(__ATTR_IN(1),__THROWING,ChOwn,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
+#else /* __CRT_HAVE_ChOwn */
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_FChownAt)
-#include <libc/local/kos.unistd/Chown.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_FChOwnAt)
+#include <libc/local/kos.unistd/ChOwn.h>
 /* >> chown(2)
  * Change the ownership of a given `file' to `group:owner' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(Chown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) void (__LIBCCALL Chown)(char const *__file, __uid_t __owner, __gid_t __group) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Chown))(__file, __owner, __group); })
-#endif /* __AT_FDCWD && __CRT_HAVE_FChownAt */
-#endif /* !__CRT_HAVE_Chown */
+__NAMESPACE_LOCAL_USING_OR_IMPL(ChOwn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) void (__LIBCCALL ChOwn)(char const *__file, __uid_t __owner, __gid_t __group) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ChOwn))(__file, __owner, __group); })
+#endif /* __AT_FDCWD && __CRT_HAVE_FChOwnAt */
+#endif /* !__CRT_HAVE_ChOwn */
 #ifdef __CRT_HAVE_Link
 /* >> link(2)
  * Create a hard link from `from', leading to `to' */
@@ -282,7 +282,7 @@ __CDECLARE_OPT(,__fd_t,__THROWING,Dup2,(__fd_t __oldfd, __fd_t __newfd),(__oldfd
 __CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__THROWING,Dup,(__fd_t __fd),(__fd))
 /* >> chdir(2)
  * Change the current working directory to `path' */
-__CDECLARE_VOID_OPT(__ATTR_IN(1),__THROWING,Chdir,(char const *__path),(__path))
+__CDECLARE_VOID_OPT(__ATTR_IN(1),__THROWING,ChDir,(char const *__path),(__path))
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CDECLARE_OPT(__ATTR_OUTS(1, 2),char *,__THROWING,GetCwd,(char *__buf, size_t __bufsize),(__buf,__bufsize))
@@ -299,23 +299,23 @@ __CDECLARE_VOID(__ATTR_IN(1),__THROWING,Unlink,(char const *__file),(__file))
 __NAMESPACE_LOCAL_USING_OR_IMPL(Unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) void (__LIBCCALL Unlink)(char const *__file) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Unlink))(__file); })
 #endif /* __AT_FDCWD && __CRT_HAVE_UnlinkAt */
 #endif /* !__CRT_HAVE_Unlink */
-#ifdef __CRT_HAVE_Rmdir
+#ifdef __CRT_HAVE_RmDir
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
-__CDECLARE_VOID(__ATTR_IN(1),__THROWING,Rmdir,(char const *__path),(__path))
-#else /* __CRT_HAVE_Rmdir */
+__CDECLARE_VOID(__ATTR_IN(1),__THROWING,RmDir,(char const *__path),(__path))
+#else /* __CRT_HAVE_RmDir */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
-#include <libc/local/kos.unistd/Rmdir.h>
+#include <libc/local/kos.unistd/RmDir.h>
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(Rmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) void (__LIBCCALL Rmdir)(char const *__path) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Rmdir))(__path); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(RmDir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) void (__LIBCCALL RmDir)(char const *__path) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(RmDir))(__path); })
 #endif /* __AT_FDCWD && __CRT_HAVE_UnlinkAt */
-#endif /* !__CRT_HAVE_Rmdir */
+#endif /* !__CRT_HAVE_RmDir */
 #ifdef __USE_ATFILE
 /* >> fchownat(2)
  * Change the ownership of a given `dfd:file' to `group:owner' */
-__CDECLARE_VOID_OPT(__ATTR_IN(2),__THROWING,FChownAt,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),(__dfd,__file,__owner,__group,__flags))
+__CDECLARE_VOID_OPT(__ATTR_IN(2),__THROWING,FChOwnAt,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),(__dfd,__file,__owner,__group,__flags))
 /* >> linkat(2)
  * Create a hard link from `fromfd:from', leading to `tofd:to' */
 __CDECLARE_VOID_OPT(__ATTR_IN(2) __ATTR_IN(4),__THROWING,LinkAt,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),(__fromfd,__from,__tofd,__to,__flags))
@@ -331,12 +331,12 @@ __CDECLARE_VOID_OPT(__ATTR_IN(1) __ATTR_IN(3),__THROWING,SymlinkAt,(char const *
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-__CDECLARE_OPT(__ATTR_IN(2) __ATTR_OUTS(3, 4),size_t,__THROWING,ReadlinkAt,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, size_t __buflen),(__dfd,__path,__buf,__buflen))
+__CDECLARE_OPT(__ATTR_IN(2) __ATTR_OUTS(3, 4),size_t,__THROWING,ReadLinkAt,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, size_t __buflen),(__dfd,__path,__buf,__buflen))
 #ifdef __USE_KOS
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE' */
-__CDECLARE_OPT(__ATTR_IN(2) __ATTR_OUTS(3, 4),size_t,__THROWING,FReadlinkAt,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, size_t __buflen, __atflag_t __flags),(__dfd,__path,__buf,__buflen,__flags))
+__CDECLARE_OPT(__ATTR_IN(2) __ATTR_OUTS(3, 4),size_t,__THROWING,FReadLinkAt,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, size_t __buflen, __atflag_t __flags),(__dfd,__path,__buf,__buflen,__flags))
 #endif /* __USE_KOS */
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
@@ -499,16 +499,16 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WU
  * made thread-safe, so try not to use this one. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(GetCurrentDirName, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED char *(__LIBCCALL GetCurrentDirName)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(GetCurrentDirName))(); })
 #endif /* ... */
-#ifdef __CRT_HAVE_SyncFs
-__CDECLARE_VOID(,__THROWING,SyncFs,(__fd_t __fd),(__fd))
-#else /* __CRT_HAVE_SyncFs */
-#include <libc/local/kos.unistd/SyncFs.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(SyncFs, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL SyncFs)(__fd_t __fd) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(SyncFs))(__fd); })
-#endif /* !__CRT_HAVE_SyncFs */
-__CDECLARE_VOID_OPT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(3),__THROWING,GetResUid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
-__CDECLARE_VOID_OPT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(3),__THROWING,GetResGid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *__sgid),(__rgid,__egid,__sgid))
-__CDECLARE_VOID_OPT(,__THROWING,SetResUid,(__uid_t __ruid, __uid_t __euid, __uid_t __suid),(__ruid,__euid,__suid))
-__CDECLARE_VOID_OPT(,__THROWING,SetResGid,(__gid_t __rgid, __gid_t __egid, __gid_t __sgid),(__rgid,__egid,__sgid))
+#ifdef __CRT_HAVE_SyncFS
+__CDECLARE_VOID(,__THROWING,SyncFS,(__fd_t __fd),(__fd))
+#else /* __CRT_HAVE_SyncFS */
+#include <libc/local/kos.unistd/SyncFS.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(SyncFS, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL SyncFS)(__fd_t __fd) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(SyncFS))(__fd); })
+#endif /* !__CRT_HAVE_SyncFS */
+__CDECLARE_VOID_OPT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(3),__THROWING,GetRESUid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
+__CDECLARE_VOID_OPT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(3),__THROWING,GetRESGid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *__sgid),(__rgid,__egid,__sgid))
+__CDECLARE_VOID_OPT(,__THROWING,SetRESUid,(__uid_t __ruid, __uid_t __euid, __uid_t __suid),(__ruid,__euid,__suid))
+__CDECLARE_VOID_OPT(,__THROWING,SetRESGid,(__gid_t __rgid, __gid_t __egid, __gid_t __sgid),(__rgid,__egid,__sgid))
 #endif /* __USE_GNU */
 #if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)) || \
      defined(__USE_MISC)
@@ -542,10 +542,10 @@ __CDECLARE_OPT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__THROWING,VFork,(voi
 #endif
 /* >> fchown(2)
  * Change the ownership of a given `fd' to `group:owner' */
-__CDECLARE_VOID_OPT(,__THROWING,FChown,(__fd_t __fd, __uid_t __owner, __gid_t __group),(__fd,__owner,__group))
+__CDECLARE_VOID_OPT(,__THROWING,FChOwn,(__fd_t __fd, __uid_t __owner, __gid_t __group),(__fd,__owner,__group))
 /* >> fchdir(2)
  * Change the current working directory to `path' */
-__CDECLARE_VOID_OPT(,__THROWING,FChdir,(__fd_t __fd),(__fd))
+__CDECLARE_VOID_OPT(,__THROWING,FChDir,(__fd_t __fd),(__fd))
 /* >> getpgid(2)
  * Return  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
@@ -556,21 +556,21 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,GetPGid,(__pid_t __pid),(__pid)
  * Return the ID of the session which a process `pid' is apart of.
  * return  THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,GetSid,(__pid_t __pid),(__pid))
-#ifdef __CRT_HAVE_LChown
+#ifdef __CRT_HAVE_LChOwn
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if  that file is a symbolic  link */
-__CDECLARE_VOID(__ATTR_IN(1),__THROWING,LChown,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
-#else /* __CRT_HAVE_LChown */
+__CDECLARE_VOID(__ATTR_IN(1),__THROWING,LChOwn,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
+#else /* __CRT_HAVE_LChOwn */
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && defined(__CRT_HAVE_FChownAt)
-#include <libc/local/kos.unistd/LChown.h>
+#if defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && defined(__CRT_HAVE_FChOwnAt)
+#include <libc/local/kos.unistd/LChOwn.h>
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if  that file is a symbolic  link */
-__NAMESPACE_LOCAL_USING_OR_IMPL(LChown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) void (__LIBCCALL LChown)(char const *__file, __uid_t __owner, __gid_t __group) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LChown))(__file, __owner, __group); })
-#endif /* __AT_FDCWD && __AT_SYMLINK_NOFOLLOW && __CRT_HAVE_FChownAt */
-#endif /* !__CRT_HAVE_LChown */
+__NAMESPACE_LOCAL_USING_OR_IMPL(LChOwn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) void (__LIBCCALL LChOwn)(char const *__file, __uid_t __owner, __gid_t __group) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LChOwn))(__file, __owner, __group); })
+#endif /* __AT_FDCWD && __AT_SYMLINK_NOFOLLOW && __CRT_HAVE_FChOwnAt */
+#endif /* !__CRT_HAVE_LChOwn */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 #if defined(__CRT_HAVE_Truncate) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
@@ -641,12 +641,12 @@ __CDECLARE_VOID_OPT(,__THROWING,SetPGrp,(void),())
  * Set the real and effective UID of the calling thread.
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE_VOID_OPT(,__THROWING,SetReUid,(__uid_t __ruid, __uid_t __euid),(__ruid,__euid))
+__CDECLARE_VOID_OPT(,__THROWING,SetREUid,(__uid_t __ruid, __uid_t __euid),(__ruid,__euid))
 /* >> setregid(2)
  * Set the real and effective GID of the calling thread.
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE_VOID_OPT(,__THROWING,SetReGid,(__gid_t __rgid, __gid_t __egid),(__rgid,__egid))
+__CDECLARE_VOID_OPT(,__THROWING,SetREGid,(__gid_t __rgid, __gid_t __egid),(__rgid,__egid))
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 #ifdef __USE_XOPEN2K
@@ -682,7 +682,7 @@ __CDECLARE_VOID(__ATTR_IN(1) __ATTR_IN(2),__THROWING,Symlink,(char const *__link
 __NAMESPACE_LOCAL_USING_OR_IMPL(Symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) void (__LIBCCALL Symlink)(char const *__link_text, char const *__target_path) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Symlink))(__link_text, __target_path); })
 #endif /* __AT_FDCWD && __CRT_HAVE_SymlinkAt */
 #endif /* !__CRT_HAVE_Symlink */
-#ifdef __CRT_HAVE_Readlink
+#ifdef __CRT_HAVE_ReadLink
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
@@ -692,11 +692,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_I
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-__CDECLARE(__ATTR_IN(1) __ATTR_OUTS(2, 3),size_t,__THROWING,Readlink,(char const *__restrict __path, char *__restrict __buf, size_t __buflen),(__path,__buf,__buflen))
-#else /* __CRT_HAVE_Readlink */
+__CDECLARE(__ATTR_IN(1) __ATTR_OUTS(2, 3),size_t,__THROWING,ReadLink,(char const *__restrict __path, char *__restrict __buf, size_t __buflen),(__path,__buf,__buflen))
+#else /* __CRT_HAVE_ReadLink */
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_ReadlinkAt)
-#include <libc/local/kos.unistd/Readlink.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_ReadLinkAt)
+#include <libc/local/kos.unistd/ReadLink.h>
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
@@ -706,9 +706,9 @@ __CDECLARE(__ATTR_IN(1) __ATTR_OUTS(2, 3),size_t,__THROWING,Readlink,(char const
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(Readlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUTS(2, 3) size_t (__LIBCCALL Readlink)(char const *__restrict __path, char *__restrict __buf, size_t __buflen) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Readlink))(__path, __buf, __buflen); })
-#endif /* __AT_FDCWD && __CRT_HAVE_ReadlinkAt */
-#endif /* !__CRT_HAVE_Readlink */
+__NAMESPACE_LOCAL_USING_OR_IMPL(ReadLink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUTS(2, 3) size_t (__LIBCCALL ReadLink)(char const *__restrict __path, char *__restrict __buf, size_t __buflen) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ReadLink))(__path, __buf, __buflen); })
+#endif /* __AT_FDCWD && __CRT_HAVE_ReadLinkAt */
+#endif /* !__CRT_HAVE_ReadLink */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)

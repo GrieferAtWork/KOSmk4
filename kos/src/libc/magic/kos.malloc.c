@@ -67,7 +67,8 @@ Valloc:(size_t num_bytes) -> [[nonnull, memalign(getpagesize(), num_bytes)]] voi
 [[throws(E_BADALLOC), decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.except.heap.rare_helpers")]]
 [[userimpl, requires_function(Malloc)]]
-Memdup:([[in(num_bytes)]] void const *__restrict ptr, size_t num_bytes) -> [[nonnull, malloc(num_bytes)]] void * {
+MemDup:([[in(num_bytes)]] void const *__restrict ptr,
+        size_t num_bytes) -> [[nonnull, malloc(num_bytes)]] void * {
 	void *result;
 	result = Malloc(num_bytes);
 	memcpy(result, ptr, num_bytes);
@@ -77,15 +78,16 @@ Memdup:([[in(num_bytes)]] void const *__restrict ptr, size_t num_bytes) -> [[non
 @@@throws: E_BADALLOC: ...
 [[throws(E_BADALLOC), decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.except.heap.rare_helpers")]]
-[[userimpl, requires_function(Memdup)]]
-Memcdup:([[in(? <= num_bytes)]] void const *__restrict ptr, int needle, size_t num_bytes) -> [[nonnull, malloc]] void * {
+[[userimpl, requires_function(MemDup)]]
+MemCDup:([[in(? <= num_bytes)]] void const *__restrict ptr,
+         int needle, size_t num_bytes) -> [[nonnull, malloc]] void * {
 	if likely(num_bytes) {
 		void const *endaddr;
 		endaddr = memchr(ptr, needle, num_bytes - 1);
 		if (endaddr)
 			num_bytes = ((uintptr_t)endaddr - (uintptr_t)ptr) + 1;
 	}
-	return Memdup(ptr, num_bytes);
+	return MemDup(ptr, num_bytes);
 }
 %#endif /* __USE_KOS */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ef513d8 */
+/* HASH CRC-32:0x6f7dff7e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,10 @@
 #define __CRT_HAVE_Bind
 #define __CRT_HAVE_C_alloca
 #define __CRT_HAVE_Calloc
+#define __CRT_HAVE_ChDir
+#define __CRT_HAVE_ChMod
+#define __CRT_HAVE_ChOwn
 #define __CRT_HAVE_ChRoot
-#define __CRT_HAVE_Chdir
-#define __CRT_HAVE_Chmod
-#define __CRT_HAVE_Chown
 #define __CRT_HAVE_Connect
 #define __CRT_HAVE_Creat
 #define __CRT_HAVE_Creat64
@@ -4181,21 +4181,21 @@
 #define __CRT_HAVE_Execve
 #define __CRT_HAVE_Execvp
 #define __CRT_HAVE_Execvpe
-#define __CRT_HAVE_FChdir
-#define __CRT_HAVE_FChmod
-#define __CRT_HAVE_FChmodAt
-#define __CRT_HAVE_FChown
-#define __CRT_HAVE_FChownAt
+#define __CRT_HAVE_FChDir
+#define __CRT_HAVE_FChMod
+#define __CRT_HAVE_FChModAt
+#define __CRT_HAVE_FChOwn
+#define __CRT_HAVE_FChOwnAt
 #define __CRT_HAVE_FDataSync
 #define __CRT_HAVE_FExecve
-#define __CRT_HAVE_FMkdirAt
-#define __CRT_HAVE_FMknodAt
-#define __CRT_HAVE_FReadlinkAt
+#define __CRT_HAVE_FMkDirAt
+#define __CRT_HAVE_FMkNodAt
+#define __CRT_HAVE_FReadLinkAt
 #define __CRT_HAVE_FSync
 #define __CRT_HAVE_FTruncate
 #define __CRT_HAVE_FTruncate64
-#define __CRT_HAVE_FUtimens
-#define __CRT_HAVE_FUtimens64
+#define __CRT_HAVE_FUTimens
+#define __CRT_HAVE_FUTimens64
 #define __CRT_HAVE_Fcntl
 #define __CRT_HAVE_Fork
 #define __CRT_HAVE_GetCurrentDirName
@@ -4204,14 +4204,14 @@
 #define __CRT_HAVE_GetHostName
 #define __CRT_HAVE_GetPGid
 #define __CRT_HAVE_GetPeerName
-#define __CRT_HAVE_GetResGid
-#define __CRT_HAVE_GetResUid
+#define __CRT_HAVE_GetRESGid
+#define __CRT_HAVE_GetRESUid
 #define __CRT_HAVE_GetSid
 #define __CRT_HAVE_GetSockName
 #define __CRT_HAVE_GetSockOpt
 #define __CRT_HAVE_Ioctl
-#define __CRT_HAVE_LChmod
-#define __CRT_HAVE_LChown
+#define __CRT_HAVE_LChMod
+#define __CRT_HAVE_LChOwn
 #define __CRT_HAVE_LFutexExpr
 #define __CRT_HAVE_LFutexExpr64
 #define __CRT_HAVE_LFutexExprI
@@ -4235,16 +4235,16 @@
 #define __CRT_HAVE_MUnlockAll
 #define __CRT_HAVE_MUnmap
 #define __CRT_HAVE_Malloc
+#define __CRT_HAVE_MemCDup
+#define __CRT_HAVE_MemDup
 #define __CRT_HAVE_MemFdCreate
 #define __CRT_HAVE_Memalign
-#define __CRT_HAVE_Memcdup
-#define __CRT_HAVE_Memdup
-#define __CRT_HAVE_Mkdir
-#define __CRT_HAVE_MkdirAt
-#define __CRT_HAVE_Mkfifo
-#define __CRT_HAVE_MkfifoAt
-#define __CRT_HAVE_Mknod
-#define __CRT_HAVE_MknodAt
+#define __CRT_HAVE_MkDir
+#define __CRT_HAVE_MkDirAt
+#define __CRT_HAVE_MkFiFo
+#define __CRT_HAVE_MkFiFoAt
+#define __CRT_HAVE_MkNod
+#define __CRT_HAVE_MkNodAt
 #define __CRT_HAVE_Nice
 #define __CRT_HAVE_Open
 #define __CRT_HAVE_Open64
@@ -4255,7 +4255,7 @@
 #define __CRT_HAVE_PKeyAlloc
 #define __CRT_HAVE_PKeyFree
 #define __CRT_HAVE_PKeyGet
-#define __CRT_HAVE_PKeyMprotect
+#define __CRT_HAVE_PKeyMProtect
 #define __CRT_HAVE_PKeySet
 #endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */
 #ifndef __KERNEL__
@@ -4271,8 +4271,8 @@
 #define __CRT_HAVE_PosixMAdvise
 #define __CRT_HAVE_Read
 #define __CRT_HAVE_ReadAll
-#define __CRT_HAVE_Readlink
-#define __CRT_HAVE_ReadlinkAt
+#define __CRT_HAVE_ReadLink
+#define __CRT_HAVE_ReadLinkAt
 #define __CRT_HAVE_Realloc
 #define __CRT_HAVE_Recv
 #define __CRT_HAVE_RecvFrom
@@ -4280,7 +4280,7 @@
 #define __CRT_HAVE_RecvMMsg64
 #define __CRT_HAVE_RecvMsg
 #define __CRT_HAVE_RemapFilePages
-#define __CRT_HAVE_Rmdir
+#define __CRT_HAVE_RmDir
 #define __CRT_HAVE_RpcExec
 #define __CRT_HAVE_RpcInterrupt
 #define __CRT_HAVE_RpcSchedule
@@ -4295,10 +4295,10 @@
 #define __CRT_HAVE_SetHostName
 #define __CRT_HAVE_SetPGid
 #define __CRT_HAVE_SetPGrp
-#define __CRT_HAVE_SetReGid
-#define __CRT_HAVE_SetReUid
-#define __CRT_HAVE_SetResGid
-#define __CRT_HAVE_SetResUid
+#define __CRT_HAVE_SetREGid
+#define __CRT_HAVE_SetRESGid
+#define __CRT_HAVE_SetRESUid
+#define __CRT_HAVE_SetREUid
 #define __CRT_HAVE_SetSid
 #define __CRT_HAVE_SetSockOpt
 #define __CRT_HAVE_SetUid
@@ -4309,7 +4309,7 @@
 #define __CRT_HAVE_SocketPair
 #define __CRT_HAVE_Symlink
 #define __CRT_HAVE_SymlinkAt
-#define __CRT_HAVE_SyncFs
+#define __CRT_HAVE_SyncFS
 #define __CRT_HAVE_Syscall
 #define __CRT_HAVE_Syscall64
 #define __CRT_HAVE_Truncate

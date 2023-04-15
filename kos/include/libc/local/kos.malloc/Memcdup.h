@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4a30a18 */
+/* HASH CRC-32:0x1d443a22 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,26 +18,26 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_Memcdup_defined
-#define __local_Memcdup_defined
+#ifndef __local_MemCDup_defined
+#define __local_MemCDup_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_Memdup) || defined(__CRT_HAVE_Malloc)
+#if defined(__CRT_HAVE_MemDup) || defined(__CRT_HAVE_Malloc)
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_Memdup_defined
-#define __local___localdep_Memdup_defined
-#ifdef __CRT_HAVE_Memdup
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_INS(1, 2),void *,__THROWING,__localdep_Memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __num_bytes),Memdup,(__ptr,__num_bytes))
+#ifndef __local___localdep_MemDup_defined
+#define __local___localdep_MemDup_defined
+#ifdef __CRT_HAVE_MemDup
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_INS(1, 2),void *,__THROWING,__localdep_MemDup,(void const *__restrict __ptr, __SIZE_TYPE__ __num_bytes),MemDup,(__ptr,__num_bytes))
 #elif defined(__CRT_HAVE_Malloc)
 __NAMESPACE_LOCAL_END
-#include <libc/local/kos.malloc/Memdup.h>
+#include <libc/local/kos.malloc/MemDup.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_Memdup __LIBC_LOCAL_NAME(Memdup)
+#define __localdep_MemDup __LIBC_LOCAL_NAME(MemDup)
 #else /* ... */
-#undef __local___localdep_Memdup_defined
+#undef __local___localdep_MemDup_defined
 #endif /* !... */
-#endif /* !__local___localdep_Memdup_defined */
+#endif /* !__local___localdep_MemDup_defined */
 #ifndef __local___localdep_memchr_defined
 #define __local___localdep_memchr_defined
 #ifdef __CRT_HAVE_memchr
@@ -49,22 +49,22 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memchr __LIBC_LOCAL_NAME(memchr)
 #endif /* !__CRT_HAVE_memchr */
 #endif /* !__local___localdep_memchr_defined */
-__LOCAL_LIBC(Memcdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_INS(1, 3) void *
-(__LIBCCALL __LIBC_LOCAL_NAME(Memcdup))(void const *__restrict __ptr, int __needle, __SIZE_TYPE__ __num_bytes) __THROWS(__E_BADALLOC) {
+__LOCAL_LIBC(MemCDup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_INS(1, 3) void *
+(__LIBCCALL __LIBC_LOCAL_NAME(MemCDup))(void const *__restrict __ptr, int __needle, __SIZE_TYPE__ __num_bytes) __THROWS(__E_BADALLOC) {
 	if __likely(__num_bytes) {
 		void const *__endaddr;
 		__endaddr = (__NAMESPACE_LOCAL_SYM __localdep_memchr)(__ptr, __needle, __num_bytes - 1);
 		if (__endaddr)
 			__num_bytes = ((__UINTPTR_TYPE__)__endaddr - (__UINTPTR_TYPE__)__ptr) + 1;
 	}
-	return (__NAMESPACE_LOCAL_SYM __localdep_Memdup)(__ptr, __num_bytes);
+	return (__NAMESPACE_LOCAL_SYM __localdep_MemDup)(__ptr, __num_bytes);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_Memcdup_defined
-#define __local___localdep_Memcdup_defined
-#define __localdep_Memcdup __LIBC_LOCAL_NAME(Memcdup)
-#endif /* !__local___localdep_Memcdup_defined */
-#else /* __CRT_HAVE_Memdup || __CRT_HAVE_Malloc */
-#undef __local_Memcdup_defined
-#endif /* !__CRT_HAVE_Memdup && !__CRT_HAVE_Malloc */
-#endif /* !__local_Memcdup_defined */
+#ifndef __local___localdep_MemCDup_defined
+#define __local___localdep_MemCDup_defined
+#define __localdep_MemCDup __LIBC_LOCAL_NAME(MemCDup)
+#endif /* !__local___localdep_MemCDup_defined */
+#else /* __CRT_HAVE_MemDup || __CRT_HAVE_Malloc */
+#undef __local_MemCDup_defined
+#endif /* !__CRT_HAVE_MemDup && !__CRT_HAVE_Malloc */
+#endif /* !__local_MemCDup_defined */

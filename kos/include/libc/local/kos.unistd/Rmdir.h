@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63b3deac */
+/* HASH CRC-32:0xec01b493 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_Rmdir_defined
-#define __local_Rmdir_defined
+#ifndef __local_RmDir_defined
+#define __local_RmDir_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
@@ -32,16 +32,16 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_VOID(__ATTR_IN(2),__THROWING,__localdep_UnlinkAt,(__fd_t __dfd, char const *__name, __atflag_t __flags),UnlinkAt,(__dfd,__name,__flags))
 #endif /* !__local___localdep_UnlinkAt_defined */
-__LOCAL_LIBC(Rmdir) __ATTR_IN(1) void
-(__LIBCCALL __LIBC_LOCAL_NAME(Rmdir))(char const *__path) __THROWS(...) {
+__LOCAL_LIBC(RmDir) __ATTR_IN(1) void
+(__LIBCCALL __LIBC_LOCAL_NAME(RmDir))(char const *__path) __THROWS(...) {
 	(__NAMESPACE_LOCAL_SYM __localdep_UnlinkAt)(__AT_FDCWD, __path, 0x0200); /* AT_REMOVEDIR */
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_Rmdir_defined
-#define __local___localdep_Rmdir_defined
-#define __localdep_Rmdir __LIBC_LOCAL_NAME(Rmdir)
-#endif /* !__local___localdep_Rmdir_defined */
+#ifndef __local___localdep_RmDir_defined
+#define __local___localdep_RmDir_defined
+#define __localdep_RmDir __LIBC_LOCAL_NAME(RmDir)
+#endif /* !__local___localdep_RmDir_defined */
 #else /* __AT_FDCWD && __CRT_HAVE_UnlinkAt */
-#undef __local_Rmdir_defined
+#undef __local_RmDir_defined
 #endif /* !__AT_FDCWD || !__CRT_HAVE_UnlinkAt */
-#endif /* !__local_Rmdir_defined */
+#endif /* !__local_RmDir_defined */

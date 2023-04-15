@@ -129,9 +129,9 @@ $pid_t Fork();
 
 [[cp, throws, decl_include("<bits/types.h>"), doc_alias("chown")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
-[[requires(defined(__AT_FDCWD) && $has_function(FChownAt))]]
-void Chown([[in]] char const *file, $uid_t owner, $gid_t group) {
-	FChownAt(__AT_FDCWD, file, owner, group, 0);
+[[requires(defined(__AT_FDCWD) && $has_function(FChOwnAt))]]
+void ChOwn([[in]] char const *file, $uid_t owner, $gid_t group) {
+	FChOwnAt(__AT_FDCWD, file, owner, group, 0);
 }
 
 [[cp, throws, doc_alias("link")]]
@@ -216,7 +216,7 @@ $fd_t Dup($fd_t fd);
 
 [[cp, throws, doc_alias("chdir")]]
 [[section(".text.crt{|.dos}.except.fs.basic_property")]]
-void Chdir([[in]] char const *path);
+void ChDir([[in]] char const *path);
 
 [[cp, throws, doc_alias("getcwd"), decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.except.fs.basic_property")]]
@@ -234,7 +234,7 @@ void Unlink([[in]] char const *file) {
 [[cp, throws, doc_alias("rmdir")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(UnlinkAt))]]
-void Rmdir([[in]] char const *path) {
+void RmDir([[in]] char const *path) {
 	UnlinkAt(__AT_FDCWD, path, 0x0200); /* AT_REMOVEDIR */
 }
 
@@ -242,7 +242,7 @@ void Rmdir([[in]] char const *path) {
 %[default:section(".text.crt{|.dos}.except.fs.modify")]
 
 [[cp, throws, doc_alias("fchownat"), decl_include("<bits/types.h>")]]
-void FChownAt($fd_t dfd, [[in]] char const *file,
+void FChOwnAt($fd_t dfd, [[in]] char const *file,
               $uid_t owner, $gid_t group, $atflag_t flags);
 
 [[cp, throws, doc_alias("linkat"), decl_include("<bits/types.h>")]]
@@ -257,13 +257,13 @@ void SymlinkAt([[in]] char const *link_text, $fd_t tofd,
 %[default:section(".text.crt{|.dos}.except.fs.property")]
 
 [[cp, throws, doc_alias("readlinkat"), decl_include("<bits/types.h>")]]
-size_t ReadlinkAt($fd_t dfd, [[in]] char const *__restrict path,
+size_t ReadLinkAt($fd_t dfd, [[in]] char const *__restrict path,
                   [[out(return <= buflen)]] char *__restrict buf,
                   size_t buflen);
 
 %#ifdef __USE_KOS
 [[cp, throws, doc_alias("freadlinkat"), decl_include("<bits/types.h>")]]
-size_t FReadlinkAt($fd_t dfd, [[in]] char const *__restrict path,
+size_t FReadLinkAt($fd_t dfd, [[in]] char const *__restrict path,
                    [[out(return<= buflen)]] char *__restrict buf,
                    size_t buflen, $atflag_t flags);
 %#endif /* __USE_KOS */
@@ -409,7 +409,7 @@ GetCurrentDirName() -> [[nonnull, malloc]] char * {
 
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[userimpl, section(".text.crt{|.dos}.except.fs.modify")]]
-void SyncFs($fd_t fd) {
+void SyncFS($fd_t fd) {
 	(void)fd;
 	/* NO-OP */
 }
@@ -417,20 +417,20 @@ void SyncFs($fd_t fd) {
 %[default:section(".text.crt{|.dos}.except.sched.user")];
 
 [[throws, decl_include("<bits/types.h>")]]
-void GetResUid([[out_opt]] $uid_t *ruid,
+void GetRESUid([[out_opt]] $uid_t *ruid,
                [[out_opt]] $uid_t *euid,
                [[out_opt]] $uid_t *suid);
 
 [[throws, decl_include("<bits/types.h>")]]
-void GetResGid([[out_opt]] $gid_t *rgid,
+void GetRESGid([[out_opt]] $gid_t *rgid,
                [[out_opt]] $gid_t *egid,
                [[out_opt]] $gid_t *sgid);
 
 [[throws, decl_include("<bits/types.h>")]]
-void SetResUid($uid_t ruid, $uid_t euid, $uid_t suid);
+void SetRESUid($uid_t ruid, $uid_t euid, $uid_t suid);
 
 [[throws, decl_include("<bits/types.h>")]]
-void SetResGid($gid_t rgid, $gid_t egid, $gid_t sgid);
+void SetRESGid($gid_t rgid, $gid_t egid, $gid_t sgid);
 %#endif /* __USE_GNU */
 
 %#if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)) || \
@@ -443,11 +443,11 @@ $pid_t VFork();
 
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("fchown"), section(".text.crt{|.dos}.except.fs.modify")]]
-void FChown($fd_t fd, $uid_t owner, $gid_t group);
+void FChOwn($fd_t fd, $uid_t owner, $gid_t group);
 
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("fchdir"), section(".text.crt{|.dos}.except.fs.basic_property")]]
-void FChdir($fd_t fd);
+void FChDir($fd_t fd);
 
 [[throws, decl_include("<bits/types.h>")]]
 [[wunused, doc_alias("getpgid"), section(".text.crt{|.dos}.except.sched.user")]]
@@ -459,10 +459,10 @@ $pid_t GetSid($pid_t pid);
 
 [[cp, throws, decl_include("<bits/types.h>"), doc_alias("lchown")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
-[[requires(defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && $has_function(FChownAt))]]
+[[requires(defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && $has_function(FChOwnAt))]]
 [[section(".text.crt{|.dos}.except.fs.modify")]]
-void LChown([[in]] char const *file, $uid_t owner, $gid_t group) {
-	FChownAt(__AT_FDCWD, file, owner, group, __AT_SYMLINK_NOFOLLOW);
+void LChOwn([[in]] char const *file, $uid_t owner, $gid_t group) {
+	FChOwnAt(__AT_FDCWD, file, owner, group, __AT_SYMLINK_NOFOLLOW);
 }
 
 
@@ -542,11 +542,11 @@ void SetPGrp();
 
 [[throws, decl_include("<bits/types.h>"), doc_alias("setreuid")]]
 [[section(".text.crt{|.dos}.except.sched.user")]]
-void SetReUid($uid_t ruid, $uid_t euid);
+void SetREUid($uid_t ruid, $uid_t euid);
 
 [[throws, decl_include("<bits/types.h>"), doc_alias("setregid")]]
 [[section(".text.crt{|.dos}.except.sched.user")]]
-void SetReGid($gid_t rgid, $gid_t egid);
+void SetREGid($gid_t rgid, $gid_t egid);
 
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
@@ -579,12 +579,12 @@ void Symlink([[in]] char const *link_text,
 
 [[cp, throws, decl_include("<hybrid/typecore.h>"), doc_alias("readlink")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
-[[requires(defined(__AT_FDCWD) && $has_function(ReadlinkAt))]]
+[[requires(defined(__AT_FDCWD) && $has_function(ReadLinkAt))]]
 [[section(".text.crt{|.dos}.except.fs.property")]]
-size_t Readlink([[in]] char const *__restrict path,
+size_t ReadLink([[in]] char const *__restrict path,
                 [[out(return <= buflen)]] char *__restrict buf,
                 size_t buflen) {
-	ReadlinkAt(__AT_FDCWD, path, buf, buflen);
+	ReadLinkAt(__AT_FDCWD, path, buf, buflen);
 }
 
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */

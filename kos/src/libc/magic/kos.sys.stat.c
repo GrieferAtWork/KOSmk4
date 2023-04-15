@@ -117,17 +117,17 @@ void FStatAt64($fd_t dirfd, [[in]] char const *__restrict filename,
 %[default:section(".text.crt{|.dos}.except.fs.modify")]
 
 [[cp, throws, doc_alias("mkdir"), decl_include("<bits/types.h>")]]
-void Mkdir([[in]] char const *pathname, $mode_t mode);
+void MkDir([[in]] char const *pathname, $mode_t mode);
 
 [[cp, throws, doc_alias("chmod"), decl_include("<bits/types.h>")]]
-void Chmod([[in]] char const *filename, $mode_t mode);
+void ChMod([[in]] char const *filename, $mode_t mode);
 
 
 %
 %#ifdef __USE_MISC
 
 [[cp, throws, doc_alias("lchmod"), decl_include("<bits/types.h>")]]
-void LChmod([[in]] char const *filename, $mode_t mode);
+void LChMod([[in]] char const *filename, $mode_t mode);
 
 %#endif /* __USE_MISC */
 
@@ -137,32 +137,32 @@ void LChmod([[in]] char const *filename, $mode_t mode);
 %#if defined(__USE_KOS) && defined(__USE_ATFILE)
 
 [[cp, throws, doc_alias("fmkdirat"), decl_include("<bits/types.h>")]]
-void FMkdirAt($fd_t dirfd, [[in]] char const *pathname,
+void FMkDirAt($fd_t dirfd, [[in]] char const *pathname,
               $mode_t mode, $atflag_t flags);
 
 [[cp, throws, doc_alias("fmknodat"), decl_include("<bits/types.h>")]]
-void FMknodAt($fd_t dirfd, [[in]] char const *nodename,
+void FMkNodAt($fd_t dirfd, [[in]] char const *nodename,
               $mode_t mode, $dev_t dev, $atflag_t flags);
 
 %#endif /* __USE_KOS && __USE_ATFILE */
 
 
 [[cp, throws, doc_alias("mkfifo"), decl_include("<bits/types.h>")]]
-void Mkfifo([[in]] char const *fifoname, $mode_t mode);
+void MkFiFo([[in]] char const *fifoname, $mode_t mode);
 
 
 %
 %#ifdef __USE_ATFILE
 
 [[cp, throws, doc_alias("fchmodat"), decl_include("<bits/types.h>")]]
-void FChmodAt($fd_t dirfd, [[in]] char const *filename,
+void FChModAt($fd_t dirfd, [[in]] char const *filename,
               $mode_t mode, $atflag_t flags);
 
 [[cp, throws, doc_alias("mkdirat"), decl_include("<bits/types.h>")]]
-void MkdirAt($fd_t dirfd, [[in]] char const *pathname, $mode_t mode);
+void MkDirAt($fd_t dirfd, [[in]] char const *pathname, $mode_t mode);
 
 [[cp, throws, doc_alias("mkfifoat"), decl_include("<bits/types.h>")]]
-void MkfifoAt($fd_t dirfd, [[in]] char const *fifoname, $mode_t mode);
+void MkFiFoAt($fd_t dirfd, [[in]] char const *fifoname, $mode_t mode);
 
 %#endif /* __USE_ATFILE */
 
@@ -171,7 +171,7 @@ void MkfifoAt($fd_t dirfd, [[in]] char const *fifoname, $mode_t mode);
 %#ifdef __USE_POSIX
 
 [[cp, throws, doc_alias("fchmod"), decl_include("<bits/types.h>")]]
-void FChmod($fd_t fd, $mode_t mode);
+void FChMod($fd_t fd, $mode_t mode);
 
 %#endif /* __USE_POSIX */
 
@@ -179,13 +179,13 @@ void FChmod($fd_t fd, $mode_t mode);
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 
 [[cp, throws, doc_alias("mknod"), decl_include("<bits/types.h>")]]
-void Mknod([[in]] char const *nodename,
+void MkNod([[in]] char const *nodename,
            $mode_t mode, $dev_t dev);
 
 %#ifdef __USE_ATFILE
 
 [[cp, throws, doc_alias("mknodat"), decl_include("<bits/types.h>")]]
-void MknodAt($fd_t dirfd, [[in]] char const *nodename,
+void MkNodAt($fd_t dirfd, [[in]] char const *nodename,
              $mode_t mode, $dev_t dev);
 
 %#endif /* __USE_ATFILE */
@@ -308,56 +308,56 @@ void UTimensAt64($fd_t dirfd, [[in]] char const *filename,
 %#endif /* __USE_TIME64 */
 %#endif /* __USE_ATFILE */
 
-[[cp, throws, doc_alias("futimens32"), ignore, nocrt, alias("FUtimens")]]
+[[cp, throws, doc_alias("futimens32"), ignore, nocrt, alias("FUTimens")]]
 [[decl_include("<bits/os/timespec.h>")]]
-void FUtimens32($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]);
+void FUTimens32($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]);
 
 %
 %#ifdef __USE_XOPEN2K8
 [[cp, throws, doc_alias("futimens"), no_crt_self_import, decl_include("<bits/os/timespec.h>")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("FUtimens")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("FUtimens64")]]
-[[userimpl, requires($has_function(FUtimens32) || $has_function(FUtimens64))]]
-FUtimens:($fd_t fd, [[in_opt]] struct timespec const times[2 /*or:3*/]) {
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("FUTimens")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("FUTimens64")]]
+[[userimpl, requires($has_function(FUTimens32) || $has_function(FUTimens64))]]
+FUTimens:($fd_t fd, [[in_opt]] struct timespec const times[2 /*or:3*/]) {
 @@pp_if $has_function(UTimensAt64)@@
 	struct timespec64 tms[2];
 	if (!times) {
-		FUtimens64(fd, NULL);
+		FUTimens64(fd, NULL);
 	} else {
 		tms[0].tv_sec  = (time64_t)times[0].tv_sec;
 		tms[0].tv_nsec = times[0].tv_nsec;
 		tms[1].tv_sec  = (time64_t)times[1].tv_sec;
 		tms[1].tv_nsec = times[1].tv_nsec;
-		FUtimens64(fd, tms);
+		FUTimens64(fd, tms);
 	}
 @@pp_else@@
 	struct timespec32 tms[2];
 	if (!times) {
-		FUtimens32(fd, NULL);
+		FUTimens32(fd, NULL);
 	} else {
 		tms[0].tv_sec  = (time32_t)times[0].tv_sec;
 		tms[0].tv_nsec = times[0].tv_nsec;
 		tms[1].tv_sec  = (time32_t)times[1].tv_sec;
 		tms[1].tv_nsec = times[1].tv_nsec;
-		FUtimens32(fd, tms);
+		FUTimens32(fd, tms);
 	}
 @@pp_endif@@
 }
 
 %#ifdef __USE_TIME64
 [[cp, throws, decl_include("<bits/os/timespec.h>")]]
-[[preferred_time64_variant_of(FUtimens), doc_alias("futimens")]]
-[[userimpl, requires_function(FUtimens32)]]
-void FUtimens64($fd_t fd, [[in_opt]] struct timespec64 const times[2 /*or:3*/]) {
+[[preferred_time64_variant_of(FUTimens), doc_alias("futimens")]]
+[[userimpl, requires_function(FUTimens32)]]
+void FUTimens64($fd_t fd, [[in_opt]] struct timespec64 const times[2 /*or:3*/]) {
 	struct timespec32 tms[2];
 	if (!times) {
-		FUtimens32(fd, NULL);
+		FUTimens32(fd, NULL);
 	} else {
 		tms[0].tv_sec  = (time32_t)times[0].tv_sec;
 		tms[0].tv_nsec = times[0].tv_nsec;
 		tms[1].tv_sec  = (time32_t)times[1].tv_sec;
 		tms[1].tv_nsec = times[1].tv_nsec;
-		FUtimens32(fd, tms);
+		FUTimens32(fd, tms);
 	}
 }
 %#endif /* __USE_TIME64 */

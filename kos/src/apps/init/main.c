@@ -31,7 +31,7 @@
 #include <kos/ioctl/svga.h>
 #include <kos/ksysctl.h>   /* ksysctl_insmod() */
 #include <kos/sys/ioctl.h> /* Ioctl() */
-#include <kos/sys/stat.h>  /* Mkdir() */
+#include <kos/sys/stat.h>  /* MkDir() */
 #include <kos/syscalls.h>  /* sys_Xmktty() */
 #include <kos/types.h>     /* fd_t */
 #include <kos/unistd.h>    /* Dup2() */
@@ -100,7 +100,7 @@ int main(int argc, char *argv[], char *envp[]) {
 	/* Mount the /dev filesystem. */
 	if (mount(NULL, "/dev", "devfs", 0, NULL) < 0) {
 		if (errno == ENOENT) {
-			Mkdir("/dev", 0755);
+			MkDir("/dev", 0755);
 			sync();
 			if (mount(NULL, "/dev", "devfs", 0, NULL) >= 0)
 				goto done_devfs;
