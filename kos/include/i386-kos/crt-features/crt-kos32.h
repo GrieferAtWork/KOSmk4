@@ -3975,7 +3975,6 @@
 #define __CRT_HAVE_munlock
 #define __CRT_HAVE_munlockall
 #define __CRT_HAVE_munmap
-#define __CRT_HAVE_mutex_try_lock
 #define __CRT_HAVE_mutex_unlock
 #define __CRT_HAVE_mutex_wait_lock
 #define __CRT_HAVE_name_to_handle_at
@@ -4704,13 +4703,15 @@
 #define __CRT_HAVE_shared_lock_acquire
 #define __CRT_HAVE_shared_lock_acquire_with_timeout
 #define __CRT_HAVE_shared_lock_acquire_with_timeout64
+#define __CRT_HAVE_shared_lock_release_ex
+#define __CRT_HAVE_shared_lock_tryacquire
 #define __CRT_HAVE_shared_lock_waitfor
 #define __CRT_HAVE_shared_lock_waitfor_with_timeout
 #define __CRT_HAVE_shared_lock_waitfor_with_timeout64
 #define __CRT_HAVE_shared_recursive_lock_acquire
 #define __CRT_HAVE_shared_recursive_lock_acquire_with_timeout
 #define __CRT_HAVE_shared_recursive_lock_acquire_with_timeout64
-#define __CRT_HAVE_shared_recursive_lock_release
+#define __CRT_HAVE_shared_recursive_lock_release_ex
 #define __CRT_HAVE_shared_recursive_lock_tryacquire
 #define __CRT_HAVE_shared_recursive_lock_waitfor
 #define __CRT_HAVE_shared_recursive_lock_waitfor_with_timeout

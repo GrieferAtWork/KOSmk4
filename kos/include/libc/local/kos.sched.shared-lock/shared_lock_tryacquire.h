@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec3119db */
+/* HASH CRC-32:0xb8e8c292 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,41 +18,31 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_shared_lock_waitfor_defined
-#define __local_shared_lock_waitfor_defined
+#ifndef __local_shared_lock_tryacquire_defined
+#define __local_shared_lock_tryacquire_defined
 #include <__crt.h>
 #include <kos/bits/shared-lock.h>
-#if defined(__KERNEL__) || defined(__shared_lock_wait_impl)
-#include <kos/anno.h>
+#include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(shared_lock_waitfor) __BLOCKING __ATTR_INOUT(1) void
-(__FCALL __LIBC_LOCAL_NAME(shared_lock_waitfor))(struct shared_lock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL_LIBC(shared_lock_tryacquire) __ATTR_INOUT(1) __BOOL
+__NOTHROW_NCX(__FCALL __LIBC_LOCAL_NAME(shared_lock_tryacquire))(struct shared_lock *__restrict __self) {
 #ifdef __KERNEL__
-	__hybrid_assert(!task_wasconnected());
-	while (!__shared_lock_available(__self)) {
-		TASK_POLL_BEFORE_CONNECT({
-			if (__shared_lock_available(__self))
-				return;
-		});
-		task_connect_for_poll(&__self->sl_sig);
-		if __unlikely(__shared_lock_available(__self)) {
-			task_disconnectall();
-			break;
-		}
-		task_waitfor(KTIME_INFINITE);
-	}
+	return __shared_lock_tryacquire(__self);
 #else /* __KERNEL__ */
-	__shared_lock_waitfor_or_wait_impl(__self, {
-		__shared_lock_wait_impl(__self);
-	});
+	unsigned int __lockword;
+	do {
+		__lockword = __hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE);
+		if ((__lockword & ~__SHARED_LOCK_UNLOCKED_WAITING) != 0)
+			return 0; /* Lock is acquired */
+	} while (!__hybrid_atomic_cmpxch_weak(&__self->sl_lock, __lockword,
+	                                      __lockword ? 2 : 1, /* Set canonical lock state */
+	                                      __ATOMIC_ACQUIRE, __ATOMIC_RELAXED));
+	return 1;
 #endif /* !__KERNEL__ */
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_shared_lock_waitfor_defined
-#define __local___localdep_shared_lock_waitfor_defined
-#define __localdep_shared_lock_waitfor __LIBC_LOCAL_NAME(shared_lock_waitfor)
-#endif /* !__local___localdep_shared_lock_waitfor_defined */
-#else /* __KERNEL__ || __shared_lock_wait_impl */
-#undef __local_shared_lock_waitfor_defined
-#endif /* !__KERNEL__ && !__shared_lock_wait_impl */
-#endif /* !__local_shared_lock_waitfor_defined */
+#ifndef __local___localdep_shared_lock_tryacquire_defined
+#define __local___localdep_shared_lock_tryacquire_defined
+#define __localdep_shared_lock_tryacquire __LIBC_LOCAL_NAME(shared_lock_tryacquire)
+#endif /* !__local___localdep_shared_lock_tryacquire_defined */
+#endif /* !__local_shared_lock_tryacquire_defined */

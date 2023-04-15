@@ -185,7 +185,7 @@ libk32_ReleaseSRWLockShared(PSRWLOCK SRWLock) {
 	 *                           it would be enough to wake a single writer,
 	 *                           and  only wake all  readers if there aren't
 	 *                           any writers. */
-	if (atomic_rwlock_endread(me))
+	if (atomic_rwlock_endread_ex(me))
 		futex_wakeall(&me->arw_lock);
 }
 

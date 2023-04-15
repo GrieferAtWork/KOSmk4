@@ -289,6 +289,14 @@ _mfile_map_init_and_acquire(struct mfile_map *__restrict self)
 	if (node != NULL) {
 		SLIST_REMOVE_HEAD(&self->mfm_flist, _mn_alloc);
 	} else {
+		/* TODO: This right here leaked once:
+		 * Leaked 8192 bytes of mnode-memory at F11D6000...F11D7FFF [tid=15] (Referenced 0 times)
+		 * /kos/src/kernel/include/kernel/malloc.h(257,20) : kmalloc+6 : C01BEE2E+5 : Allocated here
+		 * /kos/src/kernel/core/memory/mman/mfile-map.c(292,33) : _mfile_map_init_and_acquire+423 : C01BEE28+12 : Allocated here
+		 * /kos/src/kernel/core/memory/mman/mman-map.c.inl(365,3) : mman_map+430 : C01F9FD8+5 : Called here
+		 * /kos/src/kernel/core/memory/mman/driver.c(358,27) : driver_section_create_kernaddr_ex+162 : C01958C1+5 : Called here
+		 * /kos/src/kernel/core/memory/mman/driver.c(378,42) : driver_section_create_kernaddr+169 : C0195976+5 : Called here
+		 */
 		node = (struct mnode *)kmalloc(sizeof(struct mnode),
 		                               GFP_LOCKED | GFP_PREFLT);
 	}

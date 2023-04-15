@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3bbc967 */
+/* HASH CRC-32:0x46f5246d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,22 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local___mutex_unlock_defined
-#define __local___mutex_unlock_defined
+#ifndef __local___spin_lock_locked_defined
+#define __local___spin_lock_locked_defined
 #include <__crt.h>
-#include <kos/sched/shared-lock.h>
-#ifdef __shared_lock_release
+#include <kos/bits/shared-lock.h>
+#ifdef __shared_lock_available
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(__mutex_unlock) __ATTR_INOUT(1) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mutex_unlock))(void *__lock) {
-	__shared_lock_release((struct shared_lock *)__lock);
+__LOCAL_LIBC(__spin_lock_locked) __ATTR_IN(1) int
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__spin_lock_locked))(unsigned int __KOS_FIXED_CONST *__lock) {
+	return !__shared_lock_available((struct shared_lock *)__lock);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep___mutex_unlock_defined
-#define __local___localdep___mutex_unlock_defined
-#define __localdep___mutex_unlock __LIBC_LOCAL_NAME(__mutex_unlock)
-#endif /* !__local___localdep___mutex_unlock_defined */
-#else /* __shared_lock_release */
-#undef __local___mutex_unlock_defined
-#endif /* !__shared_lock_release */
-#endif /* !__local___mutex_unlock_defined */
+#ifndef __local___localdep___spin_lock_locked_defined
+#define __local___localdep___spin_lock_locked_defined
+#define __localdep___spin_lock_locked __LIBC_LOCAL_NAME(__spin_lock_locked)
+#endif /* !__local___localdep___spin_lock_locked_defined */
+#else /* __shared_lock_available */
+#undef __local___spin_lock_locked_defined
+#endif /* !__shared_lock_available */
+#endif /* !__local___spin_lock_locked_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x251916f0 */
+/* HASH CRC-32:0x448f51aa */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -192,37 +192,44 @@ struct mutex {
 	(WAIT_CLEAR_DEBUG(m), spin_unlock(&(m)->held))
 #endif
 
-#include <kos/sched/shared-lock.h>
-#if defined(__CRT_HAVE___mutex_trylock) && defined(__shared_lock_tryacquire)
-__CEIREDIRECT(,int,__NOTHROW_NCX,mutex_try_lock,(mutex_t __m),__mutex_trylock,{ return __shared_lock_tryacquire((struct shared_lock *)__lock); })
-#elif defined(__CRT_HAVE___mutex_trylock)
+#ifdef __CRT_HAVE___mutex_trylock
 __CREDIRECT(,int,__NOTHROW_NCX,mutex_try_lock,(mutex_t __m),__mutex_trylock,(__m))
-#elif defined(__CRT_HAVE_mutex_try_lock)
-__CDECLARE(,int,__NOTHROW_NCX,mutex_try_lock,(mutex_t __m),(__m))
-#elif defined(__shared_lock_tryacquire)
-__LOCAL int __NOTHROW_NCX(__LIBCCALL mutex_try_lock)(mutex_t __m) { return __shared_lock_tryacquire((struct shared_lock *)__lock); }
-#endif /* ... */
+#elif defined(__CRT_HAVE___spin_try_lock)
+__CREDIRECT(,int,__NOTHROW_NCX,mutex_try_lock,(mutex_t __m),__spin_try_lock,(__m))
+#else /* ... */
+#include <libc/local/lock-intern/__spin_try_lock.h>
+__FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL mutex_try_lock)(mutex_t __m) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__spin_try_lock))((unsigned int *)__m); }
+#endif /* !... */
 #ifdef __CRT_HAVE___mutex_lock
 __CREDIRECT_VOID(,__NOTHROW_NCX,mutex_wait_lock,(mutex_t __m),__mutex_lock,(__m))
+#elif defined(__CRT_HAVE___mutex_lock_solid)
+__CREDIRECT_VOID(,__NOTHROW_NCX,mutex_wait_lock,(mutex_t __m),__mutex_lock_solid,(__m))
 #elif defined(__CRT_HAVE_mutex_wait_lock)
 __CDECLARE_VOID(,__NOTHROW_NCX,mutex_wait_lock,(mutex_t __m),(__m))
-#elif defined(__CRT_HAVE_shared_lock_acquire)
-__CREDIRECT_VOID(,__NOTHROW_NCX,mutex_wait_lock,(mutex_t __m),shared_lock_acquire,(__m))
+#elif defined(__CRT_HAVE___spin_lock)
+__CREDIRECT_VOID(,__NOTHROW_NCX,mutex_wait_lock,(mutex_t __m),__spin_lock,(__m))
+#elif defined(__CRT_HAVE___spin_lock_solid)
+__CREDIRECT_VOID(,__NOTHROW_NCX,mutex_wait_lock,(mutex_t __m),__spin_lock_solid,(__m))
 #else /* ... */
 #include <kos/bits/shared-lock.h>
-#if defined(__KERNEL__) || defined(__shared_lock_wait)
-#include <libc/local/kos.sched.shared-lock/shared_lock_acquire.h>
-__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL mutex_wait_lock)(mutex_t __m) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_lock_acquire))((struct shared_lock *)__m); }
-#endif /* __KERNEL__ || __shared_lock_wait */
+#if defined(__CRT_HAVE_shared_lock_acquire) || defined(__KERNEL__) || defined(__shared_lock_wait_impl)
+#include <libc/local/lock-intern/__spin_lock_solid.h>
+__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL mutex_wait_lock)(mutex_t __m) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__spin_lock_solid))((unsigned int *)__m); }
+#endif /* __CRT_HAVE_shared_lock_acquire || __KERNEL__ || __shared_lock_wait_impl */
 #endif /* !... */
 #ifdef __CRT_HAVE___mutex_unlock
 __CREDIRECT_VOID(,__NOTHROW_NCX,mutex_unlock,(mutex_t __m),__mutex_unlock,(__m))
 #elif defined(__CRT_HAVE_mutex_unlock)
 __CDECLARE_VOID(,__NOTHROW_NCX,mutex_unlock,(mutex_t __m),(__m))
-#elif defined(__shared_lock_release)
+#elif defined(__CRT_HAVE___spin_unlock)
+__CREDIRECT_VOID(,__NOTHROW_NCX,mutex_unlock,(mutex_t __m),__spin_unlock,(__m))
+#else /* ... */
+#include <kos/bits/shared-lock.h>
+#if defined(__CRT_HAVE_shared_lock_release_ex) || defined(__shared_lock_release_ex) || (defined(__shared_lock_sendone) && defined(__shared_lock_sendall))
 #include <libc/local/lock-intern/__spin_unlock.h>
 __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL mutex_unlock)(mutex_t __m) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__spin_unlock))((unsigned int *)__m); }
-#endif /* ... */
+#endif /* __CRT_HAVE_shared_lock_release_ex || __shared_lock_release_ex || (__shared_lock_sendone && __shared_lock_sendall) */
+#endif /* !... */
 
 
 /************************************************************************/

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdcd3c7d5 */
+/* HASH CRC-32:0x80635935 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,19 +40,16 @@ typedef __spin_lock_t spin_lock_t;
 
 #define spin_lock_init(lock) __spin_lock_init(lock)
 #include <kos/bits/shared-lock.h>
-#if defined(__CRT_HAVE___spin_lock) || defined(__CRT_HAVE_shared_lock_acquire) || defined(__KERNEL__) || defined(__shared_lock_wait)
+#if defined(__CRT_HAVE___spin_lock) || defined(__CRT_HAVE___spin_lock_solid) || defined(__CRT_HAVE___mutex_lock) || defined(__CRT_HAVE___mutex_lock_solid) || defined(__CRT_HAVE_mutex_wait_lock) || defined(__CRT_HAVE_shared_lock_acquire) || defined(__KERNEL__) || defined(__shared_lock_wait_impl)
 #define spin_lock(lock) __spin_lock(lock)
-#endif /* __CRT_HAVE___spin_lock || __CRT_HAVE_shared_lock_acquire || __KERNEL__ || __shared_lock_wait */
-#include <kos/sched/shared-lock.h>
-#if defined(__CRT_HAVE___spin_try_lock) || defined(__shared_lock_tryacquire)
+#endif /* __CRT_HAVE___spin_lock || __CRT_HAVE___spin_lock_solid || __CRT_HAVE___mutex_lock || __CRT_HAVE___mutex_lock_solid || __CRT_HAVE_mutex_wait_lock || __CRT_HAVE_shared_lock_acquire || __KERNEL__ || __shared_lock_wait_impl */
 #define spin_try_lock(lock) __spin_try_lock(lock)
-#endif /* __CRT_HAVE___spin_try_lock || __shared_lock_tryacquire */
-#if defined(__CRT_HAVE___spin_unlock) || defined(__shared_lock_release)
+#if defined(__CRT_HAVE___spin_unlock) || defined(__CRT_HAVE___mutex_unlock) || defined(__CRT_HAVE_mutex_unlock) || defined(__CRT_HAVE_shared_lock_release_ex) || defined(__shared_lock_release_ex) || (defined(__shared_lock_sendone) && defined(__shared_lock_sendall))
 #define spin_unlock(lock) __spin_unlock(lock)
-#endif /* __CRT_HAVE___spin_unlock || __shared_lock_release */
-#if defined(__CRT_HAVE___spin_lock_locked) || defined(__shared_lock_acquired)
+#endif /* __CRT_HAVE___spin_unlock || __CRT_HAVE___mutex_unlock || __CRT_HAVE_mutex_unlock || __CRT_HAVE_shared_lock_release_ex || __shared_lock_release_ex || (__shared_lock_sendone && __shared_lock_sendall) */
+#if defined(__CRT_HAVE___spin_lock_locked) || defined(__shared_lock_available)
 #define spin_lock_locked(lock) __spin_lock_locked(lock)
-#endif /* __CRT_HAVE___spin_lock_locked || __shared_lock_acquired */
+#endif /* __CRT_HAVE___spin_lock_locked || __shared_lock_available */
 
 __SYSDECL_END
 #endif /* __CC__ */

@@ -56,50 +56,42 @@ typedef unsigned int __spin_lock_t;
 %[define_replacement(__spin_lock_t = "unsigned int")]
 
 [[extern_inline]]
+[[export_as("__mutex_init")]]
 void __spin_lock_init([[out]] __spin_lock_t *lock) {
 	*lock = 0;
 }
 
-[[extern_inline]]
-[[requires_include("<kos/sched/shared-lock.h>")]]
-[[requires(defined(shared_lock_tryacquire))]]
-[[impl_include("<kos/sched/shared-lock.h>")]]
-[[impl_include("<hybrid/sched/__yield.h>")]]
+[[export_alias("__spin_lock", "__mutex_lock", "__mutex_lock_solid", "mutex_wait_lock")]]
+[[requires_function(shared_lock_acquire)]]
+[[impl_include("<kos/bits/shared-lock.h>")]]
 void __spin_lock_solid([[inout]] __spin_lock_t *lock) {
-	while (!shared_lock_tryacquire((struct shared_lock *)lock))
-		__hybrid_yield();
+	shared_lock_acquire((struct shared_lock *)lock);
 }
 
-
-[[nocrt, alias("__spin_lock", "shared_lock_acquire")]]
-[[if($extended_include_prefix("<kos/bits/shared-lock.h>")defined(__KERNEL__) || defined(__shared_lock_wait)),
-  bind_local_function(shared_lock_acquire)]]
+[[nocrt, alias("__spin_lock", "__spin_lock_solid", "__mutex_lock", "__mutex_lock_solid", "mutex_wait_lock")]]
+[[if($has_function(shared_lock_acquire)), bind_local_function(__spin_lock_solid)]]
 void __spin_lock([[inout]] __spin_lock_t *lock);
 
-
-[[requires_include("<kos/sched/shared-lock.h>")]]
-[[requires(defined(shared_lock_release))]]
-[[impl_include("<kos/sched/shared-lock.h>")]]
+[[export_alias("__mutex_unlock", "mutex_unlock")]]
+[[requires_function(shared_lock_release_ex)]]
+[[impl_include("<kos/bits/shared-lock.h>")]]
 void __spin_unlock([[inout]] __spin_lock_t *lock) {
-	shared_lock_release((struct shared_lock *)lock);
+	shared_lock_release_ex((struct shared_lock *)lock);
 }
 
-
-[[extern_inline]]
-[[requires_include("<kos/sched/shared-lock.h>")]]
-[[requires(defined(shared_lock_tryacquire))]]
-[[impl_include("<kos/sched/shared-lock.h>")]]
+[[export_alias("__mutex_trylock")]]
+[[requires_function(shared_lock_tryacquire)]]
+[[impl_include("<kos/bits/shared-lock.h>")]]
 int __spin_try_lock([[inout]] __spin_lock_t *lock) {
 	return shared_lock_tryacquire((struct shared_lock *)lock);
 }
 
-[[extern_inline]]
 [[decl_include("<features.h>")]]
-[[requires_include("<kos/sched/shared-lock.h>")]]
-[[requires(defined(shared_lock_acquired))]]
-[[impl_include("<kos/sched/shared-lock.h>")]]
+[[requires_include("<kos/bits/shared-lock.h>")]]
+[[requires(defined(__shared_lock_available))]]
+[[impl_include("<kos/bits/shared-lock.h>")]]
 int __spin_lock_locked([[in]] __spin_lock_t __KOS_FIXED_CONST *lock) {
-	return shared_lock_acquired((struct shared_lock *)lock);
+	return !__shared_lock_available((struct shared_lock *)lock);
 }
 
 
@@ -134,50 +126,31 @@ struct mutex {
 
 }
 
-[[extern_inline]]
-[[crt_intern_alias(__spin_lock_init)]]
-void __mutex_init([[out]] void *lock) {
-	*(unsigned int *)lock = 0;
-}
+[[nocrt, alias("__mutex_init", "__spin_lock_init")]]
+[[inline({ *(unsigned int *)lock = 0; })]]
+void __mutex_init([[out]] void *lock);
 
-[[nocrt, alias("__mutex_lock", "mutex_wait_lock", "shared_lock_acquire")]]
-[[if($extended_include_prefix("<kos/bits/shared-lock.h>")defined(__KERNEL__) || defined(__shared_lock_wait)),
-  bind_local_function(shared_lock_acquire)]]
+[[nocrt, alias("__mutex_lock", "__mutex_lock_solid", "mutex_wait_lock", "__spin_lock", "__spin_lock_solid")]]
+[[if($has_function(shared_lock_acquire)), bind_local_function(__spin_lock_solid)]]
 void __mutex_lock([[inout]] void *lock);
 
-[[nocrt, alias("__mutex_lock_solid", "mutex_wait_lock", "shared_lock_acquire")]]
-[[if($extended_include_prefix("<kos/bits/shared-lock.h>")defined(__KERNEL__) || defined(__shared_lock_wait)),
-  bind_local_function(shared_lock_acquire)]]
+[[nocrt, alias("__mutex_lock_solid", "__mutex_lock", "mutex_wait_lock", "__spin_lock", "__spin_lock_solid")]]
+[[if($has_function(shared_lock_acquire)), bind_local_function(__spin_lock_solid)]]
 void __mutex_lock_solid([[inout]] void *lock);
 
-[[export_alias("mutex_unlock")]]
-[[crt_intern_alias(__spin_unlock)]]
-[[if($extended_include_prefix("<kos/sched/shared-lock.h>")defined(shared_lock_release)),
-  bind_local_function(__spin_unlock)]]
-[[requires_include("<kos/sched/shared-lock.h>")]]
-[[requires(defined(shared_lock_release))]]
-[[impl_include("<kos/sched/shared-lock.h>")]]
-void __mutex_unlock([[inout]] void *lock) {
-	shared_lock_release((struct shared_lock *)lock);
-}
+[[nocrt, alias("__mutex_unlock", "mutex_unlock", "__spin_unlock")]]
+[[if($has_function(shared_lock_release_ex)), bind_local_function(__spin_unlock)]]
+void __mutex_unlock([[inout]] void *lock);
 
-[[requires_include("<kos/sched/shared-lock.h>")]]
-[[requires(defined(shared_lock_tryacquire) && defined(shared_lock_release))]]
-[[impl_include("<kos/sched/shared-lock.h>")]]
+[[requires_function(shared_lock_waitfor)]]
+[[impl_include("<kos/bits/shared-lock.h>")]]
 void __mutex_unlock_solid([[inout]] void *lock) {
-	if (shared_lock_tryacquire((struct shared_lock *)lock))
-		shared_lock_release((struct shared_lock *)lock);
+	shared_lock_waitfor((struct shared_lock *)lock);
 }
 
-[[extern_inline]]
-[[requires_include("<kos/sched/shared-lock.h>")]]
-[[requires(defined(shared_lock_tryacquire))]]
-[[crt_intern_alias(__spin_try_lock)]]
-[[export_alias("mutex_try_lock")]]
-[[impl_include("<kos/sched/shared-lock.h>")]]
-int __mutex_trylock([[inout]] void *lock) {
-	return shared_lock_tryacquire((struct shared_lock *)lock);
-}
+[[nocrt, alias("__mutex_trylock", "__spin_try_lock")]]
+[[if($has_function(shared_lock_tryacquire)), bind_local_function(__spin_try_lock)]]
+int __mutex_trylock([[inout]] void *lock);
 
 
 

@@ -355,6 +355,8 @@ __LOCAL_LIBC(__invoke_compare_helper) int
 
 [[throws, std, kernel, guard]]
 [[decl_include("<hybrid/typecore.h>")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_qsort_r")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_qsort_r")]]
 [[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER)]]
 [[section(".text.crt{|.dos}.utility.stdlib")]]
 [[crt_dos_variant(callback(
@@ -377,6 +379,8 @@ void qsort([[inout(item_count * item_size)]] void *pbase, size_t item_count, siz
 
 [[wunused, std, throws, guard]]
 [[decl_include("<hybrid/typecore.h>")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_bsearch_r")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_bsearch_r")]]
 [[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER)]]
 [[section(".text.crt{|.dos}.utility.stdlib")]]
 [[crt_dos_variant(callback(

@@ -3097,7 +3097,7 @@ again_check_extendedPrefixes:
 					fp.ppIf(f"!defined({guardName}) && ({
 						escapeText(bind.ppCond, escapeMode)
 					})");
-					fp.ppDefine(guardName, "");
+					fp.ppDefine(guardName, guardName == exposedName ? guardName : "");
 					bind.cprintBindFunction(
 						fp, escapeMode, decl, exposedName, guardName,
 						doc, preferBindingMacros,
@@ -3109,7 +3109,7 @@ again_check_extendedPrefixes:
 				}
 normal_guardName_binding:
 				fp.ppIfndef(guardName);
-				fp.ppDefine(guardName, "");
+				fp.ppDefine(guardName, guardName == exposedName ? guardName : "");
 			} else /* if (guardName is none) */ {
 				/* Check if we can use `__CDECLARE_OPT()' */
 				if (#usedBindings == 1) {

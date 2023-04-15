@@ -124,7 +124,7 @@ __LOCAL void __NOTHROW(atomic_owner_rwlock_downgrade)(struct atomic_owner_rwlock
 
 /* End reading/writing/either.
  * @return: true:  The lock has become free.
- * @return: false: The lock is still held by something. */
+ * @return: false: The lock is still held by someone. */
 __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_endwrite)(struct atomic_owner_rwlock *__restrict __self);
 __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_endread)(struct atomic_owner_rwlock *__restrict __self);
 __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_end)(struct atomic_owner_rwlock *__restrict __self);

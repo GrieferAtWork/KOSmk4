@@ -108,9 +108,25 @@ __DECL_END
 #define __HYBRID_GETTID_PRINTF_ARG(x) (void *)(x)
 #define __HYBRID_GETTID_INVALID_IS_ZERO
 #elif defined(__WINNT__)
+#if defined(__NO_has_include) || __has_include(<intrin.h>)
+#include <intrin.h>
+/* Use the fs/gs self-pointer as TID field. */
+#if defined(__x86_64__)
+#define __HYBRID_SIZEOF_TID__ 8
+#define __hybrid_gettid()     (void *)__readgsqword(0x30)
+#elif defined(__i386__)
 #define __HYBRID_SIZEOF_TID__ 4
+#define __hybrid_gettid()     (void *)__readfsdword(0x18)
+#endif /* ... */
+#endif /* __has_include(<intrin.h>) */
+
 #define __HYBRID_GETTID_INVALID_IS_ZERO
+#ifdef __hybrid_gettid
+#define __hybrid_tid_t          void *
+#define __HYBRID_GETTID_INVALID __NULLPTR
+#else /* __hybrid_gettid */
 #define __HYBRID_GETTID_INVALID 0
+#define __HYBRID_SIZEOF_TID__ 4
 #ifdef __CC__
 #include <hybrid/typecore.h>
 #ifdef _MSC_VER
@@ -127,6 +143,15 @@ __DECL_END
 #endif /* !_MSC_VER */
 #endif /* __CC__ */
 #define __hybrid_gettid GetCurrentThreadId
+#endif /* !__hybrid_gettid */
+#elif __has_include(<errno.h>) || (defined(__unix__) && defined(__NO_has_include))
+/* Posix requires that `errno' be thread-local, so we can just use its address as a TID */
+#include <errno.h>
+#define __HYBRID_SIZEOF_TID__   __SIZEOF_POINTER__
+#define __hybrid_tid_t          void *
+#define __hybrid_gettid()       ((void *)&errno)
+#define __HYBRID_GETTID_INVALID __NULLPTR
+#define __HYBRID_GETTID_INVALID_IS_ZERO
 #elif (__has_include(<unistd.h>) || \
        (defined(__unix__) && defined(__NO_has_include)))
 #include <unistd.h>

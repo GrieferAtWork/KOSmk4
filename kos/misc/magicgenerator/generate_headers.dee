@@ -241,15 +241,18 @@ function servicePendingTasks() {
 		for (;;) {
 			/* Wait for more tasks */
 			pendingTasksSem.acquire();
+
 			/* Execute pending tasks */
 			while (pendingTasks) {
 				local task: (Callable, Tuple);
+
 				/* Take one task and start executing it */
 				try {
 					task = pendingTasks.popfront();
 				} catch (IndexError) {
 					continue;
 				}
+
 				/* Execute the task */
 				task[0](task[1]...);
 				local oldNumCompletedTasks = incCompletedTasks();
@@ -322,6 +325,7 @@ again_create_new:
 				goto again_create_new;
 			throw;
 		}
+
 		/* Create a previously non-existent file */
 		printMessage(f"Creating: {repr filename}");
 		with (criticalSection) {
@@ -340,6 +344,7 @@ again_create_new:
 		}
 		goto done;
 	}
+
 	/* File already exists.
 	 * -> Read in the existing file, and check if its contents match its hash.
 	 *    If they don't, then throw an Error.

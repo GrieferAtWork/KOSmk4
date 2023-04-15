@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec3119db */
+/* HASH CRC-32:0x1ce58168 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,41 +18,34 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_shared_lock_waitfor_defined
-#define __local_shared_lock_waitfor_defined
+#ifndef __local___spin_try_lock_defined
+#define __local___spin_try_lock_defined
 #include <__crt.h>
-#include <kos/bits/shared-lock.h>
-#if defined(__KERNEL__) || defined(__shared_lock_wait_impl)
-#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(shared_lock_waitfor) __BLOCKING __ATTR_INOUT(1) void
-(__FCALL __LIBC_LOCAL_NAME(shared_lock_waitfor))(struct shared_lock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
-#ifdef __KERNEL__
-	__hybrid_assert(!task_wasconnected());
-	while (!__shared_lock_available(__self)) {
-		TASK_POLL_BEFORE_CONNECT({
-			if (__shared_lock_available(__self))
-				return;
-		});
-		task_connect_for_poll(&__self->sl_sig);
-		if __unlikely(__shared_lock_available(__self)) {
-			task_disconnectall();
-			break;
-		}
-		task_waitfor(KTIME_INFINITE);
-	}
-#else /* __KERNEL__ */
-	__shared_lock_waitfor_or_wait_impl(__self, {
-		__shared_lock_wait_impl(__self);
-	});
-#endif /* !__KERNEL__ */
+#ifndef __local___localdep_shared_lock_tryacquire_defined
+#define __local___localdep_shared_lock_tryacquire_defined
+#ifdef __CRT_HAVE_shared_lock_tryacquire
+__NAMESPACE_LOCAL_END
+#include <kos/bits/shared-lock.h>
+__NAMESPACE_LOCAL_BEGIN
+__COMPILER_CREDIRECT(__LIBC,__ATTR_INOUT(1),__BOOL,__NOTHROW_NCX,__FCALL,__localdep_shared_lock_tryacquire,(struct shared_lock *__restrict __self),shared_lock_tryacquire,(__self))
+#else /* __CRT_HAVE_shared_lock_tryacquire */
+__NAMESPACE_LOCAL_END
+#include <libc/local/kos.sched.shared-lock/shared_lock_tryacquire.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_shared_lock_tryacquire __LIBC_LOCAL_NAME(shared_lock_tryacquire)
+#endif /* !__CRT_HAVE_shared_lock_tryacquire */
+#endif /* !__local___localdep_shared_lock_tryacquire_defined */
+__NAMESPACE_LOCAL_END
+#include <kos/bits/shared-lock.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(__spin_try_lock) __ATTR_INOUT(1) int
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__spin_try_lock))(unsigned int *__lock) {
+	return (__NAMESPACE_LOCAL_SYM __localdep_shared_lock_tryacquire)((struct shared_lock *)__lock);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_shared_lock_waitfor_defined
-#define __local___localdep_shared_lock_waitfor_defined
-#define __localdep_shared_lock_waitfor __LIBC_LOCAL_NAME(shared_lock_waitfor)
-#endif /* !__local___localdep_shared_lock_waitfor_defined */
-#else /* __KERNEL__ || __shared_lock_wait_impl */
-#undef __local_shared_lock_waitfor_defined
-#endif /* !__KERNEL__ && !__shared_lock_wait_impl */
-#endif /* !__local_shared_lock_waitfor_defined */
+#ifndef __local___localdep___spin_try_lock_defined
+#define __local___localdep___spin_try_lock_defined
+#define __localdep___spin_try_lock __LIBC_LOCAL_NAME(__spin_try_lock)
+#endif /* !__local___localdep___spin_try_lock_defined */
+#endif /* !__local___spin_try_lock_defined */

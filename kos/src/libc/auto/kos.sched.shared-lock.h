@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd520e909 */
+/* HASH CRC-32:0xfe59af52 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,18 @@
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
+/* >> shared_lock_tryacquire(3)
+ * Try to acquire a lock to a given `struct shared_lock *self'
+ * @return: true:  success
+ * @return: false: error */
+INTDEF ATTR_INOUT(1) bool NOTHROW_NCX(__FCALL libc_shared_lock_tryacquire)(struct shared_lock *__restrict self);
+/* >> shared_lock_release_ex(3)
+ * Release a lock from a given shared_lock.
+ * @return: true:  A waiting thread was signaled.
+ * @return: false: No thread was waiting for the lock. */
+INTDEF ATTR_INOUT(1) bool NOTHROW_NCX(__FCALL libc_shared_lock_release_ex)(struct shared_lock *__restrict self);
+#endif /* !__KERNEL__ */
 /* >> shared_lock_acquire(3)
  * Acquire a lock to the given shared_lock. */
 INTDEF __BLOCKING ATTR_INOUT(1) void (__FCALL libc_shared_lock_acquire)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, ...);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9301b75f */
+/* HASH CRC-32:0x15a66460 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,75 @@
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
+#include <kos/bits/shared-lock.h>
+#include <hybrid/__atomic.h>
+/* >> shared_lock_tryacquire(3)
+ * Try to acquire a lock to a given `struct shared_lock *self'
+ * @return: true:  success
+ * @return: false: error */
+INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_INOUT(1) bool
+NOTHROW_NCX(__FCALL libc_shared_lock_tryacquire)(struct shared_lock *__restrict self) {
+
+
+
+	unsigned int lockword;
+	do {
+		lockword = __hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE);
+		if ((lockword & ~__SHARED_LOCK_UNLOCKED_WAITING) != 0)
+			return false; /* Lock is acquired */
+	} while (!__hybrid_atomic_cmpxch_weak(&self->sl_lock, lockword,
+	                                      lockword ? 2 : 1, /* Set canonical lock state */
+	                                      __ATOMIC_ACQUIRE, __ATOMIC_RELAXED));
+	return true;
+
+}
+#include <kos/bits/shared-lock.h>
+#include <hybrid/__atomic.h>
+/* >> shared_lock_release_ex(3)
+ * Release a lock from a given shared_lock.
+ * @return: true:  A waiting thread was signaled.
+ * @return: false: No thread was waiting for the lock. */
+INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_INOUT(1) bool
+NOTHROW_NCX(__FCALL libc_shared_lock_release_ex)(struct shared_lock *__restrict self) {
+#ifdef __shared_lock_release_ex
+	return __shared_lock_release_ex(self);
+#else /* __shared_lock_release_ex */
+	unsigned int lockword;
+	do {
+		lockword = __hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE);
+		__hybrid_assertf(lockword > 0 && lockword < __SHARED_LOCK_UNLOCKED_WAITING,
+		                 "Lock is not held by anyone (lockword: %#x)", lockword);
+		if (lockword >= 2) {
+			/* There (might be) are waiting threads */
+			__hybrid_atomic_store(&self->sl_lock,
+			                      __SHARED_LOCK_UNLOCKED_WAITING,
+			                      __ATOMIC_RELEASE);
+			if (__shared_lock_sendone(self))
+				return true;
+
+			/* Apparently, there actually aren't any waiting threads...
+			 * -> Try to clear the waiting-threads-are-present flag */
+			if (__hybrid_atomic_cmpxch(&self->sl_lock, __SHARED_LOCK_UNLOCKED_WAITING, 0,
+			                           __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
+				/* Make sure that  there really aren't  any waiting  threads
+				 * (just in case a thread came by after we read the lockword
+				 * above) */
+				if (__shared_lock_sendall(self))
+					return true;
+			}
+			break;
+		}
+
+		/* There are no waiting threads */
+	} while (!__hybrid_atomic_cmpxch_weak(&self->sl_lock, 1, 0,
+	                                      __ATOMIC_RELEASE,
+	                                      __ATOMIC_RELAXED));
+	/* No-one was waiting for the lock */
+	return false;
+#endif /* !__shared_lock_release_ex */
+}
+#endif /* !__KERNEL__ */
 #include <kos/bits/shared-lock.h>
 /* >> shared_lock_acquire(3)
  * Acquire a lock to the given shared_lock. */
@@ -35,28 +104,25 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 (__FCALL libc_shared_lock_acquire)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_xch(&self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
+	while (!__shared_lock_tryacquire(self)) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_xch(&self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
+			if (__shared_lock_tryacquire(self))
 				goto success;
 		});
 		task_connect(&self->sl_sig);
-		if unlikely(__hybrid_atomic_xch(&self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__shared_lock_tryacquire(self)) {
 			task_disconnectall();
 			break;
 		}
 		task_waitfor(KTIME_INFINITE);
 	}
 success:
+	;
 #else /* __KERNEL__ */
-	unsigned int lockword;
-	while ((lockword = __hybrid_atomic_xch(&self->sl_lock, 1, __ATOMIC_ACQUIRE)) != 0) {
-		__shared_lock_beginwait(self);
-		__shared_lock_wait(self, lockword);
-		__shared_lock_endwait(self);
-	}
+	__shared_lock_acquire_or_wait_impl(self, {
+		__shared_lock_wait_impl(self);
+	});
 #endif /* !__KERNEL__ */
-	COMPILER_BARRIER();
 }
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
@@ -67,13 +133,13 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
                                                 __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_xch(&self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
+	while (!__shared_lock_tryacquire(self)) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_xch(&self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
+			if (__shared_lock_tryacquire(self))
 				goto success;
 		});
 		task_connect(&self->sl_sig);
-		if unlikely(__hybrid_atomic_xch(&self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__shared_lock_tryacquire(self)) {
 			task_disconnectall();
 			break;
 		}
@@ -82,17 +148,11 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 	}
 success:
 #else /* __KERNEL__ */
-	unsigned int lockword;
-	while ((lockword = __hybrid_atomic_xch(&self->sl_lock, 1, __ATOMIC_ACQUIRE)) != 0) {
-		bool ok;
-		__shared_lock_beginwait(self);
-		ok = __shared_lock_wait_timeout(self, lockword, abs_timeout);
-		__shared_lock_endwait(self);
-		if (!ok)
+	__shared_lock_acquire_or_wait_impl(self, {
+		if (!__shared_lock_wait_impl_timeout(self, abs_timeout))
 			return false; /* Timeout */
-	}
+	});
 #endif /* !__KERNEL__ */
-	COMPILER_BARRIER();
 	return true;
 }
 /* >> shared_lock_waitfor(3)
@@ -101,25 +161,22 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 (__FCALL libc_shared_lock_waitfor)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+	while (!__shared_lock_available(self)) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0)
+			if (__shared_lock_available(self))
 				return;
 		});
 		task_connect_for_poll(&self->sl_sig);
-		if unlikely(__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__shared_lock_available(self)) {
 			task_disconnectall();
 			break;
 		}
 		task_waitfor(KTIME_INFINITE);
 	}
 #else /* __KERNEL__ */
-	unsigned int lockword;
-	while ((lockword = __hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE)) != 0) {
-		__shared_lock_beginwait(self);
-		__shared_lock_wait(self, lockword);
-		__shared_lock_endwait(self);
-	}
+	__shared_lock_waitfor_or_wait_impl(self, {
+		__shared_lock_wait_impl(self);
+	});
 #endif /* !__KERNEL__ */
 }
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
@@ -131,13 +188,13 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
                                                 __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+	while (!__shared_lock_available(self)) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0)
+			if (__shared_lock_available(self))
 				goto success;
 		});
 		task_connect_for_poll(&self->sl_sig);
-		if unlikely(__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__shared_lock_available(self)) {
 			task_disconnectall();
 			break;
 		}
@@ -146,15 +203,10 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 	}
 success:
 #else /* __KERNEL__ */
-	unsigned int lockword;
-	while ((lockword = __hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE)) != 0) {
-		bool ok;
-		__shared_lock_beginwait(self);
-		ok = __shared_lock_wait_timeout(self, lockword, abs_timeout);
-		__shared_lock_endwait(self);
-		if (!ok)
-			return false;
-	}
+	__shared_lock_waitfor_or_wait_impl(self, {
+		if (!__shared_lock_wait_impl_timeout(self, abs_timeout))
+			return false; /* Timeout */
+	});
 #endif /* !__KERNEL__ */
 	return true;
 }
@@ -170,16 +222,10 @@ DEFINE_INTERN_ALIAS(libc_shared_lock_acquire_with_timeout64, libc_shared_lock_ac
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2) bool
 (__FCALL libc_shared_lock_acquire_with_timeout64)(struct shared_lock *__restrict self,
                                                   struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
-	unsigned int lockword;
-	while ((lockword = __hybrid_atomic_fetchinc(&self->sl_lock, __ATOMIC_ACQUIRE)) != 0) {
-		bool ok;
-		__shared_lock_beginwait(self);
-		ok = __shared_lock_wait_timeout64(self, lockword, abs_timeout);
-		__shared_lock_endwait(self);
-		if (!ok)
+	__shared_lock_acquire_or_wait_impl(self, {
+		if (!__shared_lock_wait_impl_timeout64(self, abs_timeout))
 			return false; /* Timeout */
-	}
-	COMPILER_BARRIER();
+	});
 	return true;
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
@@ -194,15 +240,10 @@ DEFINE_INTERN_ALIAS(libc_shared_lock_waitfor_with_timeout64, libc_shared_lock_wa
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2) bool
 (__FCALL libc_shared_lock_waitfor_with_timeout64)(struct shared_lock *__restrict self,
                                                   struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
-	unsigned int lockword;
-	while ((lockword = __hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE)) != 0) {
-		bool ok;
-		__shared_lock_beginwait(self);
-		ok = __shared_lock_wait_timeout64(self, lockword, abs_timeout);
-		__shared_lock_endwait(self);
-		if (!ok)
-			return false;
-	}
+	__shared_lock_waitfor_or_wait_impl(self, {
+		if (!__shared_lock_wait_impl_timeout64(self, abs_timeout))
+			return false; /* Timeout */
+	});
 	return true;
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
@@ -218,13 +259,13 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) AT
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_lock_acquire_nx)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_xch(&self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
+	while (!__shared_lock_tryacquire(self)) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_xch(&self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
+			if (__shared_lock_tryacquire(self))
 				goto success;
 		});
 		task_connect(&self->sl_sig);
-		if unlikely(__hybrid_atomic_xch(&self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__shared_lock_tryacquire(self)) {
 			task_disconnectall();
 			break;
 		}
@@ -232,7 +273,6 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 			return false;
 	}
 success:
-	COMPILER_BARRIER();
 	return true;
 }
 #include <hybrid/__assert.h>
@@ -247,13 +287,13 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 (__FCALL libc_shared_lock_acquire_with_timeout_nx)(struct shared_lock *__restrict self,
                                                    __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_xch(&self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
+	while (!__shared_lock_tryacquire(self)) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_xch(&self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
+			if (__shared_lock_tryacquire(self))
 				goto success;
 		});
 		task_connect(&self->sl_sig);
-		if unlikely(__hybrid_atomic_xch(&self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__shared_lock_tryacquire(self)) {
 			task_disconnectall();
 			break;
 		}
@@ -261,7 +301,6 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 			return false;
 	}
 success:
-	COMPILER_BARRIER();
 	return true;
 }
 #include <hybrid/__assert.h>
@@ -274,13 +313,13 @@ success:
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_lock_waitfor_nx)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+	while (!__shared_lock_available(self)) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0)
+			if (__shared_lock_available(self))
 				goto success;
 		});
 		task_connect_for_poll(&self->sl_sig);
-		if unlikely(__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__shared_lock_available(self)) {
 			task_disconnectall();
 			break;
 		}
@@ -288,7 +327,6 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 			return false;
 	}
 success:
-	COMPILER_BARRIER();
 	return true;
 }
 #include <hybrid/__assert.h>
@@ -303,13 +341,13 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 (__FCALL libc_shared_lock_waitfor_with_timeout_nx)(struct shared_lock *__restrict self,
                                                    __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+	while (!__shared_lock_available(self)) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0)
+			if (__shared_lock_available(self))
 				goto success;
 		});
 		task_connect_for_poll(&self->sl_sig);
-		if unlikely(__hybrid_atomic_load(&self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__shared_lock_available(self)) {
 			task_disconnectall();
 			break;
 		}
@@ -317,7 +355,6 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 			return false;
 	}
 success:
-	COMPILER_BARRIER();
 	return true;
 }
 #endif /* __KERNEL__ */
@@ -325,10 +362,8 @@ success:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__spin_lock, libc_shared_lock_acquire);
-DEFINE_PUBLIC_ALIAS(__mutex_lock, libc_shared_lock_acquire);
-DEFINE_PUBLIC_ALIAS(__mutex_lock_solid, libc_shared_lock_acquire);
-DEFINE_PUBLIC_ALIAS(mutex_wait_lock, libc_shared_lock_acquire);
+DEFINE_PUBLIC_ALIAS(shared_lock_tryacquire, libc_shared_lock_tryacquire);
+DEFINE_PUBLIC_ALIAS(shared_lock_release_ex, libc_shared_lock_release_ex);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(shared_lock_acquire, libc_shared_lock_acquire);
 DEFINE_PUBLIC_ALIAS(shared_lock_acquire_with_timeout, libc_shared_lock_acquire_with_timeout);

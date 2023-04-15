@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5e303b5 */
+/* HASH CRC-32:0x1e704270 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,6 +120,9 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED ATTR_IN(1) ATTR_IN_OPT(2
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_qsort, libd_qsort_r);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 #ifndef __dwrap_cTP_TDTPTPTP_CA0A1_defined
 #define __dwrap_cTP_TDTPTPTP_CA0A1_defined
 PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
@@ -136,7 +139,11 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") ATTR_INOU
                       int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...) {
 	libc_qsort_r(pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&_dwrap_cTP_TDTPTPTP_CA0A1, (void *)compar);
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_qsort, libc_qsort_r);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 #ifndef __LIBCCALL_CALLER_CLEANUP
 #ifndef ____invoke_compare_helper_defined
 __NAMESPACE_LOCAL_BEGIN
@@ -163,7 +170,11 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") ATTR_INOUT_OPT(1) NONNULL((4)) v
 	        (void *)compar);
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_bsearch, libd_bsearch_r);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 #ifndef __dwrap_cTP_TDTPTPTP_CA0A1_defined
 #define __dwrap_cTP_TDTPTPTP_CA0A1_defined
 PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
@@ -181,8 +192,23 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED A
                         int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...) {
 	return libc_bsearch_r(pkey, pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&_dwrap_cTP_TDTPTPTP_CA0A1, (void *)compar);
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_bsearch, libc_bsearch_r);
+#else /* __LIBKCALL_CALLER_CLEANUP */
+#ifndef __LIBCCALL_CALLER_CLEANUP
+#ifndef ____invoke_compare_helper_defined
+__NAMESPACE_LOCAL_BEGIN
+#define ____invoke_compare_helper_defined
+__LOCAL_LIBC(__invoke_compare_helper) int
+(__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
+	return (*(int (__LIBCCALL *)(void const *, void const *))__arg)(__a, __b);
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____invoke_compare_helper_defined */
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED ATTR_IN(1) ATTR_IN_OPT(2) NONNULL((5)) void *
 (LIBCCALL libc_bsearch)(void const *pkey,
                         void const *pbase,
@@ -199,6 +225,7 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED ATTR_IN(1) ATTR_IN_OPT(2
 	                         (void *)compar);
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
 INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_abs)(int x) {
 	return x < 0 ? -x : x;

@@ -84,14 +84,15 @@ __SYSDECL_BEGIN
 @@>> shared_recursive_lock_tryacquire(3)
 @@Try to acquire a recursive lock to `self'
 [[extern_inline, wunused, nothrow, cc(__FCALL), attribute(__NOBLOCK)]]
+[[requires_function(shared_lock_tryacquire)]]
 [[decl_include("<kos/bits/shared-recursive-lock.h>", "<kos/anno.h>")]]
 [[impl_include("<hybrid/__atomic.h>")]]
 $bool shared_recursive_lock_tryacquire([[inout]] struct shared_recursive_lock *__restrict self) {
 	__COMPILER_WORKAROUND_GCC_105689(self);
-@@pp_ifdef __KERNEL__@@
-	if (__hybrid_atomic_xch(&self->@sr_lock@.@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0)
+@@pp_ifdef __shared_lock_tryacquire@@
+	if (__shared_lock_tryacquire(&self->@sr_lock@))
 @@pp_else@@
-	if (__hybrid_atomic_cmpxch(&self->@sr_lock@.@sl_lock@, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+	if (shared_lock_tryacquire(&self->@sr_lock@))
 @@pp_endif@@
 	{
 		__shared_recursive_lock_setown(self);
@@ -105,38 +106,37 @@ $bool shared_recursive_lock_tryacquire([[inout]] struct shared_recursive_lock *_
 }
 
 
-@@>> shared_recursive_lock_release(3)
-@@Release a recursive lock from `self'
+@@>> shared_recursive_lock_release_ex(3)
+@@Release a recursive  lock from  `self'
 @@@return: true:  The lock has become free.
 @@@return: false: You're still holding the lock
+[[guard(shared_recursive_lock_release_ex)]]
 [[extern_inline, nothrow, cc(__FCALL), attribute(__NOBLOCK)]]
 [[decl_include("<kos/bits/shared-recursive-lock.h>", "<kos/anno.h>")]]
+[[requires_function(shared_lock_release_ex)]]
 [[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/asm/futex.h>")]]
-[[requires_include("<kos/bits/shared-recursive-lock.h>"), requires(defined(__shared_lock_send))]]
-$bool shared_recursive_lock_release([[inout]] struct shared_recursive_lock *__restrict self) {
+$bool shared_recursive_lock_release_ex([[inout]] struct shared_recursive_lock *__restrict self) {
 	__COMPILER_WORKAROUND_GCC_105689(self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(self->@sr_lock@.@sl_lock@ != 0, "Lock isn't acquired");
 	__hybrid_assertf(__shared_recursive_lock_isown(self), "You're not the owner of this lock");
 	if (self->@sr_rcnt@ == 0) {
-@@pp_ifdef __KERNEL__@@
 		self->@sr_owner@ = __SHARED_RECURSIVE_LOCK_BADTID;
-		__COMPILER_BARRIER();
-		__hybrid_atomic_store(&self->@sr_lock@.@sl_lock@, 0, __ATOMIC_RELEASE);
-		__shared_lock_send(&self->@sr_lock@);
+@@pp_ifdef __shared_lock_release_ex@@
+		return __shared_lock_release_ex(&self->@sr_lock@);
 @@pp_else@@
-		unsigned int lockstate;
-		self->@sr_owner@ = __SHARED_RECURSIVE_LOCK_BADTID;
-		lockstate        = self->@sr_lock@.@sl_lock@;
-		__COMPILER_BARRIER();
-		__hybrid_atomic_store(&self->@sr_lock@.@sl_lock@, 0, __ATOMIC_RELEASE);
-		if (lockstate >= 2)
-			__shared_lock_send(&self->@sr_lock@);
+		return shared_lock_release_ex(&self->@sr_lock@);
 @@pp_endif@@
-		return $true;
 	}
 	--self->@sr_rcnt@;
 	return $false;
+}
+
+%{
+#ifdef shared_recursive_lock_release_ex
+#define shared_recursive_lock_release(self) \
+	(void)shared_recursive_lock_release_ex(self)
+#endif /* shared_recursive_lock_release_ex */
 }
 
 

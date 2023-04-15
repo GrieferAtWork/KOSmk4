@@ -240,7 +240,7 @@ struct uhci_controller: usb_controller {
 #define uhci_controller_tryread(self)      atomic_rwlock_tryread(&(self)->uc_lock)
 #define _uhci_controller_endread(self)     atomic_rwlock_endread(&(self)->uc_lock)
 #define _uhci_controller_end(self)         atomic_rwlock_end(&(self)->uc_lock)
-#define uhci_controller_end(self)          (void)(atomic_rwlock_end(&(self)->uc_lock) && (uhci_controller_reap(self), 0))
+#define uhci_controller_end(self)          (void)(atomic_rwlock_end_ex(&(self)->uc_lock) && (uhci_controller_reap(self), 0))
 #define uhci_controller_upgrade(self)      atomic_rwlock_upgrade(&(self)->uc_lock)
 #define uhci_controller_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->uc_lock)
 #define uhci_controller_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->uc_lock)

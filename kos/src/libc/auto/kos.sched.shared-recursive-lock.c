@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9baa6ea */
+/* HASH CRC-32:0x39200d53 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,11 +36,11 @@ DECL_BEGIN
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __NOBLOCK ATTR_INOUT(1) bool
 NOTHROW(__FCALL libc_shared_recursive_lock_tryacquire)(struct shared_recursive_lock *__restrict self) {
 	__COMPILER_WORKAROUND_GCC_105689(self);
-
-
-
-	if (__hybrid_atomic_cmpxch(&self->sr_lock.sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
-
+#ifdef __shared_lock_tryacquire
+	if (__shared_lock_tryacquire(&self->sr_lock))
+#else /* __shared_lock_tryacquire */
+	if (libc_shared_lock_tryacquire(&self->sr_lock))
+#endif /* !__shared_lock_tryacquire */
 	{
 		__shared_recursive_lock_setown(self);
 		return true;
@@ -54,32 +54,23 @@ NOTHROW(__FCALL libc_shared_recursive_lock_tryacquire)(struct shared_recursive_l
 #include <hybrid/__atomic.h>
 #include <hybrid/__assert.h>
 #include <kos/asm/futex.h>
-/* >> shared_recursive_lock_release(3)
- * Release a recursive lock from `self'
+/* >> shared_recursive_lock_release_ex(3)
+ * Release a recursive  lock from  `self'
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __NOBLOCK ATTR_INOUT(1) bool
-NOTHROW(__FCALL libc_shared_recursive_lock_release)(struct shared_recursive_lock *__restrict self) {
+NOTHROW(__FCALL libc_shared_recursive_lock_release_ex)(struct shared_recursive_lock *__restrict self) {
 	__COMPILER_WORKAROUND_GCC_105689(self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(self->sr_lock.sl_lock != 0, "Lock isn't acquired");
 	__hybrid_assertf(__shared_recursive_lock_isown(self), "You're not the owner of this lock");
 	if (self->sr_rcnt == 0) {
-
-
-
-
-
-
-		unsigned int lockstate;
 		self->sr_owner = __SHARED_RECURSIVE_LOCK_BADTID;
-		lockstate        = self->sr_lock.sl_lock;
-		__COMPILER_BARRIER();
-		__hybrid_atomic_store(&self->sr_lock.sl_lock, 0, __ATOMIC_RELEASE);
-		if (lockstate >= 2)
-			__shared_lock_send(&self->sr_lock);
-
-		return true;
+#ifdef __shared_lock_release_ex
+		return __shared_lock_release_ex(&self->sr_lock);
+#else /* __shared_lock_release_ex */
+		return libc_shared_lock_release_ex(&self->sr_lock);
+#endif /* !__shared_lock_release_ex */
 	}
 	--self->sr_rcnt;
 	return false;
@@ -193,7 +184,7 @@ DECL_END
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(shared_recursive_lock_tryacquire, libc_shared_recursive_lock_tryacquire);
-DEFINE_PUBLIC_ALIAS(shared_recursive_lock_release, libc_shared_recursive_lock_release);
+DEFINE_PUBLIC_ALIAS(shared_recursive_lock_release_ex, libc_shared_recursive_lock_release_ex);
 DEFINE_PUBLIC_ALIAS(shared_recursive_lock_acquire, libc_shared_recursive_lock_acquire);
 DEFINE_PUBLIC_ALIAS(shared_recursive_lock_acquire_with_timeout, libc_shared_recursive_lock_acquire_with_timeout);
 DEFINE_PUBLIC_ALIAS(shared_recursive_lock_waitfor, libc_shared_recursive_lock_waitfor);

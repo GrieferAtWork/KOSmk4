@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d514ab2 */
+/* HASH CRC-32:0xd84d47f0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,11 +33,11 @@ DECL_BEGIN
 /* >> shared_recursive_lock_tryacquire(3)
  * Try to acquire a recursive lock to `self' */
 INTDEF WUNUSED __NOBLOCK ATTR_INOUT(1) bool NOTHROW(__FCALL libc_shared_recursive_lock_tryacquire)(struct shared_recursive_lock *__restrict self);
-/* >> shared_recursive_lock_release(3)
- * Release a recursive lock from `self'
+/* >> shared_recursive_lock_release_ex(3)
+ * Release a recursive  lock from  `self'
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
-INTDEF __NOBLOCK ATTR_INOUT(1) bool NOTHROW(__FCALL libc_shared_recursive_lock_release)(struct shared_recursive_lock *__restrict self);
+INTDEF __NOBLOCK ATTR_INOUT(1) bool NOTHROW(__FCALL libc_shared_recursive_lock_release_ex)(struct shared_recursive_lock *__restrict self);
 /* >> shared_recursive_lock_acquire(3)
  * Acquire a recursive lock to the given shared_recursive_lock. */
 INTDEF __BLOCKING ATTR_INOUT(1) void (__FCALL libc_shared_recursive_lock_acquire)(struct shared_recursive_lock *__restrict self) THROWS(E_WOULDBLOCK, ...);

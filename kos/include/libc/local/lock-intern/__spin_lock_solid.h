@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e48bc9 */
+/* HASH CRC-32:0x91ccf656 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,43 +18,38 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_shared_lock_acquire_defined
-#define __local_shared_lock_acquire_defined
+#ifndef __local___spin_lock_solid_defined
+#define __local___spin_lock_solid_defined
 #include <__crt.h>
 #include <kos/bits/shared-lock.h>
-#if defined(__KERNEL__) || defined(__shared_lock_wait_impl)
-#include <kos/anno.h>
+#if defined(__CRT_HAVE_shared_lock_acquire) || defined(__KERNEL__) || defined(__shared_lock_wait_impl)
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(shared_lock_acquire) __BLOCKING __ATTR_INOUT(1) void
-(__FCALL __LIBC_LOCAL_NAME(shared_lock_acquire))(struct shared_lock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
-#ifdef __KERNEL__
-	__hybrid_assert(!task_wasconnected());
-	while (!__shared_lock_tryacquire(__self)) {
-		TASK_POLL_BEFORE_CONNECT({
-			if (__shared_lock_tryacquire(__self))
-				goto __success;
-		});
-		task_connect(&__self->sl_sig);
-		if __unlikely(__shared_lock_tryacquire(__self)) {
-			task_disconnectall();
-			break;
-		}
-		task_waitfor(KTIME_INFINITE);
-	}
-__success:
-	;
-#else /* __KERNEL__ */
-	__shared_lock_acquire_or_wait_impl(__self, {
-		__shared_lock_wait_impl(__self);
-	});
-#endif /* !__KERNEL__ */
-}
-__NAMESPACE_LOCAL_END
 #ifndef __local___localdep_shared_lock_acquire_defined
 #define __local___localdep_shared_lock_acquire_defined
+#ifdef __CRT_HAVE_shared_lock_acquire
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+__COMPILER_CREDIRECT_VOID(__LIBC,__BLOCKING __ATTR_INOUT(1),__THROWING,__FCALL,__localdep_shared_lock_acquire,(struct shared_lock *__restrict __self),shared_lock_acquire,(__self))
+#elif defined(__KERNEL__) || defined(__shared_lock_wait_impl)
+__NAMESPACE_LOCAL_END
+#include <libc/local/kos.sched.shared-lock/shared_lock_acquire.h>
+__NAMESPACE_LOCAL_BEGIN
 #define __localdep_shared_lock_acquire __LIBC_LOCAL_NAME(shared_lock_acquire)
+#else /* ... */
+#undef __local___localdep_shared_lock_acquire_defined
+#endif /* !... */
 #endif /* !__local___localdep_shared_lock_acquire_defined */
-#else /* __KERNEL__ || __shared_lock_wait_impl */
-#undef __local_shared_lock_acquire_defined
-#endif /* !__KERNEL__ && !__shared_lock_wait_impl */
-#endif /* !__local_shared_lock_acquire_defined */
+__LOCAL_LIBC(__spin_lock_solid) __ATTR_INOUT(1) void
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__spin_lock_solid))(unsigned int *__lock) {
+	(__NAMESPACE_LOCAL_SYM __localdep_shared_lock_acquire)((struct shared_lock *)__lock);
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep___spin_lock_solid_defined
+#define __local___localdep___spin_lock_solid_defined
+#define __localdep___spin_lock_solid __LIBC_LOCAL_NAME(__spin_lock_solid)
+#endif /* !__local___localdep___spin_lock_solid_defined */
+#else /* __CRT_HAVE_shared_lock_acquire || __KERNEL__ || __shared_lock_wait_impl */
+#undef __local___spin_lock_solid_defined
+#endif /* !__CRT_HAVE_shared_lock_acquire && !__KERNEL__ && !__shared_lock_wait_impl */
+#endif /* !__local___spin_lock_solid_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc43e6dd5 */
+/* HASH CRC-32:0x6ef513d8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4504,9 +4504,6 @@
 #define __CRT_HAVE___memsetq_chk
 #define __CRT_HAVE___memsetw_chk
 #define __CRT_HAVE___minor
-#define __CRT_HAVE___mutex_init
-#define __CRT_HAVE___mutex_trylock
-#define __CRT_HAVE___mutex_unlock
 #define __CRT_HAVE___mutex_unlock_solid
 #define __CRT_HAVE___overflow
 #define __CRT_HAVE___p___argc
@@ -7652,6 +7649,10 @@
 #ifdef __KERNEL__
 #define __CRT_HAVE_shared_lock_acquire_with_timeout_nx
 #endif /* __KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_shared_lock_release_ex
+#define __CRT_HAVE_shared_lock_tryacquire
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_shared_lock_waitfor
 #ifdef __KERNEL__
 #define __CRT_HAVE_shared_lock_waitfor_nx
@@ -7667,7 +7668,7 @@
 #define __CRT_HAVE_shared_recursive_lock_acquire
 #define __CRT_HAVE_shared_recursive_lock_acquire_with_timeout
 #define __CRT_HAVE_shared_recursive_lock_acquire_with_timeout64
-#define __CRT_HAVE_shared_recursive_lock_release
+#define __CRT_HAVE_shared_recursive_lock_release_ex
 #define __CRT_HAVE_shared_recursive_lock_tryacquire
 #define __CRT_HAVE_shared_recursive_lock_waitfor
 #define __CRT_HAVE_shared_recursive_lock_waitfor_with_timeout

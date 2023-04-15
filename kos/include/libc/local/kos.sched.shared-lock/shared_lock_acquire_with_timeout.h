@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa11481e7 */
+/* HASH CRC-32:0xec7bba41 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_shared_lock_acquire_with_timeout_defined
 #include <__crt.h>
 #include <kos/bits/shared-lock.h>
-#if defined(__KERNEL__) || defined(__shared_lock_wait_timeout)
+#if defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout)
 #include <kos/anno.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -30,13 +30,13 @@ __LOCAL_LIBC(shared_lock_acquire_with_timeout) __ATTR_WUNUSED __BLOCKING __ATTR_
 (__FCALL __LIBC_LOCAL_NAME(shared_lock_acquire_with_timeout))(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_xch(&__self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
+	while (!__shared_lock_tryacquire(__self)) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_xch(&__self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
+			if (__shared_lock_tryacquire(__self))
 				goto __success;
 		});
 		task_connect(&__self->sl_sig);
-		if __unlikely(__hybrid_atomic_xch(&__self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0) {
+		if __unlikely(__shared_lock_tryacquire(__self)) {
 			task_disconnectall();
 			break;
 		}
@@ -45,17 +45,11 @@ __LOCAL_LIBC(shared_lock_acquire_with_timeout) __ATTR_WUNUSED __BLOCKING __ATTR_
 	}
 __success:
 #else /* __KERNEL__ */
-	unsigned int __lockword;
-	while ((__lockword = __hybrid_atomic_xch(&__self->sl_lock, 1, __ATOMIC_ACQUIRE)) != 0) {
-		__BOOL __ok;
-		__shared_lock_beginwait(__self);
-		__ok = __shared_lock_wait_timeout(__self, __lockword, __abs_timeout);
-		__shared_lock_endwait(__self);
-		if (!__ok)
+	__shared_lock_acquire_or_wait_impl(__self, {
+		if (!__shared_lock_wait_impl_timeout(__self, __abs_timeout))
 			return 0; /* Timeout */
-	}
+	});
 #endif /* !__KERNEL__ */
-	__COMPILER_BARRIER();
 	return 1;
 }
 __NAMESPACE_LOCAL_END
@@ -63,7 +57,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_shared_lock_acquire_with_timeout_defined
 #define __localdep_shared_lock_acquire_with_timeout __LIBC_LOCAL_NAME(shared_lock_acquire_with_timeout)
 #endif /* !__local___localdep_shared_lock_acquire_with_timeout_defined */
-#else /* __KERNEL__ || __shared_lock_wait_timeout */
+#else /* __KERNEL__ || __shared_lock_wait_impl_timeout */
 #undef __local_shared_lock_acquire_with_timeout_defined
-#endif /* !__KERNEL__ && !__shared_lock_wait_timeout */
+#endif /* !__KERNEL__ && !__shared_lock_wait_impl_timeout */
 #endif /* !__local_shared_lock_acquire_with_timeout_defined */

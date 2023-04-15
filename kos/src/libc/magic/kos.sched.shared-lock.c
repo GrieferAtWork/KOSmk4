@@ -66,67 +66,119 @@ __SYSDECL_BEGIN
 #define shared_lock_cinit(self)        (void)(sig_cinit(&(self)->sl_sig), __hybrid_assert((self)->sl_lock == 0))
 #define shared_lock_cinit_locked(self) (void)(sig_cinit(&(self)->sl_sig), (self)->sl_lock = 1)
 #else /* __KERNEL__ */
-#define SHARED_LOCK_INIT               { 0, 0 }
-#define SHARED_LOCK_INIT_LOCKED        { 1, 0 }
-#define shared_lock_init(self)         (void)((self)->sl_lock = 0, (self)->sl_waiting = 0)
-#define shared_lock_init_locked(self)  (void)((self)->sl_lock = 1, (self)->sl_waiting = 0)
-#define shared_lock_cinit(self)        (void)(__hybrid_assert((self)->sl_lock == 0), __hybrid_assert((self)->sl_waiting == 0))
-#define shared_lock_cinit_locked(self) (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1, __hybrid_assert((self)->sl_waiting == 0))
+#define SHARED_LOCK_INIT               { 0 }
+#define SHARED_LOCK_INIT_LOCKED        { 1 }
+#define shared_lock_init(self)         (void)((self)->sl_lock = 0)
+#define shared_lock_init_locked(self)  (void)((self)->sl_lock = 1)
+#define shared_lock_cinit(self)        (void)(__hybrid_assert((self)->sl_lock == 0))
+#define shared_lock_cinit_locked(self) (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1)
 #endif /* !__KERNEL__ */
-#define shared_lock_acquired(self)  (__hybrid_atomic_load(&(self)->sl_lock, __ATOMIC_ACQUIRE) != 0)
-#define shared_lock_available(self) (__hybrid_atomic_load(&(self)->sl_lock, __ATOMIC_ACQUIRE) == 0)
+#define shared_lock_acquired(self)  (!__shared_lock_available(self))
+#define shared_lock_available(self) __shared_lock_available(self)
 #ifdef __KERNEL__
 #define shared_lock_broadcast_for_fini(self) \
 	sig_broadcast_for_fini(&(self)->sl_sig)
-#elif defined(__CRT_HAVE_XSC)
-#if __CRT_HAVE_XSC(futex)
-/* NOTE: we use `sys_Xfutex()', because the only possible exception is E_SEGFAULT */
+#elif defined(__shared_lock_sendall)
 #define shared_lock_broadcast_for_fini(self) \
-	((self)->sl_waiting >= 2 ? (void)sys_Xfutex(&(self)->sl_lock, /*FUTEX_WAKE*/ 1, (__UINT32_TYPE__)-1, __NULLPTR, __NULLPTR, 0) : (void)0)
-#endif /* __CRT_HAVE_XSC(futex) */
+	((self)->sl_lock >= 2 ? __shared_lock_sendall(self) : (void)0)
 #endif /* !__KERNEL__ */
 
-/* Try to acquire a lock to a given `struct shared_lock *self' */
-#ifdef __KERNEL__
-#ifdef __COMPILER_WORKAROUND_GCC_105689_MAC
-#define shared_lock_tryacquire(self) \
-	__COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_xch(&__cw_105689_self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
-#else /* __COMPILER_WORKAROUND_GCC_105689_MAC */
-#define shared_lock_tryacquire(self) \
-	(__hybrid_atomic_xch(&(self)->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
-#endif /* !__COMPILER_WORKAROUND_GCC_105689_MAC */
-#else /* __KERNEL__ */
-#ifdef __COMPILER_WORKAROUND_GCC_105689_MAC
-#define shared_lock_tryacquire(self) \
-	__COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_cmpxch(&__cw_105689_self->sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
-#else /* __COMPILER_WORKAROUND_GCC_105689_MAC */
-#define shared_lock_tryacquire(self) \
-	__hybrid_atomic_cmpxch(&(self)->sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE)
-#endif /* !__COMPILER_WORKAROUND_GCC_105689_MAC */
-#endif /* !__KERNEL__ */
+#ifdef __shared_lock_tryacquire
+/* >> shared_lock_tryacquire(3)
+ * Try to acquire a lock to a given `struct shared_lock *self'
+ * @return: true:  success
+ * @return: false: error */
+#define shared_lock_tryacquire(self) __shared_lock_tryacquire(self)
+#else /* __shared_lock_tryacquire */
+}
+@@>> shared_lock_tryacquire(3)
+@@Try to acquire a lock to a given `struct shared_lock *self'
+@@@return: true:  success
+@@@return: false: error
+[[cc(__FCALL), guard(shared_lock_tryacquire)]]
+[[decl_include("<kos/bits/shared-lock.h>")]]
+[[impl_include("<kos/bits/shared-lock.h>", "<hybrid/__atomic.h>")]]
+$bool shared_lock_tryacquire([[inout]] struct shared_lock *__restrict self) {
+@@pp_ifdef __KERNEL__@@
+	return __shared_lock_tryacquire(self);
+@@pp_else@@
+	unsigned int lockword;
+	do {
+		lockword = __hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE);
+		if ((lockword & ~__SHARED_LOCK_UNLOCKED_WAITING) != 0)
+			return false; /* Lock is acquired */
+	} while (!__hybrid_atomic_cmpxch_weak(&self->@sl_lock@, lockword,
+	                                      lockword ? 2 : 1, /* Set canonical lock state */
+	                                      __ATOMIC_ACQUIRE, __ATOMIC_RELAXED));
+	return true;
+@@pp_endif@@
+}
+%{
+#endif /* !__shared_lock_tryacquire */
 
-/* Release a lock from a given shared_lock.
+
+
+#ifdef __shared_lock_sendone
+#ifdef __shared_lock_release_ex
+/* >> shared_lock_release_ex(3)
+ * Release a lock from a given shared_lock.
  * @return: true:  A waiting thread was signaled.
- * @return: false: Either no  thread was  signaled, or  the
- *                 lock remains held by the calling thread. */
-#ifdef __shared_lock_send
-#ifdef __KERNEL__
-#define shared_lock_release(self)                                  \
-	(__shared_lock_release_assert_(self)                           \
-	 __hybrid_atomic_store(&(self)->sl_lock, 0, __ATOMIC_RELEASE), \
-	 __shared_lock_send(self))
-#else /* __KERNEL__ */
-#define shared_lock_release(self)                                  \
-	(__shared_lock_release_assert_(self)                           \
-	 __hybrid_atomic_store(&(self)->sl_lock, 0, __ATOMIC_RELEASE), \
-	 __hybrid_atomic_load(&(self)->sl_waiting, __ATOMIC_ACQUIRE) != 0 && __shared_lock_send(self))
-#endif /* !__KERNEL__ */
-#if defined(NDEBUG) || defined(NDEBUG_SYNC)
-#define __shared_lock_release_assert_(self) /* nothing */
-#else /* NDEBUG || NDEBUG_SYNC */
-#define __shared_lock_release_assert_(self) __hybrid_assert((self)->sl_lock != 0),
-#endif /* !NDEBUG || !NDEBUG_SYNC */
-#endif /* __shared_lock_send */
+ * @return: false: No thread was waiting for the lock. */
+#define shared_lock_release_ex(self) __shared_lock_release_ex(self)
+#else /* __shared_lock_release_ex */
+}
+
+@@>> shared_lock_release_ex(3)
+@@Release a lock from a given shared_lock.
+@@@return: true:  A waiting thread was signaled.
+@@@return: false: No thread was waiting for the lock.
+[[cc(__FCALL), guard(shared_lock_release_ex)]]
+[[decl_include("<kos/bits/shared-lock.h>")]]
+[[requires_include("<kos/bits/shared-lock.h>")]]
+[[requires(defined(__shared_lock_release_ex) || (defined(__shared_lock_sendone) && defined(__shared_lock_sendall)))]]
+[[impl_include("<kos/bits/shared-lock.h>", "<hybrid/__atomic.h>")]]
+$bool shared_lock_release_ex([[inout]] struct shared_lock *__restrict self) {
+@@pp_ifdef __shared_lock_release_ex@@
+	return __shared_lock_release_ex(self);
+@@pp_else@@
+	unsigned int lockword;
+	do {
+		lockword = __hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE);
+		__hybrid_assertf(lockword > 0 && lockword < __SHARED_LOCK_UNLOCKED_WAITING,
+		                 "Lock is not held by anyone (lockword: %#x)", lockword);
+		if (lockword >= 2) {
+			/* There (might be) are waiting threads */
+			__hybrid_atomic_store(&self->@sl_lock@,
+			                      __SHARED_LOCK_UNLOCKED_WAITING,
+			                      __ATOMIC_RELEASE);
+			if (__shared_lock_sendone(self))
+				return true;
+
+			/* Apparently, there actually aren't any waiting threads...
+			 * -> Try to clear the waiting-threads-are-present flag */
+			if (__hybrid_atomic_cmpxch(&self->@sl_lock@, __SHARED_LOCK_UNLOCKED_WAITING, 0,
+			                           __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
+				/* Make sure that  there really aren't  any waiting  threads
+				 * (just in case a thread came by after we read the lockword
+				 * above) */
+				if (__shared_lock_sendall(self))
+					return true;
+			}
+			break;
+		}
+
+		/* There are no waiting threads */
+	} while (!__hybrid_atomic_cmpxch_weak(&self->@sl_lock@, 1, 0,
+	                                      __ATOMIC_RELEASE,
+	                                      __ATOMIC_RELAXED));
+	/* No-one was waiting for the lock */
+	return false;
+@@pp_endif@@
+}
+%{
+#endif /* !__shared_lock_release_ex */
+#define shared_lock_release(self) (void)shared_lock_release_ex(self)
+#endif /* __shared_lock_sendone */
 
 }
 
@@ -136,37 +188,30 @@ __SYSDECL_BEGIN
 [[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires_include("<kos/bits/shared-lock.h>")]]
-[[requires(defined(__KERNEL__) || defined(__shared_lock_wait))]]
+[[requires(defined(__KERNEL__) || defined(__shared_lock_wait_impl))]]
 [[impl_include("<kos/bits/shared-lock.h>")]]
-[[if(!defined(__KERNEL__)), export_as(
-	"__spin_lock", "__mutex_lock", "__mutex_lock_solid", /* For Hurd compat */
-	"mutex_wait_lock"                                    /* For OSX compat */
-)]]
 void shared_lock_acquire([[inout]] struct shared_lock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
-	while (__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
+	while (!__shared_lock_tryacquire(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
-			if (__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0)
+			if (__shared_lock_tryacquire(self))
 				goto success;
 		});
 		@task_connect@(&self->@sl_sig@);
-		if unlikely(__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__shared_lock_tryacquire(self)) {
 			@task_disconnectall@();
 			break;
 		}
 		@task_waitfor@(@KTIME_INFINITE@);
 	}
 success:
+	;
 @@pp_else@@
-	unsigned int lockword;
-	while ((lockword = __hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE)) != 0) {
-		__shared_lock_beginwait(self);
-		__shared_lock_wait(self, lockword);
-		__shared_lock_endwait(self);
-	}
+	__shared_lock_acquire_or_wait_impl(self, {
+		__shared_lock_wait_impl(self);
+	});
 @@pp_endif@@
-	COMPILER_BARRIER();
 }
 
 
@@ -179,19 +224,19 @@ success:
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_lock_acquire_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_lock_acquire_with_timeout64")]]
 [[requires_include("<kos/bits/shared-lock.h>")]]
-[[requires(defined(__KERNEL__) || defined(__shared_lock_wait_timeout))]]
+[[requires(defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout))]]
 [[impl_include("<kos/bits/shared-lock.h>")]]
 $bool shared_lock_acquire_with_timeout([[inout]] struct shared_lock *__restrict self,
                                        __shared_lock_timespec abs_timeout) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
-	while (__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
+	while (!__shared_lock_tryacquire(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
-			if (__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0)
+			if (__shared_lock_tryacquire(self))
 				goto success;
 		});
 		@task_connect@(&self->@sl_sig@);
-		if unlikely(__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__shared_lock_tryacquire(self)) {
 			@task_disconnectall@();
 			break;
 		}
@@ -200,17 +245,11 @@ $bool shared_lock_acquire_with_timeout([[inout]] struct shared_lock *__restrict 
 	}
 success:
 @@pp_else@@
-	unsigned int lockword;
-	while ((lockword = __hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE)) != 0) {
-		bool ok;
-		__shared_lock_beginwait(self);
-		ok = __shared_lock_wait_timeout(self, lockword, abs_timeout);
-		__shared_lock_endwait(self);
-		if (!ok)
+	__shared_lock_acquire_or_wait_impl(self, {
+		if (!__shared_lock_wait_impl_timeout(self, abs_timeout))
 			return false; /* Timeout */
-	}
+	});
 @@pp_endif@@
-	COMPILER_BARRIER();
 	return true;
 }
 
@@ -220,30 +259,27 @@ success:
 [[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires_include("<kos/bits/shared-lock.h>")]]
-[[requires(defined(__KERNEL__) || defined(__shared_lock_wait_timeout))]]
+[[requires(defined(__KERNEL__) || defined(__shared_lock_wait_impl))]]
 [[impl_include("<kos/bits/shared-lock.h>")]]
 void shared_lock_waitfor([[inout]] struct shared_lock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
-	while (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+	while (!__shared_lock_available(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
-			if (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
+			if (__shared_lock_available(self))
 				return;
 		});
 		@task_connect_for_poll@(&self->@sl_sig@);
-		if unlikely(__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__shared_lock_available(self)) {
 			@task_disconnectall@();
 			break;
 		}
 		@task_waitfor@(@KTIME_INFINITE@);
 	}
 @@pp_else@@
-	unsigned int lockword;
-	while ((lockword = __hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
-		__shared_lock_beginwait(self);
-		__shared_lock_wait(self, lockword);
-		__shared_lock_endwait(self);
-	}
+	__shared_lock_waitfor_or_wait_impl(self, {
+		__shared_lock_wait_impl(self);
+	});
 @@pp_endif@@
 }
 
@@ -257,19 +293,19 @@ void shared_lock_waitfor([[inout]] struct shared_lock *__restrict self) {
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_lock_waitfor_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_lock_waitfor_with_timeout64")]]
 [[requires_include("<kos/bits/shared-lock.h>")]]
-[[requires(defined(__KERNEL__) || defined(__shared_lock_wait_timeout))]]
+[[requires(defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout))]]
 [[impl_include("<kos/bits/shared-lock.h>")]]
 $bool shared_lock_waitfor_with_timeout([[inout]] struct shared_lock *__restrict self,
                                        __shared_lock_timespec abs_timeout) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
-	while (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+	while (!__shared_lock_available(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
-			if (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
+			if (__shared_lock_available(self))
 				goto success;
 		});
 		@task_connect_for_poll@(&self->@sl_sig@);
-		if unlikely(__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__shared_lock_available(self)) {
 			@task_disconnectall@();
 			break;
 		}
@@ -278,15 +314,10 @@ $bool shared_lock_waitfor_with_timeout([[inout]] struct shared_lock *__restrict 
 	}
 success:
 @@pp_else@@
-	unsigned int lockword;
-	while ((lockword = __hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
-		bool ok;
-		__shared_lock_beginwait(self);
-		ok = __shared_lock_wait_timeout(self, lockword, abs_timeout);
-		__shared_lock_endwait(self);
-		if (!ok)
-			return false;
-	}
+	__shared_lock_waitfor_or_wait_impl(self, {
+		if (!__shared_lock_wait_impl_timeout(self, abs_timeout))
+			return false; /* Timeout */
+	});
 @@pp_endif@@
 	return true;
 }
@@ -299,20 +330,14 @@ success:
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>", "<bits/os/timespec.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires_include("<kos/bits/shared-lock.h>")]]
-[[requires(defined(__shared_lock_wait_timeout64))]]
+[[requires(defined(__shared_lock_wait_impl_timeout64))]]
 [[impl_include("<kos/bits/shared-lock.h>")]]
 $bool shared_lock_acquire_with_timeout64([[inout]] struct shared_lock *__restrict self,
                                          [[in_opt]] struct timespec64 const *abs_timeout) {
-	unsigned int lockword;
-	while ((lockword = __hybrid_atomic_fetchinc(&self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
-		bool ok;
-		__shared_lock_beginwait(self);
-		ok = __shared_lock_wait_timeout64(self, lockword, abs_timeout);
-		__shared_lock_endwait(self);
-		if (!ok)
+	__shared_lock_acquire_or_wait_impl(self, {
+		if (!__shared_lock_wait_impl_timeout64(self, abs_timeout))
 			return false; /* Timeout */
-	}
-	COMPILER_BARRIER();
+	});
 	return true;
 }
 
@@ -320,19 +345,14 @@ $bool shared_lock_acquire_with_timeout64([[inout]] struct shared_lock *__restric
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>", "<bits/os/timespec.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires_include("<kos/bits/shared-lock.h>")]]
-[[requires(defined(__shared_lock_wait_timeout64))]]
+[[requires(defined(__shared_lock_wait_impl_timeout64))]]
 [[impl_include("<kos/bits/shared-lock.h>")]]
 $bool shared_lock_waitfor_with_timeout64([[inout]] struct shared_lock *__restrict self,
                                          [[in_opt]] struct timespec64 const *abs_timeout) {
-	unsigned int lockword;
-	while ((lockword = __hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE)) != 0) {
-		bool ok;
-		__shared_lock_beginwait(self);
-		ok = __shared_lock_wait_timeout64(self, lockword, abs_timeout);
-		__shared_lock_endwait(self);
-		if (!ok)
-			return false;
-	}
+	__shared_lock_waitfor_or_wait_impl(self, {
+		if (!__shared_lock_wait_impl_timeout64(self, abs_timeout))
+			return false; /* Timeout */
+	});
 	return true;
 }
 %#endif /* !__KERNEL__ && __USE_TIME64 */
@@ -355,13 +375,13 @@ $bool shared_lock_waitfor_with_timeout64([[inout]] struct shared_lock *__restric
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_lock_acquire_nx([[inout]] struct shared_lock *__restrict self) {
 	__hybrid_assert(!@task_wasconnected@());
-	while (__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
+	while (!__shared_lock_tryacquire(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
-			if (__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0)
+			if (__shared_lock_tryacquire(self))
 				goto success;
 		});
 		@task_connect@(&self->@sl_sig@);
-		if unlikely(__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__shared_lock_tryacquire(self)) {
 			@task_disconnectall@();
 			break;
 		}
@@ -369,7 +389,6 @@ $bool shared_lock_acquire_nx([[inout]] struct shared_lock *__restrict self) {
 			return false;
 	}
 success:
-	COMPILER_BARRIER();
 	return true;
 }
 
@@ -387,13 +406,13 @@ success:
 $bool shared_lock_acquire_with_timeout_nx([[inout]] struct shared_lock *__restrict self,
                                           __shared_lock_timespec abs_timeout) {
 	__hybrid_assert(!@task_wasconnected@());
-	while (__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
+	while (!__shared_lock_tryacquire(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
-			if (__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0)
+			if (__shared_lock_tryacquire(self))
 				goto success;
 		});
 		@task_connect@(&self->@sl_sig@);
-		if unlikely(__hybrid_atomic_xch(&self->@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__shared_lock_tryacquire(self)) {
 			@task_disconnectall@();
 			break;
 		}
@@ -401,7 +420,6 @@ $bool shared_lock_acquire_with_timeout_nx([[inout]] struct shared_lock *__restri
 			return false;
 	}
 success:
-	COMPILER_BARRIER();
 	return true;
 }
 
@@ -417,13 +435,13 @@ success:
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_lock_waitfor_nx([[inout]] struct shared_lock *__restrict self) {
 	__hybrid_assert(!@task_wasconnected@());
-	while (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+	while (!__shared_lock_available(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
-			if (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
+			if (__shared_lock_available(self))
 				goto success;
 		});
 		@task_connect_for_poll@(&self->@sl_sig@);
-		if unlikely(__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__shared_lock_available(self)) {
 			@task_disconnectall@();
 			break;
 		}
@@ -431,7 +449,6 @@ $bool shared_lock_waitfor_nx([[inout]] struct shared_lock *__restrict self) {
 			return false;
 	}
 success:
-	COMPILER_BARRIER();
 	return true;
 }
 
@@ -449,13 +466,13 @@ success:
 $bool shared_lock_waitfor_with_timeout_nx([[inout]] struct shared_lock *__restrict self,
                                           __shared_lock_timespec abs_timeout) {
 	__hybrid_assert(!@task_wasconnected@());
-	while (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+	while (!__shared_lock_available(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
-			if (__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
+			if (__shared_lock_available(self))
 				goto success;
 		});
 		@task_connect_for_poll@(&self->@sl_sig@);
-		if unlikely(__hybrid_atomic_load(&self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
+		if unlikely(__shared_lock_available(self)) {
 			@task_disconnectall@();
 			break;
 		}
@@ -463,7 +480,6 @@ $bool shared_lock_waitfor_with_timeout_nx([[inout]] struct shared_lock *__restri
 			return false;
 	}
 success:
-	COMPILER_BARRIER();
 	return true;
 }
 %#endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */

@@ -668,9 +668,9 @@ enum {
 	REOP_GROUP_MATCH_J6,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 6 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_MATCH_J7,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 7 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_MATCH_J8,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
-	REOP_GROUP_MATCH_J9,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
-	REOP_GROUP_MATCH_J10,      /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
-	REOP_GROUP_MATCH_J11,      /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
+	REOP_GROUP_MATCH_J9,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 9 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
+	REOP_GROUP_MATCH_J10,      /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 10 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
+	REOP_GROUP_MATCH_J11,      /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 11 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 #define REOP_GROUP_MATCH_JMAX  REOP_GROUP_MATCH_J11
 #define REOP_GROUP_MATCH_Jn(n) (REOP_GROUP_MATCH_J3 + (n) - 3)
 #define REOP_GROUP_MATCH_Joff(opcode) (3 + (opcode) - REOP_GROUP_MATCH_J3)
@@ -729,9 +729,9 @@ enum {
 	REOP_GROUP_END_J6,          /* [+1] Same as `REOP_GROUP_END', but skip the next 6 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_END_J7,          /* [+1] Same as `REOP_GROUP_END', but skip the next 7 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_END_J8,          /* [+1] Same as `REOP_GROUP_END', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
-	REOP_GROUP_END_J9,          /* [+1] Same as `REOP_GROUP_END', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
-	REOP_GROUP_END_J10,         /* [+1] Same as `REOP_GROUP_END', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
-	REOP_GROUP_END_J11,         /* [+1] Same as `REOP_GROUP_END', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
+	REOP_GROUP_END_J9,          /* [+1] Same as `REOP_GROUP_END', but skip the next 9 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
+	REOP_GROUP_END_J10,         /* [+1] Same as `REOP_GROUP_END', but skip the next 10 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
+	REOP_GROUP_END_J11,         /* [+1] Same as `REOP_GROUP_END', but skip the next 11 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 #define REOP_GROUP_END_JMAX         REOP_GROUP_END_J11
 	REOP_POP_ONFAIL,            /* [+0] Pop the top-most element from the on-fail stack (no-op if the stack is empty) */
 	REOP_POP_ONFAIL_AT,         /* [+2] Pop on-fail stack items until one is found referencing the given 16-bit, signed, relative address.

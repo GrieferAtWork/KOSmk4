@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84c9b78c */
+/* HASH CRC-32:0xbcef6320 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,19 +21,32 @@
 #ifndef __local___spin_unlock_defined
 #define __local___spin_unlock_defined
 #include <__crt.h>
-#include <kos/sched/shared-lock.h>
-#ifdef __shared_lock_release
+#include <kos/bits/shared-lock.h>
+#if defined(__CRT_HAVE_shared_lock_release_ex) || defined(__shared_lock_release_ex) || (defined(__shared_lock_sendone) && defined(__shared_lock_sendall))
 __NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_shared_lock_release_ex_defined
+#define __local___localdep_shared_lock_release_ex_defined
+#ifdef __CRT_HAVE_shared_lock_release_ex
+__COMPILER_CREDIRECT(__LIBC,__ATTR_INOUT(1),__BOOL,__NOTHROW_NCX,__FCALL,__localdep_shared_lock_release_ex,(struct shared_lock *__restrict __self),shared_lock_release_ex,(__self))
+#elif defined(__shared_lock_release_ex) || (defined(__shared_lock_sendone) && defined(__shared_lock_sendall))
+__NAMESPACE_LOCAL_END
+#include <libc/local/kos.sched.shared-lock/shared_lock_release_ex.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_shared_lock_release_ex __LIBC_LOCAL_NAME(shared_lock_release_ex)
+#else /* ... */
+#undef __local___localdep_shared_lock_release_ex_defined
+#endif /* !... */
+#endif /* !__local___localdep_shared_lock_release_ex_defined */
 __LOCAL_LIBC(__spin_unlock) __ATTR_INOUT(1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__spin_unlock))(unsigned int *__lock) {
-	__shared_lock_release((struct shared_lock *)__lock);
+	(__NAMESPACE_LOCAL_SYM __localdep_shared_lock_release_ex)((struct shared_lock *)__lock);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___spin_unlock_defined
 #define __local___localdep___spin_unlock_defined
 #define __localdep___spin_unlock __LIBC_LOCAL_NAME(__spin_unlock)
 #endif /* !__local___localdep___spin_unlock_defined */
-#else /* __shared_lock_release */
+#else /* __CRT_HAVE_shared_lock_release_ex || __shared_lock_release_ex || (__shared_lock_sendone && __shared_lock_sendall) */
 #undef __local___spin_unlock_defined
-#endif /* !__shared_lock_release */
+#endif /* !__CRT_HAVE_shared_lock_release_ex && !__shared_lock_release_ex && (!__shared_lock_sendone || !__shared_lock_sendall) */
 #endif /* !__local___spin_unlock_defined */

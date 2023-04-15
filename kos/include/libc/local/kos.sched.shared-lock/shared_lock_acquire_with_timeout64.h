@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefebd2aa */
+/* HASH CRC-32:0x49109c98 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,22 +22,16 @@
 #define __local_shared_lock_acquire_with_timeout64_defined
 #include <__crt.h>
 #include <kos/bits/shared-lock.h>
-#ifdef __shared_lock_wait_timeout64
+#ifdef __shared_lock_wait_impl_timeout64
 #include <kos/anno.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(shared_lock_acquire_with_timeout64) __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL
 (__FCALL __LIBC_LOCAL_NAME(shared_lock_acquire_with_timeout64))(struct shared_lock *__restrict __self, struct __timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
-	unsigned int __lockword;
-	while ((__lockword = __hybrid_atomic_fetchinc(&__self->sl_lock, __ATOMIC_ACQUIRE)) != 0) {
-		__BOOL __ok;
-		__shared_lock_beginwait(__self);
-		__ok = __shared_lock_wait_timeout64(__self, __lockword, __abs_timeout);
-		__shared_lock_endwait(__self);
-		if (!__ok)
+	__shared_lock_acquire_or_wait_impl(__self, {
+		if (!__shared_lock_wait_impl_timeout64(__self, __abs_timeout))
 			return 0; /* Timeout */
-	}
-	__COMPILER_BARRIER();
+	});
 	return 1;
 }
 __NAMESPACE_LOCAL_END
@@ -45,7 +39,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_shared_lock_acquire_with_timeout64_defined
 #define __localdep_shared_lock_acquire_with_timeout64 __LIBC_LOCAL_NAME(shared_lock_acquire_with_timeout64)
 #endif /* !__local___localdep_shared_lock_acquire_with_timeout64_defined */
-#else /* __shared_lock_wait_timeout64 */
+#else /* __shared_lock_wait_impl_timeout64 */
 #undef __local_shared_lock_acquire_with_timeout64_defined
-#endif /* !__shared_lock_wait_timeout64 */
+#endif /* !__shared_lock_wait_impl_timeout64 */
 #endif /* !__local_shared_lock_acquire_with_timeout64_defined */

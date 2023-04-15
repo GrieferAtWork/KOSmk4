@@ -61,7 +61,7 @@ DECL_BEGIN
  * @return: * :                One of `VM86_*' */
 INTDEF NONNULL((1)) int CC libvm86_step(vm86_state_t *__restrict self);
 
-PRIVATE byte_t *CC
+PRIVATE WUNUSED NONNULL((1)) byte_t *CC
 libvm86_translate(vm86_state_t *__restrict self, void const *addr) {
 	if (self->vr_trans)
 		addr = (*self->vr_trans)(self, (void *)addr);

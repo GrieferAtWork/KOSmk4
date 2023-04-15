@@ -438,6 +438,7 @@ __DECL_END
 #define __hybrid_atomic_load        __hybrid_atomic_load
 #define __hybrid_atomic_store       __hybrid_atomic_store
 #define __hybrid_atomic_xch         __hybrid_atomic_xch
+/* @param: fail: Must be `<= succ' and cannot be `__ATOMIC_RELEASE' or `__ATOMIC_ACQ_REL' */
 #define __hybrid_atomic_cmpxch      __hybrid_atomic_cmpxch
 #define __hybrid_atomic_cmpxch_weak __hybrid_atomic_cmpxch_weak
 #define __hybrid_atomic_cmpxch_val  __hybrid_atomic_cmpxch_val
