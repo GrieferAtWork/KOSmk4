@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x897cab9d */
+/* HASH CRC-32:0xb8137d2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1211,7 +1211,7 @@ NOTHROW_NCX(LIBKCALL libc_except_print_short_description)(pformatprinter printer
 		goto done;
 	{
 		char const *name;
-		char const *errno_name; /* XXX: Also print in kernel-space? */
+		char const *errno_name;
 		name = libc_except_name(data->e_code);
 		errno_name = libc_strerrorname_np(libc_except_as_errno(data));
 		if (name) {

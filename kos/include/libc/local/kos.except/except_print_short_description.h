@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc04a6cb5 */
+/* HASH CRC-32:0x53b26629 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,7 +109,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(except_print_short_description))(__pf
 		goto __done;
 	{
 		char const *__name;
-		char const *__errno_name; /* XXX: Also print in kernel-space? */
+		char const *__errno_name;
 		__name = (__NAMESPACE_LOCAL_SYM __localdep_except_name)(__data->e_code);
 		__errno_name = (__NAMESPACE_LOCAL_SYM __localdep_strerrorname_np)((__NAMESPACE_LOCAL_SYM __localdep_except_as_errno)(__data));
 		if (__name) {

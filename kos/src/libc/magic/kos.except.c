@@ -1504,7 +1504,7 @@ $ssize_t except_print_short_description([[nonnull]] $pformatprinter printer, voi
 		goto done;
 	{
 		char const *name;
-		char const *errno_name; /* XXX: Also print in kernel-space? */
+		char const *errno_name;
 		name = except_name(data->@e_code@);
 		errno_name = strerrorname_np(except_as_errno(data));
 		if (name) {
