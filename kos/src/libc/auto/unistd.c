@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38be2209 */
+/* HASH CRC-32:0xad2333af */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -546,7 +546,8 @@ NOTHROW_RPC(LIBCCALL libc_writeall)(fd_t fd,
 			             (byte_t *)buf + (size_t)result,
 			             bufsize - (size_t)result);
 			if (temp <= 0) {
-				result = temp;
+				if (temp < 0)
+					result = temp;
 				break;
 			}
 			result += temp;
@@ -633,7 +634,8 @@ NOTHROW_RPC(LIBCCALL libc_pwriteall)(fd_t fd,
 			              bufsize - (size_t)result,
 			              offset + (size_t)result);
 			if (temp <= 0) {
-				result = temp;
+				if (temp < 0)
+					result = temp;
 				break;
 			}
 			result += temp;
@@ -879,7 +881,7 @@ NOTHROW_NCX(LIBCCALL libc_gethostid)(void) {
 		uint32_t id32;
 		ssize_t count = libc_readall(fd, &id32, 4);
 
-		libc_close(fd);
+		(void)libc_close(fd);
 
 		if (count == 4)
 			return (longptr_t)(ulongptr_t)id32;
@@ -1070,7 +1072,7 @@ got_fd:
 	id32  = (uint32_t)(ulongptr_t)id;
 	count = libc_writeall(fd, &id32, 4);
 
-	libc_close(fd);
+	(void)libc_close(fd);
 
 	if (count != 4) {
 
@@ -1798,7 +1800,7 @@ out:
 	/* Close our file handle to /dev/tty */
 
 	if (default_fds[0] != __STDIN_FILENO)
-		libc_close(default_fds[0]);
+		(void)libc_close(default_fds[0]);
 
 
 	/* Error-only cleanup... */

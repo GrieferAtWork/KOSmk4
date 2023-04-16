@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a19db39 */
+/* HASH CRC-32:0x9478c9b0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2594,7 +2594,8 @@ __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,_exit,(int __status),exit,(__
 #endif /* !___exit_defined */
 
 #ifdef __USE_POSIX2
-/* Retrieve a system configuration string specified by `name'
+/* >> confstr(3)
+ * Retrieve a system configuration string specified by `name'
  * @param: name:   One of `_CS_*' from <asm/crt/confname.h>
  * @param: buf:    Target buffer
  * @param: buflen: Available buffer size (including a trailing \0-character)

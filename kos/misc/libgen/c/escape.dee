@@ -593,7 +593,9 @@ function getHeadersThatImply(thisHeader: string): none | HashSet with string {
 		for (;;) {
 			local gotMore = false;
 			for (local x: result) {
-				for (local more: typeHeadersImplications.get(x)) {
+				local moreSet = typeHeadersImplications.get(x);
+				local moreSet = HashSet(moreSet); /* Must copy to prevent `changed while being iterated' errors */
+				for (local more: moreSet) {
 					if (result.insert(more))
 						gotMore = true;
 				}

@@ -28,10 +28,15 @@
 #include <hybrid/align.h>
 #include <hybrid/host.h>
 
+#include <kos/except.h>
+#include <kos/except/reason/inval.h>
 #include <kos/exec/idata.h>
+#include <kos/fcntl.h>
 #include <kos/ioctl/file.h> /* needed for pathconf() */
 #include <kos/ioctl/tty.h>
 #include <kos/sched/shared-lock.h>
+#include <kos/sys/ioctl.h>
+#include <kos/unistd.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/param.h>
@@ -1994,6 +1999,31 @@ PRIVATE ATTR_SECTION(".rodata.crt.fs.property") longptr_t const pc_constants[] =
 #endif /* __SIZEOF_POINTER__ > 4 */
 #define FIELD_UNDEFINED UINT8_MAX
 
+PRIVATE ATTR_SECTION(".rodata.crt.fs.property")
+uint32_t const pathconf_ioctl_codes[] = {
+	[_PC_LINK_MAX]           = FILE_IOC_GETFSLINKMAX,
+	[_PC_MAX_CANON]          = 0,
+	[_PC_MAX_INPUT]          = 0,
+	[_PC_NAME_MAX]           = FILE_IOC_GETFSNAMEMAX,
+	[_PC_PATH_MAX]           = 0,
+	[_PC_PIPE_BUF]           = 0,
+	[_PC_CHOWN_RESTRICTED]   = 0,
+	[_PC_NO_TRUNC]           = 0,
+	[_PC_VDISABLE]           = 0,
+	[_PC_SYNC_IO]            = 0,
+	[_PC_ASYNC_IO]           = 0,
+	[_PC_PRIO_IO]            = 0,
+	[_PC_SOCK_MAXBUF]        = 0,
+	[_PC_FILESIZEBITS]       = FILE_IOC_GETFSSIZBITS,
+	[_PC_REC_INCR_XFER_SIZE] = FILE_IOC_GETFSXFERINC,
+	[_PC_REC_MAX_XFER_SIZE]  = FILE_IOC_GETFSXFERMAX,
+	[_PC_REC_MIN_XFER_SIZE]  = FILE_IOC_GETFSXFERMIN,
+	[_PC_REC_XFER_ALIGN]     = FILE_IOC_GETFSXFERALN,
+	[_PC_ALLOC_SIZE_MIN]     = FILE_IOC_GETFSXFERALN,
+	[_PC_SYMLINK_MAX]        = FILE_IOC_GETFSSYMMAX,
+	[_PC_2_SYMLINKS]         = FILE_IOC_GETFSSYMMAX,
+};
+
 /*[[[head:libc_fpathconf,hash:CRC-32=0x906fd475]]]*/
 /* >> fpathconf(3)
  * @param: name: One   of    `_PC_*'    from    <asm/crt/confname.h>
@@ -2040,31 +2070,8 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 		case _PC_2_SYMLINKS: {
 			alignas(alignof(uint64_t))
 			byte_t buf[sizeof(uint64_t)];
-			static uint32_t const ioctl_codes[] = {
-				[_PC_LINK_MAX]           = FILE_IOC_GETFSLINKMAX,
-				[_PC_MAX_CANON]          = 0,
-				[_PC_MAX_INPUT]          = 0,
-				[_PC_NAME_MAX]           = FILE_IOC_GETFSNAMEMAX,
-				[_PC_PATH_MAX]           = 0,
-				[_PC_PIPE_BUF]           = 0,
-				[_PC_CHOWN_RESTRICTED]   = 0,
-				[_PC_NO_TRUNC]           = 0,
-				[_PC_VDISABLE]           = 0,
-				[_PC_SYNC_IO]            = 0,
-				[_PC_ASYNC_IO]           = 0,
-				[_PC_PRIO_IO]            = 0,
-				[_PC_SOCK_MAXBUF]        = 0,
-				[_PC_FILESIZEBITS]       = FILE_IOC_GETFSSIZBITS,
-				[_PC_REC_INCR_XFER_SIZE] = FILE_IOC_GETFSXFERINC,
-				[_PC_REC_MAX_XFER_SIZE]  = FILE_IOC_GETFSXFERMAX,
-				[_PC_REC_MIN_XFER_SIZE]  = FILE_IOC_GETFSXFERMIN,
-				[_PC_REC_XFER_ALIGN]     = FILE_IOC_GETFSXFERALN,
-				[_PC_ALLOC_SIZE_MIN]     = FILE_IOC_GETFSXFERALN,
-				[_PC_SYMLINK_MAX]        = FILE_IOC_GETFSSYMMAX,
-				[_PC_2_SYMLINKS]         = FILE_IOC_GETFSSYMMAX,
-			};
 			uint32_t cmd;
-			cmd    = ioctl_codes[name];
+			cmd    = pathconf_ioctl_codes[name];
 			result = ioctl(fd, cmd, buf);
 			if (result >= 0) {
 				if (name == _PC_2_SYMLINKS) {
@@ -2092,9 +2099,9 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 
 
 PRIVATE ATTR_SECTION(".text.crt.fs.property") ATTR_IN(1) longptr_t
-NOTHROW_RPC(LIBDCALL do_pathconf)(char const *path,
-                                  __STDC_INT_AS_UINT_T name,
-                                  oflag_t path_oflags) {
+NOTHROW_RPC(LIBDCALL libc_do_pathconf)(char const *path,
+                                       __STDC_INT_AS_UINT_T name,
+                                       oflag_t path_oflags) {
 	longptr_t result;
 	/* Try not to open `path' if `name' is invalid, or has a constant value */
 	if unlikely(name >= lengthof(pc_constants)) {
@@ -2105,6 +2112,85 @@ NOTHROW_RPC(LIBDCALL do_pathconf)(char const *path,
 		if unlikely(fd < 0)
 			return -1;
 		result = libc_fpathconf(fd, name);
+		sys_close(fd);
+	}
+	return result;
+}
+
+INTERN ATTR_SECTION(".text.crt.except.fs.property") WUNUSED longptr_t LIBCCALL
+libc_do_FPathConf(fd_t fd, __STDC_INT_AS_UINT_T name) THROWS(...) {
+	longptr_t result;
+	if unlikely(name >= lengthof(pc_constants)) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_PATHCONF_NAME,
+		      name);
+	} else if ((result = pc_constants[name]) == PATHCONF_VARYING_LIMIT) {
+		/* Determine the value based on `fd' */
+		switch (name) {
+
+		case _PC_MAX_INPUT: {
+			size_t value;
+			Ioctl(fd, TTYIO_IBUF_GETLIMIT, &value);
+			result = (longptr_t)value;
+		}	break;
+
+		case _PC_MAX_CANON: {
+			size_t value;
+			Ioctl(fd, TTYIO_CANON_GETLIMIT, &value);
+			result = (longptr_t)value;
+		}	break;
+
+			/* Superblock attributes */
+		case _PC_LINK_MAX:
+		case _PC_NAME_MAX:
+		case _PC_FILESIZEBITS:
+		case _PC_REC_INCR_XFER_SIZE:
+		case _PC_REC_MAX_XFER_SIZE:
+		case _PC_REC_MIN_XFER_SIZE:
+		case _PC_REC_XFER_ALIGN:
+		case _PC_ALLOC_SIZE_MIN:
+		case _PC_SYMLINK_MAX:
+		case _PC_2_SYMLINKS: {
+			alignas(alignof(uint64_t))
+			byte_t buf[sizeof(uint64_t)];
+			uint32_t cmd;
+			cmd    = pathconf_ioctl_codes[name];
+			Ioctl(fd, cmd, buf);
+			if (name == _PC_2_SYMLINKS) {
+				result = *(uint64_t const *)buf != 0;
+			} else if (_IOC_SIZE(cmd) == 1) {
+				result = *(uint8_t const *)buf;
+			} else if (_IOC_SIZE(cmd) == 2) {
+				result = *(uint16_t const *)buf;
+			} else if (_IOC_SIZE(cmd) == 4) {
+				result = *(uint32_t const *)buf;
+			} else {
+				assert(_IOC_SIZE(cmd) == 8);
+				result = (longptr_t)*(uint64_t const *)buf;
+			}
+		}	break;
+
+		default:
+			break;
+		}
+	}
+	return result;
+}
+
+INTERN ATTR_SECTION(".text.crt.except.fs.property") ATTR_IN(1) longptr_t LIBDCALL
+libc_do_PathConf(char const *path, __STDC_INT_AS_UINT_T name, oflag_t path_oflags) THROWS(...) {
+	longptr_t result;
+	/* Try not to open `path' if `name' is invalid, or has a constant value */
+	if unlikely(name >= lengthof(pc_constants)) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_PATHCONF_NAME,
+		      name);
+	} else if ((result = pc_constants[name]) == PATHCONF_VARYING_LIMIT) {
+		fd_t fd;
+		fd = Open(path, path_oflags);
+		if unlikely(fd < 0)
+			return -1;
+		result = libc_do_FPathConf(fd, name);
 		sys_close(fd);
 	}
 	return result;
@@ -2122,7 +2208,7 @@ NOTHROW_RPC(LIBDCALL libd_pathconf)(char const *path,
                                     __STDC_INT_AS_UINT_T name)
 /*[[[body:libd_pathconf]]]*/
 {
-	return do_pathconf(path, name, O_RDONLY | libd_O_DOSPATH);
+	return libc_do_pathconf(path, name, O_RDONLY | libd_O_DOSPATH);
 }
 /*[[[end:libd_pathconf]]]*/
 
@@ -2138,7 +2224,7 @@ NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path,
                                     __STDC_INT_AS_UINT_T name)
 /*[[[body:libc_pathconf]]]*/
 {
-	return do_pathconf(path, name, O_RDONLY);
+	return libc_do_pathconf(path, name, O_RDONLY);
 }
 /*[[[end:libc_pathconf]]]*/
 
@@ -2150,7 +2236,7 @@ NOTHROW_RPC(LIBDCALL libd_lpathconf)(char const *path,
                                      __STDC_INT_AS_UINT_T name)
 /*[[[body:libd_lpathconf]]]*/
 {
-	return do_pathconf(path, name, O_RDONLY | O_PATH | O_NOFOLLOW | libd_O_DOSPATH);
+	return libc_do_pathconf(path, name, O_RDONLY | O_PATH | O_NOFOLLOW | libd_O_DOSPATH);
 }
 /*[[[end:libd_lpathconf]]]*/
 
@@ -2162,7 +2248,7 @@ NOTHROW_RPC(LIBCCALL libc_lpathconf)(char const *path,
                                      __STDC_INT_AS_UINT_T name)
 /*[[[body:libc_lpathconf]]]*/
 {
-	return do_pathconf(path, name, O_RDONLY | O_PATH | O_NOFOLLOW);
+	return libc_do_pathconf(path, name, O_RDONLY | O_PATH | O_NOFOLLOW);
 }
 /*[[[end:libc_lpathconf]]]*/
 
@@ -2174,8 +2260,9 @@ INTDEF char const libc_gnu_libc_version_full[];
 INTDEF char const libc_gnu_nptl_version_full[];
 
 
-/*[[[head:libc_confstr,hash:CRC-32=0xba470477]]]*/
-/* Retrieve a system configuration string specified by `name'
+/*[[[head:libc_confstr,hash:CRC-32=0xa93baffc]]]*/
+/* >> confstr(3)
+ * Retrieve a system configuration string specified by `name'
  * @param: name:   One of `_CS_*' from <asm/crt/confname.h>
  * @param: buf:    Target buffer
  * @param: buflen: Available buffer size (including a trailing \0-character)

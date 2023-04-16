@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb26a4c2 */
+/* HASH CRC-32:0x17392f7c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -875,7 +875,7 @@ ___out:
 	/* Close our file handle to /dev/tty */
 #if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close) || defined(__CRT_HAVE___libc_close)
 	if (__default_fds[0] != __STDIN_FILENO)
-		(__NAMESPACE_LOCAL_SYM __localdep_close)(__default_fds[0]);
+		(void)(__NAMESPACE_LOCAL_SYM __localdep_close)(__default_fds[0]);
 #endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close */
 
 	/* Error-only cleanup... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67d29759 */
+/* HASH CRC-32:0x6e3e42d0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,27 +18,27 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_Truncate64_defined
-#define __local_Truncate64_defined
+#ifndef __local_SetRUid_defined
+#define __local_SetRUid_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_Truncate
+#ifdef __CRT_HAVE_SetREUid
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_Truncate32_defined
-#define __local___localdep_Truncate32_defined
-__CREDIRECT_VOID(__ATTR_IN(1),__THROWING,__localdep_Truncate32,(char const *__file, __pos32_t __length),Truncate,(__file,__length))
-#endif /* !__local___localdep_Truncate32_defined */
-__LOCAL_LIBC(Truncate64) __ATTR_IN(1) void
-(__LIBCCALL __LIBC_LOCAL_NAME(Truncate64))(char const *__file, __pos64_t __length) __THROWS(...) {
-	(__NAMESPACE_LOCAL_SYM __localdep_Truncate32)(__file, (__pos32_t)__length);
+#ifndef __local___localdep_SetREUid_defined
+#define __local___localdep_SetREUid_defined
+__CREDIRECT_VOID(,__THROWING,__localdep_SetREUid,(__uid_t __ruid, __uid_t __euid),SetREUid,(__ruid,__euid))
+#endif /* !__local___localdep_SetREUid_defined */
+__LOCAL_LIBC(SetRUid) void
+(__LIBCCALL __LIBC_LOCAL_NAME(SetRUid))(__uid_t __ruid) __THROWS(...) {
+	(__NAMESPACE_LOCAL_SYM __localdep_SetREUid)(__ruid, (__uid_t)-1);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_Truncate64_defined
-#define __local___localdep_Truncate64_defined
-#define __localdep_Truncate64 __LIBC_LOCAL_NAME(Truncate64)
-#endif /* !__local___localdep_Truncate64_defined */
-#else /* __CRT_HAVE_Truncate */
-#undef __local_Truncate64_defined
-#endif /* !__CRT_HAVE_Truncate */
-#endif /* !__local_Truncate64_defined */
+#ifndef __local___localdep_SetRUid_defined
+#define __local___localdep_SetRUid_defined
+#define __localdep_SetRUid __LIBC_LOCAL_NAME(SetRUid)
+#endif /* !__local___localdep_SetRUid_defined */
+#else /* __CRT_HAVE_SetREUid */
+#undef __local_SetRUid_defined
+#endif /* !__CRT_HAVE_SetREUid */
+#endif /* !__local_SetRUid_defined */

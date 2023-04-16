@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f7dff7e */
+/* HASH CRC-32:0x28a76ad4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,8 @@
 #define __CRT_HAVE_ChMod
 #define __CRT_HAVE_ChOwn
 #define __CRT_HAVE_ChRoot
+#define __CRT_HAVE_CloseRange
+#define __CRT_HAVE_ConfStr
 #define __CRT_HAVE_Connect
 #define __CRT_HAVE_Creat
 #define __CRT_HAVE_Creat64
@@ -4182,15 +4184,19 @@
 #define __CRT_HAVE_Execvp
 #define __CRT_HAVE_Execvpe
 #define __CRT_HAVE_FChDir
+#define __CRT_HAVE_FChDirAt
 #define __CRT_HAVE_FChMod
 #define __CRT_HAVE_FChModAt
 #define __CRT_HAVE_FChOwn
 #define __CRT_HAVE_FChOwnAt
+#define __CRT_HAVE_FChRoot
 #define __CRT_HAVE_FDataSync
 #define __CRT_HAVE_FExecve
 #define __CRT_HAVE_FMkDirAt
 #define __CRT_HAVE_FMkNodAt
+#define __CRT_HAVE_FPathConf
 #define __CRT_HAVE_FReadLinkAt
+#define __CRT_HAVE_FSymlinkAt
 #define __CRT_HAVE_FSync
 #define __CRT_HAVE_FTruncate
 #define __CRT_HAVE_FTruncate64
@@ -4216,6 +4222,7 @@
 #define __CRT_HAVE_LFutexExpr64
 #define __CRT_HAVE_LFutexExprI
 #define __CRT_HAVE_LFutexExprI64
+#define __CRT_HAVE_LPathConf
 #define __CRT_HAVE_LSeek
 #define __CRT_HAVE_LSeek64
 #define __CRT_HAVE_Link
@@ -4266,6 +4273,9 @@
 #define __CRT_HAVE_PValloc
 #define __CRT_HAVE_PWrite
 #define __CRT_HAVE_PWrite64
+#define __CRT_HAVE_PWriteAll
+#define __CRT_HAVE_PWriteAll64
+#define __CRT_HAVE_PathConf
 #define __CRT_HAVE_Pipe
 #define __CRT_HAVE_Pipe2
 #define __CRT_HAVE_PosixMAdvise
@@ -4299,6 +4309,8 @@
 #define __CRT_HAVE_SetRESGid
 #define __CRT_HAVE_SetRESUid
 #define __CRT_HAVE_SetREUid
+#define __CRT_HAVE_SetRGid
+#define __CRT_HAVE_SetRUid
 #define __CRT_HAVE_SetSid
 #define __CRT_HAVE_SetSockOpt
 #define __CRT_HAVE_SetUid
@@ -4310,8 +4322,13 @@
 #define __CRT_HAVE_Symlink
 #define __CRT_HAVE_SymlinkAt
 #define __CRT_HAVE_SyncFS
+#define __CRT_HAVE_SysConf
 #define __CRT_HAVE_Syscall
 #define __CRT_HAVE_Syscall64
+#define __CRT_HAVE_TCGetPGrp
+#define __CRT_HAVE_TCSetPGrp
+#define __CRT_HAVE_Tell
+#define __CRT_HAVE_Tell64
 #define __CRT_HAVE_Truncate
 #define __CRT_HAVE_Truncate64
 #define __CRT_HAVE_UTimensAt
@@ -4321,6 +4338,13 @@
 #define __CRT_HAVE_VFork
 #define __CRT_HAVE_Valloc
 #define __CRT_HAVE_Write
+#define __CRT_HAVE_WriteAll
+#endif /* !__KERNEL__ */
+#include <bits/crt/format-printer.h>
+#if !defined(__KERNEL__) && (!defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__)
+#define __CRT_HAVE_WritePrinter
+#endif /* !__KERNEL__ && (!__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_INT__ != __SIZEOF_POINTER__) */
+#ifndef __KERNEL__
 #define __CRT_HAVE__CrtCheckMemory
 #define __CRT_HAVE__CrtDbgBreak
 #define __CRT_HAVE__CrtDbgReport
@@ -8606,7 +8630,6 @@
 #define __CRT_HAVE_wrenameat2
 #define __CRT_HAVE_write
 #endif /* !__KERNEL__ */
-#include <bits/crt/format-printer.h>
 #if !defined(__KERNEL__) && (!defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__)
 #define __CRT_HAVE_write_printer
 #endif /* !__KERNEL__ && (!__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_INT__ != __SIZEOF_POINTER__) */

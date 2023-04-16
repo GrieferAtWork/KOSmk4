@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f17dad5 */
+/* HASH CRC-32:0x5bea8a02 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,12 +65,18 @@ INTERN ATTR_SECTION(".text.crt.sched.futexlockexpr") ATTR_IN(3) ATTR_IN_OPT(4) N
 
 
 	for (;;) {
-		TRY {
+#ifdef TRY
+		TRY
+#endif /* TRY */
+		{
 			return libc_LFutexExpr(ulockaddr, base, expr, timeout, timeout_flags);
-		} EXCEPT {
+		}
+#ifdef TRY
+		EXCEPT {
 			if (!was_thrown(E_INTERRUPT))
 				RETHROW();
 		}
+#endif /* TRY */
 	}
 
 }
@@ -107,12 +113,18 @@ INTERN ATTR_SECTION(".text.crt.sched.futexlockexpr") ATTR_IN(3) ATTR_IN_OPT(4) N
 
 
 	for (;;) {
-		TRY {
+#ifdef TRY
+		TRY
+#endif /* TRY */
+		{
 			return libc_LFutexExpr64(ulockaddr, base, expr, timeout, timeout_flags);
-		} EXCEPT {
+		}
+#ifdef TRY
+		EXCEPT {
 			if (!was_thrown(E_INTERRUPT))
 				RETHROW();
 		}
+#endif /* TRY */
 	}
 
 }

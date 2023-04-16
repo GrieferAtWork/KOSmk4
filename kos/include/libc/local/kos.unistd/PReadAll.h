@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91623003 */
+/* HASH CRC-32:0x3b97b5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,43 +21,52 @@
 #ifndef __local_PReadAll_defined
 #define __local_PReadAll_defined
 #include <__crt.h>
+#include <features.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_PReadAll) || defined(__CRT_HAVE_PReadAll64) || defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PRead)
+#if defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PRead)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_PReadAll32_defined) && defined(__CRT_HAVE_PReadAll)
-#define __local___localdep_PReadAll32_defined
-__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_PReadAll32,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),PReadAll,(__fd,__buf,__bufsize,__offset))
-#endif /* !__local___localdep_PReadAll32_defined && __CRT_HAVE_PReadAll */
-#ifndef __local___localdep_PReadAll64_defined
-#define __local___localdep_PReadAll64_defined
-#if defined(__CRT_HAVE_PReadAll) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_PReadAll64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PReadAll,(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_PReadAll64)
-__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_PReadAll64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PReadAll64,(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PRead)
-__NAMESPACE_LOCAL_END
-#include <libc/local/kos.unistd/PReadAll64.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_PReadAll64 __LIBC_LOCAL_NAME(PReadAll64)
+#ifndef __local___localdep_PRead_defined
+#define __local___localdep_PRead_defined
+#if defined(__CRT_HAVE_PRead) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_PRead,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
+#elif defined(__CRT_HAVE_PRead64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_PRead,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos_t __offset),PRead64,(__fd,__buf,__bufsize,__offset))
 #else /* ... */
-#undef __local___localdep_PReadAll64_defined
+__NAMESPACE_LOCAL_END
+#include <libc/local/kos.unistd/PRead.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_PRead __LIBC_LOCAL_NAME(PRead)
 #endif /* !... */
-#endif /* !__local___localdep_PReadAll64_defined */
+#endif /* !__local___localdep_PRead_defined */
 __LOCAL_LIBC(PReadAll) __ATTR_OUTS(2, 3) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(PReadAll))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos_t __offset) __THROWS(...) {
-#ifdef __CRT_HAVE_PReadAll
-	return (__NAMESPACE_LOCAL_SYM __localdep_PReadAll32)(__fd, __buf, __bufsize, (__pos32_t)__offset);
-#else /* __CRT_HAVE_PReadAll */
-	return (__NAMESPACE_LOCAL_SYM __localdep_PReadAll64)(__fd, __buf, __bufsize, (__pos64_t)__offset);
-#endif /* !__CRT_HAVE_PReadAll */
+	__SIZE_TYPE__ __result, __temp;
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_PRead)(__fd, __buf, __bufsize, __offset);
+	if (__result != 0 && (__SIZE_TYPE__)__result < __bufsize) {
+		/* Keep on reading */
+		for (;;) {
+			__temp = (__NAMESPACE_LOCAL_SYM __localdep_PRead)(__fd,
+			             (__BYTE_TYPE__ *)__buf + __result,
+			             __bufsize - __result,
+			             __offset + __result);
+			if (!__temp) {
+				__result = 0;
+				break;
+			}
+			__result += __temp;
+			if (__result >= __bufsize)
+				break;
+		}
+	}
+	return __result;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_PReadAll_defined
 #define __local___localdep_PReadAll_defined
 #define __localdep_PReadAll __LIBC_LOCAL_NAME(PReadAll)
 #endif /* !__local___localdep_PReadAll_defined */
-#else /* __CRT_HAVE_PReadAll || __CRT_HAVE_PReadAll64 || __CRT_HAVE_PRead64 || __CRT_HAVE_PRead */
+#else /* __CRT_HAVE_PRead64 || __CRT_HAVE_PRead */
 #undef __local_PReadAll_defined
-#endif /* !__CRT_HAVE_PReadAll && !__CRT_HAVE_PReadAll64 && !__CRT_HAVE_PRead64 && !__CRT_HAVE_PRead */
+#endif /* !__CRT_HAVE_PRead64 && !__CRT_HAVE_PRead */
 #endif /* !__local_PReadAll_defined */

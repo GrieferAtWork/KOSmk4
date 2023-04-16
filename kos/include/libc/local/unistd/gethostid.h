@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8f83901 */
+/* HASH CRC-32:0xfa1e625c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,7 +91,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gethostid))(void) {
 		__UINT32_TYPE__ __id32;
 		__SSIZE_TYPE__ __count = (__NAMESPACE_LOCAL_SYM __localdep_readall)(__fd, &__id32, 4);
 #if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close) || defined(__CRT_HAVE___libc_close)
-		(__NAMESPACE_LOCAL_SYM __localdep_close)(__fd);
+		(void)(__NAMESPACE_LOCAL_SYM __localdep_close)(__fd);
 #endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close */
 		if (__count == 4)
 			return (__LONGPTR_TYPE__)(__ULONGPTR_TYPE__)__id32;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42b9ec32 */
+/* HASH CRC-32:0x86c476c1 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,8 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(writeall))(__fd_t __fd, void const *_
 			             (__BYTE_TYPE__ *)__buf + (__SIZE_TYPE__)__result,
 			             __bufsize - (__SIZE_TYPE__)__result);
 			if (__temp <= 0) {
-				__result = __temp;
+				if (__temp < 0)
+					__result = __temp;
 				break;
 			}
 			__result += __temp;

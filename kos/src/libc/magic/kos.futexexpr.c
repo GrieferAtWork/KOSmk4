@@ -392,12 +392,18 @@ int LFutexExprI_except([[nonnull]] lfutex_t *ulockaddr, void *base,
 	return crt_LFutexExprI64_except(ulockaddr, base, expr, &tms64, timeout_flags);
 @@pp_else@@
 	for (;;) {
-		@TRY@ {
+@@pp_if defined(@TRY@)@@
+		@TRY@
+@@pp_endif@@
+		{
 			return LFutexExpr_except(ulockaddr, base, expr, timeout, timeout_flags);
-		} @EXCEPT@ {
+		}
+@@pp_if defined(@TRY@)@@
+		@EXCEPT@ {
 			if (!@was_thrown@(@E_INTERRUPT@))
 				@RETHROW@();
 		}
+@@pp_endif@@
 	}
 @@pp_endif@@
 }
@@ -428,12 +434,18 @@ int LFutexExprI64_except([[nonnull]] lfutex_t *ulockaddr, void *base,
 	return crt_LFutexExprI32_except(ulockaddr, base, expr, &tms32, timeout_flags);
 @@pp_else@@
 	for (;;) {
-		@TRY@ {
+@@pp_if defined(@TRY@)@@
+		@TRY@
+@@pp_endif@@
+		{
 			return LFutexExpr64_except(ulockaddr, base, expr, timeout, timeout_flags);
-		} @EXCEPT@ {
+		}
+@@pp_if defined(@TRY@)@@
+		@EXCEPT@ {
 			if (!@was_thrown@(@E_INTERRUPT@))
 				@RETHROW@();
 		}
+@@pp_endif@@
 	}
 @@pp_endif@@
 }

@@ -88,13 +88,15 @@
 )]%[insert:prefix(
 #include <hybrid/host.h>
 )]%[insert:prefix(
-#include <kos/bits/except.h>         /* __EXCEPT_REGISTER_STATE_TYPE */
+#include <kos/bits/except.h>          /* __EXCEPT_REGISTER_STATE_TYPE */
 )]%[insert:prefix(
-#include <kos/bits/exception_data.h> /* struct exception_data */
+#include <kos/bits/except-compiler.h> /* __TRY, __EXCEPT */
 )]%[insert:prefix(
-#include <kos/bits/exception_nest.h> /* struct _exception_nesting_data */
+#include <kos/bits/exception_data.h>  /* struct exception_data */
 )]%[insert:prefix(
-#include <kos/except/codes.h>        /* E_OK, ... */
+#include <kos/bits/exception_nest.h>  /* struct _exception_nesting_data */
+)]%[insert:prefix(
+#include <kos/except/codes.h>         /* E_OK, ... */
 )]%[insert:prefix(
 #include <kos/bits/fastexcept.h>
 )]%[insert:prefix(
@@ -2076,63 +2078,9 @@ restore_saved_exception:
 }
 
 %{
-#ifdef __cplusplus
-extern "C++" {
-__NAMESPACE_INT_BEGIN
-template<class __F> struct __FinallyAction {
-	__F __c;
-	__CXX_CLASSMEMBER __FinallyAction(__F __f) __CXX_NOEXCEPT: __c(__f) {}
-	__CXX_CLASSMEMBER ~__FinallyAction() __CXX_NOEXCEPT { __c(); }
-};
-struct __FinallyBase {
-	template<class __F> __CXX_CLASSMEMBER __FinallyAction<__F>
-	operator ->* (__F __f) __CXX_NOEXCEPT { return __FinallyAction<__F>(__f); }
-};
-__NAMESPACE_INT_END
-} /* extern "C++" */
-#ifndef __COMPILER_UNIQUE
-#define __COMPILER_UNIQUE_IMPL2(x, y) x##y
-#define __COMPILER_UNIQUE_IMPL(x, y) __COMPILER_UNIQUE_IMPL2(x, y)
-#ifdef __COUNTER__
-#define __COMPILER_UNIQUE(x) __COMPILER_UNIQUE_IMPL(x, __COUNTER__)
-#else /* __COUNTER__ */
-#define __COMPILER_UNIQUE(x) __COMPILER_UNIQUE_IMPL(x, __LINE__)
-#endif /* !__COUNTER__ */
-#endif /* !__COMPILER_UNIQUE */
-#define __RAII_FINALLY       auto __COMPILER_UNIQUE(__raii_finally) = __NAMESPACE_INT_SYM __FinallyBase()->*[&]
-
-/* TODO: In user-space, using TRY and EXCEPT should  leave some sort of marker in  the
- *       binary  that allows for libc to consider these handlers as `dlexceptaware(3)'
- *       when operating in except-mode #4. However, I  am unsure as to how this  could
- *       be implemented without making some additional tweaks to gcc under KOS, though
- *       that wouldn't even be  the first time  I had to  tweak binutils/gcc for  this
- *       project... */
-#ifndef __TRY
-#define __TRY    try
-#define __EXCEPT catch(...)
-#endif /* !__TRY */
-
-/* Using NOTHROW_BEGIN ... NOTHROW_END, you can construct blocks of code
- * that will trigger undefined behavior  if they cause an exception.  In
- * debug-mode,  this undefined behavior includes panic/coredump, similar
- * to when an exception is propagated through a NOTHROW function. */
-#ifndef __NOTHROW_BEGIN
-#if !defined(NDEBUG) && !defined(NDEBUG_EXCEPT) && !defined(NDEBUG_NOTHROW)
-#define __NOTHROW_BEGIN do try
-#define __NOTHROW_END   catch(...) { __builtin_unreachable(); } __WHILE0
-#else /* !NDEBUG && !NDEBUG_EXCEPT && !NDEBUG_NOTHROW */
-/* Sadly, GCC doesn't see the optimization potential when  encountering
- * a catch-block that consists of nothing but `__builtin_unreachable()'
- *
- * It should be obvious that such a construct could be optimized into
- * a section of code that can be considered as NOTHROW, similar to an
- * inline function declared as NOTHROW. */
-#define __NOTHROW_BEGIN do
-#define __NOTHROW_END   __WHILE0
-#endif /* NDEBUG || NDEBUG_EXCEPT || NDEBUG_NOTHROW */
-#endif /* !__NOTHROW_BEGIN */
 
 /* Nested exception support */
+#ifdef __cplusplus
 #if defined(__except_nesting_begin_defined) && defined(__except_nesting_end_defined)
 class __cxx_exception_nesting: public _exception_nesting_data {
 public:

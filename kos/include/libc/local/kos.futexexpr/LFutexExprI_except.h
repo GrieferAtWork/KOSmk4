@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63ba5e1e */
+/* HASH CRC-32:0xd74d211c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,12 +74,18 @@ __LOCAL_LIBC(LFutexExprI_except) __ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_LFutexExprI64_except)(__ulockaddr, __base, __expr, &__tms64, __timeout_flags);
 #else /* ... */
 	for (;;) {
-		TRY {
+#ifdef TRY
+		TRY
+#endif /* TRY */
+		{
 			return (__NAMESPACE_LOCAL_SYM __localdep_LFutexExpr_except)(__ulockaddr, __base, __expr, __timeout, __timeout_flags);
-		} EXCEPT {
+		}
+#ifdef TRY
+		EXCEPT {
 			if (!was_thrown(E_INTERRUPT))
 				RETHROW();
 		}
+#endif /* TRY */
 	}
 #endif /* !... */
 }

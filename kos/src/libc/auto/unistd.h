@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7398ae45 */
+/* HASH CRC-32:0x7655f3b6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -450,7 +450,8 @@ INTDEF WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_getsid)(pid_t pid);
  * given `argv', and setting `environ' to `envp'. */
 INTDEF ATTR_IN(2) ATTR_IN(3) int NOTHROW_RPC(LIBDCALL libd_fexecve)(fd_t execfd, __TARGV, __TENVP);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_nice)(int inc);
-/* Retrieve a system configuration string specified by `name'
+/* >> confstr(3)
+ * Retrieve a system configuration string specified by `name'
  * @param: name:   One of `_CS_*' from <asm/crt/confname.h>
  * @param: buf:    Target buffer
  * @param: buflen: Available buffer size (including a trailing \0-character)

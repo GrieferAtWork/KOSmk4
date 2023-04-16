@@ -25,6 +25,7 @@
 /**/
 
 #include <kos/except.h>
+#include <kos/except/reason/inval.h>
 #include <kos/malloc.h>
 #include <kos/syscalls.h>
 #include <sys/resource.h>
@@ -41,6 +42,12 @@
 #include "kos.unistd.h"
 
 DECL_BEGIN
+
+INTDEF WUNUSED longptr_t LIBCCALL
+libc_do_FPathConf(fd_t fd, __STDC_INT_AS_UINT_T name) THROWS(...);
+INTDEF ATTR_IN(1) longptr_t LIBDCALL
+libc_do_PathConf(char const *path, __STDC_INT_AS_UINT_T name, oflag_t path_oflags) THROWS(...);
+
 
 /*[[[head:libc_Execv,hash:CRC-32=0x699785e7]]]*/
 /* >> execv(3)
@@ -121,50 +128,25 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_IN(1) AT
 }
 /*[[[end:libc_Execvpe]]]*/
 
-
-/*[[[head:libc_ReadAll,hash:CRC-32=0x38c4efd8]]]*/
-/* >> readall(3)
- * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
- * `readall()' to immediately return `0') or the entirety of the given buffer has been
- * filled (in which case `bufsize' is returned).
- * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
- * the file descriptor by the amount of data that had already been loaded. - Errors
- * during this phase are silently ignored and don't cause `errno' to change */
-INTERN ATTR_SECTION(".text.crt.except.io.read") ATTR_OUTS(2, 3) size_t
-(LIBCCALL libc_ReadAll)(fd_t fd,
-                        void *buf,
-                        size_t bufsize) THROWS(...)
-/*[[[body:libc_ReadAll]]]*/
+/*[[[head:libc_FExecve,hash:CRC-32=0xcb4d0949]]]*/
+/* >> fexecve(2)
+ * Replace the calling process with the application image referred
+ * to by `execfd'  and execute it's  `main()' method, passing  the
+ * given `argv', and setting `environ' to `envp'. */
+INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_IN(2) ATTR_IN(3) void
+(LIBCCALL libc_FExecve)(fd_t fd,
+                        __TARGV,
+                        __TENVP) THROWS(...)
+/*[[[body:libc_FExecve]]]*/
 {
-	size_t result, temp;
-	result = Read(fd, buf, bufsize);
-	if (result != 0 && result < bufsize) {
-		/* Keep on reading */
-		for (;;) {
-			TRY {
-				temp = Read(fd,
-				           (byte_t *)buf + (size_t)result,
-				            bufsize - (size_t)result);
-			} EXCEPT {
-				int old_error = libc_geterrno();
-				/* Try to un-read data that had already been loaded. */
-				lseek(fd, -(off_t)(pos_t)result, SEEK_CUR);
-				libc_seterrno(old_error);
-				RETHROW();
-			}
-			if (!temp) {
-				result = 0;
-				break;
-			}
-			result += temp;
-			if (result >= bufsize)
-				break;
-		}
-	}
-	return result;
+	sys_Xexecveat(fd,
+	              "",
+	              (char *const *)___argv,
+	              (char *const *)___envp,
+	              AT_EMPTY_PATH);
+	__builtin_unreachable();
 }
-/*[[[end:libc_ReadAll]]]*/
-
+/*[[[end:libc_FExecve]]]*/
 
 /*[[[head:libc_GetCwd,hash:CRC-32=0x404a02cb]]]*/
 /* >> getcwd(2)
@@ -221,7 +203,9 @@ INTERN ATTR_SECTION(".text.crt.except.fs.basic_property") ATTR_OUTS(1, 2) char *
 }
 /*[[[end:libc_GetCwd]]]*/
 
-/*[[[head:libc_PRead,hash:CRC-32=0xb6cfe021]]]*/
+/*[[[skip:libc_PRead]]]*/
+/*[[[skip:libc_PWrite]]]*/
+#if __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
@@ -229,14 +213,10 @@ INTERN ATTR_SECTION(".text.crt.except.io.read") ATTR_OUTS(2, 3) size_t
 (LIBCCALL libc_PRead)(fd_t fd,
                       void *buf,
                       size_t bufsize,
-                      pos_t offset) THROWS(...)
-/*[[[body:libc_PRead]]]*/
-{
+                      pos_t offset) THROWS(...) {
 	return (size_t)sys_Xpread64(fd, buf, bufsize, (u64)offset);
 }
-/*[[[end:libc_PRead]]]*/
 
-/*[[[head:libc_PWrite,hash:CRC-32=0x8bc73868]]]*/
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
@@ -244,130 +224,19 @@ INTERN ATTR_SECTION(".text.crt.except.io.write") ATTR_INS(2, 3) size_t
 (LIBCCALL libc_PWrite)(fd_t fd,
                        void const *buf,
                        size_t bufsize,
-                       pos_t offset) THROWS(...)
-/*[[[body:libc_PWrite]]]*/
-{
+                       pos_t offset) THROWS(...) {
 	return (size_t)sys_Xpwrite64(fd, buf, bufsize, (u64)offset);
 }
-/*[[[end:libc_PWrite]]]*/
-
-/*[[[head:libc_PReadAll,hash:CRC-32=0xe3da6aa1]]]*/
-/* >> preadall(3), preadall64(3)
- * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTERN ATTR_SECTION(".text.crt.except.io.read") ATTR_OUTS(2, 3) size_t
-(LIBCCALL libc_PReadAll)(fd_t fd,
-                         void *buf,
-                         size_t bufsize,
-                         pos_t offset) THROWS(...)
-/*[[[body:libc_PReadAll]]]*/
-{
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-	size_t result, temp;
-	result = PRead(fd, buf, bufsize, offset);
-	if (result != 0 && (size_t)result < bufsize) {
-		/* Keep on reading */
-		for (;;) {
-			temp = PRead(fd,
-			             (byte_t *)buf + result,
-			             bufsize - result,
-			             offset + result);
-			if (!temp) {
-				result = 0;
-				break;
-			}
-			result += temp;
-			if (result >= bufsize)
-				break;
-		}
-	}
-	return result;
-#else /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
-	return PReadAll64(fd, buf, bufsize, offset);
 #endif /* __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */
-}
-/*[[[end:libc_PReadAll]]]*/
-
-/*[[[head:libc_PReadAll64,hash:CRC-32=0x9121e995]]]*/
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_PReadAll64, libc_PReadAll);
-#else /* MAGIC:alias */
-/* >> preadall(3), preadall64(3)
- * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTERN ATTR_SECTION(".text.crt.except.io.large.read") ATTR_OUTS(2, 3) size_t
-(LIBCCALL libc_PReadAll64)(fd_t fd,
-                           void *buf,
-                           size_t bufsize,
-                           pos64_t offset) THROWS(...)
-/*[[[body:libc_PReadAll64]]]*/
-{
-	size_t result, temp;
-	result = PRead64(fd, buf, bufsize, offset);
-	if (result != 0 && (size_t)result < bufsize) {
-		/* Keep on reading */
-		for (;;) {
-			temp = PRead64(fd,
-			              (byte_t *)buf + result,
-			               bufsize - result,
-			               offset + result);
-			if (!temp) {
-				result = 0;
-				break;
-			}
-			result += temp;
-			if (result >= bufsize)
-				break;
-		}
-	}
-	return result;
-}
-#endif /* MAGIC:alias */
-/*[[[end:libc_PReadAll64]]]*/
-
-/*[[[head:libc_GetCurrentDirName,hash:CRC-32=0x8c0d341a]]]*/
-/* >> get_current_dir_name(3)
- * Return an malloc(3)'d string  representing the current working  directory
- * This is usually the same  as `getcwd(NULL, 0)', however standards  caused
- * this function to be badly designed, as iff `$PWD' is defined and correct,
- * it is strdup(3)'d  and returned (correctness  is determined by  comparing
- * `stat($PWD)' against `stat(".")').
- * Due to the mandatory dependency on `getenv(3)', this function can't be
- * made thread-safe, so try not to use this one. */
-INTERN ATTR_SECTION(".text.crt.except.fs.basic_property") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *
-(LIBCCALL libc_GetCurrentDirName)(void) THROWS(...)
-/*[[[body:libc_GetCurrentDirName]]]*/
-{
-	return GetCwd(NULL, 0);
-}
-/*[[[end:libc_GetCurrentDirName]]]*/
-
-/*[[[head:libc_FExecve,hash:CRC-32=0xcb4d0949]]]*/
-/* >> fexecve(2)
- * Replace the calling process with the application image referred
- * to by `execfd'  and execute it's  `main()' method, passing  the
- * given `argv', and setting `environ' to `envp'. */
-INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_IN(2) ATTR_IN(3) void
-(LIBCCALL libc_FExecve)(fd_t fd,
-                        __TARGV,
-                        __TENVP) THROWS(...)
-/*[[[body:libc_FExecve]]]*/
-{
-	sys_Xexecveat(fd,
-	              "",
-	              (char *const *)___argv,
-	              (char *const *)___envp,
-	              AT_EMPTY_PATH);
-	__builtin_unreachable();
-}
-/*[[[end:libc_FExecve]]]*/
 
 /*[[[head:libc_Nice,hash:CRC-32=0x857a694b]]]*/
 INTERN ATTR_SECTION(".text.crt.except.sched.param") int
 (LIBCCALL libc_Nice)(int inc) THROWS(...)
 /*[[[body:libc_Nice]]]*/
 {
-#ifdef __sys_Xnice_defined
+#ifdef SYS_nice
 	return 20 - sys_Xnice(inc);
-#else /* __sys_Xnice_defined */
+#else /* SYS_nice */
 	syscall_slong_t prio;
 	prio = sys_Xgetpriority(PRIO_PROCESS, 0);
 	prio = (20 - prio);
@@ -375,7 +244,7 @@ INTERN ATTR_SECTION(".text.crt.except.sched.param") int
 	sys_Xsetpriority(PRIO_PROCESS, 0, (syscall_ulong_t)(20 - prio));
 	prio = sys_Xgetpriority(PRIO_PROCESS, 0);
 	return 20 - prio;
-#endif /* !__sys_Xnice_defined */
+#endif /* !SYS_nice */
 }
 /*[[[end:libc_Nice]]]*/
 
@@ -473,6 +342,108 @@ INTERN ATTR_SECTION(".text.crt.except.system.configuration") ATTR_OUTS(1, 2) voi
 }
 /*[[[end:libc_GetDomainName]]]*/
 
+/*[[[head:libc_FPathConf,hash:CRC-32=0x4869bf4e]]]*/
+/* >> fpathconf(3)
+ * @param: name: One   of    `_PC_*'    from    <asm/crt/confname.h>
+ * Return a path configuration value associated with `name' for `fd'
+ * return: * : The configuration limit associated with `name' for `fd'
+ * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `fd'
+ * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
+INTERN ATTR_SECTION(".text.crt.except.fs.property") WUNUSED longptr_t
+(LIBCCALL libc_FPathConf)(fd_t fd,
+                          __STDC_INT_AS_UINT_T name) THROWS(...)
+/*[[[body:libc_FPathConf]]]*/
+{
+	return libc_do_FPathConf(fd, name);
+}
+/*[[[end:libc_FPathConf]]]*/
+
+/*[[[head:libc_PathConf,hash:CRC-32=0x3ce51e33]]]*/
+/* >> pathconf(3)
+ * @param: name: One of `_PC_*' from <asm/crt/confname.h>
+ * Return a path configuration value associated with `name' for `path'
+ * return: * : The configuration limit associated with `name' for `path'
+ * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `path'
+ * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
+INTERN ATTR_SECTION(".text.crt.except.fs.property") ATTR_IN(1) longptr_t
+(LIBCCALL libc_PathConf)(char const *path,
+                         __STDC_INT_AS_UINT_T name) THROWS(...)
+/*[[[body:libc_PathConf]]]*/
+{
+	return libc_do_PathConf(path, name, O_RDONLY);
+}
+/*[[[end:libc_PathConf]]]*/
+
+/*[[[head:libc_LPathConf,hash:CRC-32=0xafd0662c]]]*/
+/* >> lpathconf(3)
+ * Same as `pathconf(3)', but don't dereference `path' if it's a symbolic link */
+INTERN ATTR_SECTION(".text.crt.except.fs.property") ATTR_IN(1) longptr_t
+(LIBCCALL libc_LPathConf)(char const *path,
+                          __STDC_INT_AS_UINT_T name) THROWS(...)
+/*[[[body:libc_LPathConf]]]*/
+{
+	return libc_do_PathConf(path, name, O_RDONLY | O_PATH | O_NOFOLLOW);
+}
+/*[[[end:libc_LPathConf]]]*/
+
+/*[[[head:libc_ConfStr,hash:CRC-32=0x7f1f67f6]]]*/
+/* >> confstr(3)
+ * Retrieve a system configuration string specified by `name'
+ * @param: name:   One of `_CS_*' from <asm/crt/confname.h>
+ * @param: buf:    Target buffer
+ * @param: buflen: Available buffer size (including a trailing \0-character)
+ * @return: * :    Required buffer size (including a trailing \0-character)
+ * @return: 1 :    Empty configuration string.
+ * @return: 0 :    [errno=EINVAL] Bad configuration `name'. */
+INTERN ATTR_SECTION(".text.crt.except.system.configuration") ATTR_OUTS(2, 3) size_t
+(LIBCCALL libc_ConfStr)(__STDC_INT_AS_UINT_T name,
+                        char *buf,
+                        size_t buflen) THROWS(...)
+/*[[[body:libc_ConfStr]]]*/
+{
+	longptr_t result;
+	errno_t old_errno = libc_geterrno();
+	(void)libc_seterrno(EOK);
+	result = confstr(name, buf, buflen);
+	if (result == -1 && libc_geterrno() == EINVAL) {
+		(void)libc_seterrno(old_errno);
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_CONFSTR_NAME,
+		      name);
+	}
+	(void)libc_seterrno(old_errno);
+	return result;
+}
+/*[[[end:libc_ConfStr]]]*/
+
+
+/*[[[head:libc_SysConf,hash:CRC-32=0x32346246]]]*/
+/* >> sysconf(2)
+ * @param: name: One of `_SC_*' from <asm/crt/confname.h>
+ * Return   a   system    configuration   value    `name'
+ * return: * : The configuration limit associated with `name' for `path'
+ * return: -1: [errno=<unchanged>] `name'  refers to a maximum or minimum
+ *                                 limit, and that limit is indeterminate
+ * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
+INTERN ATTR_SECTION(".text.crt.except.system.configuration") WUNUSED longptr_t
+(LIBCCALL libc_SysConf)(__STDC_INT_AS_UINT_T name) THROWS(...)
+/*[[[body:libc_SysConf]]]*/
+{
+	longptr_t result;
+	errno_t old_errno = libc_geterrno();
+	(void)libc_seterrno(EOK);
+	result = sysconf(name);
+	if (result == -1 && libc_geterrno() == EINVAL) {
+		(void)libc_seterrno(old_errno);
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_SYSCONF_NAME,
+		      name);
+	}
+	(void)libc_seterrno(old_errno);
+	return result;
+}
+/*[[[end:libc_SysConf]]]*/
+
 /*[[[skip:libc_Execve]]]*/
 /*[[[skip:libc_Pipe]]]*/
 /*[[[skip:libc_SetPGid]]]*/
@@ -527,29 +498,29 @@ INTERN ATTR_SECTION(".text.crt.except.system.configuration") ATTR_OUTS(1, 2) voi
 /*[[[skip:libc_Syscall64]]]*/
 /*[[[skip:libc_FTruncate]]]*/
 /*[[[skip:libc_FSync]]]*/
+/*[[[skip:libc_FChDirAt]]]*/
+/*[[[skip:libc_FSymlinkAt]]]*/
+/*[[[skip:libc_CloseRange]]]*/
 
 
 
-
-
-/*[[[start:exports,hash:CRC-32=0x9ba5928b]]]*/
+/*[[[start:exports,hash:CRC-32=0x5f429b4]]]*/
 DEFINE_PUBLIC_ALIAS(Execv, libc_Execv);
 DEFINE_PUBLIC_ALIAS(Execvp, libc_Execvp);
-DEFINE_PUBLIC_ALIAS(ReadAll, libc_ReadAll);
+DEFINE_PUBLIC_ALIAS(FPathConf, libc_FPathConf);
+DEFINE_PUBLIC_ALIAS(PathConf, libc_PathConf);
 DEFINE_PUBLIC_ALIAS(GetCwd, libc_GetCwd);
-DEFINE_PUBLIC_ALIAS(PRead, libc_PRead);
-DEFINE_PUBLIC_ALIAS(PWrite, libc_PWrite);
-DEFINE_PUBLIC_ALIAS(PReadAll, libc_PReadAll);
-DEFINE_PUBLIC_ALIAS(PReadAll64, libc_PReadAll64);
-DEFINE_PUBLIC_ALIAS(GetCurrentDirName, libc_GetCurrentDirName);
 DEFINE_PUBLIC_ALIAS(FExecve, libc_FExecve);
 DEFINE_PUBLIC_ALIAS(Execvpe, libc_Execvpe);
+DEFINE_PUBLIC_ALIAS(ConfStr, libc_ConfStr);
 DEFINE_PUBLIC_ALIAS(Nice, libc_Nice);
 DEFINE_PUBLIC_ALIAS(SetPGrp, libc_SetPGrp);
 DEFINE_PUBLIC_ALIAS(SetEUid, libc_SetEUid);
 DEFINE_PUBLIC_ALIAS(SetEGid, libc_SetEGid);
 DEFINE_PUBLIC_ALIAS(GetHostName, libc_GetHostName);
 DEFINE_PUBLIC_ALIAS(GetDomainName, libc_GetDomainName);
+DEFINE_PUBLIC_ALIAS(LPathConf, libc_LPathConf);
+DEFINE_PUBLIC_ALIAS(SysConf, libc_SysConf);
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -426,9 +426,12 @@
 	CB(PREFIX.crt.except.fs.modify) \
 	CB(PREFIX.crt.except.fs.utility) \
 	CB(PREFIX.crt.except.net.socket) \
+	CB(PREFIX.crt.except.io.tty) \
 	CB(PREFIX.crt.except.fs.modify_time) \
 	CB(PREFIX.crt.except.system.mman PREFIX.crt.except.system.utility) \
 	CB(PREFIX.crt.except.system.configuration) \
+	CB(PREFIX.crt.except.bsd.user PREFIX.crt.except.bsd) \
+	CB(PREFIX.crt.except.solaris) \
 	CB(PREFIX.crt.dos.application.init) \
 	CB(PREFIX.crt.dos.errno_access) \
 	CB(PREFIX.crt.dos.application.exit) \

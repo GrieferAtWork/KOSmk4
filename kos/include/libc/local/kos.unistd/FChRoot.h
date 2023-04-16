@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67d29759 */
+/* HASH CRC-32:0x42474ebd */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,27 +18,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_Truncate64_defined
-#define __local_Truncate64_defined
+#ifndef __local_FChRoot_defined
+#define __local_FChRoot_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_Truncate
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE_Dup2) && defined(__AT_FDROOT)
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_Truncate32_defined
-#define __local___localdep_Truncate32_defined
-__CREDIRECT_VOID(__ATTR_IN(1),__THROWING,__localdep_Truncate32,(char const *__file, __pos32_t __length),Truncate,(__file,__length))
-#endif /* !__local___localdep_Truncate32_defined */
-__LOCAL_LIBC(Truncate64) __ATTR_IN(1) void
-(__LIBCCALL __LIBC_LOCAL_NAME(Truncate64))(char const *__file, __pos64_t __length) __THROWS(...) {
-	(__NAMESPACE_LOCAL_SYM __localdep_Truncate32)(__file, (__pos32_t)__length);
+#ifndef __local___localdep_Dup2_defined
+#define __local___localdep_Dup2_defined
+__CREDIRECT(,__fd_t,__THROWING,__localdep_Dup2,(__fd_t __oldfd, __fd_t __newfd),Dup2,(__oldfd,__newfd))
+#endif /* !__local___localdep_Dup2_defined */
+__LOCAL_LIBC(FChRoot) void
+(__LIBCCALL __LIBC_LOCAL_NAME(FChRoot))(__fd_t __fd) __THROWS(...) {
+	(void)(__NAMESPACE_LOCAL_SYM __localdep_Dup2)(__fd, __AT_FDROOT);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_Truncate64_defined
-#define __local___localdep_Truncate64_defined
-#define __localdep_Truncate64 __LIBC_LOCAL_NAME(Truncate64)
-#endif /* !__local___localdep_Truncate64_defined */
-#else /* __CRT_HAVE_Truncate */
-#undef __local_Truncate64_defined
-#endif /* !__CRT_HAVE_Truncate */
-#endif /* !__local_Truncate64_defined */
+#ifndef __local___localdep_FChRoot_defined
+#define __local___localdep_FChRoot_defined
+#define __localdep_FChRoot __LIBC_LOCAL_NAME(FChRoot)
+#endif /* !__local___localdep_FChRoot_defined */
+#else /* __CRT_HAVE_Dup2 && __AT_FDROOT */
+#undef __local_FChRoot_defined
+#endif /* !__CRT_HAVE_Dup2 || !__AT_FDROOT */
+#endif /* !__local_FChRoot_defined */

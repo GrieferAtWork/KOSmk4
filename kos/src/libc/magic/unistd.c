@@ -1091,7 +1091,7 @@ $longptr_t pathconf([[in]] char const *path, __STDC_INT_AS_UINT_T name) {
 		return -1;
 	result = fpathconf(fd, name);
 @@pp_if $has_function(close)@@
-	close(fd);
+	(void)close(fd);
 @@pp_endif@@
 	return result;
 }
@@ -1200,7 +1200,8 @@ ssize_t writeall($fd_t fd, [[in(bufsize)]] void const *buf, size_t bufsize) {
 			             (byte_t *)buf + (size_t)result,
 			             bufsize - (size_t)result);
 			if (temp <= 0) {
-				result = temp;
+				if (temp < 0)
+					result = temp;
 				break;
 			}
 			result += temp;
@@ -1660,7 +1661,8 @@ ssize_t pwriteall($fd_t fd, [[in(bufsize)]] void const *buf,
 			              bufsize - (size_t)result,
 			              offset + (size_t)result);
 			if (temp <= 0) {
-				result = temp;
+				if (temp < 0)
+					result = temp;
 				break;
 			}
 			result += temp;
@@ -2214,7 +2216,7 @@ int truncate([[in]] char const *file, __PIO_OFFSET length) {
 		return -1;
 	result = ftruncate(fd, length);
 @@pp_if $has_function(close)@@
-	close(fd);
+	(void)close(fd);
 @@pp_endif@@
 	return result;
 @@pp_endif@@
@@ -2240,7 +2242,7 @@ int truncate64([[in]] char const *file, __PIO_OFFSET64 length) {
 		return -1;
 	result = ftruncate64(fd, length);
 @@pp_if $has_function(close)@@
-	close(fd);
+	(void)close(fd);
 @@pp_endif@@
 	return result;
 @@pp_endif@@
@@ -2298,6 +2300,7 @@ int nice(int inc) {
 %
 %#ifdef __USE_POSIX2
 
+@@>> confstr(3)
 @@Retrieve a system configuration string specified by `name'
 @@@param: name:   One of `_CS_*' from <asm/crt/confname.h>
 @@@param: buf:    Target buffer
@@ -2456,7 +2459,7 @@ $longptr_t gethostid() {
 		uint32_t id32;
 		ssize_t count = readall(fd, &id32, 4);
 @@pp_if $has_function(close)@@
-		close(fd);
+		(void)close(fd);
 @@pp_endif@@
 		if (count == 4)
 			return (longptr_t)(ulongptr_t)id32;
@@ -2761,7 +2764,7 @@ got_fd:
 	id32  = (uint32_t)(ulongptr_t)id;
 	count = writeall(fd, &id32, 4);
 @@pp_if $has_function(close)@@
-	close(fd);
+	(void)close(fd);
 @@pp_endif@@
 	if (count != 4) {
 @@pp_ifdef ENOSPC@@
@@ -3751,7 +3754,7 @@ out:
 	/* Close our file handle to /dev/tty */
 @@pp_if $has_function(close)@@
 	if (default_fds[0] != __STDIN_FILENO)
-		close(default_fds[0]);
+		(void)close(default_fds[0]);
 @@pp_endif@@
 
 	/* Error-only cleanup... */
@@ -3871,7 +3874,7 @@ $longptr_t lpathconf([[in]] char const *path, __STDC_INT_AS_UINT_T name) {
 		return -1;
 	result = fpathconf(fd, name);
 @@pp_if $has_function(close)@@
-	close(fd);
+	(void)close(fd);
 @@pp_endif@@
 	return result;
 }
