@@ -25,13 +25,14 @@ jobs:
         key: ${{ runner.os }}-binutils-i386
 
     - name: Install gcc build dependencies
+      if: steps.cache-binutils-i386-restore.outputs.cache-hit != 'true'
       run: sudo apt-get install libmpc-dev
 
     - name: Build toolchain (i386)
       run: EXTRA_DEEMON_CONFIGURE_ARGS=--without-libffi bash kos/misc/make_toolchain.sh i386-kos
 
     - name: Save binutils (i386)
-      if: (success() || failure()) && steps.cache-binutils-i386-restore.outputs.cache-hit != 'true'
+      if: steps.cache-binutils-i386-restore.outputs.cache-hit != 'true'
       id: cache-binutils-i386-save
       uses: actions/cache/save@v3
       with:
@@ -40,11 +41,7 @@ jobs:
         key: ${{ runner.os }}-binutils-i386
 
     - name: Touch magicgenerator .latest (skip system header re-build)
-      run: touch kos/misc/magicgenerator/.generate_headers.dee.latest && \
-           touch kos/misc/magicgenerator/.generate_syscalls.dee.arm.latest && \
-           touch kos/misc/magicgenerator/.generate_syscalls.dee.i386.latest && \
-           touch kos/misc/magicgenerator/.generate_syscalls.dee.x86_64.latest
-           touch kos/misc/magicgenerator/.generate_syscalls.dee.latest
+      run: bash -c "> kos/misc/magicgenerator/.generate_headers.dee.latest && > kos/misc/magicgenerator/.generate_syscalls.dee.arm.latest && > kos/misc/magicgenerator/.generate_syscalls.dee.i386.latest && > kos/misc/magicgenerator/.generate_syscalls.dee.x86_64.latest && > kos/misc/magicgenerator/.generate_syscalls.dee.latest"
 
     - name: build (i386)
       run: ./binutils/deemon/deemon magic.dee --build-only --target=i386 --config=OD
