@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix a bug with mappings in constant expression `contains` operations"
-DEEMON_VERSION="6f1e97bbc5487d121d2507f5f8be3736e5f2976f"
+#     v -- "Fix a problem with `time.milliseconds()` and `time.seconds()`"
+DEEMON_VERSION="1bc9efdc65ece9c5ae4a36df675f229ee1223771"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
@@ -398,7 +398,7 @@ else
 	fi
 	cmd cd "$KOS_BINUTILS/deemon"
 	echo "Configuring deemon..."
-	cmd bash "./configure"
+	cmd bash "./configure" $EXTRA_DEEMON_CONFIGURE_ARGS
 	echo "Making deemon..."
 	cmd make -j "$MAKE_PARALLEL_COUNT"
 	cmd cd "$KOS_BINUTILS"
