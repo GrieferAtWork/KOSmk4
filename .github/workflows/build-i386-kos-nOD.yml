@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: i386-kos (DEBUG)
 
 on:
   push:
@@ -16,32 +16,42 @@ jobs:
       with:
         submodules: 'true'
 
-    - name: Restore binutils (i386)
+    - name: Restore binutils
       id: cache-binutils-i386-restore
       uses: actions/cache/restore@v3
       with:
         path: |
           binutils
+          kos/include/i386-kos/c++
         key: ${{ runner.os }}-binutils-i386
 
     - name: Install gcc build dependencies
       if: steps.cache-binutils-i386-restore.outputs.cache-hit != 'true'
       run: sudo apt-get install libmpc-dev
 
-    - name: Build toolchain (i386)
+    - name: Build toolchain
       run: EXTRA_DEEMON_CONFIGURE_ARGS=--without-libffi bash kos/misc/make_toolchain.sh i386-kos
 
-    - name: Save binutils (i386)
+    - name: Save binutils
       if: steps.cache-binutils-i386-restore.outputs.cache-hit != 'true'
       id: cache-binutils-i386-save
       uses: actions/cache/save@v3
       with:
         path: |
           binutils
+          kos/include/i386-kos/c++
         key: ${{ runner.os }}-binutils-i386
 
     - name: Touch magicgenerator .latest (skip system header re-build)
       run: bash -c "> kos/misc/magicgenerator/.generate_headers.dee.latest && > kos/misc/magicgenerator/.generate_syscalls.dee.arm.latest && > kos/misc/magicgenerator/.generate_syscalls.dee.i386.latest && > kos/misc/magicgenerator/.generate_syscalls.dee.x86_64.latest && > kos/misc/magicgenerator/.generate_syscalls.dee.latest"
 
-    - name: build (i386)
-      run: ./binutils/deemon/deemon magic.dee --build-only --target=i386 --config=OD
+    - name: build # FIXME: Running magic once should be enough
+      run: ./binutils/deemon/deemon magic.dee --build-only --target=i386 --config=OD && ./binutils/deemon/deemon magic.dee --build-only --target=i386 --config=OD
+
+    - name: Save disk image as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ runner.os }}-${{ github.sha }}-disk
+        if-no-files-found: ignore
+        path: |
+          bin/i386-kos-nOD/disk.img
