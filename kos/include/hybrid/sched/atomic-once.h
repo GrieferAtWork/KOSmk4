@@ -37,15 +37,15 @@ __DECL_BEGIN
 
 #ifdef __CC__
 struct atomic_once {
-	__UINTPTR_TYPE__   ao_state;
+	unsigned int ao_state;
 };
-#define ATOMIC_ONCE_INIT              { __ATOMIC_ONCE_PENDING }
+#define ATOMIC_ONCE_INIT        { __ATOMIC_ONCE_PENDING }
 #if __ATOMIC_ONCE_PENDING == 0
-#define atomic_once_cinit(self)       (void)__hybrid_assert((self)->ao_state == __ATOMIC_ONCE_PENDING)
+#define atomic_once_cinit(self) (void)__hybrid_assert((self)->ao_state == __ATOMIC_ONCE_PENDING)
 #else /* __ATOMIC_ONCE_PENDING == 0 */
-#define atomic_once_cinit(self)       (void)((self)->ao_state = __ATOMIC_ONCE_PENDING)
+#define atomic_once_cinit(self) (void)((self)->ao_state = __ATOMIC_ONCE_PENDING)
 #endif /* !__ATOMIC_ONCE_PENDING == 0 */
-#define atomic_once_init(self)        (void)((self)->ao_state = __ATOMIC_ONCE_PENDING)
+#define atomic_once_init(self)  (void)((self)->ao_state = __ATOMIC_ONCE_PENDING)
 
 #define ATOMIC_ONCE_RUN(self, ...)     \
 	do {                               \
@@ -59,12 +59,14 @@ struct atomic_once {
 /* Enter the atomic-once block
  * @return: true:  The caller is now responsible for executing the associated function.
  * @return: false: The associated function has already been executed. */
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (atomic_once_enter)(struct atomic_once *__restrict __self);
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+(atomic_once_enter)(struct atomic_once *__restrict __self);
 
 #if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
 /* Enter the atomic-once block
  * @return: * : One of `ATOMIC_ONCE_ENTER_NX_*'. */
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned int __NOTHROW(atomic_once_enter_nx)(struct atomic_once *__restrict __self);
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned int
+__NOTHROW(atomic_once_enter_nx)(struct atomic_once *__restrict __self);
 #define ATOMIC_ONCE_ENTER_NX_MUSTRUN    __ATOMIC_ONCE_PENDING /* Atomic-once successfully entered. */
 #define ATOMIC_ONCE_ENTER_NX_WOULDBLOCK __ATOMIC_ONCE_RUNNING /* The operation would have blocked. */
 #define ATOMIC_ONCE_ENTER_NX_ALREADY    __ATOMIC_ONCE_RUNDONE /* Atomic-once was already executed. */
@@ -72,7 +74,8 @@ __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned int __NOTHROW(atomic_once_en
 
 /* Try to enter the atomic-once block
  * @return: * : One of `ATOMIC_ONCE_TRYENTER_*' */
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned int __NOTHROW(atomic_once_tryenter)(struct atomic_once *__restrict __self);
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned int
+__NOTHROW(atomic_once_tryenter)(struct atomic_once *__restrict __self);
 #define ATOMIC_ONCE_TRYENTER_MUSTRUN    __ATOMIC_ONCE_PENDING /* Atomic-once successfully entered. */
 #define ATOMIC_ONCE_TRYENTER_INPROGRESS __ATOMIC_ONCE_RUNNING /* Atomic-once is currently being run by another thread (the caller should yield() and try again later). */
 #define ATOMIC_ONCE_TRYENTER_ALREADY    __ATOMIC_ONCE_RUNDONE /* Atomic-once was already executed. */
@@ -89,8 +92,9 @@ __LOCAL __ATTR_NONNULL((1)) void __NOTHROW(atomic_once_abort)(struct atomic_once
 /* Enter the atomic-once block
  * @return: true:  The caller is now responsible for executing the associated function.
  * @return: false: The associated function has already been executed. */
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (atomic_once_enter)(struct atomic_once *__restrict __self) {
-	__UINTPTR_TYPE__ __state;
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+(atomic_once_enter)(struct atomic_once *__restrict __self) {
+	unsigned int __state;
 	for (;;) {
 		__state = __hybrid_atomic_load(&__self->ao_state, __ATOMIC_ACQUIRE);
 		if (__state == __ATOMIC_ONCE_RUNDONE)
@@ -117,7 +121,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (atomic_once_enter)(struct ato
  * @return: * : One of `ATOMIC_ONCE_ENTER_NX_*'. */
 __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned int
 __NOTHROW(atomic_once_enter_nx)(struct atomic_once *__restrict __self) {
-	__UINTPTR_TYPE__ __state;
+	unsigned int __state;
 	for (;;) {
 		__state = __hybrid_atomic_load(&__self->ao_state, __ATOMIC_ACQUIRE);
 		if (__state == __ATOMIC_ONCE_RUNDONE)
@@ -145,7 +149,7 @@ __NOTHROW(atomic_once_enter_nx)(struct atomic_once *__restrict __self) {
  * @return: * : One of `ATOMIC_ONCE_TRYENTER_*' */
 __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned int
 __NOTHROW(atomic_once_tryenter)(struct atomic_once *__restrict __self) {
-	__UINTPTR_TYPE__ __state;
+	unsigned int __state;
 	for (;;) {
 		__state = __hybrid_atomic_load(&__self->ao_state, __ATOMIC_ACQUIRE);
 		if (__state == __ATOMIC_ONCE_RUNDONE)
@@ -171,7 +175,7 @@ __NOTHROW(atomic_once_tryenter)(struct atomic_once *__restrict __self) {
 __LOCAL __ATTR_NONNULL((1)) void
 __NOTHROW(atomic_once_success)(struct atomic_once *__restrict __self) {
 #if !defined(NDEBUG) && !defined(NDEBUG_SYNC)
-	__UINTPTR_TYPE__ __state;
+	unsigned int __state;
 	do {
 		__state = __self->ao_state;
 		__hybrid_assertf(__state == __ATOMIC_ONCE_RUNNING,
@@ -190,7 +194,7 @@ __NOTHROW(atomic_once_success)(struct atomic_once *__restrict __self) {
 __LOCAL __ATTR_NONNULL((1)) void
 __NOTHROW(atomic_once_abort)(struct atomic_once *__restrict __self) {
 #if !defined(NDEBUG) && !defined(NDEBUG_SYNC)
-	__UINTPTR_TYPE__ __state;
+	unsigned int __state;
 	do {
 		__state = __self->ao_state;
 		__hybrid_assertf(__state == __ATOMIC_ONCE_RUNNING,

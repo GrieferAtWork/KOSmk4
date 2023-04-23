@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Add workflow for windows build"
-DEEMON_VERSION="6f3112510ded0f8984e4d6b160c19f8b028cd4dc"
+#     v -- "Fix sporadic crashes when comparing bytes on some hosts"
+DEEMON_VERSION="25d11aa4de8f848ec60d832f82b151bd7880cc48"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
