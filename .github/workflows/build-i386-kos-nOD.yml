@@ -46,7 +46,7 @@ jobs:
       run: bash -c "> kos/misc/magicgenerator/.generate_headers.dee.latest && > kos/misc/magicgenerator/.generate_syscalls.dee.arm.latest && > kos/misc/magicgenerator/.generate_syscalls.dee.i386.latest && > kos/misc/magicgenerator/.generate_syscalls.dee.x86_64.latest && > kos/misc/magicgenerator/.generate_syscalls.dee.latest"
 
     - name: build # FIXME: Running magic once should be enough
-      run: ./binutils/deemon/deemon magic.dee --build-only --target=i386 --config=OD && ./binutils/deemon/deemon magic.dee --build-only --target=i386 --config=OD
+      run: ./binutils/deemon/deemon magic.dee --build-only --target=i386 --config=nOD && ./binutils/deemon/deemon magic.dee --build-only --target=i386 --config=nOD
 
     - name: Save disk image as artifact
       uses: actions/upload-artifact@v3
