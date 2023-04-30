@@ -48,10 +48,13 @@ jobs:
     - name: build # FIXME: Running magic once should be enough
       run: ./binutils/deemon/deemon magic.dee --build-only --target=i386 --config=nOD && ./binutils/deemon/deemon magic.dee --build-only --target=i386 --config=nOD
 
+    - name: Compress disk image
+      run: bash -c "cd bin/i386-kos-nOD && tar zcvf ../../i386-kos-nOD-disk.tar.gz disk.img"
+
     - name: Save disk image as artifact
       uses: actions/upload-artifact@v3
       with:
         name: ${{ runner.os }}-${{ github.sha }}-disk
         if-no-files-found: ignore
         path: |
-          bin/i386-kos-nOD/disk.img
+          i386-kos-nOD-disk.tar.gz
