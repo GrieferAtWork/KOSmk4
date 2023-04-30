@@ -870,9 +870,26 @@ INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_sigpending)(sigset_t *__restrict set)
 /*[[[body:libc_sigpending]]]*/
 {
-	errno_t result;
-	result = sys_rt_sigpending(set, sizeof(sigset_t));
-	return libc_seterrno_syserr(result);
+#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
+	struct pthread *me = &current;
+	if unlikely(me->pt_pmask.lpm_pmask.pm_sigmask == NULL) {
+		me->pt_pmask.lpm_pmask.pm_sigmask = &me->pt_pmask.lpm_masks[0];
+		if unlikely(sys_set_userprocmask_address(&me->pt_pmask.lpm_pmask) != -EOK)
+			goto do_legacy_sigpending;
+	}
+
+	/* Can simply copy the userprocmask's set of pending signals
+	 * back  to the caller  (since that is  the effective set of
+	 * signals that *may* be pending right now) */
+	memcpy(set, &me->pt_pmask.lpm_pmask.pm_pending, sizeof(sigset_t));
+	return 0;
+do_legacy_sigpending:
+#endif /* __LIBC_CONFIG_HAVE_USERPROCMASK */
+	{
+		errno_t result;
+		result = sys_rt_sigpending(set, sizeof(sigset_t));
+		return libc_seterrno_syserr(result);
+	}
 }
 /*[[[end:libc_sigpending]]]*/
 

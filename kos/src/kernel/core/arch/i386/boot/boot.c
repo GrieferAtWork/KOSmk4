@@ -891,6 +891,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *     near its start)
 	 */
 
+	/* TODO: Turn on `-mtls-direct-seg-refs' by default (just like glibc,
+	 *       directly segment offsets are possible with KOS's libc/libdl) */
+
+	/* TODO: Look into what `-mtls-dialect=gnu2' does and maybe turn it on */
+
 	return state;
 }
 

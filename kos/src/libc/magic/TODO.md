@@ -161,6 +161,7 @@
 - `<bits/types/res_state.h>`    (Glibc)
 - `<bits/types/struct_statx.h>` (Glibc)
 - `<bits/types/struct_statx_timestamp.h>` (Glibc)
+- `<bm.h>`                      (NetBSD)
 - `<bsd/netinet/ip_icmp.h>`     (libbsd)
 - `<bsd/md5.h>`                 (libbsd)
 - `<bsd/sys/tree.h>`            (libbsd)
