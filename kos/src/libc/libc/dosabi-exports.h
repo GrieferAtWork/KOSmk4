@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9aff292 */
+/* HASH CRC-32:0x2e94c39c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1999,6 +1999,7 @@ DEFINE_PUBLIC_ALIAS(DOS$sem_timedwait, libd_sem_timedwait);
 DEFINE_PUBLIC_ALIAS(DOS$sem_timedwait64, libd_sem_timedwait64);
 DEFINE_PUBLIC_ALIAS(DOS$sem_trywait, libd_sem_trywait);
 DEFINE_PUBLIC_ALIAS(DOS$sem_post, libd_sem_post);
+DEFINE_PUBLIC_ALIAS(DOS$sem_post_multiple, libd_sem_post_multiple);
 DEFINE_PUBLIC_ALIAS(DOS$sem_getvalue, libd_sem_getvalue);
 
 /* sgtty */

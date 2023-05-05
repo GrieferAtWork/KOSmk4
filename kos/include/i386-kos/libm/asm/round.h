@@ -32,7 +32,7 @@
 
 #include <libm/fdlibm.h>
 
-#ifdef __CC__
+#if defined (__CC__) && 0
 __DECL_BEGIN
 
 #ifdef __IEEE754_FLOAT_TYPE__

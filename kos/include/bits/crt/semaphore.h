@@ -57,7 +57,9 @@ typedef struct {
 	__byte_t   __s_cpad[8 - __SIZEOF_INT__];
 #endif /* __SIZEOF_INT__ < 8 && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 
-	/* Futex for waiting threads (non-zero if threads are waiting) */
+	/* Number of potentially waiting threads
+	 * - When a thread starts waiting, it increments this.
+	 * - When someone posts to the sempahore, they decrement this. */
 #if __SIZEOF_POINTER__ < 8 && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 	__byte_t   __s_wpad[8 - __SIZEOF_POINTER__];
 #endif /* __SIZEOF_POINTER__ < 8 && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */

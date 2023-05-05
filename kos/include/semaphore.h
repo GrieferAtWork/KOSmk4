@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a598e5c */
+/* HASH CRC-32:0x5df08b05 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -200,6 +200,24 @@ __CDECLARE_OPT(__ATTR_INOUT(1),int,__NOTHROW_NCX,sem_trywait,(sem_t *__self),(__
  * @return: 0:  Success
  * @return: -1: [errno=EOVERFLOW] The maximum number of tickets have already been posted. */
 __CDECLARE_OPT(__ATTR_INOUT(1),int,__NOTHROW_NCX,sem_post,(sem_t *__self),(__self))
+#ifdef __CRT_HAVE_sem_post_multiple
+/* >> sem_post_multiple(3)
+ * Post up to `count' tickets to the given semaphore `self', waking up to that
+ * that  may other thread that may be  waiting for tickets to become available
+ * before returning.
+ * @return: 0:  Success
+ * @return: -1: [errno=EOVERFLOW] The maximum number of tickets have already been posted. */
+__CDECLARE(__ATTR_INOUT(1),int,__NOTHROW_NCX,sem_post_multiple,(sem_t *__self, __STDC_INT_AS_UINT_T __count),(__self,__count))
+#elif defined(__CRT_HAVE_sem_post)
+#include <libc/local/semaphore/sem_post_multiple.h>
+/* >> sem_post_multiple(3)
+ * Post up to `count' tickets to the given semaphore `self', waking up to that
+ * that  may other thread that may be  waiting for tickets to become available
+ * before returning.
+ * @return: 0:  Success
+ * @return: -1: [errno=EOVERFLOW] The maximum number of tickets have already been posted. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(sem_post_multiple, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) int __NOTHROW_NCX(__LIBCCALL sem_post_multiple)(sem_t *__self, __STDC_INT_AS_UINT_T __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sem_post_multiple))(__self, __count); })
+#endif /* ... */
 /* >> sem_getvalue(3)
  * Capture a snapshot of how may tickets are available storing that number in `*sval'
  * @return: 0: Success */

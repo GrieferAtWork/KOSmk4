@@ -4627,6 +4627,7 @@
 #define __CRT_HAVE_sem_init
 #define __CRT_HAVE_sem_open
 #define __CRT_HAVE_sem_post
+#define __CRT_HAVE_sem_post_multiple
 #define __CRT_HAVE_sem_timedwait
 #define __CRT_HAVE_sem_timedwait64
 #define __CRT_HAVE_sem_trywait

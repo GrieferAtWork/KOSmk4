@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83cef162 */
+/* HASH CRC-32:0xa8e905ef */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2069,6 +2069,7 @@ DFUN(".text.crt.dos.sched.semaphore", libd_sem_timedwait, libc_sem_timedwait, TD
 DFUN(".text.crt.dos.sched.semaphore", libd_sem_timedwait64, libc_sem_timedwait64, TD, 2, TP, TP)
 DFUN(".text.crt.dos.sched.semaphore", libd_sem_trywait, libc_sem_trywait, TD, 1, TP)
 DFUN(".text.crt.dos.sched.semaphore", libd_sem_post, libc_sem_post, TD, 1, TP)
+DFUN(".text.crt.dos.sched.semaphore", libd_sem_post_multiple, libc_sem_post_multiple, TD, 2, TP, TD)
 DFUN(".text.crt.dos.sched.semaphore", libd_sem_getvalue, libc_sem_getvalue, TD, 2, TP, TP)
 
 /* sgtty */

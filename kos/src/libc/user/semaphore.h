@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2921a776 */
+/* HASH CRC-32:0xfeb0c82d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -118,6 +118,13 @@ INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc_sem_trywait)(sem_t *self);
  * @return: 0:  Success
  * @return: -1: [errno=EOVERFLOW] The maximum number of tickets have already been posted. */
 INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc_sem_post)(sem_t *self);
+/* >> sem_post_multiple(3)
+ * Post up to `count' tickets to the given semaphore `self', waking up to that
+ * that  may other thread that may be  waiting for tickets to become available
+ * before returning.
+ * @return: 0:  Success
+ * @return: -1: [errno=EOVERFLOW] The maximum number of tickets have already been posted. */
+INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc_sem_post_multiple)(sem_t *self, __STDC_INT_AS_UINT_T count);
 /* >> sem_getvalue(3)
  * Capture a snapshot of how may tickets are available storing that number in `*sval'
  * @return: 0: Success */

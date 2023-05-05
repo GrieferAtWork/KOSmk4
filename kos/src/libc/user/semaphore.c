@@ -24,6 +24,8 @@
 #include "../api.h"
 /**/
 
+#include <hybrid/overflow.h>
+
 #include <kos/futex.h>
 #include <kos/futexexpr.h>
 #include <kos/syscalls.h>
@@ -366,22 +368,6 @@ err:
 /*[[[end:libc_sem_unlink]]]*/
 
 
-/* Futex wait expression: wait while `self->s_count == 0' */
-PRIVATE ATTR_SECTION(".rodata.crt.sched.semaphore")
-struct lfutexexpr const sem_waitexpr[] = {
-#if SEM_COUNT_SIZE >= __SIZEOF_POINTER__
-	LFUTEXEXPR_INIT(offsetof(sem_t, s_count), LFUTEX_WAIT_WHILE, 0, 0),
-#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	LFUTEXEXPR_INIT(offsetof(sem_t, s_count), LFUTEX_WAIT_WHILE_BITMASK, SEM_COUNT_MASK, 0),
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	LFUTEXEXPR_INIT(offsetof(sem_t, s_count) + __SIZEOF_POINTER__ - SEM_COUNT_SIZE,
-	                LFUTEX_WAIT_WHILE_BITMASK, SEM_COUNT_MASK, 0),
-#else /* ... */
-#error "Unsupported configuration"
-#endif /* !... */
-	LFUTEXEXPR_INIT(0, LFUTEX_EXPREND, 0, 0)
-};
-
 /*[[[head:libc_sem_wait,hash:CRC-32=0xdcb374bb]]]*/
 /* >> sem_wait(3)
  * Wait for a ticket to become  available to the given semaphore  `self'
@@ -404,10 +390,10 @@ NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *self)
 		}
 
 		/* Set the is-waiting bit the first time around. */
-		atomic_store(&self->s_wait, 1);
+		atomic_inc(&self->s_wait);
 
 		/* Wait until `self->s_count' becomes non-zero. */
-		error = lfutexexpr(&self->s_wait, self, sem_waitexpr, NULL, 0);
+		error = lfutex64((lfutex_t *)&self->s_count, LFUTEX_WAIT_WHILE, 0, NULL);
 		if (error < 0)
 			return error;
 	}
@@ -439,11 +425,10 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict self,
 		}
 
 		/* Set the is-waiting bit the first time around. */
-		atomic_store(&self->s_wait, 1);
+		atomic_inc(&self->s_wait);
 
 		/* Wait until `self->s_count' becomes non-zero. */
-		error = lfutexexpr(&self->s_wait, self, sem_waitexpr, abstime,
-		                   LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE);
+		error = lfutex((lfutex_t *)&self->s_count, LFUTEX_WAIT_WHILE, 0, abstime);
 		if (error < 0)
 			return error;
 	}
@@ -478,11 +463,10 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait64)(sem_t *__restrict self,
 		}
 
 		/* Set the is-waiting bit the first time around. */
-		atomic_store(&self->s_wait, 1);
+		atomic_inc(&self->s_wait);
 
 		/* Wait until `self->s_count' becomes non-zero. */
-		error = lfutexexpr64(&self->s_wait, self, sem_waitexpr, abstime,
-		                     LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE);
+		error = lfutex64((lfutex_t *)&self->s_count, LFUTEX_WAIT_WHILE, 0, abstime);
 		if (error < 0)
 			return error;
 	}
@@ -516,6 +500,40 @@ NOTHROW_NCX(LIBCCALL libc_sem_trywait)(sem_t *self)
 }
 /*[[[end:libc_sem_trywait]]]*/
 
+PRIVATE ATTR_SECTION(".text.crt.sched.semaphore") ATTR_INOUT(1) void
+NOTHROW_NCX(LIBCCALL sem_wakeall)(sem_t *self) {
+	atomic_write(&self->s_wait, 0);
+	(void)sys_lfutex((lfutex_t *)&self->s_count, LFUTEX_WAKEMASK, (size_t)-1, NULL, 0);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.sched.semaphore") ATTR_INOUT(1) void
+NOTHROW_NCX(LIBCCALL sem_wakeone)(sem_t *self) {
+	uintptr_t waiters;
+again_check_waiters:
+	waiters = atomic_read(&self->s_wait);
+	if (waiters != 0) {
+		if (!atomic_cmpxch_weak(&self->s_wait, waiters, waiters - 1))
+			goto again_check_waiters;
+		if (sys_lfutex((lfutex_t *)&self->s_count, LFUTEX_WAKEMASK, 1, NULL, 0) == 0)
+			sem_wakeall(self);
+	}
+}
+
+PRIVATE ATTR_SECTION(".text.crt.sched.semaphore") ATTR_INOUT(1) void
+NOTHROW_NCX(LIBCCALL sem_wakemany)(sem_t *self, uintptr_t count) {
+	uintptr_t waiters, new_waiters;
+again_check_waiters:
+	waiters = atomic_read(&self->s_wait);
+	if (waiters != 0) {
+		if (OVERFLOW_USUB(waiters, count, &new_waiters))
+			new_waiters = 0;
+		if (!atomic_cmpxch_weak(&self->s_wait, waiters, new_waiters))
+			goto again_check_waiters;
+		if ((size_t)sys_lfutex((lfutex_t *)&self->s_count, LFUTEX_WAKEMASK, count, NULL, 0) < count)
+			sem_wakeall(self);
+	}
+}
+
 /*[[[head:libc_sem_post,hash:CRC-32=0xbe1e7ff6]]]*/
 /* >> sem_post(3)
  * Post a ticket to the given semaphore `self', waking up to 1 other thread
@@ -532,12 +550,38 @@ NOTHROW_NCX(LIBCCALL libc_sem_post)(sem_t *self)
 		if unlikely(count >= SEM_VALUE_MAX)
 			return libc_seterrno(EOVERFLOW);
 	} while (!atomic_cmpxch_weak(&self->s_count, count, count + 1));
+
 	/* If there are waiting threads, wake one of them. */
-	if (atomic_read(&self->s_wait) != 0)
-		sys_lfutex(&self->s_wait, LFUTEX_WAKEMASK, 1, NULL, 0);
+	sem_wakeone(self);
 	return 0;
 }
 /*[[[end:libc_sem_post]]]*/
+
+/*[[[head:libc_sem_post_multiple,hash:CRC-32=0xd68e9015]]]*/
+/* >> sem_post_multiple(3)
+ * Post up to `count' tickets to the given semaphore `self', waking up to that
+ * that  may other thread that may be  waiting for tickets to become available
+ * before returning.
+ * @return: 0:  Success
+ * @return: -1: [errno=EOVERFLOW] The maximum number of tickets have already been posted. */
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_INOUT(1) int
+NOTHROW_NCX(LIBCCALL libc_sem_post_multiple)(sem_t *self,
+                                             __STDC_INT_AS_UINT_T count)
+/*[[[body:libc_sem_post_multiple]]]*/
+{
+	sem_count_t old_count, new_count;
+	do {
+		old_count = atomic_read(&self->s_count);
+		if unlikely(OVERFLOW_UADD(old_count, count, &new_count) ||
+		            new_count > SEM_VALUE_MAX)
+			return libc_seterrno(EOVERFLOW);
+	} while (!atomic_cmpxch_weak(&self->s_count, old_count, new_count));
+
+	/* If there are waiting threads, wake up to `count' of them. */
+	sem_wakemany(self, (uintptr_t)count);
+	return 0;
+}
+/*[[[end:libc_sem_post_multiple]]]*/
 
 /*[[[head:libc_sem_getvalue,hash:CRC-32=0x7d07537c]]]*/
 /* >> sem_getvalue(3)
@@ -554,7 +598,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_getvalue)(sem_t *__restrict self,
 /*[[[end:libc_sem_getvalue]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0x83453b4]]]*/
+/*[[[start:exports,hash:CRC-32=0xcd3e8ab1]]]*/
 DEFINE_PUBLIC_ALIAS(sem_init, libc_sem_init);
 DEFINE_PUBLIC_ALIAS(sem_destroy, libc_sem_destroy);
 DEFINE_PUBLIC_ALIAS(sem_open, libc_sem_open);
@@ -565,6 +609,7 @@ DEFINE_PUBLIC_ALIAS(sem_timedwait, libc_sem_timedwait);
 DEFINE_PUBLIC_ALIAS(sem_timedwait64, libc_sem_timedwait64);
 DEFINE_PUBLIC_ALIAS(sem_trywait, libc_sem_trywait);
 DEFINE_PUBLIC_ALIAS(sem_post, libc_sem_post);
+DEFINE_PUBLIC_ALIAS(sem_post_multiple, libc_sem_post_multiple);
 DEFINE_PUBLIC_ALIAS(sem_getvalue, libc_sem_getvalue);
 /*[[[end:exports]]]*/
 

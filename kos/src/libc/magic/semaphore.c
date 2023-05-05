@@ -208,6 +208,24 @@ int sem_trywait([[inout]] sem_t *self);
 [[decl_include("<bits/crt/semaphore.h>")]]
 int sem_post([[inout]] sem_t *self);
 
+@@>> sem_post_multiple(3)
+@@Post up to `count' tickets to the given semaphore `self', waking up to that
+@@that  may other thread that may be  waiting for tickets to become available
+@@before returning.
+@@@return: 0:  Success
+@@@return: -1: [errno=EOVERFLOW] The maximum number of tickets have already been posted.
+[[decl_include("<bits/crt/semaphore.h>", "<features.h>")]]
+[[userimpl, requires_function(sem_post)]]
+int sem_post_multiple([[inout]] sem_t *self, __STDC_INT_AS_UINT_T count) {
+	int result = 0;
+	for (; count > 0; --count) {
+		result = sem_post(self);
+		if unlikely(result != 0)
+			break;
+	}
+	return result;
+}
+
 @@>> sem_getvalue(3)
 @@Capture a snapshot of how may tickets are available storing that number in `*sval'
 @@@return: 0: Success
