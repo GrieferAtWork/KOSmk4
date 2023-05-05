@@ -61,7 +61,7 @@ function sub(n: string) {
 	print("	__XBLOCK({ __UINT", n, "_TYPE__ __hacx", n, "_ov = (oldval); __XRETURN __hybrid_atomic_cmpxch_val", n, "(p, __hacx", n, "_ov, newval, succ, fail) == __hacx", n, "_ov; })");
 	print("#else /" "* __NO_XBLOCK *" "/");
 	print("#define __hybrid_atomic_cmpxch", n, " __hybrid_atomic_cmpxch", n);
-	print("__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__hybrid_atomic_cmpxch", n, ")(__UINT", n, "_TYPE__ *__p, __UINT", n, "_TYPE__ __oldval, __UINT", n, "_TYPE__ __newval, int __succ, int __fail) {");
+	print("__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW_NCX(__hybrid_atomic_cmpxch", n, ")(__UINT", n, "_TYPE__ *__p, __UINT", n, "_TYPE__ __oldval, __UINT", n, "_TYPE__ __newval, int __succ, int __fail) {");
 	print("	(void)__succ, (void)__fail;");
 	print("	return __hybrid_atomic_cmpxch_val", n, "(__p, __oldval, __newval, __succ, __fail) == __oldval;");
 	print("}");
@@ -113,7 +113,7 @@ function sub(n: string) {
 	print("	           __XRETURN __hal", n, "_res; })");
 	print("#else /" "* __NO_XBLOCK *" "/");
 	print("#define __hybrid_atomic_load", n, " __hybrid_atomic_load", n);
-	print("__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT", n, "_TYPE__ (__hybrid_atomic_load", n, ")(__UINT", n, "_TYPE__ const *__p, int __order) {");
+	print("__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT", n, "_TYPE__ __NOTHROW_NCX(__hybrid_atomic_load", n, ")(__UINT", n, "_TYPE__ const *__p, int __order) {");
 	print("	__UINT", n, "_TYPE__ __res;");
 	print("	(void)__order;");
 	print("	do { __res = *__p; __COMPILER_READ_BARRIER();");
@@ -137,7 +137,7 @@ function sub(n: string) {
 	print("	           __XRETURN __hacxv", n, "_res; })");
 	print("#else /" "* __NO_XBLOCK *" "/");
 	print("#define __hybrid_atomic_cmpxch_val", n, " __hybrid_atomic_cmpxch_val", n);
-	print("__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT", n, "_TYPE__ (__hybrid_atomic_cmpxch_val", n, ")(__UINT", n, "_TYPE__ *__p, __UINT", n, "_TYPE__ __oldval, __UINT", n, "_TYPE__ __newval, int __succ, int __fail) {");
+	print("__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT", n, "_TYPE__ __NOTHROW_NCX(__hybrid_atomic_cmpxch_val", n, ")(__UINT", n, "_TYPE__ *__p, __UINT", n, "_TYPE__ __oldval, __UINT", n, "_TYPE__ __newval, int __succ, int __fail) {");
 	print("	__UINT", n, "_TYPE__ __res;");
 	print("	(void)__succ, (void)__fail;");
 	print("	do if ((__res = __hybrid_atomic_load", n, "(__p, __ATOMIC_ACQUIRE)) != __oldval) break;");
@@ -154,7 +154,7 @@ function sub(n: string) {
 	print("#define __hybrid_atomic_cmpxch", n, "(p, oldval, newval, succ, fail) \\");
 	print("	__XBLOCK({ __UINT", n, "_TYPE__ __hacx", n, "_ov = (oldval); __XRETURN __hybrid_atomic_cmpxch_val", n, "(p, __hacx", n, "_ov, newval, succ, fail) == __hacx", n, "_ov; })");
 	print("#else /" "* __NO_XBLOCK *" "/");
-	print("__LOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __BOOL (__hybrid_atomic_cmpxch", n, ")(__UINT", n, "_TYPE__ *__p, __UINT", n, "_TYPE__ __oldval, __UINT", n, "_TYPE__ __newval, int __succ, int __fail) {");
+	print("__LOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __BOOL __NOTHROW_NCX(__hybrid_atomic_cmpxch", n, ")(__UINT", n, "_TYPE__ *__p, __UINT", n, "_TYPE__ __oldval, __UINT", n, "_TYPE__ __newval, int __succ, int __fail) {");
 	print("	(void)__succ, (void)__fail;");
 	print("	return __hybrid_atomic_cmpxch_val", n, "(__p, __oldval, __newval, __succ, __fail) == __oldval;");
 	print("}");
@@ -179,7 +179,7 @@ function sub(n: string) {
 	print("	           __XRETURN __hal", n, "_res; })");
 	print("#else /" "* __NO_XBLOCK *" "/");
 	print("#define __hybrid_atomic_xch", n, " __hybrid_atomic_xch", n);
-	print("__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT", n, "_TYPE__ (__hybrid_atomic_xch", n, ")(__UINT", n, "_TYPE__ *__p, __UINT", n, "_TYPE__ __val, int __order) {");
+	print("__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT", n, "_TYPE__ __NOTHROW_NCX(__hybrid_atomic_xch", n, ")(__UINT", n, "_TYPE__ *__p, __UINT", n, "_TYPE__ __val, int __order) {");
 	print("	__UINT", n, "_TYPE__ __res;");
 	print("	(void)__order;");
 	print("	do __res = __hybrid_atomic_load(__p, __ATOMIC_ACQUIRE);");
@@ -230,7 +230,7 @@ function sub(n: string) {
 			print("	__XBLOCK({ __UINT", n, "_TYPE__ __hafx", n, "_val = (val); __XRETURN __hybrid_atomic_", op, "fetch", n, "(p, __hafx", n, "_val, order) ", revop, " __hafx", n, "_val; })");
 			print("#else /" "* !__NO_XBLOCK *" "/");
 			print("#define __hybrid_atomic_fetch", op, n, " __hybrid_atomic_fetch", op, n);
-			print("__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT", n, "_TYPE__ (__hybrid_atomic_fetch", op, n, ")(__UINT", n, "_TYPE__ *__p, __UINT", n, "_TYPE__ __val, int __order) {");
+			print("__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT", n, "_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetch", op, n, ")(__UINT", n, "_TYPE__ *__p, __UINT", n, "_TYPE__ __val, int __order) {");
 			print("	(void)__order;");
 			print("	return __hybrid_atomic_", op, "fetch", n, "(__p, __val, __order) ", revop, " __val;");
 			print("}");
@@ -247,7 +247,7 @@ function sub(n: string) {
 			print("	           __XRETURN __hacxv", n, "_res; })");
 			print("#else /" "* __NO_XBLOCK *" "/");
 			print("#define __hybrid_atomic_fetch", op, n, " __hybrid_atomic_fetch", op, n);
-			print("__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT", n, "_TYPE__ (__hybrid_atomic_fetch", op, n, ")(__UINT", n, "_TYPE__ *__p, __UINT", n, "_TYPE__ __val, int __order) {");
+			print("__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT", n, "_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetch", op, n, ")(__UINT", n, "_TYPE__ *__p, __UINT", n, "_TYPE__ __val, int __order) {");
 			print("	__UINT", n, "_TYPE__ __res;");
 			print("	(void)__order;");
 			print("	do __res = __hybrid_atomic_load", n, "(__p, __ATOMIC_ACQUIRE);");
@@ -288,7 +288,7 @@ function sub(n: string) {
 			print("	__XBLOCK({ __UINT", n, "_TYPE__ __haxf", n, "_val = (val); __XRETURN ", opfun(f"__hybrid_atomic_fetch{op}{n}(p, __haxf{n}_val, order)", f"__haxf{n}_val"), "; })");
 			print("#else /" "* __NO_XBLOCK *" "/");
 			print("#define __hybrid_atomic_", op, "fetch", n, " __hybrid_atomic_", op, "fetch", n);
-			print("__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT", n, "_TYPE__ (__hybrid_atomic_", op, "fetch", n, ")(__UINT", n, "_TYPE__ *__p, __UINT", n, "_TYPE__ __val, int __order) {");
+			print("__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT", n, "_TYPE__ __NOTHROW_NCX(__hybrid_atomic_", op, "fetch", n, ")(__UINT", n, "_TYPE__ *__p, __UINT", n, "_TYPE__ __val, int __order) {");
 			print("	(void)__order;");
 			print("	return ", opfun(f"__hybrid_atomic_fetch{op}{n}(__p, __val, __order)", "__val"), ";");
 			print("}");
@@ -385,7 +385,7 @@ print("#endif /" "* __UINT128_TYPE__ *" "/");
 	__XBLOCK({ __UINT8_TYPE__ __hacx8_ov = (oldval); __XRETURN __hybrid_atomic_cmpxch_val8(p, __hacx8_ov, newval, succ, fail) == __hacx8_ov; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_cmpxch8 __hybrid_atomic_cmpxch8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__hybrid_atomic_cmpxch8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __oldval, __UINT8_TYPE__ __newval, int __succ, int __fail) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW_NCX(__hybrid_atomic_cmpxch8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __oldval, __UINT8_TYPE__ __newval, int __succ, int __fail) {
 	(void)__succ, (void)__fail;
 	return __hybrid_atomic_cmpxch_val8(__p, __oldval, __newval, __succ, __fail) == __oldval;
 }
@@ -435,7 +435,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__hybrid_at
 	           __XRETURN __hal8_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_load8 __hybrid_atomic_load8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__hybrid_atomic_load8)(__UINT8_TYPE__ const *__p, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ __NOTHROW_NCX(__hybrid_atomic_load8)(__UINT8_TYPE__ const *__p, int __order) {
 	__UINT8_TYPE__ __res;
 	(void)__order;
 	do { __res = *__p; __COMPILER_READ_BARRIER();
@@ -458,7 +458,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__h
 	           __XRETURN __hacxv8_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_cmpxch_val8 __hybrid_atomic_cmpxch_val8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__hybrid_atomic_cmpxch_val8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __oldval, __UINT8_TYPE__ __newval, int __succ, int __fail) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ __NOTHROW_NCX(__hybrid_atomic_cmpxch_val8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __oldval, __UINT8_TYPE__ __newval, int __succ, int __fail) {
 	__UINT8_TYPE__ __res;
 	(void)__succ, (void)__fail;
 	do if ((__res = __hybrid_atomic_load8(__p, __ATOMIC_ACQUIRE)) != __oldval) break;
@@ -474,7 +474,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__h
 #define __hybrid_atomic_cmpxch8(p, oldval, newval, succ, fail) \
 	__XBLOCK({ __UINT8_TYPE__ __hacx8_ov = (oldval); __XRETURN __hybrid_atomic_cmpxch_val8(p, __hacx8_ov, newval, succ, fail) == __hacx8_ov; })
 #else /* __NO_XBLOCK */
-__LOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __BOOL (__hybrid_atomic_cmpxch8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __oldval, __UINT8_TYPE__ __newval, int __succ, int __fail) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __BOOL __NOTHROW_NCX(__hybrid_atomic_cmpxch8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __oldval, __UINT8_TYPE__ __newval, int __succ, int __fail) {
 	(void)__succ, (void)__fail;
 	return __hybrid_atomic_cmpxch_val8(__p, __oldval, __newval, __succ, __fail) == __oldval;
 }
@@ -497,7 +497,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __BOOL (__hybrid_atomic_cmpxch8)(_
 	           __XRETURN __hal8_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_xch8 __hybrid_atomic_xch8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__hybrid_atomic_xch8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ __NOTHROW_NCX(__hybrid_atomic_xch8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
 	__UINT8_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load(__p, __ATOMIC_ACQUIRE);
@@ -529,7 +529,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__h
 	__XBLOCK({ __UINT8_TYPE__ __hafx8_val = (val); __XRETURN __hybrid_atomic_addfetch8(p, __hafx8_val, order) - __hafx8_val; })
 #else /* !__NO_XBLOCK */
 #define __hybrid_atomic_fetchadd8 __hybrid_atomic_fetchadd8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__hybrid_atomic_fetchadd8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchadd8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_addfetch8(__p, __val, __order) - __val;
 }
@@ -543,7 +543,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__h
 	           __XRETURN __hacxv8_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchadd8 __hybrid_atomic_fetchadd8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__hybrid_atomic_fetchadd8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchadd8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
 	__UINT8_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load8(__p, __ATOMIC_ACQUIRE);
@@ -567,7 +567,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__h
 	__XBLOCK({ __UINT8_TYPE__ __hafx8_val = (val); __XRETURN __hybrid_atomic_subfetch8(p, __hafx8_val, order) + __hafx8_val; })
 #else /* !__NO_XBLOCK */
 #define __hybrid_atomic_fetchsub8 __hybrid_atomic_fetchsub8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__hybrid_atomic_fetchsub8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchsub8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_subfetch8(__p, __val, __order) + __val;
 }
@@ -581,7 +581,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__h
 	           __XRETURN __hacxv8_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchsub8 __hybrid_atomic_fetchsub8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__hybrid_atomic_fetchsub8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchsub8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
 	__UINT8_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load8(__p, __ATOMIC_ACQUIRE);
@@ -604,7 +604,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__h
 	           __XRETURN __hacxv8_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchand8 __hybrid_atomic_fetchand8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__hybrid_atomic_fetchand8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchand8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
 	__UINT8_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load8(__p, __ATOMIC_ACQUIRE);
@@ -624,7 +624,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__h
 	__XBLOCK({ __UINT8_TYPE__ __hafx8_val = (val); __XRETURN __hybrid_atomic_xorfetch8(p, __hafx8_val, order) ^ __hafx8_val; })
 #else /* !__NO_XBLOCK */
 #define __hybrid_atomic_fetchxor8 __hybrid_atomic_fetchxor8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__hybrid_atomic_fetchxor8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchxor8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_xorfetch8(__p, __val, __order) ^ __val;
 }
@@ -638,7 +638,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__h
 	           __XRETURN __hacxv8_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchxor8 __hybrid_atomic_fetchxor8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__hybrid_atomic_fetchxor8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchxor8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
 	__UINT8_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load8(__p, __ATOMIC_ACQUIRE);
@@ -661,7 +661,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__h
 	           __XRETURN __hacxv8_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchor8 __hybrid_atomic_fetchor8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__hybrid_atomic_fetchor8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchor8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
 	__UINT8_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load8(__p, __ATOMIC_ACQUIRE);
@@ -684,7 +684,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__h
 	           __XRETURN __hacxv8_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchnand8 __hybrid_atomic_fetchnand8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__hybrid_atomic_fetchnand8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchnand8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
 	__UINT8_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load8(__p, __ATOMIC_ACQUIRE);
@@ -732,7 +732,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__h
 	__XBLOCK({ __UINT8_TYPE__ __haxf8_val = (val); __XRETURN __hybrid_atomic_fetchadd8(p, __haxf8_val, order) + __haxf8_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_addfetch8 __hybrid_atomic_addfetch8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__hybrid_atomic_addfetch8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ __NOTHROW_NCX(__hybrid_atomic_addfetch8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchadd8(__p, __val, __order) + __val;
 }
@@ -753,7 +753,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__h
 	__XBLOCK({ __UINT8_TYPE__ __haxf8_val = (val); __XRETURN __hybrid_atomic_fetchsub8(p, __haxf8_val, order) - __haxf8_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_subfetch8 __hybrid_atomic_subfetch8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__hybrid_atomic_subfetch8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ __NOTHROW_NCX(__hybrid_atomic_subfetch8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchsub8(__p, __val, __order) - __val;
 }
@@ -770,7 +770,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__h
 	__XBLOCK({ __UINT8_TYPE__ __haxf8_val = (val); __XRETURN __hybrid_atomic_fetchand8(p, __haxf8_val, order) & __haxf8_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_andfetch8 __hybrid_atomic_andfetch8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__hybrid_atomic_andfetch8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ __NOTHROW_NCX(__hybrid_atomic_andfetch8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchand8(__p, __val, __order) & __val;
 }
@@ -787,7 +787,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__h
 	__XBLOCK({ __UINT8_TYPE__ __haxf8_val = (val); __XRETURN __hybrid_atomic_fetchxor8(p, __haxf8_val, order) ^ __haxf8_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_xorfetch8 __hybrid_atomic_xorfetch8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__hybrid_atomic_xorfetch8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ __NOTHROW_NCX(__hybrid_atomic_xorfetch8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchxor8(__p, __val, __order) ^ __val;
 }
@@ -804,7 +804,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__h
 	__XBLOCK({ __UINT8_TYPE__ __haxf8_val = (val); __XRETURN __hybrid_atomic_fetchor8(p, __haxf8_val, order) | __haxf8_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_orfetch8 __hybrid_atomic_orfetch8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__hybrid_atomic_orfetch8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ __NOTHROW_NCX(__hybrid_atomic_orfetch8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchor8(__p, __val, __order) | __val;
 }
@@ -821,7 +821,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__h
 	__XBLOCK({ __UINT8_TYPE__ __haxf8_val = (val); __XRETURN ~(__hybrid_atomic_fetchnand8(p, __haxf8_val, order) & __haxf8_val); })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_nandfetch8 __hybrid_atomic_nandfetch8
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__hybrid_atomic_nandfetch8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ __NOTHROW_NCX(__hybrid_atomic_nandfetch8)(__UINT8_TYPE__ *__p, __UINT8_TYPE__ __val, int __order) {
 	(void)__order;
 	return ~(__hybrid_atomic_fetchnand8(__p, __val, __order) & __val);
 }
@@ -942,7 +942,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT8_TYPE__ (__h
 	__XBLOCK({ __UINT16_TYPE__ __hacx16_ov = (oldval); __XRETURN __hybrid_atomic_cmpxch_val16(p, __hacx16_ov, newval, succ, fail) == __hacx16_ov; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_cmpxch16 __hybrid_atomic_cmpxch16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__hybrid_atomic_cmpxch16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __oldval, __UINT16_TYPE__ __newval, int __succ, int __fail) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW_NCX(__hybrid_atomic_cmpxch16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __oldval, __UINT16_TYPE__ __newval, int __succ, int __fail) {
 	(void)__succ, (void)__fail;
 	return __hybrid_atomic_cmpxch_val16(__p, __oldval, __newval, __succ, __fail) == __oldval;
 }
@@ -992,7 +992,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__hybrid_at
 	           __XRETURN __hal16_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_load16 __hybrid_atomic_load16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__hybrid_atomic_load16)(__UINT16_TYPE__ const *__p, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ __NOTHROW_NCX(__hybrid_atomic_load16)(__UINT16_TYPE__ const *__p, int __order) {
 	__UINT16_TYPE__ __res;
 	(void)__order;
 	do { __res = *__p; __COMPILER_READ_BARRIER();
@@ -1015,7 +1015,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__
 	           __XRETURN __hacxv16_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_cmpxch_val16 __hybrid_atomic_cmpxch_val16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__hybrid_atomic_cmpxch_val16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __oldval, __UINT16_TYPE__ __newval, int __succ, int __fail) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ __NOTHROW_NCX(__hybrid_atomic_cmpxch_val16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __oldval, __UINT16_TYPE__ __newval, int __succ, int __fail) {
 	__UINT16_TYPE__ __res;
 	(void)__succ, (void)__fail;
 	do if ((__res = __hybrid_atomic_load16(__p, __ATOMIC_ACQUIRE)) != __oldval) break;
@@ -1031,7 +1031,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__
 #define __hybrid_atomic_cmpxch16(p, oldval, newval, succ, fail) \
 	__XBLOCK({ __UINT16_TYPE__ __hacx16_ov = (oldval); __XRETURN __hybrid_atomic_cmpxch_val16(p, __hacx16_ov, newval, succ, fail) == __hacx16_ov; })
 #else /* __NO_XBLOCK */
-__LOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __BOOL (__hybrid_atomic_cmpxch16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __oldval, __UINT16_TYPE__ __newval, int __succ, int __fail) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __BOOL __NOTHROW_NCX(__hybrid_atomic_cmpxch16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __oldval, __UINT16_TYPE__ __newval, int __succ, int __fail) {
 	(void)__succ, (void)__fail;
 	return __hybrid_atomic_cmpxch_val16(__p, __oldval, __newval, __succ, __fail) == __oldval;
 }
@@ -1054,7 +1054,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __BOOL (__hybrid_atomic_cmpxch16)(
 	           __XRETURN __hal16_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_xch16 __hybrid_atomic_xch16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__hybrid_atomic_xch16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ __NOTHROW_NCX(__hybrid_atomic_xch16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
 	__UINT16_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load(__p, __ATOMIC_ACQUIRE);
@@ -1086,7 +1086,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__
 	__XBLOCK({ __UINT16_TYPE__ __hafx16_val = (val); __XRETURN __hybrid_atomic_addfetch16(p, __hafx16_val, order) - __hafx16_val; })
 #else /* !__NO_XBLOCK */
 #define __hybrid_atomic_fetchadd16 __hybrid_atomic_fetchadd16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__hybrid_atomic_fetchadd16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchadd16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_addfetch16(__p, __val, __order) - __val;
 }
@@ -1100,7 +1100,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__
 	           __XRETURN __hacxv16_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchadd16 __hybrid_atomic_fetchadd16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__hybrid_atomic_fetchadd16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchadd16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
 	__UINT16_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load16(__p, __ATOMIC_ACQUIRE);
@@ -1124,7 +1124,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__
 	__XBLOCK({ __UINT16_TYPE__ __hafx16_val = (val); __XRETURN __hybrid_atomic_subfetch16(p, __hafx16_val, order) + __hafx16_val; })
 #else /* !__NO_XBLOCK */
 #define __hybrid_atomic_fetchsub16 __hybrid_atomic_fetchsub16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__hybrid_atomic_fetchsub16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchsub16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_subfetch16(__p, __val, __order) + __val;
 }
@@ -1138,7 +1138,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__
 	           __XRETURN __hacxv16_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchsub16 __hybrid_atomic_fetchsub16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__hybrid_atomic_fetchsub16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchsub16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
 	__UINT16_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load16(__p, __ATOMIC_ACQUIRE);
@@ -1161,7 +1161,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__
 	           __XRETURN __hacxv16_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchand16 __hybrid_atomic_fetchand16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__hybrid_atomic_fetchand16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchand16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
 	__UINT16_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load16(__p, __ATOMIC_ACQUIRE);
@@ -1181,7 +1181,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__
 	__XBLOCK({ __UINT16_TYPE__ __hafx16_val = (val); __XRETURN __hybrid_atomic_xorfetch16(p, __hafx16_val, order) ^ __hafx16_val; })
 #else /* !__NO_XBLOCK */
 #define __hybrid_atomic_fetchxor16 __hybrid_atomic_fetchxor16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__hybrid_atomic_fetchxor16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchxor16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_xorfetch16(__p, __val, __order) ^ __val;
 }
@@ -1195,7 +1195,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__
 	           __XRETURN __hacxv16_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchxor16 __hybrid_atomic_fetchxor16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__hybrid_atomic_fetchxor16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchxor16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
 	__UINT16_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load16(__p, __ATOMIC_ACQUIRE);
@@ -1218,7 +1218,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__
 	           __XRETURN __hacxv16_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchor16 __hybrid_atomic_fetchor16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__hybrid_atomic_fetchor16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchor16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
 	__UINT16_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load16(__p, __ATOMIC_ACQUIRE);
@@ -1241,7 +1241,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__
 	           __XRETURN __hacxv16_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchnand16 __hybrid_atomic_fetchnand16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__hybrid_atomic_fetchnand16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchnand16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
 	__UINT16_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load16(__p, __ATOMIC_ACQUIRE);
@@ -1289,7 +1289,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__
 	__XBLOCK({ __UINT16_TYPE__ __haxf16_val = (val); __XRETURN __hybrid_atomic_fetchadd16(p, __haxf16_val, order) + __haxf16_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_addfetch16 __hybrid_atomic_addfetch16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__hybrid_atomic_addfetch16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ __NOTHROW_NCX(__hybrid_atomic_addfetch16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchadd16(__p, __val, __order) + __val;
 }
@@ -1310,7 +1310,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__
 	__XBLOCK({ __UINT16_TYPE__ __haxf16_val = (val); __XRETURN __hybrid_atomic_fetchsub16(p, __haxf16_val, order) - __haxf16_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_subfetch16 __hybrid_atomic_subfetch16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__hybrid_atomic_subfetch16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ __NOTHROW_NCX(__hybrid_atomic_subfetch16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchsub16(__p, __val, __order) - __val;
 }
@@ -1327,7 +1327,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__
 	__XBLOCK({ __UINT16_TYPE__ __haxf16_val = (val); __XRETURN __hybrid_atomic_fetchand16(p, __haxf16_val, order) & __haxf16_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_andfetch16 __hybrid_atomic_andfetch16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__hybrid_atomic_andfetch16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ __NOTHROW_NCX(__hybrid_atomic_andfetch16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchand16(__p, __val, __order) & __val;
 }
@@ -1344,7 +1344,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__
 	__XBLOCK({ __UINT16_TYPE__ __haxf16_val = (val); __XRETURN __hybrid_atomic_fetchxor16(p, __haxf16_val, order) ^ __haxf16_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_xorfetch16 __hybrid_atomic_xorfetch16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__hybrid_atomic_xorfetch16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ __NOTHROW_NCX(__hybrid_atomic_xorfetch16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchxor16(__p, __val, __order) ^ __val;
 }
@@ -1361,7 +1361,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__
 	__XBLOCK({ __UINT16_TYPE__ __haxf16_val = (val); __XRETURN __hybrid_atomic_fetchor16(p, __haxf16_val, order) | __haxf16_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_orfetch16 __hybrid_atomic_orfetch16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__hybrid_atomic_orfetch16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ __NOTHROW_NCX(__hybrid_atomic_orfetch16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchor16(__p, __val, __order) | __val;
 }
@@ -1378,7 +1378,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__
 	__XBLOCK({ __UINT16_TYPE__ __haxf16_val = (val); __XRETURN ~(__hybrid_atomic_fetchnand16(p, __haxf16_val, order) & __haxf16_val); })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_nandfetch16 __hybrid_atomic_nandfetch16
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__hybrid_atomic_nandfetch16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ __NOTHROW_NCX(__hybrid_atomic_nandfetch16)(__UINT16_TYPE__ *__p, __UINT16_TYPE__ __val, int __order) {
 	(void)__order;
 	return ~(__hybrid_atomic_fetchnand16(__p, __val, __order) & __val);
 }
@@ -1499,7 +1499,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ (__
 	__XBLOCK({ __UINT32_TYPE__ __hacx32_ov = (oldval); __XRETURN __hybrid_atomic_cmpxch_val32(p, __hacx32_ov, newval, succ, fail) == __hacx32_ov; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_cmpxch32 __hybrid_atomic_cmpxch32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__hybrid_atomic_cmpxch32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __oldval, __UINT32_TYPE__ __newval, int __succ, int __fail) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW_NCX(__hybrid_atomic_cmpxch32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __oldval, __UINT32_TYPE__ __newval, int __succ, int __fail) {
 	(void)__succ, (void)__fail;
 	return __hybrid_atomic_cmpxch_val32(__p, __oldval, __newval, __succ, __fail) == __oldval;
 }
@@ -1549,7 +1549,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__hybrid_at
 	           __XRETURN __hal32_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_load32 __hybrid_atomic_load32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__hybrid_atomic_load32)(__UINT32_TYPE__ const *__p, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__hybrid_atomic_load32)(__UINT32_TYPE__ const *__p, int __order) {
 	__UINT32_TYPE__ __res;
 	(void)__order;
 	do { __res = *__p; __COMPILER_READ_BARRIER();
@@ -1572,7 +1572,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__
 	           __XRETURN __hacxv32_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_cmpxch_val32 __hybrid_atomic_cmpxch_val32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__hybrid_atomic_cmpxch_val32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __oldval, __UINT32_TYPE__ __newval, int __succ, int __fail) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__hybrid_atomic_cmpxch_val32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __oldval, __UINT32_TYPE__ __newval, int __succ, int __fail) {
 	__UINT32_TYPE__ __res;
 	(void)__succ, (void)__fail;
 	do if ((__res = __hybrid_atomic_load32(__p, __ATOMIC_ACQUIRE)) != __oldval) break;
@@ -1588,7 +1588,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__
 #define __hybrid_atomic_cmpxch32(p, oldval, newval, succ, fail) \
 	__XBLOCK({ __UINT32_TYPE__ __hacx32_ov = (oldval); __XRETURN __hybrid_atomic_cmpxch_val32(p, __hacx32_ov, newval, succ, fail) == __hacx32_ov; })
 #else /* __NO_XBLOCK */
-__LOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __BOOL (__hybrid_atomic_cmpxch32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __oldval, __UINT32_TYPE__ __newval, int __succ, int __fail) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __BOOL __NOTHROW_NCX(__hybrid_atomic_cmpxch32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __oldval, __UINT32_TYPE__ __newval, int __succ, int __fail) {
 	(void)__succ, (void)__fail;
 	return __hybrid_atomic_cmpxch_val32(__p, __oldval, __newval, __succ, __fail) == __oldval;
 }
@@ -1611,7 +1611,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __BOOL (__hybrid_atomic_cmpxch32)(
 	           __XRETURN __hal32_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_xch32 __hybrid_atomic_xch32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__hybrid_atomic_xch32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__hybrid_atomic_xch32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
 	__UINT32_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load(__p, __ATOMIC_ACQUIRE);
@@ -1643,7 +1643,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__
 	__XBLOCK({ __UINT32_TYPE__ __hafx32_val = (val); __XRETURN __hybrid_atomic_addfetch32(p, __hafx32_val, order) - __hafx32_val; })
 #else /* !__NO_XBLOCK */
 #define __hybrid_atomic_fetchadd32 __hybrid_atomic_fetchadd32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__hybrid_atomic_fetchadd32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchadd32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_addfetch32(__p, __val, __order) - __val;
 }
@@ -1657,7 +1657,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__
 	           __XRETURN __hacxv32_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchadd32 __hybrid_atomic_fetchadd32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__hybrid_atomic_fetchadd32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchadd32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
 	__UINT32_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load32(__p, __ATOMIC_ACQUIRE);
@@ -1681,7 +1681,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__
 	__XBLOCK({ __UINT32_TYPE__ __hafx32_val = (val); __XRETURN __hybrid_atomic_subfetch32(p, __hafx32_val, order) + __hafx32_val; })
 #else /* !__NO_XBLOCK */
 #define __hybrid_atomic_fetchsub32 __hybrid_atomic_fetchsub32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__hybrid_atomic_fetchsub32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchsub32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_subfetch32(__p, __val, __order) + __val;
 }
@@ -1695,7 +1695,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__
 	           __XRETURN __hacxv32_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchsub32 __hybrid_atomic_fetchsub32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__hybrid_atomic_fetchsub32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchsub32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
 	__UINT32_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load32(__p, __ATOMIC_ACQUIRE);
@@ -1718,7 +1718,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__
 	           __XRETURN __hacxv32_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchand32 __hybrid_atomic_fetchand32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__hybrid_atomic_fetchand32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchand32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
 	__UINT32_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load32(__p, __ATOMIC_ACQUIRE);
@@ -1738,7 +1738,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__
 	__XBLOCK({ __UINT32_TYPE__ __hafx32_val = (val); __XRETURN __hybrid_atomic_xorfetch32(p, __hafx32_val, order) ^ __hafx32_val; })
 #else /* !__NO_XBLOCK */
 #define __hybrid_atomic_fetchxor32 __hybrid_atomic_fetchxor32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__hybrid_atomic_fetchxor32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchxor32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_xorfetch32(__p, __val, __order) ^ __val;
 }
@@ -1752,7 +1752,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__
 	           __XRETURN __hacxv32_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchxor32 __hybrid_atomic_fetchxor32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__hybrid_atomic_fetchxor32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchxor32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
 	__UINT32_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load32(__p, __ATOMIC_ACQUIRE);
@@ -1775,7 +1775,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__
 	           __XRETURN __hacxv32_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchor32 __hybrid_atomic_fetchor32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__hybrid_atomic_fetchor32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchor32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
 	__UINT32_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load32(__p, __ATOMIC_ACQUIRE);
@@ -1798,7 +1798,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__
 	           __XRETURN __hacxv32_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchnand32 __hybrid_atomic_fetchnand32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__hybrid_atomic_fetchnand32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchnand32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
 	__UINT32_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load32(__p, __ATOMIC_ACQUIRE);
@@ -1846,7 +1846,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__
 	__XBLOCK({ __UINT32_TYPE__ __haxf32_val = (val); __XRETURN __hybrid_atomic_fetchadd32(p, __haxf32_val, order) + __haxf32_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_addfetch32 __hybrid_atomic_addfetch32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__hybrid_atomic_addfetch32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__hybrid_atomic_addfetch32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchadd32(__p, __val, __order) + __val;
 }
@@ -1867,7 +1867,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__
 	__XBLOCK({ __UINT32_TYPE__ __haxf32_val = (val); __XRETURN __hybrid_atomic_fetchsub32(p, __haxf32_val, order) - __haxf32_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_subfetch32 __hybrid_atomic_subfetch32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__hybrid_atomic_subfetch32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__hybrid_atomic_subfetch32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchsub32(__p, __val, __order) - __val;
 }
@@ -1884,7 +1884,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__
 	__XBLOCK({ __UINT32_TYPE__ __haxf32_val = (val); __XRETURN __hybrid_atomic_fetchand32(p, __haxf32_val, order) & __haxf32_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_andfetch32 __hybrid_atomic_andfetch32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__hybrid_atomic_andfetch32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__hybrid_atomic_andfetch32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchand32(__p, __val, __order) & __val;
 }
@@ -1901,7 +1901,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__
 	__XBLOCK({ __UINT32_TYPE__ __haxf32_val = (val); __XRETURN __hybrid_atomic_fetchxor32(p, __haxf32_val, order) ^ __haxf32_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_xorfetch32 __hybrid_atomic_xorfetch32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__hybrid_atomic_xorfetch32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__hybrid_atomic_xorfetch32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchxor32(__p, __val, __order) ^ __val;
 }
@@ -1918,7 +1918,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__
 	__XBLOCK({ __UINT32_TYPE__ __haxf32_val = (val); __XRETURN __hybrid_atomic_fetchor32(p, __haxf32_val, order) | __haxf32_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_orfetch32 __hybrid_atomic_orfetch32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__hybrid_atomic_orfetch32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__hybrid_atomic_orfetch32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchor32(__p, __val, __order) | __val;
 }
@@ -1935,7 +1935,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__
 	__XBLOCK({ __UINT32_TYPE__ __haxf32_val = (val); __XRETURN ~(__hybrid_atomic_fetchnand32(p, __haxf32_val, order) & __haxf32_val); })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_nandfetch32 __hybrid_atomic_nandfetch32
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__hybrid_atomic_nandfetch32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__hybrid_atomic_nandfetch32)(__UINT32_TYPE__ *__p, __UINT32_TYPE__ __val, int __order) {
 	(void)__order;
 	return ~(__hybrid_atomic_fetchnand32(__p, __val, __order) & __val);
 }
@@ -2057,7 +2057,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ (__
 	__XBLOCK({ __UINT64_TYPE__ __hacx64_ov = (oldval); __XRETURN __hybrid_atomic_cmpxch_val64(p, __hacx64_ov, newval, succ, fail) == __hacx64_ov; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_cmpxch64 __hybrid_atomic_cmpxch64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__hybrid_atomic_cmpxch64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __oldval, __UINT64_TYPE__ __newval, int __succ, int __fail) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW_NCX(__hybrid_atomic_cmpxch64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __oldval, __UINT64_TYPE__ __newval, int __succ, int __fail) {
 	(void)__succ, (void)__fail;
 	return __hybrid_atomic_cmpxch_val64(__p, __oldval, __newval, __succ, __fail) == __oldval;
 }
@@ -2107,7 +2107,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__hybrid_at
 	           __XRETURN __hal64_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_load64 __hybrid_atomic_load64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__hybrid_atomic_load64)(__UINT64_TYPE__ const *__p, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__hybrid_atomic_load64)(__UINT64_TYPE__ const *__p, int __order) {
 	__UINT64_TYPE__ __res;
 	(void)__order;
 	do { __res = *__p; __COMPILER_READ_BARRIER();
@@ -2130,7 +2130,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__
 	           __XRETURN __hacxv64_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_cmpxch_val64 __hybrid_atomic_cmpxch_val64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__hybrid_atomic_cmpxch_val64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __oldval, __UINT64_TYPE__ __newval, int __succ, int __fail) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__hybrid_atomic_cmpxch_val64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __oldval, __UINT64_TYPE__ __newval, int __succ, int __fail) {
 	__UINT64_TYPE__ __res;
 	(void)__succ, (void)__fail;
 	do if ((__res = __hybrid_atomic_load64(__p, __ATOMIC_ACQUIRE)) != __oldval) break;
@@ -2146,7 +2146,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__
 #define __hybrid_atomic_cmpxch64(p, oldval, newval, succ, fail) \
 	__XBLOCK({ __UINT64_TYPE__ __hacx64_ov = (oldval); __XRETURN __hybrid_atomic_cmpxch_val64(p, __hacx64_ov, newval, succ, fail) == __hacx64_ov; })
 #else /* __NO_XBLOCK */
-__LOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __BOOL (__hybrid_atomic_cmpxch64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __oldval, __UINT64_TYPE__ __newval, int __succ, int __fail) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __BOOL __NOTHROW_NCX(__hybrid_atomic_cmpxch64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __oldval, __UINT64_TYPE__ __newval, int __succ, int __fail) {
 	(void)__succ, (void)__fail;
 	return __hybrid_atomic_cmpxch_val64(__p, __oldval, __newval, __succ, __fail) == __oldval;
 }
@@ -2169,7 +2169,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __BOOL (__hybrid_atomic_cmpxch64)(
 	           __XRETURN __hal64_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_xch64 __hybrid_atomic_xch64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__hybrid_atomic_xch64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__hybrid_atomic_xch64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
 	__UINT64_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load(__p, __ATOMIC_ACQUIRE);
@@ -2201,7 +2201,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__
 	__XBLOCK({ __UINT64_TYPE__ __hafx64_val = (val); __XRETURN __hybrid_atomic_addfetch64(p, __hafx64_val, order) - __hafx64_val; })
 #else /* !__NO_XBLOCK */
 #define __hybrid_atomic_fetchadd64 __hybrid_atomic_fetchadd64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__hybrid_atomic_fetchadd64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchadd64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_addfetch64(__p, __val, __order) - __val;
 }
@@ -2215,7 +2215,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__
 	           __XRETURN __hacxv64_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchadd64 __hybrid_atomic_fetchadd64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__hybrid_atomic_fetchadd64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchadd64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
 	__UINT64_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load64(__p, __ATOMIC_ACQUIRE);
@@ -2239,7 +2239,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__
 	__XBLOCK({ __UINT64_TYPE__ __hafx64_val = (val); __XRETURN __hybrid_atomic_subfetch64(p, __hafx64_val, order) + __hafx64_val; })
 #else /* !__NO_XBLOCK */
 #define __hybrid_atomic_fetchsub64 __hybrid_atomic_fetchsub64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__hybrid_atomic_fetchsub64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchsub64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_subfetch64(__p, __val, __order) + __val;
 }
@@ -2253,7 +2253,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__
 	           __XRETURN __hacxv64_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchsub64 __hybrid_atomic_fetchsub64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__hybrid_atomic_fetchsub64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchsub64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
 	__UINT64_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load64(__p, __ATOMIC_ACQUIRE);
@@ -2276,7 +2276,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__
 	           __XRETURN __hacxv64_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchand64 __hybrid_atomic_fetchand64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__hybrid_atomic_fetchand64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchand64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
 	__UINT64_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load64(__p, __ATOMIC_ACQUIRE);
@@ -2296,7 +2296,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__
 	__XBLOCK({ __UINT64_TYPE__ __hafx64_val = (val); __XRETURN __hybrid_atomic_xorfetch64(p, __hafx64_val, order) ^ __hafx64_val; })
 #else /* !__NO_XBLOCK */
 #define __hybrid_atomic_fetchxor64 __hybrid_atomic_fetchxor64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__hybrid_atomic_fetchxor64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchxor64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_xorfetch64(__p, __val, __order) ^ __val;
 }
@@ -2310,7 +2310,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__
 	           __XRETURN __hacxv64_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchxor64 __hybrid_atomic_fetchxor64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__hybrid_atomic_fetchxor64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchxor64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
 	__UINT64_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load64(__p, __ATOMIC_ACQUIRE);
@@ -2333,7 +2333,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__
 	           __XRETURN __hacxv64_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchor64 __hybrid_atomic_fetchor64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__hybrid_atomic_fetchor64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchor64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
 	__UINT64_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load64(__p, __ATOMIC_ACQUIRE);
@@ -2356,7 +2356,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__
 	           __XRETURN __hacxv64_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchnand64 __hybrid_atomic_fetchnand64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__hybrid_atomic_fetchnand64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchnand64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
 	__UINT64_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load64(__p, __ATOMIC_ACQUIRE);
@@ -2404,7 +2404,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__
 	__XBLOCK({ __UINT64_TYPE__ __haxf64_val = (val); __XRETURN __hybrid_atomic_fetchadd64(p, __haxf64_val, order) + __haxf64_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_addfetch64 __hybrid_atomic_addfetch64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__hybrid_atomic_addfetch64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__hybrid_atomic_addfetch64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchadd64(__p, __val, __order) + __val;
 }
@@ -2425,7 +2425,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__
 	__XBLOCK({ __UINT64_TYPE__ __haxf64_val = (val); __XRETURN __hybrid_atomic_fetchsub64(p, __haxf64_val, order) - __haxf64_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_subfetch64 __hybrid_atomic_subfetch64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__hybrid_atomic_subfetch64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__hybrid_atomic_subfetch64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchsub64(__p, __val, __order) - __val;
 }
@@ -2442,7 +2442,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__
 	__XBLOCK({ __UINT64_TYPE__ __haxf64_val = (val); __XRETURN __hybrid_atomic_fetchand64(p, __haxf64_val, order) & __haxf64_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_andfetch64 __hybrid_atomic_andfetch64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__hybrid_atomic_andfetch64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__hybrid_atomic_andfetch64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchand64(__p, __val, __order) & __val;
 }
@@ -2459,7 +2459,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__
 	__XBLOCK({ __UINT64_TYPE__ __haxf64_val = (val); __XRETURN __hybrid_atomic_fetchxor64(p, __haxf64_val, order) ^ __haxf64_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_xorfetch64 __hybrid_atomic_xorfetch64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__hybrid_atomic_xorfetch64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__hybrid_atomic_xorfetch64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchxor64(__p, __val, __order) ^ __val;
 }
@@ -2476,7 +2476,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__
 	__XBLOCK({ __UINT64_TYPE__ __haxf64_val = (val); __XRETURN __hybrid_atomic_fetchor64(p, __haxf64_val, order) | __haxf64_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_orfetch64 __hybrid_atomic_orfetch64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__hybrid_atomic_orfetch64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__hybrid_atomic_orfetch64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchor64(__p, __val, __order) | __val;
 }
@@ -2493,7 +2493,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__
 	__XBLOCK({ __UINT64_TYPE__ __haxf64_val = (val); __XRETURN ~(__hybrid_atomic_fetchnand64(p, __haxf64_val, order) & __haxf64_val); })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_nandfetch64 __hybrid_atomic_nandfetch64
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__hybrid_atomic_nandfetch64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__hybrid_atomic_nandfetch64)(__UINT64_TYPE__ *__p, __UINT64_TYPE__ __val, int __order) {
 	(void)__order;
 	return ~(__hybrid_atomic_fetchnand64(__p, __val, __order) & __val);
 }
@@ -2616,7 +2616,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__
 	__XBLOCK({ __UINT128_TYPE__ __hacx128_ov = (oldval); __XRETURN __hybrid_atomic_cmpxch_val128(p, __hacx128_ov, newval, succ, fail) == __hacx128_ov; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_cmpxch128 __hybrid_atomic_cmpxch128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__hybrid_atomic_cmpxch128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __oldval, __UINT128_TYPE__ __newval, int __succ, int __fail) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW_NCX(__hybrid_atomic_cmpxch128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __oldval, __UINT128_TYPE__ __newval, int __succ, int __fail) {
 	(void)__succ, (void)__fail;
 	return __hybrid_atomic_cmpxch_val128(__p, __oldval, __newval, __succ, __fail) == __oldval;
 }
@@ -2666,7 +2666,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__hybrid_at
 	           __XRETURN __hal128_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_load128 __hybrid_atomic_load128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (__hybrid_atomic_load128)(__UINT128_TYPE__ const *__p, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __NOTHROW_NCX(__hybrid_atomic_load128)(__UINT128_TYPE__ const *__p, int __order) {
 	__UINT128_TYPE__ __res;
 	(void)__order;
 	do { __res = *__p; __COMPILER_READ_BARRIER();
@@ -2689,7 +2689,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (_
 	           __XRETURN __hacxv128_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_cmpxch_val128 __hybrid_atomic_cmpxch_val128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (__hybrid_atomic_cmpxch_val128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __oldval, __UINT128_TYPE__ __newval, int __succ, int __fail) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __NOTHROW_NCX(__hybrid_atomic_cmpxch_val128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __oldval, __UINT128_TYPE__ __newval, int __succ, int __fail) {
 	__UINT128_TYPE__ __res;
 	(void)__succ, (void)__fail;
 	do if ((__res = __hybrid_atomic_load128(__p, __ATOMIC_ACQUIRE)) != __oldval) break;
@@ -2705,7 +2705,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (_
 #define __hybrid_atomic_cmpxch128(p, oldval, newval, succ, fail) \
 	__XBLOCK({ __UINT128_TYPE__ __hacx128_ov = (oldval); __XRETURN __hybrid_atomic_cmpxch_val128(p, __hacx128_ov, newval, succ, fail) == __hacx128_ov; })
 #else /* __NO_XBLOCK */
-__LOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __BOOL (__hybrid_atomic_cmpxch128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __oldval, __UINT128_TYPE__ __newval, int __succ, int __fail) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __BOOL __NOTHROW_NCX(__hybrid_atomic_cmpxch128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __oldval, __UINT128_TYPE__ __newval, int __succ, int __fail) {
 	(void)__succ, (void)__fail;
 	return __hybrid_atomic_cmpxch_val128(__p, __oldval, __newval, __succ, __fail) == __oldval;
 }
@@ -2728,7 +2728,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __BOOL (__hybrid_atomic_cmpxch128)
 	           __XRETURN __hal128_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_xch128 __hybrid_atomic_xch128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (__hybrid_atomic_xch128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __NOTHROW_NCX(__hybrid_atomic_xch128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
 	__UINT128_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load(__p, __ATOMIC_ACQUIRE);
@@ -2760,7 +2760,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (_
 	__XBLOCK({ __UINT128_TYPE__ __hafx128_val = (val); __XRETURN __hybrid_atomic_addfetch128(p, __hafx128_val, order) - __hafx128_val; })
 #else /* !__NO_XBLOCK */
 #define __hybrid_atomic_fetchadd128 __hybrid_atomic_fetchadd128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (__hybrid_atomic_fetchadd128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchadd128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_addfetch128(__p, __val, __order) - __val;
 }
@@ -2774,7 +2774,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (_
 	           __XRETURN __hacxv128_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchadd128 __hybrid_atomic_fetchadd128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (__hybrid_atomic_fetchadd128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchadd128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
 	__UINT128_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load128(__p, __ATOMIC_ACQUIRE);
@@ -2798,7 +2798,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (_
 	__XBLOCK({ __UINT128_TYPE__ __hafx128_val = (val); __XRETURN __hybrid_atomic_subfetch128(p, __hafx128_val, order) + __hafx128_val; })
 #else /* !__NO_XBLOCK */
 #define __hybrid_atomic_fetchsub128 __hybrid_atomic_fetchsub128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (__hybrid_atomic_fetchsub128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchsub128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_subfetch128(__p, __val, __order) + __val;
 }
@@ -2812,7 +2812,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (_
 	           __XRETURN __hacxv128_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchsub128 __hybrid_atomic_fetchsub128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (__hybrid_atomic_fetchsub128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchsub128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
 	__UINT128_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load128(__p, __ATOMIC_ACQUIRE);
@@ -2835,7 +2835,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (_
 	           __XRETURN __hacxv128_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchand128 __hybrid_atomic_fetchand128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (__hybrid_atomic_fetchand128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchand128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
 	__UINT128_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load128(__p, __ATOMIC_ACQUIRE);
@@ -2855,7 +2855,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (_
 	__XBLOCK({ __UINT128_TYPE__ __hafx128_val = (val); __XRETURN __hybrid_atomic_xorfetch128(p, __hafx128_val, order) ^ __hafx128_val; })
 #else /* !__NO_XBLOCK */
 #define __hybrid_atomic_fetchxor128 __hybrid_atomic_fetchxor128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (__hybrid_atomic_fetchxor128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchxor128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_xorfetch128(__p, __val, __order) ^ __val;
 }
@@ -2869,7 +2869,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (_
 	           __XRETURN __hacxv128_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchxor128 __hybrid_atomic_fetchxor128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (__hybrid_atomic_fetchxor128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchxor128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
 	__UINT128_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load128(__p, __ATOMIC_ACQUIRE);
@@ -2892,7 +2892,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (_
 	           __XRETURN __hacxv128_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchor128 __hybrid_atomic_fetchor128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (__hybrid_atomic_fetchor128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchor128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
 	__UINT128_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load128(__p, __ATOMIC_ACQUIRE);
@@ -2915,7 +2915,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (_
 	           __XRETURN __hacxv128_res; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_fetchnand128 __hybrid_atomic_fetchnand128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (__hybrid_atomic_fetchnand128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __NOTHROW_NCX(__hybrid_atomic_fetchnand128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
 	__UINT128_TYPE__ __res;
 	(void)__order;
 	do __res = __hybrid_atomic_load128(__p, __ATOMIC_ACQUIRE);
@@ -2963,7 +2963,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (_
 	__XBLOCK({ __UINT128_TYPE__ __haxf128_val = (val); __XRETURN __hybrid_atomic_fetchadd128(p, __haxf128_val, order) + __haxf128_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_addfetch128 __hybrid_atomic_addfetch128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (__hybrid_atomic_addfetch128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __NOTHROW_NCX(__hybrid_atomic_addfetch128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchadd128(__p, __val, __order) + __val;
 }
@@ -2984,7 +2984,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (_
 	__XBLOCK({ __UINT128_TYPE__ __haxf128_val = (val); __XRETURN __hybrid_atomic_fetchsub128(p, __haxf128_val, order) - __haxf128_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_subfetch128 __hybrid_atomic_subfetch128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (__hybrid_atomic_subfetch128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __NOTHROW_NCX(__hybrid_atomic_subfetch128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchsub128(__p, __val, __order) - __val;
 }
@@ -3001,7 +3001,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (_
 	__XBLOCK({ __UINT128_TYPE__ __haxf128_val = (val); __XRETURN __hybrid_atomic_fetchand128(p, __haxf128_val, order) & __haxf128_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_andfetch128 __hybrid_atomic_andfetch128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (__hybrid_atomic_andfetch128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __NOTHROW_NCX(__hybrid_atomic_andfetch128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchand128(__p, __val, __order) & __val;
 }
@@ -3018,7 +3018,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (_
 	__XBLOCK({ __UINT128_TYPE__ __haxf128_val = (val); __XRETURN __hybrid_atomic_fetchxor128(p, __haxf128_val, order) ^ __haxf128_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_xorfetch128 __hybrid_atomic_xorfetch128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (__hybrid_atomic_xorfetch128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __NOTHROW_NCX(__hybrid_atomic_xorfetch128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchxor128(__p, __val, __order) ^ __val;
 }
@@ -3035,7 +3035,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (_
 	__XBLOCK({ __UINT128_TYPE__ __haxf128_val = (val); __XRETURN __hybrid_atomic_fetchor128(p, __haxf128_val, order) | __haxf128_val; })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_orfetch128 __hybrid_atomic_orfetch128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (__hybrid_atomic_orfetch128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __NOTHROW_NCX(__hybrid_atomic_orfetch128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
 	(void)__order;
 	return __hybrid_atomic_fetchor128(__p, __val, __order) | __val;
 }
@@ -3052,7 +3052,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (_
 	__XBLOCK({ __UINT128_TYPE__ __haxf128_val = (val); __XRETURN ~(__hybrid_atomic_fetchnand128(p, __haxf128_val, order) & __haxf128_val); })
 #else /* __NO_XBLOCK */
 #define __hybrid_atomic_nandfetch128 __hybrid_atomic_nandfetch128
-__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ (__hybrid_atomic_nandfetch128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __NOTHROW_NCX(__hybrid_atomic_nandfetch128)(__UINT128_TYPE__ *__p, __UINT128_TYPE__ __val, int __order) {
 	(void)__order;
 	return ~(__hybrid_atomic_fetchnand128(__p, __val, __order) & __val);
 }
@@ -3231,7 +3231,7 @@ function makeTypeGeneric(
 		print("	|| sizeof(__T) == ", (n / 8));
 		print("#endif /" "* __hybrid_atomic_", name, n, " *" "/");
 	}
-	print(", ", returnType, ">::__type (__hybrid_atomic_", name, ")(__T "),;
+	print(", ", returnType, ">::__type __NOTHROW_NCX(__hybrid_atomic_", name, ")(__T "),;
 	if (const)
 		print("const "),;
 	print("*__p"),;
@@ -3380,7 +3380,7 @@ template<class __T, class __Toldval, class __Tnewval> inline __ATTR_ARTIFICIAL _
 #ifdef __hybrid_atomic_cmpxch128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_cmpxch128 */
-, bool>::__type (__hybrid_atomic_cmpxch)(__T *__p, __Toldval __oldval, __Tnewval __newval, int __succ, int __fail) {
+, bool>::__type __NOTHROW_NCX(__hybrid_atomic_cmpxch)(__T *__p, __Toldval __oldval, __Tnewval __newval, int __succ, int __fail) {
 	(void)__succ, (void)__fail;
 #ifdef __hybrid_atomic_cmpxch8
 	__STATIC_IF(sizeof(__T) == 1) { return __hybrid_atomic_cmpxch8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__oldval, (__UINT8_TYPE__)__newval, __succ, __fail); }
@@ -3467,7 +3467,7 @@ template<class __T, class __Toldval, class __Tnewval> inline __ATTR_ARTIFICIAL _
 #ifdef __hybrid_atomic_cmpxch_weak128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_cmpxch_weak128 */
-, bool>::__type (__hybrid_atomic_cmpxch_weak)(__T *__p, __Toldval __oldval, __Tnewval __newval, int __succ, int __fail) {
+, bool>::__type __NOTHROW_NCX(__hybrid_atomic_cmpxch_weak)(__T *__p, __Toldval __oldval, __Tnewval __newval, int __succ, int __fail) {
 	(void)__succ, (void)__fail;
 #ifdef __hybrid_atomic_cmpxch_weak8
 	__STATIC_IF(sizeof(__T) == 1) { return __hybrid_atomic_cmpxch_weak8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__oldval, (__UINT8_TYPE__)__newval, __succ, __fail); }
@@ -3554,7 +3554,7 @@ template<class __T, class __Toldval, class __Tnewval> inline __ATTR_ARTIFICIAL _
 #ifdef __hybrid_atomic_cmpxch_val128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_cmpxch_val128 */
-, __T>::__type (__hybrid_atomic_cmpxch_val)(__T *__p, __Toldval __oldval, __Tnewval __newval, int __succ, int __fail) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T *__p, __Toldval __oldval, __Tnewval __newval, int __succ, int __fail) {
 	(void)__succ, (void)__fail;
 #ifdef __hybrid_atomic_cmpxch_val8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_cmpxch_val8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__oldval, (__UINT8_TYPE__)__newval, __succ, __fail); }
@@ -3641,7 +3641,7 @@ template<class __T> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) 
 #ifdef __hybrid_atomic_load128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_load128 */
-, __T>::__type (__hybrid_atomic_load)(__T const *__p, int __order) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_load)(__T const *__p, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_load8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_load8((__UINT8_TYPE__ const *)__p, __order); }
@@ -3728,7 +3728,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) t
 #ifdef __hybrid_atomic_store128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_store128 */
-, void>::__type (__hybrid_atomic_store)(__T *__p, __Tval __val, int __order) {
+, void>::__type __NOTHROW_NCX(__hybrid_atomic_store)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_store8
 	__STATIC_IF(sizeof(__T) == 1) { __hybrid_atomic_store8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -3815,7 +3815,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR
 #ifdef __hybrid_atomic_xch128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_xch128 */
-, __T>::__type (__hybrid_atomic_xch)(__T *__p, __Tval __val, int __order) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_xch)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_xch8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_xch8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -3902,7 +3902,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR
 #ifdef __hybrid_atomic_fetchadd128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_fetchadd128 */
-, __T>::__type (__hybrid_atomic_fetchadd)(__T *__p, __Tval __val, int __order) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_fetchadd)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_fetchadd8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_fetchadd8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -3989,7 +3989,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR
 #ifdef __hybrid_atomic_fetchsub128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_fetchsub128 */
-, __T>::__type (__hybrid_atomic_fetchsub)(__T *__p, __Tval __val, int __order) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_fetchsub)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_fetchsub8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_fetchsub8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -4076,7 +4076,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR
 #ifdef __hybrid_atomic_fetchand128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_fetchand128 */
-, __T>::__type (__hybrid_atomic_fetchand)(__T *__p, __Tval __val, int __order) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_fetchand)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_fetchand8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_fetchand8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -4163,7 +4163,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR
 #ifdef __hybrid_atomic_fetchxor128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_fetchxor128 */
-, __T>::__type (__hybrid_atomic_fetchxor)(__T *__p, __Tval __val, int __order) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_fetchxor)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_fetchxor8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_fetchxor8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -4250,7 +4250,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR
 #ifdef __hybrid_atomic_fetchor128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_fetchor128 */
-, __T>::__type (__hybrid_atomic_fetchor)(__T *__p, __Tval __val, int __order) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_fetchor)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_fetchor8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_fetchor8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -4337,7 +4337,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR
 #ifdef __hybrid_atomic_fetchnand128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_fetchnand128 */
-, __T>::__type (__hybrid_atomic_fetchnand)(__T *__p, __Tval __val, int __order) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_fetchnand)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_fetchnand8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_fetchnand8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -4426,7 +4426,7 @@ template<class __T> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) 
 #ifdef __hybrid_atomic_fetchinc128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_fetchinc128 */
-, __T>::__type (__hybrid_atomic_fetchinc)(__T *__p, int __order) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_fetchinc)(__T *__p, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_fetchinc8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_fetchinc8((__UINT8_TYPE__ *)__p, __order); }
@@ -4515,7 +4515,7 @@ template<class __T> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) 
 #ifdef __hybrid_atomic_fetchdec128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_fetchdec128 */
-, __T>::__type (__hybrid_atomic_fetchdec)(__T *__p, int __order) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_fetchdec)(__T *__p, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_fetchdec8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_fetchdec8((__UINT8_TYPE__ *)__p, __order); }
@@ -4602,7 +4602,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR
 #ifdef __hybrid_atomic_addfetch128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_addfetch128 */
-, __T>::__type (__hybrid_atomic_addfetch)(__T *__p, __Tval __val, int __order) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_addfetch)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_addfetch8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_addfetch8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -4689,7 +4689,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR
 #ifdef __hybrid_atomic_subfetch128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_subfetch128 */
-, __T>::__type (__hybrid_atomic_subfetch)(__T *__p, __Tval __val, int __order) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_subfetch)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_subfetch8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_subfetch8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -4776,7 +4776,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR
 #ifdef __hybrid_atomic_andfetch128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_andfetch128 */
-, __T>::__type (__hybrid_atomic_andfetch)(__T *__p, __Tval __val, int __order) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_andfetch)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_andfetch8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_andfetch8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -4863,7 +4863,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR
 #ifdef __hybrid_atomic_xorfetch128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_xorfetch128 */
-, __T>::__type (__hybrid_atomic_xorfetch)(__T *__p, __Tval __val, int __order) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_xorfetch)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_xorfetch8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_xorfetch8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -4950,7 +4950,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR
 #ifdef __hybrid_atomic_orfetch128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_orfetch128 */
-, __T>::__type (__hybrid_atomic_orfetch)(__T *__p, __Tval __val, int __order) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_orfetch)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_orfetch8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_orfetch8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -5037,7 +5037,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR
 #ifdef __hybrid_atomic_nandfetch128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_nandfetch128 */
-, __T>::__type (__hybrid_atomic_nandfetch)(__T *__p, __Tval __val, int __order) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_nandfetch)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_nandfetch8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_nandfetch8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -5126,7 +5126,7 @@ template<class __T> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) 
 #ifdef __hybrid_atomic_incfetch128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_incfetch128 */
-, __T>::__type (__hybrid_atomic_incfetch)(__T *__p, int __order) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_incfetch)(__T *__p, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_incfetch8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_incfetch8((__UINT8_TYPE__ *)__p, __order); }
@@ -5215,7 +5215,7 @@ template<class __T> inline __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) 
 #ifdef __hybrid_atomic_decfetch128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_decfetch128 */
-, __T>::__type (__hybrid_atomic_decfetch)(__T *__p, int __order) {
+, __T>::__type __NOTHROW_NCX(__hybrid_atomic_decfetch)(__T *__p, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_decfetch8
 	__STATIC_IF(sizeof(__T) == 1) { return (__T)__hybrid_atomic_decfetch8((__UINT8_TYPE__ *)__p, __order); }
@@ -5302,7 +5302,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) t
 #ifdef __hybrid_atomic_add128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_add128 */
-, void>::__type (__hybrid_atomic_add)(__T *__p, __Tval __val, int __order) {
+, void>::__type __NOTHROW_NCX(__hybrid_atomic_add)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_add8
 	__STATIC_IF(sizeof(__T) == 1) { __hybrid_atomic_add8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -5389,7 +5389,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) t
 #ifdef __hybrid_atomic_sub128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_sub128 */
-, void>::__type (__hybrid_atomic_sub)(__T *__p, __Tval __val, int __order) {
+, void>::__type __NOTHROW_NCX(__hybrid_atomic_sub)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_sub8
 	__STATIC_IF(sizeof(__T) == 1) { __hybrid_atomic_sub8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -5476,7 +5476,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) t
 #ifdef __hybrid_atomic_and128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_and128 */
-, void>::__type (__hybrid_atomic_and)(__T *__p, __Tval __val, int __order) {
+, void>::__type __NOTHROW_NCX(__hybrid_atomic_and)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_and8
 	__STATIC_IF(sizeof(__T) == 1) { __hybrid_atomic_and8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -5563,7 +5563,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) t
 #ifdef __hybrid_atomic_xor128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_xor128 */
-, void>::__type (__hybrid_atomic_xor)(__T *__p, __Tval __val, int __order) {
+, void>::__type __NOTHROW_NCX(__hybrid_atomic_xor)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_xor8
 	__STATIC_IF(sizeof(__T) == 1) { __hybrid_atomic_xor8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -5650,7 +5650,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) t
 #ifdef __hybrid_atomic_or128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_or128 */
-, void>::__type (__hybrid_atomic_or)(__T *__p, __Tval __val, int __order) {
+, void>::__type __NOTHROW_NCX(__hybrid_atomic_or)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_or8
 	__STATIC_IF(sizeof(__T) == 1) { __hybrid_atomic_or8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -5737,7 +5737,7 @@ template<class __T, class __Tval> inline __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) t
 #ifdef __hybrid_atomic_nand128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_nand128 */
-, void>::__type (__hybrid_atomic_nand)(__T *__p, __Tval __val, int __order) {
+, void>::__type __NOTHROW_NCX(__hybrid_atomic_nand)(__T *__p, __Tval __val, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_nand8
 	__STATIC_IF(sizeof(__T) == 1) { __hybrid_atomic_nand8((__UINT8_TYPE__ *)__p, (__UINT8_TYPE__)__val, __order); }
@@ -5826,7 +5826,7 @@ template<class __T> inline __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) typename __NAME
 #ifdef __hybrid_atomic_inc128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_inc128 */
-, void>::__type (__hybrid_atomic_inc)(__T *__p, int __order) {
+, void>::__type __NOTHROW_NCX(__hybrid_atomic_inc)(__T *__p, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_inc8
 	__STATIC_IF(sizeof(__T) == 1) { __hybrid_atomic_inc8((__UINT8_TYPE__ *)__p, __order); }
@@ -5915,7 +5915,7 @@ template<class __T> inline __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) typename __NAME
 #ifdef __hybrid_atomic_dec128
 	|| sizeof(__T) == 16
 #endif /* __hybrid_atomic_dec128 */
-, void>::__type (__hybrid_atomic_dec)(__T *__p, int __order) {
+, void>::__type __NOTHROW_NCX(__hybrid_atomic_dec)(__T *__p, int __order) {
 	(void)__order;
 #ifdef __hybrid_atomic_dec8
 	__STATIC_IF(sizeof(__T) == 1) { __hybrid_atomic_dec8((__UINT8_TYPE__ *)__p, __order); }

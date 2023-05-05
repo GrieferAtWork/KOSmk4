@@ -211,7 +211,7 @@ RBTREE_NOTHROW_U(RBTREE_CC RBTREE(rlocate))(/*nullable*/ RBTREE_T *root,
 /* Insert the given node into the given tree. The caller must ensure
  * that no  already-existing node  overlaps  with the  given  `node' */
 RBTREE_DECL __ATTR_NONNULL((1, 2)) void
-RBTREE_NOTHROW(RBTREE_CC RBTREE(insert))(RBTREE_T **__restrict proot,
+RBTREE_NOTHROW(RBTREE_CC RBTREE(insert))(RBTREE_T **__restrict p_root,
                                          RBTREE_T *__restrict node
                                          RBTREE_SLOT__PARAMS);
 #endif /* !RBTREE_OMIT_INSERT */
@@ -220,7 +220,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(insert))(RBTREE_T **__restrict proot,
 /* Same as `RBTREE(insert)', but gracefully fail (by returning `false')
  * when  some other node already exists that is overlapping with `node' */
 RBTREE_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL
-RBTREE_NOTHROW(RBTREE_CC RBTREE(tryinsert))(RBTREE_T **__restrict proot,
+RBTREE_NOTHROW(RBTREE_CC RBTREE(tryinsert))(RBTREE_T **__restrict p_root,
                                             RBTREE_T *__restrict node
                                             RBTREE_SLOT__PARAMS);
 #endif /* RBTREE_WANT_TRYINSERT */
@@ -229,7 +229,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(tryinsert))(RBTREE_T **__restrict proot,
 /* Remove and return the node node for `key'.
  * @return: RBTREE_NULL: No node exists for the given key. */
 RBTREE_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
-RBTREE_NOTHROW_U(RBTREE_CC RBTREE(remove))(RBTREE_T **__restrict proot,
+RBTREE_NOTHROW_U(RBTREE_CC RBTREE(remove))(RBTREE_T **__restrict p_root,
                                            RBTREE_Tkey key
                                            RBTREE_SLOT__PARAMS);
 #endif /* !RBTREE_OMIT_REMOVE */
@@ -238,7 +238,7 @@ RBTREE_NOTHROW_U(RBTREE_CC RBTREE(remove))(RBTREE_T **__restrict proot,
 /* Remove and return the node node for `minkey...maxkey'.
  * @return: RBTREE_NULL: No node exists within the given range. */
 RBTREE_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
-RBTREE_NOTHROW_U(RBTREE_CC RBTREE(rremove))(RBTREE_T **__restrict proot,
+RBTREE_NOTHROW_U(RBTREE_CC RBTREE(rremove))(RBTREE_T **__restrict p_root,
                                             RBTREE_Tkey minkey,
                                             RBTREE_Tkey maxkey
                                             RBTREE_SLOT__PARAMS);
@@ -247,7 +247,7 @@ RBTREE_NOTHROW_U(RBTREE_CC RBTREE(rremove))(RBTREE_T **__restrict proot,
 #ifndef RBTREE_OMIT_REMOVENODE
 /* Remove the given node from the given tree. */
 RBTREE_DECL __ATTR_NONNULL((1, 2)) void
-RBTREE_NOTHROW(RBTREE_CC RBTREE(removenode))(RBTREE_T **__restrict proot,
+RBTREE_NOTHROW(RBTREE_CC RBTREE(removenode))(RBTREE_T **__restrict p_root,
                                              RBTREE_T *__restrict node
                                              RBTREE_SLOT__PARAMS);
 #endif /* !RBTREE_OMIT_REMOVENODE */
@@ -359,8 +359,8 @@ __DECL_END
 #endif /* !RBTREE_LOCVAR */
 
 #ifndef RBTREE_PROOT_GET
-#define RBTREE_PROOT_GET(proot)    (*(proot))
-#define RBTREE_PROOT_SET(proot, v) (*(proot) = (v))
+#define RBTREE_PROOT_GET(p_root)    (*(p_root))
+#define RBTREE_PROOT_SET(p_root, v) (*(p_root) = (v))
 #endif /* !RBTREE_PROOT_GET */
 
 #ifndef RBTREE_TRUE
@@ -796,14 +796,14 @@ RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNUL
  * that no  already-existing node  overlaps  with the  given  `node' */
 RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_NONNULL((1, 2)), void,
                        RBTREE_NOTHROW, RBTREE_CC, RBTREE(insert),
-                       (RBTREE_T **__restrict proot, RBTREE_T *__restrict node RBTREE_SLOT__PARAMS),
-                       (proot, node RBTREE_SLOT__ARGS)) {
+                       (RBTREE_T **__restrict p_root, RBTREE_T *__restrict node RBTREE_SLOT__PARAMS),
+                       (p_root, node RBTREE_SLOT__ARGS)) {
 	RBTREE_LOCVAR(RBTREE_T *, root);
-	root = RBTREE_PROOT_GET(proot);
+	root = RBTREE_PROOT_GET(p_root);
 	_RBTREE_VALIDATE(root);
 	root = RBTREE(_insert_impl)(root, node RBTREE_SLOT__ARGS);
 	RBTREE_SETBLACK(root);
-	RBTREE_PROOT_SET(proot, root);
+	RBTREE_PROOT_SET(p_root, root);
 	_RBTREE_VALIDATE(root);
 }
 #endif /* !RBTREE_OMIT_INSERT */
@@ -860,18 +860,18 @@ RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_WUNUSED __ATTR_NONNULL((2)), RBTREE_T *
  * when  some other node already exists that is overlapping with `node' */
 RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_WUNUSED __ATTR_NONNULL((1, 2)), __BOOL,
                        RBTREE_NOTHROW, RBTREE_CC, RBTREE(tryinsert),
-                       (RBTREE_T **__restrict proot, RBTREE_T *__restrict node RBTREE_SLOT__PARAMS),
-                       (proot, node RBTREE_SLOT__ARGS)) {
+                       (RBTREE_T **__restrict p_root, RBTREE_T *__restrict node RBTREE_SLOT__PARAMS),
+                       (p_root, node RBTREE_SLOT__ARGS)) {
 	RBTREE_LOCVAR(RBTREE_T *, root);
-	root = RBTREE_PROOT_GET(proot);
+	root = RBTREE_PROOT_GET(p_root);
 	_RBTREE_VALIDATE(root);
 	root = RBTREE(_tryinsert_impl)(root, node RBTREE_SLOT__ARGS);
 	if (RBTREE_NODE_ISNULL(root)) {
-		_RBTREE_VALIDATE(RBTREE_PROOT_GET(proot));
+		_RBTREE_VALIDATE(RBTREE_PROOT_GET(p_root));
 		return RBTREE_FALSE;
 	}
 	RBTREE_SETBLACK(root);
-	RBTREE_PROOT_SET(proot, root);
+	RBTREE_PROOT_SET(p_root, root);
 	_RBTREE_VALIDATE(root);
 	return RBTREE_TRUE;
 }
@@ -1054,17 +1054,17 @@ RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_WUNUSED __ATTR_NONNULL((1, 2)), RBTREE_
 #ifdef RBTREE_OMIT_REMOVENODE
 RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_NONNULL((1, 2)), void,
                        RBTREE_NOTHROW, RBTREE_CC, RBTREE(removenode),
-                       (RBTREE_T **__restrict proot, RBTREE_T *__restrict node RBTREE_SLOT__PARAMS),
-                       (proot, node RBTREE_SLOT__ARGS))
+                       (RBTREE_T **__restrict p_root, RBTREE_T *__restrict node RBTREE_SLOT__PARAMS),
+                       (p_root, node RBTREE_SLOT__ARGS))
 #else /* RBTREE_OMIT_REMOVENODE */
 RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_NONNULL((1, 2)), void,
                        RBTREE_NOTHROW, RBTREE_CC, RBTREE(removenode),
-                       (RBTREE_T **__restrict proot, RBTREE_T *__restrict node RBTREE_SLOT__PARAMS),
-                       (proot, node RBTREE_SLOT__ARGS))
+                       (RBTREE_T **__restrict p_root, RBTREE_T *__restrict node RBTREE_SLOT__PARAMS),
+                       (p_root, node RBTREE_SLOT__ARGS))
 #endif /* !RBTREE_OMIT_REMOVENODE */
 {
 	RBTREE_LOCVAR(RBTREE_T *, root);
-	root = RBTREE_PROOT_GET(proot);
+	root = RBTREE_PROOT_GET(p_root);
 	_RBTREE_VALIDATE(root);
 #if (!defined(RBTREE_OMIT_LOCATE) || !defined(RBTREE_OMIT_REMOVE)) && !defined(RBTREE_NDEBUG)
 	{
@@ -1080,7 +1080,7 @@ RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_NONNULL((1, 2)), void,
 	if (RBTREE_NODE_NOT_ISNULL(root))
 		RBTREE_SETBLACK(root);
 #endif /* !RBTREE_XSETBLACK */
-	RBTREE_PROOT_SET(proot, root);
+	RBTREE_PROOT_SET(p_root, root);
 #ifndef RBTREE_NDEBUG
 #ifdef RBTREE_DELLHS
 	RBTREE_DELLHS(node);
@@ -1232,8 +1232,8 @@ again:
 
 RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_NONNULL((1, 2, 3)), void,
                        RBTREE_NOTHROW, RBTREE_CC, RBTREE(_insert_repair),
-                       (RBTREE_T **__restrict proot, RBTREE_T *__restrict node, RBTREE_T *__restrict parent RBTREE_SLOT__PARAMS),
-                       (proot, node, parent RBTREE_SLOT__ARGS)) {
+                       (RBTREE_T **__restrict p_root, RBTREE_T *__restrict node, RBTREE_T *__restrict parent RBTREE_SLOT__PARAMS),
+                       (p_root, node, parent RBTREE_SLOT__ARGS)) {
 again:
 	RBTREE_ASSERT(RBTREE_ISRED(node));
 	RBTREE_ASSERT(RBTREE_NODE_NOT_ISNULL(parent));
@@ -1276,7 +1276,7 @@ again:
 			if (RBTREE_NODE_ISNULL(parent)) {
 /*set_node_black_and_return:*/
 				RBTREE_SETBLACK(node); /* The root node is black. */
-				_RBTREE_VALIDATE(RBTREE_PROOT_GET(proot));
+				_RBTREE_VALIDATE(RBTREE_PROOT_GET(p_root));
 				return;
 			}
 			goto again;
@@ -1311,14 +1311,14 @@ again:
 			RBTREE_SETRED(grandparent);
 
 			/* Update the root node in case it got changed by the rotations above. */
-			if (RBTREE_NODE_NOT_ISNULL(RBTREE_GETPAR(RBTREE_PROOT_GET(proot)))) {
+			if (RBTREE_NODE_NOT_ISNULL(RBTREE_GETPAR(RBTREE_PROOT_GET(p_root)))) {
 				do {
-					RBTREE_PROOT_SET(proot, RBTREE_GETPAR(RBTREE_PROOT_GET(proot)));
-				} while (RBTREE_NODE_NOT_ISNULL(RBTREE_GETPAR(RBTREE_PROOT_GET(proot))));
+					RBTREE_PROOT_SET(p_root, RBTREE_GETPAR(RBTREE_PROOT_GET(p_root)));
+				} while (RBTREE_NODE_NOT_ISNULL(RBTREE_GETPAR(RBTREE_PROOT_GET(p_root))));
 			}
 		}
 	}
-	_RBTREE_VALIDATE(RBTREE_PROOT_GET(proot));
+	_RBTREE_VALIDATE(RBTREE_PROOT_GET(p_root));
 }
 #endif /* RBTREE_WANT_TRYINSERT || !RBTREE_OMIT_INSERT */
 
@@ -1327,26 +1327,26 @@ again:
  * that no  already-existing node  overlaps  with the  given  `node' */
 RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_NONNULL((1, 2)), void,
                        RBTREE_NOTHROW, RBTREE_CC, RBTREE(insert),
-                       (RBTREE_T **__restrict proot, RBTREE_T *__restrict node RBTREE_SLOT__PARAMS),
-                       (proot, node RBTREE_SLOT__ARGS)) {
+                       (RBTREE_T **__restrict p_root, RBTREE_T *__restrict node RBTREE_SLOT__PARAMS),
+                       (p_root, node RBTREE_SLOT__ARGS)) {
 	RBTREE_LOCVAR(RBTREE_T *, root);
 	RBTREE_LOCVAR(RBTREE_T *, parent);
-	root = RBTREE_PROOT_GET(proot);
+	root = RBTREE_PROOT_GET(p_root);
 	_RBTREE_VALIDATE(root);
 	if __unlikely(RBTREE_NODE_ISNULL(root)) {
 		/* Special case: First node. (Insert-case: #1) */
-		RBTREE_PROOT_SET(proot, node);
+		RBTREE_PROOT_SET(p_root, node);
 		RBTREE_SETPAR(node, RBTREE_NULL);
 		RBTREE_SETLHS(node, RBTREE_NULL);
 		RBTREE_SETRHS(node, RBTREE_NULL);
 /*set_node_black_and_return:*/
 		RBTREE_SETBLACK(node); /* The root node is black. */
-		_RBTREE_VALIDATE(RBTREE_PROOT_GET(proot));
+		_RBTREE_VALIDATE(RBTREE_PROOT_GET(p_root));
 		return;
 	}
 	parent = (RBTREE(_insert_worker)(root, node RBTREE_SLOT__ARGS));
 	/* Repair the RB-tree. */
-	(RBTREE(_insert_repair)(proot, node, parent RBTREE_SLOT__ARGS));
+	(RBTREE(_insert_repair)(p_root, node, parent RBTREE_SLOT__ARGS));
 }
 #endif /* !RBTREE_OMIT_INSERT */
 
@@ -1356,26 +1356,26 @@ RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_NONNULL((1, 2)), void,
  * when  some other node already exists that is overlapping with `node' */
 RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_WUNUSED __ATTR_NONNULL((1, 2)), __BOOL,
                        RBTREE_NOTHROW, RBTREE_CC, RBTREE(tryinsert),
-                       (RBTREE_T **__restrict proot, RBTREE_T *__restrict node RBTREE_SLOT__PARAMS),
-                       (proot, node RBTREE_SLOT__ARGS)) {
+                       (RBTREE_T **__restrict p_root, RBTREE_T *__restrict node RBTREE_SLOT__PARAMS),
+                       (p_root, node RBTREE_SLOT__ARGS)) {
 	RBTREE_LOCVAR(RBTREE_T *, root);
-	root = RBTREE_PROOT_GET(proot);
+	root = RBTREE_PROOT_GET(p_root);
 	_RBTREE_VALIDATE(root);
 	if __unlikely(RBTREE_NODE_ISNULL(root)) {
 		/* Special case: First node. (Insert-case: #1) */
-		RBTREE_PROOT_SET(proot, node);
+		RBTREE_PROOT_SET(p_root, node);
 		RBTREE_SETPAR(node, RBTREE_NULL);
 		RBTREE_SETLHS(node, RBTREE_NULL);
 		RBTREE_SETRHS(node, RBTREE_NULL);
 /*set_node_black_and_return:*/
 		RBTREE_SETBLACK(node); /* The root node is black. */
-		_RBTREE_VALIDATE(RBTREE_PROOT_GET(proot));
+		_RBTREE_VALIDATE(RBTREE_PROOT_GET(p_root));
 		return RBTREE_TRUE;
 	}
 again:
 	/* Gracefully fail if the given range is already mapped. */
 	if (_RBTREE_OVERLAPPING(root, node)) {
-		_RBTREE_VALIDATE(RBTREE_PROOT_GET(proot));
+		_RBTREE_VALIDATE(RBTREE_PROOT_GET(p_root));
 		return RBTREE_FALSE;
 	}
 	if (RBTREE_KEY_LO(RBTREE_GETMAXKEY(node), RBTREE_GETMINKEY(root))) {
@@ -1400,7 +1400,7 @@ again:
 	RBTREE_SETRHS(node, RBTREE_NULL);
 	RBTREE_SETRED(node);
 	/* Repair the RB-tree. */
-	(RBTREE(_insert_repair)(proot, node, root RBTREE_SLOT__ARGS));
+	(RBTREE(_insert_repair)(p_root, node, root RBTREE_SLOT__ARGS));
 	return RBTREE_TRUE;
 }
 #endif /* RBTREE_WANT_TRYINSERT */
@@ -1408,8 +1408,8 @@ again:
 #if !defined(RBTREE_OMIT_REMOVENODE) || !defined(RBTREE_OMIT_REMOVE) || defined(RBTREE_WANT_RREMOVE)
 RBTREE_DEFINE_FUNCTION(__LOCAL, __ATTR_NONNULL((1, 2, 3)), void,
                        RBTREE_NOTHROW, RBTREE_CC, RBTREE(_replace),
-                       (RBTREE_T **__restrict proot, RBTREE_T const *__restrict node, RBTREE_T *__restrict repl RBTREE_SLOT__PARAMS),
-                       (proot, node, repl RBTREE_SLOT__ARGS)) {
+                       (RBTREE_T **__restrict p_root, RBTREE_T const *__restrict node, RBTREE_T *__restrict repl RBTREE_SLOT__PARAMS),
+                       (p_root, node, repl RBTREE_SLOT__ARGS)) {
 	RBTREE_LOCVAR(RBTREE_T *, temp);
 	RBTREE_SETBLACK(repl);
 	if (RBTREE_ISRED(node))
@@ -1417,7 +1417,7 @@ RBTREE_DEFINE_FUNCTION(__LOCAL, __ATTR_NONNULL((1, 2, 3)), void,
 	temp = RBTREE_GETPAR(node);
 	RBTREE_SETPAR(repl, temp);
 	if (RBTREE_NODE_NOT_ISNULL(temp)) {
-		RBTREE_ASSERT(RBTREE_NODE_NE(RBTREE_PROOT_GET(proot), node));
+		RBTREE_ASSERT(RBTREE_NODE_NE(RBTREE_PROOT_GET(p_root), node));
 		if (RBTREE_NODE_EQ(RBTREE_GETLHS(temp), node)) {
 			RBTREE_SETLHS(temp, repl);
 		} else {
@@ -1425,8 +1425,8 @@ RBTREE_DEFINE_FUNCTION(__LOCAL, __ATTR_NONNULL((1, 2, 3)), void,
 			RBTREE_SETRHS(temp, repl);
 		}
 	} else {
-		RBTREE_ASSERT(RBTREE_NODE_EQ(RBTREE_PROOT_GET(proot), node));
-		RBTREE_PROOT_SET(proot, repl);
+		RBTREE_ASSERT(RBTREE_NODE_EQ(RBTREE_PROOT_GET(p_root), node));
+		RBTREE_PROOT_SET(p_root, repl);
 	}
 	temp = RBTREE_GETLHS(node);
 	RBTREE_SETLHS(repl, temp);
@@ -1454,26 +1454,26 @@ RBTREE_DEFINE_FUNCTION(__LOCAL, __ATTR_NONNULL((1, 2, 3)), void,
 #ifdef RBTREE_OMIT_REMOVENODE
 RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_NONNULL((1, 2)), void,
                        RBTREE_NOTHROW, RBTREE_CC, RBTREE(removenode),
-                       (RBTREE_T **__restrict proot, RBTREE_T *__restrict node RBTREE_SLOT__PARAMS),
-                       (proot, node RBTREE_SLOT__ARGS))
+                       (RBTREE_T **__restrict p_root, RBTREE_T *__restrict node RBTREE_SLOT__PARAMS),
+                       (p_root, node RBTREE_SLOT__ARGS))
 #else /* RBTREE_OMIT_REMOVENODE */
 RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_NONNULL((1, 2)), void,
                        RBTREE_NOTHROW, RBTREE_CC, RBTREE(removenode),
-                       (RBTREE_T **__restrict proot, RBTREE_T *__restrict node RBTREE_SLOT__PARAMS),
-                       (proot, node RBTREE_SLOT__ARGS))
+                       (RBTREE_T **__restrict p_root, RBTREE_T *__restrict node RBTREE_SLOT__PARAMS),
+                       (p_root, node RBTREE_SLOT__ARGS))
 #endif /* !RBTREE_OMIT_REMOVENODE */
 {
 	RBTREE_LOCVAR(RBTREE_T *, lhs);
 	RBTREE_LOCVAR(RBTREE_T *, rhs);
 	RBTREE_LOCVAR(RBTREE_T *, parent);
 	RBTREE_LOCVAR(RBTREE_T const *, fixnode);
-	_RBTREE_VALIDATE(RBTREE_PROOT_GET(proot));
-	RBTREE_ASSERT(RBTREE_NODE_NOT_ISNULL(RBTREE_PROOT_GET(proot)));
+	_RBTREE_VALIDATE(RBTREE_PROOT_GET(p_root));
+	RBTREE_ASSERT(RBTREE_NODE_NOT_ISNULL(RBTREE_PROOT_GET(p_root)));
 	RBTREE_ASSERT(RBTREE_NODE_NOT_ISNULL(node));
 	lhs = RBTREE_GETLHS(node);
 	rhs = RBTREE_GETRHS(node);
 	RBTREE_ASSERT(!!RBTREE_NODE_ISNULL(RBTREE_GETPAR(node)) ==
-	              !!RBTREE_NODE_EQ(RBTREE_PROOT_GET(proot), node));
+	              !!RBTREE_NODE_EQ(RBTREE_PROOT_GET(p_root), node));
 	/* Find the  node with  which to  replace the  given  `node'.
 	 * This this purpose, when our node what 2 non-NULL children,
 	 * then we must replace `node' with either the MAX-node  from
@@ -1492,11 +1492,11 @@ RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_NONNULL((1, 2)), void,
 		/* At this point we know that `node_to_remove' has <= 2
 		 * child  nodes, so when we call ourselves recursively,
 		 * we know that we won't get here again. */
-		(RBTREE(removenode)(proot, replacement RBTREE_SLOT__ARGS));
+		(RBTREE(removenode)(p_root, replacement RBTREE_SLOT__ARGS));
 
 		/* Replicate the original configuration of `node' in `node_to_remove' */
-		(RBTREE(_replace)(proot, node, replacement RBTREE_SLOT__ARGS));
-		_RBTREE_VALIDATE(RBTREE_PROOT_GET(proot));
+		(RBTREE(_replace)(p_root, node, replacement RBTREE_SLOT__ARGS));
+		_RBTREE_VALIDATE(RBTREE_PROOT_GET(p_root));
 		goto done;
 	}
 	RBTREE_ASSERT(RBTREE_NODE_ISNULL(lhs) || RBTREE_NODE_ISNULL(rhs));
@@ -1504,7 +1504,7 @@ RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_NONNULL((1, 2)), void,
 	if (RBTREE_NODE_ISNULL(lhs) && RBTREE_NODE_ISNULL(rhs)) {
 		parent = RBTREE_GETPAR(node);
 		if (RBTREE_NODE_ISNULL(parent)) {
-			RBTREE_PROOT_SET(proot, RBTREE_NULL);
+			RBTREE_PROOT_SET(p_root, RBTREE_NULL);
 		} else {
 			if (!RBTREE_ISRED(node)) {
 				/* Special case: Removing a black leaf-node. */
@@ -1519,7 +1519,7 @@ RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_NONNULL((1, 2)), void,
 				RBTREE_SETRHS(parent, RBTREE_NULL);
 			}
 		}
-		_RBTREE_VALIDATE(RBTREE_PROOT_GET(proot));
+		_RBTREE_VALIDATE(RBTREE_PROOT_GET(p_root));
 		goto done;
 	}
 	if (RBTREE_NODE_ISNULL(lhs))
@@ -1527,15 +1527,15 @@ RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_NONNULL((1, 2)), void,
 	/* Replace `node' with `lhs' */
 	parent = RBTREE_GETPAR(node);
 #ifdef RBTREE_REPPAR_MAYBE_NULL
-	RBTREE_REPPAR_MAYBE_NULL(lhs, node, parent, proot);
+	RBTREE_REPPAR_MAYBE_NULL(lhs, node, parent, p_root);
 #else /* RBTREE_REPPAR_MAYBE_NULL */
 	RBTREE_SETPAR(lhs, parent);
 #endif /* !RBTREE_REPPAR_MAYBE_NULL */
 	if (RBTREE_NODE_ISNULL(parent)) {
 		/* Special case: Remove the root node. */
-		RBTREE_PROOT_SET(proot, lhs);
+		RBTREE_PROOT_SET(p_root, lhs);
 		RBTREE_SETBLACK(lhs);
-		_RBTREE_VALIDATE(RBTREE_PROOT_GET(proot));
+		_RBTREE_VALIDATE(RBTREE_PROOT_GET(p_root));
 		goto done;
 	}
 	if (RBTREE_NODE_EQ(node, RBTREE_GETLHS(parent))) {
@@ -1568,8 +1568,8 @@ do_delete_black_leaf_node:
 						(RBTREE(_rotr)(parent RBTREE_SLOT__ARGS));
 					}
 					/* Update the root node in case it got changed by the rotations above. */
-					while (RBTREE_GETPAR(RBTREE_PROOT_GET(proot)))
-						RBTREE_PROOT_SET(proot, RBTREE_GETPAR(RBTREE_PROOT_GET(proot)));
+					while (RBTREE_GETPAR(RBTREE_PROOT_GET(p_root)))
+						RBTREE_PROOT_SET(p_root, RBTREE_GETPAR(RBTREE_PROOT_GET(p_root)));
 					parent  = RBTREE_GETPAR(fixnode);
 					sibling = RBTREE_GETLHS(parent);
 					if (RBTREE_NODE_EQ(sibling, fixnode))
@@ -1630,8 +1630,8 @@ do_delete_black_leaf_node:
 						(RBTREE(_rotr)(parent RBTREE_SLOT__ARGS));
 					}
 					/* Update the root-pointer due to all of the rotations above. */
-					while (RBTREE_GETPAR(RBTREE_PROOT_GET(proot)))
-						RBTREE_PROOT_SET(proot, RBTREE_GETPAR(RBTREE_PROOT_GET(proot)));
+					while (RBTREE_GETPAR(RBTREE_PROOT_GET(p_root)))
+						RBTREE_PROOT_SET(p_root, RBTREE_GETPAR(RBTREE_PROOT_GET(p_root)));
 				}
 			}
 			if (RBTREE_NODE_ISNULL(lhs) && RBTREE_NODE_ISNULL(rhs)) {
@@ -1646,7 +1646,7 @@ do_delete_black_leaf_node:
 			}
 		}
 	}
-	_RBTREE_VALIDATE(RBTREE_PROOT_GET(proot));
+	_RBTREE_VALIDATE(RBTREE_PROOT_GET(p_root));
 done:;
 #ifndef RBTREE_NDEBUG
 #ifdef RBTREE_DELPAR
@@ -1681,12 +1681,12 @@ done:;
  * @return: RBTREE_NULL: No node exists for the given key. */
 RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_WUNUSED __ATTR_NONNULL((1)), RBTREE_T *,
                        RBTREE_NOTHROW_U, RBTREE_CC, RBTREE(remove),
-                       (RBTREE_T **__restrict proot, RBTREE_Tkey key RBTREE_SLOT__PARAMS),
-                       (proot, key RBTREE_SLOT__ARGS)) {
+                       (RBTREE_T **__restrict p_root, RBTREE_Tkey key RBTREE_SLOT__PARAMS),
+                       (p_root, key RBTREE_SLOT__ARGS)) {
 	RBTREE_LOCVAR(RBTREE_T *, node);
-	node = RBTREE(locate)(RBTREE_PROOT_GET(proot), key RBTREE_SLOT__ARGS);
+	node = RBTREE(locate)(RBTREE_PROOT_GET(p_root), key RBTREE_SLOT__ARGS);
 	if (RBTREE_NODE_NOT_ISNULL(node))
-		(RBTREE(removenode)(proot, node RBTREE_SLOT__ARGS));
+		(RBTREE(removenode)(p_root, node RBTREE_SLOT__ARGS));
 	return node;
 }
 #endif /* !RBTREE_OMIT_REMOVE */
@@ -1697,12 +1697,12 @@ RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_WUNUSED __ATTR_NONNULL((1)), RBTREE_T
  * @return: RBTREE_NULL: No node exists within the given range. */
 RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_WUNUSED __ATTR_NONNULL((1)), RBTREE_T *,
                        RBTREE_NOTHROW_U, RBTREE_CC, RBTREE(rremove),
-                       (RBTREE_T **__restrict proot, RBTREE_Tkey minkey, RBTREE_Tkey maxkey RBTREE_SLOT__PARAMS),
-                       (proot, minkey, maxkey RBTREE_SLOT__ARGS)) {
+                       (RBTREE_T **__restrict p_root, RBTREE_Tkey minkey, RBTREE_Tkey maxkey RBTREE_SLOT__PARAMS),
+                       (p_root, minkey, maxkey RBTREE_SLOT__ARGS)) {
 	RBTREE_LOCVAR(RBTREE_T *, node);
-	node = RBTREE(rlocate)(RBTREE_PROOT_GET(proot), minkey, maxkey RBTREE_SLOT__ARGS);
+	node = RBTREE(rlocate)(RBTREE_PROOT_GET(p_root), minkey, maxkey RBTREE_SLOT__ARGS);
 	if (RBTREE_NODE_NOT_ISNULL(node))
-		(RBTREE(removenode)(proot, node RBTREE_SLOT__ARGS));
+		(RBTREE(removenode)(p_root, node RBTREE_SLOT__ARGS));
 	return node;
 }
 #endif /* RBTREE_WANT_RREMOVE */

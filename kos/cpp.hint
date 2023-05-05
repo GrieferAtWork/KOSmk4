@@ -1294,6 +1294,8 @@
 #define SLIST_FOREACH_FROM_P(...) for(;;)
 #define SLIST_FOREACH_FROM_SAFE(...) for(;;)
 #define SLIST_FOREACH_FROM_SAFE_P(...) for(;;)
+#define SLIST_FOREACH_PREVPTR(...) for(;;)
+#define SLIST_FOREACH_PREVPTR_P(...) for(;;)
 #define SLIST_P_FOREACH(...) for(;;)
 #define SLIST_P_FOREACH_P(...) for(;;)
 

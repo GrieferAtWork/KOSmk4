@@ -536,6 +536,11 @@ void __builtin_va_end(__builtin_va_list &__ap);
 #define __builtin_va_end  __builtin_va_end
 #endif /* __INTELLISENSE__ && __cplusplus */
 
+#ifdef _PREFAST_ /* Disable BS code analysis warnings that are based on miss-guided opinions */
+#pragma warning(disable: 26493 26494 26477 26438 26446 26482 26485 26448 26462 26496 26461 26476 26481 6255 26427)
+#pragma warning(disable: 26489 26486 26487 26451 26492 26430 28182) /* There warnings would be helpful... IF THEY WORKED! */
+#endif /* _PREFAST_ */
+
 #pragma warning(disable: 4514) /* Unused inline function was removed. */
 #pragma warning(disable: 4574) /* Nonsensical preprocessor warning. */
 #pragma warning(disable: 4710) /* Function not inlined (Emit for local varargs functions...) */

@@ -105,7 +105,7 @@
  * │        1      │  T*   [*]_LOOP_PREV(self, elem, key)                     (NOTE: *_PREV(elem, key) for RINGQ)
  * ├───────────────┤
  * │N N N N N   N N│ size_t[*]_COUNT(self, key)                   # Requires: !__NO_XBLOCK + __COMPILER_HAVE_TYPEOF
- * │N N N N N   N N│  void [*]_COUNT(self, presult, [type], key)
+ * │N N N N N   N N│  void [*]_COUNT(self, p_result, [type], key)
  * ├───────────────┤
  * │1 1 1     1 1 1│  void [*]_INSERT_AFTER(predecessor, elem, key)
  * │      1 1      │  void [*]_INSERT_AFTER(self, predecessor, elem, key)
@@ -497,25 +497,25 @@
 #define LIST_P_PREV_UNSAFE_P(p_elem, T, getpath)                                   (T *)((__SIZE_TYPE__)(p_elem) - (__SIZE_TYPE__)&getpath((T *)0).le_next)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_LIST_COUNT_2(self, key)                   __XBLOCK({ __SIZE_TYPE__ __hlc_res; __HYBRID_LIST_COUNT_3(self, &__hlc_res, key); __XRETURN __hlc_res; })
-#define __HYBRID_LIST_COUNT_3(self, presult, key)          __HYBRID_LIST_COUNT(self, presult, __typeof__(*(self)->lh_first), __HYBRID_Q_KEY, key)
-#define __HYBRID_LIST_COUNT_4(self, presult, type, key)    __HYBRID_LIST_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define __HYBRID_LIST_COUNT_P_2(self, getpath)             __XBLOCK({ __SIZE_TYPE__ __hlc_res; __HYBRID_LIST_COUNT_P_3(self, &__hlc_res, getpath); __XRETURN __hlc_res; })
-#define __HYBRID_LIST_COUNT_P_3(self, presult, getpath)    __HYBRID_LIST_COUNT(self, presult, __typeof__(*(self)->lh_first), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_LIST_COUNT_P_4(self, presult, T, getpath) __HYBRID_LIST_COUNT(self, presult, T, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_LIST_LAST_2(self, key)                    __XBLOCK({ __typeof__(*(self)->lh_first) *__hll_res; __HYBRID_LIST_LAST(self, __hll_res, __HYBRID_Q_KEY, key); __XRETURN __hll_res; })
-#define __HYBRID_LIST_LAST_3(self, p_result, key)          __HYBRID_LIST_LAST(self, *(p_result), __HYBRID_Q_KEY, key)
-#define __HYBRID_LIST_LAST_P_2(self, getpath)              __XBLOCK({ __typeof__(*(self)->lh_first) *__hll_res; __HYBRID_LIST_LAST(self, __hll_res, __HYBRID_Q_PTH, getpath); __XRETURN __hll_res; })
-#define __HYBRID_LIST_LAST_P_3(self, p_result, getpath)    __HYBRID_LIST_LAST(self, *(p_result), __HYBRID_Q_PTH, getpath)
-#define LIST_COUNT(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_COUNT_, (__VA_ARGS__))(__VA_ARGS__)   /* LIST_COUNT(self, [presult], [type], key) */
-#define LIST_COUNT_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_COUNT_P_, (__VA_ARGS__))(__VA_ARGS__) /* LIST_COUNT_P(self, [presult], [T], getpath) */
-#define LIST_LAST(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_LAST_, (__VA_ARGS__))(__VA_ARGS__)    /* LIST_LAST(self, [presult], key) */
-#define LIST_LAST_P(...)  __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_LAST_P_, (__VA_ARGS__))(__VA_ARGS__)  /* LIST_LAST(self, [presult], getpath) */
+#define __HYBRID_LIST_COUNT_2(self, key)                    __XBLOCK({ __SIZE_TYPE__ __hlc_res; __HYBRID_LIST_COUNT_3(self, &__hlc_res, key); __XRETURN __hlc_res; })
+#define __HYBRID_LIST_COUNT_3(self, p_result, key)          __HYBRID_LIST_COUNT(self, p_result, __typeof__(*(self)->lh_first), __HYBRID_Q_KEY, key)
+#define __HYBRID_LIST_COUNT_4(self, p_result, type, key)    __HYBRID_LIST_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define __HYBRID_LIST_COUNT_P_2(self, getpath)              __XBLOCK({ __SIZE_TYPE__ __hlc_res; __HYBRID_LIST_COUNT_P_3(self, &__hlc_res, getpath); __XRETURN __hlc_res; })
+#define __HYBRID_LIST_COUNT_P_3(self, p_result, getpath)    __HYBRID_LIST_COUNT(self, p_result, __typeof__(*(self)->lh_first), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_LIST_COUNT_P_4(self, p_result, T, getpath) __HYBRID_LIST_COUNT(self, p_result, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_LIST_LAST_2(self, key)                     __XBLOCK({ __typeof__(*(self)->lh_first) *__hll_res; __HYBRID_LIST_LAST(self, __hll_res, __HYBRID_Q_KEY, key); __XRETURN __hll_res; })
+#define __HYBRID_LIST_LAST_3(self, p_result, key)           __HYBRID_LIST_LAST(self, *(p_result), __HYBRID_Q_KEY, key)
+#define __HYBRID_LIST_LAST_P_2(self, getpath)               __XBLOCK({ __typeof__(*(self)->lh_first) *__hll_res; __HYBRID_LIST_LAST(self, __hll_res, __HYBRID_Q_PTH, getpath); __XRETURN __hll_res; })
+#define __HYBRID_LIST_LAST_P_3(self, p_result, getpath)     __HYBRID_LIST_LAST(self, *(p_result), __HYBRID_Q_PTH, getpath)
+#define LIST_COUNT(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_COUNT_, (__VA_ARGS__))(__VA_ARGS__)   /* LIST_COUNT(self, [p_result], [type], key) */
+#define LIST_COUNT_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_COUNT_P_, (__VA_ARGS__))(__VA_ARGS__) /* LIST_COUNT_P(self, [p_result], [T], getpath) */
+#define LIST_LAST(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_LAST_, (__VA_ARGS__))(__VA_ARGS__)    /* LIST_LAST(self, [p_result], key) */
+#define LIST_LAST_P(...)  __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_LAST_P_, (__VA_ARGS__))(__VA_ARGS__)  /* LIST_LAST(self, [p_result], getpath) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
-#define LIST_COUNT(self, presult, type, key)    __HYBRID_LIST_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define LIST_COUNT_P(self, presult, T, getpath) __HYBRID_LIST_COUNT(self, presult, T, __HYBRID_Q_PTH, getpath)
-#define LIST_LAST_3(self, p_result, key)        __HYBRID_LIST_LAST(self, *(p_result), __HYBRID_Q_KEY, key)
-#define LIST_LAST_P_3(self, p_result, getpath)  __HYBRID_LIST_LAST(self, *(p_result), __HYBRID_Q_PTH, getpath)
+#define LIST_COUNT(self, p_result, type, key)    __HYBRID_LIST_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define LIST_COUNT_P(self, p_result, T, getpath) __HYBRID_LIST_COUNT(self, p_result, T, __HYBRID_Q_PTH, getpath)
+#define LIST_LAST_3(self, p_result, key)         __HYBRID_LIST_LAST(self, *(p_result), __HYBRID_Q_KEY, key)
+#define LIST_LAST_P_3(self, p_result, getpath)   __HYBRID_LIST_LAST(self, *(p_result), __HYBRID_Q_PTH, getpath)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 #define __HYBRID_LIST_REMOVE_TAIL(self, T, X, _)     \
@@ -533,14 +533,14 @@
 		while (X(_, result).le_next)           \
 			result = X(_, result).le_next;     \
 	}	__WHILE0
-#define __HYBRID_LIST_COUNT(self, presult, T, X, _)     \
+#define __HYBRID_LIST_COUNT(self, p_result, T, X, _)    \
 	/* Sorry, this one must be a statement */           \
 	do {                                                \
 		T *__hlc_iter;                                  \
-		*(presult) = 0;                                 \
+		*(p_result) = 0;                                \
 		for (__hlc_iter = (self)->lh_first; __hlc_iter; \
 		     __hlc_iter = X(_, __hlc_iter).le_next)     \
-			++*(presult);                               \
+			++*(p_result);                              \
 	}	__WHILE0
 #define __HYBRID_LIST_CONCAT(dst, src, T, X, _)                               \
 	/* Sorry, this one must be a statement */                                 \
@@ -1055,25 +1055,25 @@
 #define SLIST_TRYREPLACE_R_P(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, getpath, on_failure) __HYBRID_SLIST_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_SLIST_COUNT_2(self, key)                   __XBLOCK({ __SIZE_TYPE__ __hslc_res; __HYBRID_SLIST_COUNT_3(self, &__hslc_res, key); __XRETURN __hslc_res; })
-#define __HYBRID_SLIST_COUNT_3(self, presult, key)          __HYBRID_SLIST_COUNT(self, presult, __typeof__(*(self)->slh_first), __HYBRID_Q_KEY, key)
-#define __HYBRID_SLIST_COUNT_4(self, presult, type, key)    __HYBRID_SLIST_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define __HYBRID_SLIST_COUNT_P_2(self, getpath)             __XBLOCK({ __SIZE_TYPE__ __hslc_res; __HYBRID_SLIST_COUNT_P_3(self, &__hslc_res, getpath); __XRETURN __hslc_res; })
-#define __HYBRID_SLIST_COUNT_P_3(self, presult, getpath)    __HYBRID_SLIST_COUNT(self, presult, __typeof__(*(self)->slh_first), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_SLIST_COUNT_P_4(self, presult, T, getpath) __HYBRID_SLIST_COUNT(self, presult, T, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_SLIST_LAST_2(self, key)                    __XBLOCK({ __typeof__(*(self)->slh_first) *__hsll_res; __HYBRID_SLIST_LAST(self, __hsll_res, __HYBRID_Q_KEY, key); __XRETURN __hsll_res; })
-#define __HYBRID_SLIST_LAST_3(self, p_result, key)          __HYBRID_SLIST_LAST(self, *(p_result), __HYBRID_Q_KEY, key)
-#define __HYBRID_SLIST_LAST_P_2(self, getpath)              __XBLOCK({ __typeof__(*(self)->slh_first) *__hsll_res; __HYBRID_SLIST_LAST(self, __hsll_res, __HYBRID_Q_PTH, getpath); __XRETURN __hsll_res; })
-#define __HYBRID_SLIST_LAST_P_3(self, p_result, getpath)    __HYBRID_SLIST_LAST(self, *(p_result), __HYBRID_Q_PTH, getpath)
-#define SLIST_COUNT(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_COUNT_, (__VA_ARGS__))(__VA_ARGS__)   /* SLIST_COUNT(self, [presult], [type], key) */
-#define SLIST_COUNT_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_COUNT_P_, (__VA_ARGS__))(__VA_ARGS__) /* SLIST_COUNT_P(self, [presult], [T], getpath) */
-#define SLIST_LAST(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_LAST_, (__VA_ARGS__))(__VA_ARGS__)    /* SLIST_LAST(self, [presult], key) */
-#define SLIST_LAST_P(...)  __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_LAST_P_, (__VA_ARGS__))(__VA_ARGS__)  /* SLIST_LAST(self, [presult], getpath) */
+#define __HYBRID_SLIST_COUNT_2(self, key)                    __XBLOCK({ __SIZE_TYPE__ __hslc_res; __HYBRID_SLIST_COUNT_3(self, &__hslc_res, key); __XRETURN __hslc_res; })
+#define __HYBRID_SLIST_COUNT_3(self, p_result, key)          __HYBRID_SLIST_COUNT(self, p_result, __typeof__(*(self)->slh_first), __HYBRID_Q_KEY, key)
+#define __HYBRID_SLIST_COUNT_4(self, p_result, type, key)    __HYBRID_SLIST_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define __HYBRID_SLIST_COUNT_P_2(self, getpath)              __XBLOCK({ __SIZE_TYPE__ __hslc_res; __HYBRID_SLIST_COUNT_P_3(self, &__hslc_res, getpath); __XRETURN __hslc_res; })
+#define __HYBRID_SLIST_COUNT_P_3(self, p_result, getpath)    __HYBRID_SLIST_COUNT(self, p_result, __typeof__(*(self)->slh_first), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SLIST_COUNT_P_4(self, p_result, T, getpath) __HYBRID_SLIST_COUNT(self, p_result, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SLIST_LAST_2(self, key)                     __XBLOCK({ __typeof__(*(self)->slh_first) *__hsll_res; __HYBRID_SLIST_LAST(self, __hsll_res, __HYBRID_Q_KEY, key); __XRETURN __hsll_res; })
+#define __HYBRID_SLIST_LAST_3(self, p_result, key)           __HYBRID_SLIST_LAST(self, *(p_result), __HYBRID_Q_KEY, key)
+#define __HYBRID_SLIST_LAST_P_2(self, getpath)               __XBLOCK({ __typeof__(*(self)->slh_first) *__hsll_res; __HYBRID_SLIST_LAST(self, __hsll_res, __HYBRID_Q_PTH, getpath); __XRETURN __hsll_res; })
+#define __HYBRID_SLIST_LAST_P_3(self, p_result, getpath)     __HYBRID_SLIST_LAST(self, *(p_result), __HYBRID_Q_PTH, getpath)
+#define SLIST_COUNT(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_COUNT_, (__VA_ARGS__))(__VA_ARGS__)   /* SLIST_COUNT(self, [p_result], [type], key) */
+#define SLIST_COUNT_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_COUNT_P_, (__VA_ARGS__))(__VA_ARGS__) /* SLIST_COUNT_P(self, [p_result], [T], getpath) */
+#define SLIST_LAST(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_LAST_, (__VA_ARGS__))(__VA_ARGS__)    /* SLIST_LAST(self, [p_result], key) */
+#define SLIST_LAST_P(...)  __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_LAST_P_, (__VA_ARGS__))(__VA_ARGS__)  /* SLIST_LAST(self, [p_result], getpath) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
-#define SLIST_COUNT(self, presult, type, key)    __HYBRID_SLIST_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define SLIST_COUNT_P(self, presult, T, getpath) __HYBRID_SLIST_COUNT(self, presult, T, __HYBRID_Q_PTH, getpath)
-#define SLIST_LAST(self, p_result, key)          __HYBRID_SLIST_LAST(self, *(p_result), __HYBRID_Q_KEY, key)
-#define SLIST_LAST_P(self, p_result, getpath)    __HYBRID_SLIST_LAST(self, *(p_result), __HYBRID_Q_PTH, getpath)
+#define SLIST_COUNT(self, p_result, type, key)    __HYBRID_SLIST_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define SLIST_COUNT_P(self, p_result, T, getpath) __HYBRID_SLIST_COUNT(self, p_result, T, __HYBRID_Q_PTH, getpath)
+#define SLIST_LAST(self, p_result, key)           __HYBRID_SLIST_LAST(self, *(p_result), __HYBRID_Q_KEY, key)
+#define SLIST_LAST_P(self, p_result, getpath)     __HYBRID_SLIST_LAST(self, *(p_result), __HYBRID_Q_PTH, getpath)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 #define __HYBRID_SLIST_REMOVE_TAIL(self, T, X, _)                \
@@ -1095,14 +1095,14 @@
 		while (X(_, result).sle_next)           \
 			result = X(_, result).sle_next;     \
 	}	__WHILE0
-#define __HYBRID_SLIST_COUNT(self, presult, T, X, _)       \
+#define __HYBRID_SLIST_COUNT(self, p_result, T, X, _)      \
 	/* Sorry, this one must be a statement */              \
 	do {                                                   \
 		T *__hslc_iter;                                    \
-		*(presult) = 0;                                    \
+		*(p_result) = 0;                                   \
 		for (__hslc_iter = (self)->slh_first; __hslc_iter; \
 		     __hslc_iter = X(_, __hslc_iter).sle_next)     \
-			++*(presult);                                  \
+			++*(p_result);                                 \
 	}	__WHILE0
 
 #define __HYBRID_SLIST_CONCAT(dst, src, T, X, _)                     \
@@ -1606,17 +1606,17 @@
 #define STAILQ_TRYREPLACE_R_P(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, getpath, on_failure) __HYBRID_STAILQ_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_STAILQ_COUNT_2(self, key)                      __XBLOCK({ __SIZE_TYPE__ __hstqc_res; __HYBRID_STAILQ_COUNT_3(self, &__hstqc_res, key); __XRETURN __hstqc_res; })
-#define __HYBRID_STAILQ_COUNT_3(self, presult, key)             __HYBRID_STAILQ_COUNT(self, presult, __typeof__(*(self)->stqh_first), __HYBRID_Q_KEY, key)
-#define __HYBRID_STAILQ_COUNT_4(self, presult, type, key)       __HYBRID_STAILQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define __HYBRID_STAILQ_COUNT_P_2(self, getpath)                __XBLOCK({ __SIZE_TYPE__ __hstqc_res; __HYBRID_STAILQ_COUNT_P_3(self, &__hstqc_res, getpath); __XRETURN __hstqc_res; })
-#define __HYBRID_STAILQ_COUNT_P_3(self, presult, getpath)       __HYBRID_STAILQ_COUNT(self, presult, __typeof__(*(self)->stqh_first), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_STAILQ_COUNT_P_4(self, presult, type, getpath) __HYBRID_STAILQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
-#define STAILQ_COUNT(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_COUNT_, (__VA_ARGS__))(__VA_ARGS__)   /* STAILQ_COUNT(self, [presult], [type], key) */
-#define STAILQ_COUNT_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_COUNT_P_, (__VA_ARGS__))(__VA_ARGS__) /* STAILQ_COUNT_P(self, [presult], [type], getpath) */
+#define __HYBRID_STAILQ_COUNT_2(self, key)                       __XBLOCK({ __SIZE_TYPE__ __hstqc_res; __HYBRID_STAILQ_COUNT_3(self, &__hstqc_res, key); __XRETURN __hstqc_res; })
+#define __HYBRID_STAILQ_COUNT_3(self, p_result, key)             __HYBRID_STAILQ_COUNT(self, p_result, __typeof__(*(self)->stqh_first), __HYBRID_Q_KEY, key)
+#define __HYBRID_STAILQ_COUNT_4(self, p_result, type, key)       __HYBRID_STAILQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define __HYBRID_STAILQ_COUNT_P_2(self, getpath)                 __XBLOCK({ __SIZE_TYPE__ __hstqc_res; __HYBRID_STAILQ_COUNT_P_3(self, &__hstqc_res, getpath); __XRETURN __hstqc_res; })
+#define __HYBRID_STAILQ_COUNT_P_3(self, p_result, getpath)       __HYBRID_STAILQ_COUNT(self, p_result, __typeof__(*(self)->stqh_first), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_STAILQ_COUNT_P_4(self, p_result, type, getpath) __HYBRID_STAILQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
+#define STAILQ_COUNT(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_COUNT_, (__VA_ARGS__))(__VA_ARGS__)   /* STAILQ_COUNT(self, [p_result], [type], key) */
+#define STAILQ_COUNT_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_COUNT_P_, (__VA_ARGS__))(__VA_ARGS__) /* STAILQ_COUNT_P(self, [p_result], [type], getpath) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
-#define STAILQ_COUNT(self, presult, type, key)       __HYBRID_STAILQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define STAILQ_COUNT_P(self, presult, type, getpath) __HYBRID_STAILQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
+#define STAILQ_COUNT(self, p_result, type, key)       __HYBRID_STAILQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define STAILQ_COUNT_P(self, p_result, type, getpath) __HYBRID_STAILQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 #define __HYBRID_STAILQ_REMOVE_TAIL(self, T, X, _)                              \
@@ -1633,14 +1633,14 @@
 		__HYBRID_Q_BADPTR(X(_, __hstqrt_last).stqe_next);                       \
 		(self)->stqh_last = __hstqrt_pbefore_last;                              \
 	}	__WHILE0
-#define __HYBRID_STAILQ_COUNT(self, presult, T, X, _)         \
+#define __HYBRID_STAILQ_COUNT(self, p_result, T, X, _)        \
 	/* Sorry, this one must be a statement */                 \
 	do {                                                      \
 		T *__hstqc_iter;                                      \
-		*(presult) = 0;                                       \
+		*(p_result) = 0;                                      \
 		for (__hstqc_iter = (self)->stqh_first; __hstqc_iter; \
 		     __hstqc_iter = X(_, __hstqc_iter).stqe_next)     \
-			++*(presult);                                     \
+			++*(p_result);                                    \
 	}	__WHILE0
 
 #define __HYBRID_STAILQ_P_PREV3(p_elem, self, T, key) \
@@ -2130,17 +2130,17 @@
 #define SIMPLEQ_TRYREPLACE_R_P(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, getpath, on_failure) __HYBRID_SIMPLEQ_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_SIMPLEQ_COUNT_2(self, key)                      __XBLOCK({ __SIZE_TYPE__ __hsqc_res; __HYBRID_SIMPLEQ_COUNT_3(self, &__hsqc_res, key); __XRETURN __hsqc_res; })
-#define __HYBRID_SIMPLEQ_COUNT_3(self, presult, key)             __HYBRID_SIMPLEQ_COUNT(self, presult, __typeof__(*(self)->sqh_first), __HYBRID_Q_KEY, key)
-#define __HYBRID_SIMPLEQ_COUNT_4(self, presult, type, key)       __HYBRID_SIMPLEQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define __HYBRID_SIMPLEQ_COUNT_P_2(self, getpath)                __XBLOCK({ __SIZE_TYPE__ __hsqc_res; __HYBRID_SIMPLEQ_COUNT_P_3(self, &__hsqc_res, getpath); __XRETURN __hsqc_res; })
-#define __HYBRID_SIMPLEQ_COUNT_P_3(self, presult, getpath)       __HYBRID_SIMPLEQ_COUNT(self, presult, __typeof__(*(self)->sqh_first), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_SIMPLEQ_COUNT_P_4(self, presult, type, getpath) __HYBRID_SIMPLEQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
-#define SIMPLEQ_COUNT(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_COUNT_, (__VA_ARGS__))(__VA_ARGS__)   /* SIMPLEQ_COUNT(self, [presult], [type], key) */
-#define SIMPLEQ_COUNT_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_COUNT_P_, (__VA_ARGS__))(__VA_ARGS__) /* SIMPLEQ_COUNT_P(self, [presult], [type], getpath) */
+#define __HYBRID_SIMPLEQ_COUNT_2(self, key)                       __XBLOCK({ __SIZE_TYPE__ __hsqc_res; __HYBRID_SIMPLEQ_COUNT_3(self, &__hsqc_res, key); __XRETURN __hsqc_res; })
+#define __HYBRID_SIMPLEQ_COUNT_3(self, p_result, key)             __HYBRID_SIMPLEQ_COUNT(self, p_result, __typeof__(*(self)->sqh_first), __HYBRID_Q_KEY, key)
+#define __HYBRID_SIMPLEQ_COUNT_4(self, p_result, type, key)       __HYBRID_SIMPLEQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define __HYBRID_SIMPLEQ_COUNT_P_2(self, getpath)                 __XBLOCK({ __SIZE_TYPE__ __hsqc_res; __HYBRID_SIMPLEQ_COUNT_P_3(self, &__hsqc_res, getpath); __XRETURN __hsqc_res; })
+#define __HYBRID_SIMPLEQ_COUNT_P_3(self, p_result, getpath)       __HYBRID_SIMPLEQ_COUNT(self, p_result, __typeof__(*(self)->sqh_first), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SIMPLEQ_COUNT_P_4(self, p_result, type, getpath) __HYBRID_SIMPLEQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
+#define SIMPLEQ_COUNT(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_COUNT_, (__VA_ARGS__))(__VA_ARGS__)   /* SIMPLEQ_COUNT(self, [p_result], [type], key) */
+#define SIMPLEQ_COUNT_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_COUNT_P_, (__VA_ARGS__))(__VA_ARGS__) /* SIMPLEQ_COUNT_P(self, [p_result], [type], getpath) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
-#define SIMPLEQ_COUNT(self, presult, type, key)       __HYBRID_SIMPLEQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define SIMPLEQ_COUNT_P(self, presult, type, getpath) __HYBRID_SIMPLEQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
+#define SIMPLEQ_COUNT(self, p_result, type, key)       __HYBRID_SIMPLEQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define SIMPLEQ_COUNT_P(self, p_result, type, getpath) __HYBRID_SIMPLEQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 #define __HYBRID_SIMPLEQ_REMOVE_TAIL(self, T, X, _)                          \
@@ -2157,14 +2157,14 @@
 		__HYBRID_Q_BADPTR(X(_, __hsqrt_last).sqe_next);                      \
 		(self)->sqh_last = __hsqrt_pbefore_last;                             \
 	}	__WHILE0
-#define __HYBRID_SIMPLEQ_COUNT(self, presult, T, X, _)     \
+#define __HYBRID_SIMPLEQ_COUNT(self, p_result, T, X, _)    \
 	/* Sorry, this one must be a statement */              \
 	do {                                                   \
 		T *__hsqc_iter;                                    \
-		*(presult) = 0;                                    \
+		*(p_result) = 0;                                   \
 		for (__hsqc_iter = (self)->sqh_first; __hsqc_iter; \
 		     __hsqc_iter = X(_, __hsqc_iter).sqe_next)     \
-			++*(presult);                                  \
+			++*(p_result);                                 \
 	}	__WHILE0
 
 #define __HYBRID_SIMPLEQ_P_PREV3(p_elem, self, T, key) \
@@ -2630,17 +2630,17 @@
 #define TAILQ_UNBIND_IF_P(self, out_pelem, type, getpath, condition)                __HYBRID_TAILQ_UNBIND_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_TAILQ_COUNT_2(self, key)                      __XBLOCK({ __SIZE_TYPE__ __htqc_res; __HYBRID_TAILQ_COUNT_3(self, &__htqc_res, key); __XRETURN __htqc_res; })
-#define __HYBRID_TAILQ_COUNT_3(self, presult, key)             __HYBRID_TAILQ_COUNT(self, presult, __typeof__(*(self)->tqh_first), __HYBRID_Q_KEY, key)
-#define __HYBRID_TAILQ_COUNT_4(self, presult, type, key)       __HYBRID_TAILQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define __HYBRID_TAILQ_COUNT_P_2(self, getpath)                __XBLOCK({ __SIZE_TYPE__ __htqc_res; __HYBRID_TAILQ_COUNT_P_3(self, &__htqc_res, getpath); __XRETURN __htqc_res; })
-#define __HYBRID_TAILQ_COUNT_P_3(self, presult, getpath)       __HYBRID_TAILQ_COUNT(self, presult, __typeof__(*(self)->tqh_first), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_TAILQ_COUNT_P_4(self, presult, type, getpath) __HYBRID_TAILQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
-#define TAILQ_COUNT(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_COUNT_, (__VA_ARGS__))(__VA_ARGS__)   /* TAILQ_COUNT(self, [presult], [type], key) */
-#define TAILQ_COUNT_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_COUNT_P_, (__VA_ARGS__))(__VA_ARGS__) /* TAILQ_COUNT_P(self, [presult], [type], getpath) */
+#define __HYBRID_TAILQ_COUNT_2(self, key)                       __XBLOCK({ __SIZE_TYPE__ __htqc_res; __HYBRID_TAILQ_COUNT_3(self, &__htqc_res, key); __XRETURN __htqc_res; })
+#define __HYBRID_TAILQ_COUNT_3(self, p_result, key)             __HYBRID_TAILQ_COUNT(self, p_result, __typeof__(*(self)->tqh_first), __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_COUNT_4(self, p_result, type, key)       __HYBRID_TAILQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_COUNT_P_2(self, getpath)                 __XBLOCK({ __SIZE_TYPE__ __htqc_res; __HYBRID_TAILQ_COUNT_P_3(self, &__htqc_res, getpath); __XRETURN __htqc_res; })
+#define __HYBRID_TAILQ_COUNT_P_3(self, p_result, getpath)       __HYBRID_TAILQ_COUNT(self, p_result, __typeof__(*(self)->tqh_first), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_COUNT_P_4(self, p_result, type, getpath) __HYBRID_TAILQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
+#define TAILQ_COUNT(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_COUNT_, (__VA_ARGS__))(__VA_ARGS__)   /* TAILQ_COUNT(self, [p_result], [type], key) */
+#define TAILQ_COUNT_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_COUNT_P_, (__VA_ARGS__))(__VA_ARGS__) /* TAILQ_COUNT_P(self, [p_result], [type], getpath) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
-#define TAILQ_COUNT(self, presult, type, key)       __HYBRID_TAILQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define TAILQ_COUNT_P(self, presult, type, getpath) __HYBRID_TAILQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
+#define TAILQ_COUNT(self, p_result, type, key)       __HYBRID_TAILQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define TAILQ_COUNT_P(self, p_result, type, getpath) __HYBRID_TAILQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 #define __HYBRID_TAILQ_REMOVE_TAIL(self, T, X, _)                                                         \
@@ -2649,14 +2649,14 @@
 		T *__htqrt_last = (T *)((__SIZE_TYPE__)(self)->tqh_last - (__SIZE_TYPE__)&X(_, (T *)0).tqe_next); \
 		__HYBRID_TAILQ_REMOVE(self, __htqrt_last, X, _);                                                  \
 	}	__WHILE0
-#define __HYBRID_TAILQ_COUNT(self, presult, T, X, _)       \
+#define __HYBRID_TAILQ_COUNT(self, p_result, T, X, _)      \
 	/* Sorry, this one must be a statement */              \
 	do {                                                   \
 		T *__htqc_iter;                                    \
-		*(presult) = 0;                                    \
+		*(p_result) = 0;                                   \
 		for (__htqc_iter = (self)->tqh_first; __htqc_iter; \
 		     __htqc_iter = X(_, __htqc_iter).tqe_next)     \
-			++*(presult);                                  \
+			++*(p_result);                                 \
 	}	__WHILE0
 #define __HYBRID_TAILQ_INSERT_HEAD(self, elem, X, _) \
 	__HYBRID_TAILQ_INSERT_HEAD_R(self, elem, elem, X, _)
@@ -3264,17 +3264,17 @@
 #define CIRCLEQ_UNBIND_IF_P(self, out_pelem, type, getpath, condition)                __HYBRID_CIRCLEQ_UNBIND_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_CIRCLEQ_COUNT_2(self, key)                      __XBLOCK({ __SIZE_TYPE__ __hcqc_res; __HYBRID_CIRCLEQ_COUNT_3(self, &__hcqc_res, key); __XRETURN __hcqc_res; })
-#define __HYBRID_CIRCLEQ_COUNT_3(self, presult, key)             __HYBRID_CIRCLEQ_COUNT(self, presult, __typeof__(*(self)->cqh_first), __HYBRID_Q_KEY, key)
-#define __HYBRID_CIRCLEQ_COUNT_4(self, presult, type, key)       __HYBRID_CIRCLEQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define __HYBRID_CIRCLEQ_COUNT_P_2(self, getpath)                __XBLOCK({ __SIZE_TYPE__ __hcqc_res; __HYBRID_CIRCLEQ_COUNT_P_3(self, &__hcqc_res, getpath); __XRETURN __hcqc_res; })
-#define __HYBRID_CIRCLEQ_COUNT_P_3(self, presult, getpath)       __HYBRID_CIRCLEQ_COUNT(self, presult, __typeof__(*(self)->cqh_first), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_CIRCLEQ_COUNT_P_4(self, presult, type, getpath) __HYBRID_CIRCLEQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
-#define CIRCLEQ_COUNT(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_COUNT_, (__VA_ARGS__))(__VA_ARGS__)   /* CIRCLEQ_COUNT(self, [presult], [type], key) */
-#define CIRCLEQ_COUNT_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_COUNT_P_, (__VA_ARGS__))(__VA_ARGS__) /* CIRCLEQ_COUNT_P(self, [presult], [type], getpath) */
+#define __HYBRID_CIRCLEQ_COUNT_2(self, key)                       __XBLOCK({ __SIZE_TYPE__ __hcqc_res; __HYBRID_CIRCLEQ_COUNT_3(self, &__hcqc_res, key); __XRETURN __hcqc_res; })
+#define __HYBRID_CIRCLEQ_COUNT_3(self, p_result, key)             __HYBRID_CIRCLEQ_COUNT(self, p_result, __typeof__(*(self)->cqh_first), __HYBRID_Q_KEY, key)
+#define __HYBRID_CIRCLEQ_COUNT_4(self, p_result, type, key)       __HYBRID_CIRCLEQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define __HYBRID_CIRCLEQ_COUNT_P_2(self, getpath)                 __XBLOCK({ __SIZE_TYPE__ __hcqc_res; __HYBRID_CIRCLEQ_COUNT_P_3(self, &__hcqc_res, getpath); __XRETURN __hcqc_res; })
+#define __HYBRID_CIRCLEQ_COUNT_P_3(self, p_result, getpath)       __HYBRID_CIRCLEQ_COUNT(self, p_result, __typeof__(*(self)->cqh_first), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_CIRCLEQ_COUNT_P_4(self, p_result, type, getpath) __HYBRID_CIRCLEQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
+#define CIRCLEQ_COUNT(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_COUNT_, (__VA_ARGS__))(__VA_ARGS__)   /* CIRCLEQ_COUNT(self, [p_result], [type], key) */
+#define CIRCLEQ_COUNT_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_COUNT_P_, (__VA_ARGS__))(__VA_ARGS__) /* CIRCLEQ_COUNT_P(self, [p_result], [type], getpath) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
-#define CIRCLEQ_COUNT(self, presult, type, key)       __HYBRID_CIRCLEQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define CIRCLEQ_COUNT_P(self, presult, type, getpath) __HYBRID_CIRCLEQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
+#define CIRCLEQ_COUNT(self, p_result, type, key)       __HYBRID_CIRCLEQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define CIRCLEQ_COUNT_P(self, p_result, type, getpath) __HYBRID_CIRCLEQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 #define __HYBRID_CIRCLEQ_REMOVE_TAIL(self, X, _)                                                 \
@@ -3283,15 +3283,15 @@
 	 : (void)(X(_, X(_, (self)->cqh_last).cqe_prev).cqe_next = X(_, (self)->cqh_last).cqe_next), \
 	 __HYBRID_Q_BADPTR(X(_, (self)->cqh_last).cqe_next),                                         \
 	 (self)->cqh_last = X(_, (self)->cqh_last).cqe_prev)
-#define __HYBRID_CIRCLEQ_COUNT(self, presult, T, X, _)            \
+#define __HYBRID_CIRCLEQ_COUNT(self, p_result, T, X, _)           \
 	/* Sorry, this one must be a statement */                     \
 	do {                                                          \
 		T *__hcqc_iter;                                           \
-		*(presult) = 0;                                           \
+		*(p_result) = 0;                                          \
 		for (__hcqc_iter = (self)->cqh_first;                     \
 		     (void const *)(__hcqc_iter) != (void const *)(self); \
 		     __hcqc_iter = X(_, __hcqc_iter).cqe_next)            \
-			++*(presult);                                         \
+			++*(p_result);                                        \
 	}	__WHILE0
 
 #define __HYBRID_CIRCLEQ_CONCAT(dst, src, X, _)                                         \
@@ -3860,23 +3860,23 @@
 #define DLIST_TRYREMOVE_IF_P(self, out_pelem, T, getpath, condition, on_failure) __HYBRID_DLIST_TRYREMOVE_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_failure)
 #endif /* !__HYBRID_PP_VA_OVERLOAD || !__COMPILER_HAVE_TYPEOF */
 #if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_DLIST_COUNT_2(self, key)                   __XBLOCK({ __SIZE_TYPE__ __hdlc_res; __HYBRID_DLIST_COUNT_3(self, &__hdlc_res, key); __XRETURN __hdlc_res; })
-#define __HYBRID_DLIST_COUNT_3(self, presult, key)          __HYBRID_DLIST_COUNT(self, presult, __typeof__(*(self)->dlh_first), __HYBRID_Q_KEY, key)
-#define __HYBRID_DLIST_COUNT_4(self, presult, type, key)    __HYBRID_DLIST_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define __HYBRID_DLIST_COUNT_P_2(self, getpath)             __XBLOCK({ __SIZE_TYPE__ __hdlc_res; __HYBRID_DLIST_COUNT_P_3(self, &__hdlc_res, getpath); __XRETURN __hdlc_res; })
-#define __HYBRID_DLIST_COUNT_P_3(self, presult, getpath)    __HYBRID_DLIST_COUNT(self, presult, __typeof__(*(self)->dlh_first), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_DLIST_COUNT_P_4(self, presult, T, getpath) __HYBRID_DLIST_COUNT(self, presult, T, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_DLIST_LAST_2(self, key)                    __XBLOCK({ __typeof__(*(self)->dlh_first) *__hsll_res; __HYBRID_DLIST_LAST(self, __hsll_res, __HYBRID_Q_KEY, key); __XRETURN __hsll_res; })
-#define __HYBRID_DLIST_LAST_3(self, p_result, key)          __HYBRID_DLIST_LAST(self, *(p_result), __HYBRID_Q_KEY, key)
-#define __HYBRID_DLIST_LAST_P_2(self, getpath)              __XBLOCK({ __typeof__(*(self)->dlh_first) *__hsll_res; __HYBRID_DLIST_LAST(self, __hsll_res, __HYBRID_Q_PTH, getpath); __XRETURN __hsll_res; })
-#define __HYBRID_DLIST_LAST_P_3(self, p_result, getpath)    __HYBRID_DLIST_LAST(self, *(p_result), __HYBRID_Q_PTH, getpath)
-#define DLIST_COUNT(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_COUNT_, (__VA_ARGS__))(__VA_ARGS__)   /* DLIST_COUNT(self, [presult], [type], key) */
-#define DLIST_COUNT_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_COUNT_P_, (__VA_ARGS__))(__VA_ARGS__) /* DLIST_COUNT_P(self, [presult], [T], getpath) */
-#define DLIST_LAST(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_LAST_, (__VA_ARGS__))(__VA_ARGS__)    /* DLIST_LAST(self, [presult], key) */
-#define DLIST_LAST_P(...)  __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_LAST_P_, (__VA_ARGS__))(__VA_ARGS__)  /* DLIST_LAST(self, [presult], getpath) */
+#define __HYBRID_DLIST_COUNT_2(self, key)                    __XBLOCK({ __SIZE_TYPE__ __hdlc_res; __HYBRID_DLIST_COUNT_3(self, &__hdlc_res, key); __XRETURN __hdlc_res; })
+#define __HYBRID_DLIST_COUNT_3(self, p_result, key)          __HYBRID_DLIST_COUNT(self, p_result, __typeof__(*(self)->dlh_first), __HYBRID_Q_KEY, key)
+#define __HYBRID_DLIST_COUNT_4(self, p_result, type, key)    __HYBRID_DLIST_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define __HYBRID_DLIST_COUNT_P_2(self, getpath)              __XBLOCK({ __SIZE_TYPE__ __hdlc_res; __HYBRID_DLIST_COUNT_P_3(self, &__hdlc_res, getpath); __XRETURN __hdlc_res; })
+#define __HYBRID_DLIST_COUNT_P_3(self, p_result, getpath)    __HYBRID_DLIST_COUNT(self, p_result, __typeof__(*(self)->dlh_first), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_DLIST_COUNT_P_4(self, p_result, T, getpath) __HYBRID_DLIST_COUNT(self, p_result, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_DLIST_LAST_2(self, key)                     __XBLOCK({ __typeof__(*(self)->dlh_first) *__hsll_res; __HYBRID_DLIST_LAST(self, __hsll_res, __HYBRID_Q_KEY, key); __XRETURN __hsll_res; })
+#define __HYBRID_DLIST_LAST_3(self, p_result, key)           __HYBRID_DLIST_LAST(self, *(p_result), __HYBRID_Q_KEY, key)
+#define __HYBRID_DLIST_LAST_P_2(self, getpath)               __XBLOCK({ __typeof__(*(self)->dlh_first) *__hsll_res; __HYBRID_DLIST_LAST(self, __hsll_res, __HYBRID_Q_PTH, getpath); __XRETURN __hsll_res; })
+#define __HYBRID_DLIST_LAST_P_3(self, p_result, getpath)     __HYBRID_DLIST_LAST(self, *(p_result), __HYBRID_Q_PTH, getpath)
+#define DLIST_COUNT(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_COUNT_, (__VA_ARGS__))(__VA_ARGS__)   /* DLIST_COUNT(self, [p_result], [type], key) */
+#define DLIST_COUNT_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_COUNT_P_, (__VA_ARGS__))(__VA_ARGS__) /* DLIST_COUNT_P(self, [p_result], [T], getpath) */
+#define DLIST_LAST(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_LAST_, (__VA_ARGS__))(__VA_ARGS__)    /* DLIST_LAST(self, [p_result], key) */
+#define DLIST_LAST_P(...)  __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_LAST_P_, (__VA_ARGS__))(__VA_ARGS__)  /* DLIST_LAST(self, [p_result], getpath) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
-#define DLIST_COUNT(self, presult, type, key)        __HYBRID_DLIST_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define DLIST_COUNT_P(self, presult, T, getpath)     __HYBRID_DLIST_COUNT(self, presult, T, __HYBRID_Q_PTH, getpath)
+#define DLIST_COUNT(self, p_result, type, key)       __HYBRID_DLIST_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define DLIST_COUNT_P(self, p_result, T, getpath)    __HYBRID_DLIST_COUNT(self, p_result, T, __HYBRID_Q_PTH, getpath)
 #define HYBRID_DLIST_LAST(self, p_result, key)       __HYBRID_DLIST_LAST(self, *(p_result), __HYBRID_Q_KEY, key)
 #define HYBRID_DLIST_LAST_P(self, p_result, getpath) __HYBRID_DLIST_LAST(self, *(p_result), __HYBRID_Q_PTH, getpath)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
@@ -3895,14 +3895,14 @@
 		while (X(_, result).dle_next)           \
 			result = X(_, result).dle_next;     \
 	}	__WHILE0
-#define __HYBRID_DLIST_COUNT(self, presult, T, X, _)       \
+#define __HYBRID_DLIST_COUNT(self, p_result, T, X, _)      \
 	/* Sorry, this one must be a statement */              \
 	do {                                                   \
 		T *__hdlc_iter;                                    \
-		*(presult) = 0;                                    \
+		*(p_result) = 0;                                   \
 		for (__hdlc_iter = (self)->dlh_first; __hdlc_iter; \
 		     __hdlc_iter = X(_, __hdlc_iter).dle_next)     \
-			++*(presult);                                  \
+			++*(p_result);                                 \
 	}	__WHILE0
 
 #define __HYBRID_DLIST_CONCAT(dst, src, T, X, _)                                                    \
@@ -4378,17 +4378,17 @@ __NAMESPACE_INT_END
 #define XSIMPLEQ_TRYREPLACE_R_P(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, getpath, on_failure) __HYBRID_XSIMPLEQ_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_XSIMPLEQ_COUNT_2(self, key)                      __XBLOCK({ __SIZE_TYPE__ __hxqc_res; __HYBRID_XSIMPLEQ_COUNT_3(self, &__hxqc_res, key); __XRETURN __hxqc_res; })
-#define __HYBRID_XSIMPLEQ_COUNT_3(self, presult, key)             __HYBRID_XSIMPLEQ_COUNT(self, presult, __typeof__(*(self)->sqx_first), __HYBRID_Q_KEY, key)
-#define __HYBRID_XSIMPLEQ_COUNT_4(self, presult, type, key)       __HYBRID_XSIMPLEQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define __HYBRID_XSIMPLEQ_COUNT_P_2(self, getpath)                __XBLOCK({ __SIZE_TYPE__ __hxqc_res; __HYBRID_XSIMPLEQ_COUNT_P_3(self, &__hxqc_res, getpath); __XRETURN __hxqc_res; })
-#define __HYBRID_XSIMPLEQ_COUNT_P_3(self, presult, getpath)       __HYBRID_XSIMPLEQ_COUNT(self, presult, __typeof__(*(self)->sqx_first), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_XSIMPLEQ_COUNT_P_4(self, presult, type, getpath) __HYBRID_XSIMPLEQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
-#define XSIMPLEQ_COUNT(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_XSIMPLEQ_COUNT_, (__VA_ARGS__))(__VA_ARGS__)   /* XSIMPLEQ_COUNT(self, [presult], [type], key) */
-#define XSIMPLEQ_COUNT_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_XSIMPLEQ_COUNT_P_, (__VA_ARGS__))(__VA_ARGS__) /* XSIMPLEQ_COUNT_P(self, [presult], [type], getpath) */
+#define __HYBRID_XSIMPLEQ_COUNT_2(self, key)                       __XBLOCK({ __SIZE_TYPE__ __hxqc_res; __HYBRID_XSIMPLEQ_COUNT_3(self, &__hxqc_res, key); __XRETURN __hxqc_res; })
+#define __HYBRID_XSIMPLEQ_COUNT_3(self, p_result, key)             __HYBRID_XSIMPLEQ_COUNT(self, p_result, __typeof__(*(self)->sqx_first), __HYBRID_Q_KEY, key)
+#define __HYBRID_XSIMPLEQ_COUNT_4(self, p_result, type, key)       __HYBRID_XSIMPLEQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define __HYBRID_XSIMPLEQ_COUNT_P_2(self, getpath)                 __XBLOCK({ __SIZE_TYPE__ __hxqc_res; __HYBRID_XSIMPLEQ_COUNT_P_3(self, &__hxqc_res, getpath); __XRETURN __hxqc_res; })
+#define __HYBRID_XSIMPLEQ_COUNT_P_3(self, p_result, getpath)       __HYBRID_XSIMPLEQ_COUNT(self, p_result, __typeof__(*(self)->sqx_first), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_XSIMPLEQ_COUNT_P_4(self, p_result, type, getpath) __HYBRID_XSIMPLEQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
+#define XSIMPLEQ_COUNT(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_XSIMPLEQ_COUNT_, (__VA_ARGS__))(__VA_ARGS__)   /* XSIMPLEQ_COUNT(self, [p_result], [type], key) */
+#define XSIMPLEQ_COUNT_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_XSIMPLEQ_COUNT_P_, (__VA_ARGS__))(__VA_ARGS__) /* XSIMPLEQ_COUNT_P(self, [p_result], [type], getpath) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
-#define XSIMPLEQ_COUNT(self, presult, type, key)       __HYBRID_XSIMPLEQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define XSIMPLEQ_COUNT_P(self, presult, type, getpath) __HYBRID_XSIMPLEQ_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
+#define XSIMPLEQ_COUNT(self, p_result, type, key)       __HYBRID_XSIMPLEQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define XSIMPLEQ_COUNT_P(self, p_result, type, getpath) __HYBRID_XSIMPLEQ_COUNT(self, p_result, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 
@@ -4471,14 +4471,14 @@ __NAMESPACE_INT_END
 		__HYBRID_Q_BADPTR(X(_, __hxqrt_last).sqx_next);                                          \
 		(self)->sqx_last = XSIMPLEQ_XOR(self, __hxqrt_pbefore_last);                             \
 	}	__WHILE0
-#define __HYBRID_XSIMPLEQ_COUNT(self, presult, T, X, _)                        \
+#define __HYBRID_XSIMPLEQ_COUNT(self, p_result, T, X, _)                       \
 	/* Sorry, this one must be a statement */                                  \
 	do {                                                                       \
 		T *__hxqc_iter;                                                        \
-		*(presult) = 0;                                                        \
+		*(p_result) = 0;                                                       \
 		for (__hxqc_iter = XSIMPLEQ_XOR(self, (self)->sqx_first); __hxqc_iter; \
 		     __hxqc_iter = XSIMPLEQ_XOR(self, X(_, __hxqc_iter).sqx_next))     \
-			++*(presult);                                                      \
+			++*(p_result);                                                     \
 	}	__WHILE0
 #define __HYBRID_XSIMPLEQ_P_PREV3(p_elem, self, T, key) \
 	((p_elem) == XSIMPLEQ_XOR(self, &(self)->sqx_first) ? __NULLPTR : __COMPILER_CONTAINER_OF(p_elem, T, key.sqx_next))
