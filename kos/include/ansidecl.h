@@ -61,9 +61,9 @@
 #define GCC_VERSION (__GNUC__ * 1000 + __GNUC_MINOR__)
 #endif /* GCC_VERSION && __GNUC__ */
 
-#if !defined(inline) && !defined(__ATTR_INLINE_IS_INLINE) && !defined(__NO_ATTR_INLINE)
+#if !defined(inline) && !defined(__ATTR_INLINE_IS_inline) && !defined(__NO_ATTR_INLINE)
 #define inline __ATTR_INLINE
-#endif /* !inline && !__ATTR_INLINE_IS_INLINE && !__NO_ATTR_INLINE */
+#endif /* !inline && !__ATTR_INLINE_IS_inline && !__NO_ATTR_INLINE */
 
 #ifdef ANSI_PROTOTYPES
 #define VPARAMS(args)               args

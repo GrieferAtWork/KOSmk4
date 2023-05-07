@@ -64,8 +64,8 @@
 #endif /* !__GCC_VERSION_NUM */
 
 #ifndef __has_attribute
-#if (defined(__i386__) || defined(__i386)) && \
-    !defined(__x86_64__) && !defined(__x86_64)
+#if ((defined(__i386__) || defined(__i386)) && \
+     !defined(__x86_64__) && !defined(__x86_64))
 #define __GCC_HAS_ATTRIBUTE___fastcall__
 #define __GCC_HAS_ATTRIBUTE___stdcall__
 #define __GCC_HAS_ATTRIBUTE___cdecl__
@@ -92,32 +92,26 @@
 #if __GCC_VERSION_NUM >= 20000 && !defined(__cplusplus)
 #define __GCC_HAS_ATTRIBUTE___transparent_union__
 #endif
-#if __GCC_VERSION_NUM >= 20300
-#define __GCC_HAS_ATTRIBUTE___format__ /* 20400 */
-#endif
-#if __GCC_VERSION_NUM >= 20500
-#define __GCC_HAS_ATTRIBUTE___noreturn__ /* 20800 */
-#define __GCC_HAS_ATTRIBUTE___const__ /* 20400 */
-#endif
-#if __GCC_VERSION_NUM >= 20700
-#define __GCC_HAS_ATTRIBUTE___unused__ /* 20400 */
+#if __GCC_VERSION_NUM >= 20400
+#define __GCC_HAS_ATTRIBUTE___format__ /* 20300 */
+#define __GCC_HAS_ATTRIBUTE___format_arg__ /* 20800 */
+#define __GCC_HAS_ATTRIBUTE___const__ /* 20500 */
+#define __GCC_HAS_ATTRIBUTE___unused__ /* 20700 */
+#define __GCC_HAS_ATTRIBUTE___no_instrument_function__ /* 30100 */
 #endif
 #if __GCC_VERSION_NUM >= 20800
-#define __GCC_HAS_ATTRIBUTE___format_arg__ /* 20400 */
+#define __GCC_HAS_ATTRIBUTE___noreturn__ /* 20500 */
 #endif
 #if __GCC_VERSION_NUM >= 29600
 #define __GCC_HAS_ATTRIBUTE___pure__
-#endif
-#if __GCC_VERSION_NUM >= 30000 /* 29600 */
-#define __GCC_HAS_ATTRIBUTE___malloc__
+#define __GCC_HAS_ATTRIBUTE___malloc__ /* 30000 */
+#define __GCC_HAS_ATTRIBUTE___noinline__ /* 30100 */
 #endif
 #if __GCC_VERSION_NUM >= 30100
-#define __GCC_HAS_ATTRIBUTE___no_instrument_function__ /* 20400 */
-#define __GCC_HAS_ATTRIBUTE___noinline__ /* 29600 */
 #define __GCC_HAS_ATTRIBUTE___used__
-#define __GCC_HAS_ATTRIBUTE___deprecated__ /*  - __GCC_VERSION_NUM >= 30100
-                                            *  - __GCC_VERSION_NUM >= 30200
-                                            *  - __GCC_VERSION_NUM >= 30500
+#define __GCC_HAS_ATTRIBUTE___deprecated__ /* - __GCC_VERSION_NUM >= 30100
+                                            * - __GCC_VERSION_NUM >= 30200
+                                            * - __GCC_VERSION_NUM >= 30500
                                             * The internet isn't unanimous about this one... */
 #endif
 #if __GCC_VERSION_NUM >= 30300
@@ -129,8 +123,8 @@
 #if __GCC_VERSION_NUM >= 30400
 #define __GCC_HAS_ATTRIBUTE_warn_unused_result
 #endif
-#if __GCC_VERSION_NUM >= 30500
-#define __GCC_HAS_ATTRIBUTE___sentinel__ /* 40000 */
+#if __GCC_VERSION_NUM >= 40000
+#define __GCC_HAS_ATTRIBUTE___sentinel__ /* 30500 */
 #endif
 #if __GCC_VERSION_NUM >= 40300
 #define __GCC_HAS_ATTRIBUTE___alloc_size__
@@ -150,11 +144,11 @@
 #if __GCC_VERSION_NUM >= 50400
 #define __GCC_HAS_ATTRIBUTE___alloc_align__
 #endif
-#if __GCC_VERSION_NUM >= 70000
-#define __GCC_HAS_ATTRIBUTE___fallthrough__
-#endif
 #if __GCC_VERSION_NUM >= 60000
 #define __GCC_HAS_ATTRIBUTE_fallthrough
+#endif
+#if __GCC_VERSION_NUM >= 70000
+#define __GCC_HAS_ATTRIBUTE___fallthrough__
 #endif
 #if defined(__GNUC_GNU_INLINE__) || defined(__GNUC_STDC_INLINE__)
 #define __GCC_HAS_ATTRIBUTE___gnu_inline__
@@ -326,6 +320,7 @@
 #endif /* !... */
 
 #if __has_attribute(__noreturn__)
+#define __ATTR_NORETURN_IS___attribute_____noreturn__
 #define __ATTR_NORETURN __attribute__((__noreturn__))
 #else /* ... */
 #define __NO_ATTR_NORETURN
@@ -507,7 +502,7 @@
 #endif /* !... */
 
 #if __GCC_VERSION_NUM >= 40800
-#define __ATTR_THREAD_IS___THREAD
+#define __ATTR_THREAD_IS___thread
 #define __ATTR_THREAD __thread
 #else /* __GCC_VERSION_NUM >= 40800 */
 #define __NO_ATTR_THREAD
@@ -720,7 +715,7 @@
       !defined(__clang__) && !defined(unix) && \
       !defined(__unix__)) ||                   \
      defined(__LP64__))
-#define __COMPILER_ALIGNOF_IS___ALIGNOF__
+#define __COMPILER_ALIGNOF_IS___alignof__
 #define __COMPILER_ALIGNOF __alignof__
 #elif defined(__clang__)
 #define __COMPILER_ALIGNOF_IS___ALIGNOF
@@ -737,10 +732,10 @@ extern "C++" { template<class T> struct __compiler_alignof { char __x; T __y; };
 #define __ATTR_INLINE /* Nothing */
 #elif (defined(inline) || defined(__cplusplus) || \
        (defined(__STDC_VERSION__) && __STDC_VERSION__ > 199901L))
-#define __ATTR_INLINE_IS_INLINE
+#define __ATTR_INLINE_IS_inline
 #define __ATTR_INLINE inline
 #elif __GCC_VERSION_NUM >= 20700
-#define __ATTR_INLINE_IS___INLINE__
+#define __ATTR_INLINE_IS___inline__
 #define __ATTR_INLINE __inline__
 #else /* ... */
 #define __NO_ATTR_INLINE
@@ -817,7 +812,7 @@ __extension__ typedef unsigned long long __ulonglong_t;
 #if __GCC_VERSION_NUM < 29200 /* __GCC_VERSION_NUM < 29500 */
 #ifndef __restrict
 #if defined(restrict) || (defined(__STDC_VERSION__) && (__STDC_VERSION__+0) >= 199901L)
-#define __RESTRICT_IS_RESTRICT
+#define __restrict_IS_restrict
 #define __restrict restrict
 #else /* restrict || ... */
 #define __restrict /* Nothing */

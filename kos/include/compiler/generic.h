@@ -138,8 +138,8 @@
 #define __COMPILER_HAVE_PRAGMA_PACK
 #endif /* ... */
 
-#if __has_feature(__tpp_pragma_push_macro__) || \
-    (defined(__TPP_VERSION__) && __TPP_VERSION__ == 103)
+#if (__has_feature(__tpp_pragma_push_macro__) || \
+     (defined(__TPP_VERSION__) && __TPP_VERSION__ == 103))
 #define __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #endif /* #pragma push_macro(...) */
 
@@ -266,30 +266,33 @@
 
 #if (__has_attribute(__noreturn__) || defined(__TINYC__) || \
      (defined(__SUNPRO_C) && __SUNPRO_C >= 0x5110))
+#define __ATTR_NORETURN_IS___attribute_____noreturn__
 #define __ATTR_NORETURN __attribute__((__noreturn__))
 #elif defined(__SUNPRO_C) && __SUNPRO_C >= 0x590
+#define __ATTR_NORETURN_IS___attribute___noreturn
 #define __ATTR_NORETURN __attribute__((noreturn))
 #elif __has_declspec_attribute(noreturn)
+#define __ATTR_NORETURN_IS___declspec_noreturn
 #define __ATTR_NORETURN __declspec(noreturn)
 #elif defined(_Noreturn) || (!defined(__cplusplus) && defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112)
-#define __ATTR_NORETURN_IS__NORETURN
+#define __ATTR_NORETURN_IS__Noreturn
 #define __ATTR_NORETURN _Noreturn
 #elif __has_cpp_attribute(noreturn)
 #undef noreturn
-#define __ATTR_NORETURN_IS_LB_LB_NORETURN_RB_RB
+#define __ATTR_NORETURN_IS_LB_LB_noreturn_RB_RB
 #define __ATTR_NORETURN [[noreturn]]
 #elif defined(noreturn)
-#define __ATTR_NORETURN_IS_NORETURN
+#define __ATTR_NORETURN_IS_noreturn
 #define __ATTR_NORETURN noreturn
 #elif !defined(__KOS_SYSTEM_HEADERS__)
 #ifdef __NO_has_include
 #include <stdnoreturn.h>
-#define __ATTR_NORETURN_IS_NORETURN
+#define __ATTR_NORETURN_IS_noreturn
 #define __ATTR_NORETURN noreturn
 #else /* __NO_has_include */
 #if __has_include(<stdnoreturn.h>)
 #include <stdnoreturn.h>
-#define __ATTR_NORETURN_IS_NORETURN
+#define __ATTR_NORETURN_IS_noreturn
 #define __ATTR_NORETURN noreturn
 #endif /* __has_include(<stdnoreturn.h>) */
 #endif /* !__NO_has_include */
@@ -319,7 +322,7 @@
 #if __has_attribute(__fastcall__) || (defined(__TINYC__) && defined(__i386__))
 #define __ATTR_FASTCALL __attribute__((__fastcall__))
 #elif defined(__fastcall)
-#define __ATTR_FASTCALL_IS___FASTCALL
+#define __ATTR_FASTCALL_IS___fastcall
 #define __ATTR_FASTCALL __fastcall
 #else /* ... */
 #define __NO_ATTR_FASTCALL
@@ -329,7 +332,7 @@
 #if __has_attribute(__stdcall__) || defined(__TINYC__)
 #define __ATTR_STDCALL __attribute__((__stdcall__))
 #elif defined(__stdcall)
-#define __ATTR_STDCALL_IS___STDCALL
+#define __ATTR_STDCALL_IS___stdcall
 #define __ATTR_STDCALL __stdcall
 #else /* ... */
 #define __NO_ATTR_STDCALL
@@ -339,7 +342,7 @@
 #if __has_attribute(__cdecl__) || defined(__TINYC__)
 #define __ATTR_CDECL __attribute__((__cdecl__))
 #elif defined(__cdecl)
-#define __ATTR_CDECL_IS___CDECL
+#define __ATTR_CDECL_IS___cdecl
 #define __ATTR_CDECL __cdecl
 #else /* ... */
 #define __NO_ATTR_CDECL
@@ -349,7 +352,7 @@
 #if __has_attribute(__clrcall__)
 #define __ATTR_CLRCALL __attribute__((__clrcall__))
 #elif defined(__clrcall)
-#define __ATTR_CLRCALL_IS___CLRCALL
+#define __ATTR_CLRCALL_IS___clrcall
 #define __ATTR_CLRCALL __clrcall
 #else /* ... */
 #define __NO_ATTR_CLRCALL
@@ -359,7 +362,7 @@
 #if __has_attribute(__thiscall__)
 #define __ATTR_THISCALL __attribute__((__thiscall__))
 #elif defined(__thiscall)
-#define __ATTR_THISCALL_IS___THISCALL
+#define __ATTR_THISCALL_IS___thiscall
 #define __ATTR_THISCALL __thiscall
 #else /* ... */
 #define __NO_ATTR_THISCALL
@@ -369,7 +372,7 @@
 #if __has_attribute(__ms_abi__) || defined(__TINYC__)
 #define __ATTR_MSABI __attribute__((__ms_abi__))
 #elif defined(__ms_abi)
-#define __ATTR_MSABI_IS___MS_ABI
+#define __ATTR_MSABI_IS___ms_abi
 #define __ATTR_MSABI __ms_abi
 #else /* ... */
 #define __NO_ATTR_MSABI
@@ -379,7 +382,7 @@
 #if __has_attribute(__sysv_abi__) || defined(__TINYC__)
 #define __ATTR_SYSVABI __attribute__((__sysv_abi__))
 #elif defined(__sysv_abi)
-#define __ATTR_SYSVABI_IS___SYSV_ABI
+#define __ATTR_SYSVABI_IS___sysv_abi
 #define __ATTR_SYSVABI __sysv_abi
 #else /* ... */
 #define __NO_ATTR_SYSVABI
@@ -502,19 +505,21 @@
 #if (__has_feature(cxx_thread_local) ||                                     \
      (defined(__cplusplus) && (defined(__SUNPRO_CC) || defined(__IBMC__) || \
                                defined(__IBMCPP__))))
-#define __ATTR_THREAD_IS_THREAD_LOCAL
+#define __ATTR_THREAD_IS_thread_local
 #define __ATTR_THREAD thread_local
 #elif (__has_feature(c_thread_local) || \
        (!defined(__cplusplus) && defined(__STDC_VERSION__) && (__STDC_VERSION__+0) > 201000L))
-#define __ATTR_THREAD_IS__THREAD_LOCAL
+#define __ATTR_THREAD_IS__Thread_local
 #define __ATTR_THREAD _Thread_local
 #elif __has_declspec_attribute(thread) || defined(__BORLANDC__) || defined(__DMC__)
+#define __ATTR_THREAD_IS___declspec_thread
 #define __ATTR_THREAD __declspec(thread)
 #elif (defined(__INTEL_COMPILER) || defined(__ICC) || defined(__ICL) || defined(__ECC))
 #if defined(_WIN32) || defined(WIN32)
-#define __ATTR_THREAD_IS___THREAD
+#define __ATTR_THREAD_IS___thread
 #define __ATTR_THREAD __thread
 #else /* _WIN32 || WIN32 */
+#define __ATTR_THREAD_IS___declspec_thread
 #define __ATTR_THREAD __declspec(thread)
 #endif /* !_WIN32 && !WIN32 */
 #else /* ... */
@@ -563,6 +568,8 @@
 
 #if __has_attribute(__nothrow__)
 #define __ATTR_NOTHROW __attribute__((__nothrow__))
+#elif __has_declspec_attribute(nothrow)
+#define __ATTR_NOTHROW __declspec(nothrow)
 #else /* ... */
 #define __NO_ATTR_NOTHROW
 #define __ATTR_NOTHROW /* Nothing */
@@ -601,10 +608,10 @@
 #elif __has_declspec_attribute(align)
 #define __ATTR_ALIGNED(n) __declspec(align(n))
 #elif __has_feature(cxx_alignas) || __has_extension(cxx_alignas)
-#define __ATTR_ALIGNED_IS_ALIGNAS
+#define __ATTR_ALIGNED_IS_alignas
 #define __ATTR_ALIGNED(n) alignas(n)
 #elif 0
-#define __ATTR_ALIGNED_IS__ALIGNAS
+#define __ATTR_ALIGNED_IS__Alignas
 #define __ATTR_ALIGNED(n) _Alignas(n)
 #else /* ... */
 #define __NO_ATTR_ALIGNED
@@ -624,7 +631,7 @@
      (defined(__ELF__) || defined(__TINYC__)))
 #define __ATTR_WEAK __attribute__((__weak__))
 #elif !defined(__NO_ATTR_SELECTANY)
-#define __ATTR_WEAK_IS_SELECTANY
+#define __ATTR_WEAK_IS_ATTR_SELECTANY
 #define __ATTR_WEAK __ATTR_SELECTANY
 #else /* ... */
 #define __NO_ATTR_WEAK
@@ -834,15 +841,15 @@
       (defined(__CODEGEARC__) ||   \
        (defined(__BORLANDC__) &&   \
         defined(__CODEGEAR_0X_SUPPORT__) && __BORLANDC__ >= 0x610))))
-#define __COMPILER_ALIGNOF_IS_ALIGNOF
+#define __COMPILER_ALIGNOF_IS_alignof
 #define __COMPILER_ALIGNOF alignof
 #elif ((defined(__ghs__) && (__GHS_VERSION_NUMBER >= 600)) || \
        (defined(__SUNPRO_CC) && __SUNPRO_CC >= 0x5130) ||     \
        defined(__DCC_VERSION__) || defined(__TINYC__))
-#define __COMPILER_ALIGNOF_IS___ALIGNOF__
+#define __COMPILER_ALIGNOF_IS___alignof__
 #define __COMPILER_ALIGNOF __alignof__
 #elif 0
-#define __COMPILER_ALIGNOF_IS__ALIGNOF
+#define __COMPILER_ALIGNOF_IS__Alignof
 #define __COMPILER_ALIGNOF _Alignof
 #elif defined(__cplusplus)
 namespace __intern { template<class T> struct __compiler_alignof { char __x; T __y; }; }
@@ -858,16 +865,16 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #if (defined(inline) || defined(__cplusplus) ||        \
      (defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550)) || \
      (defined(__STDC_VERSION__) && (__STDC_VERSION__ - 0 >= 199901L)))
-#define __ATTR_INLINE_IS_INLINE
+#define __ATTR_INLINE_IS_inline
 #define __ATTR_INLINE inline
 #elif (defined(__BORLANDC__) || defined(__DMC__) || \
        defined(__SC__) || defined(__WATCOMC__) ||   \
        defined(__LCC__) || defined(__DECC))
-#define __ATTR_INLINE_IS___INLINE__
+#define __ATTR_INLINE_IS___inline
 #define __ATTR_INLINE __inline
 #elif (__has_attribute(__always_inline__) || \
        defined(__DCC_VERSION__) || defined(__TINYC__))
-#define __ATTR_INLINE_IS___INLINE__
+#define __ATTR_INLINE_IS___inline__
 #define __ATTR_INLINE __inline__
 #else /* ... */
 #define __NO_ATTR_INLINE
@@ -941,10 +948,10 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #ifndef __restrict
 #if (defined(restrict) || \
      (defined(__STDC_VERSION__) && (__STDC_VERSION__ + 0) >= 199901L))
-#define __RESTRICT_IS_RESTRICT
-#define __restrict  restrict
+#define __restrict_IS_restrict
+#define __restrict restrict
 #else /* ... */
-#define __restrict  /* Nothing */
+#define __restrict /* Nothing */
 #endif /* !... */
 #endif /* !__restrict */
 #endif /* !__INTELLISENSE__ */

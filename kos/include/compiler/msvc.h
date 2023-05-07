@@ -128,7 +128,7 @@
 #define __ATTR_NOINLINE __declspec(noinline)
 
 #if _MSC_VER >= 1200
-#define __ATTR_NORETURN_IS_DECLSPEC_NORETURN
+#define __ATTR_NORETURN_IS___declspec_noreturn
 #define __ATTR_NORETURN __declspec(noreturn)
 #else /* _MSC_VER >= 1200 */
 #define __NO_ATTR_NORETURN
@@ -142,28 +142,28 @@
 #define __NO_ATTR_W64
 #define __ATTR_W64 /* Nothing */
 #endif /* __midl || (!_X86_ && !_M_IX86) */
-#define __ATTR_FASTCALL_IS___FASTCALL
+#define __ATTR_FASTCALL_IS___fastcall
 #define __ATTR_FASTCALL __fastcall
-#define __ATTR_STDCALL_IS___STDCALL
+#define __ATTR_STDCALL_IS___stdcall
 #define __ATTR_STDCALL __stdcall
-#define __ATTR_CDECL_IS___CDECL
+#define __ATTR_CDECL_IS___cdecl
 #define __ATTR_CDECL __cdecl
-#define __ATTR_THISCALL_IS___THISCALL
+#define __ATTR_THISCALL_IS___thiscall
 #define __ATTR_THISCALL __thiscall
 #ifdef _M_CEE_PURE
-#define __ATTR_CLRCALL_IS___CLRCALL
+#define __ATTR_CLRCALL_IS___clrcall
 #define __ATTR_CLRCALL __clrcall
 #else /* _M_CEE_PURE */
 #define __NO_ATTR_CLRCALL
 #define __ATTR_CLRCALL /* nothing */
 #endif /* !_M_CEE_PURE */
-#if defined(__x86_64__) || defined(__amd64__) || defined(__amd64) || \
-    defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64)
+#if (defined(__x86_64__) || defined(__amd64__) || defined(__amd64) || \
+     defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64))
 #define __ATTR_MSABI /* Nothing (default) */
-#else /* X64 */
+#else /* X64... */
 #define __NO_ATTR_MSABI
 #define __ATTR_MSABI /* Nothing */
-#endif /* !X64 */
+#endif /* !X64... */
 #define __NO_ATTR_SYSVABI
 #define __ATTR_SYSVABI /* Nothing */
 #define __ATTR_PURE  __declspec(noalias)
@@ -194,6 +194,7 @@
 #define __NO_ATTR_SENTINEL_O
 #define __ATTR_SENTINEL_O(x) /* Nothing */
 #if _MSC_VER >= 1700
+#define __ATTR_THREAD_IS___declspec_thread
 #define __ATTR_THREAD __declspec(thread)
 #else /* _MSC_VER >= 1700 */
 #define __NO_ATTR_THREAD
@@ -233,7 +234,7 @@
 #define __NO_ATTR_ALIGNED
 #define __ATTR_ALIGNED(n) /* Nothing */
 #endif /* _MSC_VER < 1300 */
-#define __ATTR_WEAK_IS_SELECTANY
+#define __ATTR_WEAK_IS_ATTR_SELECTANY
 #define __ATTR_WEAK      __declspec(selectany) /* For all that we care, it's basically the same. */
 #define __ATTR_SELECTANY __declspec(selectany)
 #define __NO_ATTR_RETURNS_TWICE
@@ -322,7 +323,7 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 #define __COMPILER_ALIGNOF_IS___ALIGNOF
 #define __COMPILER_ALIGNOF __alignof
 #define __builtin_offsetof(s, m) ((__SIZE_TYPE__) & ((s *)0)->m)
-#define __ATTR_INLINE_IS___INLINE
+#define __ATTR_INLINE_IS___inline
 #define __ATTR_INLINE      __inline
 #define __ATTR_FORCEINLINE_IS___FORCEINLINE
 #define __ATTR_FORCEINLINE __forceinline

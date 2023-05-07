@@ -147,19 +147,19 @@
 #elif __has_declspec_attribute(noreturn)
 #define __ATTR_NORETURN __declspec(noreturn)
 #elif !defined(__cplusplus)
-#define __ATTR_NORETURN_IS__NORETURN
+#define __ATTR_NORETURN_IS__Noreturn
 #define __ATTR_NORETURN _Noreturn
 #elif __has_cpp_attribute(noreturn)
 #undef noreturn
-#define __ATTR_NORETURN_IS_LB_LB_NORETURN_RB_RB
+#define __ATTR_NORETURN_IS_LB_LB_noreturn_RB_RB
 #define __ATTR_NORETURN [[noreturn]]
 #elif defined(noreturn)
-#define __ATTR_NORETURN_IS_NORETURN
+#define __ATTR_NORETURN_IS_noreturn
 #define __ATTR_NORETURN noreturn
 #elif (!defined(__KOS_SYSTEM_HEADERS__) && \
        (defined(__NO_has_include) || __has_include(<stdnoreturn.h>))
 #include <stdnoreturn.h>
-#define __ATTR_NORETURN_IS_NORETURN
+#define __ATTR_NORETURN_IS_noreturn
 #define __ATTR_NORETURN noreturn
 #else /* ... */
 #define __NO_ATTR_NORETURN
@@ -183,7 +183,7 @@
 #elif __has_attribute(__fastcall__)
 #define __ATTR_FASTCALL __attribute__((__fastcall__))
 #elif defined(__fastcall)
-#define __ATTR_FASTCALL_IS___FASTCALL
+#define __ATTR_FASTCALL_IS___fastcall
 #define __ATTR_FASTCALL __fastcall
 #else /* ... */
 #define __NO_ATTR_FASTCALL
@@ -195,7 +195,7 @@
 #elif __has_attribute(__stdcall__)
 #define __ATTR_STDCALL __attribute__((__stdcall__))
 #elif defined(__stdcall)
-#define __ATTR_STDCALL_IS___STDCALL
+#define __ATTR_STDCALL_IS___stdcall
 #define __ATTR_STDCALL __stdcall
 #else /* ... */
 #define __NO_ATTR_STDCALL
@@ -207,7 +207,7 @@
 #elif __has_attribute(__cdecl__)
 #define __ATTR_CDECL __attribute__((__cdecl__))
 #elif defined(__cdecl)
-#define __ATTR_CDECL_IS___CDECL
+#define __ATTR_CDECL_IS___cdecl
 #define __ATTR_CDECL __cdecl
 #else /* ... */
 #define __NO_ATTR_CDECL
@@ -219,7 +219,7 @@
 #elif __has_attribute(__clrcall__)
 #define __ATTR_CLRCALL __attribute__((__clrcall__))
 #elif defined(__clrcall)
-#define __ATTR_CLRCALL_IS___CLRCALL
+#define __ATTR_CLRCALL_IS___clrcall
 #define __ATTR_CLRCALL __clrcall
 #else /* ... */
 #define __NO_ATTR_CLRCALL
@@ -231,7 +231,7 @@
 #elif __has_attribute(__thiscall__)
 #define __ATTR_THISCALL __attribute__((__thiscall__))
 #elif defined(__thiscall)
-#define __ATTR_THISCALL_IS___THISCALL
+#define __ATTR_THISCALL_IS___thiscall
 #define __ATTR_THISCALL __thiscall
 #else /* ... */
 #define __NO_ATTR_THISCALL
@@ -243,7 +243,7 @@
 #elif __has_attribute(__ms_abi__)
 #define __ATTR_MSABI __attribute__((__ms_abi__))
 #elif defined(__ms_abi)
-#define __ATTR_MSABI_IS___MS_ABI
+#define __ATTR_MSABI_IS___ms_abi
 #define __ATTR_MSABI __ms_abi
 #else /* ... */
 #define __NO_ATTR_MSABI
@@ -255,7 +255,7 @@
 #elif __has_attribute(__sysv_abi__)
 #define __ATTR_SYSVABI __attribute__((__sysv_abi__))
 #elif defined(__sysv_abi)
-#define __ATTR_SYSVABI_IS___SYSV_ABI
+#define __ATTR_SYSVABI_IS___sysv_abi
 #define __ATTR_SYSVABI __sysv_abi
 #else /* ... */
 #define __NO_ATTR_SYSVABI
@@ -376,10 +376,10 @@
 #endif /* !... */
 
 #if __has_feature(cxx_thread_local)
-#define __ATTR_THREAD_IS_THREAD_LOCAL
+#define __ATTR_THREAD_IS_thread_local
 #define __ATTR_THREAD thread_local
 #elif __has_feature(c_thread_local)
-#define __ATTR_THREAD_IS__THREAD_LOCAL
+#define __ATTR_THREAD_IS__Thread_local
 #define __ATTR_THREAD _Thread_local
 #elif __has_declspec_attribute(thread)
 #define __ATTR_THREAD __declspec(thread)
@@ -464,7 +464,7 @@
 #elif __has_declspec_attribute(align)
 #define __ATTR_ALIGNED(n) __declspec(align(n))
 #elif __has_feature(cxx_alignas) || __has_extension(cxx_alignas)
-#define __ATTR_ALIGNED_IS_ALIGNAS
+#define __ATTR_ALIGNED_IS_alignas
 #define __ATTR_ALIGNED(n) alignas(n)
 #else /* ... */
 #define __NO_ATTR_ALIGNED
@@ -485,7 +485,7 @@
 #define __ATTR_WEAK __attribute__((__weak__))
 #elif !defined(__NO_ATTR_SELECTANY)
 #define __ATTR_WEAK __ATTR_SELECTANY
-#define __ATTR_WEAK_IS_SELECTANY
+#define __ATTR_WEAK_IS_ATTR_SELECTANY
 #else /* ... */
 #define __NO_ATTR_WEAK
 #define __ATTR_WEAK /* Nothing */
@@ -699,7 +699,7 @@
 #endif /* ... */
 
 #if __has_feature(cxx_alignof)
-#define __COMPILER_ALIGNOF_IS_ALIGNOF
+#define __COMPILER_ALIGNOF_IS_alignof
 #define __COMPILER_ALIGNOF alignof
 #elif defined(__cplusplus)
 namespace __intern { template<class T> struct __compiler_alignof { char __x; T __y; }; }
@@ -710,13 +710,13 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 
 
 #if defined(inline) || defined(__cplusplus)
-#define __ATTR_INLINE_IS_INLINE
+#define __ATTR_INLINE_IS_inline
 #define __ATTR_INLINE inline
 #elif __has_attribute(__always_inline__)
-#define __ATTR_INLINE_IS___INLINE__
+#define __ATTR_INLINE_IS___inline__
 #define __ATTR_INLINE __inline__
 #else /* ... */
-#define __ATTR_INLINE_IS___INLINE
+#define __ATTR_INLINE_IS___inline
 #define __ATTR_INLINE __inline
 #endif /* !... */
 

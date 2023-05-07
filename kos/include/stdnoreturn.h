@@ -48,13 +48,16 @@
 #endif /* !__GNUC__ */
 #endif /* !__GCC_VERSION_NUM */
 
-#if (!defined(noreturn) && !defined(__ATTR_NORETURN_IS_LB_LB_NORETURN_RB_RB) &&                 \
-     !defined(__ATTR_NORETURN_IS_NORETURN) && !defined(__ATTR_NORETURN_IS_DECLSPEC_NORETURN) && \
+#if (!defined(noreturn) &&                                  \
+     !defined(__ATTR_NORETURN_IS___attribute___noreturn) && \
+     !defined(__ATTR_NORETURN_IS_LB_LB_noreturn_RB_RB) &&   \
+     !defined(__ATTR_NORETURN_IS_noreturn) &&               \
+     !defined(__ATTR_NORETURN_IS___declspec_noreturn) &&    \
      !defined(__cplusplus) && (__GCC_VERSION_NUM < 40700))
 #define noreturn __ATTR_NORETURN
 #endif /* ... */
 
-#if (!defined(_Noreturn) && !defined(__ATTR_NORETURN_IS__NORETURN) && \
+#if (!defined(_Noreturn) && !defined(__ATTR_NORETURN_IS__Noreturn) && \
      (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 201112))
 #define _Noreturn __ATTR_NORETURN
 #endif /* ... */

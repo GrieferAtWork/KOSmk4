@@ -144,7 +144,7 @@
 #define   ATTR_NOCLONE __attribute__((__noclone__))
 #undef __NO_ATTR_NOCLONE
 
-#define __ATTR_THREAD_IS___THREAD
+#define __ATTR_THREAD_IS___thread
 #define __ATTR_THREAD __thread
 #define   ATTR_THREAD __thread
 #undef __NO_ATTR_THREAD

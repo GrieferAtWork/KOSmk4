@@ -578,7 +578,7 @@ for (local name: argnames) {
 #define __y y
 #define __year year
 #define __z z
-//[[[end]]]
+/*[[[end]]]*/
 
 /* XXX: Keywords starting with `__' that  should
  *      appear in docs should be #undef'ed here. */

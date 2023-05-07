@@ -271,7 +271,7 @@
 #if __GNUC_PREREQ(4, 3) || __has_builtin(__builtin_va_arg_pack_len)
 #define __va_arg_pack_len() __builtin_va_arg_pack_len()
 #endif /* __GNUC_PREREQ(4, 3) || __has_builtin(__builtin_va_arg_pack_len) */
-#if (!defined(_Noreturn) && !defined(__ATTR_NORETURN_IS__NORETURN) &&     \
+#if (!defined(_Noreturn) && !defined(__ATTR_NORETURN_IS__Noreturn) &&     \
      (defined(__STDC_VERSION__) ? (__STDC_VERSION__ + 0) : 0) < 201112 && \
      !__GNUC_PREREQ(4, 7))
 #define _Noreturn __ATTR_NORETURN
@@ -285,30 +285,30 @@
 #if !defined(__alignof) && !defined(__COMPILER_ALIGNOF_IS___ALIGNOF)
 #define __alignof(x) __COMPILER_ALIGNOF(x)
 #endif /* !__alignof && !__COMPILER_ALIGNOF_IS___ALIGNOF */
-#if !defined(_Alignof) && !defined(__COMPILER_ALIGNOF_IS__ALIGNOF)
+#if !defined(_Alignof) && !defined(__COMPILER_ALIGNOF_IS__Alignof)
 #define _Alignof(x) __COMPILER_ALIGNOF(x)
-#endif /* !_Alignof && !__COMPILER_ALIGNOF_IS__ALIGNOF */
-#if !defined(_Alignas) && !defined(__ATTR_ALIGNED_IS__ALIGNAS)
+#endif /* !_Alignof && !__COMPILER_ALIGNOF_IS__Alignof */
+#if !defined(_Alignas) && !defined(__ATTR_ALIGNED_IS__Alignas)
 #define _Alignas(x) __ATTR_ALIGNED(x)
-#endif /* !_Alignas && !__ATTR_ALIGNED_IS__ALIGNAS */
-#if !defined(_Thread_local) && !defined(__ATTR_THREAD_IS__THREAD_LOCAL)
+#endif /* !_Alignas && !__ATTR_ALIGNED_IS__Alignas */
+#if !defined(_Thread_local) && !defined(__ATTR_THREAD_IS__Thread_local)
 #define _Thread_local __ATTR_THREAD
-#endif /* !_Thread_local && !__ATTR_THREAD_IS__THREAD_LOCAL */
+#endif /* !_Thread_local && !__ATTR_THREAD_IS__Thread_local */
 #if !defined(__restrict__) && !defined(__RESTRICT_IS___RESTRICT__)
 #define __restrict__ __restrict
 #endif /* !__restrict__ && !__RESTRICT_IS___RESTRICT__ */
-#if !defined(restrict) && !defined(__RESTRICT_IS_RESTRICT)
+#if !defined(restrict) && !defined(__restrict_IS_restrict)
 #define restrict __restrict
-#endif /* !restrict && !__RESTRICT_IS_RESTRICT */
-#if !defined(inline) && !defined(__ATTR_INLINE_IS_INLINE) && !defined(__NO_ATTR_INLINE)
+#endif /* !restrict && !__restrict_IS_restrict */
+#if !defined(inline) && !defined(__ATTR_INLINE_IS_inline) && !defined(__NO_ATTR_INLINE)
 #define inline __ATTR_INLINE
-#endif /* !inline && !__ATTR_INLINE_IS_INLINE && !__NO_ATTR_INLINE */
-#if !defined(__inline) && !defined(__ATTR_INLINE_IS___INLINE) && !defined(__NO_ATTR_INLINE)
+#endif /* !inline && !__ATTR_INLINE_IS_inline && !__NO_ATTR_INLINE */
+#if !defined(__inline) && !defined(__ATTR_INLINE_IS___inline) && !defined(__NO_ATTR_INLINE)
 #define __inline __ATTR_INLINE
-#endif /* !inline && !__ATTR_INLINE_IS___INLINE && !__NO_ATTR_INLINE */
-#if !defined(__inline__) && !defined(__ATTR_INLINE_IS___INLINE__) && !defined(__NO_ATTR_INLINE)
+#endif /* !inline && !__ATTR_INLINE_IS___inline && !__NO_ATTR_INLINE */
+#if !defined(__inline__) && !defined(__ATTR_INLINE_IS___inline__) && !defined(__NO_ATTR_INLINE)
 #define __inline__ __ATTR_INLINE
-#endif /* !__inline__ && !__ATTR_INLINE_IS___INLINE__ && !__NO_ATTR_INLINE */
+#endif /* !__inline__ && !__ATTR_INLINE_IS___inline__ && !__NO_ATTR_INLINE */
 
 
 #if (defined(__LONG_DOUBLE_MATH_OPTIONAL) && \
@@ -376,9 +376,9 @@
 #define __alloc_size(x)       __ATTR_ALLOC_SIZE((x))
 #define __alloc_size2(n, x)   __ATTR_ALLOC_SIZE((n, x))
 #define __alloc_align(x)      __ATTR_ALLOC_ALIGN(x)
-#ifndef __ATTR_FASTCALL_IS___FASTCALL
+#ifndef __ATTR_FASTCALL_IS___fastcall
 #define __fastcall         __ATTR_FASTCALL
-#endif /* !__ATTR_FASTCALL_IS___FASTCALL */
+#endif /* !__ATTR_FASTCALL_IS___fastcall */
 #ifndef NDEBUG
 #define __diagused         /* nothing */
 #else /* !NDEBUG */
