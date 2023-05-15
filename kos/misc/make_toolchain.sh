@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix sporadic crashes when comparing bytes on some hosts"
-DEEMON_VERSION="25d11aa4de8f848ec60d832f82b151bd7880cc48"
+#     v -- "Fix GCC warning"
+DEEMON_VERSION="7cf6adc31ed404f635d2a84119184c58af8093da"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
