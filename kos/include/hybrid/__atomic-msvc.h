@@ -839,6 +839,99 @@ extern __int64 (_InterlockedXor64_rel)(__int64 volatile *__px, __int64 __v);
 #pragma intrinsic(_InterlockedXor64_rel)
 #endif /* !_InterlockedXor64_rel */
 
+#ifndef __iso_volatile_load8
+#define __iso_volatile_load8 __iso_volatile_load8
+__int8 __iso_volatile_load8(__int8 const volatile *__px);
+#pragma intrinsic(__iso_volatile_load8)
+#endif /* !__iso_volatile_load8 */
+#ifndef __iso_volatile_load16
+#define __iso_volatile_load16 __iso_volatile_load16
+__int16 __iso_volatile_load16(__int16 const volatile *__px);
+#pragma intrinsic(__iso_volatile_load16)
+#endif /* !__iso_volatile_load16 */
+#ifndef __iso_volatile_load32
+#define __iso_volatile_load32 __iso_volatile_load32
+__int32 __iso_volatile_load32(__int32 const volatile *__px);
+#pragma intrinsic(__iso_volatile_load32)
+#endif /* !__iso_volatile_load32 */
+#ifndef __iso_volatile_load64
+#define __iso_volatile_load64 __iso_volatile_load64
+__int64 __iso_volatile_load64(__int64 const volatile *__px);
+#pragma intrinsic(__iso_volatile_load64)
+#endif /* !__iso_volatile_load64 */
+#ifndef __iso_volatile_store8
+#define __iso_volatile_store8 __iso_volatile_store8
+void __iso_volatile_store8(volatile __int8 *__px, __int8 __v);
+#pragma intrinsic(__iso_volatile_store8)
+#endif /* !__iso_volatile_store8 */
+#ifndef __iso_volatile_store16
+#define __iso_volatile_store16 __iso_volatile_store16
+void __iso_volatile_store16(volatile __int16 *__px, __int16 __v);
+#pragma intrinsic(__iso_volatile_store16)
+#endif /* !__iso_volatile_store16 */
+#ifndef __iso_volatile_store32
+#define __iso_volatile_store32 __iso_volatile_store32
+void __iso_volatile_store32(volatile __int32 *__px, __int32 __v);
+#pragma intrinsic(__iso_volatile_store32)
+#endif /* !__iso_volatile_store32 */
+#ifndef __iso_volatile_store64
+#define __iso_volatile_store64 __iso_volatile_store64
+void __iso_volatile_store64(volatile __int64 *__px, __int64 __v);
+#pragma intrinsic(__iso_volatile_store64)
+#endif /* !__iso_volatile_store64 */
+
+/* ARM-specific atomic load overrides */
+#define __hybrid_atomic_load8_relaxed(p)  (__UINT8_TYPE__)__iso_volatile_load8((__int8 const volatile *)(p))
+#define __hybrid_atomic_load16_relaxed(p) (__UINT16_TYPE__)__iso_volatile_load16((__int16 const volatile *)(p))
+#define __hybrid_atomic_load32_relaxed(p) (__UINT32_TYPE__)__iso_volatile_load32((__int32 const volatile *)(p))
+#define __hybrid_atomic_load64_relaxed(p) (__UINT64_TYPE__)__iso_volatile_load64((__int64 const volatile *)(p))
+#define __hybrid_atomic_load8_acquire __hybrid_atomic_load8_acquire
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __int8
+__NOTHROW_NCX(__hybrid_atomic_load8_acquire)(__int8 const volatile *__px) {
+	__int8 __res = __hybrid_atomic_load8_relaxed(__px);
+	__COMPILER_READ_BARRIER();
+	return __res;
+}
+#define __hybrid_atomic_load16_acquire __hybrid_atomic_load16_acquire
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __int16
+__NOTHROW_NCX(__hybrid_atomic_load16_acquire)(__int16 const volatile *__px) {
+	__int16 __res = __hybrid_atomic_load16_relaxed(__px);
+	__COMPILER_READ_BARRIER();
+	return __res;
+}
+#define __hybrid_atomic_load32_acquire __hybrid_atomic_load32_acquire
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __int32
+__NOTHROW_NCX(__hybrid_atomic_load32_acquire)(__int32 const volatile *__px) {
+	__int32 __res = __hybrid_atomic_load32_relaxed(__px);
+	__COMPILER_READ_BARRIER();
+	return __res;
+}
+#define __hybrid_atomic_load64_acquire __hybrid_atomic_load64_acquire
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __int64
+__NOTHROW_NCX(__hybrid_atomic_load64_acquire)(__int64 const volatile *__px) {
+	__int64 __res = __hybrid_atomic_load64_relaxed(__px);
+	__COMPILER_READ_BARRIER();
+	return __res;
+}
+#define __hybrid_atomic_load8(p, order)   ((order) >= __ATOMIC_ACQUIRE ? __hybrid_atomic_load8_acquire(p) : __hybrid_atomic_load8_relaxed(p))
+#define __hybrid_atomic_load16(p, order)  ((order) >= __ATOMIC_ACQUIRE ? __hybrid_atomic_load16_acquire(p) : __hybrid_atomic_load16_relaxed(p))
+#define __hybrid_atomic_load32(p, order)  ((order) >= __ATOMIC_ACQUIRE ? __hybrid_atomic_load32_acquire(p) : __hybrid_atomic_load32_relaxed(p))
+#define __hybrid_atomic_load64(p, order)  ((order) >= __ATOMIC_ACQUIRE ? __hybrid_atomic_load64_acquire(p) : __hybrid_atomic_load64_relaxed(p))
+
+/* ARM-specific atomic store overrides */
+#define __hybrid_atomic_store8_relaxed(p, val)  __iso_volatile_store8((__int8 volatile *)(p), val)
+#define __hybrid_atomic_store16_relaxed(p, val) __iso_volatile_store16((__int16 volatile *)(p), val)
+#define __hybrid_atomic_store32_relaxed(p, val) __iso_volatile_store32((__int32 volatile *)(p), val)
+#define __hybrid_atomic_store64_relaxed(p, val) __iso_volatile_store64((__int64 volatile *)(p), val)
+#define __hybrid_atomic_store8_release(p, val)  (__COMPILER_WRITE_BARRIER(), __hybrid_atomic_store8_relaxed(p, val))
+#define __hybrid_atomic_store16_release(p, val) (__COMPILER_WRITE_BARRIER(), __hybrid_atomic_store16_relaxed(p, val))
+#define __hybrid_atomic_store32_release(p, val) (__COMPILER_WRITE_BARRIER(), __hybrid_atomic_store32_relaxed(p, val))
+#define __hybrid_atomic_store64_release(p, val) (__COMPILER_WRITE_BARRIER(), __hybrid_atomic_store64_relaxed(p, val))
+#define __hybrid_atomic_store8(p, val, order)   ((order) >= __ATOMIC_RELEASE ? __COMPILER_WRITE_BARRIER() : (void)0, __iso_volatile_store8((__int8 volatile *)(p), val))
+#define __hybrid_atomic_store16(p, val, order)  ((order) >= __ATOMIC_RELEASE ? __COMPILER_WRITE_BARRIER() : (void)0, __iso_volatile_store16((__int16 volatile *)(p), val))
+#define __hybrid_atomic_store32(p, val, order)  ((order) >= __ATOMIC_RELEASE ? __COMPILER_WRITE_BARRIER() : (void)0, __iso_volatile_store32((__int32 volatile *)(p), val))
+#define __hybrid_atomic_store64(p, val, order)  ((order) >= __ATOMIC_RELEASE ? __COMPILER_WRITE_BARRIER() : (void)0, __iso_volatile_store64((__int64 volatile *)(p), val))
+
 #define __hybrid_atomic_xch8_release(p, val)       ((__UINT8_TYPE__)_InterlockedExchange8_rel((char volatile *)(p), (char)(val)))
 #define __hybrid_atomic_xch16_release(p, val)      ((__UINT16_TYPE__)_InterlockedExchange16_rel((short volatile *)(p), (short)(val)))
 #define __hybrid_atomic_xch32_release(p, val)      ((__UINT32_TYPE__)_InterlockedExchange_rel((long volatile *)(p), (long)(val)))
