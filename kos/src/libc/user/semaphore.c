@@ -130,9 +130,9 @@ NOTHROW_NCX(LIBCCALL libc_sem_destroy)(sem_t *self)
 	 * In  other words: we don't have to  do a broadcast to wake up
 	 * all of the remaining threads. -- It's good enough if we just
 	 * leave everything as-is. */
-
 	COMPILER_IMPURE();
 	(void)self;
+
 	/* Nothing to do here... */
 	DBG_memset(self, 0xcc, sizeof(sem_t));
 	return 0;

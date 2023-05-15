@@ -141,7 +141,7 @@ class Addr2line {
 		}\n");
 		local text = reader.read();
 		while (text) {
-			local func,data;
+			local func, data;
 			func, none, text = text.partition("\n")...;
 			data, none, text = text.partition("\n")...;
 			local filename, line = data.scanf("%[^:]:%[A-Fa-f0-9]")...;

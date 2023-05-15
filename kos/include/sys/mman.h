@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64226d10 */
+/* HASH CRC-32:0xec45f75a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -886,9 +886,13 @@ __SYSDECL_BEGIN
  * @return: -1: [errno=EINVAL]  `FMAPFILE_MAPSHARED' was set,  an mmap  was
  *                              attempted, and `num_trailing_nulbytes != 0'
  * @return: -1: [errno=EPERM]   `fd' doesn't support read(2)ing
- * @return: -1: [errno=ENOMEM]  Out of memory
+ * @return: -1: [errno=ENOMEM]  Out of memory (or file is too large for a continuous heap-buffer to be posible)
  * @return: -1: [errno=EBADF]   Invalid `fd'
- * @return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and mmap wasn't possible
+ * @return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and mmap  wasn't possible, either because a  call
+ *                              to  `mmap(2)' with the  given `fd' returned an  error (including indicating that
+ *                              the file doesn't support mmap(), or that there isn't enough space t map the file
+ *                              in its entirety), or because  `max_bytes == (size_t)-1', and the effective  area
+ *                              that you are trying to map is larger than the entirety of your address space.
  * @return: -1: [errno=*]       Read error */
 __CDECLARE(__ATTR_WUNUSED __ATTR_OUT(1),int,__NOTHROW_NCX,fmapfile,(struct mapfile *__restrict __mapping, __fd_t __fd, __pos64_t __offset, size_t __min_bytes, size_t __max_bytes, size_t __num_trailing_nulbytes, unsigned int __flags),(__mapping,__fd,__offset,__min_bytes,__max_bytes,__num_trailing_nulbytes,__flags))
 #elif (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
@@ -938,9 +942,13 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_OUT(1),int,__NOTHROW_NCX,fmapfile,(struct mapfi
  * @return: -1: [errno=EINVAL]  `FMAPFILE_MAPSHARED' was set,  an mmap  was
  *                              attempted, and `num_trailing_nulbytes != 0'
  * @return: -1: [errno=EPERM]   `fd' doesn't support read(2)ing
- * @return: -1: [errno=ENOMEM]  Out of memory
+ * @return: -1: [errno=ENOMEM]  Out of memory (or file is too large for a continuous heap-buffer to be posible)
  * @return: -1: [errno=EBADF]   Invalid `fd'
- * @return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and mmap wasn't possible
+ * @return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and mmap  wasn't possible, either because a  call
+ *                              to  `mmap(2)' with the  given `fd' returned an  error (including indicating that
+ *                              the file doesn't support mmap(), or that there isn't enough space t map the file
+ *                              in its entirety), or because  `max_bytes == (size_t)-1', and the effective  area
+ *                              that you are trying to map is larger than the entirety of your address space.
  * @return: -1: [errno=*]       Read error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fmapfile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL fmapfile)(struct mapfile *__restrict __mapping, __fd_t __fd, __pos64_t __offset, size_t __min_bytes, size_t __max_bytes, size_t __num_trailing_nulbytes, unsigned int __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmapfile))(__mapping, __fd, __offset, __min_bytes, __max_bytes, __num_trailing_nulbytes, __flags); })
 #endif /* ... */

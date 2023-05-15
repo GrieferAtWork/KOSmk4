@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8969d7a */
+/* HASH CRC-32:0xf7f5afa */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -163,9 +163,13 @@ INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBDCALL libd_pkey_mprotect)(void *ad
  * @return: -1: [errno=EINVAL]  `FMAPFILE_MAPSHARED' was set,  an mmap  was
  *                              attempted, and `num_trailing_nulbytes != 0'
  * @return: -1: [errno=EPERM]   `fd' doesn't support read(2)ing
- * @return: -1: [errno=ENOMEM]  Out of memory
+ * @return: -1: [errno=ENOMEM]  Out of memory (or file is too large for a continuous heap-buffer to be posible)
  * @return: -1: [errno=EBADF]   Invalid `fd'
- * @return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and mmap wasn't possible
+ * @return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and mmap  wasn't possible, either because a  call
+ *                              to  `mmap(2)' with the  given `fd' returned an  error (including indicating that
+ *                              the file doesn't support mmap(), or that there isn't enough space t map the file
+ *                              in its entirety), or because  `max_bytes == (size_t)-1', and the effective  area
+ *                              that you are trying to map is larger than the entirety of your address space.
  * @return: -1: [errno=*]       Read error */
 INTDEF WUNUSED ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_fmapfile)(struct mapfile *__restrict mapping, fd_t fd, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -215,9 +219,13 @@ INTDEF WUNUSED ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_fmapfile)(struct mapfil
  * @return: -1: [errno=EINVAL]  `FMAPFILE_MAPSHARED' was set,  an mmap  was
  *                              attempted, and `num_trailing_nulbytes != 0'
  * @return: -1: [errno=EPERM]   `fd' doesn't support read(2)ing
- * @return: -1: [errno=ENOMEM]  Out of memory
+ * @return: -1: [errno=ENOMEM]  Out of memory (or file is too large for a continuous heap-buffer to be posible)
  * @return: -1: [errno=EBADF]   Invalid `fd'
- * @return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and mmap wasn't possible
+ * @return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and mmap  wasn't possible, either because a  call
+ *                              to  `mmap(2)' with the  given `fd' returned an  error (including indicating that
+ *                              the file doesn't support mmap(), or that there isn't enough space t map the file
+ *                              in its entirety), or because  `max_bytes == (size_t)-1', and the effective  area
+ *                              that you are trying to map is larger than the entirety of your address space.
  * @return: -1: [errno=*]       Read error */
 INTDEF WUNUSED ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping, fd_t fd, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags);
 /* >> fmapfileat(3)

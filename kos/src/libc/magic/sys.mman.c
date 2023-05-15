@@ -1014,9 +1014,13 @@ int pkey_mprotect([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T 
 @@@return: -1: [errno=EINVAL]  `FMAPFILE_MAPSHARED' was set,  an mmap  was
 @@                             attempted, and `num_trailing_nulbytes != 0'
 @@@return: -1: [errno=EPERM]   `fd' doesn't support read(2)ing
-@@@return: -1: [errno=ENOMEM]  Out of memory
+@@@return: -1: [errno=ENOMEM]  Out of memory (or file is too large for a continuous heap-buffer to be posible)
 @@@return: -1: [errno=EBADF]   Invalid `fd'
-@@@return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and mmap wasn't possible
+@@@return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and mmap  wasn't possible, either because a  call
+@@                             to  `mmap(2)' with the  given `fd' returned an  error (including indicating that
+@@                             the file doesn't support mmap(), or that there isn't enough space t map the file
+@@                             in its entirety), or because  `max_bytes == (size_t)-1', and the effective  area
+@@                             that you are trying to map is larger than the entirety of your address space.
 @@@return: -1: [errno=*]       Read error
 [[wunused, decl_include("<bits/types.h>", "<bits/crt/mapfile.h>")]]
 [[requires_function(read, malloc, realloc)]]
@@ -1062,10 +1066,39 @@ int fmapfile([[out]] struct mapfile *__restrict mapping, $fd_t fd,
 						goto after_mmap_attempt;
 				}
 			}
-			if (__hybrid_overflow_usub(st.@st_size@, map_offset, &map_bytes))
+			if (__hybrid_overflow_usub(st.@st_size@, map_offset, &map_bytes)) {
 				map_bytes = 0;
-			if (map_bytes > max_bytes)
+				if (st.@st_size@ > map_offset)
+					map_bytes = (size_t)-1;
+			}
+			if (map_bytes >= max_bytes) {
 				map_bytes = max_bytes;
+@@pp_if __SIZEOF_SIZE_T__ < __SIZEOF_OFF64_T__@@
+				if (map_bytes == (size_t)-1) {
+					/* Special case: caller wants to map the entire file, but it's too large. */
+					uint64_t true_size = st.@st_size@ - map_offset;
+					if (true_size > (uint64_t)(size_t)-1) {
+						/* File is too large to be loaded into memory in its entirety. */
+						if (flags & __FMAPFILE_MUSTMMAP) {
+@@pp_ifdef ENOTSUP@@
+							return __libc_seterrno(ENOTSUP);
+@@pp_elif defined(EOPNOTSUPP)@@
+							return __libc_seterrno(EOPNOTSUPP);
+@@pp_else@@
+							return __libc_seterrno(1);
+@@pp_endif@@
+						}
+
+						/* File is too large for a continuous heap-buffer to be posible */
+@@pp_ifdef ENOMEM@@
+						return __libc_seterrno(ENOMEM);
+@@pp_else@@
+						return __libc_seterrno(1);
+@@pp_endif@@
+					}
+				}
+@@pp_endif@@
+			}
 			if (map_bytes) {
 				/* Map file into memory. */
 				size_t mapsize, used_nulbytes;

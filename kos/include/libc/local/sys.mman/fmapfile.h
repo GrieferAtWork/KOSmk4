@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7eb4047 */
+/* HASH CRC-32:0xa217410d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -381,10 +381,39 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(struct mapfile *__restrict
 						goto __after_mmap_attempt;
 				}
 			}
-			if (__hybrid_overflow_usub(__st.st_size, __map_offset, &__map_bytes))
+			if (__hybrid_overflow_usub(__st.st_size, __map_offset, &__map_bytes)) {
 				__map_bytes = 0;
-			if (__map_bytes > __max_bytes)
+				if (__st.st_size > __map_offset)
+					__map_bytes = (__SIZE_TYPE__)-1;
+			}
+			if (__map_bytes >= __max_bytes) {
 				__map_bytes = __max_bytes;
+#if __SIZEOF_SIZE_T__ < __SIZEOF_OFF64_T__
+				if (__map_bytes == (__SIZE_TYPE__)-1) {
+					/* Special case: caller wants to map the entire file, but it's too large. */
+					__UINT64_TYPE__ __true_size = __st.st_size - __map_offset;
+					if (__true_size > (__UINT64_TYPE__)(__SIZE_TYPE__)-1) {
+						/* File is too large to be loaded into memory in its entirety. */
+						if (__flags & __FMAPFILE_MUSTMMAP) {
+#ifdef __ENOTSUP
+							return __libc_seterrno(__ENOTSUP);
+#elif defined(__EOPNOTSUPP)
+							return __libc_seterrno(__EOPNOTSUPP);
+#else /* ... */
+							return __libc_seterrno(1);
+#endif /* !... */
+						}
+
+						/* File is too large for a continuous heap-buffer to be posible */
+#ifdef __ENOMEM
+						return __libc_seterrno(__ENOMEM);
+#else /* __ENOMEM */
+						return __libc_seterrno(1);
+#endif /* !__ENOMEM */
+					}
+				}
+#endif /* __SIZEOF_SIZE_T__ < __SIZEOF_OFF64_T__ */
+			}
 			if (__map_bytes) {
 				/* Map file into memory. */
 				__SIZE_TYPE__ __mapsize, __used_nulbytes;
