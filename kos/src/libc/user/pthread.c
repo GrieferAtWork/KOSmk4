@@ -1372,7 +1372,7 @@ get_stack_pointer_rpc(struct rpc_context *__restrict ctx, void *cookie) {
 }
 
 /* Use /proc/self/maps to figure out the mapping containing `pointer' */
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") int PRPC_EXEC_CALLBACK_CC
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") int LIBCCALL
 get_mapping_from_pointer(void *pointer, void **p_minaddr, void **p_endaddr) {
 	char *line;
 	FILE *fp = fopen("/proc/self/maps", "r");

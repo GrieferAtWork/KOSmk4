@@ -27,6 +27,12 @@
 #ifdef __cplusplus
 extern "C++" {
 
+/* Fix some broken c++ feature macros */
+#if __cplusplus >= 201406L
+#undef __cpp_static_assert
+#define __cpp_static_assert 201411
+#endif /* __cplusplus >= 201406L */
+
 #undef __event
 namespace __intern {
 
@@ -532,6 +538,45 @@ bool>::__type __builtin_mul_overflow_p(__TA __lhs, __TB __rhs, __TR __res_type);
 #define __builtin_mul_overflow_p(lhs, rhs, res_type) ((lhs) * (rhs), 0)
 #endif /* !__cplusplus */
 
+#undef __builtin_sadd_overflow
+#undef __builtin_saddl_overflow
+#undef __builtin_saddll_overflow
+#undef __builtin_uadd_overflow
+#undef __builtin_uaddl_overflow
+#undef __builtin_uaddll_overflow
+#undef __builtin_ssub_overflow
+#undef __builtin_ssubl_overflow
+#undef __builtin_ssubll_overflow
+#undef __builtin_usub_overflow
+#undef __builtin_usubl_overflow
+#undef __builtin_usubll_overflow
+#undef __builtin_smul_overflow
+#undef __builtin_smull_overflow
+#undef __builtin_smulll_overflow
+#undef __builtin_umul_overflow
+#undef __builtin_umull_overflow
+#undef __builtin_umulll_overflow
+/* For some reason, intellisense seems to ?somewhat? know of these functions?
+ * Anyways, we need to rename them, since otherwise there will be IDE errors. */
+#define __builtin_sadd_overflow   __intellisense_builtin_sadd_overflow
+#define __builtin_saddl_overflow  __intellisense_builtin_saddl_overflow
+#define __builtin_saddll_overflow __intellisense_builtin_saddll_overflow
+#define __builtin_uadd_overflow   __intellisense_builtin_uadd_overflow
+#define __builtin_uaddl_overflow  __intellisense_builtin_uaddl_overflow
+#define __builtin_uaddll_overflow __intellisense_builtin_uaddll_overflow
+#define __builtin_ssub_overflow   __intellisense_builtin_ssub_overflow
+#define __builtin_ssubl_overflow  __intellisense_builtin_ssubl_overflow
+#define __builtin_ssubll_overflow __intellisense_builtin_ssubll_overflow
+#define __builtin_usub_overflow   __intellisense_builtin_usub_overflow
+#define __builtin_usubl_overflow  __intellisense_builtin_usubl_overflow
+#define __builtin_usubll_overflow __intellisense_builtin_usubll_overflow
+#define __builtin_smul_overflow   __intellisense_builtin_smul_overflow
+#define __builtin_smull_overflow  __intellisense_builtin_smull_overflow
+#define __builtin_smulll_overflow __intellisense_builtin_smulll_overflow
+#define __builtin_umul_overflow   __intellisense_builtin_umul_overflow
+#define __builtin_umull_overflow  __intellisense_builtin_umull_overflow
+#define __builtin_umulll_overflow __intellisense_builtin_umulll_overflow
+
 ____INTELLISENSE_BOOL __builtin_sadd_overflow(int __a, int __b, int *__res);
 ____INTELLISENSE_BOOL __builtin_saddl_overflow(long __a, long __b, long *__res);
 ____INTELLISENSE_BOOL __builtin_saddll_overflow(long long __a, long long __b, long long *__res);
@@ -552,14 +597,8 @@ ____INTELLISENSE_BOOL __builtin_umull_overflow(unsigned long __a, unsigned long 
 ____INTELLISENSE_BOOL __builtin_umulll_overflow(unsigned long long __a, unsigned long long __b, unsigned long long *__res);
 
 
-/* Fix some broken c++ feature macros */
 #ifdef __cplusplus
-#if __cplusplus >= 201406L
-#undef __cpp_static_assert
-#define __cpp_static_assert 201411
-#endif /* __cplusplus >= 201406L */
 } /* extern "C++" */
 #endif /* __cplusplus */
-
 
 #endif /* !____INTELLISENSE_STDINC_COMMON_H */

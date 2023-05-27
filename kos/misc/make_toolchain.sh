@@ -980,6 +980,10 @@ cmd cd "$KOS_ROOT/kos/include/libregex"
 for name in *.h; do
 	lib_mirror_include "libregex" "$name"
 done
+cmd cd "$KOS_ROOT/kos/include/libjson"
+for name in *.h; do
+	lib_mirror_include "libjson" "$name"
+done
 
 if test -z "$SYSHEADER_BUILD_CONFIG_SUFFIX"; then
 	SYSHEADER_BUILD_CONFIG_SUFFIX=""

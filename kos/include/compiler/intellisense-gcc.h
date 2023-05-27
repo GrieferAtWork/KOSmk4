@@ -164,6 +164,7 @@ static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__, "WTF Intellisense?");
 
 #ifndef __cplusplus
 #define __builtin_choose_expr(c, tt, ff) ((c) ? (tt) : (ff))
+#define __LONGDOUBLE long double
 #else /* !__cplusplus */
 
 #if __cplusplus == 201406L
@@ -627,9 +628,7 @@ template<class __VT> typename ____INTELLISENSE_enableif<____INTELLISENSE_issigne
 #endif
 
 } /* namespace __intern */
-#else /* __cplusplus */
-#define __LONGDOUBLE long double
-#endif /* !__cplusplus */
+#endif /* __cplusplus */
 
 
 /* Intellisense forgets about a whole bunch of builtin functions defined by GCC: */

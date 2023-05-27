@@ -537,6 +537,9 @@ NOTHROW(KCALL system_cc_async_aio_handles)(struct ccinfo *__restrict info) {
 	 * TODO: This function should be called after driver finalization to delete AIO
 	 *       handles which may still be holding references to the driver (Note that
 	 *       such references would likely be indirect; e.g.: aio->device->driver). */
+	/* TODO: Instead of periodically cleaning up handles, just pass them along to
+	 *       some fixed thread (like boottask, asyncwork) in the form of an  RPC,
+	 *       and then have *them* do the finalization. */
 	size_t i;
 	struct async_aio_handle *h;
 	while ((h = aio_handle_async_alloc_exising()) != NULL) {

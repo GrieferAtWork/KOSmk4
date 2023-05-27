@@ -359,6 +359,7 @@ eof:
 @@pp_endif@@
 		goto done_free_dbline;
 	}
+
 	/* Accepted formats:
 	 *     gr_name:gr_passwd:gr_gid
 	 *     gr_name:gr_passwd:gr_gid:gr_mem[0],gr_mem[1],...
@@ -383,6 +384,7 @@ eof:
 		iter = strchrnul(iter, ':');
 		if likely(*iter) {
 			*iter++ = '\0';
+
 			/* Right now, `iter' points at the start of `gr_mem[0]' */
 			field_starts[3] = iter; /* gr_mem[0] */
 			if unlikely(*strchrnul(iter, ':'))
@@ -419,11 +421,14 @@ eof:
 			uintptr_t offset = offsets[i];
 			str = field_starts[i];
 			len = (strlen(str) + 1) * sizeof(char);
+
 			/* Ensure that sufficient space is available in the user-provided buffer. */
 			if unlikely(len > buflen)
 				goto err_ERANGE;
+
 			/* Set the associated pointer in `resultbuf' */
 			*(char **)((byte_t *)resultbuf + offset) = buffer;
+
 			/* Copy the string to the user-provided buffer. */
 			buffer = (char *)mempcpy(buffer, str, len);
 			buflen -= len;
@@ -439,6 +444,7 @@ eof:
 			buffer = aligned;
 			buflen -= padsiz;
 		}
+
 		/* Figure out how many members there are */
 		{
 			size_t reqspace, member_count = 0;
@@ -459,6 +465,7 @@ eof:
 			buflen -= reqspace;
 			buffer += reqspace;
 		}
+
 		/* Assign member names. */
 		{
 			char **dst = resultbuf->@gr_mem@;
@@ -469,6 +476,7 @@ eof:
 					siz = stroff(iter, ',') * sizeof(char);
 					if unlikely((siz + 1) > buflen)
 						goto err_ERANGE;
+
 					/* Copy to user-provided buffer. */
 					*(char *)mempcpy(buffer, iter, siz) = '\0';
 					*dst++ = buffer;
@@ -634,6 +642,7 @@ int initgroups([[in]] char const *user, $gid_t group) {
 		ngroups = buflen;
 		if (getgrouplist(user, group, buf, &ngroups) != -1)
 			break;
+
 		/* Allocate more space. */
 		if (buf == initbuf)
 			buf = NULL;

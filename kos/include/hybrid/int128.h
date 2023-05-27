@@ -3041,6 +3041,93 @@ __DECL_END
 
 #endif /* !__INT128_TYPE__ || !__UINT128_TYPE__ */
 
+#define __hybrid_int128_overflow_cast8(var, p_result)   (*(p_result) = __hybrid_int128_get8(var), __builtin_expect(!__hybrid_int128_is8bit(var), 0))
+#define __hybrid_int128_overflow_cast16(var, p_result)  (*(p_result) = __hybrid_int128_get16(var), __builtin_expect(!__hybrid_int128_is16bit(var), 0))
+#define __hybrid_int128_overflow_cast32(var, p_result)  (*(p_result) = __hybrid_int128_get32(var), __builtin_expect(!__hybrid_int128_is32bit(var), 0))
+#define __hybrid_uint128_overflow_cast8(var, p_result)  (*(p_result) = __hybrid_uint128_get8(var), __builtin_expect(!__hybrid_uint128_is8bit(var), 0))
+#define __hybrid_uint128_overflow_cast16(var, p_result) (*(p_result) = __hybrid_uint128_get16(var), __builtin_expect(!__hybrid_uint128_is16bit(var), 0))
+#define __hybrid_uint128_overflow_cast32(var, p_result) (*(p_result) = __hybrid_uint128_get32(var), __builtin_expect(!__hybrid_uint128_is32bit(var), 0))
+#ifdef __UINT64_TYPE__
+#define __hybrid_int128_overflow_cast64(var, p_result)  (*(p_result) = __hybrid_int128_get64(var), __builtin_expect(!__hybrid_int128_is64bit(var), 0))
+#define __hybrid_uint128_overflow_cast64(var, p_result) (*(p_result) = __hybrid_uint128_get64(var), __builtin_expect(!__hybrid_uint128_is64bit(var), 0))
+#endif /* __UINT64_TYPE__ */
+#ifdef __UINT128_TYPE__
+#define __hybrid_int128_overflow_cast128(var, p_result)  (*(p_result) = (var), 0)
+#define __hybrid_uint128_overflow_cast128(var, p_result) (*(p_result) = (var), 0)
+#endif /* __UINT128_TYPE__ */
+#ifdef __NO_builtin_choose_expr
+#ifdef __UINT128_TYPE__
+#define __hybrid_uint128_overflow_cast(x, p_result)                             \
+	(sizeof(*(p_result)) <= 1 ? __hybrid_uint128_overflow_cast8(x, p_result) :  \
+	 sizeof(*(p_result)) <= 2 ? __hybrid_uint128_overflow_cast16(x, p_result) : \
+	 sizeof(*(p_result)) <= 4 ? __hybrid_uint128_overflow_cast32(x, p_result) : \
+	 sizeof(*(p_result)) <= 8 ? __hybrid_uint128_overflow_cast64(x, p_result) : \
+	                            __hybrid_uint128_overflow_cast128(x, p_result))
+#define __hybrid_int128_overflow_cast(x, p_result)                             \
+	(sizeof(*(p_result)) <= 1 ? __hybrid_int128_overflow_cast8(x, p_result) :  \
+	 sizeof(*(p_result)) <= 2 ? __hybrid_int128_overflow_cast16(x, p_result) : \
+	 sizeof(*(p_result)) <= 4 ? __hybrid_int128_overflow_cast32(x, p_result) : \
+	 sizeof(*(p_result)) <= 8 ? __hybrid_int128_overflow_cast64(x, p_result) : \
+	                            __hybrid_int128_overflow_cast128(x, p_result))
+#elif defined(__UINT64_TYPE__)
+#define __hybrid_uint128_overflow_cast(x, p_result)                             \
+	(sizeof(*(p_result)) <= 1 ? __hybrid_uint128_overflow_cast8(x, p_result) :  \
+	 sizeof(*(p_result)) <= 2 ? __hybrid_uint128_overflow_cast16(x, p_result) : \
+	 sizeof(*(p_result)) <= 4 ? __hybrid_uint128_overflow_cast32(x, p_result) : \
+	                            __hybrid_uint128_overflow_cast64(x, p_result))
+#define __hybrid_int128_overflow_cast(x, p_result)                             \
+	(sizeof(*(p_result)) <= 1 ? __hybrid_int128_overflow_cast8(x, p_result) :  \
+	 sizeof(*(p_result)) <= 2 ? __hybrid_int128_overflow_cast16(x, p_result) : \
+	 sizeof(*(p_result)) <= 4 ? __hybrid_int128_overflow_cast32(x, p_result) : \
+	                            __hybrid_int128_overflow_cast64(x, p_result))
+#else /* ... */
+#define __hybrid_uint128_overflow_cast(x, p_result)                             \
+	(sizeof(*(p_result)) <= 1 ? __hybrid_uint128_overflow_cast8(x, p_result) :  \
+	 sizeof(*(p_result)) <= 2 ? __hybrid_uint128_overflow_cast16(x, p_result) : \
+	                            __hybrid_uint128_overflow_cast32(x, p_result))
+#define __hybrid_int128_overflow_cast(x, p_result)                             \
+	(sizeof(*(p_result)) <= 1 ? __hybrid_int128_overflow_cast8(x, p_result) :  \
+	 sizeof(*(p_result)) <= 2 ? __hybrid_int128_overflow_cast16(x, p_result) : \
+	                            __hybrid_int128_overflow_cast32(x, p_result))
+#endif /* !... */
+#else /* __NO_builtin_choose_expr */
+#ifdef __UINT128_TYPE__
+#define __hybrid_uint128_overflow_cast(x, p_result)                                                \
+	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_uint128_overflow_cast8(x, p_result),  \
+	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_uint128_overflow_cast16(x, p_result), \
+	__builtin_choose_expr(sizeof(*(p_result)) <= 4, __hybrid_uint128_overflow_cast32(x, p_result), \
+	__builtin_choose_expr(sizeof(*(p_result)) <= 8, __hybrid_uint128_overflow_cast64(x, p_result), \
+	                                                __hybrid_uint128_overflow_cast128(x, p_result)))))
+#define __hybrid_int128_overflow_cast(x, p_result)                                                \
+	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_int128_overflow_cast8(x, p_result),  \
+	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_int128_overflow_cast16(x, p_result), \
+	__builtin_choose_expr(sizeof(*(p_result)) <= 4, __hybrid_int128_overflow_cast32(x, p_result), \
+	__builtin_choose_expr(sizeof(*(p_result)) <= 8, __hybrid_int128_overflow_cast64(x, p_result), \
+	                                                __hybrid_int128_overflow_cast128(x, p_result)))))
+#elif defined(__UINT64_TYPE__)
+#define __hybrid_uint128_overflow_cast(x, p_result)                                                \
+	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_uint128_overflow_cast8(x, p_result),  \
+	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_uint128_overflow_cast16(x, p_result), \
+	__builtin_choose_expr(sizeof(*(p_result)) <= 4, __hybrid_uint128_overflow_cast32(x, p_result), \
+	                                                __hybrid_uint128_overflow_cast64(x, p_result))))
+#define __hybrid_int128_overflow_cast(x, p_result)                                                \
+	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_int128_overflow_cast8(x, p_result),  \
+	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_int128_overflow_cast16(x, p_result), \
+	__builtin_choose_expr(sizeof(*(p_result)) <= 4, __hybrid_int128_overflow_cast32(x, p_result), \
+	                                                __hybrid_int128_overflow_cast64(x, p_result))))
+#else /* ... */
+#define __hybrid_uint128_overflow_cast(x, p_result)                                                \
+	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_uint128_overflow_cast8(x, p_result),  \
+	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_uint128_overflow_cast16(x, p_result), \
+	                                                __hybrid_uint128_overflow_cast32(x, p_result)))
+#define __hybrid_int128_overflow_cast(x, p_result)                                                \
+	__builtin_choose_expr(sizeof(*(p_result)) <= 1, __hybrid_int128_overflow_cast8(x, p_result),  \
+	__builtin_choose_expr(sizeof(*(p_result)) <= 2, __hybrid_int128_overflow_cast16(x, p_result), \
+	                                                __hybrid_int128_overflow_cast32(x, p_result)))
+#endif /* !... */
+#endif /* !__NO_builtin_choose_expr */
+
+
 #define __hybrid_uint128_ne(var, v)    (!__hybrid_uint128_eq(var, v))
 #define __hybrid_uint128_ne8(var, v)   (!__hybrid_uint128_eq8(var, v))
 #define __hybrid_uint128_ne16(var, v)  (!__hybrid_uint128_eq16(var, v))

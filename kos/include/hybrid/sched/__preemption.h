@@ -118,8 +118,8 @@ __DECL_BEGIN
 typedef struct { int __hpf_flag; } __hybrid_preemption_flag_t;
 #define __hybrid_preemption_flag_t __hybrid_preemption_flag_t
 #if defined(__KOS__) && defined(__KERNEL__)
-__hybrid_preemption_flag_t const __HYBRID_PREEMPTION_OFF_VALUE;
-__hybrid_preemption_flag_t const __HYBRID_PREEMPTION_ON_VALUE;
+__hybrid_preemption_flag_t const __HYBRID_PREEMPTION_OFF_VALUE = { 0 };
+__hybrid_preemption_flag_t const __HYBRID_PREEMPTION_ON_VALUE  = { 1 };
 #define __HYBRID_PREEMPTION_OFF_VALUE __HYBRID_PREEMPTION_OFF_VALUE
 #define __HYBRID_PREEMPTION_ON_VALUE  __HYBRID_PREEMPTION_ON_VALUE
 #endif /* __KOS__ && __KERNEL__ */

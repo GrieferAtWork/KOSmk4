@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd76ccde */
+/* HASH CRC-32:0x9f5ac255 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -377,6 +377,7 @@ __eof:
 #endif /* !__ENOENT */
 		goto __done_free_dbline;
 	}
+
 	/* Accepted formats:
 	 *     gr_name:gr_passwd:gr_gid
 	 *     gr_name:gr_passwd:gr_gid:gr_mem[0],gr_mem[1],...
@@ -401,6 +402,7 @@ __eof:
 		__iter = (__NAMESPACE_LOCAL_SYM __localdep_strchrnul)(__iter, ':');
 		if __likely(*__iter) {
 			*__iter++ = '\0';
+
 			/* Right now, `iter' points at the start of `gr_mem[0]' */
 			__field_starts[3] = __iter; /* gr_mem[0] */
 			if __unlikely(*(__NAMESPACE_LOCAL_SYM __localdep_strchrnul)(__iter, ':'))
@@ -437,11 +439,14 @@ __eof:
 			__UINTPTR_TYPE__ __offset = __offsets[__i];
 			__str = __field_starts[__i];
 			__len = ((__NAMESPACE_LOCAL_SYM __localdep_strlen)(__str) + 1) * sizeof(char);
+
 			/* Ensure that sufficient space is available in the user-provided buffer. */
 			if __unlikely(__len > __buflen)
 				goto __err_ERANGE;
+
 			/* Set the associated pointer in `resultbuf' */
 			*(char **)((__BYTE_TYPE__ *)__resultbuf + __offset) = __buffer;
+
 			/* Copy the string to the user-provided buffer. */
 			__buffer = (char *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpy)(__buffer, __str, __len);
 			__buflen -= __len;
@@ -457,6 +462,7 @@ __eof:
 			__buffer = __aligned;
 			__buflen -= __padsiz;
 		}
+
 		/* Figure out how many members there are */
 		{
 			__SIZE_TYPE__ __reqspace, __member_count = 0;
@@ -477,6 +483,7 @@ __eof:
 			__buflen -= __reqspace;
 			__buffer += __reqspace;
 		}
+
 		/* Assign member names. */
 		{
 			char **__dst = __resultbuf->gr_mem;
@@ -487,6 +494,7 @@ __eof:
 					__siz = (__NAMESPACE_LOCAL_SYM __localdep_stroff)(__iter, ',') * sizeof(char);
 					if __unlikely((__siz + 1) > __buflen)
 						goto __err_ERANGE;
+
 					/* Copy to user-provided buffer. */
 					*(char *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpy)(__buffer, __iter, __siz) = '\0';
 					*__dst++ = __buffer;

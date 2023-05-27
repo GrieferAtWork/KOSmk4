@@ -971,19 +971,25 @@
 #define __CEIREDIRECT_DOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,...)                                      Treturn name param;
 #define __CEIREDIRECT_KOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,...)                                      Treturn name param;
 
-#define DEFINE_PRIVATE_ALIAS(new,old) int new(){}
-#define DEFINE_PUBLIC_ALIAS(new,old) int new(){}
-#define DEFINE_INTERN_ALIAS(new,old) int new(){}
-#define DEFINE_PRIVATE_WEAK_ALIAS(new,old) int new(){}
-#define DEFINE_PUBLIC_WEAK_ALIAS(new,old) int new(){}
-#define DEFINE_INTERN_WEAK_ALIAS(new,old) int new(){}
-#define __DEFINE_PRIVATE_ALIAS(new,old) int new(){}
-#define __DEFINE_PUBLIC_ALIAS(new,old) int new(){}
-#define __DEFINE_INTERN_ALIAS(new,old) int new(){}
-#define __DEFINE_PRIVATE_WEAK_ALIAS(new,old) int new(){}
-#define __DEFINE_PUBLIC_WEAK_ALIAS(new,old) int new(){}
-#define __DEFINE_INTERN_WEAK_ALIAS(new,old) int new(){}
-#define DEFINE_PUBLIC_IDATA(name,resolve,size) int name(){}
+#define DEFINE_PRIVATE_ALIAS(n,o) int n(){}
+#define DEFINE_PUBLIC_ALIAS(n,o) int n(){}
+#define DEFINE_INTERN_ALIAS(n,o) int n(){}
+#define DEFINE_PRIVATE_WEAK_ALIAS(n,o) int n(){}
+#define DEFINE_PUBLIC_WEAK_ALIAS(n,o) int n(){}
+#define DEFINE_INTERN_WEAK_ALIAS(n,o) int n(){}
+#define __DEFINE_PRIVATE_ALIAS(n,o) int n(){}
+#define __DEFINE_PUBLIC_ALIAS(n,o) int n(){}
+#define __DEFINE_INTERN_ALIAS(n,o) int n(){}
+#define __DEFINE_PRIVATE_WEAK_ALIAS(n,o) int n(){}
+#define __DEFINE_PUBLIC_WEAK_ALIAS(n,o) int n(){}
+#define __DEFINE_INTERN_WEAK_ALIAS(n,o) int n(){}
+#define DEFINE_PUBLIC_IDATA(n,r,s) int n(){}
+#define DEFINE_PRIVATE_SYMBOL(n,v,s) ;int n(){};
+#define DEFINE_PUBLIC_SYMBOL(n,v,s) ;int n(){};
+#define DEFINE_INTERN_SYMBOL(n,v,s) ;int n(){};
+#define DEFINE_PRIVATE_WEAK_SYMBOL(n,v,s) ;int n(){};
+#define DEFINE_PUBLIC_WEAK_SYMBOL(n,v,s) ;int n(){};
+#define DEFINE_INTERN_WEAK_SYMBOL(n,v,s) ;int n(){};
 
 #define REFCNT_METHODS(T) int
 #define REFCNT_METHODS_P(i) int
@@ -1264,6 +1270,9 @@
 #define MY_ElfW(x) ELF64_##x
 #define MY_ELFW(x) Elf64_##x
 
+#define __CDECL_OR_DEFAULT
+#define __HYBRID_LIBATOMIC_DECL
+#define __HYBRID_LIBATOMIC_CC
 #define __HYBRID_Q_STRUCT struct
 #define __HYBRID_Q_CLASS class
 #define LIST_HEAD(n,t) struct n{struct t *lh_first;}

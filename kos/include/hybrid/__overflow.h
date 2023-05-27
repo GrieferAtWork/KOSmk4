@@ -1608,23 +1608,23 @@ print("#endif /" "* !__NO_builtin_choose_expr *" "/");
  * Do the operation `*p_result = (T)x'
  * @return: true:  Overflow happened
  * @return: false: Overflow didn't happen */
-#define __hybrid_overflow_ucast8(x, p_result)  __builtin_expect((*(p_result) = (__UINT8_TYPE__)(x)) != (x) || sizeof(x) <= 1, 0)
-#define __hybrid_overflow_ucast16(x, p_result) __builtin_expect((*(p_result) = (__UINT16_TYPE__)(x)) != (x) || sizeof(x) <= 2, 0)
-#define __hybrid_overflow_ucast32(x, p_result) __builtin_expect((*(p_result) = (__UINT32_TYPE__)(x)) != (x) || sizeof(x) <= 4, 0)
-#define __hybrid_overflow_scast8(x, p_result)  __builtin_expect((*(p_result) = (__INT8_TYPE__)(x)) != (x) || sizeof(x) <= 1, 0)
-#define __hybrid_overflow_scast16(x, p_result) __builtin_expect((*(p_result) = (__INT16_TYPE__)(x)) != (x) || sizeof(x) <= 2, 0)
-#define __hybrid_overflow_scast32(x, p_result) __builtin_expect((*(p_result) = (__INT32_TYPE__)(x)) != (x) || sizeof(x) <= 4, 0)
+#define __hybrid_overflow_ucast8(x, p_result)  __builtin_expect((*(p_result) = (__UINT8_TYPE__)(x)) != (x) && sizeof(x) > 1, 0)
+#define __hybrid_overflow_ucast16(x, p_result) __builtin_expect((*(p_result) = (__UINT16_TYPE__)(x)) != (x) && sizeof(x) > 2, 0)
+#define __hybrid_overflow_ucast32(x, p_result) __builtin_expect((*(p_result) = (__UINT32_TYPE__)(x)) != (x) && sizeof(x) > 4, 0)
+#define __hybrid_overflow_scast8(x, p_result)  __builtin_expect((*(p_result) = (__INT8_TYPE__)(x)) != (x) && sizeof(x) > 1, 0)
+#define __hybrid_overflow_scast16(x, p_result) __builtin_expect((*(p_result) = (__INT16_TYPE__)(x)) != (x) && sizeof(x) > 2, 0)
+#define __hybrid_overflow_scast32(x, p_result) __builtin_expect((*(p_result) = (__INT32_TYPE__)(x)) != (x) && sizeof(x) > 4, 0)
 #ifdef __UINT64_TYPE__
-#define __hybrid_overflow_ucast64(x, p_result) __builtin_expect((*(p_result) = (__UINT64_TYPE__)(x)) != (x) || sizeof(x) <= 8, 0)
-#define __hybrid_overflow_scast64(x, p_result) __builtin_expect((*(p_result) = (__INT64_TYPE__)(x)) != (x) || sizeof(x) <= 8, 0)
+#define __hybrid_overflow_ucast64(x, p_result) __builtin_expect((*(p_result) = (__UINT64_TYPE__)(x)) != (x) && sizeof(x) > 8, 0)
+#define __hybrid_overflow_scast64(x, p_result) __builtin_expect((*(p_result) = (__INT64_TYPE__)(x)) != (x) && sizeof(x) > 8, 0)
 #ifdef __UINT128_TYPE__
-#define __hybrid_overflow_ucast128(x, p_result) __builtin_expect((*(p_result) = (__UINT128_TYPE__)(x)) != (x) || sizeof(x) <= 8, 0)
-#define __hybrid_overflow_scast128(x, p_result) __builtin_expect((*(p_result) = (__INT128_TYPE__)(x)) != (x) || sizeof(x) <= 8, 0)
+#define __hybrid_overflow_ucast128(x, p_result) __builtin_expect((*(p_result) = (__UINT128_TYPE__)(x)) != (x) && sizeof(x) > 8, 0)
+#define __hybrid_overflow_scast128(x, p_result) __builtin_expect((*(p_result) = (__INT128_TYPE__)(x)) != (x) && sizeof(x) > 8, 0)
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
 #ifdef __COMPILER_HAVE_TYPEOF
-#define __hybrid_overflow_ucast(x, p_result) __builtin_expect((*(p_result) = (__typeof__(*(p_result)))(x)) != (x) || sizeof(x) <= sizeof(*(p_result)), 0)
-#define __hybrid_overflow_scast(x, p_result) __builtin_expect((*(p_result) = (__typeof__(*(p_result)))(x)) != (x) || sizeof(x) <= sizeof(*(p_result)), 0)
+#define __hybrid_overflow_ucast(x, p_result) __builtin_expect((*(p_result) = (__typeof__(*(p_result)))(x)) != (x) && sizeof(x) > sizeof(*(p_result)), 0)
+#define __hybrid_overflow_scast(x, p_result) __builtin_expect((*(p_result) = (__typeof__(*(p_result)))(x)) != (x) && sizeof(x) > sizeof(*(p_result)), 0)
 #elif !defined(__NO_builtin_choose_expr)
 #ifdef __UINT128_TYPE__
 #define __hybrid_overflow_ucast(x, p_result)                                                \
