@@ -4,3 +4,6 @@
 [submodule "kos/src/libregex"]
 	path = kos/src/libregex
 	url = https://github.com/GrieferAtWork/kos-libregex.git
+[submodule "kos/src/libjson"]
+	path = kos/src/libjson
+	url = https://github.com/GrieferAtWork/kos-libjson.git
