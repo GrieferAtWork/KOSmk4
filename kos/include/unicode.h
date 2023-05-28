@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd42399f */
+/* HASH CRC-32:0xf3bc0ad7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -609,36 +609,36 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_writeutf16_chk, __FORCELOCAL __ATTR_ARTI
 extern "C++" {
 /* >> unicode_readutf32(3)
  * Read a single Unicode character from a given UTF-32 string. */
-__LOCAL __ATTR_INOUT(1) char32_t (__LIBCCALL unicode_readutf32)(/*utf-32*/ char32_t const **__restrict __ptext) { return *(*__ptext)++; }
+__LOCAL __ATTR_INOUT(1) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf32)(/*utf-32*/ char32_t const **__restrict __ptext) { return *(*__ptext)++; }
 /* >> unicode_readutf32(3)
  * Read a single Unicode character from a given UTF-32 string. */
-__LOCAL __ATTR_INOUT(1) char32_t (__LIBCCALL unicode_readutf32)(/*utf-32*/ char32_t **__restrict __ptext) { return *(*__ptext)++; }
+__LOCAL __ATTR_INOUT(1) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf32)(/*utf-32*/ char32_t **__restrict __ptext) { return *(*__ptext)++; }
 /* >> unicode_readutf32_swap(3)
  * Same as `unicode_readutf32()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_INOUT(1) char32_t (__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ char32_t const **__restrict __ptext) { char32_t __res = *(*__ptext++); return __hybrid_bswap32(__res); }
+__LOCAL __ATTR_INOUT(1) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ char32_t const **__restrict __ptext) { char32_t __res = *(*__ptext++); return __hybrid_bswap32(__res); }
 /* >> unicode_readutf32_swap(3)
  * Same as `unicode_readutf32()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_INOUT(1) char32_t (__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ char32_t **__restrict __ptext) { char32_t __res = *(*__ptext++); return __hybrid_bswap32(__res); }
+__LOCAL __ATTR_INOUT(1) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ char32_t **__restrict __ptext) { char32_t __res = *(*__ptext++); return __hybrid_bswap32(__res); }
 /* >> unicode_readutf32_rev(3)
  * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
  * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
-__LOCAL __ATTR_INOUT(1) char32_t (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ char32_t const **__restrict __ptext) { return *(--*__ptext); }
+__LOCAL __ATTR_INOUT(1) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ char32_t const **__restrict __ptext) { return *(--*__ptext); }
 /* >> unicode_readutf32_rev(3)
  * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
  * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
-__LOCAL __ATTR_INOUT(1) char32_t (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ char32_t **__restrict __ptext) { return *(--*__ptext); }
+__LOCAL __ATTR_INOUT(1) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ char32_t **__restrict __ptext) { return *(--*__ptext); }
 /* >> unicode_readutf32_swap_rev(3)
  * Same as `unicode_readutf32_rev()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_INOUT(1) char32_t (__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ char32_t const **__restrict __ptext) { char32_t __res = *(--*__ptext); return __hybrid_bswap32(__res); }
+__LOCAL __ATTR_INOUT(1) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ char32_t const **__restrict __ptext) { char32_t __res = *(--*__ptext); return __hybrid_bswap32(__res); }
 /* >> unicode_readutf32_swap_rev(3)
  * Same as `unicode_readutf32_rev()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_INOUT(1) char32_t (__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ char32_t **__restrict __ptext) { char32_t __res = *(--*__ptext); return __hybrid_bswap32(__res); }
+__LOCAL __ATTR_INOUT(1) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ char32_t **__restrict __ptext) { char32_t __res = *(--*__ptext); return __hybrid_bswap32(__res); }
 /* >> unicode_readutf32_n(3)
  * Same as `unicode_readutf32()', but don't read past `text_end'. */
 __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
-(__LIBCCALL unicode_readutf32_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_end) {
+__NOTHROW_NCX(__LIBCCALL unicode_readutf32_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_end) {
 	char32_t __result;
 	char32_t const *__text = *__ptext;
 	if (__text >= __text_end)
@@ -650,13 +650,13 @@ __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
 /* >> unicode_readutf32_n(3)
  * Same as `unicode_readutf32()', but don't read past `text_end'. */
 __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
-(__LIBCCALL unicode_readutf32_n)(/*utf-32*/ char32_t **__restrict __ptext, char32_t const *__text_end) {
+__NOTHROW_NCX(__LIBCCALL unicode_readutf32_n)(/*utf-32*/ char32_t **__restrict __ptext, char32_t const *__text_end) {
 	return unicode_readutf32_n((char32_t const **)__ptext, __text_end);
 }
 /* >> unicode_readutf32_rev_n(3)
  * Same as `unicode_readutf32()', but don't read before `text_start'. */
 __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
-(__LIBCCALL unicode_readutf32_rev_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_start) {
+__NOTHROW_NCX(__LIBCCALL unicode_readutf32_rev_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_start) {
 	char32_t __result;
 	char32_t const *__text = *__ptext;
 	if (__text <= __text_start)
@@ -668,13 +668,13 @@ __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
 /* >> unicode_readutf32_rev_n(3)
  * Same as `unicode_readutf32()', but don't read before `text_start'. */
 __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
-(__LIBCCALL unicode_readutf32_rev_n)(/*utf-32*/ char32_t **__restrict __ptext, char32_t const *__text_start) {
+__NOTHROW_NCX(__LIBCCALL unicode_readutf32_rev_n)(/*utf-32*/ char32_t **__restrict __ptext, char32_t const *__text_start) {
 	return unicode_readutf32_rev_n((char32_t const **)__ptext, __text_start);
 }
 /* >> unicode_readutf32_swap_n(3)
  * Same as `unicode_readutf32_n()', but read in reverse endian as that of the host CPU. */
 __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
-(__LIBCCALL unicode_readutf32_swap_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_end) {
+__NOTHROW_NCX(__LIBCCALL unicode_readutf32_swap_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_end) {
 	char32_t __result;
 	char32_t const *__text = *__ptext;
 	if (__text >= __text_end)
@@ -686,13 +686,13 @@ __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
 /* >> unicode_readutf32_swap_n(3)
  * Same as `unicode_readutf32_n()', but read in reverse endian as that of the host CPU. */
 __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
-(__LIBCCALL unicode_readutf32_swap_n)(/*utf-32*/ char32_t **__restrict __ptext, char32_t const *__text_end) {
+__NOTHROW_NCX(__LIBCCALL unicode_readutf32_swap_n)(/*utf-32*/ char32_t **__restrict __ptext, char32_t const *__text_end) {
 	return unicode_readutf32_swap_n((char32_t const **)__ptext, __text_end);
 }
 /* >> unicode_readutf32_swap_rev_n(3)
  * Same as `unicode_readutf32_rev_n()', but read in reverse endian as that of the host CPU. */
 __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
-(__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_start) {
+__NOTHROW_NCX(__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_start) {
 	char32_t __result;
 	char32_t const *__text = *__ptext;
 	if (__text <= __text_start)
@@ -704,7 +704,7 @@ __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
 /* >> unicode_readutf32_swap_rev_n(3)
  * Same as `unicode_readutf32_rev_n()', but read in reverse endian as that of the host CPU. */
 __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
-(__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ char32_t **__restrict __ptext, char32_t const *__text_start) {
+__NOTHROW_NCX(__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ char32_t **__restrict __ptext, char32_t const *__text_start) {
 	return unicode_readutf32_swap_rev_n((char32_t const **)__ptext, __text_start);
 }
 } /* extern "C++" */
@@ -712,13 +712,13 @@ __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
 /* >> unicode_readutf32(3)
  * Read a single Unicode character from a given UTF-32 string. */
 __LOCAL __ATTR_INOUT(1) char32_t
-(__LIBCCALL unicode_readutf32)(/*utf-32*/ char32_t const **__restrict __ptext) {
+__NOTHROW_NCX(__LIBCCALL unicode_readutf32)(/*utf-32*/ char32_t const **__restrict __ptext) {
 	return *(*__ptext)++;
 }
 /* >> unicode_readutf32_swap(3)
  * Same as `unicode_readutf32()', but read in reverse endian as that of the host CPU. */
 __LOCAL __ATTR_INOUT(1) char32_t
-(__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ char32_t const **__restrict __ptext) {
+__NOTHROW_NCX(__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ char32_t const **__restrict __ptext) {
 	char32_t __res = *(*__ptext++);
 	return __hybrid_bswap32(__res);
 }
@@ -727,20 +727,20 @@ __LOCAL __ATTR_INOUT(1) char32_t
  * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 __LOCAL __ATTR_INOUT(1) char32_t
-(__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ char32_t const **__restrict __ptext) {
+__NOTHROW_NCX(__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ char32_t const **__restrict __ptext) {
 	return *(--*__ptext);
 }
 /* >> unicode_readutf32_swap_rev(3)
  * Same as `unicode_readutf32_rev()', but read in reverse endian as that of the host CPU. */
 __LOCAL __ATTR_INOUT(1) char32_t
-(__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ char32_t const **__restrict __ptext) {
+__NOTHROW_NCX(__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ char32_t const **__restrict __ptext) {
 	char32_t __res = *(--*__ptext);
 	return __hybrid_bswap32(__res);
 }
 /* >> unicode_readutf32_n(3)
  * Same as `unicode_readutf32()', but don't read past `text_end'. */
 __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
-(__LIBCCALL unicode_readutf32_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_end) {
+__NOTHROW_NCX(__LIBCCALL unicode_readutf32_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_end) {
 	char32_t __result;
 	char32_t const *__text = *__ptext;
 	if (__text >= __text_end)
@@ -752,7 +752,7 @@ __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
 /* >> unicode_readutf32_rev_n(3)
  * Same as `unicode_readutf32()', but don't read before `text_start'. */
 __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
-(__LIBCCALL unicode_readutf32_rev_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_start) {
+__NOTHROW_NCX(__LIBCCALL unicode_readutf32_rev_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_start) {
 	char32_t __result;
 	char32_t const *__text = *__ptext;
 	if (__text <= __text_start)
@@ -764,7 +764,7 @@ __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
 /* >> unicode_readutf32_swap_n(3)
  * Same as `unicode_readutf32_n()', but read in reverse endian as that of the host CPU. */
 __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
-(__LIBCCALL unicode_readutf32_swap_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_end) {
+__NOTHROW_NCX(__LIBCCALL unicode_readutf32_swap_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_end) {
 	char32_t __result;
 	char32_t const *__text = *__ptext;
 	if (__text >= __text_end)
@@ -776,7 +776,7 @@ __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
 /* >> unicode_readutf32_swap_rev_n(3)
  * Same as `unicode_readutf32_rev_n()', but read in reverse endian as that of the host CPU. */
 __LOCAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t
-(__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_start) {
+__NOTHROW_NCX(__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_start) {
 	char32_t __result;
 	char32_t const *__text = *__ptext;
 	if (__text <= __text_start)
