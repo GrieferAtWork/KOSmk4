@@ -20,21 +20,25 @@
 #ifndef _LIBJSON_API_H
 #define _LIBJSON_API_H 1
 
+#ifndef LIBJSON_NO_SYSTEM_INCLUDES
 #include <__stdinc.h>
-
 #include <hybrid/host.h>
+#endif /* !LIBJSON_NO_SYSTEM_INCLUDES */
 
+#ifndef LIBJSON_CC
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBJSON_CC __ATTR_STDCALL
 #else /* ... */
 #define LIBJSON_CC /* nothing */
 #endif /* !... */
+#endif /* !LIBJSON_CC */
 
 #if (!defined(LIBJSON_WANT_PROTOTYPES) && \
      defined(__KOS__) && defined(__KERNEL__))
 #define LIBJSON_WANT_PROTOTYPES
 #endif /* ... */
 
+#ifndef LIBJSON_DECL
 #if (defined(__KOS__) && defined(__KERNEL__) && \
      defined(BUILDING_KERNEL_CORE))
 #define LIBJSON_DECL __PUBDEF
@@ -43,6 +47,7 @@
 #else /* ... */
 #define LIBJSON_DECL __IMPDEF
 #endif /* !... */
+#endif /* !LIBJSON_DECL */
 
 /* Library name for use with `dlopen(3D)' */
 #define LIBJSON_LIBRARY_NAME "libjson.so"
