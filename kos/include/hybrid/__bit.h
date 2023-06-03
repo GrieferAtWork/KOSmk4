@@ -257,7 +257,7 @@ extern unsigned char (__cdecl _BitScanReverse64)(unsigned long *__index, unsigne
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __SHIFT_TYPE__ __NOTHROW(__hybrid_clz64)(__UINT64_TYPE__ __i) {
 	unsigned long __res;
 	_BitScanReverse64(&__res, (__UINT64_TYPE__)__i);
-	return (__SHIFT_TYPE__)__res;
+	return (__SHIFT_TYPE__)63 - (__SHIFT_TYPE__)__res;
 }
 #endif /* ... */
 #endif /* !__hybrid_clz64 */
@@ -279,7 +279,7 @@ extern unsigned char (__cdecl _BitScanReverse)(unsigned long *__index, unsigned 
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __SHIFT_TYPE__ __NOTHROW(__hybrid_clz32)(__UINT32_TYPE__ __i) {
 	unsigned long __res;
 	_BitScanReverse(&__res, (unsigned long)__i);
-	return (__SHIFT_TYPE__)__res;
+	return (__SHIFT_TYPE__)31 - (__SHIFT_TYPE__)__res;
 }
 #endif /* ... */
 #endif /* !__hybrid_clz32 */
