@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "More efficient PRI* macros in libregex"
-DEEMON_VERSION="223c2972c0f1160a41dbc2d7c064eb6a3098d3a7"
+#     v -- "Update VS project files"
+DEEMON_VERSION="a9e735389a3c4ca10c2a48953c1bf721c4e900ab"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
