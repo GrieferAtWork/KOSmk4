@@ -1647,25 +1647,27 @@ print_special_struct(struct ctyperef const *__restrict self,
 				raw_name = self->ct_info.ci_name;
 		}
 		name = raw_name;
-		for (;;) {
-			if (*name == '_') {
-				++name;
-				continue;
+		if (name != NULL) {
+			for (;;) {
+				if (*name == '_') {
+					++name;
+					continue;
+				}
+				if (memcmp(name, "hybrid_", COMPILER_STRLEN("hybrid_") * sizeof(char)) == 0) {
+					name += COMPILER_STRLEN("hybrid_");
+					continue;
+				}
+				break;
 			}
-			if (memcmp(name, "hybrid_", COMPILER_STRLEN("hybrid_") * sizeof(char)) == 0) {
-				name += COMPILER_STRLEN("hybrid_");
-				continue;
-			}
-			break;
-		}
 
-		is_unsigned = false;
-		if (*name == 'u') {
-			is_unsigned = true;
-			++name;
+			is_unsigned = false;
+			if (*name == 'u') {
+				is_unsigned = true;
+				++name;
+			}
+			if (strcmp(name, "int128_struct") == 0 || strcmp(name, "int128_t") == 0)
+				return do_print_int128(printer, ptr, is_unsigned, flags, p_result);
 		}
-		if (strcmp(name, "int128_struct") == 0 || strcmp(name, "int128_t") == 0)
-			return do_print_int128(printer, ptr, is_unsigned, flags, p_result);
 	}
 
 	/* Support for other special struct-types would go here. */
