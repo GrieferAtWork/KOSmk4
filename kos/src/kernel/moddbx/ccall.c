@@ -36,6 +36,7 @@ opt.removeif(e -> e.startswith("-O"));
 
 #include <kernel/mman.h>
 
+#include <hybrid/align.h>
 #include <hybrid/host.h>
 
 #include <kos/except.h>
@@ -90,6 +91,7 @@ NOTHROW(FCALL cfunction_call_impl)(void const *func_address, uintptr_half_t cc,
 		if (CTYPE_KIND_ISARRAY_OR_STRUCT(arg_type->ct_kind)) {
 			/* Inline struct argument */
 			argv_space += ctype_sizeof(arg_type);
+			argv_space = CEIL_ALIGN(argv_space, 4);
 		} else {
 			argv_space += 4;
 			if (is_double_wide_argument(arg_type))
@@ -128,6 +130,7 @@ NOTHROW(FCALL cfunction_call_impl)(void const *func_address, uintptr_half_t cc,
 		param_size = 4;
 		if (CTYPE_KIND_ISARRAY_OR_STRUCT(arg_type->ct_kind)) {
 			param_size = ctype_sizeof(arg_type); /* Inline struct argument */
+			param_size = CEIL_ALIGN(param_size, 4);
 		} else if (is_double_wide_argument(arg_type)) {
 			param_size = 8; /* Double-wide register */
 		}
