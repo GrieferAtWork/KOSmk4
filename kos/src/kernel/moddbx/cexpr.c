@@ -979,7 +979,11 @@ do_second_pass:
 				uintptr_t p;
 				byte_t buf[CFI_REGISTER_MAXSIZE];
 			} regval;
-			if unlikely(!(*LOCAL_ue_regget)(LOCAL_ue_regget_arg, ste_top.s_register, regval.buf))
+			unwind_errno_t getreg_error;
+			getreg_error = (*LOCAL_ue_regget)(LOCAL_ue_regget_arg,
+			                                  ste_top.s_register,
+			                                  regval.buf);
+			if unlikely(getreg_error != UNWIND_SUCCESS)
 				goto done;
 			lvalue = (byte_t *)regval.p + ste_top.s_regoffset;
 		}
@@ -1014,6 +1018,14 @@ NOTHROW(FCALL cexpr_cfi_to_address)(struct cvalue *__restrict self) {
 		 *               it's `self->cv_expr.v_expr.v_objaddr' */
 		return cexpr_cfi_set_address(self, self->cv_expr.v_expr.v_objaddr);
 	}
+#if 0 /* Enable to force use of `debuginfo_location_(get|set)value' */
+	(void)&cexpr_cfi_to_address_impl;
+	(void)result;
+	(void)old_pdir;
+	(void)req_pdir;
+	(void)mod;
+	return DBX_EOK;
+#else
 	old_pdir = pagedir_get();
 	req_pdir = old_pdir;
 	mod      = self->cv_expr.v_expr.v_module;
@@ -1037,6 +1049,7 @@ NOTHROW(FCALL cexpr_cfi_to_address)(struct cvalue *__restrict self) {
 	if (old_pdir != req_pdir)
 		pagedir_set(old_pdir);
 	return result;
+#endif
 }
 
 
@@ -1339,9 +1352,9 @@ NOTHROW(FCALL cvalue_flush)(struct cvalue *__restrict self) {
 				goto done;
 		}
 		reqsize = dbg_rt_setregbyid(DBG_RT_REGLEVEL_VIEW,
-		                         self->cv_register.r_regid,
-		                         self->cv_register.r_ibuffer,
-		                         bufneed);
+		                            self->cv_register.r_regid,
+		                            self->cv_register.r_ibuffer,
+		                            bufneed);
 		if unlikely(reqsize != bufneed)
 			result = DBX_EINTERN;
 	}	break;
@@ -1473,7 +1486,7 @@ NOTHROW(FCALL cexpr_pushexpr)(struct ctyperef const *__restrict typ,
 	return DBX_EOK;
 }
 
-FUNDEF NONNULL((1, 2)) dbx_errno_t /* Push `(typ)(*(typ const *)data)' */
+PUBLIC NONNULL((1, 2)) dbx_errno_t /* Push `(typ)(*(typ const *)data)' */
 NOTHROW(FCALL cexpr_pushdata)(struct ctyperef const *__restrict typ,
                               void const *__restrict data) {
 	struct cvalue *valp;
@@ -1503,7 +1516,7 @@ NOTHROW(FCALL cexpr_pushdata)(struct ctyperef const *__restrict typ,
 	return DBX_EOK;
 }
 
-FUNDEF NONNULL((1)) dbx_errno_t /* Push `(typ)value' */
+PUBLIC NONNULL((1)) dbx_errno_t /* Push `(typ)value' */
 NOTHROW(FCALL cexpr_pushint)(struct ctyperef const *__restrict typ,
                              uintmax_t value) {
 	struct cvalue *valp;
@@ -1678,8 +1691,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_rrot)(unsigned int n) {
 
 
 
-/* Return a pointer to the data associated with the top expression stack  element.
- * If the stack is empty or `cexpr_typeonly' is `true', write-back a NULL pointer.
+/* Return a pointer to the data associated with the given `self' stack element.
  * WARNING: The pointer written back to `*presult' may point to arbitrary
  *          user- or out-of-mman memory, meaning that it must be accessed
  *          through use of `dbg_(read|write)memory'!
@@ -1687,45 +1699,39 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_rrot)(unsigned int n) {
  * @return: DBX_ENOMEM:  Insufficient memory to allocate an intermediate buffer.
  * @return: DBX_EFAULT:  A CFI expression caused a memory fault.
  * @return: DBX_EINTERN: Internal error. */
-FUNDEF WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW(FCALL cexpr_getdata)(byte_t **__restrict presult) {
-	struct cvalue *top;
-	if unlikely(!cexpr_stacksize) {
-nodata:
-		*presult = NULL;
-		return DBX_EOK;
-	}
-	top = &cexpr_stacktop;
+PUBLIC WUNUSED NONNULL((1, 2)) dbx_errno_t
+NOTHROW(FCALL cexpr_getdata_ex)(struct cvalue *__restrict self,
+                                byte_t **__restrict presult) {
 again:
-	switch (top->cv_kind) {
+	switch (self->cv_kind) {
 
 	case CVALUE_KIND_ADDR:
 		/* This right here can cause an arbitrary pointer to be written back! */
-		*presult = (byte_t *)top->cv_addr;
+		*presult = (byte_t *)self->cv_addr;
 		break;
 
 	case CVALUE_KIND_DATA:
-		*presult = top->cv_data;
+		*presult = self->cv_data;
 		break;
 
 	case CVALUE_KIND_IDATA:
-		*presult = top->cv_idata;
+		*presult = self->cv_idata;
 		break;
 
 	case CVALUE_KIND_EXPR: {
 		size_t bufavail;
-		*presult = (byte_t *)top->cv_expr.v_buffer;
+		*presult = (byte_t *)self->cv_expr.v_buffer;
 
 		/* Lazily load a CFI expression. */
 		if (!*presult) {
 			dbx_errno_t error;
 			/* Try to load the address of the CFI expression. */
-			error = cexpr_cfi_to_address(top);
+			error = cexpr_cfi_to_address(self);
 			if unlikely(error != DBX_EOK)
 				return error;
-			if (top->cv_kind != CVALUE_KIND_EXPR)
+			if (self->cv_kind != CVALUE_KIND_EXPR)
 				goto again;
-			error = cvalue_rw_expr(top, false);
+			error = cvalue_rw_expr(self, false);
 			if (error == DBX_EOK)
 				goto again;
 			return error;
@@ -1735,38 +1741,59 @@ again:
 		 * If less space is available, return NULL to prevent writing past
 		 * the end of the internal buffer for expressions.
 		 * Note though, that this really shouldn't happen... */
-		if (OVERFLOW_USUB(top->cv_expr.v_buflen, top->cv_expr.v_bufoff, &bufavail))
+		if (OVERFLOW_USUB(self->cv_expr.v_buflen, self->cv_expr.v_bufoff, &bufavail))
 			return DBX_EINTERN;
-		if (bufavail < ctype_sizeof(top->cv_type.ct_typ))
+		if (bufavail < ctype_sizeof(self->cv_type.ct_typ))
 			return DBX_EINTERN;
 
 		/* Adjust the  buffer pointer  for the  expression-base-offset.
 		 * This is used (e.g.) for accessing struct-through-CFI fields. */
-		*presult += top->cv_expr.v_bufoff;
+		*presult += self->cv_expr.v_bufoff;
 	}	break;
 
 	case CVALUE_KIND_IEXPR:
-		*presult = top->cv_expr.v_ibuffer + top->cv_expr.v_bufoff;
+		*presult = self->cv_expr.v_ibuffer + self->cv_expr.v_bufoff;
 		break;
 
 	case CVALUE_KIND_REGISTER:
-		*presult = top->cv_register.r_ibuffer;
+		*presult = self->cv_register.r_ibuffer;
 		break;
 
 	default:
 		goto nodata;
 	}
 	return DBX_EOK;
+nodata:
+	*presult = NULL;
+	return DBX_EOK;
+}
+
+/* Return a pointer to the data associated with the top expression stack element.
+ * If the  stack  is empty,  write-back  a  NULL pointer  and  return  `DBX_EOK'.
+ * @return: DBX_EOK:     Success.
+ * @return: DBX_ENOMEM:  Insufficient memory to allocate an intermediate buffer.
+ * @return: DBX_EFAULT:  A CFI expression caused a memory fault.
+ * @return: DBX_EINTERN: Internal error. */
+PUBLIC WUNUSED NONNULL((1)) dbx_errno_t
+NOTHROW(FCALL cexpr_getdata)(byte_t **__restrict presult) {
+	if unlikely(cexpr_stacksize == 0) {
+		*presult = NULL;
+		return DBX_EOK;
+	}
+	return cexpr_getdata_ex(&cexpr_stacktop, presult);
 }
 
 /* Return the actual size of the top element of the C expression stack.
  * If the stack is empty,  return `0' instead. (s.a.  `ctype_sizeof()') */
 PUBLIC ATTR_PURE WUNUSED size_t
 NOTHROW(FCALL cexpr_getsize)(void) {
-	if unlikely(!cexpr_stacksize)
+	if unlikely(cexpr_stacksize == 0)
 		return 0;
-	return ctype_sizeof(cexpr_stacktop.cv_type.ct_typ);
+	return cexpr_getsize_ex(&cexpr_stacktop);
 }
+
+
+
 
 /* Return the boolean value of the top stack element.
  * When `cexpr_typeonly' is set to true, this function's return value is undefined.
@@ -3061,12 +3088,63 @@ done_pop_rhs:
  * where TOP is RHS, and the one before is LHS. When `cexpr_readonly'
  * is set to `true', then this function fails with `DBX_ERDONLY' */
 PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_store)(void) {
-	if (cexpr_readonly)
-		return DBX_ERDONLY;
+	dbx_errno_t result;
+	struct cvalue *lhs, *rhs;
+	byte_t *lhs_data, *rhs_data;
+	size_t num_bytes;
+	if unlikely(cexpr_stacksize < 2)
+		return DBX_EINTERN; /* Shouldn't happen */
+	lhs = &cexpr_stack[cexpr_stacksize - 2];
+	rhs = &cexpr_stack[cexpr_stacksize - 1];
+	switch (lhs->cv_kind) {
 
-	/* TODO: Not implemented... */
-	COMPILER_IMPURE();
-	return DBX_ENOMEM;
+	case CVALUE_KIND_VOID:
+		/* This is needed for `cexpr_typeonly' */
+		goto done_pop;
+
+	case CVALUE_KIND_DATA:
+	case CVALUE_KIND_IDATA:
+		/* Cannot write to R-value expressions */
+		return DBX_ESYNTAX;
+
+	default: break;
+	}
+	if (cexpr_readonly)
+		return DBX_ERDONLY; /* Refuse to perform store operations in read-only mode. */
+	result = cexpr_promote(); /* R-value+promote */
+	if unlikely(result != DBX_EOK)
+		goto done;
+
+	/* Cast the RHS-operand to the same type as the LHS-operand */
+	result = cexpr_cast(&lhs->cv_type);
+	if unlikely(result != DBX_EOK)
+		goto done;
+
+	/* Load data pointers for the LHS and RHS operands. */
+	result = cexpr_getdata_ex(lhs, &lhs_data);
+	if unlikely(result != DBX_EOK)
+		goto done;
+	result = cexpr_getdata_ex(rhs, &rhs_data);
+	if unlikely(result != DBX_EOK)
+		goto done;
+
+	/* Figure out how many bytes to transfer (and assert that the number is equal on both sides) */
+	num_bytes = cexpr_getsize_ex(lhs);
+	if unlikely(num_bytes != cexpr_getsize_ex(rhs))
+		return DBX_EINTERN;
+
+	/* Do the actual job of copying data from `rhs_data' to `lhs_data' */
+	if (dbg_movememory(lhs_data, rhs_data, num_bytes, cexpr_forcewrite) != 0)
+		return DBX_EFAULT;
+
+	/* Write-back the changes made to the LHS operand. */
+	result = cvalue_flush(lhs);
+	if unlikely(result != DBX_EOK)
+		goto done;
+done_pop:
+	result = cexpr_pop(); /* Pop the RHS-expression */
+done:
+	return result;
 }
 
 /* Pop `argc' operands, followed by popping the function to call.
