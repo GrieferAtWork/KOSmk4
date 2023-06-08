@@ -2598,9 +2598,11 @@ NOTHROW(FCALL loadinfo_const_value)(di_debuginfo_cu_parser_t const *__restrict p
 	di_debuginfo_block_t block;
 	if (debuginfo_cu_parser_getconst(parser, form, &value, attr_reader)) {
 		info->clv_data.s_var.v_objaddr = info->clv_data.s_var._v_objdata;
+		info->clv_data.s_var.v_gotaddr = true;
 		UNALIGNED_SET((uintptr_t *)info->clv_data.s_var._v_objdata, value);
 	} else if (debuginfo_cu_parser_getblock(parser, form, &block)) {
 		info->clv_data.s_var.v_objaddr = (void *)block.b_addr;
+		info->clv_data.s_var.v_gotaddr = true;
 	} else {
 		printk(KERN_WARNING "[dbx] Unable to decode form %" PRIxPTR " of DW_AT_const_value\n",
 		       form);
@@ -2881,9 +2883,10 @@ NOTHROW(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info) {
 		} else {
 			goto no_sip_addr;
 		}
-		has_object_address             = true;
 		info->clv_data.s_var.v_objaddr = (void *)(cmodule_getloadaddr(info->clv_mod) +
 		                                          symbol_addr);
+		info->clv_data.s_var.v_gotaddr = true;
+		has_object_address             = true;
 	}
 no_sip_addr:
 	if (!info->clv_unit) {
@@ -3017,8 +3020,10 @@ again_attributes:
 			case DW_AT_entry_pc:
 				if (!has_object_address) {
 					uintptr_t addr;
-					if likely(debuginfo_cu_parser_getaddr(&info->clv_parser, attr.dica_form, &addr))
+					if likely(debuginfo_cu_parser_getaddr(&info->clv_parser, attr.dica_form, &addr)) {
 						info->clv_data.s_var.v_objaddr = (void *)(addr + cmodule_getloadaddr(info->clv_mod));
+						info->clv_data.s_var.v_gotaddr = true;
+					}
 				}
 				break;
 
@@ -3278,6 +3283,7 @@ again_subprogram_component:
 							info->clv_data.s_var.v_location  = var.v_location;
 							info->clv_data.s_var.v_typeinfo  = var.v_type;
 							info->clv_data.s_var.v_objaddr   = NULL;
+							info->clv_data.s_var.v_gotaddr   = false;
 
 							/* Actually enumerate this variable. */
 							temp = (*cb)(info, true);

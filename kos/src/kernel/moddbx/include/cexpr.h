@@ -62,7 +62,8 @@ struct cvalue_cfiexpr {
 	uintptr_t               v_cu_addr_base;      /* == di_debuginfo_compile_unit_t::cu_addr_base */
 	uint8_t                 v_addrsize;          /* == di_debuginfo_cu_simple_parser_t::dsp_addrsize */
 	uint8_t                 v_ptrsize;           /* == di_debuginfo_cu_simple_parser_t::dsp_ptrsize */
-	void                   *v_objaddr;           /* [0..1] Object address. */
+	bool                    v_gotaddr;           /* True if `v_objaddr' is valid. */
+	void                   *v_objaddr;           /* [?..?] Object address (or `NULL' when `!v_gotaddr'). */
 };
 
 
@@ -141,6 +142,7 @@ DATDEF size_t cexpr_stacksize;
 /* Return the current stack-top element. If the stack is otherwise empty,
  * then this will  instead return a  stub-void expression, ala  `(void)0' */
 #define cexpr_stacktop cexpr_stack[cexpr_stacksize - 1]
+#define cexpr_stackend (cexpr_stack + cexpr_stacksize)
 
 /* When true, only allow read-only C expression operations.
  * During a debugger reset, this option is reset to `false' */
@@ -200,6 +202,11 @@ NOTHROW(FCALL cexpr_pushint_simple)(struct ctype *__restrict typ,
  * @return: DBX_EINTERN: Stack was already empty. */
 FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_pop)(void);
 
+/* Pop exactly `count' elements from the C expression stack.
+ * @return: DBX_EOK:     Success.
+ * @return: DBX_EINTERN: Stack has less than `count' elements. */
+FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_pop_n)(size_t count);
+
 /* Clear the C expression stack. */
 FUNDEF void NOTHROW(FCALL cexpr_empty)(void);
 
@@ -218,8 +225,8 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_swap)(void);
  * When  `n <= 1', these  calls are  a no-op  in regards to
  * @return: DBX_EOK:     Success
  * @return: DBX_EINTERN: The stack size is < n */
-FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_lrot)(unsigned int n);
-FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_rrot)(unsigned int n);
+FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_lrot)(size_t n);
+FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_rrot)(size_t n);
 
 /* Return a pointer to the data associated with the given `self' stack element.
  * WARNING: The pointer written back to `*presult' may point to arbitrary

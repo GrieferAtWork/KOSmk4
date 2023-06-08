@@ -516,7 +516,8 @@ struct cmodsyminfo {
 				byte_t _v_objdata[sizeof(di_debuginfo_location_t) * 2]; /* Inline buffer for object data. */
 			};
 			byte_t const       *v_typeinfo;    /* [0..1] Type information. */
-			void               *v_objaddr;     /* [0..1] Object address. */
+			void               *v_objaddr;     /* [?..?] Object address (or `NULL' when `!v_gotaddr') */
+			bool                v_gotaddr;     /* Set to true if `v_gotaddr' is valid. */
 		} s_var;                               /* [!cmodsyminfo_istype] Variable or parameter. */
 	} clv_data;
 };

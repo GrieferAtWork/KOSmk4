@@ -24,8 +24,8 @@ for (local o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3",
  */
 #ifndef GUARD_MODDBX_CEXPR_C
 #define GUARD_MODDBX_CEXPR_C 1
-#define _KOS_SOURCE          1
-#define __HAVE_FPU           1 /* Enable FPU access */
+#define _KOS_SOURCE 1
+#define __HAVE_FPU 1 /* Enable FPU access */
 
 /* DeBug eXtensions. */
 
@@ -1011,7 +1011,8 @@ NOTHROW(FCALL cexpr_cfi_to_address)(struct cvalue *__restrict self) {
 	if (self->cv_kind != CVALUE_KIND_EXPR &&
 	    self->cv_kind != CVALUE_KIND_IEXPR)
 		return DBX_EOK;
-	if (!self->cv_expr.v_expr.v_expr.l_expr &&
+	if (self->cv_expr.v_expr.v_gotaddr &&
+	    !self->cv_expr.v_expr.v_expr.l_expr &&
 	    !self->cv_expr.v_expr.v_expr.l_llist4 &&
 	    !self->cv_expr.v_expr.v_expr.l_llist5) {
 		/* Special case: We're already been given the address.
@@ -1053,6 +1054,40 @@ NOTHROW(FCALL cexpr_cfi_to_address)(struct cvalue *__restrict self) {
 }
 
 
+PRIVATE dbx_errno_t const errno_unwind2dbx[] = {
+	[UNWIND_SUCCESS]                      = DBX_EOK,
+	[UNWIND_NO_FRAME]                     = DBX_EINTERN,
+	[UNWIND_INVALID_REGISTER]             = DBX_EINTERN,
+	[UNWIND_SEGFAULT]                     = DBX_EFAULT,
+	[UNWIND_BADALLOC]                     = DBX_ENOMEM,
+	[UNWIND_EMULATOR_UNKNOWN_INSTRUCTION] = DBX_EINTERN,
+	[UNWIND_EMULATOR_ILLEGAL_INSTRUCTION] = DBX_EINTERN,
+	[UNWIND_EMULATOR_STACK_OVERFLOW]      = DBX_EINTERN,
+	[UNWIND_EMULATOR_STACK_UNDERFLOW]     = DBX_EINTERN,
+	[UNWIND_EMULATOR_BADJMP]              = DBX_EINTERN,
+	[UNWIND_EMULATOR_LOOP]                = DBX_EINTERN,
+	[UNWIND_EMULATOR_BUFFER_TOO_SMALL]    = DBX_EINTERN,
+	[UNWIND_EMULATOR_DIVIDE_BY_ZERO]      = DBX_EFAULT,
+	[UNWIND_EMULATOR_NO_FUNCTION]         = DBX_EOPTIMIZED,
+	[UNWIND_EMULATOR_INVALID_FUNCTION]    = DBX_EINTERN,
+	[UNWIND_EMULATOR_NO_CFA]              = DBX_EINTERN,
+	[UNWIND_EMULATOR_NO_RETURN_VALUE]     = DBX_EINTERN,
+	[UNWIND_EMULATOR_NOT_WRITABLE]        = DBX_ERDONLY,
+	[UNWIND_CFA_UNKNOWN_INSTRUCTION]      = DBX_EINTERN,
+	[UNWIND_CFA_ILLEGAL_INSTRUCTION]      = DBX_EINTERN,
+	[UNWIND_APPLY_NOADDR_REGISTER]        = DBX_EINTERN, /* DBX_ENOADDR */
+	[UNWIND_PERSONALITY_ERROR]            = DBX_EINTERN,
+	[UNWIND_OPTIMIZED_AWAY]               = DBX_EOPTIMIZED,
+	[UNWIND_CORRUPTED]                    = DBX_ECORRUPT,
+};
+
+PRIVATE WUNUSED ATTR_CONST dbx_errno_t
+NOTHROW(FCALL map_unwind_errno)(unwind_errno_t error) {
+	if (error < COMPILER_LENOF(errno_unwind2dbx))
+		return errno_unwind2dbx[error];
+	return DBX_EINTERN;
+}
+
 /* Read/write the value of the given CFI expression to/from buf.
  * @return: DBX_EOK:     Success.
  * @return: DBX_EFAULT:  Faulty memory location accessed.
@@ -1062,9 +1097,8 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
                                         void *buf, size_t buflen, bool write) {
 	unwind_errno_t error;
 	TRY {
-		if (!self->v_expr.l_expr &&
-		    !self->v_expr.l_llist4 &&
-		    !self->v_expr.l_llist5) {
+		if (self->v_gotaddr && !self->v_expr.l_expr &&
+		    !self->v_expr.l_llist4 && !self->v_expr.l_llist5) {
 			size_t copy_error;
 			copy_error = write ? dbg_writememory(self->v_objaddr, buf, buflen, cexpr_forcewrite)
 			                   : dbg_readmemory(self->v_objaddr, buf, buflen);
@@ -1154,11 +1188,8 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 	} EXCEPT {
 		error = UNWIND_SEGFAULT;
 	}
-	if unlikely(error != UNWIND_SUCCESS) {
-		if (error == UNWIND_SEGFAULT)
-			return DBX_EFAULT;
-		return DBX_EINTERN;
-	}
+	if unlikely(error != UNWIND_SUCCESS)
+		return map_unwind_errno(error);
 	return DBX_EOK;
 }
 
@@ -1174,6 +1205,7 @@ NOTHROW(FCALL cvalue_rw_expr)(struct cvalue *__restrict self,
 		if (!buffer) {
 			if (write)
 				return DBX_EOK; /* Not loaded */
+
 			/* Load a new buffer. */
 			if (self->cv_expr.v_buflen <= sizeof(self->cv_expr.v_ibuffer)) {
 				self->cv_kind = CVALUE_KIND_IEXPR;
@@ -1184,6 +1216,7 @@ NOTHROW(FCALL cvalue_rw_expr)(struct cvalue *__restrict self,
 				}
 				return result;
 			}
+
 			/* Allocate a dynamic buffer. */
 			buffer = dbx_malloc(self->cv_expr.v_buflen);
 			if unlikely(!buffer)
@@ -1468,7 +1501,7 @@ NOTHROW(FCALL cexpr_pushexpr)(struct ctyperef const *__restrict typ,
 	ctyperef_initcopy(&valp->cv_type, typ);
 	if (cexpr_typeonly) {
 		valp->cv_kind = CVALUE_KIND_VOID;
-	} else if (/*expr->v_objaddr &&*/
+	} else if (expr->v_gotaddr &&
 	           !expr->v_expr.l_expr &&
 	           !expr->v_expr.l_llist4 &&
 	           !expr->v_expr.l_llist5) {
@@ -1617,6 +1650,18 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_pop)(void) {
 	return DBX_EOK;
 }
 
+/* Pop exactly `count' elements from the C expression stack.
+ * @return: DBX_EOK:     Success.
+ * @return: DBX_EINTERN: Stack has less than `count' elements. */
+PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_pop_n)(size_t count) {
+	if unlikely(cexpr_stacksize < count)
+		return DBX_EINTERN;
+	for (; count; --count) {
+		--cexpr_stacksize;
+		cvalue_fini(&cexpr_stack[cexpr_stacksize]);
+	}
+	return DBX_EOK;
+}
 
 /* Clear the C expression stack. */
 PUBLIC void NOTHROW(FCALL cexpr_empty)(void) {
@@ -1661,7 +1706,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_swap)(void) {
  * When  `n <= 1', these  calls are  a no-op  in regards to
  * @return: DBX_EOK:     Success
  * @return: DBX_EINTERN: The stack size is < n */
-PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_lrot)(unsigned int n) {
+PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_lrot)(size_t n) {
 	struct cvalue temp;
 	if unlikely(cexpr_stacksize < n)
 		return DBX_EINTERN;
@@ -1675,7 +1720,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_lrot)(unsigned int n) {
 	return DBX_EOK;
 }
 
-PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_rrot)(unsigned int n) {
+PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_rrot)(size_t n) {
 	struct cvalue temp;
 	if unlikely(cexpr_stacksize < n)
 		return DBX_EINTERN;
@@ -3494,7 +3539,8 @@ fallback_load_opt_type:
 	}
 	if likely(result == DBX_EOK) {
 got_symbol_type:
-		if (sym->clv_data.s_var.v_objaddr == sym->clv_data.s_var._v_objdata) {
+		if (sym->clv_data.s_var.v_gotaddr &&
+		    sym->clv_data.s_var.v_objaddr == sym->clv_data.s_var._v_objdata) {
 			result = cexpr_pushdata(&symtype, sym->clv_data.s_var.v_objaddr);
 		} else {
 			struct cvalue_cfiexpr expr;
@@ -3507,6 +3553,7 @@ got_symbol_type:
 			expr.v_cu_addr_base      = sym->clv_cu.cu_addr_base;
 			expr.v_addrsize          = sym->clv_parser.dsp_addrsize;
 			expr.v_ptrsize           = sym->clv_parser.dsp_ptrsize;
+			expr.v_gotaddr           = sym->clv_data.s_var.v_gotaddr;
 			expr.v_objaddr           = sym->clv_data.s_var.v_objaddr;
 
 			/* Push the symbol expression. */

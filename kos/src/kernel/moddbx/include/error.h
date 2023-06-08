@@ -31,19 +31,21 @@ DECL_BEGIN
 
 #define DBX_EISERR(x) ((x) < 0) /* Check for error */
 
-#define DBX_EOK      (0)  /* Success */
-#define DBX_ENOMEM   (-1) /* Out of memory */
-#define DBX_ESYNTAX  (-2) /* Syntax error */
-#define DBX_EDIVZERO (-3) /* Divide by zero */
-#define DBX_ENOENT   (-4) /* No such object */
-#define DBX_ERDONLY  (-5) /* Read-only */
-#define DBX_EINTERN  (-6) /* Internal error */
-#define DBX_EFAULT   (-7) /* Segmentation fault */
-#define DBX_EINTR    (-8) /* Operation interrupted (s.a. `dbg_awaituser()') */
-#define DBX_ENOADDR  (-9) /* Cannot take  address of  object (only  returned for  variables
-                           * that have lost  their address due  to compiler  optimizations.
-                           * Attempting to reference something that can never be referenced
-                           * results in `DBX_ESYNTAX' instead) */
+#define DBX_EOK        (0)   /* Success */
+#define DBX_ENOMEM     (-1)  /* Out of memory */
+#define DBX_ESYNTAX    (-2)  /* Syntax error */
+#define DBX_EDIVZERO   (-3)  /* Divide by zero */
+#define DBX_ENOENT     (-4)  /* No such object */
+#define DBX_ERDONLY    (-5)  /* Read-only */
+#define DBX_EINTERN    (-6)  /* Internal error */
+#define DBX_EFAULT     (-7)  /* Segmentation fault */
+#define DBX_EINTR      (-8)  /* Operation interrupted (s.a. `dbg_awaituser()') */
+#define DBX_ENOADDR    (-9)  /* Cannot take  address of  object (only  returned for  variables
+                              * that have lost  their address due  to compiler  optimizations.
+                              * Attempting to reference something that can never be referenced
+                              * results in `DBX_ESYNTAX' instead) */
+#define DBX_EOPTIMIZED (-10) /* Optimized away */
+#define DBX_ECORRUPT   (-11) /* Corrupt debug information */
 typedef int dbx_errno_t;
 
 /* Returns  the  message associated  with a  given `error'

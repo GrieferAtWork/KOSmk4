@@ -46,6 +46,8 @@ PRIVATE char const error_messages[] =
 "Segmentation fault\0"
 "Operation interrupted\0"
 "Cannot take address of object\0"
+"Optimized away\0"
+"Corrupt debug information\0"
 ;
 
 
