@@ -180,6 +180,7 @@ NOTHROW(FCALL dbx_add2free)(void *base, size_t num_bytes) {
 			}
 			break;
 		}
+
 		/* Insert before `iter'. */
 		newnode = (struct freerange *)base;
 		if ((byte_t *)base + num_bytes == (byte_t *)iter) {
@@ -315,6 +316,7 @@ again:
 		struct freerange *newrange;
 		/* Allocate from the front. */
 		result_siz = num_bytes;
+
 		/* Replace the old free-range with a smaller one. */
 		newrange = (struct freerange *)((byte_t *)result + num_bytes);
 		newrange->fr_link = result->fr_link;
@@ -334,6 +336,7 @@ nomem:
 		goto nope;
 	if (extend_heap(num_bytes))
 		goto again;
+
 	/* Try to clear the module cache to make more memory available. */
 	if (cmodule_clearcache(true))
 		goto again;
@@ -366,6 +369,7 @@ NOTHROW(FCALL dbx_heap_allocat)(void *addr, size_t num_bytes) {
 	avail = (size_t)(freerange_end(result) - (byte_t *)addr);
 	if (avail < num_bytes)
 		goto nope;
+
 	/* If not allocating at the  front, make sure that the  gap
 	 * that would get created is large enough for a free-range. */
 	if ((byte_t *)addr > (byte_t *)result) {
@@ -381,6 +385,7 @@ NOTHROW(FCALL dbx_heap_allocat)(void *addr, size_t num_bytes) {
 		if (tail < sizeof(struct freerange))
 			num_bytes = avail;
 	}
+
 	/* Confirmed! */
 	if ((byte_t *)addr == (byte_t *)result) {
 		if ((byte_t *)addr + num_bytes >= freerange_end(result)) {
@@ -484,6 +489,7 @@ PRIVATE void KCALL reset_heap(void) {
 PRIVATE void KCALL clear_heap(void) {
 	if (kernel_poisoned())
 		return; /* Don't touch the kernel MMan after poison */
+
 	/* Unmap all dynamically mapped heap nodes. */
 	while (SLIST_NEXT(&static_heap, sh_link)) {
 		struct sheap *pred = &static_heap;
@@ -563,6 +569,7 @@ NOTHROW(FCALL dbx_realloc)(void *ptr, size_t num_bytes) {
 		}
 		return ptr;
 	}
+
 	/* Try to extend an existing heap-block. */
 	missing = num_bytes - old_size;
 	missing = dbx_heap_allocat((byte_t *)ptr + old_size, missing);
@@ -571,6 +578,7 @@ NOTHROW(FCALL dbx_realloc)(void *ptr, size_t num_bytes) {
 		*base += missing;
 		return ptr;
 	}
+
 	/* Failed. - Try to allocate an entirely new block,
 	 * and copy  over the  contents from  the old  one. */
 	new_ptr = dbx_malloc(num_bytes);
@@ -622,6 +630,7 @@ DBG_NAMED_COMMAND(dbx_heapinfo, "dbx.heapinfo",
 			largest_fragment = iter->fr_size;
 		++num_fragments;
 	}
+
 	/* Calculate fragmentation percentage as suggested by this:
 	 * https://stackoverflow.com/questions/4586972/how-to-calculate-fragmentation/4587077#4587077
 	 */

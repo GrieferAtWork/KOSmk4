@@ -136,7 +136,7 @@ struct cmodsym {
 	 *    In this case, an attempt is made to only store a single instance of
 	 *    `struct tm', which will appear within the per-module symbol  table. */
 	char const   *cms_name; /* [1..1] Symbol name (usually points into `.debug_str', and
-	                         * owned by the  referenced held by  `cmodule::cm_sectrefs')
+	                         * owned by  the reference  held by  `cmodule::cm_sectrefs')
 	                         * By  default, this  name is  the string  pointed-to by the
 	                         * `DW_AT_linkage_name'  attribute,  but  uses  `DW_AT_name'
 	                         * as a fallback. */
@@ -154,11 +154,11 @@ struct cmodsym {
 	                         *   - DW_TAG_variable  (with a `DW_AT_location' that is expected to
 	                         *                       contain `DW_OP_addr' or `DW_OP_form_tls_address')
 	                         *   - DW_TAG_enumerator
-	                         * NOTE: Recursive components are  _NOT_ included  if they  originate
-	                         *       from within `DW_TAG_subprogram', `DW_TAG_inlined_subroutine'
-	                         *       are not scanned. In  general, only globally visible  symbols
-	                         *       are included, as would be accessible from within an  unnamed
-	                         *       function placed at the end of the associated CU.
+	                         * NOTE: Recursive  components  are _NOT_  included if  they originate
+	                         *       from inside `DW_TAG_subprogram', `DW_TAG_inlined_subroutine'.
+	                         *       In general, only  globally visible symbols  are included,  as
+	                         *       would be accessible from within an unnamed function placed at
+	                         *       the end of the associated CU.
 	                         *
 	                         * Load debug info for this symbol by:
 	                         * >> di_debuginfo_cu_parser_t parser;
@@ -389,15 +389,14 @@ NOTHROW(FCALL cmodule_ataddr)(void const *addr);
 FUNDEF WUNUSED REF struct cmodule *
 NOTHROW(FCALL cmodule_current)(void);
 
-/* Load  debug  symbols for  the give  CModule.  Since doing  this may
- * take  quite  a while,  this  function is  equipped  to make  use of
- * `dbg_awaituser()' to  allow it  to be  interrupted prior  to  being
- * completed. If this happens, then this function returns `DBX_EINTR',
- * and the caller must assume that  not all symbols have been  loaded.
- * In this case,  the caller  is allowed  to continue  as though  that
- * the  symbol  they were  looking for  doesn't  exist, or  no symbols
- * exist  at all. Calling the function again will resume loading still
- * missing symbols.
+/* Load debug symbols for the give CModule. Since doing this may take quite
+ * a while, this function is equipped  to make use of `dbg_awaituser()'  to
+ * allow  it to be  interrupted prior to being  completed. If this happens,
+ * then  this function returns `DBX_EINTR', and the caller must assume that
+ * not all symbols have been loaded.
+ *
+ * In this case,  the caller is  allowed to continue  as through that  the
+ * symbol they were looking for doesn't exist, or no symbols exist at all.
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOMEM: Insufficient memory.
  * @return: DBX_EINTR:  Operation was interrupted. */

@@ -317,7 +317,7 @@ NOTHROW(FCALL get_user_tls_base_register)(void) {
 #define ElfV_field(mod, self, name)  (self).name
 #define ElfV_fieldP(mod, self, name) (self) name
 #else /* ... */
-#error "Unsupported configuration"
+#error "Invalid configuration (no known elf word size configuration is active)"
 #endif /* !... */
 
 typedef ElfV(Ehdr)   ElfV_Ehdr;
@@ -329,7 +329,7 @@ typedef ElfV(Rel)    ElfV_Rel;
 typedef ElfV(Rela)   ElfV_Rela;
 
 
-/* Member indices (to-be multipled by the pointer-size) libdl internals */
+/* Member indices (to-be multiplied by the pointer-size) of libdl internals */
 #define STRUCT_dlmodule_INDEXOF_dm_loadaddr             0
 #define STRUCT_dlmodule_INDEXOF_dm_filename             1
 #define STRUCT_dlmodule_INDEXOF_dm_dynhdr               2
@@ -386,7 +386,9 @@ NOTHROW(FCALL module_getpointer)(struct module *__restrict self,
 	if (dbg_readmemory(address, &p64, 8) != 0)
 		goto err;
 	*presult = (void *)(uintptr_t)p64;
-#endif /* ... */
+#else /* ... */
+#error "Invalid configuration (no known elf word size configuration is active)"
+#endif /* !... */
 	return true;
 err:
 	return false;
@@ -554,6 +556,7 @@ NOTHROW(FCALL module_scan_dynamic_for_DlModule)(struct module *__restrict self,
 		dyn_start = (USER ElfV_Dyn const *)((byte_t const *)dyn_start + entsize);
 	}
 done_dynamic:
+
 	/* Scan the different relocation tables for what we're looking for. */
 	if (module_scan_rel_for_DlModule(self, presult, rel_base, rel_count))
 		return true;
@@ -638,10 +641,12 @@ NOTHROW(FCALL module_get_libdl_DlModule_address_byrel)(struct module *__restrict
 	}
 	goto nope_phdr;
 got_pt_dynamic:
+
 	/* Load the bounds of the user-space .dynamic section. */
 	dyn_start = (ElfV_Dyn const *)(self->md_loadaddr + ElfV_fieldP(self, phdr, [pt_dyn_header].p_vaddr));
 	dyn_end   = (ElfV_Dyn const *)((byte_t const *)dyn_start + ElfV_fieldP(self, phdr, [pt_dyn_header].p_memsz));
 	dbx_free(ElfV_any(phdr));
+
 	/* Validate loaded pointers. */
 	if unlikely(dyn_start >= dyn_end)
 		goto nope;
@@ -649,6 +654,7 @@ got_pt_dynamic:
 		goto nope;
 	if unlikely(!ADDR_ISUSER((byte_t const *)dyn_end - 1))
 		goto nope;
+
 	/* Now scan the .dynamic section for meta-data related to relocations. */
 	return module_scan_dynamic_for_DlModule(self, presult, dyn_start, dyn_end);
 nope_phdr:
@@ -730,6 +736,7 @@ NOTHROW(FCALL module_get_user_tls_base)(struct module *__restrict self,
 		                       module_sizeof_pointer(self),
 		                       (void **)&tls_offset))
 			goto nope;
+
 		/* Check if this module has a static TLS offset. */
 		if (tls_offset != 0) {
 			*ptls_base = (byte_t *)utls + tls_offset;
@@ -769,6 +776,7 @@ NOTHROW(FCALL module_get_user_tls_base)(struct module *__restrict self,
 			                       module_sizeof_pointer(self),
 			                       (void **)&extab_dlmod))
 				goto nope;
+
 			/* The least significant bit is used as red/black indicator.
 			 * As such, we must clear that bit here. */
 			extab_dlmod = (struct libdl_dlmodule *)((uintptr_t)extab_dlmod & ~1);
@@ -785,6 +793,7 @@ NOTHROW(FCALL module_get_user_tls_base)(struct module *__restrict self,
 			if (!max_indirection)
 				goto nope;
 			--max_indirection;
+
 			/* Load the next extension pointer. */
 			if (!module_getpointer(self,
 			                       (byte_t *)ext +
@@ -793,6 +802,7 @@ NOTHROW(FCALL module_get_user_tls_base)(struct module *__restrict self,
 			                       (void **)&ext))
 				goto nope;
 		}
+
 		/* Found the proper TLS extension.
 		 * The result we're looking for is stored in its `te_data' field. */
 		if (!module_getpointer(self,
@@ -801,6 +811,7 @@ NOTHROW(FCALL module_get_user_tls_base)(struct module *__restrict self,
 		                       module_sizeof_pointer(self),
 		                       (void **)ptls_base))
 			goto nope;
+
 		/* Make sure that the pointer is actually user-space! */
 		if (!ADDR_ISUSER(*ptls_base))
 			goto nope;
@@ -817,6 +828,7 @@ cexpr_cfi_set_address(struct cvalue *__restrict self,
 	 * Without this, you'd be unable to access (e.g.) members of a struct
 	 * who's address must be calculated via a CFI expression. */
 	addr = (byte_t *)addr + self->cv_expr.v_bufoff;
+
 	/* We must  still write-back  any unwritten  modifications,
 	 * even though there really shouldn't be any at this point. */
 	if (self->cv_kind == CVALUE_KIND_EXPR) {
@@ -833,6 +845,7 @@ cexpr_cfi_set_address(struct cvalue *__restrict self,
 		                    cexpr_forcewrite) != 0)
 			goto err_fault;
 	}
+
 	/* Change the value-kind to become a memory reference. */
 	self->cv_kind = CVALUE_KIND_ADDR;
 	self->cv_addr = addr;
@@ -870,6 +883,7 @@ cexpr_cfi_to_address_impl(struct cvalue *__restrict self,
 do_second_pass:
 	bzero(&cu, sizeof(cu));
 	pc = dbg_getpcreg(DBG_RT_REGLEVEL_VIEW);
+
 	/* Select the proper function. */
 	module_relative_pc = (uintptr_t)pc;
 	if (mod) {
@@ -925,6 +939,7 @@ do_second_pass:
 		goto done; /* Ignore all errors... */
 	if unlikely(emulator.ue_piecebits != 0)
 		goto done; /* The value isn't continuous (and so its address cannot be taken) */
+
 	/* Switch on what was left in the stack-top entry to
 	 * determine  if we can extract an absolute address. */
 	switch (ste_top.s_type) {
@@ -941,6 +956,7 @@ do_second_pass:
 	case UNWIND_STE_RO_LVALUE:
 	case UNWIND_STE_RW_LVALUE: {
 		byte_t *lvalue;
+
 		/* Check if the TLS-base address was used by the CFI expression.
 		 * If it was, then we must repeat the expression with the proper
 		 * TLS address, since the one calculated by libunwind only works
@@ -948,6 +964,7 @@ do_second_pass:
 		if (emulator.ue_tlsbase != (byte_t *)-1 && mod &&
 		    cmodule_isuser(mod) && !second_pass) {
 			bool ok;
+
 			/* Calculate the TLS-base address for `mod' in the context of `dbg_current' */
 			ok = module_get_user_tls_base(mod->cm_module, &emulator.ue_tlsbase);
 			if unlikely(!ok)
@@ -966,6 +983,7 @@ do_second_pass:
 				goto done;
 			lvalue = (byte_t *)regval.p + ste_top.s_regoffset;
 		}
+
 		/* Got it! The address can now be found in `lvalue' */
 		return cexpr_cfi_set_address(self, lvalue);
 	}	break;
@@ -984,6 +1002,7 @@ NOTHROW(FCALL cexpr_cfi_to_address)(struct cvalue *__restrict self) {
 	dbx_errno_t result;
 	pagedir_phys_t old_pdir, req_pdir;
 	struct cmodule *mod;
+
 	/* Sanity check: are we actually dealing with a CFI expression? */
 	if (self->cv_kind != CVALUE_KIND_EXPR &&
 	    self->cv_kind != CVALUE_KIND_IEXPR)
@@ -1000,6 +1019,7 @@ NOTHROW(FCALL cexpr_cfi_to_address)(struct cvalue *__restrict self) {
 	mod      = self->cv_expr.v_expr.v_module;
 	if (mod && !wasdestroyed(cmodule_mman(mod)))
 		req_pdir = cmodule_mman(mod)->mm_pagedir_p;
+
 	/* This must run in the context of `cmodule_mman(mod)' */
 	if (old_pdir != req_pdir) {
 		if unlikely(!dbg_rt_verifypagedir(req_pdir))
@@ -1257,7 +1277,7 @@ err_fault:
 	return DBX_EFAULT;
 }
 
-PRIVATE void
+PRIVATE NONNULL((1)) void
 NOTHROW(FCALL buffer_inv_nofault)(byte_t *buf, size_t buflen) {
 	while (buflen) {
 		*buf ^= 0xff;
@@ -1266,7 +1286,7 @@ NOTHROW(FCALL buffer_inv_nofault)(byte_t *buf, size_t buflen) {
 	}
 }
 
-PRIVATE void
+PRIVATE NONNULL((1)) void
 NOTHROW(FCALL buffer_dec_nofault)(byte_t *buf, size_t buflen) {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	while (buflen) {
@@ -1522,8 +1542,8 @@ NOTHROW(FCALL cexpr_pushregister_by_id)(cpu_regno_t regno) {
 	if unlikely(!valp)
 		return DBX_ENOMEM;
 	buflen = dbg_rt_getregbyid(DBG_RT_REGLEVEL_VIEW, regno,
-	                        valp->cv_register.r_ibuffer,
-	                        sizeof(valp->cv_register.r_ibuffer));
+	                           valp->cv_register.r_ibuffer,
+	                           sizeof(valp->cv_register.r_ibuffer));
 	if unlikely(buflen > sizeof(valp->cv_register.r_ibuffer))
 		return DBX_EINTERN; /* Internal error */
 	if unlikely(!buflen)
@@ -1695,6 +1715,7 @@ again:
 	case CVALUE_KIND_EXPR: {
 		size_t bufavail;
 		*presult = (byte_t *)top->cv_expr.v_buffer;
+
 		/* Lazily load a CFI expression. */
 		if (!*presult) {
 			dbx_errno_t error;
@@ -1709,6 +1730,7 @@ again:
 				goto again;
 			return error;
 		}
+
 		/* Assert  that sufficient space is available for the type in use.
 		 * If less space is available, return NULL to prevent writing past
 		 * the end of the internal buffer for expressions.
@@ -1717,6 +1739,7 @@ again:
 			return DBX_EINTERN;
 		if (bufavail < ctype_sizeof(top->cv_type.ct_typ))
 			return DBX_EINTERN;
+
 		/* Adjust the  buffer pointer  for the  expression-base-offset.
 		 * This is used (e.g.) for accessing struct-through-CFI fields. */
 		*presult += top->cv_expr.v_bufoff;
@@ -1844,6 +1867,7 @@ again:
 		top->cv_kind = CVALUE_KIND_VOID;
 		return DBX_EOK;
 	}
+
 	/* Make sure that stack-top is an R-value. */
 	result = cexpr_rvalue();
 	if unlikely(result != DBX_EOK)
@@ -1856,6 +1880,7 @@ again:
 	if (top->cv_kind == CVALUE_KIND_DATA)
 		data = top->cv_data;
 	old_typ = top->cv_type.ct_typ;
+
 	/* Check for special case: cast from float. */
 	if (CTYPE_KIND_ISFLOAT(old_typ->ct_kind)) {
 		if (CTYPE_KIND_ISFLOAT(new_typ->ct_kind)) {
@@ -1883,6 +1908,7 @@ again:
 		}
 		goto set_new_type;
 	}
+
 	/* Check for special case: cast to float. */
 	if (CTYPE_KIND_ISFLOAT(new_typ->ct_kind)) {
 		switch (CTYPE_KIND_CLASSOF(old_typ->ct_kind)) {
@@ -1914,11 +1940,13 @@ again:
 		}
 		goto set_new_type;
 	}
+
 	/* All right! With  floating-point out of  the way, move  on to integer  casts.
 	 * For this purpose, allow any sort of cast to/from integer/bool/pointer types. */
 	if (CTYPE_KIND_ISINT_OR_BOOL_OR_POINTER(old_typ->ct_kind) &&
 	    CTYPE_KIND_ISINT_OR_BOOL_OR_POINTER(new_typ->ct_kind))
 		goto ok;
+
 	/* All other types of casts aren't allowed. */
 	return DBX_ESYNTAX;
 ok:
@@ -1943,6 +1971,7 @@ ok:
 				top->cv_data = data = new_data;
 				top->cv_kind = CVALUE_KIND_DATA;
 			}
+
 			/* Sign-/Zero-extend the value based on if the old type was signed. */
 			result = buffer_extend(data, old_size, new_size,
 			                       CTYPE_KIND_ISINT(old_typ->ct_kind) &&
@@ -1988,6 +2017,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_rvalue)(void) {
 		static_assert(offsetof(struct cvalue, cv_addr) == offsetof(struct cvalue, cv_idata),
 		              "This is required so we don't have to copy the old address into the "
 		              "new inline-data field");
+
 		/* Try to load the address of a CFI expression. */
 		if (top->cv_kind == CVALUE_KIND_EXPR ||
 		    top->cv_kind == CVALUE_KIND_IEXPR) {
@@ -1995,6 +2025,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_rvalue)(void) {
 			if unlikely(result != DBX_EOK)
 				return result;
 		}
+
 		/* Check if the address of the top-element can be taken. */
 		if (top->cv_kind != CVALUE_KIND_ADDR &&
 		    top->cv_kind != CVALUE_KIND_VOID)
@@ -2027,6 +2058,7 @@ again_switch_kind:
 			return result;
 		if (top->cv_kind != CVALUE_KIND_EXPR)
 			goto again_switch_kind;
+
 		/* Just inherit the expression buffer. */
 		cvalue_cfiexpr_fini(&top->cv_expr.v_expr);
 		if (top->cv_expr.v_bufoff != 0) {
@@ -2167,10 +2199,12 @@ NOTHROW(FCALL cexpr_field)(char const *__restrict name,
 	if unlikely(result != DBX_EOK)
 		return result;
 	field_size = ctype_sizeof(field_type.ct_typ);
+
 	/* Make sure that the field is in-bounds of the structure as a whole. */
 	if unlikely(OVERFLOW_UADD(field_offset, field_size, &temp))
 		return DBX_EINTERN;
 	container_size = ctype_sizeof(top->cv_type.ct_typ);
+
 	/* Allow zero-sized structs, which is indicative of containing a variable-length array. */
 	if unlikely(container_size && temp > container_size)
 		return DBX_EINTERN;
@@ -2219,6 +2253,7 @@ NOTHROW(FCALL cexpr_field)(char const *__restrict name,
 		ctyperef_fini(&field_type);
 		return result;
 	}
+
 	/* Copy over the field type into the C-value. */
 	ctyperef_fini(&top->cv_type);
 	memcpy(&top->cv_type, &field_type, sizeof(struct ctyperef));
@@ -2241,6 +2276,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_ref)(void) {
 	if unlikely(!cexpr_stacksize)
 		return DBX_EINTERN;
 	top = &cexpr_stacktop;
+
 	/* Try to load the address of a CFI expression. */
 	if (top->cv_kind == CVALUE_KIND_EXPR ||
 	    top->cv_kind == CVALUE_KIND_IEXPR) {
@@ -2249,6 +2285,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_ref)(void) {
 		if unlikely(error != DBX_EOK)
 			return error;
 	}
+
 	/* Make sure that the top-element is located in-memory. */
 	if (top->cv_kind != CVALUE_KIND_ADDR &&
 	    top->cv_kind != CVALUE_KIND_VOID) {
@@ -2259,10 +2296,12 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_ref)(void) {
 			return DBX_ENOADDR;
 		return DBX_ESYNTAX;
 	}
+
 	/* Construct the pointer-type. */
 	typ = ctype_ptr(&top->cv_type, dbg_current_sizeof_pointer());
 	if unlikely(!typ)
 		return DBX_ENOMEM;
+
 	/* Switch over to inline-data, thus re-using the object address as the inline pointer value. */
 	ctyperef_fini(&top->cv_type);
 	bzero(&top->cv_type, sizeof(top->cv_type));
@@ -2277,6 +2316,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_deref)(void) {
 	struct cvalue *top;
 	struct ctype *typ;
 	byte_t *pointed_to_addr;
+
 	/* Force an R-value expression (which we can dereference) */
 	result = cexpr_rvalue();
 	if unlikely(result != DBX_EOK)
@@ -2284,6 +2324,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_deref)(void) {
 	if unlikely(!cexpr_stacksize)
 		return DBX_EINTERN;
 	top = &cexpr_stacktop;
+
 	/* Make sure that `top' has pointer typing.
 	 * Note  that we need  to check for arrays  here, since those will
 	 * have already been promoted to base-pointers by `cexpr_rvalue()' */
@@ -2321,9 +2362,11 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_deref)(void) {
 	default:
 		return DBX_EINTERN; /* Shouldn't happen... */
 	}
+
 	/* switch back to referencing a memory location. */
 	top->cv_addr = pointed_to_addr;
 	top->cv_kind = CVALUE_KIND_ADDR;
+
 	/* Replace the top item's pointer-type with the pointed-to type. */
 do_set_type:
 	ctypeinfo_fini(&top->cv_type.ct_info); /* inherit:`top->cv_type.ct_typ' in `typ' */
@@ -2476,6 +2519,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_op1)(unsigned int op) {
 	return DBX_EOK;
 }
 
+
 /* Perform a binary operation `op' on the top 2 C expression stack elements.
  * As  far as operands go, STACK.TOP is  RHS and STACK.TOP-1 is LHS (meaning
  * that LHS must be pushed first, and RHS second)
@@ -2547,6 +2591,7 @@ again:
 	} else if (rhs->cv_kind == CVALUE_KIND_VOID) {
 		rhs_data = NULL;
 	}
+
 	/* Swap operands such that a float always appears left. */
 	if (CTYPE_KIND_ISFLOAT(lhs_typ->ct_kind)) {
 		__LONGDOUBLE lhs_value, rhs_value;
@@ -2638,7 +2683,7 @@ again:
 			                        lhs_data, lhs_value,
 			                        return DBX_EINTERN);
 		}
-		goto done;
+		goto done_pop_rhs;
 	}
 	if (CTYPE_KIND_ISFLOAT(rhs_typ->ct_kind)) {
 		/* Cast the left operand to the type of the right one. */
@@ -2654,6 +2699,7 @@ swap_operands_and_again:
 			return result;
 		goto again;
 	}
+
 	/* And with that, everything relating to floating-point types is off the table.
 	 * Next up: Deal with pointer types. */
 	if (CTYPE_KIND_ISPOINTER(lhs_typ->ct_kind)) {
@@ -2700,6 +2746,7 @@ swap_operands_and_again:
 			if (!ctype_equal(lhs_typ->ct_pointer.cp_base.ct_typ,
 			                 rhs_typ->ct_pointer.cp_base.ct_typ))
 				return DBX_ESYNTAX;
+
 			/* Only '-' and compare operators can be used when both operands are pointers. */
 do_pointer_pointer_op:
 			switch (op) {
@@ -2712,7 +2759,7 @@ do_pointer_pointer_op:
 					lhs_value /= sizeof_base;
 				/* Write-back as a `ptrdiff_t' value. */
 				cvalue_setptrdiff_t(lhs, (ptrdiff_t)lhs_value);
-				goto done;
+				goto done_pop_rhs;
 			}	break;
 
 			case '+':
@@ -2735,7 +2782,7 @@ do_pointer_pointer_op:
 				/* Handle the case of comparing pointers. */
 				bool retval;
 				if (!lhs_data)
-					goto done;
+					goto done_pop_rhs;
 				switch (op) {
 				case CTOKEN_TOK_EQUALS_EQUALS: retval = lhs_value == rhs_value; break;
 				case CTOKEN_TOK_XCLAIM_EQUALS: retval = lhs_value != rhs_value; break;
@@ -2746,7 +2793,7 @@ do_pointer_pointer_op:
 				default: __builtin_unreachable();
 				}
 				cvalue_setbool(lhs, retval);
-				goto done;
+				goto done_pop_rhs;
 			}	break;
 
 			default:
@@ -2791,6 +2838,7 @@ do_pointer_pointer_op:
 				return DBX_EINTERN;
 			}
 		}
+
 		/* Write-back the LHS-value. */
 		if (lhs_data) {
 			switch (CTYPE_KIND_SIZEOF(lhs_typ->ct_kind)) {
@@ -2801,8 +2849,9 @@ do_pointer_pointer_op:
 			default: return DBX_EINTERN;
 			}
 		}
-		goto done;
+		goto done_pop_rhs;
 	}
+
 	if (CTYPE_KIND_ISPOINTER(rhs_typ->ct_kind)) {
 		switch (op) {
 
@@ -2839,6 +2888,7 @@ do_pointer_pointer_op:
 		}
 		__builtin_unreachable();
 	}
+
 	/* The last case: Operations with bool/integer/enum */
 	if (!CTYPE_KIND_ISINT_OR_BOOL(lhs_typ->ct_kind))
 		return DBX_ESYNTAX;
@@ -2872,6 +2922,7 @@ do_pointer_pointer_op:
 				is_signed = true;
 			}
 		}
+
 		/* Load the RHS-value. */
 		if (!rhs_data) {
 			rhs_value = 0;
@@ -2953,7 +3004,7 @@ do_pointer_pointer_op:
 			/* Handle generic compare. */
 			bool retval;
 			if (!lhs_data)
-				goto done;
+				goto done_pop_rhs;
 			if (op == CTOKEN_TOK_EQUALS_EQUALS) {
 				retval = lhs_value == rhs_value;
 			} else if (op == CTOKEN_TOK_XCLAIM_EQUALS) {
@@ -2981,7 +3032,7 @@ do_pointer_pointer_op:
 				}
 			}
 			cvalue_setbool(lhs, retval);
-			goto done;
+			goto done_pop_rhs;
 		}	break;
 
 		default:
@@ -2999,7 +3050,7 @@ do_pointer_pointer_op:
 			}
 		}
 	} /* Scope... */
-done:
+done_pop_rhs:
 	return cexpr_pop(); /* Pop `rhs' */
 }
 
@@ -3010,6 +3061,9 @@ done:
  * where TOP is RHS, and the one before is LHS. When `cexpr_readonly'
  * is set to `true', then this function fails with `DBX_ERDONLY' */
 PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_store)(void) {
+	if (cexpr_readonly)
+		return DBX_ERDONLY;
+
 	/* TODO: Not implemented... */
 	COMPILER_IMPURE();
 	return DBX_ENOMEM;
@@ -3265,7 +3319,7 @@ NOTHROW(FCALL cexpr_pushsymbol)(struct cmodsyminfo *__restrict sym,
 		 * manage to find such a  reference, then we can  make use of its  type
 		 * information to complete what we couldn't find earlier!
 		 *
-		 * This  can happen if `sym' is exported from hard-written assembly, in
+		 * This  can happen if `sym' is exported from hand-written assembly, in
 		 * which case there won't be  any C-style debug information  associated
 		 * with it, but it probably can still be accessed using a C-type (after
 		 * all: everything can), so if some other module does so, we can re-use
@@ -3330,6 +3384,7 @@ NOTHROW(FCALL cexpr_pushsymbol)(struct cmodsyminfo *__restrict sym,
 		goto got_symbol_type;
 	}
 fallback_load_opt_type:
+
 	/* Load the type of the variable. */
 	result = ctype_fromdw_opt(sym->clv_mod, sym->clv_unit,
 	                          &sym->clv_parser,
@@ -3432,9 +3487,9 @@ got_symbol_type:
 				 * in relation to dbg_current, such  that the user can directly  reference
 				 * these objects without having to manually sym@object them.
 				 *
-				 * Note  however that this is in normal code, this is only done when the
-				 * symbol doesn't already appear in an @-expression (i.e. isn't followed
-				 * by an @-token) or within __identifier, meaning that:
+				 * Note however that in normal code, this is only done when the  symbol
+				 * doesn't already appear in an @-expression (i.e. isn't followed by an
+				 * @-token) or within __identifier, meaning that:
 				 *   - `&__identifier(this_cred)' == `&__identifier(this_cred)'
 				 *   - `this_cred'                == `*(typeof(this_cred) *)((uintptr_t)&__identifier(this_cred) + (uintptr_t)dbg_current)'
 				 *   - `this_cred@foo'            == `*(typeof(this_cred) *)((uintptr_t)&__identifier(this_cred) + (uintptr_t)foo)'
@@ -3536,7 +3591,7 @@ NOTHROW(FCALL cexpr_pushsymbol_byname)(char const *__restrict name, size_t namel
 PUBLIC NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cexpr_pushregister)(char const *__restrict name, size_t namelen) {
 	isa_t isa = dbg_rt_getisa(DBG_RT_REGLEVEL_VIEW);
-	cpu_regno_t regno  = register_byname(isa, name, namelen);
+	cpu_regno_t regno = register_byname(isa, name, namelen);
 	if (regno == CPU_REGISTER_NONE)
 		return DBX_ENOENT;
 	return cexpr_pushregister_by_id(regno);

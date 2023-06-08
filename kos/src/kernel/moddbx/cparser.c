@@ -67,6 +67,7 @@ NOTHROW(FCALL cparser_autocomplete)(struct cparser const *__restrict self,
 	ptr = (char *)mempcpy(ptr, self->c_autocom_start, mylen, sizeof(char));
 	ptr = (char *)mempcpy(ptr, str, len, sizeof(char));
 	*ptr = '\0';
+
 	/* Invoke the auto-completion callback. */
 	(*self->c_autocom)(self->c_autocom_arg, buffer, (size_t)(ptr - buffer));
 	if (total_len > STACK_LIMIT)

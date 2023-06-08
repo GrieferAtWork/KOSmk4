@@ -78,7 +78,7 @@ NOTHROW(FCALL cexpr_pusheval)(char const *__restrict expr,
 
 /* Parse a named type from  `self'. This function expects  that
  * `self' points at the first token of the named type on entry.
- * @return: presult:      Filled with the name type that was parsed (token from
+ * @return: p_result:     Filled with the name type that was parsed (token from
  *                        `self' were yielded, and not point to the first token
  *                        after the returned type)
  * @param: p_varname:     When non-NULL, also parse a contained variable name, and
@@ -95,7 +95,7 @@ NOTHROW(FCALL cexpr_pusheval)(char const *__restrict expr,
  * @return: DBX_ESYNTAX: Syntax error. */
 FUNDEF WUNUSED NONNULL((1, 2)) dbx_errno_t
 NOTHROW(FCALL ctype_eval)(struct cparser *__restrict self,
-                          /*out:ref*/ struct ctyperef *__restrict presult,
+                          /*out:ref*/ struct ctyperef *__restrict p_result,
                           char const **p_varname, size_t *p_varname_len);
 
 DECL_END

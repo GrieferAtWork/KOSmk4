@@ -501,6 +501,7 @@ NOTHROW(FCALL parse_typeof)(struct cparser *__restrict self,
 	has_paren = self->c_tok == '(';
 	if (has_paren)
 		yield();
+
 	/* Try to parse a type-expression */
 	result = ctype_eval(self, presult, NULL, NULL);
 	if (result != DBX_EOK) {
@@ -513,6 +514,7 @@ NOTHROW(FCALL parse_typeof)(struct cparser *__restrict self,
 		cexpr_typeonly = old_cexpr_typeonly;
 		if unlikely(result != DBX_EOK)
 			goto done;
+
 		/* Use the type of the stack-top expression. */
 		ctyperef_initcopy(presult, &cexpr_stacktop.cv_type);
 		result = cexpr_pop();
@@ -571,6 +573,7 @@ NOTHROW(FCALL autocomplete_symbols)(struct cparser *__restrict self,
 		                           name, namelen, ns, scope);
 		if (count != 0)
 			break;
+
 		/* Change the scope to enumerate other things if we've failed to find anything. */
 		if (scope == (CMOD_SYMENUM_SCOPE_FNOGLOBAL | CMOD_SYMENUM_SCOPE_FNOFOREIGN)) {
 			scope = CMOD_SYMENUM_SCOPE_FNOLOCAL | CMOD_SYMENUM_SCOPE_FNOFOREIGN;
@@ -621,6 +624,7 @@ NOTHROW(LIBCPUSTATE_CC autocomplete_register_name_cb)(void *cookie,
                                                       size_t namelen) {
 	struct autocomplete_register_name_data *data;
 	data = (struct autocomplete_register_name_data *)cookie;
+
 	/* Check if the given startswith prefix applies to this register name */
 	if (namelen >= data->startswith_len &&
 	    memcasecmp(name, data->startswith_str, data->startswith_len) == 0) {
@@ -676,6 +680,7 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 				ctyperef_fini(&cast_type);
 				goto doparen_expr;
 			}
+
 			/* Cast-expression */
 			result = cparser_skip(self, ')');
 			if likely(result == DBX_EOK) {
@@ -689,10 +694,12 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 			ctyperef_fini(&cast_type);
 			goto done;
 		}
+
 		/* Handle the case where the wrapped expression isn't a type-expression */
 		if unlikely(result != DBX_ENOENT)
 			goto done;
 doparen_expr:
+
 		/* Simple parenthesis. */
 		result = cexpr_pushparse_inner(self);
 		if unlikely(result != DBX_EOK)
@@ -788,6 +795,7 @@ doparen_expr:
 				break;
 			shift += NBBY;
 		}
+
 		/* Push as an integer. */
 		result = cexpr_pushint_simple(&ctype_int, value);
 		yield();
@@ -935,6 +943,7 @@ doparen_expr:
 		} else if (KWD_CHECK(kwd_str, kwd_len, "offsetof") ||
 		           KWD_CHECK(kwd_str, kwd_len, "offsetafter") ||
 		           KWD_CHECK(kwd_str, kwd_len, "__builtin_offsetof") ||
+		           KWD_CHECK(kwd_str, kwd_len, "COMPILER_OFFSETAFTER") ||
 		           KWD_CHECK(kwd_str, kwd_len, "__COMPILER_OFFSETAFTER")) {
 			/* For simplicity, and correctness, literally implement
 			 * `offsetof()' like its generic macro implementation:
@@ -944,6 +953,7 @@ doparen_expr:
 			struct ctyperef t;
 			REF struct ctype *t_ptr;
 			want_after = (kwd_len == COMPILER_STRLEN("offsetafter") ||
+			              kwd_len == COMPILER_STRLEN("COMPILER_OFFSETAFTER") ||
 			              kwd_len == COMPILER_STRLEN("__COMPILER_OFFSETAFTER"));
 			result     = cparser_skip(self, '(');
 			if unlikely(result != DBX_EOK)
@@ -959,6 +969,7 @@ doparen_expr:
 			decref(t_ptr);
 			if unlikely(result != DBX_EOK)
 				goto done;
+
 			/* NOTE: Also  accept '.' and '::' instead of the ',' before the
 			 * member expression, but don't tell auto-completion about this. */
 			if (self->c_tok != '.' && self->c_tok != CTOKEN_TOK_COLON_COLON) {
@@ -966,6 +977,7 @@ doparen_expr:
 				if unlikely(result != DBX_EOK)
 					goto done;
 			}
+
 			/* Simply parse any valid integer suffix expression,
 			 * but  act as  though the  ',' was  actually a '->' */
 			self->c_tok = CTOKEN_TOK_MINUS_RANGLE;
@@ -989,6 +1001,7 @@ doparen_expr:
 				goto done;
 			result = cparser_skip(self, ')');
 		} else if (KWD_CHECK(kwd_str, kwd_len, "container_of") ||
+		           KWD_CHECK(kwd_str, kwd_len, "COMPILER_CONTAINER_OF") ||
 		           KWD_CHECK(kwd_str, kwd_len, "__COMPILER_CONTAINER_OF")) {
 			/* For  simplicity,  and correctness,  literally implement
 			 * `container_of()' like its generic macro implementation:
@@ -1022,6 +1035,7 @@ done_container_of_t_ptr:
 				decref(t_ptr);
 				goto done;
 			}
+
 			/* NOTE: Also  accept '.' and '::' instead of the ',' before the
 			 * member expression, but don't tell auto-completion about this. */
 			if (self->c_tok != '.' && self->c_tok != CTOKEN_TOK_COLON_COLON) {
@@ -1029,6 +1043,7 @@ done_container_of_t_ptr:
 				if unlikely(result != DBX_EOK)
 					goto done_container_of_t_ptr;
 			}
+
 			/* Simply parse any valid integer suffix expression,
 			 * but  act as  though the  ',' was  actually a '->' */
 			self->c_tok = CTOKEN_TOK_MINUS_RANGLE;
@@ -1041,10 +1056,12 @@ done_container_of_t_ptr:
 			result = cexpr_cast_simple(&ctype_size_t);
 			if unlikely(result != DBX_EOK)
 				goto done_container_of_t_ptr;
+
 			/* Add together p + offset */
 			result = cexpr_op2('+');
 			if unlikely(result != DBX_EOK)
 				goto done_container_of_t_ptr;
+
 			/* Cast the result back to `t_ptr' */
 			result = cexpr_cast_simple(t_ptr);
 			decref(t_ptr);
@@ -1058,9 +1075,11 @@ done_container_of_t_ptr:
 				yield();
 			if (self->c_tok != CTOKEN_TOK_KEYWORD)
 				goto syn;
+
 			/* Pure symbol lookup. */
 			kwd_str = self->c_tokstart;
 			kwd_len = cparser_toklen(self);
+
 			/* NOTE: Don't enable automatic symbol offsets within __identifier()! */
 			result = cexpr_pushsymbol_byname(kwd_str, kwd_len, false);
 			if (result == DBX_ENOENT && self->c_autocom && self->c_tokend == self->c_end)
@@ -1102,7 +1121,6 @@ done_container_of_t_ptr:
 			 * exactly, so it should be obvious to the user which variables would be printed
 			 * by using this trick!
 			 */
-
 
 			/* NOTE: Only add  automatic  symbol  offsets  when  this  symbol  isn't
 			 *       already being used within an explicit symbol-offset expression.
@@ -1203,7 +1221,7 @@ again:
 		 * Intended for ATTR_PERxxx variables within the kernel:
 		 * >> this_connections@caller
 		 * Where `caller' is presumably a local variable `struct task *caller'.
-		 * This  will  then resolve  to  print information  about  the pet-task
+		 * This  will  then resolve  to  print information  about  the per-task
 		 * variable `this_connections', as viewed by `caller'
 		 *
 		 * TODO: The 2 operands  should be  interchangeable, so-long  as
@@ -1280,6 +1298,7 @@ err_lhs_ptr_type:
 		kwd_str = self->c_tokstart;
 		kwd_len = cparser_toklen(self);
 		result  = cexpr_field(kwd_str, kwd_len);
+
 		/* Autocomplete struct field names. */
 		if (result == DBX_ENOENT && self->c_autocom && self->c_tokend == self->c_end)
 			result = autocomplete_struct_fields(self, kwd_str, kwd_len);
@@ -1618,10 +1637,12 @@ again:
 				goto done;
 			goto again;
 		}
+
 		/* Convert to boolean. */
 		result = cexpr_cast_simple(&ctype_bool);
 		if unlikely(result != DBX_EOK)
 			goto done;
+
 		/* Extract boolean value of LHS. */
 		result = cexpr_bool();
 		if unlikely(DBX_EISERR(result))
@@ -1643,6 +1664,7 @@ again:
 		result = parse_bitor(self); /* Parse the RHS-operand */
 		if unlikely(result != DBX_EOK)
 			goto done;
+
 		/* Convert to boolean. */
 		result = cexpr_cast_simple(&ctype_bool);
 		if unlikely(result != DBX_EOK)
@@ -1672,10 +1694,12 @@ again:
 				goto done;
 			goto again;
 		}
+
 		/* Convert to boolean. */
 		result = cexpr_cast_simple(&ctype_bool);
 		if unlikely(result != DBX_EOK)
 			goto done;
+
 		/* Extract boolean value of LHS. */
 		result = cexpr_bool();
 		if unlikely(DBX_EISERR(result))
@@ -1697,6 +1721,7 @@ again:
 		result = parse_land(self); /* Parse the RHS-operand */
 		if unlikely(result != DBX_EOK)
 			goto done;
+
 		/* Convert to boolean. */
 		result = cexpr_cast_simple(&ctype_bool);
 		if unlikely(result != DBX_EOK)
@@ -1729,6 +1754,7 @@ again:
 				goto done;
 			eval_tt = result > 0;
 		}
+
 		/* Check for special case: re-use the condition as true-branch. */
 		if (self->c_tok != ':') {
 			result = cexpr_pop();
@@ -1763,6 +1789,7 @@ again:
 		}
 		if unlikely(result != DBX_EOK)
 			goto done;
+
 		/* Right now our stack should look like this:
 		 * >> `keep_branch', `drop_branch' */
 		if unlikely(cexpr_stacksize < 2) {
@@ -1933,10 +1960,12 @@ DEFINE_INTERPOS_PARSER(cond, lor)
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL parse_assign)(struct cparser *__restrict self) {
 	dbx_errno_t result;
+
 	/* Parse the base-level unary expression. */
 	result = parse_unary_prefix(self);
 	if unlikely(result != DBX_EOK)
 		goto done;
+
 	/* Parse arbitrary suffix expressions in correct order. */
 	switch (self->c_tok) {
 
@@ -2007,6 +2036,7 @@ again_after_comma:
 			bool old_cexpr_typeonly;
 			old_cexpr_typeonly = cexpr_typeonly;
 			cexpr_typeonly     = false;
+
 			/* Special case: Implement the comma-for-array expression. */
 			result = parse_nocomma(self);
 			if unlikely(result != DBX_EOK) {
@@ -2024,6 +2054,7 @@ again_after_comma:
 					goto done;
 				goto again_after_comma;
 			}
+
 			/* Last comma reached, and our expression stack looks like this:
 			 * >> [...] foo 16      (for `foo, 16')
 			 * As such, cast the top-expression (16) to `size_t' */
@@ -2043,11 +2074,13 @@ again_after_comma:
 					goto err_nomem;
 				}
 			}
+
 			/* Pop the array-length expression. */
 			result = cexpr_pop();
 			cexpr_typeonly = old_cexpr_typeonly;
 			if unlikely(result != DBX_EOK)
 				goto done;
+
 			/* The left operand of the ,-operator must be a pointer or array. */
 			lhs_operand_type = cexpr_stacktop.cv_type.ct_typ;
 			if (CTYPE_KIND_ISARRAY(lhs_operand_type->ct_kind)) {
@@ -2071,11 +2104,13 @@ again_after_comma:
 			decref(new_array_type.ct_typ);
 			if unlikely(!array_pointer_type)
 				goto err_nomem;
+
 			/* And now do the actual cast. */
 			result = cexpr_cast_simple(array_pointer_type);
 			decref(array_pointer_type);
 			if unlikely(result != DBX_EOK)
 				goto done;
+
 			/* And finally, deref the result. */
 			result = cexpr_deref();
 		} /* !ceval_comma_is_select2nd */
@@ -2101,6 +2136,7 @@ NOTHROW(FCALL cexpr_pusheval)(char const *__restrict expr,
 	struct cparser cp;
 	cparser_init(&cp, expr, strnlen(expr, maxlen));
 	result = cexpr_pushparse(&cp);
+
 	/* Make sure that the entirety of `expr' was parsed. */
 	if (likely(result == DBX_EOK) && unlikely(cp.c_tok != CTOKEN_TOK_EOF))
 		result = DBX_ESYNTAX;
@@ -2348,6 +2384,7 @@ NOTHROW(FCALL ctype_parse_cv)(struct cparser *__restrict self,
 			yield();
 			continue;
 		}
+
 		/* Strip leading/trailing underscores */
 		while (kwd_len && kwd_str[0] == '_') {
 			++kwd_str;
@@ -2520,6 +2557,7 @@ NOTHROW(FCALL ctype_parse_base)(struct cparser *__restrict self,
 	if (self->c_tok != CTOKEN_TOK_KEYWORD)
 		return DBX_ENOENT;
 	bzero(presult, sizeof(*presult));
+
 	/* Parse const/volatile flags, and initial attributes. */
 	result = ctype_parse_cv(self, &presult->ct_flags, attrib);
 	if unlikely(result != DBX_EOK)
@@ -2547,12 +2585,14 @@ do_scan_keyword:
 		         ? CMODSYM_DIP_NS_UNION
 		         : CMODSYM_DIP_NS_CLASS;
 		yield();
+
 		/* Parse additional attributes before the name. */
 		result = ctype_parse_attrib(self, attrib);
 		if unlikely(result != DBX_EOK)
 			goto err_nopresult;
 		if unlikely(self->c_tok != CTOKEN_TOK_KEYWORD)
 			goto syn;
+
 		/* Lookup the object name. */
 		kwd_str = self->c_tokstart;
 		kwd_len = cparser_toklen(self);
@@ -2563,6 +2603,7 @@ do_scan_keyword:
 				autocomplete_symbols(self, kwd_str, kwd_len, ns);
 			goto err_nopresult;
 		}
+
 		/* Load the C-type from the symbol we've found. */
 		result = ctype_from_cmodsyminfo(&csym, &dw_type);
 		cmod_syminfo_local_fini(&csym);
@@ -2667,6 +2708,7 @@ yield_and_scan_keyword:
 		}
 		while (kwd_len && kwd_str[kwd_len - 1] == '_')
 			--kwd_len;
+
 		/* Check for keywords that are also accepted with underscores. */
 		if (KWD_CHECK(kwd_str, kwd_len, "unsigned")) {
 			if unlikely(integer_type_flags & BASETYPE_FLAG_SIGNMASK)
@@ -2739,6 +2781,7 @@ yield_and_scan_keyword:
 
 			default: presult->ct_typ = &ctype_int; break;
 			}
+
 			/* Convert to unsigned if required. */
 			if ((integer_type_flags & BASETYPE_FLAG_SIGNMASK) == BASETYPE_FLAG_UNSIGNED) {
 				presult->ct_typ = make_unsigned(presult->ct_typ);
@@ -2794,6 +2837,7 @@ again:
 
 	case '*': {
 		REF struct ctype *pointer_type;
+
 		/* Pointer indirection. */
 		pointer_type = ctype_ptr(presult, dbg_current_sizeof_pointer());
 		if unlikely(!pointer_type)
@@ -2804,6 +2848,7 @@ again:
 		presult->ct_flags = CTYPEREF_FLAG_NORMAL;
 		presult->ct_typ   = pointer_type; /* Inherit reference. */
 		yield();
+
 		/* Parse additional const/volatile modifiers */
 		result = ctype_parse_cv(self, &presult->ct_flags, attrib);
 		if unlikely(result != DBX_EOK)
@@ -2855,6 +2900,7 @@ handle_dots_in_parameter_list:
 			argv = (struct ctyperef *)dbx_malloc(sizeof(struct ctyperef));
 			if unlikely(!argv)
 				goto err_nomem;
+
 			/* Parse argument types. */
 			for (;;) {
 				char const *argname_start;
@@ -2892,14 +2938,17 @@ err_fuction_argv:
 			goto done;
 		}
 		yield(); /* Yield the ')'-token. */
+
 		/* Parse additional attributes. */
 		result = ctype_parse_attrib(self, attrib);
 		if unlikely(result != DBX_EOK)
 			goto err_fuction_argv;
+
 		/* Parse any additional suffixes */
 		result = ctype_parse_inner_suffix(self, presult, attrib);
 		if unlikely(result != DBX_EOK)
 			goto err_fuction_argv;
+
 		/* Create the new function type */
 		function_type = ctype_function(presult, argc, argv, attrib->ca_fun_cc);
 		if unlikely(!function_type)
@@ -2921,6 +2970,7 @@ err_fuction_argv:
 		bool old_cexpr_typeonly;
 		size_t array_length = 0;
 		yield();
+
 		/* Array type */
 		old_cexpr_typeonly = cexpr_typeonly;
 		cexpr_typeonly     = false;
@@ -2942,14 +2992,17 @@ err_fuction_argv:
 		cexpr_typeonly = old_cexpr_typeonly;
 		if unlikely(result != DBX_EOK)
 			goto done;
+
 		/* Parse additional attributes. */
 		result = ctype_parse_attrib(self, attrib);
 		if unlikely(result != DBX_EOK)
 			goto done;
+
 		/* Parse any additional suffixes */
 		result = ctype_parse_inner_suffix(self, presult, attrib);
 		if unlikely(result != DBX_EOK)
 			goto done;
+
 		/* Create the new array type. */
 		new_type = ctype_array(presult, array_length);
 		if unlikely(!new_type)
@@ -2957,6 +3010,7 @@ err_fuction_argv:
 		decref(presult->ct_typ);
 		ctypeinfo_fini(&presult->ct_info);
 		ctypeinfo_init(&presult->ct_info);
+
 		/* Propagate const/volatile/... from element type. */
 		/*---presult->ct_flags = CTYPEREF_FLAG_NORMAL;---*/
 		presult->ct_typ = new_type; /* Inherit reference */
@@ -2979,6 +3033,7 @@ NOTHROW(FCALL ctype_eval_inner)(struct cparser *__restrict self,
                                 char const **p_varname, size_t *p_varname_len,
                                 struct ctype_attributes *__restrict attrib) {
 	dbx_errno_t result;
+
 	/* Parse the inner expression. */
 	result = ctype_parse_inner_prefix(self, presult, attrib);
 	if unlikely(result != DBX_EOK)
@@ -2994,6 +3049,7 @@ NOTHROW(FCALL ctype_eval_inner)(struct cparser *__restrict self,
 		struct ctype_attributes inner_attrib;
 		unsigned int recursion;
 		yield();
+
 		/* Parse leading attributes within the caller's context. */
 		result = ctype_parse_attrib(self, attrib);
 		if unlikely(result != DBX_EOK)
@@ -3014,10 +3070,12 @@ NOTHROW(FCALL ctype_eval_inner)(struct cparser *__restrict self,
 		}
 		inner_parser.c_end = self->c_tokstart;
 		yield();
+
 		/* At this point, we're past the matching `)'-token. */
 		result = ctype_parse_inner_suffix(self, presult, attrib);
 		if unlikely(result != DBX_EOK)
 			goto done;
+
 		/* Now parse the inner type-expression */
 		memcpy(&inner_attrib, attrib, sizeof(inner_attrib));
 		result = ctype_eval_inner(&inner_parser, presult,
@@ -3075,6 +3133,7 @@ NOTHROW(FCALL ctype_eval)(struct cparser *__restrict self,
 	result = ctype_parse_base(self, presult, &attrib);
 	if (result != DBX_EOK)
 		return result;
+
 	/* Parse the inner expression. */
 	result = ctype_eval_inner(self, presult, p_varname, p_varname_len, &attrib);
 	if unlikely(result != DBX_EOK)

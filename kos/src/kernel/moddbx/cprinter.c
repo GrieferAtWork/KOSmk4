@@ -212,6 +212,7 @@ again:
 						goto got_type_name;
 					}
 				}
+
 				/* Fallback: Variable-length-integer type. */
 				FORMAT(DEBUGINFO_PRINT_FORMAT_TYPENAME_PREFIX);
 				PRINTF("%sINT%" PRIuSIZ,
@@ -413,6 +414,7 @@ again:
 	default:
 		break;
 	}
+
 	/* Print the variable name. */
 do_print_varname_suffix:
 	if (varname_len) {
@@ -531,10 +533,12 @@ ctyperef_printname(struct ctyperef const *__restrict self,
                    char const *varname, size_t varname_len) {
 	ssize_t temp, result;
 	struct ctyperef me;
+
 	/* Print the type prefix. */
 	result = ctype_printprefix(self, printer);
 	if unlikely(result < 0)
 		goto done;
+
 	/* Print the type suffix head+tail. */
 	memcpy(&me, self, sizeof(me));
 	DO(ctype_printsuffix_head(&me, printer, varname, varname_len));
@@ -764,9 +768,11 @@ NOTHROW(KCALL ctype_printstruct_ismultiline_callback)(void *cookie,
 	} else {
 		struct ctyperef member_type;
 		byte_t const *member_addr;
+
 		/* Load type information for this member. */
 		if (ctype_fromdw(mod, cu, parser, member->m_type, &member_type) != DBX_EOK)
 			return 0;
+
 		/* Check if printing this field causes a line-wrap, or exceeds the max line width */
 		member_addr           = (byte_t const *)arg->buf + member->m_offset;
 		arg->firstline_indent = ctype_printvalue_nextindent(&member_type, member_addr,
@@ -826,6 +832,7 @@ NOTHROW(KCALL ctype_printstruct_callback)(void *cookie,
 	printer       = arg->printer;
 	member_addr   = (byte_t const *)arg->buf + member->m_offset;
 	prefix_length = 0;
+
 	/* Load type information for this member. */
 	if (ctype_fromdw(mod, cu, parser, member->m_type, &member_type) != DBX_EOK)
 		return 0;
@@ -844,6 +851,7 @@ NOTHROW(KCALL ctype_printstruct_callback)(void *cookie,
 			 * the correct # of elements for `my_elemv' */
 		}
 	}
+
 	/* Print the leading "," */
 	if (arg->out_field_count != 0) {
 		FORMAT(DEBUGINFO_PRINT_FORMAT_COMMA_PREFIX);
@@ -877,6 +885,7 @@ NOTHROW(KCALL ctype_printstruct_callback)(void *cookie,
 		next_indent = 0;
 		goto do_print_space_and_field;
 	}
+
 	/* Check how this member will end up being printed. */
 	contains_newline = false;
 	elem_indent = arg->firstline_indent + prefix_length;
@@ -908,10 +917,12 @@ do_print_space_and_field:
 	} else {
 		size_t maybe_next_indent;
 		--prefix_length; /* Discount the leading ' ' */
+
 		/* Insert a line-feed before the element. */
 		PRINT("\n");
 		REPEAT(' ', arg->newline_indent); /* Print leading spaces. */
 		elem_indent = arg->newline_indent + prefix_length;
+
 		/* With the lowered indent, check if we can now print the member without
 		 * any line-feeds, and if so,  use that new indent  for the rest of  the
 		 * struct. */
@@ -925,6 +936,7 @@ do_print_space_and_field:
 		if (!contains_newline)
 			next_indent = maybe_next_indent;
 	}
+
 	/* Actually print the prefix+member. */
 	if (arg->flags & CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS) {
 		/* Don't print field names. */
