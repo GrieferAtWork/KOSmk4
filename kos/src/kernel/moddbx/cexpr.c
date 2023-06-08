@@ -3198,10 +3198,132 @@ done:
  * @return: DBX_ENOMEM:  Out of memory.
  * @return: DBX_EINTERN: The stack does not contain enough elements. */
 PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc) {
-	/* TODO: Not implemented... */
-	COMPILER_IMPURE();
-	(void)argc;
-	return DBX_ENOMEM;
+	size_t i;
+	dbx_errno_t result;
+	struct cvalue *func, *argv;
+	struct ctype *func_type;
+	struct ctype *return_type;
+	byte_t *func_addr;
+	byte_t *return_buffer;
+	size_t return_size;
+	if (cexpr_stacksize < (argc + 1))
+		return DBX_EINTERN;
+
+	/* Dereference function pointers. */
+	result = cexpr_lrot(argc + 1);
+	if unlikely(result != DBX_EOK)
+		goto done;
+	for (;;) {
+		uintptr_half_t kind;
+		kind = cexpr_stacktop.cv_type.ct_typ->ct_kind;
+		if (!CTYPE_KIND_ISARRAY_OR_POINTER(kind))
+			break;
+		result = cexpr_deref();
+		if unlikely(result != DBX_EOK)
+			goto done;
+	}
+	result = cexpr_rrot(argc + 1);
+	if unlikely(result != DBX_EOK)
+		goto done;
+
+	/* Load cvalue pointers. */
+	argv = cexpr_stackend - argc;
+	func = argv - 1;
+
+	/* Ensure that `func' is actually a function type. */
+	func_type = func->cv_type.ct_typ;
+	if unlikely(!CTYPE_KIND_ISFUNCTION(func_type->ct_kind))
+		return DBX_ESYNTAX;
+	if (func_type->ct_function.cf_argc != argc) {
+		if (func_type->ct_function.cf_argc > argc)
+			return DBX_ESYNTAX; /* Need more arguments */
+		if (!(func_type->ct_kind & CTYPE_KIND_FUNPROTO_VARARGS))
+			return DBX_ESYNTAX; /* Need less arguments */
+	}
+
+	/* Special handling for `cexpr_typeonly' */
+	if (func->cv_kind == CVALUE_KIND_VOID) {
+		/* Pop arguments. */
+		result = cexpr_pop_n(argc);
+		if unlikely(result != DBX_EOK)
+			goto done;
+
+		/* Re-load the function stack element. */
+		func = &cexpr_stacktop;
+		if unlikely(func->cv_kind != CVALUE_KIND_VOID)
+			return DBX_EINTERN;
+		if unlikely(func_type != func->cv_type.ct_typ)
+			return DBX_EINTERN;
+
+		/* Change the typing of the function element into its own return type. */
+		incref(func_type);
+		ctyperef_fini(&func->cv_type);
+		ctyperef_initcopy(&func->cv_type, &func_type->ct_function.cf_base);
+		decref(func_type);
+		goto done;
+	}
+
+	/* Cast caller-given arguments to their required types. */
+	for (i = 0; i < func_type->ct_function.cf_argc; ++i) {
+		size_t delta = argc - i;
+		result = cexpr_lrot(delta);
+		if unlikely(result != DBX_EOK)
+			goto done;
+		result = cexpr_cast(&func_type->ct_function.cf_argv[i]);
+		if unlikely(result != DBX_EOK)
+			goto done;
+		result = cexpr_promote(); /* Promote argument types after casting */
+		if unlikely(result != DBX_EOK)
+			goto done;
+		result = cexpr_rrot(delta);
+		if unlikely(result != DBX_EOK)
+			goto done;
+	}
+	argv = cexpr_stackend - argc;
+	func = argv - 1;
+	if unlikely(func->cv_kind == CVALUE_KIND_VOID)
+		return DBX_EINTERN;
+	if unlikely(func_type != func->cv_type.ct_typ)
+		return DBX_EINTERN;
+
+	/* Load the address of the function to call. */
+	result = cexpr_getdata_ex(func, &func_addr);
+	if unlikely(result != DBX_EOK)
+		goto done;
+
+	/* Figure out the storage required for the return type, and change
+	 * the  function stack element into an R-value slot for the return
+	 * value. */
+	incref(func_type);
+	return_type = func_type->ct_function.cf_base.ct_typ;
+	return_size = ctype_sizeof(return_type);
+	cvalue_fini(func);
+	ctyperef_initcopy(&func->cv_type, &func_type->ct_function.cf_base);
+	func->cv_kind = CVALUE_KIND_IDATA;
+	return_buffer = func->cv_idata;
+	if (return_size > sizeof(func->cv_idata)) {
+		/* Must dynamically allocate a return value buffer. */
+		return_buffer = (byte_t *)dbx_malloc(return_size);
+		if unlikely(!return_buffer) {
+			decref(func_type);
+			return DBX_ENOMEM;
+		}
+		func->cv_kind = CVALUE_KIND_DATA;
+		func->cv_data = return_buffer;
+	}
+
+	/* Perform the actual function call. */
+	result = cfunction_call((void const *)func_addr,
+	                        func_type->ct_kind & CTYPE_KIND_FUNPROTO_CCMASK,
+	                        argc, argv, return_type, return_buffer);
+	decref(func_type);
+	if unlikely(result != DBX_EOK)
+		goto done;
+
+	/* Pop arguments. */
+	result = cexpr_pop_n(argc);
+done:
+	return result;
 }
 
 

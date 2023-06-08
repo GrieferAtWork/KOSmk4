@@ -410,6 +410,28 @@ NOTHROW(FCALL cexpr_pushsymbol_byname)(char const *__restrict name, size_t namel
 FUNDEF NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cexpr_pushregister)(char const *__restrict name, size_t namelen);
 
+
+/* Arch-specific handler to perform a function call to a C function
+ * !!!CAUTION!!! This *actually* executes the function in the context
+ *               of the built-in debugger, and there is a good chance
+ *               that if you randomly  try to execute functions  that
+ *               weren't  meant for something like this, you'll cause
+ *               the system to hang, or possible even worse.
+ * @param: func_address: The address of the function to call (in the context of `dbg_current')
+ * @param: cc:           One of `CTYPE_KIND_FUNPROTO_CC_*'
+ * @param: argc:         Number of arguments to pass
+ * @param: argv:         Vector of arguments to pass
+ * @param: return_type:  The type of value that is returned by the function
+ * @param: return_buf:   A caller-provided buffer to fill with the function's return value
+ * @return: DBX_EOK:     Success.
+ * @return: DBX_EFAULT:  Unhandled exception while trying to execute the function.
+ * @return: DBX_EINTERN: Function calling is not implemented for the architecture. */
+FUNDEF NONNULL((4, 5)) dbx_errno_t
+NOTHROW(FCALL cfunction_call)(void const *func_address, uintptr_half_t cc,
+                              size_t argc, struct cvalue *argv,
+                              struct ctype *__restrict return_type,
+                              void *__restrict return_buf);
+
 DECL_END
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
