@@ -901,6 +901,8 @@ doparen_expr:
 					break;
 				}
 				break;
+			} else {
+				break;
 			}
 		}
 		self->c_tokstart = regname_start;      /* Fake one long keyword */
