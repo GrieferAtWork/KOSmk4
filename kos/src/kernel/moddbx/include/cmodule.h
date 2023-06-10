@@ -28,6 +28,7 @@
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <kernel/types.h>
 
+#include <hybrid/sequence/list.h>
 #include <hybrid/typecore.h>
 
 #include <kos/exec/module.h>
@@ -283,9 +284,8 @@ NOTHROW(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
 
 
 struct cmodule {
-	struct cmodule                         **cm_pself;    /* [1..1][1..1] Self-pointer */
-	struct cmodule                          *cm_next;     /* [0..1] Next module. */
-	REF struct cmodule                      *cm_cache;    /* [0..1] Next cached module. */
+	LIST_ENTRY(cmodule)                      cm_link;     /* [0..1] Link in list of modules (`cmodule_list') */
+	SLIST_ENTRY(REF cmodule)                 cm_cache;    /* [0..1] Link in list of cached module. */
 	uintptr_t                                cm_refcnt;   /* Reference counter. */
 	REF module_t                            *cm_module;   /* [1..1][const] Module handle. */
 	di_debug_sections_t                      cm_sections; /* [const] Debug section mappings. */

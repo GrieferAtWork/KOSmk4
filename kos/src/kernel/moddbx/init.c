@@ -46,24 +46,29 @@ INTDEF void KCALL dbx_heap_init(void);
 INTDEF void KCALL dbx_heap_reset(void);
 INTDEF void KCALL dbx_heap_fini(void);
 
-INTDEF struct cmodule *cmodule_list;
-INTDEF REF struct cmodule *cmodule_cache;
+LIST_HEAD(cmodule_list_struct, cmodule);
+SLIST_HEAD(cmodule_slist_struct, cmodule);
+
+INTDEF struct cmodule_list_struct cmodule_list;
+INTDEF REF struct cmodule_slist_struct cmodule_cache;
 INTDEF NONNULL((1)) void NOTHROW(FCALL cmodule_fini_for_reset)(struct cmodule *__restrict self);
 INTDEF void NOTHROW(KCALL reset_builtin_types)(void);
 
 PRIVATE void NOTHROW(KCALL drop_module_references)(void) {
 	struct cmodule *mod;
-	for (mod = cmodule_list; mod; mod = mod->cm_next)
+	LIST_FOREACH (mod, &cmodule_list, cm_link) {
 		cmodule_fini_for_reset(mod);
+	}
 }
 
 
 DBG_INIT(init) {
 	/* Initialize the DBX heap-system. */
 	dbx_heap_init();
+
 	/* Make sure the debug-module-list is empty. */
-	cmodule_list  = NULL;
-	cmodule_cache = NULL;
+	LIST_INIT(&cmodule_list);
+	SLIST_INIT(&cmodule_cache);
 }
 
 
@@ -84,8 +89,8 @@ DBG_RESET(reset) {
 
 	/* Drop all external references held by `cmodule_list' */
 	drop_module_references();
-	cmodule_list  = NULL;
-	cmodule_cache = NULL;
+	LIST_INIT(&cmodule_list);
+	SLIST_INIT(&cmodule_cache);
 
 	/* Re-initialize the debugger heap-system */
 	dbx_heap_reset();

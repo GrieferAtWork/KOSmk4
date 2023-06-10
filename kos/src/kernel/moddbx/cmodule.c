@@ -59,6 +59,8 @@
 
 DECL_BEGIN
 
+LIST_HEAD(cmodule_list_struct, cmodule);
+SLIST_HEAD(cmodule_slist_struct, cmodule);
 
 /* Initialize a debug information CU parser from a given CModule CompilationUnit
  * @param: dip: A pointer  to the  first component  to load,  or `NULL'  to simply  load
@@ -166,10 +168,8 @@ NOTHROW(FCALL cmodunit_fini)(struct cmodunit *__restrict self) {
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL cmodule_fini)(struct cmodule *__restrict self) {
 	size_t i;
-	if (self->cm_pself) {
-		if ((*self->cm_pself = self->cm_next) != NULL)
-			self->cm_next->cm_pself = self->cm_pself;
-	}
+	if (LIST_ISBOUND(self, cm_link))
+		LIST_REMOVE(self, cm_link);
 	debug_sections_unlock(&self->cm_sectrefs);
 	module_decref_unlikely(self->cm_module);
 	cmodsymtab_fini(&self->cm_symbols);
@@ -377,15 +377,15 @@ NOTHROW(FCALL cmodule_enum_drivers)(cmodule_enum_callback_t cb,
 
 
 
-
-
-/* [0..1] Linked list of loaded debug-module objects (cleared during
+/* [0..n] Linked list of loaded debug-module objects (cleared during
  *        debugger reset; elements are lazily removed as they are
  *        destroyed) */
-INTERN struct cmodule *cmodule_list = NULL;
+INTERN struct cmodule_list_struct
+cmodule_list = LIST_HEAD_INITIALIZER(cmodule_list);
 
-/* [0..1] Cache of already-loaded DW modules. */
-INTERN REF struct cmodule *cmodule_cache = NULL;
+/* [0..n] Cache of already-loaded DW modules. */
+INTERN REF struct cmodule_slist_struct
+cmodule_cache = SLIST_HEAD_INITIALIZER(cmodule_cache);
 
 /* Clear the internal cache of pre-loaded DW modules (called
  * from `dbx_heap_alloc()' in  an attempt  to free  memory).
@@ -397,7 +397,7 @@ INTERN REF struct cmodule *cmodule_cache = NULL;
 PUBLIC size_t NOTHROW(FCALL cmodule_clearcache)(bool keep_loaded) {
 	size_t result = 0;
 	struct cmodule **piter, *iter;
-	piter = &cmodule_cache;
+	piter = SLIST_PFIRST(&cmodule_cache);
 	while ((iter = *piter) != NULL) {
 		if (keep_loaded) {
 			/* Check if we should keep this module. */
@@ -406,13 +406,13 @@ PUBLIC size_t NOTHROW(FCALL cmodule_clearcache)(bool keep_loaded) {
 			if (modvm == &mman_kernel ||
 			    modvm == dbg_current->t_mman) {
 				/* Don't remove this one. */
-				piter = &iter->cm_cache;
+				piter = SLIST_PNEXT(iter, cm_cache);
 				continue;
 			}
 		}
 
 		/* Remove this one! */
-		*piter = iter->cm_cache; /* Unlink */
+		*piter = SLIST_NEXT(iter, cm_cache); /* Unlink */
 
 		/* Drop the cache reference. */
 		if (--iter->cm_refcnt == 0) {
@@ -682,7 +682,7 @@ NOTHROW(FCALL cmodule_locate)(module_t *__restrict mod) {
 	REF struct cmodule *result;
 
 	/* Search for an already-loaded module. */
-	for (result = cmodule_list; result; result = result->cm_next) {
+	LIST_FOREACH (result, &cmodule_list, cm_link) {
 		if (result->cm_module == mod)
 			return incref(result);
 	}
@@ -690,15 +690,11 @@ NOTHROW(FCALL cmodule_locate)(module_t *__restrict mod) {
 	/* Create a new module. */
 	result = cmodule_create(mod);
 	if likely(result) {
-		result->cm_next  = cmodule_list;
-		result->cm_pself = &cmodule_list;
-		if (cmodule_list)
-			cmodule_list->cm_pself = &result->cm_next;
-		cmodule_list = result;
+		LIST_INSERT_HEAD(&cmodule_list, result, cm_link);
 
 		/* Cache the module so we can find it faster the next time around! */
-		result->cm_cache = cmodule_cache;
-		cmodule_cache    = incref(result);
+		incref(result);
+		SLIST_INSERT_HEAD(&cmodule_cache, result, cm_cache);
 	}
 	return result;
 }
@@ -3163,13 +3159,13 @@ NOTHROW(FCALL cmod_symenum_globals)(/*in|out(undef)*/ struct cmodsyminfo *__rest
 
 
 struct cmod_symenum_foreign_globals_data {
-	REF struct cmodule     *excluded_module; /* [1..1] */
-	struct cmodsyminfo     *info;            /* [1..1] */
-	cmod_symenum_callback_t cb;              /* [1..1] */
-	char const             *startswith_name;
-	size_t                  startswith_namelen;
-	uintptr_t               ns;
-	bool                    did_encounter_nomem;
+	REF struct cmodule     *csefgd_excluded_module; /* [1..1] */
+	struct cmodsyminfo     *csefgd_info;            /* [1..1] */
+	cmod_symenum_callback_t csefgd_cb;              /* [1..1] */
+	char const             *csefgd_startswith_name;
+	size_t                  csefgd_startswith_namelen;
+	uintptr_t               csefgd_ns;
+	bool                    csefgd_did_encounter_nomem;
 };
 
 PRIVATE NONNULL((2)) ssize_t
@@ -3179,18 +3175,18 @@ NOTHROW(FCALL cmod_symenum_foreign_globals_cb)(void *cookie, struct cmodule *__r
 	arg = (struct cmod_symenum_foreign_globals_data *)cookie;
 
 	/* Check if we're supposed to exclude this module in particular. */
-	if (mod != arg->excluded_module) {
+	if (mod != arg->csefgd_excluded_module) {
 		/* Select the new module. */
-		xdecref(arg->info->clv_mod);
-		arg->info->clv_mod = incref(mod);
+		xdecref(arg->csefgd_info->clv_mod);
+		arg->csefgd_info->clv_mod = incref(mod);
 
 		/* Enumerate symbols of this module. */
-		result = cmod_symenum_globals(arg->info,
-		                              arg->cb,
-		                              arg->startswith_name,
-		                              arg->startswith_namelen,
-		                              arg->ns,
-		                              &arg->did_encounter_nomem,
+		result = cmod_symenum_globals(arg->csefgd_info,
+		                              arg->csefgd_cb,
+		                              arg->csefgd_startswith_name,
+		                              arg->csefgd_startswith_namelen,
+		                              arg->csefgd_ns,
+		                              &arg->csefgd_did_encounter_nomem,
 		                              /* Indicate  that  we  don't want  to  enumerate symbols
 		                               * from some  specific  CU,  but  only  those  that  are
 		                               * globally visible, and don't conflict with each other.
@@ -3459,22 +3455,22 @@ NOTHROW(FCALL cmod_symenum)(/*in|out(undef)*/ struct cmodsyminfo *__restrict inf
 	}
 	if (!(scope & CMOD_SYMENUM_SCOPE_FNOFOREIGN)) {
 		struct cmod_symenum_foreign_globals_data data;
-		data.excluded_module     = xincref(info->clv_mod); /* Exclude the original module. */
-		data.info                = info;
-		data.cb                  = cb;
-		data.startswith_name     = startswith_name;
-		data.startswith_namelen  = startswith_namelen;
-		data.ns                  = ns;
-		data.did_encounter_nomem = did_encounter_nomem;
+		data.csefgd_excluded_module     = xincref(info->clv_mod); /* Exclude the original module. */
+		data.csefgd_info                = info;
+		data.csefgd_cb                  = cb;
+		data.csefgd_startswith_name     = startswith_name;
+		data.csefgd_startswith_namelen  = startswith_namelen;
+		data.csefgd_ns                  = ns;
+		data.csefgd_did_encounter_nomem = did_encounter_nomem;
 
 		/* Enumerate all CModules currently visible,
 		 * and recursively enumerate their  symbols. */
 		temp = cmodule_enum(&cmod_symenum_foreign_globals_cb, &data);
-		xdecref(data.excluded_module);
+		xdecref(data.csefgd_excluded_module);
 		if unlikely(temp < 0)
 			goto err;
 		result += temp;
-		did_encounter_nomem = data.did_encounter_nomem;
+		did_encounter_nomem = data.csefgd_did_encounter_nomem;
 	}
 
 	/* If  (seemingly) nothing was  enumerated, and we did
