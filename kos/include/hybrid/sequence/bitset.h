@@ -23,8 +23,10 @@
 #include "../../__stdinc.h"
 #include "../__atomic.h"
 
+/* TODO: Get rid of this API and replace it with `<sys/bitstring.h>' */
+
 #ifdef __CC__
-#
+
 /* The word type used by bitsets */
 #ifndef BITSET_WORDTYPE
 #include "../typecore.h"
