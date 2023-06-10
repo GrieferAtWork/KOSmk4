@@ -427,7 +427,7 @@ NOTHROW(FCALL cexpr_pushregister)(char const *__restrict name, size_t namelen);
  * @return: DBX_EFAULT:  Unhandled exception while trying to execute the function.
  * @return: DBX_EINTERN: Function calling is not implemented for the architecture. */
 FUNDEF NONNULL((4, 5)) dbx_errno_t
-NOTHROW(FCALL cfunction_call)(void const *func_address, uintptr_half_t cc,
+NOTHROW(KCALL cfunction_call)(void const *func_address, uintptr_half_t cc,
                               size_t argc, struct cvalue *argv,
                               struct ctype *__restrict return_type,
                               void *__restrict return_buf);

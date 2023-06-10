@@ -32,6 +32,7 @@
 #include <kernel/types.h>
 
 #include <hybrid/host.h>
+#include <hybrid/sequence/list.h>
 #include <hybrid/typecore.h>
 
 #include <compat/config.h>
@@ -76,21 +77,16 @@ NOTHROW(FCALL ctype_destroy)(struct ctype *__restrict self) {
 	}	ATTR_FALLTHROUGH
 	case CTYPE_KIND_CLASSOF(CTYPE_KIND_PTR):
 	case CTYPE_KIND_CLASSOF(CTYPE_KIND_ARRAY): {
-		static_assert(offsetof(struct ctype, ct_pointer.cp_base.ct_typ) == offsetof(struct ctype, ct_function.cf_base));
-		static_assert(offsetof(struct ctype, ct_pointer.cp_base.ct_typ) == offsetof(struct ctype, ct_array.ca_elem));
-		static_assert(offsetof(struct ctype, ct_pointer.cp_base.ct_info) == offsetof(struct ctype, ct_array.ca_eleminfo));
-		if (self->ct_pointer.cp_base.ct_typ != NULL) {
+		static_assert(offsetof(struct ctype, ct_parent) == offsetof(struct ctype, ct_pointer.cp_base.ct_typ));
+		static_assert(offsetof(struct ctype, ct_parent) == offsetof(struct ctype, ct_array.ca_elem));
+		static_assert(offsetof(struct ctype, ct_parent) == offsetof(struct ctype, ct_function.cf_base));
+		static_assert(offsetof(struct ctype, ct_sibling) == offsetof(struct ctype, ct_pointer._cp_sib));
+		static_assert(offsetof(struct ctype, ct_sibling) == offsetof(struct ctype, ct_array._ca_sib));
+		static_assert(offsetof(struct ctype, ct_sibling) == offsetof(struct ctype, ct_function._cf_sib));
+		if (self->ct_parent != NULL) {
 			/* Remove `self' from its sibling-chain. */
-			struct ctype **piter, *iter;
-			piter = &self->ct_pointer.cp_base.ct_typ->ct_children;
-			while ((iter = *piter) != NULL) {
-				if (iter == self) {
-					*piter = iter->ct_sibling;
-					break;
-				}
-				piter = &iter->ct_sibling;
-			}
-			decref(self->ct_pointer.cp_base.ct_typ);
+			SLIST_REMOVE(&self->ct_parent->ct_children, self, ct_sibling);
+			decref(self->ct_parent);
 		}
 	}	break;
 
@@ -103,27 +99,30 @@ NOTHROW(FCALL ctype_destroy)(struct ctype *__restrict self) {
 
 /* Return the pointer-version of the given C-type
  * @param: flags: Type-reference-flags (set of `CTYPEREF_FLAG_*') */
-PUBLIC NONNULL((1)) REF struct ctype *
+PUBLIC WUNUSED NONNULL((1)) REF struct ctype *
 NOTHROW(FCALL ctype_ptr)(struct ctyperef const *__restrict self,
                          size_t sizeof_pointer) {
 	REF struct ctype *result;
 	uintptr_half_t wanted_kind;
+
+	/* Search for an existing child of the base type. */
 	wanted_kind = CTYPE_KIND_CLASSOF(CTYPE_KIND_PTR) | sizeof_pointer;
-	for (result = self->ct_typ->ct_children; result;
-	     result = result->ct_sibling) {
+	SLIST_FOREACH (result, &self->ct_typ->ct_children, ct_sibling) {
 		assert(result->ct_parent == self->ct_typ);
 		if (result->ct_kind == wanted_kind &&
 		    ctyperef_equal_assume_same_type(&result->ct_pointer.cp_base, self))
 			return incref(result);
 	}
+
 	/* Create a new sibling. */
 	result = (REF struct ctype *)dbx_malloc(offsetafter(struct ctype, ct_pointer));
 	if unlikely(!result)
 		return NULL;
-	result->ct_refcnt   = 1; /* Returned reference. */
-	result->ct_kind     = wanted_kind;
-	result->ct_children = NULL;
+	result->ct_refcnt = 1; /* Returned reference. */
+	result->ct_kind   = wanted_kind;
+	SLIST_INIT(&result->ct_children);
 	ctyperef_initcopy(&result->ct_pointer.cp_base, self);
+
 	/* Add the new pointer type to the chain of children of `self' */
 	ctype_addchild(self->ct_typ, result);
 	return result;
@@ -133,42 +132,46 @@ NOTHROW(FCALL ctype_ptr)(struct ctyperef const *__restrict self,
 /* Return  the   array-version  of   the  given   C-type
  * NOTE: The returned type must inherit `self->ct_flags'
  * @param: flags: Type-reference-flags (set of `CTYPEREF_FLAG_*') */
-PUBLIC NONNULL((1)) REF struct ctype *
+PUBLIC WUNUSED NONNULL((1)) REF struct ctype *
 NOTHROW(FCALL ctype_array)(struct ctyperef const *__restrict self,
                            size_t elem_count) {
 	REF struct ctype *result;
-	for (result = self->ct_typ->ct_children; result;
-	     result = result->ct_sibling) {
+
+	/* Search for an existing child of the base type. */
+	SLIST_FOREACH (result, &self->ct_typ->ct_children, ct_sibling) {
 		assert(result->ct_parent == self->ct_typ);
 		if (result->ct_kind == CTYPE_KIND_ARRAY &&
 		    result->ct_array.ca_count == elem_count &&
 		    ctypeinfo_equal(&result->ct_array.ca_eleminfo, &self->ct_info))
 			return incref(result);
 	}
+
 	/* Create a new sibling. */
 	result = (REF struct ctype *)dbx_malloc(offsetafter(struct ctype, ct_array));
 	if unlikely(!result)
 		return NULL;
-	result->ct_refcnt   = 1; /* Returned reference. */
-	result->ct_kind     = CTYPE_KIND_ARRAY;
-	result->ct_children = NULL;
+	result->ct_refcnt = 1; /* Returned reference. */
+	result->ct_kind   = CTYPE_KIND_ARRAY;
+	SLIST_INIT(&result->ct_children);
 	ctypeinfo_initcopy(&result->ct_array.ca_eleminfo, &self->ct_info);
 	result->ct_array.ca_elem  = incref(self->ct_typ);
 	result->ct_array.ca_count = elem_count;
+
 	/* Add the new type to the chain of children of `self' */
 	ctype_addchild(self->ct_typ, result);
 	return result;
 }
 
 /* Return a function-type C-type. */
-PUBLIC NONNULL((1)) REF struct ctype *
+PUBLIC WUNUSED NONNULL((1)) REF struct ctype *
 NOTHROW(FCALL ctype_function)(struct ctyperef const *return_type, size_t argc,
                               struct ctyperef const *argv, uint16_t cc) {
 	size_t i;
 	REF struct ctype *result;
 	cc |= CTYPE_KIND_FUNCTION;
-	for (result = return_type->ct_typ->ct_children; result;
-	     result = result->ct_sibling) {
+
+	/* Search for an existing child of the base type. */
+	SLIST_FOREACH (result, &return_type->ct_typ->ct_children, ct_sibling) {
 		assert(result->ct_parent == return_type->ct_typ);
 		if (result->ct_kind == cc && result->ct_function.cf_argc == argc &&
 		    ctyperef_equal_assume_same_type(&result->ct_function.cf_base, return_type)) {
@@ -188,14 +191,16 @@ NOTHROW(FCALL ctype_function)(struct ctyperef const *return_type, size_t argc,
 next_typ:
 		;
 	}
+
 	/* Create a new sibling. */
 	result = (REF struct ctype *)dbx_malloc(offsetof(struct ctype, ct_function.cf_argv) +
 	                                        (argc * sizeof(struct ctyperef)));
 	if unlikely(!result)
 		return NULL;
-	result->ct_refcnt   = 1; /* Returned reference. */
-	result->ct_kind     = cc;
-	result->ct_children = NULL;
+	result->ct_refcnt = 1; /* Returned reference. */
+	result->ct_kind   = cc;
+	SLIST_INIT(&result->ct_children);
+
 	/* Fill in the new function type */
 	ctyperef_initcopy(&result->ct_function.cf_base, return_type);
 	result->ct_function.cf_argc = argc;
@@ -205,6 +210,7 @@ next_typ:
 		incref(result->ct_function.cf_argv[i].ct_typ);
 		xincref(result->ct_function.cf_argv[i].ct_info.ci_nameref);
 	}
+
 	/* Add the new type to the chain of children of `self' */
 	ctype_addchild(return_type->ct_typ, result);
 	return result;
@@ -238,7 +244,7 @@ NOTHROW(FCALL ctype_sizeof)(struct ctype const *__restrict self) {
 }
 
 /* Check if 2 given C-types are equal. */
-PUBLIC ATTR_PURE NONNULL((1, 2)) bool
+PUBLIC ATTR_PURE WUNUSED NONNULL((1, 2)) bool
 NOTHROW(FCALL ctype_equal)(struct ctype const *a,
                            struct ctype const *b) {
 again:
@@ -492,27 +498,27 @@ PRIVATE struct ctype_triple const builtin_triples[] = {
 INTERN void NOTHROW(KCALL reset_builtin_types)(void) {
 	unsigned int i;
 	for (i = 0; i < lengthof(standalong_ctypes); ++i) {
-		standalong_ctypes[i]->ct_refcnt   = 0x7fff;
-		standalong_ctypes[i]->ct_children = NULL;
+		standalong_ctypes[i]->ct_refcnt             = 0x7fff;
+		standalong_ctypes[i]->ct_children.slh_first = NULL;
 	}
 	for (i = 0; i < lengthof(builtin_triples); ++i) {
-		builtin_triples[i].ct_base->ct_refcnt         = 0x7fff;
-		builtin_triples[i].ct_base->ct_children       = builtin_triples[i].ct_ptr;
-		builtin_triples[i].ct_ptr->ct_refcnt          = 0x7fff;
-		builtin_triples[i].ct_ptr->ct_children        = NULL;
-		builtin_triples[i].ct_ptr->ct_sibling         = builtin_triples[i].ct_const_ptr;
-		builtin_triples[i].ct_const_ptr->ct_refcnt    = 0x7fff;
-		builtin_triples[i].ct_const_ptr->ct_children  = NULL;
+		builtin_triples[i].ct_base->ct_refcnt                  = 0x7fff;
+		builtin_triples[i].ct_base->ct_children.slh_first      = builtin_triples[i].ct_ptr;
+		builtin_triples[i].ct_ptr->ct_refcnt                   = 0x7fff;
+		builtin_triples[i].ct_ptr->ct_children.slh_first       = NULL;
+		builtin_triples[i].ct_ptr->ct_sibling.sle_next         = builtin_triples[i].ct_const_ptr;
+		builtin_triples[i].ct_const_ptr->ct_refcnt             = 0x7fff;
+		builtin_triples[i].ct_const_ptr->ct_children.slh_first = NULL;
 #ifdef __ARCH_HAVE_COMPAT
-		builtin_triples[i].ct_const_ptr->ct_sibling         = builtin_triples[i].ct_compat_ptr;
-		builtin_triples[i].ct_compat_ptr->ct_refcnt         = 0x7fff;
-		builtin_triples[i].ct_compat_ptr->ct_children       = NULL;
-		builtin_triples[i].ct_compat_ptr->ct_sibling        = builtin_triples[i].ct_const_compat_ptr;
-		builtin_triples[i].ct_const_compat_ptr->ct_refcnt   = 0x7fff;
-		builtin_triples[i].ct_const_compat_ptr->ct_children = NULL;
-		builtin_triples[i].ct_const_compat_ptr->ct_sibling  = NULL;
-#else /* __ARCH_HAVE_COMPAT */
-		builtin_triples[i].ct_const_ptr->ct_sibling = NULL;
+		builtin_triples[i].ct_const_ptr->ct_sibling.sle_next          = builtin_triples[i].ct_compat_ptr;
+		builtin_triples[i].ct_compat_ptr->ct_refcnt                   = 0x7fff;
+		builtin_triples[i].ct_compat_ptr->ct_children.slh_first       = NULL;
+		builtin_triples[i].ct_compat_ptr->ct_sibling.sle_next         = builtin_triples[i].ct_const_compat_ptr;
+		builtin_triples[i].ct_const_compat_ptr->ct_refcnt             = 0x7fff;
+		builtin_triples[i].ct_const_compat_ptr->ct_children.slh_first = NULL;
+		builtin_triples[i].ct_const_compat_ptr->ct_sibling.sle_next   = NULL;
+#else  /* __ARCH_HAVE_COMPAT */
+		builtin_triples[i].ct_const_ptr->ct_sibling.sle_next = NULL;
 #endif /* !__ARCH_HAVE_COMPAT */
 	}
 }
@@ -1090,10 +1096,10 @@ again:
 				ct = (REF struct ctype *)dbx_malloc(sizeof(struct _basic_ctype));
 				if unlikely(!ct)
 					goto err_nomem;
-				ct->ct_refcnt   = 1;
-				ct->ct_kind     = CTYPE_KIND_BOOL | typinfo.t_sizeof;
-				ct->ct_children = NULL;
-				presult->ct_typ  = ct;
+				ct->ct_refcnt = 1;
+				ct->ct_kind   = CTYPE_KIND_BOOL | typinfo.t_sizeof;
+				SLIST_INIT(&ct->ct_children);
+				presult->ct_typ = ct;
 			}
 			break;
 
@@ -1260,9 +1266,9 @@ got_elem_count:
 		result_type = (REF struct ctype *)dbx_malloc(offsetafter(struct ctype, ct_enum));
 		if unlikely(!result_type)
 			goto err_nomem;
-		result_type->ct_refcnt      = 1;
-		result_type->ct_kind        = CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM) | typinfo.t_sizeof;
-		result_type->ct_children    = NULL;
+		result_type->ct_refcnt = 1;
+		result_type->ct_kind   = CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM) | typinfo.t_sizeof;
+		SLIST_INIT(&result_type->ct_children);
 		result_type->ct_enum.cd_mod = incref(mod);
 		result_type->ct_enum.cd_dip = type_debug_info;
 		presult->ct_typ             = result_type; /* Inherit reference */
@@ -1311,7 +1317,7 @@ got_elem_count:
 		struct_type->ct_kind   = CTYPE_KIND_STRUCT;
 		if (parser.dup_comp.dic_tag == DW_TAG_union_type)
 			struct_type->ct_kind = CTYPE_KIND_UNION;
-		struct_type->ct_children              = NULL;
+		SLIST_INIT(&struct_type->ct_children);
 		struct_type->ct_struct.ct_info.cd_mod = incref(mod);
 		struct_type->ct_struct.ct_info.cd_dip = type_debug_info;
 		struct_type->ct_struct.ct_sizeof      = typinfo.t_sizeof;

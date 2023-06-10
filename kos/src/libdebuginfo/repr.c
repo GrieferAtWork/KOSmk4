@@ -478,6 +478,20 @@ unwind_instruction_succ_failsafe(byte_t const *__restrict unwind_pc,
 }
 
 
+/* Read the expression length as ULEB128 from `*expr' and print
+ * the  disassembled contents of the succeeding CFI expression.
+ * Same as `debug_repr_cfi_expression_with_length()'
+ * @param: printer:  Output printer.
+ * @param: arg:      Output printer cookie.
+ * @param: pc:       Starting address of the expression.
+ * @param: addrsize: s.a. `unwind_instruction_succ(3)'
+ * @param: ptrsize:  s.a. `unwind_instruction_succ(3)'
+ * @return: * : The usual pformatprinter-style value. */
+INTDEF NONNULL((1, 3)) ssize_t CC
+libdl_debug_repr_cfi_expression(pformatprinter printer, void *arg,
+                                byte_t const *__restrict expr, size_t indent,
+                                byte_t addrsize, byte_t ptrsize);
+
 
 PRIVATE REPR_TEXTSECTION NONNULL((1, 3, 6)) ssize_t CC
 print_cfi_instruction(pformatprinter printer, void *arg,

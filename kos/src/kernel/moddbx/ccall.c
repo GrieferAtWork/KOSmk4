@@ -54,7 +54,7 @@ DECL_BEGIN
 
 /* Low-level implementation for `cfunction_call' */
 PRIVATE NONNULL((4, 5)) dbx_errno_t
-NOTHROW(FCALL cfunction_call_impl)(void const *func_address, uintptr_half_t cc,
+NOTHROW(KCALL cfunction_call_impl)(void const *func_address, uintptr_half_t cc,
                                    size_t argc, struct cvalue *argv,
                                    struct ctype *__restrict return_type,
                                    void *__restrict return_buf) {
@@ -146,7 +146,15 @@ NOTHROW(FCALL cfunction_call_impl)(void const *func_address, uintptr_half_t cc,
 	uc.ucs_gpregs.gp_ecx = ((uint32_t *)sp)[0]; /* For `__attribute__((fastcall))' */
 	uc.ucs_gpregs.gp_edx = ((uint32_t *)sp)[1]; /* For `__attribute__((fastcall))' */
 	uc.ucs_gpregs.gp_eax = ((uint32_t *)sp)[0]; /* For `__attribute__((regparm(1)))' */
-	(void)cc;
+
+	/* For FASTCALL, the first 2 arguments aren't passed via the stack. */
+	if (cc == CTYPE_KIND_FUNPROTO_CC_FASTCALL) {
+		if (argc >= 2) {
+			sp += 8;
+		} else if (argc >= 1) {
+			sp += 4;
+		}
+	}
 
 	/* Fill in fixed registers. */
 	uc.ucs_gpregs.gp_esp = (uint32_t)sp - 4;    /* -4 addend needed for return address. */
@@ -161,7 +169,10 @@ NOTHROW(FCALL cfunction_call_impl)(void const *func_address, uintptr_half_t cc,
 	uc.ucs_eip           = (uint32_t)func_address;
 
 	/* TODO: Instead of trying to do the context restore
-	 *       here dynamically, why not do so statically? */
+	 *       here dynamically, why not do so statically?
+	 * - The debugger is single-threaded, so we can use a global state
+	 * - By using a global state, we wouldn't rely on the called function preserving `%ebp'
+	 */
 	TRY {
 		__asm__ __volatile__(".pushsection .text.cold\n"
 		                     ".global __dbx_i386_invoke_cfunction\n"
@@ -254,7 +265,7 @@ NOTHROW(FCALL cfunction_call_impl)(void const *func_address, uintptr_half_t cc,
  * @return: DBX_EFAULT:  Unhandled exception while trying to execute the function.
  * @return: DBX_EINTERN: Function calling is not implemented for the architecture. */
 PUBLIC NONNULL((4, 5)) dbx_errno_t
-NOTHROW(FCALL cfunction_call)(void const *func_address, uintptr_half_t cc,
+NOTHROW(KCALL cfunction_call)(void const *func_address, uintptr_half_t cc,
                               size_t argc, struct cvalue *argv,
                               struct ctype *__restrict return_type,
                               void *__restrict return_buf) {

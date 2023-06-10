@@ -1494,11 +1494,11 @@ err:
 		ssize_t result;
 		struct ctype pointer_type;
 		struct ctyperef pointer_typeref;
-		pointer_type.ct_refcnt   = 0;
-		pointer_type.ct_kind     = CTYPE_KIND_PTR;
-		pointer_type.ct_children = NULL;
+		pointer_type.ct_refcnt = 0;
+		pointer_type.ct_kind   = CTYPE_KIND_PTR;
+		SLIST_INIT(&pointer_type.ct_children);
 		memcpy(&pointer_type.ct_pointer.cp_base, self, sizeof(struct ctyperef));
-		pointer_type.ct_pointer._cp_sib = NULL;
+		bzero(&pointer_type.ct_pointer._cp_sib, sizeof(pointer_type.ct_pointer._cp_sib));
 		bzero(&pointer_typeref, sizeof(pointer_typeref));
 		pointer_typeref.ct_typ = &pointer_type;
 		/* Print the function object at `ptr' as a pointer-to-function. */

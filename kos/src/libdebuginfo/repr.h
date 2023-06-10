@@ -136,9 +136,7 @@ INTDEF NONNULL((1, 3)) ssize_t CC
 libdl_debug_repr_cfi_expression(pformatprinter printer, void *arg,
                                 byte_t const *__restrict expr, size_t indent,
                                 byte_t addrsize, byte_t ptrsize);
-
 #endif /* __KERNEL__ */
-
 
 DECL_END
 

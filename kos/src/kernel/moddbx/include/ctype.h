@@ -31,6 +31,7 @@
 #include <kernel/types.h>
 
 #include <hybrid/host.h>
+#include <hybrid/sequence/list.h>
 #include <hybrid/typecore.h>
 
 #include <compat/config.h>
@@ -146,8 +147,8 @@ DECL_BEGIN
 #define CTYPEREF_FLAG_RESTRICT 0x0008 /* `__restrict' */
 #if defined(__x86_64__) || defined(__i386__)
 #define CTYPEREF_FLAG_SEGMASK  0xc000
-#define CTYPEREF_FLAG_SEG_FS   0x4000
-#define CTYPEREF_FLAG_SEG_GS   0x8000
+#define CTYPEREF_FLAG_SEG_FS   0x4000 /* `__seg_fs' */
+#define CTYPEREF_FLAG_SEG_GS   0x8000 /* `__seg_gs' */
 #endif /* __x86_64__ || __i386__ */
 
 struct ctype;
@@ -188,11 +189,11 @@ struct ctyperef {
 	((a)->ct_flags == (b)->ct_flags &&        \
 	 ctypeinfo_equal(&(a)->ct_info, &(b)->ct_info))
 
-
+SLIST_HEAD(ctype_slist, ctype);
 struct ctype {
-	uintptr_half_t ct_refcnt;   /* Reference counter. */
-	uintptr_half_t ct_kind;     /* The kind of type (one of `CTYPE_KIND_*'). */
-	struct ctype  *ct_children; /* [0..1] Derived types (all of these have `CTYPE_KIND_HASSIBLING()') */
+	uintptr_half_t     ct_refcnt;   /* Reference counter. */
+	uintptr_half_t     ct_kind;     /* The kind of type (one of `CTYPE_KIND_*'). */
+	struct ctype_slist ct_children; /* [0..n] Derived types (all of these have `CTYPE_KIND_HASSIBLING()') */
 	union {
 		struct cmoduledip ct_enum; /* [valid_if(CTYPE_KIND_ISENUM)] Enum information. Points just past
 		                            * the  `DW_TAG_enumeration_type' tag of the surrounding enumerator
@@ -206,24 +207,24 @@ struct ctype {
 		} ct_struct; /* [valid_if(CTYPE_KIND_ISSTRUCT)] */
 
 		struct {
-			struct ctype     *ct_sibling; /* [0..1][valid_if(CTYPE_KIND_HASSIBLING)] Sibling type */
-			REF struct ctype *ct_parent;  /* [0..1][valid_if(CTYPE_KIND_HASSIBLING)] Parent type */
+			SLIST_ENTRY(ctype) ct_sibling; /* [0..1][valid_if(CTYPE_KIND_HASSIBLING)] Sibling type */
+			REF struct ctype  *ct_parent;  /* [0..1][valid_if(CTYPE_KIND_HASSIBLING)] Parent type */
 		};
 
 		struct {
-			struct ctype   *_cp_sib; /* [0..1] Sibling type */
-			struct ctyperef cp_base; /* Pointed-to type (and const/volatile flags) */
-		} ct_pointer;                /* [valid_if(CTYPE_KIND_ISPOINTER)] */
+			SLIST_ENTRY(ctype) _cp_sib; /* [0..1] Sibling type */
+			struct ctyperef    cp_base; /* Pointed-to type (and const/volatile flags) */
+		} ct_pointer;                   /* [valid_if(CTYPE_KIND_ISPOINTER)] */
 
 		struct {
-			struct ctype     *_ca_sib;     /* [0..1] Sibling type */
-			REF struct ctype *ca_elem;     /* Element type. */
-			struct ctypeinfo  ca_eleminfo; /* Element information. */
-			size_t            ca_count;    /* Element count. (or `0' for flexible arrays) */
-		} ct_array;                        /* [valid_if(CTYPE_KIND_ARRAY)] */
+			SLIST_ENTRY(ctype) _ca_sib;     /* [0..1] Sibling type */
+			REF struct ctype  *ca_elem;     /* Element type. */
+			struct ctypeinfo   ca_eleminfo; /* Element information. */
+			size_t             ca_count;    /* Element count. (or `0' for flexible arrays) */
+		} ct_array;                         /* [valid_if(CTYPE_KIND_ARRAY)] */
 
 		struct {
-			struct ctype                            *_cf_sib;  /* [0..1] Sibling type */
+			SLIST_ENTRY(ctype)                       _cf_sib;  /* [0..1] Sibling type */
 			struct ctyperef                          cf_base;  /* Return-type */
 			size_t                                   cf_argc;  /* Argument count. */
 			COMPILER_FLEXIBLE_ARRAY(struct ctyperef, cf_argv); /* [1..1][cfp_argc] Argument vector. */
@@ -231,9 +232,8 @@ struct ctype {
 	};
 };
 
-#define ctype_addchild(self, child)                   \
-	(void)((child)->ct_sibling = (self)->ct_children, \
-	       (self)->ct_children = (child))
+#define ctype_addchild(self, child) \
+	SLIST_INSERT_HEAD(&(self)->ct_children, child, ct_sibling)
 
 
 /* Destroy the given C-type. */
@@ -244,19 +244,19 @@ __DEFINE_NONATOMIC_REFCNT_FUNCTIONS(struct ctype, ct_refcnt, ctype_destroy)
 
 /* Return the pointer-version of the given C-type
  * @param: flags: Type-reference-flags (set of `CTYPEREF_FLAG_*') */
-FUNDEF NONNULL((1)) REF struct ctype *
+FUNDEF WUNUSED NONNULL((1)) REF struct ctype *
 NOTHROW(FCALL ctype_ptr)(struct ctyperef const *__restrict self,
                          size_t sizeof_pointer);
 
 /* Return  the   array-version  of   the  given   C-type
  * NOTE: The returned type must inherit `self->ct_flags'
  * @param: flags: Type-reference-flags (set of `CTYPEREF_FLAG_*') */
-FUNDEF NONNULL((1)) REF struct ctype *
+FUNDEF WUNUSED NONNULL((1)) REF struct ctype *
 NOTHROW(FCALL ctype_array)(struct ctyperef const *__restrict self,
                            size_t elem_count);
 
 /* Return a function-type C-type. */
-FUNDEF NONNULL((1)) REF struct ctype *
+FUNDEF WUNUSED NONNULL((1)) REF struct ctype *
 NOTHROW(FCALL ctype_function)(struct ctyperef const *return_type, size_t argc,
                               struct ctyperef const *argv, uint16_t cc);
 
@@ -265,7 +265,7 @@ FUNDEF ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW(FCALL ctype_sizeof)(struct ctype const *__restrict self);
 
 /* Check if 2 given C-types are equal. */
-FUNDEF ATTR_PURE NONNULL((1, 2)) __BOOL
+FUNDEF ATTR_PURE WUNUSED NONNULL((1, 2)) __BOOL
 NOTHROW(FCALL ctype_equal)(struct ctype const *a,
                            struct ctype const *b);
 
@@ -284,7 +284,7 @@ FUNDEF WUNUSED REF struct ctype *
 NOTHROW(FCALL ctype_for_register)(cpu_regno_t regno, size_t buflen);
 
 struct ctypeenumname {
-	char const           *en_name;    /* [1..1] Name of the enum. */
+	char const         *en_name;    /* [1..1] Name of the enum. */
 	REF struct cmodule *en_nameref; /* [1..1] Module reference for keeping `en_name' alive. */
 };
 #define ctypeenumname_fini(self) decref((self)->en_nameref)
