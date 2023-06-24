@@ -410,8 +410,8 @@ DECL_BEGIN
 
 
 /* High-level implementation for the `clone(2)' system call.
- * @param: init_state: The CPU state of the thead that called `clone(2)'
- *                     Pass   `NULL'  to  spawn  a  new  kernel  thread.
+ * @param: init_state: The CPU state of the thread that called `clone(2)'
+ *                     Pass   `NULL'  to  spawn   a  new  kernel  thread.
  * @param: args:       Clone arguments. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((2)) REF struct task *FCALL
 task_clone(struct icpustate const *init_state,

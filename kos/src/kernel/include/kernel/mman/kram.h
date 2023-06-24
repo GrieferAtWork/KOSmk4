@@ -47,7 +47,7 @@ typedef unsigned int gfp_t;
 
 #define GFP_MAP_FIXED        0x0010 /* Map new kernel ram at exactly the given address.
                                      * If the given address is already in-use, fail  by
-                                     * unconditionally returning `MAP_FAILED' */
+                                     * unconditionally returning `MAP_INUSE' */
 #define GFP_MAP_32BIT        0x0040 /* The  backing  _physical_  memory  will  use  32-bit  addresses.
                                      * This differs from the normal meaning of the `MAP_32BIT' flag!!! */
 #define GFP_MAP_PREPARED     0x0080 /* Set the `MNODE_F_MPREPARED'  node flag,  and ensure  that
@@ -68,7 +68,7 @@ typedef unsigned int gfp_t;
 
 
 /* @param: flags: Set of:
- *   - GFP_LOCKED:       Normal behavior
+ *   - GFP_LOCKED:       Usual behavior
  *   - GFP_PREFLT:       Prefault everything
  *   - GFP_CALLOC:       Allocate from `mfile_zero' instead of `mfile_ndef'
  *   - GFP_ATOMIC:       Don't block when waiting to acquire any sort of lock.
@@ -84,7 +84,7 @@ typedef unsigned int gfp_t;
  *   - GFP_MAP_32BIT:    Allocate   32-bit  physical  memory  addresses.  This  flag
  *                       should be combined with `GFP_LOCKED' to prevent the backing
  *                       physical memory  from being  altered (and  thus having  its
- *                       physical location altered).
+ *                       physical location changed).
  *   - GFP_MAP_PREPARED: Ensure that all mapped pages are prepared, and left as such
  *   - GFP_MAP_BELOW:    s.a. `MAP_GROWSDOWN'
  *   - GFP_MAP_ABOVE:    s.a. `MAP_GROWSUP'
@@ -98,8 +98,8 @@ typedef unsigned int gfp_t;
  *     other calls to kmalloc() that may need to be made internally.
  * Returned memory will be initialized as:
  *   - GFP_CALLOC: All zero-initialized
- *   - else:       #ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP: DEBUGHEAP_FRESH_MEMORY
- *                 #ifndef       CONFIG_HAVE_KERNEL_DEBUG_HEAP:       Undefined
+ *   - else:       - #ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP: DEBUGHEAP_FRESH_MEMORY
+ *                 - #ifndef CONFIG_HAVE_KERNEL_DEBUG_HEAP: Undefined
  *
  * @param: hint:          Hint  for  where  the  mapping  should  go.  This  argument is
  *                        passed  onto  `mman_findunmapped()',  alongside  certain  bits

@@ -70,6 +70,15 @@
 #define __DECL_END }
 #define __SYSDECL_END }
 
+#define __pragma_GCC_diagnostic_push
+#define __pragma_GCC_diagnostic_pop
+#define __pragma_GCC_diagnostic_ignored(name)
+#define __pragma_GCC_diagnostic_push_ignored(name)
+#define __pragma_GCC_diagnostic_pop_ignored(name)
+#define __pragma_MSVC_diagnostic_ignored
+#define __pragma_MSVC_diagnostic_push_ignored
+#define __pragma_MSVC_diagnostic_pop_ignored(ids)
+
 #define __BOOL       bool
 #define __LONGLONG   long long
 #define __ULONGLONG  unsigned long long
@@ -85,8 +94,8 @@
 
 #define __P(x) x
 #define __builtin_va_list va_list
-#define DFL(x) = x
-#define __DFL(x) = x
+#define DFL(x) =x
+#define __DFL(x) =x
 #define COMPILER_FLEXIBLE_ARRAY(T,n) T n[]
 #define __COMPILER_FLEXIBLE_ARRAY(T,n) T n[]
 #define ASMNAME(x)

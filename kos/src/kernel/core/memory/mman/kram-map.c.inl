@@ -50,7 +50,7 @@ DECL_BEGIN
 
 #ifdef DEFINE_mman_map_kram
 /* @param: flags: Set of:
- *   - GFP_LOCKED:       Normal behavior
+ *   - GFP_LOCKED:       Usual behavior
  *   - GFP_PREFLT:       Prefault everything
  *   - GFP_CALLOC:       Allocate from `mfile_zero' instead of `mfile_ndef'
  *   - GFP_ATOMIC:       Don't block when waiting to acquire any sort of lock.
@@ -66,7 +66,7 @@ DECL_BEGIN
  *   - GFP_MAP_32BIT:    Allocate   32-bit  physical  memory  addresses.  This  flag
  *                       should be combined with `GFP_LOCKED' to prevent the backing
  *                       physical memory  from being  altered (and  thus having  its
- *                       physical location altered).
+ *                       physical location changed).
  *   - GFP_MAP_PREPARED: Ensure that all mapped pages are prepared, and left as such
  *   - GFP_MAP_BELOW:    s.a. `MAP_GROWSDOWN'
  *   - GFP_MAP_ABOVE:    s.a. `MAP_GROWSUP'
@@ -80,8 +80,8 @@ DECL_BEGIN
  *     other calls to kmalloc() that may need to be made internally.
  * Returned memory will be initialized as:
  *   - GFP_CALLOC: All zero-initialized
- *   - else:       #ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP: DEBUGHEAP_FRESH_MEMORY
- *                 #ifndef       CONFIG_HAVE_KERNEL_DEBUG_HEAP:       Undefined
+ *   - else:       - #ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP: DEBUGHEAP_FRESH_MEMORY
+ *                 - #ifndef CONFIG_HAVE_KERNEL_DEBUG_HEAP: Undefined
  *
  * @param: hint:          Hint  for  where  the  mapping  should  go.  This  argument is
  *                        passed  onto  `mman_findunmapped()',  alongside  certain  bits
@@ -207,16 +207,13 @@ again_lock_mman:
 			if (existing_node != NULL) {
 				/* Address range is already in use. */
 				mman_lock_release(&mman_kernel);
+
 				/* Unconditionally return MAP_INUSE. */
-#ifdef LOCAL_NX
-				goto err;
-#else /* LOCAL_NX */
 				if unlikely(node != NULL)
 					mnode_free(node);
 				if unlikely(part != NULL)
 					kram_part_destroy(part);
 				return MAP_INUSE;
-#endif /* !LOCAL_NX */
 			}
 		} else {
 			if unlikely(hint == NULL) {
@@ -245,7 +242,6 @@ again_lock_mman:
 		if unlikely(!pagedir_prepare(result, num_bytes))
 			goto err_nophys_for_backing;
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-
 
 		/* Check if we may be able to extend a pre-existing node. */
 		if (!(flags & GFP_MAP_NOMERGE)) {
@@ -441,6 +437,7 @@ LOCAL_IFNX(err_physmem:)
 					kram_freevec(vec.ms_v, vec.ms_c);
 					LOCAL_IFELSE_NX(RETHROW(), goto err);
 				}
+
 				/* Try to release unused memory */
 				{
 					struct mchunk *smvec;
@@ -450,6 +447,7 @@ LOCAL_IFNX(err_physmem:)
 					if likely(smvec)
 						vec.ms_v = smvec;
 				}
+
 				/* Write-back the backing physical memory */
 				part->mp_state  = MPART_ST_MEM_SC;
 				part->mp_mem_sc = vec;
@@ -542,6 +540,7 @@ do_prefault:
 				part->mp_file = &mfile_ndef;
 #endif /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 			}
+
 			/* To ensure atomic initialization without prefaulting, we must
 			 * set-up the  new node/part  pair as  a page  directory  hint. */
 			node->mn_flags |= MNODE_F_MHINT;

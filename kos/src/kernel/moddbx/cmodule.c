@@ -3032,7 +3032,7 @@ done_attributes:
 	;
 }
 
-/* Return non-zero if the name of the given `sym' starts with the given name. */
+/* Return non-zero if the name of the given `sym' starts with the given string. */
 #define cmodsym_name_startswith(sym, mod, startswith_name, startswith_namelen) \
 	(strstartcmpz(cmodsym_name(sym, mod), startswith_name, startswith_namelen) == 0)
 

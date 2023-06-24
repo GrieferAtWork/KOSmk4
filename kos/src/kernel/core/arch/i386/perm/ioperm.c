@@ -57,6 +57,62 @@ iob_maskbyte(byte_t *pbyte, u8 byte_mask, u8 byte_flag) {
 		 * >> [2022-12-13T10:14:18.841998792:trace ][6] sys32_ioperm(from: 1016, num: 1, turn_on: 0)
 		 * >> [2022-12-13T10:14:18.842094932:debug ][6][segfault] Fault at FFFFFFFF8097E07F (page FFFFFFFF8097E000) [pc=FFFFFFFF803D94C6,FFFFFFFF803D94CA] [ecode=0x3]
 		 * >> [2022-12-13T10:14:18.844260930:trace ][6][except] Translate exception 0xff0e:0x2,E_SEGFAULT_READONLY[0xffffffff8097e07f,0x3] into errno=-EFAULT
+		 * And another:
+		 * [2023-06-15T14:55:29.925834392:trace ][17][test:ioperm_works_correctly] kos/src/apps/system-test/test-ioperm.c:57
+		 * [2023-06-15T14:55:29.925991577:trace ][17] sys_write(fd: STDOUT_FILENO, buf: "test:ioperm_works_correctly\e[K\n", bufsize: 31)
+		 * [2023-06-15T14:55:29.927792212:trace ][17][except] Propagate exception 0xff06:0x3,E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE[0x6e,0x40,0x3f8,0x1] hand:[pc=E0486A9,sp=7FFFFEB0] orig:[pc=806D104,sp=7FFFFF00] fault:[pc=806D102] [mode=0x4003]
+		 * [2023-06-15T14:55:29.928091442:trace ][17] sys_Xarch_prctl(command: ARCH_GET_GS, addr: 0x7ffffcc8)
+		 * [2023-06-15T14:55:29.929845315:trace ][17][rtld] Lazy resolve "except_nesting_begin" in "/lib/libunwind.so" (to 0E0CBBEB from "/lib/libc.so")
+		 * [2023-06-15T14:55:29.930036182:trace ][17][rtld] Lazy resolve "except_nesting_end" in "/lib/libunwind.so" (to 0E0CBC88 from "/lib/libc.so")
+		 * [2023-06-15T14:55:29.930826719:trace ][17][rtld] Lazy resolve "except_code" in "/bin/system-test" (to 0E048DE4 from "/lib/libc.so")
+		 * [2023-06-15T14:55:29.931008164:trace ][17][rtld] Lazy resolve "iopl" in "/bin/system-test" (to 0E0901D1 from "/lib/libc.so")
+		 * [2023-06-15T14:55:29.931178481:trace ][17] sys_iopl(level: 3)
+		 *
+		 * HELLO QEMU DEBUG PORT
+		 * HELLO QEMU DEBUG PORT
+		 * HELLO QEMU DEBUG PORT
+		 *
+		 * [2023-06-15T14:55:29.931411051:trace ][17] sys_iopl(level: 0)
+		 * [2023-06-15T14:55:29.931514504:trace ][17][except] Propagate exception 0xff06:0x3,E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE[0x6e,0x40,0x3f8,0x1] hand:[pc=E0486A9,sp=7FFFFEB0] orig:[pc=806D104,sp=7FFFFF00] fault:[pc=806D102] [mode=0x4003]
+		 * [2023-06-15T14:55:29.931806719:trace ][17] sys_Xarch_prctl(command: ARCH_GET_GS, addr: 0x7ffffcc8)
+		 * [2023-06-15T14:55:29.931947965:trace ][17][rtld] Lazy resolve "ioperm" in "/bin/system-test" (to 0E09014F from "/lib/libc.so")
+		 * [2023-06-15T14:55:29.932123595:trace ][17] sys_ioperm(from: 1016, num: 1, turn_on: 1)
+		 * [2023-06-15T14:55:29.932479267:debug ][17][segfault] Fault at C091507F (page C0915000) [pc=C03704C9,C03704CD] [ecode=0x3]
+		 * [2023-06-15T14:55:29.933688395:trace ][17][except] Translate exception 0xff0e:0x2,E_SEGFAULT_READONLY[0xc091507f,0x3] into errno=-EFAULT
+		 * [2023-06-15T14:55:29.933877659:trace ][17][rtld] Lazy resolve "__afailf" in "/bin/system-test" (to 0E09308B from "/lib/libc.so")
+		 * [2023-06-15T14:55:29.943122200:trace ][17] sys_ioctl(fd: STDERR_FILENO, command: TCGETA, arg: 7FFFF294)
+		 * [2023-06-15T14:55:29.943319182:trace ][17] sys_write(fd: STDERR_FILENO, buf: "Assertion Failure [pc=", bufsize: 22)
+		 * [2023-06-15T14:55:29.943488999:trace ][17] sys_write(fd: STDERR_FILENO, buf: "0", bufsize: 1)
+		 * [2023-06-15T14:55:29.943670744:trace ][17] sys_write(fd: STDERR_FILENO, buf: "806D285", bufsize: 7)
+		 * [2023-06-15T14:55:29.943786527:trace ][17] sys_write(fd: STDERR_FILENO, buf: "]\n", bufsize: 2)
+		 * [2023-06-15T14:55:29.943475165:error ][17] Assertion Failure [pc=0806D285]
+		 * [2023-06-15T14:55:29.944591700:trace ][17] sys_write(fd: STDERR_FILENO, buf: "kos/src/apps/system-test/test-ioperm.c", bufsize: 38)
+		 * [2023-06-15T14:55:29.944859556:trace ][17] sys_write(fd: STDERR_FILENO, buf: "(", bufsize: 1)
+		 * [2023-06-15T14:55:29.944982758:trace ][17] sys_write(fd: STDERR_FILENO, buf: "82", bufsize: 2)
+		 * [2023-06-15T14:55:29.945152675:trace ][17] sys_write(fd: STDERR_FILENO, buf: ") : ", bufsize: 4)
+		 * [2023-06-15T14:55:29.945370107:trace ][17] sys_write(fd: STDERR_FILENO, buf: "test_ioperm_works_correctly", bufsize: 27)
+		 * [2023-06-15T14:55:29.945624230:trace ][17] sys_write(fd: STDERR_FILENO, buf: " : ", bufsize: 3)
+		 * [2023-06-15T14:55:29.945762268:trace ][17] sys_write(fd: STDERR_FILENO, buf: "0 == ioperm(portno, 1, 1)", bufsize: 25)
+		 * [2023-06-15T14:55:29.945955441:trace ][17] sys_write(fd: STDERR_FILENO, buf: "\n", bufsize: 1)
+		 * [2023-06-15T14:55:29.944845923:error ][17] kos/src/apps/system-test/test-ioperm.c(82) : test_ioperm_works_correctly : 0 == ioperm(portno, 1, 1)
+		 * [2023-06-15T14:55:29.946817554:trace ][17] sys_write(fd: STDERR_FILENO, buf: "0 == -1\n", bufsize: 8)
+		 * [2023-06-15T14:55:29.947475465:error ][17] 0 == -1
+		 * [2023-06-15T14:55:29.947560273:trace ][17] sys_coredump(curr_state: 7FFFF620, orig_state: 00000000, traceback_vector: 00000000, traceback_length: 0, reason: 7FFFF6AC, unwind_error: 00000045)
+		 * [2023-06-15T14:55:29.948698562:error ][17][coredump] Creating coredump...
+		 * assert.expr: "0 == ioperm(portno, 1, 1)"
+		 * assert.file: "kos/src/apps/system-test/test-ioperm.c"
+		 * assert.line: 82
+		 * assert.func: "test_ioperm_works_correctly"
+		 * assert.mesg: "0 == -1"
+		 * 806D285 [test-ioperm.c:83,7:test_ioperm_works_correctly] orig_ustate
+		 * Coredump /bin/system-test tid:17
+		 * assert.expr: "0 == ioperm(portno, 1, 1)"
+		 * assert.file: "kos/src/apps/system-test/test-ioperm.c"
+		 * assert.line: 82
+		 * assert.func: "test_ioperm_works_correctly"
+		 * assert.mesg: "0 == -1"
+		 * E:\c\kls\kos\kos\src\apps\system-test\test-ioperm.c(83,7) : 0806D285+5[/bin/system-test][test_ioperm_works_correctly+366] [orig_ustate]
+		 * > [2023-06-15T14:55:31.463858083:trace ][17][sched] Exiting thread E2016DE4
 		 */
 	} while (!atomic_cmpxch_weak(pbyte, oldval, (oldval & byte_mask) | byte_flag));
 }

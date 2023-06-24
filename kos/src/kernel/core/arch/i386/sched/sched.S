@@ -557,8 +557,6 @@ INTERN_FUNCTION(arch_sched_super_override_ipi)
 	jmp    libcpu_apply_scpustate_Psp
 	.cfi_endproc
 END(arch_sched_super_override_ipi)
-
-
 #endif /* !CONFIG_NO_SMP */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_SCHED_S */

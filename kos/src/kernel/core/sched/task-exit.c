@@ -96,9 +96,10 @@ NOTHROW(FCALL maybe_clear_tid_address)(struct task *__restrict caller) {
 		write_once(addr, 0);
 		mman_broadcastfutex(addr);
 	} EXCEPT {
-		/* Explicitly handle E_SEGFAULT:addr as a no-op */
-		if (!was_thrown(E_SEGFAULT) ||
-		    PERTASK_NE(this_exception_args.e_segfault.s_addr, (uintptr_t)addr)) {
+		if (was_thrown(E_SEGFAULT) &&
+		    PERTASK_EQ(this_exception_args.e_segfault.s_addr, (uintptr_t)addr)) {
+			/* Explicitly handle E_SEGFAULT:addr as a no-op */
+		} else {
 			/* We  can't RETHROW() the  exception since our function
 			 * has to be NOTHROW() (especially so since we're called
 			 * as part of thread cleanup)
@@ -321,8 +322,8 @@ NOTHROW(FCALL task_exit)(uint16_t w_status) {
 	terminate_pending_rpcs(caller);
 
 	if (taskpid_isaprocess(pid)) {
-		/* Propagate exit status to child threads, and
-		 * reparent all child process onto  /bin/init. */
+		/* Propagate  exit status to child threads, and
+		 * reparent all child processes onto /bin/init. */
 		struct procctl *ctl = pid->tp_pctl;
 		REF struct procgrp *grp;
 
@@ -340,7 +341,7 @@ NOTHROW(FCALL task_exit)(uint16_t w_status) {
 		/* NOTE: As per the requirements, we're allowed to assume  that
 		 *       no-one is allowed to still be adding additional  items
 		 *       to `ctl->pc_chlds_list' (because we, as the associated
-		 *       process have the TASK_FTERMINATING flag set). */
+		 *       process, have the TASK_FTERMINATING flag set). */
 again_process_children:
 		assert(PREEMPTION_ENABLED());
 		procctl_chlds_write(ctl); /* Never throws because preemption is enabled */
@@ -420,8 +421,10 @@ again_get_ctty:
 			ctty = axref_get(&session->ps_ctty);
 			if (ctty) {
 				bool ok;
+
 				/* Clear the controlling process group field */
 				awref_cmpxch(&ctty->t_cproc, grp, NULL);
+
 				/* If the foreground process group is part of
 				 * our  session,  clear that  field  as well. */
 				for (;;) {
@@ -436,6 +439,7 @@ again_get_ctty:
 					if (ok)
 						break;
 				}
+
 				/* Clear the session's CTTY reference. */
 				ok = axref_cmpxch(&session->ps_ctty, ctty, NULL);
 				decref_unlikely(ctty);
@@ -468,10 +472,11 @@ again_get_ctty:
 	assertf(FORCPU(mycpu, thiscpu_sched_override) != caller, "Cannot exit while being the scheduling override");
 	assertf(caller != &FORCPU(mycpu, thiscpu_idle), "The IDLE task cannot be terminated");
 
-#ifdef CONFIG_HAVE_FPU
 	/* Unset the  calling thread  potentially holding  the FPU  state.
 	 * Since the task will go away, we don't actually have to save it. */
-	atomic_cmpxch(&FORCPU(mycpu, thiscpu_fputhread), caller, NULL);
+#ifdef CONFIG_HAVE_FPU
+	if (FORCPU(mycpu, thiscpu_fputhread) == caller)
+		FORCPU(mycpu, thiscpu_fputhread) = NULL;
 #endif /* CONFIG_HAVE_FPU */
 
 	/* Account for timings and scheduler internals, as well as figure out a successor thread. */
@@ -519,6 +524,7 @@ again_get_ctty:
 			};
 			old_flags = atomic_read(&caller->t_flags);
 			new_flags = old_flags;
+
 			/* While this was already checked for above, some other thread may have set this
 			 * flag in the mean time (though doing  something like that would be really  bad
 			 * practice). In any case: properly handle the CRITICAL-flag until the very end,
