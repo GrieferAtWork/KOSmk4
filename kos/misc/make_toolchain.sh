@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Update VS project files"
-DEEMON_VERSION="a9e735389a3c4ca10c2a48953c1bf721c4e900ab"
+#     v -- "Cleanup & minor improvements"
+DEEMON_VERSION="fbaca8329cf4936f59d1c4d8bafcf79e10649d72"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
