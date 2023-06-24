@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea057195 */
+/* HASH CRC-32:0xf9784b71 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -609,6 +609,7 @@ __NAMESPACE_STD_USING(islessgreater)
 
 /* Math constants (`_USE_MATH_DEFINES' is the DOS feature macro to expose these) */
 #if defined(__USE_MISC) || defined(__USE_XOPEN) || defined(_USE_MATH_DEFINES)
+#ifndef M_E
 #define M_E        2.7182818284590452354  /* e */
 #define M_LOG2E    1.4426950408889634074  /* log_2 e */
 #define M_LOG10E   0.43429448190325182765 /* log_10 e */
@@ -622,10 +623,12 @@ __NAMESPACE_STD_USING(islessgreater)
 #define M_2_SQRTPI 1.12837916709551257390 /* 2/sqrt(pi) */
 #define M_SQRT2    1.41421356237309504880 /* sqrt(2) */
 #define M_SQRT1_2  0.70710678118654752440 /* 1/sqrt(2) */
+#endif /* !M_E */
 #endif /* __USE_MISC || __USE_XOPEN || _USE_MATH_DEFINES */
 
 /* Math constants with long-double precision. */
 #if defined(__USE_GNU) && defined(__COMPILER_HAVE_LONGDOUBLE)
+#ifndef M_El
 #define M_El        2.718281828459045235360287471352662498L /* e */
 #define M_LOG2El    1.442695040888963407359924681001892137L /* log_2 e */
 #define M_LOG10El   0.434294481903251827651128918916605082L /* log_10 e */
@@ -639,6 +642,7 @@ __NAMESPACE_STD_USING(islessgreater)
 #define M_2_SQRTPIl 1.128379167095512573896158903121545172L /* 2/sqrt(pi) */
 #define M_SQRT2l    1.414213562373095048801688724209698079L /* sqrt(2) */
 #define M_SQRT1_2l  0.707106781186547524400844362104849039L /* 1/sqrt(2) */
+#endif /* !M_El */
 #endif /* __USE_GNU && __COMPILER_HAVE_LONGDOUBLE */
 
 

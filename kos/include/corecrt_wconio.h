@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2a883c1 */
+/* HASH CRC-32:0x49746ee8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,6 +44,16 @@
 
 #ifdef __CC__
 __SYSDECL_BEGIN
+
+#ifndef __wint_t_defined
+#define __wint_t_defined
+typedef __WINT_TYPE__ wint_t;
+#endif /* !__wint_t_defined */
+
+#ifndef __wchar_t_defined
+#define __wchar_t_defined
+typedef __WCHAR_TYPE__ wchar_t;
+#endif /* !__wchar_t_defined */
 
 #ifndef __size_t_defined
 #define __size_t_defined

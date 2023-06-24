@@ -56,6 +56,11 @@ typedef __errno_t errno_t;
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
 
+#ifndef __wchar_t_defined
+#define __wchar_t_defined
+typedef __WCHAR_TYPE__ wchar_t;
+#endif /* !__wchar_t_defined */
+
 }
 
 [[wchar, wunused, requires_function(_wasctime_s)]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3feae44f */
+/* HASH CRC-32:0xea8ce856 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,6 +50,11 @@ typedef __errno_t errno_t;
 #define __size_t_defined
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
+
+#ifndef __wchar_t_defined
+#define __wchar_t_defined
+typedef __WCHAR_TYPE__ wchar_t;
+#endif /* !__wchar_t_defined */
 
 #ifdef __CRT_HAVE__wasctime
 __CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),wchar_t *,__NOTHROW_NCX,_wasctime,(struct __NAMESPACE_STD_SYM tm const *__tp),(__tp))

@@ -51,6 +51,16 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifndef __wint_t_defined
+#define __wint_t_defined
+typedef __WINT_TYPE__ wint_t;
+#endif /* !__wint_t_defined */
+
+#ifndef __wchar_t_defined
+#define __wchar_t_defined
+typedef __WCHAR_TYPE__ wchar_t;
+#endif /* !__wchar_t_defined */
+
 #ifndef __size_t_defined
 #define __size_t_defined
 typedef __size_t size_t;
