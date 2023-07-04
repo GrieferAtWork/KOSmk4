@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Cleanup & minor improvements"
-DEEMON_VERSION="fbaca8329cf4936f59d1c4d8bafcf79e10649d72"
+#     v -- "Fix a problem with file operator inheritance"
+DEEMON_VERSION="f331565e974d15d216ae951ec5d7d72f1ca63649"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
