@@ -122,12 +122,13 @@ int _getch_nolock(void) {
 	struct termios oios, nios;
 	FILE *fp = stdtty;
 	fd_t fd  = fileno(fp);
-	tcgetattr(fd, &oios);
+	if unlikely(tcgetattr(fd, &oios) != 0)
+		bzero(&oios, sizeof(oios));
 	memcpy(&nios, &oios, sizeof(nios));
 	nios.@c_lflag@ &= ~__ECHO;
-	tcsetattr(fd, __TCSANOW, &nios);
+	(void)tcsetattr(fd, __TCSANOW, &nios);
 	result = fgetc_unlocked(fp);
-	tcsetattr(fd, __TCSANOW, &oios);
+	(void)tcsetattr(fd, __TCSANOW, &oios);
 	return result;
 }
 
@@ -162,12 +163,13 @@ int _getche_nolock(void) {
 	struct termios oios, nios;
 	FILE *fp = stdtty;
 	fd_t fd  = fileno(fp);
-	tcgetattr(fd, &oios);
+	if unlikely(tcgetattr(fd, &oios) != 0)
+		bzero(&oios, sizeof(oios));
 	memcpy(&nios, &oios, sizeof(nios));
 	nios.@c_lflag@ |= __ECHO;
-	tcsetattr(fd, __TCSANOW, &nios);
+	(void)tcsetattr(fd, __TCSANOW, &nios);
 	result = fgetc_unlocked(fp);
-	tcsetattr(fd, __TCSANOW, &oios);
+	(void)tcsetattr(fd, __TCSANOW, &oios);
 	return result;
 }
 
@@ -585,8 +587,8 @@ void clearkeybuf(void) {
 	fd_t fd  = fileno(fp);
 
 	/* Flush (read: "drain") kernel-space buffer. */
-	tcgetattr(fd, &ios);
-	tcsetattr(fd, __TCSADRAIN, &ios);
+	if likely(tcgetattr(fd, &ios) == 0)
+		(void)tcsetattr(fd, __TCSADRAIN, &ios);
 
 	/* Flush (read: "purge") user-space buffer. */
 	__fpurge(fp);

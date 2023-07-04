@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2fcc9e1 */
+/* HASH CRC-32:0x51186210 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,8 +114,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clearkeybuf))(void) {
 	__fd_t __fd  = (__NAMESPACE_LOCAL_SYM __localdep_fileno)(__fp);
 
 	/* Flush (read: "drain") kernel-space buffer. */
-	(__NAMESPACE_LOCAL_SYM __localdep_tcgetattr)(__fd, &__ios);
-	(__NAMESPACE_LOCAL_SYM __localdep_tcsetattr)(__fd, __TCSADRAIN, &__ios);
+	if __likely((__NAMESPACE_LOCAL_SYM __localdep_tcgetattr)(__fd, &__ios) == 0)
+		(void)(__NAMESPACE_LOCAL_SYM __localdep_tcsetattr)(__fd, __TCSADRAIN, &__ios);
 
 	/* Flush (read: "purge") user-space buffer. */
 	(__NAMESPACE_LOCAL_SYM __localdep___fpurge)(__fp);

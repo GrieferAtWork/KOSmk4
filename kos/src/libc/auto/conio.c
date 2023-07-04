@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb73515e0 */
+/* HASH CRC-32:0x173a603c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,12 +69,13 @@ NOTHROW_NCX(LIBCCALL libc__getch_nolock)(void) {
 	struct termios oios, nios;
 	FILE *fp = stdtty;
 	fd_t fd  = libc_fileno(fp);
-	libc_tcgetattr(fd, &oios);
+	if unlikely(libc_tcgetattr(fd, &oios) != 0)
+		libc_bzero(&oios, sizeof(oios));
 	libc_memcpy(&nios, &oios, sizeof(nios));
 	nios.c_lflag &= ~__ECHO;
-	libc_tcsetattr(fd, __TCSANOW, &nios);
+	(void)libc_tcsetattr(fd, __TCSANOW, &nios);
 	result = libc_fgetc_unlocked(fp);
-	libc_tcsetattr(fd, __TCSANOW, &oios);
+	(void)libc_tcsetattr(fd, __TCSANOW, &oios);
 	return result;
 }
 #include <libc/template/stdtty.h>
@@ -109,12 +110,13 @@ NOTHROW_NCX(LIBCCALL libc__getche_nolock)(void) {
 	struct termios oios, nios;
 	FILE *fp = stdtty;
 	fd_t fd  = libc_fileno(fp);
-	libc_tcgetattr(fd, &oios);
+	if unlikely(libc_tcgetattr(fd, &oios) != 0)
+		libc_bzero(&oios, sizeof(oios));
 	libc_memcpy(&nios, &oios, sizeof(nios));
 	nios.c_lflag |= __ECHO;
-	libc_tcsetattr(fd, __TCSANOW, &nios);
+	(void)libc_tcsetattr(fd, __TCSANOW, &nios);
 	result = libc_fgetc_unlocked(fp);
-	libc_tcsetattr(fd, __TCSANOW, &oios);
+	(void)libc_tcsetattr(fd, __TCSANOW, &oios);
 	return result;
 }
 #include <libc/template/stdtty.h>
@@ -614,8 +616,8 @@ NOTHROW_NCX(LIBCCALL libc_clearkeybuf)(void) {
 	fd_t fd  = libc_fileno(fp);
 
 	/* Flush (read: "drain") kernel-space buffer. */
-	libc_tcgetattr(fd, &ios);
-	libc_tcsetattr(fd, __TCSADRAIN, &ios);
+	if likely(libc_tcgetattr(fd, &ios) == 0)
+		(void)libc_tcsetattr(fd, __TCSADRAIN, &ios);
 
 	/* Flush (read: "purge") user-space buffer. */
 	libc___fpurge(fp);

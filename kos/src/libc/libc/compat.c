@@ -168,7 +168,7 @@ NOTHROW(LIBCCALL libc_stdtty_initialize)(void) {
 		libc_stdttyfile.if_fd = ttyfd;
 #endif /* !AT_FDCTTY */
 
-	/* Initialize global points so they don't require relocations. */
+	/* Initialize FILE pointers so they don't require relocations. */
 	libc_stdttyfile.if_exdata = (struct iofile_data *)&libc_stdttyfile_data;
 	libc_stdtty               = &libc_stdttyfile;
 }
@@ -1357,7 +1357,7 @@ NOTHROW(LIBDCALL libd___initialize_lconv_for_unsigned_char)(void) {
 #define libd_exit libc_exit
 #endif /* __LIBCCALL_IS_LIBDCALL */
 
-PRIVATE ATTR_SECTION(".bss.crt.dos.compat.dos") void (*LIBDCALL libd__aexit_rtn)(int) = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.dos.compat.dos") void (LIBDCALL *libd__aexit_rtn)(int) = NULL;
 DEFINE_PUBLIC_IDATA(DOS$_aexit_rtn, libd___p__aexit_rtn, __SIZEOF_POINTER__);
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos") void *
 NOTHROW(LIBDCALL libd___p__aexit_rtn)(void) {
@@ -1482,11 +1482,9 @@ libd_requirek32(char const *__restrict symbol_name) {
 	void *result = dlsym(libd_getk32(), symbol_name);
 	if (!result) {
 		char *msg = dlerror();
-		if (msg) {
-			syslog(LOG_CRIT, "[libc] Failed to load '%s' from 'libkernel32.so': %s\n",
-			       symbol_name, msg);
-			sys_exit_group(1);
-		}
+		syslog(LOG_CRIT, "[libc] Failed to load '%s' from 'libkernel32.so': %s\n",
+		       symbol_name, msg);
+		sys_exit_group(1);
 	}
 	return result;
 }
