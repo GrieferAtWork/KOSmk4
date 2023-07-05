@@ -49,6 +49,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
+#include <unistd.h>
 
 #include <libdl/tls.h>
 #include <libzlib/error.h>
@@ -318,6 +319,60 @@ again_old_flags:
 		dlglobals_global_endwrite(&dl_globals);
 	}
 }
+
+
+
+/* Function to implement `LD_TRACE_LOADED_OBJECTS' */
+#ifdef HAVE_dl_trace_loaded_objects
+PRIVATE ssize_t FORMATPRINTER_CC
+dl_fd_printer(void *arg, /*utf-8*/ char const *__restrict data, size_t datalen) {
+	fd_t fd = (fd_t)(uintptr_t)arg;
+	ssize_t result = sys_write(fd, data, datalen);
+	while (E_ISOK(result) && (size_t)result < datalen) {
+		ssize_t temp;
+		temp = sys_write(fd, data + (size_t)result,
+		                 datalen - (size_t)result);
+		if unlikely(E_ISERR(temp)) {
+			result = temp;
+			break;
+		}
+		result += (size_t)temp;
+	}
+	return result;
+}
+
+PRIVATE void VCC dl_printf(char const *format, ...) {
+	va_list args;
+	va_start(args, format);
+	format_vprintf(&dl_fd_printer, (void *)(uintptr_t)STDOUT_FILENO, format, args);
+	va_end(args);
+}
+
+#undef PRIdotnP
+#if __SIZEOF_POINTER__ == 4
+#define PRIdotnP ".8"
+#elif __SIZEOF_POINTER__ == 8
+#define PRIdotnP ".16"
+#elif __SIZEOF_POINTER__ == 2
+#define PRIdotnP ".4"
+#elif __SIZEOF_POINTER__ == 1
+#define PRIdotnP ".2"
+#else /* __SIZEOF_POINTER__ == ... */
+#define PRIdotnP ""
+#endif /* __SIZEOF_POINTER__ != ... */
+
+INTERN void CC dl_trace_loaded_objects(void) {
+	DlModule *mod;
+	for (mod = DLIST_LAST(&dl_globals.dg_alllist, dm_modules);
+	     mod != NULL; mod = DLIST_PREV(mod, dm_modules)) {
+		char *filename = mod->dm_filename;
+		char *name     = strrchrnul(filename, '/') + 1;
+		dl_printf("\t%s => %s (%#" PRIdotnP "x)\n",
+		          name, filename, mod->dm_loadstart);
+	}
+	sys_exit_group(0);
+}
+#endif /* HAVE_dl_trace_loaded_objects */
 
 
 /* Lazily load a shared library file, and return a handle to said file.

@@ -29,9 +29,10 @@
 #include <hybrid/compiler.h>
 
 #include <hybrid/host.h>
-#include <hybrid/sequence/list.h>
 #include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sequence/list.h>
 
+#include <asm/redirect.h>
 #include <kos/anno.h>
 #include <kos/except.h>
 #include <kos/exec/elf-rel.h> /* ELF_ARCH_*_R_* */
@@ -791,6 +792,11 @@ INTDEF struct dlmodule_format *dl_extensions;
 INTDEF ATTR_RETNONNULL WUNUSED struct dlcore_ops *NOTHROW(CC dl_getcoreops)(void);
 
 
+#if __ARCH_REDIRECT_MAXBYTES != 0
+/* Function to implement `LD_TRACE_LOADED_OBJECTS' */
+INTDEF void CC dl_trace_loaded_objects(void);
+#define HAVE_dl_trace_loaded_objects
+#endif /* __ARCH_REDIRECT_MAXBYTES != 0 */
 
 DECL_END
 

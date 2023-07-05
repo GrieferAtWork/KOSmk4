@@ -36,6 +36,7 @@
 #include <kos/syscalls.h>
 #include <linux/prctl.h>
 #include <sys/ioctl.h>
+#include <sys/mman.h>
 
 #include <malloc.h>
 #include <pty.h>
@@ -173,6 +174,21 @@ PRIVATE NONNULL((1)) void FCALL dl_loadenv(char **envp) {
 			/* Enable direct binding when `LD_BIND_NOW' is defined as non-empty */
 			if (*value != '\0')
 				dl_globals.dg_flags |= DLGLOBALS_FLAG_BIND_NOW;
+		} else
+#ifdef HAVE_dl_trace_loaded_objects
+		if (ISENV("TRACE_LOADED_OBJECTS")) {
+			/* We do this one really dirtily by modifying out own code (so we don't
+			 * need any sort of branch or check in order to dump the list of loaded
+			 * libraries instead of initializing any of them) */
+			sys_Xmprotect((void *)&DlModule_RunAllStaticInitializers,
+			              __ARCH_REDIRECT_MAXBYTES,
+			              PROT_READ | PROT_WRITE | PROT_EXEC);
+			__arch_redirect((void *)&DlModule_RunAllStaticInitializers,
+			                (void *)&dl_trace_loaded_objects);
+		} else
+#endif /* HAVE_dl_trace_loaded_objects */
+		{
+			/* Unsupported LD_-option */
 		}
 #undef ISENV
 	}

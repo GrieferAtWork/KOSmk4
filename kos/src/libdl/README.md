@@ -18,9 +18,12 @@
 				- ... `DT_BIND_NOW` appears in the `.dynamic` section of a module
 				- ... `DF_BIND_NOW` is set in `DT_FLAGS` in `.dynamic`
 				- ... `RTLD_NOW` is passed to `dlopen(3D)` (as opposed to `RTLD_LAZY`)
+		- `LD_PRELOAD`
+			- Inject extra library dependencies that will be loaded as though they were extra dependencies of the main program (injected before all other (normal) dependencies of the main program)
+		- `LD_TRACE_LOADED_OBJECTS`
+			- Rather than initialize loaded library and call `main()`, dump names of loaded modules in load-order (`ldd(1)`-style)
 	- Unsupported LD environment variables (with no intention of support being added)
 		- `LD_SHOW_AUXV`
-		- `LD_TRACE_LOADED_OBJECTS`
 		- `LD_AOUT_LIBRARY_PATH` / `LD_ELF_LIBRARY_PATH`
 		- `LD_AOUT_PRELOAD` / `LD_ELF_PRELOAD`
 	- Other environment variables may become supported/unsupported in the future at my discretion
