@@ -121,9 +121,11 @@ INTERN DlModule dl_rtld_module = {
 
 /* libdl global variables (as also shared with extension drivers) */
 INTERN struct dlglobals dl_globals = {
-	.dg_peb              = NULL, /* Initialized in `linker_main()' */
-	.dg_libpath          = NULL, /* Initialized in `linker_main()' */
-	.dg_globallist       = { NULL, NULL }, /* Manually initialized (would otherwise need relocations) */
+	.dg_peb              = NULL,                  /* Initialized in `linker_main()' */
+	.dg_libpath          = NULL,                  /* Initialized in `linker_main()' */
+	.dg_preload          = NULL,                  /* Initialized in `linker_main()' */
+	.dg_flags            = DLGLOBALS_FLAG_NORMAL, /* Initialized in `linker_main()' */
+	.dg_globallist       = { NULL, NULL },        /* Manually initialized (would otherwise need relocations) */
 	.dg_globallock       = ATOMIC_RWLOCK_INIT,
 	.dg_alllist          = DLIST_HEAD_INITIALIZER(dl_globals.dg_alllist),
 	.dg_alllock          = ATOMIC_RWLOCK_INIT,
@@ -141,6 +143,41 @@ typedef void *(FCALL *PLINKER_MAIN)(struct elfexec_info *__restrict info,
                                     uintptr_t loadaddr,
                                     struct process_peb *__restrict peb);
 
+/* Load special LD_* environment variables. */
+PRIVATE NONNULL((1)) void FCALL dl_loadenv(char **envp) {
+	char *env;
+	while ((env = *envp++) != NULL) {
+		char *value;
+		size_t namelen;
+		if (*env++ != 'L')
+			continue;
+		if (*env++ != 'D')
+			continue;
+		if (*env++ != '_')
+			continue;
+
+		/* LD-specific variable encountered -> parse it. */
+		value = strchr(env, '=');
+		if unlikely(!value)
+			continue;
+		namelen = (size_t)(value - env);
+		++value;
+
+		/* Parse variables. */
+#define ISENV(name) (namelen == COMPILER_STRLEN(name) && memcmp(env, name, COMPILER_STRLEN(name)) == 0)
+		if (ISENV("LIBRARY_PATH")) {
+			dl_globals.dg_libpath = value;
+		} else if (ISENV("PRELOAD")) {
+			dl_globals.dg_preload = value;
+		} else if (ISENV("BIND_NOW")) {
+			/* Enable direct binding when `LD_BIND_NOW' is defined as non-empty */
+			if (*value != '\0')
+				dl_globals.dg_flags |= DLGLOBALS_FLAG_BIND_NOW;
+		}
+#undef ISENV
+	}
+}
+
 
 INTERN WUNUSED NONNULL((1, 3)) void *FCALL
 linker_main(struct elfexec_info *__restrict info,
@@ -148,7 +185,7 @@ linker_main(struct elfexec_info *__restrict info,
             struct process_peb *__restrict peb) {
 	void *result;
 	REF DlModule *base_module;
-	size_t rtld_size = __rtld_end - __rtld_start;
+	size_t rtld_size = (size_t)(__rtld_end - __rtld_start);
 
 	/* Initialize globals (not done statically because we can't have relocations). */
 	dl_globals.dg_peb                 = peb;
@@ -163,13 +200,19 @@ linker_main(struct elfexec_info *__restrict info,
 	dl_rtld_module.dm_elf.de_phdr[0].p_memsz  = (ElfW(Word))rtld_size;
 
 	/* Check for LD-specific environment variables. */
-	dl_globals.dg_libpath = process_peb_getenv(peb, "LD_LIBRARY_PATH");
+	dl_loadenv(peb->pp_envp);
+
+	/* Make sure that the libpath is sane. */
 	if (dl_globals.dg_libpath == NULL) {
 		dl_globals.dg_libpath = (char *)RTLD_LIBRARY_PATH;
 	} else {
 		/* Specs state that `LD_LIBRARY_PATH' should be ignored under AT_SECURE-mode */
-		if (sys_Xprctl(PR_KOS_GET_AT_SECURE, 0, 0, 0, 0))
+		if (sys_Xprctl(PR_KOS_GET_AT_SECURE, 0, 0, 0, 0)) {
 			dl_globals.dg_libpath = (char *)RTLD_LIBRARY_PATH;
+			dl_globals.dg_flags |= DLGLOBALS_FLAG_SECURE;
+		} else {
+			dl_globals.dg_flags |= DLGLOBALS_FLAG_INSECURE;
+		}
 	}
 
 	/* Support for executable formats other than ELF */

@@ -726,6 +726,9 @@ INTDEF NONNULL((1)) void NOTHROW(CC DlModule_RemoveTLSExtension)(DlModule *__res
 /* Run finalizers for all TLS segments allocated within the calling thread. */
 INTDEF void CC DlModule_RunAllTlsFinalizers(void) THROWS(...);
 
+/* Import modules from `dl_globals.dg_preload' */
+INTDEF WUNUSED int CC DlModule_ImportPreloadModules(void) THROWS(...);
+
 #ifdef ELF_ARCH_IS_R_JMP_SLOT
 /* Called from JMP_SLOT relocations (s.a. `arch/i386/rt32.S') */
 INTDEF void ASMCALL dl_load_lazy_relocation(void);

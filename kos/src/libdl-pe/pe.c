@@ -1135,9 +1135,15 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	DLIST_INSERT_AFTER(dl.dl_rtld_module, mod, dm_modules);        /* NOTE: _MUST_ insert after builtin DL module! */
 	TAILQ_INSERT_HEAD(&dl_globals.dg_globallist, mod, dm_globals); /* NOTE: _MUST_ insert at head! */
 
+	/* Preload extra modules (if needed) */
+	if (dl_globals.dg_preload != NULL) {
+		if unlikely((*dl.DlModule_ImportPreloadModules)() != 0)
+			goto err;
+	}
+
 	/* Initialize the PE module. */
 	if (DlModule_PeInitialize(mod) != 0)
-		return NULL;
+		goto err;
 
 	/* Mark this module as having been fully loaded. */
 	atomic_and(&mod->dm_flags, ~RTLD_LOADING);
@@ -1174,6 +1180,7 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	return result;
 err_nomem:
 	dl_seterror_nomem();
+err:
 	return NULL;
 }
 

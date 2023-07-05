@@ -34,6 +34,7 @@
 #include <kos/io.h>
 #include <kos/ioctl/fd.h>
 #include <kos/syscalls.h>
+#include <linux/prctl.h>
 #include <sys/param.h>
 
 #include <atomic.h>
@@ -863,6 +864,12 @@ DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self)
 		dlglobals_all_endwrite(&dl_globals);
 	}
 
+	/* Preload modules (if defined) */
+	if (dl_globals.dg_preload != NULL) {
+		if unlikely(DlModule_ImportPreloadModules())
+			goto err;
+	}
+
 	/* Apply relocations and invoke module initializers. */
 	if unlikely(DlModule_ElfInitialize(self,
 	                                   (self->dm_flags & RTLD_BINDING_MASK) == RTLD_NOW
@@ -1131,6 +1138,109 @@ NOTHROW_NCX(CC DlModule_FindFromFilename)(USER char const *filename)
 	dlglobals_all_endread(&dl_globals);
 	return result;
 }
+
+
+PRIVATE bool CC dl_issetugid(void) {
+	if (!(dl_globals.dg_flags & (DLGLOBALS_FLAG_SECURE | DLGLOBALS_FLAG_INSECURE))) {
+		if (sys_Xprctl(PR_KOS_GET_AT_SECURE, 0, 0, 0, 0)) {
+			dl_globals.dg_libpath = (char *)RTLD_LIBRARY_PATH;
+			dl_globals.dg_flags |= DLGLOBALS_FLAG_SECURE;
+		} else {
+			dl_globals.dg_flags |= DLGLOBALS_FLAG_INSECURE;
+		}
+	}
+	return (dl_globals.dg_flags & DLGLOBALS_FLAG_SECURE) != 0;
+}
+
+/* Flags used for opening modules specified via the LD_PRELOAD mechanism:
+ * - RTLD_LAZY:     No need to immediately resolve everything (unless otherwise overwritten)
+ * - RTLD_GLOBAL:   The module must be loaded globally, else `DlModule_RunAllStaticInitializers()' won't see it
+ * - RTLD_NODELETE: The module is to stay resident in memory until the process exits
+ * - RTLD_NOINIT:   Initializers will be invoked later (by `DlModule_RunAllStaticInitializers()') */
+#define LD_PRELOAD_MODULE_OPEN_FLAGS \
+	(RTLD_LAZY | RTLD_GLOBAL | RTLD_NODELETE | RTLD_NOINIT)
+
+PRIVATE WUNUSED NONNULL((1)) int CC
+ld_preload_module(char const *filename) THROWS(...) {
+	DlModule *mod;
+	if (strchr(filename, '/')) {
+		if (dl_issetugid()) {
+			/* """ In secure-execution mode, preload pathnames containing slashes are ignored """ */
+			syslog(LOG_INFO, "[dl] Not LD_PRELOAD-ing module %q because it contains a '/'\n",
+			       filename);
+			return 0;
+		}
+		mod = DlModule_OpenFilename(filename, LD_PRELOAD_MODULE_OPEN_FLAGS);
+	} else {
+		atomic_write(&dl_globals.dg_errmsg, NULL);
+		mod = DlModule_OpenFilenameInPathList(dl_globals.dg_libpath, filename,
+		                                      LD_PRELOAD_MODULE_OPEN_FLAGS, NULL);
+	}
+
+	if (mod) {
+		if (dl_issetugid()) {
+			/* Assert that the module's library-file has the SUID bit set.
+			 *
+			 * (Technically we should have done this *before* the  library
+			 * was even loaded, but that  would require making the  normal
+			 * library open code-path slower. And yes: that means that  if
+			 * there is some way to construct a malicious library and then
+			 * place it in the standard library path, *and* inject it into
+			 * a  SUID program via  LD_PRELOAD, there *might*  be a way to
+			 * get privilege escalation, but that's  not a reason to  make
+			 * normal library loading run more slowly if you ask me) */
+			struct stat st;
+			if (sys_kfstat(mod->dm_file, &st) != 0 || !(st.st_mode & S_ISUID)) {
+				syslog(LOG_INFO, "[dl] Unload LD_PRELOAD'ed module %q because it is not setuid\n",
+				       mod->dm_filename);
+				atomic_write(&mod->dm_refcnt, 0);
+				atomic_write(&mod->dm_weakrefcnt, 1);
+				DlModule_Destroy(mod);
+			}
+		}
+		return 0;
+	}
+	if (!atomic_read(&dl_globals.dg_errmsg))
+		dl_seterror_dlopen_failed(filename);
+	return -1;
+}
+
+/* Import modules from `dl_globals.dg_preload' */
+INTERN WUNUSED int CC DlModule_ImportPreloadModules(void) THROWS(...) {
+	char *iter;
+	iter = dl_globals.dg_preload;
+	dl_globals.dg_preload = NULL;
+	assert(iter);
+	for (;;) {
+		int error;
+		char *next, temp;
+		next = iter;
+		/* from `man 8 ld.so':
+		 * """
+		 * [...] The items of  the list  can be separated  by spaces  or
+		 * colons, and there is no support for escaping either separator
+		 * """ */
+		while (*next != ':' && *next != '\0' && *next != ' ')
+			++next;
+
+		/* We cheat a little by changing the trailing ':' or ' ' to a NUL-character. */
+		temp  = *next;
+		*next = '\0';
+		error = ld_preload_module(iter);
+		*next = temp;
+
+		/* Check for errors. */
+		if unlikely(error)
+			return error;
+
+		/* Continue by loading the next module (if present) */
+		if (!*next)
+			break;
+		iter = next + 1;
+	}
+	return 0;
+}
+
 
 DECL_END
 

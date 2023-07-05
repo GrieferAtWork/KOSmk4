@@ -389,10 +389,18 @@ struct dltls_segment;
 LIST_HEAD(dltls_segment_list, dltls_segment);
 #endif /* !__dltls_segment_list_defined */
 
+/* Flags for `struct dlglobals::dg_flags' */
+#define DLGLOBALS_FLAG_NORMAL   0x0000
+#define DLGLOBALS_FLAG_BIND_NOW 0x0001 /* `$LD_BIND_NOW' was set in the initial program environment block. */
+#define DLGLOBALS_FLAG_SECURE   0x4000 /* Process is setuid */
+#define DLGLOBALS_FLAG_INSECURE 0x8000 /* Process is not setuid  */
+
 /* Libdl global data (defined here because shared with DL extension drivers) */
 struct dlglobals {
 	struct process_peb       *dg_peb;              /* [1..1][const] Process environment block (The `__peb' symbol resolves to the address of this struct member) */
 	char                     *dg_libpath;          /* [1..1][const] The library path set when the program was started (initenv:$LD_LIBRARY_PATH) */
+	char                     *dg_preload;          /* [0..1][lock(CLEAR_ONCE)] Extra modules to pre-load ahead of the module currently being loaded. */
+	uintptr_t                 dg_flags;            /* [const] Extra libdl execution flags (set of `DLGLOBALS_FLAG_*'). */
 	struct dlmodule_tailq     dg_globallist;       /* [1..N][lock(dg_globallock)] List of RTLD_GLOBAL modules (first element is main program). */
 	struct atomic_rwlock      dg_globallock;       /* Lock for `dg_globallist' */
 	struct dlmodule_dlist     dg_alllist;          /* [1..N][lock(dg_alllock)] List of all loaded modules. */

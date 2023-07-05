@@ -184,8 +184,9 @@ done_fini:
 		free(self->dm_elf.de_shstrtab);
 	}
 	COMPILER_BARRIER();
+
 	/* Drop references from dependent modules. */
-	{
+	if (self->dm_depvec) {
 		size_t i;
 		for (i = 0; i < self->dm_depcnt; ++i) {
 			DlModule *temp;
@@ -193,9 +194,13 @@ done_fini:
 			if (!(temp->dm_flags & RTLD_NODELETE))
 				decref(temp);
 		}
+		free(self->dm_depvec);
 	}
+
+	/* Close the module's file (if loaded) */
 	if (self->dm_file > 0)
 		sys_close(self->dm_file);
+
 	/* Free dynamically allocated heap-memory. */
 	if (self->dm_sections) {
 		size_t i;
@@ -243,7 +248,6 @@ again_free_sections:
 	} else {
 		assert(!self->dm_tlsfsize);
 	}
-	free(self->dm_depvec);
 	free(self->dm_filename);
 	weakdecref_likely(self);
 }

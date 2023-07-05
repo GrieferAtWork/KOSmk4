@@ -245,6 +245,7 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags)
 	ElfW(Rel) *jmp_base = NULL;
 	size_t jmp_size     = 0;
 	size_t i;
+
 	/* Load dependencies of the module. */
 	if (self->dm_depcnt) {
 		unsigned int dep_flags;
@@ -304,6 +305,7 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags)
 			self->dm_depvec[self->dm_depcnt++] = dependency; /* Inherit reference */
 		}
 	}
+
 	/* Service relocations of the module. */
 	for (i = 0; i < self->dm_elf.de_dyncnt; ++i) {
 		ElfW(Dyn) tag = self->dm_dynhdr[i];
@@ -395,13 +397,8 @@ done_dynamic:
 	}
 
 #ifdef ELF_ARCH_IS_R_JMP_SLOT
-	/* Enable direct binding when `LD_BIND_NOW' is defined as non-empty */
-	{
-		char *ld_bind_now;
-		ld_bind_now = process_peb_getenv(dl_globals.dg_peb, "LD_BIND_NOW");
-		if (ld_bind_now && *ld_bind_now)
-			flags |= DL_MODULE_ELF_INITIALIZE_FBINDNOW;
-	}
+	if (dl_globals.dg_flags & DLGLOBALS_FLAG_BIND_NOW)
+		flags |= DL_MODULE_ELF_INITIALIZE_FBINDNOW;
 #endif /* ELF_ARCH_IS_R_JMP_SLOT */
 
 	/* Apply relocations. */

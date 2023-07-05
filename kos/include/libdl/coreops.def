@@ -31,6 +31,7 @@ DL_COREOP(NONNULL_T((1)), void, , LIBDL_CC, DlModule_Destroy, (DlModule *__restr
 DL_COREOP(NONNULL_T((1)), void, NOTHROW_NCX_T, LIBDL_CC, DlModule_Free, (DlModule *__restrict self))
 DL_COREOP(NONNULL_T((1)), void, NOTHROW_NCX_T, LIBDL_CC, DlSection_Destroy, (DlSection *__restrict self))
 DL_COREOP(__REF_IF(!(return->dm_flags & RTLD_NODELETE)), DlModule *, NOTHROW_NCX_T, LIBDL_CC, DlModule_FindFromFilename, (char const *__restrict filename))
+DL_COREOP(WUNUSED, int, , LIBDL_CC, DlModule_ImportPreloadModules, (void))
 DL_COREOP(NONNULL_T((1)), int, NOTHROW_NCX_T, LIBDL_VCC, dl_seterrorf, (char const *__restrict format, ...))
 DL_COREOP(NONNULL_T((1)), int, NOTHROW_NCX_T, LIBDL_CC, dl_vseterrorf, (char const *__restrict format, __builtin_va_list args))
 DL_COREOP(WUNUSED_T ATTR_PURE_T NONNULL_T((1)), void *, NOTHROW_NCX_T, __FCALL, dlsym_builtin, (char const *__restrict name))
