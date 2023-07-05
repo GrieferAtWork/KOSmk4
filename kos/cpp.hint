@@ -619,12 +619,12 @@
 
 
 // <hybrid/__assembly.h>
-#define PRIVATE_FUNCTION(sym)      ;int sym() {}
-#define INTERN_FUNCTION(sym)       ;int sym() {}
-#define PUBLIC_FUNCTION(sym)       ;int sym() {}
-#define PRIVATE_WEAK_FUNCTION(sym) ;int sym() {}
-#define INTERN_WEAK_FUNCTION(sym)  ;int sym() {}
-#define PUBLIC_WEAK_FUNCTION(sym)  ;int sym() {}
+#define PRIVATE_FUNCTION(sym)      ;int sym(){}
+#define INTERN_FUNCTION(sym)       ;int sym(){}
+#define PUBLIC_FUNCTION(sym)       ;int sym(){}
+#define PRIVATE_WEAK_FUNCTION(sym) ;int sym(){}
+#define INTERN_WEAK_FUNCTION(sym)  ;int sym(){}
+#define PUBLIC_WEAK_FUNCTION(sym)  ;int sym(){}
 #define PRIVATE_OBJECT(sym)        ;int sym;
 #define INTERN_OBJECT(sym)         ;int sym;
 #define PUBLIC_OBJECT(sym)         ;int sym;

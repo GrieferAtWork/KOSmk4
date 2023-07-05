@@ -167,7 +167,13 @@ PRIVATE NONNULL((1)) void FCALL dl_loadenv(char **envp) {
 		/* Parse variables. */
 #define ISENV(name) (namelen == COMPILER_STRLEN(name) && memcmp(env, name, COMPILER_STRLEN(name)) == 0)
 		if (ISENV("LIBRARY_PATH")) {
-			dl_globals.dg_libpath = value;
+			/* Specs state that `LD_LIBRARY_PATH' should be ignored under AT_SECURE-mode */
+			if (sys_Xprctl(PR_KOS_GET_AT_SECURE, 0, 0, 0, 0)) {
+				dl_globals.dg_flags |= DLGLOBALS_FLAG_SECURE;
+			} else {
+				dl_globals.dg_libpath = value;
+				dl_globals.dg_flags |= DLGLOBALS_FLAG_INSECURE;
+			}
 		} else if (ISENV("PRELOAD")) {
 			dl_globals.dg_preload = value;
 		} else if (ISENV("BIND_NOW")) {
@@ -205,6 +211,7 @@ linker_main(struct elfexec_info *__restrict info,
 
 	/* Initialize globals (not done statically because we can't have relocations). */
 	dl_globals.dg_peb                 = peb;
+	dl_globals.dg_libpath             = (char *)RTLD_LIBRARY_PATH;
 	dl_globals.dg_globallist.tqh_last = &dl_globals.dg_globallist.tqh_first; /* Initialize global list. */
 	dl_rtld_module.dm_filename        = (char *)RTLD_LIBDL;
 	dl_rtld_module.dm_loadaddr        = info->ei_rtldaddr;
@@ -217,19 +224,6 @@ linker_main(struct elfexec_info *__restrict info,
 
 	/* Check for LD-specific environment variables. */
 	dl_loadenv(peb->pp_envp);
-
-	/* Make sure that the libpath is sane. */
-	if (dl_globals.dg_libpath == NULL) {
-		dl_globals.dg_libpath = (char *)RTLD_LIBRARY_PATH;
-	} else {
-		/* Specs state that `LD_LIBRARY_PATH' should be ignored under AT_SECURE-mode */
-		if (sys_Xprctl(PR_KOS_GET_AT_SECURE, 0, 0, 0, 0)) {
-			dl_globals.dg_libpath = (char *)RTLD_LIBRARY_PATH;
-			dl_globals.dg_flags |= DLGLOBALS_FLAG_SECURE;
-		} else {
-			dl_globals.dg_flags |= DLGLOBALS_FLAG_INSECURE;
-		}
-	}
 
 	/* Support for executable formats other than ELF */
 	if (elfexec_info_usesinterpreter(info)) {
