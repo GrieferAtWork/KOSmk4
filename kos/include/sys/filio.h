@@ -51,10 +51,10 @@
 #define FIONREAD __TIOCINQ  /* [int *count] Save the number of pending input bytes */
 #endif /* !FIONREAD && __TIOCINQ */
 #if !defined(FIONBIO) && defined(__FIONBIO)
-#define FIONBIO  __FIONBIO  /* [int *arg] Set (*arg != 0) or clear (*arg == 0) O_NONBLOCK / IO_NONBLOCK */
+#define FIONBIO  __FIONBIO  /* [int const *arg] Set (*arg != 0) or clear (*arg == 0) O_NONBLOCK / IO_NONBLOCK */
 #endif /* !FIONBIO && __FIONBIO */
 #if !defined(FIOASYNC) && defined(__FIOASYNC)
-#define FIOASYNC __FIOASYNC /* [int *arg] Set (*arg != 0) or clear (*arg == 0) O_ASYNC / IO_ASYNC */
+#define FIOASYNC __FIOASYNC /* [int const *arg] Set (*arg != 0) or clear (*arg == 0) O_ASYNC / IO_ASYNC */
 #endif /* !FIOASYNC && __FIOASYNC */
 
 #if !defined(FIOSETOWN) && defined(__FIOSETOWN)

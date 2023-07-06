@@ -42,7 +42,9 @@ gcc_opt.remove("-g"); // Disable debug informations for this file!
 
 #include <compat/config.h>
 #include <kos/asm/rpc-method.h>
+#include <sys/ioctl.h>
 #include <sys/mman.h>
+#include <sys/mount.h>
 
 #include <assert.h>
 #include <fcntl.h>
@@ -436,6 +438,13 @@ unknown_syscall:
 }
 
 
+#if defined(HAVE_SC_REPR_IOCTL_ARG)
+/* Check if the given `command' (when used with `ioctl(2)') *definitely* ignores its argument. */
+INTDEF ATTR_CONST WUNUSED bool /* From "./sc_printvalue.c" */
+NOTHROW(CC libsc_ioctl_voidarg)(syscall_ulong_t command);
+#define HAVE_libsc_ioctl_voidarg
+#endif /* ... */
+
 
 /* Get a description  of the  system call  described by  `sc_info' in  `desc'
  * This  is  the main  function used  to access  the system  call description
@@ -565,6 +574,17 @@ NOTHROW_NCX(CC libsc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
 			break;
 #endif /* __NR(32|64)_mremap */
 
+#ifdef HAVE_libsc_ioctl_voidarg
+#if __ARCH_COMPAT_SIZEOF_POINTER == 4 ? defined(__NR32_ioctl) : defined(__NR64_ioctl)
+		case COMPAT_NR(ioctl):
+			/* sys_ioctl() sometimes ignores its third argument */
+			if (desc->sc_argc == 3 &&
+			    libsc_ioctl_voidarg((syscall_ulong_t)desc->sc_argv[1].sa_value.sv_u64))
+				desc->sc_argc = 2;
+			break;
+#endif /* __NR(32|64)_ioctl */
+#endif /* HAVE_libsc_ioctl_voidarg */
+
 		default:
 			break;
 		}
@@ -601,6 +621,17 @@ NOTHROW_NCX(CC libsc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
 				desc->sc_argc = 4;
 			break;
 #endif /* __NR_mremap */
+
+#ifdef HAVE_libsc_ioctl_voidarg
+#ifdef __NR_ioctl
+		case __NR_ioctl:
+			/* sys_ioctl() sometimes ignores its third argument */
+			if (desc->sc_argc == 3 &&
+			    libsc_ioctl_voidarg((syscall_ulong_t)desc->sc_argv[1].sa_value.sv_u64))
+				desc->sc_argc = 2;
+			break;
+#endif /* __NR_ioctl */
+#endif /* HAVE_libsc_ioctl_voidarg */
 
 		default:
 			break;

@@ -44,9 +44,9 @@
 #define __TIOCGWINSZ          _IO('T', 0x13) /* [struct winsize *arg] Get the window size */
 #define __TIOCSWINSZ          _IO('T', 0x14) /* [struct winsize const *arg] Set the window size */
 #define __TIOCMGET            _IO('T', 0x15) /* [unsigned int *argp] Get status of modem bits (set of `TIOCM_*') */
-#define __TIOCMBIS            _IO('T', 0x16) /* [unsigned int *argp] Enable modem bits (bits |= *argp) (set of `TIOCM_*') */
-#define __TIOCMBIC            _IO('T', 0x17) /* [unsigned int *argp] Clear modem bits (bits &= ~*argp) (set of `TIOCM_*') */
-#define __TIOCMSET            _IO('T', 0x18) /* [unsigned int *argp] Set modem bits (bits = *argp) (set of `TIOCM_*') */
+#define __TIOCMBIS            _IO('T', 0x16) /* [unsigned int const *argp] Enable modem bits (bits |= *argp) (set of `TIOCM_*') */
+#define __TIOCMBIC            _IO('T', 0x17) /* [unsigned int const *argp] Clear modem bits (bits &= ~*argp) (set of `TIOCM_*') */
+#define __TIOCMSET            _IO('T', 0x18) /* [unsigned int const *argp] Set modem bits (bits = *argp) (set of `TIOCM_*') */
 
 #define __TIOCGSOFTCAR        _IO('T', 0x19) /* [int *arg] Get the state of `termios::c_cflag::CLOCAL'. */
 #define __TIOCSSOFTCAR        _IO('T', 0x1a) /* [int const *arg] Set the state of `termios::c_cflag::CLOCAL'. */
@@ -64,28 +64,28 @@
 #define __TIOCSBRK            _IO('T', 0x27) /* BSD compatibility */
 #define __TIOCCBRK            _IO('T', 0x28) /* BSD compatibility */
 #define __TIOCGSID            _IO('T', 0x29) /* [pid_t *arg] Return the session ID of a tty */
-#define __TCGETS2            _IOR('T', 0x2a, struct termios2) /* ... */
-#define __TCSETS2            _IOW('T', 0x2b, struct termios2) /* ... */
-#define __TCSETSW2           _IOW('T', 0x2c, struct termios2) /* ... */
-#define __TCSETSF2           _IOW('T', 0x2d, struct termios2) /* ... */
+#define __TCGETS2            _IOR('T', 0x2a, struct termios2) /* [struct termios2 *arg] ... */
+#define __TCSETS2            _IOW('T', 0x2b, struct termios2) /* [struct termios2 const *arg] ... */
+#define __TCSETSW2           _IOW('T', 0x2c, struct termios2) /* [struct termios2 const *arg] ... */
+#define __TCSETSF2           _IOW('T', 0x2d, struct termios2) /* [struct termios2 const *arg] ... */
 #define __TIOCGRS485          _IO('T', 0x2e) /* ... */
 #define __TIOCSRS485          _IO('T', 0x2f) /* ... */
 #define __TIOCGPTN           _IOR('T', 0x30, unsigned int) /* Get Pty Number (of pty-mux device) */
 #define __TIOCSPTLCK         _IOW('T', 0x31, int)  /* Lock/unlock Pty */
 #define __TIOCGDEV           _IOR('T', 0x32, unsigned int) /* Get primary device node of /dev/console */
-#define __TCGETX              _IO('T', 0x32) /* SYS5 TCGETX compatibility */
-#define __TCSETX              _IO('T', 0x33) /* ... */
-#define __TCSETXF             _IO('T', 0x34) /* ... */
-#define __TCSETXW             _IO('T', 0x35) /* ... */
+#define __TCGETX              _IO('T', 0x32) /* [struct termiox *arg] SYS5 TCGETX compatibility */
+#define __TCSETX              _IO('T', 0x33) /* [struct termiox const *arg] ... */
+#define __TCSETXF             _IO('T', 0x34) /* [struct termiox const *arg] ... */
+#define __TCSETXW             _IO('T', 0x35) /* [struct termiox const *arg] ... */
 #define __TIOCSIG            _IOW('T', 0x36, __signo_t) /* pty: generate signal */
 #define __TIOCVHANGUP         _IO('T', 0x37) /* ... */
-#define __TIOCGPKT           _IOR('T', 0x38, int) /* Get packet mode state */
-#define __TIOCGPTLCK         _IOR('T', 0x39, int) /* Get Pty lock state */
-#define __TIOCGEXCL          _IOR('T', 0x40, int) /* Get exclusive mode state */
+#define __TIOCGPKT           _IOR('T', 0x38, int) /* [int *] Get packet mode state */
+#define __TIOCGPTLCK         _IOR('T', 0x39, int) /* [int *] Get Pty lock state */
+#define __TIOCGEXCL          _IOR('T', 0x40, int) /* [int *] Get exclusive mode state */
 
 #define __FIONCLEX            _IO('T', 0x50) /* Clear O_CLOEXEC / IO_CLOEXEC */
 #define __FIOCLEX             _IO('T', 0x51) /* Set O_CLOEXEC / IO_CLOEXEC */
-#define __FIOASYNC            _IO('T', 0x52) /* [int *arg] Set (*arg != 0) or clear (*arg == 0) O_ASYNC / IO_ASYNC */
+#define __FIOASYNC            _IO('T', 0x52) /* [int const *arg] Set (*arg != 0) or clear (*arg == 0) O_ASYNC / IO_ASYNC */
 #define __TIOCSERCONFIG       _IO('T', 0x53) /* ... */
 #define __TIOCSERGWILD        _IO('T', 0x54) /* ... */
 #define __TIOCSERSWILD        _IO('T', 0x55) /* ... */

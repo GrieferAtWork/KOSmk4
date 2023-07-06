@@ -173,13 +173,13 @@ __DECL_END
 #define TIOCMSET   __TIOCMSET   /* [unsigned int *argp] Set modem bits (bits = *argp) (set of `TIOCM_*') */
 #endif /* !TIOCMSET && __TIOCMSET */
 #if !defined(TIOCMBIS) && defined(__TIOCMBIS)
-#define TIOCMBIS   __TIOCMBIS   /* [unsigned int *argp] Enable modem bits (bits |= *argp) (set of `TIOCM_*') */
+#define TIOCMBIS   __TIOCMBIS   /* [unsigned int const *argp] Enable modem bits (bits |= *argp) (set of `TIOCM_*') */
 #endif /* !TIOCMBIS && __TIOCMBIS */
 #if !defined(TIOCMBIC) && defined(__TIOCMBIC)
-#define TIOCMBIC   __TIOCMBIC   /* [unsigned int *argp] Clear modem bits (bits &= ~*argp) (set of `TIOCM_*') */
+#define TIOCMBIC   __TIOCMBIC   /* [unsigned int const *argp] Clear modem bits (bits &= ~*argp) (set of `TIOCM_*') */
 #endif /* !TIOCMBIC && __TIOCMBIC */
 #if !defined(TIOCMGET) && defined(__TIOCMGET)
-#define TIOCMGET   __TIOCMGET   /* [unsigned int *argp] Get status of modem bits (set of `TIOCM_*') */
+#define TIOCMGET   __TIOCMGET   /* [unsigned int const *argp] Get status of modem bits (set of `TIOCM_*') */
 #endif /* !TIOCMGET && __TIOCMGET */
 #if !defined(TIOCREMOTE) && defined(__TIOCREMOTE)
 #define TIOCREMOTE __TIOCREMOTE      /* ... */

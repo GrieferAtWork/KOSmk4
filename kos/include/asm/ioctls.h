@@ -130,7 +130,7 @@
 #define TIOCPKT      __TIOCPKT      /* ... */
 #endif /* !TIOCPKT && __TIOCPKT */
 #if !defined(FIONBIO) && defined(__FIONBIO)
-#define FIONBIO      __FIONBIO      /* [int *arg] Set (*arg != 0) or clear (*arg == 0) O_NONBLOCK / IO_NONBLOCK */
+#define FIONBIO      __FIONBIO      /* [int const *arg] Set (*arg != 0) or clear (*arg == 0) O_NONBLOCK / IO_NONBLOCK */
 #endif /* !FIONBIO && __FIONBIO */
 #if !defined(TIOCNOTTY) && defined(__TIOCNOTTY)
 #define TIOCNOTTY    __TIOCNOTTY    /* Given up control over this CTTY */
@@ -215,7 +215,7 @@
 #define FIOCLEX         __FIOCLEX         /* Set O_CLOEXEC / IO_CLOEXEC */
 #endif /* !FIOCLEX && __FIOCLEX */
 #if !defined(FIOASYNC) && defined(__FIOASYNC)
-#define FIOASYNC        __FIOASYNC        /* [int *arg] Set (*arg != 0) or clear (*arg == 0) O_ASYNC / IO_ASYNC */
+#define FIOASYNC        __FIOASYNC        /* [int const *arg] Set (*arg != 0) or clear (*arg == 0) O_ASYNC / IO_ASYNC */
 #endif /* !FIOASYNC && __FIOASYNC */
 #if !defined(TIOCSERCONFIG) && defined(__TIOCSERCONFIG)
 #define TIOCSERCONFIG   __TIOCSERCONFIG   /* ... */

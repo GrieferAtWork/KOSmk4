@@ -35,8 +35,8 @@
  *       that isn't supported has ioctl(2) return with ENOTTY! */
 #define FD_IOC_NCLEX  __FIONCLEX /* Clear O_CLOEXEC / IO_CLOEXEC */
 #define FD_IOC_CLEX   __FIOCLEX  /* Set O_CLOEXEC / IO_CLOEXEC */
-#define FD_IOC_ASYNC  __FIOASYNC /* [int *arg] Set (*arg != 0) or clear (*arg == 0) O_ASYNC / IO_ASYNC */
-#define FD_IOC_NBIO   __FIONBIO  /* [int *arg] Set (*arg != 0) or clear (*arg == 0) O_NONBLOCK / IO_NONBLOCK */
+#define FD_IOC_ASYNC  __FIOASYNC /* [int const *arg] Set (*arg != 0) or clear (*arg == 0) O_ASYNC / IO_ASYNC */
+#define FD_IOC_NBIO   __FIONBIO  /* [int const *arg] Set (*arg != 0) or clear (*arg == 0) O_NONBLOCK / IO_NONBLOCK */
 #define FD_IOC_QSIZE  __FIOQSIZE /* [loff_t *arg] Return object data-size (not supported by all types of objects) */
 #define FD_IOC_GETBSZ __FIGETBSZ /* [int *arg] Return `struct stat::st_blksize' */
 

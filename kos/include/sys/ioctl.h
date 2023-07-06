@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x261a00c6 */
+/* HASH CRC-32:0x5bb0e139 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -121,13 +121,13 @@
 #define TIOCMGET   __TIOCMGET   /* [unsigned int *argp] Get status of modem bits (set of `TIOCM_*') */
 #endif /* !TIOCMGET && __TIOCMGET */
 #if !defined(TIOCMBIS) && defined(__TIOCMBIS)
-#define TIOCMBIS   __TIOCMBIS   /* [unsigned int *argp] Enable modem bits (bits |= *argp) (set of `TIOCM_*') */
+#define TIOCMBIS   __TIOCMBIS   /* [unsigned int const *argp] Enable modem bits (bits |= *argp) (set of `TIOCM_*') */
 #endif /* !TIOCMBIS && __TIOCMBIS */
 #if !defined(TIOCMBIC) && defined(__TIOCMBIC)
-#define TIOCMBIC   __TIOCMBIC   /* [unsigned int *argp] Clear modem bits (bits &= ~*argp) (set of `TIOCM_*') */
+#define TIOCMBIC   __TIOCMBIC   /* [unsigned int const *argp] Clear modem bits (bits &= ~*argp) (set of `TIOCM_*') */
 #endif /* !TIOCMBIC && __TIOCMBIC */
 #if !defined(TIOCMSET) && defined(__TIOCMSET)
-#define TIOCMSET   __TIOCMSET   /* [unsigned int *argp] Set modem bits (bits = *argp) (set of `TIOCM_*') */
+#define TIOCMSET   __TIOCMSET   /* [unsigned int const *argp] Set modem bits (bits = *argp) (set of `TIOCM_*') */
 #endif /* !TIOCMSET && __TIOCMSET */
 
 #if !defined(TIOCGSOFTCAR) && defined(__TIOCGSOFTCAR)
@@ -182,16 +182,16 @@
 #define TIOCGSID    __TIOCGSID      /* [pid_t *arg] Return the session ID of a tty */
 #endif /* !TIOCGSID && __TIOCGSID */
 #if !defined(TCGETS2) && defined(__TCGETS2)
-#define TCGETS2     __TCGETS2       /* ... */
+#define TCGETS2     __TCGETS2       /* [struct termios2 *arg] ... */
 #endif /* !TCGETS2 && __TCGETS2 */
 #if !defined(TCSETS2) && defined(__TCSETS2)
-#define TCSETS2     __TCSETS2       /* ... */
+#define TCSETS2     __TCSETS2       /* [struct termios2 const *arg] ... */
 #endif /* !TCSETS2 && __TCSETS2 */
 #if !defined(TCSETSW2) && defined(__TCSETSW2)
-#define TCSETSW2    __TCSETSW2      /* ... */
+#define TCSETSW2    __TCSETSW2      /* [struct termios2 const *arg] ... */
 #endif /* !TCSETSW2 && __TCSETSW2 */
 #if !defined(TCSETSF2) && defined(__TCSETSF2)
-#define TCSETSF2    __TCSETSF2      /* ... */
+#define TCSETSF2    __TCSETSF2      /* [struct termios2 const *arg] ... */
 #endif /* !TCSETSF2 && __TCSETSF2 */
 #if !defined(TIOCGRS485) && defined(__TIOCGRS485)
 #define TIOCGRS485  __TIOCGRS485    /* ... */
@@ -209,16 +209,16 @@
 #define TIOCGDEV    __TIOCGDEV      /* Get primary device node of /dev/console */
 #endif /* !TIOCGDEV && __TIOCGDEV */
 #if !defined(TCGETX) && defined(__TCGETX)
-#define TCGETX      __TCGETX        /* SYS5 TCGETX compatibility */
+#define TCGETX      __TCGETX        /* [struct termiox *arg] SYS5 TCGETX compatibility */
 #endif /* !TCGETX && __TCGETX */
 #if !defined(TCSETX) && defined(__TCSETX)
-#define TCSETX      __TCSETX        /* ... */
+#define TCSETX      __TCSETX        /* [struct termiox const *arg] ... */
 #endif /* !TCSETX && __TCSETX */
 #if !defined(TCSETXF) && defined(__TCSETXF)
-#define TCSETXF     __TCSETXF       /* ... */
+#define TCSETXF     __TCSETXF       /* [struct termiox const *arg] ... */
 #endif /* !TCSETXF && __TCSETXF */
 #if !defined(TCSETXW) && defined(__TCSETXW)
-#define TCSETXW     __TCSETXW       /* ... */
+#define TCSETXW     __TCSETXW       /* [struct termiox const *arg] ... */
 #endif /* !TCSETXW && __TCSETXW */
 #if !defined(TIOCSIG) && defined(__TIOCSIG)
 #define TIOCSIG     __TIOCSIG       /* pty: generate signal */
@@ -227,13 +227,13 @@
 #define TIOCVHANGUP __TIOCVHANGUP   /* ... */
 #endif /* !TIOCVHANGUP && __TIOCVHANGUP */
 #if !defined(TIOCGPKT) && defined(__TIOCGPKT)
-#define TIOCGPKT    __TIOCGPKT      /* Get packet mode state */
+#define TIOCGPKT    __TIOCGPKT      /* [int *] Get packet mode state */
 #endif /* !TIOCGPKT && __TIOCGPKT */
 #if !defined(TIOCGPTLCK) && defined(__TIOCGPTLCK)
-#define TIOCGPTLCK  __TIOCGPTLCK    /* Get Pty lock state */
+#define TIOCGPTLCK  __TIOCGPTLCK    /* [int *] Get Pty lock state */
 #endif /* !TIOCGPTLCK && __TIOCGPTLCK */
 #if !defined(TIOCGEXCL) && defined(__TIOCGEXCL)
-#define TIOCGEXCL   __TIOCGEXCL     /* Get exclusive mode state */
+#define TIOCGEXCL   __TIOCGEXCL     /* [int *] Get exclusive mode state */
 #endif /* !TIOCGEXCL && __TIOCGEXCL */
 
 #if !defined(FIONCLEX) && defined(__FIONCLEX)
@@ -243,7 +243,7 @@
 #define FIOCLEX         __FIOCLEX         /* Set O_CLOEXEC / IO_CLOEXEC */
 #endif /* !FIOCLEX && __FIOCLEX */
 #if !defined(FIOASYNC) && defined(__FIOASYNC)
-#define FIOASYNC        __FIOASYNC        /* [int *arg] Set (*arg != 0) or clear (*arg == 0) O_ASYNC / IO_ASYNC */
+#define FIOASYNC        __FIOASYNC        /* [int const *arg] Set (*arg != 0) or clear (*arg == 0) O_ASYNC / IO_ASYNC */
 #endif /* !FIOASYNC && __FIOASYNC */
 #if !defined(TIOCSERCONFIG) && defined(__TIOCSERCONFIG)
 #define TIOCSERCONFIG   __TIOCSERCONFIG   /* ... */

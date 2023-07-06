@@ -39,6 +39,7 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 
 #include <hybrid/__va_size.h>
 #include <hybrid/align.h>
+#include <hybrid/byteorder.h>
 #include <hybrid/overflow.h>
 #include <hybrid/typecore.h>
 
@@ -48,6 +49,8 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <bits/os/itimerval.h>
 #include <bits/os/timespec.h>
 #include <bits/os/timeval.h>
+#include <bits/os/termios.h>
+#include <bits/os/termiox.h>
 #include <kos/anno.h>
 #include <kos/except-handler.h>
 #include <kos/except.h>
@@ -248,6 +251,10 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #ifdef HAVE_SC_REPR_IOCTL_COMMAND
 #define NEED_print_ioctl_command
 #endif /* HAVE_SC_REPR_IOCTL_COMMAND */
+
+#ifdef HAVE_SC_REPR_IOCTL_ARG
+#define NEED_print_ioctl_arg
+#endif /* HAVE_SC_REPR_IOCTL_ARG */
 
 #ifdef HAVE_SC_REPR_STRING_VECTOR
 #define NEED_print_string_vector
@@ -765,6 +772,28 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #if defined(NEED_print_flagset8) || defined(NEED_print_flagset16) || defined(NEED_print_flagset32)
 #define NEED_print_flagset_remainder
 #endif /* NEED_print_flagset8 || NEED_print_flagset16 || NEED_print_flagset32 */
+
+#ifdef NEED_print_ioctl_arg
+#define NEED_print_termio
+#define NEED_print_termios
+#define NEED_print_termios2
+#define NEED_print_termiox
+#define NEED_print_winsize
+#define NEED_print_tty_modem_bits
+#define NEED_print_tcflow_arg
+#define NEED_print_tcflush_arg
+#endif /* NEED_print_ioctl_arg */
+
+#if defined(NEED_print_termio) || defined(NEED_print_termios) || defined(NEED_print_termios2)
+#define NEED_print_termio_common
+#endif /* NEED_print_termio || NEED_print_termios || NEED_print_termios2 */
+
+#ifdef NEED_print_termio_common
+#define NEED_print_termios_iflag
+#define NEED_print_termios_oflag
+#define NEED_print_termios_lflag
+#define NEED_print_termios_cflag
+#endif /* NEED_print_termio_common */
 
 
 
@@ -1796,7 +1825,7 @@ print_epoll_what(pformatprinter printer, void *arg, uint16_t events) {
 	                       sizeof(*epoll_event_flag_names),
 	                       "EPOLL", events);
 }
-#endif /* NEED_print_poll_what */
+#endif /* NEED_print_epoll_what */
 
 
 
@@ -1962,8 +1991,7 @@ err:
 import * from deemon;
 import * from ...misc.libgen.strendN;
 import util;
-local ioctls = [];
-local kos_ioctls = [];
+local ioctls = Dict();
 
 for (local macroName, macroValue: enumerateMacrosFromFiles({
 	"../../include/asm/os/kos/block.h",
@@ -1977,10 +2005,10 @@ for (local macroName, macroValue: enumerateMacrosFromFiles({
 	"../../include/linux/vt.h",
 	"../../include/kos/ioctl/" "*.h",
 })) {
-	local ns = ioctls;
 	for (local prefix: {
 		"_IO(", "_IOR(", "_IOW(", "_IOWR(",
-		"_IO_KOS(", "_IOR_KOS(", "_IOW_KOS(", "_IOWR_KOS(" }) {
+		"_IO_KOS(", "_IOR_KOS(", "_IOW_KOS(", "_IOWR_KOS("
+	}) {
 		if (!macroValue.startswith(prefix))
 			continue;
 		local a, b;
@@ -1994,26 +2022,28 @@ for (local macroName, macroValue: enumerateMacrosFromFiles({
 		if (a < 0 || a > 0xff || b < 0 || b > 0xff)
 			continue;
 		macroValue = a << 8 | b;
+		if (prefix.startswith("_IOWR")) {
+			macroValue |= 0xc0000000; // _IOC_INOUT
+		} else if (prefix.startswith("_IOR")) {
+			macroValue |= 0x80000000; // _IOC_OUT
+		} else if (prefix.startswith("_IOW")) {
+			macroValue |= 0x40000000; // _IOC_IN
+		}
 		if ("KOS" in prefix)
-			ns = kos_ioctls;
+			macroValue |= 0x20000000; // _IOCKOS_MASK
 		break;
 	}
 	if (macroValue !is int)
 		continue;
-	if (macroValue >= #ns)
-		ns.resize(macroValue + 1);
-	if (ns[macroValue] is none)
-		ns[macroValue] = macroName.lstrip("_");
+	if (macroValue !in ioctls)
+		ioctls[macroValue] = macroName.lstrip("_");
 }
 
 printStrendNDatabase("IOCTLS", ioctls);
-printStrendNDatabase("KOS_IOCTLS", kos_ioctls);
 ]]]*/
 #define GETBASE_IOCTLS(result, index) \
 	(((index) <= 0x2) ? ((result) = repr_IOCTLS_0h, true) : \
-	 ((index) >= 0x204 && (index) <= 0x217) ? ((index) -= 0x204, (result) = repr_IOCTLS_204h, true) : \
 	 ((index) >= 0x241 && (index) <= 0x25a) ? ((index) -= 0x241, (result) = repr_IOCTLS_241h, true) : \
-	 ((index) == 0x290) ? ((index) = 0, (result) = repr_IOCTLS_290h, true) : \
 	 ((index) >= 0x301 && (index) <= 0x32f) ? ((index) -= 0x301, (result) = repr_IOCTLS_301h, true) : \
 	 ((index) >= 0x125d && (index) <= 0x127f) ? ((index) -= 0x125d, (result) = repr_IOCTLS_125dh, true) : \
 	 ((index) >= 0x4b2f && (index) <= 0x4b72) ? ((index) -= 0x4b2f, (result) = repr_IOCTLS_4b2fh, true) : \
@@ -2021,22 +2051,58 @@ printStrendNDatabase("KOS_IOCTLS", kos_ioctls);
 	 ((index) >= 0x5301 && (index) <= 0x5322) ? ((index) -= 0x5301, (result) = repr_IOCTLS_5301h, true) : \
 	 ((index) >= 0x5401 && (index) <= 0x5460) ? ((index) -= 0x5401, (result) = repr_IOCTLS_5401h, true) : \
 	 ((index) >= 0x5600 && (index) <= 0x560f) ? ((index) -= 0x5600, (result) = repr_IOCTLS_5600h, true) : \
-	 ((index) >= 0x5877 && (index) <= 0x5879) ? ((index) -= 0x5877, (result) = repr_IOCTLS_5877h, true) : \
-	 ((index) == 0x667a) ? ((index) = 0, (result) = repr_IOCTLS_667ah, true) : \
-	 ((index) >= 0x7201 && (index) <= 0x7213) ? ((index) -= 0x7201, (result) = repr_IOCTLS_7201h, true) : \
 	 ((index) >= 0x8901 && (index) <= 0x89b1) ? ((index) -= 0x8901, (result) = repr_IOCTLS_8901h, true) : \
-	 ((index) >= 0x89e0 && (index) <= 0x89f0) ? ((index) -= 0x89e0, (result) = repr_IOCTLS_89e0h, true) : false)
+	 ((index) >= 0x89e0 && (index) <= 0x89f0) ? ((index) -= 0x89e0, (result) = repr_IOCTLS_89e0h, true) : \
+	 ((index) >= 0x20004b03 && (index) <= 0x20004b04) ? ((index) -= 0x20004b03, (result) = repr_IOCTLS_20004b03h, true) : \
+	 ((index) == 0x20004d07) ? ((index) = 0, (result) = repr_IOCTLS_20004d07h, true) : \
+	 ((index) == 0x20005600) ? ((index) = 0, (result) = repr_IOCTLS_20005600h, true) : \
+	 ((index) == 0x20006600) ? ((index) = 0, (result) = repr_IOCTLS_20006600h, true) : \
+	 ((index) == 0x2000664c) ? ((index) = 0, (result) = repr_IOCTLS_2000664ch, true) : \
+	 ((index) >= 0x200066c0 && (index) <= 0x200066c1) ? ((index) -= 0x200066c0, (result) = repr_IOCTLS_200066c0h, true) : \
+	 ((index) >= 0x20006d12 && (index) <= 0x20006d13) ? ((index) -= 0x20006d12, (result) = repr_IOCTLS_20006d12h, true) : \
+	 ((index) >= 0x40000242 && (index) <= 0x4000024c) ? ((index) -= 0x40000242, (result) = repr_IOCTLS_40000242h, true) : \
+	 ((index) == 0x40000290) ? ((index) = 0, (result) = repr_IOCTLS_40000290h, true) : \
+	 ((index) == 0x40001271) ? ((index) = 0, (result) = repr_IOCTLS_40001271h, true) : \
+	 ((index) >= 0x4000542b && (index) <= 0x40005436) ? ((index) -= 0x4000542b, (result) = repr_IOCTLS_4000542bh, true) : \
+	 ((index) == 0x40007211) ? ((index) = 0, (result) = repr_IOCTLS_40007211h, true) : \
+	 ((index) >= 0x60004b02 && (index) <= 0x60004b08) ? ((index) -= 0x60004b02, (result) = repr_IOCTLS_60004b02h, true) : \
+	 ((index) == 0x60004c01) ? ((index) = 0, (result) = repr_IOCTLS_60004c01h, true) : \
+	 ((index) >= 0x60004d00 && (index) <= 0x60004d06) ? ((index) -= 0x60004d00, (result) = repr_IOCTLS_60004d00h, true) : \
+	 ((index) >= 0x60005301 && (index) <= 0x60005302) ? ((index) -= 0x60005301, (result) = repr_IOCTLS_60005301h, true) : \
+	 ((index) >= 0x60005400 && (index) <= 0x60005403) ? ((index) -= 0x60005400, (result) = repr_IOCTLS_60005400h, true) : \
+	 ((index) >= 0x60005611 && (index) <= 0x60005612) ? ((index) -= 0x60005611, (result) = repr_IOCTLS_60005611h, true) : \
+	 ((index) == 0x6000664c) ? ((index) = 0, (result) = repr_IOCTLS_6000664ch, true) : \
+	 ((index) >= 0x80000204 && (index) <= 0x80000217) ? ((index) -= 0x80000204, (result) = repr_IOCTLS_80000204h, true) : \
+	 ((index) >= 0x80001270 && (index) <= 0x80001272) ? ((index) -= 0x80001270, (result) = repr_IOCTLS_80001270h, true) : \
+	 ((index) >= 0x8000542a && (index) <= 0x80005442) ? ((index) -= 0x8000542a, (result) = repr_IOCTLS_8000542ah, true) : \
+	 ((index) == 0x8000667a) ? ((index) = 0, (result) = repr_IOCTLS_8000667ah, true) : \
+	 ((index) >= 0x80007201 && (index) <= 0x80007213) ? ((index) -= 0x80007201, (result) = repr_IOCTLS_80007201h, true) : \
+	 ((index) >= 0x80008906 && (index) <= 0x80008907) ? ((index) -= 0x80008906, (result) = repr_IOCTLS_80008906h, true) : \
+	 ((index) >= 0xa0004600 && (index) <= 0xa0004604) ? ((index) -= 0xa0004600, (result) = repr_IOCTLS_a0004600h, true) : \
+	 ((index) >= 0xa0004680 && (index) <= 0xa0004687) ? ((index) -= 0xa0004680, (result) = repr_IOCTLS_a0004680h, true) : \
+	 ((index) >= 0xa0004b00 && (index) <= 0xa0004b08) ? ((index) -= 0xa0004b00, (result) = repr_IOCTLS_a0004b00h, true) : \
+	 ((index) >= 0xa0004c01 && (index) <= 0xa0004c06) ? ((index) -= 0xa0004c01, (result) = repr_IOCTLS_a0004c01h, true) : \
+	 ((index) >= 0xa0004d00 && (index) <= 0xa0004d04) ? ((index) -= 0xa0004d00, (result) = repr_IOCTLS_a0004d00h, true) : \
+	 ((index) >= 0xa0005000 && (index) <= 0xa0005001) ? ((index) -= 0xa0005000, (result) = repr_IOCTLS_a0005000h, true) : \
+	 ((index) >= 0xa0005300 && (index) <= 0xa0005305) ? ((index) -= 0xa0005300, (result) = repr_IOCTLS_a0005300h, true) : \
+	 ((index) >= 0xa0005400 && (index) <= 0xa0005403) ? ((index) -= 0xa0005400, (result) = repr_IOCTLS_a0005400h, true) : \
+	 ((index) >= 0xa0005601 && (index) <= 0xa0005612) ? ((index) -= 0xa0005601, (result) = repr_IOCTLS_a0005601h, true) : \
+	 ((index) == 0xa000664c) ? ((index) = 0, (result) = repr_IOCTLS_a000664ch, true) : \
+	 ((index) >= 0xa0006680 && (index) <= 0xa0006685) ? ((index) -= 0xa0006680, (result) = repr_IOCTLS_a0006680h, true) : \
+	 ((index) >= 0xa0006d01 && (index) <= 0xa0006d11) ? ((index) -= 0xa0006d01, (result) = repr_IOCTLS_a0006d01h, true) : \
+	 ((index) >= 0xa0007000 && (index) <= 0xa0007010) ? ((index) -= 0xa0007000, (result) = repr_IOCTLS_a0007000h, true) : \
+	 ((index) == 0xc0001273) ? ((index) = 0, (result) = repr_IOCTLS_c0001273h, true) : \
+	 ((index) == 0xc0005443) ? ((index) = 0, (result) = repr_IOCTLS_c0005443h, true) : \
+	 ((index) >= 0xc0005877 && (index) <= 0xc0005879) ? ((index) -= 0xc0005877, (result) = repr_IOCTLS_c0005877h, true) : \
+	 ((index) >= 0xe0004610 && (index) <= 0xe0004620) ? ((index) -= 0xe0004610, (result) = repr_IOCTLS_e0004610h, true) : \
+	 ((index) >= 0xe0005008 && (index) <= 0xe0005009) ? ((index) -= 0xe0005008, (result) = repr_IOCTLS_e0005008h, true) : \
+	 ((index) >= 0xe0006601 && (index) <= 0xe0006612) ? ((index) -= 0xe0006601, (result) = repr_IOCTLS_e0006601h, true) : \
+	 ((index) >= 0xe0006d00 && (index) <= 0xe0006d02) ? ((index) -= 0xe0006d00, (result) = repr_IOCTLS_e0006d00h, true) : false)
 PRIVATE char const repr_IOCTLS_0h[] =
 "\0FIBMAP\0FIGETBSZ";
-PRIVATE char const repr_IOCTLS_204h[] =
-"FDGETMEDIAPRM\0\0\0\0\0\0\0\0\0\0FDGETMAXERRS\0FDGETDRVTYP\0\0FDGETDRVPRM\0FDG"
-"ETDRVSTAT\0FDPOLLDRVSTAT\0\0FDGETFDCSTAT\0\0FDWERRORGET";
 PRIVATE char const repr_IOCTLS_241h[] =
-"FDCLRPRM\0FDSETMEDIAPRM\0FDDEFPRM\0\0FDMSGON\0FDMSGOFF\0FDFMTBEG\0FDFMT"
-"TRK\0FDFMTEND\0FDSETEMSGTRESH\0FDFLUSH\0FDSETMAXERRS\0\0\0\0\0\0\0\0FDRESET\0"
-"\0FDWERRORCLR\0\0FDRAWCMD\0FDTWADDLE\0FDEJECT";
-PRIVATE char const repr_IOCTLS_290h[] =
-"FDSETDRVPRM";
+"FDCLRPRM\0\0\0\0FDMSGON\0FDMSGOFF\0FDFMTBEG\0\0FDFMTEND\0FDSETEMSGTRESH\0F"
+"DFLUSH\0\0\0\0\0\0\0\0\0FDRESET\0\0FDWERRORCLR\0\0FDRAWCMD\0FDTWADDLE\0FDEJECT";
 PRIVATE char const repr_IOCTLS_301h[] =
 "HDIO_GETGEO\0HDIO_GET_UNMASKINTR\0\0HDIO_GET_MULTCOUNT\0HDIO_GET_QDM"
 "A\0HDIO_SET_XFER\0HDIO_OBSOLETE_IDENTITY\0HDIO_GET_KEEPSETTINGS\0HDI"
@@ -2050,11 +2116,10 @@ PRIVATE char const repr_IOCTLS_301h[] =
 "IO_SET_BUSSTATE\0HDIO_SET_QDMA\0HDIO_SET_ADDRESS";
 PRIVATE char const repr_IOCTLS_125dh[] =
 "BLKROSET\0BLKROGET\0BLKRRPART\0BLKGETSIZE\0BLKFLSBUF\0BLKRASET\0BLKRAG"
-"ET\0BLKFRASET\0BLKFRAGET\0BLKSECTSET\0BLKSECTGET\0BLKSSZGET\0\0\0\0\0\0\0\0BL"
-"KBSZGET\0BLKBSZSET\0BLKGETSIZE64\0BLKTRACESETUP\0BLKTRACESTART\0BLKTR"
-"ACESTOP\0BLKTRACETEARDOWN\0BLKDISCARD\0BLKIOMIN\0BLKIOOPT\0BLKALIGNOF"
-"F\0BLKPBSZGET\0BLKDISCARDZEROES\0BLKSECDISCARD\0BLKROTATIONAL\0BLKZER"
-"OOUT";
+"ET\0BLKFRASET\0BLKFRAGET\0BLKSECTSET\0BLKSECTGET\0BLKSSZGET\0\0\0\0\0\0\0\0\0\0"
+"\0\0BLKTRACESTART\0BLKTRACESTOP\0BLKTRACETEARDOWN\0BLKDISCARD\0BLKIOMI"
+"N\0BLKIOOPT\0BLKALIGNOFF\0BLKPBSZGET\0BLKDISCARDZEROES\0BLKSECDISCARD"
+"\0BLKROTATIONAL\0BLKZEROOUT";
 PRIVATE char const repr_IOCTLS_4b2fh[] =
 "KIOCSOUND\0KDMKTONE\0KDGETLED\0KDSETLED\0KDGKBTYPE\0KDADDIO\0KDDELIO\0K"
 "DENABIO\0KDDISABIO\0\0\0KDSETMODE\0KDGETMODE\0KDMAPDISP\0KDUNMAPDISP\0\0\0"
@@ -2078,130 +2143,188 @@ PRIVATE char const repr_IOCTLS_5401h[] =
 "\0TIOCOUTQ\0TIOCSTI\0TIOCGWINSZ\0TIOCSWINSZ\0TIOCMGET\0TIOCMBIS\0TIOCMB"
 "IC\0TIOCMSET\0TIOCGSOFTCAR\0TIOCSSOFTCAR\0TIOCINQ\0TIOCLINUX\0TIOCCONS"
 "\0TIOCGSERIAL\0TIOCSSERIAL\0TIOCPKT\0FIONBIO\0TIOCNOTTY\0TIOCSETD\0TIOC"
-"GETD\0TCSBRKP\0\0TIOCSBRK\0TIOCCBRK\0TIOCGSID\0TCGETS2\0TCSETS2\0TCSETSW"
-"2\0TCSETSF2\0TIOCGRS485\0TIOCSRS485\0TIOCGPTN\0TIOCSPTLCK\0TIOCGDEV\0TC"
-"SETX\0TCSETXF\0TCSETXW\0TIOCSIG\0TIOCVHANGUP\0TIOCGPKT\0TIOCGPTLCK\0\0\0\0"
-"\0\0\0TIOCGEXCL\0TIOCGPTPEER\0TIOCGISO7816\0TIOCSISO7816\0\0\0\0\0\0\0\0\0\0\0\0\0F"
-"IONCLEX\0FIOCLEX\0FIOASYNC\0TIOCSERCONFIG\0TIOCSERGWILD\0TIOCSERSWILD"
-"\0TIOCGLCKTRMIOS\0TIOCSLCKTRMIOS\0TIOCSERGSTRUCT\0TIOCSERGETLSR\0TIOC"
-"SERGETMULTI\0TIOCSERSETMULTI\0TIOCMIWAIT\0TIOCGICOUNT\0\0\0FIOQSIZE";
+"GETD\0TCSBRKP\0\0TIOCSBRK\0TIOCCBRK\0TIOCGSID\0\0\0\0\0TIOCGRS485\0TIOCSRS4"
+"85\0\0\0TCGETX\0TCSETX\0TCSETXF\0TCSETXW\0\0TIOCVHANGUP\0\0\0\0\0\0\0\0\0\0TIOCGPT"
+"PEER\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0FIONCLEX\0FIOCLEX\0FIOASYNC\0TIOCSERCONFIG\0TIOCS"
+"ERGWILD\0TIOCSERSWILD\0TIOCGLCKTRMIOS\0TIOCSLCKTRMIOS\0TIOCSERGSTRUC"
+"T\0TIOCSERGETLSR\0TIOCSERGETMULTI\0TIOCSERSETMULTI\0TIOCMIWAIT\0TIOCG"
+"ICOUNT\0\0\0FIOQSIZE";
 PRIVATE char const repr_IOCTLS_5600h[] =
 "VT_OPENQRY\0VT_GETMODE\0VT_SETMODE\0VT_GETSTATE\0VT_SENDSIG\0VT_RELDI"
 "SP\0VT_ACTIVATE\0VT_WAITACTIVE\0VT_DISALLOCATE\0VT_RESIZE\0VT_RESIZEX"
 "\0VT_LOCKSWITCH\0VT_UNLOCKSWITCH\0VT_GETHIFONTMASK\0VT_WAITEVENT\0VT_"
 "SETACTIVATE";
-PRIVATE char const repr_IOCTLS_5877h[] =
-"FIFREEZE\0FITHAW\0FITRIM";
-PRIVATE char const repr_IOCTLS_667ah[] =
-"FIODTYPE";
-PRIVATE char const repr_IOCTLS_7201h[] =
-"VFAT_IOCTL_READDIR_BOTH\0VFAT_IOCTL_READDIR_SHORT\0\0\0\0\0\0\0\0\0\0\0\0\0\0FA"
-"T_IOCTL_GET_ATTRIBUTES\0FAT_IOCTL_SET_ATTRIBUTES\0\0FAT_IOCTL_GET_V"
-"OLUME_ID";
 PRIVATE char const repr_IOCTLS_8901h[] =
-"FIOSETOWN\0SIOCSPGRP\0FIOGETOWN\0SIOCGPGRP\0SIOCATMARK\0SIOCGSTAMP64\0"
-"SIOCGSTAMPNS64\0\0\0\0SIOCADDRT\0SIOCDELRT\0SIOCRTMSG\0\0\0SIOCGIFNAME\0SI"
-"OCSIFLINK\0SIOCGIFCONF\0SIOCGIFFLAGS\0SIOCSIFFLAGS\0SIOCGIFADDR\0SIOC"
-"SIFADDR\0SIOCGIFDSTADDR\0SIOCSIFDSTADDR\0SIOCGIFBRDADDR\0SIOCSIFBRDA"
-"DDR\0SIOCGIFNETMASK\0SIOCSIFNETMASK\0SIOCGIFMETRIC\0SIOCSIFMETRIC\0SI"
-"OCGIFMEM\0SIOCSIFMEM\0SIOCGIFMTU\0SIOCSIFMTU\0SIOCSIFNAME\0SIOCSIFHWA"
-"DDR\0SIOCGIFENCAP\0SIOCSIFENCAP\0SIOCGIFHWADDR\0\0SIOCGIFSLAVE\0\0\0\0\0\0\0"
-"SIOCSIFSLAVE\0SIOCADDMULTI\0SIOCDELMULTI\0SIOCGIFINDEX\0SIOCSIFPFLAG"
-"S\0SIOCGIFPFLAGS\0SIOCDIFADDR\0SIOCSIFHWBROADCAST\0SIOCGIFCOUNT\0\0\0\0\0"
-"\0\0\0SIOCGIFBR\0SIOCSIFBR\0SIOCGIFTXQLEN\0SIOCSIFTXQLEN\0\0\0SIOCETHTOOL"
-"\0SIOCGMIIPHY\0SIOCGMIIREG\0SIOCSMIIREG\0SIOCWANDEV\0SIOCOUTQNSD\0\0\0\0\0"
-"\0\0\0SIOCDARP\0SIOCGARP\0SIOCSARP\0\0\0\0\0\0\0\0\0\0\0SIOCDRARP\0SIOCGRARP\0SIOC"
-"SRARP\0\0\0\0\0\0\0\0\0\0\0\0\0\0SIOCGIFMAP\0SIOCSIFMAP\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0SIOCADDDL"
-"CI\0SIOCDELDLCI\0SIOCGIFVLAN\0SIOCSIFVLAN\0\0\0\0\0\0\0\0\0\0\0\0\0SIOCBONDENSLA"
-"VE\0SIOCBONDRELEASE\0SIOCBONDSETHWADDR\0SIOCBONDSLAVEINFOQUERY\0SIOC"
-"BONDINFOQUERY\0SIOCBONDCHANGEACTIVE\0\0\0\0\0\0\0\0\0\0\0SIOCBRADDBR\0SIOCBRD"
-"ELBR\0SIOCBRADDIF\0SIOCBRDELIF\0\0\0\0\0\0\0\0\0\0\0\0\0SIOCSHWTSTAMP\0SIOCGHWTS"
-"TAMP";
+"FIOSETOWN\0SIOCSPGRP\0FIOGETOWN\0SIOCGPGRP\0SIOCATMARK\0\0\0\0\0\0SIOCADDR"
+"T\0SIOCDELRT\0SIOCRTMSG\0\0\0SIOCGIFNAME\0SIOCSIFLINK\0SIOCGIFCONF\0SIOC"
+"GIFFLAGS\0SIOCSIFFLAGS\0SIOCGIFADDR\0SIOCSIFADDR\0SIOCGIFDSTADDR\0SIO"
+"CSIFDSTADDR\0SIOCGIFBRDADDR\0SIOCSIFBRDADDR\0SIOCGIFNETMASK\0SIOCSIF"
+"NETMASK\0SIOCGIFMETRIC\0SIOCSIFMETRIC\0SIOCGIFMEM\0SIOCSIFMEM\0SIOCGI"
+"FMTU\0SIOCSIFMTU\0SIOCSIFNAME\0SIOCSIFHWADDR\0SIOCGIFENCAP\0SIOCSIFEN"
+"CAP\0SIOCGIFHWADDR\0\0SIOCGIFSLAVE\0\0\0\0\0\0\0SIOCSIFSLAVE\0SIOCADDMULTI\0"
+"SIOCDELMULTI\0SIOCGIFINDEX\0SIOCSIFPFLAGS\0SIOCGIFPFLAGS\0SIOCDIFADD"
+"R\0SIOCSIFHWBROADCAST\0SIOCGIFCOUNT\0\0\0\0\0\0\0\0SIOCGIFBR\0SIOCSIFBR\0SIO"
+"CGIFTXQLEN\0SIOCSIFTXQLEN\0\0\0SIOCETHTOOL\0SIOCGMIIPHY\0SIOCGMIIREG\0S"
+"IOCSMIIREG\0SIOCWANDEV\0SIOCOUTQNSD\0\0\0\0\0\0\0\0SIOCDARP\0SIOCGARP\0SIOCS"
+"ARP\0\0\0\0\0\0\0\0\0\0\0SIOCDRARP\0SIOCGRARP\0SIOCSRARP\0\0\0\0\0\0\0\0\0\0\0\0\0\0SIOCGIF"
+"MAP\0SIOCSIFMAP\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0SIOCADDDLCI\0SIOCDELDLCI\0SIOCGIFVLAN"
+"\0SIOCSIFVLAN\0\0\0\0\0\0\0\0\0\0\0\0\0SIOCBONDENSLAVE\0SIOCBONDRELEASE\0SIOCBON"
+"DSETHWADDR\0SIOCBONDSLAVEINFOQUERY\0SIOCBONDINFOQUERY\0SIOCBONDCHAN"
+"GEACTIVE\0\0\0\0\0\0\0\0\0\0\0SIOCBRADDBR\0SIOCBRDELBR\0SIOCBRADDIF\0SIOCBRDEL"
+"IF\0\0\0\0\0\0\0\0\0\0\0\0\0SIOCSHWTSTAMP\0SIOCGHWTSTAMP";
 PRIVATE char const repr_IOCTLS_89e0h[] =
 "SIOCPROTOPRIVATE\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0SIOCDEVPRIVATE";
-
-#define GETBASE_KOS_IOCTLS(result, index) \
-	(((index) >= 0x4600 && (index) <= 0x4620) ? ((index) -= 0x4600, (result) = repr_KOS_IOCTLS_4600h, true) : \
-	 ((index) >= 0x4680 && (index) <= 0x4687) ? ((index) -= 0x4680, (result) = repr_KOS_IOCTLS_4680h, true) : \
-	 ((index) >= 0x4b00 && (index) <= 0x4b08) ? ((index) -= 0x4b00, (result) = repr_KOS_IOCTLS_4b00h, true) : \
-	 ((index) >= 0x4c01 && (index) <= 0x4c06) ? ((index) -= 0x4c01, (result) = repr_KOS_IOCTLS_4c01h, true) : \
-	 ((index) >= 0x4d00 && (index) <= 0x4d07) ? ((index) -= 0x4d00, (result) = repr_KOS_IOCTLS_4d00h, true) : \
-	 ((index) >= 0x5000 && (index) <= 0x5009) ? ((index) -= 0x5000, (result) = repr_KOS_IOCTLS_5000h, true) : \
-	 ((index) >= 0x5300 && (index) <= 0x5305) ? ((index) -= 0x5300, (result) = repr_KOS_IOCTLS_5300h, true) : \
-	 ((index) >= 0x5400 && (index) <= 0x5403) ? ((index) -= 0x5400, (result) = repr_KOS_IOCTLS_5400h, true) : \
-	 ((index) >= 0x5600 && (index) <= 0x5612) ? ((index) -= 0x5600, (result) = repr_KOS_IOCTLS_5600h, true) : \
-	 ((index) >= 0x6600 && (index) <= 0x6612) ? ((index) -= 0x6600, (result) = repr_KOS_IOCTLS_6600h, true) : \
-	 ((index) == 0x664c) ? ((index) = 0, (result) = repr_KOS_IOCTLS_664ch, true) : \
-	 ((index) >= 0x6680 && (index) <= 0x6685) ? ((index) -= 0x6680, (result) = repr_KOS_IOCTLS_6680h, true) : \
-	 ((index) >= 0x66c0 && (index) <= 0x66c1) ? ((index) -= 0x66c0, (result) = repr_KOS_IOCTLS_66c0h, true) : \
-	 ((index) >= 0x6d00 && (index) <= 0x6d13) ? ((index) -= 0x6d00, (result) = repr_KOS_IOCTLS_6d00h, true) : \
-	 ((index) >= 0x7000 && (index) <= 0x7010) ? ((index) -= 0x7000, (result) = repr_KOS_IOCTLS_7000h, true) : false)
-PRIVATE char const repr_KOS_IOCTLS_4600h[] =
+PRIVATE char const repr_IOCTLS_20004b03h[] =
+"KBD_IOC_RESETKEYMAP\0KBD_IOC_FLUSHPENDING";
+PRIVATE char const repr_IOCTLS_20004d07h[] =
+"MOUSEIO_FLUSHPENDING";
+PRIVATE char const repr_IOCTLS_20005600h[] =
+"VID_IOC_ACTIVATE";
+PRIVATE char const repr_IOCTLS_20006600h[] =
+"FD_IOC_NOOP";
+PRIVATE char const repr_IOCTLS_2000664ch[] =
+"FD_IOC_DIRECTIO";
+PRIVATE char const repr_IOCTLS_200066c0h[] =
+"FD_IOC_INCREF\0FD_IOC_DECREF";
+PRIVATE char const repr_IOCTLS_20006d12h[] =
+"MOD_IOC_INIT\0MOD_IOC_FINI";
+PRIVATE char const repr_IOCTLS_40000242h[] =
+"FDSETMEDIAPRM\0FDDEFPRM\0\0\0\0\0FDFMTTRK\0\0\0\0FDSETMAXERRS";
+PRIVATE char const repr_IOCTLS_40000290h[] =
+"FDSETDRVPRM";
+PRIVATE char const repr_IOCTLS_40001271h[] =
+"BLKBSZSET";
+PRIVATE char const repr_IOCTLS_4000542bh[] =
+"TCSETS2\0TCSETSW2\0TCSETSF2\0\0\0\0TIOCSPTLCK\0\0\0\0\0TIOCSIG";
+PRIVATE char const repr_IOCTLS_40007211h[] =
+"FAT_IOCTL_SET_ATTRIBUTES";
+PRIVATE char const repr_IOCTLS_60004b02h[] =
+"KBD_IOC_SETLED\0KBD_IOC_SETKEYMAP\0\0KBD_IOC_PUTSTR\0KBD_IOC_PUTKEY\0"
+"KBD_IOC_SETDBGF12\0KBD_IOC_SETMOD";
+PRIVATE char const repr_IOCTLS_60004c01h[] =
+"LEAKS_IOC_SETONCLOSE";
+PRIVATE char const repr_IOCTLS_60004d00h[] =
+"MOUSEIO_SETABSMODE\0MOUSEIO_SETABSRECT\0MOUSEIO_PUTMOTION\0MOUSEIO_"
+"SETPOS\0MOUSEIO_PUTBUTTON\0MOUSEIO_PUTVWHEEL\0MOUSEIO_PUTHWHEEL";
+PRIVATE char const repr_IOCTLS_60005301h[] =
+"SVGA_IOC_SETMODE\0SVGA_IOC_SETDEFMODE";
+PRIVATE char const repr_IOCTLS_60005400h[] =
+"TTYIO_IBUF_SETLIMIT\0TTYIO_CANON_SETLIMIT\0TTYIO_OPEND_SETLIMIT\0TT"
+"YIO_IPEND_SETLIMIT";
+PRIVATE char const repr_IOCTLS_60005611h[] =
+"VID_IOC_SETCELLDATA\0VID_IOC_SETCURSOR";
+PRIVATE char const repr_IOCTLS_6000664ch[] =
+"FD_IOC_SETDIRECTIO";
+PRIVATE char const repr_IOCTLS_80000204h[] =
+"FDGETMEDIAPRM\0\0\0\0\0\0\0\0\0\0FDGETMAXERRS\0FDGETDRVTYP\0\0FDGETDRVPRM\0FDG"
+"ETDRVSTAT\0FDPOLLDRVSTAT\0\0FDGETFDCSTAT\0\0FDWERRORGET";
+PRIVATE char const repr_IOCTLS_80001270h[] =
+"BLKBSZGET\0\0BLKGETSIZE64";
+PRIVATE char const repr_IOCTLS_8000542ah[] =
+"TCGETS2\0\0\0\0\0\0TIOCGPTN\0\0TIOCGDEV\0\0\0\0\0\0TIOCGPKT\0TIOCGPTLCK\0\0\0\0\0\0\0T"
+"IOCGEXCL\0\0TIOCGISO7816";
+PRIVATE char const repr_IOCTLS_8000667ah[] =
+"FIODTYPE";
+PRIVATE char const repr_IOCTLS_80007201h[] =
+"VFAT_IOCTL_READDIR_BOTH\0VFAT_IOCTL_READDIR_SHORT\0\0\0\0\0\0\0\0\0\0\0\0\0\0FA"
+"T_IOCTL_GET_ATTRIBUTES\0\0\0FAT_IOCTL_GET_VOLUME_ID";
+PRIVATE char const repr_IOCTLS_80008906h[] =
+"SIOCGSTAMP64\0SIOCGSTAMPNS64";
+PRIVATE char const repr_IOCTLS_a0004600h[] =
 "FILE_IOC_DELETED\0FILE_IOC_HASRAWIO\0FILE_IOC_DCHANGED\0FILE_IOC_CH"
-"ANGED\0FILE_IOC_BLKSHIFT\0\0\0\0\0\0\0\0\0\0\0\0FILE_IOC_MKUALIGN\0\0\0\0\0\0\0\0\0\0\0\0"
-"\0\0\0\0FILE_IOC_TAILREAD";
-PRIVATE char const repr_KOS_IOCTLS_4680h[] =
+"ANGED\0FILE_IOC_BLKSHIFT";
+PRIVATE char const repr_IOCTLS_a0004680h[] =
 "FILE_IOC_GETFSLINKMAX\0FILE_IOC_GETFSNAMEMAX\0FILE_IOC_GETFSSIZBIT"
 "S\0FILE_IOC_GETFSXFERINC\0FILE_IOC_GETFSXFERMAX\0FILE_IOC_GETFSXFER"
 "MIN\0FILE_IOC_GETFSXFERALN\0FILE_IOC_GETFSSYMMAX";
-PRIVATE char const repr_KOS_IOCTLS_4b00h[] =
-"KBD_IOC_TRYGETKEY\0KBD_IOC_GETKEY\0KBD_IOC_SETLED\0KBD_IOC_RESETKEY"
-"MAP\0KBD_IOC_FLUSHPENDING\0KBD_IOC_PUTSTR\0KBD_IOC_PUTKEY\0KBD_IOC_S"
-"ETDBGF12\0KBD_IOC_MASKMOD";
-PRIVATE char const repr_KOS_IOCTLS_4c01h[] =
-"LEAKS_IOC_SETONCLOSE\0LEAKS_IOC_GETCOUNT\0LEAKS_IOC_LEAKATTR\0LEAKS"
+PRIVATE char const repr_IOCTLS_a0004b00h[] =
+"KBD_IOC_TRYGETKEY\0KBD_IOC_GETKEY\0KBD_IOC_MASKLED\0KBD_IOC_GETKEYM"
+"AP\0\0\0\0KBD_IOC_GETDBGF12\0KBD_IOC_MASKMOD";
+PRIVATE char const repr_IOCTLS_a0004c01h[] =
+"LEAKS_IOC_GETONCLOSE\0LEAKS_IOC_GETCOUNT\0LEAKS_IOC_LEAKATTR\0LEAKS"
 "_IOC_LEAKTB\0LEAKS_IOC_READLEAKMEM\0LEAKS_IOC_READUSERMEM";
-PRIVATE char const repr_KOS_IOCTLS_4d00h[] =
-"MOUSEIO_SETABSMODE\0MOUSEIO_SETABSRECT\0MOUSEIO_PUTMOTION\0MOUSEIO_"
-"SETPOS\0MOUSEIO_PUTBUTTON\0MOUSEIO_PUTVWHEEL\0MOUSEIO_PUTHWHEEL\0MOU"
-"SEIO_FLUSHPENDING";
-PRIVATE char const repr_KOS_IOCTLS_5000h[] =
-"PIPE_IOC_CLOSED\0PIPE_IOC_READABLE\0\0\0\0\0\0\0PIPE_IOC_PEEK\0PIPE_IOC_D"
-"ISCARD";
-PRIVATE char const repr_KOS_IOCTLS_5300h[] =
-"SVGA_IOC_MAKETTY\0SVGA_IOC_GETMODE\0SVGA_IOC_SETDEFMODE\0SVGA_IOC_L"
+PRIVATE char const repr_IOCTLS_a0004d00h[] =
+"MOUSEIO_GETABSMODE\0MOUSEIO_GETABSRECT\0\0MOUSEIO_GETPOS\0MOUSEIO_GE"
+"TBUTTONS";
+PRIVATE char const repr_IOCTLS_a0005000h[] =
+"PIPE_IOC_CLOSED\0PIPE_IOC_READABLE";
+PRIVATE char const repr_IOCTLS_a0005300h[] =
+"SVGA_IOC_MAKETTY\0SVGA_IOC_GETMODE\0SVGA_IOC_GETDEFMODE\0SVGA_IOC_L"
 "SMODES\0SVGA_IOC_GETCSNAME\0SVGA_IOC_CSSTRINGS";
-PRIVATE char const repr_KOS_IOCTLS_5400h[] =
-"TTYIO_IBUF_GETLIMIT\0TTYIO_CANON_SETLIMIT\0TTYIO_OPEND_SETLIMIT\0TT"
+PRIVATE char const repr_IOCTLS_a0005400h[] =
+"TTYIO_IBUF_GETLIMIT\0TTYIO_CANON_GETLIMIT\0TTYIO_OPEND_GETLIMIT\0TT"
 "YIO_IPEND_GETLIMIT";
-PRIVATE char const repr_KOS_IOCTLS_5600h[] =
-"VID_IOC_ACTIVATE\0VID_IOC_MAKELCK\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0VID_IOC_GETTTYINF"
-"O\0VID_IOC_GETCELLDATA\0VID_IOC_GETCURSOR";
-PRIVATE char const repr_KOS_IOCTLS_6600h[] =
-"FD_IOC_NOOP\0FD_IOC_POLLTEST\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0FD_IOC_DUPFD\0FD_IOC_CA"
-"ST\0FD_IOC_DESC";
-PRIVATE char const repr_KOS_IOCTLS_664ch[] =
+PRIVATE char const repr_IOCTLS_a0005601h[] =
+"VID_IOC_MAKELCK\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0VID_IOC_GETTTYINFO\0VID_IOC_GETCELL"
+"DATA\0VID_IOC_GETCURSOR";
+PRIVATE char const repr_IOCTLS_a000664ch[] =
 "FD_IOC_GETDIRECTIO";
-PRIVATE char const repr_KOS_IOCTLS_6680h[] =
+PRIVATE char const repr_IOCTLS_a0006680h[] =
 "FD_IOC_GETTYPE\0FD_IOC_GETKIND\0FD_IOC_GETMODE\0FD_IOC_GETADDR\0FD_I"
 "OC_GETRADDR\0FD_IOC_GETREFCNT";
-PRIVATE char const repr_KOS_IOCTLS_66c0h[] =
-"FD_IOC_INCREF\0FD_IOC_DECREF";
-PRIVATE char const repr_KOS_IOCTLS_6d00h[] =
-"MOD_IOC_GETOBJECT\0MOD_IOC_GETCOUNT\0MOD_IOC_GETSTRING\0\0\0\0\0\0\0\0\0\0\0\0"
-"\0\0MOD_IOC_GETSTATE\0MOD_IOC_LOADINFO\0MOD_IOC_INIT\0MOD_IOC_FINI";
-PRIVATE char const repr_KOS_IOCTLS_7000h[] =
+PRIVATE char const repr_IOCTLS_a0006d01h[] =
+"MOD_IOC_GETCOUNT\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0MOD_IOC_GETSTATE\0MOD_IOC_LOADINFO";
+PRIVATE char const repr_IOCTLS_a0007000h[] =
 "PIDFD_IOC_GETTID\0PIDFD_IOC_GETPID\0PIDFD_IOC_GETPPID\0PIDFD_IOC_GE"
 "TPGID\0PIDFD_IOC_GETSID\0\0\0\0\0PIDFD_IOC_OPENPID\0PIDFD_IOC_OPENPPID\0"
 "\0\0\0\0\0PIDFD_IOC_EXITCODE";
-//[[[end]]]
+PRIVATE char const repr_IOCTLS_c0001273h[] =
+"BLKTRACESETUP";
+PRIVATE char const repr_IOCTLS_c0005443h[] =
+"TIOCSISO7816";
+PRIVATE char const repr_IOCTLS_c0005877h[] =
+"FIFREEZE\0FITHAW\0FITRIM";
+PRIVATE char const repr_IOCTLS_e0004610h[] =
+"FILE_IOC_MKUALIGN\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0FILE_IOC_TAILREAD";
+PRIVATE char const repr_IOCTLS_e0005008h[] =
+"PIPE_IOC_PEEK\0PIPE_IOC_DISCARD";
+PRIVATE char const repr_IOCTLS_e0006601h[] =
+"FD_IOC_POLLTEST\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0FD_IOC_DUPFD\0FD_IOC_CAST\0FD_IOC_DE"
+"SC";
+PRIVATE char const repr_IOCTLS_e0006d00h[] =
+"MOD_IOC_GETOBJECT\0\0MOD_IOC_GETSTRING";
+/*[[[end]]]*/
 
 PRIVATE ATTR_CONST WUNUSED char const *CC
-get_ioctl_command_name(syscall_ulong_t command) {
+get_ioctl_command_name_raw(syscall_ulong_t command) {
 	char const *result = NULL;
-	if (_IOC_ISKOS(command)) {
-		command &= 0xffff;
-		if (!GETBASE_KOS_IOCTLS(result, command))
-			goto done;
-	} else {
-		command &= 0xffff;
-		if (!GETBASE_IOCTLS(result, command))
-			goto done;
-	}
+	if (!GETBASE_IOCTLS(result, command))
+		goto done;
 	for (; command; --command)
 		result = strend(result) + 1;
 	if (!*result)
 		result = NULL;
+done:
+	return result;
+}
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_ioctl_command_name(syscall_ulong_t command) {
+	char const *result;
+	command &= ((_IOC_NRMASK << _IOC_NRSHIFT) |
+	            (_IOC_TYPEMASK << _IOC_TYPESHIFT) |
+	            (_IOC_KOSMASK << _IOC_KOSSHIFT) |
+	            (_IOC_DIRMASK << _IOC_DIRSHIFT));
+	result = get_ioctl_command_name_raw(command);
+	if (result)
+		goto done;
+
+	/* If not found with the original direct, also try different directions. */
+	command &= ((_IOC_NRMASK << _IOC_NRSHIFT) |
+	            (_IOC_TYPEMASK << _IOC_TYPESHIFT) |
+	            (_IOC_KOSMASK << _IOC_KOSSHIFT));
+	result = get_ioctl_command_name_raw(command);
+	if (result)
+		goto done;
+	result = get_ioctl_command_name_raw(command | _IOC_IN);
+	if (result)
+		goto done;
+	result = get_ioctl_command_name_raw(command | _IOC_OUT);
+	if (result)
+		goto done;
+	result = get_ioctl_command_name_raw(command | _IOC_INOUT);
+	/*if (result)
+		goto done;*/
 done:
 	return result;
 }
@@ -2311,6 +2434,753 @@ err:
 	return temp;
 }
 #endif /* NEED_print_ioctl_command */
+
+
+#ifdef NEED_print_termios_iflag
+PRIVATE struct {
+	uint32_t   pn_flag;
+	char const pn_name[8];
+} const termios_iflag_names[] = {
+	{ __IGNBRK, /* */ "IGNBRK" },
+	{ __BRKINT, /* */ "BRKINT" },
+	{ __IGNPAR, /* */ "IGNPAR" },
+	{ __PARMRK, /* */ "PARMRK" },
+	{ __INPCK, /*  */ "INPCK" },
+	{ __ISTRIP, /* */ "ISTRIP" },
+	{ __INLCR, /*  */ "INLCR" },
+	{ __IGNCR, /*  */ "IGNCR" },
+	{ __ICRNL, /*  */ "ICRNL" },
+	{ __IUCLC, /*  */ "IUCLC" },
+	{ __IXON, /*   */ "IXON" },
+	{ __IXANY, /*  */ "IXANY" },
+	{ __IXOFF, /*  */ "IXOFF" },
+	{ __IMAXBEL, /**/ "IMAXBEL" },
+	{ __IUTF8, /*  */ "IUTF8" },
+	{ __IIOFF, /*  */ "IIOFF" },
+	{ __IBAUD0, /* */ "IBAUD0" },
+	{ 0, "" },
+};
+
+PRIVATE NONNULL((1)) ssize_t CC
+print_termios_iflag(pformatprinter printer, void *arg, syscall_ulong_t flags) {
+	if (flags == TTYDEF_IFLAG)
+		return (*printer)(arg, "TTYDEF_IFLAG", COMPILER_STRLEN("TTYDEF_IFLAG"));
+	return print_flagset32(printer, arg, termios_iflag_names,
+	                       sizeof(*termios_iflag_names),
+	                       "", flags);
+}
+#endif /* NEED_print_termios_iflag */
+
+
+#ifdef NEED_print_termios_oflag
+PRIVATE struct {
+	uint32_t   pn_flag;
+	char const pn_name[8];
+} const termios_oflag_names[] = {
+	{ __OPOST, /* */ "OPOST" },
+	{ __OLCUC, /* */ "OLCUC" },
+	{ __ONLCR, /* */ "ONLCR" },
+	{ __OCRNL, /* */ "OCRNL" },
+	{ __ONOCR, /* */ "ONOCR" },
+	{ __ONLRET, /**/ "ONLRET" },
+	{ __OFILL, /* */ "OFILL" },
+	{ __OFDEL, /* */ "OFDEL" },
+	{ __NL1, /*   */ "NL1" },
+	{ __BS1, /*   */ "BS1" },
+	{ __FF1, /*   */ "FF1" },
+	{ __VT1, /*   */ "VT1" },
+	{ 0, "" },
+};
+
+PRIVATE NONNULL((1)) ssize_t CC
+print_termios_oflag(pformatprinter printer, void *arg, syscall_ulong_t flags) {
+	ssize_t result, temp;
+	if (flags == TTYDEF_OFLAG)
+		return (*printer)(arg, "TTYDEF_OFLAG", COMPILER_STRLEN("TTYDEF_OFLAG"));
+	result = 0;
+	if (flags & __CRDLY) {
+		syscall_ulong_t mask = flags & __CRDLY;
+		PRINTF("CR%d" PIPESTR_S, mask == __CR1 ? 1 : mask == __CR2 ? 2 : 3);
+		flags &= ~__CRDLY;
+	}
+	if (flags & __TABDLY) {
+		syscall_ulong_t mask = flags & __TABDLY;
+		PRINTF("TAB%d" PIPESTR_S, mask == __TAB1 ? 1 : mask == __TAB2 ? 2 : 3);
+		flags &= ~__TABDLY;
+	}
+	DO(print_flagset32(printer, arg, termios_oflag_names,
+	                   sizeof(*termios_oflag_names),
+	                   "", flags));
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_termios_oflag */
+
+
+#ifdef NEED_print_termios_lflag
+PRIVATE struct {
+	uint32_t   pn_flag;
+	char const pn_name[12];
+} const termios_lflag_names[] = {
+	{ __ISIG, /*     */ "ISIG" },
+	{ __ICANON, /*   */ "ICANON" },
+	{ __XCASE, /*    */ "XCASE" },
+	{ __ECHO, /*     */ "ECHO" },
+	{ __ECHOE, /*    */ "ECHOE" },
+	{ __ECHOK, /*    */ "ECHOK" },
+	{ __ECHONL, /*   */ "ECHONL" },
+	{ __NOFLSH, /*   */ "NOFLSH" },
+	{ __TOSTOP, /*   */ "TOSTOP" },
+	{ __ECHOCTL, /*  */ "ECHOCTL" },
+	{ __ECHOPRT, /*  */ "ECHOPRT" },
+	{ __ECHOKE, /*   */ "ECHOKE" },
+	{ __FLUSHO, /*   */ "FLUSHO" },
+	{ __PENDIN, /*   */ "PENDIN" },
+	{ __IEXTEN, /*   */ "IEXTEN" },
+	{ __EXTPROC, /*  */ "EXTPROC" },
+	{ __IERASING, /* */ "IERASING" },
+	{ __IXCASEING, /**/ "IXCASEING" },
+	{ __IEOFING, /*  */ "IEOFING" },
+	{ __IESCAPING, /**/ "IESCAPING" },
+	{ 0, "" },
+};
+
+PRIVATE NONNULL((1)) ssize_t CC
+print_termios_lflag(pformatprinter printer, void *arg, syscall_ulong_t flags) {
+	if (flags == TTYDEF_LFLAG)
+		return (*printer)(arg, "TTYDEF_LFLAG", COMPILER_STRLEN("TTYDEF_LFLAG"));
+	return print_flagset32(printer, arg, termios_lflag_names,
+	                       sizeof(*termios_lflag_names),
+	                       "", flags);
+}
+#endif /* NEED_print_termios_lflag */
+
+
+#ifdef NEED_print_termios_cflag
+PRIVATE struct {
+	uint32_t   pn_flag;
+	char const pn_name[8];
+} const termios_cflag_names[] = {
+	{ __CSTOPB, /* */ "CSTOPB" },
+	{ __CREAD, /*  */ "CREAD" },
+	{ __PARENB, /* */ "PARENB" },
+	{ __PARODD, /* */ "PARODD" },
+	{ __HUPCL, /*  */ "HUPCL" },
+	{ __CLOCAL, /* */ "CLOCAL" },
+	{ __CMSPAR, /* */ "CMSPAR" },
+	{ __CRTSCTS, /**/ "CRTSCTS" },
+	{ 0, "" },
+};
+
+PRIVATE unsigned int const termio_speeds[0x20] = {
+	/* For: __B0       */ 0,
+	/* For: __B50      */ 50,
+	/* For: __B75      */ 75,
+	/* For: __B110     */ 110,
+	/* For: __B134     */ 134,
+	/* For: __B150     */ 150,
+	/* For: __B200     */ 200,
+	/* For: __B300     */ 300,
+	/* For: __B600     */ 600,
+	/* For: __B1200    */ 1200,
+	/* For: __B1800    */ 1800,
+	/* For: __B2400    */ 2400,
+	/* For: __B4800    */ 4800,
+	/* For: __B9600    */ 9600,
+	/* For: __B19200   */ 19200,
+	/* For: __B38400   */ 38400,
+	/* For: __BOTHER   */ 0,
+	/* For: __B57600   */ 57600,
+	/* For: __B115200  */ 115200,
+	/* For: __B230400  */ 230400,
+	/* For: __B460800  */ 460800,
+	/* For: __B500000  */ 500000,
+	/* For: __B576000  */ 576000,
+	/* For: __B921600  */ 921600,
+	/* For: __B1000000 */ 1000000,
+	/* For: __B1152000 */ 1152000,
+	/* For: __B1500000 */ 1500000,
+	/* For: __B2000000 */ 2000000,
+	/* For: __B2500000 */ 2500000,
+	/* For: __B3000000 */ 3000000,
+	/* For: __B3500000 */ 3500000,
+	/* For: __B4000000 */ 4000000,
+};
+
+PRIVATE ATTR_CONST WUNUSED unsigned int CC
+get_termios_speed(syscall_ulong_t flags) {
+	if (flags & 0x00001000) {
+		flags &= ~0x00001000;
+		flags |= 0x10;
+	}
+	return termio_speeds[flags];
+}
+
+PRIVATE NONNULL((1)) ssize_t CC
+print_termios_cflag(pformatprinter printer, void *arg, syscall_ulong_t flags) {
+	ssize_t result, temp;
+	if (flags == TTYDEF_CFLAG)
+		return (*printer)(arg, "TTYDEF_CFLAG", COMPILER_STRLEN("TTYDEF_CFLAG"));
+	result = 0;
+	if (flags & __CSIZE) {
+		syscall_ulong_t mask = flags & __CSIZE;
+		PRINTF("CS%d" PIPESTR_S, mask == __CS6 ? 6 : mask == __CS7 ? 7 : 8);
+		flags &= ~__CSIZE;
+	}
+	if (flags & __CBAUD) {
+		syscall_ulong_t mask = flags & __CBAUD;
+		if (mask == __CBAUDEX) {
+			PRINT("CBAUDEX");
+		} else {
+			PRINTF("B%u" PIPESTR_S, get_termios_speed(mask));
+		}
+		flags &= ~__CBAUD;
+	}
+	if (flags & __CIBAUD) {
+		syscall_ulong_t mask = (flags & __CIBAUD) >> __IBSHIFT;
+		if (mask == __CBAUDEX) {
+			PRINT("(CBAUDEX" SYNSPACE "<<" SYNSPACE "IBSHIFT)");
+		} else {
+			PRINTF("(B%u" SYNSPACE "<<" SYNSPACE "IBSHIFT)" PIPESTR_S,
+			       get_termios_speed(mask));
+		}
+		flags &= ~__CIBAUD;
+	}
+	DO(print_flagset32(printer, arg, termios_cflag_names,
+	                   sizeof(*termios_cflag_names),
+	                   "", flags));
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_termios_cflag */
+
+
+#if defined(NEED_print_termio_common) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local typ = getPrefixedMacrosFromFileAsMapping(
+	"../../include/asm/os/kos/termios.h", "__V",
+	filter: x -> x !in { "__VTDLY", "__VT0", "__VT1" });
+printStrendNDatabase("TERMIOS_V_NAME", typ);
+]]]*/
+#define GETBASE_TERMIOS_V_NAME(result, index) \
+	(((index) <= 0x10) ? ((result) = repr_TERMIOS_V_NAME_0h, true) : false)
+PRIVATE char const repr_TERMIOS_V_NAME_0h[] =
+"INTR\0QUIT\0ERASE\0KILL\0EOF\0TIME\0MIN\0SWTCH\0START\0STOP\0SUSP\0EOL\0REPR"
+"INT\0DISCARD\0WERASE\0LNEXT\0EOL2";
+/*[[[end]]]*/
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_termios_v_name(size_t slotid) {
+	char const *result = NULL;
+	if (!GETBASE_TERMIOS_V_NAME(result, slotid))
+		goto done;
+	for (; slotid; --slotid)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+
+
+PRIVATE NONNULL((1)) ssize_t CC
+print_termio_common(pformatprinter printer, void *arg,
+                    USER CHECKED struct termios const *ios,
+                    size_t nccs, bool have_speed) {
+	bool is_first;
+	size_t i;
+	ssize_t result, temp;
+#define LOCAL_HEAD "{" SYNSPACE SYNFIELD("c_iflag")
+	result = (*printer)(arg, LOCAL_HEAD, COMPILER_STRLEN(LOCAL_HEAD));
+#undef LOCAL_HEAD
+	if unlikely(result < 0)
+		goto done;
+	DO(print_termios_iflag(printer, arg, ios->c_iflag));
+	PRINT("," SYNSPACE SYNFIELD("c_oflag"));
+	DO(print_termios_oflag(printer, arg, ios->c_oflag));
+	PRINT("," SYNSPACE SYNFIELD("c_cflag"));
+	DO(print_termios_cflag(printer, arg, ios->c_cflag));
+	PRINT("," SYNSPACE SYNFIELD("c_lflag"));
+	DO(print_termios_lflag(printer, arg, ios->c_lflag));
+	PRINTF("," SYNSPACE SYNFIELD("c_line") "%" PRIu8
+	       "," SYNSPACE SYNFIELD("c_cc") "[",
+	       ios->c_line);
+	is_first = true;
+	for (i = 0; i < nccs; ++i) {
+		char const *name;
+		cc_t cc = ios->c_cc[i];
+		if (cc == _POSIX_VDISABLE)
+			continue;
+		if (!is_first)
+			PRINT("," SYNSPACE2);
+		name = get_termios_v_name(i);
+		if (name) {
+			PRINTF("V%s", name);
+		} else {
+			PRINTF("%" PRIuSIZ, i);
+		}
+		PRINT(":" SYNSPACE);
+		if (i == __VMIN || i == __VTIME || (cc & ~31)) {
+			PRINTF("%" PRIu8, (uint8_t)cc);
+		} else {
+			PRINTF("^%c", '@' + cc);
+		}
+		is_first = false;
+	}
+	if (have_speed && (ios->c_ispeed || ios->c_ospeed)) {
+		PRINTF("]"
+		       "," SYNSPACE SYNFIELD("c_ispeed") "%" PRIu32
+		       "," SYNSPACE SYNFIELD("c_ospeed") "%" PRIu32
+		       "}",
+		       (uint32_t)ios->c_ispeed,
+		       (uint32_t)ios->c_ospeed);
+	} else {
+		PRINT("]}");
+	}
+done:
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_termio_common */
+
+
+#ifdef NEED_print_termio
+PRIVATE NONNULL((1)) ssize_t CC
+print_termio(pformatprinter printer, void *arg,
+             USER UNCHECKED struct termio const *ios) {
+	struct termios common_ios;
+	static_assert(sizeof(common_ios.c_cc[0]) == sizeof(ios->c_cc[0]));
+	static_assert(COMPILER_LENOF(common_ios.c_cc) >= COMPILER_LENOF(ios->c_cc));
+	validate_readable(ios, sizeof(*ios));
+	common_ios.c_iflag = ios->c_iflag;
+	common_ios.c_oflag = ios->c_oflag;
+	common_ios.c_cflag = ios->c_cflag;
+	common_ios.c_lflag = ios->c_lflag;
+	common_ios.c_line  = ios->c_line;
+	memcpy(common_ios.c_cc, ios->c_cc, sizeof(ios->c_cc));
+	return print_termio_common(printer, arg, &common_ios, COMPILER_LENOF(ios->c_cc), false);
+}
+#endif /* NEED_print_termio */
+
+
+#ifdef NEED_print_termios
+PRIVATE NONNULL((1)) ssize_t CC
+print_termios(pformatprinter printer, void *arg,
+              USER UNCHECKED struct termios const *ios) {
+	validate_readable(ios, sizeof(*ios));
+	return print_termio_common(printer, arg, ios, COMPILER_LENOF(ios->c_cc), true);
+}
+#endif /* NEED_print_termios */
+
+
+#ifdef NEED_print_termios2
+PRIVATE NONNULL((1)) ssize_t CC
+print_termios2(pformatprinter printer, void *arg,
+               USER UNCHECKED struct termios2 const *ios) {
+	struct termios common_ios;
+	static_assert(sizeof(common_ios.c_cc[0]) == sizeof(ios->c_cc[0]));
+	static_assert(COMPILER_LENOF(common_ios.c_cc) >= COMPILER_LENOF(ios->c_cc));
+	validate_readable(ios, sizeof(*ios));
+	common_ios.c_iflag = ios->c_iflag;
+	common_ios.c_oflag = ios->c_oflag;
+	common_ios.c_cflag = ios->c_cflag;
+	common_ios.c_lflag = ios->c_lflag;
+	common_ios.c_line  = ios->c_line;
+	memcpy(common_ios.c_cc, ios->c_cc, sizeof(ios->c_cc));
+	common_ios.c_ispeed = ios->c_ispeed;
+	common_ios.c_ospeed = ios->c_ospeed;
+	return print_termio_common(printer, arg, &common_ios, COMPILER_LENOF(ios->c_cc), true);
+}
+#endif /* NEED_print_termios2 */
+
+
+#ifdef NEED_print_termiox
+PRIVATE NONNULL((1)) ssize_t CC
+print_termiox(pformatprinter printer, void *arg,
+              USER UNCHECKED struct termiox const *ios) {
+	size_t i;
+	ssize_t result, temp;
+	static_assert(sizeof(ios->x_hflag) == 2);
+	static_assert(sizeof(ios->x_cflag) == 2);
+	static_assert(sizeof(ios->x_rflag[0]) == 2);
+	static_assert(sizeof(ios->x_sflag) == 2);
+	validate_readable(ios, sizeof(*ios));
+	result = format_printf(printer, arg,
+	                       "{" SYNSPACE SYNFIELD("x_hflag") "%#" PRIx16
+	                       "," SYNSPACE SYNFIELD("x_cflag") "%#" PRIx16
+	                       "," SYNSPACE SYNFIELD("x_rflag") "[",
+	                       ios->x_hflag,
+	                       ios->x_cflag);
+	if unlikely(result < 0)
+		goto done;
+	for (i = 0; i < COMPILER_LENOF(ios->x_rflag); ++i) {
+		PRINTF("%s%#" PRIx16, i ? "," SYNSPACE2 : "", ios->x_rflag[i]);
+	}
+	PRINTF("]," SYNSPACE SYNFIELD("x_sflag") "%#" PRIx16
+	       SYNSPACE "}",
+	       ios->x_sflag);
+done:
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_termiox */
+
+
+#ifdef NEED_print_winsize
+PRIVATE NONNULL((1)) ssize_t CC
+print_winsize(pformatprinter printer, void *arg,
+              USER UNCHECKED struct winsize const *ws) {
+	ssize_t result;
+	static_assert(sizeof(ws->ws_row) == 2);
+	static_assert(sizeof(ws->ws_col) == 2);
+	static_assert(sizeof(ws->ws_xpixel) == 2);
+	static_assert(sizeof(ws->ws_ypixel) == 2);
+	validate_readable(ws, sizeof(*ws));
+	result = format_printf(printer, arg,
+	                       "{" SYNSPACE SYNFIELD("ws_row") "%" PRIu16
+	                       "," SYNSPACE SYNFIELD("ws_col") "%" PRIu16
+	                       "," SYNSPACE SYNFIELD("ws_xpixel") "%" PRIu16
+	                       "," SYNSPACE SYNFIELD("ws_ypixel") "%" PRIu16
+	                       SYNSPACE "}",
+	                       ws->ws_row,
+	                       ws->ws_col,
+	                       ws->ws_xpixel,
+	                       ws->ws_ypixel);
+	return result;
+}
+#endif /* NEED_print_winsize */
+
+
+#ifdef NEED_print_tty_modem_bits
+PRIVATE struct {
+	uint16_t   pn_flag;
+	char const pn_name[6];
+} const tty_modem_bit_flag_names[] = {
+#ifdef __TIOCM_LE
+	{ __TIOCM_LE, "LE" },
+#endif /* __TIOCM_LE */
+#ifdef __TIOCM_DTR
+	{ __TIOCM_DTR, "DTR" },
+#endif /* __TIOCM_DTR */
+#ifdef __TIOCM_RTS
+	{ __TIOCM_RTS, "RTS" },
+#endif /* __TIOCM_RTS */
+#ifdef __TIOCM_ST
+	{ __TIOCM_ST, "ST" },
+#endif /* __TIOCM_ST */
+#ifdef __TIOCM_SR
+	{ __TIOCM_SR, "SR" },
+#endif /* __TIOCM_SR */
+#ifdef __TIOCM_CTS
+	{ __TIOCM_CTS, "CTS" },
+#endif /* __TIOCM_CTS */
+#ifdef __TIOCM_CAR
+	{ __TIOCM_CAR, "CAR" },
+#endif /* __TIOCM_CAR */
+#ifdef __TIOCM_RNG
+	{ __TIOCM_RNG, "RNG" },
+#endif /* __TIOCM_RNG */
+#ifdef __TIOCM_DSR
+	{ __TIOCM_DSR, "DSR" },
+#endif /* __TIOCM_DSR */
+#ifdef __TIOCM_OUT1
+	{ __TIOCM_OUT1, "OUT1" },
+#endif /* __TIOCM_OUT1 */
+#ifdef __TIOCM_OUT2
+	{ __TIOCM_OUT2, "OUT2" },
+#endif /* __TIOCM_OUT2 */
+#ifdef __TIOCM_LOOP
+	{ __TIOCM_LOOP, "LOOP" },
+#endif /* __TIOCM_LOOP */
+	{ 0, "" },
+};
+
+PRIVATE NONNULL((1)) ssize_t CC
+print_tty_modem_bits(pformatprinter printer, void *arg, syscall_ulong_t flags) {
+	return print_flagset16(printer, arg,
+	                       tty_modem_bit_flag_names,
+	                       sizeof(*tty_modem_bit_flag_names),
+	                       "TIOCM_", flags);
+}
+#endif /* NEED_print_tty_modem_bits */
+
+
+#if defined(NEED_print_tcflow_arg) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local typ = getPrefixedMacrosFromFileAsMapping(
+	"../../include/asm/os/kos/termios.h", "__TC",
+	filter: x -> x in { "__TCOOFF", "__TCOON", "__TCIOFF", "__TCION" });
+printStrendNDatabase("TCFLOW_ARG", typ);
+]]]*/
+#define GETBASE_TCFLOW_ARG(result, index) \
+	(((index) <= 0x3) ? ((result) = repr_TCFLOW_ARG_0h, true) : false)
+PRIVATE char const repr_TCFLOW_ARG_0h[] =
+"OOFF\0OON\0IOFF\0ION";
+/*[[[end]]]*/
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_tcflow_arg_name(syscall_slong_t mode) {
+	char const *result = NULL;
+	if (!GETBASE_TCFLOW_ARG(result, mode))
+		goto done;
+	for (; mode; --mode)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+
+PRIVATE NONNULL((1)) ssize_t CC
+print_tcflow_arg(pformatprinter printer, void *arg,
+                 syscall_slong_t mode) {
+	char const *name;
+	name = get_tcflow_arg_name(mode);
+	if (name)
+		return format_printf(printer, arg, "TC_%s", name);
+	return format_printf(printer, arg, "%#" PRIxPTR, mode);
+}
+#endif /* NEED_print_tcflow_arg */
+
+
+#if defined(NEED_print_tcflush_arg) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local typ = getPrefixedMacrosFromFileAsMapping(
+	"../../include/asm/os/kos/termios.h", "__TC",
+	filter: x -> x in { "__TCIFLUSH", "__TCOFLUSH", "__TCIOFLUSH" });
+printStrendNDatabase("TCFLUSH_ARG", typ);
+]]]*/
+#define GETBASE_TCFLUSH_ARG(result, index) \
+	(((index) <= 0x2) ? ((result) = repr_TCFLUSH_ARG_0h, true) : false)
+PRIVATE char const repr_TCFLUSH_ARG_0h[] =
+"IFLUSH\0OFLUSH\0IOFLUSH";
+/*[[[end]]]*/
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_tcflush_arg_name(syscall_slong_t mode) {
+	char const *result = NULL;
+	if (!GETBASE_TCFLUSH_ARG(result, mode))
+		goto done;
+	for (; mode; --mode)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+
+PRIVATE NONNULL((1)) ssize_t CC
+print_tcflush_arg(pformatprinter printer, void *arg,
+                  syscall_slong_t mode) {
+	char const *name;
+	name = get_tcflush_arg_name(mode);
+	if (name)
+		return format_printf(printer, arg, "TC_%s", name);
+	return format_printf(printer, arg, "%#" PRIxPTR, mode);
+}
+#endif /* NEED_print_tcflush_arg */
+
+
+
+#ifdef NEED_print_ioctl_arg
+PRIVATE NONNULL((1)) ssize_t CC
+print_ioctl_arg_fallback(pformatprinter printer, void *arg,
+                         syscall_ulong_t command, USER UNCHECKED void *io_arg) {
+	ssize_t result, temp;
+	if (!io_arg) {
+		result = (*printer)(arg, NULLSTR, COMPILER_STRLEN(NULLSTR));
+	} else {
+		syscall_ulong_t size = _IOC_SIZE(command);
+		if ((command & _IOC_IN) && (size != 0)) {
+			syscall_ulong_t i;
+			result = (*printer)(arg, "{" SYNSPACE, COMPILER_STRLEN("{" SYNSPACE));
+			if unlikely(result < 0)
+				goto done;
+			for (i = 0; i < size; ++i) {
+				byte_t b = ((byte_t const *)io_arg)[i];
+				PRINTF("%s%.2" PRIx8, i ? " " : "", b);
+			}
+			PRINT(SYNSPACE "}");
+		} else {
+			result = format_printf(printer, arg, "%#" PRIxPTR, io_arg);
+		}
+	}
+done:
+	return result;
+err:
+	return temp;
+}
+
+PRIVATE WUNUSED intmax_t CC
+print_ioctl_getarg_intptr(syscall_ulong_t command,
+                          USER UNCHECKED void *io_arg,
+                          size_t default_size) {
+	intmax_t value;
+	size_t intsize = _IOC_SIZE(command);
+	if (intsize == 0)
+		intsize = default_size;
+	if (!IS_POWER_OF_TWO(intsize) || !intsize || intsize > sizeof(intmax_t))
+		intsize = default_size;
+	value = 0;
+	validate_readable(io_arg, intsize);
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	memcpy(&value, io_arg, intsize);
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+	memcpy((byte_t *)&value + sizeof(intmax_t) - intsize, io_arg, intsize);
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+
+	/* Force sign-extension. */
+	if (intsize < sizeof(intmax_t)) {
+		value <<= ((sizeof(intmax_t) - intsize) * NBBY);
+		value >>= ((sizeof(intmax_t) - intsize) * NBBY);
+	}
+	return value;
+}
+
+PRIVATE NONNULL((1)) ssize_t CC
+print_ioctl_arg_intptr(pformatprinter printer, void *arg,
+                       syscall_ulong_t command, USER UNCHECKED void *io_arg,
+                       size_t default_size) {
+	intmax_t value = print_ioctl_getarg_intptr(command, io_arg, default_size);
+	return format_printf(printer, arg, "{" SYNSPACE "%" PRIdMAX SYNSPACE "}", value);
+}
+
+/* Mask of command-relevant bits of ioctl codes */
+#undef IOCTL_CMDMASK
+#define IOCTL_CMDMASK ((_IOC_NRMASK << _IOC_NRSHIFT) | (_IOC_TYPEMASK << _IOC_TYPESHIFT))
+
+/* Check if the given `command' (when used with `ioctl(2)') *definitely* ignores its argument. */
+INTERN ATTR_CONST WUNUSED bool /* "INTERN" because also used in "./sc_getdesc.c" */
+NOTHROW(CC libsc_ioctl_voidarg)(syscall_ulong_t command) {
+	switch (command & IOCTL_CMDMASK) {
+
+	case (BLKRRPART & IOCTL_CMDMASK):
+	case (BLKFLSBUF & IOCTL_CMDMASK):
+	case (TIOCNOTTY & IOCTL_CMDMASK):
+	case (TIOCVHANGUP & IOCTL_CMDMASK):
+	case (FIONCLEX & IOCTL_CMDMASK):
+	case (FIOCLEX & IOCTL_CMDMASK):
+		return true;
+
+	default: break;
+	}
+	return false;
+}
+
+PRIVATE NONNULL((1)) ssize_t CC
+print_ioctl_arg(pformatprinter printer, void *arg,
+                syscall_ulong_t command, USER UNCHECKED void *io_arg) {
+	ssize_t result;
+	switch (command & IOCTL_CMDMASK) {
+
+	case (BLKSECTSET & IOCTL_CMDMASK):
+		result = print_ioctl_arg_intptr(printer, arg, command, io_arg, sizeof(u16));
+		break;
+
+	case (BLKROSET & IOCTL_CMDMASK):
+	case (TIOCSSOFTCAR & IOCTL_CMDMASK):
+	case (FIONBIO & IOCTL_CMDMASK):
+	case (TIOCSETD & IOCTL_CMDMASK):
+	case (FIOASYNC & IOCTL_CMDMASK):
+		result = print_ioctl_arg_intptr(printer, arg, command, io_arg, sizeof(int));
+		break;
+
+	case (TIOCSTI & IOCTL_CMDMASK):
+		result = print_ioctl_arg_intptr(printer, arg, command, io_arg, sizeof(char));
+		break;
+
+	case (BLKBSZSET & IOCTL_CMDMASK):
+		result = print_ioctl_arg_intptr(printer, arg, command, io_arg, sizeof(size_t));
+		break;
+
+	case (BLKRASET & IOCTL_CMDMASK):
+	case (BLKFRASET & IOCTL_CMDMASK):
+		result = print_ioctl_arg_intptr(printer, arg, command, io_arg, sizeof(ulongptr_t));
+		break;
+
+	case (TIOCSPGRP & IOCTL_CMDMASK):
+		result = print_ioctl_arg_intptr(printer, arg, command, io_arg, sizeof(pid_t));
+		break;
+
+	case (TCSETS & IOCTL_CMDMASK):
+	case (TCSETSW & IOCTL_CMDMASK):
+	case (TCSETSF & IOCTL_CMDMASK):
+		result = print_termio(printer, arg, (USER UNCHECKED struct termio const *)io_arg);
+		break;
+
+	case (TCSETA & IOCTL_CMDMASK):
+	case (TCSETAW & IOCTL_CMDMASK):
+	case (TCSETAF & IOCTL_CMDMASK):
+		result = print_termios(printer, arg, (USER UNCHECKED struct termios const *)io_arg);
+		break;
+
+	case (TCSETS2 & IOCTL_CMDMASK):
+	case (TCSETSW2 & IOCTL_CMDMASK):
+	case (TCSETSF2 & IOCTL_CMDMASK):
+		result = print_termios2(printer, arg, (USER UNCHECKED struct termios2 const *)io_arg);
+		break;
+
+	case (TCSETX & IOCTL_CMDMASK):
+	case (TCSETXF & IOCTL_CMDMASK):
+	case (TCSETXW & IOCTL_CMDMASK):
+		result = print_termiox(printer, arg, (USER UNCHECKED struct termiox const *)io_arg);
+		break;
+
+	case (TIOCSWINSZ & IOCTL_CMDMASK):
+		result = print_winsize(printer, arg, (USER UNCHECKED struct winsize const *)io_arg);
+		break;
+
+	case (TCSBRK & IOCTL_CMDMASK):
+	case (TIOCSCTTY & IOCTL_CMDMASK):
+	case (TCSBRKP & IOCTL_CMDMASK):
+		result = format_printf(printer, arg, "%" PRIdPTR, (intptr_t)(syscall_slong_t)io_arg);
+		break;
+
+	case (TIOCMBIS & IOCTL_CMDMASK):
+	case (TIOCMBIC & IOCTL_CMDMASK):
+	case (TIOCMSET & IOCTL_CMDMASK): {
+		uintmax_t value = (uintmax_t)print_ioctl_getarg_intptr(command, io_arg, sizeof(int));
+		result = print_tty_modem_bits(printer, arg, (syscall_ulong_t)value);
+	}	break;
+
+	case (TCXONC & IOCTL_CMDMASK):
+		result = print_tcflow_arg(printer, arg, (syscall_ulong_t)io_arg);
+		break;
+
+	case (TCFLSH & IOCTL_CMDMASK):
+		result = print_tcflush_arg(printer, arg, (syscall_ulong_t)io_arg);
+		break;
+
+// TODO: ioctls from: "../../include/asm/os/kos/stropts.h",
+// TODO: ioctls from: "../../include/asm/os/kos/socket-ioctls.h",
+// TODO: ioctls from: "../../include/linux/kd.h",
+// TODO: ioctls from: "../../include/linux/fd.h",
+// TODO: ioctls from: "../../include/linux/hdreg.h",
+// TODO: ioctls from: "../../include/linux/msdos_fs.h",
+// TODO: ioctls from: "../../include/linux/vt.h",
+// TODO: ioctls from: "../../include/kos/ioctl/" "*.h",
+
+	default:
+		if (libsc_ioctl_voidarg(command)) {
+			result = (*printer)(arg, "(void)0", 7);
+		} else {
+			result = print_ioctl_arg_fallback(printer, arg, command, io_arg);
+		}
+		break;
+	}
+	return result;
+}
+#endif /* NEED_print_ioctl_arg */
 
 
 
@@ -4725,7 +5595,6 @@ for (local c: knownCases.sorted()) {
 	// TODO: #define HAVE_SC_REPR_GID_VECTOR32
 	// TODO: #define HAVE_SC_REPR_INOTIFY_INIT_FLAGS
 	// TODO: #define HAVE_SC_REPR_INOTIFY_MASK
-	// TODO: #define HAVE_SC_REPR_IOCTL_ARG
 	// TODO: #define HAVE_SC_REPR_IOPRIO_ID
 	// TODO: #define HAVE_SC_REPR_IOPRIO_VALUE
 	// TODO: #define HAVE_SC_REPR_IOPRIO_WHO
@@ -5490,6 +6359,16 @@ for (local c: knownCases.sorted()) {
 		                             (syscall_ulong_t)value.sv_u64);
 		break;
 #endif /* HAVE_SC_REPR_IOCTL_COMMAND */
+
+#ifdef HAVE_SC_REPR_IOCTL_ARG
+	case SC_REPR_IOCTL_ARG:
+		if (!link)
+			goto do_pointer;
+		result = print_ioctl_arg(printer, arg,
+		                         (syscall_ulong_t)link->sa_value.sv_u64,
+		                         (void *)(uintptr_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_IOCTL_ARG */
 
 #if defined(HAVE_SC_REPR_FCNTL64_COMMAND) || defined(HAVE_SC_REPR_FCNTL_COMMAND)
 #ifdef HAVE_SC_REPR_FCNTL64_COMMAND
