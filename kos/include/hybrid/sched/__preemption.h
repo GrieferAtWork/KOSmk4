@@ -370,7 +370,7 @@ __LOCAL __ATTR_NONNULL((1)) void
 __NOTHROW(__hybrid_private_preemption_pushoff)(sigset_t *__restrict __p_flag) {
 	sigset_t __hpp_nss;
 	__hybrid_sigfillset(&__hpp_nss);
-	sigprocmask(SIG_SETMASK, __p_flag, &__hpp_nss);
+	sigprocmask(SIG_SETMASK, &__hpp_nss, __p_flag);
 }
 __LOCAL __ATTR_PURE __ATTR_WUNUSED __BOOL
 __NOTHROW(__hybrid_private_preemption_ison)(void) {
@@ -385,7 +385,7 @@ __DECL_END
 	__XBLOCK({                                        \
 		sigset_t __hpp_nss;                           \
 		__hybrid_sigfillset(&__hpp_nss);              \
-		sigprocmask(SIG_SETMASK, p_flag, &__hpp_nss); \
+		sigprocmask(SIG_SETMASK, &__hpp_nss, p_flag); \
 	})
 #define __hybrid_preemption_ison()                        \
 	__XBLOCK({                                            \

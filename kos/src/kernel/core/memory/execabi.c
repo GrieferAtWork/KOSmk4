@@ -122,6 +122,7 @@ execabis_register(struct execabi const *__restrict abi)
 	REF struct execabis_struct *new_abis;
 again:
 	old_abis = arref_get(&execabis);
+
 	/* Check if this ABI has already been defined. */
 	for (i = 0; i < old_abis->eas_count; ++i) {
 		struct execabi *other_abi;
@@ -134,10 +135,12 @@ again:
 			continue;
 		if (bcmp(other_abi->ea_magic, abi->ea_magic, other_abi->ea_magsiz) != 0)
 			continue;
+
 		/* Already defined... */
 		decref_unlikely(old_abis);
 		return false;
 	}
+
 	/* Extend the list of supported ABIs. */
 	FINALLY_DECREF(old_abis);
 	new_abis = (REF struct execabis_struct *)kmalloc(offsetof(struct execabis_struct, eas_abis) +
@@ -151,6 +154,7 @@ again:
 		weakincref(new_abis->eas_abis[i].ea_driver);
 	new_abis->eas_count  = old_abis->eas_count + 1;
 	new_abis->eas_refcnt = 1;
+
 	/* Fill in the new ABI. */
 	memcpy(&new_abis->eas_abis[old_abis->eas_count],
 	       abi, sizeof(struct execabi));
@@ -173,6 +177,7 @@ driver_clear_execabis(struct driver *__restrict self)
 again:
 	abi_count = 0;
 	old_abis  = arref_get(&execabis);
+
 	/* Search for ABIs defined by the given driver. */
 	for (i = 0; i < old_abis->eas_count; ++i) {
 		if (old_abis->eas_abis[i].ea_driver == self)
@@ -187,6 +192,7 @@ again:
 	                                                 GFP_NORMAL);
 	new_abis->eas_refcnt = 1;
 	new_abis->eas_count  = old_abis->eas_count - abi_count;
+
 	/* Copy only ABIs defined by other drivers into `new_abis' */
 	for (i = j = 0; i < old_abis->eas_count; ++i) {
 		if (old_abis->eas_abis[i].ea_driver == self)
