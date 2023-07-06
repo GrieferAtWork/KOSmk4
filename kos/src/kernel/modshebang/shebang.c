@@ -33,13 +33,21 @@
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
 
+#include <compat/config.h>
 #include <kos/except.h>
 #include <kos/except/reason/noexec.h>
 
+#include <assert.h>
 #include <atomic.h>
 #include <ctype.h>
+#include <format-printer.h>
+#include <inttypes.h>
 #include <string.h>
 #include <unistd.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <compat/kos/types.h>
+#endif /* __ARCH_HAVE_COMPAT */
 
 /**/
 #include "shebang.h"
@@ -59,6 +67,69 @@ find_eol(char *line, size_t len) {
 		--len;
 	}
 	return NULL;
+}
+
+
+struct path_aprinter_data {
+	char *pap_buf; /* [0..1] Printer base pointer. */
+	char *pap_ptr; /* [0..1] Printer end pointer. */
+};
+
+PRIVATE WUNUSED ssize_t FORMATPRINTER_CC
+path_aprinter(void *arg, char const *__restrict data, size_t datalen) {
+	struct path_aprinter_data *cookie = (struct path_aprinter_data *)arg;
+	size_t usable = kmalloc_usable_size(cookie->pap_buf);
+	size_t used   = (size_t)(cookie->pap_ptr - cookie->pap_buf);
+	size_t avail  = usable - used;
+	if (datalen >= avail) { /* >= because we want space for a trailing \0 */
+		char *newbuf;
+		size_t needed  = used + datalen;
+		size_t newsize = (needed << 1) | 1;
+		newbuf = (char *)krealloc_nx(cookie->pap_buf, newsize * sizeof(char), GFP_NORMAL);
+		if (!newbuf) {
+			newsize = needed + 1; /* +1 because we want space for a trailing \0 */
+			newbuf  = (char *)krealloc(cookie->pap_buf, newsize * sizeof(char), GFP_NORMAL);
+		}
+		cookie->pap_buf = newbuf;
+		cookie->pap_ptr = newbuf + used;
+	}
+	cookie->pap_ptr = (char *)mempcpy(cookie->pap_ptr, data,
+	                                  datalen, sizeof(char));
+	return (ssize_t)datalen;
+}
+
+PRIVATE WUNUSED NONNULL((1)) char *KCALL
+path_aprintent_ex(struct path *__restrict self,
+                  USER CHECKED char const *dentry_name,
+                  u16 dentry_namelen, struct path *root)
+		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
+	size_t reqlen;
+	char *result;
+	struct path_aprinter_data printer;
+	bzero(&printer, sizeof(printer));
+	TRY {
+		path_printent(self, dentry_name, dentry_namelen,
+		              &path_aprinter, &printer,
+		              AT_PATHPRINT_INCTRAIL, root);
+		reqlen = (size_t)(printer.pap_ptr - printer.pap_buf);
+		result = (char *)krealloc(printer.pap_buf, (reqlen + 1) * sizeof(char), GFP_NORMAL);
+	} EXCEPT {
+		kfree(printer.pap_buf);
+		RETHROW();
+	}
+	result[reqlen] = '\0';
+	return result;
+}
+
+
+PRIVATE WUNUSED NONNULL((1)) char *KCALL
+path_aprintent(struct path *__restrict self,
+               USER CHECKED char const *dentry_name,
+               u16 dentry_namelen)
+		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
+	REF struct path *root = fs_getroot(THIS_FS);
+	FINALLY_DECREF_UNLIKELY(root);
+	return path_aprintent_ex(self, dentry_name, dentry_namelen, root);
 }
 
 
@@ -138,23 +209,25 @@ shebang_exec(struct execargs *__restrict args) {
 			break;
 		++optarg_start;
 	}
+
 	/* At this point:
 	 *   FILENAME      = [execfile, execfile_end)
 	 *   OPTARG_EXISTS = optarg_start < execline_end
 	 *   OPTARG        = [optarg_start, execline_end) */
 #define HAS_OPTIONAL_ARGUMENT() (optarg_start < execline_end)
+#define HAS_SCRIPT_MAKEABS()    (args->ea_xdentry != NULL)
 	{
 		/* Load the interpreter program. */
-		REF struct path /*           */ *interp_path;
+		REF struct path /*   */ *interp_path;
 		REF struct fdirent /**/ *interp_dentry;
-		REF struct fnode *interp_node;
+		REF struct fnode /*  */ *interp_node;
 		{
 			u32 lnks = atomic_read(&THIS_FS->fs_lnkmax);
 			interp_node = path_traversefull_ex(args->ea_xpath, &lnks, execfile, 0,
 			                                   &interp_path, &interp_dentry);
 		}
 		TRY {
-			char *inject_arg0, *inject_arg1;
+			char *inject_arg0, *inject_arg1, *inject_arg2;
 			size_t more_argc;
 
 			/* In order to allow for execution, the file itself must support mmaping.
@@ -169,7 +242,9 @@ shebang_exec(struct execargs *__restrict args) {
 			/* Construct a new set to arguments to-be injected. */
 			more_argc = 1;
 			if (HAS_OPTIONAL_ARGUMENT())
-				more_argc = 2;
+				++more_argc;
+			if (HAS_SCRIPT_MAKEABS())
+				++more_argc;
 			args->ea_argv_inject = (char **)krealloc(args->ea_argv_inject,
 			                                         (args->ea_argc_inject +
 			                                          more_argc) *
@@ -197,6 +272,31 @@ shebang_exec(struct execargs *__restrict args) {
 				}
 			}
 
+			inject_arg2 = NULL;
+			if (HAS_SCRIPT_MAKEABS()) {
+				TRY {
+					/* The absolute pathname of the interpreter. */
+					inject_arg2 = path_aprintent(args->ea_xpath,
+					                             args->ea_xdentry->fd_name,
+					                             args->ea_xdentry->fd_namelen);
+				} EXCEPT {
+					kfree(inject_arg1);
+					kfree(inject_arg0);
+					RETHROW();
+				}
+
+				/* Clip the first element of the original argument vector,
+				 * because we replace that argument with an absolute path. */
+#ifdef __ARCH_HAVE_COMPAT
+				if (args->ea_argv_is_compat) {
+					args->ea_argv = (execabi_strings_t)((uintptr_t)args->ea_argv + sizeof(compat_uintptr_t));
+				} else
+#endif /* __ARCH_HAVE_COMPAT */
+				{
+					args->ea_argv = (execabi_strings_t)((uintptr_t)args->ea_argv + sizeof(uintptr_t));
+				}
+			}
+
 			/* Keep arguments that were already supposed to be
 			 * injected, however inject  those after the  ones
 			 * that we're supposed to inject. */
@@ -205,10 +305,19 @@ shebang_exec(struct execargs *__restrict args) {
 			          args->ea_argc_inject,
 			          sizeof(char *));
 
-			/* Actually inject the 2 arguments. */
-			args->ea_argv_inject[0] = inject_arg0;
-			if (inject_arg1)
-				args->ea_argv_inject[1] = inject_arg1;
+			/* Actually inject the 1-3 arguments. */
+			{
+				char **dst = args->ea_argv_inject;
+				*dst++ = inject_arg0;
+				if (inject_arg1 != NULL)
+					*dst++ = inject_arg1;
+				if (inject_arg2 != NULL)
+					*dst++ = inject_arg2;
+				assertf(dst == args->ea_argv_inject + more_argc,
+				        "Wrong number of injected arguments "
+				        "(expected: %" PRIuSIZ ", got: %" PRIuSIZ ")",
+				        more_argc, (size_t)(dst - args->ea_argv_inject));
+			}
 			args->ea_argc_inject += more_argc;
 		} EXCEPT {
 			decref_unlikely(interp_path);
@@ -226,6 +335,7 @@ shebang_exec(struct execargs *__restrict args) {
 		args->ea_xfile   = interp_node;   /* Inherit reference */
 	}
 #undef HAS_OPTIONAL_ARGUMENT
+#undef HAS_SCRIPT_MAKEABS
 
 	/* Tell our caller to restart interpretation. */
 	return EXECABI_EXEC_RESTART;
