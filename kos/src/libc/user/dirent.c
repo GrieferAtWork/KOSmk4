@@ -432,6 +432,7 @@ again:
 	if unlikely((size_t)load_size > dirp->ds_bufsize) {
 		size_t new_bufsize;
 		struct dirent *new_buffer;
+		errno_t error;
 
 		/* Buffer is too small. -> Must allocate one that is larger. */
 		if (dirp->ds_buf == (struct dirent *)(dirp->ds_sbuf + dirbuf_compat_offset)) {
@@ -442,8 +443,12 @@ again:
 		new_bufsize = load_size << 1;
 		if unlikely(new_bufsize < (size_t)load_size)
 			new_bufsize = (size_t)load_size;
-		new_buffer  = (struct dirent *)realloc(dirp->ds_buf, new_bufsize + dirbuf_compat_offset);
+
+		/* Must preserve errno when this realloc fails */
+		error      = libc_geterrno();
+		new_buffer = (struct dirent *)realloc(dirp->ds_buf, new_bufsize + dirbuf_compat_offset);
 		if unlikely(!new_buffer) {
+			libc_seterrno(error);
 			new_bufsize = (size_t)load_size;
 			new_buffer  = (struct dirent *)realloc(dirp->ds_buf, new_bufsize + dirbuf_compat_offset);
 			if unlikely(!new_buffer)
@@ -696,8 +701,8 @@ struct glibc_dirent64 {
 /* Evaluates to true if the `d_type' must be removed for compatibility */
 #define get_glibc_dirent32_compat_libc5() libc_compat_islibc5()
 
-PRIVATE ATTR_SECTION(".text.crt.compat.linux.dirent") NONNULL((1))
-ATTR_RETNONNULL WUNUSED struct glibc_dirent32 *__FCALL
+PRIVATE ATTR_SECTION(".text.crt.compat.linux.dirent")
+ATTR_RETNONNULL WUNUSED NONNULL((1)) struct glibc_dirent32 *__FCALL
 dirent_glibc32_to_libc5(struct glibc_dirent32 *__restrict self) {
 	/* Old versions of libc4/5 didn't have the `d_type' field.
 	 * Instead, their `struct dirent' matched `struct old_linux_direntx32',
@@ -707,8 +712,8 @@ dirent_glibc32_to_libc5(struct glibc_dirent32 *__restrict self) {
 	return self;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.compat.linux.dirent") NONNULL((1))
-ATTR_RETNONNULL WUNUSED struct glibc_dirent32 *__FCALL
+PRIVATE ATTR_SECTION(".text.crt.compat.linux.dirent")
+ATTR_RETNONNULL WUNUSED NONNULL((1)) struct glibc_dirent32 *__FCALL
 dirent2glibc32(struct dirent *__restrict self) {
 	static_assert(offsetof(struct glibc_dirent32, d_ino) == offsetof(struct dirent, d_ino));
 	static_assert(offsetof(struct glibc_dirent32, d_reclen) == offsetof(struct dirent, d_namlen));
