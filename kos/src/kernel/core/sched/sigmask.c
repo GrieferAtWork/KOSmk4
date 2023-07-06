@@ -1435,21 +1435,21 @@ DEFINE_COMPAT_SYSCALL3(errno_t, sigprocmask, syscall_ulong_t, how,
 /* sgetmask(), ssetmask()                                               */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_SGETMASK
-DEFINE_SYSCALL0(syscall_ulong_t, sgetmask) {
+DEFINE_SYSCALL0(uint32_t, sgetmask) {
 	COMPILER_IMPURE(); /* Yes, this syscall is pure, but we don't care about it in this case. */
-	return sigmask_getmask_word0();
+	return (uint32_t)sigmask_getmask_word0();
 }
 #endif /* __ARCH_WANT_SYSCALL_SGETMASK */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SGETMASK
-DEFINE_COMPAT_SYSCALL0(syscall_ulong_t, sgetmask) {
+DEFINE_COMPAT_SYSCALL0(uint32_t, sgetmask) {
 	COMPILER_IMPURE(); /* Yes, this syscall is pure, but we don't care about it in this case. */
-	return (compat_syscall_ulong_t)sigmask_getmask_word0();
+	return (uint32_t)sigmask_getmask_word0();
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SGETMASK */
 
 #ifdef __ARCH_WANT_SYSCALL_SSETMASK
-DEFINE_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, new_sigmask) {
+DEFINE_SYSCALL1(uint32_t, ssetmask, uint32_t, new_sigmask) {
 	sigset_t oldmask, newmask;
 	sigmask_getmask(&oldmask);
 	memcpy(&newmask, &oldmask, sizeof(sigset_t));
@@ -1457,15 +1457,15 @@ DEFINE_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, new_sigmask) {
 	nmidelset(&newmask);
 	if (sigmask_setmask(&newmask))
 		userexcept_sysret_inject_self();
-	return oldmask.__val[0];
+	return (uint32_t)oldmask.__val[0];
 }
 #endif /* __ARCH_WANT_SYSCALL_SSETMASK */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SSETMASK
-DEFINE_COMPAT_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, new_sigmask) {
+DEFINE_COMPAT_SYSCALL1(uint32_t, ssetmask, uint32_t, new_sigmask) {
 	union {
 		sigset_t s;
-		compat_syscall_ulong_t w;
+		uint32_t w;
 	} oldmask, newmask;
 	sigmask_getmask(&oldmask.s);
 	memcpy(&newmask.s, &oldmask, sizeof(sigset_t));
