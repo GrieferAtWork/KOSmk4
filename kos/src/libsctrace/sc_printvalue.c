@@ -486,6 +486,30 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_sigaction
 #endif /* HAVE_SC_REPR_STRUCT_SIGACTIONX64 */
 
+#ifdef HAVE_SC_REPR_STRUCT_KERNEL_SIGACTION
+#define NEED_print_sigaction
+#endif /* HAVE_SC_REPR_STRUCT_KERNEL_SIGACTION */
+
+#ifdef HAVE_SC_REPR_STRUCT_KERNEL_SIGACTIONX32
+#define NEED_print_sigaction
+#endif /* HAVE_SC_REPR_STRUCT_KERNEL_SIGACTIONX32 */
+
+#ifdef HAVE_SC_REPR_STRUCT_KERNEL_SIGACTIONX64
+#define NEED_print_sigaction
+#endif /* HAVE_SC_REPR_STRUCT_KERNEL_SIGACTIONX64 */
+
+#ifdef HAVE_SC_REPR_STRUCT_OLD_KERNEL_SIGACTION
+#define NEED_print_sigaction
+#endif /* HAVE_SC_REPR_STRUCT_OLD_KERNEL_SIGACTION */
+
+#ifdef HAVE_SC_REPR_STRUCT_OLD_KERNEL_SIGACTIONX32
+#define NEED_print_sigaction
+#endif /* HAVE_SC_REPR_STRUCT_OLD_KERNEL_SIGACTIONX32 */
+
+#ifdef HAVE_SC_REPR_STRUCT_OLD_KERNEL_SIGACTIONX64
+#define NEED_print_sigaction
+#endif /* HAVE_SC_REPR_STRUCT_OLD_KERNEL_SIGACTIONX64 */
+
 #ifdef HAVE_SC_REPR_EPOLL_CREATE1_FLAGS
 #define NEED_print_epoll_create1_flags
 #endif /* HAVE_SC_REPR_EPOLL_CREATE1_FLAGS */
@@ -734,6 +758,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_flagset8
 #endif /* NEED_print_close_range_flags */
 
+#if defined(NEED_print_flagset8) || defined(NEED_print_flagset16) || defined(NEED_print_flagset32)
+#define NEED_print_flagset_remainder
+#endif /* NEED_print_flagset8 || NEED_print_flagset16 || NEED_print_flagset32 */
+
 
 
 
@@ -847,7 +875,25 @@ typedef uint8_t va_uint_t;
 #endif
 
 
-
+#ifdef NEED_print_flagset_remainder
+PRIVATE NONNULL((1)) ssize_t CC
+print_flagset_remainder(pformatprinter printer, void *arg,
+                        syscall_ulong_t flags, bool is_first) {
+	ssize_t result;
+	if (flags) {
+		/* Print unknown flags. */
+		result = format_printf(printer, arg,
+		                       "%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
+		                       is_first ? "" : PIPESTR, flags);
+	} else if (is_first) {
+		/* Special case for when no flags are given (in this case, don't print the `0x' prefix) */
+		result = (*printer)(arg, "0", 1);
+	} else {
+		result = 0;
+	}
+	return result;
+}
+#endif /* NEED_print_flagset_remainder */
 
 #ifdef NEED_print_flagset8
 PRIVATE NONNULL((1)) ssize_t CC
@@ -871,11 +917,7 @@ print_flagset8(pformatprinter printer, void *arg,
 		flags &= ~flag;
 		is_first = false;
 	}
-	if (flags || is_first) {
-		/* Print unknown flags. */
-		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
-		       is_first ? "" : PIPESTR, flags);
-	}
+	DO(print_flagset_remainder(printer, arg, flags, is_first));
 	return result;
 err:
 	return temp;
@@ -907,11 +949,7 @@ print_flagset16(pformatprinter printer, void *arg,
 		flags &= ~flag;
 		is_first = false;
 	}
-	if (flags || is_first) {
-		/* Print unknown flags. */
-		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
-		       is_first ? "" : PIPESTR, flags);
-	}
+	DO(print_flagset_remainder(printer, arg, flags, is_first));
 	return result;
 err:
 	return temp;
@@ -943,11 +981,7 @@ print_flagset32(pformatprinter printer, void *arg,
 		flags &= ~flag;
 		is_first = false;
 	}
-	if (flags || is_first) {
-		/* Print unknown flags. */
-		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
-		       is_first ? "" : PIPESTR, flags);
-	}
+	DO(print_flagset_remainder(printer, arg, flags, is_first));
 	return result;
 err:
 	return temp;
@@ -979,9 +1013,13 @@ print_flagset64(pformatprinter printer, void *arg,
 		flags &= ~flag;
 		is_first = false;
 	}
-	if (flags || is_first) {
+	if (flags) {
 		/* Print unknown flags. */
-		PRINTF("%s%#" PRIx64, is_first ? "" : PIPESTR, flags);
+		PRINTF("%s%#" PRIx64,
+		       is_first ? "" : PIPESTR, flags);
+	} else if (is_first) {
+		/* Special case for when no flags are given (in this case, don't print the `0x' prefix) */
+		PRINT("0");
 	}
 	return result;
 err:
@@ -1617,8 +1655,8 @@ local typ = getPrefixedMacrosFromFileAsMapping(
 printStrendNDatabase("SIGHANDLER", typ);
 ]]]*/
 #define GETBASE_SIGHANDLER(result, index) \
-	(((index) >= -0x1 && (index) <= 0xb) ? ((index) += 0x1, (result) = repr_SIGHANDLER_x1h, true) : false)
-PRIVATE char const repr_SIGHANDLER_x1h[] =
+	(((index) >= -0x1 && (index) <= 0xb) ? ((index) += 0x1, (result) = repr_SIGHANDLER_m1h, true) : false)
+PRIVATE char const repr_SIGHANDLER_m1h[] =
 "ERR\0DFL\0IGN\0HOLD\0TERM\0EXIT\0\0\0\0CONT\0STOP\0CORE\0GET";
 /*[[[end]]]*/
 
@@ -2039,10 +2077,10 @@ PRIVATE char const repr_IOCTLS_5401h[] =
 "GETD\0TCSBRKP\0\0TIOCSBRK\0TIOCCBRK\0TIOCGSID\0TCGETS2\0TCSETS2\0TCSETSW"
 "2\0TCSETSF2\0TIOCGRS485\0TIOCSRS485\0TIOCGPTN\0TIOCSPTLCK\0TIOCGDEV\0TC"
 "SETX\0TCSETXF\0TCSETXW\0TIOCSIG\0TIOCVHANGUP\0TIOCGPKT\0TIOCGPTLCK\0\0\0\0"
-"\0\0\0TIOCGEXCL\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0FIONCLEX\0FIOCLEX\0FIOASYNC\0TIOCSERCON"
-"FIG\0TIOCSERGWILD\0TIOCSERSWILD\0TIOCGLCKTRMIOS\0TIOCSLCKTRMIOS\0TIOC"
-"SERGSTRUCT\0TIOCSERGETLSR\0TIOCSERGETMULTI\0TIOCSERSETMULTI\0TIOCMIW"
-"AIT\0TIOCGICOUNT\0\0\0FIOQSIZE";
+"\0\0\0TIOCGEXCL\0TIOCGPTPEER\0TIOCGISO7816\0TIOCSISO7816\0\0\0\0\0\0\0\0\0\0\0\0\0F"
+"IONCLEX\0FIOCLEX\0FIOASYNC\0TIOCSERCONFIG\0TIOCSERGWILD\0TIOCSERSWILD"
+"\0TIOCGLCKTRMIOS\0TIOCSLCKTRMIOS\0TIOCSERGSTRUCT\0TIOCSERGETLSR\0TIOC"
+"SERGETMULTI\0TIOCSERSETMULTI\0TIOCMIWAIT\0TIOCGICOUNT\0\0\0FIOQSIZE";
 PRIVATE char const repr_IOCTLS_5600h[] =
 "VT_OPENQRY\0VT_GETMODE\0VT_SETMODE\0VT_GETSTATE\0VT_SENDSIG\0VT_RELDI"
 "SP\0VT_ACTIVATE\0VT_WAITACTIVE\0VT_DISALLOCATE\0VT_RESIZE\0VT_RESIZEX"
@@ -2398,8 +2436,8 @@ print_signo_t(pformatprinter printer, void *arg, signo_t signo) {
 	if (name)
 		return format_printf(printer, arg, "SIG%s", name);
 	if (signo >= __SIGRTMIN && signo <= __SIGRTMAX) {
-		return format_printf(printer, arg, "SIGRTMIN+%d",
-		                     (int)(signo - __SIGRTMIN));
+		return format_printf(printer, arg, "SIGRTMIN+%u",
+		                     (unsigned int)(signo - __SIGRTMIN));
 	} else {
 		/* Fallback: Print the integer value */
 		return format_printf(printer, arg, "%d", signo);
@@ -2707,7 +2745,8 @@ local typ = getPrefixedMacrosFromFileAsMapping("../../include/asm/os/kos/fcntl.h
 	filter: [](x) -> x !in {
 		"__F_RDLCK", "__F_WRLCK", "__F_UNLCK", "__F_EXLCK", "__F_SHLCK",
 		"__F_OWNER_TID", "__F_OWNER_PID", "__F_OWNER_PGRP",
-		"__F_LINUX_SPECIFIC_BASE"
+		"__F_LINUX_SPECIFIC_BASE", "__F_SEAL_SEAL", "__F_SEAL_SHRINK",
+		"__F_SEAL_GROW", "__F_SEAL_WRITE", "__F_SEAL_FUTURE_WRITE",
 	});
 printStrendNDatabase("FCNTL", typ);
 ]]]*/
@@ -2716,9 +2755,9 @@ printStrendNDatabase("FCNTL", typ);
 	 ((index) >= 0x400 && (index) <= 0x40e) ? ((index) -= 0x400, (result) = repr_FCNTL_400h, true) : \
 	 ((index) >= 0x142b && (index) <= 0x1430) ? ((index) -= 0x142b, (result) = repr_FCNTL_142bh, true) : false)
 PRIVATE char const repr_FCNTL_0h[] =
-"DUPFD\0GETFD\0SEAL_SHRINK\0GETFL\0SETFL\0GETLK\0SETLK\0SETLKW\0SEAL_WRIT"
-"E\0GETOWN\0SETSIG\0GETSIG\0GETLK64\0SETLK64\0SETLKW64\0SETOWN_EX\0GETOWN"
-"_EX\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0OFD_GETLK\0OFD_SETLK\0OFD_SETLKW";
+"DUPFD\0GETFD\0SETFD\0GETFL\0SETFL\0GETLK\0SETLK\0SETLKW\0SETOWN\0GETOWN\0S"
+"ETSIG\0GETSIG\0GETLK64\0SETLK64\0SETLKW64\0SETOWN_EX\0GETOWN_EX\0GETOWN"
+"ER_UIDS\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0OFD_GETLK\0OFD_SETLK\0OFD_SETLKW";
 PRIVATE char const repr_FCNTL_400h[] =
 "SETLEASE\0GETLEASE\0NOTIFY\0\0\0\0DUPFD_CLOEXEC\0SETPIPE_SZ\0GETPIPE_SZ\0"
 "ADD_SEALS\0GET_SEALS\0GET_RW_HINT\0SET_RW_HINT\0GET_FILE_RW_HINT\0SET"
@@ -3319,18 +3358,23 @@ local typ = getPrefixedMacrosFromFileAsMapping("../../include/asm/os/kos/socket.
 printStrendNDatabase("SOCKET_SO", typ);
 ]]]*/
 #define GETBASE_SOCKET_SO(result, index) \
-	(((index) <= 0x32) ? ((result) = repr_SOCKET_SO_0h, true) : \
+	(((index) <= 0x48) ? ((result) = repr_SOCKET_SO_0h, true) : \
 	 ((index) >= 0x400 && (index) <= 0x401) ? ((index) -= 0x400, (result) = repr_SOCKET_SO_400h, true) : false)
 PRIVATE char const repr_SOCKET_SO_0h[] =
 "\0DEBUG\0REUSEADDR\0TYPE\0ERROR\0DONTROUTE\0BROADCAST\0SNDBUF\0RCVBUF\0KE"
 "EPALIVE\0OOBINLINE\0NO_CHECK\0PRIORITY\0LINGER\0BSDCOMPAT\0REUSEPORT\0P"
-"ASSCRED\0PEERCRED\0RCVLOWAT\0SNDLOWAT\0RCVTIMEO\0SNDTIMEO\0SECURITY_AU"
-"THENTICATION\0SECURITY_ENCRYPTION_TRANSPORT\0SECURITY_ENCRYPTION_N"
-"ETWORK\0BINDTODEVICE\0ATTACH_FILTER\0DETACH_FILTER\0PEERNAME\0TIMESTA"
-"MP\0ACCEPTCONN\0PEERSEC\0SNDBUFFORCE\0RCVBUFFORCE\0PASSSEC\0TIMESTAMPN"
-"S\0MARK\0TIMESTAMPING\0PROTOCOL\0DOMAIN\0RXQ_OVFL\0WIFI_STATUS\0PEEK_OF"
-"F\0NOFCS\0LOCK_FILTER\0SELECT_ERR_QUEUE\0BUSY_POLL\0MAX_PACING_RATE\0B"
-"PF_EXTENSIONS\0INCOMING_CPU\0ATTACH_BPF";
+"ASSCRED\0PEERCRED\0RCVLOWAT\0SNDLOWAT\0RCVTIMEO_OLD\0SNDTIMEO_OLD\0SEC"
+"URITY_AUTHENTICATION\0SECURITY_ENCRYPTION_TRANSPORT\0SECURITY_ENCR"
+"YPTION_NETWORK\0BINDTODEVICE\0ATTACH_FILTER\0DETACH_FILTER\0PEERNAME"
+"\0TIMESTAMP_OLD\0ACCEPTCONN\0PEERSEC\0SNDBUFFORCE\0RCVBUFFORCE\0PASSSE"
+"C\0TIMESTAMPNS_OLD\0MARK\0TIMESTAMPING_OLD\0PROTOCOL\0DOMAIN\0RXQ_OVFL"
+"\0WIFI_STATUS\0PEEK_OFF\0NOFCS\0LOCK_FILTER\0SELECT_ERR_QUEUE\0BUSY_PO"
+"LL\0MAX_PACING_RATE\0BPF_EXTENSIONS\0INCOMING_CPU\0ATTACH_BPF\0ATTACH"
+"_REUSEPORT_CBPF\0ATTACH_REUSEPORT_EBPF\0CNX_ADVICE\0\0MEMINFO\0INCOMI"
+"NG_NAPI_ID\0COOKIE\0\0PEERGROUPS\0ZEROCOPY\0TXTIME\0BINDTOIFINDEX\0TIME"
+"STAMP\0TIMESTAMPNS_NEW\0TIMESTAMPING_NEW\0RCVTIMEO\0SNDTIMEO_NEW\0DET"
+"ACH_REUSEPORT_BPF\0PREFER_BUSY_POLL\0BUSY_POLL_BUDGET\0NETNS_COOKIE"
+"\0BUF_LOCK";
 PRIVATE char const repr_SOCKET_SO_400h[] =
 "NOSIGPIPE\0DONTWAIT";
 /*[[[end]]]*/
@@ -3380,31 +3424,43 @@ PRIVATE NONNULL((1)) ssize_t CC
 print_sigset(pformatprinter printer, void *arg,
              USER UNCHECKED sigset_t const *sigset,
              size_t sigsetsize) {
+	__CRT_PRIVATE_UINT(__SIZEOF_SIGNO_T__) signo_limit;
 	signo_t signo_max = NSIG - 1;
 	ssize_t temp, result = 0;
-	size_t signo_limit;
 	bool has_prefix = false;
 	bool is_first   = true;
-	if (!OVERFLOW_UMUL(sigsetsize, sizeof(sigset->__val[0]), &signo_limit) &&
-	    !OVERFLOW_UMUL(signo_limit, NBBY, &signo_limit) && (size_t)(signo_max - 1) > signo_limit)
+	if (!OVERFLOW_UMUL(sigsetsize, NBBY, &signo_limit) &&
+	    signo_max > (signo_t)(signo_limit + 1))
 		signo_max = (signo_t)(signo_limit + 1);
 	TRY {
-		bool inverse = false;
+		bool inverse;
 		signo_t signo;
-		unsigned int count, limit;
+		unsigned int count, inverse_count;
 		validate_readable(sigset, sigsetsize);
 		/* Check if we should print the inverse of the bitset. */
-		count = 0;
-		limit = (unsigned int)signo_max / 2;
-		for (signo = 1; signo <= signo_max; ++signo) {
-			if (sigismember(sigset, signo)) {
-				if (count >= limit) {
-					inverse = true;
-					break;
-				}
-				++count;
+		for (count = 0, signo = 1; signo <= signo_max; ++signo) {
+			if (!sigismember(sigset, signo))
+				continue;
+			if (signo >= __SIGRTMIN) {
+				unsigned int n = 1; /* Special handling for grouping SIGRT* signals. */
+				while (((signo_t)(signo + n) <= signo_max) && sigismember(sigset, signo))
+					++n;
+				signo += (n - 1); /* -1 because of the `++signo' on the for-expression above. */
 			}
+			++count;
 		}
+		for (inverse_count = 0, signo = 1; signo <= signo_max; ++signo) {
+			if (sigismember(sigset, signo))
+				continue;
+			if (signo >= __SIGRTMIN) {
+				unsigned int n = 1; /* Special handling for grouping SIGRT* signals. */
+				while (((signo_t)(signo + n) <= signo_max) && !sigismember(sigset, signo))
+					++n;
+				signo += (n - 1); /* -1 because of the `++signo' on the for-expression above. */
+			}
+			++inverse_count;
+		}
+		inverse = inverse_count < count;
 		result = inverse
 		         ? DOPRINT("~{" SYNSPACE)
 		         : DOPRINT("{" SYNSPACE);
@@ -3413,7 +3469,7 @@ print_sigset(pformatprinter printer, void *arg,
 		has_prefix = true;
 		count      = 0;
 		for (signo = 1; signo <= signo_max; ++signo) {
-			if (!!sigismember(sigset, signo) == inverse)
+			if ((sigismember(sigset, signo) != 0) == inverse)
 				continue;
 			if (!is_first)
 				PRINT("," SYNSPACE2);
@@ -3421,9 +3477,24 @@ print_sigset(pformatprinter printer, void *arg,
 				PRINT("...");
 				break;
 			}
-			is_first = false;
+			if (signo >= __SIGRTMIN) {
+				/* Special handling for grouping SIGRT* signals. */
+				unsigned int n = 1;
+				while (((signo_t)(signo + n) <= signo_max) &&
+				       ((sigismember(sigset, signo) != 0) != inverse))
+					++n;
+				if (n >= 2) {
+					DO(format_printf(printer, arg, "SIGRTMIN+[%u..%u]",
+					                 (unsigned int)(signo - __SIGRTMIN),
+					                 (unsigned int)(signo + n - 1 - __SIGRTMIN)));
+					signo += (n - 1); /* -1 because of the `++signo' on the for-expression above. */
+					goto do_continue;
+				}
+			}
 			DO(print_signo_t(printer, arg, signo));
+do_continue:
 			++count;
+			is_first = false;
 		}
 	} EXCEPT {
 		if (!was_thrown(E_SEGFAULT))
@@ -4881,8 +4952,15 @@ for (local c: knownCases.sorted()) {
 		break;
 #endif /* HAVE_SC_REPR_EPOLL_CREATE1_FLAGS */
 
+#if ((defined(HAVE_SC_REPR_STRUCT_SIGACTION)) || \
+     (defined(HAVE_SC_REPR_STRUCT_KERNEL_SIGACTION) && defined(__ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION)))
 #ifdef HAVE_SC_REPR_STRUCT_SIGACTION
-	case SC_REPR_STRUCT_SIGACTION: {
+	case SC_REPR_STRUCT_SIGACTION:
+#endif /* HAVE_SC_REPR_STRUCT_SIGACTION */
+#if defined(HAVE_SC_REPR_STRUCT_KERNEL_SIGACTION) && defined(__ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION)
+	case SC_REPR_STRUCT_KERNEL_SIGACTION:
+#endif /* HAVE_SC_REPR_STRUCT_KERNEL_SIGACTION && __ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION */
+	{
 		USER UNCHECKED struct sigaction *sa;
 		size_t sigsetsize = sizeof(sa->sa_mask);
 		sa = (USER UNCHECKED struct sigaction *)(uintptr_t)value.sv_u64;
@@ -4899,16 +4977,23 @@ for (local c: knownCases.sorted()) {
 		                         sa->sa_flags,
 		                         (void *)sa->sa_restorer);
 	}	break;
-#endif /* HAVE_SC_REPR_STRUCT_SIGACTION */
+#endif /* HAVE_SC_REPR_STRUCT_SIGACTION... */
 
+#if ((defined(HAVE_SC_REPR_STRUCT_SIGACTIONX32)) || \
+     (defined(HAVE_SC_REPR_STRUCT_KERNEL_SIGACTIONX32) && defined(__ARCH_HAVE_KERNEL_SIGACTIONX32_IS_LIBC_SIGACTIONX32)))
 #ifdef HAVE_SC_REPR_STRUCT_SIGACTIONX32
-	case SC_REPR_STRUCT_SIGACTIONX32: {
+	case SC_REPR_STRUCT_SIGACTIONX32:
+#endif /* HAVE_SC_REPR_STRUCT_SIGACTIONX32 */
+#if defined(HAVE_SC_REPR_STRUCT_KERNEL_SIGACTIONX32) && defined(__ARCH_HAVE_KERNEL_SIGACTIONX32_IS_LIBC_SIGACTIONX32)
+	case SC_REPR_STRUCT_KERNEL_SIGACTIONX32:
+#endif /* HAVE_SC_REPR_STRUCT_KERNEL_SIGACTIONX32 && __ARCH_HAVE_KERNEL_SIGACTIONX32_IS_LIBC_SIGACTIONX32 */
+	{
 		USER UNCHECKED struct __sigactionx32 *sa;
 		size_t sigsetsize = sizeof(sa->sa_mask);
 		sa = (USER UNCHECKED struct __sigactionx32 *)(uintptr_t)value.sv_u64;
 		if (link)
 			sigsetsize = (size_t)link->sa_value.sv_u64;
-		if (!sa || sigsetsize != sizeof(sa->sa_mask))
+		if (!sa)
 			goto do_pointer;
 		validate_readable(sa, sizeof(*sa));
 		result = print_sigaction(printer,
@@ -4919,10 +5004,17 @@ for (local c: knownCases.sorted()) {
 		                         sa->sa_flags,
 		                         (void *)sa->sa_restorer);
 	}	break;
-#endif /* HAVE_SC_REPR_STRUCT_SIGACTIONX32 */
+#endif /* HAVE_SC_REPR_STRUCT_SIGACTIONX32... */
 
+#if ((defined(HAVE_SC_REPR_STRUCT_SIGACTIONX64)) || \
+     (defined(HAVE_SC_REPR_STRUCT_KERNEL_SIGACTIONX64) && defined(__ARCH_HAVE_KERNEL_SIGACTIONX64_IS_LIBC_SIGACTIONX64)))
 #ifdef HAVE_SC_REPR_STRUCT_SIGACTIONX64
-	case SC_REPR_STRUCT_SIGACTIONX64: {
+	case SC_REPR_STRUCT_SIGACTIONX64:
+#endif /* HAVE_SC_REPR_STRUCT_SIGACTIONX64 */
+#if defined(HAVE_SC_REPR_STRUCT_KERNEL_SIGACTIONX64) && defined(__ARCH_HAVE_KERNEL_SIGACTIONX64_IS_LIBC_SIGACTIONX64)
+	case SC_REPR_STRUCT_KERNEL_SIGACTIONX64:
+#endif /* HAVE_SC_REPR_STRUCT_KERNEL_SIGACTIONX64 && __ARCH_HAVE_KERNEL_SIGACTIONX64_IS_LIBC_SIGACTIONX64 */
+	{
 		USER UNCHECKED struct __sigactionx64 *sa;
 		size_t sigsetsize = sizeof(sa->sa_mask);
 		sa = (USER UNCHECKED struct __sigactionx64 *)(uintptr_t)value.sv_u64;
@@ -4939,7 +5031,127 @@ for (local c: knownCases.sorted()) {
 		                         sa->sa_flags,
 		                         (void *)sa->sa_restorer);
 	}	break;
-#endif /* HAVE_SC_REPR_STRUCT_SIGACTIONX64 */
+#endif /* HAVE_SC_REPR_STRUCT_SIGACTIONX64... */
+
+#if defined(HAVE_SC_REPR_STRUCT_KERNEL_SIGACTION) && !defined(__ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION)
+	case SC_REPR_STRUCT_KERNEL_SIGACTION: {
+		USER UNCHECKED struct __kernel_sigaction *sa;
+		size_t sigsetsize = sizeof(sa->sa_mask);
+		sa = (USER UNCHECKED struct __kernel_sigaction *)(uintptr_t)value.sv_u64;
+		if (link)
+			sigsetsize = (size_t)link->sa_value.sv_u64;
+		if (!sa || sigsetsize != sizeof(sa->sa_mask))
+			goto do_pointer;
+		validate_readable(sa, sizeof(*sa));
+		result = print_sigaction(printer,
+		                         arg,
+		                         (sighandler_t)(void *)sa->sa_handler,
+		                         (USER CHECKED sigset_t *)&sa->sa_mask,
+		                         sigsetsize,
+		                         sa->sa_flags,
+		                         (void *)sa->sa_restorer);
+	}	break;
+#endif /* HAVE_SC_REPR_STRUCT_KERNEL_SIGACTION && !__ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION */
+
+#if defined(HAVE_SC_REPR_STRUCT_KERNEL_SIGACTIONX32) && !defined(__ARCH_HAVE_KERNEL_SIGACTIONX32_IS_LIBC_SIGACTIONX32)
+	case SC_REPR_STRUCT_KERNEL_SIGACTIONX32: {
+		USER UNCHECKED struct __kernel_sigactionx32 *sa;
+		size_t sigsetsize = sizeof(sa->sa_mask);
+		sa = (USER UNCHECKED struct __kernel_sigactionx32 *)(uintptr_t)value.sv_u64;
+		if (link)
+			sigsetsize = (size_t)link->sa_value.sv_u64;
+		if (!sa)
+			goto do_pointer;
+		validate_readable(sa, sizeof(*sa));
+		result = print_sigaction(printer,
+		                         arg,
+		                         (sighandler_t)(void *)sa->sa_handler,
+		                         (USER CHECKED sigset_t *)&sa->sa_mask,
+		                         sigsetsize,
+		                         sa->sa_flags,
+		                         (void *)sa->sa_restorer);
+	}	break;
+#endif /* HAVE_SC_REPR_STRUCT_KERNEL_SIGACTIONX32 && !__ARCH_HAVE_KERNEL_SIGACTIONX32_IS_LIBC_SIGACTIONX32 */
+
+#if defined(HAVE_SC_REPR_STRUCT_KERNEL_SIGACTIONX64) && !defined(__ARCH_HAVE_KERNEL_SIGACTIONX64_IS_LIBC_SIGACTIONX64)
+	case SC_REPR_STRUCT_KERNEL_SIGACTIONX64: {
+		USER UNCHECKED struct __kernel_sigactionx64 *sa;
+		size_t sigsetsize = sizeof(sa->sa_mask);
+		sa = (USER UNCHECKED struct __kernel_sigactionx64 *)(uintptr_t)value.sv_u64;
+		if (link)
+			sigsetsize = (size_t)link->sa_value.sv_u64;
+		if (!sa || sigsetsize != sizeof(sa->sa_mask))
+			goto do_pointer;
+		validate_readable(sa, sizeof(*sa));
+		result = print_sigaction(printer,
+		                         arg,
+		                         (sighandler_t)(void *)sa->sa_handler,
+		                         (USER CHECKED sigset_t *)&sa->sa_mask,
+		                         sigsetsize,
+		                         sa->sa_flags,
+		                         (void *)sa->sa_restorer);
+	}	break;
+#endif /* HAVE_SC_REPR_STRUCT_KERNEL_SIGACTIONX64 && !__ARCH_HAVE_KERNEL_SIGACTIONX64_IS_LIBC_SIGACTIONX64 */
+
+#ifdef HAVE_SC_REPR_STRUCT_OLD_KERNEL_SIGACTION
+	case SC_REPR_STRUCT_OLD_KERNEL_SIGACTION: {
+		USER UNCHECKED struct __kernel_sigaction *sa;
+		size_t sigsetsize = sizeof(sa->sa_mask);
+		sa = (USER UNCHECKED struct __kernel_sigaction *)(uintptr_t)value.sv_u64;
+		if (link)
+			sigsetsize = (size_t)link->sa_value.sv_u64;
+		if (!sa || sigsetsize != sizeof(sa->sa_mask))
+			goto do_pointer;
+		validate_readable(sa, sizeof(*sa));
+		result = print_sigaction(printer,
+		                         arg,
+		                         (sighandler_t)(void *)sa->sa_handler,
+		                         (USER CHECKED sigset_t *)&sa->sa_mask,
+		                         sigsetsize,
+		                         sa->sa_flags,
+		                         (void *)sa->sa_restorer);
+	}	break;
+#endif /* HAVE_SC_REPR_STRUCT_OLD_KERNEL_SIGACTION */
+
+#ifdef HAVE_SC_REPR_STRUCT_OLD_KERNEL_SIGACTIONX32
+	case SC_REPR_STRUCT_OLD_KERNEL_SIGACTIONX32: {
+		USER UNCHECKED struct __kernel_sigactionx32 *sa;
+		size_t sigsetsize = sizeof(sa->sa_mask);
+		sa = (USER UNCHECKED struct __kernel_sigactionx32 *)(uintptr_t)value.sv_u64;
+		if (link)
+			sigsetsize = (size_t)link->sa_value.sv_u64;
+		if (!sa)
+			goto do_pointer;
+		validate_readable(sa, sizeof(*sa));
+		result = print_sigaction(printer,
+		                         arg,
+		                         (sighandler_t)(void *)sa->sa_handler,
+		                         (USER CHECKED sigset_t *)&sa->sa_mask,
+		                         sigsetsize,
+		                         sa->sa_flags,
+		                         (void *)sa->sa_restorer);
+	}	break;
+#endif /* HAVE_SC_REPR_STRUCT_OLD_KERNEL_SIGACTIONX32 */
+
+#ifdef HAVE_SC_REPR_STRUCT_OLD_KERNEL_SIGACTIONX64
+	case SC_REPR_STRUCT_OLD_KERNEL_SIGACTIONX64: {
+		USER UNCHECKED struct __kernel_sigactionx64 *sa;
+		size_t sigsetsize = sizeof(sa->sa_mask);
+		sa = (USER UNCHECKED struct __kernel_sigactionx64 *)(uintptr_t)value.sv_u64;
+		if (link)
+			sigsetsize = (size_t)link->sa_value.sv_u64;
+		if (!sa || sigsetsize != sizeof(sa->sa_mask))
+			goto do_pointer;
+		validate_readable(sa, sizeof(*sa));
+		result = print_sigaction(printer,
+		                         arg,
+		                         (sighandler_t)(void *)sa->sa_handler,
+		                         (USER CHECKED sigset_t *)&sa->sa_mask,
+		                         sigsetsize,
+		                         sa->sa_flags,
+		                         (void *)sa->sa_restorer);
+	}	break;
+#endif /* HAVE_SC_REPR_STRUCT_OLD_KERNEL_SIGACTIONX64 */
 
 #ifdef HAVE_SC_REPR_KREADDIR_MODE
 	case SC_REPR_KREADDIR_MODE:

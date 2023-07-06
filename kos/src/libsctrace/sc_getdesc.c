@@ -1,6 +1,6 @@
 /*[[[magic
 local gcc_opt = options.setdefault("GCC.options", []);
-if (gcc_opt.removeif([](x) -> x.startswith("-O")))
+if (gcc_opt.removeif(x -> x.startswith("-O")))
 	gcc_opt.append("-Os");
 gcc_opt.remove("-g"); // Disable debug informations for this file!
 ]]]*/

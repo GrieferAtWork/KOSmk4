@@ -137,6 +137,7 @@ struct __ATTR_ALIGNED(__ALIGNOF_SIGACTIONX64) __sigactionx64 /*[NAME(sigactionx6
 
 /* Because of `__ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION', the kernel's `struct sigaction' matches libc's! */
 #define __kernel_sigactionx64 __sigactionx64
+#define __ARCH_HAVE_KERNEL_SIGACTIONX64_IS_LIBC_SIGACTIONX64
 
 __DECL_END
 #endif /* __CC__ */

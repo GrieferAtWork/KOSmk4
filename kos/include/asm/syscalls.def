@@ -1522,15 +1522,15 @@ signalx64:(signo_t signo, __sigactionx64_sa_handler_t handler) -> __sigactionx64
 %[endgroup]
 
 %[startgroup]
-sigaction:(signo_t signo, [tostr(STRUCT_SIGACTION)] struct __old_kernel_sigaction const *act, [tostr(out:STRUCT_SIGACTION)] struct __old_kernel_sigaction *oact) -> errno_t;
-sigactionx32:(signo_t signo, [tostr(STRUCT_SIGACTIONX32)] struct __old_kernel_sigactionx32 const *act, [tostr(out:STRUCT_SIGACTIONX32)] struct __old_kernel_sigactionx32 *oact) -> errno_t;
-sigactionx64:(signo_t signo, [tostr(STRUCT_SIGACTIONX64)] struct __old_kernel_sigactionx64 const *act, [tostr(out:STRUCT_SIGACTIONX64)] struct __old_kernel_sigactionx64 *oact) -> errno_t;
+sigaction:(signo_t signo, [tostr(STRUCT_OLD_KERNEL_SIGACTION)] struct __old_kernel_sigaction const *act, [tostr(out:STRUCT_OLD_KERNEL_SIGACTION)] struct __old_kernel_sigaction *oact) -> errno_t;
+sigactionx32:(signo_t signo, [tostr(STRUCT_OLD_KERNEL_SIGACTIONX32)] struct __old_kernel_sigactionx32 const *act, [tostr(out:STRUCT_OLD_KERNEL_SIGACTIONX32)] struct __old_kernel_sigactionx32 *oact) -> errno_t;
+sigactionx64:(signo_t signo, [tostr(STRUCT_OLD_KERNEL_SIGACTIONX64)] struct __old_kernel_sigactionx64 const *act, [tostr(out:STRUCT_OLD_KERNEL_SIGACTIONX64)] struct __old_kernel_sigactionx64 *oact) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-rt_sigaction:(signo_t signo, [tostr(STRUCT_SIGACTION:sigsetsize)] struct __kernel_sigaction const *act, [tostr(out:STRUCT_SIGACTION:sigsetsize)] struct __kernel_sigaction *oact, size_t sigsetsize) -> errno_t;
-rt_sigactionx32:(signo_t signo, [tostr(STRUCT_SIGACTIONX32:sigsetsize)] struct __kernel_sigactionx32 const *act, [tostr(out:STRUCT_SIGACTIONX32:sigsetsize)] struct __kernel_sigactionx32 *oact, size_t sigsetsize) -> errno_t;
-rt_sigactionx64:(signo_t signo, [tostr(STRUCT_SIGACTIONX64:sigsetsize)] struct __kernel_sigactionx64 const *act, [tostr(out:STRUCT_SIGACTIONX64:sigsetsize)] struct __kernel_sigactionx64 *oact, size_t sigsetsize) -> errno_t;
+rt_sigaction:(signo_t signo, [tostr(STRUCT_KERNEL_SIGACTION:sigsetsize)] struct __kernel_sigaction const *act, [tostr(out:STRUCT_KERNEL_SIGACTION:sigsetsize)] struct __kernel_sigaction *oact, size_t sigsetsize) -> errno_t;
+rt_sigactionx32:(signo_t signo, [tostr(STRUCT_KERNEL_SIGACTIONX32:sigsetsize)] struct __kernel_sigactionx32 const *act, [tostr(out:STRUCT_KERNEL_SIGACTIONX32:sigsetsize)] struct __kernel_sigactionx32 *oact, size_t sigsetsize) -> errno_t;
+rt_sigactionx64:(signo_t signo, [tostr(STRUCT_KERNEL_SIGACTIONX64:sigsetsize)] struct __kernel_sigactionx64 const *act, [tostr(out:STRUCT_KERNEL_SIGACTIONX64:sigsetsize)] struct __kernel_sigactionx64 *oact, size_t sigsetsize) -> errno_t;
 %[endgroup]
 
 %[startgroup]

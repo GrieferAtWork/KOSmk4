@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6390e2b */
+/* HASH CRC-32:0x7becf9a4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1023,7 +1023,7 @@
 #define __NR64ATR0_brk                      SC_REPR_POINTER                                                      /* addr */ 
 #define __NR64RTR_brk                       SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_rt_sigaction             SC_REPR_SIGNO_T                                                      /* signo */ 
-#define __NR64ATR1_rt_sigaction             SC_REPR_STRUCT_SIGACTIONX64                                          /* act */ 
+#define __NR64ATR1_rt_sigaction             SC_REPR_STRUCT_KERNEL_SIGACTIONX64                                   /* act */ 
 #define __NR64ATL1_rt_sigaction             3                                                                    /* act -> sigsetsize */ 
 #define __NR64ATR2_rt_sigaction             SC_REPR_POINTER                                                      /* oact */ 
 #define __NR64ATR3_rt_sigaction             SC_REPR_SIZE_T                                                       /* sigsetsize */ 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f80ebfe */
+/* HASH CRC-32:0xe0d564b1 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1266,7 +1266,7 @@
 #define __NRATR1_rt_sigsuspend          SC_REPR_SIZE_T                                          /* sigsetsize */ 
 #define __NRRTR_rt_sigsuspend           SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_rt_sigaction           SC_REPR_SIGNO_T                                         /* signo */ 
-#define __NRATR1_rt_sigaction           SC_REPR_STRUCT_SIGACTION                                /* act */ 
+#define __NRATR1_rt_sigaction           SC_REPR_STRUCT_KERNEL_SIGACTION                         /* act */ 
 #define __NRATL1_rt_sigaction           3                                                       /* act -> sigsetsize */ 
 #define __NRATR2_rt_sigaction           SC_REPR_POINTER                                         /* oact */ 
 #define __NRATR3_rt_sigaction           SC_REPR_SIZE_T                                          /* sigsetsize */ 

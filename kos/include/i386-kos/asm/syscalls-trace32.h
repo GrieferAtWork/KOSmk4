@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x905c58ec */
+/* HASH CRC-32:0xfe250bec */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1339,7 +1339,7 @@
 #define __NRRTR_getpgrp                       SC_REPR_PID_T                                                        /* return */
 #define __NRRTR_setsid                        SC_REPR_PID_T                                                        /* return */
 #define __NRATR0_sigaction                    SC_REPR_SIGNO_T                                                      /* signo */ 
-#define __NRATR1_sigaction                    SC_REPR_STRUCT_SIGACTIONX32                                          /* act */ 
+#define __NRATR1_sigaction                    SC_REPR_STRUCT_OLD_KERNEL_SIGACTIONX32                               /* act */ 
 #define __NRATR2_sigaction                    SC_REPR_POINTER                                                      /* oact */ 
 #define __NRRTR_sigaction                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NRRTR_sgetmask                      SC_REPR_SIGMASK                                                      /* return */
@@ -1656,7 +1656,7 @@
 #define __NRRTR_prctl                         SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NRRTR_rt_sigreturn                  SC_REPR_SIGNO_T                                                      /* return */
 #define __NRATR0_rt_sigaction                 SC_REPR_SIGNO_T                                                      /* signo */ 
-#define __NRATR1_rt_sigaction                 SC_REPR_STRUCT_SIGACTIONX32                                          /* act */ 
+#define __NRATR1_rt_sigaction                 SC_REPR_STRUCT_KERNEL_SIGACTIONX32                                   /* act */ 
 #define __NRATL1_rt_sigaction                 3                                                                    /* act -> sigsetsize */ 
 #define __NRATR2_rt_sigaction                 SC_REPR_POINTER                                                      /* oact */ 
 #define __NRATR3_rt_sigaction                 SC_REPR_SIZE_T                                                       /* sigsetsize */ 

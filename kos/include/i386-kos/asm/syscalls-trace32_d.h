@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ee33736 */
+/* HASH CRC-32:0x7f67dcf2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1339,7 +1339,7 @@
 #define __NR32RTR_getpgrp                       SC_REPR_PID_T                                                        /* return */
 #define __NR32RTR_setsid                        SC_REPR_PID_T                                                        /* return */
 #define __NR32ATR0_sigaction                    SC_REPR_SIGNO_T                                                      /* signo */ 
-#define __NR32ATR1_sigaction                    SC_REPR_STRUCT_SIGACTIONX32                                          /* act */ 
+#define __NR32ATR1_sigaction                    SC_REPR_STRUCT_OLD_KERNEL_SIGACTIONX32                               /* act */ 
 #define __NR32ATR2_sigaction                    SC_REPR_POINTER                                                      /* oact */ 
 #define __NR32RTR_sigaction                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32RTR_sgetmask                      SC_REPR_SIGMASK                                                      /* return */
@@ -1656,7 +1656,7 @@
 #define __NR32RTR_prctl                         SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32RTR_rt_sigreturn                  SC_REPR_SIGNO_T                                                      /* return */
 #define __NR32ATR0_rt_sigaction                 SC_REPR_SIGNO_T                                                      /* signo */ 
-#define __NR32ATR1_rt_sigaction                 SC_REPR_STRUCT_SIGACTIONX32                                          /* act */ 
+#define __NR32ATR1_rt_sigaction                 SC_REPR_STRUCT_KERNEL_SIGACTIONX32                                   /* act */ 
 #define __NR32ATL1_rt_sigaction                 3                                                                    /* act -> sigsetsize */ 
 #define __NR32ATR2_rt_sigaction                 SC_REPR_POINTER                                                      /* oact */ 
 #define __NR32ATR3_rt_sigaction                 SC_REPR_SIZE_T                                                       /* sigsetsize */ 
