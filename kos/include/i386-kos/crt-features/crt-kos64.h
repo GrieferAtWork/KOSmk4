@@ -1891,6 +1891,7 @@
 #define __CRT_HAVE__mktemp_s
 #define __CRT_HAVE__msize
 #define __CRT_HAVE__msize_dbg
+#define __CRT_HAVE__msize_debug
 #define __CRT_HAVE__nl_default_dirname
 #define __CRT_HAVE__nl_domain_bindings
 #define __CRT_HAVE__nl_msg_cat_cntr
@@ -6513,7 +6514,6 @@
 #define __CRT_HAVE__mktemp
 #define __CRT_HAVE__mktime32
 #define __CRT_HAVE__mktime64
-#define __CRT_HAVE__msize_debug
 #define __CRT_HAVE__nextafter
 #define __CRT_HAVE__nextafterf
 #define __CRT_HAVE__onexit
@@ -7947,6 +7947,7 @@
 #define __CRT_HAVE_KOS$_mkdir
 #define __CRT_HAVE_KOS$_mktemp_s
 #define __CRT_HAVE_KOS$_msize
+#define __CRT_HAVE_KOS$_msize_debug
 #define __CRT_HAVE_KOS$_objalloc_alloc
 #define __CRT_HAVE_KOS$_obstack_allocated_p
 #define __CRT_HAVE_KOS$_obstack_begin

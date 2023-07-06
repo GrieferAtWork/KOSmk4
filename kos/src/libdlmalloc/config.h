@@ -254,6 +254,7 @@ DEFINE_DL_EXPORT_ALIAS(pvalloc, dlpvalloc);
 DEFINE_DL_EXPORT_ALIAS(malloc_trim, dlmalloc_trim);
 DEFINE_DL_EXPORT_ALIAS(malloc_usable_size, dlmalloc_usable_size);
 DEFINE_DL_EXPORT_ALIAS(_msize, dlmalloc_usable_size);
+DEFINE_DL_EXPORT_ALIAS(_msize_debug, dlmalloc_usable_size);
 #undef DEFINE_DL_EXPORT_ALIAS
 
 /* Also create libc-overrides exports
@@ -290,6 +291,7 @@ DEFINE_INTERN_ALIAS(libc_pvalloc, dlpvalloc);
 DEFINE_INTERN_ALIAS(libc_malloc_trim, dlmalloc_trim);
 DEFINE_INTERN_ALIAS(libc_malloc_usable_size, dlmalloc_usable_size);
 
+#ifdef __BUILDING_LIBC
 #if __SIZEOF_INT__ != __SIZEOF_SIZE_T__
 INTERN ATTR_SECTION(".text.crt.heap.malloc")
 struct mallinfo libc_mallinfo_int(void) {
@@ -308,7 +310,6 @@ struct mallinfo libc_mallinfo_int(void) {
 	return result;
 }
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
-#ifdef __BUILDING_LIBC
 #endif /* __BUILDING_LIBC */
 
 

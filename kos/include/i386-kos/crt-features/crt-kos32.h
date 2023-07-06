@@ -1976,6 +1976,7 @@
 #define __CRT_HAVE__mktime64
 #define __CRT_HAVE__msize
 #define __CRT_HAVE__msize_dbg
+#define __CRT_HAVE__msize_debug
 #define __CRT_HAVE__nextafter
 #define __CRT_HAVE__nl_default_dirname
 #define __CRT_HAVE__nl_domain_bindings
