@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99821429 */
+/* HASH CRC-32:0x73008476 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2575,7 +2575,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaction)
 	.cfi_endproc
 END(__x86_asm32_int80_sigaction)
 
-/* syscall_ulong_t sgetmask(void) */
+/* uint32_t sgetmask(void) */
 .section .text.x86.asm32_syscall_int80.sgetmask
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sgetmask)
 	.cfi_startproc simple
@@ -2610,7 +2610,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sgetmask)
 	.cfi_endproc
 END(__x86_asm32_int80_sgetmask)
 
-/* syscall_ulong_t ssetmask(syscall_ulong_t sigmask) */
+/* uint32_t ssetmask(uint32_t sigmask) */
 .section .text.x86.asm32_syscall_int80.ssetmask
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_ssetmask)
 	.cfi_startproc simple
@@ -22083,7 +22083,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigaction)
 	.cfi_endproc
 END(__x86_asm32_sysenter_sigaction)
 
-/* syscall_ulong_t sgetmask(void) */
+/* uint32_t sgetmask(void) */
 .section .text.x86.asm32_syscall_sysenter.sgetmask
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sgetmask)
 	.cfi_startproc simple
@@ -22118,7 +22118,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sgetmask)
 	.cfi_endproc
 END(__x86_asm32_sysenter_sgetmask)
 
-/* syscall_ulong_t ssetmask(syscall_ulong_t sigmask) */
+/* uint32_t ssetmask(uint32_t sigmask) */
 .section .text.x86.asm32_syscall_sysenter.ssetmask
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ssetmask)
 	.cfi_startproc simple

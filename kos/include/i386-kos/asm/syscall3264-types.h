@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42c21364 */
+/* HASH CRC-32:0xafa5c0ee */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,7 +109,7 @@
 #define HAVE_SC_REPR_SCHED_PRIORITY_WHICH
 #define HAVE_SC_REPR_SEEK_WHENCE
 #define HAVE_SC_REPR_SIGHANDLER_T
-#define HAVE_SC_REPR_SIGMASK
+#define HAVE_SC_REPR_SIGMASK32
 #define HAVE_SC_REPR_SIGNALFD4_FLAGS
 #define HAVE_SC_REPR_SIGNO_T
 #define HAVE_SC_REPR_SIGPROCMASK_HOW
@@ -316,7 +316,7 @@ __SYSCALL_REPR(SC_REPR_SCHED_POLICY)
 __SYSCALL_REPR(SC_REPR_SCHED_PRIORITY_WHICH)
 __SYSCALL_REPR(SC_REPR_SEEK_WHENCE)
 __SYSCALL_REPR(SC_REPR_SIGHANDLER_T)
-__SYSCALL_REPR(SC_REPR_SIGMASK)
+__SYSCALL_REPR(SC_REPR_SIGMASK32)
 __SYSCALL_REPR(SC_REPR_SIGNALFD4_FLAGS)
 __SYSCALL_REPR(SC_REPR_SIGNO_T)
 __SYSCALL_REPR(SC_REPR_SIGPROCMASK_HOW)

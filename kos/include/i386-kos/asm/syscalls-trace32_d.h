@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f67dcf2 */
+/* HASH CRC-32:0x5d3e3f81 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1342,9 +1342,9 @@
 #define __NR32ATR1_sigaction                    SC_REPR_STRUCT_OLD_KERNEL_SIGACTIONX32                               /* act */ 
 #define __NR32ATR2_sigaction                    SC_REPR_POINTER                                                      /* oact */ 
 #define __NR32RTR_sigaction                     SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32RTR_sgetmask                      SC_REPR_SIGMASK                                                      /* return */
-#define __NR32ATR0_ssetmask                     SC_REPR_SIGMASK                                                      /* sigmask */ 
-#define __NR32RTR_ssetmask                      SC_REPR_SIGMASK                                                      /* return */
+#define __NR32RTR_sgetmask                      SC_REPR_SIGMASK32                                                    /* return */
+#define __NR32ATR0_ssetmask                     SC_REPR_SIGMASK32                                                    /* sigmask */ 
+#define __NR32RTR_ssetmask                      SC_REPR_SIGMASK32                                                    /* return */
 #define __NR32ATR0_setreuid                     SC_REPR_UID_T                                                        /* ruid */ 
 #define __NR32ATR1_setreuid                     SC_REPR_UID_T                                                        /* euid */ 
 #define __NR32RTR_setreuid                      SC_REPR_ERRNO_T                                                      /* return */

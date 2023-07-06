@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa87c509b */
+/* HASH CRC-32:0xc8ede18d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -608,8 +608,8 @@
 #define __NR32RT_getpgrp                      (pid_t, __pid_t)
 #define __NR32RT_setsid                       (pid_t, __pid_t)
 #define __NR32RT_sigaction                    (errno_t, __errno_t)
-#define __NR32RT_sgetmask                     (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32RT_ssetmask                     (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32RT_sgetmask                     (uint32_t, __uint32_t)
+#define __NR32RT_ssetmask                     (uint32_t, __uint32_t)
 #define __NR32RT_setreuid                     (errno_t, __errno_t)
 #define __NR32RT_setregid                     (errno_t, __errno_t)
 #define __NR32RT_sigsuspend                   (errno_t, __errno_t)
@@ -1135,7 +1135,7 @@
 #define __NR32AT0_sigaction                    (signo_t, __signo_t)
 #define __NR32AT1_sigaction                    (struct __old_kernel_sigactionx32 const *, struct __old_kernel_sigactionx32 const *)
 #define __NR32AT2_sigaction                    (struct __old_kernel_sigactionx32 *, struct __old_kernel_sigactionx32 *)
-#define __NR32AT0_ssetmask                     (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT0_ssetmask                     (uint32_t, __uint32_t)
 #define __NR32AT0_setreuid                     (uint16_t, __uint16_t)
 #define __NR32AT1_setreuid                     (uint16_t, __uint16_t)
 #define __NR32AT0_setregid                     (uint16_t, __uint16_t)
@@ -2258,7 +2258,7 @@
 #define __NR32AM_setsid(a, b, c, d, e, f)                       /* nothing */
 #define __NR32AM_sigaction(a, b, c, d, e, f)                    (__signo_t)a, (struct __old_kernel_sigactionx32 const *)b, (struct __old_kernel_sigactionx32 *)c
 #define __NR32AM_sgetmask(a, b, c, d, e, f)                     /* nothing */
-#define __NR32AM_ssetmask(a, b, c, d, e, f)                     (__syscall_ulong_t)a
+#define __NR32AM_ssetmask(a, b, c, d, e, f)                     (__uint32_t)a
 #define __NR32AM_setreuid(a, b, c, d, e, f)                     (__uint16_t)a, (__uint16_t)b
 #define __NR32AM_setregid(a, b, c, d, e, f)                     (__uint16_t)a, (__uint16_t)b
 #define __NR32AM_sigsuspend(a, b, c, d, e, f)                   (struct __old_sigset_struct const *)a

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0b2b6ee */
+/* HASH CRC-32:0x8bea42c5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -747,14 +747,14 @@ INTERN_FUNCTION(libc_sys_sigaction)
 END(libc_sys_sigaction)
 DEFINE_PUBLIC_ALIAS(sys_sigaction, libc_sys_sigaction)
 
-/* syscall_ulong_t sgetmask(void) */
+/* uint32_t sgetmask(void) */
 INTERN_FUNCTION(libc_sys_sgetmask)
 	movl   $(0x44), %eax
 	jmp    libc___i386_syscall
 END(libc_sys_sgetmask)
 DEFINE_PUBLIC_ALIAS(sys_sgetmask, libc_sys_sgetmask)
 
-/* syscall_ulong_t ssetmask(syscall_ulong_t sigmask) */
+/* uint32_t ssetmask(uint32_t sigmask) */
 INTERN_FUNCTION(libc_sys_ssetmask)
 	movl   $(0x45), %eax
 	jmp    libc_x86_exec_syscall1
@@ -5228,14 +5228,14 @@ INTERN_FUNCTION(libc_sys_Xsigaction)
 END(libc_sys_Xsigaction)
 DEFINE_PUBLIC_ALIAS(sys_Xsigaction, libc_sys_Xsigaction)
 
-/* syscall_ulong_t sgetmask(void) */
+/* uint32_t sgetmask(void) */
 INTERN_FUNCTION(libc_sys_Xsgetmask)
 	movl   $(0x44), %eax
 	jmp    libc___i386_Xsyscall
 END(libc_sys_Xsgetmask)
 DEFINE_PUBLIC_ALIAS(sys_Xsgetmask, libc_sys_Xsgetmask)
 
-/* syscall_ulong_t ssetmask(syscall_ulong_t sigmask) */
+/* uint32_t ssetmask(uint32_t sigmask) */
 INTERN_FUNCTION(libc_sys_Xssetmask)
 	movl   $(0x45), %eax
 	jmp    libc_x86_exec_Xsyscall1

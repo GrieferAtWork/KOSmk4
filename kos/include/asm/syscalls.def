@@ -1541,8 +1541,8 @@ sigaltstackx64:([tostr(STRUCT_SIGALTSTACKX64)] struct __sigaltstackx64 const *ss
 
 alarm:(syscall_ulong_t seconds) -> syscall_ulong_t; /* UNIMPLEMENTED! */
 
-sgetmask:() -> [tostr(SIGMASK)] syscall_ulong_t;
-ssetmask:([tostr(SIGMASK)] syscall_ulong_t sigmask) -> [tostr(SIGMASK)] syscall_ulong_t;
+sgetmask:() -> [tostr(SIGMASK32)] uint32_t;
+ssetmask:([tostr(SIGMASK32)] uint32_t sigmask) -> [tostr(SIGMASK32)] uint32_t;
 
 @@@param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
 sigprocmask:([tostr(SIGPROCMASK_HOW)] syscall_ulong_t how,

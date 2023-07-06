@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d178664 */
+/* HASH CRC-32:0x9cc2df9b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -155,8 +155,8 @@
 #define __NR_getpgrp                      0x41                   /* pid_t getpgrp(void) */
 #define __NR_setsid                       0x42                   /* pid_t setsid(void) */
 #define __NR_sigaction                    0x43                   /* errno_t sigaction(signo_t signo, struct __old_kernel_sigactionx32 const *act, struct __old_kernel_sigactionx32 *oact) */
-#define __NR_sgetmask                     0x44                   /* syscall_ulong_t sgetmask(void) */
-#define __NR_ssetmask                     0x45                   /* syscall_ulong_t ssetmask(syscall_ulong_t sigmask) */
+#define __NR_sgetmask                     0x44                   /* uint32_t sgetmask(void) */
+#define __NR_ssetmask                     0x45                   /* uint32_t ssetmask(uint32_t sigmask) */
 /* >> setreuid(2)
  * Set the real and effective UID of the calling thread.
  * @return: 0 : Success

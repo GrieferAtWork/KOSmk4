@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11add2e5 */
+/* HASH CRC-32:0x25ab8d47 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -608,8 +608,8 @@
 #define __NRRT_getpgrp                      (pid_t, __pid_t)
 #define __NRRT_setsid                       (pid_t, __pid_t)
 #define __NRRT_sigaction                    (errno_t, __errno_t)
-#define __NRRT_sgetmask                     (syscall_ulong_t, __syscall_ulong_t)
-#define __NRRT_ssetmask                     (syscall_ulong_t, __syscall_ulong_t)
+#define __NRRT_sgetmask                     (uint32_t, __uint32_t)
+#define __NRRT_ssetmask                     (uint32_t, __uint32_t)
 #define __NRRT_setreuid                     (errno_t, __errno_t)
 #define __NRRT_setregid                     (errno_t, __errno_t)
 #define __NRRT_sigsuspend                   (errno_t, __errno_t)
@@ -1135,7 +1135,7 @@
 #define __NRAT0_sigaction                    (signo_t, __signo_t)
 #define __NRAT1_sigaction                    (struct __old_kernel_sigactionx32 const *, struct __old_kernel_sigactionx32 const *)
 #define __NRAT2_sigaction                    (struct __old_kernel_sigactionx32 *, struct __old_kernel_sigactionx32 *)
-#define __NRAT0_ssetmask                     (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT0_ssetmask                     (uint32_t, __uint32_t)
 #define __NRAT0_setreuid                     (uint16_t, __uint16_t)
 #define __NRAT1_setreuid                     (uint16_t, __uint16_t)
 #define __NRAT0_setregid                     (uint16_t, __uint16_t)
@@ -2258,7 +2258,7 @@
 #define __NRAM_setsid(a, b, c, d, e, f)                       /* nothing */
 #define __NRAM_sigaction(a, b, c, d, e, f)                    (__signo_t)a, (struct __old_kernel_sigactionx32 const *)b, (struct __old_kernel_sigactionx32 *)c
 #define __NRAM_sgetmask(a, b, c, d, e, f)                     /* nothing */
-#define __NRAM_ssetmask(a, b, c, d, e, f)                     (__syscall_ulong_t)a
+#define __NRAM_ssetmask(a, b, c, d, e, f)                     (__uint32_t)a
 #define __NRAM_setreuid(a, b, c, d, e, f)                     (__uint16_t)a, (__uint16_t)b
 #define __NRAM_setregid(a, b, c, d, e, f)                     (__uint16_t)a, (__uint16_t)b
 #define __NRAM_sigsuspend(a, b, c, d, e, f)                   (struct __old_sigset_struct const *)a

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe21e290a */
+/* HASH CRC-32:0x833de94a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2270,7 +2270,7 @@ __CDECLARE_SC(,__errno_t,setuid32,(__uint32_t __uid),(__uid))
 __CDECLARE_SC(,__errno_t,setxattr,(char const *__path, char const *__name, void const *__buf, __size_t __bufsize, __syscall_ulong_t __flags),(__path,__name,__buf,__bufsize,__flags))
 #endif /* __CRT_HAVE_SC(setxattr) */
 #if __CRT_HAVE_SC(sgetmask)
-__CDECLARE_SC(,__syscall_ulong_t,sgetmask,(void),())
+__CDECLARE_SC(,__uint32_t,sgetmask,(void),())
 #endif /* __CRT_HAVE_SC(sgetmask) */
 #if __CRT_HAVE_SC(shmat)
 __CDECLARE_SC(,__errno_t,shmat,(__syscall_ulong_t __shmid, void const *__shmaddr, __syscall_ulong_t __shmflg),(__shmid,__shmaddr,__shmflg))
@@ -2366,7 +2366,7 @@ __CDECLARE_SC(,__errno_t,socketpair,(__syscall_ulong_t __domain, __syscall_ulong
 __CDECLARE_SC(,__ssize_t,splice,(__fd_t __fdin, __uint64_t *__offin, __fd_t __fdout, __uint64_t *__offout, __size_t __length, __syscall_ulong_t __flags),(__fdin,__offin,__fdout,__offout,__length,__flags))
 #endif /* __CRT_HAVE_SC(splice) */
 #if __CRT_HAVE_SC(ssetmask)
-__CDECLARE_SC(,__syscall_ulong_t,ssetmask,(__syscall_ulong_t __sigmask),(__sigmask))
+__CDECLARE_SC(,__uint32_t,ssetmask,(__uint32_t __sigmask),(__sigmask))
 #endif /* __CRT_HAVE_SC(ssetmask) */
 #if __CRT_HAVE_SC(stat)
 __CDECLARE_SC(,__errno_t,stat,(char const *__filename, struct linux_statx32 *__statbuf),(__filename,__statbuf))
@@ -4770,7 +4770,7 @@ __CDECLARE_XSC(,__errno_t,setuid32,(__uint32_t __uid),(__uid))
 __CDECLARE_XSC(,__errno_t,setxattr,(char const *__path, char const *__name, void const *__buf, __size_t __bufsize, __syscall_ulong_t __flags),(__path,__name,__buf,__bufsize,__flags))
 #endif /* __CRT_HAVE_XSC(setxattr) */
 #if __CRT_HAVE_XSC(sgetmask)
-__CDECLARE_XSC(,__syscall_ulong_t,sgetmask,(void),())
+__CDECLARE_XSC(,__uint32_t,sgetmask,(void),())
 #endif /* __CRT_HAVE_XSC(sgetmask) */
 #if __CRT_HAVE_XSC(shmat)
 __CDECLARE_XSC(,__errno_t,shmat,(__syscall_ulong_t __shmid, void const *__shmaddr, __syscall_ulong_t __shmflg),(__shmid,__shmaddr,__shmflg))
@@ -4863,7 +4863,7 @@ __CDECLARE_XSC(,__errno_t,socketpair,(__syscall_ulong_t __domain, __syscall_ulon
 __CDECLARE_XSC(,__ssize_t,splice,(__fd_t __fdin, __uint64_t *__offin, __fd_t __fdout, __uint64_t *__offout, __size_t __length, __syscall_ulong_t __flags),(__fdin,__offin,__fdout,__offout,__length,__flags))
 #endif /* __CRT_HAVE_XSC(splice) */
 #if __CRT_HAVE_XSC(ssetmask)
-__CDECLARE_XSC(,__syscall_ulong_t,ssetmask,(__syscall_ulong_t __sigmask),(__sigmask))
+__CDECLARE_XSC(,__uint32_t,ssetmask,(__uint32_t __sigmask),(__sigmask))
 #endif /* __CRT_HAVE_XSC(ssetmask) */
 #if __CRT_HAVE_XSC(stat)
 __CDECLARE_XSC(,__errno_t,stat,(char const *__filename, struct linux_statx32 *__statbuf),(__filename,__statbuf))

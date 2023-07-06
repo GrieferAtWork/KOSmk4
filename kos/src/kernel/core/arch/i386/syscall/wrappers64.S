@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2414fbfc */
+/* HASH CRC-32:0x37e727a0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -14679,7 +14679,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaction)
 	.cfi_endproc
 END(__x86_asm32_int80_sigaction)
 
-/* syscall_ulong_t sgetmask(void) */
+/* uint32_t sgetmask(void) */
 .section .text.x86.asm32_syscall_int80.sgetmask
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sgetmask)
 	.cfi_startproc simple
@@ -14701,7 +14701,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sgetmask)
 	.cfi_endproc
 END(__x86_asm32_int80_sgetmask)
 
-/* syscall_ulong_t ssetmask(syscall_ulong_t sigmask) */
+/* uint32_t ssetmask(uint32_t sigmask) */
 .section .text.x86.asm32_syscall_int80.ssetmask
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_ssetmask)
 	.cfi_startproc simple
@@ -26511,10 +26511,10 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setsid, __x86_asm32_int80_setsid)
 /* errno_t sigaction(signo_t signo, struct __old_kernel_sigactionx32 const *act, struct __old_kernel_sigactionx32 *oact) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sigaction, __x86_asm32_int80_sigaction)
 
-/* syscall_ulong_t sgetmask(void) */
+/* uint32_t sgetmask(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sgetmask, __x86_asm32_int80_sgetmask)
 
-/* syscall_ulong_t ssetmask(syscall_ulong_t sigmask) */
+/* uint32_t ssetmask(uint32_t sigmask) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ssetmask, __x86_asm32_int80_ssetmask)
 
 /* >> setreuid(2)
@@ -31512,10 +31512,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sigaction)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_sigaction)
 
-/* syscall_ulong_t sgetmask(void) */
+/* uint32_t sgetmask(void) */
 /* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_sgetmask, sys32_sgetmask); */
 
-/* syscall_ulong_t ssetmask(syscall_ulong_t sigmask) */
+/* uint32_t ssetmask(uint32_t sigmask) */
 .section .text.x86.asm32_syscall_sysrun32.ssetmask
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ssetmask)
 	.cfi_startproc
