@@ -1,7 +1,7 @@
 /*[[[magic
 // This file is all about compat stuff, so optimize it for size rather than speed!
 local gcc_opt = options.setdefault("GCC.options", []);
-if (gcc_opt.removeif([](x) -> x.startswith("-O")))
+if (gcc_opt.removeif(x -> x.startswith("-O")))
 	gcc_opt.append("-Os");
 ]]]*/
 /* Copyright (c) 2019-2023 Griefer@Work                                       *

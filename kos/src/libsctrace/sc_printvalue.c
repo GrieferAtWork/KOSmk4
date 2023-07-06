@@ -1,6 +1,6 @@
 /*[[[magic
 local gcc_opt = options.setdefault("GCC.options", []);
-if (gcc_opt.removeif([](x) -> x.startswith("-O")))
+if (gcc_opt.removeif(x -> x.startswith("-O")))
 	gcc_opt.append("-Os");
 ]]]*/
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
@@ -1651,7 +1651,7 @@ import * from deemon;
 import * from ...misc.libgen.strendN;
 local typ = getPrefixedMacrosFromFileAsMapping(
 	"../../include/asm/os/kos/signal.h", "__SIG_",
-	filter: [](x) -> x !in { "__SIG_BLOCK", "__SIG_UNBLOCK", "__SIG_SETMASK" });
+	filter: x -> x !in { "__SIG_BLOCK", "__SIG_UNBLOCK", "__SIG_SETMASK" });
 printStrendNDatabase("SIGHANDLER", typ);
 ]]]*/
 #define GETBASE_SIGHANDLER(result, index) \
@@ -2742,7 +2742,7 @@ print_seek_whence(pformatprinter printer, void *arg,
 import * from deemon;
 import * from ...misc.libgen.strendN;
 local typ = getPrefixedMacrosFromFileAsMapping("../../include/asm/os/kos/fcntl.h", "__F_",
-	filter: [](x) -> x !in {
+	filter: x -> x !in {
 		"__F_RDLCK", "__F_WRLCK", "__F_UNLCK", "__F_EXLCK", "__F_SHLCK",
 		"__F_OWNER_TID", "__F_OWNER_PID", "__F_OWNER_PGRP",
 		"__F_LINUX_SPECIFIC_BASE", "__F_SEAL_SEAL", "__F_SEAL_SHRINK",

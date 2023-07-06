@@ -1,6 +1,6 @@
 /*[[[magic
 local gcc_opt = options.setdefault("GCC.options", []);
-if (gcc_opt.removeif([](x) -> x.startswith("-O")))
+if (gcc_opt.removeif(x -> x.startswith("-O")))
 	gcc_opt.append("-Os"); // Optimize this file for size
 ]]]*/
 /* Copyright (c) 2019-2023 Griefer@Work                                       *

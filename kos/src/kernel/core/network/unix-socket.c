@@ -1,6 +1,6 @@
 /*[[[magic
 local gcc_opt = options.setdefault("GCC.options", []);
-gcc_opt.removeif([](x) -> x.startswith("-O")); // TODO: Why are optimizations disabled here?
+gcc_opt.removeif(x -> x.startswith("-O")); // TODO: Why are optimizations disabled here?
 ]]]*/
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *

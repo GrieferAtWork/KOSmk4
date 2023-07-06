@@ -1,6 +1,6 @@
 /*[[[magic
 local gcc_opt = options.setdefault("GCC.options", []);
-gcc_opt.removeif([](x) -> x.startswith("-O"));
+gcc_opt.removeif(x -> x.startswith("-O"));
 gcc_opt.append("-Os"); // Optimize for size (don't want to bloat libc too much with this compat stuff)
 ]]]*/
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
