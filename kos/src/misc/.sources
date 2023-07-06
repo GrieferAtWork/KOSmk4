@@ -19,12 +19,18 @@
  */
 
 if (!OPT_ONLY_BUILD_LIBRARIES) {
-/* Compile keymap files. */
-for (local x: fs.dir("kos/src/misc/keymaps")) {
-	BEGIN GROUP("keymaps." + x) { KEYMAP, MCOPY };
-		options[OPT_KEYMAP_SRC]   = { "keymaps/" + x };
-		options[OPT_LINK_OUTPUT]  = TARGET_BINPATH + "/lib/keymap/" + x;
-		options[OPT_MCOPY_OUTPUT] = "/lib/keymap/" + x;
-	END
-}
+	/* Compile keymap files. */
+	for (local x: fs.dir("kos/src/misc/keymaps")) {
+		BEGIN GROUP("keymaps." + x) { KEYMAP, MCOPY };
+			options[OPT_KEYMAP_SRC]   = { "keymaps/" + x };
+			options[OPT_LINK_OUTPUT]  = TARGET_BINPATH + "/lib/keymap/" + x;
+			options[OPT_MCOPY_OUTPUT] = "/lib/keymap/" + x;
+		END
+	}
+	for (local x: fs.dir("kos/src/misc/bin")) {
+		BEGIN GROUP("bin." + x) { MCOPY };
+			options[OPT_MCOPY_INPUT]  = "bin/" + x;
+			options[OPT_MCOPY_OUTPUT] = "/bin/" + x;
+		END
+	}
 }
