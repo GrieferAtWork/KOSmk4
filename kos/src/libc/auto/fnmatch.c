@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4bfe669b */
+/* HASH CRC-32:0xe17aaa5a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,6 +49,8 @@ NOTHROW_NCX(LIBCCALL libc_fnmatch)(char const *pattern,
 			/* End of name (if the patter is empty, or only contains '*', we have a match) */
 			while (*pattern == '*')
 				++pattern;
+			if (!*pattern)
+				return 0; /* Pattern ends with '*' (matches everything) */
 			goto nomatch;
 		}
 		if (!*pattern)

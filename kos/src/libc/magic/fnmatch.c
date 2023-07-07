@@ -94,6 +94,8 @@ int fnmatch([[in]] char const *pattern,
 			/* End of name (if the patter is empty, or only contains '*', we have a match) */
 			while (*pattern == '*')
 				++pattern;
+			if (!*pattern)
+				return 0; /* Pattern ends with '*' (matches everything) */
 			goto nomatch;
 		}
 		if (!*pattern)
