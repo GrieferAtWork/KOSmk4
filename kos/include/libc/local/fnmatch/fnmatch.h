@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x363cb0ea */
+/* HASH CRC-32:0x95bfb96b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,7 +75,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fnmatch))(char const *__pattern, char
 				    ((__match_flags & 0x10) &&
 				     (__NAMESPACE_LOCAL_SYM __localdep_tolower)(__ch) == (__NAMESPACE_LOCAL_SYM __localdep_tolower)(__card_post))) {
 					/* Recursively check if the rest of the name and pattern match */
-					if (!(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fnmatch))(__name, __pattern, __match_flags))
+					if (!(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fnmatch))(__pattern, __name, __match_flags))
 						return 0;
 				} else if (!__ch) {
 					goto __nomatch; /* Wildcard suffix not found */

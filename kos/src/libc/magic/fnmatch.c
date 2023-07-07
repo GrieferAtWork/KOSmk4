@@ -115,7 +115,7 @@ int fnmatch([[in]] char const *pattern,
 				    ((match_flags & FNM_CASEFOLD) &&
 				     tolower(ch) == tolower(card_post))) {
 					/* Recursively check if the rest of the name and pattern match */
-					if (!fnmatch(name, pattern, match_flags))
+					if (!fnmatch(pattern, name, match_flags))
 						return 0;
 				} else if (!ch) {
 					goto nomatch; /* Wildcard suffix not found */

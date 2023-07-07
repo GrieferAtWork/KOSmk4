@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe17aaa5a */
+/* HASH CRC-32:0xccc23582 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ NOTHROW_NCX(LIBCCALL libc_fnmatch)(char const *pattern,
 				    ((match_flags & 0x10) &&
 				     libc_tolower(ch) == libc_tolower(card_post))) {
 					/* Recursively check if the rest of the name and pattern match */
-					if (!libc_fnmatch(name, pattern, match_flags))
+					if (!libc_fnmatch(pattern, name, match_flags))
 						return 0;
 				} else if (!ch) {
 					goto nomatch; /* Wildcard suffix not found */
