@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95bfb96b */
+/* HASH CRC-32:0x23878a2a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fnmatch))(char const *__pattern, char
 	/* TODO: Support for `FNM_EXTMATCH' */
 	for (;;) {
 		if (!*__name) {
-			/* End of name (if the patter is empty, or only contains '*', we have a match) */
+			/* End of name (if the pattern is empty, or only contains '*', we have a match) */
 			while (*__pattern == '*')
 				++__pattern;
 			if (!*__pattern)

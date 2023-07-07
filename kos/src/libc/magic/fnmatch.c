@@ -91,7 +91,7 @@ int fnmatch([[in]] char const *pattern,
 	/* TODO: Support for `FNM_EXTMATCH' */
 	for (;;) {
 		if (!*name) {
-			/* End of name (if the patter is empty, or only contains '*', we have a match) */
+			/* End of name (if the pattern is empty, or only contains '*', we have a match) */
 			while (*pattern == '*')
 				++pattern;
 			if (!*pattern)

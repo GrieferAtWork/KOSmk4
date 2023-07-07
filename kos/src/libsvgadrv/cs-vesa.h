@@ -55,7 +55,7 @@ struct vesa_chipset: svga_chipset {
 #endif /* !__KERNEL__ */
 };
 
-/* BIOS Buffer offsets (info `vc_emu.b86e_bios.b86_biosbase') */
+/* BIOS Buffer offsets (into `vc_emu.b86e_bios.b86_biosbase') */
 #define VESA_CHIPSET_BIOSADDR_BIOSINFO (BIOS86_MEM_GPBAS + 0)                                                         /* struct vbe_biosinfo */
 #define VESA_CHIPSET_BIOSADDR_MODEINFO (BIOS86_MEM_GPBAS + sizeof(struct vbe_biosinfo))                               /* struct vbe_modeinfo */
 #define VESA_CHIPSET_BIOSADDR_REGBUF   (BIOS86_MEM_GPBAS + sizeof(struct vbe_biosinfo) + sizeof(struct vbe_modeinfo)) /* Register buffer */
