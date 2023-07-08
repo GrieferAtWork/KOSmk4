@@ -1557,6 +1557,8 @@ endwrite_and_free_newrange_and_done:
 			newrange->hr_nlops = 0;
 			newrange->hr_cexec = 0;
 			newrange->hr_cfork = 0;
+			DBG_memset(&newrange->_hr_joinlop, 0xcc, sizeof(newrange->_hr_joinlop));
+			newrange->_hr_joinlop.olo_func = NULL; /* Mark as "inactive" */
 			assert(newrange->hr_minfd <= newrange->hr_maxfd);
 			assert(handrange_count(newrange) == hicount);
 			range->hr_maxfd = range->hr_minfd + rel_freemin - 1;
@@ -2594,7 +2596,7 @@ create_new_range_for_relfd:
 		result->hr_cexec = 0;
 		result->hr_cfork = 0;
 		DBG_memset(&result->_hr_joinlop, 0xcc, sizeof(result->_hr_joinlop));
-		result->_hr_joinlop.olo_func = NULL;
+		result->_hr_joinlop.olo_func = NULL; /* Mark as "inactive" */
 		DBG_memset(&result->hr_hand[0], 0xcc, sizeof(result->hr_hand[0]));
 		result->hr_hand[0].mh_hand.h_type = HANDLE_TYPE_UNDEFINED;
 		*p_relfd = 0;
