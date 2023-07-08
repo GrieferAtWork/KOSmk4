@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe61c4ca7 */
+/* HASH CRC-32:0xa2b304bb */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -138,7 +138,7 @@ INTDEF int (LIBCCALL libc_fflush_unlocked)(FILE *stream) THROWS(...);
 INTDEF WUNUSED ATTR_INOUT(4) ATTR_OUT_OPT(1) size_t (LIBCCALL libc_fread_unlocked)(void *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
 /* >> fwrite_unlocked(3)
  * Same as `fwrite()', but performs I/O without acquiring a lock to `stream' */
-INTDEF WUNUSED ATTR_INOUT(4) ATTR_IN_OPT(1) size_t (LIBCCALL libc_fwrite_unlocked)(void const *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_INOUT(4) ATTR_IN_OPT(1) size_t (LIBCCALL libc_fwrite_unlocked)(void const *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
 /* >> fgetc_unlocked(3)
  * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
 INTDEF ATTR_INOUT(1) int (LIBCCALL libc_fgetc_unlocked)(FILE *__restrict stream) THROWS(...);

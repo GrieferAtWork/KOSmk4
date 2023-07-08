@@ -1842,7 +1842,7 @@ done:
 
 @@>> fwrite_unlocked(3)
 @@Same as `fwrite()', but performs I/O without acquiring a lock to `stream'
-[[cp_stdio, wunused, decl_include("<hybrid/typecore.h>")]]
+[[cp_stdio, decl_include("<hybrid/typecore.h>")]]
 [[no_crt_self_import, no_crt_self_export]]
 [[export_alias(CNL_fwrite_unlocked...), alias(CNL_fwrite...)]]
 [[requires_function(fgetc_unlocked)]]

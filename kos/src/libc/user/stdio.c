@@ -2061,10 +2061,10 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") ATTR_INOUT(4) ATTR_IN_O
 }
 /*[[[end:libc_fwrite]]]*/
 
-/*[[[head:libc_fwrite_unlocked,hash:CRC-32=0x35af1fd5]]]*/
+/*[[[head:libc_fwrite_unlocked,hash:CRC-32=0x6dc3ca4c]]]*/
 /* >> fwrite_unlocked(3)
  * Same as `fwrite()', but performs I/O without acquiring a lock to `stream' */
-INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") WUNUSED ATTR_INOUT(4) ATTR_IN_OPT(1) size_t
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") ATTR_INOUT(4) ATTR_IN_OPT(1) size_t
 (LIBCCALL libc_fwrite_unlocked)(void const *__restrict buf,
                                 size_t elemsize,
                                 size_t elemcount,
