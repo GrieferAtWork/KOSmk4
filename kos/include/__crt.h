@@ -53,7 +53,9 @@
 /* This might seem like a good idea, but programs using `-ffreestanding',
  * but still ending up #including some  CRT header will likely also  pass
  * `-lc' on the  commandline, so  we shouldn't  respond to  that flag  to
- * determine the linked CRT library to be non-present... */
+ * determine the linked CRT library to be non-present...
+ *
+ * If that *is* what you want, you need to compile with `-D_CRT=freestanding' */
 ///* Freestanding CRT environment. */
 //#   define __CRT_FREESTANDING
 #elif defined(__KOS__)
@@ -64,14 +66,14 @@
 #elif defined(__CYGWIN__) || defined(__CYGWIN32__)
 #   define __CRT_CYG_PRIMARY
 #   define __CRT_CYG
-#elif defined(__linux__) || defined(__linux) || defined(linux) || \
-      defined(__unix__) || defined(__unix) || defined(unix)
+#elif (defined(__linux__) || defined(__linux) || defined(linux) || \
+       defined(__unix__) || defined(__unix) || defined(unix))
 #   define __CRT_GLC_PRIMARY
 #   define __CRT_GLC
-#elif defined(__WINDOWS__) || defined(_MSC_VER) || \
-      defined(_WIN16) || defined(WIN16) || defined(_WIN32) || defined(WIN32) || \
-      defined(_WIN64) || defined(WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || \
-      defined(_WIN32_WCE) || defined(WIN32_WCE)
+#elif (defined(__WINDOWS__) || defined(_MSC_VER) ||                                       \
+       defined(_WIN16) || defined(WIN16) || defined(_WIN32) || defined(WIN32) ||          \
+       defined(_WIN64) || defined(WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || \
+       defined(_WIN32_WCE) || defined(WIN32_WCE))
 #   define __CRT_DOS_PRIMARY
 #   define __CRT_DOS
 #else /* ... */

@@ -48,11 +48,14 @@
 #define __M_MMAP_MAX       (-4)
 #define __M_CHECK_ACTION   (-5)
 #define __M_PERTURB        (-6)
+#elif defined(__CRT_DOS) && !defined(__CRT_KOS)
+#define __MALLOC_ZERO_IS_NONNULL
+#undef __REALLOC_ZERO_IS_NONNULL /* Nope, `realloc(p, 0)' acts like `free(p)'... */
 #elif defined(__CRT_KOS) || defined(__CRT_GLC) || defined(__KOS__)
 /* malloc behavior attributes. */
 #ifndef __clang_tidy__
-#define __MALLOC_ZERO_IS_NONNULL  1
-#define __REALLOC_ZERO_IS_NONNULL 1
+#define __MALLOC_ZERO_IS_NONNULL
+#define __REALLOC_ZERO_IS_NONNULL
 #endif /* !__clang_tidy__ */
 
 /* Options for `mallopt(3)' */
