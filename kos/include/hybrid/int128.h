@@ -2337,10 +2337,10 @@ union __hybrid_uint128_struct;
 typedef union __hybrid_int128_struct {
 #ifdef __INTELLISENSE__
 	__INT8_TYPE__ __s128_8[16];
-	__INT16_TYPE__ __s128_16[16];
-	__INT32_TYPE__ __s128_32[16];
+	__INT16_TYPE__ __s128_16[8];
+	__INT32_TYPE__ __s128_32[4];
 #ifdef __INT64_TYPE__
-	__INT64_TYPE__ __s128_64[16];
+	__INT64_TYPE__ __s128_64[2];
 #endif /* __INT64_TYPE__ */
 #endif /* __INTELLISENSE__ */
 	__UINT8_TYPE__  __i128_u8[16];
@@ -2390,10 +2390,10 @@ typedef union __hybrid_int128_struct {
 typedef union __hybrid_uint128_struct {
 #ifdef __INTELLISENSE__
 	__UINT8_TYPE__ __u128_8[16];
-	__UINT16_TYPE__ __u128_16[16];
-	__UINT32_TYPE__ __u128_32[16];
+	__UINT16_TYPE__ __u128_16[8];
+	__UINT32_TYPE__ __u128_32[4];
 #ifdef __INT64_TYPE__
-	__UINT64_TYPE__ __u128_64[16];
+	__UINT64_TYPE__ __u128_64[2];
 #endif /* __INT64_TYPE__ */
 #endif /* __INTELLISENSE__ */
 	__UINT8_TYPE__  __i128_u8[16];
