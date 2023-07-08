@@ -787,10 +787,20 @@ download_file() {
 	if ! [ -f "$1" ]; then
 		echo -e "\e[${UI_COLCFG_ACTION}mdownload\e[m: \e[${UI_COLCFG_NAME}m$2\e[m" >&2
 		local OLDPWD="$(pwd)"
-		local DIR="${1%/*}"
-		cmd mkdir -p "$DIR"
-		cmd cd "$DIR"
-		cmd wget "$2"
+		local DIR=""
+		local FILE="$1"
+		case "$1" in
+		*/*)
+			DIR="${1%/*}"
+			FILE="${1##*/}"
+			;;
+		*)   ;;
+		esac
+		if ! test -z "$DIR"; then
+			cmd mkdir -p "$DIR"
+			cmd cd "$DIR"
+		fi
+		cmd wget --output-document="$FILE" "$2"
 		cmd cd "$OLDPWD"
 		if ! [ -f "$1" ]; then
 			echo -e "Missing file \e[${UI_COLCFG_ERR}m$1\e[m" >&2
