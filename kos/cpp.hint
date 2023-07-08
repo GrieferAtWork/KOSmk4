@@ -646,6 +646,44 @@
 
 
 
+// <hybrid/int128.h>
+#define __HYBRID_INT128_DEFINE_BINARY_CXX_OPERATOR(op,name) \
+	template<class ValType>__hybrid_uint128_t&operator op##=(__hybrid_uint128_t&self,ValType v){} \
+	template<class ValType>__hybrid_int128_t&operator op##=(__hybrid_int128_t&self,ValType v){} \
+	template<class ValType>__hybrid_uint128_t&operator op##=(__hybrid_uint128_t&self,ValType v){} \
+	template<class ValType>__hybrid_int128_t&operator op##=(__hybrid_int128_t&self,ValType v){} \
+	template<class ValType>__hybrid_uint128_t operator op(__hybrid_uint128_t const&self,ValType __v){} \
+	template<class ValType>__hybrid_int128_t operator op(__hybrid_int128_t const&self,ValType __v){} \
+	template<class ValType>__hybrid_uint128_t operator op(__hybrid_uint128_t const&self,ValType __v){} \
+	template<class ValType>__hybrid_int128_t operator op(__hybrid_int128_t const&self,ValType __v){} \
+	__hybrid_uint128_t&operator op##=(__hybrid_uint128_t&self,__hybrid_uint128_t const&v){} \
+	__hybrid_uint128_t&operator op##=(__hybrid_uint128_t&self,__hybrid_int128_t const&v){} \
+	__hybrid_int128_t&operator op##=(__hybrid_int128_t&self,__hybrid_uint128_t const&v){} \
+	__hybrid_int128_t&operator op##=(__hybrid_int128_t&self,__hybrid_int128_t const&v){} \
+	__hybrid_uint128_t operator op(__hybrid_uint128_t const&self,__hybrid_uint128_t const&v){} \
+	__hybrid_uint128_t operator op(__hybrid_uint128_t const&self,__hybrid_int128_t const&v){} \
+	__hybrid_int128_t operator op(__hybrid_int128_t const&self,__hybrid_uint128_t const&v){} \
+	__hybrid_int128_t operator op(__hybrid_int128_t const&self,__hybrid_int128_t const&v){}
+#define __HYBRID_INT128_DEFINE_COMPARE_CXX_OPERATOR(op,np,name) \
+	template<class ValType>bool operator op(__hybrid_uint128_t const&self,ValType v){} \
+	template<class ValType>bool operator np(__hybrid_uint128_t const&self,ValType v){} \
+	template<class ValType>bool operator op(__hybrid_int128_t const&self,ValType v){} \
+	template<class ValType>bool operator np(__hybrid_int128_t const&self,ValType v){} \
+	template<class ValType>bool operator op(__hybrid_uint128_t const&self,ValType v){} \
+	template<class ValType>bool operator np(__hybrid_uint128_t const&self,ValType v){} \
+	template<class ValType>bool operator op(__hybrid_int128_t const&self,ValType v){} \
+	template<class ValType>bool operator np(__hybrid_int128_t const&self,ValType v){} \
+	bool operator op(__hybrid_int128_t const&self,__hybrid_int128_t const&v){} \
+	bool operator op(__hybrid_int128_t const&self,__hybrid_uint128_t const&v){} \
+	bool operator np(__hybrid_int128_t const&self,__hybrid_int128_t const&v){} \
+	bool operator np(__hybrid_int128_t const&self,__hybrid_uint128_t const&v){} \
+	bool operator op(__hybrid_uint128_t const&self,__hybrid_int128_t const&v){} \
+	bool operator op(__hybrid_uint128_t const&self,__hybrid_uint128_t const&v){} \
+	bool operator np(__hybrid_uint128_t const&self,__hybrid_int128_t const&v){} \
+	bool operator np(__hybrid_uint128_t const&self,__hybrid_uint128_t const&v){}
+
+
+
 // <hybrid/sequence/[...].h>
 #define __HYBRID_Q_STRUCT struct
 #define __HYBRID_Q_CLASS class

@@ -2335,14 +2335,6 @@ union __hybrid_uint128_struct;
 #endif /* __cplusplus && WANT_INT128_CXX_INTEGRATION */
 
 typedef union __hybrid_int128_struct {
-#ifdef __INTELLISENSE__
-	__INT8_TYPE__ __s128_8[16];
-	__INT16_TYPE__ __s128_16[8];
-	__INT32_TYPE__ __s128_32[4];
-#ifdef __INT64_TYPE__
-	__INT64_TYPE__ __s128_64[2];
-#endif /* __INT64_TYPE__ */
-#endif /* __INTELLISENSE__ */
 	__UINT8_TYPE__  __i128_u8[16];
 	__UINT16_TYPE__ __i128_u16[8];
 	__UINT32_TYPE__ __i128_u32[4];
@@ -2353,6 +2345,14 @@ typedef union __hybrid_int128_struct {
 	__UINT64_TYPE__ __i128_u64[2];
 	__INT64_TYPE__  __i128_s64[2];
 #endif /* __UINT64_TYPE__ */
+#ifdef __INTELLISENSE__
+	__INT8_TYPE__ __s128_8[16];
+	__INT16_TYPE__ __s128_16[8];
+	__INT32_TYPE__ __s128_32[4];
+#ifdef __INT64_TYPE__
+	__INT64_TYPE__ __s128_64[2];
+#endif /* __INT64_TYPE__ */
+#endif /* __INTELLISENSE__ */
 #if defined(__cplusplus) && defined(WANT_INT128_CXX_INTEGRATION)
 	__CXX_CLASSMEMBER __CXX_DEFAULT_DTOR_NOEXCEPT(__hybrid_int128_struct);
 	__CXX_CLASSMEMBER __CXX_DEFAULT_CTOR_NOEXCEPT(__hybrid_int128_struct);
@@ -2388,14 +2388,6 @@ typedef union __hybrid_int128_struct {
 #define __hybrid_int128_t  __hybrid_int128_t
 
 typedef union __hybrid_uint128_struct {
-#ifdef __INTELLISENSE__
-	__UINT8_TYPE__ __u128_8[16];
-	__UINT16_TYPE__ __u128_16[8];
-	__UINT32_TYPE__ __u128_32[4];
-#ifdef __INT64_TYPE__
-	__UINT64_TYPE__ __u128_64[2];
-#endif /* __INT64_TYPE__ */
-#endif /* __INTELLISENSE__ */
 	__UINT8_TYPE__  __i128_u8[16];
 	__UINT16_TYPE__ __i128_u16[8];
 	__UINT32_TYPE__ __i128_u32[4];
@@ -2406,6 +2398,14 @@ typedef union __hybrid_uint128_struct {
 	__UINT64_TYPE__ __i128_u64[2];
 	__INT64_TYPE__  __i128_s64[2];
 #endif /* __UINT64_TYPE__ */
+#ifdef __INTELLISENSE__
+	__UINT8_TYPE__ __u128_8[16];
+	__UINT16_TYPE__ __u128_16[8];
+	__UINT32_TYPE__ __u128_32[4];
+#ifdef __INT64_TYPE__
+	__UINT64_TYPE__ __u128_64[2];
+#endif /* __INT64_TYPE__ */
+#endif /* __INTELLISENSE__ */
 #if defined(__cplusplus) && defined(WANT_INT128_CXX_INTEGRATION)
 	__CXX_CLASSMEMBER __CXX_DEFAULT_DTOR_NOEXCEPT(__hybrid_uint128_struct);
 	__CXX_CLASSMEMBER __CXX_DEFAULT_CTOR_NOEXCEPT(__hybrid_uint128_struct);
@@ -2473,12 +2473,12 @@ __LOCAL __ATTR_INOUT(1) __ATTR_IN(2) void
 	__hybrid_uint128_setzero(__u128_mulres);
 	for (__u128_i = 0; __u128_i < 128; ++__u128_i) {
 		if (__HYBRID_PRIVATE_UINT128_BIT128(*__rhs, __u128_i)) {
-			__u128_tmp = *__lhs;
+			__hybrid_uint128_copy(__u128_tmp, *__lhs);
 			__hybrid_uint128_shl(__u128_tmp, __u128_i);
 			__hybrid_uint128_add128(__u128_mulres, __u128_tmp);
 		}
 	}
-	*__lhs = __u128_mulres;
+	__hybrid_uint128_copy(*__lhs, __u128_mulres);
 }
 
 __LOCAL __ATTR_INOUT(1) void
@@ -2488,12 +2488,12 @@ __LOCAL __ATTR_INOUT(1) void
 	__hybrid_uint128_setzero(__u128_mulres);
 	for (__u128_i = 0; __u128_i < 32; ++__u128_i) {
 		if (((__rhs >> __u128_i) & 1) != 0) {
-			__u128_tmp = *__lhs;
+			__hybrid_uint128_copy(__u128_tmp, *__lhs);
 			__hybrid_uint128_shl32(__u128_tmp, __u128_i);
 			__hybrid_uint128_add128(__u128_mulres, __u128_tmp);
 		}
 	}
-	*__lhs = __u128_mulres;
+	__hybrid_uint128_copy(*__lhs, __u128_mulres);
 }
 
 
@@ -2505,12 +2505,12 @@ __LOCAL __ATTR_INOUT(1) void
 	__hybrid_uint128_setzero(__u128_mulres);
 	for (__u128_i = 0; __u128_i < 64; ++__u128_i) {
 		if (((__rhs >> __u128_i) & 1) != 0) {
-			__u128_tmp = *__lhs;
+			__hybrid_uint128_copy(__u128_tmp, *__lhs);
 			__hybrid_uint128_shl64(__u128_tmp, __u128_i);
 			__hybrid_uint128_add128(__u128_mulres, __u128_tmp);
 		}
 	}
-	*__lhs = __u128_mulres;
+	__hybrid_uint128_copy(*__lhs, __u128_mulres);
 }
 #endif /* __UINT64_TYPE__ */
 
@@ -2572,8 +2572,7 @@ __LOCAL __ATTR_INOUT(1) void
 	__hybrid_uint128_mul64_impl((__hybrid_uint128_t *)&__u128_a, (__UINT64_TYPE__)__rhs);
 	if (__u128_neg)
 		__hybrid_int128_neg(__u128_a);
-	__lhs->__i128_u64[0] = __u128_a.__i128_u64[0];
-	__lhs->__i128_u64[1] = __u128_a.__i128_u64[1];
+	__hybrid_int128_copy(*__lhs, __u128_a);
 }
 #endif /* __UINT64_TYPE__ */
 
@@ -2589,8 +2588,8 @@ __LOCAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_OUT_OPT(3) __ATTR_OUT_OPT(4) void
 	unsigned int __u128_i;
 	__hybrid_uint128_t __u128_a, __u128_b;
 	__hybrid_uint128_t __u128_res, __u128_mask;
-	__u128_a = *__lhs;
-	__u128_b = *__rhs;
+	__hybrid_uint128_copy(__u128_a, *__lhs);
+	__hybrid_uint128_copy(__u128_b, *__rhs);
 	for (__u128_i = 128;;) {
 		__hybrid_assertf(__u128_i != 0, "Divide by ZERO");
 		--__u128_i;
@@ -2614,10 +2613,10 @@ __LOCAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_OUT_OPT(3) __ATTR_OUT_OPT(4) void
 		__hybrid_uint128_shr32(__u128_b, 1);
 		__hybrid_uint128_shr32(__u128_mask, 1);
 	}
-	if (__res_div)
-		*__res_div = __u128_res;
-	if (__res_mod)
-		*__res_mod = __u128_a;
+	if (__res_div != __NULLPTR)
+		__hybrid_uint128_copy(*__res_div, __u128_res);
+	if (__res_mod != __NULLPTR)
+		__hybrid_uint128_copy(*__res_mod, __u128_a);
 }
 
 __LOCAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_OUT_OPT(3) __ATTR_OUT_OPT(4) void
@@ -2645,9 +2644,9 @@ __LOCAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_OUT_OPT(3) __ATTR_OUT_OPT(4) void
 		__hybrid_int128_neg(__u128_div);
 	if (__hybrid_int128_isneg(*__lhs))
 		__hybrid_int128_neg(__u128_mod);
-	if (__res_div)
+	if (__res_div != __NULLPTR)
 		__hybrid_int128_copy(*__res_div, __u128_div);
-	if (__res_mod)
+	if (__res_mod != __NULLPTR)
 		__hybrid_int128_copy(*__res_mod, __u128_mod);
 }
 
@@ -2684,9 +2683,9 @@ __LOCAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_OUT_OPT(3) __ATTR_OUT_OPT(4) void
 		__hybrid_int128_dec(__u128_div);
 	}
 
-	if (__res_div)
+	if (__res_div != __NULLPTR)
 		__hybrid_int128_copy(*__res_div, __u128_div);
-	if (__res_mod)
+	if (__res_mod != __NULLPTR)
 		__hybrid_uint128_copy(*__res_mod, __hybrid_int128_asunsigned(__u128_mod));
 }
 
@@ -2697,7 +2696,7 @@ __LOCAL __ATTR_IN(1) __ATTR_OUT_OPT(3) __ATTR_OUT_OPT(4) void
 	__hybrid_int128_t __xmod;
 	__hybrid_int128_set8(__xrhs, __rhs);
 	__hybrid_PRIVATE_int128_divmod128(__lhs, &__xrhs, __res_div, __res_mod ? &__xmod : __NULLPTR);
-	if (__res_mod)
+	if (__res_mod != __NULLPTR)
 		*__res_mod = __hybrid_int128_get8(__xmod);
 }
 
@@ -2708,7 +2707,7 @@ __LOCAL __ATTR_IN(1) __ATTR_OUT_OPT(3) __ATTR_OUT_OPT(4) void
 	__hybrid_uint128_t __xmod;
 	__hybrid_int128_set8(__xrhs, __rhs);
 	__hybrid_PRIVATE_int128_floordivmod128(__lhs, &__xrhs, __res_div, __res_mod ? &__xmod : __NULLPTR);
-	if (__res_mod)
+	if (__res_mod != __NULLPTR)
 		*__res_mod = __hybrid_uint128_get8(__xmod);
 }
 
@@ -2719,7 +2718,7 @@ __LOCAL __ATTR_IN(1) __ATTR_OUT_OPT(3) __ATTR_OUT_OPT(4) void
 	__hybrid_uint128_t __xmod;
 	__hybrid_uint128_set8(__xrhs, __rhs);
 	__hybrid_PRIVATE_uint128_divmod128(__lhs, &__xrhs, __res_div, __res_mod ? &__xmod : __NULLPTR);
-	if (__res_mod)
+	if (__res_mod != __NULLPTR)
 		*__res_mod = __hybrid_uint128_get8(__xmod);
 }
 
@@ -2730,7 +2729,7 @@ __LOCAL __ATTR_IN(1) __ATTR_OUT_OPT(3) __ATTR_OUT_OPT(4) void
 	__hybrid_int128_t __xmod;
 	__hybrid_int128_set16(__xrhs, __rhs);
 	__hybrid_PRIVATE_int128_divmod128(__lhs, &__xrhs, __res_div, __res_mod ? &__xmod : __NULLPTR);
-	if (__res_mod)
+	if (__res_mod != __NULLPTR)
 		*__res_mod = __hybrid_int128_get16(__xmod);
 }
 
@@ -2741,7 +2740,7 @@ __LOCAL __ATTR_IN(1) __ATTR_OUT_OPT(3) __ATTR_OUT_OPT(4) void
 	__hybrid_uint128_t __xmod;
 	__hybrid_int128_set16(__xrhs, __rhs);
 	__hybrid_PRIVATE_int128_floordivmod128(__lhs, &__xrhs, __res_div, __res_mod ? &__xmod : __NULLPTR);
-	if (__res_mod)
+	if (__res_mod != __NULLPTR)
 		*__res_mod = __hybrid_uint128_get16(__xmod);
 }
 
@@ -2752,7 +2751,7 @@ __LOCAL __ATTR_IN(1) __ATTR_OUT_OPT(3) __ATTR_OUT_OPT(4) void
 	__hybrid_uint128_t __xmod;
 	__hybrid_uint128_set16(__xrhs, __rhs);
 	__hybrid_PRIVATE_uint128_divmod128(__lhs, &__xrhs, __res_div, __res_mod ? &__xmod : __NULLPTR);
-	if (__res_mod)
+	if (__res_mod != __NULLPTR)
 		*__res_mod = __hybrid_uint128_get16(__xmod);
 }
 
@@ -2763,7 +2762,7 @@ __LOCAL __ATTR_IN(1) __ATTR_OUT_OPT(3) __ATTR_OUT_OPT(4) void
 	__hybrid_int128_t __xmod;
 	__hybrid_int128_set32(__xrhs, __rhs);
 	__hybrid_PRIVATE_int128_divmod128(__lhs, &__xrhs, __res_div, __res_mod ? &__xmod : __NULLPTR);
-	if (__res_mod)
+	if (__res_mod != __NULLPTR)
 		*__res_mod = __hybrid_int128_get32(__xmod);
 }
 
@@ -2774,7 +2773,7 @@ __LOCAL __ATTR_IN(1) __ATTR_OUT_OPT(3) __ATTR_OUT_OPT(4) void
 	__hybrid_uint128_t __xmod;
 	__hybrid_int128_set32(__xrhs, __rhs);
 	__hybrid_PRIVATE_int128_floordivmod128(__lhs, &__xrhs, __res_div, __res_mod ? &__xmod : __NULLPTR);
-	if (__res_mod)
+	if (__res_mod != __NULLPTR)
 		*__res_mod = __hybrid_uint128_get32(__xmod);
 }
 
@@ -2785,7 +2784,7 @@ __LOCAL __ATTR_IN(1) __ATTR_OUT_OPT(3) __ATTR_OUT_OPT(4) void
 	__hybrid_uint128_t __xmod;
 	__hybrid_uint128_set32(__xrhs, __rhs);
 	__hybrid_PRIVATE_uint128_divmod128(__lhs, &__xrhs, __res_div, __res_mod ? &__xmod : __NULLPTR);
-	if (__res_mod)
+	if (__res_mod != __NULLPTR)
 		*__res_mod = __hybrid_uint128_get32(__xmod);
 }
 
@@ -2839,7 +2838,7 @@ __LOCAL __ATTR_IN(1) __ATTR_OUT_OPT(3) __ATTR_OUT_OPT(4) void
 	__hybrid_int128_t __xmod;
 	__hybrid_int128_set64(__xrhs, __rhs);
 	__hybrid_PRIVATE_int128_divmod128(__lhs, &__xrhs, __res_div, __res_mod ? &__xmod : __NULLPTR);
-	if (__res_mod)
+	if (__res_mod != __NULLPTR)
 		*__res_mod = __hybrid_int128_get64(__xmod);
 }
 
@@ -2850,7 +2849,7 @@ __LOCAL __ATTR_IN(1) __ATTR_OUT_OPT(3) __ATTR_OUT_OPT(4) void
 	__hybrid_uint128_t __xmod;
 	__hybrid_int128_set64(__xrhs, __rhs);
 	__hybrid_PRIVATE_int128_floordivmod128(__lhs, &__xrhs, __res_div, __res_mod ? &__xmod : __NULLPTR);
-	if (__res_mod)
+	if (__res_mod != __NULLPTR)
 		*__res_mod = __hybrid_uint128_get64(__xmod);
 }
 
@@ -2861,7 +2860,7 @@ __LOCAL __ATTR_IN(1) __ATTR_OUT_OPT(3) __ATTR_OUT_OPT(4) void
 	__hybrid_uint128_t __xmod;
 	__hybrid_uint128_set64(__xrhs, __rhs);
 	__hybrid_PRIVATE_uint128_divmod128(__lhs, &__xrhs, __res_div, __res_mod ? &__xmod : __NULLPTR);
-	if (__res_mod)
+	if (__res_mod != __NULLPTR)
 		*__res_mod = __hybrid_uint128_get64(__xmod);
 }
 
@@ -2937,32 +2936,20 @@ extern "C++" {
 #if defined(__cplusplus) && defined(WANT_INT128_CXX_INTEGRATION)
 __CXX_CLASSMEMBER __hybrid_int128_struct::
 __hybrid_int128_struct(__hybrid_uint128_struct const &__v) __CXX_NOEXCEPT {
-	__i128_u32[0] = __v.__i128_u32[0];
-	__i128_u32[1] = __v.__i128_u32[1];
-	__i128_u32[2] = __v.__i128_u32[2];
-	__i128_u32[3] = __v.__i128_u32[3];
+	__hybrid_int128_copy(*this, __hybrid_uint128_assigned(__v));
 }
 __CXX_CLASSMEMBER __hybrid_int128_struct &__hybrid_int128_struct::
 operator=(__hybrid_uint128_struct const &__v) __CXX_NOEXCEPT {
-	__i128_u32[0] = __v.__i128_u32[0];
-	__i128_u32[1] = __v.__i128_u32[1];
-	__i128_u32[2] = __v.__i128_u32[2];
-	__i128_u32[3] = __v.__i128_u32[3];
+	__hybrid_int128_copy(*this, __hybrid_uint128_assigned(__v));
 	return *this;
 }
 __CXX_CLASSMEMBER __hybrid_uint128_struct::
 __hybrid_uint128_struct(__hybrid_int128_struct const &__v) __CXX_NOEXCEPT {
-	__i128_u32[0] = __v.__i128_u32[0];
-	__i128_u32[1] = __v.__i128_u32[1];
-	__i128_u32[2] = __v.__i128_u32[2];
-	__i128_u32[3] = __v.__i128_u32[3];
+	__hybrid_uint128_copy(*this, __hybrid_int128_asunsigned(__v));
 }
 __CXX_CLASSMEMBER __hybrid_uint128_struct &__hybrid_uint128_struct::
 operator=(__hybrid_int128_struct const &__v) __CXX_NOEXCEPT {
-	__i128_u32[0] = __v.__i128_u32[0];
-	__i128_u32[1] = __v.__i128_u32[1];
-	__i128_u32[2] = __v.__i128_u32[2];
-	__i128_u32[3] = __v.__i128_u32[3];
+	__hybrid_uint128_copy(*this, __hybrid_int128_asunsigned(__v));
 	return *this;
 }
 
@@ -2977,23 +2964,23 @@ __LOCAL __hybrid_uint128_t &operator++(__hybrid_uint128_t &__self) __CXX_NOEXCEP
 __LOCAL __hybrid_uint128_t operator++(__hybrid_uint128_t &__self, int) __CXX_NOEXCEPT { __hybrid_uint128_t __res = __self; __hybrid_uint128_inc(__self); return __res; }
 __LOCAL __hybrid_uint128_t &operator--(__hybrid_uint128_t &__self) __CXX_NOEXCEPT { __hybrid_uint128_dec(__self); return __self; }
 __LOCAL __hybrid_uint128_t operator--(__hybrid_uint128_t &__self, int) __CXX_NOEXCEPT { __hybrid_uint128_t __res = __self; __hybrid_uint128_dec(__self); return __res; }
-#define __HYBRID_INT128_DEFINE_BINARY_CXX_OPERATOR(op, name)                                                                                                                                                                                                                          \
-	template<class __ValType> __LOCAL __HYBRID_INT128_ENABLE_IF_UNSIGNED(__ValType, __hybrid_uint128_t &) operator op##= (__hybrid_uint128_t &__self, __ValType __v) __CXX_NOEXCEPT { __hybrid_uint128_##name(__self, __v); return __self; }                                          \
-	template<class __ValType> __LOCAL __HYBRID_INT128_ENABLE_IF_UNSIGNED(__ValType, __hybrid_int128_t &) operator op##= (__hybrid_int128_t &__self, __ValType __v) __CXX_NOEXCEPT { __hybrid_uint128_##name(__self, __v); return __self; }                                            \
-	template<class __ValType> __LOCAL __HYBRID_INT128_ENABLE_IF_SIGNED(__ValType, __hybrid_uint128_t &) operator op##= (__hybrid_uint128_t &__self, __ValType __v) __CXX_NOEXCEPT { __hybrid_int128_##name(__self, __v); return __self; }                                             \
-	template<class __ValType> __LOCAL __HYBRID_INT128_ENABLE_IF_SIGNED(__ValType, __hybrid_int128_t &) operator op##= (__hybrid_int128_t &__self, __ValType __v) __CXX_NOEXCEPT { __hybrid_int128_##name(__self, __v); return __self; }                                               \
-	template<class __ValType> __LOCAL __ATTR_PURE __ATTR_WUNUSED __HYBRID_INT128_ENABLE_IF_UNSIGNED(__ValType, __hybrid_uint128_t) operator op (__hybrid_uint128_t const &__self, __ValType __v) __CXX_NOEXCEPT { __hybrid_uint128_t __res = __self; __res op##= __v; return __res; } \
-	template<class __ValType> __LOCAL __ATTR_PURE __ATTR_WUNUSED __HYBRID_INT128_ENABLE_IF_UNSIGNED(__ValType, __hybrid_int128_t) operator op (__hybrid_int128_t const &__self, __ValType __v) __CXX_NOEXCEPT { __hybrid_int128_t __res = __self; __res op##= __v; return __res; }    \
-	template<class __ValType> __LOCAL __ATTR_PURE __ATTR_WUNUSED __HYBRID_INT128_ENABLE_IF_SIGNED(__ValType, __hybrid_uint128_t) operator op (__hybrid_uint128_t const &__self, __ValType __v) __CXX_NOEXCEPT { __hybrid_uint128_t __res = __self; __res op##= __v; return __res; }   \
-	template<class __ValType> __LOCAL __ATTR_PURE __ATTR_WUNUSED __HYBRID_INT128_ENABLE_IF_SIGNED(__ValType, __hybrid_int128_t) operator op (__hybrid_int128_t const &__self, __ValType __v) __CXX_NOEXCEPT { __hybrid_int128_t __res = __self; __res op##= __v; return __res; }      \
-	__LOCAL __hybrid_uint128_t &operator op##= (__hybrid_uint128_t &__self, __hybrid_uint128_t const &__v) __CXX_NOEXCEPT { __hybrid_uint128_##name##128(__self, __v); return __self; }                                                                                               \
-	__LOCAL __hybrid_uint128_t &operator op##= (__hybrid_uint128_t &__self, __hybrid_int128_t const &__v) __CXX_NOEXCEPT { __hybrid_uint128_##name##128(__self, (__hybrid_uint128_t const &)__v); return __self; }                                                                    \
-	__LOCAL __hybrid_int128_t &operator op##= (__hybrid_int128_t &__self, __hybrid_uint128_t const &__v) __CXX_NOEXCEPT { __hybrid_int128_##name##128(__self, (__hybrid_int128_t const &)__v); return __self; }                                                                       \
-	__LOCAL __hybrid_int128_t &operator op##= (__hybrid_int128_t &__self, __hybrid_int128_t const &__v) __CXX_NOEXCEPT { __hybrid_int128_##name##128(__self, __v); return __self; }                                                                                                   \
-	__LOCAL __hybrid_uint128_t operator op (__hybrid_uint128_t const &__self, __hybrid_uint128_t const &__v) __CXX_NOEXCEPT { __hybrid_uint128_t __res = __self; __res op##= __v; return __res; }                                                                                     \
-	__LOCAL __hybrid_uint128_t operator op (__hybrid_uint128_t const &__self, __hybrid_int128_t const &__v) __CXX_NOEXCEPT { __hybrid_uint128_t __res = __self; __res op##= __v; return __res; }                                                                                      \
-	__LOCAL __hybrid_int128_t operator op (__hybrid_int128_t const &__self, __hybrid_uint128_t const &__v) __CXX_NOEXCEPT { __hybrid_int128_t __res = __self; __res op##= __v; return __res; }                                                                                        \
-	__LOCAL __hybrid_int128_t operator op (__hybrid_int128_t const &__self, __hybrid_int128_t const &__v) __CXX_NOEXCEPT { __hybrid_int128_t __res = __self; __res op##= __v; return __res; }
+#define __HYBRID_INT128_DEFINE_BINARY_CXX_OPERATOR(op, name)                                                                                                                                                                                                                                                       \
+	template<class __ValType> __LOCAL __HYBRID_INT128_ENABLE_IF_UNSIGNED(__ValType, __hybrid_uint128_t &) operator op##= (__hybrid_uint128_t &__self, __ValType __v) __CXX_NOEXCEPT { __hybrid_uint128_##name(__self, __v); return __self; }                                                                       \
+	template<class __ValType> __LOCAL __HYBRID_INT128_ENABLE_IF_UNSIGNED(__ValType, __hybrid_int128_t &) operator op##= (__hybrid_int128_t &__self, __ValType __v) __CXX_NOEXCEPT { __hybrid_uint128_##name(__self, __v); return __self; }                                                                         \
+	template<class __ValType> __LOCAL __HYBRID_INT128_ENABLE_IF_SIGNED(__ValType, __hybrid_uint128_t &) operator op##= (__hybrid_uint128_t &__self, __ValType __v) __CXX_NOEXCEPT { __hybrid_int128_##name(__self, __v); return __self; }                                                                          \
+	template<class __ValType> __LOCAL __HYBRID_INT128_ENABLE_IF_SIGNED(__ValType, __hybrid_int128_t &) operator op##= (__hybrid_int128_t &__self, __ValType __v) __CXX_NOEXCEPT { __hybrid_int128_##name(__self, __v); return __self; }                                                                            \
+	template<class __ValType> __LOCAL __ATTR_PURE __ATTR_WUNUSED __HYBRID_INT128_ENABLE_IF_UNSIGNED(__ValType, __hybrid_uint128_t) operator op (__hybrid_uint128_t const &__self, __ValType __v) __CXX_NOEXCEPT { __hybrid_uint128_t __res; __hybrid_uint128_copy(__res, __self); __res op##= __v; return __res; } \
+	template<class __ValType> __LOCAL __ATTR_PURE __ATTR_WUNUSED __HYBRID_INT128_ENABLE_IF_UNSIGNED(__ValType, __hybrid_int128_t) operator op (__hybrid_int128_t const &__self, __ValType __v) __CXX_NOEXCEPT { __hybrid_int128_t __res; __hybrid_int128_copy(__res, __self); __res op##= __v; return __res; }     \
+	template<class __ValType> __LOCAL __ATTR_PURE __ATTR_WUNUSED __HYBRID_INT128_ENABLE_IF_SIGNED(__ValType, __hybrid_uint128_t) operator op (__hybrid_uint128_t const &__self, __ValType __v) __CXX_NOEXCEPT { __hybrid_uint128_t __res; __hybrid_uint128_copy(__res, __self); __res op##= __v; return __res; }   \
+	template<class __ValType> __LOCAL __ATTR_PURE __ATTR_WUNUSED __HYBRID_INT128_ENABLE_IF_SIGNED(__ValType, __hybrid_int128_t) operator op (__hybrid_int128_t const &__self, __ValType __v) __CXX_NOEXCEPT { __hybrid_int128_t __res; __hybrid_int128_copy(__res, __self); __res op##= __v; return __res; }       \
+	__LOCAL __hybrid_uint128_t &operator op##= (__hybrid_uint128_t &__self, __hybrid_uint128_t const &__v) __CXX_NOEXCEPT { __hybrid_uint128_##name##128(__self, __v); return __self; }                                                                                                                            \
+	__LOCAL __hybrid_uint128_t &operator op##= (__hybrid_uint128_t &__self, __hybrid_int128_t const &__v) __CXX_NOEXCEPT { __hybrid_uint128_##name##128(__self, (__hybrid_uint128_t const &)__v); return __self; }                                                                                                 \
+	__LOCAL __hybrid_int128_t &operator op##= (__hybrid_int128_t &__self, __hybrid_uint128_t const &__v) __CXX_NOEXCEPT { __hybrid_int128_##name##128(__self, (__hybrid_int128_t const &)__v); return __self; }                                                                                                    \
+	__LOCAL __hybrid_int128_t &operator op##= (__hybrid_int128_t &__self, __hybrid_int128_t const &__v) __CXX_NOEXCEPT { __hybrid_int128_##name##128(__self, __v); return __self; }                                                                                                                                \
+	__LOCAL __hybrid_uint128_t operator op (__hybrid_uint128_t const &__self, __hybrid_uint128_t const &__v) __CXX_NOEXCEPT { __hybrid_uint128_t __res; __hybrid_uint128_copy(__res, __self); __res op##= __v; return __res; }                                                                                     \
+	__LOCAL __hybrid_uint128_t operator op (__hybrid_uint128_t const &__self, __hybrid_int128_t const &__v) __CXX_NOEXCEPT { __hybrid_uint128_t __res; __hybrid_uint128_copy(__res, __self); __res op##= __v; return __res; }                                                                                      \
+	__LOCAL __hybrid_int128_t operator op (__hybrid_int128_t const &__self, __hybrid_uint128_t const &__v) __CXX_NOEXCEPT { __hybrid_int128_t __res; __hybrid_int128_copy(__res, __self); __res op##= __v; return __res; }                                                                                         \
+	__LOCAL __hybrid_int128_t operator op (__hybrid_int128_t const &__self, __hybrid_int128_t const &__v) __CXX_NOEXCEPT { __hybrid_int128_t __res; __hybrid_int128_copy(__res, __self); __res op##= __v; return __res; }
 __HYBRID_INT128_DEFINE_BINARY_CXX_OPERATOR(&, and)
 __HYBRID_INT128_DEFINE_BINARY_CXX_OPERATOR(|, or)
 __HYBRID_INT128_DEFINE_BINARY_CXX_OPERATOR(^, xor)
@@ -3013,10 +3000,10 @@ __HYBRID_INT128_DEFINE_BINARY_CXX_OPERATOR(%, mod)
 	template<class __ValType> __LOCAL __ATTR_PURE __ATTR_WUNUSED __HYBRID_INT128_ENABLE_IF_SIGNED(__ValType, bool) operator op (__hybrid_int128_t const &__self, __ValType __v) __CXX_NOEXCEPT { return __hybrid_int128_##name(__self, __v); }     \
 	template<class __ValType> __LOCAL __ATTR_PURE __ATTR_WUNUSED __HYBRID_INT128_ENABLE_IF_SIGNED(__ValType, bool) operator np (__hybrid_int128_t const &__self, __ValType __v) __CXX_NOEXCEPT { return !(__self op __v); }                        \
 	__LOCAL __ATTR_PURE __ATTR_WUNUSED bool operator op (__hybrid_int128_t const &__self, __hybrid_int128_t const &__v) __CXX_NOEXCEPT { return __hybrid_int128_##name##128(__self, __v); }                                                        \
-	__LOCAL __ATTR_PURE __ATTR_WUNUSED bool operator op (__hybrid_int128_t const &__self, __hybrid_uint128_t const &__v) __CXX_NOEXCEPT { return __hybrid_int128_##name##128(__self, __v); }                                                       \
+	__LOCAL __ATTR_PURE __ATTR_WUNUSED bool operator op (__hybrid_int128_t const &__self, __hybrid_uint128_t const &__v) __CXX_NOEXCEPT { return __hybrid_int128_##name##128(__self, __hybrid_uint128_assigned(__v)); }                            \
 	__LOCAL __ATTR_PURE __ATTR_WUNUSED bool operator np (__hybrid_int128_t const &__self, __hybrid_int128_t const &__v) __CXX_NOEXCEPT { return !(__self op __v); }                                                                                \
 	__LOCAL __ATTR_PURE __ATTR_WUNUSED bool operator np (__hybrid_int128_t const &__self, __hybrid_uint128_t const &__v) __CXX_NOEXCEPT { return !(__self op __v); }                                                                               \
-	__LOCAL __ATTR_PURE __ATTR_WUNUSED bool operator op (__hybrid_uint128_t const &__self, __hybrid_int128_t const &__v) __CXX_NOEXCEPT { return __hybrid_uint128_##name##128(__self, __v); }                                                      \
+	__LOCAL __ATTR_PURE __ATTR_WUNUSED bool operator op (__hybrid_uint128_t const &__self, __hybrid_int128_t const &__v) __CXX_NOEXCEPT { return __hybrid_uint128_##name##128(__self, __hybrid_int128_asunsigned(__v)); }                          \
 	__LOCAL __ATTR_PURE __ATTR_WUNUSED bool operator op (__hybrid_uint128_t const &__self, __hybrid_uint128_t const &__v) __CXX_NOEXCEPT { return __hybrid_uint128_##name##128(__self, __v); }                                                     \
 	__LOCAL __ATTR_PURE __ATTR_WUNUSED bool operator np (__hybrid_uint128_t const &__self, __hybrid_int128_t const &__v) __CXX_NOEXCEPT { return !(__self op __v); }                                                                               \
 	__LOCAL __ATTR_PURE __ATTR_WUNUSED bool operator np (__hybrid_uint128_t const &__self, __hybrid_uint128_t const &__v) __CXX_NOEXCEPT { return !(__self op __v); }
