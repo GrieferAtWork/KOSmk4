@@ -1169,10 +1169,10 @@ $1=$2"
 						_config_site_option "gl_cv_func_printf_sizes_c99" "yes"; ;;
 					*gl_cv_func_printf_long_double*)
 						_config_site_option "gl_cv_func_printf_long_double" "yes"; ;;
-					*gl_cv_func_printf_infinite*)
-						_config_site_option "gl_cv_func_printf_infinite" "yes"; ;;
 					*gl_cv_func_printf_infinite_long_double*)
 						_config_site_option "gl_cv_func_printf_infinite_long_double" "yes"; ;;
+					*gl_cv_func_printf_infinite*)
+						_config_site_option "gl_cv_func_printf_infinite" "yes"; ;;
 					*gl_cv_func_printf_directive_a*)
 						_config_site_option "gl_cv_func_printf_directive_a" "yes"; ;;
 					*gl_cv_func_printf_directive_f*)
