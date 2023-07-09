@@ -964,7 +964,7 @@
 #undef __GNU_LIBRARY__
 #define __GNU_LIBRARY__ 6
 #define __GLIBC__       2
-#define __GLIBC_MINOR__ 23
+#define __GLIBC_MINOR__ 36
 #define __GLIBC_PREREQ(major, minor) \
 	((major) > __GLIBC__ || ((major) == __GLIBC__ && (minor) >= __GLIBC_MINOR__))
 
