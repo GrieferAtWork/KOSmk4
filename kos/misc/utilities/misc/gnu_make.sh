@@ -58,7 +58,7 @@ if test -z "$PACKAGE_RAWNAME"; then
 #	fi
 fi
 
-if test -z "$PACKAGE_VERSION"; then
+if test -z "${PACKAGE_VERSION+x}"; then
 	PACKAGE_VERSION="$PACKAGE_NAME"
 	if [[ "$PACKAGE_VERSION" == *"-"* ]]; then
 		PACKAGE_VERSION="${PACKAGE_VERSION#*-}"
@@ -73,30 +73,30 @@ if test -z "$PACKAGE_VERSION"; then
 	fi
 fi
 
-if test -z "$PACKAGE_PREFIX";         then PACKAGE_PREFIX="/"; fi
-if test -z "$PACKAGE_EPREFIX";        then PACKAGE_EPREFIX="$PACKAGE_PREFIX"; fi
-if test -z "$PACKAGE_BINDIR";         then PACKAGE_BINDIR="${PACKAGE_EPREFIX%/}/bin"; fi
-if test -z "$PACKAGE_SBINDIR";        then PACKAGE_SBINDIR="${PACKAGE_EPREFIX%/}/bin"; fi
-if test -z "$PACKAGE_LIBEXECDIR";     then PACKAGE_LIBEXECDIR="${PACKAGE_EPREFIX%/}/libexec"; fi
-if test -z "$PACKAGE_SYSCONFDIR";     then PACKAGE_SYSCONFDIR="${PACKAGE_PREFIX%/}/etc"; fi
-if test -z "$PACKAGE_SHAREDSTATEDIR"; then PACKAGE_SHAREDSTATEDIR="${PACKAGE_PREFIX%/}/usr/com"; fi
-if test -z "$PACKAGE_LOCALSTATEDIR";  then PACKAGE_LOCALSTATEDIR="${PACKAGE_PREFIX%/}/var"; fi
-if test -z "$PACKAGE_RUNSTATEDIR";    then PACKAGE_RUNSTATEDIR="${PACKAGE_LOCALSTATEDIR}/run"; fi
-if test -z "$PACKAGE_LIBDIR";         then PACKAGE_LIBDIR="${PACKAGE_EPREFIX%/}/$TARGET_LIBPATH"; fi
-if test -z "$PACKAGE_INCLUDEDIR";     then PACKAGE_INCLUDEDIR="${PACKAGE_PREFIX%/}/usr/include"; fi
-if test -z "$PACKAGE_OLDINCLUDEDIR";  then PACKAGE_OLDINCLUDEDIR="$PACKAGE_INCLUDEDIR"; fi
-if test -z "$PACKAGE_DATAROOTDIR";    then PACKAGE_DATAROOTDIR="${PACKAGE_PREFIX%/}/usr/share"; fi
-if test -z "$PACKAGE_DATADIR";        then PACKAGE_DATADIR="$PACKAGE_DATAROOTDIR"; fi
-if test -z "$PACKAGE_INFODIR";        then PACKAGE_INFODIR="$PACKAGE_DATAROOTDIR/info"; fi
-if test -z "$PACKAGE_LOCALEDIR";      then PACKAGE_LOCALEDIR="$PACKAGE_DATAROOTDIR/locale"; fi
-if test -z "$PACKAGE_MANDIR";         then PACKAGE_MANDIR="$PACKAGE_DATAROOTDIR/man"; fi
-if test -z "$PACKAGE_DOCDIR";         then PACKAGE_DOCDIR="$PACKAGE_DATAROOTDIR/doc/$PACKAGE_RAWNAME"; fi
-if test -z "$PACKAGE_HTMLDIR";        then PACKAGE_HTMLDIR="$PACKAGE_DOCDIR"; fi
-if test -z "$PACKAGE_DVIDIR";         then PACKAGE_DVIDIR="$PACKAGE_DOCDIR"; fi
-if test -z "$PACKAGE_PDFDIR";         then PACKAGE_PDFDIR="$PACKAGE_DOCDIR"; fi
-if test -z "$PACKAGE_PSDIR";          then PACKAGE_PSDIR="$PACKAGE_DOCDIR"; fi
-if test -z "$PACKAGE_HOST";           then PACKAGE_HOST="$TARGET_NAME-linux-gnu"; fi
-if test -z "$PACKAGE_TARGET";         then PACKAGE_TARGET="$PACKAGE_HOST"; fi
+if test -z "${PACKAGE_PREFIX+x}";         then PACKAGE_PREFIX="/"; fi
+if test -z "${PACKAGE_EPREFIX+x}";        then PACKAGE_EPREFIX="$PACKAGE_PREFIX"; fi
+if test -z "${PACKAGE_BINDIR+x}";         then PACKAGE_BINDIR="${PACKAGE_EPREFIX%/}/bin"; fi
+if test -z "${PACKAGE_SBINDIR+x}";        then PACKAGE_SBINDIR="${PACKAGE_EPREFIX%/}/bin"; fi
+if test -z "${PACKAGE_LIBEXECDIR+x}";     then PACKAGE_LIBEXECDIR="${PACKAGE_EPREFIX%/}/libexec"; fi
+if test -z "${PACKAGE_SYSCONFDIR+x}";     then PACKAGE_SYSCONFDIR="${PACKAGE_PREFIX%/}/etc"; fi
+if test -z "${PACKAGE_SHAREDSTATEDIR+x}"; then PACKAGE_SHAREDSTATEDIR="${PACKAGE_PREFIX%/}/usr/com"; fi
+if test -z "${PACKAGE_LOCALSTATEDIR+x}";  then PACKAGE_LOCALSTATEDIR="${PACKAGE_PREFIX%/}/var"; fi
+if test -z "${PACKAGE_RUNSTATEDIR+x}";    then PACKAGE_RUNSTATEDIR="${PACKAGE_LOCALSTATEDIR}/run"; fi
+if test -z "${PACKAGE_LIBDIR+x}";         then PACKAGE_LIBDIR="${PACKAGE_EPREFIX%/}/$TARGET_LIBPATH"; fi
+if test -z "${PACKAGE_INCLUDEDIR+x}";     then PACKAGE_INCLUDEDIR="${PACKAGE_PREFIX%/}/usr/include"; fi
+if test -z "${PACKAGE_OLDINCLUDEDIR+x}";  then PACKAGE_OLDINCLUDEDIR="$PACKAGE_INCLUDEDIR"; fi
+if test -z "${PACKAGE_DATAROOTDIR+x}";    then PACKAGE_DATAROOTDIR="${PACKAGE_PREFIX%/}/usr/share"; fi
+if test -z "${PACKAGE_DATADIR+x}";        then PACKAGE_DATADIR="$PACKAGE_DATAROOTDIR"; fi
+if test -z "${PACKAGE_INFODIR+x}";        then PACKAGE_INFODIR="$PACKAGE_DATAROOTDIR/info"; fi
+if test -z "${PACKAGE_LOCALEDIR+x}";      then PACKAGE_LOCALEDIR="$PACKAGE_DATAROOTDIR/locale"; fi
+if test -z "${PACKAGE_MANDIR+x}";         then PACKAGE_MANDIR="$PACKAGE_DATAROOTDIR/man"; fi
+if test -z "${PACKAGE_DOCDIR+x}";         then PACKAGE_DOCDIR="$PACKAGE_DATAROOTDIR/doc/$PACKAGE_RAWNAME"; fi
+if test -z "${PACKAGE_HTMLDIR+x}";        then PACKAGE_HTMLDIR="$PACKAGE_DOCDIR"; fi
+if test -z "${PACKAGE_DVIDIR+x}";         then PACKAGE_DVIDIR="$PACKAGE_DOCDIR"; fi
+if test -z "${PACKAGE_PDFDIR+x}";         then PACKAGE_PDFDIR="$PACKAGE_DOCDIR"; fi
+if test -z "${PACKAGE_PSDIR+x}";          then PACKAGE_PSDIR="$PACKAGE_DOCDIR"; fi
+if test -z "${PACKAGE_HOST+x}";           then PACKAGE_HOST="$TARGET_NAME-linux-gnu"; fi
+if test -z "${PACKAGE_TARGET+x}";         then PACKAGE_TARGET="$PACKAGE_HOST"; fi
 
 
 echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_RAWNAME    '\e[${UI_COLCFG_NAME}m$PACKAGE_RAWNAME\e[m'" >&2
@@ -281,7 +281,7 @@ if test x"$MODE_FORCE_MAKE" == xyes || ! [ -d "$DESTDIR" ]; then
 				if test -z "$CONFIGURE"; then CONFIGURE=(); fi
 				CONFIGURE+=("${PACKAGE_CONFIGURE[@]}")
 				if ! test -z "$CONFIGURE"; then
-					echo -e "Using given \e[${UI_COLCFG_NAME}m\$PACKAGE_CONFIGURE\e[m and \e[${UI_COLCFG_NAME}m\$CONFIGURE\e[m options:" >&2
+					echo -e "\e[${UI_COLCFG_ACTION}mscan\e[m: Using given \e[${UI_COLCFG_NAME}m\$PACKAGE_CONFIGURE\e[m and \e[${UI_COLCFG_NAME}m\$CONFIGURE\e[m options:" >&2
 					for opt in "${CONFIGURE[@]}"; do
 						echo -e "	option: \e[${UI_COLCFG_NAME}m$opt\e[m" >&2
 					done
@@ -294,7 +294,7 @@ if test x"$MODE_FORCE_MAKE" == xyes || ! [ -d "$DESTDIR" ]; then
 					cmd mv "$SRCPATH/._configure_help.temp" "$SRCPATH/._configure_help"
 				fi
 				if ! test -z "$CONFIGURE"; then
-					echo -e "Using given \e[${UI_COLCFG_NAME}m\$CONFIGURE\e[m options:" >&2
+					echo -e "\e[${UI_COLCFG_ACTION}mscan\e[m: Using given \e[${UI_COLCFG_NAME}m\$CONFIGURE\e[m options:" >&2
 					for opt in "${CONFIGURE[@]}"; do
 						echo -e "	option: \e[${UI_COLCFG_NAME}m$opt\e[m" >&2
 					done
@@ -619,31 +619,30 @@ if test x"$MODE_FORCE_MAKE" == xyes || ! [ -d "$DESTDIR" ]; then
 			fi
 
 			# Auto-configure a custom config.site for ./configure
-			if ! test -z "$PACKAGE_CONFIG_SITE"; then
-				CONFIG_SITE="$PACKAGE_CONFIG_SITE
-$CONFIG_SITE"
-				if ! test -z "$CONFIG_SITE"; then
-					echo -e "Using given \e[${UI_COLCFG_NAME}m\$PACKAGE_CONFIG_SITE\e[m and \e[${UI_COLCFG_NAME}m\$CONFIG_SITE\e[m options:" >&2
+			if ! test -z "${PACKAGE_CONFIG_SITE_CONTENT+x}"; then
+				CONFIG_SITE_CONTENT="$PACKAGE_CONFIG_SITE_CONTENT
+$CONFIG_SITE_CONTENT"
+				if ! test -z "$CONFIG_SITE_CONTENT"; then
+					echo -e "Using given \e[${UI_COLCFG_NAME}m\$PACKAGE_CONFIG_SITE_CONTENT\e[m and \e[${UI_COLCFG_NAME}m\$CONFIG_SITE_CONTENT\e[m options:" >&2
 					while IFS= read -r line; do
 						echo -e "	>> \e[${UI_COLCFG_NAME}m$line\e[m" >&2
-					done <<< "$CONFIG_SITE"
+					done <<< "$CONFIG_SITE_CONTENT"
 				fi
 			else
 				# Auto-detect necessary config.site options
-				if ! test -z "$CONFIG_SITE"; then
-					echo -e "Using given \e[${UI_COLCFG_NAME}m\$CONFIG_SITE\e[m options:" >&2
+				if ! test -z "${CONFIG_SITE_CONTENT+x}"; then
+					echo -e "Using given \e[${UI_COLCFG_NAME}m\$CONFIG_SITE_CONTENT\e[m options:" >&2
 					while IFS= read -r line; do
 						echo -e "	>> \e[${UI_COLCFG_NAME}m$line\e[m" >&2
-					done <<< "$CONFIG_SITE"
-					CONFIG_SITE="
-$CONFIG_SITE"
+					done <<< "$CONFIG_SITE_CONTENT"
+					CONFIG_SITE_CONTENT="
+$CONFIG_SITE_CONTENT"
 				fi
-				echo -e "\e[${UI_COLCFG_ACTION}mscan\e[m: for needed \e[${UI_COLCFG_NAME}mconfig.site\e[m options for '\e[${UI_COLCFG_NAME}m$SRCPATH/configure\e[m'..." >&2
 				_config_site_option() {
-					if ! [[ "$CONFIG_SITE" == *"
+					if ! [[ "$CONFIG_SITE_CONTENT" == *"
 $1="* ]]; then
 						echo -e "	config.site: \e[${UI_COLCFG_NAME}m$1=$2\e[m" >&2
-						CONFIG_SITE="$CONFIG_SITE
+						CONFIG_SITE_CONTENT="$CONFIG_SITE_CONTENT
 $1=$2"
 					fi
 				}
@@ -659,12 +658,13 @@ $1=$2"
 					int main() { return a[0]; }
 					"
 				}
-				while IFS= read -r line; do
+				_eval_conf_line() {
 					# NOTE: Options were discovered by searching through 3rd party packages for:
 					#   - AC_TRY_RUN
 					#   - AC_RUN_IFELSE
 					# Matches where then individually looked at for use of AC_CACHE_CHECK
 
+					local line="$1"
 					case "$line" in
 
 					*ac_cv_c_stack_direction*)
@@ -1746,16 +1746,41 @@ $1=$2"
 
 					*) ;;
 					esac
-				done < "$SRCPATH/configure"
+				}
+
+				# PACKAGE_CONFIGURE_SITE_SCANNED_FILES: Master override for list of files scanned for config.site options (absolute)
+				# CONFIGURE_SITE_SCANNED_FILES:         Like $PACKAGE_CONFIGURE_SITE_SCANNED_FILES, but files are src-relative
+				# EXTRA_CONFIGURE_SITE_SCANNED_FILES:   Like $CONFIGURE_SITE_SCANNED_FILES, but don't override default; only append
+				if test -z "${PACKAGE_CONFIGURE_SITE_SCANNED_FILES+x}"; then
+					PACKAGE_CONFIGURE_SITE_SCANNED_FILES=("$SRCPATH/configure")
+					if ! test -z "${CONFIGURE_SITE_SCANNED_FILES+x}"; then
+						PACKAGE_CONFIGURE_SITE_SCANNED_FILES=()
+						if test -z "$EXTRA_CONFIGURE_SITE_SCANNED_FILES"; then EXTRA_CONFIGURE_SITE_SCANNED_FILES=(); fi
+						EXTRA_CONFIGURE_SITE_SCANNED_FILES+=("${CONFIGURE_SITE_SCANNED_FILES[@]}")
+					fi
+					if ! test -z "${EXTRA_CONFIGURE_SITE_SCANNED_FILES+x}"; then
+						for extra_configure_site_scan_file in "${EXTRA_CONFIGURE_SITE_SCANNED_FILES[@]}"; do
+							PACKAGE_CONFIGURE_SITE_SCANNED_FILES+=("$SRCPATH/$extra_configure_site_scan_file")
+						done
+					fi
+				fi
+				if ! test -z "$PACKAGE_CONFIGURE_SITE_SCANNED_FILES"; then
+					for configure_site_scan_filename in "${PACKAGE_CONFIGURE_SITE_SCANNED_FILES[@]}"; do
+						echo -e "\e[${UI_COLCFG_ACTION}mscan\e[m: for needed \e[${UI_COLCFG_NAME}mconfig.site\e[m options '\e[${UI_COLCFG_NAME}m${configure_site_scan_filename}\e[m'..." >&2
+						while IFS= read -r line; do
+							_eval_conf_line "$line"
+						done < "${configure_site_scan_filename}"
+					done
+				fi
 			fi
 			(
 				export CC="${CROSS_PREFIX}gcc"
 				export CFLAGS="-ggdb"
 				export CXX="${CROSS_PREFIX}g++"
 				export CXXFLAGS="-ggdb"
-				if ! test -z "$PACKAGE_CFLAGS"; then export CFLAGS="$CFLAGS $PACKAGE_CFLAGS"; fi
-				if ! test -z "$PACKAGE_CXXFLAGS"; then export CXXFLAGS="$CXXFLAGS $PACKAGE_CXXFLAGS"; fi
-				if ! test -z "$PACKAGE_CCFLAGS"; then
+				if ! test -z "${PACKAGE_CFLAGS+x}"; then export CFLAGS="$CFLAGS $PACKAGE_CFLAGS"; fi
+				if ! test -z "${PACKAGE_CXXFLAGS+x}"; then export CXXFLAGS="$CXXFLAGS $PACKAGE_CXXFLAGS"; fi
+				if ! test -z "${PACKAGE_CCFLAGS+x}"; then
 					export CFLAGS="$CFLAGS $PACKAGE_CCFLAGS";
 					export CXXFLAGS="$CXXFLAGS $PACKAGE_CCFLAGS";
 				fi
@@ -1769,19 +1794,29 @@ $1=$2"
 #				export SIZE="${CROSS_PREFIX}size"
 				export STRIP="${CROSS_PREFIX}strip"
 				export AR="${CROSS_PREFIX}ar"
-				if ! test -z "$CONFIG_SITE"; then
-					cat > "$OPTPATH/config.site" <<< "$CONFIG_SITE"
+				if ! test -z "${CONFIG_SITE_CONTENT+x}"; then
+					cat > "$OPTPATH/config.site" <<< "$CONFIG_SITE_CONTENT"
 					export CONFIG_SITE="$OPTPATH/config.site"
 				fi
 				${GM_HOOK_BEFORE_CONFIGURE:-:}
 				cmd cd "$OPTPATH"
+				if ! test -z "${CONFIG_SITE+x}"; then
+					echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: Using \e[${UI_COLCFG_NAME}m${CONFIG_SITE}\e[m for '\e[${UI_COLCFG_NAME}m./configure\e[m'..." >&2
+				fi
 				echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: Now running \e[${UI_COLCFG_NAME}m$PACKAGE_NAME\e[m: '\e[${UI_COLCFG_NAME}m./configure\e[m'..." >&2
 				cmd "$SH" "$SRCPATH/configure" "${CONFIGURE[@]}"
 			) || exit $?
 			${GM_HOOK_AFTER_CONFIGURE:-:}
 		fi # if test x"$MODE_FORCE_CONF" == xyes || ! [ -f "$OPTPATH/Makefile" ];
-		${GM_HOOK_BEFORE_MAKE:-:}
 		cmd cd "$OPTPATH"
+		if [ -f "config.site" ]; then
+			# If present, also set the config.site
+			export CONFIG_SITE="$OPTPATH/config.site"
+		fi
+		${GM_HOOK_BEFORE_MAKE:-:}
+		if ! test -z "${CONFIG_SITE+x}"; then
+			echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: Using \e[${UI_COLCFG_NAME}m${CONFIG_SITE}\e[m for '\e[${UI_COLCFG_NAME}mmake\e[m'..." >&2
+		fi
 		echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: Now running \e[${UI_COLCFG_NAME}m$PACKAGE_NAME\e[m: '\e[${UI_COLCFG_NAME}mmake\e[m'..." >&2
 		cmd make -j "$MAKE_PARALLEL_COUNT"
 		${GM_HOOK_AFTER_MAKE:-:}

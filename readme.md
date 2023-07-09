@@ -58,6 +58,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- [deemon-200](https://github.com/GrieferAtWork/deemon)
 	- [python-2.7.16](https://www.python.org/)
 	- [make-4.4.1](https://ftp.gnu.org/gnu/make/)
+	- [binutils-2.38](https://ftp.gnu.org/gnu/binutils/)
 - Games
 	- [vitetris-0.58.0](https://www.victornils.net/tetris/)
 	- [tty-solitaire-1.1.1](https://github.com/mpereira/tty-solitaire)
