@@ -199,12 +199,14 @@ INSTALL_SKIP="
 /lib/gcc/i686-kos/12.1.0/include/varargs.h
 /lib/gcc/i686-kos/12.1.0/include-fixed
 /lib/gcc/i686-kos/12.1.0/install-tools
+/lib/gcc/i686-kos/12.1.0/plugin
 /usr/libexec/gcc/i686-kos/12.1.0/install-tools
 /usr/libexec/gcc/i686-kos/12.1.0/liblto_plugin.a
 /usr/libexec/gcc/i686-kos/12.1.0/liblto_plugin.la
 /usr/libexec/gcc/i686-kos/12.1.0/lto1
 /usr/libexec/gcc/i686-kos/12.1.0/lto-wrapper
 /usr/libexec/gcc/i686-kos/12.1.0/NULL
+/usr/libexec/gcc/i686-kos/12.1.0/plugin
 "
 
 # Automatically build+install using autoconf
