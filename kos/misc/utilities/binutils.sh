@@ -101,7 +101,7 @@ fi
 
 # Skip some files during install
 INSTALL_SKIP="
-/lib/i686-kos/bin
+/lib/$USED_TARGET_NAME-kos/bin
 /usr/include/ansidecl.h
 /usr/include/symcat.h
 "
