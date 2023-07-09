@@ -162,10 +162,6 @@ PACKAGE_CCFLAGS="$PACKAGE_CCFLAGS -D_BROKEN_CCOMPAT_SOURCE"
 # GCC is a *huge* program, so try to optimize for size
 PACKAGE_CCFLAGS="$PACKAGE_CCFLAGS -Os"
 
-# GCC's .debug_info section is a whopping 100MiB!!! - So at least try to compress it...
-PACKAGE_CCFLAGS="$PACKAGE_CCFLAGS -gz"
-PACKAGE_LDFLAGS="-gz"
-
 # Because we *only* want to install gcc (and not its support libs,
 # since those were already installed by the cross compiler), we
 # have to set some custom targets for the make invocations.
