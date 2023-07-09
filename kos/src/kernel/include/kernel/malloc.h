@@ -333,7 +333,11 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 }
 
 /* Same as `kfree()', but use if it is unlikely that `ptr != NULL' */
+#if !defined(__OPTIMIZE_SIZE__) && !defined(__NO_builtin_expect)
+#define kfree_unlikely(ptr) (unlikely(ptr) ? kfree(ptr) : (void)0)
+#else /* !__OPTIMIZE_SIZE__ && !__NO_builtin_expect */
 #define kfree_unlikely(ptr) kfree(ptr)
+#endif /* __OPTIMIZE_SIZE__ || __NO_builtin_expect */
 
 
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
