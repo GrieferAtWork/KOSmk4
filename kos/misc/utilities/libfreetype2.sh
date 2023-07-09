@@ -69,7 +69,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/objs/.libs/libfreetype.so.$
 				--exec-prefix="/" \
 				--bindir="/bin" \
 				--sbindir="/bin" \
-				--libexecdir="/libexec" \
+				--libexecdir="/usr/libexec" \
 				--sysconfdir="/etc" \
 				--sharedstatedir="/usr/com" \
 				--localstatedir="/var" \

@@ -77,7 +77,7 @@ if test -z "${PACKAGE_PREFIX+x}";         then PACKAGE_PREFIX="/"; fi
 if test -z "${PACKAGE_EPREFIX+x}";        then PACKAGE_EPREFIX="$PACKAGE_PREFIX"; fi
 if test -z "${PACKAGE_BINDIR+x}";         then PACKAGE_BINDIR="${PACKAGE_EPREFIX%/}/bin"; fi
 if test -z "${PACKAGE_SBINDIR+x}";        then PACKAGE_SBINDIR="${PACKAGE_EPREFIX%/}/bin"; fi
-if test -z "${PACKAGE_LIBEXECDIR+x}";     then PACKAGE_LIBEXECDIR="${PACKAGE_EPREFIX%/}/libexec"; fi
+if test -z "${PACKAGE_LIBEXECDIR+x}";     then PACKAGE_LIBEXECDIR="${PACKAGE_EPREFIX%/}/usr/libexec"; fi
 if test -z "${PACKAGE_SYSCONFDIR+x}";     then PACKAGE_SYSCONFDIR="${PACKAGE_PREFIX%/}/etc"; fi
 if test -z "${PACKAGE_SHAREDSTATEDIR+x}"; then PACKAGE_SHAREDSTATEDIR="${PACKAGE_PREFIX%/}/usr/com"; fi
 if test -z "${PACKAGE_LOCALSTATEDIR+x}";  then PACKAGE_LOCALSTATEDIR="${PACKAGE_PREFIX%/}/var"; fi
@@ -330,7 +330,7 @@ if test x"$MODE_FORCE_MAKE" == xyes || ! [ -d "$DESTDIR" ]; then
 					*--exec-prefix=*)        addconf "--exec-prefix="    "$PACKAGE_EPREFIX"; ;;
 					*--bindir=*)             addconf "--bindir="         "$PACKAGE_BINDIR"; ;;
 					*--sbindir=*)            addconf "--sbindir="        "$PACKAGE_SBINDIR"; ;;
-					*--libexecdir=*)         addconf "--libexecdir="     "$PACKAGE_SBINDIR"; ;;
+					*--libexecdir=*)         addconf "--libexecdir="     "$PACKAGE_LIBEXECDIR"; ;;
 					*--sysconfdir=*)         addconf "--sysconfdir="     "$PACKAGE_SYSCONFDIR"; ;;
 					*--sharedstatedir=*)     addconf "--sharedstatedir=" "$PACKAGE_SHAREDSTATEDIR"; ;;
 					*--localstatedir=*)      addconf "--localstatedir="  "$PACKAGE_LOCALSTATEDIR"; ;;
@@ -1818,7 +1818,11 @@ $1=$2"
 			echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: Using \e[${UI_COLCFG_NAME}m${CONFIG_SITE}\e[m for '\e[${UI_COLCFG_NAME}mmake\e[m'..." >&2
 		fi
 		echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: Now running \e[${UI_COLCFG_NAME}m$PACKAGE_NAME\e[m: '\e[${UI_COLCFG_NAME}mmake\e[m'..." >&2
-		cmd make -j "$MAKE_PARALLEL_COUNT"
+		if ! test -z "${MAKE_TARGET+x}"; then
+			cmd make -j "$MAKE_PARALLEL_COUNT" "${MAKE_TARGET}"
+		else
+			cmd make -j "$MAKE_PARALLEL_COUNT"
+		fi
 		${GM_HOOK_AFTER_MAKE:-:}
 		> "$OPTPATH/_didmake"
 	fi     # if test x"$MODE_FORCE_MAKE" == xyes || ! [ -f "$OPTPATH/_didmake" ]
@@ -1830,7 +1834,7 @@ $1=$2"
 	(
 		export DESTDIR="$DESTDIR-temp"
 		${GM_HOOK_BEFORE_INSTALL:-:}
-		cmd make -j "$MAKE_PARALLEL_COUNT" DESTDIR="$DESTDIR" install
+		cmd make -j "$MAKE_PARALLEL_COUNT" DESTDIR="$DESTDIR" "${MAKE_TARGET_INSTALL:-install}"
 	) || exit $?
 	${GM_HOOK_AFTER_INSTALL:-:}
 	rm -r "$DESTDIR" > /dev/null 2>&1
