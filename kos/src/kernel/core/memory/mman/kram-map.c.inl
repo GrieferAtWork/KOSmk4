@@ -421,6 +421,8 @@ again_lock_mman:
 						page = MY_PAGE_MALLOC(missing, &count);
 						if unlikely(page == PHYSPAGE_INVALID) {
 							kram_freevec(vec.ms_v, vec.ms_c);
+							if (did_unlock)
+								goto err_nophys_for_backing_unlocked;
 							goto err_nophys_for_backing_and_unprepare;
 						}
 						assert(count != 0);
@@ -606,6 +608,7 @@ err_nophys_for_backing_and_unprepare:
 err_nophys_for_backing:
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		mman_lock_release(&mman_kernel);
+err_nophys_for_backing_unlocked:
 		if (kram_reclaim_memory(&cache_version, flags))
 			goto again_lock_mman;
 		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY,
@@ -641,6 +644,7 @@ err_nophys_for_backing:
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 err_nospace_for_mapping:
 		mman_lock_release(&mman_kernel);
+err_nophys_for_backing_unlocked:
 		if (kram_reclaim_memory(&cache_version, flags))
 			goto again_lock_mman;
 err_preempt:
