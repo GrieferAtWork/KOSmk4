@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23878a2a */
+/* HASH CRC-32:0x6bcd5542 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,7 +67,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fnmatch))(char const *__pattern, char
 			} while (*__pattern == '*');
 			if ((__card_post = *__pattern++) == '\0')
 				return 0; /* Pattern ends with '*' (matches everything) */
-			if (__card_post == '?')
+			if (__card_post == '?' || __card_post == '[')
 				goto __next; /* Match any --> already found */
 			for (;;) {
 				char __ch = *__name++;
@@ -88,12 +88,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fnmatch))(char const *__pattern, char
 				}
 			}
 		}
-		if (*__pattern == *__name) {
-__next:
-			++__name;
-			++__pattern;
-			continue; /* single character match */
-		}
 		if (*__pattern == '?') {
 			if (*__name == '/') {
 				if (__match_flags & 0x01)
@@ -102,7 +96,32 @@ __next:
 				    __name[1] == '.' && __pattern[1] != '.')
 					goto __nomatch;
 			}
-			goto __next;
+			goto __next; /* This will consume the '?' */
+		} else if (*__pattern == '[') {
+			__BOOL __did_match = 0;
+			++__pattern;
+			do {
+				if (!*__pattern)
+					goto __nomatch;
+				if (__pattern[1] == '-') {
+					char __lo = __pattern[0];
+					char __hi = __pattern[2];
+					__pattern += 3;
+					if ((unsigned char)*__name >= (unsigned char)__lo &&
+					    (unsigned char)*__name <= (unsigned char)__hi)
+						__did_match = 1;
+				} else {
+					if (*__pattern == *__name)
+						__did_match = 1;
+					++__pattern;
+				}
+			} while (*__pattern != ']');
+			goto __next; /* This will consume the trailing ']' */
+		} else if (*__pattern == *__name) {
+__next:
+			++__name;
+			++__pattern;
+			continue; /* single character match */
 		}
 		break; /* mismatch */
 	}

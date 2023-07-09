@@ -107,7 +107,7 @@ int fnmatch([[in]] char const *pattern,
 			} while (*pattern == '*');
 			if ((card_post = *pattern++) == '\0')
 				return 0; /* Pattern ends with '*' (matches everything) */
-			if (card_post == '?')
+			if (card_post == '?' || card_post == '[')
 				goto next; /* Match any --> already found */
 			for (;;) {
 				char ch = *name++;
@@ -128,12 +128,6 @@ int fnmatch([[in]] char const *pattern,
 				}
 			}
 		}
-		if (*pattern == *name) {
-next:
-			++name;
-			++pattern;
-			continue; /* single character match */
-		}
 		if (*pattern == '?') {
 			if (*name == '/') {
 				if (match_flags & FNM_PATHNAME)
@@ -142,7 +136,32 @@ next:
 				    name[1] == '.' && pattern[1] != '.')
 					goto nomatch;
 			}
-			goto next;
+			goto next; /* This will consume the '?' */
+		} else if (*pattern == '[') {
+			bool did_match = false;
+			++pattern;
+			do {
+				if (!*pattern)
+					goto nomatch;
+				if (pattern[1] == '-') {
+					char lo = pattern[0];
+					char hi = pattern[2];
+					pattern += 3;
+					if ((unsigned char)*name >= (unsigned char)lo &&
+					    (unsigned char)*name <= (unsigned char)hi)
+						did_match = true;
+				} else {
+					if (*pattern == *name)
+						did_match = true;
+					++pattern;
+				}
+			} while (*pattern != ']');
+			goto next; /* This will consume the trailing ']' */
+		} else if (*pattern == *name) {
+next:
+			++name;
+			++pattern;
+			continue; /* single character match */
 		}
 		break; /* mismatch */
 	}
