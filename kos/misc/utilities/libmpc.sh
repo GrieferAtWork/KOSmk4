@@ -1,4 +1,4 @@
-#TEST: require_utility libmpc "$PKG_CONFIG_PATH/mpc.pc"
+#TEST: require_utility libmpc "$SYSROOT_BIN_TARGET_COMMON/$TARGET_LIBPATH/libmpc.so.3"
 # Copyright (c) 2019-2023 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
