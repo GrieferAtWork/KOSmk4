@@ -253,9 +253,12 @@ again:
 				                                            sizeof(struct path_bucket),
 				                                            ccinfo_gfp(info) |
 				                                            GFP_ATOMIC | GFP_CALLOC);
-				if (!new_list && !ccinfo_noblock(info)) {
-					/* Try a blocking allocation. */
+				if (!new_list) {
 					path_cldlock_endread(self);
+					if (ccinfo_noblock(info))
+						return; /* nope... */
+
+					/* Try a blocking allocation. */
 					new_list = (struct path_bucket *)kmalloc_nx((minmask + 1) *
 					                                            sizeof(struct path_bucket),
 					                                            ccinfo_gfp(info) | GFP_CALLOC);
