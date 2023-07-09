@@ -199,9 +199,9 @@ $pid_t spawnve(__STDC_INT_AS_UINT_T mode,
 	fd_t fd;
 	pid_t result = -1;
 @@pp_ifdef O_RDONLY@@
-	fd = open(path, O_RDONLY | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
+	fd = open(path, O_RDONLY | __PRIVATE_O_CLOEXEC);
 @@pp_else@@
-	fd = open(path, __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
+	fd = open(path, __PRIVATE_O_CLOEXEC);
 @@pp_endif@@
 	if likely(fd >= 0) {
 		result = fspawnve(mode, fd, ___argv, ___envp);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5d77d25 */
+/* HASH CRC-32:0xfbc2302c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,9 +93,9 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(spawnve))(__STDC_INT_AS_UINT_T __mode
 	__fd_t __fd;
 	__pid_t __result = -1;
 #ifdef __O_RDONLY
-	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__path, __O_RDONLY | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
+	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__path, __O_RDONLY | __PRIVATE_O_CLOEXEC);
 #else /* __O_RDONLY */
-	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__path, __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
+	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__path, __PRIVATE_O_CLOEXEC);
 #endif /* !__O_RDONLY */
 	if __likely(__fd >= 0) {
 		__result = (__NAMESPACE_LOCAL_SYM __localdep_fspawnve)(__mode, __fd, ___argv, ___envp);
