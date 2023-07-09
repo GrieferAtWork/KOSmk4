@@ -151,6 +151,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 		tm_lock_regain();
 		goto success;
 	}
+
 	/* Calculate the overlapping address range. */
 	overlap_min = umin;
 	overlap_max = umax;
@@ -168,6 +169,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 		size_t startbit;
 		if (!trace_node_bitset_bitget(oldnode, i))
 			continue;
+
 		/* Oops... That's a kernel panic... */
 		startbit = i;
 		while (i < maxbit && trace_node_bitset_bitget(oldnode, i + 1))
@@ -181,6 +183,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 		               (trace_node_umin(oldnode) + (i + 1) * sizeof(void *)) - 1,
 		               trace_node_umin(oldnode), trace_node_umax(oldnode),
 		               &trace_node_print_traceback, oldnode);
+
 		/* Manually untrace to resolve a continue-after-panic */
 		for (;;) {
 			trace_node_bitset_bitoff(oldnode, startbit);
@@ -189,6 +192,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 			++startbit;
 		}
 	}
+
 	/* So we know that the indicated range really was marked as untraced.
 	 * With this in mind, we must truncate/split the BITSET-node in order
 	 * to make space for the new node that's supposed to take its place. */
@@ -203,6 +207,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 			tm_lock_regain();
 			goto success;
 		}
+
 		/* Must shift-down the is-traced bits of `oldnode' */
 		src   = ((overlap_max + 1) - oldnode->tn_link.rb_min) / sizeof(void *);
 		count = ((trace_node_umax(oldnode) /*+1*/) - (overlap_max /*+1*/)) / sizeof(void *);
@@ -214,6 +219,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 			}
 			++src;
 		}
+
 		/* Truncate `oldnode' in the front */
 		oldnode->tn_link.rb_min = overlap_max + 1;
 	} else if (overlap_max == trace_node_umax(oldnode)) {
@@ -248,6 +254,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 		new_node_size = CEILDIV(new_node_size, BITSOF(trace_node_bitset_t)); /* new_node_size = REQ_BITSET_WORDS */
 		new_node_size *= sizeof(trace_node_bitset_t);                        /* new_node_size = sizeof(BITSET) */
 		new_node_size += offsetof(struct trace_node, tn_trace);              /* Header addend. */
+
 		/* Allocate the tracing node. */
 		tm_nodes_insert(oldnode);
 		tm_lock_break();
@@ -259,6 +266,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 			return false;
 #endif /* DEFINE_X_noexcept */
 		tm_lock_regain();
+
 		/* Verify that the old node didn't change. */
 		oldnode = tm_nodes_rremove(umin, umax);
 #define FREE_NODE_PTR()                              \
@@ -275,6 +283,7 @@ again_free_node_ptr:
 			FREE_NODE_PTR();
 			goto success;
 		}
+
 		/* (re-)calculate the overlapping address range. */
 		overlap_min = umin;
 		overlap_max = umax;
@@ -283,6 +292,7 @@ again_free_node_ptr:
 		if (overlap_min < trace_node_umin(oldnode))
 			overlap_min = trace_node_umin(oldnode);
 		assert(overlap_min <= overlap_max);
+
 		/* (re-)verify that all overlapping range is marked as untraced in the old node. */
 		minbit = (overlap_min - trace_node_umin(oldnode)) / sizeof(void *);
 		maxbit = (overlap_max - trace_node_umin(oldnode)) / sizeof(void *);
@@ -294,6 +304,7 @@ again_free_node_ptr:
 		if unlikely(overlap_min == trace_node_umin(oldnode) ||
 		            overlap_max == trace_node_umax(oldnode))
 			goto again_free_node_ptr_insert_oldnode;
+
 		/* (re-)calculate the memory requirements of the new node. */
 		lo_node_min = trace_node_umin(oldnode);
 		lo_node_max = overlap_min - 1;
@@ -382,13 +393,13 @@ again_free_node_ptr:
 		 * that we can now use to insert the caller's `node' into the  tree. */
 		goto success;
 	}
+
 	/* Re-insert `oldnode' now that it's been truncated */
 	tm_nodes_insert(oldnode);
-success:
+success:;
 #ifdef DEFINE_X_noexcept
-	return true
+	return true;
 #endif /* DEFINE_X_noexcept */
-	;
 }
 
 /* Begin tracing the given `node' */
