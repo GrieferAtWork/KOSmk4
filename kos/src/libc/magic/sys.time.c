@@ -175,7 +175,7 @@ int getitimer32(__itimer_which_t which, [[out]] struct $itimerval32 *curr_value)
 [[alias("setitimer", "__setitimer", "__libc_setitimer")]]
 [[decl_include("<bits/os/itimerval.h>")]]
 int setitimer32(__itimer_which_t which,
-                [[in]] struct $itimerval32 const *__restrict newval,
+                [[in_opt]] struct $itimerval32 const *__restrict newval,
                 [[out_opt]] struct $itimerval32 *__restrict oldval);
 
 [[ignore, nocrt, doc_alias("utimes"), alias("utimes", "__utimes")]]
@@ -286,16 +286,21 @@ int getitimer(__itimer_which_t which,
 [[requires($has_function(setitimer32) || $has_function(setitimer64))]]
 [[userimpl, section(".text.crt{|.dos}.time")]]
 int setitimer(__itimer_which_t which,
-              [[in]] struct itimerval const *newval,
+              [[in_opt]] struct itimerval const *newval,
               [[out_opt]] struct itimerval *oldval) {
 @@pp_if $has_function(setitimer32)@@
 	int result;
-	struct itimerval32 new32, old32;
-	new32.@it_interval@.tv_sec  = (time32_t)newval->@it_interval@.tv_sec;
-	new32.@it_interval@.tv_usec = newval->@it_interval@.tv_usec;
-	new32.@it_value@.tv_sec     = (time32_t)newval->@it_value@.tv_sec;
-	new32.@it_value@.tv_usec    = newval->@it_value@.tv_usec;
-	result = setitimer32(which, &new32, oldval ? &old32 : NULL);
+	struct itimerval32 old32;
+	if (newval) {
+		struct itimerval32 new32;
+		new32.@it_interval@.tv_sec  = (time32_t)newval->@it_interval@.tv_sec;
+		new32.@it_interval@.tv_usec = newval->@it_interval@.tv_usec;
+		new32.@it_value@.tv_sec     = (time32_t)newval->@it_value@.tv_sec;
+		new32.@it_value@.tv_usec    = newval->@it_value@.tv_usec;
+		result = setitimer32(which, &new32, oldval ? &old32 : NULL);
+	} else {
+		result = setitimer32(which, NULL, oldval ? &old32 : NULL);
+	}
 	if (likely(!result) && oldval) {
 		oldval->@it_interval@.tv_sec  = (time64_t)old32.@it_interval@.tv_sec;
 		oldval->@it_interval@.tv_usec = old32.@it_interval@.tv_usec;
@@ -305,12 +310,17 @@ int setitimer(__itimer_which_t which,
 	return result;
 @@pp_else@@
 	int result;
-	struct itimerval64 new64, old64;
-	new64.@it_interval@.tv_sec  = (time64_t)newval->@it_interval@.tv_sec;
-	new64.@it_interval@.tv_usec = newval->@it_interval@.tv_usec;
-	new64.@it_value@.tv_sec     = (time64_t)newval->@it_value@.tv_sec;
-	new64.@it_value@.tv_usec    = newval->@it_value@.tv_usec;
-	result = setitimer64(which, &new64, oldval ? &old64 : NULL);
+	struct itimerval64 old64;
+	if (newval) {
+		struct itimerval64 new64;
+		new64.@it_interval@.tv_sec  = (time64_t)newval->@it_interval@.tv_sec;
+		new64.@it_interval@.tv_usec = newval->@it_interval@.tv_usec;
+		new64.@it_value@.tv_sec     = (time64_t)newval->@it_value@.tv_sec;
+		new64.@it_value@.tv_usec    = newval->@it_value@.tv_usec;
+		result = setitimer64(which, &new64, oldval ? &old64 : NULL);
+	} else {
+		result = setitimer64(which, NULL, oldval ? &old64 : NULL);
+	}
 	if (likely(!result) && oldval) {
 		oldval->@it_interval@.tv_sec  = (time32_t)old64.@it_interval@.tv_sec;
 		oldval->@it_interval@.tv_usec = old64.@it_interval@.tv_usec;
@@ -559,15 +569,20 @@ int getitimer64(__itimer_which_t which,
 [[requires_function(setitimer32)]]
 [[userimpl, section(".text.crt{|.dos}.time")]]
 int setitimer64(__itimer_which_t which,
-                [[in]] struct itimerval64 const *newval,
+                [[in_opt]] struct itimerval64 const *newval,
                 [[out_opt]] struct itimerval64 *oldval) {
 	int result;
-	struct itimerval32 new32, old32;
-	new32.@it_interval@.tv_sec  = (time32_t)newval->@it_interval@.tv_sec;
-	new32.@it_interval@.tv_usec = newval->@it_interval@.tv_usec;
-	new32.@it_value@.tv_sec     = (time32_t)newval->@it_value@.tv_sec;
-	new32.@it_value@.tv_usec    = newval->@it_value@.tv_usec;
-	result = setitimer32(which, &new32, oldval ? &old32 : NULL);
+	struct itimerval32 old32;
+	if (newval) {
+		struct itimerval32 new32;
+		new32.@it_interval@.tv_sec  = (time32_t)newval->@it_interval@.tv_sec;
+		new32.@it_interval@.tv_usec = newval->@it_interval@.tv_usec;
+		new32.@it_value@.tv_sec     = (time32_t)newval->@it_value@.tv_sec;
+		new32.@it_value@.tv_usec    = newval->@it_value@.tv_usec;
+		result = setitimer32(which, &new32, oldval ? &old32 : NULL);
+	} else {
+		result = setitimer32(which, NULL, oldval ? &old32 : NULL);
+	}
 	if (likely(!result) && oldval) {
 		oldval->@it_interval@.tv_sec  = (time64_t)old32.@it_interval@.tv_sec;
 		oldval->@it_interval@.tv_usec = old32.@it_interval@.tv_usec;

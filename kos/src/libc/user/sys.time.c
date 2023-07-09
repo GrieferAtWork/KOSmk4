@@ -60,9 +60,9 @@ NOTHROW_NCX(LIBCCALL libc_getitimer)(__itimer_which_t which,
 }
 /*[[[end:libc_getitimer]]]*/
 
-/*[[[head:libc_setitimer,hash:CRC-32=0x92295d84]]]*/
+/*[[[head:libc_setitimer,hash:CRC-32=0xd14049a1]]]*/
 /* >> setitimer(2), setitimer64(2) */
-INTERN ATTR_SECTION(".text.crt.time") ATTR_IN(2) ATTR_OUT_OPT(3) int
+INTERN ATTR_SECTION(".text.crt.time") ATTR_IN_OPT(2) ATTR_OUT_OPT(3) int
 NOTHROW_NCX(LIBCCALL libc_setitimer)(__itimer_which_t which,
                                      struct itimerval const *newval,
                                      struct itimerval *oldval)
@@ -208,12 +208,12 @@ NOTHROW_NCX(LIBCCALL libc_getitimer64)(__itimer_which_t which,
 #endif /* MAGIC:alias */
 /*[[[end:libc_getitimer64]]]*/
 
-/*[[[head:libc_setitimer64,hash:CRC-32=0xffa5c7e4]]]*/
+/*[[[head:libc_setitimer64,hash:CRC-32=0xa7839f86]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_setitimer64, libc_setitimer);
 #else /* MAGIC:alias */
 /* >> setitimer(2), setitimer64(2) */
-INTERN ATTR_SECTION(".text.crt.time") ATTR_IN(2) ATTR_OUT_OPT(3) int
+INTERN ATTR_SECTION(".text.crt.time") ATTR_IN_OPT(2) ATTR_OUT_OPT(3) int
 NOTHROW_NCX(LIBCCALL libc_setitimer64)(__itimer_which_t which,
                                        struct itimerval64 const *newval,
                                        struct itimerval64 *oldval)

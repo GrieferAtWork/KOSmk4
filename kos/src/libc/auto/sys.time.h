@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x552b3ad8 */
+/* HASH CRC-32:0x8a1ea655 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ INTDEF ATTR_OUT_OPT(1) ATTR_OUT_OPT(2) int NOTHROW_NCX(LIBDCALL libd_gettimeofda
 /* >> getitimer(2), getitimer64(2) */
 INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_getitimer)(__itimer_which_t which, struct itimerval *curr_value);
 /* >> setitimer(2), setitimer64(2) */
-INTDEF ATTR_IN(2) ATTR_OUT_OPT(3) int NOTHROW_NCX(LIBDCALL libd_setitimer)(__itimer_which_t which, struct itimerval const *newval, struct itimerval *oldval);
+INTDEF ATTR_IN_OPT(2) ATTR_OUT_OPT(3) int NOTHROW_NCX(LIBDCALL libd_setitimer)(__itimer_which_t which, struct itimerval const *newval, struct itimerval *oldval);
 /* >> utimes(2), utimes64(2) */
 INTDEF ATTR_IN(1) ATTR_IN_OPT(2) int NOTHROW_NCX(LIBDCALL libd_utimes)(char const *file, struct timeval const tvp[2]);
 /* >> futimesat(2), futimesat64(2) */
@@ -53,7 +53,7 @@ INTDEF ATTR_OUT_OPT(1) ATTR_OUT_OPT(2) int NOTHROW_NCX(LIBDCALL libd_gettimeofda
 /* >> getitimer(2), getitimer64(2) */
 INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_getitimer64)(__itimer_which_t which, struct itimerval64 *curr_value);
 /* >> setitimer(2), setitimer64(2) */
-INTDEF ATTR_IN(2) ATTR_OUT_OPT(3) int NOTHROW_NCX(LIBDCALL libd_setitimer64)(__itimer_which_t which, struct itimerval64 const *newval, struct itimerval64 *oldval);
+INTDEF ATTR_IN_OPT(2) ATTR_OUT_OPT(3) int NOTHROW_NCX(LIBDCALL libd_setitimer64)(__itimer_which_t which, struct itimerval64 const *newval, struct itimerval64 *oldval);
 /* >> utimes(2), utimes64(2) */
 INTDEF ATTR_IN(1) ATTR_IN_OPT(2) int NOTHROW_NCX(LIBDCALL libd_utimes64)(char const *file, struct timeval64 const tvp[2]);
 /* >> settimeofday(2), settimeofday64(2) */
