@@ -622,6 +622,7 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
 PUBLIC NOBLOCK ATTR_MALLOC WUNUSED union mcorepart *
 NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void) {
 	union mcorepart *result;
+	union mcorepart *replica;
 	assert(mcoreheap_freecount >= 2);
 
 	/* Allocate the part. */
@@ -633,9 +634,16 @@ NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void) {
 
 	/* We're down to the last couple of (for this purpose reserved) nodes.
 	 * As such,  use  the last  2  of  them to  replicate  the  core-heap. */
+	replica = mcoreheap_alloc_impl();
 	if unlikely(!mcoreheap_replicate(&result->mcp_part,
-	                                 &mcoreheap_alloc_impl()->mcp_node))
+	                                 &replica->mcp_node)) {
+		/* Free the already-allocated part. */
+		assert(mcoreheap_freecount < 2);
+		mcoreheap_free_locked(replica);
+		mcoreheap_free_locked(result);
+		assert(mcoreheap_freecount >= 2);
 		return NULL;
+	}
 
 	/* At this point, there should be at least 3 parts, since we statically
 	 * assert that a mem-core-page is capable of holding at least that many
