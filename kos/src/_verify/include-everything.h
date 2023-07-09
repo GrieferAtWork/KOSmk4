@@ -23,6 +23,11 @@
 /* Prevent `<regexp.h>' from defining `compile(3)' */
 #define __DO_NOT_DEFINE_COMPILE
 
+/* Detect errors resulting from missing imports. */
+#ifdef __cplusplus
+#define __COMPILER_HAVE_BUG_BLOATY_CXX_USING 0
+#endif /* __cplusplus */
+
 
 /* In order to  ensure that all  of our system  headers work nice  with each  other,
  * try to include every single one at the same time in the following configurations:

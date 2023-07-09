@@ -61,13 +61,15 @@ typedef __CHAR32_TYPE__ char32_t;
 	}                                                                                                                       \
 	__CXX_CLASSMEMBER bool                                                                                                  \
 	compare_exchange_weak(T &__exp, T __val,                                                                                \
-	                      __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {            \
+	                      __NAMESPACE_STD_SYM memory_order __order                                                          \
+	                      __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {                                 \
 		return compare_exchange_weak(__exp, __val, __order,                                                                 \
 		                             __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                  \
 	}                                                                                                                       \
 	__CXX_CLASSMEMBER bool                                                                                                  \
 	compare_exchange_weak(T &__exp, T __val,                                                                                \
-	                      __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {   \
+	                      __NAMESPACE_STD_SYM memory_order __order                                                          \
+	                      __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {                        \
 		return compare_exchange_weak(__exp, __val, __order,                                                                 \
 		                             __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                  \
 	}                                                                                                                       \
@@ -99,13 +101,15 @@ typedef __CHAR32_TYPE__ char32_t;
 	}                                                                                                                       \
 	__CXX_CLASSMEMBER bool                                                                                                  \
 	compare_exchange_strong(T &__exp, T __val,                                                                              \
-	                        __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {          \
+	                        __NAMESPACE_STD_SYM memory_order __order                                                        \
+	                        __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {                               \
 		return compare_exchange_strong(__exp, __val, __order,                                                               \
 		                               __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                \
 	}                                                                                                                       \
 	__CXX_CLASSMEMBER bool                                                                                                  \
 	compare_exchange_strong(T &__exp, T __val,                                                                              \
-	                        __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT { \
+	                        __NAMESPACE_STD_SYM memory_order __order                                                        \
+	                        __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {                      \
 		return compare_exchange_strong(__exp, __val, __order,                                                               \
 		                               __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                \
 	}
@@ -132,13 +136,15 @@ typedef __CHAR32_TYPE__ char32_t;
 	}                                                                                                               \
 	__CXX_CLASSMEMBER bool                                                                                          \
 	cmpxch(T __oldv, T __newv,                                                                                      \
-	       __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {                   \
+	       __NAMESPACE_STD_SYM memory_order __order                                                                 \
+	       __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {                                        \
 		return cmpxch(__oldv, __newv, __order,                                                                      \
 		              __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                         \
 	}                                                                                                               \
 	__CXX_CLASSMEMBER bool                                                                                          \
 	cmpxch(T __oldv, T __newv,                                                                                      \
-	       __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {          \
+	       __NAMESPACE_STD_SYM memory_order __order                                                                 \
+	       __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {                               \
 		return cmpxch(__oldv, __newv, __order,                                                                      \
 		              __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                         \
 	}                                                                                                               \
@@ -160,13 +166,15 @@ typedef __CHAR32_TYPE__ char32_t;
 	}                                                                                                               \
 	__CXX_CLASSMEMBER T                                                                                             \
 	cmpxch_val(T __oldv, T __newv,                                                                                  \
-	           __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {               \
+	           __NAMESPACE_STD_SYM memory_order __order                                                             \
+	           __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {                                    \
 		return cmpxch_val(__oldv, __newv, __order,                                                                  \
 		                  __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                     \
 	}                                                                                                               \
 	__CXX_CLASSMEMBER T                                                                                             \
 	cmpxch_val(T __oldv, T __newv,                                                                                  \
-	           __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {      \
+	           __NAMESPACE_STD_SYM memory_order __order                                                             \
+	           __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {                           \
 		return cmpxch_val(__oldv, __newv, __order,                                                                  \
 		                  __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                     \
 	}                                                                                                               \
@@ -184,25 +192,29 @@ typedef __CHAR32_TYPE__ char32_t;
 	}                                                                                                               \
 	__CXX_CLASSMEMBER bool                                                                                          \
 	cmpxch_weak(T __oldv, T __newv,                                                                                 \
-	            __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {              \
+	            __NAMESPACE_STD_SYM memory_order __order                                                            \
+	            __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {                                   \
 		return cmpxch_weak(__oldv, __newv, __order,                                                                 \
 		                   __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                    \
 	}                                                                                                               \
 	__CXX_CLASSMEMBER bool                                                                                          \
 	cmpxch_weak(T __oldv, T __newv,                                                                                 \
-	            __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {     \
+	            __NAMESPACE_STD_SYM memory_order __order                                                            \
+	            __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {                          \
 		return cmpxch_weak(__oldv, __newv, __order,                                                                 \
 		                   __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                    \
 	}                                                                                                               \
 	__CXX_CLASSMEMBER T                                                                                             \
 	cmpxch_val_weak(T __oldv, T __newv,                                                                             \
-	                __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {          \
+	                __NAMESPACE_STD_SYM memory_order __order                                                        \
+	                __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {                               \
 		return cmpxch_val_weak(__oldv, __newv, __order,                                                             \
 		                       __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                \
 	}                                                                                                               \
 	__CXX_CLASSMEMBER T                                                                                             \
 	cmpxch_val_weak(T __oldv, T __newv,                                                                             \
-	                __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT { \
+	                __NAMESPACE_STD_SYM memory_order __order                                                        \
+	                __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {                      \
 		return cmpxch_val_weak(__oldv, __newv, __order,                                                             \
 		                       __NAMESPACE_INT_SYM __cmpxch_failure_order(__order));                                \
 	}
@@ -378,82 +390,82 @@ public:
 	}
 
 	__CXX_CLASSMEMBER void
-	store(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	store(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {
 		__hybrid_atomic_store(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER void
-	store(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	store(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		__hybrid_atomic_store(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	load(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) const __CXX_NOEXCEPT {
+	load(__NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) const __CXX_NOEXCEPT {
 		return __hybrid_atomic_load(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	load(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) const volatile __CXX_NOEXCEPT {
+	load(__NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) const volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_load(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	exchange(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	exchange(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_xch(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	exchange(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	exchange(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_xch(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_add(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	fetch_add(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchadd(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_add(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	fetch_add(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchadd(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_sub(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	fetch_sub(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchsub(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_sub(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	fetch_sub(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchsub(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_and(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	fetch_and(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchand(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_and(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	fetch_and(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchand(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_or(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	fetch_or(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchor(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_or(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	fetch_or(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchor(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_xor(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	fetch_xor(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchxor(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_xor(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	fetch_xor(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchxor(&__m_val, __val, __order);
 	}
 
@@ -461,62 +473,62 @@ public:
 
 #ifdef __USE_KOS
 	__CXX_CLASSMEMBER __T
-	fetch_inc(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	fetch_inc(__NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchinc(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_inc(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	fetch_inc(__NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchinc(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	inc_fetch(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	inc_fetch(__NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_incfetch(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	inc_fetch(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	inc_fetch(__NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_incfetch(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_dec(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	fetch_dec(__NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchdec(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_dec(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	fetch_dec(__NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchdec(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	dec_fetch(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	dec_fetch(__NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_decfetch(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	dec_fetch(__NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	dec_fetch(__NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_decfetch(&__m_val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_nand(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	fetch_nand(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchnand(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	fetch_nand(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	fetch_nand(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_fetchnand(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	nand_fetch(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) __CXX_NOEXCEPT {
+	nand_fetch(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) __CXX_NOEXCEPT {
 		return __hybrid_atomic_nandfetch(&__m_val, __val, __order);
 	}
 
 	__CXX_CLASSMEMBER __T
-	nand_fetch(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
+	nand_fetch(__T __val, __NAMESPACE_STD_SYM memory_order __order __DFL(__NAMESPACE_STD_SYM memory_order_seq_cst)) volatile __CXX_NOEXCEPT {
 		return __hybrid_atomic_nandfetch(&__m_val, __val, __order);
 	}
 #endif /* __USE_KOS */
