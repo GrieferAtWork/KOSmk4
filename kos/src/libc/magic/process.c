@@ -47,31 +47,70 @@
 )]%[insert:prefix(
 #include <kos/anno.h>
 )]%{
+#if defined(__USE_DOS) && !defined(__USE_DOS_CLEAN)
+#include <corecrt_wprocess.h> /* Include <wchar.h> instead */
+#endif /* __USE_DOS && !__USE_DOS_CLEAN */
+
 
 /* `mode' argument values for spawn() functions. */
-#ifdef __P_WAIT
+#if !defined(P_WAIT) && defined(__P_WAIT)
 #define P_WAIT    __P_WAIT    /* Wait for the process to terminate, and return its exit status */
-#endif /* __P_WAIT */
-#ifdef __P_NOWAIT
+#endif /* !P_WAIT && __P_WAIT */
+#if !defined(P_NOWAIT) && defined(__P_NOWAIT)
 #define P_NOWAIT  __P_NOWAIT  /* Spawn the process asynchronously, and return its PID */
-#endif /* __P_NOWAIT */
-#ifdef __P_OVERLAY
+#endif /* !P_NOWAIT && __P_NOWAIT */
+#if !defined(P_OVERLAY) && defined(__P_OVERLAY)
 #define P_OVERLAY __P_OVERLAY /* Don't spawn, but rather try to exec() the new program */
-#endif /* __P_OVERLAY */
-#ifdef __P_NOWAITO
+#endif /* !P_OVERLAY && __P_OVERLAY */
+#if !defined(P_NOWAITO) && defined(__P_NOWAITO)
 #define P_NOWAITO __P_NOWAITO /* Same as `P_NOWAIT' */
-#endif /* __P_NOWAITO */
-#ifdef __P_DETACH
+#endif /* !P_NOWAITO && __P_NOWAITO */
+#if !defined(P_DETACH) && defined(__P_DETACH)
 #define P_DETACH  __P_DETACH  /* Create the new process as detached and return `0' */
-#endif /* __P_DETACH */
+#endif /* !P_DETACH && __P_DETACH */
 
 /* `action' argument values for cwait() functions. */
-#ifdef __WAIT_CHILD
+#if !defined(WAIT_CHILD) && defined(__WAIT_CHILD)
 #define WAIT_CHILD      __WAIT_CHILD      /* Ignored */
-#endif /* __WAIT_CHILD */
-#ifdef __WAIT_GRANDCHILD
+#endif /* !WAIT_CHILD && __WAIT_CHILD */
+#if !defined(WAIT_GRANDCHILD) && defined(__WAIT_GRANDCHILD)
 #define WAIT_GRANDCHILD __WAIT_GRANDCHILD /* Ignored */
-#endif /* __WAIT_GRANDCHILD */
+#endif /* !WAIT_GRANDCHILD && __WAIT_GRANDCHILD */
+
+
+/* Aliases that are expected by some programs */
+#if !defined(_P_WAIT) && defined(__P_WAIT)
+#define _P_WAIT __P_WAIT
+#endif /* !_P_WAIT && __P_WAIT */
+#if !defined(_P_NOWAIT) && defined(__P_NOWAIT)
+#define _P_NOWAIT __P_NOWAIT
+#endif /* !_P_NOWAIT && __P_NOWAIT */
+#if !defined(_P_OVERLAY) && defined(__P_OVERLAY)
+#define _P_OVERLAY __P_OVERLAY
+#endif /* !_P_OVERLAY && __P_OVERLAY */
+#if !defined(_P_NOWAITO) && defined(__P_NOWAITO)
+#define _P_NOWAITO __P_NOWAITO
+#endif /* !_P_NOWAITO && __P_NOWAITO */
+#if !defined(_P_DETACH) && defined(__P_DETACH)
+#define _P_DETACH __P_DETACH
+#endif /* !_P_DETACH && __P_DETACH */
+#if !defined(_WAIT_CHILD) && defined(__WAIT_CHILD)
+#define _WAIT_CHILD __WAIT_CHILD
+#endif /* !_WAIT_CHILD && __WAIT_CHILD */
+#if !defined(_WAIT_GRANDCHILD) && defined(__WAIT_GRANDCHILD)
+#define _WAIT_GRANDCHILD __WAIT_GRANDCHILD
+#endif /* !_WAIT_GRANDCHILD && __WAIT_GRANDCHILD */
+
+
+#ifdef __USE_DOS
+/* Weird DOS aliases. */
+#if !defined(_OLD_P_OVERLAY) && defined(__P_OVERLAY)
+#define _OLD_P_OVERLAY __P_OVERLAY
+#endif /* !_OLD_P_OVERLAY && __P_OVERLAY */
+#if !defined(OLD_P_OVERLAY) && defined(__P_OVERLAY)
+#define OLD_P_OVERLAY  __P_OVERLAY
+#endif /* !OLD_P_OVERLAY && __P_OVERLAY */
+#endif /* __USE_DOS */
 
 
 #ifndef __TARGV
@@ -84,325 +123,51 @@
 #endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 
+#ifdef __CC__
 __SYSDECL_BEGIN
 
-/* DOS */
-}
-%#ifdef __USE_DOS
-%{
-#ifndef __USE_DOS_CLEAN
-#include <corecrt_wprocess.h> /* Include <wchar.h> instead */
-#endif /* !__USE_DOS_CLEAN */
-
-#define _P_WAIT          P_WAIT
-#define _P_NOWAIT        P_NOWAIT
-#define _P_OVERLAY       P_OVERLAY
-#define _P_NOWAITO       P_NOWAITO
-#define _P_DETACH        P_DETACH
-#define _OLD_P_OVERLAY   P_OVERLAY
-#define _WAIT_CHILD      WAIT_CHILD
-#define _WAIT_GRANDCHILD WAIT_GRANDCHILD
-#define OLD_P_OVERLAY    _OLD_P_OVERLAY
-
-
-}
-%#ifdef __CC__
-%{
-
-#ifndef __intptr_t_defined
-#define __intptr_t_defined
-typedef __intptr_t intptr_t;
-#endif /* !__intptr_t_defined */
-#ifndef __uintptr_t_defined
-#define __uintptr_t_defined
-typedef __uintptr_t uintptr_t;
-#endif /* !__uintptr_t_defined */
-#ifndef __wchar_t_defined
-#define __wchar_t_defined
-typedef __WCHAR_TYPE__ wchar_t;
-#endif /* !__wchar_t_defined */
+/************************************************************************/
+/* Standard (as per Cygwin)                                             */
+/************************************************************************/
 
 }
 
-%{
-#ifndef ____dos_beginthreadex_entry_t_defined
-#define ____dos_beginthreadex_entry_t_defined
-#ifdef __NO_ATTR_STDCALL
-typedef __UINT32_TYPE__ (__LIBDCALL *__dos_beginthreadex_entry_t)(void *__arg);
-#else /* __NO_ATTR_STDCALL */
-typedef __UINT32_TYPE__ (__ATTR_STDCALL *__dos_beginthreadex_entry_t)(void *__arg);
-#endif /* !__NO_ATTR_STDCALL */
-#endif /* !____dos_beginthreadex_entry_t_defined */
-}
-%
-
-%[define(DEFINE_DOS_BEGINTHREADEX_ENTRY_T =
-@@pp_ifndef ____dos_beginthreadex_entry_t_defined@@
-#define ____dos_beginthreadex_entry_t_defined
-#ifdef __NO_ATTR_STDCALL
-typedef __UINT32_TYPE__ (__LIBDCALL *__dos_beginthreadex_entry_t)(void *__arg);
-#else /* __NO_ATTR_STDCALL */
-typedef __UINT32_TYPE__ (__ATTR_STDCALL *__dos_beginthreadex_entry_t)(void *__arg);
-#endif /* !__NO_ATTR_STDCALL */
-@@pp_endif@@
-)]
-
-%[define_type_class(__dos_beginthreadex_entry_t = "TP")]
-%[define_replacement(__dos_beginthreadex_entry_t = __dos_beginthreadex_entry_t)]
-
-
-
-%[insert:std]
-%[insert:guarded_std_function(exit)]
-%[insert:guarded_std_function(abort)]
-
-%[insert:guarded_function(_exit = _Exit)]
-
-
-
-[[decl_include("<hybrid/typecore.h>")]]
-[[section(".text.crt.dos.sched.thread")]]
-uintptr_t _beginthread(void (LIBDCALL *entry)(void *arg), $u32 stacksz, void *arg);
-
-[[decl_include("<hybrid/typecore.h>")]]
-[[decl_prefix(DEFINE_DOS_BEGINTHREADEX_ENTRY_T)]]
-[[section(".text.crt.dos.sched.thread")]]
-uintptr_t _beginthreadex(void *sec, $u32 stacksz, __dos_beginthreadex_entry_t entry,
-                         void *arg, $u32 flags, $u32 *threadaddr);
-
-[[requires($has_function(_endthreadex))]]
-[[section(".text.crt.dos.sched.thread")]]
-void _endthread() {
-	_endthreadex(0);
+[[section(".text.crt{|.dos}.fs.exec.spawn")]]
+[[cp, guard, ATTR_SENTINEL, impl_include("<parts/redirect-exec.h>")]]
+[[requires_dependent_function("spawnv"), dos_export_alias("_spawnl")]]
+[[decl_include("<features.h>", "<bits/types.h>"), crt_dos_variant]]
+$pid_t spawnl(__STDC_INT_AS_UINT_T mode, [[in]] char const *__restrict path,
+              [[in_opt]] char const *args, ... /*, (char *)NULL*/) {
+	__REDIRECT_SPAWNL(char, spawnv, mode, path, args)
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[section(".text.crt.dos.sched.thread")]]
-void _endthreadex($u32 exitcode);
-
-[[throws, section(".text.crt.dos.sched.process")]]
-void _cexit();
-
-[[throws, section(".text.crt.dos.sched.process")]]
-void _c_exit() {
+[[section(".text.crt{|.dos}.fs.exec.spawn")]]
+[[cp, guard, ATTR_SENTINEL, impl_include("<parts/redirect-exec.h>")]]
+[[requires_dependent_function("spawnvp"), dos_export_alias("_spawnlp")]]
+[[decl_include("<features.h>", "<bits/types.h>"), crt_dos_variant]]
+$pid_t spawnlp(__STDC_INT_AS_UINT_T mode, [[in]] char const *__restrict file,
+               [[in_opt]] char const *args, ... /*, (char *)NULL*/) {
+	__REDIRECT_SPAWNL(char, spawnvp, mode, file, args)
 }
 
-%[define(DEFINE__tls_callback_type =
-@@pp_ifndef ___tls_callback_type_defined@@
-#define ___tls_callback_type_defined
-#ifdef __NO_ATTR_STDCALL
-typedef void (__ATTR_MSABI *_tls_callback_type)(void * /*???*/, __ULONG32_TYPE__ /*???*/, void * /*???*/);
-#else /* __NO_ATTR_STDCALL */
-typedef void (__ATTR_STDCALL *_tls_callback_type)(void * /*???*/, __ULONG32_TYPE__ /*???*/, void * /*???*/);
-#endif /* !__NO_ATTR_STDCALL */
-@@pp_endif@@
-)]
-%[define_replacement(_tls_callback_type = _tls_callback_type)]
-
-%[insert:prefix(DEFINE__tls_callback_type)]
-
-[[section(".text.crt.dos.sched.process")]]
-[[crt_dos_only, decl_prefix(DEFINE__tls_callback_type)]]
-void _register_thread_local_exe_atexit_callback([[nonnull]] _tls_callback_type callback);
-
-
-
-
-%[insert:function(_getpid = getpid)]
-
-[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
-int _execv([[in]] char const *__restrict path,
-           [[in]] char const *const *___argv) = execv;
-
-[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
-int _execvp([[in]] char const *__restrict file,
-            [[in]] char const *const *___argv) = execvp;
-
-[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
-int _execve([[in]] char const *__restrict path,
-            [[in]] char const *const *___argv,
-            [[in]] char const *const *___envp) = execve;
-
-[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
-int _execvpe([[in]] char const *__restrict file,
-             [[in]] char const *const *___argv,
-             [[in]] char const *const *___envp) = execvpe;
-
-%[insert:function(_execl = execl)]
-%[insert:function(_execlp = execlp)]
-%[insert:function(_execle = execle)]
-%[insert:function(_execlpe = execlpe)]
-
-%[insert:function(_cwait = cwait)]
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-intptr_t _spawnv(__STDC_INT_AS_UINT_T mode,
-                 [[in]] char const *__restrict path,
-                 [[in]] char const *const *___argv) = spawnv;
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-intptr_t _spawnvp(__STDC_INT_AS_UINT_T mode,
-                  [[in]] char const *__restrict file,
-                  [[in]] char const *const *___argv) = spawnvp;
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-intptr_t _spawnve(__STDC_INT_AS_UINT_T mode,
-                  [[in]] char const *__restrict path,
-                  [[in]] char const *const *___argv,
-                  [[in]] char const *const *___envp) = spawnve;
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-intptr_t _spawnvpe(__STDC_INT_AS_UINT_T mode,
-                   [[in]] char const *__restrict file,
-                   [[in]] char const *const *___argv,
-                   [[in]] char const *const *___envp) = spawnvpe;
-
-[[ATTR_SENTINEL, decl_include("<features.h>", "<hybrid/typecore.h>")]]
-intptr_t _spawnl(__STDC_INT_AS_UINT_T mode,
-                 [[in]] char const *__restrict path,
-                 [[in_opt]] char const *args, ... /*, (char *)NULL*/) = spawnl;
-
-[[ATTR_SENTINEL, decl_include("<features.h>", "<hybrid/typecore.h>")]]
-intptr_t _spawnlp(__STDC_INT_AS_UINT_T mode,
-                  [[in]] char const *__restrict file,
-                  [[in_opt]] char const *args, ... /*, (char *)NULL*/) = spawnlp;
-
-[[ATTR_SENTINEL_O(1), decl_include("<features.h>", "<hybrid/typecore.h>")]]
-intptr_t _spawnle(__STDC_INT_AS_UINT_T mode,
-                  [[in]] char const *__restrict path,
-                  [[in_opt]] char const *args, ... /*, (char *)NULL, [[in]] (char **)environ*/) = spawnle;
-
-[[ATTR_SENTINEL_O(1), decl_include("<features.h>", "<hybrid/typecore.h>")]]
-intptr_t _spawnlpe(__STDC_INT_AS_UINT_T mode,
-                   [[in]] char const *__restrict file,
-                   [[in_opt]] char const *args, ... /*, (char *)NULL, [[in]] (char **)environ*/) = spawnlpe;
-
-%[insert:extern(system)]
-
-%
-%
-%
-%[define_c_language_keyword(__KOS_FIXED_CONST)]
-
-[[section(".text.crt.dos.fs.dlfcn")]]
-[[throws, decl_include("<features.h>", "<bits/types.h>")]]
-[[requires_include("<libdl/asm/dlfcn.h>")]]
-[[requires(defined(__CRT_HAVE_dlopen))]]
-[[crt_dos_variant, userimpl, impl_include("<dlfcn.h>")]]
-intptr_t _loaddll([[in_opt]] char __KOS_FIXED_CONST *file) {
-@@pp_if defined(@RTLD_LOCAL@)@@
-	return (intptr_t)(uintptr_t)@dlopen@(file, @RTLD_LOCAL@);
-@@pp_elif defined(@RTLD_GLOBAL@)@@
-	return (intptr_t)(uintptr_t)@dlopen@(file, @RTLD_GLOBAL@);
-@@pp_else@@
-	return (intptr_t)(uintptr_t)@dlopen@(file, 0);
-@@pp_endif@@
+[[section(".text.crt{|.dos}.fs.exec.spawn")]]
+[[cp, guard, ATTR_SENTINEL_O(1), impl_include("<parts/redirect-exec.h>")]]
+[[requires_dependent_function("spawnve"), dos_export_alias("_spawnle")]]
+[[decl_include("<features.h>", "<bits/types.h>"), crt_dos_variant]]
+$pid_t spawnle(__STDC_INT_AS_UINT_T mode, [[in]] char const *__restrict path,
+               [[in_opt]] char const *args, ... /*, (char *)NULL, [[in]] char **environ*/) {
+	__REDIRECT_SPAWNLE(char, spawnve, mode, path, args)
 }
 
-[[section(".text.crt.dos.fs.dlfcn")]]
-[[throws, decl_include("<bits/types.h>")]]
-[[impl_include("<dlfcn.h>")]]
-int _unloaddll(intptr_t hnd) {
-@@pp_ifdef __CRT_HAVE_dlclose@@
-	return @dlclose@((void *)(uintptr_t)hnd);
-@@pp_else@@
-	(void)hnd;
-	return 0;
-@@pp_endif@@
+[[section(".text.crt{|.dos}.fs.exec.spawn")]]
+[[cp, guard, ATTR_SENTINEL_O(1), impl_include("<parts/redirect-exec.h>")]]
+[[requires_dependent_function("spawnvpe"), dos_export_alias("_spawnlpe")]]
+[[decl_include("<features.h>", "<bits/types.h>"), crt_dos_variant]]
+$pid_t spawnlpe(__STDC_INT_AS_UINT_T mode, [[in]] char const *__restrict file,
+                [[in_opt]] char const *args, ... /*, (char *)NULL, [[in]] char **environ*/) {
+	__REDIRECT_SPAWNLE(char, spawnvpe, mode, file, args)
 }
 
-%
-%{
-#ifndef ____procfun_defined
-#define ____procfun_defined
-typedef int (*__procfun)(void);
-#endif /* !____procfun_defined */
-}
-%[define_replacement(__procfun = __procfun)]
-%[define_type_class(__procfun = "TP")]
-%[define(DEFINE_PROCFUN =
-#ifndef ____procfun_defined
-#define ____procfun_defined
-typedef int (*__procfun)(void);
-#endif /* !____procfun_defined */
-)]
-
-[[section(".text.crt.dos.fs.dlfcn")]]
-[[throws, decl_include("<features.h>", "<bits/types.h>")]]
-[[decl_prefix(DEFINE_PROCFUN)]]
-[[requires_include("<libdl/asm/dlfcn.h>")]]
-[[requires(defined(__CRT_HAVE_dlsym))]]
-[[impl_include("<dlfcn.h>")]]
-__procfun _getdllprocaddr(intptr_t hnd,
-                          [[in_opt]] char __KOS_FIXED_CONST *symname,
-                          intptr_t ord) {
-	(void)ord;
-	return (__procfun)@dlsym@((void *)(uintptr_t)hnd, symname);
-}
-
-
-%{
-
-#ifndef __wchar_t_defined
-#define __wchar_t_defined
-typedef __WCHAR_TYPE__ wchar_t;
-#endif /* !__wchar_t_defined */
-
-#ifndef __intptr_t_defined
-#define __intptr_t_defined
-typedef __intptr_t intptr_t;
-#endif /* !__intptr_t_defined */
-
-#ifndef __TWARGV
-#ifdef __USE_DOS_ALTERATIONS
-#define __TWARGV wchar_t const *const *__restrict ___argv
-#define __TWENVP wchar_t const *const *__restrict ___envp
-#else /* __USE_DOS_ALTERATIONS */
-#define __TWARGV wchar_t *const ___argv[__restrict_arr]
-#define __TWENVP wchar_t *const ___envp[__restrict_arr]
-#endif /* !__USE_DOS_ALTERATIONS */
-#endif /* !__TWARGV */
-
-}
-
-%[define_type_class(__TWARGV = "TP")]
-%[define_type_class(__TWENVP = "TP")]
-
-%
-%#endif /* __CC__ */
-%#endif /* __USE_DOS */
-
-%
-%
-%#if defined(__USE_DOS) || defined(__USE_KOS)
-
-%[insert:extern(getpid)]
-%[insert:extern(execv)]
-%[insert:extern(execvp)]
-%[insert:extern(execve)]
-%[insert:extern(execvpe)]
-%[insert:extern(execl)]
-%[insert:extern(execlp)]
-%[insert:extern(execle)]
-%[insert:extern(execlpe)]
-
-
-@@>> cwait(3)
-@@DOS name for `waitpid(2)', except that `action' is ignored. Use
-@@this function together with the `spawn(3)' family of functions.
-@@@return: pid: Child process exited.
-@@@return: -1:  Error (s.a. `errno')
-[[section(".text.crt.dos.fs.exec.spawn")]]
-[[decl_include("<features.h>", "<bits/types.h>")]]
-[[cp, dos_only_export_alias("_cwait"), requires_function(waitpid)]]
-$pid_t cwait([[out_opt]] int *tstat, $pid_t pid, __STDC_INT_AS_UINT_T action) {
-	/* This one's pretty simple, because it's literally just a waitpid() system call...
-	 * (It even returns the same  thing, that being the  PID of the joined  process...) */
-	/* NOTE: Apparently, the `action' argument is completely ignored... */
-	(void)action;
-	/* NOTE: `waitpid(2)' with `options: 0' means `WEXITED' */
-	return waitpid(pid, tstat, 0);
-}
 
 [[section(".text.crt{|.dos}.fs.exec.spawn")]]
 [[cp, guard, argument_names(mode, path, ___argv), dos_export_alias("_spawnv")]]
@@ -580,41 +345,43 @@ $pid_t spawnvpe(__STDC_INT_AS_UINT_T mode,
 	return -1;
 }
 
-[[section(".text.crt{|.dos}.fs.exec.spawn")]]
-[[cp, guard, ATTR_SENTINEL, impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function("spawnv"), dos_export_alias("_spawnl")]]
-[[decl_include("<features.h>", "<bits/types.h>"), crt_dos_variant]]
-$pid_t spawnl(__STDC_INT_AS_UINT_T mode, [[in]] char const *__restrict path,
-              [[in_opt]] char const *args, ... /*, (char *)NULL*/) {
-	__REDIRECT_SPAWNL(char, spawnv, mode, path, args)
+@@>> cwait(3)
+@@DOS name for `waitpid(2)', except that `action' is ignored. Use
+@@this function together with the `spawn(3)' family of functions.
+@@@return: pid: Child process exited.
+@@@return: -1:  Error (s.a. `errno')
+[[section(".text.crt.dos.fs.exec.spawn")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
+[[cp, dos_only_export_alias("_cwait"), requires_function(waitpid)]]
+$pid_t cwait([[out_opt]] int *tstat, $pid_t pid, __STDC_INT_AS_UINT_T action) {
+	/* This one's pretty simple, because it's literally just a waitpid() system call...
+	 * (It even returns the same  thing, that being the  PID of the joined  process...) */
+	/* NOTE: Apparently, the `action' argument is completely ignored... */
+	(void)action;
+	/* NOTE: `waitpid(2)' with `options: 0' means `WEXITED' */
+	return waitpid(pid, tstat, 0);
 }
 
-[[section(".text.crt{|.dos}.fs.exec.spawn")]]
-[[cp, guard, ATTR_SENTINEL, impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function("spawnvp"), dos_export_alias("_spawnlp")]]
-[[decl_include("<features.h>", "<bits/types.h>"), crt_dos_variant]]
-$pid_t spawnlp(__STDC_INT_AS_UINT_T mode, [[in]] char const *__restrict file,
-               [[in_opt]] char const *args, ... /*, (char *)NULL*/) {
-	__REDIRECT_SPAWNL(char, spawnvp, mode, file, args)
-}
 
-[[section(".text.crt{|.dos}.fs.exec.spawn")]]
-[[cp, guard, ATTR_SENTINEL_O(1), impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function("spawnve"), dos_export_alias("_spawnle")]]
-[[decl_include("<features.h>", "<bits/types.h>"), crt_dos_variant]]
-$pid_t spawnle(__STDC_INT_AS_UINT_T mode, [[in]] char const *__restrict path,
-               [[in_opt]] char const *args, ... /*, (char *)NULL, [[in]] char **environ*/) {
-	__REDIRECT_SPAWNLE(char, spawnve, mode, path, args)
-}
 
-[[section(".text.crt{|.dos}.fs.exec.spawn")]]
-[[cp, guard, ATTR_SENTINEL_O(1), impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function("spawnvpe"), dos_export_alias("_spawnlpe")]]
-[[decl_include("<features.h>", "<bits/types.h>"), crt_dos_variant]]
-$pid_t spawnlpe(__STDC_INT_AS_UINT_T mode, [[in]] char const *__restrict file,
-                [[in_opt]] char const *args, ... /*, (char *)NULL, [[in]] char **environ*/) {
-	__REDIRECT_SPAWNLE(char, spawnvpe, mode, file, args)
+%{
+
+
+/************************************************************************/
+/* KOS extensions                                                       */
+/************************************************************************/
 }
+%#if defined(__USE_DOS) || defined(__USE_KOS)
+
+%[insert:extern(getpid)]
+%[insert:extern(execv)]
+%[insert:extern(execvp)]
+%[insert:extern(execve)]
+%[insert:extern(execvpe)]
+%[insert:extern(execl)]
+%[insert:extern(execlp)]
+%[insert:extern(execle)]
+%[insert:extern(execlpe)]
 
 %#ifdef __USE_KOS
 [[section(".text.crt{|.dos}.fs.exec.spawn")]]
@@ -796,9 +563,236 @@ do_exec:
 %#endif /* __USE_KOS */
 %#endif /* __USE_DOS || __USE_KOS */
 
+
+%{
+
+/************************************************************************/
+/* DOS extensions                                                       */
+/************************************************************************/
+}
+%#ifdef __USE_DOS
+%{
+#ifndef __intptr_t_defined
+#define __intptr_t_defined
+typedef __intptr_t intptr_t;
+#endif /* !__intptr_t_defined */
+#ifndef __uintptr_t_defined
+#define __uintptr_t_defined
+typedef __uintptr_t uintptr_t;
+#endif /* !__uintptr_t_defined */
+
+}
+
+%[define_type_class(__dos_beginthreadex_entry_t = "TP")]
+%[define_replacement(__dos_beginthreadex_entry_t = __dos_beginthreadex_entry_t)]
+%[define(DEFINE_DOS_BEGINTHREADEX_ENTRY_T =
+@@pp_ifndef ____dos_beginthreadex_entry_t_defined@@
+#define ____dos_beginthreadex_entry_t_defined
+#ifdef __NO_ATTR_STDCALL
+typedef __UINT32_TYPE__ (__LIBDCALL *__dos_beginthreadex_entry_t)(void *__arg);
+#else /* __NO_ATTR_STDCALL */
+typedef __UINT32_TYPE__ (__ATTR_STDCALL *__dos_beginthreadex_entry_t)(void *__arg);
+#endif /* !__NO_ATTR_STDCALL */
+@@pp_endif@@
+)]
+
+%[insert:prefix(DEFINE_DOS_BEGINTHREADEX_ENTRY_T)]
+%
+
+
+
+%[insert:std]
+%[insert:guarded_std_function(exit)]
+%[insert:guarded_std_function(abort)]
+%[insert:guarded_function(_exit = _Exit)]
+
+
+[[decl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt.dos.sched.thread")]]
+uintptr_t _beginthread(void (LIBDCALL *entry)(void *arg), $u32 stacksz, void *arg);
+
+[[decl_include("<hybrid/typecore.h>")]]
+[[decl_prefix(DEFINE_DOS_BEGINTHREADEX_ENTRY_T)]]
+[[section(".text.crt.dos.sched.thread")]]
+uintptr_t _beginthreadex(void *sec, $u32 stacksz, __dos_beginthreadex_entry_t entry,
+                         void *arg, $u32 flags, $u32 *threadaddr);
+
+[[requires($has_function(_endthreadex))]]
+[[section(".text.crt.dos.sched.thread")]]
+void _endthread() {
+	_endthreadex(0);
+}
+
+[[decl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt.dos.sched.thread")]]
+void _endthreadex($u32 exitcode);
+
+[[throws, section(".text.crt.dos.sched.process")]]
+void _cexit();
+
+[[throws, section(".text.crt.dos.sched.process")]]
+void _c_exit() {
+}
+
+%[define(DEFINE__tls_callback_type =
+@@pp_ifndef ___tls_callback_type_defined@@
+#define ___tls_callback_type_defined
+#ifdef __NO_ATTR_STDCALL
+typedef void (__ATTR_MSABI *_tls_callback_type)(void * /*???*/, __ULONG32_TYPE__ /*???*/, void * /*???*/);
+#else /* __NO_ATTR_STDCALL */
+typedef void (__ATTR_STDCALL *_tls_callback_type)(void * /*???*/, __ULONG32_TYPE__ /*???*/, void * /*???*/);
+#endif /* !__NO_ATTR_STDCALL */
+@@pp_endif@@
+)]
+%[define_replacement(_tls_callback_type = _tls_callback_type)]
+
+%[insert:prefix(DEFINE__tls_callback_type)]
+
+[[section(".text.crt.dos.sched.process")]]
+[[crt_dos_only, decl_prefix(DEFINE__tls_callback_type)]]
+void _register_thread_local_exe_atexit_callback([[nonnull]] _tls_callback_type callback);
+
+
+
+
+%[insert:function(_getpid = getpid)]
+
+[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+int _execv([[in]] char const *__restrict path,
+           [[in]] char const *const *___argv) = execv;
+
+[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+int _execvp([[in]] char const *__restrict file,
+            [[in]] char const *const *___argv) = execvp;
+
+[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+int _execve([[in]] char const *__restrict path,
+            [[in]] char const *const *___argv,
+            [[in]] char const *const *___envp) = execve;
+
+[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+int _execvpe([[in]] char const *__restrict file,
+             [[in]] char const *const *___argv,
+             [[in]] char const *const *___envp) = execvpe;
+
+%[insert:function(_execl = execl)]
+%[insert:function(_execlp = execlp)]
+%[insert:function(_execle = execle)]
+%[insert:function(_execlpe = execlpe)]
+
+%[insert:function(_cwait = cwait)]
+
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+intptr_t _spawnv(__STDC_INT_AS_UINT_T mode,
+                 [[in]] char const *__restrict path,
+                 [[in]] char const *const *___argv) = spawnv;
+
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+intptr_t _spawnvp(__STDC_INT_AS_UINT_T mode,
+                  [[in]] char const *__restrict file,
+                  [[in]] char const *const *___argv) = spawnvp;
+
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+intptr_t _spawnve(__STDC_INT_AS_UINT_T mode,
+                  [[in]] char const *__restrict path,
+                  [[in]] char const *const *___argv,
+                  [[in]] char const *const *___envp) = spawnve;
+
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+intptr_t _spawnvpe(__STDC_INT_AS_UINT_T mode,
+                   [[in]] char const *__restrict file,
+                   [[in]] char const *const *___argv,
+                   [[in]] char const *const *___envp) = spawnvpe;
+
+[[ATTR_SENTINEL, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+intptr_t _spawnl(__STDC_INT_AS_UINT_T mode,
+                 [[in]] char const *__restrict path,
+                 [[in_opt]] char const *args, ... /*, (char *)NULL*/) = spawnl;
+
+[[ATTR_SENTINEL, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+intptr_t _spawnlp(__STDC_INT_AS_UINT_T mode,
+                  [[in]] char const *__restrict file,
+                  [[in_opt]] char const *args, ... /*, (char *)NULL*/) = spawnlp;
+
+[[ATTR_SENTINEL_O(1), decl_include("<features.h>", "<hybrid/typecore.h>")]]
+intptr_t _spawnle(__STDC_INT_AS_UINT_T mode,
+                  [[in]] char const *__restrict path,
+                  [[in_opt]] char const *args, ... /*, (char *)NULL, [[in]] (char **)environ*/) = spawnle;
+
+[[ATTR_SENTINEL_O(1), decl_include("<features.h>", "<hybrid/typecore.h>")]]
+intptr_t _spawnlpe(__STDC_INT_AS_UINT_T mode,
+                   [[in]] char const *__restrict file,
+                   [[in_opt]] char const *args, ... /*, (char *)NULL, [[in]] (char **)environ*/) = spawnlpe;
+
+%[insert:extern(system)]
+
+
+
+%
+%[define_c_language_keyword(__KOS_FIXED_CONST)]
+
+[[section(".text.crt.dos.fs.dlfcn")]]
+[[throws, decl_include("<features.h>", "<bits/types.h>")]]
+[[requires_include("<libdl/asm/dlfcn.h>")]]
+[[requires(defined(__CRT_HAVE_dlopen))]]
+[[crt_dos_variant, userimpl, impl_include("<dlfcn.h>")]]
+intptr_t _loaddll([[in_opt]] char __KOS_FIXED_CONST *file) {
+@@pp_if defined(@RTLD_LOCAL@)@@
+	return (intptr_t)(uintptr_t)@dlopen@(file, @RTLD_LOCAL@);
+@@pp_elif defined(@RTLD_GLOBAL@)@@
+	return (intptr_t)(uintptr_t)@dlopen@(file, @RTLD_GLOBAL@);
+@@pp_else@@
+	return (intptr_t)(uintptr_t)@dlopen@(file, 0);
+@@pp_endif@@
+}
+
+[[section(".text.crt.dos.fs.dlfcn")]]
+[[throws, decl_include("<bits/types.h>")]]
+[[impl_include("<dlfcn.h>")]]
+int _unloaddll(intptr_t hnd) {
+@@pp_ifdef __CRT_HAVE_dlclose@@
+	return @dlclose@((void *)(uintptr_t)hnd);
+@@pp_else@@
+	(void)hnd;
+	return 0;
+@@pp_endif@@
+}
+
+%
+%{
+#ifndef ____procfun_defined
+#define ____procfun_defined
+typedef int (*__procfun)(void);
+#endif /* !____procfun_defined */
+}
+%[define_replacement(__procfun = __procfun)]
+%[define_type_class(__procfun = "TP")]
+%[define(DEFINE_PROCFUN =
+#ifndef ____procfun_defined
+#define ____procfun_defined
+typedef int (*__procfun)(void);
+#endif /* !____procfun_defined */
+)]
+
+[[section(".text.crt.dos.fs.dlfcn")]]
+[[throws, decl_include("<features.h>", "<bits/types.h>")]]
+[[decl_prefix(DEFINE_PROCFUN)]]
+[[requires_include("<libdl/asm/dlfcn.h>")]]
+[[requires(defined(__CRT_HAVE_dlsym))]]
+[[impl_include("<dlfcn.h>")]]
+__procfun _getdllprocaddr(intptr_t hnd,
+                          [[in_opt]] char __KOS_FIXED_CONST *symname,
+                          intptr_t ord) {
+	(void)ord;
+	return (__procfun)@dlsym@((void *)(uintptr_t)hnd, symname);
+}
+
+%#endif /* __USE_DOS */
+
 %{
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #ifdef __USE_KOS
 #if defined(_WCHAR_H) && !defined(_PARTS_WCHAR_PROCESS_H)

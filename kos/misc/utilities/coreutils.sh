@@ -20,7 +20,6 @@
 require_utility libgmp "$PKG_CONFIG_PATH/gmp.pc"
 
 PACKAGE_URL="https://ftp.gnu.org/gnu/coreutils/coreutils-9.1.tar.xz"
-PACKAGE_NAME="coreutils-9.1"
 
 CONFIGURE=(
 	--disable-libsmack

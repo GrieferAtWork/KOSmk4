@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e94c39c */
+/* HASH CRC-32:0xb8cd2127 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1626,14 +1626,14 @@ DEFINE_PUBLIC_ALIAS(DOS$partition_union, libd_partition_union);
 DEFINE_PUBLIC_ALIAS(DOS$partition_print, libd_partition_print);
 
 /* process */
+DEFINE_PUBLIC_ALIAS(DOS$_cwait, libd_cwait);
+DEFINE_PUBLIC_ALIAS(DOS$cwait, libd_cwait);
+DEFINE_PUBLIC_ALIAS(DOS$fspawnve, libd_fspawnve);
 DEFINE_PUBLIC_ALIAS(DOS$_beginthread, libd__beginthread);
 DEFINE_PUBLIC_ALIAS(DOS$_beginthreadex, libd__beginthreadex);
 DEFINE_PUBLIC_ALIAS(DOS$_endthreadex, libd__endthreadex);
 DEFINE_PUBLIC_ALIAS(DOS$_unloaddll, libd__unloaddll);
 DEFINE_PUBLIC_ALIAS(DOS$_getdllprocaddr, libd__getdllprocaddr);
-DEFINE_PUBLIC_ALIAS(DOS$_cwait, libd_cwait);
-DEFINE_PUBLIC_ALIAS(DOS$cwait, libd_cwait);
-DEFINE_PUBLIC_ALIAS(DOS$fspawnve, libd_fspawnve);
 
 /* pthread */
 DEFINE_PUBLIC_ALIAS(DOS$thr_exit, libd_pthread_exit);
