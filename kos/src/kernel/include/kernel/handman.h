@@ -228,7 +228,7 @@ struct handrange {
 	                                    * Lowest FD (relative to `hr_minfd') which *may* be `HANDLE_TYPE_UNDEFINED'.
 	                                    * When searching for free slots, we only consider slots above this  relative
 	                                    * value, though due to race conditions, some may also exist below.
-	                                    * NOTE: Must be considered invalid as `>= handrange_count()' */
+	                                    * NOTE: Must be considered invalid if `>= handrange_count()' */
 	unsigned int             hr_nlops; /* [lock(INC(:hm_lock), DEC(ATOMIC))] Max # of lop-handles.
 	                                    * When non-zero, the  range may not  be reallocated  (only
 	                                    * inplace-realloc  is  allowed),  as  direct  pointers  to

@@ -97,9 +97,9 @@ struct handle_types {
 	 *       In other words: To check if a function is implemented, compare it with
 	 *                       its `HANDLE_TYPE_UNDEFINED' counterpart!
 	 * NOTE: The incref() and decref() functions for `HANDLE_TYPE_UNDEFINED' are no-ops.
-	 * NOTE: The  reason why type-ids  are vectored at  this lowest possible level
-	 *       is to speed up callback selection by ensuring a constant base address
-	 *      (since `handle_type_db' is known at compile-time, and offsets to fields
+	 * NOTE: The reason  why type-ids  are vectored  at this  lowest possible  level
+	 *       is to speed up callback selection  by ensuring a constant base  address
+	 *       (since `handle_type_db' is known at compile-time, and offsets to fields
 	 *       are known, also), with the type-index then only having to be multiplied
 	 *       by the size of a pointer.
 	 *       Thanks to this, the necessary call operation can be encoded as a single
