@@ -1780,6 +1780,7 @@ $1=$2"
 				export CXXFLAGS="-ggdb"
 				if ! test -z "${PACKAGE_CFLAGS+x}"; then export CFLAGS="$CFLAGS $PACKAGE_CFLAGS"; fi
 				if ! test -z "${PACKAGE_CXXFLAGS+x}"; then export CXXFLAGS="$CXXFLAGS $PACKAGE_CXXFLAGS"; fi
+				if ! test -z "${PACKAGE_LDFLAGS+x}"; then export LDFLAGS="$PACKAGE_LDFLAGS"; fi
 				if ! test -z "${PACKAGE_CCFLAGS+x}"; then
 					export CFLAGS="$CFLAGS $PACKAGE_CCFLAGS";
 					export CXXFLAGS="$CXXFLAGS $PACKAGE_CCFLAGS";
@@ -1819,6 +1820,7 @@ $1=$2"
 		fi
 		echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: Now running \e[${UI_COLCFG_NAME}m$PACKAGE_NAME\e[m: '\e[${UI_COLCFG_NAME}mmake\e[m'..." >&2
 		if ! test -z "${MAKE_TARGET+x}"; then
+			#cmd make "${MAKE_TARGET}"
 			cmd make -j "$MAKE_PARALLEL_COUNT" "${MAKE_TARGET}"
 		else
 			cmd make -j "$MAKE_PARALLEL_COUNT"
