@@ -337,7 +337,7 @@ __COMPILER_REDIRECT(__IMPDEF,__ATTR_WUNUSED __ATTR_NONNULL((2)),void *,,__DLFCN_
  *                exported from libdl.
  * @return: NULL: No error happened, or the last error has already been consumed. */
 #ifdef __CRT_HAVE_dlerror
-__IMPDEF __ATTR_WUNUSED char *__NOTHROW(__DLFCN_CC dlerror)(void);
+__IMPDEF char *__NOTHROW(__DLFCN_CC dlerror)(void);
 #endif /* __CRT_HAVE_dlerror */
 
 
