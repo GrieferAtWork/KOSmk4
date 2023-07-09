@@ -1343,7 +1343,7 @@ $size_t mbsnrtowcs([[out_opt/*(dstlen)*/]] wchar_t *__restrict dst,
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 [[decl_include("<hybrid/typecore.h>", "<bits/crt/mbstate.h>")]]
 $size_t wcsnrtombs([[out_opt/*(dstlen)*/]] char *dst,
-                   [[inout]] wchar_t const **__restrict psrc, $size_t nwc, size_t dstlen,
+                   [[inout]] wchar_t const **__restrict psrc, $size_t nwc, $size_t dstlen,
                    [[inout_opt]] $mbstate_t *mbs) {
 	size_t result = 0;
 	wchar_t const *src = *psrc;
