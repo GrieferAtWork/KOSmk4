@@ -230,8 +230,8 @@
 	__PH_IF_DEBUG_MALLOC(bind_zero(memleak_next, /*         */ ph_memleak_next, 2))          \
 	__PH_IF_DEBUG_MALLOC(bind_zero(memleak_getattr, /*      */ ph_memleak_getattr, 2))       \
 	__PH_IF_DEBUG_MALLOC(bind_func(kmalloc_trace_nx, /*     */ ph_kmalloc_trace_nx))         \
-	__PH_IF_DEBUG_MALLOC(bind_void(kmalloc_untrace, /*      */ ph_kmalloc_untrace, 1))       \
-	__PH_IF_DEBUG_MALLOC(bind_void(kmalloc_untrace_n, /*    */ ph_kmalloc_untrace_n, 2))     \
+	__PH_IF_DEBUG_MALLOC(bind_func(kmalloc_untrace, /*      */ ph_kmalloc_untrace))          \
+	__PH_IF_DEBUG_MALLOC(bind_func(kmalloc_untrace_n, /*    */ ph_kmalloc_untrace_n))        \
 	__PH_IF_DEBUG_MALLOC(bind_zero(kmalloc_traceback, /*    */ ph_kmalloc_traceback, 4))
 
 #ifdef __CC__

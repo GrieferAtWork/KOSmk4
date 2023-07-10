@@ -386,11 +386,11 @@ err:
  * point somewhere into an address range that has  previously
  * been registered by `kmalloc_trace()'.
  * NOTE: When `ptr' is `NULL', then this function does nothing. */
-PUBLIC NOBLOCK ATTR_NOINLINE void
+PUBLIC NOBLOCK ATTR_NOINLINE void *
 NOTHROW(KCALL kmalloc_untrace)(void *ptr) {
 	struct trace_node *node;
 	if unlikely(!ptr)
-		return;
+		goto done;
 	ptr = (void *)CEIL_ALIGN((uintptr_t)ptr, sizeof(void *));
 	tm_lock_acquire();
 	node = tm_nodes_remove(ptr);
@@ -399,8 +399,9 @@ NOTHROW(KCALL kmalloc_untrace)(void *ptr) {
 		kernel_panic_n(/* n_skip: */ 1,
 		               "kmalloc_untrace(%p): No node at this location",
 		               ptr);
-		return;
+		goto done;
 	}
+
 	switch (node->tn_kind) {
 
 	case TRACE_NODE_KIND_MALL: {
@@ -412,11 +413,12 @@ NOTHROW(KCALL kmalloc_untrace)(void *ptr) {
 		               ptr, trace_node_umin(node), trace_node_umax(node),
 		               &trace_node_print_traceback, node);
 		trace_node_free(node);
-		return;
+		goto done;
 	}	break;
 
 	case TRACE_NODE_KIND_BITSET: {
 		size_t i, ptr_index, minbit, maxbit, limit;
+
 		/* Special case: Partially untraced node. */
 		ptr_index = (size_t)((byte_t *)ptr - trace_node_uaddr(node)) / sizeof(void *);
 		limit     = trace_node_bitset_count(node);
@@ -428,7 +430,7 @@ NOTHROW(KCALL kmalloc_untrace)(void *ptr) {
 			kernel_panic_n(/* n_skip: */ 1,
 			               "kmalloc_untrace(%p): Node at %p...%p was already untraced",
 			               ptr, trace_node_umin(node), trace_node_umax(node));
-			return;
+			goto done;
 		}
 		minbit = ptr_index;
 		maxbit = ptr_index;
@@ -440,15 +442,17 @@ NOTHROW(KCALL kmalloc_untrace)(void *ptr) {
 			/* Completely remove this node. */
 			tm_lock_break();
 			trace_node_free(node);
-			return;
+			goto done;
 		}
+
 		/* Mark all address locations in [minbit, maxbit] as untraced. */
 		for (i = minbit; i <= maxbit; ++i)
 			trace_node_bitset_bitoff(node, i);
+
 		/* Re-insert the node into the tree */
 		tm_nodes_insert(node);
 		tm_lock_break();
-		return;
+		goto done;
 	}	break;
 
 	default: break;
@@ -459,6 +463,8 @@ NOTHROW(KCALL kmalloc_untrace)(void *ptr) {
 	 * removed it from the tree. */
 	tm_lock_release();
 	trace_node_free(node);
+done:
+	return ptr;
 }
 
 
@@ -639,9 +645,10 @@ again_while_num_bytes:
  * pre-existing  trace-node), that node will be changed such that the given range is marked
  * as  untraced, which will prevent the kernel from accessing its contents during GC scans.
  * In practice though, you shouldn't need to concern yourself with this behavior. */
-PUBLIC NOBLOCK ATTR_NOINLINE void
+PUBLIC NOBLOCK ATTR_NOINLINE void *
 NOTHROW(KCALL kmalloc_untrace_n)(void *base, size_t num_bytes) {
 	kmalloc_untrace_n_impl(base, num_bytes, 1);
+	return base;
 }
 
 /* Return the  traceback stored  inside of  the debug  descriptor of  `ptr'.

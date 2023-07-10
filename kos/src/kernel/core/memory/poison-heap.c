@@ -537,6 +537,8 @@ INTDEF void NOTHROW(KCALL ph_kffree)(void *ptr, gfp_t flags);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED void *
 NOTHROW(KCALL ph_kmalloc_trace_nx)(void *base, size_t num_bytes,
                                    gfp_t gfp, unsigned int tb_skip);
+INTDEF void *NOTHROW(KCALL ph_kmalloc_untrace)(void *ptr);
+INTDEF void *NOTHROW(KCALL ph_kmalloc_untrace_n)(void *ptr, size_t num_bytes);
 #ifdef POISON_HEAP_CONFIG_NEED_ZERO_FUNCTIONS
 INTDEF ATTR_CONST size_t KCALL ph_kmalloc_leaks(void);
 INTDEF ATTR_CONST kmalloc_leaks_t KCALL ph_kmalloc_leaks_collect(void);
@@ -546,8 +548,6 @@ INTDEF ATTR_CONST size_t KCALL ph_kmalloc_traceback(void *ptr, /*out*/ void **tb
 #ifdef POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS
 INTDEF void NOTHROW(KCALL ph_kmalloc_validate)(void);
 INTDEF void NOTHROW(KCALL ph_kmalloc_leaks_release)(kmalloc_leaks_t leaks, unsigned int how);
-INTDEF void NOTHROW(KCALL ph_kmalloc_untrace)(void *ptr);
-INTDEF void NOTHROW(KCALL ph_kmalloc_untrace_n)(void *ptr, size_t num_bytes);
 #endif /* POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS */
 #endif /* !CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 
@@ -803,6 +803,16 @@ NOTHROW(KCALL ph_kmalloc_trace_nx)(void *base, size_t UNUSED(num_bytes),
 	return base;
 }
 
+INTERN ATTR_COLDTEXT void *
+NOTHROW(KCALL ph_kmalloc_untrace)(void *ptr) {
+	return ptr;
+}
+
+INTERN ATTR_COLDTEXT void *
+NOTHROW(KCALL ph_kmalloc_untrace_n)(void *base, size_t UNUSED(num_bytes)) {
+	return base;
+}
+
 #ifdef POISON_HEAP_CONFIG_NEED_ZERO_FUNCTIONS
 INTERN ATTR_COLDTEXT ATTR_CONST size_t KCALL
 ph_kmalloc_leaks(void) {
@@ -852,16 +862,6 @@ NOTHROW(KCALL ph_kmalloc_validate)(void) {
 INTERN ATTR_COLDTEXT void
 NOTHROW(KCALL ph_kmalloc_leaks_release)(kmalloc_leaks_t UNUSED(leaks),
                                         unsigned int UNUSED(how)) {
-	/* no-op */
-}
-
-INTERN ATTR_COLDTEXT void
-NOTHROW(KCALL ph_kmalloc_untrace)(void *UNUSED(ptr)) {
-	/* no-op */
-}
-
-INTERN ATTR_COLDTEXT void
-NOTHROW(KCALL ph_kmalloc_untrace_n)(void *UNUSED(ptr), size_t UNUSED(num_bytes)) {
 	/* no-op */
 }
 #endif /* POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS */

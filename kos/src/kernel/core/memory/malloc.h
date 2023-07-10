@@ -47,8 +47,8 @@ INTDEF NOBLOCK ATTR_PURE void *FCALL untraced_memleak_getattr(memleak_t self, ui
 INTDEF NOBLOCK void NOTHROW(KCALL untraced_kmalloc_leaks_release)(kmalloc_leaks_t leaks, unsigned int now);
 INTDEF NOBLOCK_IF(gfp & GFP_ATOMIC) WUNUSED void *NOTHROW(KCALL untraced_kmalloc_trace_nx)(void *base, size_t num_bytes, gfp_t gfp, unsigned int tb_skip);
 INTDEF NOBLOCK_IF(gfp & GFP_ATOMIC) ATTR_RETNONNULL void *KCALL untraced_kmalloc_trace(void *base, size_t num_bytes, gfp_t gfp, unsigned int tb_skip) THROWS(E_BADALLOC, E_WOULDBLOCK);
-INTDEF NOBLOCK void NOTHROW(KCALL untraced_kmalloc_untrace)(void *ptr);
-INTDEF NOBLOCK void NOTHROW(KCALL untraced_kmalloc_untrace_n)(void *ptr, size_t num_bytes);
+INTDEF NOBLOCK ATTR_CONST void *NOTHROW(KCALL untraced_kmalloc_untrace)(void *ptr);
+INTDEF NOBLOCK ATTR_CONST void *NOTHROW(KCALL untraced_kmalloc_untrace_n)(void *base, size_t num_bytes);
 INTDEF NOBLOCK size_t NOTHROW(KCALL untraced_kmalloc_traceback)(void *ptr, /*out*/ void **tb, size_t buflen, pid_t *p_alloc_roottid);
 INTDEF NOBLOCK ssize_t KCALL untraced_kmalloc_printtrace(void *ptr, __pformatprinter printer, void *arg);
 INTDEF ATTR_MALLOC WUNUSED void *KCALL untraced_kmalloc_noslab(size_t n_bytes, gfp_t flags);

@@ -465,8 +465,9 @@ NOTHROW(KCALL kmalloc_trace_nx)(void *base, size_t num_bytes,
  * For this  purpose, `CEIL_ALIGN(ptr, sizeof(void *))'  must
  * point somewhere into an address range that has  previously
  * been registered by `kmalloc_trace()'.
- * NOTE: When `ptr' is `NULL', then this function does nothing. */
-FUNDEF NOBLOCK void
+ * NOTE: When `ptr' is `NULL', then this function does nothing.
+ * @return: * : Always re-returns `ptr' */
+FUNDEF NOBLOCK void *
 NOTHROW(KCALL kmalloc_untrace)(void *ptr);
 
 /* Similar to `kmalloc_untrace()', but explicitly untrace only the given address range.
@@ -478,13 +479,14 @@ NOTHROW(KCALL kmalloc_untrace)(void *ptr);
  * can happen when this function would  have to carve out a  chunk from the middle of  some
  * pre-existing  trace-node), that node will be changed such that the given range is marked
  * as  untraced, which will prevent the kernel from accessing its contents during GC scans.
- * In practice though, you shouldn't need to concern yourself with this behavior. */
-FUNDEF NOBLOCK void
+ * In practice though, you shouldn't need to concern yourself with this behavior.
+ * @return: * : Always re-returns `base' */
+FUNDEF NOBLOCK void *
 NOTHROW(KCALL kmalloc_untrace_n)(void *base, size_t num_bytes);
 
 #ifdef __cplusplus
 extern "C++" {
-FUNDEF NOBLOCK void
+FUNDEF NOBLOCK void *
 NOTHROW(KCALL kmalloc_untrace)(void *base, size_t num_bytes) ASMNAME("kmalloc_untrace_n");
 } /* extern "C++" */
 #endif /* __cplusplus */
@@ -571,10 +573,10 @@ DECL_END
 #ifdef __CC__
 #define memleak_t                                         void *
 #define kmalloc_leaks_t                                   void *
-#define kmalloc_trace(base, num_bytes, flags, tb_skip)    (base)
-#define kmalloc_trace_nx(base, num_bytes, flags, tb_skip) (base)
-#define kmalloc_untrace(...)                              (void)0
-#define kmalloc_untrace_n(ptr, num_bytes)                 (void)0
+#define kmalloc_trace(base, num_bytes, flags, tb_skip)    (void *)(base)
+#define kmalloc_trace_nx(base, num_bytes, flags, tb_skip) (void *)(base)
+#define kmalloc_untrace(base, ...)                        (void *)(base)
+#define kmalloc_untrace_n(base, num_bytes)                (void *)(base)
 #define kmalloc_traceback(ptr, tb, buflen)                0
 #define kmalloc_validate()                                (void)0
 #define kmalloc_leaks()                                   0
