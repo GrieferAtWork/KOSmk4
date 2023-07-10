@@ -770,7 +770,7 @@ again_rw_region:
 		} else {
 			buf = mempcpy(buf, rdat, avail_bytes);
 		}
-		addr = (USER byte_t *)addr + avail_bytes;
+		addr = (byte_t USER *)addr + avail_bytes;
 		num_bytes -= avail_bytes;
 		/* Some data is still missing.
 		 * -> Check if the next region starts where the current left off.
@@ -1150,7 +1150,7 @@ do_create_far_region:
 					} else {
 						/* Extend upwards */
 						size_t missing_bytes;
-						USER byte_t *missing_addr_start;
+						byte_t USER *missing_addr_start;
 						assertf((byte_t *)addr + access_bytes - 1 > region->mr_addrhi,
 						        "addr + .... - 1    = %p\n"
 						        "region->mr_addrhi  = %p\n",
@@ -1174,7 +1174,7 @@ do_create_far_region:
 						region = rtm_memory_realloc_region(self, region,
 						                                   old_region_size +
 						                                   missing_bytes);
-						missing_addr_start = (USER byte_t *)region->mr_addrhi + 1;
+						missing_addr_start = (byte_t USER *)region->mr_addrhi + 1;
 						region->mr_addrhi  = (byte_t *)region->mr_addrhi + missing_bytes;
 						assert((byte_t *)region->mr_addrhi ==
 						       (byte_t *)region->mr_addrlo + old_region_size + missing_bytes - 1);

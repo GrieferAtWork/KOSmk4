@@ -34,6 +34,7 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <hybrid/sequence/bsearch.h>
 #include <hybrid/unaligned.h>
 
+#include <kos/anno.h>
 #include <kos/except.h>
 #include <kos/exec/module.h>
 #include <kos/types.h>
@@ -130,38 +131,38 @@ struct unwind_register {
 
 struct cfientry_sections {
 	/*BEGIN:compat(unwind_emulator_sections_t)*/
-	__byte_t const *ds_eh_frame_hdr_start;   /* [0..1][valid_if(:ce_s_eh_frame_hdr)] `.eh_frame_hdr' start */
-	__byte_t const *ds_eh_frame_hdr_end;     /* [0..1][valid_if(:ce_s_eh_frame_hdr)] `.eh_frame_hdr' end */
-	__byte_t const *ds_eh_frame_start;       /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' start */
-	__byte_t const *ds_eh_frame_end;         /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' end */
-	__byte_t const *ds_debug_frame_start;    /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' start */
-	__byte_t const *ds_debug_frame_end;      /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' end */
-	__byte_t const *ds_debug_addr_start;     /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' start */
-	__byte_t const *ds_debug_addr_end;       /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' end */
+	__byte_t __CHECKED const *ds_eh_frame_hdr_start;   /* [0..1][valid_if(:ce_s_eh_frame_hdr)] `.eh_frame_hdr' start */
+	__byte_t __CHECKED const *ds_eh_frame_hdr_end;     /* [0..1][valid_if(:ce_s_eh_frame_hdr)] `.eh_frame_hdr' end */
+	__byte_t __CHECKED const *ds_eh_frame_start;       /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' start */
+	__byte_t __CHECKED const *ds_eh_frame_end;         /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' end */
+	__byte_t __CHECKED const *ds_debug_frame_start;    /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' start */
+	__byte_t __CHECKED const *ds_debug_frame_end;      /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' end */
+	__byte_t __CHECKED const *ds_debug_addr_start;     /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' start */
+	__byte_t __CHECKED const *ds_debug_addr_end;       /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' end */
 	/*BEGIN:compat(di_debuginfo_cu_parser_sections_t)*/
-	__byte_t const *ds_debug_loclists_start; /* [0..1][valid_if(:ce_s_debug_loclists)] `.debug_loclists' start */
-	__byte_t const *ds_debug_loclists_end;   /* [0..1][valid_if(:ce_s_debug_loclists)] `.debug_loclists' end */
-	__byte_t const *ds_debug_loc_start;      /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' start */
-	__byte_t const *ds_debug_loc_end;        /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' end */
-	__byte_t const *ds_debug_abbrev_start;   /* [0..1][const] `.debug_abbrev' start */
-	__byte_t const *ds_debug_abbrev_end;     /* [0..1][const] `.debug_abbrev' end */
-	__byte_t const *ds_debug_info_start;     /* [0..1][const] `.debug_info' start */
-	__byte_t const *ds_debug_info_end;       /* [0..1][const] `.debug_info' end */
+	__byte_t __CHECKED const *ds_debug_loclists_start; /* [0..1][valid_if(:ce_s_debug_loclists)] `.debug_loclists' start */
+	__byte_t __CHECKED const *ds_debug_loclists_end;   /* [0..1][valid_if(:ce_s_debug_loclists)] `.debug_loclists' end */
+	__byte_t __CHECKED const *ds_debug_loc_start;      /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' start */
+	__byte_t __CHECKED const *ds_debug_loc_end;        /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' end */
+	__byte_t __CHECKED const *ds_debug_abbrev_start;   /* [0..1][const] `.debug_abbrev' start */
+	__byte_t __CHECKED const *ds_debug_abbrev_end;     /* [0..1][const] `.debug_abbrev' end */
+	__byte_t __CHECKED const *ds_debug_info_start;     /* [0..1][const] `.debug_info' start */
+	__byte_t __CHECKED const *ds_debug_info_end;       /* [0..1][const] `.debug_info' end */
 	/*END:compat(unwind_emulator_sections_t)*/
 	/*BEGIN:compat(di_string_sections_t)*/
-	__byte_t const *ds_debug_str_start;      /* [0..0][const] Always NULL */
-	__byte_t const *ds_debug_str_end;        /* [0..0][const] Always NULL */
-	__byte_t const *ds_debug_str_line_start; /* [0..0][const] Always NULL */
-	__byte_t const *ds_debug_str_line_end;   /* [0..0][const] Always NULL */
+	__byte_t __CHECKED const *ds_debug_str_start;      /* [0..0][const] Always NULL */
+	__byte_t __CHECKED const *ds_debug_str_end;        /* [0..0][const] Always NULL */
+	__byte_t __CHECKED const *ds_debug_str_line_start; /* [0..0][const] Always NULL */
+	__byte_t __CHECKED const *ds_debug_str_line_end;   /* [0..0][const] Always NULL */
 	/*END:compat(di_string_sections_t)*/
 	/*END:compat(di_debuginfo_cu_parser_sections_t)*/
-	__byte_t const *ds_debug_aranges_start;  /* [0..1][const] `.debug_aranges' start */
-	__byte_t const *ds_debug_aranges_end;    /* [0..1][const] `.debug_aranges' end */
+	__byte_t __CHECKED const *ds_debug_aranges_start;  /* [0..1][const] `.debug_aranges' start */
+	__byte_t __CHECKED const *ds_debug_aranges_end;    /* [0..1][const] `.debug_aranges' end */
 	/*BEGIN:compat(di_rnglists_sections_t)*/
-	__byte_t const *ds_debug_rnglists_start; /* [0..1][valid_if(:ce_s_debug_rnglists)] `.debug_rnglists' start */
-	__byte_t const *ds_debug_rnglists_end;   /* [0..1][valid_if(:ce_s_debug_rnglists)] `.debug_rnglists' end */
-	__byte_t const *ds_debug_ranges_start;   /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' start */
-	__byte_t const *ds_debug_ranges_end;     /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' end */
+	__byte_t __CHECKED const *ds_debug_rnglists_start; /* [0..1][valid_if(:ce_s_debug_rnglists)] `.debug_rnglists' start */
+	__byte_t __CHECKED const *ds_debug_rnglists_end;   /* [0..1][valid_if(:ce_s_debug_rnglists)] `.debug_rnglists' end */
+	__byte_t __CHECKED const *ds_debug_ranges_start;   /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' start */
+	__byte_t __CHECKED const *ds_debug_ranges_end;     /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' end */
 	/*END:compat(di_rnglists_sections_t)*/
 };
 #define cfientry_sections_as_unwind_emulator_sections(self)        ((unwind_emulator_sections_t *)&(self)->ds_eh_frame_hdr_start)
@@ -268,7 +269,7 @@ NOTHROW_NCX(CC find_register)(struct cfientry *__restrict self,
                               unwind_regno_t dw_regno) {
 	size_t i;
 	/* Check if the register can be found as part of unwind information. */
-	BSEARCH(i, self->ce_unwind_regv, self->ce_unwind_regc, .ur_regno, dw_regno) {
+	BSEARCH (i, self->ce_unwind_regv, self->ce_unwind_regc, .ur_regno, dw_regno) {
 		return &self->ce_unwind_regv[i];
 	}
 	return NULL;
@@ -280,10 +281,10 @@ NOTHROW_NCX(CC find_register)(struct cfientry *__restrict self,
  * simply forward the request to `arg->ce_regget'.
  * This function is used to facilitate register access inside of call-site parameter
  * expressions found in  `DW_TAG_GNU_call_site_parameter:DW_AT_GNU_call_site_value'. */
-PRIVATE NONNULL((1, 3)) unwind_errno_t
+PRIVATE NONNULL((1)) unwind_errno_t
 NOTHROW_NCX(LIBUNWIND_CC after_unwind_getreg)(/*struct cfientry **/ void const *arg,
                                               unwind_regno_t dw_regno,
-                                              void *__restrict dst) {
+                                              __CHECKED void *dst) {
 	struct cfientry *self;
 	size_t i;
 	self = (struct cfientry *)arg;
@@ -652,7 +653,7 @@ NOTHROW_NCX(CC is_cfi_expression_a_simple_register_push)(struct cfientry *__rest
                                                          di_debuginfo_location_t const *__restrict loc,
                                                          unwind_regno_t dw_regno) {
 	size_t length;
-	byte_t const *expr;
+	byte_t __CHECKED const *expr;
 	expr = debuginfo_location_select(loc, self->cr_cu.cu_ranges.r_startpc,
 	                                 self->ce_modrelpc,
 	                                 self->ce_parser.dsp_addrsize, &length);
@@ -691,10 +692,10 @@ NOTHROW_NCX(CC is_cfi_expression_a_simple_register_push)(struct cfientry *__rest
 __pragma_GCC_diagnostic_pop_ignored(Wmaybe_uninitialized)
 
 
-PRIVATE NONNULL((1, 3)) unwind_errno_t
+PRIVATE NONNULL((1)) unwind_errno_t
 NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
                                      unwind_regno_t dw_regno,
-                                     void *__restrict dst);
+                                     __CHECKED void *dst);
 
 /* GCC claims that "expr_length" in  the below function is uninitialized,  when
  * clearly it is very much getting initialized by `debuginfo_location_select()' */
@@ -702,10 +703,10 @@ __pragma_GCC_diagnostic_push_ignored(Wmaybe_uninitialized)
 
 /* @param: deref_expression_result: When true, dereference the expression result, and
  *                                  copy the  pointed-to memory  contents into  `dst' */
-PRIVATE ATTR_NOINLINE NONNULL((1, 2, 4)) unwind_errno_t
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) unwind_errno_t
 NOTHROW_NCX(LIBUNWIND_CC evaluate_call_site_expression)(struct cfientry *__restrict self,
                                                         di_debuginfo_location_t const *__restrict location,
-                                                        unwind_regno_t dw_regno, void *__restrict dst,
+                                                        unwind_regno_t dw_regno, __CHECKED void *dst,
                                                         bool deref_expression_result) {
 	unwind_emulator_t emulator;
 	size_t expr_length;
@@ -858,7 +859,7 @@ __pragma_GCC_diagnostic_pop_ignored(Wmaybe_uninitialized)
 PRIVATE NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
                                      unwind_regno_t dw_regno,
-                                     void *__restrict dst) {
+                                     __CHECKED void *dst) {
 	struct cfientry *self;
 	size_t i;
 	byte_t const *saved_dip;
@@ -992,7 +993,7 @@ NOTHROW_NCX(CC make_rvalue)(unwind_emulator_t *__restrict self,
 PRIVATE NONNULL((1, 3)) unwind_errno_t LIBUNWIND_CC
 cfi_entry_init_setreg(void *arg,
                       unwind_regno_t dw_regno,
-                      void const *__restrict src) {
+                      __CHECKED void const *src) {
 	struct cfientry *self;
 	size_t index, lo, hi;
 	self = (struct cfientry *)arg;
@@ -1154,12 +1155,12 @@ done:
  * @return: UNWIND_EMULATOR_*:       ... */
 INTERN WUNUSED NONNULL((1, 2, 3)) unwind_errno_t
 NOTHROW_NCX(CC libdi_debuginfo_run_entry_value_emulator)(unwind_emulator_t *__restrict self,
-                                                         byte_t const *cfi_start_pc,
-                                                         byte_t const *cfi_end_pc) {
+                                                         byte_t __CHECKED const *cfi_start_pc,
+                                                         byte_t __CHECKED const *cfi_end_pc) {
 	unwind_errno_t result;
-	byte_t const *saved_pc;
-	byte_t const *saved_pc_start;
-	byte_t const *saved_pc_end;
+	byte_t __CHECKED const *saved_pc;
+	byte_t __CHECKED const *saved_pc_start;
+	byte_t __CHECKED const *saved_pc_end;
 	unwind_setreg_t saved_regset;
 
 #ifndef __KERNEL__

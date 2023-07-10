@@ -496,15 +496,14 @@ NOTHROW(KCALL dbg_waitforinput)(void) {
 
 /* @param: insert_match: When true, insert a matched word when there is only one that matches.
  * @param: pbad_cmd:     Set to true if the written command is badly formatted. */
-PRIVATE ATTR_DBGTEXT ATTR_NOINLINE size_t
-NOTHROW(KCALL dbg_autocomplete)(size_t cursor,
-                                u32 screen_cursor_pos
+PRIVATE ATTR_DBGTEXT ATTR_NOINLINE size_t KCALL
+dbg_autocomplete(size_t cursor,
+                 u32 screen_cursor_pos
 #ifdef CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE
-                                ,
-                                bool *pbad_cmd,
-                                bool insert_match
+                 , bool *pbad_cmd
+                 , bool insert_match
 #endif /* CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE */
-                                ) {
+                 ) {
 	size_t argc, effective_argc;
 	dbg_autocomplete_t autofun;
 	uintptr_t func_flags;
@@ -923,11 +922,17 @@ continue_readline:
 				 * if we got here because the user pressed TAB! */
 				if (did_press_tab)
 					dbg_awaituser_end(true);
-				cursor_pos = dbg_autocomplete(cursor_pos,
-				                              DBG_MAKECUR(DBG_GETCUR_X(cur) + (cursor_pos -
-				                                                               screen_left),
-				                                          DBG_GETCUR_Y(cur)),
-				                              &badcmd, did_press_tab);
+				TRY {
+					cursor_pos = dbg_autocomplete(cursor_pos,
+					                              DBG_MAKECUR(DBG_GETCUR_X(cur) + (cursor_pos -
+					                                                               screen_left),
+					                                          DBG_GETCUR_Y(cur)),
+					                              &badcmd, did_press_tab);
+				} EXCEPT {
+					/* Handle exceptions during auto-complete */
+					except_print_into(&dbg_printer, NULL);
+					goto again_readline;
+				}
 				if (badcmd) {
 					dbg_beginupdate();
 					dbg_setcolor(AUTOCOMPLETE_CC_BADCMD, ANSITTY_CL_DARK_GRAY);

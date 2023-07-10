@@ -24,6 +24,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
 #include <kos/types.h>
 
 #include <format-printer.h>
@@ -71,12 +72,12 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW(CC libdi_debug_repr_DW_EH_PE)(uint
  * >>                 debug_str_data, debug_str_data + debug_str_size); */
 INTDEF NONNULL((1)) ssize_t CC
 libdi_debug_repr_dump(pformatprinter printer, void *arg,
-                      byte_t const *debug_info_start, byte_t const *debug_info_end,
-                      byte_t const *debug_abbrev_start, byte_t const *debug_abbrev_end,
-                      byte_t const *debug_loc_start, byte_t const *debug_loc_end,
-                      byte_t const *debug_loclists_start, byte_t const *debug_loclists_end,
-                      byte_t const *debug_str_start, byte_t const *debug_str_end,
-                      byte_t const *debug_line_str_start, byte_t const *debug_line_str_end);
+                      byte_t __CHECKED const *debug_info_start, byte_t __CHECKED const *debug_info_end,
+                      byte_t __CHECKED const *debug_abbrev_start, byte_t __CHECKED const *debug_abbrev_end,
+                      byte_t __CHECKED const *debug_loc_start, byte_t __CHECKED const *debug_loc_end,
+                      byte_t __CHECKED const *debug_loclists_start, byte_t __CHECKED const *debug_loclists_end,
+                      byte_t __CHECKED const *debug_str_start, byte_t __CHECKED const *debug_str_end,
+                      byte_t __CHECKED const *debug_line_str_start, byte_t __CHECKED const *debug_line_str_end);
 
 /* Print the  disassembly of  a given  CFI expression  starting at  `pc',
  * covering a total  of `length'  bytes. One instruction  is printed  per
@@ -98,7 +99,7 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
  * @return: * : The usual pformatprinter-style value. */
 INTDEF NONNULL((1, 3)) ssize_t CC
 libdl_debug_repr_cfi_expression_ex(pformatprinter printer, void *arg,
-                                   byte_t const *__restrict pc, size_t length,
+                                   byte_t __CHECKED const *__restrict pc, size_t length,
                                    size_t indent, byte_t addrsize, byte_t ptrsize,
                                    bool indent_on_first_line);
 
@@ -119,7 +120,7 @@ libdl_debug_repr_cfi_expression_ex(pformatprinter printer, void *arg,
  * @return: * : The usual pformatprinter-style value. */
 INTDEF NONNULL((1, 3)) ssize_t CC
 libdl_debug_repr_cfi_expression_with_length(pformatprinter printer, void *arg,
-                                            byte_t const *__restrict expr,
+                                            byte_t __CHECKED const *__restrict expr,
                                             size_t length, size_t indent,
                                             byte_t addrsize, byte_t ptrsize);
 
@@ -134,7 +135,7 @@ libdl_debug_repr_cfi_expression_with_length(pformatprinter printer, void *arg,
  * @return: * : The usual pformatprinter-style value. */
 INTDEF NONNULL((1, 3)) ssize_t CC
 libdl_debug_repr_cfi_expression(pformatprinter printer, void *arg,
-                                byte_t const *__restrict expr, size_t indent,
+                                byte_t __CHECKED const *__restrict expr, size_t indent,
                                 byte_t addrsize, byte_t ptrsize);
 #endif /* __KERNEL__ */
 

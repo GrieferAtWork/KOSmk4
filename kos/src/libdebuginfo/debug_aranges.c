@@ -35,6 +35,9 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 
+#include <kos/anno.h>
+#include <kos/types.h>
+
 #include <stdint.h>
 
 #include <libdebuginfo/debug_aranges.h>
@@ -55,11 +58,11 @@ DECL_BEGIN
  * @return: DEBUG_INFO_ERROR_NOFRAME: ...
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 INTERN TEXTSECTION NONNULL((1, 2, 3)) debuginfo_errno_t
-NOTHROW_NCX(CC libdi_debugaranges_locate)(byte_t const *__restrict debug_aranges_start,
-                                          byte_t const *__restrict debug_aranges_end,
+NOTHROW_NCX(CC libdi_debugaranges_locate)(byte_t __CHECKED const *__restrict debug_aranges_start,
+                                          byte_t __CHECKED const *__restrict debug_aranges_end,
                                           uintptr_t *__restrict pdebug_info_cu_offset,
                                           uintptr_t module_relative_pc) {
-	byte_t const *reader, *next;
+	byte_t __CHECKED const *reader, *next;
 	uintptr_t debug_info_cu_offset;
 	reader = debug_aranges_start;
 	while (reader < debug_aranges_end) {
@@ -98,8 +101,8 @@ NOTHROW_NCX(CC libdi_debugaranges_locate)(byte_t const *__restrict debug_aranges
 			length = (uintptr_t)UNALIGNED_GET64(reader);
 			reader += 8;
 		}
-		addrsize = *(uint8_t const *)reader, reader += 1; /* address_size */
-		segsize  = *(uint8_t const *)reader, reader += 1; /* segment_size */
+		addrsize = *(uint8_t __CHECKED const *)reader, reader += 1; /* address_size */
+		segsize  = *(uint8_t __CHECKED const *)reader, reader += 1; /* segment_size */
 #if __SIZEOF_POINTER__ > 4
 		if unlikely(addrsize != 1 && addrsize != 2 && addrsize != 4 && addrsize != 8)
 			return DEBUG_INFO_ERROR_CORRUPT;

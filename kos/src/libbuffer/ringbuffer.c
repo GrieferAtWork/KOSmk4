@@ -198,7 +198,7 @@ NOTHROW(CC ringbuffer_trimbuf_and_endwrite)(struct ringbuffer *__restrict self) 
  * @return: * : The number of bytes read. */
 INTERN BLOCKING NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libringbuffer_read(struct ringbuffer *__restrict self,
-                   __USER __CHECKED void *dst, size_t num_bytes)
+                   void __USER __CHECKED *dst, size_t num_bytes)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...) {
 	size_t result, temp;
 	IF_KERNEL(assert(!task_wasconnected()));
@@ -255,7 +255,7 @@ again_connect:
 
 INTERN NONNULL((1)) size_t CC
 libringbuffer_read_nonblock(struct ringbuffer *__restrict self,
-                            __USER __CHECKED void *dst, size_t num_bytes)
+                            void __USER __CHECKED *dst, size_t num_bytes)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
 	bool was_full;
 	size_t result = 0;
@@ -435,7 +435,7 @@ done:
  * @return: -1: [USERSPACE] Failed to increase the buffer size (s.a. `errno = ENOMEM') */
 INTERN BLOCKING NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libringbuffer_write(struct ringbuffer *__restrict self,
-                    __USER __CHECKED void const *src, size_t num_bytes)
+                    void __USER __CHECKED const *src, size_t num_bytes)
 		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
 		              THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...)) {
 	KERNEL_SELECT(size_t, ssize_t) result, temp;
@@ -511,7 +511,7 @@ again_connect:
 
 INTERN BLOCKING NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libringbuffer_writesome(struct ringbuffer *__restrict self,
-                        __USER __CHECKED void const *src, size_t num_bytes)
+                        void __USER __CHECKED const *src, size_t num_bytes)
 		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
 		              THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...)) {
 	KERNEL_SELECT(size_t, ssize_t) result, temp;
@@ -587,7 +587,7 @@ again_connect:
 
 INTERN NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libringbuffer_write_nonblock(struct ringbuffer *__restrict self,
-                             __USER __CHECKED void const *src, size_t num_bytes)
+                             void __USER __CHECKED const *src, size_t num_bytes)
 		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_BADALLOC),
 		              THROWS(E_SEGFAULT, E_WOULDBLOCK)) {
 	size_t result;
@@ -684,7 +684,7 @@ done:
 /* Same as `ringbuffer_write_nonblock()', but don't increase the buffer's size. */
 INTERN NONNULL((1)) size_t CC
 libringbuffer_write_nonblock_noalloc(struct ringbuffer *__restrict self,
-                                     __USER __CHECKED void const *src, size_t num_bytes)
+                                     void __USER __CHECKED const *src, size_t num_bytes)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
 	bool was_empty;
 	size_t result = 0;

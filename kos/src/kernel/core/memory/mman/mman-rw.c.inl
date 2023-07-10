@@ -182,7 +182,7 @@ mman_memset(struct mman *__restrict self,
 			mman_write(self, addr, tempbuf, transfer);
 #endif /* ... */
 
-			addr = (UNCHECKED byte_t *)addr + transfer;
+			addr = (byte_t UNCHECKED *)addr + transfer;
 			buf  = (byte_t *)buf + transfer;
 			num_bytes -= transfer;
 

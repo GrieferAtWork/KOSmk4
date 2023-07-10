@@ -136,47 +136,47 @@ struct cmodsym {
 	 *    define its own version of e.g. `struct tm'.
 	 *    In this case, an attempt is made to only store a single instance of
 	 *    `struct tm', which will appear within the per-module symbol  table. */
-	char const   *cms_name; /* [1..1] Symbol name (usually points into `.debug_str', and
-	                         * owned by  the reference  held by  `cmodule::cm_sectrefs')
-	                         * By  default, this  name is  the string  pointed-to by the
-	                         * `DW_AT_linkage_name'  attribute,  but  uses  `DW_AT_name'
-	                         * as a fallback. */
-	uintptr_t     cms_dip;  /* [1..1] Debug  information  pointer  for  this  symbol  & namespace.
-	                         * Use this pointer to load the associated DWARF debug info by passing
-	                         * it to  `cmodunit_parser_from_dip()' or  `cmodule_parser_from_dip()'
-	                         * The resulting  parser's `dup_comp.dic_tag'  will  then be  one  of:
-	                         *   - DW_TAG_structure_type
-	                         *      - Namespace collisions with
-	                         *   - DW_TAG_namespace   // TODO: Handling of namespace members
-	                         *   - DW_TAG_subprogram
-	                         *      - Only if a `DW_AT_entry_pc' or `DW_AT_low_pc' tag is contained (which in
-	                         *        turn translates to the symbol's address at runtime)
-	                         *   - DW_TAG_label
-	                         *   - DW_TAG_variable  (with a `DW_AT_location' that is expected to
-	                         *                       contain `DW_OP_addr' or `DW_OP_form_tls_address')
-	                         *   - DW_TAG_enumerator
-	                         * NOTE: Recursive  components  are _NOT_  included if  they originate
-	                         *       from inside `DW_TAG_subprogram', `DW_TAG_inlined_subroutine'.
-	                         *       In general, only  globally visible symbols  are included,  as
-	                         *       would be accessible from within an unnamed function placed at
-	                         *       the end of the associated CU.
-	                         *
-	                         * Load debug info for this symbol by:
-	                         * >> di_debuginfo_cu_parser_t parser;
-	                         * >> cmodule_parser_from_dip(mod, cmodsym_getdip(sym, mod), &parser);
-	                         * >> switch (parser.dup_comp.dic_tag) {
-	                         * >>
-	                         * >> case DW_TAG_structure_type:
-	                         * >>     ...
-	                         * >>
-	                         * >> case DW_TAG_subprogram:
-	                         * >>     ...
-	                         * >>
-	                         * >> case ...:
-	                         * >>     ...
-	                         * >>
-	                         * >> default: break;
-	                         * >> } */
+	CHECKED char const *cms_name; /* [1..1] Symbol name (usually points into `.debug_str', and
+	                               * owned by  the reference  held by  `cmodule::cm_sectrefs')
+	                               * By  default, this  name is  the string  pointed-to by the
+	                               * `DW_AT_linkage_name'  attribute,  but  uses  `DW_AT_name'
+	                               * as a fallback. */
+	uintptr_t           cms_dip;  /* [1..1] Debug  information  pointer  for  this  symbol  & namespace.
+	                               * Use this pointer to load the associated DWARF debug info by passing
+	                               * it to  `cmodunit_parser_from_dip()' or  `cmodule_parser_from_dip()'
+	                               * The resulting  parser's `dup_comp.dic_tag'  will  then be  one  of:
+	                               *   - DW_TAG_structure_type
+	                               *      - Namespace collisions with
+	                               *   - DW_TAG_namespace   // TODO: Handling of namespace members
+	                               *   - DW_TAG_subprogram
+	                               *      - Only if a `DW_AT_entry_pc' or `DW_AT_low_pc' tag is contained (which in
+	                               *        turn translates to the symbol's address at runtime)
+	                               *   - DW_TAG_label
+	                               *   - DW_TAG_variable  (with a `DW_AT_location' that is expected to
+	                               *                       contain `DW_OP_addr' or `DW_OP_form_tls_address')
+	                               *   - DW_TAG_enumerator
+	                               * NOTE: Recursive  components  are _NOT_  included if  they originate
+	                               *       from inside `DW_TAG_subprogram', `DW_TAG_inlined_subroutine'.
+	                               *       In general, only  globally visible symbols  are included,  as
+	                               *       would be accessible from within an unnamed function placed at
+	                               *       the end of the associated CU.
+	                               *
+	                               * Load debug info for this symbol by:
+	                               * >> di_debuginfo_cu_parser_t parser;
+	                               * >> cmodule_parser_from_dip(mod, cmodsym_getdip(sym, mod), &parser);
+	                               * >> switch (parser.dup_comp.dic_tag) {
+	                               * >>
+	                               * >> case DW_TAG_structure_type:
+	                               * >>     ...
+	                               * >>
+	                               * >> case DW_TAG_subprogram:
+	                               * >>     ...
+	                               * >>
+	                               * >> case ...:
+	                               * >>     ...
+	                               * >>
+	                               * >> default: break;
+	                               * >> } */
 };
 
 #if __SIZEOF_POINTER__ == 4
@@ -257,7 +257,7 @@ struct cmodmixsymtab {
 
 struct cmodunit {
 	/* CModule CompilationUnit */
-	byte_t const            *cu_di_start; /* [1..1] .debug_info start (s.a. `di_debuginfo_cu_parser_t::dup_cu_info_hdr'). */
+	byte_t CHECKED const    *cu_di_start; /* [1..1] .debug_info start (s.a. `di_debuginfo_cu_parser_t::dup_cu_info_hdr'). */
 	struct cmodsymtab        cu_symbols;  /* Per-unit symbols (who's names collide with other per-module symbols).
 	                                       * NOTE: `.mst_symv == (struct cmodsym *)-1' if symbols from this CU have
 	                                       *       yet to be loaded. Also note  that when symbols are loaded,  this
@@ -277,10 +277,10 @@ struct cmodunit {
  *              `cmodunit_di_start(self)' and `cmodunit_di_maxend(self)'.
  *              If it isn't, then the parser will be initialized to always indicate EOF. */
 FUNDEF NONNULL((1, 2, 3)) void
-NOTHROW(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
-                                        struct cmodule const *__restrict mod,
-                                        di_debuginfo_cu_parser_t *__restrict result,
-                                        byte_t const *dip);
+NOTHROW_NCX(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
+                                            struct cmodule const *__restrict mod,
+                                            di_debuginfo_cu_parser_t *__restrict result,
+                                            byte_t CHECKED const *dip);
 
 
 struct cmodule {
@@ -318,7 +318,7 @@ __DEFINE_NONATOMIC_REFCNT_FUNCTIONS(struct cmodule, cm_refcnt, cmodule_destroy)
 /* Callback for `cmodule_enum()'
  * @return: * : pformatprinter-compatible return value. */
 typedef NONNULL_T((2)) ssize_t
-NOTHROW_T(FCALL *cmodule_enum_callback_t)(void *cookie, struct cmodule *__restrict mod);
+(FCALL *cmodule_enum_callback_t)(void *cookie, struct cmodule *__restrict mod);
 
 /* Enumerate all CModules that are currently visible in the following order:
  * >> void const *pc = dbg_getpcreg(DBG_RT_REGLEVEL_VIEW);
@@ -332,14 +332,13 @@ NOTHROW_T(FCALL *cmodule_enum_callback_t)(void *cookie, struct cmodule *__restri
  * >> }
  * @return: * :        pformatprinter-compatible return value.
  * @return: DBX_EINTR: Operation was interrupted. */
-FUNDEF NONNULL((1)) ssize_t
-NOTHROW(FCALL cmodule_enum)(cmodule_enum_callback_t cb,
-                            void *cookie);
+FUNDEF NONNULL((1)) ssize_t FCALL
+cmodule_enum(cmodule_enum_callback_t cb, void *cookie);
 /* Same as `cmodule_enum()', but use `start_module' (if non-NULL) instead of `cmodule_ataddr(pc)' */
-FUNDEF NONNULL((2)) ssize_t
-NOTHROW(FCALL cmodule_enum_with_hint)(struct cmodule *start_module,
-                                      cmodule_enum_callback_t cb,
-                                      void *cookie);
+FUNDEF NONNULL((2)) ssize_t FCALL
+cmodule_enum_with_hint(struct cmodule *start_module,
+                       cmodule_enum_callback_t cb,
+                       void *cookie);
 
 struct mman;
 
@@ -347,18 +346,17 @@ struct mman;
  * `self' as CModule objects, and  invoke `cb' on each of  them.
  * @return: * :        pformatprinter-compatible return value.
  * @return: DBX_EINTR: Operation was interrupted. */
-FUNDEF NONNULL((1, 2)) ssize_t
-NOTHROW(FCALL cmodule_enum_usermman)(struct mman *__restrict self,
-                                     cmodule_enum_callback_t cb,
-                                     void *cookie);
+FUNDEF NONNULL((1, 2)) ssize_t FCALL
+cmodule_enum_usermman(struct mman *__restrict self,
+                      cmodule_enum_callback_t cb,
+                      void *cookie);
 
 /* Enumerate all kernel-space drivers as CModule objects, and
  * invoke `cb' on each of them.
  * @return: * :        pformatprinter-compatible return value.
  * @return: DBX_EINTR: Operation was interrupted. */
-FUNDEF NONNULL((1)) ssize_t
-NOTHROW(FCALL cmodule_enum_drivers)(cmodule_enum_callback_t cb,
-                                    void *cookie);
+FUNDEF NONNULL((1)) ssize_t FCALL
+cmodule_enum_drivers(cmodule_enum_callback_t cb, void *cookie);
 
 /* Clear the internal cache of pre-loaded CModules (called
  * from  `dbx_heap_alloc()' in an attempt to free memory).
@@ -375,19 +373,19 @@ FUNDEF size_t NOTHROW(FCALL cmodule_clearcache)(__BOOL keep_loaded DFL(0));
  * module which is then kept in-cache. If this step fails due to
  * lack of memory, `NULL' is returned instead. */
 FUNDEF WUNUSED NONNULL((1)) REF struct cmodule *
-NOTHROW(FCALL cmodule_locate)(module_t *__restrict mod);
+NOTHROW_NCX(FCALL cmodule_locate)(module_t *__restrict mod);
 
 /* Return the CModule descriptor for  a given `addr', which  should
  * be a program counter, or data-pointer. If no such module exists,
  * or its descriptor could not be allocated, return `NULL' instead.
  * This function is a thin wrapper around `module_fromaddr_nx()' + `cmodule_locate()' */
 FUNDEF WUNUSED NONNULL((1)) REF struct cmodule *
-NOTHROW(FCALL cmodule_ataddr)(void const *addr);
+NOTHROW_NCX(FCALL cmodule_ataddr)(void const *addr);
 
 /* Return the CModule for  `dbg_getpcreg(DBG_RT_REGLEVEL_VIEW)'
  * Same as `cmodule_ataddr(dbg_getpcreg(DBG_RT_REGLEVEL_VIEW))' */
 FUNDEF WUNUSED REF struct cmodule *
-NOTHROW(FCALL cmodule_current)(void);
+NOTHROW_NCX(FCALL cmodule_current)(void);
 
 /* Load debug symbols for the give CModule. Since doing this may take quite
  * a while, this function is equipped  to make use of `dbg_awaituser()'  to
@@ -401,7 +399,7 @@ NOTHROW(FCALL cmodule_current)(void);
  * @return: DBX_ENOMEM: Insufficient memory.
  * @return: DBX_EINTR:  Operation was interrupted. */
 FUNDEF WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW(FCALL cmodule_loadsyms)(struct cmodule *__restrict self);
+NOTHROW_NCX(FCALL cmodule_loadsyms)(struct cmodule *__restrict self);
 
 /* Lookup the a symbol within  `self', given its `name'. If  debug
  * symbols  had yet to  be loaded, then this  function will make a
@@ -424,10 +422,10 @@ NOTHROW(FCALL cmodule_loadsyms)(struct cmodule *__restrict self);
  *             given namespace, but when (at least 1) symbol is found
  *             that is apart  of a different  namespace, return  that
  *             symbol instead. */
-FUNDEF WUNUSED NONNULL((1, 2)) struct cmodsym const *
-NOTHROW(FCALL cmodule_getsym)(struct cmodule *__restrict self,
-                              char const *__restrict name, size_t namelen,
-                              uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
+FUNDEF WUNUSED NONNULL((1)) struct cmodsym const *
+NOTHROW_NCX(FCALL cmodule_getsym)(struct cmodule *__restrict self,
+                                  char CHECKED const *name, size_t namelen,
+                                  uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 
 
 /* Resolve a global symbol by finding its containing module, and returning
@@ -438,21 +436,21 @@ NOTHROW(FCALL cmodule_getsym)(struct cmodule *__restrict self,
  * @return: NULL: Error: Insufficient memory.
  * @return: NULL: Error: No such symbol.
  * @return: NULL: Error: Operation was interrupted. */
-FUNDEF WUNUSED NONNULL((1, 3)) struct cmodsym const *
-NOTHROW(FCALL cmodule_getsym_global)(char const *__restrict name, size_t namelen,
-                                     REF struct cmodule **__restrict presult_module,
-                                     uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
+FUNDEF WUNUSED NONNULL((3)) struct cmodsym const *
+NOTHROW_NCX(FCALL cmodule_getsym_global)(char CHECKED const *name, size_t namelen,
+                                         REF struct cmodule **__restrict presult_module,
+                                         uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 
 /* Same as `cmodule_getsym_global()',  but search for  symbols starting  with
  * `start_module', and continuing the search within related modules. For this
  * purpose,  start by searching `start_module' itself, and moving on to other
  * modules within its address space, before finally search through modules in
  * different address spaces. */
-FUNDEF WUNUSED NONNULL((2, 4)) struct cmodsym const *
-NOTHROW(FCALL cmodule_getsym_withhint)(struct cmodule *start_module,
-                                       char const *__restrict name, size_t namelen,
-                                       REF struct cmodule **__restrict presult_module,
-                                       uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
+FUNDEF WUNUSED NONNULL((4)) struct cmodsym const *
+NOTHROW_NCX(FCALL cmodule_getsym_withhint)(struct cmodule *start_module,
+                                           char CHECKED const *name, size_t namelen,
+                                           REF struct cmodule **__restrict presult_module,
+                                           uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 
 /* Initialize a debug information CU parser to load debug information for a
  * component located at `dip' within  the `.debug_info' mapping of  `self'.
@@ -461,22 +459,22 @@ NOTHROW(FCALL cmodule_getsym_withhint)(struct cmodule *start_module,
  * given `dip' is not apart of any of the CUs of `self', then `result' will
  * be initialized to always indicate EOF.
  * @param: dip: DebugInfoPointer. (s.a. `cmodunit_parser_from_dip()') */
-FUNDEF NONNULL((1, 2, 3)) void
-NOTHROW(FCALL cmodule_parser_from_dip)(struct cmodule const *__restrict self,
-                                       di_debuginfo_cu_parser_t *__restrict result,
-                                       byte_t const *__restrict dip);
+FUNDEF NONNULL((1, 2)) void
+NOTHROW_NCX(FCALL cmodule_parser_from_dip)(struct cmodule const *__restrict self,
+                                           di_debuginfo_cu_parser_t *__restrict result,
+                                           byte_t CHECKED const *dip);
 
 /* Try to find the compilation unit that contains `module_relative_pc'
  * If  no such unit  can be located, `NULL'  will be returned instead. */
 FUNDEF WUNUSED NONNULL((1)) struct cmodunit *
-NOTHROW(FCALL cmodule_findunit_from_pc)(struct cmodule const *__restrict self,
-                                        uintptr_t module_relative_pc);
+NOTHROW_NCX(FCALL cmodule_findunit_from_pc)(struct cmodule const *__restrict self,
+                                            uintptr_t module_relative_pc);
 
 /* Try  to   find  the   compilation  unit   that  contains   `dip'
  * If no such unit can be located, `NULL' will be returned instead. */
 FUNDEF ATTR_PURE WUNUSED NONNULL((1)) struct cmodunit *
-NOTHROW(FCALL cmodule_findunit_from_dip)(struct cmodule const *__restrict self,
-                                         byte_t const *__restrict dip);
+NOTHROW_NCX(FCALL cmodule_findunit_from_dip)(struct cmodule const *__restrict self,
+                                             byte_t CHECKED const *dip);
 
 /* Simple wrapper for a pair `REF struct cmodule *mod' + `byte_t const *dip'
  * that can be  used to  reference and store  arbitrary debug-info  objects. */
@@ -543,10 +541,10 @@ struct cmodsyminfo {
  * @return: DBX_EOK:    Success
  * @return: DBX_ENOENT: No local variable `name' exists at `module_relative_pc'
  * @return: DBX_EINTR:  Operation was interrupted. */
-FUNDEF NONNULL((1, 2)) dbx_errno_t
-NOTHROW(FCALL cmod_syminfo)(/*in|out*/ struct cmodsyminfo *__restrict info,
-                            char const *__restrict name, size_t namelen,
-                            uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
+FUNDEF NONNULL((1)) dbx_errno_t
+NOTHROW_NCX(FCALL cmod_syminfo)(/*in|out*/ struct cmodsyminfo *__restrict info,
+                                char CHECKED const *name, size_t namelen,
+                                uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 
 /* Same as `cmod_syminfo()', but  the caller is not  required to fill in  information
  * about  any symbol at  all, which are automatically  loaded based on `dbg_current',
@@ -557,10 +555,10 @@ NOTHROW(FCALL cmod_syminfo)(/*in|out*/ struct cmodsyminfo *__restrict info,
  * @return: DBX_EOK:    Success
  * @return: DBX_ENOENT: No local variable `name' exists at `module_relative_pc'
  * @return: DBX_EINTR:  Operation was interrupted. */
-FUNDEF NONNULL((1, 2)) dbx_errno_t
-NOTHROW(FCALL cmod_syminfo_local)(/*out*/ struct cmodsyminfo *__restrict info,
-                                  char const *__restrict name, size_t namelen,
-                                  uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
+FUNDEF NONNULL((1)) dbx_errno_t
+NOTHROW_NCX(FCALL cmod_syminfo_local)(/*out*/ struct cmodsyminfo *__restrict info,
+                                      char CHECKED const *name, size_t namelen,
+                                      uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 #define cmod_syminfo_local_fini(info) decref((info)->clv_mod)
 
 
@@ -582,14 +580,14 @@ NOTHROW(FCALL cmod_syminfo_local)(/*out*/ struct cmodsyminfo *__restrict info,
  *                      loaded manually via a call to `cmod_symenum_loadinfo()'
  * @return: * :         pformatprinter-compatible return value. */
 typedef NONNULL_T((1)) ssize_t
-NOTHROW_T(FCALL *cmod_symenum_callback_t)(struct cmodsyminfo *__restrict info,
-                                          __BOOL info_loaded);
+(FCALL *cmod_symenum_callback_t)(struct cmodsyminfo *__restrict info,
+                                 __BOOL info_loaded);
 
 /* To-be called from inside of `cmod_symenum_callback_t' when
  * `info_loaded == false', and extended symbol information is
  * needed. */
 FUNDEF NONNULL((1)) void
-NOTHROW(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info);
+NOTHROW_NCX(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info);
 
 
 /* Flags for `cmod_symenum:scope' */
@@ -620,13 +618,13 @@ NOTHROW(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info);
  * @param: scope: The scope of symbols that should be enumerated (set of `CMOD_SYMENUM_SCOPE_F*')
  * @return: * :        pformatprinter-compatible accumulation of return values from `cb'
  * @return: DBX_EINTR: Operation was interrupted. */
-FUNDEF NONNULL((1, 2)) ssize_t
-NOTHROW(FCALL cmod_symenum)(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
-                            cmod_symenum_callback_t cb,
-                            char const *startswith_name,
-                            size_t startswith_namelen,
-                            uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL),
-                            uintptr_t scope DFL(CMOD_SYMENUM_SCOPE_FNORMAL));
+FUNDEF NONNULL((1, 2)) ssize_t FCALL
+cmod_symenum(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
+             cmod_symenum_callback_t cb,
+             char CHECKED const *startswith_name,
+             size_t startswith_namelen,
+             uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL),
+             uintptr_t scope DFL(CMOD_SYMENUM_SCOPE_FNORMAL));
 
 /* Same as `cmod_symenum()', except  this function automatically manages  the
  * input fields of `info' which must normally be filled in by the caller, and
@@ -640,15 +638,13 @@ NOTHROW(FCALL cmod_symenum)(/*in|out(undef)*/ struct cmodsyminfo *__restrict inf
  *       on what `cb' may or may not have done.
  * @return: * :        pformatprinter-compatible accumulation of return values from `cb'
  * @return: DBX_EINTR: Operation was interrupted. */
-FUNDEF NONNULL((1, 2)) ssize_t
-NOTHROW(FCALL cmod_symenum_local)(/*in(oob_only)|out(undef)*/ struct cmodsyminfo *__restrict info,
-                                  cmod_symenum_callback_t cb,
-                                  char const *startswith_name,
-                                  size_t startswith_namelen,
-                                  uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL),
-                                  uintptr_t scope DFL(CMOD_SYMENUM_SCOPE_FNORMAL));
-
-
+FUNDEF NONNULL((1, 2)) ssize_t FCALL
+cmod_symenum_local(/*in(oob_only)|out(undef)*/ struct cmodsyminfo *__restrict info,
+                   cmod_symenum_callback_t cb,
+                   char CHECKED const *startswith_name,
+                   size_t startswith_namelen,
+                   uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL),
+                   uintptr_t scope DFL(CMOD_SYMENUM_SCOPE_FNORMAL));
 
 DECL_END
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */

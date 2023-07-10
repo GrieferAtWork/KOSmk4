@@ -23,6 +23,7 @@
 #ifndef __DEEMON__
 #include "api.h"
 
+#include <kos/anno.h>
 #include <hybrid/host.h>
 
 #include <bits/types.h>
@@ -606,17 +607,17 @@ typedef __UINTPTR_HALF_TYPE__ unwind_regno_t;
 
 typedef struct {
 	/* Stack entry for unwind expressions. */
-	__uint8_t          s_type;      /* Stack entry type (One of `UNWIND_STE_*') */
-	__uint8_t          s_pad[(sizeof(__uintptr_t) / 2) - 1];
+	__uint8_t               s_type;      /* Stack entry type (One of `UNWIND_STE_*') */
+	__uint8_t               s_pad[(sizeof(__uintptr_t) / 2) - 1];
 	union {
-		unwind_regno_t s_lsize;     /* [UNWIND_STE_RW_LVALUE] Size of an L-value expression in bytes (If unknown, set to `0') */
-		unwind_regno_t s_register;  /* [UNWIND_STE_REGISTER] Register ID */
+		unwind_regno_t      s_lsize;     /* [UNWIND_STE_RW_LVALUE] Size of an L-value expression in bytes (If unknown, set to `0') */
+		unwind_regno_t      s_register;  /* [UNWIND_STE_REGISTER] Register ID */
 	};
 	union {
-		__uintptr_t    s_uconst;    /* Unsigned constant value */
-		__intptr_t     s_sconst;    /* Signed constant value */
-		__intptr_t     s_regoffset; /* Offset added to a register expression */
-		__byte_t      *s_lvalue;    /* L-value pointer. */
+		__uintptr_t         s_uconst;    /* Unsigned constant value */
+		__intptr_t          s_sconst;    /* Signed constant value */
+		__intptr_t          s_regoffset; /* Offset added to a register expression */
+		__byte_t __CHECKED *s_lvalue;    /* L-value pointer. */
 	};
 } unwind_ste_t;
 
@@ -630,92 +631,90 @@ typedef struct {
  * @return: UNWIND_INVALID_REGISTER: The given `dw_regno' is invalid/unsupported.
  * @return: UNWIND_OPTIMIZED_AWAY:   Register information has been optimized away.
  * @return: * :                      Some other error (propagate) */
-typedef __ATTR_NONNULL_T((3)) unwind_errno_t (LIBUNWIND_CC *unwind_getreg_t)(void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
-typedef __ATTR_NONNULL_T((3)) unwind_errno_t (LIBUNWIND_CC *unwind_setreg_t)(void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((3)) unwind_errno_t (LIBUNWIND_CC *unwind_getreg_t)(void const *__arg, unwind_regno_t __dw_regno, void __CHECKED *__dst);
+typedef __ATTR_NONNULL_T((3)) unwind_errno_t (LIBUNWIND_CC *unwind_setreg_t)(void *__arg, unwind_regno_t __dw_regno, void __CHECKED const *__src);
 
 typedef struct unwind_emulator_sections_struct {
 	/* NOTE: When individual sections are empty, the associated instructions become illegal
 	 * NOTE: The order of members in this struct is important!
 	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
-	__byte_t const *ues_eh_frame_hdr_start;   /* [0..1][const] `.eh_frame_hdr' start (for `DW_OP_call_frame_cfa') */
-	__byte_t const *ues_eh_frame_hdr_end;     /* [0..1][const] `.eh_frame_hdr' end */
-	__byte_t const *ues_eh_frame_start;       /* [0..1][const] `.eh_frame' start (for `DW_OP_call_frame_cfa') */
-	__byte_t const *ues_eh_frame_end;         /* [0..1][const] `.eh_frame' end */
-	__byte_t const *ues_debug_frame_start;    /* [0..1][const] `.debug_frame' start (for `DW_OP_call_frame_cfa') */
-	__byte_t const *ues_debug_frame_end;      /* [0..1][const] `.debug_frame' end */
-	__byte_t const *ues_debug_addr_start;     /* [0..1][const] `.debug_addr' start (for `DW_OP_addrx' / `DW_OP_constx') */
-	__byte_t const *ues_debug_addr_end;       /* [0..1][const] `.debug_addr' end */
-	__byte_t const *ues_debug_loclists_start; /* [0..1][const] `.debug_loclists' start (for `DW_OP_call2' / `DW_OP_call4') */
-	__byte_t const *ues_debug_loclists_end;   /* [0..1][const] `.debug_loclists' end */
-	__byte_t const *ues_debug_loc_start;      /* [0..1][const] `.debug_loc' start (for `DW_OP_call2' / `DW_OP_call4') */
-	__byte_t const *ues_debug_loc_end;        /* [0..1][const] `.debug_loc' end */
-	__byte_t const *ues_debug_abbrev_start;   /* [0..1][const] `.debug_abbrev' start (for `DW_OP_call2' / `DW_OP_call4') */
-	__byte_t const *ues_debug_abbrev_end;     /* [0..1][const] `.debug_abbrev' end */
-	__byte_t const *ues_debug_info_start;     /* [0..1][const] `.debug_info' start (for `DW_OP_call2' / `DW_OP_call4') */
-	__byte_t const *ues_debug_info_end;       /* [0..1][const] `.debug_info' end */
+	__byte_t __CHECKED const *ues_eh_frame_hdr_start;   /* [0..1][const] `.eh_frame_hdr' start (for `DW_OP_call_frame_cfa') */
+	__byte_t __CHECKED const *ues_eh_frame_hdr_end;     /* [0..1][const] `.eh_frame_hdr' end */
+	__byte_t __CHECKED const *ues_eh_frame_start;       /* [0..1][const] `.eh_frame' start (for `DW_OP_call_frame_cfa') */
+	__byte_t __CHECKED const *ues_eh_frame_end;         /* [0..1][const] `.eh_frame' end */
+	__byte_t __CHECKED const *ues_debug_frame_start;    /* [0..1][const] `.debug_frame' start (for `DW_OP_call_frame_cfa') */
+	__byte_t __CHECKED const *ues_debug_frame_end;      /* [0..1][const] `.debug_frame' end */
+	__byte_t __CHECKED const *ues_debug_addr_start;     /* [0..1][const] `.debug_addr' start (for `DW_OP_addrx' / `DW_OP_constx') */
+	__byte_t __CHECKED const *ues_debug_addr_end;       /* [0..1][const] `.debug_addr' end */
+	__byte_t __CHECKED const *ues_debug_loclists_start; /* [0..1][const] `.debug_loclists' start (for `DW_OP_call2' / `DW_OP_call4') */
+	__byte_t __CHECKED const *ues_debug_loclists_end;   /* [0..1][const] `.debug_loclists' end */
+	__byte_t __CHECKED const *ues_debug_loc_start;      /* [0..1][const] `.debug_loc' start (for `DW_OP_call2' / `DW_OP_call4') */
+	__byte_t __CHECKED const *ues_debug_loc_end;        /* [0..1][const] `.debug_loc' end */
+	__byte_t __CHECKED const *ues_debug_abbrev_start;   /* [0..1][const] `.debug_abbrev' start (for `DW_OP_call2' / `DW_OP_call4') */
+	__byte_t __CHECKED const *ues_debug_abbrev_end;     /* [0..1][const] `.debug_abbrev' end */
+	__byte_t __CHECKED const *ues_debug_info_start;     /* [0..1][const] `.debug_info' start (for `DW_OP_call2' / `DW_OP_call4') */
+	__byte_t __CHECKED const *ues_debug_info_end;       /* [0..1][const] `.debug_info' end */
 } unwind_emulator_sections_t;
 
 #ifndef __di_debuginfo_location_t_defined
 #define __di_debuginfo_location_t_defined
 typedef struct di_debuginfo_location_struct {
-	__byte_t const *l_expr;   /* [0..1] Pointer to a CFI expression (for use with `unwind_emulator_exec') for the pointed-to expression. */
-	__byte_t const *l_llist4; /* [0..1] Pointer to a CFI location list (points into the `.debug_loc' section). */
-	__byte_t const *l_llist5; /* [0..1] Pointer to a CFI location list (points into the `.debug_loclists' section). */
+	__byte_t __CHECKED const *l_expr;   /* [0..1] Pointer to a CFI expression (for use with `unwind_emulator_exec') for the pointed-to expression. */
+	__byte_t __CHECKED const *l_llist4; /* [0..1] Pointer to a CFI location list (points into the `.debug_loc' section). */
+	__byte_t __CHECKED const *l_llist5; /* [0..1] Pointer to a CFI location list (points into the `.debug_loclists' section). */
 } di_debuginfo_location_t;
 #endif /* !__di_debuginfo_location_t_defined */
 
 struct unwind_bases {
-	void const *ub_tbase; /* [0..1] Text base address (lazily calculated when set to `NULL'; s.a. `DLAUXCTRL_GET_TEXTBASE') */
-	void const *ub_dbase; /* [0..1] Data base address (lazily calculated when set to `NULL'; s.a. `DLAUXCTRL_GET_DATABASE') */
-	void const *ub_fbase; /* [0..1] Function base address (or `NULL' if unknown or not applicable). */
+	void __CHECKED const *ub_tbase; /* [0..1] Text base address (lazily calculated when set to `NULL'; s.a. `DLAUXCTRL_GET_TEXTBASE') */
+	void __CHECKED const *ub_dbase; /* [0..1] Data base address (lazily calculated when set to `NULL'; s.a. `DLAUXCTRL_GET_DATABASE') */
+	void __CHECKED const *ub_fbase; /* [0..1] Function base address (or `NULL' if unknown or not applicable). */
 };
 
 
 struct di_debuginfo_compile_unit_simple_struct;
 typedef struct unwind_emulator_struct {
-	unwind_ste_t           *ue_stack;              /* [0..ue_stacksz|ALLOC(ue_stackmax)][const] Value stack for the emulator. */
-	__size_t                ue_stacksz;            /* Currently used stack size. */
-	__size_t                ue_stackmax;           /* [const] Max available stack size. */
-	__byte_t const         *ue_pc;                 /* [1..1] Program counter position. */
-	__byte_t const         *ue_pc_start;           /* [1..1][const] Program start pointer. */
-	__byte_t const         *ue_pc_end;             /* [1..1][const] Program end pointer. */
-	unwind_emulator_sections_t const
-	                       *ue_sectinfo;           /* [0..1][const] Emulator section information. */
-	unwind_getreg_t         ue_regget;             /* [1..1][const] Callback for reading out the value of a register. */
-	unwind_setreg_t         ue_regset;             /* [0..1][const] Callback for writing the value of a register (or NULL
-	                                                * if registers are read-only; ignored when `ue_piecewrite' is false). */
-	void const             *ue_regget_arg;         /* [?..?][const] Argument passed to `ue_regget'. */
-	void                   *ue_regset_arg;         /* [?..?][const] Argument passed to `ue_regset'. */
-	di_debuginfo_location_t const
-	                       *ue_framebase;          /* [0..1][const] Frame base expression (for use with `DW_OP_fbreg').
-	                                                * Set to NULL to consider `DW_OP_fbreg' as an illegal  instruction. */
-	__uintptr_t             ue_addroffset;         /* [const] Offset added to the value of `DW_OP_addr'. For .eh_frame, this should be `0', but
-	                                                *         for all other purposes, this should be the loadaddr of the associated module. */
-	void                   *ue_objaddr;            /* [0..1][const] Object address value (for use with `DW_OP_push_object_address').
-	                                                * Set to NULL to consider `DW_OP_push_object_address' as an illegal instruction. */
-	__uint32_t              ue_bjmprem;            /* Number of remaining allowed backwards-jumps  (used to prevent infinite  loops,
-	                                                * which  get  terminated  and  cause  `UNWIND_EMULATOR_LOOP'  to  be   returned)
-	                                                * During initialization, you may simply assign `UNWIND_EMULATOR_BJMPREM_DEFAULT'
-	                                                * to this field. */
-	__uint8_t               ue_addrsize;           /* [const] Address size (one of 1,2,4 or 8) (operand size of `DW_OP_addr') */
-	__uint8_t               ue_ptrsize;            /* [const] DWARF pointer size (4 for 32-bit dwarf; 8 for 64-bit dwarf) */
-	__uint8_t               ue_piecewrite;         /* [const] Non-zero if data pieces should be written, rather than read. */
-	__uint8_t               ue_pad;                /* ... */
-	__byte_t               *ue_piecebuf;           /* [0..ue_piecesiz][const] Pointer to a buffer to receive data from `DW_OP_piece' */
-	__size_t                ue_piecesiz;           /* [const] Size of the `ue_piecebuf' buffer in bytes. */
-	__size_t                ue_piecebits;          /* [<= ue_piecesiz * 8] Number of _BITS_ within the `ue_piecebuf' buffer that are in use. */
-	__uintptr_t             ue_call_frame_cfa;     /* [0..1] Lazily calculated value for the call-frame-CFA of the given register state.
-	                                                * When   set   to   ZERO(0),   this   value   is   calculated   as-needed,    using:
-	                                                *  - unwind_fde_scan(ue_eh_frame_start, ue_eh_frame_end, ...)
-	                                                *  - unwind_fde_exec(...) */
-	struct unwind_bases     ue_bases;              /* Base addresses. (may be calculated lazily) */
+	unwind_ste_t                     *ue_stack;              /* [0..ue_stacksz|ALLOC(ue_stackmax)][const] Value stack for the emulator. */
+	__size_t                          ue_stacksz;            /* Currently used stack size. */
+	__size_t                          ue_stackmax;           /* [const] Max available stack size. */
+	__byte_t __CHECKED const         *ue_pc;                 /* [1..1] Program counter position. */
+	__byte_t __CHECKED const         *ue_pc_start;           /* [1..1][const] Program start pointer. */
+	__byte_t __CHECKED const         *ue_pc_end;             /* [1..1][const] Program end pointer. */
+	unwind_emulator_sections_t const *ue_sectinfo;           /* [0..1][const] Emulator section information. */
+	unwind_getreg_t                   ue_regget;             /* [1..1][const] Callback for reading out the value of a register. */
+	unwind_setreg_t                   ue_regset;             /* [0..1][const] Callback for writing the value of a register (or NULL
+	                                                          * if registers are read-only; ignored when `ue_piecewrite' is false). */
+	void const                       *ue_regget_arg;         /* [?..?][const] Argument passed to `ue_regget'. */
+	void                             *ue_regset_arg;         /* [?..?][const] Argument passed to `ue_regset'. */
+	di_debuginfo_location_t const    *ue_framebase;          /* [0..1][const] Frame base expression (for use with `DW_OP_fbreg').
+	                                                          * Set to NULL to consider `DW_OP_fbreg' as an illegal  instruction. */
+	__uintptr_t                       ue_addroffset;         /* [const] Offset added to the value of `DW_OP_addr'. For .eh_frame, this should be `0', but
+	                                                          *         for all other purposes, this should be the loadaddr of the associated module. */
+	void __CHECKED                   *ue_objaddr;            /* [0..1][const] Object address value (for use with `DW_OP_push_object_address').
+	                                                          * Set to NULL to consider `DW_OP_push_object_address' as an illegal instruction. */
+	__uint32_t                        ue_bjmprem;            /* Number of remaining allowed backwards-jumps  (used to prevent infinite  loops,
+	                                                          * which  get  terminated  and  cause  `UNWIND_EMULATOR_LOOP'  to  be   returned)
+	                                                          * During initialization, you may simply assign `UNWIND_EMULATOR_BJMPREM_DEFAULT'
+	                                                          * to this field. */
+	__uint8_t                         ue_addrsize;           /* [const] Address size (one of 1,2,4 or 8) (operand size of `DW_OP_addr') */
+	__uint8_t                         ue_ptrsize;            /* [const] DWARF pointer size (4 for 32-bit dwarf; 8 for 64-bit dwarf) */
+	__uint8_t                         ue_piecewrite;         /* [const] Non-zero if data pieces should be written, rather than read. */
+	__uint8_t                         ue_pad;                /* ... */
+	__byte_t __CHECKED               *ue_piecebuf;           /* [0..ue_piecesiz][const] Pointer to a buffer to receive data from `DW_OP_piece' */
+	__size_t                          ue_piecesiz;           /* [const] Size of the `ue_piecebuf' buffer in bytes. */
+	__size_t                          ue_piecebits;          /* [<= ue_piecesiz * 8] Number of _BITS_ within the `ue_piecebuf' buffer that are in use. */
+	__uintptr_t                       ue_call_frame_cfa;     /* [0..1] Lazily calculated value for the call-frame-CFA of the given register state.
+	                                                          * When   set   to   ZERO(0),   this   value   is   calculated   as-needed,    using:
+	                                                          *  - unwind_fde_scan(ue_eh_frame_start, ue_eh_frame_end, ...)
+	                                                          *  - unwind_fde_exec(...) */
+	struct unwind_bases               ue_bases;              /* Base addresses. (may be calculated lazily) */
 	struct di_debuginfo_compile_unit_simple_struct const
-	                       *ue_cu;                 /* [0..1][const] The associated CU (when non-NULL, fields that may be used
-	                                                * are  listed  in the  documentation  of `debuginfo_location_getvalue()') */
-	__uintptr_t             ue_module_relative_pc; /* [const] Module-relative program counter position (used for selecting callbacks within expression lists) */
-	__byte_t               *ue_tlsbase;            /* [0..1] Base to-be added to an offset in order to form a TLS address within the
-	                                                * targeted thread (or `NULL' if unknown, in which case  `DW_OP_form_tls_address'
-	                                                * is considered an illegal instruction, or `(__byte_t *)-1' to lazily calculate) */
+	                                 *ue_cu;                 /* [0..1][const] The associated CU (when non-NULL, fields that may be used
+	                                                          * are  listed  in the  documentation  of `debuginfo_location_getvalue()') */
+	__uintptr_t                       ue_module_relative_pc; /* [const] Module-relative program counter position (used for selecting callbacks within expression lists) */
+	__byte_t __CHECKED               *ue_tlsbase;            /* [0..1] Base to-be added to an offset in order to form a TLS address within the
+	                                                          * targeted thread (or `NULL' if unknown, in which case  `DW_OP_form_tls_address'
+	                                                          * is considered an illegal instruction, or `(__byte_t *)-1' to lazily calculate) */
 } unwind_emulator_t;
 
 /* Execute the CFI expression loaded into the given unwind-emulator  `self'.
@@ -767,12 +766,12 @@ unwind_emulator_exec_autostack(unwind_emulator_t *__restrict __self,
 typedef __ATTR_NONNULL_T((1, 2, 4)) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_STE_ADDR)(unwind_ste_t const *__restrict __self,
                                                 unwind_getreg_t __regget, void const *__regget_arg,
-                                                void **__restrict __paddr);
+                                                void __CHECKED **__restrict __paddr);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4)) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_ste_addr)(unwind_ste_t const *__restrict __self,
                                             unwind_getreg_t __regget, void const *__regget_arg,
-                                            void **__restrict __paddr);
+                                            void __CHECKED **__restrict __paddr);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
@@ -791,28 +790,28 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_ste_addr)(unwind_ste_t const *__restrict __sel
  * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `self'
  * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `self'
  * @return: UNWIND_SEGFAULT:                     Attempted to access faulty memory. */
-typedef __ATTR_NONNULL_T((1, 3, 5)) unwind_errno_t
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_STE_READ)(unwind_ste_t const *__restrict __self, __uint8_t __addrsize,
                                                 unwind_getreg_t __regget, void const *__regget_arg,
-                                                void *__restrict __dst, __size_t __num_bits,
+                                                void __CHECKED *__dst, __size_t __num_bits,
                                                 __size_t __dst_left_shift, __size_t __src_left_shift);
-typedef __ATTR_NONNULL_T((1, 3, 7)) unwind_errno_t
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_STE_WRITE)(unwind_ste_t const *__restrict __self, __uint8_t __addrsize,
                                                  /*[1..1]*/ unwind_getreg_t __regget, void const *__regget_arg,
                                                  /*[0..1]*/ unwind_setreg_t __regset, void *__regset_arg,
-                                                 void const *__restrict __src, __size_t __num_bits,
+                                                 void __CHECKED const *__src, __size_t __num_bits,
                                                  __size_t __dst_left_shift, __size_t __src_left_shift);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 5)) unwind_errno_t
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_ste_read)(unwind_ste_t const *__restrict __self, __uint8_t __addrsize,
                                             unwind_getreg_t __regget, void const *__regget_arg,
-                                            void *__restrict __dst, __size_t __num_bits,
+                                            void __CHECKED *__dst, __size_t __num_bits,
                                             __size_t __dst_left_shift, __size_t __src_left_shift);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 7)) unwind_errno_t
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_ste_write)(unwind_ste_t const *__restrict __self, __uint8_t __addrsize,
                                              /*[1..1]*/ unwind_getreg_t __regget, void const *__regget_arg,
                                              /*[0..1]*/ unwind_setreg_t __regset, void *__regset_arg,
-                                             void const *__restrict __src, __size_t __num_bits,
+                                             void __CHECKED const *__src, __size_t __num_bits,
                                              __size_t __dst_left_shift, __size_t __src_left_shift);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
@@ -824,18 +823,18 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_ste_write)(unwind_ste_t const *__restrict __se
  * @param: addrsize: Size of a target address.
  * @param: ptrsize:  Size of a DWARF pointer (4 for 32-bit dwarf; 8 for 64-bit dwarf).
  * @return: NULL: The instruction at `unwind_pc' wasn't recognized. */
-typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __byte_t const *
-__NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_INSTRUCTION_SUCC)(__byte_t const *__restrict __unwind_pc,
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T __byte_t __CHECKED const *
+__NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_INSTRUCTION_SUCC)(__byte_t __CHECKED const *__unwind_pc,
                                                         __uint8_t __addrsize, __uint8_t __ptrsize);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __byte_t const *
-__NOTHROW_NCX(LIBUNWIND_CC unwind_instruction_succ)(__byte_t const *__restrict __unwind_pc,
+LIBUNWIND_DECL __ATTR_PURE __ATTR_WUNUSED __byte_t __CHECKED const *
+__NOTHROW_NCX(LIBUNWIND_CC unwind_instruction_succ)(__byte_t __CHECKED const *__unwind_pc,
                                                     __uint8_t __addrsize, __uint8_t __ptrsize);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 /* Return a pointer to a CFI expression that is applicable for `module_relative_pc'
  * If no such expression exists, return `NULL' instead. */
-typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 5)) __byte_t *
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 5)) __byte_t __CHECKED *
 __NOTHROW_NCX_T(LIBUNWIND_CC *PDEBUGINFO_LOCATION_SELECT)(di_debuginfo_location_t const *__restrict __self,
                                                           __uintptr_t __cu_base,
                                                           __uintptr_t __module_relative_pc,
@@ -886,18 +885,18 @@ struct di_debuginfo_compile_unit_simple_struct;
  * @return: UNWIND_EMULATOR_NOT_WRITABLE:     Attempted to write to a read-only location expression.
  * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `bufsize' is too small.
  * @return: UNWIND_EMULATOR_NO_FUNCTION:      The associated location list is undefined for `module_relative_pc' */
-typedef __ATTR_NONNULL_T((1, 3, 8, 10)) unwind_errno_t
+typedef __ATTR_NONNULL_T((1, 3, 10)) unwind_errno_t
 (LIBUNWIND_CC *PDEBUGINFO_LOCATION_GETVALUE)(di_debuginfo_location_t const *__restrict __self,
                                              unwind_emulator_sections_t const *__sectinfo,
                                              unwind_getreg_t __regget, void *__regget_arg,
                                              struct di_debuginfo_compile_unit_simple_struct const *__cu,
                                              __uintptr_t __module_relative_pc,
                                              __uintptr_t __module_addroffset,
-                                             void *__restrict __buf, __size_t __bufsize,
+                                             void __CHECKED *__buf, __size_t __bufsize,
                                              __size_t *__restrict __pnum_written_bits,
                                              di_debuginfo_location_t const *__frame_base_expression,
-                                             void const *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
-typedef __ATTR_NONNULL_T((1, 3, 5, 10, 12)) unwind_errno_t
+                                             void __CHECKED const *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
+typedef __ATTR_NONNULL_T((1, 3, 5, 12)) unwind_errno_t
 (LIBUNWIND_CC *PDEBUGINFO_LOCATION_SETVALUE)(di_debuginfo_location_t const *__restrict __self,
                                              unwind_emulator_sections_t const *__sectinfo,
                                              unwind_getreg_t __regget, void *__regget_arg,
@@ -905,23 +904,23 @@ typedef __ATTR_NONNULL_T((1, 3, 5, 10, 12)) unwind_errno_t
                                              struct di_debuginfo_compile_unit_simple_struct const *__cu,
                                              __uintptr_t __module_relative_pc,
                                              __uintptr_t __module_addroffset,
-                                             void const *__restrict __buf, __size_t __bufsize,
+                                             void __CHECKED const *__buf, __size_t __bufsize,
                                              __size_t *__restrict __pnum_read_bits,
                                              di_debuginfo_location_t const *__frame_base_expression,
-                                             void *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
+                                             void __CHECKED *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 8, 10)) unwind_errno_t LIBUNWIND_CC
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 10)) unwind_errno_t LIBUNWIND_CC
 debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict __self,
                             unwind_emulator_sections_t const *__sectinfo,
                             unwind_getreg_t __regget, void *__regget_arg,
                             struct di_debuginfo_compile_unit_simple_struct const *__cu,
                             __uintptr_t __module_relative_pc,
                             __uintptr_t __module_addroffset,
-                            void *__restrict __buf, __size_t __bufsize,
+                            void __CHECKED *__buf, __size_t __bufsize,
                             __size_t *__restrict __pnum_written_bits,
                             di_debuginfo_location_t const *__frame_base_expression,
-                            void const *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 5, 10, 12)) unwind_errno_t LIBUNWIND_CC
+                            void __CHECKED const *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 5, 12)) unwind_errno_t LIBUNWIND_CC
 debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict __self,
                             unwind_emulator_sections_t const *__sectinfo,
                             unwind_getreg_t __regget, void *__regget_arg,
@@ -929,10 +928,10 @@ debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict __self,
                             struct di_debuginfo_compile_unit_simple_struct const *__cu,
                             __uintptr_t __module_relative_pc,
                             __uintptr_t __module_addroffset,
-                            void const *__restrict __buf, __size_t __bufsize,
+                            void __CHECKED const *__buf, __size_t __bufsize,
                             __size_t *__restrict __pnum_read_bits,
                             di_debuginfo_location_t const *__frame_base_expression,
-                            void *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
+                            void __CHECKED *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 

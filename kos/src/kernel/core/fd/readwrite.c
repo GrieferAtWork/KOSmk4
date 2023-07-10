@@ -288,7 +288,7 @@ DEFINE_SYSCALL3(ssize_t, readv, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER UNCHECKED byte_t *)iov[i].iov_base;
+			entries[i].ive_base = (byte_t USER UNCHECKED *)iov[i].iov_base;
 			entries[i].ive_size = iov[i].iov_len;
 			COMPILER_READ_BARRIER();
 			validate_writable(entries[i].ive_base, entries[i].ive_size);
@@ -327,7 +327,7 @@ DEFINE_SYSCALL3(ssize_t, writev, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER UNCHECKED byte_t *)iov[i].iov_base;
+			entries[i].ive_base = (byte_t USER UNCHECKED *)iov[i].iov_base;
 			entries[i].ive_size = iov[i].iov_len;
 			COMPILER_READ_BARRIER();
 			validate_readable(entries[i].ive_base, entries[i].ive_size);
@@ -366,7 +366,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, readv, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER UNCHECKED byte_t *)(void *)(uintptr_t)(*(compat_uintptr_t const *)&iov[i].iov_base);
+			entries[i].ive_base = (byte_t USER UNCHECKED *)(void *)(uintptr_t)(*(compat_uintptr_t const *)&iov[i].iov_base);
 			entries[i].ive_size = iov[i].iov_len;
 			COMPILER_READ_BARRIER();
 			compat_validate_writable(entries[i].ive_base, entries[i].ive_size);
@@ -405,7 +405,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, writev, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER UNCHECKED byte_t *)(void *)(uintptr_t)(*(compat_uintptr_t *)&iov[i].iov_base);
+			entries[i].ive_base = (byte_t USER UNCHECKED *)(void *)(uintptr_t)(*(compat_uintptr_t *)&iov[i].iov_base);
 			entries[i].ive_size = iov[i].iov_len;
 			COMPILER_READ_BARRIER();
 			compat_validate_readable(entries[i].ive_base, entries[i].ive_size);
@@ -451,7 +451,7 @@ DEFINE_SYSCALL4(ssize_t, preadv, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER UNCHECKED byte_t *)iov[i].iov_base;
+			entries[i].ive_base = (byte_t USER UNCHECKED *)iov[i].iov_base;
 			entries[i].ive_size = iov[i].iov_len;
 			COMPILER_READ_BARRIER();
 			validate_writable(entries[i].ive_base, entries[i].ive_size);
@@ -490,7 +490,7 @@ DEFINE_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER UNCHECKED byte_t *)iov[i].iov_base;
+			entries[i].ive_base = (byte_t USER UNCHECKED *)iov[i].iov_base;
 			entries[i].ive_size = iov[i].iov_len;
 			COMPILER_READ_BARRIER();
 			validate_readable(entries[i].ive_base, entries[i].ive_size);
@@ -529,7 +529,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, preadv, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER UNCHECKED byte_t *)(void *)(uintptr_t)(*(compat_uintptr_t *)&iov[i].iov_base);
+			entries[i].ive_base = (byte_t USER UNCHECKED *)(void *)(uintptr_t)(*(compat_uintptr_t *)&iov[i].iov_base);
 			entries[i].ive_size = iov[i].iov_len;
 			COMPILER_READ_BARRIER();
 			compat_validate_writable(entries[i].ive_base, entries[i].ive_size);
@@ -568,7 +568,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER UNCHECKED byte_t *)(void *)(uintptr_t)(*(compat_uintptr_t const *)&iov[i].iov_base);
+			entries[i].ive_base = (byte_t USER UNCHECKED *)(void *)(uintptr_t)(*(compat_uintptr_t const *)&iov[i].iov_base);
 			entries[i].ive_size = iov[i].iov_len;
 			COMPILER_READ_BARRIER();
 			compat_validate_readable(entries[i].ive_base, entries[i].ive_size);

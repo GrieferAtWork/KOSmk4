@@ -49,7 +49,7 @@ ioctl_intarg_getbool(ioctl_t cmd,
 	if likely(argsz == sizeof(int))
 		return UNALIGNED_GET((USER CHECKED unsigned int const *)arg) != 0;
 	for (i = 0; i < argsz; ++i) {
-		if (((USER CHECKED byte_t const *)arg)[i] != 0)
+		if (((byte_t USER CHECKED const *)arg)[i] != 0)
 			return true;
 	}
 	return false;
@@ -71,13 +71,13 @@ ioctl_intarg_setbool(ioctl_t cmd,
 	} else {
 		size_t i;
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		((USER CHECKED byte_t *)arg)[0] = value ? 1 : 0;
+		((byte_t USER CHECKED *)arg)[0] = value ? 1 : 0;
 		for (i = 1; i < argsz; ++i)
-			((USER CHECKED byte_t *)arg)[i] = 0;
+			((byte_t USER CHECKED *)arg)[i] = 0;
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 		for (i = 0; i < argsz - 1; ++i)
-			((USER CHECKED byte_t *)arg)[i] = 0;
-		((USER CHECKED byte_t *)arg)[i] = value ? 1 : 0;
+			((byte_t USER CHECKED *)arg)[i] = 0;
+		((byte_t USER CHECKED *)arg)[i] = value ? 1 : 0;
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 	}
 	return 0;

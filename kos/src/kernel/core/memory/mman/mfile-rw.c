@@ -228,7 +228,7 @@ mfile_readall(struct mfile *__restrict self,
 			break;
 		if (!temp)
 			THROW(E_IOERROR_BADBOUNDS, (uintptr_t)E_IOERROR_SUBSYSTEM_FILE);
-		dst = (USER CHECKED byte_t *)dst + temp;
+		dst = (byte_t USER CHECKED *)dst + temp;
 		num_bytes -= temp;
 		src_offset += temp;
 	}

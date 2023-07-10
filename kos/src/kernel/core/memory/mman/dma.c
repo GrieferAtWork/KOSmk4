@@ -168,7 +168,7 @@ again_lock_mman:
 
 		/* Update positions for the next iteration. */
 		assert(num_bytes >= mf.mfl_size);
-		addr = (UNCHECKED void *)((UNCHECKED byte_t *)addr + mf.mfl_size);
+		addr = (UNCHECKED void *)((byte_t UNCHECKED *)addr + mf.mfl_size);
 		num_bytes -= mf.mfl_size;
 
 		/* Iterate through physical memory of the affected address range. */

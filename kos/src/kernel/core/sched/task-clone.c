@@ -194,10 +194,10 @@ restore_userprocmask_after_vfork(USER CHECKED struct userprocmask *um,
 	}
 	while (umasksize) {
 		byte_t oword, nword;
-		oword = *(USER CHECKED byte_t const *)umask;
+		oword = *(byte_t USER CHECKED const *)umask;
 		nword = *(byte_t const *)saved;
 		if (nword != oword)
-			*(USER CHECKED byte_t *)umask = nword;
+			*(byte_t USER CHECKED *)umask = nword;
 		umask = (USER CHECKED sigset_t *)((byte_t *)umask + 1);
 		saved = (sigset_t const *)((byte_t const *)saved + 1);
 		umasksize -= 1;

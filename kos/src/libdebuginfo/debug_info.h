@@ -25,6 +25,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
 #include <kos/types.h>
 
 #include <format-printer.h>
@@ -47,33 +48,33 @@ DECL_BEGIN
  * @param: sections: Mapping for `.debug_rnglists' and `.debug_ranges' */
 INTDEF NONNULL((1, 2, 3, 5)) void
 NOTHROW_NCX(CC libdi_debuginfo_rnglists_iterator_init)(di_debuginfo_rnglists_iterator_t *__restrict self,
-                                                     di_debuginfo_rnglists_t const *__restrict ranges,
-                                                     di_debuginfo_cu_parser_t const *__restrict parser,
-                                                     uintptr_t cu_base,
-                                                     di_rnglists_sections_t const *__restrict sections);
+                                                       di_debuginfo_rnglists_t const *__restrict ranges,
+                                                       di_debuginfo_cu_parser_t const *__restrict parser,
+                                                       uintptr_t cu_base,
+                                                       di_rnglists_sections_t const *__restrict sections);
 
 /* Yield the next range accessible through a given debug-ranges iterator. */
 INTDEF NONNULL((1, 2, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_rnglists_iterator_next)(di_debuginfo_rnglists_iterator_t *__restrict self,
-                                                     uintptr_t *__restrict pmodule_relative_start_pc,
-                                                     uintptr_t *__restrict pmodule_relative_end_pc);
+                                                       uintptr_t *__restrict pmodule_relative_start_pc,
+                                                       uintptr_t *__restrict pmodule_relative_end_pc);
 
 /* Check if a given `module_relative_pc' is apart of the given range selector.
  * @param: self: The ranges object to query for `module_relative_pc' */
 INTDEF NONNULL((1, 2, 5)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains)(di_debuginfo_rnglists_t const *__restrict self,
-                                                di_debuginfo_cu_parser_t const *__restrict parser,
-                                                uintptr_t cu_base,
-                                                uintptr_t module_relative_pc,
-                                                di_rnglists_sections_t const *__restrict sections);
+                                                  di_debuginfo_cu_parser_t const *__restrict parser,
+                                                  uintptr_t cu_base,
+                                                  uintptr_t module_relative_pc,
+                                                  di_rnglists_sections_t const *__restrict sections);
 INTDEF NONNULL((1, 2, 5, 6, 7)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t const *__restrict self,
-                                                   di_debuginfo_cu_parser_t const *__restrict parser,
-                                                   uintptr_t cu_base,
-                                                   uintptr_t module_relative_pc,
-                                                   di_rnglists_sections_t const *__restrict sections,
-                                                   uintptr_t *__restrict poverlap_start,
-                                                   uintptr_t *__restrict poverlap_end);
+                                                     di_debuginfo_cu_parser_t const *__restrict parser,
+                                                     uintptr_t cu_base,
+                                                     uintptr_t module_relative_pc,
+                                                     di_rnglists_sections_t const *__restrict sections,
+                                                     uintptr_t *__restrict poverlap_start,
+                                                     uintptr_t *__restrict poverlap_end);
 
 
 #define debuginfo_cu_parser_skipform(...) \
@@ -93,17 +94,17 @@ NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t con
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 INTDEF NONNULL((1, 2, 3, 4, 5)) debuginfo_errno_t
-NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadunit)(byte_t const **__restrict pdebug_info_reader,
-                                                   byte_t const *__restrict debug_info_end,
+NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadunit)(byte_t __CHECKED const **__restrict pdebug_info_reader,
+                                                   byte_t __CHECKED const *__restrict debug_info_end,
                                                    di_debuginfo_cu_parser_sections_t const *__restrict sectinfo,
                                                    di_debuginfo_cu_parser_t *__restrict result,
                                                    di_debuginfo_cu_abbrev_t *__restrict abbrev,
-                                                   byte_t const *first_component_pointer);
+                                                   byte_t __CHECKED const *first_component_pointer);
 
 
 /* Finalize the given abbreviation code controller. */
 INTDEF NONNULL((1)) void
-NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_fini)(di_debuginfo_cu_abbrev_t *__restrict self);
+NOTHROW(CC libdi_debuginfo_cu_abbrev_fini)(di_debuginfo_cu_abbrev_t *__restrict self);
 
 
 /* Skip data associated with the given attribute form.
@@ -111,7 +112,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_fini)(di_debuginfo_cu_abbrev_t *__restr
 INTDEF NONNULL((1, 3)) void
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipform)(di_debuginfo_cu_simple_parser_t *__restrict self,
                                                    dwarf_uleb128_t form,
-                                                   byte_t const **__restrict p_attr_reader);
+                                                   byte_t __CHECKED const **__restrict p_attr_reader);
 
 /* Start a new component.
  * @return: true:  ...
@@ -123,8 +124,8 @@ INTDEF NONNULL((1)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextsibling)(d
 INTDEF NONNULL((1)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextparent)(di_debuginfo_cu_parser_t *__restrict self);
 
 /* Same as `libdi_debuginfo_cu_parser_next()', but store a pointer to the
- * debug information start location of  the next componet within  `*pdip' */
-INTDEF NONNULL((1, 2)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_next_with_dip)(di_debuginfo_cu_parser_t *__restrict self, byte_t const **__restrict pdip);
+ * debug information start location of the next componet within  `*p_dip' */
+INTDEF NONNULL((1, 2)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_next_with_dip)(di_debuginfo_cu_parser_t *__restrict self, byte_t __CHECKED const **__restrict p_dip);
 
 /* Skip the attributes  of the  current component  (must be  called if  not
  * parsed explicitly prior to the next call to `debuginfo_cu_parser_next*') */
@@ -139,18 +140,18 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipattr)(di_d
  *  - debuginfo_cu_parser_getref():    DW_FORM_ref_addr, DW_FORM_ref1, DW_FORM_ref2, DW_FORM_ref4, DW_FORM_ref8, DW_FORM_ref_sig8, DW_FORM_ref_udata, DW_FORM_ref_sup4, DW_FORM_ref_sig8, DW_FORM_ref_sup8
  *  - debuginfo_cu_parser_getexpr():   DW_FORM_exprloc
  *  - debuginfo_cu_parser_getblock():  DW_FORM_block, DW_FORM_block1, DW_FORM_block2, DW_FORM_block4 */
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, char const **__restrict presult);
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring_ex)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, char const **__restrict presult, di_string_sections_t const *__restrict sections);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, char __CHECKED const **__restrict presult);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring_ex)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, char __CHECKED const **__restrict presult, di_string_sections_t const *__restrict sections);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getaddr)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult);
-INTDEF NONNULL((1, 3, 4)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult, byte_t const *__restrict attr_reader);
+INTDEF NONNULL((1, 3, 4)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult, byte_t __CHECKED const *__restrict attr_reader);
 #if __SIZEOF_POINTER__ == 8
 #define libdi_debuginfo_cu_parser_getconst64 libdi_debuginfo_cu_parser_getconst
 #else /* __SIZEOF_POINTER__ == 8 */
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst64)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uint64_t *__restrict presult, byte_t const *__restrict attr_reader);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst64)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uint64_t *__restrict presult, byte_t __CHECKED const *__restrict attr_reader);
 #endif /* __SIZEOF_POINTER__ != 8 */
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst128)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uint128_t *__restrict presult, byte_t const *__restrict attr_reader);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst128)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uint128_t *__restrict presult, byte_t __CHECKED const *__restrict attr_reader);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getflag)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, bool *__restrict presult);
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getref)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, byte_t const **__restrict presult);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getref)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, byte_t __CHECKED const **__restrict presult);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getexpr)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, di_debuginfo_location_t *__restrict result);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getblock)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, di_debuginfo_block_t *__restrict result);
 

@@ -140,7 +140,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
                             siginfo_t const *__restrict siginfo,
                             struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT) {
-	USER CHECKED byte_t *usp, *orig_usp;
+	byte_t USER CHECKED *usp, *orig_usp;
 	bool must_restore_sigmask;
 	sigset_t old_sigmask;
 	USER CHECKED LOCAL_siginfo_t *user_siginfo;
@@ -172,12 +172,12 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	}
 
 	/* Figure out which stack we should write data to. */
-	orig_usp = (USER CHECKED byte_t *)icpustate_getusersp(state);
+	orig_usp = (byte_t USER CHECKED *)icpustate_getusersp(state);
 	usp      = orig_usp;
 	/* Check if sigaltstack should be used. */
 	if (action->sa_flags & SA_ONSTACK) {
 		/* TODO: SS_AUTODISARM */
-		usp = (USER CHECKED byte_t *)PERTASK_GET(this_user_except_handler.ueh_stack);
+		usp = (byte_t USER CHECKED *)PERTASK_GET(this_user_except_handler.ueh_stack);
 	}
 #ifdef DEFINE_x86_userexcept_callsignal64
 	else {
@@ -187,9 +187,9 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 
 	/* Force proper alignment. */
 #ifdef DEFINE_x86_userexcept_callsignal32
-	usp = (USER CHECKED byte_t *)((uintptr_t)usp & ~3);
+	usp = (byte_t USER CHECKED *)((uintptr_t)usp & ~3);
 #else /* DEFINE_x86_userexcept_callsignal32 */
-	usp = (USER CHECKED byte_t *)((uintptr_t)usp & ~7);
+	usp = (byte_t USER CHECKED *)((uintptr_t)usp & ~7);
 #endif /* !DEFINE_x86_userexcept_callsignal32 */
 
 	/* At this point, the following options affect how we need to set up the stack:
@@ -415,7 +415,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	/* SYSVABI specs require the stack pointer to be 16-byte aligned _BEFORE_ the call.
 	 * This way, after +8 for the return  address and +8 for a potential  `pushq %rbp',
 	 * the stack will be 16-byte aligned once again. */
-	usp = (USER CHECKED byte_t *)FLOOR_ALIGN((uintptr_t)usp, 16);
+	usp = (byte_t USER CHECKED *)FLOOR_ALIGN((uintptr_t)usp, 16);
 
 	/* Push return address */
 	usp -= 8;

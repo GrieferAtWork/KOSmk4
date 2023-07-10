@@ -581,11 +581,11 @@ DATDEF struct ctype ctype_char32_t_const_compat_ptr;
  * @return: >= 0: Sum up this value, and continue enumeration.
  * @return: < 0:  Stop enumeration and have `ctype_struct_enumfields()' re-return this value. */
 typedef NONNULL_T((2, 3, 4, 5)) ssize_t
-NOTHROW_T(KCALL *ctype_struct_field_callback_t)(void *cookie,
-                                                di_debuginfo_member_t const *__restrict member,
-                                                di_debuginfo_cu_parser_t const *__restrict parser,
-                                                struct cmodule *__restrict mod,
-                                                struct cmodunit *__restrict cu);
+(KCALL *ctype_struct_field_callback_t)(void *cookie,
+                                       di_debuginfo_member_t const *__restrict member,
+                                       di_debuginfo_cu_parser_t const *__restrict parser,
+                                       struct cmodule *__restrict mod,
+                                       struct cmodunit *__restrict cu);
 
 /* Enumerate/find the fields of a given struct.
  * @param: cb:     Callback to-be invoked for the field.

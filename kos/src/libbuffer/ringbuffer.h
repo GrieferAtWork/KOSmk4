@@ -49,11 +49,11 @@ DECL_BEGIN
  * @return: * : The number of bytes read. */
 INTDEF BLOCKING NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libringbuffer_read(struct ringbuffer *__restrict self,
-                   __USER __CHECKED void *dst, size_t num_bytes)
+                   void __USER __CHECKED *dst, size_t num_bytes)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...);
 INTDEF NONNULL((1)) size_t CC
 libringbuffer_read_nonblock(struct ringbuffer *__restrict self,
-                            __USER __CHECKED void *dst, size_t num_bytes)
+                            void __USER __CHECKED *dst, size_t num_bytes)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 
 
@@ -74,24 +74,24 @@ libringbuffer_read_nonblock(struct ringbuffer *__restrict self,
  * @return: -1: [USERSPACE] Failed to increase the buffer size (s.a. `errno = ENOMEM') */
 INTDEF BLOCKING NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libringbuffer_write(struct ringbuffer *__restrict self,
-                    __USER __CHECKED void const *src, size_t num_bytes)
+                    void __USER __CHECKED const *src, size_t num_bytes)
 		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
 		              THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...));
 INTDEF BLOCKING NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libringbuffer_writesome(struct ringbuffer *__restrict self,
-                        __USER __CHECKED void const *src, size_t num_bytes)
+                        void __USER __CHECKED const *src, size_t num_bytes)
 		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
 		              THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...));
 INTDEF NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libringbuffer_write_nonblock(struct ringbuffer *__restrict self,
-                             __USER __CHECKED void const *src, size_t num_bytes)
+                             void __USER __CHECKED const *src, size_t num_bytes)
 		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_BADALLOC),
 		              THROWS(E_SEGFAULT, E_WOULDBLOCK));
 
 /* Same as `ringbuffer_write_nonblock()', but don't increase the buffer's size. */
 INTDEF NONNULL((1)) size_t CC
 libringbuffer_write_nonblock_noalloc(struct ringbuffer *__restrict self,
-                                     __USER __CHECKED void const *src, size_t num_bytes)
+                                     void __USER __CHECKED const *src, size_t num_bytes)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 
 /* Try to unread up to `num_bytes' of data that had yet to be re-written

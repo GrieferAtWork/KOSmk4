@@ -25,6 +25,7 @@
 
 #include <bits/crt/format-printer.h>
 #include <bits/types.h>
+#include <kos/anno.h>
 
 #include <libunwind/dwarf.h>
 
@@ -77,21 +78,21 @@ LIBDEBUGINFO_DECL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(LIBDEBUGINFO
  * >>                 debug_str_data, debug_str_data + debug_str_size); */
 typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBDEBUGINFO_CC *PDEBUG_REPR_DUMP)(__pformatprinter printer, void *arg,
-                                    __byte_t const *debug_info_start, __byte_t const *debug_info_end,
-                                    __byte_t const *debug_abbrev_start, __byte_t const *debug_abbrev_end,
-                                    __byte_t const *debug_loclists_start, __byte_t const *debug_loclists_end,
-                                    __byte_t const *debug_loc_start, __byte_t const *debug_loc_end,
-                                    __byte_t const *debug_str_start, __byte_t const *debug_str_end,
-                                    __byte_t const *debug_line_str_start, __byte_t const *debug_line_str_end);
+                                    __byte_t __CHECKED const *debug_info_start, __byte_t __CHECKED const *debug_info_end,
+                                    __byte_t __CHECKED const *debug_abbrev_start, __byte_t __CHECKED const *debug_abbrev_end,
+                                    __byte_t __CHECKED const *debug_loclists_start, __byte_t __CHECKED const *debug_loclists_end,
+                                    __byte_t __CHECKED const *debug_loc_start, __byte_t __CHECKED const *debug_loc_end,
+                                    __byte_t __CHECKED const *debug_str_start, __byte_t __CHECKED const *debug_str_end,
+                                    __byte_t __CHECKED const *debug_line_str_start, __byte_t __CHECKED const *debug_line_str_end);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __ssize_t
 (LIBDEBUGINFO_CC debug_repr_dump)(__pformatprinter printer, void *arg,
-                                  __byte_t const *debug_info_start, __byte_t const *debug_info_end,
-                                  __byte_t const *debug_abbrev_start, __byte_t const *debug_abbrev_end,
-                                  __byte_t const *debug_loclists_start, __byte_t const *debug_loclists_end,
-                                  __byte_t const *debug_loc_start, __byte_t const *debug_loc_end,
-                                  __byte_t const *debug_str_start, __byte_t const *debug_str_end,
-                                  __byte_t const *debug_line_str_start, __byte_t const *debug_line_str_end);
+                                  __byte_t __CHECKED const *debug_info_start, __byte_t __CHECKED const *debug_info_end,
+                                  __byte_t __CHECKED const *debug_abbrev_start, __byte_t __CHECKED const *debug_abbrev_end,
+                                  __byte_t __CHECKED const *debug_loclists_start, __byte_t __CHECKED const *debug_loclists_end,
+                                  __byte_t __CHECKED const *debug_loc_start, __byte_t __CHECKED const *debug_loc_end,
+                                  __byte_t __CHECKED const *debug_str_start, __byte_t __CHECKED const *debug_str_end,
+                                  __byte_t __CHECKED const *debug_line_str_start, __byte_t __CHECKED const *debug_line_str_end);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 
@@ -115,13 +116,13 @@ LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __ssize_t
  * @return: * : The usual pformatprinter-style value. */
 typedef __ATTR_NONNULL_T((1, 3)) __ssize_t
 (LIBDEBUGINFO_CC *PDEBUG_REPR_CFI_EXPRESSION_EX)(__pformatprinter printer, void *arg,
-                                                 __byte_t const *__restrict pc, __size_t length,
+                                                 __byte_t __CHECKED const *__restrict pc, __size_t length,
                                                  __size_t indent, __byte_t addrsize, __byte_t ptrsize,
                                                  __BOOL indent_on_first_line);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __ssize_t LIBDEBUGINFO_CC
 debug_repr_cfi_expression_ex(__pformatprinter printer, void *arg,
-                             __byte_t const *__restrict pc, __size_t length,
+                             __byte_t __CHECKED const *__restrict pc, __size_t length,
                              __size_t indent, __byte_t addrsize, __byte_t ptrsize,
                              __BOOL indent_on_first_line);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
@@ -143,13 +144,13 @@ debug_repr_cfi_expression_ex(__pformatprinter printer, void *arg,
  * @return: * : The usual pformatprinter-style value. */
 typedef __ATTR_NONNULL_T((1, 3)) __ssize_t
 (LIBDEBUGINFO_CC *PDEBUG_REPR_CFI_EXPRESSION_WITH_LENGTH)(__pformatprinter printer, void *arg,
-                                                          __byte_t const *__restrict expr,
+                                                          __byte_t __CHECKED const *__restrict expr,
                                                           __size_t length, __size_t indent,
                                                           __byte_t addrsize, __byte_t ptrsize);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __ssize_t LIBDEBUGINFO_CC
 debug_repr_cfi_expression_with_length(__pformatprinter printer, void *arg,
-                                      __byte_t const *__restrict expr,
+                                      __byte_t __CHECKED const *__restrict expr,
                                       __size_t length, __size_t indent,
                                       __byte_t addrsize, __byte_t ptrsize);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
@@ -165,12 +166,12 @@ debug_repr_cfi_expression_with_length(__pformatprinter printer, void *arg,
  * @return: * : The usual pformatprinter-style value. */
 typedef __ATTR_NONNULL_T((1, 3)) __ssize_t
 (LIBDEBUGINFO_CC *PDEBUG_REPR_CFI_EXPRESSION)(__pformatprinter printer, void *arg,
-                                              __byte_t const *__restrict expr, __size_t indent,
+                                              __byte_t __CHECKED const *__restrict expr, __size_t indent,
                                               __byte_t addrsize, __byte_t ptrsize);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __ssize_t LIBDEBUGINFO_CC
 debug_repr_cfi_expression(__pformatprinter printer, void *arg,
-                          __byte_t const *__restrict expr, __size_t indent,
+                          __byte_t __CHECKED const *__restrict expr, __size_t indent,
                           __byte_t addrsize, __byte_t ptrsize);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 

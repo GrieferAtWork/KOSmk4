@@ -25,6 +25,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
 #include <kos/types.h>
 
 #include <libdebuginfo/debug_aranges.h>
@@ -43,8 +44,8 @@ DECL_BEGIN
  * @return: DEBUG_INFO_ERROR_NOFRAME: ...
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 INTDEF NONNULL((1, 2, 3)) debuginfo_errno_t
-NOTHROW_NCX(CC libdi_debugaranges_locate)(byte_t const *__restrict debug_aranges_start,
-                                          byte_t const *__restrict debug_aranges_end,
+NOTHROW_NCX(CC libdi_debugaranges_locate)(byte_t __CHECKED const *__restrict debug_aranges_start,
+                                          byte_t __CHECKED const *__restrict debug_aranges_end,
                                           uintptr_t *__restrict pdebug_info_cu_offset,
                                           uintptr_t module_relative_pc);
 

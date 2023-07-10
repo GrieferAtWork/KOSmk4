@@ -134,11 +134,7 @@ class Addr2line {
 
 	@@Convert a given address to a (filename, line, function) triple
 	function addr2line(addr: int | string): {(string, string, string)...} {
-		writer.write(f"{
-			addr is string
-				? addr
-				: addr.hex()
-		}\n");
+		writer.write(f"{addr is int ? addr.hex() : addr}\n");
 		local text = reader.read();
 		while (text) {
 			local func, data;

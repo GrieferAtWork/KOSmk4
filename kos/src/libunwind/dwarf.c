@@ -27,6 +27,7 @@
 
 #include <hybrid/unaligned.h>
 
+#include <kos/anno.h>
 #include <kos/exec/module.h>
 #include <kos/types.h>
 
@@ -46,9 +47,9 @@ DECL_BEGIN
 
 /* Decode a signed/unsigned LEB128 integer and advance `*preader' */
 INTERN NONNULL((1)) dwarf_sleb128_t
-NOTHROW_NCX(CC libuw_dwarf_decode_sleb128)(byte_t const **__restrict preader) {
+NOTHROW_NCX(CC libuw_dwarf_decode_sleb128)(byte_t __CHECKED const **__restrict preader) {
+	byte_t __CHECKED const *reader = *preader;
 	byte_t byte;
-	byte_t const *reader   = *preader;
 	dwarf_sleb128_t result = 0;
 	shift_t shift          = 0;
 	for (;;) {
@@ -66,9 +67,9 @@ NOTHROW_NCX(CC libuw_dwarf_decode_sleb128)(byte_t const **__restrict preader) {
 }
 
 INTERN NONNULL((1)) dwarf_uleb128_t
-NOTHROW_NCX(CC libuw_dwarf_decode_uleb128)(byte_t const **__restrict preader) {
+NOTHROW_NCX(CC libuw_dwarf_decode_uleb128)(byte_t __CHECKED const **__restrict preader) {
+	byte_t __CHECKED const *reader = *preader;
 	byte_t byte;
-	byte_t const *reader   = *preader;
 	dwarf_uleb128_t result = 0;
 	shift_t shift          = 0;
 	for (;;) {
@@ -83,8 +84,8 @@ NOTHROW_NCX(CC libuw_dwarf_decode_uleb128)(byte_t const **__restrict preader) {
 }
 
 
-PRIVATE NONNULL((1)) byte_t *
-NOTHROW_NCX(CC calculate_tbase)(void const *modptr) {
+PRIVATE NONNULL((1)) byte_t __CHECKED *
+NOTHROW_NCX(CC calculate_tbase)(void __CHECKED const *modptr) {
 	void *result;
 	result = module_fromaddr_nx(modptr);
 	if (result != NULL)
@@ -92,8 +93,8 @@ NOTHROW_NCX(CC calculate_tbase)(void const *modptr) {
 	return (byte_t *)result;
 }
 
-PRIVATE NONNULL((1)) byte_t *
-NOTHROW_NCX(CC calculate_dbase)(void const *modptr) {
+PRIVATE NONNULL((1)) byte_t __CHECKED *
+NOTHROW_NCX(CC calculate_dbase)(void __CHECKED const *modptr) {
 	void *result;
 	result = module_fromaddr_nx(modptr);
 	if (result != NULL)
@@ -102,27 +103,27 @@ NOTHROW_NCX(CC calculate_dbase)(void const *modptr) {
 }
 
 
-INTERN NONNULL((1)) byte_t *
-NOTHROW_NCX(CC libuw_dwarf_decode_pointer)(byte_t const **__restrict preader,
+INTERN NONNULL((1)) byte_t __CHECKED *
+NOTHROW_NCX(CC libuw_dwarf_decode_pointer)(byte_t __CHECKED const **__restrict preader,
                                            uint8_t encoding, uint8_t addrsize,
                                            struct unwind_bases *dw_bases) {
-	byte_t *result;
-	byte_t const *reader = *preader;
+	byte_t __CHECKED *result;
+	byte_t __CHECKED const *reader = *preader;
 
 	/* Relative encoding formats. */
 	switch (DW_EH_PE_BASE(encoding)) {
 
 	case DW_EH_PE_pcrel:
-		result = (byte_t *)reader; /* Relative to here. */
+		result = (byte_t __CHECKED *)reader; /* Relative to here. */
 		break;
 
 	case DW_EH_PE_textrel:
 		if (dw_bases) {
-			result = (byte_t *)dw_bases->ub_tbase;
+			result = (byte_t __CHECKED *)dw_bases->ub_tbase;
 			if (!result) {
-				result = (byte_t *)dw_bases->ub_fbase;
+				result = (byte_t __CHECKED *)dw_bases->ub_fbase;
 				if (!result)
-					result = (byte_t *)reader;
+					result = (byte_t __CHECKED *)reader;
 				result = calculate_tbase(reader);
 				dw_bases->ub_tbase = result;
 			}
@@ -133,11 +134,11 @@ NOTHROW_NCX(CC libuw_dwarf_decode_pointer)(byte_t const **__restrict preader,
 
 	case DW_EH_PE_datarel:
 		if (dw_bases) {
-			result = (byte_t *)dw_bases->ub_dbase;
+			result = (byte_t __CHECKED *)dw_bases->ub_dbase;
 			if (!result) {
-				result = (byte_t *)dw_bases->ub_fbase;
+				result = (byte_t __CHECKED *)dw_bases->ub_fbase;
 				if (!result)
-					result = (byte_t *)reader;
+					result = (byte_t __CHECKED *)reader;
 				result = calculate_dbase(reader);
 				dw_bases->ub_dbase = result;
 			}
@@ -147,19 +148,19 @@ NOTHROW_NCX(CC libuw_dwarf_decode_pointer)(byte_t const **__restrict preader,
 		break;
 
 	case DW_EH_PE_funcrel:
-		result = (byte_t *)0;
+		result = (byte_t __CHECKED *)0;
 		if (dw_bases != NULL)
-			result = (byte_t *)dw_bases->ub_fbase;
+			result = (byte_t __CHECKED *)dw_bases->ub_fbase;
 		break;
 
 	case DW_EH_PE_aligned:
-		reader = (byte_t const *)(((uintptr_t)reader + (addrsize - 1)) & ~(addrsize - 1));
-		result = (byte_t *)0;
+		reader = (byte_t __CHECKED const *)(((uintptr_t)reader + (addrsize - 1)) & ~(addrsize - 1));
+		result = (byte_t __CHECKED *)0;
 		break;
 
 	default:
 	case DW_EH_PE_absptr:
-		result = (byte_t *)0;
+		result = (byte_t __CHECKED *)0;
 		break;
 	}
 	switch (DW_EH_PE_OFF(encoding)) {
@@ -235,15 +236,15 @@ NOTHROW_NCX(CC libuw_dwarf_decode_pointer)(byte_t const **__restrict preader,
 	}
 	if (encoding & DW_EH_PE_indirect) {
 		if (addrsize >= sizeof(uintptr_t)) {
-			result = (byte_t *)UNALIGNED_GET((uintptr_t const *)result);
+			result = (byte_t __CHECKED *)UNALIGNED_GET((__CHECKED uintptr_t const *)result);
 #if __SIZEOF_POINTER__ > 4
 		} else if (addrsize >= 4) {
-			result = (byte_t *)(uintptr_t)UNALIGNED_GET32(result);
+			result = (byte_t __CHECKED *)(uintptr_t)UNALIGNED_GET32(result);
 #endif /* __SIZEOF_POINTER__ > 4 */
 		} else if (addrsize >= 2) {
-			result = (byte_t *)(uintptr_t)UNALIGNED_GET16(result);
+			result = (byte_t __CHECKED *)(uintptr_t)UNALIGNED_GET16(result);
 		} else if (addrsize >= 1) {
-			result = (byte_t *)(uintptr_t)UNALIGNED_GET8(result);
+			result = (byte_t __CHECKED *)(uintptr_t)UNALIGNED_GET8(result);
 		}
 	}
 	*preader = reader;

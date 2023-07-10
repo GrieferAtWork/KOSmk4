@@ -23,6 +23,7 @@
 #include "api.h"
 /**/
 
+#include <kos/anno.h>
 #include <bits/types.h>
 
 #include "cfi.h"
@@ -217,24 +218,24 @@ typedef struct unwind_fde_struct {
 	union {
 		struct unwind_bases f_bases;       /* Base addresses */
 		struct {
-			void const     *f_tbase;       /* [0..1][in|out] Text base address. */
-			void const     *f_dbase;       /* [0..1][in|out] Text base address. */
-			void const     *f_pcstart;     /* [<= f_pcend] PC (Program counter) starting address (absolute). */
+			void __CHECKED const     *f_tbase;       /* [0..1][in|out] Text base address. */
+			void __CHECKED const     *f_dbase;       /* [0..1][in|out] Text base address. */
+			void __CHECKED const     *f_pcstart;     /* [<= f_pcend] PC (Program counter) starting address (absolute). */
 		};
 	};
-	void const             *f_pcend;       /* [>= f_pcstart] PC (Program counter) end address (absolute). */
-	__uintptr_t             f_codealign;   /* Code alignment. (Multiplied with the delta argument of an advance location instruction) */
-	__intptr_t              f_dataalign;   /* Data alignment. (Multiplied with the register offset argument of an offset instruction) */
-	void const             *f_persofun;    /* [0..1] Address of a personality handler function. (absolute) */
-	void const             *f_lsdaaddr;    /* [0..1] Address of a language-specific data area. (absolute) */
-	__byte_t const         *f_inittext;    /* [0..1] Pointer to initial EH instructions (usually describing compiler-generated frames) (absolute) */
-	__byte_t const         *f_inittextend; /* [0..1] End address of `f_inittext'. */
-	__byte_t const         *f_evaltext;    /* [0..1] Pointer to FDE-specific EH instructions (This is the meat of it all) (absolute) */
-	__byte_t const         *f_evaltextend; /* [0..1] End address of `f_evaltext'. */
-	unwind_regno_t          f_retreg;      /* Return-address register number (One of `CFI_[ARCH]_UNWIND_REGISTER_[NAME]'). */
-	__uint8_t               f_ptrenc;      /* Encoding used for pointers (One of `DW_EH_PE_*') */
-	__uint8_t               f_sigframe;    /* Non-zero if this is a signal frame. */
-	__uint8_t               f_addrsize;    /* Size of an address. */
+	void __CHECKED const             *f_pcend;       /* [>= f_pcstart] PC (Program counter) end address (absolute). */
+	__uintptr_t                       f_codealign;   /* Code alignment. (Multiplied with the delta argument of an advance location instruction) */
+	__intptr_t                        f_dataalign;   /* Data alignment. (Multiplied with the register offset argument of an offset instruction) */
+	void __CHECKED const             *f_persofun;    /* [0..1] Address of a personality handler function. (absolute) */
+	void __CHECKED const             *f_lsdaaddr;    /* [0..1] Address of a language-specific data area. (absolute) */
+	__byte_t __CHECKED const         *f_inittext;    /* [0..1] Pointer to initial EH instructions (usually describing compiler-generated frames) (absolute) */
+	__byte_t __CHECKED const         *f_inittextend; /* [0..1] End address of `f_inittext'. */
+	__byte_t __CHECKED const         *f_evaltext;    /* [0..1] Pointer to FDE-specific EH instructions (This is the meat of it all) (absolute) */
+	__byte_t __CHECKED const         *f_evaltextend; /* [0..1] End address of `f_evaltext'. */
+	unwind_regno_t                    f_retreg;      /* Return-address register number (One of `CFI_[ARCH]_UNWIND_REGISTER_[NAME]'). */
+	__uint8_t                         f_ptrenc;      /* Encoding used for pointers (One of `DW_EH_PE_*') */
+	__uint8_t                         f_sigframe;    /* Non-zero if this is a signal frame. */
+	__uint8_t                         f_addrsize;    /* Size of an address. */
 } unwind_fde_t;
 
 
@@ -245,14 +246,14 @@ typedef struct unwind_fde_struct {
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 typedef __ATTR_NONNULL_T((1, 2, 3)) unwind_errno_t
-__NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_LOAD)(__byte_t const **__restrict __peh_frame_reader,
-                                                __byte_t const *__eh_frame_end,
+__NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_LOAD)(__byte_t __CHECKED const **__restrict __peh_frame_reader,
+                                                __byte_t __CHECKED const *__eh_frame_end,
                                                 unwind_fde_t *__restrict __result,
                                                 __uint8_t __sizeof_address);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 3)) unwind_errno_t
-__NOTHROW_NCX(LIBUNWIND_CC unwind_fde_load)(__byte_t const **__restrict __peh_frame_reader,
-                                            __byte_t const *__eh_frame_end,
+__NOTHROW_NCX(LIBUNWIND_CC unwind_fde_load)(__byte_t __CHECKED const **__restrict __peh_frame_reader,
+                                            __byte_t __CHECKED const *__eh_frame_end,
                                             unwind_fde_t *__restrict __result,
                                             __uint8_t __sizeof_address);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
@@ -265,16 +266,16 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_load)(__byte_t const **__restrict __peh_fr
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `absolute_pc'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 typedef __ATTR_NONNULL_T((1, 2, 4)) unwind_errno_t
-__NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_SCAN)(__byte_t const *__eh_frame_start,
-                                                __byte_t const *__eh_frame_end,
-                                                void const *__absolute_pc,
+__NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_SCAN)(__byte_t __CHECKED const *__eh_frame_start,
+                                                __byte_t __CHECKED const *__eh_frame_end,
+                                                void __CHECKED const *__absolute_pc,
                                                 unwind_fde_t *__restrict __result,
                                                 __uint8_t __sizeof_address);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4)) unwind_errno_t
-__NOTHROW_NCX(LIBUNWIND_CC unwind_fde_scan)(__byte_t const *__eh_frame_start,
-                                            __byte_t const *__eh_frame_end,
-                                            void const *__absolute_pc,
+__NOTHROW_NCX(LIBUNWIND_CC unwind_fde_scan)(__byte_t __CHECKED const *__eh_frame_start,
+                                            __byte_t __CHECKED const *__eh_frame_end,
+                                            void __CHECKED const *__absolute_pc,
                                             unwind_fde_t *__restrict __result,
                                             __uint8_t __sizeof_address);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
@@ -284,16 +285,16 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_scan)(__byte_t const *__eh_frame_start,
 typedef struct unwind_cfa_register_struct {
 	/* Canonical Frame Address register restore descriptor. */
 	union {
-		__byte_t const   *cr_expr;  /* [valid_if(cr_rule == rule_expression || cr_rule == rule_val_expression)]
-		                             * [1..1] Expression.
-		                             * NOTE: This  pointer  is  directed  at  a  `dwarf_uleb128_t',
-		                             *       describing the amount of types that follow immediately
-		                             *       after, containing expression text. */
-		__intptr_t        cr_value; /* [valid_if(cr_rule != rule_expression && cr_rule != rule_val_expression)]
-		                             * Register value. */
+		__byte_t __CHECKED const *cr_expr;  /* [valid_if(cr_rule == rule_expression || cr_rule == rule_val_expression)]
+		                                     * [1..1] Expression.
+		                                     * NOTE: This  pointer  is  directed  at  a  `dwarf_uleb128_t',
+		                                     *       describing the amount of types that follow immediately
+		                                     *       after, containing expression text. */
+		__intptr_t                cr_value; /* [valid_if(cr_rule != rule_expression && cr_rule != rule_val_expression)]
+		                                     * Register value. */
 	};
-	__uint8_t             cr_rule;  /* Register rule (One of `DW_CFA_register_rule_*') */
-	__uint8_t             cr_pad[sizeof(void *) - 1]; /* ... */
+	__uint8_t                     cr_rule;  /* Register rule (One of `DW_CFA_register_rule_*') */
+	__uint8_t                     cr_pad[sizeof(void *) - 1]; /* ... */
 } unwind_cfa_register_t;
 
 #define UNWIND_CFA_VALUE_UNSET      0 /* Not set... */
@@ -304,12 +305,12 @@ typedef struct unwind_cfa_value_struct {
 	unwind_regno_t cv_type;  /* CFA type (One of `UNWIND_CFA_VALUE_*') */
 	unwind_regno_t cv_reg;   /* [valid_if(cv_type == UNWIND_CFA_VALUE_REGISTER)] CFA register. */
 	union {
-		__byte_t const *cv_expr;  /* [1..1][valid_if(cv_type == UNWIND_CFA_VALUE_EXPRESSION)] Expression.
-		                           * NOTE: This pointer is directed at a `uleb128', describing
-		                           *       the  amount of bytes that follow immediately after,
-		                           *       containing expression text. */
-		__intptr_t      cv_value; /* [valid_if(cv_type == UNWIND_CFA_VALUE_REGISTER)]
-		                           * Address offset (added to the value of `cv_reg') */
+		__byte_t __CHECKED const *cv_expr;  /* [1..1][valid_if(cv_type == UNWIND_CFA_VALUE_EXPRESSION)] Expression.
+		                                     * NOTE: This pointer is directed at a `uleb128', describing
+		                                     *       the  amount of bytes that follow immediately after,
+		                                     *       containing expression text. */
+		__intptr_t                cv_value; /* [valid_if(cv_type == UNWIND_CFA_VALUE_REGISTER)]
+		                                     * Address offset (added to the value of `cv_reg') */
 	};
 } unwind_cfa_value_t;
 
@@ -376,12 +377,12 @@ typedef struct unwind_cfa_landing_state_struct {
 typedef __ATTR_NONNULL_T((1, 2)) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_EXEC)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                                 unwind_cfa_state_t *__restrict __result,
-                                                void const *__absolute_pc);
+                                                void __CHECKED const *__absolute_pc);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_exec)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                             unwind_cfa_state_t *__restrict __result,
-                                            void const *__absolute_pc);
+                                            void __CHECKED const *__absolute_pc);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
@@ -402,12 +403,12 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_exec)(unwind_fde_t *__restrict __self, /* 
 typedef __ATTR_NONNULL_T((1, 2)) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_SIGFRAME_EXEC)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                                          unwind_cfa_sigframe_state_t *__restrict __result,
-                                                         void const *__absolute_pc);
+                                                         void __CHECKED const *__absolute_pc);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_sigframe_exec)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                                      unwind_cfa_sigframe_state_t *__restrict __result,
-                                                     void const *__absolute_pc);
+                                                     void __CHECKED const *__absolute_pc);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
@@ -428,14 +429,14 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_sigframe_exec)(unwind_fde_t *__restrict __
 typedef __ATTR_NONNULL_T((1, 2)) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_LANDING_EXEC)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                                         unwind_cfa_landing_state_t *__restrict __result,
-                                                        void const *__absolute_pc,
-                                                        void const *__landingpad_pc);
+                                                        void __CHECKED const *__absolute_pc,
+                                                        void __CHECKED const *__landingpad_pc);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_landing_exec)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                                     unwind_cfa_landing_state_t *__restrict __result,
-                                                    void const *__absolute_pc,
-                                                    void const *__landingpad_pc);
+                                                    void __CHECKED const *__absolute_pc,
+                                                    void __CHECKED const *__landingpad_pc);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
@@ -457,13 +458,13 @@ typedef __ATTR_NONNULL_T((1, 2)) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_RULE)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                                 unwind_cfa_register_t *__restrict __result,
                                                 unwind_regno_t __dw_regno,
-                                                void const *__absolute_pc);
+                                                void __CHECKED const *__absolute_pc);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_rule)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                             unwind_cfa_register_t *__restrict __result,
                                             unwind_regno_t __dw_regno,
-                                            void const *__absolute_pc);
+                                            void __CHECKED const *__absolute_pc);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
@@ -476,12 +477,12 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_rule)(unwind_fde_t *__restrict __self, /* 
 typedef __ATTR_NONNULL_T((1, 2)) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_EXEC_CFA)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                                     unwind_cfa_value_t *__restrict __result,
-                                                    void const *__absolute_pc);
+                                                    void __CHECKED const *__absolute_pc);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_exec_cfa)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                                 unwind_cfa_value_t *__restrict __result,
-                                                void const *__absolute_pc);
+                                                void __CHECKED const *__absolute_pc);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
@@ -502,14 +503,14 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_exec_cfa)(unwind_fde_t *__restrict __self,
 typedef __ATTR_NONNULL_T((1, 2, 4, 6)) unwind_errno_t
 (LIBUNWIND_CC *PUNWIND_CFA_APPLY)(unwind_cfa_state_t *__restrict __self,
                                   unwind_fde_t *__restrict __fde, /* Only non-const for lazy initialized fields! */
-                                  void const *__absolute_pc,
+                                  void __CHECKED const *__absolute_pc,
                                   unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
                                   unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4, 6)) unwind_errno_t LIBUNWIND_CC
 unwind_cfa_apply(unwind_cfa_state_t *__restrict __self,
                  unwind_fde_t *__restrict __fde, /* Only non-const for lazy initialized fields! */
-                 void const *__absolute_pc,
+                 void __CHECKED const *__absolute_pc,
                  unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
                  unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
@@ -527,14 +528,14 @@ unwind_cfa_apply(unwind_cfa_state_t *__restrict __self,
 typedef __ATTR_NONNULL_T((1, 2, 4, 6)) unwind_errno_t
 (LIBUNWIND_CC *PUNWIND_CFA_SIGFRAME_APPLY)(unwind_cfa_sigframe_state_t *__restrict __self,
                                            unwind_fde_t *__restrict __fde, /* Only non-const for lazy initialized fields! */
-                                           void const *__absolute_pc,
+                                           void __CHECKED const *__absolute_pc,
                                            unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
                                            unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4, 6)) unwind_errno_t LIBUNWIND_CC
 unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict __self,
                           unwind_fde_t *__restrict __fde, /* Only non-const for lazy initialized fields! */
-                          void const *__absolute_pc,
+                          void __CHECKED const *__absolute_pc,
                           unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
                           unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
@@ -552,14 +553,14 @@ unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict __self,
 typedef __ATTR_NONNULL_T((1, 2, 4, 6)) unwind_errno_t
 (LIBUNWIND_CC *PUNWIND_CFA_LANDING_APPLY)(unwind_cfa_landing_state_t *__restrict __self,
                                           unwind_fde_t *__restrict __fde, /* Only non-const for lazy initialized fields! */
-                                          void const *__absolute_pc,
+                                          void __CHECKED const *__absolute_pc,
                                           unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
                                           unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4, 6)) unwind_errno_t LIBUNWIND_CC
 unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict __self,
                          unwind_fde_t *__restrict __fde, /* Only non-const for lazy initialized fields! */
-                         void const *__absolute_pc,
+                         void __CHECKED const *__absolute_pc,
                          unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
                          unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */

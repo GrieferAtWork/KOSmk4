@@ -25,6 +25,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
 #include <kos/types.h>
 
 #include <libunwind/cfi.h>
@@ -68,13 +69,13 @@ libuw_unwind_emulator_exec_autostack(unwind_emulator_t *__restrict self,
  * @param: addrsize: Size of a target address.
  * @param: ptrsize:  Size of a DWARF pointer (4 for 32-bit dwarf; 8 for 64-bit dwarf).
  * @return: NULL: The instruction at `unwind_pc' wasn't recognized. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) byte_t const *
-NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc,
+INTDEF ATTR_PURE WUNUSED byte_t __CHECKED const *
+NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t __CHECKED const *unwind_pc,
                                               uint8_t addrsize, uint8_t ptrsize);
 
 /* Return a pointer to a CFI expression that is applicable for `module_relative_pc'
  * If no such expression exists, return `NULL' instead. */
-INTDEF WUNUSED NONNULL((1, 5)) byte_t const *
+INTDEF WUNUSED NONNULL((1, 5)) byte_t __CHECKED const *
 NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *__restrict self,
                                                 uintptr_t cu_base,
                                                 uintptr_t module_relative_pc,
@@ -94,7 +95,7 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
 INTDEF NONNULL((1, 2, 4)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_ste_addr)(unwind_ste_t const *__restrict self,
                                       unwind_getreg_t regget, void const *regget_arg,
-                                      void **__restrict paddr);
+                                      void __CHECKED **__restrict paddr);
 
 /* Read/write bit-wise data to/from an unwind stack-entry location.
  * @param: self:           The unwind STE-element to/from which to read/write.
@@ -111,16 +112,16 @@ NOTHROW_NCX(CC libuw_unwind_ste_addr)(unwind_ste_t const *__restrict self,
  * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `self'
  * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `self'
  * @return: UNWIND_SEGFAULT:                     Attempted to access faulty memory. */
-INTDEF NONNULL((1, 3, 5)) unwind_errno_t
+INTDEF NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_ste_read)(unwind_ste_t const *__restrict self, uint8_t addrsize,
                                       unwind_getreg_t regget, void const *regget_arg,
-                                      void *__restrict dst, size_t num_bits,
+                                      void __CHECKED *dst, size_t num_bits,
                                       size_t dst_left_shift, size_t src_left_shift);
-INTDEF NONNULL((1, 3, 7)) unwind_errno_t
+INTDEF NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_ste_write)(unwind_ste_t const *__restrict self, uint8_t addrsize,
                                        /*[1..1]*/ unwind_getreg_t regget, void const *regget_arg,
                                        /*[0..1]*/ unwind_setreg_t regset, void *regset_arg,
-                                       void const *__restrict src, size_t num_bits,
+                                       void __CHECKED const *src, size_t num_bits,
                                        size_t dst_left_shift, size_t src_left_shift);
 
 /* Read/Write the value associated with a given debuginfo location descriptor.
@@ -156,27 +157,27 @@ NOTHROW_NCX(CC libuw_unwind_ste_write)(unwind_ste_t const *__restrict self, uint
  * @return: UNWIND_EMULATOR_NOT_WRITABLE:     Attempted to write to a read-only location expression.
  * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `bufsize' is too small.
  * @return: UNWIND_EMULATOR_NO_FUNCTION:      The associated location list is undefined for `module_relative_pc' */
-INTDEF NONNULL((1, 3, 8, 10)) unwind_errno_t CC
+INTDEF NONNULL((1, 3, 10)) unwind_errno_t CC
 libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,
                                   unwind_getreg_t regget, void *regget_arg,
                                   struct di_debuginfo_compile_unit_simple_struct const *cu,
                                   uintptr_t module_relative_pc, uintptr_t module_addroffset,
-                                  void *__restrict buf, size_t bufsize,
+                                  void __CHECKED *buf, size_t bufsize,
                                   size_t *__restrict pnum_written_bits,
                                   di_debuginfo_location_t const *frame_base_expression,
-                                  void const *objaddr, uint8_t addrsize, uint8_t ptrsize);
-INTDEF NONNULL((1, 3, 5, 10, 12)) unwind_errno_t CC
+                                  void __CHECKED const *objaddr, uint8_t addrsize, uint8_t ptrsize);
+INTDEF NONNULL((1, 3, 5, 12)) unwind_errno_t CC
 libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,
                                   unwind_getreg_t regget, void *regget_arg,
                                   unwind_setreg_t regset, void *regset_arg,
                                   struct di_debuginfo_compile_unit_simple_struct const *cu,
                                   uintptr_t module_relative_pc, uintptr_t module_addroffset,
-                                  void const *__restrict buf, size_t bufsize,
+                                  void __CHECKED const *buf, size_t bufsize,
                                   size_t *__restrict pnum_read_bits,
                                   di_debuginfo_location_t const *frame_base_expression,
-                                  void *objaddr, uint8_t addrsize, uint8_t ptrsize);
+                                  void __CHECKED *objaddr, uint8_t addrsize, uint8_t ptrsize);
 
 
 DECL_END

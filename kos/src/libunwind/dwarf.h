@@ -24,6 +24,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
 #include <kos/types.h>
 
 #include <libunwind/dwarf.h>
@@ -32,12 +33,12 @@ DECL_BEGIN
 
 /* Decode a signed/unsigned LEB128 integer and advance `*preader' */
 INTDEF NONNULL((1)) dwarf_sleb128_t
-NOTHROW_NCX(CC libuw_dwarf_decode_sleb128)(byte_t const **__restrict preader);
+NOTHROW_NCX(CC libuw_dwarf_decode_sleb128)(byte_t __CHECKED const **__restrict preader);
 INTDEF NONNULL((1)) dwarf_uleb128_t
-NOTHROW_NCX(CC libuw_dwarf_decode_uleb128)(byte_t const **__restrict preader);
+NOTHROW_NCX(CC libuw_dwarf_decode_uleb128)(byte_t __CHECKED const **__restrict preader);
 
-INTDEF NONNULL((1)) byte_t *
-NOTHROW_NCX(CC libuw_dwarf_decode_pointer)(byte_t const **__restrict preader,
+INTDEF NONNULL((1)) byte_t __CHECKED *
+NOTHROW_NCX(CC libuw_dwarf_decode_pointer)(byte_t __CHECKED const **__restrict preader,
                                            uint8_t encoding, uint8_t addrsize,
                                            struct unwind_bases *dw_bases);
 

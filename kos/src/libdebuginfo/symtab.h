@@ -25,6 +25,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
 #include <kos/types.h>
 
 #include <libdebuginfo/symtab.h>
@@ -39,9 +40,9 @@ DECL_BEGIN
  * @return: NULL: All defined symbols have an address > module_relative_pc
  * @return: NULL: The given symbol table is empty, too small, or corrupted.
  * @return: NULL: The given `symtab_entsize' is neither `sizeof(Elf32_Sym)', nor `sizeof(Elf64_Sym)' */
-INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) byte_t const *
-NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t const *__restrict symtab_start,
-                                       byte_t const *__restrict symtab_end,
+INTDEF ATTR_PURE WUNUSED byte_t __CHECKED const *
+NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t __CHECKED const *symtab_start,
+                                       byte_t __CHECKED const *symtab_end,
                                        size_t symtab_entsize,
                                        uintptr_t module_relative_pc);
 

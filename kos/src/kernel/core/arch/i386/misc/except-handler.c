@@ -157,7 +157,7 @@ userexcept_callhandler(struct icpustate *__restrict state,
 {
 	/* Call a 32-bit exception handler. */
 	uintptr_t mode;
-	USER CHECKED byte_t *stack;
+	byte_t USER CHECKED *stack;
 	USER CHECKED __except_handler32_t handler;
 	USER CHECKED struct kcpustate32 *user_state;
 	USER CHECKED struct __exception_data32 *user_error;

@@ -52,7 +52,7 @@ printnode_v_stat(struct mfile *__restrict UNUSED(self),
 
 
 struct vprinter_data {
-	USER CHECKED byte_t *vpd_buf; /* [?..?] Destination buffer. */
+	byte_t USER CHECKED *vpd_buf; /* [?..?] Destination buffer. */
 	size_t               vpd_siz; /* Remaining buffer space. */
 	pos_t                vpd_pos; /* # of leading bytes to skip. */
 };
@@ -95,7 +95,7 @@ printnode_v_pread(struct mfile *__restrict self, USER CHECKED void *dst,
 	ops = printnode_getops(me);
 
 	/* Fill in printer data. */
-	data.vpd_buf = (USER CHECKED byte_t *)dst;
+	data.vpd_buf = (byte_t USER CHECKED *)dst;
 	data.vpd_siz = num_bytes;
 	data.vpd_pos = addr;
 

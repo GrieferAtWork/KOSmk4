@@ -583,7 +583,7 @@ DEFINE_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 				validate_readable(vec.iov_base, vec.iov_len);
 				if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 					THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-				iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+				iov_vec[iov_i].ive_base = (byte_t USER CHECKED *)vec.iov_base;
 				iov_vec[iov_i].ive_size = vec.iov_len;
 			}
 			iov.iv_entc         = msg.msg_iovlen;
@@ -680,7 +680,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 				compat_validate_readable(vec.iov_base, vec.iov_len);
 				if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 					THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-				iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+				iov_vec[iov_i].ive_base = (byte_t USER CHECKED *)vec.iov_base;
 				iov_vec[iov_i].ive_size = vec.iov_len;
 			}
 			iov.iv_entc         = msg.msg_iovlen;
@@ -778,7 +778,7 @@ DEFINE_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 					validate_readable(vec.iov_base, vec.iov_len);
 					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+					iov_vec[iov_i].ive_base = (byte_t USER CHECKED *)vec.iov_base;
 					iov_vec[iov_i].ive_size = vec.iov_len;
 				}
 				iov.iv_entc         = msg.msg_iovlen;
@@ -894,7 +894,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 					compat_validate_readable(vec.iov_base, vec.iov_len);
 					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+					iov_vec[iov_i].ive_base = (byte_t USER CHECKED *)vec.iov_base;
 					iov_vec[iov_i].ive_size = vec.iov_len;
 				}
 				iov.iv_entc         = msg.msg_iovlen;
@@ -1120,7 +1120,7 @@ DEFINE_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 				validate_writable(vec.iov_base, vec.iov_len);
 				if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 					THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-				iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+				iov_vec[iov_i].ive_base = (byte_t USER CHECKED *)vec.iov_base;
 				iov_vec[iov_i].ive_size = vec.iov_len;
 			}
 			iov.iv_entc         = msg.msg_iovlen;
@@ -1223,7 +1223,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 				compat_validate_writable(vec.iov_base, vec.iov_len);
 				if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 					THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-				iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+				iov_vec[iov_i].ive_base = (byte_t USER CHECKED *)vec.iov_base;
 				iov_vec[iov_i].ive_size = vec.iov_len;
 			}
 			iov.iv_entc         = msg.msg_iovlen;
@@ -1335,7 +1335,7 @@ sys_recvmmsg_impl(fd_t sockfd,
 					validate_writable(vec.iov_base, vec.iov_len);
 					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+					iov_vec[iov_i].ive_base = (byte_t USER CHECKED *)vec.iov_base;
 					iov_vec[iov_i].ive_size = vec.iov_len;
 				}
 				iov.iv_entc         = msg.msg_iovlen;
@@ -1516,7 +1516,7 @@ compat_sys_recvmmsg_impl(fd_t sockfd,
 					validate_writable(vec.iov_base, vec.iov_len);
 					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+					iov_vec[iov_i].ive_base = (byte_t USER CHECKED *)vec.iov_base;
 					iov_vec[iov_i].ive_size = vec.iov_len;
 				}
 				iov.iv_entc         = msg.msg_iovlen;

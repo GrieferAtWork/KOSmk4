@@ -157,8 +157,8 @@ NOTHROW(FCALL task_userrpc_cancelprogram)(struct pending_rpc *__restrict rpc) {
 
 
 struct rpc_membank {
-	USER CHECKED byte_t            *rmb_addrlo;  /* [const] Lowest bank address. (1-byte granularity) */
-	USER CHECKED byte_t            *rmb_addrhi;  /* [const] Greatest bank address. */
+	byte_t USER CHECKED            *rmb_addrlo;  /* [const] Lowest bank address. (1-byte granularity) */
+	byte_t USER CHECKED            *rmb_addrhi;  /* [const] Greatest bank address. */
 	size_t                          rmb_datoff;  /* [const] Offset of mem-bank data. */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, rmb_status); /* Bitset of bytes that were modified. */
 };
@@ -184,7 +184,7 @@ struct rpc_membank {
 	  (v) << _rpc_membank_changed_shft(bankrel_addr)))
 
 PRIVATE ATTR_RETNONNULL WUNUSED struct rpc_membank *FCALL
-rpc_membank_create(USER CHECKED byte_t *addr, size_t num_bytes)
+rpc_membank_create(byte_t USER CHECKED *addr, size_t num_bytes)
 		THROWS(E_BADALLOC) {
 	struct rpc_membank *result;
 	size_t struct_size, data_offset, bitset_size;
@@ -396,7 +396,7 @@ rpc_mem_writeback(struct rpc_mem *__restrict self) {
 }
 
 /* Verify that `addr' is writable (VIO is allowed), but DON'T invoke VIO (if `addr' points to such a mapping) */
-LOCAL void FCALL verify_writable_byte(USER CHECKED byte_t *addr) {
+LOCAL void FCALL verify_writable_byte(byte_t USER CHECKED *addr) {
 	byte_t buf;
 	if (!readb_nopf(addr, &buf) || !writeb_nopf(addr, buf)) {
 		/* Force a fault for the given address */
@@ -408,7 +408,7 @@ LOCAL void FCALL verify_writable_byte(USER CHECKED byte_t *addr) {
 #define rpc_mem_write(self, addr, buf, num_bytes) rpc_mem_readwrite(self, (byte_t *)(addr), (void *)(buf), num_bytes, true)
 PRIVATE NONNULL((1, 3)) void FCALL
 rpc_mem_readwrite(struct rpc_mem *__restrict self,
-                  USER UNCHECKED byte_t *addr,
+                  byte_t USER UNCHECKED *addr,
                   void *buf, size_t num_bytes,
                   bool is_writing)
 		THROWS(E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED) {
@@ -570,7 +570,7 @@ rw_bank:
 
 PRIVATE NONNULL((1)) void FCALL
 rpc_mem_fill(struct rpc_mem *__restrict self,
-             USER UNCHECKED byte_t *addr,
+             byte_t USER UNCHECKED *addr,
              byte_t filler, size_t num_bytes)
 		THROWS(E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED) {
 	void *buffer;
@@ -617,7 +617,7 @@ struct rpc_vm {
 	uintptr_t                      rv_flags;                     /* Set of `RPC_VM_*'. */
 	size_t                         rv_stacksz;                   /* # of in-use elements in `rv_stack' */
 	uintptr_t                      rv_stack[RPC_PROG_STACK_MAX]; /* [rv_stacksz] RPC program stack. */
-	USER CHECKED byte_t const     *rv_pc;                        /* [?..1] User-space address of next PC byte. */
+	byte_t USER CHECKED const     *rv_pc;                        /* [?..1] User-space address of next PC byte. */
 	byte_t                         rv_pcbuf_ptr;                 /* Index of next byte to read from `rv_pcbuf' */
 	byte_t                         rv_pcbuf_siz;                 /* # of unread bytes at `&rv_pcbuf[rv_pcbuf_ptr]' */
 	byte_t                         rv_pcbuf[32];                 /* Program text buffer. */
@@ -712,9 +712,9 @@ rpc_vm_setreg_impl(void *arg, unwind_regno_t dw_regno, void const *__restrict sr
 
 /* Return the user-space stack pointer register */
 #ifdef ucpustate_getsp
-#define rpc_vm_getsp(self) ((USER UNCHECKED byte_t *)ucpustate_getsp(&(self)->rv_cpu))
+#define rpc_vm_getsp(self) ((byte_t USER UNCHECKED *)ucpustate_getsp(&(self)->rv_cpu))
 #else /* ucpustate_getsp */
-PRIVATE WUNUSED NONNULL((1)) USER UNCHECKED byte_t *FCALL
+PRIVATE WUNUSED NONNULL((1)) byte_t USER UNCHECKED *FCALL
 rpc_vm_getsp(struct rpc_vm *__restrict self) {
 	byte_t *result;
 #ifdef NDEBUG
@@ -733,7 +733,7 @@ rpc_vm_getsp(struct rpc_vm *__restrict self) {
 #define rpc_vm_setsp(self, value) ucpustate_setsp(&(self)->rv_cpu, value)
 #else /*ucpustate_setsp */
 PRIVATE NONNULL((1)) void FCALL
-rpc_vm_setsp(struct rpc_vm *__restrict self, USER UNCHECKED byte_t *value) {
+rpc_vm_setsp(struct rpc_vm *__restrict self, byte_t USER UNCHECKED *value) {
 #ifdef NDEBUG
 	rpc_vm_setreg(self, CFI_UNWIND_REGISTER_SP(sizeof(void *)), &value);
 #else /* NDEBUG */
@@ -861,7 +861,7 @@ PRIVATE NONNULL((1)) void FCALL
 rpc_vm_push2user(struct rpc_vm *__restrict self,
                  void const *buf, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
-	USER UNCHECKED byte_t *sp;
+	byte_t USER UNCHECKED *sp;
 	sp = rpc_vm_getsp(self);
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 	sp -= num_bytes;
@@ -878,7 +878,7 @@ PRIVATE NONNULL((1)) void FCALL
 rpc_vm_push2user_fill(struct rpc_vm *__restrict self,
                       byte_t byte, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
-	USER UNCHECKED byte_t *sp;
+	byte_t USER UNCHECKED *sp;
 	sp = rpc_vm_getsp(self);
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 	sp -= num_bytes;
@@ -1959,7 +1959,7 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 	vm.rv_reason    = reason;
 	vm.rv_sc_info   = sc_info;
 	vm.rv_flags     = RPC_VM_NORMAL;
-	vm.rv_pc        = (USER CHECKED byte_t *)rpc->pr_user.pur_prog;
+	vm.rv_pc        = (byte_t USER CHECKED *)rpc->pr_user.pur_prog;
 	vm.rv_pcbuf_siz = 0;
 
 	/* As  per specs, RPC programs start execution with 1 element on-

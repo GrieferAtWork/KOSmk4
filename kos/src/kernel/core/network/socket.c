@@ -87,7 +87,7 @@ NOTHROW(KCALL iov_buffer_init)(struct iov_buffer *__restrict self,
                                USER CHECKED void const *buf, size_t buflen) {
 	self->iv_entc          = 1;
 	self->iv_entv          = &self->iv_head;
-	self->iv_head.ive_base = (USER CHECKED byte_t *)buf;
+	self->iv_head.ive_base = (byte_t USER CHECKED *)buf;
 	self->iv_head.ive_size = buflen;
 	self->iv_last          = buflen;
 }

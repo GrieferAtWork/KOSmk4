@@ -25,6 +25,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
 #include <kos/types.h>
 
 #include <int128.h>
@@ -34,19 +35,19 @@
 DECL_BEGIN
 
 /* Similar to the functions from `libunwind(3)', but decode into a 64-bit integer! */
-INTDEF ATTR_RETNONNULL NONNULL((1, 2)) byte_t const *
-NOTHROW_NCX(CC libdi_dwarf_decode_sleb128_64)(byte_t const *__restrict reader,
+INTDEF ATTR_RETNONNULL NONNULL((1, 2)) byte_t __CHECKED const *
+NOTHROW_NCX(CC libdi_dwarf_decode_sleb128_64)(byte_t __CHECKED const *__restrict reader,
                                               int64_t *__restrict p_result);
-INTDEF ATTR_RETNONNULL NONNULL((1, 2)) byte_t const *
-NOTHROW_NCX(CC libdi_dwarf_decode_uleb128_64)(byte_t const *__restrict reader,
+INTDEF ATTR_RETNONNULL NONNULL((1, 2)) byte_t __CHECKED const *
+NOTHROW_NCX(CC libdi_dwarf_decode_uleb128_64)(byte_t __CHECKED const *__restrict reader,
                                               uint64_t *__restrict p_result);
 
 /* Similar to the functions from `libunwind(3)', but these actually decode into a 128-bit integer! */
-INTDEF ATTR_RETNONNULL NONNULL((1, 2)) byte_t const *
-NOTHROW_NCX(CC libdi_dwarf_decode_sleb128_128)(byte_t const *__restrict reader,
+INTDEF ATTR_RETNONNULL NONNULL((1, 2)) byte_t __CHECKED const *
+NOTHROW_NCX(CC libdi_dwarf_decode_sleb128_128)(byte_t __CHECKED const *__restrict reader,
                                                int128_t *__restrict p_result);
-INTDEF ATTR_RETNONNULL NONNULL((1, 2)) byte_t const *
-NOTHROW_NCX(CC libdi_dwarf_decode_uleb128_128)(byte_t const *__restrict reader,
+INTDEF ATTR_RETNONNULL NONNULL((1, 2)) byte_t __CHECKED const *
+NOTHROW_NCX(CC libdi_dwarf_decode_uleb128_128)(byte_t __CHECKED const *__restrict reader,
                                                uint128_t *__restrict p_result);
 
 DECL_END

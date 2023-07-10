@@ -301,7 +301,7 @@ entropy_read(USER CHECKED void *buf, size_t num_bytes, iomode_t mode)
 		}
 
 		/* Copy data into userspace. */
-		buf = (USER CHECKED byte_t *)mempcpy(buf, temp_buf, take_bytes);
+		buf = (byte_t USER CHECKED *)mempcpy(buf, temp_buf, take_bytes);
 		num_bytes -= take_bytes;
 		result += take_bytes;
 	}

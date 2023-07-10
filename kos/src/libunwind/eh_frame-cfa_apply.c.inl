@@ -101,7 +101,7 @@ DECL_BEGIN
 INTERN NONNULL((1, 2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                       unwind_cfa_state_t *__restrict result,
-                                      void const *absolute_pc)
+                                      void __CHECKED const *absolute_pc)
 #elif defined(EH_FRAME_CFA_SIGFRAME_APPLY)
 /* Behaves  identical to `unwind_fde_exec()', and doesn't actually ever have to be
  * used, but performes better than `unwind_fde_exec()' when unwinding SIGNAL_FRAME
@@ -119,7 +119,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t *__restrict self, /* Only non
 INTERN NONNULL((1, 2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                unwind_cfa_sigframe_state_t *__restrict result,
-                                               void const *absolute_pc)
+                                               void __CHECKED const *absolute_pc)
 #endif /* ... */
 {
 	unwind_errno_t error;
@@ -132,7 +132,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t *__restrict self, /*
 	                                          self->f_inittext,
 	                                          self->f_inittextend,
 	                                          result,
-	                                          (void *)-1);
+	                                          (void __CHECKED *)-1);
 	if likely(error == UNWIND_SUCCESS) {
 		LOCAL_IF_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t common_init_regs[LOCAL_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT];)
 		LOCAL_IF_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT(byte_t uncommon_init_regs[(LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT + NBBY) / NBBY];)
@@ -183,7 +183,7 @@ NOTHROW(CC guarded_memcpy)(void *dst, void const *src, size_t num_bytes);
 INTERN NONNULL((1, 2, 4, 6)) unwind_errno_t CC
 libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
                        unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
-                       void const *absolute_pc,
+                       void __CHECKED const *absolute_pc,
                        unwind_getreg_t reg_getter, void const *reg_getter_arg,
                        unwind_setreg_t reg_setter, void *reg_setter_arg)
 #elif defined(EH_FRAME_CFA_SIGFRAME_APPLY)
@@ -198,7 +198,7 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
 INTERN NONNULL((1, 2, 4, 6)) unwind_errno_t CC
 libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
                                 unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
-                                void const *absolute_pc,
+                                void __CHECKED const *absolute_pc,
                                 unwind_getreg_t reg_getter, void const *reg_getter_arg,
                                 unwind_setreg_t reg_setter, void *reg_setter_arg)
 #elif defined(EH_FRAME_CFA_LANDING_APPLY)
@@ -213,7 +213,7 @@ libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
 PRIVATE NONNULL((1, 2, 4, 6)) unwind_errno_t CC
 _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
                           unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
-                          void const *absolute_pc,
+                          void __CHECKED const *absolute_pc,
                           unwind_getreg_t reg_getter, void const *reg_getter_arg,
                           unwind_setreg_t reg_setter, void *reg_setter_arg)
 #endif /* ... */

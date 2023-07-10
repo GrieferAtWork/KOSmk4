@@ -431,7 +431,7 @@ DEFINE_SYSCALL3(errno_t, mincore,
 	static_assert(!MPART_BLOCK_ST_MINCORE(MPART_BLOCK_ST_INIT));
 	static_assert(MPART_BLOCK_ST_MINCORE(MPART_BLOCK_ST_LOAD));
 	static_assert(MPART_BLOCK_ST_MINCORE(MPART_BLOCK_ST_CHNG));
-	USER UNCHECKED byte_t *maxaddr;
+	byte_t USER UNCHECKED *maxaddr;
 	USER CHECKED PAGEDIR_PAGEALIGNED byte_t *iter;
 	struct mman *mm = THIS_MMAN;
 	if unlikely(!IS_ALIGNED((uintptr_t)addr, PAGESIZE)) {

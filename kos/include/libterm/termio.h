@@ -134,26 +134,26 @@ __NOTHROW_NCX(LIBTERM_CC terminal_init)(struct terminal *__restrict self,
  * @return: -1:   [USERSPACE] Printing to one of the linebuffers failed (s.a. `linebuffer_write()'; `errno') */
 typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBTERM_CC *PTERMINAL_OWRITE)(struct terminal *__restrict self,
-                               __USER __CHECKED void const *src,
+                               void __USER __CHECKED const *src,
                                __size_t num_bytes, iomode_t mode)
 		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
 		                __THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...));
 typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBTERM_CC *PTERMINAL_IWRITE)(struct terminal *__restrict self,
-                               __USER __CHECKED void const *src,
+                               void __USER __CHECKED const *src,
                                __size_t num_bytes, iomode_t mode)
 		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
 		                __THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...));
 #ifdef LIBTERM_WANT_PROTOTYPES
 LIBTERM_DECL __ATTR_NONNULL((1)) __ssize_t LIBTERM_CC
 terminal_owrite(struct terminal *__restrict self,
-                __USER __CHECKED void const *src,
+                void __USER __CHECKED const *src,
                 __size_t num_bytes, iomode_t mode)
 		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
 		                __THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...));
 LIBTERM_DECL __ATTR_NONNULL((1)) __ssize_t LIBTERM_CC
 terminal_iwrite(struct terminal *__restrict self,
-                __USER __CHECKED void const *src,
+                void __USER __CHECKED const *src,
                 __size_t num_bytes, iomode_t mode)
 		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
 		                __THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...));
@@ -166,13 +166,13 @@ terminal_iwrite(struct terminal *__restrict self,
  * @return: <0:  [USERSPACE] An error occurred (s.a. `errno') */
 typedef __ATTR_NONNULL_T((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBTERM_CC *PTERMINAL_IREAD)(struct terminal *__restrict self,
-                              __USER __CHECKED void *dst,
+                              void __USER __CHECKED *dst,
                               __size_t num_bytes, iomode_t mode)
 		__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT);
 #ifdef LIBTERM_WANT_PROTOTYPES
 LIBTERM_DECL __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t) LIBTERM_CC
 terminal_iread(struct terminal *__restrict self,
-               __USER __CHECKED void *dst,
+               void __USER __CHECKED *dst,
                __size_t num_bytes, iomode_t mode)
 		__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT);
 #endif /* LIBTERM_WANT_PROTOTYPES */
