@@ -153,8 +153,8 @@ static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__, "WTF Intellisense?");
 #define _Thread_local __thread
 
 #if defined(__x86_64__) || defined(__i386__)
-#define __seg_fs /* nothing */
-#define __seg_gs /* nothing */
+#define __seg_fs /* Nothing */
+#define __seg_gs /* Nothing */
 #define __SEG_FS 1
 #define __SEG_GS 1
 #endif /* __x86_64__ || __i386__ */

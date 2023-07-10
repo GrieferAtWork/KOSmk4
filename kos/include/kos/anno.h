@@ -46,29 +46,41 @@
  *
  */
 
-
-#define __PHYS            /* Annotation for physical pointers */
-#define __VIRT            /* Annotation for virtual pointers */
+#ifdef __CHECKER__
+#define __USER        __ATTR_USER
+#define __CHECKED     __ATTR_CHECKED
+#define __UNCHECKED   __ATTR_UNCHECKED
+#define __NOBLOCK     __ATTR_NOBLOCK
+#define __NOBLOCK_IF  __ATTR_NOBLOCK_IF
+#define __BLOCKING    __ATTR_BLOCKING
+#define __BLOCKING_IF __ATTR_BLOCKING_IF
+#define __NOPREEMPT   __ATTR_NOPREEMPT
+#else /* __CHECKER__ */
 #define __USER            /* Annotation for user-space memory (default outside kernel). */
 #define __CHECKED         /* Annotation for checked memory. */
 #define __UNCHECKED       /* Annotation for unchecked memory. */
-#define __KERNEL          /* Annotation for kernel-space memory (default within kernel). */
-#define __WEAK            /* Annotation for weakly referenced data/data updated randomly with both the old/new state remaining valid. */
-#define __REF             /* Annotation for reference holders/transfers.
-                           * When used on a struct-field/local/global variable: Reference storage
-                           * When used on a return  type:  The   function  returns  a   reference
-                           * When used on an argument: The function inherits a reference (but look out for `inherit(<condition>)' annotations) */
-#define __REF_IF(x)       /* Same as `__REF', but only when `x' is true. */
 #define __NOBLOCK         /* Annotation for functions that are guarantied to never block,
                            * making them safe to-be called from any asynchronous context. */
 #define __NOBLOCK_IF(x)   /* Same as `__NOBLOCK', but only when `x' is true. */
 #define __BLOCKING        /* Annotation for functions that may block indefinitely (as well as service RPCs and be a cancellation point, unless otherwise documented) */
 #define __BLOCKING_IF(x)  /* Annotation for functions that may block indefinitely (as well as service RPCs and be a cancellation point, unless otherwise documented) */
 #define __NOPREEMPT       /* Annotation for functions that may only be called with preemption disabled. */
+#endif /* !__CHECKER__ */
+
+#define __KERNEL          /* Annotation for kernel-space memory (default within kernel). */
 #define __ABNORMAL_RETURN /* Annotation for functions that (may) not return normally, or by throwing an exception.
                            * Functions with this annotation must not be  called if there are any finally  handlers
                            * on-stack  which need to perform cleanup, or any EXCEPT-handlers that would want to do
                            * the same. The poster-example for this kind of behavior is `longjmp(3)' */
+
+#define __PHYS            /* Annotation for physical pointers */
+#define __VIRT            /* Annotation for virtual pointers */
+#define __WEAK            /* Annotation for weakly referenced data/data updated randomly with both the old/new state remaining valid. */
+#define __REF             /* Annotation for reference holders/transfers.
+                           * When used on a struct-field/local/global variable: Reference storage
+                           * When used on a return  type:  The   function  returns  a   reference
+                           * When used on an argument: The function inherits a reference (but look out for `inherit(<condition>)' annotations) */
+#define __REF_IF(x)       /* Same as `__REF', but only when `x' is true. */
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __THROWS(...)     /* Annotation for the set of error codes/classes/sub-classes that may be thrown
                            * by a function.

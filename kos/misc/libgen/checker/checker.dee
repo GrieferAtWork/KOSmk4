@@ -1,0 +1,1229 @@
+/* Copyright (c) 2019-2023 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2023 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+import * from deemon;
+import Parser from .parser;
+
+/* Special constants used for symbols */
+#define NO_VALUE      false /* Symbol has no value */
+#define UNKNOWN_VALUE none  /* Symbol value is unknown */
+#define SymbolValue   int | bool | none | \
+	/* Array  initializer */ {Object /*SymbolValue*/...} | \
+	/* Struct initializer */ {string: Object /*SymbolValue*/}
+#define ArraySymbolValue  {SymbolValue...}
+#define StructSymbolValue {string: SymbolValue}
+
+class CType {
+	// function tostr(varname: string = ""): string;
+
+	// @@@param targetModule: The target's module file from `/kos/misc/targets`
+	// function sizeof(targetModule: Module): int;
+}
+
+final class CTypeRef {
+	this = default;
+	public member typ: CType;
+
+	@@Type flags. Set of `CTYPEREF_FLAG_*`
+	public member flags: int = 0;
+#define CTYPEREF_FLAG_CONST    0x0001
+#define CTYPEREF_FLAG_VOLATILE 0x0002
+#define CTYPEREF_FLAG_DEREF    0x0004
+#define CTYPEREF_FLAG_NODEREF  0x0008
+#define CTYPEREF_FLAG_RESTRICT 0x0010
+#define CTYPEREF_FLAG_PACKED   0x8000 /* Used during creation of struct objects. */
+
+	@@Type attributes. Map of:
+	@@ - @"nothrow"               -> @string   (nothrow level, as string-coded decimal, possible prefixed by @"*")
+	@@ - @"tag"                   -> @string   (function tag)
+	@@ - @"require_caller_tag"    -> @string   (function caller tag requirements)
+	public member attrib: {string: string} = Dict();
+
+	function tostr(varname: string = ""): string {
+		if (flags & CTYPEREF_FLAG_RESTRICT)
+			varname = f"restrict {varname}";
+		if (flags & CTYPEREF_FLAG_VOLATILE)
+			varname = f"volatile {varname}";
+		if (flags & CTYPEREF_FLAG_CONST)
+			varname = f"const {varname}";
+		if (flags & CTYPEREF_FLAG_NODEREF)
+			varname = f"[[noderef]] {varname}";
+		for (local attr, val: attrib) {
+			varname = f"[[{attr}({val})]] {varname}";
+		}
+		return typ.tostr(varname);
+	}
+
+	function importFrom(other: CTypeRef) {
+		flags |= other.flags;
+		attrib.update(other.attrib);
+		typ = other.typ;
+	}
+}
+
+final class CCoreType: CType {
+	this = default;
+	public member name: string;
+	public member constantSizeOf: int | none = none;
+	public function sizeof(targetModule: Module): int {
+		if (constantSizeOf !is none)
+			return constantSizeOf;
+		switch (name) {
+		case "long":
+		case "unsigned long":
+			return targetModule.POINTER_SIZE;
+		case "long double":
+			return {
+				"arm" : 8,
+				"i686" : 12,
+				"x86_64" : 16,
+			}[targetModule.CPUNAME];
+		default:
+			break;
+		}
+		throw Error(f"Unable to determine size of {name}");
+	}
+	function tostr(varname: string = ""): string {
+		return varname ? f"{name} {varname}" : name;
+	}
+}
+
+global final C_bool = CCoreType("bool", 1);
+global final C_void = CCoreType("void", 0);
+global final C_char = CCoreType("char", 1);
+global final C_schar = CCoreType("signed char", 1);
+global final C_uchar = CCoreType("unsigned char", 1);
+global final C_short = CCoreType("short", 2);
+global final C_ushort = CCoreType("unsigned short", 2);
+global final C_int = CCoreType("int", 4);
+global final C_uint = CCoreType("unsigned int", 4);
+global final C_long = CCoreType("long");
+global final C_ulong = CCoreType("unsigned long");
+global final C_llong = CCoreType("long long", 8);
+global final C_ullong = CCoreType("unsigned long long", 8);
+global final C_wchar_t = CCoreType("wchar_t", 4);
+global final C_char16_t = CCoreType("char16_t", 2);
+global final C_char32_t = CCoreType("char32_t", 4);
+global final C_float = CCoreType("float", 4);
+global final C_double = CCoreType("double", 8);
+global final C_ldouble = CCoreType("long double");
+
+global final SINGLE_KEYWORD_CORE_TYPES: {string: CCoreType} = {
+	"void" : C_void,
+	"float" : C_float,
+	"wchar_t" : C_wchar_t,
+	"bool" : C_bool,
+	"_Bool" : C_bool,
+	"char16_t" : C_char16_t,
+	"char32_t" : C_char32_t,
+};
+
+final class CPointerType: CType {
+	this = default;
+	public member base: CTypeRef;
+	function tostr(varname: string = ""): string {
+		return base.tostr("*" + varname);
+	}
+	public function sizeof(targetModule: Module): int {
+		return targetModule.POINTER_SIZE;
+	}
+}
+
+final class CStructType: CType {
+	this = default;
+	public member name: string;
+	public member isUnion: bool = false;
+	@@Used struct packing
+	public member packing: int | none = none;
+	@@NOTE: The third value of these tuples is a mapping of
+	public member fields: {(CTypeRef, string)...} = [];
+	public member fieldsByName: {string: (CTypeRef, {string: int})} = Dict();
+	function tostr(varname: string = ""): string {
+		return varname ? f"struct {name} {varname}" : f"struct {name}";
+	}
+
+	@@Return the type and offset of @field
+	function getField(field: string, targetModule: Module): (CTypeRef, int) | none {
+		local fieldDef = fieldsByName.get(field);
+		if (fieldDef is none)
+			return none;
+		local offset = fieldDef.last.get(targetModule.CPUNAME);
+		if (offset is none) {
+			_loadFieldOffsets(targetModule);
+			offset = fieldDef.last.get(targetModule.CPUNAME);
+			assert offset !is none;
+		}
+		return (fieldDef.first, offset);
+	}
+
+	private function _loadFieldOffsets(targetModule: Module) {
+		local key = targetModule.CPUNAME;
+		local structOffset = 0;
+		for (local typ, offsetByTarget: fieldsByName.values) {
+			/* Calculate the target-specific offset of the field. */
+			local fieldPacking = packing;
+			if (typ.flags & CTYPEREF_FLAG_PACKED)
+				fieldPacking = 1;
+			local fieldPackingMask = fieldPacking - 1;
+			structOffset = (structOffset + fieldPackingMask) & ~fieldPackingMask;
+			if (isUnion)
+				structOffset = 0;
+			offsetByTarget[key] = structOffset;
+			structOffset += typ.sizeof(targetModule);
+		}
+	}
+
+	private member _sizeof_cache: {string: int};
+	public function sizeof(targetModule: Module): int {
+		if (_sizeof_cache !is bound)
+			_sizeof_cache = Dict();
+		local key = targetModule.CPUNAME;
+		local result = _sizeof_cache.get(key);
+		if (result is none) {
+			result = 0;
+			_loadFieldOffsets(targetModule);
+			for (local fieldType, offsetByTarget: fieldsByName.values) {
+				local offsetAfter = offsetByTarget[key] + fieldType.typ.sizeof(targetModule);
+				if (result < offsetAfter)
+					result = offsetAfter;
+			}
+			_sizeof_cache[key] = result;
+		}
+		return result;
+	}
+}
+
+final class CEnumType: CType {
+	this = default;
+	public member name: string;
+	public member base: CType = C_int;
+	public member values: {string: int} = Dict();
+	function tostr(varname: string = ""): string {
+		return varname ? f"enum {name} {varname}" : f"enum {name}";
+	}
+}
+
+final class CFunctionType: CType {
+	this = default;
+	public member returnType: CType;
+	public member args: {(CTypeRef, string)...} = [];
+	public member isVarArgs: bool = false;
+	function tostr(varname: string = ""): string {
+		if (varname.startswith("*") || " " in varname) {
+			varname = f"({varname})";
+		}
+		if (args) {
+			varname = f"{varname}({
+				", ".join(for (local typ, name: args) typ.tostr(name))
+			})";
+		} else {
+			varname += "(void)";
+		}
+		return returnType.tostr(varname);
+	}
+}
+
+final class CArrayType: CType {
+	this = default;
+	public member base: CType;
+	@@Set to @none for flexible arrays
+	public member dim: int | none;
+	function tostr(varname: string = ""): string {
+		if (varname.startswith("*") || " " in varname)
+			varname = f"({varname})";
+		return base.tostr(f"{varname}[{dim is none ? "" : dim}]");
+	}
+}
+
+class CNamespace {
+	this = default;
+	public member name: string;
+	public member symbols: {string: (CTypeRef, SymbolValue)} = Dict();
+	public member typedefs: {string: CTypeRef} = Dict();
+	public member namespaces: {string: CNamespace} = Dict();
+	public member structSymbols: {string: CStructType} = Dict();
+	public member unionSymbols: {string: CStructType} = Dict();
+	public member enumTypeSymbols: {string: CEnumType} = Dict();
+	public member importedNamespaces: {CNamespace...} = [];
+
+	function lookup(tab: string, name: string): Object | none {
+		local result = this.operator . (tab).get(name);
+		if (result !is none)
+			return result;
+		for (local importedNamespace: importedNamespaces) {
+			result = importedNamespace.lookup(tab, name);
+			if (result !is none)
+				return result;
+		}
+		return none;
+	}
+
+	function childNamespace(name: string): CNamespace {
+		local result = lookup("namespaces", name);
+		if (result is none) {
+			result = CNamespace(name: name);
+			namespaces[name] = result;
+		}
+		return result;
+	}
+
+}
+
+final class CEnumClass: CNamespace, CType {
+	this = super;
+	public member base: CTypeRef = C_int;
+	public member values: {string: int} = Dict();
+	function tostr(varname: string = ""): string {
+		return varname ? f"enum class {this.name} {varname}" : f"enum class {this.name}";
+	}
+}
+
+
+
+final class Checker {
+	public member parser: Parser;
+	public member globalNamespace: CNamespace = CNamespace(name: "");
+	public member namespaceStack: {CNamespace...} = [globalNamespace];
+	public member targetModule: Module;
+	public member defaultStructPacking: int;
+
+	@@The function whose body is currently being parsed
+	public member currentFunctionName: string | none = none;
+	public member currentFunctionType: CFunctionType | none = none;
+	public member currentFunctionTypeRef: CTypeRef | none = none;
+
+	this(parser: Parser, targetModule: Module) {
+		this.parser = parser;
+		this.targetModule = targetModule;
+		defaultStructPacking = targetModule.POINTER_SIZE;
+		parser.next();
+	}
+
+	function nsLookup(tab: string, name: string): Object | none {
+		for (local ns: namespaceStack) {
+			local result = ns.lookup(tab, name);
+			if (result !is none)
+				return result;
+		}
+		return none;
+	}
+
+	@@Parse a a child-namespace lookup expression chain
+	@@@return @none if not found, but only when @errorIfNotFound is false.
+	@@        When @none is returned, the parser is NOT rewound to the start
+	@@        of the non-present symbol expression! (if needed, this has  to
+	@@        be done by the caller)
+	function nsLookupChildChain(ns: CNamespace, tab: string,
+	                            errorIfNotFound: bool = true): Object | none {
+again:
+		local name = parser.tok;
+		if (!name.issymbol())
+			parser.err(f"Expected symbol in namespace symbol expression, but got {repr name}");
+		if (parser.next() == "::") {
+			ns = ns.lookup("namespaces", name);
+			if (ns is none) {
+				if (errorIfNotFound)
+					return parser.err(f"Unknown namespace {repr name}");
+				return none;
+			}
+			parser.next();
+			goto again;
+		}
+		local result = ns.lookup(tab, name);
+		if (result is none && errorIfNotFound)
+			parser.err(f"Unknown symbol {repr name}");
+		return result;
+	}
+
+	@@Parse a namespace lookup expression, returning @none if nothing was parsed
+	function nsLookupChain(tab: string): Object | none {
+		local name = parser.tok;
+		if (name == "::") {
+			/* Root-namespace-relative symbol lookup */
+			parser.next();
+			return nsLookupChildChain(globalNamespace, tab);
+		}
+		if (!name.issymbol())
+			parser.err(f"Expected symbol name, but got {repr name}");
+		local backup = parser.backupCreate();
+		try {
+			if (parser.next() == "::") {
+				/* Lookup chain */
+				local baseNs = nsLookup("namespaces", name);
+				if (baseNs is none) {
+					parser.backupRestore(backup);
+					return parser.err(f"Unknown namespace {repr name}");
+				}
+				parser.next();
+				local result = nsLookupChildChain(baseNs, tab, errorIfNotFound: false);
+				if (result is none) {
+					parser.backupRestore(backup);
+				} else {
+					parser.backupDiscard(backup);
+				}
+				return result;
+			}
+		} catch (...) {
+			parser.backupDiscard(backup);
+			throw;
+		}
+		return nsLookup(tab, name);
+	}
+
+	function parseCTypeRefAttribute(tr: CTypeRef): bool {
+		local attrib = parser.requireSymbolName().strip("_");
+		switch (attrib) {
+
+		case "deref":
+			tr.flags = (tr.flags & ~CTYPEREF_FLAG_NODEREF) | CTYPEREF_FLAG_DEREF;
+			parser.next();
+			break;
+
+		case "noderef":
+			if (!(tr.flags & CTYPEREF_FLAG_DEREF))
+				tr.flags |= CTYPEREF_FLAG_NODEREF;
+			parser.next();
+			break;
+
+		case "nothrow": {
+			local isStar = false;
+			parser.next();
+			parser.skip("(");
+			if (parser.tok == "*") {
+				isStar = true;
+				parser.next();
+			}
+			local level = parseConstantExpression();
+			local mode = isStar ? f"*{level}" : f"{level}";
+			tr.attrib["nothrow"] = mode;
+			parser.skip(")");
+		}	break;
+
+		case "tag":
+		case "require_caller_tag": {
+			parser.next();
+			parser.skip("(");
+			tr.attrib[attrib] = parser.parseString();
+			parser.skip(")");
+		}	break;
+
+		default:
+			parser.err("Unknown attribute ");
+		}
+	}
+
+	function parseCTypeRefAttributes(tr: CTypeRef): bool {
+		local result = false;
+again:
+		switch (parser.tok) {
+
+		case "[":
+			parser.next();
+			parser.skip("[");
+			while (parser.tok != "]") {
+				parseCTypeRefAttribute(tr);
+				if (parser.tok != ",")
+					break;
+				parser.next();
+			}
+			parser.skip("]");
+			parser.skip("]");
+			result = true;
+			goto again;
+
+		case "__attribute":
+		case "__attribute__":
+			parser.next();
+			parser.skip("(");
+			parser.skip("(");
+			while (parser.tok != ")") {
+				parseCTypeRefAttribute(tr);
+				if (parser.tok != ",")
+					break;
+				parser.next();
+			}
+			parser.skip(")");
+			parser.skip(")");
+			result = true;
+			goto again;
+
+		default: break;
+		}
+		return result;
+	}
+
+	function parseCTypeRefConstVolatile(tr: CTypeRef): bool {
+		local result = false;
+again:
+		switch (parser.tok) {
+
+		case "const":
+		case "volatile":
+		case "restrict":
+			tr.flags |= {
+				"const":    CTYPEREF_FLAG_CONST,
+				"volatile": CTYPEREF_FLAG_VOLATILE,
+				"restrict": CTYPEREF_FLAG_RESTRICT,
+			}[parser.tok];
+			parser.next();
+			result = true;
+			goto again;
+
+		default: break;
+		}
+		if (parseCTypeRefAttributes(tr)) {
+			result = true;
+			goto again;
+		}
+		return result;
+	}
+
+	private member _anonStructMemberId: int = 0;
+	function parseStructMembers(tr: CTypeRef, struct: CStructType) {
+again:
+		switch (parser.tok) {
+
+		case "":
+		case "}":
+			break;
+
+		case ";":
+			parser.next();
+			goto again;
+
+		default: {
+			local typ, nam = parseTypeRefWithoutStorageClass()...;
+			if (!nam) {
+				nam = f"__anon_struct_member_{_anonStructMemberId}";
+				++_anonStructMemberId;
+			}
+			if (nam in struct.fieldsByName)
+				parser.err(f"Duplicate field {repr nam} in struct type");
+			struct.fields.append((typ, nam));
+			struct.fieldsByName[nam] = (typ, Dict());
+			if (parser.tok == ":") {
+				/* Bit fields */
+				parser.next();
+				parseExpression();
+			}
+			parser.skip(";");
+			goto again;
+		}	break;
+
+		}
+	}
+
+	function parseStruct(tr: CTypeRef, isUnion: bool): CStructType {
+		local structName = "";
+		if (parser.tok.issymbol()) {
+			structName = parser.parseSymbolName();
+			parseCTypeRefAttributes(tr);
+		}
+		local struct;
+		if (structName) {
+			local tab = namespaceStack.first.operator . (isUnion ? "unionSymbols" : "structSymbols");
+			local existingType = tab.get(structName);
+			if (existingType !is none) {
+				if (parser.tok != "{") {
+					tr.typ = existingType;
+					return existingType;
+				}
+				parser.err(f"redeclaration of struct type {repr structName}");
+			}
+			struct = CStructType(name: structName);
+			tab[structName] = struct;
+		} else {
+			struct = CStructType(name: structName);
+		}
+		tr.typ = struct;
+		struct.isUnion = isUnion;
+		struct.packing = defaultStructPacking;
+		parser.skip("{");
+		parseStructMembers(tr, struct);
+		parser.skip("}");
+		parseCTypeRefAttributes(tr);
+		if (tr.flags & CTYPEREF_FLAG_PACKED)
+			struct.packing = 1;
+		return struct;
+	}
+
+	function parseStorageClass(): string {
+		local result = parser.tok;
+		if (result in ["extern", "typedef"]) {
+			parser.next();
+			return result;
+		}
+		return "";
+	}
+
+	@@Parse a type base reference
+	@@@return @none if no type was parsed, else the type itself (also stored in @tr.typ)
+	function parseCTypeRefBase(tr: CTypeRef): CType | none {
+		local hasCv = parseCTypeRefConstVolatile(tr);
+		local intFlags = 0;
+#define BASETYPE_FLAG_SIGNED    0x0001 /* FLAG: `signed' was given */
+#define BASETYPE_FLAG_UNSIGNED  0x0002 /* FLAG: `unsigned' was given */
+#define BASETYPE_FLAG_SIGNMASK  0x0003 /* Mask for explicit sign prefix. */
+#define BASETYPE_FLAG_INT       0x0004 /* FLAG: Explicit `int' was given. */
+#define BASETYPE_FLAG_CHAR      0x0010 /* FLAG: `char' was given. */
+#define BASETYPE_FLAG_SHORT     0x0020 /* FLAG: `short' was given. */
+#define BASETYPE_FLAG_LONG      0x0030 /* FLAG: `long' was given. */
+#define BASETYPE_FLAG_LLONG     0x0040 /* FLAG: `long long' was given. */
+#define BASETYPE_FLAG_WIDTHMASK 0x00f0 /* MASK: Explicit width was given. */
+again:
+		switch (parser.tok) {
+
+		case "signed":
+		case "unsigned":
+			if (intFlags & BASETYPE_FLAG_SIGNMASK)
+				parser.err("Duplicate 'signed' or 'unsigned' in type-expression");
+			intFlags |= parser.tok == "signed" ? BASETYPE_FLAG_SIGNED : BASETYPE_FLAG_UNSIGNED;
+			parser.next();
+			goto again;
+
+		case "int":
+			if (intFlags & BASETYPE_FLAG_INT)
+				parser.err("Duplicate 'int' in type-expression");
+			intFlags |= BASETYPE_FLAG_INT;
+			parser.next();
+			goto again;
+
+		case "char":
+			if (intFlags & BASETYPE_FLAG_WIDTHMASK)
+				parser.err("Duplicate width-keyword in type-expression");
+			intFlags |= BASETYPE_FLAG_CHAR;
+			parser.next();
+			goto again;
+
+		case "short":
+			if (intFlags & BASETYPE_FLAG_WIDTHMASK)
+				parser.err("Duplicate width-keyword in type-expression");
+			intFlags |= BASETYPE_FLAG_SHORT;
+			parser.next();
+			goto again;
+
+		case "long":
+			if (intFlags & BASETYPE_FLAG_WIDTHMASK) {
+				if ((intFlags & BASETYPE_FLAG_WIDTHMASK) != BASETYPE_FLAG_LONG)
+					parser.err("Duplicate width-keyword in type-expression");
+				intFlags &= ~BASETYPE_FLAG_WIDTHMASK;
+				intFlags |= BASETYPE_FLAG_LLONG;
+			} else {
+				intFlags |= BASETYPE_FLAG_LONG;
+			}
+			parser.next();
+			goto again;
+
+		case "struct":
+		case "union":
+		case "class": {
+			local isUnion = parser.tok == "union";
+			if (intFlags)
+				parser.err("struct/union/class with integer keyword");
+			parser.next();
+			parseCTypeRefAttributes(tr);
+			parseStruct(tr, isUnion);
+		}	break;
+
+		case "double":
+			if (intFlags) {
+				if (intFlags != BASETYPE_FLAG_LONG)
+					parser.err("double with integer keyword");
+				tr.typ = C_ldouble;
+				parser.next();
+			} else {
+				parser.next();
+				if (parser.tok == "long") {
+					parser.next();
+					tr.typ = C_ldouble;
+				} else {
+					tr.typ = C_double;
+				}
+			}
+			break;
+
+		case "__typeof__":
+			parser.next();
+			parser.skip("(");
+			tr.typ = parseTypeOrExpressionType().typ;
+			parser.skip(")");
+			break;
+
+		default: {
+			if (intFlags) {
+				/* Integer core type */
+				local typ;
+				switch (intFlags & BASETYPE_FLAG_WIDTHMASK) {
+				case BASETYPE_FLAG_CHAR:  typ = C_char; break;
+				case BASETYPE_FLAG_SHORT: typ = C_short; break;
+				case BASETYPE_FLAG_LONG:  typ = C_long; break;
+				case BASETYPE_FLAG_LLONG: typ = C_llong; break;
+				default: typ = C_int; break;
+				}
+				switch (intFlags & BASETYPE_FLAG_SIGNMASK) {
+				case BASETYPE_FLAG_SIGNED:
+					if (typ === C_char)
+						typ = C_schar;
+					break;
+				case BASETYPE_FLAG_UNSIGNED:
+					if (typ === C_char) {
+						typ = C_uchar;
+					} else if (typ === C_short) {
+						typ = C_ushort;
+					} else if (typ === C_int) {
+						typ = C_uint;
+					} else if (typ === C_long) {
+						typ = C_ulong;
+					} else if (typ === C_llong) {
+						typ = C_ullong;
+					}
+					break;
+				default: break;
+				}
+				tr.typ = typ;
+				break;
+			}
+
+			/* Single-keyword integer core types */
+			local typ = SINGLE_KEYWORD_CORE_TYPES.get(parser.tok);
+			if (typ !is none) {
+				parser.next();
+				tr.typ = typ;
+				break;
+			}
+
+			/* Lookup a typedef */
+			local typedef = nsLookupChain("typedefs");
+			if (typedef is none) {
+				if (hasCv)
+					parser.err("Unable to parse type after const/volatile");
+				return none;
+			}
+			tr.importFrom(typedef);
+		}	break;
+
+		}
+		parseCTypeRefConstVolatile(tr);
+		return tr.typ;
+	}
+
+	function parseTypeRefWithoutStorageClass(): (CTypeRef, string) {
+		local tr, nam, sc = parseTypeRef(storageClass: "-")...;
+		if (sc != "-")
+			parser.err(f"Storage class {repr sc} is invalid in this context");
+		return (tr, nam);
+	}
+
+	function parseTypeRefInnerSuffix(tr: CTypeRef) {
+suffixAgain:
+		switch (parser.tok) {
+
+		case "(": {
+			parser.next();
+			local func = CFunctionType(returnType: tr.typ);
+			while (parser.tok != ")") {
+				if (parser.tok == "...") {
+					func.isVarArgs = true;
+					parser.next();
+					break;
+				}
+				local typ, nam = parseTypeRefWithoutStorageClass()...;
+				if (typ.typ === C_void && !nam)
+					break;
+				func.args.append((typ, nam));
+				if (parser.tok != ",")
+					break;
+				parser.next();
+			}
+			parser.skip(")");
+			tr.typ = func;
+			goto suffixAgain;
+		}
+
+		case "[": {
+			parser.next();
+			local dim;
+			if (parser.tok == "]") {
+				dim = none;
+			} else {
+				/* NOTE: When the expression isn't constant, this evaluations to `none'
+				 *       We're fairly lenient in  this regard, since expressions  exist
+				 *       that would be constant for GCC but aren't for us. */
+				dim = parseExpression().last;
+			}
+			tr.typ = CArrayType(base: tr.typ, dim: dim);
+			parser.skip("]");
+			goto suffixAgain;
+		}
+
+		default: break;
+		}
+	}
+
+	@@Parse everything after the base-expression of a C-type
+	function parseTypeRefInner(tr: CTypeRef, name: string = ""): (CTypeRef, string) {
+		/* Parse the inner type-ref prefix (iow: pointer types) */
+prefixAgain:
+		local tok = parser.tok;
+		if (tok == "*") {
+			parser.next();
+			local pt = CPointerType(base: tr);
+			tr = CTypeRef(typ: pt);
+			parseCTypeRefConstVolatile(tr);
+			goto prefixAgain;
+		}
+		if (parseCTypeRefAttributes(tr))
+			tok = parser.tok;
+
+		local result;
+		if (tok == "(") {
+			parser.next();
+			result = parseTypeRefInner(tr, name);
+			parser.skip(")");
+		} else {
+			/* Parse variable name */
+			if (!name && tok.issymbol()) {
+				name = tok;
+				parser.next();
+			}
+			result = (tr, name);
+		}
+
+		/* Parse type suffix expressions */
+		do {
+			parseTypeRefInnerSuffix(tr);
+		} while (parseCTypeRefAttributes(tr));
+		return result;
+	}
+
+	@@Parse a type reference and return (type, name, storage-class)
+	function parseTypeRef(name: string = "",
+	                      storageClass: string = ""): (CTypeRef, string, string) {
+		if (!storageClass)
+			storageClass = parseStorageClass();
+		local tr = CTypeRef();
+		if (parseCTypeRefBase(tr) is none)
+			parser.err(f"Cannot parse type from {repr parser.tok}");
+		if (!storageClass)
+			storageClass = parseStorageClass();
+		tr, name = parseTypeRefInner(tr, name)...;
+		return (tr, name, storageClass);
+	}
+
+	function parseDeclaration(storageClass: string = "") {
+		local typ, name;
+		typ, name, storageClass = parseTypeRef(storageClass)...;
+		print "parse: ", repr storageClass, typ.tostr(name);
+
+		/* Create a typedef/symbol for the parsed declaration. */
+		if (storageClass == "typedef") {
+			local tab: {string: CTypeRef} = namespaceStack.first.typedefs;
+			local existingDecl: CTypeRef = tab.get(name);
+			if (existingDecl is none) {
+				tab[name] = typ;
+			} else {
+				if (typ == existingDecl) {
+					/* Ignore typedef re-declaration where the new type matches the old */
+				} else {
+					parser.err(f"redeclaration of {tab[:-1]} {repr name}");
+				}
+			}
+			parser.skip(";");
+			return;
+		}
+
+		/* Handle symbol assembly names. */
+		if (parser.tok == "__asm__") {
+			parser.next();
+			parser.skip("(");
+			parser.parseString();
+			parser.skip(")");
+		}
+
+		local tab: {string: (CTypeRef, SymbolValue)} = namespaceStack.first.symbols;
+		local existingDecl: (CTypeRef, SymbolValue) | none = tab.get(name);
+		if (existingDecl !is none) {
+			if (typ == existingDecl.first) {
+				/* Ignore typedef re-declaration where the new type matches the old */
+			} else {
+				parser.err(f"redeclaration of {tab[:-1]} {repr name}");
+			}
+			if (existingDecl.first !== NO_VALUE) {
+				/* Symbol already had a value assigned. */
+				parser.skip(";");
+				return;
+			}
+		}
+
+		if (parser.tok == ";") {
+			tab[name] = (typ, NO_VALUE);
+			parser.next();
+			return;
+		}
+
+		/* Must parse an initializer/function-body for the declaration. */
+		local ctype: CType = typ.typ;
+		tab[name] = (typ, UNKNOWN_VALUE);
+		if (ctype is CFunctionType) {
+			parser.skip("{");
+			parseFunctionBody(typ, name);
+			parser.skip("}");
+		} else {
+			local value: SymbolValue = UNKNOWN_VALUE;
+			parser.skip("=");
+			if (ctype is CArrayType && parser.tok == "{") {
+				value = parseArrayInitializer(ctype);
+			} else if (ctype is CStructType && parser.tok == "{") {
+				value = parseStructInitializer(ctype);
+			} else {
+				local initTyp = parseExpression()...;
+				initTyp, value = parseExpression()...;
+				value = castValue(value, initTyp.typ, typ.typ);
+			}
+			parser.skip(";");
+			if (value !== UNKNOWN_VALUE)
+				tab[name] = (typ, value);
+		}
+	}
+
+	function parseFunctionBody(funTypRef: CTypeRef, name: string) {
+		/* Push a namespace for the function's body. */
+		local fnScope: CNamespace = CNamespace(name: name);
+
+		/* Define local symbols for each of the function's arguments. */
+		for (local typ, nam: funTypRef.typ.args) {
+			if (!nam)
+				continue;
+			fnScope.symbols[nam] = typ;
+		}
+
+		/* Setup the context for evaluation of the function body */
+		namespaceStack.pushfront(fnScope);
+		local savedCurrentFunctionName    = currentFunctionName;
+		local savedCurrentFunctionType    = currentFunctionType;
+		local savedCurrentFunctionTypeRef = currentFunctionTypeRef;
+		currentFunctionName    = name;
+		currentFunctionType    = funTypRef.typ;
+		currentFunctionTypeRef = funTypRef;
+
+		/* Parse the function body. */
+		parseStatements();
+
+		/* Restore context */
+		currentFunctionName    = savedCurrentFunctionName;
+		currentFunctionType    = savedCurrentFunctionType;
+		currentFunctionTypeRef = savedCurrentFunctionTypeRef;
+		namespaceStack.popfront();
+	}
+
+	private member isInSwitchStatement: bool = false; /* True inside of a switch-statement */
+	private member isInLoop: bool = false;            /* True inside of a loop-statement */
+	private member isUnreachable: bool = false;       /* True inside of dead code */
+	private member encounteredBreak: bool = false;    /* True if `break' was encountered */
+	private member switchConstantExpressionValue: int | none = none;
+
+	function parseGCCAssemblyArgument() {
+		if (parser.tok == "[") {
+			parser.next();
+			parser.parseSymbolName();
+			parser.skip("]");
+		}
+		parser.parseString();
+		parser.skip("(");
+		parseExpression();
+		parser.skip(")");
+	}
+
+	function parseGCCAssemblyArguments() {
+		if (parser.tok !in [":", "::"]) {
+			for (;;) {
+				parseGCCAssemblyArgument();
+				if (parser.tok != ",")
+					break;
+				parser.next();
+			}
+		}
+	}
+
+	function parseGCCAssemblyStatement() {
+		/* Local assembly */
+		if (parser.next() == "volatile")
+			parser.next();
+		local hasGoto = parser.tok == "goto";
+		if (hasGoto)
+			parser.next();
+		parser.skip("(");
+		parser.parseString();
+		if (parser.tok in [":", "::"]) {
+			parser.makeSingleCharacterToken();
+			parser.next();
+			/* output arguments */
+			parseGCCAssemblyArguments();
+			if (parser.tok in [":", "::"]) {
+				parser.makeSingleCharacterToken();
+				parser.next();
+				/* input arguments */
+				parseGCCAssemblyArguments();
+				if (parser.tok in [":", "::"]) {
+					parser.makeSingleCharacterToken();
+					parser.next();
+					/* Clobber list */
+					if (parser.tok.startswith('"')) {
+						for (;;) {
+							parser.parseString();
+							if (parser.tok != ",")
+								break;
+							parser.next();
+						}
+					}
+					if (hasGoto && parser.tok in [":", "::"]) {
+						parser.makeSingleCharacterToken();
+						parser.next();
+						/* Label list */
+						if (parser.tok.issymbol()) {
+							for (;;) {
+								parser.next();
+								if (parser.tok != ",")
+									break;
+								parser.next();
+								if (!parser.tok.issymbol())
+									parser.err(f"Expected label in asm goto, but got {repr parser.tok}");
+							}
+						}
+					}
+				}
+			}
+		}
+		parser.skip(")");
+		parser.skip(";");
+	}
+
+	function parseStatement() {
+		local tok = parser.tok;
+again:
+		switch (tok) {
+
+		case "":
+		case "}":
+			break;
+
+		case ";":
+			parser.next();
+			break;
+
+		case "case":
+		case "default":
+			if (!isInSwitchStatement)
+				parser.error("`case' or `default' outside of switch-statement");
+			parser.next();
+			if (tok == "case")
+				parseConstantExpression();
+			parser.skip(":");
+			goto again;
+
+		case "break":
+			encounteredBreak = true;
+			/* FALLTHRU */
+		case "continue":
+			if (!isInLoop && (tok != "break" || !isInSwitchStatement))
+				parser.error("`break' or `continue' outside of loop");
+			parser.next();
+			parser.skip(";");
+			break;
+
+		case "__asm__":
+			parseGCCAssemblyStatement();
+			break;
+
+		case "switch": {
+			parser.next();
+			parser.skip("(");
+			local savedSwitchConstantExpressionValue = switchConstantExpressionValue;
+			switchConstantExpressionValue = parseExpression().last;
+			parser.skip(")");
+			local savedIsInSwitchStatement = isInSwitchStatement;
+			isInSwitchStatement = true;
+			parser.require("{");
+			parseStatement();
+			isInSwitchStatement = savedIsInSwitchStatement;
+			switchConstantExpressionValue = savedSwitchConstantExpressionValue;
+		}	break;
+
+		case "if":
+		case "while":
+		case "for":
+		case "do":
+		case "return":
+			/* TODO */
+			break;
+
+		default:
+			if (tok.issymbol() && parser.nextTokIsSingleColon()) {
+				/* Special case: labels. */
+				parser.next();
+				parser.skip(":");
+				goto again;
+			}
+			parseDeclaration();
+			break;
+		}
+	}
+
+	function parseStatements() {
+		do {
+			parseStatement();
+		} while (parser.tok !in ["", "}"]);
+	}
+
+	function parseArrayInitializer(typ: CArrayType): ArraySymbolValue {
+		parser.skip("{");
+		/* TODO */
+		parser.err(f"TODO: parseArrayInitializer({repr typ})");
+		parser.skip("}");
+	}
+
+	function parseStructInitializer(typ: CStructType): StructSymbolValue {
+		parser.skip("{");
+		/* TODO */
+		parser.err(f"TODO: parseStructInitializer({repr typ})");
+		parser.skip("}");
+	}
+
+	@@High-level function to parse an expression and return its type and constant value
+	@@This function returns:
+	@@ - @UNKNOWN_VALUE:         If the expression's value is only known at runtime
+	@@ - @{SymbolValue...}:      If the expression's type is @CArrayType
+	@@ - @{string: SymbolValue}: If the expression's type is @CStructType
+	function parseExpression(): (CTypeRef, SymbolValue) {
+		// parser.err("TODO: parseExpressionType()");
+		return (CTypeRef(typ: C_int), parser.parseInt());
+	}
+
+	@@High-level function to parse an expression and return its type
+	function parseExpressionType(): CTypeRef {
+		return parseExpression().first;
+	}
+
+	@@Parse a type-expression, or parse a normal expression and return its type
+	function parseTypeOrExpressionType(): CTypeRef {
+		local tr = CTypeRef();
+		if (parseCTypeRefBase(tr) is none)
+			return parseExpressionType();
+		return parseTypeRefInner(tr, "-").first;
+	}
+
+	function parseConstantExpression(): int {
+		local typ, val = parseExpression()...;
+		if (val !is int)
+			parser.err(f"Expression of type {typ.tostr("")} is not an integer constant expression");
+		return val;
+	}
+
+	function castValue(value: SymbolValue,
+	                   fromType: CType, toType: CType,
+	                   explicit: bool = false): SymbolValue {
+		/* TODO */
+	}
+
+	@@Parse stuff from the global scope
+	function parseGlobal() {
+again:
+		switch (parser.tok) {
+
+		case "":
+		case "}":
+			break;
+
+		case ";":
+			parser.next();
+			goto again;
+
+		case "__asm__":
+			/* Global assembly (ignore) */
+			parser.next();
+			parser.skip("(");
+			parser.parseString();
+			parser.skip(")");
+			parser.skip(";");
+			goto again;
+
+		case "namespace": {
+			parser.next();
+			local ns = namespaceStack.first;
+			do {
+				ns = ns.childNamespace(parser.parseSymbolName());
+			} while (parser.trySkip("::"));
+			namespaceStack.pushfront(ns);
+			parser.skip("{");
+			do {
+				parseGlobal();
+			} while (parser.tok !in ["", "}"]);
+			parser.skip("}");
+			namespaceStack.popfront();
+		}	break;
+
+		case "extern":
+			parser.next();
+			if (parser.tok.startswith('"')) {
+				parser.parseString();
+				parser.skip("{");
+				do {
+					parseGlobal();
+				} while (parser.tok !in ["", "}"]);
+				parser.skip("}");
+				return;
+			}
+			parseDeclaration("extern");
+			break;
+
+		default:
+			parseDeclaration();
+			break;
+		}
+	}
+
+	function main() {
+		do {
+			parseGlobal();
+		} while (parser.tok);
+	}
+}
+
+@@Main function to run the checker on an already-preprocessed C/C++ source file
+function runChecker(filename: string, targetModule: Module) {
+	local fp = File.open(filename, "rb");
+	local parser = Parser(fp: fp, filename: filename);
+	local checker = Checker(parser: parser, targetModule: targetModule);
+#if 1
+	checker.main();
+#else
+	try {
+		checker.main();
+	} catch (e...) {
+		print repr e;
+		print Traceback.current;
+	}
+#endif
+}
+
+#ifdef __MAIN__
+runChecker(
+	"build/i386-kos-nOD/mod.dbx/kos.src.kernel.moddbx.cmodule.c.chk.E",
+	import("...targets.i386"));
+#endif

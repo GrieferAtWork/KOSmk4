@@ -155,7 +155,7 @@
 #define __ATTR_CLRCALL __clrcall
 #else /* _M_CEE_PURE */
 #define __NO_ATTR_CLRCALL
-#define __ATTR_CLRCALL /* nothing */
+#define __ATTR_CLRCALL /* Nothing */
 #endif /* !_M_CEE_PURE */
 #if (defined(__x86_64__) || defined(__amd64__) || defined(__amd64) || \
      defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64))
@@ -254,7 +254,7 @@
 #define __ATTR_DLLIMPORT __declspec(dllimport)
 #define __ATTR_DLLEXPORT __declspec(dllexport)
 #define __NO_ATTR_NOPLT
-#define __ATTR_NOPLT /* nothing */
+#define __ATTR_NOPLT /* Nothing */
 #define __NO_ATTR_NONNULL
 #define __ATTR_NONNULL(ppars)     /* Nothing */
 #define __ATTR_NONNULL_CXX(ppars) /* Nothing */
@@ -263,9 +263,9 @@
 #define __NO_ATTR_TRANSPARENT_UNION
 #define __ATTR_TRANSPARENT_UNION /* Nothing */
 #define __NO_ATTR_ARTIFICIAL
-#define __ATTR_ARTIFICIAL /* nothing */
+#define __ATTR_ARTIFICIAL /* Nothing */
 #define __NO_ATTR_FORMAT_ARG
-#define __ATTR_FORMAT_ARG(x) /* nothing */
+#define __ATTR_FORMAT_ARG(x) /* Nothing */
 #define __NO_ATTR_ACCESS
 #define __ATTR_ACCESS_NONE(ptr_index)        /* Nothing */
 #define __ATTR_INS(ptr_index, size_index)    /* Nothing */
@@ -320,7 +320,7 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 #define __builtin_FILE() __FILE__
 #define __builtin_FUNCTION() __FUNCTION__
 #define __builtin_unreachable() __assume(0)
-#define __COMPILER_ALIGNOF_IS___ALIGNOF
+#define __COMPILER_ALIGNOF_IS___alignof
 #define __COMPILER_ALIGNOF __alignof
 #define __builtin_offsetof(s, m) ((__SIZE_TYPE__) & ((s *)0)->m)
 #define __ATTR_INLINE_IS___inline
@@ -358,7 +358,7 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
      defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64) ||     \
      defined(_WIN64) || defined(WIN64))
 #define __USER_LABEL_PREFIX_IS_EMPTY
-#define __USER_LABEL_PREFIX__ /* nothing */
+#define __USER_LABEL_PREFIX__ /* Nothing */
 #else /* ... */
 #define __USER_LABEL_PREFIX__ _
 #endif /* !... */
@@ -576,9 +576,9 @@ void __builtin_va_end(__builtin_va_list &__ap);
 #define __PRIVATE_pragma_GCC_diagnostic_ignored_1(decl)      __PRIVATE_pragma_GCC_diagnostic_ignored_1_##decl
 #define __PRIVATE_pragma_GCC_diagnostic_push_ignored_1(decl) __pragma_GCC_diagnostic_push __PRIVATE_pragma_GCC_diagnostic_ignored_1_##decl
 #define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_1(decl)  __pragma_GCC_diagnostic_pop
-#define __PRIVATE_pragma_GCC_diagnostic_ignored_0(decl)            /* nothing */
-#define __PRIVATE_pragma_GCC_diagnostic_push_ignored_0(decl)       /* nothing */
-#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_0(decl)        /* nothing */
+#define __PRIVATE_pragma_GCC_diagnostic_ignored_0(decl)            /* Nothing */
+#define __PRIVATE_pragma_GCC_diagnostic_push_ignored_0(decl)       /* Nothing */
+#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_0(decl)        /* Nothing */
 #define __PRIVATE_pragma_GCC_diagnostic_ignored__(cond, decl)      __PRIVATE_pragma_GCC_diagnostic_ignored_##cond(decl)
 #define __PRIVATE_pragma_GCC_diagnostic_ignored_(cond, decl)       __PRIVATE_pragma_GCC_diagnostic_ignored__(cond, decl)
 #define __PRIVATE_pragma_GCC_diagnostic_push_ignored__(cond, decl) __PRIVATE_pragma_GCC_diagnostic_push_ignored_##cond(decl)

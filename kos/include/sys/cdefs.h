@@ -282,9 +282,9 @@
      (!__GNUC_PREREQ(4, 6) || defined(__STRICT_ANSI__)))
 #define _Static_assert(expr, diagnostic) __STATIC_ASSERT(expr)
 #endif /* !... */
-#if !defined(__alignof) && !defined(__COMPILER_ALIGNOF_IS___ALIGNOF)
+#if !defined(__alignof) && !defined(__COMPILER_ALIGNOF_IS___alignof)
 #define __alignof(x) __COMPILER_ALIGNOF(x)
-#endif /* !__alignof && !__COMPILER_ALIGNOF_IS___ALIGNOF */
+#endif /* !__alignof && !__COMPILER_ALIGNOF_IS___alignof */
 #if !defined(_Alignof) && !defined(__COMPILER_ALIGNOF_IS__Alignof)
 #define _Alignof(x) __COMPILER_ALIGNOF(x)
 #endif /* !_Alignof && !__COMPILER_ALIGNOF_IS__Alignof */

@@ -45,9 +45,9 @@
 #define __PRIVATE_pragma_GCC_diagnostic_ignored_1(decl)      __PRIVATE_pragma_GCC_diagnostic_ignored_1_##decl
 #define __PRIVATE_pragma_GCC_diagnostic_push_ignored_1(decl) __pragma_GCC_diagnostic_push __PRIVATE_pragma_GCC_diagnostic_ignored_1_##decl
 #define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_1(decl)  __pragma_GCC_diagnostic_pop
-#define __PRIVATE_pragma_GCC_diagnostic_ignored_0(decl)           /* nothing */
-#define __PRIVATE_pragma_GCC_diagnostic_push_ignored_0(decl)      /* nothing */
-#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_0(decl)       /* nothing */
+#define __PRIVATE_pragma_GCC_diagnostic_ignored_0(decl)           /* Nothing */
+#define __PRIVATE_pragma_GCC_diagnostic_push_ignored_0(decl)      /* Nothing */
+#define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_0(decl)       /* Nothing */
 #define __PRIVATE_pragma_GCC_diagnostic_ignored_(cond, decl)      __PRIVATE_pragma_GCC_diagnostic_ignored_##cond(decl)
 #define __PRIVATE_pragma_GCC_diagnostic_push_ignored_(cond, decl) __PRIVATE_pragma_GCC_diagnostic_push_ignored_##cond(decl)
 #define __PRIVATE_pragma_GCC_diagnostic_pop_ignored_(cond, decl)  __PRIVATE_pragma_GCC_diagnostic_pop_ignored_##cond(decl)

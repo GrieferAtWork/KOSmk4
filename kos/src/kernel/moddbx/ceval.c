@@ -2370,8 +2370,8 @@ done:
 /* Parse `const' / `volatile' / `_Atomic' type flags. */
 PRIVATE WUNUSED NONNULL((1, 2)) dbx_errno_t
 NOTHROW_NCX(FCALL ctype_parse_cv)(struct cparser *__restrict self,
-                              uintptr_t *__restrict ct_flags,
-                              struct ctype_attributes *__restrict attrib) {
+                                  uintptr_t *__restrict ct_flags,
+                                  struct ctype_attributes *__restrict attrib) {
 	dbx_errno_t result = DBX_EOK;
 	while (self->c_tok == CTOKEN_TOK_KEYWORD) {
 		char const *kwd_str;

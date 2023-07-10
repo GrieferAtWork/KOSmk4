@@ -706,7 +706,7 @@
 #if __has_attribute(__noplt__)
 #define __ATTR_NOPLT __attribute__((__noplt__))
 #else /* ... */
-#define __ATTR_NOPLT /* nothing */
+#define __ATTR_NOPLT /* Nothing */
 #define __NO_ATTR_NOPLT
 #endif /* !... */
 
@@ -892,14 +892,14 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #define __ATTR_ARTIFICIAL __attribute__((__artificial__))
 #else /* __has_attribute(__artificial__) */
 #define __NO_ATTR_ARTIFICIAL
-#define __ATTR_ARTIFICIAL /* nothing */
+#define __ATTR_ARTIFICIAL /* Nothing */
 #endif /* !__has_attribute(__artificial__) */
 
 #if __has_attribute(__format_arg__)
 #define __ATTR_FORMAT_ARG(x) __attribute__((__format_arg__(x)))
 #else /* __has_attribute(__format_arg__) */
 #define __NO_ATTR_FORMAT_ARG
-#define __ATTR_FORMAT_ARG(x) /* nothing */
+#define __ATTR_FORMAT_ARG(x) /* Nothing */
 #endif /* !__has_attribute(__format_arg__) */
 
 #define __LOCAL      static __ATTR_INLINE

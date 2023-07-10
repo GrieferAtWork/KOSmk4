@@ -28,7 +28,8 @@ import * from ..libmagic;
 
 @@Toolchain configuration: string
 @@The filename of the MTOOLS base executable (`mtools.exe')
-global final TOOLCHAIN_MTOOLS_EXE  = "MTOOLS.exe";
+global final TOOLCHAIN_MTOOLS_EXE = "MTOOLS.exe";
+
 @@Toolchain configuration: string
 @@The filename of the MTOOLS disk
 global final TOOLCHAIN_MTOOLS_DISK = "MTOOLS.disk";

@@ -219,43 +219,55 @@ function main(argv: {string...}) {
 	while (args) {
 		local arg = args.pop(0);
 		switch (arg) {
+
 		case "-1":
 			OPT_MAX_COMPILERS = 1;
 			break;
+
 		case "-v":
 		case "--verbose":
 			config.VERBOSE = true;
 			break;
+
 		case "-E":
 			options.setdefault(OPT_COMPILE_SECONDARY, []).append("E");
 			OPT_EMULATOR_USED = none;
 			break;
+
 		case "-S":
 			options.setdefault(OPT_COMPILE_SECONDARY, []).append("S");
 			OPT_EMULATOR_USED = none;
 			break;
+
 		case "--run-only":
 			OPT_DONT_BUILD = true;
 			break;
+
 		case "--libraries-only":
 			OPT_ONLY_BUILD_LIBRARIES = true;
 			break;
+
 		case "--build-only":
 			OPT_EMULATOR_USED = none;
 			break;
+
 		case "-f":
 			config.FORCE = true;
 			break;
+
 		case "--emulator-hosted":
 			OPT_EMULATOR_OPTIONS[emulatorOptions.HOSTED] = "true";
 			break;
+
 		case "--format-error-messages":
 			config.FORMAT_ERRORS = true;
 			break;
+
 		case "--":
 			OPT_EMULATOR_OPTIONS[emulatorOptions.CMDLINE] = " ".join(args);
 			args = { };
 			break;
+
 		case "--install-sh":
 			/* Like with `make_utility.sh', this option should cause magic to do
 			 * a normal build, but redirect  build progress messages to  stderr.
@@ -265,17 +277,26 @@ function main(argv: {string...}) {
 			OPT_EMULATOR_USED = none;
 			import(".kos.misc.libmagic.steps.mtools-install-sh").hook();
 			break;
+
 		case "--target":
 			if (config.CONFIG is none || TARGET_ARCH !is bound)
 				loadMissingSettings();
 			print(TARGET_ARCH, "-kos-", config.CONFIG.name);
 			AppExit.exit(0);
+
 		case "--config":
 			/* List available configs */
 			print("Available configurations:");
 			for (local name: configs.listConfigurationNames())
 				print("\t", name);
 			AppExit.exit(0);
+
+		case "--checker":
+			options.setdefault(OPT_COMPILE_SECONDARY, [])
+				.append("checker");
+			OPT_EMULATOR_USED = none;
+			break;
+
 		default:
 			if ("=" in arg) {
 				local name, none, value = arg.partition("=")...;

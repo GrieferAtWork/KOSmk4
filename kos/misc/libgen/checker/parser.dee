@@ -1,0 +1,462 @@
+/* Copyright (c) 2019-2023 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2023 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+import * from deemon;
+
+/* Disable filename/line overrides */
+#undef NO_LINE_OVERRIDES
+#if 1
+#define NO_LINE_OVERRIDES
+#endif
+
+final class Parser {
+
+	@@Current filename (can be overwritten via directives)
+	public member filename: string;
+
+	@@Set of warnings that are currently being ignored
+	public member ignoredWarnings: {string...} = [];
+
+	@@Incremented every time a non-EOF token is created
+	public member tokenId: int = 0;
+
+	@@When true, always extend the buffer (never clear it)
+	private member peeking: bool = false;
+
+	private member fp: File;
+	private member buf: Bytes = none;
+	private member bufPos: int = 0;
+	private member bufLen: int = 0;
+
+	@@Starting line of @buf (1-based)
+	private member bufStartLine: int = 1;
+	@@Starting column of @buf (1-based)
+	private member bufStartCol: int = 1;
+
+	private member ignoredWarningsStack: {{string...}...} = [];
+
+	this(fp: File, filename?: string, startLine: int = 1, startCol: int = 1) {
+		this.fp = fp;
+		this.filename = filename is bound ? filename : "";
+		this.bufStartLine = startLine;
+		this.bufStartCol = startCol;
+	}
+
+	public function backupCreate(): Tuple {
+		local oldPeeking = peeking;
+		peeking = true;
+		return (oldPeeking, bufPos, tok, tokStart, tokenId);
+	}
+
+	public function backupRestore(backup: Tuple) {
+		peeking, bufPos, tok, tokStart, tokenId = backup...;
+	}
+
+	public function backupDiscard(backup: Tuple) {
+		peeking = backup.first;
+	}
+
+	private function setFilename(filename: string) {
+#ifdef __WINDOWS__
+		if (filename.startswith("/cygdrive/")) {
+			filename = filename[10:];
+			local driveEnd = filename.find("/");
+			if (driveEnd < 0)
+				driveEnd = #filename;
+			filename = f"{filename[:driveEnd].upper()}:{filename[driveEnd:].replace("/", r"\")}";
+		}
+#endif /* __WINDOWS__ */
+		this.filename = filename;
+	}
+
+	@@Return the line/column (both 1-based) at @bufOff
+	private function lcAt(bufOff: int): (int, int) {
+		local lines = buf.count("\n", 0, bufOff);
+		if (!lines) {
+			return (bufStartLine, bufStartCol + bufOff);
+		} else {
+			local lastLineStart = buf.rindex("\n", 0, bufOff);
+			return (bufStartLine + lines, bufOff - lastLineStart);
+		}
+	}
+
+	@@Set the line/column at a given buffer offset
+	private function setLcAt(bufOff: int, line: int, col: int) {
+		local lines = buf.count("\n", 0, bufOff);
+		if (!lines) {
+			bufStartLine = line;
+			bufStartCol = col - bufOff;
+		} else {
+			local lastLineStart = buf.rindex("\n", 0, bufOff);
+			bufStartLine = line - lines;
+			bufStartCol = col + lastLineStart;
+		}
+	}
+
+	@@Extend the currently loaded buffer
+	private function more(extend: bool = false): bool {
+		local data = fp.read(1024);
+		if (!data)
+			return false;
+		data = data.unifylines();
+		if (bufPos >= bufLen && !extend && !peeking) {
+			local oldBufLineCount = buf.count("\n");
+			if (oldBufLineCount) {
+				this.bufStartLine += oldBufLineCount;
+				bufStartCol = bufLen - buf.rindex("\n");
+			} else {
+				bufStartCol += bufLen;
+			}
+			buf = data;
+			bufPos = 0;
+			bufLen = #data;
+			tokStart = 0;
+		} else {
+			buf += data;
+			bufLen += #data;
+		}
+		return true;
+	}
+
+	@@Read 1 character
+	private function getc(): string {
+		if (bufPos >= bufLen && !more())
+			return "";
+		local result = string.chr(buf[bufPos]); /* Yes, this isn't unicode-aware, but that's OK. */
+		++bufPos;
+		return result;
+	}
+
+	@@Read 1 character (extend the current buffer)
+	private function getc_extend(): string {
+		if (bufPos >= bufLen && !more(true))
+			return "";
+		local result = string.chr(buf[bufPos]); /* Yes, this isn't unicode-aware, but that's OK. */
+		++bufPos;
+		return result;
+	}
+
+	@@Peek the next character (extend the current buffer)
+	private function peekc(): string {
+		if (bufPos >= bufLen && !more(true))
+			return "";
+		return string.chr(buf[bufPos]); /* Yes, this isn't unicode-aware, but that's OK. */
+	}
+
+	@@Peek the character after the next character (extend the current buffer)
+	private function peekc2(): string {
+		if ((bufPos + 1) >= bufLen && !more(true))
+			return "";
+		return string.chr(buf[bufPos + 1]); /* Yes, this isn't unicode-aware, but that's OK. */
+	}
+
+	@@The currently loaded token
+	public member tok: string = "";
+
+	@@Returns the line/column pair for @tok
+	public property lc: (int, int) = {
+		get(): (int, int) {
+			return lcAt(tokStart);
+		}
+	}
+
+	@@Start of the currently loaded token (for @lc)
+	public member tokStart: int = 0;
+
+	public function warnAt(pos: int, warningName: string, message: string) {
+		if (warningName !in ignoredWarnings) {
+			local line, col = this.lcAt(pos)...;
+			local text = f"{filename}({line}, {col}): Warning {warningName} : {message}";
+			print File.stderr: text;
+		}
+	}
+
+	public function errAt(pos: int, message: string) {
+		local line, col = this.lcAt(pos)...;
+		local text = f"{filename}({line}, {col}): Error : {message}";
+		print File.stderr: text;
+		throw Error(text);
+	}
+
+	public function warn(warningName: string, message: string) {
+		warnAt(tokStart, warningName, message);
+	}
+
+	public function err(message: string) {
+		errAt(tokStart, message);
+	}
+
+	public function requireInt(): int {
+		try {
+			return int(tok);
+		} catch (e...) {
+			err(f"Failed to parse integer {repr tok}");
+		}
+	}
+
+	public function parseInt(): int {
+		local result = requireInt();
+		next();
+		return result;
+	}
+
+	public function requireString(): string {
+		try {
+			return tok.decode("c-escape");
+		} catch (e...) {
+			err(f"Failed to parse c-string {repr tok}");
+		}
+	}
+
+	@@Same as @requireString, but parse all consecutive strings
+	public function parseString(): string {
+		local result = requireString();
+		for (;;) {
+			if (!next().startswith('"'))
+				break;
+			result += requireString();
+		}
+		return result;
+	}
+
+	public function requireSymbolName(): string {
+		if (!tok.issymbol())
+			err(f"Expected a symbol name but got {repr tok}");
+		return tok;
+	}
+
+	public function parseSymbolName(): string {
+		local result = requireSymbolName();
+		next();
+		return result;
+	}
+
+	@@Assert that the current token is
+	@@@return The next token
+	public function skip(tok: string): string {
+		if (this.tok != tok)
+			require(tok);
+		return next();
+	}
+
+	public function require(tok: string) {
+		if (this.tok != tok)
+			err(f"Unexpected token. Expected {repr tok}, but got {repr this.tok}");
+	}
+
+	@@Check if the current token is @tok, and if so: skip it
+	public function trySkip(tok: string): bool {
+		if (this.tok != tok)
+			return false;
+		next();
+		return true;
+	}
+
+	public function nextTokIsSingleColon(): bool {
+again:
+		local ch = peekc();
+		if (ch.isspace()) {
+			++bufPos;
+			goto again;
+		}
+		if (ch != ":")
+			return false;
+		return peekc2() != ":"; /* "::" would be a different token! */
+	}
+
+	@@Turn the current token into a single-character token
+	public function makeSingleCharacterToken() {
+		bufPos = tokStart + 1;
+		tok = tok[0];
+	}
+
+	@@Advance to the next token
+	public function next(): string {
+		local ch;
+again:
+		tokStart = bufPos;
+		ch = getc();
+		switch (ch) {
+
+		case "": /* EOF */
+			goto return_ch_eof;
+
+		case "+":
+		case "-":
+		case "&":
+		case "|": {
+			local ch2 = peekc();
+			if (ch2 == ch || ch2 == "=") {
+				++bufPos;
+				ch += ch2;
+			}
+			goto return_ch;
+		}
+
+		case "#": {
+			/* Line directive */
+			local eol;
+			for (;;) {
+				eol = buf.find("\n", tokStart, bufLen);
+				if (eol >= 0)
+					break;
+				if (!more(true)) {
+					eol = bufLen;
+					break;
+				}
+			}
+			bufPos = tokStart + 1;
+			local directive = next();
+			if (directive == "pragma") {
+				local pragmaStart = tokStart;
+				directive = next();
+				if (directive == "GCC") {
+					directive = next();
+					if (directive != "diagnostic")
+						goto warn_unknown_pragma;
+					directive = next();
+					switch (directive) {
+					case "push":
+						ignoredWarningsStack.append(ignoredWarnings);
+						break;
+					case "pop":
+						if (!ignoredWarningsStack)
+							err("Warning stack is empty");
+						ignoredWarnings = ignoredWarningsStack.popback();
+						break;
+					case "ignored":
+						next();
+						directive = requireString();
+						ignoredWarnings.append(directive);
+						break;
+					default:
+						goto warn_unknown_pragma;
+					}
+					next();
+					if (tokStart < eol)
+						err("Unused token after #pragma directive");
+				} else {
+warn_unknown_pragma:
+					warn("-Wunknown-pragmas", f"Unknown pragma: {buf[pragmaStart:eol]}");
+				}
+			} else {
+				local line = requireInt();
+				next();
+				local file = requireString();
+#ifndef NO_LINE_OVERRIDES
+				setFilename(file);
+				setLcAt(eol + 1, line, 1);
+#endif /* !NO_LINE_OVERRIDES */
+			}
+			bufPos = eol + 1;
+			goto again;
+		}
+
+		case ".":
+			if (peekc() == "." && peekc2() == ".") {
+				bufPos += 2;
+				ch = "...";
+			}
+			goto return_ch;
+
+		case ":":
+			if (peekc() == ":") {
+				++bufPos;
+				ch += ":";
+			}
+			goto return_ch;
+
+		case "*":
+		case "/":
+		case "%":
+		case "=":
+		case "!":
+		case "^":
+			if (peekc() == "=") {
+				++bufPos;
+				ch += "=";
+			}
+			goto return_ch;
+
+		case "<":
+		case ">": {
+			local ch2 = peekc();
+			if (ch2 == ch) {
+				++bufPos;
+				ch += ch2;
+				if (peekc() == "=") {
+					++bufPos;
+					ch += ch2;
+				}
+			} else if (ch2 == "=") {
+				++bufPos;
+				ch += ch2;
+			}
+			goto return_ch;
+		}
+
+		case "'":
+		case '"':
+			for (;;) {
+				local ch2 = getc_extend();
+				if (!ch2)
+					err("Unterminated string");
+				if (ch2 == "\\") {
+					if (!getc_extend())
+						err("Unterminated string");
+				} else {
+					if (ch == ch2)
+						break;
+				}
+			}
+			goto return_tok;
+
+		default:
+			if (ch.isspace()) {
+		case "\n":
+		case "\t":
+		case " ":
+				goto again;
+			}
+			if (ch.issymcont()) {
+				/* Keyword or number */
+				local isNumber = !ch.issymstrt();
+				for (;;) {
+					ch = peekc();
+					if (!ch)
+						break;
+					if (!ch.issymcont() && (!isNumber || ch !in ".+-"))
+						break;
+					++bufPos;
+				}
+return_tok:
+				ch = str buf[tokStart:bufPos];
+				goto return_ch;
+			}
+
+return_ch:
+			++tokenId;
+return_ch_eof:
+			tok = ch;
+			return ch;
+		}
+
+	}
+
+}

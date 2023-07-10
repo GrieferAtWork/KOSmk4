@@ -100,12 +100,12 @@
 
 
 #ifdef __INTELLISENSE__
-#define __DEFINE_PRIVATE_ALIAS(new, old)      /* nothing */
-#define __DEFINE_PRIVATE_WEAK_ALIAS(new, old) /* nothing */
-#define __DEFINE_INTERN_WEAK_ALIAS(new, old)  /* nothing */
-#define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  /* nothing */
-#define __DEFINE_PUBLIC_ALIAS(new, old)       /* nothing */
-#define __DEFINE_INTERN_ALIAS(new, old)       /* nothing */
+#define __DEFINE_PRIVATE_ALIAS(new, old)      /* Nothing */
+#define __DEFINE_PRIVATE_WEAK_ALIAS(new, old) /* Nothing */
+#define __DEFINE_INTERN_WEAK_ALIAS(new, old)  /* Nothing */
+#define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  /* Nothing */
+#define __DEFINE_PUBLIC_ALIAS(new, old)       /* Nothing */
+#define __DEFINE_INTERN_ALIAS(new, old)       /* Nothing */
 #elif defined(__ASSEMBLER__)
 #define __DEFINE_PRIVATE_ALIAS(new, old)      .local new; .set new, old;
 #define __DEFINE_PUBLIC_ALIAS(new, old)       .global new; .set new, old;
@@ -121,12 +121,12 @@
 #define __DEFINE_PUBLIC_ALIAS(new, old)       PROVIDE(new = ABSOLUTE(old))
 #define __DEFINE_INTERN_ALIAS(new, old)       PROVIDE_HIDDEN(new = ABSOLUTE(old))
 #else /* ... */
-#define __DEFINE_PRIVATE_ALIAS(new, old)      /* nothing */
-#define __DEFINE_PRIVATE_WEAK_ALIAS(new, old) /* nothing */
-#define __DEFINE_INTERN_WEAK_ALIAS(new, old)  /* nothing */
-#define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  /* nothing */
-#define __DEFINE_PUBLIC_ALIAS(new, old)       /* nothing */
-#define __DEFINE_INTERN_ALIAS(new, old)       /* nothing */
+#define __DEFINE_PRIVATE_ALIAS(new, old)      /* Nothing */
+#define __DEFINE_PRIVATE_WEAK_ALIAS(new, old) /* Nothing */
+#define __DEFINE_INTERN_WEAK_ALIAS(new, old)  /* Nothing */
+#define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  /* Nothing */
+#define __DEFINE_PUBLIC_ALIAS(new, old)       /* Nothing */
+#define __DEFINE_INTERN_ALIAS(new, old)       /* Nothing */
 #endif /* !... */
 
 
@@ -238,26 +238,26 @@
 #define __NO_ATTR_FORMAT_STRFTIME
 #define __ATTR_FORMAT_STRFTIME(fmt, args) /* Nothing */
 #define __NO_ATTR_DLLIMPORT
-#define __ATTR_DLLIMPORT /* nothing */
+#define __ATTR_DLLIMPORT /* Nothing */
 #define __NO_ATTR_DLLEXPORT
-#define __ATTR_DLLEXPORT /* nothing */
+#define __ATTR_DLLEXPORT /* Nothing */
 #define __NO_ATTR_NOPLT
-#define __ATTR_NOPLT /* nothing */
+#define __ATTR_NOPLT /* Nothing */
 #define __NO_ATTR_NONNULL
 #define __ATTR_NONNULL(ppars)     /* Nothing */
 #define __ATTR_NONNULL_CXX(ppars) /* Nothing */
 #define __NO_ATTR_WUNUSED
 #define __ATTR_WUNUSED /* Nothing */
 #define __NO_ATTR_TRANSPARENT_UNION
-#define __ATTR_TRANSPARENT_UNION /* nothing */
+#define __ATTR_TRANSPARENT_UNION /* Nothing */
 #define __NO_ATTR_INLINE
-#define __ATTR_INLINE /* nothing */
+#define __ATTR_INLINE /* Nothing */
 #define __NO_ATTR_FORCEINLINE
-#define __ATTR_FORCEINLINE /* nothing */
+#define __ATTR_FORCEINLINE /* Nothing */
 #define __NO_ATTR_ARTIFICIAL
-#define __ATTR_ARTIFICIAL /* nothing */
+#define __ATTR_ARTIFICIAL /* Nothing */
 #define __NO_ATTR_FORMAT_ARG
-#define __ATTR_FORMAT_ARG(x) /* nothing */
+#define __ATTR_FORMAT_ARG(x) /* Nothing */
 #define __NO_ATTR_ACCESS
 #define __ATTR_ACCESS_NONE(ptr_index)        /* Nothing */
 #define __ATTR_INS(ptr_index, size_index)    /* Nothing */
@@ -280,13 +280,13 @@
 #define __builtin_types_compatible_p(T1,T2)
 #endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
 #undef __builtin_assume_has_sideeffects
-#define __builtin_assume(x)     /* nothing */
-#define __builtin_unreachable() /* nothing */
-#define __LOCAL                 /* nothing */
-#define __FORCELOCAL            /* nothing */
+#define __builtin_assume(x)     /* Nothing */
+#define __builtin_unreachable() /* Nothing */
+#define __LOCAL                 /* Nothing */
+#define __FORCELOCAL            /* Nothing */
 #define __NO_EXTERN_INLINE
-#define __EXTERN_INLINE      /* nothing */
-#define __EXTERN_FORCEINLINE /* nothing */
+#define __EXTERN_INLINE      /* Nothing */
+#define __EXTERN_FORCEINLINE /* Nothing */
 #define __NO_builtin_constant_p
 #define __builtin_LINE() __LINE__
 #define __builtin_FILE() __FILE__
@@ -294,28 +294,28 @@
 #define __builtin_FUNCTION() ""
 #define __FUNCTION__ ""
 
-#define __DECL_BEGIN                        /* nothing */
-#define __DECL_END                          /* nothing */
-#define __CXX11_CONSTEXPR                   /* nothing */
-#define __CXX11_CONSTEXPR_OR_CONST          /* nothing */
-#define __CXX14_CONSTEXPR                   /* nothing */
-#define __CXX14_CONSTEXPR_OR_CONST          /* nothing */
-#define __CXX_NOEXCEPT                      /* nothing */
-#define __NAMESPACE_STD_BEGIN               /* nothing */
-#define __NAMESPACE_STD_END                 /* nothing */
-#define __NAMESPACE_STD_SYM                 /* nothing */
-#define __NAMESPACE_STD_USING(x)            /* nothing */
-#define __NAMESPACE_GLB_SYM                 /* nothing */
-#define __NAMESPACE_GLB_USING(x)            /* nothing */
-#define __NAMESPACE_GLB_USING_TYPE(x)       /* nothing */
-#define __NAMESPACE_GLB_USING_OR_IMPL(x, i) /* nothing */
-#define __NAMESPACE_INT_BEGIN               /* nothing */
-#define __NAMESPACE_INT_END                 /* nothing */
-#define __NAMESPACE_INT_SYM                 /* nothing */
-#define __NAMESPACE_INT_LSYM                /* nothing */
-#define __DFL(expr)                         /* nothing */
-#define __register                          /* nothing */
-#define __BOOL                              /* nothing */
+#define __DECL_BEGIN                        /* Nothing */
+#define __DECL_END                          /* Nothing */
+#define __CXX11_CONSTEXPR                   /* Nothing */
+#define __CXX11_CONSTEXPR_OR_CONST          /* Nothing */
+#define __CXX14_CONSTEXPR                   /* Nothing */
+#define __CXX14_CONSTEXPR_OR_CONST          /* Nothing */
+#define __CXX_NOEXCEPT                      /* Nothing */
+#define __NAMESPACE_STD_BEGIN               /* Nothing */
+#define __NAMESPACE_STD_END                 /* Nothing */
+#define __NAMESPACE_STD_SYM                 /* Nothing */
+#define __NAMESPACE_STD_USING(x)            /* Nothing */
+#define __NAMESPACE_GLB_SYM                 /* Nothing */
+#define __NAMESPACE_GLB_USING(x)            /* Nothing */
+#define __NAMESPACE_GLB_USING_TYPE(x)       /* Nothing */
+#define __NAMESPACE_GLB_USING_OR_IMPL(x, i) /* Nothing */
+#define __NAMESPACE_INT_BEGIN               /* Nothing */
+#define __NAMESPACE_INT_END                 /* Nothing */
+#define __NAMESPACE_INT_SYM                 /* Nothing */
+#define __NAMESPACE_INT_LSYM                /* Nothing */
+#define __DFL(expr)                         /* Nothing */
+#define __register                          /* Nothing */
+#define __BOOL                              /* Nothing */
 #define __COMPILER_REQTYPE(T, v)            (v)
 
 
@@ -325,17 +325,17 @@
 #define __builtin_constant_p(x) 0
 #endif /* !__LINKER__ */
 
-#define __restrict     /* nothing */
-#define __restrict_arr /* nothing */
-#define __COMPILER_FLEXIBLE_ARRAY(T, x) /* nothing */
+#define __restrict     /* Nothing */
+#define __restrict_arr /* Nothing */
+#define __COMPILER_FLEXIBLE_ARRAY(T, x) /* Nothing */
 
 #define __NO_COMPILER_IGNORE_UNINITIALIZED
 #define __COMPILER_IGNORE_UNINITIALIZED(var) var
 
-#define __COMPILER_BARRIER()       /* nothing */
-#define __COMPILER_READ_BARRIER()  /* nothing */
-#define __COMPILER_WRITE_BARRIER() /* nothing */
-#define __COMPILER_IMPURE()        /* nothing */
+#define __COMPILER_BARRIER()       /* Nothing */
+#define __COMPILER_READ_BARRIER()  /* Nothing */
+#define __COMPILER_WRITE_BARRIER() /* Nothing */
+#define __COMPILER_IMPURE()        /* Nothing */
 
 #define __NULLPTR 0
 

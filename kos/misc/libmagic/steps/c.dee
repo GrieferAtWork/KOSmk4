@@ -299,6 +299,7 @@ local final function COMPILE_split(self: BoundStep): {BoundStep...} {
 		yield self.createChildStep(f);
 }
 
+global _saved_checker_module;
 global _saved_clang_tidy_module;
 global _saved_lint_module;
 local final function COMPILE_run(self: BoundStep): {Waitable...} {
@@ -340,8 +341,7 @@ local final function COMPILE_run(self: BoundStep): {Waitable...} {
 				incPath:  group.fixFilenames(options.get(OPT_COMPILE_INCPATH)),
 				macros:   options.get(OPT_COMPILE_MACROS),
 			);
-		}
-		if (x == "S") {
+		} else if (x == "S") {
 			yield toolchain.createAssemblerProcess(
 				step:     self,
 				options:  options,
@@ -354,8 +354,24 @@ local final function COMPILE_run(self: BoundStep): {Waitable...} {
 				incPath:  group.fixFilenames(options.get(OPT_COMPILE_INCPATH)),
 				macros:   options.get(OPT_COMPILE_MACROS)
 			);
-		}
-		if (x.startswith("clang-tidy=")) {
+		} else if (x == "checker") {
+			if (_saved_checker_module !is bound)
+				_saved_checker_module = import("..toolchain.checker");
+			if (_saved_checker_module.shouldRunChecker(self, options)) {
+				yield _saved_checker_module.createCheckerProcess(
+					step:      self,
+					toolchain: toolchain,
+					options:   options,
+					srcFile:   srcFile,
+					ppFile:    config.getBuildArtifact(group, srcFile, ".chk.E"),
+					depFile:   config.getDependencyFilename(group, srcFile),
+					ppFlags:   options.get(OPT_COMPILE_PPFLAGS),
+					language:  options.get(OPT_COMPILE_LANGUAGE),
+					incPath:   group.fixFilenames(options.get(OPT_COMPILE_INCPATH)),
+					macros:    options.get(OPT_COMPILE_MACROS)
+				);
+			}
+		} else if (x.startswith("clang-tidy=")) {
 			if (_saved_clang_tidy_module !is bound)
 				_saved_clang_tidy_module = import("..toolchain.clang_tidy");
 			if (_saved_clang_tidy_module.shouldRunClangTidy(self, options)) {
@@ -374,8 +390,7 @@ local final function COMPILE_run(self: BoundStep): {Waitable...} {
 					clangTidyExe: x[11:]
 				);
 			}
-		}
-		if (x.startswith("lint=")) {
+		} else if (x.startswith("lint=")) {
 			if (_saved_lint_module !is bound)
 				_saved_lint_module = import("..toolchain.lint");
 			if (_saved_lint_module.shouldRunLint(self, options)) {
@@ -436,17 +451,18 @@ local final function COMPILE_getProducedOutputFiles(self: BoundStep): {string...
 			: group.fixFilename(objFile)
 			;
 	} else for (local x: options.get(OPT_COMPILE_SECONDARY)) {
-		if (x == "E")
+		if (x == "E") {
 			yield config.getPreprocessedFilename(group, srcFile);
-		if (x == "S")
+		} else if (x == "S") {
 			yield config.getAssembledFilename(group, srcFile);
-		if (x.startswith("clang-tidy=")) {
+		} else if (x == "checker") {
+			yield config.getBuildArtifact(group, srcFile, ".chk.E");
+		} else if (x.startswith("clang-tidy=")) {
 			if (_saved_clang_tidy_module !is bound)
 				_saved_clang_tidy_module = import("..toolchain.clang_tidy");
 			if (_saved_clang_tidy_module.shouldRunClangTidy(self, options))
 				yield config.getBuildArtifact(group, srcFile, ".ctout");
-		}
-		if (x.startswith("lint=")) {
+		} else if (x.startswith("lint=")) {
 			if (_saved_lint_module !is bound)
 				_saved_lint_module = import("..toolchain.lint");
 			if (_saved_lint_module.shouldRunLint(self, options))

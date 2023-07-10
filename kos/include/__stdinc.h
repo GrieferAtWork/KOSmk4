@@ -119,6 +119,7 @@
 #define __SYSDECL_END   __DECL_END
 #endif /* !__SYSDECL_BEGIN */
 
+#ifndef __NOTHROW
 #ifdef __INTELLISENSE__
 #define __NOTHROW /* Nothing */
 #elif !defined(__PREPROCESSOR_HAVE_VA_ARGS) && !defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
@@ -146,6 +147,7 @@
 #else /* ... */
 #define __NOTHROW __ATTR_NOTHROW
 #endif /* !... */
+#endif /* !__NOTHROW */
 
 
 /* A  special  variant  of  NOTHROW  that  is  only  applied   when
@@ -158,6 +160,7 @@
  * memory buffers qualifies for this, as  the user may have defined  a
  * signal handler to throw an exception upon `SIGSEGV', or the like.
  * Or alternatively, has KOS kernel exceptions enabled (s.a. <kos/except-handler.h>) */
+#ifndef __NOTHROW_NCX
 #if (!defined(__NO_NON_CALL_EXCEPTIONS) || \
      (defined(__NON_CALL_EXCEPTIONS) && (__NON_CALL_EXCEPTIONS + 0) != 0) || \
      (defined(__KOS__) && defined(__KERNEL__)))
@@ -178,6 +181,7 @@
 #define __CXX_NOEXCEPT_NCX __CXX_NOEXCEPT
 #endif /* __cplusplus */
 #endif /* !__NON_CALL_EXCEPTIONS */
+#endif /* !__NOTHROW_NCX */
 
 
 
@@ -187,6 +191,7 @@
  * By default, declare functions such that generated code is capable of  dealing
  * with throwing RPC functions (`rpc_schedule()'), as well as `pthread_cancel()'
  * -> This mainly affects system calls */
+#ifndef __NOTHROW_RPC
 #if !defined(__NON_CALL_EXCEPTIONS) && defined(__NO_RPC_EXCEPTIONS)
 #define __NOTHROW_RPC            __NOTHROW
 #ifdef __KOS__
@@ -226,6 +231,7 @@
 #define __CXX_NOEXCEPT_RPC_PURE /* Nothing */
 #endif /* __cplusplus */
 #endif /* !__NO_RPC_EXCEPTIONS */
+#endif /* !__NOTHROW_RPC */
 
 
 /* Same as `__NOTHROW', but must be used in `typedef's and variable declarations:

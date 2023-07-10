@@ -1,0 +1,84 @@
+/* Copyright (c) 2019-2023 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2023 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from ..libmagic;
+import * from ..steps.c;
+import * from .gcc;
+import ...libgen.checker.checker as checker;
+import ipc;
+import fs;
+
+function shouldRunChecker(step: BoundStep, options: {string: Object}): bool {
+	local language = options.get(OPT_COMPILE_LANGUAGE);
+	if (language is none)
+		language = getLanguageFromExtension(fs.extof(step.userData));
+	return language in ["c", "c++"];
+}
+
+
+function createCheckerProcess(
+		step:      BoundStep,
+		toolchain: Toolchain,
+		options:   {string: Object},
+		srcFile:   string,          /* "kos/src/kernel/core/arch/i386/boot/boot.c" */
+		ppFile:    string,          /* "build/i386-kos-nOD/kernel/kos.src.kernel.core.arch.i386.boot.boot.c.chk.E" */
+		depFile:   string,          /* "build/i386-kos-nOD/kernel/kos.src.kernel.core.arch.i386.boot.boot.c.MF" */
+		ppFlags:   {string...},     /* options.get(OPT_COMPILE_PPFLAGS) */
+		language:  string,          /* "c" */
+		incPath:   string,          /* { "kos/src/kernel/include/i386-kos", "Ikos/src/kernel/include" } */
+		macros:    {string: string} /* { "__KOS__" : "1" } */
+		): Waitable {
+	local th = Thread(() -> {
+		/* Always define the `__CHECKER__' macro (so headers will reconfigure for the checker) */
+		local usedMacros = Dict(macros);
+		usedMacros["__CHECKER__"] = "1";
+
+		/* Step #1: Preprocess the source file */
+		toolchain.createPreprocessorProcess(
+			step:     step,
+			options:  options,
+			srcFile:  srcFile,
+			outFile:  ppFile,
+			depFile:  depFile,
+			ppFlags:  ppFlags,
+			language: language,
+			incPath:  incPath,
+			macros:   usedMacros,
+		).waitfor();
+
+		/* Step #2: Figure out the target configuration module (super hacky) */
+		local targetName = toolchain.config.BUILD_PATH
+			.replace("\\", "/")
+			.partition("/").last
+			.partition("-").first;
+		local targetModule = import(f"...targets.{targetName}");
+
+		/* Step #3: Run the preprocessed source file through the checker */
+		try {
+			checker.runChecker(ppFile, targetModule);
+		} @[interrupt] catch (...) {
+			try fs.unlink(ppFile); catch (...);
+			throw;
+		}
+	});
+	th.start();
+	return WaitableJoin(th);
+}

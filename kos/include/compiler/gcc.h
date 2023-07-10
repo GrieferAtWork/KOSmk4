@@ -17,6 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifdef __CHECKER__
+#include "checker.h"
+#else /* __CHECKER__ */
+
 #define __GCC_PRIVATE_ARG_PLACEHOLDER_  ,
 #define __GCC_PRIVATE_TAKE_SECOND_ARG_IMPL(x,val,...) val
 #define __GCC_PRIVATE_TAKE_SECOND_ARG(x) __GCC_PRIVATE_TAKE_SECOND_ARG_IMPL x
@@ -197,8 +201,8 @@
 
 #ifndef __likely
 #ifdef __INTELLISENSE__
-#define __likely   /* nothing */
-#define __unlikely /* nothing */
+#define __likely   /* Nothing */
+#define __unlikely /* Nothing */
 #elif __has_builtin(__builtin_expect)
 #define __likely(x)   (__builtin_expect(!!(x), 1))
 #define __unlikely(x) (__builtin_expect(!!(x), 0))
@@ -582,7 +586,7 @@
 #if __has_attribute(__noplt__)
 #define __ATTR_NOPLT __attribute__((__noplt__))
 #else /* ... */
-#define __ATTR_NOPLT /* nothing */
+#define __ATTR_NOPLT /* Nothing */
 #define __NO_ATTR_NOPLT
 #endif /* !... */
 
@@ -680,8 +684,8 @@
 
 #ifdef __INTELLISENSE_GCC__
 #define __pragma(...) _Pragma(#__VA_ARGS__)
-#define __XBLOCK      /* nothing */
-#define __XRETURN     /* nothing */
+#define __XBLOCK      /* Nothing */
+#define __XRETURN     /* Nothing */
 #define __builtin_assume_has_sideeffects
 #define __builtin_assume(x) (!(x) ? __builtin_unreachable() : (void)0)
 #elif defined(__INTELLISENSE__)
@@ -718,7 +722,7 @@
 #define __COMPILER_ALIGNOF_IS___alignof__
 #define __COMPILER_ALIGNOF __alignof__
 #elif defined(__clang__)
-#define __COMPILER_ALIGNOF_IS___ALIGNOF
+#define __COMPILER_ALIGNOF_IS___alignof
 #define __COMPILER_ALIGNOF __alignof
 #elif defined(__cplusplus)
 extern "C++" { template<class T> struct __compiler_alignof { char __x; T __y; }; }
@@ -756,14 +760,14 @@ extern "C++" { template<class T> struct __compiler_alignof { char __x; T __y; };
 #define __ATTR_ARTIFICIAL __attribute__((__artificial__))
 #else /* __GCC_VERSION_NUM >= 40300 */
 #define __NO_ATTR_ARTIFICIAL
-#define __ATTR_ARTIFICIAL /* nothing */
+#define __ATTR_ARTIFICIAL /* Nothing */
 #endif /* __GCC_VERSION_NUM < 40300 */
 
 #if __has_attribute(__format_arg__)
 #define __ATTR_FORMAT_ARG(x) __attribute__((__format_arg__(x)))
 #else /* __has_attribute(__format_arg__) */
 #define __NO_ATTR_FORMAT_ARG
-#define __ATTR_FORMAT_ARG(x) /* nothing */
+#define __ATTR_FORMAT_ARG(x) /* Nothing */
 #endif /* !__has_attribute(__format_arg__) */
 
 #define __LOCAL      static __ATTR_INLINE
@@ -1012,3 +1016,4 @@ template<class __T1, class __T2> struct __gcc_types_compatible:
 #endif /* ... */
 
 /************************************************************************/
+#endif /* !__CHECKER__ */

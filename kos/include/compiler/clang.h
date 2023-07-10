@@ -179,7 +179,7 @@
 #define __ATTR_W64 /* Nothing */
 
 #ifdef __clang_tidy__
-#define __ATTR_FASTCALL /* nothing */
+#define __ATTR_FASTCALL /* Nothing */
 #elif __has_attribute(__fastcall__)
 #define __ATTR_FASTCALL __attribute__((__fastcall__))
 #elif defined(__fastcall)
@@ -191,7 +191,7 @@
 #endif /* !... */
 
 #ifdef __clang_tidy__
-#define __ATTR_STDCALL /* nothing */
+#define __ATTR_STDCALL /* Nothing */
 #elif __has_attribute(__stdcall__)
 #define __ATTR_STDCALL __attribute__((__stdcall__))
 #elif defined(__stdcall)
@@ -203,7 +203,7 @@
 #endif /* !... */
 
 #ifdef __clang_tidy__
-#define __ATTR_CDECL /* nothing */
+#define __ATTR_CDECL /* Nothing */
 #elif __has_attribute(__cdecl__)
 #define __ATTR_CDECL __attribute__((__cdecl__))
 #elif defined(__cdecl)
@@ -215,7 +215,7 @@
 #endif /* !... */
 
 #ifdef __clang_tidy__
-#define __ATTR_CLRCALL /* nothing */
+#define __ATTR_CLRCALL /* Nothing */
 #elif __has_attribute(__clrcall__)
 #define __ATTR_CLRCALL __attribute__((__clrcall__))
 #elif defined(__clrcall)
@@ -227,7 +227,7 @@
 #endif /* !... */
 
 #ifdef __clang_tidy__
-#define __ATTR_THISCALL /* nothing */
+#define __ATTR_THISCALL /* Nothing */
 #elif __has_attribute(__thiscall__)
 #define __ATTR_THISCALL __attribute__((__thiscall__))
 #elif defined(__thiscall)
@@ -239,7 +239,7 @@
 #endif /* !... */
 
 #ifdef __clang_tidy__
-#define __ATTR_MSABI /* nothing */
+#define __ATTR_MSABI /* Nothing */
 #elif __has_attribute(__ms_abi__)
 #define __ATTR_MSABI __attribute__((__ms_abi__))
 #elif defined(__ms_abi)
@@ -251,7 +251,7 @@
 #endif /* !... */
 
 #ifdef __clang_tidy__
-#define __ATTR_SYSVABI /* nothing */
+#define __ATTR_SYSVABI /* Nothing */
 #elif __has_attribute(__sysv_abi__)
 #define __ATTR_SYSVABI __attribute__((__sysv_abi__))
 #elif defined(__sysv_abi)
@@ -731,14 +731,14 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #define __ATTR_ARTIFICIAL __attribute__((__artificial__))
 #else /* __has_attribute(__artificial__) */
 #define __NO_ATTR_ARTIFICIAL
-#define __ATTR_ARTIFICIAL /* nothing */
+#define __ATTR_ARTIFICIAL /* Nothing */
 #endif /* !__has_attribute(__artificial__) */
 
 #if __has_attribute(__format_arg__)
 #define __ATTR_FORMAT_ARG(x) __attribute__((__format_arg__(x)))
 #else /* __has_attribute(__format_arg__) */
 #define __NO_ATTR_FORMAT_ARG
-#define __ATTR_FORMAT_ARG(x) /* nothing */
+#define __ATTR_FORMAT_ARG(x) /* Nothing */
 #endif /* !__has_attribute(__format_arg__) */
 
 #define __LOCAL      static __ATTR_INLINE
@@ -917,11 +917,11 @@ extern void *realloc_in_place(void *, __SIZE_TYPE__);
  * Re-configure stuff to prevent false warnings! */
 #ifndef __NO_ATTR_MSABI
 #undef __ATTR_MSABI
-#define __ATTR_MSABI /* nothing */
+#define __ATTR_MSABI /* Nothing */
 #endif /* !__NO_ATTR_MSABI */
 #ifndef __NO_ATTR_SYSVABI
 #undef __ATTR_SYSVABI
-#define __ATTR_SYSVABI /* nothing */
+#define __ATTR_SYSVABI /* Nothing */
 #endif /* !__NO_ATTR_SYSVABI */
 #undef WIN32
 #undef WIN64
