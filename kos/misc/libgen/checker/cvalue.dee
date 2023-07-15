@@ -1,0 +1,259 @@
+/* Copyright (c) 2019-2023 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2023 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+import * from deemon;
+import * from .ctype;
+
+#define ArrayConstValue  {CValue...}
+#define StructConstValue {string: CValue}
+#define ConstValue       int | float | ArrayConstValue | StructConstValue
+
+global final CVALUE_CONST  = 0; /* Constant, or array/struct initializer */
+global final CVALUE_SYMBOL = 1; /* L-Value Symbol reference (+ optional pointer offset) */
+global final CVALUE_ADDROF = 2; /* R-Value Symbol pointer (+ optional pointer offset) */
+
+final class CValue {
+	this = default;
+
+	@@Value kind (one of `CVALUE_*`)
+	public member kind: int;
+
+	@@Type of value
+	public member typeref: CTypeRef;
+
+	@@The actual value itself:
+	@@ - @CVALUE_CONST:@ConstValue: Constant expression
+	@@ - @CVALUE_SYMBOL:@CSymbol:   L-value symbol value
+	@@ - *any*:none:                Unknown value
+	public member data: ConstValue | CSymbol | none;
+
+	@@For @CVALUE_SYMBOL and @CVALUE_ADDROF, an addend
+	@@that is added to the address of the symbol  (for
+	@@accessing struct fields and so on...)
+	@@
+	@@Unused (and possibly unbound) for other @(kind)s
+	public member addend: int;
+
+	operator str(): string -> str typeref;
+
+	/* Utility functions */
+
+	@@Check if @this is a compile-time constant value
+	public property isConstExpr: bool = {
+		get(): bool {
+			return kind == CVALUE_CONST && data !is none;
+		}
+	}
+
+	@@Check if @this @CValue, when compared to @other via `==` always equates to @true
+	public function same(other: CValue): bool {
+		return this == other || this.rValue == other.rValue;
+	}
+
+	public property rValue: CValue = {
+		get(): CValue {
+			return copy(this).inplaceRValue;
+		}
+	}
+
+	@@Set @kind to @CVALUE_CONST, and @data to @none, thus marking the value as unknown-at-compile-time
+	@@@return: * : Always re-returns @this
+	public function makeUnknown(): CValue {
+		kind = CVALUE_CONST;
+		data = none;
+		try del addend; catch (...);
+		return this;
+	}
+
+	public property inplaceRValue: CValue = {
+		get(): CValue {
+again:
+			if (kind == CVALUE_SYMBOL) {
+				/* Unpack constant value of a CSymbol (and resolve struct/array element references) */
+				data = data.valOrNone;
+				local myType = typeref.typ;
+				local value: CValue;
+				if (myType is CStructType && data is Mapping) {
+					local field, subOffset = myType.fieldByOffset(addend)...;
+					if (field is none) {
+						data = none;
+					} else {
+						value = data.get(field);
+assign_value:
+						if (value is none) {
+							data = none;
+						} else {
+							local origType = this.typeref;
+							this := value;
+							if (subOffset != 0) {
+								if (this.kind == CVALUE_CONST) {
+									data = none;
+									del addend;
+									goto done;
+								}
+								addend += subOffset;
+							}
+							del addend;
+							this.inplaceCast(origType);
+							goto again;
+						}
+					}
+				} else if (myType is CArrayType && data is Sequence) {
+					local index, subOffset = myType.indexByOffset(addend)...;
+					if (index is none) {
+						data = none;
+					} else if (index < 0 || index >= #data) {
+						data = none;
+					} else {
+						value = data[index];
+						goto assign_value;
+					}
+				} else if (data !is int && data !is float) {
+					data = none;
+				}
+				del addend;
+			}
+done:
+			return this;
+		}
+	}
+
+	public function cast(typeref: CTypeRef, explicit: bool = false): CValue {
+		return copy(this).inplaceCast(typeref, explicit);
+	}
+	public function inplaceCast(typeref: CTypeRef, explicit: bool = false): CValue {
+		/* TODO: Sign extension / constant masking */
+		/* TODO: Errors when casting is impossible */
+		/* TODO: Error when `!explicit' and casting between pointer types, where neither type is `void *' */
+		/* TODO: Error when `!explicit' and casting from int to pointer, and the integer isn't a compile-time constant `0' */
+		/* TODO: If `!(typeref.flags & CTYPEREF_FLAG_FORCE)', then retain nothrow attributes
+		 *       of  `(typeref.typ as CPointerType).base.attrib' (also: warn if the new type
+		 *       has no force attribute, and both types have nothrow levels, which are  also
+		 *       different from each other):
+		 *       >> #define NTX(n) __attribute__((__nothrow__(n)))
+		 *       >> #define FORCE  __attribute__((__force__))
+		 *       >>        void *p = (NTX(0) void *)42;       // OK: p inherits the NTX(0) attribute
+		 *       >> NTX(0) void *p = (void *)42;              // OK: p retains the NTX(0) attribute
+		 *       >> NTX(0) void *p = (NTX(0) void *)42;       // OK: Nothing changes
+		 *       >> NTX(0) void *p = (NTX(1) void *)42;       // Warning: Multiple nothrow levels (p retains NTX(0))
+		 *       >> NTX(1) void *p = (NTX(0) void *)42;       // Warning: Multiple nothrow levels (p retains NTX(1))
+		 *       >> NTX(1) void *p = (FORCE NTX(0) void *)42; // OK: p inherits the NTX(0) attribute
+		 *       >> FORCE NTX(1) void *p = (NTX(0) void *)42; // Warning: Multiple nothrow levels (p retains NTX(1))
+		 */
+		inplaceRValue;
+		this.typeref = typeref;
+		return this;
+	}
+
+
+	public property promote: CValue = {
+		get(): CValue {
+			return copy(this).inplacePromote;
+		}
+	}
+
+	public property inplacePromote: CValue = {
+		get(): CValue {
+			// TODO: Array -> pointer decay
+			// TODO: char/short -> int promotion
+			// TODO: Strip top-level const/volatile
+			return this;
+		}
+	}
+
+	public property deRef: CValue = {
+		get(): CValue {
+			return copy(this).inplaceDeRef;
+		}
+	}
+
+	public property inplaceDeRef: CValue = {
+		get(): CValue {
+			inplacePromote; /* To deal with array decay */
+			if (typeref.typ !is CPointerType) {
+				/* Special case: ignore deref on function types. */
+				if (typeref.typ is CFunctionType)
+					return this;
+				throw Error(f"Cannot dereference non-pointer type `{typeref}'");
+			}
+			typeref = typeref.typ.base;
+			if (kind != CVALUE_ADDROF)
+				return makeUnknown();
+			kind = CVALUE_SYMBOL;
+			return this;
+		}
+	}
+
+	public property logicalNot: CValue = {
+		get(): CValue {
+			return copy(this).inplaceLogicalNot;
+		}
+	}
+
+	public property inplaceLogicalNot: CValue = {
+		get(): CValue {
+			inplaceRValue;
+			if (kind == CVALUE_CONST) {
+				if (data is int || data is float)
+					data = data ? 0 : 1;
+			} else if (kind == CVALUE_ADDROF) {
+				del addend;
+				data = 0;
+				kind = CVALUE_CONST;
+			} else {
+				makeUnknown();
+			}
+			typeref = CTypeRef(C_bool);
+			return this;
+		}
+	}
+
+}
+
+function cvalueFromConst(typeref: CTypeRef, value: ConstValue | none): CValue {
+	return CValue(kind: CVALUE_CONST, typeref: typeref, data: value);
+}
+
+function cvalueFromSymbol(sym: CSymbol): CValue {
+	return CValue(kind: CVALUE_SYMBOL, typeref: sym.typeref, data: sym);
+}
+
+
+
+final class CScope: CNamespace {
+	this = default;
+	@@Symbol value overrides (for when a function overrides the value of a pre-defined symbol)
+	public member symbolValues: {string: CValue} = Dict();
+
+	function setSymbolValue(name: string, value: CValue) {
+		local localSym = this.symbols.get(name);
+		if (localSym !is none) {
+			/* Directly set original symbol value. */
+			this.symbols[name] = (localSym.first, value);
+		} else {
+			/* Sea symbol value override */
+			symbolValues[name] = value;
+		}
+	}
+
+	function setSymbolValues(overrides: {string: CValue}) {
+		for (local name, val: overrides)
+			setSymbolValue(name, val);
+	}
+}

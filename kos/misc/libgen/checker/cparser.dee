@@ -25,16 +25,25 @@ import * from deemon;
 #define NO_LINE_OVERRIDES
 #endif
 
-final class Parser {
+class ParserError: Error { this = super; }
+
+class CParser {
+	this(fp: File, filename: string = "",
+	     startLine: int = 1, startCol: int = 1) {
+		this.fp = fp;
+		this.filename = filename;
+		this.bufStartLine = startLine;
+		this.bufStartCol = startCol;
+	}
 
 	@@Current filename (can be overwritten via directives)
-	public member filename: string;
+	public final member filename: string;
 
 	@@Set of warnings that are currently being ignored
-	public member ignoredWarnings: {string...} = [];
+	private final member ignoredWarnings: {string...} = [];
 
 	@@Incremented every time a non-EOF token is created
-	public member tokenId: int = 0;
+	public final member tokenId: int = 0;
 
 	@@When true, always extend the buffer (never clear it)
 	private member peeking: bool = false;
@@ -51,25 +60,30 @@ final class Parser {
 
 	private member ignoredWarningsStack: {{string...}...} = [];
 
-	this(fp: File, filename?: string, startLine: int = 1, startCol: int = 1) {
-		this.fp = fp;
-		this.filename = filename is bound ? filename : "";
-		this.bufStartLine = startLine;
-		this.bufStartCol = startCol;
-	}
+#define ParserBackup Tuple
 
-	public function backupCreate(): Tuple {
+	public final function backupCreate(): ParserBackup {
 		local oldPeeking = peeking;
 		peeking = true;
-		return (oldPeeking, bufPos, tok, tokStart, tokenId);
+		return (bufPos, tok, tokStart, tokenId, oldPeeking);
 	}
 
-	public function backupRestore(backup: Tuple) {
-		peeking, bufPos, tok, tokStart, tokenId = backup...;
+	public final function backupRestore(backup: ParserBackup) {
+		bufPos, tok, tokStart, tokenId, peeking = backup...;
 	}
 
-	public function backupDiscard(backup: Tuple) {
-		peeking = backup.first;
+	public final function backupDiscard(backup: ParserBackup) {
+		peeking = backup.last;
+	}
+
+	public final function warnBackupCreate(): ParserBackup {
+		local oldPeeking = peeking;
+		peeking = true;
+		return (bufPos, oldPeeking);
+	}
+
+	public final function warnBackupDiscard(backup: ParserBackup) {
+		peeking = backup.last;
 	}
 
 	private function setFilename(filename: string) {
@@ -86,7 +100,9 @@ final class Parser {
 	}
 
 	@@Return the line/column (both 1-based) at @bufOff
-	private function lcAt(bufOff: int): (int, int) {
+	private function lcAt(bufOff: int | ParserBackup): (int, int) {
+		if (bufOff !is int)
+			bufOff = bufOff.first;
 		local lines = buf.count("\n", 0, bufOff);
 		if (!lines) {
 			return (bufStartLine, bufStartCol + bufOff);
@@ -167,42 +183,50 @@ final class Parser {
 	}
 
 	@@The currently loaded token
-	public member tok: string = "";
+	public final member tok: string = "";
 
 	@@Returns the line/column pair for @tok
-	public property lc: (int, int) = {
+	public final property lc: (int, int) = {
 		get(): (int, int) {
 			return lcAt(tokStart);
 		}
 	}
 
 	@@Start of the currently loaded token (for @lc)
-	public member tokStart: int = 0;
+	public final member tokStart: int = 0;
 
-	public function warnAt(pos: int, warningName: string, message: string) {
+	public final function warnAt(pos: int | ParserBackup, warningName: string, message: string) {
 		if (warningName !in ignoredWarnings) {
 			local line, col = this.lcAt(pos)...;
-			local text = f"{filename}({line}, {col}): Warning {warningName} : {message}";
+			local text = f"{filename}({line},{col}): Warning {warningName} : {message}";
 			print File.stderr: text;
 		}
 	}
 
-	public function errAt(pos: int, message: string) {
+	public final function errMsgAt(pos: int | ParserBackup, message: string): string {
 		local line, col = this.lcAt(pos)...;
-		local text = f"{filename}({line}, {col}): Error : {message}";
+		local text = f"{filename}({line},{col}): Error : {message}";
 		print File.stderr: text;
-		throw Error(text);
+		return text;
 	}
 
-	public function warn(warningName: string, message: string) {
+	public final function errMsg(message: string): string {
+		return errMsgAt(tokStart, message);
+	}
+
+	public final function errAt(pos: int | ParserBackup, message: string) {
+		throw ParserError(errMsgAt(pos, message));
+	}
+
+	public final function warn(warningName: string, message: string) {
 		warnAt(tokStart, warningName, message);
 	}
 
-	public function err(message: string) {
+	public final function err(message: string) {
 		errAt(tokStart, message);
 	}
 
-	public function requireInt(): int {
+	public final function requireInt(): int {
 		try {
 			return int(tok);
 		} catch (e...) {
@@ -210,13 +234,13 @@ final class Parser {
 		}
 	}
 
-	public function parseInt(): int {
+	public final function parseInt(): int {
 		local result = requireInt();
 		next();
 		return result;
 	}
 
-	public function requireString(): string {
+	public final function requireString(): string {
 		try {
 			return tok.decode("c-escape");
 		} catch (e...) {
@@ -225,7 +249,7 @@ final class Parser {
 	}
 
 	@@Same as @requireString, but parse all consecutive strings
-	public function parseString(): string {
+	public final function parseString(): string {
 		local result = requireString();
 		for (;;) {
 			if (!next().startswith('"'))
@@ -235,13 +259,13 @@ final class Parser {
 		return result;
 	}
 
-	public function requireSymbolName(): string {
+	public final function requireSymbolName(): string {
 		if (!tok.issymbol())
 			err(f"Expected a symbol name but got {repr tok}");
 		return tok;
 	}
 
-	public function parseSymbolName(): string {
+	public final function parseSymbolName(): string {
 		local result = requireSymbolName();
 		next();
 		return result;
@@ -249,26 +273,26 @@ final class Parser {
 
 	@@Assert that the current token is
 	@@@return The next token
-	public function skip(tok: string): string {
+	public final function skip(tok: string): string {
 		if (this.tok != tok)
 			require(tok);
 		return next();
 	}
 
-	public function require(tok: string) {
+	public final function require(tok: string) {
 		if (this.tok != tok)
 			err(f"Unexpected token. Expected {repr tok}, but got {repr this.tok}");
 	}
 
 	@@Check if the current token is @tok, and if so: skip it
-	public function trySkip(tok: string): bool {
+	public final function trySkip(tok: string): bool {
 		if (this.tok != tok)
 			return false;
 		next();
 		return true;
 	}
 
-	public function nextTokIsSingleColon(): bool {
+	public final function nextTokIsSingleColon(): bool {
 again:
 		local ch = peekc();
 		if (ch.isspace()) {
@@ -281,13 +305,16 @@ again:
 	}
 
 	@@Turn the current token into a single-character token
-	public function makeSingleCharacterToken() {
+	public final function makeSingleCharacterToken() {
 		bufPos = tokStart + 1;
 		tok = tok[0];
 	}
 
+	private member staticIfDepth: int = 0;
+	private member staticIfAllowed: bool = true;
+
 	@@Advance to the next token
-	public function next(): string {
+	public final function next(): string {
 		local ch;
 again:
 		tokStart = bufPos;
@@ -427,6 +454,17 @@ warn_unknown_pragma:
 			}
 			goto return_tok;
 
+		case "}":
+			if (staticIfDepth && staticIfAllowed) {
+				ch = handleStaticIfRBrace();
+				if (ch is none)
+					goto again;
+				if (ch == "__static_if")
+					goto do_handleStaticIf;
+				return ch;
+			}
+			break;
+
 		default:
 			if (ch.isspace()) {
 		case "\n":
@@ -447,16 +485,95 @@ warn_unknown_pragma:
 				}
 return_tok:
 				ch = str buf[tokStart:bufPos];
+				if (ch == "__static_if" && staticIfAllowed) {
+do_handleStaticIf:
+					ch = handleStaticIf();
+					if (ch is none)
+						goto again;
+					return ch;
+				}
 				goto return_ch;
 			}
-
-return_ch:
-			++tokenId;
-return_ch_eof:
-			tok = ch;
-			return ch;
+			break;
 		}
-
+return_ch:
+		++tokenId;
+return_ch_eof:
+		tok = ch;
+		return ch;
 	}
 
+	function handleStaticIfSkipBlock() {
+		local recursion = 0;
+		for (;;) {
+			switch (next()) {
+			case "":
+				err("EOF during inactive __static_if-block");
+				break;
+			case "{":
+				++recursion;
+				continue;
+			case "}":
+				if (!recursion)
+					break;
+				--recursion;
+				continue;
+			default:
+				continue;
+			}
+			break;
+		}
+	}
+
+	function handleStaticIfRBrace(): string | none {
+		++tokenId;
+		--staticIfDepth;
+		local saved = backupCreate();
+		staticIfAllowed = false;
+		local tok = next();
+		if (tok == "else") {
+			next();
+			skip("{");
+			handleStaticIfSkipBlock();
+			staticIfAllowed = true;
+			return none;
+		}
+		staticIfAllowed = true;
+		return tok;
+	}
+
+	function handleStaticIf(): string | none {
+again:
+		++tokenId;
+		staticIfAllowed = false;
+		next();
+		skip("(");
+		staticIfAllowed = true;
+		/* Virtual function call to `Checker' sub-class */
+		local isTrue: int = this.parseExprConstantInteger();
+		staticIfAllowed = false;
+		skip(")");
+		local result = skip("{");
+		if (isTrue) {
+handle_true_block:
+			staticIfAllowed = true;
+			if (result == "}") {
+				result = none;
+			} else {
+				++staticIfDepth;
+			}
+			return result;
+		}
+		handleStaticIfSkipBlock();
+		result = next();
+		if (result == "__static_if")
+			goto again;
+		if (result == "else") {
+			next();
+			result = skip("{");
+			goto handle_true_block;
+		}
+		staticIfAllowed = true;
+		return result;
+	}
 }

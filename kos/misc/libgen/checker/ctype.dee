@@ -1,0 +1,385 @@
+/* Copyright (c) 2019-2023 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2023 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+import * from deemon;
+import * from errors;
+
+#define ConstValue int | float | {Object/*CValue*/...} | {string: Object/*CValue*/}
+
+class CType {
+	// function tostr(varname: string = ""): string;
+
+	operator str() -> this.tostr();
+	// property sizeof: int;
+	property alignof: int = { get(): int -> this.sizeof; };
+}
+
+global final CTYPEREF_FLAG_CONST    = 0x0001;
+global final CTYPEREF_FLAG_VOLATILE = 0x0002;
+global final CTYPEREF_FLAG_DEREF    = 0x0004;
+global final CTYPEREF_FLAG_NODEREF  = 0x0008;
+global final CTYPEREF_FLAG_RESTRICT = 0x0010;
+
+@@Do no inherit pointer attributes during casts:
+@@```c
+@@void *p = *(__attribute__((force)) int *)
+@@int x = *(__attribute__((force)) int *)
+@@```
+global final CTYPEREF_FLAG_FORCE    = 0x0020;
+global final CTYPEREF_FLAG_PACKED   = 0x8000; /* Used during creation of struct objects. */
+
+final class CTypeRef {
+	this = default;
+	public member typ: CType;
+
+	@@Type flags. Set of `CTYPEREF_FLAG_*`
+	public member flags: int = 0;
+
+	@@Type attributes. Map of:
+	@@ - @"nothrow"               -> @string   (nothrow level, as string-coded decimal, possible prefixed by @"*")
+	@@ - @"tag"                   -> @string   (function tag)
+	@@ - @"require_caller_tag"    -> @string   (function caller tag requirements)
+	@@ - @"aligned"               -> @int      (alignment)
+	public member attrib: {string: string | int} = Dict();
+
+	/* Helpers */
+	operator str(): string -> tostr();
+	public property sizeof: int = { get(): int -> typ.sizeof; };
+	public property alignof: int = { get(): int -> typ.alignof; };
+
+	@@Check if @this @CTypeRef is identical to @other in such
+	@@a way  that  no  re-declaration error  show  be  thrown
+	function equalsForRedeclaration(other: CTypeRef): bool {
+		return typ == other.typ;
+	}
+
+	function tostr(varname: string = ""): string {
+		if (flags & CTYPEREF_FLAG_RESTRICT)
+			varname = f"restrict {varname}";
+		if (flags & CTYPEREF_FLAG_VOLATILE)
+			varname = f"volatile {varname}";
+		if (flags & CTYPEREF_FLAG_CONST)
+			varname = f"const {varname}";
+		if (flags & CTYPEREF_FLAG_NODEREF)
+			varname = f"__attribute__((noderef)) {varname}";
+		for (local attr, val: attrib) {
+			if (attr in ["tag", "require_caller_tag"])
+				val = repr val;
+			varname = f"__attribute__(({attr}({val}))) {varname}";
+		}
+		return typ.tostr(varname);
+	}
+
+	function importFrom(other: CTypeRef) {
+		flags |= other.flags;
+		attrib.update(other.attrib);
+		typ = other.typ;
+	}
+}
+
+final class CCoreType: CType {
+	this = default;
+	public member name: string;
+	public member sizeof: int;
+	public member alignof: int;
+	function tostr(varname: string = ""): string {
+		return varname ? f"{name} {varname}" : name;
+	}
+}
+
+global final C_bool = CCoreType("bool", 1, 1);
+global final C_void = CCoreType("void", 0, 1);
+global final C_char = CCoreType("char", 1, 1);
+global final C_schar = CCoreType("signed char", 1, 1);
+global final C_uchar = CCoreType("unsigned char", 1, 1);
+global final C_short = CCoreType("short", 2, 2);
+global final C_ushort = CCoreType("unsigned short", 2, 2);
+global final C_int = CCoreType("int", 4, 4);
+global final C_uint = CCoreType("unsigned int", 4, 4);
+global final C_long32 = CCoreType("long", 4, 4);
+global final C_long64 = CCoreType("long", 8, 8);
+global final C_ulong32 = CCoreType("unsigned long", 4, 4);
+global final C_ulong64 = CCoreType("unsigned long", 8, 8);
+global final C_llong = CCoreType("long long", 8, 8);
+global final C_llong_align4 = CCoreType("long long", 8, 4);
+global final C_ullong = CCoreType("unsigned long long", 8, 8);
+global final C_ullong_align4 = CCoreType("unsigned long long", 8, 4);
+global final C_wchar_t = CCoreType("wchar_t", 4, 4);
+global final C_char16_t = CCoreType("char16_t", 2, 2);
+global final C_char32_t = CCoreType("char32_t", 4, 4);
+global final C_float = CCoreType("float", 4, 4);
+global final C_double = CCoreType("double", 8, 8);
+global final C_ldouble_12 = CCoreType("long double", 12, 8);
+global final C_ldouble_16 = CCoreType("long double", 16, 16);
+
+global final SINGLE_KEYWORD_CORE_TYPES: {string: CCoreType} = {
+	"void" : C_void,
+	"float" : C_float,
+	"wchar_t" : C_wchar_t,
+	"bool" : C_bool,
+	"_Bool" : C_bool,
+	"char16_t" : C_char16_t,
+	"char32_t" : C_char32_t,
+};
+
+class CPointerType: CType {
+	this = default;
+	public member base: CTypeRef;
+	function tostr(varname: string = ""): string {
+		return base.tostr("*" + varname);
+	}
+}
+
+final class CPointerType32: CPointerType {
+	this = super;
+	public property sizeof: int = { get() -> 4; };
+}
+
+final class CPointerType64: CPointerType {
+	this = super;
+	public property sizeof: int = { get() -> 8; };
+}
+
+final class CStructType: CType {
+	this = default;
+	public member name: string;
+	public member base: CStructType | none = none;
+	public member fields: {string: (CTypeRef, int)} = Dict();
+	public member fieldsByDeclarationOrder: {string...} = [];
+
+	function tostr(varname: string = ""): string {
+		return varname ? f"struct {name} {varname}" : f"struct {name}";
+	}
+
+	function getField(name: string): (CTypeRef, int) | none {
+		local result = fields.get(name);
+		if (result is none && base !is none)
+			result = base.getField(name);
+		return result;
+	}
+
+	public property foreachField: {(string, CTypeRef, int)...} = {
+		get(): {(string, CTypeRef, int)...} {
+			if (base !is none)
+				yield base.foreachField...;
+			for (local name, typAndOffset: fields) {
+				yield (name, typAndOffset...);
+			}
+		}
+	}
+
+	function fieldByOffset(offset: int): (string, int) | none {
+		local result: (string, int) | none = none;
+		for (local fieldName, none, fieldOffset: foreachField) {
+			if (fieldOffset <= offset) {
+				local subOffset = offset - fieldOffset;
+				if (result is none || subOffset < result.last)
+					result = (fieldName, subOffset);
+				if (subOffset == 0)
+					break;
+			}
+		}
+		return none;
+	}
+
+	private member _sizeof: int;
+	public property sizeof: int = {
+		get() {
+			if (_sizeof !is bound) {
+				local result = 0;
+				for (local none, fieldType, fieldOffset: foreachField) {
+					local offsetAfter = fieldOffset + fieldType.typ.sizeof;
+					if (result < offsetAfter)
+						result = offsetAfter;
+				}
+				_sizeof = result;
+			}
+			return _sizeof;
+		}
+	}
+
+	public member _alignof: int;
+	public property alignof: int = {
+		get() {
+			if (_alignof !is bound) {
+				local result = 1;
+				for (local none, fieldType, none: foreachField) {
+					local temp = fieldType.typ.alignof;
+					if (result < temp)
+						result = temp;
+				}
+				_alignof = result;
+			}
+			return _alignof;
+		}
+	}
+}
+
+final class CEnumType: CType {
+	this = default;
+	public member name: string;
+	public member base: CType = C_int;
+	public property sizeof: int = { get(): int -> base.sizeof; };
+	public property alignof: int = { get(): int -> base.alignof; };
+	function tostr(varname: string = ""): string {
+		return varname ? f"enum {name} {varname}" : f"enum {name}";
+	}
+}
+
+final class CFunctionType: CType {
+	this = default;
+	public member returnType: CType;
+	public member args: {(CTypeRef, string)...} = [];
+	public member isVarArgs: bool = false;
+	public property sizeof: int = { get(): int -> 0; };
+	public property alignof: int = { get(): int -> 1; };
+	function tostr(varname: string = ""): string {
+		if (varname.startswith("*") || " " in varname) {
+			varname = f"({varname})";
+		}
+		if (args) {
+			varname = f"{varname}({
+				", ".join(for (local typ, name: args) typ.tostr(name))
+			})";
+		} else {
+			varname += "(void)";
+		}
+		return returnType.tostr(varname);
+	}
+}
+
+final class CArrayType: CType {
+	this = default;
+	public member base: CType;
+	@@Set to @none for flexible arrays
+	public member dim: int | none;
+	public property sizeof: int = { get(): int -> dim is none ? 0 : base.sizeof * dim; };
+	public property alignof: int = { get(): int -> base.alignof; };
+	function tostr(varname: string = ""): string {
+		if (varname.startswith("*") || " " in varname)
+			varname = f"({varname})";
+		return base.tostr(f"{varname}[{dim is none ? "" : dim}]");
+	}
+
+	function indexByOffset(offset: int): (int, int) | none {
+		local stride = base.alignof;
+		if (stride <= 0)
+			return none;
+		local index, subOffset = offset.divmod(stride)...;
+		if (index < 0 || (dim !is none && index >= dim))
+			return none;
+		return (index, subOffset);
+	}
+
+}
+
+
+class CSymbol {
+	this = default;
+	@@Type of the symbol
+	public member typeref: CTypeRef;
+	@@Constant value of the symbol, or unbound if never assigned, or @none if unknown
+	public member val: ConstValue | none;
+	public property valOrNone: ConstValue | none = {
+		get(): ConstValue | none {
+			try {
+				return val;
+			} catch (UnboundAttribute) {
+				return none;
+			}
+		}
+	}
+}
+
+@@Sub-class for overloaded function-like symbols (needed for overloads)
+@@NOTE: The primary symbol element should not be used, and its fields are unbound!
+final class COverloadedFunctionSymbol: CSymbol {
+	this = default;
+	@@The overloads of this function
+	public member overloads: {CSymbol...} = [];
+
+	@@Get or create an overload for the given @typeref c-function-type
+	function getOrCreateOverload(typeref: CTypeRef): CSymbol {
+		for (local overload: overloads) {
+			if (overload.typeref.equalsForRedeclaration(typeref)) {
+				overload.typeref.importFrom(typeref);
+				return overload;
+			}
+		}
+		local result = CSymbol(typeref: typeref);
+		overloads.append(result);
+		return result;
+	}
+}
+
+global CEnumClassType;
+class CNamespace {
+	this = default;
+	public final member name: string;
+	public final member symbols: {string: CSymbol} = Dict();
+	public final member typedefs: {string: CTypeRef} = Dict();
+	public final member namespaces: {string: CNamespace} = Dict();
+	public final member structSymbols: {string: CStructType} = Dict();
+	public final member unionSymbols: {string: CStructType} = Dict();
+	public final member enumSymbols: {string: CEnumType | CEnumClassType} = Dict();
+	public final member importedNamespaces: {CNamespace...} = [];
+
+	@@Only here so we don't need special handling in for @Parser.getSymbolValue
+	public property symbolValues = { get() -> none; };
+
+	@@@param tab: One of:
+	@@            - @"symbols": CSymbol
+	@@            - @"typedefs": CTypeRef
+	@@            - @"namespaces": CNamespace
+	@@            - @"structSymbols": CStructType
+	@@            - @"unionSymbols": CStructType
+	@@            - @"enumSymbols": CEnumType
+	public final function lookup(tab: string, name: string): Object | none {
+		local result = this.operator . (tab).get(name);
+		if (result !is none)
+			return result;
+		for (local importedNamespace: importedNamespaces) {
+			result = importedNamespace.lookup(tab, name);
+			if (result !is none)
+				return result;
+		}
+		return none;
+	}
+
+	function childNamespace(name: string): CNamespace {
+		local result = lookup("namespaces", name);
+		if (result is none) {
+			result = CNamespace(name: name);
+			namespaces[name] = result;
+		}
+		return result;
+	}
+}
+
+
+final class CEnumClassType: CNamespace, CType {
+	this = super;
+	public member name: string;
+	public member base: CTypeRef = C_int;
+	public property sizeof: int = { get(): int -> base.sizeof; };
+	public property alignof: int = { get(): int -> base.alignof; };
+	function tostr(varname: string = ""): string {
+		return varname ? f"enum class {this.name} {varname}" : f"enum class {this.name}";
+	}
+}

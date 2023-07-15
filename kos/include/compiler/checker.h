@@ -145,7 +145,8 @@
  * also has a __nothrow__ attribute, and whose __nothrow__ attribute specifies a level
  * that is smaller than the called function. Additionally, a warning is issued for a
  * function that has no nothrow attribute and calls only functions that have __nothrow__
- * attributes.
+ * attributes. The same also happens when dereferencing a pointer with a greater nothrow
+ * level than one's own function.
  *
  * Levels are defined as follows:
  * 0: NOTHROW:     Always nothrow; if this function *were* to throw an exception, that's a crash
@@ -187,9 +188,9 @@
 #define __ATTR_BLOCKING_IF(...) __checker_attribute__(__nothrow__(3), __tag__("BLOCKING")) /* XXX: Condition */
 #define __ATTR_NOPREEMPT        __checker_attribute__(__tag__("NOPREEMPT"), __require_caller_tag__("NOPREEMPT"))
 
-#define __ATTR_USER            __checker_attribute__(__nothrow__(2))
-#define __ATTR_UNCHECKED       __checker_attribute__(__noderef__, __nothrow__(2))
-#define __ATTR_CHECKED         __checker_attribute__(__deref__, __nothrow__(2))
+#define __ATTR_USER             __checker_attribute__(__nothrow__(2))
+#define __ATTR_UNCHECKED        __checker_attribute__(__noderef__, __nothrow__(2))
+#define __ATTR_CHECKED          __checker_attribute__(__deref__, __nothrow__(2))
 
 
 
@@ -265,17 +266,6 @@
 #define __COMPILER_ALIGNOF_IS___alignof__
 #define __COMPILER_ALIGNOF __alignof__
 
-#define static /* Nothing */
-#define __const const
-#define __const__ const
-#define __volatile volatile
-#define __volatile__ volatile
-#define __signed signed
-#define __signed__ signed
-#define __unsigned unsigned
-#define __unsigned__ unsigned
-#define asm __asm__
-#define __asm __asm__
 #define __seg_gs
 #define __seg_fs
 
@@ -294,10 +284,6 @@
 #define __ULONGLONG unsigned long long
 #endif /* !__LONGLONG */
 
-#ifndef __restrict
-#define __restrict_IS_restrict
-#define __restrict restrict
-#endif /* !__restrict */
 #define __restrict_arr restrict
 
 #if __GCC_VERSION_NUM >= 20970
@@ -305,7 +291,9 @@
 #endif /* __GCC_VERSION_NUM >= 20970 */
 #define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[]
 
-#define __STATIC_IF(x) if(x)
+#define __builtin_choose_expr(c, tt, ff) __static_if(x){tt}else{ff}
+
+#define __STATIC_IF(x)   __static_if(x)
 #define __STATIC_ELSE(x) else
 #define __IF0    if(0)
 #define __IF1    if(1)
@@ -337,9 +325,6 @@
 #define __builtin_va_start(ap, last_arg) (void)((ap) = (__builtin_va_list)&(last_arg))
 #define __builtin_va_arg(ap, T)          (*(T *)(((ap) += sizeof(T)) - sizeof(T)))
 #define __builtin_va_end(ap)             (void)0
-
-#define __NO_builtin_choose_expr
-#define __builtin_choose_expr(c, tt, ff) ((c) ? (tt) : (ff))
 
 #define __NO_builtin_types_compatible_p
 #define __builtin_types_compatible_p(...) 1

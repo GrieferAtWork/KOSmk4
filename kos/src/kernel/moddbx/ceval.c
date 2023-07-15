@@ -1396,15 +1396,6 @@ syn:
 	return DBX_ESYNTAX;
 }
 
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL parse_unary)(struct cparser *__restrict self) {
-	dbx_errno_t result;
-	result = parse_unary_prefix(self);
-	if (likely(result == DBX_EOK) && parse_unary_suffix_check(self->c_tok))
-		result = parse_unary_suffix(self);
-	return result;
-}
-
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
 NOTHROW_NCX(FCALL parse_prod_suffix)(struct cparser *__restrict self) {
@@ -1945,6 +1936,7 @@ done:
 			result = parse_##name##_suffix(self);                                  \
 		return result;                                                             \
 	}
+DEFINE_INTERPOS_PARSER(unary, unary_prefix)
 DEFINE_INTERPOS_PARSER(prod, unary)
 DEFINE_INTERPOS_PARSER(sum, prod)
 DEFINE_INTERPOS_PARSER(shift, sum)
