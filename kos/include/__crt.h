@@ -210,7 +210,7 @@
 #endif /* !__cplusplus */
 
 /* Automatic namespacing for header-local implementations of functions. */
-#ifdef __cplusplus
+#if defined(__cplusplus) && !defined(__CHECKER__)
 #ifdef __INTELLISENSE__
 #define __LIBC_LOCAL_NAME(x) x
 #define __LIBC_LOCAL_NAME_IS_IDENTITY
@@ -277,7 +277,7 @@ template<class __S> struct __loc_T { typedef __S __T; };
 #else /* __LIBC_LOCAL_NAME_IS_IDENTITY */
 #define __NAMESPACE_LOCAL_USING_OR_IMPL(x, i) i
 #endif /* !__LIBC_LOCAL_NAME_IS_IDENTITY */
-#else /* __cplusplus */
+#else /* __cplusplus && !__CHECKER__ */
 #define __NAMESPACE_LOCAL_TYPEHAX(Tp, Tr, x)  (*(Tp)&__local_##x)
 #define __NAMESPACE_LOCAL_BEGIN               /* nothing */
 #define __NAMESPACE_LOCAL_END                 /* nothing */
@@ -285,7 +285,7 @@ template<class __S> struct __loc_T { typedef __S __T; };
 #define __NAMESPACE_LOCAL_USING(x)            /* nothing */
 #define __NAMESPACE_LOCAL_USING_OR_IMPL(x, i) i
 #define __LIBC_LOCAL_NAME(x)                  __local_##x
-#endif /* !__cplusplus */
+#endif /* !__cplusplus || __CHECKER__ */
 
 #ifndef __FCALL
 #if defined(__x86_64__)

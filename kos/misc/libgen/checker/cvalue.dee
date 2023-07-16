@@ -19,14 +19,71 @@
  */
 import * from deemon;
 import * from .ctype;
+#define Checker Object
 
-#define ArrayConstValue  {CValue...}
-#define StructConstValue {string: CValue}
-#define ConstValue       int | float | ArrayConstValue | StructConstValue
+#define IDENTICAL(a, b) (type(a) === type(b) && ((a) == (b)))
 
-global final CVALUE_CONST  = 0; /* Constant, or array/struct initializer */
-global final CVALUE_SYMBOL = 1; /* L-Value Symbol reference (+ optional pointer offset) */
-global final CVALUE_ADDROF = 2; /* R-Value Symbol pointer (+ optional pointer offset) */
+global final OPERATORS1_BY_NAME: {string: Callable} = {
+	"+"  : operator pos,
+	"-"  : operator neg,
+	"~"  : operator ~,
+};
+global final OPERATORS2_BY_NAME: {string: Callable} = {
+	"+"  : operator add,
+	"-"  : operator sub,
+	"*"  : operator *,
+	"/"  : operator /,  /* TODO: This is floordiv, but C needs truncdiv! */
+	"%"  : operator %,  /* TODO: This is floormod, but C needs truncmod! */
+	"<<" : operator <<,
+	">>" : operator >>,
+	"&"  : operator &,
+	"|"  : operator |,
+	"^"  : operator ^,
+	"==" : operator ==,
+	"!=" : operator !=,
+	"<"  : operator <,
+	"<=" : operator <=,
+	">"  : operator >,
+	">=" : operator >=,
+};
+
+global final FLIPPED_COMPARE_OPERATORS: {string: string} = {
+	"<"  : ">",
+	">"  : "<",
+	"<=" : ">=",
+	">=" : "<=",
+};
+
+
+#define CVALUE_RVALUE      1
+#define CVALUE_AVALUE      2
+#define CVALUE_ISLVALUE(x) (!((x) & CVALUE_RVALUE)) /* L-Value */
+#define CVALUE_ISRVALUE(x) ((x) & CVALUE_RVALUE)    /* R-Value */
+#define CVALUE_ISAVALUE(x) (((x) & (CVALUE_RVALUE | CVALUE_AVALUE)) == (CVALUE_RVALUE | CVALUE_AVALUE))
+global final CVALUE_LVOID   = 0x00; /* L-Value: *(T *)??? Value */
+global final CVALUE_RVOID   = 0x01; /* R-Value: *(T *)??? Value */
+global final CVALUE_AVOID   = 0x03; /* R-Value:    (T)??? Value */
+global final CVALUE_LCONST  = 0x04; /* L-Value: *(T *)&data[offset:offset+...] */
+global final CVALUE_RCONST  = 0x05; /* R-Value: *(T *)&data[offset:offset+...] */
+global final CVALUE_ACONST  = 0x07; /* R-Value:    (T)&data[offset:offset+...] */
+global final CVALUE_LSYMBOL = 0x08; /* L-Value: *(T *)&CSymbol.val[offset:offset+...] */
+global final CVALUE_RSYMBOL = 0x09; /* R-Value: *(T *)&CSymbol.val[offset:offset+...] */
+global final CVALUE_ASYMBOL = 0x0b; /* R-Value:    (T)&CSymbol.val[offset:offset+...] */
+
+
+global final PRETTY_NOTHROW_LEVEL_NAME: {int: string} = {
+	0 : "NOTHROW",
+	1 : "NOTHROW_NCX",
+	2 : "USER' or `CHECKED",
+	3 : "BLOCKING",
+};
+function getPrettyNothrowLevelName(level: int): string {
+	local result = PRETTY_NOTHROW_LEVEL_NAME.get(level);
+	if (result !is none)
+		return result;
+	return f"__attribute__((nothrow({level})))";
+}
+
 
 final class CValue {
 	this = default;
@@ -34,207 +91,660 @@ final class CValue {
 	@@Value kind (one of `CVALUE_*`)
 	public member kind: int;
 
-	@@Type of value
+	@@Value type
 	public member typeref: CTypeRef;
 
-	@@The actual value itself:
-	@@ - @CVALUE_CONST:@ConstValue: Constant expression
-	@@ - @CVALUE_SYMBOL:@CSymbol:   L-value symbol value
-	@@ - *any*:none:                Unknown value
-	public member data: ConstValue | CSymbol | none;
+	@@The actual value, or symbol-reference
+	public member data: Bytes | CSymbol;
 
-	@@For @CVALUE_SYMBOL and @CVALUE_ADDROF, an addend
-	@@that is added to the address of the symbol  (for
-	@@accessing struct fields and so on...)
-	@@
-	@@Unused (and possibly unbound) for other @(kind)s
-	public member addend: int;
+	@@Offset into @data
+	public member offset: int;
 
-	operator str(): string -> str typeref;
+	operator str(): string -> f"<instance of {typeref}>";
 
 	/* Utility functions */
 
 	@@Check if @this is a compile-time constant value
 	public property isConstExpr: bool = {
 		get(): bool {
-			return kind == CVALUE_CONST && data !is none;
+			return kind in [CVALUE_LCONST, CVALUE_RCONST];
 		}
 	}
-
-	@@Check if @this @CValue, when compared to @other via `==` always equates to @true
-	public function same(other: CValue): bool {
-		return this == other || this.rValue == other.rValue;
-	}
-
-	public property rValue: CValue = {
-		get(): CValue {
-			return copy(this).inplaceRValue;
+	public property constExprBytes: Bytes = {
+		get(): Bytes {
+			assert isConstExpr;
+			return data[offset:offset+typeref.typ.sizeof];
 		}
 	}
+	public function constExprValue(checker: Checker): int | float {
+		assert isConstExpr;
+		return typeref.typ.peek(checker, data, offset);
+	}
 
-	@@Set @kind to @CVALUE_CONST, and @data to @none, thus marking the value as unknown-at-compile-time
-	@@@return: * : Always re-returns @this
-	public function makeUnknown(): CValue {
-		kind = CVALUE_CONST;
-		data = none;
-		try del addend; catch (...);
+#define MAKE_VOID() (kind &= CVALUE_RVALUE)
+
+	/* Utility API */
+
+	public function rValue(checker: Checker): CValue -> copy(this).inplaceRValue(checker);
+	public function inplaceRValue(checker: Object): CValue {
+		local typ: CType = typeref.typ;
+		if (typ is CArrayType) {
+			if (CVALUE_ISRVALUE(kind))
+				checker.err(f"Cannot decay r-value array `{typeref}' to pointer");
+			local pointerTypeRef: CTypeRef = copy typeref;
+			pointerTypeRef.typ = typ.base;
+			typ = checker.TARGET_CPointerType(pointerTypeRef);
+			typeref = CTypeRef(typ);
+		}
+		kind |= CVALUE_RVALUE;
+		if (kind == CVALUE_RSYMBOL) {
+			/* Check if the symbol has a known value */
+			local symValue: Bytes | none = data.valOrNone;
+			if (symValue !is none) {
+				kind = CVALUE_RCONST;
+				data = symValue;
+			}
+		}
 		return this;
 	}
 
-	public property inplaceRValue: CValue = {
-		get(): CValue {
-again:
-			if (kind == CVALUE_SYMBOL) {
-				/* Unpack constant value of a CSymbol (and resolve struct/array element references) */
-				data = data.valOrNone;
-				local myType = typeref.typ;
-				local value: CValue;
-				if (myType is CStructType && data is Mapping) {
-					local field, subOffset = myType.fieldByOffset(addend)...;
-					if (field is none) {
-						data = none;
-					} else {
-						value = data.get(field);
-assign_value:
-						if (value is none) {
-							data = none;
+	public function cast(checker: Checker, newTypeRef: CTypeRef, explicit: bool = false): CValue
+		-> copy(this).inplaceCast(checker, newTypeRef, explicit);
+	public function inplaceCast(checker: Checker, newTypeRef: CTypeRef, explicit: bool = false): CValue {
+		inplaceRValue(checker);
+		local oldTyp: CType = typeref.typ;
+		local newTyp: CType = newTypeRef.typ;
+
+		/* Filter out illegal casts */
+		if (newTyp is CStructType)
+			goto err_bad_op;
+		if (newTyp is CFunctionType)
+			goto err_bad_op;
+		if (newTyp is CArrayType)
+			goto err_bad_op;
+
+		if (!explicit && !IDENTICAL(oldTyp, newTyp)) {
+			/* Error  when  `!explicit' and  casting between
+			 * pointer types, where neither type is `void *' */
+			if (oldTyp is CPointerType && newTyp is CPointerType) {
+				local oldPointerBase: CTypeRef = oldTyp.base;
+				local newPointerBase: CTypeRef = newTyp.base;
+				if (IDENTICAL(oldPointerBase, newPointerBase)) {
+					/* Pointer-cast where the pointer bases are identical is always OK */
+				} else if (IDENTICAL(oldPointerBase.typ, newPointerBase.typ)) {
+					/* Pointer-cast where the the base-types are identical is OK,
+					 * but warn if the  cast causes const/volatile to  disappear. */
+					local oldCV = oldPointerBase.flags & CTYPEREF_FLAG_CV;
+					local newCV = newPointerBase.flags & CTYPEREF_FLAG_CV;
+					if ((oldCV & newCV) != oldCV) {
+						checker.warn("-Wcast",
+							f"Implicit cast from `{oldTyp}' to `{newTyp}' "
+							f"removes `{" ".join(() -> {
+								if (oldCV & CTYPEREF_FLAG_CONST)
+									yield "const";
+								if (oldCV & CTYPEREF_FLAG_VOLATILE)
+									yield "volatile";
+							}())}'");
+					}
+				} else if (oldPointerBase.typ === C_void || newPointerBase.typ === C_void) {
+					/* Pointer-cast to/from void is always OK */
+				} else {
+					checker.warn("-Wcast",
+							f"Implicit cast between incompatible pointer "
+							f"types from `{oldTyp}' to `{newTyp}'");
+				}
+			} else if (newTyp is CPointerType) {
+				if (oldTyp is C_NULLPTR) {
+					/* Implicit cast from `nullptr' to pointer is OK. */
+				} else if (oldTyp in C_INTEGER && isConstExpr && constExprValue(checker) == 0) {
+					/* Implicit cast from 0-constant to pointer is OK. */
+				} else {
+					goto warn_implicit_pointer_cast;
+				}
+			} else if (oldTyp is CPointerType) {
+warn_implicit_pointer_cast:
+				checker.warn("-Wcast", f"Implicit integer/pointer-cast from `{oldTyp}' to `{newTyp}'");
+			}
+		}
+
+		/* If `!(newTypeRef.flags & CTYPEREF_FLAG_FORCE)', then retain nothrow attributes
+		 * of  `(newTypeRef.typ as CPointerType).base.attrib' (also: warn if the new type
+		 * has no force  attribute, and both  types have nothrow  levels, which are  also
+		 * different from each other):
+		 * >> #define NTX(n) __attribute__((__nothrow__(n)))
+		 * >> #define FORCE  __attribute__((__force__))
+		 * >>        void *p = (NTX(0) void *)42;       // p inherits the NTX(0) attribute (but also generates a warning to please annotate `p')
+		 * >>        void *p = (FORCE NTX(0) void *)42; // p inherits the NTX(0) attribute
+		 * >> NTX(0) void *p = (void *)42;              // OK: p retains the NTX(0) attribute
+		 * >> NTX(0) void *p = (NTX(0) void *)42;       // OK: Nothing changes
+		 * >> NTX(0) void *p = (NTX(1) void *)42;       // Warning: Multiple nothrow levels (p retains NTX(0))
+		 * >> NTX(1) void *p = (NTX(0) void *)42;       // OK: Always allowed to increase nothrow level (p retains NTX(1))
+		 * >> NTX(1) void *p = (FORCE NTX(0) void *)42; // OK: p inherits the NTX(0) attribute (but you shouldn't do this)
+		 * >> FORCE NTX(1) void *p = (NTX(0) void *)42; // Warning: Multiple nothrow levels (p retains NTX(1))
+		 */
+		if (newTypeRef.flags & CTYPEREF_FLAG_FORCE) {
+			/* Always use `newTypeRef' as-is */
+		} else {
+			if ((oldTyp is CPointerType) && (newTyp is CPointerType)) {
+				local oldPointerBase: CTypeRef = oldTyp.base;
+				local newPointerBase: CTypeRef = newTyp.base;
+				local oldNothrowLevel = oldPointerBase.attrib.get("nothrow");
+				local newNothrowLevel = newPointerBase.attrib.get("nothrow");
+				if (oldNothrowLevel is none) {
+					/* Automatically inherit the new nothrow-level */
+				} else if (newPointerBase.flags & CTYPEREF_FLAG_FORCE) {
+					/* Force inherit the new type's nothrow level */
+				} else {
+					if (newNothrowLevel !is none) {
+						if (oldNothrowLevel == newNothrowLevel) {
+							/* Both pointers have the same nothrow-level -> nothing changes */
+						} else if (newNothrowLevel > oldNothrowLevel) {
+							checker.warn("-Wnothrow",
+									f"Cast from `{oldTyp}' to `{newTyp}' results in nothrow "
+									f"level `{oldNothrowLevel}', rather than `{newNothrowLevel}'. "
+									f"Use `__attribute__((force))' to select which nothrow level "
+									f"should be used");
+							goto pointer_cast_retain_nothrow;
 						} else {
-							local origType = this.typeref;
-							this := value;
-							if (subOffset != 0) {
-								if (this.kind == CVALUE_CONST) {
-									data = none;
-									del addend;
-									goto done;
-								}
-								addend += subOffset;
-							}
-							del addend;
-							this.inplaceCast(origType);
-							goto again;
+							/* Retain nothrow level */
+							goto pointer_cast_retain_nothrow;
+						}
+					} else {
+pointer_cast_retain_nothrow:
+						newPointerBase = copy newPointerBase;
+						newPointerBase.attrib = copy newPointerBase.attrib;
+						newPointerBase.attrib["nothrow"] = oldNothrowLevel;
+						newTyp = type(newTyp)(newPointerBase);
+						newTypeRef = copy newTypeRef;
+						newTypeRef.typ = newTyp;
+					}
+				}
+			}
+		}
+		typeref = newTypeRef;
+
+		/* Perform value transformations based on the cast. */
+		switch (kind) {
+
+		case CVALUE_RCONST:
+		case CVALUE_RSYMBOL:
+			if (newTyp.sizeof > oldTyp.sizeof) {
+				if (kind == CVALUE_RCONST) {
+					/* Zero-/Sign-extend constant integer */
+					data   = newTyp.bytes(checker, oldTyp.peek(checker, data, offset));
+					offset = 0;
+				} else {
+					MAKE_VOID();
+				}
+			} else {
+				if (checker.TARGET_BIG_ENDIAN) {
+					offset += oldTyp.sizeof;
+					offset -= newTyp.sizeof;
+				}
+			}
+			break;
+
+		case CVALUE_ACONST:
+		case CVALUE_ASYMBOL:
+			if (newTyp.sizeof < checker.TARGET_SIZEOF_POINTER)
+				MAKE_VOID(); /* Pointer masking (treat value as unknown) */
+			break;
+
+		default:
+			break;
+		}
+		return this;
+err_bad_op:
+		checker.err(f"Bad operation `({newTypeRef}){this}'");
+		return this;
+	}
+
+
+	public function promote(checker: Checker): CValue -> copy(this).inplacePromote(checker);
+	public function inplacePromote(checker: Checker): CValue {
+		if (typeref.typ in C_PROMOTE) {
+			return inplaceCast(checker, CTypeRef(C_int), true);
+		} else if (typeref.typ === C_float) {
+			return inplaceCast(checker, CTypeRef(C_double), true);
+		} else {
+			return inplaceRValue(checker);
+		}
+	}
+
+	public function ref(checker: Checker): CValue -> copy(this).inplaceRef(checker);
+	public function inplaceRef(checker: Checker): CValue {
+		typeref = CTypeRef(CPointerType(typeref));
+		if (!CVALUE_ISLVALUE(kind))
+			checker.err(f"Cannot reference expression: not an l-value");
+		kind |= CVALUE_RVALUE | CVALUE_AVALUE;
+		return this;
+	}
+
+	public function ind(checker: Checker): CValue -> copy(this).inplaceInd(checker);
+	public function inplaceInd(checker: Checker): CValue {
+		inplacePromote(checker); /* To deal with array decay */
+		if (typeref.typ !is CPointerType) {
+			/* Special case: ignore deref on function types. */
+			if (typeref.typ is CFunctionType)
+				return this;
+			checker.err(f"Cannot dereference non-pointer type `{typeref}'");
+		}
+		typeref = typeref.typ.base;
+		if (CVALUE_ISAVALUE(kind)) {
+			kind &= ~(CVALUE_AVALUE | CVALUE_RVALUE);
+		} else {
+			/* Unknown value */
+			kind = CVALUE_LVOID;
+		}
+
+		/* Emit warnings about illegal dereference operations. */
+		if (!checker.isUnreachable) {
+			if (typeref.flags & CTYPEREF_FLAG_NODEREF)
+				checker.warn("-Wnoderef", f"Dereference pointer to `{typeref.typ}' marked as `__attribute__((noderef))'");
+			if (checker.currentFunctionTypeRef !is none) {
+				local pointerNoThrow: string = typeref.attrib.get("nothrow");
+				if (pointerNoThrow !is none) {
+					/* Issue a warning if:
+					 * - The current function doesn't have a __attribute__((nothrow(N))) attribute
+					 * - The current function has a nothrow level N that is lower than `pointerNoThrow' */
+					local pointerNoThrowLevel: int = int(pointerNoThrow);
+					local currentFunctionNothrow: string = checker.currentFunctionTypeRef.attrib.get("nothrow");
+					if (currentFunctionNothrow is none) {
+						checker.warn("-Wnothrow",
+							f"Dereference `{getPrettyNothrowLevelName(pointerNoThrowLevel)}'-pointer "
+							f"in function that does not have any `__attribute__((nothrow(...)))'");
+					} else {
+						local currentFunctionNothrowLevel: int = int(currentFunctionNothrow);
+						if (currentFunctionNothrowLevel < pointerNoThrowLevel) {
+							checker.warn("-Wnothrow",
+								f"Dereference `{getPrettyNothrowLevelName(pointerNoThrowLevel)}'-pointer "
+								f"in function marked as `{getPrettyNothrowLevelName(currentFunctionNothrowLevel)}'");
 						}
 					}
-				} else if (myType is CArrayType && data is Sequence) {
-					local index, subOffset = myType.indexByOffset(addend)...;
-					if (index is none) {
-						data = none;
-					} else if (index < 0 || index >= #data) {
-						data = none;
-					} else {
-						value = data[index];
-						goto assign_value;
-					}
-				} else if (data !is int && data !is float) {
-					data = none;
 				}
-				del addend;
 			}
-done:
-			return this;
 		}
-	}
-
-	public function cast(typeref: CTypeRef, explicit: bool = false): CValue {
-		return copy(this).inplaceCast(typeref, explicit);
-	}
-	public function inplaceCast(typeref: CTypeRef, explicit: bool = false): CValue {
-		/* TODO: Sign extension / constant masking */
-		/* TODO: Errors when casting is impossible */
-		/* TODO: Error when `!explicit' and casting between pointer types, where neither type is `void *' */
-		/* TODO: Error when `!explicit' and casting from int to pointer, and the integer isn't a compile-time constant `0' */
-		/* TODO: If `!(typeref.flags & CTYPEREF_FLAG_FORCE)', then retain nothrow attributes
-		 *       of  `(typeref.typ as CPointerType).base.attrib' (also: warn if the new type
-		 *       has no force attribute, and both types have nothrow levels, which are  also
-		 *       different from each other):
-		 *       >> #define NTX(n) __attribute__((__nothrow__(n)))
-		 *       >> #define FORCE  __attribute__((__force__))
-		 *       >>        void *p = (NTX(0) void *)42;       // OK: p inherits the NTX(0) attribute
-		 *       >> NTX(0) void *p = (void *)42;              // OK: p retains the NTX(0) attribute
-		 *       >> NTX(0) void *p = (NTX(0) void *)42;       // OK: Nothing changes
-		 *       >> NTX(0) void *p = (NTX(1) void *)42;       // Warning: Multiple nothrow levels (p retains NTX(0))
-		 *       >> NTX(1) void *p = (NTX(0) void *)42;       // Warning: Multiple nothrow levels (p retains NTX(1))
-		 *       >> NTX(1) void *p = (FORCE NTX(0) void *)42; // OK: p inherits the NTX(0) attribute
-		 *       >> FORCE NTX(1) void *p = (NTX(0) void *)42; // Warning: Multiple nothrow levels (p retains NTX(1))
-		 */
-		inplaceRValue;
-		this.typeref = typeref;
 		return this;
 	}
 
+	public function op1(checker: Checker, op: string): CValue -> copy(this).inplaceOp1(checker, op);
+	public function inplaceOp1(checker: Checker, op: string): CValue {
+		switch (op) {
 
-	public property promote: CValue = {
-		get(): CValue {
-			return copy(this).inplacePromote;
-		}
-	}
+		case "&":
+			return inplaceRef(checker);
 
-	public property inplacePromote: CValue = {
-		get(): CValue {
-			// TODO: Array -> pointer decay
-			// TODO: char/short -> int promotion
-			// TODO: Strip top-level const/volatile
-			return this;
-		}
-	}
+		case "*":
+			return inplaceInd(checker);
 
-	public property deRef: CValue = {
-		get(): CValue {
-			return copy(this).inplaceDeRef;
-		}
-	}
-
-	public property inplaceDeRef: CValue = {
-		get(): CValue {
-			inplacePromote; /* To deal with array decay */
-			if (typeref.typ !is CPointerType) {
-				/* Special case: ignore deref on function types. */
-				if (typeref.typ is CFunctionType)
-					return this;
-				throw Error(f"Cannot dereference non-pointer type `{typeref}'");
-			}
-			typeref = typeref.typ.base;
-			if (kind != CVALUE_ADDROF)
-				return makeUnknown();
-			kind = CVALUE_SYMBOL;
-			return this;
-		}
-	}
-
-	public property logicalNot: CValue = {
-		get(): CValue {
-			return copy(this).inplaceLogicalNot;
-		}
-	}
-
-	public property inplaceLogicalNot: CValue = {
-		get(): CValue {
-			inplaceRValue;
-			if (kind == CVALUE_CONST) {
-				if (data is int || data is float)
-					data = data ? 0 : 1;
-			} else if (kind == CVALUE_ADDROF) {
-				del addend;
-				data = 0;
-				kind = CVALUE_CONST;
-			} else {
-				makeUnknown();
-			}
+		case "!":
+			inplacePromote(checker);
 			typeref = CTypeRef(C_bool);
-			return this;
+			switch (kind) {
+			case CVALUE_ACONST:
+			case CVALUE_ASYMBOL:
+				data = Bytes({ 0 }); /* Pointer-to-data/symbol is always non-NULL */
+				break;
+			case CVALUE_RCONST:
+				data = Bytes({ constExprValue(checker) ? 0 : 1 });
+				break;
+			default:
+				MAKE_VOID();
+				break;
+			}
+			break;
+
+		default:
+			inplacePromote(checker);
+			/* Default case: <op> <integer> */
+			if (typeref.typ !in C_NUMERIC)
+				goto err_bad_op;
+			if (op == "~" && typeref.typ !in C_INTEGER)
+				goto err_bad_op;
+			switch (kind) {
+			case CVALUE_RCONST:
+				data = typeref.typ.bytes(checker, OPERATORS1_BY_NAME[op](constExprValue(checker)));
+				offset = 0;
+				break;
+			default:
+				if (op != "+")
+					MAKE_VOID();
+				break;
+			}
+			break;
+
 		}
+		return this;
+err_bad_op:
+		throw Error(f"Bad operation: `{op} <{typeref}>'");
+	}
+
+	public function op2(checker: Checker, op: string, rhs: CValue): CValue
+		-> copy(this).inplaceOp2(checker, op, rhs);
+	public function inplaceOp2(checker: Checker, op: string, rhs: CValue): CValue {
+		inplacePromote(checker);
+		rhs = rhs.promote(checker);
+again:
+		local lhsTyp: CType = typeref.typ;
+		local rhsTyp: CType = rhs.typeref.typ;
+
+		/* Deal with floating-point */
+		if (lhsTyp in C_FLOATING) {
+			if (rhsTyp !in C_FLOATING)
+				return inplaceOp2(checker, op, rhs.inplaceCast(checker, typeref));
+			if (rhsTyp.sizeof > lhsTyp.sizeof) {
+				inplaceCast(checker, rhs.typeref);
+				goto again;
+			}
+			/* Floating-point operation. */
+			if (op in ["==", "!=", "<", "<=", ">", ">="])
+				goto do_compare_operation;
+			if (op !in ["+", "-", "*", "/"])
+				goto err_bad_op;
+			local resTyp: CType = lhsTyp;
+			if (resTyp.sizeof < rhsTyp.sizeof)
+				resTyp = rhsTyp;
+			typeref = CTypeRef(resTyp);
+			if (isConstExpr && rhs.isConstExpr) {
+				data = typeref.typ.bytes(checker, OPERATORS2_BY_NAME[op](
+					constExprValue(checker), rhs.constExprValue(checker)));
+				offset = 0;
+			} else {
+				MAKE_VOID();
+			}
+			return this;
+		} else if (rhsTyp in C_FLOATING) {
+			inplaceCast(checker, rhs.typeref);
+			goto again;
+		}
+
+		/* Deal with pointers */
+		if (lhsTyp is CPointerType) {
+			if (rhsTyp is CPointerType) {
+				local lhsBase: CType = lhsTyp.base.typ;
+				local rhsBase: CType = rhsTyp.base.typ;
+				if (!IDENTICAL(lhsBase, rhsBase) && (lhsBase !== C_void && rhsBase !== C_void)) {
+					checker.err(f"Pointer base types `{lhsTyp.base.typ}' "
+					            f"and `{rhsTyp.base.typ}' are incompatible");
+				}
+				switch (op) {
+
+				case "-": {
+					local C_ptrdiff_t: Type = {
+						4: C_int,
+						8: C_long64
+					}[{lhsTyp.sizeof, rhsTyp.sizeof} > ...];
+					typeref = CTypeRef(C_ptrdiff_t);
+					if (kind == rhs.kind) {
+						switch (kind) {
+						case CVALUE_RCONST: {
+							local newVal = (
+								constExprValue(checker) -
+								rhs.constExprValue(checker)
+							) / (lhsBase.sizeof ?: 1);
+							data = C_ptrdiff_t.bytes(checker, newVal);
+							offset = 0;
+						}	break;
+						case CVALUE_ACONST:
+						case CVALUE_ASYMBOL: {
+							if (data === rhs.data) {
+								/* Special case: pointer-delta on identical symbols */
+								local newVal = (offset - rhs.offset) / (lhsBase.sizeof ?: 1);
+								data = C_ptrdiff_t.bytes(checker, newVal);
+								kind = CVALUE_RCONST;
+								offset = 0;
+							} else {
+								MAKE_VOID();
+							}
+						}	break;
+						default:
+							MAKE_VOID();
+							break;
+						}
+					} else {
+						MAKE_VOID();
+					}
+					return this;
+				}	break;
+
+				case "==":
+				case "!=":
+				case "<":
+				case "<=":
+				case ">":
+				case ">=":
+					goto do_compare_operation;
+
+				default:
+					break;
+				}
+				goto err_bad_op;
+			}
+
+			switch (op) {
+
+			case "+":
+			case "-":
+				if (rhs.isConstExpr) {
+					local delta: int = rhs.constExprValue(checker) * lhsTyp.base.typ.sizeof;
+					if (op == "-")
+						delta = -delta;
+					switch (kind) {
+					case CVALUE_RCONST:
+						data = typeref.typ.bytes(checker, constExprValue(checker) + delta);
+						offset = 0;
+						break;
+					case CVALUE_ACONST:
+					case CVALUE_ASYMBOL:
+						offset += delta;
+						break;
+					default:
+						MAKE_VOID();
+						break;
+					}
+				} else {
+					MAKE_VOID();
+				}
+				return this;
+
+			case "==":
+			case "!=":
+			case "<":
+			case "<=":
+			case ">":
+			case ">=":
+				goto do_compare_operation;
+
+			default:
+				break;
+			}
+			goto err_bad_op;
+		} else if (rhsTyp is CPointerType) {
+			switch (op) {
+			case "+":
+			case "==":
+			case "!=":
+			case "<":
+			case "<=":
+			case ">":
+			case ">=":
+				return rhs.op2(this, {
+					"<"  : ">",
+					"<=" : ">=",
+					">"  : "<",
+					">=" : "<=",
+				}.get(op, op));
+				break;
+			default:
+				break;
+			}
+			goto err_bad_op;
+		}
+
+		if (lhsTyp !in C_INTEGER)
+			goto err_bad_op;
+		if (rhsTyp !in C_INTEGER)
+			goto err_bad_op;
+
+		/* Generic operation. */
+		switch (op) {
+
+		case "+":
+		case "-":
+			if (rhs.isConstExpr) {
+				local delta: int = rhs.constExprValue(checker);
+				if (op == "-")
+					delta = -delta;
+				switch (kind) {
+				case CVALUE_RCONST:
+					data = typeref.typ.bytes(checker, constExprValue(checker) + delta);
+					offset = 0;
+					break;
+				case CVALUE_ACONST:
+				case CVALUE_ASYMBOL:
+					offset += delta;
+					break;
+				default:
+					MAKE_VOID();
+					break;
+				}
+			} else {
+				MAKE_VOID();
+			}
+			return this;
+
+		case "==":
+		case "!=":
+		case "<":
+		case "<=":
+		case ">":
+		case ">=":
+do_compare_operation:
+			typeref = CTypeRef(C_bool);
+			if (kind == rhs.kind) {
+				switch (kind) {
+				case CVALUE_RCONST:
+					data = Bytes({ OPERATORS2_BY_NAME[op](
+						constExprValue(checker),
+						rhs.constExprValue(checker)) ? 1 : 0 });
+					break;
+				case CVALUE_ACONST:
+				case CVALUE_ASYMBOL:
+					if (data === rhs.data) {
+						data = Bytes({ OPERATORS2_BY_NAME[op](offset, rhs.offset) ? 1 : 0 });
+						offset = 0;
+					} else if (op in ["==", "!="]) {
+						data = Bytes({ op == "==" ? 0 : 1 });
+						offset = 0;
+					} else {
+						MAKE_VOID();
+					}
+					break;
+				default:
+					MAKE_VOID();
+					break;
+				}
+			} else {
+				local nonNullPointerOperand: CValue | none = none;
+				if (isConstExpr && !constExprValue(checker)) {
+					nonNullPointerOperand = rhs;
+					op = FLIPPED_COMPARE_OPERATORS.get(op, op);
+				} else if (rhs.isConstExpr && !rhs.constExprValue(checker)) {
+					nonNullPointerOperand = this;
+				}
+				if (nonNullPointerOperand !is none) {
+					/* Special case: compare with null-pointer */
+					switch (nonNullPointerOperand.kind) {
+					case CVALUE_ACONST:
+					case CVALUE_ASYMBOL:
+						kind = CVALUE_RCONST;
+						data = Bytes({
+							"==" : 0, /* <symbol> == NULL */
+							"!=" : 1, /* <symbol> != NULL */
+							"<"  : 0, /* <symbol> < NULL */
+							"<=" : 0, /* <symbol> <= NULL */
+							">"  : 1, /* <symbol> > NULL */
+							">=" : 1, /* <symbol> >= NULL */
+						}[op]);
+						offset = 0;
+						break;
+					default:
+						MAKE_VOID();
+						break;
+					}
+				} else {
+					MAKE_VOID();
+				}
+			}
+			return this;
+
+		default: {
+			/* Default case: <integer> <op> <integer>
+			 * In this case, the return type is the greater of the 2 integer
+			 * types, and signed types are preferred over non-signed  types. */
+			local lhsTypeSize = lhsTyp.sizeof;
+			local rhsTypeSize = rhsTyp.sizeof;
+			if ((lhsTypeSize < rhsTypeSize) ||
+			    (lhsTypeSize == rhsTypeSize && rhsTyp in C_SIGNED)) {
+				/* The right-hand-side operand is the type to use. */
+				inplaceCast(checker, rhs.typeref);
+				goto again;
+			}
+			if (isConstExpr && rhs.isConstExpr) {
+				data = lhsTyp.bytes(checker, OPERATORS2_BY_NAME[op](
+					constExprValue(checker),
+					rhs.constExprValue(checker)));
+			} else {
+				MAKE_VOID();
+			}
+		}	break;
+
+		}
+		return this;
+err_bad_op:
+		throw Error(f"Bad operation: `<{lhsTyp}> {op} <{rhsTyp}>'");
 	}
 
 }
 
-function cvalueFromConst(typeref: CTypeRef, value: ConstValue | none): CValue {
-	return CValue(kind: CVALUE_CONST, typeref: typeref, data: value);
+global final C_char_typeref: CTypeRef = CTypeRef(C_char);
+
+@@Construct a CValue object in the form of an array-of-char
+@@for   a  deemon  @Bytes  or  sequence-of-integer  object.
+function cvalueFromBytesAsString(s: Bytes): CValue {
+	return CValue(
+			kind:    CVALUE_RCONST,
+			typeref: CTypeRef(CArrayType(C_char, #s, 1), CTYPEREF_FLAG_CONST),
+			data:    s,
+			offset:  0);
+}
+
+@@Wrapper for @cvalueFromBytesAsString for the purpose of encoding strings
+function cvalueFromString(s: string): CValue {
+	return cvalueFromBytesAsString((s + "\0").encode("utf-8"));
+}
+
+function cvalueFromValue(checker: Checker, typeref: CTypeRef, value: int | float): CValue {
+	return CValue(
+			kind:    CVALUE_RCONST,
+			typeref: typeref,
+			data:    typeref.typ.bytes(checker, value),
+			offset:  0);
 }
 
 function cvalueFromSymbol(sym: CSymbol): CValue {
-	return CValue(kind: CVALUE_SYMBOL, typeref: sym.typeref, data: sym);
+	return CValue(
+			kind:    CVALUE_LSYMBOL,
+			typeref: sym.typeref,
+			data:    sym,
+			offset:  0);
 }
 
-
+global final C_bool_typeref: CTypeRef = CTypeRef(C_bool);
+global final C_false: CValue = CValue(kind: CVALUE_RCONST, typeref: C_bool_typeref, data: Bytes({ 0 }), offset: 0);
+global final C_true:  CValue = CValue(kind: CVALUE_RCONST, typeref: C_bool_typeref, data: Bytes({ 1 }), offset: 0);
+global final C_nullptr_32: CValue = CValue(kind: CVALUE_RCONST, typeref: CTypeRef(C_nullptr_t_32), data: Bytes({ 0, 0, 0, 0 }), offset: 0);
+global final C_nullptr_64: CValue = CValue(kind: CVALUE_RCONST, typeref: CTypeRef(C_nullptr_t_64), data: Bytes({ 0, 0, 0, 0, 0, 0, 0, 0 }), offset: 0);
 
 final class CScope: CNamespace {
 	this = default;

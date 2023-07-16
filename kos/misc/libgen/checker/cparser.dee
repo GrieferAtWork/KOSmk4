@@ -48,10 +48,13 @@ class CParser {
 	@@When true, always extend the buffer (never clear it)
 	private member peeking: bool = false;
 
+#define ParserBackup Tuple
+
 	private member fp: File;
 	private member buf: Bytes = none;
 	private member bufPos: int = 0;
 	private member bufLen: int = 0;
+	private member warnPos: ParserBackup | none = none;
 
 	@@Starting line of @buf (1-based)
 	private member bufStartLine: int = 1;
@@ -59,8 +62,6 @@ class CParser {
 	private member bufStartCol: int = 1;
 
 	private member ignoredWarningsStack: {{string...}...} = [];
-
-#define ParserBackup Tuple
 
 	public final function backupCreate(): ParserBackup {
 		local oldPeeking = peeking;
@@ -84,6 +85,16 @@ class CParser {
 
 	public final function warnBackupDiscard(backup: ParserBackup) {
 		peeking = backup.last;
+	}
+
+	public final function startWarnHere() {
+		warnPos = (bufPos, peeking);
+		peeking = true;
+	}
+
+	public final function endWarnHere() {
+		peeking = warnPos.last;
+		warnPos = none;
 	}
 
 	private function setFilename(filename: string) {
@@ -211,7 +222,7 @@ class CParser {
 	}
 
 	public final function errMsg(message: string): string {
-		return errMsgAt(tokStart, message);
+		return errMsgAt(warnPos !is none ? warnPos : tokStart, message);
 	}
 
 	public final function errAt(pos: int | ParserBackup, message: string) {
@@ -219,11 +230,11 @@ class CParser {
 	}
 
 	public final function warn(warningName: string, message: string) {
-		warnAt(tokStart, warningName, message);
+		warnAt(warnPos !is none ? warnPos : tokStart, warningName, message);
 	}
 
 	public final function err(message: string) {
-		errAt(tokStart, message);
+		errAt(warnPos !is none ? warnPos : tokStart, message);
 	}
 
 	public final function requireInt(): int {

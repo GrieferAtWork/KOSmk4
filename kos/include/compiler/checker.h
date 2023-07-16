@@ -19,6 +19,13 @@
  */
 #define __P(x) x
 
+#undef __SIZEOF_INT128__
+#undef __INT128_TYPE__
+#undef __UINT128_TYPE__
+#define __SIZEOF_INT128__ 16
+#define __INT128_TYPE__ signed __int128
+#define __UINT128_TYPE__ unsigned __int128
+
 #ifndef __GNUC_MINOR__
 #define __GNUC_MINOR__ 0
 #endif /* !__GNUC_MINOR__ */
@@ -37,11 +44,39 @@
 
 #include "gcc-warnings.h"
 
+#ifndef __GCC_PRIVATE_IS_DEFINED
+#define __GCC_PRIVATE_ARG_PLACEHOLDER_ ,
+#define __GCC_PRIVATE_TAKE_SECOND_ARG_IMPL(x, val, ...) val
+#define __GCC_PRIVATE_TAKE_SECOND_ARG(x) __GCC_PRIVATE_TAKE_SECOND_ARG_IMPL x
+#define __GCC_PRIVATE_IS_DEFINED3(x) __GCC_PRIVATE_TAKE_SECOND_ARG((x 1, 0))
+#define __GCC_PRIVATE_IS_DEFINED2(x) __GCC_PRIVATE_IS_DEFINED3(__GCC_PRIVATE_ARG_PLACEHOLDER_##x)
+#define __GCC_PRIVATE_IS_DEFINED(x) __GCC_PRIVATE_IS_DEFINED2(x)
+#endif /* !__GCC_PRIVATE_IS_DEFINED */
+
 #undef __has_attribute
-#define __has_attribute(x) 0
+#define __has_attribute(x) __GCC_PRIVATE_IS_DEFINED(__GCC_HAS_ATTRIBUTE_##x)
+#define __GCC_HAS_ATTRIBUTE___packed__
+#define __GCC_HAS_ATTRIBUTE___noreturn__
+#define __GCC_HAS_ATTRIBUTE___deref__
+#define __GCC_HAS_ATTRIBUTE___noderef__
+#define __GCC_HAS_ATTRIBUTE___nothrow__
+#define __GCC_HAS_ATTRIBUTE___tag__
+#define __GCC_HAS_ATTRIBUTE___require_caller_tag__
+#define __GCC_HAS_ATTRIBUTE___aligned__
 
 #undef __has_builtin
-#define __has_builtin(x) 0
+#define __has_builtin(x) __GCC_PRIVATE_IS_DEFINED(__GCC_HAS_BUILTIN_##x)
+#define __GCC_HAS_BUILTIN___builtin_alloca
+#define __GCC_HAS_BUILTIN___builtin_bswap16
+#define __GCC_HAS_BUILTIN___builtin_bswap32
+#define __GCC_HAS_BUILTIN___builtin_bswap64
+#define __GCC_HAS_BUILTIN___builtin_bswap128
+#define __GCC_HAS_BUILTIN___builtin_alignof
+#define __GCC_HAS_BUILTIN___builtin_expect
+#define __GCC_HAS_BUILTIN___builtin_expect_with_probability
+#define __GCC_HAS_BUILTIN___builtin_unreachable
+#define __GCC_HAS_BUILTIN___builtin_constant_p
+#define __GCC_HAS_BUILTIN___builtin_has_attribute
 
 #ifndef __has_feature
 #define __NO_has_feature
@@ -98,13 +133,19 @@
 #define __COMPILER_HAVE_TRANSPARENT_UNION
 #endif /* __CC__ */
 
-#define __COMPILER_ASM_BUFFER(T, s, p) (*(T(*)[s])(p))
-#define __register_var(T, name, regname) T name
+#ifdef __cplusplus
+#define __STATIC_ASSERT_IS_static_assert
+#define __STATIC_ASSERT_MSG_IS_static_assert
+#define __STATIC_ASSERT(x)        static_assert(x)
+#define __STATIC_ASSERT_MSG(x, m) static_assert(x, m)
+#else /* __cplusplus */
+#define __STATIC_ASSERT_IS__Static_assert
+#define __STATIC_ASSERT_MSG_IS__Static_assert
+#define __STATIC_ASSERT(x)        _Static_assert(x)
+#define __STATIC_ASSERT_MSG(x, m) _Static_assert(x, m)
+#endif /* !__cplusplus */
 
-#define static_assert(...)       /* Nothing */
-#define __STATIC_ASSERT(...)     /* Nothing */
-#define __STATIC_ASSERT_MSG(...) /* Nothing */
-#define __COMPILER_ASMNAME(x)    /* Nothing */
+#define __COMPILER_ASMNAME __asm__
 #undef __extension__
 #define __extension__
 
@@ -131,9 +172,7 @@
 #undef __NO_NON_CALL_EXCEPTIONS
 #undef __NON_CALL_EXCEPTIONS
 #define __NON_CALL_EXCEPTIONS
-#define __checker_attribute__(...) [[__VA_ARGS__]]
-
-#define __ATTR_NORETURN __checker_attribute__(__noreturn__)
+#define __checker_attribute__(...) __attribute__((__VA_ARGS__))
 
 /* >> __attribute__((__nothrow__(<level>))
 /* >> __attribute__((__nothrow__(*<level>))
@@ -194,6 +233,7 @@
 
 
 
+#define __ATTR_NORETURN                      __checker_attribute__(__noreturn__)
 #define __ATTR_NOINLINE                      /* Nothing */
 #define __ATTR_FALLTHROUGH                   /* Nothing */
 #define __ATTR_W64                           /* Nothing */
@@ -258,6 +298,11 @@
 /* Suppress warnings about `-Wsuggest-attribute=const' or `-Wsuggest-attribute=pure' */
 #define __COMPILER_IMPURE() __asm__("")
 
+/* NOTE: We pass force,nothrow(0) during assembly buffer casts to prevent warnings
+ *       in case  `p' turns  out to  be  annotated with  a higher  nothrow  level. */
+#define __COMPILER_ASM_BUFFER(T, s, p) (*(__checker_attribute__(__force__, __nothrow__(0)) T(*)[s])(p))
+#define __register_var(T, name, regname) T name
+
 #define __pragma(...) _Pragma(#__VA_ARGS__)
 #define __XBLOCK  /* Nothing */
 #define __XRETURN /* Nothing */
@@ -266,8 +311,8 @@
 #define __COMPILER_ALIGNOF_IS___alignof__
 #define __COMPILER_ALIGNOF __alignof__
 
-#define __seg_gs
-#define __seg_fs
+#define __seg_gs /* Nothing */
+#define __seg_fs /* Nothing */
 
 #define __NO_ATTR_FORCEINLINE
 #define __ATTR_INLINE        /* Nothing */
@@ -286,9 +331,7 @@
 
 #define __restrict_arr restrict
 
-#if __GCC_VERSION_NUM >= 20970
 #define __COMPILER_HAVE_VARIABLE_LENGTH_ARRAYS
-#endif /* __GCC_VERSION_NUM >= 20970 */
 #define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[]
 
 #define __builtin_choose_expr(c, tt, ff) __static_if(x){tt}else{ff}
@@ -301,10 +344,10 @@
 #define __WHILE1 while(1)
 #define __native_wchar_t_defined
 #define __wchar_t_defined
-#define __FUNCTION__ ""
+#define __FUNCTION__ __func__
 #define __builtin_LINE() __LINE__
 #define __builtin_FILE() __FILE__
-#define __builtin_FUNCTION() ""
+#define __builtin_FUNCTION() __func__
 #define __builtin_unreachable() __XBLOCK({ for (;;); (void)0; })
 #define __builtin_object_size(ptr,type) ((type) < 2 ? (__SIZE_TYPE__)-1 : 0)
 
@@ -328,12 +371,6 @@
 
 #define __NO_builtin_types_compatible_p
 #define __builtin_types_compatible_p(...) 1
-
-#define __builtin_constant_p(x) 0
-#define __NO_builtin_constant_p
-
-#define __ptr32
-#define __ptr64
 
 #define __COMPILER_HAVE_BUG_BLOATY_CXX_USING 0
 

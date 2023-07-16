@@ -2928,7 +2928,7 @@ do_pointer_pointer_op:
 		switch (op) {
 
 		case '+':
-			/* NON_PONITER + POINTER -> POINTER + NON_PONITER */
+			/* NON_POINTER + POINTER -> POINTER + NON_POINTER */
 			goto swap_operands_and_again;
 
 			/* We know that `lhs_typ' isn't a pointer, but `rhs_typ' is.

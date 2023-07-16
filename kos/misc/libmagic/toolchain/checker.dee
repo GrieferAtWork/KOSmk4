@@ -73,7 +73,7 @@ function createCheckerProcess(
 
 		/* Step #3: Run the preprocessed source file through the checker */
 		try {
-			checker.runChecker(ppFile, targetModule);
+			checker.runChecker(ppFile, targetModule, language: language);
 		} @[interrupt] catch (...) {
 			try fs.unlink(ppFile); catch (...);
 			throw;

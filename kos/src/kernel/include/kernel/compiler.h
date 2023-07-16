@@ -313,7 +313,16 @@ FUNDEF void NOTHROW(KCALL BREAKPOINT)(void);
 #endif /* !... */
 
 
-
+#ifdef __CHECKER__
+#define FINALLY_DECREF(ptr)           decref(ptr)
+#define FINALLY_DECREF_LIKELY(ptr)    decref_likely(ptr)
+#define FINALLY_DECREF_UNLIKELY(ptr)  decref_unlikely(ptr)
+#define FINALLY_DECREF_NOKILL(ptr)    decref_nokill(ptr)
+#define FINALLY_DESTROY(ptr)          destroy(ptr)
+#define FINALLY_XDECREF(ptr)          xdecref(ptr)
+#define FINALLY_XDECREF_LIKELY(ptr)   xdecref_likely(ptr)
+#define FINALLY_XDECREF_UNLIKELY(ptr) xdecref_unlikely(ptr)
+#else /* __CHECKER__ */
 extern "C++" {
 __NAMESPACE_INT_BEGIN
 template<class T> class _finally_decref {
@@ -436,6 +445,7 @@ __NAMESPACE_INT_END
 #define FINALLY_XDECREF(ptr)          __NAMESPACE_INT_SYM _finally_xdecref<REFCNT_METHODS_BASE_P(*(ptr))> __COMPILER_UNIQUE(__fxdecref)(ptr)
 #define FINALLY_XDECREF_LIKELY(ptr)   __NAMESPACE_INT_SYM _finally_xdecref_likely<REFCNT_METHODS_BASE_P(*(ptr))> __COMPILER_UNIQUE(__fxdecref_l)(ptr)
 #define FINALLY_XDECREF_UNLIKELY(ptr) __NAMESPACE_INT_SYM _finally_xdecref_unlikely<REFCNT_METHODS_BASE_P(*(ptr))> __COMPILER_UNIQUE(__fxdecref_u)(ptr)
+#endif /* !__CHECKER__ */
 #endif /* __cplusplus */
 #endif /* __CC__ */
 
