@@ -75,7 +75,7 @@
 
 #define __PHYS            /* Annotation for physical pointers */
 #define __VIRT            /* Annotation for virtual pointers */
-#define __WEAK            /* Annotation for weakly referenced data/data updated randomly with both the old/new state remaining valid. */
+#define __WEAK            /* Annotation for weakly referenced data/data updated randomly with both the old/new state being valid. */
 #define __REF             /* Annotation for reference holders/transfers.
                            * When used on a struct-field/local/global variable: Reference storage
                            * When used on a return  type:  The   function  returns  a   reference

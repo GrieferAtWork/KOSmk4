@@ -19,6 +19,7 @@
  */
 import * from deemon;
 import * from .ctype;
+import UniqueDict from collections;
 #define Checker Object
 
 #define IDENTICAL(a, b) (type(a) === type(b) && ((a) == (b)))
@@ -69,7 +70,8 @@ global final CVALUE_ACONST  = 0x07; /* R-Value:    (T)&data[offset:offset+...] *
 global final CVALUE_LSYMBOL = 0x08; /* L-Value: *(T *)&CSymbol.val[offset:offset+...] */
 global final CVALUE_RSYMBOL = 0x09; /* R-Value: *(T *)&CSymbol.val[offset:offset+...] */
 global final CVALUE_ASYMBOL = 0x0b; /* R-Value:    (T)&CSymbol.val[offset:offset+...] */
-
+global final CVALUE_LADDR   = 0x0c; /* L-Value: *(T *)offset */
+global final CVALUE_RADDR   = 0x0d; /* R-Value: *(T *)offset */
 
 global final PRETTY_NOTHROW_LEVEL_NAME: {int: string} = {
 	0 : "NOTHROW",
@@ -85,6 +87,32 @@ function getPrettyNothrowLevelName(level: int): string {
 }
 
 
+#if 0
+global final CVALUE_KINDNAME: {int: string} = {
+	CVALUE_LVOID   : "LVOID",
+	CVALUE_RVOID   : "RVOID",
+	CVALUE_AVOID   : "AVOID",
+	CVALUE_LCONST  : "LCONST",
+	CVALUE_RCONST  : "RCONST",
+	CVALUE_ACONST  : "ACONST",
+	CVALUE_LSYMBOL : "LSYMBOL",
+	CVALUE_RSYMBOL : "RSYMBOL",
+	CVALUE_ASYMBOL : "ASYMBOL",
+	CVALUE_LADDR   : "LADDR",
+	CVALUE_RADDR   : "RADDR",
+};
+#define TRACE() \
+	({ \
+		print(__LINE__, ":", CVALUE_KINDNAME[kind], ":", typeref),; \
+		if (offset is bound) \
+			print(":", repr offset),; \
+		if (data is bound) \
+			print(":", repr data),; \
+		print; \
+	})
+#else
+#define TRACE() none
+#endif
 final class CValue {
 	this = default;
 
@@ -122,6 +150,12 @@ final class CValue {
 	}
 
 #define MAKE_VOID() (kind &= CVALUE_RVALUE)
+	public property inplaceVoid: CValue = {
+		get(): CValue {
+			MAKE_VOID();
+			return this;
+		}
+	}
 
 	/* Utility API */
 
@@ -138,13 +172,19 @@ final class CValue {
 		}
 		kind |= CVALUE_RVALUE;
 		if (kind == CVALUE_RSYMBOL) {
-			/* Check if the symbol has a known value */
-			local symValue: Bytes | none = data.valOrNone;
+			/* Check if the symbol has an override */
+			local symValue: Bytes | none = checker.getSymbolValue(data);
+
+			/* Check if the symbol has a known, constant value */
+			if (symValue is none && (data.typeref.flags & CTYPEREF_FLAG_CONST))
+				symValue = data.valOrNone;
 			if (symValue !is none) {
 				kind = CVALUE_RCONST;
 				data = symValue;
+				offset = 0;
 			}
 		}
+		TRACE();
 		return this;
 	}
 
@@ -250,6 +290,17 @@ warn_implicit_pointer_cast:
 							goto pointer_cast_retain_nothrow;
 						}
 					} else {
+						/* TODO: Warning when implicitly casting a function pointer such  that
+						 *       it loses or gains any of its attributes (nothrow, tag, etc.).
+						 * This is needed so that function pointer assignments doesn't silently
+						 * change    a   function's   behavior    as   per   its   annotations. */
+
+						/* TODO: Warning when passing a custom nothrow pointer to a function
+						 *       whose arguments don't have any nothrow argument. This  case
+						 *       must  be treated in  a special way  because the function in
+						 *       question won't magically get the attribute just because  it
+						 *       is called with the attribute!
+						 */
 pointer_cast_retain_nothrow:
 						newPointerBase = copy newPointerBase;
 						newPointerBase.attrib = copy newPointerBase.attrib;
@@ -293,12 +344,30 @@ pointer_cast_retain_nothrow:
 		default:
 			break;
 		}
+		TRACE();
 		return this;
 err_bad_op:
 		checker.err(f"Bad operation `({newTypeRef}){this}'");
 		return this;
 	}
 
+	public function field(checker: Checker, fieldName: string): CValue
+		-> copy(this).inplaceField(checker, fieldName);
+	public function inplaceField(checker: Checker, fieldName: string): CValue {
+		local typ: CType = typeref.typ;
+		if (typ !is CStructType)
+			checker.err(f"Cannot access field `{fieldName}' of non-struct-type `{typ}'");
+		local fieldInfo: (CTypeRef, int) | none = typ.fields.get(fieldName);
+		if (fieldInfo is none) {
+			checker.err(f"No such field `{fieldName}' in `{typ}'");
+		} else {
+			/* Load the field in question */
+			typeref = fieldInfo.first;
+			offset += fieldInfo.last;
+		}
+		TRACE();
+		return this;
+	}
 
 	public function promote(checker: Checker): CValue -> copy(this).inplacePromote(checker);
 	public function inplacePromote(checker: Checker): CValue {
@@ -313,10 +382,21 @@ err_bad_op:
 
 	public function ref(checker: Checker): CValue -> copy(this).inplaceRef(checker);
 	public function inplaceRef(checker: Checker): CValue {
-		typeref = CTypeRef(CPointerType(typeref));
+		typeref = CTypeRef(checker.TARGET_CPointerType(typeref));
 		if (!CVALUE_ISLVALUE(kind))
 			checker.err(f"Cannot reference expression: not an l-value");
-		kind |= CVALUE_RVALUE | CVALUE_AVALUE;
+		switch (kind) {
+		case CVALUE_LADDR:
+		case CVALUE_RADDR:
+			kind   = CVALUE_RCONST;
+			data   = offset.tobytes(checker.TARGET_SIZEOF_POINTER, checker.TARGET_ENDIAN, false);
+			offset = 0;
+			break;
+		default:
+			kind |= CVALUE_RVALUE | CVALUE_AVALUE;
+			break;
+		}
+		TRACE();
 		return this;
 	}
 
@@ -332,6 +412,13 @@ err_bad_op:
 		typeref = typeref.typ.base;
 		if (CVALUE_ISAVALUE(kind)) {
 			kind &= ~(CVALUE_AVALUE | CVALUE_RVALUE);
+		} else if (kind == CVALUE_RCONST) {
+			/* Special case: dereference compile-time constant address */
+			kind   = CVALUE_LADDR;
+			offset = int.frombytes(
+				data[offset:offset + checker.TARGET_SIZEOF_POINTER],
+				checker.TARGET_ENDIAN, false);
+			del data;
 		} else {
 			/* Unknown value */
 			kind = CVALUE_LVOID;
@@ -339,8 +426,11 @@ err_bad_op:
 
 		/* Emit warnings about illegal dereference operations. */
 		if (!checker.isUnreachable) {
-			if (typeref.flags & CTYPEREF_FLAG_NODEREF)
-				checker.warn("-Wnoderef", f"Dereference pointer to `{typeref.typ}' marked as `__attribute__((noderef))'");
+			if (typeref.flags & CTYPEREF_FLAG_NODEREF) {
+				checker.warn("-Wnoderef",
+					f"Dereference pointer to `{typeref.typ}' "
+					f"marked as `__attribute__((noderef))'");
+			}
 			if (checker.currentFunctionTypeRef !is none) {
 				local pointerNoThrow: string = typeref.attrib.get("nothrow");
 				if (pointerNoThrow !is none) {
@@ -348,22 +438,25 @@ err_bad_op:
 					 * - The current function doesn't have a __attribute__((nothrow(N))) attribute
 					 * - The current function has a nothrow level N that is lower than `pointerNoThrow' */
 					local pointerNoThrowLevel: int = int(pointerNoThrow);
-					local currentFunctionNothrow: string = checker.currentFunctionTypeRef.attrib.get("nothrow");
+					local currentFunctionNothrow: string | none =
+						checker.currentFunctionTypeRef.attrib.get("nothrow");
 					if (currentFunctionNothrow is none) {
 						checker.warn("-Wnothrow",
 							f"Dereference `{getPrettyNothrowLevelName(pointerNoThrowLevel)}'-pointer "
 							f"in function that does not have any `__attribute__((nothrow(...)))'");
 					} else {
-						local currentFunctionNothrowLevel: int = int(currentFunctionNothrow);
+						local currentFunctionNothrowLevel: int = int(currentFunctionNothrow.lstrip("*"));
 						if (currentFunctionNothrowLevel < pointerNoThrowLevel) {
 							checker.warn("-Wnothrow",
 								f"Dereference `{getPrettyNothrowLevelName(pointerNoThrowLevel)}'-pointer "
-								f"in function marked as `{getPrettyNothrowLevelName(currentFunctionNothrowLevel)}'");
+								f"in function `{checker.currentFunctionName}' marked as "
+								f"`{getPrettyNothrowLevelName(currentFunctionNothrowLevel)}'");
 						}
 					}
 				}
 			}
 		}
+		TRACE();
 		return this;
 	}
 
@@ -376,6 +469,23 @@ err_bad_op:
 
 		case "*":
 			return inplaceInd(checker);
+
+		case "bool":
+			inplacePromote(checker);
+			typeref = CTypeRef(C_bool);
+			switch (kind) {
+			case CVALUE_ACONST:
+			case CVALUE_ASYMBOL:
+				data = Bytes({ 1 }); /* Pointer-to-data/symbol is always non-NULL */
+				break;
+			case CVALUE_RCONST:
+				data = Bytes({ constExprValue(checker) ? 1 : 0 });
+				break;
+			default:
+				MAKE_VOID();
+				break;
+			}
+			break;
 
 		case "!":
 			inplacePromote(checker);
@@ -414,6 +524,7 @@ err_bad_op:
 			break;
 
 		}
+		TRACE();
 		return this;
 err_bad_op:
 		throw Error(f"Bad operation: `{op} <{typeref}>'");
@@ -452,6 +563,7 @@ again:
 			} else {
 				MAKE_VOID();
 			}
+			TRACE();
 			return this;
 		} else if (rhsTyp in C_FLOATING) {
 			inplaceCast(checker, rhs.typeref);
@@ -504,6 +616,7 @@ again:
 					} else {
 						MAKE_VOID();
 					}
+					TRACE();
 					return this;
 				}	break;
 
@@ -545,6 +658,7 @@ again:
 				} else {
 					MAKE_VOID();
 				}
+				TRACE();
 				return this;
 
 			case "==":
@@ -611,6 +725,7 @@ again:
 			} else {
 				MAKE_VOID();
 			}
+			TRACE();
 			return this;
 
 		case "==":
@@ -676,6 +791,7 @@ do_compare_operation:
 					MAKE_VOID();
 				}
 			}
+			TRACE();
 			return this;
 
 		default: {
@@ -700,9 +816,177 @@ do_compare_operation:
 		}	break;
 
 		}
+		TRACE();
 		return this;
 err_bad_op:
 		throw Error(f"Bad operation: `<{lhsTyp}> {op} <{rhsTyp}>'");
+	}
+
+	public function assign(checker: Checker, value: CValue): CValue
+		-> copy(this).inplaceAssign(checker, value);
+	public function inplaceAssign(checker: Checker, value: CValue): CValue {
+		value = value.cast(checker, typeref); /* NOTE: This also does rvalue transform! */
+		switch (kind) {
+		case CVALUE_LVOID:
+			break;
+		case CVALUE_LCONST:
+			checker.err(f"Write to compile-time constant expression of type `{typeref}'");
+			break;
+		case CVALUE_LSYMBOL:
+			/* Remember the value override of the symbol (using `none' to indicate "unknown") */
+			if (!checker.isUnreachable) {
+				local scope: CNamespace = checker.namespaceStack.first;
+				scope.symbolValues[data] = value.isConstExpr ? value.constExprBytes : none;
+			}
+			break;
+		default:
+			checker.err(f"Cannot assign to r-value expression of type `{typeref}'");
+			break;
+		}
+		TRACE();
+		return this;
+	}
+
+	public function call(checker: Checker, args: {CValue...}, mustCastArgs: bool = true): CValue
+		-> copy(this).inplaceCall(checker, args, mustCastArgs);
+	public function inplaceCall(checker: Checker, args: {CValue...}, mustCastArgs: bool = true): CValue {
+		// TODO: Overloaded function support
+		inplaceRValue(checker);
+		local funType: CType = typeref.typ;
+		if (funType !is CFunctionType) {
+			checker.err(f"Cannot call non-function-type `{funType}'");
+			return this;
+		}
+
+		/* Normalize arguments */
+		local funArgs: {(CTypeRef, string)...} = funType.args;
+		if (#args > #funArgs) {
+			if (!funType.isVarArgs) {
+				checker.warn("-Wcall",
+					f"Too many arguments in function call: need at most "
+					f"`{#funArgs}', but got `{#args}'");
+			}
+		} else if (#args < #funArgs) {
+			local missingArgsFirst: int = #args;
+			local missingArgsCount: int = #funArgs - missingArgsFirst;
+			local defaultArgsCount: int = #funType.defaults;
+			local defaultArgsFirst: int = #funArgs - defaultArgsCount;
+			if (missingArgsFirst >= defaultArgsFirst) {
+				/* Can substitute missing missing arguments from defaults */
+				args = List(args);
+				local defaultStart: int = missingArgsFirst - defaultArgsFirst;
+				local defaultEnd: int   = defaultArgsCount - defaultStart;
+				for (local i: [defaultStart: defaultEnd]) {
+					args.append(CValue(
+						kind:    CVALUE_RCONST,
+						typedef: funArgs[defaultArgsFirst + i].first,
+						data:    funType.defaults[i],
+						offset:  0));
+				}
+			} else {
+				checker.warn("-Wcall",
+					f"Too few arguments in function call: need at least "
+					f"`{defaultArgsFirst}', but only got `{#args}'");
+			}
+		}
+
+		/* Cast arguments to their proper types if not done so already. */
+		if (mustCastArgs) {
+			args = List(args);
+			for (local i: [:#funArgs]) {
+				args[i] = args[i].cast(funArgs[i].first);
+			}
+		}
+
+		/* Only do static checks if not inside of a dead code region. */
+		if (!checker.isUnreachable) {
+			/* Check if the called function requires its caller to have a certain tag. */
+			local reqTag: string | none = typeref.attrib.get("require_caller_tag");
+			if (reqTag !is none) {
+				local callerTag: string | none = checker.currentFunctionTypeRef.attrib.get("tag");
+				if (callerTag is none) {
+					checker.warn("-Wtag",
+						f"Function `{checker.currentFunctionName}' needs "
+						f"`__attribute__((tag({repr reqTag})))'");
+				} else if (reqTag != callerTag) {
+					checker.warn("-Wtag",
+						f"Function `{checker.currentFunctionName}' is tagged as "
+						f"`__attribute__((tag({repr callerTag})))', but needs "
+						f"`__attribute__((tag({repr reqTag})))'");
+				}
+			}
+
+			/* Verify the nothrow-attribute of the  called function (and since we  know
+			 * the typing and attributes of all arguments used in the call, we can also
+			 * resolve *-prefixed nothrow levels!) */
+			local calleeNothrow: string | none = typeref.attrib.get("nothrow");
+			if (calleeNothrow !is none) {
+				local calleeNothrowLevel: int;
+				if (calleeNothrow.startswith("*")) {
+#define NO_LEVEL (-9999999999)
+					calleeNothrowLevel = NO_LEVEL;
+
+					/* Scan the argument list for pointers with nothrow arguments. */
+					for (local arg: args) {
+						local argType: CType = arg.typeref.typ;
+						if (argType is CPointerType) {
+							local pointerBaseTypeRef: CTypeRef = argType.base;
+							local pointerNothrow = pointerBaseTypeRef.attrib.get("nothrow");
+							if (pointerNothrow !is none) {
+								pointerNothrow = int(pointerNothrow);
+								if (calleeNothrowLevel < pointerNothrow)
+									calleeNothrowLevel = pointerNothrow;
+							}
+						}
+					}
+
+					/* If we didn't find a nothrow level, use the function's default. */
+					if (calleeNothrowLevel == NO_LEVEL)
+						calleeNothrowLevel = int(calleeNothrow[1:]);
+#undef NO_LEVEL
+				} else {
+					calleeNothrowLevel = int(calleeNothrow);
+				}
+
+				/* Remember the greatest called nothrow level. */
+				local lastNothrowLevel = checker.currentFunctionGreatestCalleNothrowLevel;
+				if (lastNothrowLevel is none) {
+					checker.currentFunctionGreatestCalleNothrowLevel = calleeNothrowLevel;
+				} else if (lastNothrowLevel !== false) {
+					if (lastNothrowLevel < calleeNothrowLevel)
+						checker.currentFunctionGreatestCalleNothrowLevel = calleeNothrowLevel;
+				}
+
+				/* A warning will be issued if a nothrow function is called by another function
+				 * that also has a nothrow attribute,  and whose nothrow attribute specifies  a
+				 * level that is smaller than the called function. */
+				local currentFunctionNothrow: string | none =
+					checker.currentFunctionTypeRef.attrib.get("nothrow");
+				if (currentFunctionNothrow !is none) {
+					local currentFunctionNothrowLevel: int = int(currentFunctionNothrow.lstrip("*"));
+					if (currentFunctionNothrowLevel < calleeNothrowLevel) {
+						checker.warn("-Wnothrow",
+							f"Call to `{getPrettyNothrowLevelName(calleeNothrowLevel)}'-function "
+							f"in function `{checker.currentFunctionName}' marked as "
+							f"`{getPrettyNothrowLevelName(currentFunctionNothrowLevel)}'");
+					}
+				}
+			} else {
+				/* Remember that a function was called without a nothrow level */
+				checker.currentFunctionGreatestCalleNothrowLevel = false;
+			}
+		}
+
+		/* Evaluate the function's return value
+		 * TODO: support for `inline',  which is then  handled
+		 *       by evaluating the function's body while using
+		 *       fixed constants for arguments. */
+		if (!isConstExpr) {
+			MAKE_VOID();
+		}
+		typeref = CTypeRef(funType.returnType);
+		TRACE();
+		return this;
 	}
 
 }
@@ -747,23 +1031,7 @@ global final C_nullptr_32: CValue = CValue(kind: CVALUE_RCONST, typeref: CTypeRe
 global final C_nullptr_64: CValue = CValue(kind: CVALUE_RCONST, typeref: CTypeRef(C_nullptr_t_64), data: Bytes({ 0, 0, 0, 0, 0, 0, 0, 0 }), offset: 0);
 
 final class CScope: CNamespace {
-	this = default;
+	this = super;
 	@@Symbol value overrides (for when a function overrides the value of a pre-defined symbol)
-	public member symbolValues: {string: CValue} = Dict();
-
-	function setSymbolValue(name: string, value: CValue) {
-		local localSym = this.symbols.get(name);
-		if (localSym !is none) {
-			/* Directly set original symbol value. */
-			this.symbols[name] = (localSym.first, value);
-		} else {
-			/* Sea symbol value override */
-			symbolValues[name] = value;
-		}
-	}
-
-	function setSymbolValues(overrides: {string: CValue}) {
-		for (local name, val: overrides)
-			setSymbolValue(name, val);
-	}
+	public member symbolValues: {CSymbol: Bytes | none} = UniqueDict();
 }

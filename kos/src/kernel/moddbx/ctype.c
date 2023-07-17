@@ -358,7 +358,7 @@ NOTHROW(FCALL ctype_common)(struct ctype *a,
 		goto return_a;
 	}
 	if (ctype_equal(a, b))
-		return incref(a);
+		goto return_a;
 	if (CTYPE_KIND_ISPOINTER(akind) && CTYPE_KIND_ISPOINTER(bkind) &&
 	    CTYPE_KIND_SIZEOF(akind) == CTYPE_KIND_SIZEOF(bkind)) {
 		/* EXTENSION: Both types are (non-equal) pointers.

@@ -296,7 +296,7 @@
 #define __ATTR_VISIBILITY(vis)               /* Nothing */
 
 /* Suppress warnings about `-Wsuggest-attribute=const' or `-Wsuggest-attribute=pure' */
-#define __COMPILER_IMPURE() __asm__("")
+#define __COMPILER_IMPURE() (void)0
 
 /* NOTE: We pass force,nothrow(0) during assembly buffer casts to prevent warnings
  *       in case  `p' turns  out to  be  annotated with  a higher  nothrow  level. */
@@ -329,6 +329,9 @@
 #define __ULONGLONG unsigned long long
 #endif /* !__LONGLONG */
 
+#define inline
+#define __inline
+#define __inline__
 #define __restrict_arr restrict
 
 #define __COMPILER_HAVE_VARIABLE_LENGTH_ARRAYS
@@ -348,8 +351,8 @@
 #define __builtin_LINE() __LINE__
 #define __builtin_FILE() __FILE__
 #define __builtin_FUNCTION() __func__
-#define __builtin_unreachable() __XBLOCK({ for (;;); (void)0; })
-#define __builtin_object_size(ptr,type) ((type) < 2 ? (__SIZE_TYPE__)-1 : 0)
+#define __builtin_object_size(ptr, type) ((type) < 2 ? (__SIZE_TYPE__)-1 : 0)
+#define __builtin_offsetof(s, ...) ((__SIZE_TYPE__)&((s *)0)->__VA_ARGS__)
 
 #define __COMPILER_BARRIERS_ALL_IDENTICAL
 #define __COMPILER_BARRIER()       (void)0
@@ -366,11 +369,8 @@
 
 #define __builtin_va_list                char *
 #define __builtin_va_start(ap, last_arg) (void)((ap) = (__builtin_va_list)&(last_arg))
-#define __builtin_va_arg(ap, T)          (*(T *)(((ap) += sizeof(T)) - sizeof(T)))
+#define __builtin_va_arg(ap, T)          (*(T *)((ap) += sizeof(T)))
 #define __builtin_va_end(ap)             (void)0
-
-#define __NO_builtin_types_compatible_p
-#define __builtin_types_compatible_p(...) 1
 
 #define __COMPILER_HAVE_BUG_BLOATY_CXX_USING 0
 

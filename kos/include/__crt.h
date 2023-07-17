@@ -1189,7 +1189,7 @@ struct __locale_struct;
  * However, this  makes debugging  much harder  than it  needs to  be, so  to
  * make our lives a bit easier, provide a functions that gets called in these
  * situations, with the equivalent effect of `abort()' and `std::terminate()' */
-#if (!defined(NDEBUG) && !defined(NDEBUG_UNREACHABLE) && \
+#if (!defined(NDEBUG) && !defined(NDEBUG_UNREACHABLE) && !defined(__CHECKER__) && \
      defined(__CRT_HAVE___ubsan_handle_builtin_unreachable))
 /* XXX: Don't do this if user already passed `-fsanitize=unreachable' */
 __DECL_BEGIN

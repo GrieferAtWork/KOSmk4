@@ -21,13 +21,16 @@ import * from deemon;
 import * from .cparser;
 import * from .ctype;
 import * from .cvalue;
+import UniqueSet from collections;
+
+#define IDENTICAL(a, b) (type(a) === type(b) && ((a) == (b)))
 
 final class Checker: CParser {
 	public member globalNamespace: CNamespace = CNamespace(name: "");
 	@@Note: All elements except for the last are of type @CScope
 	public member namespaceStack: {CNamespace...} = [globalNamespace];
 	public member targetModule: Module;
-	public member defaultStructPacking: int = 16;
+	public member defaultStructPacking: int;
 	public member cxx: bool = true;
 
 	this(targetModule: Module, fp: File, filename: string = "",
@@ -36,6 +39,7 @@ final class Checker: CParser {
 	{
 		this.targetModule = targetModule;
 		this.cxx = cxx;
+		this.defaultStructPacking = targetModule.POINTER_SIZE;
 		this.TARGET_SIZEOF_POINTER = targetModule.POINTER_SIZE;
 		this.TARGET_BIG_ENDIAN = false;
 		this.TARGET_ENDIAN = "little";
@@ -108,6 +112,10 @@ final class Checker: CParser {
 	public  member currentFunctionTypeRef: CTypeRef | none = none;
 	@@Set to @false until a return-statement is encountered
 	private member currentFunctionReturnValue: Bytes | none | bool = false;
+	@@The greatest nothrow level of a function called by the current function
+	@@- Set to @none when no function has yet to be called
+	@@- Set to @false when a function has been called with no nothrow level
+	public  member currentFunctionGreatestCalleNothrowLevel: int | none | bool = none;
 
 	private member isInExternC: bool = false;         /* True inside of an extern-C block */
 	private member isInSwitchStatement: bool = false; /* True inside of a switch-statement */
@@ -116,6 +124,7 @@ final class Checker: CParser {
 	private member switchIsUnreachable: bool = false; /* True inside of an unreachable switch-statement */
 	private member encounteredBreak: bool = false;    /* True if `break' was encountered */
 	private member switchConstantExpressionValue: Bytes | none = none;
+	private member switchExpressionType: CTypeRef | none = none;
 
 
 	@@@param tab: One of:
@@ -135,17 +144,35 @@ final class Checker: CParser {
 	}
 
 	@@Lookup the symbol value override for lvalue @name
-	function getSymbolValue(name: string): CValue | none {
+	@@@return: @none: The value of @symbol is unknown
+	function getSymbolValue(symbol: CSymbol): Bytes | none {
 		for (local ns: namespaceStack) {
-			local symbol: CSymbol | none = ns.symbols.get(name);
-			if (symbol !is none)
-				return cvalueFromSymbol(symbol);
-			local override: CValue | none = ns.symbolValues.get(name);
-			if (override !is none)
+			local override: CValue | bool | none = ns.symbolValues.get(symbol, false);
+			if (override !== false)
 				return override;
 		}
 		return none;
 	}
+
+	@@Return the prefix for the current namespace (e.g. @"std::")
+	@@When inside of the global namespace, return an empty string
+	property currentNamespacePrefix: string = {
+		get(): string {
+			local result = "";
+			for (local ns: namespaceStack) {
+				if (ns is CScope)
+					continue;
+				if (ns === globalNamespace)
+					break;
+				result = f"{ns.name}::{result}";
+			}
+			return result;
+		}
+	}
+
+
+	@@The name of the final symbol in @nsLookupChildChain and @nsLookupChain
+	private member _nsLookupChildChainSymbolName: string;
 
 	@@Parse a a child-namespace lookup expression chain
 	@@@return @none if not found, but only when @errorIfNotFound is false.
@@ -155,7 +182,7 @@ final class Checker: CParser {
 	function nsLookupChildChain(ns: CNamespace, tab: string,
 	                            errorIfNotFound: bool = true): Object | none {
 again:
-		local name = this.tok;
+		local name: string = this.tok;
 		if (!name.issymbol())
 			this.err(f"Expected symbol in namespace symbol expression, but got {repr name}");
 		if (this.next() == "::" && cxx) {
@@ -168,6 +195,7 @@ again:
 			this.next();
 			goto again;
 		}
+		_nsLookupChildChainSymbolName = name;
 		local result = ns.lookup(tab, name);
 		if (result is none && errorIfNotFound)
 			this.err(f"Unknown symbol in namespace {repr name}");
@@ -198,6 +226,7 @@ again:
 				result = nsLookupChildChain(baseNs, tab, errorIfNotFound: false);
 			} else {
 				result = lookup(tab, name);
+				_nsLookupChildChainSymbolName = name;
 			}
 			if (result is none) {
 				this.backupRestore(backup);
@@ -297,6 +326,9 @@ again:
 			goto again;
 
 		case "[":
+			/* Be careful not to parse as attribute in case of array type. */
+			if (this.firstCharOfNextTok() != "[")
+				break;
 			this.next();
 			this.skip("[");
 			while (this.tok != "]") {
@@ -441,7 +473,10 @@ default_case:
 					tr.typ = struct;
 					return struct;
 				}
-				this.err(f"redeclaration of struct type {repr structName}");
+				if (struct.fields) {
+					this.err(f"redeclaration of {isUnion ? "union" : "struct"} "
+					         f"type {repr structName}");
+				}
 			}
 		} else {
 			struct = CStructType(name: structName);
@@ -493,7 +528,7 @@ default_case:
 			}
 			if (!fieldName && fieldType.typ is CStructType) {
 				/* Anonymous union/struct */
-				for (local innerFieldName, innerFieldType, innerFieldOffset: fieldType.foreachField) {
+				for (local innerFieldName, innerFieldType, innerFieldOffset: fieldType.typ.foreachField) {
 					if (innerFieldName in struct.fields)
 						this.err(f"Anonymous struct field `{innerFieldName}' redeclared");
 					struct.fields[innerFieldName] = (innerFieldType, innerFieldOffset + fieldOffset);
@@ -513,7 +548,7 @@ default_case:
 		return struct;
 	}
 
-	function parseEnumMembers(ns: CNamespace, valueType: CTypeRef) {
+	function parseEnumMembers(ns: CNamespace, enumTypeRef: CTypeRef) {
 		local prevEnumConstantValue: int = 0;
 		while (this.tok != "}") {
 			local enumName = this.parseSymbolName();
@@ -525,7 +560,7 @@ default_case:
 			}
 			if (enumName in ns.symbols)
 				this.err(f"Symbol `{enumName}' has already been defined");
-			ns.symbols[enumName] = CSymbol(valueType, enumValue);
+			ns.symbols[enumName] = CSymbol(enumTypeRef, enumValue);
 			prevEnumConstantValue = enumValue;
 		}
 	}
@@ -588,10 +623,11 @@ default_case:
 			baseType = CTypeRef(enum.base);
 		}
 		this.skip("{");
+		local enumTypeRef: CTypeRef = CTypeRef(enum, CTYPEREF_FLAG_CONST);
 		if (enumType === CEnumClassType) {
-			parseEnumMembers(enum, baseType);
+			parseEnumMembers(enum, enumTypeRef);
 		} else {
-			parseEnumMembers(namespaceStack.first, baseType);
+			parseEnumMembers(namespaceStack.first, enumTypeRef);
 		}
 		this.skip("}");
 		parseCTypeRefAttributes(tr);
@@ -605,6 +641,112 @@ default_case:
 			return result;
 		}
 		return "";
+	}
+
+	@@Return the common type between @a and @b
+	@@@return: none: Only when @tryCommon is set to @true, and the types have no common type
+	function commonType(a: CTypeRef, b: CTypeRef, tryCommon: bool = false): CTypeRef | none {
+		local aTyp: CType = a.typ;
+		local bTyp: CType = b.typ;
+		if (aTyp in C_NUMERIC && bTyp in C_NUMERIC) {
+			/* Special case: return the larger of 2  */
+
+			/* Return the larger of the two types. */
+			if (aTyp.sizeof > bTyp.sizeof)
+				goto return_a;
+			if (aTyp.sizeof < bTyp.sizeof)
+				goto return_b;
+
+			/* Return whichever isn't a boolean. */
+			if (aTyp in C_BOOLEAN)
+				goto return_b;
+			if (bTyp in C_BOOLEAN)
+				goto return_a;
+
+			/* Same type sizes. -> Return the signed of the two types. */
+			if (aTyp in C_SIGNED && bTyp !in C_SIGNED)
+				goto return_a;
+			if (bTyp in C_SIGNED && aTyp !in C_SIGNED)
+				goto return_b;
+
+			/* Both types are integers, and have the same size and sign.
+			 * Prefer `long long' over `long', `long' over `int', and `int' over `short' */
+			if (aTyp in C_LLONG)
+				goto return_a;
+			if (bTyp in C_LLONG)
+				goto return_b;
+			if (aTyp in C_LONG)
+				goto return_a;
+			if (bTyp in C_LONG)
+				goto return_b;
+			if (aTyp in C_INT)
+				goto return_a;
+			if (bTyp in C_INT)
+				goto return_b;
+
+			/* Fallback: The 2 types seem to be identical, so just return `a' over `b' */
+			goto return_a;
+		}
+
+		/* Check if the types are identical. */
+		if (IDENTICAL(aTyp, bTyp))
+			goto return_a;
+
+		if (aTyp is CPointerType) {
+			/* Special case: if one of the types is a nullptr, return the other type */
+			if (bTyp in C_NULLPTR)
+				goto return_a;
+			if (bTyp is CPointerType) {
+				/* Return the common type of 2 pointer types.
+				 *
+				 * For this purpose,  the greatest nothrow  level is  used,
+				 * and all type flags are or'd, except CTYPEREF_FLAG_FORCE,
+				 * which is and-ed. */
+				local aBaseTypeRef: CTypeRef = aTyp.base;
+				local bBaseTypeRef: CTypeRef = bTyp.base;
+				local aBaseType: CType = aBaseTypeRef.typ;
+				local bBaseType: CType = bBaseTypeRef.typ;
+				local rBaseType: CType;
+				if (IDENTICAL(aBaseType, bBaseType)) {
+					rBaseType = aBaseType;
+				} else {
+					/* When one of the base types is void, use the other! */
+					if (aBaseType === C_void) {
+						rBaseType = bBaseType;
+					} else if (bBaseType === C_void) {
+						rBaseType = aBaseType;
+					} else {
+						goto after_pointer;
+					}
+				}
+
+				/* Merge pointer types and their attributes */
+				local rBaseTypeRef: CTypeRef = CTypeRef(rBaseType);
+				rBaseTypeRef.flags = commonTypeRefFlags(aBaseTypeRef.flags, aBaseTypeRef.flags);
+				commonTypeRefAttrib(aBaseTypeRef.attrib, aBaseTypeRef.attrib, rBaseTypeRef.attrib);
+				local rPointerType: Type = type aBaseType;
+				if (rPointerType !== type bBaseType && bBaseType.sizeof > aBaseType.sizeof)
+					rPointerType = type bBaseType;
+				local rType: CType = rPointerType(rBaseTypeRef);
+				local rTypeRef: CTypeRef = CTypeRef(rType);
+				rTypeRef.flags = commonTypeRefFlags(a.flags, b.flags);
+				commonTypeRefAttrib(a.attrib, b.attrib, rTypeRef.attrib);
+				return rTypeRef;
+			}
+		} else if (bTyp is CPointerType) {
+			/* Special case: if one of the types is a nullptr, return the other type */
+			if (aTyp in C_NULLPTR)
+				goto return_b;
+		}
+after_pointer:
+
+		if (!tryCommon)
+			this.err(f"Types `{a}' and `{b}' don't have a common type");
+		return none;
+return_a:
+		return cTypeRefWithCommonAttrib(a, b);
+return_b:
+		return cTypeRefWithCommonAttrib(b, a);
 	}
 
 	@@Parse a type base reference
@@ -774,25 +916,66 @@ default_case:
 				break;
 			}
 
-			/* Single-keyword integer core types */
-			local typ = SINGLE_KEYWORD_CORE_TYPES.get(this.tok);
+			local typ: CType;
+			switch (this.tok) {
+
+				/* Single-keyword integer core types */
+			case "void":
+				typ = C_void;
+				break;
+
+			case "float":
+				typ = C_float;
+				break;
+
+			case "wchar_t":
+			case "__wchar_t":
+				typ = C_wchar_t;
+				break;
+
+			case "_Bool":
+				if (cxx)
+					goto lookup_typedef;
+				typ = C_bool;
+				break;
+
+			case "bool":
+			case "char8_t":
+			case "char16_t":
+			case "char32_t":
+				if (!cxx)
+					goto lookup_typedef;
+				typ = {
+					"bool":     C_bool,
+					"char8_t":  C_char8_t,
+					"char16_t": C_char16_t,
+					"char32_t": C_char32_t,
+				}[this.tok];
+				break;
+
+			default: {
+				/* Lookup a typedef */
+lookup_typedef:
+				local typedef: CTypeRef = nsLookupChain("typedefs");
+				if (typedef is none) {
+					if (hasCv)
+						this.err("Unable to parse type after const/volatile");
+					return none;
+				}
+				tr.importFrom(typedef);
+				goto done;
+			}	break;
+
+			}
 			if (typ !is none) {
 				this.next();
 				tr.typ = typ;
 				break;
 			}
-
-			/* Lookup a typedef */
-			local typedef = nsLookupChain("typedefs");
-			if (typedef is none) {
-				if (hasCv)
-					this.err("Unable to parse type after const/volatile");
-				return none;
-			}
-			tr.importFrom(typedef);
 		}	break;
 
 		}
+done:
 		parseCTypeRefConstVolatile(tr);
 		return tr.typ;
 	}
@@ -817,10 +1000,17 @@ suffixAgain:
 					this.next();
 					break;
 				}
-				local typ, nam = parseTypeRefWithoutStorageClass()...;
-				if (typ.typ === C_void && !nam)
+				local argTypeRef, argName = parseTypeRefWithoutStorageClass()...;
+				if (argTypeRef.typ === C_void && !argName)
 					break;
-				func.args.append((typ, nam));
+				func.args.append((argTypeRef, argName));
+				if (this.tok == "=") {
+					this.next();
+					local argDefault: Bytes | none = parseTypedExprConstant(argTypeRef);
+					if (argDefault is none)
+						argDefault = Bytes();
+					func.defaults.append(argDefault);
+				}
 				if (this.tok != ",")
 					break;
 				this.next();
@@ -873,16 +1063,20 @@ prefixAgain:
 			switch (this.tok) {
 			case "__ptr32":
 				this.next();
-				pt = CPointerType32(base: tr);
+				pt = CPointerType32(tr);
 				break;
 			case "__ptr64":
 				this.next();
-				pt = CPointerType64(base: tr);
+				pt = CPointerType64(tr);
 				break;
 			default:
-				pt = TARGET_CPointerType(base: tr);
+				pt = TARGET_CPointerType(tr);
 				break;
 			}
+			/* TODO: move certain attributes out of the pointer:
+			 * >> NOBLOCK void *foo();
+			 * Here, the NOBLOCK needs to be attached to the function,
+			 * and   not   its   return   value's   pointed-to   type! */
 			tr = CTypeRef(typ: pt);
 			parseCTypeRefConstVolatile(tr);
 			goto prefixAgain;
@@ -929,14 +1123,21 @@ prefixAgain:
 		return (tr, name, storageClass);
 	}
 
-	function parseDeclaration(storageClass: string = "", tryParse: bool = false): bool {
+	function parseDeclaration(storageClass: string = "",
+	                          tryParse: bool = false,
+	                          withSemiColon: bool = true): bool {
 		local typeref, name;
 		typeref, name, storageClass = parseTypeRef("", storageClass, tryParse)...;
 		if (typeref is none)
 			return false;
 		if (!name)
 			return true;
-		//print "parse: ", repr storageClass, typeref.tostr(name);
+#if 1 /* Dump top-level declarations as they are parsed. */
+		if (currentFunctionName is none) {
+			print("decl: ", storageClass, " ",
+				typeref.tostr(currentNamespacePrefix + name), ";");
+		}
+#endif
 
 		/* Create a typedef/symbol for the parsed declaration. */
 		if (storageClass == "typedef") {
@@ -951,7 +1152,8 @@ prefixAgain:
 					this.err(f"redeclaration of {tab[:-1]} {repr name}");
 				}
 			}
-			this.skip(";");
+			if (withSemiColon)
+				this.skip(";");
 			return true;
 		}
 
@@ -996,7 +1198,8 @@ prefixAgain:
 			}
 			if (decl.val is bound) {
 				/* Symbol already had a value assigned. */
-				this.skip(";");
+				if (withSemiColon)
+					this.skip(";");
 				return true;
 			}
 		} else {
@@ -1004,17 +1207,21 @@ prefixAgain:
 			tab[name] = decl;
 		}
 
-		if (this.tok == ";") {
+		if (withSemiColon && this.tok == ";") {
 			this.next();
 			return true;
 		}
 
 		/* Must parse an initializer/function-body for the declaration. */
 		if (typeref.typ is CFunctionType) {
+			if (!withSemiColon && this.tok != "{")
+				return true;
 			this.skip("{");
 			decl.val = parseFunctionBody(typeref, name);
 			this.skip("}");
 		} else {
+			if (!withSemiColon && this.tok != "=")
+				return true;
 			this.skip("=");
 			local val = parseTypedExpr(typeref);
 			if (!isUnreachable) {
@@ -1025,7 +1232,8 @@ prefixAgain:
 				decl.typeref = val.typeref;
 				decl.val     = val;
 			}
-			this.skip(";");
+			if (withSemiColon)
+				this.skip(";");
 		}
 		return true;
 	}
@@ -1045,12 +1253,14 @@ prefixAgain:
 
 		/* Setup the context for evaluation of the function body */
 		namespaceStack.pushfront(fnScope);
-		local savedCurrentFunctionName        = currentFunctionName;
-		local savedCurrentFunctionTypeRef     = currentFunctionTypeRef;
-		local savedCurrentFunctionReturnValue = currentFunctionReturnValue;
-		currentFunctionName        = name;
-		currentFunctionTypeRef     = funTypRef;
-		currentFunctionReturnValue = false;
+		local savedCurrentFunctionName                      = currentFunctionName;
+		local savedCurrentFunctionTypeRef                   = currentFunctionTypeRef;
+		local savedCurrentFunctionReturnValue               = currentFunctionReturnValue;
+		local savedCurrentFunctionGreatestCalleNothrowLevel = currentFunctionGreatestCalleNothrowLevel;
+		currentFunctionName                      = name;
+		currentFunctionTypeRef                   = funTypRef;
+		currentFunctionReturnValue               = false;
+		currentFunctionGreatestCalleNothrowLevel = none;
 
 		/* Parse the function body. */
 		parseStatements();
@@ -1060,10 +1270,17 @@ prefixAgain:
 		if (result === false)
 			result = none;
 
+		if (currentFunctionGreatestCalleNothrowLevel !is none &&
+		    currentFunctionGreatestCalleNothrowLevel !== false) {
+			/* TODO: a warning is issued for a function that has no nothrow attribute
+			 *       and  calls  only  functions  that  have  __nothrow__ attributes. */
+		}
+
 		/* Restore context */
-		currentFunctionName        = savedCurrentFunctionName;
-		currentFunctionTypeRef     = savedCurrentFunctionTypeRef;
-		currentFunctionReturnValue = savedCurrentFunctionReturnValue;
+		currentFunctionName                      = savedCurrentFunctionName;
+		currentFunctionTypeRef                   = savedCurrentFunctionTypeRef;
+		currentFunctionReturnValue               = savedCurrentFunctionReturnValue;
+		currentFunctionGreatestCalleNothrowLevel = savedCurrentFunctionGreatestCalleNothrowLevel;
 		namespaceStack.popfront();
 		return result;
 	}
@@ -1156,15 +1373,16 @@ again:
 			this.next();
 			break;
 
-		case "{":
+		case "{": {
 			this.next();
-			namespaceStack.pushfront(CScope(
-					/* Can just re-use the parent scope's symbol value overrides */
-					symbolValues: namespaceStack.first.symbolValues));
+			local innerScope: CScope = CScope();
+			/* Can just re-use the parent scope's symbol value hints */
+			innerScope.symbolValues = namespaceStack.first.symbolValues;
+			namespaceStack.pushfront(innerScope);
 			parseStatements();
 			namespaceStack.popfront();
 			this.skip("}");
-			break;
+		}	break;
 
 		case "case":
 		case "default":
@@ -1172,13 +1390,16 @@ again:
 				this.err("`case' or `default' outside of switch-statement");
 			this.next();
 			if (this.tok == "case") {
-				local caseValue: CValue = parseExprConstant();
-				if (switchConstantExpressionValue !is none && !switchIsUnreachable) {
+				local savedIsUnreachable = isUnreachable;
+				isUnreachable = switchIsUnreachable;
+				local caseValue: Bytes | none = parseTypedExprConstant(switchExpressionType);
+				isUnreachable = savedIsUnreachable;
+				if (switchConstantExpressionValue !is none &&
+				    caseValue !is none && !switchIsUnreachable) {
 					/* When the switch-expression is constant, only
 					 * disable unreachable if  case matches  switch */
-					if (switchConstantExpressionValue == caseValue.constExprValue(this)) {
+					if (switchConstantExpressionValue == caseValue)
 						isUnreachable = false;
-					}
 					this.skip(":");
 					goto again;
 				}
@@ -1230,10 +1451,13 @@ again:
 		case "switch": {
 			this.next();
 			this.skip("(");
+			local savedSwitchExpressionType = switchExpressionType;
 			local savedSwitchConstantExpressionValue = switchConstantExpressionValue;
-			local switchExpr = parseExprRValue();
-			switchConstantExpressionValue = none;
-			switchConstantExpressionValue = switchExpr.data;
+			local switchExpr: CValue = parseExprRValue();
+			switchExpressionType = switchExpr.typeref;
+			switchConstantExpressionValue = switchExpr.isConstExpr
+				? switchExpr.constExprBytes
+				: none;
 			this.skip(")");
 			this.require("{");
 
@@ -1253,6 +1477,7 @@ again:
 			isInSwitchStatement = savedIsInSwitchStatement;
 			switchIsUnreachable = savedSwitchIsUnreachable;
 			switchConstantExpressionValue = savedSwitchConstantExpressionValue;
+			switchExpressionType = savedSwitchExpressionType;
 		}	break;
 
 		case "if": {
@@ -1292,7 +1517,15 @@ again:
 				namespaceStack.pushfront(ttScope);
 				parseStatement();
 				namespaceStack.popfront();
-				if (this.tok == "else") {
+				if (this.tok != "else") {
+					/* The true-branch is conditional,  so
+					 * it being noreturn doesn't propagate */
+					isUnreachable = false;
+
+					/* Value assumptions made  by the conditional  branch must  be
+					 * inherited as unknowns because they might not always happen. */
+					inheritAllSymbolValuesAsUnknowns(ttScope);
+				} else {
 					local ttIsNoReturn = isUnreachable;
 					this.next();
 					local ffScope = CScope();
@@ -1303,23 +1536,21 @@ again:
 					if (!ttIsNoReturn)
 						isUnreachable = false;
 					local parentScope: CScope = namespaceStack.first;
-					local ttOverrides: {string: CValue} = ttScope.symbolValues;
-					local ffOverrides: {string: CValue} = ffScope.symbolValues;
-					local allNames: {string...} = HashSet(ttOverrides);
-					allNames.insertall(ffOverrides);
-					for (local name: allNames) {
-						local ttValue = ttOverrides.get(name);
-						local ffValue = ffOverrides.get(name);
-						if (ttValue is none)
-							ttValue = getSymbolValue(name);
-						if (ffValue is none)
-							ffValue = getSymbolValue(name);
+					local ttOverrides: {CSymbol: Bytes | none} = ttScope.symbolValues;
+					local ffOverrides: {CSymbol: Bytes | none} = ffScope.symbolValues;
+					for (local symbol: ttOverrides.keys | ffOverrides.keys) {
+						local ttValue: Bytes | bool | none = ttOverrides.get(symbol, false);
+						local ffValue: Bytes | bool | none = ffOverrides.get(symbol, false);
+						if (ttValue === false)
+							ttValue = getSymbolValue(symbol);
+						if (ffValue === false)
+							ffValue = getSymbolValue(symbol);
 						if (ttValue is none || ffValue is none) {
 							ttValue = none;
 						} else if (ttValue != ffValue) {
 							ttValue = none;
 						}
-						parentScope.setSymbolValue(name, ttValue);
+						parentScope.symbolValues[symbol] = ttValue;
 					}
 				}
 			}
@@ -1394,9 +1625,9 @@ again:
 					this.skip("(");
 					local secondPassWhileCond = parseExprRValue();
 					if (secondPassWhileCond !is none && whileVal == secondPassWhileCond) {
-						if (loopScope.symbolValues == pass1SymbolValues) {
+						if (pass1SymbolValues == loopScope.symbolValues) {
 							/* Everything ended up the same -> can inherit */
-							namespaceStack.first.setSymbolValues(pass1SymbolValues);
+							namespaceStack.first.symbolValues.update(pass1SymbolValues);
 						}
 					}
 				}
@@ -1408,7 +1639,7 @@ again:
 				/* Special   case   for  `do { } while (0)'-loops   without  `break'.
 				 * Here, we can always inherit the contained scope's value overrides. */
 				if (!encounteredBreak)
-					namespaceStack.first.setSymbolValues(loopScope.symbolValues);
+					namespaceStack.first.symbolValues.update(loopScope.symbolValues);
 			}
 
 			this.skip(")");
@@ -1423,7 +1654,7 @@ again:
 			namespaceStack.pushfront(CScope());
 			this.next();
 			this.skip("(");
-			if (!parseDeclaration(tryParse: true))
+			if (!parseDeclaration(tryParse: true, withSemiColon: false))
 				parseExprComma();
 			this.skip(";");
 			local savedIsInLoop         = isInLoop;
@@ -1473,25 +1704,40 @@ again:
 
 		case "return": {
 			this.next();
-			local returnValue: CValue;
-			local returnType: CTypeRef = CTypeRef(currentFunctionTypeRef.typ.returnType);
-			for (;;) {
-				returnValue = parseTypedExpr(returnType);
-				if (this.tok != ",")
-					break;
-				this.next();
-			}
-			if (isUnreachable) {
-				/* Unreachable code */
-			} else if (!returnValue.isConstExpr) {
-				currentFunctionReturnValue = none;
-			} else if (currentFunctionReturnValue === false) {
-				currentFunctionReturnValue = returnValue.data;
-			} else if (currentFunctionReturnValue !is none) {
-				if (currentFunctionReturnValue != returnValue.data)
+			local returnType: CType = currentFunctionTypeRef.typ.returnType;
+			if (returnType === C_void) {
+				if (this.tok != ";") {
+					this.warn("-Wreturn",
+						f"Non-empty return expression in function `{currentFunctionName}'"
+						f"expected to return `void'");
+					parseExprComma();
+				}
+			} else if (this.tok == ";") {
+				this.warn("-Wreturn",
+					f"Missing return expression in function `{currentFunctionName}' "
+					f"expected to return `{returnType}'");
+			} else {
+				local returnTypeRef: CTypeRef = CTypeRef(returnType);
+				local returnValue: CValue;
+				for (;;) {
+					returnValue = parseTypedExpr(returnTypeRef);
+					if (this.tok != ",")
+						break;
+					this.next();
+				}
+				if (isUnreachable) {
+					/* Unreachable code */
+				} else if (!returnValue.isConstExpr) {
 					currentFunctionReturnValue = none;
+				} else if (currentFunctionReturnValue === false) {
+					currentFunctionReturnValue = returnValue.constExprBytes;
+				} else if (currentFunctionReturnValue !is none) {
+					if (currentFunctionReturnValue != returnValue.constExprBytes)
+						currentFunctionReturnValue = none;
+				}
 			}
 			isUnreachable = true;
+			this.skip(";");
 		}	break;
 
 		default:
@@ -1509,6 +1755,7 @@ again:
 			}
 			if (!parseDeclaration(tryParse: true)) {
 				parseExprComma();
+				this.skip(";");
 			}
 			break;
 		}
@@ -1736,6 +1983,52 @@ again:
 			namespaceStack.popfront();
 		}	break;
 
+		case "using": {
+			if (!cxx)
+				goto default_case;
+			this.next();
+			if (this.tok == "namespace") {
+				this.next();
+				local ns: CNamespace | none = nsLookupChain("namespace");
+				if (ns is none)
+					this.err(f"No such namespace `{this.tok}'");
+				local imports = namespaceStack.first.importedNamespaces;
+				if (ns !in imports)
+					imports.append(ns);
+			} else {
+				if (this.tok.issymbol() && this.nextTokIsEquals()) {
+					/* using foo = bar; */
+					local name: string = this.parseSymbolName();
+					this.skip("=");
+					local newTypeRef: CTypeRef | none = nsLookupChain("typedefs");
+					if (newTypeRef is none)
+						this.err(f"No such symbol/typedef `{this.tok}'");
+					local tab: {string: CTypeRef} = namespaceStack.first.typedefs;
+					local existingTypeRef: CTypeRef | none = tab.get(name);
+					if (existingTypeRef !is none && existingTypeRef != newTypeRef)
+						this.err(f"Duplicate declaration of {name}");
+					tab[name] = newTypeRef;
+				} else {
+					local tabName: string;
+					local element: Object | none;
+					for (tabName: ["symbols", "typedefs"]) {
+						element = nsLookupChain(tabName);
+						if (element !is none)
+							break;
+					}
+					if (element is none)
+						this.err(f"No such symbol/typedef `{this.tok}'");
+					local name: string = _nsLookupChildChainSymbolName;
+					local tab: {string: Object} = namespaceStack.first.operator . (tabName);
+					local existingElement: Object | none = tab.get(name);
+					if (existingElement !is none && existingElement != element)
+						this.err(f"Duplicate declaration of {name}");
+					tab[name] = element;
+				}
+			}
+			this.skip(";");
+		}	break;
+
 		case "extern":
 			if (!cxx)
 				goto default_case;
@@ -1767,12 +2060,11 @@ default_case:
 	// function parseExprUnaryPrefix(): CValue;
 	// function parseExprUnarySuffix(value: CValue): CValue;
 	// function parseExprUnary(): CValue;
-#define parseExprUnarySuffixCheck(tok) ((tok) in ["[", "(", ".", "@", "->", "++", "--"])
+#define parseExprUnarySuffixCheck(tok) ((tok) in ["[", "(", ".", "->", "++", "--"])
 #define parseExprUnarySuffix_CASE \
 	case "[":                     \
 	case "(":                     \
 	case ".":                     \
-	case "@":                     \
 	case "->":                    \
 	case "++":                    \
 	case "--"
@@ -1925,6 +2217,7 @@ return_unknown_void_pointer:
 				case "__builtin_bswap128": val = val.swap128; break;
 				}
 				result.data = result.typeref.typ.bytes(this, val);
+				result.offset = 0;
 			}
 			return result;
 		}	break;
@@ -1944,7 +2237,7 @@ return_unknown_void_pointer:
 			} else {
 				typ = parseTypeOrExpressionType().typ;
 			}
-			return CValue(CTypeRef(TARGET_C_size_t), typ.operator . (
+			return cvalueFromValue(this, CTypeRef(TARGET_C_size_t), typ.operator . (
 					tok == "sizeof" ? "sizeof" : "alignof"));
 		}	break;
 
@@ -1975,7 +2268,18 @@ return_unknown_void_pointer:
 			this.skip("(");
 			local expr: CValue = parseExprRValue();
 			this.skip(")");
-			return CValue(CTypeRef(C_int), expr.isConstExpr ? 1 : 0);
+			return cvalueFromValue(this, CTypeRef(C_int), expr.isConstExpr ? 1 : 0);
+		}	break;
+
+		case "__builtin_types_compatible_p": {
+			this.next();
+			this.skip("(");
+			local a: CTypeRef = parseTypeOrExpressionType();
+			this.skip(",");
+			local b: CTypeRef = parseTypeOrExpressionType();
+			this.skip(")");
+			local r: CTypeRef | none = commonType(a, b, true);
+			return cvalueFromValue(this, CTypeRef(C_int), r !is none ? 1 : 0);
 		}	break;
 
 		case "__builtin_has_attribute": {
@@ -1987,7 +2291,8 @@ return_unknown_void_pointer:
 			parseCTypeRefAttribute(template);
 			this.skip(")");
 			/* Verify that by merging attributes, we get `(check & template) == template' */
-			return CValue(CTypeRef(C_int), check.hasAllAttributesFrom(template) ? 1 : 0);
+			return cvalueFromValue(this, CTypeRef(C_int),
+				check.hasAllAttributesFrom(template) ? 1 : 0);
 		}	break;
 
 		case "(": {
@@ -2020,6 +2325,18 @@ return_unknown_void_pointer:
 			return result;
 		}	break;
 
+		case "++":
+		case "--": {
+			this.startWarnHere();
+			this.next();
+			local result: CValue = parseExprUnary();
+			local one: CValue = cvalueFromValue(this, CTypeRef(C_int), 1);
+			local newValue: CValue = result.op2(this, tok[0], one);
+			result = result.inplaceAssign(this, newValue);
+			this.endWarnHere();
+			return result;
+		}	break;
+
 		default:
 default_case:
 			if (tok.issymbol()) {
@@ -2037,7 +2354,6 @@ default_case:
 					return result;
 				} else {
 					/* Not a type -> check for a normal symbol */
-					/* TODO: Check for `symbolValues' */
 					local symbol: CSymbol | none = nsLookupChain("symbols");
 					if (symbol is none)
 						this.err(f"No such symbol `{tok}'");
@@ -2053,7 +2369,7 @@ default_case:
 				for (local ch: chr.ordinals) {
 					ord = (ord << 8) | ch;
 				}
-				return CValue(CTypeRef(C_int), ord & 0xffffffff);
+				return cvalueFromValue(this, CTypeRef(C_int), ord & 0xffffffff);
 			} else {
 				local constVal: int | float;
 				local suffixEnd = #tok;
@@ -2116,7 +2432,68 @@ default_case:
 
 	function parseExprUnarySuffix(value: CValue): CValue {
 		assert parseExprUnarySuffixCheck(this.tok);
-		this.err(f"TODO: parseExprUnarySuffix({repr value})");
+again:
+		switch (this.tok) {
+
+		case "++":
+		case "--": {
+			local oldValue: CValue = value.rValue(this);
+			local one: CValue = cvalueFromValue(this, CTypeRef(C_int), 1);
+			local newValue: CValue = value.op2(this, this.tok[0], one);
+			value.inplaceAssign(this, newValue);
+			value = oldValue;
+			this.next();
+			goto again;
+		}	break;
+
+		case "[": {
+			this.next();
+			local rhs: CValue = parseExprComma();
+			this.skip("]");
+			value = value
+				.inplaceOp2(this, "+", rhs)
+				.inplaceInd(this);
+			goto again;
+		}	break;
+
+		case "->":
+			value = value.inplaceInd(this);
+			/* FALLTHRU */
+		case ".":
+			this.next();
+			value = value.inplaceField(this, this.parseSymbolName());
+			goto again;
+
+		case "(": {
+			this.next();
+			/* Automatically dereference function pointers. */
+			while (value.typeref.typ is CPointerType)
+				value = value.inplaceInd(this);
+			local funTyp: CType = value.typeref.typ;
+			local args: {CValue...} = [];
+			local argTypes: {(CTypeRef, string)...} = funTyp is CFunctionType ? funTyp.args : ();
+			/* Parse function arguments. */
+			while (this.tok != ")") {
+				local arg: CValue;
+				if (#args < #argTypes) {
+					arg = parseTypedExpr(argTypes[#args]);
+				} else {
+					arg = parseExpr();
+				}
+				args.append(arg);
+				if (this.tok != ",")
+					break;
+				this.next();
+			}
+			value = value.inplaceCall(this, args, mustCastArgs: !argTypes);
+			this.skip(")");
+			goto again;
+		}	break;
+
+		default:
+			break;
+		}
+		return value;
 	}
 
 #define DEFINE_SIMPLE_SUFFIX_PARSER(name, parseExprOperand)       \
@@ -2140,23 +2517,159 @@ default_case:
 #undef DEFINE_SIMPLE_SUFFIX_PARSER
 
 	function parseExprLAndSuffix(value: CValue): CValue {
+		/* NOTE: `A && B' is the same as `A ? !!B : false' */
+		value = value.inplaceOp1(this, "bool");
+again:
 		assert parseExprLAndSuffixCheck(this.tok);
-		this.err(f"TODO: parseExprLAndSuffix({repr value})");
+		this.next(); /* Consume "&&" */
+		if (isUnreachable) {
+			parseExprBitOr();
+			value.inplaceVoid;
+		} else if (value.isConstExpr) {
+			if (value.constExprValue) {
+				value = parseExprBitOr().inplaceOp1(this, "bool");
+			} else {
+				isUnreachable = true;
+				parseExprBitOr();
+				isUnreachable = false;
+			}
+		} else {
+			/* Value assumptions made  by the conditional  branch must  be
+			 * inherited as unknowns because they might not always happen. */
+			local condScope: CScope = CScope();
+			namespaceStack.pushfront(condScope);
+			parseExprBitOr();
+			namespaceStack.popfront();
+			inheritAllSymbolValuesAsUnknowns(condScope);
+			/* The true-branch is conditional, so it being noreturn doesn't propagate */
+			isUnreachable = false;
+			value.inplaceVoid;
+		}
+		if (parseExprLAndSuffixCheck(this.tok))
+			goto again;
+		return value;
 	}
 
 	function parseExprLOrSuffix(value: CValue): CValue {
+		/* NOTE: `A || B' is the same as `A ? true : !!B' */
+		value = value.inplaceOp1(this, "bool");
+again:
 		assert parseExprLOrSuffixCheck(this.tok);
-		this.err(f"TODO: parseExprLOrSuffix({repr value})");
+		this.next(); /* Consume "||" */
+		if (isUnreachable) {
+			parseExprLAnd();
+			value.inplaceVoid;
+		} else if (value.isConstExpr) {
+			if (value.constExprValue) {
+				isUnreachable = true;
+				parseExprLAnd();
+				isUnreachable = false;
+			} else {
+				value = parseExprLAnd().inplaceOp1(this, "bool");
+			}
+		} else {
+			/* Value assumptions made  by the conditional  branch must  be
+			 * inherited as unknowns because they might not always happen. */
+			local condScope: CScope = CScope();
+			namespaceStack.pushfront(condScope);
+			parseExprLAnd();
+			namespaceStack.popfront();
+			inheritAllSymbolValuesAsUnknowns(condScope);
+			/* The false-branch is conditional, so it being noreturn doesn't propagate */
+			isUnreachable = false;
+			value.inplaceVoid;
+		}
+		if (parseExprLOrSuffixCheck(this.tok))
+			goto again;
+		return value;
+	}
+
+	function inheritAllSymbolValuesAsUnknowns(scope: CScope) {
+		local parentScope: CScope = namespaceStack.first;
+		for (local symbol: scope.symbolValues.keys) {
+			parentScope.symbolValues[symbol] = none;
+		}
 	}
 
 	function parseExprCondSuffix(value: CValue): CValue {
 		assert parseExprCondSuffixCheck(this.tok);
-		this.err(f"TODO: parseExprCondSuffix({repr value})");
+		this.next();
+		if (isUnreachable) {
+			local ttVal: CValue = value;
+			if (this.tok != ":")
+				ttVal = parseExprLOr().inplaceRValue(this);
+			this.skip(":");
+			local ffVal: CValue = parseExprCond().inplaceRValue(this);
+			value = CValue(kind: CVALUE_AVOID, typeref: commonType(ttVal.typeref, ffVal.typeref));
+		} else if (value.isConstExpr) {
+			if (value.constExprValue) {
+				if (this.tok != ":")
+					value = parseExprLOr().inplaceRValue(this);
+				this.skip(":");
+				local savedIsUnreachable = isUnreachable;
+				isUnreachable = true;
+				local ffVal: CValue = parseExprCond().inplaceRValue(this);
+				isUnreachable = savedIsUnreachable;
+				value = value.inplaceCast(commonType(value.typeref, ffVal.typeref));
+			} else {
+				if (this.tok != ":") {
+					isUnreachable = true;
+					value = parseExprLOr().inplaceRValue(this);
+					isUnreachable = false;
+				}
+				local ffVal: CValue = parseExprCond().inplaceRValue(this);
+				value = ffVal.inplaceCast(commonType(value.typeref, ffVal.typeref));
+			}
+		} else {
+			/* Configure the expression value engine such that
+			 * it  maintains identical values from both sides. */
+			local ttScope: CScope = CScope();
+			if (this.tok != ":") {
+				namespaceStack.pushfront(ttScope);
+				value = parseExprLOr().inplaceRValue(this);
+				namespaceStack.popfront();
+			}
+			local ttIsNoReturn: bool = isUnreachable;
+			this.next();
+			local ffScope: CScope = CScope();
+			namespaceStack.pushfront(ffScope);
+			isUnreachable = false;
+			local ffVal: CValue = parseExprCond().inplaceRValue(this);
+			namespaceStack.popfront();
+			if (!ttIsNoReturn)
+				isUnreachable = false;
+			local parentScope: CScope = namespaceStack.first;
+			local ttOverrides: {CSymbol: Bytes | none} = ttScope.symbolValues;
+			local ffOverrides: {CSymbol: Bytes | none} = ffScope.symbolValues;
+			for (local symbol: ttOverrides.keys | ffOverrides.keys) {
+				local ttValue: Bytes | bool | none = ttOverrides.get(symbol, false);
+				local ffValue: Bytes | bool | none = ffOverrides.get(symbol, false);
+				if (ttValue === false)
+					ttValue = getSymbolValue(symbol);
+				if (ffValue === false)
+					ffValue = getSymbolValue(symbol);
+				if (ttValue is none || ffValue is none) {
+					ttValue = none;
+				} else if (ttValue != ffValue) {
+					ttValue = none;
+				}
+				parentScope.symbolValues[symbol] = ttValue;
+			}
+		}
+		return value;
 	}
 
 	function parseExprAssignSuffix(value: CValue): CValue {
 		assert parseExprAssignSuffixCheck(this.tok);
-		this.err(f"TODO: parseExprAssignSuffix({repr value})");
+		do {
+			local op: string = this.tok[:-1]; /* Remove trailing "=" */
+			this.next();
+			local rhs: CValue = parseExprCond();
+			if (op) /* Perform inplace operation. */
+				rhs = value.op2(this, op, rhs);
+			value = value.inplaceAssign(this, rhs);
+		} while (parseExprAssignSuffixCheck(this.tok));
+		return value;
 	}
 
 
@@ -2262,8 +2775,7 @@ again:
 			.inplaceCast(this, typeref, explicit);
 		if (result !is none) {
 			if (value.isConstExpr) {
-				local valueData: Bytes = value.data;
-				assert valueData is Bytes;
+				local valueData: Bytes = value.constExprBytes;
 				local endOffset: int = offset + #valueData;
 				if (#result < endOffset)
 					result = result.resized(endOffset);
@@ -2278,6 +2790,16 @@ again:
 	@@Parse an expression and convert it into an R-Value
 	function parseExprRValue(): CValue {
 		return parseExpr().inplaceRValue(this);
+	}
+
+	function parseTypedExprConstant(typeref: CTypeRef, explicit: bool = false): Bytes | none {
+		local result: CValue = parseTypedExpr(typeref, explicit);
+		if (!result.isConstExpr) {
+			if (!isUnreachable)
+				this.err("Expected a compile-time constant expression");
+			return none;
+		}
+		return result.constExprBytes;
 	}
 
 	function parseExprConstant(): CValue | none {
@@ -2323,10 +2845,12 @@ again:
 @@Main function to run the checker on an already-preprocessed C/C++ source file
 @@@param: language: Either "c" or "c++"
 function runChecker(filename: string, targetModule: Module, language: string = "c++") {
+	// TODO: Annotate `__THROWS()' and emit warnings about missing throws
+	//       annotations  in   functions  that   can  throw   exceptions.
 	local fp = File.open(filename, "rb");
 	local checker = Checker(
-			targetModule: targetModule, fp: fp, filename: filename,
-			cxx: { "c": false, "c++": true }[language]);
+		targetModule: targetModule, fp: fp, filename: filename,
+		cxx: { "c": false, "c++": true }[language]);
 #if 0
 	do {
 		print repr checker.filename, repr checker.lc, repr checker.this.tok;

@@ -315,6 +315,28 @@ again:
 		return peekc2() != ":"; /* "::" would be a different token! */
 	}
 
+	public final function nextTokIsEquals(): bool {
+again:
+		local ch = peekc();
+		if (ch.isspace()) {
+			++bufPos;
+			goto again;
+		}
+		if (ch != "=")
+			return false;
+		return peekc2() != "="; /* "==" would be a different token! */
+	}
+
+	public final function firstCharOfNextTok(): string {
+again:
+		local ch = peekc();
+		if (ch.isspace()) {
+			++bufPos;
+			goto again;
+		}
+		return ch;
+	}
+
 	@@Turn the current token into a single-character token
 	public final function makeSingleCharacterToken() {
 		bufPos = tokStart + 1;
@@ -335,8 +357,16 @@ again:
 		case "": /* EOF */
 			goto return_ch_eof;
 
+		case "-": {
+			local ch2 = peekc();
+			if (ch2 == ch || ch2 in "=>") {
+				++bufPos;
+				ch += ch2;
+			}
+			goto return_ch;
+		}
+
 		case "+":
-		case "-":
 		case "&":
 		case "|": {
 			local ch2 = peekc();

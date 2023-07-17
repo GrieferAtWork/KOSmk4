@@ -290,8 +290,8 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 #endif /* !__PRIVATE_REFCNT_IMPL_TRYINCREF */
 
 #ifdef __CHECKER__
-#define __DEFINE_REFCNT_TEMPLATE_X(T, destroy_, X, _)
-#define __DEFINE_WEAKREFCNT_TEMPLATE_X(T, destroy_, X, _)
+#define __DEFINE_REFCNT_TEMPLATE_X(T, destroy_, X, _)     /* Nothing */
+#define __DEFINE_WEAKREFCNT_TEMPLATE_X(T, destroy_, X, _) /* Nothing */
 #define __DEFINE_REFCNT_GLOBAL_FUNCTIONS_X(T, destroy_, X, _)                                                                      \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))                                        \
 	__PRIVATE_REFCNT_TYPE_X(T, X, _) __REFCNT_NOTHROW(__REFCNT_CC getrefcnt)(T const *__restrict __self) {                         \

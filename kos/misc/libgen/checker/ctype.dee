@@ -19,8 +19,10 @@
  */
 import * from deemon;
 import * from errors;
+import UniqueSet from collections;
 #define Checker Object
 
+global CTypeRef;
 class CType {
 	// function tostr(varname: string = ""): string;
 
@@ -49,6 +51,51 @@ global final CTYPEREF_FLAG_FORCE = 0x4000;
 
 @@Used during creation of struct objects.
 global final CTYPEREF_FLAG_PACKED = 0x8000;
+
+function commonTypeRefFlags(a: int, b: int): int {
+	return ((a | b) & ~CTYPEREF_FLAG_FORCE) |
+	       ((a & b) & (CTYPEREF_FLAG_FORCE));
+}
+
+function commonTypeRefAttrib(a: {string: string | int},
+                             b: {string: string | int},
+                             r: {string: string | int}) {
+	for (local key: a.keys | b.keys) {
+		local aValue: string | int | none = a.get(key);
+		local bValue: string | int | none = b.get(key);
+		local rValue: string | int;
+		if (aValue is none) {
+			rValue = bValue;
+		} else if (bValue is none) {
+			rValue = aValue;
+		} else if (aValue == bValue) {
+			rValue = aValue;
+		} else if (aValue is int) {
+			rValue = aValue;
+			if (rValue < bValue)
+				rValue = bValue;
+		} else if (key == "nothrow") {
+			aValue = int(aValue.lstrip("*"));
+			bValue = int(bValue.lstrip("*"));
+			rValue = aValue;
+			if (rValue < bValue)
+				rValue = bValue;
+			rValue = str rValue;
+		} else {
+			/* Remove attribute. */
+			continue;
+		}
+		r[key] = rValue;
+	}
+}
+
+function cTypeRefWithCommonAttrib(self: CTypeRef, other: CTypeRef): CTypeRef {
+	if (self.flags == other.flags && self.attrib == other.attrib)
+		return self;
+	local result = CTypeRef(typ: self.typ, flags: commonTypeRefFlags(self.flags, other.flags));
+	commonTypeRefAttrib(self.attrib, other.attrib, result.attrib);
+	return result;
+}
 
 final class CTypeRef {
 	this = default;
@@ -147,8 +194,21 @@ final class CCoreIntType: CCoreType {
 	}
 }
 
+final class CCoreBoolType: CCoreType {
+	this = super;
+	public function peek(checker: Checker, data: Bytes, offset: int): int {
+		return int.frombytes(data[offset:offset + this.sizeof]) ? 1 : 0;
+	}
+	public function poke(checker: Checker, data: Bytes, offset: int, value: int) {
+		data[offset:offset + this.sizeof] = (value ? 1 : 0).tobytes(this.sizeof, checker.TARGET_ENDIAN, false);
+	}
+	public function bytes(checker: Checker, value: int): Bytes {
+		return (value ? 1 : 0).tobytes(this.sizeof, checker.TARGET_ENDIAN, false);
+	}
+}
+
 global final C_void = CCoreType("void", 0, 1);
-global final C_bool = CCoreIntType("bool", 1, 1, false);
+global final C_bool = CCoreBoolType("bool", 1, 1);
 global final C_char = CCoreIntType("char", 1, 1, true);
 global final C_schar = CCoreIntType("signed char", 1, 1, true);
 global final C_uchar = CCoreIntType("unsigned char", 1, 1, false);
@@ -169,6 +229,7 @@ global final C_int128_t_align8 = CCoreIntType("__int128", 16, 8, true);
 global final C_uint128_t_align4 = CCoreIntType("unsigned __int128", 16, 4, false);
 global final C_uint128_t_align8 = CCoreIntType("unsigned __int128", 16, 8, false);
 global final C_wchar_t = CCoreIntType("wchar_t", 4, 4, false);
+global final C_char8_t = CCoreIntType("char8_t", 1, 1, false);
 global final C_char16_t = CCoreIntType("char16_t", 2, 2, false);
 global final C_char32_t = CCoreIntType("char32_t", 4, 4, false);
 global final C_float = CCoreType("float", 4, 4);
@@ -178,25 +239,17 @@ global final C_ldouble_16 = CCoreType("long double", 16, 16);
 global final C_nullptr_t_32 = CCoreType("nullptr_t", 4, 4);
 global final C_nullptr_t_64 = CCoreType("nullptr_t", 8, 8);
 
-global final SINGLE_KEYWORD_CORE_TYPES: {string: CCoreType} = {
-	"void" : C_void,
-	"float" : C_float,
-	"wchar_t" : C_wchar_t,
-	"bool" : C_bool,
-	"_Bool" : C_bool,
-	"char16_t" : C_char16_t,
-	"char32_t" : C_char32_t,
-};
-
-global final C_PROMOTE: {CCoreType...} = HashSet({
+global final C_PROMOTE: {CCoreType...} = UniqueSet({
 	C_bool,
 	C_char,
 	C_schar,
 	C_uchar,
 	C_short,
 	C_ushort,
+	C_char8_t,
+	C_char16_t,
 }).frozen;
-global final C_NUMERIC: {CCoreType...} = HashSet({
+global final C_NUMERIC: {CCoreType...} = UniqueSet({
 	C_bool,
 	C_char,
 	C_schar,
@@ -218,6 +271,7 @@ global final C_NUMERIC: {CCoreType...} = HashSet({
 	C_uint128_t_align4,
 	C_uint128_t_align8,
 	C_wchar_t,
+	C_char8_t,
 	C_char16_t,
 	C_char32_t,
 	C_float,
@@ -226,11 +280,35 @@ global final C_NUMERIC: {CCoreType...} = HashSet({
 	C_ldouble_16,
 }).frozen;
 
-global final C_NULLPTR: {CCoreType...} = HashSet({
+global final C_BOOLEAN: {CCoreType...} = UniqueSet({
+	C_bool,
+}).frozen;
+
+global final C_NULLPTR: {CCoreType...} = UniqueSet({
 	C_nullptr_t_32,
 	C_nullptr_t_64,
 }).frozen;
-global final C_INTEGER: {CCoreType...} = HashSet({
+
+global final C_INT: {CCoreType...} = UniqueSet({
+	C_int,
+	C_uint,
+}).frozen;
+
+global final C_LONG: {CCoreType...} = UniqueSet({
+	C_long32,
+	C_long64,
+	C_ulong32,
+	C_ulong64,
+}).frozen;
+
+global final C_LLONG: {CCoreType...} = UniqueSet({
+	C_llong_align4,
+	C_llong_align8,
+	C_ullong_align4,
+	C_ullong_align8,
+}).frozen;
+
+global final C_INTEGER: {CCoreType...} = UniqueSet({
 	C_bool,
 	C_char,
 	C_schar,
@@ -252,11 +330,12 @@ global final C_INTEGER: {CCoreType...} = HashSet({
 	C_uint128_t_align4,
 	C_uint128_t_align8,
 	C_wchar_t,
+	C_char8_t,
 	C_char16_t,
 	C_char32_t,
 }).frozen;
 
-global final C_FLOATING: {CCoreType...} = HashSet({
+global final C_FLOATING: {CCoreType...} = UniqueSet({
 	C_float,
 	C_double,
 	C_ldouble_12,
@@ -329,10 +408,23 @@ final class CStructType: CType {
 	public member name: string;
 	public member base: CStructType | none = none;
 	public member fields: {string: (CTypeRef, int)} = Dict();
-	public member fieldsByDeclarationOrder: {(string, CTypeRef)...} = [];
+	public member fieldsByDeclarationOrder: {(CTypeRef, string)...} = [];
+
+	property structRepr: string = {
+		get(): string {
+			if (name)
+				return f"struct {name}";
+			local result = File.Writer();
+			result << "struct {";
+			for (local fieldType, fieldName: fieldsByDeclarationOrder)
+				result << " " << fieldType.tostr(fieldName) << ";";
+			result << " }";
+			return result.string;
+		}
+	}
 
 	function tostr(varname: string = ""): string {
-		return varname ? f"struct {name} {varname}" : f"struct {name}";
+		return varname ? f"{structRepr} {varname}" : structRepr;
 	}
 
 	function getField(name: string): (CTypeRef, int) | none {
@@ -414,13 +506,14 @@ final class CFunctionType: CType {
 	this = default;
 	public member returnType: CType;
 	public member args: {(CTypeRef, string)...} = [];
+	@@Defaults for the last N arguments of the function
+	public member defaults: {Bytes...} = [];
 	public member isVarArgs: bool = false;
 	public property sizeof: int = { get(): int -> 0; };
 	public property alignof: int = { get(): int -> 1; };
 	function tostr(varname: string = ""): string {
-		if (varname.startswith("*") || " " in varname) {
+		if (!varname.replace(":", "").issymbol())
 			varname = f"({varname})";
-		}
 		if (args) {
 			varname = f"{varname}({
 				", ".join(for (local typ, name: args) typ.tostr(name))
