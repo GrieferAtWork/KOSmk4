@@ -1239,7 +1239,7 @@ function printExceptNameFunctionBodyForMappings(
 			text << exceptClassEndMarker;
 		}
 		fp << linePrefix << "static char const e_linear_"
-		   << min.hex(4) << "h_" << max.hex(4) << "h[] =\n"
+		   << min.tostr(16, 4) << "h_" << max.tostr(16, 4) << "h[] =\n"
 		   << linePrefix;
 		local isFirst = true;
 		for (local l: text.string.segments(64)) {
@@ -1262,12 +1262,12 @@ function printExceptNameFunctionBodyForMappings(
 		isFirst = false;
 		fp << "if (";
 		if (min != 0)
-			fp << classVariableName << " >= 0x" << min.hex(4) << " && ";
-		fp << classVariableName << " <= 0x" << max.hex(4) << ") {\n"
-		   << linePrefix << "	result = e_linear_" << min.hex(4) << "h_" << max.hex(4) << "h;\n"
+			fp << classVariableName << " >= " << min.hex(4) << " && ";
+		fp << classVariableName << " <= " << max.hex(4) << ") {\n"
+		   << linePrefix << "	result = e_linear_" << min.tostr(16, 4) << "h_" << max.tostr(16, 4) << "h;\n"
 		   << linePrefix << "	class_offset = " << classVariableName;
 		if (min != 0)
-			fp << " - 0x" << min.hex(4);
+			fp << " - " << min.hex(4);
 		fp << ";\n"
 			<< linePrefix << "} else ";
 	}
@@ -1301,7 +1301,7 @@ function printExceptNameFunctionBodyForMappings(
 		fp << linePrefix << "switch(" << classVariableName << ") {\n";
 		for (local classId: nonLinearMappings.keys.sorted()) {
 			fp << "\n"
-			   << linePrefix << "case 0x" << classId.hex(4) << ": {\n";
+			   << linePrefix << "case " << classId.hex(4) << ": {\n";
 			/* Deal with `nonLinearMappings' by generating a conventional STREND^N table. */
 			local mySubClassPartitions = subClassPartitions[classId];
 			assert #mySubClassPartitions >= 2 || mySubClassPartitions.first.first != 0;
@@ -1321,8 +1321,8 @@ function printExceptNameFunctionBodyForMappings(
 				}
 				if (exceptSubClassEndMarker != "\0" && !isFirst)
 					text << exceptSubClassEndMarker;
-				fp << linePrefix << "\tstatic char const e_" << classId.hex(4) << "h_linear_"
-				   << min.hex(4) << "h_" << max.hex(4) << "h[] =\n"
+				fp << linePrefix << "\tstatic char const e_" << classId.tostr(16, 4) << "h_linear_"
+				   << min.tostr(16, 4) << "h_" << max.tostr(16, 4) << "h[] =\n"
 				   << linePrefix << "\t";
 				local isFirst = true;
 				for (local l: text.string.segments(64)) {
@@ -1342,14 +1342,14 @@ function printExceptNameFunctionBodyForMappings(
 				isFirst = false;
 				fp << "if (";
 				if (min != 0)
-					fp << subClassVariableName << " >= 0x" << min.hex(4) << " && ";
-				fp << subClassVariableName << " <= 0x" << max.hex(4) << ") {\n"
-				   << linePrefix << "		result = e_" << classId.hex(4))
-				   << "h_linear_" << min.hex(4) << "h_" << max.hex(4) << "h;\n"
+					fp << subClassVariableName << " >= " << min.hex(4) << " && ";
+				fp << subClassVariableName << " <= " << max.hex(4) << ") {\n"
+				   << linePrefix << "		result = e_" << classId.tostr(16, 4)
+				   << "h_linear_" << min.tostr(16, 4) << "h_" << max.tostr(16, 4) << "h;\n"
 				   << linePrefix << "		subclass_offset = "
 				   << subClassVariableName;
 				if (min != 0)
-					fp << " - 0x" << min.hex(4);
+					fp << " - " << min.hex(4);
 				fp << ";\n"
 				   << linePrefix << "	} else ";
 			}
