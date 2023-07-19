@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix `DeeHashSet_NewItemsInherited()` producing broken objects"
-DEEMON_VERSION="2ea4314f11fc1a816e4d56f4bc125033e03f31d0"
+#     v -- "Fix soft-lock race condition with `Dee_rshared_lock_t`"
+DEEMON_VERSION="fa19fde3c67b18c0e83f6335f83e1d3ec92b00b9"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
