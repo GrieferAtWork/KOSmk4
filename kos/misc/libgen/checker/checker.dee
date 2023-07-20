@@ -240,6 +240,49 @@ again:
 		}
 	}
 
+	@@Parse an exception ID for a `__attribute__((throws(...)))` annotation
+	@@Exceptions can appear a any of the following:
+	@@+------------------------+---------------------------------------+
+	@@| `...`                  | Indicator for throws-any (@0)         |
+	@@| `"E_INVALID_ARGUMENT"` | Raw keyword as string                 |
+	@@| `E_INVALID_ARGUMENT`   | Raw keyword                           |
+	@@| `(0x0002)`             | Preprocessor expanded class           |
+	@@| `(0x0002, 0x0001)`     | Preprocessor expanded sub-class       |
+	@@| `(0x00010002)`         | Fully evaluated sub-class             |
+	@@| `0x0002`               | Preprocessor expanded class w/o paren |
+	@@| `0x00010002`           | Fully evaluated sub-class w/o paren   |
+	@@+------------------------+---------------------------------------+
+	function parseExceptionId(): int {
+		local tok = this.tok;
+		if (tok == "...") {
+			this.next();
+			return 0;
+		}
+		if (tok == "(") {
+			this.next();
+			local id: int = this.parseInt();
+			if (this.tok == ",") {
+				this.next();
+				id = (this.parseInt() << 16) | id;
+			}
+			this.skip(")");
+			return id;
+		}
+		local exceptName: string;
+		if (tok.startswith('"')) {
+			exceptName = this.parseString();
+		} else if (tok.issymbol()) {
+			exceptName = tok;
+			this.next();
+		} else {
+			return this.parseInt();
+		}
+		local result: int | none = this.exceptByName.get(exceptName);
+		if (result is none)
+			this.err(f"Unknown exception `{result}'");
+		return result;
+	}
+
 	function parseCTypeRefAttribute(tr: CTypeRef) {
 again:
 		local attributeName = this.requireSymbolName().strip("_");
@@ -274,6 +317,23 @@ again:
 				tr.flags |= CTYPEREF_FLAG_NODEREF;
 			this.next();
 			break;
+
+		case "throws": {
+			this.next();
+			this.skip("(");
+			local throws: {int...} | none = tr.attrib.get("throws");
+			if (throws is none)
+				tr.attrib["throws"] = throws = HashSet();
+			while (this.tok != ")") {
+				local id: int = parseExceptionId();
+				throws.insert(id);
+				throws.insert(id & 0xffff); /* Implied super-class */
+				if (this.tok != ",")
+					break;
+				this.next();
+			}
+			this.skip(")");
+		}	break;
 
 		case "nothrow": {
 			local isStar = false;
@@ -323,6 +383,11 @@ again:
 			tr.attrib["aligned"] = parseExprConstantInteger();
 			this.skip(")");
 			result = true;
+			goto again;
+
+		case "__extension__":
+			/* In GCC, this suppresses warnings about use of extensions. */
+			this.next();
 			goto again;
 
 		case "[":
@@ -2220,6 +2285,23 @@ return_unknown_void_pointer:
 				result.offset = 0;
 			}
 			return result;
+		}	break;
+
+		case "__builtin_throw": {
+			this.next();
+			this.skip("(");
+			local exceptCodeValue: CValue = parseExprRValue();
+			local exceptCode: int = exceptCodeValue.isConstExpr
+				? exceptCodeValue.constExprValue
+				: 0;
+			if (!isUnreachable) {
+				/* TODO: Assert that `exceptCode' is part of the caller's throws-attribute */
+			}
+			while (this.tok == ",") {
+				this.next();
+				this.parseExpr();
+			}
+			this.skip(")");
 		}	break;
 
 		case "sizeof":

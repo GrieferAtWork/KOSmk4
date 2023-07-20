@@ -916,6 +916,9 @@ err_bad_op:
 				}
 			}
 
+			/* TODO: Check the throws-annotation of the called function and compare it to
+			 *       the caller's */
+
 			/* Verify the nothrow-attribute of the  called function (and since we  know
 			 * the typing and attributes of all arguments used in the call, we can also
 			 * resolve *-prefixed nothrow levels!) */
@@ -978,9 +981,9 @@ err_bad_op:
 		}
 
 		/* Evaluate the function's return value
-		 * TODO: support for `inline',  which is then  handled
-		 *       by evaluating the function's body while using
-		 *       fixed constants for arguments. */
+		 * XXX: support for `inline',  which is then  handled
+		 *      by evaluating the function's body while using
+		 *      fixed constants for arguments. */
 		if (!isConstExpr) {
 			MAKE_VOID();
 		}

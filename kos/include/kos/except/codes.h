@@ -26,8 +26,9 @@
  * $ deemon -F kos/include/i386-kos/kos/bits/exception_data64.h
  * $ deemon -F kos/src/libc/magic/kos.except.c
  * $ deemon -F kos/src/libc/hybrid/except.c
+ * $ deemon -F kos/include/kos/except/checker.h
  * Or the one-liner
- * $ deemon -F kos/include/kos/bits/exception_data.h kos/include/i386-kos/kos/bits/exception_data32.h kos/include/i386-kos/kos/bits/exception_data64.h kos/src/libc/magic/kos.except.c
+ * $ deemon -F kos/include/kos/bits/exception_data.h kos/include/i386-kos/kos/bits/exception_data32.h kos/include/i386-kos/kos/bits/exception_data64.h kos/src/libc/magic/kos.except.c kos/include/kos/except/checker.h
  */
 
 #include <__stdinc.h>
@@ -1261,7 +1262,7 @@
 
 
 
-#if __SIZEOF_POINTER__ == 4
+#if __SIZEOF_POINTER__ == 4 || defined(__CHECKER__)
 #define EXCEPT_CODE(class, subclass) (__CCAST(__UINT32_TYPE__)(class) | __CCAST(__UINT32_TYPE__)(subclass) << 16)
 #define EXCEPT_CLASS(code)           ((code) & __UINT16_C(0xffff))
 #define EXCEPT_SUBCLASS(code)        ((code) >> 16)

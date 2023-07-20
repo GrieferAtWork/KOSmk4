@@ -48,6 +48,18 @@ class CParser {
 	@@When true, always extend the buffer (never clear it)
 	private member peeking: bool = false;
 
+	@@The currently loaded token
+	public final member tok: string = "";
+
+	@@Start of the currently loaded token (for @lc)
+	public final member tokStart: int = 0;
+
+	@@Mapping of defined exception IDs to their resp. name
+	public final member exceptByCode: {int: string} = Dict();
+
+	@@Mapping of defined exception names to their resp. ID
+	public final member exceptByName: {string: int} = Dict();
+
 #define ParserBackup Tuple
 
 	private member fp: File;
@@ -193,18 +205,12 @@ class CParser {
 		return string.chr(buf[bufPos + 1]); /* Yes, this isn't unicode-aware, but that's OK. */
 	}
 
-	@@The currently loaded token
-	public final member tok: string = "";
-
 	@@Returns the line/column pair for @tok
 	public final property lc: (int, int) = {
 		get(): (int, int) {
 			return lcAt(tokStart);
 		}
 	}
-
-	@@Start of the currently loaded token (for @lc)
-	public final member tokStart: int = 0;
 
 	public final function warnAt(pos: int | ParserBackup, warningName: string, message: string) {
 		if (warningName !in ignoredWarnings) {
@@ -359,7 +365,7 @@ again:
 
 		case "-": {
 			local ch2 = peekc();
-			if (ch2 == ch || ch2 in "=>") {
+			if (ch2 in "-=>") {
 				++bufPos;
 				ch += ch2;
 			}
@@ -416,9 +422,22 @@ again:
 					default:
 						goto warn_unknown_pragma;
 					}
+at_end_of_pragma:
+					while (bufPos < eol && buf.isspace(bufPos))
+						++bufPos;
+					if (bufPos < eol)
+						err(f"Unused token after #pragma directive: {repr buf[bufPos:eol]}");
+					tokStart = bufPos;
+				} else if (directive == "checker") {
 					next();
-					if (tokStart < eol)
-						err("Unused token after #pragma directive");
+					skip("throws");
+					local exceptName: string = parseSymbolName();
+					skip("=");
+					local exceptCode: int = requireInt();
+					/* Remember this exception */
+					exceptByCode[exceptCode] = exceptName;
+					exceptByName[exceptName] = exceptCode;
+					goto at_end_of_pragma;
 				} else {
 warn_unknown_pragma:
 					warn("-Wunknown-pragmas", f"Unknown pragma: {buf[pragmaStart:eol]}");

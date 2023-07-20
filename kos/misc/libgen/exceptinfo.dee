@@ -1448,6 +1448,85 @@ function printExceptNameFunctionBody(
 
 
 
+function printExceptNameCheckerPragmasForMappings(
+		fp: File, mappings: {int: {int: ExceptClass}},
+		keyExceptClassName: Callable with ExceptClass) {
+	for (local classId, subClasses: mappings.sorted()) {
+		for (local subClassId, exceptClass: subClasses.sorted()) {
+			print("#pragma checker throws ",
+				keyExceptClassName(exceptClass), " = ",
+				(subClassId << 16 | classId).hex());
+		}
+	}
+}
+
+
+
+function printExceptNameCheckerPragmas(
+		fp: File = none,
+		ppCondMappings: {string: {int: {int: ExceptClass}}} = none,
+		keyExceptClassName: Callable with ExceptClass = none) {
+	if (fp is none)
+		fp = File.stdout;
+	if (ppCondMappings is none)
+		ppCondMappings = getExceptionCodeMappings();
+	if (keyExceptClassName is none)
+		keyExceptClassName = (x: ExceptClass) -> x.name;
+	/* Use ppexpr optimizations to turn a sequence of:
+	 * >> #if FOO
+	 * >> a
+	 * >> #endif
+	 * >> #if !FOO
+	 * >> b
+	 * >> #endif
+	 *
+	 * into:
+	 * >> #if FOO
+	 * >> a
+	 * >> #else
+	 * >> b
+	 * >> #endif */
+	local assumptions: ppexpr.PPAssume = none;
+	local didEncounter1: bool = false;
+	for (local ppCond, mappings: ppCondMappings) {
+		if (didEncounter1) {
+			print File.stderr: ("Warning: Impossible mappings for:", repr ppCond);
+			continue;
+		}
+		ppCond = ppexpr.ppParse(ppCond).optimize(assume: assumptions);
+		local strCond = ppCond.tostr();
+		if (strCond == "1") {
+			didEncounter1 = true;
+			if (assumptions !is none) {
+				fp << "#else /* ... */\n";
+				assumptions = none;
+			}
+			printExceptNameCheckerPragmasForMappings(
+				fp, mappings, keyExceptClassName);
+			continue;
+		}
+		if (assumptions !is none) {
+			fp << "#elif " << strCond << "\n";
+		} else {
+			printPreprocessorExpressionIf(File.stdout, strCond);
+			assumptions = ppexpr.createPPAssume();
+		}
+		ppCond = ppexpr
+			.PPBranch(ppexpr.BRT_NOT, ppCond)
+			.optimize(assume: assumptions);
+		assumptions.addAssumption(ppCond);
+		printExceptNameCheckerPragmasForMappings(
+			fp, mappings, keyExceptClassName);
+	}
+	if (assumptions !is none) {
+		fp << "#endif /* ... */\n";
+	} else if (didEncounter1) {
+		fp << "#endif /* !... */\n";
+	}
+}
+
+
+
 
 
 

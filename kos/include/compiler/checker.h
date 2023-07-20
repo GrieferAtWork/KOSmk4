@@ -77,6 +77,7 @@
 #define __GCC_HAS_BUILTIN___builtin_unreachable
 #define __GCC_HAS_BUILTIN___builtin_constant_p
 #define __GCC_HAS_BUILTIN___builtin_has_attribute
+#define __GCC_HAS_BUILTIN___builtin_throw /* __attribute__((noreturn)) void __builtin_throw(int code, ...); */
 
 #ifndef __has_feature
 #define __NO_has_feature
@@ -87,7 +88,7 @@
 #ifndef __NO_has_feature
 #define __NO_has_extension
 #endif /* !__NO_has_feature */
-#define __has_extension  __has_feature
+#define __has_extension __has_feature
 #endif /* !__has_extension */
 
 #ifndef __has_declspec_attribute
@@ -117,7 +118,6 @@
 
 #define __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #define __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#ifdef __CC__
 #define __COMPILER_HAVE_LONGDOUBLE
 #ifndef __LONGDOUBLE
 #define __LONGDOUBLE long double
@@ -126,12 +126,9 @@
 #define __COMPILER_HAVE_PRAGMA_PACK
 #define __COMPILER_HAVE_ADDRESSIBLE_LABELS /* void *p = &&foo; goto *p; foo: */
 #define __COMPILER_HAVE_TYPEOF
-#if defined(__clang__) || !defined(__DARWIN_NO_LONG_LONG)
 #define __COMPILER_HAVE_LONGLONG
-#endif /* __clang__ || !__DARWIN_NO_LONG_LONG */
 #define __COMPILER_HAVE_TRANSPARENT_STRUCT
 #define __COMPILER_HAVE_TRANSPARENT_UNION
-#endif /* __CC__ */
 
 #ifdef __cplusplus
 #define __STATIC_ASSERT_IS_static_assert
@@ -146,8 +143,6 @@
 #endif /* !__cplusplus */
 
 #define __COMPILER_ASMNAME __asm__
-#undef __extension__
-#define __extension__
 
 #if defined(__x86_64__) || defined(__x86_64)
 #if (defined(__PE__) || defined(__CYGWIN__) || defined(__CYGWIN32__) || defined(__MINGW32__) || \
@@ -231,6 +226,8 @@
 #define __ATTR_UNCHECKED        __checker_attribute__(__noderef__, __nothrow__(2))
 #define __ATTR_CHECKED          __checker_attribute__(__deref__, __nothrow__(2))
 
+#define __ATTR_THROWS(...)      __checker_attribute__(__throws__(__VA_ARGS__))
+#define __ATTR_THROWING         __checker_attribute__(__throws__(...))
 
 
 #define __ATTR_NORETURN                      __checker_attribute__(__noreturn__)

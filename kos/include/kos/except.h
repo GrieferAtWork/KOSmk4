@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8bdc67b */
+/* HASH CRC-32:0xe00d4d56 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -352,6 +352,15 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(except_code_t __code);
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
 #define __PRIVATE_THROW_PACKAGE_CODE(args...) __PRIVATE_THROW_PACKAGE_CODEN(__HYBRID_PP_VA_NARGS(args))(args)
 #endif /* ... */
+
+#ifdef __CHECKER__
+#define __except_throw_defined
+#define __except_thrown_defined
+#undef except_throw
+#undef except_thrown
+#define except_throw(code)          __builtin_throw(code)
+#define except_thrown(code, n, ...) __builtin_throw(code, __VA_ARGS__)
+#endif /* __CHECKER__ */
 
 #ifdef __except_thrown_defined
 #ifdef __except_throw_defined

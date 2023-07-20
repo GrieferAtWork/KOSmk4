@@ -61,9 +61,9 @@ function commonTypeRefAttrib(a: {string: string | int},
                              b: {string: string | int},
                              r: {string: string | int}) {
 	for (local key: a.keys | b.keys) {
-		local aValue: string | int | none = a.get(key);
-		local bValue: string | int | none = b.get(key);
-		local rValue: string | int;
+		local aValue: Object | none = a.get(key);
+		local bValue: Object | none = b.get(key);
+		local rValue: Object;
 		if (aValue is none) {
 			rValue = bValue;
 		} else if (bValue is none) {
@@ -74,6 +74,8 @@ function commonTypeRefAttrib(a: {string: string | int},
 			rValue = aValue;
 			if (rValue < bValue)
 				rValue = bValue;
+		} else if (key == "throws") {
+			rValue = aValue | bValue;
 		} else if (key == "nothrow") {
 			aValue = int(aValue.lstrip("*"));
 			bValue = int(bValue.lstrip("*"));
@@ -105,11 +107,12 @@ final class CTypeRef {
 	public member flags: int = 0;
 
 	@@Type attributes. Map of:
-	@@ - @"nothrow"               -> @string   (nothrow level, as string-coded decimal, possible prefixed by @"*")
-	@@ - @"tag"                   -> @string   (function tag)
-	@@ - @"require_caller_tag"    -> @string   (function caller tag requirements)
-	@@ - @"aligned"               -> @int      (alignment)
-	public member attrib: {string: string | int} = Dict();
+	@@ - @"nothrow"               -> @string    (nothrow level, as string-coded decimal, possible prefixed by @"*")
+	@@ - @"tag"                   -> @string    (function tag)
+	@@ - @"require_caller_tag"    -> @string    (function caller tag requirements)
+	@@ - @"aligned"               -> @int       (alignment)
+	@@ - @"throws"                -> @{int...}  (IDs of thrown exceptions; @0 for `...`)
+	public member attrib: {string: Object} = Dict();
 
 	/* Helpers */
 	operator str(): string -> tostr();
@@ -132,8 +135,20 @@ final class CTypeRef {
 		if (flags & CTYPEREF_FLAG_NODEREF)
 			varname = f"__attribute__((noderef)) {varname}";
 		for (local attrName, attrVal: attrib) {
-			if (attrName in ["tag", "require_caller_tag"])
+			switch (attrName) {
+			case "throws":
+				attrVal = ",".join(
+					for (local key: attrVal.sorted())
+						key ? key.hex() : "..."
+				);
+				break;
+			case "tag":
+			case "require_caller_tag":
 				attrVal = repr attrVal;
+				break;
+			default:
+				break;
+			}
 			varname = f"__attribute__(({attrName}({attrVal}))) {varname}";
 		}
 		return typ.tostr(varname);

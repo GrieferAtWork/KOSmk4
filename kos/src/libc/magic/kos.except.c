@@ -1900,8 +1900,6 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(except_code_t __code);
 %{
 
 #ifndef THROW
-}
-%{
 #ifdef __HYBRID_PP_VA_NARGS
 #define __PRIVATE_THROW_PACKAGE_CODE1(code) code
 #define __PRIVATE_THROW_PACKAGE_CODE2       EXCEPT_CODE
@@ -1912,6 +1910,15 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(except_code_t __code);
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
 #define __PRIVATE_THROW_PACKAGE_CODE(args...) __PRIVATE_THROW_PACKAGE_CODEN(__HYBRID_PP_VA_NARGS(args))(args)
 #endif /* ... */
+
+#ifdef __CHECKER__
+#define __except_throw_defined
+#define __except_thrown_defined
+#undef except_throw
+#undef except_thrown
+#define except_throw(code)          __builtin_throw(code)
+#define except_thrown(code, n, ...) __builtin_throw(code, __VA_ARGS__)
+#endif /* __CHECKER__ */
 
 #ifdef __except_thrown_defined
 #ifdef __except_throw_defined
