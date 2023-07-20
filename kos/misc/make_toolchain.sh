@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix soft-lock race condition with `Dee_rshared_lock_t`"
-DEEMON_VERSION="fa19fde3c67b18c0e83f6335f83e1d3ec92b00b9"
+#     v -- "Fix GCC warning"
+DEEMON_VERSION="7f8358087879cca54923b556ff7a377a4d22adea"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
