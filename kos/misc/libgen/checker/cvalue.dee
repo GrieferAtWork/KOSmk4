@@ -203,47 +203,43 @@ final class CValue {
 		if (newTyp is CArrayType)
 			goto err_bad_op;
 
-		if (!explicit && !IDENTICAL(oldTyp, newTyp)) {
-			/* Error  when  `!explicit' and  casting between
-			 * pointer types, where neither type is `void *' */
-			if (oldTyp is CPointerType && newTyp is CPointerType) {
-				local oldPointerBase: CTypeRef = oldTyp.base;
-				local newPointerBase: CTypeRef = newTyp.base;
-				if (IDENTICAL(oldPointerBase, newPointerBase)) {
-					/* Pointer-cast where the pointer bases are identical is always OK */
-				} else if (IDENTICAL(oldPointerBase.typ, newPointerBase.typ)) {
-					/* Pointer-cast where the the base-types are identical is OK,
-					 * but warn if the  cast causes const/volatile to  disappear. */
-					local oldCV = oldPointerBase.flags & CTYPEREF_FLAG_CV;
-					local newCV = newPointerBase.flags & CTYPEREF_FLAG_CV;
-					if ((oldCV & newCV) != oldCV) {
+		if (!oldTyp.isConvertibleTo(newTyp, explicit)) {
+			/* Cast isn't allowed for some reason (figure out why) */
+			if (newTyp === C_void) {
+				/* Special case: cast-to-void is always OK. */
+			} else if (oldTyp is CPointerType && newTyp is CPointerType) {
+				if (!explicit) {
+					local oldPointerBaseTypeRef: CTypeRef = oldTyp.base;
+					local newPointerBaseTypeRef: CTypeRef = newTyp.base;
+					if (oldPointerBaseTypeRef.typ.isConvertibleTo(newPointerBaseTypeRef.typ, explicit) ||
+					    newPointerBaseTypeRef.typ === C_void) {
+						/* Pointer-cast where the the base-types are identical is OK,
+						 * but warn if the  cast causes const/volatile to  disappear. */
+						local oldCV = oldPointerBaseTypeRef.flags & CTYPEREF_FLAG_CV;
+						local newCV = newPointerBaseTypeRef.flags & CTYPEREF_FLAG_CV;
+						if ((oldCV & newCV) != oldCV) {
+							checker.warn("-Wcast",
+								f"Implicit cast from `{oldTyp}' to `{newTyp}' "
+								f"removes `{" ".join(() -> {
+									if (oldCV & CTYPEREF_FLAG_CONST)
+										yield "const";
+									if (oldCV & CTYPEREF_FLAG_VOLATILE)
+										yield "volatile";
+								}())}'");
+						}
+					} else {
 						checker.warn("-Wcast",
-							f"Implicit cast from `{oldTyp}' to `{newTyp}' "
-							f"removes `{" ".join(() -> {
-								if (oldCV & CTYPEREF_FLAG_CONST)
-									yield "const";
-								if (oldCV & CTYPEREF_FLAG_VOLATILE)
-									yield "volatile";
-							}())}'");
+								f"Implicit cast between incompatible pointer "
+								f"types from `{oldTyp}' to `{newTyp}'");
 					}
-				} else if (oldPointerBase.typ === C_void || newPointerBase.typ === C_void) {
-					/* Pointer-cast to/from void is always OK */
-				} else {
+				}
+			} else if (oldTyp is CPointerType && newTyp in C_NUMERIC) {
+				if (!explicit) {
 					checker.warn("-Wcast",
-							f"Implicit cast between incompatible pointer "
-							f"types from `{oldTyp}' to `{newTyp}'");
+						f"Implicit integer/pointer-cast from `{oldTyp}' to `{newTyp}'");
 				}
-			} else if (newTyp is CPointerType) {
-				if (oldTyp is C_NULLPTR) {
-					/* Implicit cast from `nullptr' to pointer is OK. */
-				} else if (oldTyp in C_INTEGER && isConstExpr && constExprValue(checker) == 0) {
-					/* Implicit cast from 0-constant to pointer is OK. */
-				} else {
-					goto warn_implicit_pointer_cast;
-				}
-			} else if (oldTyp is CPointerType) {
-warn_implicit_pointer_cast:
-				checker.warn("-Wcast", f"Implicit integer/pointer-cast from `{oldTyp}' to `{newTyp}'");
+			} else {
+				goto err_bad_op;
 			}
 		}
 
@@ -801,7 +797,7 @@ do_compare_operation:
 			local lhsTypeSize = lhsTyp.sizeof;
 			local rhsTypeSize = rhsTyp.sizeof;
 			if ((lhsTypeSize < rhsTypeSize) ||
-			    (lhsTypeSize == rhsTypeSize && rhsTyp in C_SIGNED)) {
+			    (lhsTypeSize == rhsTypeSize && (rhsTyp in C_SIGNED && lhsTyp !in C_SIGNED))) {
 				/* The right-hand-side operand is the type to use. */
 				inplaceCast(checker, rhs.typeref);
 				goto again;
@@ -850,11 +846,57 @@ err_bad_op:
 	public function call(checker: Checker, args: {CValue...}, mustCastArgs: bool = true): CValue
 		-> copy(this).inplaceCall(checker, args, mustCastArgs);
 	public function inplaceCall(checker: Checker, args: {CValue...}, mustCastArgs: bool = true): CValue {
-		// TODO: Overloaded function support
+		/* Overloaded function support */
+		local functionName: string = "<unnamed>";
+		local functionDecl: (string, int, int) | none = none;
+		switch (kind) {
+
+		case CVALUE_LSYMBOL:
+		case CVALUE_RSYMBOL:
+		case CVALUE_ASYMBOL:
+			functionName = data.name;
+			functionDecl = data.decl;
+			if (!functionName)
+				functionName = "<unnamed>";
+			if (data is COverloadedFunctionSymbol) {
+				local types: {CType...} = Tuple(args.each.typeref.typ);
+				local candidates: {CSymbol...} = data.getOverloadForTypes(types);
+				if (!candidates) {
+					for (local x: data.overloads)
+						print x;
+					checker.err(
+						f"No overload of `{functionName}' matches "
+						f"argument list `({", ".join(types)})'");
+				} else if (#candidates > 1) {
+					checker.err(
+						f"More than one overload of `{functionName}' "
+						f"matches argument list `({", ".join(types)})'"
+						f"{"".join(
+							for (local candidate: candidates)
+								checker.forceFormatMessageAddend(
+									candidate.decl, f"Candidate `{candidate}'")
+						)}");
+				} else {
+					data         = candidates.first;
+					typeref      = data.typeref;
+					functionName = data.name;
+					functionDecl = data.decl;
+					if (!functionName)
+						functionName = "<unnamed>";
+				}
+			}
+			break;
+
+		default:
+			break;
+		}
+
 		inplaceRValue(checker);
 		local funType: CType = typeref.typ;
 		if (funType !is CFunctionType) {
-			checker.err(f"Cannot call non-function-type `{funType}'");
+			checker.err(
+				f"Cannot call non-function-type `{funType.tostr(functionName)}'"
+				f"{checker.formatMessageAddend(functionDecl, "Symbol was declared here")}");
 			return this;
 		}
 
@@ -863,8 +905,9 @@ err_bad_op:
 		if (#args > #funArgs) {
 			if (!funType.isVarArgs) {
 				checker.warn("-Wcall",
-					f"Too many arguments in function call: need at most "
-					f"`{#funArgs}', but got `{#args}'");
+					f"Too many arguments in call to `{functionName}': "
+					f"need at most `{#funArgs}', but got `{#args}'"
+					f"{checker.formatMessageAddend(functionDecl, "Function was declared here")}");
 			}
 		} else if (#args < #funArgs) {
 			local missingArgsFirst: int = #args;
@@ -885,8 +928,8 @@ err_bad_op:
 				}
 			} else {
 				checker.warn("-Wcall",
-					f"Too few arguments in function call: need at least "
-					f"`{defaultArgsFirst}', but only got `{#args}'");
+					f"Too few arguments in call to `{functionName}': "
+					f"need at least `{defaultArgsFirst}', but only got `{#args}'");
 			}
 		}
 
@@ -894,7 +937,7 @@ err_bad_op:
 		if (mustCastArgs) {
 			args = List(args);
 			for (local i: [:#funArgs]) {
-				args[i] = args[i].cast(funArgs[i].first);
+				args[i] = args[i].cast(checker, funArgs[i].first);
 			}
 		}
 
@@ -907,17 +950,33 @@ err_bad_op:
 				if (callerTag is none) {
 					checker.warn("-Wtag",
 						f"Function `{checker.currentFunctionName}' needs "
-						f"`__attribute__((tag({repr reqTag})))'");
+						f"`__attribute__((tag({repr reqTag})))' because "
+						f"it calls `{functionName}'");
 				} else if (reqTag != callerTag) {
 					checker.warn("-Wtag",
 						f"Function `{checker.currentFunctionName}' is tagged as "
 						f"`__attribute__((tag({repr callerTag})))', but needs "
-						f"`__attribute__((tag({repr reqTag})))'");
+						f"`__attribute__((tag({repr reqTag})))' because "
+						f"it calls `{functionName}'");
 				}
 			}
 
-			/* TODO: Check the throws-annotation of the called function and compare it to
-			 *       the caller's */
+			/* Check the throws-annotation of the called function and compare it to the caller's */
+			local calledThrows: {int...} = typeref.attrib.get("throws", ());
+			if (calledThrows) {
+				local callerThrows: {int...} = checker.currentFunctionTypeRef.attrib.get("throws", ());
+				local missingThrows: {int...} = (calledThrows & ~callerThrows).sorted();
+				if (missingThrows && (0 !in callerThrows)) {
+					local missingThrowsNames: {string...} = (
+						for (local id: missingThrows)
+							id == 0 ? "..." : checker.exceptByCode.get(id, id.hex())
+					).frozen;
+					checker.warn("-Wthrows",
+						f"Function `{checker.currentFunctionName}' is missing "
+						f"annotations `THROWS({", ".join(missingThrowsNames)})' "
+						f"because it calls `{functionName}'");
+				}
+			}
 
 			/* Verify the nothrow-attribute of the  called function (and since we  know
 			 * the typing and attributes of all arguments used in the call, we can also
@@ -970,6 +1029,7 @@ err_bad_op:
 					if (currentFunctionNothrowLevel < calleeNothrowLevel) {
 						checker.warn("-Wnothrow",
 							f"Call to `{getPrettyNothrowLevelName(calleeNothrowLevel)}'-function "
+							f"`{functionName}' "
 							f"in function `{checker.currentFunctionName}' marked as "
 							f"`{getPrettyNothrowLevelName(currentFunctionNothrowLevel)}'");
 					}
@@ -1000,7 +1060,7 @@ global final C_char_typeref: CTypeRef = CTypeRef(C_char);
 @@for   a  deemon  @Bytes  or  sequence-of-integer  object.
 function cvalueFromBytesAsString(s: Bytes): CValue {
 	return CValue(
-			kind:    CVALUE_RCONST,
+			kind:    CVALUE_LCONST,
 			typeref: CTypeRef(CArrayType(C_char, #s, 1), CTYPEREF_FLAG_CONST),
 			data:    s,
 			offset:  0);
@@ -1032,6 +1092,8 @@ global final C_false: CValue = CValue(kind: CVALUE_RCONST, typeref: C_bool_typer
 global final C_true:  CValue = CValue(kind: CVALUE_RCONST, typeref: C_bool_typeref, data: Bytes({ 1 }), offset: 0);
 global final C_nullptr_32: CValue = CValue(kind: CVALUE_RCONST, typeref: CTypeRef(C_nullptr_t_32), data: Bytes({ 0, 0, 0, 0 }), offset: 0);
 global final C_nullptr_64: CValue = CValue(kind: CVALUE_RCONST, typeref: CTypeRef(C_nullptr_t_64), data: Bytes({ 0, 0, 0, 0, 0, 0, 0, 0 }), offset: 0);
+global final C_void_typeref: CTypeRef = CTypeRef(C_void);
+global final C_voidval: CValue = CValue(kind: CVALUE_AVOID, typeref: C_void_typeref);
 
 final class CScope: CNamespace {
 	this = super;

@@ -210,7 +210,7 @@
 #endif /* !__cplusplus */
 
 /* Automatic namespacing for header-local implementations of functions. */
-#if defined(__cplusplus) && !defined(__CHECKER__)
+#ifdef __cplusplus
 #ifdef __INTELLISENSE__
 #define __LIBC_LOCAL_NAME(x) x
 #define __LIBC_LOCAL_NAME_IS_IDENTITY

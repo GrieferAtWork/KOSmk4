@@ -60,9 +60,9 @@ class CParser {
 	@@Mapping of defined exception names to their resp. ID
 	public final member exceptByName: {string: int} = Dict();
 
-#define ParserBackup Tuple
+#define ParserBackup  Tuple
 
-	private member fp: File;
+	private member fp: File | none;
 	private member buf: Bytes = none;
 	private member bufPos: int = 0;
 	private member bufLen: int = 0;
@@ -74,6 +74,49 @@ class CParser {
 	private member bufStartCol: int = 1;
 
 	private member ignoredWarningsStack: {{string...}...} = [];
+
+	@@Override the parser position with a previously saved sub-chunk
+	public final function subChunkPush(bytes: Bytes, flc: (string, int, int)): ParserBackup {
+		local backup = (
+			bufPos, tok, tokStart, tokenId, filename, fp,
+			buf, warnPos, bufStartLine, bufStartCol, peeking);
+		tok = "";
+		tokStart = 0;
+		tokenId = 0;
+		filename = flc[0];
+		fp = none;
+		buf = bytes;
+		bufPos = 0;
+		bufLen = #bytes;
+		warnPos = none;
+		bufStartLine = flc[1];
+		bufStartCol = flc[2];
+		peeking = true;
+		this.next();
+		return backup;
+	}
+
+	@@Restore the context from before a call to @subChunkPush
+	public final function subChunkPop(backup: ParserBackup) {
+		bufPos, tok, tokStart, tokenId, filename, fp, buf,
+			warnPos, bufStartLine, bufStartCol, peeking = backup...;
+		bufLen = #buf;
+	}
+
+	@@Start doing the initial pass of a sub-chunk
+	public final function subChunkBegin(): ParserBackup {
+		local oldPeeking = peeking;
+		peeking = true;
+		return (tokStart, flc, oldPeeking);
+	}
+
+	@@End the initial pass of a sub-chunk (returning its bytes and starting file/line/column)
+	public final function subChunkEnd(backup: ParserBackup): (Bytes, (string, int, int)) {
+		local bufStart: int;
+		local flc: (string, int, int);
+		bufStart, flc, peeking = backup...;
+		return (buf[bufStart:tokStart], flc);
+	}
 
 	public final function backupCreate(): ParserBackup {
 		local oldPeeking = peeking;
@@ -212,6 +255,32 @@ class CParser {
 		}
 	}
 
+	@@Returns the filename/line/column pair for @tok
+	public final property flc: (string, int, int) = {
+		get(): (string, int, int) {
+			local lines = buf.count("\n", 0, tokStart);
+			if (!lines) {
+				return (filename, bufStartLine, bufStartCol + tokStart);
+			} else {
+				local lastLineStart = buf.rindex("\n", 0, tokStart);
+				return (filename, bufStartLine + lines, tokStart - lastLineStart);
+			}
+		}
+	}
+
+	public final function formatMessageAddend(flc: (string, int, int) | none, message: string): string {
+		if (flc is none)
+			return "";
+		return forceFormatMessageAddend(flc, message);
+	}
+
+	public final function forceFormatMessageAddend(
+			flc: (string, int, int) | none, message: string): string {
+		if (flc is none)
+			return "";
+		return f"\n{flc[0]}({flc[1]},{flc[2]}) : Note : {message}";
+	}
+
 	public final function warnAt(pos: int | ParserBackup, warningName: string, message: string) {
 		if (warningName !in ignoredWarnings) {
 			local line, col = this.lcAt(pos)...;
@@ -291,8 +360,13 @@ class CParser {
 	@@Assert that the current token is
 	@@@return The next token
 	public final function skip(tok: string): string {
-		if (this.tok != tok)
-			require(tok);
+		if (this.tok != tok) {
+			if (this.tok.startswith(tok)) {
+				this.bufPos = this.tokStart + #tok;
+			} else {
+				require(tok);
+			}
+		}
 		return next();
 	}
 
@@ -489,7 +563,7 @@ warn_unknown_pragma:
 				ch += ch2;
 				if (peekc() == "=") {
 					++bufPos;
-					ch += ch2;
+					ch += "=";
 				}
 			} else if (ch2 == "=") {
 				++bufPos;

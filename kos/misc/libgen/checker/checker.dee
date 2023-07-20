@@ -23,6 +23,14 @@ import * from .ctype;
 import * from .cvalue;
 import UniqueSet from collections;
 
+/* Dump top-level declarations as they are parsed. */
+#undef DUMP_TOP_LEVEL_DECLS
+#if 0
+#define DUMP_TOP_LEVEL_DECLS
+#endif
+
+#define TemplateParamValue (CTypeRef | Bytes)
+
 #define IDENTICAL(a, b) (type(a) === type(b) && ((a) == (b)))
 
 final class Checker: CParser {
@@ -128,16 +136,25 @@ final class Checker: CParser {
 
 
 	@@@param tab: One of:
-	@@            - @"symbols": CSymbol
-	@@            - @"typedefs": CTypeRef
-	@@            - @"namespaces": CNamespace
-	@@            - @"structSymbols": CStructType
-	@@            - @"unionSymbols": CStructType
-	@@            - @"enumSymbols": CEnumType
+	@@            - @"symbols": @CSymbol or @CSymbolTemplate
+	@@            - @"typedefs": @CTypeRef or @CTypeRefTemplate
+	@@            - @"namespaces": @CNamespace
+	@@            - @"structSymbols": @CStructType
+	@@            - @"unionSymbols": @CStructType
+	@@            - @"enumSymbols": @CEnumType
 	function lookup(tab: string, name: string): Object | none {
 		for (local ns: namespaceStack) {
 			local result = ns.lookup(tab, name);
 			if (result !is none)
+				return result;
+		}
+		return none;
+	}
+
+	function lookupEx(tab: string, name: string, check: Callable): Object | none {
+		for (local ns: namespaceStack) {
+			local result = ns.lookup(tab, name);
+			if (result !is none && check(result))
 				return result;
 		}
 		return none;
@@ -196,36 +213,46 @@ again:
 			goto again;
 		}
 		_nsLookupChildChainSymbolName = name;
-		local result = ns.lookup(tab, name);
+		local result: Object | none = ns.lookup(tab, name);
 		if (result is none && errorIfNotFound)
-			this.err(f"Unknown symbol in namespace {repr name}");
+			this.err(f"Unknown symbol `{name}' in namespace `{ns.name}' [tab: {repr tab}]");
 		return result;
 	}
 
 	@@Parse a namespace lookup expression, returning @none if nothing was parsed
 	function nsLookupChain(tab: string): Object | none {
 		local name = this.tok;
+		local backup;
+		local baseNs;
 		if (name == "::" && cxx) {
 			/* Root-namespace-relative symbol lookup */
-			this.next();
-			return nsLookupChildChain(globalNamespace, tab);
+			backup = this.backupCreate();
+			baseNs = globalNamespace;
+			goto next_and_lookup_in_baseNs;
 		}
 		if (!name.issymbol())
 			return none;
-		local backup = this.backupCreate();
+		backup = this.backupCreate();
 		try {
 			local result;
 			if (this.next() == "::" && cxx) {
 				/* Lookup chain */
-				local baseNs = lookup("namespaces", name);
+				baseNs = lookup("namespaces", name);
 				if (baseNs is none) {
 					this.backupRestore(backup);
 					return this.err(f"Unknown namespace {repr name}");
 				}
+next_and_lookup_in_baseNs:
 				this.next();
 				result = nsLookupChildChain(baseNs, tab, errorIfNotFound: false);
 			} else {
-				result = lookup(tab, name);
+				if (tab == "typedefs" && cxx && this.tok == "<") {
+					result = lookupEx(tab, name, x -> x is CTypeRefTemplate);
+					if (result is none)
+						result = lookup(tab, name);
+				} else {
+					result = lookup(tab, name);
+				}
 				_nsLookupChildChainSymbolName = name;
 			}
 			if (result is none) {
@@ -388,6 +415,7 @@ again:
 		case "__extension__":
 			/* In GCC, this suppresses warnings about use of extensions. */
 			this.next();
+			result = true;
 			goto again;
 
 		case "[":
@@ -461,7 +489,8 @@ again:
 	}
 
 	private member _anonStructMemberId: int = 0;
-	function parseStructMembers(tr: CTypeRef, fields: {(CTypeRef, string)...}) {
+	function parseStructMembers(tr: CTypeRef, structType: CStructType,
+	                            fields: {(CTypeRef, string)...}) {
 again:
 		switch (this.tok) {
 
@@ -486,25 +515,30 @@ again:
 			local fieldType: CTypeRef;
 			local fieldName: string;
 default_case:
-			fieldType, fieldName = parseTypeRefWithoutStorageClass()...;
-			if (this.tok == ":") {
-				/* Bit fields */
-				this.next();
-				/* XXX: Actually support? */
-				parseExprConstantInteger();
-			}
-			if (!fieldName && fieldType.typ !is CStructType) {
-				fieldName = f"__anon_struct_member_{_anonStructMemberId}";
-				++_anonStructMemberId;
-			}
-			if (fieldName) {
-				for (local none, existingName: fields) {
-					if (fieldName == existingName)
-						this.err(f"Duplicate field {repr fieldName} in struct type");
+			for (fieldType, fieldName, none: parseTypeRefs("-")) {
+				if (this.tok == ":") {
+					/* Bit fields */
+					this.next();
+					/* XXX: Actually support? */
+					parseExprConstantInteger();
 				}
-				tr.typ.fieldsByDeclarationOrder.append((fieldType, fieldName));
+				if (!fieldName && fieldType.typ !is CStructType) {
+					this.warn("-Wtypedef", f"Unnamed struct field of type `{fieldType}'");
+					fieldName = f"__anon_struct_member_{_anonStructMemberId}";
+					++_anonStructMemberId;
+				}
+				if (fieldName) {
+					for (local none, existingName: fields) {
+						if (fieldName == existingName)
+							this.err(f"Duplicate field {repr fieldName} in struct type");
+					}
+					tr.typ.fieldsByDeclarationOrder.append((fieldType, fieldName));
+				}
+				/* Use a WeakRef to prevent a reference loop */
+				if (gc.isreferring(fieldType.typ, structType))
+					fieldType.typ = WeakRef(fieldType.typ);
+				fields.append((fieldType, fieldName));
 			}
-			fields.append((fieldType, fieldName));
 			this.skip(";");
 			goto again;
 		}	break;
@@ -512,25 +546,27 @@ default_case:
 		}
 	}
 
-	function parseStruct(tr: CTypeRef, isUnion: bool): CStructType {
-		local structName = "";
-		if (this.tok.issymbol()) {
-			structName = this.parseSymbolName();
-			parseCTypeRefAttributes(tr);
-		}
+	function parseStruct(structName: string, tr: CTypeRef, isUnion: bool): CStructType {
 		local struct: CStructType;
 		if (structName) {
-			local tab = namespaceStack.first.operator . (isUnion ? "unionSymbols" : "structSymbols");
-			struct = tab.get(structName);
+			local tabName: string = isUnion ? "unionSymbols" : "structSymbols";
+			/* Check if the struct was already defined somewhere */
+			struct = lookup(tabName, structName);
 			if (struct is none) {
 				struct = CStructType(name: structName);
+				local tab = namespaceStack.first.operator . (tabName);
+				if (tab is none)
+					namespaceStack.first.operator . (tabName) = tab = Dict();
 				tab[structName] = struct;
 
 				/* C++ also requires us to put the type into the typedefs table. */
 				if (cxx) {
 					local typedefs = namespaceStack.first.typedefs;
-					if (structName !in typedefs)
+					if (structName !in typedefs) {
+						if (typedefs is none)
+							namespaceStack.first.typedefs = typedefs = Dict();
 						typedefs[structName] = CTypeRef(typ: struct);
+					}
 				}
 			} else {
 				parseCTypeRefAttributes(tr);
@@ -553,19 +589,18 @@ default_case:
 			this.next();
 			if (this.tok in ["private", "public"])
 				this.next();
-			local typedef = nsLookupChain("typedefs");
-			if (typedef is none)
-				this.err("No such struct base type");
-			if (typedef.typ !is CStructType)
-				this.err(f"Expected struct-type for struct base, but got {typedef}");
-			struct.base = typedef.typ;
+			local baseTypeRef: CTypeRef = CTypeRef();
+			parseCTypeRefBase(baseTypeRef);
+			if (baseTypeRef.typ !is CStructType)
+				this.err(f"Expected struct-type for struct base, but got {baseTypeRef}");
+			struct.base = baseTypeRef.typ;
 		} else {
 			if (this.tok != "{")
 				return struct;
 		}
 		this.skip("{");
 		local fields: {(CTypeRef, string)...} = [];
-		parseStructMembers(tr, fields);
+		parseStructMembers(tr, struct, fields);
 		this.skip("}");
 		parseCTypeRefAttributes(tr);
 
@@ -616,6 +651,7 @@ default_case:
 	function parseEnumMembers(ns: CNamespace, enumTypeRef: CTypeRef) {
 		local prevEnumConstantValue: int = 0;
 		while (this.tok != "}") {
+			local enumDecl = this.flc;
 			local enumName = this.parseSymbolName();
 			local enumValue: int;
 			if (this.tok == "=") {
@@ -625,7 +661,9 @@ default_case:
 			}
 			if (enumName in ns.symbols)
 				this.err(f"Symbol `{enumName}' has already been defined");
-			ns.symbols[enumName] = CSymbol(enumTypeRef, enumValue);
+			if (ns.symbols is none)
+				ns.symbols = Dict();
+			ns.symbols[enumName] = CSymbol(enumName, enumDecl, enumTypeRef, enumValue);
 			prevEnumConstantValue = enumValue;
 		}
 	}
@@ -644,23 +682,36 @@ default_case:
 		}
 		local enum: CEnumType | CEnumClassType;
 		if (enumName) {
+			if (enumType === CEnumClassType) {
+				enum = CEnumClassType(name: enumName);
+				goto skip_normal_enum_namespace;
+			}
 			local tab = namespaceStack.first.enumSymbols;
 			enum = tab.get(enumName);
 			if (enum is none) {
 				enum = enumType(name: enumName);
+				if (tab is none)
+					namespaceStack.first.enumSymbols = tab = Dict();
 				tab[enumName] = enum;
 
 				/* C++ also requires us to put the type into the typedefs table. */
+skip_normal_enum_namespace:
 				if (cxx) {
 					local typedefs = namespaceStack.first.typedefs;
-					if (enumName !in typedefs)
+					if (enumName !in typedefs) {
+						if (typedefs is none)
+							namespaceStack.first.typedefs = typedefs = Dict();
 						typedefs[enumName] = CTypeRef(typ: enum);
+					}
 					if (enumType === CEnumClassType) {
 						/* Since enum classes are also namespaces, must
 						 * also register the type as a child-namespace! */
 						local namespaces = namespaceStack.first.namespaces;
-						if (enumName !in namespaces)
+						if (enumName !in namespaces) {
+							if (namespaces is none)
+								namespaceStack.first.namespaces = namespaces = Dict();
 							namespaces[enumName] = enumType;
+						}
 					}
 				}
 			} else {
@@ -759,7 +810,7 @@ default_case:
 
 		if (aTyp is CPointerType) {
 			/* Special case: if one of the types is a nullptr, return the other type */
-			if (bTyp in C_NULLPTR)
+			if (bTyp is CCoreNullptrType)
 				goto return_a;
 			if (bTyp is CPointerType) {
 				/* Return the common type of 2 pointer types.
@@ -800,7 +851,7 @@ default_case:
 			}
 		} else if (bTyp is CPointerType) {
 			/* Special case: if one of the types is a nullptr, return the other type */
-			if (aTyp in C_NULLPTR)
+			if (aTyp is CCoreNullptrType)
 				goto return_b;
 		}
 after_pointer:
@@ -817,8 +868,9 @@ return_b:
 	@@Parse a type base reference
 	@@@return @none if no type was parsed, else the type itself (also stored in @tr.typ)
 	function parseCTypeRefBase(tr: CTypeRef): CType | none {
-		local hasCv = parseCTypeRefConstVolatile(tr);
-		local intFlags = 0;
+		local hasCv: bool = parseCTypeRefConstVolatile(tr);
+		local typedef: CTypeRef | CTypeRefTemplate;
+		local intFlags: int = 0;
 #define BASETYPE_FLAG_SIGNED    0x0001 /* FLAG: `signed' was given */
 #define BASETYPE_FLAG_UNSIGNED  0x0002 /* FLAG: `unsigned' was given */
 #define BASETYPE_FLAG_SIGNMASK  0x0003 /* Mask for explicit sign prefix. */
@@ -909,7 +961,18 @@ again:
 				this.err("struct/union/class with integer keyword");
 			this.next();
 			parseCTypeRefAttributes(tr);
-			parseStruct(tr, isUnion);
+			local structName: string = "";
+			if (this.tok.issymbol()) {
+				structName = this.parseSymbolName();
+				parseCTypeRefAttributes(tr);
+				if (this.tok == "<") {
+					typedef = lookupEx("typedefs", structName, x -> x is CTypeRefTemplate);
+					if (typedef is none)
+						return this.err(f"No such struct/union/class template-typedef `{structName}'");
+					goto resolve_template_typedef;
+				}
+			}
+			parseStruct(structName, tr, isUnion);
 		}	break;
 
 		case "enum": {
@@ -1021,11 +1084,25 @@ default_case:
 			default: {
 				/* Lookup a typedef */
 lookup_typedef:
-				local typedef: CTypeRef = nsLookupChain("typedefs");
+				typedef = nsLookupChain("typedefs");
 				if (typedef is none) {
 					if (hasCv)
 						this.err("Unable to parse type after const/volatile");
 					return none;
+				}
+				if (typedef is CTypeRefTemplate) {
+resolve_template_typedef:
+					local templateParamValues: {TemplateParamValue...} = [];
+					this.skip("<");
+					while (!this.tok.startswith(">") && #templateParamValues < #typedef.params) {
+						local param: TemplateParam = typedef.params[#templateParamValues];
+						templateParamValues.append(parseTemplateParamValue(param));
+						if (this.tok != ",")
+							break;
+						this.next();
+					}
+					typedef = instantiateTemplate(typedef, templateParamValues);
+					this.skip(">");
 				}
 				tr.importFrom(typedef);
 				goto done;
@@ -1045,11 +1122,39 @@ done:
 		return tr.typ;
 	}
 
+	function parseTemplateParamValue(param: TemplateParam): TemplateParamValue {
+		local typeref: CTypeRef | none = param.typeref;
+		if (typeref !is none) {
+			if (this.tok == "{")
+				return parseTypedExprConstant(typeref); /* Parse a constant */
+			/* Can only parse unary expressions here since everything else would
+			 * result in ambiguity when it comes  to ">", ">>", ">=" and  ">>="!
+			 * If you want full expressions here, you just need to use parens! */
+			local cvalue: CValue = parseExprUnary()
+				.inplaceRValue(this)
+				.inplaceCast(this, typeref);
+			if (!cvalue.isConstExpr) {
+				if (!isUnreachable)
+					this.err("Expected a compile-time constant expression");
+				return none;
+			}
+			return cvalue.constExprBytes;
+		}
+		return parseTypeRefWithoutStorageClassOrName();
+	}
+
 	function parseTypeRefWithoutStorageClass(): (CTypeRef, string) {
 		local tr, nam, sc = parseTypeRef(storageClass: "-")...;
 		if (sc != "-")
 			this.err(f"Storage class {repr sc} is invalid in this context");
 		return (tr, nam);
+	}
+
+	function parseTypeRefWithoutStorageClassOrName(): CTypeRef {
+		local tr, nam, sc = parseTypeRef("-", "-")...;
+		if (sc != "-")
+			this.err(f"Storage class {repr sc} is invalid in this context");
+		return tr;
 	}
 
 	function parseTypeRefInnerSuffix(tr: CTypeRef) {
@@ -1099,7 +1204,7 @@ suffixAgain:
 				 * arrays. */
 				local dimExpr: CValue = parseExprRValue();
 				if (dimExpr.isConstExpr) {
-					dim = dimExpr.constExprValue;
+					dim = dimExpr.constExprValue(this);
 				} else {
 					dim = none;
 				}
@@ -1188,132 +1293,177 @@ prefixAgain:
 		return (tr, name, storageClass);
 	}
 
+	function parseTypeRefs(storageClass: string = "",
+	                       tryParse: bool = false)
+			: {(CTypeRef, string, string)...} {
+		if (!storageClass)
+			storageClass = parseStorageClass();
+		local tr = CTypeRef();
+		if (parseCTypeRefBase(tr) is none) {
+			if (tryParse && !storageClass)
+				return;
+			this.err(f"Cannot parse type from {repr this.tok}");
+		}
+		if (!storageClass)
+			storageClass = parseStorageClass();
+		for (;;) {
+			local itemTr: CTypeRef;
+			local itemName: string;
+			itemTr, itemName = parseTypeRefInner(copy tr)...;
+			yield (itemTr, itemName, storageClass);
+			if (this.tok != ",")
+				break;
+			this.next();
+		}
+	}
+
 	function parseDeclaration(storageClass: string = "",
 	                          tryParse: bool = false,
 	                          withSemiColon: bool = true): bool {
-		local typeref, name;
-		typeref, name, storageClass = parseTypeRef("", storageClass, tryParse)...;
-		if (typeref is none)
-			return false;
-		if (!name)
-			return true;
-#if 1 /* Dump top-level declarations as they are parsed. */
-		if (currentFunctionName is none) {
-			print("decl: ", storageClass, " ",
-				typeref.tostr(currentNamespacePrefix + name), ";");
-		}
-#endif
-
-		/* Create a typedef/symbol for the parsed declaration. */
-		if (storageClass == "typedef") {
-			local tab: {string: CTypeRef} = namespaceStack.first.typedefs;
-			local existingDecl: CTypeRef = tab.get(name);
-			if (existingDecl is none) {
-				tab[name] = typeref;
-			} else {
-				if (typeref == existingDecl) {
-					/* Ignore typedef re-declaration where the new type matches the old */
-				} else {
-					this.err(f"redeclaration of {tab[:-1]} {repr name}");
-				}
+		local typeref: CTypeRef;
+		local name: string;
+		local result: bool = false;
+		for (typeref, name, storageClass: parseTypeRefs(storageClass, tryParse)) {
+			result = true;
+#ifdef DUMP_TOP_LEVEL_DECLS
+			if (currentFunctionName is none) {
+				print("decl: ", storageClass, " ",
+					typeref.tostr(currentNamespacePrefix + name), ";");
 			}
-			if (withSemiColon)
-				this.skip(";");
-			return true;
-		}
+#endif /* DUMP_TOP_LEVEL_DECLS */
 
-		/* Handle symbol assembly names. */
-		if (this.tok in ["asm", "__asm", "__asm__"]) {
-			this.next();
-			this.skip("(");
-			this.parseString();
-			this.skip(")");
-		}
-
-		local tab: {string: CSymbol} = namespaceStack.first.symbols;
-		local decl: CSymbol | none = tab.get(name);
-		if (decl !is none) {
-			/* Special case for function overloads. */
-			if (typeref.typ is CFunctionType && this.tok != ";" && !isInExternC && cxx) {
-				local overload: CSymbol;
-				if (decl is COverloadedFunctionSymbol) {
-					overload = decl.getOrCreateOverload(typeref);
-				} else if (decl.typeref.equalsForRedeclaration(typeref)) {
-					overload = decl;
+			/* Create a typedef/symbol for the parsed declaration. */
+			if (storageClass == "typedef") {
+				if (!name) {
+					this.warn("-Wtypedef", f"Unnamed typedef for type `{typeref}'");
 				} else {
-					/* Initial overload given */
-					local overloadsDecl: COverloadedFunctionSymbol = COverloadedFunctionSymbol();
-					overloadsDecl.overloads.append(decl);
-					decl = CSymbol(typeref);
-					overloadsDecl.overloads.append(decl);
-					namespaceStack.first.symbols[name] = overloadsDecl;
+					local tab: {string: CTypeRef | CTypeRefTemplate} | none = namespaceStack.first.typedefs;
+					local existingDecl: CTypeRef | CTypeRefTemplate | none = tab.get(name);
+					if (existingDecl is none) {
+						if (tab is none)
+							namespaceStack.first.typedefs = tab = Dict();
+						tab[name] = typeref;
+					} else if (existingDecl is CTypeRefTemplate) {
+						this.err(
+							f"Redefinition of template typedef `{name}' as non-template"
+							f"{this.formatMessageAddend(existingDecl.decl, "See definition of template")}");
+					} else {
+						if (typeref == existingDecl) {
+							/* Ignore typedef re-declaration where the new type matches the old */
+						} else {
+							this.err(f"redeclaration of {tab[:-1]} {repr name}");
+						}
+					}
 				}
+				continue;
+			}
+
+			/* Handle symbol assembly names. */
+			if (this.tok in ["asm", "__asm", "__asm__"]) {
+				this.next();
+				this.skip("(");
+				this.parseString();
+				this.skip(")");
+			}
+
+			if (!name) {
+				/* Need a name to have an initializer or a symbol! */
+				continue;
+			}
+
+			local tab: {string: CSymbol | CSymbolTemplate} | none = namespaceStack.first.symbols;
+			local decl: CSymbol | CSymbolTemplate | none = tab.get(name);
+			if (decl !is none) {
+				if (decl is CSymbolTemplate) {
+					this.err(
+						f"Redefinition of template symbol `{name}' as non-template"
+						f"{this.formatMessageAddend(decl.decl, "See definition of template")}");
+				}
+
+				/* Special case for function overloads. */
+				if (typeref.typ is CFunctionType && !isInExternC && cxx) {
+					if (decl is COverloadedFunctionSymbol) {
+						decl = decl.getOrCreateOverload(typeref);
+					} else if (decl.typeref.equalsForRedeclaration(typeref)) {
+						/* Still the same symbol */
+					} else {
+						/* Initial overload given */
+						local overloadsDecl = COverloadedFunctionSymbol();
+						overloadsDecl.name = name;
+						overloadsDecl.decl = decl.decl;
+						overloadsDecl.typeref = none;
+						overloadsDecl.overloads.append(decl);
+						decl = CSymbol(name, this.flc, typeref);
+						overloadsDecl.overloads.append(decl);
+						namespaceStack.first.symbols[name] = overloadsDecl;
+					}
+					if (this.tok == "{") {
+						this.skip("{");
+						decl.val = parseFunctionBody(typeref, name);
+						this.skip("}");
+						/* Don't allow extra definitions here, and don't require a ';' */
+						return true;
+					}
+					continue;
+				}
+				if (decl.typeref.equalsForRedeclaration(typeref) &&
+					namespaceStack.first === globalNamespace) {
+					/* Ignore re-declaration where the new type matches the old */
+					decl.typeref.importFrom(typeref);
+				} else {
+					this.err(f"redeclaration of `{decl.typeref.tostr(name)}' "
+							 f"as `{typeref.tostr(name)}'");
+				}
+				if (decl.val is bound)
+					continue; /* Symbol already had a value assigned. */
+			} else {
+				if (tab is none)
+					namespaceStack.first.symbols = tab = Dict();
+				decl = CSymbol(name, this.flc, typeref);
+				tab[name] = decl;
+			}
+
+			/* Must parse an initializer/function-body for the declaration. */
+			if (typeref.typ is CFunctionType) {
+				if (this.tok != "{")
+					continue;
 				this.skip("{");
 				decl.val = parseFunctionBody(typeref, name);
 				this.skip("}");
+				/* Don't allow extra definitions here, and don't require a ';' */
 				return true;
-			}
-			if (decl.typeref.equalsForRedeclaration(typeref) &&
-			    namespaceStack.first === globalNamespace) {
-				/* Ignore re-declaration where the new type matches the old */
-				decl.typeref.importFrom(typeref);
 			} else {
-				this.err(f"redeclaration of `{decl.typeref.tostr(name)}' "
-				         f"as `{typeref.tostr(name)}'");
+				if (this.tok != "=")
+					continue;
+				this.skip("=");
+				local val = parseTypedExpr(typeref);
+				if (!isUnreachable) {
+					/* Override the declaration's type so pointer attributes are inherited
+					 * >> void foo(USER CHECKED void *p) {
+					 * >>     void *x = p; // Here, `x' automatically inherits pointer attributes from `p'
+					 * >> } */
+					decl.typeref = val.typeref;
+					decl.val     = val;
+				}
 			}
-			if (decl.val is bound) {
-				/* Symbol already had a value assigned. */
-				if (withSemiColon)
-					this.skip(";");
-				return true;
-			}
-		} else {
-			decl = CSymbol(typeref: typeref);
-			tab[name] = decl;
 		}
-
-		if (withSemiColon && this.tok == ";") {
-			this.next();
-			return true;
-		}
-
-		/* Must parse an initializer/function-body for the declaration. */
-		if (typeref.typ is CFunctionType) {
-			if (!withSemiColon && this.tok != "{")
-				return true;
-			this.skip("{");
-			decl.val = parseFunctionBody(typeref, name);
-			this.skip("}");
-		} else {
-			if (!withSemiColon && this.tok != "=")
-				return true;
-			this.skip("=");
-			local val = parseTypedExpr(typeref);
-			if (!isUnreachable) {
-				/* Override the declaration's type so pointer attributes are inherited
-				 * >> void foo(USER CHECKED void *p) {
-				 * >>     void *x = p; // Here, `x' automatically inherits pointer attributes from `p'
-				 * >> } */
-				decl.typeref = val.typeref;
-				decl.val     = val;
-			}
-			if (withSemiColon)
-				this.skip(";");
-		}
-		return true;
+		if (result && withSemiColon)
+			this.skip(";");
+		return result;
 	}
 
 	@@Returns the function's return value
 	function parseFunctionBody(funTypRef: CTypeRef, name: string): Bytes | none {
 		/* Push a namespace for the function's body. */
 		local fnScope: CScope = CScope();
+		fnScope.symbols = Dict();
 		fnScope.name = name;
 
 		/* Define local symbols for each of the function's arguments. */
 		for (local argTypeRef, argName: funTypRef.typ.args) {
 			if (!argName)
 				continue;
-			fnScope.symbols[argName] = CSymbol(argTypeRef, none);
+			fnScope.symbols[argName] = CSymbol(argName, this.flc, argTypeRef, none);
 		}
 
 		/* Setup the context for evaluation of the function body */
@@ -1363,7 +1513,7 @@ prefixAgain:
 	}
 
 	function parseGCCAssemblyArguments() {
-		if (!this.tok.startswith(":")) {
+		if (!this.tok.startswith(":") && this.tok != ")") {
 			for (;;) {
 				parseGCCAssemblyArgument();
 				if (this.tok != ",")
@@ -1426,7 +1576,7 @@ prefixAgain:
 		this.skip(";");
 	}
 
-	function parseStatement() {
+	function parseStatement(): CValue | none {
 again:
 		switch (this.tok) {
 
@@ -1436,6 +1586,19 @@ again:
 
 		case ";":
 			this.next();
+			break;
+
+		case "template":
+			if (!cxx)
+				goto default_case;
+			parseTemplate();
+			break;
+
+		case "static_assert":
+		case "_Static_assert":
+			if (this.tok != (cxx ? "static_assert" : "_Static_assert"))
+				goto default_case;
+			parseStaticAssert();
 			break;
 
 		case "{": {
@@ -1557,7 +1720,7 @@ again:
 					parseStatement();
 				}
 			} else if (ifVal.isConstExpr) {
-				if (ifVal.constExprValue) {
+				if (ifVal.constExprValue(this)) {
 					parseStatement();
 					if (this.tok == "else") {
 						this.next();
@@ -1632,7 +1795,7 @@ again:
 			encounteredBreak = false;
 			if (isUnreachable) {
 				parseStatement();
-			} else if (whileVal.isConstExpr && !whileVal.constExprValue) {
+			} else if (whileVal.isConstExpr && !whileVal.constExprValue(this)) {
 				/* Loop condition is never true -> loop body is dead */
 				isUnreachable = true;
 				parseStatement();
@@ -1645,7 +1808,7 @@ again:
 				namespaceStack.popfront();
 				if (encounteredBreak) {
 					isUnreachable = false; /* There is a reachable break, so the loop can be exited */
-				} else if (whileVal.isConstExpr && whileVal.constExprValue) {
+				} else if (whileVal.isConstExpr && whileVal.constExprValue(this)) {
 					isUnreachable = true; /* For-ever loop without break */
 				}
 			}
@@ -1696,7 +1859,7 @@ again:
 						}
 					}
 				}
-			} else if (whileVal.constExprValue) {
+			} else if (whileVal.constExprValue(this)) {
 				/* For-ever loop without break never returns */
 				if (!encounteredBreak)
 					isUnreachable = true;
@@ -1719,8 +1882,10 @@ again:
 			namespaceStack.pushfront(CScope());
 			this.next();
 			this.skip("(");
-			if (!parseDeclaration(tryParse: true, withSemiColon: false))
-				parseExprComma();
+			if (this.tok != ";") {
+				if (!parseDeclaration(tryParse: true, withSemiColon: false))
+					parseExprComma();
+			}
 			this.skip(";");
 			local savedIsInLoop         = isInLoop;
 			local savedEncounteredBreak = encounteredBreak;
@@ -1736,7 +1901,7 @@ again:
 					parseExprComma();
 				this.skip(")");
 				parseStatement();
-			} else if (condVal.isConstExpr && !condVal.constExprValue) {
+			} else if (condVal.isConstExpr && !condVal.constExprValue(this)) {
 				/* Loop condition is never true -> loop body is dead */
 				isUnreachable = true;
 				if (this.tok != ")")
@@ -1757,7 +1922,7 @@ again:
 				namespaceStack.popfront();
 				if (encounteredBreak) {
 					isUnreachable = false; /* There is a reachable break, so the loop can be exited */
-				} else if (condVal.isConstExpr && condVal.constExprValue) {
+				} else if (condVal.isConstExpr && condVal.constExprValue(this)) {
 					isUnreachable = true; /* For-ever loop without break */
 				}
 			}
@@ -1806,6 +1971,7 @@ again:
 		}	break;
 
 		default:
+default_case:
 			if (this.tok.issymbol() && this.nextTokIsSingleColon()) {
 				/* Special case: labels. */
 				this.next();
@@ -1819,8 +1985,9 @@ again:
 				goto again;
 			}
 			if (!parseDeclaration(tryParse: true)) {
-				parseExprComma();
+				local result: CValue = parseExprComma();
 				this.skip(";");
+				return result;
 			}
 			break;
 		}
@@ -1952,7 +2119,7 @@ return_void_value:
 					local innerStruct: CStructType = fieldType.typ;
 					local firstFieldOffset: int;
 					if (innerStruct.fieldsByDeclarationOrder) {
-						local firstFieldName: string = innerStruct.fieldsByDeclarationOrder.first.first;
+						local firstFieldName: string = innerStruct.fieldsByDeclarationOrder.first.last;
 						firstFieldOffset = innerStruct.fields[firstFieldName].last;
 					} else {
 						firstFieldOffset = offset;
@@ -1979,6 +2146,624 @@ after_field_init:
 		return result;
 	}
 
+	function parseSkipUntil(oneOfTheseTokens: {string...}) {
+		local recursionStack: {string...} = [];
+		for (;;) {
+			if (!recursionStack && (this.tok in oneOfTheseTokens))
+				break;
+			switch (this.tok) {
+			case "(": case "<":
+			case "[": case "{":
+				recursionStack.append({
+					"(": ")",
+					"<": ">",
+					"[": "]",
+					"{": "}",
+				}[this.tok]);
+				break;
+			case ")": case ">":
+			case "]": case "}":
+				if (recursionStack && recursionStack.last == this.tok)
+					recursionStack.popback();
+				break;
+			default:
+				break;
+			}
+			this.next();
+		}
+	}
+
+	@@Skip over `__attribute__((...))` and `[[...]]`
+	function parseSkipCTypeRefAttributes(): bool {
+		local result: bool = false;
+again:
+		switch (this.tok) {
+
+		case "[":
+			/* Be careful not to parse as attribute in case of array type. */
+			if (this.firstCharOfNextTok() != "[")
+				break;
+			this.next();
+			this.skip("[");
+			parseSkipUntil({ "]" });
+			this.skip("]");
+			this.skip("]");
+			result = true;
+			goto again;
+
+		case "__attribute":
+		case "__attribute__":
+			this.next();
+			this.skip("(");
+			this.skip("(");
+			parseSkipUntil({ ")" });
+			this.skip(")");
+			this.skip(")");
+			result = true;
+			goto again;
+
+		case "alignas":
+			this.next();
+			this.skip("(");
+			parseSkipUntil(")");
+			this.skip(")");
+			result = true;
+			goto again;
+
+		case "__extension__":
+			/* In GCC, this suppresses warnings about use of extensions. */
+			this.next();
+			result = true;
+			goto again;
+
+		default:
+			break;
+		}
+		return result;
+	}
+
+	function parseSkipCTypeRefConstVolatile() {
+again:
+		switch (this.tok) {
+		case "const":
+		case "__const":
+		case "__const__":
+		case "volatile":
+		case "__volatile":
+		case "__volatile__":
+		case "restrict":
+		case "__restrict":
+		case "__restrict__":
+			this.next();
+			goto again;
+		case "[":
+		case "__attribute":
+		case "__attribute__":
+		case "alignas":
+		case "__extension__":
+			if (!parseSkipCTypeRefAttributes())
+				break;
+			goto again;
+		default: break;
+		}
+	}
+
+	@@Skip over the base-portion of a typeref expression
+	@@s.a. @parseCTypeRefBase
+	function parseSkipCTypeRefBase(): bool {
+		local hasIntFlags: bool = false;
+		local result: bool = false;
+again:
+		switch (this.tok) {
+
+		case "[":
+		case "__attribute":
+		case "__attribute__":
+		case "alignas":
+		case "__extension__":
+			if (!parseSkipCTypeRefAttributes())
+				break;
+			result = true;
+			goto again;
+
+		case "const":
+		case "__const":
+		case "__const__":
+		case "volatile":
+		case "__volatile":
+		case "__volatile__":
+		case "restrict":
+		case "__restrict":
+		case "__restrict__":
+			goto next;
+
+		case "signed":
+		case "__signed":
+		case "__signed__":
+		case "unsigned":
+		case "__unsigned":
+		case "__unsigned__":
+		case "int":
+		case "char":
+		case "short":
+		case "long":
+		case "__int8":
+		case "__int16":
+		case "__int32":
+		case "__int64":
+		case "__int128":
+		case "double":
+		case "void":
+		case "float":
+		case "wchar_t":
+		case "__wchar_t":
+		case "_Bool":
+		case "bool":
+		case "char8_t":
+		case "char16_t":
+		case "char32_t":
+			hasIntFlags = true;
+			goto next;
+
+		case "class":
+		case "struct":
+		case "union":
+		case "enum":
+			this.next();
+			parseSkipCTypeRefAttributes();
+			if (this.tok.issymbol())
+				this.next();
+			if (this.tok == ":")
+				parseSkipUntil("{");
+			if (this.tok == "{") {
+				this.next();
+				parseSkipUntil("}");
+				this.skip("}");
+			}
+			result = true;
+			break;
+
+		case "decltype":
+		case "typeof":
+		case "__typeof":
+		case "__typeof__":
+			this.next();
+			this.skip("(");
+			parseSkipUntil(")");
+			this.skip(")");
+			break;
+
+		default:
+			if (hasIntFlags) {
+				parseSkipCTypeRefConstVolatile();
+				break;
+			}
+			if (this.tok.issymbol()) {
+				result = true;
+				this.next();
+				while (this.tok == "::") {
+		case "::":
+					this.next();
+					this.requireSymbolName();
+					this.next();
+				}
+				if (this.tok == "<") {
+					this.next();
+					parseSkipUntil({ ">" });
+					this.skip(">");
+				}
+				result = true;
+				parseSkipCTypeRefConstVolatile();
+				break;
+			}
+			break;
+
+		}
+		return result;
+next:
+		result = true;
+		this.next();
+		goto again;
+	}
+
+	@@Skip over the inner-portion of a typeref expression
+	@@s.a. @parseTypeRefInner
+	@@@return: * : The name of the typeref expression (or an empty string if unnamed)
+	function parseSkipTypeRefInner(): string {
+		/* Parse the inner type-ref prefix (iow: pointer types) */
+prefixAgain:
+		if (this.tok == "*") {
+			this.next();
+			if (this.tok in ["__ptr32", "__ptr64"])
+				this.next();
+			parseSkipCTypeRefConstVolatile();
+			goto prefixAgain;
+		}
+		parseSkipCTypeRefAttributes();
+
+		local result: string;
+		if (this.tok == "(") {
+			this.next();
+			result = parseSkipTypeRefInner();
+			this.skip(")");
+		} else {
+			/* Parse variable name */
+			if (this.tok.issymbol()) {
+				result = this.tok;
+				this.next();
+			} else {
+				result = "";
+			}
+		}
+		return result;
+	}
+
+
+	function parseTemplateParam(): TemplateParam {
+		local result: TemplateParam = TemplateParam();
+		if (this.tok in ["class", "typename"]) {
+			this.next();
+			result.typeref = none;
+			result.decl = this.flc;
+			result.name = this.parseSymbolName();
+		} else {
+			result.decl = this.flc;
+			result.typeref, result.name = parseTypeRefWithoutStorageClass()...;
+			result.typeref.flags |= CTYPEREF_FLAG_CONST; /* Needed so constants are inlined */
+		}
+		if (this.tok == "=") {
+			local backup = this.subChunkBegin();
+			parseSkipUntil({ ",", ">", ">>", ">=", ">>=" });
+			result.defaultInit, result.defaultDecl = this.subChunkEnd(backup)...;
+		}
+		return result;
+	}
+
+	function instantiateTemplate(template: CTypeRefTemplate | CSymbolTemplate,
+	                             args: {TemplateParamValue...}): CTypeRef | CSymbol {
+		local templateParams: {TemplateParam...} = template.params;
+		local templateScope: CScope | none = none;
+		assert #args <= #templateParams;
+		local hasAllTemplateArgs = #args >= #templateParams;
+
+		/* Check if another instance already exists for this set of parameters. */
+		local result: CTypeRef | CSymbol | none;
+		if (hasAllTemplateArgs) {
+			if (args !is Tuple)
+				args = Tuple(args);
+			result = template.instances.get(args);
+			if (result !is none)
+				return result;
+		}
+
+		local templateScope = CScope();
+		namespaceStack.pushfront(templateScope);
+		for (local i: [:#args]) {
+			local argValue: TemplateParamValue = args[i];
+			local argParam: TemplateParam = templateParams[i];
+			assert (argValue is Bytes) == (argParam.typeref !is none);
+			templateScope.defineTemplateParamValue(argParam, argValue);
+		}
+
+		/* Load default template arguments for missing arguments. */
+		if (!hasAllTemplateArgs) {
+			args = List(args);
+			for (local argParam: templateParams[#args:]) {
+				if (argParam.defaultInit is none)
+					this.err(f"Template argument `{argParam.name}' is missing and has no default");
+				local backup = this.subChunkPush(argParam.defaultInit, argParam.defaultDecl);
+				local argValue: TemplateParamValue;
+				if (argParam.typeref is none) {
+					argValue = parseTypeRefWithoutStorageClassOrName();
+				} else {
+					argValue = parseTypedExprConstant(argParam.typeref);
+				}
+				if (this.tok) {
+					this.err(
+						f"Unrecognized token `{this.tok}' after default value "
+						f"of template `{template.name}' argument `{argParam.name}'");
+				}
+				this.subChunkPop(backup);
+				templateScope.defineTemplateParamValue(argParam, argValue);
+				args.append(argValue);
+			}
+			args = Tuple(args);
+			/* Check if another instance already exists for this set of parameters. */
+			result = template.instances.get(args);
+			if (result !is none) {
+				namespaceStack.popfront();
+				return result;
+			}
+		} else {
+			if (args !is Tuple)
+				args = Tuple(args);
+		}
+
+		/* At this point, all template parameters have been loaded.
+		 * -> Time to parse the template's type initializer. */
+		local backup = this.subChunkPush(template.typeInit, template.typeDecl);
+		/* Remember this template instantiation */
+		if (template is CSymbolTemplate) {
+			result = CSymbol(template.name, template.decl);
+			template.instances[args] = result;
+			local typeref: CTypeRef;
+			try {
+				typeref = parseTypeRefWithoutStorageClass().first;
+			} catch (e...) {
+				this.errMsg(f"In symbol-template type-instantiation "
+				            f"`{template.instantiationRepr(this, args)}'");
+				this.subChunkPop(backup);
+				throw;
+			}
+			if (this.tok) {
+				this.err(f"Unrecognized token `{this.tok}' after "
+				         f"symbol-template `{template.name}' type-block");
+			}
+			this.subChunkPop(backup);
+
+			/* We're actually parsing a symbol initializer, so we must also parse the symbol! */
+			backup = this.subChunkPush(template.valInit, template.valDecl);
+			local symValue: CValue;
+			try {
+				symValue = parseTypedExpr(typeref);
+			} catch (e...) {
+				this.errMsg(f"In symbol-template init-instantiation "
+				            f"`{template.instantiationRepr(this, args)}'");
+				this.subChunkPop(backup);
+				throw;
+			}
+			if (this.tok) {
+				this.err(f"Unrecognized token `{this.tok}' after "
+				         f"symbol-template `{template.name}' init-block");
+			}
+			this.subChunkPop(backup);
+			local symValueConstant = symValue.isConstExpr ? symValue.constExprBytes : none;
+			assert result is CSymbol;
+			result.typeref = typeref;
+			result.val = symValueConstant;
+		} else {
+			result = CTypeRef();
+			template.instances[args] = result;
+			try {
+				if (parseCTypeRefBase(result) is none)
+					this.err(f"Cannot parse type from {repr this.tok}");
+				local finalTypeRef = parseTypeRefInner(result, "").first;
+				if (finalTypeRef !== result)
+					template.instances[args] = result = finalTypeRef;
+			} catch (e...) {
+				this.errMsg(f"In typedef-template instantiation "
+				            f"`{template.instantiationRepr(this, args)}'");
+				this.subChunkPop(backup);
+				throw;
+			}
+			if (this.tok) {
+				this.err(f"Unrecognized token `{this.tok}' after "
+				         f"template `{template.name}' type-block");
+			}
+			this.subChunkPop(backup);
+		}
+
+		/* Cleanup the scope that was used during the template instantiation. */
+		namespaceStack.popfront();
+		return result;
+	}
+
+	function parseTemplate(): CTypeRefTemplate | CSymbolTemplate {
+		assert this.tok == "template";
+		this.next();
+		this.skip("<");
+		local templateParams: {TemplateParam...} = [];
+		while (!this.tok.startswith(">")) {
+			templateParams.append(parseTemplateParam());
+			if (this.tok != ",")
+				break;
+			this.next();
+		}
+		this.skip(">");
+
+		/* Simple case: `template using':
+		 * >> template<class T> using Foo = Bar<T>; */
+		local result: CTypeRefTemplate | CSymbolTemplate;
+		if (this.tok == "using") {
+			this.next();
+			result = CTypeRefTemplate();
+			result.decl = this.flc;
+			result.name = this.requireSymbolName();
+			local tab: {string: CTypeRef | CTypeRefTemplate} | none = namespaceStack.first.typedefs;
+			if (tab is none)
+				namespaceStack.first.typedefs = tab = Dict();
+			if (result.name in tab)
+				this.err(f"Redefinition of typedef `{result.name}' with template using");
+			this.next();
+			result.params = templateParams;
+			this.skip("=");
+			local usingInitBackup = this.subChunkBegin();
+			parseSkipUntil({ ";" });
+			result.typeInit, result.typeDecl = this.subChunkEnd(usingInitBackup)...;
+			this.skip(";");
+			tab[result.name] = result;
+			goto done;
+		}
+
+		/* Must  support   the   following   cases:
+		 * >> template<class T> struct Foo { T x };
+		 * >> template<class T> union Foo { T x };
+		 * >> template<class T> Foo<T> foo;
+		 * >> template<class T> Foo<T> foo = 42;
+		 * >> template<class T> Foo<T> foo();
+		 * >> template<class T> Foo<T> foo() { return 42; }
+		 */
+		local typeDeclChunkBackup = this.subChunkBegin();
+		parseSkipCTypeRefAttributes();
+
+		/* Check  if  it's a  struct/union/class template  (as  opposed to  a normal
+		 * template that just so happens to return/be-typed-as a struct/union/class) */
+		switch (this.tok) {
+
+		case "struct":
+		case "union":
+		case "class": {
+			this.next();
+			parseSkipCTypeRefAttributes();
+			local structName: string = this.tok;
+			local structDecl: (string, int, int) = this.flc;
+			if (structName.issymbol()) {
+				this.next();
+				parseSkipCTypeRefAttributes();
+			} else {
+				structName = "";
+			}
+			if (this.tok == ":")
+				parseSkipUntil({ "{" });
+			if (this.tok == "{") {
+				this.next();
+				parseSkipUntil({ "}" });
+				this.skip("}");
+				if (this.tok == ";") {
+update_or_create_struct_template:
+					if (!structName)
+						this.err("Unnamed struct/union/class templates are not allowed");
+					/* Yup! it's a struct/union/class template! */
+					local tab: {string: CTypeRef | CTypeRefTemplate} | none = namespaceStack.first.typedefs;
+					if (tab is none)
+						namespaceStack.first.typedefs = tab = Dict();
+					local oldDecl: CTypeRef | CTypeRefTemplate | none = tab.get(structName);
+					if (oldDecl !is none) {
+						if (oldDecl is CTypeRefTemplate && oldDecl.typeInit !is bound) {
+							/* Uninitialized (forward-declared) template */
+						} else {
+							this.err(f"Redefinition of typedef `{structName}' "
+							         f"with template struct/union/class");
+						}
+						result = oldDecl;
+					} else {
+						result = CTypeRefTemplate();
+						tab[structName] = result;
+					}
+					result.name = structName;
+					result.decl = structDecl;
+					result.params = templateParams;
+					if (typeDeclChunkBackup !is none)
+						result.typeInit, result.typeDecl = this.subChunkEnd(typeDeclChunkBackup)...;
+					this.next();
+					goto done;
+				}
+			} else if (this.tok == ";") {
+				this.subChunkEnd(typeDeclChunkBackup);
+				typeDeclChunkBackup = none;
+				goto update_or_create_struct_template;
+			}
+		}	break;
+
+		default:
+			/* Skip type keywords. */
+			if (!parseSkipCTypeRefBase())
+				this.err(f"Expected type-base-expression base `template', but got `{this.tok}'");
+			break;
+		}
+
+		/* At this point, we've parsed an abstract typeref prefix:
+		 * >> int (*foo)(int, int, int) = 42;
+		 *        ^--- We are here
+		 * This also means that we know that it's going to be a
+		 * symbol template  (rather than  a typedef  template).
+		 *
+		 * We must now figure out the template name (above:  "foo"),
+		 * and then skip ahead until the "=" (which can also be ";") */
+		local templateDecl: (string, int, int) = this.flc;
+		local templateName: string = parseSkipTypeRefInner();
+		if (!templateName)
+			this.err("Unnamed symbol templates are not allowed");
+
+		/* Skip until the template symbol/function initializer (or the end-of-declaration marker) */
+		this.parseSkipUntil({ "=", "{", ";" });
+
+		/* All right! At this point we've got the symbol name and the parser
+		 * should be located at the body/initialize of the  symbol/function.
+		 *
+		 * Time to create the template object and fill in its fields. */
+		local tab: {string: CSymbol | CSymbolTemplate} | none = namespaceStack.first.symbols;
+		if (tab is none)
+			namespaceStack.first.typedefs = tab = Dict();
+		result = tab.get(templateName);
+		local typeInit: Bytes;
+		local typeDecl: (string, int, int);
+		typeInit, typeDecl = this.subChunkEnd(typeDeclChunkBackup)...;
+		if (result is none) {
+			result = CSymbolTemplate();
+		} else if (result !is CSymbolTemplate) {
+			if (this.tok in ["{", ";"]) {
+				if (result is COverloadedFunctionSymbol) {
+create_for_overloaded_function_symbol:
+					result = result.getOrCreateTemplateOverload(typeInit);
+					goto fill_template;
+				} else if (result.typeref.typ is CFunctionType) {
+					/* Turn into an overloaded function */
+					local overloadsDecl = COverloadedFunctionSymbol();
+					overloadsDecl.name = templateName;
+					overloadsDecl.decl = result.decl;
+					overloadsDecl.typeref = none;
+					overloadsDecl.overloads.append(result);
+					tab[templateName] = result = overloadsDecl;
+					goto create_for_overloaded_function_symbol;
+				}
+			}
+			this.err(f"Redefinition of non-template symbol `{templateName}' with template");
+		}
+fill_template:
+		result.name = templateName;
+		result.decl = templateDecl;
+		result.params = templateParams;
+		result.typeInit = typeInit;
+		result.typeDecl = typeDecl;
+		if (this.tok == "=") {
+			if (result.valInit is bound)
+				this.err(f"Redefinition of template-symbol `{templateName}'");
+			result.isFunction = false;
+			parseSkipUntil({ ";" });
+			this.skip(";");
+		} else if (this.tok == "{") {
+			if (result.valInit is bound)
+				this.err(f"Redefinition of template-function `{templateName}'");
+			result.isFunction = true;
+			this.next();
+			parseSkipUntil({ "}" });
+			this.skip("}");
+		}
+done:
+#ifdef DUMP_TOP_LEVEL_DECLS
+		if (currentFunctionName is none) {
+			print("template: ", result.name, ": ", result,  ";");
+		}
+#endif /* DUMP_TOP_LEVEL_DECLS */
+		return result;
+	}
+
+	function parseStaticAssert() {
+		this.next();
+		this.skip("(");
+		local exprStart = this.warnBackupCreate();
+		if (!parseExprConstantInteger()) {
+			local message: string;
+			if (this.tok == ",") {
+				this.next();
+				message = this.parseString();
+			} else {
+				message = this.parseString();
+			}
+			this.errAt(exprStart, "Static assertion failed");
+			this.warnBackupDiscard(exprStart);
+		} else {
+			this.warnBackupDiscard(exprStart);
+		}
+		if (this.tok == ",") {
+			this.next();
+			this.parseString();
+		}
+		this.skip(")");
+		this.skip(";");
+	}
+
 	@@Parse stuff from the global scope
 	function parseGlobal() {
 again:
@@ -1990,6 +2775,12 @@ again:
 
 		case ";":
 			this.next();
+			goto again;
+
+		case "template":
+			if (!cxx && !isInExternC)
+				goto default_case;
+			parseTemplate();
 			goto again;
 
 		case "asm":
@@ -2004,32 +2795,11 @@ again:
 			goto again;
 
 		case "static_assert":
-		case "_Static_assert": {
+		case "_Static_assert":
 			if (this.tok != (cxx ? "static_assert" : "_Static_assert"))
 				goto default_case;
-			this.next();
-			this.skip("(");
-			local exprStart = this.warnBackupCreate();
-			if (!parseExprConstantInteger()) {
-				local message: string;
-				if (this.tok == ",") {
-					this.next();
-					message = this.parseString();
-				} else {
-					message = this.parseString();
-				}
-				this.errAt(exprStart, "Static assertion failed");
-				this.warnBackupDiscard(exprStart);
-			} else {
-				this.warnBackupDiscard(exprStart);
-			}
-			if (this.tok == ",") {
-				this.next();
-				this.parseString();
-			}
-			this.skip(")");
-			this.skip(";");
-		}	break;
+			parseStaticAssert();
+			break;
 
 		case "namespace": {
 			if (!cxx)
@@ -2058,8 +2828,11 @@ again:
 				if (ns is none)
 					this.err(f"No such namespace `{this.tok}'");
 				local imports = namespaceStack.first.importedNamespaces;
-				if (ns !in imports)
+				if (ns !in imports) {
+					if (imports is none)
+						namespaceStack.first.importedNamespaces = imports = List();
 					imports.append(ns);
+				}
 			} else {
 				if (this.tok.issymbol() && this.nextTokIsEquals()) {
 					/* using foo = bar; */
@@ -2068,10 +2841,12 @@ again:
 					local newTypeRef: CTypeRef | none = nsLookupChain("typedefs");
 					if (newTypeRef is none)
 						this.err(f"No such symbol/typedef `{this.tok}'");
-					local tab: {string: CTypeRef} = namespaceStack.first.typedefs;
+					local tab: {string: CTypeRef} | none = namespaceStack.first.typedefs;
 					local existingTypeRef: CTypeRef | none = tab.get(name);
 					if (existingTypeRef !is none && existingTypeRef != newTypeRef)
 						this.err(f"Duplicate declaration of {name}");
+					if (tab is none)
+						namespaceStack.first.typedefs = tab = Dict();
 					tab[name] = newTypeRef;
 				} else {
 					local tabName: string;
@@ -2084,10 +2859,12 @@ again:
 					if (element is none)
 						this.err(f"No such symbol/typedef `{this.tok}'");
 					local name: string = _nsLookupChildChainSymbolName;
-					local tab: {string: Object} = namespaceStack.first.operator . (tabName);
+					local tab: {string: Object} | none = namespaceStack.first.operator . (tabName);
 					local existingElement: Object | none = tab.get(name);
 					if (existingElement !is none && existingElement != element)
 						this.err(f"Duplicate declaration of {name}");
+					if (tab is none)
+						namespaceStack.first.operator . (tabName) = tab = Dict();
 					tab[name] = element;
 				}
 			}
@@ -2258,6 +3035,22 @@ return_unknown_void_pointer:
 			this.skip(")");
 			goto return_unknown_void_pointer;
 
+		case "__builtin_void": {
+			this.next();
+			this.skip("(");
+			local result: CValue = parseExpr().inplaceVoid;
+			this.skip(")");
+		}	break;
+
+		case "__builtin_rvoid": {
+			this.next();
+			this.skip("(");
+			local result: CValue = parseExpr()
+					.inplaceVoid
+					.inplaceRValue(this);
+			this.skip(")");
+		}	break;
+
 		case "__builtin_bswap16":
 		case "__builtin_bswap32":
 		case "__builtin_bswap64":
@@ -2274,7 +3067,7 @@ return_unknown_void_pointer:
 			local result = parseExpr().inplaceCast(this, CTypeRef(typ));
 			this.skip(")");
 			if (result.isConstExpr) {
-				local val = result.constExprValue;
+				local val = result.constExprValue(this);
 				switch (tok) {
 				case "__builtin_bswap16":  val = val.swap16; break;
 				case "__builtin_bswap32":  val = val.swap32; break;
@@ -2292,10 +3085,18 @@ return_unknown_void_pointer:
 			this.skip("(");
 			local exceptCodeValue: CValue = parseExprRValue();
 			local exceptCode: int = exceptCodeValue.isConstExpr
-				? exceptCodeValue.constExprValue
+				? exceptCodeValue.constExprValue(this)
 				: 0;
 			if (!isUnreachable) {
-				/* TODO: Assert that `exceptCode' is part of the caller's throws-attribute */
+				/* Assert that `exceptCode' is part of the caller's throws-attribute */
+				local callerThrows: {int...} = currentFunctionTypeRef.attrib.get("throws", ());
+				if (exceptCode !in callerThrows && (0 !in callerThrows)) {
+					this.warn("-Wthrows",
+						f"Function `{currentFunctionName}' is missing "
+						f"annotations `THROWS({
+							this.exceptByCode.get(exceptCode, exceptCode.hex())
+						})'");
+				}
 			}
 			while (this.tok == ",") {
 				this.next();
@@ -2379,9 +3180,22 @@ return_unknown_void_pointer:
 
 		case "(": {
 			this.next();
+			if (this.tok == "{") {
+				/* Statements-in-expression */
+				this.next();
+				local result: CValue | none = none;
+				while (this.tok != "}")
+					result = parseStatement();
+				this.skip("}");
+				this.skip(")");
+				if (result is none)
+					result = copy C_voidval;
+				return result;
+			}
 			local castInfo = parseTypeRef("-", "", tryParse: true);
 			if (castInfo !is none) {
-				local typeref, storageClass;
+				local typeref: CTypeRef;
+				local storageClass: string;
 				typeref, none, storageClass = castInfo...;
 				if (storageClass != "")
 					this.err(f"Storage class {repr storageClass} cannot appear in expressions");
@@ -2551,14 +3365,15 @@ again:
 			/* Automatically dereference function pointers. */
 			while (value.typeref.typ is CPointerType)
 				value = value.inplaceInd(this);
-			local funTyp: CType = value.typeref.typ;
+			local funTyp: CType | none = value.typeref.typ;
 			local args: {CValue...} = [];
-			local argTypes: {(CTypeRef, string)...} = funTyp is CFunctionType ? funTyp.args : ();
+			local argTypesAndNames: {(CTypeRef, string)...} =
+				funTyp is CFunctionType ? funTyp.args : ();
 			/* Parse function arguments. */
 			while (this.tok != ")") {
 				local arg: CValue;
-				if (#args < #argTypes) {
-					arg = parseTypedExpr(argTypes[#args]);
+				if (#args < #argTypesAndNames) {
+					arg = parseTypedExpr(argTypesAndNames[#args].first);
 				} else {
 					arg = parseExpr();
 				}
@@ -2567,7 +3382,7 @@ again:
 					break;
 				this.next();
 			}
-			value = value.inplaceCall(this, args, mustCastArgs: !argTypes);
+			value = value.inplaceCall(this, args, mustCastArgs: !argTypesAndNames);
 			this.skip(")");
 			goto again;
 		}	break;
@@ -2608,7 +3423,7 @@ again:
 			parseExprBitOr();
 			value.inplaceVoid;
 		} else if (value.isConstExpr) {
-			if (value.constExprValue) {
+			if (value.constExprValue(this)) {
 				value = parseExprBitOr().inplaceOp1(this, "bool");
 			} else {
 				isUnreachable = true;
@@ -2642,7 +3457,7 @@ again:
 			parseExprLAnd();
 			value.inplaceVoid;
 		} else if (value.isConstExpr) {
-			if (value.constExprValue) {
+			if (value.constExprValue(this)) {
 				isUnreachable = true;
 				parseExprLAnd();
 				isUnreachable = false;
@@ -2684,7 +3499,7 @@ again:
 			local ffVal: CValue = parseExprCond().inplaceRValue(this);
 			value = CValue(kind: CVALUE_AVOID, typeref: commonType(ttVal.typeref, ffVal.typeref));
 		} else if (value.isConstExpr) {
-			if (value.constExprValue) {
+			if (value.constExprValue(this)) {
 				if (this.tok != ":")
 					value = parseExprLOr().inplaceRValue(this);
 				this.skip(":");
@@ -2837,11 +3652,7 @@ again:
 			if (typ is CStructType)
 				return parseStructInitializer(typ);
 		}
-		if (isUnreachable) {
-			return parseExpr();
-		} else {
-			return parseExprRValue().inplaceCast(this, typeref, explicit);
-		}
+		return parseExprRValue().inplaceCast(this, typeref, explicit);
 	}
 
 	function parseTypedExprInto(typeref: CTypeRef, result: Bytes | none,
@@ -2951,6 +3762,6 @@ function runChecker(filename: string, targetModule: Module, language: string = "
 
 #ifdef __MAIN__
 runChecker(
-	"build/i386-kos-nOD/mod.dbx/kos.src.kernel.moddbx.cmodule.c.chk.E",
+	r"E:\c\kls\kos\build/i386-kos-nOD/mod.dbx/kos.src.kernel.moddbx.cmodule.c.chk.E",
 	import("...targets.i386"));
 #endif

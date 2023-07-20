@@ -78,6 +78,8 @@
 #define __GCC_HAS_BUILTIN___builtin_constant_p
 #define __GCC_HAS_BUILTIN___builtin_has_attribute
 #define __GCC_HAS_BUILTIN___builtin_throw /* __attribute__((noreturn)) void __builtin_throw(int code, ...); */
+#define __GCC_HAS_BUILTIN___builtin_void  /* T __builtin_void(T val);  ## Evaluates to `val', but value becomes unknown */
+#define __GCC_HAS_BUILTIN___builtin_rvoid /* T __builtin_rvoid(T val); ## Like `__builtin_void()', but also do r-value */
 
 #ifndef __has_feature
 #define __NO_has_feature
@@ -329,6 +331,8 @@
 #define inline
 #define __inline
 #define __inline__
+#define __restrict restrict
+#define __restrict__ restrict
 #define __restrict_arr restrict
 
 #define __COMPILER_HAVE_VARIABLE_LENGTH_ARRAYS
@@ -370,6 +374,31 @@
 #define __builtin_va_end(ap)             (void)0
 
 #define __COMPILER_HAVE_BUG_BLOATY_CXX_USING 0
+
+/* Atomic builtins (only need to emulate semantics ). */
+#define __atomic_load_n(ptr, memorder)                 __builtin_rvoid(*(ptr))
+#define __atomic_load(ptr, p_ret, memorder)            (void)(__builtin_void(*(p_ret)) = __builtin_rvoid(*(ptr)))
+#define __atomic_store_n(ptr, val, memorder)           (void)(__builtin_void(*(ptr)) = (val))
+#define __atomic_store(ptr, p_val, memorder)           (void)(__builtin_void(*(ptr)) = *(p_val))
+#define __atomic_exchange_n(ptr, val, memorder)        __builtin_rvoid(__builtin_void(*(ptr)) += (val))
+#define __atomic_exchange(ptr, p_val, p_ret, memorder) (void)(*(p_ret) = __atomic_exchange_n(ptr, *(p_val), memorder))
+#define __atomic_compare_exchange_n(ptr, p_expected, desired, weak, success_memorder, failure_memorder) \
+	(!__builtin_rvoid(__builtin_void(*(ptr)) += (*(p_expected) += 0)))
+#define __atomic_compare_exchange(ptr, p_expected, p_desired, weak, success_memorder, failure_memorder) \
+	__atomic_compare_exchange_n(ptr, p_expected, *(p_desired), weak, success_memorder, failure_memorder)
+#define __atomic_add_fetch(ptr, val, memorder)  __atomic_exchange_n(ptr, val, memorder)
+#define __atomic_sub_fetch(ptr, val, memorder)  __atomic_exchange_n(ptr, val, memorder)
+#define __atomic_and_fetch(ptr, val, memorder)  __atomic_exchange_n(ptr, val, memorder)
+#define __atomic_xor_fetch(ptr, val, memorder)  __atomic_exchange_n(ptr, val, memorder)
+#define __atomic_or_fetch(ptr, val, memorder)   __atomic_exchange_n(ptr, val, memorder)
+#define __atomic_nand_fetch(ptr, val, memorder) __atomic_exchange_n(ptr, val, memorder)
+#define __atomic_fetch_add(ptr, val, memorder)  __atomic_exchange_n(ptr, val, memorder)
+#define __atomic_fetch_sub(ptr, val, memorder)  __atomic_exchange_n(ptr, val, memorder)
+#define __atomic_fetch_and(ptr, val, memorder)  __atomic_exchange_n(ptr, val, memorder)
+#define __atomic_fetch_xor(ptr, val, memorder)  __atomic_exchange_n(ptr, val, memorder)
+#define __atomic_fetch_or(ptr, val, memorder)   __atomic_exchange_n(ptr, val, memorder)
+#define __atomic_fetch_nand(ptr, val, memorder) __atomic_exchange_n(ptr, val, memorder)
+
 
 /* Prevent including of too many local functions by faking CRT features. */
 #include <crt-features/crt-kos.h>

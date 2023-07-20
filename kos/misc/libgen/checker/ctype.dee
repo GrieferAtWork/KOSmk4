@@ -19,16 +19,26 @@
  */
 import * from deemon;
 import * from errors;
+import util;
 import UniqueSet from collections;
 #define Checker Object
 
-global CTypeRef;
-class CType {
-	// function tostr(varname: string = ""): string;
+#define IDENTICAL(a, b) (type(a) === type(b) && ((a) == (b)))
 
+global CTypeRef;
+class CType: WeakRefAble {
+	operator == (other) { return other is CType; }
+	operator != (other) { return other !is CType; }
 	operator str() -> this.tostr();
+
+	// function tostr(varname: string = ""): string;
 	// property sizeof: int;
 	property alignof: int = { get(): int -> this.sizeof; };
+
+	@@Check if this type can be converted to @other
+	function isConvertibleTo(other: CType, explicit: bool = false): bool {
+		return IDENTICAL(this, other);
+	}
 }
 
 global final CTYPEREF_FLAG_CONST    = 0x0001;
@@ -101,7 +111,9 @@ function cTypeRefWithCommonAttrib(self: CTypeRef, other: CTypeRef): CTypeRef {
 
 final class CTypeRef {
 	this = default;
-	public member typ: CType;
+	@@NOTE: Might point  to a  weakref in  order to  prevent
+	@@      reference loops in self-referencing struct types
+	public member typ: CType | WeakRef with CType;
 
 	@@Type flags. Set of `CTYPEREF_FLAG_*`
 	public member flags: int = 0;
@@ -119,10 +131,37 @@ final class CTypeRef {
 	public property sizeof: int = { get(): int -> typ.sizeof; };
 	public property alignof: int = { get(): int -> typ.alignof; };
 
+	@@Unwind a @CTypeRef that's pointing to a @WeakRef
+	public property unwindWeakRef: CTypeRef = {
+		get(): CTypeRef {
+			if (typ is WeakRef) {
+				local result = copy this;
+				result.typ = typ.value;
+				return result;
+			}
+			return this;
+		}
+	}
+
 	@@Check if @this @CTypeRef is identical to @other in such
 	@@a way  that  no  re-declaration error  show  be  thrown
 	function equalsForRedeclaration(other: CTypeRef): bool {
 		return typ == other.typ;
+	}
+
+	function isConvertibleTo(other: CTypeRef, explicit: bool = false): bool {
+		return typ.isConvertibleTo(other.typ, explicit);
+	}
+
+	function isConvertibleToWithFlags(other: CTypeRef, explicit: bool = false): bool {
+		if (!explicit) {
+			/* Not allowed to cast away const/volatile */
+			local myCV = flags & CTYPEREF_FLAG_CV;
+			local otCV = other.flags & CTYPEREF_FLAG_CV;
+			if ((myCV & otCV) != otCV)
+				return false;
+		}
+		return typ.isConvertibleTo(other.typ, explicit);
 	}
 
 	function tostr(varname: string = ""): string {
@@ -176,6 +215,7 @@ final class CTypeRef {
 	}
 }
 
+global C_NUMERIC;
 class CCoreType: CType {
 	this = default;
 	public member name: string;
@@ -184,28 +224,38 @@ class CCoreType: CType {
 	function tostr(varname: string = ""): string {
 		return varname ? f"{name} {varname}" : name;
 	}
+	function isConvertibleTo(other: CType, explicit: bool = false): bool {
+		return this in C_NUMERIC && other in C_NUMERIC;
+	}
 }
 
+global CPointerType;
 final class CCoreIntType: CCoreType {
 	public member signed: bool;
+	public member mask: int;
 	this(name: string, sizeof: int, alignof: int, signed: bool)
 		: super(name, sizeof, alignof)
 	{
 		this.signed = signed;
+		this.mask = (1 << (sizeof * 8)) - 1;
 	}
 	operator repr(): string ->
 			f"CCoreIntType(name: {repr this.name}, "
 			f"sizeof: {repr this.sizeof}, "
 			f"alignof: {repr this.alignof}, "
 			f"signed: {repr signed})";
+	function isConvertibleTo(other: CType, explicit: bool = false): bool {
+		return (other in C_NUMERIC) ||
+		       (other is CPointerType);
+	}
 	public function peek(checker: Checker, data: Bytes, offset: int): int {
 		return int.frombytes(data[offset:offset + this.sizeof], checker.TARGET_ENDIAN, signed);
 	}
 	public function poke(checker: Checker, data: Bytes, offset: int, value: int) {
-		data[offset:offset + this.sizeof] = value.tobytes(this.sizeof, checker.TARGET_ENDIAN, signed);
+		data[offset:offset + this.sizeof] = (value & mask).tobytes(this.sizeof, checker.TARGET_ENDIAN, false);
 	}
 	public function bytes(checker: Checker, value: int): Bytes {
-		return value.tobytes(this.sizeof, checker.TARGET_ENDIAN, signed);
+		return (value & mask).tobytes(this.sizeof, checker.TARGET_ENDIAN, false);
 	}
 }
 
@@ -222,7 +272,33 @@ final class CCoreBoolType: CCoreType {
 	}
 }
 
-global final C_void = CCoreType("void", 0, 1);
+class CCoreNullptrType: CCoreType {
+	this = super;
+	function isConvertibleTo(other: CType, explicit: bool = false): bool {
+		return (other is CPointerType) ||
+		       (other is CCoreNullptrType) ||
+		       (explicit && (other in C_NUMERIC));
+	}
+	public function peek(checker: Checker, data: Bytes, offset: int): int {
+		return 0;
+	}
+	public function poke(checker: Checker, data: Bytes, offset: int, value: int) {
+		data[offset:offset + this.sizeof] = Bytes(this.sizeof);
+	}
+	public function bytes(checker: Checker, value: int): Bytes {
+		return Bytes(this.sizeof);
+	}
+}
+
+class CCoreVoidType: CCoreType {
+	this(): super("void", 0, 1) {}
+	function isConvertibleTo(other: CType, explicit: bool = false): bool {
+		return other is CCoreVoidType;
+	}
+}
+
+
+global final C_void = CCoreVoidType();
 global final C_bool = CCoreBoolType("bool", 1, 1);
 global final C_char = CCoreIntType("char", 1, 1, true);
 global final C_schar = CCoreIntType("signed char", 1, 1, true);
@@ -251,8 +327,8 @@ global final C_float = CCoreType("float", 4, 4);
 global final C_double = CCoreType("double", 8, 8);
 global final C_ldouble_12 = CCoreType("long double", 12, 8);
 global final C_ldouble_16 = CCoreType("long double", 16, 16);
-global final C_nullptr_t_32 = CCoreType("nullptr_t", 4, 4);
-global final C_nullptr_t_64 = CCoreType("nullptr_t", 8, 8);
+global final C_nullptr_t_32 = CCoreNullptrType("nullptr_t", 4, 4);
+global final C_nullptr_t_64 = CCoreNullptrType("nullptr_t", 8, 8);
 
 global final C_PROMOTE: {CCoreType...} = UniqueSet({
 	C_bool,
@@ -388,6 +464,13 @@ class CPointerType: CType {
 	function tostr(varname: string = ""): string {
 		return base.tostr("*" + varname);
 	}
+	function isConvertibleTo(other: CType, explicit: bool = false): bool {
+		if (other !is CPointerType)
+			return false;
+		if (explicit)
+			return true;
+		return base.isConvertibleToWithFlags(other.base, explicit);
+	}
 }
 
 final class CPointerType32: CPointerType {
@@ -425,6 +508,20 @@ final class CStructType: CType {
 	public member fields: {string: (CTypeRef, int)} = Dict();
 	public member fieldsByDeclarationOrder: {(CTypeRef, string)...} = [];
 
+	operator hash(): int -> Object.id(this);
+	operator == (other: CStructType) -> this === other;
+	operator != (other: CStructType) -> this !== other;
+
+	function isConvertibleTo(other: CType, explicit: bool = false): bool {
+		local iter: CStructType | none = this;
+		do {
+			if (other === iter)
+				return true;
+			iter = iter.base;
+		} while (iter !is none);
+		return false;
+	}
+
 	property structRepr: string = {
 		get(): string {
 			if (name)
@@ -432,7 +529,7 @@ final class CStructType: CType {
 			local result = File.Writer();
 			result << "struct {";
 			for (local fieldType, fieldName: fieldsByDeclarationOrder)
-				result << " " << fieldType.tostr(fieldName) << ";";
+				result << " " << fieldType.unwindWeakRef.tostr(fieldName) << ";";
 			result << " }";
 			return result.string;
 		}
@@ -446,6 +543,8 @@ final class CStructType: CType {
 		local result = fields.get(name);
 		if (result is none && base !is none)
 			result = base.getField(name);
+		if (result !is none)
+			result = (result.first.unwindWeakRef, result.last);
 		return result;
 	}
 
@@ -454,7 +553,8 @@ final class CStructType: CType {
 			if (base !is none)
 				yield base.foreachField...;
 			for (local name, typAndOffset: fields) {
-				yield (name, typAndOffset...);
+				local typ, offset = typAndOffset...;
+				yield (name, typ.unwindWeakRef, offset);
 			}
 		}
 	}
@@ -512,6 +612,11 @@ final class CEnumType: CType {
 	public member base: CType = C_int;
 	public property sizeof: int = { get(): int -> base.sizeof; };
 	public property alignof: int = { get(): int -> base.alignof; };
+	function isConvertibleTo(other: CType, explicit: bool = false): bool {
+		if (explicit)
+			return base.iisConvertibleTo(other, explicit);
+		return this === other;
+	}
 	function tostr(varname: string = ""): string {
 		return varname ? f"enum {name} {varname}" : f"enum {name}";
 	}
@@ -526,6 +631,23 @@ final class CFunctionType: CType {
 	public member isVarArgs: bool = false;
 	public property sizeof: int = { get(): int -> 0; };
 	public property alignof: int = { get(): int -> 1; };
+
+	function isConvertibleTo(other: CType, explicit: bool = false): bool {
+		if (other !is CFunctionType)
+			return false;
+		if (explicit)
+			return true;
+		if (isVarArgs != other.isVarArgs)
+			return false;
+		if (#args != #other.args)
+			return false;
+		for (local myArg, otArg: util.zip(args, other.args)) {
+			if (!myArg.first.typ.isConvertibleTo(otArg.first.typ))
+				return false;
+		}
+		return returnType.isConvertibleTo(other);
+	}
+
 	function tostr(varname: string = ""): string {
 		if (!varname.replace(":", "").issymbol())
 			varname = f"({varname})";
@@ -537,6 +659,38 @@ final class CFunctionType: CType {
 			varname += "(void)";
 		}
 		return returnType.tostr(varname);
+	}
+
+	function acceptsArgumentTypes(types: {CType...}, exactly: bool = false): bool {
+		local myTypes = args;
+		if (#types != #myTypes) {
+			if (#types > #myTypes) {
+				if (!isVarArgs)
+					return false;
+				types = types[:#myTypes];
+			} else {
+				local myMinArgc: int = #myTypes - #defaults;
+				if (#types < myMinArgc)
+					return false;
+				myTypes = myTypes[:#types];
+			}
+		}
+		assert #types == #myTypes;
+		/*print("acceptsArgumentTypes([", ", ".join(
+			for (local typ, nam: myTypes) typ.tostr(nam)
+		), "], [", ", ".join(types), "])");*/
+		myTypes = myTypes.each.first.typ; /* {CType...} */
+		for (local myTyp, rqTyp: util.zip(myTypes, types)) {
+			if (exactly) {
+				if (IDENTICAL(myTyp, rqTyp))
+					continue;
+				return false;
+			} else {
+				if (!rqTyp.isConvertibleTo(myTyp))
+					return false;
+			}
+		}
+		return true;
 	}
 }
 
@@ -569,10 +723,16 @@ final class CArrayType: CType {
 
 class CSymbol {
 	this = default;
-	@@Type of the symbol
-	public member typeref: CTypeRef;
+	@@Name of the symbol
+	public member name: string;
+	@@Declaration location `filename, line, column`
+	public member decl: (string, int, int);
+	@@Type of the symbol (@none for @COverloadedFunctionSymbol)
+	public member typeref: CTypeRef | none;
 	@@Constant value of the symbol, or unbound if never assigned, or @none if unknown
 	public member val: Bytes | none;
+
+	operator str(): string -> str typeref.tostr(name);
 	public property valOrNone: Bytes | none = {
 		get(): Bytes | none {
 			try {
@@ -584,49 +744,186 @@ class CSymbol {
 	}
 }
 
+global CSymbolTemplate;
+
 @@Sub-class for overloaded function-like symbols (needed for overloads)
 @@NOTE: The primary symbol element should not be used, and its fields are unbound!
 final class COverloadedFunctionSymbol: CSymbol {
 	this = default;
 	@@The overloads of this function
-	public member overloads: {CSymbol...} = [];
+	public member overloads: {CSymbol | CSymbolTemplate...} = [];
 
 	@@Get or create an overload for the given @typeref c-function-type
 	function getOrCreateOverload(typeref: CTypeRef): CSymbol {
 		for (local overload: overloads) {
+			if (overload is CSymbolTemplate)
+				continue;
 			if (overload.typeref.equalsForRedeclaration(typeref)) {
 				overload.typeref.importFrom(typeref);
 				return overload;
 			}
 		}
-		local result = CSymbol(typeref: typeref);
+		local result = CSymbol(this.name, this.decl, typeref);
 		overloads.append(result);
 		return result;
 	}
+
+	function getOrCreateTemplateOverload(typeInit: Bytes): CSymbolTemplate {
+		for (local overload: overloads) {
+			if (overload !is CSymbolTemplate)
+				continue;
+			if (overload.typeInit == typeInit)
+				return overload;
+		}
+		local result = CSymbolTemplate();
+		overloads.append(result);
+		return result;
+	}
+
+	function getOverloadForTypes(argTypes: {CType...}): {CSymbol...} {
+		local result: {CSymbol...} = [];
+		for (local overload: overloads) {
+			if (overload is CSymbolTemplate) {
+				/* TODO: Instantiate template */
+			} else {
+				local symType: CType = overload.typeref.typ;
+				if (symType is CFunctionType && symType.acceptsArgumentTypes(argTypes))
+					result.append(overload);
+			}
+		}
+		if (#result > 1) {
+			local newResult: {CSymbol...} = [];
+			for (local overload: newResult) {
+				local symType: CType = overload.typeref.typ;
+				if (symType is CFunctionType && symType.acceptsArgumentTypes(argTypes, exactly: true))
+					newResult.append(overload);
+			}
+			if (newResult)
+				result = newResult;
+		}
+		return result;
+	}
+
 }
+
+
+#define TemplateParamValue (CTypeRef | Bytes)
+class TemplateParam {
+	this = default;
+	@@Name of this template parameter
+	@@ - `FOO` in `template<class FOO = int>`
+	@@ - `N` in `template<size_t N = 4>`
+	public member name: string;
+	@@Declaration location of @name
+	public member decl: (string, int, int);
+	@@Parameter type, or @none if it's a type-parameter
+	public member typeref: CTypeRef | none;
+	@@Default initializer for this parameter
+	@@ - `int` in `template<class FOO = int>`
+	@@ - `4` in `template<size_t N = 4>`
+	public member defaultInit: Bytes | none = none;
+	@@Declaration location of @defaultInit
+	public member defaultDecl: (string, int, int) | none = none;
+	operator str(): string {
+		if (defaultInit is none) {
+			if (typeref is none)
+				return f"class {name}";
+			return typeref.tostr(name);
+		} else {
+			if (typeref is none)
+				return f"class {name} = {defaultInit}";
+			return f"{typeref.tostr(name)} = {defaultInit}";
+		}
+	}
+}
+
+class CTypeRefTemplate {
+	this = default;
+	@@Name of the typedef/symbol
+	@@ - `Name` in `template<class T> using Name = T;`
+	@@ - `bar` in `template<class T> T bar = (T)0;`
+	@@ - `foo` in `template<class T> struct foo { T x; };`
+	@@ - `foo` in `template<class T> void foo(T x) { callMe(); }`
+	public member name: string;
+	@@Declaration location of @name
+	public member decl: (string, int, int);
+	@@Template parameters
+	public member params: {TemplateParam...};
+	@@Raw source-code that represents the initializer for the template type
+	@@ - `T` in `template<class T> using Name = T;`
+	@@ - `struct foo { T x; }` in `template<class T> struct foo { T x; };`
+	@@For @CSymbolTemplate:
+	@@ - `T bar` in `template<class T> T bar = (T)0;`
+	@@ - `void foo(T x)` in `template<class T> void foo(T x) { callMe(); }`
+	@@NOTE: Unbound in case of an uninitialized struct/union/class template
+	public member typeInit: Bytes;
+	@@Declaration location of @typeInit
+	public member typeDecl: (string, int, int);
+	@@Instantiated instances of this template.
+	@@ - For @CTypeRefTemplate, elements are @CTypeRef
+	@@ - For @CSymbolTemplate, elements are @CSymbol
+	public member instances: {{TemplateParamValue...} : CTypeRef | CSymbol} = Dict();
+
+	function instantiationRepr(checker: Checker, args: {TemplateParamValue...}): string {
+		local writer = File.Writer();
+		writer << name << "<";
+		local isFirst = true;
+		for (local param, arg: util.zip(params, args)) {
+			if (!isFirst)
+				writer << ", ";
+			isFirst = false;
+			if (arg is CTypeRef) {
+				writer << arg;
+			} else {
+				writer << param.typeref.typ.peek(checker, arg);
+			}
+		}
+		writer << ">";
+		return writer.string;
+	}
+
+	operator str(): string {
+		if (typeInit is bound)
+			return f"template<{", ".join(params)}> {typeInit.replace("\n", " ")}";
+		return f"template<{", ".join(params)}> <uninitialized> {name}";
+	}
+}
+
+class CSymbolTemplate: CTypeRefTemplate {
+	@@Raw source-code that represents the initializer for this symbol template
+	@@ - `(T)0` in `template<class T> T bar = (T)0;`
+	@@ - `{ callMe(); }` in `template<class T> void foo(T x) { callMe(); }`
+	@@NOTE: Unbound in case of an uninitialized symbol template
+	public member valInit: Bytes;
+	@@Declaration location of @valInit
+	public member valDecl: (string, int, int);
+	@@Set to @true if this is a function-template (i.e. *no* `=` exists before @valInit)
+	public member isFunction: bool;
+}
+
 
 global CEnumClassType;
 class CNamespace {
 	this = default;
 	public final member name: string;
-	public final member symbols: {string: CSymbol} = Dict();
-	public final member typedefs: {string: CTypeRef} = Dict();
-	public final member namespaces: {string: CNamespace} = Dict();
-	public final member structSymbols: {string: CStructType} = Dict();
-	public final member unionSymbols: {string: CStructType} = Dict();
-	public final member enumSymbols: {string: CEnumType | CEnumClassType} = Dict();
-	public final member importedNamespaces: {CNamespace...} = [];
+	public final member symbols: {string: CSymbol | CSymbolTemplate} | none = none;
+	public final member typedefs: {string: CTypeRef | CTypeRefTemplate} | none = none;
+	public final member namespaces: {string: CNamespace} | none = none;
+	public final member structSymbols: {string: CStructType} | none = none;
+	public final member unionSymbols: {string: CStructType} | none = none;
+	public final member enumSymbols: {string: CEnumType} | none = none;
+	public final member importedNamespaces: {CNamespace...} | none = none;
 
 	@@Only here so we don't need special handling when used as a @CScope
 	public property symbolValues = { get() -> none; };
 
 	@@@param tab: One of:
-	@@            - @"symbols": CSymbol
-	@@            - @"typedefs": CTypeRef
-	@@            - @"namespaces": CNamespace
-	@@            - @"structSymbols": CStructType
-	@@            - @"unionSymbols": CStructType
-	@@            - @"enumSymbols": CEnumType
+	@@            - @"symbols": @CSymbol or @CSymbolTemplate
+	@@            - @"typedefs": @CTypeRef or @CTypeRefTemplate
+	@@            - @"namespaces": @CNamespace
+	@@            - @"structSymbols": @CStructType
+	@@            - @"unionSymbols": @CStructType
+	@@            - @"enumSymbols": @CEnumType
 	public final function lookup(tab: string, name: string): Object | none {
 		local result = this.operator . (tab).get(name);
 		if (result !is none)
@@ -639,10 +936,25 @@ class CNamespace {
 		return none;
 	}
 
-	function childNamespace(name: string): CNamespace {
+	public final function defineTemplateParamValue(param: TemplateParam, value: TemplateParamValue) {
+		local tabName: string = "typedefs";
+		if (value is Bytes) {
+			tabName = "symbols";
+			assert param.typeref !is none;
+			value = CSymbol(param.name, param.decl, param.typeref, value);
+		}
+		local tab: {string: Object} | none = this.operator . (tabName);
+		if (tab is none)
+			this.operator . (tabName) = tab = Dict();
+		tab[param.name] = value;
+	}
+
+	public final function childNamespace(name: string): CNamespace {
 		local result = lookup("namespaces", name);
 		if (result is none) {
 			result = CNamespace(name: name);
+			if (namespaces is none)
+				namespaces = Dict();
 			namespaces[name] = result;
 		}
 		return result;
