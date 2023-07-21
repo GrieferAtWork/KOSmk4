@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd31b77aa */
+/* HASH CRC-32:0xc416e4fb */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,11 +31,11 @@ __NOTHROW_CB(__LIBKCALL __LIBC_LOCAL_NAME(format_c32repeat))(__pc32formatprinter
 #ifdef __hybrid_alloca
 	__CHAR32_TYPE__ *__buffer;
 	if __likely(__num_repetitions <= 64) {
-		__buffer = (__CHAR32_TYPE__ *)__hybrid_alloca(__num_repetitions);
+		__buffer = (__CHAR32_TYPE__ *)__hybrid_alloca(__num_repetitions * sizeof(__CHAR32_TYPE__));
 		__libc_memsetc(__buffer, __ch, __num_repetitions, 4);
 		return (*__printer)(__arg, __buffer, __num_repetitions);
 	}
-	__buffer = (__CHAR32_TYPE__ *)__hybrid_alloca(64);
+	__buffer = (__CHAR32_TYPE__ *)__hybrid_alloca(64 * sizeof(__CHAR32_TYPE__));
 	__libc_memsetc(__buffer, __ch, 64, 4);
 #else /* __hybrid_alloca */
 	__CHAR32_TYPE__ __buffer[64];

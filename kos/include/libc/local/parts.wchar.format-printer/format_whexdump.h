@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac611d2e */
+/* HASH CRC-32:0x46c350c9 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -214,10 +214,10 @@ __NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(format_whexdump))(__pwformatprinter __
 		}
 		if (!(__flags & 0x0010)) {
 			for (__i = 0; __i < __line_len; ++__i) {
-				__BYTE_TYPE__ __b = __line_data[__i];
-				if (!(__NAMESPACE_LOCAL_SYM __localdep_iswprint)(__b))
+				__WCHAR_TYPE__ __b = (__WCHAR_TYPE__)(__WCHAR_TYPE__)__line_data[__i];
+				if (!(__NAMESPACE_LOCAL_SYM __localdep_iswprint)((__WCHAR_TYPE__)__b))
 					__b = '.';
-				__temp = (*__printer)(__arg, (__WCHAR_TYPE__ const *)&__b, 1);
+				__temp = (*__printer)(__arg, &__b, 1);
 				if __unlikely(__temp < 0)
 					goto __err;
 				__result += __temp;

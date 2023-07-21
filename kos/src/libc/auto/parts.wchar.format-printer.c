@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b6ee2fd */
+/* HASH CRC-32:0xb17b4c92 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,11 +65,11 @@ NOTHROW_CB(LIBDCALL libd_format_wrepeat)(pc16formatprinter printer,
 
 	char16_t *buffer;
 	if likely(num_repetitions <= 64) {
-		buffer = (char16_t *)__hybrid_alloca(num_repetitions);
+		buffer = (char16_t *)__hybrid_alloca(num_repetitions * sizeof(char16_t));
 		__libc_memsetc(buffer, ch, num_repetitions, 2);
 		return (*printer)(arg, buffer, num_repetitions);
 	}
-	buffer = (char16_t *)__hybrid_alloca(64);
+	buffer = (char16_t *)__hybrid_alloca(64 * sizeof(char16_t));
 	__libc_memsetc(buffer, ch, 64, 2);
 
 
@@ -117,11 +117,11 @@ NOTHROW_CB(LIBKCALL libc_format_wrepeat)(pc32formatprinter printer,
 
 	char32_t *buffer;
 	if likely(num_repetitions <= 64) {
-		buffer = (char32_t *)__hybrid_alloca(num_repetitions);
+		buffer = (char32_t *)__hybrid_alloca(num_repetitions * sizeof(char32_t));
 		__libc_memsetc(buffer, ch, num_repetitions, 4);
 		return (*printer)(arg, buffer, num_repetitions);
 	}
-	buffer = (char32_t *)__hybrid_alloca(64);
+	buffer = (char32_t *)__hybrid_alloca(64 * sizeof(char32_t));
 	__libc_memsetc(buffer, ch, 64, 4);
 
 
@@ -868,10 +868,10 @@ NOTHROW_CB(LIBDCALL libd_format_whexdump)(pc16formatprinter printer,
 		}
 		if (!(flags & 0x0010)) {
 			for (i = 0; i < line_len; ++i) {
-				byte_t b = line_data[i];
-				if (!libd_iswprint(b))
+				char16_t b = (char16_t)(char16_t)line_data[i];
+				if (!libd_iswprint((char16_t)b))
 					b = '.';
-				temp = (*printer)(arg, (char16_t const *)&b, 1);
+				temp = (*printer)(arg, &b, 1);
 				if unlikely(temp < 0)
 					goto err;
 				result += temp;
@@ -1063,10 +1063,10 @@ NOTHROW_CB(LIBKCALL libc_format_whexdump)(pc32formatprinter printer,
 		}
 		if (!(flags & 0x0010)) {
 			for (i = 0; i < line_len; ++i) {
-				byte_t b = line_data[i];
-				if (!libc_iswprint(b))
+				char32_t b = (char32_t)(char32_t)line_data[i];
+				if (!libc_iswprint((char32_t)b))
 					b = '.';
-				temp = (*printer)(arg, (char32_t const *)&b, 1);
+				temp = (*printer)(arg, &b, 1);
 				if unlikely(temp < 0)
 					goto err;
 				result += temp;

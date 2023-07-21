@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb28fa856 */
+/* HASH CRC-32:0x10b0aac1 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,11 +65,11 @@ NOTHROW_CB(LIBCCALL libc_format_repeat)(pformatprinter printer,
 #ifdef __hybrid_alloca
 	char *buffer;
 	if likely(num_repetitions <= 64) {
-		buffer = (char *)__hybrid_alloca(num_repetitions);
+		buffer = (char *)__hybrid_alloca(num_repetitions * sizeof(char));
 		__libc_memsetc(buffer, ch, num_repetitions, __SIZEOF_CHAR__);
 		return (*printer)(arg, buffer, num_repetitions);
 	}
-	buffer = (char *)__hybrid_alloca(64);
+	buffer = (char *)__hybrid_alloca(64 * sizeof(char));
 	__libc_memsetc(buffer, ch, 64, __SIZEOF_CHAR__);
 #else /* __hybrid_alloca */
 	char buffer[64];
@@ -543,10 +543,10 @@ NOTHROW_CB(LIBCCALL libc_format_hexdump)(pformatprinter printer,
 		}
 		if (!(flags & 0x0010)) {
 			for (i = 0; i < line_len; ++i) {
-				byte_t b = line_data[i];
-				if (!libc_isprint(b))
+				char b = (char)(unsigned char)line_data[i];
+				if (!libc_isprint((unsigned char)b))
 					b = '.';
-				temp = (*printer)(arg, (char const *)&b, 1);
+				temp = (*printer)(arg, &b, 1);
 				if unlikely(temp < 0)
 					goto err;
 				result += temp;

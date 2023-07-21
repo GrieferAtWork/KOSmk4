@@ -349,11 +349,11 @@ $ssize_t format_repeat([[nonnull]] pformatprinter printer, void *arg,
 @@pp_ifdef __hybrid_alloca@@
 	char *buffer;
 	if likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
-		buffer = (char *)__hybrid_alloca(num_repetitions);
+		buffer = (char *)__hybrid_alloca(num_repetitions * sizeof(char));
 		__libc_memsetc(buffer, ch, num_repetitions, __SIZEOF_CHAR__);
 		return (*printer)(arg, buffer, num_repetitions);
 	}
-	buffer = (char *)__hybrid_alloca(FORMAT_REPEAT_BUFSIZE);
+	buffer = (char *)__hybrid_alloca(FORMAT_REPEAT_BUFSIZE * sizeof(char));
 	__libc_memsetc(buffer, ch, FORMAT_REPEAT_BUFSIZE, __SIZEOF_CHAR__);
 @@pp_else@@
 	char buffer[FORMAT_REPEAT_BUFSIZE];
@@ -881,10 +881,10 @@ $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
 		}
 		if (!(flags & FORMAT_HEXDUMP_FNOASCII)) {
 			for (i = 0; i < line_len; ++i) {
-				byte_t b = line_data[i];
-				if (!isprint(b))
+				char b = (char)(unsigned char)line_data[i];
+				if (!isprint((unsigned char)b))
 					b = '.';
-				temp = (*printer)(arg, (char const *)&b, 1);
+				temp = (*printer)(arg, &b, 1);
 				if unlikely(temp < 0)
 					goto err;
 				result += temp;
