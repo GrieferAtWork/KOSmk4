@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix a problem with `operator hash()` of user-classes"
-DEEMON_VERSION="95d9525208bd6132d922e0fb1987712c8458d42f"
+#     v -- "Have `Mapping.Keys` implement `Set`"
+DEEMON_VERSION="13bea817b6e13ebf3b8b46d4fc68c2d16b9b5ef5"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
