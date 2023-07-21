@@ -219,7 +219,7 @@ NOTHROW_NCX(LIBCCALL libc__setmbcp)(int cp)
 				char utf8_buf[UNICODE_UTF8_MAXLEN + 1];
 				format_snprintf_init(&printer, utf8_buf, sizeof(utf8_buf));
 				input[0] = (unsigned char)ch;
-				if ((*decode_input.ii_printer)(decode_input.ii_arg, (char const *)input, 2) < 0) {
+				if ((*decode_input.ii_printer)(decode_input.ii_arg, (char const *)input, 1) < 0) {
 					/* Encoding error --> invalid character --> assume it's a trail byte.
 					 * XXX: This isn't necessarily correct, but libiconv doesn't offer any
 					 *      way to properly determine this... */
