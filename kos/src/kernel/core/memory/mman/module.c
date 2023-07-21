@@ -628,8 +628,8 @@ DEFINE_PUBLIC_ALIAS(mman_module_next_nx, mman_module_next);
 
 #ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 LOCAL NONNULL((1, 5, 7)) unwind_errno_t KCALL
-unwind_userspace_with_section(struct module *__restrict mod, void __CHECKED const *absolute_pc,
-                              byte_t __CHECKED const *eh_frame_data, size_t eh_frame_size,
+unwind_userspace_with_section(struct module *__restrict mod, CHECKED void const *absolute_pc,
+                              CHECKED byte_t const *eh_frame_data, size_t eh_frame_size,
                               unwind_getreg_t reg_getter, void const *reg_getter_arg,
                               unwind_setreg_t reg_setter, void *reg_setter_arg,
                               bool is_debug_frame) {
@@ -688,7 +688,7 @@ unwind_userspace_with_section(struct module *__restrict mod, void __CHECKED cons
 }
 
 PRIVATE BLOCKING ATTR_NOINLINE NONNULL((2, 4)) unwind_errno_t LIBUNWIND_CC
-unwind_userspace(void __CHECKED const *absolute_pc,
+unwind_userspace(CHECKED void const *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	/* Unwind a user-space location. */
@@ -720,7 +720,7 @@ unwind_userspace(void __CHECKED const *absolute_pc,
 		/* Search for the `.eh_frame' and `.debug_frame' sections. */
 		for (i = 0; i < 2; ++i) {
 			size_t size;
-			byte_t __CHECKED const *data;
+			CHECKED byte_t const *data;
 			REF struct module_section *sect;
 			static char const section_names[][16] = { ".eh_frame", ".debug_frame" };
 			if ((sect = module_locksection(mod, section_names[i])) == NULL)
@@ -758,7 +758,7 @@ unwind_userspace(void __CHECKED const *absolute_pc,
 
 
 PUBLIC BLOCKING NONNULL((2, 4)) unwind_errno_t LIBDEBUGINFO_CC
-unwind_for_debug(void __CHECKED const *absolute_pc,
+unwind_for_debug(CHECKED void const *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	unwind_errno_t result;
@@ -780,7 +780,7 @@ unwind_for_debug(void __CHECKED const *absolute_pc,
 }
 #else /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 PUBLIC NONNULL((2, 4)) unwind_errno_t LIBDEBUGINFO_CC
-unwind_for_debug(void __CHECKED const *absolute_pc,
+unwind_for_debug(CHECKED void const *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	/* Use the normal unwind(3) to implement unwind_for_debug(3) */

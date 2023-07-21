@@ -72,9 +72,9 @@ PUBLIC NONNULL((1, 2, 3)) void
 NOTHROW_NCX(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
                                             struct cmodule const *__restrict mod,
                                             di_debuginfo_cu_parser_t *__restrict result,
-                                            byte_t CHECKED const *dip) {
+                                            CHECKED byte_t const *dip) {
 	uintptr_t temp;
-	byte_t CHECKED const *reader;
+	CHECKED byte_t const *reader;
 	uint8_t unit_type;
 	reader = cmodunit_di_start(self);
 	result->dup_cu_info_hdr = reader;
@@ -455,7 +455,7 @@ NOTHROW(FCALL cmodule_reloc_units)(struct cmodule *new_addr,
 
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL print_invalid_addrsize_warning)(di_debuginfo_cu_parser_t const *__restrict parser,
-                                              byte_t CHECKED const *reader) {
+                                              CHECKED byte_t const *reader) {
 	printk(KERN_ERR "[dbx][dwarf%" PRIu16 "] Illegal address_size %#" PRIx8 " in .debug_info CU header at %p\n",
 	       parser->dsp_version, parser->dsp_addrsize, reader);
 }
@@ -484,7 +484,7 @@ NOTHROW_NCX(FCALL cmodule_create)(module_t *__restrict mod) {
 	/* Special handling to ensure that .symtab is loaded as intended
 	 * when   accessing  debug  information  for  the  kernel  core. */
 	if (mod == (module_t *)&kernel_driver) {
-		result->cm_sections.ds_symtab_start = (byte_t CHECKED const *)&kernel_symbol_table;
+		result->cm_sections.ds_symtab_start = (byte_t const *)&kernel_symbol_table;
 		result->cm_sections.ds_symtab_end   = NULL;
 		result->cm_sections.ds_symtab_ent   = 0;
 		result->cm_sections.ds_strtab_start = NULL;
@@ -497,7 +497,7 @@ NOTHROW_NCX(FCALL cmodule_create)(module_t *__restrict mod) {
 	 * are gained automatically  since we're traversing  .debug_info
 	 * linearly, and always appending to the end of the list of  CUs */
 	{
-		byte_t CHECKED const *reader, *end, *next_cu;
+		CHECKED byte_t const *reader, *end, *next_cu;
 		reader = result->cm_sections.ds_debug_info_start;
 		end    = result->cm_sections.ds_debug_info_end;
 		result->cm_cuv[0].cu_di_start = end; /* Initial end-pointer (for consistency) */
@@ -554,9 +554,9 @@ NOTHROW_NCX(FCALL cmodule_create)(module_t *__restrict mod) {
 			parser.dsp_version = UNALIGNED_GET16(reader);
 			reader += 2; /* version */
 			if (parser.dsp_version >= 5) {
-				unit_type = *(uint8_t CHECKED const *)reader; /* unit_type */
+				unit_type = *(uint8_t const *)reader; /* unit_type */
 				reader += 1;
-				parser.dsp_addrsize = *(uint8_t CHECKED const *)reader; /* address_size */
+				parser.dsp_addrsize = *(uint8_t const *)reader; /* address_size */
 				if unlikely(!addrsize_isvalid(parser.dsp_addrsize)) {
 					print_invalid_addrsize_warning(&parser, reader);
 					goto done_cucs;
@@ -585,7 +585,7 @@ NOTHROW_NCX(FCALL cmodule_create)(module_t *__restrict mod) {
 			cu->cu_abbrev.dua_cache_next = 0;
 
 			if (parser.dsp_version < 5) {
-				parser.dsp_addrsize = *(uint8_t CHECKED const *)reader; /* address_size */
+				parser.dsp_addrsize = *(uint8_t const *)reader; /* address_size */
 				if unlikely(!addrsize_isvalid(parser.dsp_addrsize)) {
 					print_invalid_addrsize_warning(&parser, reader);
 					goto done_cucs;
@@ -801,7 +801,7 @@ NOTHROW_NCX(FCALL cmodsymtab_lookup)(struct cmodsymtab const *__restrict self,
 #define cmodsymtab_lookup(self, mod, name, namlen, ns) \
 	cmodsymtab_lookup(self, name, namlen, ns)
 #endif /* !CMODSYM_NAME_NEEDS_MODULE */
-                                     char CHECKED const *name, size_t namelen,
+                                     CHECKED char const *name, size_t namelen,
                                      uintptr_t ns) {
 	struct cmodsym *result;
 	size_t lo, hi;
@@ -860,14 +860,14 @@ NOTHROW_NCX(FCALL cmodsymtab_lookup)(struct cmodsymtab const *__restrict self,
 
 
 
-PRIVATE NONNULL((1, 2, 4)) char CHECKED const *
+PRIVATE NONNULL((1, 2, 4)) CHECKED char const *
 NOTHROW_NCX(FCALL parse_symbol_name_for_object)(di_debuginfo_cu_parser_t *__restrict self,
                                                 uintptr_t *__restrict pns,
                                                 bool reuse_parser,
                                                 bool *__restrict phas_location_information);
-PRIVATE ATTR_NOINLINE NONNULL((1)) char CHECKED const *
+PRIVATE ATTR_NOINLINE NONNULL((1)) CHECKED char const *
 NOTHROW_NCX(FCALL parse_symbol_name_for_object_r)(di_debuginfo_cu_parser_t *__restrict self,
-                                                  byte_t CHECKED const *abstract_origin,
+                                                  CHECKED byte_t const *abstract_origin,
                                                   uintptr_t *__restrict pns,
                                                   bool *__restrict phas_location_information) {
 	di_debuginfo_cu_parser_t inner_parser;
@@ -886,9 +886,9 @@ NOTHROW_NCX(FCALL parse_symbol_name_for_object_r)(di_debuginfo_cu_parser_t *__re
 
 PRIVATE ATTR_NOINLINE NONNULL((1, 2, 3, 4, 5)) void
 NOTHROW_NCX(FCALL parse_variable_specifications)(di_debuginfo_cu_parser_t const *__restrict self,
-                                                 byte_t CHECKED const *specification,
-                                                 char CHECKED const **__restrict p_linkage_name,
-                                                 char CHECKED const **__restrict p_name,
+                                                 CHECKED byte_t const *specification,
+                                                 CHECKED char const **__restrict p_linkage_name,
+                                                 CHECKED char const **__restrict p_name,
                                                  unsigned int *__restrict p_features) {
 	di_debuginfo_cu_parser_t inner_parser;
 	di_debuginfo_component_attrib_t attr;
@@ -903,7 +903,7 @@ again:
 				switch (attr.dica_name) {
 
 				case DW_AT_abstract_origin: {
-					byte_t CHECKED const *abstract_origin;
+					CHECKED byte_t const *abstract_origin;
 					/* Load data from the pointed-to location. */
 					if unlikely(!debuginfo_cu_parser_getref(&inner_parser, attr.dica_form,
 					                                        &abstract_origin))
@@ -949,14 +949,14 @@ again:
  * to figure out if it has a  name that should appear in symbol  tables.
  * If it does, then that name is returned. Otherwise, NULL is  returned,
  * but attributes for the current component will have still been parsed. */
-PRIVATE NONNULL((1, 2, 4)) char CHECKED const *
+PRIVATE NONNULL((1, 2, 4)) CHECKED char const *
 NOTHROW_NCX(FCALL parse_symbol_name_for_object)(di_debuginfo_cu_parser_t *__restrict self,
                                                 uintptr_t *__restrict pns,
                                                 bool reuse_parser,
                                                 bool *__restrict phas_location_information) {
 	di_debuginfo_component_attrib_t attr;
-	byte_t CHECKED const *attrib_pos;
-	char CHECKED const *result = NULL;
+	CHECKED byte_t const *attrib_pos;
+	CHECKED char const *result = NULL;
 again:
 	attrib_pos = self->dsp_cu_info_pos;
 	switch (self->dup_comp.dic_tag) {
@@ -973,7 +973,7 @@ again:
 		 *     - One of: DW_AT_const_value, DW_AT_location
 		 *     - One of: DW_AT_type
 		 */
-		char CHECKED const *name_attribute = NULL;
+		CHECKED char const *name_attribute = NULL;
 		unsigned int features = 0;
 		DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, self) {
 			switch (attr.dica_name) {
@@ -983,7 +983,7 @@ again:
 
 			case DW_AT_sibling:
 			case DW_AT_specification: {
-				byte_t CHECKED const *specification;
+				CHECKED byte_t const *specification;
 				if (debuginfo_cu_parser_getref(self, attr.dica_form, &specification)) {
 					/* Only load the pointed-to name if we don't already have one. */
 					if (result && !name_attribute)
@@ -1039,7 +1039,7 @@ again:
 		 *  - One of: DW_AT_linkage_name, DW_AT_name
 		 *  - One of: DW_AT_low_pc, DW_AT_entry_pc
 		 */
-		char CHECKED const *name_attribute = NULL;
+		CHECKED char const *name_attribute = NULL;
 		*phas_location_information = false;
 		DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, self) {
 			switch (attr.dica_name) {
@@ -1162,7 +1162,7 @@ again:
 	}
 	return result;
 	{
-		byte_t CHECKED const *abstract_origin;
+		CHECKED byte_t const *abstract_origin;
 do_abstract_origin:
 		/* Load data from the pointed-to location. */
 		if unlikely(!debuginfo_cu_parser_getref(self, attr.dica_form,
@@ -1211,7 +1211,7 @@ NOTHROW(FCALL same_namespace)(uintptr_t dip_a, uintptr_t dip_b) {
  * @return: DBX_ENOMEM: Insufficient memory. */
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
 NOTHROW_NCX(FCALL cmodsymtab_insert_symbol)(struct cmodsymtab *__restrict self,
-                                            size_t index, char CHECKED const *name,
+                                            size_t index, CHECKED char const *name,
                                             uintptr_t symbol_dip) {
 	size_t syma;
 	assert(index <= self->mst_symc);
@@ -1274,7 +1274,7 @@ NOTHROW(FCALL cmodsymtab_addsymbol)(struct cmodsymtab *__restrict self,
 #ifdef CMODSYM_NAME_NEEDS_MODULE
                                     struct cmodule const *__restrict mod,
 #endif /* CMODSYM_NAME_NEEDS_MODULE */
-                                    char CHECKED const *name,
+                                    CHECKED char const *name,
                                     uintptr_t symbol_dip) {
 	size_t lo, hi, index;
 	lo = 0;
@@ -1357,8 +1357,8 @@ NOTHROW(FCALL cmodule_relocate_mip_symbols_below)(struct cmodsymtab *__restrict 
 PRIVATE WUNUSED NONNULL((1, 2)) dbx_errno_t
 NOTHROW_NCX(FCALL cmodule_make_symbol_mixed)(struct cmodule *__restrict self,
                                              struct cmodsym *__restrict sym,
-                                             byte_t CHECKED const *dip,
-                                             CLinkerSymbol CHECKED const *sip) {
+                                             CHECKED byte_t const *dip,
+                                             CHECKED CLinkerSymbol const *sip) {
 	size_t index, alloc;
 	struct cmodmixsym *mixed;
 
@@ -1471,11 +1471,11 @@ NOTHROW_NCX(FCALL cmodule_make_symbol_mixed)(struct cmodule *__restrict self,
 PRIVATE WUNUSED NONNULL((1, 2, 3, 4)) unsigned int
 NOTHROW_NCX(FCALL cmodule_evaluate_symbol_address)(struct cmodule const *__restrict self,
                                                    struct cmodunit const *__restrict cu,
-                                                   byte_t CHECKED const *dip,
+                                                   CHECKED byte_t const *dip,
                                                    uintptr_t *__restrict pmodule_relative_addr) {
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_component_attrib_t attr;
-	byte_t CHECKED const *referenced_component;
+	CHECKED byte_t const *referenced_component;
 	bool is_external = false;
 again:
 
@@ -1575,8 +1575,8 @@ PRIVATE WUNUSED NONNULL((1, 2, 3)) dbx_errno_t
 NOTHROW_NCX(FCALL cmodule_addsymbol)(struct cmodule *__restrict self,
                                      struct cmodsymtab *__restrict cu_symtab,
                                      struct cmodunit *__restrict cu,
-                                     char CHECKED const *name,
-                                     byte_t CHECKED const *dip,
+                                     CHECKED char const *name,
+                                     CHECKED byte_t const *dip,
                                      uintptr_t ns,
                                      bool has_location_information) {
 	uintptr_t symbol_dip;
@@ -1635,7 +1635,7 @@ NOTHROW_NCX(FCALL cmodule_addsymbol)(struct cmodule *__restrict self,
 						if (mip->ms_dip == dip)
 							return DBX_EOK; /* Same dip -> Redefinition (ignore silently) */
 					} else if (cmodsym_issip(sym) && ns == CMODSYM_DIP_NS_NORMAL) {
-						CLinkerSymbol CHECKED const *sip;
+						CHECKED CLinkerSymbol const *sip;
 						uintptr_t dip_modrel_symaddr;
 						uintptr_t sip_modrel_symaddr;
 						unsigned int address_status;
@@ -1784,8 +1784,8 @@ fallback_insert_possible_collision:
 
 
 /* Check if `name' is a valid symbol name. */
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
-NOTHROW_NCX(FCALL is_a_valid_symbol_name)(char CHECKED const *__restrict name) {
+PRIVATE ATTR_PURE WUNUSED bool
+NOTHROW_NCX(FCALL is_a_valid_symbol_name)(CHECKED char const *name) {
 	char ch = *name;
 	if (!isalpha(ch) && ch != '_' && ch != '$')
 		goto nope;
@@ -1820,7 +1820,7 @@ NOTHROW_NCX(FCALL cmodunit_loadsyms)(struct cmodunit *__restrict self,
 	cmodunit_parser_from_dip(self, mod, &parser, NULL);
 
 	for (;;) {
-		byte_t CHECKED const *dip;
+		CHECKED byte_t const *dip;
 		size_t cu_depth;
 
 		/* Load the initial compile-unit container-tag. */
@@ -1924,16 +1924,16 @@ NOTHROW_NCX(FCALL cmodule_append_symtab_symbol)(struct cmodule const *__restrict
                                                 struct cmodsymtab *__restrict symtab,
                                                 uintptr_t symtab_symbol_offset,
                                                 uintptr_t strtab_name_offset) {
-	char CHECKED const *name;
+	CHECKED char const *name;
 	dbx_errno_t result = DBX_EOK;
 
 	/* Construct the actual symbol name. */
-	name = (char CHECKED const *)(self->cm_sections.ds_strtab_start +
-	                              strtab_name_offset);
+	name = (char const *)(self->cm_sections.ds_strtab_start +
+	                      strtab_name_offset);
 
 	/* Verify that the name is in-bounds. */
-	if unlikely((byte_t CHECKED const *)name < self->cm_sections.ds_strtab_start ||
-	            (byte_t CHECKED const *)name >= self->cm_sections.ds_strtab_end)
+	if unlikely((byte_t const *)name < self->cm_sections.ds_strtab_start ||
+	            (byte_t const *)name >= self->cm_sections.ds_strtab_end)
 		goto done;
 
 	/* Verify that the name is a valid symbol identifier. */
@@ -1972,7 +1972,7 @@ NOTHROW_NCX(FCALL cmodule_load_symtab_elf32)(struct cmodule const *__restrict se
 
 	/* Actually add the symbol. */
 	result = cmodule_append_symtab_symbol(self, symtab,
-	                                      (byte_t CHECKED const *)sym - self->cm_sections.ds_symtab_start,
+	                                      (byte_t const *)sym - self->cm_sections.ds_symtab_start,
 	                                      sym->st_name);
 done:
 	return result;
@@ -1992,7 +1992,7 @@ NOTHROW_NCX(FCALL cmodule_load_symtab_elf64)(struct cmodule const *__restrict se
 
 	/* Actually add the symbol. */
 	result = cmodule_append_symtab_symbol(self, symtab,
-	                                      (byte_t CHECKED const *)sym - self->cm_sections.ds_symtab_start,
+	                                      (byte_t const *)sym - self->cm_sections.ds_symtab_start,
 	                                      sym->st_name);
 done:
 	return result;
@@ -2080,8 +2080,8 @@ NOTHROW_NCX(FCALL cmodule_load_symtab_symbols)(struct cmodule *__restrict self) 
 			goto done; /* No .strtab / .dynstr */
 		if (CLinkerSymbol_IsElf32(self)) {
 			Elf32_Sym CHECKED const *iter, *end;
-			iter = (Elf32_Sym CHECKED const *)self->cm_sections.ds_symtab_start;
-			end  = (Elf32_Sym CHECKED const *)(self->cm_sections.ds_symtab_end - (sizeof(Elf32_Sym) - 1));
+			iter = (Elf32_Sym const *)self->cm_sections.ds_symtab_start;
+			end  = (Elf32_Sym const *)(self->cm_sections.ds_symtab_end - (sizeof(Elf32_Sym) - 1));
 			for (; iter < end; ++iter) {
 				error = cmodule_load_symtab_elf32(self, &symtab, iter);
 				if unlikely(error != DBX_EOK)
@@ -2091,8 +2091,8 @@ NOTHROW_NCX(FCALL cmodule_load_symtab_symbols)(struct cmodule *__restrict self) 
 			}
 		} else if (CLinkerSymbol_IsElf64(self)) {
 			Elf64_Sym CHECKED const *iter, *end;
-			iter = (Elf64_Sym CHECKED const *)self->cm_sections.ds_symtab_start;
-			end  = (Elf64_Sym CHECKED const *)(self->cm_sections.ds_symtab_end - (sizeof(Elf64_Sym) - 1));
+			iter = (Elf64_Sym const *)self->cm_sections.ds_symtab_start;
+			end  = (Elf64_Sym const *)(self->cm_sections.ds_symtab_end - (sizeof(Elf64_Sym) - 1));
 			for (; iter < end; ++iter) {
 				error = cmodule_load_symtab_elf64(self, &symtab, iter);
 				if unlikely(error != DBX_EOK)
@@ -2220,7 +2220,7 @@ done:
  *             symbol instead. */
 PUBLIC WUNUSED NONNULL((1)) struct cmodsym const *
 NOTHROW_NCX(FCALL cmodule_getsym)(struct cmodule *__restrict self,
-                                  char CHECKED const *name,
+                                  CHECKED char const *name,
                                   size_t namelen, uintptr_t ns) {
 	struct cmodsym const *result;
 
@@ -2238,8 +2238,8 @@ NOTHROW_NCX(FCALL cmodule_getsym)(struct cmodule *__restrict self,
 	if (result && (cmodsym_getns(result) & CMODSYM_DIP_NS_FCONFLICT)) {
 		void const *pc;
 		pc = dbg_getpcreg(DBG_RT_REGLEVEL_VIEW);
-		if ((byte_t CHECKED const *)pc >= cmodule_getloadmin(self) &&
-		    (byte_t CHECKED const *)pc <= cmodule_getloadmax(self)) {
+		if ((byte_t const *)pc >= cmodule_getloadmin(self) &&
+		    (byte_t const *)pc <= cmodule_getloadmax(self)) {
 			uintptr_t module_relative_pc;
 			struct cmodunit *cu;
 			module_relative_pc = (uintptr_t)pc - cmodule_getloadaddr(self);
@@ -2259,7 +2259,7 @@ NOTHROW_NCX(FCALL cmodule_getsym)(struct cmodule *__restrict self,
 
 struct cmodule_getsym_global_data {
 	struct cmodsym const *cmgsgd_result;
-	char CHECKED const   *cmgsgd_name;
+	CHECKED char const   *cmgsgd_name;
 	size_t                cmgsgd_namelen;
 	REF struct cmodule  **cmgsgd_presult_module;
 	uintptr_t             cmgsgd_ns;
@@ -2293,7 +2293,7 @@ cmodule_getsym_global_callback(void *cookie,
  * @return: NULL: Error: No such symbol.
  * @return: NULL: Error: Operation was interrupted. */
 PUBLIC WUNUSED NONNULL((3)) struct cmodsym const *
-NOTHROW_NCX(FCALL cmodule_getsym_global)(char CHECKED const *name, size_t namelen,
+NOTHROW_NCX(FCALL cmodule_getsym_global)(CHECKED char const *name, size_t namelen,
                                          REF struct cmodule **__restrict presult_module,
                                          uintptr_t ns) {
 	struct cmodule_getsym_global_data data;
@@ -2314,7 +2314,7 @@ NOTHROW_NCX(FCALL cmodule_getsym_global)(char CHECKED const *name, size_t namele
  * different address spaces. */
 PUBLIC WUNUSED NONNULL((4)) struct cmodsym const *
 NOTHROW_NCX(FCALL cmodule_getsym_withhint)(struct cmodule *start_module,
-                                           char CHECKED const *name, size_t namelen,
+                                           CHECKED char const *name, size_t namelen,
                                            REF struct cmodule **__restrict presult_module,
                                            uintptr_t ns) {
 	struct cmodule_getsym_global_data data;
@@ -2340,7 +2340,7 @@ NOTHROW_NCX(FCALL cmodule_getsym_withhint)(struct cmodule *start_module,
 PUBLIC NONNULL((1, 2)) void
 NOTHROW_NCX(FCALL cmodule_parser_from_dip)(struct cmodule const *__restrict self,
                                            di_debuginfo_cu_parser_t *__restrict result,
-                                           byte_t CHECKED const *dip) {
+                                           CHECKED byte_t const *dip) {
 	struct cmodunit *cu;
 
 	/* Try to find the CU associated with `dip' */
@@ -2408,7 +2408,7 @@ NOTHROW_NCX(FCALL cmodule_findunit_from_pc)(struct cmodule const *__restrict sel
 		                            &debuginfo_cu_offset,
 		                            module_relative_pc);
 		if (error == DEBUG_INFO_ERROR_SUCCESS) {
-			byte_t CHECKED const *cu_start;
+			CHECKED byte_t const *cu_start;
 			cu_start = self->cm_sections.ds_debug_info_start + debuginfo_cu_offset;
 			result   = cmodule_findunit_from_dip(self, cu_start);
 			if (result != NULL)
@@ -2427,7 +2427,7 @@ done:
  * If no such unit can be located, `NULL' will be returned instead. */
 PUBLIC ATTR_PURE WUNUSED NONNULL((1)) struct cmodunit *
 NOTHROW_NCX(FCALL cmodule_findunit_from_dip)(struct cmodule const *__restrict self,
-                                             byte_t CHECKED const *dip) {
+                                             CHECKED byte_t const *dip) {
 	struct cmodunit const *result;
 	size_t lo, hi;
 	lo = 0, hi = self->cm_cuc;
@@ -2497,7 +2497,7 @@ NOTHROW_NCX(FCALL cmodsyminfo_lookup_cb)(struct cmodsyminfo *__restrict info,
  * @return: DBX_EINTR:  Operation was interrupted. */
 PUBLIC NONNULL((1)) dbx_errno_t
 NOTHROW_NCX(FCALL cmod_syminfo)(/*in|out*/ struct cmodsyminfo *__restrict info,
-                                char CHECKED const *name, size_t namelen,
+                                CHECKED char const *name, size_t namelen,
                                 uintptr_t ns) {
 	/* Implement the symbol-lookup function in terms of the symbol enumeration function. */
 	struct cmodsyminfo_lookup_data data;
@@ -2548,9 +2548,9 @@ NOTHROW_NCX(FCALL cmod_syminfo)(/*in|out*/ struct cmodsyminfo *__restrict info,
  * @return: DBX_EINTR:  Operation was interrupted. */
 PUBLIC NONNULL((1)) dbx_errno_t
 NOTHROW_NCX(FCALL cmod_syminfo_local)(/*out*/ struct cmodsyminfo *__restrict info,
-                                      char CHECKED const *name, size_t namelen,
+                                      CHECKED char const *name, size_t namelen,
                                       uintptr_t ns) {
-	void CHECKED const *pc;
+	CHECKED void const *pc;
 	dbx_errno_t result;
 	pc = dbg_getpcreg(DBG_RT_REGLEVEL_VIEW);
 
@@ -2587,7 +2587,7 @@ NOTHROW_NCX(FCALL loadinfo_location)(di_debuginfo_cu_parser_t const *__restrict 
 PRIVATE NONNULL((1, 2, 4)) void
 NOTHROW_NCX(FCALL loadinfo_const_value)(di_debuginfo_cu_parser_t const *__restrict parser,
                                         struct cmodsyminfo *__restrict info,
-                                        uintptr_t form, byte_t CHECKED const *attr_reader) {
+                                        uintptr_t form, CHECKED byte_t const *attr_reader) {
 	uintptr_t value;
 	di_debuginfo_block_t block;
 	if (debuginfo_cu_parser_getconst(parser, form, &value, attr_reader)) {
@@ -2613,7 +2613,7 @@ NOTHROW_NCX(FCALL loadinfo_type)(di_debuginfo_cu_parser_t const *__restrict pars
 
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) void
 NOTHROW_NCX(FCALL loadinfo_specifications)(struct cmodsyminfo *__restrict info,
-                                           byte_t CHECKED const *specification,
+                                           CHECKED byte_t const *specification,
                                            bool has_object_address) {
 	di_debuginfo_cu_parser_t inner_parser;
 	di_debuginfo_component_attrib_t attr;
@@ -2629,7 +2629,7 @@ again:
 				switch (attr.dica_name) {
 
 				case DW_AT_abstract_origin: {
-					byte_t CHECKED const *abstract_origin;
+					CHECKED byte_t const *abstract_origin;
 					/* Load data from the pointed-to location. */
 					if unlikely(!debuginfo_cu_parser_getref(&inner_parser, attr.dica_form,
 					                                        &abstract_origin))
@@ -2670,7 +2670,7 @@ again:
 PRIVATE NONNULL((1)) bool
 NOTHROW_NCX(FCALL parser_check_object_has_address)(di_debuginfo_cu_parser_t *__restrict parser,
                                                    uintptr_t module_relative_addr) {
-	byte_t CHECKED const *referenced_component;
+	CHECKED byte_t const *referenced_component;
 	di_debuginfo_cu_parser_t _inner_parser;
 	di_debuginfo_component_attrib_t attr;
 	bool has_location;
@@ -2765,11 +2765,11 @@ done:
  * for a symbol that has a starting address equal to `module_relative_addr'
  * Once found,  store information  about  that symbol  in  `info->clv_data'
  * If found, return the DIP for that object. Otherwise, return `NULL' */
-PRIVATE NONNULL((1)) byte_t CHECKED const *
+PRIVATE NONNULL((1)) CHECKED byte_t const *
 NOTHROW_NCX(FCALL cmod_symenum_search_for_address)(struct cmodsyminfo *__restrict info,
                                                    uintptr_t module_relative_addr) {
 	for (;;) {
-		byte_t CHECKED const *dip;
+		CHECKED byte_t const *dip;
 		size_t cu_depth;
 
 		/* Load the initial compile-unit container-tag. */
@@ -2859,7 +2859,7 @@ NOTHROW_NCX(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info) {
 	bzero(&info->clv_data, sizeof(info->clv_data));
 	has_object_address = false;
 	if (cmodsyminfo_ismip(info) || cmodsyminfo_issip(info)) {
-		CLinkerSymbol CHECKED const *psymbol;
+		CHECKED CLinkerSymbol const *psymbol;
 		uintptr_t symbol_addr;
 		if (cmodsyminfo_ismip(info)) {
 			psymbol = cmodsyminfo_getmip(info)->ms_sip;
@@ -2979,7 +2979,7 @@ again_attributes:
 			switch (attr.dica_name) {
 
 			case DW_AT_abstract_origin: {
-				byte_t CHECKED const *abstract_origin;
+				CHECKED byte_t const *abstract_origin;
 				if unlikely(!debuginfo_cu_parser_getref(&info->clv_parser, attr.dica_form,
 				                                        &abstract_origin))
 					goto done_attributes;
@@ -3005,7 +3005,7 @@ again_attributes:
 
 			case DW_AT_sibling:
 			case DW_AT_specification: {
-				byte_t CHECKED const *spec;
+				CHECKED byte_t const *spec;
 				if likely(debuginfo_cu_parser_getref(&info->clv_parser, attr.dica_form, &spec))
 					loadinfo_specifications(info, spec, has_object_address);
 			}	break;
@@ -3160,7 +3160,7 @@ struct cmod_symenum_foreign_globals_data {
 	REF struct cmodule     *csefgd_excluded_module; /* [1..1] */
 	struct cmodsyminfo     *csefgd_info;            /* [1..1] */
 	cmod_symenum_callback_t csefgd_cb;              /* [1..1] */
-	char CHECKED const     *csefgd_startswith_name;
+	CHECKED char const     *csefgd_startswith_name;
 	size_t                  csefgd_startswith_namelen;
 	uintptr_t               csefgd_ns;
 	bool                    csefgd_did_encounter_nomem;
@@ -3207,7 +3207,7 @@ cmod_symenum_foreign_globals_cb(void *cookie, struct cmodule *__restrict mod) {
  * @return: DBX_EINTERN: Internal error. */
 PRIVATE ATTR_NOINLINE NONNULL((1, 2, 6)) dbx_errno_t FCALL
 cmod_symenum_locals_from_cu(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
-                            cmod_symenum_callback_t cb, char CHECKED const *startswith_name,
+                            cmod_symenum_callback_t cb, CHECKED char const *startswith_name,
                             size_t startswith_namelen, uintptr_t ns,
                             ssize_t *__restrict presult) {
 	debuginfo_errno_t error;
@@ -3246,7 +3246,7 @@ again_cu_component:
 				}
 			}
 			for (;;) {
-				byte_t CHECKED const *dip;
+				CHECKED byte_t const *dip;
 				if (!debuginfo_cu_parser_next_with_dip(&info->clv_parser, &dip))
 					goto done_subprogram;
 again_subprogram_component:
@@ -3349,7 +3349,7 @@ err_intr:
 /* Enumerate local variables from the selected CU */
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t FCALL
 cmod_symenum_locals(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
-                    cmod_symenum_callback_t cb, char CHECKED const *startswith_name,
+                    cmod_symenum_callback_t cb, CHECKED char const *startswith_name,
                     size_t startswith_namelen, uintptr_t ns) {
 	ssize_t result = 0;
 
@@ -3422,7 +3422,7 @@ skip_attributes_and_parse_next:
  * @return: DBX_EINTR: Operation was interrupted. */
 PUBLIC NONNULL((1, 2)) ssize_t FCALL
 cmod_symenum(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
-             cmod_symenum_callback_t cb, char CHECKED const *startswith_name,
+             cmod_symenum_callback_t cb, CHECKED char const *startswith_name,
              size_t startswith_namelen, uintptr_t ns, uintptr_t scope) {
 	ssize_t temp, result = 0;
 	bool did_encounter_nomem = false;
@@ -3495,7 +3495,7 @@ err:
  * @return: DBX_EINTR: Operation was interrupted. */
 PUBLIC NONNULL((1, 2)) ssize_t FCALL
 cmod_symenum_local(/*in(oob_only)|out(undef)*/ struct cmodsyminfo *__restrict info,
-                   cmod_symenum_callback_t cb, char CHECKED const *startswith_name,
+                   cmod_symenum_callback_t cb, CHECKED char const *startswith_name,
                    size_t startswith_namelen, uintptr_t ns, uintptr_t scope) {
 	void const *pc;
 	ssize_t result;

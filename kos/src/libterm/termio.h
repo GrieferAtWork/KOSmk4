@@ -54,16 +54,16 @@ NOTHROW_NCX(CC libterminal_init)(struct terminal *__restrict self,
  * @return: -1:   [USERSPACE] Printing to one of the linebuffers failed (s.a. `linebuffer_write()'; `errno') */
 INTDEF NONNULL((1)) ssize_t CC
 libterminal_owrite(struct terminal *__restrict self,
-                   void __USER __CHECKED const *__restrict src,
+                   USER CHECKED void const *__restrict src,
                    size_t num_bytes, iomode_t mode)
-	KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
-	              __THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...));
+	KERNEL_SELECT(THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
+	              THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...));
 INTDEF NONNULL((1)) ssize_t CC
 libterminal_iwrite(struct terminal *__restrict self,
-                   void __USER __CHECKED const *src,
+                   USER CHECKED void const *src,
                    size_t num_bytes, iomode_t mode)
-	KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
-	              __THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...));
+	KERNEL_SELECT(THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
+	              THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...));
 
 /* Read from the terminal input buffer (usually the keyboard), and into the given `dst'
  * @param: mode: Set of `0|IO_NONBLOCK'
@@ -71,9 +71,9 @@ libterminal_iwrite(struct terminal *__restrict self,
  * @return: <0:  [USERSPACE] An error occurred (s.a. `errno') */
 INTDEF NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libterminal_iread(struct terminal *__restrict self,
-                  void __USER __CHECKED *dst,
+                  USER CHECKED void *dst,
                   size_t num_bytes, iomode_t mode)
-		__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT);
+		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT);
 
 /* Set terminal I/O settings
  * @return: < 0: [USERSPACE]   A printer callback returned negative, or an error occurred (s.a. `errno')
@@ -82,8 +82,8 @@ INTDEF NONNULL((1, 2)) ssize_t CC
 libterminal_setios(struct terminal *__restrict self,
                    struct termios const *__restrict tio,
                    struct termios *old_tio)
-	KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
-	              __THROWS(E_WOULDBLOCK, E_INTERRUPT, ...));
+	KERNEL_SELECT(THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
+	              THROWS(E_WOULDBLOCK, E_INTERRUPT, ...));
 
 /* Flush the input buffer canon by writing all of its contents to `t_ibuf',
  * thus allowing the data to be read by a future call to `terminal_iread()'
@@ -91,8 +91,8 @@ libterminal_setios(struct terminal *__restrict self,
  * @return: <0: [USERSPACE] An error occurred (s.a. `errno') */
 INTDEF NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libterminal_flush_icanon(struct terminal *__restrict self, iomode_t mode)
-		KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
-		              __THROWS(E_WOULDBLOCK, E_INTERRUPT, ...));
+		KERNEL_SELECT(THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
+		              THROWS(E_WOULDBLOCK, E_INTERRUPT, ...));
 
 DECL_END
 

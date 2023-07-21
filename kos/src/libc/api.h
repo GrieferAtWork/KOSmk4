@@ -190,12 +190,6 @@ __asm__("__ubsan_handle_builtin_unreachable = libc___ubsan_handle_builtin_unreac
 #define CC        LIBCCALL
 #define VCC       VLIBCCALL
 
-#ifndef NOBLOCK
-#define NOBLOCK __NOBLOCK
-#endif /* !NOBLOCK */
-#ifndef THROWS
-#define THROWS __THROWS
-#endif /* !THROWS */
 #ifndef ASMCALL
 #define ASMCALL /* nothing */
 #endif /* !ASMCALL */

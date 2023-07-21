@@ -31,14 +31,6 @@
 
 #define CC LIBSVGADRV_CC
 
-#ifndef NOBLOCK
-#define NOBLOCK __NOBLOCK
-#endif /* !NOBLOCK */
-
-#ifndef THROWS
-#define THROWS __THROWS
-#endif /* !THROWS */
-
 #ifndef NOTHROW_KERNEL
 #define NOTHROW_KERNEL __NOTHROW_KERNEL
 #endif /* !NOTHROW_KERNEL */

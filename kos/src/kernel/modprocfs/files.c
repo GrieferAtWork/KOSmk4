@@ -400,6 +400,7 @@ kcore_ehdr_print(pformatprinter printer, void *arg) {
 	return (*printer)(arg, (char *)&ehdr, sizeof(ehdr));
 }
 
+__pragma_GCC_diagnostic_push_ignored(Wnonnull)
 INTERN NONNULL((1)) void KCALL
 procfs_kcore_printer(pformatprinter printer, void *arg,
                      pos_t offset_hint) {
@@ -408,13 +409,13 @@ procfs_kcore_printer(pformatprinter printer, void *arg,
 		if (kcore_ehdr_print(printer, arg) < 0)
 			return;
 	} else {
-		(*printer)(arg, NULL, kcore_ehdr_size);
+		(*printer)(arg, (char *)0, kcore_ehdr_size);
 	}
-
 
 	/* TODO: Print a coredump for the kernel core itself */
 	PRINT("TODO");
 }
+__pragma_GCC_diagnostic_pop_ignored(Wnonnull)
 
 
 

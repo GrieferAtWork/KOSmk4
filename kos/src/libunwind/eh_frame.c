@@ -361,10 +361,10 @@ PRIVATE
 NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                             IF_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t *common_init_regs,)
                                             IF_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT(byte_t *uncommon_init_regs,)
-                                            byte_t __CHECKED const *reader,
-                                            byte_t __CHECKED const *end,
+                                            CHECKED byte_t const *reader,
+                                            CHECKED byte_t const *end,
                                             unwind_cfa_state_t *__restrict result,
-                                            void __CHECKED const *absolute_pc);
+                                            CHECKED void const *absolute_pc);
 
 #ifndef CONFIG_NO_LIBUNWIND_CFA_SIGFRAME_STATE
 PRIVATE
@@ -379,10 +379,10 @@ PRIVATE
 NOTHROW_NCX(CC libuw_unwind_sigframe_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                      IF_CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t *common_init_regs,)
                                                      IF_CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT(byte_t *uncommon_init_regs,)
-                                                     byte_t __CHECKED const *reader,
-                                                     byte_t __CHECKED const *end,
+                                                     CHECKED byte_t const *reader,
+                                                     CHECKED byte_t const *end,
                                                      unwind_cfa_sigframe_state_t *__restrict result,
-                                                     void __CHECKED const *absolute_pc);
+                                                     CHECKED void const *absolute_pc);
 #endif /* !CONFIG_NO_LIBUNWIND_CFA_SIGFRAME_STATE */
 
 /* Internal helper for calculating landing-pad rules. */
@@ -399,27 +399,27 @@ PRIVATE
 NOTHROW_NCX(CC libuw_unwind_landing_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                     IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t *common_init_regs,)
                                                     IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(byte_t *uncommon_init_regs,)
-                                                    byte_t __CHECKED const *reader,
-                                                    byte_t __CHECKED const *landing_start_reader,
-                                                    byte_t __CHECKED const *end,
+                                                    CHECKED byte_t const *reader,
+                                                    CHECKED byte_t const *landing_start_reader,
+                                                    CHECKED byte_t const *end,
                                                     _unwind_cfa_landing_state_t *__restrict result,
-                                                    void __CHECKED const *absolute_pc);
+                                                    CHECKED void const *absolute_pc);
 #endif /* LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
 
 PRIVATE NONNULL((1, 2, 3, 4)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
-                                                byte_t __CHECKED const *reader,
-                                                byte_t __CHECKED const *end,
+                                                CHECKED byte_t const *reader,
+                                                CHECKED byte_t const *end,
                                                 unwind_cfa_value_t *__restrict result,
-                                                void __CHECKED const *absolute_pc);
+                                                CHECKED void const *absolute_pc);
 
 PRIVATE NONNULL((1, 2, 3, 4)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
-                                                 byte_t __CHECKED const *reader,
-                                                 byte_t __CHECKED const *end,
+                                                 CHECKED byte_t const *reader,
+                                                 CHECKED byte_t const *end,
                                                  unwind_cfa_register_t *__restrict rule,
                                                  unwind_regno_t dw_regno,
-                                                 void __CHECKED const *absolute_pc);
+                                                 CHECKED void const *absolute_pc);
 #endif /* __INTELLISENSE__ */
 
 
@@ -442,7 +442,7 @@ INTERN NONNULL((1, 2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_rule)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                       unwind_cfa_register_t *__restrict result,
                                       unwind_regno_t dw_regno,
-                                      void __CHECKED const *absolute_pc) {
+                                      CHECKED void const *absolute_pc) {
 	unwind_errno_t error;
 
 	/* `libuw_unwind_fde_exec_rule_until()'  won't  initialize
@@ -480,14 +480,14 @@ NOTHROW_NCX(CC libuw_unwind_fde_rule)(unwind_fde_t *__restrict self, /* Only non
 INTERN NONNULL((1, 2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                           unwind_cfa_value_t *__restrict result,
-                                          void __CHECKED const *absolute_pc) {
+                                          CHECKED void const *absolute_pc) {
 	unwind_errno_t error;
 	bzero(result, sizeof(*result));
 	error = libuw_unwind_fde_exec_cfa_until(self,
 	                                        self->f_inittext,
 	                                        self->f_inittextend,
 	                                        result,
-	                                        (void __CHECKED *)-1);
+	                                        (void *)-1);
 	if likely(error == UNWIND_SUCCESS) {
 		error = libuw_unwind_fde_exec_cfa_until(self,
 		                                        self->f_evaltext,
@@ -501,16 +501,16 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa)(unwind_fde_t *__restrict self, /* Only
 
 PRIVATE NONNULL((1, 2, 3, 5)) unwind_errno_t CC
 execute_eh_frame_expression(unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
-                            byte_t __CHECKED const *__restrict expression_pointer,
+                            CHECKED byte_t const *__restrict expression_pointer,
                             unwind_getreg_t reg_getter,
                             void const *reg_callback_arg,
-                            __CHECKED uintptr_t *__restrict presult,
+                            CHECKED uintptr_t *__restrict presult,
                             uintptr_t cfa_value) {
 	unwind_errno_t result;
 	unwind_ste_t top;
 	unwind_emulator_t emulator;
 	size_t expr_length;
-	expr_length = dwarf_decode_uleb128((byte_t __CHECKED const **)&expression_pointer);
+	expr_length = dwarf_decode_uleb128((byte_t const **)&expression_pointer);
 	bzero(&emulator, sizeof(emulator));
 	emulator.ue_pc             = expression_pointer;
 	emulator.ue_pc_start       = expression_pointer;
@@ -521,7 +521,7 @@ execute_eh_frame_expression(unwind_fde_t *__restrict fde, /* Only non-const for 
 	emulator.ue_bjmprem        = UNWIND_EMULATOR_BJMPREM_DEFAULT;
 	emulator.ue_call_frame_cfa = cfa_value;
 	emulator.ue_bases          = fde->f_bases;
-	emulator.ue_tlsbase        = (byte_t __CHECKED *)-1;
+	emulator.ue_tlsbase        = (byte_t *)-1;
 	top.s_type                 = UNWIND_STE_CONSTANT;
 	top.s_uconst               = cfa_value;
 
@@ -604,7 +604,7 @@ err:
 PRIVATE NONNULL((1, 2, 4, 6)) unwind_errno_t CC
 _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
                           unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
-                          void __CHECKED const *absolute_pc,
+                          CHECKED void const *absolute_pc,
                           unwind_getreg_t reg_getter, void const *reg_getter_arg,
                           unwind_setreg_t reg_setter, void *reg_setter_arg);
 #endif /* LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
@@ -659,8 +659,8 @@ NOTHROW_NCX(CC landing1_backup_freechain)(landing1_backup_t *base) {
 struct cfa_parser {
 	unwind_fde_t           *cp_fde;    /* [1..1][const] Associated FDE. Only non-const for lazy initialized fields! */
 	uintptr_t               cp_pc;     /* Program counter position (absolute) */
-	byte_t __CHECKED const *cp_reader; /* [1..1] CFA instruction program counter. */
-	byte_t __CHECKED const *cp_end;    /* [1..1][const] End of CFA instructions. */
+	CHECKED byte_t const *cp_reader; /* [1..1] CFA instruction program counter. */
+	CHECKED byte_t const *cp_end;    /* [1..1][const] End of CFA instructions. */
 };
 
 #define READ_CFA_INSTRUCTION_STARTCAPSULE ((unwind_errno_t)-1)
@@ -675,7 +675,7 @@ struct cfa_parser {
 PRIVATE NONNULL((1)) unwind_errno_t
 NOTHROW_NCX(CC read_capsule_instruction)(struct cfa_parser *__restrict parser) {
 	unwind_errno_t result = UNWIND_NO_FRAME;
-	byte_t __CHECKED const *cfa_reader = parser->cp_reader;
+	CHECKED byte_t const *cfa_reader = parser->cp_reader;
 	uintptr_t current_pc = parser->cp_pc;
 	while (cfa_reader < parser->cp_end/* &&
 	       current_pc <= (uintptr_t)parser->cp_maxpc*/) {
@@ -688,7 +688,7 @@ NOTHROW_NCX(CC read_capsule_instruction)(struct cfa_parser *__restrict parser) {
 			current_pc += (uintptr_t)operand * parser->cp_fde->f_codealign;
 		} else if (opcode == DW_CFA_offset) {
 			TRACE("DW_CFA_offset(%" PRIu8 ")\n", operand);
-			dwarf_decode_uleb128((byte_t __CHECKED const **)&cfa_reader);
+			dwarf_decode_uleb128((byte_t const **)&cfa_reader);
 		} else if (opcode == DW_CFA_restore) {
 			TRACE("DW_CFA_restore\n");
 		} else {
@@ -696,7 +696,7 @@ NOTHROW_NCX(CC read_capsule_instruction)(struct cfa_parser *__restrict parser) {
 
 			CASE(DW_CFA_set_loc)
 				/* Decode the PC pointer according to FDE pointer encoding. */
-				current_pc = (uintptr_t)dwarf_decode_pointer((byte_t __CHECKED const **)&cfa_reader,
+				current_pc = (uintptr_t)dwarf_decode_pointer((byte_t const **)&cfa_reader,
 				                                             parser->cp_fde->f_ptrenc,
 				                                             parser->cp_fde->f_addrsize,
 				                                             &parser->cp_fde->f_bases);
@@ -726,7 +726,7 @@ NOTHROW_NCX(CC read_capsule_instruction)(struct cfa_parser *__restrict parser) {
 			CASE(DW_CFA_def_cfa)
 			CASE(DW_CFA_val_offset)
 			CASE(DW_CFA_GNU_negative_offset_extended)
-				dwarf_decode_uleb128((byte_t __CHECKED const **)&cfa_reader);
+				dwarf_decode_uleb128((byte_t const **)&cfa_reader);
 				ATTR_FALLTHROUGH
 			CASE(DW_CFA_restore_extended)
 			CASE(DW_CFA_undefined)
@@ -734,24 +734,24 @@ NOTHROW_NCX(CC read_capsule_instruction)(struct cfa_parser *__restrict parser) {
 			CASE(DW_CFA_def_cfa_register)
 			CASE(DW_CFA_def_cfa_offset)
 			CASE(DW_CFA_GNU_args_size)
-				dwarf_decode_uleb128((byte_t __CHECKED const **)&cfa_reader);
+				dwarf_decode_uleb128((byte_t const **)&cfa_reader);
 				break;
 
 			CASE(DW_CFA_def_cfa_sf)
 			CASE(DW_CFA_offset_extended_sf)
 			CASE(DW_CFA_val_offset_sf)
-				dwarf_decode_uleb128((byte_t __CHECKED const **)&cfa_reader);
+				dwarf_decode_uleb128((byte_t const **)&cfa_reader);
 				ATTR_FALLTHROUGH
 			CASE(DW_CFA_def_cfa_offset_sf)
-				dwarf_decode_sleb128((byte_t __CHECKED const **)&cfa_reader);
+				dwarf_decode_sleb128((byte_t const **)&cfa_reader);
 				break;
 
 			CASE(DW_CFA_def_cfa_expression) {
 				size_t expr_size;
 skip_expression:
-				expr_size = dwarf_decode_uleb128((byte_t __CHECKED const **)&cfa_reader);
+				expr_size = dwarf_decode_uleb128((byte_t const **)&cfa_reader);
 				if unlikely(OVERFLOW_UADD((uintptr_t)cfa_reader, expr_size,
-				                          (uintptr_t *)(byte_t __CHECKED const **)&cfa_reader) ||
+				                          (uintptr_t *)(byte_t const **)&cfa_reader) ||
 				            cfa_reader > parser->cp_end) {
 					ERRORF(err_illegal_instruction,
 					       "cfa_reader=%p, expr_size=%" PRIuSIZ "(%#" PRIxSIZ "), cfa_end=%p",
@@ -762,7 +762,7 @@ skip_expression:
 
 			CASE(DW_CFA_expression)
 			CASE(DW_CFA_val_expression)
-				dwarf_decode_uleb128((byte_t __CHECKED const **)&cfa_reader);
+				dwarf_decode_uleb128((byte_t const **)&cfa_reader);
 				goto skip_expression;
 
 			CASE(DW_CFA_nop)
@@ -823,8 +823,8 @@ NOTHROW_NCX(CC find_capsule_end)(struct cfa_parser *__restrict parser) {
 PRIVATE NONNULL((1, 2)) unwind_errno_t
 NOTHROW_NCX(CC unwind_capsules)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                 unwind_cfa_landing_state_t *__restrict result,
-                                void __CHECKED const *absolute_pc,
-                                void __CHECKED const *landingpad_pc) {
+                                CHECKED void const *absolute_pc,
+                                CHECKED void const *landingpad_pc) {
 	unwind_errno_t error;
 	struct cfa_parser capsule_start;
 	struct cfa_parser capsule_end;
@@ -976,8 +976,8 @@ NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t *__restrict self, /* 
                                               unwind_cfa_landing_state_t *__restrict result,
                                               void const *absolute_pc, void const *landingpad_pc) {
 	uintptr_t current_pc;
-	byte_t __CHECKED const *cfa_reader;
-	byte_t __CHECKED const *cfa_end;
+	CHECKED byte_t const *cfa_reader;
+	CHECKED byte_t const *cfa_end;
 	landing1_backup_t *state_backup_list = NULL;
 	landing1_backup_t *state_backup_free = NULL; /* Free list of state backups. */
 #ifdef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
@@ -1011,7 +1011,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t *__restrict self, /* 
 			current_pc += (uintptr_t)operand * self->f_codealign;
 		} else if (opcode == DW_CFA_offset) {
 			TRACE("DW_CFA_offset(%" PRIu8 ")\n", operand);
-			dwarf_decode_uleb128((byte_t __CHECKED const **)&cfa_reader);
+			dwarf_decode_uleb128((byte_t const **)&cfa_reader);
 		} else if (opcode == DW_CFA_restore) {
 			TRACE("DW_CFA_restore\n");
 		} else {
@@ -1019,7 +1019,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t *__restrict self, /* 
 
 			CASE(DW_CFA_set_loc)
 				/* Decode the PC pointer according to FDE pointer encoding. */
-				current_pc = (uintptr_t)dwarf_decode_pointer((byte_t __CHECKED const **)&cfa_reader,
+				current_pc = (uintptr_t)dwarf_decode_pointer((byte_t const **)&cfa_reader,
 				                                             self->f_ptrenc,
 				                                             self->f_addrsize,
 				                                             &self->f_bases);
@@ -1046,23 +1046,23 @@ NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t *__restrict self, /* 
 			CASE(DW_CFA_def_cfa)
 			CASE(DW_CFA_val_offset)
 			CASE(DW_CFA_GNU_negative_offset_extended)
-				dwarf_decode_uleb128((byte_t __CHECKED const **)&cfa_reader);
+				dwarf_decode_uleb128((byte_t const **)&cfa_reader);
 				ATTR_FALLTHROUGH
 			CASE(DW_CFA_restore_extended)
 			CASE(DW_CFA_undefined)
 			CASE(DW_CFA_same_value)
 			CASE(DW_CFA_def_cfa_register)
 			CASE(DW_CFA_def_cfa_offset)
-				dwarf_decode_uleb128((byte_t __CHECKED const **)&cfa_reader);
+				dwarf_decode_uleb128((byte_t const **)&cfa_reader);
 				break;
 
 			CASE(DW_CFA_def_cfa_sf)
 			CASE(DW_CFA_offset_extended_sf)
 			CASE(DW_CFA_val_offset_sf)
-				dwarf_decode_uleb128((byte_t __CHECKED const **)&cfa_reader);
+				dwarf_decode_uleb128((byte_t const **)&cfa_reader);
 				ATTR_FALLTHROUGH
 			CASE(DW_CFA_def_cfa_offset_sf)
-				dwarf_decode_sleb128((byte_t __CHECKED const **)&cfa_reader);
+				dwarf_decode_sleb128((byte_t const **)&cfa_reader);
 				break;
 
 			CASE(DW_CFA_remember_state) {
@@ -1113,9 +1113,9 @@ NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t *__restrict self, /* 
 			CASE(DW_CFA_def_cfa_expression) {
 				size_t expr_size;
 skip_expression:
-				expr_size = dwarf_decode_uleb128((byte_t __CHECKED const **)&cfa_reader);
+				expr_size = dwarf_decode_uleb128((byte_t const **)&cfa_reader);
 				if unlikely(OVERFLOW_UADD((uintptr_t)cfa_reader, expr_size,
-				                          (uintptr_t *)(byte_t __CHECKED const **)&cfa_reader) ||
+				                          (uintptr_t *)(byte_t const **)&cfa_reader) ||
 				            cfa_reader > cfa_end) {
 					ERRORF(err_illegal_instruction,
 					       "cfa_reader=%p, expr_size=%" PRIuSIZ "(%#" PRIxSIZ "), cfa_end=%p",
@@ -1126,12 +1126,12 @@ skip_expression:
 
 			CASE(DW_CFA_expression)
 			CASE(DW_CFA_val_expression)
-				dwarf_decode_uleb128((byte_t __CHECKED const **)&cfa_reader);
+				dwarf_decode_uleb128((byte_t const **)&cfa_reader);
 				goto skip_expression;
 
 			CASE(DW_CFA_GNU_args_size)
 				/* Landing pad stack adjustment */
-				result->cs_lp_adjustment = dwarf_decode_uleb128((byte_t __CHECKED const **)&cfa_reader);
+				result->cs_lp_adjustment = dwarf_decode_uleb128((byte_t const **)&cfa_reader);
 				break;
 
 			CASE(DW_CFA_nop) /* no-op. */
@@ -1194,7 +1194,7 @@ err_illegal_instruction:
 INTERN NONNULL((1, 2, 4, 6)) unwind_errno_t CC
 libuw_unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict self,
                                unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
-                               void __CHECKED const *absolute_pc,
+                               CHECKED void const *absolute_pc,
                                unwind_getreg_t reg_getter, void const *reg_getter_arg,
                                unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	unwind_errno_t error;

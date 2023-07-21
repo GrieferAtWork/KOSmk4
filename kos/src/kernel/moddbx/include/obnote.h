@@ -72,7 +72,7 @@ struct obnote_entry {
 FUNDEF NONNULL((1, 4, 5)) ssize_t
 NOTHROW(KCALL obnote_print)(__pformatprinter printer, void *arg,
                             CHECKED void const *pointer,
-                            char const *__restrict name,
+                            CHECKED char const *name,
                             unsigned int *__restrict pstatus);
 
 DECL_END

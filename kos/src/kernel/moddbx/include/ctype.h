@@ -153,7 +153,7 @@ DECL_BEGIN
 
 struct ctype;
 struct ctypeinfo {
-	char CHECKED const *ci_name;    /* [0..1] Name of this type (or NULL if anonymous). */
+	CHECKED char const *ci_name;    /* [0..1] Name of this type (or NULL if anonymous). */
 	REF struct cmodule *ci_nameref; /* [0..1] Module reference for keeping `ct_name' alive. */
 };
 #define ctypeinfo_equal(a, b) \
@@ -284,7 +284,7 @@ FUNDEF WUNUSED REF struct ctype *
 NOTHROW(FCALL ctype_for_register)(cpu_regno_t regno, size_t buflen);
 
 struct ctypeenumname {
-	char CHECKED const *en_name;    /* [1..1] Name of the enum. */
+	CHECKED char const *en_name;    /* [1..1] Name of the enum. */
 	REF struct cmodule *en_nameref; /* [1..1] Module reference for keeping `en_name' alive. */
 };
 #define ctypeenumname_fini(self) decref((self)->en_nameref)
@@ -602,12 +602,12 @@ NOTHROW_CB_NCX(FCALL ctype_struct_enumfields)(struct ctype *__restrict self,
  * @return: DBX_ENOENT: No field with this name. */
 FUNDEF WUNUSED NONNULL((1, 2, 4, 5)) dbx_errno_t
 NOTHROW_NCX(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
-                                         char CHECKED const *__restrict name, size_t namelen,
+                                         CHECKED char const *__restrict name, size_t namelen,
                                          /*out*/ struct ctyperef *__restrict pfield_type,
                                          /*out*/ ptrdiff_t *__restrict pfield_offset);
 
 /* Return the name of a structure type, or `NULL' if unknown or `self' isn't a struct. */
-FUNDEF WUNUSED NONNULL((1)) char CHECKED const *
+FUNDEF WUNUSED NONNULL((1)) CHECKED char const *
 NOTHROW_NCX(FCALL ctype_struct_getname)(struct ctype const *__restrict self);
 
 
@@ -622,7 +622,7 @@ FUNDEF WUNUSED NONNULL((1, 2, 3, 4, 5)) dbx_errno_t
 NOTHROW_NCX(FCALL ctype_fromdw)(struct cmodule *__restrict mod,
                                 struct cmodunit const *__restrict cunit,
                                 di_debuginfo_cu_parser_t const *__restrict cu_parser,
-                                byte_t CHECKED const *__restrict type_debug_info,
+                                CHECKED byte_t const *__restrict type_debug_info,
                                 /*out*/ struct ctyperef *__restrict presult);
 
 /* Same as `ctype_fromdw()', but when `type_debug_info'
@@ -631,7 +631,7 @@ FUNDEF WUNUSED NONNULL((1, 2, 3, 5)) dbx_errno_t
 NOTHROW_NCX(FCALL ctype_fromdw_opt)(struct cmodule *__restrict mod,
                                     struct cmodunit const *__restrict cunit,
                                     di_debuginfo_cu_parser_t const *__restrict cu_parser,
-                                    byte_t CHECKED const *type_debug_info,
+                                    CHECKED byte_t const *type_debug_info,
                                     /*out*/ struct ctyperef *__restrict presult);
 
 /* Parse the parameters of a subroutine or subroutine type. */

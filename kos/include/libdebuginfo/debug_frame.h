@@ -43,16 +43,16 @@ __DECL_BEGIN
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 typedef __ATTR_NONNULL_T((1, 2, 3, 4)) unwind_errno_t
-__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PUNWIND_FDE_LOAD_DF)(__byte_t __CHECKED const **__restrict __pdebug_frame_reader,
-                                                      __byte_t __CHECKED const *__debug_frame_start,
-                                                      __byte_t __CHECKED const *__debug_frame_end,
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PUNWIND_FDE_LOAD_DF)(__CHECKED __byte_t const **__restrict __pdebug_frame_reader,
+                                                      __CHECKED __byte_t const *__debug_frame_start,
+                                                      __CHECKED __byte_t const *__debug_frame_end,
                                                       unwind_fde_t *__restrict __result,
                                                       __uint8_t __sizeof_address);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 3, 4)) unwind_errno_t
-__NOTHROW_NCX(LIBDEBUGINFO_CC unwind_fde_load_df)(__byte_t __CHECKED const **__restrict __pdebug_frame_reader,
-                                                  __byte_t __CHECKED const *__debug_frame_start,
-                                                  __byte_t __CHECKED const *__debug_frame_end,
+__NOTHROW_NCX(LIBDEBUGINFO_CC unwind_fde_load_df)(__CHECKED __byte_t const **__restrict __pdebug_frame_reader,
+                                                  __CHECKED __byte_t const *__debug_frame_start,
+                                                  __CHECKED __byte_t const *__debug_frame_end,
                                                   unwind_fde_t *__restrict __result,
                                                   __uint8_t __sizeof_address);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
@@ -64,16 +64,16 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC unwind_fde_load_df)(__byte_t __CHECKED const **__r
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `absolute_pc'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 typedef __ATTR_NONNULL_T((1, 2, 4)) unwind_errno_t
-__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PUNWIND_FDE_SCAN_DF)(__byte_t __CHECKED const *__debug_frame_start,
-                                                      __byte_t __CHECKED const *__debug_frame_end,
-                                                      void __CHECKED const *__absolute_pc,
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PUNWIND_FDE_SCAN_DF)(__CHECKED __byte_t const *__debug_frame_start,
+                                                      __CHECKED __byte_t const *__debug_frame_end,
+                                                      __CHECKED void const *__absolute_pc,
                                                       unwind_fde_t *__restrict __result,
                                                       __uint8_t __sizeof_address);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 4)) unwind_errno_t
-__NOTHROW_NCX(LIBDEBUGINFO_CC unwind_fde_scan_df)(__byte_t __CHECKED const *__debug_frame_start,
-                                                  __byte_t __CHECKED const *__debug_frame_end,
-                                                  void __CHECKED const *__absolute_pc,
+__NOTHROW_NCX(LIBDEBUGINFO_CC unwind_fde_scan_df)(__CHECKED __byte_t const *__debug_frame_start,
+                                                  __CHECKED __byte_t const *__debug_frame_end,
+                                                  __CHECKED void const *__absolute_pc,
                                                   unwind_fde_t *__restrict __result,
                                                   __uint8_t __sizeof_address);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */

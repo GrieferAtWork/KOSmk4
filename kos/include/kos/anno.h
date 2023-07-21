@@ -60,14 +60,15 @@
 #define __THROWING    __ATTR_THROWING
 #else /* __CHECKER__ */
 #define __USER            /* Annotation for user-space memory (default outside kernel). */
-#define __CHECKED         /* Annotation for checked memory. */
-#define __UNCHECKED       /* Annotation for unchecked memory. */
+#define __CHECKED         /* Annotation for checked memory (access may result in sporadic E_SEGFAULT and E_BADALLOC) */
+#define __UNCHECKED       /* Annotation for unchecked memory (like `CHECKED', but access is not allowed) */
 #define __NOBLOCK         /* Annotation for functions that are guarantied to never block,
                            * making them safe to-be called from any asynchronous context. */
 #define __NOBLOCK_IF(x)   /* Same as `__NOBLOCK', but only when `x' is true. */
 #define __BLOCKING        /* Annotation for functions that may block indefinitely (as well as service RPCs and be a cancellation point, unless otherwise documented) */
 #define __BLOCKING_IF(x)  /* Annotation for functions that may block indefinitely (as well as service RPCs and be a cancellation point, unless otherwise documented) */
-#define __NOPREEMPT       /* Annotation for functions that may only be called with preemption disabled. */
+#define __NOPREEMPT       /* Annotation for functions that may only be called with preemption disabled. In user-
+                           * space, this means that all posix-signals are masked (s.a.  `setsigmaskfullptr(3)'). */
 
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __THROWS(...)     /* Annotation for the set of error codes/classes/sub-classes that may be thrown
@@ -88,7 +89,6 @@
 #define __THROWING        /* Use in place of __NOTHROW() for the same effect as `__THROWS(...)' */
 #endif /* !__CHECKER__ */
 
-#define __KERNEL          /* Annotation for kernel-space memory (default within kernel). */
 #define __ABNORMAL_RETURN /* Annotation for functions that (may) not return normally, or by throwing an exception.
                            * Functions with this annotation must not be  called if there are any finally  handlers
                            * on-stack  which need to perform cleanup, or any EXCEPT-handlers that would want to do
@@ -111,5 +111,25 @@
 #define __THROWING(...) (__VA_ARGS__) __PRIVATE_THROWING
 #define __PRIVATE_THROWING(...) (__VA_ARGS__) noexcept(false)
 #endif /* __clang_tidy__ && __cplusplus */
+
+#ifdef __GUARD_HYBRID_COMPILER_H
+#define PHYS            __PHYS
+#define VIRT            __VIRT
+#define USER            __USER
+#define CHECKED         __CHECKED
+#define UNCHECKED       __UNCHECKED
+#define REF             __REF
+#define REF_IF          __REF_IF
+#define NOBLOCK         __NOBLOCK
+#define NOBLOCK_IF      __NOBLOCK_IF
+#define BLOCKING        __BLOCKING
+#define BLOCKING_IF     __BLOCKING_IF
+#define NOPREEMPT       __NOPREEMPT
+#define ABNORMAL_RETURN __ABNORMAL_RETURN
+#define THROWS          __THROWS
+#ifndef WEAK
+#define WEAK __WEAK
+#endif /* !WEAK */
+#endif /* __GUARD_HYBRID_COMPILER_H */
 
 #endif /* !_KOS_ANNO_H */

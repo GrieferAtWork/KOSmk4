@@ -79,8 +79,8 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t *__restrict self, /
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 INTDEF NONNULL((1, 2, 3)) debuginfo_errno_t
-NOTHROW_NCX(CC libdi_debugline_loadunit)(byte_t __CHECKED const **__restrict preader,
-                                         byte_t __CHECKED const *__restrict text_end,
+NOTHROW_NCX(CC libdi_debugline_loadunit)(CHECKED byte_t const **__restrict preader,
+                                         CHECKED byte_t const *__restrict text_end,
                                          di_debugline_unit_t *__restrict result);
 
 

@@ -23,6 +23,25 @@ import * from .ctype;
 import * from .cvalue;
 import UniqueSet from collections;
 
+/* TODO: Annotate  `DEFINE_PUBLIC_ALIAS(new, old)' such that  it checks if a
+ *       declarations exists for  both `new'  and `old', and  if so:  assert
+ *       that those declarations are  binary-compatible, as well as  feature
+ *       the same annotations (thus ensuring  that lib headers use the  same
+ *       set   of   annotations   as  the   internal   lib  implementations)
+ *       When no declaration  exists for  `new', remember one  for the  sake
+ *       of future `DEFINE_PUBLIC_ALIAS' checks when `new' appears as `old',
+ *       so that transitive alias definitions are still checked.
+ * -> Also do the same for `DEFINE_INTERN_ALIAS()'
+ */
+
+/* TODO: Warn when pointer types with  a non-zero nothrow attribute also  make
+ *       use of `__restrict'. And in the case of a function declaration,  also
+ *       parse the `nonnull()' attribute, and warn if nonnull-marked arguments
+ *       also have a non-zero nothrow attribute (neither of these combinations
+ *       make  sense since nothrow  implies that the value  can be NULL, which
+ *       conflict  with non-null, as well as the non-aliasing behavior that is
+ *       implied by `__restrict') */
+
 /* Dump top-level declarations as they are parsed. */
 #undef DUMP_TOP_LEVEL_DECLS
 #if 0
@@ -1452,7 +1471,7 @@ prefixAgain:
 				} else {
 					this.err(f"redeclaration of `{typeref.tostr(name)}'{
 						this.formatMessageAddend(decl.decl,
-							f"previously declared as `{decl.typeref.tostr(name)}'")
+							f'previously declared as `{decl.typeref.tostr(name)}\'')
 					}");
 				}
 				if (decl.val is bound) {
@@ -4268,7 +4287,7 @@ function runChecker(filename: string, targetModule: Module, language: string = "
 #ifdef __MAIN__
 local args = [...][1:];
 if (!args)
-	args = [r"E:\c\kls\kos\build\i386-kos-nOD\mod.dbx\kos.src.kernel.moddbx.cmodule.c.chk.E"];
+	args = [r"E:\c\kls\kos\build\i386-kos-nOD\mod.dbx\kos.src.kernel.moddbx.ctype.c.chk.E"];
 for (local arg: args)
 	runChecker(arg, import("...targets.i386"));
 #endif

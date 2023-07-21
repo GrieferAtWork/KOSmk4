@@ -25,6 +25,8 @@
 
 #include <hybrid/typecore.h>
 
+#include <kos/anno.h>
+
 #if defined(__KOS_VERSION__) && __KOS_VERSION__ < 400
 #error "Unsupported version of KOS"
 #endif /* __KOS_VERSION__ < 400 */
@@ -61,7 +63,10 @@ __DECL_BEGIN
  *                  Usually,  the return value is added to a sum of values which is then
  *                  returned by the calling function upon success, also meaning that the
  *                  usual return value used to indicate success is `datalen'. */
-typedef __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatprinter)(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen);
+typedef __ATTR_INS_T(2, 3) __SSIZE_TYPE__
+(__FORMATPRINTER_CC *__pformatprinter)(void *__arg,
+                                       /*utf-8*/ __CHECKED char const *__restrict __data,
+                                       __SIZE_TYPE__ __datalen);
 
 
 /* The type of the word passed to/from getc/ungetc function pointers. */

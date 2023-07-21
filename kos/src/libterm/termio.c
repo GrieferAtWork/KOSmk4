@@ -57,7 +57,7 @@ DECL_BEGIN
 
 LOCAL KERNEL_SELECT(__size_t, __ssize_t) CC
 linebuffer_writef(struct linebuffer *__restrict self,
-                  void __USER __CHECKED const *src,
+                  USER CHECKED void const *src,
                   size_t num_bytes, iomode_t mode) {
 	KERNEL_SELECT(__size_t, __ssize_t) result;
 	result = mode & IO_NONBLOCK
@@ -109,14 +109,14 @@ PRIVATE byte_t const erase1[]    = { '\b', ' ', '\b' };
 
 FORCELOCAL ATTR_ARTIFICIAL ssize_t CC
 libterminal_do_owrite_direct(struct terminal *__restrict self,
-                             void __USER __CHECKED const *src,
+                             USER CHECKED void const *src,
                              size_t num_bytes, iomode_t mode) {
 	return (*self->t_oprint)(self, src, num_bytes, mode);
 }
 
 FORCELOCAL ATTR_ARTIFICIAL KERNEL_SELECT(size_t, ssize_t) CC
 libterminal_do_iwrite_direct(struct terminal *__restrict self,
-                             void __USER __CHECKED const *src,
+                             USER CHECKED void const *src,
                              size_t num_bytes, iomode_t mode) {
 	KERNEL_SELECT(size_t, ssize_t) result;
 	result = mode & IO_NONBLOCK
@@ -138,7 +138,7 @@ libterminal_do_iwrite_set_eofing(struct terminal *__restrict self) {
 
 PRIVATE ssize_t CC
 libterminal_do_owrite_nostop_nobuf(struct terminal *__restrict self,
-                                   void __USER __CHECKED const *src,
+                                   USER CHECKED void const *src,
                                    size_t num_bytes, iomode_t mode,
                                    tcflag_t lflag) {
 	tcflag_t oflag;
@@ -276,7 +276,7 @@ err:
 
 PRIVATE ssize_t CC
 libterminal_do_owrite_nostop(struct terminal *__restrict self,
-                             void __USER __CHECKED const *src,
+                             USER CHECKED void const *src,
                              size_t num_bytes, iomode_t mode,
                              tcflag_t iflag, tcflag_t lflag) {
 	ssize_t result;
@@ -303,7 +303,7 @@ done:
 
 PRIVATE ssize_t CC
 libterminal_do_owrite(struct terminal *__restrict self,
-                      void __USER __CHECKED const *src,
+                      USER CHECKED void const *src,
                       size_t num_bytes, iomode_t mode,
                       tcflag_t iflag, tcflag_t lflag) {
 	ssize_t result;
@@ -326,7 +326,7 @@ done:
 
 PRIVATE NONNULL((1)) ssize_t CC
 libterminal_do_owrite_force_echo(struct terminal *__restrict self,
-                                 void __USER __CHECKED const *src,
+                                 USER CHECKED void const *src,
                                  size_t num_bytes, iomode_t mode,
                                  tcflag_t lflag) {
 	ssize_t result, temp;
@@ -396,7 +396,7 @@ err:
 
 PRIVATE NONNULL((1)) ssize_t CC
 libterminal_do_owrite_echo(struct terminal *__restrict self,
-                           void __USER __CHECKED const *src,
+                           USER CHECKED void const *src,
                            size_t num_bytes, iomode_t mode,
                            tcflag_t lflag) {
 	ssize_t result, temp;
@@ -436,7 +436,7 @@ err_or_done:
 /* Write the given input to the canon */
 PRIVATE NONNULL((1)) ssize_t CC
 libterminal_do_iwrite_canon(struct terminal *__restrict self,
-                            void __USER __CHECKED const *src,
+                            USER CHECKED void const *src,
                             size_t num_bytes, iomode_t mode,
                             tcflag_t iflag, tcflag_t lflag) {
 	ssize_t result;
@@ -467,8 +467,8 @@ done:
  * @return: <0: [USERSPACE] An error occurred (s.a. `errno') */
 INTERN NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libterminal_flush_icanon(struct terminal *__restrict self, iomode_t mode)
-		KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
-		              __THROWS(E_WOULDBLOCK, E_INTERRUPT, ...)) {
+		KERNEL_SELECT(THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
+		              THROWS(E_WOULDBLOCK, E_INTERRUPT, ...)) {
 	KERNEL_SELECT(size_t, ssize_t) result;
 	struct linecapture cap;
 	linebuffer_capture(&self->t_canon, &cap);
@@ -480,10 +480,10 @@ libterminal_flush_icanon(struct terminal *__restrict self, iomode_t mode)
 
 /* Return the number of unicode characters within a given utf-8 string */
 PRIVATE ATTR_PURE WUNUSED size_t CC
-utf8_character_count(__USER __CHECKED /*utf-8*/ char const *string,
+utf8_character_count(USER CHECKED /*utf-8*/ char const *string,
                      size_t num_bytes) {
 	size_t result = 0;
-	__USER char __CHECKED const *ptr, *end;
+	USER CHECKED char const *ptr, *end;
 	ptr = string;
 	end = string + num_bytes;
 	while (ptr < end) {
@@ -495,7 +495,7 @@ utf8_character_count(__USER __CHECKED /*utf-8*/ char const *string,
 
 PRIVATE NONNULL((1)) ssize_t CC
 libterminal_do_iwrite_erase(struct terminal *__restrict self,
-                            void __USER __CHECKED const *erased_data,
+                            USER CHECKED void const *erased_data,
                             size_t num_bytes, iomode_t mode,
                             tcflag_t lflag, tcflag_t iflag) {
 	ssize_t temp, result = 0;
@@ -506,9 +506,9 @@ libterminal_do_iwrite_erase(struct terminal *__restrict self,
 			goto err_or_done;
 		result += temp;
 		if (iflag & IUTF8) {
-			__USER char __CHECKED const *ptr, *nextptr, *start;
-			start = (__USER char __CHECKED const *)erased_data;
-			ptr   = (__USER char __CHECKED const *)((byte_t const *)erased_data + num_bytes);
+			USER CHECKED char const *ptr, *nextptr, *start;
+			start = (USER CHECKED char const *)erased_data;
+			ptr   = (USER CHECKED char const *)((byte_t const *)erased_data + num_bytes);
 			/* Unwrite data-blocks one unicode character at a time. */
 			while (ptr > start) {
 				nextptr = ptr;
@@ -548,7 +548,7 @@ libterminal_do_iwrite_erase(struct terminal *__restrict self,
 		/* If UTF-8 is supported, count the number of characters
 		 * to  delete,  rather   than  the   number  of   bytes. */
 		if (iflag & IUTF8)
-			character_count = utf8_character_count((__USER __CHECKED /*utf-8*/ char const *)erased_data, num_bytes);
+			character_count = utf8_character_count((USER CHECKED /*utf-8*/ char const *)erased_data, num_bytes);
 		while (character_count) {
 			--character_count;
 			temp = libterminal_do_owrite_echo(self, erase1, lengthof(erase1), mode,
@@ -574,7 +574,7 @@ err_or_done:
 /* Write PTY input after control characters have been handled. */
 PRIVATE NONNULL((1)) ssize_t CC
 libterminal_do_iwrite_controlled(struct terminal *__restrict self,
-                                 void __USER __CHECKED const *src,
+                                 USER CHECKED void const *src,
                                  size_t num_bytes, iomode_t mode,
                                  tcflag_t iflag, tcflag_t lflag) {
 	ssize_t result, temp;
@@ -841,7 +841,7 @@ err:
 /* Write PTY input after it has been formatted according to `c_iflag & ...' */
 PRIVATE NONNULL((1)) ssize_t CC
 libterminal_do_iwrite_formatted(struct terminal *__restrict self,
-                                void __USER __CHECKED const *src,
+                                USER CHECKED void const *src,
                                 size_t num_bytes, iomode_t mode,
                                 tcflag_t iflag, tcflag_t lflag) {
 	ssize_t result, temp;
@@ -1063,7 +1063,7 @@ err:
 
 PRIVATE ssize_t CC
 libterminal_do_iwrite(struct terminal *__restrict self,
-                      void __USER __CHECKED const *src,
+                      USER CHECKED void const *src,
                       size_t num_bytes, iomode_t mode, tcflag_t iflag) {
 	tcflag_t lflag;
 	ssize_t result, temp;
@@ -1344,10 +1344,10 @@ libterminal_flush_ibuf(struct terminal *__restrict self,
  * @return: -1:   [USERSPACE] Printing to one of the linebuffers failed (s.a. `linebuffer_write()'; `errno') */
 INTERN NONNULL((1)) ssize_t CC
 libterminal_owrite(struct terminal *__restrict self,
-                   void __USER __CHECKED const *src,
+                   USER CHECKED void const *src,
                    size_t num_bytes, iomode_t mode)
-		KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
-		              __THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...)) {
+		KERNEL_SELECT(THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
+		              THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...)) {
 	ssize_t result;
 	tcflag_t iflag = atomic_read(&self->t_ios.c_iflag);
 	tcflag_t lflag = atomic_read(&self->t_ios.c_lflag);
@@ -1357,10 +1357,10 @@ libterminal_owrite(struct terminal *__restrict self,
 
 INTERN NONNULL((1)) ssize_t CC
 libterminal_iwrite(struct terminal *__restrict self,
-                   void __USER __CHECKED const *src,
+                   USER CHECKED void const *src,
                    size_t num_bytes, iomode_t mode)
-		KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
-		              __THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...)) {
+		KERNEL_SELECT(THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
+		              THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...)) {
 	ssize_t result;
 	tcflag_t iflag = atomic_read(&self->t_ios.c_iflag);
 	if unlikely(iflag & __IIOFF) {
@@ -1387,7 +1387,7 @@ done:
 
 PRIVATE NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libterminal_do_iread_chk_eofing(struct terminal *__restrict self,
-                                void __USER __CHECKED *dst,
+                                USER CHECKED void *dst,
                                 size_t num_bytes) {
 	size_t result, temp;
 	result = ringbuffer_read_nonblock(&self->t_ibuf, dst, num_bytes);
@@ -1464,9 +1464,9 @@ again_connect:
  * @return: <0:  [USERSPACE] An error occurred (s.a. `errno') */
 INTERN NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libterminal_iread(struct terminal *__restrict self,
-                  void __USER __CHECKED *dst,
+                  USER CHECKED void *dst,
                   size_t num_bytes, iomode_t mode)
-		__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT) {
+		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT) {
 	KERNEL_SELECT(size_t, ssize_t) result;
 	result = ringbuffer_read_nonblock(&self->t_ibuf, dst, num_bytes);
 #ifndef __KERNEL__
@@ -1532,8 +1532,8 @@ INTERN NONNULL((1, 2)) ssize_t CC
 libterminal_setios(struct terminal *__restrict self,
                    struct termios const *__restrict tio,
                    struct termios *old_tio)
-		KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
-		              __THROWS(E_WOULDBLOCK, E_INTERRUPT, ...)) {
+		KERNEL_SELECT(THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
+		              THROWS(E_WOULDBLOCK, E_INTERRUPT, ...)) {
 	ssize_t error;
 	struct termios old;
 	bool echo_disabled;

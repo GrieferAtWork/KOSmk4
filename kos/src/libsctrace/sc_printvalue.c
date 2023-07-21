@@ -118,18 +118,6 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #define validate_readablem_opt(base, num_items, item_size_in_bytes) (void)0
 #endif /* !__KERNEL__ */
 
-#ifndef USER
-#define USER __USER
-#endif /* !USER */
-
-#ifndef CHECKED
-#define CHECKED __CHECKED
-#endif /* !CHECKED */
-
-#ifndef UNCHECKED
-#define UNCHECKED __UNCHECKED
-#endif /* !UNCHECKED */
-
 
 /* Representation limits before printed data is truncated */
 #define LIMIT_STRLEN       128 /* Max # of bytes to print from user-supplied strings. */

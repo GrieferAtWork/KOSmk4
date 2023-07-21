@@ -1505,10 +1505,10 @@ libvio_cmpxch_or_writeq(struct vioargs *__restrict args,
 INTERN NONNULL((1)) void CC
 libvio_xchwithvio(struct vioargs *__restrict args,
                   vio_addr_t offset,
-                  void __USER __CHECKED *oldbuf,
-                  void __USER __CHECKED const *newbuf,
+                  USER CHECKED void *oldbuf,
+                  USER CHECKED void const *newbuf,
                   size_t num_bytes, bool atomic)
-		__THROWS(E_SEGFAULT, ...) {
+		THROWS(E_SEGFAULT, ...) {
 	if (!num_bytes)
 		return;
 	if (offset & 1) {
@@ -1588,9 +1588,9 @@ libvio_xchwithvio(struct vioargs *__restrict args,
 INTERN NONNULL((1)) void CC
 libvio_copyfromvio(struct vioargs *__restrict args,
                    vio_addr_t offset,
-                   void __USER __CHECKED *buf,
+                   USER CHECKED void *buf,
                    size_t num_bytes)
-		__THROWS(E_SEGFAULT, ...) {
+		THROWS(E_SEGFAULT, ...) {
 	if (!num_bytes)
 		return;
 	if (offset & 1) {
@@ -1726,9 +1726,9 @@ libvio_copyfromvio(struct vioargs *__restrict args,
 INTERN NONNULL((1)) void CC
 libvio_copytovio(struct vioargs *__restrict args,
                  vio_addr_t offset,
-                 void __USER __CHECKED const *buf,
+                 USER CHECKED void const *buf,
                  size_t num_bytes)
-		__THROWS(E_SEGFAULT, ...) {
+		THROWS(E_SEGFAULT, ...) {
 	if (!num_bytes)
 		return;
 	if (offset & 1) {
@@ -1795,7 +1795,7 @@ libvio_memset(struct vioargs *__restrict args,
               vio_addr_t offset,
               int byte,
               size_t num_bytes)
-		__THROWS(E_SEGFAULT, ...) {
+		THROWS(E_SEGFAULT, ...) {
 	if (!num_bytes)
 		return;
 	if (offset & 1) {

@@ -50,12 +50,12 @@ struct cprinter {
 FUNDEF NONNULL((1, 2)) ssize_t
 NOTHROW_CB_NCX(KCALL ctyperef_printname)(struct ctyperef const *__restrict self,
                                          struct cprinter const *__restrict printer,
-                                         char CHECKED const *varname DFL(__NULLPTR),
+                                         CHECKED char const *varname DFL(__NULLPTR),
                                          size_t varname_len DFL(0));
 FUNDEF NONNULL((1, 2)) ssize_t
 NOTHROW_CB_NCX(KCALL ctype_printname)(struct ctype const *__restrict self,
                                       struct cprinter const *__restrict printer,
-                                      char CHECKED const *varname DFL(__NULLPTR),
+                                      CHECKED char const *varname DFL(__NULLPTR),
                                       size_t varname_len DFL(0));
 
 
@@ -91,7 +91,7 @@ NOTHROW_CB_NCX(KCALL ctype_printname)(struct ctype const *__restrict self,
 FUNDEF NONNULL((1, 2)) ssize_t
 NOTHROW_CB_NCX(KCALL ctype_printvalue)(struct ctyperef const *__restrict self,
                                        struct cprinter const *__restrict printer,
-                                       void CHECKED const *buf, unsigned int flags,
+                                       CHECKED void const *buf, unsigned int flags,
                                        size_t firstline_indent, size_t newline_indent,
                                        size_t newline_tab, size_t maxlinelen);
 #define CTYPE_PRINTVALUE_FLAG_NORMAL             0x0000 /* Normal flags. */

@@ -249,4 +249,24 @@
 #include "__assembly.h"
 #endif /* __ASSEMBLER__ */
 
+#if !defined(__NO_KOS_SYSTEM_HEADERS__) && defined(_KOS_ANNO_H)
+#define PHYS            __PHYS
+#define VIRT            __VIRT
+#define USER            __USER
+#define CHECKED         __CHECKED
+#define UNCHECKED       __UNCHECKED
+#define REF             __REF
+#define REF_IF          __REF_IF
+#define NOBLOCK         __NOBLOCK
+#define NOBLOCK_IF      __NOBLOCK_IF
+#define BLOCKING        __BLOCKING
+#define BLOCKING_IF     __BLOCKING_IF
+#define NOPREEMPT       __NOPREEMPT
+#define ABNORMAL_RETURN __ABNORMAL_RETURN
+#define THROWS          __THROWS
+#ifndef WEAK
+#define WEAK __WEAK
+#endif /* !WEAK */
+#endif /* !__NO_KOS_SYSTEM_HEADERS__ && _KOS_ANNO_H */
+
 #endif /* !__GUARD_HYBRID_COMPILER_H */

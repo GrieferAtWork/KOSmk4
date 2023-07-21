@@ -54,12 +54,6 @@
 
 #include "builtin.h"
 
-#ifndef USER
-#define USER __USER
-#endif /* !USER */
-#ifndef THROWS
-#define THROWS __THROWS
-#endif /* !THROWS */
 #ifndef ASMCALL
 #define ASMCALL /* nothing */
 #endif /* !ASMCALL */

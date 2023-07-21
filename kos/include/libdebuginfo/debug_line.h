@@ -53,15 +53,15 @@ typedef struct __ATTR_PACKED {
 
 typedef struct {
 	/* Compilation unit descriptor, as decoded from `.debug_line' */
-	__byte_t __CHECKED const                       *dlu_headerbase;       /* [1..1] Base address of the CU header. */
-	__byte_t __CHECKED const                       *dlu_textbase;         /* [1..1] Base address of the CU resolver text. */
-	__byte_t __CHECKED const                       *dlu_cuend;            /* [1..1] End address of the CU segment. */
-	di_debugline_fileinfo_format_t __CHECKED const *dlu_pathfmt;          /* [1..1] Format of path names. */
+	__CHECKED __byte_t const                       *dlu_headerbase;       /* [1..1] Base address of the CU header. */
+	__CHECKED __byte_t const                       *dlu_textbase;         /* [1..1] Base address of the CU resolver text. */
+	__CHECKED __byte_t const                       *dlu_cuend;            /* [1..1] End address of the CU segment. */
+	__CHECKED di_debugline_fileinfo_format_t const *dlu_pathfmt;          /* [1..1] Format of path names. */
 	__size_t                                        dlu_pathcount;        /* # of path-items in `dlu_pathdata' */
-	__byte_t __CHECKED const                       *dlu_pathdata;         /* [0..dlu_pathcount] Path data (array of `dlu_pathfmt') */
-	di_debugline_fileinfo_format_t __CHECKED const *dlu_filefmt;          /* [1..1] Format of file names. */
+	__CHECKED __byte_t const                       *dlu_pathdata;         /* [0..dlu_pathcount] Path data (array of `dlu_pathfmt') */
+	__CHECKED di_debugline_fileinfo_format_t const *dlu_filefmt;          /* [1..1] Format of file names. */
 	__size_t                                        dlu_filecount;        /* # of file-items in `dlu_filedata' */
-	__byte_t __CHECKED const                       *dlu_filedata;         /* [0..dlu_filecount] Path data (array of `dlu_filefmt') */
+	__CHECKED __byte_t const                       *dlu_filedata;         /* [0..dlu_filecount] Path data (array of `dlu_filefmt') */
 	__uint16_t                                      dlu_version;          /* Used during decoding... */
 	__uint8_t                                       dlu_min_insn_length;  /* Used during decoding... */
 	__uint8_t                                       dlu_max_ops_per_insn; /* Used during decoding... */
@@ -69,15 +69,15 @@ typedef struct {
 	__int8_t                                        dlu_line_base;        /* Used during decoding... */
 	__uint8_t                                       dlu_line_range;       /* Used during decoding... */
 	__uint8_t                                       dlu_opcode_base;      /* Used during decoding... */
-	__uint8_t __CHECKED const                      *dlu_opcode_lengths;   /* Used during decoding... */
+	__CHECKED __uint8_t const                      *dlu_opcode_lengths;   /* Used during decoding... */
 	__uint8_t                                       dlu_ptrsize;          /* Pointer size (4 in 32-bit DWARF; 8 in 64-bit DWARF). */
 	__uint8_t                                       dlu_addrsize;         /* Address size */
 } di_debugline_unit_t;
 
 
 typedef struct {
-	char __CHECKED const *dlfi_path; /* [0..1] File path */
-	char __CHECKED const *dlfi_file; /* [0..1] File name */
+	__CHECKED char const *dlfi_path; /* [0..1] File path */
+	__CHECKED char const *dlfi_file; /* [0..1] File name */
 } di_debugline_fileinfo_t;
 
 #define di_debug_addr2line_srcas_debugline_fileinfo(x) \
@@ -153,13 +153,13 @@ typedef struct {
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 typedef __ATTR_NONNULL_T((1, 2, 3)) debuginfo_errno_t
-__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGLINE_LOADUNIT)(__byte_t __CHECKED const **__restrict preader,
-                                                      __byte_t __CHECKED const *__restrict text_end,
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGLINE_LOADUNIT)(__CHECKED __byte_t const **__restrict preader,
+                                                      __CHECKED __byte_t const *__restrict text_end,
                                                       di_debugline_unit_t *__restrict result);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 3)) debuginfo_errno_t
-__NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadunit)(__byte_t __CHECKED const **__restrict preader,
-                                                  __byte_t __CHECKED const *__restrict text_end,
+__NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadunit)(__CHECKED __byte_t const **__restrict preader,
+                                                  __CHECKED __byte_t const *__restrict text_end,
                                                   di_debugline_unit_t *__restrict result);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 

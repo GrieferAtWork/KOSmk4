@@ -30,27 +30,6 @@
 
 #define CC LIBSERVICE_CC
 
-#ifndef NOBLOCK
-#define NOBLOCK __NOBLOCK
-#endif /* !NOBLOCK */
-
-#ifndef REF
-#define REF __REF
-#endif /* !REF */
-
-#ifndef WEAK
-#define WEAK __WEAK
-#endif /* !WEAK */
-
-#ifndef THROWS
-#define THROWS __THROWS
-#endif /* !THROWS */
-
-#ifndef NOPREEMPT
- /* Here, this means that all posix signals are masked! */
-#define NOPREEMPT __NOPREEMPT
-#endif /* !NOPREEMPT */
-
 #ifndef FCALL
 #define FCALL __FCALL
 #endif /* !FCALL */

@@ -288,8 +288,8 @@ __X86_NOPF_DEFFUN(x86_nopf_rep_movsb)
  *               - `dst + num_bytes - return ... dst + num_bytes - 1'
  *               - `src + num_bytes - return ... src + num_bytes - 1' */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __size_t
-__NOTHROW(__arch_memcpy_nopf)(void __USER __CHECKED *__dst,
-                              void __USER __CHECKED const *__src,
+__NOTHROW(__arch_memcpy_nopf)(__USER __CHECKED void *__dst,
+                              __USER __CHECKED void const *__src,
                               __size_t __num_bytes) {
 	__register __size_t __result;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_rep_movsb, 6)
@@ -315,8 +315,8 @@ __X86_NOPF_DEFFUN(x86_nopf_repe_cmpsb)
  * @return:  0: The contents of the 2 buffers are identical.
  * @return: <0: At least one of the 2 buffers is faulty. */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ssize_t
-__NOTHROW(__arch_nopf_memeq)(void __USER __CHECKED const *__lhs,
-                             void __USER __CHECKED const *__rhs,
+__NOTHROW(__arch_nopf_memeq)(__USER __CHECKED void const *__lhs,
+                             __USER __CHECKED void const *__rhs,
                              __size_t __num_bytes) {
 	__register __size_t __result;
 	__BOOL __are_equal;
@@ -343,7 +343,7 @@ __NOTHROW(__arch_nopf_memeq)(void __USER __CHECKED const *__lhs,
 __X86_NOPF_DEFFUN(x86_nopf_rep_insb)
 /* @return: * : The # of bytes that could not be accessed */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __size_t
-__NOTHROW(__arch_insb_nopf)(__port_t __port, void __USER __CHECKED *__buf, __size_t __num_bytes) {
+__NOTHROW(__arch_insb_nopf)(__port_t __port, __USER __CHECKED void *__buf, __size_t __num_bytes) {
 	__register __size_t __result;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_rep_insb, 5)
 	                     : "+D" (__buf)
@@ -361,7 +361,7 @@ __NOTHROW(__arch_insb_nopf)(__port_t __port, void __USER __CHECKED *__buf, __siz
 __X86_NOPF_DEFFUN(x86_nopf_rep_insw)
 /* @return: * : The # of words that could not be accessed */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __size_t
-__NOTHROW(__arch_insw_nopf)(__port_t __port, void __USER __CHECKED *__buf, __size_t __num_words) {
+__NOTHROW(__arch_insw_nopf)(__port_t __port, __USER __CHECKED void *__buf, __size_t __num_words) {
 	__register __size_t __result;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_rep_insw, 5)
 	                     : "+D" (__buf)
@@ -379,7 +379,7 @@ __NOTHROW(__arch_insw_nopf)(__port_t __port, void __USER __CHECKED *__buf, __siz
 __X86_NOPF_DEFFUN(x86_nopf_rep_insl)
 /* @return: * : The # of d-words that could not be accessed */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __size_t
-__NOTHROW(__arch_insl_nopf)(__port_t __port, void __USER __CHECKED *__buf, __size_t __num_dwords) {
+__NOTHROW(__arch_insl_nopf)(__port_t __port, __USER __CHECKED void *__buf, __size_t __num_dwords) {
 	__register __size_t __result;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_rep_insl, 5)
 	                     : "+D" (__buf)
@@ -397,7 +397,7 @@ __NOTHROW(__arch_insl_nopf)(__port_t __port, void __USER __CHECKED *__buf, __siz
 __X86_NOPF_DEFFUN(x86_nopf_rep_outsb)
 /* @return: * : The # of bytes that could not be accessed */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __size_t
-__NOTHROW(__arch_outsb_nopf)(__port_t __port, void __USER __CHECKED const *__buf, __size_t __num_bytes) {
+__NOTHROW(__arch_outsb_nopf)(__port_t __port, __USER __CHECKED void const *__buf, __size_t __num_bytes) {
 	__register __size_t __result;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_rep_outsb, 5)
 	                     : "+S" (__buf)
@@ -415,7 +415,7 @@ __NOTHROW(__arch_outsb_nopf)(__port_t __port, void __USER __CHECKED const *__buf
 __X86_NOPF_DEFFUN(x86_nopf_rep_outsw)
 /* @return: * : The # of words that could not be accessed */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __size_t
-__NOTHROW(__arch_outsw_nopf)(__port_t __port, void __USER __CHECKED const *__buf, __size_t __num_words) {
+__NOTHROW(__arch_outsw_nopf)(__port_t __port, __USER __CHECKED void const *__buf, __size_t __num_words) {
 	__register __size_t __result;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_rep_outsw, 5)
 	                     : "+S" (__buf)
@@ -433,7 +433,7 @@ __NOTHROW(__arch_outsw_nopf)(__port_t __port, void __USER __CHECKED const *__buf
 __X86_NOPF_DEFFUN(x86_nopf_rep_outsl)
 /* @return: * : The # of d-words that could not be accessed */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __size_t
-__NOTHROW(__arch_outsl_nopf)(__port_t __port, void __USER __CHECKED const *__buf, __size_t __num_dwords) {
+__NOTHROW(__arch_outsl_nopf)(__port_t __port, __USER __CHECKED void const *__buf, __size_t __num_dwords) {
 	__register __size_t __result;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_rep_outsl, 5)
 	                     : "+S" (__buf)
@@ -457,7 +457,7 @@ __X86_NOPF_DEFFUN(x86_nopf_movb_Pax_al) /* movb (%Pax), %al  (read byte) */
 /* Try to read from a possibly faulty `addr' into `*presult'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __BOOL
-__NOTHROW(__arch_readb_nopf)(void __USER __CHECKED const *__addr, __uint8_t *__presult) {
+__NOTHROW(__arch_readb_nopf)(__USER __CHECKED void const *__addr, __uint8_t *__presult) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movb_Pax_al, 3)
 	                     : "=a" (*__presult)
@@ -474,7 +474,7 @@ __X86_NOPF_DEFFUN(x86_nopf_movw_Pax_ax) /* movw (%Pax), %ax  (read word) */
 /* Try to read from a possibly faulty `addr' into `*presult'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __BOOL
-__NOTHROW(__arch_readw_nopf)(void __USER __CHECKED const *__addr, __uint16_t *__presult) {
+__NOTHROW(__arch_readw_nopf)(__USER __CHECKED void const *__addr, __uint16_t *__presult) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movw_Pax_ax, 3)
 	                     : "=a" (*__presult)
@@ -491,7 +491,7 @@ __X86_NOPF_DEFFUN(x86_nopf_movl_Pax_eax) /* movl (%Pax), %eax  (read dword) */
 /* Try to read from a possibly faulty `addr' into `*presult'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __BOOL
-__NOTHROW(__arch_readl_nopf)(void __USER __CHECKED const *__addr, __uint32_t *__presult) {
+__NOTHROW(__arch_readl_nopf)(__USER __CHECKED void const *__addr, __uint32_t *__presult) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movl_Pax_eax, 3)
 	                     : "=a" (*__presult)
@@ -510,7 +510,7 @@ __X86_NOPF_DEFFUN(x86_nopf_movq_Pax_rax) /* movq (%Pax), %rax  (read qword) */
 /* Try to read from a possibly faulty `addr' into `*presult'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __BOOL
-__NOTHROW(__arch_readq_nopf)(void __USER __CHECKED const *__addr, __uint64_t *__presult) {
+__NOTHROW(__arch_readq_nopf)(__USER __CHECKED void const *__addr, __uint64_t *__presult) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movq_Pax_rax, 3)
 	                     : "=a" (*__presult)
@@ -527,7 +527,7 @@ __X86_NOPF_DEFFUN(x86_nopf_movb_al_Pcx)  /* movb %al, (%Pcx)  (write byte) */
 /* Try to write `val' into a possibly faulty `addr'
  * Return  `true'  on  success,  `false'  on  error */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_writeb_nopf)(void __USER __CHECKED *__addr, __uint8_t __val) {
+__NOTHROW(__arch_writeb_nopf)(__USER __CHECKED void *__addr, __uint8_t __val) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movb_al_Pcx, 3)
 	                     : "=@ccc" (__error)
@@ -544,7 +544,7 @@ __X86_NOPF_DEFFUN(x86_nopf_movw_ax_Pcx)  /* movw %ax, (%Pcx)  (write word) */
 /* Try to write `val' into a possibly faulty `addr'
  * Return  `true'  on  success,  `false'  on  error */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_writew_nopf)(void __USER __CHECKED *__addr, __uint16_t __val) {
+__NOTHROW(__arch_writew_nopf)(__USER __CHECKED void *__addr, __uint16_t __val) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movw_ax_Pcx, 3)
 	                     : "=@ccc" (__error)
@@ -561,7 +561,7 @@ __X86_NOPF_DEFFUN(x86_nopf_movl_eax_Pcx) /* movl %eax, (%Pcx)  (write dword) */
 /* Try to write `val' into a possibly faulty `addr'
  * Return  `true'  on  success,  `false'  on  error */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_writel_nopf)(void __USER __CHECKED *__addr, __uint32_t __val) {
+__NOTHROW(__arch_writel_nopf)(__USER __CHECKED void *__addr, __uint32_t __val) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movl_eax_Pcx, 3)
 	                     : "=@ccc" (__error)
@@ -579,7 +579,7 @@ __X86_NOPF_DEFFUN(x86_nopf_movq_rax_Pcx) /* movq %rax, (%Pcx)  (write qword) */
 /* Try to write `val' into a possibly faulty `addr'
  * Return  `true'  on  success,  `false'  on  error */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_writeq_nopf)(void __USER __CHECKED *__addr, __uint64_t __val) {
+__NOTHROW(__arch_writeq_nopf)(__USER __CHECKED void *__addr, __uint64_t __val) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movq_rax_Pcx, 3)
 	                     : "=@ccc" (__error)
@@ -595,7 +595,7 @@ __NOTHROW(__arch_writeq_nopf)(void __USER __CHECKED *__addr, __uint64_t __val) {
 __X86_NOPF_DEFFUN(x86_nopf_rep_stosb)
 /* @return: * : The # of bytes that could not be accessed */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __size_t
-__NOTHROW(__arch_memset_nopf)(void __USER __CHECKED *__dst, int __byte, __size_t __num_bytes) {
+__NOTHROW(__arch_memset_nopf)(__USER __CHECKED void *__dst, int __byte, __size_t __num_bytes) {
 	__register __size_t __result;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_rep_stosb, 5)
 	                     : "+D" (__dst)
@@ -620,7 +620,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_xchgb_al_Pcx) /* lock xchgb %al, (%Pcx) -- atomi
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
-__NOTHROW(__arch_atomic_xchb_nopf)(void __USER __CHECKED const *__addr,
+__NOTHROW(__arch_atomic_xchb_nopf)(__USER __CHECKED void const *__addr,
                                    __uint8_t __newval, __uint8_t *__poldval) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_xchgb_al_Pcx, 4)
@@ -640,7 +640,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_xchgw_ax_Pcx) /* lock xchgw %ax, (%Pcx) -- atomi
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
-__NOTHROW(__arch_atomic_xchw_nopf)(void __USER __CHECKED const *__addr,
+__NOTHROW(__arch_atomic_xchw_nopf)(__USER __CHECKED void const *__addr,
                                    __uint16_t __newval, __uint16_t *__poldval) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_xchgw_ax_Pcx, 4)
@@ -660,7 +660,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_xchgl_eax_Pcx) /* lock xchgl %eax, (%Pcx) -- ato
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
-__NOTHROW(__arch_atomic_xchl_nopf)(void __USER __CHECKED const *__addr,
+__NOTHROW(__arch_atomic_xchl_nopf)(__USER __CHECKED void const *__addr,
                                    __uint32_t __newval, __uint32_t *__poldval) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_xchgl_eax_Pcx, 4)
@@ -680,7 +680,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_xchgq_rax_Pcx) /* lock xchgq %rax, (%Pcx) -- ato
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
-__NOTHROW(__arch_atomic_xchq_nopf)(void __USER __CHECKED const *__addr,
+__NOTHROW(__arch_atomic_xchq_nopf)(__USER __CHECKED void const *__addr,
                                    __uint64_t __newval, __uint64_t *__poldval) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_xchgq_rax_Pcx, 4)
@@ -701,7 +701,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_xaddb_al_Pcx) /* lock xaddb %al, (%Pcx) -- atomi
  * old value in `*poldval', and adding `newval' onto the stored __val
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
-__NOTHROW(__arch_atomic_fetchaddb_nopf)(void __USER __CHECKED const *__addr,
+__NOTHROW(__arch_atomic_fetchaddb_nopf)(__USER __CHECKED void const *__addr,
                                         __uint8_t __addend, __uint8_t *__poldval) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_xaddb_al_Pcx, 4)
@@ -721,7 +721,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_xaddw_ax_Pcx) /* lock xaddw %ax, (%Pcx) -- atomi
  * old value in `*poldval', and adding `newval' onto the stored __val
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
-__NOTHROW(__arch_atomic_fetchaddw_nopf)(void __USER __CHECKED const *__addr,
+__NOTHROW(__arch_atomic_fetchaddw_nopf)(__USER __CHECKED void const *__addr,
                                         __uint16_t __addend, __uint16_t *__poldval) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_xaddw_ax_Pcx, 4)
@@ -741,7 +741,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_xaddl_eax_Pcx) /* lock xaddl %eax, (%Pcx) -- ato
  * old value in `*poldval', and adding `newval' onto the stored __val
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
-__NOTHROW(__arch_atomic_fetchaddl_nopf)(void __USER __CHECKED const *__addr,
+__NOTHROW(__arch_atomic_fetchaddl_nopf)(__USER __CHECKED void const *__addr,
                                         __uint32_t __addend, __uint32_t *__poldval) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_xaddl_eax_Pcx, 4)
@@ -761,7 +761,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_xaddq_rax_Pcx) /* lock xaddq %rax, (%Pcx) -- ato
  * old value in `*poldval', and adding `newval' onto the stored __val
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
-__NOTHROW(__arch_atomic_fetchaddq_nopf)(void __USER __CHECKED const *__addr,
+__NOTHROW(__arch_atomic_fetchaddq_nopf)(__USER __CHECKED void const *__addr,
                                         __uint64_t __addend, __uint64_t *__poldval) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_xaddq_rax_Pcx, 4)
@@ -780,7 +780,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_orb_al_Pcx) /* lock orb %al, (%Pcx) -- atomic_or
 /* Try to atomically turn on all bits from `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_atomic_orb_nopf)(void __USER __CHECKED *__addr, __uint8_t __mask) {
+__NOTHROW(__arch_atomic_orb_nopf)(__USER __CHECKED void *__addr, __uint8_t __mask) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_orb_al_Pcx, 3)
 	                     : "=@ccc" (__error)
@@ -797,7 +797,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_orw_ax_Pcx) /* lock orw %ax, (%Pcx) -- atomic_or
 /* Try to atomically turn on all bits from `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_atomic_orw_nopf)(void __USER __CHECKED *__addr, __uint16_t __mask) {
+__NOTHROW(__arch_atomic_orw_nopf)(__USER __CHECKED void *__addr, __uint16_t __mask) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_orw_ax_Pcx, 3)
 	                     : "=@ccc" (__error)
@@ -814,7 +814,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_orl_eax_Pcx) /* lock orl %eax, (%Pcx) -- atomic_
 /* Try to atomically turn on all bits from `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_atomic_orl_nopf)(void __USER __CHECKED *__addr, __uint32_t __mask) {
+__NOTHROW(__arch_atomic_orl_nopf)(__USER __CHECKED void *__addr, __uint32_t __mask) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_orl_eax_Pcx, 3)
 	                     : "=@ccc" (__error)
@@ -831,7 +831,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_orq_rax_Pcx) /* lock orq %rax, (%Pcx) -- atomic_
 /* Try to atomically turn on all bits from `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_atomic_orq_nopf)(void __USER __CHECKED *__addr, __uint64_t __mask) {
+__NOTHROW(__arch_atomic_orq_nopf)(__USER __CHECKED void *__addr, __uint64_t __mask) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_orq_rax_Pcx, 3)
 	                     : "=@ccc" (__error)
@@ -848,7 +848,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_andb_al_Pcx) /* lock andb %al, (%Pcx) -- atomic_
 /* Try to atomically __mask all bits with `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_atomic_andb_nopf)(void __USER __CHECKED *__addr, __uint8_t __mask) {
+__NOTHROW(__arch_atomic_andb_nopf)(__USER __CHECKED void *__addr, __uint8_t __mask) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_andb_al_Pcx, 3)
 	                     : "=@ccc" (__error)
@@ -865,7 +865,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_andw_ax_Pcx) /* lock andw %ax, (%Pcx) -- atomic_
 /* Try to atomically __mask all bits with `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_atomic_andw_nopf)(void __USER __CHECKED *__addr, __uint16_t __mask) {
+__NOTHROW(__arch_atomic_andw_nopf)(__USER __CHECKED void *__addr, __uint16_t __mask) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_andw_ax_Pcx, 3)
 	                     : "=@ccc" (__error)
@@ -882,7 +882,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_andl_eax_Pcx) /* lock andl %eax, (%Pcx) -- atomi
 /* Try to atomically __mask all bits with `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_atomic_andl_nopf)(void __USER __CHECKED *__addr, __uint32_t __mask) {
+__NOTHROW(__arch_atomic_andl_nopf)(__USER __CHECKED void *__addr, __uint32_t __mask) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_andl_eax_Pcx, 3)
 	                     : "=@ccc" (__error)
@@ -899,7 +899,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_andq_rax_Pcx) /* lock andq %rax, (%Pcx) -- atomi
 /* Try to atomically __mask all bits with `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_atomic_andq_nopf)(void __USER __CHECKED *__addr, __uint64_t __mask) {
+__NOTHROW(__arch_atomic_andq_nopf)(__USER __CHECKED void *__addr, __uint64_t __mask) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_andq_rax_Pcx, 3)
 	                     : "=@ccc" (__error)
@@ -916,7 +916,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_xorb_al_Pcx) /* lock xorb %al, (%Pcx) -- atomic_
 /* Try to atomically flip all bits from `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_atomic_xorb_nopf)(void __USER __CHECKED *__addr, __uint8_t __mask) {
+__NOTHROW(__arch_atomic_xorb_nopf)(__USER __CHECKED void *__addr, __uint8_t __mask) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_xorb_al_Pcx, 3)
 	                     : "=@ccc" (__error)
@@ -933,7 +933,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_xorw_ax_Pcx) /* lock xorw %ax, (%Pcx) -- atomic_
 /* Try to atomically flip all bits from `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_atomic_xorw_nopf)(void __USER __CHECKED *__addr, __uint16_t __mask) {
+__NOTHROW(__arch_atomic_xorw_nopf)(__USER __CHECKED void *__addr, __uint16_t __mask) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_xorw_ax_Pcx, 3)
 	                     : "=@ccc" (__error)
@@ -950,7 +950,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_xorl_eax_Pcx) /* lock xorl %eax, (%Pcx) -- atomi
 /* Try to atomically flip all bits from `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_atomic_xorl_nopf)(void __USER __CHECKED *__addr, __uint32_t __mask) {
+__NOTHROW(__arch_atomic_xorl_nopf)(__USER __CHECKED void *__addr, __uint32_t __mask) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_xorl_eax_Pcx, 3)
 	                     : "=@ccc" (__error)
@@ -967,7 +967,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_xorq_rax_Pcx) /* lock xorq %rax, (%Pcx) -- atomi
 /* Try to atomically flip all bits from `mask' at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_atomic_xorq_nopf)(void __USER __CHECKED *__addr, __uint64_t __mask) {
+__NOTHROW(__arch_atomic_xorq_nopf)(__USER __CHECKED void *__addr, __uint64_t __mask) {
 	__BOOL __error;
 	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_lock_xorq_rax_Pcx, 3)
 	                     : "=@ccc" (__error)
@@ -984,7 +984,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_cmpxchgb_dl_Pcx) /* lock cmpxchgb %dl, (%Pcx) --
 /* Try to do an atomic-compare-exchange at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((4)) __BOOL
-__NOTHROW(__arch_atomic_cmpxchb_nopf)(void __USER __CHECKED *__addr,
+__NOTHROW(__arch_atomic_cmpxchb_nopf)(__USER __CHECKED void *__addr,
                                       __uint8_t __oldval, __uint8_t __newval,
                                       __uint8_t *__preal_oldval) {
 	__BOOL __error;
@@ -1005,7 +1005,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_cmpxchgw_dx_Pcx) /* lock cmpxchgw %dx, (%Pcx) --
 /* Try to do an atomic-compare-exchange at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((4)) __BOOL
-__NOTHROW(__arch_atomic_cmpxchw_nopf)(void __USER __CHECKED *__addr,
+__NOTHROW(__arch_atomic_cmpxchw_nopf)(__USER __CHECKED void *__addr,
                                       __uint16_t __oldval, __uint16_t __newval,
                                       __uint16_t *__preal_oldval) {
 	__BOOL __error;
@@ -1026,7 +1026,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_cmpxchgl_edx_Pcx) /* lock cmpxchgl %edx, (%Pcx) 
 /* Try to do an atomic-compare-exchange at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((4)) __BOOL
-__NOTHROW(__arch_atomic_cmpxchl_nopf)(void __USER __CHECKED *__addr,
+__NOTHROW(__arch_atomic_cmpxchl_nopf)(__USER __CHECKED void *__addr,
                                       __uint32_t __oldval, __uint32_t __newval,
                                       __uint32_t *__preal_oldval) {
 	__BOOL __error;
@@ -1047,7 +1047,7 @@ __X86_NOPF_DEFFUN(x86_nopf_lock_cmpxchgq_rdx_Pcx) /* lock cmpxchgq %rdx, (%Pcx) 
 /* Try to do an atomic-compare-exchange at the possibly faulty `addr'
  * Return `true' on success, `false' on fault */
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((4)) __BOOL
-__NOTHROW(__arch_atomic_cmpxchq_nopf)(void __USER __CHECKED *__addr,
+__NOTHROW(__arch_atomic_cmpxchq_nopf)(__USER __CHECKED void *__addr,
                                       __uint64_t __oldval, __uint64_t __newval,
                                       __uint64_t *__preal_oldval) {
 	__BOOL __error;

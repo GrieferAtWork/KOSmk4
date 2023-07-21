@@ -400,7 +400,7 @@ NOTHROW(CC libdi_debug_repr_DW_EH_PE)(uint8_t value) {
 INTDEF char const unknown_string[];
 
 struct label_entry {
-	byte_t __CHECKED const *le_dest; /* [1..1] Label destination address. */
+	CHECKED byte_t const *le_dest; /* [1..1] Label destination address. */
 };
 struct label_buffer {
 	size_t                                      lb_alloc;    /* Allocated size. */
@@ -411,7 +411,7 @@ struct label_buffer {
 /* Return the entry associated with `addr' (if any) or NULLO */
 PRIVATE NOBLOCK ATTR_PURE NONNULL((1, 2)) struct label_entry const *
 NOTHROW(CC label_buffer_locate)(struct label_buffer const *__restrict self,
-                                byte_t __CHECKED const *__restrict addr) {
+                                CHECKED byte_t const *__restrict addr) {
 	size_t lo, hi;
 	lo = 0;
 	hi = self->lb_count;
@@ -436,7 +436,7 @@ NOTHROW(CC label_buffer_locate)(struct label_buffer const *__restrict self,
  * else. */
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(CC label_buffer_insert)(struct label_buffer *__restrict self,
-                                byte_t __CHECKED const *__restrict addr) {
+                                CHECKED byte_t const *__restrict addr) {
 	size_t lo, hi;
 	if unlikely(self->lb_count >= self->lb_alloc)
 		goto done;
@@ -469,10 +469,10 @@ done:
 
 /* Same as `unwind_instruction_succ()', but never returns
  * NULL. Also guarantied to always  `return > unwind_pc'. */
-PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) byte_t __CHECKED const *CC
-unwind_instruction_succ_failsafe(byte_t __CHECKED const *__restrict unwind_pc,
+PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) CHECKED byte_t const *CC
+unwind_instruction_succ_failsafe(CHECKED byte_t const *__restrict unwind_pc,
                                  byte_t addrsize, byte_t ptrsize) {
-	byte_t __CHECKED const *result;
+	CHECKED byte_t const *result;
 	result = unwind_instruction_succ(unwind_pc, addrsize, ptrsize);
 	if unlikely(result == NULL)
 		result = unwind_pc + 1;
@@ -492,13 +492,13 @@ unwind_instruction_succ_failsafe(byte_t __CHECKED const *__restrict unwind_pc,
  * @return: * : The usual pformatprinter-style value. */
 INTDEF NONNULL((1, 3)) ssize_t CC
 libdl_debug_repr_cfi_expression(pformatprinter printer, void *arg,
-                                byte_t __CHECKED const *__restrict expr, size_t indent,
+                                CHECKED byte_t const *__restrict expr, size_t indent,
                                 byte_t addrsize, byte_t ptrsize);
 
 
 PRIVATE REPR_TEXTSECTION NONNULL((1, 3, 6)) ssize_t CC
 print_cfi_instruction(pformatprinter printer, void *arg,
-                      byte_t __CHECKED const *__restrict reader,
+                      CHECKED byte_t const *__restrict reader,
                       byte_t addrsize, byte_t ptrsize,
                       struct label_buffer const *__restrict labels,
                       size_t indent) {
@@ -581,7 +581,7 @@ print_cfi_instruction(pformatprinter printer, void *arg,
 		case DW_OP_GNU_addr_index:
 		case DW_OP_constx:
 		case DW_OP_GNU_const_index:
-				addend = dwarf_decode_uleb128((byte_t __CHECKED const **)&reader);
+				addend = dwarf_decode_uleb128((byte_t const **)&reader);
 			}
 			PRINTF("\t$%#" PRIxMAX, addend);
 		}	break;
@@ -596,7 +596,7 @@ print_cfi_instruction(pformatprinter printer, void *arg,
 		case DW_OP_consts:
 		case DW_OP_breg0 ... DW_OP_breg31:
 		case DW_OP_fbreg:
-				addend = (intmax_t)dwarf_decode_sleb128((byte_t __CHECKED const **)&reader);
+				addend = (intmax_t)dwarf_decode_sleb128((byte_t const **)&reader);
 			}
 			PRINTF("\t$%" PRIdMAX, addend);
 		}	break;
@@ -611,29 +611,29 @@ print_cfi_instruction(pformatprinter printer, void *arg,
 		case DW_OP_regx:
 		case DW_OP_piece: {
 			uintptr_t value;
-			value = dwarf_decode_uleb128((byte_t __CHECKED const **)&reader);
+			value = dwarf_decode_uleb128((byte_t const **)&reader);
 			PRINTF("\t$%" PRIuPTR, value);
 		}	break;
 
 		case DW_OP_bregx: {
 			uintptr_t regno;
 			intptr_t offset;
-			regno  = dwarf_decode_uleb128((byte_t __CHECKED const **)&reader);
-			offset = dwarf_decode_sleb128((byte_t __CHECKED const **)&reader);
+			regno  = dwarf_decode_uleb128((byte_t const **)&reader);
+			offset = dwarf_decode_sleb128((byte_t const **)&reader);
 			PRINTF("\t$%" PRIuPTR ", $%" PRIdPTR, regno, offset);
 		}	break;
 
 		case DW_OP_bit_piece: {
 			uintptr_t size;
 			uintptr_t offset;
-			size   = dwarf_decode_uleb128((byte_t __CHECKED const **)&reader);
-			offset = dwarf_decode_uleb128((byte_t __CHECKED const **)&reader);
+			size   = dwarf_decode_uleb128((byte_t const **)&reader);
+			offset = dwarf_decode_uleb128((byte_t const **)&reader);
 			PRINTF("\t$%" PRIuPTR ", $%" PRIuPTR, size, offset);
 		}	break;
 
 		case DW_OP_implicit_value: {
 			uintptr_t size;
-			size = dwarf_decode_uleb128((byte_t __CHECKED const **)&reader);
+			size = dwarf_decode_uleb128((byte_t const **)&reader);
 			PRINTF("\t%$q", size, reader);
 		}	break;
 
@@ -645,7 +645,7 @@ print_cfi_instruction(pformatprinter printer, void *arg,
 
 		case DW_OP_GNU_encoded_addr: {
 			uint8_t encoding = *reader++;
-			void *pointer    = dwarf_decode_pointer((byte_t __CHECKED const **)&reader, encoding, addrsize, NULL);
+			void *pointer    = dwarf_decode_pointer((byte_t const **)&reader, encoding, addrsize, NULL);
 			PRINTF("\t$%#" PRIxPTR, pointer);
 		}	break;
 
@@ -677,12 +677,12 @@ err:
 
 PRIVATE ATTR_NOINLINE REPR_TEXTSECTION NONNULL((1, 3)) ssize_t CC
 print_cfi_expression_with_labels(pformatprinter printer, void *arg,
-                                 byte_t __CHECKED const *__restrict pc, size_t length,
+                                 CHECKED byte_t const *__restrict pc, size_t length,
                                  size_t indent, byte_t addrsize, byte_t ptrsize,
                                  struct label_buffer const *__restrict labels,
                                  bool indent_on_first_line) {
 	ssize_t temp, result = 0;
-	byte_t __CHECKED const *reader, *end;
+	CHECKED byte_t const *reader, *end;
 	bool is_first;
 	reader   = pc;
 	end      = pc + length;
@@ -714,12 +714,12 @@ err:
 
 PRIVATE ATTR_NOINLINE REPR_TEXTSECTION NONNULL((1, 3)) size_t CC
 print_cfi_expression_with_label_bufsize(pformatprinter printer, void *arg,
-                                        byte_t __CHECKED const *__restrict pc, size_t length,
+                                        CHECKED byte_t const *__restrict pc, size_t length,
                                         size_t indent, size_t label_bufsize,
                                         ssize_t *__restrict presult,
                                         byte_t addrsize, byte_t ptrsize,
                                         bool indent_on_first_line) {
-	byte_t __CHECKED const *reader, *end;
+	CHECKED byte_t const *reader, *end;
 	struct label_buffer *labels;
 	labels = (struct label_buffer *)alloca(offsetof(struct label_buffer, lb_entries) +
 	                                       (label_bufsize * sizeof(struct label_entry)));
@@ -771,7 +771,7 @@ print_cfi_expression_with_label_bufsize(pformatprinter printer, void *arg,
  * @return: * : The usual pformatprinter-style value. */
 INTERN REPR_TEXTSECTION NONNULL((1, 3)) ssize_t CC
 libdl_debug_repr_cfi_expression_ex(pformatprinter printer, void *arg,
-                                   byte_t __CHECKED const *__restrict pc, size_t length,
+                                   CHECKED byte_t const *__restrict pc, size_t length,
                                    size_t indent, byte_t addrsize, byte_t ptrsize,
                                    bool indent_on_first_line) {
 	ssize_t result;
@@ -805,14 +805,14 @@ libdl_debug_repr_cfi_expression_ex(pformatprinter printer, void *arg,
  * @return: * : The usual pformatprinter-style value. */
 INTERN REPR_TEXTSECTION NONNULL((1, 3)) ssize_t CC
 libdl_debug_repr_cfi_expression_with_length(pformatprinter printer, void *arg,
-                                            byte_t __CHECKED const *__restrict expr,
+                                            CHECKED byte_t const *__restrict expr,
                                             size_t length, size_t indent,
                                             byte_t addrsize, byte_t ptrsize) {
 	ssize_t temp, result = 0;
 	if unlikely(!length) {
 		result = (*printer)(arg, REPR_STRING("{}"), 2);
 	} else {
-		byte_t __CHECKED const *instr2;
+		CHECKED byte_t const *instr2;
 		instr2 = unwind_instruction_succ_failsafe(expr, addrsize, ptrsize);
 		if (instr2 >= expr + length) {
 			/* Single instruction -> Print in-line. */
@@ -850,9 +850,9 @@ err:
  * @return: * : The usual pformatprinter-style value. */
 INTERN REPR_TEXTSECTION NONNULL((1, 3)) ssize_t CC
 libdl_debug_repr_cfi_expression(pformatprinter printer, void *arg,
-                                byte_t __CHECKED const *__restrict expr, size_t indent,
+                                CHECKED byte_t const *__restrict expr, size_t indent,
                                 byte_t addrsize, byte_t ptrsize) {
-	size_t length = dwarf_decode_uleb128((byte_t __CHECKED const **)&expr);
+	size_t length = dwarf_decode_uleb128((byte_t const **)&expr);
 	return libdl_debug_repr_cfi_expression_with_length(printer, arg, expr, length,
 	                                                   indent, addrsize, ptrsize);
 }
@@ -878,15 +878,15 @@ libdl_debug_repr_cfi_expression(pformatprinter printer, void *arg,
  * >>                 debug_str_data, debug_str_data + debug_str_size); */
 INTERN REPR_TEXTSECTION NONNULL((1)) ssize_t CC
 libdi_debug_repr_dump(pformatprinter printer, void *arg,
-                      byte_t __CHECKED const *debug_info_start, byte_t __CHECKED const *debug_info_end,
-                      byte_t __CHECKED const *debug_abbrev_start, byte_t __CHECKED const *debug_abbrev_end,
-                      byte_t __CHECKED const *debug_loc_start, byte_t __CHECKED const *debug_loc_end,
-                      byte_t __CHECKED const *debug_loclists_start, byte_t __CHECKED const *debug_loclists_end,
-                      byte_t __CHECKED const *debug_str_start, byte_t __CHECKED const *debug_str_end,
-                      byte_t __CHECKED const *debug_line_str_start, byte_t __CHECKED const *debug_line_str_end) {
+                      CHECKED byte_t const *debug_info_start, CHECKED byte_t const *debug_info_end,
+                      CHECKED byte_t const *debug_abbrev_start, CHECKED byte_t const *debug_abbrev_end,
+                      CHECKED byte_t const *debug_loc_start, CHECKED byte_t const *debug_loc_end,
+                      CHECKED byte_t const *debug_loclists_start, CHECKED byte_t const *debug_loclists_end,
+                      CHECKED byte_t const *debug_str_start, CHECKED byte_t const *debug_str_end,
+                      CHECKED byte_t const *debug_line_str_start, CHECKED byte_t const *debug_line_str_end) {
 	ssize_t temp, result = 0;
 	char const *s;
-	byte_t __CHECKED const *debug_info_iter;
+	CHECKED byte_t const *debug_info_iter;
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_cu_abbrev_t abbrev;
 	di_debuginfo_cu_parser_sections_t cu_sections;
@@ -914,7 +914,7 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 			     : format_printf(printer, arg, REPR_STRING("%#" PRIxPTR ":\n"), (uintptr_t)parser.dup_comp.dic_tag));
 			di_debuginfo_component_attrib_t attr;
 			DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &parser) {
-				byte_t __CHECKED const *orig_reader = parser.dsp_cu_info_pos;
+				CHECKED byte_t const *orig_reader = parser.dsp_cu_info_pos;
 				DO(format_repeat(printer, arg, '\t', parser.dup_child_depth + 1));
 				PRINT("[");
 				s = libdi_debug_repr_DW_AT(attr.dica_name);
@@ -990,7 +990,7 @@ decode_form:
 				case DW_FORM_ref_sup4:
 				case DW_FORM_ref_sup8:
 				case DW_FORM_GNU_ref_alt: {
-					byte_t __CHECKED const *value;
+					CHECKED byte_t const *value;
 					di_debuginfo_cu_parser_t p2;
 					if (!libdi_debuginfo_cu_parser_getref(&parser, attr.dica_form, &value))
 						goto err_bad_value;

@@ -45,7 +45,7 @@ libvio_copytovio_from_phys(struct vioargs *__restrict args,
                            vio_addr_t offset, physaddr_t buf,
                            size_t num_bytes)
 #endif /* ... */
-		__THROWS(...) {
+		THROWS(...) {
 	PHYS_VARS;
 	byte_t *vbuf;
 #ifdef DEFINE_IO_READ

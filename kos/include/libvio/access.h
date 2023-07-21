@@ -105,18 +105,18 @@ LIBVIO_DECL __ATTR_NONNULL((1)) __uint32_t LIBVIO_CC vio_xorl(struct vioargs *__
 
 /* Copy memory to/from VIO, or exchange memory with VIO
  * NOTE: `oldbuf' and `newbuf' may no overlap, though with the exception that they are allowed to be identical */
-typedef __ATTR_NONNULL_T((1)) void (LIBVIO_CC *PVIO_XCHWITHVIO)(struct vioargs *__restrict args, vio_addr_t offset, void __USER __CHECKED *oldbuf, void __USER __CHECKED const *newbuf, __size_t num_bytes, __BOOL atomic) /*__THROWS(E_SEGFAULT, ...)*/;
-typedef __ATTR_NONNULL_T((1)) void (LIBVIO_CC *PVIO_COPYFROMVIO)(struct vioargs *__restrict args, vio_addr_t offset, void __USER __CHECKED *buf, __size_t num_bytes) /*__THROWS(E_SEGFAULT, ...)*/;
-typedef __ATTR_NONNULL_T((1)) void (LIBVIO_CC *PVIO_COPYTOVIO)(struct vioargs *__restrict args, vio_addr_t offset, void __USER __CHECKED const *buf, __size_t num_bytes) /*__THROWS(E_SEGFAULT, ...)*/;
+typedef __ATTR_NONNULL_T((1)) void (LIBVIO_CC *PVIO_XCHWITHVIO)(struct vioargs *__restrict args, vio_addr_t offset, __USER __CHECKED void *oldbuf, __USER __CHECKED void const *newbuf, __size_t num_bytes, __BOOL atomic) /*__THROWS(E_SEGFAULT, ...)*/;
+typedef __ATTR_NONNULL_T((1)) void (LIBVIO_CC *PVIO_COPYFROMVIO)(struct vioargs *__restrict args, vio_addr_t offset, __USER __CHECKED void *buf, __size_t num_bytes) /*__THROWS(E_SEGFAULT, ...)*/;
+typedef __ATTR_NONNULL_T((1)) void (LIBVIO_CC *PVIO_COPYTOVIO)(struct vioargs *__restrict args, vio_addr_t offset, __USER __CHECKED void const *buf, __size_t num_bytes) /*__THROWS(E_SEGFAULT, ...)*/;
 typedef __ATTR_NONNULL_T((1)) void (LIBVIO_CC *PVIO_MEMSET)(struct vioargs *__restrict args, vio_addr_t offset, int byte, __size_t num_bytes) /*__THROWS(E_SEGFAULT, ...)*/;
 #ifdef __KERNEL__
 typedef __ATTR_NONNULL_T((1)) void (LIBVIO_CC *PVIO_COPYFROMVIO_TO_PHYS)(struct vioargs *__restrict args, vio_addr_t offset, __physaddr_t buf, __size_t num_bytes) __THROWS(...);
 typedef __ATTR_NONNULL_T((1)) void (LIBVIO_CC *PVIO_COPYTOVIO_FROM_PHYS)(struct vioargs *__restrict args, vio_addr_t offset, __physaddr_t buf, __size_t num_bytes) __THROWS(...);
 #endif /* __KERNEL__ */
 #ifdef LIBVIO_WANT_PROTOTYPES
-LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_xchwithvio(struct vioargs *__restrict args, vio_addr_t offset, void __USER __CHECKED *oldbuf, void __USER __CHECKED const *newbuf, __size_t num_bytes, __BOOL atomic) __THROWS(E_SEGFAULT, ...);
-LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_copyfromvio(struct vioargs *__restrict args, vio_addr_t offset, void __USER __CHECKED *buf, __size_t num_bytes) __THROWS(E_SEGFAULT, ...);
-LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_copytovio(struct vioargs *__restrict args, vio_addr_t offset, void __USER __CHECKED const *buf, __size_t num_bytes) __THROWS(E_SEGFAULT, ...);
+LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_xchwithvio(struct vioargs *__restrict args, vio_addr_t offset, __USER __CHECKED void *oldbuf, __USER __CHECKED void const *newbuf, __size_t num_bytes, __BOOL atomic) __THROWS(E_SEGFAULT, ...);
+LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_copyfromvio(struct vioargs *__restrict args, vio_addr_t offset, __USER __CHECKED void *buf, __size_t num_bytes) __THROWS(E_SEGFAULT, ...);
+LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_copytovio(struct vioargs *__restrict args, vio_addr_t offset, __USER __CHECKED void const *buf, __size_t num_bytes) __THROWS(E_SEGFAULT, ...);
 LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_memset(struct vioargs *__restrict args, vio_addr_t offset, int byte, __size_t num_bytes) __THROWS(E_SEGFAULT, ...);
 #ifdef __KERNEL__
 LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_copyfromvio_to_phys(struct vioargs *__restrict args, vio_addr_t offset, __physaddr_t buf, __size_t num_bytes) __THROWS(...);

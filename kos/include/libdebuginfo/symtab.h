@@ -38,15 +38,15 @@ __DECL_BEGIN
  * @return: NULL: All defined symbols have an address > module_relative_pc
  * @return: NULL: The given symbol table is empty, too small, or corrupted.
  * @return: NULL: The given `symtab_entsize' is neither `sizeof(Elf32_Sym)', nor `sizeof(Elf64_Sym)' */
-typedef __ATTR_PURE_T __ATTR_WUNUSED_T __byte_t __CHECKED const *
-__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PSYMTAB_SCANTABLE)(__byte_t __CHECKED const *symtab_start,
-                                                    __byte_t __CHECKED const *symtab_end,
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T __CHECKED __byte_t const *
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PSYMTAB_SCANTABLE)(__CHECKED __byte_t const *symtab_start,
+                                                    __CHECKED __byte_t const *symtab_end,
                                                     __size_t symtab_entsize,
                                                     __uintptr_t module_relative_pc);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
-LIBDEBUGINFO_DECL __ATTR_PURE __ATTR_WUNUSED __byte_t __CHECKED const *
-__NOTHROW_NCX(LIBDEBUGINFO_CC symtab_scantable)(__byte_t __CHECKED const *symtab_start,
-                                                __byte_t __CHECKED const *symtab_end,
+LIBDEBUGINFO_DECL __ATTR_PURE __ATTR_WUNUSED __CHECKED __byte_t const *
+__NOTHROW_NCX(LIBDEBUGINFO_CC symtab_scantable)(__CHECKED __byte_t const *symtab_start,
+                                                __CHECKED __byte_t const *symtab_end,
                                                 __size_t symtab_entsize,
                                                 __uintptr_t module_relative_pc);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */

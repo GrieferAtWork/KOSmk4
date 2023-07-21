@@ -387,7 +387,7 @@ pointer_cast_retain_nothrow:
 							if (getExtraCannotRetainInfo !is none)
 								extraInfo = getExtraCannotRetainInfo();
 							checker.warn("-Wnothrow",
-									f"Cannot retain `__attribute__((nothrow({oldNothrowLevel})))' "
+									f"Cannot retain `{getPrettyNothrowLevelName(int(oldNothrowLevel))}' "
 									f"in cast to `{newTyp}'{extraInfo}");
 						} else {
 							newPointerBase = copy newPointerBase;

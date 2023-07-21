@@ -27,6 +27,7 @@
 
 #include <bits/crt/format-printer.h>
 #include <bits/crt/wformat-printer.h>
+#include <kos/anno.h>
 
 #ifdef __PE__
 #ifndef __C16FORMATPRINTER_CC
@@ -83,8 +84,14 @@ __SYSDECL_BEGIN
 #endif /* __LIBCCALL_IS_LIBKCALL */
 #endif /* !__C32FORMATPRINTER_CC */
 
-typedef __SSIZE_TYPE__ (__C16FORMATPRINTER_CC *__pc16formatprinter)(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen);
-typedef __SSIZE_TYPE__ (__C32FORMATPRINTER_CC *__pc32formatprinter)(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen);
+typedef __ATTR_INS_T(2, 3) __SSIZE_TYPE__
+(__C16FORMATPRINTER_CC *__pc16formatprinter)(void *__arg,
+                                             __CHECKED __CHAR16_TYPE__ const *__restrict __data,
+                                             __SIZE_TYPE__ __datalen);
+typedef __ATTR_INS_T(2, 3) __SSIZE_TYPE__
+(__C32FORMATPRINTER_CC *__pc32formatprinter)(void *__arg,
+                                             __CHECKED __CHAR32_TYPE__ const *__restrict __data,
+                                             __SIZE_TYPE__ __datalen);
 
 __SYSDECL_END
 #endif /* __CC__ */

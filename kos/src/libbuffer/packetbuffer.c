@@ -157,7 +157,7 @@ INTERN WUNUSED NONNULL((1)) struct pb_packet *CC
 lib_pb_buffer_startwrite(struct pb_buffer *__restrict self,
                          size_t payload_size,
                          size_t ancillary_size)
-		__THROWS(E_BADALLOC)
+		THROWS(E_BADALLOC)
 #else /* __KERNEL__ */
 INTERN WUNUSED NONNULL((1)) struct pb_packet *
 NOTHROW(CC lib_pb_buffer_startwrite)(struct pb_buffer *__restrict self,
@@ -486,7 +486,7 @@ NOTHROW(CC lib_pb_buffer_endwrite_abort)(struct pb_buffer *__restrict self,
 #ifdef __KERNEL__
 INTERN WUNUSED NONNULL((1)) struct pb_packet *CC
 lib_pb_buffer_startread(struct pb_buffer *__restrict self)
-		__THROWS(E_WOULDBLOCK)
+		THROWS(E_WOULDBLOCK)
 #else /* __KERNEL__ */
 INTERN WUNUSED NONNULL((1)) struct pb_packet *
 NOTHROW(CC lib_pb_buffer_startread)(struct pb_buffer *__restrict self)
@@ -670,7 +670,7 @@ NOTHROW(CC lib_pb_buffer_endread_consume)(struct pb_buffer *__restrict self,
 #ifdef __KERNEL__
 INTERN NOBLOCK WUNUSED NONNULL((1)) bool
 (CC lib_pb_buffer_canread)(struct pb_buffer *__restrict self)
-		__THROWS(E_WOULDBLOCK)
+		THROWS(E_WOULDBLOCK)
 #else /* __KERNEL__ */
 INTERN NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(CC lib_pb_buffer_canread)(struct pb_buffer *__restrict self)
@@ -717,7 +717,7 @@ INTERN NOBLOCK WUNUSED NONNULL((1)) bool
 (CC lib_pb_buffer_canwrite)(struct pb_buffer *__restrict self,
                             size_t payload_size,
                             size_t ancillary_size)
-		__THROWS(E_WOULDBLOCK)
+		THROWS(E_WOULDBLOCK)
 #else /* __KERNEL__ */
 INTERN NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(CC lib_pb_buffer_canwrite)(struct pb_buffer *__restrict self,

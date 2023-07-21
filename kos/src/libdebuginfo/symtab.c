@@ -55,20 +55,20 @@ DECL_BEGIN
  * @return: NULL: All defined symbols have an address > module_relative_pc
  * @return: NULL: The given symbol table is empty, too small, or corrupted.
  * @return: NULL: The given `symtab_entsize' is neither `sizeof(Elf32_Sym)', nor `sizeof(Elf64_Sym)' */
-INTERN TEXTSECTION ATTR_PURE WUNUSED byte_t __CHECKED const *
-NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t __CHECKED const *symtab_start,
-                                       byte_t __CHECKED const *symtab_end,
+INTERN TEXTSECTION ATTR_PURE WUNUSED CHECKED byte_t const *
+NOTHROW_NCX(CC libdi_symtab_scantable)(CHECKED byte_t const *symtab_start,
+                                       CHECKED byte_t const *symtab_end,
                                        size_t symtab_entsize,
                                        uintptr_t module_relative_pc) {
-	byte_t __CHECKED const *result;
+	CHECKED byte_t const *result;
 	if (symtab_start >= symtab_end)
 		goto done_null;
 	if (symtab_entsize == sizeof(Elf32_Sym)) {
-		Elf32_Sym __CHECKED const *iter;
+		CHECKED Elf32_Sym const *iter;
 		Elf32_Addr result_value;
 		symtab_end -= (sizeof(Elf32_Sym) - 1);
-		for (iter = (Elf32_Sym __CHECKED const *)symtab_start;
-		     iter < (Elf32_Sym __CHECKED const *)symtab_end; ++iter) {
+		for (iter = (Elf32_Sym const *)symtab_start;
+		     iter < (Elf32_Sym const *)symtab_end; ++iter) {
 			Elf32_Section st_shndx; /* Section index */
 			Elf32_Addr st_value;    /* Symbol value */
 			st_shndx = UNALIGNED_GET(&iter->st_shndx);
@@ -79,13 +79,13 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t __CHECKED const *symtab_start,
 			if ((st_value == module_relative_pc) ||
 			    (module_relative_pc >= (uintptr_t)st_value &&
 			     module_relative_pc < (uintptr_t)st_value + UNALIGNED_GET(&iter->st_size)))
-				return (byte_t __CHECKED const *)iter; /* Perfect match! */
+				return (byte_t const *)iter; /* Perfect match! */
 		}
 		/* Fallback: return the nearest symbol. */
 		result       = NULL;
 		result_value = (Elf32_Addr)-1;
-		for (iter = (Elf32_Sym __CHECKED const *)symtab_start;
-		     iter < (Elf32_Sym __CHECKED const *)symtab_end; ++iter) {
+		for (iter = (Elf32_Sym const *)symtab_start;
+		     iter < (Elf32_Sym const *)symtab_end; ++iter) {
 			Elf32_Section st_shndx; /* Section index */
 			Elf32_Addr st_value;    /* Symbol value */
 			st_shndx = UNALIGNED_GET(&iter->st_shndx);
@@ -96,16 +96,16 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t __CHECKED const *symtab_start,
 			if (st_value > module_relative_pc)
 				continue; /* Defined above the result */
 			if (st_value < result_value) {
-				result       = (byte_t __CHECKED const *)iter;
+				result       = (byte_t const *)iter;
 				result_value = st_value;
 			}
 		}
 	} else if (symtab_entsize == sizeof(Elf64_Sym)) {
-		Elf64_Sym __CHECKED const *iter;
+		CHECKED Elf64_Sym const *iter;
 		Elf64_Addr result_value;
 		symtab_end -= (sizeof(Elf64_Sym) - 1);
-		for (iter = (Elf64_Sym __CHECKED const *)symtab_start;
-		     iter < (Elf64_Sym __CHECKED const *)symtab_end; ++iter) {
+		for (iter = (Elf64_Sym const *)symtab_start;
+		     iter < (Elf64_Sym const *)symtab_end; ++iter) {
 			Elf64_Section st_shndx; /* Section index */
 			Elf64_Addr st_value;    /* Symbol value */
 			st_shndx = UNALIGNED_GET(&iter->st_shndx);
@@ -116,13 +116,13 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t __CHECKED const *symtab_start,
 			if ((st_value == module_relative_pc) ||
 			    (module_relative_pc >= st_value &&
 			     module_relative_pc < st_value + UNALIGNED_GET(&iter->st_size)))
-				return (byte_t __CHECKED const *)iter; /* Perfect match! */
+				return (byte_t const *)iter; /* Perfect match! */
 		}
 		/* Fallback: return the nearest symbol. */
 		result       = NULL;
 		result_value = (Elf64_Addr)-1;
-		for (iter = (Elf64_Sym __CHECKED const *)symtab_start;
-		     iter < (Elf64_Sym __CHECKED const *)symtab_end; ++iter) {
+		for (iter = (Elf64_Sym const *)symtab_start;
+		     iter < (Elf64_Sym const *)symtab_end; ++iter) {
 			Elf64_Section st_shndx; /* Section index */
 			Elf64_Addr st_value;    /* Symbol value */
 			st_shndx = UNALIGNED_GET(&iter->st_shndx);
@@ -133,7 +133,7 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t __CHECKED const *symtab_start,
 			if (st_value > module_relative_pc)
 				continue; /* Defined above the result */
 			if (st_value < result_value) {
-				result       = (byte_t __CHECKED const *)iter;
+				result       = (byte_t const *)iter;
 				result_value = st_value;
 			}
 		}

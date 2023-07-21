@@ -257,7 +257,7 @@ struct cmodmixsymtab {
 
 struct cmodunit {
 	/* CModule CompilationUnit */
-	byte_t CHECKED const    *cu_di_start; /* [1..1] .debug_info start (s.a. `di_debuginfo_cu_parser_t::dup_cu_info_hdr'). */
+	CHECKED byte_t const    *cu_di_start; /* [1..1] .debug_info start (s.a. `di_debuginfo_cu_parser_t::dup_cu_info_hdr'). */
 	struct cmodsymtab        cu_symbols;  /* Per-unit symbols (who's names collide with other per-module symbols).
 	                                       * NOTE: `.mst_symv == (struct cmodsym *)-1' if symbols from this CU have
 	                                       *       yet to be loaded. Also note  that when symbols are loaded,  this
@@ -280,7 +280,7 @@ FUNDEF NONNULL((1, 2, 3)) void
 NOTHROW_NCX(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
                                             struct cmodule const *__restrict mod,
                                             di_debuginfo_cu_parser_t *__restrict result,
-                                            byte_t CHECKED const *dip);
+                                            CHECKED byte_t const *dip);
 
 
 struct cmodule {
@@ -424,7 +424,7 @@ NOTHROW_NCX(FCALL cmodule_loadsyms)(struct cmodule *__restrict self);
  *             symbol instead. */
 FUNDEF WUNUSED NONNULL((1)) struct cmodsym const *
 NOTHROW_NCX(FCALL cmodule_getsym)(struct cmodule *__restrict self,
-                                  char CHECKED const *name, size_t namelen,
+                                  CHECKED char const *name, size_t namelen,
                                   uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 
 
@@ -437,7 +437,7 @@ NOTHROW_NCX(FCALL cmodule_getsym)(struct cmodule *__restrict self,
  * @return: NULL: Error: No such symbol.
  * @return: NULL: Error: Operation was interrupted. */
 FUNDEF WUNUSED NONNULL((3)) struct cmodsym const *
-NOTHROW_NCX(FCALL cmodule_getsym_global)(char CHECKED const *name, size_t namelen,
+NOTHROW_NCX(FCALL cmodule_getsym_global)(CHECKED char const *name, size_t namelen,
                                          REF struct cmodule **__restrict presult_module,
                                          uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 
@@ -448,7 +448,7 @@ NOTHROW_NCX(FCALL cmodule_getsym_global)(char CHECKED const *name, size_t namele
  * different address spaces. */
 FUNDEF WUNUSED NONNULL((4)) struct cmodsym const *
 NOTHROW_NCX(FCALL cmodule_getsym_withhint)(struct cmodule *start_module,
-                                           char CHECKED const *name, size_t namelen,
+                                           CHECKED char const *name, size_t namelen,
                                            REF struct cmodule **__restrict presult_module,
                                            uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 
@@ -462,7 +462,7 @@ NOTHROW_NCX(FCALL cmodule_getsym_withhint)(struct cmodule *start_module,
 FUNDEF NONNULL((1, 2)) void
 NOTHROW_NCX(FCALL cmodule_parser_from_dip)(struct cmodule const *__restrict self,
                                            di_debuginfo_cu_parser_t *__restrict result,
-                                           byte_t CHECKED const *dip);
+                                           CHECKED byte_t const *dip);
 
 /* Try to find the compilation unit that contains `module_relative_pc'
  * If  no such unit  can be located, `NULL'  will be returned instead. */
@@ -474,13 +474,13 @@ NOTHROW_NCX(FCALL cmodule_findunit_from_pc)(struct cmodule const *__restrict sel
  * If no such unit can be located, `NULL' will be returned instead. */
 FUNDEF ATTR_PURE WUNUSED NONNULL((1)) struct cmodunit *
 NOTHROW_NCX(FCALL cmodule_findunit_from_dip)(struct cmodule const *__restrict self,
-                                             byte_t CHECKED const *dip);
+                                             CHECKED byte_t const *dip);
 
 /* Simple wrapper for a pair `REF struct cmodule *mod' + `byte_t const *dip'
  * that can be  used to  reference and store  arbitrary debug-info  objects. */
 struct cmoduledip {
 	REF struct cmodule   *cd_mod; /* [1..1] CModule. */
-	byte_t CHECKED const *cd_dip; /* [1..1] DIP pointer. */
+	CHECKED byte_t const *cd_dip; /* [1..1] DIP pointer. */
 };
 #define cmoduledip_fini(self)           decref((self)->cd_mod)
 #define cmoduledip_parser(self, result) cmodule_parser_from_dip((self)->cd_mod, result, (self)->cd_dip)
@@ -543,7 +543,7 @@ struct cmodsyminfo {
  * @return: DBX_EINTR:  Operation was interrupted. */
 FUNDEF NONNULL((1)) dbx_errno_t
 NOTHROW_NCX(FCALL cmod_syminfo)(/*in|out*/ struct cmodsyminfo *__restrict info,
-                                char CHECKED const *name, size_t namelen,
+                                CHECKED char const *name, size_t namelen,
                                 uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 
 /* Same as `cmod_syminfo()', but  the caller is not  required to fill in  information
@@ -557,7 +557,7 @@ NOTHROW_NCX(FCALL cmod_syminfo)(/*in|out*/ struct cmodsyminfo *__restrict info,
  * @return: DBX_EINTR:  Operation was interrupted. */
 FUNDEF NONNULL((1)) dbx_errno_t
 NOTHROW_NCX(FCALL cmod_syminfo_local)(/*out*/ struct cmodsyminfo *__restrict info,
-                                      char CHECKED const *name, size_t namelen,
+                                      CHECKED char const *name, size_t namelen,
                                       uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 #define cmod_syminfo_local_fini(info) decref((info)->clv_mod)
 
@@ -621,7 +621,7 @@ NOTHROW_NCX(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info);
 FUNDEF NONNULL((1, 2)) ssize_t FCALL
 cmod_symenum(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
              cmod_symenum_callback_t cb,
-             char CHECKED const *startswith_name,
+             CHECKED char const *startswith_name,
              size_t startswith_namelen,
              uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL),
              uintptr_t scope DFL(CMOD_SYMENUM_SCOPE_FNORMAL));
@@ -641,7 +641,7 @@ cmod_symenum(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
 FUNDEF NONNULL((1, 2)) ssize_t FCALL
 cmod_symenum_local(/*in(oob_only)|out(undef)*/ struct cmodsyminfo *__restrict info,
                    cmod_symenum_callback_t cb,
-                   char CHECKED const *startswith_name,
+                   CHECKED char const *startswith_name,
                    size_t startswith_namelen,
                    uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL),
                    uintptr_t scope DFL(CMOD_SYMENUM_SCOPE_FNORMAL));

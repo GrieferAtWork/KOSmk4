@@ -748,9 +748,9 @@ INTDEF STRINGSECTION char const unknown_string[]; /* "???" */
 
 INTERN TEXTSECTION NONNULL((1)) ssize_t CC
 libdi_debug_addr2line_print_filename(pformatprinter printer, void *arg,
-                                     char __CHECKED const *cubase,
-                                     char __CHECKED const *pathname,
-                                     char __CHECKED const *filename) {
+                                     CHECKED char const *cubase,
+                                     CHECKED char const *pathname,
+                                     CHECKED char const *filename) {
 	ssize_t temp, result = 0;
 	size_t strid;
 	if (pathname && (pathname[0] == '/' || pathname[0] == '\\' ||
