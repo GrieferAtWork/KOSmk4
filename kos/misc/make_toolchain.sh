@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Have `Mapping.Keys` implement `Set`"
-DEEMON_VERSION="13bea817b6e13ebf3b8b46d4fc68c2d16b9b5ef5"
+#     v -- "Fix problem with `int.frombytes()`"
+DEEMON_VERSION="0db988f11fd7a3c3f6019687db938a381df07023"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
