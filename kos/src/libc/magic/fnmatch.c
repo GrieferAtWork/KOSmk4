@@ -156,6 +156,8 @@ int fnmatch([[in]] char const *pattern,
 					++pattern;
 				}
 			} while (*pattern != ']');
+			if (!did_match)
+				goto nomatch;
 			goto next; /* This will consume the trailing ']' */
 		} else if (*pattern == *name) {
 next:
