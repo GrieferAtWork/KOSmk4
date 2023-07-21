@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cc20389 */
+/* HASH CRC-32:0xd8459207 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,20 +22,19 @@
 #define __local___overflow_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf)
-#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__flsbuf_defined
 #define __local___localdep__flsbuf_defined
 #ifdef __CRT_HAVE__flsbuf
-__CREDIRECT(__ATTR_INOUT(2),int,__THROWING,__localdep__flsbuf,(int __ch, __FILE *__restrict __stream),_flsbuf,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB,__localdep__flsbuf,(int __ch, __FILE *__restrict __stream),_flsbuf,(__ch,__stream))
 #elif defined(__CRT_HAVE___swbuf)
-__CREDIRECT(__ATTR_INOUT(2),int,__THROWING,__localdep__flsbuf,(int __ch, __FILE *__restrict __stream),__swbuf,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB,__localdep__flsbuf,(int __ch, __FILE *__restrict __stream),__swbuf,(__ch,__stream))
 #else /* ... */
 #undef __local___localdep__flsbuf_defined
 #endif /* !... */
 #endif /* !__local___localdep__flsbuf_defined */
 __LOCAL_LIBC(__overflow) __ATTR_INOUT(1) int
-(__LIBCCALL __LIBC_LOCAL_NAME(__overflow))(__FILE *__stream, int __ch) __THROWS(...) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(__overflow))(__FILE *__stream, int __ch) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__flsbuf)(__ch, __stream);
 }
 __NAMESPACE_LOCAL_END

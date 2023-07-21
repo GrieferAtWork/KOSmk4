@@ -98,6 +98,8 @@ global final SIMPLE_KOS_ATTRIBUTE_ANNOTATIONS: {string: string} = {
 global final SIMPLE_NOTHROW_ANNOTATIONS: {string: string} = {
 	"no_nothrow"        : "",
 	"nothrow"           : "NOTHROW",
+	"nothrow_cb"        : "NOTHROW_CB",
+	"nothrow_cb_ncx"    : "NOTHROW_CB_NCX",
 	"nothrow_ncx"       : "NOTHROW_NCX",
 	"nothrow_rpc"       : "NOTHROW_RPC",
 	"nothrow_rpc_kos"   : "NOTHROW_RPC_KOS",
@@ -106,7 +108,7 @@ global final SIMPLE_NOTHROW_ANNOTATIONS: {string: string} = {
 
 	/* CP for stdio (because of libio, custom FILE cookies may throw exceptions)
 	 * Used  for  functions  that  are   already  CP  in  their  syscall   form. */
-	"cp_stdio"          : "THROWS(...)",
+	"cp_stdio"          : "NOTHROW_CB",
 	/* STDIO functions that may throw because of custom FILE cookies. */
 	"stdio_throws"      : "THROWS(...)",
 	"throws"            : "THROWS(...)",
@@ -317,7 +319,9 @@ function parsePrototypeAnnotation(
 		tok = self.next();
 		if (tok == "(") {
 			self.next();
-			prototype.nothrow = f"THROWS({self.parseCStringOrAllUntilRParenNoComma()})";
+			local decl = str self.parseCStringOrAllUntilRParenNoComma();
+			local decl = ", ".join(for (local part: decl.split(",")) f"@{part.strip()}@");
+			prototype.nothrow = f"THROWS({decl})";
 			self.skip(")");
 		} else {
 			prototype.nothrow = "THROWS(...)";
@@ -3495,10 +3499,11 @@ class CrtDosVariantCallbackMetadata: CrtDosVariantMetadata {
 				f"[[crt_dos_variant(callback(...))]] (see: {repr name})"
 			);
 		}
-		if (dosProto.nothrow != "THROWS(...)") {
+		if (dosProto.nothrow !in ["NOTHROW_CB", "NOTHROW_CB_NCX", "THROWS(...)"]) {
 			this.err(
-				f"[[crt_dos_variant(callback(...))]] used on function {repr name} not marked as "
-				f"[[throws]]. Because user-defined callbacks are invoked, obviously this function "
+				f"[[crt_dos_variant(callback(...))]] used on function {repr name} "
+				f"not marked as [[nothrow_cb]], [[nothrow_cb_ncx]], or [[throws]]. "
+				f"Because user-defined callbacks are invoked, obviously this function "
 				f"can throw any kind of exception!"
 			);
 		}

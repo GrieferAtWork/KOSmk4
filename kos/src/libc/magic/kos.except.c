@@ -1823,13 +1823,13 @@ except_register_state_t *except_unwind([[inout]] except_register_state_t *__rest
 
 @@>> except_throw_current(3)
 @@Throw the currently set (in `except_data()') exception.
-[[noreturn, cold, throws]]
+[[noreturn, cold, no_nothrow]]
 [[kernel, cc(LIBKCALL)]]
 void except_throw_current(void);
 
 @@>> except_rethrow(3)
 @@Rethrow the current exception (same as a c++ `throw;' expression)
-[[guard, noreturn, cold, throws]]
+[[guard, noreturn, cold, no_nothrow]]
 [[kernel, cc(LIBKCALL)]]
 void except_rethrow(void);
 
@@ -1842,7 +1842,7 @@ void except_rethrow(void);
 #define __EXCEPT_THROW_CC __LIBKCALL
 #endif /* !__EXCEPT_THROW_CC */
 )]]
-[[noreturn, cold, throws]]
+[[noreturn, cold, no_nothrow]]
 [[kernel, cc(__EXCEPT_THROW_CC)]]
 void except_throw(except_code_t code);
 
@@ -1855,7 +1855,7 @@ void except_throw(except_code_t code);
 #define __EXCEPT_THROWN_CC __LIBKCALL
 #endif /* !__EXCEPT_THROWN_CC */
 )]]
-[[noreturn, cold, throws]]
+[[noreturn, cold, no_nothrow]]
 [[kernel, cc(__EXCEPT_THROWN_CC)]]
 void except_thrown(except_code_t code, unsigned int _argc, ...);
 
@@ -1863,7 +1863,12 @@ void except_thrown(except_code_t code, unsigned int _argc, ...);
 
 %{
 /* Rethrow the last exception */
-#ifdef __except_rethrow_defined
+#ifdef __CHECKER__
+#define __except_rethrow_defined
+#undef except_rethrow
+#define except_rethrow() __builtin_rethrow()
+#define RETHROW()        __builtin_rethrow()
+#elif defined(__except_rethrow_defined)
 #define RETHROW() except_rethrow()
 #elif defined(__cplusplus)
 #define RETHROW() throw
@@ -2088,7 +2093,10 @@ restore_saved_exception:
 
 /* Nested exception support */
 #ifdef __cplusplus
-#if defined(__except_nesting_begin_defined) && defined(__except_nesting_end_defined)
+#ifdef __CHECKER__
+#define __NESTED_TRY       try
+#define __NESTED_EXCEPTION (void)0
+#elif defined(__except_nesting_begin_defined) && defined(__except_nesting_end_defined)
 class __cxx_exception_nesting: public _exception_nesting_data {
 public:
 	__ATTR_FORCEINLINE operator bool() const __CXX_NOEXCEPT { return false; }

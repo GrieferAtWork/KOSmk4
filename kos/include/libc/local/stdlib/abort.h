@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfeac436f */
+/* HASH CRC-32:0x20efe704 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,22 +22,21 @@
 #define __local_abort_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)
-#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__Exit_defined
 #define __local___localdep__Exit_defined
 #if __has_builtin(__builtin__Exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE__Exit)
-__CEIREDIRECT(__ATTR_NORETURN,void,__THROWING,__localdep__Exit,(int __status),_Exit,{ __builtin__Exit(__status); })
+__CEIREDIRECT(__ATTR_NORETURN,void,,__localdep__Exit,(int __status),_Exit,{ __builtin__Exit(__status); })
 #elif __has_builtin(__builtin__exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE__exit)
-__CEIREDIRECT(__ATTR_NORETURN,void,__THROWING,__localdep__Exit,(int __status),_exit,{ __builtin__exit(__status); })
+__CEIREDIRECT(__ATTR_NORETURN,void,,__localdep__Exit,(int __status),_exit,{ __builtin__exit(__status); })
 #elif defined(__CRT_HAVE__Exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep__Exit,(int __status),_Exit,(__status))
+__CREDIRECT_VOID(__ATTR_NORETURN,,__localdep__Exit,(int __status),_Exit,(__status))
 #elif defined(__CRT_HAVE__exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep__Exit,(int __status),_exit,(__status))
+__CREDIRECT_VOID(__ATTR_NORETURN,,__localdep__Exit,(int __status),_exit,(__status))
 #elif defined(__CRT_HAVE_quick_exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep__Exit,(int __status),quick_exit,(__status))
+__CREDIRECT_VOID(__ATTR_NORETURN,,__localdep__Exit,(int __status),quick_exit,(__status))
 #elif defined(__CRT_HAVE_exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep__Exit,(int __status),exit,(__status))
+__CREDIRECT_VOID(__ATTR_NORETURN,,__localdep__Exit,(int __status),exit,(__status))
 #else /* ... */
 #undef __local___localdep__Exit_defined
 #endif /* !... */
@@ -46,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/os/stdlib.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(abort) __ATTR_NORETURN void
-(__LIBCCALL __LIBC_LOCAL_NAME(abort))(void) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(abort))(void) {
 	(__NAMESPACE_LOCAL_SYM __localdep__Exit)(__EXIT_FAILURE);
 }
 __NAMESPACE_LOCAL_END

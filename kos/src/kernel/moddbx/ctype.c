@@ -324,16 +324,19 @@ NOTHROW(FCALL ctype_common)(struct ctype *a,
 			goto return_a;
 		if (CTYPE_KIND_SIZEOF(akind) < CTYPE_KIND_SIZEOF(bkind))
 			goto return_b;
+
 		/* Return whichever isn't a boolean. */
 		if (CTYPE_KIND_ISBOOL(bkind))
 			goto return_a;
 		if (CTYPE_KIND_ISBOOL(akind))
 			goto return_b;
+
 		/* Same type sizes. -> Return the signed of the two types. */
 		if (!CTYPE_KIND_INT_ISUNSIGNED(akind) && CTYPE_KIND_INT_ISUNSIGNED(bkind))
 			goto return_a;
 		if (!CTYPE_KIND_INT_ISUNSIGNED(bkind) && CTYPE_KIND_INT_ISUNSIGNED(akind))
 			goto return_b;
+
 		/* Both types are integers, and have the same size and sign.
 		 * Prefer `long long' over `long', `long' over `int', and `int' over `short' */
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
@@ -624,12 +627,12 @@ try_pointer_register:
 
 
 PRIVATE NONNULL((1, 2)) ssize_t
-NOTHROW(FCALL dw_enumerate_fields)(struct cmodule *__restrict mod,
-                                   byte_t const *__restrict dip,
-                                   ctype_struct_field_callback_t cb,
-                                   void *cookie,
-                                   ptrdiff_t base_offset,
-                                   bool *__restrict pstruct_has_children) {
+NOTHROW_CB_NCX(FCALL dw_enumerate_fields)(struct cmodule *__restrict mod,
+                                          byte_t CHECKED const *__restrict dip,
+                                          ctype_struct_field_callback_t cb,
+                                          void *cookie,
+                                          ptrdiff_t base_offset,
+                                          bool *__restrict pstruct_has_children) {
 	ssize_t temp, result = 0;
 	di_debuginfo_cu_parser_t parser;
 	struct cmodunit *cunit;
@@ -735,9 +738,9 @@ err:
 }
 
 PRIVATE NONNULL((1, 2)) void
-NOTHROW(FCALL dw_determine_type_size)(struct cmodule *__restrict mod,
-                                      byte_t const *__restrict dip,
-                                      size_t *__restrict ptype_size) {
+NOTHROW_NCX(FCALL dw_determine_type_size)(struct cmodule *__restrict mod,
+                                          byte_t CHECKED const *__restrict dip,
+                                          size_t *__restrict ptype_size) {
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_component_attrib_t attr;
 	cmodule_parser_from_dip(mod, &parser, dip);
@@ -752,8 +755,8 @@ NOTHROW(FCALL dw_determine_type_size)(struct cmodule *__restrict mod,
 }
 
 /* Return the name of a structure type, or `NULL' if unknown or `self' isn't a struct. */
-PUBLIC WUNUSED NONNULL((1)) char const *
-NOTHROW(FCALL ctype_struct_getname)(struct ctype const *__restrict self) {
+PUBLIC WUNUSED NONNULL((1)) char CHECKED const *
+NOTHROW_NCX(FCALL ctype_struct_getname)(struct ctype const *__restrict self) {
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_component_attrib_t attr;
 	char const *result;
@@ -773,10 +776,10 @@ NOTHROW(FCALL ctype_struct_getname)(struct ctype const *__restrict self) {
 }
 
 /* Try to find the definition of a given struct. */
-PRIVATE NONNULL((1, 2)) byte_t const *
-NOTHROW(FCALL dw_enumerate_find_struct_definition)(struct cmodule *__restrict mod,
-                                                   byte_t const *__restrict dip,
-                                                   /*out*/ REF struct cmodule **__restrict def_module) {
+PRIVATE NONNULL((1, 2)) byte_t CHECKED const *
+NOTHROW_NCX(FCALL dw_enumerate_find_struct_definition)(struct cmodule *__restrict mod,
+                                                       byte_t CHECKED const *__restrict dip,
+                                                       /*out*/ REF struct cmodule **__restrict def_module) {
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_component_attrib_t attr;
 	char const *name;
@@ -824,9 +827,9 @@ NOTHROW(FCALL dw_enumerate_find_struct_definition)(struct cmodule *__restrict mo
  * @return: * :    The sum of return values of `cb'
  * @return: < 0:   A propagated, negative return value of `cb'. */
 PUBLIC NONNULL((1, 2)) ssize_t
-NOTHROW(FCALL ctype_struct_enumfields)(struct ctype *__restrict self,
-                                       ctype_struct_field_callback_t cb,
-                                       void *cookie) {
+NOTHROW_CB_NCX(FCALL ctype_struct_enumfields)(struct ctype *__restrict self,
+                                              ctype_struct_field_callback_t cb,
+                                              void *cookie) {
 	ssize_t result;
 	bool struct_has_children;
 	/* Sanity check: we're actually dealing with a struct! */
@@ -845,7 +848,7 @@ again:
 		 *  - All other CUs of the current module.
 		 *  - All CUs of all other modules from the current address space.
 		 *  - All CUs of all other modules from the other address space. */
-		byte_t const *def;
+		byte_t CHECKED const *def;
 		REF struct cmodule *def_module;
 		def = dw_enumerate_find_struct_definition(self->ct_struct.ct_info.cd_mod,
 		                                          self->ct_struct.ct_info.cd_dip,
@@ -870,7 +873,7 @@ again:
 
 
 struct ctype_struct_getfield_data {
-	char const              *name;
+	char CHECKED const      *name;
 	size_t                   namelen;
 	/*out*/ struct ctyperef *pfield_type;   /* [1..1] */
 	/*out*/ ptrdiff_t       *pfield_offset; /* [1..1] */
@@ -878,11 +881,11 @@ struct ctype_struct_getfield_data {
 };
 
 PRIVATE NONNULL((2, 3, 4, 5)) ssize_t
-NOTHROW(KCALL ctype_struct_getfield_cb)(void *cookie,
-                                        di_debuginfo_member_t const *__restrict member,
-                                        di_debuginfo_cu_parser_t const *__restrict parser,
-                                        struct cmodule *__restrict mod,
-                                        struct cmodunit *__restrict cu) {
+NOTHROW_NCX(KCALL ctype_struct_getfield_cb)(void *cookie,
+                                            di_debuginfo_member_t const *__restrict member,
+                                            di_debuginfo_cu_parser_t const *__restrict parser,
+                                            struct cmodule *__restrict mod,
+                                            struct cmodunit *__restrict cu) {
 	struct ctype_struct_getfield_data *arg;
 	arg = (struct ctype_struct_getfield_data *)cookie;
 	if (!member->m_name || unlikely(!member->m_type))
@@ -902,10 +905,10 @@ NOTHROW(KCALL ctype_struct_getfield_cb)(void *cookie,
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOENT: No field with this name. */
 PUBLIC WUNUSED NONNULL((1, 2, 4, 5)) dbx_errno_t
-NOTHROW(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
-                                     char const *__restrict name, size_t namelen,
-                                     /*out*/ struct ctyperef *__restrict pfield_type,
-                                     /*out*/ ptrdiff_t *__restrict pfield_offset) {
+NOTHROW_NCX(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
+                                         char CHECKED const *__restrict name, size_t namelen,
+                                         /*out*/ struct ctyperef *__restrict pfield_type,
+                                         /*out*/ ptrdiff_t *__restrict pfield_offset) {
 	struct ctype_struct_getfield_data data;
 	data.name          = name;
 	data.namelen       = namelen;
@@ -922,11 +925,11 @@ NOTHROW(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
 /* Same as `ctype_fromdw()', but when `type_debug_info'
  * is  NULL,   fill   `*presult'   with   `ctype_void'. */
 PUBLIC WUNUSED NONNULL((1, 2, 3, 5)) dbx_errno_t
-NOTHROW(FCALL ctype_fromdw_opt)(struct cmodule *__restrict mod,
-                                struct cmodunit const *__restrict cunit,
-                                di_debuginfo_cu_parser_t const *__restrict cu_parser,
-                                byte_t const *type_debug_info,
-                                /*out*/ struct ctyperef *__restrict presult) {
+NOTHROW_NCX(FCALL ctype_fromdw_opt)(struct cmodule *__restrict mod,
+                                    struct cmodunit const *__restrict cunit,
+                                    di_debuginfo_cu_parser_t const *__restrict cu_parser,
+                                    byte_t CHECKED const *type_debug_info,
+                                    /*out*/ struct ctyperef *__restrict presult) {
 	dbx_errno_t result;
 	if (!type_debug_info) {
 		bzero(presult, sizeof(*presult));
@@ -940,11 +943,11 @@ NOTHROW(FCALL ctype_fromdw_opt)(struct cmodule *__restrict mod,
 
 
 PUBLIC WUNUSED NONNULL((1, 2, 3, 4, 5)) dbx_errno_t
-NOTHROW(FCALL ctype_fromdw_subroutine)(struct cmodule *__restrict mod,
-                                       struct cmodunit const *__restrict cunit,
-                                       di_debuginfo_cu_parser_t *__restrict parser,
-                                       /*out*/ REF struct ctype **__restrict presult,
-                                       /*in*/ struct ctyperef const *__restrict return_type) {
+NOTHROW_NCX(FCALL ctype_fromdw_subroutine)(struct cmodule *__restrict mod,
+                                           struct cmodunit const *__restrict cunit,
+                                           di_debuginfo_cu_parser_t *__restrict parser,
+                                           /*out*/ REF struct ctype **__restrict presult,
+                                           /*in*/ struct ctyperef const *__restrict return_type) {
 	dbx_errno_t result;
 	struct ctyperef *argv;
 	size_t argc;
@@ -1017,11 +1020,11 @@ done_fuction_argv:
  * @return: DBX_ENOMEM:  Out of memory.
  * @return: DBX_EINTERN: Debug information was corrupted. */
 PUBLIC WUNUSED NONNULL((1, 2, 3, 4, 5)) dbx_errno_t
-NOTHROW(FCALL ctype_fromdw)(struct cmodule *__restrict mod,
-                            struct cmodunit const *__restrict cunit,
-                            di_debuginfo_cu_parser_t const *__restrict cu_parser,
-                            byte_t const *__restrict type_debug_info,
-                            /*out*/ struct ctyperef *__restrict presult) {
+NOTHROW_NCX(FCALL ctype_fromdw)(struct cmodule *__restrict mod,
+                                struct cmodunit const *__restrict cunit,
+                                di_debuginfo_cu_parser_t const *__restrict cu_parser,
+                                byte_t CHECKED const *__restrict type_debug_info,
+                                /*out*/ struct ctyperef *__restrict presult) {
 	dbx_errno_t result = DBX_EOK;
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_type_t typinfo;
@@ -1380,9 +1383,9 @@ err_nomem:
  * @return: DBX_ENOENT: `self' isn't an enum type.
  * @return: DBX_ENOENT: No name associated with `value' */
 PUBLIC WUNUSED NONNULL((1, 2)) dbx_errno_t
-NOTHROW(FCALL ctype_enumname)(struct ctype const *__restrict self,
-                              /*out*/ struct ctypeenumname *__restrict result,
-                              intmax_t value) {
+NOTHROW_NCX(FCALL ctype_enumname)(struct ctype const *__restrict self,
+                                  /*out*/ struct ctypeenumname *__restrict result,
+                                  intmax_t value) {
 	/* TODO */
 	COMPILER_IMPURE();
 	(void)self;

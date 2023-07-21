@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe28e6d60 */
+/* HASH CRC-32:0xa8613084 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,35 +27,17 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_exit_defined
 #define __local___localdep_exit_defined
 #if __has_builtin(__builtin_exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exit)
-__NAMESPACE_LOCAL_END
-#include <kos/anno.h>
-__NAMESPACE_LOCAL_BEGIN
-__CEIREDIRECT(__ATTR_NORETURN,void,__THROWING,__localdep_exit,(int __status),exit,{ __builtin_exit(__status); })
+__CEIREDIRECT(__ATTR_NORETURN,void,,__localdep_exit,(int __status),exit,{ __builtin_exit(__status); })
 #elif defined(__CRT_HAVE_exit)
-__NAMESPACE_LOCAL_END
-#include <kos/anno.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_exit,(int __status),exit,(__status))
+__CREDIRECT_VOID(__ATTR_NORETURN,,__localdep_exit,(int __status),exit,(__status))
 #elif defined(__CRT_HAVE_quick_exit)
-__NAMESPACE_LOCAL_END
-#include <kos/anno.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_exit,(int __status),quick_exit,(__status))
+__CREDIRECT_VOID(__ATTR_NORETURN,,__localdep_exit,(int __status),quick_exit,(__status))
 #elif defined(__CRT_HAVE__exit)
-__NAMESPACE_LOCAL_END
-#include <kos/anno.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_exit,(int __status),_exit,(__status))
+__CREDIRECT_VOID(__ATTR_NORETURN,,__localdep_exit,(int __status),_exit,(__status))
 #elif defined(__CRT_HAVE__Exit)
-__NAMESPACE_LOCAL_END
-#include <kos/anno.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_exit,(int __status),_Exit,(__status))
+__CREDIRECT_VOID(__ATTR_NORETURN,,__localdep_exit,(int __status),_Exit,(__status))
 #elif defined(__CRT_HAVE_xexit)
-__NAMESPACE_LOCAL_END
-#include <kos/anno.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_exit,(int __status),xexit,(__status))
+__CREDIRECT_VOID(__ATTR_NORETURN,,__localdep_exit,(int __status),xexit,(__status))
 #else /* ... */
 #undef __local___localdep_exit_defined
 #endif /* !... */

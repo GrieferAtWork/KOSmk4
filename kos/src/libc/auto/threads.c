@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5d2d7e0 */
+/* HASH CRC-32:0x6260378e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,7 +81,7 @@ NOTHROW_NCX(LIBCCALL libc_thrd_create)(thrd_t *thr,
 /* >> thrd_exit(3)
  * Terminate the calling thread (s.a. `pthread_exit(3)') */
 INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_NORETURN void
-(LIBCCALL libc_thrd_exit)(int res) THROWS(...) {
+(LIBCCALL libc_thrd_exit)(int res) {
 	libc_pthread_exit((void *)(uintptr_t)(unsigned int)res);
 }
 #include <asm/crt/threads.h>

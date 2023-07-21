@@ -125,7 +125,7 @@ typedef __pwformatprinter pwformatprinter;
 }
 
 [[wchar]]
-[[throws, decl_include("<bits/crt/wformat-printer.h>")]]
+[[nothrow_cb, decl_include("<bits/crt/wformat-printer.h>")]]
 $ssize_t format_wrepeat([[nonnull]] pwformatprinter printer, void *arg,
                         wchar_t ch, $size_t num_repetitions)
 	%{generate(str2wcs("format_repeat"))}
@@ -138,7 +138,7 @@ $ssize_t format_wrepeat([[nonnull]] pwformatprinter printer, void *arg,
 %
 %
 
-[[throws, wchar, doc_alias("format_vprintf")]]
+[[nothrow_cb, wchar, doc_alias("format_vprintf")]]
 [[decl_include("<bits/crt/wformat-printer.h>")]]
 [[impl_include("<parts/printf-config.h>", "<bits/types.h>")]]
 [[impl_include("<libc/template/itoa_digits.h>")]]
@@ -200,7 +200,7 @@ format_wprintf(*) %{printf("format_vwprintf")}
 
 
 
-[[throws, wchar, doc_alias("format_vscanf")]]
+[[nothrow_cb, wchar, doc_alias("format_vscanf")]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<libc/string.h>", "<libc/unicode.h>")]]
 [[impl_include("<parts/printf-config.h>")]]

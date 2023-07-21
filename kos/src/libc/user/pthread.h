@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10458db3 */
+/* HASH CRC-32:0xe28a304d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ INTDEF ATTR_IN_OPT(2) ATTR_OUT(1) NONNULL((3)) errno_t NOTHROW_NCX(LIBCCALL libc
 /* >> pthread_exit(3)
  * Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
-INTDEF ATTR_NORETURN ATTR_ACCESS_NONE(1) void (LIBCCALL libc_pthread_exit)(void *retval) THROWS(...);
+INTDEF ATTR_NORETURN ATTR_ACCESS_NONE(1) void (LIBCCALL libc_pthread_exit)(void *retval);
 /* >> pthread_join(3)
  * Make calling thread wait for termination of the thread  `self'.
  * The exit status of the thread is stored in `*thread_return', if

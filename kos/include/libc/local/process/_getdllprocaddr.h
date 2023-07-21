@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d618e74 */
+/* HASH CRC-32:0xc0dde0ef */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <libdl/asm/dlfcn.h>
 #ifdef __CRT_HAVE_dlsym
-#include <kos/anno.h>
 #include <features.h>
 #include <bits/types.h>
 #ifndef ____procfun_defined
@@ -33,7 +32,7 @@ typedef int (*__procfun)(void);
 #include <dlfcn.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_getdllprocaddr) __ATTR_IN_OPT(2) __procfun
-(__LIBCCALL __LIBC_LOCAL_NAME(_getdllprocaddr))(__INTPTR_TYPE__ __hnd, char __KOS_FIXED_CONST *__symname, __INTPTR_TYPE__ __ord) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(_getdllprocaddr))(__INTPTR_TYPE__ __hnd, char __KOS_FIXED_CONST *__symname, __INTPTR_TYPE__ __ord) {
 	(void)__ord;
 	return (__procfun)dlsym((void *)(__UINTPTR_TYPE__)__hnd, __symname);
 }

@@ -518,7 +518,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(maybe_split_for_insert))(void **rootp
 	}
 }
 @@pop_namespace@@
-), throws, crt_dos_variant(callback(
+), nothrow_cb_ncx, crt_dos_variant(callback(
 	cook: struct { auto compar = compar; auto arg = arg; },
 	wrap: (void const *a, void const *b, $cook *c): int { return (*c->compar)(a, b, c->arg); },
 	impl: tsearch_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, &$cook),
@@ -582,7 +582,7 @@ void *tsearch_r([[in_opt]] void const *key, [[inout_opt]] void **vrootp,
 @@>> tfind(3), tfind_r(3)
 @@Search for an entry matching the given `key' in the tree pointed
 @@to  by `*rootp'. If no matching entry is available return `NULL'
-[[throws, crt_dos_variant(callback(
+[[nothrow_cb_ncx, crt_dos_variant(callback(
 	cook: struct { auto compar = compar; auto arg = arg; },
 	wrap: (void const *a, void const *b, $cook *c): int { return (*c->compar)(a, b, c->arg); },
 	impl: tfind_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, &$cook),
@@ -611,7 +611,7 @@ void *tfind_r([[in_opt]] void const *key, [[in_opt]] void *const *vrootp,
 
 @@>> tdelete(3), tdelete_r(3)
 @@Remove the element matching `key' from the tree pointed to by `*rootp'
-[[throws, impl_include("<hybrid/typecore.h>", "<parts/malloca.h>")]]
+[[nothrow_cb_ncx, impl_include("<hybrid/typecore.h>", "<parts/malloca.h>")]]
 [[crt_dos_variant(callback(
 	cook: struct { auto compar = compar; auto arg = arg; },
 	wrap: (void const *a, void const *b, $cook *c): int { return (*c->compar)(a, b, c->arg); },
@@ -801,7 +801,7 @@ done:
 
 @@>> twalk(3), twalk_r(3)
 @@Walk through the whole tree and call the `action' callback for every node or leaf
-[[throws, decl_prefix(DEFINE_VISIT)]]
+[[nothrow_cb_ncx, decl_prefix(DEFINE_VISIT)]]
 [[export_alias("__twalk_r")]]
 [[impl_prefix(
 @@push_namespace(local)@@
@@ -842,7 +842,7 @@ void twalk_r([[in_opt]] void const *root,
 
 @@>> tdestroy(3), tdestroy_r(3)
 @@Destroy the whole tree, call `freefct' for each node or leaf
-[[throws, crt_dos_variant(callback(
+[[nothrow_cb_ncx, crt_dos_variant(callback(
 	cook: struct { auto freefct = freefct; auto arg = arg; },
 	wrap: (void *nodep, $cook *c) { (*c->freefct)(nodep, c->arg); },
 	impl: tdestroy_r(root, (void (LIBCCALL *)(void *, void *))&$wrap, &$cook),
@@ -879,7 +879,7 @@ again:
 [[requires_function(tsearch_r)]]
 [[export_alias("__tsearch"), doc_alias("tsearch_r")]]
 [[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER)]]
-[[throws, crt_dos_variant(callback(
+[[nothrow_cb_ncx, crt_dos_variant(callback(
 	cook: auto = compar,
 	wrap: (void const *a, void const *b, $cook c): int { return (*c)(a, b); },
 	impl: tsearch_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, (void *)$cook),
@@ -895,7 +895,7 @@ void *tsearch([[in_opt]] void const *key, [[inout_opt]] void **vrootp,
 
 [[export_alias("__tfind"), doc_alias("tfind_r")]]
 [[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER)]]
-[[throws, crt_dos_variant(callback(
+[[nothrow_cb_ncx, crt_dos_variant(callback(
 	cook: auto = compar,
 	wrap: (void const *a, void const *b, $cook c): int { return (*c)(a, b); },
 	impl: tfind_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, (void *)$cook),
@@ -911,7 +911,7 @@ void *tfind([[in_opt]] void const *key, [[in_opt]] void *const *vrootp,
 
 [[export_alias("__tdelete"), doc_alias("tdelete_r")]]
 [[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER)]]
-[[throws, crt_dos_variant(callback(
+[[nothrow_cb_ncx, crt_dos_variant(callback(
 	cook: auto = compar,
 	wrap: (void const *a, void const *b, $cook c): int { return (*c)(a, b); },
 	impl: tdelete_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, (void *)$cook),
@@ -950,7 +950,7 @@ __LOCAL_LIBC(__invoke_twalk_action_helper) void
 
 [[export_alias("__twalk"), doc_alias("twalk_r")]]
 [[decl_prefix(DEFINE_VISIT), impl_prefix(DEFINE_INVOKE_TWALK_ACTION_HELPER)]]
-[[throws, crt_dos_variant(callback(
+[[nothrow_cb_ncx, crt_dos_variant(callback(
 	cook: auto = action,
 	wrap: (void const *nodep, VISIT value, int level, $cook c) { (*c)(nodep, value, level); },
 	impl: twalk_r(root, (void (LIBCCALL *)(void const *, VISIT, int, void *))&$wrap, (void *)$cook),
@@ -990,7 +990,7 @@ __LOCAL_LIBC(__invoke_free_fn_helper) void
 @@pp_endif@@
 )]
 
-[[doc_alias("tdestroy_r"), throws, crt_dos_variant(callback(
+[[doc_alias("tdestroy_r"), nothrow_cb_ncx, crt_dos_variant(callback(
 	cook: auto = freefct,
 	wrap: (void *nodep, $cook c) { (*c)(nodep); },
 	impl: tdestroy_r(root, (void (LIBCCALL *)(void *, void *))&$wrap, (void *)$cook),
@@ -1012,7 +1012,7 @@ void tdestroy([[inout_opt]] void *root,
 @@>> lfind(3)
 @@Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size)
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[throws, wunused, dos_only_export_alias("_lfind"), crt_dos_variant(callback(
+[[nothrow_cb_ncx, wunused, dos_only_export_alias("_lfind"), crt_dos_variant(callback(
 	cook: auto = compar,
 	wrap: ($cook c, void const *a, void const *b): int { return (*c)(a, b); },
 	impl: _lfind_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&$wrap, (void *)$cook),
@@ -1035,7 +1035,7 @@ void *lfind([[in_opt]] void const *key, [[in(*pitem_count * item_size)]] void co
 @@Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
 @@in array [pbase, pbase+pitem_count*item_size) and insert entry if not found
 [[decl_include("<hybrid/typecore.h>")]]
-[[throws, dos_only_export_alias("_lsearch"), crt_dos_variant(callback(
+[[nothrow_cb_ncx, dos_only_export_alias("_lsearch"), crt_dos_variant(callback(
 	cook: auto = compar,
 	wrap: ($cook c, void const *a, void const *b): int { return (*c)(a, b); },
 	impl: _lsearch_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&$wrap, (void *)$cook),
@@ -1069,7 +1069,7 @@ typedef __compar_fn_t _CoreCrtMgdNonSecureSearchSortCompareFunction;
 %[insert:extern(qsort)]
 %[insert:extern(bsearch)]
 
-[[wunused, throws, decl_include("<hybrid/typecore.h>", "<features.h>"), crt_dos_variant(callback(
+[[wunused, nothrow_cb_ncx, decl_include("<hybrid/typecore.h>", "<features.h>"), crt_dos_variant(callback(
 	cook: struct { auto compar = compar; auto arg = arg; },
 	wrap: ($cook *c, void const *a, void const *b): int { return (*c->compar)(c->arg, a, b); },
 	impl: _lfind_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&$wrap, &$cook),
@@ -1089,7 +1089,7 @@ void *_lfind_s([[in_opt]] void const *key, [[in(*pitem_count * item_size)]] void
 }
 
 
-[[wunused, throws, decl_include("<hybrid/typecore.h>"), crt_dos_variant(callback(
+[[wunused, nothrow_cb_ncx, decl_include("<hybrid/typecore.h>"), crt_dos_variant(callback(
 	cook: struct { auto compar = compar; auto arg = arg; },
 	wrap: ($cook *c, void const *a, void const *b): int { return (*c->compar)(c->arg, a, b); },
 	impl: _lsearch_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&$wrap, &$cook),

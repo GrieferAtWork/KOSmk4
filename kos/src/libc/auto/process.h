@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbabffea1 */
+/* HASH CRC-32:0xa51a09e4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,19 +80,19 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc__endthread)(void);
 INTDEF void NOTHROW_NCX(LIBDCALL libd__endthreadex)(u32 exitcode);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF void (LIBCCALL libc__c_exit)(void) THROWS(...);
+INTDEF void (LIBCCALL libc__c_exit)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF int (LIBDCALL libd__unloaddll)(intptr_t hnd) THROWS(...);
+INTDEF int (LIBDCALL libd__unloaddll)(intptr_t hnd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF int (LIBCCALL libc__unloaddll)(intptr_t hnd) THROWS(...);
+INTDEF int (LIBCCALL libc__unloaddll)(intptr_t hnd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_IN_OPT(2) __procfun (LIBDCALL libd__getdllprocaddr)(intptr_t hnd, char __KOS_FIXED_CONST *symname, intptr_t ord) THROWS(...);
+INTDEF ATTR_IN_OPT(2) __procfun (LIBDCALL libd__getdllprocaddr)(intptr_t hnd, char __KOS_FIXED_CONST *symname, intptr_t ord);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_IN_OPT(2) __procfun (LIBCCALL libc__getdllprocaddr)(intptr_t hnd, char __KOS_FIXED_CONST *symname, intptr_t ord) THROWS(...);
+INTDEF ATTR_IN_OPT(2) __procfun (LIBCCALL libc__getdllprocaddr)(intptr_t hnd, char __KOS_FIXED_CONST *symname, intptr_t ord);
 #endif /* !__KERNEL__ */
 
 DECL_END

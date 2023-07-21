@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x725c3ce9 */
+/* HASH CRC-32:0xf759aa89 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,6 @@
 #ifndef __local__flushall_defined
 #define __local__flushall_defined
 #include <__crt.h>
-#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fflush_defined
 #define __local___localdep_fflush_defined
@@ -29,17 +28,17 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_fflush_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),fflush_unlocked,(__stream))
+__CREDIRECT(,int,__NOTHROW_CB,__localdep_fflush,(__FILE *__stream),fflush_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fflush_nolock) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),_fflush_nolock,(__stream))
+__CREDIRECT(,int,__NOTHROW_CB,__localdep_fflush,(__FILE *__stream),_fflush_nolock,(__stream))
 #elif defined(__CRT_HAVE_fflush)
-__CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),fflush,(__stream))
+__CREDIRECT(,int,__NOTHROW_CB,__localdep_fflush,(__FILE *__stream),fflush,(__stream))
 #elif defined(__CRT_HAVE__IO_fflush)
-__CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),_IO_fflush,(__stream))
+__CREDIRECT(,int,__NOTHROW_CB,__localdep_fflush,(__FILE *__stream),_IO_fflush,(__stream))
 #elif defined(__CRT_HAVE_fflush_unlocked)
-__CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),fflush_unlocked,(__stream))
+__CREDIRECT(,int,__NOTHROW_CB,__localdep_fflush,(__FILE *__stream),fflush_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fflush_nolock)
-__CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),_fflush_nolock,(__stream))
+__CREDIRECT(,int,__NOTHROW_CB,__localdep_fflush,(__FILE *__stream),_fflush_nolock,(__stream))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fflush.h>
@@ -48,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fflush_defined */
 __LOCAL_LIBC(_flushall) int
-(__LIBCCALL __LIBC_LOCAL_NAME(_flushall))(void) __THROWS(...) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(_flushall))(void) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fflush)(__NULLPTR);
 }
 __NAMESPACE_LOCAL_END

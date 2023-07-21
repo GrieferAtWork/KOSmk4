@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c2e8167 */
+/* HASH CRC-32:0xe246a08f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,16 +62,16 @@ INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_info *NOTHROW(LIBKCAL
 INTDEF ATTR_RETNONNULL WUNUSED ATTR_INOUT(1) except_register_state_t *NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_except_unwind)(except_register_state_t *__restrict state);
 /* >> except_throw_current(3)
  * Throw the currently set (in `except_data()') exception. */
-INTDEF ATTR_COLD ATTR_NORETURN void (LIBKCALL libc_except_throw_current)(void) THROWS(...);
+INTDEF ATTR_COLD ATTR_NORETURN void (LIBKCALL libc_except_throw_current)(void);
 /* >> except_rethrow(3)
  * Rethrow the current exception (same as a c++ `throw;' expression) */
-INTDEF ATTR_COLD ATTR_NORETURN void (LIBKCALL libc_except_rethrow)(void) THROWS(...);
+INTDEF ATTR_COLD ATTR_NORETURN void (LIBKCALL libc_except_rethrow)(void);
 /* >> except_throw(3)
  * Throw an exception and fill exception pointers with all zeroes */
-INTDEF ATTR_COLD ATTR_NORETURN void (__EXCEPT_THROW_CC libc_except_throw)(except_code_t code) THROWS(...);
+INTDEF ATTR_COLD ATTR_NORETURN void (__EXCEPT_THROW_CC libc_except_throw)(except_code_t code);
 /* >> except_thrown(3)
  * Throw an exception and load `argc' pointers from varargs */
-INTDEF ATTR_COLD ATTR_NORETURN void (__EXCEPT_THROWN_CC libc_except_thrown)(except_code_t code, unsigned int _argc, ...) THROWS(...);
+INTDEF ATTR_COLD ATTR_NORETURN void (__EXCEPT_THROWN_CC libc_except_thrown)(except_code_t code, unsigned int _argc, ...);
 #ifndef __KERNEL__
 /* >> _except_badusage_no_nesting(3)
  * Assertion check handler for missing `TRY' nesting */

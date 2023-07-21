@@ -77,9 +77,66 @@
 #define __GCC_HAS_BUILTIN___builtin_unreachable
 #define __GCC_HAS_BUILTIN___builtin_constant_p
 #define __GCC_HAS_BUILTIN___builtin_has_attribute
-#define __GCC_HAS_BUILTIN___builtin_throw /* __attribute__((noreturn)) void __builtin_throw(int code, ...); */
-#define __GCC_HAS_BUILTIN___builtin_void  /* T __builtin_void(T val);  ## Evaluates to `val', but value becomes unknown */
-#define __GCC_HAS_BUILTIN___builtin_rvoid /* T __builtin_rvoid(T val); ## Like `__builtin_void()', but also do r-value */
+#define __GCC_HAS_BUILTIN___builtin_speculation_safe_value
+#define __GCC_HAS_BUILTIN___builtin_assoc_barrier
+#define __GCC_HAS_BUILTIN___builtin_offsetof
+#define __GCC_HAS_BUILTIN___builtin_add_overflow
+#define __GCC_HAS_BUILTIN___builtin_add_overflow_p
+#define __GCC_HAS_BUILTIN___builtin_sadd_overflow
+#define __GCC_HAS_BUILTIN___builtin_saddl_overflow
+#define __GCC_HAS_BUILTIN___builtin_saddll_overflow
+#define __GCC_HAS_BUILTIN___builtin_uadd_overflow
+#define __GCC_HAS_BUILTIN___builtin_uaddl_overflow
+#define __GCC_HAS_BUILTIN___builtin_uaddll_overflow
+#define __GCC_HAS_BUILTIN___builtin_sub_overflow
+#define __GCC_HAS_BUILTIN___builtin_sub_overflow_p
+#define __GCC_HAS_BUILTIN___builtin_ssub_overflow
+#define __GCC_HAS_BUILTIN___builtin_ssubl_overflow
+#define __GCC_HAS_BUILTIN___builtin_ssubll_overflow
+#define __GCC_HAS_BUILTIN___builtin_usub_overflow
+#define __GCC_HAS_BUILTIN___builtin_usubl_overflow
+#define __GCC_HAS_BUILTIN___builtin_usubll_overflow
+#define __GCC_HAS_BUILTIN___builtin_mul_overflow
+#define __GCC_HAS_BUILTIN___builtin_mul_overflow_p
+#define __GCC_HAS_BUILTIN___builtin_smul_overflow
+#define __GCC_HAS_BUILTIN___builtin_smull_overflow
+#define __GCC_HAS_BUILTIN___builtin_smulll_overflow
+#define __GCC_HAS_BUILTIN___builtin_umul_overflow
+#define __GCC_HAS_BUILTIN___builtin_umull_overflow
+#define __GCC_HAS_BUILTIN___builtin_umulll_overflow
+/* Builtins that we're emulating */
+#define __GCC_HAS_BUILTIN___builtin_va_list
+#define __GCC_HAS_BUILTIN___builtin_va_start
+#define __GCC_HAS_BUILTIN___builtin_va_arg
+#define __GCC_HAS_BUILTIN___builtin_va_end
+#define __GCC_HAS_BUILTIN___atomic_load_n
+#define __GCC_HAS_BUILTIN___atomic_load
+#define __GCC_HAS_BUILTIN___atomic_store_n
+#define __GCC_HAS_BUILTIN___atomic_store
+#define __GCC_HAS_BUILTIN___atomic_exchange_n
+#define __GCC_HAS_BUILTIN___atomic_exchange
+#define __GCC_HAS_BUILTIN___atomic_compare_exchange_n
+#define __GCC_HAS_BUILTIN___atomic_compare_exchange
+#define __GCC_HAS_BUILTIN___atomic_add_fetch
+#define __GCC_HAS_BUILTIN___atomic_sub_fetch
+#define __GCC_HAS_BUILTIN___atomic_and_fetch
+#define __GCC_HAS_BUILTIN___atomic_xor_fetch
+#define __GCC_HAS_BUILTIN___atomic_or_fetch
+#define __GCC_HAS_BUILTIN___atomic_nand_fetch
+#define __GCC_HAS_BUILTIN___atomic_fetch_add
+#define __GCC_HAS_BUILTIN___atomic_fetch_sub
+#define __GCC_HAS_BUILTIN___atomic_fetch_and
+#define __GCC_HAS_BUILTIN___atomic_fetch_xor
+#define __GCC_HAS_BUILTIN___atomic_fetch_or
+#define __GCC_HAS_BUILTIN___atomic_fetch_nand
+#define __GCC_HAS_BUILTIN___builtin_assume
+#define __GCC_HAS_BUILTIN___builtin_choose_expr
+/* Checker-specific builtins */
+#define __GCC_HAS_BUILTIN___builtin_offsetafter  /* size_t __builtin_offsetafter(T, fields...) */
+#define __GCC_HAS_BUILTIN___builtin_container_of /* T *__builtin_container_of(typeof(((T *)0)->fields) *p, T, fields...) */
+#define __GCC_HAS_BUILTIN___builtin_throw        /* __attribute__((noreturn)) void __builtin_throw(int code, ...); */
+#define __GCC_HAS_BUILTIN___builtin_void         /* T __builtin_void(T val);  ## Evaluates to `val', but value becomes unknown */
+#define __GCC_HAS_BUILTIN___builtin_rvoid        /* T __builtin_rvoid(T val); ## Like `__builtin_void()', but also do r-value */
 
 #ifndef __has_feature
 #define __NO_has_feature
@@ -152,7 +209,7 @@
      defined(WIN32) || defined(_WIN64) || defined(WIN64) || defined(__WIN32__) ||               \
      defined(__TOS_WIN__) || defined(_WIN32_WCE) || defined(WIN32_WCE))
 #undef __VA_LIST_IS_ARRAY /* No on this platform, it's not... */
-#else                     /* ... */
+#else /* ... */
 #define __VA_LIST_IS_ARRAY
 #endif /* !... */
 #endif /* */
@@ -171,65 +228,72 @@
 #define __NON_CALL_EXCEPTIONS
 #define __checker_attribute__(...) __attribute__((__VA_ARGS__))
 
-/* >> __attribute__((__nothrow__(<level>))
-/* >> __attribute__((__nothrow__(*<level>))
- * Set the nothrow level for the annotated function. When `*' appears before `<level>',
+/* >> __attribute__((nothrow(<level>))
+ * >> __attribute__((nothrow(*<level>))
+ * Set  the nothrow level for the annotated  function. When `*' appears before `<level>',
  * scan the argument list of the function and use the greatest nothrow level of arguments
  * instead. If no argument specifies a nothrow level, use the given `<level>'.
  *
- * A warning will be issued if a __nothrow__ function is called by another function that
- * also has a __nothrow__ attribute, and whose __nothrow__ attribute specifies a level
- * that is smaller than the called function. Additionally, a warning is issued for a
- * function that has no nothrow attribute and calls only functions that have __nothrow__
- * attributes. The same also happens when dereferencing a pointer with a greater nothrow
- * level than one's own function.
+ * A  warning will be  issued if a nothrow  function is called  by another function that
+ * also has a  nothrow attribute,  and whose nothrow  attribute specifies  a level  that
+ * is smaller than the called function. Additionally, a warning is issued for a function
+ * that has no nothrow attribute and calls only functions that have nothrow  attributes.
+ * The  same also happens when dereferencing a pointer with a greater nothrow level than
+ * one's own function.
  *
  * Levels are defined as follows:
  * 0: NOTHROW:     Always nothrow; if this function *were* to throw an exception, that's a crash
- * 1: NOTHROW_NCX: A function that might throw indirectly due to accessing pointers from volatile
- *                 structures passed as arguments (though arguments themselves are not marked as
- *                 __nothrow__)
- * 2: CHECKED:     Memory that has been checked, but might still throw an exception upon access
+ * 1: CHECKED:     Memory that has been checked, but might still throw an exception upon access
  *                 due to OOM, some other thread unmapping memory, etc.
- * 3: NOTHROW_RPC: This function always can throw exception because it serves RPCs
+ * 2: NOTHROW_RPC: This function always can throw exception because it serves RPCs
  *
- * >> __attribute__((__noderef__))
- * >> __attribute__((__deref__))
- * Specify if this pointer may be dereferenced or not (`__deref__' is the
- * default and supersedes `__noderef__' when both attributes are present)
+ * >> __attribute__((noderef))
+ * >> __attribute__((deref))
+ * Specify if this pointer may be dereferenced or not (`deref' is the
+ * default and supersedes `noderef' when both attributes are present)
  *
- * >> __attribute__((__tag__(<name>)))
- * Tag the annotated function with a name. Each function can have at most
+ * >> __attribute__((tag(<name>)))
+ * Tag the annotated function with a name. Each function can have at  most
  * 1 tag, and it is possible to assert that the calling function also have
- * some tag (s.a. `__require_caller_tag__').
+ * some tag (s.a. `require_caller_tag').
  * A warning is generated when trying to assign multiple tags to the same
  * function.
  *
- * >> __attribute__((__require_caller_tag__(<name>)))
+ * >> __attribute__((require_caller_tag(<name>)))
  * Produce a compiler warning if this function is invoked by one that is
- * not tagged as `__attribute__((__tag__(<name>)))'.
+ * not tagged as `__attribute__((tag(<name>)))'.
  */
 #define __ATTR_NOTHROW          __checker_attribute__(__nothrow__(0))
 #define __NOTHROW               __checker_attribute__(__nothrow__(0))
-#define __NOTHROW_NCX           __checker_attribute__(__nothrow__(*1))
-#define __CXX_NOEXCEPT_NCX      __checker_attribute__(__nothrow__(*1))
-#define __NOTHROW_RPC           __checker_attribute__(__nothrow__(3))
-#define __NOTHROW_RPC_KOS       __checker_attribute__(__nothrow__(3))
-#define __NOTHROW_RPC_NOKOS     __checker_attribute__(__nothrow__(3))
-#define __CXX_NOEXCEPT_RPC_PURE __checker_attribute__(__nothrow__(3))
+#define __NOTHROW_NCX           __checker_attribute__(__nothrow__(*0))
+#define __CXX_NOEXCEPT_NCX      __checker_attribute__(__nothrow__(*0))
+#define __NOTHROW_CB            __checker_attribute__(__nothrow__(0), __throws__(*))
+#define __NOTHROW_CB_NCX        __checker_attribute__(__nothrow__(*0), __throws__(*))
+#define __NOTHROW_RPC           __checker_attribute__(__nothrow__(2))
+#define __NOTHROW_RPC_KOS       __checker_attribute__(__nothrow__(2))
+#define __NOTHROW_RPC_NOKOS     __checker_attribute__(__nothrow__(2))
+#define __CXX_NOEXCEPT_RPC_PURE __checker_attribute__(__nothrow__(2))
 
 #define __ATTR_NOBLOCK          __checker_attribute__(__tag__("NOBLOCK"))
 #define __ATTR_NOBLOCK_IF(...)  __checker_attribute__(__tag__("NOBLOCK")) /* XXX: Condition */
-#define __ATTR_BLOCKING         __checker_attribute__(__nothrow__(3), __tag__("BLOCKING"), __require_caller_tag__("BLOCKING"))
-#define __ATTR_BLOCKING_IF(...) __checker_attribute__(__nothrow__(3), __tag__("BLOCKING")) /* XXX: Condition */
+#define __ATTR_BLOCKING         __checker_attribute__(__nothrow__(2), __tag__("BLOCKING"), __require_caller_tag__("BLOCKING"))
+#define __ATTR_BLOCKING_IF(...) __checker_attribute__(__nothrow__(2), __tag__("BLOCKING")) /* XXX: Condition */
 #define __ATTR_NOPREEMPT        __checker_attribute__(__tag__("NOPREEMPT"), __require_caller_tag__("NOPREEMPT"))
 
-#define __ATTR_USER             __checker_attribute__(__nothrow__(2))
-#define __ATTR_UNCHECKED        __checker_attribute__(__noderef__, __nothrow__(2))
-#define __ATTR_CHECKED          __checker_attribute__(__deref__, __nothrow__(2))
+#define __ATTR_USER             __checker_attribute__(__nothrow__(1))
+#define __ATTR_UNCHECKED        __checker_attribute__(__noderef__, __nothrow__(1))
+#define __ATTR_CHECKED          __checker_attribute__(__deref__, __nothrow__(1))
 
 #define __ATTR_THROWS(...)      __checker_attribute__(__throws__(__VA_ARGS__))
 #define __ATTR_THROWING         __checker_attribute__(__throws__(...))
+
+/* TODO: __throws__(*) to indicate that a function throws exceptions  that
+ *       may be thrown by a function pointer it takes as argument. Example
+ *       for this would be `format_printf()'
+ *       Such a function would then also be `__nothrow__(*0)', and the `*'
+ *       must then also inherit  the __nothrow__-tag of function  pointers
+ *       passed to the function in question.
+ */
 
 
 #define __ATTR_NORETURN                      __checker_attribute__(__noreturn__)
@@ -297,15 +361,13 @@
 /* Suppress warnings about `-Wsuggest-attribute=const' or `-Wsuggest-attribute=pure' */
 #define __COMPILER_IMPURE() (void)0
 
-/* NOTE: We pass force,nothrow(0) during assembly buffer casts to prevent warnings
- *       in case  `p' turns  out to  be  annotated with  a higher  nothrow  level. */
-#define __COMPILER_ASM_BUFFER(T, s, p) (*(__checker_attribute__(__force__, __nothrow__(0)) T(*)[s])(p))
+#define __COMPILER_ASM_BUFFER(T, s, p) (*(__checker_attribute__(__force__) T(*)[s])(p))
 #define __register_var(T, name, regname) T name
 
 #define __pragma(...) _Pragma(#__VA_ARGS__)
 #define __XBLOCK  /* Nothing */
 #define __XRETURN /* Nothing */
-#define __builtin_assume(x) (void)0
+#define __builtin_assume(x) (void)(int(*)[(x) ? 1 : -1])0
 
 #define __COMPILER_ALIGNOF_IS___alignof__
 #define __COMPILER_ALIGNOF __alignof__
@@ -338,7 +400,7 @@
 #define __COMPILER_HAVE_VARIABLE_LENGTH_ARRAYS
 #define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[]
 
-#define __builtin_choose_expr(c, tt, ff) __static_if(x){tt}else{ff}
+#define __builtin_choose_expr(c, tt, ff) __static_if(c){tt}else{ff}
 
 #define __STATIC_IF(x)   __static_if(x)
 #define __STATIC_ELSE(x) else
@@ -348,19 +410,27 @@
 #define __WHILE1 while(1)
 #define __native_wchar_t_defined
 #define __wchar_t_defined
-#define __FUNCTION__ __func__
-#define __builtin_LINE() __LINE__
-#define __builtin_FILE() __FILE__
-#define __builtin_FUNCTION() __func__
 #define __builtin_object_size(ptr, type) ((type) < 2 ? (__SIZE_TYPE__)-1 : 0)
-#define __builtin_offsetof(s, ...) ((__SIZE_TYPE__)&((s *)0)->__VA_ARGS__)
+
+#if 0 /* These are built-in, but function the same as these macros */
+#define __builtin_offsetof(s, ...)    ((__SIZE_TYPE__)&((s *)0)->__VA_ARGS__)
+#define __builtin_offsetafter(s, ...) ((__SIZE_TYPE__)&((s *)0)->__VA_ARGS__ + 1)
+#define __builtin_container_of(ptr, type, member)                                  \
+	((type *)(int(*)[__builtin_types_compatible_p(__typeof__(((type *)0)->member), \
+	                                              __typeof__(*(ptr))) ? 1 : -1])   \
+	 ((__INTELLISENSE_SIZE_TYPE__)(ptr) - __builtin_offsetof(type, member)))
+#endif
+
+#define __COMPILER_OFFSETAFTER  __builtin_offsetafter
+#define __COMPILER_CONTAINER_OF __builtin_container_of
+
 
 #define __COMPILER_BARRIERS_ALL_IDENTICAL
 #define __COMPILER_BARRIER()       (void)0
 #define __COMPILER_READ_BARRIER()  (void)0
 #define __COMPILER_WRITE_BARRIER() (void)0
 #define __COMPILER_IGNORE_UNINITIALIZED(var) var
-#define __COMPILER_DELETE_ASSUMPTIONS(var) (void)0
+#define __COMPILER_DELETE_ASSUMPTIONS(var)   var = __builtin_void(var)
 
 #ifdef __cplusplus
 #define __NULLPTR nullptr
@@ -368,9 +438,13 @@
 #define __NULLPTR ((void *)0)
 #endif /* !__cplusplus */
 
-#define __builtin_va_list                char *
-#define __builtin_va_start(ap, last_arg) (void)((ap) = (__builtin_va_list)&(last_arg))
-#define __builtin_va_arg(ap, T)          (*(T *)((ap) += sizeof(T)))
+#ifdef __VA_LIST_IS_ARRAY
+#define __builtin_va_list __typeof(int[1])
+#else /* __VA_LIST_IS_ARRAY */
+#define __builtin_va_list char *
+#endif /* !__VA_LIST_IS_ARRAY */
+#define __builtin_va_start(ap, last_arg) (void)0
+#define __builtin_va_arg(ap, T)          __builtin_void(*(T *)0)
 #define __builtin_va_end(ap)             (void)0
 
 #define __COMPILER_HAVE_BUG_BLOATY_CXX_USING 0
@@ -399,6 +473,14 @@
 #define __atomic_fetch_or(ptr, val, memorder)   __atomic_exchange_n(ptr, val, memorder)
 #define __atomic_fetch_nand(ptr, val, memorder) __atomic_exchange_n(ptr, val, memorder)
 
+/* NOTE: the following builtins are actually supported by the checker, but they're no-ops.
+ *       By  deleting  them  here,  we  can   cut  down  on  some  unnecessary   overhead! */
+#define __NO_builtin_expect
+#define __builtin_expect(x, v)                     (x)
+#define __builtin_expect_with_probability(x, v, p) (x)
+
 
 /* Prevent including of too many local functions by faking CRT features. */
+#ifndef __NO_KOS_SYSTEM_HEADERS__
 #include <crt-features/crt-kos.h>
+#endif /* !__NO_KOS_SYSTEM_HEADERS__ */

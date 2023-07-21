@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c940bec */
+/* HASH CRC-32:0xaa7d359a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 INTDEF void NOTHROW_NCX(LIBCCALL libc_xmalloc_set_program_name)(char const *progname);
-INTDEF ATTR_NORETURN void (LIBCCALL libc_xmalloc_failed)(size_t num_bytes) THROWS(...);
+INTDEF ATTR_NORETURN void (LIBCCALL libc_xmalloc_failed)(size_t num_bytes);
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_fdmatch)(fd_t fd1, fd_t fd2);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_make_relative_prefix)(char const *a, char const *b, char const *c);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_make_relative_prefix_ignore_links)(char const *a, char const *b, char const *c);

@@ -153,7 +153,7 @@ DECL_BEGIN
 
 struct ctype;
 struct ctypeinfo {
-	char const         *ci_name;    /* [0..1] Name of this type (or NULL if anonymous). */
+	char CHECKED const *ci_name;    /* [0..1] Name of this type (or NULL if anonymous). */
 	REF struct cmodule *ci_nameref; /* [0..1] Module reference for keeping `ct_name' alive. */
 };
 #define ctypeinfo_equal(a, b) \
@@ -284,7 +284,7 @@ FUNDEF WUNUSED REF struct ctype *
 NOTHROW(FCALL ctype_for_register)(cpu_regno_t regno, size_t buflen);
 
 struct ctypeenumname {
-	char const         *en_name;    /* [1..1] Name of the enum. */
+	char CHECKED const *en_name;    /* [1..1] Name of the enum. */
 	REF struct cmodule *en_nameref; /* [1..1] Module reference for keeping `en_name' alive. */
 };
 #define ctypeenumname_fini(self) decref((self)->en_nameref)
@@ -295,9 +295,9 @@ struct ctypeenumname {
  * @return: DBX_ENOENT: `self' isn't an enum type.
  * @return: DBX_ENOENT: No name associated with `value' */
 FUNDEF WUNUSED NONNULL((1, 2)) dbx_errno_t
-NOTHROW(FCALL ctype_enumname)(struct ctype const *__restrict self,
-                              /*out*/ struct ctypeenumname *__restrict result,
-                              intmax_t value);
+NOTHROW_NCX(FCALL ctype_enumname)(struct ctype const *__restrict self,
+                                  /*out*/ struct ctypeenumname *__restrict result,
+                                  intmax_t value);
 
 
 
@@ -593,22 +593,22 @@ typedef NONNULL_T((2, 3, 4, 5)) ssize_t
  * @return: * :    The sum of return values of `cb'
  * @return: < 0:   A propagated, negative return value of `cb'. */
 FUNDEF NONNULL((1, 2)) ssize_t
-NOTHROW(FCALL ctype_struct_enumfields)(struct ctype *__restrict self,
-                                       ctype_struct_field_callback_t cb,
-                                       void *cookie);
+NOTHROW_CB_NCX(FCALL ctype_struct_enumfields)(struct ctype *__restrict self,
+                                              ctype_struct_field_callback_t cb,
+                                              void *cookie);
 
 /* Find a field of a given struct-kind C-type.
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOENT: No field with this name. */
 FUNDEF WUNUSED NONNULL((1, 2, 4, 5)) dbx_errno_t
-NOTHROW(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
-                                     char const *__restrict name, size_t namelen,
-                                     /*out*/ struct ctyperef *__restrict pfield_type,
-                                     /*out*/ ptrdiff_t *__restrict pfield_offset);
+NOTHROW_NCX(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
+                                         char CHECKED const *__restrict name, size_t namelen,
+                                         /*out*/ struct ctyperef *__restrict pfield_type,
+                                         /*out*/ ptrdiff_t *__restrict pfield_offset);
 
 /* Return the name of a structure type, or `NULL' if unknown or `self' isn't a struct. */
-FUNDEF WUNUSED NONNULL((1)) char const *
-NOTHROW(FCALL ctype_struct_getname)(struct ctype const *__restrict self);
+FUNDEF WUNUSED NONNULL((1)) char CHECKED const *
+NOTHROW_NCX(FCALL ctype_struct_getname)(struct ctype const *__restrict self);
 
 
 /* Load a C-type from a given `type_debug_info' which should be loaded
@@ -619,28 +619,28 @@ NOTHROW(FCALL ctype_struct_getname)(struct ctype const *__restrict self);
  * @return: DBX_ENOMEM:  Out of memory.
  * @return: DBX_EINTERN: Debug information was corrupted. */
 FUNDEF WUNUSED NONNULL((1, 2, 3, 4, 5)) dbx_errno_t
-NOTHROW(FCALL ctype_fromdw)(struct cmodule *__restrict mod,
-                            struct cmodunit const *__restrict cunit,
-                            di_debuginfo_cu_parser_t const *__restrict cu_parser,
-                            byte_t const *__restrict type_debug_info,
-                            /*out*/ struct ctyperef *__restrict presult);
+NOTHROW_NCX(FCALL ctype_fromdw)(struct cmodule *__restrict mod,
+                                struct cmodunit const *__restrict cunit,
+                                di_debuginfo_cu_parser_t const *__restrict cu_parser,
+                                byte_t CHECKED const *__restrict type_debug_info,
+                                /*out*/ struct ctyperef *__restrict presult);
 
 /* Same as `ctype_fromdw()', but when `type_debug_info'
  * is  NULL,   fill   `*presult'   with   `ctype_void'. */
 FUNDEF WUNUSED NONNULL((1, 2, 3, 5)) dbx_errno_t
-NOTHROW(FCALL ctype_fromdw_opt)(struct cmodule *__restrict mod,
-                                struct cmodunit const *__restrict cunit,
-                                di_debuginfo_cu_parser_t const *__restrict cu_parser,
-                                byte_t const *type_debug_info,
-                                /*out*/ struct ctyperef *__restrict presult);
+NOTHROW_NCX(FCALL ctype_fromdw_opt)(struct cmodule *__restrict mod,
+                                    struct cmodunit const *__restrict cunit,
+                                    di_debuginfo_cu_parser_t const *__restrict cu_parser,
+                                    byte_t CHECKED const *type_debug_info,
+                                    /*out*/ struct ctyperef *__restrict presult);
 
 /* Parse the parameters of a subroutine or subroutine type. */
 FUNDEF WUNUSED NONNULL((1, 2, 3, 4, 5)) dbx_errno_t
-NOTHROW(FCALL ctype_fromdw_subroutine)(struct cmodule *__restrict mod,
-                                       struct cmodunit const *__restrict cunit,
-                                       di_debuginfo_cu_parser_t *__restrict parser,
-                                       /*out*/ REF struct ctype **__restrict presult,
-                                       /*in*/ struct ctyperef const *__restrict return_type);
+NOTHROW_NCX(FCALL ctype_fromdw_subroutine)(struct cmodule *__restrict mod,
+                                           struct cmodunit const *__restrict cunit,
+                                           di_debuginfo_cu_parser_t *__restrict parser,
+                                           /*out*/ REF struct ctype **__restrict presult,
+                                           /*in*/ struct ctyperef const *__restrict return_type);
 
 #define ctype_from_cmodsyminfo(self, presult)                            \
 	ctype_fromdw((self)->clv_mod, (self)->clv_unit, &(self)->clv_parser, \

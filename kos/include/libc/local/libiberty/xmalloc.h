@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe65a9b78 */
+/* HASH CRC-32:0xb5bbb5f4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,10 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_malloc_defined */
 #if !defined(__local___localdep_xmalloc_failed_defined) && defined(__CRT_HAVE_xmalloc_failed)
 #define __local___localdep_xmalloc_failed_defined
-__NAMESPACE_LOCAL_END
-#include <kos/anno.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_xmalloc_failed,(__SIZE_TYPE__ __num_bytes),xmalloc_failed,(__num_bytes))
+__CREDIRECT_VOID(__ATTR_NORETURN,,__localdep_xmalloc_failed,(__SIZE_TYPE__ __num_bytes),xmalloc_failed,(__num_bytes))
 #endif /* !__local___localdep_xmalloc_failed_defined && __CRT_HAVE_xmalloc_failed */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/malloc.h>

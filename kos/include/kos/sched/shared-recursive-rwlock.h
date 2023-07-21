@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8269f077 */
+/* HASH CRC-32:0xeff775c4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -944,7 +944,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_shared_rwlock_write_defined */
 /* >> shared_recursive_rwlock_write(3)
  * Acquire a recursive write-lock to the given shared_recursive_rwlock. */
-__LOCAL __BLOCKING __ATTR_INOUT(1) void (__FCALL __localdep_shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __BLOCKING __ATTR_INOUT(1) void (__FCALL __localdep_shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict __self) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
@@ -983,7 +983,7 @@ __COMPILER_CEIDECLARE(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWIN
  *       re-load local copies of affected resources.
  * @return: true:  Upgrade was performed without the read-lock being lost
  * @return: false: The read-lock had to be released before a recursive write-lock was acquired */
-__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_upgrade)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_upgrade");
+__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_upgrade)(struct shared_recursive_rwlock *__restrict __self) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_upgrade");
 #elif (defined(__CRT_HAVE_shared_recursive_rwlock_endread) || defined(__shared_rwlock_wrwait_send)) && (defined(__CRT_HAVE_shared_recursive_rwlock_write) || defined(__CRT_HAVE_shared_rwlock_write) || defined(__KERNEL__) || defined(__CRT_HAVE_LFutexExprI64) || defined(__CRT_HAVE_LFutexExprI) || (defined(__cplusplus) && defined(__KOS__) && (defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr))))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_shared_recursive_rwlock_endread_defined
@@ -1191,7 +1191,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_shared_rwlock_write_defined */
 /* >> shared_recursive_rwlock_write(3)
  * Acquire a recursive write-lock to the given shared_recursive_rwlock. */
-__LOCAL __BLOCKING __ATTR_INOUT(1) void (__FCALL __localdep_shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __BLOCKING __ATTR_INOUT(1) void (__FCALL __localdep_shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict __self) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
@@ -1212,7 +1212,7 @@ __NAMESPACE_LOCAL_END
  *       re-load local copies of affected resources.
  * @return: true:  Upgrade was performed without the read-lock being lost
  * @return: false: The read-lock had to be released before a recursive write-lock was acquired */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_upgrade)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_upgrade)(struct shared_recursive_rwlock *__restrict __self) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__hybrid_atomic_cmpxch(&__self->srr_lock.sl_lock, 1, (__UINTPTR_TYPE__)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED)) {
 		__shared_recursive_rwlock_setown(__self);
@@ -1256,7 +1256,7 @@ __COMPILER_CEIDECLARE(__BLOCKING __ATTR_INOUT(1),void,__THROWING,__FCALL,shared_
 #elif defined(__CRT_HAVE_shared_recursive_rwlock_read)
 /* >> shared_recursive_rwlock_read(3)
  * Acquire a read-lock to the given shared_recursive_rwlock. */
-__LIBC __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_rwlock_read)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_read");
+__LIBC __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_rwlock_read)(struct shared_recursive_rwlock *__restrict __self) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_read");
 #elif defined(__CRT_HAVE_shared_rwlock_read) || defined(__KERNEL__) || defined(__CRT_HAVE_LFutexExprI64) || defined(__CRT_HAVE_LFutexExprI) || (defined(__cplusplus) && defined(__KOS__) && (defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_shared_rwlock_read_defined
@@ -1279,7 +1279,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 /* >> shared_recursive_rwlock_read(3)
  * Acquire a read-lock to the given shared_recursive_rwlock. */
-__LOCAL __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_rwlock_read)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_rwlock_read)(struct shared_recursive_rwlock *__restrict __self) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
@@ -1322,7 +1322,7 @@ __COMPILER_CEIDECLARE(__BLOCKING __ATTR_INOUT(1),void,__THROWING,__FCALL,shared_
 #elif defined(__CRT_HAVE_shared_recursive_rwlock_write)
 /* >> shared_recursive_rwlock_write(3)
  * Acquire a recursive write-lock to the given shared_recursive_rwlock. */
-__LIBC __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_write");
+__LIBC __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict __self) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_write");
 #elif defined(__CRT_HAVE_shared_rwlock_write) || defined(__KERNEL__) || defined(__CRT_HAVE_LFutexExprI64) || defined(__CRT_HAVE_LFutexExprI) || (defined(__cplusplus) && defined(__KOS__) && (defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_shared_rwlock_write_defined
@@ -1345,7 +1345,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 /* >> shared_recursive_rwlock_write(3)
  * Acquire a recursive write-lock to the given shared_recursive_rwlock. */
-__LOCAL __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict __self) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
@@ -1402,7 +1402,7 @@ __COMPILER_CEIDECLARE(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWIN
  * Acquire a read-lock to the given shared_recursive_rwlock.
  * @return: true:  Successfully acquired a read-lock.
  * @return: false: The given `abs_timeout' has expired. */
-__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_read_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_read_with_timeout");
+__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_read_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_read_with_timeout");
 #elif defined(__CRT_HAVE_shared_recursive_rwlock_read_with_timeout64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_recursive_rwlock_read_with_timeout(3), shared_recursive_rwlock_read_with_timeout64(3)
  * Acquire a read-lock to the given shared_recursive_rwlock.
@@ -1443,7 +1443,7 @@ __NAMESPACE_LOCAL_END
  * Acquire a read-lock to the given shared_recursive_rwlock.
  * @return: true:  Successfully acquired a read-lock.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_read_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_read_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
@@ -1503,7 +1503,7 @@ __COMPILER_CEIDECLARE(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWIN
  * Acquire a recursive write-lock to the given shared_recursive_rwlock.
  * @return: true:  Successfully acquired a recursive write-lock.
  * @return: false: The given `abs_timeout' has expired. */
-__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_write_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_write_with_timeout");
+__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_write_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_write_with_timeout");
 #elif defined(__CRT_HAVE_shared_recursive_rwlock_write_with_timeout64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_recursive_rwlock_write_with_timeout(3), shared_recursive_rwlock_write_with_timeout64(3)
  * Acquire a recursive write-lock to the given shared_recursive_rwlock.
@@ -1544,7 +1544,7 @@ __NAMESPACE_LOCAL_END
  * Acquire a recursive write-lock to the given shared_recursive_rwlock.
  * @return: true:  Successfully acquired a recursive write-lock.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_write_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_write_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
@@ -1588,7 +1588,7 @@ __COMPILER_CEIDECLARE(__BLOCKING __ATTR_INOUT(1),void,__THROWING,__FCALL,shared_
 #elif defined(__CRT_HAVE_shared_recursive_rwlock_waitread)
 /* >> shared_recursive_rwlock_waitread(3)
  * Wait until acquiring a read-lock to `self' no longer blocks */
-__LIBC __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_rwlock_waitread)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_waitread");
+__LIBC __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_rwlock_waitread)(struct shared_recursive_rwlock *__restrict __self) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_waitread");
 #elif defined(__CRT_HAVE_shared_rwlock_waitread) || defined(__KERNEL__) || defined(__CRT_HAVE_LFutexExprI64) || defined(__CRT_HAVE_LFutexExprI) || (defined(__cplusplus) && defined(__KOS__) && (defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_shared_rwlock_waitread_defined
@@ -1611,7 +1611,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 /* >> shared_recursive_rwlock_waitread(3)
  * Wait until acquiring a read-lock to `self' no longer blocks */
-__LOCAL __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_rwlock_waitread)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_rwlock_waitread)(struct shared_recursive_rwlock *__restrict __self) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return;
@@ -1649,7 +1649,7 @@ __COMPILER_CEIDECLARE(__BLOCKING __ATTR_INOUT(1),void,__THROWING,__FCALL,shared_
 #elif defined(__CRT_HAVE_shared_recursive_rwlock_waitwrite)
 /* >> shared_recursive_rwlock_waitwrite(3)
  * Wait until acquiring a recursive write-lock to `self' no longer blocks */
-__LIBC __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_rwlock_waitwrite)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_waitwrite");
+__LIBC __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_rwlock_waitwrite)(struct shared_recursive_rwlock *__restrict __self) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_waitwrite");
 #elif defined(__CRT_HAVE_shared_rwlock_waitwrite) || defined(__KERNEL__) || defined(__CRT_HAVE_LFutexExprI64) || defined(__CRT_HAVE_LFutexExprI) || (defined(__cplusplus) && defined(__KOS__) && (defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_shared_rwlock_waitwrite_defined
@@ -1672,7 +1672,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 /* >> shared_recursive_rwlock_waitwrite(3)
  * Wait until acquiring a recursive write-lock to `self' no longer blocks */
-__LOCAL __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_rwlock_waitwrite)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_rwlock_waitwrite)(struct shared_recursive_rwlock *__restrict __self) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return;
@@ -1724,7 +1724,7 @@ __COMPILER_CEIDECLARE(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWIN
  * Wait until acquiring a read-lock to `self' no longer blocks
  * @return: true:  A read-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_waitread_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_waitread_with_timeout");
+__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_waitread_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_waitread_with_timeout");
 #elif defined(__CRT_HAVE_shared_recursive_rwlock_waitread_with_timeout64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_recursive_rwlock_waitread_with_timeout(3), shared_recursive_rwlock_waitread_with_timeout64(3)
  * Wait until acquiring a read-lock to `self' no longer blocks
@@ -1765,7 +1765,7 @@ __NAMESPACE_LOCAL_END
  * Wait until acquiring a read-lock to `self' no longer blocks
  * @return: true:  A read-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_waitread_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_waitread_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
@@ -1817,7 +1817,7 @@ __COMPILER_CEIDECLARE(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWIN
  * Wait until acquiring a recursive write-lock to `self' no longer blocks
  * @return: true:  A write-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_waitwrite_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_waitwrite_with_timeout");
+__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_waitwrite_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_waitwrite_with_timeout");
 #elif defined(__CRT_HAVE_shared_recursive_rwlock_waitwrite_with_timeout64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_recursive_rwlock_waitwrite_with_timeout(3), shared_recursive_rwlock_waitwrite_with_timeout64(3)
  * Wait until acquiring a recursive write-lock to `self' no longer blocks
@@ -1858,7 +1858,7 @@ __NAMESPACE_LOCAL_END
  * Wait until acquiring a recursive write-lock to `self' no longer blocks
  * @return: true:  A write-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_waitwrite_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_waitwrite_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
@@ -1919,7 +1919,7 @@ __COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_
  * Acquire a read-lock to the given shared_recursive_rwlock.
  * @return: true:  Successfully acquired a read-lock.
  * @return: false: The given `abs_timeout' has expired. */
-__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_read_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_read_with_timeout64");
+__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_read_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_read_with_timeout64");
 #elif (defined(__CRT_HAVE_shared_rwlock_read_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_shared_rwlock_read_with_timeout64) || defined(__CRT_HAVE_LFutexExprI64) || defined(__CRT_HAVE_LFutexExprI) || (defined(__cplusplus) && defined(__KOS__) && (defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_shared_rwlock_read_with_timeout64_defined
@@ -1954,7 +1954,7 @@ __NAMESPACE_LOCAL_END
  * Acquire a read-lock to the given shared_recursive_rwlock.
  * @return: true:  Successfully acquired a read-lock.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_read_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_read_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
@@ -2020,7 +2020,7 @@ __COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_
  * Acquire a recursive write-lock to the given shared_recursive_rwlock.
  * @return: true:  Successfully acquired a recursive write-lock.
  * @return: false: The given `abs_timeout' has expired. */
-__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_write_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_write_with_timeout64");
+__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_write_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_write_with_timeout64");
 #elif (defined(__CRT_HAVE_shared_rwlock_write_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_shared_rwlock_write_with_timeout64) || defined(__CRT_HAVE_LFutexExprI64) || defined(__CRT_HAVE_LFutexExprI) || (defined(__cplusplus) && defined(__KOS__) && (defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_shared_rwlock_write_with_timeout64_defined
@@ -2055,7 +2055,7 @@ __NAMESPACE_LOCAL_END
  * Acquire a recursive write-lock to the given shared_recursive_rwlock.
  * @return: true:  Successfully acquired a recursive write-lock.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_write_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_write_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
@@ -2119,7 +2119,7 @@ __COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_
  * Wait until acquiring a read-lock to `self' no longer blocks
  * @return: true:  A read-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_waitread_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_waitread_with_timeout64");
+__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_waitread_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_waitread_with_timeout64");
 #elif (defined(__CRT_HAVE_shared_rwlock_waitread_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_shared_rwlock_waitread_with_timeout64) || defined(__CRT_HAVE_LFutexExprI64) || defined(__CRT_HAVE_LFutexExprI) || (defined(__cplusplus) && defined(__KOS__) && (defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_shared_rwlock_waitread_with_timeout64_defined
@@ -2154,7 +2154,7 @@ __NAMESPACE_LOCAL_END
  * Wait until acquiring a read-lock to `self' no longer blocks
  * @return: true:  A read-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_waitread_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_waitread_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
@@ -2212,7 +2212,7 @@ __COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_
  * Wait until acquiring a recursive write-lock to `self' no longer blocks
  * @return: true:  A write-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_waitwrite_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_waitwrite_with_timeout64");
+__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_waitwrite_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_rwlock_waitwrite_with_timeout64");
 #elif (defined(__CRT_HAVE_shared_rwlock_waitwrite_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_shared_rwlock_waitwrite_with_timeout64) || defined(__CRT_HAVE_LFutexExprI64) || defined(__CRT_HAVE_LFutexExprI) || (defined(__cplusplus) && defined(__KOS__) && (defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_shared_rwlock_waitwrite_with_timeout64_defined
@@ -2247,7 +2247,7 @@ __NAMESPACE_LOCAL_END
  * Wait until acquiring a recursive write-lock to `self' no longer blocks
  * @return: true:  A write-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_waitwrite_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_waitwrite_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
@@ -2349,7 +2349,7 @@ extern "C++" {
  * Acquire a read-lock to the given shared_recursive_rwlock.
  * @return: true:  Successfully acquired a read-lock.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_read)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_read)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
@@ -2454,7 +2454,7 @@ extern "C++" {
  * Acquire a recursive write-lock to the given shared_recursive_rwlock.
  * @return: true:  Successfully acquired a recursive write-lock.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
@@ -2557,7 +2557,7 @@ extern "C++" {
  * Wait until acquiring a read-lock to `self' no longer blocks
  * @return: true:  A read-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_waitread)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_waitread)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
@@ -2654,7 +2654,7 @@ extern "C++" {
  * Wait until acquiring a recursive write-lock to `self' no longer blocks
  * @return: true:  A write-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_waitwrite)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_rwlock_waitwrite)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
@@ -2756,7 +2756,7 @@ extern "C++" {
  * Acquire a read-lock to the given shared_recursive_rwlock.
  * @return: true:  Successfully acquired a read-lock.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_read)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_read)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
@@ -2861,7 +2861,7 @@ extern "C++" {
  * Acquire a recursive write-lock to the given shared_recursive_rwlock.
  * @return: true:  Successfully acquired a recursive write-lock.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
@@ -2964,7 +2964,7 @@ extern "C++" {
  * Wait until acquiring a read-lock to `self' no longer blocks
  * @return: true:  A read-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_waitread)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_waitread)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
@@ -3061,7 +3061,7 @@ extern "C++" {
  * Wait until acquiring a recursive write-lock to `self' no longer blocks
  * @return: true:  A write-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_waitwrite)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_rwlock_waitwrite)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;

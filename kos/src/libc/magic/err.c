@@ -136,11 +136,11 @@ void vwarnx([[in_opt, format("printf")]] char const *format, $va_list args) {
 
 @@>> err(3), verr(3)
 @@Same as `warn()', but follow up by calling `exit(status)'
-[[throws, noreturn]]
+[[stdio_throws, noreturn]]
 void err(int status, [[in_opt, format("printf")]] char const *format, ...)
 	%{printf("verr")}
 
-[[doc_alias("err"), throws, noreturn]]
+[[doc_alias("err"), stdio_throws, noreturn]]
 [[requires_function(verrc), impl_include("<libc/errno.h>")]]
 void verr(int status, [[in_opt, format("printf")]] char const *format, $va_list args) {
 	verrc(status, __libc_geterrno_or(0), format, args);
@@ -150,11 +150,11 @@ void verr(int status, [[in_opt, format("printf")]] char const *format, $va_list 
 %#ifdef __USE_BSD
 @@>> errc(3), verrc(3)
 @@Same as `warnc()', but follow up by calling `exit(status)'
-[[guard, throws, noreturn, decl_include("<bits/types.h>")]]
+[[guard, stdio_throws, noreturn, decl_include("<bits/types.h>")]]
 void errc(int status, $errno_t used_errno, [[in_opt, format("printf")]] char const *format, ...)
 	%{printf("verrc")}
 
-[[guard, doc_alias("errc"), throws, noreturn]]
+[[guard, doc_alias("errc"), stdio_throws, noreturn]]
 [[decl_include("<bits/types.h>")]]
 [[requires_function(vwarnc, exit)]]
 void verrc(int status, $errno_t used_errno, [[in_opt, format("printf")]] char const *format, $va_list args) {
@@ -166,14 +166,14 @@ void verrc(int status, $errno_t used_errno, [[in_opt, format("printf")]] char co
 
 @@>> errx(3), verrx(3)
 @@Same as `warnx()', but follow up by calling `exit(status)'
-[[throws, noreturn, requires_function(verrx)]]
+[[stdio_throws, noreturn, requires_function(verrx)]]
 void errx(int status, [[in_opt, format("printf")]] char const *format, ...) {
 	va_list args;
 	va_start(args, format);
 	verrx(status, format, args);
 }
 
-[[doc_alias("errx"), throws, noreturn, requires_function(vwarnx, exit)]]
+[[doc_alias("errx"), stdio_throws, noreturn, requires_function(vwarnx, exit)]]
 void verrx(int status, [[in_opt, format("printf")]] char const *format, $va_list args) {
 	vwarnx(format, args);
 	exit(status);

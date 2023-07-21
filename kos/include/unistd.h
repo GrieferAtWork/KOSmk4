@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9478c9b0 */
+/* HASH CRC-32:0xe62f275b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1288,17 +1288,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(link, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1
 #ifdef __std_exit_defined
 __NAMESPACE_STD_USING(exit)
 #elif __has_builtin(__builtin_exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exit)
-__CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,__THROWING,exit,(int __status),{ __builtin_exit(__status); })
+__CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,,exit,(int __status),{ __builtin_exit(__status); })
 #elif defined(__CRT_HAVE_exit)
-__CDECLARE_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),(__status))
+__CDECLARE_VOID_GCCNCX(__ATTR_NORETURN,,exit,(int __status),(__status))
 #elif defined(__CRT_HAVE_quick_exit)
-__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),quick_exit,(__status))
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,,exit,(int __status),quick_exit,(__status))
 #elif defined(__CRT_HAVE__exit)
-__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),_exit,(__status))
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,,exit,(int __status),_exit,(__status))
 #elif defined(__CRT_HAVE__Exit)
-__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),_Exit,(__status))
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,,exit,(int __status),_Exit,(__status))
 #elif defined(__CRT_HAVE_xexit)
-__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),xexit,(__status))
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,,exit,(int __status),xexit,(__status))
 #else /* ... */
 #undef __exit_defined
 #endif /* !... */
@@ -2577,17 +2577,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(nice, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHR
 #ifndef ___exit_defined
 #define ___exit_defined
 #if __has_builtin(__builtin__Exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE__Exit)
-__CEIREDIRECT_GCCNCX(__ATTR_NORETURN,void,__THROWING,_exit,(int __status),_Exit,{ __builtin__Exit(__status); })
+__CEIREDIRECT_GCCNCX(__ATTR_NORETURN,void,,_exit,(int __status),_Exit,{ __builtin__Exit(__status); })
 #elif __has_builtin(__builtin__exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE__exit)
-__CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,__THROWING,_exit,(int __status),{ __builtin__exit(__status); })
+__CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,,_exit,(int __status),{ __builtin__exit(__status); })
 #elif defined(__CRT_HAVE__Exit)
-__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,_exit,(int __status),_Exit,(__status))
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,,_exit,(int __status),_Exit,(__status))
 #elif defined(__CRT_HAVE__exit)
-__CDECLARE_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,_exit,(int __status),(__status))
+__CDECLARE_VOID_GCCNCX(__ATTR_NORETURN,,_exit,(int __status),(__status))
 #elif defined(__CRT_HAVE_quick_exit)
-__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,_exit,(int __status),quick_exit,(__status))
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,,_exit,(int __status),quick_exit,(__status))
 #elif defined(__CRT_HAVE_exit)
-__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,_exit,(int __status),exit,(__status))
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,,_exit,(int __status),exit,(__status))
 #else /* ... */
 #undef ___exit_defined
 #endif /* !... */

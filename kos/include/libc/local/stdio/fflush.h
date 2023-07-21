@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa99aa886 */
+/* HASH CRC-32:0x13e6e73 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,20 +21,19 @@
 #ifndef __local_fflush_defined
 #define __local_fflush_defined
 #include <__crt.h>
-#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_flushall_defined
 #define __local___localdep_crt_flushall_defined
 #ifdef __CRT_HAVE__flushall
-__CREDIRECT(,int,__THROWING,__localdep_crt_flushall,(void),_flushall,())
+__CREDIRECT(,int,__NOTHROW_CB,__localdep_crt_flushall,(void),_flushall,())
 #elif defined(__CRT_HAVE__IO_flush_all)
-__CREDIRECT(,int,__THROWING,__localdep_crt_flushall,(void),_IO_flush_all,())
+__CREDIRECT(,int,__NOTHROW_CB,__localdep_crt_flushall,(void),_IO_flush_all,())
 #else /* ... */
 #undef __local___localdep_crt_flushall_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_flushall_defined */
 __LOCAL_LIBC(fflush) int
-(__LIBCCALL __LIBC_LOCAL_NAME(fflush))(__FILE *__stream) __THROWS(...) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(fflush))(__FILE *__stream) {
 	/* NO-OP  (When  not  implemented  by  the  CRT,  assume  no
 	 * buffering being done, meaning this function isn't needed) */
 #if defined(__CRT_HAVE__flushall) || defined(__CRT_HAVE__IO_flush_all)

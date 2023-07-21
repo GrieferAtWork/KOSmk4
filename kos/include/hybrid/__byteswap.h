@@ -99,7 +99,7 @@ __DECL_END
 #define __hybrid_bswap128 __hybrid_bswap128_c
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
-#elif !defined(__NO_builtin_choose_expr) && !defined(__NO_builtin_constant_p)
+#elif !defined(__NO_builtin_choose_expr) && !defined(__NO_builtin_constant_p) && !defined(__CHECKER__)
 #define __hybrid_bswap16(x) __builtin_choose_expr(__builtin_constant_p(x), __hybrid_bswap16_c(x), __impl_hybrid_bswap16(x))
 #define __hybrid_bswap32(x) __builtin_choose_expr(__builtin_constant_p(x), __hybrid_bswap32_c(x), __impl_hybrid_bswap32(x))
 #ifdef __UINT64_TYPE__

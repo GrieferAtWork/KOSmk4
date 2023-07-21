@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a4c71e0 */
+/* HASH CRC-32:0xa51e196d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_qsort_defined
 #define __local___localdep_qsort_defined
 #ifdef __CRT_HAVE_qsort
-__NAMESPACE_LOCAL_END
-#include <kos/anno.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_INOUT_OPT(1) __ATTR_NONNULL((4)),__THROWING,__localdep_qsort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),qsort,(__pbase,__item_count,__item_size,__compar))
+__CREDIRECT_VOID(__ATTR_INOUT_OPT(1) __ATTR_NONNULL((4)),__NOTHROW_CB_NCX,__localdep_qsort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),qsort,(__pbase,__item_count,__item_size,__compar))
 #else /* __CRT_HAVE_qsort */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/qsort.h>

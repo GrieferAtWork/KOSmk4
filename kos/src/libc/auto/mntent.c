@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe011a549 */
+/* HASH CRC-32:0xf88d592f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -134,8 +134,8 @@ err:
  * @return: 0: Success
  * @return: 1: Error (WARNING: `errno' is left undefined) */
 INTERN ATTR_SECTION(".text.crt.database.mntent") ATTR_IN(2) ATTR_INOUT(1) int
-(LIBCCALL libc_addmntent)(FILE *__restrict stream,
-                          struct mntent const *__restrict mnt) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_addmntent)(FILE *__restrict stream,
+                                    struct mntent const *__restrict mnt) {
 	if unlikely(!mnt ||
 	            !mnt->mnt_fsname || !mnt->mnt_dir ||
 	            !mnt->mnt_type || !mnt->mnt_opts)

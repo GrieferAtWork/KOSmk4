@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf2f7f25 */
+/* HASH CRC-32:0x6b334874 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,11 +33,11 @@ DECL_BEGIN
 #ifndef __KERNEL__
 INTDEF WUNUSED ATTR_IN(1) char *NOTHROW_NCX(LIBDCALL libd_getenv)(char const *varname);
 INTDEF WUNUSED ATTR_IN(1) char *NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname);
-INTDEF ATTR_NORETURN void (LIBCCALL libc_exit)(int status) THROWS(...);
+INTDEF ATTR_NORETURN void (LIBCCALL libc_exit)(int status);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_atexit)(void (LIBCCALL *func)(void));
-INTDEF ATTR_NORETURN void (LIBCCALL libc_quick_exit)(int status) THROWS(...);
+INTDEF ATTR_NORETURN void (LIBCCALL libc_quick_exit)(int status);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_at_quick_exit)(void (LIBCCALL *func)(void));
-INTDEF ATTR_NORETURN void (LIBCCALL libc__Exit)(int status) THROWS(...);
+INTDEF ATTR_NORETURN void (LIBCCALL libc__Exit)(int status);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_malloc)(size_t num_bytes);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_calloc)(size_t count, size_t num_bytes);
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_realloc)(void *mallptr, size_t num_bytes);

@@ -75,9 +75,8 @@ global final CVALUE_RADDR   = 0x0d; /* R-Value: *(T *)offset */
 
 global final PRETTY_NOTHROW_LEVEL_NAME: {int: string} = {
 	0 : "NOTHROW",
-	1 : "NOTHROW_NCX",
-	2 : "USER' or `CHECKED",
-	3 : "BLOCKING",
+	1 : "CHECKED",
+	2 : "BLOCKING",
 };
 function getPrettyNothrowLevelName(level: int): string {
 	local result = PRETTY_NOTHROW_LEVEL_NAME.get(level);
@@ -128,7 +127,25 @@ final class CValue {
 	@@Offset into @data
 	public member offset: int;
 
-	operator str(): string -> f"<instance of {typeref}>";
+	operator str(): string {
+		switch (kind) {
+		case CVALUE_LSYMBOL:
+		case CVALUE_RSYMBOL:
+			if (offset)
+				return f"*({CPointerType(typeref)})((char *)&{data.name} + {offset})";
+			return f"*({CPointerType(typeref)})&{data.name}";
+		case CVALUE_ASYMBOL:
+			if (offset)
+				return f"({typeref})((char *)&{data.name} + {offset})";
+			return f"({typeref})&{data.name}";
+		case CVALUE_LADDR:
+		case CVALUE_RADDR:
+			return f"*({CPointerType(typeref)}){offset}";
+		default:
+			break;
+		}
+		return f"<instance of {typeref}>";
+	}
 
 	/* Utility functions */
 
@@ -136,6 +153,11 @@ final class CValue {
 	public property isConstExpr: bool = {
 		get(): bool {
 			return kind in [CVALUE_LCONST, CVALUE_RCONST];
+		}
+	}
+	public property isSymbol: bool = {
+		get(): bool {
+			return kind in [CVALUE_LSYMBOL, CVALUE_RSYMBOL, CVALUE_ASYMBOL];
 		}
 	}
 	public property constExprBytes: Bytes = {
@@ -169,6 +191,12 @@ final class CValue {
 			pointerTypeRef.typ = typ.base;
 			typ = checker.TARGET_CPointerType(pointerTypeRef);
 			typeref = CTypeRef(typ);
+			kind |= CVALUE_AVALUE;
+			if (kind == (CVALUE_LADDR | CVALUE_AVALUE)) {
+				data   = typ.bytes(checker, offset);
+				offset = 0;
+				kind   = CVALUE_RCONST;
+			}
 		}
 		kind |= CVALUE_RVALUE;
 		if (kind == CVALUE_RSYMBOL) {
@@ -181,33 +209,84 @@ final class CValue {
 			if (symValue !is none) {
 				kind = CVALUE_RCONST;
 				data = symValue;
-				offset = 0;
 			}
 		}
 		TRACE();
 		return this;
 	}
 
-	public function cast(checker: Checker, newTypeRef: CTypeRef, explicit: bool = false): CValue
-		-> copy(this).inplaceCast(checker, newTypeRef, explicit);
-	public function inplaceCast(checker: Checker, newTypeRef: CTypeRef, explicit: bool = false): CValue {
-		inplaceRValue(checker);
+	public function cast(checker: Checker, newTypeRef: CTypeRef,
+	                     explicit: bool = false, canRetainNothrow: bool = true,
+	                     getExtraCannotRetainInfo: Callable | none = none): CValue
+		-> copy(this).inplaceCast(checker, newTypeRef, explicit, canRetainNothrow, getExtraCannotRetainInfo);
+	public function inplaceCast(checker: Checker, newTypeRef: CTypeRef,
+	                            explicit: bool = false, canRetainNothrow: bool = true,
+	                            getExtraCannotRetainInfo: Callable | none = none): CValue {
 		local oldTyp: CType = typeref.typ;
 		local newTyp: CType = newTypeRef.typ;
 
-		/* Filter out illegal casts */
-		if (newTyp is CStructType)
-			goto err_bad_op;
-		if (newTyp is CFunctionType)
-			goto err_bad_op;
-		if (newTyp is CArrayType)
-			goto err_bad_op;
+		/* Check for special case: cast to array type:
+		 * >> char foo[] = "foobar";
+		 * This must happen before r-value conversion since that would result in a `char const *' */
+		if (newTyp is CArrayType && oldTyp is CArrayType &&
+		    IDENTICAL(oldTyp.base, newTyp.base)) {
+			kind |= CVALUE_RVALUE;
+			if (kind == CVALUE_RSYMBOL) {
+				local symValue: Bytes | none = checker.getSymbolValue(data);
+				if (symValue is none && (data.typeref.flags & CTYPEREF_FLAG_CONST))
+					symValue = data.valOrNone;
+				if (symValue !is none) {
+					kind = CVALUE_RCONST;
+					data = symValue;
+					offset = 0;
+				}
+			}
 
-		if (!oldTyp.isConvertibleTo(newTyp, explicit)) {
+			/* Array casts allow you to increase the array length, but not decrease it! */
+			if (newTyp.stride != oldTyp.stride) {
+				checker.err(f"Cannot cast from `{oldTyp}' to `{newTyp}': stride "
+				            f"miss-match ({oldTyp.stride} != {newTyp.stride})");
+			}
+			if (newTyp.dim is none) {
+				if (oldTyp.dim !is none) {
+					/* Inherit array dimensions from old type (for flexible array initializers) */
+					newTyp = copy newTyp;
+					newTyp.dim = oldTyp.dim;
+					newTypeRef = copy newTypeRef;
+					newTypeRef.typ = newTyp;
+				}
+			} else if (oldTyp.dim !is none) {
+				local oldDim: int = oldTyp.dim;
+				local newDim: int = newTyp.dim;
+				if (newDim > oldDim) {
+					/* Array length increase is OK (but must reflect in compile-time constant) */
+					switch (kind) {
+					case CVALUE_LCONST:
+					case CVALUE_RCONST:
+					case CVALUE_ACONST: {
+						local minLength = offset + newDim * newTyp.stride;
+						if (#data < minLength)
+							data = data.resized(minLength);
+					}	break;
+					default:
+						break;
+					}
+				} else if (newDim < oldDim) {
+					/* Array length decrease is an error */
+					goto err_bad_op;
+				}
+			}
+			typeref = newTypeRef;
+			return this;
+		}
+
+		inplaceRValue(checker);
+		oldTyp = typeref.typ;
+
+		/* Filter out illegal cast should be allowed. */
+		if (!typeref.isConvertibleTo(newTypeRef, explicit)) {
 			/* Cast isn't allowed for some reason (figure out why) */
-			if (newTyp === C_void) {
-				/* Special case: cast-to-void is always OK. */
-			} else if (oldTyp is CPointerType && newTyp is CPointerType) {
+			if (oldTyp is CPointerType && newTyp is CPointerType) {
 				if (!explicit) {
 					local oldPointerBaseTypeRef: CTypeRef = oldTyp.base;
 					local newPointerBaseTypeRef: CTypeRef = newTyp.base;
@@ -236,8 +315,11 @@ final class CValue {
 			} else if (oldTyp is CPointerType && newTyp in C_NUMERIC) {
 				if (!explicit) {
 					checker.warn("-Wcast",
-						f"Implicit integer/pointer-cast from `{oldTyp}' to `{newTyp}'");
+						f"Implicit pointer to integer cast from `{oldTyp}' to `{newTyp}'");
 				}
+			} else if (!explicit && typeref.isConvertibleTo(newTypeRef, true)) {
+				checker.warn("-Wcast",
+					f"Implicit cast from `{oldTyp}' to `{newTyp}' is only allowed when made explicit");
 			} else {
 				goto err_bad_op;
 			}
@@ -274,7 +356,9 @@ final class CValue {
 					if (newNothrowLevel !is none) {
 						if (oldNothrowLevel == newNothrowLevel) {
 							/* Both pointers have the same nothrow-level -> nothing changes */
-						} else if (newNothrowLevel > oldNothrowLevel) {
+						} else if (newNothrowLevel.startswith("*") || oldNothrowLevel.startswith("*")) {
+							/* Ignore for automatic nothrow levels */
+						} else if (int(newNothrowLevel) > int(oldNothrowLevel)) {
 							checker.warn("-Wnothrow",
 									f"Cast from `{oldTyp}' to `{newTyp}' results in nothrow "
 									f"level `{oldNothrowLevel}', rather than `{newNothrowLevel}'. "
@@ -298,12 +382,58 @@ final class CValue {
 						 *       is called with the attribute!
 						 */
 pointer_cast_retain_nothrow:
+						if (!canRetainNothrow) {
+							local extraInfo: string = "";
+							if (getExtraCannotRetainInfo !is none)
+								extraInfo = getExtraCannotRetainInfo();
+							checker.warn("-Wnothrow",
+									f"Cannot retain `__attribute__((nothrow({oldNothrowLevel})))' "
+									f"in cast to `{newTyp}'{extraInfo}");
+						} else {
+							newPointerBase = copy newPointerBase;
+							newPointerBase.attrib = copy newPointerBase.attrib;
+							newPointerBase.attrib["nothrow"] = oldNothrowLevel;
+							newTyp = type(newTyp)(newPointerBase);
+							newTypeRef = copy newTypeRef;
+							newTypeRef.typ = newTyp;
+						}
+					}
+				}
+
+				/* Check if we need to inherit function throws annotations. */
+				local oldThrows = oldPointerBase.attrib.get("throws", Set());
+				if (!oldThrows) {
+					/* Nothing to inherit! */
+				} else {
+					local newThrows = newPointerBase.attrib.get("throws", ());
+					if (0 in newThrows) {
+						/* New set allows for all exceptions */
+					} else if (newThrows >= oldThrows) {
+						/* New set of exceptions is a super-set of the original set. */
+					} else if (canRetainNothrow) {
+						/* Have the final type inherit missing throws */
+						if (newThrows !is HashSet)
+							newThrows = HashSet(newThrows);
+						newThrows.insertall(oldThrows);
 						newPointerBase = copy newPointerBase;
 						newPointerBase.attrib = copy newPointerBase.attrib;
-						newPointerBase.attrib["nothrow"] = oldNothrowLevel;
+						newPointerBase.attrib["throws"] = newThrows;
 						newTyp = type(newTyp)(newPointerBase);
 						newTypeRef = copy newTypeRef;
 						newTypeRef.typ = newTyp;
+					} else {
+						local missingThrows: {int...} = (oldThrows & ~newThrows).sorted();
+						local missingThrowsNames: string = f"THROWS({", ".join(
+							for (local id: missingThrows)
+								{ -1 : "*", 0 : "..." }.get(id,
+									checker.exceptByCode.get(id, id.hex()))
+						)})";
+						local extraInfo: string = "";
+						if (getExtraCannotRetainInfo !is none)
+							extraInfo = getExtraCannotRetainInfo();
+						checker.warn("-Wthrows",
+								f"Cannot retain `{missingThrowsNames}' "
+								f"in cast to `{newTyp}'{extraInfo}");
 					}
 				}
 			}
@@ -353,7 +483,7 @@ err_bad_op:
 		local typ: CType = typeref.typ;
 		if (typ !is CStructType)
 			checker.err(f"Cannot access field `{fieldName}' of non-struct-type `{typ}'");
-		local fieldInfo: (CTypeRef, int) | none = typ.fields.get(fieldName);
+		local fieldInfo: (CTypeRef, int) | none = typ.getField(fieldName);
 		if (fieldInfo is none) {
 			checker.err(f"No such field `{fieldName}' in `{typ}'");
 		} else {
@@ -434,19 +564,27 @@ err_bad_op:
 					 * - The current function doesn't have a __attribute__((nothrow(N))) attribute
 					 * - The current function has a nothrow level N that is lower than `pointerNoThrow' */
 					local pointerNoThrowLevel: int = int(pointerNoThrow);
-					local currentFunctionNothrow: string | none =
-						checker.currentFunctionTypeRef.attrib.get("nothrow");
-					if (currentFunctionNothrow is none) {
-						checker.warn("-Wnothrow",
-							f"Dereference `{getPrettyNothrowLevelName(pointerNoThrowLevel)}'-pointer "
-							f"in function that does not have any `__attribute__((nothrow(...)))'");
+					if (pointerNoThrowLevel > 0 && checker.currentTryBlockExceptions !is none) {
+						/* Access to volatile pointer inside of try-block means that
+						 * it's possible for E_SEGFAULT and E_BADALLOC to be  thrown
+						 * within that try-block. */
+						checker.currentTryBlockExceptions.insert(checker.exceptByName["E_SEGFAULT"]);
+						checker.currentTryBlockExceptions.insert(checker.exceptByName["E_BADALLOC"]);
 					} else {
-						local currentFunctionNothrowLevel: int = int(currentFunctionNothrow.lstrip("*"));
-						if (currentFunctionNothrowLevel < pointerNoThrowLevel) {
+						local currentFunctionNothrow: string | none =
+							checker.currentFunctionTypeRef.attrib.get("nothrow");
+						if (currentFunctionNothrow is none) {
 							checker.warn("-Wnothrow",
 								f"Dereference `{getPrettyNothrowLevelName(pointerNoThrowLevel)}'-pointer "
-								f"in function `{checker.currentFunctionName}' marked as "
-								f"`{getPrettyNothrowLevelName(currentFunctionNothrowLevel)}'");
+								f"in function that does not have any `__attribute__((nothrow(...)))'");
+						} else if (!currentFunctionNothrow.startswith("*")) {
+							local currentFunctionNothrowLevel: int = int(currentFunctionNothrow);
+							if (currentFunctionNothrowLevel < pointerNoThrowLevel) {
+								checker.warn("-Wnothrow",
+									f"Dereference `{getPrettyNothrowLevelName(pointerNoThrowLevel)}'-pointer "
+									f"in function `{checker.currentFunctionName}' marked as "
+									f"`{getPrettyNothrowLevelName(currentFunctionNothrowLevel)}'");
+							}
 						}
 					}
 				}
@@ -540,7 +678,7 @@ again:
 			if (rhsTyp !in C_FLOATING)
 				return inplaceOp2(checker, op, rhs.inplaceCast(checker, typeref));
 			if (rhsTyp.sizeof > lhsTyp.sizeof) {
-				inplaceCast(checker, rhs.typeref);
+				inplaceCast(checker, rhs.typeref, true);
 				goto again;
 			}
 			/* Floating-point operation. */
@@ -638,6 +776,7 @@ again:
 					local delta: int = rhs.constExprValue(checker) * lhsTyp.base.typ.sizeof;
 					if (op == "-")
 						delta = -delta;
+					TRACE();
 					switch (kind) {
 					case CVALUE_RCONST:
 						data = typeref.typ.bytes(checker, constExprValue(checker) + delta);
@@ -651,6 +790,7 @@ again:
 						MAKE_VOID();
 						break;
 					}
+					TRACE();
 				} else {
 					MAKE_VOID();
 				}
@@ -731,13 +871,15 @@ again:
 		case ">":
 		case ">=":
 do_compare_operation:
-			typeref = CTypeRef(C_bool);
 			if (kind == rhs.kind) {
 				switch (kind) {
 				case CVALUE_RCONST:
-					data = Bytes({ OPERATORS2_BY_NAME[op](
-						constExprValue(checker),
-						rhs.constExprValue(checker)) ? 1 : 0 });
+					data = Bytes({
+						OPERATORS2_BY_NAME[op](
+							constExprValue(checker),
+							rhs.constExprValue(checker)
+						) ? 1 : 0
+					});
 					break;
 				case CVALUE_ACONST:
 				case CVALUE_ASYMBOL:
@@ -787,6 +929,7 @@ do_compare_operation:
 					MAKE_VOID();
 				}
 			}
+			typeref = CTypeRef(C_bool);
 			TRACE();
 			return this;
 
@@ -821,7 +964,10 @@ err_bad_op:
 	public function assign(checker: Checker, value: CValue): CValue
 		-> copy(this).inplaceAssign(checker, value);
 	public function inplaceAssign(checker: Checker, value: CValue): CValue {
-		value = value.cast(checker, typeref); /* NOTE: This also does rvalue transform! */
+		/* NOTE: This cast also does rvalue transform! */
+		value = value.cast(checker, typeref, canRetainNothrow: false,
+			getExtraCannotRetainInfo: () ->
+				f" (symbol `{isSymbol ? data.name : "<expression>"}' appears incorrectly annotated)");
 		switch (kind) {
 		case CVALUE_LVOID:
 			break;
@@ -834,6 +980,10 @@ err_bad_op:
 				local scope: CNamespace = checker.namespaceStack.first;
 				scope.symbolValues[data] = value.isConstExpr ? value.constExprBytes : none;
 			}
+			break;
+		case CVALUE_LADDR:
+			checker.warn("-Wconstaddr",
+				f"Write to compile-time constant memory address `({typeref}){offset.hex()}'");
 			break;
 		default:
 			checker.err(f"Cannot assign to r-value expression of type `{typeref}'");
@@ -860,13 +1010,19 @@ err_bad_op:
 				functionName = "<unnamed>";
 			if (data is COverloadedFunctionSymbol) {
 				local types: {CType...} = Tuple(args.each.typeref.typ);
-				local candidates: {CSymbol...} = data.getOverloadForTypes(types);
+				local candidates: {CSymbol...} = data.getOverloadsForTypes(checker, types);
 				if (!candidates) {
-					for (local x: data.overloads)
-						print x;
 					checker.err(
 						f"No overload of `{functionName}' matches "
-						f"argument list `({", ".join(types)})'");
+						f"argument types `({", ".join(types)})'"
+						f"{"".join(for (local overload: data.overloads)
+							checker.forceFormatMessageAddend(
+								overload.decl,
+								overload is CSymbol
+									? f"Known overload {overload}"
+									: f"Template overload"
+							)
+						)}");
 				} else if (#candidates > 1) {
 					checker.err(
 						f"More than one overload of `{functionName}' "
@@ -922,7 +1078,7 @@ err_bad_op:
 				for (local i: [defaultStart: defaultEnd]) {
 					args.append(CValue(
 						kind:    CVALUE_RCONST,
-						typedef: funArgs[defaultArgsFirst + i].first,
+						typeref: funArgs[defaultArgsFirst + i].first,
 						data:    funType.defaults[i],
 						offset:  0));
 				}
@@ -936,8 +1092,18 @@ err_bad_op:
 		/* Cast arguments to their proper types if not done so already. */
 		if (mustCastArgs) {
 			args = List(args);
+			local canRetainNothrow: bool = false;
+			/* When the function is annotated as `nothrow(*...)', then  nothrow
+			 * specifications of arguments passed to the function are retained. */
+			local calleeNothrow: string | none = typeref.attrib.get("nothrow");
+			if (calleeNothrow !is none && calleeNothrow.startswith("*"))
+				canRetainNothrow = true;
 			for (local i: [:#funArgs]) {
-				args[i] = args[i].cast(checker, funArgs[i].first);
+				args[i] = args[i].cast(checker, funArgs[i].first,
+					canRetainNothrow: canRetainNothrow,
+					getExtraCannotRetainInfo: canRetainNothrow ? none : () ->
+						f" (argument `{funArgs[i].last}' of function "
+						f"`{functionName}' appears incorrectly annotated)");
 			}
 		}
 
@@ -962,19 +1128,68 @@ err_bad_op:
 			}
 
 			/* Check the throws-annotation of the called function and compare it to the caller's */
-			local calledThrows: {int...} = typeref.attrib.get("throws", ());
-			if (calledThrows) {
-				local callerThrows: {int...} = checker.currentFunctionTypeRef.attrib.get("throws", ());
-				local missingThrows: {int...} = (calledThrows & ~callerThrows).sorted();
-				if (missingThrows && (0 !in callerThrows)) {
-					local missingThrowsNames: {string...} = (
-						for (local id: missingThrows)
-							id == 0 ? "..." : checker.exceptByCode.get(id, id.hex())
-					).frozen;
-					checker.warn("-Wthrows",
-						f"Function `{checker.currentFunctionName}' is missing "
-						f"annotations `THROWS({", ".join(missingThrowsNames)})' "
-						f"because it calls `{functionName}'");
+			local calleeThrows: {int...} = typeref.attrib.get("throws", ());
+			if (calleeThrows) {
+				local calleThrowsReferences: {int: string} = none;
+				if (-1 in calleeThrows) {
+					/* Special case: the function takes  a callback-argument  which it  invokes
+					 *               and will propagate the exceptions thrown by said callback. */
+					calleeThrows = HashSet(calleeThrows);
+					local foundAny: bool = false;
+					for (local arg: args) {
+						local argTypeRef: CTypeRef = arg.typeref;
+						while (argTypeRef.typ is CPointerType)
+							argTypeRef = argTypeRef.typ.base;
+						if (argTypeRef.typ is CFunctionType) {
+							foundAny = true;
+							local inner = argTypeRef.attrib.get("throws", ());
+							if (inner) {
+								if (calleThrowsReferences is none)
+									calleThrowsReferences = Dict();
+								local reference: string = "";
+								if (arg.isSymbol)
+									reference = arg.data.name;
+								if (!reference)
+									reference = f"<value of {arg.name}>";
+								for (local id: inner)
+									calleThrowsReferences[id] = reference;
+								calleeThrows.insertall(inner);
+							}
+						}
+					}
+					if (foundAny)
+						calleeThrows.remove(-1);
+				}
+
+				local tryBlock: {int...} | none = checker.currentTryBlockExceptions;
+				if (tryBlock !is none) {
+					tryBlock.insertall(calleeThrows);
+				} else {
+					local callerThrows: {int...} = checker.currentFunctionTypeRef.attrib.get("throws", Set());
+					local missingThrows: {int...} = (calleeThrows & ~callerThrows).sorted();
+					if (missingThrows && (0 !in callerThrows)) {
+						local missingThrowsNames: string = f"THROWS({", ".join(
+							for (local id: missingThrows)
+								{ -1 : "*", 0 : "..." }.get(id,
+									checker.exceptByCode.get(id, id.hex()))
+						)})";
+						local references: string = "";
+						if (calleThrowsReferences !is none) {
+							local referencedFunctions: string = [];
+							for (local id: missingThrows) {
+								local ref: string | none = calleThrowsReferences.get(id);
+								if (ref !is none && ref !in referencedFunctions)
+									referencedFunctions.append(ref);
+							}
+							references = f" and passes callbacks {", ".join(
+								for (local referencedFunction: referencedFunctions)
+									f"`{referencedFunction}'")}";
+						}
+						checker.warn("-Wthrows",
+							f"Function `{checker.currentFunctionName}' is missing "
+							f"annotations `{missingThrowsNames}' "
+							f"because it calls `{functionName}'{references}");
+					}
 				}
 			}
 
@@ -984,6 +1199,7 @@ err_bad_op:
 			local calleeNothrow: string | none = typeref.attrib.get("nothrow");
 			if (calleeNothrow !is none) {
 				local calleeNothrowLevel: int;
+				local calleeNothrowLevelDerivedFromArguments: bool = false;
 				if (calleeNothrow.startswith("*")) {
 #define NO_LEVEL (-9999999999)
 					calleeNothrowLevel = NO_LEVEL;
@@ -993,25 +1209,36 @@ err_bad_op:
 						local argType: CType = arg.typeref.typ;
 						if (argType is CPointerType) {
 							local pointerBaseTypeRef: CTypeRef = argType.base;
-							local pointerNothrow = pointerBaseTypeRef.attrib.get("nothrow");
-							if (pointerNothrow !is none) {
+							local pointerNothrow: string | none = pointerBaseTypeRef.attrib.get("nothrow");
+							if (pointerNothrow !is none && !pointerNothrow.startswith("*")) {
 								pointerNothrow = int(pointerNothrow);
-								if (calleeNothrowLevel < pointerNothrow)
+								if (calleeNothrowLevel < pointerNothrow) {
 									calleeNothrowLevel = pointerNothrow;
+									calleeNothrowLevelDerivedFromArguments = true;
+								}
 							}
 						}
 					}
 
 					/* If we didn't find a nothrow level, use the function's default. */
-					if (calleeNothrowLevel == NO_LEVEL)
+					if (calleeNothrowLevel == NO_LEVEL) {
 						calleeNothrowLevel = int(calleeNothrow[1:]);
+					} else {
+						/* Special case: the function might throw E_SEGFAULT and E_BADALLOC
+						 * Remember that fact if we're inside a TRY-block. */
+						local tryBlock: {int...} | none = checker.currentTryBlockExceptions;
+						if (tryBlock !is none) {
+							tryBlock.insert(checker.exceptByName["E_SEGFAULT"]);
+							tryBlock.insert(checker.exceptByName["E_BADALLOC"]);
+						}
+					}
 #undef NO_LEVEL
 				} else {
 					calleeNothrowLevel = int(calleeNothrow);
 				}
 
 				/* Remember the greatest called nothrow level. */
-				local lastNothrowLevel = checker.currentFunctionGreatestCalleNothrowLevel;
+				local lastNothrowLevel: int | none = checker.currentFunctionGreatestCalleNothrowLevel;
 				if (lastNothrowLevel is none) {
 					checker.currentFunctionGreatestCalleNothrowLevel = calleeNothrowLevel;
 				} else if (lastNothrowLevel !== false) {
@@ -1024,20 +1251,30 @@ err_bad_op:
 				 * level that is smaller than the called function. */
 				local currentFunctionNothrow: string | none =
 					checker.currentFunctionTypeRef.attrib.get("nothrow");
-				if (currentFunctionNothrow !is none) {
-					local currentFunctionNothrowLevel: int = int(currentFunctionNothrow.lstrip("*"));
+				if (currentFunctionNothrow !is none && !currentFunctionNothrow.startswith("*")) {
+					local currentFunctionNothrowLevel: int = int(currentFunctionNothrow);
 					if (currentFunctionNothrowLevel < calleeNothrowLevel) {
 						checker.warn("-Wnothrow",
-							f"Call to `{getPrettyNothrowLevelName(calleeNothrowLevel)}'-function "
-							f"`{functionName}' "
-							f"in function `{checker.currentFunctionName}' marked as "
-							f"`{getPrettyNothrowLevelName(currentFunctionNothrowLevel)}'");
+							f"Call to `{functionName}' follows `{
+								getPrettyNothrowLevelName(calleeNothrowLevel)
+							}'-semantics{
+								calleeNothrowLevelDerivedFromArguments
+									? " because of passed arguments"
+									: ""
+							}"
+							f", but caller function `{checker.currentFunctionName}' is marked "
+							f"as `{getPrettyNothrowLevelName(currentFunctionNothrowLevel)}'"
+						);
 					}
 				}
 			} else {
 				/* Remember that a function was called without a nothrow level */
 				checker.currentFunctionGreatestCalleNothrowLevel = false;
 			}
+
+			/* If the called function is noreturn, set isUnreachable=true */
+			if (typeref.flags & CTYPEREF_FLAG_NORETURN)
+				checker.isUnreachable = true;
 		}
 
 		/* Evaluate the function's return value

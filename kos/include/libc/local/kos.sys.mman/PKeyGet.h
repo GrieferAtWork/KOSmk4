@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca924f37 */
+/* HASH CRC-32:0x11dc9468 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __NAMESPACE_LOCAL_END
 #define __EXCEPT_THROWN_CC __LIBKCALL
 #endif /* !__EXCEPT_THROWN_CC */
 __NAMESPACE_LOCAL_BEGIN
-__LIBC __ATTR_COLD __ATTR_NORETURN void (__EXCEPT_THROWN_CC __localdep_except_thrown)(__except_code_t __code, unsigned int ___argc, ...) __THROWS(...) __CASMNAME("except_thrown");
+__LIBC __ATTR_COLD __ATTR_NORETURN void (__EXCEPT_THROWN_CC __localdep_except_thrown)(__except_code_t __code, unsigned int ___argc, ...) __CASMNAME("except_thrown");
 #endif /* !__local___localdep_except_thrown_defined */
 __NAMESPACE_LOCAL_END
 #include <kos/except/codes.h>

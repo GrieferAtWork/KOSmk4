@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd34116e5 */
+/* HASH CRC-32:0xd32dab5f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,12 @@
 #ifndef __local_pthread_once_defined
 #define __local_pthread_once_defined
 #include <__crt.h>
-#include <kos/anno.h>
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_except_rethrow_defined) && defined(__CRT_HAVE_except_rethrow)
 #define __local___localdep_except_rethrow_defined
-__COMPILER_CREDIRECT_VOID(__LIBC,__ATTR_COLD __ATTR_NORETURN,__THROWING,__LIBKCALL,__localdep_except_rethrow,(void),except_rethrow,())
+__COMPILER_CREDIRECT_VOID(__LIBC,__ATTR_COLD __ATTR_NORETURN,,__LIBKCALL,__localdep_except_rethrow,(void),except_rethrow,())
 #endif /* !__local___localdep_except_rethrow_defined && __CRT_HAVE_except_rethrow */
 #ifndef __local___localdep_futex_waitwhile_defined
 #define __local___localdep_futex_waitwhile_defined
@@ -78,7 +77,7 @@ __NAMESPACE_LOCAL_END
 #include <kos/asm/futex.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(pthread_once) __ATTR_INOUT(1) __ATTR_NONNULL((2)) __errno_t
-(__LIBCCALL __LIBC_LOCAL_NAME(pthread_once))(__pthread_once_t *__once_control, void (__LIBCCALL *__init_routine)(void)) __THROWS(...) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(pthread_once))(__pthread_once_t *__once_control, void (__LIBCCALL *__init_routine)(void)) {
 #undef __PRIVATE_PTHREAD_ONCE_USES_FUTEX
 #if defined(__CRT_HAVE_futex_wakeall) || defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #if __SIZEOF_PTHREAD_ONCE_T == __SIZEOF_POINTER__ && (defined(__CRT_HAVE_futex_waitwhile) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex))

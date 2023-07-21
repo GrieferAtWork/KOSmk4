@@ -282,7 +282,7 @@ typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void
 #endif /* !__compar_d_fn_t_defined */
 }
 
-[[throws, wunused]]
+[[nothrow_cb_ncx, wunused]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.utility.stdlib")]]
 [[crt_dos_variant(callback(
@@ -353,7 +353,7 @@ __LOCAL_LIBC(__invoke_compare_helper) int
 @@pp_endif@@
 )]
 
-[[throws, std, kernel, guard]]
+[[nothrow_cb_ncx, std, kernel, guard]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_qsort_r")]]
 [[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_qsort_r")]]
@@ -377,7 +377,7 @@ void qsort([[inout(item_count * item_size)]] void *pbase, size_t item_count, siz
 @@pp_endif@@
 }
 
-[[wunused, std, throws, guard]]
+[[wunused, std, nothrow_cb_ncx, guard]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_bsearch_r")]]
 [[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_bsearch_r")]]
@@ -735,7 +735,7 @@ int system([[in_opt]] char const *command) {
 }
 
 
-[[std, guard, noreturn, throws, crtbuiltin]]
+[[std, guard, noreturn, no_nothrow, crtbuiltin]]
 [[export_alias("_ZSt9terminatev", "terminate", "__chk_fail")]]
 [[dos_only_export_alias("?terminate@@YAXXZ")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_ABORT))]]
@@ -745,7 +745,7 @@ void abort() {
 	_Exit(@__EXIT_FAILURE@);
 }
 
-[[std, guard, noreturn, throws, crtbuiltin]]
+[[std, guard, noreturn, no_nothrow, crtbuiltin]]
 [[alias("quick_exit", "_exit", "_Exit"), export_alias("xexit")]]
 [[section(".text.crt{|.dos}.application.exit")]]
 void exit(int status);
@@ -758,7 +758,7 @@ int atexit([[nonnull]] void (LIBCCALL *func)(void));
 
 
 %(std, c, ccompat)#if defined(__USE_ISOC11) || defined(__USE_ISOCXX11)
-[[std, noreturn, throws, alias("exit", "_exit", "_Exit")]]
+[[std, noreturn, no_nothrow, alias("exit", "_exit", "_Exit")]]
 [[section(".text.crt{|.dos}.sched.process")]]
 void quick_exit(int status);
 
@@ -769,7 +769,7 @@ int at_quick_exit([[nonnull]] void (LIBCCALL *func)(void));
 %(std, c, ccompat)#endif /* __USE_ISOC11 || __USE_ISOCXX11 */
 
 %(std, c, ccompat)#ifdef __USE_ISOC99
-[[std, noreturn, throws]]
+[[std, noreturn, no_nothrow]]
 [[crtbuiltin, export_alias("_exit"), alias("quick_exit", "exit")]]
 [[if(__has_builtin(__builtin__exit) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("_exit", { __builtin__exit(status); })]]
@@ -3296,7 +3296,7 @@ char const *getexecname() {
            (defined(__OS_HAVE_PROCFS_SELF_FD) && $has_function(opendir, readdir)))]]
 [[impl_include("<asm/os/fcntl.h>", "<libc/errno.h>", "<hybrid/__overflow.h>")]]
 [[impl_include("<bits/os/dirent.h>")]]
-[[throws, crt_dos_variant(callback(
+[[nothrow_cb_ncx, crt_dos_variant(callback(
 	cook: struct { auto walk = walk; auto arg = arg; },
 	wrap: ($cook *c, $fd_t fd): int { return (*c->walk)(c->arg, fd); },
 	impl: fdwalk((int (LIBCCALL *)(void *, $fd_t))&$wrap, &$cook),
@@ -3582,7 +3582,7 @@ void setprogname(char const *name) {
 }
 
 
-[[/*TODO:crt_dos_variant,*/ guard, throws]]
+[[/*TODO:crt_dos_variant,*/ guard, nothrow_cb_ncx]]
 [[decl_include("<hybrid/typecore.h>")]]
 int heapsort([[inout(item_count * item_size)]] void *pbase, $size_t item_count, $size_t item_size,
              [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b)) {
@@ -3591,7 +3591,7 @@ int heapsort([[inout(item_count * item_size)]] void *pbase, $size_t item_count, 
 	return 0;
 }
 
-[[/*TODO:crt_dos_variant,*/ guard, throws]]
+[[/*TODO:crt_dos_variant,*/ guard, nothrow_cb_ncx]]
 [[decl_include("<hybrid/typecore.h>")]]
 int mergesort([[inout(item_count * item_size)]] void *pbase, $size_t item_count, $size_t item_size,
               [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b)) {
@@ -3669,13 +3669,12 @@ typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void
 
 
 @@>> qsort_r(3)
-[[throws, kernel]]
-[[decl_include("<hybrid/typecore.h>")]]
+[[kernel, decl_include("<hybrid/typecore.h>")]]
 [[alias("_quicksort")]]
 [[if(!defined(__KERNEL__)), export_as("_quicksort")]] /* NOTE: `_quicksort' is the old libc4/5 name of this function. */
 [[impl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.utility.stdlib")]]
-[[throws, crt_dos_variant(callback(
+[[nothrow_cb_ncx, crt_dos_variant(callback(
 	cook: struct { auto compar = compar; auto arg = arg; },
 	wrap: (void const *a, void const *b, $cook *c): int { return (*c->compar)(a, b, c->arg); },
 	impl: qsort_r(pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, &$cook),
@@ -4580,7 +4579,7 @@ __LOCAL_LIBC(__invoke_compare_helper_s) int
 @@pp_endif@@
 )]
 
-[[guard, throws, wunused]]
+[[guard, nothrow_cb_ncx, wunused]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER_S)]]
 [[section(".text.crt.dos.utility")]]
@@ -4601,7 +4600,7 @@ void *bsearch_s([[in]] void const *key,
 	                         &data);
 }
 
-[[guard, throws]]
+[[guard, nothrow_cb_ncx]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER_S)]]
 [[section(".text.crt.dos.utility")]]

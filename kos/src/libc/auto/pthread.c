@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba5977d4 */
+/* HASH CRC-32:0xd69cbf2d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,8 +54,8 @@ NOTHROW(LIBCCALL libc_pthread_equal)(pthread_t thr1,
  * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) NONNULL((2)) errno_t
-(LIBCCALL libc_pthread_once)(pthread_once_t *once_control,
-                             void (LIBCCALL *init_routine)(void)) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_pthread_once)(pthread_once_t *once_control,
+                                       void (LIBCCALL *init_routine)(void)) {
 #undef __PRIVATE_PTHREAD_ONCE_USES_FUTEX
 
 #if __SIZEOF_PTHREAD_ONCE_T == __SIZEOF_POINTER__

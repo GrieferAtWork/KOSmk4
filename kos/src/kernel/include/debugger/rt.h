@@ -214,11 +214,11 @@ DATDEF bool dbg_memory_managed;
  *       but will instead indicate an error, or (in when `force' is true), write directly
  *       to the physical memory backing of the underlying page directory.
  * @return: * : The number of trailing bytes that could not be copied. */
-FUNDEF size_t NOTHROW(KCALL dbg_readmemory)(void const *addr, void *__restrict buf, size_t num_bytes);
-FUNDEF size_t NOTHROW(KCALL dbg_writememory)(void *addr, void const *__restrict buf, size_t num_bytes, bool force);
-FUNDEF size_t NOTHROW(KCALL dbg_setmemory)(void *addr, byte_t byte, size_t num_bytes, bool force);
+FUNDEF size_t NOTHROW(KCALL dbg_readmemory)(USER UNCHECKED void const *addr, void *__restrict buf, size_t num_bytes);
+FUNDEF size_t NOTHROW(KCALL dbg_writememory)(USER UNCHECKED void *addr, void const *__restrict buf, size_t num_bytes, bool force);
+FUNDEF size_t NOTHROW(KCALL dbg_setmemory)(USER UNCHECKED void *addr, byte_t byte, size_t num_bytes, bool force);
 /* Move memory from `src', and write it back to `dst' */
-FUNDEF size_t NOTHROW(KCALL dbg_movememory)(void *dst, void const *src, size_t num_bytes, bool force);
+FUNDEF size_t NOTHROW(KCALL dbg_movememory)(USER UNCHECKED void *dst, USER UNCHECKED void const *src, size_t num_bytes, bool force);
 #define dbg_movememorydown dbg_movememory
 #define dbg_movememoryup   dbg_movememory
 

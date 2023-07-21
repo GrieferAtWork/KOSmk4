@@ -190,14 +190,14 @@ NOTHROW_NCX(LIBCCALL libc___fpending)(FILE __KOS_FIXED_CONST *stream)
 /*[[[impl:libc___fpending_unlocked]]]*/
 DEFINE_INTERN_ALIAS(libc___fpending_unlocked, libc___fpending);
 
-/*[[[head:libc__flushlbf,hash:CRC-32=0x3d029d6f]]]*/
+/*[[[head:libc__flushlbf,hash:CRC-32=0xfbd0f057]]]*/
 /* >> _flushlbf(3)
  * Perform  a call  `fflush(stream)' for  every open  line-buffered stdio file.
  * Note that usually call this function isn't necessary, since the same already
  * happens automatically when  writing a line-feed  to any line-buffered  stdio
  * file (where line-buffered files are usually those opened on TTYs) */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") void
-(LIBCCALL libc__flushlbf)(void) THROWS(...)
+NOTHROW_CB(LIBCCALL libc__flushlbf)(void)
 /*[[[body:libc__flushlbf]]]*/
 {
 	file_sync_lnfiles();

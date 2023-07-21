@@ -130,7 +130,14 @@
 #endif /* compile-time-assert... */
 #endif /* __USE_KOS || __USE_KOS_KERNEL */
 
-#ifdef __do_cassert_wrapper
+#ifdef __CHECKER__
+#define __do_assert(expr, expr_str)                __builtin_assume(expr)
+#define __do_assert_noreturn(expr, expr_str)       __builtin_assume(expr)
+#define __do_assert_assume(expr, expr_str)         __builtin_assume(expr)
+#define __do_assertf(expr, expr_str, ...)          __builtin_assume(expr)
+#define __do_assert_noreturnf(expr, expr_str, ...) __builtin_assume(expr)
+#define __do_assert_assumef(expr, expr_str, ...)   __builtin_assume(expr)
+#elif defined(__do_cassert_wrapper)
 #if defined(__USE_KOS_KERNEL) && defined(__assertion_check) && !defined(__NO_XBLOCK)
 #ifdef __NO_builtin_expect
 #define __do_assert(expr, expr_str)          __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_check(expr_str)); (void)0; }))

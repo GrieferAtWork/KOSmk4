@@ -563,12 +563,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_create)(pthread_t *__restrict p_newthread,
 }
 /*[[[end:libc_pthread_create]]]*/
 
-/*[[[head:libc_pthread_exit,hash:CRC-32=0xf9e0636b]]]*/
+/*[[[head:libc_pthread_exit,hash:CRC-32=0x9ec8695]]]*/
 /* >> pthread_exit(3)
  * Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_NORETURN ATTR_ACCESS_NONE(1) void
-(LIBCCALL libc_pthread_exit)(void *retval) THROWS(...)
+(LIBCCALL libc_pthread_exit)(void *retval)
 /*[[[body:libc_pthread_exit]]]*/
 {
 	__REF struct pthread *me = &current;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d8c3c48 */
+/* HASH CRC-32:0xe433f0c5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,6 @@
 #ifndef __local_format_vscanf_defined
 #define __local_format_vscanf_defined
 #include <__crt.h>
-#include <kos/anno.h>
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 #include <libc/string.h>
@@ -30,7 +29,7 @@
 #include <bits/math-constants.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_vscanf) __ATTR_IN(4) __ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-(__LIBCCALL __LIBC_LOCAL_NAME(format_vscanf))(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(format_vscanf))(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, char const *__restrict __format, __builtin_va_list __args) {
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE      char
 #define __CHAR_SIZE      __SIZEOF_CHAR__

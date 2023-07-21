@@ -29,6 +29,11 @@
  *       that wouldn't even be  the first time  I had to  tweak binutils/gcc for  this
  *       project... */
 #ifdef __cplusplus
+#ifdef __CHECKER__
+#define __RAII_FINALLY  __IF1
+#define __NOTHROW_BEGIN noexcept {
+#define __NOTHROW_END   }
+#else /* __CHECKER__ */
 extern "C++" {
 __NAMESPACE_INT_BEGIN
 template<class __F> struct __FinallyAction {
@@ -71,6 +76,7 @@ __NAMESPACE_INT_END
 #define __NOTHROW_BEGIN do
 #define __NOTHROW_END   __WHILE0
 #endif /* NDEBUG || NDEBUG_EXCEPT || NDEBUG_NOTHROW */
+#endif /* !__CHECKER__ */
 #endif /* !__NOTHROW_BEGIN */
 
 #ifndef __TRY

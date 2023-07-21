@@ -1913,9 +1913,9 @@ NOTHROW_NCX(LIBCCALL libc_at_quick_exit)(void (LIBCCALL *func)(void))
 }
 /*[[[end:libc_at_quick_exit]]]*/
 
-/*[[[head:libc_exit,hash:CRC-32=0xc5fc2590]]]*/
+/*[[[head:libc_exit,hash:CRC-32=0x7f9a0666]]]*/
 INTERN ATTR_SECTION(".text.crt.application.exit") ATTR_NORETURN void
-(LIBCCALL libc_exit)(int status) THROWS(...)
+(LIBCCALL libc_exit)(int status)
 /*[[[body:libc_exit]]]*/
 {
 	/* Finalize TLS objects for the calling thread (c++11-specific) */
@@ -1931,9 +1931,9 @@ INTERN ATTR_SECTION(".text.crt.application.exit") ATTR_NORETURN void
 }
 /*[[[end:libc_exit]]]*/
 
-/*[[[head:libc_quick_exit,hash:CRC-32=0x66efab6c]]]*/
+/*[[[head:libc_quick_exit,hash:CRC-32=0x64157d92]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.process") ATTR_NORETURN void
-(LIBCCALL libc_quick_exit)(int status) THROWS(...)
+(LIBCCALL libc_quick_exit)(int status)
 /*[[[body:libc_quick_exit]]]*/
 {
 	/* Run at_quick_exit() functions */
@@ -1948,9 +1948,9 @@ INTERN ATTR_SECTION(".text.crt.sched.process") ATTR_NORETURN void
 }
 /*[[[end:libc_quick_exit]]]*/
 
-/*[[[head:libc__Exit,hash:CRC-32=0x57701208]]]*/
+/*[[[head:libc__Exit,hash:CRC-32=0xc6ad99bc]]]*/
 INTERN ATTR_SECTION(".text.crt.application.exit") ATTR_NORETURN void
-(LIBCCALL libc__Exit)(int status) THROWS(...)
+(LIBCCALL libc__Exit)(int status)
 /*[[[body:libc__Exit]]]*/
 {
 	sys_exit_group((syscall_ulong_t)(unsigned int)status);

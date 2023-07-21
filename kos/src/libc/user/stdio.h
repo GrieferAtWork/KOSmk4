@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2b304bb */
+/* HASH CRC-32:0x6f2709f9 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ INTDEF WUNUSED ATTR_OUT(1) char *NOTHROW_NCX(LIBCCALL libc_tmpnam)(char *buf);
 INTDEF ATTR_INOUT(1) int (LIBCCALL libc_fclose)(FILE *__restrict stream) THROWS(...);
 /* >> fflush(3)
  * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
-INTDEF int (LIBCCALL libc_fflush)(FILE *stream) THROWS(...);
+INTDEF int NOTHROW_CB(LIBCCALL libc_fflush)(FILE *stream);
 /* >> setvbuf(3)
  * Set the buffer and buffer-mode to-be used by the given `stream'
  * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
@@ -57,19 +57,19 @@ INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc_setvbuf)(FILE *__restrict str
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
-INTDEF ATTR_INOUT(1) int (LIBCCALL libc_fgetc)(FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_INOUT(1) int NOTHROW_CB(LIBCCALL libc_fgetc)(FILE *__restrict stream);
 /* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
-INTDEF ATTR_INOUT(2) int (LIBCCALL libc_fputc)(int ch, FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_INOUT(2) int NOTHROW_CB(LIBCCALL libc_fputc)(int ch, FILE *__restrict stream);
 /* >> ungetc(3)
  * Unget a single character byte of data previously returned by `getc()' */
 INTDEF ATTR_INOUT(2) int NOTHROW_NCX(LIBCCALL libc_ungetc)(int ch, FILE *__restrict stream);
 /* >> fread(3)
  * Read up to `elemsize * elemcount' bytes of data from `stream' into `buf' */
-INTDEF WUNUSED ATTR_INOUT(4) ATTR_OUT_OPT(1) size_t (LIBCCALL libc_fread)(void *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED ATTR_INOUT(4) ATTR_OUT_OPT(1) size_t NOTHROW_CB(LIBCCALL libc_fread)(void *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream);
 /* >> fwrite(3)
  * Write up to `elemsize * elemcount' bytes of data from `buf' into `stream' */
-INTDEF ATTR_INOUT(4) ATTR_IN_OPT(1) size_t (LIBCCALL libc_fwrite)(void const *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_INOUT(4) ATTR_IN_OPT(1) size_t NOTHROW_CB(LIBCCALL libc_fwrite)(void const *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream);
 /* >> fseek(3)
  * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 INTDEF ATTR_INOUT(1) int (LIBCCALL libc_fseek)(FILE *__restrict stream, long int off, int whence) THROWS(...);
@@ -132,19 +132,19 @@ INTDEF ATTR_IN(2) ATTR_IN(4) int NOTHROW_RPC(LIBDCALL libd_renameat2)(fd_t oldfd
 INTDEF ATTR_IN(2) ATTR_IN(4) int NOTHROW_RPC(LIBCCALL libc_renameat2)(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags);
 /* >> fflush_unlocked(3)
  * Same as `fflush()', but performs I/O without acquiring a lock to `stream' */
-INTDEF int (LIBCCALL libc_fflush_unlocked)(FILE *stream) THROWS(...);
+INTDEF int NOTHROW_CB(LIBCCALL libc_fflush_unlocked)(FILE *stream);
 /* >> fread_unlocked(3)
  * Same as `fread()', but performs I/O without acquiring a lock to `stream' */
-INTDEF WUNUSED ATTR_INOUT(4) ATTR_OUT_OPT(1) size_t (LIBCCALL libc_fread_unlocked)(void *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED ATTR_INOUT(4) ATTR_OUT_OPT(1) size_t NOTHROW_CB(LIBCCALL libc_fread_unlocked)(void *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream);
 /* >> fwrite_unlocked(3)
  * Same as `fwrite()', but performs I/O without acquiring a lock to `stream' */
-INTDEF ATTR_INOUT(4) ATTR_IN_OPT(1) size_t (LIBCCALL libc_fwrite_unlocked)(void const *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_INOUT(4) ATTR_IN_OPT(1) size_t NOTHROW_CB(LIBCCALL libc_fwrite_unlocked)(void const *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream);
 /* >> fgetc_unlocked(3)
  * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
-INTDEF ATTR_INOUT(1) int (LIBCCALL libc_fgetc_unlocked)(FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_INOUT(1) int NOTHROW_CB(LIBCCALL libc_fgetc_unlocked)(FILE *__restrict stream);
 /* >> fputc_unlocked(3)
  * Same as `fputc()', but performs I/O without acquiring a lock to `stream' */
-INTDEF ATTR_INOUT(2) int (LIBCCALL libc_fputc_unlocked)(int ch, FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_INOUT(2) int NOTHROW_CB(LIBCCALL libc_fputc_unlocked)(int ch, FILE *__restrict stream);
 /* >> tempnam(3) */
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_NCX(LIBCCALL libc_tempnam)(char const *dir, char const *pfx);
 /* >> fdopen(3)
@@ -220,10 +220,10 @@ INTDEF ATTR_INOUT(1) ATTR_OUT(2) int (LIBCCALL libc_fgetpos64)(FILE *__restrict 
 INTDEF ATTR_IN(2) ATTR_INOUT(1) int (LIBCCALL libc_fsetpos64)(FILE *__restrict stream, fpos64_t const *__restrict pos) THROWS(...);
 /* >> file_printer(3)
  * For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
-INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t (__FORMATPRINTER_CC libc_file_printer)(void *arg, char const *__restrict data, size_t datalen) THROWS(...);
+INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t NOTHROW_CB(__FORMATPRINTER_CC libc_file_printer)(void *arg, char const *__restrict data, size_t datalen);
 /* >> file_printer_unlocked(3)
  * Same as `file_printer()', but performs I/O without acquiring a lock to `(FILE *)arg' */
-INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t (__FORMATPRINTER_CC libc_file_printer_unlocked)(void *arg, char const *__restrict data, size_t datalen) THROWS(...);
+INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t NOTHROW_CB(__FORMATPRINTER_CC libc_file_printer_unlocked)(void *arg, char const *__restrict data, size_t datalen);
 /* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
 INTDEF ATTR_IN(2) ATTR_INOUT(3) FILE *NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
@@ -255,20 +255,20 @@ INTDEF ATTR_INOUT(1) void (LIBCCALL libc_rewind_unlocked)(FILE *__restrict strea
 INTDEF WUNUSED ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc_fisatty)(FILE *__restrict stream);
 /* >> fftruncate(3)
  * Truncate the given file `stream' to a length of `length' */
-INTDEF ATTR_INOUT(1) int (LIBCCALL libc_fftruncate)(FILE *__restrict stream, __PIO_OFFSET length) THROWS(...);
+INTDEF ATTR_INOUT(1) int NOTHROW_CB(LIBCCALL libc_fftruncate)(FILE *__restrict stream, __PIO_OFFSET length);
 /* >> fftruncate_unlocked(3)
  * Same as `fftruncate()', but don't acquire a lock to the file */
-INTDEF ATTR_INOUT(1) int (LIBCCALL libc_fftruncate_unlocked)(FILE *__restrict stream, __PIO_OFFSET length) THROWS(...);
+INTDEF ATTR_INOUT(1) int NOTHROW_CB(LIBCCALL libc_fftruncate_unlocked)(FILE *__restrict stream, __PIO_OFFSET length);
 INTDEF ATTR_INOUT(1) int (LIBCCALL libc_fseeko64_unlocked)(FILE *__restrict stream, off64_t off, int whence) THROWS(...);
 INTDEF WUNUSED ATTR_INOUT(1) off64_t (LIBCCALL libc_ftello64_unlocked)(FILE *__restrict stream) THROWS(...);
 INTDEF ATTR_INOUT(1) ATTR_OUT(2) int (LIBCCALL libc_fgetpos64_unlocked)(FILE *__restrict stream, fpos64_t *__restrict pos) THROWS(...);
 INTDEF ATTR_IN(2) ATTR_INOUT(1) int (LIBCCALL libc_fsetpos64_unlocked)(FILE *__restrict stream, fpos64_t const *__restrict pos) THROWS(...);
 /* >> fftruncate64(3)
  * Truncate the given file `stream' to a length of `length' */
-INTDEF ATTR_INOUT(1) int (LIBCCALL libc_fftruncate64)(FILE *__restrict stream, __PIO_OFFSET64 length) THROWS(...);
+INTDEF ATTR_INOUT(1) int NOTHROW_CB(LIBCCALL libc_fftruncate64)(FILE *__restrict stream, __PIO_OFFSET64 length);
 /* >> fftruncate64_unlocked(3)
  * Truncate the given file `stream' to a length of `length' */
-INTDEF ATTR_INOUT(1) int (LIBCCALL libc_fftruncate64_unlocked)(FILE *__restrict stream, __PIO_OFFSET64 length) THROWS(...);
+INTDEF ATTR_INOUT(1) int NOTHROW_CB(LIBCCALL libc_fftruncate64_unlocked)(FILE *__restrict stream, __PIO_OFFSET64 length);
 /* >> fgetln(3)
  * A slightly more convenient (but way less portable) alternative to `fgets(3)'
  * This function automatically malloc's a  buffer of sufficient length for  the
@@ -289,10 +289,10 @@ INTDEF WUNUSED ATTR_INOUT(1) ATTR_OUT_OPT(2) char *NOTHROW_NCX(LIBCCALL libc_fge
 INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_funopen2)(void const *cookie, ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes), ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes), off_t (LIBKCALL *seekfn)(void *cookie, off_t off, int whence), int (LIBKCALL *flushfn)(void *cookie), int (LIBKCALL *closefn)(void *cookie));
 /* >> funopen2(3), funopen2_64(3) */
 INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_funopen2_64)(void const *cookie, ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes), ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes), off64_t (LIBKCALL *seekfn)(void *cookie, off64_t off, int whence), int (LIBKCALL *flushfn)(void *cookie), int (LIBKCALL *closefn)(void *cookie));
-INTDEF int (LIBCCALL libc__flushall)(void) THROWS(...);
+INTDEF int NOTHROW_CB(LIBCCALL libc__flushall)(void);
 INTDEF int NOTHROW_RPC(LIBCCALL libc__rmtmp)(void);
-INTDEF ATTR_INOUT(1) int (LIBCCALL libc__filbuf)(FILE *__restrict stream) THROWS(...);
-INTDEF ATTR_INOUT(2) int (LIBCCALL libc__flsbuf)(int ch, FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_INOUT(1) int NOTHROW_CB(LIBCCALL libc__filbuf)(FILE *__restrict stream);
+INTDEF ATTR_INOUT(2) int NOTHROW_CB(LIBCCALL libc__flsbuf)(int ch, FILE *__restrict stream);
 /* >> _get_printf_count_output(3), _set_printf_count_output(3)
  * Enable or disable use of '%n' in printf-style format strings. */
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc__get_printf_count_output)(void);

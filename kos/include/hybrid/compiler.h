@@ -162,6 +162,10 @@
 #define XRETURN             __XRETURN
 #define NOTHROW             __NOTHROW
 #define NOTHROW_T           __NOTHROW_T
+#define NOTHROW_CB          __NOTHROW_CB
+#define NOTHROW_CB_T        __NOTHROW_CB_T
+#define NOTHROW_CB_NCX      __NOTHROW_CB_NCX
+#define NOTHROW_CB_NCX_T    __NOTHROW_CB_NCX_T
 #define NOTHROW_NCX         __NOTHROW_NCX
 #define NOTHROW_NCX_T       __NOTHROW_NCX_T
 #define NOTHROW_RPC         __NOTHROW_RPC

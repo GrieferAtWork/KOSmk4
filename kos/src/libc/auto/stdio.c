@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2dc969dc */
+/* HASH CRC-32:0x2f23075e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -94,14 +94,14 @@ NOTHROW_NCX(LIBCCALL libc_setbuf)(FILE *__restrict stream,
 /* >> getchar(3)
  * Alias for `fgetc(stdin)' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") int
-(LIBCCALL libc_getchar)(void) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_getchar)(void) {
 	return libc_fgetc(stdin);
 }
 #include <libc/template/stdstreams.h>
 /* >> putchar(3)
  * Alias for `fputc(ch, stdout)' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") int
-(LIBCCALL libc_putchar)(int ch) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_putchar)(int ch) {
 	return libc_fputc(ch, stdout);
 }
 #include <hybrid/typecore.h>
@@ -112,9 +112,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") int
  * buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf').
  * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' on error. */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_INOUT(3) ATTR_OUTS(1, 2) char *
-(LIBCCALL libc_fgets)(char *__restrict buf,
-                      __STDC_INT_AS_SIZE_T bufsize,
-                      FILE *__restrict stream) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_fgets)(char *__restrict buf,
+                                __STDC_INT_AS_SIZE_T bufsize,
+                                FILE *__restrict stream) {
 	size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
@@ -157,8 +157,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_INOUT(3) ATT
  * Print a given string `string' to `stream'. This is identical to:
  * >> fwrite(string, sizeof(char), strlen(string), stream); */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") ATTR_IN(1) ATTR_INOUT(2) __STDC_INT_AS_SSIZE_T
-(LIBCCALL libc_fputs)(char const *__restrict string,
-                      FILE *__restrict stream) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_fputs)(char const *__restrict string,
+                                FILE *__restrict stream) {
 	__STDC_INT_AS_SIZE_T result;
 	result = libc_fwrite(string,
 	                sizeof(char),
@@ -173,7 +173,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") ATTR_IN(1) ATTR_INOUT(2
  * >> putchar('\n');
  * Return the number of written characters, or `EOF' on error */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") ATTR_IN(1) __STDC_INT_AS_SSIZE_T
-(LIBCCALL libc_puts)(char const *__restrict string) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_puts)(char const *__restrict string) {
 	__STDC_INT_AS_SSIZE_T result, temp;
 	result = libc_fputs(string, stdout);
 	if (result >= 0) {
@@ -220,9 +220,9 @@ NOTHROW_RPC(LIBCCALL libc_perror)(char const *message) {
  * Print  data  to  `stream',  following  `format'
  * Return the number of successfully printed bytes */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T
-(LIBCCALL libc_vfprintf)(FILE *__restrict stream,
-                         char const *__restrict format,
-                         va_list args) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_vfprintf)(FILE *__restrict stream,
+                                   char const *__restrict format,
+                                   va_list args) {
 	return (__STDC_INT_AS_SSIZE_T)libc_format_vprintf(&libc_file_printer, stream, format, args);
 }
 #endif /* !__KERNEL__ */
@@ -231,9 +231,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_IN(2) ATTR_INOUT(
  * Print  data  to  `stream',  following  `format'
  * Return the number of successfully printed bytes */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.locked.write.printf") ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T
-(VLIBDCALL libd_fprintf)(FILE *__restrict stream,
-                         char const *__restrict format,
-                         ...) THROWS(...) {
+NOTHROW_CB(VLIBDCALL libd_fprintf)(FILE *__restrict stream,
+                                   char const *__restrict format,
+                                   ...) {
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -247,9 +247,9 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.locked.write.printf")
  * Print  data  to  `stream',  following  `format'
  * Return the number of successfully printed bytes */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T
-(VLIBCCALL libc_fprintf)(FILE *__restrict stream,
-                         char const *__restrict format,
-                         ...) THROWS(...) {
+NOTHROW_CB(VLIBCCALL libc_fprintf)(FILE *__restrict stream,
+                                   char const *__restrict format,
+                                   ...) {
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -262,8 +262,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_IN(2) ATTR_INOUT(
  * Print  data  to  `stdout',  following  `format'
  * Return the number of successfully printed bytes */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T
-(LIBCCALL libc_vprintf)(char const *__restrict format,
-                        va_list args) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_vprintf)(char const *__restrict format,
+                                  va_list args) {
 	return libc_vfprintf(stdout, format, args);
 }
 #endif /* !__KERNEL__ */
@@ -272,8 +272,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_IN(1) ATTR_LIBC_P
  * Print  data  to  `stdout',  following  `format'
  * Return the number of successfully printed bytes */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.locked.write.printf") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T
-(VLIBDCALL libd_printf)(char const *__restrict format,
-                        ...) THROWS(...) {
+NOTHROW_CB(VLIBDCALL libd_printf)(char const *__restrict format,
+                                  ...) {
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -287,8 +287,8 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.locked.write.printf")
  * Print  data  to  `stdout',  following  `format'
  * Return the number of successfully printed bytes */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T
-(VLIBCCALL libc_printf)(char const *__restrict format,
-                        ...) THROWS(...) {
+NOTHROW_CB(VLIBCCALL libc_printf)(char const *__restrict format,
+                                  ...) {
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -316,9 +316,9 @@ __NAMESPACE_LOCAL_END
  * Scan  data   from   `stream',   following   `format'
  * Return the number of successfully scanned data items */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SIZE_T
-(LIBCCALL libc_vfscanf)(FILE *__restrict stream,
-                        char const *__restrict format,
-                        va_list args) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_vfscanf)(FILE *__restrict stream,
+                                  char const *__restrict format,
+                                  va_list args) {
 #if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_INT__
 	return libc_format_vscanf((pformatgetc)(void *)&libc_fgetc,
 	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc,
@@ -336,8 +336,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_IN(2) ATTR_
  * Scan data from `stdin', following `format'
  * Return the number of successfully scanned data items */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SIZE_T
-(LIBCCALL libc_vscanf)(char const *__restrict format,
-                       va_list args) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_vscanf)(char const *__restrict format,
+                                 va_list args) {
 	return libc_vfscanf(stdin, format, args);
 }
 #endif /* !__KERNEL__ */
@@ -346,9 +346,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_IN(1) ATTR_
  * Scan  data   from   `stream',   following   `format'
  * Return the number of successfully scanned data items */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T
-(VLIBDCALL libd_fscanf)(FILE *__restrict stream,
-                        char const *__restrict format,
-                        ...) THROWS(...) {
+NOTHROW_CB(VLIBDCALL libd_fscanf)(FILE *__restrict stream,
+                                  char const *__restrict format,
+                                  ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -362,9 +362,9 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") W
  * Scan  data   from   `stream',   following   `format'
  * Return the number of successfully scanned data items */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T
-(VLIBCCALL libc_fscanf)(FILE *__restrict stream,
-                        char const *__restrict format,
-                        ...) THROWS(...) {
+NOTHROW_CB(VLIBCCALL libc_fscanf)(FILE *__restrict stream,
+                                  char const *__restrict format,
+                                  ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -378,8 +378,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_IN(2) ATTR_
  * Scan data from `stdin', following `format'
  * Return the number of successfully scanned data items */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T
-(VLIBDCALL libd_scanf)(char const *__restrict format,
-                       ...) THROWS(...) {
+NOTHROW_CB(VLIBDCALL libd_scanf)(char const *__restrict format,
+                                 ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -393,8 +393,8 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") W
  * Scan data from `stdin', following `format'
  * Return the number of successfully scanned data items */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T
-(VLIBCCALL libc_scanf)(char const *__restrict format,
-                       ...) THROWS(...) {
+NOTHROW_CB(VLIBCCALL libc_scanf)(char const *__restrict format,
+                                 ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -405,7 +405,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_IN(1) ATTR_
 #include <libc/template/stdstreams.h>
 #include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_OUT(1) char *
-(LIBCCALL libc_gets)(char *__restrict buf) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_gets)(char *__restrict buf) {
 	return libc_fgets(buf, INT_MAX, stdin);
 }
 #endif /* !__KERNEL__ */
@@ -1240,10 +1240,10 @@ NOTHROW_NCX(LIBCCALL libc_open_memstream)(char **bufloc,
 #include <hybrid/__assert.h>
 /* >> getdelim(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INOUT(4) ssize_t
-(LIBCCALL libc_getdelim)(char **__restrict lineptr,
-                         size_t *__restrict pcount,
-                         int delimiter,
-                         FILE *__restrict stream) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_getdelim)(char **__restrict lineptr,
+                                   size_t *__restrict pcount,
+                                   int delimiter,
+                                   FILE *__restrict stream) {
 	int ch;
 	char *buffer;
 	size_t bufsize, result = 0;
@@ -1288,36 +1288,36 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_INOUT(1) ATT
 }
 /* >> getline(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INOUT(3) ssize_t
-(LIBCCALL libc_getline)(char **__restrict lineptr,
-                        size_t *__restrict pcount,
-                        FILE *__restrict stream) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_getline)(char **__restrict lineptr,
+                                  size_t *__restrict pcount,
+                                  FILE *__restrict stream) {
 	return libc_getdelim(lineptr, pcount, '\n', stream);
 }
 #include <libc/template/stdstreams.h>
 /* >> getchar_unlocked(3)
  * Same as `getchar()', but performs I/O without acquiring a lock to `stdin' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.getc") int
-(LIBCCALL libc_getchar_unlocked)(void) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_getchar_unlocked)(void) {
 	return libc_fgetc_unlocked(stdin);
 }
 #include <libc/template/stdstreams.h>
 /* >> putchar_unlocked(3)
  * Same as `putchar()', but performs I/O without acquiring a lock to `stdout' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") int
-(LIBCCALL libc_putchar_unlocked)(int ch) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_putchar_unlocked)(int ch) {
 	return libc_fputc_unlocked(ch, stdout);
 }
 /* >> __overflow(3)
  * This is essentially Glibc's version of `_flsbuf(3)' (but sadly not binary compatible) */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") ATTR_INOUT(1) int
-(LIBCCALL libc___overflow)(FILE *stream,
-                           int ch) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc___overflow)(FILE *stream,
+                                     int ch) {
 	return libc__flsbuf(ch, stream);
 }
 /* >> getw(3)
  * Similar to `getc()', but read 2 bytes */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") ATTR_INOUT(1) int
-(LIBCCALL libc_getw)(FILE *__restrict stream) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_getw)(FILE *__restrict stream) {
 	u16 result;
 	return libc_fread(&result, sizeof(result), 1, stream)
 	       ? (int)result
@@ -1326,8 +1326,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") ATTR_INOUT(1) int
 /* >> putw(3)
  * Similar to `putc()', but write 2 bytes loaded from `W & 0xffff' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") ATTR_INOUT(2) int
-(LIBCCALL libc_putw)(int w,
-                     FILE *__restrict stream) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_putw)(int w,
+                               FILE *__restrict stream) {
 	u16 c = (u16)w;
 	return libc_fwrite(&c, sizeof(c), 1, stream)
 	       ? w
@@ -1732,9 +1732,9 @@ NOTHROW_NCX(LIBCCALL libc_fopencookie)(void *__restrict magic_cookie,
 /* >> fgets_unlocked(3)
  * Same as `fgets()', but performs I/O without acquiring a lock to `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED ATTR_INOUT(3) ATTR_OUTS(1, 2) char *
-(LIBCCALL libc_fgets_unlocked)(char *__restrict buf,
-                               __STDC_INT_AS_SIZE_T bufsize,
-                               FILE *__restrict stream) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_fgets_unlocked)(char *__restrict buf,
+                                         __STDC_INT_AS_SIZE_T bufsize,
+                                         FILE *__restrict stream) {
 	size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
@@ -1774,8 +1774,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED ATTR_INOUT(3) A
 /* >> fputs_unlocked(3)
  * Same as `fputs()', but performs I/O without acquiring a lock to `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") ATTR_IN(1) ATTR_INOUT(2) __STDC_INT_AS_SIZE_T
-(LIBCCALL libc_fputs_unlocked)(char const *__restrict string,
-                               FILE *__restrict stream) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_fputs_unlocked)(char const *__restrict string,
+                                         FILE *__restrict stream) {
 	__STDC_INT_AS_SIZE_T result;
 	result = libc_fwrite_unlocked(string,
 	                         sizeof(char),
@@ -1905,15 +1905,15 @@ NOTHROW_NCX(VLIBCCALL libc_asprintf)(char **__restrict pstr,
 	return result;
 }
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.getc") ATTR_INOUT(1) int
-(LIBCCALL libc_getw_unlocked)(FILE *__restrict stream) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_getw_unlocked)(FILE *__restrict stream) {
 	u16 result;
 	return libc_fread_unlocked(&result, sizeof(result), 1, stream)
 	       ? (int)(unsigned int)result
 	       : (int)EOF;
 }
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") ATTR_INOUT(2) int
-(LIBCCALL libc_putw_unlocked)(int w,
-                              FILE *__restrict stream) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_putw_unlocked)(int w,
+                                        FILE *__restrict stream) {
 	u16 c = (u16)w;
 	return libc_fwrite_unlocked(&c, sizeof(c), 1, stream)
 	       ? w
@@ -1922,10 +1922,10 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") ATTR_INOUT(2) int
 #include <hybrid/__assert.h>
 /* >> getdelim(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INOUT(4) ssize_t
-(LIBCCALL libc_getdelim_unlocked)(char **__restrict lineptr,
-                                  size_t *__restrict pcount,
-                                  int delimiter,
-                                  FILE *__restrict stream) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_getdelim_unlocked)(char **__restrict lineptr,
+                                            size_t *__restrict pcount,
+                                            int delimiter,
+                                            FILE *__restrict stream) {
 	int ch;
 	char *buffer;
 	size_t bufsize, result = 0;
@@ -1971,14 +1971,14 @@ err:
 	return -1;
 }
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INOUT(3) ssize_t
-(LIBCCALL libc_getline_unlocked)(char **__restrict lineptr,
-                                 size_t *__restrict pcount,
-                                 FILE *__restrict stream) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_getline_unlocked)(char **__restrict lineptr,
+                                           size_t *__restrict pcount,
+                                           FILE *__restrict stream) {
 	return libc_getdelim_unlocked(lineptr, pcount, '\n', stream);
 }
 #include <libc/template/stdstreams.h>
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") ATTR_IN(1) __STDC_INT_AS_SSIZE_T
-(LIBCCALL libc_puts_unlocked)(char const *__restrict string) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_puts_unlocked)(char const *__restrict string) {
 	__STDC_INT_AS_SSIZE_T result, temp;
 	result = libc_fputs_unlocked(string, stdout);
 	if (result >= 0) {
@@ -1993,18 +1993,18 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") ATTR_IN(1) __STDC_INT
 }
 /* >> fprintf_unlocked(3), vfprintf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T
-(LIBCCALL libc_vfprintf_unlocked)(FILE *__restrict stream,
-                                  char const *__restrict format,
-                                  va_list args) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_vfprintf_unlocked)(FILE *__restrict stream,
+                                            char const *__restrict format,
+                                            va_list args) {
 	return (__STDC_INT_AS_SSIZE_T)libc_format_vprintf(&libc_file_printer_unlocked, stream, format, args);
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fprintf_unlocked(3), vfprintf_unlocked(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.unlocked.write.printf") ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T
-(VLIBDCALL libd_fprintf_unlocked)(FILE *__restrict stream,
-                                  char const *__restrict format,
-                                  ...) THROWS(...) {
+NOTHROW_CB(VLIBDCALL libd_fprintf_unlocked)(FILE *__restrict stream,
+                                            char const *__restrict format,
+                                            ...) {
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -2016,9 +2016,9 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.unlocked.write.printf
 #ifndef __KERNEL__
 /* >> fprintf_unlocked(3), vfprintf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T
-(VLIBCCALL libc_fprintf_unlocked)(FILE *__restrict stream,
-                                  char const *__restrict format,
-                                  ...) THROWS(...) {
+NOTHROW_CB(VLIBCCALL libc_fprintf_unlocked)(FILE *__restrict stream,
+                                            char const *__restrict format,
+                                            ...) {
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -2029,16 +2029,16 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_IN(2) ATTR_INOU
 #include <libc/template/stdstreams.h>
 /* >> printf_unlocked(3), vprintf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T
-(LIBCCALL libc_vprintf_unlocked)(char const *__restrict format,
-                                 va_list args) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_vprintf_unlocked)(char const *__restrict format,
+                                           va_list args) {
 	return libc_vfprintf_unlocked(stdout, format, args);
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> printf_unlocked(3), vprintf_unlocked(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.unlocked.write.printf") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T
-(VLIBDCALL libd_printf_unlocked)(char const *__restrict format,
-                                 ...) THROWS(...) {
+NOTHROW_CB(VLIBDCALL libd_printf_unlocked)(char const *__restrict format,
+                                           ...) {
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -2050,8 +2050,8 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.unlocked.write.printf
 #ifndef __KERNEL__
 /* >> printf_unlocked(3), vprintf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T
-(VLIBCCALL libc_printf_unlocked)(char const *__restrict format,
-                                 ...) THROWS(...) {
+NOTHROW_CB(VLIBCCALL libc_printf_unlocked)(char const *__restrict format,
+                                           ...) {
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -2073,9 +2073,9 @@ __LOCAL_LIBC(vfscanf_ungetc_unlocked) ssize_t
 __NAMESPACE_LOCAL_END
 /* >> fscanf_unlocked(3), vfscanf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SIZE_T
-(LIBCCALL libc_vfscanf_unlocked)(FILE *__restrict stream,
-                                 char const *__restrict format,
-                                 va_list args) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_vfscanf_unlocked)(FILE *__restrict stream,
+                                           char const *__restrict format,
+                                           va_list args) {
 #if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_SIZE_T__ == __SIZEOF_INT__
 	return libc_format_vscanf((pformatgetc)(void *)&libc_fgetc_unlocked,
 	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc_unlocked,
@@ -2091,17 +2091,17 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_IN(2) ATT
 #include <libc/template/stdstreams.h>
 /* >> scanf_unlocked(3), vscanf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SIZE_T
-(LIBCCALL libc_vscanf_unlocked)(char const *__restrict format,
-                                va_list args) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_vscanf_unlocked)(char const *__restrict format,
+                                          va_list args) {
 	return libc_vfscanf_unlocked(stdin, format, args);
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fscanf_unlocked(3), vfscanf_unlocked(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.unlocked.read.scanf") WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T
-(VLIBDCALL libd_fscanf_unlocked)(FILE *__restrict stream,
-                                 char const *__restrict format,
-                                 ...) THROWS(...) {
+NOTHROW_CB(VLIBDCALL libd_fscanf_unlocked)(FILE *__restrict stream,
+                                           char const *__restrict format,
+                                           ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -2113,9 +2113,9 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.unlocked.read.scanf")
 #ifndef __KERNEL__
 /* >> fscanf_unlocked(3), vfscanf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T
-(VLIBCCALL libc_fscanf_unlocked)(FILE *__restrict stream,
-                                 char const *__restrict format,
-                                 ...) THROWS(...) {
+NOTHROW_CB(VLIBCCALL libc_fscanf_unlocked)(FILE *__restrict stream,
+                                           char const *__restrict format,
+                                           ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -2127,8 +2127,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_IN(2) ATT
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> scanf_unlocked(3), vscanf_unlocked(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.unlocked.read.scanf") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T
-(VLIBDCALL libd_scanf_unlocked)(char const *__restrict format,
-                                ...) THROWS(...) {
+NOTHROW_CB(VLIBDCALL libd_scanf_unlocked)(char const *__restrict format,
+                                          ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -2140,8 +2140,8 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.unlocked.read.scanf")
 #ifndef __KERNEL__
 /* >> scanf_unlocked(3), vscanf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T
-(VLIBCCALL libc_scanf_unlocked)(char const *__restrict format,
-                                ...) THROWS(...) {
+NOTHROW_CB(VLIBCCALL libc_scanf_unlocked)(char const *__restrict format,
+                                          ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -3020,11 +3020,11 @@ NOTHROW_RPC(LIBCCALL libc_gets_s)(char *__restrict buf,
 	return libc_fgets(buf, (__STDC_INT_AS_SIZE_T)(unsigned int)bufsize, stdin);
 }
 INTERN ATTR_SECTION(".text.crt.dos.FILE.unlocked.read.read") WUNUSED ATTR_INOUT(5) ATTR_IN_OPT(1) size_t
-(LIBCCALL libc__fread_nolock_s)(void *__restrict buf,
-                                size_t bufsize,
-                                size_t elemsize,
-                                size_t elemcount,
-                                FILE *__restrict stream) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc__fread_nolock_s)(void *__restrict buf,
+                                          size_t bufsize,
+                                          size_t elemsize,
+                                          size_t elemcount,
+                                          FILE *__restrict stream) {
 	bufsize = elemsize ? bufsize / elemsize : 0;
 	return libc_fread_unlocked(buf, elemsize,
 	                      bufsize < elemcount
@@ -4230,9 +4230,9 @@ NOTHROW_NCX(VLIBCCALL libc_sscanf_s)(char const *buf,
  * Print  data  to  `stream',  following  `format'
  * Return the number of successfully printed bytes */
 INTERN ATTR_SECTION(".text.crt.compat.linux") ATTR_IN(1) ATTR_INOUT(3) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T
-(LIBCCALL libc__doprnt)(char const *__restrict format,
-                        va_list args,
-                        FILE *__restrict stream) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc__doprnt)(char const *__restrict format,
+                                  va_list args,
+                                  FILE *__restrict stream) {
 	return libc_vfprintf(stream, format, args);
 }
 #endif /* !__KERNEL__ */

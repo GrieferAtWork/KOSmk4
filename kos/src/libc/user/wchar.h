@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x963f0c4c */
+/* HASH CRC-32:0x5d26248d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,13 +32,13 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* >> fgetwc(3), getwc(3), fgetwc_unlocked(3), getwc_unlocked(3) */
-INTDEF ATTR_INOUT(1) wint16_t (LIBDCALL libd_fgetwc)(FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_INOUT(1) wint16_t NOTHROW_CB(LIBDCALL libd_fgetwc)(FILE *__restrict stream);
 /* >> fgetwc(3), getwc(3), fgetwc_unlocked(3), getwc_unlocked(3) */
-INTDEF ATTR_INOUT(1) wint32_t (LIBKCALL libc_fgetwc)(FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_INOUT(1) wint32_t NOTHROW_CB(LIBKCALL libc_fgetwc)(FILE *__restrict stream);
 /* >> fputwc(3), putwc(3), fputwc_unlocked(3), putwc_unlocked(3) */
-INTDEF ATTR_INOUT(2) wint16_t (LIBDCALL libd_fputwc)(char16_t wc, FILE *stream) THROWS(...);
+INTDEF ATTR_INOUT(2) wint16_t NOTHROW_CB(LIBDCALL libd_fputwc)(char16_t wc, FILE *stream);
 /* >> fputwc(3), putwc(3), fputwc_unlocked(3), putwc_unlocked(3) */
-INTDEF ATTR_INOUT(2) wint32_t (LIBKCALL libc_fputwc)(char32_t wc, FILE *stream) THROWS(...);
+INTDEF ATTR_INOUT(2) wint32_t NOTHROW_CB(LIBKCALL libc_fputwc)(char32_t wc, FILE *stream);
 /* >> ungetwc(3), ungetwc_unlocked(3) */
 INTDEF ATTR_INOUT(2) wint16_t NOTHROW_NCX(LIBDCALL libd_ungetwc)(wint16_t wc, FILE *stream);
 /* >> ungetwc(3), ungetwc_unlocked(3) */
@@ -48,25 +48,25 @@ INTDEF FILE *NOTHROW_NCX(LIBDCALL libd_open_wmemstream)(char16_t **bufloc, size_
 /* >> open_wmemstream(3) */
 INTDEF FILE *NOTHROW_NCX(LIBKCALL libc_open_wmemstream)(char32_t **bufloc, size_t *sizeloc);
 /* >> fgetwc(3), getwc(3), fgetwc_unlocked(3), getwc_unlocked(3) */
-INTDEF ATTR_INOUT(1) wint16_t (LIBDCALL libd_fgetwc_unlocked)(FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_INOUT(1) wint16_t NOTHROW_CB(LIBDCALL libd_fgetwc_unlocked)(FILE *__restrict stream);
 /* >> fgetwc(3), getwc(3), fgetwc_unlocked(3), getwc_unlocked(3) */
-INTDEF ATTR_INOUT(1) wint32_t (LIBKCALL libc_fgetwc_unlocked)(FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_INOUT(1) wint32_t NOTHROW_CB(LIBKCALL libc_fgetwc_unlocked)(FILE *__restrict stream);
 /* >> fputwc(3), putwc(3), fputwc_unlocked(3), putwc_unlocked(3) */
-INTDEF ATTR_INOUT(2) wint16_t (LIBDCALL libd_fputwc_unlocked)(char16_t wc, FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_INOUT(2) wint16_t NOTHROW_CB(LIBDCALL libd_fputwc_unlocked)(char16_t wc, FILE *__restrict stream);
 /* >> fputwc(3), putwc(3), fputwc_unlocked(3), putwc_unlocked(3) */
-INTDEF ATTR_INOUT(2) wint32_t (LIBKCALL libc_fputwc_unlocked)(char32_t wc, FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_INOUT(2) wint32_t NOTHROW_CB(LIBKCALL libc_fputwc_unlocked)(char32_t wc, FILE *__restrict stream);
 /* >> file_wprinter(3), file_wprinter_unlocked(3)
  * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
-INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t (LIBDCALL libd_file_wprinter)(void *arg, char16_t const *__restrict data, size_t datalen) THROWS(...);
+INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t NOTHROW_CB(LIBDCALL libd_file_wprinter)(void *arg, char16_t const *__restrict data, size_t datalen);
 /* >> file_wprinter(3), file_wprinter_unlocked(3)
  * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
-INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t (LIBKCALL libc_file_wprinter)(void *arg, char32_t const *__restrict data, size_t datalen) THROWS(...);
+INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t NOTHROW_CB(LIBKCALL libc_file_wprinter)(void *arg, char32_t const *__restrict data, size_t datalen);
 /* >> file_wprinter(3), file_wprinter_unlocked(3)
  * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
-INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t (LIBDCALL libd_file_wprinter_unlocked)(void *arg, char16_t const *__restrict data, size_t datalen) THROWS(...);
+INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t NOTHROW_CB(LIBDCALL libd_file_wprinter_unlocked)(void *arg, char16_t const *__restrict data, size_t datalen);
 /* >> file_wprinter(3), file_wprinter_unlocked(3)
  * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
-INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t (LIBKCALL libc_file_wprinter_unlocked)(void *arg, char32_t const *__restrict data, size_t datalen) THROWS(...);
+INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t NOTHROW_CB(LIBKCALL libc_file_wprinter_unlocked)(void *arg, char32_t const *__restrict data, size_t datalen);
 /* >> ungetwc(3), ungetwc_unlocked(3) */
 INTDEF ATTR_INOUT(2) wint16_t NOTHROW_NCX(LIBDCALL libd_ungetwc_unlocked)(wint16_t ch, FILE *__restrict stream);
 /* >> ungetwc(3), ungetwc_unlocked(3) */

@@ -353,7 +353,7 @@ int thrd_sleep64([[in]] struct timespec64 const *time_point,
 
 @@>> thrd_exit(3)
 @@Terminate the calling thread (s.a. `pthread_exit(3)')
-[[noreturn, throws, requires_function(pthread_exit)]]
+[[noreturn, no_nothrow, requires_function(pthread_exit)]]
 void thrd_exit(int res) {
 	pthread_exit((void *)(uintptr_t)(unsigned int)res);
 }
@@ -541,7 +541,7 @@ void mtx_destroy([[inout]] mtx_t *__restrict mutex) = pthread_mutex_destroy;
 
 @@>> call_once(3)
 @@Invoke `func', but make sure this only happens once (s.a. `pthread_once()')
-[[decl_include("<bits/crt/threads.h>"), throws]]
+[[decl_include("<bits/crt/threads.h>"), nothrow_cb]]
 void call_once([[inout]] once_flag *__restrict flag,
                [[nonnull]] void (LIBCCALL *func)(void)) = pthread_once;
 

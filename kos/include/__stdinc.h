@@ -183,6 +183,19 @@
 #endif /* !__NON_CALL_EXCEPTIONS */
 #endif /* !__NOTHROW_NCX */
 
+/* For  functions that throw no exceptions, except
+ * those which may be thrown by a passed callback. */
+#ifndef __NOTHROW_CB
+#define __NOTHROW_CB /* nothing */
+#endif /* !__NOTHROW_CB */
+
+/* Combination of __NOTHROW_NCX and __NOTHROW_CB:
+ * exceptions thrown are those of a callback, as well as NCX */
+#ifndef __NOTHROW_CB_NCX
+#define __NOTHROW_CB_NCX /* nothing */
+#endif /* !__NOTHROW_CB_NCX */
+
+
 
 
 /* RPC-nothrow exceptions definition (used for functions that may only  throw
@@ -239,9 +252,10 @@
  * >> typedef void NOTHROW_T(KCALL TFUN)(void);
  * >> void NOTHROW_T(KCALL *funptr)(void);
  * >> void NOTHROW(KCALL fun)(void); */
-#if (defined(__cplusplus) && \
-     ((defined(__GNUC__) && __GNUC__ >= 12))) /* TODO: Other compilers? */
+#if (defined(__CHECKER__) || (defined(__cplusplus) && ((defined(__GNUC__) && __GNUC__ >= 12)))) /* TODO: Other compilers? */
 #define __NOTHROW_T           __NOTHROW
+#define __NOTHROW_CB_T        __NOTHROW_CB
+#define __NOTHROW_CB_NCX_T    __NOTHROW_CB_NCX
 #define __NOTHROW_NCX_T       __NOTHROW_NCX
 #define __NOTHROW_RPC_T       __NOTHROW_RPC
 #define __NOTHROW_RPC_KOS_T   __NOTHROW_RPC_KOS
@@ -249,6 +263,8 @@
 #define __NOTHROW_RPC_PURE_T  __NOTHROW_RPC_PURE
 #else /* __cplusplus */
 #define __NOTHROW_T           /* nothing */
+#define __NOTHROW_CB_T        /* nothing */
+#define __NOTHROW_CB_NCX_T    /* nothing */
 #define __NOTHROW_NCX_T       /* nothing */
 #define __NOTHROW_RPC_T       /* nothing */
 #define __NOTHROW_RPC_KOS_T   /* nothing */
@@ -952,6 +968,7 @@
 #if !defined(__SIZE_TYPE__) || !defined(__UINTPTR_TYPE__)
 #include "hybrid/typecore.h"
 #endif /* !__SIZE_TYPE__ || !__UINTPTR_TYPE__ */
+#ifndef __COMPILER_OFFSETAFTER
 #if __has_builtin(__builtin_offsetof) || defined(__GNUC__)
 /* Needed,  because some compilers (like GCC) will otherwise
  * claim that `offsetafter()' is a "non-constant" expression
@@ -962,7 +979,10 @@
 #else /* __has_builtin(__builtin_offsetof) || __GNUC__ */
 #define __COMPILER_OFFSETAFTER(s, m) ((__SIZE_TYPE__)(&((s *)0)->m + 1))
 #endif /* !__has_builtin(__builtin_offsetof) && !__GNUC__ */
+#endif /* !__COMPILER_OFFSETAFTER */
+#ifndef __COMPILER_CONTAINER_OF
 #define __COMPILER_CONTAINER_OF(ptr, type, member) ((type *)((__UINTPTR_TYPE__)(ptr) - __builtin_offsetof(type, member)))
+#endif /* !__COMPILER_CONTAINER_OF */
 #endif /* !__INTELLISENSE__ */
 #endif /* __CC__ */
 

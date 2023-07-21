@@ -31,6 +31,7 @@ class CType: WeakRefAble {
 	operator != (other) { return other !is CType; }
 	operator str() -> this.tostr();
 
+	// function dumpValue(checker: Checker, value: Bytes, offset: int, indent: int = -1): string;
 	// function tostr(varname: string = ""): string;
 	// property sizeof: int;
 	property alignof: int = { get(): int -> this.sizeof; };
@@ -109,6 +110,7 @@ function cTypeRefWithCommonAttrib(self: CTypeRef, other: CTypeRef): CTypeRef {
 	return result;
 }
 
+global C_void;
 final class CTypeRef {
 	this = default;
 	@@NOTE: Might point  to a  weakref in  order to  prevent
@@ -124,6 +126,7 @@ final class CTypeRef {
 	@@ - @"require_caller_tag"    -> @string    (function caller tag requirements)
 	@@ - @"aligned"               -> @int       (alignment)
 	@@ - @"throws"                -> @{int...}  (IDs of thrown exceptions; @0 for `...`)
+	@@ - @"format" TODO: Verify KOS-extended printf-format string argument types
 	public member attrib: {string: Object} = Dict();
 
 	/* Helpers */
@@ -145,12 +148,39 @@ final class CTypeRef {
 
 	@@Check if @this @CTypeRef is identical to @other in such
 	@@a way  that  no  re-declaration error  show  be  thrown
-	function equalsForRedeclaration(other: CTypeRef): bool {
-		return typ == other.typ;
+	function redeclarationEquals(other: CTypeRef): bool {
+		return IDENTICAL(typ, other.typ);
+	}
+
+	@@Import extra annotations/attributes during a second re-declaration
+	@@```c
+	@@extern int *x;
+	@@extern __attribute__((noderef)) int *x; // Extra attributes are imported here!
+	@@```
+	function redeclarationImport(checker: Checker, other: CTypeRef) {
+		/* TODO: Warnings for attributes that weren't present during the initial declaration. */
+		flags |= other.flags;
+		attrib.update(other.attrib);
+		typ = other.typ;
+	}
+
+	@@Import specifications from a fixed @typedef into @this
+	@@This merges attributes/flags in:
+	@@```c
+	@@typedef int FOO;
+	@@const FOO x = 42; // "FOO" is inherited/merged-into "const"
+	@@```
+	function importTypedef(typedef: CTypeRef) {
+		flags |= typedef.flags;
+		attrib.update(typedef.attrib);
+		typ = typedef.typ;
 	}
 
 	function isConvertibleTo(other: CTypeRef, explicit: bool = false): bool {
-		return typ.isConvertibleTo(other.typ, explicit);
+		local otherTyp: CType = other.typ;
+		if (otherTyp === C_void)
+			return true; /* Always able to convert anything to void */
+		return typ.isConvertibleTo(otherTyp, explicit);
 	}
 
 	function isConvertibleToWithFlags(other: CTypeRef, explicit: bool = false): bool {
@@ -158,10 +188,10 @@ final class CTypeRef {
 			/* Not allowed to cast away const/volatile */
 			local myCV = flags & CTYPEREF_FLAG_CV;
 			local otCV = other.flags & CTYPEREF_FLAG_CV;
-			if ((myCV & otCV) != otCV)
+			if ((myCV & otCV) != myCV)
 				return false;
 		}
-		return typ.isConvertibleTo(other.typ, explicit);
+		return isConvertibleTo(other, explicit);
 	}
 
 	function tostr(varname: string = ""): string {
@@ -178,7 +208,7 @@ final class CTypeRef {
 			case "throws":
 				attrVal = ",".join(
 					for (local key: attrVal.sorted())
-						key ? key.hex() : "..."
+						{ -1 : "*", 0 : "..." }.get(key, key.hex())
 				);
 				break;
 			case "tag":
@@ -207,12 +237,6 @@ final class CTypeRef {
 		}
 		return true;
 	}
-
-	function importFrom(other: CTypeRef) {
-		flags |= other.flags;
-		attrib.update(other.attrib);
-		typ = other.typ;
-	}
 }
 
 global C_NUMERIC;
@@ -221,6 +245,10 @@ class CCoreType: CType {
 	public member name: string;
 	public member sizeof: int;
 	public member alignof: int;
+	public operator hash(): int -> Object.id(this);
+	public operator == (other: CCoreType): bool -> this === other;
+	public operator != (other: CCoreType): bool -> this !== other;
+
 	function tostr(varname: string = ""): string {
 		return varname ? f"{name} {varname}" : name;
 	}
@@ -230,6 +258,11 @@ class CCoreType: CType {
 }
 
 global CPointerType;
+global C_INT;
+global C_LONG;
+global C_LLONG;
+global C_UNSIGNED;
+
 final class CCoreIntType: CCoreType {
 	public member signed: bool;
 	public member mask: int;
@@ -244,9 +277,19 @@ final class CCoreIntType: CCoreType {
 			f"sizeof: {repr this.sizeof}, "
 			f"alignof: {repr this.alignof}, "
 			f"signed: {repr signed})";
-	function isConvertibleTo(other: CType, explicit: bool = false): bool {
+	public function isConvertibleTo(other: CType, explicit: bool = false): bool {
 		return (other in C_NUMERIC) ||
 		       (other is CPointerType);
+	}
+	public function dumpValue(checker: Checker, value: Bytes, offset: int, indent: int = -1): string {
+		local intVal: int = peek(checker, value, offset);
+		local suffix: string = "";
+		if (this in C_LLONG) {
+			suffix = this in C_UNSIGNED ? "ull" : "ll";
+		} else if (this in C_LONG) {
+			suffix = this in C_UNSIGNED ? "ul" : "l";
+		}
+		return f"{intVal}{suffix}";
 	}
 	public function peek(checker: Checker, data: Bytes, offset: int): int {
 		return int.frombytes(data[offset:offset + this.sizeof], checker.TARGET_ENDIAN, signed);
@@ -261,6 +304,9 @@ final class CCoreIntType: CCoreType {
 
 final class CCoreBoolType: CCoreType {
 	this = super;
+	public function dumpValue(checker: Checker, value: Bytes, offset: int, indent: int = -1): string {
+		return str !!peek(checker, value, offset);
+	}
 	public function peek(checker: Checker, data: Bytes, offset: int): int {
 		return int.frombytes(data[offset:offset + this.sizeof]) ? 1 : 0;
 	}
@@ -279,6 +325,9 @@ class CCoreNullptrType: CCoreType {
 		       (other is CCoreNullptrType) ||
 		       (explicit && (other in C_NUMERIC));
 	}
+	public function dumpValue(checker: Checker, value: Bytes, offset: int, indent: int = -1): string {
+		return "nullptr";
+	}
 	public function peek(checker: Checker, data: Bytes, offset: int): int {
 		return 0;
 	}
@@ -292,6 +341,9 @@ class CCoreNullptrType: CCoreType {
 
 class CCoreVoidType: CCoreType {
 	this(): super("void", 0, 1) {}
+	public function dumpValue(checker: Checker, value: Bytes, offset: int, indent: int = -1): string {
+		return "(void)0";
+	}
 	function isConvertibleTo(other: CType, explicit: bool = false): bool {
 		return other is CCoreVoidType;
 	}
@@ -464,6 +516,13 @@ class CPointerType: CType {
 	function tostr(varname: string = ""): string {
 		return base.tostr("*" + varname);
 	}
+	public function dumpValue(checker: Checker, value: Bytes, offset: int, indent: int = -1): string {
+		local intVal: int = this.peek(checker, value, offset);
+		return intVal ? f"({this}){intVal.hex()}ul" : "0";
+	}
+	public operator hash(): int -> hash(type(this), base);
+	public operator == (other: CPointerType): bool -> type(this) === type(other) && base == other.base;
+	public operator != (other: CPointerType): bool -> type(this) !== type(other) || base != other.base;
 	function isConvertibleTo(other: CType, explicit: bool = false): bool {
 		if (other !is CPointerType)
 			return false;
@@ -508,11 +567,53 @@ final class CStructType: CType {
 	public member fields: {string: (CTypeRef, int)} = Dict();
 	public member fieldsByDeclarationOrder: {(CTypeRef, string)...} = [];
 
-	operator hash(): int -> Object.id(this);
-	operator == (other: CStructType) -> this === other;
-	operator != (other: CStructType) -> this !== other;
+	public operator hash(): int -> Object.id(this);
+	public operator == (other: CStructType) -> this === other;
+	public operator != (other: CStructType) -> this !== other;
 
-	function isConvertibleTo(other: CType, explicit: bool = false): bool {
+	public function dumpValue(checker: Checker, value: Bytes, offset: int, indent: int = -1): string {
+		local writer = File.Writer();
+		writer << "{";
+		local prefix: string = "";
+		local nextIndent: int = indent;
+		if (indent >= 0) {
+			writer << "\n";
+			prefix = "\t" * indent;
+			++nextIndent;
+		}
+		local isFirst = true;
+		if (base !is none) {
+			writer << prefix << "[" << base << "]: ";
+			base.dumpValue(checker, value, offset, nextIndent);
+			isFirst = false;
+		}
+		for (local fieldType, fieldName: fieldsByDeclarationOrder) {
+			if (!isFirst) {
+				writer << ",";
+				if (indent >= 0)
+					writer << "\n";
+			}
+			isFirst = false;
+			writer << prefix;
+			local fieldOffset: int;
+			if (fieldName) {
+				fieldOffset = fields[fieldName].last;
+				writer << fieldName << ": ";
+			} else {
+				fieldOffset = 0;
+				local innerStruct = fieldType.typ;
+				if (innerStruct is CStructType) {
+					local firstFieldName: string = innerStruct.fieldsByDeclarationOrder.first.last;
+					fieldOffset = innerStruct.fields[firstFieldName].last;
+				}
+			}
+			writer << fieldType.dumpValue(checker, value, offset + fieldOffset, nextIndent);
+		}
+		writer << "}";
+		return writer.string;
+	}
+
+	public function isConvertibleTo(other: CType, explicit: bool = false): bool {
 		local iter: CStructType | none = this;
 		do {
 			if (other === iter)
@@ -522,7 +623,7 @@ final class CStructType: CType {
 		return false;
 	}
 
-	property structRepr: string = {
+	public property structRepr: string = {
 		get(): string {
 			if (name)
 				return f"struct {name}";
@@ -535,11 +636,11 @@ final class CStructType: CType {
 		}
 	}
 
-	function tostr(varname: string = ""): string {
+	public function tostr(varname: string = ""): string {
 		return varname ? f"{structRepr} {varname}" : structRepr;
 	}
 
-	function getField(name: string): (CTypeRef, int) | none {
+	public function getField(name: string): (CTypeRef, int) | none {
 		local result = fields.get(name);
 		if (result is none && base !is none)
 			result = base.getField(name);
@@ -559,7 +660,7 @@ final class CStructType: CType {
 		}
 	}
 
-	function fieldByOffset(offset: int): (string, int) | none {
+	public function fieldByOffset(offset: int): (string, int) | none {
 		local result: (string, int) | none = none;
 		for (local fieldName, none, fieldOffset: foreachField) {
 			if (fieldOffset <= offset) {
@@ -589,7 +690,7 @@ final class CStructType: CType {
 		}
 	}
 
-	public member _alignof: int;
+	public member _alignof: int; /* Must be public! */
 	public property alignof: int = {
 		get() {
 			if (_alignof !is bound) {
@@ -612,6 +713,9 @@ final class CEnumType: CType {
 	public member base: CType = C_int;
 	public property sizeof: int = { get(): int -> base.sizeof; };
 	public property alignof: int = { get(): int -> base.alignof; };
+	public operator hash(): int -> Object.id(this);
+	public operator == (other: CStructType) -> this === other;
+	public operator != (other: CStructType) -> this !== other;
 	function isConvertibleTo(other: CType, explicit: bool = false): bool {
 		if (explicit)
 			return base.iisConvertibleTo(other, explicit);
@@ -632,6 +736,18 @@ final class CFunctionType: CType {
 	public property sizeof: int = { get(): int -> 0; };
 	public property alignof: int = { get(): int -> 1; };
 
+	public operator hash(): int -> hash(returnType, isVarArgs, args.each.first);
+	public operator == (other: CFunctionType) ->
+		other is CFunctionType &&
+		IDENTICAL(returnType, other.returnType) &&
+		isVarArgs == other.isVarArgs &&
+		(args.each.first as Sequence) == other.args.each.first;
+	public operator != (other: CFunctionType) ->
+		other !is CFunctionType ||
+		!IDENTICAL(returnType, other.returnType) ||
+		isVarArgs != other.isVarArgs ||
+		(args.each.first as Sequence) != other.args.each.first;
+
 	function isConvertibleTo(other: CType, explicit: bool = false): bool {
 		if (other !is CFunctionType)
 			return false;
@@ -642,10 +758,10 @@ final class CFunctionType: CType {
 		if (#args != #other.args)
 			return false;
 		for (local myArg, otArg: util.zip(args, other.args)) {
-			if (!myArg.first.typ.isConvertibleTo(otArg.first.typ))
+			if (!myArg.first.isConvertibleTo(otArg.first))
 				return false;
 		}
-		return returnType.isConvertibleTo(other);
+		return returnType.isConvertibleTo(other.returnType);
 	}
 
 	function tostr(varname: string = ""): string {
@@ -661,7 +777,12 @@ final class CFunctionType: CType {
 		return returnType.tostr(varname);
 	}
 
-	function acceptsArgumentTypes(types: {CType...}, exactly: bool = false): bool {
+#define ACCEPTS_CONFORMANCE_LEVEL_CONVERTIBLE      0 /* isConvertibleTo */
+#define ACCEPTS_CONFORMANCE_LEVEL_CONVERTIBLE_STDC 1 /* isConvertibleTo (but `char **' is not convertible to `char const **') */
+#define ACCEPTS_CONFORMANCE_LEVEL_EXACT            2 /* Do types match exactly? */
+#define ACCEPTS_CONFORMANCE_LEVEL_COUNT            3
+	function acceptsArgumentTypes(types: {CType...},
+	                              conformanceLevel: int = ACCEPTS_CONFORMANCE_LEVEL_CONVERTIBLE): bool {
 		local myTypes = args;
 		if (#types != #myTypes) {
 			if (#types > #myTypes) {
@@ -678,16 +799,33 @@ final class CFunctionType: CType {
 		assert #types == #myTypes;
 		/*print("acceptsArgumentTypes([", ", ".join(
 			for (local typ, nam: myTypes) typ.tostr(nam)
-		), "], [", ", ".join(types), "])");*/
+		), "], [", ", ".join(types), "]) [conformanceLevel: ", conformanceLevel, "]");*/
 		myTypes = myTypes.each.first.typ; /* {CType...} */
 		for (local myTyp, rqTyp: util.zip(myTypes, types)) {
-			if (exactly) {
-				if (IDENTICAL(myTyp, rqTyp))
-					continue;
-				return false;
-			} else {
+			switch (conformanceLevel) {
+			case ACCEPTS_CONFORMANCE_LEVEL_EXACT:
+				if (!IDENTICAL(myTyp, rqTyp))
+					return false;
+				break;
+			case ACCEPTS_CONFORMANCE_LEVEL_CONVERTIBLE_STDC: {
+				if (rqTyp is CPointerType && myTyp is CPointerType) {
+					local rqTypBase: CType = rqTyp.base.typ;
+					local myTypBase: CType = myTyp.base.typ;
+					if (!IDENTICAL(rqTypBase, myTypBase))
+						return false;
+					local rqTypCV = rqTyp.base.flags & CTYPEREF_FLAG_CV;
+					local myTypCV = myTyp.base.flags & CTYPEREF_FLAG_CV;
+					if ((rqTypCV & myTypCV) != rqTypCV)
+						return false;
+				} else {
+					if (!rqTyp.isConvertibleTo(myTyp))
+						return false;
+				}
+			}	break;
+			default:
 				if (!rqTyp.isConvertibleTo(myTyp))
 					return false;
+				break;
 			}
 		}
 		return true;
@@ -707,6 +845,18 @@ final class CArrayType: CType {
 			varname = f"({varname})";
 		return base.tostr(f"{varname}[{dim is none ? "" : dim}]");
 	}
+
+	public operator hash(): int -> hash(base, dim, stride);
+	public operator == (other: CArrayType) ->
+		other is CArrayType ||
+		IDENTICAL(base, other.base) &&
+		IDENTICAL(dim, other.dim) &&
+		stride == other.stride;
+	public operator != (other: CFunctionType) ->
+		other !is CArrayType ||
+		!IDENTICAL(base, other.base) ||
+		!IDENTICAL(dim, other.dim) ||
+		stride != other.stride;
 
 	function indexByOffset(offset: int): (int, int) | none {
 		local stride = base.alignof;
@@ -754,12 +904,12 @@ final class COverloadedFunctionSymbol: CSymbol {
 	public member overloads: {CSymbol | CSymbolTemplate...} = [];
 
 	@@Get or create an overload for the given @typeref c-function-type
-	function getOrCreateOverload(typeref: CTypeRef): CSymbol {
+	function getOrCreateOverload(checker: Checker, typeref: CTypeRef): CSymbol {
 		for (local overload: overloads) {
 			if (overload is CSymbolTemplate)
 				continue;
-			if (overload.typeref.equalsForRedeclaration(typeref)) {
-				overload.typeref.importFrom(typeref);
+			if (overload.typeref.redeclarationEquals(typeref)) {
+				overload.typeref.redeclarationImport(checker, typeref);
 				return overload;
 			}
 		}
@@ -780,7 +930,7 @@ final class COverloadedFunctionSymbol: CSymbol {
 		return result;
 	}
 
-	function getOverloadForTypes(argTypes: {CType...}): {CSymbol...} {
+	function getOverloadsForTypes(checker: Checker, argTypes: {CType...}): {CSymbol...} {
 		local result: {CSymbol...} = [];
 		for (local overload: overloads) {
 			if (overload is CSymbolTemplate) {
@@ -792,14 +942,21 @@ final class COverloadedFunctionSymbol: CSymbol {
 			}
 		}
 		if (#result > 1) {
-			local newResult: {CSymbol...} = [];
-			for (local overload: newResult) {
-				local symType: CType = overload.typeref.typ;
-				if (symType is CFunctionType && symType.acceptsArgumentTypes(argTypes, exactly: true))
-					newResult.append(overload);
+			for (local level: [1:ACCEPTS_CONFORMANCE_LEVEL_COUNT]) {
+				local newResult: {CSymbol...} = [];
+				for (local overload: result) {
+					local symType: CType = overload.typeref.typ;
+					if (symType.acceptsArgumentTypes(argTypes, level))
+						newResult.append(overload);
+				}
+				if (newResult) {
+					result = newResult;
+					if (#result == 1)
+						break;
+				} else {
+					break;
+				}
 			}
-			if (newResult)
-				result = newResult;
 		}
 		return result;
 	}

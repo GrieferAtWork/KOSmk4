@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c3bf08a */
+/* HASH CRC-32:0xcabf8234 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCA
 #endif /* !... */
 #endif /* !__local___localdep_getpagesize_defined */
 __LOCAL_LIBC(Valloc) __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALL_PAGEALIGNED __ATTR_ALLOC_SIZE((1)) void *
-(__LIBCCALL __LIBC_LOCAL_NAME(Valloc))(__SIZE_TYPE__ __num_bytes) __THROWS(__E_BADALLOC) {
+(__LIBCCALL __LIBC_LOCAL_NAME(Valloc))(__SIZE_TYPE__ __num_bytes) __THROWS(E_BADALLOC) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_Memalign)((__NAMESPACE_LOCAL_SYM __localdep_getpagesize)(), __num_bytes);
 }
 __NAMESPACE_LOCAL_END

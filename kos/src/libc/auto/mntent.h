@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x397ed8c5 */
+/* HASH CRC-32:0x1f0f7953 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ INTDEF ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUTS(3, 4) struct mntent *NOTHROW_RPC(LIBC
  * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
  * @return: 0: Success
  * @return: 1: Error (WARNING: `errno' is left undefined) */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) int (LIBDCALL libd_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt) THROWS(...);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) int NOTHROW_CB(LIBDCALL libd_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> addmntent(3)
@@ -67,7 +67,7 @@ INTDEF ATTR_IN(2) ATTR_INOUT(1) int (LIBDCALL libd_addmntent)(FILE *__restrict s
  * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
  * @return: 0: Success
  * @return: 1: Error (WARNING: `errno' is left undefined) */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) int (LIBCCALL libc_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt) THROWS(...);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) int NOTHROW_CB(LIBCCALL libc_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> hasmntopt(3)

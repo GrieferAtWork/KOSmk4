@@ -322,7 +322,8 @@ heap_alloc_untraced(struct heap *__restrict self, size_t num_bytes, gfp_t flags)
 
 FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t KCALL
 heap_align_untraced(struct heap *__restrict self, size_t min_alignment,
-                    ptrdiff_t offset, size_t num_bytes, gfp_t flags) {
+                    ptrdiff_t offset, size_t num_bytes, gfp_t flags)
+		THROWS(E_BADALLOC) {
 	if ((__builtin_constant_p(min_alignment) && min_alignment <= HEAP_ALIGNMENT) &&
 	    (__builtin_constant_p(offset) && (offset & (min_alignment - 1)) == 0))
 		return heap_alloc_untraced(self, num_bytes, flags);

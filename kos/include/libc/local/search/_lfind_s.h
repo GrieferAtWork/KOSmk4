@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa4881dc */
+/* HASH CRC-32:0x560eb668 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,11 @@
 #ifndef __local__lfind_s_defined
 #define __local__lfind_s_defined
 #include <__crt.h>
-#include <kos/anno.h>
 #include <hybrid/typecore.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_lfind_s) __ATTR_WUNUSED __ATTR_IN(3) __ATTR_IN_OPT(1) __ATTR_IN_OPT(2) __ATTR_NONNULL((5)) void *
-(__LIBCCALL __LIBC_LOCAL_NAME(_lfind_s))(void const *__key, void const *__pbase, __SIZE_TYPE__ __KOS_FIXED_CONST *__pitem_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg) __THROWS(...) {
+__NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_lfind_s))(void const *__key, void const *__pbase, __SIZE_TYPE__ __KOS_FIXED_CONST *__pitem_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg) {
 	__SIZE_TYPE__ __i, __count = *__pitem_count;
 	void const *__result = __pbase;
 	for (__i = 0; __i < __count; ++__i) {

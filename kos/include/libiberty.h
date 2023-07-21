@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd047cbf7 */
+/* HASH CRC-32:0xfb1850b1 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -817,17 +817,17 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,xatexit,(void (__LIBCCALL *__f
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,xatexit,(void (__LIBCCALL *__func)(void)),(__func))
 #endif /* ... */
 #if __has_builtin(__builtin_exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exit)
-__CEIREDIRECT(__ATTR_NORETURN,void,__THROWING,xexit,(int __status),exit,{ __builtin_exit(__status); })
+__CEIREDIRECT(__ATTR_NORETURN,void,,xexit,(int __status),exit,{ __builtin_exit(__status); })
 #elif defined(__CRT_HAVE_exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,xexit,(int __status),exit,(__status))
+__CREDIRECT_VOID(__ATTR_NORETURN,,xexit,(int __status),exit,(__status))
 #elif defined(__CRT_HAVE_quick_exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,xexit,(int __status),quick_exit,(__status))
+__CREDIRECT_VOID(__ATTR_NORETURN,,xexit,(int __status),quick_exit,(__status))
 #elif defined(__CRT_HAVE__exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,xexit,(int __status),_exit,(__status))
+__CREDIRECT_VOID(__ATTR_NORETURN,,xexit,(int __status),_exit,(__status))
 #elif defined(__CRT_HAVE__Exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,xexit,(int __status),_Exit,(__status))
+__CREDIRECT_VOID(__ATTR_NORETURN,,xexit,(int __status),_Exit,(__status))
 #elif defined(__CRT_HAVE_xexit)
-__CDECLARE_VOID(__ATTR_NORETURN,__THROWING,xexit,(int __status),(__status))
+__CDECLARE_VOID(__ATTR_NORETURN,,xexit,(int __status),(__status))
 #endif /* ... */
 #ifdef __CRT_HAVE_basename
 /* >> basename(3)
@@ -1053,7 +1053,7 @@ __CDECLARE(__ATTR_WUNUSED,char const *,__NOTHROW_NCX,spaces,(__STDC_INT_AS_SIZE_
 __NAMESPACE_LOCAL_USING_OR_IMPL(spaces, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL spaces)(__STDC_INT_AS_SIZE_T __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spaces))(__count); })
 #endif /* ... */
 __CDECLARE_VOID_OPT(,__NOTHROW_NCX,xmalloc_set_program_name,(char const *___progname),(___progname))
-__CDECLARE_VOID_OPT(__ATTR_NORETURN,__THROWING,xmalloc_failed,(size_t __num_bytes),(__num_bytes))
+__CDECLARE_VOID_OPT(__ATTR_NORETURN,,xmalloc_failed,(size_t __num_bytes),(__num_bytes))
 #ifdef __CRT_HAVE_xmalloc
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,xmalloc,(size_t __num_bytes),(__num_bytes))
 #elif defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xcalloc) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_xmalloc_failed))

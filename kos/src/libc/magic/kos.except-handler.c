@@ -287,13 +287,13 @@ int get_exception_handler([[nullable]] unsigned int *pmode,
 %[define_replacement(except_register_state_t = __EXCEPT_REGISTER_STATE_TYPE)]
 
 @@Mode #2 / #3 exception handler (see description above)
-[[throws, ATTR_NORETURN, cc("__EXCEPT_HANDLER_CC")]]
+[[no_nothrow, ATTR_NORETURN, cc("__EXCEPT_HANDLER_CC")]]
 [[decl_include("<kos/bits/exception_data.h>")]]
 void except_handler3(except_register_state_t *__restrict state,
                      struct exception_data *__restrict error);
 
 @@Mode #4 exception handler (see description above)
-[[throws, ATTR_NORETURN, cc("__EXCEPT_HANDLER_CC")]]
+[[no_nothrow, ATTR_NORETURN, cc("__EXCEPT_HANDLER_CC")]]
 [[decl_include("<kos/bits/exception_data.h>")]]
 void except_handler4(except_register_state_t *__restrict state,
                      struct exception_data *__restrict error);

@@ -479,8 +479,8 @@ NOTHROW_NCX(FCALL cmodule_findunit_from_dip)(struct cmodule const *__restrict se
 /* Simple wrapper for a pair `REF struct cmodule *mod' + `byte_t const *dip'
  * that can be  used to  reference and store  arbitrary debug-info  objects. */
 struct cmoduledip {
-	REF struct cmodule *cd_mod; /* [1..1] CModule. */
-	byte_t const       *cd_dip; /* [1..1] DIP pointer. */
+	REF struct cmodule   *cd_mod; /* [1..1] CModule. */
+	byte_t CHECKED const *cd_dip; /* [1..1] DIP pointer. */
 };
 #define cmoduledip_fini(self)           decref((self)->cd_mod)
 #define cmoduledip_parser(self, result) cmodule_parser_from_dip((self)->cd_mod, result, (self)->cd_dip)

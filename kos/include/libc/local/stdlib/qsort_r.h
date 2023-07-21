@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f7fb038 */
+/* HASH CRC-32:0x1952cbb9 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,10 @@
 #ifndef __local_qsort_r_defined
 #define __local_qsort_r_defined
 #include <__crt.h>
-#include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(qsort_r) __ATTR_INOUT_OPT(1) __ATTR_NONNULL((4)) void
-(__LIBCCALL __LIBC_LOCAL_NAME(qsort_r))(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg) __THROWS(...) {
+__NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qsort_r))(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg) {
 	/* A public domain qsort() drop-in implementation. I couldn't find the original
 	 * source referenced (see the comment below), but this code is the first  thing
 	 * that comes up when you search for `libc qsort public domain'.

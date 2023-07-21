@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd79b5a02 */
+/* HASH CRC-32:0xd222a425 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_lsearch_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
-#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lfind_defined
 #define __local___localdep_lfind_defined
@@ -30,12 +29,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_IN_OPT(1) __ATTR_IN_OPT(2) __ATTR_NONNULL((5)),void *,__THROWING,__localdep_lfind,(void const *__key, void const *__pbase, __SIZE_TYPE__ __KOS_FIXED_CONST *__pitem_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),lfind,(__key,__pbase,__pitem_count,__item_size,__compar))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_IN_OPT(1) __ATTR_IN_OPT(2) __ATTR_NONNULL((5)),void *,__NOTHROW_CB_NCX,__localdep_lfind,(void const *__key, void const *__pbase, __SIZE_TYPE__ __KOS_FIXED_CONST *__pitem_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),lfind,(__key,__pbase,__pitem_count,__item_size,__compar))
 #elif defined(__CRT_HAVE__lfind)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_IN_OPT(1) __ATTR_IN_OPT(2) __ATTR_NONNULL((5)),void *,__THROWING,__localdep_lfind,(void const *__key, void const *__pbase, __SIZE_TYPE__ __KOS_FIXED_CONST *__pitem_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),_lfind,(__key,__pbase,__pitem_count,__item_size,__compar))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_IN_OPT(1) __ATTR_IN_OPT(2) __ATTR_NONNULL((5)),void *,__NOTHROW_CB_NCX,__localdep_lfind,(void const *__key, void const *__pbase, __SIZE_TYPE__ __KOS_FIXED_CONST *__pitem_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),_lfind,(__key,__pbase,__pitem_count,__item_size,__compar))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/search/lfind.h>
@@ -55,7 +54,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
 __LOCAL_LIBC(lsearch) __ATTR_INOUT(2) __ATTR_INOUT(3) __ATTR_IN_OPT(1) __ATTR_NONNULL((5)) void *
-(__LIBCCALL __LIBC_LOCAL_NAME(lsearch))(void const *__key, void *__pbase, __SIZE_TYPE__ *__pitem_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) {
+__NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lsearch))(void const *__key, void *__pbase, __SIZE_TYPE__ *__pitem_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) {
 	void *__result;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_lfind)(__key, __pbase, __pitem_count, __item_size, __compar);
 	if (__result == __NULLPTR) {

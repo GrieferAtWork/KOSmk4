@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9462846c */
+/* HASH CRC-32:0x57b850b8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,12 +25,11 @@
 #include <libc/template/program_invocation_name.h>
 #include <features.h>
 #if defined(__CRT_HAVE_vwarnx) || (defined(__LOCAL_stderr) && defined(__LOCAL_program_invocation_short_name) && (defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))
-#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vwarnx_defined
 #define __local___localdep_vwarnx_defined
 #ifdef __CRT_HAVE_vwarnx
-__CREDIRECT_VOID(__ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 0),__THROWING,__localdep_vwarnx,(char const *__format, __builtin_va_list __args),vwarnx,(__format,__args))
+__CREDIRECT_VOID(__ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 0),__NOTHROW_CB,__localdep_vwarnx,(char const *__format, __builtin_va_list __args),vwarnx,(__format,__args))
 #elif defined(__LOCAL_stderr) && defined(__LOCAL_program_invocation_short_name) && (defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock))
 __NAMESPACE_LOCAL_END
 #include <libc/local/err/vwarnx.h>
@@ -41,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_vwarnx_defined */
 __LOCAL_LIBC(warnx) __ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 2) void
-(__VLIBCCALL __LIBC_LOCAL_NAME(warnx))(char const *__format, ...) __THROWS(...) {
+__NOTHROW_CB(__VLIBCCALL __LIBC_LOCAL_NAME(warnx))(char const *__format, ...) {
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
 	(__NAMESPACE_LOCAL_SYM __localdep_vwarnx)(__format, __args);

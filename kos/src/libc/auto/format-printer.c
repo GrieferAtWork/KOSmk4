@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x211f803d */
+/* HASH CRC-32:0xb28fa856 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,10 +57,10 @@ DECL_BEGIN
  * The usual format-printer rules apply, and this function
  * is  allowed to  call `printer'  as often  as it chooses */
 INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1)) ssize_t
-(LIBCCALL libc_format_repeat)(pformatprinter printer,
-                              void *arg,
-                              char ch,
-                              size_t num_repetitions) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_format_repeat)(pformatprinter printer,
+                                        void *arg,
+                                        char ch,
+                                        size_t num_repetitions) {
 	ssize_t result, temp;
 #ifdef __hybrid_alloca
 	char *buffer;
@@ -119,11 +119,11 @@ err:
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_INS(3, 4) NONNULL((1)) ssize_t
-(LIBCCALL libc_format_escape)(pformatprinter printer,
-                              void *arg,
-                              char const *__restrict text,
-                              size_t textlen,
-                              unsigned int flags) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_format_escape)(pformatprinter printer,
+                                        void *arg,
+                                        char const *__restrict text,
+                                        size_t textlen,
+                                        unsigned int flags) {
 	__PRIVATE char const quote[1] = { '\"' };
 	char encoded_text[12]; size_t encoded_text_size;
 	ssize_t result = 0, temp;
@@ -386,12 +386,12 @@ err:
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_INS(3, 4) NONNULL((1)) ssize_t
-(LIBCCALL libc_format_hexdump)(pformatprinter printer,
-                               void *arg,
-                               void const *__restrict data,
-                               size_t size,
-                               size_t linesize,
-                               unsigned int flags) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_format_hexdump)(pformatprinter printer,
+                                         void *arg,
+                                         void const *__restrict data,
+                                         size_t size,
+                                         size_t linesize,
+                                         unsigned int flags) {
 	__PRIVATE char const lf[1] = { '\n' };
 	byte_t const *line_data;
 	char buffer[
@@ -598,10 +598,10 @@ err:
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_IN(3) ATTR_LIBC_PRINTF(3, 0) NONNULL((1)) ssize_t
-(LIBCCALL libc_format_vprintf)(pformatprinter printer,
-                               void *arg,
-                               char const *__restrict format,
-                               va_list args) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_format_vprintf)(pformatprinter printer,
+                                         void *arg,
+                                         char const *__restrict format,
+                                         va_list args) {
 #ifndef __INTELLISENSE__
 #define __FORMAT_PRINTER           printer
 #define __FORMAT_ARG               arg
@@ -638,10 +638,10 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_IN(3) ATTR_LIBC_PRINTF(3, 0)
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.string.format") ATTR_IN(3) ATTR_LIBC_PRINTF(3, 4) NONNULL((1)) ssize_t
-(VLIBDCALL libd_format_printf)(pformatprinter printer,
-                               void *arg,
-                               char const *__restrict format,
-                               ...) THROWS(...) {
+NOTHROW_CB(VLIBDCALL libd_format_printf)(pformatprinter printer,
+                                         void *arg,
+                                         char const *__restrict format,
+                                         ...) {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -663,10 +663,10 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.string.format") ATTR_IN(3)
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_IN(3) ATTR_LIBC_PRINTF(3, 4) NONNULL((1)) ssize_t
-(VLIBCCALL libc_format_printf)(pformatprinter printer,
-                               void *arg,
-                               char const *__restrict format,
-                               ...) THROWS(...) {
+NOTHROW_CB(VLIBCCALL libc_format_printf)(pformatprinter printer,
+                                         void *arg,
+                                         char const *__restrict format,
+                                         ...) {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -701,11 +701,11 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_IN(3) ATTR_LIBC_PRINTF(3, 4)
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_IN(4) ATTR_LIBC_SCANF(4, 0) NONNULL((1, 2)) ssize_t
-(LIBCCALL libc_format_vscanf)(pformatgetc pgetc,
-                              pformatungetc pungetc,
-                              void *arg,
-                              char const *__restrict format,
-                              va_list args) THROWS(...) {
+NOTHROW_CB(LIBCCALL libc_format_vscanf)(pformatgetc pgetc,
+                                        pformatungetc pungetc,
+                                        void *arg,
+                                        char const *__restrict format,
+                                        va_list args) {
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE      char
 #define __CHAR_SIZE      __SIZEOF_CHAR__
@@ -743,11 +743,11 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_IN(4) ATTR_LIBC_SCANF(4, 0) 
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.string.format") ATTR_IN(4) ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2)) ssize_t
-(VLIBDCALL libd_format_scanf)(pformatgetc pgetc,
-                              pformatungetc pungetc,
-                              void *arg,
-                              char const *__restrict format,
-                              ...) THROWS(...) {
+NOTHROW_CB(VLIBDCALL libd_format_scanf)(pformatgetc pgetc,
+                                        pformatungetc pungetc,
+                                        void *arg,
+                                        char const *__restrict format,
+                                        ...) {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -781,11 +781,11 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.string.format") ATTR_IN(4)
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_IN(4) ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2)) ssize_t
-(VLIBCCALL libc_format_scanf)(pformatgetc pgetc,
-                              pformatungetc pungetc,
-                              void *arg,
-                              char const *__restrict format,
-                              ...) THROWS(...) {
+NOTHROW_CB(VLIBCCALL libc_format_scanf)(pformatgetc pgetc,
+                                        pformatungetc pungetc,
+                                        void *arg,
+                                        char const *__restrict format,
+                                        ...) {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);

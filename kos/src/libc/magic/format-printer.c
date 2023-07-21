@@ -341,7 +341,7 @@ typedef __format_word_t format_word_t;
 @@Repeat  `ch'  a   number  of  `num_repetitions'   times
 @@The usual format-printer rules apply, and this function
 @@is  allowed to  call `printer'  as often  as it chooses
-[[kernel, throws, decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
+[[kernel, nothrow_cb, decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/__alloca.h>", "<libc/string.h>")]]
 $ssize_t format_repeat([[nonnull]] pformatprinter printer, void *arg,
                        char ch, $size_t num_repetitions) {
@@ -425,7 +425,7 @@ err:
 @@with the `FORMAT_ESCAPE_FFORCE*' flags
 @@@param: printer: A function called for all quoted portions of the text
 @@@param: textlen: The total number of bytes to escape, starting at `text'
-[[kernel, throws, alias("format_quote")]]
+[[kernel, nothrow_cb, alias("format_quote")]]
 [[if(!defined(__KERNEL__)), export_as("format_quote")]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<libc/template/itoa_digits.h>", "<libc/template/hex.h>")]]
@@ -724,7 +724,7 @@ err:
 @@@param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
 @@@return: >= 0: The sum of all values returned by `printer'
 @@@return: < 0:  The first negative value ever returned by `printer' (if any)
-[[kernel, throws, decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
+[[kernel, nothrow_cb, decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/__alloca.h>", "<hybrid/__unaligned.h>", "<hybrid/byteorder.h>")]]
 [[impl_include("<libc/template/itoa_digits.h>")]]
 $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
@@ -925,7 +925,7 @@ err:
 @@   a second argument is passed that indicates the absolute length in characters.
 @@@return: >= 0: The sum of all values returned by `printer'
 @@@return: < 0:  The first negative value ever returned by `printer' (if any)
-[[kernel, libc, throws]]
+[[kernel, libc, nothrow_cb]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<parts/printf-config.h>", "<bits/types.h>")]]
 [[impl_include("<libc/template/itoa_digits.h>")]]
@@ -974,7 +974,7 @@ $ssize_t format_vprintf([[nonnull]] pformatprinter printer, void *arg,
 #endif /* !__INTELLISENSE__ */
 }
 
-[[kernel, libc, throws]]
+[[kernel, libc, nothrow_cb]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>"), doc_alias("format_vprintf")]]
 $ssize_t format_printf([[nonnull]] pformatprinter printer, void *arg,
                        [[in, format]] char const *__restrict format, ...) {
@@ -1014,7 +1014,7 @@ $ssize_t format_printf([[nonnull]] pformatprinter printer, void *arg,
 @@@return: 0 :  No data could be scanned.
 @@@return: * :  The total number of successfully scanned arguments.
 @@@return: EOF: `PGETC' returned EOF the first time an attempt at reading was made
-[[throws, kernel]]
+[[nothrow_cb, kernel]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<libc/string.h>", "<libc/unicode.h>")]]
 [[impl_include("<parts/printf-config.h>")]]
@@ -1034,7 +1034,7 @@ $ssize_t format_vscanf([[nonnull]] pformatgetc pgetc,
 #endif /* !__INTELLISENSE__ */
 }
 
-[[throws]]
+[[nothrow_cb]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 [[doc_alias("format_vscanf"), kernel]]
 $ssize_t format_scanf([[nonnull]] pformatgetc pgetc,

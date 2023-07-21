@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf51e4a2 */
+/* HASH CRC-32:0x98b8096b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,12 +60,12 @@ INTDEF ATTR_IN(1) ATTR_OUT_OPT(2) int NOTHROW_RPC(LIBDCALL libd_thrd_sleep)(stru
 INTDEF ATTR_IN(1) ATTR_OUT_OPT(2) int NOTHROW_RPC(LIBDCALL libd_thrd_sleep64)(struct timespec64 const *time_point, struct timespec64 *remaining);
 /* >> thrd_exit(3)
  * Terminate the calling thread (s.a. `pthread_exit(3)') */
-INTDEF ATTR_NORETURN void (LIBDCALL libd_thrd_exit)(int res) THROWS(...);
+INTDEF ATTR_NORETURN void (LIBDCALL libd_thrd_exit)(int res);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> thrd_exit(3)
  * Terminate the calling thread (s.a. `pthread_exit(3)') */
-INTDEF ATTR_NORETURN void (LIBCCALL libc_thrd_exit)(int res) THROWS(...);
+INTDEF ATTR_NORETURN void (LIBCCALL libc_thrd_exit)(int res);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> thrd_detach(3)

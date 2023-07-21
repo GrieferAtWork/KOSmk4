@@ -115,7 +115,7 @@ PUBLIC ATTR_DBGBSS bool dbg_memory_managed = false;
  *       to the physical memory backing of the underlying page directory.
  * @return: * : The number of trailing bytes that could not be copied. */
 PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_readmemory") size_t
-NOTHROW(KCALL dbg_readmemory)(void const *addr,
+NOTHROW(KCALL dbg_readmemory)(USER UNCHECKED void const *addr,
                               void *__restrict buf,
                               size_t num_bytes) {
 	size_t error;
@@ -197,7 +197,7 @@ done_nopanic_copy:
 }
 
 PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_writememory") size_t
-NOTHROW(KCALL dbg_writememory)(void *addr,
+NOTHROW(KCALL dbg_writememory)(USER UNCHECKED void *addr,
                                void const *__restrict buf,
                                size_t num_bytes, bool force) {
 	size_t error;
@@ -315,7 +315,7 @@ done_nopanic_copy:
 }
 
 PUBLIC size_t
-NOTHROW(KCALL dbg_setmemory)(void *addr, byte_t byte,
+NOTHROW(KCALL dbg_setmemory)(USER UNCHECKED void *addr, byte_t byte,
                              size_t num_bytes, bool force) {
 	byte_t *buf;
 	size_t buflen = num_bytes;
@@ -344,7 +344,8 @@ NOTHROW(KCALL dbg_setmemory)(void *addr, byte_t byte,
 
 /* Move memory from `src', and write it back to `dst' */
 PUBLIC size_t
-NOTHROW(KCALL dbg_movememory)(void *dst, void const *src,
+NOTHROW(KCALL dbg_movememory)(USER UNCHECKED void *dst,
+                              USER UNCHECKED void const *src,
                               size_t num_bytes, bool force) {
 	byte_t *buf;
 	size_t buflen = num_bytes;

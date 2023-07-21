@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2f9de68 */
+/* HASH CRC-32:0x41d15f42 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,11 @@
 #ifndef __local__unloaddll_defined
 #define __local__unloaddll_defined
 #include <__crt.h>
-#include <kos/anno.h>
 #include <bits/types.h>
 #include <dlfcn.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_unloaddll) int
-(__LIBCCALL __LIBC_LOCAL_NAME(_unloaddll))(__INTPTR_TYPE__ __hnd) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(_unloaddll))(__INTPTR_TYPE__ __hnd) {
 #ifdef __CRT_HAVE_dlclose
 	return dlclose((void *)(__UINTPTR_TYPE__)__hnd);
 #else /* __CRT_HAVE_dlclose */

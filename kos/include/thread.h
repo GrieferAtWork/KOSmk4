@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7afd19fd */
+/* HASH CRC-32:0xba53ce3c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,17 +89,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(thr_join, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 /* >> pthread_exit(3)
  * Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
-__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,thr_exit,(void *__retval),pthread_exit,(__retval))
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),,thr_exit,(void *__retval),pthread_exit,(__retval))
 #elif defined(__CRT_HAVE_thr_exit)
 /* >> pthread_exit(3)
  * Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
-__CDECLARE_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,thr_exit,(void *__retval),(__retval))
+__CDECLARE_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),,thr_exit,(void *__retval),(__retval))
 #elif defined(__CRT_HAVE_cthread_exit)
 /* >> pthread_exit(3)
  * Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
-__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,thr_exit,(void *__retval),cthread_exit,(__retval))
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),,thr_exit,(void *__retval),cthread_exit,(__retval))
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_self
 /* >> pthread_self(3)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2900664f */
+/* HASH CRC-32:0x2aae438e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__KERNEL__ */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(shared_rwlock_waitread_with_timeout) __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL
-(__FCALL __LIBC_LOCAL_NAME(shared_rwlock_waitread_with_timeout))(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+(__FCALL __LIBC_LOCAL_NAME(shared_rwlock_waitread_with_timeout))(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
 	while (__hybrid_atomic_load(&__self->sl_lock, __ATOMIC_ACQUIRE) == (__UINTPTR_TYPE__)-1) {

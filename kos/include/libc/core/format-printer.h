@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50700d2 */
+/* HASH CRC-32:0xcfe89c86 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,6 @@
 __SYSDECL_BEGIN
 
 #ifdef __CRT_HAVE_format_vprintf
-#include <kos/anno.h>
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 #include <__crt.h>
@@ -46,7 +45,7 @@ __SYSDECL_BEGIN
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-__CREDIRECT(__ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__libc_core_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args))
+__CREDIRECT(__ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_CB,__libc_core_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args))
 #else /* __CRT_HAVE_format_vprintf */
 #include <libc/local/format-printer/format_vprintf.h>
 /* >> format_printf(3), format_vprintf(3)
@@ -64,7 +63,6 @@ __CREDIRECT(__ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1)),__SSIZE_TY
 #define __libc_core_format_vprintf __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vprintf)
 #endif /* !__CRT_HAVE_format_vprintf */
 #ifdef __CRT_HAVE_format_printf
-#include <kos/anno.h>
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 #include <__crt.h>
@@ -80,7 +78,7 @@ __CREDIRECT(__ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1)),__SSIZE_TY
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-__LIBC __ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__VLIBCCALL __libc_core_format_printf)(__pformatprinter __printer, void *__arg, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("format_printf");
+__LIBC __ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_CB(__VLIBCCALL __libc_core_format_printf)(__pformatprinter __printer, void *__arg, char const *__restrict __format, ...) __CASMNAME("format_printf");
 #else /* __CRT_HAVE_format_printf */
 #include <libc/local/format-printer/format_printf.h>
 /* >> format_printf(3), format_vprintf(3)

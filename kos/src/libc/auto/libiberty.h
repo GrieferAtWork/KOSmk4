@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa92e85a1 */
+/* HASH CRC-32:0x5de2d150 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,7 +89,7 @@ INTDEF WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_spaces)(__STDC_INT_AS_SIZE_
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF void NOTHROW_NCX(LIBDCALL libd_xmalloc_set_program_name)(char const *progname);
-INTDEF ATTR_NORETURN void (LIBDCALL libd_xmalloc_failed)(size_t num_bytes) THROWS(...);
+INTDEF ATTR_NORETURN void (LIBDCALL libd_xmalloc_failed)(size_t num_bytes);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBDCALL libd_xmalloc)(size_t num_bytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__

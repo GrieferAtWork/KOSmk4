@@ -1736,9 +1736,9 @@ file_sync_std_stream(FILE *__restrict stream) {
 }
 
 
-/*[[[head:libc__flushall,hash:CRC-32=0x6230416a]]]*/
+/*[[[head:libc__flushall,hash:CRC-32=0xfba910d6]]]*/
 INTERN ATTR_SECTION(".text.crt.application.exit") int
-(LIBCCALL libc__flushall)(void) THROWS(...)
+NOTHROW_CB(LIBCCALL libc__flushall)(void)
 /*[[[body:libc__flushall]]]*/
 {
 	/* All all streams opened by the user. */
@@ -1916,11 +1916,11 @@ NOTHROW_NCX(LIBCCALL libc_funlockfile)(FILE *__restrict stream)
 }
 /*[[[end:libc_funlockfile]]]*/
 
-/*[[[head:libc_fflush,hash:CRC-32=0x5aeba993]]]*/
+/*[[[head:libc_fflush,hash:CRC-32=0x43f49798]]]*/
 /* >> fflush(3)
  * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.utility") int
-(LIBCCALL libc_fflush)(FILE *stream) THROWS(...)
+NOTHROW_CB(LIBCCALL libc_fflush)(FILE *stream)
 /*[[[body:libc_fflush]]]*/
 {
 	int result;
@@ -1938,11 +1938,11 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.utility") int
 }
 /*[[[end:libc_fflush]]]*/
 
-/*[[[head:libc_fflush_unlocked,hash:CRC-32=0xdc145d17]]]*/
+/*[[[head:libc_fflush_unlocked,hash:CRC-32=0x4f6de1bd]]]*/
 /* >> fflush_unlocked(3)
  * Same as `fflush()', but performs I/O without acquiring a lock to `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.utility") int
-(LIBCCALL libc_fflush_unlocked)(FILE *stream) THROWS(...)
+NOTHROW_CB(LIBCCALL libc_fflush_unlocked)(FILE *stream)
 /*[[[body:libc_fflush_unlocked]]]*/
 {
 	int result;
@@ -1956,14 +1956,14 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.utility") int
 
 
 
-/*[[[head:libc_fread,hash:CRC-32=0x7cbaba70]]]*/
+/*[[[head:libc_fread,hash:CRC-32=0x131c1]]]*/
 /* >> fread(3)
  * Read up to `elemsize * elemcount' bytes of data from `stream' into `buf' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_INOUT(4) ATTR_OUT_OPT(1) size_t
-(LIBCCALL libc_fread)(void *__restrict buf,
-                      size_t elemsize,
-                      size_t elemcount,
-                      FILE *__restrict stream) THROWS(...)
+NOTHROW_CB(LIBCCALL libc_fread)(void *__restrict buf,
+                                size_t elemsize,
+                                size_t elemcount,
+                                FILE *__restrict stream)
 /*[[[body:libc_fread]]]*/
 {
 	size_t result, total;
@@ -1996,14 +1996,14 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_INOUT(4) ATT
 }
 /*[[[end:libc_fread]]]*/
 
-/*[[[head:libc_fread_unlocked,hash:CRC-32=0x21301529]]]*/
+/*[[[head:libc_fread_unlocked,hash:CRC-32=0xca3fe8e2]]]*/
 /* >> fread_unlocked(3)
  * Same as `fread()', but performs I/O without acquiring a lock to `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED ATTR_INOUT(4) ATTR_OUT_OPT(1) size_t
-(LIBCCALL libc_fread_unlocked)(void *__restrict buf,
-                               size_t elemsize,
-                               size_t elemcount,
-                               FILE *__restrict stream) THROWS(...)
+NOTHROW_CB(LIBCCALL libc_fread_unlocked)(void *__restrict buf,
+                                         size_t elemsize,
+                                         size_t elemcount,
+                                         FILE *__restrict stream)
 /*[[[body:libc_fread_unlocked]]]*/
 {
 	size_t result, total;
@@ -2027,14 +2027,14 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED ATTR_INOUT(4) A
 }
 /*[[[end:libc_fread_unlocked]]]*/
 
-/*[[[head:libc_fwrite,hash:CRC-32=0xaadcf331]]]*/
+/*[[[head:libc_fwrite,hash:CRC-32=0x6a154dcb]]]*/
 /* >> fwrite(3)
  * Write up to `elemsize * elemcount' bytes of data from `buf' into `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") ATTR_INOUT(4) ATTR_IN_OPT(1) size_t
-(LIBCCALL libc_fwrite)(void const *__restrict buf,
-                       size_t elemsize,
-                       size_t elemcount,
-                       FILE *__restrict stream) THROWS(...)
+NOTHROW_CB(LIBCCALL libc_fwrite)(void const *__restrict buf,
+                                 size_t elemsize,
+                                 size_t elemcount,
+                                 FILE *__restrict stream)
 /*[[[body:libc_fwrite]]]*/
 {
 	size_t result, total;
@@ -2061,14 +2061,14 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") ATTR_INOUT(4) ATTR_IN_O
 }
 /*[[[end:libc_fwrite]]]*/
 
-/*[[[head:libc_fwrite_unlocked,hash:CRC-32=0x6dc3ca4c]]]*/
+/*[[[head:libc_fwrite_unlocked,hash:CRC-32=0x4c984d45]]]*/
 /* >> fwrite_unlocked(3)
  * Same as `fwrite()', but performs I/O without acquiring a lock to `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") ATTR_INOUT(4) ATTR_IN_OPT(1) size_t
-(LIBCCALL libc_fwrite_unlocked)(void const *__restrict buf,
-                                size_t elemsize,
-                                size_t elemcount,
-                                FILE *__restrict stream) THROWS(...)
+NOTHROW_CB(LIBCCALL libc_fwrite_unlocked)(void const *__restrict buf,
+                                          size_t elemsize,
+                                          size_t elemcount,
+                                          FILE *__restrict stream)
 /*[[[body:libc_fwrite_unlocked]]]*/
 {
 	size_t result, total;
@@ -2089,13 +2089,13 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") ATTR_INOUT(4) ATTR_IN
 }
 /*[[[end:libc_fwrite_unlocked]]]*/
 
-/*[[[head:libc_file_printer,hash:CRC-32=0xe9f604b]]]*/
+/*[[[head:libc_file_printer,hash:CRC-32=0x7eebf7cf]]]*/
 /* >> file_printer(3)
  * For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") ATTR_INS(2, 3) NONNULL((1)) ssize_t
-(__FORMATPRINTER_CC libc_file_printer)(void *arg,
-                                       char const *__restrict data,
-                                       size_t datalen) THROWS(...)
+NOTHROW_CB(__FORMATPRINTER_CC libc_file_printer)(void *arg,
+                                                 char const *__restrict data,
+                                                 size_t datalen)
 /*[[[body:libc_file_printer]]]*/
 {
 	FILE *me = file_fromuser((FILE *)arg);
@@ -2115,13 +2115,13 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") ATTR_INS(2, 3) NONNULL(
 }
 /*[[[end:libc_file_printer]]]*/
 
-/*[[[head:libc_file_printer_unlocked,hash:CRC-32=0x9b1abb91]]]*/
+/*[[[head:libc_file_printer_unlocked,hash:CRC-32=0x4d442e2d]]]*/
 /* >> file_printer_unlocked(3)
  * Same as `file_printer()', but performs I/O without acquiring a lock to `(FILE *)arg' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") ATTR_INS(2, 3) NONNULL((1)) ssize_t
-(__FORMATPRINTER_CC libc_file_printer_unlocked)(void *arg,
-                                                char const *__restrict data,
-                                                size_t datalen) THROWS(...)
+NOTHROW_CB(__FORMATPRINTER_CC libc_file_printer_unlocked)(void *arg,
+                                                          char const *__restrict data,
+                                                          size_t datalen)
 /*[[[body:libc_file_printer_unlocked]]]*/
 {
 	FILE *me = file_fromuser((FILE *)arg);
@@ -2919,12 +2919,12 @@ NOTHROW_NCX(LIBCCALL libc_fisatty)(FILE *__restrict stream)
 /* fftruncate[_unlocked](3), fftruncate64[_unlocked](3)                 */
 /************************************************************************/
 
-/*[[[head:libc_fftruncate,hash:CRC-32=0x4ae02efe]]]*/
+/*[[[head:libc_fftruncate,hash:CRC-32=0xa0aba6ca]]]*/
 /* >> fftruncate(3)
  * Truncate the given file `stream' to a length of `length' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") ATTR_INOUT(1) int
-(LIBCCALL libc_fftruncate)(FILE *__restrict stream,
-                           __PIO_OFFSET length) THROWS(...)
+NOTHROW_CB(LIBCCALL libc_fftruncate)(FILE *__restrict stream,
+                                     __PIO_OFFSET length)
 /*[[[body:libc_fftruncate]]]*/
 {
 	int result;
@@ -2942,12 +2942,12 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") ATTR_INOUT(1) int
 }
 /*[[[end:libc_fftruncate]]]*/
 
-/*[[[head:libc_fftruncate_unlocked,hash:CRC-32=0xfcf0c177]]]*/
+/*[[[head:libc_fftruncate_unlocked,hash:CRC-32=0x548d0004]]]*/
 /* >> fftruncate_unlocked(3)
  * Same as `fftruncate()', but don't acquire a lock to the file */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.utility") ATTR_INOUT(1) int
-(LIBCCALL libc_fftruncate_unlocked)(FILE *__restrict stream,
-                                    __PIO_OFFSET length) THROWS(...)
+NOTHROW_CB(LIBCCALL libc_fftruncate_unlocked)(FILE *__restrict stream,
+                                              __PIO_OFFSET length)
 /*[[[body:libc_fftruncate_unlocked]]]*/
 {
 	int result;
@@ -2959,15 +2959,15 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.utility") ATTR_INOUT(1) int
 }
 /*[[[end:libc_fftruncate_unlocked]]]*/
 
-/*[[[head:libc_fftruncate64,hash:CRC-32=0x7e3673c7]]]*/
+/*[[[head:libc_fftruncate64,hash:CRC-32=0xb8caaa39]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_fftruncate64, libc_fftruncate);
 #else /* MAGIC:alias */
 /* >> fftruncate64(3)
  * Truncate the given file `stream' to a length of `length' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") ATTR_INOUT(1) int
-(LIBCCALL libc_fftruncate64)(FILE *__restrict stream,
-                             __PIO_OFFSET64 length) THROWS(...)
+NOTHROW_CB(LIBCCALL libc_fftruncate64)(FILE *__restrict stream,
+                                       __PIO_OFFSET64 length)
 /*[[[body:libc_fftruncate64]]]*/
 {
 	int result;
@@ -2986,15 +2986,15 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") ATTR_INOUT(1) int
 #endif /* MAGIC:alias */
 /*[[[end:libc_fftruncate64]]]*/
 
-/*[[[head:libc_fftruncate64_unlocked,hash:CRC-32=0xbf00a71f]]]*/
+/*[[[head:libc_fftruncate64_unlocked,hash:CRC-32=0x364a5375]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_fftruncate64_unlocked, libc_fftruncate_unlocked);
 #else /* MAGIC:alias */
 /* >> fftruncate64_unlocked(3)
  * Truncate the given file `stream' to a length of `length' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.utility") ATTR_INOUT(1) int
-(LIBCCALL libc_fftruncate64_unlocked)(FILE *__restrict stream,
-                                      __PIO_OFFSET64 length) THROWS(...)
+NOTHROW_CB(LIBCCALL libc_fftruncate64_unlocked)(FILE *__restrict stream,
+                                                __PIO_OFFSET64 length)
 /*[[[body:libc_fftruncate64_unlocked]]]*/
 {
 	int result;
@@ -3795,12 +3795,12 @@ NOTHROW_NCX(LIBCCALL libc_pclose)(FILE *stream)
 
 
 
-/*[[[head:libc_fputc,hash:CRC-32=0xbc375bfe]]]*/
+/*[[[head:libc_fputc,hash:CRC-32=0xfc0fb406]]]*/
 /* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") ATTR_INOUT(2) int
-(LIBCCALL libc_fputc)(int ch,
-                      FILE *__restrict stream) THROWS(...)
+NOTHROW_CB(LIBCCALL libc_fputc)(int ch,
+                                FILE *__restrict stream)
 /*[[[body:libc_fputc]]]*/
 {
 	unsigned char chr = (unsigned char)ch;
@@ -3808,12 +3808,12 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") ATTR_INOUT(2) int
 }
 /*[[[end:libc_fputc]]]*/
 
-/*[[[head:libc_fputc_unlocked,hash:CRC-32=0x68194c72]]]*/
+/*[[[head:libc_fputc_unlocked,hash:CRC-32=0x9f281b16]]]*/
 /* >> fputc_unlocked(3)
  * Same as `fputc()', but performs I/O without acquiring a lock to `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") ATTR_INOUT(2) int
-(LIBCCALL libc_fputc_unlocked)(int ch,
-                               FILE *__restrict stream) THROWS(...)
+NOTHROW_CB(LIBCCALL libc_fputc_unlocked)(int ch,
+                                         FILE *__restrict stream)
 /*[[[body:libc_fputc_unlocked]]]*/
 {
 	unsigned char chr = (unsigned char)ch;
@@ -3827,13 +3827,13 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") ATTR_INOUT(2) int
 
 
 
-/*[[[head:libc_fgetc,hash:CRC-32=0xa8c345cf]]]*/
+/*[[[head:libc_fgetc,hash:CRC-32=0xe13640be]]]*/
 /* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") ATTR_INOUT(1) int
-(LIBCCALL libc_fgetc)(FILE *__restrict stream) THROWS(...)
+NOTHROW_CB(LIBCCALL libc_fgetc)(FILE *__restrict stream)
 /*[[[body:libc_fgetc]]]*/
 {
 	int result;
@@ -3851,11 +3851,11 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") ATTR_INOUT(1) int
 }
 /*[[[end:libc_fgetc]]]*/
 
-/*[[[head:libc_fgetc_unlocked,hash:CRC-32=0xda610c90]]]*/
+/*[[[head:libc_fgetc_unlocked,hash:CRC-32=0x76336ed1]]]*/
 /* >> fgetc_unlocked(3)
  * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.getc") ATTR_INOUT(1) int
-(LIBCCALL libc_fgetc_unlocked)(FILE *__restrict stream) THROWS(...)
+NOTHROW_CB(LIBCCALL libc_fgetc_unlocked)(FILE *__restrict stream)
 /*[[[body:libc_fgetc_unlocked]]]*/
 {
 	int result;

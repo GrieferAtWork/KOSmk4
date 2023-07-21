@@ -431,7 +431,7 @@ char const *spaces(__STDC_INT_AS_SIZE_T count) {
 
 void xmalloc_set_program_name(char const *progname);
 
-[[noreturn, throws, decl_include("<hybrid/typecore.h>")]]
+[[noreturn, no_nothrow, decl_include("<hybrid/typecore.h>")]]
 void xmalloc_failed(size_t num_bytes);
 
 [[ignore, nocrt, alias("xmalloc"), decl_include("<hybrid/typecore.h>")]]

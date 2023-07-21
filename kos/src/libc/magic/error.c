@@ -118,7 +118,7 @@ __CSDECLARE(,int,@error_one_per_line@)
  * need a dedicated DOS variant, we want to keep their body as small as possible,
  * so that the C library doesn't get bloated more than it needs to be. */
 
-[[static, throws, decl_include("<bits/types.h>")]]
+[[static, stdio_throws, decl_include("<bits/types.h>")]]
 [[impl_prefix(DEFINE_LOCAL_error_print_progname)]]
 [[impl_prefix(DEFINE_LOCAL_error_message_count)]]
 [[impl_include("<libc/template/stdstreams.h>")]]
@@ -155,7 +155,7 @@ void verror(int status, $errno_t errnum,
 }
 
 
-[[static, throws, decl_include("<bits/types.h>")]]
+[[static, stdio_throws, decl_include("<bits/types.h>")]]
 [[impl_include("<libc/template/stdstreams.h>")]]
 [[impl_include("<libc/template/program_invocation_name.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
@@ -217,7 +217,7 @@ void verror_at_line(int status, $errno_t errnum, char const *filename,
 @@The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
 @@Also note that `stdout' is flushed before the message is printed.
 @@If `status' is non-zero, follow up with a call to `exit(status)'
-[[fast, libc, throws, decl_include("<bits/types.h>"), requires_function(verror)]]
+[[fast, libc, stdio_throws, decl_include("<bits/types.h>"), requires_function(verror)]]
 void error(int status, $errno_t errnum, [[nullable, format("printf")]] const char *format, ...) {
 	va_list args;
 	va_start(args, format);
@@ -231,7 +231,7 @@ void error(int status, $errno_t errnum, [[nullable, format("printf")]] const cha
 @@The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
 @@Additionally,  when `error_one_per_line' is non-zero, consecutive calls to  this function that pass the same values
 @@for `filename' and `line' will not produce the error message.
-[[fast, libc, throws, decl_include("<bits/types.h>"), requires_function(verror_at_line)]]
+[[fast, libc, stdio_throws, decl_include("<bits/types.h>"), requires_function(verror_at_line)]]
 void error_at_line(int status, $errno_t errnum, char const *filename,
                    unsigned int line, [[nullable, format("printf")]] char const *format, ...) {
 	va_list args;

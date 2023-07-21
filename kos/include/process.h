@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x730e2b8c */
+/* HASH CRC-32:0xfa5bc951 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -715,19 +715,19 @@ __NAMESPACE_STD_BEGIN
 #ifndef __std_exit_defined
 #define __std_exit_defined
 #ifdef __exit_defined
-__NAMESPACE_GLB_USING_OR_IMPL(exit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL exit)(int __status) __THROWS(...) { :: exit(__status); })
+__NAMESPACE_GLB_USING_OR_IMPL(exit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL exit)(int __status) { :: exit(__status); })
 #elif __has_builtin(__builtin_exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exit)
-__CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,__THROWING,exit,(int __status),{ __builtin_exit(__status); })
+__CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,,exit,(int __status),{ __builtin_exit(__status); })
 #elif defined(__CRT_HAVE_exit)
-__CDECLARE_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),(__status))
+__CDECLARE_VOID_GCCNCX(__ATTR_NORETURN,,exit,(int __status),(__status))
 #elif defined(__CRT_HAVE_quick_exit)
-__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),quick_exit,(__status))
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,,exit,(int __status),quick_exit,(__status))
 #elif defined(__CRT_HAVE__exit)
-__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),_exit,(__status))
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,,exit,(int __status),_exit,(__status))
 #elif defined(__CRT_HAVE__Exit)
-__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),_Exit,(__status))
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,,exit,(int __status),_Exit,(__status))
 #elif defined(__CRT_HAVE_xexit)
-__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),xexit,(__status))
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,,exit,(int __status),xexit,(__status))
 #else /* ... */
 #undef __std_exit_defined
 #endif /* !... */
@@ -735,24 +735,24 @@ __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),xexit,(__
 #ifndef __std_abort_defined
 #define __std_abort_defined
 #ifdef __abort_defined
-__NAMESPACE_GLB_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL abort)(void) __THROWS(...) { :: abort(); })
+__NAMESPACE_GLB_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL abort)(void) { :: abort(); })
 #elif __has_builtin(__builtin_abort) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_abort)
-__CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,__THROWING,abort,(void),{ __builtin_abort(); })
+__CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,,abort,(void),{ __builtin_abort(); })
 #elif defined(__CRT_HAVE_abort)
-__CDECLARE_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),())
+__CDECLARE_VOID_GCCNCX(__ATTR_NORETURN,,abort,(void),())
 #elif defined(__CRT_HAVE__ZSt9terminatev)
-__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),_ZSt9terminatev,())
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,,abort,(void),_ZSt9terminatev,())
 #elif defined(__CRT_HAVE_terminate)
-__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),terminate,())
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,,abort,(void),terminate,())
 #elif defined(__CRT_HAVE___chk_fail)
-__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),__chk_fail,())
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,,abort,(void),__chk_fail,())
 #elif defined(__CRT_HAVE_$Qterminate$A$AYAXXZ)
-__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),?terminate@@YAXXZ,())
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,,abort,(void),?terminate@@YAXXZ,())
 #elif defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)
 __NAMESPACE_STD_END
 #include <libc/local/stdlib/abort.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL abort)(void) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(abort))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL abort)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(abort))(); })
 #else /* ... */
 #undef __std_abort_defined
 #endif /* !... */
@@ -771,17 +771,17 @@ __NAMESPACE_STD_USING(abort)
 #ifndef ___exit_defined
 #define ___exit_defined
 #if __has_builtin(__builtin__Exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE__Exit)
-__CEIREDIRECT_GCCNCX(__ATTR_NORETURN,void,__THROWING,_exit,(int __status),_Exit,{ __builtin__Exit(__status); })
+__CEIREDIRECT_GCCNCX(__ATTR_NORETURN,void,,_exit,(int __status),_Exit,{ __builtin__Exit(__status); })
 #elif __has_builtin(__builtin__exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE__exit)
-__CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,__THROWING,_exit,(int __status),{ __builtin__exit(__status); })
+__CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,,_exit,(int __status),{ __builtin__exit(__status); })
 #elif defined(__CRT_HAVE__Exit)
-__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,_exit,(int __status),_Exit,(__status))
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,,_exit,(int __status),_Exit,(__status))
 #elif defined(__CRT_HAVE__exit)
-__CDECLARE_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,_exit,(int __status),(__status))
+__CDECLARE_VOID_GCCNCX(__ATTR_NORETURN,,_exit,(int __status),(__status))
 #elif defined(__CRT_HAVE_quick_exit)
-__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,_exit,(int __status),quick_exit,(__status))
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,,_exit,(int __status),quick_exit,(__status))
 #elif defined(__CRT_HAVE_exit)
-__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,_exit,(int __status),exit,(__status))
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,,_exit,(int __status),exit,(__status))
 #else /* ... */
 #undef ___exit_defined
 #endif /* !... */
@@ -795,12 +795,12 @@ __CDECLARE_VOID(,__NOTHROW_NCX,_endthread,(void),())
 __NAMESPACE_LOCAL_USING_OR_IMPL(_endthread, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL _endthread)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_endthread))(); })
 #endif /* ... */
 __CDECLARE_VOID_OPT(,__NOTHROW_NCX,_endthreadex,(__UINT32_TYPE__ __exitcode),(__exitcode))
-__CDECLARE_VOID_OPT(,__THROWING,_cexit,(void),())
+__CDECLARE_VOID_OPT(,,_cexit,(void),())
 #ifdef __CRT_HAVE__c_exit
-__CDECLARE_VOID(,__THROWING,_c_exit,(void),())
+__CDECLARE_VOID(,,_c_exit,(void),())
 #else /* __CRT_HAVE__c_exit */
 #include <libc/local/process/_c_exit.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_c_exit, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL _c_exit)(void) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c_exit))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_c_exit, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL _c_exit)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c_exit))(); })
 #endif /* !__CRT_HAVE__c_exit */
 #ifndef ___tls_callback_type_defined
 #define ___tls_callback_type_defined
@@ -1218,19 +1218,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(system, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN
 #endif /* !__system_defined */
 
 #ifdef __CRT_HAVE__loaddll
-__CDECLARE(__ATTR_IN_OPT(1),intptr_t,__THROWING,_loaddll,(char __KOS_FIXED_CONST *__file),(__file))
+__CDECLARE(__ATTR_IN_OPT(1),intptr_t,,_loaddll,(char __KOS_FIXED_CONST *__file),(__file))
 #else /* __CRT_HAVE__loaddll */
 #include <libdl/asm/dlfcn.h>
 #ifdef __CRT_HAVE_dlopen
 #include <libc/local/process/_loaddll.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_loaddll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(1) intptr_t (__LIBCCALL _loaddll)(char __KOS_FIXED_CONST *__file) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_loaddll))(__file); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_loaddll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(1) intptr_t (__LIBCCALL _loaddll)(char __KOS_FIXED_CONST *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_loaddll))(__file); })
 #endif /* __CRT_HAVE_dlopen */
 #endif /* !__CRT_HAVE__loaddll */
 #ifdef __CRT_HAVE__unloaddll
-__CDECLARE(,int,__THROWING,_unloaddll,(intptr_t __hnd),(__hnd))
+__CDECLARE(,int,,_unloaddll,(intptr_t __hnd),(__hnd))
 #else /* __CRT_HAVE__unloaddll */
 #include <libc/local/process/_unloaddll.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_unloaddll, __FORCELOCAL __ATTR_ARTIFICIAL int (__LIBCCALL _unloaddll)(intptr_t __hnd) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_unloaddll))(__hnd); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_unloaddll, __FORCELOCAL __ATTR_ARTIFICIAL int (__LIBCCALL _unloaddll)(intptr_t __hnd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_unloaddll))(__hnd); })
 #endif /* !__CRT_HAVE__unloaddll */
 
 #ifndef ____procfun_defined
@@ -1238,12 +1238,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_unloaddll, __FORCELOCAL __ATTR_ARTIFICIAL int (
 typedef int (*__procfun)(void);
 #endif /* !____procfun_defined */
 #ifdef __CRT_HAVE__getdllprocaddr
-__CDECLARE(__ATTR_IN_OPT(2),__procfun,__THROWING,_getdllprocaddr,(intptr_t __hnd, char __KOS_FIXED_CONST *__symname, intptr_t __ord),(__hnd,__symname,__ord))
+__CDECLARE(__ATTR_IN_OPT(2),__procfun,,_getdllprocaddr,(intptr_t __hnd, char __KOS_FIXED_CONST *__symname, intptr_t __ord),(__hnd,__symname,__ord))
 #else /* __CRT_HAVE__getdllprocaddr */
 #include <libdl/asm/dlfcn.h>
 #ifdef __CRT_HAVE_dlsym
 #include <libc/local/process/_getdllprocaddr.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_getdllprocaddr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(2) __procfun (__LIBCCALL _getdllprocaddr)(intptr_t __hnd, char __KOS_FIXED_CONST *__symname, intptr_t __ord) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getdllprocaddr))(__hnd, __symname, __ord); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_getdllprocaddr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(2) __procfun (__LIBCCALL _getdllprocaddr)(intptr_t __hnd, char __KOS_FIXED_CONST *__symname, intptr_t __ord) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getdllprocaddr))(__hnd, __symname, __ord); })
 #endif /* __CRT_HAVE_dlsym */
 #endif /* !__CRT_HAVE__getdllprocaddr */
 #endif /* __USE_DOS */

@@ -242,6 +242,14 @@
 #define NOTHROW_NCX_T
 #define __NOTHROW_NCX
 #define __NOTHROW_NCX_T
+#define NOTHROW_CB
+#define NOTHROW_CB_T
+#define __NOTHROW_CB
+#define __NOTHROW_CB_T
+#define NOTHROW_CB_NCX
+#define NOTHROW_CB_NCX_T
+#define __NOTHROW_CB_NCX
+#define __NOTHROW_CB_NCX_T
 #define __NOTHROW_KRN
 #define NOTHROW_RPC
 #define NOTHROW_RPC_T

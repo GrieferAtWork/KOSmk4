@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x995eaa23 */
+/* HASH CRC-32:0x1775ac3c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -128,7 +128,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getmntent_r, __FORCELOCAL __ATTR_ARTIFICIAL __AT
  * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
  * @return: 0: Success
  * @return: 1: Error (WARNING: `errno' is left undefined) */
-__CDECLARE(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,addmntent,(__FILE *__restrict __stream, struct mntent const *__restrict __mnt),(__stream,__mnt))
+__CDECLARE(__ATTR_IN(2) __ATTR_INOUT(1),int,__NOTHROW_CB,addmntent,(__FILE *__restrict __stream, struct mntent const *__restrict __mnt),(__stream,__mnt))
 #else /* __CRT_HAVE_addmntent */
 #include <asm/os/stdio.h>
 #include <bits/types.h>
@@ -139,7 +139,7 @@ __CDECLARE(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,addmntent,(__FILE *__rest
  * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
  * @return: 0: Success
  * @return: 1: Error (WARNING: `errno' is left undefined) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(addmntent, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_INOUT(1) int (__LIBCCALL addmntent)(__FILE *__restrict __stream, struct mntent const *__restrict __mnt) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(addmntent))(__stream, __mnt); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(addmntent, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_INOUT(1) int __NOTHROW_CB(__LIBCCALL addmntent)(__FILE *__restrict __stream, struct mntent const *__restrict __mnt) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(addmntent))(__stream, __mnt); })
 #endif /* __SEEK_END && (__CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseeko64 || __CRT_HAVE___fseeko64 || __CRT_HAVE_fseek64 || __CRT_HAVE__fseeki64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE_fseek64_unlocked || __CRT_HAVE__fseeki64_nolock) && (__CRT_HAVE_fprintf || __CRT_HAVE__IO_fprintf || __CRT_HAVE_fprintf_s || __CRT_HAVE_fprintf_unlocked || __CRT_HAVE_vfprintf || __CRT_HAVE__IO_vfprintf || __CRT_HAVE_vfprintf_s || __CRT_HAVE_vfprintf_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_putc || __CRT_HAVE_fputc || __CRT_HAVE__IO_putc || __CRT_HAVE_putc_unlocked || __CRT_HAVE_fputc_unlocked || __CRT_HAVE__putc_nolock || __CRT_HAVE__fputc_nolock || (__CRT_DOS && (__CRT_HAVE__flsbuf || __CRT_HAVE___swbuf)) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock) */
 #endif /* !__CRT_HAVE_addmntent */
 #ifdef __CRT_HAVE_hasmntopt

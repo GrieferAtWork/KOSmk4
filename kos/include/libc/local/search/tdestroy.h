@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c92402b */
+/* HASH CRC-32:0xeda4d60c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,11 @@
 #ifndef __local_tdestroy_defined
 #define __local_tdestroy_defined
 #include <__crt.h>
-#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_tdestroy_r_defined
 #define __local___localdep_tdestroy_r_defined
 #ifdef __CRT_HAVE_tdestroy_r
-__CREDIRECT_VOID(__ATTR_INOUT_OPT(1) __ATTR_NONNULL((2)),__THROWING,__localdep_tdestroy_r,(void *__root, void (__LIBCCALL *__freefct)(void *__nodep, void *__arg), void *__arg),tdestroy_r,(__root,__freefct,__arg))
+__CREDIRECT_VOID(__ATTR_INOUT_OPT(1) __ATTR_NONNULL((2)),__NOTHROW_CB_NCX,__localdep_tdestroy_r,(void *__root, void (__LIBCCALL *__freefct)(void *__nodep, void *__arg), void *__arg),tdestroy_r,(__root,__freefct,__arg))
 #else /* __CRT_HAVE_tdestroy_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/search/tdestroy_r.h>
@@ -48,7 +47,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(tdestroy) __ATTR_INOUT_OPT(1) __ATTR_NONNULL((2)) void
-(__LIBCCALL __LIBC_LOCAL_NAME(tdestroy))(void *__root, void (__LIBCCALL *__freefct)(void *__nodep)) __THROWS(...) {
+__NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdestroy))(void *__root, void (__LIBCCALL *__freefct)(void *__nodep)) {
 #ifdef __LIBCCALL_CALLER_CLEANUP
 	(__NAMESPACE_LOCAL_SYM __localdep_tdestroy_r)(__root, (void (__LIBCCALL *)(void *, void *))(void *)__freefct, __NULLPTR);
 #else /* __LIBCCALL_CALLER_CLEANUP */

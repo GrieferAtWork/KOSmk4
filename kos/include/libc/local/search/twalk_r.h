@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73764dee */
+/* HASH CRC-32:0x92c5de66 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,6 @@
 #ifndef __local_twalk_r_defined
 #define __local_twalk_r_defined
 #include <__crt.h>
-#include <kos/anno.h>
 #ifndef __VISIT_defined
 #define __VISIT_defined
 typedef enum {
@@ -57,7 +56,7 @@ __LOCAL_LIBC(__trecurse) __ATTR_NONNULL((1, 2)) void
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(twalk_r) __ATTR_IN_OPT(1) void
-(__LIBCCALL __LIBC_LOCAL_NAME(twalk_r))(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT ___value, int __level, void *__arg), void *__arg) __THROWS(...) {
+__NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(twalk_r))(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT ___value, int __level, void *__arg), void *__arg) {
 	if (__root && __action)
 		(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__trecurse))(__root, __action, __arg, 0);
 }

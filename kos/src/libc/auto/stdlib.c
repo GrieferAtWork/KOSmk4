@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e704270 */
+/* HASH CRC-32:0x837f5d92 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,12 +63,12 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED ATTR_IN(1) ATTR_IN_OPT(2) NONNULL((5)) void *
-(LIBDCALL libd_bsearch_r)(void const *pkey,
-                          void const *pbase,
-                          size_t item_count,
-                          size_t item_size,
-                          int (LIBDCALL *compar)(void const *a, void const *b, void *arg),
-                          void *arg) THROWS(...) {
+NOTHROW_CB_NCX(LIBDCALL libd_bsearch_r)(void const *pkey,
+                                        void const *pbase,
+                                        size_t item_count,
+                                        size_t item_size,
+                                        int (LIBDCALL *compar)(void const *a, void const *b, void *arg),
+                                        void *arg) {
 	struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 libd_bsearch_r_cookie;
 	libd_bsearch_r_cookie.compar = compar;
 	libd_bsearch_r_cookie.arg    = arg;
@@ -77,12 +77,12 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED A
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED ATTR_IN(1) ATTR_IN_OPT(2) NONNULL((5)) void *
-(LIBCCALL libc_bsearch_r)(void const *pkey,
-                          void const *pbase,
-                          size_t item_count,
-                          size_t item_size,
-                          int (LIBCCALL *compar)(void const *a, void const *b, void *arg),
-                          void *arg) THROWS(...) {
+NOTHROW_CB_NCX(LIBCCALL libc_bsearch_r)(void const *pkey,
+                                        void const *pbase,
+                                        size_t item_count,
+                                        size_t item_size,
+                                        int (LIBCCALL *compar)(void const *a, void const *b, void *arg),
+                                        void *arg) {
 	/* Optimize this function with the (allowed) assumption that `pbase' is sorted according to:
 	 * >> qsort_r(pbase, item_count, item_size, compar, arg); */
 	size_t lo, hi;
@@ -133,10 +133,10 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 }
 #endif /* !__dwrap_cTP_TDTPTPTP_CA0A1_defined */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") ATTR_INOUT_OPT(1) NONNULL((4)) void
-(LIBDCALL libd_qsort)(void *pbase,
-                      size_t item_count,
-                      size_t item_size,
-                      int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...) {
+NOTHROW_CB_NCX(LIBDCALL libd_qsort)(void *pbase,
+                                    size_t item_count,
+                                    size_t item_size,
+                                    int (LIBDCALL *compar)(void const *a, void const *b)) {
 	libc_qsort_r(pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&_dwrap_cTP_TDTPTPTP_CA0A1, (void *)compar);
 }
 #endif /* !__LIBDCALL_CALLER_CLEANUP */
@@ -156,10 +156,10 @@ __NAMESPACE_LOCAL_END
 #endif /* !____invoke_compare_helper_defined */
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") ATTR_INOUT_OPT(1) NONNULL((4)) void
-(LIBCCALL libc_qsort)(void *pbase,
-                      size_t item_count,
-                      size_t item_size,
-                      int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...) {
+NOTHROW_CB_NCX(LIBCCALL libc_qsort)(void *pbase,
+                                    size_t item_count,
+                                    size_t item_size,
+                                    int (LIBCCALL *compar)(void const *a, void const *b)) {
 #ifdef __LIBCCALL_CALLER_CLEANUP
 	libc_qsort_r(pbase, item_count, item_size,
 	        (int (LIBCCALL *)(void const *, void const *, void *))(void *)compar,
@@ -185,11 +185,11 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 }
 #endif /* !__dwrap_cTP_TDTPTPTP_CA0A1_defined */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED ATTR_IN(1) ATTR_IN_OPT(2) NONNULL((5)) void *
-(LIBDCALL libd_bsearch)(void const *pkey,
-                        void const *pbase,
-                        size_t item_count,
-                        size_t item_size,
-                        int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...) {
+NOTHROW_CB_NCX(LIBDCALL libd_bsearch)(void const *pkey,
+                                      void const *pbase,
+                                      size_t item_count,
+                                      size_t item_size,
+                                      int (LIBDCALL *compar)(void const *a, void const *b)) {
 	return libc_bsearch_r(pkey, pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&_dwrap_cTP_TDTPTPTP_CA0A1, (void *)compar);
 }
 #endif /* !__LIBDCALL_CALLER_CLEANUP */
@@ -210,11 +210,11 @@ __NAMESPACE_LOCAL_END
 #endif /* !____invoke_compare_helper_defined */
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED ATTR_IN(1) ATTR_IN_OPT(2) NONNULL((5)) void *
-(LIBCCALL libc_bsearch)(void const *pkey,
-                        void const *pbase,
-                        size_t item_count,
-                        size_t item_size,
-                        int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...) {
+NOTHROW_CB_NCX(LIBCCALL libc_bsearch)(void const *pkey,
+                                      void const *pbase,
+                                      size_t item_count,
+                                      size_t item_size,
+                                      int (LIBCCALL *compar)(void const *a, void const *b)) {
 #ifdef __LIBCCALL_CALLER_CLEANUP
 	return (void *)libc_bsearch_r(pkey, pbase, item_count, item_size,
 	                         (int (LIBCCALL *)(void const *, void const *, void *))(void *)compar,
@@ -385,7 +385,7 @@ NOTHROW_RPC(LIBCCALL libc_system)(char const *command) {
 #ifndef LIBC_ARCH_HAVE_ABORT
 #include <asm/os/stdlib.h>
 INTERN ATTR_SECTION(".text.crt.application.exit") ATTR_NORETURN void
-(LIBCCALL libc_abort)(void) THROWS(...) {
+(LIBCCALL libc_abort)(void) {
 	libc__Exit(__EXIT_FAILURE);
 }
 #endif /* !LIBC_ARCH_HAVE_ABORT */
@@ -2986,8 +2986,8 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") int
  * and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") NONNULL((1)) int
-(LIBDCALL libd_fdwalk)(int (LIBDCALL *walk)(void *arg, fd_t fd),
-                       void *arg) THROWS(...) {
+NOTHROW_CB_NCX(LIBDCALL libd_fdwalk)(int (LIBDCALL *walk)(void *arg, fd_t fd),
+                                     void *arg) {
 	struct _dwrap_cookie_struct_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1 libd_fdwalk_cookie;
 	libd_fdwalk_cookie.walk = walk;
 	libd_fdwalk_cookie.arg  = arg;
@@ -3003,8 +3003,8 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") NONNULL((1)) int
  * and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
 INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((1)) int
-(LIBCCALL libc_fdwalk)(int (LIBCCALL *walk)(void *arg, fd_t fd),
-                       void *arg) THROWS(...) {
+NOTHROW_CB_NCX(LIBCCALL libc_fdwalk)(int (LIBCCALL *walk)(void *arg, fd_t fd),
+                                     void *arg) {
 	int result = 0;
 
 	errno_t saved_err;
@@ -3220,19 +3220,19 @@ NOTHROW_NCX(LIBCCALL libc_setprogname)(char const *name) {
 	__LOCAL_program_invocation_short_name_p = (char *)name;
 }
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_INOUT_OPT(1) NONNULL((4)) int
-(LIBCCALL libc_heapsort)(void *pbase,
-                         size_t item_count,
-                         size_t item_size,
-                         int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...) {
+NOTHROW_CB_NCX(LIBCCALL libc_heapsort)(void *pbase,
+                                       size_t item_count,
+                                       size_t item_size,
+                                       int (LIBCCALL *compar)(void const *a, void const *b)) {
 	/* TODO: Actually do heap-sort! */
 	libc_qsort(pbase, item_count, item_size, compar);
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_INOUT_OPT(1) NONNULL((4)) int
-(LIBCCALL libc_mergesort)(void *pbase,
-                          size_t item_count,
-                          size_t item_size,
-                          int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...) {
+NOTHROW_CB_NCX(LIBCCALL libc_mergesort)(void *pbase,
+                                        size_t item_count,
+                                        size_t item_size,
+                                        int (LIBCCALL *compar)(void const *a, void const *b)) {
 	/* TODO: Actually do merge-sort! */
 	libc_qsort(pbase, item_count, item_size, compar);
 	return 0;
@@ -3291,11 +3291,11 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined */
 /* >> qsort_r(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") ATTR_INOUT_OPT(1) NONNULL((4)) void
-(LIBDCALL libd_qsort_r)(void *pbase,
-                        size_t item_count,
-                        size_t item_size,
-                        int (LIBDCALL *compar)(void const *a, void const *b, void *arg),
-                        void *arg) THROWS(...) {
+NOTHROW_CB_NCX(LIBDCALL libd_qsort_r)(void *pbase,
+                                      size_t item_count,
+                                      size_t item_size,
+                                      int (LIBDCALL *compar)(void const *a, void const *b, void *arg),
+                                      void *arg) {
 	struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 libd_qsort_r_cookie;
 	libd_qsort_r_cookie.compar = compar;
 	libd_qsort_r_cookie.arg    = arg;
@@ -3304,11 +3304,11 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") ATTR_INOU
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> qsort_r(3) */
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") ATTR_INOUT_OPT(1) NONNULL((4)) void
-(LIBCCALL libc_qsort_r)(void *pbase,
-                        size_t item_count,
-                        size_t item_size,
-                        int (LIBCCALL *compar)(void const *a, void const *b, void *arg),
-                        void *arg) THROWS(...) {
+NOTHROW_CB_NCX(LIBCCALL libc_qsort_r)(void *pbase,
+                                      size_t item_count,
+                                      size_t item_size,
+                                      int (LIBCCALL *compar)(void const *a, void const *b, void *arg),
+                                      void *arg) {
 	/* A public domain qsort() drop-in implementation. I couldn't find the original
 	 * source referenced (see the comment below), but this code is the first  thing
 	 * that comes up when you search for `libc qsort public domain'.
@@ -3633,12 +3633,12 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") int
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0c1A0A1_defined */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") WUNUSED ATTR_IN(1) ATTR_IN_OPT(2) NONNULL((5)) void *
-(LIBDCALL libd_bsearch_s)(void const *key,
-                          void const *base,
-                          size_t elem_count,
-                          size_t elem_size,
-                          int (LIBDCALL *compar)(void *arg, void const *a, void const *b),
-                          void *arg) THROWS(...) {
+NOTHROW_CB_NCX(LIBDCALL libd_bsearch_s)(void const *key,
+                                        void const *base,
+                                        size_t elem_count,
+                                        size_t elem_size,
+                                        int (LIBDCALL *compar)(void *arg, void const *a, void const *b),
+                                        void *arg) {
 	struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A0A1 libd_bsearch_s_cookie;
 	libd_bsearch_s_cookie.compar = compar;
 	libd_bsearch_s_cookie.arg    = arg;
@@ -3661,12 +3661,12 @@ __LOCAL_LIBC(__invoke_compare_helper_s) int
 __NAMESPACE_LOCAL_END
 #endif /* !____invoke_compare_helper_s_defined */
 INTERN ATTR_SECTION(".text.crt.dos.utility") WUNUSED ATTR_IN(1) ATTR_IN_OPT(2) NONNULL((5)) void *
-(LIBCCALL libc_bsearch_s)(void const *key,
-                          void const *base,
-                          size_t elem_count,
-                          size_t elem_size,
-                          int (LIBCCALL *compar)(void *arg, void const *a, void const *b),
-                          void *arg) THROWS(...) {
+NOTHROW_CB_NCX(LIBCCALL libc_bsearch_s)(void const *key,
+                                        void const *base,
+                                        size_t elem_count,
+                                        size_t elem_size,
+                                        int (LIBCCALL *compar)(void *arg, void const *a, void const *b),
+                                        void *arg) {
 	struct __NAMESPACE_LOCAL_SYM __invoke_compare_helper_s_data data;
 	data.__fun = compar;
 	data.__arg = arg;
@@ -3690,11 +3690,11 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") int
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0c1A0A1_defined */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") ATTR_INOUT_OPT(1) NONNULL((4)) void
-(LIBDCALL libd_qsort_s)(void *base,
-                        size_t elem_count,
-                        size_t elem_size,
-                        int (LIBDCALL *compar)(void *arg, void const *a, void const *b),
-                        void *arg) THROWS(...) {
+NOTHROW_CB_NCX(LIBDCALL libd_qsort_s)(void *base,
+                                      size_t elem_count,
+                                      size_t elem_size,
+                                      int (LIBDCALL *compar)(void *arg, void const *a, void const *b),
+                                      void *arg) {
 	struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A0A1 libd_qsort_s_cookie;
 	libd_qsort_s_cookie.compar = compar;
 	libd_qsort_s_cookie.arg    = arg;
@@ -3717,11 +3717,11 @@ __LOCAL_LIBC(__invoke_compare_helper_s) int
 __NAMESPACE_LOCAL_END
 #endif /* !____invoke_compare_helper_s_defined */
 INTERN ATTR_SECTION(".text.crt.dos.utility") ATTR_INOUT_OPT(1) NONNULL((4)) void
-(LIBCCALL libc_qsort_s)(void *base,
-                        size_t elem_count,
-                        size_t elem_size,
-                        int (LIBCCALL *compar)(void *arg, void const *a, void const *b),
-                        void *arg) THROWS(...) {
+NOTHROW_CB_NCX(LIBCCALL libc_qsort_s)(void *base,
+                                      size_t elem_count,
+                                      size_t elem_size,
+                                      int (LIBCCALL *compar)(void *arg, void const *a, void const *b),
+                                      void *arg) {
 	struct __NAMESPACE_LOCAL_SYM __invoke_compare_helper_s_data data;
 	data.__fun = compar;
 	data.__arg = arg;

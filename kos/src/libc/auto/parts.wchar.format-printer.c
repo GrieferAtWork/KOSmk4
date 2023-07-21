@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x451f40bd */
+/* HASH CRC-32:0x6b6ee2fd */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,10 +57,10 @@ DECL_BEGIN
  * The usual format-printer rules apply, and this function
  * is  allowed to  call `printer'  as often  as it chooses */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
-(LIBDCALL libd_format_wrepeat)(pc16formatprinter printer,
-                               void *arg,
-                               char16_t ch,
-                               size_t num_repetitions) THROWS(...) {
+NOTHROW_CB(LIBDCALL libd_format_wrepeat)(pc16formatprinter printer,
+                                         void *arg,
+                                         char16_t ch,
+                                         size_t num_repetitions) {
 	ssize_t result, temp;
 
 	char16_t *buffer;
@@ -109,10 +109,10 @@ err:
  * The usual format-printer rules apply, and this function
  * is  allowed to  call `printer'  as often  as it chooses */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
-(LIBKCALL libc_format_wrepeat)(pc32formatprinter printer,
-                               void *arg,
-                               char32_t ch,
-                               size_t num_repetitions) THROWS(...) {
+NOTHROW_CB(LIBKCALL libc_format_wrepeat)(pc32formatprinter printer,
+                                         void *arg,
+                                         char32_t ch,
+                                         size_t num_repetitions) {
 	ssize_t result, temp;
 
 	char32_t *buffer;
@@ -171,11 +171,11 @@ err:
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_INS(3, 4) NONNULL((1)) ssize_t
-(LIBDCALL libd_format_wescape)(pc16formatprinter printer,
-                               void *arg,
-                               char16_t const *__restrict text,
-                               size_t textlen,
-                               unsigned int flags) THROWS(...) {
+NOTHROW_CB(LIBDCALL libd_format_wescape)(pc16formatprinter printer,
+                                         void *arg,
+                                         char16_t const *__restrict text,
+                                         size_t textlen,
+                                         unsigned int flags) {
 	__PRIVATE char16_t const quote[1] = { '\"' };
 	char16_t encoded_text[12]; size_t encoded_text_size;
 	ssize_t result = 0, temp;
@@ -442,11 +442,11 @@ err:
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_INS(3, 4) NONNULL((1)) ssize_t
-(LIBKCALL libc_format_wescape)(pc32formatprinter printer,
-                               void *arg,
-                               char32_t const *__restrict text,
-                               size_t textlen,
-                               unsigned int flags) THROWS(...) {
+NOTHROW_CB(LIBKCALL libc_format_wescape)(pc32formatprinter printer,
+                                         void *arg,
+                                         char32_t const *__restrict text,
+                                         size_t textlen,
+                                         unsigned int flags) {
 	__PRIVATE char32_t const quote[1] = { '\"' };
 	char32_t encoded_text[12]; size_t encoded_text_size;
 	ssize_t result = 0, temp;
@@ -711,12 +711,12 @@ err:
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_INS(3, 4) NONNULL((1)) ssize_t
-(LIBDCALL libd_format_whexdump)(pc16formatprinter printer,
-                                void *arg,
-                                void const *__restrict data,
-                                size_t size,
-                                size_t linesize,
-                                unsigned int flags) THROWS(...) {
+NOTHROW_CB(LIBDCALL libd_format_whexdump)(pc16formatprinter printer,
+                                          void *arg,
+                                          void const *__restrict data,
+                                          size_t size,
+                                          size_t linesize,
+                                          unsigned int flags) {
 	__PRIVATE char16_t const lf[1] = { '\n' };
 	byte_t const *line_data;
 	char16_t buffer[
@@ -906,12 +906,12 @@ err:
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_INS(3, 4) NONNULL((1)) ssize_t
-(LIBKCALL libc_format_whexdump)(pc32formatprinter printer,
-                                void *arg,
-                                void const *__restrict data,
-                                size_t size,
-                                size_t linesize,
-                                unsigned int flags) THROWS(...) {
+NOTHROW_CB(LIBKCALL libc_format_whexdump)(pc32formatprinter printer,
+                                          void *arg,
+                                          void const *__restrict data,
+                                          size_t size,
+                                          size_t linesize,
+                                          unsigned int flags) {
 	__PRIVATE char32_t const lf[1] = { '\n' };
 	byte_t const *line_data;
 	char32_t buffer[
@@ -1121,10 +1121,10 @@ err:
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_IN(3) ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1)) ssize_t
-(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer,
-                                void *arg,
-                                char16_t const *__restrict format,
-                                va_list args) THROWS(...) {
+NOTHROW_CB(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer,
+                                          void *arg,
+                                          char16_t const *__restrict format,
+                                          va_list args) {
 #ifndef __INTELLISENSE__
 #define __FORMAT_PRINTER            printer
 #define __FORMAT_ARG                arg
@@ -1189,10 +1189,10 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_IN(3) ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1)) ssize_t
-(LIBKCALL libc_format_vwprintf)(pc32formatprinter printer,
-                                void *arg,
-                                char32_t const *__restrict format,
-                                va_list args) THROWS(...) {
+NOTHROW_CB(LIBKCALL libc_format_vwprintf)(pc32formatprinter printer,
+                                          void *arg,
+                                          char32_t const *__restrict format,
+                                          va_list args) {
 #ifndef __INTELLISENSE__
 #define __FORMAT_PRINTER            printer
 #define __FORMAT_ARG                arg
@@ -1235,10 +1235,10 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_IN(3) ATTR_LIBC_C32PRI
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_IN(3) ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1)) ssize_t
-(LIBDCALL libd_format_wprintf)(pc16formatprinter printer,
-                               void *arg,
-                               char16_t const *__restrict format,
-                               ...) THROWS(...) {
+NOTHROW_CB(LIBDCALL libd_format_wprintf)(pc16formatprinter printer,
+                                         void *arg,
+                                         char16_t const *__restrict format,
+                                         ...) {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -1259,10 +1259,10 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_IN(3) ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1)) ssize_t
-(LIBKCALL libc_format_wprintf)(pc32formatprinter printer,
-                               void *arg,
-                               char32_t const *__restrict format,
-                               ...) THROWS(...) {
+NOTHROW_CB(LIBKCALL libc_format_wprintf)(pc32formatprinter printer,
+                                         void *arg,
+                                         char32_t const *__restrict format,
+                                         ...) {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -1299,11 +1299,11 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_IN(3) ATTR_LIBC_C32PRI
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_IN(4) ATTR_LIBC_C16SCANF(4, 0) NONNULL((1, 2)) ssize_t
-(LIBDCALL libd_format_vwscanf)(pformatgetc pgetc,
-                               pformatungetc pungetc,
-                               void *arg,
-                               char16_t const *__restrict format,
-                               va_list args) THROWS(...) {
+NOTHROW_CB(LIBDCALL libd_format_vwscanf)(pformatgetc pgetc,
+                                         pformatungetc pungetc,
+                                         void *arg,
+                                         char16_t const *__restrict format,
+                                         va_list args) {
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE      char16_t
 #define __CHAR_SIZE      2
@@ -1344,11 +1344,11 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_IN(4) ATTR_LIBC_C32SCANF(4, 0) NONNULL((1, 2)) ssize_t
-(LIBKCALL libc_format_vwscanf)(pformatgetc pgetc,
-                               pformatungetc pungetc,
-                               void *arg,
-                               char32_t const *__restrict format,
-                               va_list args) THROWS(...) {
+NOTHROW_CB(LIBKCALL libc_format_vwscanf)(pformatgetc pgetc,
+                                         pformatungetc pungetc,
+                                         void *arg,
+                                         char32_t const *__restrict format,
+                                         va_list args) {
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE      char32_t
 #define __CHAR_SIZE      4
@@ -1385,11 +1385,11 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_IN(4) ATTR_LIBC_C32SCA
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_IN(4) ATTR_LIBC_C16SCANF(4, 0) NONNULL((1, 2)) ssize_t
-(LIBDCALL libd_format_wscanf)(pformatgetc pgetc,
-                              pformatungetc pungetc,
-                              void *arg,
-                              char16_t const *__restrict format,
-                              ...) THROWS(...) {
+NOTHROW_CB(LIBDCALL libd_format_wscanf)(pformatgetc pgetc,
+                                        pformatungetc pungetc,
+                                        void *arg,
+                                        char16_t const *__restrict format,
+                                        ...) {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -1422,11 +1422,11 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_IN(4) ATTR_LIBC_C32SCANF(4, 0) NONNULL((1, 2)) ssize_t
-(LIBKCALL libc_format_wscanf)(pformatgetc pgetc,
-                              pformatungetc pungetc,
-                              void *arg,
-                              char32_t const *__restrict format,
-                              ...) THROWS(...) {
+NOTHROW_CB(LIBKCALL libc_format_wscanf)(pformatgetc pgetc,
+                                        pformatungetc pungetc,
+                                        void *arg,
+                                        char32_t const *__restrict format,
+                                        ...) {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);

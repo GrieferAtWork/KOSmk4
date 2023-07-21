@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba77e67b */
+/* HASH CRC-32:0xcc74c3d1 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,22 +22,21 @@
 #define __local_thrd_exit_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_pthread_exit) || defined(__CRT_HAVE_thr_exit) || defined(__CRT_HAVE_cthread_exit)
-#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_exit_defined
 #define __local___localdep_pthread_exit_defined
 #ifdef __CRT_HAVE_pthread_exit
-__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,__localdep_pthread_exit,(void *__retval),pthread_exit,(__retval))
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),,__localdep_pthread_exit,(void *__retval),pthread_exit,(__retval))
 #elif defined(__CRT_HAVE_thr_exit)
-__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,__localdep_pthread_exit,(void *__retval),thr_exit,(__retval))
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),,__localdep_pthread_exit,(void *__retval),thr_exit,(__retval))
 #elif defined(__CRT_HAVE_cthread_exit)
-__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,__localdep_pthread_exit,(void *__retval),cthread_exit,(__retval))
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),,__localdep_pthread_exit,(void *__retval),cthread_exit,(__retval))
 #else /* ... */
 #undef __local___localdep_pthread_exit_defined
 #endif /* !... */
 #endif /* !__local___localdep_pthread_exit_defined */
 __LOCAL_LIBC(thrd_exit) __ATTR_NORETURN void
-(__LIBCCALL __LIBC_LOCAL_NAME(thrd_exit))(int __res) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(thrd_exit))(int __res) {
 	(__NAMESPACE_LOCAL_SYM __localdep_pthread_exit)((void *)(__UINTPTR_TYPE__)(unsigned int)__res);
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94ecbe36 */
+/* HASH CRC-32:0x755d60ac */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #include <sched/sig.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(shared_lock_waitfor_nx) __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL
-(__FCALL __LIBC_LOCAL_NAME(shared_lock_waitfor_nx))(struct shared_lock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+(__FCALL __LIBC_LOCAL_NAME(shared_lock_waitfor_nx))(struct shared_lock *__restrict __self) __THROWS(E_WOULDBLOCK, ...) {
 	__hybrid_assert(!task_wasconnected());
 	while (!__shared_lock_available(__self)) {
 		TASK_POLL_BEFORE_CONNECT({

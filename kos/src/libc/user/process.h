@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8411671 */
+/* HASH CRC-32:0x75190353 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,10 +34,10 @@ DECL_BEGIN
 INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthread)(void (LIBDCALL *entry)(void *arg), u32 stacksz, void *arg);
 INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec, u32 stacksz, __dos_beginthreadex_entry_t entry, void *arg, u32 flags, u32 *threadaddr);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode);
-INTDEF void (LIBCCALL libc__cexit)(void) THROWS(...);
+INTDEF void (LIBCCALL libc__cexit)(void);
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libc__register_thread_local_exe_atexit_callback)(_tls_callback_type callback);
-INTDEF ATTR_IN_OPT(1) intptr_t (LIBDCALL libd__loaddll)(char __KOS_FIXED_CONST *file) THROWS(...);
-INTDEF ATTR_IN_OPT(1) intptr_t (LIBCCALL libc__loaddll)(char __KOS_FIXED_CONST *file) THROWS(...);
+INTDEF ATTR_IN_OPT(1) intptr_t (LIBDCALL libd__loaddll)(char __KOS_FIXED_CONST *file);
+INTDEF ATTR_IN_OPT(1) intptr_t (LIBCCALL libc__loaddll)(char __KOS_FIXED_CONST *file);
 #endif /* !__KERNEL__ */
 
 DECL_END

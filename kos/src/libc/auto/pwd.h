@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6f99480 */
+/* HASH CRC-32:0x6418f90d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,14 +59,14 @@ INTDEF ATTR_PURE WUNUSED ATTR_IN_OPT(1) bool NOTHROW_NCX(LIBCCALL libc_nss_check
  * Write the given entry `ent' into the given `stream'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF ATTR_IN(1) ATTR_INOUT(2) int (LIBDCALL libd_putpwent)(struct passwd const *__restrict ent, FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_IN(1) ATTR_INOUT(2) int NOTHROW_CB(LIBDCALL libd_putpwent)(struct passwd const *__restrict ent, FILE *__restrict stream);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> putpwent(3)
  * Write the given entry `ent' into the given `stream'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF ATTR_IN(1) ATTR_INOUT(2) int (LIBCCALL libc_putpwent)(struct passwd const *__restrict ent, FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_IN(1) ATTR_INOUT(2) int NOTHROW_CB(LIBCCALL libc_putpwent)(struct passwd const *__restrict ent, FILE *__restrict stream);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getpwuid_r(3)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21873a33 */
+/* HASH CRC-32:0x7dfc6ff2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +21,13 @@
 #ifndef __local_format_hexdump_defined
 #define __local_format_hexdump_defined
 #include <__crt.h>
-#include <kos/anno.h>
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_repeat_defined
 #define __local___localdep_format_repeat_defined
 #ifdef __CRT_HAVE_format_repeat
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_repeat,(__pformatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions),format_repeat,(__printer,__arg,__ch,__num_repetitions))
+__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_CB,__localdep_format_repeat,(__pformatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions),format_repeat,(__printer,__arg,__ch,__num_repetitions))
 #else /* __CRT_HAVE_format_repeat */
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_repeat.h>
@@ -63,7 +62,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/template/itoa_digits.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_hexdump) __ATTR_INS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__
-(__LIBCCALL __LIBC_LOCAL_NAME(format_hexdump))(__pformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(format_hexdump))(__pformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) {
 	__PRIVATE char const __lf[1] = { '\n' };
 	__BYTE_TYPE__ const *__line_data;
 	char __buffer[

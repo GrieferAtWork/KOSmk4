@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ed0b695 */
+/* HASH CRC-32:0x3863a060 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,6 @@
 #ifndef __local_format_wescape_defined
 #define __local_format_wescape_defined
 #include <__crt.h>
-#include <kos/anno.h>
 #include <bits/crt/wformat-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -52,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/template/hex.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_wescape) __ATTR_INS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__
-(__LIBCCALL __LIBC_LOCAL_NAME(format_wescape))(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(format_wescape))(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) {
 	__PRIVATE __WCHAR_TYPE__ const __quote[1] = { '\"' };
 	__WCHAR_TYPE__ __encoded_text[12]; __SIZE_TYPE__ __encoded_text_size;
 	__SSIZE_TYPE__ __result = 0, __temp;

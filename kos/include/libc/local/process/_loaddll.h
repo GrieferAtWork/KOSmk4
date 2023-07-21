@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53467113 */
+/* HASH CRC-32:0x9f97da3a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,13 +23,12 @@
 #include <__crt.h>
 #include <libdl/asm/dlfcn.h>
 #ifdef __CRT_HAVE_dlopen
-#include <kos/anno.h>
 #include <features.h>
 #include <bits/types.h>
 #include <dlfcn.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_loaddll) __ATTR_IN_OPT(1) __INTPTR_TYPE__
-(__LIBCCALL __LIBC_LOCAL_NAME(_loaddll))(char __KOS_FIXED_CONST *__file) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(_loaddll))(char __KOS_FIXED_CONST *__file) {
 #ifdef RTLD_LOCAL
 	return (__INTPTR_TYPE__)(__UINTPTR_TYPE__)dlopen(__file, RTLD_LOCAL);
 #elif defined(RTLD_GLOBAL)

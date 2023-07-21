@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bab9888 */
+/* HASH CRC-32:0xd9822f11 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -670,17 +670,17 @@ __CDECLARE_OPT(__ATTR_IN_OPT(2) __ATTR_OUT(1) __ATTR_NONNULL((3)),__errno_t,__NO
 /* >> pthread_exit(3)
  * Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
-__CDECLARE_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,pthread_exit,(void *__retval),(__retval))
+__CDECLARE_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),,pthread_exit,(void *__retval),(__retval))
 #elif defined(__CRT_HAVE_thr_exit)
 /* >> pthread_exit(3)
  * Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
-__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,pthread_exit,(void *__retval),thr_exit,(__retval))
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),,pthread_exit,(void *__retval),thr_exit,(__retval))
 #elif defined(__CRT_HAVE_cthread_exit)
 /* >> pthread_exit(3)
  * Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
-__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,pthread_exit,(void *__retval),cthread_exit,(__retval))
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),,pthread_exit,(void *__retval),cthread_exit,(__retval))
 #endif /* ... */
 /* >> pthread_join(3)
  * Make calling thread wait for termination of the thread  `self'.
@@ -1213,7 +1213,7 @@ __CDECLARE_OPT(__ATTR_OUT_OPT(3),__errno_t,__NOTHROW_NCX,pthread_getaffinity_np,
  * same `once_control' argument. `once_control' must  point to a static  or
  * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
-__CDECLARE(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__errno_t,__THROWING,pthread_once,(pthread_once_t *__once_control, void (__LIBCCALL *__init_routine)(void)),(__once_control,__init_routine))
+__CDECLARE(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__errno_t,__NOTHROW_CB,pthread_once,(pthread_once_t *__once_control, void (__LIBCCALL *__init_routine)(void)),(__once_control,__init_routine))
 #elif defined(__CRT_HAVE_call_once)
 /* >> pthread_once(3)
  * Guarantee that the initialization function `init_routine' will be called
@@ -1221,7 +1221,7 @@ __CDECLARE(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__errno_t,__THROWING,pthread_once
  * same `once_control' argument. `once_control' must  point to a static  or
  * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__errno_t,__THROWING,pthread_once,(pthread_once_t *__once_control, void (__LIBCCALL *__init_routine)(void)),call_once,(__once_control,__init_routine))
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__errno_t,__NOTHROW_CB,pthread_once,(pthread_once_t *__once_control, void (__LIBCCALL *__init_routine)(void)),call_once,(__once_control,__init_routine))
 #else /* ... */
 #include <libc/local/pthread/pthread_once.h>
 /* >> pthread_once(3)
@@ -1230,7 +1230,7 @@ __CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__errno_t,__THROWING,pthread_onc
  * same `once_control' argument. `once_control' must  point to a static  or
  * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_once, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) __errno_t (__LIBCCALL pthread_once)(pthread_once_t *__once_control, void (__LIBCCALL *__init_routine)(void)) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_once))(__once_control, __init_routine); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_once, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) __errno_t __NOTHROW_CB(__LIBCCALL pthread_once)(pthread_once_t *__once_control, void (__LIBCCALL *__init_routine)(void)) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_once))(__once_control, __init_routine); })
 #endif /* !... */
 
 /* Functions for handling cancellation.

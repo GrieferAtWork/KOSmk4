@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe00d4d56 */
+/* HASH CRC-32:0x4a5b0a49 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -290,28 +290,33 @@ __LIBC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_INOUT(1) except_register_state_t 
 #ifdef __CRT_HAVE_except_throw_current
 /* >> except_throw_current(3)
  * Throw the currently set (in `except_data()') exception. */
-__LIBC __ATTR_COLD __ATTR_NORETURN void (__LIBKCALL except_throw_current)(void) __THROWS(...) __CASMNAME_SAME("except_throw_current");
+__LIBC __ATTR_COLD __ATTR_NORETURN void (__LIBKCALL except_throw_current)(void) __CASMNAME_SAME("except_throw_current");
 #endif /* __CRT_HAVE_except_throw_current */
 #if !defined(__except_rethrow_defined) && defined(__CRT_HAVE_except_rethrow)
 #define __except_rethrow_defined
 /* >> except_rethrow(3)
  * Rethrow the current exception (same as a c++ `throw;' expression) */
-__LIBC __ATTR_COLD __ATTR_NORETURN void (__LIBKCALL except_rethrow)(void) __THROWS(...) __CASMNAME_SAME("except_rethrow");
+__LIBC __ATTR_COLD __ATTR_NORETURN void (__LIBKCALL except_rethrow)(void) __CASMNAME_SAME("except_rethrow");
 #endif /* !__except_rethrow_defined && __CRT_HAVE_except_rethrow */
 #if !defined(__except_throw_defined) && defined(__CRT_HAVE_except_throw)
 #define __except_throw_defined
 /* >> except_throw(3)
  * Throw an exception and fill exception pointers with all zeroes */
-__LIBC __ATTR_COLD __ATTR_NORETURN void (__EXCEPT_THROW_CC except_throw)(except_code_t __code) __THROWS(...) __CASMNAME_SAME("except_throw");
+__LIBC __ATTR_COLD __ATTR_NORETURN void (__EXCEPT_THROW_CC except_throw)(except_code_t __code) __CASMNAME_SAME("except_throw");
 #endif /* !__except_throw_defined && __CRT_HAVE_except_throw */
 #if !defined(__except_thrown_defined) && defined(__CRT_HAVE_except_thrown)
 #define __except_thrown_defined
 /* >> except_thrown(3)
  * Throw an exception and load `argc' pointers from varargs */
-__LIBC __ATTR_COLD __ATTR_NORETURN void (__EXCEPT_THROWN_CC except_thrown)(except_code_t __code, unsigned int ___argc, ...) __THROWS(...) __CASMNAME_SAME("except_thrown");
+__LIBC __ATTR_COLD __ATTR_NORETURN void (__EXCEPT_THROWN_CC except_thrown)(except_code_t __code, unsigned int ___argc, ...) __CASMNAME_SAME("except_thrown");
 #endif /* !__except_thrown_defined && __CRT_HAVE_except_thrown */
 /* Rethrow the last exception */
-#ifdef __except_rethrow_defined
+#ifdef __CHECKER__
+#define __except_rethrow_defined
+#undef except_rethrow
+#define except_rethrow() __builtin_rethrow()
+#define RETHROW()        __builtin_rethrow()
+#elif defined(__except_rethrow_defined)
 #define RETHROW() except_rethrow()
 #elif defined(__cplusplus)
 #define RETHROW() throw
@@ -430,7 +435,10 @@ __LIBC __ATTR_IN(1) void __NOTHROW(__EXCEPT_NESTING_END_CC except_nesting_end)(s
 
 /* Nested exception support */
 #ifdef __cplusplus
-#if defined(__except_nesting_begin_defined) && defined(__except_nesting_end_defined)
+#ifdef __CHECKER__
+#define __NESTED_TRY       try
+#define __NESTED_EXCEPTION (void)0
+#elif defined(__except_nesting_begin_defined) && defined(__except_nesting_end_defined)
 class __cxx_exception_nesting: public _exception_nesting_data {
 public:
 	__ATTR_FORCEINLINE operator bool() const __CXX_NOEXCEPT { return false; }

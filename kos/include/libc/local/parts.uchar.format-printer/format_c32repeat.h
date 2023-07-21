@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d2747b0 */
+/* HASH CRC-32:0xd31b77aa */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,12 @@
 #ifndef __local_format_c32repeat_defined
 #define __local_format_c32repeat_defined
 #include <__crt.h>
-#include <kos/anno.h>
 #include <bits/crt/uformat-printer.h>
 #include <hybrid/__alloca.h>
 #include <libc/string.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_c32repeat) __ATTR_NONNULL((1)) __SSIZE_TYPE__
-(__LIBKCALL __LIBC_LOCAL_NAME(format_c32repeat))(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions) __THROWS(...) {
+__NOTHROW_CB(__LIBKCALL __LIBC_LOCAL_NAME(format_c32repeat))(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions) {
 	__SSIZE_TYPE__ __result, __temp;
 #ifdef __hybrid_alloca
 	__CHAR32_TYPE__ *__buffer;

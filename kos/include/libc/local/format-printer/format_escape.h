@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7770edd */
+/* HASH CRC-32:0x2041b2b6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,6 @@
 #ifndef __local_format_escape_defined
 #define __local_format_escape_defined
 #include <__crt.h>
-#include <kos/anno.h>
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -52,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/template/hex.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_escape) __ATTR_INS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__
-(__LIBCCALL __LIBC_LOCAL_NAME(format_escape))(__pformatprinter __printer, void *__arg, char const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(format_escape))(__pformatprinter __printer, void *__arg, char const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) {
 	__PRIVATE char const __quote[1] = { '\"' };
 	char __encoded_text[12]; __SIZE_TYPE__ __encoded_text_size;
 	__SSIZE_TYPE__ __result = 0, __temp;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1863760 */
+/* HASH CRC-32:0x6f047d4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,12 @@
 #ifndef __local_format_wrepeat_defined
 #define __local_format_wrepeat_defined
 #include <__crt.h>
-#include <kos/anno.h>
 #include <bits/crt/wformat-printer.h>
 #include <hybrid/__alloca.h>
 #include <libc/string.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_wrepeat) __ATTR_NONNULL((1)) __SSIZE_TYPE__
-(__LIBCCALL __LIBC_LOCAL_NAME(format_wrepeat))(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions) __THROWS(...) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(format_wrepeat))(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions) {
 	__SSIZE_TYPE__ __result, __temp;
 #ifdef __hybrid_alloca
 	__WCHAR_TYPE__ *__buffer;

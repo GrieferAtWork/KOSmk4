@@ -481,14 +481,18 @@ template<class __S> struct __loc_T { typedef __S __T; };
 
 #ifdef __CC__
 #ifndef __FILE
-#define __FILE struct __NAMESPACE_STD_SYM __IO_FILE
+#ifdef __cplusplus
+#define __FILE __NAMESPACE_STD_SYM __IO_FILE
+#else /* __cplusplus */
+#define __FILE struct __IO_FILE
+#endif /* !__cplusplus */
 __NAMESPACE_STD_BEGIN
 struct __IO_FILE;
 __NAMESPACE_STD_END
 #endif /* !__FILE */
 struct __locale_struct;
 #ifdef __cplusplus
-#define __locale_t struct ::__locale_struct *
+#define __locale_t ::__locale_struct *
 #else /* __cplusplus */
 #define __locale_t struct __locale_struct *
 #endif /* !__cplusplus */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53b26629 */
+/* HASH CRC-32:0xbbf84a8c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,11 +50,10 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_format_printf_defined
 #ifdef __CRT_HAVE_format_printf
 __NAMESPACE_LOCAL_END
-#include <kos/anno.h>
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LIBC __ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__VLIBCCALL __localdep_format_printf)(__pformatprinter __printer, void *__arg, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("format_printf");
+__LIBC __ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_CB(__VLIBCCALL __localdep_format_printf)(__pformatprinter __printer, void *__arg, char const *__restrict __format, ...) __CASMNAME("format_printf");
 #else /* __CRT_HAVE_format_printf */
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_printf.h>

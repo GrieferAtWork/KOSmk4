@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x146a064 */
+/* HASH CRC-32:0xe689c691 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 /* >> pthread_exit(3)
  * Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
-INTDEF ATTR_NORETURN ATTR_ACCESS_NONE(1) void (LIBDCALL libd_pthread_exit)(void *retval) THROWS(...);
+INTDEF ATTR_NORETURN ATTR_ACCESS_NONE(1) void (LIBDCALL libd_pthread_exit)(void *retval);
 /* >> pthread_join(3)
  * Make calling thread wait for termination of the thread  `self'.
  * The exit status of the thread is stored in `*thread_return', if
@@ -273,7 +273,7 @@ INTDEF ATTR_OUT_OPT(3) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_getaffinity_np)
  * same `once_control' argument. `once_control' must  point to a static  or
  * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
-INTDEF ATTR_INOUT(1) NONNULL((2)) errno_t (LIBDCALL libd_pthread_once)(pthread_once_t *once_control, void (LIBDCALL *init_routine)(void)) THROWS(...);
+INTDEF ATTR_INOUT(1) NONNULL((2)) errno_t NOTHROW_CB(LIBDCALL libd_pthread_once)(pthread_once_t *once_control, void (LIBDCALL *init_routine)(void));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> pthread_once(3)
@@ -282,7 +282,7 @@ INTDEF ATTR_INOUT(1) NONNULL((2)) errno_t (LIBDCALL libd_pthread_once)(pthread_o
  * same `once_control' argument. `once_control' must  point to a static  or
  * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
-INTDEF ATTR_INOUT(1) NONNULL((2)) errno_t (LIBCCALL libc_pthread_once)(pthread_once_t *once_control, void (LIBCCALL *init_routine)(void)) THROWS(...);
+INTDEF ATTR_INOUT(1) NONNULL((2)) errno_t NOTHROW_CB(LIBCCALL libc_pthread_once)(pthread_once_t *once_control, void (LIBCCALL *init_routine)(void));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pthread_setcancelstate(3)

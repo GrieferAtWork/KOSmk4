@@ -18,12 +18,17 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 import * from deemon;
+import fs;
 
 /* Disable filename/line overrides */
 #undef NO_LINE_OVERRIDES
-#if 1
+#if 0
 #define NO_LINE_OVERRIDES
 #endif
+
+/* Buffer size for `CParser.more()'
+ * WARNING: If you set this too high, line/column calculations will take very long */
+#define MORE_BUFSIZE 128
 
 class ParserError: Error { this = super; }
 
@@ -66,7 +71,6 @@ class CParser {
 	private member buf: Bytes = none;
 	private member bufPos: int = 0;
 	private member bufLen: int = 0;
-	private member warnPos: ParserBackup | none = none;
 
 	@@Starting line of @buf (1-based)
 	private member bufStartLine: int = 1;
@@ -79,7 +83,7 @@ class CParser {
 	public final function subChunkPush(bytes: Bytes, flc: (string, int, int)): ParserBackup {
 		local backup = (
 			bufPos, tok, tokStart, tokenId, filename, fp,
-			buf, warnPos, bufStartLine, bufStartCol, peeking);
+			buf, bufStartLine, bufStartCol, peeking);
 		tok = "";
 		tokStart = 0;
 		tokenId = 0;
@@ -88,7 +92,6 @@ class CParser {
 		buf = bytes;
 		bufPos = 0;
 		bufLen = #bytes;
-		warnPos = none;
 		bufStartLine = flc[1];
 		bufStartCol = flc[2];
 		peeking = true;
@@ -99,7 +102,7 @@ class CParser {
 	@@Restore the context from before a call to @subChunkPush
 	public final function subChunkPop(backup: ParserBackup) {
 		bufPos, tok, tokStart, tokenId, filename, fp, buf,
-			warnPos, bufStartLine, bufStartCol, peeking = backup...;
+			bufStartLine, bufStartCol, peeking = backup...;
 		bufLen = #buf;
 	}
 
@@ -130,26 +133,6 @@ class CParser {
 
 	public final function backupDiscard(backup: ParserBackup) {
 		peeking = backup.last;
-	}
-
-	public final function warnBackupCreate(): ParserBackup {
-		local oldPeeking = peeking;
-		peeking = true;
-		return (bufPos, oldPeeking);
-	}
-
-	public final function warnBackupDiscard(backup: ParserBackup) {
-		peeking = backup.last;
-	}
-
-	public final function startWarnHere() {
-		warnPos = (bufPos, peeking);
-		peeking = true;
-	}
-
-	public final function endWarnHere() {
-		peeking = warnPos.last;
-		warnPos = none;
 	}
 
 	private function setFilename(filename: string) {
@@ -193,7 +176,7 @@ class CParser {
 
 	@@Extend the currently loaded buffer
 	private function more(extend: bool = false): bool {
-		local data = fp.read(1024);
+		local data = fp.read(MORE_BUFSIZE);
 		if (!data)
 			return false;
 		data = data.unifylines();
@@ -255,7 +238,7 @@ class CParser {
 		}
 	}
 
-	@@Returns the filename/line/column pair for @tok
+	@@Returns the filename/line/column triple for @tok
 	public final property flc: (string, int, int) = {
 		get(): (string, int, int) {
 			local lines = buf.count("\n", 0, tokStart);
@@ -278,26 +261,26 @@ class CParser {
 			flc: (string, int, int) | none, message: string): string {
 		if (flc is none)
 			return "";
-		return f"\n{flc[0]}({flc[1]},{flc[2]}) : Note : {message}";
+		return f"\n{fs.abspath(flc[0])}({flc[1]},{flc[2]}): Note : {message}";
 	}
 
 	public final function warnAt(pos: int | ParserBackup, warningName: string, message: string) {
 		if (warningName !in ignoredWarnings) {
 			local line, col = this.lcAt(pos)...;
-			local text = f"{filename}({line},{col}): Warning {warningName} : {message}";
+			local text = f"{fs.abspath(filename)}({line},{col}): Warning {warningName} : {message}";
 			print File.stderr: text;
 		}
 	}
 
 	public final function errMsgAt(pos: int | ParserBackup, message: string): string {
 		local line, col = this.lcAt(pos)...;
-		local text = f"{filename}({line},{col}): Error : {message}";
+		local text = f"{fs.abspath(filename)}({line},{col}): Error : {message}";
 		print File.stderr: text;
 		return text;
 	}
 
 	public final function errMsg(message: string): string {
-		return errMsgAt(warnPos !is none ? warnPos : tokStart, message);
+		return errMsgAt(tokStart, message);
 	}
 
 	public final function errAt(pos: int | ParserBackup, message: string) {
@@ -305,11 +288,11 @@ class CParser {
 	}
 
 	public final function warn(warningName: string, message: string) {
-		warnAt(warnPos !is none ? warnPos : tokStart, warningName, message);
+		warnAt(tokStart, warningName, message);
 	}
 
 	public final function err(message: string) {
-		errAt(warnPos !is none ? warnPos : tokStart, message);
+		errAt(tokStart, message);
 	}
 
 	public final function requireInt(): int {
@@ -428,6 +411,11 @@ again:
 
 	@@Advance to the next token
 	public final function next(): string {
+#if 0
+#define RETURN(ch) ({ print "Parser:", repr ch; return ch; })
+#else
+#define RETURN(ch) return ch
+#endif
 		local ch;
 again:
 		tokStart = bufPos;
@@ -595,7 +583,7 @@ warn_unknown_pragma:
 					goto again;
 				if (ch == "__static_if")
 					goto do_handleStaticIf;
-				return ch;
+				RETURN(ch);
 			}
 			break;
 
@@ -619,12 +607,22 @@ warn_unknown_pragma:
 				}
 return_tok:
 				ch = str buf[tokStart:bufPos];
-				if (ch == "__static_if" && staticIfAllowed) {
+				switch (ch) {
+				case "__static_if":
+					if (staticIfAllowed) {
 do_handleStaticIf:
-					ch = handleStaticIf();
-					if (ch is none)
-						goto again;
-					return ch;
+						ch = handleStaticIf();
+						if (ch is none)
+							goto again;
+						RETURN(ch);
+					}
+					break;
+				case "__FUNCTION__":
+					if (this.currentFunctionName !is none)
+						ch = repr this.currentFunctionName;
+					break;
+				default:
+					break;
 				}
 				goto return_ch;
 			}
@@ -634,7 +632,8 @@ return_ch:
 		++tokenId;
 return_ch_eof:
 		tok = ch;
-		return ch;
+		RETURN(ch);
+#undef RETURN
 	}
 
 	function handleStaticIfSkipBlock() {

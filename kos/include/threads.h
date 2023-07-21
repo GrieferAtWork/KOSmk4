@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae684c60 */
+/* HASH CRC-32:0x3336cc68 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -280,12 +280,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_sleep64, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #ifdef __CRT_HAVE_thrd_exit
 /* >> thrd_exit(3)
  * Terminate the calling thread (s.a. `pthread_exit(3)') */
-__CDECLARE_VOID(__ATTR_NORETURN,__THROWING,thrd_exit,(int __res),(__res))
+__CDECLARE_VOID(__ATTR_NORETURN,,thrd_exit,(int __res),(__res))
 #elif defined(__CRT_HAVE_pthread_exit) || defined(__CRT_HAVE_thr_exit) || defined(__CRT_HAVE_cthread_exit)
 #include <libc/local/threads/thrd_exit.h>
 /* >> thrd_exit(3)
  * Terminate the calling thread (s.a. `pthread_exit(3)') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(thrd_exit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL thrd_exit)(int __res) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_exit))(__res); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(thrd_exit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL thrd_exit)(int __res) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_exit))(__res); })
 #endif /* ... */
 #ifdef __CRT_HAVE_thrd_detach
 /* >> thrd_detach(3)
@@ -470,16 +470,16 @@ __CDECLARE_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,mtx_destroy,(mtx_t *__restrict __m
 #ifdef __CRT_HAVE_pthread_once
 /* >> call_once(3)
  * Invoke `func', but make sure this only happens once (s.a. `pthread_once()') */
-__CREDIRECT_VOID(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__THROWING,call_once,(once_flag *__restrict __flag, void (__LIBCCALL *__func)(void)),pthread_once,(__flag,__func))
+__CREDIRECT_VOID(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__NOTHROW_CB,call_once,(once_flag *__restrict __flag, void (__LIBCCALL *__func)(void)),pthread_once,(__flag,__func))
 #elif defined(__CRT_HAVE_call_once)
 /* >> call_once(3)
  * Invoke `func', but make sure this only happens once (s.a. `pthread_once()') */
-__CDECLARE_VOID(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__THROWING,call_once,(once_flag *__restrict __flag, void (__LIBCCALL *__func)(void)),(__flag,__func))
+__CDECLARE_VOID(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__NOTHROW_CB,call_once,(once_flag *__restrict __flag, void (__LIBCCALL *__func)(void)),(__flag,__func))
 #else /* ... */
 #include <libc/local/pthread/pthread_once.h>
 /* >> call_once(3)
  * Invoke `func', but make sure this only happens once (s.a. `pthread_once()') */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) void (__LIBCCALL call_once)(once_flag *__restrict __flag, void (__LIBCCALL *__func)(void)) __THROWS(...) { (void)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_once))((__pthread_once_t *)__flag, __func); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) void __NOTHROW_CB(__LIBCCALL call_once)(once_flag *__restrict __flag, void (__LIBCCALL *__func)(void)) { (void)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_once))((__pthread_once_t *)__flag, __func); }
 #endif /* !... */
 
 

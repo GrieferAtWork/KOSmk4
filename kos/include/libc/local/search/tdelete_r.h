@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdeeb6a81 */
+/* HASH CRC-32:0xd355fa69 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,6 @@
 #ifndef __local_tdelete_r_defined
 #define __local_tdelete_r_defined
 #include <__crt.h>
-#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined
@@ -56,7 +55,7 @@ __NAMESPACE_LOCAL_END
 #include <parts/malloca.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(tdelete_r) __ATTR_INOUT_OPT(2) __ATTR_IN_OPT(1) __ATTR_NONNULL((3)) void *
-(__LIBCCALL __LIBC_LOCAL_NAME(tdelete_r))(void const *__restrict __key, void **__restrict __vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg) __THROWS(...) {
+__NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdelete_r))(void const *__restrict __key, void **__restrict __vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg) {
 	typedef struct __node_struct {
 		void const           *__key;
 		struct __node_struct *__left_node;

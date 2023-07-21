@@ -723,7 +723,7 @@ $errno_t pthread_create([[out]] pthread_t *__restrict p_newthread,
 @@>> pthread_exit(3)
 @@Terminate calling thread.
 @@The registered cleanup handlers are called via exception handling
-[[throws, noreturn, export_alias("thr_exit", "cthread_exit")]]
+[[no_nothrow, noreturn, export_alias("thr_exit", "cthread_exit")]]
 void pthread_exit([[access(none)]] void *retval);
 
 @@>> pthread_join(3)
@@ -1267,7 +1267,7 @@ $errno_t pthread_getaffinity_np(pthread_t self, size_t cpusetsize,
 @@same `once_control' argument. `once_control' must  point to a static  or
 @@extern variable initialized to `PTHREAD_ONCE_INIT'.
 @@@return: EOK: Success
-[[throws, export_alias("call_once")]]
+[[nothrow_cb, export_alias("call_once")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[impl_include("<asm/crt/pthreadvalues.h>", "<hybrid/__atomic.h>")]]
 [[impl_include("<hybrid/sched/__yield.h>", "<asm/os/errno.h>")]]

@@ -153,9 +153,9 @@ NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode)
 INTDEF void LIBCCALL libc_run_atexit(int status);
 INTDEF void LIBCCALL libc___call_tls_dtors(void);
 
-/*[[[head:libc__cexit,hash:CRC-32=0xb122eb11]]]*/
+/*[[[head:libc__cexit,hash:CRC-32=0x60f22c88]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.sched.process") void
-(LIBCCALL libc__cexit)(void) THROWS(...)
+(LIBCCALL libc__cexit)(void)
 /*[[[body:libc__cexit]]]*/
 {
 	/* Same as `exit()', but without actually exiting... */
@@ -176,9 +176,9 @@ NOTHROW_NCX(LIBDCALL libc__register_thread_local_exe_atexit_callback)(_tls_callb
 }
 /*[[[end:libc__register_thread_local_exe_atexit_callback]]]*/
 
-/*[[[head:libd__loaddll,hash:CRC-32=0xcfa0757d]]]*/
+/*[[[head:libd__loaddll,hash:CRC-32=0xc392dd67]]]*/
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.dlfcn") ATTR_IN_OPT(1) intptr_t
-(LIBDCALL libd__loaddll)(char __KOS_FIXED_CONST *file) THROWS(...)
+(LIBDCALL libd__loaddll)(char __KOS_FIXED_CONST *file)
 /*[[[body:libd__loaddll]]]*/
 {
 	typedef HMODULE (WINAPI *LPLOADLIBRARYA)(LPCSTR lpLibFileName);
@@ -189,9 +189,9 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.dlfcn") ATTR_IN_OPT(1) 
 }
 /*[[[end:libd__loaddll]]]*/
 
-/*[[[head:libc__loaddll,hash:CRC-32=0x27274c2a]]]*/
+/*[[[head:libc__loaddll,hash:CRC-32=0xc0f81cd3]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.fs.dlfcn") ATTR_IN_OPT(1) intptr_t
-(LIBCCALL libc__loaddll)(char __KOS_FIXED_CONST *file) THROWS(...)
+(LIBCCALL libc__loaddll)(char __KOS_FIXED_CONST *file)
 /*[[[body:libc__loaddll]]]*/
 {
 	return (intptr_t)(uintptr_t)dlopen(file, RTLD_LOCAL);

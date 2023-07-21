@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9c88915 */
+/* HASH CRC-32:0x168f0272 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,6 @@
 #ifndef __local_tdestroy_r_defined
 #define __local_tdestroy_r_defined
 #include <__crt.h>
-#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined
@@ -38,7 +37,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
 __LOCAL_LIBC(tdestroy_r) __ATTR_INOUT_OPT(1) __ATTR_NONNULL((2)) void
-(__LIBCCALL __LIBC_LOCAL_NAME(tdestroy_r))(void *__root, void (__LIBCCALL *__freefct)(void *__nodep, void *__arg), void *__arg) __THROWS(...) {
+__NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdestroy_r))(void *__root, void (__LIBCCALL *__freefct)(void *__nodep, void *__arg), void *__arg) {
 	if (__root) {
 		void *__l, *__r;
 __again:

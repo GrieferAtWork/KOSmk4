@@ -860,12 +860,12 @@ NOTHROW_NCX(FCALL cmodsymtab_lookup)(struct cmodsymtab const *__restrict self,
 
 
 
-PRIVATE NONNULL((1, 2, 4)) char const *
+PRIVATE NONNULL((1, 2, 4)) char CHECKED const *
 NOTHROW_NCX(FCALL parse_symbol_name_for_object)(di_debuginfo_cu_parser_t *__restrict self,
                                                 uintptr_t *__restrict pns,
                                                 bool reuse_parser,
                                                 bool *__restrict phas_location_information);
-PRIVATE ATTR_NOINLINE NONNULL((1)) char const *
+PRIVATE ATTR_NOINLINE NONNULL((1)) char CHECKED const *
 NOTHROW_NCX(FCALL parse_symbol_name_for_object_r)(di_debuginfo_cu_parser_t *__restrict self,
                                                   byte_t CHECKED const *abstract_origin,
                                                   uintptr_t *__restrict pns,
@@ -2337,7 +2337,7 @@ NOTHROW_NCX(FCALL cmodule_getsym_withhint)(struct cmodule *start_module,
  * given `dip' is not apart of any of the CUs of `self', then `result' will
  * be initialized to always indicate EOF.
  * @param: dip: DebugInfoPointer. (s.a. `cmodunit_parser_from_dip()') */
-PUBLIC NONNULL((1, 2, 3)) void
+PUBLIC NONNULL((1, 2)) void
 NOTHROW_NCX(FCALL cmodule_parser_from_dip)(struct cmodule const *__restrict self,
                                            di_debuginfo_cu_parser_t *__restrict result,
                                            byte_t CHECKED const *dip) {

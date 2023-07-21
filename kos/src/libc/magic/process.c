@@ -627,10 +627,10 @@ void _endthread() {
 [[section(".text.crt.dos.sched.thread")]]
 void _endthreadex($u32 exitcode);
 
-[[throws, section(".text.crt.dos.sched.process")]]
+[[no_nothrow, section(".text.crt.dos.sched.process")]]
 void _cexit();
 
-[[throws, section(".text.crt.dos.sched.process")]]
+[[no_nothrow, section(".text.crt.dos.sched.process")]]
 void _c_exit() {
 }
 
@@ -732,7 +732,7 @@ intptr_t _spawnlpe(__STDC_INT_AS_UINT_T mode,
 %[define_c_language_keyword(__KOS_FIXED_CONST)]
 
 [[section(".text.crt.dos.fs.dlfcn")]]
-[[throws, decl_include("<features.h>", "<bits/types.h>")]]
+[[no_nothrow, decl_include("<features.h>", "<bits/types.h>")]]
 [[requires_include("<libdl/asm/dlfcn.h>")]]
 [[requires(defined(__CRT_HAVE_dlopen))]]
 [[crt_dos_variant, userimpl, impl_include("<dlfcn.h>")]]
@@ -747,7 +747,7 @@ intptr_t _loaddll([[in_opt]] char __KOS_FIXED_CONST *file) {
 }
 
 [[section(".text.crt.dos.fs.dlfcn")]]
-[[throws, decl_include("<bits/types.h>")]]
+[[no_nothrow, decl_include("<bits/types.h>")]]
 [[impl_include("<dlfcn.h>")]]
 int _unloaddll(intptr_t hnd) {
 @@pp_ifdef __CRT_HAVE_dlclose@@
@@ -775,7 +775,7 @@ typedef int (*__procfun)(void);
 )]
 
 [[section(".text.crt.dos.fs.dlfcn")]]
-[[throws, decl_include("<features.h>", "<bits/types.h>")]]
+[[no_nothrow, decl_include("<features.h>", "<bits/types.h>")]]
 [[decl_prefix(DEFINE_PROCFUN)]]
 [[requires_include("<libdl/asm/dlfcn.h>")]]
 [[requires(defined(__CRT_HAVE_dlsym))]]

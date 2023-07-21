@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15a34868 */
+/* HASH CRC-32:0x6b5a4be0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -483,11 +483,11 @@ NOTHROW_NCX(LIBCCALL libc__endthread)(void) {
 	libc__endthreadex(0);
 }
 INTERN ATTR_SECTION(".text.crt.dos.sched.process") void
-(LIBCCALL libc__c_exit)(void) THROWS(...) {
+(LIBCCALL libc__c_exit)(void) {
 }
 #include <dlfcn.h>
 INTERN ATTR_SECTION(".text.crt.dos.fs.dlfcn") int
-(LIBCCALL libc__unloaddll)(intptr_t hnd) THROWS(...) {
+(LIBCCALL libc__unloaddll)(intptr_t hnd) {
 
 	return dlclose((void *)(uintptr_t)hnd);
 
@@ -499,7 +499,7 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.dlfcn") int
 INTERN ATTR_SECTION(".text.crt.dos.fs.dlfcn") ATTR_IN_OPT(2) __procfun
 (LIBCCALL libc__getdllprocaddr)(intptr_t hnd,
                                 char __KOS_FIXED_CONST *symname,
-                                intptr_t ord) THROWS(...) {
+                                intptr_t ord) {
 	(void)ord;
 	return (__procfun)dlsym((void *)(uintptr_t)hnd, symname);
 }

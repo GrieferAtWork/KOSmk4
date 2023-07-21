@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2add4f5e */
+/* HASH CRC-32:0x982d42ea */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __CDECLARE_OPT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALL_PAGEAL
 __CDECLARE(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALL_PAGEALIGNED __ATTR_ALLOC_SIZE((1)),void *,__THROWING,Valloc,(size_t __num_bytes),(__num_bytes))
 #elif defined(__CRT_HAVE_Memalign)
 #include <libc/local/kos.malloc/Valloc.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(Valloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALL_PAGEALIGNED __ATTR_ALLOC_SIZE((1)) void *(__LIBCCALL Valloc)(size_t __num_bytes) __THROWS(__E_BADALLOC) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Valloc))(__num_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(Valloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALL_PAGEALIGNED __ATTR_ALLOC_SIZE((1)) void *(__LIBCCALL Valloc)(size_t __num_bytes) __THROWS(E_BADALLOC) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Valloc))(__num_bytes); })
 #endif /* ... */
 
 #ifdef __USE_KOS
@@ -54,7 +54,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Valloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MA
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_INS(1, 2),void *,__THROWING,MemDup,(void const *__restrict __ptr, size_t __num_bytes),(__ptr,__num_bytes))
 #elif defined(__CRT_HAVE_Malloc)
 #include <libc/local/kos.malloc/MemDup.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(MemDup, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_INS(1, 2) void *(__LIBCCALL MemDup)(void const *__restrict __ptr, size_t __num_bytes) __THROWS(__E_BADALLOC) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(MemDup))(__ptr, __num_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(MemDup, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_INS(1, 2) void *(__LIBCCALL MemDup)(void const *__restrict __ptr, size_t __num_bytes) __THROWS(E_BADALLOC) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(MemDup))(__ptr, __num_bytes); })
 #endif /* ... */
 #ifdef __CRT_HAVE_MemCDup
 /* @throws: E_BADALLOC: ... */
@@ -62,7 +62,7 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WU
 #elif defined(__CRT_HAVE_MemDup) || defined(__CRT_HAVE_Malloc)
 #include <libc/local/kos.malloc/MemCDup.h>
 /* @throws: E_BADALLOC: ... */
-__NAMESPACE_LOCAL_USING_OR_IMPL(MemCDup, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_INS(1, 3) void *(__LIBCCALL MemCDup)(void const *__restrict __ptr, int __needle, size_t __num_bytes) __THROWS(__E_BADALLOC) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(MemCDup))(__ptr, __needle, __num_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(MemCDup, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_INS(1, 3) void *(__LIBCCALL MemCDup)(void const *__restrict __ptr, int __needle, size_t __num_bytes) __THROWS(E_BADALLOC) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(MemCDup))(__ptr, __needle, __num_bytes); })
 #endif /* ... */
 #endif /* __USE_KOS */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb125bf28 */
+/* HASH CRC-32:0xd5da009c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,10 +21,9 @@
 #ifndef __local__c_exit_defined
 #define __local__c_exit_defined
 #include <__crt.h>
-#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_c_exit) void
-(__LIBCCALL __LIBC_LOCAL_NAME(_c_exit))(void) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(_c_exit))(void) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__c_exit_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa9f5100 */
+/* HASH CRC-32:0xbe3f3b9a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,12 +43,12 @@ NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg,
  * Repeat  `ch'  a   number  of  `num_repetitions'   times
  * The usual format-printer rules apply, and this function
  * is  allowed to  call `printer'  as often  as it chooses */
-INTDEF NONNULL((1)) ssize_t (LIBDCALL libd_format_wrepeat)(pc16formatprinter printer, void *arg, char16_t ch, size_t num_repetitions) THROWS(...);
+INTDEF NONNULL((1)) ssize_t NOTHROW_CB(LIBDCALL libd_format_wrepeat)(pc16formatprinter printer, void *arg, char16_t ch, size_t num_repetitions);
 /* >> format_repeat(3)
  * Repeat  `ch'  a   number  of  `num_repetitions'   times
  * The usual format-printer rules apply, and this function
  * is  allowed to  call `printer'  as often  as it chooses */
-INTDEF NONNULL((1)) ssize_t (LIBKCALL libc_format_wrepeat)(pc32formatprinter printer, void *arg, char32_t ch, size_t num_repetitions) THROWS(...);
+INTDEF NONNULL((1)) ssize_t NOTHROW_CB(LIBKCALL libc_format_wrepeat)(pc32formatprinter printer, void *arg, char32_t ch, size_t num_repetitions);
 /* >> format_escape(3)
  * Do C-style escape on the given text, printing it to the given printer.
  * Input:
@@ -63,7 +63,7 @@ INTDEF NONNULL((1)) ssize_t (LIBKCALL libc_format_wrepeat)(pc32formatprinter pri
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBDCALL libd_format_wescape)(pc16formatprinter printer, void *arg, char16_t const *__restrict text, size_t textlen, unsigned int flags) THROWS(...);
+INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t NOTHROW_CB(LIBDCALL libd_format_wescape)(pc16formatprinter printer, void *arg, char16_t const *__restrict text, size_t textlen, unsigned int flags);
 /* >> format_escape(3)
  * Do C-style escape on the given text, printing it to the given printer.
  * Input:
@@ -78,7 +78,7 @@ INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBDCALL libd_format_wescape)(pc16fo
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBKCALL libc_format_wescape)(pc32formatprinter printer, void *arg, char32_t const *__restrict text, size_t textlen, unsigned int flags) THROWS(...);
+INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t NOTHROW_CB(LIBKCALL libc_format_wescape)(pc32formatprinter printer, void *arg, char32_t const *__restrict text, size_t textlen, unsigned int flags);
 /* >> format_hexdump(3)
  * Print a hex dump of the given data using the provided format printer
  * @param: printer:  The format printer callback
@@ -89,7 +89,7 @@ INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBKCALL libc_format_wescape)(pc32fo
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBDCALL libd_format_whexdump)(pc16formatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags) THROWS(...);
+INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t NOTHROW_CB(LIBDCALL libd_format_whexdump)(pc16formatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags);
 /* >> format_hexdump(3)
  * Print a hex dump of the given data using the provided format printer
  * @param: printer:  The format printer callback
@@ -100,7 +100,7 @@ INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBDCALL libd_format_whexdump)(pc16f
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBKCALL libc_format_whexdump)(pc32formatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags) THROWS(...);
+INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t NOTHROW_CB(LIBKCALL libc_format_whexdump)(pc32formatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags);
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation. Taking a regular printf-style format string and arguments,
  * this  function will call the given `printer' callback with various strings that, when put
@@ -113,7 +113,7 @@ INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBKCALL libc_format_whexdump)(pc32f
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_IN(3) ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1)) ssize_t (LIBDCALL libd_format_vwprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_IN(3) ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1)) ssize_t NOTHROW_CB(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, va_list args);
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation. Taking a regular printf-style format string and arguments,
  * this  function will call the given `printer' callback with various strings that, when put
@@ -126,7 +126,7 @@ INTDEF ATTR_IN(3) ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1)) ssize_t (LIBDCALL libd_
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_IN(3) ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1)) ssize_t (LIBKCALL libc_format_vwprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_IN(3) ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1)) ssize_t NOTHROW_CB(LIBKCALL libc_format_vwprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, va_list args);
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation. Taking a regular printf-style format string and arguments,
  * this  function will call the given `printer' callback with various strings that, when put
@@ -139,7 +139,7 @@ INTDEF ATTR_IN(3) ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1)) ssize_t (LIBKCALL libc_
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_IN(3) ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1)) ssize_t (LIBDCALL libd_format_wprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_IN(3) ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1)) ssize_t NOTHROW_CB(LIBDCALL libd_format_wprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, ...);
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation. Taking a regular printf-style format string and arguments,
  * this  function will call the given `printer' callback with various strings that, when put
@@ -152,7 +152,7 @@ INTDEF ATTR_IN(3) ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1)) ssize_t (LIBDCALL libd_
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_IN(3) ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1)) ssize_t (LIBKCALL libc_format_wprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_IN(3) ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1)) ssize_t NOTHROW_CB(LIBKCALL libc_format_wprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, ...);
 /* >> format_scanf(3), format_vscanf(3)
  * Generic     scanf     implementation
  * Taking a regular scanf-style format string and argument, these
@@ -177,7 +177,7 @@ INTDEF ATTR_IN(3) ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1)) ssize_t (LIBKCALL libc_
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-INTDEF ATTR_IN(4) ATTR_LIBC_C16SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBDCALL libd_format_vwscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char16_t const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_IN(4) ATTR_LIBC_C16SCANF(4, 0) NONNULL((1, 2)) ssize_t NOTHROW_CB(LIBDCALL libd_format_vwscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char16_t const *__restrict format, va_list args);
 /* >> format_scanf(3), format_vscanf(3)
  * Generic     scanf     implementation
  * Taking a regular scanf-style format string and argument, these
@@ -202,7 +202,7 @@ INTDEF ATTR_IN(4) ATTR_LIBC_C16SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBDCALL lib
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-INTDEF ATTR_IN(4) ATTR_LIBC_C32SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBKCALL libc_format_vwscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char32_t const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_IN(4) ATTR_LIBC_C32SCANF(4, 0) NONNULL((1, 2)) ssize_t NOTHROW_CB(LIBKCALL libc_format_vwscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char32_t const *__restrict format, va_list args);
 /* >> format_scanf(3), format_vscanf(3)
  * Generic     scanf     implementation
  * Taking a regular scanf-style format string and argument, these
@@ -227,7 +227,7 @@ INTDEF ATTR_IN(4) ATTR_LIBC_C32SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBKCALL lib
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-INTDEF ATTR_IN(4) ATTR_LIBC_C16SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBDCALL libd_format_wscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char16_t const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_IN(4) ATTR_LIBC_C16SCANF(4, 0) NONNULL((1, 2)) ssize_t NOTHROW_CB(LIBDCALL libd_format_wscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char16_t const *__restrict format, ...);
 /* >> format_scanf(3), format_vscanf(3)
  * Generic     scanf     implementation
  * Taking a regular scanf-style format string and argument, these
@@ -252,7 +252,7 @@ INTDEF ATTR_IN(4) ATTR_LIBC_C16SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBDCALL lib
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-INTDEF ATTR_IN(4) ATTR_LIBC_C32SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBKCALL libc_format_wscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char32_t const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_IN(4) ATTR_LIBC_C32SCANF(4, 0) NONNULL((1, 2)) ssize_t NOTHROW_CB(LIBKCALL libc_format_wscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char32_t const *__restrict format, ...);
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wsprintf_printer)(void *arg, char16_t const *__restrict data, size_t datalen);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda986b73 */
+/* HASH CRC-32:0x4e9c37dd */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,13 +34,13 @@ DECL_BEGIN
  * Repeat  `ch'  a   number  of  `num_repetitions'   times
  * The usual format-printer rules apply, and this function
  * is  allowed to  call `printer'  as often  as it chooses */
-INTDEF NONNULL((1)) ssize_t (LIBDCALL libd_format_repeat)(pformatprinter printer, void *arg, char ch, size_t num_repetitions) THROWS(...);
+INTDEF NONNULL((1)) ssize_t NOTHROW_CB(LIBDCALL libd_format_repeat)(pformatprinter printer, void *arg, char ch, size_t num_repetitions);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> format_repeat(3)
  * Repeat  `ch'  a   number  of  `num_repetitions'   times
  * The usual format-printer rules apply, and this function
  * is  allowed to  call `printer'  as often  as it chooses */
-INTDEF NONNULL((1)) ssize_t (LIBCCALL libc_format_repeat)(pformatprinter printer, void *arg, char ch, size_t num_repetitions) THROWS(...);
+INTDEF NONNULL((1)) ssize_t NOTHROW_CB(LIBCCALL libc_format_repeat)(pformatprinter printer, void *arg, char ch, size_t num_repetitions);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> format_escape(3)
  * Do C-style escape on the given text, printing it to the given printer.
@@ -56,7 +56,7 @@ INTDEF NONNULL((1)) ssize_t (LIBCCALL libc_format_repeat)(pformatprinter printer
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBDCALL libd_format_escape)(pformatprinter printer, void *arg, char const *__restrict text, size_t textlen, unsigned int flags) THROWS(...);
+INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t NOTHROW_CB(LIBDCALL libd_format_escape)(pformatprinter printer, void *arg, char const *__restrict text, size_t textlen, unsigned int flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> format_escape(3)
  * Do C-style escape on the given text, printing it to the given printer.
@@ -72,7 +72,7 @@ INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBDCALL libd_format_escape)(pformat
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBCCALL libc_format_escape)(pformatprinter printer, void *arg, char const *__restrict text, size_t textlen, unsigned int flags) THROWS(...);
+INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t NOTHROW_CB(LIBCCALL libc_format_escape)(pformatprinter printer, void *arg, char const *__restrict text, size_t textlen, unsigned int flags);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> format_hexdump(3)
  * Print a hex dump of the given data using the provided format printer
@@ -84,7 +84,7 @@ INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBCCALL libc_format_escape)(pformat
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBDCALL libd_format_hexdump)(pformatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags) THROWS(...);
+INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t NOTHROW_CB(LIBDCALL libd_format_hexdump)(pformatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> format_hexdump(3)
  * Print a hex dump of the given data using the provided format printer
@@ -96,7 +96,7 @@ INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBDCALL libd_format_hexdump)(pforma
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBCCALL libc_format_hexdump)(pformatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags) THROWS(...);
+INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t NOTHROW_CB(LIBCCALL libc_format_hexdump)(pformatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation. Taking a regular printf-style format string and arguments,
@@ -110,7 +110,7 @@ INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBCCALL libc_format_hexdump)(pforma
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_IN(3) ATTR_LIBC_PRINTF(3, 0) NONNULL((1)) ssize_t (LIBDCALL libd_format_vprintf)(pformatprinter printer, void *arg, char const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_IN(3) ATTR_LIBC_PRINTF(3, 0) NONNULL((1)) ssize_t NOTHROW_CB(LIBDCALL libd_format_vprintf)(pformatprinter printer, void *arg, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation. Taking a regular printf-style format string and arguments,
@@ -124,7 +124,7 @@ INTDEF ATTR_IN(3) ATTR_LIBC_PRINTF(3, 0) NONNULL((1)) ssize_t (LIBDCALL libd_for
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_IN(3) ATTR_LIBC_PRINTF(3, 0) NONNULL((1)) ssize_t (LIBCCALL libc_format_vprintf)(pformatprinter printer, void *arg, char const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_IN(3) ATTR_LIBC_PRINTF(3, 0) NONNULL((1)) ssize_t NOTHROW_CB(LIBCCALL libc_format_vprintf)(pformatprinter printer, void *arg, char const *__restrict format, va_list args);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation. Taking a regular printf-style format string and arguments,
@@ -138,7 +138,7 @@ INTDEF ATTR_IN(3) ATTR_LIBC_PRINTF(3, 0) NONNULL((1)) ssize_t (LIBCCALL libc_for
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_IN(3) ATTR_LIBC_PRINTF(3, 4) NONNULL((1)) ssize_t (VLIBDCALL libd_format_printf)(pformatprinter printer, void *arg, char const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_IN(3) ATTR_LIBC_PRINTF(3, 4) NONNULL((1)) ssize_t NOTHROW_CB(VLIBDCALL libd_format_printf)(pformatprinter printer, void *arg, char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation. Taking a regular printf-style format string and arguments,
@@ -152,59 +152,7 @@ INTDEF ATTR_IN(3) ATTR_LIBC_PRINTF(3, 4) NONNULL((1)) ssize_t (VLIBDCALL libd_fo
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_IN(3) ATTR_LIBC_PRINTF(3, 4) NONNULL((1)) ssize_t (VLIBCCALL libc_format_printf)(pformatprinter printer, void *arg, char const *__restrict format, ...) THROWS(...);
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> format_scanf(3), format_vscanf(3)
- * Generic     scanf     implementation
- * Taking a regular scanf-style format string and argument, these
- * functions will  call  the  given  `pgetc'  function  which  in
- * return should successively  yield a character  at a time  from
- * some kind of input source.
- *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
- *    Otherwise, the function returns the amount of successfully parsed arguments.
- *  - The user may  use `pgetc' to  track the last  read character to  get
- *    additional information about what character caused the scan to fail.
- *  - The given `pgetc' should also indicate EOF by returning `NUL'
- *  - This implementation supports the following extensions:
- *    - `%[A-Z]'   -- Character ranges in scan patterns
- *    - `%[^abc]'  -- Inversion of a scan pattern
- *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
- *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
- *                    This modifier  reads a  `size_t'  from the  argument  list,
- *                    that specifies  the size  of the  following string  buffer:
- *                 >> char buffer[64];
- *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
- * format -> %[*|?][width][length]specifier
- * @return: 0 :  No data could be scanned.
- * @return: * :  The total number of successfully scanned arguments.
- * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-INTDEF ATTR_IN(4) ATTR_LIBC_SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBDCALL libd_format_vscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char const *__restrict format, va_list args) THROWS(...);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* >> format_scanf(3), format_vscanf(3)
- * Generic     scanf     implementation
- * Taking a regular scanf-style format string and argument, these
- * functions will  call  the  given  `pgetc'  function  which  in
- * return should successively  yield a character  at a time  from
- * some kind of input source.
- *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
- *    Otherwise, the function returns the amount of successfully parsed arguments.
- *  - The user may  use `pgetc' to  track the last  read character to  get
- *    additional information about what character caused the scan to fail.
- *  - The given `pgetc' should also indicate EOF by returning `NUL'
- *  - This implementation supports the following extensions:
- *    - `%[A-Z]'   -- Character ranges in scan patterns
- *    - `%[^abc]'  -- Inversion of a scan pattern
- *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
- *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
- *                    This modifier  reads a  `size_t'  from the  argument  list,
- *                    that specifies  the size  of the  following string  buffer:
- *                 >> char buffer[64];
- *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
- * format -> %[*|?][width][length]specifier
- * @return: 0 :  No data could be scanned.
- * @return: * :  The total number of successfully scanned arguments.
- * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-INTDEF ATTR_IN(4) ATTR_LIBC_SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBCCALL libc_format_vscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_IN(3) ATTR_LIBC_PRINTF(3, 4) NONNULL((1)) ssize_t NOTHROW_CB(VLIBCCALL libc_format_printf)(pformatprinter printer, void *arg, char const *__restrict format, ...);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> format_scanf(3), format_vscanf(3)
  * Generic     scanf     implementation
@@ -230,7 +178,7 @@ INTDEF ATTR_IN(4) ATTR_LIBC_SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBCCALL libc_f
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-INTDEF ATTR_IN(4) ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2)) ssize_t (VLIBDCALL libd_format_scanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_IN(4) ATTR_LIBC_SCANF(4, 0) NONNULL((1, 2)) ssize_t NOTHROW_CB(LIBDCALL libd_format_vscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> format_scanf(3), format_vscanf(3)
  * Generic     scanf     implementation
@@ -256,7 +204,59 @@ INTDEF ATTR_IN(4) ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2)) ssize_t (VLIBDCALL libd_
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-INTDEF ATTR_IN(4) ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2)) ssize_t (VLIBCCALL libc_format_scanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_IN(4) ATTR_LIBC_SCANF(4, 0) NONNULL((1, 2)) ssize_t NOTHROW_CB(LIBCCALL libc_format_vscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char const *__restrict format, va_list args);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+INTDEF ATTR_IN(4) ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2)) ssize_t NOTHROW_CB(VLIBDCALL libd_format_scanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char const *__restrict format, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+INTDEF ATTR_IN(4) ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2)) ssize_t NOTHROW_CB(VLIBCCALL libc_format_scanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char const *__restrict format, ...);
 /* >> format_sprintf_printer(3)
  * Format-printer implementation for printing to a string buffer like `sprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */

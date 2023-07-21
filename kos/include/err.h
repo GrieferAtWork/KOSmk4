@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7b48b62 */
+/* HASH CRC-32:0x81e2844e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __SYSDECL_BEGIN
 #ifdef __CRT_HAVE_warn
 /* >> warn(3), vwarn(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
-__LIBC __ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 2) void (__VLIBCCALL warn)(char const *__format, ...) __THROWS(...) __CASMNAME_SAME("warn");
+__LIBC __ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 2) void __NOTHROW_CB(__VLIBCCALL warn)(char const *__format, ...) __CASMNAME_SAME("warn");
 #else /* __CRT_HAVE_warn */
 #include <libc/template/stdstreams.h>
 #include <libc/template/program_invocation_name.h>
@@ -62,7 +62,7 @@ __LIBC __ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 2) void (__VLIBCCALL warn)(char co
 /* >> warn(3), vwarn(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(warn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 2) void (__VLIBCCALL warn)(char const *__format, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(warn))(__format, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(warn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 2) void __NOTHROW_CB(__VLIBCCALL warn)(char const *__format, ...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(warn))(__format, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define warn(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(warn))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
@@ -71,7 +71,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(warn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_O
 #ifdef __CRT_HAVE_vwarn
 /* >> warn(3), vwarn(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
-__CDECLARE_VOID(__ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 0),__THROWING,vwarn,(char const *__format, __builtin_va_list __args),(__format,__args))
+__CDECLARE_VOID(__ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 0),__NOTHROW_CB,vwarn,(char const *__format, __builtin_va_list __args),(__format,__args))
 #else /* __CRT_HAVE_vwarn */
 #include <libc/template/stdstreams.h>
 #include <libc/template/program_invocation_name.h>
@@ -79,7 +79,7 @@ __CDECLARE_VOID(__ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 0),__THROWING,vwarn,(char
 #include <libc/local/err/vwarn.h>
 /* >> warn(3), vwarn(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(vwarn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 0) void (__LIBCCALL vwarn)(char const *__format, __builtin_va_list __args) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vwarn))(__format, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(vwarn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 0) void __NOTHROW_CB(__LIBCCALL vwarn)(char const *__format, __builtin_va_list __args) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vwarn))(__format, __args); })
 #endif /* __CRT_HAVE_vwarnc || (__LOCAL_stderr && __LOCAL_program_invocation_short_name && (__CRT_HAVE_vfprintf || __CRT_HAVE__IO_vfprintf || __CRT_HAVE_vfprintf_s || __CRT_HAVE_vfprintf_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_putc || __CRT_HAVE_fputc || __CRT_HAVE__IO_putc || __CRT_HAVE_putc_unlocked || __CRT_HAVE_fputc_unlocked || __CRT_HAVE__putc_nolock || __CRT_HAVE__fputc_nolock || (__CRT_DOS && (__CRT_HAVE__flsbuf || __CRT_HAVE___swbuf)) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock)) */
 #endif /* !__CRT_HAVE_vwarn */
 
@@ -89,7 +89,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vwarn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_
 #ifdef __CRT_HAVE_warnc
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
-__LIBC __ATTR_IN_OPT(2) __ATTR_LIBC_PRINTF(2, 3) void (__VLIBCCALL warnc)(__errno_t __used_errno, char const *__format, ...) __THROWS(...) __CASMNAME_SAME("warnc");
+__LIBC __ATTR_IN_OPT(2) __ATTR_LIBC_PRINTF(2, 3) void __NOTHROW_CB(__VLIBCCALL warnc)(__errno_t __used_errno, char const *__format, ...) __CASMNAME_SAME("warnc");
 #else /* __CRT_HAVE_warnc */
 #include <libc/template/stdstreams.h>
 #include <libc/template/program_invocation_name.h>
@@ -98,7 +98,7 @@ __LIBC __ATTR_IN_OPT(2) __ATTR_LIBC_PRINTF(2, 3) void (__VLIBCCALL warnc)(__errn
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(warnc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(2) __ATTR_LIBC_PRINTF(2, 3) void (__VLIBCCALL warnc)(__errno_t __used_errno, char const *__format, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(warnc))(__used_errno, __format, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(warnc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(2) __ATTR_LIBC_PRINTF(2, 3) void __NOTHROW_CB(__VLIBCCALL warnc)(__errno_t __used_errno, char const *__format, ...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(warnc))(__used_errno, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define warnc(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(warnc))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
@@ -112,7 +112,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(warnc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_
 #ifdef __CRT_HAVE_vwarnc
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
-__CDECLARE_VOID(__ATTR_IN_OPT(2) __ATTR_LIBC_PRINTF(2, 0),__THROWING,vwarnc,(__errno_t __used_errno, char const *__format, __builtin_va_list __args),(__used_errno,__format,__args))
+__CDECLARE_VOID(__ATTR_IN_OPT(2) __ATTR_LIBC_PRINTF(2, 0),__NOTHROW_CB,vwarnc,(__errno_t __used_errno, char const *__format, __builtin_va_list __args),(__used_errno,__format,__args))
 #else /* __CRT_HAVE_vwarnc */
 #include <libc/template/stdstreams.h>
 #include <libc/template/program_invocation_name.h>
@@ -120,7 +120,7 @@ __CDECLARE_VOID(__ATTR_IN_OPT(2) __ATTR_LIBC_PRINTF(2, 0),__THROWING,vwarnc,(__e
 #include <libc/local/err/vwarnc.h>
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(vwarnc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(2) __ATTR_LIBC_PRINTF(2, 0) void (__LIBCCALL vwarnc)(__errno_t __used_errno, char const *__format, __builtin_va_list __args) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vwarnc))(__used_errno, __format, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(vwarnc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(2) __ATTR_LIBC_PRINTF(2, 0) void __NOTHROW_CB(__LIBCCALL vwarnc)(__errno_t __used_errno, char const *__format, __builtin_va_list __args) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vwarnc))(__used_errno, __format, __args); })
 #else /* __LOCAL_stderr && __LOCAL_program_invocation_short_name && (__CRT_HAVE_vfprintf || __CRT_HAVE__IO_vfprintf || __CRT_HAVE_vfprintf_s || __CRT_HAVE_vfprintf_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_putc || __CRT_HAVE_fputc || __CRT_HAVE__IO_putc || __CRT_HAVE_putc_unlocked || __CRT_HAVE_fputc_unlocked || __CRT_HAVE__putc_nolock || __CRT_HAVE__fputc_nolock || (__CRT_DOS && (__CRT_HAVE__flsbuf || __CRT_HAVE___swbuf)) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock) */
 #undef __vwarnc_defined
 #endif /* !__LOCAL_stderr || !__LOCAL_program_invocation_short_name || (!__CRT_HAVE_vfprintf && !__CRT_HAVE__IO_vfprintf && !__CRT_HAVE_vfprintf_s && !__CRT_HAVE_vfprintf_unlocked && !__CRT_HAVE_file_printer && !__CRT_HAVE_file_printer_unlocked && !__CRT_HAVE_putc && !__CRT_HAVE_fputc && !__CRT_HAVE__IO_putc && !__CRT_HAVE_putc_unlocked && !__CRT_HAVE_fputc_unlocked && !__CRT_HAVE__putc_nolock && !__CRT_HAVE__fputc_nolock && (!__CRT_DOS || (!__CRT_HAVE__flsbuf && !__CRT_HAVE___swbuf)) && !__CRT_HAVE_fwrite && !__CRT_HAVE__IO_fwrite && !__CRT_HAVE_fwrite_s && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock) */
@@ -131,7 +131,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vwarnc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN
 #ifdef __CRT_HAVE_warnx
 /* >> warnx(3), vwarnx(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
-__LIBC __ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 2) void (__VLIBCCALL warnx)(char const *__format, ...) __THROWS(...) __CASMNAME_SAME("warnx");
+__LIBC __ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 2) void __NOTHROW_CB(__VLIBCCALL warnx)(char const *__format, ...) __CASMNAME_SAME("warnx");
 #else /* __CRT_HAVE_warnx */
 #include <libc/template/stdstreams.h>
 #include <libc/template/program_invocation_name.h>
@@ -140,7 +140,7 @@ __LIBC __ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 2) void (__VLIBCCALL warnx)(char c
 /* >> warnx(3), vwarnx(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(warnx, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 2) void (__VLIBCCALL warnx)(char const *__format, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(warnx))(__format, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(warnx, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 2) void __NOTHROW_CB(__VLIBCCALL warnx)(char const *__format, ...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(warnx))(__format, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define warnx(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(warnx))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
@@ -149,7 +149,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(warnx, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_
 #ifdef __CRT_HAVE_vwarnx
 /* >> warnx(3), vwarnx(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
-__CDECLARE_VOID(__ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 0),__THROWING,vwarnx,(char const *__format, __builtin_va_list __args),(__format,__args))
+__CDECLARE_VOID(__ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 0),__NOTHROW_CB,vwarnx,(char const *__format, __builtin_va_list __args),(__format,__args))
 #else /* __CRT_HAVE_vwarnx */
 #include <libc/template/stdstreams.h>
 #include <libc/template/program_invocation_name.h>
@@ -157,7 +157,7 @@ __CDECLARE_VOID(__ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 0),__THROWING,vwarnx,(cha
 #include <libc/local/err/vwarnx.h>
 /* >> warnx(3), vwarnx(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(vwarnx, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 0) void (__LIBCCALL vwarnx)(char const *__format, __builtin_va_list __args) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vwarnx))(__format, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(vwarnx, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 0) void __NOTHROW_CB(__LIBCCALL vwarnx)(char const *__format, __builtin_va_list __args) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vwarnx))(__format, __args); })
 #endif /* __LOCAL_stderr && __LOCAL_program_invocation_short_name && (__CRT_HAVE_putc || __CRT_HAVE_fputc || __CRT_HAVE__IO_putc || __CRT_HAVE_putc_unlocked || __CRT_HAVE_fputc_unlocked || __CRT_HAVE__putc_nolock || __CRT_HAVE__fputc_nolock || (__CRT_DOS && (__CRT_HAVE__flsbuf || __CRT_HAVE___swbuf)) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock) */
 #endif /* !__CRT_HAVE_vwarnx */
 #ifdef __CRT_HAVE_err
