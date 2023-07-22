@@ -224,8 +224,8 @@ struct mnode {
 #else /* __WANT_MNODE__mn_dead */
 	_rbtree_node_mnode                  mn_mement;   /* [lock(mn_mman->mm_lock)] R/B tree entry of mman mappings. */
 #endif /* !__WANT_MNODE__mn_dead */
-	/*PAGEDIR_PAGEALIGNED*/ byte_t     *mn_minaddr;  /* [const] Lowest address mapped by this node. */
-	byte_t                             *mn_maxaddr;  /* [const] Greatest address mapped by this node. (+1, and it's `PAGEDIR_PAGEALIGNED') */
+	VIRT/*PAGEDIR_PAGEALIGNED */byte_t *mn_minaddr;  /* [const] Lowest address mapped by this node. */
+	VIRT byte_t                        *mn_maxaddr;  /* [const] Greatest address mapped by this node. (+1, and it's `PAGEDIR_PAGEALIGNED') */
 	uintptr_t                           mn_flags;    /* mem-node flags (Set of `MNODE_F_*') */
 	/*REF*/ struct mpart               *mn_part;     /* [0..1][const][valid_if(!MNODE_F_UNMAPPED && !wasdestroyed(mn_mman))]
 	                                                  * The bound mem-part. When set to NULL, then this node represents a reserved node. */
@@ -284,8 +284,8 @@ struct mnode {
 #else /* __WANT_MNODE__mn_dead */
 	RBTREE_NODE(mnode)                  mn_mement;   /* [lock(mn_mman->mm_lock)] R/B tree entry of mman mappings. */
 #endif /* !__WANT_MNODE__mn_dead */
-	PAGEDIR_PAGEALIGNED byte_t         *mn_minaddr;  /* [const] Lowest address mapped by this node. */
-	byte_t                             *mn_maxaddr;  /* [const] Greatest address mapped by this node. (+1, and it's `PAGEDIR_PAGEALIGNED') */
+	VIRT PAGEDIR_PAGEALIGNED byte_t    *mn_minaddr;  /* [const] Lowest address mapped by this node. */
+	VIRT byte_t                        *mn_maxaddr;  /* [const] Greatest address mapped by this node. (+1, and it's `PAGEDIR_PAGEALIGNED') */
 	uintptr_t                           mn_flags;    /* mem-node flags (Set of `MNODE_F_*') */
 	REF struct mpart                   *mn_part;     /* [0..1][const][valid_if(!MNODE_F_UNMAPPED && !wasdestroyed(mn_mman))]
 	                                                  * The bound mem-part. When set to NULL, then this node represents a reserved node. */
@@ -582,16 +582,16 @@ struct mnode_tree_minmax {
 
 /* Mem-node tree API. All of these functions require that
  * the caller be holding a  lock to the associated  mman. */
-FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mnode *NOTHROW(FCALL mnode_tree_locate)(/*nullable*/ struct mnode *root, void const *key);
-FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mnode *NOTHROW(FCALL mnode_tree_rlocate)(/*nullable*/ struct mnode *root, void const *minkey, void const *maxkey);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mnode *NOTHROW(FCALL mnode_tree_locate)(/*nullable*/ struct mnode *root, VIRT void const *key);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mnode *NOTHROW(FCALL mnode_tree_rlocate)(/*nullable*/ struct mnode *root, VIRT void const *minkey, VIRT void const *maxkey);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mnode_tree_insert)(struct mnode **__restrict proot, struct mnode *__restrict node);
 FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL NOTHROW(FCALL mnode_tree_tryinsert)(struct mnode **__restrict proot, struct mnode *__restrict node);
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_remove)(struct mnode **__restrict proot, void const *key);
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_rremove)(struct mnode **__restrict proot, void const *minkey, void const *maxkey);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_remove)(struct mnode **__restrict proot, VIRT void const *key);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_rremove)(struct mnode **__restrict proot, VIRT void const *minkey, VIRT void const *maxkey);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mnode_tree_removenode)(struct mnode **__restrict proot, struct mnode *__restrict node);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_prevnode)(struct mnode const *__restrict self);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mnode *NOTHROW(FCALL mnode_tree_nextnode)(struct mnode const *__restrict self);
-FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mnode_tree_minmaxlocate)(struct mnode *root, void const *minkey, void const *maxkey, struct mnode_tree_minmax *__restrict result);
+FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mnode_tree_minmaxlocate)(struct mnode *root, VIRT void const *minkey, VIRT void const *maxkey, struct mnode_tree_minmax *__restrict result);
 
 /* Helper macros for operating on the mappings tree of a given mman. */
 #define mman_mappings_locate(self, key)                          mnode_tree_locate((self)->mm_mappings, key)

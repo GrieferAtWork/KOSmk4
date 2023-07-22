@@ -593,13 +593,13 @@ NOTHROW(FCALL pagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 
 #ifndef CONFIG_NO_SMP
 /* Sync memory on every CPU with `CPU->c_pdir == pagedir' */
-FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_sync_smp_p)(pagedir_phys_t pagedir, PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
-FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncone_smp_p)(pagedir_phys_t pagedir, PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
+FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_sync_smp_p)(pagedir_phys_t pagedir, PAGEDIR_PAGEALIGNED VIRT void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
+FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncone_smp_p)(pagedir_phys_t pagedir, PAGEDIR_PAGEALIGNED VIRT void *addr);
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncall_smp_p)(pagedir_phys_t pagedir);
 
 /* Sync memory on every CPU with `CPU->c_pdir == pagedir_get()' */
-FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_sync_smp)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
-FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncone_smp)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
+FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_sync_smp)(PAGEDIR_PAGEALIGNED VIRT void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
+FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncone_smp)(PAGEDIR_PAGEALIGNED VIRT void *addr);
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncall_smp)(void);
 #else /* !CONFIG_NO_SMP */
 #if 1 /* No point in comparing against the current pagedir. - If they don't match,

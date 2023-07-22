@@ -495,7 +495,7 @@ DECL_END
 #define mnode_tree_minmax_t    struct mnode_tree_minmax
 #define RBTREE(name)           mnode_tree_##name
 #define RBTREE_T               struct mnode
-#define RBTREE_Tkey            void const *
+#define RBTREE_Tkey            VIRT void const *
 #define RBTREE_GETNODE(self)   (self)->mn_mement
 #define RBTREE_GETMINKEY(self) mnode_getminaddr(self)
 #define RBTREE_GETMAXKEY(self) mnode_getmaxaddr(self)

@@ -282,6 +282,8 @@
 
 #define __ATTR_USER             __checker_attribute__(__nothrow__(1))
 #define __ATTR_UNCHECKED        __checker_attribute__(__noderef__, __nothrow__(1))
+#define __ATTR_PHYS             __checker_attribute__(__noderef__, __nothrow__(1)) /* Physical pointer, only for arithmetic */
+#define __ATTR_VIRT             __checker_attribute__(__noderef__, __nothrow__(1)) /* Virtual pointer, only for arithmetic */
 #define __ATTR_CHECKED          __checker_attribute__(__deref__, __nothrow__(1))
 
 #define __ATTR_THROWS(...)      __checker_attribute__(__throws__(__VA_ARGS__))
@@ -457,7 +459,7 @@
 #define __atomic_exchange_n(ptr, val, memorder)        __builtin_rvoid(__builtin_void(*(ptr)) += (val))
 #define __atomic_exchange(ptr, p_val, p_ret, memorder) (void)(*(p_ret) = __atomic_exchange_n(ptr, *(p_val), memorder))
 #define __atomic_compare_exchange_n(ptr, p_expected, desired, weak, success_memorder, failure_memorder) \
-	(!__builtin_rvoid(__builtin_void(*(ptr)) += (*(p_expected) += 0)))
+	(!__builtin_rvoid(__builtin_void(*(ptr)) = __builtin_rvoid(*(p_expected) = 0)))
 #define __atomic_compare_exchange(ptr, p_expected, p_desired, weak, success_memorder, failure_memorder) \
 	__atomic_compare_exchange_n(ptr, p_expected, *(p_desired), weak, success_memorder, failure_memorder)
 #define __atomic_add_fetch(ptr, val, memorder)  __atomic_exchange_n(ptr, val, memorder)

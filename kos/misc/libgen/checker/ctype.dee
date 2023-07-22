@@ -717,9 +717,13 @@ final class CEnumType: CType {
 	public operator == (other: CStructType) -> this === other;
 	public operator != (other: CStructType) -> this !== other;
 	function isConvertibleTo(other: CType, explicit: bool = false): bool {
+#if 1
+		return base.isConvertibleTo(other, explicit);
+#else
 		if (explicit)
-			return base.iisConvertibleTo(other, explicit);
+			return base.isConvertibleTo(other, explicit);
 		return this === other;
+#endif
 	}
 	function tostr(varname: string = ""): string {
 		return varname ? f"enum {name} {varname}" : f"enum {name}";

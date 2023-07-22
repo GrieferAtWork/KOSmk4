@@ -208,7 +208,8 @@ NOTHROW(KCALL cfunction_call_impl)(void const *func_address, uintptr_half_t cc,
 		extern uint64_t __attribute__((regparm(3)))
 		__dbx_i386_invoke_cfunction(byte_t /*     */ *eax_sp_writer,
 		                            void /*       */ *edx_unused,
-		                            struct ucpustate *ecx_uc);
+		                            struct ucpustate *ecx_uc)
+				THROWS(...);
 
 		/* Invoke the wrapper for calling the external function. */
 		result = __dbx_i386_invoke_cfunction(sp_writer, NULL, &uc);

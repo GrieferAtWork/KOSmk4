@@ -618,13 +618,13 @@ NOTHROW_NCX(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info);
  * @param: scope: The scope of symbols that should be enumerated (set of `CMOD_SYMENUM_SCOPE_F*')
  * @return: * :        pformatprinter-compatible accumulation of return values from `cb'
  * @return: DBX_EINTR: Operation was interrupted. */
-FUNDEF NONNULL((1, 2)) ssize_t FCALL
-cmod_symenum(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
-             cmod_symenum_callback_t cb,
-             CHECKED char const *startswith_name,
-             size_t startswith_namelen,
-             uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL),
-             uintptr_t scope DFL(CMOD_SYMENUM_SCOPE_FNORMAL));
+FUNDEF NONNULL((1, 2)) ssize_t
+NOTHROW_CB_NCX(FCALL cmod_symenum)(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
+                                   cmod_symenum_callback_t cb,
+                                   CHECKED char const *startswith_name,
+                                   size_t startswith_namelen,
+                                   uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL),
+                                   uintptr_t scope DFL(CMOD_SYMENUM_SCOPE_FNORMAL));
 
 /* Same as `cmod_symenum()', except  this function automatically manages  the
  * input fields of `info' which must normally be filled in by the caller, and
@@ -638,13 +638,13 @@ cmod_symenum(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
  *       on what `cb' may or may not have done.
  * @return: * :        pformatprinter-compatible accumulation of return values from `cb'
  * @return: DBX_EINTR: Operation was interrupted. */
-FUNDEF NONNULL((1, 2)) ssize_t FCALL
-cmod_symenum_local(/*in(oob_only)|out(undef)*/ struct cmodsyminfo *__restrict info,
-                   cmod_symenum_callback_t cb,
-                   CHECKED char const *startswith_name,
-                   size_t startswith_namelen,
-                   uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL),
-                   uintptr_t scope DFL(CMOD_SYMENUM_SCOPE_FNORMAL));
+FUNDEF NONNULL((1, 2)) ssize_t
+NOTHROW_CB_NCX(FCALL cmod_symenum_local)(/*in(oob_only)|out(undef)*/ struct cmodsyminfo *__restrict info,
+                                         cmod_symenum_callback_t cb,
+                                         CHECKED char const *startswith_name,
+                                         size_t startswith_namelen,
+                                         uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL),
+                                         uintptr_t scope DFL(CMOD_SYMENUM_SCOPE_FNORMAL));
 
 DECL_END
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */

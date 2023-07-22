@@ -133,7 +133,7 @@ PUBLIC bool ceval_comma_is_select2nd = false;
 
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL cexpr_pushparse_inner)(struct cparser *__restrict self) {
+NOTHROW_CB_NCX(FCALL cexpr_pushparse_inner)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 	bool old_ceval_comma_is_select2nd;
 	old_ceval_comma_is_select2nd = ceval_comma_is_select2nd;
@@ -144,9 +144,9 @@ NOTHROW_NCX(FCALL cexpr_pushparse_inner)(struct cparser *__restrict self) {
 }
 
 
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_unary_prefix)(struct cparser *__restrict self);
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_unary_suffix)(struct cparser *__restrict self);
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_unary)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_unary_prefix)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_unary_suffix)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_unary)(struct cparser *__restrict self);
 #define parse_unary_suffix_check(tok)    \
 	((tok) == '[' || (tok) == '(' ||     \
 	 (tok) == '.' || (tok) == '@' ||     \
@@ -162,8 +162,8 @@ PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_unary)(struct c
 	case CTOKEN_TOK_PLUS_PLUS:    \
 	case CTOKEN_TOK_MINUS_MINUS
 
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_prod_suffix)(struct cparser *__restrict self);
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_prod)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_prod_suffix)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_prod)(struct cparser *__restrict self);
 #define parse_prod_suffix_check(tok) \
 	((tok) == '*' || (tok) == '/' || (tok) == '%')
 #define parse_prod_suffix_CASE \
@@ -171,16 +171,16 @@ PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_prod)(struct cp
 	case '/':                  \
 	case '%'
 
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_sum_suffix)(struct cparser *__restrict self);
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_sum)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_sum_suffix)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_sum)(struct cparser *__restrict self);
 #define parse_sum_suffix_check(tok) \
 	((tok) == '+' || (tok) == '-')
 #define parse_sum_suffix_CASE \
 	case '+':                 \
 	case '-'
 
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_shift_suffix)(struct cparser *__restrict self);
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_shift)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_shift_suffix)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_shift)(struct cparser *__restrict self);
 #define parse_shift_suffix_check(tok)     \
 	((tok) == CTOKEN_TOK_LANGLE_LANGLE || \
 	 (tok) == CTOKEN_TOK_RANGLE_RANGLE)
@@ -188,8 +188,8 @@ PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_shift)(struct c
 	case CTOKEN_TOK_LANGLE_LANGLE: \
 	case CTOKEN_TOK_RANGLE_RANGLE
 
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_cmp_suffix)(struct cparser *__restrict self);
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_cmp)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_cmp_suffix)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_cmp)(struct cparser *__restrict self);
 #define parse_cmp_suffix_check(tok)       \
 	((tok) == '<' || (tok) == '>' ||      \
 	 (tok) == CTOKEN_TOK_LANGLE_EQUALS || \
@@ -200,8 +200,8 @@ PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_cmp)(struct cpa
 	case CTOKEN_TOK_LANGLE_EQUALS: \
 	case CTOKEN_TOK_RANGLE_EQUALS
 
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_cmpeq_suffix)(struct cparser *__restrict self);
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_cmpeq)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_cmpeq_suffix)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_cmpeq)(struct cparser *__restrict self);
 #define parse_cmpeq_suffix_check(tok)     \
 	((tok) == CTOKEN_TOK_XCLAIM_EQUALS || \
 	 (tok) == CTOKEN_TOK_EQUALS_EQUALS)
@@ -209,38 +209,38 @@ PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_cmpeq)(struct c
 	case CTOKEN_TOK_XCLAIM_EQUALS: \
 	case CTOKEN_TOK_EQUALS_EQUALS
 
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_bitand_suffix)(struct cparser *__restrict self);
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_bitand)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_bitand_suffix)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_bitand)(struct cparser *__restrict self);
 #define parse_bitand_suffix_check(tok) ((tok) == '&')
 #define parse_bitand_suffix_CASE       case '&'
 
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_bitxor_suffix)(struct cparser *__restrict self);
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_bitxor)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_bitxor_suffix)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_bitxor)(struct cparser *__restrict self);
 #define parse_bitxor_suffix_check(tok) ((tok) == '^')
 #define parse_bitxor_suffix_CASE       case '^'
 
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_bitor_suffix)(struct cparser *__restrict self);
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_bitor)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_bitor_suffix)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_bitor)(struct cparser *__restrict self);
 #define parse_bitor_suffix_check(tok) ((tok) == '|')
 #define parse_bitor_suffix_CASE       case '|'
 
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_land_suffix)(struct cparser *__restrict self);
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_land)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_land_suffix)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_land)(struct cparser *__restrict self);
 #define parse_land_suffix_check(tok) ((tok) == CTOKEN_TOK_AND_AND)
 #define parse_land_suffix_CASE       case CTOKEN_TOK_AND_AND
 
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_lor_suffix)(struct cparser *__restrict self);
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_lor)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_lor_suffix)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_lor)(struct cparser *__restrict self);
 #define parse_lor_suffix_check(tok) ((tok) == CTOKEN_TOK_PIPE_PIPE)
 #define parse_lor_suffix_CASE       case CTOKEN_TOK_PIPE_PIPE
 
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_cond_suffix)(struct cparser *__restrict self);
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_cond)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_cond_suffix)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_cond)(struct cparser *__restrict self);
 #define parse_cond_suffix_check(tok) ((tok) == '?')
 #define parse_cond_suffix_CASE       case '?'
 
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_assign_suffix)(struct cparser *__restrict self);
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_assign)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_assign_suffix)(struct cparser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_CB_NCX(FCALL parse_assign)(struct cparser *__restrict self);
 #define parse_nocomma parse_assign
 #define parse_assign_suffix_check(tok)           \
 	((tok) == '=' ||                             \
@@ -270,8 +270,8 @@ PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW_NCX(FCALL parse_assign)(struct 
 
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL cparser_require)(struct cparser *__restrict self,
-                                   unsigned int expected_tok) {
+NOTHROW_CB_NCX(FCALL cparser_require)(struct cparser *__restrict self,
+                                      unsigned int expected_tok) {
 	if likely(self->c_tok == expected_tok)
 		return DBX_EOK;
 	if (self->c_autocom && self->c_tokend == self->c_end) {
@@ -284,8 +284,8 @@ NOTHROW_NCX(FCALL cparser_require)(struct cparser *__restrict self,
 }
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL cparser_skip)(struct cparser *__restrict self,
-                                unsigned int expected_tok) {
+NOTHROW_CB_NCX(FCALL cparser_skip)(struct cparser *__restrict self,
+                                   unsigned int expected_tok) {
 	if likely(self->c_tok == expected_tok) {
 		yield();
 		return DBX_EOK;
@@ -299,8 +299,8 @@ NOTHROW_NCX(FCALL cparser_skip)(struct cparser *__restrict self,
 	return DBX_ESYNTAX; /* Unexpected token */
 }
 
-PRIVATE WUNUSED NONNULL((1)) struct ctype *
-NOTHROW_NCX(FCALL make_unsigned)(struct ctype *__restrict self) {
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) struct ctype *
+NOTHROW(FCALL make_unsigned)(struct ctype *__restrict self) {
 	struct ctype *result;
 	if (self == &ctype_signed_char) {
 		result = &ctype_unsigned_char;
@@ -318,8 +318,8 @@ NOTHROW_NCX(FCALL make_unsigned)(struct ctype *__restrict self) {
 	return result;
 }
 
-PRIVATE WUNUSED NONNULL((1)) struct ctype *
-NOTHROW_NCX(FCALL make_longer)(struct ctype *__restrict self) {
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) struct ctype *
+NOTHROW(FCALL make_longer)(struct ctype *__restrict self) {
 	struct ctype *result;
 	if (self == &ctype_int) {
 		result = &ctype_long;
@@ -336,8 +336,8 @@ NOTHROW_NCX(FCALL make_longer)(struct ctype *__restrict self) {
 }
 
 PRIVATE WUNUSED NONNULL((1, 2)) struct ctype *
-NOTHROW_NCX(FCALL parse_ctype_from_suffix)(char const *suffix,
-                                           char const *suffix_end) {
+NOTHROW_NCX(FCALL parse_ctype_from_suffix)(CHECKED char const *suffix,
+                                           CHECKED char const *suffix_end) {
 	struct ctype *result;
 	result = &ctype_int;
 again:
@@ -408,8 +408,8 @@ syn:
 }
 
 PRIVATE WUNUSED NONNULL((1, 2, 3)) bool
-NOTHROW_NCX(FCALL unicode_readutf8_unescape)(char const **__restrict ptext,
-                                             char const *end,
+NOTHROW_NCX(FCALL unicode_readutf8_unescape)(CHECKED char const **__restrict ptext,
+                                             CHECKED char const *end,
                                              char32_t *__restrict presult) {
 	char32_t result;
 	result = unicode_readutf8_n(ptext, end);
@@ -494,8 +494,8 @@ err:
 /* Parse optional parenthesis, followed by either a type, or regular expression.
  * Afterwards,   return   the   type   of   that   expression   in   `*presult'. */
 PRIVATE WUNUSED NONNULL((1, 2)) dbx_errno_t
-NOTHROW_NCX(FCALL parse_typeof)(struct cparser *__restrict self,
-                                struct ctyperef *__restrict presult) {
+NOTHROW_CB_NCX(FCALL parse_typeof)(struct cparser *__restrict self,
+                                   struct ctyperef *__restrict presult) {
 	dbx_errno_t result;
 	bool has_paren;
 	has_paren = self->c_tok == '(';
@@ -534,17 +534,17 @@ err_result:
 }
 
 struct autocomplete_symbols_data {
-	struct cmodsyminfo info;
-	struct cparser    *self;
-	char const        *name;
-	size_t             namelen;
+	struct cmodsyminfo  info;
+	struct cparser     *self;
+	CHECKED char const *name;
+	size_t              namelen;
 };
 
 PRIVATE WUNUSED NONNULL((1)) ssize_t
-NOTHROW_NCX(FCALL autocomplete_symbols_callback)(struct cmodsyminfo *__restrict info,
-                                                 bool UNUSED(info_loaded)) {
+NOTHROW_CB_NCX(FCALL autocomplete_symbols_callback)(struct cmodsyminfo *__restrict info,
+                                                    bool UNUSED(info_loaded)) {
 	struct autocomplete_symbols_data *cookie;
-	char const *symbol_name;
+	CHECKED char const *symbol_name;
 	size_t symbol_namelen;
 	cookie         = container_of(info, struct autocomplete_symbols_data, info);
 	symbol_name    = cmodsyminfo_name(info);
@@ -557,9 +557,9 @@ NOTHROW_NCX(FCALL autocomplete_symbols_callback)(struct cmodsyminfo *__restrict 
 
 
 PRIVATE NONNULL((1)) void
-NOTHROW_NCX(FCALL autocomplete_symbols)(struct cparser *__restrict self,
-                                        char const *__restrict name,
-                                        size_t namelen, uintptr_t ns) {
+NOTHROW_CB_NCX(FCALL autocomplete_symbols)(struct cparser *__restrict self,
+                                           CHECKED char const *name,
+                                           size_t namelen, uintptr_t ns) {
 	struct autocomplete_symbols_data data;
 	unsigned int scope;
 	data.self    = self;
@@ -593,9 +593,9 @@ PRIVATE char const misc_expr_keywords[][16] = {
 };
 
 PRIVATE NONNULL((1)) void
-NOTHROW_NCX(FCALL autocomplete_nontype_symbols)(struct cparser *__restrict self,
-                                                char const *__restrict name,
-                                                size_t namelen) {
+NOTHROW_CB_NCX(FCALL autocomplete_nontype_symbols)(struct cparser *__restrict self,
+                                                   CHECKED char const *name,
+                                                   size_t namelen) {
 	if (namelen < (lengthof(misc_expr_keywords[0]) - 1)) {
 		unsigned int i;
 		for (i = 0; i < lengthof(misc_expr_keywords); ++i) {
@@ -613,15 +613,15 @@ NOTHROW_NCX(FCALL autocomplete_nontype_symbols)(struct cparser *__restrict self,
 }
 
 struct autocomplete_register_name_data {
-	struct cparser *self;
-	char const     *startswith_str;
-	size_t          startswith_len;
+	struct cparser     *self;
+	CHECKED char const *startswith_str;
+	size_t              startswith_len;
 };
 
-PRIVATE NONNULL((2)) ssize_t
-NOTHROW_NCX(LIBCPUSTATE_CC autocomplete_register_name_cb)(void *cookie,
-                                                          char const *__restrict name,
-                                                          size_t namelen) {
+PRIVATE NONNULL((1)) ssize_t
+NOTHROW_CB_NCX(LIBCPUSTATE_CC autocomplete_register_name_cb)(void *cookie,
+                                                             CHECKED char const *name,
+                                                             size_t namelen) {
 	struct autocomplete_register_name_data *data;
 	data = (struct autocomplete_register_name_data *)cookie;
 
@@ -636,9 +636,9 @@ NOTHROW_NCX(LIBCPUSTATE_CC autocomplete_register_name_cb)(void *cookie,
 }
 
 PRIVATE NONNULL((1)) void
-NOTHROW_NCX(FCALL autocomplete_register_name)(struct cparser *__restrict self,
-                                              char const *__restrict name,
-                                              size_t namelen) {
+NOTHROW_CB_NCX(FCALL autocomplete_register_name)(struct cparser *__restrict self,
+                                                 CHECKED char const *name,
+                                                 size_t namelen) {
 	/* auto-complete register names that start with the given `name...+=namelen' */
 	struct autocomplete_register_name_data data;
 	data.self           = self;
@@ -649,14 +649,14 @@ NOTHROW_NCX(FCALL autocomplete_register_name)(struct cparser *__restrict self,
 
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
+NOTHROW_CB_NCX(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 	switch (self->c_tok) {
 
 	case '(': {
 		/* Check for a C-style cast expression. */
 		struct ctyperef cast_type;
-		char const *afterparen;
+		CHECKED char const *afterparen;
 		yield();
 		afterparen = self->c_tokstart;
 		result = ctype_eval(self, &cast_type, NULL, NULL);
@@ -781,7 +781,7 @@ doparen_expr:
 	case CTOKEN_TOK_CHAR: {
 		char32_t value = 0;
 		shift_t shift  = 0;
-		char const *reader, *end;
+		CHECKED char const *reader, *end;
 		reader = self->c_tokstart;
 		end    = self->c_tokend;
 		unicode_readutf8_rev_n(&end, reader); /* Trailing '\'' */
@@ -847,7 +847,7 @@ doparen_expr:
 	case '%':
 	case '$': {
 		/* Register expression. */
-		char const *regname_start;
+		CHECKED char const *regname_start;
 		yield();
 		if unlikely(self->c_tok != CTOKEN_TOK_KEYWORD) {
 			if (self->c_autocom && self->c_tok == CTOKEN_TOK_EOF)
@@ -873,11 +873,11 @@ doparen_expr:
 				}
 			} else if (*self->c_tokend == '(') {
 				/* Skip until matching ')' */
-				char const *keyword_before_paren;
+				CHECKED char const *keyword_before_paren;
 				unsigned int paren_recursion = 1;
 				keyword_before_paren = self->c_tokstart;
 				for (;;) {
-					char const *prev_token_end;
+					CHECKED char const *prev_token_end;
 					prev_token_end = self->c_tokend;
 					yield();
 					if (self->c_tokstart != prev_token_end)
@@ -920,7 +920,7 @@ doparen_expr:
 
 	case CTOKEN_TOK_KEYWORD: {
 		/* Variable lookup. */
-		char const *kwd_str;
+		CHECKED char const *kwd_str;
 		size_t kwd_len;
 		kwd_str = self->c_tokstart;
 		kwd_len = cparser_toklen(self);
@@ -1163,17 +1163,17 @@ err_nomem:
 
 
 struct autocomplete_struct_data {
-	struct cparser *self;
-	char const     *name;
-	size_t          namelen;
+	struct cparser     *self;
+	CHECKED char const *name;
+	size_t              namelen;
 };
 
 PRIVATE NONNULL((2, 3, 4, 5)) ssize_t
-NOTHROW_NCX(KCALL autocomplete_struct_fields_callback)(void *arg,
-                                                       di_debuginfo_member_t const *__restrict member,
-                                                       di_debuginfo_cu_parser_t const *__restrict UNUSED(parser),
-                                                       struct cmodule *__restrict UNUSED(mod),
-                                                       struct cmodunit *__restrict UNUSED(cu)) {
+NOTHROW_CB_NCX(KCALL autocomplete_struct_fields_callback)(void *arg,
+                                                          di_debuginfo_member_t const *__restrict member,
+                                                          di_debuginfo_cu_parser_t const *__restrict UNUSED(parser),
+                                                          struct cmodule *__restrict UNUSED(mod),
+                                                          struct cmodunit *__restrict UNUSED(cu)) {
 	struct autocomplete_struct_data *cookie;
 	size_t member_namelen;
 	cookie         = (struct autocomplete_struct_data *)arg;
@@ -1189,10 +1189,10 @@ NOTHROW_NCX(KCALL autocomplete_struct_fields_callback)(void *arg,
 	return 0;
 }
 
-PRIVATE dbx_errno_t
-NOTHROW_NCX(KCALL autocomplete_struct_fields)(struct cparser *self,
-                                              char const *name,
-                                              size_t namelen) {
+PRIVATE NONNULL((1)) dbx_errno_t
+NOTHROW_CB_NCX(KCALL autocomplete_struct_fields)(struct cparser *__restrict self,
+                                                 CHECKED char const *name,
+                                                 size_t namelen) {
 	struct autocomplete_struct_data data;
 	struct ctype *ct;
 	if unlikely(!cexpr_stacksize)
@@ -1209,7 +1209,7 @@ NOTHROW_NCX(KCALL autocomplete_struct_fields)(struct cparser *self,
 
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL parse_unary_suffix)(struct cparser *__restrict self) {
+NOTHROW_CB_NCX(FCALL parse_unary_suffix)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 again:
 	switch (self->c_tok) {
@@ -1271,7 +1271,7 @@ err_lhs_ptr_type:
 			goto done;
 		ATTR_FALLTHROUGH
 	case '.': {
-		char const *kwd_str;
+		CHECKED char const *kwd_str;
 		size_t kwd_len;
 		/* Field w/o deref */
 		yield();
@@ -1398,7 +1398,7 @@ syn:
 
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL parse_prod_suffix)(struct cparser *__restrict self) {
+NOTHROW_CB_NCX(FCALL parse_prod_suffix)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 again:
 	switch (self->c_tok) {
@@ -1427,7 +1427,7 @@ done:
 }
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL parse_sum_suffix)(struct cparser *__restrict self) {
+NOTHROW_CB_NCX(FCALL parse_sum_suffix)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 again:
 	switch (self->c_tok) {
@@ -1455,7 +1455,7 @@ done:
 }
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL parse_shift_suffix)(struct cparser *__restrict self) {
+NOTHROW_CB_NCX(FCALL parse_shift_suffix)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 again:
 	switch (self->c_tok) {
@@ -1483,7 +1483,7 @@ done:
 }
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL parse_cmp_suffix)(struct cparser *__restrict self) {
+NOTHROW_CB_NCX(FCALL parse_cmp_suffix)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 again:
 	switch (self->c_tok) {
@@ -1513,7 +1513,7 @@ done:
 }
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL parse_cmpeq_suffix)(struct cparser *__restrict self) {
+NOTHROW_CB_NCX(FCALL parse_cmpeq_suffix)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 again:
 	switch (self->c_tok) {
@@ -1541,7 +1541,7 @@ done:
 }
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL parse_bitand_suffix)(struct cparser *__restrict self) {
+NOTHROW_CB_NCX(FCALL parse_bitand_suffix)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 again:
 	switch (self->c_tok) {
@@ -1566,7 +1566,7 @@ done:
 }
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL parse_bitxor_suffix)(struct cparser *__restrict self) {
+NOTHROW_CB_NCX(FCALL parse_bitxor_suffix)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 again:
 	switch (self->c_tok) {
@@ -1591,7 +1591,7 @@ done:
 }
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL parse_bitor_suffix)(struct cparser *__restrict self) {
+NOTHROW_CB_NCX(FCALL parse_bitor_suffix)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 again:
 	switch (self->c_tok) {
@@ -1617,7 +1617,7 @@ done:
 
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL parse_land_suffix)(struct cparser *__restrict self) {
+NOTHROW_CB_NCX(FCALL parse_land_suffix)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 again:
 	switch (self->c_tok) {
@@ -1674,7 +1674,7 @@ done:
 }
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL parse_lor_suffix)(struct cparser *__restrict self) {
+NOTHROW_CB_NCX(FCALL parse_lor_suffix)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 again:
 	switch (self->c_tok) {
@@ -1731,7 +1731,7 @@ done:
 }
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL parse_cond_suffix)(struct cparser *__restrict self) {
+NOTHROW_CB_NCX(FCALL parse_cond_suffix)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 again:
 	switch (self->c_tok) {
@@ -1814,7 +1814,7 @@ done:
 }
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL parse_assign_suffix)(struct cparser *__restrict self) {
+NOTHROW_CB_NCX(FCALL parse_assign_suffix)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 	unsigned int op;
 again:
@@ -1929,7 +1929,7 @@ done:
 
 #define DEFINE_INTERPOS_PARSER(name, inner_name)                                   \
 	PRIVATE WUNUSED NONNULL((1)) dbx_errno_t                                       \
-	NOTHROW_NCX(FCALL parse_##name)(struct cparser *__restrict self) {             \
+	NOTHROW_CB_NCX(FCALL parse_##name)(struct cparser *__restrict self) {          \
 		dbx_errno_t result;                                                        \
 		result = parse_##inner_name(self);                                         \
 		if (likely(result == DBX_EOK) && parse_##name##_suffix_check(self->c_tok)) \
@@ -1952,7 +1952,7 @@ DEFINE_INTERPOS_PARSER(cond, lor)
 #undef DEFINE_INTERPOS_PARSER
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL parse_assign)(struct cparser *__restrict self) {
+NOTHROW_CB_NCX(FCALL parse_assign)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 
 	/* Parse the base-level unary expression. */
@@ -2007,7 +2007,7 @@ done:
  * unaltered). NOTE: The given `self' is expected to  already
  * point to the first token apart of the expression on entry. */
 PUBLIC NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL cexpr_pushparse)(struct cparser *__restrict self) {
+NOTHROW_CB_NCX(FCALL cexpr_pushparse)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 again:
 	result = parse_nocomma(self);
@@ -2123,9 +2123,9 @@ err_nomem:
  * @param: maxlen:   The max length of `expr' (actual length is `strnlen(expr, maxlen)')
  * @return: DBX_EOK: Success
  * @return: * :      Error (the effective c-expression-stack-size is unaltered) */
-PUBLIC NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL cexpr_pusheval)(char const *__restrict expr,
-                                  size_t maxlen) {
+PUBLIC dbx_errno_t
+NOTHROW_CB_NCX(FCALL cexpr_pusheval)(CHECKED char const *expr,
+                                     size_t maxlen) {
 	dbx_errno_t result;
 	struct cparser cp;
 	cparser_init(&cp, expr, strnlen(expr, maxlen));
@@ -2141,8 +2141,8 @@ struct ctype_attributes {
 	uint16_t ca_fun_cc; /* Calling convention for functions (one of `CTYPE_KIND_FUNPROTO_CC_*') */
 };
 
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) uint16_t
-NOTHROW_NCX(FCALL keyword_to_calling_convention)(char const *__restrict kwd_str,
+PRIVATE ATTR_PURE WUNUSED uint16_t
+NOTHROW_NCX(FCALL keyword_to_calling_convention)(CHECKED char const *kwd_str,
                                                  size_t kwd_len) {
 	(void)kwd_str;
 	(void)kwd_len;
@@ -2171,7 +2171,7 @@ NOTHROW_NCX(FCALL keyword_to_calling_convention)(char const *__restrict kwd_str,
 
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL skip_generic_attribute)(struct cparser *__restrict self) {
+NOTHROW_CB_NCX(FCALL skip_generic_attribute)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 again:
 	result = cparser_skip(self, CTOKEN_TOK_KEYWORD);
@@ -2204,9 +2204,9 @@ done:
 
 
 PRIVATE WUNUSED NONNULL((1, 2)) dbx_errno_t
-NOTHROW_NCX(FCALL ctype_parse_attrib_gcc)(struct cparser *__restrict self,
-                                          struct ctype_attributes *__restrict attrib) {
-	char const *kwd_str;
+NOTHROW_CB_NCX(FCALL ctype_parse_attrib_gcc)(struct cparser *__restrict self,
+                                             struct ctype_attributes *__restrict attrib) {
+	CHECKED char const *kwd_str;
 	size_t kwd_len;
 	uint16_t cc;
 	kwd_str = self->c_tokstart;
@@ -2228,10 +2228,10 @@ NOTHROW_NCX(FCALL ctype_parse_attrib_gcc)(struct cparser *__restrict self,
 #define ctype_parse_attrib_declspec ctype_parse_attrib_gcc
 
 PRIVATE WUNUSED NONNULL((1, 2)) dbx_errno_t
-NOTHROW_NCX(FCALL ctype_parse_attrib_cxx)(struct cparser *__restrict self,
-                                          struct ctype_attributes *__restrict attrib) {
+NOTHROW_CB_NCX(FCALL ctype_parse_attrib_cxx)(struct cparser *__restrict self,
+                                             struct ctype_attributes *__restrict attrib) {
 	dbx_errno_t result;
-	char const *kwd_str;
+	CHECKED char const *kwd_str;
 	size_t kwd_len;
 	if (self->c_tok != CTOKEN_TOK_KEYWORD)
 		goto syn;
@@ -2261,8 +2261,8 @@ syn:
 }
 
 PRIVATE WUNUSED NONNULL((1, 2)) dbx_errno_t
-NOTHROW_NCX(FCALL ctype_parse_attrib)(struct cparser *__restrict self,
-                                      struct ctype_attributes *__restrict attrib) {
+NOTHROW_CB_NCX(FCALL ctype_parse_attrib)(struct cparser *__restrict self,
+                                         struct ctype_attributes *__restrict attrib) {
 	dbx_errno_t result = DBX_EOK;
 again:
 	if (self->c_tok == '[') {
@@ -2291,7 +2291,7 @@ again_parse_attrib_cxx:
 		goto again;
 	}
 	if (self->c_tok == CTOKEN_TOK_KEYWORD) {
-		char const *kwd_str;
+		CHECKED char const *kwd_str;
 		size_t kwd_len;
 		kwd_str = self->c_tokstart;
 		kwd_len = cparser_toklen(self);
@@ -2361,12 +2361,12 @@ done:
 
 /* Parse `const' / `volatile' / `_Atomic' type flags. */
 PRIVATE WUNUSED NONNULL((1, 2)) dbx_errno_t
-NOTHROW_NCX(FCALL ctype_parse_cv)(struct cparser *__restrict self,
-                                  uintptr_t *__restrict ct_flags,
-                                  struct ctype_attributes *__restrict attrib) {
+NOTHROW_CB_NCX(FCALL ctype_parse_cv)(struct cparser *__restrict self,
+                                     uintptr_t *__restrict ct_flags,
+                                     struct ctype_attributes *__restrict attrib) {
 	dbx_errno_t result = DBX_EOK;
 	while (self->c_tok == CTOKEN_TOK_KEYWORD) {
-		char const *kwd_str;
+		CHECKED char const *kwd_str;
 		size_t kwd_len;
 		kwd_str = self->c_tokstart;
 		kwd_len = cparser_toklen(self);
@@ -2492,9 +2492,9 @@ PRIVATE char const misc_type_keywords[][16] = {
 
 
 PRIVATE NONNULL((1)) void
-NOTHROW_NCX(FCALL autocomplete_types)(struct cparser *__restrict self,
-                                      char const *__restrict name,
-                                      size_t namelen, uintptr_t ns) {
+NOTHROW_CB_NCX(FCALL autocomplete_types)(struct cparser *__restrict self,
+                                         CHECKED char const *name,
+                                         size_t namelen, uintptr_t ns) {
 	unsigned int i;
 	if (namelen < (lengthof(builtin_types[0].bt_name) - 1)) {
 		for (i = 0; i < lengthof(builtin_types); ++i) {
@@ -2527,11 +2527,11 @@ NOTHROW_NCX(FCALL autocomplete_types)(struct cparser *__restrict self,
 
 
 PRIVATE WUNUSED NONNULL((1, 2, 3)) dbx_errno_t
-NOTHROW_NCX(FCALL ctype_parse_base)(struct cparser *__restrict self,
-                                    /*out:ref*/ struct ctyperef *__restrict presult,
-                                    struct ctype_attributes *__restrict attrib) {
+NOTHROW_CB_NCX(FCALL ctype_parse_base)(struct cparser *__restrict self,
+                                       /*out:ref*/ struct ctyperef *__restrict presult,
+                                       struct ctype_attributes *__restrict attrib) {
 	dbx_errno_t result;
-	char const *kwd_str;
+	CHECKED char const *kwd_str;
 	size_t kwd_len;
 	unsigned int integer_type_flags;
 #define BASETYPE_FLAG_SIGNED    0x0001 /* FLAG: `signed' was given */
@@ -2822,9 +2822,9 @@ syn:
 }
 
 PRIVATE WUNUSED NONNULL((1, 2, 3)) dbx_errno_t
-NOTHROW_NCX(FCALL ctype_parse_inner_prefix)(struct cparser *__restrict self,
-                                            /*in:ref|out:ref*/ struct ctyperef *__restrict presult,
-                                            struct ctype_attributes *__restrict attrib) {
+NOTHROW_CB_NCX(FCALL ctype_parse_inner_prefix)(struct cparser *__restrict self,
+                                               /*in:ref|out:ref*/ struct ctyperef *__restrict presult,
+                                               struct ctype_attributes *__restrict attrib) {
 	dbx_errno_t result;
 again:
 	switch (self->c_tok) {
@@ -2862,9 +2862,9 @@ err_nomem:
 }
 
 PRIVATE WUNUSED NONNULL((1, 2, 3)) dbx_errno_t
-NOTHROW_NCX(FCALL ctype_parse_inner_suffix)(struct cparser *__restrict self,
-                                            /*in:ref|out:ref*/ struct ctyperef *__restrict presult,
-                                            struct ctype_attributes *__restrict attrib) {
+NOTHROW_CB_NCX(FCALL ctype_parse_inner_suffix)(struct cparser *__restrict self,
+                                               /*in:ref|out:ref*/ struct ctyperef *__restrict presult,
+                                               struct ctype_attributes *__restrict attrib) {
 	dbx_errno_t result;
 	switch (self->c_tok) {
 
@@ -2897,7 +2897,7 @@ handle_dots_in_parameter_list:
 
 			/* Parse argument types. */
 			for (;;) {
-				char const *argname_start;
+				CHECKED char const *argname_start;
 				if ((argc + 1) > dbx_malloc_usable_size(argv) / sizeof(struct ctyperef)) {
 					struct ctyperef *new_argv;
 					new_argv = (struct ctyperef *)dbx_realloc(argv, (argc + 1) * sizeof(struct ctyperef));
@@ -3021,11 +3021,11 @@ err_nomem:
 	goto done;
 }
 
-PUBLIC WUNUSED NONNULL((1, 2, 5)) dbx_errno_t
-NOTHROW_NCX(FCALL ctype_eval_inner)(struct cparser *__restrict self,
-                                    /*in:ref|out:ref*/ struct ctyperef *__restrict presult,
-                                    char const **p_varname, size_t *p_varname_len,
-                                    struct ctype_attributes *__restrict attrib) {
+PRIVATE WUNUSED NONNULL((1, 2, 5)) dbx_errno_t
+NOTHROW_CB_NCX(FCALL ctype_eval_inner)(struct cparser *__restrict self,
+                                       /*in:ref|out:ref*/ struct ctyperef *__restrict presult,
+                                       CHECKED char const **p_varname, size_t *p_varname_len,
+                                       struct ctype_attributes *__restrict attrib) {
 	dbx_errno_t result;
 
 	/* Parse the inner expression. */
@@ -3117,10 +3117,10 @@ syn:
  * @return: DBX_ENOENT:  `self' does not refer to a named type.
  * @return: DBX_ESYNTAX: Syntax error. */
 PUBLIC WUNUSED NONNULL((1, 2)) dbx_errno_t
-NOTHROW_NCX(FCALL ctype_eval)(struct cparser *__restrict self,
-                              /*out:ref*/ struct ctyperef *__restrict presult,
-                              char const **p_varname,
-                              size_t *p_varname_len) {
+NOTHROW_CB_NCX(FCALL ctype_eval)(struct cparser *__restrict self,
+                                 /*out:ref*/ struct ctyperef *__restrict presult,
+                                 CHECKED char const **p_varname,
+                                 size_t *p_varname_len) {
 	dbx_errno_t result;
 	struct ctype_attributes attrib;
 	attrib.ca_fun_cc = CTYPE_KIND_FUNPROTO_CC_DEFAULT;

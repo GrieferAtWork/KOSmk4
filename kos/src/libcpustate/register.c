@@ -395,8 +395,8 @@ NOTHROW_NCX(CC libcpu_register_byname)(isa_t isa,
  * @return: >= 0: Sum of return values of `cb'
  * @return: <  0: First negative return value of `cb' (enumerate was aborted) */
 INTERN NONNULL((1)) ssize_t
-NOTHROW_NCX(CC libcpu_register_listnames)(pregister_listnames_callback_t cb,
-                                          void *cookie) {
+NOTHROW_CB_NCX(CC libcpu_register_listnames)(pregister_listnames_callback_t cb,
+                                             void *cookie) {
 	size_t i;
 	ssize_t temp, result = 0;
 	for (i = 0; i < lengthof(register_db); ++i) {

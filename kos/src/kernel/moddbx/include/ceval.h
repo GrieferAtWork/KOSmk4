@@ -64,7 +64,7 @@ DATDEF __BOOL ceval_comma_is_select2nd;
  * unaltered). NOTE: The given `self' is expected to  already
  * point to the first token apart of the expression on entry. */
 FUNDEF NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL cexpr_pushparse)(struct cparser *__restrict self);
+NOTHROW_CB_NCX(FCALL cexpr_pushparse)(struct cparser *__restrict self);
 
 /* Light-weight wrapper around `cexpr_pushparse()', and also
  * the top-level function used for evaluating C expressions.
@@ -72,9 +72,9 @@ NOTHROW_NCX(FCALL cexpr_pushparse)(struct cparser *__restrict self);
  * @param: maxlen:   The max length of `expr' (actual length is `strnlen(expr, maxlen)')
  * @return: DBX_EOK: Success
  * @return: * :      Error (the effective c-expression-stack-size is unaltered) */
-FUNDEF NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL cexpr_pusheval)(char const *__restrict expr,
-                                  size_t maxlen DFL((size_t)-1));
+FUNDEF dbx_errno_t
+NOTHROW_CB_NCX(FCALL cexpr_pusheval)(CHECKED char const *expr,
+                                     size_t maxlen DFL((size_t)-1));
 
 /* Parse a named type from  `self'. This function expects  that
  * `self' points at the first token of the named type on entry.
@@ -94,9 +94,9 @@ NOTHROW_NCX(FCALL cexpr_pusheval)(char const *__restrict expr,
  * @return: DBX_ENOENT:  `self' does not refer to a named type.
  * @return: DBX_ESYNTAX: Syntax error. */
 FUNDEF WUNUSED NONNULL((1, 2)) dbx_errno_t
-NOTHROW_NCX(FCALL ctype_eval)(struct cparser *__restrict self,
-                              /*out:ref*/ struct ctyperef *__restrict p_result,
-                              char const **p_varname, size_t *p_varname_len);
+NOTHROW_CB_NCX(FCALL ctype_eval)(struct cparser *__restrict self,
+                                 /*out:ref*/ struct ctyperef *__restrict p_result,
+                                 CHECKED char const **p_varname, size_t *p_varname_len);
 
 DECL_END
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */

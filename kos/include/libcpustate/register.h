@@ -940,8 +940,8 @@ __NOTHROW_NCX_T(LIBCPUSTATE_CC *PREGISTER_LISTNAMES)(pregister_listnames_callbac
                                                      void *__cookie);
 #ifdef LIBCPUSTATE_WANT_PROTOTYPES
 LIBCPUSTATE_DECL __ATTR_NONNULL((1)) __ssize_t
-__NOTHROW_NCX(LIBCPUSTATE_CC register_listnames)(pregister_listnames_callback_t __cb,
-                                                 void *__cookie);
+__NOTHROW_CB_NCX(LIBCPUSTATE_CC register_listnames)(pregister_listnames_callback_t __cb,
+                                                    void *__cookie);
 #endif /* LIBCPUSTATE_WANT_PROTOTYPES */
 
 __DECL_END

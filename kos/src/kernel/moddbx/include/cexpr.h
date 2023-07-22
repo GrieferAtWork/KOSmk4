@@ -305,7 +305,7 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_promote)(void);
  * @return: DBX_ESYNTAX: The C expression stack top-element isn't a struct/union.
  * @return: DBX_ENOENT:  The given `name' doesn't name a member of the top-element struct. */
 FUNDEF NONNULL((1)) dbx_errno_t
-NOTHROW(FCALL cexpr_field)(char const *__restrict name, size_t namelen);
+NOTHROW_NCX(FCALL cexpr_field)(CHECKED char const *name, size_t namelen);
 
 /* Ref/Deref the c-expression-stack top element.
  * @return: DBX_EOK:     Success.
@@ -397,18 +397,18 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc);
  * @return: DBX_ENOMEM: Insufficient memory.
  * @return: DBX_ENOENT: No object matches the given `name' */
 FUNDEF NONNULL((1)) dbx_errno_t
-NOTHROW(FCALL cexpr_pushsymbol)(struct cmodsyminfo *__restrict sym,
-                                __BOOL automatic_symbol_addend DFL(1));
+NOTHROW_NCX(FCALL cexpr_pushsymbol)(struct cmodsyminfo *__restrict sym,
+                                    __BOOL automatic_symbol_addend DFL(1));
 FUNDEF NONNULL((1)) dbx_errno_t
-NOTHROW(FCALL cexpr_pushsymbol_byname)(char const *__restrict name, size_t namelen,
-                                      __BOOL automatic_symbol_addend DFL(1));
+NOTHROW_NCX(FCALL cexpr_pushsymbol_byname)(CHECKED char const *name, size_t namelen,
+                                           __BOOL automatic_symbol_addend DFL(1));
 
 /* Push a register with its native typing, given its `name'
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOMEM: Insufficient memory.
  * @return: DBX_ENOENT: No register matches the given `name' */
 FUNDEF NONNULL((1)) dbx_errno_t
-NOTHROW(FCALL cexpr_pushregister)(char const *__restrict name, size_t namelen);
+NOTHROW_NCX(FCALL cexpr_pushregister)(CHECKED char const *name, size_t namelen);
 
 
 /* Arch-specific handler to perform a function call to a C function

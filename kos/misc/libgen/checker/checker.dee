@@ -346,8 +346,71 @@ again:
 		switch (attributeName) {
 
 		case "checker":
+		case "gnu":
 			this.skip("::");
 			goto again;
+
+			/* Ignored attributes */
+		case "regparm":
+		case "warning":
+		case "error":
+		case "section":
+		case "weakref":
+		case "alias":
+		case "visibility":
+		case "format":
+		case "format_arg":
+		case "alloc_size":
+		case "optimize":
+		case "assume_aligned":
+		case "alloc_align":
+			this.next();
+			this.skip("(");
+			parseSkipUntil(")");
+			this.skip(")");
+			break;
+
+		case "deprecated":
+		case "nonnull":
+		case "sentinel":
+			this.next();
+			if (this.tok == "(") {
+				this.next();
+				parseSkipUntil(")");
+				this.skip(")");
+			}
+			break;
+
+		case "cdecl":
+		case "stdcall":
+		case "fastcall":
+		case "thiscall":
+		case "sysvabi":
+		case "msabi":
+		case "dllimport":
+		case "dllexport":
+		case "weak":
+		case "returns_twice":
+		case "externally_visible":
+		case "returns_nonnull":
+		case "const":
+		case "pure":
+		case "leaf":
+		case "unused":
+		case "no_instrument_function":
+		case "malloc":
+		case "noinline":
+		case "used":
+		case "warn_unused_result":
+		case "may_alias":
+		case "artificial":
+		case "cold":
+		case "hot":
+		case "noclone":
+		case "fallthrough":
+		case "gnu_inline":
+			this.next();
+			break;
 
 		case "packed":
 			tr.flags |= CTYPEREF_FLAG_PACKED;
@@ -397,16 +460,20 @@ again:
 
 		case "nothrow": {
 			local isStar = false;
+			local level: int;
 			this.next();
-			this.skip("(");
-			if (this.tok == "*") {
-				isStar = true;
+			if (this.tok == "(") {
 				this.next();
+				if (this.tok == "*") {
+					isStar = true;
+					this.next();
+				}
+				level = parseExprConstantInteger();
+				this.skip(")");
+			} else {
+				level = 0;
 			}
-			local level: int = parseExprConstantInteger();
-			local mode = isStar ? f"*{level}" : f"{level}";
-			tr.attrib["nothrow"] = mode;
-			this.skip(")");
+			tr.attrib["nothrow"] = isStar ? f"*{level}" : f"{level}";
 		}	break;
 
 		case "tag":
@@ -683,6 +750,7 @@ default_case:
 
 	function parseEnumMembers(ns: CNamespace, enumTypeRef: CTypeRef) {
 		local prevEnumConstantValue: int = 0;
+		local enumBase: CType = enumTypeRef.typ.base;
 		while (this.tok != "}") {
 			local enumDecl = this.flc;
 			local enumName = this.parseSymbolName();
@@ -697,7 +765,8 @@ default_case:
 				this.err(f"Symbol `{enumName}' has already been defined");
 			if (ns.symbols is none)
 				ns.symbols = Dict();
-			ns.symbols[enumName] = CSymbol(enumName, enumDecl, enumTypeRef, enumValue);
+			ns.symbols[enumName] = CSymbol(enumName, enumDecl,
+				enumTypeRef, enumBase.bytes(this, enumValue));
 			prevEnumConstantValue = enumValue;
 			if (this.tok != ",")
 				break;
@@ -1199,12 +1268,11 @@ done:
 	}
 
 	function parseTypeRefInnerSuffix(tr: CTypeRef) {
-suffixAgain:
 		switch (this.tok) {
 
 		case "(": {
 			this.next();
-			local func = CFunctionType(returnType: tr.typ);
+			local func = CFunctionType();
 			while (this.tok != ")") {
 				if (this.tok == "...") {
 					func.isVarArgs = true;
@@ -1228,9 +1296,10 @@ suffixAgain:
 				this.next();
 			}
 			this.skip(")");
+			parseTypeRefInnerSuffix(tr);
+			func.returnType = tr.typ;
 			tr.typ = func;
-			goto suffixAgain;
-		}
+		}	break;
 
 		case "[": {
 			this.next();
@@ -1251,6 +1320,8 @@ suffixAgain:
 					dim = none;
 				}
 			}
+			this.skip("]");
+			parseTypeRefInnerSuffix(tr);
 			local baseType: CType = tr.typ;
 			local itemAlign: int = tr.attrib.get("aligned", baseType.alignof);
 			if (tr.flags & CTYPEREF_FLAG_PACKED)
@@ -1259,9 +1330,7 @@ suffixAgain:
 			if (dim !is none && dim < 0)
 				this.err(f"Negative array dimension in `{baseType}[{dim}]'");
 			tr.typ = CArrayType(baseType, dim, stride);
-			this.skip("]");
-			goto suffixAgain;
-		}
+		}	break;
 
 		default: break;
 		}
@@ -1708,15 +1777,32 @@ again:
 				this.next();
 				local savedIsUnreachable = isUnreachable;
 				isUnreachable = switchIsUnreachable;
-				local caseValue: Bytes | none = parseTypedExprConstant(
+				local caseValueLo: Bytes | none = parseTypedExprConstant(
+					switchExpressionType, canRetainNothrow: false).last;
+				local caseValueHi: Bytes | none = caseValueLo;
+				if (this.tok == "...") {
+					isUnreachable = switchIsUnreachable;
+					this.next();
+					caseValueHi = parseTypedExprConstant(
 						switchExpressionType, canRetainNothrow: false).last;
+				}
 				isUnreachable = savedIsUnreachable;
 				if (switchConstantExpressionValue !is none &&
-				    caseValue !is none && !switchIsUnreachable) {
+				    caseValueLo !is none && caseValueHi !is none &&
+				    !switchIsUnreachable) {
 					/* When the switch-expression is constant, only
 					 * disable unreachable if  case matches  switch */
-					if (switchConstantExpressionValue == caseValue)
-						isUnreachable = false;
+					if (caseValueLo === caseValueHi || caseValueLo == caseValueHi) {
+						if (switchConstantExpressionValue == caseValueLo)
+							isUnreachable = false;
+					} else {
+						local switchType: CType = switchExpressionType.typ;
+						local caseIntLo = switchType.peek(this, caseValueLo, 0);
+						local caseIntHi = switchType.peek(this, caseValueHi, 0);
+						local switchInt = switchType.peek(this, switchConstantExpressionValue, 0);
+						if (switchInt >= caseIntLo && switchInt <= caseIntHi)
+							isUnreachable = false;
+					}
 					this.skip(":");
 					goto again;
 				}
@@ -1742,12 +1828,10 @@ again:
 			break;
 
 		case "break":
-			if (isInLoop) {
-				if (!isUnreachable)
-					encounteredBreak = true;
-			} else if (!isInSwitchStatement) {
+			if (!isUnreachable)
+				encounteredBreak = true;
+			if (!isInLoop && !isInSwitchStatement)
 				this.err("`break' outside of loop or switch");
-			}
 			this.next();
 			this.skip(";");
 			isUnreachable = true;
@@ -1805,9 +1889,9 @@ again:
 		case "switch": {
 			this.next();
 			this.skip("(");
-			local savedSwitchExpressionType = switchExpressionType;
-			local savedSwitchConstantExpressionValue = switchConstantExpressionValue;
 			local switchExpr: CValue = parseExprRValue();
+			local savedSwitchExpressionType          = switchExpressionType;
+			local savedSwitchConstantExpressionValue = switchConstantExpressionValue;
 			switchExpressionType = switchExpr.typeref;
 			switchConstantExpressionValue = switchExpr.isConstExpr
 				? switchExpr.constExprBytes
@@ -1815,8 +1899,10 @@ again:
 			this.skip(")");
 			this.require("{");
 
+			local savedEncounteredBreak    = encounteredBreak;
 			local savedIsInSwitchStatement = isInSwitchStatement;
 			local savedSwitchIsUnreachable = switchIsUnreachable;
+			encounteredBreak    = false;
 			isInSwitchStatement = true;
 			switchIsUnreachable = isUnreachable;
 			if (isUnreachable) {
@@ -1825,13 +1911,17 @@ again:
 				/* Switch statement contents are unreachable until a case/default label is hit. */
 				isUnreachable = true;
 				parseStatement();
-				isUnreachable = false;
 			}
 
-			isInSwitchStatement = savedIsInSwitchStatement;
-			switchIsUnreachable = savedSwitchIsUnreachable;
+			/* If a reachable break-statement is hit, the end of the switch is reachable. */
+			if (encounteredBreak)
+				isUnreachable = false;
+
+			encounteredBreak              = savedEncounteredBreak;
+			isInSwitchStatement           = savedIsInSwitchStatement;
+			switchIsUnreachable           = savedSwitchIsUnreachable;
 			switchConstantExpressionValue = savedSwitchConstantExpressionValue;
-			switchExpressionType = savedSwitchExpressionType;
+			switchExpressionType          = savedSwitchExpressionType;
 		}	break;
 
 		case "if": {
@@ -2163,6 +2253,7 @@ return_void_value:
 			local loIndex: int = nextIndex;
 			local hiIndex: int = nextIndex;
 			if (this.tok == "[") {
+				this.next();
 				local loIndexValue: CValue = parseExprRValue();
 				local hiIndexValue: CValue = loIndexValue;
 				if (this.tok == "...") {
@@ -3168,12 +3259,32 @@ default_case:
 			this.parseSymbolName();
 return_unknown_void_pointer:
 			return CValue(kind: CVALUE_AVOID,
-				typeref: CTypeRef(TARGET_CPointerType(C_void)));
+				typeref: CTypeRef(TARGET_CPointerType(CTypeRef(C_void))));
 
 		case "__builtin_alloca":
 			this.next();
 			this.skip("(");
 			parseExpr();
+			this.skip(")");
+			goto return_unknown_void_pointer;
+
+		case "__builtin_alloca":
+			this.next();
+			this.skip("(");
+			parseExpr();
+			this.skip(")");
+			goto return_unknown_void_pointer;
+
+		case "__builtin_stack_restore":
+			this.next();
+			this.skip("(");
+			parseExpr();
+			this.skip(")");
+			goto return_C_voidval;
+
+		case "__builtin_stack_save":
+			this.next();
+			this.skip("(");
 			this.skip(")");
 			goto return_unknown_void_pointer;
 
@@ -3259,6 +3370,7 @@ return_unknown_void_pointer:
 			this.skip("(");
 			this.skip(")");
 			isUnreachable = true;
+return_C_voidval:
 			return copy C_voidval;
 		}	break;
 
@@ -3290,7 +3402,7 @@ return_unknown_void_pointer:
 			}
 			this.skip(")");
 			isUnreachable = true;
-			return copy C_voidval;
+			goto return_C_voidval;
 		}	break;
 
 		case "alignof":
@@ -3335,7 +3447,7 @@ return_unknown_void_pointer:
 			this.skip("(");
 			this.skip(")");
 			isUnreachable = true;
-			return copy C_voidval;
+			goto return_C_voidval;
 		}	break;
 
 		case "__builtin_constant_p": {
@@ -3450,7 +3562,7 @@ again_builtin_container_of_suffix:
 			return ptr /* NOTE: We cast to a char-pointer so that pointer attributes can be retained */
 				.inplaceCast(this, CTypeRef(TARGET_CPointerType(CTypeRef(C_char))), true)
 				.inplaceOp2(this, "-", val)
-				.inplaceCast(this, CTypeRef(TARGET_CPointerType(typ)));
+				.inplaceCast(this, CTypeRef(TARGET_CPointerType(typ)), true);
 		}	break;
 
 		case "__builtin_LINE":
@@ -3588,7 +3700,7 @@ again_builtin_container_of_suffix:
 				typ = TARGET_C_long;
 				tok = tok[:-1];
 			}
-			if (tok.startswith("s")) {
+			if (tok.startswith("s") && !tok.startswith("sub")) {
 				tok = tok[1:];
 				if (typ is none)
 					typ = C_int;
@@ -3804,7 +3916,7 @@ default_case:
 						break;
 					}
 					try {
-						constVal = float(tok);
+						constVal = float(tok[:suffixEnd]);
 					} catch (...) {
 						this.err(f"Unable to parse expression from {repr tok}");
 					}

@@ -3420,10 +3420,10 @@ skip_attributes_and_parse_next:
  * @param: scope: The scope of symbols that should be enumerated (set of `CMOD_SYMENUM_SCOPE_F*')
  * @return: * :        pformatprinter-compatible accumulation of return values from `cb'
  * @return: DBX_EINTR: Operation was interrupted. */
-PUBLIC NONNULL((1, 2)) ssize_t FCALL
-cmod_symenum(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
-             cmod_symenum_callback_t cb, CHECKED char const *startswith_name,
-             size_t startswith_namelen, uintptr_t ns, uintptr_t scope) {
+PUBLIC NONNULL((1, 2)) ssize_t
+NOTHROW_CB_NCX(FCALL cmod_symenum)(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
+                                   cmod_symenum_callback_t cb, CHECKED char const *startswith_name,
+                                   size_t startswith_namelen, uintptr_t ns, uintptr_t scope) {
 	ssize_t temp, result = 0;
 	bool did_encounter_nomem = false;
 	if (!(scope & CMOD_SYMENUM_SCOPE_FNOLOCAL)) {
@@ -3493,10 +3493,10 @@ err:
  *       on what `cb' may or may not have done.
  * @return: * :        pformatprinter-compatible accumulation of return values from `cb'
  * @return: DBX_EINTR: Operation was interrupted. */
-PUBLIC NONNULL((1, 2)) ssize_t FCALL
-cmod_symenum_local(/*in(oob_only)|out(undef)*/ struct cmodsyminfo *__restrict info,
-                   cmod_symenum_callback_t cb, CHECKED char const *startswith_name,
-                   size_t startswith_namelen, uintptr_t ns, uintptr_t scope) {
+PUBLIC NONNULL((1, 2)) ssize_t
+NOTHROW_CB_NCX(FCALL cmod_symenum_local)(/*in(oob_only)|out(undef)*/ struct cmodsyminfo *__restrict info,
+                                         cmod_symenum_callback_t cb, CHECKED char const *startswith_name,
+                                         size_t startswith_namelen, uintptr_t ns, uintptr_t scope) {
 	void const *pc;
 	ssize_t result;
 	pc = dbg_getpcreg(DBG_RT_REGLEVEL_VIEW);

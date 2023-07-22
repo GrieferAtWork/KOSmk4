@@ -2253,8 +2253,8 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_promote)(void) {
  * @return: DBX_ESYNTAX: The C expression stack top-element isn't a struct/union.
  * @return: DBX_ENOENT:  The given `name' doesn't name a member of the top-element struct. */
 PUBLIC NONNULL((1)) dbx_errno_t
-NOTHROW(FCALL cexpr_field)(char const *__restrict name,
-                           size_t namelen) {
+NOTHROW_NCX(FCALL cexpr_field)(CHECKED char const *name,
+                               size_t namelen) {
 	dbx_errno_t result;
 	struct ctyperef field_type;
 	struct cvalue *top;
@@ -3545,8 +3545,8 @@ err_fault:
  * @return: DBX_ENOMEM: Insufficient memory.
  * @return: DBX_ENOENT: No object matches the given `name' */
 PUBLIC NONNULL((1)) dbx_errno_t
-NOTHROW(FCALL cexpr_pushsymbol)(struct cmodsyminfo *__restrict sym,
-                                bool automatic_symbol_addend) {
+NOTHROW_NCX(FCALL cexpr_pushsymbol)(struct cmodsyminfo *__restrict sym,
+                                    bool automatic_symbol_addend) {
 	dbx_errno_t result;
 	struct ctyperef symtype;
 	if (cmodsyminfo_istype(sym))
@@ -3816,8 +3816,8 @@ err_fefault_symtype:
 }
 
 PUBLIC NONNULL((1)) dbx_errno_t
-NOTHROW(FCALL cexpr_pushsymbol_byname)(char const *__restrict name, size_t namelen,
-                                       bool automatic_symbol_addend) {
+NOTHROW_NCX(FCALL cexpr_pushsymbol_byname)(CHECKED char const *name, size_t namelen,
+                                           bool automatic_symbol_addend) {
 	dbx_errno_t result;
 	struct cmodsyminfo csym;
 	result = cmod_syminfo_local(&csym, name, namelen,
@@ -3836,7 +3836,7 @@ NOTHROW(FCALL cexpr_pushsymbol_byname)(char const *__restrict name, size_t namel
  * @return: DBX_ENOMEM: Insufficient memory.
  * @return: DBX_ENOENT: No register matches the given `name' */
 PUBLIC NONNULL((1)) dbx_errno_t
-NOTHROW(FCALL cexpr_pushregister)(char const *__restrict name, size_t namelen) {
+NOTHROW_NCX(FCALL cexpr_pushregister)(CHECKED char const *name, size_t namelen) {
 	isa_t isa = dbg_rt_getisa(DBG_RT_REGLEVEL_VIEW);
 	cpu_regno_t regno = register_byname(isa, name, namelen);
 	if (regno == CPU_REGISTER_NONE)

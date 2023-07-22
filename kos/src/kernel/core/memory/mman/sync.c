@@ -125,9 +125,9 @@ NOTHROW(FCALL ipi_invtlb_user)(struct icpustate *__restrict state,
  *    going to enable preemption.
  * Note though that all other mman_*-level APIs already perform syncing
  * automatically,  unless otherwise documented by individual functions. */
-PUBLIC NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mman_sync_p)(struct mman *__restrict self,
-                           PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+                           PAGEDIR_PAGEALIGNED VIRT void *addr,
                            PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	assertf(IS_ALIGNED((uintptr_t)addr, PAGESIZE), "addr = %p", addr);
 	assertf(IS_ALIGNED(num_bytes, PAGESIZE), "num_bytes = %#" PRIxSIZ, num_bytes);
@@ -152,9 +152,9 @@ NOTHROW(FCALL mman_sync_p)(struct mman *__restrict self,
 #endif /* !CONFIG_NO_SMP */
 }
 
-PUBLIC NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mman_syncone_p)(struct mman *__restrict self,
-                              PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
+                              PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	assertf(IS_ALIGNED((uintptr_t)addr, PAGESIZE), "addr = %p", addr);
 #ifdef CONFIG_NO_SMP
 	if (self == THIS_MMAN || self == &mman_kernel)
@@ -176,7 +176,7 @@ NOTHROW(FCALL mman_syncone_p)(struct mman *__restrict self,
 #endif /* !CONFIG_NO_SMP */
 }
 
-PUBLIC NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mman_syncall_p)(struct mman *__restrict self) {
 	/* Check for special case: The kernel MMAN is being synced. */
 	if (self == &mman_kernel) {
@@ -203,7 +203,7 @@ NOTHROW(FCALL mman_syncall_p)(struct mman *__restrict self) {
 
 /* Sync memory within `THIS_MMAN' */
 PUBLIC NOBLOCK void
-NOTHROW(FCALL mman_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+NOTHROW(FCALL mman_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                          PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	assertf(IS_ALIGNED((uintptr_t)addr, PAGESIZE), "addr = %p", addr);
 	assertf(IS_ALIGNED(num_bytes, PAGESIZE), "num_bytes = %#" PRIxSIZ, num_bytes);
@@ -233,7 +233,7 @@ NOTHROW(FCALL mman_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(FCALL mman_syncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
+NOTHROW(FCALL mman_syncone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	assertf(IS_ALIGNED((uintptr_t)addr, PAGESIZE), "addr = %p", addr);
 	if (cpu_online_count > 1) {
 		void *args[CPU_IPI_ARGCOUNT];
@@ -298,7 +298,7 @@ NOTHROW(FCALL mman_syncall)(void) {
 /* Same as above, but these functions are specifically designed to optimally
  * sync changes made to the kernel MMAN. */
 PUBLIC NOBLOCK void
-NOTHROW(FCALL mman_supersync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+NOTHROW(FCALL mman_supersync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                               PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	assertf(IS_ALIGNED((uintptr_t)addr, PAGESIZE), "addr = %p", addr);
 	assertf(IS_ALIGNED(num_bytes, PAGESIZE), "num_bytes = %#" PRIxSIZ, num_bytes);
@@ -314,7 +314,7 @@ NOTHROW(FCALL mman_supersync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(FCALL mman_supersyncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
+NOTHROW(FCALL mman_supersyncone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	assertf(IS_ALIGNED((uintptr_t)addr, PAGESIZE), "addr = %p", addr);
 	if (cpu_online_count > 1) {
 		void *args[CPU_IPI_ARGCOUNT];
@@ -341,7 +341,7 @@ NOTHROW(FCALL mman_supersyncall)(void) {
 /* Sync memory on every CPU with `CPU->c_pdir == pagedir' */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL pagedir_sync_smp_p)(pagedir_phys_t pagedir,
-                                  PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+                                  PAGEDIR_PAGEALIGNED VIRT void *addr,
                                   PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	void *args[CPU_IPI_ARGCOUNT];
 	cpuset_t targets;
@@ -360,7 +360,7 @@ NOTHROW(FCALL pagedir_sync_smp_p)(pagedir_phys_t pagedir,
 
 PUBLIC NOBLOCK void
 NOTHROW(FCALL pagedir_syncone_smp_p)(pagedir_phys_t pagedir,
-                                     PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
+                                     PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	void *args[CPU_IPI_ARGCOUNT];
 	cpuset_t targets;
 	assertf(IS_ALIGNED((uintptr_t)addr, PAGESIZE), "addr = %p", addr);
@@ -400,7 +400,7 @@ NOTHROW(FCALL pagedir_syncall_smp_p)(pagedir_phys_t pagedir) {
 
 /* Sync memory on every CPU with `CPU->c_pdir == pagedir_get()' */
 PUBLIC NOBLOCK void
-NOTHROW(FCALL pagedir_sync_smp)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+NOTHROW(FCALL pagedir_sync_smp)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                 PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	assertf(IS_ALIGNED((uintptr_t)addr, PAGESIZE), "addr = %p", addr);
 	assertf(IS_ALIGNED(num_bytes, PAGESIZE), "num_bytes = %#" PRIxSIZ, num_bytes);
@@ -426,7 +426,7 @@ NOTHROW(FCALL pagedir_sync_smp)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(FCALL pagedir_syncone_smp)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
+NOTHROW(FCALL pagedir_syncone_smp)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	assertf(IS_ALIGNED((uintptr_t)addr, PAGESIZE), "addr = %p", addr);
 	if (cpu_online_count > 1) {
 		void *args[CPU_IPI_ARGCOUNT];

@@ -78,10 +78,19 @@ global final PRETTY_NOTHROW_LEVEL_NAME: {int: string} = {
 	1 : "CHECKED",
 	2 : "BLOCKING",
 };
-function getPrettyNothrowLevelName(level: int): string {
+function getPrettyNothrowLevelName(level: int | string): string {
+	if (level !is int) {
+		if (level.startswith("*")) {
+			if (level == "*0")
+				return "NOTHROW_NCX";
+			goto fallback;
+		}
+		level = int(level);
+	}
 	local result = PRETTY_NOTHROW_LEVEL_NAME.get(level);
 	if (result !is none)
 		return result;
+fallback:
 	return f"__attribute__((nothrow({level})))";
 }
 
@@ -387,7 +396,7 @@ pointer_cast_retain_nothrow:
 							if (getExtraCannotRetainInfo !is none)
 								extraInfo = getExtraCannotRetainInfo();
 							checker.warn("-Wnothrow",
-									f"Cannot retain `{getPrettyNothrowLevelName(int(oldNothrowLevel))}' "
+									f"Cannot retain `{getPrettyNothrowLevelName(oldNothrowLevel)}' "
 									f"in cast to `{newTyp}'{extraInfo}");
 						} else {
 							newPointerBase = copy newPointerBase;
@@ -405,7 +414,7 @@ pointer_cast_retain_nothrow:
 				if (!oldThrows) {
 					/* Nothing to inherit! */
 				} else {
-					local newThrows = newPointerBase.attrib.get("throws", ());
+					local newThrows = newPointerBase.attrib.get("throws", Set());
 					if (0 in newThrows) {
 						/* New set allows for all exceptions */
 					} else if (newThrows >= oldThrows) {
@@ -497,10 +506,13 @@ err_bad_op:
 
 	public function promote(checker: Checker): CValue -> copy(this).inplacePromote(checker);
 	public function inplacePromote(checker: Checker): CValue {
-		if (typeref.typ in C_PROMOTE) {
+		local typ: CType = typeref.typ;
+		if (typ in C_PROMOTE) {
 			return inplaceCast(checker, CTypeRef(C_int), true);
-		} else if (typeref.typ === C_float) {
+		} else if (typ === C_float) {
 			return inplaceCast(checker, CTypeRef(C_double), true);
+		} else if (typ is CEnumType) {
+			return inplaceCast(checker, CTypeRef(typ.base), true);
 		} else {
 			return inplaceRValue(checker);
 		}

@@ -71,9 +71,9 @@ enum {
 
 struct cparser {
 	unsigned int          c_tok;      /* C Token kind. (single-character, or one of `CTOKEN_TOK_*') */
-	char const           *c_tokstart; /* [1..1] Start character of `c_tok' */
-	char const           *c_tokend;   /* [1..1] End character of `c_tok' */
-	char const           *c_end;      /* [1..1][const] End of text to-be parsed (NOTE: must point to a NUL-character!) */
+	CHECKED char const   *c_tokstart; /* [1..1] Start character of `c_tok' */
+	CHECKED char const   *c_tokend;   /* [1..1] End character of `c_tok' */
+	CHECKED char const   *c_end;      /* [1..1][const] End of text to-be parsed (NOTE: must point to a NUL-character!) */
 	dbg_autocomplete_cb_t c_autocom;  /* [0..1] Auto-completion callback: When `CTOKEN_TOK_EOF' is reached in certain
 	                                   *        positions while parsing an expression, and this callback is NULL, then
 	                                   *        this callback will  be invoked  with a list  of possible  continuation
@@ -86,8 +86,8 @@ struct cparser {
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOMEM: Insufficient memory. */
 FUNDEF NONNULL((1, 2)) dbx_errno_t
-NOTHROW(FCALL cparser_autocomplete)(struct cparser const *__restrict self,
-                                    char const *__restrict str, size_t len);
+NOTHROW_CB_NCX(FCALL cparser_autocomplete)(struct cparser const *__restrict self,
+                                           CHECKED char const *__restrict str, size_t len);
 
 #define cparser_init(self, str, len)                         \
 	((self)->c_end     = ((self)->c_tokend = (str)) + (len), \
@@ -102,7 +102,7 @@ NOTHROW(FCALL cparser_autocomplete)(struct cparser const *__restrict self,
  * will have been  updated to describe  the next  token
  * following the initial `c_tokend' */
 FUNDEF NONNULL((1)) void
-NOTHROW(FCALL cparser_yield)(struct cparser *__restrict self);
+NOTHROW_NCX(FCALL cparser_yield)(struct cparser *__restrict self);
 #define cparser_yieldat(self, pos) \
 	((self)->c_tokend = (pos), cparser_yield(self))
 

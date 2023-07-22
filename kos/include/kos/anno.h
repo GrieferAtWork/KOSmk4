@@ -48,6 +48,8 @@
 
 #ifdef __CHECKER__
 #include <kos/except/checker.h>
+#define __PHYS        __ATTR_PHYS
+#define __VIRT        __ATTR_VIRT
 #define __USER        __ATTR_USER
 #define __CHECKED     __ATTR_CHECKED
 #define __UNCHECKED   __ATTR_UNCHECKED
@@ -59,6 +61,8 @@
 #define __THROWS      __ATTR_THROWS
 #define __THROWING    __ATTR_THROWING
 #else /* __CHECKER__ */
+#define __PHYS            /* Annotation for physical pointers */
+#define __VIRT            /* Annotation for virtual pointers */
 #define __USER            /* Annotation for user-space memory (default outside kernel). */
 #define __CHECKED         /* Annotation for checked memory (access may result in sporadic E_SEGFAULT and E_BADALLOC) */
 #define __UNCHECKED       /* Annotation for unchecked memory (like `CHECKED', but access is not allowed) */
@@ -94,8 +98,6 @@
                            * on-stack  which need to perform cleanup, or any EXCEPT-handlers that would want to do
                            * the same. The poster-example for this kind of behavior is `longjmp(3)' */
 
-#define __PHYS            /* Annotation for physical pointers */
-#define __VIRT            /* Annotation for virtual pointers */
 #define __WEAK            /* Annotation for weakly referenced data/data updated randomly with both the old/new state being valid. */
 #define __REF             /* Annotation for reference holders/transfers.
                            * When used on a struct-field/local/global variable: Reference storage
