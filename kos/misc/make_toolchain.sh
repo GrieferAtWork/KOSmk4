@@ -33,7 +33,7 @@
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
 #     v -- "Fix problem with `int.frombytes()`"
-DEEMON_VERSION="0db988f11fd7a3c3f6019687db938a381df07023"
+DEEMON_VERSION="6d8e7ccd06f0482609f297703ee1e0a65f22278a"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
