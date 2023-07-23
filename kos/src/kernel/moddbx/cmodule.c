@@ -809,7 +809,7 @@ NOTHROW_NCX(FCALL cmodsymtab_lookup)(struct cmodsymtab const *__restrict self,
 	while (lo < hi) {
 		size_t index;
 		int cmp;
-		char const *symname;
+		CHECKED char const *symname;
 		index  = (lo + hi) / 2;
 		result = &self->mst_symv[index];
 		symname = cmodsym_name(result, mod);
@@ -1270,19 +1270,19 @@ PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
 #define cmodsymtab_addsymbol(self, mod, name, symbol_dip) \
 	cmodsymtab_addsymbol(self, name, symbol_dip)
 #endif /* !CMODSYM_NAME_NEEDS_MODULE */
-NOTHROW(FCALL cmodsymtab_addsymbol)(struct cmodsymtab *__restrict self,
+NOTHROW_NCX(FCALL cmodsymtab_addsymbol)(struct cmodsymtab *__restrict self,
 #ifdef CMODSYM_NAME_NEEDS_MODULE
-                                    struct cmodule const *__restrict mod,
+                                        struct cmodule const *__restrict mod,
 #endif /* CMODSYM_NAME_NEEDS_MODULE */
-                                    CHECKED char const *name,
-                                    uintptr_t symbol_dip) {
+                                        CHECKED char const *name,
+                                        uintptr_t symbol_dip) {
 	size_t lo, hi, index;
 	lo = 0;
 	hi = self->mst_symc;
 	for (;;) {
 		int cmp;
 		struct cmodsym const *sym;
-		char const *symname;
+		CHECKED char const *symname;
 		index = (lo + hi) / 2;
 		if (lo >= hi)
 			break;
@@ -1591,7 +1591,7 @@ NOTHROW_NCX(FCALL cmodule_addsymbol)(struct cmodule *__restrict self,
 	for (;;) {
 		int cmp;
 		struct cmodsym *sym;
-		char const *symname;
+		CHECKED char const *symname;
 		index = (lo + hi) / 2;
 		if (lo >= hi)
 			break;
@@ -1840,7 +1840,7 @@ NOTHROW_NCX(FCALL cmodunit_loadsyms)(struct cmodunit *__restrict self,
 		if (debuginfo_cu_parser_nextchild(&parser)) {
 			do {
 				uintptr_t ns;
-				char const *symbol_name;
+				CHECKED char const *symbol_name;
 				bool has_location_information;
 				if (dbg_awaituser())
 					goto err_interrupt;
@@ -3038,12 +3038,13 @@ done_attributes:
  * conflict with  some other  symbol, try  to resolve  the conflict  by looking  at
  * the secondary  symbol table  `fallback_cu->cu_symbols'. If  that table  contains
  * another symbol with the same name, then that symbol will be enumerated, instead. */
-PRIVATE NONNULL((1, 2, 3)) ssize_t FCALL
-cmod_symenum_symtab(struct cmodule const *__restrict self,
-                    /*in|out(undef)*/ struct cmodsyminfo *__restrict info,
-                    cmod_symenum_callback_t cb, char const *startswith_name,
-                    size_t startswith_namelen, uintptr_t ns,
-                    struct cmodunit const *fallback_cu) {
+PRIVATE NONNULL((1, 2, 3)) ssize_t
+NOTHROW_CB_NCX(FCALL cmod_symenum_symtab)(struct cmodule const *__restrict self,
+                                          /*in|out(undef)*/ struct cmodsyminfo *__restrict info,
+                                          cmod_symenum_callback_t cb,
+                                          CHECKED char const *startswith_name,
+                                          size_t startswith_namelen, uintptr_t ns,
+                                          struct cmodunit const *fallback_cu) {
 	ssize_t temp, result = 0;
 	size_t enum_lo, enum_hi;
 	size_t index;
@@ -3052,7 +3053,7 @@ cmod_symenum_symtab(struct cmodule const *__restrict self,
 
 	/* Do a binary search to narrow down the range of symbols that should be enumerated. */
 	for (;;) {
-		char const *symbol_name;
+		CHECKED char const *symbol_name;
 		int cmp;
 		if (enum_lo >= enum_hi)
 			goto done;
@@ -3125,12 +3126,13 @@ err:
 }
 
 /* Enumerate global variables of the module pointed-to by `info->clv_mod' */
-PRIVATE NONNULL((1, 2)) ssize_t FCALL
-cmod_symenum_globals(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
-                     cmod_symenum_callback_t cb, char const *startswith_name,
-                     size_t startswith_namelen, uintptr_t ns,
-                     bool *__restrict pdid_encounter_nomem,
-                     struct cmodunit const *fallback_cu) {
+PRIVATE NONNULL((1, 2)) ssize_t
+NOTHROW_CB_NCX(FCALL cmod_symenum_globals)(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
+                                           cmod_symenum_callback_t cb,
+                                           CHECKED char const *startswith_name,
+                                           size_t startswith_namelen, uintptr_t ns,
+                                           bool *__restrict pdid_encounter_nomem,
+                                           struct cmodunit const *fallback_cu) {
 	dbx_errno_t error;
 	ssize_t result;
 

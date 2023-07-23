@@ -441,16 +441,14 @@ again:
 		case "throws": {
 			this.next();
 			this.skip("(");
-			local throws: {int...} | none = tr.attrib.get("throws");
-			if (throws is none)
-				tr.attrib["throws"] = throws = HashSet();
+			local throws: {int...} = tr.attribThrows;
+			if (throws !is HashSet)
+				tr.attribThrows = throws = HashSet(throws);
 			while (this.tok != ")") {
 				local id: int = parseExceptionId();
 				throws.insert(id);
-				if (id > 0) {
-					/* Implied super-class */
-					throws.insert(id & 0xffff);
-				}
+				if (id > 0xffff)
+					throws.insert(id & 0xffff); /* Implied super-class */
 				if (this.tok != ",")
 					break;
 				this.next();
@@ -473,21 +471,24 @@ again:
 			} else {
 				level = 0;
 			}
-			tr.attrib["nothrow"] = isStar ? f"*{level}" : f"{level}";
+			tr.attribNothrow = f"{isStar ? "*" : ""}{level}";
 		}	break;
 
 		case "tag":
 		case "require_caller_tag": {
 			this.next();
 			this.skip("(");
-			tr.attrib[attributeName] = this.parseString();
+			tr.operator . ({
+				"tag" : "attribTag",
+				"require_caller_tag" : "attribRequireCallerTag",
+			}[attributeName]) = this.parseString();
 			this.skip(")");
 		}	break;
 
 		case "aligned":
 			this.next();
 			this.skip("(");
-			tr.attrib[attributeName] = parseExprConstantInteger();
+			tr.attribAligned = parseExprConstantInteger();
 			this.skip(")");
 			break;
 
@@ -507,7 +508,7 @@ again:
 				break;
 			this.next();
 			this.skip("(");
-			tr.attrib["aligned"] = parseExprConstantInteger();
+			tr.attribAligned = parseExprConstantInteger();
 			this.skip(")");
 			result = true;
 			goto again;
@@ -705,7 +706,7 @@ default_case:
 		parseCTypeRefAttributes(tr);
 
 		/* Calculate struct field offsets */
-		local structAlign: int | none = tr.attrib.get("aligned");
+		local structAlign: int | none = tr.attribAligned;
 		if (structAlign is none)
 			structAlign = defaultStructPacking;
 		if (tr.flags & CTYPEREF_FLAG_PACKED)
@@ -715,7 +716,7 @@ default_case:
 			fieldOffset = struct.base.sizeof;
 		for (local fieldType, fieldName: fields) {
 			if (!isUnion) {
-				local fieldAlign = fieldType.attrib.get("aligned");
+				local fieldAlign = fieldType.attribAligned;
 				if (fieldAlign is none)
 					fieldAlign = fieldType.typ.alignof;
 				if (structAlign !is none) {
@@ -740,7 +741,7 @@ default_case:
 				fieldOffset += fieldType.sizeof;
 		}
 		if (structAlign !is none) {
-			local finalStructAlign = tr.attrib.get("aligned");
+			local finalStructAlign: int | none = tr.attribAligned;
 			if (finalStructAlign is none)
 				finalStructAlign = structAlign;
 			struct._alignof = finalStructAlign;
@@ -944,16 +945,13 @@ skip_normal_enum_namespace:
 				}
 
 				/* Merge pointer types and their attributes */
-				local rBaseTypeRef: CTypeRef = CTypeRef(rBaseType);
-				rBaseTypeRef.flags = commonTypeRefFlags(aBaseTypeRef.flags, aBaseTypeRef.flags);
-				commonTypeRefAttrib(aBaseTypeRef.attrib, aBaseTypeRef.attrib, rBaseTypeRef.attrib);
+				local rBaseTypeRef: CTypeRef = cTypeRefWithCommonAttrib(aBaseTypeRef, aBaseTypeRef);
+				rBaseTypeRef.typ = rBaseType;
+				local rTypeRef: CTypeRef = cTypeRefWithCommonAttrib(a, b);
 				local rPointerType: Type = type aBaseType;
 				if (rPointerType !== type bBaseType && bBaseType.sizeof > aBaseType.sizeof)
 					rPointerType = type bBaseType;
-				local rType: CType = rPointerType(rBaseTypeRef);
-				local rTypeRef: CTypeRef = CTypeRef(rType);
-				rTypeRef.flags = commonTypeRefFlags(a.flags, b.flags);
-				commonTypeRefAttrib(a.attrib, b.attrib, rTypeRef.attrib);
+				rTypeRef.typ = rPointerType(rBaseTypeRef);
 				return rTypeRef;
 			}
 		} else if (bTyp is CPointerType) {
@@ -1323,7 +1321,9 @@ done:
 			this.skip("]");
 			parseTypeRefInnerSuffix(tr);
 			local baseType: CType = tr.typ;
-			local itemAlign: int = tr.attrib.get("aligned", baseType.alignof);
+			local itemAlign: int | none = tr.attribAligned;
+			if (itemAlign is none)
+				itemAlign = baseType.alignof;
 			if (tr.flags & CTYPEREF_FLAG_PACKED)
 				itemAlign = 1;
 			local stride: int = (baseType.sizeof + itemAlign - 1) & -itemAlign;
@@ -1360,6 +1360,7 @@ prefixAgain:
 			 * >> NOBLOCK void *foo();
 			 * Here, the NOBLOCK needs to be attached to the function,
 			 * and   not   its   return   value's   pointed-to   type! */
+
 			tr = CTypeRef(typ: pt);
 			parseCTypeRefConstVolatile(tr);
 			goto prefixAgain;
@@ -2110,7 +2111,7 @@ again:
 
 			local condVal: CValue = C_true;
 			if (this.tok != ";")
-				condVal = parseExprRValue();
+				condVal = parseExprComma().inplaceRValue(this);
 			this.skip(";");
 			if (isUnreachable) {
 				if (this.tok != ")")
@@ -3340,12 +3341,12 @@ return_unknown_void_pointer:
 				if (currentTryBlockExceptions !is none) {
 					currentTryBlockExceptions.insertall(currentCatchBlockExceptions);
 				} else {
-					local callerThrows: {int...} = currentFunctionTypeRef.attrib.get("throws", Set());
+					local callerThrows: {int...} = currentFunctionTypeRef.attribThrows;
 					local missingThrows: {int...} = (currentCatchBlockExceptions & ~callerThrows).sorted();
 					if (missingThrows) {
 						/* Remove E_SEGFAULT and E_BADALLOC if the calling function
 						 * has  a  nothrow attribute  with  a "*"  or  a level  > 0 */
-						local callerNothrow: string | none = currentFunctionTypeRef.attrib.get("nothrow");
+						local callerNothrow: string | none = currentFunctionTypeRef.attribNothrow;
 						if (callerNothrow !is none) {
 							if (callerNothrow.startswith("*") || int(callerNothrow) > 0) {
 								missingThrows.remove(this.exceptByName["E_SEGFAULT"]);
@@ -3386,7 +3387,7 @@ return_C_voidval:
 					currentTryBlockExceptions.insert(exceptCode);
 				} else {
 					/* Assert that `exceptCode' is part of the caller's throws-attribute */
-					local callerThrows: {int...} = currentFunctionTypeRef.attrib.get("throws", ());
+					local callerThrows: {int...} = currentFunctionTypeRef.attribThrows;
 					if (exceptCode !in callerThrows && (0 !in callerThrows)) {
 						this.warn("-Wthrows",
 							f"Function `{currentFunctionName}' is missing "
@@ -3974,7 +3975,7 @@ again:
 				argTypesAndNames = funTyp.args;
 				/* When the function is annotated as `nothrow(*...)', then  nothrow
 				 * specifications of arguments passed to the function are retained. */
-				local calleeNothrow: string | none = value.typeref.attrib.get("nothrow");
+				local calleeNothrow: string | none = value.typeref.attribNothrow;
 				if (calleeNothrow !is none && calleeNothrow.startswith("*"))
 					canRetainNothrow = true;
 			}

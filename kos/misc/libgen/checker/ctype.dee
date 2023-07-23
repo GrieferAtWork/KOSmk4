@@ -63,52 +63,78 @@ global final CTYPEREF_FLAG_FORCE = 0x4000;
 @@Used during creation of struct objects.
 global final CTYPEREF_FLAG_PACKED = 0x8000;
 
-function commonTypeRefFlags(a: int, b: int): int {
-	return ((a | b) & ~CTYPEREF_FLAG_FORCE) |
-	       ((a & b) & (CTYPEREF_FLAG_FORCE));
-}
+final class CTypeAttributes {
+	this = default;
+	public member nothrow: string | none = none;
+	public member tag: string | none = none;
+	public member requireCallerTag: string | none = none;
+	public member aligned: int | none = none;
+	public member throws: Set with int | none = none;
 
-function commonTypeRefAttrib(a: {string: string | int},
-                             b: {string: string | int},
-                             r: {string: string | int}) {
-	for (local key: a.keys | b.keys) {
-		local aValue: Object | none = a.get(key);
-		local bValue: Object | none = b.get(key);
-		local rValue: Object;
-		if (aValue is none) {
-			rValue = bValue;
-		} else if (bValue is none) {
-			rValue = aValue;
-		} else if (aValue == bValue) {
-			rValue = aValue;
-		} else if (aValue is int) {
-			rValue = aValue;
-			if (rValue < bValue)
-				rValue = bValue;
-		} else if (key == "throws") {
-			rValue = aValue | bValue;
-		} else if (key == "nothrow") {
-			aValue = int(aValue.lstrip("*"));
-			bValue = int(bValue.lstrip("*"));
-			rValue = aValue;
-			if (rValue < bValue)
-				rValue = bValue;
-			rValue = str rValue;
-		} else {
-			/* Remove attribute. */
-			continue;
+	// TODO: "format": Verify KOS-extended printf-format string argument types
+
+	public function importFrom(other: CTypeAttributes) {
+		if (nothrow is none) {
+			nothrow = other.nothrow;
+		} else if (other.nothrow !is none) {
+			local hasStar: bool = nothrow.startswith("*") || other.nothrow.startswith("*");
+			local myNothrowLevel: int = int(nothrow.lstrip("*"));
+			local otNothrowLevel: int = int(other.nothrow.lstrip("*"));
+			if (myNothrowLevel < otNothrowLevel)
+				myNothrowLevel = otNothrowLevel;
+			nothrow = f"{hasStar ? "*" : ""}{myNothrowLevel}";
 		}
-		r[key] = rValue;
+		if (tag is none) {
+			tag = other.tag;
+		} else if (other.tag !is none && tag != other.tag) {
+			throw Error(f"Cannot inherit differing tags `{tag}' and `{other.tag}'");
+		}
+		if (requireCallerTag is none) {
+			requireCallerTag = other.requireCallerTag;
+		} else if (other.requireCallerTag !is none && requireCallerTag != other.requireCallerTag) {
+			throw Error(f"Cannot inherit differing required tags `{requireCallerTag}' and `{other.requireCallerTag}'");
+		}
+		if (aligned is none) {
+			aligned = other.aligned;
+		} else if (other.aligned !is none) {
+			if (aligned < other.aligned)
+				aligned = other.aligned;
+		}
+		if (!throws) {
+			throws = other.throws;
+		} else if (other.throws) {
+			if (throws !is HashSet)
+				throws = HashSet(throws);
+			throws.insertall(other.throws);
+		}
+	}
+
+	function hasAllAttributesFrom(other: CTypeAttributes): bool {
+		for (local attrib: {
+			"nothrow",
+			"nothrowInheritable",
+			"throws",
+			"throwsInheritable",
+			"tag",
+			"requireCallerTag",
+			"aligned",
+		}) {
+			local myVal = this.operator . (attrib);
+			local otVal = other.operator . (attrib);
+			if (myVal is none) {
+				if (otVal !is none)
+					return false;
+			} else {
+				if (otVal is none)
+					return false;
+				if (myVal != otVal)
+					return false;
+			}
+		}
+		return true;
 	}
 }
 
-function cTypeRefWithCommonAttrib(self: CTypeRef, other: CTypeRef): CTypeRef {
-	if (self.flags == other.flags && self.attrib == other.attrib)
-		return self;
-	local result = CTypeRef(typ: self.typ, flags: commonTypeRefFlags(self.flags, other.flags));
-	commonTypeRefAttrib(self.attrib, other.attrib, result.attrib);
-	return result;
-}
 
 global C_void;
 final class CTypeRef {
@@ -120,14 +146,14 @@ final class CTypeRef {
 	@@Type flags. Set of `CTYPEREF_FLAG_*`
 	public member flags: int = 0;
 
-	@@Type attributes. Map of:
-	@@ - @"nothrow"               -> @string    (nothrow level, as string-coded decimal, possible prefixed by @"*")
-	@@ - @"tag"                   -> @string    (function tag)
-	@@ - @"require_caller_tag"    -> @string    (function caller tag requirements)
-	@@ - @"aligned"               -> @int       (alignment)
-	@@ - @"throws"                -> @{int...}  (IDs of thrown exceptions; @0 for `...`)
-	@@ - @"format" TODO: Verify KOS-extended printf-format string argument types
-	public member attrib: {string: Object} = Dict();
+	@@Type attributes.
+	public member attrib: CTypeAttributes | none = none;
+
+	operator copy(other: CTypeRef) {
+		typ = other.typ;
+		flags = other.flags;
+		attrib = copy other.attrib;
+	}
 
 	/* Helpers */
 	operator str(): string -> tostr();
@@ -146,6 +172,44 @@ final class CTypeRef {
 		}
 	}
 
+	@@Ensure that @attrib has been allocated
+	public property requireAttrib: CTypeAttributes = {
+		get(): CTypeAttributes {
+			if (attrib is none)
+				attrib = CTypeAttributes();
+			return attrib;
+		}
+	};
+
+	/* Helpers for accessing attributes */
+	public property attribNothrow: string | none = {
+		get(): string | none -> attrib.nothrow;
+		set(v: string | none) { (v is none ? attrib : requireAttrib).nothrow = v; }
+	};
+	public property attribThrows: Set with int = {
+		get(): Set with int {
+			local result: Set with int | none = attrib.throws;
+			if (result is none)
+				result = Set();
+			return result;
+		}
+		set(v: Set with int) {
+			requireAttrib.throws = v;
+		}
+	};
+	public property attribTag: string | none = {
+		get(): string | none -> attrib.tag;
+		set(v: string | none) { (v is none ? attrib : requireAttrib).tag = v; }
+	};
+	public property attribRequireCallerTag: string | none = {
+		get(): string | none -> attrib.requireCallerTag;
+		set(v: string | none) { (v is none ? attrib : requireAttrib).requireCallerTag = v; }
+	};
+	public property attribAligned: int | none = {
+		get(): int | none -> attrib.aligned;
+		set(v: int | none) { (v is none ? attrib : requireAttrib).aligned = v; }
+	};
+
 	@@Check if @this @CTypeRef is identical to @other in such
 	@@a way  that  no  re-declaration error  show  be  thrown
 	function redeclarationEquals(other: CTypeRef): bool {
@@ -160,7 +224,8 @@ final class CTypeRef {
 	function redeclarationImport(checker: Checker, other: CTypeRef) {
 		/* TODO: Warnings for attributes that weren't present during the initial declaration. */
 		flags |= other.flags;
-		attrib.update(other.attrib);
+		if (other.attrib !is none)
+			requireAttrib.importFrom(other.attrib);
 		typ = other.typ;
 	}
 
@@ -172,7 +237,8 @@ final class CTypeRef {
 	@@```
 	function importTypedef(typedef: CTypeRef) {
 		flags |= typedef.flags;
-		attrib.update(typedef.attrib);
+		if (typedef.attrib !is none)
+			requireAttrib.importFrom(typedef.attrib);
 		typ = typedef.typ;
 	}
 
@@ -203,23 +269,33 @@ final class CTypeRef {
 			varname = f"const {varname}";
 		if (flags & CTYPEREF_FLAG_NODEREF)
 			varname = f"__attribute__((noderef)) {varname}";
-		for (local attrName, attrVal: attrib) {
-			switch (attrName) {
-			case "throws":
-				attrVal = ",".join(
-					for (local key: attrVal.sorted())
-						{ -1 : "*", 0 : "..." }.get(key, key.hex())
+		local attributeValues: {string...} = [];
+		if (flags & CTYPEREF_FLAG_NODEREF)
+			attributeValues.append("noderef");
+		if (attrib !is none) {
+			local temp = attrib.nothrow;
+			if (temp !is none)
+				attributeValues.append(f"nothrow({temp})");
+			local temp = attrib.throws;
+			if (temp) {
+				local throwsCodes: {string...} = (
+					for (local throwsId: temp)
+						{ -1 : "*", 0 : "..." }.get(throwsId, throwsId.hex())
 				);
-				break;
-			case "tag":
-			case "require_caller_tag":
-				attrVal = repr attrVal;
-				break;
-			default:
-				break;
+				attributeValues.append(f"throws({", ".join(throwsCodes.sorted())})");
 			}
-			varname = f"__attribute__(({attrName}({attrVal}))) {varname}";
+			local temp = attrib.tag;
+			if (temp)
+				attributeValues.append(f"tag({repr temp})");
+			local temp = attrib.requireCallerTag;
+			if (temp)
+				attributeValues.append(f"require_caller_tag({repr temp})");
+			local temp = attrib.aligned;
+			if (temp !is none)
+				attributeValues.append(f"aligned({temp})");
 		}
+		if (attributeValues)
+			varname = f"__attribute__(({", ".join(attributeValues)})) {varname}";
 		return typ.tostr(varname);
 	}
 
@@ -228,16 +304,37 @@ final class CTypeRef {
 	function hasAllAttributesFrom(other: CTypeRef): bool {
 		if ((flags & other.flags) != other.flags)
 			return false;
-		for (local attrName, attrVal: other) {
-			local myVal = attrib.get(attrName);
-			if (myVal is none)
-				return false;
-			if (myVal != attrVal)
+		if (attrib is none && other.attrib is none) {
+			/* OK: no custom attributes anywhere */
+		} else {
+			if (!requireAttrib.hasAllAttributesFrom(other.requireAttrib))
 				return false;
 		}
 		return true;
 	}
 }
+
+function commonTypeRefFlags(a: int, b: int): int {
+	return ((a | b) & ~CTYPEREF_FLAG_FORCE) |
+	       ((a & b) & (CTYPEREF_FLAG_FORCE));
+}
+
+function cTypeRefWithCommonAttrib(self: CTypeRef, other: CTypeRef): CTypeRef {
+	if (self.flags == other.flags && IDENTICAL(self.attrib, other.attrib))
+		return self;
+	local result = CTypeRef(typ: self.typ, flags: commonTypeRefFlags(self.flags, other.flags));
+	if (self.attrib is none) {
+		result.attrib = copy other.attrib;
+	} else if (other.attrib is none) {
+		result.attrib = copy self.attrib;
+	} else {
+		result.attrib = copy self.attrib;
+		result.attrib.importFrom(other.attrib);
+	}
+	return result;
+}
+
+
 
 global C_NUMERIC;
 class CCoreType: CType {

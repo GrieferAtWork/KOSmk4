@@ -194,7 +194,7 @@ struct cmodsym {
  *       dip = DebugInfoPointer   (offset into .debug_info)
  *       mip = MixedInfoPointer   (offset into MODULE.cm_mixed.mss_symv) */
 #define cmodsym_getdip(self, mod)     ((mod)->cm_sections.ds_debug_info_start + ((self)->cms_dip & CMODSYM_DIP_DIPMASK))
-#define cmodsym_getsip(self, mod)     ((CLinkerSymbol const *)((mod)->cm_sections.ds_symtab_start + ((self)->cms_dip & CMODSYM_DIP_DIPMASK)))
+#define cmodsym_getsip(self, mod)     ((CHECKED CLinkerSymbol const *)((mod)->cm_sections.ds_symtab_start + ((self)->cms_dip & CMODSYM_DIP_DIPMASK)))
 #define cmodsym_getmip(self, mod)     ((struct cmodmixsym const *)((byte_t const *)(mod)->cm_mixed.mss_symv + ((self)->cms_dip & CMODSYM_DIP_DIPMASK)))
 #define cmodsym_makedip(mod, dip, ns) ((uintptr_t)((dip) - (mod)->cm_sections.ds_debug_info_start) | (ns))
 #define cmodsym_makesip(mod, sip)     ((uintptr_t)((sip) - (mod)->cm_sections.ds_symtab_start) | CMODSYM_DIP_NS_SYMTAB)
@@ -244,8 +244,8 @@ struct cmodsymtab {
 #define cmodsymtab_syma(self) (dbx_malloc_usable_size((self)->mst_symv) / sizeof(struct cmodsym))
 
 struct cmodmixsym {
-	byte_t        const *ms_dip; /* [1..1] Absolute pointer (apart of .debug_info) for debug information. */
-	CLinkerSymbol const *ms_sip; /* [1..1] Absolute pointer (apart of .symtab/.dynsym) for address information. */
+	CHECKED byte_t        const *ms_dip; /* [1..1] Absolute pointer (apart of .debug_info) for debug information. */
+	CHECKED CLinkerSymbol const *ms_sip; /* [1..1] Absolute pointer (apart of .symtab/.dynsym) for address information. */
 };
 
 struct cmodmixsymtab {
@@ -502,7 +502,7 @@ struct cmodsyminfo {
 	 * is the case, these fields can be loaded lazily via `cmod_symenum_loadinfo()' */
 	di_debuginfo_compile_unit_t clv_cu;        /* Compilation unit debug-info. */
 	di_debuginfo_cu_parser_t    clv_parser;    /* Parser. */
-	byte_t const               *clv_dip;       /* [0..1] Debug information pointer. */
+	CHECKED byte_t const       *clv_dip;       /* [0..1] Debug information pointer. */
 	union {
 		/* The following are selected based upon `clv_parser.dup_comp.dic_tag' */
 		struct {                               /* Variable */
@@ -513,10 +513,10 @@ struct cmodsyminfo {
 				};
 				byte_t _v_objdata[sizeof(di_debuginfo_location_t) * 2]; /* Inline buffer for object data. */
 			};
-			byte_t const       *v_typeinfo;    /* [0..1] Type information. */
-			void               *v_objaddr;     /* [?..?] Object address (or `NULL' when `!v_gotaddr') */
-			bool                v_gotaddr;     /* Set to true if `v_gotaddr' is valid. */
-		} s_var;                               /* [!cmodsyminfo_istype] Variable or parameter. */
+			CHECKED byte_t const *v_typeinfo;    /* [0..1] Type information. */
+			CHECKED void         *v_objaddr;     /* [?..?] Object address (or `NULL' when `!v_gotaddr') */
+			bool                  v_gotaddr;     /* Set to true if `v_gotaddr' is valid. */
+		} s_var;                                 /* [!cmodsyminfo_istype] Variable or parameter. */
 	} clv_data;
 };
 #define cmodsyminfo_istype(self) cmodsym_istype(&(self)->clv_symbol)

@@ -821,9 +821,9 @@ nope:
 	return false;
 }
 
-PRIVATE ATTR_NOINLINE NONNULL((1, 2)) dbx_errno_t FCALL
-cexpr_cfi_set_address(struct cvalue *__restrict self,
-                      USER void *__restrict addr) {
+PRIVATE ATTR_NOINLINE NONNULL((1)) dbx_errno_t
+NOTHROW(FCALL cexpr_cfi_set_address)(struct cvalue *__restrict self,
+                                     USER void *addr) {
 	/* Always include the expression  address addend in the  calculation!
 	 * Without this, you'd be unable to access (e.g.) members of a struct
 	 * who's address must be calculated via a CFI expression. */
@@ -861,9 +861,9 @@ err_fault:
  * @return: DBX_EOK:    Success (`self' has become `CVALUE_KIND_ADDR')
  * @return: DBX_EOK:    Not possible (`self' remains unchanged)
  * @return: DBX_EFAULT: Segmentation fault. */
-PRIVATE ATTR_NOINLINE NONNULL((1)) dbx_errno_t FCALL
-cexpr_cfi_to_address_impl(struct cvalue *__restrict self,
-                          struct cmodule *mod) {
+PRIVATE ATTR_NOINLINE NONNULL((1)) dbx_errno_t
+NOTHROW_NCX(FCALL cexpr_cfi_to_address_impl)(struct cvalue *__restrict self,
+                                             struct cmodule *mod) {
 	unwind_ste_t ste_top;
 	unwind_emulator_t emulator;
 	size_t expr_length;
@@ -955,7 +955,7 @@ do_second_pass:
 	case UNWIND_STE_REGISTER:
 	case UNWIND_STE_RO_LVALUE:
 	case UNWIND_STE_RW_LVALUE: {
-		byte_t *lvalue;
+		CHECKED byte_t *lvalue;
 
 		/* Check if the TLS-base address was used by the CFI expression.
 		 * If it was, then we must repeat the expression with the proper

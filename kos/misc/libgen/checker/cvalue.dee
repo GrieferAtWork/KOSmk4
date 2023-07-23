@@ -355,8 +355,8 @@ final class CValue {
 			if ((oldTyp is CPointerType) && (newTyp is CPointerType)) {
 				local oldPointerBase: CTypeRef = oldTyp.base;
 				local newPointerBase: CTypeRef = newTyp.base;
-				local oldNothrowLevel = oldPointerBase.attrib.get("nothrow");
-				local newNothrowLevel = newPointerBase.attrib.get("nothrow");
+				local oldNothrowLevel: string | none = oldPointerBase.attribNothrow;
+				local newNothrowLevel: string | none = newPointerBase.attribNothrow;
 				if (oldNothrowLevel is none) {
 					/* Automatically inherit the new nothrow-level */
 				} else if (newPointerBase.flags & CTYPEREF_FLAG_FORCE) {
@@ -400,8 +400,7 @@ pointer_cast_retain_nothrow:
 									f"in cast to `{newTyp}'{extraInfo}");
 						} else {
 							newPointerBase = copy newPointerBase;
-							newPointerBase.attrib = copy newPointerBase.attrib;
-							newPointerBase.attrib["nothrow"] = oldNothrowLevel;
+							newPointerBase.attribNothrow = oldNothrowLevel;
 							newTyp = type(newTyp)(newPointerBase);
 							newTypeRef = copy newTypeRef;
 							newTypeRef.typ = newTyp;
@@ -410,11 +409,11 @@ pointer_cast_retain_nothrow:
 				}
 
 				/* Check if we need to inherit function throws annotations. */
-				local oldThrows = oldPointerBase.attrib.get("throws", Set());
+				local oldThrows = oldPointerBase.attribThrows;
 				if (!oldThrows) {
 					/* Nothing to inherit! */
 				} else {
-					local newThrows = newPointerBase.attrib.get("throws", Set());
+					local newThrows = newPointerBase.attribThrows;
 					if (0 in newThrows) {
 						/* New set allows for all exceptions */
 					} else if (newThrows >= oldThrows) {
@@ -425,8 +424,7 @@ pointer_cast_retain_nothrow:
 							newThrows = HashSet(newThrows);
 						newThrows.insertall(oldThrows);
 						newPointerBase = copy newPointerBase;
-						newPointerBase.attrib = copy newPointerBase.attrib;
-						newPointerBase.attrib["throws"] = newThrows;
+						newPointerBase.attribThrows = newThrows;
 						newTyp = type(newTyp)(newPointerBase);
 						newTypeRef = copy newTypeRef;
 						newTypeRef.typ = newTyp;
@@ -570,7 +568,7 @@ err_bad_op:
 					f"marked as `__attribute__((noderef))'");
 			}
 			if (checker.currentFunctionTypeRef !is none) {
-				local pointerNoThrow: string = typeref.attrib.get("nothrow");
+				local pointerNoThrow: string | none = typeref.attribNothrow;
 				if (pointerNoThrow !is none) {
 					/* Issue a warning if:
 					 * - The current function doesn't have a __attribute__((nothrow(N))) attribute
@@ -583,8 +581,7 @@ err_bad_op:
 						checker.currentTryBlockExceptions.insert(checker.exceptByName["E_SEGFAULT"]);
 						checker.currentTryBlockExceptions.insert(checker.exceptByName["E_BADALLOC"]);
 					} else {
-						local currentFunctionNothrow: string | none =
-							checker.currentFunctionTypeRef.attrib.get("nothrow");
+						local currentFunctionNothrow: string | none = checker.currentFunctionTypeRef.attribNothrow;
 						if (currentFunctionNothrow is none) {
 							checker.warn("-Wnothrow",
 								f"Dereference `{getPrettyNothrowLevelName(pointerNoThrowLevel)}'-pointer "
@@ -1107,7 +1104,7 @@ err_bad_op:
 			local canRetainNothrow: bool = false;
 			/* When the function is annotated as `nothrow(*...)', then  nothrow
 			 * specifications of arguments passed to the function are retained. */
-			local calleeNothrow: string | none = typeref.attrib.get("nothrow");
+			local calleeNothrow: string | none = typeref.attribNothrow;
 			if (calleeNothrow !is none && calleeNothrow.startswith("*"))
 				canRetainNothrow = true;
 			for (local i: [:#funArgs]) {
@@ -1122,9 +1119,9 @@ err_bad_op:
 		/* Only do static checks if not inside of a dead code region. */
 		if (!checker.isUnreachable) {
 			/* Check if the called function requires its caller to have a certain tag. */
-			local reqTag: string | none = typeref.attrib.get("require_caller_tag");
+			local reqTag: string | none = typeref.attribRequireCallerTag;
 			if (reqTag !is none) {
-				local callerTag: string | none = checker.currentFunctionTypeRef.attrib.get("tag");
+				local callerTag: string | none = checker.currentFunctionTypeRef.attribTag;
 				if (callerTag is none) {
 					checker.warn("-Wtag",
 						f"Function `{checker.currentFunctionName}' needs "
@@ -1140,7 +1137,7 @@ err_bad_op:
 			}
 
 			/* Check the throws-annotation of the called function and compare it to the caller's */
-			local calleeThrows: {int...} = typeref.attrib.get("throws", ());
+			local calleeThrows: {int...} = typeref.attribThrows;
 			if (calleeThrows) {
 				local calleThrowsReferences: {int: string} = none;
 				if (-1 in calleeThrows) {
@@ -1154,7 +1151,7 @@ err_bad_op:
 							argTypeRef = argTypeRef.typ.base;
 						if (argTypeRef.typ is CFunctionType) {
 							foundAny = true;
-							local inner = argTypeRef.attrib.get("throws", ());
+							local inner = argTypeRef.attribThrows;
 							if (inner) {
 								if (calleThrowsReferences is none)
 									calleThrowsReferences = Dict();
@@ -1177,7 +1174,7 @@ err_bad_op:
 				if (tryBlock !is none) {
 					tryBlock.insertall(calleeThrows);
 				} else {
-					local callerThrows: {int...} = checker.currentFunctionTypeRef.attrib.get("throws", Set());
+					local callerThrows: {int...} = checker.currentFunctionTypeRef.attribThrows;
 					local missingThrows: {int...} = (calleeThrows & ~callerThrows).sorted();
 					if (missingThrows && (0 !in callerThrows)) {
 						local missingThrowsNames: string = f"THROWS({", ".join(
@@ -1208,7 +1205,7 @@ err_bad_op:
 			/* Verify the nothrow-attribute of the  called function (and since we  know
 			 * the typing and attributes of all arguments used in the call, we can also
 			 * resolve *-prefixed nothrow levels!) */
-			local calleeNothrow: string | none = typeref.attrib.get("nothrow");
+			local calleeNothrow: string | none = typeref.attribNothrow;
 			if (calleeNothrow !is none) {
 				local calleeNothrowLevel: int;
 				local calleeNothrowLevelDerivedFromArguments: bool = false;
@@ -1221,7 +1218,7 @@ err_bad_op:
 						local argType: CType = arg.typeref.typ;
 						if (argType is CPointerType) {
 							local pointerBaseTypeRef: CTypeRef = argType.base;
-							local pointerNothrow: string | none = pointerBaseTypeRef.attrib.get("nothrow");
+							local pointerNothrow: string | none = pointerBaseTypeRef.attribNothrow;
 							if (pointerNothrow !is none && !pointerNothrow.startswith("*")) {
 								pointerNothrow = int(pointerNothrow);
 								if (calleeNothrowLevel < pointerNothrow) {
@@ -1262,7 +1259,7 @@ err_bad_op:
 				 * that also has a nothrow attribute,  and whose nothrow attribute specifies  a
 				 * level that is smaller than the called function. */
 				local currentFunctionNothrow: string | none =
-					checker.currentFunctionTypeRef.attrib.get("nothrow");
+					checker.currentFunctionTypeRef.attribNothrow;
 				if (currentFunctionNothrow !is none && !currentFunctionNothrow.startswith("*")) {
 					local currentFunctionNothrowLevel: int = int(currentFunctionNothrow);
 					if (currentFunctionNothrowLevel < calleeNothrowLevel) {

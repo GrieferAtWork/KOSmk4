@@ -92,9 +92,9 @@ struct cvalue {
 	struct ctyperef cv_type; /* Value type. */
 	uintptr_t       cv_kind; /* Value kind (one of `CVALUE_KIND_*') */
 	union {
-		void   *cv_addr;                         /* [valid_if(CVALUE_KIND_ADDR)] In-memory address of this value. */
-		byte_t *cv_data;                         /* [valid_if(CVALUE_KIND_DATA)][1..1][owned] In-line data. */
-		byte_t  cv_idata[CVALUE_INLINE_MAXSIZE]; /* [valid_if(CVALUE_KIND_IDATA)] In-line data. */
+		USER void *cv_addr;                         /* [valid_if(CVALUE_KIND_ADDR)] In-memory address of this value. */
+		byte_t    *cv_data;                         /* [valid_if(CVALUE_KIND_DATA)][1..1][owned] In-line data. */
+		byte_t     cv_idata[CVALUE_INLINE_MAXSIZE]; /* [valid_if(CVALUE_KIND_IDATA)] In-line data. */
 
 		struct {
 			struct cvalue_cfiexpr v_expr;   /* CFI expression. */
