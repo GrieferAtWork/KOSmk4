@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix problem with `int.frombytes()`"
-DEEMON_VERSION="6d8e7ccd06f0482609f297703ee1e0a65f22278a"
+#     v -- "Fix bug in `urodict_rehash()`"
+DEEMON_VERSION="230ebd056689202b07263968648db58e9b3f3d5b"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
