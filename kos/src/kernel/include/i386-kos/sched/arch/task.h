@@ -104,7 +104,7 @@ FORCELOCAL ATTR_ARTIFICIAL unsigned int NOTHROW(__x86_task_tryyield_or_pause)(vo
  *     https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94357
  * @throws: E_WOULDBLOCK_PREEMPTED: When preemption is disabled.
  */
-FORCELOCAL ATTR_ARTIFICIAL void (__x86_task_yield)(void) /*THROWS(E_WOULDBLOCK_PREEMPTED)*/ {
+FORCELOCAL ATTR_ARTIFICIAL void (__x86_task_yield)(void) THROWS(E_WOULDBLOCK_PREEMPTED) {
 #ifdef __x86_64__
 	__asm__ __volatile__("call task_yield" : : : "%rax", "%rcx", "memory");
 #else /* __x86_64__ */

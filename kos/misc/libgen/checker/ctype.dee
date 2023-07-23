@@ -20,7 +20,8 @@
 import * from deemon;
 import * from errors;
 import util;
-import UniqueSet from collections;
+import UniqueSet, UniqueDict from collections;
+import ctypes;
 #define Checker Object
 
 #define IDENTICAL(a, b) (type(a) === type(b) && ((a) == (b)))
@@ -31,7 +32,7 @@ class CType: WeakRefAble {
 	operator != (other) { return other !is CType; }
 	operator str() -> this.tostr();
 
-	// function dumpValue(checker: Checker, value: Bytes, offset: int, indent: int = -1): string;
+	// function dumpValue(checker: Checker, data: Bytes, offset: int, indent: int = -1): string;
 	// function tostr(varname: string = ""): string;
 	// property sizeof: int;
 	property alignof: int = { get(): int -> this.sizeof; };
@@ -63,11 +64,42 @@ global final CTYPEREF_FLAG_FORCE = 0x4000;
 @@Used during creation of struct objects.
 global final CTYPEREF_FLAG_PACKED = 0x8000;
 
+@@Attribute flags that have no meaning for pointers and should be moved when encountered on one
+global final CTYPEREF_FLAG_NON_POINTER = CTYPEREF_FLAG_NORETURN | CTYPEREF_FLAG_PACKED;
+
+
+/* Special THROWS error codes. */
+@@Explicit anything-may-be-thrown: `THROWS(...)`
+global final THROWS_ANY = -1;
+@@Explicit throws-from-callback: `THROWS(*)`
+global final THROWS_CB = -2;
+@@Used internally: NonCallExceptions:
+@@Implicit throws due to access of pointers with nothrow>0, or calls to functions with nothrow>0.
+global final THROWS_NCX = -3;
+@@Used internally: OutOfBad:
+@@Implicit throws due to calls to functions with neither nothrow, nor throws annotation
+global final THROWS_OOB = -4;
+
+@@Remove base classes of explicitly specified sub-classes from @throws
+function simplifyThrowsSet(throws: Set with int): Set with int {
+	local result: Set with int = HashSet();
+	local subClassBases: Set with int = HashSet();
+	for (local code: throws) {
+		result.insert(code);
+		if (code > 0xffff)
+			subClassBases.insert(code & 0xffff);
+	}
+	for (local code: subClassBases)
+		result.remove(code);
+	return result;
+}
+
+
 final class CTypeAttributes {
 	this = default;
 	public member nothrow: string | none = none;
-	public member tag: string | none = none;
-	public member requireCallerTag: string | none = none;
+	public member tags: Set with string | none = none;
+	public member requireCallerTags: Set with string | none = none;
 	public member aligned: int | none = none;
 	public member throws: Set with int | none = none;
 
@@ -84,15 +116,15 @@ final class CTypeAttributes {
 				myNothrowLevel = otNothrowLevel;
 			nothrow = f"{hasStar ? "*" : ""}{myNothrowLevel}";
 		}
-		if (tag is none) {
-			tag = other.tag;
-		} else if (other.tag !is none && tag != other.tag) {
-			throw Error(f"Cannot inherit differing tags `{tag}' and `{other.tag}'");
+		if (other.tags) {
+			if (tags is none)
+				tags = HashSet();
+			tags.insertall(other.tags);
 		}
-		if (requireCallerTag is none) {
-			requireCallerTag = other.requireCallerTag;
-		} else if (other.requireCallerTag !is none && requireCallerTag != other.requireCallerTag) {
-			throw Error(f"Cannot inherit differing required tags `{requireCallerTag}' and `{other.requireCallerTag}'");
+		if (other.requireCallerTags) {
+			if (requireCallerTags is none)
+				requireCallerTags = HashSet();
+			requireCallerTags.insertall(other.requireCallerTags);
 		}
 		if (aligned is none) {
 			aligned = other.aligned;
@@ -197,13 +229,27 @@ final class CTypeRef {
 			requireAttrib.throws = v;
 		}
 	};
-	public property attribTag: string | none = {
-		get(): string | none -> attrib.tag;
-		set(v: string | none) { (v is none ? attrib : requireAttrib).tag = v; }
+	public property attribTags: Set with string = {
+		get(): Set with string {
+			local result: Set with string | none = attrib.tags;
+			if (result is none)
+				result = Set();
+			return result;
+		}
+		set(v: Set with string) {
+			requireAttrib.tags = v;
+		}
 	};
-	public property attribRequireCallerTag: string | none = {
-		get(): string | none -> attrib.requireCallerTag;
-		set(v: string | none) { (v is none ? attrib : requireAttrib).requireCallerTag = v; }
+	public property attribRequireCallerTags: Set with string = {
+		get(): Set with string {
+			local result: Set with string | none = attrib.requireCallerTags;
+			if (result is none)
+				result = Set();
+			return result;
+		}
+		set(v: Set with string) {
+			requireAttrib.requireCallerTags = v;
+		}
 	};
 	public property attribAligned: int | none = {
 		get(): int | none -> attrib.aligned;
@@ -240,6 +286,24 @@ final class CTypeRef {
 		if (typedef.attrib !is none)
 			requireAttrib.importFrom(typedef.attrib);
 		typ = typedef.typ;
+	}
+
+	@@Move attributes that have no meaning for pointers to @dst
+	function moveNonPointerAttributes(dst: CTypeRef) {
+		if (flags & CTYPEREF_FLAG_NON_POINTER) {
+			dst.flags |= flags & CTYPEREF_FLAG_NON_POINTER;
+			flags &= ~CTYPEREF_FLAG_NON_POINTER;
+		}
+		local attrib: CTypeAttributes | none = this.attrib;
+		if (attrib !is none) {
+			for (local moveAttrib: { "tags", "requireCallerTags", "aligned", "throws" }) {
+				local value = attrib.operator . (moveAttrib);
+				if (value !is none) {
+					dst.requireAttrib.operator . (moveAttrib) = value;
+					attrib.operator . (moveAttrib) = none;
+				}
+			}
+		}
 	}
 
 	function isConvertibleTo(other: CTypeRef, explicit: bool = false): bool {
@@ -352,6 +416,10 @@ class CCoreType: CType {
 	function isConvertibleTo(other: CType, explicit: bool = false): bool {
 		return this in C_NUMERIC && other in C_NUMERIC;
 	}
+
+	// public  function  peek(checker:  Checker, data:  Bytes,  offset: int):  int  | float;
+	// public function poke(checker: Checker, data: Bytes, offset: int, value: int | float);
+	// public function bytes(checker: Checker, value: int | float): Bytes;
 }
 
 global CPointerType;
@@ -378,8 +446,8 @@ final class CCoreIntType: CCoreType {
 		return (other in C_NUMERIC) ||
 		       (other is CPointerType);
 	}
-	public function dumpValue(checker: Checker, value: Bytes, offset: int, indent: int = -1): string {
-		local intVal: int = peek(checker, value, offset);
+	public function dumpValue(checker: Checker, data: Bytes, offset: int, indent: int = -1): string {
+		local intVal: int = peek(checker, data, offset);
 		local suffix: string = "";
 		if (this in C_LLONG) {
 			suffix = this in C_UNSIGNED ? "ull" : "ll";
@@ -401,8 +469,8 @@ final class CCoreIntType: CCoreType {
 
 final class CCoreBoolType: CCoreType {
 	this = super;
-	public function dumpValue(checker: Checker, value: Bytes, offset: int, indent: int = -1): string {
-		return str !!peek(checker, value, offset);
+	public function dumpValue(checker: Checker, data: Bytes, offset: int, indent: int = -1): string {
+		return str !!peek(checker, data, offset);
 	}
 	public function peek(checker: Checker, data: Bytes, offset: int): int {
 		return int.frombytes(data[offset:offset + this.sizeof]) ? 1 : 0;
@@ -415,14 +483,14 @@ final class CCoreBoolType: CCoreType {
 	}
 }
 
-class CCoreNullptrType: CCoreType {
+final class CCoreNullptrType: CCoreType {
 	this = super;
 	function isConvertibleTo(other: CType, explicit: bool = false): bool {
 		return (other is CPointerType) ||
 		       (other is CCoreNullptrType) ||
 		       (explicit && (other in C_NUMERIC));
 	}
-	public function dumpValue(checker: Checker, value: Bytes, offset: int, indent: int = -1): string {
+	public function dumpValue(checker: Checker, data: Bytes, offset: int, indent: int = -1): string {
 		return "nullptr";
 	}
 	public function peek(checker: Checker, data: Bytes, offset: int): int {
@@ -436,13 +504,56 @@ class CCoreNullptrType: CCoreType {
 	}
 }
 
-class CCoreVoidType: CCoreType {
+final class CCoreVoidType: CCoreType {
 	this(): super("void", 0, 1) {}
-	public function dumpValue(checker: Checker, value: Bytes, offset: int, indent: int = -1): string {
+	public function dumpValue(checker: Checker, data: Bytes, offset: int, indent: int = -1): string {
 		return "(void)0";
 	}
 	function isConvertibleTo(other: CType, explicit: bool = false): bool {
 		return other is CCoreVoidType;
+	}
+}
+
+global final CTYPES_FLOAT_TYPES: {int: ctypes.StructuredType} = {
+	ctypes.float.sizeof : ctypes.float,
+	ctypes.double.sizeof : ctypes.double,
+	ctypes.ldouble.sizeof : ctypes.ldouble,
+};
+
+function ctypesGetFloatTypeBySize(sizeof: int): ctypes.StructuredType {
+	for (;;) {
+		local result: ctypes.StructuredType | none;
+		result = CTYPES_FLOAT_TYPES.get(sizeof);
+		if (result !is none)
+			return result;
+		--sizeof;
+		if (sizeof <= 0)
+			throw Error("No floating point type known for this size");
+	}
+}
+
+global final FLOAT_TYPES_SUFFIX: {Type: string};
+final class CCoreFloatType: CCoreType {
+	public member ctypesType: ctypes.StructuredType;
+	this(name: string, sizeof: int, alignof: int)
+		: super(name, sizeof, alignof)
+	{
+		ctypesType = ctypesGetFloatTypeBySize(sizeof);
+	}
+	public function dumpValue(checker: Checker, data: Bytes, offset: int, indent: int = -1): string {
+		return f"{ctypesType.frombytes(data, offset)}{FLOAT_TYPES_SUFFIX[type this]}";
+	}
+	public function peek(checker: Checker, data: Bytes, offset: int): float {
+		return (float)ctypesType.frombytes(data, offset);
+	}
+	public function poke(checker: Checker, data: Bytes, offset: int, value: float) {
+		ctypesType.tobytes((ctypesType)value, data, offset);
+	}
+	public function bytes(checker: Checker, value: float): Bytes {
+		return ctypesType.tobytes((ctypesType)value);
+	}
+	function isConvertibleTo(other: CType, explicit: bool = false): bool {
+		return other in C_NUMERIC;
 	}
 }
 
@@ -472,14 +583,22 @@ global final C_wchar_t = CCoreIntType("wchar_t", 4, 4, false);
 global final C_char8_t = CCoreIntType("char8_t", 1, 1, false);
 global final C_char16_t = CCoreIntType("char16_t", 2, 2, false);
 global final C_char32_t = CCoreIntType("char32_t", 4, 4, false);
-global final C_float = CCoreType("float", 4, 4);
-global final C_double = CCoreType("double", 8, 8);
-global final C_ldouble_12 = CCoreType("long double", 12, 8);
-global final C_ldouble_16 = CCoreType("long double", 16, 16);
+global final C_float = CCoreFloatType("float", 4, 4);
+global final C_double = CCoreFloatType("double", 8, 8);
+global final C_ldouble_12 = CCoreFloatType("long double", 12, 8);
+global final C_ldouble_16 = CCoreFloatType("long double", 16, 16);
 global final C_nullptr_t_32 = CCoreNullptrType("nullptr_t", 4, 4);
 global final C_nullptr_t_64 = CCoreNullptrType("nullptr_t", 8, 8);
 
-global final C_PROMOTE: {CCoreType...} = UniqueSet({
+global final FLOAT_TYPES_SUFFIX: {Type: string} = UniqueDict.Frozen({
+	C_float : "F",
+	C_double : "",
+	C_ldouble_12 : "L",
+	C_ldouble_16 : "L",
+});
+
+
+global final C_PROMOTE: {CCoreType...} = UniqueSet.Frozen({
 	C_bool,
 	C_char,
 	C_schar,
@@ -488,8 +607,8 @@ global final C_PROMOTE: {CCoreType...} = UniqueSet({
 	C_ushort,
 	C_char8_t,
 	C_char16_t,
-}).frozen;
-global final C_NUMERIC: {CCoreType...} = UniqueSet({
+});
+global final C_NUMERIC: {CCoreType...} = UniqueSet.Frozen({
 	C_bool,
 	C_char,
 	C_schar,
@@ -518,37 +637,37 @@ global final C_NUMERIC: {CCoreType...} = UniqueSet({
 	C_double,
 	C_ldouble_12,
 	C_ldouble_16,
-}).frozen;
+});
 
-global final C_BOOLEAN: {CCoreType...} = UniqueSet({
+global final C_BOOLEAN: {CCoreType...} = UniqueSet.Frozen({
 	C_bool,
-}).frozen;
+});
 
-global final C_NULLPTR: {CCoreType...} = UniqueSet({
+global final C_NULLPTR: {CCoreType...} = UniqueSet.Frozen({
 	C_nullptr_t_32,
 	C_nullptr_t_64,
-}).frozen;
+});
 
-global final C_INT: {CCoreType...} = UniqueSet({
+global final C_INT: {CCoreType...} = UniqueSet.Frozen({
 	C_int,
 	C_uint,
-}).frozen;
+});
 
-global final C_LONG: {CCoreType...} = UniqueSet({
+global final C_LONG: {CCoreType...} = UniqueSet.Frozen({
 	C_long32,
 	C_long64,
 	C_ulong32,
 	C_ulong64,
-}).frozen;
+});
 
-global final C_LLONG: {CCoreType...} = UniqueSet({
+global final C_LLONG: {CCoreType...} = UniqueSet.Frozen({
 	C_llong_align4,
 	C_llong_align8,
 	C_ullong_align4,
 	C_ullong_align8,
-}).frozen;
+});
 
-global final C_INTEGER: {CCoreType...} = UniqueSet({
+global final C_INTEGER: {CCoreType...} = UniqueSet.Frozen({
 	C_bool,
 	C_char,
 	C_schar,
@@ -573,16 +692,16 @@ global final C_INTEGER: {CCoreType...} = UniqueSet({
 	C_char8_t,
 	C_char16_t,
 	C_char32_t,
-}).frozen;
+});
 
-global final C_FLOATING: {CCoreType...} = UniqueSet({
+global final C_FLOATING: {CCoreType...} = UniqueSet.Frozen({
 	C_float,
 	C_double,
 	C_ldouble_12,
 	C_ldouble_16,
-}).frozen;
+});
 
-global final C_SIGNED: {CCoreType: CCoreType} = {
+global final C_SIGNED: {CCoreType: CCoreType} = UniqueDict.Frozen({
 	C_char:             C_schar,
 	C_uchar:            C_schar,
 	C_ushort:           C_short,
@@ -593,8 +712,8 @@ global final C_SIGNED: {CCoreType: CCoreType} = {
 	C_ullong_align8:    C_llong_align8,
 	C_uint128_t_align4: C_int128_t_align4,
 	C_uint128_t_align8: C_int128_t_align8,
-};
-global final C_UNSIGNED: {CCoreType: CCoreType} = {
+});
+global final C_UNSIGNED: {CCoreType: CCoreType} = UniqueDict.Frozen({
 	C_char:            C_uchar,
 	C_schar:           C_uchar,
 	C_short:           C_ushort,
@@ -605,7 +724,7 @@ global final C_UNSIGNED: {CCoreType: CCoreType} = {
 	C_llong_align8:    C_ullong_align8,
 	C_int128_t_align4: C_uint128_t_align4,
 	C_int128_t_align8: C_uint128_t_align8,
-};
+});
 
 class CPointerType: CType {
 	this = default;
@@ -613,8 +732,8 @@ class CPointerType: CType {
 	function tostr(varname: string = ""): string {
 		return base.tostr("*" + varname);
 	}
-	public function dumpValue(checker: Checker, value: Bytes, offset: int, indent: int = -1): string {
-		local intVal: int = this.peek(checker, value, offset);
+	public function dumpValue(checker: Checker, data: Bytes, offset: int, indent: int = -1): string {
+		local intVal: int = this.peek(checker, data, offset);
 		return intVal ? f"({this}){intVal.hex()}ul" : "0";
 	}
 	public operator hash(): int -> hash(type(this), base);
@@ -668,7 +787,7 @@ final class CStructType: CType {
 	public operator == (other: CStructType) -> this === other;
 	public operator != (other: CStructType) -> this !== other;
 
-	public function dumpValue(checker: Checker, value: Bytes, offset: int, indent: int = -1): string {
+	public function dumpValue(checker: Checker, data: Bytes, offset: int, indent: int = -1): string {
 		local writer = File.Writer();
 		writer << "{";
 		local prefix: string = "";
@@ -681,7 +800,7 @@ final class CStructType: CType {
 		local isFirst = true;
 		if (base !is none) {
 			writer << prefix << "[" << base << "]: ";
-			base.dumpValue(checker, value, offset, nextIndent);
+			base.dumpValue(checker, data, offset, nextIndent);
 			isFirst = false;
 		}
 		for (local fieldType, fieldName: fieldsByDeclarationOrder) {
@@ -704,7 +823,7 @@ final class CStructType: CType {
 					fieldOffset = innerStruct.fields[firstFieldName].last;
 				}
 			}
-			writer << fieldType.dumpValue(checker, value, offset + fieldOffset, nextIndent);
+			writer << fieldType.dumpValue(checker, data, offset + fieldOffset, nextIndent);
 		}
 		writer << "}";
 		return writer.string;

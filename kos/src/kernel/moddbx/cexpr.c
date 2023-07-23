@@ -1519,9 +1519,9 @@ NOTHROW(FCALL cexpr_pushexpr)(struct ctyperef const *__restrict typ,
 	return DBX_EOK;
 }
 
-PUBLIC NONNULL((1, 2)) dbx_errno_t /* Push `(typ)(*(typ const *)data)' */
-NOTHROW(FCALL cexpr_pushdata)(struct ctyperef const *__restrict typ,
-                              void const *__restrict data) {
+PUBLIC NONNULL((1)) dbx_errno_t /* Push `(typ)(*(typ const *)data)' */
+NOTHROW_NCX(FCALL cexpr_pushdata)(struct ctyperef const *__restrict typ,
+                                  CHECKED void const *data) {
 	struct cvalue *valp;
 	valp = _cexpr_pushalloc();
 	if unlikely(!valp)
@@ -1619,9 +1619,9 @@ NOTHROW(FCALL cexpr_pushaddr_simple)(struct ctype *__restrict typ,
 	return cexpr_pushaddr(&ct, addr);
 }
 
-PUBLIC NONNULL((1, 2)) dbx_errno_t /* Push `(typ)(*(typ const *)data)' */
-NOTHROW(FCALL cexpr_pushdata_simple)(struct ctype *__restrict typ,
-                                     void const *__restrict data) {
+PUBLIC NONNULL((1)) dbx_errno_t /* Push `(typ)(*(typ const *)data)' */
+NOTHROW_NCX(FCALL cexpr_pushdata_simple)(struct ctype *__restrict typ,
+                                         CHECKED void const *data) {
 	struct ctyperef ct;
 	bzero(&ct, sizeof(ct));
 	ct.ct_typ = typ;
@@ -1746,7 +1746,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_rrot)(size_t n) {
  * @return: DBX_EINTERN: Internal error. */
 PUBLIC WUNUSED NONNULL((1, 2)) dbx_errno_t
 NOTHROW(FCALL cexpr_getdata_ex)(struct cvalue *__restrict self,
-                                byte_t **__restrict presult) {
+                                CHECKED byte_t **__restrict presult) {
 again:
 	switch (self->cv_kind) {
 
@@ -3330,7 +3330,7 @@ done:
 
 /* Perform custom handling of special symbols exported by the system `libdl.so' */
 PRIVATE dbx_errno_t
-NOTHROW(FCALL cexpr_load_special_libdl_symbol)(char const *__restrict name) {
+NOTHROW_NCX(FCALL cexpr_load_special_libdl_symbol)(CHECKED char const *name) {
 #define LIBDL_VAR___peb                         0 /* "__peb" */
 #define LIBDL_VAR_environ                       1 /* "environ", "_environ", "__environ" */
 #define LIBDL_VAR___argc                        2 /* "__argc" */
@@ -3586,7 +3586,7 @@ NOTHROW_NCX(FCALL cexpr_pushsymbol)(struct cmodsyminfo *__restrict sym,
 		 *     - If the size is the same as that of a pointer, assume that it's a pointer
 		 *     - Otherwise, select the proper 1,2,4 or 8-byte unsigned integer type
 		 *     - Otherwise, interpret as an array of byte_t-s. */
-		CLinkerSymbol const *sip;
+		CHECKED CLinkerSymbol const *sip;
 		unsigned char st_info;
 		size_t st_size;
 		sip = cmodsyminfo_getsip(sym);
@@ -3722,7 +3722,7 @@ got_symbol_type:
 					     bcmp(dent->fd_name, COMPAT_RTLD_LIBDL, sizeof(COMPAT_RTLD_LIBDL)) == 0)
 #endif /* __ARCH_HAVE_COMPAT */
 					    ) {
-						char const *name;
+						CHECKED char const *name;
 						name   = cmodsyminfo_name(sym);
 						result = cexpr_load_special_libdl_symbol(name);
 						goto done_symtype;

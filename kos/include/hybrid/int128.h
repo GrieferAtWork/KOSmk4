@@ -464,35 +464,35 @@
 __DECL_BEGIN
 
 __LOCAL __ATTR_INOUT(1) void
-(__hybrid_PRIVATE_int128_floordiv8)(__hybrid_int128_t *__self, __INT8_TYPE__ __v) {
+__NOTHROW_NCX(__hybrid_PRIVATE_int128_floordiv8)(__hybrid_int128_t *__self, __INT8_TYPE__ __v) {
 	__INT8_TYPE__ __temp = *__self % __v;
 	*__self /= __v;
 	__hybrid_PRIVATE_int128_floordivmodT_doadjust_div(__INT8_TYPE__, __v, *__self, __temp);
 }
 
 __LOCAL __ATTR_INOUT(1) void
-(__hybrid_PRIVATE_int128_floordiv16)(__hybrid_int128_t *__self, __INT16_TYPE__ __v) {
+__NOTHROW_NCX(__hybrid_PRIVATE_int128_floordiv16)(__hybrid_int128_t *__self, __INT16_TYPE__ __v) {
 	__INT16_TYPE__ __temp = *__self % __v;
 	*__self /= __v;
 	__hybrid_PRIVATE_int128_floordivmodT_doadjust_div(__INT16_TYPE__, __v, *__self, __temp);
 }
 
 __LOCAL __ATTR_INOUT(1) void
-(__hybrid_PRIVATE_int128_floordiv32)(__hybrid_int128_t *__self, __INT32_TYPE__ __v) {
+__NOTHROW_NCX(__hybrid_PRIVATE_int128_floordiv32)(__hybrid_int128_t *__self, __INT32_TYPE__ __v) {
 	__INT32_TYPE__ __temp = *__self % __v;
 	*__self /= __v;
 	__hybrid_PRIVATE_int128_floordivmodT_doadjust_div(__INT32_TYPE__, __v, *__self, __temp);
 }
 
 __LOCAL __ATTR_INOUT(1) void
-(__hybrid_PRIVATE_int128_floordiv64)(__hybrid_int128_t *__self, __INT64_TYPE__ __v) {
+__NOTHROW_NCX(__hybrid_PRIVATE_int128_floordiv64)(__hybrid_int128_t *__self, __INT64_TYPE__ __v) {
 	__INT64_TYPE__ __temp = *__self % __v;
 	*__self /= __v;
 	__hybrid_PRIVATE_int128_floordivmodT_doadjust_div(__INT64_TYPE__, __v, *__self, __temp);
 }
 
 __LOCAL __ATTR_INOUT(1) void
-(__hybrid_PRIVATE_int128_floordiv128)(__hybrid_int128_t *__self, __INT128_TYPE__ const *__pv) {
+__NOTHROW_NCX(__hybrid_PRIVATE_int128_floordiv128)(__hybrid_int128_t *__self, __INT128_TYPE__ const *__pv) {
 	__INT128_TYPE__ __temp = *__self % *__pv;
 	*__self /= *__pv;
 	__hybrid_PRIVATE_int128_floordivmodT_doadjust_div(__INT128_TYPE__, *__pv, *__self, __temp);

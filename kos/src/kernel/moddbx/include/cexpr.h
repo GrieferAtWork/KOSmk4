@@ -63,7 +63,7 @@ struct cvalue_cfiexpr {
 	uint8_t                 v_addrsize;          /* == di_debuginfo_cu_simple_parser_t::dsp_addrsize */
 	uint8_t                 v_ptrsize;           /* == di_debuginfo_cu_simple_parser_t::dsp_ptrsize */
 	bool                    v_gotaddr;           /* True if `v_objaddr' is valid. */
-	void                   *v_objaddr;           /* [?..?] Object address (or `NULL' when `!v_gotaddr'). */
+	CHECKED void           *v_objaddr;           /* [?..?] Object address (or `NULL' when `!v_gotaddr'). */
 };
 
 
@@ -170,9 +170,9 @@ FUNDEF NONNULL((1, 2)) dbx_errno_t /* Push a CFI expression. */
 NOTHROW(FCALL cexpr_pushexpr)(struct ctyperef const *__restrict typ,
                               struct cvalue_cfiexpr const *__restrict expr,
                               size_t buflen, size_t bufoff);
-FUNDEF NONNULL((1, 2)) dbx_errno_t /* Push `(typ)(*(typ const *)data)' */
-NOTHROW(FCALL cexpr_pushdata)(struct ctyperef const *__restrict typ,
-                              void const *__restrict data);
+FUNDEF NONNULL((1)) dbx_errno_t /* Push `(typ)(*(typ const *)data)' */
+NOTHROW_NCX(FCALL cexpr_pushdata)(struct ctyperef const *__restrict typ,
+                                  CHECKED void const *data);
 FUNDEF NONNULL((1)) dbx_errno_t /* Push `(typ)value' */
 NOTHROW(FCALL cexpr_pushint)(struct ctyperef const *__restrict typ,
                              __UINTMAX_TYPE__ value);
@@ -188,9 +188,9 @@ NOTHROW(FCALL cexpr_pushregister_by_id)(cpu_regno_t regno);
  * information (typ flags, and name are pushed as 0/NULL) */
 FUNDEF NONNULL((1)) dbx_errno_t /* Push `*(typ *)addr' */
 NOTHROW(FCALL cexpr_pushaddr_simple)(struct ctype *__restrict typ, USER void *addr);
-FUNDEF NONNULL((1, 2)) dbx_errno_t /* Push `(typ)(*(typ const *)data)' */
-NOTHROW(FCALL cexpr_pushdata_simple)(struct ctype *__restrict typ,
-                                     void const *__restrict data);
+FUNDEF NONNULL((1)) dbx_errno_t /* Push `(typ)(*(typ const *)data)' */
+NOTHROW_NCX(FCALL cexpr_pushdata_simple)(struct ctype *__restrict typ,
+                                         CHECKED void const *data);
 FUNDEF NONNULL((1)) dbx_errno_t /* Push `(typ)value' */
 NOTHROW(FCALL cexpr_pushint_simple)(struct ctype *__restrict typ,
                                     __UINTMAX_TYPE__ value);
@@ -238,7 +238,7 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_rrot)(size_t n);
  * @return: DBX_EINTERN: Internal error. */
 FUNDEF WUNUSED NONNULL((1, 2)) dbx_errno_t
 NOTHROW(FCALL cexpr_getdata_ex)(struct cvalue *__restrict self,
-                                byte_t **__restrict presult);
+                                CHECKED byte_t **__restrict presult);
 
 /* Return the actual size of the given `self' stack element. (s.a. `ctype_sizeof()') */
 #define cexpr_getsize_ex(self) ctype_sizeof((self)->cv_type.ct_typ)

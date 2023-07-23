@@ -234,6 +234,10 @@ final class CValue {
 		local oldTyp: CType = typeref.typ;
 		local newTyp: CType = newTypeRef.typ;
 
+		/* Cast between function types isn't allowed (you can only cast function pointers) */
+		if (newTyp is CFunctionType)
+			goto err_bad_op;
+
 		/* Check for special case: cast to array type:
 		 * >> char foo[] = "foobar";
 		 * This must happen before r-value conversion since that would result in a `char const *' */
@@ -308,11 +312,11 @@ final class CValue {
 						if ((oldCV & newCV) != oldCV) {
 							checker.warn("-Wcast",
 								f"Implicit cast from `{oldTyp}' to `{newTyp}' "
-								f"removes `{" ".join(() -> {
+								f"removes `{' '.join(() -> {
 									if (oldCV & CTYPEREF_FLAG_CONST)
-										yield "const";
+										yield 'const';
 									if (oldCV & CTYPEREF_FLAG_VOLATILE)
-										yield "volatile";
+										yield 'volatile';
 								}())}'");
 						}
 					} else {
@@ -357,7 +361,116 @@ final class CValue {
 				local newPointerBase: CTypeRef = newTyp.base;
 				local oldNothrowLevel: string | none = oldPointerBase.attribNothrow;
 				local newNothrowLevel: string | none = newPointerBase.attribNothrow;
-				if (oldNothrowLevel is none) {
+				if (newPointerBase.typ is CFunctionType) {
+					/* When casting to a function type, things are different. */
+					if (oldPointerBase.typ !is CFunctionType) {
+						/* Cast  from   non-function-pointer   to   function-pointer.
+						 * In this case, warn if the pointer had a nothrow attribute. */
+						if (oldNothrowLevel !is none) {
+							checker.warn("-Wcast",
+								f"annotated pointer of type `{oldTyp}' "
+								f"cast to function pointer `{newTyp}'");
+						}
+					} else {
+						/* When casting from one function pointer to another, must
+						 * take special care about nothrow and throws annotations:
+						 * - A `nothrow' annotation not present in `newNothrowLevel' is OK
+						 * - A `nothrow' annotation not present in `oldNothrowLevel' is NOT OK,
+						 *   as that would mean casting a throwing function into a pointer that
+						 *   is annotated as non-throwing. */
+						local functionName: string = "<unnamed>";
+						if (isSymbol)
+							functionName = data.name;
+						if (canRetainNothrow) {
+							if (!IDENTICAL(oldNothrowLevel, newNothrowLevel)) {
+								if (newNothrowLevel !is none) {
+									checker.warn("-Wcast",
+										f"Retaining `{getPrettyNothrowLevelName(oldNothrowLevel)}` "
+										f"instead of `{getPrettyNothrowLevelName(newNothrowLevel)}`");
+								}
+								newPointerBase = copy newPointerBase;
+								newPointerBase.attribNothrow = oldNothrowLevel;
+								newTyp = type(newTyp)(newPointerBase);
+								newTypeRef = copy newTypeRef;
+								newTypeRef.typ = newTyp;
+							}
+						} else if (newNothrowLevel !is none) {
+							/* The new pointer requires a nothrow annotation. In this  case
+							 * we have to ensure that `oldNothrowLevel' (i.e.: the function
+							 * that is being cast) has a nothrow level <= `newNothrowLevel' */
+							/* Function pointer is (probably) NOTHROW_NCX */
+							if (oldNothrowLevel is none) {
+								checker.warn("-Wcast",
+									f"function pointer cast adds "
+									f"`{getPrettyNothrowLevelName(newNothrowLevel)}' "
+									f"to un-annotated function `{functionName}'");
+							} else if (oldNothrowLevel == "0") {
+								/* Always OK! */
+							} else if (newNothrowLevel.startswith("*")) {
+								/* Always OK! */
+							} else if (oldNothrowLevel.startswith("*")) {
+								goto warn_function_pointer_cast_changes_nothrow_level;
+							} else if (int(oldNothrowLevel) <= int(newNothrowLevel)) {
+								/* OK: nothrow level of new type is at least as high as that of old type. */
+							} else {
+warn_function_pointer_cast_changes_nothrow_level:
+								checker.warn("-Wcast",
+									f"function pointer cast changes "
+									f"`{getPrettyNothrowLevelName(oldNothrowLevel)}' to"
+									f"`{getPrettyNothrowLevelName(newNothrowLevel)}' "
+									f"of function `{functionName}'");
+							}
+						} else {
+							/* Target pointer is marked as OOB-throwing, so all annotations are OK */
+						}
+
+						/* Assert  that the function being casted doesn't
+						 * throw more than is accepted by the target type */
+						local oldThrows: Set with int = oldPointerBase.attribThrows;
+						local newThrows: Set with int = newPointerBase.attribThrows;
+						if (canRetainNothrow) {
+							/* Have the final type retain all of the original throws
+							 * In this case, warn if `newThrows' specifies different
+							 * throws than the original type. */
+							if (oldThrows != newThrows) {
+								if (newThrows) {
+									checker.warn("-Wcast",
+										f"Retaining `THROWS({checker.exceptCodeNames(oldThrows)})` "
+										f"instead of `THROWS({checker.exceptCodeNames(newThrows)})`");
+								}
+								newPointerBase = copy newPointerBase;
+								newPointerBase.attribThrows = oldThrows;
+								newTyp = type(newTyp)(newPointerBase);
+								newTypeRef = copy newTypeRef;
+								newTypeRef.typ = newTyp;
+							}
+						} else if (newThrows >= oldThrows) {
+							/* OK: New type accepts at least those exceptions also accepted
+							 *     by the original type. */
+						} else if (THROWS_ANY !in newThrows) {
+							local extraInfo: string = "";
+							if (getExtraCannotRetainInfo !is none)
+								extraInfo = getExtraCannotRetainInfo();
+							checker.warn("-Wthrows",
+								f"Cannot retain `THROWS({', '.join(
+									checker.exceptCodeNames(oldThrows - newThrows)
+								)})' "
+								f"in cast to `{newTyp}'{extraInfo}");
+						}
+
+						/* Assert that the function is implementing
+						 * all tags  required by  the target  type. */
+						// TODO
+
+						/* Assert that the function doesn't  require
+						 * any caller tags that aren't also required
+						 * by the target type. */
+						// TODO
+					}
+				} else if (oldPointerBase.typ is CFunctionType) {
+					/* Function pointer -> non-function-pointer
+					 * (don't try to retain the function's nothrow attribute) */
+				} else if (oldNothrowLevel is none) {
 					/* Automatically inherit the new nothrow-level */
 				} else if (newPointerBase.flags & CTYPEREF_FLAG_FORCE) {
 					/* Force inherit the new type's nothrow level */
@@ -369,8 +482,9 @@ final class CValue {
 							/* Ignore for automatic nothrow levels */
 						} else if (int(newNothrowLevel) > int(oldNothrowLevel)) {
 							checker.warn("-Wnothrow",
-									f"Cast from `{oldTyp}' to `{newTyp}' results in nothrow "
-									f"level `{oldNothrowLevel}', rather than `{newNothrowLevel}'. "
+									f"Cast from `{oldTyp}' to `{newTyp}' results in "
+									f"`{getPrettyNothrowLevelName(oldNothrowLevel)}', "
+									f"rather than `{getPrettyNothrowLevelName(newNothrowLevel)}'. "
 									f"Use `__attribute__((force))' to select which nothrow level "
 									f"should be used");
 							goto pointer_cast_retain_nothrow;
@@ -379,17 +493,6 @@ final class CValue {
 							goto pointer_cast_retain_nothrow;
 						}
 					} else {
-						/* TODO: Warning when implicitly casting a function pointer such  that
-						 *       it loses or gains any of its attributes (nothrow, tag, etc.).
-						 * This is needed so that function pointer assignments doesn't silently
-						 * change    a   function's   behavior    as   per   its   annotations. */
-
-						/* TODO: Warning when passing a custom nothrow pointer to a function
-						 *       whose arguments don't have any nothrow argument. This  case
-						 *       must  be treated in  a special way  because the function in
-						 *       question won't magically get the attribute just because  it
-						 *       is called with the attribute!
-						 */
 pointer_cast_retain_nothrow:
 						if (!canRetainNothrow) {
 							local extraInfo: string = "";
@@ -405,42 +508,6 @@ pointer_cast_retain_nothrow:
 							newTypeRef = copy newTypeRef;
 							newTypeRef.typ = newTyp;
 						}
-					}
-				}
-
-				/* Check if we need to inherit function throws annotations. */
-				local oldThrows = oldPointerBase.attribThrows;
-				if (!oldThrows) {
-					/* Nothing to inherit! */
-				} else {
-					local newThrows = newPointerBase.attribThrows;
-					if (0 in newThrows) {
-						/* New set allows for all exceptions */
-					} else if (newThrows >= oldThrows) {
-						/* New set of exceptions is a super-set of the original set. */
-					} else if (canRetainNothrow) {
-						/* Have the final type inherit missing throws */
-						if (newThrows !is HashSet)
-							newThrows = HashSet(newThrows);
-						newThrows.insertall(oldThrows);
-						newPointerBase = copy newPointerBase;
-						newPointerBase.attribThrows = newThrows;
-						newTyp = type(newTyp)(newPointerBase);
-						newTypeRef = copy newTypeRef;
-						newTypeRef.typ = newTyp;
-					} else {
-						local missingThrows: {int...} = (oldThrows & ~newThrows).sorted();
-						local missingThrowsNames: string = f"THROWS({", ".join(
-							for (local id: missingThrows)
-								{ -1 : "*", 0 : "..." }.get(id,
-									checker.exceptByCode.get(id, id.hex()))
-						)})";
-						local extraInfo: string = "";
-						if (getExtraCannotRetainInfo !is none)
-							extraInfo = getExtraCannotRetainInfo();
-						checker.warn("-Wthrows",
-								f"Cannot retain `{missingThrowsNames}' "
-								f"in cast to `{newTyp}'{extraInfo}");
 					}
 				}
 			}
@@ -574,19 +641,16 @@ err_bad_op:
 					 * - The current function doesn't have a __attribute__((nothrow(N))) attribute
 					 * - The current function has a nothrow level N that is lower than `pointerNoThrow' */
 					local pointerNoThrowLevel: int = int(pointerNoThrow);
-					if (pointerNoThrowLevel > 0 && checker.currentTryBlockExceptions !is none) {
-						/* Access to volatile pointer inside of try-block means that
-						 * it's possible for E_SEGFAULT and E_BADALLOC to be  thrown
-						 * within that try-block. */
-						checker.currentTryBlockExceptions.insert(checker.exceptByName["E_SEGFAULT"]);
-						checker.currentTryBlockExceptions.insert(checker.exceptByName["E_BADALLOC"]);
-					} else {
+
+					/* Access to a pointer with nothrow level > 0 can cause NCX exceptions */
+					if (pointerNoThrowLevel > 0)
+						checker.currentTryBlockExceptions.insert(THROWS_NCX);
+
+					if (!checker.isInTryBlock) {
 						local currentFunctionNothrow: string | none = checker.currentFunctionTypeRef.attribNothrow;
-						if (currentFunctionNothrow is none) {
-							checker.warn("-Wnothrow",
-								f"Dereference `{getPrettyNothrowLevelName(pointerNoThrowLevel)}'-pointer "
-								f"in function that does not have any `__attribute__((nothrow(...)))'");
-						} else if (!currentFunctionNothrow.startswith("*")) {
+						if (checker.currentTryBlockGreatestNothrowLevel < pointerNoThrowLevel)
+							checker.currentTryBlockGreatestNothrowLevel = pointerNoThrowLevel;
+						if (!currentFunctionNothrow.startswith("*")) {
 							local currentFunctionNothrowLevel: int = int(currentFunctionNothrow);
 							if (currentFunctionNothrowLevel < pointerNoThrowLevel) {
 								checker.warn("-Wnothrow",
@@ -976,7 +1040,7 @@ err_bad_op:
 		/* NOTE: This cast also does rvalue transform! */
 		value = value.cast(checker, typeref, canRetainNothrow: false,
 			getExtraCannotRetainInfo: () ->
-				f" (symbol `{isSymbol ? data.name : "<expression>"}' appears incorrectly annotated)");
+				f" (symbol `{isSymbol ? data.name : '<expression>'}' appears incorrectly annotated)");
 		switch (kind) {
 		case CVALUE_LVOID:
 			break;
@@ -1023,8 +1087,8 @@ err_bad_op:
 				if (!candidates) {
 					checker.err(
 						f"No overload of `{functionName}' matches "
-						f"argument types `({", ".join(types)})'"
-						f"{"".join(for (local overload: data.overloads)
+						f"argument types `({', '.join(types)})'"
+						f"{''.join(for (local overload: data.overloads)
 							checker.forceFormatMessageAddend(
 								overload.decl,
 								overload is CSymbol
@@ -1035,8 +1099,8 @@ err_bad_op:
 				} else if (#candidates > 1) {
 					checker.err(
 						f"More than one overload of `{functionName}' "
-						f"matches argument list `({", ".join(types)})'"
-						f"{"".join(
+						f"matches argument list `({', '.join(types)})'"
+						f"{''.join(
 							for (local candidate: candidates)
 								checker.forceFormatMessageAddend(
 									candidate.decl, f"Candidate `{candidate}'")
@@ -1061,7 +1125,7 @@ err_bad_op:
 		if (funType !is CFunctionType) {
 			checker.err(
 				f"Cannot call non-function-type `{funType.tostr(functionName)}'"
-				f"{checker.formatMessageAddend(functionDecl, "Symbol was declared here")}");
+				f"{checker.formatMessageAddend(functionDecl, 'Symbol was declared here')}");
 			return this;
 		}
 
@@ -1072,7 +1136,7 @@ err_bad_op:
 				checker.warn("-Wcall",
 					f"Too many arguments in call to `{functionName}': "
 					f"need at most `{#funArgs}', but got `{#args}'"
-					f"{checker.formatMessageAddend(functionDecl, "Function was declared here")}");
+					f"{checker.formatMessageAddend(functionDecl, 'Function was declared here')}");
 			}
 		} else if (#args < #funArgs) {
 			local missingArgsFirst: int = #args;
@@ -1119,28 +1183,26 @@ err_bad_op:
 		/* Only do static checks if not inside of a dead code region. */
 		if (!checker.isUnreachable) {
 			/* Check if the called function requires its caller to have a certain tag. */
-			local reqTag: string | none = typeref.attribRequireCallerTag;
-			if (reqTag !is none) {
-				local callerTag: string | none = checker.currentFunctionTypeRef.attribTag;
-				if (callerTag is none) {
+			local reqTags: Set with string = typeref.attribRequireCallerTags;
+			if (reqTags) {
+				local callerTags: Set with string = checker.currentFunctionTypeRef.attribTags;
+				local missingTags: Set with string = reqTags - callerTags;
+				if (missingTags) {
 					checker.warn("-Wtag",
-						f"Function `{checker.currentFunctionName}' needs "
-						f"`__attribute__((tag({repr reqTag})))' because "
-						f"it calls `{functionName}'");
-				} else if (reqTag != callerTag) {
-					checker.warn("-Wtag",
-						f"Function `{checker.currentFunctionName}' is tagged as "
-						f"`__attribute__((tag({repr callerTag})))', but needs "
-						f"`__attribute__((tag({repr reqTag})))' because "
-						f"it calls `{functionName}'");
+						f"Function `{checker.currentFunctionName}' is missing "
+						f"`__attribute__((tag({', '.join(
+							for (local tag: missingTags.sorted())
+								repr tag
+						)})))' because it calls `{functionName}'");
 				}
 			}
 
 			/* Check the throws-annotation of the called function and compare it to the caller's */
 			local calleeThrows: {int...} = typeref.attribThrows;
 			if (calleeThrows) {
+				@@Mapping from throws exception codes to responsible parameter names
 				local calleThrowsReferences: {int: string} = none;
-				if (-1 in calleeThrows) {
+				if (THROWS_CB in calleeThrows) {
 					/* Special case: the function takes  a callback-argument  which it  invokes
 					 *               and will propagate the exceptions thrown by said callback. */
 					calleeThrows = HashSet(calleeThrows);
@@ -1167,21 +1229,15 @@ err_bad_op:
 						}
 					}
 					if (foundAny)
-						calleeThrows.remove(-1);
+						calleeThrows.remove(THROWS_CB);
 				}
 
-				local tryBlock: {int...} | none = checker.currentTryBlockExceptions;
-				if (tryBlock !is none) {
-					tryBlock.insertall(calleeThrows);
-				} else {
-					local callerThrows: {int...} = checker.currentFunctionTypeRef.attribThrows;
-					local missingThrows: {int...} = (calleeThrows & ~callerThrows).sorted();
-					if (missingThrows && (0 !in callerThrows)) {
-						local missingThrowsNames: string = f"THROWS({", ".join(
-							for (local id: missingThrows)
-								{ -1 : "*", 0 : "..." }.get(id,
-									checker.exceptByCode.get(id, id.hex()))
-						)})";
+				/* Remember exceptions that may be thrown. */
+				checker.currentTryBlockExceptions.insertall(calleeThrows);
+
+				/* When not inside of a try-block, can warn about exceptions that may be thrown. */
+				if (!checker.isInTryBlock) {
+					checker.verifyTopLevelThrows(calleeThrows, getReason: missingThrows -> {
 						local references: string = "";
 						if (calleThrowsReferences !is none) {
 							local referencedFunctions: string = [];
@@ -1190,15 +1246,12 @@ err_bad_op:
 								if (ref !is none && ref !in referencedFunctions)
 									referencedFunctions.append(ref);
 							}
-							references = f" and passes callbacks {", ".join(
+							references = f" and passes callbacks {', '.join(
 								for (local referencedFunction: referencedFunctions)
-									f"`{referencedFunction}'")}";
+									f'`{referencedFunction}\'')}";
 						}
-						checker.warn("-Wthrows",
-							f"Function `{checker.currentFunctionName}' is missing "
-							f"annotations `{missingThrowsNames}' "
-							f"because it calls `{functionName}'{references}");
-					}
+						return f"it calls `{functionName}'{references}";
+					});
 				}
 			}
 
@@ -1230,30 +1283,21 @@ err_bad_op:
 					}
 
 					/* If we didn't find a nothrow level, use the function's default. */
-					if (calleeNothrowLevel == NO_LEVEL) {
+					if (calleeNothrowLevel == NO_LEVEL)
 						calleeNothrowLevel = int(calleeNothrow[1:]);
-					} else {
-						/* Special case: the function might throw E_SEGFAULT and E_BADALLOC
-						 * Remember that fact if we're inside a TRY-block. */
-						local tryBlock: {int...} | none = checker.currentTryBlockExceptions;
-						if (tryBlock !is none) {
-							tryBlock.insert(checker.exceptByName["E_SEGFAULT"]);
-							tryBlock.insert(checker.exceptByName["E_BADALLOC"]);
-						}
-					}
 #undef NO_LEVEL
 				} else {
 					calleeNothrowLevel = int(calleeNothrow);
 				}
 
+				/* Special case:  the  function  might  throw  NCX
+				 * Remember that fact if we're inside a TRY-block. */
+				if (calleeNothrowLevel > 0)
+					checker.currentTryBlockExceptions.insert(THROWS_NCX);
+
 				/* Remember the greatest called nothrow level. */
-				local lastNothrowLevel: int | none = checker.currentFunctionGreatestCalleNothrowLevel;
-				if (lastNothrowLevel is none) {
-					checker.currentFunctionGreatestCalleNothrowLevel = calleeNothrowLevel;
-				} else if (lastNothrowLevel !== false) {
-					if (lastNothrowLevel < calleeNothrowLevel)
-						checker.currentFunctionGreatestCalleNothrowLevel = calleeNothrowLevel;
-				}
+				if (checker.currentTryBlockGreatestNothrowLevel < calleeNothrowLevel)
+					checker.currentTryBlockGreatestNothrowLevel = calleeNothrowLevel;
 
 				/* A warning will be issued if a nothrow function is called by another function
 				 * that also has a nothrow attribute,  and whose nothrow attribute specifies  a
@@ -1268,8 +1312,8 @@ err_bad_op:
 								getPrettyNothrowLevelName(calleeNothrowLevel)
 							}'-semantics{
 								calleeNothrowLevelDerivedFromArguments
-									? " because of passed arguments"
-									: ""
+									? ' because of passed arguments'
+									: ''
 							}"
 							f", but caller function `{checker.currentFunctionName}' is marked "
 							f"as `{getPrettyNothrowLevelName(currentFunctionNothrowLevel)}'"
@@ -1277,8 +1321,9 @@ err_bad_op:
 					}
 				}
 			} else {
-				/* Remember that a function was called without a nothrow level */
-				checker.currentFunctionGreatestCalleNothrowLevel = false;
+				/* If the function has neither throws, nor nothrow, it may throw out-of-band */
+				if (!calleeThrows)
+					checker.currentTryBlockExceptions.insert(THROWS_OOB);
 			}
 
 			/* If the called function is noreturn, set isUnreachable=true */

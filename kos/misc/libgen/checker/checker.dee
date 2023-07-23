@@ -135,17 +135,16 @@ final class Checker: CParser {
 	/* Context variables */
 
 	@@The function whose body is currently being parsed
-	public  member currentFunctionName: string | none = none;
-	public  member currentFunctionTypeRef: CTypeRef | none = none;
+	public member currentFunctionName: string | none = none;
+	public member currentFunctionTypeRef: CTypeRef | none = none;
 	@@Set to @false until a return-statement is encountered
 	private member currentFunctionReturnValue: Bytes | none | bool = false;
-	@@The greatest nothrow level of a function called by the current function
-	@@- Set to @none when no function has yet to be called
-	@@- Set to @false when a function has been called with no nothrow level
-	public  member currentFunctionGreatestCalleNothrowLevel: int | none | bool = none;
+	@@The greatest nothrow level of a function called by the current function,
+	@@as well as pointers dereferenced by the function
+	@@Set to @-1 if nothing like that has yet to have happened.
+	public member currentTryBlockGreatestNothrowLevel: int = -1;
 
-	@@Set of exceptions that may be thrown within the current `try`-block
-	@@When  @none,  the  parser  isn't  currently  within  a  `try`-block
+	@@Set of exceptions that were seen as throwable within the current context
 	public member currentTryBlockExceptions: {int...} | none = none;
 
 	@@Value of @currentTryBlockExceptions, but only gets assigned while inside of `catch`
@@ -155,8 +154,10 @@ final class Checker: CParser {
 	private member isInSwitchStatement: bool = false; /* True inside of a switch-statement */
 	private member isInLoop: bool = false;            /* True inside of a loop-statement */
 	public  member isUnreachable: bool = false;       /* True inside of dead code */
+	public  member isInTryBlock: bool = false;        /* True inside of a try-block */
 	private member switchIsUnreachable: bool = false; /* True inside of an unreachable switch-statement */
 	private member encounteredBreak: bool = false;    /* True if `break' was encountered */
+	private member encounteredAsm: bool = false;      /* True if `__asm__' was encountered */
 	private member switchConstantExpressionValue: Bytes | none = none;
 	private member switchExpressionType: CTypeRef | none = none;
 
@@ -210,6 +211,38 @@ final class Checker: CParser {
 			}
 			return result;
 		}
+	}
+
+	function exceptCodeName(code: int): string {
+		if (code == THROWS_ANY)
+			return "...";
+		if (code == THROWS_CB)
+			return "*";
+		local result: string | none = this.exceptByCode.get(code);
+		if (result !is none)
+			return result;
+		return code.hex();
+	}
+
+	function exceptCodeNames(codes: {int...}): {string...} {
+		local hasCb = false;
+		local hasAny = false;
+		for (local code: codes.sorted()) {
+			if (code == THROWS_ANY) {
+				hasAny = true;
+			} else if (code == THROWS_CB) {
+				hasCb = true;
+			} else {
+				local result: string | none = this.exceptByCode.get(code);
+				if (result is none)
+					result = code.hex();
+				yield result;
+			}
+		}
+		if (hasCb)
+			yield "*";
+		if (hasAny)
+			yield "...";
 	}
 
 
@@ -309,11 +342,11 @@ next_and_lookup_in_baseNs:
 		local tok = this.tok;
 		if (tok == "...") {
 			this.next();
-			return 0;
+			return THROWS_ANY;
 		}
 		if (tok == "*") {
 			this.next();
-			return -1;
+			return THROWS_CB;
 		}
 		if (tok == "(") {
 			this.next();
@@ -478,10 +511,19 @@ again:
 		case "require_caller_tag": {
 			this.next();
 			this.skip("(");
-			tr.operator . ({
-				"tag" : "attribTag",
-				"require_caller_tag" : "attribRequireCallerTag",
-			}[attributeName]) = this.parseString();
+			local attribName: string = {
+				"tag" : "attribTags",
+				"require_caller_tag" : "attribRequireCallerTags",
+			}[attributeName];
+			local tags: Set with string = tr.operator . (attribName);
+			if (tags !is HashSet)
+				tr.operator . (attribName) = tags = HashSet(tags);
+			for (;;) {
+				tags.insert(this.parseString());
+				if (this.tok != ",")
+					break;
+				this.next();
+			}
 			this.skip(")");
 		}	break;
 
@@ -1277,7 +1319,9 @@ done:
 					this.next();
 					break;
 				}
-				local argTypeRef, argName = parseTypeRefWithoutStorageClass()...;
+				local argTypeRef: CTypeRef;
+				local argName: string;
+				argTypeRef, argName = parseTypeRefWithoutStorageClass()...;
 				if (argTypeRef.typ === C_void && !argName)
 					break;
 				if (this.tok == "=") {
@@ -1287,6 +1331,14 @@ done:
 					if (argDefault is none)
 						argDefault = Bytes();
 					func.defaults.append(argDefault);
+				}
+				if (argTypeRef.typ is CArrayType) {
+					/* Top-level array  arguments in  function
+					 * types are actually treated as pointers. */
+					local argType: CType = argTypeRef.typ;
+					argTypeRef.typ = argType.base;
+					argType = TARGET_CPointerType(argTypeRef);
+					argTypeRef = CTypeRef(argType);
 				}
 				func.args.append((argTypeRef, argName));
 				if (this.tok != ",")
@@ -1342,26 +1394,29 @@ done:
 prefixAgain:
 		if (this.tok == "*") {
 			this.next();
-			local pt: CPointerType;
+			local pointerType: Type;
 			switch (this.tok) {
 			case "__ptr32":
 				this.next();
-				pt = CPointerType32(tr);
+				pointerType = CPointerType32;
 				break;
 			case "__ptr64":
 				this.next();
-				pt = CPointerType64(tr);
+				pointerType = CPointerType64;
 				break;
 			default:
-				pt = TARGET_CPointerType(tr);
+				pointerType = TARGET_CPointerType;
 				break;
 			}
-			/* TODO: move certain attributes out of the pointer:
+
+			/* move certain attributes out of the pointer:
 			 * >> NOBLOCK void *foo();
 			 * Here, the NOBLOCK needs to be attached to the function,
 			 * and   not   its   return   value's   pointed-to   type! */
-
-			tr = CTypeRef(typ: pt);
+			local pt: CPointerType = pointerType(tr);
+			local newTr = CTypeRef(typ: pt);
+			tr.moveNonPointerAttributes(newTr);
+			tr = newTr;
 			parseCTypeRefConstVolatile(tr);
 			goto prefixAgain;
 		}
@@ -1604,6 +1659,40 @@ prefixAgain:
 		return result;
 	}
 
+	@@Verify that it's OK that exceptions @codes are thrown at the top-level of the current function
+	function verifyTopLevelThrows(codes: {int...}, getReason: Callable) {
+		local callerThrows: {int...} = currentFunctionTypeRef.attribThrows;
+		local missingThrows: {int...} = codes - callerThrows;
+		if (missingThrows) {
+			local simplifiedMissingThrows = HashSet();
+
+			/* Remove sub-classes where `callerThrows' specifies the base-class */
+			for (local code: missingThrows) {
+				if (code > 0xffff && (code & 0xffff) in callerThrows)
+					continue;
+				simplifiedMissingThrows.insert(code);
+			}
+
+			/* Remove some exceptions if the calling function has
+			 * a nothrow attribute  with a  "*" or a  level >  0. */
+			local callerNothrow: string | none = currentFunctionTypeRef.attribNothrow;
+			if (callerNothrow !is none) {
+				if (callerNothrow.startswith("*") || int(callerNothrow) > 0) {
+					simplifiedMissingThrows.remove(this.exceptByName["E_SEGFAULT"]);
+					simplifiedMissingThrows.remove(this.exceptByName["E_BADALLOC"]);
+					simplifiedMissingThrows.remove(this.exceptByName["E_WOULDBLOCK"]);
+				}
+			}
+			missingThrows = simplifiedMissingThrows;
+		}
+		if (missingThrows && (THROWS_ANY !in callerThrows)) {
+			this.warn("-Wthrows",
+				f"Function `{currentFunctionName}' is missing annotations "
+				f"`THROWS({", ".join(exceptCodeNames(simplifyThrowsSet(missingThrows)))})', "
+				f"because {getReason(missingThrows)}");
+		}
+	}
+
 	@@Returns the function's return value
 	function parseFunctionBody(funTypRef: CTypeRef, name: string): Bytes | none {
 		/* Push a namespace for the function's body. */
@@ -1620,16 +1709,22 @@ prefixAgain:
 
 		/* Setup the context for evaluation of the function body */
 		namespaceStack.pushfront(fnScope);
-		local savedCurrentFunctionName                      = currentFunctionName;
-		local savedCurrentFunctionTypeRef                   = currentFunctionTypeRef;
-		local savedCurrentFunctionReturnValue               = currentFunctionReturnValue;
-		local savedCurrentFunctionGreatestCalleNothrowLevel = currentFunctionGreatestCalleNothrowLevel;
-		local savedIsUnreachable                            = isUnreachable;
-		currentFunctionName                      = name;
-		currentFunctionTypeRef                   = funTypRef;
-		currentFunctionReturnValue               = false;
-		currentFunctionGreatestCalleNothrowLevel = none;
-		isUnreachable                            = false;
+		local savedCurrentFunctionName                 = currentFunctionName;
+		local savedCurrentFunctionTypeRef              = currentFunctionTypeRef;
+		local savedCurrentFunctionReturnValue          = currentFunctionReturnValue;
+		local savedCurrentTryBlockGreatestNothrowLevel = currentTryBlockGreatestNothrowLevel;
+		local savedCurrentTryBlockExceptions           = currentTryBlockExceptions;
+		local savedIsUnreachable                       = isUnreachable;
+		local savedIsInTryBlock                        = isInTryBlock;
+		local savedEncounteredAsm                      = encounteredAsm;
+		currentFunctionName                 = name;
+		currentFunctionTypeRef              = funTypRef;
+		currentFunctionReturnValue          = false;
+		currentTryBlockGreatestNothrowLevel = -1;
+		currentTryBlockExceptions           = HashSet();
+		isUnreachable                       = false;
+		isInTryBlock                        = false;
+		encounteredAsm                      = false;
 
 		/* Parse the function body. */
 		parseStatements();
@@ -1639,21 +1734,94 @@ prefixAgain:
 		if (result === false)
 			result = none;
 
+		/* Warn if the end of a non-void function is reached without a return-statement. */
 		if (!isUnreachable && funTypRef.typ.returnType !== C_void)
 			this.warn("-Wreturn", "End of non-void function reached (missing return?)");
 
-		if (currentFunctionGreatestCalleNothrowLevel !is none &&
-		    currentFunctionGreatestCalleNothrowLevel !== false) {
-			/* TODO: a warning is issued for a function that has no nothrow attribute
-			 *       and  calls  only  functions  that  have  __nothrow__ attributes. */
+		/* Compare the function's annotations to what happens within the function. */
+		local functionThrows: Set with int = funTypRef.attribThrows;
+		local functionNothrow: string | none = funTypRef.attribNothrow;
+		local bodyThrows: Set with int = currentTryBlockExceptions;
+		local bodyNothrow: int = currentTryBlockGreatestNothrowLevel;
+		if (bodyNothrow < 0 && (THROWS_OOB !in bodyThrows && THROWS_NCX !in bodyThrows))
+			bodyNothrow = 0; /* Function doesn't do anything dangerous */
+		if (functionThrows && !encounteredAsm) {
+			if (THROWS_ANY in functionThrows && THROWS_ANY !in bodyThrows) {
+				local thrownButNotAnnotated: Set with int = HashSet(bodyThrows - functionThrows);
+				thrownButNotAnnotated.remove(THROWS_CB);
+				this.warn("-Wnothrow",
+					f"`THROWS(...)' is more broad than it needs to be. "
+					f"Use `THROWS({", ".join(
+						exceptCodeNames(simplifyThrowsSet(thrownButNotAnnotated))
+					)})' instead");
+			}
+			local neverThrownExceptions: Set with int = HashSet(functionThrows - bodyThrows);
+			neverThrownExceptions.remove(THROWS_ANY);
+			neverThrownExceptions.remove(THROWS_CB);
+			if (functionNothrow.startswith("*") || int(functionNothrow) > 0) {
+				neverThrownExceptions.remove(this.exceptByName["E_SEGFAULT"]);
+				neverThrownExceptions.remove(this.exceptByName["E_BADALLOC"]);
+				neverThrownExceptions.remove(this.exceptByName["E_WOULDBLOCK"]);
+			}
+			if (neverThrownExceptions) {
+				/* Remove exception base classes if sub-classes are also part of the set. */
+
+				this.warn("-Wnothrow",
+					f"Exceptions `THROWS({", ".join(
+						exceptCodeNames(simplifyThrowsSet(neverThrownExceptions))
+					)})' are never thrown");
+			}
+		}
+
+		if (functionNothrow is none) {
+			/* Figure out which annotation the function should have (if any) */
+			local expectedAnnotation: string;
+			if (bodyThrows.remove(THROWS_OOB)) {
+				expectedAnnotation = "";
+			} else if (bodyThrows || encounteredAsm) {
+				expectedAnnotation = "";
+			} else {
+				local bodyHasNcx = bodyThrows.remove(THROWS_NCX);
+				local bodyHasCb = bodyThrows.remove(THROWS_CB);
+				if (bodyHasNcx && bodyHasCb) {
+					expectedAnnotation = "NOTHROW_CB_NCX";
+				} else if (bodyHasCb) {
+					expectedAnnotation = "NOTHROW_CB";
+				} else if (bodyHasNcx) {
+					expectedAnnotation = "NOTHROW_NCX";
+				} else if (bodyNothrow <= 0) {
+					/* TODO: If the function takes pointer arguments that are not  __restrict
+					 *       or appear in nonnull((n)), suggest NOTHROW or NOTHROW_NCX intead */
+					expectedAnnotation = "NOTHROW";
+				} else {
+					expectedAnnotation = getPrettyNothrowLevelName(bodyNothrow);
+				}
+			}
+			if (expectedAnnotation) {
+				this.warn("-Wnothrow",
+					f"Function `{currentFunctionName}' should "
+					f"be annotated as `{expectedAnnotation}', "
+					f"as no explicit exceptions are thrown");
+			}
+		} else if (!functionNothrow.startswith("*")) {
+			local functionNothrowLevel: int = int(functionNothrow);
+			if (bodyNothrow >= 0 && functionNothrowLevel > bodyNothrow) {
+				this.warn("-Wnothrow",
+					f"Function `{currentFunctionName}' can be annotated as "
+					f"`{getPrettyNothrowLevelName(bodyNothrow)}' instead of "
+					f"`{getPrettyNothrowLevelName(functionNothrowLevel)}'");
+			}
 		}
 
 		/* Restore context */
-		currentFunctionName                      = savedCurrentFunctionName;
-		currentFunctionTypeRef                   = savedCurrentFunctionTypeRef;
-		currentFunctionReturnValue               = savedCurrentFunctionReturnValue;
-		currentFunctionGreatestCalleNothrowLevel = savedCurrentFunctionGreatestCalleNothrowLevel;
-		isUnreachable                            = savedIsUnreachable;
+		currentFunctionName                 = savedCurrentFunctionName;
+		currentFunctionTypeRef              = savedCurrentFunctionTypeRef;
+		currentFunctionReturnValue          = savedCurrentFunctionReturnValue;
+		currentTryBlockGreatestNothrowLevel = savedCurrentTryBlockGreatestNothrowLevel;
+		currentTryBlockExceptions           = savedCurrentTryBlockExceptions;
+		isUnreachable                       = savedIsUnreachable;
+		isInTryBlock                        = savedIsInTryBlock;
+		encounteredAsm                      = savedEncounteredAsm;
 		namespaceStack.popfront();
 		return result;
 	}
@@ -1849,27 +2017,49 @@ again:
 		case "asm":
 		case "__asm":
 		case "__asm__":
+			if (!isUnreachable)
+				encounteredAsm = true;
 			parseGCCAssemblyStatement();
 			break;
 
 		case "try": {
 			if (!cxx)
 				goto default_case;
-			local savedCurrentTryBlockExceptions   = currentTryBlockExceptions;
-			local savedCurrentCatchBlockExceptions = currentCatchBlockExceptions;
-			currentTryBlockExceptions = HashSet();
+			local savedIsInTryBlock                        = isInTryBlock;
+			local savedCurrentTryBlockExceptions           = currentTryBlockExceptions;
+			local savedCurrentTryBlockGreatestNothrowLevel = currentTryBlockGreatestNothrowLevel;
+			local savedEncounteredAsm                      = encounteredAsm;
+			currentTryBlockExceptions           = HashSet();
+			currentTryBlockGreatestNothrowLevel = -1;
+			encounteredAsm                      = false;
 			this.next();
-			this.require("{");
+
+			isInTryBlock = true;
 			local tryIsUnreachable: bool = isUnreachable;
+			this.require("{");
 			this.parseStatement();
-			if (!currentTryBlockExceptions && !isUnreachable)
+			isInTryBlock = savedCurrentTryBlockExceptions;
+
+			local tryBlockGreatestNothrowLevel = currentTryBlockGreatestNothrowLevel;
+			currentTryBlockGreatestNothrowLevel = savedCurrentTryBlockGreatestNothrowLevel;
+			if (!currentTryBlockExceptions && !encounteredAsm &&
+			    tryBlockGreatestNothrowLevel <= 0 && !isUnreachable) {
 				this.warn("-Wthrows", "Guarded code never throws any exceptions");
+			}
+			if (tryIsUnreachable) {
+				encounteredAsm = savedEncounteredAsm;
+			} else if (savedEncounteredAsm) {
+				encounteredAsm = true;
+			}
 			this.skip("catch");
 			this.skip("(");
 			this.skip("...");
 			this.skip(")");
+
+			local savedCurrentCatchBlockExceptions = currentCatchBlockExceptions;
 			currentCatchBlockExceptions = currentTryBlockExceptions;
 			currentTryBlockExceptions   = savedCurrentTryBlockExceptions;
+
 			this.require("{");
 			if (tryIsUnreachable) {
 				isUnreachable = true;
@@ -3338,33 +3528,10 @@ return_unknown_void_pointer:
 
 		case "__builtin_rethrow": {
 			if (!isUnreachable && currentCatchBlockExceptions) {
-				if (currentTryBlockExceptions !is none) {
-					currentTryBlockExceptions.insertall(currentCatchBlockExceptions);
-				} else {
-					local callerThrows: {int...} = currentFunctionTypeRef.attribThrows;
-					local missingThrows: {int...} = (currentCatchBlockExceptions & ~callerThrows).sorted();
-					if (missingThrows) {
-						/* Remove E_SEGFAULT and E_BADALLOC if the calling function
-						 * has  a  nothrow attribute  with  a "*"  or  a level  > 0 */
-						local callerNothrow: string | none = currentFunctionTypeRef.attribNothrow;
-						if (callerNothrow !is none) {
-							if (callerNothrow.startswith("*") || int(callerNothrow) > 0) {
-								missingThrows.remove(this.exceptByName["E_SEGFAULT"]);
-								missingThrows.remove(this.exceptByName["E_BADALLOC"]);
-							}
-						}
-					}
-					if (missingThrows && (0 !in callerThrows)) {
-						local missingThrowsNames: {string...} = (
-							for (local id: missingThrows)
-								{ -1 : "*", 0 : "..." }.get(id,
-									this.exceptByCode.get(id, id.hex()))
-						).frozen;
-						this.warn("-Wthrows",
-							f"Function `{currentFunctionName}' is missing "
-							f"annotations `THROWS({", ".join(missingThrowsNames)})' "
-							f"because those are the exceptions that can be re-thrown here");
-					}
+				currentTryBlockExceptions.insertall(currentCatchBlockExceptions);
+				if (!isInTryBlock) {
+					verifyTopLevelThrows(currentCatchBlockExceptions,
+						getReason: _ -> "it `RETHROW()`s them here");
 				}
 			}
 			this.next();
@@ -3383,18 +3550,11 @@ return_C_voidval:
 				? exceptCodeValue.constExprValue(this)
 				: 0;
 			if (!isUnreachable) {
-				if (currentTryBlockExceptions !is none) {
-					currentTryBlockExceptions.insert(exceptCode);
-				} else {
+				currentTryBlockExceptions.insert(exceptCode);
+				if (!isInTryBlock) {
 					/* Assert that `exceptCode' is part of the caller's throws-attribute */
-					local callerThrows: {int...} = currentFunctionTypeRef.attribThrows;
-					if (exceptCode !in callerThrows && (0 !in callerThrows)) {
-						this.warn("-Wthrows",
-							f"Function `{currentFunctionName}' is missing "
-							f"annotations `THROWS({
-								this.exceptByCode.get(exceptCode, exceptCode.hex())
-							})'");
-					}
+					verifyTopLevelThrows({exceptCode},
+						getReason: _ -> "it `THROW()`s it here");
 				}
 			}
 			while (this.tok == ",") {
@@ -4400,7 +4560,7 @@ function runChecker(filename: string, targetModule: Module, language: string = "
 #ifdef __MAIN__
 local args = [...][1:];
 if (!args)
-	args = [r"E:\c\kls\kos\build\i386-kos-nOD\mod.dbx\kos.src.kernel.moddbx.ctype.c.chk.E"];
+	args = [r"E:\c\kls\kos\build\i386-kos-nOD\mod.dbx\kos.src.kernel.moddbx.cexpr.c.chk.E"];
 for (local arg: args)
 	runChecker(arg, import("...targets.i386"));
 #endif

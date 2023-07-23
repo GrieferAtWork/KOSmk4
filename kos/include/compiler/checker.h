@@ -274,20 +274,20 @@
 #define __NOTHROW_RPC_NOKOS     __checker_attribute__(__nothrow__(2))
 #define __CXX_NOEXCEPT_RPC_PURE __checker_attribute__(__nothrow__(2))
 
-#define __ATTR_NOBLOCK          __checker_attribute__(__tag__("NOBLOCK"))
-#define __ATTR_NOBLOCK_IF(...)  __checker_attribute__(__tag__("NOBLOCK")) /* XXX: Condition */
-#define __ATTR_BLOCKING         __checker_attribute__(__nothrow__(2), __tag__("BLOCKING"), __require_caller_tag__("BLOCKING"))
-#define __ATTR_BLOCKING_IF(...) __checker_attribute__(__nothrow__(2), __tag__("BLOCKING")) /* XXX: Condition */
-#define __ATTR_NOPREEMPT        __checker_attribute__(__tag__("NOPREEMPT"), __require_caller_tag__("NOPREEMPT"))
-
 #define __ATTR_USER             __checker_attribute__(__nothrow__(1))
 #define __ATTR_UNCHECKED        __checker_attribute__(__noderef__, __nothrow__(1))
 #define __ATTR_PHYS             __checker_attribute__(__noderef__, __nothrow__(1)) /* Physical pointer, only for arithmetic */
 #define __ATTR_VIRT             __checker_attribute__(__noderef__, __nothrow__(1)) /* Virtual pointer, only for arithmetic */
 #define __ATTR_CHECKED          __checker_attribute__(__deref__, __nothrow__(1))
+#define __ATTR_BLOCKING         __checker_attribute__(__throws__(E_INTERRUPT))
+#define __ATTR_BLOCKING_IF(...) __checker_attribute__(__throws__(E_INTERRUPT)) /* XXX: Condition */
 
 #define __ATTR_THROWS(...)      __checker_attribute__(__throws__(__VA_ARGS__))
 #define __ATTR_THROWING         __checker_attribute__(__throws__(...))
+
+#define __ATTR_NOBLOCK          __checker_attribute__(__tag__("NOBLOCK"))
+#define __ATTR_NOBLOCK_IF(...)  __checker_attribute__(__tag__("NOBLOCK")) /* XXX: Condition */
+#define __ATTR_NOPREEMPT        __checker_attribute__(__tag__("NOPREEMPT"), __require_caller_tag__("NOPREEMPT"))
 
 /* TODO: __throws__(*) to indicate that a function throws exceptions  that
  *       may be thrown by a function pointer it takes as argument. Example
