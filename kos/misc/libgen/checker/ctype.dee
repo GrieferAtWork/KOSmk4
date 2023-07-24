@@ -62,10 +62,11 @@ global final CTYPEREF_FLAG_VOLATILE = 0x0002;
 global final CTYPEREF_FLAG_RESTRICT = 0x0004;
 global final CTYPEREF_FLAG_DEREF    = 0x0010;
 global final CTYPEREF_FLAG_NODEREF  = 0x0020;
+global final CTYPEREF_FLAG_NONNULL  = 0x0040;
 global final CTYPEREF_FLAG_CV = CTYPEREF_FLAG_CONST | CTYPEREF_FLAG_VOLATILE;
 
 @@A function that never returns. When the function is invoked,
-global final CTYPEREF_FLAG_NORETURN = 0x0040;
+global final CTYPEREF_FLAG_NORETURN = 0x0080;
 
 @@Do no inherit pointer attributes during casts:
 @@```c
@@ -113,19 +114,20 @@ function simplifyThrowsSet(throws: Set with int): Set with int {
  * CTYPEATTRIBUTES_NONSENSE_REGULAR:          int __attribute__((...)) foo;
  */
 global final CTYPEATTRIBUTES_NONSENSE_PTRBASE_FUNCTION: {string...} = { "aligned" };
-global final CTYPEATTRIBUTES_NONSENSE_PTRBASE_REGULAR: {string...} = { "tags", "requireCallerTags", "aligned", "throws" };
+global final CTYPEATTRIBUTES_NONSENSE_PTRBASE_REGULAR: {string...} = { "tags", "requireCallerTags", "throws", "nonnull" };
 global final CTYPEATTRIBUTES_NONSENSE_FUNCTION: {string...} = { "aligned" };
-global final CTYPEATTRIBUTES_NONSENSE_REGULAR: {string...} = { "nothrow", "tags", "requireCallerTags", "throws" };
+global final CTYPEATTRIBUTES_NONSENSE_REGULAR: {string...} = { "nothrow", "tags", "requireCallerTags", "throws", "nonnull" };
 
 global final CTYPEREF_FLAG_NONSENSE_FUNCTION =
 	CTYPEREF_FLAG_CONST | CTYPEREF_FLAG_VOLATILE | CTYPEREF_FLAG_DEREF |
-	CTYPEREF_FLAG_NODEREF | CTYPEREF_FLAG_FORCE | CTYPEREF_FLAG_PACKED;
+	CTYPEREF_FLAG_NODEREF | CTYPEREF_FLAG_NONNULL | CTYPEREF_FLAG_FORCE |
+	CTYPEREF_FLAG_PACKED;
 global final CTYPEREF_FLAG_NONSENSE_POINTER =
-	CTYPEREF_FLAG_DEREF | CTYPEREF_FLAG_NODEREF | CTYPEREF_FLAG_FORCE |
-	CTYPEREF_FLAG_NORETURN;
+	CTYPEREF_FLAG_DEREF | CTYPEREF_FLAG_NODEREF | CTYPEREF_FLAG_NONNULL |
+	CTYPEREF_FLAG_FORCE | CTYPEREF_FLAG_NORETURN;
 global final CTYPEREF_FLAG_NONSENSE_REGULAR =
-	CTYPEREF_FLAG_DEREF | CTYPEREF_FLAG_NODEREF | CTYPEREF_FLAG_FORCE |
-	CTYPEREF_FLAG_NORETURN | CTYPEREF_FLAG_RESTRICT;
+	CTYPEREF_FLAG_DEREF | CTYPEREF_FLAG_NODEREF | CTYPEREF_FLAG_NONNULL |
+	CTYPEREF_FLAG_FORCE | CTYPEREF_FLAG_NORETURN | CTYPEREF_FLAG_RESTRICT;
 global final CTYPEREF_FLAG_NONSENSE_PTRBASE_FUNCTION = CTYPEREF_FLAG_PACKED;
 global final CTYPEREF_FLAG_NONSENSE_PTRBASE_REGULAR = CTYPEREF_FLAG_NORETURN | CTYPEREF_FLAG_PACKED;
 
@@ -160,7 +162,8 @@ final class CTypeAttributes {
 	public member requireCallerTags: Set with string | none = none;
 	public member aligned: int | none = none;
 	public member throws: Set with int | none = none;
-	// TODO: "nonnull"
+	@@Only ever set during parsing: function arguments that are non-null
+	public member nonnull: Set with int | none = none;
 
 	// TODO: "format": Verify KOS-extended printf-format string argument types
 	// NOTE: Based on this, dynamically create varargs function parameter types (including annotations):
@@ -201,6 +204,13 @@ final class CTypeAttributes {
 				throws = HashSet(throws);
 			throws.insertall(other.throws);
 		}
+		if (!nonnull) {
+			nonnull = other.nonnull;
+		} else if (other.nonnull) {
+			if (nonnull !is HashSet)
+				nonnull = HashSet(nonnull);
+			nonnull.insertall(other.nonnull);
+		}
 	}
 
 	function hasAllAttributesFrom(other: CTypeAttributes): bool {
@@ -212,6 +222,7 @@ final class CTypeAttributes {
 			"tags",
 			"requireCallerTags",
 			"aligned",
+			"nonnull",
 		}) {
 			local myVal = this.operator . (attrib);
 			local otVal = other.operator . (attrib);
@@ -393,10 +404,24 @@ final class CTypeRef {
 				innerMostReturnPointerBaseTypeRef.moveNonPointerAttributes(this);
 			}
 			if (flags & CTYPEREF_FLAG_NONSENSE_FUNCTION) {
-				shouldWarn = copy this;
-				flags &= ~CTYPEREF_FLAG_NONSENSE_FUNCTION;
+				if (flags & CTYPEREF_FLAG_NONNULL) {
+					if (!typ.setNonnullArgumentsAllPointers(checker)) {
+						checker.warn("-Wattribute",
+							f"Function type `{this}' with `__attribute__((nonnull))' "
+							f"does not have any pointer-type arguments");
+					}
+					flags &= ~CTYPEREF_FLAG_NONNULL;
+				}
+				if (flags & CTYPEREF_FLAG_NONSENSE_FUNCTION) {
+					shouldWarn = copy this;
+					flags &= ~CTYPEREF_FLAG_NONSENSE_FUNCTION;
+				}
 			}
 			if (attrib !is none) {
+				if (attrib.nonnull !is none) {
+					typ.setNonnullArguments(checker, attrib.nonnull);
+					attrib.nonnull = none;
+				}
 				for (local nonSenseAttrib: CTYPEATTRIBUTES_NONSENSE_FUNCTION) {
 					if (attrib.operator . (nonSenseAttrib) !is none) {
 						if (shouldWarn is none)
@@ -439,6 +464,7 @@ final class CTypeRef {
 		local typ: CType = this.typ;
 		local attrib: CTypeAttributes | none = this.attrib;
 		local shouldWarn: CTypeRef | none = none;
+
 		if (typ is CFunctionType) {
 			/* If the function returns a pointer, the function attributes may
 			 * have been parsed in the  context of that pointer's base  type:
@@ -459,10 +485,20 @@ final class CTypeRef {
 				innerMostReturnPointerBaseTypeRef.moveNonPointerAttributes(this);
 			}
 			if (flags & CTYPEREF_FLAG_NONSENSE_PTRBASE_FUNCTION) {
-				shouldWarn = copy this;
-				flags &= ~CTYPEREF_FLAG_NONSENSE_PTRBASE_FUNCTION;
+				if (flags & CTYPEREF_FLAG_NONNULL) {
+					if (typ.setNonnullArgumentsAllPointers(checker))
+						flags &= ~CTYPEREF_FLAG_NONNULL;
+				}
+				if (flags & CTYPEREF_FLAG_NONSENSE_PTRBASE_FUNCTION) {
+					shouldWarn = copy this;
+					flags &= ~CTYPEREF_FLAG_NONSENSE_PTRBASE_FUNCTION;
+				}
 			}
 			if (attrib !is none) {
+				if (attrib.nonnull !is none) {
+					typ.setNonnullArguments(checker, attrib.nonnull);
+					attrib.nonnull = none;
+				}
 				for (local nonSenseAttrib: CTYPEATTRIBUTES_NONSENSE_PTRBASE_FUNCTION) {
 					if (attrib.operator . (nonSenseAttrib) !is none) {
 						if (shouldWarn is none)
@@ -494,10 +530,42 @@ final class CTypeRef {
 				}
 			}
 		}
+
+		/* Warn if `nonnull' is used alongside a non-zero `nothrow' tag.
+		 * s.a. `setNonnullFlagForFunctionArgument()' */
+		if (flags & CTYPEREF_FLAG_NONNULL) {
+			local nothrow: string | none = attrib.nothrow;
+			if (nothrow !is none && (nothrow.startswith("*") || int(nothrow) > 0)) {
+				checker.warn("-Wattribute",
+					f"Use of `__attribute__((nonnull))' together "
+					f"with `__attribute__((nothrow({nothrow})))' "
+					f"in `{this}'");
+			}
+		}
+
 		if (shouldWarn !is none) {
-			checker.warn("-Wattribute", f"Nonsensical attributes in `{CPointerType(shouldWarn)}'");
+			checker.warn("-Wattribute",
+				f"Nonsensical attributes in `{CPointerType(shouldWarn)}'");
 		}
 		typ.fixNonsensicalAttributes(checker);
+	}
+
+	@@Set the @CTYPEREF_FLAG_NONNULL flag, and warn if its use is inappropriate
+	function setNonnullFlagForFunctionArgument(checker: Checker, varname: string) {
+		/* Warn if `nonnull' is used  alongside a non-zero `nothrow'  tag.
+		 * Reason is that a pointer with a non-zero nothrow annotation can
+		 * implicitly result in E_SEGFAULT when accessed, which also means
+		 * that there'd be no point  in disallowing NULL, since  accessing
+		 * NULL also results in E_SEGFAULT! */
+		if (!(flags & CTYPEREF_FLAG_NONNULL)) {
+			local nothrow: string | none = attrib.nothrow;
+			if (nothrow !is none && (nothrow.startswith("*") || int(nothrow) > 0)) {
+				checker.warn("-Wattribute",
+					f"`__attribute__((nonnull))' applied to argument `{varname}' "
+					f"which is annotated as `{getPrettyNothrowLevelName(nothrow)}'");
+			}
+			flags |= CTYPEREF_FLAG_NONNULL;
+		}
 	}
 
 	function isConvertibleTo(other: CTypeRef, explicit: bool = false): bool {
@@ -528,6 +596,8 @@ final class CTypeRef {
 		local attributeValues: {string...} = [];
 		if (flags & CTYPEREF_FLAG_NODEREF)
 			attributeValues.append("noderef");
+		if (flags & CTYPEREF_FLAG_NONNULL)
+			attributeValues.append("nonnull");
 		if (flags & CTYPEREF_FLAG_FORCE)
 			attributeValues.append("force");
 		if (flags & CTYPEREF_FLAG_NORETURN)
@@ -1156,8 +1226,6 @@ final class CFunctionType: CType {
 	public property sizeof: int = { get(): int -> 0; };
 	public property alignof: int = { get(): int -> 1; };
 
-	function fixNonsensicalAttributes(checker: Checker)
-		-> returnType.fixNonsensicalAttributes(checker);
 	public operator hash(): int -> hash(returnType, isVarArgs, args.each.first);
 	public operator == (other: CFunctionType) ->
 		other is CFunctionType &&
@@ -1197,6 +1265,46 @@ final class CFunctionType: CType {
 			varname += "(void)";
 		}
 		return returnType.tostr(varname);
+	}
+
+	function fixNonsensicalAttributes(checker: Checker)
+		-> returnType.fixNonsensicalAttributes(checker);
+
+	@@Mark all pointer arguments as non-null
+	function setNonnullArgumentsAllPointers(checker: Checker): bool {
+		local result: bool = false;
+		for (local argTypeRef, argName: args) {
+			local typ: CType = argTypeRef.typ;
+			if (typ is CPointerType) {
+				typ.base.setNonnullFlagForFunctionArgument(checker, argName);
+				result = true;
+			}
+		}
+		return true;
+	}
+
+	@@Mark all arguments that are part of @nonnull as non-null
+	function setNonnullArguments(checker: Checker, nonnull: Set with int) {
+		for (local index: nonnull) {
+			if (index <= 0 || index > #args) {
+				checker.warn("-Wattribute",
+					f"`__attribute__((nonnull({index})))': Argument index does not exist");
+				continue;
+			}
+			--index;
+			local argTypeRef: CTypeRef;
+			local argName: string;
+			argTypeRef, argName = args[index]...;
+			local argType: CType = argTypeRef.typ;
+			if (argType !is CPointerType) {
+				checker.warn("-Wattribute",
+					f"`__attribute__((nonnull({index + 1})))': "
+					f"Argument `{argTypeRef.tostr(argName)}' "
+					f"does not have pointer-typing");
+				continue;
+			}
+			argType.base.setNonnullFlagForFunctionArgument(checker, argName);
+		}
 	}
 
 #define ACCEPTS_CONFORMANCE_LEVEL_CONVERTIBLE      0 /* isConvertibleTo */

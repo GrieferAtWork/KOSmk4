@@ -88,17 +88,22 @@ DECL_BEGIN
 
 /* PATH/VFS data ownership diagram:
  *
- *    SUPER
- *      ^
- *      │
- *    MOUNT=PATH ──parent─> PATH ──parent─> PATH
- *      ^   │ ^              ^               ^ │
- *      │   │ │              │               │ │
- *      │   │ └─recent_cache─┴───────────────┘ │
- *      │   │       │                          │
- *      │   └─[*]─┐ │                          │
- *      │         v │                          │
- *     MOUNTS ─── VFS ──> ROOT <─────parent────┘
+ ****************************************************
+ *                                                  *
+ *    SUPER                                         *
+ *      ^                                           *
+ *      │                                           *
+ *    MOUNT=PATH ──parent─> PATH ──parent─> PATH    *
+ *      ^   │ ^              ^               ^ │    *
+ *      │   │ │              │               │ │    *
+ *      │   │ └─recent_cache─┴───────────────┘ │    *
+ *      │   │       │                          │    *
+ *      │   └─[*]─┐ │                          │    *
+ *      │         v │                          │    *
+ *     MOUNTS ─── VFS ──> ROOT <─────parent────┘    *
+ *                                                  *
+ *                                                  *
+ ****************************************************
  *
  * [*] Weak reference (PATH->VFS)
  *
@@ -652,7 +657,7 @@ path_print(struct path *__restrict self, __pformatprinter printer, void *arg,
  * path may be invalid. */
 FUNDEF NONNULL((1, 4)) ssize_t KCALL
 path_printent(struct path *__restrict self,
-              USER CHECKED char const *dentry_name, u16 dentry_namelen,
+              CHECKED char const *dentry_name, u16 dentry_namelen,
               __pformatprinter printer, void *arg,
               atflag_t atflags DFL(AT_PATHPRINT_INCTRAIL),
               struct path *root DFL(__NULLPTR))

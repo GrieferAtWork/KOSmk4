@@ -63,6 +63,7 @@
 #define __GCC_HAS_ATTRIBUTE___tag__
 #define __GCC_HAS_ATTRIBUTE___require_caller_tag__
 #define __GCC_HAS_ATTRIBUTE___aligned__
+#define __GCC_HAS_ATTRIBUTE___nonnull__
 
 #undef __has_builtin
 #define __has_builtin(x) __GCC_PRIVATE_IS_DEFINED(__GCC_HAS_BUILTIN_##x)
@@ -274,6 +275,10 @@
 #define __NOTHROW_RPC_NOKOS     __checker_attribute__(__nothrow__(2))
 #define __CXX_NOEXCEPT_RPC_PURE __checker_attribute__(__nothrow__(2))
 
+/* TODO: `CHECKED'        should become `NCX' */
+/* TODO: `USER CHECKED'   should become `NCX' */
+/* TODO: `USER UNCHECKED' should become `NCX UNCHECKED' */
+#define __ATTR_NCX              __checker_attribute__(__nothrow__(1))
 #define __ATTR_USER             __checker_attribute__(__nothrow__(1))
 #define __ATTR_UNCHECKED        __checker_attribute__(__noderef__, __nothrow__(1))
 #define __ATTR_PHYS             __checker_attribute__(__noderef__) /* Physical pointer, only for arithmetic */
@@ -325,7 +330,7 @@
 #define __ATTR_COLD                          /* Nothing */
 #define __ATTR_NOCLONE                       /* Nothing */
 #define __ATTR_THREAD                        /* Nothing */
-#define __ATTR_ASSUME_ALIGNED(n)             /* Nothing */
+#define __ATTR_ASSUME_ALIGNED(n)             __checker_attribute__(__aligned__(n))
 #define __ATTR_ALLOC_ALIGN(pari)             /* Nothing */
 #define __ATTR_OPTIMIZE(opt)                 /* Nothing */
 #define __ATTR_FORMAT_PRINTF(fmt, args)      /* Nothing */
@@ -335,7 +340,7 @@
 #define __ATTR_DLLIMPORT                     /* Nothing */
 #define __ATTR_DLLEXPORT                     /* Nothing */
 #define __ATTR_NOPLT                         /* Nothing */
-#define __ATTR_NONNULL(ppars)                /* Nothing */
+#define __ATTR_NONNULL(ppars)                __checker_attribute__(__nonnull__ ppars)
 #define __ATTR_WUNUSED                       /* Nothing */
 #define __ATTR_SELECTANY                     /* Nothing */
 #define __ATTR_ACCESS_NONE(ptr_index)        /* Nothing */
@@ -345,16 +350,16 @@
 #define __ATTR_IN_OPT(ptr_index)             /* Nothing */
 #define __ATTR_OUT_OPT(ptr_index)            /* Nothing */
 #define __ATTR_INOUT_OPT(ptr_index)          /* Nothing */
-#define __ATTR_IN(ptr_index)                 /* Nothing */
-#define __ATTR_OUT(ptr_index)                /* Nothing */
-#define __ATTR_INOUT(ptr_index)              /* Nothing */
+#define __ATTR_IN(ptr_index)                 __checker_attribute__(__nonnull__(ptr_index))
+#define __ATTR_OUT(ptr_index)                __checker_attribute__(__nonnull__(ptr_index))
+#define __ATTR_INOUT(ptr_index)              __checker_attribute__(__nonnull__(ptr_index))
 #define __ATTR_WARNING(text)                 /* Nothing */
 #define __ATTR_ERROR(text)                   /* Nothing */
 #define __ATTR_SECTION(name)                 /* Nothing */
 #define __ATTR_RETNONNULL                    /* Nothing */
-#define __ATTR_PACKED                        /* Nothing */
+#define __ATTR_PACKED                        __checker_attribute__(__packed__)
 #define __ATTR_ALIAS(name)                   /* Nothing */
-#define __ATTR_ALIGNED(n)                    /* Nothing */
+#define __ATTR_ALIGNED(n)                    __checker_attribute__(__aligned__(n))
 #define __ATTR_WEAK                          /* Nothing */
 #define __ATTR_RETURNS_TWICE                 /* Nothing */
 #define __ATTR_EXTERNALLY_VISIBLE            /* Nothing */

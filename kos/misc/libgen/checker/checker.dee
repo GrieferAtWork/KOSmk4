@@ -415,7 +415,6 @@ again:
 			break;
 
 		case "deprecated":
-		case "nonnull":
 		case "sentinel":
 			this.next();
 			if (this.tok == "(") {
@@ -517,6 +516,25 @@ again:
 			}
 			tr.attribNothrow = f"{isStar ? "*" : ""}{level}";
 		}	break;
+
+		case "nonnull":
+			this.next();
+			if (this.tok == "(") {
+				this.next();
+				local nonnull: Set with int = tr.requireAttrib.nonnull;
+				if (nonnull !is HashSet)
+					tr.attrib.nonnull = nonnull = HashSet(nonnull);
+				while (this.tok != ")") {
+					nonnull.insert(parseExprConstantInteger());
+					if (this.tok != ",")
+						break;
+					this.next();
+				}
+				this.skip(")");
+			} else {
+				tr.flags |= CTYPEREF_FLAG_NONNULL;
+			}
+			break;
 
 		case "tag":
 		case "require_caller_tag": {
