@@ -435,14 +435,14 @@ ringbuffer_ioctl(struct ringbuffer *__restrict self, ioctl_t cmd,
 
 	case PIPE_IOC_PEEK: {
 		USER CHECKED struct pipe_peek *info;
-		byte_t USER CHECKED *buf;
+		USER CHECKED byte_t *buf;
 		size_t offset, count, total;
 		if unlikely(!IO_CANREAD(mode))
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_READ, mode);
 		info = (USER CHECKED struct pipe_peek *)arg;
 		validate_readwrite(info, sizeof(*info));
 		COMPILER_READ_BARRIER();
-		buf    = (byte_t USER CHECKED *)info->pp_buf;
+		buf    = (USER CHECKED byte_t *)info->pp_buf;
 		offset = (size_t)info->pp_bufof;
 		count  = (size_t)info->pp_bufsz;
 		COMPILER_READ_BARRIER();

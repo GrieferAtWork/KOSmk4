@@ -1858,7 +1858,7 @@ memleaks_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		memleak_t leak;
 		USER CHECKED struct leakmem *info;
 		size_t size, offs, _temp;
-		byte_t USER CHECKED *ubuf;
+		USER CHECKED byte_t *ubuf;
 		validate_readwrite(arg, sizeof(struct leakmem));
 		info = (USER CHECKED struct leakmem *)arg;
 		leak = get_nth_leak(me, info->lm_index);

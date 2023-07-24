@@ -77,7 +77,7 @@ struct module_section_ops {
 	 *          `SHF_ALLOC'  flag set, the returned buffer obviously
 	 *          resides in user-space, also meaning that it may only
 	 *          be accessed while the correct mman/pagedir is active */
-	BLOCKING WUNUSED_T NONNULL_T((1)) byte_t USER CHECKED *
+	BLOCKING WUNUSED_T NONNULL_T((1)) USER CHECKED byte_t *
 	(FCALL *ms_getaddr)(struct module_section *__restrict self);
 
 	/* [1..1] Similar  to `ms_getaddr' (and  identical in case of
@@ -138,7 +138,7 @@ DEFINE_REFCNT_FUNCTIONS(struct module_section, ms_refcnt, module_section_destroy
 /* Wrappers for module section operators. */
 #ifdef __INTELLISENSE__
 BLOCKING WUNUSED NONNULL((1)) char const *(module_section_getname)(struct module_section *__restrict self);
-BLOCKING WUNUSED NONNULL((1)) byte_t USER CHECKED *(module_section_getaddr)(struct module_section *__restrict self);
+BLOCKING WUNUSED NONNULL((1)) USER CHECKED byte_t *(module_section_getaddr)(struct module_section *__restrict self);
 BLOCKING WUNUSED NONNULL((1)) KERNEL byte_t *(module_section_getaddr_alias)(struct module_section *__restrict self);
 BLOCKING WUNUSED NONNULL((1, 2)) KERNEL byte_t *(module_section_getaddr_inflate)(struct module_section *__restrict self, size_t *__restrict psize);
 #else /* __INTELLISENSE__ */
@@ -150,7 +150,7 @@ BLOCKING WUNUSED NONNULL((1, 2)) KERNEL byte_t *(module_section_getaddr_inflate)
 
 /* Same as the functions above, but preserve the current exception, and return `NULL' on error. */
 FUNDEF BLOCKING WUNUSED NONNULL((1)) char const *NOTHROW(FCALL module_section_getname_nx)(struct module_section *__restrict self);
-FUNDEF BLOCKING WUNUSED NONNULL((1)) byte_t USER CHECKED *NOTHROW(FCALL module_section_getaddr_nx)(struct module_section *__restrict self);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) USER CHECKED byte_t *NOTHROW(FCALL module_section_getaddr_nx)(struct module_section *__restrict self);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_alias_nx)(struct module_section *__restrict self);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_inflate_nx)(struct module_section *__restrict self, size_t *__restrict psize);
 

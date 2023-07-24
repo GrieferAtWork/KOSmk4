@@ -83,7 +83,7 @@ typedef UM_ElfW(Phdr *) UM_ElfW_PhdrP;
 
 struct userelf_module_section: module_section {
 	UM_ElfW_Shdr        *ums_shdr;     /* [1..1][const] Section header. */
-	byte_t USER CHECKED *ums_useraddr; /* [const] User-space address of `SHF_ALLOC' sections, or `(void *)-1' for others. */
+	USER CHECKED byte_t *ums_useraddr; /* [const] User-space address of `SHF_ALLOC' sections, or `(void *)-1' for others. */
 	KERNEL byte_t       *ums_kernaddr; /* [0..1][lock(WRITE_ONCE)] Lazily allocated address of this section's
 	                                    * kernel mapping. If not already mapped, set to `(void *)-1' instead. */
 	KERNEL byte_t       *ums_infladdr; /* [0..1][lock(WRITE_ONCE)] Inflated section address. */
@@ -147,7 +147,7 @@ INTDEF struct module_ops const uem_ops;
 /* UserELF module section operators */
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL uems_destroy)(struct userelf_module_section *__restrict self);
 INTDEF BLOCKING WUNUSED NONNULL((1)) char const *FCALL uems_getname(struct userelf_module_section *__restrict self);
-INTDEF BLOCKING WUNUSED NONNULL((1)) byte_t USER CHECKED *FCALL uems_getaddr(struct userelf_module_section *__restrict self);
+INTDEF BLOCKING WUNUSED NONNULL((1)) USER CHECKED byte_t *FCALL uems_getaddr(struct userelf_module_section *__restrict self);
 INTDEF BLOCKING WUNUSED NONNULL((1)) KERNEL byte_t *FCALL uems_getaddr_alias(struct userelf_module_section *__restrict self);
 INTDEF BLOCKING WUNUSED NONNULL((1, 2)) KERNEL byte_t *FCALL uems_getaddr_inflate(struct userelf_module_section *__restrict self, size_t *__restrict psize);
 

@@ -566,8 +566,8 @@ struct indent_printer_data {
 	bool stop_after_newline;
 };
 
-PRIVATE ssize_t FORMATPRINTER_CC
-indent_printer(void *arg, char const *__restrict data, size_t datalen) {
+PRIVATE ssize_t
+NOTHROW_NCX(FORMATPRINTER_CC indent_printer)(void *arg, char const *__restrict data, size_t datalen) {
 	struct indent_printer_data *cookie;
 	char const *last_linefeed;
 	cookie = (struct indent_printer_data *)arg;
@@ -1092,10 +1092,10 @@ err:
 	return temp;
 }
 
-PRIVATE ssize_t FORMATPRINTER_CC
-is_nonempty_printer(void *UNUSED(arg),
-                    char const *__restrict UNUSED(data),
-                    size_t datalen) {
+PRIVATE ssize_t
+NOTHROW(FORMATPRINTER_CC is_nonempty_printer)(void *UNUSED(arg),
+                                              char const *__restrict UNUSED(data),
+                                              size_t datalen) {
 	return datalen ? -1 : 0;
 }
 

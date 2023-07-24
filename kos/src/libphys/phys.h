@@ -44,30 +44,30 @@ DECL_BEGIN
 
 /************************************************************************/
 /* Low-level physical memory read/write primitives.                     */
-INTDEF NOBLOCK WUNUSED uint8_t NOTHROW(CC libphys_peekphysb)(PHYS physaddr_t addr);
-INTDEF NOBLOCK WUNUSED uint16_t NOTHROW(CC libphys_peekphysw)(/*aligned(2)*/ PHYS physaddr_t addr);
-INTDEF NOBLOCK WUNUSED uint32_t NOTHROW(CC libphys_peekphysl)(/*aligned(4)*/ PHYS physaddr_t addr);
-INTDEF NOBLOCK WUNUSED uint64_t NOTHROW(CC libphys_peekphysq)(/*aligned(8)*/ PHYS physaddr_t addr);
-INTDEF NOBLOCK WUNUSED uint16_t NOTHROW(CC libphys_peekphysw_unaligned)(PHYS physaddr_t addr);
-INTDEF NOBLOCK WUNUSED uint32_t NOTHROW(CC libphys_peekphysl_unaligned)(PHYS physaddr_t addr);
-INTDEF NOBLOCK WUNUSED uint64_t NOTHROW(CC libphys_peekphysq_unaligned)(PHYS physaddr_t addr);
-INTDEF NOBLOCK void NOTHROW(CC libphys_pokephysb)(PHYS physaddr_t addr, uint8_t value);
-INTDEF NOBLOCK void NOTHROW(CC libphys_pokephysw)(/*aligned(2)*/ PHYS physaddr_t addr, uint16_t value);
-INTDEF NOBLOCK void NOTHROW(CC libphys_pokephysl)(/*aligned(4)*/ PHYS physaddr_t addr, uint32_t value);
-INTDEF NOBLOCK void NOTHROW(CC libphys_pokephysq)(/*aligned(8)*/ PHYS physaddr_t addr, uint64_t value);
-INTDEF NOBLOCK void NOTHROW(CC libphys_pokephysw_unaligned)(PHYS physaddr_t addr, uint16_t value);
-INTDEF NOBLOCK void NOTHROW(CC libphys_pokephysl_unaligned)(PHYS physaddr_t addr, uint32_t value);
-INTDEF NOBLOCK void NOTHROW(CC libphys_pokephysq_unaligned)(PHYS physaddr_t addr, uint64_t value);
+INTDEF NOBLOCK WUNUSED uint8_t NOTHROW(CC libphys_peekphysb)(physaddr_t addr);
+INTDEF NOBLOCK WUNUSED uint16_t NOTHROW(CC libphys_peekphysw)(/*aligned(2)*/ physaddr_t addr);
+INTDEF NOBLOCK WUNUSED uint32_t NOTHROW(CC libphys_peekphysl)(/*aligned(4)*/ physaddr_t addr);
+INTDEF NOBLOCK WUNUSED uint64_t NOTHROW(CC libphys_peekphysq)(/*aligned(8)*/ physaddr_t addr);
+INTDEF NOBLOCK WUNUSED uint16_t NOTHROW(CC libphys_peekphysw_unaligned)(physaddr_t addr);
+INTDEF NOBLOCK WUNUSED uint32_t NOTHROW(CC libphys_peekphysl_unaligned)(physaddr_t addr);
+INTDEF NOBLOCK WUNUSED uint64_t NOTHROW(CC libphys_peekphysq_unaligned)(physaddr_t addr);
+INTDEF NOBLOCK void NOTHROW(CC libphys_pokephysb)(physaddr_t addr, uint8_t value);
+INTDEF NOBLOCK void NOTHROW(CC libphys_pokephysw)(/*aligned(2)*/ physaddr_t addr, uint16_t value);
+INTDEF NOBLOCK void NOTHROW(CC libphys_pokephysl)(/*aligned(4)*/ physaddr_t addr, uint32_t value);
+INTDEF NOBLOCK void NOTHROW(CC libphys_pokephysq)(/*aligned(8)*/ physaddr_t addr, uint64_t value);
+INTDEF NOBLOCK void NOTHROW(CC libphys_pokephysw_unaligned)(physaddr_t addr, uint16_t value);
+INTDEF NOBLOCK void NOTHROW(CC libphys_pokephysl_unaligned)(physaddr_t addr, uint32_t value);
+INTDEF NOBLOCK void NOTHROW(CC libphys_pokephysq_unaligned)(physaddr_t addr, uint64_t value);
 /************************************************************************/
 
 
 
 /************************************************************************/
 /* Copy memory to/from/within the physical address space.               */
-INTDEF void CC libphys_copyfromphys(void *dst, PHYS physaddr_t src, size_t num_bytes) THROWS(E_SEGFAULT);
-INTDEF void CC libphys_copytophys(PHYS physaddr_t dst, void const *src, size_t num_bytes) THROWS(E_SEGFAULT);
-INTDEF NOBLOCK void NOTHROW(CC libphys_copyinphys)(PHYS physaddr_t dst, PHYS physaddr_t src, size_t num_bytes);
-INTDEF NOBLOCK void NOTHROW(CC libphys_memsetphys)(PHYS physaddr_t dst, int byte, size_t num_bytes);
+INTDEF void CC libphys_copyfromphys(void *dst, physaddr_t src, size_t num_bytes) THROWS(E_SEGFAULT);
+INTDEF void CC libphys_copytophys(physaddr_t dst, void const *src, size_t num_bytes) THROWS(E_SEGFAULT);
+INTDEF NOBLOCK void NOTHROW(CC libphys_copyinphys)(physaddr_t dst, physaddr_t src, size_t num_bytes);
+INTDEF NOBLOCK void NOTHROW(CC libphys_memsetphys)(physaddr_t dst, int byte, size_t num_bytes);
 /************************************************************************/
 
 
@@ -88,7 +88,7 @@ INTDEF NOBLOCK void NOTHROW(CC libphys_memsetphys)(PHYS physaddr_t dst, int byte
  * @return: * :         Base address of the newly created memory mapping.
  * @return: MAP_FAILED: Operation failed (s.a. `errno') */
 INTDEF NOBLOCK WUNUSED void *
-NOTHROW(CC libphys_mmapphys)(PHYS physaddr_t addr, size_t num_bytes);
+NOTHROW(CC libphys_mmapphys)(physaddr_t addr, size_t num_bytes);
 INTDEF NOBLOCK void
 NOTHROW(CC libphys_munmapphys)(void *base, size_t num_bytes);
 /************************************************************************/

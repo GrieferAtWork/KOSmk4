@@ -338,12 +338,12 @@ NOTHROW(FCALL p32_pagedir_gethint)(PAGEDIR_PAGEALIGNED VIRT void *addr);
  * @param: prot: A set of `PAGEDIR_PROT_*' detailing how memory should be mapped. */
 INTDEF NOBLOCK void
 NOTHROW(FCALL p32_pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                  PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
+                                  PAGEDIR_PAGEALIGNED physaddr_t phys,
                                   pagedir_prot_t prot);
 INTDEF NOBLOCK void
 NOTHROW(FCALL p32_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                PAGEDIR_PAGEALIGNED size_t num_bytes,
-                               PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
+                               PAGEDIR_PAGEALIGNED physaddr_t phys,
                                pagedir_prot_t prot);
 
 /* Special variants of `pagedir_mapone()' that should be used to
@@ -355,7 +355,7 @@ NOTHROW(FCALL p32_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
  * NOTE: If the page had been mapped, `pagedir_pop_mapone()' will automatically sync the page. */
 INTDEF NOBLOCK WUNUSED p32_pagedir_pushval_t
 NOTHROW(FCALL p32_pagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                       PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
+                                       PAGEDIR_PAGEALIGNED physaddr_t phys,
                                        pagedir_prot_t prot);
 INTDEF NOBLOCK void
 NOTHROW(FCALL p32_pagedir_pop_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
@@ -382,7 +382,7 @@ INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unmap_userspace)(void);
 INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unmap_userspace_nosync)(void);
 
 /* Translate a virtual address into its physical counterpart. */
-INTDEF NOBLOCK WUNUSED PHYS physaddr_t NOTHROW(FCALL p32_pagedir_translate)(VIRT void const *addr);
+INTDEF NOBLOCK WUNUSED physaddr_t NOTHROW(FCALL p32_pagedir_translate)(VIRT void const *addr);
 
 /* Check if the given page is mapped. */
 INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL p32_pagedir_ismapped)(VIRT void const *addr);

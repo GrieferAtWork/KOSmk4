@@ -767,7 +767,7 @@ INTERN_CONST ATTR_PAGING_READMOSTLY u32 const p32_pageprot_table[0x40] = {
 
 LOCAL NOBLOCK WUNUSED u32
 NOTHROW(FCALL p32_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                       PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
+                                       PAGEDIR_PAGEALIGNED physaddr_t phys,
                                        pagedir_prot_t prot) {
 	u32 result;
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
@@ -855,7 +855,7 @@ NOTHROW(FCALL p32_pagedir_gethint)(VIRT void *addr) {
  * @param: prot: A set of `PAGEDIR_PROT_*' detailing how memory should be mapped. */
 INTERN NOBLOCK void
 NOTHROW(FCALL p32_pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                  PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
+                                  PAGEDIR_PAGEALIGNED physaddr_t phys,
                                   pagedir_prot_t prot) {
 	u32 e1_word;
 	unsigned int vec2, vec1;
@@ -869,7 +869,7 @@ NOTHROW(FCALL p32_pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 INTERN NOBLOCK void
 NOTHROW(FCALL p32_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                PAGEDIR_PAGEALIGNED size_t num_bytes,
-                               PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
+                               PAGEDIR_PAGEALIGNED physaddr_t phys,
                                pagedir_prot_t prot) {
 	size_t i;
 	u32 e1_word;
@@ -895,7 +895,7 @@ NOTHROW(FCALL p32_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
  * NOTE: If the page had been mapped, `pagedir_pop_mapone()' will automatically sync the page. */
 INTERN NOBLOCK WUNUSED p32_pagedir_pushval_t
 NOTHROW(FCALL p32_pagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                       PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
+                                       PAGEDIR_PAGEALIGNED physaddr_t phys,
                                        pagedir_prot_t prot) {
 	u32 e1_word, result;
 	unsigned int vec2, vec1;
@@ -1047,7 +1047,7 @@ again_read_word:
 }
 
 /* Translate a virtual address into its physical counterpart. */
-INTERN NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(1) PHYS physaddr_t
+INTERN NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(1) physaddr_t
 NOTHROW(FCALL p32_pagedir_translate)(VIRT void const *addr) {
 	u32 word;
 	unsigned int vec2, vec1;

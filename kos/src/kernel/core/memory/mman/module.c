@@ -204,9 +204,9 @@ NOTHROW(FCALL module_section_getname_nx)(struct module_section *__restrict self)
 	return result;
 }
 
-PUBLIC WUNUSED NONNULL((1)) byte_t USER CHECKED *
+PUBLIC WUNUSED NONNULL((1)) USER CHECKED byte_t *
 NOTHROW(FCALL module_section_getaddr_nx)(struct module_section *__restrict self) {
-	byte_t USER CHECKED *result;
+	USER CHECKED byte_t *result;
 	NESTED_TRY {
 		result = module_section_getaddr(self);
 	} EXCEPT {

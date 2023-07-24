@@ -73,44 +73,44 @@ typedef uintptr_t pagedir_pushval_t;
  * - However any memory outside that region (or  any memory at all if no  such
  *   region is defined by the arch -- as is the case for `i386'), will need to
  *   be accessed through use of `THIS_TRAMPOLINE'! */
-FUNDEF NOBLOCK WUNUSED u8 NOTHROW(FCALL peekphysb)(PHYS physaddr_t addr);
-FUNDEF NOBLOCK WUNUSED u16 NOTHROW(FCALL peekphysw)(/*aligned(2)*/ PHYS physaddr_t addr);
-FUNDEF NOBLOCK WUNUSED u32 NOTHROW(FCALL peekphysl)(/*aligned(4)*/ PHYS physaddr_t addr);
-FUNDEF NOBLOCK WUNUSED u16 NOTHROW(FCALL peekphysw_unaligned)(PHYS physaddr_t addr);
-FUNDEF NOBLOCK WUNUSED u32 NOTHROW(FCALL peekphysl_unaligned)(PHYS physaddr_t addr);
-FUNDEF NOBLOCK void NOTHROW(FCALL pokephysb)(PHYS physaddr_t addr, u8 value);
-FUNDEF NOBLOCK void NOTHROW(FCALL pokephysw)(/*aligned(2)*/ PHYS physaddr_t addr, u16 value);
-FUNDEF NOBLOCK void NOTHROW(FCALL pokephysl)(/*aligned(4)*/ PHYS physaddr_t addr, u32 value);
-FUNDEF NOBLOCK void NOTHROW(FCALL pokephysw_unaligned)(PHYS physaddr_t addr, u16 value);
-FUNDEF NOBLOCK void NOTHROW(FCALL pokephysl_unaligned)(PHYS physaddr_t addr, u32 value);
+FUNDEF NOBLOCK WUNUSED u8 NOTHROW(FCALL peekphysb)(physaddr_t addr);
+FUNDEF NOBLOCK WUNUSED u16 NOTHROW(FCALL peekphysw)(/*aligned(2)*/ physaddr_t addr);
+FUNDEF NOBLOCK WUNUSED u32 NOTHROW(FCALL peekphysl)(/*aligned(4)*/ physaddr_t addr);
+FUNDEF NOBLOCK WUNUSED u16 NOTHROW(FCALL peekphysw_unaligned)(physaddr_t addr);
+FUNDEF NOBLOCK WUNUSED u32 NOTHROW(FCALL peekphysl_unaligned)(physaddr_t addr);
+FUNDEF NOBLOCK void NOTHROW(FCALL pokephysb)(physaddr_t addr, u8 value);
+FUNDEF NOBLOCK void NOTHROW(FCALL pokephysw)(/*aligned(2)*/ physaddr_t addr, u16 value);
+FUNDEF NOBLOCK void NOTHROW(FCALL pokephysl)(/*aligned(4)*/ physaddr_t addr, u32 value);
+FUNDEF NOBLOCK void NOTHROW(FCALL pokephysw_unaligned)(physaddr_t addr, u16 value);
+FUNDEF NOBLOCK void NOTHROW(FCALL pokephysl_unaligned)(physaddr_t addr, u32 value);
 #ifdef __UINT64_TYPE__
-FUNDEF NOBLOCK WUNUSED u64 NOTHROW(FCALL peekphysq)(/*aligned(8)*/ PHYS physaddr_t addr);
-FUNDEF NOBLOCK WUNUSED u64 NOTHROW(FCALL peekphysq_unaligned)(PHYS physaddr_t addr);
-FUNDEF NOBLOCK void NOTHROW(FCALL pokephysq)(/*aligned(8)*/ PHYS physaddr_t addr, u64 value);
-FUNDEF NOBLOCK void NOTHROW(FCALL pokephysq_unaligned)(PHYS physaddr_t addr, u64 value);
+FUNDEF NOBLOCK WUNUSED u64 NOTHROW(FCALL peekphysq)(/*aligned(8)*/ physaddr_t addr);
+FUNDEF NOBLOCK WUNUSED u64 NOTHROW(FCALL peekphysq_unaligned)(physaddr_t addr);
+FUNDEF NOBLOCK void NOTHROW(FCALL pokephysq)(/*aligned(8)*/ physaddr_t addr, u64 value);
+FUNDEF NOBLOCK void NOTHROW(FCALL pokephysq_unaligned)(physaddr_t addr, u64 value);
 #endif /* __UINT64_TYPE__ */
 
 /* I/O functions with physical buffers. */
 #ifdef __port_t
-FUNDEF NOBLOCK void NOTHROW(KCALL insphysb)(port_t port, PHYS physaddr_t addr, size_t num_bytes);
-FUNDEF NOBLOCK void NOTHROW(KCALL insphysw)(port_t port, /*aligned(2)*/ PHYS physaddr_t addr, size_t num_words);
-FUNDEF NOBLOCK void NOTHROW(KCALL insphysl)(port_t port, /*aligned(4)*/ PHYS physaddr_t addr, size_t num_dwords);
-FUNDEF NOBLOCK void NOTHROW(KCALL outsphysb)(port_t port, PHYS physaddr_t addr, size_t num_bytes);
-FUNDEF NOBLOCK void NOTHROW(KCALL outsphysw)(port_t port, /*aligned(2)*/ PHYS physaddr_t addr, size_t num_words);
-FUNDEF NOBLOCK void NOTHROW(KCALL outsphysl)(port_t port, /*aligned(4)*/ PHYS physaddr_t addr, size_t num_dwords);
+FUNDEF NOBLOCK void NOTHROW(KCALL insphysb)(port_t port, physaddr_t addr, size_t num_bytes);
+FUNDEF NOBLOCK void NOTHROW(KCALL insphysw)(port_t port, /*aligned(2)*/ physaddr_t addr, size_t num_words);
+FUNDEF NOBLOCK void NOTHROW(KCALL insphysl)(port_t port, /*aligned(4)*/ physaddr_t addr, size_t num_dwords);
+FUNDEF NOBLOCK void NOTHROW(KCALL outsphysb)(port_t port, physaddr_t addr, size_t num_bytes);
+FUNDEF NOBLOCK void NOTHROW(KCALL outsphysw)(port_t port, /*aligned(2)*/ physaddr_t addr, size_t num_words);
+FUNDEF NOBLOCK void NOTHROW(KCALL outsphysl)(port_t port, /*aligned(4)*/ physaddr_t addr, size_t num_dwords);
 #endif /* __port_t */
 
 /* Copy memory to/from/within the physical address space. */
 #ifdef __OMIT_PHYS_COPY_CONSTANT_P_WRAPPERS
-FUNDEF void KCALL copyfromphys(USER CHECKED void *dst, PHYS physaddr_t src, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL copytophys(PHYS physaddr_t dst, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF void KCALL copyfromphys(USER CHECKED void *dst, physaddr_t src, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF void KCALL copytophys(physaddr_t dst, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT);
 #else /* __OMIT_PHYS_COPY_CONSTANT_P_WRAPPERS */
-FUNDEF void KCALL __os_copyfromphys(USER CHECKED void *dst, PHYS physaddr_t src, size_t num_bytes) THROWS(E_SEGFAULT) ASMNAME("copyfromphys");
-FUNDEF void KCALL __os_copytophys(PHYS physaddr_t dst, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT) ASMNAME("copytophys");
+FUNDEF void KCALL __os_copyfromphys(USER CHECKED void *dst, physaddr_t src, size_t num_bytes) THROWS(E_SEGFAULT) ASMNAME("copyfromphys");
+FUNDEF void KCALL __os_copytophys(physaddr_t dst, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT) ASMNAME("copytophys");
 
 FORCELOCAL ATTR_ARTIFICIAL void KCALL
 copyfromphys(USER CHECKED void *dst,
-             PHYS physaddr_t src,
+             physaddr_t src,
              size_t num_bytes)
 		THROWS(E_SEGFAULT) {
 	if (__builtin_constant_p(num_bytes)) {
@@ -139,7 +139,7 @@ copyfromphys(USER CHECKED void *dst,
 }
 
 FORCELOCAL ATTR_ARTIFICIAL void KCALL
-copytophys(PHYS physaddr_t dst,
+copytophys(physaddr_t dst,
            USER CHECKED void const *src,
            size_t num_bytes)
 		THROWS(E_SEGFAULT) {
@@ -169,42 +169,42 @@ copytophys(PHYS physaddr_t dst,
 }
 #endif /* !__OMIT_PHYS_COPY_CONSTANT_P_WRAPPERS */
 
-FUNDEF NOBLOCK void NOTHROW(KCALL copyinphys)(PHYS physaddr_t dst, PHYS physaddr_t src, size_t num_bytes);
-FUNDEF NOBLOCK void NOTHROW(KCALL memsetphys)(PHYS physaddr_t dst, int byte, size_t num_bytes);
+FUNDEF NOBLOCK void NOTHROW(KCALL copyinphys)(physaddr_t dst, physaddr_t src, size_t num_bytes);
+FUNDEF NOBLOCK void NOTHROW(KCALL memsetphys)(physaddr_t dst, int byte, size_t num_bytes);
 /* Same as `memsetphys(dst, 0, num_bytes)', but includes a special optimization
  * where it will skip whole  physical pages when `page_iszero()' returns  true. */
-FUNDEF NOBLOCK void NOTHROW(KCALL bzerophyscc)(PHYS physaddr_t dst, size_t num_bytes);
+FUNDEF NOBLOCK void NOTHROW(KCALL bzerophyscc)(physaddr_t dst, size_t num_bytes);
 
 /* no-#PF variants of `copy(from|to)phys()'.
  * @return: 0 : The copy operation completed without any problems.
  * @return: * : The number of bytes that could not be transferred.
  *              The affected memory range is:
  *               - `(dst|src) + num_bytes - return ... (dst|src) + num_bytes - 1' */
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL copyfromphys_nopf)(USER CHECKED void *dst, PHYS physaddr_t src, size_t num_bytes);
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL copytophys_nopf)(PHYS physaddr_t dst, USER CHECKED void const *src, size_t num_bytes);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL copyfromphys_nopf)(USER CHECKED void *dst, physaddr_t src, size_t num_bytes);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL copytophys_nopf)(physaddr_t dst, USER CHECKED void const *src, size_t num_bytes);
 
 /* Same as the functions above, however all memory accesses are guarantied to happen within the same page.
  * In other words: `(PHYS & ~PAGEMASK) == ((PHYS + num_bytes - 1) & ~PAGEMASK)' */
-FUNDEF void KCALL copyfromphys_onepage(USER CHECKED void *dst, PHYS physaddr_t src, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL copytophys_onepage(PHYS physaddr_t dst, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void NOTHROW(KCALL copyinphys_onepage)(PHYS physaddr_t dst, PHYS physaddr_t src, size_t num_bytes);
-FUNDEF NOBLOCK void NOTHROW(KCALL memsetphys_onepage)(PHYS physaddr_t dst, int byte, size_t num_bytes);
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL copyfromphys_onepage_nopf)(USER CHECKED void *dst, PHYS physaddr_t src, size_t num_bytes);
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL copytophys_onepage_nopf)(PHYS physaddr_t dst, USER CHECKED void const *src, size_t num_bytes);
+FUNDEF void KCALL copyfromphys_onepage(USER CHECKED void *dst, physaddr_t src, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF void KCALL copytophys_onepage(physaddr_t dst, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF NOBLOCK void NOTHROW(KCALL copyinphys_onepage)(physaddr_t dst, physaddr_t src, size_t num_bytes);
+FUNDEF NOBLOCK void NOTHROW(KCALL memsetphys_onepage)(physaddr_t dst, int byte, size_t num_bytes);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL copyfromphys_onepage_nopf)(USER CHECKED void *dst, physaddr_t src, size_t num_bytes);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL copytophys_onepage_nopf)(physaddr_t dst, USER CHECKED void const *src, size_t num_bytes);
 
 /* Copy a whole page to/from physical memory. (s.a. `PAGESIZE') */
-FUNDEF void KCALL copypagefromphys(USER CHECKED void *dst, PAGEDIR_PAGEALIGNED PHYS physaddr_t src) THROWS(E_SEGFAULT);
-FUNDEF void KCALL copypagesfromphys(USER CHECKED void *dst, PAGEDIR_PAGEALIGNED PHYS physaddr_t src, PAGEDIR_PAGEALIGNED size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL copypagetophys(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst, USER CHECKED void const *src) THROWS(E_SEGFAULT);
-FUNDEF void KCALL copypagestophys(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst, USER CHECKED void const *src, PAGEDIR_PAGEALIGNED size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void NOTHROW(KCALL copypageinphys)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst, PAGEDIR_PAGEALIGNED PHYS physaddr_t src);
-FUNDEF NOBLOCK void NOTHROW(KCALL copypagesinphys)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst, PAGEDIR_PAGEALIGNED PHYS physaddr_t src, PAGEDIR_PAGEALIGNED size_t num_bytes);
-FUNDEF NOBLOCK void NOTHROW(KCALL memsetphyspage)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst, int byte);
-FUNDEF NOBLOCK void NOTHROW(KCALL memsetphyspages)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst, int byte, PAGEDIR_PAGEALIGNED size_t num_bytes);
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL copypagefromphys_nopf)(USER CHECKED void *dst, PAGEDIR_PAGEALIGNED PHYS physaddr_t src);
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL copypagesfromphys_nopf)(USER CHECKED void *dst, PAGEDIR_PAGEALIGNED PHYS physaddr_t src, PAGEDIR_PAGEALIGNED size_t num_bytes);
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL copypagetophys_nopf)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst, USER CHECKED void const *src);
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL copypagestophys_nopf)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst, USER CHECKED void const *src, PAGEDIR_PAGEALIGNED size_t num_bytes);
+FUNDEF void KCALL copypagefromphys(USER CHECKED void *dst, PAGEDIR_PAGEALIGNED physaddr_t src) THROWS(E_SEGFAULT);
+FUNDEF void KCALL copypagesfromphys(USER CHECKED void *dst, PAGEDIR_PAGEALIGNED physaddr_t src, PAGEDIR_PAGEALIGNED size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF void KCALL copypagetophys(PAGEDIR_PAGEALIGNED physaddr_t dst, USER CHECKED void const *src) THROWS(E_SEGFAULT);
+FUNDEF void KCALL copypagestophys(PAGEDIR_PAGEALIGNED physaddr_t dst, USER CHECKED void const *src, PAGEDIR_PAGEALIGNED size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF NOBLOCK void NOTHROW(KCALL copypageinphys)(PAGEDIR_PAGEALIGNED physaddr_t dst, PAGEDIR_PAGEALIGNED physaddr_t src);
+FUNDEF NOBLOCK void NOTHROW(KCALL copypagesinphys)(PAGEDIR_PAGEALIGNED physaddr_t dst, PAGEDIR_PAGEALIGNED physaddr_t src, PAGEDIR_PAGEALIGNED size_t num_bytes);
+FUNDEF NOBLOCK void NOTHROW(KCALL memsetphyspage)(PAGEDIR_PAGEALIGNED physaddr_t dst, int byte);
+FUNDEF NOBLOCK void NOTHROW(KCALL memsetphyspages)(PAGEDIR_PAGEALIGNED physaddr_t dst, int byte, PAGEDIR_PAGEALIGNED size_t num_bytes);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL copypagefromphys_nopf)(USER CHECKED void *dst, PAGEDIR_PAGEALIGNED physaddr_t src);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL copypagesfromphys_nopf)(USER CHECKED void *dst, PAGEDIR_PAGEALIGNED physaddr_t src, PAGEDIR_PAGEALIGNED size_t num_bytes);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL copypagetophys_nopf)(PAGEDIR_PAGEALIGNED physaddr_t dst, USER CHECKED void const *src);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL copypagestophys_nopf)(PAGEDIR_PAGEALIGNED physaddr_t dst, USER CHECKED void const *src, PAGEDIR_PAGEALIGNED size_t num_bytes);
 /************************************************************************/
 
 

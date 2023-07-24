@@ -404,7 +404,7 @@ DEFINE_SYSCALL5(errno_t, lfutexexpr,
 			syscall_ulong_t cond;
 			USER CHECKED LOCAL_uintptr_t *uaddr;
 			cond  = atomic_read(&iter->fe_condition);
-			uaddr = (USER UNCHECKED LOCAL_uintptr_t *)((byte_t USER UNCHECKED *)base +
+			uaddr = (USER UNCHECKED LOCAL_uintptr_t *)((USER UNCHECKED byte_t *)base +
 			                                           atomic_read(&iter->fe_offset));
 			/* !!! Don't use LOCAL_validate_readable here -- (base+fe_offset might produce large pointers) */
 			validate_readable(uaddr, sizeof(*uaddr));
@@ -445,7 +445,7 @@ DEFINE_SYSCALL5(errno_t, lfutexexpr,
 				size_t num_bytes = iter->fe_val2;
 				USER CHECKED void const *rhs;
 				int cmp;
-				rhs = (byte_t USER UNCHECKED *)base + iter->fe_val;
+				rhs = (USER UNCHECKED byte_t *)base + iter->fe_val;
 				COMPILER_READ_BARRIER();
 				/* !!! Don't use LOCAL_validate_readable here -- (base+fe_val might produce large pointers) */
 				rhs = validate_readable(rhs, num_bytes);

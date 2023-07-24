@@ -73,28 +73,6 @@ global final CVALUE_ASYMBOL = 0x0b; /* R-Value:    (T)&CSymbol.val[offset:offset
 global final CVALUE_LADDR   = 0x0c; /* L-Value: *(T *)offset */
 global final CVALUE_RADDR   = 0x0d; /* R-Value: *(T *)offset */
 
-global final PRETTY_NOTHROW_LEVEL_NAME: {int: string} = {
-	0 : "NOTHROW",
-	1 : "CHECKED",
-	2 : "BLOCKING",
-};
-function getPrettyNothrowLevelName(level: int | string): string {
-	if (level !is int) {
-		if (level.startswith("*")) {
-			if (level == "*0")
-				return "NOTHROW_NCX";
-			goto fallback;
-		}
-		level = int(level);
-	}
-	local result = PRETTY_NOTHROW_LEVEL_NAME.get(level);
-	if (result !is none)
-		return result;
-fallback:
-	return f"__attribute__((nothrow({level})))";
-}
-
-
 #if 0
 global final CVALUE_KINDNAME: {int: string} = {
 	CVALUE_LVOID   : "LVOID",
@@ -361,7 +339,11 @@ final class CValue {
 				local newPointerBase: CTypeRef = newTyp.base;
 				local oldNothrowLevel: string | none = oldPointerBase.attribNothrow;
 				local newNothrowLevel: string | none = newPointerBase.attribNothrow;
-				if (newPointerBase.typ is CFunctionType) {
+				if (newPointerBase.flags & CTYPEREF_FLAG_NODEREF) {
+					/* If the target pointer type says that it will never dereference the
+					 * pointer, then it won't matter if nothrow levels don't match or any
+					 * other problems like that. */
+				} else if (newPointerBase.typ is CFunctionType) {
 					/* When casting to a function type, things are different. */
 					if (oldPointerBase.typ !is CFunctionType) {
 						/* Cast  from   non-function-pointer   to   function-pointer.

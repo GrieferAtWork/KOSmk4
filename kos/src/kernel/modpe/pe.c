@@ -404,7 +404,7 @@ done_bss:
 	} /* Scope (for `mbuilder_fini()') */
 
 	{
-		byte_t USER CHECKED *stack_end;
+		USER CHECKED byte_t *stack_end;
 		REF struct mman *oldmman = THIS_MMAN;
 		struct icpustate *state;
 
@@ -418,7 +418,7 @@ done_bss:
 			void *entrypoint;
 			/* Pass important information onto the stack
 			 * and set-up the user-space register state. */
-			stack_end = (byte_t USER CHECKED *)stack_base + USER_STACK_SIZE;
+			stack_end = (USER CHECKED byte_t *)stack_base + USER_STACK_SIZE;
 #ifdef __x86_64__
 #define PUSHP(val)                                                                        \
 	(stack_end -= sizeof_pointer,                                                         \

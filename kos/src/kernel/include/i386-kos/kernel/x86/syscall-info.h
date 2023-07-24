@@ -209,13 +209,13 @@ NOTHROW(FCALL rpc_syscall_info_get32_lcall7_ucpustate_nx)(struct rpc_syscall_inf
 	/* NOTE: By  being  a program  counter from  user-space, PC
 	 *       is  implicitly checked by the fact that user-space
 	 *       will have invoked the instruction from user-space. */
-	byte_t USER CHECKED const *pc;
+	USER CHECKED byte_t const *pc;
 	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_LCALL7_32;
 	if (ucpustate_getpflags(state) & EFLAGS_DF)
 		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	self->rsi_sysno = gpregs_getpax(&state->ucs_gpregs);
 	/* lcall $7, $? -- { 0x9a, ?, ?, ?, ?, 0x07, 0x00 } */
-	pc = (byte_t USER CHECKED const *)ucpustate_getpc(state);
+	pc = (USER CHECKED byte_t const *)ucpustate_getpc(state);
 	if (__hybrid_unaligned_getle8(pc - 7) == 0x9a &&
 		__hybrid_unaligned_getle16(pc - 2) == 0x0007) {
 		/* This really is an lcall7 instruction */

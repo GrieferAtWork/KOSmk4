@@ -471,7 +471,7 @@ internal_error:
 }
 
 
-PRIVATE void KCALL reset_heap(void) {
+PRIVATE void NOTHROW(KCALL reset_heap)(void) {
 	/* Reset the static heap. */
 	memset(&static_heap, 0xcc, offsetof(struct sheap, sh_heap));
 	static_heap.sh_link.sle_next = NULL;
@@ -486,7 +486,7 @@ PRIVATE void KCALL reset_heap(void) {
 	freemem.slh_first->fr_size = sizeof(static_heap.sh_heap);
 }
 
-PRIVATE void KCALL clear_heap(void) {
+PRIVATE void NOTHROW(KCALL clear_heap)(void) {
 	if (kernel_poisoned())
 		return; /* Don't touch the kernel MMan after poison */
 
@@ -512,7 +512,7 @@ PRIVATE void KCALL clear_heap(void) {
 		/* Because the part should be NULL, the node shouldn't
 		 * be  apart  of  the  kernel  mman's  writable  list! */
 		printk(KERN_DEBUG "[dbx] Remove extension node %p-%p\n",
-			   mnode_getminaddr(&pred->sh_node),
+		       mnode_getminaddr(&pred->sh_node),
 		       mnode_getmaxaddr(&pred->sh_node));
 		mman_mappings_removenode(&mman_kernel, &pred->sh_node);
 		pred->sh_link.sle_next = NULL;
@@ -523,14 +523,14 @@ PRIVATE void KCALL clear_heap(void) {
 }
 
 
-INTERN void KCALL dbx_heap_init(void) {
+INTERN void NOTHROW(KCALL dbx_heap_init)(void) {
 	reset_heap();
 }
-INTERN void KCALL dbx_heap_reset(void) {
+INTERN void NOTHROW(KCALL dbx_heap_reset)(void) {
 	clear_heap();
 	reset_heap();
 }
-INTERN void KCALL dbx_heap_fini(void) {
+INTERN void NOTHROW(KCALL dbx_heap_fini)(void) {
 	clear_heap();
 }
 

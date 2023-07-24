@@ -26,7 +26,18 @@ import ctypes;
 
 #define IDENTICAL(a, b) (type(a) === type(b) && ((a) == (b)))
 
-global CTypeRef;
+global CPointerType;
+global CFunctionType;
+
+global C_INT;
+global C_LONG;
+global C_LLONG;
+global C_UNSIGNED;
+global C_NUMERIC;
+
+global C_void;
+
+
 class CType: WeakRefAble {
 	operator == (other) { return other is CType; }
 	operator != (other) { return other !is CType; }
@@ -41,6 +52,9 @@ class CType: WeakRefAble {
 	function isConvertibleTo(other: CType, explicit: bool = false): bool {
 		return IDENTICAL(this, other);
 	}
+
+	@@Fix nonsensical attributes an warn where their presence is a user-error.
+	function fixNonsensicalAttributes(checker: Checker) {}
 }
 
 global final CTYPEREF_FLAG_CONST    = 0x0001;
@@ -63,9 +77,6 @@ global final CTYPEREF_FLAG_FORCE = 0x4000;
 
 @@Used during creation of struct objects.
 global final CTYPEREF_FLAG_PACKED = 0x8000;
-
-@@Attribute flags that have no meaning for pointers and should be moved when encountered on one
-global final CTYPEREF_FLAG_NON_POINTER = CTYPEREF_FLAG_NORETURN | CTYPEREF_FLAG_PACKED;
 
 
 /* Special THROWS error codes. */
@@ -95,15 +106,66 @@ function simplifyThrowsSet(throws: Set with int): Set with int {
 }
 
 
+/* Attributes that are nonsensical for:
+ * CTYPEATTRIBUTES_NONSENSE_PTRBASE_FUNCTION: int __attribute__((...)) (*foo)(...);
+ * CTYPEATTRIBUTES_NONSENSE_PTRBASE_REGULAR:  int __attribute__((...)) *foo;
+ * CTYPEATTRIBUTES_NONSENSE_FUNCTION:         int __attribute__((...)) foo(...);
+ * CTYPEATTRIBUTES_NONSENSE_REGULAR:          int __attribute__((...)) foo;
+ */
+global final CTYPEATTRIBUTES_NONSENSE_PTRBASE_FUNCTION: {string...} = { "aligned" };
+global final CTYPEATTRIBUTES_NONSENSE_PTRBASE_REGULAR: {string...} = { "tags", "requireCallerTags", "aligned", "throws" };
+global final CTYPEATTRIBUTES_NONSENSE_FUNCTION: {string...} = { "aligned" };
+global final CTYPEATTRIBUTES_NONSENSE_REGULAR: {string...} = { "nothrow", "tags", "requireCallerTags", "throws" };
+
+global final CTYPEREF_FLAG_NONSENSE_FUNCTION =
+	CTYPEREF_FLAG_CONST | CTYPEREF_FLAG_VOLATILE | CTYPEREF_FLAG_DEREF |
+	CTYPEREF_FLAG_NODEREF | CTYPEREF_FLAG_FORCE | CTYPEREF_FLAG_PACKED;
+global final CTYPEREF_FLAG_NONSENSE_POINTER =
+	CTYPEREF_FLAG_DEREF | CTYPEREF_FLAG_NODEREF | CTYPEREF_FLAG_FORCE |
+	CTYPEREF_FLAG_NORETURN;
+global final CTYPEREF_FLAG_NONSENSE_REGULAR =
+	CTYPEREF_FLAG_DEREF | CTYPEREF_FLAG_NODEREF | CTYPEREF_FLAG_FORCE |
+	CTYPEREF_FLAG_NORETURN | CTYPEREF_FLAG_RESTRICT;
+global final CTYPEREF_FLAG_NONSENSE_PTRBASE_FUNCTION = CTYPEREF_FLAG_PACKED;
+global final CTYPEREF_FLAG_NONSENSE_PTRBASE_REGULAR = CTYPEREF_FLAG_NORETURN | CTYPEREF_FLAG_PACKED;
+
+
+global final PRETTY_NOTHROW_LEVEL_NAME: {int: string} = {
+	0 : "NOTHROW",
+	1 : "CHECKED",
+	2 : "BLOCKING",
+};
+function getPrettyNothrowLevelName(level: int | string): string {
+	if (level !is int) {
+		if (level.startswith("*")) {
+			if (level == "*0")
+				return "NOTHROW_NCX";
+			goto fallback;
+		}
+		level = int(level);
+	}
+	local result = PRETTY_NOTHROW_LEVEL_NAME.get(level);
+	if (result !is none)
+		return result;
+fallback:
+	return f"__attribute__((nothrow({level})))";
+}
+
+
 final class CTypeAttributes {
 	this = default;
+
 	public member nothrow: string | none = none;
 	public member tags: Set with string | none = none;
 	public member requireCallerTags: Set with string | none = none;
 	public member aligned: int | none = none;
 	public member throws: Set with int | none = none;
+	// TODO: "nonnull"
 
 	// TODO: "format": Verify KOS-extended printf-format string argument types
+	// NOTE: Based on this, dynamically create varargs function parameter types (including annotations):
+	//       >> printf("foo = %s", p); // int printf(char const *, char const *);
+	//       >> printf("foo = %p", p); // int printf(char const *, void [[noderef]] const volatile *);
 
 	public function importFrom(other: CTypeAttributes) {
 		if (nothrow is none) {
@@ -147,8 +209,8 @@ final class CTypeAttributes {
 			"nothrowInheritable",
 			"throws",
 			"throwsInheritable",
-			"tag",
-			"requireCallerTag",
+			"tags",
+			"requireCallerTags",
 			"aligned",
 		}) {
 			local myVal = this.operator . (attrib);
@@ -168,7 +230,6 @@ final class CTypeAttributes {
 }
 
 
-global C_void;
 final class CTypeRef {
 	this = default;
 	@@NOTE: Might point  to a  weakref in  order to  prevent
@@ -290,13 +351,13 @@ final class CTypeRef {
 
 	@@Move attributes that have no meaning for pointers to @dst
 	function moveNonPointerAttributes(dst: CTypeRef) {
-		if (flags & CTYPEREF_FLAG_NON_POINTER) {
-			dst.flags |= flags & CTYPEREF_FLAG_NON_POINTER;
-			flags &= ~CTYPEREF_FLAG_NON_POINTER;
+		if (flags & CTYPEREF_FLAG_NONSENSE_PTRBASE_REGULAR) {
+			dst.flags |= flags & CTYPEREF_FLAG_NONSENSE_PTRBASE_REGULAR;
+			flags &= ~CTYPEREF_FLAG_NONSENSE_PTRBASE_REGULAR;
 		}
 		local attrib: CTypeAttributes | none = this.attrib;
 		if (attrib !is none) {
-			for (local moveAttrib: { "tags", "requireCallerTags", "aligned", "throws" }) {
+			for (local moveAttrib: CTYPEATTRIBUTES_NONSENSE_PTRBASE_REGULAR) {
 				local value = attrib.operator . (moveAttrib);
 				if (value !is none) {
 					dst.requireAttrib.operator . (moveAttrib) = value;
@@ -304,6 +365,139 @@ final class CTypeRef {
 				}
 			}
 		}
+	}
+
+	@@Warn about the presence of nonsensical attributes being present based on @typ
+	@@e.g. `__attribute((noreturn)) int i;`
+	function fixNonsensicalAttributes(checker: Checker) {
+		local typ: CType = this.typ;
+		local attrib: CTypeAttributes | none = this.attrib;
+		local shouldWarn: CTypeRef | none = none;
+		if (typ is CFunctionType) {
+			/* If the function returns a pointer, the function attributes may
+			 * have been parsed in the  context of that pointer's base  type:
+			 * >> __attribute__((tag("MyTag"))) void *foo(void);
+			 *
+			 * By default, this is parsed as:
+			 * >> void __attribute__((tag("MyTag"))) *(foo)(void);
+			 *
+			 * But we want to change this to become:
+			 * >> void *(__attribute__((tag("MyTag"))) foo)(void);
+			 */
+			local functionReturnType: CType = typ.returnType;
+			if (functionReturnType is CPointerType) {
+				local innerMostReturnPointerBaseTypeRef: CTypeRef;
+				innerMostReturnPointerBaseTypeRef = functionReturnType.base;
+				while (innerMostReturnPointerBaseTypeRef.typ is CPointerType)
+					innerMostReturnPointerBaseTypeRef = innerMostReturnPointerBaseTypeRef.typ.base;
+				innerMostReturnPointerBaseTypeRef.moveNonPointerAttributes(this);
+			}
+			if (flags & CTYPEREF_FLAG_NONSENSE_FUNCTION) {
+				shouldWarn = copy this;
+				flags &= ~CTYPEREF_FLAG_NONSENSE_FUNCTION;
+			}
+			if (attrib !is none) {
+				for (local nonSenseAttrib: CTYPEATTRIBUTES_NONSENSE_FUNCTION) {
+					if (attrib.operator . (nonSenseAttrib) !is none) {
+						if (shouldWarn is none)
+							shouldWarn = copy this;
+						attrib.operator . (nonSenseAttrib) = none;
+					}
+				}
+			}
+		} else {
+			if (typ is CPointerType) {
+				if (flags & CTYPEREF_FLAG_NONSENSE_POINTER) {
+					shouldWarn = copy this;
+					flags &= ~CTYPEREF_FLAG_NONSENSE_POINTER;
+				}
+			} else {
+				if (flags & CTYPEREF_FLAG_NONSENSE_REGULAR) {
+					shouldWarn = copy this;
+					flags &= ~CTYPEREF_FLAG_NONSENSE_REGULAR;
+				}
+			}
+			if (attrib !is none) {
+				for (local nonSenseAttrib: CTYPEATTRIBUTES_NONSENSE_REGULAR) {
+					if (attrib.operator . (nonSenseAttrib) !is none) {
+						if (shouldWarn is none)
+							shouldWarn = copy this;
+						attrib.operator . (nonSenseAttrib) = none;
+					}
+				}
+			}
+		}
+		if (shouldWarn !is none) {
+			checker.warn("-Wattribute",
+				f"Nonsensical attributes in `{shouldWarn}'");
+		}
+		typ.fixNonsensicalAttributes(checker);
+	}
+
+	@@Same as @fixNonsensicalAttributes, but called when @this @CTypeRef is the base of a @CPointerType
+	function fixNonsensicalPointerBaseAttributes(checker: Checker) {
+		local typ: CType = this.typ;
+		local attrib: CTypeAttributes | none = this.attrib;
+		local shouldWarn: CTypeRef | none = none;
+		if (typ is CFunctionType) {
+			/* If the function returns a pointer, the function attributes may
+			 * have been parsed in the  context of that pointer's base  type:
+			 * >> __attribute__((tag("MyTag"))) void *foo(void);
+			 *
+			 * By default, this is parsed as:
+			 * >> void __attribute__((tag("MyTag"))) *(foo)(void);
+			 *
+			 * But we want to change this to become:
+			 * >> void *(__attribute__((tag("MyTag"))) foo)(void);
+			 */
+			local functionReturnType: CType = typ.returnType;
+			if (functionReturnType is CPointerType) {
+				local innerMostReturnPointerBaseTypeRef: CTypeRef;
+				innerMostReturnPointerBaseTypeRef = functionReturnType.base;
+				while (innerMostReturnPointerBaseTypeRef.typ is CPointerType)
+					innerMostReturnPointerBaseTypeRef = innerMostReturnPointerBaseTypeRef.typ.base;
+				innerMostReturnPointerBaseTypeRef.moveNonPointerAttributes(this);
+			}
+			if (flags & CTYPEREF_FLAG_NONSENSE_PTRBASE_FUNCTION) {
+				shouldWarn = copy this;
+				flags &= ~CTYPEREF_FLAG_NONSENSE_PTRBASE_FUNCTION;
+			}
+			if (attrib !is none) {
+				for (local nonSenseAttrib: CTYPEATTRIBUTES_NONSENSE_PTRBASE_FUNCTION) {
+					if (attrib.operator . (nonSenseAttrib) !is none) {
+						if (shouldWarn is none)
+							shouldWarn = copy this;
+						attrib.operator . (nonSenseAttrib) = none;
+					}
+				}
+			}
+		} else {
+			if (flags & CTYPEREF_FLAG_NONSENSE_PTRBASE_REGULAR) {
+				shouldWarn = copy this;
+				flags &= ~CTYPEREF_FLAG_NONSENSE_PTRBASE_REGULAR;
+			}
+			if (attrib !is none) {
+				for (local nonSenseAttrib: CTYPEATTRIBUTES_NONSENSE_PTRBASE_REGULAR) {
+					if (attrib.operator . (nonSenseAttrib) !is none) {
+						if (shouldWarn is none)
+							shouldWarn = copy this;
+						attrib.operator . (nonSenseAttrib) = none;
+					}
+				}
+				local nothrow: string | none = attrib.nothrow;
+				if (nothrow.startswith("*")) {
+					/* Inheriting nothrow attributes are not allowed on regular pointer types. */
+					checker.warn("-Wattribute",
+						f"`__attribute__((nothrow(*)))' cannot be "
+						f"used on pointer-to-non-function `{this}'");
+					attrib.nothrow = nothrow.lstrip("*");
+				}
+			}
+		}
+		if (shouldWarn !is none) {
+			checker.warn("-Wattribute", f"Nonsensical attributes in `{CPointerType(shouldWarn)}'");
+		}
+		typ.fixNonsensicalAttributes(checker);
 	}
 
 	function isConvertibleTo(other: CTypeRef, explicit: bool = false): bool {
@@ -331,11 +525,13 @@ final class CTypeRef {
 			varname = f"volatile {varname}";
 		if (flags & CTYPEREF_FLAG_CONST)
 			varname = f"const {varname}";
-		if (flags & CTYPEREF_FLAG_NODEREF)
-			varname = f"__attribute__((noderef)) {varname}";
 		local attributeValues: {string...} = [];
 		if (flags & CTYPEREF_FLAG_NODEREF)
 			attributeValues.append("noderef");
+		if (flags & CTYPEREF_FLAG_FORCE)
+			attributeValues.append("force");
+		if (flags & CTYPEREF_FLAG_NORETURN)
+			attributeValues.append("noreturn");
 		if (attrib !is none) {
 			local temp = attrib.nothrow;
 			if (temp !is none)
@@ -348,19 +544,25 @@ final class CTypeRef {
 				);
 				attributeValues.append(f"throws({", ".join(throwsCodes.sorted())})");
 			}
-			local temp = attrib.tag;
-			if (temp)
-				attributeValues.append(f"tag({repr temp})");
-			local temp = attrib.requireCallerTag;
-			if (temp)
-				attributeValues.append(f"require_caller_tag({repr temp})");
+			local temp = attrib.tags;
+			if (temp) {
+				attributeValues.append(f"tag({
+					', '.join(for (local x: temp.sorted()) repr x)
+				})");
+			}
+			local temp = attrib.requireCallerTags;
+			if (temp) {
+				attributeValues.append(f"require_caller_tag({
+					', '.join(for (local x: temp.sorted()) repr x)
+				})");
+			}
 			local temp = attrib.aligned;
 			if (temp !is none)
 				attributeValues.append(f"aligned({temp})");
 		}
 		if (attributeValues)
 			varname = f"__attribute__(({", ".join(attributeValues)})) {varname}";
-		return typ.tostr(varname);
+		return typ.tostr(varname.rstrip());
 	}
 
 	@@Used to implement the `__builtin_has_attribute' function
@@ -400,7 +602,6 @@ function cTypeRefWithCommonAttrib(self: CTypeRef, other: CTypeRef): CTypeRef {
 
 
 
-global C_NUMERIC;
 class CCoreType: CType {
 	this = default;
 	public member name: string;
@@ -421,12 +622,6 @@ class CCoreType: CType {
 	// public function poke(checker: Checker, data: Bytes, offset: int, value: int | float);
 	// public function bytes(checker: Checker, value: int | float): Bytes;
 }
-
-global CPointerType;
-global C_INT;
-global C_LONG;
-global C_LLONG;
-global C_UNSIGNED;
 
 final class CCoreIntType: CCoreType {
 	public member signed: bool;
@@ -728,7 +923,12 @@ global final C_UNSIGNED: {CCoreType: CCoreType} = UniqueDict.Frozen({
 
 class CPointerType: CType {
 	this = default;
+
+	@@Pointer base type.
 	public member base: CTypeRef;
+	function fixNonsensicalAttributes(checker: Checker)
+		-> base.fixNonsensicalPointerBaseAttributes(checker);
+
 	function tostr(varname: string = ""): string {
 		return base.tostr("*" + varname);
 	}
@@ -956,6 +1156,8 @@ final class CFunctionType: CType {
 	public property sizeof: int = { get(): int -> 0; };
 	public property alignof: int = { get(): int -> 1; };
 
+	function fixNonsensicalAttributes(checker: Checker)
+		-> returnType.fixNonsensicalAttributes(checker);
 	public operator hash(): int -> hash(returnType, isVarArgs, args.each.first);
 	public operator == (other: CFunctionType) ->
 		other is CFunctionType &&
@@ -1060,6 +1262,10 @@ final class CArrayType: CType {
 	public member stride: int;
 	public property sizeof: int = { get(): int -> dim is none ? 0 : base.sizeof * dim; };
 	public property alignof: int = { get(): int -> base.alignof; };
+
+	function fixNonsensicalAttributes(checker: Checker)
+		-> base.fixNonsensicalAttributes(checker);
+
 	function tostr(varname: string = ""): string {
 		if (varname.startswith("*") || " " in varname)
 			varname = f"({varname})";

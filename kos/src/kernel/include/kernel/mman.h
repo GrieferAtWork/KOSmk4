@@ -127,7 +127,7 @@ struct mman {
 	void const         *_mm_wrlockpc;    /* [lock(mm_lock)] Write-lock program counter. */
 #endif /* CONFIG_KERNEL_MMAN_TRACES_LOCKPC */
 	RBTREE_ROOT(mnode)   mm_mappings;    /* [owned][0..n][lock(mm_lock)] Known file mappings. */
-	PHYS pagedir_phys_t  mm_pagedir_p;   /* [1..1][const] Physical pointer of the page directory */
+	pagedir_phys_t       mm_pagedir_p;   /* [1..1][const] Physical pointer of the page directory */
 	struct mnode_list    mm_writable;    /* [0..n][lock(mm_lock)] List of nodes that contain writable mappings. */
 	struct task_list     mm_threads;     /* [0..n][lock(!PREEMPTION && SMP_LOCK(mm_threadslock))] */
 #ifndef CONFIG_NO_SMP

@@ -68,7 +68,7 @@ DECL_BEGIN
 #ifndef __iov_entry_defined
 #define __iov_entry_defined
 struct iov_entry {
-	byte_t USER CHECKED *ive_base; /* [?..ive_size] Virtual base address of the buffer. */
+	USER CHECKED byte_t *ive_base; /* [?..ive_size] Virtual base address of the buffer. */
 	size_t               ive_size; /* Buffer size of `ive_base' (in bytes) */
 };
 #endif /* !__iov_entry_defined */
@@ -82,7 +82,7 @@ struct iov_buffer {
 #define iov_buffer_initone(self, base, size)                   \
 	((self)->iv_entc          = 1,                             \
 	 (self)->iv_entv          = &(self)->iv_head,              \
-	 (self)->iv_head.ive_base = (byte_t USER CHECKED *)(base), \
+	 (self)->iv_head.ive_base = (USER CHECKED byte_t *)(base), \
 	 (self)->iv_head.ive_size = (size),                        \
 	 (self)->iv_last          = (size))
 
@@ -107,7 +107,7 @@ struct iov_physbuffer {
 #define iov_physbuffer_initone(self, base, size)               \
 	((self)->iv_entc          = 1,                             \
 	 (self)->iv_entv          = &(self)->iv_head,              \
-	 (self)->iv_head.ive_base = (byte_t USER CHECKED *)(base), \
+	 (self)->iv_head.ive_base = (USER CHECKED byte_t *)(base), \
 	 (self)->iv_head.ive_size = (size),                        \
 	 (self)->iv_last          = (size))
 

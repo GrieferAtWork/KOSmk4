@@ -4848,7 +4848,7 @@ got_ARM_exidx:
 
 PRIVATE WUNUSED NONNULL((1)) struct mnode *FCALL
 create_mnode_for_phdr(ElfW(Phdr) const *__restrict phdr,
-                      byte_t USER CHECKED const *base, size_t num_bytes,
+                      USER CHECKED byte_t const *base, size_t num_bytes,
                       struct path *drv_fspath, struct fdirent *drv_fsname)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT) {
 	struct mnode *node;
@@ -4966,7 +4966,7 @@ create_mnode_for_phdr(ElfW(Phdr) const *__restrict phdr,
  * loaded driver that matches the `DT_SONAME' attribute found within
  * the given data-blob) */
 PRIVATE BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
-driver_create(byte_t USER CHECKED const *base, size_t num_bytes,
+driver_create(USER CHECKED byte_t const *base, size_t num_bytes,
               struct mfile *drv_file, struct path *drv_fspath,
               struct fdirent *drv_fsname,
               USER CHECKED char const *drv_cmdline,
@@ -5575,7 +5575,7 @@ driver_loadmod_blob(USER CHECKED void const *base, size_t num_bytes,
 	REF struct driver *result;
 
 	/* Try to create a driver from the given blob. */
-	result = driver_create((byte_t USER CHECKED const *)base,
+	result = driver_create((USER CHECKED byte_t const *)base,
 	                       num_bytes, NULL, NULL, NULL,
 	                       driver_cmdline, pnew_driver_loaded);
 	return result;

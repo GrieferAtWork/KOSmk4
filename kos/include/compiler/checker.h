@@ -276,8 +276,8 @@
 
 #define __ATTR_USER             __checker_attribute__(__nothrow__(1))
 #define __ATTR_UNCHECKED        __checker_attribute__(__noderef__, __nothrow__(1))
-#define __ATTR_PHYS             __checker_attribute__(__noderef__, __nothrow__(1)) /* Physical pointer, only for arithmetic */
-#define __ATTR_VIRT             __checker_attribute__(__noderef__, __nothrow__(1)) /* Virtual pointer, only for arithmetic */
+#define __ATTR_PHYS             __checker_attribute__(__noderef__) /* Physical pointer, only for arithmetic */
+#define __ATTR_VIRT             __checker_attribute__(__noderef__) /* Virtual pointer, only for arithmetic */
 #define __ATTR_CHECKED          __checker_attribute__(__deref__, __nothrow__(1))
 #define __ATTR_BLOCKING         __checker_attribute__(__throws__(E_INTERRUPT))
 #define __ATTR_BLOCKING_IF(...) __checker_attribute__(__throws__(E_INTERRUPT)) /* XXX: Condition */

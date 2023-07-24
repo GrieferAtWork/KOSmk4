@@ -1575,7 +1575,7 @@ print_bytes(pformatprinter printer, void *arg,
 	size_t i;
 	for (i = 0; i < len; ++i) {
 		byte_t b;
-		b = ((byte_t USER CHECKED const *)buf)[i];
+		b = ((USER CHECKED byte_t const *)buf)[i];
 		if (i != 0)
 			PRINT("," SYNSPACE);
 		PRINTF("%#.2" PRIx8, b);
@@ -3496,12 +3496,12 @@ print_sockaddr(pformatprinter printer, void *arg,
                socklen_t len) {
 	ssize_t temp, result = 0;
 	sa_family_t family = AF_UNSPEC;
-	byte_t USER CHECKED const *payload_data;
+	USER CHECKED byte_t const *payload_data;
 	size_t payload_len = 0;
 #ifdef HAVE_SYNFIELD
 	char const *family_prefix;
 #endif /* HAVE_SYNFIELD */
-	payload_data = (byte_t USER CHECKED const *)sa + offsetafter(struct sockaddr, sa_family);
+	payload_data = (USER CHECKED byte_t const *)sa + offsetafter(struct sockaddr, sa_family);
 	if likely(len >= offsetafter(struct sockaddr, sa_family)) {
 		payload_len = len - offsetafter(struct sockaddr, sa_family);
 		family      = sa->sa_family;

@@ -86,7 +86,7 @@ PRIVATE void NOTHROW(CC openmem)(void) {
 /************************************************************************/
 /* Low-level physical memory read/write primitives.                     */
 INTERN NOBLOCK WUNUSED uint8_t
-NOTHROW(CC libphys_peekphysb)(PHYS physaddr_t addr) {
+NOTHROW(CC libphys_peekphysb)(physaddr_t addr) {
 	uint8_t result;
 	WITHMEM(pread64(dev_mem, &result, sizeof(result),
 	                (pos64_t)addr) == sizeof(result),
@@ -95,7 +95,7 @@ NOTHROW(CC libphys_peekphysb)(PHYS physaddr_t addr) {
 }
 
 INTERN NOBLOCK WUNUSED uint16_t
-NOTHROW(CC libphys_peekphysw)(/*aligned(2)*/ PHYS physaddr_t addr) {
+NOTHROW(CC libphys_peekphysw)(/*aligned(2)*/ physaddr_t addr) {
 	uint16_t result;
 	WITHMEM(pread64(dev_mem, &result, sizeof(result),
 	                (pos64_t)addr) == sizeof(result),
@@ -104,7 +104,7 @@ NOTHROW(CC libphys_peekphysw)(/*aligned(2)*/ PHYS physaddr_t addr) {
 }
 
 INTERN NOBLOCK WUNUSED uint32_t
-NOTHROW(CC libphys_peekphysl)(/*aligned(4)*/ PHYS physaddr_t addr) {
+NOTHROW(CC libphys_peekphysl)(/*aligned(4)*/ physaddr_t addr) {
 	uint32_t result;
 	WITHMEM(pread64(dev_mem, &result, sizeof(result),
 	                (pos64_t)addr) == sizeof(result),
@@ -113,7 +113,7 @@ NOTHROW(CC libphys_peekphysl)(/*aligned(4)*/ PHYS physaddr_t addr) {
 }
 
 INTERN NOBLOCK WUNUSED uint64_t
-NOTHROW(CC libphys_peekphysq)(/*aligned(8)*/ PHYS physaddr_t addr) {
+NOTHROW(CC libphys_peekphysq)(/*aligned(8)*/ physaddr_t addr) {
 	uint64_t result;
 	WITHMEM(pread64(dev_mem, &result, sizeof(result),
 	                (pos64_t)addr) == sizeof(result),
@@ -127,28 +127,28 @@ DEFINE_INTERN_ALIAS(libphys_peekphysq_unaligned, libphys_peekphysq);
 
 
 INTERN NOBLOCK void
-NOTHROW(CC libphys_pokephysb)(PHYS physaddr_t addr, uint8_t value) {
+NOTHROW(CC libphys_pokephysb)(physaddr_t addr, uint8_t value) {
 	WITHMEM(pwrite64(dev_mem, &value, sizeof(value),
 	                 (pos64_t)addr) == sizeof(value),
 	        (void)0);
 }
 
 INTERN NOBLOCK void
-NOTHROW(CC libphys_pokephysw)(/*aligned(2)*/ PHYS physaddr_t addr, uint16_t value) {
+NOTHROW(CC libphys_pokephysw)(/*aligned(2)*/ physaddr_t addr, uint16_t value) {
 	WITHMEM(pwrite64(dev_mem, &value, sizeof(value),
 	                 (pos64_t)addr) == sizeof(value),
 	        (void)0);
 }
 
 INTERN NOBLOCK void
-NOTHROW(CC libphys_pokephysl)(/*aligned(4)*/ PHYS physaddr_t addr, uint32_t value) {
+NOTHROW(CC libphys_pokephysl)(/*aligned(4)*/ physaddr_t addr, uint32_t value) {
 	WITHMEM(pwrite64(dev_mem, &value, sizeof(value),
 	                 (pos64_t)addr) == sizeof(value),
 	        (void)0);
 }
 
 INTERN NOBLOCK void
-NOTHROW(CC libphys_pokephysq)(/*aligned(8)*/ PHYS physaddr_t addr, uint64_t value) {
+NOTHROW(CC libphys_pokephysq)(/*aligned(8)*/ physaddr_t addr, uint64_t value) {
 	WITHMEM(pwrite64(dev_mem, &value, sizeof(value),
 	                 (pos64_t)addr) == sizeof(value),
 	        (void)0);
@@ -164,7 +164,7 @@ DEFINE_INTERN_ALIAS(libphys_pokephysq_unaligned, libphys_pokephysq);
 /************************************************************************/
 /* Copy memory to/from/within the physical address space.               */
 INTERN void CC
-libphys_copyfromphys(void *dst, PHYS physaddr_t src, size_t num_bytes)
+libphys_copyfromphys(void *dst, physaddr_t src, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
 	WITHMEM((size_t)pread64(dev_mem, dst, num_bytes, (pos64_t)src) == num_bytes,
 	        bzero(dst, num_bytes));
@@ -187,15 +187,15 @@ touch_all_pages(void const *src, size_t num_bytes) {
 }
 
 INTERN void CC
-libphys_copytophys(PHYS physaddr_t dst, void const *src, size_t num_bytes)
+libphys_copytophys(physaddr_t dst, void const *src, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
 	WITHMEM(PWrite64(dev_mem, src, num_bytes, (pos64_t)dst) == num_bytes,
 	        touch_all_pages(src, num_bytes));
 }
 
 INTERN NOBLOCK void
-NOTHROW(CC libphys_copyinphys)(PHYS physaddr_t dst,
-                               PHYS physaddr_t src,
+NOTHROW(CC libphys_copyinphys)(physaddr_t dst,
+                               physaddr_t src,
                                size_t num_bytes) {
 	void *temp;
 	temp = libphys_mmapphys(src, num_bytes);
@@ -207,7 +207,7 @@ NOTHROW(CC libphys_copyinphys)(PHYS physaddr_t dst,
 }
 
 INTERN NOBLOCK void
-NOTHROW(CC libphys_memsetphys)(PHYS physaddr_t dst,
+NOTHROW(CC libphys_memsetphys)(physaddr_t dst,
                                int byte, size_t num_bytes) {
 	void *temp;
 	temp = libphys_mmapphys(dst, num_bytes);
@@ -236,7 +236,7 @@ NOTHROW(CC libphys_memsetphys)(PHYS physaddr_t dst,
  * @return: * :         Base address of the newly created memory mapping.
  * @return: MAP_FAILED: Operation failed (s.a. `errno') */
 INTERN NOBLOCK WUNUSED void *
-NOTHROW(CC libphys_mmapphys)(PHYS physaddr_t addr, size_t num_bytes) {
+NOTHROW(CC libphys_mmapphys)(physaddr_t addr, size_t num_bytes) {
 	void *result;
 	/* NOTE: As an  extension, KOS's  mmap(2) system  call automatically  does
 	 *       all of the  in-page-offset alignment  when it has  been given  an

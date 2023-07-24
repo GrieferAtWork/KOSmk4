@@ -1897,7 +1897,7 @@ INTERN u64 p64_pageprot_table[0x40] = {
 
 LOCAL NOBLOCK WUNUSED u64
 NOTHROW(FCALL p64_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                       PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
+                                       PAGEDIR_PAGEALIGNED physaddr_t phys,
                                        pagedir_prot_t prot) {
 	u64 result;
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
@@ -2002,7 +2002,7 @@ NOTHROW(FCALL p64_pagedir_gethint)(VIRT void *addr) {
  * @param: prot: A set of `PAGEDIR_PROT_*' detailing how memory should be mapped. */
 INTERN NOBLOCK void
 NOTHROW(FCALL p64_pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                  PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
+                                  PAGEDIR_PAGEALIGNED physaddr_t phys,
                                   pagedir_prot_t prot) {
 	u64 e1_word;
 	unsigned int vec4, vec3, vec2, vec1;
@@ -2018,7 +2018,7 @@ NOTHROW(FCALL p64_pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 INTERN NOBLOCK void
 NOTHROW(FCALL p64_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                PAGEDIR_PAGEALIGNED size_t num_bytes,
-                               PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
+                               PAGEDIR_PAGEALIGNED physaddr_t phys,
                                pagedir_prot_t prot) {
 	size_t i;
 	u64 e1_word;
@@ -2046,7 +2046,7 @@ NOTHROW(FCALL p64_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
  * NOTE: If the page had been mapped, `pagedir_pop_mapone()' will automatically sync the page. */
 INTERN NOBLOCK WUNUSED pagedir_pushval_t
 NOTHROW(FCALL p64_pagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                       PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
+                                       PAGEDIR_PAGEALIGNED physaddr_t phys,
                                        pagedir_prot_t prot) {
 	u64 e1_word, result;
 	unsigned int vec4, vec3, vec2, vec1;
@@ -2236,7 +2236,7 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace_nosync)(void) {
 
 
 /* Translate a virtual address into its physical counterpart. */
-INTERN NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(1) PHYS physaddr_t
+INTERN NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(1) physaddr_t
 NOTHROW(FCALL p64_pagedir_translate)(VIRT void const *addr) {
 	u64 word;
 	unsigned int vec4, vec3, vec2, vec1;

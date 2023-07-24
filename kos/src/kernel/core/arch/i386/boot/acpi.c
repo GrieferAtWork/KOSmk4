@@ -55,7 +55,7 @@ PUBLIC size_t acpi_sdt_count = 0;
 #else /* NO_PHYS_IDENTITY */
 PRIVATE ATTR_FREETEXT size_t
 NOTHROW(KCALL copyfromphys_noidentity_partial)(void *__restrict dst,
-                                               PHYS physaddr_t src,
+                                               physaddr_t src,
                                                size_t num_bytes) {
 	uintptr_t offset;
 	size_t result;
@@ -92,7 +92,7 @@ NOTHROW(KCALL copyfromphys_noidentity_partial)(void *__restrict dst,
  * will not  make  use  of  the  phys2virt  identity  segment. */
 PRIVATE ATTR_FREETEXT void
 NOTHROW(KCALL copyfromphys_noidentity)(void *__restrict dst,
-                                       PHYS physaddr_t src,
+                                       physaddr_t src,
                                        size_t num_bytes) {
 	for (;;) {
 		size_t temp;

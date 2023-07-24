@@ -923,7 +923,7 @@ again_read_ch:
 			goto again_read_ch;
 		}
 do_append_ch:
-		((byte_t USER CHECKED *)dst)[result] = (byte_t)(unsigned int)ch;
+		((USER CHECKED byte_t *)dst)[result] = (byte_t)(unsigned int)ch;
 	}
 	return result;
 }

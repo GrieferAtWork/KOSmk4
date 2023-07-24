@@ -3116,7 +3116,7 @@ perproc_mapfile_direnum_v_seekdir(struct fdirenum *__restrict self,
 		UNCHECKED void *oldpos;
 		do {
 			oldpos = atomic_read(&me->ppmd_addr);
-			newpos = (byte_t UNCHECKED *)oldpos + (intptr_t)offset;
+			newpos = (UNCHECKED byte_t *)oldpos + (intptr_t)offset;
 			if unlikely(offset < 0 ? newpos > oldpos
 			                       : newpos < oldpos)
 				THROW(E_OVERFLOW);

@@ -342,7 +342,7 @@ uems_getname(struct userelf_module_section *__restrict self) {
 	return result;
 }
 
-INTERN BLOCKING WUNUSED NONNULL((1)) byte_t USER CHECKED *FCALL
+INTERN BLOCKING WUNUSED NONNULL((1)) USER CHECKED byte_t *FCALL
 uems_getaddr(struct userelf_module_section *__restrict self) {
 	if (self->ms_flags & SHF_ALLOC)
 		return self->ums_useraddr;
@@ -714,13 +714,13 @@ again:
 	result->ms_link      = UM_field(self, *shdr, .sh_link);
 	result->ms_info      = UM_field(self, *shdr, .sh_info);
 	result->ums_shdr     = shdr;
-	result->ums_useraddr = (byte_t USER CHECKED *)-1;
+	result->ums_useraddr = (USER CHECKED byte_t *)-1;
 	result->ums_kernaddr = (KERNEL byte_t *)-1;
 	result->ums_infladdr = (KERNEL byte_t *)-1;
 	result->ums_inflsize = 0;
 	if (result->ms_flags & SHF_ALLOC) {
 		/* Set the user-space load-address for allocated sections. */
-		result->ums_useraddr = (byte_t USER CHECKED *)(self->md_loadaddr +
+		result->ums_useraddr = (USER CHECKED byte_t *)(self->md_loadaddr +
 		                                               UM_field(self, *shdr, .sh_addr));
 	}
 
@@ -969,7 +969,7 @@ NOTHROW(FCALL system_cc_mman_module_cache)(struct mman *__restrict self,
 PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) REF struct userelf_module *FCALL
 uem_create_from_mapping(struct mman *__restrict self,
                         struct mfile *__restrict file,
-                        byte_t USER CHECKED *node_addr,
+                        USER CHECKED byte_t *node_addr,
                         pos_t node_fpos) {
 	/* NOTE: Since the addr<==>file values were loaded from mem-nodes,
 	 *       we can assume  that they're always  properly aligned,  as
@@ -1127,7 +1127,7 @@ uem_create_from_mapping(struct mman *__restrict self,
 				 * to  determine the load-offset (i.e. the ASLR key) that was used
 				 * when the module was mapped, and that is needed to locate  other
 				 * nodes that would also belong to this module. */
-				byte_t USER *segment_address;
+				USER byte_t *segment_address;
 				uintptr_t offset_in_segment;
 				offset_in_segment = (uintptr_t)(node_fpos - aligned_phdr_file_pos);
 				segment_address   = node_addr - offset_in_segment;
@@ -1523,7 +1523,7 @@ uem_create_system_rtld(struct mman *__restrict self,
                        struct mfile *__restrict rtld_file,
                        struct mfile_axref *__restrict rtld_fsfile,
                        struct fdirent *__restrict rtld_name,
-                       byte_t USER CHECKED *node_addr, pos_t node_fpos) {
+                       USER CHECKED byte_t *node_addr, pos_t node_fpos) {
 	REF struct userelf_module *result;
 	REF struct mfile *file;
 	UM_ElfW_ShdrP shdrs;
@@ -2161,7 +2161,7 @@ anon_mem_not_a_module:
 	 * all of the other, regular libraries) */
 	if (file == &execabi_system_rtld_file.mrf_file) {
 		/* Special handling for /lib[64]/libdl.so */
-		byte_t USER CHECKED *node_addr;
+		USER CHECKED byte_t *node_addr;
 		pos_t node_fpos;
 		node_addr = (byte_t *)mnode_getaddr(node);
 		node_fpos = mnode_getfileaddr(node);
@@ -2178,7 +2178,7 @@ anon_mem_not_a_module:
 #ifdef __ARCH_HAVE_COMPAT
 	if (file == &compat_execabi_system_rtld_file.mrf_file) {
 		/* Special handling for /lib/libdl.so */
-		byte_t USER CHECKED *node_addr;
+		USER CHECKED byte_t *node_addr;
 		pos_t node_fpos;
 		node_addr = (byte_t *)mnode_getaddr(node);
 		node_fpos = mnode_getfileaddr(node);
@@ -2195,7 +2195,7 @@ anon_mem_not_a_module:
 
 	/* Assume that we're dealing with an actual file-mapping. */
 	{
-		byte_t USER CHECKED *node_addr;
+		USER CHECKED byte_t *node_addr;
 		pos_t node_fpos;
 		incref(file);
 		node_addr = (byte_t *)mnode_getaddr(node);

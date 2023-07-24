@@ -1004,13 +1004,13 @@ NOTHROW(FCALL sigmask_blockmask)(sigset_t const *__restrict these)
 		}
 		while (umasksize) {
 			byte_t word, blck, nwrd;
-			word = *(byte_t USER CHECKED const *)umask;
+			word = *(USER CHECKED byte_t const *)umask;
 			blck = *(byte_t const *)these;
 			nwrd = word | blck;
 			if (nwrd != word) {
 				nwrd = (byte_t)copy_nmi_signal_mask_bits(nwrd, word, sigbase);
 				if (nwrd != word)
-					*(byte_t USER CHECKED *)umask = nwrd;
+					*(USER CHECKED byte_t *)umask = nwrd;
 			}
 			umask = (USER CHECKED sigset_t *)((byte_t *)umask + 1);
 			these = (sigset_t const *)((byte_t const *)these + 1);
@@ -1079,13 +1079,13 @@ NOTHROW(FCALL sigmask_unblockmask)(sigset_t const *__restrict these)
 		}
 		while (umasksize) {
 			byte_t word, blck, nwrd;
-			word = *(byte_t USER CHECKED const *)umask;
+			word = *(USER CHECKED byte_t const *)umask;
 			blck = *(byte_t const *)these;
 			nwrd = word & ~blck;
 			if (nwrd != word) {
 				nwrd = (byte_t)copy_nmi_signal_mask_bits(nwrd, word, sigbase);
 				if (nwrd != word) {
-					*(byte_t USER CHECKED *)umask = nwrd;
+					*(USER CHECKED byte_t *)umask = nwrd;
 					result = true;
 				}
 			}

@@ -34,13 +34,18 @@ import UniqueSet from collections;
  * -> Also do the same for `DEFINE_INTERN_ALIAS()'
  */
 
-/* TODO: Warn when pointer types with  a non-zero nothrow attribute also  make
- *       use of `__restrict'. And in the case of a function declaration,  also
- *       parse the `nonnull()' attribute, and warn if nonnull-marked arguments
- *       also have a non-zero nothrow attribute (neither of these combinations
- *       make  sense since nothrow  implies that the value  can be NULL, which
- *       conflict  with non-null, as well as the non-aliasing behavior that is
- *       implied by `__restrict') */
+/* TODO: Warn when pointer types with a non-zero nothrow attribute are marked as `nonnull'
+ *       Technically, such a combination would be allowed, but since pointers classes like
+ *       `CHECKED' mean that accessing the pointer can throw exceptions, there's no  point
+ *       in *not* allowing `NULL' to be accepted, too. */
+
+/* TODO: Add an attribute  `function_abi("foo")` that  allows for  user-defined
+ *       strings to be set on function pointers. Then, a warning is issued when
+ *       trying to assign a function that doesn't have the same ABI-tag.
+ * -> This  way, we can  assert calling conventions  even where those would
+ *    normally be identical on certain arches (e.g. assert correct usage of
+ *    LIBCCALL / LIBDCALL not just on x86_64, but also i386)
+ */
 
 /* Dump top-level declarations as they are parsed. */
 #undef DUMP_TOP_LEVEL_DECLS
@@ -173,6 +178,12 @@ final class Checker: CParser {
 			local result = ns.lookup(tab, name);
 			if (result !is none)
 				return result;
+			/* When looking for typedefs, don't keep searching if a symbol of the same name also exists */
+			if (tab == "typedefs") {
+				result = ns.lookup("symbols", name);
+				if (result !is none)
+					return none;
+			}
 		}
 		return none;
 	}
@@ -1390,6 +1401,13 @@ done:
 
 	@@Parse everything after the base-expression of a C-type
 	function parseTypeRefInner(tr: CTypeRef, name: string = ""): (CTypeRef, string) {
+		/* Warn about use of nonsensical attributes (e.g. `__attribute((noreturn)) int i;') */
+		local result = parseTypeRefInnerImpl(tr, name);
+		result.first.fixNonsensicalAttributes(this);
+		return result;
+	}
+
+	function parseTypeRefInnerImpl(tr: CTypeRef, name: string = ""): (CTypeRef, string) {
 		/* Parse the inner type-ref prefix (iow: pointer types) */
 prefixAgain:
 		if (this.tok == "*") {
@@ -1409,14 +1427,7 @@ prefixAgain:
 				break;
 			}
 
-			/* move certain attributes out of the pointer:
-			 * >> NOBLOCK void *foo();
-			 * Here, the NOBLOCK needs to be attached to the function,
-			 * and   not   its   return   value's   pointed-to   type! */
-			local pt: CPointerType = pointerType(tr);
-			local newTr = CTypeRef(typ: pt);
-			tr.moveNonPointerAttributes(newTr);
-			tr = newTr;
+			tr = CTypeRef(pointerType(tr));
 			parseCTypeRefConstVolatile(tr);
 			goto prefixAgain;
 		}
@@ -1425,7 +1436,7 @@ prefixAgain:
 		local result;
 		if (this.tok == "(") {
 			this.next();
-			result = parseTypeRefInner(tr, name);
+			result = parseTypeRefInnerImpl(tr, name);
 			this.skip(")");
 		} else {
 			/* Parse variable name */
@@ -1440,6 +1451,7 @@ prefixAgain:
 		do {
 			parseTypeRefInnerSuffix(tr);
 		} while (parseCTypeRefAttributes(tr));
+
 		return result;
 	}
 
@@ -1791,7 +1803,8 @@ prefixAgain:
 					expectedAnnotation = "NOTHROW_NCX";
 				} else if (bodyNothrow <= 0) {
 					/* TODO: If the function takes pointer arguments that are not  __restrict
-					 *       or appear in nonnull((n)), suggest NOTHROW or NOTHROW_NCX intead */
+					 *       and don't appear in nonnull((n)), suggest NOTHROW or NOTHROW_NCX
+					 *       instead */
 					expectedAnnotation = "NOTHROW";
 				} else {
 					expectedAnnotation = getPrettyNothrowLevelName(bodyNothrow);
@@ -3993,48 +4006,48 @@ again_builtin_container_of_suffix:
 default_case:
 			if (tok.issymbol()) {
 		case "::":
-				if (cxx) {
-					local ctorInfo = parseTypeRef("-", "", tryParse: true)...;
-					if (ctorInfo !is none) {
-						/* C++ function-style cast expression */
-						local typeref, storageClass;
-						typeref, none, storageClass = ctorInfo...;
-						if (storageClass != "")
-							this.err(f"Storage class {repr storageClass} cannot appear in expressions");
-						local result: CValue;
-						if (this.tok == "{") {
-							result = parseTypedExpr(typeref, explicit: true);
-						} else {
-							this.skip("(");
-							result = parseTypedExpr(typeref, explicit: true);
-							this.skip(")");
-						}
-						return result;
-					}
-				}
-				/* Not a type -> check for a normal symbol */
 				local symbol: CSymbol | none = nsLookupChain("symbols");
-				if (symbol is none)
+				if (symbol is none) {
+					/* Not a symbol -> check for a typedef and see if it's a c++-style construct call */
+					if (cxx) {
+						local ctorInfo = parseTypeRef("-", "", tryParse: true);
+						if (ctorInfo !is none) {
+							/* C++ function-style cast expression */
+							local typeref, storageClass;
+							typeref, none, storageClass = ctorInfo...;
+							if (storageClass != "")
+								this.err(f"Storage class {repr storageClass} cannot appear in expressions");
+							local result: CValue;
+							if (this.tok == "{") {
+								result = parseTypedExpr(typeref, explicit: true);
+							} else {
+								this.skip("(");
+								result = parseTypedExpr(typeref, explicit: true);
+								this.skip(")");
+							}
+							return result;
+						}
+					}
 					this.err(f"No such symbol `{tok}'");
+				}
 				return cvalueFromSymbol(symbol);
 			} else if (tok.startswith('"')) {
 				/* String literal. */
 				return cvalueFromString(this.parseString());
 			} else if (tok.startswith("'")) {
 				/* Character literal. */
-				local chr = this.parseString();
-				local ord = 0;
-				for (local ch: chr.ordinals) {
+				local chr: string = this.parseString();
+				local ord: int = 0;
+				for (local ch: chr.ordinals)
 					ord = (ord << 8) | ch;
-				}
-				return cvalueFromValue(this, CTypeRef(C_int), ord & 0xffffffff);
+				return cvalueFromValue(this, CTypeRef(C_int), ord);
 			} else {
 				local constVal: int | float;
-				local suffixEnd = #tok;
+				local suffixEnd: int = #tok;
 				while (suffixEnd && tok[suffixEnd - 1] in "ulUL")
 					--suffixEnd;
 				local integerType: CType;
-				local integerSuffix = tok[suffixEnd:];
+				local integerSuffix: string = tok[suffixEnd:];
 				switch (integerSuffix.lower()) {
 				case "":
 					integerType = C_int;

@@ -106,7 +106,7 @@ struct ancillary_rmessage {
 /* Decode a cmsg header and return a pointer to its `cmsg_data' field.
  * @param: msg_flags: Message flags (set of `MSG_*'; `MSG_CMSG_COMPAT' affects
  *                    the ABI  of the  `cmsghdr'  structure on  some  systems) */
-extern NONNULL((2, 3, 4)) byte_t USER CHECKED const *KCALL
+extern NONNULL((2, 3, 4)) USER CHECKED byte_t const *KCALL
 ancillary_message_readcmsghdr(USER CHECKED void const *reader,
                               size_t *plen, u32 *plevel, u32 *ptype,
                               syscall_ulong_t msg_flags);
@@ -115,7 +115,7 @@ ancillary_message_readcmsghdr(USER CHECKED void const *reader,
  * Its  individual  fields  are  initialized  with  the  given  `len',  `level'  and   `type'
  * @param: msg_flags: Message flags (set of `MSG_*'; `MSG_CMSG_COMPAT' affects
  *                    the ABI  of the  `cmsghdr'  structure on  some  systems) */
-extern byte_t USER CHECKED *KCALL
+extern USER CHECKED byte_t *KCALL
 ancillary_message_makecmsghdr(USER CHECKED void *writer, size_t len,
                               u32 level, u32 type,
                               syscall_ulong_t msg_flags);
@@ -127,12 +127,12 @@ extern NONNULL((1)) void KCALL
 ancillary_rmessage_setcontrolused(struct ancillary_rmessage const *__restrict self,
                                   size_t value, syscall_ulong_t msg_flags);
 #elif defined(__ARCH_HAVE_COMPAT)
-LOCAL NONNULL((2, 3, 4)) byte_t USER CHECKED const *KCALL
+LOCAL NONNULL((2, 3, 4)) USER CHECKED byte_t const *KCALL
 ancillary_message_readcmsghdr(USER CHECKED void const *reader,
                               size_t *plen, u32 *plevel, u32 *ptype,
                               syscall_ulong_t msg_flags) {
-	byte_t USER CHECKED const *result;
-	result = (byte_t USER CHECKED const *)reader;
+	USER CHECKED byte_t const *result;
+	result = (USER CHECKED byte_t const *)reader;
 	if (msg_flags & MSG_CMSG_COMPAT) {
 		*plen = (size_t)(*(USER CHECKED __compat_size_t const *)result);
 		result += sizeof(__compat_size_t);
@@ -147,12 +147,12 @@ ancillary_message_readcmsghdr(USER CHECKED void const *reader,
 	return result;
 }
 
-LOCAL byte_t USER CHECKED *KCALL
+LOCAL USER CHECKED byte_t *KCALL
 ancillary_message_makecmsghdr(USER CHECKED void *writer, size_t len,
                               u32 level, u32 type,
                               syscall_ulong_t msg_flags) {
-	byte_t USER CHECKED *result;
-	result = (byte_t USER CHECKED *)writer;
+	USER CHECKED byte_t *result;
+	result = (USER CHECKED byte_t *)writer;
 	if (msg_flags & MSG_CMSG_COMPAT) {
 		*(USER CHECKED __compat_size_t *)result = (__compat_size_t)len;
 		result += sizeof(__compat_size_t);
@@ -183,14 +183,14 @@ ancillary_rmessage_setcontrolused(struct ancillary_rmessage const *__restrict se
 #else /* ... */
 #define ancillary_message_readcmsghdr(reader, plen, plevel, ptype, msg_flags)                             \
 	(*(plen)   = *(USER CHECKED size_t const *)(reader),                                                  \
-	 *(plevel) = *(USER CHECKED u32 const *)((byte_t USER CHECKED const *)(reader) + sizeof(size_t)),     \
-	 *(ptype)  = *(USER CHECKED u32 const *)((byte_t USER CHECKED const *)(reader) + sizeof(size_t) + 4), \
-	 (byte_t USER CHECKED const *)(reader) + sizeof(size_t) + 8)
+	 *(plevel) = *(USER CHECKED u32 const *)((USER CHECKED byte_t const *)(reader) + sizeof(size_t)),     \
+	 *(ptype)  = *(USER CHECKED u32 const *)((USER CHECKED byte_t const *)(reader) + sizeof(size_t) + 4), \
+	 (USER CHECKED byte_t const *)(reader) + sizeof(size_t) + 8)
 #define ancillary_message_makecmsghdr(writer, len, level, type, msg_flags)                        \
 	(*(USER CHECKED size_t *)(writer)                                            = (size_t)(len), \
-	 *(USER CHECKED u32 *)((byte_t USER CHECKED *)(writer) + sizeof(size_t))     = (u32)(level),  \
-	 *(USER CHECKED u32 *)((byte_t USER CHECKED *)(writer) + sizeof(size_t) + 4) = (u32)(type),   \
-	 (byte_t USER CHECKED *)(writer) + sizeof(size_t) + 8)
+	 *(USER CHECKED u32 *)((USER CHECKED byte_t *)(writer) + sizeof(size_t))     = (u32)(level),  \
+	 *(USER CHECKED u32 *)((USER CHECKED byte_t *)(writer) + sizeof(size_t) + 4) = (u32)(type),   \
+	 (USER CHECKED byte_t *)(writer) + sizeof(size_t) + 8)
 #define ancillary_rmessage_setcontrolused(self, value, msg_flags) \
 	(void)(*(self)->am_controlused = (value))
 #endif /* !... */
