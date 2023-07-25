@@ -75,6 +75,9 @@ function createCheckerProcess(
 		try {
 			checker.runChecker(ppFile, targetModule, language: language);
 		} @[interrupt] catch (...) {
+			/* Delete the produced preprocessor file on error, so the relevant
+			 * source isn't considered as  having already been compiled  after
+			 * something goes wrong. */
 			try fs.unlink(ppFile); catch (...);
 			throw;
 		}

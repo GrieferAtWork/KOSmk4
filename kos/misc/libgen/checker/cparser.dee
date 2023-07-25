@@ -47,9 +47,6 @@ class CParser {
 	@@Set of warnings that are currently being ignored
 	private final member ignoredWarnings: {string...} = [];
 
-	@@Incremented every time a non-EOF token is created
-	public final member tokenId: int = 0;
-
 	@@When true, always extend the buffer (never clear it)
 	private member peeking: bool = false;
 
@@ -93,11 +90,10 @@ class CParser {
 	@@Override the parser position with a previously saved sub-chunk
 	public final function subChunkPush(bytes: Bytes, flc: (string, int, int)): ParserBackup {
 		local backup = (
-			bufPos, tok, tokStart, tokenId, filename, fp,
+			bufPos, tok, tokStart, filename, fp,
 			buf, bufStartLine, bufStartCol, peeking);
 		tok = "";
 		tokStart = 0;
-		tokenId = 0;
 		filename = flc[0];
 		fp = none;
 		buf = bytes;
@@ -112,7 +108,7 @@ class CParser {
 
 	@@Restore the context from before a call to @subChunkPush
 	public final function subChunkPop(backup: ParserBackup) {
-		bufPos, tok, tokStart, tokenId, filename, fp, buf,
+		bufPos, tok, tokStart, filename, fp, buf,
 			bufStartLine, bufStartCol, peeking = backup...;
 		bufLen = #buf;
 	}
@@ -135,11 +131,11 @@ class CParser {
 	public final function backupCreate(): ParserBackup {
 		local oldPeeking = peeking;
 		peeking = true;
-		return (bufPos, tok, tokStart, tokenId, oldPeeking);
+		return (bufPos, tok, tokStart, oldPeeking);
 	}
 
 	public final function backupRestore(backup: ParserBackup) {
-		bufPos, tok, tokStart, tokenId, peeking = backup...;
+		bufPos, tok, tokStart, peeking = backup...;
 	}
 
 	public final function backupDiscard(backup: ParserBackup) {
@@ -652,7 +648,6 @@ do_handleStaticIf:
 			break;
 		}
 return_ch:
-		++tokenId;
 return_ch_eof:
 		tok = ch;
 		RETURN(ch);
@@ -682,9 +677,8 @@ return_ch_eof:
 	}
 
 	function handleStaticIfRBrace(): string | none {
-		++tokenId;
+again:
 		--staticIfDepth;
-		local saved = backupCreate();
 		staticIfAllowed = false;
 		local tok = next();
 		if (tok == "else") {
@@ -695,12 +689,14 @@ return_ch_eof:
 			return none;
 		}
 		staticIfAllowed = true;
+		local saved = backupCreate();
+		if (tok == "}" && staticIfDepth)
+			goto again;
 		return tok;
 	}
 
 	function handleStaticIf(): string | none {
 again:
-		++tokenId;
 		staticIfAllowed = false;
 		next();
 		skip("(");
@@ -717,6 +713,8 @@ handle_true_block:
 				result = none;
 			} else {
 				++staticIfDepth;
+				if (result == "__static_if")
+					goto again;
 			}
 			return result;
 		}
