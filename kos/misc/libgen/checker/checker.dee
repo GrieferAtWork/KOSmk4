@@ -23,22 +23,6 @@ import * from .ctype;
 import * from .cvalue;
 import UniqueSet from collections;
 
-/* TODO: Annotate  `DEFINE_PUBLIC_ALIAS(new, old)' such that  it checks if a
- *       declarations exists for  both `new'  and `old', and  if so:  assert
- *       that those declarations are  binary-compatible, as well as  feature
- *       the same annotations (thus ensuring  that lib headers use the  same
- *       set   of   annotations   as  the   internal   lib  implementations)
- *       When no declaration  exists for  `new', remember one  for the  sake
- *       of future `DEFINE_PUBLIC_ALIAS' checks when `new' appears as `old',
- *       so that transitive alias definitions are still checked.
- * -> Also do the same for `DEFINE_INTERN_ALIAS()'
- */
-
-/* TODO: Warn when pointer types with a non-zero nothrow attribute are marked as `nonnull'
- *       Technically, such a combination would be allowed, but since pointers classes like
- *       `CHECKED' mean that accessing the pointer can throw exceptions, there's no  point
- *       in *not* allowing `NULL' to be accepted, too. */
-
 /* TODO: Add an attribute  `function_abi("foo")` that  allows for  user-defined
  *       strings to be set on function pointers. Then, a warning is issued when
  *       trying to assign a function that doesn't have the same ABI-tag.
@@ -165,6 +149,11 @@ final class Checker: CParser {
 	private member encounteredAsm: bool = false;      /* True if `__asm__' was encountered */
 	private member switchConstantExpressionValue: Bytes | none = none;
 	private member switchExpressionType: CTypeRef | none = none;
+
+	@@Mapping of  `new ->  old`  or `DEFINE_PUBLIC_ALIAS()`  and  friends.
+	@@At the end of the parsing process, these are checked against symbols
+	@@from the global namespace to see if
+	private member asmSymbolAliasDefinitions: {string: string} = Dict();
 
 	@@@param tab: One of:
 	@@            - @"symbols": @CSymbol or @CSymbolTemplate
@@ -1539,7 +1528,7 @@ prefixAgain:
 			/* Create a typedef/symbol for the parsed declaration. */
 			if (storageClass == "typedef") {
 				if (!name) {
-					this.warn("-Wtypedef", f"Unnamed typedef for type `{typeref}'");
+					this.warn("-Wtypedef", f"Unnamed typedef declaration with `{typeref}'");
 				} else {
 					local tab: {string: CTypeRef | CTypeRefTemplate} | none = namespaceStack.first.typedefs;
 					local existingDecl: CTypeRef | CTypeRefTemplate | none = tab.get(name);
@@ -1555,11 +1544,11 @@ prefixAgain:
 					} else {
 						if (existingDecl.redeclarationEquals(typeref)) {
 							/* Ignore typedef re-declaration where the new type matches the old */
-							existingDecl.redeclarationImport(this, typeref);
+							existingDecl.redeclarationImport(this, typeref, name, name);
 						} else {
-							this.err(f"redeclaration of typedef `{typeref.tostr(name)}'{
-								this.formatMessageAddend(existingDecl.decl, "See previous definition")
-							}");
+							this.err(
+								f"redeclaration of typedef `{typeref.tostr(name)}' "
+								f"previously declared as `{existingDecl.tostr(name)}'");
 						}
 						LOG_DECL(existingDecl);
 					}
@@ -1596,7 +1585,7 @@ prefixAgain:
 						decl = decl.getOrCreateOverload(this, typeref);
 					} else if (decl.typeref.redeclarationEquals(typeref)) {
 						/* Still the same symbol */
-						decl.typeref.redeclarationImport(this, typeref);
+						decl.typeref.redeclarationImport(this, typeref, name, name, decl.decl);
 					} else {
 						/* Initial overload given */
 						local overloadsDecl = COverloadedFunctionSymbol();
@@ -1621,7 +1610,7 @@ prefixAgain:
 				if (decl.typeref.redeclarationEquals(typeref) &&
 					namespaceStack.first !is CScope) {
 					/* Ignore re-declaration where the new type matches the old */
-					decl.typeref.redeclarationImport(this,typeref);
+					decl.typeref.redeclarationImport(this,typeref, name, name, decl.decl);
 					typeref = decl.typeref;
 				} else {
 					this.err(f"redeclaration of `{typeref.tostr(name)}'{
@@ -1820,10 +1809,14 @@ prefixAgain:
 				} else if (bodyHasNcx) {
 					expectedAnnotation = "NOTHROW_NCX";
 				} else if (bodyNothrow <= 0) {
-					/* TODO: If the function takes pointer arguments that are not  __restrict
-					 *       and don't appear in nonnull((n)), suggest NOTHROW or NOTHROW_NCX
-					 *       instead */
-					expectedAnnotation = "NOTHROW";
+					/* If the function takes pointer arguments that are not  __restrict
+					 * and don't appear in nonnull((n)), suggest NOTHROW or NOTHROW_NCX
+					 * instead */
+					if (funTypRef.typ.hasNotRestrictNotNonnullPointerArguments) {
+						expectedAnnotation = "NOTHROW_NCX' or `NOTHROW";
+					} else {
+						expectedAnnotation = "NOTHROW";
+					}
 				} else {
 					expectedAnnotation = getPrettyNothrowLevelName(bodyNothrow);
 				}
@@ -1930,6 +1923,18 @@ prefixAgain:
 			}
 		}
 		this.skip(")");
+		this.skip(";");
+	}
+
+	@@Parse the `__builtin_define_alias` statement
+	function parseBuiltinDefineAlias() {
+		this.next();
+		this.skip("(");
+		local newName: string = this.parseString();
+		this.skip(",");
+		local oldName: string = this.parseString();
+		this.skip(")");
+		this.asmSymbolAliasDefinitions[newName] = oldName;
 		this.skip(";");
 	}
 
@@ -2043,6 +2048,10 @@ again:
 			this.next();
 			this.skip(";");
 			isUnreachable = true;
+			break;
+
+		case "__builtin_define_alias":
+			parseBuiltinDefineAlias();
 			break;
 
 		case "asm":
@@ -3237,6 +3246,10 @@ again:
 				goto default_case;
 			parseTemplate();
 			goto again;
+
+		case "__builtin_define_alias":
+			parseBuiltinDefineAlias();
+			break;
 
 		case "asm":
 		case "__asm":
@@ -4550,6 +4563,27 @@ again:
 		return parseTypeRefInner(tr, "-").first;
 	}
 
+	@@When set to true, @CFunctionType.redeclarationImport will ignore duplicate default arguments
+	public member ignoreDuplicateDefaultArgumentDeclarations: bool = false;
+
+	function checkAsmSymbolAliasDefinitions() {
+		local savedIgnoreDuplicateDefaultArgumentDeclarations = ignoreDuplicateDefaultArgumentDeclarations;
+		ignoreDuplicateDefaultArgumentDeclarations = savedIgnoreDuplicateDefaultArgumentDeclarations;
+		ignoreDuplicateDefaultArgumentDeclarations = true;
+		for (local newSymbolName: asmSymbolAliasDefinitions.keys.sorted()) {
+			local oldSymbolName: string = asmSymbolAliasDefinitions[newSymbolName];
+			local oldSymbol: CSymbol | CSymbolTemplate | none = globalNamespace.symbols.get(oldSymbolName);
+			local newSymbol: CSymbol | CSymbolTemplate | none = globalNamespace.symbols.get(newSymbolName);
+			if (oldSymbol is CSymbol && newSymbol is CSymbol) {
+				local oldSymbolTypeRef: CTypeRef = oldSymbol.typeref;
+				local newSymbolTypeRef: CTypeRef = newSymbol.typeref;
+				this.pushWarnLocationOverride(newSymbol.decl);
+				deepcopy(oldSymbolTypeRef).redeclarationImport(this, newSymbolTypeRef,
+					newSymbolName, oldSymbolName, oldSymbol.decl);
+				this.popWarnLocationOverride();
+			}
+		}
+	}
 
 	@@Main parser function
 	function main() {
@@ -4562,6 +4596,7 @@ again:
 				this.errMsg(f"Parser error: {e}");
 			throw;
 		}
+		checkAsmSymbolAliasDefinitions();
 	}
 }
 

@@ -138,6 +138,7 @@
 #define __GCC_HAS_BUILTIN___builtin_throw        /* __attribute__((noreturn)) void __builtin_throw(int code, ...); */
 #define __GCC_HAS_BUILTIN___builtin_void         /* T __builtin_void(T val);  ## Evaluates to `val', but value becomes unknown */
 #define __GCC_HAS_BUILTIN___builtin_rvoid        /* T __builtin_rvoid(T val); ## Like `__builtin_void()', but also do r-value */
+#define __GCC_HAS_BUILTIN___builtin_define_alias /* __builtin_define_alias(char const new[], char const old[]); ## Verify correct attributes for `DEFINE_PUBLIC_ALIAS()' & friends */
 
 #ifndef __has_feature
 #define __NO_has_feature
@@ -294,14 +295,6 @@
 #define __ATTR_NOBLOCK_IF(...)  __checker_attribute__(__tag__("NOBLOCK")) /* XXX: Condition */
 #define __ATTR_NOPREEMPT        __checker_attribute__(__tag__("NOPREEMPT"), __require_caller_tag__("NOPREEMPT"))
 
-/* TODO: __throws__(*) to indicate that a function throws exceptions  that
- *       may be thrown by a function pointer it takes as argument. Example
- *       for this would be `format_printf()'
- *       Such a function would then also be `__nothrow__(*0)', and the `*'
- *       must then also inherit  the __nothrow__-tag of function  pointers
- *       passed to the function in question.
- */
-
 
 #define __ATTR_NORETURN                      __checker_attribute__(__noreturn__)
 #define __ATTR_NOINLINE                      /* Nothing */
@@ -365,8 +358,16 @@
 #define __ATTR_EXTERNALLY_VISIBLE            /* Nothing */
 #define __ATTR_VISIBILITY(vis)               /* Nothing */
 
+/* Warn if declarations for `new' and `old' exist, but they're incompatible. */
+#define __DEFINE_PRIVATE_ALIAS(new, old)      __builtin_define_alias(#new, #old)
+#define __DEFINE_PUBLIC_ALIAS(new, old)       __builtin_define_alias(#new, #old)
+#define __DEFINE_INTERN_ALIAS(new, old)       __builtin_define_alias(#new, #old)
+#define __DEFINE_PRIVATE_WEAK_ALIAS(new, old) __builtin_define_alias(#new, #old)
+#define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  __builtin_define_alias(#new, #old)
+#define __DEFINE_INTERN_WEAK_ALIAS(new, old)  __builtin_define_alias(#new, #old)
+
 /* Suppress warnings about `-Wsuggest-attribute=const' or `-Wsuggest-attribute=pure' */
-#define __COMPILER_IMPURE() (void)0
+#define __COMPILER_IMPURE() __asm__("")
 
 #define __COMPILER_ASM_BUFFER(T, s, p) (*(__checker_attribute__(__force__) T(*)[s])(p))
 #define __register_var(T, name, regname) T name

@@ -77,7 +77,18 @@ class CParser {
 	@@Starting column of @buf (1-based)
 	private member bufStartCol: int = 1;
 
+	@@Stack for `#pragma GCC diagnostic push`
 	private member ignoredWarningsStack: {{string...}...} = [];
+
+	@@Override for where warnings should be printed at
+	private member warnLocationOverride: {(string, int, int)...} = [];
+
+	public function pushWarnLocationOverride(loc: (string, int, int)) {
+		warnLocationOverride.append(loc);
+	}
+	public function popWarnLocationOverride() {
+		warnLocationOverride.popback();
+	}
 
 	@@Override the parser position with a previously saved sub-chunk
 	public final function subChunkPush(bytes: Bytes, flc: (string, int, int)): ParserBackup {
@@ -266,14 +277,26 @@ class CParser {
 
 	public final function warnAt(pos: int | ParserBackup, warningName: string, message: string) {
 		if (warningName !in ignoredWarnings) {
-			local line, col = this.lcAt(pos)...;
+			local filename: string = this.filename;
+			local line: int, col: int;
+			if (warnLocationOverride && pos is int && pos == tokStart) {
+				filename, line, col = warnLocationOverride.last...;
+			} else {
+				line, col = lcAt(pos)...;
+			}
 			local text = f"{fs.abspath(filename)}({line},{col}): Warning {warningName} : {message}";
 			print File.stderr: text;
 		}
 	}
 
 	public final function errMsgAt(pos: int | ParserBackup, message: string): string {
-		local line, col = this.lcAt(pos)...;
+		local filename: string = this.filename;
+		local line: int, col: int;
+		if (warnLocationOverride && pos is int && pos == tokStart) {
+			filename, line, col = warnLocationOverride.last...;
+		} else {
+			line, col = lcAt(pos)...;
+		}
 		local text = f"{fs.abspath(filename)}({line},{col}): Error : {message}";
 		print File.stderr: text;
 		return text;

@@ -54,7 +54,14 @@ class CType: WeakRefAble {
 	}
 
 	@@Fix nonsensical attributes an warn where their presence is a user-error.
-	function fixNonsensicalAttributes(checker: Checker) {}
+	function fixNonsensicalAttributes(checker: Checker) {
+	}
+
+	@@Import added attributes/annotations during a re-declaration, and warn about this
+	function redeclarationImport(checker: Checker, other: CType,
+	                             newName: string = "", oldName: string = "",
+	                             oldDeclFlc: (string, int, int) | none = none) {
+	}
 }
 
 global final CTYPEREF_FLAG_CONST    = 0x0001;
@@ -79,6 +86,37 @@ global final CTYPEREF_FLAG_FORCE = 0x4000;
 @@Used during creation of struct objects.
 global final CTYPEREF_FLAG_PACKED = 0x8000;
 
+@@Flags that are relevant for 2 types to be considered equal
+global final CTYPEREF_FLAG_RELEVANT_FOR_EQUALITY =
+	CTYPEREF_FLAG_CONST | CTYPEREF_FLAG_VOLATILE |
+	CTYPEREF_FLAG_RESTRICT;
+
+global final CTYPEREF_FLAGNAMES_KEYWORD: {int: string} = {
+	CTYPEREF_FLAG_CONST    : "const",
+	CTYPEREF_FLAG_VOLATILE : "volatile",
+	CTYPEREF_FLAG_RESTRICT : "restrict",
+};
+
+global final CTYPEREF_FLAGNAMES_ATTRIB: {int: string} = {
+	CTYPEREF_FLAG_DEREF    : "deref",
+	CTYPEREF_FLAG_NODEREF  : "noderef",
+	CTYPEREF_FLAG_NONNULL  : "nonnull",
+	CTYPEREF_FLAG_NORETURN : "noreturn",
+	CTYPEREF_FLAG_FORCE    : "force",
+	CTYPEREF_FLAG_PACKED   : "packed",
+};
+
+function CTYPEREF_FLAGNAMES_TOSTR(tab: {int: string}, flags: int): {string...} {
+	local mask = 1;
+	while (mask <= flags) {
+		if (flags & mask) {
+			local res: string | none = tab.get(mask);
+			if (res !is none)
+				yield res;
+		}
+		mask <<= 1;
+	}
+}
 
 /* Special THROWS error codes. */
 @@Explicit anything-may-be-thrown: `THROWS(...)`
@@ -170,6 +208,36 @@ final class CTypeAttributes {
 	//       >> printf("foo = %s", p); // int printf(char const *, char const *);
 	//       >> printf("foo = %p", p); // int printf(char const *, void [[noderef]] const volatile *);
 
+	public function enumerateAttributsNotPresentIn(
+			checker: Checker | none = none,
+			other: CTypeAttributes | none = none
+		): {string...} {
+		if (!IDENTICAL(nothrow, other.nothrow) && nothrow !is none)
+			yield f"nothrow({nothrow})";
+		if (!IDENTICAL(tags, other.tags) && tags !is none) {
+			local missingTags: {string...} = (other is none ? tags : (tags - other.tags)).sorted();
+			if (missingTags)
+				yield f"tag({", ".join(for (local x: missingTags) repr x)})";
+		}
+		if (!IDENTICAL(requireCallerTags, other.requireCallerTags) && requireCallerTags !is none) {
+			local missingTags: {string...} = (requireCallerTags - other.requireCallerTags).sorted();
+			if (missingTags)
+				yield f"require_caller_tag({", ".join(for (local x: missingTags) repr x)})";
+		}
+		if (!IDENTICAL(aligned, other.aligned) && aligned !is none)
+			yield f"aligned({aligned})";
+		if (!IDENTICAL(throws, other.throws) && throws !is none) {
+			local missingThrows: {int...} = other is none ? throws : throws - other.throws;
+			if (missingThrows) {
+				yield f"throws({', '.join(
+					checker is none
+					? for (local id: missingThrows) { -1 : '*', 0 : '...' }.get(id, id.hex())
+					: checker.exceptCodeNames(missingThrows)
+				)})";
+			}
+		}
+	}
+
 	public function importFrom(other: CTypeAttributes) {
 		if (nothrow is none) {
 			nothrow = other.nothrow;
@@ -253,14 +321,27 @@ final class CTypeRef {
 	@@Type attributes.
 	public member attrib: CTypeAttributes | none = none;
 
+	/* Copy constructor (that also copies attributes, if present) */
 	operator copy(other: CTypeRef) {
 		typ = other.typ;
 		flags = other.flags;
 		attrib = copy other.attrib;
 	}
 
-	/* Helpers */
-	operator str(): string -> tostr();
+	/* Operator integration */
+	public operator str(): string -> tostr();
+	public operator hash(): int ->
+		hash(typ, flags & CTYPEREF_FLAG_RELEVANT_FOR_EQUALITY);
+	public operator == (other: CTypeRef): bool ->
+		((flags & CTYPEREF_FLAG_RELEVANT_FOR_EQUALITY) ==
+		 (other.flags & CTYPEREF_FLAG_RELEVANT_FOR_EQUALITY)) &&
+		IDENTICAL(typ, other.typ);
+	public operator != (other: CTypeRef): bool ->
+		((flags & CTYPEREF_FLAG_RELEVANT_FOR_EQUALITY) !=
+		 (other.flags & CTYPEREF_FLAG_RELEVANT_FOR_EQUALITY)) ||
+		!IDENTICAL(typ, other.typ);
+
+	/* Helper proxies for the underlying CType */
 	public property sizeof: int = { get(): int -> typ.sizeof; };
 	public property alignof: int = { get(): int -> typ.alignof; };
 
@@ -339,12 +420,74 @@ final class CTypeRef {
 	@@extern int *x;
 	@@extern __attribute__((noderef)) int *x; // Extra attributes are imported here!
 	@@```
-	function redeclarationImport(checker: Checker, other: CTypeRef) {
-		/* TODO: Warnings for attributes that weren't present during the initial declaration. */
-		flags |= other.flags;
-		if (other.attrib !is none)
-			requireAttrib.importFrom(other.attrib);
-		typ = other.typ;
+	function redeclarationImport(checker: Checker, other: CTypeRef,
+	                             newName: string = "", oldName: string = "",
+	                             oldDeclFlc: (string, int, int) | none = none) {
+		/* Check for changed flags. */
+		local flagsRemoved: int = 0;
+		local flagsAdded: int = 0;
+		if (flags != other.flags) {
+			flagsRemoved = flags & ~other.flags;
+			flagsAdded   = other.flags & ~flags;
+			flags |= other.flags;
+		}
+
+		/* Check for changed attributes. */
+		local attribRemoved: {string...} = ();
+		local attribAdded: {string...} = ();
+		if (attrib !is none) {
+			if (other.attrib is none) {
+				attribRemoved = List(attrib.enumerateAttributsNotPresentIn(checker));
+			} else {
+				attribRemoved = List(attrib.enumerateAttributsNotPresentIn(checker, other.attrib));
+				attribAdded   = List(other.attrib.enumerateAttributsNotPresentIn(checker, attrib));
+				if (attribAdded)
+					attrib.importFrom(other.attrib);
+			}
+		} else if (other.attrib !is none) {
+			attribAdded = List(other.attrib.enumerateAttributsNotPresentIn(checker));
+			if (attribAdded) {
+				attrib = CTypeAttributes();
+				attrib.importFrom(other.attrib);
+			}
+		}
+
+		/* Warnings for attributes that weren't present during the initial declaration. */
+		if (flagsRemoved || flagsAdded || attribRemoved || attribAdded) {
+			local addedKeywords: string = "";
+			local removedKeywords: string = "";
+			if (flagsAdded) {
+				if (attribAdded !is List)
+					attribAdded = List(attribAdded);
+				addedKeywords = " ".join(CTYPEREF_FLAGNAMES_TOSTR(CTYPEREF_FLAGNAMES_KEYWORD, flagsAdded));
+				attribAdded.extend(CTYPEREF_FLAGNAMES_TOSTR(CTYPEREF_FLAGNAMES_ATTRIB, flagsAdded));
+			}
+			if (flagsRemoved) {
+				if (attribRemoved !is List)
+					attribRemoved = List(attribRemoved);
+				removedKeywords = " ".join(CTYPEREF_FLAGNAMES_TOSTR(CTYPEREF_FLAGNAMES_KEYWORD, flagsRemoved));
+				attribRemoved.extend(CTYPEREF_FLAGNAMES_TOSTR(CTYPEREF_FLAGNAMES_ATTRIB, flagsRemoved));
+			}
+			if (attribAdded)
+				addedKeywords = f"__attribute__(({', '.join(attribAdded)})) {addedKeywords}".rstrip();
+			if (attribRemoved)
+				removedKeywords = f"__attribute__(({', '.join(attribRemoved)})) {removedKeywords}".rstrip();
+			local message = f"redeclaration of `{newName}' with different attributes: ";
+			if (addedKeywords && removedKeywords) {
+				message += f"added `{addedKeywords}' & removed `{removedKeywords}'";
+			} else if (addedKeywords) {
+				message += f"added `{addedKeywords}'";
+			} else {
+				message += f"removed `{removedKeywords}'";
+			}
+			if (oldDeclFlc !is none) {
+				message += checker.forceFormatMessageAddend(
+					oldDeclFlc, f"See previous declaration of `{oldName}'");
+			}
+			checker.warn("-Wdecl", message);
+		}
+		assert type(typ) === type(other.typ);
+		typ.redeclarationImport(checker, other.typ, newName, oldName, oldDeclFlc);
 	}
 
 	@@Import specifications from a fixed @typedef into @this
@@ -536,10 +679,14 @@ final class CTypeRef {
 		if (flags & CTYPEREF_FLAG_NONNULL) {
 			local nothrow: string | none = attrib.nothrow;
 			if (nothrow !is none && (nothrow.startswith("*") || int(nothrow) > 0)) {
-				checker.warn("-Wattribute",
-					f"Use of `__attribute__((nonnull))' together "
-					f"with `__attribute__((nothrow({nothrow})))' "
-					f"in `{this}'");
+				if (typ is CFunctionType) {
+					/* Function pointers are allowed to have a nothrow attribute *and* be nonnull! */
+				} else {
+					checker.warn("-Wattribute",
+						f"Use of `__attribute__((nonnull))' together "
+						f"with `__attribute__((nothrow({nothrow})))' "
+						f"in `{this}'");
+				}
 			}
 		}
 
@@ -560,9 +707,13 @@ final class CTypeRef {
 		if (!(flags & CTYPEREF_FLAG_NONNULL)) {
 			local nothrow: string | none = attrib.nothrow;
 			if (nothrow !is none && (nothrow.startswith("*") || int(nothrow) > 0)) {
-				checker.warn("-Wattribute",
-					f"`__attribute__((nonnull))' applied to argument `{varname}' "
-					f"which is annotated as `{getPrettyNothrowLevelName(nothrow)}'");
+				if (typ is CFunctionType) {
+					/* Function pointers are allowed to have a nothrow attribute *and* be nonnull! */
+				} else {
+					checker.warn("-Wattribute",
+						f"`__attribute__((nonnull))' applied to argument `{varname}' "
+						f"which is annotated as `{getPrettyNothrowLevelName(nothrow)}'");
+				}
 			}
 			flags |= CTYPEREF_FLAG_NONNULL;
 		}
@@ -587,51 +738,14 @@ final class CTypeRef {
 	}
 
 	function tostr(varname: string = ""): string {
-		if (flags & CTYPEREF_FLAG_RESTRICT)
-			varname = f"restrict {varname}";
-		if (flags & CTYPEREF_FLAG_VOLATILE)
-			varname = f"volatile {varname}";
-		if (flags & CTYPEREF_FLAG_CONST)
-			varname = f"const {varname}";
-		local attributeValues: {string...} = [];
-		if (flags & CTYPEREF_FLAG_NODEREF)
-			attributeValues.append("noderef");
-		if (flags & CTYPEREF_FLAG_NONNULL)
-			attributeValues.append("nonnull");
-		if (flags & CTYPEREF_FLAG_FORCE)
-			attributeValues.append("force");
-		if (flags & CTYPEREF_FLAG_NORETURN)
-			attributeValues.append("noreturn");
-		if (attrib !is none) {
-			local temp = attrib.nothrow;
-			if (temp !is none)
-				attributeValues.append(f"nothrow({temp})");
-			local temp = attrib.throws;
-			if (temp) {
-				local throwsCodes: {string...} = (
-					for (local throwsId: temp)
-						{ -1 : "*", 0 : "..." }.get(throwsId, throwsId.hex())
-				);
-				attributeValues.append(f"throws({", ".join(throwsCodes.sorted())})");
-			}
-			local temp = attrib.tags;
-			if (temp) {
-				attributeValues.append(f"tag({
-					', '.join(for (local x: temp.sorted()) repr x)
-				})");
-			}
-			local temp = attrib.requireCallerTags;
-			if (temp) {
-				attributeValues.append(f"require_caller_tag({
-					', '.join(for (local x: temp.sorted()) repr x)
-				})");
-			}
-			local temp = attrib.aligned;
-			if (temp !is none)
-				attributeValues.append(f"aligned({temp})");
-		}
+		for (local keyword: CTYPEREF_FLAGNAMES_TOSTR(CTYPEREF_FLAGNAMES_KEYWORD, flags))
+			varname = f"{keyword} {varname}";
+		local attributeValues: {string...} = List(
+			CTYPEREF_FLAGNAMES_TOSTR(CTYPEREF_FLAGNAMES_ATTRIB, flags));
+		if (attrib !is none)
+			attributeValues.extend(attrib.enumerateAttributsNotPresentIn());
 		if (attributeValues)
-			varname = f"__attribute__(({", ".join(attributeValues)})) {varname}";
+			varname = f"__attribute__(({', '.join(attributeValues)})) {varname}";
 		return typ.tostr(varname.rstrip());
 	}
 
@@ -999,6 +1113,11 @@ class CPointerType: CType {
 	function fixNonsensicalAttributes(checker: Checker)
 		-> base.fixNonsensicalPointerBaseAttributes(checker);
 
+	function redeclarationImport(checker: Checker, other: CType,
+	                             newName: string = "", oldName: string = "",
+	                             oldDeclFlc: (string, int, int) | none = none)
+		-> base.redeclarationImport(checker, other.base, newName, oldName, oldDeclFlc);
+
 	function tostr(varname: string = ""): string {
 		return base.tostr("*" + varname);
 	}
@@ -1226,6 +1345,57 @@ final class CFunctionType: CType {
 	public property sizeof: int = { get(): int -> 0; };
 	public property alignof: int = { get(): int -> 1; };
 
+	@@Evaluations to @true if there are pointer-arguments that are neither `restrict`, not `[[nonnull]]`
+	public property hasNotRestrictNotNonnullPointerArguments: bool = {
+		get(): bool {
+			for (local argTypeRef, none: args) {
+				local argType: CType = argTypeRef.typ;
+				if ((argType is CPointerType) &&
+				    !(argTypeRef.flags & CTYPEREF_FLAG_RESTRICT) &&
+				    !(argType.base.flags & CTYPEREF_FLAG_NONNULL)) {
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+
+	function redeclarationImport(checker: Checker, other: CType,
+	                             newName: string = "", oldName: string = "",
+	                             oldDeclFlc: (string, int, int) | none = none) {
+		returnType.redeclarationImport(checker, other.returnType, newName, oldName, oldDeclFlc);
+		assert #args == #other.args;
+		if (other.defaults) {
+			/* Default arguments can only be declared *once* */
+			if (checker.ignoreDuplicateDefaultArgumentDeclarations) {
+				/* Special mode for `__builtin_define_alias()` */
+			} else if (!defaults) {
+				defaults = other.defaults;
+			} else {
+				checker.warn("-Wdecl",
+					f"Function default arguments were already "
+					f"present in previous declaration of `{newName}'");
+			}
+		}
+		for (local i: [:#args]) {
+			local argTypeRef: CTypeRef;
+			local argName: string;
+			argTypeRef, argName = args[i]...;
+			local otherArgName = other.args[i].last;
+			if (!argName) {
+				/* Lazily import argument names when not already defined. */
+				argName = otherArgName;
+				args[i] = (argTypeRef, argName);
+			}
+			if (!otherArgName)
+				otherArgName = argName;
+			argTypeRef.redeclarationImport(checker, other.args[i].first,
+					f"{newName}.{argName}",
+					f"{oldName}.{otherArgName}",
+					oldDeclFlc);
+		}
+	}
+
 	public operator hash(): int -> hash(returnType, isVarArgs, args.each.first);
 	public operator == (other: CFunctionType) ->
 		other is CFunctionType &&
@@ -1443,7 +1613,9 @@ final class COverloadedFunctionSymbol: CSymbol {
 			if (overload is CSymbolTemplate)
 				continue;
 			if (overload.typeref.redeclarationEquals(typeref)) {
-				overload.typeref.redeclarationImport(checker, typeref);
+				local symbolName = this.name;
+				overload.typeref.redeclarationImport(
+					checker, typeref, symbolName, symbolName, overload.decl);
 				return overload;
 			}
 		}
