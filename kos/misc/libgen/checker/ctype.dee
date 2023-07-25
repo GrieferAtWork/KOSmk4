@@ -969,6 +969,10 @@ global final C_ldouble_16 = CCoreFloatType("long double", 16, 16);
 global final C_nullptr_t_32 = CCoreNullptrType("nullptr_t", 4, 4);
 global final C_nullptr_t_64 = CCoreNullptrType("nullptr_t", 8, 8);
 
+global final C_int_typeref: CTypeRef = CTypeRef(C_int);
+global final C_uint_typeref: CTypeRef = CTypeRef(C_uint);
+global final C_double_typeref: CTypeRef = CTypeRef(C_double);
+
 global final FLOAT_TYPES_SUFFIX: {Type: string} = UniqueDict.Frozen({
 	C_float : "F",
 	C_double : "",

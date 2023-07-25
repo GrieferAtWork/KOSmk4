@@ -105,7 +105,34 @@
 #define __GCC_HAS_BUILTIN___builtin_umul_overflow
 #define __GCC_HAS_BUILTIN___builtin_umull_overflow
 #define __GCC_HAS_BUILTIN___builtin_umulll_overflow
-/* Builtins that we're emulating */
+#define __GCC_HAS_BUILTIN___builtin_LINE
+#define __GCC_HAS_BUILTIN___builtin_FILE
+#define __GCC_HAS_BUILTIN___builtin_FUNCTION
+#define __GCC_HAS_BUILTIN___builtin_ffs
+#define __GCC_HAS_BUILTIN___builtin_ffsl
+#define __GCC_HAS_BUILTIN___builtin_ffsll
+#define __GCC_HAS_BUILTIN___builtin_clz
+#define __GCC_HAS_BUILTIN___builtin_clzl
+#define __GCC_HAS_BUILTIN___builtin_clzll
+#define __GCC_HAS_BUILTIN___builtin_ctz
+#define __GCC_HAS_BUILTIN___builtin_ctzl
+#define __GCC_HAS_BUILTIN___builtin_ctzll
+#define __GCC_HAS_BUILTIN___builtin_clrsb
+#define __GCC_HAS_BUILTIN___builtin_clrsbl
+#define __GCC_HAS_BUILTIN___builtin_clrsbll
+#define __GCC_HAS_BUILTIN___builtin_popcount
+#define __GCC_HAS_BUILTIN___builtin_popcountl
+#define __GCC_HAS_BUILTIN___builtin_popcountll
+#define __GCC_HAS_BUILTIN___builtin_parity
+#define __GCC_HAS_BUILTIN___builtin_parityl
+#define __GCC_HAS_BUILTIN___builtin_parityll
+#define __GCC_HAS_BUILTIN___builtin_return_address
+#define __GCC_HAS_BUILTIN___builtin_frame_address
+#define __GCC_HAS_BUILTIN___builtin_extract_return_addr
+#define __GCC_HAS_BUILTIN___builtin_frob_return_addr
+#define __GCC_HAS_BUILTIN___builtin_stack_restore
+#define __GCC_HAS_BUILTIN___builtin_stack_save
+/* Builtins that we're emulating with macros below */
 #define __GCC_HAS_BUILTIN___builtin_va_list
 #define __GCC_HAS_BUILTIN___builtin_va_start
 #define __GCC_HAS_BUILTIN___builtin_va_arg
@@ -398,9 +425,9 @@
 #define __ULONGLONG unsigned long long
 #endif /* !__LONGLONG */
 
-#define inline
-#define __inline
-#define __inline__
+#define inline     /* Nothing */
+#define __inline   /* Nothing */
+#define __inline__ /* Nothing */
 #define __restrict restrict
 #define __restrict__ restrict
 #define __restrict_arr restrict
@@ -480,6 +507,15 @@
 #define __atomic_fetch_xor(ptr, val, memorder)  __atomic_exchange_n(ptr, val, memorder)
 #define __atomic_fetch_or(ptr, val, memorder)   __atomic_exchange_n(ptr, val, memorder)
 #define __atomic_fetch_nand(ptr, val, memorder) __atomic_exchange_n(ptr, val, memorder)
+#ifndef __ATOMIC_RELAXED
+#define __ATOMIC_RELAXED 0
+#define __ATOMIC_CONSUME 1
+#define __ATOMIC_ACQUIRE 2
+#define __ATOMIC_RELEASE 3
+#define __ATOMIC_ACQ_REL 4
+#define __ATOMIC_SEQ_CST 5
+#endif /* !__ATOMIC_RELAXED */
+
 
 /* NOTE: the following builtins are actually supported by the checker, but they're no-ops.
  *       By  deleting  them  here,  we  can   cut  down  on  some  unnecessary   overhead! */
@@ -490,5 +526,12 @@
 
 /* Prevent including of too many local functions by faking CRT features. */
 #ifndef __NO_KOS_SYSTEM_HEADERS__
+#if (!defined(__CRT_DOS) && !defined(__CRT_GLC) &&            \
+     !defined(__CRT_KOS) && !defined(__CRT_CYG) &&            \
+     !defined(__CRT_GENERIC) && !defined(__CRT_KOS_KERNEL) && \
+     !defined(__CRT_FREESTANDING))
+#ifndef _CRT
 #include <crt-features/crt-kos.h>
+#endif /* !_CRT */
+#endif /* !... */
 #endif /* !__NO_KOS_SYSTEM_HEADERS__ */

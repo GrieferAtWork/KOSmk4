@@ -47,7 +47,7 @@ __CSDECLARE2(,char const _itoa_digits[101],_itoa_digits)
 #elif defined(__cplusplus)
 #define __LOCAL_itoa_digits __LOCAL_itoa_digits_fp()
 __ATTR_FORCEINLINE __ATTR_UNUSED __ATTR_VISIBILITY("hidden")
-char const *(__LOCAL_itoa_digits_fp)(void) {
+char const *__NOTHROW(__LOCAL_itoa_digits_fp)(void) {
 	__ATTR_VISIBILITY("hidden")
 	static __LOCAL_LIBC_CONST_DATA_SECTION(_itoa_digits) char const ___itoa_digits_p[101] =
 	"0123456789abcdefghijklmnopqrstuvwxyz\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"

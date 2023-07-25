@@ -32,7 +32,7 @@
  * - Custom CRT feature functions (see __CRT_HAVE_* below)
  * - Functions are linked as INTERN
  * - Substitute the rest using implementations from <libc/local/xxx/yyy.h> */
-#define __CRT_FREESTANDING 1
+#define __CRT_FREESTANDING
 #define __LIBC __INTDEF
 
 /* Disable some format_printf() features that we're not using. */

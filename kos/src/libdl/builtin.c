@@ -3243,12 +3243,14 @@ got_current:
 			decref_unlikely(current);
 			goto done;
 		}
+
 		/* Try to lock the next module. */
 		dlglobals_all_read(&dl_globals);
 		next = DLIST_NEXT(current, dm_modules);
 		while (next && !tryincref(next))
 			next = DLIST_NEXT(next, dm_modules);
 		dlglobals_all_endread(&dl_globals);
+
 		/* Continue enumerating the next module. */
 		decref_unlikely(current);
 		if (!next)

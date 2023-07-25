@@ -38,7 +38,7 @@ __CSDECLARE2(,__UINT8_TYPE__ const unicode_utf8seqlen[256],unicode_utf8seqlen)
 #elif defined(__cplusplus)
 #define __LOCAL_unicode_utf8seqlen (__LOCAL_unicode_utf8seqlen_p())
 __ATTR_FORCEINLINE __ATTR_UNUSED __ATTR_VISIBILITY("hidden")
-__UINT8_TYPE__ const *(__LOCAL_unicode_utf8seqlen_p)(void) {
+__UINT8_TYPE__ const *__NOTHROW(__LOCAL_unicode_utf8seqlen_p)(void) {
 	__ATTR_VISIBILITY("hidden")
 	static __LOCAL_LIBC_CONST_DATA_SECTION(unicode_utf8seqlen)
 	__UINT8_TYPE__ const __unicode_utf8seqlen_p[256] =

@@ -555,9 +555,9 @@ err_bad_op:
 	public function inplacePromote(checker: Checker): CValue {
 		local typ: CType = typeref.typ;
 		if (typ in C_PROMOTE) {
-			return inplaceCast(checker, CTypeRef(C_int), true);
+			return inplaceCast(checker, C_int_typeref, true);
 		} else if (typ === C_float) {
-			return inplaceCast(checker, CTypeRef(C_double), true);
+			return inplaceCast(checker, C_double_typeref, true);
 		} else if (typ is CEnumType) {
 			return inplaceCast(checker, CTypeRef(typ.base), true);
 		} else {

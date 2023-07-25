@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_EXCEPT_CODES_H
-#define _KOS_EXCEPT_CODES_H 1
+#ifndef _KOS_EXCEPT_CHECKER_H
+#define _KOS_EXCEPT_CHECKER_H 1
 
 #include <__stdinc.h>
 
@@ -299,4 +299,4 @@
 #endif /* !... */
 /*[[[end]]]*/
 
-#endif /* !_KOS_EXCEPT_CODES_H */
+#endif /* !_KOS_EXCEPT_CHECKER_H */

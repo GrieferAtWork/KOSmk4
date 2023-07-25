@@ -6806,7 +6806,7 @@ char *strcasestr_l([[in]] char const *haystack, [[in]] char const *needle, $loca
 [[requires_function(vasprintf)]]
 char *vstrdupf([[in, format("printf")]] char const *__restrict format, $va_list args) {
 	char *result;
-	return vasprintf(&result, format, args) >= 0 ? result : 0;
+	return vasprintf(&result, format, args) >= 0 ? result : NULL;
 }
 
 @@>> strdupf(3), vstrdupf(3)

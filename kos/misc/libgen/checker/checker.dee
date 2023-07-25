@@ -1364,6 +1364,13 @@ done:
 				this.next();
 			}
 			this.skip(")");
+			parseCTypeRefAttributes(tr);
+			if (this.tok == "noexcept" && cxx) {
+				/* c++ noexcept attribute -> parse like `__attribute__((nothrow(0)))` */
+				tr.requireAttrib.nothrow = 0;
+				this.next();
+				parseCTypeRefAttributes(tr);
+			}
 			parseTypeRefInnerSuffix(tr);
 			func.returnType = tr.typ;
 			tr.typ = func;
@@ -1389,6 +1396,7 @@ done:
 				}
 			}
 			this.skip("]");
+			parseCTypeRefAttributes(tr);
 			parseTypeRefInnerSuffix(tr);
 			local baseType: CType = tr.typ;
 			local itemAlign: int | none = tr.attribAligned;
@@ -1416,6 +1424,7 @@ done:
 
 	function parseTypeRefInnerImpl(tr: CTypeRef, name: string = ""): (CTypeRef, string) {
 		/* Parse the inner type-ref prefix (iow: pointer types) */
+		parseCTypeRefAttributes(tr);
 prefixAgain:
 		if (this.tok == "*") {
 			this.next();
@@ -1438,26 +1447,26 @@ prefixAgain:
 			parseCTypeRefConstVolatile(tr);
 			goto prefixAgain;
 		}
-		parseCTypeRefAttributes(tr);
 
 		local result;
 		if (this.tok == "(") {
 			this.next();
 			result = parseTypeRefInnerImpl(tr, name);
 			this.skip(")");
+			parseCTypeRefAttributes(tr);
 		} else {
 			/* Parse variable name */
 			if (!name && this.tok.issymbol()) {
 				name = this.tok;
 				this.next();
+				parseCTypeRefAttributes(tr);
 			}
 			result = (tr, name);
 		}
 
 		/* Parse type suffix expressions */
-		do {
-			parseTypeRefInnerSuffix(tr);
-		} while (parseCTypeRefAttributes(tr));
+		parseTypeRefInnerSuffix(tr);
+		parseCTypeRefAttributes(tr);
 
 		return result;
 	}
@@ -1676,6 +1685,16 @@ prefixAgain:
 		if (result && withSemiColon)
 			this.skip(";");
 		return result;
+	}
+
+	function verifyRethrow() {
+		if (!isUnreachable && currentCatchBlockExceptions) {
+			currentTryBlockExceptions.insertall(currentCatchBlockExceptions);
+			if (!isInTryBlock) {
+				verifyTopLevelThrows(currentCatchBlockExceptions,
+					getReason: _ -> "it `RETHROW()`s them here");
+			}
+		}
 	}
 
 	@@Verify that it's OK that exceptions @codes are thrown at the top-level of the current function
@@ -2060,6 +2079,14 @@ again:
 			if (!isUnreachable)
 				encounteredAsm = true;
 			parseGCCAssemblyStatement();
+			break;
+
+		case "throw":
+			if (!cxx)
+				goto default_case;
+			verifyRethrow();
+			this.next();
+			this.skip(";");
 			break;
 
 		case "try": {
@@ -3499,14 +3526,23 @@ return_unknown_void_pointer:
 		case "__builtin_alloca":
 			this.next();
 			this.skip("(");
-			parseExpr();
+			parseExpr().inplaceCast(this, CTypeRef(TARGET_C_size_t));
 			this.skip(")");
 			goto return_unknown_void_pointer;
 
-		case "__builtin_alloca":
+		case "__builtin_return_address":
+		case "__builtin_frame_address":
 			this.next();
 			this.skip("(");
-			parseExpr();
+			parseExpr().inplaceCast(this, C_uint_typeref);
+			this.skip(")");
+			goto return_unknown_void_pointer;
+
+		case "__builtin_extract_return_addr":
+		case "__builtin_frob_return_addr":
+			this.next();
+			this.skip("(");
+			parseExpr().inplaceCast(this, CTypeRef(TARGET_CPointerType(CTypeRef(C_void))));
 			this.skip(")");
 			goto return_unknown_void_pointer;
 
@@ -3571,13 +3607,7 @@ return_unknown_void_pointer:
 		}	break;
 
 		case "__builtin_rethrow": {
-			if (!isUnreachable && currentCatchBlockExceptions) {
-				currentTryBlockExceptions.insertall(currentCatchBlockExceptions);
-				if (!isInTryBlock) {
-					verifyTopLevelThrows(currentCatchBlockExceptions,
-						getReason: _ -> "it `RETHROW()`s them here");
-				}
-			}
+			verifyRethrow();
 			this.next();
 			this.skip("(");
 			this.skip(")");
@@ -3660,7 +3690,7 @@ return_C_voidval:
 			this.skip("(");
 			local expr: CValue = parseExprRValue();
 			this.skip(")");
-			return cvalueFromValue(this, CTypeRef(C_int), expr.isConstExpr ? 1 : 0);
+			return cvalueFromValue(this, C_int_typeref, expr.isConstExpr ? 1 : 0);
 		}	break;
 
 		case "__builtin_types_compatible_p": {
@@ -3671,7 +3701,7 @@ return_C_voidval:
 			local b: CTypeRef = parseTypeOrExpressionType();
 			this.skip(")");
 			local r: CTypeRef | none = commonType(a, b, true);
-			return cvalueFromValue(this, CTypeRef(C_int), r !is none ? 1 : 0);
+			return cvalueFromValue(this, C_int_typeref, r !is none ? 1 : 0);
 		}	break;
 
 		case "__builtin_has_attribute": {
@@ -3683,7 +3713,7 @@ return_C_voidval:
 			parseCTypeRefAttribute(template);
 			this.skip(")");
 			/* Verify that by merging attributes, we get `(check & template) == template' */
-			return cvalueFromValue(this, CTypeRef(C_int),
+			return cvalueFromValue(this, C_int_typeref,
 				check.hasAllAttributesFrom(template) ? 1 : 0);
 		}	break;
 
@@ -3725,7 +3755,7 @@ again_builtin_offsetof_suffix:
 			this.skip(")");
 			val.inplaceRef(this);
 			if (tok == "__builtin_offsetafter")
-				val.inplaceOp2(this, "+", cvalueFromValue(this, CTypeRef(C_int), 1));
+				val.inplaceOp2(this, "+", cvalueFromValue(this, C_int_typeref, 1));
 			return val.inplaceCast(this, CTypeRef(TARGET_C_size_t), true);
 		}	break;
 
@@ -3780,7 +3810,7 @@ again_builtin_container_of_suffix:
 				return cvalueFromString(currentFunctionName);
 			if (tok == "__builtin_FILE")
 				return cvalueFromString(this.filename);
-			return cvalueFromValue(this, CTypeRef(C_int), this.lc.first);
+			return cvalueFromValue(this, C_int_typeref, this.lc.first);
 		}	break;
 
 		case "__builtin_ffs":
@@ -3852,11 +3882,11 @@ again_builtin_container_of_suffix:
 				default:
 					break;
 				}
-				result = cvalueFromValue(this, CTypeRef(C_int), val);
+				result = cvalueFromValue(this, C_int_typeref, val);
 			} else {
 				result = CValue(
 					kind:    CVALUE_AVOID,
-					typeref: CTypeRef(C_int));
+					typeref: C_int_typeref);
 			}
 			return result;
 		}	break;
@@ -4027,7 +4057,7 @@ again_builtin_container_of_suffix:
 		case "--": {
 			this.next();
 			local result: CValue = parseExprUnary();
-			local one: CValue = cvalueFromValue(this, CTypeRef(C_int), 1);
+			local one: CValue = cvalueFromValue(this, C_int_typeref, 1);
 			local newValue: CValue = result.op2(this, tok[0], one);
 			result = result.inplaceAssign(this, newValue);
 			return result;
@@ -4071,7 +4101,7 @@ default_case:
 				local ord: int = 0;
 				for (local ch: chr.ordinals)
 					ord = (ord << 8) | ch;
-				return cvalueFromValue(this, CTypeRef(C_int), ord);
+				return cvalueFromValue(this, C_int_typeref, ord);
 			} else {
 				local constVal: int | float;
 				local suffixEnd: int = #tok;
@@ -4140,7 +4170,7 @@ again:
 		case "++":
 		case "--": {
 			local oldValue: CValue = value.rValue(this);
-			local one: CValue = cvalueFromValue(this, CTypeRef(C_int), 1);
+			local one: CValue = cvalueFromValue(this, C_int_typeref, 1);
 			local newValue: CValue = value.op2(this, this.tok[0], one);
 			value.inplaceAssign(this, newValue);
 			value = oldValue;
@@ -4611,7 +4641,7 @@ function runChecker(filename: string, targetModule: Module, language: string = "
 	do {
 		print repr checker.filename, repr checker.lc, repr checker.this.tok;
 	} while (checker.this.next());
-#elif defined(__MAIN__)
+#elif defined(__MAIN__) || 0
 	checker.main();
 #else
 	try {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e99e8e4 */
+/* HASH CRC-32:0xe6129ebb */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5228,7 +5228,7 @@ INTERN ATTR_SECTION(".text.crt.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGN
 NOTHROW_NCX(LIBCCALL libc_vstrdupf)(char const *__restrict format,
                                     va_list args) {
 	char *result;
-	return libc_vasprintf(&result, format, args) >= 0 ? result : 0;
+	return libc_vasprintf(&result, format, args) >= 0 ? result : NULL;
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
