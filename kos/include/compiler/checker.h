@@ -305,7 +305,7 @@
 
 /* TODO: `CHECKED'        should become `NCX' */
 /* TODO: `USER CHECKED'   should become `NCX' */
-/* TODO: `USER UNCHECKED' should become `NCX UNCHECKED' */
+/* TODO: `USER UNCHECKED' should become `NCX UNCHECKED' (And `UNCHECKED' should only be `__attribute__((noderef))') */
 #define __ATTR_NCX              __checker_attribute__(__nothrow__(1))
 #define __ATTR_USER             __checker_attribute__(__nothrow__(1))
 #define __ATTR_UNCHECKED        __checker_attribute__(__noderef__, __nothrow__(1))
@@ -349,6 +349,7 @@
 #define __ATTR_HOT                           /* Nothing */
 #define __ATTR_COLD                          /* Nothing */
 #define __ATTR_NOCLONE                       /* Nothing */
+#define __thread                             /* Nothing */
 #define __ATTR_THREAD                        /* Nothing */
 #define __ATTR_ASSUME_ALIGNED(n)             __checker_attribute__(__aligned__(n))
 #define __ATTR_ALLOC_ALIGN(pari)             /* Nothing */
@@ -393,7 +394,9 @@
 #define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  __builtin_define_alias(#new, #old)
 #define __DEFINE_INTERN_WEAK_ALIAS(new, old)  __builtin_define_alias(#new, #old)
 
-/* Suppress warnings about `-Wsuggest-attribute=const' or `-Wsuggest-attribute=pure' */
+/* Suppress warnings about  `-Wsuggest-attribute=const' or  `-Wsuggest-attribute=pure'
+ * Within the checker, this also works to suppress warnings about errors that (appear)
+ * to never be thrown, or suggestions for making a function NOTHROW. */
 #define __COMPILER_IMPURE() __asm__("")
 
 #define __COMPILER_ASM_BUFFER(T, s, p) (*(__checker_attribute__(__force__) T(*)[s])(p))

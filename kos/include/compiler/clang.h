@@ -677,16 +677,18 @@
 #endif /* !__FUNCTION__ */
 #endif /* !__has_builtin(__builtin_FUNCTION) */
 
-#if !__has_builtin(__builtin_assume)
-#if 0
+#if __has_builtin(__builtin_assume)
+/* Already exists as a *true* builtin */
+#elif __has_attribute(__assume__)
+#define __builtin_assume(x) __XBLOCK({ __attribute__((__assume__(x))); (void)0; })
+#elif 1
 #define __builtin_assume_has_sideeffects
-#define __builtin_assume(x)  (!(x) ? __builtin_unreachable() : (void)0)
+#define __builtin_assume(x) (!(x) ? __builtin_unreachable() : (void)0)
 #else /* ... */
 #undef __builtin_assume_has_sideeffects
 #define __NO_builtin_assume
 #define __builtin_assume(x) (void)0
 #endif /* !... */
-#endif /* ... */
 
 #if !__has_builtin(__builtin_unreachable) && !defined(__TINYC__)
 #define __NO_builtin_unreachable

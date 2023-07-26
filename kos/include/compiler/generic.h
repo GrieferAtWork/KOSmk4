@@ -815,16 +815,22 @@
 #endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
 #endif /* !... */
 
-#if !__has_builtin(__builtin_assume)
-#if 0
+#if __has_builtin(__builtin_assume)
+/* Already exists as a *true* builtin */
+#elif __has_attribute(__assume__)
+#ifdef __NO_XBLOCK
+#define __builtin_assume(x) __attribute__((__assume__(x)))
+#else /* __NO_XBLOCK */
+#define __builtin_assume(x) __XBLOCK({ __attribute__((__assume__(x))); (void)0; })
+#endif /* !__NO_XBLOCK */
+#elif 1
 #define __builtin_assume_has_sideeffects
 #define __builtin_assume(x) (!(x) ? __builtin_unreachable() : (void)0)
-#else
+#else /* ... */
 #undef __builtin_assume_has_sideeffects
 #define __NO_builtin_assume
 #define __builtin_assume(x) (void)0
-#endif
-#endif /* ... */
+#endif /* !... */
 
 #if !__has_builtin(__builtin_unreachable) /*|| defined(__TINYC__)*/
 #define __NO_builtin_unreachable

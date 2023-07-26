@@ -154,6 +154,9 @@
 #if __GCC_VERSION_NUM >= 70000
 #define __GCC_HAS_ATTRIBUTE___fallthrough__
 #endif
+#if __GCC_VERSION_NUM >= 130000
+#define __GCC_HAS_ATTRIBUTE___assume__
+#endif
 #if defined(__GNUC_GNU_INLINE__) || defined(__GNUC_STDC_INLINE__)
 #define __GCC_HAS_ATTRIBUTE___gnu_inline__
 #endif /* __GNUC_GNU_INLINE__ || __GNUC_STDC_INLINE__ */
@@ -686,13 +689,9 @@
 #define __pragma(...) _Pragma(#__VA_ARGS__)
 #define __XBLOCK      /* Nothing */
 #define __XRETURN     /* Nothing */
-#define __builtin_assume_has_sideeffects
-#define __builtin_assume(x) (!(x) ? __builtin_unreachable() : (void)0)
 #elif defined(__INTELLISENSE__)
 #define __XBLOCK(...) (([&] __VA_ARGS__)())
 #define __XRETURN     return
-#define __builtin_assume_has_sideeffects
-#define __builtin_assume(x) __assume(x)
 #else /* ... */
 #if __GCC_VERSION_NUM >= 40400 || defined(__TPP_VERSION__)
 #define __pragma(...) _Pragma(#__VA_ARGS__)
@@ -702,16 +701,19 @@
 #endif /* __GCC_VERSION_NUM < 40400 && !__TPP_VERSION__ */
 #define __XBLOCK  __extension__
 #define __XRETURN /* Nothing */
-#if !__has_builtin(__builtin_assume)
-#if 1
+#endif /* !... */
+
+#if __has_builtin(__builtin_assume)
+/* Already exists as a *true* builtin */
+#elif __has_attribute(__assume__)
+#define __builtin_assume(x) __XBLOCK({ __attribute__((__assume__(x))); (void)0; })
+#elif 1
 #define __builtin_assume_has_sideeffects
 #define __builtin_assume(x) (!(x) ? __builtin_unreachable() : (void)0)
 #else /* ... */
 #undef __builtin_assume_has_sideeffects
 #define __NO_builtin_assume
 #define __builtin_assume(x) (void)0
-#endif /* !... */
-#endif /* !__has_builtin(__builtin_assume) */
 #endif /* !... */
 
 #if (__GCC_VERSION_NUM >= 40300 &&             \
