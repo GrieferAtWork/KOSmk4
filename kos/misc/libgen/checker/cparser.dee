@@ -48,7 +48,7 @@ class CParser {
 	private final member ignoredWarnings: {string...} = [];
 
 	@@When true, always extend the buffer (never clear it)
-	private member peeking: bool = false;
+	private final member peeking: bool = false;
 
 	@@The currently loaded token
 	public final member tok: string = "";
@@ -64,26 +64,26 @@ class CParser {
 
 #define ParserBackup  Tuple
 
-	private member fp: File | none;
-	private member buf: Bytes = none;
-	private member bufPos: int = 0;
-	private member bufLen: int = 0;
+	private final member fp: File | none;
+	private final member buf: Bytes = none;
+	private final member bufPos: int = 0;
+	private final member bufLen: int = 0;
 
 	@@Starting line of @buf (1-based)
-	private member bufStartLine: int = 1;
+	private final member bufStartLine: int = 1;
 	@@Starting column of @buf (1-based)
-	private member bufStartCol: int = 1;
+	private final member bufStartCol: int = 1;
 
 	@@Stack for `#pragma GCC diagnostic push`
-	private member ignoredWarningsStack: {{string...}...} = [];
+	private final member ignoredWarningsStack: {{string...}...} = [];
 
 	@@Override for where warnings should be printed at
-	private member warnLocationOverride: {(string, int, int)...} = [];
+	private final member warnLocationOverride: {(string, int, int)...} = [];
 
-	public function pushWarnLocationOverride(loc: (string, int, int)) {
+	public final function pushWarnLocationOverride(loc: (string, int, int)) {
 		warnLocationOverride.append(loc);
 	}
-	public function popWarnLocationOverride() {
+	public final function popWarnLocationOverride() {
 		warnLocationOverride.popback();
 	}
 
@@ -425,8 +425,8 @@ again:
 		tok = tok[0];
 	}
 
-	private member staticIfDepth: int = 0;
-	private member staticIfAllowed: bool = true;
+	private final member staticIfDepth: int = 0;
+	private final member staticIfAllowed: bool = true;
 
 	@@Advance to the next token
 	public final function next(): string {
@@ -654,7 +654,7 @@ return_ch_eof:
 #undef RETURN
 	}
 
-	function handleStaticIfSkipBlock() {
+	private final function handleStaticIfSkipBlock() {
 		local recursion = 0;
 		for (;;) {
 			switch (next()) {
@@ -676,7 +676,7 @@ return_ch_eof:
 		}
 	}
 
-	function handleStaticIfRBrace(): string | none {
+	private final function handleStaticIfRBrace(): string | none {
 again:
 		--staticIfDepth;
 		staticIfAllowed = false;
@@ -695,7 +695,7 @@ again:
 		return tok;
 	}
 
-	function handleStaticIf(): string | none {
+	private final function handleStaticIf(): string | none {
 again:
 		staticIfAllowed = false;
 		next();

@@ -60,6 +60,10 @@
 #endif /* !__REFCNT_NOTHROW */
 #endif /* !__KOS__ || !__KERNEL__ */
 
+#ifndef __REFCNT_DESTROY_NOTHROW
+#define __REFCNT_DESTROY_NOTHROW __REFCNT_NOTHROW
+#endif /* !__REFCNT_DESTROY_NOTHROW */
+
 #if (defined(__USE_KOS) || defined(__USE_KOS_KERNEL) || \
      (defined(__KOS__) && defined(__KERNEL__)))
 #define __PRIVATE_REFCNT_NAME(x)                            x
@@ -128,11 +132,11 @@ public:
 	typedef __UINTPTR_TYPE__ refcnt_t;
 	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC incref)(__T *__restrict self);
 	static __NOBLOCK __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC tryincref)(__T *__restrict self);
-	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref)(__T *__restrict self);
-	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC destroy)(__T *__restrict self);
+	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC decref)(__T *__restrict self);
+	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC destroy)(__T *__restrict self);
 	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref_nokill)(__T *__restrict self);
-	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref_likely)(__T *__restrict self);
-	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref_unlikely)(__T *__restrict self);
+	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC decref_likely)(__T *__restrict self);
+	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC decref_unlikely)(__T *__restrict self);
 	static __NOBLOCK __ATTR_NONNULL((1)) refcnt_t __REFCNT_NOTHROW(__REFCNT_CC getrefcnt)(__T const *__restrict self);
 };
 template<class __T> class weakrefcnt_methods {
@@ -140,11 +144,11 @@ public:
 	typedef __UINTPTR_TYPE__ refcnt_t;
 	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC incref)(__T *__restrict self);
 	static __NOBLOCK __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC tryincref)(__T *__restrict self);
-	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref)(__T *__restrict self);
-	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC destroy)(__T *__restrict self);
+	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC decref)(__T *__restrict self);
+	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC destroy)(__T *__restrict self);
 	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref_nokill)(__T *__restrict self);
-	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref_likely)(__T *__restrict self);
-	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref_unlikely)(__T *__restrict self);
+	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC decref_likely)(__T *__restrict self);
+	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC decref_unlikely)(__T *__restrict self);
 	static __NOBLOCK __ATTR_NONNULL((1)) refcnt_t __REFCNT_NOTHROW(__REFCNT_CC getrefcnt)(__T const *__restrict self);
 };
 } /* extern "C++" */
@@ -157,15 +161,15 @@ public:
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC tryincref)(T *__restrict self);                                 \
 	template<class __T> __NOBLOCK __PRIVATE_REFCNT_INCREF_RT(__T, T) __REFCNT_NOTHROW(__REFCNT_CC xincref)(__T *__restrict self);                    \
 	template<class __T> __NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1)) __PRIVATE_REFCNT_INCREF_RT(__T, T) __REFCNT_NOTHROW(__REFCNT_CC incref)(__T *__restrict self); \
-	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC destroy)(T *__restrict self);                                                    \
-	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref)(T *__restrict self);                                                     \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC destroy)(T *__restrict self);                                            \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC decref)(T *__restrict self);                                             \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC decref_likely)(T *__restrict self);                                      \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC decref_unlikely)(T *__restrict self);                                    \
 	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref_nokill)(T *__restrict self);                                              \
-	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref_likely)(T *__restrict self);                                              \
-	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref_unlikely)(T *__restrict self);                                            \
-	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref)(T *self);                                                                                   \
+	__NOBLOCK void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC xdecref)(T *self);                                                                           \
+	__NOBLOCK void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC xdecref_likely)(T *self);                                                                    \
+	__NOBLOCK void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC xdecref_unlikely)(T *self);                                                                  \
 	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_nokill)(T *self);                                                                            \
-	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_likely)(T *self);                                                                            \
-	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_unlikely)(T *self);                                                                          \
 	}
 #define __DEFINE_WEAKREFCNT_GLOBAL_FUNCTIONS_X(T, destroy_, X, _)                                                                                        \
 	extern "C++" {                                                                                                                                       \
@@ -175,40 +179,40 @@ public:
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC tryweakincref)(T *__restrict self);                                 \
 	template<class __T> __NOBLOCK __PRIVATE_REFCNT_INCREF_RT(__T, T) __REFCNT_NOTHROW(__REFCNT_CC xweakincref)(__T *__restrict self);                    \
 	template<class __T> __NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1)) __PRIVATE_REFCNT_INCREF_RT(__T, T) __REFCNT_NOTHROW(__REFCNT_CC weakincref)(__T *__restrict self); \
-	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdestroy)(T *__restrict self);                                                    \
-	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdecref)(T *__restrict self);                                                     \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC weakdestroy)(T *__restrict self);                                            \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC weakdecref)(T *__restrict self);                                             \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC weakdecref_likely)(T *__restrict self);                                      \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC weakdecref_unlikely)(T *__restrict self);                                    \
 	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdecref_nokill)(T *__restrict self);                                              \
-	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdecref_likely)(T *__restrict self);                                              \
-	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdecref_unlikely)(T *__restrict self);                                            \
-	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref)(T *self);                                                                                   \
+	__NOBLOCK void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC xweakdecref)(T *self);                                                                           \
+	__NOBLOCK void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC xweakdecref_likely)(T *self);                                                                    \
+	__NOBLOCK void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC xweakdecref_unlikely)(T *self);                                                                  \
 	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_nokill)(T *self);                                                                            \
-	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_likely)(T *self);                                                                            \
-	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_unlikely)(T *self);                                                                          \
 	}
 #else /* __USE_KOS || __USE_KOS_KERNEL || (__KOS__ && __KERNEL__) */
 template<class __T> class __refcnt_methods {
 public:
 	typedef __UINTPTR_TYPE__ __refcnt_t;
+	static __NOBLOCK __ATTR_NONNULL((1)) __refcnt_t __REFCNT_NOTHROW(__REFCNT_CC __getrefcnt)(__T const *__restrict __self);
 	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC __incref)(__T *__restrict __self);
 	static __NOBLOCK __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC __tryincref)(__T *__restrict __self);
-	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC __decref)(__T *__restrict __self);
-	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC __destroy)(__T *__restrict __self);
+	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC __decref)(__T *__restrict __self);
+	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC __destroy)(__T *__restrict __self);
+	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC __decref_likely)(__T *__restrict __self);
+	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC __decref_unlikely)(__T *__restrict __self);
 	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC __decref_nokill)(__T *__restrict __self);
-	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC __decref_likely)(__T *__restrict __self);
-	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC __decref_unlikely)(__T *__restrict __self);
-	static __NOBLOCK __ATTR_NONNULL((1)) __refcnt_t __REFCNT_NOTHROW(__REFCNT_CC __getrefcnt)(__T const *__restrict __self);
 };
 template<class __T> class __weakrefcnt_methods {
 public:
 	typedef __UINTPTR_TYPE__ __refcnt_t;
+	static __NOBLOCK __ATTR_NONNULL((1)) __refcnt_t __REFCNT_NOTHROW(__REFCNT_CC __getrefcnt)(__T const *__restrict __self);
 	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC __incref)(__T *__restrict __self);
 	static __NOBLOCK __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC __tryincref)(__T *__restrict __self);
-	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC __decref)(__T *__restrict __self);
-	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC __destroy)(__T *__restrict __self);
+	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC __decref)(__T *__restrict __self);
+	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC __destroy)(__T *__restrict __self);
+	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC __decref_likely)(__T *__restrict __self);
+	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC __decref_unlikely)(__T *__restrict __self);
 	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC __decref_nokill)(__T *__restrict __self);
-	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC __decref_likely)(__T *__restrict __self);
-	static __NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC __decref_unlikely)(__T *__restrict __self);
-	static __NOBLOCK __ATTR_NONNULL((1)) __refcnt_t __REFCNT_NOTHROW(__REFCNT_CC __getrefcnt)(__T const *__restrict __self);
 };
 #define __DEFINE_REFCNT_GLOBAL_FUNCTIONS_X(T, destroy_, X, _)     /* nothing */
 #define __DEFINE_WEAKREFCNT_GLOBAL_FUNCTIONS_X(T, destroy_, X, _) /* nothing */
@@ -294,15 +298,15 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 #define __DEFINE_WEAKREFCNT_TEMPLATE_X(T, destroy_, X, _) /* Nothing */
 #define __DEFINE_REFCNT_GLOBAL_FUNCTIONS_X(T, destroy_, X, _)                                                                      \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))                                        \
-	__PRIVATE_REFCNT_TYPE_X(T, X, _) __REFCNT_NOTHROW(__REFCNT_CC getrefcnt)(T const *__restrict __self) {                         \
+	__PRIVATE_REFCNT_TYPE_X(T, X, _) __REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(getrefcnt))(T const *__restrict __self) {  \
 		return __hybrid_atomic_load(&X(_, __self), __ATOMIC_ACQUIRE);                                                              \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))                                        \
-	bool __REFCNT_NOTHROW(__REFCNT_CC isshared)(T const *__restrict __self) {                                                      \
+	bool __REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(isshared))(T const *__restrict __self) {                               \
 		return __hybrid_atomic_load(&X(_, __self), __ATOMIC_ACQUIRE) > 1;                                                          \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))                                        \
-	bool __REFCNT_NOTHROW(__REFCNT_CC wasdestroyed)(T const *__restrict __self) {                                                  \
+	bool __REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(wasdestroyed))(T const *__restrict __self) {                           \
 		return __hybrid_atomic_load(&X(_, __self), __ATOMIC_ACQUIRE) == 0;                                                         \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1))                                                 \
@@ -322,7 +326,8 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 		__PRIVATE_REFCNT_IMPL_INCREF(T, incref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))                          \
 		return __self;                                                                                                             \
 	}                                                                                                                              \
-	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK T *__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xincref))(T *__self) {          \
+	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK T *                                                                                   \
+	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xincref))(T *__self) {                                                      \
 		if (__self) {                                                                                                              \
 			__PRIVATE_REFCNT_IMPL_INCREF(T, incref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))                      \
 		}                                                                                                                          \
@@ -333,19 +338,19 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 		__PRIVATE_REFCNT_IMPL_TRYINCREF(T, tryincref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))                    \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                              \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(destroy))(T *__restrict __self) {                                           \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(destroy))(T *__restrict __self) {                                   \
 		__PRIVATE_REFCNT_IMPL_DESTROY(T, destroy, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))                        \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                              \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref))(T *__restrict __self) {                                            \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref))(T *__restrict __self) {                                    \
 		__PRIVATE_REFCNT_IMPL_DECREF(T, decref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), /**/)                    \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                              \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_likely))(T *__restrict __self) {                                     \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_likely))(T *__restrict __self) {                             \
 		__PRIVATE_REFCNT_IMPL_DECREF(T, decref_likely, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), __likely)         \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                              \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_unlikely))(T *__restrict __self) {                                   \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_unlikely))(T *__restrict __self) {                           \
 		__PRIVATE_REFCNT_IMPL_DECREF(T, decref_unlikely, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), __unlikely)     \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                              \
@@ -353,19 +358,19 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 		__PRIVATE_REFCNT_IMPL_DECREF_NOKILL(T, decref_nokill, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))            \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK void                                                                                  \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xdecref))(T *__self) {                                                      \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xdecref))(T *__self) {                                              \
 		if (__self) {                                                                                                              \
 			__PRIVATE_REFCNT_IMPL_DECREF(T, decref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), /**/)                \
 		}                                                                                                                          \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK void                                                                                  \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xdecref_likely))(T *__self) {                                               \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xdecref_likely))(T *__self) {                                       \
 		if (__self) {                                                                                                              \
 			__PRIVATE_REFCNT_IMPL_DECREF(T, decref_likely, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), __likely)     \
 		}                                                                                                                          \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK void                                                                                  \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xdecref_unlikely))(T *__self) {                                             \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xdecref_unlikely))(T *__self) {                                     \
 		if (__self) {                                                                                                              \
 			__PRIVATE_REFCNT_IMPL_DECREF(T, decref_unlikely, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), __unlikely) \
 		}                                                                                                                          \
@@ -378,15 +383,15 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 	}
 #define __DEFINE_WEAKREFCNT_GLOBAL_FUNCTIONS_X(T, destroy_, X, _)                                                                      \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))                                            \
-	__PRIVATE_REFCNT_TYPE_X(T, X, _) __REFCNT_NOTHROW(__REFCNT_CC getweakrefcnt)(T const *__restrict __self) {                         \
+	__PRIVATE_REFCNT_TYPE_X(T, X, _) __REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(getweakrefcnt))(T const *__restrict __self) {  \
 		return __hybrid_atomic_load(&X(_, __self), __ATOMIC_ACQUIRE);                                                                  \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))                                            \
-	bool __REFCNT_NOTHROW(__REFCNT_CC isweakshared)(T const *__restrict __self) {                                                      \
+	bool __REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(isweakshared))(T const *__restrict __self) {                               \
 		return __hybrid_atomic_load(&X(_, __self), __ATOMIC_ACQUIRE) > 1;                                                              \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))                                            \
-	bool __REFCNT_NOTHROW(__REFCNT_CC wasweakdestroyed)(T const *__restrict __self) {                                                  \
+	bool __REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(wasweakdestroyed))(T const *__restrict __self) {                           \
 		return __hybrid_atomic_load(&X(_, __self), __ATOMIC_ACQUIRE) == 0;                                                             \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1))                                                     \
@@ -406,7 +411,8 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 		__PRIVATE_REFCNT_IMPL_INCREF(T, weakincref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))                          \
 		return __self;                                                                                                                 \
 	}                                                                                                                                  \
-	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK T *__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xweakincref))(T *__self) {          \
+	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK T *                                                                                       \
+	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xweakincref))(T *__self) {                                                      \
 		if (__self) {                                                                                                                  \
 			__PRIVATE_REFCNT_IMPL_INCREF(T, weakincref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))                      \
 		}                                                                                                                              \
@@ -417,19 +423,19 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 		__PRIVATE_REFCNT_IMPL_TRYINCREF(T, tryweakincref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))                    \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                                  \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(weakdestroy))(T *__restrict __self) {                                           \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(weakdestroy))(T *__restrict __self) {                                   \
 		__PRIVATE_REFCNT_IMPL_DESTROY(T, weakdestroy, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))                        \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                                  \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(weakdecref))(T *__restrict __self) {                                            \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(weakdecref))(T *__restrict __self) {                                    \
 		__PRIVATE_REFCNT_IMPL_DECREF(T, weakdecref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), /**/)                    \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                                  \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(weakdecref_likely))(T *__restrict __self) {                                     \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(weakdecref_likely))(T *__restrict __self) {                             \
 		__PRIVATE_REFCNT_IMPL_DECREF(T, weakdecref_likely, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), __likely)         \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                                  \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(weakdecref_unlikely))(T *__restrict __self) {                                   \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(weakdecref_unlikely))(T *__restrict __self) {                           \
 		__PRIVATE_REFCNT_IMPL_DECREF(T, weakdecref_unlikely, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), __unlikely)     \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                                  \
@@ -437,19 +443,19 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 		__PRIVATE_REFCNT_IMPL_DECREF_NOKILL(T, weakdecref_nokill, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))            \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK void                                                                                      \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xweakdecref))(T *__self) {                                                      \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xweakdecref))(T *__self) {                                              \
 		if (__self) {                                                                                                                  \
 			__PRIVATE_REFCNT_IMPL_DECREF(T, weakdecref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), /**/)                \
 		}                                                                                                                              \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK void                                                                                      \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xweakdecref_likely))(T *__self) {                                               \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xweakdecref_likely))(T *__self) {                                       \
 		if (__self) {                                                                                                                  \
 			__PRIVATE_REFCNT_IMPL_DECREF(T, weakdecref_likely, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), __likely)     \
 		}                                                                                                                              \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK void                                                                                      \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xweakdecref_unlikely))(T *__self) {                                             \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xweakdecref_unlikely))(T *__self) {                                     \
 		if (__self) {                                                                                                                  \
 			__PRIVATE_REFCNT_IMPL_DECREF(T, weakdecref_unlikely, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), __unlikely) \
 		}                                                                                                                              \
@@ -480,24 +486,24 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 			__PRIVATE_REFCNT_IMPL_TRYINCREF(T, tryincref, destroy_, __PRIVATE_REFCNT_NAME(refcnt_t), X(_, __self))                \
 		}                                                                                                                         \
 		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                             \
-		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref))(T *__restrict __self) {                                       \
+		__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref))(T *__restrict __self) {                               \
 			__PRIVATE_REFCNT_IMPL_DECREF(T, decref, destroy_, __PRIVATE_REFCNT_NAME(refcnt_t), X(_, __self), /**/)                \
 		}                                                                                                                         \
 		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                             \
-		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(destroy))(T *__restrict __self) {                                      \
+		__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(destroy))(T *__restrict __self) {                              \
 			__PRIVATE_REFCNT_IMPL_DESTROY(T, destroy, destroy_, __PRIVATE_REFCNT_NAME(refcnt_t), X(_, __self))                    \
+		}                                                                                                                         \
+		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                             \
+		__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_likely))(T *__restrict __self) {                        \
+			__PRIVATE_REFCNT_IMPL_DECREF(T, decref_likely, destroy_, __PRIVATE_REFCNT_NAME(refcnt_t), X(_, __self), __likely)     \
+		}                                                                                                                         \
+		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                             \
+		__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_unlikely))(T *__restrict __self) {                      \
+			__PRIVATE_REFCNT_IMPL_DECREF(T, decref_unlikely, destroy_, __PRIVATE_REFCNT_NAME(refcnt_t), X(_, __self), __unlikely) \
 		}                                                                                                                         \
 		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                             \
 		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_nokill))(T *__restrict __self) {                                \
 			__PRIVATE_REFCNT_IMPL_DECREF_NOKILL(T, decref_nokill, destroy_, __PRIVATE_REFCNT_NAME(refcnt_t), X(_, __self))        \
-		}                                                                                                                         \
-		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                             \
-		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_likely))(T *__restrict __self) {                                \
-			__PRIVATE_REFCNT_IMPL_DECREF(T, decref_likely, destroy_, __PRIVATE_REFCNT_NAME(refcnt_t), X(_, __self), __likely)     \
-		}                                                                                                                         \
-		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                             \
-		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_unlikely))(T *__restrict __self) {                              \
-			__PRIVATE_REFCNT_IMPL_DECREF(T, decref_unlikely, destroy_, __PRIVATE_REFCNT_NAME(refcnt_t), X(_, __self), __unlikely) \
 		}                                                                                                                         \
 	};
 #define __DEFINE_WEAKREFCNT_TEMPLATE_X(T, destroy_, X, _)                                                                            \
@@ -519,37 +525,37 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 			__PRIVATE_REFCNT_IMPL_TRYINCREF(T, tryweakincref, destroy_, __PRIVATE_REFCNT_NAME(refcnt_t), X(_, __self))               \
 		}                                                                                                                            \
 		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                \
-		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref))(T *__restrict __self) {                                          \
+		__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref))(T *__restrict __self) {                                  \
 			__PRIVATE_REFCNT_IMPL_DECREF(T, weakdecref, destroy_, __PRIVATE_REFCNT_NAME(refcnt_t), X(_, __self), /**/)               \
 		}                                                                                                                            \
 		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                \
-		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(destroy))(T *__restrict __self) {                                         \
+		__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(destroy))(T *__restrict __self) {                                 \
 			__PRIVATE_REFCNT_IMPL_DESTROY(T, weakdestroy, destroy_, __PRIVATE_REFCNT_NAME(refcnt_t), X(_, __self))                   \
+		}                                                                                                                            \
+		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                \
+		__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_likely))(T *__restrict __self) {                           \
+			__PRIVATE_REFCNT_IMPL_DECREF(T, weakdecref_likely, destroy_, __PRIVATE_REFCNT_NAME(refcnt_t), X(_, __self), __likely)    \
+		}                                                                                                                            \
+		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                \
+		__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_unlikely))(T *__restrict __self) {                         \
+			__PRIVATE_REFCNT_IMPL_DECREF(T, weakdecref_unlikely, destroy_, __PRIVATE_REFCNT_NAME(refcnt_t), X(_, __self), __unlikely)\
 		}                                                                                                                            \
 		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                \
 		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_nokill))(T *__restrict __self) {                                   \
 			__PRIVATE_REFCNT_IMPL_DECREF_NOKILL(T, weakdecref_nokill, destroy_, __PRIVATE_REFCNT_NAME(refcnt_t), X(_, __self))       \
 		}                                                                                                                            \
-		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                \
-		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_likely))(T *__restrict __self) {                                   \
-			__PRIVATE_REFCNT_IMPL_DECREF(T, weakdecref_likely, destroy_, __PRIVATE_REFCNT_NAME(refcnt_t), X(_, __self), __likely)    \
-		}                                                                                                                            \
-		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                \
-		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_unlikely))(T *__restrict __self) {                                 \
-			__PRIVATE_REFCNT_IMPL_DECREF(T, weakdecref_unlikely, destroy_, __PRIVATE_REFCNT_NAME(refcnt_t), X(_, __self), __unlikely)\
-		}                                                                                                                            \
 	};
 #define __DEFINE_REFCNT_GLOBAL_FUNCTIONS_X(T, destroy_, X, _)                                                                      \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))                                        \
-	__PRIVATE_REFCNT_TYPE_X(T, X, _) __REFCNT_NOTHROW(__REFCNT_CC getrefcnt)(T const *__restrict __self) {                         \
+	__PRIVATE_REFCNT_TYPE_X(T, X, _) __REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(getrefcnt))(T const *__restrict __self) {  \
 		return __hybrid_atomic_load(&X(_, __self), __ATOMIC_ACQUIRE);                                                              \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))                                        \
-	bool __REFCNT_NOTHROW(__REFCNT_CC isshared)(T const *__restrict __self) {                                                      \
+	bool __REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(isshared))(T const *__restrict __self) {                               \
 		return __hybrid_atomic_load(&X(_, __self), __ATOMIC_ACQUIRE) > 1;                                                          \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))                                        \
-	bool __REFCNT_NOTHROW(__REFCNT_CC wasdestroyed)(T const *__restrict __self) {                                                  \
+	bool __REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(wasdestroyed))(T const *__restrict __self) {                           \
 		return __hybrid_atomic_load(&X(_, __self), __ATOMIC_ACQUIRE) == 0;                                                         \
 	}                                                                                                                              \
 	template<class __T> __FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1))                             \
@@ -569,7 +575,8 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 		__PRIVATE_REFCNT_IMPL_INCREF(T, incref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))                          \
 		return __self;                                                                                                             \
 	}                                                                                                                              \
-	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK T *__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xincref))(T *__self) {          \
+	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK T *                                                                                   \
+	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xincref))(T *__self) {                                                      \
 		if (__self) {                                                                                                              \
 			__PRIVATE_REFCNT_IMPL_INCREF(T, incref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))                      \
 		}                                                                                                                          \
@@ -580,19 +587,19 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 		__PRIVATE_REFCNT_IMPL_TRYINCREF(T, tryincref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))                    \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                              \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(destroy))(T *__restrict __self) {                                           \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(destroy))(T *__restrict __self) {                                   \
 		__PRIVATE_REFCNT_IMPL_DESTROY(T, destroy, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))                        \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                              \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref))(T *__restrict __self) {                                            \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref))(T *__restrict __self) {                                    \
 		__PRIVATE_REFCNT_IMPL_DECREF(T, decref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), /**/)                    \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                              \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_likely))(T *__restrict __self) {                                     \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_likely))(T *__restrict __self) {                             \
 		__PRIVATE_REFCNT_IMPL_DECREF(T, decref_likely, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), __likely)         \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                              \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_unlikely))(T *__restrict __self) {                                   \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_unlikely))(T *__restrict __self) {                           \
 		__PRIVATE_REFCNT_IMPL_DECREF(T, decref_unlikely, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), __unlikely)     \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                              \
@@ -600,19 +607,19 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 		__PRIVATE_REFCNT_IMPL_DECREF_NOKILL(T, decref_nokill, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))            \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK void                                                                                  \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xdecref))(T *__self) {                                                      \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xdecref))(T *__self) {                                              \
 		if (__self) {                                                                                                              \
 			__PRIVATE_REFCNT_IMPL_DECREF(T, decref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), /**/)                \
 		}                                                                                                                          \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK void                                                                                  \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xdecref_likely))(T *__self) {                                               \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xdecref_likely))(T *__self) {                                       \
 		if (__self) {                                                                                                              \
 			__PRIVATE_REFCNT_IMPL_DECREF(T, decref_likely, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), __likely)     \
 		}                                                                                                                          \
 	}                                                                                                                              \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK void                                                                                  \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xdecref_unlikely))(T *__self) {                                             \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xdecref_unlikely))(T *__self) {                                     \
 		if (__self) {                                                                                                              \
 			__PRIVATE_REFCNT_IMPL_DECREF(T, decref_unlikely, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), __unlikely) \
 		}                                                                                                                          \
@@ -625,15 +632,15 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 	}
 #define __DEFINE_WEAKREFCNT_GLOBAL_FUNCTIONS_X(T, destroy_, X, _)                                                                      \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))                                            \
-	__PRIVATE_REFCNT_TYPE_X(T, X, _) __REFCNT_NOTHROW(__REFCNT_CC getweakrefcnt)(T const *__restrict __self) {                         \
+	__PRIVATE_REFCNT_TYPE_X(T, X, _) __REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(getweakrefcnt))(T const *__restrict __self) {  \
 		return __hybrid_atomic_load(&X(_, __self), __ATOMIC_ACQUIRE);                                                                  \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))                                            \
-	bool __REFCNT_NOTHROW(__REFCNT_CC isweakshared)(T const *__restrict __self) {                                                      \
+	bool __REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(isweakshared))(T const *__restrict __self) {                               \
 		return __hybrid_atomic_load(&X(_, __self), __ATOMIC_ACQUIRE) > 1;                                                              \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))                                            \
-	bool __REFCNT_NOTHROW(__REFCNT_CC wasweakdestroyed)(T const *__restrict __self) {                                                  \
+	bool __REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(wasweakdestroyed))(T const *__restrict __self) {                           \
 		return __hybrid_atomic_load(&X(_, __self), __ATOMIC_ACQUIRE) == 0;                                                             \
 	}                                                                                                                                  \
 	template<class __T> __FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1))                                 \
@@ -653,7 +660,8 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 		__PRIVATE_REFCNT_IMPL_INCREF(T, weakincref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))                          \
 		return __self;                                                                                                                 \
 	}                                                                                                                                  \
-	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK T *__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xweakincref))(T *__self) {          \
+	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK T *                                                                                       \
+	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xweakincref))(T *__self) {                                                      \
 		if (__self) {                                                                                                                  \
 			__PRIVATE_REFCNT_IMPL_INCREF(T, weakincref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))                      \
 		}                                                                                                                              \
@@ -664,19 +672,19 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 		__PRIVATE_REFCNT_IMPL_TRYINCREF(T, tryweakincref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))                    \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                                  \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(weakdestroy))(T *__restrict __self) {                                           \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(weakdestroy))(T *__restrict __self) {                                   \
 		__PRIVATE_REFCNT_IMPL_DESTROY(T, weakdestroy, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))                        \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                                  \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(weakdecref))(T *__restrict __self) {                                            \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(weakdecref))(T *__restrict __self) {                                    \
 		__PRIVATE_REFCNT_IMPL_DECREF(T, weakdecref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), /**/)                    \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                                  \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(weakdecref_likely))(T *__restrict __self) {                                     \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(weakdecref_likely))(T *__restrict __self) {                             \
 		__PRIVATE_REFCNT_IMPL_DECREF(T, weakdecref_likely, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), __likely)         \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                                  \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(weakdecref_unlikely))(T *__restrict __self) {                                   \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(weakdecref_unlikely))(T *__restrict __self) {                           \
 		__PRIVATE_REFCNT_IMPL_DECREF(T, weakdecref_unlikely, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), __unlikely)     \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                                                                  \
@@ -684,19 +692,19 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 		__PRIVATE_REFCNT_IMPL_DECREF_NOKILL(T, weakdecref_nokill, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self))            \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK void                                                                                      \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xweakdecref))(T *__self) {                                                      \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xweakdecref))(T *__self) {                                              \
 		if (__self) {                                                                                                                  \
 			__PRIVATE_REFCNT_IMPL_DECREF(T, weakdecref, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), /**/)                \
 		}                                                                                                                              \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK void                                                                                      \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xweakdecref_likely))(T *__self) {                                               \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xweakdecref_likely))(T *__self) {                                       \
 		if (__self) {                                                                                                                  \
 			__PRIVATE_REFCNT_IMPL_DECREF(T, weakdecref_likely, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), __likely)     \
 		}                                                                                                                              \
 	}                                                                                                                                  \
 	__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK void                                                                                      \
-	__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xweakdecref_unlikely))(T *__self) {                                             \
+	__REFCNT_DESTROY_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(xweakdecref_unlikely))(T *__self) {                                     \
 		if (__self) {                                                                                                                  \
 			__PRIVATE_REFCNT_IMPL_DECREF(T, weakdecref_unlikely, destroy_, __PRIVATE_REFCNT_TYPE_X(T, X, _), X(_, __self), __unlikely) \
 		}                                                                                                                              \

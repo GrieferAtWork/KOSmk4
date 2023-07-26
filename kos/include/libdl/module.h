@@ -128,8 +128,8 @@ struct dlsection {
 
 
 #ifdef __INTELLISENSE__
-INTDEF NONNULL((1)) void NOTHROW_NCX(DlSection_Incref)(__USER DlSection *self) __THROWS(E_SEGFAULT);
-INTDEF NONNULL((1)) void NOTHROW_NCX(DlSection_Decref)(__USER DlSection *self) __THROWS(E_SEGFAULT);
+INTDEF NONNULL((1)) void NOTHROW_NCX(DlSection_Incref)(DlSection *self) __THROWS(E_SEGFAULT);
+INTDEF NONNULL((1)) void NOTHROW_NCX(DlSection_Decref)(DlSection *self) __THROWS(E_SEGFAULT);
 #else /* __INTELLISENSE__ */
 #define DlSection_Incref(self) \
 	__hybrid_atomic_inc(&(self)->ds_refcnt, __ATOMIC_SEQ_CST)
@@ -139,7 +139,7 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(DlSection_Decref)(__USER DlSection *self) _
 #endif /* !__INTELLISENSE__ */
 
 LOCAL ATTR_ARTIFICIAL NONNULL((1)) __BOOL
-NOTHROW_NCX(LIBDL_CC DlSection_TryIncref)(__USER DlSection *self) __THROWS(E_SEGFAULT) {
+NOTHROW_NCX(LIBDL_CC DlSection_TryIncref)(DlSection *self) __THROWS(E_SEGFAULT) {
 	refcnt_t refcnt;
 	do {
 		refcnt = __hybrid_atomic_load(&self->ds_refcnt, __ATOMIC_ACQUIRE);
@@ -152,7 +152,7 @@ NOTHROW_NCX(LIBDL_CC DlSection_TryIncref)(__USER DlSection *self) __THROWS(E_SEG
 
 #ifdef __BUILDING_LIBDL
 INTDEF NONNULL((1)) void
-NOTHROW_NCX(LIBDL_CC DlSection_Destroy)(__USER DlSection *self) __THROWS(E_SEGFAULT);
+NOTHROW_NCX(LIBDL_CC DlSection_Destroy)(DlSection *self) __THROWS(E_SEGFAULT);
 #endif /* __BUILDING_LIBDL */
 
 struct dlmodule_finalizer {
@@ -350,8 +350,8 @@ struct dlmodule {
 
 
 #ifdef __BUILDING_LIBDL
-INTDEF NONNULL((1)) void LIBDL_CC DlModule_Destroy(__USER DlModule *self) __THROWS(E_SEGFAULT, ...);
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDL_CC DlModule_Free)(__USER DlModule *self) __THROWS(E_SEGFAULT);
+INTDEF NONNULL((1)) void LIBDL_CC DlModule_Destroy(DlModule *self) __THROWS(E_SEGFAULT, ...);
+INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDL_CC DlModule_Free)(DlModule *self) __THROWS(E_SEGFAULT);
 #else /* __BUILDING_LIBDL */
 #define DlModule_Destroy(self) (DL_API_SYMBOL(DlModule_Destroy)(self))
 #define DlModule_Free(self)    (DL_API_SYMBOL(DlModule_Free)(self))
@@ -361,15 +361,18 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDL_CC DlModule_Free)(__USER DlModule *se
  * This  is required  since `DlModule_Destroy()'  invokes module  finalizers which might
  * throw exceptions. (Whether or not they should do that is another story, though) */
 #undef __REFCNT_NOTHROW
-#define __REFCNT_NOTHROW /* nothing */
+#undef __REFCNT_DESTROY_NOTHROW
+#define __REFCNT_NOTHROW         __NOTHROW_NCX
+#define __REFCNT_DESTROY_NOTHROW __THROWING
 __DEFINE_REFCNT_FUNCTIONS(DlModule, dm_refcnt, DlModule_Destroy)
 #undef __REFCNT_NOTHROW
+#undef __REFCNT_DESTROY_NOTHROW
 #ifdef __KERNEL__
 #define __REFCNT_NOTHROW __NOTHROW
 #else /* __KERNEL__ */
 #define __REFCNT_NOTHROW __NOTHROW_NCX
 #endif /* !__KERNEL__ */
-
+#define __REFCNT_DESTROY_NOTHROW __REFCNT_NOTHROW
 __DEFINE_WEAKREFCNT_FUNCTIONS(DlModule, dm_weakrefcnt, DlModule_Free)
 
 

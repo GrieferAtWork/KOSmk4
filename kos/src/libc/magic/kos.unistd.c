@@ -637,6 +637,7 @@ GetCurrentDirName() -> [[nonnull, malloc]] char * {
 [[userimpl]]
 [[section(".text.crt{|.dos}.except.fs.modify")]]
 void SyncFS($fd_t fd) {
+	COMPILER_IMPURE();
 	(void)fd;
 	/* NO-OP */
 }

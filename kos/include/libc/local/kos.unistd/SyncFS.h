@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e38060f */
+/* HASH CRC-32:0x6b98c41f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(SyncFS) void
 (__LIBCCALL __LIBC_LOCAL_NAME(SyncFS))(__fd_t __fd) __THROWS(...) {
+	__COMPILER_IMPURE();
 	(void)__fd;
 	/* NO-OP */
 }

@@ -46,12 +46,12 @@ DL_COREFIELD(struct dlglobals, dl_globals)
 DL_COREFIELD(DlModule, dl_rtld_module)
 
 /* Malloc functions to access the heap used by the libdl core. */
-DL_COREOP(ATTR_MALLOC_T WUNUSED_T, void *, NOTHROW_NCX_T, __LIBCCALL, dlmalloc, (size_t bytes))
-DL_COREOP(, void , NOTHROW_NCX_T, __LIBCCALL, dlfree, (void *mem))
-DL_COREOP(ATTR_MALLOC_T WUNUSED_T, void *, NOTHROW_NCX_T, __LIBCCALL, dlcalloc, (size_t n_elements, size_t elem_size))
-DL_COREOP(WUNUSED_T, void *, NOTHROW_NCX_T, __LIBCCALL, dlrealloc, (void *oldmem, size_t bytes))
-DL_COREOP(WUNUSED_T, void *, NOTHROW_NCX_T, __LIBCCALL, dlrealloc_in_place, (void *oldmem, size_t bytes))
-DL_COREOP(WUNUSED_T, void *, NOTHROW_NCX_T, __LIBCCALL, dlmemalign, (size_t alignment, size_t bytes))
+DL_COREOP(ATTR_MALLOC_T WUNUSED_T, void *, , __LIBCCALL, dlmalloc, (size_t bytes))
+DL_COREOP(, void , , __LIBCCALL, dlfree, (void *mem))
+DL_COREOP(ATTR_MALLOC_T WUNUSED_T, void *, , __LIBCCALL, dlcalloc, (size_t n_elements, size_t elem_size))
+DL_COREOP(WUNUSED_T, void *, , __LIBCCALL, dlrealloc, (void *oldmem, size_t bytes))
+DL_COREOP(WUNUSED_T, void *, , __LIBCCALL, dlrealloc_in_place, (void *oldmem, size_t bytes))
+DL_COREOP(WUNUSED_T, void *, , __LIBCCALL, dlmemalign, (size_t alignment, size_t bytes))
 
 #undef DL_COREFIELD
 #undef DL_COREOP

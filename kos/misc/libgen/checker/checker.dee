@@ -2073,6 +2073,12 @@ again:
 			parseBuiltinDefineAlias();
 			break;
 
+		case "__label__":
+			this.next();
+			this.parseSymbolName();
+			this.skip(";");
+			break;
+
 		case "asm":
 		case "__asm":
 		case "__asm__":

@@ -276,8 +276,7 @@ INTERN ATTR_COLD int NOTHROW(CC dl_seterror_nomem)(void) {
 }
 
 INTERN ATTR_COLD NONNULL((1)) int
-NOTHROW_NCX(VCC dl_seterrorf)(char const *__restrict format, ...)
-		THROWS(E_SEGFAULT) {
+NOTHROW_NCX(VCC dl_seterrorf)(char const *__restrict format, ...) {
 	int result;
 	va_list args;
 	va_start(args, format);
@@ -287,8 +286,7 @@ NOTHROW_NCX(VCC dl_seterrorf)(char const *__restrict format, ...)
 }
 
 INTERN ATTR_COLD NONNULL((1)) int
-NOTHROW_NCX(CC dl_vseterrorf)(char const *__restrict format, va_list args)
-		THROWS(E_SEGFAULT) {
+NOTHROW_NCX(CC dl_vseterrorf)(char const *__restrict format, va_list args) {
 	vsnprintf(dl_globals.dg_errbuf, sizeof(dl_globals.dg_errbuf), format, args);
 	atomic_write(&dl_globals.dg_errmsg, (char *)dl_globals.dg_errbuf);
 	return -1;

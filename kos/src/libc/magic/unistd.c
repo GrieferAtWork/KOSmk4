@@ -669,6 +669,7 @@ unsigned int sleep(unsigned int seconds) {
 [[alias("fdatasync", "__fdatasync")]]
 [[userimpl, section(".text.crt{|.dos}.io.sync")]]
 int fsync($fd_t fd) {
+	COMPILER_IMPURE();
 	(void)fd;
 	/* NO-OP */
 	return 0;
@@ -1949,6 +1950,7 @@ char *get_current_dir_name() {
 [[cp, decl_include("<bits/types.h>")]]
 [[userimpl, section(".text.crt{|.dos}.fs.modify")]]
 int syncfs($fd_t fd) {
+	COMPILER_IMPURE();
 	(void)fd;
 	/* NO-OP */
 	return 0;
@@ -2406,6 +2408,7 @@ int unistd_getopt(int argc, char *const argv[], char const *shortopts);
 [[cp, export_alias("__sync", "__libc_sync")]]
 [[userimpl, section(".text.crt{|.dos}.fs.modify")]]
 void sync() {
+	COMPILER_IMPURE();
 	/* NO-OP */
 }
 
@@ -3031,6 +3034,7 @@ void *sbrk(intptr_t delta);
 [[alias("fsync", "__fsync", "_commit")]]
 [[userimpl, section(".text.crt{|.dos}.io.sync")]]
 int fdatasync($fd_t fd) {
+	COMPILER_IMPURE();
 	(void)fd;
 	/* NO-OP */
 	return 0;

@@ -90,7 +90,7 @@ PRIVATE PSERVICE_CLOSE pdyn_service_close = NULL;
 #define service_close (*pdyn_service_close)
 
 /* Try to open libservice and increment `libservice_inuse' */
-PRIVATE WUNUSED bool CC libservice_open(void) {
+PRIVATE WUNUSED bool CC libservice_open(void) THROWS(...) {
 	REF DlModule *_libservice;
 	size_t count;
 again:
@@ -144,7 +144,7 @@ failed:
 }
 
 /* Decrement `libservice_inuse' and close libservice once that drops to 0 */
-PRIVATE void CC libservice_close(void) {
+PRIVATE void CC libservice_close(void) THROWS(...) {
 	REF DlModule *_libservice;
 	/* The read order here is important, as `libservice' becomes
 	 * invalid  the second that `libservice_inuse' drops to `0'! */
@@ -471,9 +471,9 @@ struct dynstring {
 	size_t ds_len; /* Used string length. */
 };
 
-PRIVATE NONNULL((1, 2)) int CC
-dynstring_append(struct dynstring *__restrict self,
-                 char const *__restrict str, size_t len) {
+PRIVATE NONNULL((1, 2)) int
+NOTHROW_NCX(CC dynstring_append)(struct dynstring *__restrict self,
+                                 char const *__restrict str, size_t len) {
 	char *newstr;
 	newstr = (char *)realloc(self->ds_str,
 	                         (self->ds_len + len + 1) *
@@ -982,9 +982,9 @@ err:
 
 
 PRIVATE WUNUSED NONNULL((1, 2)) REF DlModule *
-NOTHROW(CC DlModule_ElfMapProgramHeaders)(ElfW(Ehdr) const *__restrict ehdr,
-                                          /*inherit(on_success,HEAP)*/ char *__restrict filename,
-                                          /*inherit(on_success)*/ fd_t fd) {
+NOTHROW_RPC(CC DlModule_ElfMapProgramHeaders)(ElfW(Ehdr) const *__restrict ehdr,
+                                              /*inherit(on_success,HEAP)*/ char *__restrict filename,
+                                              /*inherit(on_success)*/ fd_t fd) {
 	uint16_t pidx;
 	REF DlModule *result;
 	if unlikely(DlModule_ElfVerifyEhdr(ehdr, filename, true))

@@ -147,18 +147,15 @@
 #define DLFCN_CC  __DLFCN_CC  /* Public (aka. <dlfcn.h>) calling convention */
 #define DLFCN_VCC __DLFCN_VCC /* *ditto* */
 
+/* We're not using the `USER' annotation as intended (...) so hide it from __CHECKER__ for now... */
+#ifdef __CHECKER__
+#undef __USER
+#define __USER /* Nothing */
+#endif /* __CHECKER__ */
+
 #ifndef FCALL
 #define FCALL __FCALL
 #endif /* FCALL */
-#ifndef WEAK
-#define WEAK __WEAK
-#endif /* !WEAK */
-#ifndef REF
-#define REF __REF
-#endif /* !REF */
-#ifndef REF_IF
-#define REF_IF __REF_IF
-#endif /* !REF_IF */
 #ifndef LIBCCALL
 #define LIBCCALL __LIBCCALL
 #endif /* !LIBCCALL */

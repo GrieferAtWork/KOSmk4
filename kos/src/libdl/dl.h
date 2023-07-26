@@ -55,7 +55,7 @@
 #include "builtin.h"
 
 #ifndef ASMCALL
-#define ASMCALL /* nothing */
+#define ASMCALL /* Nothing */
 #endif /* !ASMCALL */
 
 #undef TRY
@@ -242,7 +242,7 @@ NOTHROW_NCX(CC DlModule_ElfGetLocalSymbol)(USER DlModule *self,
 /* Find  the  DL   module  mapping   the  specified   file.
  * If no such module is loaded, `NULL' is returned instead.
  * @return: NULL: No such module exists (NOTE: No error was set in this case!) */
-INTERN REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *
+INTERN WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *
 NOTHROW_NCX(CC DlModule_FindFromFilename)(USER char const *filename)
 		THROWS(E_SEGFAULT);
 
@@ -367,8 +367,9 @@ INTDEF char *NOTHROW(DLFCN_CC libdl_dlerror)(void);
  * @param: mode: Exactly  one  of  [RTLD_LAZY, RTLD_NOW],  or'd  with
  *               exactly one of [RTLD_GLOBAL, RTLD_LOCAL], optionally
  *               or'd with any of the other `RTLD_*' flags. */
-INTDEF REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *
-NOTHROW(DLFCN_CC libdl_dlfopen)(/*inherit(on_success)*/ fd_t fd, unsigned int mode);
+INTDEF REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *DLFCN_CC
+libdl_dlfopen(/*inherit(on_success)*/ fd_t fd, unsigned int mode)
+		THROWS(...);
 
 /* Check if a given module is exception aware.
  * TODO: Figure out how we want to detect this condition...
@@ -758,8 +759,8 @@ INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_seterror_nosym_next_badcalle
 INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_seterror_dlopen_failed)(USER char const *libname) THROWS(E_SEGFAULT);
 INTDEF ATTR_COLD NONNULL((1, 2)) int NOTHROW_NCX(CC dl_seterr_section_mmap_failed)(USER DlModule const *self, USER char const *section_filename) THROWS(E_SEGFAULT);
 INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_seterr_section_index_mmap_failed)(USER DlModule const *self, size_t section_index) THROWS(E_SEGFAULT);
-INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(VCC dl_seterrorf)(char const *__restrict format, ...) THROWS(E_SEGFAULT);
-INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_vseterrorf)(char const *__restrict format, va_list args) THROWS(E_SEGFAULT);
+INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(VCC dl_seterrorf)(char const *__restrict format, ...);
+INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_vseterrorf)(char const *__restrict format, va_list args);
 
 /* Return the address of a builtin function (e.g. `dlopen(3D)') */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) void *NOTHROW_NCX(CC dlsym_builtin)(USER char const *name) THROWS(E_SEGFAULT);

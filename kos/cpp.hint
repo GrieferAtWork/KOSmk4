@@ -1252,6 +1252,55 @@
 
 
 
+// <kos/lockop.h>
+#define Tobpostlockop(T)            struct obpostlockop
+#define Toblockop(T)                struct oblockop
+#define Toblockop_slist(T)          struct oblockop_slist
+#define Tobpostlockop_slist(T)      struct obpostlockop_slist
+#define Tobpostlockop_callback_t(T) obpostlockop_callback_t
+#define Toblockop_callback_t(T)     oblockop_callback_t
+
+
+
+// <kos/refcnt.h>
+#define __REFCNT_CC
+#define __REFCNT_NOTHROW
+#define __REFCNT_DESTROY_NOTHROW
+#define REFCNT_METHODS(T) int
+#define REFCNT_METHODS_P(i) int
+#define REFCNT_METHODS_BASE(T) int
+#define REFCNT_METHODS_BASE_P(i) int
+#define WEAKREFCNT_METHODS(T) int
+#define WEAKREFCNT_METHODS_P(i) int
+#define WEAKREFCNT_METHODS_BASE(T) int
+#define WEAKREFCNT_METHODS_BASE_P(i) int
+#define __REFCNT_METHODS(T) int
+#define __REFCNT_METHODS_P(i) int
+#define __REFCNT_METHODS_BASE(T) int
+#define __REFCNT_METHODS_BASE_P(i) int
+#define __WEAKREFCNT_METHODS(T) int
+#define __WEAKREFCNT_METHODS_P(i) int
+#define __WEAKREFCNT_METHODS_BASE(T) int
+#define __WEAKREFCNT_METHODS_BASE_P(i) int
+#define __DEFINE_REFCNT_FUNCTIONS(...)
+#define __DEFINE_REFCNT_FUNCTIONS_P(...)
+#define __DEFINE_REFCNT_FUNCTIONS_X(...)
+#define __DEFINE_WEAKREFCNT_FUNCTIONS(...)
+#define __DEFINE_WEAKREFCNT_FUNCTIONS_P(...)
+#define __DEFINE_WEAKREFCNT_FUNCTIONS_X(...)
+#define __DEFINE_NONATOMIC_REFCNT_FUNCTIONS(...)
+#define __DEFINE_NONATOMIC_REFCNT_FUNCTIONS_P(...)
+#define __DEFINE_NONATOMIC_REFCNT_FUNCTIONS_X(...)
+#define __DEFINE_NONATOMIC_WEAKREFCNT_FUNCTIONS(...)
+#define __DEFINE_NONATOMIC_WEAKREFCNT_FUNCTIONS_P(...)
+#define __DEFINE_NONATOMIC_WEAKREFCNT_FUNCTIONS_X(...)
+#define DEFINE_REFCNT_FUNCTIONS(...)
+#define DEFINE_REFCNT_FUNCTIONS_P(...)
+#define DEFINE_WEAKREFCNT_FUNCTIONS(...)
+#define DEFINE_WEAKREFCNT_FUNCTIONS_P(...)
+
+
+
 // <kos/syscalls.h>
 #define __CDECLARE_SC(attr,Treturn,name,param,args)  Treturn sys_##name param;
 #define __CDECLARE_VOID_SC(attr,name,param,args)     void sys_##name param;
@@ -1417,42 +1466,6 @@
 #define os_heap_gfparg(v) int v
 #define os_heap_gfppar(v) v
 #define os_heap_gfpvar(v) int v;
-
-#define Tobpostlockop(T)            struct obpostlockop
-#define Toblockop(T)                struct oblockop
-#define Toblockop_slist(T)          struct oblockop_slist
-#define Tobpostlockop_slist(T)      struct obpostlockop_slist
-#define Tobpostlockop_callback_t(T) obpostlockop_callback_t
-#define Toblockop_callback_t(T)     oblockop_callback_t
-
-#define REFCNT_METHODS(T) int
-#define REFCNT_METHODS_P(i) int
-#define REFCNT_METHODS_BASE(T) int
-#define REFCNT_METHODS_BASE_P(i) int
-#define WEAKREFCNT_METHODS(T) int
-#define WEAKREFCNT_METHODS_P(i) int
-#define WEAKREFCNT_METHODS_BASE(T) int
-#define WEAKREFCNT_METHODS_BASE_P(i) int
-#define __REFCNT_METHODS(T) int
-#define __REFCNT_METHODS_P(i) int
-#define __REFCNT_METHODS_BASE(T) int
-#define __REFCNT_METHODS_BASE_P(i) int
-#define __WEAKREFCNT_METHODS(T) int
-#define __WEAKREFCNT_METHODS_P(i) int
-#define __WEAKREFCNT_METHODS_BASE(T) int
-#define __WEAKREFCNT_METHODS_BASE_P(i) int
-#define __DEFINE_REFCNT_FUNCTIONS(...)
-#define __DEFINE_REFCNT_FUNCTIONS_P(...)
-#define __DEFINE_WEAKREFCNT_FUNCTIONS(...)
-#define __DEFINE_WEAKREFCNT_FUNCTIONS_P(...)
-#define __DEFINE_NONATOMIC_REFCNT_FUNCTIONS(...)
-#define __DEFINE_NONATOMIC_REFCNT_FUNCTIONS_P(...)
-#define __DEFINE_NONATOMIC_WEAKREFCNT_FUNCTIONS(...)
-#define __DEFINE_NONATOMIC_WEAKREFCNT_FUNCTIONS_P(...)
-#define DEFINE_REFCNT_FUNCTIONS(...)
-#define DEFINE_REFCNT_FUNCTIONS_P(...)
-#define DEFINE_WEAKREFCNT_FUNCTIONS(...)
-#define DEFINE_WEAKREFCNT_FUNCTIONS_P(...)
 
 #define IOV_BUFFER_FOREACH(ent,self) for(;;)
 #define IOV_BUFFER_FOREACH_N(ent,self) for(;;)

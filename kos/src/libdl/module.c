@@ -58,7 +58,7 @@ static_assert(offsetof(struct link_map, l_ld) == offsetof(DlModule, dm_dynhdr));
 static_assert(offsetof(struct link_map, l_next) == offsetof(DlModule, dm_modules.dle_next));
 static_assert(offsetof(struct link_map, l_prev) == offsetof(DlModule, dm_modules.dle_prev));
 
-INTERN ElfW(Shdr) empty_shdr[1] = { 0 };
+INTERN ElfW(Shdr) empty_shdr[1] = { { 0 } };
 
 /* Module finalizer functions. */
 INTERN NONNULL((1)) void CC

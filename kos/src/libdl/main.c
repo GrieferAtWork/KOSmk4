@@ -206,7 +206,8 @@ PRIVATE NONNULL((1)) void FCALL dl_loadenv(char **envp) {
 INTERN WUNUSED NONNULL((1, 3)) void *FCALL
 linker_main(struct elfexec_info *__restrict info,
             uintptr_t loadaddr,
-            struct process_peb *__restrict peb) {
+            struct process_peb *__restrict peb)
+		THROWS(...) {
 	void *result;
 	REF DlModule *base_module;
 	size_t rtld_size = (size_t)(__rtld_end - __rtld_start);
