@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix a problem with file mappings on windows"
-DEEMON_VERSION="009a6a7e582ad0dc37909b7c98403fe2f302b505"
+#     v -- "Fix `da_recursion` uninitialized during thread init"
+DEEMON_VERSION="325b82eec77f3e31722928a249f42a0a55913ecc"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
