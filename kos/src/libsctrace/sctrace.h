@@ -53,10 +53,10 @@ NOTHROW_NCX(CC libsc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
  *          if the system call invoker has passed some invalid
  *          argument to a system  call (i.e. a faulty  pointer
  *          when a structure pointer or string was expected) */
-INTDEF NONNULL((1)) ssize_t CC
-libsc_printvalue(pformatprinter printer, void *arg,
-                 uintptr_t argtype, union sc_argval value,
-                 struct sc_argument *link);
+INTDEF NONNULL((1)) ssize_t
+NOTHROW_CB_NCX(CC libsc_printvalue)(pformatprinter printer, void *arg,
+                                    uintptr_t argtype, union sc_argval value,
+                                    struct sc_argument *link);
 
 DECL_END
 

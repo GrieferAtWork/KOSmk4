@@ -166,6 +166,7 @@
 #define __GCC_HAS_BUILTIN___builtin_void         /* T __builtin_void(T val);  ## Evaluates to `val', but value becomes unknown */
 #define __GCC_HAS_BUILTIN___builtin_rvoid        /* T __builtin_rvoid(T val); ## Like `__builtin_void()', but also do r-value */
 #define __GCC_HAS_BUILTIN___builtin_define_alias /* __builtin_define_alias(char const new[], char const old[]); ## Verify correct attributes for `DEFINE_PUBLIC_ALIAS()' & friends */
+#define __GCC_HAS_BUILTIN___builtin_remove_noderef /* T *__builtin_remove_noderef(__attribute__((noderef)) T *p); ## Remove `noderef' from a type/variable (NOTE: the annotation is only removed for the duration of the current scope) */
 
 #ifndef __has_feature
 #define __NO_has_feature
@@ -434,6 +435,7 @@
 #define __restrict restrict
 #define __restrict__ restrict
 #define __restrict_arr restrict
+#define __register /* Nothing */
 
 #define __COMPILER_HAVE_VARIABLE_LENGTH_ARRAYS
 #define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[]

@@ -75,14 +75,14 @@ __NOTHROW_NCX(LIBSCTRACE_CC sc_getdesc)(struct rpc_syscall_info const *__restric
  *          argument to a system  call (i.e. a faulty  pointer
  *          when a structure pointer or string was expected) */
 typedef __ATTR_NONNULL_T((1)) __ssize_t
-(LIBSCTRACE_CC *PSC_PRINTVALUE)(__pformatprinter printer, void *arg,
-                                __uintptr_t argtype, union sc_argval value,
-                                struct sc_argument *link);
+__NOTHROW_CB_NCX_T(LIBSCTRACE_CC *PSC_PRINTVALUE)(__pformatprinter printer, void *arg,
+                                                  __uintptr_t argtype, union sc_argval value,
+                                                  struct sc_argument *link);
 #ifdef LIBSCTRACE_WANT_PROTOTYPES
-LIBSCTRACE_DECL __ATTR_NONNULL((1)) __ssize_t LIBSCTRACE_CC
-sc_printvalue(__pformatprinter printer, void *arg,
-              __uintptr_t argtype, union sc_argval value,
-              struct sc_argument *link);
+LIBSCTRACE_DECL __ATTR_NONNULL((1)) __ssize_t
+__NOTHROW_CB_NCX(LIBSCTRACE_CC sc_printvalue)(__pformatprinter printer, void *arg,
+                                              __uintptr_t argtype, union sc_argval value,
+                                              struct sc_argument *link);
 #endif /* LIBSCTRACE_WANT_PROTOTYPES */
 
 

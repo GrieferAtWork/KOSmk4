@@ -107,7 +107,34 @@ FUNDEF CHECKED USER void *FCALL validate_readwriteaddr(UNCHECKED USER void *addr
 FUNDEF CHECKED USER void *FCALL validate_readwriteaddr_opt(UNCHECKED USER void *addr) THROWS(E_SEGFAULT);
 FUNDEF CHECKED USER void const *FCALL validate_executable(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT);
 FUNDEF CHECKED USER void const *FCALL validate_executable_opt(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT);
-#else /* __INTELLISENSE__ */
+#elif defined(__CHECKER__)
+#define validate_user(base, num_bytes)                               __builtin_remove_noderef(base)
+#define validate_user_opt(base, num_bytes)                           __builtin_remove_noderef(base)
+#define validate_userm(base, num_items, item_size_in_bytes)          __builtin_remove_noderef(base)
+#define validate_userm_opt(base, num_items, item_size_in_bytes)      __builtin_remove_noderef(base)
+#define validate_useraddr(addr)                                      __builtin_remove_noderef(addr)
+#define validate_useraddr_opt(addr)                                  __builtin_remove_noderef(addr)
+#define validate_readable(base, num_bytes)                           __builtin_remove_noderef(base)
+#define validate_readable_opt(base, num_bytes)                       __builtin_remove_noderef(base)
+#define validate_readablem(base, num_items, item_size_in_bytes)      __builtin_remove_noderef(base)
+#define validate_readablem_opt(base, num_items, item_size_in_bytes)  __builtin_remove_noderef(base)
+#define validate_readableaddr(addr)                                  __builtin_remove_noderef(addr)
+#define validate_readableaddr_opt(addr)                              __builtin_remove_noderef(addr)
+#define validate_writable(base, num_bytes)                           __builtin_remove_noderef(base)
+#define validate_writable_opt(base, num_bytes)                       __builtin_remove_noderef(base)
+#define validate_writablem(base, num_items, item_size_in_bytes)      __builtin_remove_noderef(base)
+#define validate_writablem_opt(base, num_items, item_size_in_bytes)  __builtin_remove_noderef(base)
+#define validate_writableaddr(addr)                                  __builtin_remove_noderef(addr)
+#define validate_writableaddr_opt(addr)                              __builtin_remove_noderef(addr)
+#define validate_readwrite(base, num_bytes)                          __builtin_remove_noderef(base)
+#define validate_readwrite_opt(base, num_bytes)                      __builtin_remove_noderef(base)
+#define validate_readwritem(base, num_items, item_size_in_bytes)     __builtin_remove_noderef(base)
+#define validate_readwritem_opt(base, num_items, item_size_in_bytes) __builtin_remove_noderef(base)
+#define validate_readwriteaddr(addr)                                 __builtin_remove_noderef(addr)
+#define validate_readwriteaddr_opt(addr)                             __builtin_remove_noderef(addr)
+#define validate_executable(addr)                                    __builtin_remove_noderef(addr)
+#define validate_executable_opt(addr)                                __builtin_remove_noderef(addr)
+#else /* ... */
 EIDECLARE(, USER CHECKED void const *, , FCALL, validate_readableaddr, (UNCHECKED USER void const *addr), THROWS(E_SEGFAULT) { if unlikely(!_ADDR_ISUSER(addr)) _except_throw_unmapped_user_rd(addr); return addr; })
 EIDECLARE(, USER CHECKED void *, , FCALL, validate_writableaddr, (UNCHECKED USER void *addr), THROWS(E_SEGFAULT) { if unlikely(!_ADDR_ISUSER(addr)) _except_throw_unmapped_user_wr(addr); return addr; })
 EIDECLARE(, USER CHECKED void const *, , FCALL, validate_executable, (UNCHECKED USER void const *addr), THROWS(E_SEGFAULT) { if unlikely(!_ADDR_ISUSER(addr)) _except_throw_noexec_user(addr); return addr; })
@@ -153,7 +180,7 @@ EIDECLARE(, USER CHECKED void const *, , FCALL, validate_executable, (UNCHECKED 
 #define validate_readwriteaddr_opt(addr)                             (!(addr) ? __NULLPTR : validate_readwriteaddr(addr))
 #define validate_executable_opt(addr)                                (!(addr) ? __NULLPTR : validate_executable(addr))
 #endif /* !KERNELSPACE_HIGHMEM */
-#endif /* !__INTELLISENSE__ */
+#endif /* !... */
 
 /* Same as the regular validate functions, but are allowed to be used for verification
  * of  pointers originating from  compatibility mode (this  allows for an optimization

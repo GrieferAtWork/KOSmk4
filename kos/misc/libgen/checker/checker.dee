@@ -105,6 +105,13 @@ final class Checker: CParser {
 		this.next();
 	}
 
+	function pushNamespace(ns: CNamespace) {
+		namespaceStack.pushfront(ns);
+	}
+	function popNamespace() {
+		namespaceStack.popfront().onPop();
+	}
+
 	/* Target-specific types */
 	public member TARGET_C_long: CType;
 	public member TARGET_C_ulong: CType;
@@ -334,6 +341,7 @@ next_and_lookup_in_baseNs:
 	@@| `E_INVALID_ARGUMENT`   | Raw keyword                           |
 	@@| `(0x0002)`             | Preprocessor expanded class           |
 	@@| `(0x0002, 0x0001)`     | Preprocessor expanded sub-class       |
+	@@| `((0x0002), 0x0001)`   | Preprocessor expanded sub-class       |
 	@@| `(0x00010002)`         | Fully evaluated sub-class             |
 	@@| `0x0002`               | Preprocessor expanded class w/o paren |
 	@@| `0x00010002`           | Fully evaluated sub-class w/o paren   |
@@ -349,8 +357,14 @@ next_and_lookup_in_baseNs:
 			return THROWS_CB;
 		}
 		if (tok == "(") {
-			this.next();
-			local id: int = this.parseInt();
+			local id: int;
+			if (this.next() == "(") {
+				this.next();
+				id = this.parseInt();
+				this.skip(")");
+			} else {
+				id = this.parseInt();
+			}
 			if (this.tok == ",") {
 				this.next();
 				id = (this.parseInt() << 16) | id;
@@ -1127,15 +1141,35 @@ again:
 			this.next();
 			parseCTypeRefAttributes(tr);
 			local structName: string = "";
-			if (this.tok.issymbol()) {
+			local baseNs: CNamespace;
+			if (this.tok == "::") {
+				baseNs = globalNamespace;
+				goto lookup_struct_in_namespace;
+			} else if (this.tok.issymbol()) {
 				structName = this.parseSymbolName();
-				parseCTypeRefAttributes(tr);
+				if (this.tok == "::" && cxx) {
+					/* Lookup chain */
+					baseNs = lookup("namespaces", structName);
+					if (baseNs is none)
+						return this.err(f"Unknown namespace {repr structName}");
+lookup_struct_in_namespace:
+					this.next();
+					tr.typ = nsLookupChildChain(baseNs, {
+						true:  "unionSymbols",
+						false: "structSymbols",
+					}[isUnion], errorIfNotFound: true);
+					if (this.tok == "<")
+						goto resolve_template_typedef;
+					parseCTypeRefAttributes(tr);
+					break;
+				}
 				if (this.tok == "<") {
 					typedef = lookupEx("typedefs", structName, x -> x is CTypeRefTemplate);
 					if (typedef is none)
 						return this.err(f"No such struct/union/class template-typedef `{structName}'");
 					goto resolve_template_typedef;
 				}
+				parseCTypeRefAttributes(tr);
 			}
 			parseStruct(structName, tr, isUnion);
 		}	break;
@@ -1252,7 +1286,7 @@ lookup_typedef:
 				typedef = nsLookupChain("typedefs");
 				if (typedef is none) {
 					if (hasCv)
-						this.err("Unable to parse type after const/volatile");
+						this.err(f"Unable to parse type from `{this.tok}' after const/volatile");
 					return none;
 				}
 				if (typedef is CTypeRefTemplate) {
@@ -1381,6 +1415,11 @@ done:
 			local dim: int | none;
 			if (this.tok == "]") {
 				dim = none;
+			} else if (this.tok in ["restrict", "__restrict", "__restrict__"]) {
+				this.next();
+				dim = none;
+				/* TODO: Restrict arrays (become restrict pointers during array->pointer decay) */
+				/*tr.flags |= CTYPEREF_FLAG_RESTRICT;*/
 			} else if (currentFunctionName is none) {
 				dim = parseExprConstantInteger();
 			} else {
@@ -1746,7 +1785,7 @@ prefixAgain:
 		}
 
 		/* Setup the context for evaluation of the function body */
-		namespaceStack.pushfront(fnScope);
+		pushNamespace(fnScope);
 		local savedCurrentFunctionName                 = currentFunctionName;
 		local savedCurrentFunctionTypeRef              = currentFunctionTypeRef;
 		local savedCurrentFunctionReturnValue          = currentFunctionReturnValue;
@@ -1865,7 +1904,7 @@ prefixAgain:
 		isUnreachable                       = savedIsUnreachable;
 		isInTryBlock                        = savedIsInTryBlock;
 		encounteredAsm                      = savedEncounteredAsm;
-		namespaceStack.popfront();
+		popNamespace();
 		return result;
 	}
 
@@ -1982,16 +2021,14 @@ again:
 			parseStaticAssert();
 			break;
 
-		case "{": {
+		case "{":
 			this.next();
-			local innerScope: CScope = CScope();
 			/* Can just re-use the parent scope's symbol value hints */
-			innerScope.symbolValues = namespaceStack.first.symbolValues;
-			namespaceStack.pushfront(innerScope);
+			pushNamespace(createCScopeAlias(namespaceStack.first));
 			parseStatements();
-			namespaceStack.popfront();
+			popNamespace();
 			this.skip("}");
-		}	break;
+			break;
 
 		case "case":
 		case "default":
@@ -2222,9 +2259,9 @@ again:
 				/* Configure the expression value engine such that
 				 * it  maintains identical values from both sides. */
 				local ttScope = CScope();
-				namespaceStack.pushfront(ttScope);
+				pushNamespace(ttScope);
 				parseStatement();
-				namespaceStack.popfront();
+				popNamespace();
 				if (this.tok != "else") {
 					/* The true-branch is conditional,  so
 					 * it being noreturn doesn't propagate */
@@ -2237,10 +2274,10 @@ again:
 					local ttIsNoReturn = isUnreachable;
 					this.next();
 					local ffScope = CScope();
-					namespaceStack.pushfront(ffScope);
+					pushNamespace(ffScope);
 					isUnreachable = false;
 					parseStatement();
-					namespaceStack.popfront();
+					popNamespace();
 					if (!ttIsNoReturn)
 						isUnreachable = false;
 					local parentScope: CScope = namespaceStack.first;
@@ -2283,9 +2320,9 @@ again:
 			} else {
 				/* Must eval the loop in a sub-scope. Since it's  conditionally
 				 * executed, we mustn't inherit symbol value overrides from it. */
-				namespaceStack.pushfront(CScope());
+				pushNamespace(CScope());
 				parseStatement();
-				namespaceStack.popfront();
+				popNamespace();
 				if (encounteredBreak) {
 					isUnreachable = false; /* There is a reachable break, so the loop can be exited */
 				} else if (whileVal.isConstExpr && whileVal.constExprValue(this)) {
@@ -2305,9 +2342,9 @@ again:
 
 			local loopBodyLoc = this.backupCreate();
 			local loopScope = CScope();
-			namespaceStack.pushfront(loopScope);
+			pushNamespace(loopScope);
 			parseStatement();
-			namespaceStack.popfront();
+			popNamespace();
 			this.skip("while");
 			this.skip("(");
 			local whileVal: CValue = parseExprRValue();
@@ -2326,9 +2363,9 @@ again:
 					loopBodyLoc = none;
 					local pass1SymbolValues = loopScope.symbolValues;
 					loopScope.symbolValues = Dict();
-					namespaceStack.pushfront(loopScope);
+					pushNamespace(loopScope);
 					parseStatement();
-					namespaceStack.popfront();
+					popNamespace();
 					this.skip("while");
 					this.skip("(");
 					local secondPassWhileCond = parseExprRValue();
@@ -2359,7 +2396,7 @@ again:
 		}	break;
 
 		case "for": {
-			namespaceStack.pushfront(CScope());
+			pushNamespace(CScope());
 			this.next();
 			this.skip("(");
 			if (this.tok != ";") {
@@ -2392,14 +2429,14 @@ again:
 			} else {
 				/* Must eval the loop in a sub-scope. Since it's  conditionally
 				 * executed, we mustn't inherit symbol value overrides from it. */
-				namespaceStack.pushfront(CScope());
+				pushNamespace(CScope());
 				if (this.tok != ")")
 					parseExprComma();
 				this.skip(")");
-				namespaceStack.pushfront(CScope());
+				pushNamespace(CScope());
 				parseStatement();
-				namespaceStack.popfront();
-				namespaceStack.popfront();
+				popNamespace();
+				popNamespace();
 				if (encounteredBreak) {
 					isUnreachable = false; /* There is a reachable break, so the loop can be exited */
 				} else if (condVal.isConstExpr && condVal.constExprValue(this)) {
@@ -2409,7 +2446,7 @@ again:
 
 			isInLoop         = savedIsInLoop;
 			encounteredBreak = savedEncounteredBreak;
-			namespaceStack.popfront();
+			popNamespace();
 		}	break;
 
 		case "return": {
@@ -2935,7 +2972,7 @@ prefixAgain:
 		}
 
 		local templateScope = CScope();
-		namespaceStack.pushfront(templateScope);
+		pushNamespace(templateScope);
 		for (local i: [:#args]) {
 			local argValue: TemplateParamValue = args[i];
 			local argParam: TemplateParam = templateParams[i];
@@ -2969,7 +3006,7 @@ prefixAgain:
 			/* Check if another instance already exists for this set of parameters. */
 			result = template.instances.get(args);
 			if (result !is none) {
-				namespaceStack.popfront();
+				popNamespace();
 				return result;
 			}
 		} else {
@@ -3042,7 +3079,7 @@ prefixAgain:
 		}
 
 		/* Cleanup the scope that was used during the template instantiation. */
-		namespaceStack.popfront();
+		popNamespace();
 		return result;
 	}
 
@@ -3310,13 +3347,13 @@ again:
 			do {
 				ns = ns.childNamespace(this.parseSymbolName());
 			} while (this.trySkip("::"));
-			namespaceStack.pushfront(ns);
+			pushNamespace(ns);
 			this.skip("{");
 			do {
 				parseGlobal();
 			} while (this.tok !in ["", "}"]);
 			this.skip("}");
-			namespaceStack.popfront();
+			popNamespace();
 		}	break;
 
 		case "using": {
@@ -3581,6 +3618,25 @@ return_unknown_void_pointer:
 					.inplaceRValue(this);
 			this.skip(")");
 			return result;
+		}	break;
+
+		case "__builtin_remove_noderef": {
+			this.next();
+			this.skip("(");
+			local value: CValue = parseExpr();
+			this.skip(")");
+			local valueTyp: CType = value.typeref.typ;
+			if (valueTyp is CPointerType) {
+				local valuePointerBaseTypeRef: CTypeRef = valueTyp.base;
+				if (valuePointerBaseTypeRef.flags & CTYPEREF_FLAG_NODEREF) {
+					valuePointerBaseTypeRef.flags &= ~CTYPEREF_FLAG_NODEREF;
+					/* Restore the NODEREF flag at the end of the current scope. */
+					namespaceStack.first.onPopRegister(() -> {
+						valuePointerBaseTypeRef.flags |= CTYPEREF_FLAG_NODEREF;
+					});
+				}
+			}
+			return value;
 		}	break;
 
 		case "__builtin_bswap16":
@@ -4017,14 +4073,12 @@ again_builtin_container_of_suffix:
 				this.next();
 				local result: CValue | none = none;
 				if (this.tok != "}") {
-					local innerScope: CScope = CScope();
 					/* Can just re-use the parent scope's symbol value hints */
-					innerScope.symbolValues = namespaceStack.first.symbolValues;
-					namespaceStack.pushfront(innerScope);
+					pushNamespace(createCScopeAlias(namespaceStack.first));
 					do {
 						result = parseStatement();
 					} while (this.tok != "}");
-					namespaceStack.popfront();
+					popNamespace();
 				}
 				this.skip("}");
 				this.skip(")");
@@ -4293,9 +4347,9 @@ again:
 			/* Value assumptions made  by the conditional  branch must  be
 			 * inherited as unknowns because they might not always happen. */
 			local condScope: CScope = CScope();
-			namespaceStack.pushfront(condScope);
+			pushNamespace(condScope);
 			parseExprBitOr();
-			namespaceStack.popfront();
+			popNamespace();
 			inheritAllSymbolValuesAsUnknowns(condScope);
 			/* The true-branch is conditional, so it being noreturn doesn't propagate */
 			isUnreachable = false;
@@ -4327,9 +4381,9 @@ again:
 			/* Value assumptions made  by the conditional  branch must  be
 			 * inherited as unknowns because they might not always happen. */
 			local condScope: CScope = CScope();
-			namespaceStack.pushfront(condScope);
+			pushNamespace(condScope);
 			parseExprLAnd();
-			namespaceStack.popfront();
+			popNamespace();
 			inheritAllSymbolValuesAsUnknowns(condScope);
 			/* The false-branch is conditional, so it being noreturn doesn't propagate */
 			isUnreachable = false;
@@ -4382,17 +4436,17 @@ again:
 			 * it  maintains identical values from both sides. */
 			local ttScope: CScope = CScope();
 			if (this.tok != ":") {
-				namespaceStack.pushfront(ttScope);
+				pushNamespace(ttScope);
 				value = parseExprLOr().inplaceRValue(this);
-				namespaceStack.popfront();
+				popNamespace();
 			}
 			local ttIsNoReturn: bool = isUnreachable;
 			this.next();
 			local ffScope: CScope = CScope();
-			namespaceStack.pushfront(ffScope);
+			pushNamespace(ffScope);
 			isUnreachable = false;
 			local ffVal: CValue = parseExprCond().inplaceRValue(this);
-			namespaceStack.popfront();
+			popNamespace();
 			if (!ttIsNoReturn)
 				isUnreachable = false;
 			local parentScope: CScope = namespaceStack.first;
@@ -4594,8 +4648,13 @@ again:
 	@@Parse a type-expression, or parse a normal expression and return its type
 	function parseTypeOrExpressionType(): CTypeRef {
 		local tr: CTypeRef = CTypeRef();
-		if (parseCTypeRefBase(tr) is none)
-			return parseExpr().typeref;
+		if (parseCTypeRefBase(tr) is none) {
+			local savedIsUnreachable = isUnreachable;
+			isUnreachable = true;
+			local result = parseExpr().typeref;
+			isUnreachable = savedIsUnreachable;
+			return result;
+		}
 		return parseTypeRefInner(tr, "-").first;
 	}
 

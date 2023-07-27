@@ -202,7 +202,7 @@ struct __stat_timespec32 /*[PREFIX(tv_)][NAME(stat_timespec32)]*/ {
 	__time_t          tv_sec;  /* seconds since 01.01.1970 */
 	__byte_t        __tv_pad_sec[__SIZEOF_TIME64_T__ - __SIZEOF_TIME_T__];
 	__syscall_ulong_t tv_nsec; /* nanoseconds */
-#ifdef __cplusplus
+#if defined(__cplusplus) && !defined(__CHECKER__)
 	__CXX_CLASSMEMBER operator timespec(void) const __CXX_NOEXCEPT {
 		struct timespec __res;
 		__res.tv_sec  = (__time_t)this->tv_sec;
@@ -214,7 +214,7 @@ struct __stat_timespec32 /*[PREFIX(tv_)][NAME(stat_timespec32)]*/ {
 		this->tv_nsec = __val.tv_nsec;
 		return *this;
 	}
-#endif /* __cplusplus */
+#endif /* __cplusplus && !__CHECKER__ */
 };
 #endif /* __SIZEOF_TIME_T__ != __SIZEOF_TIME64_T__ */
 

@@ -754,7 +754,7 @@ NOTHROW(FCALL fsuper_delete_impl)(REF struct fsuper *__restrict self) {
 
 
 /* Gather information about the filesystem and store that information in `*result' */
-PUBLIC BLOCKING NONNULL((1, 2)) void FCALL
+PUBLIC BLOCKING NONNULL((1)) void FCALL
 fsuper_statfs(struct fsuper *__restrict self,
               USER CHECKED struct statfs *result)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {

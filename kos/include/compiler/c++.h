@@ -177,6 +177,7 @@ using namespace std; /* Overlay */
 #define __BOOL                bool
 #define __DFL(expr)           = expr
 
+#ifndef __register
 #ifdef __INTELLISENSE__
 #define __register /* Nothing */
 #elif defined(__cplusplus) && __cplusplus >= 201703L
@@ -184,6 +185,7 @@ using namespace std; /* Overlay */
 #else /* ... */
 #define __register register
 #endif /* !... */
+#endif /* !__register */
 
 #ifdef __INTELLISENSE__
 __NAMESPACE_INT_BEGIN

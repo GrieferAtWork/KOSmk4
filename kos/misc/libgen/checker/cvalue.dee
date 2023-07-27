@@ -632,7 +632,7 @@ err_bad_op:
 						local currentFunctionNothrow: string | none = checker.currentFunctionTypeRef.attribNothrow;
 						if (checker.currentTryBlockGreatestNothrowLevel < pointerNoThrowLevel)
 							checker.currentTryBlockGreatestNothrowLevel = pointerNoThrowLevel;
-						if (!currentFunctionNothrow.startswith("*")) {
+						if (currentFunctionNothrow !is none && !currentFunctionNothrow.startswith("*")) {
 							local currentFunctionNothrowLevel: int = int(currentFunctionNothrow);
 							if (currentFunctionNothrowLevel < pointerNoThrowLevel) {
 								checker.warn("-Wnothrow",
@@ -1368,8 +1368,35 @@ global final C_nullptr_64: CValue = CValue(kind: CVALUE_RCONST, typeref: CTypeRe
 global final C_void_typeref: CTypeRef = CTypeRef(C_void);
 global final C_voidval: CValue = CValue(kind: CVALUE_AVOID, typeref: C_void_typeref);
 
+
 final class CScope: CNamespace {
 	this = super;
 	@@Symbol value overrides (for when a function overrides the value of a pre-defined symbol)
 	public member symbolValues: {CSymbol: Bytes | none} = UniqueDict();
+
+	@@Callbacks that are invoked when the scope is popped
+	public member onPopCallbacks: {Callable...} | none = none;
+
+	@@Register a callback that should be invoked when the scope is popped
+	public function onPopRegister(cb: Callable) {
+		if (onPopCallbacks is none)
+			onPopCallbacks = [];
+		onPopCallbacks.pushfront(cb);
+	}
+
+	@@Called when the scope is popped (s.a. @CNamespace.onPop)
+	public function onPop() {
+		for (local cb: onPopCallbacks)
+			cb();
+	}
+}
+
+@@Create a @CScope whose symbol value overrides and on-pop callbacks alias those of @forScope
+function createCScopeAlias(forScope: CScope): CScope {
+	local result: CScope = CScope();
+	result.symbolValues = forScope.symbolValues;
+	if (forScope.onPopCallbacks is none)
+		forScope.onPopCallbacks = [];
+	result.onPopCallbacks = forScope.onPopCallbacks;
+	return result;
 }

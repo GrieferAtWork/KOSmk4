@@ -38,7 +38,9 @@
 #define __NAMESPACE_INT_SYM                 /* Nothing */
 #define __NAMESPACE_INT_LSYM                /* Nothing */
 #define __DFL(expr)                         /* Nothing */
+#ifndef __register
 #define __register                          register
+#endif /* !__register */
 
 #if 1
 #define __BOOL _Bool
