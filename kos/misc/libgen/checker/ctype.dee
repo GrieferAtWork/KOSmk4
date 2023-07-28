@@ -211,7 +211,8 @@ final class CTypeAttributes {
 
 	public function enumerateAttributsNotPresentIn(
 			checker: Checker | none = none,
-			other: CTypeAttributes | none = none
+			other: CTypeAttributes | none = none,
+			includeAllAttributes: bool = true
 		): {string...} {
 		if (!IDENTICAL(nothrow, other.nothrow) && nothrow !is none)
 			yield f"nothrow({nothrow})";
@@ -225,7 +226,7 @@ final class CTypeAttributes {
 			if (missingTags)
 				yield f"require_caller_tag({", ".join(for (local x: missingTags) repr x)})";
 		}
-		if (!IDENTICAL(aligned, other.aligned) && aligned !is none)
+		if (!IDENTICAL(aligned, other.aligned) && aligned !is none && includeAllAttributes)
 			yield f"aligned({aligned})";
 		if (!IDENTICAL(throws, other.throws) && throws !is none) {
 			local missingThrows: {int...} = other is none ? throws : throws - other.throws;
@@ -438,15 +439,19 @@ final class CTypeRef {
 		local attribAdded: {string...} = ();
 		if (attrib !is none) {
 			if (other.attrib is none) {
-				attribRemoved = List(attrib.enumerateAttributsNotPresentIn(checker));
+				attribRemoved = List(attrib.enumerateAttributsNotPresentIn(
+						checker, includeAllAttributes: false));
 			} else {
-				attribRemoved = List(attrib.enumerateAttributsNotPresentIn(checker, other.attrib));
-				attribAdded   = List(other.attrib.enumerateAttributsNotPresentIn(checker, attrib));
+				attribRemoved = List(attrib.enumerateAttributsNotPresentIn(
+						checker, other.attrib, includeAllAttributes: false));
+				attribAdded   = List(other.attrib.enumerateAttributsNotPresentIn(
+						checker, attrib, includeAllAttributes: false));
 				if (attribAdded)
 					attrib.importFrom(other.attrib);
 			}
 		} else if (other.attrib !is none) {
-			attribAdded = List(other.attrib.enumerateAttributsNotPresentIn(checker));
+			attribAdded = List(other.attrib.enumerateAttributsNotPresentIn(
+					checker, includeAllAttributes: false));
 			if (attribAdded) {
 				attrib = CTypeAttributes();
 				attrib.importFrom(other.attrib);
@@ -1818,10 +1823,6 @@ class CNamespace {
 
 	@@Only here so we don't need special handling when used as a @CScope
 	public property symbolValues = { get() -> none; };
-
-	@@Callback invoked when the scope/namespace is popped from the namespace stack.
-	public function onPop() {
-	}
 
 	@@@param tab: One of:
 	@@            - @"symbols": @CSymbol or @CSymbolTemplate
