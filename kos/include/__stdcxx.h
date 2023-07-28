@@ -30,6 +30,12 @@
 #define __COMPILER_HAVE_CXX_PARTIAL_TPL_SPEC
 #define __CXX_DEDUCE_TYPENAME typename
 
+#ifdef __CHECKER__
+#define __COMPILER_HAVE_CXX_TEMPLATE_USING
+#define __COMPILER_HAVE_CXX_ENUM_CLASSES
+#define __COMPILER_HAVE_CXX_NULLPTR
+#define __COMPILER_HAVE_CXX_DECLTYPE
+#else /* __CHECKER__ */
 #if (__has_feature(cxx_variadic_templates) ||                                                           \
      (defined(__cpp_variadic_templates) && __cpp_variadic_templates >= 200704) ||                       \
      (__GCC_VERSION_NUM >= 40300 && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)) || \
@@ -77,6 +83,7 @@
      (defined(__IBMCPP_DECLTYPE) && (__IBMCPP_DECLTYPE + 0)))
 #define __COMPILER_HAVE_CXX_DECLTYPE
 #endif /* ... */
+#endif /* !__CHECKER__ */
 
 
 
