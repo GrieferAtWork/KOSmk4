@@ -46,7 +46,7 @@
 DECL_BEGIN
 
 /* Lookup addr2line information for the given source address. */
-PUBLIC ATTR_COLDTEXT NONNULL((1)) debuginfo_errno_t
+PUBLIC ATTR_COLDTEXT NONNULL((1, 3)) debuginfo_errno_t
 NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
                          uintptr_t module_relative_pc,
                          di_debug_addr2line_t *__restrict result,

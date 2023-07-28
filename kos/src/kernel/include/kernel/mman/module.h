@@ -149,10 +149,10 @@ BLOCKING WUNUSED NONNULL((1, 2)) KERNEL byte_t *(module_section_getaddr_inflate)
 #endif /* !__INTELLISENSE__ */
 
 /* Same as the functions above, but preserve the current exception, and return `NULL' on error. */
-FUNDEF BLOCKING WUNUSED NONNULL((1)) char const *NOTHROW(FCALL module_section_getname_nx)(struct module_section *__restrict self);
-FUNDEF BLOCKING WUNUSED NONNULL((1)) NCX byte_t *NOTHROW(FCALL module_section_getaddr_nx)(struct module_section *__restrict self);
-FUNDEF BLOCKING WUNUSED NONNULL((1)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_alias_nx)(struct module_section *__restrict self);
-FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_inflate_nx)(struct module_section *__restrict self, size_t *__restrict psize);
+FUNDEF WUNUSED NONNULL((1)) char const *NOTHROW(FCALL module_section_getname_nx)(struct module_section *__restrict self);
+FUNDEF WUNUSED NONNULL((1)) NCX byte_t *NOTHROW(FCALL module_section_getaddr_nx)(struct module_section *__restrict self);
+FUNDEF WUNUSED NONNULL((1)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_alias_nx)(struct module_section *__restrict self);
+FUNDEF WUNUSED NONNULL((1, 2)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_inflate_nx)(struct module_section *__restrict self, size_t *__restrict psize);
 
 
 struct module_sectinfo {
@@ -207,8 +207,8 @@ struct module_ops {
 	/* [1..1] Return the text/data base address for `self' (as used by unwinding)
 	 * NOTE: `self' is only non-const in  order to allow for lazy  initialization.
 	 * These functions may not alter the state of `self' in any observable manner! */
-	BLOCKING WUNUSED_T NONNULL_T((1)) void const *NOTHROW_T(FCALL *mo_get_tbase)(struct module *__restrict self);
-	BLOCKING WUNUSED_T NONNULL_T((1)) void const *NOTHROW_T(FCALL *mo_get_dbase)(struct module *__restrict self);
+	WUNUSED_T NONNULL_T((1)) void const *NOTHROW_T(FCALL *mo_get_tbase)(struct module *__restrict self);
+	WUNUSED_T NONNULL_T((1)) void const *NOTHROW_T(FCALL *mo_get_dbase)(struct module *__restrict self);
 };
 
 struct module {
@@ -339,13 +339,13 @@ NOTHROW(FCALL module_getname)(struct module *__restrict self);
  * path excluding the leading  path) of the given  module.
  * If the module doesn't have a path/name (s.a. the macros
  * above), then nothing will be printed. */
-FUNDEF BLOCKING_IF(BLOCKING(printer)) NONNULL((1, 2)) ssize_t KCALL
+FUNDEF NONNULL((1, 2)) ssize_t KCALL
 module_printpath(struct module *__restrict self, __pformatprinter printer, void *arg);
-FUNDEF BLOCKING_IF(BLOCKING(printer)) NONNULL((1, 2)) ssize_t KCALL
+FUNDEF NONNULL((1, 2)) ssize_t KCALL
 module_printname(struct module *__restrict self, __pformatprinter printer, void *arg);
 
 /* Try to print the module's path, and if that fails, print its name. */
-FUNDEF BLOCKING_IF(BLOCKING(printer)) NONNULL((1, 2)) ssize_t KCALL
+FUNDEF NONNULL((1, 2)) ssize_t KCALL
 module_printpath_or_name(struct module *__restrict self, __pformatprinter printer, void *arg);
 
 
@@ -375,9 +375,9 @@ module_next(struct module *prev);
 /* Same as  the functions  above, but  preserve/restore the  old
  * exception if one ends up being thrown by the above functions,
  * and simply return `NULL', rather than RETHROW()-ing it. */
-FUNDEF BLOCKING WUNUSED REF struct module *NOTHROW(FCALL module_fromaddr_nx)(NCX void const *addr);
-FUNDEF BLOCKING WUNUSED REF struct module *NOTHROW(FCALL module_aboveaddr_nx)(NCX void const *addr);
-FUNDEF BLOCKING WUNUSED REF struct module *NOTHROW(FCALL module_next_nx)(struct module *prev);
+FUNDEF WUNUSED REF struct module *NOTHROW(FCALL module_fromaddr_nx)(NCX void const *addr);
+FUNDEF WUNUSED REF struct module *NOTHROW(FCALL module_aboveaddr_nx)(NCX void const *addr);
+FUNDEF WUNUSED REF struct module *NOTHROW(FCALL module_next_nx)(struct module *prev);
 #define module_first_nx() module_aboveaddr_nx((void const *)0)
 
 /* Same as the functions above,  but rather than operating  the
@@ -387,9 +387,9 @@ FUNDEF BLOCKING WUNUSED REF struct module *NOTHROW(FCALL module_next_nx)(struct 
 FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL mman_module_fromaddr(struct mman *__restrict self, NCX void const *addr);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL mman_module_aboveaddr(struct mman *__restrict self, NCX void const *addr);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL mman_module_next(struct mman *__restrict self, struct module *prev);
-FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_fromaddr_nx)(struct mman *__restrict self, NCX void const *addr);
-FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_aboveaddr_nx)(struct mman *__restrict self, NCX void const *addr);
-FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_next_nx)(struct mman *__restrict self, struct module *prev);
+FUNDEF WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_fromaddr_nx)(struct mman *__restrict self, NCX void const *addr);
+FUNDEF WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_aboveaddr_nx)(struct mman *__restrict self, NCX void const *addr);
+FUNDEF WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_next_nx)(struct mman *__restrict self, struct module *prev);
 #define mman_module_first(self)    mman_module_aboveaddr(self, (void const *)0)
 #define mman_module_first_nx(self) mman_module_aboveaddr_nx(self, (void const *)0)
 

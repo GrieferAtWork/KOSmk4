@@ -209,6 +209,19 @@ final class CTypeAttributes {
 	//       >> printf("foo = %s", p); // int printf(char const *, char const *);
 	//       >> printf("foo = %p", p); // int printf(char const *, void [[noderef]] const volatile *);
 
+	function fixNonsensicalFunctionAttributes(checker: Checker) {
+		if (nothrow !is none && throws) {
+			/* It only makes sense to have both of these
+			 * attributes when `throws' is `{THROWS_CB}' */
+			if (throws != {THROWS_CB}) {
+				checker.warn("-Wattribute",
+					f"Function type annotated as both `{getPrettyNothrowLevelName(nothrow)}' "
+					f"and `THROWS({", ".join(checker.exceptCodeNames(throws))})'");
+				throws = none;
+			}
+		}
+	}
+
 	public function enumerateAttributsNotPresentIn(
 			checker: Checker | none = none,
 			other: CTypeAttributes | none = none,
@@ -579,6 +592,7 @@ final class CTypeRef {
 						attrib.operator . (nonSenseAttrib) = none;
 					}
 				}
+				attrib.fixNonsensicalFunctionAttributes(checker);
 			}
 		} else {
 			if (typ is CPointerType || typ is CLValueType) {
@@ -657,6 +671,7 @@ final class CTypeRef {
 						attrib.operator . (nonSenseAttrib) = none;
 					}
 				}
+				attrib.fixNonsensicalFunctionAttributes(checker);
 			}
 		} else {
 			if (flags & CTYPEREF_FLAG_NONSENSE_PTRBASE_REGULAR) {

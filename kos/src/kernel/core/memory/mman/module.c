@@ -106,7 +106,7 @@ NOTHROW(FCALL module_locksection_index_nx)(struct module *__restrict self,
  * path excluding the leading  path) of the given  module.
  * If the module doesn't have a path/name (s.a. the macros
  * above), then nothing will be printed. */
-PUBLIC BLOCKING_IF(BLOCKING(printer)) NONNULL((1, 2)) ssize_t KCALL
+PUBLIC NONNULL((1, 2)) ssize_t KCALL
 module_printpath(struct module *__restrict self,
                  pformatprinter printer, void *arg) {
 	ssize_t result = 0;
@@ -126,7 +126,7 @@ done:
 	return result;
 }
 
-PUBLIC BLOCKING_IF(BLOCKING(printer)) NONNULL((1, 2)) ssize_t KCALL
+PUBLIC NONNULL((1, 2)) ssize_t KCALL
 module_printname(struct module *__restrict self,
                  pformatprinter printer, void *arg) {
 	ssize_t result = 0;
@@ -169,7 +169,7 @@ NOTHROW(FCALL module_getname)(struct module *__restrict self) {
 }
 
 /* Try to print the module's path, and if that fails, print its name. */
-PUBLIC BLOCKING_IF(BLOCKING(printer)) NONNULL((1, 2)) ssize_t KCALL
+PUBLIC NONNULL((1, 2)) ssize_t KCALL
 module_printpath_or_name(struct module *__restrict self,
                          pformatprinter printer, void *arg) {
 	ssize_t result = 0;
@@ -478,7 +478,7 @@ module_next(struct module *prev) {
 #ifdef _MODULE_FROMADDR_IS_NOTHROW
 DEFINE_PUBLIC_ALIAS(module_fromaddr_nx, module_fromaddr);
 #else /* _MODULE_FROMADDR_IS_NOTHROW */
-PUBLIC BLOCKING WUNUSED REF struct module *
+PUBLIC WUNUSED REF struct module *
 NOTHROW(FCALL module_fromaddr_nx)(VIRT void const *addr) {
 	REF struct module *result;
 	NESTED_TRY {
@@ -493,7 +493,7 @@ NOTHROW(FCALL module_fromaddr_nx)(VIRT void const *addr) {
 #ifdef _MODULE_ABOVEADDR_IS_NOTHROW
 DEFINE_PUBLIC_ALIAS(module_aboveaddr_nx, module_aboveaddr);
 #else /* _MODULE_ABOVEADDR_IS_NOTHROW */
-PUBLIC BLOCKING WUNUSED REF struct module *
+PUBLIC WUNUSED REF struct module *
 NOTHROW(FCALL module_aboveaddr_nx)(NCX void const *addr) {
 	REF struct module *result;
 	NESTED_TRY {
@@ -508,7 +508,7 @@ NOTHROW(FCALL module_aboveaddr_nx)(NCX void const *addr) {
 #ifdef _MODULE_NEXT_IS_NOTHROW
 DEFINE_PUBLIC_ALIAS(module_next_nx, module_next);
 #else /* _MODULE_NEXT_IS_NOTHROW */
-PUBLIC BLOCKING WUNUSED REF struct module *
+PUBLIC WUNUSED REF struct module *
 NOTHROW(FCALL module_next_nx)(struct module *prev) {
 	REF struct module *result;
 	NESTED_TRY {
@@ -561,7 +561,7 @@ mman_module_next(struct mman *__restrict self, struct module *prev) {
 #endif /* !CONFIG_HAVE_KERNEL_USERELF_MODULES */
 }
 
-PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *
+PUBLIC WUNUSED NONNULL((1)) REF struct module *
 NOTHROW(FCALL mman_module_fromaddr_nx)(struct mman *__restrict self,
                                        NCX void const *addr) {
 	REF struct module *result;
@@ -573,7 +573,7 @@ NOTHROW(FCALL mman_module_fromaddr_nx)(struct mman *__restrict self,
 	return result;
 }
 
-PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *
+PUBLIC WUNUSED NONNULL((1)) REF struct module *
 NOTHROW(FCALL mman_module_aboveaddr_nx)(struct mman *__restrict self,
                                         NCX void const *addr) {
 	REF struct module *result;
@@ -585,7 +585,7 @@ NOTHROW(FCALL mman_module_aboveaddr_nx)(struct mman *__restrict self,
 	return result;
 }
 
-PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *
+PUBLIC WUNUSED NONNULL((1)) REF struct module *
 NOTHROW(FCALL mman_module_next_nx)(struct mman *__restrict self,
                                    struct module *prev) {
 	REF struct module *result;
@@ -687,7 +687,7 @@ unwind_userspace_with_section(struct module *__restrict mod, VIRT void const *ab
 	return result;
 }
 
-PRIVATE BLOCKING ATTR_NOINLINE NONNULL((2, 4)) unwind_errno_t LIBUNWIND_CC
+PRIVATE ATTR_NOINLINE NONNULL((2, 4)) unwind_errno_t LIBUNWIND_CC
 unwind_userspace(VIRT void const *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {
@@ -757,7 +757,7 @@ unwind_userspace(VIRT void const *absolute_pc,
 }
 
 
-PUBLIC BLOCKING NONNULL((2, 4)) unwind_errno_t LIBDEBUGINFO_CC
+PUBLIC NONNULL((2, 4)) unwind_errno_t LIBDEBUGINFO_CC
 unwind_for_debug(VIRT void const *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {

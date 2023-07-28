@@ -424,8 +424,10 @@ warn_function_pointer_cast_changes_nothrow_level:
 							if (oldThrows != newThrows) {
 								if (newThrows) {
 									checker.warn("-Wcast",
-										f"Retaining `THROWS({checker.exceptCodeNames(oldThrows)})` "
-										f"instead of `THROWS({checker.exceptCodeNames(newThrows)})`");
+										f"Retaining `THROWS({', '.join(
+											checker.exceptCodeNames(oldThrows))})` "
+										f"instead of `THROWS({', '.join(
+											checker.exceptCodeNames(newThrows))})`");
 								}
 								newPointerBase = copy newPointerBase;
 								newPointerBase.attribThrows = oldThrows;
