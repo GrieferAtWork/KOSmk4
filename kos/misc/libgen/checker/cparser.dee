@@ -425,6 +425,8 @@ again:
 		tok = tok[0];
 	}
 
+	@@Recursion counter for "{...}" pairs within an active static-if block
+	private final member staticIfRecursion: int = 0;
 	private final member staticIfDepth: int = 0;
 	private final member staticIfAllowed: bool = true;
 
@@ -595,14 +597,23 @@ warn_unknown_pragma:
 			}
 			goto return_tok;
 
+		case "{":
+			if (staticIfDepth && staticIfAllowed)
+				++staticIfRecursion;
+			break;
+
 		case "}":
 			if (staticIfDepth && staticIfAllowed) {
-				ch = handleStaticIfRBrace();
-				if (ch is none)
-					goto again;
-				if (ch == "__static_if")
-					goto do_handleStaticIf;
-				RETURN(ch);
+				if (staticIfRecursion) {
+					--staticIfRecursion;
+				} else {
+					ch = handleStaticIfRBrace();
+					if (ch is none)
+						goto again;
+					if (ch == "__static_if")
+						goto do_handleStaticIf;
+					RETURN(ch);
+				}
 			}
 			break;
 
