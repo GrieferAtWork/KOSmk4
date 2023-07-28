@@ -54,10 +54,10 @@ NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
 	debuginfo_errno_t error;
 	NESTED_TRY {
 		error = debug_addr2line(&info->ds_info,
-		                         result,
-		                         module_relative_pc,
-		                         level,
-		                         DEBUG_ADDR2LINE_FNORMAL);
+		                        result,
+		                        module_relative_pc,
+		                        level,
+		                        DEBUG_ADDR2LINE_FNORMAL);
 	} EXCEPT {
 		error = DEBUG_INFO_ERROR_CORRUPT;
 	}

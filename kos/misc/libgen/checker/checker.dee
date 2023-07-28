@@ -1045,9 +1045,9 @@ skip_normal_enum_namespace:
 				local rBaseTypeRef: CTypeRef = cTypeRefWithCommonAttrib(aBaseTypeRef, aBaseTypeRef);
 				rBaseTypeRef.typ = rBaseType;
 				local rTypeRef: CTypeRef = cTypeRefWithCommonAttrib(a, b);
-				local rPointerType: Type = type aBaseType;
-				if (rPointerType !== type bBaseType && bBaseType.sizeof > aBaseType.sizeof)
-					rPointerType = type bBaseType;
+				local rPointerType: Type = type aTyp;
+				if (rPointerType !== type bTyp && bTyp.sizeof > aBaseType.sizeof)
+					rPointerType = type bTyp;
 				rTypeRef.typ = rPointerType(rBaseTypeRef);
 				return rTypeRef;
 			}
