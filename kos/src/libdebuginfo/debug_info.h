@@ -93,9 +93,9 @@ NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t con
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-INTDEF NONNULL((1, 2, 3, 4, 5)) debuginfo_errno_t
+INTDEF NONNULL((1, 3, 4, 5)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadunit)(CHECKED byte_t const **__restrict pdebug_info_reader,
-                                                   CHECKED byte_t const *__restrict debug_info_end,
+                                                   CHECKED byte_t const *debug_info_end,
                                                    di_debuginfo_cu_parser_sections_t const *__restrict sectinfo,
                                                    di_debuginfo_cu_parser_t *__restrict result,
                                                    di_debuginfo_cu_abbrev_t *__restrict abbrev,
@@ -143,13 +143,13 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipattr)(di_d
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, CHECKED char const **__restrict presult);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring_ex)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, CHECKED char const **__restrict presult, di_string_sections_t const *__restrict sections);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getaddr)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult);
-INTDEF NONNULL((1, 3, 4)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult, CHECKED byte_t const *__restrict attr_reader);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult, CHECKED byte_t const *attr_reader);
 #if __SIZEOF_POINTER__ == 8
 #define libdi_debuginfo_cu_parser_getconst64 libdi_debuginfo_cu_parser_getconst
 #else /* __SIZEOF_POINTER__ == 8 */
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst64)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uint64_t *__restrict presult, CHECKED byte_t const *__restrict attr_reader);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst64)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uint64_t *__restrict presult, CHECKED byte_t const *attr_reader);
 #endif /* __SIZEOF_POINTER__ != 8 */
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst128)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uint128_t *__restrict presult, CHECKED byte_t const *__restrict attr_reader);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst128)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uint128_t *__restrict presult, CHECKED byte_t const *attr_reader);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getflag)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, bool *__restrict presult);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getref)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, CHECKED byte_t const **__restrict presult);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getexpr)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, di_debuginfo_location_t *__restrict result);

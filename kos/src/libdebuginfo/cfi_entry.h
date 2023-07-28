@@ -55,10 +55,10 @@ DECL_BEGIN
  * @return: UNWIND_SEGFAULT:         ...
  * @return: UNWIND_BADALLOC:         ...
  * @return: UNWIND_EMULATOR_*:       ... */
-INTDEF WUNUSED NONNULL((1, 2, 3)) unwind_errno_t
+INTDEF WUNUSED NONNULL((1)) unwind_errno_t
 NOTHROW_NCX(CC libdi_debuginfo_run_entry_value_emulator)(struct unwind_emulator_struct *__restrict self,
-                                                         byte_t const *cfi_start_pc,
-                                                         byte_t const *cfi_end_pc);
+                                                         CHECKED byte_t const *cfi_start_pc,
+                                                         CHECKED byte_t const *cfi_end_pc);
 
 DECL_END
 

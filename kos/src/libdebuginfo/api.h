@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBDEBUGINFO_API_H
 #define GUARD_LIBDEBUGINFO_API_H 1
 #define LIBUNWIND_WANT_PROTOTYPES
+#define LIBDEBUGINFO_WANT_PROTOTYPES
 
 #include <__crt.h>
 #include <hybrid/compiler.h>

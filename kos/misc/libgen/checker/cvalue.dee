@@ -212,6 +212,13 @@ final class CValue {
 		local oldTyp: CType = typeref.typ;
 		local newTyp: CType = newTypeRef.typ;
 
+		/* Special case for C++ L-Value types. */
+		if (newTyp is CLValueType) {
+			return inplaceRef(this)
+				.inplaceCast(this, CTypeRef(checker.TARGET_CPointerType(newTyp.base)), explicit)
+				.inplaceInd(this);
+		}
+
 		/* Cast between function types isn't allowed (you can only cast function pointers) */
 		if (newTyp is CFunctionType)
 			goto err_bad_op;
@@ -544,7 +551,17 @@ err_bad_op:
 			checker.err(f"No such field `{fieldName}' in `{typ}'");
 		} else {
 			/* Load the field in question */
-			typeref = fieldInfo.first;
+			local cv: int = typeref.flags & CTYPEREF_FLAG_CV;
+			if (cv) {
+				/* const/volatile are inherited in field expressions:
+				 * >> struct foo { int x; };
+				 * >> struct foo const v = { 0 };
+				 * >> typeof(v.x) z; // int const z; */
+				typeref = copy fieldInfo.first;
+				typeref.flags |= cv;
+			} else {
+				typeref = fieldInfo.first;
+			}
 			offset += fieldInfo.last;
 		}
 		TRACE();

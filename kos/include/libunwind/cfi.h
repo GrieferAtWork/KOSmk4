@@ -631,8 +631,8 @@ typedef struct {
  * @return: UNWIND_INVALID_REGISTER: The given `dw_regno' is invalid/unsupported.
  * @return: UNWIND_OPTIMIZED_AWAY:   Register information has been optimized away.
  * @return: * :                      Some other error (propagate) */
-typedef __ATTR_NONNULL_T((3)) unwind_errno_t (LIBUNWIND_CC *unwind_getreg_t)(void const *__arg, unwind_regno_t __dw_regno, __CHECKED void *__dst);
-typedef __ATTR_NONNULL_T((3)) unwind_errno_t (LIBUNWIND_CC *unwind_setreg_t)(void *__arg, unwind_regno_t __dw_regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((3)) unwind_errno_t (LIBUNWIND_CC *unwind_getreg_t)(void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
+typedef __ATTR_NONNULL_T((3)) unwind_errno_t (LIBUNWIND_CC *unwind_setreg_t)(void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
 
 typedef struct unwind_emulator_sections_struct {
 	/* NOTE: When individual sections are empty, the associated instructions become illegal

@@ -125,14 +125,14 @@ for (local state: APPLY_CPUSTATE) {
 	print("/" "* ", state.ljust(68), " *" "/");
 	print("/" "************************************************************************" "/");
 	print("#ifdef LIBUNWIND_HAVE_GETSETREG_", STATE);
-	print("typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_", STATE, ")(/" "*struct ", state, "**" "/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);");
-	print("typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_", STATE, "_EXCLUSIVE)(/" "*struct ", state, "**" "/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);");
+	print("typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_", STATE, ")(/" "*struct ", state, "**" "/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);");
+	print("typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_", STATE, "_EXCLUSIVE)(/" "*struct ", state, "**" "/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);");
 	print("#ifdef LIBUNWIND_HAVE_GETSETREG_", STATE, "_P");
-	print("typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_", STATE, "_P)(/" "*struct ", state, "***" "/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);");
-	print("typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_", STATE, "_EXCLUSIVE_P)(/" "*struct ", state, "***" "/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);");
+	print("typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_", STATE, "_P)(/" "*struct ", state, "***" "/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);");
+	print("typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_", STATE, "_EXCLUSIVE_P)(/" "*struct ", state, "***" "/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);");
 	print("#else /" "* LIBUNWIND_HAVE_GETSETREG_", STATE, "_P *" "/");
-	print("typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_", STATE, ")(/" "*struct ", state, "**" "/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);");
-	print("typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_", STATE, "_EXCLUSIVE)(/" "*struct ", state, "**" "/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);");
+	print("typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_", STATE, ")(/" "*struct ", state, "**" "/ void *__state, unwind_regno_t __regno, void const *__restrict __src);");
+	print("typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_", STATE, "_EXCLUSIVE)(/" "*struct ", state, "**" "/ void *__state, unwind_regno_t __regno, void const *__restrict __src);");
 	print("#endif /" "* !LIBUNWIND_HAVE_GETSETREG_", STATE, "_P *" "/");
 	if (aliases) {
 		print("#ifdef ", STATE, "_ALIAS");
@@ -163,25 +163,25 @@ for (local state: APPLY_CPUSTATE) {
 	print("#ifdef LIBUNWIND_WANT_PROTOTYPES");
 	if (aliases) {
 		print("#ifdef ", STATE, "_ALIAS");
-		print("__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_", state, ",(/" "*struct ", state, "**" "/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst),__LIBUNWIND_GETREG_GENERATE_ASMNAME(", STATE, "_ALIAS),(__state,__regno,__dst))");
-		print("__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_", state, "_exclusive,(/" "*struct ", state, "**" "/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst),__LIBUNWIND_GETREG_EXCLUSIVE_GENERATE_ASMNAME(", STATE, "_ALIAS),(__state,__regno,__dst))");
+		print("__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_", state, ",(/" "*struct ", state, "**" "/ void const *__state, unwind_regno_t __regno, void *__restrict __dst),__LIBUNWIND_GETREG_GENERATE_ASMNAME(", STATE, "_ALIAS),(__state,__regno,__dst))");
+		print("__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_", state, "_exclusive,(/" "*struct ", state, "**" "/ void const *__state, unwind_regno_t __regno, void *__restrict __dst),__LIBUNWIND_GETREG_EXCLUSIVE_GENERATE_ASMNAME(", STATE, "_ALIAS),(__state,__regno,__dst))");
 		print("#ifdef LIBUNWIND_HAVE_GETSETREG_", STATE, "_P");
-		print("__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_", state, "_p,(/" "*struct ", state, "***" "/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_P_GENERATE_ASMNAME(", STATE, "_ALIAS),(__p_state,__regno,__src))");
-		print("__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_", state, "_exclusive_p,(/" "*struct ", state, "***" "/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_EXCLUSIVE_P_GENERATE_ASMNAME(", STATE, "_ALIAS),(__p_state,__regno,__src))");
+		print("__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_", state, "_p,(/" "*struct ", state, "***" "/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_P_GENERATE_ASMNAME(", STATE, "_ALIAS),(__p_state,__regno,__src))");
+		print("__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_", state, "_exclusive_p,(/" "*struct ", state, "***" "/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_EXCLUSIVE_P_GENERATE_ASMNAME(", STATE, "_ALIAS),(__p_state,__regno,__src))");
 		print("#else /" "* LIBUNWIND_HAVE_GETSETREG_", STATE, "_P *" "/");
-		print("__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_", state, ",(/" "*struct ", state, "**" "/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_GENERATE_ASMNAME(", STATE, "_ALIAS),(__state,__regno,__src))");
-		print("__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_", state, "_exclusive,(/" "*struct ", state, "**" "/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_EXCLUSIVE_GENERATE_ASMNAME(", STATE, "_ALIAS),(__state,__regno,__src))");
+		print("__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_", state, ",(/" "*struct ", state, "**" "/ void *__state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_GENERATE_ASMNAME(", STATE, "_ALIAS),(__state,__regno,__src))");
+		print("__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_", state, "_exclusive,(/" "*struct ", state, "**" "/ void *__state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_EXCLUSIVE_GENERATE_ASMNAME(", STATE, "_ALIAS),(__state,__regno,__src))");
 		print("#endif /" "* !LIBUNWIND_HAVE_GETSETREG_", STATE, "_P *" "/");
 		print("#else /" "* ", STATE, "_ALIAS *" "/");
 	}
-	print("LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_", state, ")(/" "*struct ", state, "**" "/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);");
-	print("LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_", state, "_exclusive)(/" "*struct ", state, "**" "/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);");
+	print("LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_", state, ")(/" "*struct ", state, "**" "/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);");
+	print("LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_", state, "_exclusive)(/" "*struct ", state, "**" "/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);");
 	print("#ifdef LIBUNWIND_HAVE_GETSETREG_", STATE, "_P");
-	print("LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_", state, "_p)(/" "*struct ", state, "***" "/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);");
-	print("LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_", state, "_exclusive_p)(/" "*struct ", state, "***" "/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);");
+	print("LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_", state, "_p)(/" "*struct ", state, "***" "/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);");
+	print("LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_", state, "_exclusive_p)(/" "*struct ", state, "***" "/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);");
 	print("#else /" "* LIBUNWIND_HAVE_GETSETREG_", STATE, "_P *" "/");
-	print("LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_", state, ")(/" "*struct ", state, "**" "/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);");
-	print("LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_", state, "_exclusive)(/" "*struct ", state, "**" "/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);");
+	print("LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_", state, ")(/" "*struct ", state, "**" "/ void *__state, unwind_regno_t __regno, void const *__restrict __src);");
+	print("LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_", state, "_exclusive)(/" "*struct ", state, "**" "/ void *__state, unwind_regno_t __regno, void const *__restrict __src);");
 	print("#endif /" "* !LIBUNWIND_HAVE_GETSETREG_", STATE, "_P *" "/");
 	if (aliases)
 		print("#endif /" "* !", STATE, "_ALIAS *" "/");
@@ -194,14 +194,14 @@ for (local state: APPLY_CPUSTATE) {
 /* ucpustate                                                            */
 /************************************************************************/
 #ifdef LIBUNWIND_HAVE_GETSETREG_UCPUSTATE
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_UCPUSTATE)(/*struct ucpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_UCPUSTATE_EXCLUSIVE)(/*struct ucpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_UCPUSTATE)(/*struct ucpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_UCPUSTATE_EXCLUSIVE)(/*struct ucpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef LIBUNWIND_HAVE_GETSETREG_UCPUSTATE_P
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_UCPUSTATE_P)(/*struct ucpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_UCPUSTATE_EXCLUSIVE_P)(/*struct ucpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_UCPUSTATE_P)(/*struct ucpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_UCPUSTATE_EXCLUSIVE_P)(/*struct ucpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
 #else /* LIBUNWIND_HAVE_GETSETREG_UCPUSTATE_P */
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_UCPUSTATE)(/*struct ucpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_UCPUSTATE_EXCLUSIVE)(/*struct ucpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_UCPUSTATE)(/*struct ucpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_UCPUSTATE_EXCLUSIVE)(/*struct ucpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_UCPUSTATE_P */
 #define UNWIND_GETREG_UCPUSTATE_NAME           "unwind_getreg_ucpustate"
 #define UNWIND_GETREG_UCPUSTATE_EXCLUSIVE_NAME "unwind_getreg_ucpustate_exclusive"
@@ -213,14 +213,14 @@ typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PU
 #define UNWIND_SETREG_UCPUSTATE_EXCLUSIVE_NAME "unwind_setreg_ucpustate_exclusive"
 #endif /* !LIBUNWIND_HAVE_GETSETREG_UCPUSTATE_P */
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucpustate)(/*struct ucpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucpustate_exclusive)(/*struct ucpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucpustate)(/*struct ucpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucpustate_exclusive)(/*struct ucpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef LIBUNWIND_HAVE_GETSETREG_UCPUSTATE_P
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucpustate_p)(/*struct ucpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucpustate_exclusive_p)(/*struct ucpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucpustate_p)(/*struct ucpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucpustate_exclusive_p)(/*struct ucpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
 #else /* LIBUNWIND_HAVE_GETSETREG_UCPUSTATE_P */
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucpustate)(/*struct ucpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucpustate_exclusive)(/*struct ucpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucpustate)(/*struct ucpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucpustate_exclusive)(/*struct ucpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_UCPUSTATE_P */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 #endif /* LIBUNWIND_HAVE_GETSETREG_UCPUSTATE */
@@ -229,14 +229,14 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC 
 /* lcpustate                                                            */
 /************************************************************************/
 #ifdef LIBUNWIND_HAVE_GETSETREG_LCPUSTATE
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_LCPUSTATE)(/*struct lcpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_LCPUSTATE_EXCLUSIVE)(/*struct lcpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_LCPUSTATE)(/*struct lcpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_LCPUSTATE_EXCLUSIVE)(/*struct lcpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef LIBUNWIND_HAVE_GETSETREG_LCPUSTATE_P
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_LCPUSTATE_P)(/*struct lcpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_LCPUSTATE_EXCLUSIVE_P)(/*struct lcpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_LCPUSTATE_P)(/*struct lcpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_LCPUSTATE_EXCLUSIVE_P)(/*struct lcpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
 #else /* LIBUNWIND_HAVE_GETSETREG_LCPUSTATE_P */
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_LCPUSTATE)(/*struct lcpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_LCPUSTATE_EXCLUSIVE)(/*struct lcpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_LCPUSTATE)(/*struct lcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_LCPUSTATE_EXCLUSIVE)(/*struct lcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_LCPUSTATE_P */
 #ifdef LCPUSTATE_ALIAS
 #define UNWIND_GETREG_LCPUSTATE_NAME           "unwind_getreg_" LCPUSTATE_ALIAS_STR
@@ -261,24 +261,24 @@ typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PU
 #endif /* !LCPUSTATE_ALIAS */
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 #ifdef LCPUSTATE_ALIAS
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_lcpustate,(/*struct lcpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst),__LIBUNWIND_GETREG_GENERATE_ASMNAME(LCPUSTATE_ALIAS),(__state,__regno,__dst))
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_lcpustate_exclusive,(/*struct lcpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst),__LIBUNWIND_GETREG_EXCLUSIVE_GENERATE_ASMNAME(LCPUSTATE_ALIAS),(__state,__regno,__dst))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_lcpustate,(/*struct lcpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst),__LIBUNWIND_GETREG_GENERATE_ASMNAME(LCPUSTATE_ALIAS),(__state,__regno,__dst))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_lcpustate_exclusive,(/*struct lcpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst),__LIBUNWIND_GETREG_EXCLUSIVE_GENERATE_ASMNAME(LCPUSTATE_ALIAS),(__state,__regno,__dst))
 #ifdef LIBUNWIND_HAVE_GETSETREG_LCPUSTATE_P
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_lcpustate_p,(/*struct lcpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_P_GENERATE_ASMNAME(LCPUSTATE_ALIAS),(__p_state,__regno,__src))
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_lcpustate_exclusive_p,(/*struct lcpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_EXCLUSIVE_P_GENERATE_ASMNAME(LCPUSTATE_ALIAS),(__p_state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_lcpustate_p,(/*struct lcpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_P_GENERATE_ASMNAME(LCPUSTATE_ALIAS),(__p_state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_lcpustate_exclusive_p,(/*struct lcpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_EXCLUSIVE_P_GENERATE_ASMNAME(LCPUSTATE_ALIAS),(__p_state,__regno,__src))
 #else /* LIBUNWIND_HAVE_GETSETREG_LCPUSTATE_P */
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_lcpustate,(/*struct lcpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_GENERATE_ASMNAME(LCPUSTATE_ALIAS),(__state,__regno,__src))
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_lcpustate_exclusive,(/*struct lcpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_EXCLUSIVE_GENERATE_ASMNAME(LCPUSTATE_ALIAS),(__state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_lcpustate,(/*struct lcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_GENERATE_ASMNAME(LCPUSTATE_ALIAS),(__state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_lcpustate_exclusive,(/*struct lcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_EXCLUSIVE_GENERATE_ASMNAME(LCPUSTATE_ALIAS),(__state,__regno,__src))
 #endif /* !LIBUNWIND_HAVE_GETSETREG_LCPUSTATE_P */
 #else /* LCPUSTATE_ALIAS */
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_lcpustate)(/*struct lcpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_lcpustate_exclusive)(/*struct lcpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_lcpustate)(/*struct lcpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_lcpustate_exclusive)(/*struct lcpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef LIBUNWIND_HAVE_GETSETREG_LCPUSTATE_P
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_lcpustate_p)(/*struct lcpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_lcpustate_exclusive_p)(/*struct lcpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_lcpustate_p)(/*struct lcpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_lcpustate_exclusive_p)(/*struct lcpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
 #else /* LIBUNWIND_HAVE_GETSETREG_LCPUSTATE_P */
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_lcpustate)(/*struct lcpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_lcpustate_exclusive)(/*struct lcpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_lcpustate)(/*struct lcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_lcpustate_exclusive)(/*struct lcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_LCPUSTATE_P */
 #endif /* !LCPUSTATE_ALIAS */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
@@ -288,14 +288,14 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC 
 /* kcpustate                                                            */
 /************************************************************************/
 #ifdef LIBUNWIND_HAVE_GETSETREG_KCPUSTATE
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_KCPUSTATE)(/*struct kcpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_KCPUSTATE_EXCLUSIVE)(/*struct kcpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_KCPUSTATE)(/*struct kcpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_KCPUSTATE_EXCLUSIVE)(/*struct kcpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef LIBUNWIND_HAVE_GETSETREG_KCPUSTATE_P
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_KCPUSTATE_P)(/*struct kcpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_KCPUSTATE_EXCLUSIVE_P)(/*struct kcpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_KCPUSTATE_P)(/*struct kcpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_KCPUSTATE_EXCLUSIVE_P)(/*struct kcpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
 #else /* LIBUNWIND_HAVE_GETSETREG_KCPUSTATE_P */
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_KCPUSTATE)(/*struct kcpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_KCPUSTATE_EXCLUSIVE)(/*struct kcpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_KCPUSTATE)(/*struct kcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_KCPUSTATE_EXCLUSIVE)(/*struct kcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_KCPUSTATE_P */
 #ifdef KCPUSTATE_ALIAS
 #define UNWIND_GETREG_KCPUSTATE_NAME           "unwind_getreg_" KCPUSTATE_ALIAS_STR
@@ -320,24 +320,24 @@ typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PU
 #endif /* !KCPUSTATE_ALIAS */
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 #ifdef KCPUSTATE_ALIAS
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_kcpustate,(/*struct kcpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst),__LIBUNWIND_GETREG_GENERATE_ASMNAME(KCPUSTATE_ALIAS),(__state,__regno,__dst))
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_kcpustate_exclusive,(/*struct kcpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst),__LIBUNWIND_GETREG_EXCLUSIVE_GENERATE_ASMNAME(KCPUSTATE_ALIAS),(__state,__regno,__dst))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_kcpustate,(/*struct kcpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst),__LIBUNWIND_GETREG_GENERATE_ASMNAME(KCPUSTATE_ALIAS),(__state,__regno,__dst))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_kcpustate_exclusive,(/*struct kcpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst),__LIBUNWIND_GETREG_EXCLUSIVE_GENERATE_ASMNAME(KCPUSTATE_ALIAS),(__state,__regno,__dst))
 #ifdef LIBUNWIND_HAVE_GETSETREG_KCPUSTATE_P
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_kcpustate_p,(/*struct kcpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_P_GENERATE_ASMNAME(KCPUSTATE_ALIAS),(__p_state,__regno,__src))
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_kcpustate_exclusive_p,(/*struct kcpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_EXCLUSIVE_P_GENERATE_ASMNAME(KCPUSTATE_ALIAS),(__p_state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_kcpustate_p,(/*struct kcpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_P_GENERATE_ASMNAME(KCPUSTATE_ALIAS),(__p_state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_kcpustate_exclusive_p,(/*struct kcpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_EXCLUSIVE_P_GENERATE_ASMNAME(KCPUSTATE_ALIAS),(__p_state,__regno,__src))
 #else /* LIBUNWIND_HAVE_GETSETREG_KCPUSTATE_P */
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_kcpustate,(/*struct kcpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_GENERATE_ASMNAME(KCPUSTATE_ALIAS),(__state,__regno,__src))
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_kcpustate_exclusive,(/*struct kcpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_EXCLUSIVE_GENERATE_ASMNAME(KCPUSTATE_ALIAS),(__state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_kcpustate,(/*struct kcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_GENERATE_ASMNAME(KCPUSTATE_ALIAS),(__state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_kcpustate_exclusive,(/*struct kcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_EXCLUSIVE_GENERATE_ASMNAME(KCPUSTATE_ALIAS),(__state,__regno,__src))
 #endif /* !LIBUNWIND_HAVE_GETSETREG_KCPUSTATE_P */
 #else /* KCPUSTATE_ALIAS */
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_kcpustate)(/*struct kcpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_kcpustate_exclusive)(/*struct kcpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_kcpustate)(/*struct kcpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_kcpustate_exclusive)(/*struct kcpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef LIBUNWIND_HAVE_GETSETREG_KCPUSTATE_P
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_kcpustate_p)(/*struct kcpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_kcpustate_exclusive_p)(/*struct kcpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_kcpustate_p)(/*struct kcpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_kcpustate_exclusive_p)(/*struct kcpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
 #else /* LIBUNWIND_HAVE_GETSETREG_KCPUSTATE_P */
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_kcpustate)(/*struct kcpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_kcpustate_exclusive)(/*struct kcpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_kcpustate)(/*struct kcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_kcpustate_exclusive)(/*struct kcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_KCPUSTATE_P */
 #endif /* !KCPUSTATE_ALIAS */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
@@ -347,14 +347,14 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC 
 /* icpustate                                                            */
 /************************************************************************/
 #ifdef LIBUNWIND_HAVE_GETSETREG_ICPUSTATE
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_ICPUSTATE)(/*struct icpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_ICPUSTATE_EXCLUSIVE)(/*struct icpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_ICPUSTATE)(/*struct icpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_ICPUSTATE_EXCLUSIVE)(/*struct icpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef LIBUNWIND_HAVE_GETSETREG_ICPUSTATE_P
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE_P)(/*struct icpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE_EXCLUSIVE_P)(/*struct icpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE_P)(/*struct icpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE_EXCLUSIVE_P)(/*struct icpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
 #else /* LIBUNWIND_HAVE_GETSETREG_ICPUSTATE_P */
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE)(/*struct icpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE_EXCLUSIVE)(/*struct icpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE)(/*struct icpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE_EXCLUSIVE)(/*struct icpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_ICPUSTATE_P */
 #ifdef ICPUSTATE_ALIAS
 #define UNWIND_GETREG_ICPUSTATE_NAME           "unwind_getreg_" ICPUSTATE_ALIAS_STR
@@ -379,24 +379,24 @@ typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PU
 #endif /* !ICPUSTATE_ALIAS */
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 #ifdef ICPUSTATE_ALIAS
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_icpustate,(/*struct icpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst),__LIBUNWIND_GETREG_GENERATE_ASMNAME(ICPUSTATE_ALIAS),(__state,__regno,__dst))
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_icpustate_exclusive,(/*struct icpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst),__LIBUNWIND_GETREG_EXCLUSIVE_GENERATE_ASMNAME(ICPUSTATE_ALIAS),(__state,__regno,__dst))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_icpustate,(/*struct icpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst),__LIBUNWIND_GETREG_GENERATE_ASMNAME(ICPUSTATE_ALIAS),(__state,__regno,__dst))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_icpustate_exclusive,(/*struct icpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst),__LIBUNWIND_GETREG_EXCLUSIVE_GENERATE_ASMNAME(ICPUSTATE_ALIAS),(__state,__regno,__dst))
 #ifdef LIBUNWIND_HAVE_GETSETREG_ICPUSTATE_P
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_icpustate_p,(/*struct icpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_P_GENERATE_ASMNAME(ICPUSTATE_ALIAS),(__p_state,__regno,__src))
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_icpustate_exclusive_p,(/*struct icpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_EXCLUSIVE_P_GENERATE_ASMNAME(ICPUSTATE_ALIAS),(__p_state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_icpustate_p,(/*struct icpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_P_GENERATE_ASMNAME(ICPUSTATE_ALIAS),(__p_state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_icpustate_exclusive_p,(/*struct icpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_EXCLUSIVE_P_GENERATE_ASMNAME(ICPUSTATE_ALIAS),(__p_state,__regno,__src))
 #else /* LIBUNWIND_HAVE_GETSETREG_ICPUSTATE_P */
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_icpustate,(/*struct icpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_GENERATE_ASMNAME(ICPUSTATE_ALIAS),(__state,__regno,__src))
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_icpustate_exclusive,(/*struct icpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_EXCLUSIVE_GENERATE_ASMNAME(ICPUSTATE_ALIAS),(__state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_icpustate,(/*struct icpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_GENERATE_ASMNAME(ICPUSTATE_ALIAS),(__state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_icpustate_exclusive,(/*struct icpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_EXCLUSIVE_GENERATE_ASMNAME(ICPUSTATE_ALIAS),(__state,__regno,__src))
 #endif /* !LIBUNWIND_HAVE_GETSETREG_ICPUSTATE_P */
 #else /* ICPUSTATE_ALIAS */
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_icpustate)(/*struct icpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_icpustate_exclusive)(/*struct icpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_icpustate)(/*struct icpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_icpustate_exclusive)(/*struct icpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef LIBUNWIND_HAVE_GETSETREG_ICPUSTATE_P
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate_p)(/*struct icpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate_exclusive_p)(/*struct icpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate_p)(/*struct icpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate_exclusive_p)(/*struct icpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
 #else /* LIBUNWIND_HAVE_GETSETREG_ICPUSTATE_P */
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate)(/*struct icpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate_exclusive)(/*struct icpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate)(/*struct icpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate_exclusive)(/*struct icpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_ICPUSTATE_P */
 #endif /* !ICPUSTATE_ALIAS */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
@@ -406,14 +406,14 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC 
 /* scpustate                                                            */
 /************************************************************************/
 #ifdef LIBUNWIND_HAVE_GETSETREG_SCPUSTATE
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_SCPUSTATE)(/*struct scpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_SCPUSTATE_EXCLUSIVE)(/*struct scpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_SCPUSTATE)(/*struct scpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_SCPUSTATE_EXCLUSIVE)(/*struct scpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef LIBUNWIND_HAVE_GETSETREG_SCPUSTATE_P
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE_P)(/*struct scpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE_EXCLUSIVE_P)(/*struct scpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE_P)(/*struct scpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE_EXCLUSIVE_P)(/*struct scpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
 #else /* LIBUNWIND_HAVE_GETSETREG_SCPUSTATE_P */
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE)(/*struct scpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE_EXCLUSIVE)(/*struct scpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE)(/*struct scpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE_EXCLUSIVE)(/*struct scpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_SCPUSTATE_P */
 #ifdef SCPUSTATE_ALIAS
 #define UNWIND_GETREG_SCPUSTATE_NAME           "unwind_getreg_" SCPUSTATE_ALIAS_STR
@@ -438,24 +438,24 @@ typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PU
 #endif /* !SCPUSTATE_ALIAS */
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 #ifdef SCPUSTATE_ALIAS
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_scpustate,(/*struct scpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst),__LIBUNWIND_GETREG_GENERATE_ASMNAME(SCPUSTATE_ALIAS),(__state,__regno,__dst))
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_scpustate_exclusive,(/*struct scpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst),__LIBUNWIND_GETREG_EXCLUSIVE_GENERATE_ASMNAME(SCPUSTATE_ALIAS),(__state,__regno,__dst))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_scpustate,(/*struct scpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst),__LIBUNWIND_GETREG_GENERATE_ASMNAME(SCPUSTATE_ALIAS),(__state,__regno,__dst))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_scpustate_exclusive,(/*struct scpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst),__LIBUNWIND_GETREG_EXCLUSIVE_GENERATE_ASMNAME(SCPUSTATE_ALIAS),(__state,__regno,__dst))
 #ifdef LIBUNWIND_HAVE_GETSETREG_SCPUSTATE_P
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_scpustate_p,(/*struct scpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_P_GENERATE_ASMNAME(SCPUSTATE_ALIAS),(__p_state,__regno,__src))
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_scpustate_exclusive_p,(/*struct scpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_EXCLUSIVE_P_GENERATE_ASMNAME(SCPUSTATE_ALIAS),(__p_state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_scpustate_p,(/*struct scpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_P_GENERATE_ASMNAME(SCPUSTATE_ALIAS),(__p_state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_scpustate_exclusive_p,(/*struct scpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_EXCLUSIVE_P_GENERATE_ASMNAME(SCPUSTATE_ALIAS),(__p_state,__regno,__src))
 #else /* LIBUNWIND_HAVE_GETSETREG_SCPUSTATE_P */
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_scpustate,(/*struct scpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_GENERATE_ASMNAME(SCPUSTATE_ALIAS),(__state,__regno,__src))
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_scpustate_exclusive,(/*struct scpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_EXCLUSIVE_GENERATE_ASMNAME(SCPUSTATE_ALIAS),(__state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_scpustate,(/*struct scpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_GENERATE_ASMNAME(SCPUSTATE_ALIAS),(__state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_scpustate_exclusive,(/*struct scpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_EXCLUSIVE_GENERATE_ASMNAME(SCPUSTATE_ALIAS),(__state,__regno,__src))
 #endif /* !LIBUNWIND_HAVE_GETSETREG_SCPUSTATE_P */
 #else /* SCPUSTATE_ALIAS */
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_scpustate)(/*struct scpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_scpustate_exclusive)(/*struct scpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_scpustate)(/*struct scpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_scpustate_exclusive)(/*struct scpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef LIBUNWIND_HAVE_GETSETREG_SCPUSTATE_P
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate_p)(/*struct scpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate_exclusive_p)(/*struct scpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate_p)(/*struct scpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate_exclusive_p)(/*struct scpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
 #else /* LIBUNWIND_HAVE_GETSETREG_SCPUSTATE_P */
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate)(/*struct scpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate_exclusive)(/*struct scpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate)(/*struct scpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate_exclusive)(/*struct scpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_SCPUSTATE_P */
 #endif /* !SCPUSTATE_ALIAS */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
@@ -465,14 +465,14 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC 
 /* fcpustate                                                            */
 /************************************************************************/
 #ifdef LIBUNWIND_HAVE_GETSETREG_FCPUSTATE
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_FCPUSTATE)(/*struct fcpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_FCPUSTATE_EXCLUSIVE)(/*struct fcpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_FCPUSTATE)(/*struct fcpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_FCPUSTATE_EXCLUSIVE)(/*struct fcpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef LIBUNWIND_HAVE_GETSETREG_FCPUSTATE_P
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_FCPUSTATE_P)(/*struct fcpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_FCPUSTATE_EXCLUSIVE_P)(/*struct fcpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_FCPUSTATE_P)(/*struct fcpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_FCPUSTATE_EXCLUSIVE_P)(/*struct fcpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
 #else /* LIBUNWIND_HAVE_GETSETREG_FCPUSTATE_P */
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_FCPUSTATE)(/*struct fcpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_FCPUSTATE_EXCLUSIVE)(/*struct fcpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_FCPUSTATE)(/*struct fcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_FCPUSTATE_EXCLUSIVE)(/*struct fcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_FCPUSTATE_P */
 #ifdef FCPUSTATE_ALIAS
 #define UNWIND_GETREG_FCPUSTATE_NAME           "unwind_getreg_" FCPUSTATE_ALIAS_STR
@@ -497,24 +497,24 @@ typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PU
 #endif /* !FCPUSTATE_ALIAS */
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 #ifdef FCPUSTATE_ALIAS
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_fcpustate,(/*struct fcpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst),__LIBUNWIND_GETREG_GENERATE_ASMNAME(FCPUSTATE_ALIAS),(__state,__regno,__dst))
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_fcpustate_exclusive,(/*struct fcpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst),__LIBUNWIND_GETREG_EXCLUSIVE_GENERATE_ASMNAME(FCPUSTATE_ALIAS),(__state,__regno,__dst))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_fcpustate,(/*struct fcpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst),__LIBUNWIND_GETREG_GENERATE_ASMNAME(FCPUSTATE_ALIAS),(__state,__regno,__dst))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_getreg_fcpustate_exclusive,(/*struct fcpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst),__LIBUNWIND_GETREG_EXCLUSIVE_GENERATE_ASMNAME(FCPUSTATE_ALIAS),(__state,__regno,__dst))
 #ifdef LIBUNWIND_HAVE_GETSETREG_FCPUSTATE_P
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_fcpustate_p,(/*struct fcpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_P_GENERATE_ASMNAME(FCPUSTATE_ALIAS),(__p_state,__regno,__src))
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_fcpustate_exclusive_p,(/*struct fcpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_EXCLUSIVE_P_GENERATE_ASMNAME(FCPUSTATE_ALIAS),(__p_state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_fcpustate_p,(/*struct fcpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_P_GENERATE_ASMNAME(FCPUSTATE_ALIAS),(__p_state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_fcpustate_exclusive_p,(/*struct fcpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_EXCLUSIVE_P_GENERATE_ASMNAME(FCPUSTATE_ALIAS),(__p_state,__regno,__src))
 #else /* LIBUNWIND_HAVE_GETSETREG_FCPUSTATE_P */
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_fcpustate,(/*struct fcpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_GENERATE_ASMNAME(FCPUSTATE_ALIAS),(__state,__regno,__src))
-__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_fcpustate_exclusive,(/*struct fcpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src),__LIBUNWIND_SETREG_EXCLUSIVE_GENERATE_ASMNAME(FCPUSTATE_ALIAS),(__state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_fcpustate,(/*struct fcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_GENERATE_ASMNAME(FCPUSTATE_ALIAS),(__state,__regno,__src))
+__COMPILER_REDIRECT(LIBUNWIND_DECL,__ATTR_NONNULL((1, 3)),unwind_errno_t,__NOTHROW_NCX,LIBUNWIND_CC,unwind_setreg_fcpustate_exclusive,(/*struct fcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src),__LIBUNWIND_SETREG_EXCLUSIVE_GENERATE_ASMNAME(FCPUSTATE_ALIAS),(__state,__regno,__src))
 #endif /* !LIBUNWIND_HAVE_GETSETREG_FCPUSTATE_P */
 #else /* FCPUSTATE_ALIAS */
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_fcpustate)(/*struct fcpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_fcpustate_exclusive)(/*struct fcpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_fcpustate)(/*struct fcpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_fcpustate_exclusive)(/*struct fcpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef LIBUNWIND_HAVE_GETSETREG_FCPUSTATE_P
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fcpustate_p)(/*struct fcpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fcpustate_exclusive_p)(/*struct fcpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fcpustate_p)(/*struct fcpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fcpustate_exclusive_p)(/*struct fcpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
 #else /* LIBUNWIND_HAVE_GETSETREG_FCPUSTATE_P */
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fcpustate)(/*struct fcpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fcpustate_exclusive)(/*struct fcpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fcpustate)(/*struct fcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fcpustate_exclusive)(/*struct fcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_FCPUSTATE_P */
 #endif /* !FCPUSTATE_ALIAS */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
@@ -524,14 +524,14 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC 
 /* mcontext                                                             */
 /************************************************************************/
 #ifdef LIBUNWIND_HAVE_GETSETREG_MCONTEXT
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_MCONTEXT)(/*struct mcontext**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_MCONTEXT_EXCLUSIVE)(/*struct mcontext**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_MCONTEXT)(/*struct mcontext**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_MCONTEXT_EXCLUSIVE)(/*struct mcontext**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef LIBUNWIND_HAVE_GETSETREG_MCONTEXT_P
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_MCONTEXT_P)(/*struct mcontext***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_MCONTEXT_EXCLUSIVE_P)(/*struct mcontext***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_MCONTEXT_P)(/*struct mcontext***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_MCONTEXT_EXCLUSIVE_P)(/*struct mcontext***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
 #else /* LIBUNWIND_HAVE_GETSETREG_MCONTEXT_P */
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_MCONTEXT)(/*struct mcontext**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_MCONTEXT_EXCLUSIVE)(/*struct mcontext**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_MCONTEXT)(/*struct mcontext**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_MCONTEXT_EXCLUSIVE)(/*struct mcontext**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_MCONTEXT_P */
 #define UNWIND_GETREG_MCONTEXT_NAME           "unwind_getreg_mcontext"
 #define UNWIND_GETREG_MCONTEXT_EXCLUSIVE_NAME "unwind_getreg_mcontext_exclusive"
@@ -543,14 +543,14 @@ typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PU
 #define UNWIND_SETREG_MCONTEXT_EXCLUSIVE_NAME "unwind_setreg_mcontext_exclusive"
 #endif /* !LIBUNWIND_HAVE_GETSETREG_MCONTEXT_P */
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_mcontext)(/*struct mcontext**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_mcontext_exclusive)(/*struct mcontext**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_mcontext)(/*struct mcontext**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_mcontext_exclusive)(/*struct mcontext**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef LIBUNWIND_HAVE_GETSETREG_MCONTEXT_P
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext_p)(/*struct mcontext***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext_exclusive_p)(/*struct mcontext***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext_p)(/*struct mcontext***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext_exclusive_p)(/*struct mcontext***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
 #else /* LIBUNWIND_HAVE_GETSETREG_MCONTEXT_P */
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext)(/*struct mcontext**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext_exclusive)(/*struct mcontext**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext)(/*struct mcontext**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext_exclusive)(/*struct mcontext**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_MCONTEXT_P */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 #endif /* LIBUNWIND_HAVE_GETSETREG_MCONTEXT */
@@ -559,14 +559,14 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC 
 /* ucontext                                                             */
 /************************************************************************/
 #ifdef LIBUNWIND_HAVE_GETSETREG_UCONTEXT
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_UCONTEXT)(/*struct ucontext**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_UCONTEXT_EXCLUSIVE)(/*struct ucontext**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_UCONTEXT)(/*struct ucontext**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_UCONTEXT_EXCLUSIVE)(/*struct ucontext**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef LIBUNWIND_HAVE_GETSETREG_UCONTEXT_P
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_UCONTEXT_P)(/*struct ucontext***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_UCONTEXT_EXCLUSIVE_P)(/*struct ucontext***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_UCONTEXT_P)(/*struct ucontext***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_UCONTEXT_EXCLUSIVE_P)(/*struct ucontext***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
 #else /* LIBUNWIND_HAVE_GETSETREG_UCONTEXT_P */
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_UCONTEXT)(/*struct ucontext**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_UCONTEXT_EXCLUSIVE)(/*struct ucontext**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_UCONTEXT)(/*struct ucontext**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_UCONTEXT_EXCLUSIVE)(/*struct ucontext**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_UCONTEXT_P */
 #define UNWIND_GETREG_UCONTEXT_NAME           "unwind_getreg_ucontext"
 #define UNWIND_GETREG_UCONTEXT_EXCLUSIVE_NAME "unwind_getreg_ucontext_exclusive"
@@ -578,14 +578,14 @@ typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PU
 #define UNWIND_SETREG_UCONTEXT_EXCLUSIVE_NAME "unwind_setreg_ucontext_exclusive"
 #endif /* !LIBUNWIND_HAVE_GETSETREG_UCONTEXT_P */
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucontext)(/*struct ucontext**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucontext_exclusive)(/*struct ucontext**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucontext)(/*struct ucontext**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucontext_exclusive)(/*struct ucontext**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef LIBUNWIND_HAVE_GETSETREG_UCONTEXT_P
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext_p)(/*struct ucontext***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext_exclusive_p)(/*struct ucontext***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext_p)(/*struct ucontext***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext_exclusive_p)(/*struct ucontext***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
 #else /* LIBUNWIND_HAVE_GETSETREG_UCONTEXT_P */
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext)(/*struct ucontext**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext_exclusive)(/*struct ucontext**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext)(/*struct ucontext**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext_exclusive)(/*struct ucontext**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_UCONTEXT_P */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 #endif /* LIBUNWIND_HAVE_GETSETREG_UCONTEXT */
@@ -594,14 +594,14 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC 
 /* fpustate                                                             */
 /************************************************************************/
 #ifdef LIBUNWIND_HAVE_GETSETREG_FPUSTATE
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_FPUSTATE)(/*struct fpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_FPUSTATE_EXCLUSIVE)(/*struct fpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_FPUSTATE)(/*struct fpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_FPUSTATE_EXCLUSIVE)(/*struct fpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef LIBUNWIND_HAVE_GETSETREG_FPUSTATE_P
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_FPUSTATE_P)(/*struct fpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_FPUSTATE_EXCLUSIVE_P)(/*struct fpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_FPUSTATE_P)(/*struct fpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_FPUSTATE_EXCLUSIVE_P)(/*struct fpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
 #else /* LIBUNWIND_HAVE_GETSETREG_FPUSTATE_P */
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_FPUSTATE)(/*struct fpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_FPUSTATE_EXCLUSIVE)(/*struct fpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_FPUSTATE)(/*struct fpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_FPUSTATE_EXCLUSIVE)(/*struct fpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_FPUSTATE_P */
 #define UNWIND_GETREG_FPUSTATE_NAME           "unwind_getreg_fpustate"
 #define UNWIND_GETREG_FPUSTATE_EXCLUSIVE_NAME "unwind_getreg_fpustate_exclusive"
@@ -613,14 +613,14 @@ typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PU
 #define UNWIND_SETREG_FPUSTATE_EXCLUSIVE_NAME "unwind_setreg_fpustate_exclusive"
 #endif /* !LIBUNWIND_HAVE_GETSETREG_FPUSTATE_P */
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_fpustate)(/*struct fpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_fpustate_exclusive)(/*struct fpustate**/ void const *__state, unwind_regno_t __regno, __CHECKED void *__dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_fpustate)(/*struct fpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_fpustate_exclusive)(/*struct fpustate**/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef LIBUNWIND_HAVE_GETSETREG_FPUSTATE_P
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fpustate_p)(/*struct fpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fpustate_exclusive_p)(/*struct fpustate***/ void *__p_state, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fpustate_p)(/*struct fpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fpustate_exclusive_p)(/*struct fpustate***/ void *__p_state, unwind_regno_t __regno, void const *__restrict __src);
 #else /* LIBUNWIND_HAVE_GETSETREG_FPUSTATE_P */
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fpustate)(/*struct fpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fpustate_exclusive)(/*struct fpustate**/ void *__state, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fpustate)(/*struct fpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fpustate_exclusive)(/*struct fpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_FPUSTATE_P */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 #endif /* LIBUNWIND_HAVE_GETSETREG_FPUSTATE */
@@ -649,7 +649,7 @@ struct unwind_getreg_compat_data {
 	 * @param: regno: One of `CFI_X86_64_UNWIND_REGISTER_*' */
 	__ATTR_NONNULL((1, 3)) unwind_errno_t
 	__NOTHROW_NCX_T(LIBUNWIND_CC *ugcd_getreg)(void const *__arg, unwind_regno_t __regno,
-	                                           __CHECKED void *__dst);
+	                                           void *__restrict __dst);
 
 	/* [?..?] Argument for `ugcd_getreg' */
 	void const    *ugcd_arg;
@@ -660,7 +660,7 @@ struct unwind_setreg_compat_data {
 	 * @param: regno: One of `CFI_X86_64_UNWIND_REGISTER_*' */
 	__ATTR_NONNULL((1, 3)) unwind_errno_t
 	__NOTHROW_NCX_T(LIBUNWIND_CC *uscd_setreg)(void *__arg, unwind_regno_t __regno,
-	                                           __CHECKED void const *__src);
+	                                           void const *__restrict __src);
 
 	/* [?..?] Argument for `uscd_setreg' */
 	void          *uscd_arg;
@@ -679,11 +679,11 @@ struct unwind_setreg_compat_data {
 
 /* Compatibility mode register get/set wrappers.
  * @param: regno: One of `CFI_386_UNWIND_REGISTER_*' */
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_COMPAT)(/*struct unwind_getreg_compat_data **/ void const *__arg, unwind_regno_t __regno, __CHECKED void *__dst);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_COMPAT)(/*struct unwind_setreg_compat_data **/ void *__arg, unwind_regno_t __regno, __CHECKED void const *__src);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_COMPAT)(/*struct unwind_getreg_compat_data **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_COMPAT)(/*struct unwind_setreg_compat_data **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_compat)(/*struct unwind_getreg_compat_data **/ void const *__arg, unwind_regno_t __regno, __CHECKED void *__dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_compat)(/*struct unwind_setreg_compat_data **/ void *__arg, unwind_regno_t __regno, __CHECKED void const *__src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_compat)(/*struct unwind_getreg_compat_data **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_compat)(/*struct unwind_setreg_compat_data **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 #endif /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 

@@ -44,133 +44,135 @@
  * number of repeats of the following pattern can't be assumed to correlate  with
  * the number of CUs):
  *
- * ```
- * ┌───────────────────────────────────────────────────────────────────────────────────────┐
- * │ HEADER                                                                                │
- * ├───────────────────────────────────────────────────────────────────────────────────────┘
- * │     uint32_t             eh_chunk_size;      # Chunk size (including _all_ fields)
- * │ #if eh_chunk_size == 0xffffffff
- * │     uint64_t             eh_chunk_size64;    # 64-bit chunk size override. This only exists (and must be
- * │                                              # be used instead of `eh_chunk_size'), when `eh_chunk_size'
- * │                                              # is equal to `0xffffffff'
- * │ #endif
- * │ #if <SECTION_IS_EH_FRAME>
+ ********************************************************************************************************************
+ *                                                                                                                  *
+ * ┌───────────────────────────────────────────────────────────────────────────────────────┐                        *
+ * │ HEADER                                                                                │                        *
+ * ├───────────────────────────────────────────────────────────────────────────────────────┘                        *
+ * │     uint32_t             eh_chunk_size;      # Chunk size (including _all_ fields)                             *
+ * │ #if eh_chunk_size == 0xffffffff                                                                                *
+ * │     uint64_t             eh_chunk_size64;    # 64-bit chunk size override. This only exists (and must be       *
+ * │                                              # be used instead of `eh_chunk_size'), when `eh_chunk_size'       *
+ * │                                              # is equal to `0xffffffff'                                        *
+ * │ #endif                                                                                                         *
+ * │ #if <SECTION_IS_EH_FRAME>                                                                                      *
  * │     uint32_t             eh_cie_offset;      # Offset to CIE metadata-descriptor block. The absolute CIE start address
- * │                                              # is calculated as `(CIE *)((byte_t *)&eh_cie_offset - eh_cie_offset)'.
- * │                                              # iow: the CIE always comes before an FDE
+ * │                                              # is  calculated  as `(CIE *)((byte_t *)&eh_cie_offset - eh_cie_offset)'.
+ * │                                              # iow: the CIE always comes before an FDE                         *
  * │                                              # When equal to `0', what follows is a chunk of out-of-band data (which
  * │                                              # usually contains CIE descriptors), and is simply skipped and ignored
- * │                                              # during unwind parsing.
- * │ #elif <SECTION_IS_DEBUG_FRAME>
- * │     uint32_t             eh_cie_offset;      # Same as when `SECTION_IS_EH_FRAME', except:
- * │                                              #  - For CIE location calculation:
+ * │                                              # during unwind parsing.                                          *
+ * │ #elif <SECTION_IS_DEBUG_FRAME>                                                                                 *
+ * │     uint32_t             eh_cie_offset;      # Same as when `SECTION_IS_EH_FRAME', except:                     *
+ * │                                              #  - For CIE location calculation:                                *
  * │                                              #    Instead of: `(CIE *)((byte_t *)&eh_cie_offset - eh_cie_offset)'
  * │                                              #    use:        `(CIE *)((byte_t *)debug_frame_start + eh_cie_offset)'
- * │                                              #  - For FDE vs. skip-chunk determination:
- * │                                              #    Instead of: `0'
- * │                                              #    use:        `0xffffffff'
- * │ #endif
- * └────────────────────────────────────────────────────────────────────────────────────────
- *
- *
- *
- * ┌───────────────────────────────────────────────────────────────────────────────────────┐
- * │ CIE (as pointed to by `eh_cie_offset')                                                │
- * ├───────────────────────────────────────────────────────────────────────────────────────┘
- * │     uint32_t             cie_size;      # CIE chunk size
- * │ #if cie_size == 0xffffffff
- * │     uint64_t             cie_size64;    # 64-bit chunk size override
- * │ #endif
+ * │                                              #  - For FDE vs. skip-chunk determination:                        *
+ * │                                              #    Instead of: `0'                                              *
+ * │                                              #    use:        `0xffffffff'                                     *
+ * │ #endif                                                                                                         *
+ * └────────────────────────────────────────────────────────────────────────────────────────                        *
+ *                                                                                                                  *
+ *                                                                                                                  *
+ *                                                                                                                  *
+ * ┌───────────────────────────────────────────────────────────────────────────────────────┐                        *
+ * │ CIE (as pointed to by `eh_cie_offset')                                                │                        *
+ * ├───────────────────────────────────────────────────────────────────────────────────────┘                        *
+ * │     uint32_t             cie_size;      # CIE chunk size                                                       *
+ * │ #if cie_size == 0xffffffff                                                                                     *
+ * │     uint64_t             cie_size64;    # 64-bit chunk size override                                           *
+ * │ #endif                                                                                                         *
  * │     uint32_t             cie_id;        # CIE record id (always `0' in .eh_frame / `0xffffffff' in .debug_frame)
- * │     uint8_t              cie_version;   # CIE descriptor version (see below)
- * │     char                 cie_augstr[];  # inline, NUL-terminated c-string of augmentation options. (see below)
- * │ #if cie_version >= 4
- * │     uint8_t              cie_addrsize;  # Address size (for `dwarf_decode_pointer(3)')
- * │                                         # When not present, use `sizeof(void *)' instead!
- * │     uint8_t              cie_segsize;   # Segment selector size (for `dwarf_decode_pointer(3)')
- * │                                         # When not present, use `0' instead!
- * │ #endif
- * │     uleb128_t            cie_codealign; # Code alignment (s.a. `unwind_fde_t::f_codealign')
- * │     sleb128_t            cie_dataalign; # Data alignment (s.a. `unwind_fde_t::f_dataalign')
- * │ #if cie_version >= 3
- * │     uleb128_t            cie_retreg;    # Return register (s.a. `unwind_fde_t::f_retreg')
- * │ #else
- * │     uint8_t              cie_retreg;    # Return register (s.a. `unwind_fde_t::f_retreg')
- * │ #endif
- * │
- * │     // Augmentation data
- * │ #if cie_augstr[0] == 'z'
- * │     uleb128_t            cie_auglen;    # Augmentation data length
- * │     union {
- * │         byte_t cie_augdat[cie_auglen];  # Augmentation data
- * │         union {
- * │
- * │             uint8_t      cie_lsdaenc;   # [CH == 'L'] Encoding for `cie_lsdaaddr'
- * │                                         # When not present, use `DW_EH_PE_absptr'
- * │
- * │             struct {
- * │                 uint8_t  cie_persoenc;  # Encoding for `cie_persoptr'
- * │                 [PTR]    cie_persoptr;  # Personality function pointer (s.a. `dwarf_decode_pointer(3)')
- * │             }            cie_persofun;  # [CH == 'P'] Personality info (s.a. `unwind_fde_t::f_persofun')
- * │
- * │             uint8_t      cie_ptrenc;    # [CH == 'R'] Encoding for pointers (s.a. `unwind_fde_t::f_ptrenc')
- * │                                         # When not present, use `DW_EH_PE_absptr'
- * │
- * │         } cie_augfields[*];             # Augmentation fields are parsed based on the order
- * │                                         # of characters in `cie_augstr', with one field for
- * │                                         # every character, starting with `cie_augstr[1]',
- * │                                         # and ending once '\0' is reached.
- * │     };
- * │ #endif
- * │
- * │     // Function instrumentation init text (this field extends until the end of the CIE)
- * │     // s.a. `unwind_fde_t::f_inittext' and `unwind_fde_t::f_inittextend'
- * │     byte_t               cie_inittext[cie_size - offsetof(cie_inittext)];
- * │
- * └────────────────────────────────────────────────────────────────────────────────────────
- *
- *
- *
- * ┌───────────────────────────────────────────────────────────────────────────────────────┐
- * │ FDE (as it appears immediately after `eh_cie_offset' when a CIE is not indicated)     │
- * ├───────────────────────────────────────────────────────────────────────────────────────┘
- * │
- * │     // Fields already seen within the header
- * │     uint32_t             fde_size;      # FDE Chunk size
- * │ #if fde_size == 0xffffffff
- * │     uint64_t             fde_size64;    # 64-bit chunk size override
- * │ #endif
- * │     uint32_t             fde_cie_off;   # s.a. `HEADER::eh_cie_offset' (points to a `CIE *cie')
- * │
+ * │     uint8_t              cie_version;   # CIE descriptor version (see below)                                   *
+ * │     char                 cie_augstr[];  # inline, NUL-terminated c-string of augmentation options. (see below) *
+ * │ #if cie_version >= 4                                                                                           *
+ * │     uint8_t              cie_addrsize;  # Address size (for `dwarf_decode_pointer(3)')                         *
+ * │                                         # When not present, use `sizeof(void *)' instead!                      *
+ * │     uint8_t              cie_segsize;   # Segment selector size (for `dwarf_decode_pointer(3)')                *
+ * │                                         # When not present, use `0' instead!                                   *
+ * │ #endif                                                                                                         *
+ * │     uleb128_t            cie_codealign; # Code alignment (s.a. `unwind_fde_t::f_codealign')                    *
+ * │     sleb128_t            cie_dataalign; # Data alignment (s.a. `unwind_fde_t::f_dataalign')                    *
+ * │ #if cie_version >= 3                                                                                           *
+ * │     uleb128_t            cie_retreg;    # Return register (s.a. `unwind_fde_t::f_retreg')                      *
+ * │ #else                                                                                                          *
+ * │     uint8_t              cie_retreg;    # Return register (s.a. `unwind_fde_t::f_retreg')                      *
+ * │ #endif                                                                                                         *
+ * │                                                                                                                *
+ * │     // Augmentation data                                                                                       *
+ * │ #if cie_augstr[0] == 'z'                                                                                       *
+ * │     uleb128_t            cie_auglen;    # Augmentation data length                                             *
+ * │     union {                                                                                                    *
+ * │         byte_t cie_augdat[cie_auglen];  # Augmentation data                                                    *
+ * │         union {                                                                                                *
+ * │                                                                                                                *
+ * │             uint8_t      cie_lsdaenc;   # [CH == 'L'] Encoding for `cie_lsdaaddr'                              *
+ * │                                         # When not present, use `DW_EH_PE_absptr'                              *
+ * │                                                                                                                *
+ * │             struct {                                                                                           *
+ * │                 uint8_t  cie_persoenc;  # Encoding for `cie_persoptr'                                          *
+ * │                 [PTR]    cie_persoptr;  # Personality function pointer (s.a. `dwarf_decode_pointer(3)')        *
+ * │             }            cie_persofun;  # [CH == 'P'] Personality info (s.a. `unwind_fde_t::f_persofun')       *
+ * │                                                                                                                *
+ * │             uint8_t      cie_ptrenc;    # [CH == 'R'] Encoding for pointers (s.a. `unwind_fde_t::f_ptrenc')    *
+ * │                                         # When not present, use `DW_EH_PE_absptr'                              *
+ * │                                                                                                                *
+ * │         } cie_augfields[*];             # Augmentation fields are parsed based on the order                    *
+ * │                                         # of characters in `cie_augstr', with one field for                    *
+ * │                                         # every character, starting with `cie_augstr[1]',                      *
+ * │                                         # and ending once '\0' is reached.                                     *
+ * │     };                                                                                                         *
+ * │ #endif                                                                                                         *
+ * │                                                                                                                *
+ * │     // Function instrumentation init text (this field extends until the end of the CIE)                        *
+ * │     // s.a. `unwind_fde_t::f_inittext' and `unwind_fde_t::f_inittextend'                                       *
+ * │     byte_t               cie_inittext[cie_size - offsetof(cie_inittext)];                                      *
+ * │                                                                                                                *
+ * └────────────────────────────────────────────────────────────────────────────────────────                        *
+ *                                                                                                                  *
+ *                                                                                                                  *
+ *                                                                                                                  *
+ * ┌───────────────────────────────────────────────────────────────────────────────────────┐                        *
+ * │ FDE (as it appears immediately after `eh_cie_offset' when a CIE is not indicated)     │                        *
+ * ├───────────────────────────────────────────────────────────────────────────────────────┘                        *
+ * │                                                                                                                *
+ * │     // Fields already seen within the header                                                                   *
+ * │     uint32_t             fde_size;      # FDE Chunk size                                                       *
+ * │ #if fde_size == 0xffffffff                                                                                     *
+ * │     uint64_t             fde_size64;    # 64-bit chunk size override                                           *
+ * │ #endif                                                                                                         *
+ * │     uint32_t             fde_cie_off;   # s.a. `HEADER::eh_cie_offset' (points to a `CIE *cie')                *
+ * │                                                                                                                *
  * │     [PTR]                fde_funbase;   # Function base address (encoding is `cie->cie_ptrenc'; s.a. `unwind_fde_t::f_pcstart')
  * │     [PTR]                fde_funsize;   # Function size (encoding is `DW_EH_PE_OFF(cie->cie_ptrenc)'; s.a. `unwind_fde_t::f_pcend')
- * │
- * │     // Additional augmentation data
- * │ #if cie->cie_augstr[0] == 'z'
- * │     uleb128_t            fde_auglen;    # Augmentation data length
- * │     union {
- * │         byte_t fde_augdat[fde_auglen];  # Augmentation data
- * │         union {
- * │
+ * │                                                                                                                *
+ * │     // Additional augmentation data                                                                            *
+ * │ #if cie->cie_augstr[0] == 'z'                                                                                  *
+ * │     uleb128_t            fde_auglen;    # Augmentation data length                                             *
+ * │     union {                                                                                                    *
+ * │         byte_t fde_augdat[fde_auglen];  # Augmentation data                                                    *
+ * │         union {                                                                                                *
+ * │                                                                                                                *
  * │             [PTR]        fde_lsda;      # [CH == 'L'] s.a. `unwind_fde_t::f_lsdaaddr' (encoding is `cie->cie_lsdaenc')
- * │
+ * │                                                                                                                *
  * │             void         fde_sigframe;  # [CH == 'S'] Mark this function as a signal frame (s.a. `unwind_fde_t::f_sigframe')
  * │                                         #             Note that this is only an imaginary field which depends entirely on
- * │                                         #             the associated CIE!
- * │
- * │         } fde_augfields[*];             # Augmentation fields are parsed based on the order of
- * │                                         # characters in `cie->cie_augstr', with one field for
- * │                                         # every character, starting with `cie->cie_augstr[1]',
- * │                                         # and ending once '\0' is reached.
- * │     };
- * │ #endif
- * │
- * │     // Function instrumentation text (this field extends until the end of the FDE)
- * │     // s.a. `unwind_fde_t::f_evaltext' and `unwind_fde_t::f_evaltextend'
- * │     byte_t               fde_text[fde_size - offsetof(fde_text)];
- * │
- * └────────────────────────────────────────────────────────────────────────────────────────
- * ```
+ * │                                         #             the associated CIE!                                      *
+ * │                                                                                                                *
+ * │         } fde_augfields[*];             # Augmentation fields are parsed based on the order of                 *
+ * │                                         # characters in `cie->cie_augstr', with one field for                  *
+ * │                                         # every character, starting with `cie->cie_augstr[1]',                 *
+ * │                                         # and ending once '\0' is reached.                                     *
+ * │     };                                                                                                         *
+ * │ #endif                                                                                                         *
+ * │                                                                                                                *
+ * │     // Function instrumentation text (this field extends until the end of the FDE)                             *
+ * │     // s.a. `unwind_fde_t::f_evaltext' and `unwind_fde_t::f_evaltextend'                                       *
+ * │     byte_t               fde_text[fde_size - offsetof(fde_text)];                                              *
+ * │                                                                                                                *
+ * └────────────────────────────────────────────────────────────────────────────────────────                        *
+ *                                                                                                                  *
+ ********************************************************************************************************************
  *
  * Both  `CIE::cie_inittext', as well  as `FDE::fde_text' contain pseudo-instruction
  * sequences in the form of `DW_CFA_*' (s.a. <libunwind/cfi.h>) that are interpreted
@@ -245,13 +247,13 @@ typedef struct unwind_fde_struct {
  * NOTE: The caller must pre-initialize `result->f_tbase' and `result->f_dbase'!
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-typedef __ATTR_NONNULL_T((1, 2, 3)) unwind_errno_t
+typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_LOAD)(__CHECKED __byte_t const **__restrict __peh_frame_reader,
                                                 __CHECKED __byte_t const *__eh_frame_end,
                                                 unwind_fde_t *__restrict __result,
                                                 __uint8_t __sizeof_address);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 3)) unwind_errno_t
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_load)(__CHECKED __byte_t const **__restrict __peh_frame_reader,
                                             __CHECKED __byte_t const *__eh_frame_end,
                                             unwind_fde_t *__restrict __result,
@@ -265,14 +267,14 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_load)(__CHECKED __byte_t const **__restric
  * @assume(!return || result->f_pcend > absolute_pc);
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `absolute_pc'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-typedef __ATTR_NONNULL_T((1, 2, 4)) unwind_errno_t
+typedef __ATTR_NONNULL_T((4)) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_SCAN)(__CHECKED __byte_t const *__eh_frame_start,
                                                 __CHECKED __byte_t const *__eh_frame_end,
                                                 __CHECKED void const *__absolute_pc,
                                                 unwind_fde_t *__restrict __result,
                                                 __uint8_t __sizeof_address);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4)) unwind_errno_t
+LIBUNWIND_DECL __ATTR_NONNULL((4)) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_scan)(__CHECKED __byte_t const *__eh_frame_start,
                                             __CHECKED __byte_t const *__eh_frame_end,
                                             __CHECKED void const *__absolute_pc,

@@ -46,9 +46,9 @@ DECL_BEGIN
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 #ifdef DEBUG_FRAME
-INTERN NONNULL((1, 2, 3, 4)) unwind_errno_t
+INTERN NONNULL((1, 4)) unwind_errno_t
 #else /* DEBUG_FRAME */
-INTERN NONNULL((1, 2, 3)) unwind_errno_t
+INTERN NONNULL((1, 3)) unwind_errno_t
 #endif /* !DEBUG_FRAME */
 NOTHROW_NCX(CC libuw_unwind_fde_load)(CHECKED byte_t const **__restrict peh_frame_reader,
 #ifdef DEBUG_FRAME
@@ -62,7 +62,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_load)(CHECKED byte_t const **__restrict peh_fram
  * FDE descriptor containing  the given  `absolute_pc' text  address.
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `absolute_pc'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-INTERN NONNULL((1, 2, 4)) unwind_errno_t
+INTERN NONNULL((4)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_scan)(CHECKED byte_t const *reader,
                                       CHECKED byte_t const *eh_frame_end,
                                       CHECKED void const *absolute_pc,

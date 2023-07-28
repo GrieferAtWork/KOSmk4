@@ -352,7 +352,7 @@ NOTHROW_NCX(CC abbrev_loadcache)(CHECKED byte_t const *ace_data,
 
 PRIVATE NONNULL((1, 2)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__restrict self,
-                                                 CHECKED byte_t const *__restrict abbrev_end,
+                                                 CHECKED byte_t const *abbrev_end,
                                                  di_debuginfo_component_t *__restrict result,
                                                  uintptr_t abbrev_code) {
 #if 0
@@ -489,9 +489,9 @@ do_fill_dynamic_cache:
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-INTERN TEXTSECTION NONNULL((1, 2, 3, 4, 5)) debuginfo_errno_t
+INTERN TEXTSECTION NONNULL((1, 3, 4, 5)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadunit)(CHECKED byte_t const **__restrict pdebug_info_reader,
-                                                   CHECKED byte_t const *__restrict debug_info_end,
+                                                   CHECKED byte_t const *debug_info_end,
                                                    di_debuginfo_cu_parser_sections_t const *__restrict sectinfo,
                                                    di_debuginfo_cu_parser_t *__restrict result,
                                                    di_debuginfo_cu_abbrev_t *__restrict abbrev,
@@ -982,7 +982,7 @@ decode_form:
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst)(di_debuginfo_cu_simple_parser_t const *__restrict self,
                                                    uintptr_t form, uintptr_t *__restrict presult,
-                                                   CHECKED byte_t const *__restrict attr_reader) {
+                                                   CHECKED byte_t const *attr_reader) {
 	CHECKED byte_t const *reader;
 	reader = self->dsp_cu_info_pos;
 decode_form:
@@ -1053,7 +1053,7 @@ decode_form:
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst64)(di_debuginfo_cu_simple_parser_t const *__restrict self,
                                                      uintptr_t form, uint64_t *__restrict presult,
-                                                     CHECKED byte_t const *__restrict attr_reader) {
+                                                     CHECKED byte_t const *attr_reader) {
 	CHECKED byte_t const *reader;
 	reader = self->dsp_cu_info_pos;
 decode_form:
@@ -1127,7 +1127,7 @@ decode_form:
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst128)(di_debuginfo_cu_simple_parser_t const *__restrict self,
                                                       uintptr_t form, uint128_t *__restrict presult,
-                                                      CHECKED byte_t const *__restrict attr_reader) {
+                                                      CHECKED byte_t const *attr_reader) {
 	CHECKED byte_t const *reader;
 	reader = self->dsp_cu_info_pos;
 decode_form:
@@ -1857,7 +1857,7 @@ err:
 PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2, 3)) bool
 NOTHROW_NCX(CC ao_loadattr_type)(di_debuginfo_cu_parser_t *__restrict self,
                                  di_debuginfo_type_t *__restrict result,
-                                 CHECKED byte_t const *__restrict abstract_origin) {
+                                 CHECKED byte_t const *abstract_origin) {
 	di_debuginfo_cu_parser_t pp;
 	memcpy(&pp, self, sizeof(pp));
 	pp.dsp_cu_info_pos = abstract_origin;
@@ -2026,7 +2026,7 @@ err:
 PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2)) bool
 NOTHROW_NCX(CC ao_loadattr_member)(di_debuginfo_cu_parser_t *__restrict self,
                                    di_debuginfo_member_t *__restrict result,
-                                   CHECKED byte_t const *__restrict abstract_origin) {
+                                   CHECKED byte_t const *abstract_origin) {
 	di_debuginfo_cu_parser_t pp;
 	memcpy(&pp, self, sizeof(pp));
 	pp.dsp_cu_info_pos = abstract_origin;
@@ -2126,7 +2126,7 @@ err:
 PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2, 3)) bool
 NOTHROW_NCX(CC ao_loadattr_variable)(di_debuginfo_cu_parser_t *__restrict self,
                                      di_debuginfo_variable_t *__restrict result,
-                                     CHECKED byte_t const *__restrict abstract_origin) {
+                                     CHECKED byte_t const *abstract_origin) {
 	di_debuginfo_cu_parser_t pp;
 	memcpy(&pp, self, sizeof(pp));
 	pp.dsp_cu_info_pos = abstract_origin;

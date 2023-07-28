@@ -40,9 +40,9 @@ DECL_BEGIN
  * written back to `*peh_frame_reader' after a previous call to `unwind_fde_load()'.
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-INTDEF NONNULL((1, 2, 3)) unwind_errno_t
+INTDEF NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_load)(CHECKED byte_t const **__restrict peh_frame_reader,
-                                      CHECKED byte_t const *__restrict eh_frame_end,
+                                      CHECKED byte_t const *eh_frame_end,
                                       unwind_fde_t *__restrict result,
                                       uint8_t sizeof_address);
 
@@ -50,9 +50,9 @@ NOTHROW_NCX(CC libuw_unwind_fde_load)(CHECKED byte_t const **__restrict peh_fram
  * FDE descriptor containing  the given  `absolute_pc' text  address.
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `absolute_pc'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-INTDEF NONNULL((1, 2, 4)) unwind_errno_t
-NOTHROW_NCX(CC libuw_unwind_fde_scan)(CHECKED byte_t const *__restrict eh_frame_start,
-                                      CHECKED byte_t const *__restrict eh_frame_end,
+INTDEF NONNULL((4)) unwind_errno_t
+NOTHROW_NCX(CC libuw_unwind_fde_scan)(CHECKED byte_t const *eh_frame_start,
+                                      CHECKED byte_t const *eh_frame_end,
                                       CHECKED void const *absolute_pc,
                                       unwind_fde_t *__restrict result,
                                       uint8_t sizeof_address);

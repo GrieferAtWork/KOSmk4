@@ -29,6 +29,20 @@
 #include "__yield.h"
 #endif /* !__INTELLISENSE__ */
 
+#ifdef __KOS_SYSTEM_HEADERS__
+#include <kos/anno.h>
+#endif /* __KOS_SYSTEM_HEADERS__ */
+
+#ifndef __THROWS
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define __THROWS(...)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __THROWS(e...)
+#else /* ... */
+#define __THROWS(e)
+#endif /* !... */
+#endif /* !__THROWS */
+
 #ifndef __NOPREEMPT
 #define __NOPREEMPT /* Annotation for functions that may only be called with preemption disabled. */
 #endif /* !__NOPREEMPT */
@@ -95,13 +109,15 @@ __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW(atomic_lock_waitfor_
 #ifndef __INTELLISENSE__
 #ifndef __HYBRID_PREEMPTION_TRYYIELD_IS_HYBRID_YIELD
 __LOCAL __ATTR_NONNULL((1)) void
-(atomic_lock_acquire)(struct atomic_lock *__restrict __self) {
+(atomic_lock_acquire)(struct atomic_lock *__restrict __self)
+		__THROWS(E_WOULDBLOCK_PREEMPTED) {
 	while (!atomic_lock_tryacquire(__self))
 		__hybrid_yield();
 	__COMPILER_READ_BARRIER();
 }
 __LOCAL __ATTR_NONNULL((1)) void
-(atomic_lock_waitfor)(struct atomic_lock *__restrict __self) {
+(atomic_lock_waitfor)(struct atomic_lock *__restrict __self)
+		__THROWS(E_WOULDBLOCK_PREEMPTED) {
 	while (!atomic_lock_available(__self))
 		__hybrid_yield();
 	__COMPILER_READ_BARRIER();

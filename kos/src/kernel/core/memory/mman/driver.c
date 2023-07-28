@@ -2321,7 +2321,7 @@ again:
 	return info.dsi_addr;
 }
 
-PUBLIC BLOCKING WUNUSED NONNULL((1)) void *FCALL
+PUBLIC BLOCKING WUNUSED void *FCALL
 driver_dlsym_global_f(USER CHECKED char const *name)
 		THROWS(E_SEGFAULT, ...) {
 	struct driver_syminfo info;
@@ -5567,7 +5567,7 @@ driver_loadmod_file(struct mfile *__restrict driver_file,
 	return result;
 }
 
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED ATTR_INS(1, 2) REF struct driver *KCALL
 driver_loadmod_blob(USER CHECKED void const *base, size_t num_bytes,
                     USER CHECKED char const *driver_cmdline,
                     bool *pnew_driver_loaded)
@@ -5923,7 +5923,7 @@ driver_insmod_file(struct mfile *__restrict driver_file,
 	return result;
 }
 
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED ATTR_INS(1, 2) REF struct driver *KCALL
 driver_insmod_blob(USER CHECKED void const *base, size_t num_bytes,
                    USER CHECKED char const *driver_cmdline,
                    bool *pnew_driver_loaded)
@@ -6116,7 +6116,7 @@ success:
  *                      filename (when the first character is `/')
  * @param: flags: Set of `DRIVER_DELMOD_F_*'
  * @return: * :   One of `DRIVER_DELMOD_ST_*' */
-PUBLIC BLOCKING NONNULL((1)) unsigned int FCALL
+PUBLIC BLOCKING unsigned int FCALL
 driver_delmod(USER CHECKED char const *driver_name,
               unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {

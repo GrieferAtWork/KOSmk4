@@ -152,14 +152,14 @@ typedef struct {
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-typedef __ATTR_NONNULL_T((1, 2, 3)) debuginfo_errno_t
+typedef __ATTR_NONNULL_T((1, 3)) debuginfo_errno_t
 __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGLINE_LOADUNIT)(__CHECKED __byte_t const **__restrict preader,
-                                                      __CHECKED __byte_t const *__restrict text_end,
+                                                      __CHECKED __byte_t const *text_end,
                                                       di_debugline_unit_t *__restrict result);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 3)) debuginfo_errno_t
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) debuginfo_errno_t
 __NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadunit)(__CHECKED __byte_t const **__restrict preader,
-                                                  __CHECKED __byte_t const *__restrict text_end,
+                                                  __CHECKED __byte_t const *text_end,
                                                   di_debugline_unit_t *__restrict result);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 

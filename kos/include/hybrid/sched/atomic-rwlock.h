@@ -28,6 +28,20 @@
 #include "__yield.h"
 #endif /* !__INTELLISENSE__ */
 
+#ifdef __KOS_SYSTEM_HEADERS__
+#include <kos/anno.h>
+#endif /* __KOS_SYSTEM_HEADERS__ */
+
+#ifndef __THROWS
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define __THROWS(...)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __THROWS(e...)
+#else /* ... */
+#define __THROWS(e)
+#endif /* !... */
+#endif /* !__THROWS */
+
 #define __SIZEOF_ATOMIC_RWLOCK __SIZEOF_POINTER__
 
 #ifdef __CC__
@@ -74,10 +88,10 @@ __NOTHROW(atomic_rwlock_tryread)(struct atomic_rwlock *__restrict __self);
 
 
 /* Acquire a read/write lock. */
-__LOCAL __ATTR_NONNULL((1)) void (atomic_rwlock_read)(struct atomic_rwlock *__restrict __self);
-__LOCAL __ATTR_NONNULL((1)) void (atomic_rwlock_write)(struct atomic_rwlock *__restrict __self);
-__LOCAL __ATTR_NONNULL((1)) void (atomic_rwlock_waitread)(struct atomic_rwlock *__restrict __self);
-__LOCAL __ATTR_NONNULL((1)) void (atomic_rwlock_waitwrite)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_NONNULL((1)) void (atomic_rwlock_read)(struct atomic_rwlock *__restrict __self) __THROWS(E_WOULDBLOCK_PREEMPTED);
+__LOCAL __ATTR_NONNULL((1)) void (atomic_rwlock_write)(struct atomic_rwlock *__restrict __self) __THROWS(E_WOULDBLOCK_PREEMPTED);
+__LOCAL __ATTR_NONNULL((1)) void (atomic_rwlock_waitread)(struct atomic_rwlock *__restrict __self) __THROWS(E_WOULDBLOCK_PREEMPTED);
+__LOCAL __ATTR_NONNULL((1)) void (atomic_rwlock_waitwrite)(struct atomic_rwlock *__restrict __self) __THROWS(E_WOULDBLOCK_PREEMPTED);
 #if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
 __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW(atomic_rwlock_read_nx)(struct atomic_rwlock *__restrict __self);
 __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW(atomic_rwlock_write_nx)(struct atomic_rwlock *__restrict __self);
@@ -108,7 +122,8 @@ __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW(atomic_rwlock_waitwr
  *       re-load local copies of affected resources.
  * NOTE: When `0' is returned, the original read-lock created by the caller has
  *       already been released. */
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned int __NOTHROW(atomic_rwlock_upgrade_nx)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned int
+__NOTHROW(atomic_rwlock_upgrade_nx)(struct atomic_rwlock *__restrict __self);
 #endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
 /* Downgrade a write-lock to a read-lock (Always succeeds). */
@@ -201,25 +216,29 @@ __NOTHROW(atomic_rwlock_tryread)(struct atomic_rwlock *__restrict __self) {
 }
 
 __LOCAL __ATTR_NONNULL((1)) void
-(atomic_rwlock_read)(struct atomic_rwlock *__restrict __self) {
+(atomic_rwlock_read)(struct atomic_rwlock *__restrict __self)
+		__THROWS(E_WOULDBLOCK_PREEMPTED) {
 	while (!atomic_rwlock_tryread(__self))
 		__hybrid_yield();
 }
 
 __LOCAL __ATTR_NONNULL((1)) void
-(atomic_rwlock_write)(struct atomic_rwlock *__restrict __self) {
+(atomic_rwlock_write)(struct atomic_rwlock *__restrict __self)
+		__THROWS(E_WOULDBLOCK_PREEMPTED) {
 	while (!atomic_rwlock_trywrite(__self))
 		__hybrid_yield();
 }
 
 __LOCAL __ATTR_NONNULL((1)) void
-(atomic_rwlock_waitread)(struct atomic_rwlock *__restrict __self) {
+(atomic_rwlock_waitread)(struct atomic_rwlock *__restrict __self)
+		__THROWS(E_WOULDBLOCK_PREEMPTED) {
 	while (!atomic_rwlock_canread(__self))
 		__hybrid_yield();
 }
 
 __LOCAL __ATTR_NONNULL((1)) void
-(atomic_rwlock_waitwrite)(struct atomic_rwlock *__restrict __self) {
+(atomic_rwlock_waitwrite)(struct atomic_rwlock *__restrict __self)
+		__THROWS(E_WOULDBLOCK_PREEMPTED) {
 	while (!atomic_rwlock_canwrite(__self))
 		__hybrid_yield();
 }

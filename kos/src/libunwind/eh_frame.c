@@ -406,14 +406,14 @@ NOTHROW_NCX(CC libuw_unwind_landing_fde_exec_until)(unwind_fde_t *__restrict sel
                                                     CHECKED void const *absolute_pc);
 #endif /* LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
 
-PRIVATE NONNULL((1, 2, 3, 4)) unwind_errno_t
+PRIVATE NONNULL((1, 4)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                 CHECKED byte_t const *reader,
                                                 CHECKED byte_t const *end,
                                                 unwind_cfa_value_t *__restrict result,
                                                 CHECKED void const *absolute_pc);
 
-PRIVATE NONNULL((1, 2, 3, 4)) unwind_errno_t
+PRIVATE NONNULL((1, 4)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                  CHECKED byte_t const *reader,
                                                  CHECKED byte_t const *end,

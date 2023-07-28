@@ -539,10 +539,11 @@ final class CTypeRef {
 			 * >> void *(__attribute__((tag("MyTag"))) foo)(void);
 			 */
 			local functionReturnType: CType = typ.returnType;
-			if (functionReturnType is CPointerType) {
+			if (functionReturnType is CPointerType || functionReturnType is CLValueType) {
 				local innerMostReturnPointerBaseTypeRef: CTypeRef;
 				innerMostReturnPointerBaseTypeRef = functionReturnType.base;
-				while (innerMostReturnPointerBaseTypeRef.typ is CPointerType)
+				while (innerMostReturnPointerBaseTypeRef.typ is CPointerType ||
+				       innerMostReturnPointerBaseTypeRef.typ is CLValueType)
 					innerMostReturnPointerBaseTypeRef = innerMostReturnPointerBaseTypeRef.typ.base;
 				innerMostReturnPointerBaseTypeRef.moveNonPointerAttributes(this);
 			}
@@ -574,7 +575,7 @@ final class CTypeRef {
 				}
 			}
 		} else {
-			if (typ is CPointerType) {
+			if (typ is CPointerType || typ is CLValueType) {
 				if (flags & CTYPEREF_FLAG_NONSENSE_POINTER) {
 					shouldWarn = copy this;
 					flags &= ~CTYPEREF_FLAG_NONSENSE_POINTER;
@@ -620,10 +621,11 @@ final class CTypeRef {
 			 * >> void *(__attribute__((tag("MyTag"))) foo)(void);
 			 */
 			local functionReturnType: CType = typ.returnType;
-			if (functionReturnType is CPointerType) {
+			if (functionReturnType is CPointerType || functionReturnType is CLValueType) {
 				local innerMostReturnPointerBaseTypeRef: CTypeRef;
 				innerMostReturnPointerBaseTypeRef = functionReturnType.base;
-				while (innerMostReturnPointerBaseTypeRef.typ is CPointerType)
+				while (innerMostReturnPointerBaseTypeRef.typ is CPointerType ||
+				       innerMostReturnPointerBaseTypeRef.typ is CLValueType)
 					innerMostReturnPointerBaseTypeRef = innerMostReturnPointerBaseTypeRef.typ.base;
 				innerMostReturnPointerBaseTypeRef.moveNonPointerAttributes(this);
 			}
@@ -1166,6 +1168,38 @@ final class CPointerType64: CPointerType {
 	}
 	public function bytes(checker: Checker, value: int): Bytes {
 		return value.tobytes(8, checker.TARGET_ENDIAN, false);
+	}
+}
+
+class CLValueType: CType {
+	this = default;
+
+	@@LValue base type.
+	public member base: CTypeRef;
+	function fixNonsensicalAttributes(checker: Checker)
+		-> base.fixNonsensicalPointerBaseAttributes(checker);
+
+	function redeclarationImport(checker: Checker, other: CType,
+	                             newName: string = "", oldName: string = "",
+	                             oldDeclFlc: (string, int, int) | none = none)
+		-> base.redeclarationImport(checker, other.base, newName, oldName, oldDeclFlc);
+
+	function tostr(varname: string = ""): string {
+		return base.tostr("&" + varname);
+	}
+	public function dumpValue(checker: Checker, data: Bytes, offset: int, indent: int = -1): string {
+		local intVal: int = this.peek(checker, data, offset);
+		return intVal ? f"*({base.tostr("*" + varname)}){intVal.hex()}ul" : "0";
+	}
+	public operator hash(): int -> hash(base);
+	public operator == (other: CLValueType): bool -> base == other.base;
+	public operator != (other: CLValueType): bool -> base != other.base;
+	function isConvertibleTo(other: CType, explicit: bool = false): bool {
+		if (other !is CLValueType)
+			return base.isConvertibleTo(other.base, explicit);
+		if (explicit)
+			return true;
+		return base.isConvertibleToWithFlags(other.base, explicit);
 	}
 }
 

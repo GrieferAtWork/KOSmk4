@@ -348,9 +348,9 @@ PRIVATE byte_t const dwarf4_lne_filefmt[] = {
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-INTERN TEXTSECTION NONNULL((1, 2, 3)) debuginfo_errno_t
+INTERN TEXTSECTION NONNULL((1, 3)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debugline_loadunit)(CHECKED byte_t const **__restrict preader,
-                                         CHECKED byte_t const *__restrict text_end,
+                                         CHECKED byte_t const *text_end,
                                          di_debugline_unit_t *__restrict result) {
 	uintptr_t length;
 	CHECKED byte_t const *reader;

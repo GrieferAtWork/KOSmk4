@@ -57,13 +57,19 @@
 #define __has_attribute(x) __GCC_PRIVATE_IS_DEFINED(__GCC_HAS_ATTRIBUTE_##x)
 #define __GCC_HAS_ATTRIBUTE___packed__
 #define __GCC_HAS_ATTRIBUTE___noreturn__
+#define __GCC_HAS_ATTRIBUTE___aligned__
+#define __GCC_HAS_ATTRIBUTE___nonnull__
+
+/************************************************************************/
+/* Checker-specific attributes                                          */
+/************************************************************************/
 #define __GCC_HAS_ATTRIBUTE___deref__
 #define __GCC_HAS_ATTRIBUTE___noderef__
 #define __GCC_HAS_ATTRIBUTE___nothrow__
 #define __GCC_HAS_ATTRIBUTE___tag__
 #define __GCC_HAS_ATTRIBUTE___require_caller_tag__
-#define __GCC_HAS_ATTRIBUTE___aligned__
-#define __GCC_HAS_ATTRIBUTE___nonnull__
+
+
 
 #undef __has_builtin
 #define __has_builtin(x) __GCC_PRIVATE_IS_DEFINED(__GCC_HAS_BUILTIN_##x)
@@ -159,14 +165,36 @@
 #define __GCC_HAS_BUILTIN___atomic_fetch_nand
 #define __GCC_HAS_BUILTIN___builtin_assume
 #define __GCC_HAS_BUILTIN___builtin_choose_expr
-/* Checker-specific builtins */
-#define __GCC_HAS_BUILTIN___builtin_offsetafter  /* size_t __builtin_offsetafter(T, fields...) */
-#define __GCC_HAS_BUILTIN___builtin_container_of /* T *__builtin_container_of(typeof(((T *)0)->fields) *p, T, fields...) */
-#define __GCC_HAS_BUILTIN___builtin_throw        /* __attribute__((noreturn)) void __builtin_throw(int code, ...); */
-#define __GCC_HAS_BUILTIN___builtin_void         /* T __builtin_void(T val);  ## Evaluates to `val', but value becomes unknown */
-#define __GCC_HAS_BUILTIN___builtin_rvoid        /* T __builtin_rvoid(T val); ## Like `__builtin_void()', but also do r-value */
-#define __GCC_HAS_BUILTIN___builtin_define_alias /* __builtin_define_alias(char const new[], char const old[]); ## Verify correct attributes for `DEFINE_PUBLIC_ALIAS()' & friends */
-#define __GCC_HAS_BUILTIN___builtin_remove_noderef /* T *__builtin_remove_noderef(__attribute__((noderef)) T *p); ## Remove `noderef' from a type/variable (NOTE: the annotation is only removed for the duration of the current scope) */
+
+/************************************************************************/
+/* Checker-specific builtins                                            */
+/************************************************************************/
+
+/* >> size_t __builtin_offsetafter(T, fields...) */
+#define __GCC_HAS_BUILTIN___builtin_offsetafter
+
+/* >> T *__builtin_container_of(typeof(((T *)0)->fields) *p, T, fields...) */
+#define __GCC_HAS_BUILTIN___builtin_container_of
+
+/* >> __attribute__((noreturn)) void __builtin_throw(int code, ...); */
+#define __GCC_HAS_BUILTIN___builtin_throw
+
+/* >> T __builtin_void(T val);
+ * Evaluates to `val', but value becomes unknown */
+#define __GCC_HAS_BUILTIN___builtin_void
+
+/* >> T __builtin_rvoid(T val);
+ * Like `__builtin_void()', but also do r-value */
+#define __GCC_HAS_BUILTIN___builtin_rvoid
+
+/* >> __builtin_define_alias(char const new[], char const old[]);
+ * Verify correct attributes for `DEFINE_PUBLIC_ALIAS()' & friends */
+#define __GCC_HAS_BUILTIN___builtin_define_alias
+
+/* >> T *__builtin_remove_noderef(__attribute__((noderef)) T *p);
+ * Remove `noderef' from a type/variable and re-return that variable.
+ * NOTE: the annotation is only removed for the duration of the current scope */
+#define __GCC_HAS_BUILTIN___builtin_remove_noderef
 
 #ifndef __has_feature
 #define __NO_has_feature

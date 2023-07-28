@@ -131,38 +131,38 @@ struct unwind_register {
 
 struct cfientry_sections {
 	/*BEGIN:compat(unwind_emulator_sections_t)*/
-	__CHECKED __byte_t const *ds_eh_frame_hdr_start;   /* [0..1][valid_if(:ce_s_eh_frame_hdr)] `.eh_frame_hdr' start */
-	__CHECKED __byte_t const *ds_eh_frame_hdr_end;     /* [0..1][valid_if(:ce_s_eh_frame_hdr)] `.eh_frame_hdr' end */
-	__CHECKED __byte_t const *ds_eh_frame_start;       /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' start */
-	__CHECKED __byte_t const *ds_eh_frame_end;         /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' end */
-	__CHECKED __byte_t const *ds_debug_frame_start;    /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' start */
-	__CHECKED __byte_t const *ds_debug_frame_end;      /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' end */
-	__CHECKED __byte_t const *ds_debug_addr_start;     /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' start */
-	__CHECKED __byte_t const *ds_debug_addr_end;       /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' end */
+	CHECKED byte_t const *ds_eh_frame_hdr_start;   /* [0..1][valid_if(:ce_s_eh_frame_hdr)] `.eh_frame_hdr' start */
+	CHECKED byte_t const *ds_eh_frame_hdr_end;     /* [0..1][valid_if(:ce_s_eh_frame_hdr)] `.eh_frame_hdr' end */
+	CHECKED byte_t const *ds_eh_frame_start;       /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' start */
+	CHECKED byte_t const *ds_eh_frame_end;         /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' end */
+	CHECKED byte_t const *ds_debug_frame_start;    /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' start */
+	CHECKED byte_t const *ds_debug_frame_end;      /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' end */
+	CHECKED byte_t const *ds_debug_addr_start;     /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' start */
+	CHECKED byte_t const *ds_debug_addr_end;       /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' end */
 	/*BEGIN:compat(di_debuginfo_cu_parser_sections_t)*/
-	__CHECKED __byte_t const *ds_debug_loclists_start; /* [0..1][valid_if(:ce_s_debug_loclists)] `.debug_loclists' start */
-	__CHECKED __byte_t const *ds_debug_loclists_end;   /* [0..1][valid_if(:ce_s_debug_loclists)] `.debug_loclists' end */
-	__CHECKED __byte_t const *ds_debug_loc_start;      /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' start */
-	__CHECKED __byte_t const *ds_debug_loc_end;        /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' end */
-	__CHECKED __byte_t const *ds_debug_abbrev_start;   /* [0..1][const] `.debug_abbrev' start */
-	__CHECKED __byte_t const *ds_debug_abbrev_end;     /* [0..1][const] `.debug_abbrev' end */
-	__CHECKED __byte_t const *ds_debug_info_start;     /* [0..1][const] `.debug_info' start */
-	__CHECKED __byte_t const *ds_debug_info_end;       /* [0..1][const] `.debug_info' end */
+	CHECKED byte_t const *ds_debug_loclists_start; /* [0..1][valid_if(:ce_s_debug_loclists)] `.debug_loclists' start */
+	CHECKED byte_t const *ds_debug_loclists_end;   /* [0..1][valid_if(:ce_s_debug_loclists)] `.debug_loclists' end */
+	CHECKED byte_t const *ds_debug_loc_start;      /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' start */
+	CHECKED byte_t const *ds_debug_loc_end;        /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' end */
+	CHECKED byte_t const *ds_debug_abbrev_start;   /* [0..1][const] `.debug_abbrev' start */
+	CHECKED byte_t const *ds_debug_abbrev_end;     /* [0..1][const] `.debug_abbrev' end */
+	CHECKED byte_t const *ds_debug_info_start;     /* [0..1][const] `.debug_info' start */
+	CHECKED byte_t const *ds_debug_info_end;       /* [0..1][const] `.debug_info' end */
 	/*END:compat(unwind_emulator_sections_t)*/
 	/*BEGIN:compat(di_string_sections_t)*/
-	__CHECKED __byte_t const *ds_debug_str_start;      /* [0..0][const] Always NULL */
-	__CHECKED __byte_t const *ds_debug_str_end;        /* [0..0][const] Always NULL */
-	__CHECKED __byte_t const *ds_debug_str_line_start; /* [0..0][const] Always NULL */
-	__CHECKED __byte_t const *ds_debug_str_line_end;   /* [0..0][const] Always NULL */
+	CHECKED byte_t const *ds_debug_str_start;      /* [0..0][const] Always NULL */
+	CHECKED byte_t const *ds_debug_str_end;        /* [0..0][const] Always NULL */
+	CHECKED byte_t const *ds_debug_str_line_start; /* [0..0][const] Always NULL */
+	CHECKED byte_t const *ds_debug_str_line_end;   /* [0..0][const] Always NULL */
 	/*END:compat(di_string_sections_t)*/
 	/*END:compat(di_debuginfo_cu_parser_sections_t)*/
-	__CHECKED __byte_t const *ds_debug_aranges_start;  /* [0..1][const] `.debug_aranges' start */
-	__CHECKED __byte_t const *ds_debug_aranges_end;    /* [0..1][const] `.debug_aranges' end */
+	CHECKED byte_t const *ds_debug_aranges_start;  /* [0..1][const] `.debug_aranges' start */
+	CHECKED byte_t const *ds_debug_aranges_end;    /* [0..1][const] `.debug_aranges' end */
 	/*BEGIN:compat(di_rnglists_sections_t)*/
-	__CHECKED __byte_t const *ds_debug_rnglists_start; /* [0..1][valid_if(:ce_s_debug_rnglists)] `.debug_rnglists' start */
-	__CHECKED __byte_t const *ds_debug_rnglists_end;   /* [0..1][valid_if(:ce_s_debug_rnglists)] `.debug_rnglists' end */
-	__CHECKED __byte_t const *ds_debug_ranges_start;   /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' start */
-	__CHECKED __byte_t const *ds_debug_ranges_end;     /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' end */
+	CHECKED byte_t const *ds_debug_rnglists_start; /* [0..1][valid_if(:ce_s_debug_rnglists)] `.debug_rnglists' start */
+	CHECKED byte_t const *ds_debug_rnglists_end;   /* [0..1][valid_if(:ce_s_debug_rnglists)] `.debug_rnglists' end */
+	CHECKED byte_t const *ds_debug_ranges_start;   /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' start */
+	CHECKED byte_t const *ds_debug_ranges_end;     /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' end */
 	/*END:compat(di_rnglists_sections_t)*/
 };
 #define cfientry_sections_as_unwind_emulator_sections(self)        ((unwind_emulator_sections_t *)&(self)->ds_eh_frame_hdr_start)
@@ -281,10 +281,9 @@ NOTHROW_NCX(CC find_register)(struct cfientry *__restrict self,
  * simply forward the request to `arg->ce_regget'.
  * This function is used to facilitate register access inside of call-site parameter
  * expressions found in  `DW_TAG_GNU_call_site_parameter:DW_AT_GNU_call_site_value'. */
-PRIVATE NONNULL((1)) unwind_errno_t
+PRIVATE NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(LIBUNWIND_CC after_unwind_getreg)(/*struct cfientry **/ void const *arg,
-                                              unwind_regno_t dw_regno,
-                                              __CHECKED void *dst) {
+                                              unwind_regno_t dw_regno, void *dst) {
 	struct cfientry *self;
 	size_t i;
 	self = (struct cfientry *)arg;
@@ -653,7 +652,7 @@ NOTHROW_NCX(CC is_cfi_expression_a_simple_register_push)(struct cfientry *__rest
                                                          di_debuginfo_location_t const *__restrict loc,
                                                          unwind_regno_t dw_regno) {
 	size_t length;
-	__CHECKED byte_t const *expr;
+	CHECKED byte_t const *expr;
 	expr = debuginfo_location_select(loc, self->cr_cu.cu_ranges.r_startpc,
 	                                 self->ce_modrelpc,
 	                                 self->ce_parser.dsp_addrsize, &length);
@@ -694,8 +693,7 @@ __pragma_GCC_diagnostic_pop_ignored(Wmaybe_uninitialized)
 
 PRIVATE NONNULL((1)) unwind_errno_t
 NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
-                                     unwind_regno_t dw_regno,
-                                     __CHECKED void *dst);
+                                     unwind_regno_t dw_regno, void *dst);
 
 /* GCC claims that "expr_length" in  the below function is uninitialized,  when
  * clearly it is very much getting initialized by `debuginfo_location_select()' */
@@ -706,7 +704,7 @@ __pragma_GCC_diagnostic_push_ignored(Wmaybe_uninitialized)
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) unwind_errno_t
 NOTHROW_NCX(LIBUNWIND_CC evaluate_call_site_expression)(struct cfientry *__restrict self,
                                                         di_debuginfo_location_t const *__restrict location,
-                                                        unwind_regno_t dw_regno, __CHECKED void *dst,
+                                                        unwind_regno_t dw_regno, void *dst,
                                                         bool deref_expression_result) {
 	unwind_emulator_t emulator;
 	size_t expr_length;
@@ -858,8 +856,7 @@ __pragma_GCC_diagnostic_pop_ignored(Wmaybe_uninitialized)
 
 PRIVATE NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
-                                     unwind_regno_t dw_regno,
-                                     __CHECKED void *dst) {
+                                     unwind_regno_t dw_regno, void *dst) {
 	struct cfientry *self;
 	size_t i;
 	byte_t const *saved_dip;
@@ -991,9 +988,7 @@ NOTHROW_NCX(CC make_rvalue)(unwind_emulator_t *__restrict self,
 }
 
 PRIVATE NONNULL((1, 3)) unwind_errno_t LIBUNWIND_CC
-cfi_entry_init_setreg(void *arg,
-                      unwind_regno_t dw_regno,
-                      __CHECKED void const *src) {
+cfi_entry_init_setreg(void *arg, unwind_regno_t dw_regno, void const *src) {
 	struct cfientry *self;
 	size_t index, lo, hi;
 	self = (struct cfientry *)arg;
@@ -1153,14 +1148,14 @@ done:
  * @return: UNWIND_SEGFAULT:         ...
  * @return: UNWIND_BADALLOC:         ...
  * @return: UNWIND_EMULATOR_*:       ... */
-INTERN WUNUSED NONNULL((1, 2, 3)) unwind_errno_t
+INTERN WUNUSED NONNULL((1)) unwind_errno_t
 NOTHROW_NCX(CC libdi_debuginfo_run_entry_value_emulator)(unwind_emulator_t *__restrict self,
-                                                         __CHECKED byte_t const *cfi_start_pc,
-                                                         __CHECKED byte_t const *cfi_end_pc) {
+                                                         CHECKED byte_t const *cfi_start_pc,
+                                                         CHECKED byte_t const *cfi_end_pc) {
 	unwind_errno_t result;
-	__CHECKED byte_t const *saved_pc;
-	__CHECKED byte_t const *saved_pc_start;
-	__CHECKED byte_t const *saved_pc_end;
+	CHECKED byte_t const *saved_pc;
+	CHECKED byte_t const *saved_pc_start;
+	CHECKED byte_t const *saved_pc_end;
 	unwind_setreg_t saved_regset;
 
 #ifndef __KERNEL__

@@ -690,7 +690,14 @@ again:
 			local fieldType: CTypeRef;
 			local fieldName: string;
 default_case:
-			for (fieldType, fieldName, none: parseTypeRefs("-")) {
+			for (fieldType, fieldName, none: parseUncheckedTypeRefs("-")) {
+				if (fieldType.flags & CTYPEREF_FLAG_PACKED) {
+					fieldType.flags &= ~CTYPEREF_FLAG_PACKED;
+					fieldType.fixNonsensicalAttributes(this);
+					fieldType.flags |= CTYPEREF_FLAG_PACKED;
+				} else {
+					fieldType.fixNonsensicalAttributes(this);
+				}
 				if (this.tok == ":") {
 					/* Bit fields */
 					this.next();
@@ -783,8 +790,10 @@ default_case:
 		local structAlign: int | none = tr.attribAligned;
 		if (structAlign is none)
 			structAlign = defaultStructPacking;
-		if (tr.flags & CTYPEREF_FLAG_PACKED)
+		if (tr.flags & CTYPEREF_FLAG_PACKED) {
+			tr.flags &= ~CTYPEREF_FLAG_PACKED;
 			structAlign = 1;
+		}
 		local fieldOffset: int = 0;
 		if (struct.base !is none)
 			fieldOffset = struct.base.sizeof;
@@ -797,8 +806,10 @@ default_case:
 					if (fieldAlign > structAlign)
 						fieldAlign = structAlign;
 				}
-				if (fieldType.flags & CTYPEREF_FLAG_PACKED)
+				if (fieldType.flags & CTYPEREF_FLAG_PACKED) {
+					fieldType.flags &= ~CTYPEREF_FLAG_PACKED;
 					fieldAlign = 1;
+				}
 				fieldOffset = (fieldOffset + fieldAlign - 1) & -fieldAlign;
 			}
 			if (!fieldName && fieldType.typ is CStructType) {
@@ -1373,7 +1384,10 @@ done:
 				}
 				local argTypeRef: CTypeRef;
 				local argName: string;
-				argTypeRef, argName = parseTypeRefWithoutStorageClass()...;
+				local sc: string;
+				argTypeRef, argName, sc = parseUncheckedTypeRef(storageClass: "-")...;
+				if (sc != "-")
+					this.err(f"Storage class {repr sc} is invalid in this context");
 				if (argTypeRef.typ === C_void && !argName)
 					break;
 				if (this.tok == "=") {
@@ -1390,8 +1404,15 @@ done:
 					local argType: CType = argTypeRef.typ;
 					argTypeRef.typ = argType.base;
 					argType = TARGET_CPointerType(argTypeRef);
-					argTypeRef = CTypeRef(argType);
+					if (argTypeRef.flags & CTYPEREF_FLAG_RESTRICT) {
+						argTypeRef.flags &= ~CTYPEREF_FLAG_RESTRICT;
+						argTypeRef = CTypeRef(argType);
+						argTypeRef.flags |= CTYPEREF_FLAG_RESTRICT;
+					} else {
+						argTypeRef = CTypeRef(argType);
+					}
 				}
+				argTypeRef.fixNonsensicalAttributes(this);
 				func.args.append((argTypeRef, argName));
 				if (this.tok != ",")
 					break;
@@ -1418,8 +1439,7 @@ done:
 			} else if (this.tok in ["restrict", "__restrict", "__restrict__"]) {
 				this.next();
 				dim = none;
-				/* TODO: Restrict arrays (become restrict pointers during array->pointer decay) */
-				/*tr.flags |= CTYPEREF_FLAG_RESTRICT;*/
+				tr.flags |= CTYPEREF_FLAG_RESTRICT;
 			} else if (currentFunctionName is none) {
 				dim = parseExprConstantInteger();
 			} else {
@@ -1441,8 +1461,10 @@ done:
 			local itemAlign: int | none = tr.attribAligned;
 			if (itemAlign is none)
 				itemAlign = baseType.alignof;
-			if (tr.flags & CTYPEREF_FLAG_PACKED)
+			if (tr.flags & CTYPEREF_FLAG_PACKED) {
+				tr.flags &= ~CTYPEREF_FLAG_PACKED;
 				itemAlign = 1;
+			}
 			local stride: int = (baseType.sizeof + itemAlign - 1) & -itemAlign;
 			if (dim !is none && dim < 0)
 				this.err(f"Negative array dimension in `{baseType}[{dim}]'");
@@ -1464,8 +1486,10 @@ done:
 	function parseTypeRefInnerImpl(tr: CTypeRef, name: string = ""): (CTypeRef, string) {
 		/* Parse the inner type-ref prefix (iow: pointer types) */
 		parseCTypeRefAttributes(tr);
-prefixAgain:
-		if (this.tok == "*") {
+prefix_again:
+		switch (this.tok) {
+
+		case "*": {
 			this.next();
 			local pointerType: Type;
 			switch (this.tok) {
@@ -1481,10 +1505,20 @@ prefixAgain:
 				pointerType = TARGET_CPointerType;
 				break;
 			}
-
 			tr = CTypeRef(pointerType(tr));
 			parseCTypeRefConstVolatile(tr);
-			goto prefixAgain;
+			goto prefix_again;
+		}	break;
+
+		case "&": {
+			this.next();
+			tr = CTypeRef(CLValueType(tr));
+			parseCTypeRefConstVolatile(tr);
+			goto prefix_again;
+		}	break;
+
+		default:
+			break;
 		}
 
 		local result;
@@ -1546,6 +1580,48 @@ prefixAgain:
 			local itemTr: CTypeRef;
 			local itemName: string;
 			itemTr, itemName = parseTypeRefInner(copy tr)...;
+			yield (itemTr, itemName, storageClass);
+			if (this.tok != ",")
+				break;
+			this.next();
+		}
+	}
+
+	function parseUncheckedTypeRef(name: string = "",
+	                               storageClass: string = "",
+	                               tryParse: bool = false)
+			: (CTypeRef, string, string) | none {
+		if (!storageClass)
+			storageClass = parseStorageClass();
+		local tr = CTypeRef();
+		if (parseCTypeRefBase(tr) is none) {
+			if (tryParse && !storageClass)
+				return none;
+			this.err(f"Cannot parse type from {repr this.tok}");
+		}
+		if (!storageClass)
+			storageClass = parseStorageClass();
+		tr, name = parseTypeRefInnerImpl(tr, name)...;
+		return (tr, name, storageClass);
+	}
+
+	function parseUncheckedTypeRefs(storageClass: string = "",
+	                                tryParse: bool = false)
+			: {(CTypeRef, string, string)...} {
+		if (!storageClass)
+			storageClass = parseStorageClass();
+		local tr = CTypeRef();
+		if (parseCTypeRefBase(tr) is none) {
+			if (tryParse && !storageClass)
+				return;
+			this.err(f"Cannot parse type from {repr this.tok}");
+		}
+		if (!storageClass)
+			storageClass = parseStorageClass();
+		for (;;) {
+			local itemTr: CTypeRef;
+			local itemName: string;
+			itemTr, itemName = parseTypeRefInnerImpl(copy tr)...;
 			yield (itemTr, itemName, storageClass);
 			if (this.tok != ",")
 				break;
@@ -2906,13 +2982,13 @@ next:
 	@@@return: * : The name of the typeref expression (or an empty string if unnamed)
 	function parseSkipTypeRefInner(): string {
 		/* Parse the inner type-ref prefix (iow: pointer types) */
-prefixAgain:
-		if (this.tok == "*") {
+prefix_again:
+		if (this.tok in ["*", "&"]) {
 			this.next();
 			if (this.tok in ["__ptr32", "__ptr64"])
 				this.next();
 			parseSkipCTypeRefConstVolatile();
-			goto prefixAgain;
+			goto prefix_again;
 		}
 		parseSkipCTypeRefAttributes();
 
@@ -3689,7 +3765,7 @@ return_C_voidval:
 				currentTryBlockExceptions.insert(exceptCode);
 				if (!isInTryBlock) {
 					/* Assert that `exceptCode' is part of the caller's throws-attribute */
-					verifyTopLevelThrows({exceptCode},
+					verifyTopLevelThrows({exceptCode} as Set,
 						getReason: _ -> "it `THROW()`s it here");
 				}
 			}
