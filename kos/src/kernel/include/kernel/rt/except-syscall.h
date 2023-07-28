@@ -54,10 +54,10 @@ DECL_BEGIN
 /* User-space exception handler descriptor. */
 #ifdef __CC__
 struct user_except_handler {
-	uintptr_t                     ueh_mode;    /* Handler mode (One of `EXCEPT_HANDLER_MODE_*' + set of `EXCEPT_HANDLER_FLAG_*') */
+	uintptr_t            ueh_mode;    /* Handler mode (One of `EXCEPT_HANDLER_MODE_*' + set of `EXCEPT_HANDLER_FLAG_*') */
 	NCX except_handler_t ueh_handler; /* [valid_if(EXCEPT_HANDLER_FLAG_SETHANDLER)] Handler entry point */
 	NCX void            *ueh_stack;   /* Handler stack  (or `EXCEPT_HANDLER_SP_CURRENT'  when not  set)
-	                                            * NOTE: This pointer also doubles as the user-space sigaltstack! */
+	                                   * NOTE: This pointer also doubles as the user-space sigaltstack! */
 };
 
 /* User-space exception handler mode for the current thread. */

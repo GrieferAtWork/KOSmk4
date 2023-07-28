@@ -209,7 +209,7 @@ DEFINE_SYSCALL3(errno_t, set_exception_handler,
 DEFINE_SYSCALL2(errno_t, sigaltstack,
                 NCX UNCHECKED struct sigaltstack const *, ss,
                 NCX UNCHECKED struct sigaltstack *, oss) {
-	void *sp;
+	NCX void *sp;
 	if (oss) {
 		validate_writable(oss, sizeof(*oss));
 		COMPILER_WRITE_BARRIER();
@@ -429,7 +429,7 @@ DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
 		NCX UNCHECKED sigset_t *new_sigset;
 
 		/* Enable USERPROCMASK mode. */
-		validate_readwrite_opt(ctl, sizeof(*ctl));
+		validate_readwrite(ctl, sizeof(*ctl));
 		COMPILER_BARRIER();
 
 		/* Load the address for the initial signal mask. We'll be copying
