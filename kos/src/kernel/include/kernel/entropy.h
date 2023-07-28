@@ -133,14 +133,14 @@ NOTHROW(FCALL entropy_give_nopr)(void const *buf, size_t num_bits);
  * either wait for data to become available, throw an  error
  * `E_WOULDBLOCK', or return `0' (under `IO_NODATAZERO') */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) size_t FCALL
-entropy_read(USER CHECKED void *buf, size_t num_bytes, iomode_t mode)
+entropy_read(NCX void *buf, size_t num_bytes, iomode_t mode)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 
 /* Same as `entropy_read()', but always fill the entire buffer,
  * potentially  waiting until enough entropy has been generated
  * before returning. */
 FUNDEF NOBLOCK NONNULL((1)) void FCALL
-entropy_readall(USER CHECKED void *buf, size_t num_bytes)
+entropy_readall(NCX void *buf, size_t num_bytes)
 		THROWS(E_WOULDBLOCK, E_INTERRUPT, E_SEGFAULT);
 
 
@@ -148,7 +148,7 @@ entropy_readall(USER CHECKED void *buf, size_t num_bytes)
  * This function uses a  PRNG which may be  seeded at random points  in
  * time (but at least once during boot) to generate numbers. */
 FUNDEF NOBLOCK NONNULL((1)) void FCALL
-urandom_read(USER CHECKED void *buf, size_t num_bytes)
+urandom_read(NCX void *buf, size_t num_bytes)
 		THROWS(E_SEGFAULT);
 
 

@@ -130,7 +130,7 @@ DEFINE_INTERN_ALIAS(handle_dirhandlex_weakdecref, handle_dirhandle_weakdecref);
 DEFINE_INTERN_ALIAS(handle_dirhandlex_readdir, handle_dirhandle_readdir);
 INTERN BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 handle_dirhandle_readdir(struct dirhandle *__restrict self,
-                         USER CHECKED struct dirent *buf, size_t bufsize,
+                         NCX struct dirent *buf, size_t bufsize,
                          readdir_mode_t readdir_mode, iomode_t mode)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	uintptr_t dots;
@@ -333,14 +333,14 @@ do_normal_seek:
 DEFINE_INTERN_ALIAS(handle_dirhandlex_ioctl, handle_dirhandle_ioctl);
 INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_dirhandle_ioctl(struct dirhandle *__restrict self, ioctl_t cmd,
-                       USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+                       NCX UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	return fdirenum_ioctl(&self->dh_enum, cmd, arg, mode);
 }
 
 DEFINE_INTERN_ALIAS(handle_dirhandlex_stat, handle_dirhandle_stat);
 INTERN BLOCKING NONNULL((1)) void KCALL
 handle_dirhandle_stat(struct dirhandle *__restrict self,
-                      USER CHECKED struct stat *result) THROWS(...) {
+                      NCX struct stat *result) THROWS(...) {
 	return mfile_ustat(self->dh_enum.de_dir, result);
 }
 

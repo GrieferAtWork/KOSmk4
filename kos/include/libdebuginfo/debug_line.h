@@ -53,31 +53,31 @@ typedef struct __ATTR_PACKED {
 
 typedef struct {
 	/* Compilation unit descriptor, as decoded from `.debug_line' */
-	__CHECKED __byte_t const                       *dlu_headerbase;       /* [1..1] Base address of the CU header. */
-	__CHECKED __byte_t const                       *dlu_textbase;         /* [1..1] Base address of the CU resolver text. */
-	__CHECKED __byte_t const                       *dlu_cuend;            /* [1..1] End address of the CU segment. */
-	__CHECKED di_debugline_fileinfo_format_t const *dlu_pathfmt;          /* [1..1] Format of path names. */
-	__size_t                                        dlu_pathcount;        /* # of path-items in `dlu_pathdata' */
-	__CHECKED __byte_t const                       *dlu_pathdata;         /* [0..dlu_pathcount] Path data (array of `dlu_pathfmt') */
-	__CHECKED di_debugline_fileinfo_format_t const *dlu_filefmt;          /* [1..1] Format of file names. */
-	__size_t                                        dlu_filecount;        /* # of file-items in `dlu_filedata' */
-	__CHECKED __byte_t const                       *dlu_filedata;         /* [0..dlu_filecount] Path data (array of `dlu_filefmt') */
-	__uint16_t                                      dlu_version;          /* Used during decoding... */
-	__uint8_t                                       dlu_min_insn_length;  /* Used during decoding... */
-	__uint8_t                                       dlu_max_ops_per_insn; /* Used during decoding... */
-	__uint8_t                                       dlu_default_isstmt;   /* Used during decoding... */
-	__int8_t                                        dlu_line_base;        /* Used during decoding... */
-	__uint8_t                                       dlu_line_range;       /* Used during decoding... */
-	__uint8_t                                       dlu_opcode_base;      /* Used during decoding... */
-	__CHECKED __uint8_t const                      *dlu_opcode_lengths;   /* Used during decoding... */
-	__uint8_t                                       dlu_ptrsize;          /* Pointer size (4 in 32-bit DWARF; 8 in 64-bit DWARF). */
-	__uint8_t                                       dlu_addrsize;         /* Address size */
+	__NCX __byte_t const                       *dlu_headerbase;       /* [1..1] Base address of the CU header. */
+	__NCX __byte_t const                       *dlu_textbase;         /* [1..1] Base address of the CU resolver text. */
+	__NCX __byte_t const                       *dlu_cuend;            /* [1..1] End address of the CU segment. */
+	__NCX di_debugline_fileinfo_format_t const *dlu_pathfmt;          /* [1..1] Format of path names. */
+	__size_t                                    dlu_pathcount;        /* # of path-items in `dlu_pathdata' */
+	__NCX __byte_t const                       *dlu_pathdata;         /* [0..dlu_pathcount] Path data (array of `dlu_pathfmt') */
+	__NCX di_debugline_fileinfo_format_t const *dlu_filefmt;          /* [1..1] Format of file names. */
+	__size_t                                    dlu_filecount;        /* # of file-items in `dlu_filedata' */
+	__NCX __byte_t const                       *dlu_filedata;         /* [0..dlu_filecount] Path data (array of `dlu_filefmt') */
+	__uint16_t                                  dlu_version;          /* Used during decoding... */
+	__uint8_t                                   dlu_min_insn_length;  /* Used during decoding... */
+	__uint8_t                                   dlu_max_ops_per_insn; /* Used during decoding... */
+	__uint8_t                                   dlu_default_isstmt;   /* Used during decoding... */
+	__int8_t                                    dlu_line_base;        /* Used during decoding... */
+	__uint8_t                                   dlu_line_range;       /* Used during decoding... */
+	__uint8_t                                   dlu_opcode_base;      /* Used during decoding... */
+	__NCX __uint8_t const                      *dlu_opcode_lengths;   /* Used during decoding... */
+	__uint8_t                                   dlu_ptrsize;          /* Pointer size (4 in 32-bit DWARF; 8 in 64-bit DWARF). */
+	__uint8_t                                   dlu_addrsize;         /* Address size */
 } di_debugline_unit_t;
 
 
 typedef struct {
-	__CHECKED char const *dlfi_path; /* [0..1] File path */
-	__CHECKED char const *dlfi_file; /* [0..1] File name */
+	__NCX char const *dlfi_path; /* [0..1] File path */
+	__NCX char const *dlfi_file; /* [0..1] File name */
 } di_debugline_fileinfo_t;
 
 #define di_debug_addr2line_srcas_debugline_fileinfo(x) \
@@ -153,13 +153,13 @@ typedef struct {
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 typedef __ATTR_NONNULL_T((1, 3)) debuginfo_errno_t
-__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGLINE_LOADUNIT)(__CHECKED __byte_t const **__restrict preader,
-                                                      __CHECKED __byte_t const *text_end,
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGLINE_LOADUNIT)(__NCX __byte_t const **__restrict preader,
+                                                      __NCX __byte_t const *text_end,
                                                       di_debugline_unit_t *__restrict result);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) debuginfo_errno_t
-__NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadunit)(__CHECKED __byte_t const **__restrict preader,
-                                                  __CHECKED __byte_t const *text_end,
+__NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadunit)(__NCX __byte_t const **__restrict preader,
+                                                  __NCX __byte_t const *text_end,
                                                   di_debugline_unit_t *__restrict result);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 

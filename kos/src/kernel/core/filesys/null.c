@@ -80,7 +80,7 @@ DECL_BEGIN
 
 INTERN NONNULL((1)) void KCALL /* `INTERN' because also re-used for pre-defined mounts */
 nullfile_v_stat(struct mfile *__restrict UNUSED(self),
-                USER CHECKED struct stat *result) {
+                NCX struct stat *result) {
 	result->st_atime     = boottime.tv_sec;
 	result->st_atimensec = boottime.tv_nsec;
 	result->st_mtime     = boottime.tv_sec;
@@ -117,7 +117,7 @@ devmem_v_newpart(struct mfile *__restrict UNUSED(self),
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devmem_v_pread(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+devmem_v_pread(struct mfile *__restrict UNUSED(self), NCX void *dst,
                size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
 	return interruptible_copyfromphys(dst, (physaddr_t)addr, num_bytes);
 }
@@ -142,7 +142,7 @@ done:
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devmem_v_pwrite(struct mfile *__restrict UNUSED(self), USER CHECKED void const *src,
+devmem_v_pwrite(struct mfile *__restrict UNUSED(self), NCX void const *src,
                 size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
 	return interruptible_copytophys((physaddr_t)addr, src, num_bytes);
 }
@@ -168,7 +168,7 @@ done:
 
 PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
 devmem_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-               USER UNCHECKED void *arg, iomode_t mode)
+               NCX UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 	switch (_IO_WITHSIZE(cmd, 0)) {
 
@@ -200,7 +200,7 @@ PRIVATE struct mfile_stream_ops const devmem_stream_ops = {
 /* General-purpose, write-swallow file (/dev/null)                      */
 /************************************************************************/
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devnull_v_read(struct mfile *__restrict UNUSED(self), USER CHECKED void *UNUSED(dst),
+devnull_v_read(struct mfile *__restrict UNUSED(self), NCX void *UNUSED(dst),
                size_t UNUSED(num_bytes), iomode_t UNUSED(mode)) THROWS(...) {
 	return 0;
 }
@@ -213,7 +213,7 @@ devnull_v_readv(struct mfile *__restrict UNUSED(self),
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devnull_v_pread(struct mfile *__restrict UNUSED(self), USER CHECKED void *UNUSED(dst),
+devnull_v_pread(struct mfile *__restrict UNUSED(self), NCX void *UNUSED(dst),
                 size_t UNUSED(num_bytes), pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
 	return 0;
 }
@@ -226,7 +226,7 @@ devnull_v_preadv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__res
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
 devnull_v_write(struct mfile *__restrict UNUSED(self),
-                USER CHECKED void const *UNUSED(src),
+                NCX void const *UNUSED(src),
                 size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
 	return num_bytes;
 }
@@ -239,7 +239,7 @@ devnull_v_writev(struct mfile *__restrict UNUSED(self),
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devnull_v_pwrite(struct mfile *__restrict UNUSED(self), USER CHECKED void const *UNUSED(src),
+devnull_v_pwrite(struct mfile *__restrict UNUSED(self), NCX void const *UNUSED(src),
                  size_t num_bytes, pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
 	return num_bytes;
 }
@@ -286,7 +286,7 @@ NOTHROW(KCALL mfile_zero_loadpages)(struct mfile *__restrict self,
 #define devzero_v_loadpages mfile_zero_loadpages
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devzero_v_read(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+devzero_v_read(struct mfile *__restrict UNUSED(self), NCX void *dst,
                size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
 	return interruptible_bzero(dst, num_bytes);
 }
@@ -316,7 +316,7 @@ devzero_v_readv(struct mfile *__restrict UNUSED(self),
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devzero_v_pread(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+devzero_v_pread(struct mfile *__restrict UNUSED(self), NCX void *dst,
                 size_t num_bytes, pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
 	return interruptible_bzero(dst, num_bytes);
 }
@@ -360,7 +360,7 @@ PRIVATE ATTR_NORETURN void KCALL throw_disk_full(void) {
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
 devfull_v_write(struct mfile *__restrict UNUSED(self),
-                USER CHECKED void const *UNUSED(src),
+                NCX void const *UNUSED(src),
                 size_t UNUSED(num_bytes), iomode_t UNUSED(mode)) THROWS(...) {
 	throw_disk_full();
 }
@@ -373,7 +373,7 @@ devfull_v_writev(struct mfile *__restrict UNUSED(self),
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devfull_v_pwrite(struct mfile *__restrict UNUSED(self), USER CHECKED void const *UNUSED(src),
+devfull_v_pwrite(struct mfile *__restrict UNUSED(self), NCX void const *UNUSED(src),
                  size_t UNUSED(num_bytes), pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
 	throw_disk_full();
 }
@@ -412,7 +412,7 @@ PRIVATE struct mfile_stream_ops const devfull_stream_ops = {
 /* Full, unfiltered, kernel memory access (/dev/kmem)                   */
 /************************************************************************/
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devkmem_v_pread(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+devkmem_v_pread(struct mfile *__restrict UNUSED(self), NCX void *dst,
                 size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
 	return interruptible_memcpy(dst, (UNCHECKED void const *)(uintptr_t)addr, num_bytes);
 }
@@ -437,7 +437,7 @@ done:
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devkmem_v_pwrite(struct mfile *__restrict UNUSED(self), USER CHECKED void const *src,
+devkmem_v_pwrite(struct mfile *__restrict UNUSED(self), NCX void const *src,
                  size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
 	return interruptible_memcpy((UNCHECKED void *)(uintptr_t)addr, src, num_bytes);
 }
@@ -575,7 +575,7 @@ PRIVATE struct vio_ops const devkmem_vio_ops = {
 /************************************************************************/
 #ifdef __port_t
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devport_v_pread(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+devport_v_pread(struct mfile *__restrict UNUSED(self), NCX void *dst,
                 size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
 	return interruptible_insb((port_t)addr, dst, num_bytes);
 }
@@ -600,7 +600,7 @@ done:
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devport_v_pwrite(struct mfile *__restrict UNUSED(self), USER CHECKED void const *src,
+devport_v_pwrite(struct mfile *__restrict UNUSED(self), NCX void const *src,
                  size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
 	return interruptible_outsb((port_t)addr, src, num_bytes);
 }
@@ -698,7 +698,7 @@ devrandom_readv(struct iov_buffer *__restrict dst, iomode_t mode) THROWS(...) {
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devrandom_v_read(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+devrandom_v_read(struct mfile *__restrict UNUSED(self), NCX void *dst,
                  size_t num_bytes, iomode_t mode) THROWS(...) {
 	return entropy_read(dst, num_bytes, mode);
 }
@@ -710,7 +710,7 @@ devrandom_v_readv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__re
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devrandom_v_pread(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+devrandom_v_pread(struct mfile *__restrict UNUSED(self), NCX void *dst,
                   size_t num_bytes, pos_t UNUSED(addr), iomode_t mode) THROWS(...) {
 	return entropy_read(dst, num_bytes, mode);
 }
@@ -755,7 +755,7 @@ devrandom_v_polltest(struct mfile *__restrict UNUSED(self),
 
 PRIVATE NONNULL((1)) void KCALL
 devrandom_v_stat(struct mfile *__restrict self,
-                 USER CHECKED struct stat *result)
+                 NCX struct stat *result)
 		THROWS(...) {
 	/* Expose the # of available entropy bytes via stat. */
 	result->st_size = atomic_read(&entropy_bits) / NBBY;
@@ -829,7 +829,7 @@ devurandom_readv(struct iov_buffer *__restrict dst) THROWS(...) {
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devurandom_v_read(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+devurandom_v_read(struct mfile *__restrict UNUSED(self), NCX void *dst,
                  size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
 	urandom_read(dst, num_bytes);
 	return num_bytes;
@@ -843,7 +843,7 @@ devurandom_v_readv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__r
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devurandom_v_pread(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+devurandom_v_pread(struct mfile *__restrict UNUSED(self), NCX void *dst,
                   size_t num_bytes, pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
 	urandom_read(dst, num_bytes);
 	return num_bytes;
@@ -912,7 +912,7 @@ PRIVATE struct vio_ops const devurandom_vio_ops = {
 /************************************************************************/
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
 devkmsg_v_write(struct mfile *__restrict UNUSED(self),
-                USER CHECKED void const *src,
+                NCX void const *src,
                 size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
 	return (size_t)syslog_printer(SYSLOG_LEVEL_RAW, (char const *)src, num_bytes);
 }
@@ -970,7 +970,7 @@ devtty_v_open(struct mfile *__restrict UNUSED(self),
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devtty_v_read(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+devtty_v_read(struct mfile *__restrict UNUSED(self), NCX void *dst,
               size_t num_bytes, iomode_t mode) THROWS(...) {
 	REF struct ttydev *dev = getctty();
 	FINALLY_DECREF_UNLIKELY(dev);
@@ -986,7 +986,7 @@ devtty_v_readv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__restr
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devtty_v_write(struct mfile *__restrict UNUSED(self), USER CHECKED void const *src,
+devtty_v_write(struct mfile *__restrict UNUSED(self), NCX void const *src,
                size_t num_bytes, iomode_t mode) THROWS(...) {
 	REF struct ttydev *dev = getctty();
 	FINALLY_DECREF_UNLIKELY(dev);
@@ -1002,7 +1002,7 @@ devtty_v_writev(struct mfile *__restrict UNUSED(self), struct iov_buffer *__rest
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devtty_v_pread(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+devtty_v_pread(struct mfile *__restrict UNUSED(self), NCX void *dst,
                size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
 	REF struct ttydev *dev = getctty();
 	FINALLY_DECREF_UNLIKELY(dev);
@@ -1018,7 +1018,7 @@ devtty_v_preadv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__rest
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devtty_v_pwrite(struct mfile *__restrict UNUSED(self), USER CHECKED void const *src,
+devtty_v_pwrite(struct mfile *__restrict UNUSED(self), NCX void const *src,
                 size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
 	REF struct ttydev *dev = getctty();
 	FINALLY_DECREF_UNLIKELY(dev);
@@ -1043,7 +1043,7 @@ devtty_v_seek(struct mfile *__restrict UNUSED(self), off_t offset,
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 devtty_v_ioctl(struct mfile *__restrict UNUSED(self), ioctl_t cmd,
-               USER UNCHECKED void *arg, iomode_t mode)
+               NCX UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 	REF struct ttydev *dev = getctty();
 	FINALLY_DECREF_UNLIKELY(dev);
@@ -1079,7 +1079,7 @@ devtty_v_allocate(struct mfile *__restrict UNUSED(self),
 
 PRIVATE NONNULL((1)) void KCALL
 devtty_v_stat(struct mfile *__restrict UNUSED(self),
-              USER CHECKED struct stat *result)
+              NCX struct stat *result)
 		THROWS(...) {
 	struct stat ctty_stat;
 	REF struct ttydev *dev = getctty();

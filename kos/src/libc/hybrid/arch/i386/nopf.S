@@ -415,9 +415,9 @@ END(libc_x86_nopf_rep_stosb)
  *    instead advance  the instruction  pointer to  the `ret'  instruction,
  *    causing the `rep' to be aborted.
  * IN:
- *   - USER CHECKED void       *%Pdi:  Destination pointer
- *   - USER CHECKED void const *%Psi:  Source pointer
- *   - size_t                   %Pcx:  Copy size
+ *   - NCX void       *%Pdi:  Destination pointer
+ *   - NCX void const *%Psi:  Source pointer
+ *   - size_t          %Pcx:  Copy size
  * OUT:
  *   - %Pdi:  == IN(%Pdi) + (IN(%Pcx) - OUT(%Pcx))
  *   - %Psi:  == IN(%Psi) + (IN(%Pcx) - OUT(%Pcx))

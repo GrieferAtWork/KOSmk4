@@ -892,7 +892,7 @@ done:
 /* Keyboard character device operators */
 PUBLIC NONNULL((1)) size_t KCALL
 kbddev_v_read(struct mfile *__restrict self,
-              USER CHECKED void *dst, size_t num_bytes,
+              NCX void *dst, size_t num_bytes,
               iomode_t mode) THROWS(...) {
 	struct kbddev *me = mfile_askbd(self);
 	size_t result;
@@ -923,14 +923,14 @@ again_read_ch:
 			goto again_read_ch;
 		}
 do_append_ch:
-		((USER CHECKED byte_t *)dst)[result] = (byte_t)(unsigned int)ch;
+		((NCX byte_t *)dst)[result] = (byte_t)(unsigned int)ch;
 	}
 	return result;
 }
 
 PUBLIC NONNULL((1)) void KCALL
 kbddev_v_stat(struct mfile *__restrict self,
-              USER CHECKED struct stat *result) THROWS(...) {
+              NCX struct stat *result) THROWS(...) {
 	struct kbddev *me = mfile_askbd(self);
 	size_t bufsize;
 	bufsize = atomic_read(&me->kd_pendsz);
@@ -1019,7 +1019,7 @@ linux_keyboard_setmeta(struct kbddev *__restrict self,
 
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 kbddev_v_ioctl(struct mfile *__restrict self,
-               ioctl_t cmd, USER UNCHECKED void *arg,
+               ioctl_t cmd, NCX UNCHECKED void *arg,
                iomode_t mode) THROWS(...) {
 	struct kbddev *me = mfile_askbd(self);
 	(void)mode;
@@ -1046,11 +1046,11 @@ kbddev_v_ioctl(struct mfile *__restrict self,
 	}	break;
 
 	case KBD_IOC_MASKLED: {
-		USER CHECKED struct kbd_ledmask *data;
+		NCX struct kbd_ledmask *data;
 		u32 old_leds, new_mods;
 		u32 led_mask, led_flag, led_fxor;
 		validate_readable(arg, sizeof(struct kbd_ledmask));
-		data     = (USER CHECKED struct kbd_ledmask *)arg;
+		data     = (NCX struct kbd_ledmask *)arg;
 		led_mask = data->lm_mask;
 		led_flag = data->lm_flag;
 		led_fxor = data->lm_fxor;
@@ -1076,11 +1076,11 @@ kbddev_v_ioctl(struct mfile *__restrict self,
 	}	break;
 
 	case KBD_IOC_MASKMOD: {
-		USER CHECKED struct kbd_ledmask *data;
+		NCX struct kbd_ledmask *data;
 		u32 old_mods, new_mods;
 		u32 mod_mask, mod_flag, mod_fxor;
 		validate_readable(arg, sizeof(struct kbd_ledmask));
-		data = (USER CHECKED struct kbd_ledmask *)arg;
+		data = (NCX struct kbd_ledmask *)arg;
 		mod_mask = data->lm_mask;
 		mod_flag = data->lm_flag;
 		mod_fxor = data->lm_fxor;

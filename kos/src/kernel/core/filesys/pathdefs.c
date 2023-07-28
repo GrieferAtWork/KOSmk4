@@ -39,7 +39,7 @@ DECL_BEGIN
 
 INTDEF NONNULL((1)) void KCALL /* From "./null.c" */
 nullfile_v_stat(struct mfile *__restrict UNUSED(self),
-                USER CHECKED struct stat *result);
+                NCX struct stat *result);
 
 PRIVATE struct mfile_stream_ops const fsuper_unmounted_v_stream_ops = {
 	.mso_open  = &ramfs_super_v_open,

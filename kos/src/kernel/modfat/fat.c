@@ -865,7 +865,7 @@ PRIVATE byte_t const Fat_CygwinSymlinkMagic[] = { '!', '<', 's', 'y', 'm', 'l', 
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
 fatlnk_v_readlink(struct flnknode *__restrict self,
-                  USER CHECKED /*utf-8*/ char *buf,
+                  NCX /*utf-8*/ char *buf,
                   size_t bufsize)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	size_t result;
@@ -898,7 +898,7 @@ fatlnk_v_readlink(struct flnknode *__restrict self,
 			mfile_readall(me->fn_super->fs_dev, buf, disksiz, diskpos);
 			if likely(disksiz >= bufsize)
 				return result;
-			buf = (USER CHECKED char *)((byte_t *)buf + disksiz);
+			buf = (NCX char *)((byte_t *)buf + disksiz);
 			bufsize -= disksiz;
 			filepos += disksiz;
 		}
@@ -912,7 +912,7 @@ fatlnk_v_readlink(struct flnknode *__restrict self,
 
 PRIVATE NONNULL((1)) void KCALL
 fatlnk_v_stat(struct mfile *__restrict self,
-              USER CHECKED struct stat *result)
+              NCX struct stat *result)
 		THROWS(...) {
 	FatLnkNode *me  = flnknode_asfat(self);
 	result->st_size = _atomic64_val(me->mf_filesize) -
@@ -1949,7 +1949,7 @@ fatdir_v_direntchanged(struct fnode *__restrict self,
 /************************************************************************/
 PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
 fat_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-            USER UNCHECKED void *arg, iomode_t mode)
+            NCX UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 	struct fnode *me = mfile_asnode(self);
 	switch (cmd) {
@@ -2052,7 +2052,7 @@ fat_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	default: {
 		BLOCKING NONNULL_T((1)) syscall_slong_t
 		(KCALL *super_ioctl)(struct mfile *__restrict self, ioctl_t cmd,
-		                     USER UNCHECKED void *arg, iomode_t mode)
+		                     NCX UNCHECKED void *arg, iomode_t mode)
 				THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 
 		/* Invoke the super-type's ioctl() operator. */
@@ -2089,7 +2089,7 @@ fat_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 #endif /* NEED_COMPAT_IOCTL_FAT_READDIR */
 PRIVATE NONNULL((1)) void KCALL
 fatdirenum_do_ioctl_readdir(struct fatdirent *__restrict ent,
-                            USER CHECKED struct __fat_dirent *result,
+                            NCX struct __fat_dirent *result,
                             unsigned int flags) {
 	uint8_t usedname_len;
 	char usedname[11 * 2 + 2], *dstptr;
@@ -2129,8 +2129,8 @@ fatdirenum_do_ioctl_readdir(struct fatdirent *__restrict ent,
 	/* Fill in info about the DOS filename. */
 #ifdef NEED_COMPAT_IOCTL_FAT_READDIR
 	if (flags & FATDIRENUM_IOCTL_READDIR_F_COMPAT) {
-		USER CHECKED struct __compat_fat_dirent *compat_result;
-		compat_result = (USER CHECKED struct __compat_fat_dirent *)result;
+		NCX struct __compat_fat_dirent *compat_result;
+		compat_result = (NCX struct __compat_fat_dirent *)result;
 		compat_result[0].d_ino    = 0;
 		compat_result[0].d_off    = 0;
 		compat_result[0].d_reclen = usedname_len;
@@ -2179,7 +2179,7 @@ fatdirenum_do_ioctl_readdir(struct fatdirent *__restrict ent,
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 fatdirenum_ioctl_readdir(struct flatdirenum *__restrict self,
-                         USER CHECKED struct __fat_dirent *result,
+                         NCX struct __fat_dirent *result,
                          unsigned int flags) {
 	pos_t oldpos, real_oldpos;
 	FatDirNode *dir;
@@ -2254,7 +2254,7 @@ next_next_ent:
 
 PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
 fatdirenum_v_ioctl(struct fdirenum *__restrict self, ioctl_t cmd,
-                   USER UNCHECKED void *arg, iomode_t mode)
+                   NCX UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 	struct flatdirenum *me = fdirenum_asflat(self);
 
@@ -2264,9 +2264,9 @@ fatdirenum_v_ioctl(struct fdirenum *__restrict self, ioctl_t cmd,
 	case VFAT_IOCTL_READDIR_BOTH:
 	case VFAT_IOCTL_READDIR_SHORT: {
 		unsigned int flags;
-		USER CHECKED struct __fat_dirent *data;
+		NCX struct __fat_dirent *data;
 		validate_writable(arg, 2 * sizeof(struct __fat_dirent));
-		data = (USER CHECKED struct __fat_dirent *)arg;
+		data = (NCX struct __fat_dirent *)arg;
 		if unlikely(!IO_CANREAD(mode))
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_READ, mode);
 		flags = 0;
@@ -2279,15 +2279,15 @@ fatdirenum_v_ioctl(struct fdirenum *__restrict self, ioctl_t cmd,
 	case _IO_WITHTYPE(VFAT_IOCTL_READDIR_BOTH, struct __compat_fat_dirent[2]):
 	case _IO_WITHTYPE(VFAT_IOCTL_READDIR_SHORT, struct __compat_fat_dirent[2]): {
 		unsigned int flags;
-		USER CHECKED struct __compat_fat_dirent *data;
+		NCX struct __compat_fat_dirent *data;
 		validate_writable(arg, 2 * sizeof(struct __compat_fat_dirent));
-		data = (USER CHECKED struct __compat_fat_dirent *)arg;
+		data = (NCX struct __compat_fat_dirent *)arg;
 		if unlikely(!IO_CANREAD(mode))
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_READ, mode);
 		flags = FATDIRENUM_IOCTL_READDIR_F_COMPAT;
 		if (cmd == _IO_WITHTYPE(VFAT_IOCTL_READDIR_BOTH, struct __compat_fat_dirent[2]))
 			flags = FATDIRENUM_IOCTL_READDIR_F_BOTH | FATDIRENUM_IOCTL_READDIR_F_COMPAT;
-		return fatdirenum_ioctl_readdir(me, (USER CHECKED struct __fat_dirent *)data, flags);
+		return fatdirenum_ioctl_readdir(me, (NCX struct __fat_dirent *)data, flags);
 	}	break;
 #endif /* NEED_COMPAT_IOCTL_FAT_READDIR */
 
@@ -2910,7 +2910,7 @@ fatsuper_v_sync(struct fsuper *__restrict self)
 
 PRIVATE BLOCKING WUNUSED NONNULL((1)) bool KCALL
 fatsuper_v_getlabel(struct fsuper *__restrict self,
-                    USER CHECKED char buf[FSLABEL_MAX])
+                    NCX char buf[FSLABEL_MAX])
 		THROWS(E_IOERROR, E_SEGFAULT, ...) {
 	static_assert(FSLABEL_MAX >= 12);
 	FatSuperblock *me = fsuper_asfat(self);
@@ -2928,7 +2928,7 @@ fatsuper_v_getlabel(struct fsuper *__restrict self,
 
 PRIVATE BLOCKING WUNUSED NONNULL((1)) bool KCALL
 fatsuper_v_setlabel(struct fsuper *__restrict self,
-                    USER CHECKED char const *name, size_t namelen)
+                    NCX char const *name, size_t namelen)
 		THROWS(E_IOERROR, E_FSERROR_READONLY, E_SEGFAULT,
 		       E_INVALID_ARGUMENT_BAD_VALUE, ...) {
 	unsigned int i;
@@ -3149,7 +3149,7 @@ trimspecstring(char *__restrict buf, size_t size) {
 
 PRIVATE WUNUSED NONNULL((1)) struct fsuper *KCALL
 fatfs_open(struct ffilesys *__restrict UNUSED(filesys),
-           struct mfile *dev, UNCHECKED USER char *args) {
+           struct mfile *dev, NCX UNCHECKED char *args) {
 	FatSuperblock *result;
 	FatDiskHeader *disk;
 	u16 sector_size;

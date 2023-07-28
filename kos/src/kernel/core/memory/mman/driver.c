@@ -643,7 +643,7 @@ kernel_locksection_index(struct driver *__restrict UNUSED(self),
 
 PRIVATE WUNUSED NONNULL((1)) REF struct driver_section *FCALL
 kernel_locksection(struct driver *__restrict self,
-                   USER CHECKED char const *section_name) {
+                   NCX char const *section_name) {
 	unsigned int i;
 	for (i = 0; i < KERNEL_SECTIONS_COUNT; ++i) {
 		char const *name;
@@ -686,7 +686,7 @@ PRIVATE struct module_ops const kernel_module_ops = {
 	.mo_free              = (NONNULL_T((1)) void NOTHROW_T(FCALL *)(struct module *__restrict))&driver_free_,  /* Needed for `module_isdriver()' */
 	.mo_destroy           = (typeoffield(struct module_ops, mo_destroy))(void *)-1, /* Must never be called! */
 	.mo_nonodes           = (typeoffield(struct module_ops, mo_nonodes))(void *)-1, /* Must never be called! */
-	.mo_locksection       = (WUNUSED_T NONNULL_T((1)) REF struct module_section *(FCALL *)(struct module *__restrict, USER CHECKED char const *))&kernel_locksection,
+	.mo_locksection       = (WUNUSED_T NONNULL_T((1)) REF struct module_section *(FCALL *)(struct module *__restrict, NCX char const *))&kernel_locksection,
 	.mo_locksection_index = (WUNUSED_T NONNULL_T((1)) REF struct module_section *(FCALL *)(struct module *__restrict, unsigned int))&kernel_locksection_index,
 	.mo_sectinfo          = (WUNUSED_T NONNULL_T((1, 3)) bool (FCALL *)(struct module *__restrict, uintptr_t, struct module_sectinfo *__restrict))&driver_sectinfo,
 	.mo_get_tbase         = (WUNUSED_T NONNULL_T((1)) void const *NOTHROW_T(FCALL *)(struct module *__restrict))&kernel_get_tbase,
@@ -916,7 +916,7 @@ NOTHROW(FCALL driver_next)(struct module *prev) {
  * are interpreted relative to `vfs_kernel' (i.e. are _NOT_ affected by
  * chroot(2)) */
 PUBLIC WUNUSED REF struct driver *FCALL
-driver_fromname(USER CHECKED char const *driver_name)
+driver_fromname(NCX char const *driver_name)
 		THROWS(E_SEGFAULT) {
 	size_t i;
 	REF struct driver *result;
@@ -936,7 +936,7 @@ driver_fromname(USER CHECKED char const *driver_name)
 }
 
 PUBLIC WUNUSED REF struct driver *FCALL
-driver_fromname_with_len(USER CHECKED char const *driver_name,
+driver_fromname_with_len(NCX char const *driver_name,
                          size_t driver_name_len)
 		THROWS(E_SEGFAULT) {
 	size_t i;
@@ -1505,9 +1505,9 @@ PRIVATE NONNULL((1, 2)) void FCALL
 driver_argcash_resolve(struct driver *__restrict self,
                        struct driver_syminfo *__restrict info) {
 	struct driver_argcash_entry *entry;
-	USER CHECKED char const *uname, *unameend;
-	USER CHECKED char const *utype, *utypeend;
-	USER CHECKED char const *udefl, *udeflend;
+	NCX char const *uname, *unameend;
+	NCX char const *utype, *utypeend;
+	NCX char const *udefl, *udeflend;
 	char *kname;
 	uintptr_half_t arg_type;
 	uintptr_half_t arg_size;
@@ -1533,7 +1533,7 @@ driver_argcash_resolve(struct driver *__restrict self,
 	arg_type = DRIVER_ARGCASH_ENTRY_TYPE_PRESENT;
 	arg_size = sizeof(bool);
 	if (utype) {
-		USER CHECKED char const *iter;
+		NCX char const *iter;
 
 		/* Parse the user-type string. */
 		iter     = utype;
@@ -1679,7 +1679,7 @@ PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) bool FCALL
 driver_dlsym_drv(struct driver *__restrict self,
                  struct driver_syminfo *__restrict info)
 		THROWS(E_SEGFAULT, ...) {
-	USER CHECKED char const *name = info->dsi_name + 4;
+	NCX char const *name = info->dsi_name + 4;
 	if (strcmp(name, "self") == 0) {
 		info->dsi_addr = self;
 		info->dsi_size = sizeof(*self);
@@ -1687,7 +1687,7 @@ driver_dlsym_drv(struct driver *__restrict self,
 	}
 	if (name[0] == 'l' && name[1] == 'o' &&
 	    name[2] == 'a' && name[3] == 'd') {
-		USER CHECKED char const *load_name = name + 4;
+		NCX char const *load_name = name + 4;
 		if (strcmp(load_name, "addr") == 0) {
 			info->dsi_addr = (void *)self->d_module.md_loadaddr;
 			goto ok_size0;
@@ -1717,7 +1717,7 @@ driver_dlsym_drv(struct driver *__restrict self,
 		goto ok;
 	}
 	if (name[0] == 'a' && name[1] == 'r' && name[2] == 'g') {
-		USER CHECKED char const *arg_name = name + 3;
+		NCX char const *arg_name = name + 3;
 		if (strcmp(arg_name, "c") == 0) {
 			info->dsi_addr = &self->d_argc;
 			info->dsi_size = sizeof(self->d_argc);
@@ -1744,7 +1744,7 @@ ok:
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) u32 FCALL
-gnu_symhash(USER CHECKED char const *name) THROWS(E_SEGFAULT) {
+gnu_symhash(NCX char const *name) THROWS(E_SEGFAULT) {
 	u32 h = 5381;
 	for (; *name; ++name) {
 		h = h * 33 + (u8)*name;
@@ -1753,7 +1753,7 @@ gnu_symhash(USER CHECKED char const *name) THROWS(E_SEGFAULT) {
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) u32 FCALL
-elf_symhash(USER CHECKED char const *name) THROWS(E_SEGFAULT) {
+elf_symhash(NCX char const *name) THROWS(E_SEGFAULT) {
 	u32 h = 0;
 	while (*name) {
 		u32 g;
@@ -2289,7 +2289,7 @@ driver_dlsym_global(struct driver_syminfo *__restrict info)
  * no such symbol could be found. */
 PUBLIC BLOCKING WUNUSED NONNULL((1)) void *FCALL
 driver_dlsym_local_f(struct driver *__restrict self,
-                     USER CHECKED char const *name)
+                     NCX char const *name)
 		THROWS(E_SEGFAULT, ...) {
 	struct driver_syminfo info;
 	driver_syminfo_init(&info, name);
@@ -2303,7 +2303,7 @@ NOTHROW(FCALL driver_destroy)(struct driver *__restrict self);
 
 PUBLIC BLOCKING WUNUSED NONNULL((1)) void *FCALL
 driver_dlsym_f(struct driver *__restrict self,
-               USER CHECKED char const *name)
+               NCX char const *name)
 		THROWS(E_SEGFAULT, ...) {
 	struct driver_syminfo info;
 	REF struct driver *drv;
@@ -2322,7 +2322,7 @@ again:
 }
 
 PUBLIC BLOCKING WUNUSED void *FCALL
-driver_dlsym_global_f(USER CHECKED char const *name)
+driver_dlsym_global_f(NCX char const *name)
 		THROWS(E_SEGFAULT, ...) {
 	struct driver_syminfo info;
 	REF struct driver *drv;
@@ -2606,7 +2606,7 @@ cannot_cache:
  * function. */
 DEFINE_PUBLIC_ALIAS(unwind_fde_find, libuw_unwind_fde_find);
 INTERN NOBLOCK NONNULL((2)) unwind_errno_t
-NOTHROW_NCX(KCALL libuw_unwind_fde_find)(CHECKED void const *absolute_pc,
+NOTHROW_NCX(KCALL libuw_unwind_fde_find)(VIRT void const *absolute_pc,
                                          unwind_fde_t *__restrict result) {
 	unwind_errno_t error;
 	REF struct driver *d;
@@ -4249,7 +4249,7 @@ again:
 
 PRIVATE WUNUSED NONNULL((1)) REF struct driver_section *FCALL
 driver_locksection(struct driver *__restrict self,
-                   USER CHECKED char const *section_name) {
+                   NCX char const *section_name) {
 	unsigned int i;
 	for (i = 0; i < self->d_shnum; ++i) {
 		char const *name;
@@ -4351,7 +4351,7 @@ PRIVATE struct module_ops const driver_module_ops = {
 	.mo_free              = (NONNULL_T((1)) void NOTHROW_T(FCALL *)(struct module *__restrict))&driver_free_,
 	.mo_destroy           = (NONNULL_T((1)) void NOTHROW_T(FCALL *)(struct module *__restrict))&driver_destroy,
 	.mo_nonodes           = (NONNULL_T((1)) void NOTHROW_T(FCALL *)(struct module *__restrict))&driver_nonodes,
-	.mo_locksection       = (WUNUSED_T NONNULL_T((1)) REF struct module_section *(FCALL *)(struct module *__restrict, USER CHECKED char const *))&driver_locksection,
+	.mo_locksection       = (WUNUSED_T NONNULL_T((1)) REF struct module_section *(FCALL *)(struct module *__restrict, NCX char const *))&driver_locksection,
 	.mo_locksection_index = (WUNUSED_T NONNULL_T((1)) REF struct module_section *(FCALL *)(struct module *__restrict, unsigned int))&driver_locksection_index,
 	.mo_sectinfo          = (WUNUSED_T NONNULL_T((1, 3)) bool (FCALL *)(struct module *__restrict, uintptr_t, struct module_sectinfo *__restrict))&driver_sectinfo,
 	.mo_get_tbase         = (WUNUSED_T NONNULL_T((1)) void const *NOTHROW_T(FCALL *)(struct module *__restrict))&driver_get_tbase,
@@ -4403,7 +4403,7 @@ err_elf_reason:
 
 PRIVATE NONNULL((1)) void FCALL
 driver_init_cmdline(struct driver *__restrict self,
-                    USER CHECKED char const *cmdline)
+                    NCX char const *cmdline)
 		THROWS(E_BADALLOC, E_SEGFAULT, E_WOULDBLOCK) {
 	size_t cmdline_size;
 	char *cmdline_copy;
@@ -4848,7 +4848,7 @@ got_ARM_exidx:
 
 PRIVATE WUNUSED NONNULL((1)) struct mnode *FCALL
 create_mnode_for_phdr(ElfW(Phdr) const *__restrict phdr,
-                      USER CHECKED byte_t const *base, size_t num_bytes,
+                      NCX byte_t const *base, size_t num_bytes,
                       struct path *drv_fspath, struct fdirent *drv_fsname)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT) {
 	struct mnode *node;
@@ -4966,10 +4966,10 @@ create_mnode_for_phdr(ElfW(Phdr) const *__restrict phdr,
  * loaded driver that matches the `DT_SONAME' attribute found within
  * the given data-blob) */
 PRIVATE BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
-driver_create(USER CHECKED byte_t const *base, size_t num_bytes,
+driver_create(NCX byte_t const *base, size_t num_bytes,
               struct mfile *drv_file, struct path *drv_fspath,
               struct fdirent *drv_fsname,
-              USER CHECKED char const *drv_cmdline,
+              NCX char const *drv_cmdline,
               bool *pnew_driver_loaded)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_IOERROR, E_NOT_EXECUTABLE, ...) {
 	REF struct driver *result;
@@ -5513,7 +5513,7 @@ PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
 driver_loadmod_file(struct mfile *__restrict driver_file,
                     struct path *driver_path,
                     struct fdirent *driver_dentry,
-                    USER CHECKED char const *driver_cmdline,
+                    NCX char const *driver_cmdline,
                     bool *pnew_driver_loaded)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR, ...) {
 	REF struct driver *result;
@@ -5568,14 +5568,14 @@ driver_loadmod_file(struct mfile *__restrict driver_file,
 }
 
 PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED ATTR_INS(1, 2) REF struct driver *KCALL
-driver_loadmod_blob(USER CHECKED void const *base, size_t num_bytes,
-                    USER CHECKED char const *driver_cmdline,
+driver_loadmod_blob(NCX void const *base, size_t num_bytes,
+                    NCX char const *driver_cmdline,
                     bool *pnew_driver_loaded)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR, ...) {
 	REF struct driver *result;
 
 	/* Try to create a driver from the given blob. */
-	result = driver_create((USER CHECKED byte_t const *)base,
+	result = driver_create((NCX byte_t const *)base,
 	                       num_bytes, NULL, NULL, NULL,
 	                       driver_cmdline, pnew_driver_loaded);
 	return result;
@@ -5583,8 +5583,8 @@ driver_loadmod_blob(USER CHECKED void const *base, size_t num_bytes,
 
 /* Load a driver, given its filename. */
 PRIVATE BLOCKING ATTR_RETNONNULL WUNUSED REF struct driver *KCALL
-driver_loadmod_filename(USER CHECKED char const *driver_filename,
-                        USER CHECKED char const *driver_cmdline,
+driver_loadmod_filename(NCX char const *driver_filename,
+                        NCX char const *driver_cmdline,
                         bool *pnew_driver_loaded)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_FSERROR, E_IOERROR, ...) {
 	REF struct driver *result;
@@ -5611,14 +5611,14 @@ driver_loadmod_filename(USER CHECKED char const *driver_filename,
 
 
 struct path_segment {
-	USER CHECKED char const *ps_base; /* Segment base */
+	NCX char const *ps_base; /* Segment base */
 	size_t                   ps_size; /* Segment length */
 };
 
 /* Extract the last segment from `path', and update
  * `*p_pathlen'  to point at the preceding segment. */
 PRIVATE WUNUSED NONNULL((2, 3)) bool KCALL
-path_get_last_segment_raw(USER CHECKED char const *path,
+path_get_last_segment_raw(NCX char const *path,
                           size_t *__restrict p_pathlen,
                           struct path_segment *__restrict result)
 		THROWS(E_SEGFAULT) {
@@ -5642,7 +5642,7 @@ path_get_last_segment_raw(USER CHECKED char const *path,
 }
 
 PRIVATE WUNUSED NONNULL((2, 3)) bool KCALL
-path_get_last_segment(USER CHECKED char const *path,
+path_get_last_segment(NCX char const *path,
                       size_t *__restrict p_pathlen,
                       struct path_segment *__restrict result)
 		THROWS(E_SEGFAULT) {
@@ -5669,7 +5669,7 @@ again:
 /* Check if the given `pth' equals `pth_str...pth_len' */
 PRIVATE WUNUSED NONNULL((1)) bool KCALL
 path_equals_string(struct path *__restrict pth,
-                   USER CHECKED char const *pth_str,
+                   NCX char const *pth_str,
                    size_t pth_len)
 		THROWS(E_SEGFAULT) {
 	bool path_is_root = false;
@@ -5697,7 +5697,7 @@ nope:
 
 
 PUBLIC WUNUSED REF struct driver *FCALL
-driver_fromfilename(USER CHECKED char const *driver_filename)
+driver_fromfilename(NCX char const *driver_filename)
 		THROWS(E_SEGFAULT) {
 	REF struct driver *result;
 	REF struct driver_loadlist *ll;
@@ -5734,7 +5734,7 @@ driver_fromfilename(USER CHECKED char const *driver_filename)
 }
 
 PUBLIC WUNUSED REF struct driver *FCALL
-driver_fromfilename_with_len(USER CHECKED char const *driver_filename,
+driver_fromfilename_with_len(NCX char const *driver_filename,
                              size_t driver_filename_len)
 		THROWS(E_SEGFAULT) {
 	REF struct driver *result;
@@ -5778,8 +5778,8 @@ driver_fromfilename_with_len(USER CHECKED char const *driver_filename,
 
 PRIVATE BLOCKING WUNUSED REF struct driver *KCALL
 driver_loadmod_file_in_path(char const *__restrict path, size_t pathlen,
-                            USER CHECKED char const *driver_name, size_t driver_namelen,
-                            USER CHECKED char const *driver_cmdline,
+                            NCX char const *driver_name, size_t driver_namelen,
+                            NCX char const *driver_cmdline,
                             bool *pnew_driver_loaded,
                             bool create_new_drivers)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_FSERROR, E_IOERROR, ...) {
@@ -5813,8 +5813,8 @@ driver_loadmod_file_in_path(char const *__restrict path, size_t pathlen,
 
 PRIVATE BLOCKING WUNUSED REF struct driver *KCALL
 driver_loadmod_file_with_path(struct driver_libpath_struct *__restrict lp,
-                              USER CHECKED char const *driver_name,
-                              USER CHECKED char const *driver_cmdline,
+                              NCX char const *driver_name,
+                              NCX char const *driver_cmdline,
                               bool *pnew_driver_loaded,
                               bool create_new_drivers)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_FSERROR, E_IOERROR, ...) {
@@ -5848,8 +5848,8 @@ driver_loadmod_file_with_path(struct driver_libpath_struct *__restrict lp,
 
 /* Load a driver, given its name. */
 PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct driver *KCALL
-driver_loadmod(USER CHECKED char const *driver_name,
-               USER CHECKED char const *driver_cmdline,
+driver_loadmod(NCX char const *driver_name,
+               NCX char const *driver_cmdline,
                bool *pnew_driver_loaded)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_FSERROR, E_IOERROR, ...) {
 	REF struct driver *result;
@@ -5908,7 +5908,7 @@ PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
 driver_insmod_file(struct mfile *__restrict driver_file,
                    struct path *driver_path,
                    struct fdirent *driver_dentry,
-                   USER CHECKED char const *driver_cmdline,
+                   NCX char const *driver_cmdline,
                    bool *pnew_driver_loaded)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR, ...) {
 	REF struct driver *result;
@@ -5924,8 +5924,8 @@ driver_insmod_file(struct mfile *__restrict driver_file,
 }
 
 PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED ATTR_INS(1, 2) REF struct driver *KCALL
-driver_insmod_blob(USER CHECKED void const *base, size_t num_bytes,
-                   USER CHECKED char const *driver_cmdline,
+driver_insmod_blob(NCX void const *base, size_t num_bytes,
+                   NCX char const *driver_cmdline,
                    bool *pnew_driver_loaded)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR, ...) {
 	REF struct driver *result;
@@ -5942,8 +5942,8 @@ driver_insmod_blob(USER CHECKED void const *base, size_t num_bytes,
 }
 
 PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct driver *KCALL
-driver_insmod(USER CHECKED char const *driver_name,
-              USER CHECKED char const *driver_cmdline,
+driver_insmod(NCX char const *driver_name,
+              NCX char const *driver_cmdline,
               bool *pnew_driver_loaded)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_FSERROR, E_IOERROR, ...) {
 	REF struct driver *result;
@@ -6117,7 +6117,7 @@ success:
  * @param: flags: Set of `DRIVER_DELMOD_F_*'
  * @return: * :   One of `DRIVER_DELMOD_ST_*' */
 PUBLIC BLOCKING unsigned int FCALL
-driver_delmod(USER CHECKED char const *driver_name,
+driver_delmod(NCX char const *driver_name,
               unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	unsigned int result;

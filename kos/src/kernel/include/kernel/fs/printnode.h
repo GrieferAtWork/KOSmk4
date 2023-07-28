@@ -171,10 +171,10 @@ struct printnode
 #define printnode_v_ioctl   fregnode_v_ioctl
 FUNDEF NONNULL((1)) void KCALL /* Writes `0' into `st_size' and `st_blocks' */
 printnode_v_stat(struct mfile *__restrict self,
-                 USER CHECKED struct stat *result)
+                 NCX struct stat *result)
 		THROWS(E_SEGFAULT);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL /* Populates `dst' via `pno_print' */
-printnode_v_pread(struct mfile *__restrict self, USER CHECKED void *dst,
+printnode_v_pread(struct mfile *__restrict self, NCX void *dst,
                   size_t num_bytes, pos_t addr, iomode_t mode)
 		THROWS(E_SEGFAULT, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL

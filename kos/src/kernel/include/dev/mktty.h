@@ -68,7 +68,7 @@ struct mkttydev
 	REF void       *mtd_ohandle_ptr; /* [1..1][const] Output handle pointer. */
 
 	/* [1..1][const] Input handle read operator callback. */
-	size_t (KCALL *mtd_ihandle_read)(void *__restrict ptr, USER CHECKED void *dst,
+	size_t (KCALL *mtd_ihandle_read)(void *__restrict ptr, NCX void *dst,
 	                                 size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
 
 	/* [1..1][const] Input handle poll-connect operator callback. */
@@ -78,7 +78,7 @@ struct mkttydev
 	poll_mode_t (KCALL *mtd_ihandle_polltest)(void *__restrict ptr, poll_mode_t what) /*THROWS(...)*/;
 
 	/* [1..1][const] Output handle write operator callback. */
-	size_t (KCALL *mtd_ohandle_write)(void *__restrict ptr, USER CHECKED void const *src,
+	size_t (KCALL *mtd_ohandle_write)(void *__restrict ptr, NCX void const *src,
 	                                  size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
 };
 
@@ -109,7 +109,7 @@ DATDEF struct ttydev_ops const mkttydev_ops;
 FUNDEF ATTR_RETNONNULL REF struct mkttydev *KCALL
 mkttydev_new(uintptr_half_t ihandle_typ, void *ihandle_ptr,
              uintptr_half_t ohandle_typ, void *ohandle_ptr,
-             USER CHECKED char const *name, size_t namelen)
+             NCX char const *name, size_t namelen)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 
 /* Start/Stop forwarding  input  handle  data  on  the  given  TTY

@@ -91,7 +91,7 @@ LOCAL NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(FCALL log_userexcept_error_propagate)(struct icpustate const *__restrict state,
                                               struct rpc_syscall_info const *__restrict sc_info,
                                               struct exception_data const *__restrict error,
-                                              uintptr_t mode, USER void *handler, USER void *stack) {
+                                              uintptr_t mode, NCX void *handler, NCX void *stack) {
 	unsigned int pointer_count = EXCEPTION_DATA_POINTERS;
 	char const *name;
 	(void)state;
@@ -157,10 +157,10 @@ userexcept_callhandler(struct icpustate *__restrict state,
 {
 	/* Call a 32-bit exception handler. */
 	uintptr_t mode;
-	USER CHECKED byte_t *stack;
-	USER CHECKED __except_handler32_t handler;
-	USER CHECKED struct kcpustate32 *user_state;
-	USER CHECKED struct __exception_data32 *user_error;
+	NCX byte_t *stack;
+	NCX __except_handler32_t handler;
+	NCX struct kcpustate32 *user_state;
+	NCX struct __exception_data32 *user_error;
 	unsigned int i;
 
 	/* Call the user-space exception handler */
@@ -236,10 +236,10 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 		THROWS(E_SEGFAULT) {
 	/* Call a 64-bit exception handler. */
 	uintptr_t mode;
-	USER CHECKED void *stack;
-	USER CHECKED __except_handler64_t handler;
-	USER CHECKED struct kcpustate64 *user_state;
-	USER CHECKED struct __exception_data64 *user_error;
+	NCX void *stack;
+	NCX __except_handler64_t handler;
+	NCX struct kcpustate64 *user_state;
+	NCX struct __exception_data64 *user_error;
 	unsigned int i;
 	/* Call the user-space exception handler */
 	mode = PERTASK_GET(this_user_except_handler.ueh_mode);

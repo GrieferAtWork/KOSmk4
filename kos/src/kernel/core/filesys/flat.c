@@ -1764,7 +1764,7 @@ again_locked:
 }
 
 PUBLIC BLOCKING NONNULL((1)) size_t KCALL
-flatdirenum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+flatdirenum_v_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                       size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_BADALLOC, E_WOULDBLOCK, E_IOERROR, ...) {
 	ssize_t result;

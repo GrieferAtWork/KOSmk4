@@ -41,7 +41,7 @@ DECL_BEGIN
  * This function is used by various APIs related to file lookup.
  * @throw: E_SEGFAULT: Failed to access the given `text'. */
 PUBLIC ATTR_PURE WUNUSED uintptr_t FCALL
-fdirent_hash(CHECKED USER /*utf-8*/ char const *text, u16 textlen)
+fdirent_hash(NCX /*utf-8*/ char const *text, u16 textlen)
 		THROWS(E_SEGFAULT) {
 	/* !!! Changes to this algorithm must be mirrored in `/kos/misc/libgen/fdirent_hash.dee' */
 	uintptr_t hash = FDIRENT_EMPTY_HASH;
@@ -97,7 +97,7 @@ DEFINE_HANDLE_REFCNT_FUNCTIONS(dirent, struct fdirent);
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_dirent_pread(struct fdirent *__restrict self,
-                    USER CHECKED void *dst, size_t num_bytes,
+                    NCX void *dst, size_t num_bytes,
                     pos_t addr, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT) {
 	size_t avail;
@@ -135,7 +135,7 @@ handle_dirent_preadv(struct fdirent *__restrict self,
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_dirent_readdir(struct fdirent *__restrict self,
-                      USER CHECKED struct dirent *buf, size_t bufsize,
+                      NCX struct dirent *buf, size_t bufsize,
                       readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT) {
 	ssize_t result;
@@ -149,7 +149,7 @@ handle_dirent_readdir(struct fdirent *__restrict self,
 
 INTERN NONNULL((1)) void KCALL
 handle_dirent_stat(struct fdirent *__restrict self,
-                   USER CHECKED struct stat *result)
+                   NCX struct stat *result)
 		THROWS(E_SEGFAULT) {
 	bzero(result, sizeof(*result));
 	/* NOTE: In this case, we can't invoke the `fdo_getino' operator... :( */

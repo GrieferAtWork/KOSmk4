@@ -202,7 +202,7 @@ NOTHROW(FCALL inplace_swap_fpustate_variant)(struct fpustate *__restrict state) 
  * If no FPU state had yet to be allocated when `fpustate_loadfrom()' is called,
  * a new state will be allocated before returning. */
 PUBLIC NOBLOCK void KCALL
-fpustate_loadfrom(USER CHECKED struct fpustate const *state)
+fpustate_loadfrom(NCX struct fpustate const *state)
 		THROWS(E_SEGFAULT, E_BADALLOC) {
 	struct fpustate *mystate;
 	mystate = PERTASK_GET(this_fpustate);
@@ -238,7 +238,7 @@ fpustate_loadfrom(USER CHECKED struct fpustate const *state)
 }
 
 PUBLIC NOBLOCK void KCALL
-fpustate_saveinto(USER CHECKED struct fpustate *state)
+fpustate_saveinto(NCX struct fpustate *state)
 		THROWS(E_SEGFAULT) {
 	struct fpustate *mystate;
 	if (!PERTASK_TEST(this_fpustate)) {
@@ -262,7 +262,7 @@ fpustate_saveinto(USER CHECKED struct fpustate *state)
 
 #ifdef __x86_64__
 PUBLIC NOBLOCK void KCALL
-fpustate32_loadfrom(USER CHECKED struct fpustate32 const *state)
+fpustate32_loadfrom(NCX struct fpustate32 const *state)
 		THROWS(E_SEGFAULT, E_BADALLOC) {
 	struct fpustate fst;
 	if (fpustate32_isssave(state)) {
@@ -276,7 +276,7 @@ fpustate32_loadfrom(USER CHECKED struct fpustate32 const *state)
 }
 
 PUBLIC NOBLOCK void KCALL
-fpustate32_saveinto(USER CHECKED struct fpustate32 *state)
+fpustate32_saveinto(NCX struct fpustate32 *state)
 		THROWS(E_SEGFAULT) {
 	struct fpustate fst;
 	fpustate_saveinto(&fst);

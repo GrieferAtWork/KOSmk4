@@ -78,14 +78,14 @@ NOTHROW(FCALL mman_unlockinfo_cb)(struct unlockinfo *__restrict self) {
 #define LOCAL_elfW elfW
 DEFINE_SYSCALL5(void *, maplibrary,
                 void *, addr, syscall_ulong_t, flags, fd_t, fd,
-                USER UNCHECKED ElfW(Phdr) const *, hdrv, size_t, hdrc)
+                NCX UNCHECKED ElfW(Phdr) const *, hdrv, size_t, hdrc)
 #elif defined(DEFINE_compat_sys_maplibrary)
 #define LOCAL_ELFW COMPAT_ELFW
 #define LOCAL_ElfW COMPAT_ElfW
 #define LOCAL_elfW COMPAT_elfW
 DEFINE_COMPAT_SYSCALL5(void *, maplibrary,
                        void *, addr, syscall_ulong_t, flags, fd_t, fd,
-                       USER UNCHECKED COMPAT_ElfW(Phdr) const *, hdrv, size_t, hdrc)
+                       NCX UNCHECKED COMPAT_ElfW(Phdr) const *, hdrv, size_t, hdrc)
 #else /* ... */
 #error "Invalid configuration"
 #endif /* !... */

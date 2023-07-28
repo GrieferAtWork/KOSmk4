@@ -156,7 +156,7 @@ PRIVATE void CC libservice_close(void) THROWS(...) {
 }
 
 PRIVATE ATTR_MALLOC WUNUSED char *
-NOTHROW_RPC(CC realpath_s_malloc)(USER char const *filename) {
+NOTHROW_RPC(CC realpath_s_malloc)(NCX char const *filename) {
 	char *resolved, *buffer;
 	ssize_t result;
 	size_t bufsize;
@@ -244,7 +244,7 @@ NOTHROW(CC get_service_module_format)(void) {
 
 
 PRIVATE WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
-DlModule_OpenService(USER char const *filename, unsigned int mode) THROWS(E_SEGFAULT, ...) {
+DlModule_OpenService(NCX char const *filename, unsigned int mode) THROWS(E_SEGFAULT, ...) {
 	struct dl_service_module *result;
 	DlModule *mod;
 	result = (struct dl_service_module *)malloc(sizeof(struct dl_service_module));
@@ -434,7 +434,7 @@ err:
 }
 
 INTERN WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
-DlModule_OpenFilename(USER char const *filename,
+DlModule_OpenFilename(NCX char const *filename,
                       unsigned int mode)
 		THROWS(E_SEGFAULT, ...) {
 	fd_t fd;
@@ -490,7 +490,7 @@ NOTHROW_NCX(CC dynstring_append)(struct dynstring *__restrict self,
 
 PRIVATE WUNUSED ATTR_NOINLINE NONNULL((1, 3)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
 DlModule_OpenFilenameInPathWithDollar(char const *__restrict path, size_t pathlen,
-                                      USER char const *filename, size_t filenamelen,
+                                      NCX char const *filename, size_t filenamelen,
                                       unsigned int mode, char const *origin_filename)
 		THROWS(E_SEGFAULT, ...) {
 	DlModule *result = NULL;
@@ -592,7 +592,7 @@ done:
 
 INTERN WUNUSED ATTR_NOINLINE NONNULL((1, 3)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
 DlModule_OpenFilenameInPath(char const *__restrict path, size_t pathlen,
-                            USER char const *filename, size_t filenamelen,
+                            NCX char const *filename, size_t filenamelen,
                             unsigned int mode, char const *origin_filename)
 		THROWS(E_SEGFAULT, ...) {
 	char *buf;
@@ -630,7 +630,7 @@ DlModule_OpenFilenameInPath(char const *__restrict path, size_t pathlen,
 
 INTERN WUNUSED ATTR_NOINLINE NONNULL((1, 3)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *
 NOTHROW_NCX(CC DlModule_FindFilenameInPathFromAll)(char const *__restrict path, size_t pathlen,
-                                                   USER char const *filename, size_t filenamelen)
+                                                   NCX char const *filename, size_t filenamelen)
 		THROWS(E_SEGFAULT) {
 	char *buf;
 	REF DlModule *result;
@@ -651,7 +651,7 @@ NOTHROW_NCX(CC DlModule_FindFilenameInPathFromAll)(char const *__restrict path, 
 }
 
 INTERN WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *
-NOTHROW_NCX(CC DlModule_FindFilenameInPathListFromAll)(USER char const *filename)
+NOTHROW_NCX(CC DlModule_FindFilenameInPathListFromAll)(NCX char const *filename)
 		THROWS(E_SEGFAULT) {
 	REF DlModule *result;
 	char const *sep;
@@ -688,7 +688,7 @@ NOTHROW_NCX(CC DlModule_FindFilenameInPathListFromAll)(USER char const *filename
 /*[[[end]]]*/
 
 INTERN WUNUSED NONNULL((1, 2)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
-DlModule_OpenFilenameInPathList(char const *__restrict path, USER char const *filename,
+DlModule_OpenFilenameInPathList(char const *__restrict path, NCX char const *filename,
                                 unsigned int mode, char const *origin_filename)
 		THROWS(E_SEGFAULT, ...) {
 	REF DlModule *result;
@@ -1124,7 +1124,7 @@ err:
 /* Find  the  DL   module  mapping   the  specified   file.
  * If no such module is loaded, `NULL' is returned instead. */
 INTERN WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *
-NOTHROW_NCX(CC DlModule_FindFromFilename)(USER char const *filename)
+NOTHROW_NCX(CC DlModule_FindFromFilename)(NCX char const *filename)
 		THROWS(E_SEGFAULT) {
 	REF DlModule *result;
 	dlglobals_all_read(&dl_globals);

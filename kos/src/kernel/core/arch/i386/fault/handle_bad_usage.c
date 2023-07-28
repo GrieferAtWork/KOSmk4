@@ -1454,7 +1454,7 @@ NOTHROW(KCALL cpuid)(struct icpustate *__restrict state) {
 #define DEFINE_DO_ATOMIC_CMPXCH(bwlq, Nbits)                                 \
 	PRIVATE NONNULL((1)) u##Nbits KCALL                                      \
 	do_atomic_cmpxch##bwlq(struct icpustate **__restrict pstate,             \
-	                       USER CHECKED u##Nbits *addr, u##Nbits oldval,     \
+	                       NCX u##Nbits *addr, u##Nbits oldval,     \
 	                       u##Nbits newval, bool force_atomic)               \
 			THROWS(E_SEGFAULT) {                                             \
 		u##Nbits result;                                                     \
@@ -1476,7 +1476,7 @@ NOTHROW(KCALL cpuid)(struct icpustate *__restrict state) {
 #define DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(bwlq, Nbits)                               \
 	PRIVATE NONNULL((1)) bool KCALL                                                 \
 	do_atomic_cmpxch##bwlq##_or_write(struct icpustate **__restrict pstate,         \
-	                                  USER CHECKED u##Nbits *addr, u##Nbits oldval, \
+	                                  NCX u##Nbits *addr, u##Nbits oldval, \
 	                                  u##Nbits newval, bool force_atomic)           \
 			THROWS(E_SEGFAULT) {                                                    \
 		u##Nbits result;                                                            \
@@ -1502,7 +1502,7 @@ NOTHROW(KCALL cpuid)(struct icpustate *__restrict state) {
 	do_atomic_cmpxchx((struct icpustate **)&_state, (uint128_t *)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) uint128_t KCALL
 do_atomic_cmpxchx(struct icpustate **__restrict pstate,
-                  USER CHECKED uint128_t *addr, uint128_t oldval,
+                  NCX uint128_t *addr, uint128_t oldval,
                   uint128_t newval, bool force_atomic)
 		THROWS(E_SEGFAULT) {
 	uint128_t result;

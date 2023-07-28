@@ -204,9 +204,9 @@ NOTHROW(FCALL module_section_getname_nx)(struct module_section *__restrict self)
 	return result;
 }
 
-PUBLIC WUNUSED NONNULL((1)) USER CHECKED byte_t *
+PUBLIC WUNUSED NONNULL((1)) NCX byte_t *
 NOTHROW(FCALL module_section_getaddr_nx)(struct module_section *__restrict self) {
-	USER CHECKED byte_t *result;
+	NCX byte_t *result;
 	NESTED_TRY {
 		result = module_section_getaddr(self);
 	} EXCEPT {
@@ -386,7 +386,7 @@ NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(WEAK REF struct module *_
  * inspected in order to check if a module has been loaded to that location.
  * If no module exists at `addr', return `NULL'. */
 PUBLIC BLOCKING WUNUSED REF struct module *FCALL
-module_fromaddr(USER CHECKED void const *addr) {
+module_fromaddr(NCX void const *addr) {
 #ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 	if (ADDR_ISUSER(addr))
 		return uem_fromaddr(CURRENT_MMAN, addr);
@@ -400,7 +400,7 @@ module_fromaddr(USER CHECKED void const *addr) {
  * that  `return->md_loadstart >= addr'. If no  such module exists, simply
  * return `NULL' instead. */
 PUBLIC BLOCKING WUNUSED REF struct module *FCALL
-module_aboveaddr(USER CHECKED void const *addr) {
+module_aboveaddr(NCX void const *addr) {
 #ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 #ifdef KERNELSPACE_HIGHMEM
 	if (ADDR_ISUSER(addr)) {
@@ -410,7 +410,7 @@ module_aboveaddr(USER CHECKED void const *addr) {
 			return result;
 
 		/* Fallthru to find the first kernel-space module... */
-		addr = (USER CHECKED void *)KERNELSPACE_BASE;
+		addr = (NCX void *)KERNELSPACE_BASE;
 	}
 	return driver_aboveaddr(addr);
 #else /* KERNELSPACE_HIGHMEM */
@@ -445,7 +445,7 @@ module_next(struct module *prev) {
 			return result;
 
 		/* Find the first kernel-space module. */
-		return module_aboveaddr((USER CHECKED void *)KERNELSPACE_BASE);
+		return module_aboveaddr((NCX void *)KERNELSPACE_BASE);
 #else /* KERNELSPACE_HIGHMEM */
 		/* User-space exists in high memory, so the
 		 * last  module has to be a UserELF module. */
@@ -479,7 +479,7 @@ module_next(struct module *prev) {
 DEFINE_PUBLIC_ALIAS(module_fromaddr_nx, module_fromaddr);
 #else /* _MODULE_FROMADDR_IS_NOTHROW */
 PUBLIC BLOCKING WUNUSED REF struct module *
-NOTHROW(FCALL module_fromaddr_nx)(USER CHECKED void const *addr) {
+NOTHROW(FCALL module_fromaddr_nx)(VIRT void const *addr) {
 	REF struct module *result;
 	NESTED_TRY {
 		result = module_fromaddr(addr);
@@ -494,7 +494,7 @@ NOTHROW(FCALL module_fromaddr_nx)(USER CHECKED void const *addr) {
 DEFINE_PUBLIC_ALIAS(module_aboveaddr_nx, module_aboveaddr);
 #else /* _MODULE_ABOVEADDR_IS_NOTHROW */
 PUBLIC BLOCKING WUNUSED REF struct module *
-NOTHROW(FCALL module_aboveaddr_nx)(USER CHECKED void const *addr) {
+NOTHROW(FCALL module_aboveaddr_nx)(NCX void const *addr) {
 	REF struct module *result;
 	NESTED_TRY {
 		result = module_aboveaddr(addr);
@@ -528,7 +528,7 @@ NOTHROW(FCALL module_next_nx)(struct module *prev) {
 #ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL
 mman_module_fromaddr(struct mman *__restrict self,
-                     USER CHECKED void const *addr) {
+                     NCX void const *addr) {
 	if (self == &mman_kernel)
 		return driver_fromaddr(addr);
 #ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
@@ -540,7 +540,7 @@ mman_module_fromaddr(struct mman *__restrict self,
 
 PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL
 mman_module_aboveaddr(struct mman *__restrict self,
-                      USER CHECKED void const *addr) {
+                      NCX void const *addr) {
 	if (self == &mman_kernel)
 		return driver_aboveaddr(addr);
 #ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
@@ -563,7 +563,7 @@ mman_module_next(struct mman *__restrict self, struct module *prev) {
 
 PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *
 NOTHROW(FCALL mman_module_fromaddr_nx)(struct mman *__restrict self,
-                                       USER CHECKED void const *addr) {
+                                       NCX void const *addr) {
 	REF struct module *result;
 	NESTED_TRY {
 		result = mman_module_fromaddr(self, addr);
@@ -575,7 +575,7 @@ NOTHROW(FCALL mman_module_fromaddr_nx)(struct mman *__restrict self,
 
 PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *
 NOTHROW(FCALL mman_module_aboveaddr_nx)(struct mman *__restrict self,
-                                        USER CHECKED void const *addr) {
+                                        NCX void const *addr) {
 	REF struct module *result;
 	NESTED_TRY {
 		result = mman_module_aboveaddr(self, addr);
@@ -600,14 +600,14 @@ NOTHROW(FCALL mman_module_next_nx)(struct mman *__restrict self,
 #else /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL
 mman_module_fromaddr(struct mman *__restrict self,
-                     USER CHECKED void const *addr) {
+                     NCX void const *addr) {
 	if (self == &mman_kernel)
 		return driver_fromaddr(addr);
 	return NULL;
 }
 PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL
 mman_module_aboveaddr(struct mman *__restrict self,
-                      USER CHECKED void const *addr) {
+                      NCX void const *addr) {
 	if (self == &mman_kernel)
 		return driver_aboveaddr(addr);
 	return NULL;
@@ -628,8 +628,8 @@ DEFINE_PUBLIC_ALIAS(mman_module_next_nx, mman_module_next);
 
 #ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 LOCAL NONNULL((1, 5, 7)) unwind_errno_t KCALL
-unwind_userspace_with_section(struct module *__restrict mod, CHECKED void const *absolute_pc,
-                              CHECKED byte_t const *eh_frame_data, size_t eh_frame_size,
+unwind_userspace_with_section(struct module *__restrict mod, VIRT void const *absolute_pc,
+                              NCX byte_t const *eh_frame_data, size_t eh_frame_size,
                               unwind_getreg_t reg_getter, void const *reg_getter_arg,
                               unwind_setreg_t reg_setter, void *reg_setter_arg,
                               bool is_debug_frame) {
@@ -688,7 +688,7 @@ unwind_userspace_with_section(struct module *__restrict mod, CHECKED void const 
 }
 
 PRIVATE BLOCKING ATTR_NOINLINE NONNULL((2, 4)) unwind_errno_t LIBUNWIND_CC
-unwind_userspace(CHECKED void const *absolute_pc,
+unwind_userspace(VIRT void const *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	/* Unwind a user-space location. */
@@ -720,7 +720,7 @@ unwind_userspace(CHECKED void const *absolute_pc,
 		/* Search for the `.eh_frame' and `.debug_frame' sections. */
 		for (i = 0; i < 2; ++i) {
 			size_t size;
-			CHECKED byte_t const *data;
+			NCX byte_t const *data;
 			REF struct module_section *sect;
 			static char const section_names[][16] = { ".eh_frame", ".debug_frame" };
 			if ((sect = module_locksection(mod, section_names[i])) == NULL)
@@ -758,7 +758,7 @@ unwind_userspace(CHECKED void const *absolute_pc,
 
 
 PUBLIC BLOCKING NONNULL((2, 4)) unwind_errno_t LIBDEBUGINFO_CC
-unwind_for_debug(CHECKED void const *absolute_pc,
+unwind_for_debug(VIRT void const *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	unwind_errno_t result;
@@ -780,7 +780,7 @@ unwind_for_debug(CHECKED void const *absolute_pc,
 }
 #else /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 PUBLIC NONNULL((2, 4)) unwind_errno_t LIBDEBUGINFO_CC
-unwind_for_debug(CHECKED void const *absolute_pc,
+unwind_for_debug(VIRT void const *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	/* Use the normal unwind(3) to implement unwind_for_debug(3) */

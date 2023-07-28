@@ -130,14 +130,14 @@ struct mousedev
 #define mousedev_v_wrattr  chrdev_v_wrattr
 #define mousedev_v_tryas   chrdev_v_tryas
 FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This read operator is _MANDATORY_ and may not be overwritten by sub-classes! */
-mousedev_v_read(struct mfile *__restrict self, USER CHECKED void *dst,
+mousedev_v_read(struct mfile *__restrict self, NCX void *dst,
                 size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
 mousedev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-                 USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+                 NCX UNCHECKED void *arg, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) void KCALL
 mousedev_v_stat(struct mfile *__restrict self,
-                USER CHECKED struct stat *result) THROWS(...);
+                NCX struct stat *result) THROWS(...);
 FUNDEF NONNULL((1)) void KCALL
 mousedev_v_pollconnect(struct mfile *__restrict self,
                        poll_mode_t what) THROWS(...);

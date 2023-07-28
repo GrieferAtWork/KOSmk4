@@ -32,7 +32,7 @@
 DECL_BEGIN
 
 PUBLIC ATTR_COLDTEXT ATTR_COLD ATTR_NORETURN void FCALL
-except_throw_unmapped_user_rd(UNCHECKED USER void const *addr)
+except_throw_unmapped_user_rd(NCX UNCHECKED void const *addr)
 		THROWS(E_SEGFAULT_UNMAPPED) {
 	uintptr_t flags = E_SEGFAULT_CONTEXT_USERCODE;
 #ifdef ADDR_IS_NONCANON
@@ -43,7 +43,7 @@ except_throw_unmapped_user_rd(UNCHECKED USER void const *addr)
 }
 
 PUBLIC ATTR_COLDTEXT ATTR_COLD ATTR_NORETURN void FCALL
-except_throw_unmapped_user_wr(UNCHECKED USER void const *addr)
+except_throw_unmapped_user_wr(NCX UNCHECKED void const *addr)
 		THROWS(E_SEGFAULT_UNMAPPED) {
 	uintptr_t flags = E_SEGFAULT_CONTEXT_USERCODE | E_SEGFAULT_CONTEXT_WRITING;
 #ifdef ADDR_IS_NONCANON
@@ -54,7 +54,7 @@ except_throw_unmapped_user_wr(UNCHECKED USER void const *addr)
 }
 
 PUBLIC ATTR_COLDTEXT ATTR_COLD ATTR_NORETURN void FCALL
-except_throw_noexec_user(UNCHECKED USER void const *addr)
+except_throw_noexec_user(NCX UNCHECKED void const *addr)
 		THROWS(E_SEGFAULT_NOTEXECUTABLE) {
 	uintptr_t flags = E_SEGFAULT_CONTEXT_USERCODE;
 #ifdef ADDR_IS_NONCANON
@@ -72,22 +72,22 @@ except_throw_noexec_user(UNCHECKED USER void const *addr)
  * In order words: If  the  user passes  a pointer  that  is part  of kernel-space,
  *                 these functions are used to deny the user access to such memory.
  * @throw E_SEGFAULT: User-space has not been granted access to the given address range. */
-PUBLIC USER CHECKED void const *FCALL
-validate_readableaddr(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT) {
+PUBLIC NCX void const *FCALL
+validate_readableaddr(NCX UNCHECKED void const *addr) THROWS(E_SEGFAULT) {
 	if unlikely(!ADDR_ISUSER(addr))
 		except_throw_unmapped_user_rd(addr);
 	return addr;
 }
 
-PUBLIC USER CHECKED void *FCALL
-validate_writableaddr(UNCHECKED USER void *addr) THROWS(E_SEGFAULT) {
+PUBLIC NCX void *FCALL
+validate_writableaddr(NCX UNCHECKED void *addr) THROWS(E_SEGFAULT) {
 	if unlikely(!_ADDR_ISUSER(addr))
 		except_throw_unmapped_user_wr(addr);
 	return addr;
 }
 
-PUBLIC USER CHECKED void const *FCALL
-validate_executable(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT) {
+PUBLIC NCX void const *FCALL
+validate_executable(NCX UNCHECKED void const *addr) THROWS(E_SEGFAULT) {
 	if unlikely(!_ADDR_ISUSER(addr))
 		except_throw_noexec_user(addr);
 	return addr;

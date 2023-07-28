@@ -218,7 +218,7 @@ mfile_write_from_mempart_buffer(struct mfile *__restrict self,
 
 PUBLIC BLOCKING NONNULL((1)) void KCALL
 mfile_readall(struct mfile *__restrict self,
-              USER CHECKED void *dst,
+              NCX void *dst,
               size_t num_bytes, pos_t src_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	while (num_bytes) {
@@ -228,7 +228,7 @@ mfile_readall(struct mfile *__restrict self,
 			break;
 		if (!temp)
 			THROW(E_IOERROR_BADBOUNDS, (uintptr_t)E_IOERROR_SUBSYSTEM_FILE);
-		dst = (USER CHECKED byte_t *)dst + temp;
+		dst = (NCX byte_t *)dst + temp;
 		num_bytes -= temp;
 		src_offset += temp;
 	}
@@ -291,7 +291,7 @@ mfile_readallv_p(struct mfile *__restrict self,
 }
 
 PUBLIC BLOCKING NONNULL((1)) void KCALL
-mfile_writeall(struct mfile *__restrict self, USER CHECKED void const *src,
+mfile_writeall(struct mfile *__restrict self, NCX void const *src,
                size_t num_bytes, pos_t dst_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	if unlikely(mfile_write(self, src, num_bytes, dst_offset) < num_bytes)
@@ -342,7 +342,7 @@ NOTHROW(FCALL get_stackbuf_size)(size_t num_bytes) {
  * As such, these functions are called by the above when `memcpy_nopf()' produces
  * transfer errors that cannot be resolved by `mman_prefault()' */
 PUBLIC BLOCKING NONNULL((1)) size_t KCALL
-_mfile_buffered_read(struct mfile *__restrict self, USER CHECKED void *dst,
+_mfile_buffered_read(struct mfile *__restrict self, NCX void *dst,
                      size_t num_bytes, pos_t filepos)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	size_t result      = 0;
@@ -366,7 +366,7 @@ _mfile_buffered_read(struct mfile *__restrict self, USER CHECKED void *dst,
 }
 
 PUBLIC BLOCKING NONNULL((1)) size_t KCALL
-_mfile_buffered_write(struct mfile *__restrict self, USER CHECKED void const *src,
+_mfile_buffered_write(struct mfile *__restrict self, NCX void const *src,
                       size_t num_bytes, pos_t filepos)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	size_t result      = 0;
@@ -391,7 +391,7 @@ _mfile_buffered_write(struct mfile *__restrict self, USER CHECKED void const *sr
 
 PUBLIC BLOCKING NONNULL((1)) size_t KCALL
 _mfile_buffered_tailwrite(struct mfile *__restrict self,
-                          USER CHECKED void const *src,
+                          NCX void const *src,
                           size_t num_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	size_t result      = 0;

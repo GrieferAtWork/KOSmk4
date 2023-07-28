@@ -84,7 +84,7 @@ DECL_BEGIN
  * mappings below this address always fails.
  *
  * The value of this variable is exposed in `/proc/sys/vm/mmap_min_addr' */
-PUBLIC USER CHECKED void *mman_getunmapped_user_minaddr = MHINT_GETADDR(KERNEL_MHINT_USER_MINADDR);
+PUBLIC NCX void *mman_getunmapped_user_minaddr = MHINT_GETADDR(KERNEL_MHINT_USER_MINADDR);
 
 /* Default base address for user-space  memory mappings. When trying to  find
  * an unmapped area within a user-space mman, the FIXED flag isn't given, and
@@ -94,11 +94,11 @@ PUBLIC USER CHECKED void *mman_getunmapped_user_minaddr = MHINT_GETADDR(KERNEL_M
  * Afterwards, the actual address to-be returned will be calculated normally.
  *
  * By default, this variable is set to `KERNEL_MHINT_USER_HEAP' */
-PUBLIC USER CHECKED void *mman_getunmapped_user_defbase = MHINT_GETADDR(KERNEL_MHINT_USER_HEAP);
+PUBLIC NCX void *mman_getunmapped_user_defbase = MHINT_GETADDR(KERNEL_MHINT_USER_HEAP);
 
 /* Same as `mman_getunmapped_user_defbase', but used
  * instead  when  the  `MAP_STACK'  flag  is  given. */
-PUBLIC USER CHECKED void *mman_getunmapped_user_stkbase = MHINT_GETADDR(KERNEL_MHINT_USER_STACK);
+PUBLIC NCX void *mman_getunmapped_user_stkbase = MHINT_GETADDR(KERNEL_MHINT_USER_STACK);
 
 /* [lock(ATOMIC)]
  * Additional flags that are always or'd to those given to `mman_findunmapped()'

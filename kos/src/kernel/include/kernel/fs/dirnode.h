@@ -69,7 +69,7 @@ struct fdirenum_ops {
 	 * When end-of-file has been reached, `0' is returned.
 	 * NOTE: This function mustn't enumerate the `.' and `..' entries! */
 	BLOCKING NONNULL_T((1)) size_t
-	(KCALL *deo_readdir)(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+	(KCALL *deo_readdir)(struct fdirenum *__restrict self, NCX struct dirent *buf,
 	                     size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
 			THROWS(E_SEGFAULT, E_IOERROR, ...);
 
@@ -98,7 +98,7 @@ struct fdirenum_ops {
 	 * directory instead. */
 	BLOCKING NONNULL_T((1)) syscall_slong_t
 	(KCALL *deo_ioctl)(struct fdirenum *__restrict self, ioctl_t cmd,
-	                   USER UNCHECKED void *arg, iomode_t mode)
+	                   NCX UNCHECKED void *arg, iomode_t mode)
 			THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 };
 
@@ -141,21 +141,21 @@ struct fdirenum {
  * @return: >= 0: Advance directory position to next entry and re-return this value.
  * @return: <  0: Keep current directory position and re-return bitwise inverse ('~') of this value. */
 FUNDEF WUNUSED ssize_t FCALL
-fdirenum_feedent_ex(USER CHECKED struct dirent *buf,
+fdirenum_feedent_ex(NCX struct dirent *buf,
                     size_t bufsize, readdir_mode_t readdir_mode,
                     ino_t feed_d_ino, unsigned char feed_d_type,
-                    u16 feed_d_namlen, USER CHECKED char const *feed_d_name)
+                    u16 feed_d_namlen, NCX char const *feed_d_name)
 		THROWS(E_SEGFAULT);
 /* Same as `fdirenum_feedent_ex()', but feed values from `ent' */
 FUNDEF BLOCKING WUNUSED NONNULL((4, 5)) ssize_t FCALL
-fdirenum_feedent(USER CHECKED struct dirent *buf,
+fdirenum_feedent(NCX struct dirent *buf,
                  size_t bufsize, readdir_mode_t readdir_mode,
                  struct fdirent *__restrict ent,
                  struct fdirnode *__restrict dir)
 		THROWS(E_SEGFAULT, E_IOERROR, ...);
 /* Same as `fdirenum_feedent()', but may only be used when `ent' doesn't implement `fdo_getino' */
 FUNDEF WUNUSED NONNULL((4)) ssize_t FCALL
-fdirenum_feedent_fast(USER CHECKED struct dirent *buf,
+fdirenum_feedent_fast(NCX struct dirent *buf,
                       size_t bufsize, readdir_mode_t readdir_mode,
                       struct fdirent *__restrict ent)
 		THROWS(E_SEGFAULT);
@@ -169,7 +169,7 @@ fdirenum_feedent_fast(USER CHECKED struct dirent *buf,
 
 /* Info descriptor for looking up directory entries by-name. */
 struct flookup_info {
-	CHECKED USER /*utf-8*/ char const *flu_name;    /* [?..flu_namelen] Name for the new file. */
+	NCX /*utf-8*/ char const *flu_name;    /* [?..flu_namelen] Name for the new file. */
 	uintptr_t                          flu_hash;    /* Hash for `mkf_name' (s.a. `fdirent_hash()') or
 	                                                 * `FLOOKUP_INFO_HASH_UNSET'  if  not calculated. */
 	u16                                flu_namelen; /* Length of `mkf_name' */
@@ -187,7 +187,7 @@ struct fcreatfile_info {
 	union {
 		dev_t                  c_rdev;      /* [valid_if(S_ISDEV(mkf_fmode))][in] Referenced device. */
 		struct {
-			CHECKED USER /*utf-8*/ char const *s_text; /* [?..s_size][in] Symlink text. */
+			NCX /*utf-8*/ char const *s_text; /* [?..s_size][in] Symlink text. */
 			size_t                             s_size; /* [in] Symlink text length (in characters; excluding trailing \0). */
 		}                      c_symlink;   /* [valid_if(S_ISLNK(mkf_fmode))] Symlink text. */
 	};
@@ -197,7 +197,7 @@ struct fcreatfile_info {
 struct fmkfile_info {
 	union {
 		struct {
-			CHECKED USER /*utf-8*/ char const *mkf_name;    /* [?..mkf_namelen][in] Name for the new file. */
+			NCX /*utf-8*/ char const *mkf_name;    /* [?..mkf_namelen][in] Name for the new file. */
 			uintptr_t                          mkf_hash;    /* [in] Hash for `mkf_name' (s.a. `fdirent_hash()') (or `FLOOKUP_INFO_HASH_UNSET') */
 			u16                                mkf_namelen; /* [in] Length of `mkf_name' */
 			u16                               _mkf_pad;     /* ... */
@@ -231,7 +231,7 @@ struct fmkfile_info {
 struct frename_info {
 	union {
 		struct {
-			CHECKED USER /*utf-8*/ char const *frn_name;    /* [?..frn_namelen][in] Name for the new file. */
+			NCX /*utf-8*/ char const *frn_name;    /* [?..frn_namelen][in] Name for the new file. */
 			uintptr_t                          frn_hash;    /* [in] Hash for `frn_name' (s.a. `fdirent_hash()') (or `FLOOKUP_INFO_HASH_UNSET') */
 			u16                                frn_namelen; /* [in] Length of `frn_name' */
 			u16                               _frn_pad;     /* ... */
@@ -557,7 +557,7 @@ fdirnode_v_open(struct mfile *__restrict self,
 		THROWS(E_BADALLOC);
 FUNDEF NONNULL((1)) void KCALL /* Writes `st_blocks = 1;', `st_size = mfile_getblocksize(self);' */
 fdirnode_v_stat(struct mfile *__restrict self,
-                USER CHECKED struct stat *result)
+                NCX struct stat *result)
 		THROWS(E_SEGFAULT);
 
 /* Default stream operators for directories (using `fdirnode_v_open') */
@@ -600,7 +600,7 @@ fdirnode_lookup_node(struct fdirnode *__restrict self,
  *                or a segment of the path isn't a directory) */
 FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct fnode *FCALL
 fdirnode_lookup_path(struct fdirnode *__restrict self,
-                     USER CHECKED char const *path)
+                     NCX char const *path)
 		THROWS(E_SEGFAULT, E_BADALLOC, E_IOERROR, ...);
 
 

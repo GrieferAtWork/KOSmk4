@@ -183,7 +183,7 @@ NOTHROW(KCALL bus_releaselock)(void) {
 
 PRIVATE void KCALL
 x86_emulock_cmpxch(struct icpustate **__restrict pstate,
-                   USER CHECKED void *addr,
+                   NCX void *addr,
                    void *preal_oldval,
                    void *poldval,
                    void *pnewval,
@@ -350,7 +350,7 @@ handle_vio_or_not_faulted:
 #ifdef ARCH_X86_HAVE_EMULOCK_CMPXCHB
 PUBLIC u8 KCALL
 x86_emulock_cmpxchb(struct icpustate **__restrict pstate,
-                    USER CHECKED u8 *addr,
+                    NCX u8 *addr,
                     u8 oldval, u8 newval) {
 	u8 real_oldval;
 	x86_emulock_cmpxch(pstate, addr, &real_oldval, &oldval, &newval, 1);
@@ -361,7 +361,7 @@ x86_emulock_cmpxchb(struct icpustate **__restrict pstate,
 #ifdef ARCH_X86_HAVE_EMULOCK_CMPXCHW
 PUBLIC u16 KCALL
 x86_emulock_cmpxchw(struct icpustate **__restrict pstate,
-                    USER CHECKED u16 *addr,
+                    NCX u16 *addr,
                     u16 oldval, u16 newval) {
 	u16 real_oldval;
 	x86_emulock_cmpxch(pstate, addr, &real_oldval, &oldval, &newval, 2);
@@ -372,7 +372,7 @@ x86_emulock_cmpxchw(struct icpustate **__restrict pstate,
 #ifdef ARCH_X86_HAVE_EMULOCK_CMPXCHL
 PUBLIC u32 KCALL
 x86_emulock_cmpxchl(struct icpustate **__restrict pstate,
-                    USER CHECKED u32 *addr,
+                    NCX u32 *addr,
                     u32 oldval, u32 newval) {
 	u32 real_oldval;
 	x86_emulock_cmpxch(pstate, addr, &real_oldval, &oldval, &newval, 4);
@@ -383,7 +383,7 @@ x86_emulock_cmpxchl(struct icpustate **__restrict pstate,
 #ifdef ARCH_X86_HAVE_EMULOCK_CMPXCHQ
 PUBLIC u64 KCALL
 x86_emulock_cmpxchq(struct icpustate **__restrict pstate,
-                    USER CHECKED u64 *addr,
+                    NCX u64 *addr,
                     u64 oldval, u64 newval) {
 	u64 real_oldval;
 	x86_emulock_cmpxch(pstate, addr, &real_oldval, &oldval, &newval, 8);
@@ -394,7 +394,7 @@ x86_emulock_cmpxchq(struct icpustate **__restrict pstate,
 #ifdef ARCH_X86_HAVE_EMULOCK_CMPXCHX
 PUBLIC uint128_t KCALL
 x86_emulock_cmpxchx(struct icpustate **__restrict pstate,
-                    USER CHECKED uint128_t *addr,
+                    NCX uint128_t *addr,
                     uint128_t oldval, uint128_t newval) {
 	uint128_t real_oldval;
 	x86_emulock_cmpxch(pstate, addr, &real_oldval, &oldval, &newval, 16);

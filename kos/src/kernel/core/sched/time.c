@@ -62,7 +62,7 @@
 DECL_BEGIN
 
 
-PRIVATE void KCALL get_timezone(USER CHECKED struct timezone *result) {
+PRIVATE void KCALL get_timezone(NCX struct timezone *result) {
 	/* TODO */
 	result->tz_dsttime     = 0;
 	result->tz_minuteswest = 0;
@@ -75,7 +75,7 @@ PRIVATE void KCALL get_timezone(USER CHECKED struct timezone *result) {
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_FTIME
 DEFINE_SYSCALL1(errno_t, ftime,
-                USER UNCHECKED struct timeb32 *, tp) {
+                NCX UNCHECKED struct timeb32 *, tp) {
 	struct timespec ts;
 	struct timezone tz;
 	validate_writable(tp, sizeof(*tp));
@@ -92,7 +92,7 @@ DEFINE_SYSCALL1(errno_t, ftime,
 
 #ifdef __ARCH_WANT_SYSCALL_FTIME64
 DEFINE_SYSCALL1(errno_t, ftime64,
-                USER UNCHECKED struct timeb64 *, tp) {
+                NCX UNCHECKED struct timeb64 *, tp) {
 	struct timespec ts;
 	struct timezone tz;
 	validate_writable(tp, sizeof(*tp));
@@ -109,7 +109,7 @@ DEFINE_SYSCALL1(errno_t, ftime64,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_FTIME
 DEFINE_COMPAT_SYSCALL1(errno_t, ftime,
-                       USER UNCHECKED struct compat_timeb32 *, tp) {
+                       NCX UNCHECKED struct compat_timeb32 *, tp) {
 	struct timespec ts;
 	struct timezone tz;
 	compat_validate_writable(tp, sizeof(*tp));
@@ -126,7 +126,7 @@ DEFINE_COMPAT_SYSCALL1(errno_t, ftime,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_FTIME64
 DEFINE_COMPAT_SYSCALL1(errno_t, ftime64,
-                       USER UNCHECKED struct compat_timeb64 *, tp) {
+                       NCX UNCHECKED struct compat_timeb64 *, tp) {
 	struct timespec ts;
 	struct timezone tz;
 	compat_validate_writable(tp, sizeof(*tp));
@@ -150,8 +150,8 @@ DEFINE_COMPAT_SYSCALL1(errno_t, ftime64,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_GETTIMEOFDAY
 DEFINE_SYSCALL2(errno_t, gettimeofday,
-                USER UNCHECKED struct timeval32 *, tv,
-                USER UNCHECKED struct timezone *, tz) {
+                NCX UNCHECKED struct timeval32 *, tv,
+                NCX UNCHECKED struct timezone *, tz) {
 	if (tv) {
 		struct timespec ts;
 		validate_writable(tv, sizeof(*tv));
@@ -172,8 +172,8 @@ DEFINE_SYSCALL2(errno_t, gettimeofday,
 
 #ifdef __ARCH_WANT_SYSCALL_GETTIMEOFDAY64
 DEFINE_SYSCALL2(errno_t, gettimeofday64,
-                USER UNCHECKED struct timeval64 *, tv,
-                USER UNCHECKED struct timezone *, tz) {
+                NCX UNCHECKED struct timeval64 *, tv,
+                NCX UNCHECKED struct timezone *, tz) {
 	if (tv) {
 		struct timespec ts;
 		validate_writable(tv, sizeof(*tv));
@@ -194,8 +194,8 @@ DEFINE_SYSCALL2(errno_t, gettimeofday64,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_GETTIMEOFDAY
 DEFINE_COMPAT_SYSCALL2(errno_t, gettimeofday,
-                       USER UNCHECKED struct compat_timeval32 *, tv,
-                       USER UNCHECKED struct timezone *, tz) {
+                       NCX UNCHECKED struct compat_timeval32 *, tv,
+                       NCX UNCHECKED struct timezone *, tz) {
 	if (tv) {
 		struct timespec ts;
 		compat_validate_writable(tv, sizeof(*tv));
@@ -216,8 +216,8 @@ DEFINE_COMPAT_SYSCALL2(errno_t, gettimeofday,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_GETTIMEOFDAY64
 DEFINE_COMPAT_SYSCALL2(errno_t, gettimeofday64,
-                       USER UNCHECKED struct compat_timeval64 *, tv,
-                       USER UNCHECKED struct timezone *, tz) {
+                       NCX UNCHECKED struct compat_timeval64 *, tv,
+                       NCX UNCHECKED struct timezone *, tz) {
 	if (tv) {
 		struct timespec ts;
 		compat_validate_writable(tv, sizeof(*tv));
@@ -244,7 +244,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, gettimeofday64,
 /* time(), time64()                                                     */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_TIME
-DEFINE_SYSCALL1(time32_t, time, USER UNCHECKED time32_t *, tmp) {
+DEFINE_SYSCALL1(time32_t, time, NCX UNCHECKED time32_t *, tmp) {
 	time32_t result;
 	struct timespec nowts;
 	nowts  = realtime();
@@ -260,7 +260,7 @@ DEFINE_SYSCALL1(time32_t, time, USER UNCHECKED time32_t *, tmp) {
 #endif /* __ARCH_WANT_SYSCALL_TIME */
 
 #ifdef __ARCH_WANT_SYSCALL_TIME64
-DEFINE_SYSCALL1(time64_t, time64, USER UNCHECKED time64_t *, tmp) {
+DEFINE_SYSCALL1(time64_t, time64, NCX UNCHECKED time64_t *, tmp) {
 	time64_t result;
 	struct timespec nowts;
 	nowts  = realtime();
@@ -277,7 +277,7 @@ DEFINE_SYSCALL1(time64_t, time64, USER UNCHECKED time64_t *, tmp) {
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_TIME
 DEFINE_COMPAT_SYSCALL1(compat_time32_t, time,
-                       USER UNCHECKED compat_time32_t *, tmp) {
+                       NCX UNCHECKED compat_time32_t *, tmp) {
 	compat_time32_t result;
 	struct timespec nowts;
 	nowts  = realtime();
@@ -294,7 +294,7 @@ DEFINE_COMPAT_SYSCALL1(compat_time32_t, time,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_TIME64
 DEFINE_COMPAT_SYSCALL1(compat_time64_t, time64,
-                       USER UNCHECKED compat_time64_t *, tmp) {
+                       NCX UNCHECKED compat_time64_t *, tmp) {
 	compat_time64_t result;
 	struct timespec nowts;
 	nowts  = realtime();
@@ -318,8 +318,8 @@ DEFINE_COMPAT_SYSCALL1(compat_time64_t, time64,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_NANOSLEEP
 DEFINE_SYSCALL2(errno_t, nanosleep,
-                USER UNCHECKED struct timespec32 const *, req,
-                USER UNCHECKED struct timespec32 *, rem) {
+                NCX UNCHECKED struct timespec32 const *, req,
+                NCX UNCHECKED struct timespec32 *, rem) {
 	ktime_t timeout;
 	validate_readable(req, sizeof(*req));
 	validate_writable_opt(rem, sizeof(*rem));
@@ -361,8 +361,8 @@ DEFINE_SYSCALL2(errno_t, nanosleep,
 
 #ifdef __ARCH_WANT_SYSCALL_NANOSLEEP64
 DEFINE_SYSCALL2(errno_t, nanosleep64,
-                USER UNCHECKED struct timespec64 const *, req,
-                USER UNCHECKED struct timespec64 *, rem) {
+                NCX UNCHECKED struct timespec64 const *, req,
+                NCX UNCHECKED struct timespec64 *, rem) {
 	ktime_t timeout;
 	validate_readable(req, sizeof(*req));
 	validate_writable_opt(rem, sizeof(*rem));
@@ -404,8 +404,8 @@ DEFINE_SYSCALL2(errno_t, nanosleep64,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_NANOSLEEP
 DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep,
-                       USER UNCHECKED struct compat_timespec32 const *, req,
-                       USER UNCHECKED struct compat_timespec32 *, rem) {
+                       NCX UNCHECKED struct compat_timespec32 const *, req,
+                       NCX UNCHECKED struct compat_timespec32 *, rem) {
 	ktime_t timeout;
 	compat_validate_readable(req, sizeof(*req));
 	compat_validate_writable_opt(rem, sizeof(*rem));
@@ -447,8 +447,8 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_NANOSLEEP64
 DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep64,
-                       USER UNCHECKED struct compat_timespec64 const *, req,
-                       USER UNCHECKED struct compat_timespec64 *, rem) {
+                       NCX UNCHECKED struct compat_timespec64 const *, req,
+                       NCX UNCHECKED struct compat_timespec64 *, rem) {
 	ktime_t timeout;
 	compat_validate_readable(req, sizeof(*req));
 	compat_validate_writable_opt(rem, sizeof(*rem));

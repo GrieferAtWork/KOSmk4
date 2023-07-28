@@ -425,7 +425,7 @@ DEFINE_PUBLIC_ALIAS(_Unwind_Find_FDE, libuw__Unwind_Find_FDE);
  * and  friends for  FDE entries  containing `absolute_pc'.  Used when we
  * were unable to find FDE data through normal means. */
 PRIVATE NONNULL((2)) unwind_errno_t
-NOTHROW_NCX(CC libuw_unwind_fde_find_rf)(CHECKED void const *absolute_pc,
+NOTHROW_NCX(CC libuw_unwind_fde_find_rf)(VIRT void const *absolute_pc,
                                          unwind_fde_t *__restrict result) {
 	unwind_errno_t error = UNWIND_NO_FRAME;
 	struct rf_object *obj;
@@ -466,7 +466,7 @@ done:
  *       in `/kos/src/kernel/core/memory/mman/driver.c' */
 PRIVATE NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_find_new)(void *dlmod,
-                                          CHECKED void const *absolute_pc,
+                                          VIRT void const *absolute_pc,
                                           unwind_fde_t *__restrict result) {
 	unwind_errno_t error;
 	struct dl_section *eh_frame_sect;
@@ -502,7 +502,7 @@ err_no_section:
  * caches for quick (O(log2)) repeated access to an FDE located within a known
  * function. */
 INTERN NONNULL((2)) unwind_errno_t
-NOTHROW_NCX(CC libuw_unwind_fde_find)(CHECKED void const *absolute_pc,
+NOTHROW_NCX(CC libuw_unwind_fde_find)(VIRT void const *absolute_pc,
                                       unwind_fde_t *__restrict result) {
 	struct fde_cache_entry *fce;
 	void *dlmod;
@@ -628,7 +628,7 @@ DEFINE_PUBLIC_ALIAS(unwind_fde_find, libuw_unwind_fde_find);
  *       `absolute_pc >= start && absolute_pc < end'
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
 INTERN NONNULL((2, 4)) unwind_errno_t CC
-linuw_unwind(CHECKED void const *absolute_pc,
+linuw_unwind(VIRT void const *absolute_pc,
              unwind_getreg_t reg_getter, void const *reg_getter_arg,
              unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	unwind_errno_t result;

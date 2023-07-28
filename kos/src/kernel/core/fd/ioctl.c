@@ -92,7 +92,7 @@ PRIVATE WUNUSED iomode_t FCALL get_directio_mode(uintptr_t cmd) {
 PRIVATE WUNUSED NONNULL((3, 5)) bool KCALL
 ioctl_generic(ioctl_t cmd, fd_t fd,
               struct handle const *__restrict hand,
-              USER UNCHECKED void *arg,
+              NCX UNCHECKED void *arg,
               syscall_slong_t *__restrict result) {
 	/* Check for specific commands. */
 	switch (cmd) {
@@ -112,8 +112,8 @@ ioctl_generic(ioctl_t cmd, fd_t fd,
 		break;
 
 	case FD_IOC_DUPFD: {
-		USER UNCHECKED struct openfd *ofd;
-		ofd = (USER UNCHECKED struct openfd *)arg;
+		NCX UNCHECKED struct openfd *ofd;
+		ofd = (NCX UNCHECKED struct openfd *)arg;
 		*result = handles_install_openfd(hand, ofd);
 	}	goto done;
 
@@ -123,10 +123,10 @@ ioctl_generic(ioctl_t cmd, fd_t fd,
 
 	case FD_IOC_CAST: {
 		struct handle newhand;
-		USER CHECKED struct fdcast *cast;
+		NCX struct fdcast *cast;
 		uintptr_half_t reqtype;
 		validate_readwrite(arg, sizeof(*cast));
-		cast = (USER CHECKED struct fdcast *)arg;
+		cast = (NCX struct fdcast *)arg;
 		COMPILER_READ_BARRIER();
 		reqtype = cast->fc_rqtyp;
 		COMPILER_READ_BARRIER();
@@ -177,7 +177,7 @@ err_bad_handle_type:
 		COMPILER_WRITE_BARRIER();
 
 		/* Write-back the required buffer size */
-		((USER CHECKED struct fddesc *)arg)->fdc_len = reqlen;
+		((NCX struct fddesc *)arg)->fdc_len = reqlen;
 		goto done;
 	}	break;
 
@@ -324,7 +324,7 @@ done:
 
 #ifdef __ARCH_WANT_SYSCALL_IOCTL
 DEFINE_SYSCALL3(syscall_slong_t, ioctl, fd_t, fd,
-                ioctl_t, command, UNCHECKED USER void *, arg) {
+                ioctl_t, command, NCX UNCHECKED void *, arg) {
 	struct handle hand;
 	syscall_slong_t result;
 	hand = handles_lookup(fd);
@@ -354,7 +354,7 @@ done:
 #ifdef __ARCH_WANT_SYSCALL_IOCTLF
 DEFINE_SYSCALL4(syscall_slong_t, ioctlf, fd_t, fd,
                 ioctl_t, command, iomode_t, mode,
-                USER UNCHECKED void *, arg) {
+                NCX UNCHECKED void *, arg) {
 	struct handle hand;
 	syscall_slong_t result;
 	VALIDATE_FLAGSET(mode,

@@ -48,11 +48,11 @@ __FORCELOCAL void (__isb)(void) { __asm__ __volatile__("isb"); }
 /* TODO: LDREXB */
 /* TODO: LDREXD */
 /* TODO: LDREXH */
-__FORCELOCAL __UINT32_TYPE__ (__ldrbt)(__USER __UNCHECKED __UINT8_TYPE__ const *__addr) { __UINT32_TYPE__ __res; __asm__ __volatile__("ldrbt %0, %1" : "=r" (__res) : "m" (*__addr)); return __res; }
-__FORCELOCAL __UINT32_TYPE__ (__ldrsbt)(__USER __UNCHECKED __INT8_TYPE__ const *__addr) { __UINT32_TYPE__ __res; __asm__ __volatile__("ldrsbt %0, %1" : "=r" (__res) : "m" (*__addr)); return __res; }
-__FORCELOCAL __UINT32_TYPE__ (__ldrht)(__USER __UNCHECKED __UINT16_TYPE__ const *__addr) { __UINT32_TYPE__ __res; __asm__ __volatile__("ldrht %0, %1" : "=r" (__res) : "m" (*__addr)); return __res; }
-__FORCELOCAL __UINT32_TYPE__ (__ldrsht)(__USER __UNCHECKED __INT16_TYPE__ const *__addr) { __UINT32_TYPE__ __res; __asm__ __volatile__("ldrsht %0, %1" : "=r" (__res) : "m" (*__addr)); return __res; }
-__FORCELOCAL __UINT32_TYPE__ (__ldrt)(__USER __UNCHECKED __UINT32_TYPE__ const *__addr) { __UINT32_TYPE__ __res; __asm__ __volatile__("ldrt %0, %1" : "=r" (__res) : "m" (*__addr)); return __res; }
+__FORCELOCAL __UINT32_TYPE__ (__ldrbt)(__NCX __UINT8_TYPE__ const *__addr) { __UINT32_TYPE__ __res; __asm__ __volatile__("ldrbt %0, %1" : "=r" (__res) : "m" (*__addr)); return __res; }
+__FORCELOCAL __UINT32_TYPE__ (__ldrsbt)(__NCX __INT8_TYPE__ const *__addr) { __UINT32_TYPE__ __res; __asm__ __volatile__("ldrsbt %0, %1" : "=r" (__res) : "m" (*__addr)); return __res; }
+__FORCELOCAL __UINT32_TYPE__ (__ldrht)(__NCX __UINT16_TYPE__ const *__addr) { __UINT32_TYPE__ __res; __asm__ __volatile__("ldrht %0, %1" : "=r" (__res) : "m" (*__addr)); return __res; }
+__FORCELOCAL __UINT32_TYPE__ (__ldrsht)(__NCX __INT16_TYPE__ const *__addr) { __UINT32_TYPE__ __res; __asm__ __volatile__("ldrsht %0, %1" : "=r" (__res) : "m" (*__addr)); return __res; }
+__FORCELOCAL __UINT32_TYPE__ (__ldrt)(__NCX __UINT32_TYPE__ const *__addr) { __UINT32_TYPE__ __res; __asm__ __volatile__("ldrt %0, %1" : "=r" (__res) : "m" (*__addr)); return __res; }
 
 /* TODO: MCR */
 /* TODO: MCR2 */
@@ -85,9 +85,9 @@ __FORCELOCAL void (__sev)(void) { __asm__ __volatile__("sev"); }
 /* TODO: STREXB */
 /* TODO: STREXD */
 /* TODO: STREXH */
-__FORCELOCAL void (__strbt)(__USER __UNCHECKED __UINT8_TYPE__ *__addr, __UINT8_TYPE__ __val) { __asm__ __volatile__("strbt %0, %1" : : "r" (__val), "m" (*__addr)); }
-__FORCELOCAL void (__strht)(__USER __UNCHECKED __UINT16_TYPE__ *__addr, __UINT16_TYPE__ __val) { __asm__ __volatile__("strht %0, %1" : : "r" (__val), "m" (*__addr)); }
-__FORCELOCAL void (__strt)(__USER __UNCHECKED __UINT32_TYPE__ *__addr, __UINT32_TYPE__ __val) { __asm__ __volatile__("strt %0, %1" : : "r" (__val), "m" (*__addr)); }
+__FORCELOCAL void (__strbt)(__NCX __UINT8_TYPE__ *__addr, __UINT8_TYPE__ __val) { __asm__ __volatile__("strbt %0, %1" : : "r" (__val), "m" (*__addr)); }
+__FORCELOCAL void (__strht)(__NCX __UINT16_TYPE__ *__addr, __UINT16_TYPE__ __val) { __asm__ __volatile__("strht %0, %1" : : "r" (__val), "m" (*__addr)); }
+__FORCELOCAL void (__strt)(__NCX __UINT32_TYPE__ *__addr, __UINT32_TYPE__ __val) { __asm__ __volatile__("strt %0, %1" : : "r" (__val), "m" (*__addr)); }
 #define __svc(/*thumb:uint8_t,!thumb:uint24_t*/ imm) __asm__ __volatile__("svc %0" : : "n" (imm))
 /* TODO: SWP */
 /* TODO: SWPB */

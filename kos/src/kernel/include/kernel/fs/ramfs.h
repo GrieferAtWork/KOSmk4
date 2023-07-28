@@ -224,8 +224,8 @@ FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL ramfs_direnttree_insert)(struc
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL ramfs_direnttree_removenode)(struct ramfs_dirent **__restrict proot, struct ramfs_dirent *__restrict node);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct ramfs_dirent *NOTHROW(FCALL ramfs_direnttree_prevnode)(struct ramfs_dirent const *__restrict self);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct ramfs_dirent *NOTHROW(FCALL ramfs_direnttree_nextnode)(struct ramfs_dirent const *__restrict self);
-FUNDEF ATTR_PURE WUNUSED struct ramfs_dirent *FCALL ramfs_direnttree_locate(/*nullable*/ struct ramfs_dirent *root, USER CHECKED char const *key, size_t keylen) THROWS(E_SEGFAULT);
-FUNDEF ATTR_PURE WUNUSED NONNULL((1)) struct ramfs_dirent *FCALL _ramfs_direnttree_caselocate(struct ramfs_dirent *__restrict root, USER CHECKED char const *key, size_t keylen) THROWS(E_SEGFAULT);
+FUNDEF ATTR_PURE WUNUSED struct ramfs_dirent *FCALL ramfs_direnttree_locate(/*nullable*/ struct ramfs_dirent *root, NCX char const *key, size_t keylen) THROWS(E_SEGFAULT);
+FUNDEF ATTR_PURE WUNUSED NONNULL((1)) struct ramfs_dirent *FCALL _ramfs_direnttree_caselocate(struct ramfs_dirent *__restrict root, NCX char const *key, size_t keylen) THROWS(E_SEGFAULT);
 #define ramfs_direnttree_caselocate(root, key, keylen) ((root) ? _ramfs_direnttree_caselocate(root, key, keylen) : __NULLPTR)
 
 
@@ -256,7 +256,7 @@ DATDEF struct fdirenum_ops const ramfs_direnum_ops;
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ramfs_direnum_v_fini)(struct fdirenum *__restrict self);
 FUNDEF BLOCKING NONNULL((1)) size_t KCALL
-ramfs_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+ramfs_direnum_v_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                         size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK, ...);
 FUNDEF BLOCKING NONNULL((1)) pos_t KCALL

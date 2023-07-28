@@ -336,8 +336,8 @@ NOTHROW(FCALL make_longer)(struct ctype *__restrict self) {
 }
 
 PRIVATE WUNUSED NONNULL((1, 2)) struct ctype *
-NOTHROW_NCX(FCALL parse_ctype_from_suffix)(CHECKED char const *suffix,
-                                           CHECKED char const *suffix_end) {
+NOTHROW_NCX(FCALL parse_ctype_from_suffix)(NCX char const *suffix,
+                                           NCX char const *suffix_end) {
 	struct ctype *result;
 	result = &ctype_int;
 again:
@@ -408,8 +408,8 @@ syn:
 }
 
 PRIVATE WUNUSED NONNULL((1, 2, 3)) bool
-NOTHROW_NCX(FCALL unicode_readutf8_unescape)(CHECKED char const **__restrict ptext,
-                                             CHECKED char const *end,
+NOTHROW_NCX(FCALL unicode_readutf8_unescape)(NCX char const **__restrict ptext,
+                                             NCX char const *end,
                                              char32_t *__restrict presult) {
 	char32_t result;
 	result = unicode_readutf8_n(ptext, end);
@@ -534,17 +534,17 @@ err_result:
 }
 
 struct autocomplete_symbols_data {
-	struct cmodsyminfo  info;
-	struct cparser     *self;
-	CHECKED char const *name;
-	size_t              namelen;
+	struct cmodsyminfo info;
+	struct cparser    *self;
+	NCX char const    *name;
+	size_t             namelen;
 };
 
 PRIVATE WUNUSED NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(FCALL autocomplete_symbols_callback)(struct cmodsyminfo *__restrict info,
                                                     bool UNUSED(info_loaded)) {
 	struct autocomplete_symbols_data *cookie;
-	CHECKED char const *symbol_name;
+	NCX char const *symbol_name;
 	size_t symbol_namelen;
 	cookie         = container_of(info, struct autocomplete_symbols_data, info);
 	symbol_name    = cmodsyminfo_name(info);
@@ -558,7 +558,7 @@ NOTHROW_CB_NCX(FCALL autocomplete_symbols_callback)(struct cmodsyminfo *__restri
 
 PRIVATE NONNULL((1)) void
 NOTHROW_CB_NCX(FCALL autocomplete_symbols)(struct cparser *__restrict self,
-                                           CHECKED char const *name,
+                                           NCX char const *name,
                                            size_t namelen, uintptr_t ns) {
 	struct autocomplete_symbols_data data;
 	unsigned int scope;
@@ -594,7 +594,7 @@ PRIVATE char const misc_expr_keywords[][16] = {
 
 PRIVATE NONNULL((1)) void
 NOTHROW_CB_NCX(FCALL autocomplete_nontype_symbols)(struct cparser *__restrict self,
-                                                   CHECKED char const *name,
+                                                   NCX char const *name,
                                                    size_t namelen) {
 	if (namelen < (lengthof(misc_expr_keywords[0]) - 1)) {
 		unsigned int i;
@@ -614,13 +614,13 @@ NOTHROW_CB_NCX(FCALL autocomplete_nontype_symbols)(struct cparser *__restrict se
 
 struct autocomplete_register_name_data {
 	struct cparser     *self;
-	CHECKED char const *startswith_str;
+	NCX char const *startswith_str;
 	size_t              startswith_len;
 };
 
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(LIBCPUSTATE_CC autocomplete_register_name_cb)(void *cookie,
-                                                             CHECKED char const *name,
+                                                             NCX char const *name,
                                                              size_t namelen) {
 	struct autocomplete_register_name_data *data;
 	data = (struct autocomplete_register_name_data *)cookie;
@@ -637,7 +637,7 @@ NOTHROW_CB_NCX(LIBCPUSTATE_CC autocomplete_register_name_cb)(void *cookie,
 
 PRIVATE NONNULL((1)) void
 NOTHROW_CB_NCX(FCALL autocomplete_register_name)(struct cparser *__restrict self,
-                                                 CHECKED char const *name,
+                                                 NCX char const *name,
                                                  size_t namelen) {
 	/* auto-complete register names that start with the given `name...+=namelen' */
 	struct autocomplete_register_name_data data;
@@ -656,7 +656,7 @@ NOTHROW_CB_NCX(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 	case '(': {
 		/* Check for a C-style cast expression. */
 		struct ctyperef cast_type;
-		CHECKED char const *afterparen;
+		NCX char const *afterparen;
 		yield();
 		afterparen = self->c_tokstart;
 		result = ctype_eval(self, &cast_type, NULL, NULL);
@@ -781,7 +781,7 @@ doparen_expr:
 	case CTOKEN_TOK_CHAR: {
 		char32_t value = 0;
 		shift_t shift  = 0;
-		CHECKED char const *reader, *end;
+		NCX char const *reader, *end;
 		reader = self->c_tokstart;
 		end    = self->c_tokend;
 		unicode_readutf8_rev_n(&end, reader); /* Trailing '\'' */
@@ -847,7 +847,7 @@ doparen_expr:
 	case '%':
 	case '$': {
 		/* Register expression. */
-		CHECKED char const *regname_start;
+		NCX char const *regname_start;
 		yield();
 		if unlikely(self->c_tok != CTOKEN_TOK_KEYWORD) {
 			if (self->c_autocom && self->c_tok == CTOKEN_TOK_EOF)
@@ -873,11 +873,11 @@ doparen_expr:
 				}
 			} else if (*self->c_tokend == '(') {
 				/* Skip until matching ')' */
-				CHECKED char const *keyword_before_paren;
+				NCX char const *keyword_before_paren;
 				unsigned int paren_recursion = 1;
 				keyword_before_paren = self->c_tokstart;
 				for (;;) {
-					CHECKED char const *prev_token_end;
+					NCX char const *prev_token_end;
 					prev_token_end = self->c_tokend;
 					yield();
 					if (self->c_tokstart != prev_token_end)
@@ -920,7 +920,7 @@ doparen_expr:
 
 	case CTOKEN_TOK_KEYWORD: {
 		/* Variable lookup. */
-		CHECKED char const *kwd_str;
+		NCX char const *kwd_str;
 		size_t kwd_len;
 		kwd_str = self->c_tokstart;
 		kwd_len = cparser_toklen(self);
@@ -1164,7 +1164,7 @@ err_nomem:
 
 struct autocomplete_struct_data {
 	struct cparser     *self;
-	CHECKED char const *name;
+	NCX char const *name;
 	size_t              namelen;
 };
 
@@ -1191,7 +1191,7 @@ NOTHROW_CB_NCX(KCALL autocomplete_struct_fields_callback)(void *arg,
 
 PRIVATE NONNULL((1)) dbx_errno_t
 NOTHROW_CB_NCX(KCALL autocomplete_struct_fields)(struct cparser *__restrict self,
-                                                 CHECKED char const *name,
+                                                 NCX char const *name,
                                                  size_t namelen) {
 	struct autocomplete_struct_data data;
 	struct ctype *ct;
@@ -1271,7 +1271,7 @@ err_lhs_ptr_type:
 			goto done;
 		ATTR_FALLTHROUGH
 	case '.': {
-		CHECKED char const *kwd_str;
+		NCX char const *kwd_str;
 		size_t kwd_len;
 		/* Field w/o deref */
 		yield();
@@ -2124,7 +2124,7 @@ err_nomem:
  * @return: DBX_EOK: Success
  * @return: * :      Error (the effective c-expression-stack-size is unaltered) */
 PUBLIC dbx_errno_t
-NOTHROW_CB_NCX(FCALL cexpr_pusheval)(CHECKED char const *expr,
+NOTHROW_CB_NCX(FCALL cexpr_pusheval)(NCX char const *expr,
                                      size_t maxlen) {
 	dbx_errno_t result;
 	struct cparser cp;
@@ -2142,7 +2142,7 @@ struct ctype_attributes {
 };
 
 PRIVATE ATTR_PURE WUNUSED uint16_t
-NOTHROW_NCX(FCALL keyword_to_calling_convention)(CHECKED char const *kwd_str,
+NOTHROW_NCX(FCALL keyword_to_calling_convention)(NCX char const *kwd_str,
                                                  size_t kwd_len) {
 	(void)kwd_str;
 	(void)kwd_len;
@@ -2206,7 +2206,7 @@ done:
 PRIVATE WUNUSED NONNULL((1, 2)) dbx_errno_t
 NOTHROW_CB_NCX(FCALL ctype_parse_attrib_gcc)(struct cparser *__restrict self,
                                              struct ctype_attributes *__restrict attrib) {
-	CHECKED char const *kwd_str;
+	NCX char const *kwd_str;
 	size_t kwd_len;
 	uint16_t cc;
 	kwd_str = self->c_tokstart;
@@ -2231,7 +2231,7 @@ PRIVATE WUNUSED NONNULL((1, 2)) dbx_errno_t
 NOTHROW_CB_NCX(FCALL ctype_parse_attrib_cxx)(struct cparser *__restrict self,
                                              struct ctype_attributes *__restrict attrib) {
 	dbx_errno_t result;
-	CHECKED char const *kwd_str;
+	NCX char const *kwd_str;
 	size_t kwd_len;
 	if (self->c_tok != CTOKEN_TOK_KEYWORD)
 		goto syn;
@@ -2291,7 +2291,7 @@ again_parse_attrib_cxx:
 		goto again;
 	}
 	if (self->c_tok == CTOKEN_TOK_KEYWORD) {
-		CHECKED char const *kwd_str;
+		NCX char const *kwd_str;
 		size_t kwd_len;
 		kwd_str = self->c_tokstart;
 		kwd_len = cparser_toklen(self);
@@ -2366,7 +2366,7 @@ NOTHROW_CB_NCX(FCALL ctype_parse_cv)(struct cparser *__restrict self,
                                      struct ctype_attributes *__restrict attrib) {
 	dbx_errno_t result = DBX_EOK;
 	while (self->c_tok == CTOKEN_TOK_KEYWORD) {
-		CHECKED char const *kwd_str;
+		NCX char const *kwd_str;
 		size_t kwd_len;
 		kwd_str = self->c_tokstart;
 		kwd_len = cparser_toklen(self);
@@ -2493,7 +2493,7 @@ PRIVATE char const misc_type_keywords[][16] = {
 
 PRIVATE NONNULL((1)) void
 NOTHROW_CB_NCX(FCALL autocomplete_types)(struct cparser *__restrict self,
-                                         CHECKED char const *name,
+                                         NCX char const *name,
                                          size_t namelen, uintptr_t ns) {
 	unsigned int i;
 	if (namelen < (lengthof(builtin_types[0].bt_name) - 1)) {
@@ -2531,7 +2531,7 @@ NOTHROW_CB_NCX(FCALL ctype_parse_base)(struct cparser *__restrict self,
                                        /*out:ref*/ struct ctyperef *__restrict presult,
                                        struct ctype_attributes *__restrict attrib) {
 	dbx_errno_t result;
-	CHECKED char const *kwd_str;
+	NCX char const *kwd_str;
 	size_t kwd_len;
 	unsigned int integer_type_flags;
 #define BASETYPE_FLAG_SIGNED    0x0001 /* FLAG: `signed' was given */
@@ -2897,7 +2897,7 @@ handle_dots_in_parameter_list:
 
 			/* Parse argument types. */
 			for (;;) {
-				CHECKED char const *argname_start;
+				NCX char const *argname_start;
 				if ((argc + 1) > dbx_malloc_usable_size(argv) / sizeof(struct ctyperef)) {
 					struct ctyperef *new_argv;
 					new_argv = (struct ctyperef *)dbx_realloc(argv, (argc + 1) * sizeof(struct ctyperef));
@@ -3024,7 +3024,7 @@ err_nomem:
 PRIVATE WUNUSED NONNULL((1, 2, 5)) dbx_errno_t
 NOTHROW_CB_NCX(FCALL ctype_eval_inner)(struct cparser *__restrict self,
                                        /*in:ref|out:ref*/ struct ctyperef *__restrict presult,
-                                       CHECKED char const **p_varname, size_t *p_varname_len,
+                                       NCX char const **p_varname, size_t *p_varname_len,
                                        struct ctype_attributes *__restrict attrib) {
 	dbx_errno_t result;
 
@@ -3119,7 +3119,7 @@ syn:
 PUBLIC WUNUSED NONNULL((1, 2)) dbx_errno_t
 NOTHROW_CB_NCX(FCALL ctype_eval)(struct cparser *__restrict self,
                                  /*out:ref*/ struct ctyperef *__restrict presult,
-                                 CHECKED char const **p_varname,
+                                 NCX char const **p_varname,
                                  size_t *p_varname_len) {
 	dbx_errno_t result;
 	struct ctype_attributes attrib;

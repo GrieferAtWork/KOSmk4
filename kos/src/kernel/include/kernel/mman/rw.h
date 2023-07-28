@@ -37,10 +37,10 @@ DECL_BEGIN
  *               - `buf + num_bytes - return ... buf + num_bytes - 1' */
 FUNDEF NOBLOCK NONNULL((1)) size_t
 NOTHROW(KCALL mman_read_nopf)(struct mman *__restrict self, UNCHECKED void const *addr,
-                              USER CHECKED void *buf, size_t num_bytes);
+                              NCX void *buf, size_t num_bytes);
 FUNDEF NOBLOCK NONNULL((1)) size_t
 NOTHROW(KCALL mman_write_nopf)(struct mman *__restrict self, UNCHECKED void *addr,
-                               USER CHECKED void const *buf, size_t num_bytes);
+                               NCX void const *buf, size_t num_bytes);
 FUNDEF NOBLOCK NONNULL((1)) size_t
 NOTHROW(KCALL mman_memset_nopf)(struct mman *__restrict self, UNCHECKED void *addr,
                                 int byte, size_t num_bytes);
@@ -53,12 +53,12 @@ NOTHROW(KCALL mman_memset_nopf)(struct mman *__restrict self, UNCHECKED void *ad
  * @param: force_writable_destination: When true, force `addr' to be writable, invoking COW as needed. */
 FUNDEF BLOCKING void KCALL
 mman_read(struct mman *__restrict self,
-          UNCHECKED void const *addr, USER CHECKED void *buf,
+          UNCHECKED void const *addr, NCX void *buf,
           size_t num_bytes, __BOOL force_readable_source DFL(0))
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 FUNDEF BLOCKING void KCALL
 mman_write(struct mman *__restrict self,
-           UNCHECKED void *addr, USER CHECKED void const *buf,
+           UNCHECKED void *addr, NCX void const *buf,
            size_t num_bytes, __BOOL force_writable_destination DFL(0))
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 /* Same as `mman_write()', but implement memset() semantics instead. */

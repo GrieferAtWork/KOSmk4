@@ -59,7 +59,7 @@
 #define RBTREE_OMIT_REMOVE
 #define RBTREE(name)               ramfs_direnttree_##name
 #define RBTREE_T                   struct ramfs_dirent
-#define RBTREE_Tkey                USER CHECKED char const *
+#define RBTREE_Tkey                NCX char const *
 #define RBTREE_GETNODE(self)       (self)->rde_treenode
 #define RBTREE_GETKEY(self)        (self)->rde_ent.fd_name
 #define RBTREE_REDFIELD            rde_isred
@@ -252,7 +252,7 @@ ramfs_dirent_next(struct ramfs_dirent *__restrict self,
 }
 
 PUBLIC BLOCKING NONNULL((1)) size_t KCALL
-ramfs_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+ramfs_direnum_v_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                         size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_WOULDBLOCK, ...) {
 	ssize_t result;
@@ -439,7 +439,7 @@ do_seek_end:
 
 PUBLIC ATTR_PURE WUNUSED struct ramfs_dirent *FCALL
 ramfs_direnttree_locate(/*nullable*/ struct ramfs_dirent *root,
-                        USER CHECKED char const *key,
+                        NCX char const *key,
                         size_t keylen) THROWS(E_SEGFAULT) {
 	while (root) {
 		int cmp = strcmpz(root->rde_ent.fd_name, key, keylen);
@@ -458,7 +458,7 @@ ramfs_direnttree_locate(/*nullable*/ struct ramfs_dirent *root,
 
 PUBLIC ATTR_PURE WUNUSED NONNULL((1)) struct ramfs_dirent *FCALL
 _ramfs_direnttree_caselocate(struct ramfs_dirent *__restrict root,
-                             USER CHECKED char const *key, size_t keylen)
+                             NCX char const *key, size_t keylen)
 		THROWS(E_SEGFAULT) {
 again:
 	if (root->rde_ent.fd_namelen == keylen &&
@@ -1415,7 +1415,7 @@ PUBLIC_CONST struct fsuper_ops const ramfs_super_ops = {
 PRIVATE WUNUSED NONNULL((1)) REF struct fsuper *KCALL
 ramfs_open(struct ffilesys *__restrict UNUSED(filesys),
            struct mfile *UNUSED(dev),
-           UNCHECKED USER char *UNUSED(args)) {
+           NCX UNCHECKED char *UNUSED(args)) {
 	static_assert((offsetof(struct ramfs_super, rs_dat) -
 	               offsetof(struct ramfs_super, fs_root)) ==
 	              offsetof(struct ramfs_dirnode, rdn_dat));

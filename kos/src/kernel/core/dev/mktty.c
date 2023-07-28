@@ -195,7 +195,7 @@ NOTHROW(KCALL mkttydev_stopfwd)(struct mkttydev *__restrict self) {
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 mkttydev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-                 USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+                 NCX UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct mkttydev *me = mfile_asmktty(self);
 	switch (cmd) {
 
@@ -309,8 +309,8 @@ NOTHROW(KCALL mkttydev_v_destroy)(struct mfile *__restrict self) {
 }
 
 
-typedef size_t (KCALL *phandle_read_function_t)(void *__restrict ptr, USER CHECKED void *, size_t, iomode_t) /*THROWS(...)*/;
-typedef size_t (KCALL *phandle_write_function_t)(void *__restrict ptr, USER CHECKED void const *, size_t, iomode_t) /*THROWS(...)*/;
+typedef size_t (KCALL *phandle_read_function_t)(void *__restrict ptr, NCX void *, size_t, iomode_t) /*THROWS(...)*/;
+typedef size_t (KCALL *phandle_write_function_t)(void *__restrict ptr, NCX void const *, size_t, iomode_t) /*THROWS(...)*/;
 typedef void (KCALL *phandle_pollconnect_function_t)(void *__restrict ptr, poll_mode_t) /*THROWS(...)*/;
 typedef poll_mode_t (KCALL *phandle_polltest_function_t)(void *__restrict ptr, poll_mode_t) /*THROWS(...)*/;
 
@@ -346,7 +346,7 @@ PUBLIC_CONST struct ttydev_ops const mkttydev_ops = {{{{{
 PUBLIC ATTR_RETNONNULL REF struct mkttydev *KCALL
 mkttydev_new(uintptr_half_t ihandle_typ, void *ihandle_ptr,
              uintptr_half_t ohandle_typ, void *ohandle_ptr,
-             USER CHECKED char const *name, size_t namelen)
+             NCX char const *name, size_t namelen)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
 	struct mkttydev *result;
 	result = (struct mkttydev *)kmalloc(sizeof(struct mkttydev), GFP_NORMAL);
@@ -443,7 +443,7 @@ mkttydev_new(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_MKTTY
 DEFINE_SYSCALL4(fd_t, mktty,
-                USER UNCHECKED char const *, name,
+                NCX UNCHECKED char const *, name,
                 fd_t, keyboard, fd_t, display,
                 syscall_ulong_t, reserved) {
 	fd_t result;

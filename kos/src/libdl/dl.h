@@ -115,17 +115,17 @@ DlModule_OpenFd(/*inherit(on_success)*/ fd_t fd, unsigned int mode)
 		THROWS(...);
 
 INTDEF WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
-DlModule_OpenFilename(USER char const *filename, unsigned int mode)
+DlModule_OpenFilename(NCX char const *filename, unsigned int mode)
 		THROWS(E_SEGFAULT, ...);
 
 INTDEF WUNUSED NONNULL((1, 3)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
 DlModule_OpenFilenameInPath(char const *__restrict path, size_t pathlen,
-                            USER char const *filename, size_t filenamelen,
+                            NCX char const *filename, size_t filenamelen,
                             unsigned int mode, char const *origin_filename)
 		THROWS(E_SEGFAULT, ...);
 
 INTDEF WUNUSED NONNULL((1, 2)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
-DlModule_OpenFilenameInPathList(char const *__restrict path, USER char const *filename,
+DlModule_OpenFilenameInPathList(char const *__restrict path, NCX char const *filename,
                                 unsigned int mode, char const *origin_filename)
 		THROWS(E_SEGFAULT, ...);
 
@@ -143,11 +143,11 @@ DlModule_ElfOpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restri
 /* Try to find an already-loaded module. */
 INTDEF WUNUSED NONNULL((1, 3)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *
 NOTHROW_NCX(CC DlModule_FindFilenameInPathFromAll)(char const *__restrict path, size_t pathlen,
-                                                   USER char const *filename, size_t filenamelen)
+                                                   NCX char const *filename, size_t filenamelen)
 		THROWS(E_SEGFAULT);
 
 INTDEF WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *
-NOTHROW_NCX(CC DlModule_FindFilenameInPathListFromAll)(USER char const *filename)
+NOTHROW_NCX(CC DlModule_FindFilenameInPathListFromAll)(NCX char const *filename)
 		THROWS(E_SEGFAULT);
 
 
@@ -190,7 +190,7 @@ NOTHROW(CC DlModule_UpdateFlags)(DlModule *__restrict self, int mode);
 /* Lazily allocate if necessary, and return the file descriptor for `self'
  * @return: -1: Error (s.a. dlerror()) */
 INTDEF WUNUSED NONNULL((1)) fd_t
-NOTHROW_NCX(CC DlModule_GetFd)(USER DlModule *self)
+NOTHROW_NCX(CC DlModule_GetFd)(NCX DlModule *self)
 		THROWS(E_SEGFAULT);
 
 /* Lazily allocate  if  necessary,  and  return  the vector  of  section  headers  for  `self'
@@ -201,21 +201,21 @@ NOTHROW_NCX(CC DlModule_GetFd)(USER DlModule *self)
  *  - self->dm_elf.de_shdr
  * @return: NULL: Error (s.a. dlerror()) */
 INTDEF WUNUSED NONNULL((1)) ElfW(Shdr) *
-NOTHROW_NCX(CC DlModule_ElfGetShdrs)(USER DlModule *self)
+NOTHROW_NCX(CC DlModule_ElfGetShdrs)(NCX DlModule *self)
 		THROWS(E_SEGFAULT);
 
 /* Lazily allocate if necessary, and return the section header string table for `self'
  * @return: NULL: Error (s.a. dlerror()) */
 INTDEF WUNUSED NONNULL((1)) char *
-NOTHROW_NCX(CC DlModule_ElfGetShstrtab)(USER DlModule *self)
+NOTHROW_NCX(CC DlModule_ElfGetShstrtab)(NCX DlModule *self)
 		THROWS(E_SEGFAULT);
 
 /* Return the section header associated with a given `name'
  * @return: NULL:             Error (w/ dlerror() set)
  * @return: (ElfW(Shdr) *)-1: Not found (w/o dlerror() set) */
 INTDEF WUNUSED NONNULL((1, 2)) ElfW(Shdr) *
-NOTHROW_NCX(CC DlModule_ElfGetSection)(USER DlModule *self,
-                                       USER char const *name)
+NOTHROW_NCX(CC DlModule_ElfGetSection)(NCX DlModule *self,
+                                       NCX char const *name)
 		THROWS(E_SEGFAULT);
 
 /* Lazily calculates  and  returns  the #  of  symbols  in  `de_dynsym_tab'
@@ -223,7 +223,7 @@ NOTHROW_NCX(CC DlModule_ElfGetSection)(USER DlModule *self,
  * @return: * : The # of symbols in `de_dynsym_tab'
  * @return: 0 : Error (dlerror() was modified) */
 INTDEF WUNUSED NONNULL((1)) size_t
-NOTHROW_NCX(CC DlModule_ElfGetDynSymCnt)(USER DlModule *self)
+NOTHROW_NCX(CC DlModule_ElfGetDynSymCnt)(NCX DlModule *self)
 		THROWS(E_SEGFAULT);
 
 /* Return a pointer to the Elf_Sym object assigned with `name'.
@@ -232,8 +232,8 @@ NOTHROW_NCX(CC DlModule_ElfGetDynSymCnt)(USER DlModule *self)
  * NOTE: This function ~may~ set `dlerror()' when returning `NULL' in
  *       case of the error is the  result of a corrupted hash  table. */
 INTDEF WUNUSED NONNULL((1, 2, 3, 4)) ElfW(Sym) const *
-NOTHROW_NCX(CC DlModule_ElfGetLocalSymbol)(USER DlModule *self,
-                                           USER char const *name,
+NOTHROW_NCX(CC DlModule_ElfGetLocalSymbol)(NCX DlModule *self,
+                                           NCX char const *name,
                                            uintptr_t *__restrict phash_elf,
                                            uintptr_t *__restrict phash_gnu)
 		THROWS(E_SEGFAULT);
@@ -243,7 +243,7 @@ NOTHROW_NCX(CC DlModule_ElfGetLocalSymbol)(USER DlModule *self,
  * If no such module is loaded, `NULL' is returned instead.
  * @return: NULL: No such module exists (NOTE: No error was set in this case!) */
 INTERN WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *
-NOTHROW_NCX(CC DlModule_FindFromFilename)(USER char const *filename)
+NOTHROW_NCX(CC DlModule_FindFromFilename)(NCX char const *filename)
 		THROWS(E_SEGFAULT);
 
 
@@ -275,7 +275,7 @@ NOTHROW_NCX(CC DlModule_FindFromFilename)(USER char const *filename)
  * @return: * :   A handle to the library that got loaded.
  * @return: NULL: Failed to load the library. - Call `dlerror()' to get an error message. */
 INTDEF WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *DLFCN_CC
-libdl_dlopen(USER char const *filename, int mode)
+libdl_dlopen(NCX char const *filename, int mode)
 		THROWS(E_SEGFAULT, ...);
 
 /* Close  a  previously  opened  dynamic  module  handle,  as  returned by
@@ -299,7 +299,7 @@ libdl_dlopen(USER char const *filename, int mode)
  *              performed.  The  only guaranty  made is  that NULL-handles
  *              are always handled as fail-safe! */
 INTDEF NONNULL((1)) int DLFCN_CC
-libdl_dlclose(USER REF_IF(!(self->dm_flags & RTLD_NODELETE)) DlModule *handle)
+libdl_dlclose(NCX REF_IF(!(self->dm_flags & RTLD_NODELETE)) DlModule *handle)
 		THROWS(E_SEGFAULT, ...);
 
 /* Lookup the load address of a symbol within a shared library  `handle',
@@ -339,7 +339,7 @@ libdl_dlclose(USER REF_IF(!(self->dm_flags & RTLD_NODELETE)) DlModule *handle)
  * @return: NULL:  No  such symbol (dlerror()  != NULL), or  the symbol has been
  *                 linked to be loaded at the address `NULL' (dlerror() == NULL) */
 INTDEF WUNUSED NONNULL((2)) void *DLFCN_CC
-libdl_dlsym(USER DlModule *handle, USER char const *symbol_name)
+libdl_dlsym(NCX DlModule *handle, NCX char const *symbol_name)
 		THROWS(E_SEGFAULT, ...);
 
 /* Return  and clear the  current libdl error message  string, such that for
@@ -378,7 +378,7 @@ libdl_dlfopen(/*inherit(on_success)*/ fd_t fd, unsigned int mode)
  * @return: 0 : The given module isn't exception aware
  * @return: * : The given module handler is invalid (s.a. `dlerror()') */
 INTDEF WUNUSED NONNULL((1)) int
-NOTHROW_NCX(DLFCN_CC libdl_dlexceptaware)(USER DlModule *handle) THROWS(E_SEGFAULT);
+NOTHROW_NCX(DLFCN_CC libdl_dlexceptaware)(NCX DlModule *handle) THROWS(E_SEGFAULT);
 
 /* Return the handle of an already loaded library, given a static data/text pointer
  * @param: flags: Set of `DLGETHANDLE_F*' */
@@ -398,7 +398,7 @@ NOTHROW(DLFCN_CC libdl_dlgethandle)(void const *static_pointer, unsigned int fla
  *                Alternatively, `NULL' can be passed to return a handle for the caller's module.
  * @param: flags: Set of `DLGETHANDLE_F*' */
 INTDEF WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE) && (flags & DLGETHANDLE_FINCREF)) DlModule *
-NOTHROW_NCX(DLFCN_CC libdl_dlgetmodule)(USER char const *name, unsigned int flags) THROWS(E_SEGFAULT);
+NOTHROW_NCX(DLFCN_CC libdl_dlgetmodule)(NCX char const *name, unsigned int flags) THROWS(E_SEGFAULT);
 
 /* >> dladdr(3D)
  * Query information on the symbol/module associated with a given `address'
@@ -408,7 +408,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dlgetmodule)(USER char const *name, unsigned int flag
  * @return: -1: Error (s.a. `dlerror()') */
 INTDEF NONNULL((2)) int
 NOTHROW_NCX(DLFCN_CC libdl_dladdr)(void const *address,
-                                   USER Dl_info *info)
+                                   NCX Dl_info *info)
 		THROWS(E_SEGFAULT);
 
 /* >> dlinfo(3)
@@ -418,8 +418,8 @@ NOTHROW_NCX(DLFCN_CC libdl_dladdr)(void const *address,
  * @return: 0 : Success.
  * @return: -1: Error (s.a. `dlerror()') */
 INTDEF NONNULL((1)) int
-NOTHROW_NCX(DLFCN_CC libdl_dlinfo)(USER DlModule *self, int request,
-                                   USER void *arg);
+NOTHROW_NCX(DLFCN_CC libdl_dlinfo)(NCX DlModule *self, int request,
+                                   NCX void *arg);
 
 
 /* Return the internally used file descriptor for the given module `handle'
@@ -434,7 +434,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dlinfo)(USER DlModule *self, int request,
  *                       same slot was re-used in the mean time.
  * @return: -1: Error (s.a. `dlerror()') */
 INTDEF WUNUSED NONNULL((1)) fd_t
-NOTHROW_NCX(DLFCN_CC libdl_dlmodulefd)(USER DlModule *self) THROWS(E_SEGFAULT);
+NOTHROW_NCX(DLFCN_CC libdl_dlmodulefd)(NCX DlModule *self) THROWS(E_SEGFAULT);
 
 /* Return the internally  used filename for  the given module  `handle'
  * Note that this path is an absolute, canonical (realpath()) filename.
@@ -442,7 +442,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dlmodulefd)(USER DlModule *self) THROWS(E_SEGFAULT);
  * @return: * :    The absolute, unambiguous filename for the given module `handle'
  * @return: NULL:  Error (s.a. `dlerror()') */
 INTDEF WUNUSED NONNULL((1)) char const *
-NOTHROW_NCX(DLFCN_CC libdl_dlmodulename)(USER DlModule *self) THROWS(E_SEGFAULT);
+NOTHROW_NCX(DLFCN_CC libdl_dlmodulename)(NCX DlModule *self) THROWS(E_SEGFAULT);
 
 /* Return the base address offset chosen by ASLR, which is added to addresses of the given module `handle'.
  * WARNING: This function  usually returns  `NULL' for  the root  executable, in  which case  dlerror()
@@ -456,7 +456,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dlmodulename)(USER DlModule *self) THROWS(E_SEGFAULT)
  * @return: * : The load address / module base for the given `handle'.
  * @return: 0 : Error (s.a. `dlerror()'), or load-address of ZERO */
 INTDEF WUNUSED NONNULL((1)) uintptr_t
-NOTHROW_NCX(DLFCN_CC libdl_dlmodulebase)(USER DlModule *self) THROWS(E_SEGFAULT);
+NOTHROW_NCX(DLFCN_CC libdl_dlmodulebase)(NCX DlModule *self) THROWS(E_SEGFAULT);
 
 /* Lock a named section of a given dynamic library into memory.
  * @param: handle: Handle for the library who's section `name' should be locked & loaded.
@@ -467,8 +467,8 @@ NOTHROW_NCX(DLFCN_CC libdl_dlmodulebase)(USER DlModule *self) THROWS(E_SEGFAULT)
  *                 very least `MAP_PRIVATE', meaning that writes aren't written back to the library file!
  * @return: NULL:  Error (s.a. `dlerror()'; usually: unknown section) */
 INTDEF WUNUSED NONNULL((2)) REF DlSection *
-NOTHROW_NCX(DLFCN_CC libdl_dllocksection)(USER DlModule *self,
-                                          USER char const *name,
+NOTHROW_NCX(DLFCN_CC libdl_dllocksection)(NCX DlModule *self,
+                                          NCX char const *name,
                                           unsigned int flags)
 		THROWS(E_SEGFAULT);
 
@@ -478,7 +478,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dllocksection)(USER DlModule *self,
  * @return: 0 : Successfully unlocked the given section `sect'
  * @return: * : Error (s.a. `dlerror()') */
 INTDEF NONNULL((1)) int
-NOTHROW_NCX(DLFCN_CC libdl_dlunlocksection)(USER REF DlSection *sect)
+NOTHROW_NCX(DLFCN_CC libdl_dlunlocksection)(NCX REF DlSection *sect)
 		THROWS(E_SEGFAULT);
 
 /* Return the name of a given section, or NULL on error
@@ -496,12 +496,12 @@ NOTHROW_NCX(DLFCN_CC libdl_dlunlocksection)(USER REF DlSection *sect)
  *          >> ...
  *          >> dlclose(mod); */
 INTDEF WUNUSED NONNULL((1)) char const *
-NOTHROW_NCX(DLFCN_CC libdl_dlsectionname)(USER DlSection *sect)
+NOTHROW_NCX(DLFCN_CC libdl_dlsectionname)(NCX DlSection *sect)
 		THROWS(E_SEGFAULT);
 
 /* Returns  the index of a given section, or `(size_t)-1' on error. */
 INTDEF WUNUSED NONNULL((1)) size_t
-NOTHROW_NCX(DLFCN_CC libdl_dlsectionindex)(USER DlSection *sect)
+NOTHROW_NCX(DLFCN_CC libdl_dlsectionindex)(NCX DlSection *sect)
 		THROWS(E_SEGFAULT);
 
 /* Return the module associated with a given section, or `NULL' on error.
@@ -509,7 +509,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dlsectionindex)(USER DlSection *sect)
  * @return: * :   A pointer, or reference to the module handle (when `DLGETHANDLE_FINCREF' was given)
  * @return: NULL: Error (s.a. `dlerror()'; usually, the module was already unloaded) */
 INTDEF WUNUSED NONNULL((1)) DlModule *
-NOTHROW_NCX(DLFCN_CC libdl_dlsectionmodule)(USER DlSection *sect, unsigned int flags)
+NOTHROW_NCX(DLFCN_CC libdl_dlsectionmodule)(NCX DlSection *sect, unsigned int flags)
 		THROWS(E_SEGFAULT);
 
 /* Try to inflate compressed  module sections (`SHF_COMPRESSED'), returning  a
@@ -536,8 +536,8 @@ NOTHROW_NCX(DLFCN_CC libdl_dlsectionmodule)(USER DlSection *sect, unsigned int f
  *                the section's normal data blob, that is `sect->ds_data'
  * @return: NULL: Error (s.a. `dlerror()') */
 INTDEF WUNUSED NONNULL((1)) void *
-NOTHROW_NCX(DLFCN_CC libdl_dlinflatesection)(USER DlSection *sect,
-                                             USER size_t *psize)
+NOTHROW_NCX(DLFCN_CC libdl_dlinflatesection)(NCX DlSection *sect,
+                                             NCX size_t *psize)
 		THROWS(E_SEGFAULT);
 
 /* Clear internal caches used by loaded modules in order to free  up
@@ -560,7 +560,7 @@ INTDEF int DLFCN_CC libdl_dlclearcaches(void) THROWS(...);
  * @return: NULL: Error: Unknown `cmd' (s.a. dlerror())
  * @return: NULL: Error: Invalid `handle' (s.a. dlerror()) */
 INTDEF void *DLFCN_CC
-libdl_dlauxctrl(USER DlModule *self, unsigned int type, ...)
+libdl_dlauxctrl(NCX DlModule *self, unsigned int type, ...)
 		THROWS(E_SEGFAULT, ...);
 
 INTDEF void *ASMCALL libdl____tls_get_addr(void); /* Only available on some architectures, with arch-specific semantics */
@@ -580,7 +580,7 @@ NOTHROW(DLFCN_CC libdl_dltlsallocseg)(void);
 
 /* Free a previously allocated static TLS segment (usually called by `pthread_exit(3)' and friends). */
 INTDEF NONNULL((1)) int DLFCN_CC
-libdl_dltlsfreeseg(USER struct dltls_segment *ptr)
+libdl_dltlsfreeseg(NCX struct dltls_segment *ptr)
 		THROWS(E_SEGFAULT, ...);
 
 /* Return a pointer to the base of the given module's
@@ -642,14 +642,14 @@ libdl_dltlsbase(DlModule *__restrict self) THROWS(...);
  * @return: NULL:          Failed to allocate the TLS segment (s.a. `dlerror()') */
 INTDEF WUNUSED DlModule *
 NOTHROW(DLFCN_CC libdl_dltlsalloc)(size_t num_bytes, size_t min_alignment,
-                                   USER void const *template_data, size_t template_size,
-                                   void (DLFCN_CC USER *perthread_init)(void *arg, void *base, void *tls_segment),
-                                   void (DLFCN_CC USER *perthread_fini)(void *arg, void *base, void *tls_segment),
-                                   USER void *perthread_callback_arg);
+                                   NCX void const *template_data, size_t template_size,
+                                   void (DLFCN_CC NCX *perthread_init)(void *arg, void *base, void *tls_segment),
+                                   void (DLFCN_CC NCX *perthread_fini)(void *arg, void *base, void *tls_segment),
+                                   NCX void *perthread_callback_arg);
 
 /* Free a TLS segment previously allocated with `dltlsalloc(3D)' */
 INTDEF int
-NOTHROW_NCX(DLFCN_CC libdl_dltlsfree)(USER DlModule *self)
+NOTHROW_NCX(DLFCN_CC libdl_dltlsfree)(NCX DlModule *self)
 		THROWS(E_SEGFAULT);
 
 #ifndef __DLFCN_DLTLSADDR_CC
@@ -672,7 +672,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dltlsfree)(USER DlModule *self)
  * @return: * :   Pointer to the base of the TLS segment associated with `tls_handle' within the calling thread.
  * @return: NULL: Invalid `tls_handle', or allocation/initialization failed. (s.a. `dlerror()') */
 INTDEF WUNUSED void *__DLFCN_DLTLSADDR_CC
-libdl_dltlsaddr(USER DlModule *self)
+libdl_dltlsaddr(NCX DlModule *self)
 		THROWS(E_SEGFAULT, ...);
 
 /* Same as `dltlsaddr(3D)', but used to lookup a TLS block relative to a given `tls_segment',
@@ -684,16 +684,16 @@ libdl_dltlsaddr(USER DlModule *self)
  * @return: NULL: Invalid `tls_handle' or `tls_segment', or
  *                allocation/initialization failed. (s.a. `dlerror()') */
 INTDEF WUNUSED void *__DLFCN_DLTLSADDR2_CC
-libdl_dltlsaddr2(USER DlModule *self, USER struct dltls_segment *seg)
+libdl_dltlsaddr2(NCX DlModule *self, NCX struct dltls_segment *seg)
 		THROWS(E_SEGFAULT, ...);
 INTDEF WUNUSED void *__DLFCN_DLTLSADDR2_CC
 libdl_dltlsaddr2_noinit(DlModule *__restrict self,
-                        USER struct dltls_segment *seg);
+                        NCX struct dltls_segment *seg);
 
 /* Similar to `libdl_dltlsaddr()', but do no lazy allocation
  * and return NULL if the module doesn't have a TLS segment. */
 INTDEF WUNUSED NONNULL((1)) void *
-NOTHROW_NCX(CC DlModule_TryGetTLSAddr)(USER DlModule *self)
+NOTHROW_NCX(CC DlModule_TryGetTLSAddr)(NCX DlModule *self)
 		THROWS(E_SEGFAULT);
 
 /* Enumerate all loaded modules, as  well as information about  them.
@@ -701,7 +701,7 @@ NOTHROW_NCX(CC DlModule_TryGetTLSAddr)(USER DlModule *self)
  * will then also be returned  by this function. Otherwise, `0'  will
  * be returned after all modules have been enumerated. */
 INTDEF NONNULL((1)) int DLFCN_CC
-libdl_iterate_phdr(USER __dl_iterator_callback callback, USER void *arg)
+libdl_iterate_phdr(NCX __dl_iterator_callback callback, NCX void *arg)
 		THROWS(E_SEGFAULT, ...);
 
 /* Invoke the  static initializers  of  all currently  loaded  modules.
@@ -743,29 +743,29 @@ dl_bind_lazy_relocation(DlModule *__restrict self,
 		THROWS(...);
 #endif /* ELF_ARCH_IS_R_JMP_SLOT */
 
-INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_badptr)(USER void *ptr);
-INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_badmodule)(USER void *modptr);
-INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_badsection)(USER void *sectptr);
+INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_badptr)(NCX void *ptr);
+INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_badmodule)(NCX void *modptr);
+INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_badsection)(NCX void *sectptr);
 INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_nomem)(void);
-INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_no_mod_at_addr)(USER void const *static_pointer);
+INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_no_mod_at_addr)(NCX void const *static_pointer);
 INTDEF ATTR_COLD NONNULL((1)) int NOTHROW(CC dl_seterror_header_read_error)(char const *__restrict filename);
 INTDEF ATTR_COLD NONNULL((1)) int NOTHROW(CC dl_seterror_notelf)(char const *__restrict filename);
-INTDEF ATTR_COLD NONNULL((1, 2)) int NOTHROW_NCX(CC dl_seterror_nosect)(USER DlModule const *self, USER char const *name) THROWS(E_SEGFAULT);
-INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_seterror_nosect_index)(USER DlModule const *self, size_t index) THROWS(E_SEGFAULT);
-INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_seterror_nosym_global)(USER char const *symname) THROWS(E_SEGFAULT);
-INTDEF ATTR_COLD NONNULL((1, 2)) int NOTHROW_NCX(CC dl_seterror_nosym_next)(DlModule const *__restrict after, USER char const *symname) THROWS(E_SEGFAULT);
-INTDEF ATTR_COLD NONNULL((1, 2)) int NOTHROW_NCX(CC dl_seterror_nosym_in)(USER DlModule const *mod, USER char const *symname) THROWS(E_SEGFAULT);
-INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_seterror_nosym_next_badcaller)(USER char const *symname) THROWS(E_SEGFAULT);
-INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_seterror_dlopen_failed)(USER char const *libname) THROWS(E_SEGFAULT);
-INTDEF ATTR_COLD NONNULL((1, 2)) int NOTHROW_NCX(CC dl_seterr_section_mmap_failed)(USER DlModule const *self, USER char const *section_filename) THROWS(E_SEGFAULT);
-INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_seterr_section_index_mmap_failed)(USER DlModule const *self, size_t section_index) THROWS(E_SEGFAULT);
+INTDEF ATTR_COLD NONNULL((1, 2)) int NOTHROW_NCX(CC dl_seterror_nosect)(NCX DlModule const *self, NCX char const *name) THROWS(E_SEGFAULT);
+INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_seterror_nosect_index)(NCX DlModule const *self, size_t index) THROWS(E_SEGFAULT);
+INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_seterror_nosym_global)(NCX char const *symname) THROWS(E_SEGFAULT);
+INTDEF ATTR_COLD NONNULL((1, 2)) int NOTHROW_NCX(CC dl_seterror_nosym_next)(DlModule const *__restrict after, NCX char const *symname) THROWS(E_SEGFAULT);
+INTDEF ATTR_COLD NONNULL((1, 2)) int NOTHROW_NCX(CC dl_seterror_nosym_in)(NCX DlModule const *mod, NCX char const *symname) THROWS(E_SEGFAULT);
+INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_seterror_nosym_next_badcaller)(NCX char const *symname) THROWS(E_SEGFAULT);
+INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_seterror_dlopen_failed)(NCX char const *libname) THROWS(E_SEGFAULT);
+INTDEF ATTR_COLD NONNULL((1, 2)) int NOTHROW_NCX(CC dl_seterr_section_mmap_failed)(NCX DlModule const *self, NCX char const *section_filename) THROWS(E_SEGFAULT);
+INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_seterr_section_index_mmap_failed)(NCX DlModule const *self, size_t section_index) THROWS(E_SEGFAULT);
 INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(VCC dl_seterrorf)(char const *__restrict format, ...);
 INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_vseterrorf)(char const *__restrict format, va_list args);
 
 /* Return the address of a builtin function (e.g. `dlopen(3D)') */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) void *NOTHROW_NCX(CC dlsym_builtin)(USER char const *name) THROWS(E_SEGFAULT);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(CC dlsym_builtin_size)(USER char const *name) THROWS(E_SEGFAULT);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) DlSection *NOTHROW_NCX(CC dlsec_builtin)(USER char const *name) THROWS(E_SEGFAULT);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) void *NOTHROW_NCX(CC dlsym_builtin)(NCX char const *name) THROWS(E_SEGFAULT);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(CC dlsym_builtin_size)(NCX char const *name) THROWS(E_SEGFAULT);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) DlSection *NOTHROW_NCX(CC dlsec_builtin)(NCX char const *name) THROWS(E_SEGFAULT);
 INTDEF ATTR_CONST WUNUSED DlSection *NOTHROW(CC dlsec_builtin_index)(size_t sect_index);
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(CC dlsec_builtin_name)(size_t sect_index);
 

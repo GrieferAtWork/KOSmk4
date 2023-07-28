@@ -402,7 +402,7 @@ rtm_memory_schedule_syscall(struct rtm_memory *__restrict self) {
 INTERN NONNULL((1)) void FCALL
 rtm_memory_schedule_sys_syslog(struct rtm_memory *__restrict self,
                                syscall_ulong_t level,
-                               USER char const *str, size_t len) {
+                               NCX char const *str, size_t len) {
 	struct rtm_pending_syscall *ent;
 	char *str_copy;
 	/* Verify that the `level' argument is valid. */
@@ -616,7 +616,7 @@ NOTHROW(FCALL rtm_memory_try_merge_regions)(struct rtm_memory *__restrict self,
 PRIVATE void FCALL
 rtm_memcpy_prefault(struct mman *__restrict effective_mm,
                     void *__restrict dst,
-                    USER void const *src,
+                    NCX void const *src,
                     size_t num_bytes) {
 	size_t copy_error;
 	while ((copy_error = memcpy_nopf(dst, src, num_bytes)) != 0) {
@@ -685,8 +685,8 @@ rtm_memory_insert_region(struct rtm_memory *__restrict self, size_t index,
 PRIVATE ATTR_RETNONNULL struct rtm_memory_region *FCALL
 rtm_memory_create_far_region(struct rtm_memory *__restrict self,
                              size_t region_insert_index,
-                             USER void *region_min,
-                             USER void *region_max,
+                             NCX void *region_min,
+                             NCX void *region_max,
                              struct mman *__restrict effective_mm,
                              struct mpart *__restrict part,
                              uintptr_t version) {
@@ -726,7 +726,7 @@ rtm_memory_create_far_region(struct rtm_memory *__restrict self,
  * @throw: E_SEGFAULT: Faulty `addr', or `addr' points into a VIO mapping.
  * @throw: E_BADALLOC: Not enough memory, or `rtm_memory_limit' has been reached. */
 PRIVATE NONNULL((1, 3)) void FCALL
-rtm_memory_readwrite(struct rtm_memory *__restrict self, USER void *addr,
+rtm_memory_readwrite(struct rtm_memory *__restrict self, NCX void *addr,
                      void *__restrict buf, size_t num_bytes, bool write)
 		THROWS(E_BADALLOC, E_SEGFAULT) {
 	/* Step #1: Check if the given `addr' is apart of an existing region. */
@@ -770,7 +770,7 @@ again_rw_region:
 		} else {
 			buf = mempcpy(buf, rdat, avail_bytes);
 		}
-		addr = (USER byte_t *)addr + avail_bytes;
+		addr = (NCX byte_t *)addr + avail_bytes;
 		num_bytes -= avail_bytes;
 		/* Some data is still missing.
 		 * -> Check if the next region starts where the current left off.
@@ -1150,7 +1150,7 @@ do_create_far_region:
 					} else {
 						/* Extend upwards */
 						size_t missing_bytes;
-						USER byte_t *missing_addr_start;
+						NCX byte_t *missing_addr_start;
 						assertf((byte_t *)addr + access_bytes - 1 > region->mr_addrhi,
 						        "addr + .... - 1    = %p\n"
 						        "region->mr_addrhi  = %p\n",
@@ -1174,7 +1174,7 @@ do_create_far_region:
 						region = rtm_memory_realloc_region(self, region,
 						                                   old_region_size +
 						                                   missing_bytes);
-						missing_addr_start = (USER byte_t *)region->mr_addrhi + 1;
+						missing_addr_start = (NCX byte_t *)region->mr_addrhi + 1;
 						region->mr_addrhi  = (byte_t *)region->mr_addrhi + missing_bytes;
 						assert((byte_t *)region->mr_addrhi ==
 						       (byte_t *)region->mr_addrlo + old_region_size + missing_bytes - 1);
@@ -1342,11 +1342,11 @@ do_access_region:
  * @throw: E_SEGFAULT: Faulty `addr', or `addr' points into a VIO mapping.
  * @throw: E_BADALLOC: Not enough memory, or `rtm_memory_limit' has been reached. */
 INTERN NONNULL((1, 3)) void FCALL
-rtm_memory_read(struct rtm_memory *__restrict self, USER void const *addr,
+rtm_memory_read(struct rtm_memory *__restrict self, NCX void const *addr,
                 void *__restrict buf, size_t num_bytes)
 		THROWS(E_BADALLOC, E_SEGFAULT) {
 	rtm_memory_readwrite(self,
-	                     (USER void *)addr,
+	                     (NCX void *)addr,
 	                     buf,
 	                     num_bytes,
 	                     false);
@@ -1356,7 +1356,7 @@ rtm_memory_read(struct rtm_memory *__restrict self, USER void const *addr,
  * @throw: E_SEGFAULT: Faulty `addr', or `addr' points into a VIO mapping.
  * @throw: E_BADALLOC: Not enough memory, or `rtm_memory_limit' has been reached. */
 INTERN NONNULL((1, 3)) void FCALL
-rtm_memory_write(struct rtm_memory *__restrict self, USER void *addr,
+rtm_memory_write(struct rtm_memory *__restrict self, NCX void *addr,
                  void const *__restrict buf, size_t num_bytes)
 		THROWS(E_BADALLOC, E_SEGFAULT) {
 	rtm_memory_readwrite(self,
@@ -1374,7 +1374,7 @@ rtm_memory_write(struct rtm_memory *__restrict self, USER void *addr,
 
 PRIVATE void FCALL
 prefault_memory_for_writing(struct mman *__restrict mymm,
-                            USER void *addr, size_t num_bytes) {
+                            NCX void *addr, size_t num_bytes) {
 #ifndef CONFIG_MODRTM_USERSPACE_ONLY
 	mman_forcefault(ADDR_ISKERN(addr) ? &mman_kernel
 	                                  : mymm,
@@ -1406,7 +1406,7 @@ NOTHROW(FCALL rtm_memory_endwrite_modified_parts)(struct rtm_memory const *__res
 /* Verify that the given address range is writable
  * without  any   chance  of   triggering  a   #PF */
 PRIVATE NOBLOCK ATTR_PURE NONNULL((1)) bool
-NOTHROW(FCALL rtm_verify_writable_nopf)(USER CHECKED void *addr,
+NOTHROW(FCALL rtm_verify_writable_nopf)(NCX void *addr,
                                         size_t num_bytes) {
 	num_bytes += (uintptr_t)addr & PAGEMASK;
 	for (;;) {

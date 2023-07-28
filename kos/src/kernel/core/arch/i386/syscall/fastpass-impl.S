@@ -761,7 +761,7 @@ SC_END_ALL_NOTHROW(rtm_abort)
 
 
 
-/* >> errno_t sigsuspend(USER UNCHECKED sigset_t const *unot_these); */
+/* >> errno_t sigsuspend(NCX UNCHECKED sigset_t const *unot_these); */
 #if _SYSFAST_WANT(SIGSUSPEND, sigsuspend)
 SC_BEGIN(sigsuspend)
 	SC_PUSH_ICPUSTATE
@@ -806,7 +806,7 @@ SC_END(sigsuspend)
 
 
 
-/* >> errno_t rt_sigsuspend(USER UNCHECKED sigset_t const *unot_these, size_t sigsetsize); */
+/* >> errno_t rt_sigsuspend(NCX UNCHECKED sigset_t const *unot_these, size_t sigsetsize); */
 #if _SYSFAST_WANT(RT_SIGSUSPEND, rt_sigsuspend)
 SC_BEGIN(rt_sigsuspend)
 	SC_PUSH_ICPUSTATE

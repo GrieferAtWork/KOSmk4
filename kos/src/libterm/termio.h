@@ -54,13 +54,13 @@ NOTHROW_NCX(CC libterminal_init)(struct terminal *__restrict self,
  * @return: -1:   [USERSPACE] Printing to one of the linebuffers failed (s.a. `linebuffer_write()'; `errno') */
 INTDEF NONNULL((1)) ssize_t CC
 libterminal_owrite(struct terminal *__restrict self,
-                   USER CHECKED void const *__restrict src,
+                   NCX void const *__restrict src,
                    size_t num_bytes, iomode_t mode)
 	KERNEL_SELECT(THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
 	              THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...));
 INTDEF NONNULL((1)) ssize_t CC
 libterminal_iwrite(struct terminal *__restrict self,
-                   USER CHECKED void const *src,
+                   NCX void const *src,
                    size_t num_bytes, iomode_t mode)
 	KERNEL_SELECT(THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
 	              THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...));
@@ -71,7 +71,7 @@ libterminal_iwrite(struct terminal *__restrict self,
  * @return: <0:  [USERSPACE] An error occurred (s.a. `errno') */
 INTDEF NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libterminal_iread(struct terminal *__restrict self,
-                  USER CHECKED void *dst,
+                  NCX void *dst,
                   size_t num_bytes, iomode_t mode)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT);
 

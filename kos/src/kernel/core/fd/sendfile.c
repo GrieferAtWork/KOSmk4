@@ -137,7 +137,7 @@ sys_sendfile_impl(fd_t outfd, fd_t infd,
 
 #ifdef __ARCH_WANT_SYSCALL_SENDFILE
 DEFINE_SYSCALL4(ssize_t, sendfile, fd_t, outfd, fd_t, infd,
-                USER UNCHECKED syscall_ulong_t *, pin_offset,
+                NCX UNCHECKED syscall_ulong_t *, pin_offset,
                 size_t, num_bytes) {
 	ssize_t result;
 	pos_t offset;
@@ -172,7 +172,7 @@ DEFINE_SYSCALL4(ssize_t, sendfile, fd_t, outfd, fd_t, infd,
 
 #ifdef __ARCH_WANT_SYSCALL_SENDFILE64
 DEFINE_SYSCALL4(ssize_t, sendfile64, fd_t, outfd, fd_t, infd,
-                USER UNCHECKED uint64_t *, pin_offset,
+                NCX UNCHECKED uint64_t *, pin_offset,
                 size_t, num_bytes) {
 	ssize_t result;
 	pos_t offset;
@@ -196,7 +196,7 @@ DEFINE_SYSCALL4(ssize_t, sendfile64, fd_t, outfd, fd_t, infd,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SENDFILE
 DEFINE_COMPAT_SYSCALL4(ssize_t, sendfile, fd_t, outfd, fd_t, infd,
-                       USER UNCHECKED compat_syscall_ulong_t *, pin_offset,
+                       NCX UNCHECKED compat_syscall_ulong_t *, pin_offset,
                        size_t, num_bytes) {
 	ssize_t result;
 	pos_t offset;

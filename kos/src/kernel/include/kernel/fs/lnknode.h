@@ -46,7 +46,7 @@ struct flnknode_ops {
 	 * @throw: E_IOERROR:  Failed to read data from disk. */
 	BLOCKING WUNUSED_T NONNULL_T((1)) size_t
 	(KCALL *lno_readlink)(struct flnknode *__restrict self,
-	                      USER CHECKED /*utf-8*/ char *buf,
+	                      NCX /*utf-8*/ char *buf,
 	                      size_t bufsize)
 			THROWS(E_SEGFAULT, E_IOERROR, ...);
 
@@ -141,7 +141,7 @@ struct flnknode_ops {
  * is invoked before the returned string is copied into the supplied buffer. */
 FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 flnknode_v_readlink_default(struct flnknode *__restrict self,
-                            USER CHECKED /*utf-8*/ char *buf,
+                            NCX /*utf-8*/ char *buf,
                             size_t bufsize)
 			THROWS(E_SEGFAULT, E_IOERROR, ...);
 #define flnknode_v_changed    fnode_v_changed
@@ -152,7 +152,7 @@ flnknode_v_readlink_default(struct flnknode *__restrict self,
  * with  the return value  of the `lno_readlink()' operator. */
 FUNDEF BLOCKING NONNULL((1)) void KCALL
 flnknode_v_stat_readlink_size(struct mfile *__restrict self,
-                              USER CHECKED struct stat *result)
+                              NCX struct stat *result)
 		THROWS(...);
 /* Stream operator table that includes `flnknode_v_stat_readlink_size' */
 DATDEF struct mfile_stream_ops const flnknode_v_stream_ops_readlink_size;

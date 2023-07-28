@@ -58,8 +58,8 @@ DECL_BEGIN
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 elfexec_init_entry(struct icpustate *__restrict user_state,
                    Elf64_Ehdr const *__restrict ehdr,
-                   USER void *peb_address, USER void *ustack_base,
-                   size_t ustack_size, USER void const *entry_pc) {
+                   NCX void *peb_address, NCX void *ustack_base,
+                   size_t ustack_size, NCX void const *entry_pc) {
 	switch (ehdr->e_ident[EI_OSABI]) {
 
 	case ELFOSABI_SYSV:
@@ -111,13 +111,13 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
                   KERNEL Elf64_Ehdr const *__restrict ehdr,
                   KERNEL Elf64_Phdr const *__restrict phdr_vec, Elf64_Half phdr_cnt,
                   void *application_loadaddr, void *linker_loadaddr,
-                  USER void *peb_address, USER void *ustack_base,
-                  size_t ustack_size, USER void const *entry_pc) {
+                  NCX void *peb_address, NCX void *ustack_base,
+                  size_t ustack_size, NCX void const *entry_pc) {
 	/* The application-level entry point is stored
 	 * stored at the base of the user-space stack. */
 	uintptr_t user_state_sp;
 	size_t buflen;
-	USER struct elfexec_info64 *dl_data;
+	NCX struct elfexec_info64 *dl_data;
 
 	switch (ehdr->e_ident[EI_OSABI]) {
 
@@ -162,17 +162,17 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 			reqlen = path_sprintent(exec_path,
 			                        exec_dentry->fd_name,
 			                        exec_dentry->fd_namelen,
-			                        (USER char *)user_state_sp - buflen,
+			                        (NCX char *)user_state_sp - buflen,
 			                        buflen, AT_PATHPRINT_INCTRAIL, myroot);
 		} else if (exec_dentry) {
-			reqlen = snprintf((USER char *)user_state_sp - buflen, buflen,
+			reqlen = snprintf((NCX char *)user_state_sp - buflen, buflen,
 			                  "%$s", (size_t)exec_dentry->fd_namelen,
 			                  exec_dentry->fd_name) +
 			         1;
 		} else {
 			reqlen = 1;
 			if (buflen)
-				((USER char *)user_state_sp - buflen)[0] = '\0';
+				((NCX char *)user_state_sp - buflen)[0] = '\0';
 		}
 		ok = reqlen <= buflen;
 		buflen = (reqlen + 7) & ~7;
@@ -180,7 +180,7 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 			break;
 	}
 	user_state_sp -= buflen;
-	dl_data = (USER struct elfexec_info64 *)(user_state_sp -
+	dl_data = (NCX struct elfexec_info64 *)(user_state_sp -
 	                                         ((phdr_cnt * sizeof(Elf64_Phdr)) +
 	                                          offsetof(struct elfexec_info64, ei_phdr)));
 	memcpy(dl_data->ei_phdr, phdr_vec, phdr_cnt, sizeof(Elf64_Phdr));
@@ -224,8 +224,8 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 elfexec_init_entry32(struct icpustate *__restrict user_state,
                      Elf32_Ehdr const *__restrict ehdr,
-                     USER void *peb_address, USER void *ustack_base,
-                     size_t ustack_size, USER void const *entry_pc) {
+                     NCX void *peb_address, NCX void *ustack_base,
+                     size_t ustack_size, NCX void const *entry_pc) {
 	switch (ehdr->e_ident[EI_OSABI]) {
 
 	case ELFOSABI_SYSV:
@@ -293,13 +293,13 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
                     KERNEL Elf32_Ehdr const *__restrict ehdr,
                     KERNEL Elf32_Phdr const *__restrict phdr_vec, Elf32_Half phdr_cnt,
                     void *application_loadaddr, void *linker_loadaddr,
-                    USER void *peb_address, USER void *ustack_base,
-                    size_t ustack_size, USER void const *entry_pc) {
+                    NCX void *peb_address, NCX void *ustack_base,
+                    size_t ustack_size, NCX void const *entry_pc) {
 	/* The application-level entry point is stored
 	 * stored at the base of the user-space stack. */
 	uintptr_t user_state_sp;
 	size_t buflen;
-	USER struct elfexec_info32 *dl_data;
+	NCX struct elfexec_info32 *dl_data;
 
 	switch (ehdr->e_ident[EI_OSABI]) {
 
@@ -358,17 +358,17 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
 			reqlen = path_sprintent(exec_path,
 			                        exec_dentry->fd_name,
 			                        exec_dentry->fd_namelen,
-			                        (USER char *)user_state_sp - buflen,
+			                        (NCX char *)user_state_sp - buflen,
 			                        buflen, AT_PATHPRINT_INCTRAIL, myroot);
 		} else if (exec_dentry) {
-			reqlen = snprintf((USER char *)user_state_sp - buflen, buflen,
+			reqlen = snprintf((NCX char *)user_state_sp - buflen, buflen,
 			                  "%$s", (size_t)exec_dentry->fd_namelen,
 			                  exec_dentry->fd_name) +
 			         1;
 		} else {
 			reqlen = 1;
 			if (buflen)
-				((USER char *)user_state_sp - buflen)[0] = '\0';
+				((NCX char *)user_state_sp - buflen)[0] = '\0';
 		}
 		ok     = reqlen <= buflen;
 		buflen = (reqlen + 3) & ~3;
@@ -376,7 +376,7 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
 			break;
 	}
 	user_state_sp -= buflen;
-	dl_data = (USER struct elfexec_info32 *)(user_state_sp -
+	dl_data = (NCX struct elfexec_info32 *)(user_state_sp -
 	                                         ((phdr_cnt * sizeof(Elf32_Phdr)) +
 	                                          offsetof(struct elfexec_info32, ei_phdr)));
 	memcpy(dl_data->ei_phdr, phdr_vec, phdr_cnt, sizeof(Elf32_Phdr));

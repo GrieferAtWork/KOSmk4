@@ -360,7 +360,7 @@ struct libdl_dtls_extension;
  * pointer may be zero-extended if necessary. */
 PRIVATE NONNULL((1, 2)) bool
 NOTHROW(FCALL module_getpointer)(struct module *__restrict self,
-                                 USER void *address,
+                                 NCX void *address,
                                  void **__restrict presult) {
 #if defined(ELFV_HAVE_32) && defined(ELFV_HAVE_64)
 	if (self->md_sizeof_pointer == 4) {
@@ -408,10 +408,10 @@ NOTHROW(FCALL module_scan_reloc_for_DlModule)(struct module *__restrict self,
 
 #ifdef __x86_64__
 	case R_X86_64_DTPMOD64: {
-		USER uint64_t *uaddr;
+		NCX uint64_t *uaddr;
 		if (self->md_sizeof_pointer == 4)
 			break;
-		uaddr = (USER uint64_t *)(self->md_loadaddr + r_offset);
+		uaddr = (NCX uint64_t *)(self->md_loadaddr + r_offset);
 		if (!ADDR_ISUSER(uaddr))
 			break;
 		/* Try to read the pointer from this location. */
@@ -421,12 +421,12 @@ NOTHROW(FCALL module_scan_reloc_for_DlModule)(struct module *__restrict self,
 
 #if defined(__x86_64__) || defined(__i386__)
 	case R_386_TLS_DTPMOD32: {
-		USER uint32_t *uaddr;
+		NCX uint32_t *uaddr;
 #ifdef __x86_64__
 		if (self->md_sizeof_pointer != 4)
 			break;
 #endif /* __x86_64__ */
-		uaddr = (USER uint32_t *)(self->md_loadaddr + r_offset);
+		uaddr = (NCX uint32_t *)(self->md_loadaddr + r_offset);
 		if (!ADDR_ISUSER(uaddr))
 			break;
 		/* Try to read the pointer from this location. */
@@ -436,8 +436,8 @@ NOTHROW(FCALL module_scan_reloc_for_DlModule)(struct module *__restrict self,
 
 #ifdef __arm__
 	case R_ARM_TLS_DTPMOD32: {
-		USER uint32_t *uaddr;
-		uaddr = (USER uint32_t *)(self->md_loadaddr + r_offset);
+		NCX uint32_t *uaddr;
+		uaddr = (NCX uint32_t *)(self->md_loadaddr + r_offset);
 		if (!ADDR_ISUSER(uaddr))
 			break;
 		/* Try to read the pointer from this location. */
@@ -454,7 +454,7 @@ NOTHROW(FCALL module_scan_reloc_for_DlModule)(struct module *__restrict self,
 PRIVATE NONNULL((1, 2)) bool
 NOTHROW(FCALL module_scan_rel_for_DlModule)(struct module *__restrict self,
                                             struct libdl_dlmodule **__restrict presult,
-                                            USER ElfV_Rel const *base, size_t count) {
+                                            NCX ElfV_Rel const *base, size_t count) {
 	size_t sizeof_rel;
 	sizeof_rel = ElfV_sizeof(self, Rel);
 	for (; count; --count) {
@@ -466,7 +466,7 @@ NOTHROW(FCALL module_scan_rel_for_DlModule)(struct module *__restrict self,
 		                                   ElfV_field(self, rel, r_info),
 		                                   0))
 			return true;
-		base = (USER ElfV_Rel const *)((byte_t const *)base + sizeof_rel);
+		base = (NCX ElfV_Rel const *)((byte_t const *)base + sizeof_rel);
 	}
 	return false;
 }
@@ -474,7 +474,7 @@ NOTHROW(FCALL module_scan_rel_for_DlModule)(struct module *__restrict self,
 PRIVATE NONNULL((1, 2)) bool
 NOTHROW(FCALL module_scan_rela_for_DlModule)(struct module *__restrict self,
                                               struct libdl_dlmodule **__restrict presult,
-                                              USER ElfV_Rela const *base, size_t count) {
+                                              NCX ElfV_Rela const *base, size_t count) {
 	size_t sizeof_rel;
 	sizeof_rel = ElfV_sizeof(self, Rela);
 	for (; count; --count) {
@@ -486,7 +486,7 @@ NOTHROW(FCALL module_scan_rela_for_DlModule)(struct module *__restrict self,
 		                                   ElfV_field(self, rel, r_info),
 		                                   ElfV_field(self, rel, r_addend)))
 			return true;
-		base = (USER ElfV_Rela const *)((byte_t const *)base + sizeof_rel);
+		base = (NCX ElfV_Rela const *)((byte_t const *)base + sizeof_rel);
 	}
 	return false;
 }
@@ -494,8 +494,8 @@ NOTHROW(FCALL module_scan_rela_for_DlModule)(struct module *__restrict self,
 PRIVATE NONNULL((1, 2)) bool
 NOTHROW(FCALL module_scan_dynamic_for_DlModule)(struct module *__restrict self,
                                                 struct libdl_dlmodule **__restrict presult,
-                                                USER ElfV_Dyn const *dyn_start,
-                                                USER ElfV_Dyn const *dyn_end) {
+                                                NCX ElfV_Dyn const *dyn_start,
+                                                NCX ElfV_Dyn const *dyn_end) {
 	ElfV_Rela const *rela_base;
 	ElfV_Rel const *rel_base, *jmp_base;
 	size_t rela_count, rel_count;
@@ -553,7 +553,7 @@ NOTHROW(FCALL module_scan_dynamic_for_DlModule)(struct module *__restrict self,
 		default:
 			break;
 		}
-		dyn_start = (USER ElfV_Dyn const *)((byte_t const *)dyn_start + entsize);
+		dyn_start = (NCX ElfV_Dyn const *)((byte_t const *)dyn_start + entsize);
 	}
 done_dynamic:
 
@@ -823,7 +823,7 @@ nope:
 
 PRIVATE ATTR_NOINLINE NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cexpr_cfi_set_address)(struct cvalue *__restrict self,
-                                     USER void *addr) {
+                                     NCX void *addr) {
 	/* Always include the expression  address addend in the  calculation!
 	 * Without this, you'd be unable to access (e.g.) members of a struct
 	 * who's address must be calculated via a CFI expression. */
@@ -955,7 +955,7 @@ do_second_pass:
 	case UNWIND_STE_REGISTER:
 	case UNWIND_STE_RO_LVALUE:
 	case UNWIND_STE_RW_LVALUE: {
-		CHECKED byte_t *lvalue;
+		NCX byte_t *lvalue;
 
 		/* Check if the TLS-base address was used by the CFI expression.
 		 * If it was, then we must repeat the expression with the proper
@@ -1474,7 +1474,7 @@ done:
  * @return: DBX_ENOENT: [cexpr_pushregister_by_id] No such register. */
 PUBLIC NONNULL((1)) dbx_errno_t /* Push `*(typ *)addr' */
 NOTHROW(FCALL cexpr_pushaddr)(struct ctyperef const *__restrict typ,
-                              USER void *addr) {
+                              NCX void *addr) {
 	struct cvalue *valp;
 	valp = _cexpr_pushalloc();
 	if unlikely(!valp)
@@ -1521,7 +1521,7 @@ NOTHROW(FCALL cexpr_pushexpr)(struct ctyperef const *__restrict typ,
 
 PUBLIC NONNULL((1)) dbx_errno_t /* Push `(typ)(*(typ const *)data)' */
 NOTHROW_NCX(FCALL cexpr_pushdata)(struct ctyperef const *__restrict typ,
-                                  CHECKED void const *data) {
+                                  NCX void const *data) {
 	struct cvalue *valp;
 	valp = _cexpr_pushalloc();
 	if unlikely(!valp)
@@ -1612,7 +1612,7 @@ NOTHROW(FCALL cexpr_pushregister_by_id)(cpu_regno_t regno) {
  * information (typ flags, and name are pushed as 0/NULL) */
 PUBLIC NONNULL((1)) dbx_errno_t /* Push `*(typ *)addr' */
 NOTHROW(FCALL cexpr_pushaddr_simple)(struct ctype *__restrict typ,
-                                     USER void *addr) {
+                                     NCX void *addr) {
 	struct ctyperef ct;
 	bzero(&ct, sizeof(ct));
 	ct.ct_typ = typ;
@@ -1621,7 +1621,7 @@ NOTHROW(FCALL cexpr_pushaddr_simple)(struct ctype *__restrict typ,
 
 PUBLIC NONNULL((1)) dbx_errno_t /* Push `(typ)(*(typ const *)data)' */
 NOTHROW_NCX(FCALL cexpr_pushdata_simple)(struct ctype *__restrict typ,
-                                         CHECKED void const *data) {
+                                         NCX void const *data) {
 	struct ctyperef ct;
 	bzero(&ct, sizeof(ct));
 	ct.ct_typ = typ;
@@ -1746,7 +1746,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_rrot)(size_t n) {
  * @return: DBX_EINTERN: Internal error. */
 PUBLIC WUNUSED NONNULL((1, 2)) dbx_errno_t
 NOTHROW(FCALL cexpr_getdata_ex)(struct cvalue *__restrict self,
-                                CHECKED byte_t **__restrict presult) {
+                                NCX byte_t **__restrict presult) {
 again:
 	switch (self->cv_kind) {
 
@@ -2253,7 +2253,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_promote)(void) {
  * @return: DBX_ESYNTAX: The C expression stack top-element isn't a struct/union.
  * @return: DBX_ENOENT:  The given `name' doesn't name a member of the top-element struct. */
 PUBLIC NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL cexpr_field)(CHECKED char const *name,
+NOTHROW_NCX(FCALL cexpr_field)(NCX char const *name,
                                size_t namelen) {
 	dbx_errno_t result;
 	struct ctyperef field_type;
@@ -3330,7 +3330,7 @@ done:
 
 /* Perform custom handling of special symbols exported by the system `libdl.so' */
 PRIVATE dbx_errno_t
-NOTHROW_NCX(FCALL cexpr_load_special_libdl_symbol)(CHECKED char const *name) {
+NOTHROW_NCX(FCALL cexpr_load_special_libdl_symbol)(NCX char const *name) {
 #define LIBDL_VAR___peb                         0 /* "__peb" */
 #define LIBDL_VAR_environ                       1 /* "environ", "_environ", "__environ" */
 #define LIBDL_VAR___argc                        2 /* "__argc" */
@@ -3586,7 +3586,7 @@ NOTHROW_NCX(FCALL cexpr_pushsymbol)(struct cmodsyminfo *__restrict sym,
 		 *     - If the size is the same as that of a pointer, assume that it's a pointer
 		 *     - Otherwise, select the proper 1,2,4 or 8-byte unsigned integer type
 		 *     - Otherwise, interpret as an array of byte_t-s. */
-		CHECKED CLinkerSymbol const *sip;
+		NCX CLinkerSymbol const *sip;
 		unsigned char st_info;
 		size_t st_size;
 		sip = cmodsyminfo_getsip(sym);
@@ -3722,7 +3722,7 @@ got_symbol_type:
 					     bcmp(dent->fd_name, COMPAT_RTLD_LIBDL, sizeof(COMPAT_RTLD_LIBDL)) == 0)
 #endif /* __ARCH_HAVE_COMPAT */
 					    ) {
-						CHECKED char const *name;
+						NCX char const *name;
 						name   = cmodsyminfo_name(sym);
 						result = cexpr_load_special_libdl_symbol(name);
 						goto done_symtype;
@@ -3816,7 +3816,7 @@ err_fefault_symtype:
 }
 
 PUBLIC NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL cexpr_pushsymbol_byname)(CHECKED char const *name, size_t namelen,
+NOTHROW_NCX(FCALL cexpr_pushsymbol_byname)(NCX char const *name, size_t namelen,
                                            bool automatic_symbol_addend) {
 	dbx_errno_t result;
 	struct cmodsyminfo csym;
@@ -3836,7 +3836,7 @@ NOTHROW_NCX(FCALL cexpr_pushsymbol_byname)(CHECKED char const *name, size_t name
  * @return: DBX_ENOMEM: Insufficient memory.
  * @return: DBX_ENOENT: No register matches the given `name' */
 PUBLIC NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL cexpr_pushregister)(CHECKED char const *name, size_t namelen) {
+NOTHROW_NCX(FCALL cexpr_pushregister)(NCX char const *name, size_t namelen) {
 	isa_t isa = dbg_rt_getisa(DBG_RT_REGLEVEL_VIEW);
 	cpu_regno_t regno = register_byname(isa, name, namelen);
 	if (regno == CPU_REGISTER_NONE)

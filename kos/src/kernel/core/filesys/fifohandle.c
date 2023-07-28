@@ -52,13 +52,13 @@ DEFINE_HANDLE_REFCNT_FUNCTIONS(fifohandle, struct fifohandle);
 
 /* Handle operators */
 INTERN WUNUSED NONNULL((1)) size_t KCALL
-handle_fifohandle_read(struct fifohandle *__restrict self, USER CHECKED void *dst,
+handle_fifohandle_read(struct fifohandle *__restrict self, NCX void *dst,
                        size_t num_bytes, iomode_t mode) THROWS(...) {
 	return ffifonode_v_read(self->fu_fifo, dst, num_bytes, mode);
 }
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
-handle_fifohandle_write(struct fifohandle *__restrict self, USER CHECKED void const *src,
+handle_fifohandle_write(struct fifohandle *__restrict self, NCX void const *src,
                         size_t num_bytes, iomode_t mode) THROWS(...) {
 	return ffifonode_v_write(self->fu_fifo, src, num_bytes, mode);
 }
@@ -79,7 +79,7 @@ handle_fifohandle_writev(struct fifohandle *__restrict self,
 
 INTERN NONNULL((1)) syscall_slong_t KCALL
 handle_fifohandle_ioctl(struct fifohandle *__restrict self, ioctl_t cmd,
-                        USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+                        NCX UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	return mfile_uioctl(self->fu_fifo, cmd, arg, mode);
 }
 
@@ -91,7 +91,7 @@ handle_fifohandle_truncate(struct fifohandle *__restrict self,
 
 INTERN NONNULL((1)) void KCALL
 handle_fifohandle_stat(struct fifohandle *__restrict self,
-                       USER CHECKED struct stat *result) THROWS(...) {
+                       NCX struct stat *result) THROWS(...) {
 	mfile_ustat(self->fu_fifo, result);
 }
 

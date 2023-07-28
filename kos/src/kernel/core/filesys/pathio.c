@@ -314,7 +314,7 @@ NOTHROW(FCALL path_ismount_reachable_from)(struct path *__restrict self) {
  * @throw: E_BADALLOC:                    ... */
 PUBLIC BLOCKING NONNULL((1)) void KCALL
 path_remove(struct path *__restrict self,
-            /*utf-8*/ USER CHECKED char const *name, u16 namelen, atflag_t atflags,
+            /*utf-8*/ NCX char const *name, u16 namelen, atflag_t atflags,
             /*out[1..1]_opt*/ REF struct fnode **pdeleted_node,
             /*out[1..1]_opt*/ REF struct fdirent **pdeleted_dirent,
             /*out[0..1]_opt*/ REF struct path **pdeleted_path)
@@ -1057,8 +1057,8 @@ fdirnode_rename_in_path(struct path *oldpath, struct path *newpath,
  * @throw: E_IOERROR:                         ...
  * @throw: E_BADALLOC:                        ... */
 PUBLIC BLOCKING NONNULL((1, 4)) void KCALL
-path_rename(struct path *oldpath, /*utf-8*/ USER CHECKED char const *oldname, u16 oldnamelen,
-            struct path *newpath, /*utf-8*/ USER CHECKED char const *newname, u16 newnamelen,
+path_rename(struct path *oldpath, /*utf-8*/ NCX char const *oldname, u16 oldnamelen,
+            struct path *newpath, /*utf-8*/ NCX char const *newname, u16 newnamelen,
             atflag_t atflags, bool check_permissions,
             /*out[1..1]_opt*/ REF struct fdirent **pold_dirent,
             /*out[1..1]_opt*/ REF struct fdirent **pnew_dirent,
@@ -2071,7 +2071,7 @@ done:
  * path may be invalid. */
 PUBLIC NONNULL((1, 4)) ssize_t KCALL
 path_printent(struct path *__restrict self,
-              USER CHECKED char const *dentry_name, u16 dentry_namelen,
+              NCX char const *dentry_name, u16 dentry_namelen,
               pformatprinter printer, void *arg, atflag_t atflags,
               struct path *root)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
@@ -2094,7 +2094,7 @@ path_printent(struct path *__restrict self,
 /* Helper functions for printing a path into a user-space buffer.
  * @return: * : The required buffer size (including a trailing NUL-character) */
 PUBLIC NONNULL((1)) size_t KCALL
-path_sprint(struct path *__restrict self, USER CHECKED char *buffer, size_t buflen,
+path_sprint(struct path *__restrict self, NCX char *buffer, size_t buflen,
             atflag_t atflags, struct path *root)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
 	size_t result;
@@ -2110,8 +2110,8 @@ path_sprint(struct path *__restrict self, USER CHECKED char *buffer, size_t bufl
 
 PUBLIC NONNULL((1)) size_t KCALL
 path_sprintent(struct path *__restrict self,
-               USER CHECKED char const *dentry_name, u16 dentry_namelen,
-               USER CHECKED char *buffer, size_t buflen,
+               NCX char const *dentry_name, u16 dentry_namelen,
+               NCX char *buffer, size_t buflen,
                atflag_t atflags, struct path *root)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
 	size_t result;
@@ -2129,7 +2129,7 @@ path_sprintent(struct path *__restrict self,
 /* Like above, but don't print a trailing NUL and return length w/o said NUL
  * @return: * : The required buffer size (excluding a trailing NUL, which also isn't printed) */
 PUBLIC NONNULL((1)) size_t KCALL
-path_sprint_without_nul(struct path *__restrict self, USER CHECKED char *buffer, size_t buflen,
+path_sprint_without_nul(struct path *__restrict self, NCX char *buffer, size_t buflen,
                         atflag_t atflags, struct path *root)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
 	size_t result;
@@ -2142,8 +2142,8 @@ path_sprint_without_nul(struct path *__restrict self, USER CHECKED char *buffer,
 
 PUBLIC NONNULL((1)) size_t KCALL
 path_sprintent_without_nul(struct path *__restrict self,
-                           USER CHECKED char const *dentry_name, u16 dentry_namelen,
-                           USER CHECKED char *buffer, size_t buflen,
+                           NCX char const *dentry_name, u16 dentry_namelen,
+                           NCX char *buffer, size_t buflen,
                            atflag_t atflags, struct path *root)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
 	size_t result;

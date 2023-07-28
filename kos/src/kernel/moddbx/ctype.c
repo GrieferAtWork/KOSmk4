@@ -628,7 +628,7 @@ try_pointer_register:
 
 PRIVATE NONNULL((1, 2)) ssize_t
 NOTHROW_CB_NCX(FCALL dw_enumerate_fields)(struct cmodule *__restrict mod,
-                                          CHECKED byte_t const *__restrict dip,
+                                          NCX byte_t const *__restrict dip,
                                           ctype_struct_field_callback_t cb,
                                           void *cookie,
                                           ptrdiff_t base_offset,
@@ -739,7 +739,7 @@ err:
 
 PRIVATE NONNULL((1, 2)) void
 NOTHROW_NCX(FCALL dw_determine_type_size)(struct cmodule *__restrict mod,
-                                          CHECKED byte_t const *__restrict dip,
+                                          NCX byte_t const *__restrict dip,
                                           size_t *__restrict ptype_size) {
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_component_attrib_t attr;
@@ -755,7 +755,7 @@ NOTHROW_NCX(FCALL dw_determine_type_size)(struct cmodule *__restrict mod,
 }
 
 /* Return the name of a structure type, or `NULL' if unknown or `self' isn't a struct. */
-PUBLIC WUNUSED NONNULL((1)) CHECKED char const *
+PUBLIC WUNUSED NONNULL((1)) NCX char const *
 NOTHROW_NCX(FCALL ctype_struct_getname)(struct ctype const *__restrict self) {
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_component_attrib_t attr;
@@ -776,9 +776,9 @@ NOTHROW_NCX(FCALL ctype_struct_getname)(struct ctype const *__restrict self) {
 }
 
 /* Try to find the definition of a given struct. */
-PRIVATE NONNULL((1, 2)) CHECKED byte_t const *
+PRIVATE NONNULL((1, 2)) NCX byte_t const *
 NOTHROW_NCX(FCALL dw_enumerate_find_struct_definition)(struct cmodule *__restrict mod,
-                                                       CHECKED byte_t const *__restrict dip,
+                                                       NCX byte_t const *__restrict dip,
                                                        /*out*/ REF struct cmodule **__restrict def_module) {
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_component_attrib_t attr;
@@ -848,7 +848,7 @@ again:
 		 *  - All other CUs of the current module.
 		 *  - All CUs of all other modules from the current address space.
 		 *  - All CUs of all other modules from the other address space. */
-		CHECKED byte_t const *def;
+		NCX byte_t const *def;
 		REF struct cmodule *def_module;
 		def = dw_enumerate_find_struct_definition(self->ct_struct.ct_info.cd_mod,
 		                                          self->ct_struct.ct_info.cd_dip,
@@ -873,7 +873,7 @@ again:
 
 
 struct ctype_struct_getfield_data {
-	CHECKED char const      *name;
+	NCX char const          *name;
 	size_t                   namelen;
 	/*out*/ struct ctyperef *pfield_type;   /* [1..1] */
 	/*out*/ ptrdiff_t       *pfield_offset; /* [1..1] */
@@ -906,7 +906,7 @@ NOTHROW_NCX(KCALL ctype_struct_getfield_cb)(void *cookie,
  * @return: DBX_ENOENT: No field with this name. */
 PUBLIC WUNUSED NONNULL((1, 2, 4, 5)) dbx_errno_t
 NOTHROW_NCX(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
-                                         CHECKED char const *__restrict name, size_t namelen,
+                                         NCX char const *__restrict name, size_t namelen,
                                          /*out*/ struct ctyperef *__restrict pfield_type,
                                          /*out*/ ptrdiff_t *__restrict pfield_offset) {
 	struct ctype_struct_getfield_data data;
@@ -928,7 +928,7 @@ PUBLIC WUNUSED NONNULL((1, 2, 3, 5)) dbx_errno_t
 NOTHROW_NCX(FCALL ctype_fromdw_opt)(struct cmodule *__restrict mod,
                                     struct cmodunit const *__restrict cunit,
                                     di_debuginfo_cu_parser_t const *__restrict cu_parser,
-                                    CHECKED byte_t const *type_debug_info,
+                                    NCX byte_t const *type_debug_info,
                                     /*out*/ struct ctyperef *__restrict presult) {
 	dbx_errno_t result;
 	if (!type_debug_info) {
@@ -1023,7 +1023,7 @@ PUBLIC WUNUSED NONNULL((1, 2, 3, 4, 5)) dbx_errno_t
 NOTHROW_NCX(FCALL ctype_fromdw)(struct cmodule *__restrict mod,
                                 struct cmodunit const *__restrict cunit,
                                 di_debuginfo_cu_parser_t const *__restrict cu_parser,
-                                CHECKED byte_t const *__restrict type_debug_info,
+                                NCX byte_t const *__restrict type_debug_info,
                                 /*out*/ struct ctyperef *__restrict presult) {
 	dbx_errno_t result = DBX_EOK;
 	di_debuginfo_cu_parser_t parser;

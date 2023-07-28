@@ -65,7 +65,7 @@ __DECL_BEGIN
  *                  usual return value used to indicate success is `datalen'. */
 typedef __ATTR_INS_T(2, 3) __SSIZE_TYPE__
 (__FORMATPRINTER_CC *__pformatprinter)(void *__arg,
-                                       /*utf-8*/ __CHECKED char const *__restrict __data,
+                                       /*utf-8*/ __NCX char const *__restrict __data,
                                        __SIZE_TYPE__ __datalen);
 
 

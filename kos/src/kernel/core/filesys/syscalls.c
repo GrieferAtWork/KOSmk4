@@ -217,7 +217,7 @@ static_assert(IO_HANDLE_FFROM_OPENFLAG((-1 & ~(O_CLOEXEC | O_CLOFORK)) | O_CLOEX
 /************************************************************************/
 #if (defined(__ARCH_WANT_SYSCALL_FACCESSAT) || defined(__ARCH_WANT_SYSCALL_ACCESS))
 PRIVATE errno_t KCALL
-sys_faccessat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
+sys_faccessat_impl(fd_t dirfd, NCX UNCHECKED char const *filename,
                    syscall_ulong_t type, atflag_t atflags) {
 	REF struct fnode *node;
 	VALIDATE_FLAGSET(type, F_OK | R_OK | W_OK | X_OK,
@@ -235,7 +235,7 @@ sys_faccessat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
 
 #ifdef __ARCH_WANT_SYSCALL_FACCESSAT2
 DEFINE_SYSCALL4(errno_t, faccessat2,
-                fd_t, dirfd, USER UNCHECKED char const *, filename,
+                fd_t, dirfd, NCX UNCHECKED char const *, filename,
                 syscall_ulong_t, type, atflag_t, atflags) {
 	return sys_faccessat_impl(dirfd, filename, type, atflags);
 }
@@ -243,7 +243,7 @@ DEFINE_SYSCALL4(errno_t, faccessat2,
 
 #ifdef __ARCH_WANT_SYSCALL_FACCESSAT
 DEFINE_SYSCALL3(errno_t, faccessat,
-                fd_t, dirfd, USER UNCHECKED char const *, filename,
+                fd_t, dirfd, NCX UNCHECKED char const *, filename,
                 syscall_ulong_t, type) {
 	return sys_faccessat_impl(dirfd, filename, type, 0);
 }
@@ -251,7 +251,7 @@ DEFINE_SYSCALL3(errno_t, faccessat,
 
 #ifdef __ARCH_WANT_SYSCALL_ACCESS
 DEFINE_SYSCALL2(errno_t, access,
-                USER UNCHECKED char const *, filename,
+                NCX UNCHECKED char const *, filename,
                 syscall_ulong_t, type) {
 	return sys_faccessat_impl(AT_FDCWD, filename, type, 0);
 }
@@ -266,7 +266,7 @@ DEFINE_SYSCALL2(errno_t, access,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_GETCWD
 DEFINE_SYSCALL2(ssize_t, getcwd,
-                USER UNCHECKED char *, buf, size_t, bufsize) {
+                NCX UNCHECKED char *, buf, size_t, bufsize) {
 	struct fs *myfs = THIS_FS;
 	REF struct path *cwd, *root;
 	atflag_t atflags;
@@ -299,7 +299,7 @@ DEFINE_SYSCALL2(ssize_t, getcwd,
      defined(__ARCH_WANT_SYSCALL_MKNODAT) ||  \
      defined(__ARCH_WANT_SYSCALL_MKNOD))
 PRIVATE errno_t KCALL
-sys_fmknodat_impl(fd_t dirfd, USER UNCHECKED char const *nodename,
+sys_fmknodat_impl(fd_t dirfd, NCX UNCHECKED char const *nodename,
                   mode_t mode, dev_t dev, atflag_t atflags) {
 	struct fmkfile_info mkinfo;
 	REF struct path *nodename_path;
@@ -346,7 +346,7 @@ sys_fmknodat_impl(fd_t dirfd, USER UNCHECKED char const *nodename,
 #endif /* mknod... */
 #ifdef __ARCH_WANT_SYSCALL_FMKNODAT
 DEFINE_SYSCALL5(errno_t, fmknodat, fd_t, dirfd,
-                USER UNCHECKED char const *, nodename,
+                NCX UNCHECKED char const *, nodename,
                 mode_t, mode, __dev_t, dev, atflag_t, atflags) {
 	return sys_fmknodat_impl(dirfd, nodename, mode, (dev_t)dev, atflags);
 }
@@ -354,7 +354,7 @@ DEFINE_SYSCALL5(errno_t, fmknodat, fd_t, dirfd,
 
 #ifdef __ARCH_WANT_SYSCALL_MKNODAT
 DEFINE_SYSCALL4(errno_t, mknodat, fd_t, dirfd,
-                USER UNCHECKED char const *, nodename,
+                NCX UNCHECKED char const *, nodename,
                 mode_t, mode, __dev_t, dev) {
 	return sys_fmknodat_impl(dirfd, nodename, mode, (dev_t)dev, 0);
 }
@@ -362,7 +362,7 @@ DEFINE_SYSCALL4(errno_t, mknodat, fd_t, dirfd,
 
 #ifdef __ARCH_WANT_SYSCALL_MKNOD
 DEFINE_SYSCALL3(errno_t, mknod,
-                USER UNCHECKED char const *, nodename,
+                NCX UNCHECKED char const *, nodename,
                 mode_t, mode, __dev_t, dev) {
 	return sys_fmknodat_impl(AT_FDCWD, nodename, mode, (dev_t)dev, 0);
 }
@@ -379,7 +379,7 @@ DEFINE_SYSCALL3(errno_t, mknod,
      defined(__ARCH_WANT_SYSCALL_MKDIRAT) ||  \
      defined(__ARCH_WANT_SYSCALL_MKDIR))
 PRIVATE errno_t KCALL
-sys_fmkdirat_impl(fd_t dirfd, USER UNCHECKED char const *pathname,
+sys_fmkdirat_impl(fd_t dirfd, NCX UNCHECKED char const *pathname,
                   mode_t mode, atflag_t atflags) {
 	struct fmkfile_info mkinfo;
 	REF struct path *pathname_path;
@@ -418,7 +418,7 @@ sys_fmkdirat_impl(fd_t dirfd, USER UNCHECKED char const *pathname,
 #endif /* mkdir... */
 #ifdef __ARCH_WANT_SYSCALL_FMKDIRAT
 DEFINE_SYSCALL4(errno_t, fmkdirat, fd_t, dirfd,
-                USER UNCHECKED char const *, pathname, mode_t, mode,
+                NCX UNCHECKED char const *, pathname, mode_t, mode,
                 atflag_t, atflags) {
 	return sys_fmkdirat_impl(dirfd, pathname, mode, atflags);
 }
@@ -426,14 +426,14 @@ DEFINE_SYSCALL4(errno_t, fmkdirat, fd_t, dirfd,
 
 #ifdef __ARCH_WANT_SYSCALL_MKDIRAT
 DEFINE_SYSCALL3(errno_t, mkdirat, fd_t, dirfd,
-                USER UNCHECKED char const *, pathname, mode_t, mode) {
+                NCX UNCHECKED char const *, pathname, mode_t, mode) {
 	return sys_fmkdirat_impl(dirfd, pathname, mode, 0);
 }
 #endif /* __ARCH_WANT_SYSCALL_MKDIRAT */
 
 #ifdef __ARCH_WANT_SYSCALL_MKDIR
 DEFINE_SYSCALL2(errno_t, mkdir,
-                USER UNCHECKED char const *, pathname, mode_t, mode) {
+                NCX UNCHECKED char const *, pathname, mode_t, mode) {
 	return sys_fmkdirat_impl(AT_FDCWD, pathname, mode, 0);
 }
 #endif /* __ARCH_WANT_SYSCALL_MKDIR */
@@ -449,9 +449,9 @@ DEFINE_SYSCALL2(errno_t, mkdir,
      defined(__ARCH_WANT_SYSCALL_UNLINK) ||   \
      defined(__ARCH_WANT_SYSCALL_RMDIR))
 PRIVATE errno_t KCALL
-sys_unlinkat_impl(fd_t dirfd, USER UNCHECKED char const *pathname,
+sys_unlinkat_impl(fd_t dirfd, NCX UNCHECKED char const *pathname,
                   atflag_t atflags) {
-	USER UNCHECKED char const *laststr;
+	NCX UNCHECKED char const *laststr;
 	u16 lastlen;
 	REF struct path *pathname_path;
 	VALIDATE_FLAGSET(atflags,
@@ -472,7 +472,7 @@ sys_unlinkat_impl(fd_t dirfd, USER UNCHECKED char const *pathname,
 
 #ifdef __ARCH_WANT_SYSCALL_UNLINKAT
 DEFINE_SYSCALL3(errno_t, unlinkat, fd_t, dirfd,
-                USER UNCHECKED char const *, pathname,
+                NCX UNCHECKED char const *, pathname,
                 atflag_t, atflags) {
 	if ((atflags & (AT_REMOVEDIR | AT_REMOVEREG)) == 0)
 		atflags |= AT_REMOVEREG; /* When neither flag is given, remove regular files */
@@ -481,13 +481,13 @@ DEFINE_SYSCALL3(errno_t, unlinkat, fd_t, dirfd,
 #endif /* __ARCH_WANT_SYSCALL_UNLINKAT */
 
 #ifdef __ARCH_WANT_SYSCALL_UNLINK
-DEFINE_SYSCALL1(errno_t, unlink, USER UNCHECKED char const *, pathname) {
+DEFINE_SYSCALL1(errno_t, unlink, NCX UNCHECKED char const *, pathname) {
 	return sys_unlinkat_impl(AT_FDCWD, pathname, AT_REMOVEREG);
 }
 #endif /* __ARCH_WANT_SYSCALL_UNLINK */
 
 #ifdef __ARCH_WANT_SYSCALL_RMDIR
-DEFINE_SYSCALL1(errno_t, rmdir, USER UNCHECKED char const *, pathname) {
+DEFINE_SYSCALL1(errno_t, rmdir, NCX UNCHECKED char const *, pathname) {
 	return sys_unlinkat_impl(AT_FDCWD, pathname, AT_REMOVEDIR);
 }
 #endif /* __ARCH_WANT_SYSCALL_RMDIR */
@@ -503,8 +503,8 @@ DEFINE_SYSCALL1(errno_t, rmdir, USER UNCHECKED char const *, pathname) {
      defined(__ARCH_WANT_SYSCALL_SYMLINKAT) ||  \
      defined(__ARCH_WANT_SYSCALL_SYMLINK))
 PRIVATE errno_t KCALL
-sys_fsymlinkat_impl(USER UNCHECKED char const *link_text, fd_t target_dirfd,
-                    USER UNCHECKED char const *target_path, atflag_t atflags) {
+sys_fsymlinkat_impl(NCX UNCHECKED char const *link_text, fd_t target_dirfd,
+                    NCX UNCHECKED char const *target_path, atflag_t atflags) {
 	struct fmkfile_info mkinfo;
 	REF struct path *pathname_path;
 	unsigned int status;
@@ -542,24 +542,24 @@ sys_fsymlinkat_impl(USER UNCHECKED char const *link_text, fd_t target_dirfd,
 
 #ifdef __ARCH_WANT_SYSCALL_FSYMLINKAT
 DEFINE_SYSCALL4(errno_t, fsymlinkat,
-                USER UNCHECKED char const *, link_text, fd_t, target_dirfd,
-                USER UNCHECKED char const *, target_path, atflag_t, atflags) {
+                NCX UNCHECKED char const *, link_text, fd_t, target_dirfd,
+                NCX UNCHECKED char const *, target_path, atflag_t, atflags) {
 	return sys_fsymlinkat_impl(link_text, target_dirfd, target_path, atflags);
 }
 #endif /* __ARCH_WANT_SYSCALL_FSYMLINKAT */
 
 #ifdef __ARCH_WANT_SYSCALL_SYMLINKAT
 DEFINE_SYSCALL3(errno_t, symlinkat,
-                USER UNCHECKED char const *, link_text, fd_t, target_dirfd,
-                USER UNCHECKED char const *, target_path) {
+                NCX UNCHECKED char const *, link_text, fd_t, target_dirfd,
+                NCX UNCHECKED char const *, target_path) {
 	return sys_fsymlinkat_impl(link_text, target_dirfd, target_path, 0);
 }
 #endif /* __ARCH_WANT_SYSCALL_SYMLINKAT */
 
 #ifdef __ARCH_WANT_SYSCALL_SYMLINK
 DEFINE_SYSCALL2(errno_t, symlink,
-                USER UNCHECKED char const *, link_text,
-                USER UNCHECKED char const *, target_path) {
+                NCX UNCHECKED char const *, link_text,
+                NCX UNCHECKED char const *, target_path) {
 	return sys_fsymlinkat_impl(link_text, AT_FDCWD, target_path, 0);
 }
 #endif /* __ARCH_WANT_SYSCALL_SYMLINK */
@@ -574,8 +574,8 @@ DEFINE_SYSCALL2(errno_t, symlink,
 #if (defined(__ARCH_WANT_SYSCALL_LINKAT) || \
      defined(__ARCH_WANT_SYSCALL_LINK))
 PRIVATE errno_t KCALL
-sys_linkat_impl(fd_t olddirfd, USER UNCHECKED char const *oldpath,
-                fd_t newdirfd, USER UNCHECKED char const *newpath,
+sys_linkat_impl(fd_t olddirfd, NCX UNCHECKED char const *oldpath,
+                fd_t newdirfd, NCX UNCHECKED char const *newpath,
                 atflag_t atflags) {
 	struct fmkfile_info mkinfo;
 	REF struct path *pathname_path;
@@ -621,8 +621,8 @@ sys_linkat_impl(fd_t olddirfd, USER UNCHECKED char const *oldpath,
 
 #ifdef __ARCH_WANT_SYSCALL_LINKAT
 DEFINE_SYSCALL5(errno_t, linkat,
-                fd_t, olddirfd, USER UNCHECKED char const *, oldpath,
-                fd_t, newdirfd, USER UNCHECKED char const *, newpath,
+                fd_t, olddirfd, NCX UNCHECKED char const *, oldpath,
+                fd_t, newdirfd, NCX UNCHECKED char const *, newpath,
                 atflag_t, atflags) {
 	return sys_linkat_impl(olddirfd, oldpath, newdirfd, newpath, atflags);
 }
@@ -630,8 +630,8 @@ DEFINE_SYSCALL5(errno_t, linkat,
 
 #ifdef __ARCH_WANT_SYSCALL_LINK
 DEFINE_SYSCALL2(errno_t, link,
-                USER UNCHECKED char const *, oldpath,
-                USER UNCHECKED char const *, newpath) {
+                NCX UNCHECKED char const *, oldpath,
+                NCX UNCHECKED char const *, newpath) {
 	return sys_linkat_impl(AT_FDCWD, oldpath, AT_FDCWD, newpath, 0);
 }
 #endif /* __ARCH_WANT_SYSCALL_LINK */
@@ -647,11 +647,11 @@ DEFINE_SYSCALL2(errno_t, link,
      defined(__ARCH_WANT_SYSCALL_RENAMEAT) ||  \
      defined(__ARCH_WANT_SYSCALL_RENAME))
 PRIVATE errno_t KCALL
-sys_renameat2_impl(fd_t olddirfd, USER UNCHECKED char const *oldpath,
-                   fd_t newdirfd, USER UNCHECKED char const *newpath,
+sys_renameat2_impl(fd_t olddirfd, NCX UNCHECKED char const *oldpath,
+                   fd_t newdirfd, NCX UNCHECKED char const *newpath,
                    atflag_t atflags) {
 	REF struct path *oldpathob, *newpathob;
-	USER CHECKED char const *oldname, *newname;
+	NCX char const *oldname, *newname;
 	u16 oldnamelen, newnamelen;
 	VALIDATE_FLAGSET(atflags,
 	                 AT_DOSPATH | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE |
@@ -698,8 +698,8 @@ sys_renameat2_impl(fd_t olddirfd, USER UNCHECKED char const *oldpath,
 
 #ifdef __ARCH_WANT_SYSCALL_RENAMEAT2
 DEFINE_SYSCALL5(errno_t, renameat2,
-                fd_t, olddirfd, USER UNCHECKED char const *, oldpath,
-                fd_t, newdirfd, USER UNCHECKED char const *, newpath,
+                fd_t, olddirfd, NCX UNCHECKED char const *, oldpath,
+                fd_t, newdirfd, NCX UNCHECKED char const *, newpath,
                 atflag_t, atflags) {
 	return sys_renameat2_impl(olddirfd, oldpath, newdirfd, newpath, atflags);
 }
@@ -707,16 +707,16 @@ DEFINE_SYSCALL5(errno_t, renameat2,
 
 #ifdef __ARCH_WANT_SYSCALL_RENAMEAT
 DEFINE_SYSCALL4(errno_t, renameat,
-                fd_t, olddirfd, USER UNCHECKED char const *, oldpath,
-                fd_t, newdirfd, USER UNCHECKED char const *, newpath) {
+                fd_t, olddirfd, NCX UNCHECKED char const *, oldpath,
+                fd_t, newdirfd, NCX UNCHECKED char const *, newpath) {
 	return sys_renameat2_impl(olddirfd, oldpath, newdirfd, newpath, 0);
 }
 #endif /* __ARCH_WANT_SYSCALL_RENAMEAT */
 
 #ifdef __ARCH_WANT_SYSCALL_RENAME
 DEFINE_SYSCALL2(errno_t, rename,
-                USER UNCHECKED char const *, oldpath,
-                USER UNCHECKED char const *, newpath) {
+                NCX UNCHECKED char const *, oldpath,
+                NCX UNCHECKED char const *, newpath) {
 	return sys_renameat2_impl(AT_FDCWD, oldpath, AT_FDCWD, newpath, 0);
 }
 #endif /* __ARCH_WANT_SYSCALL_RENAME */
@@ -732,7 +732,7 @@ DEFINE_SYSCALL2(errno_t, rename,
      defined(__ARCH_WANT_SYSCALL_UMOUNT) ||  \
      defined(__ARCH_WANT_COMPAT_SYSCALL_UMOUNT))
 PRIVATE errno_t KCALL
-sys_umount2_impl(fd_t dirfd, USER UNCHECKED char const *target,
+sys_umount2_impl(fd_t dirfd, NCX UNCHECKED char const *target,
                  syscall_ulong_t flags) {
 	atflag_t atflags;
 	REF struct path *unmount_me;
@@ -768,7 +768,7 @@ sys_umount2_impl(fd_t dirfd, USER UNCHECKED char const *target,
 
 #ifdef __ARCH_WANT_SYSCALL_UMOUNT2
 DEFINE_SYSCALL2(errno_t, umount2,
-                USER UNCHECKED char const *, target,
+                NCX UNCHECKED char const *, target,
                 syscall_ulong_t, flags) {
 	return sys_umount2_impl(AT_FDCWD, target, flags);
 }
@@ -776,14 +776,14 @@ DEFINE_SYSCALL2(errno_t, umount2,
 
 #ifdef __ARCH_WANT_SYSCALL_UMOUNT
 DEFINE_SYSCALL1(errno_t, umount,
-                USER UNCHECKED char const *, special_file) {
+                NCX UNCHECKED char const *, special_file) {
 	return sys_umount2_impl(AT_FDCWD, special_file, 0);
 }
 #endif /* __ARCH_WANT_SYSCALL_UMOUNT */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_UMOUNT
 DEFINE_COMPAT_SYSCALL1(errno_t, umount,
-                       USER UNCHECKED char const *, special_file) {
+                       NCX UNCHECKED char const *, special_file) {
 	return sys_umount2_impl(AT_FDCWD, special_file, 0);
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_UMOUNT */
@@ -831,11 +831,11 @@ super_set_mount_flags(struct fsuper *__restrict self,
 }
 
 PRIVATE errno_t KCALL
-sys_mount_impl(USER UNCHECKED char const *source,
-               USER UNCHECKED char const *target,
-               USER UNCHECKED char const *filesystemtype,
+sys_mount_impl(NCX UNCHECKED char const *source,
+               NCX UNCHECKED char const *target,
+               NCX UNCHECKED char const *filesystemtype,
                syscall_ulong_t mountflags,
-               USER UNCHECKED void const *data) {
+               NCX UNCHECKED void const *data) {
 	atflag_t atflags;
 	validate_readable(target, 1);
 	atflags = fs_atflags(0) | AT_IGNORE_TRAILING_SLASHES;
@@ -980,8 +980,8 @@ sys_mount_impl(USER UNCHECKED char const *source,
 
 		/* Open the superblock with the associated device. */
 again_open_superblock:
-		super = type ? ffilesys_open(type, &newsuper, dev, (USER UNCHECKED char *)data)
-		             : ffilesys_opendev(&newsuper, dev, (USER UNCHECKED char *)data);
+		super = type ? ffilesys_open(type, &newsuper, dev, (NCX UNCHECKED char *)data)
+		             : ffilesys_opendev(&newsuper, dev, (NCX UNCHECKED char *)data);
 		if unlikely(!super)
 			THROW(E_FSERROR_WRONG_FILE_SYSTEM);
 		FINALLY_DECREF_UNLIKELY(super);
@@ -1042,11 +1042,11 @@ again_open_superblock:
 
 #ifdef __ARCH_WANT_SYSCALL_MOUNT
 DEFINE_SYSCALL5(errno_t, mount,
-                USER UNCHECKED char const *, source,
-                USER UNCHECKED char const *, target,
-                USER UNCHECKED char const *, filesystemtype,
+                NCX UNCHECKED char const *, source,
+                NCX UNCHECKED char const *, target,
+                NCX UNCHECKED char const *, filesystemtype,
                 syscall_ulong_t, mountflags,
-                USER UNCHECKED void const *, data) {
+                NCX UNCHECKED void const *, data) {
 	return sys_mount_impl(source, target, filesystemtype, mountflags, data);
 }
 #endif /* __ARCH_WANT_SYSCALL_MOUNT */
@@ -1061,7 +1061,7 @@ DEFINE_SYSCALL5(errno_t, mount,
 #if (defined(__ARCH_WANT_SYSCALL_TRUNCATE) || \
      defined(__ARCH_WANT_SYSCALL_TRUNCATE64))
 PRIVATE errno_t KCALL
-sys_truncate_impl(USER UNCHECKED char const *pathname,
+sys_truncate_impl(NCX UNCHECKED char const *pathname,
                   pos_t length) {
 	REF struct fnode *node;
 	validate_readable(pathname, 1);
@@ -1075,7 +1075,7 @@ sys_truncate_impl(USER UNCHECKED char const *pathname,
 
 #ifdef __ARCH_WANT_SYSCALL_TRUNCATE
 DEFINE_SYSCALL2(errno_t, truncate,
-                USER UNCHECKED char const *, pathname,
+                NCX UNCHECKED char const *, pathname,
                 syscall_ulong_t, length) {
 	return sys_truncate_impl(pathname, (pos_t)length);
 }
@@ -1083,7 +1083,7 @@ DEFINE_SYSCALL2(errno_t, truncate,
 
 #ifdef __ARCH_WANT_SYSCALL_TRUNCATE64
 DEFINE_SYSCALL2(errno_t, truncate64,
-                USER UNCHECKED char const *, pathname,
+                NCX UNCHECKED char const *, pathname,
                 uint64_t, length) {
 	return sys_truncate_impl(pathname, (pos_t)length);
 }
@@ -1135,7 +1135,7 @@ sys_fchdir_impl(/*inherit(always)*/ REF struct path *__restrict newpath) {
      defined(__ARCH_WANT_SYSCALL_CHDIR))
 PRIVATE errno_t KCALL
 sys_fchdirat_impl(fd_t dirfd,
-                  USER UNCHECKED char const *pathname,
+                  NCX UNCHECKED char const *pathname,
                   atflag_t atflags) {
 	REF struct path *newpath;
 	validate_readable(pathname, 1);
@@ -1149,7 +1149,7 @@ sys_fchdirat_impl(fd_t dirfd,
 
 #ifdef __ARCH_WANT_SYSCALL_FCHDIRAT
 DEFINE_SYSCALL3(errno_t, fchdirat, fd_t, dirfd,
-                USER UNCHECKED char const *, pathname, atflag_t, atflags) {
+                NCX UNCHECKED char const *, pathname, atflag_t, atflags) {
 	return sys_fchdirat_impl(dirfd, pathname, atflags);
 }
 #endif /* __ARCH_WANT_SYSCALL_FCHDIRAT */
@@ -1164,7 +1164,7 @@ DEFINE_SYSCALL1(errno_t, fchdir, fd_t, fd) {
 
 #ifdef __ARCH_WANT_SYSCALL_CHDIR
 DEFINE_SYSCALL1(errno_t, chdir,
-                USER UNCHECKED char const *, pathname) {
+                NCX UNCHECKED char const *, pathname) {
 	return sys_fchdirat_impl(AT_FDCWD, pathname, 0);
 }
 #endif /* __ARCH_WANT_SYSCALL_CHDIR */
@@ -1196,7 +1196,7 @@ sys_fchroot_impl(/*inherit(always)*/ REF struct path *__restrict newpath) {
 }
 
 PRIVATE errno_t KCALL
-sys_chroot_impl(USER UNCHECKED char const *pathname) {
+sys_chroot_impl(NCX UNCHECKED char const *pathname) {
 	atflag_t atflags;
 	REF struct path *newpath;
 	validate_readable(pathname, 1);
@@ -1208,7 +1208,7 @@ sys_chroot_impl(USER UNCHECKED char const *pathname) {
 
 #ifdef __ARCH_WANT_SYSCALL_CHROOT
 DEFINE_SYSCALL1(errno_t, chroot,
-                USER UNCHECKED char const *, pathname) {
+                NCX UNCHECKED char const *, pathname) {
 	return sys_chroot_impl(pathname);
 }
 #endif /* __ARCH_WANT_SYSCALL_CHROOT */
@@ -1223,7 +1223,7 @@ DEFINE_SYSCALL1(errno_t, chroot,
 #if (defined(__ARCH_WANT_SYSCALL_FCHMODAT) || \
      defined(__ARCH_WANT_SYSCALL_CHMOD))
 PRIVATE errno_t KCALL
-sys_fchmodat_impl(fd_t dirfd, USER CHECKED char const *filename,
+sys_fchmodat_impl(fd_t dirfd, NCX char const *filename,
                   mode_t mode, atflag_t atflags) {
 	REF struct fnode *node;
 	validate_readable(filename, 1);
@@ -1241,7 +1241,7 @@ sys_fchmodat_impl(fd_t dirfd, USER CHECKED char const *filename,
 
 #ifdef __ARCH_WANT_SYSCALL_FCHMODAT
 DEFINE_SYSCALL4(errno_t, fchmodat, fd_t, dirfd,
-                USER CHECKED char const *, filename,
+                NCX char const *, filename,
                 mode_t, mode, atflag_t, atflags) {
 	return sys_fchmodat_impl(dirfd, filename, mode, atflags);
 }
@@ -1260,7 +1260,7 @@ DEFINE_SYSCALL2(errno_t, fchmod, fd_t, fd, mode_t, mode) {
 #endif /* __ARCH_WANT_SYSCALL_FCHMOD */
 
 #ifdef __ARCH_WANT_SYSCALL_CHMOD
-DEFINE_SYSCALL2(errno_t, chmod, USER CHECKED char const *, filename, mode_t, mode) {
+DEFINE_SYSCALL2(errno_t, chmod, NCX char const *, filename, mode_t, mode) {
 	return sys_fchmodat_impl(AT_FDCWD, filename, mode, 0);
 }
 #endif /* __ARCH_WANT_SYSCALL_CHMOD */
@@ -1280,7 +1280,7 @@ DEFINE_SYSCALL2(errno_t, chmod, USER CHECKED char const *, filename, mode_t, mod
      defined(__ARCH_WANT_SYSCALL_CHOWN32) ||    \
      defined(__ARCH_WANT_SYSCALL_CHOWN))
 PRIVATE errno_t KCALL
-sys_fchownat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
+sys_fchownat_impl(fd_t dirfd, NCX UNCHECKED char const *filename,
                   uid_t owner, gid_t group, atflag_t atflags) {
 	REF struct fnode *node;
 	validate_readable(filename, 1);
@@ -1308,7 +1308,7 @@ sys_fchown_impl(fd_t fd, uid_t owner, gid_t group) {
 
 #ifdef __ARCH_WANT_SYSCALL_FCHOWNAT32
 DEFINE_SYSCALL5(errno_t, fchownat32, fd_t, dirfd,
-                USER UNCHECKED char const *, filename,
+                NCX UNCHECKED char const *, filename,
                 __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_fchownat32), owner,
                 __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT3_fchownat32), group,
                 atflag_t, atflags) {
@@ -1318,7 +1318,7 @@ DEFINE_SYSCALL5(errno_t, fchownat32, fd_t, dirfd,
 
 #ifdef __ARCH_WANT_SYSCALL_FCHOWNAT
 DEFINE_SYSCALL5(errno_t, fchownat, fd_t, dirfd,
-                USER UNCHECKED char const *, filename,
+                NCX UNCHECKED char const *, filename,
                 __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_fchownat), owner,
                 __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT3_fchownat), group,
                 atflag_t, atflags) {
@@ -1344,7 +1344,7 @@ DEFINE_SYSCALL3(errno_t, fchown, fd_t, fd,
 
 #ifdef __ARCH_WANT_SYSCALL_LCHOWN32
 DEFINE_SYSCALL3(errno_t, lchown32,
-                USER UNCHECKED char const *, filename,
+                NCX UNCHECKED char const *, filename,
                 __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_lchown32), owner,
                 __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_lchown32), group) {
 	return sys_fchownat_impl(AT_FDCWD, filename, (uid_t)owner, (gid_t)group, AT_SYMLINK_NOFOLLOW);
@@ -1353,7 +1353,7 @@ DEFINE_SYSCALL3(errno_t, lchown32,
 
 #ifdef __ARCH_WANT_SYSCALL_LCHOWN
 DEFINE_SYSCALL3(errno_t, lchown,
-                USER UNCHECKED char const *, filename,
+                NCX UNCHECKED char const *, filename,
                 __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_lchown), owner,
                 __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_lchown), group) {
 	return sys_fchownat_impl(AT_FDCWD, filename, (uid_t)owner, (gid_t)group, AT_SYMLINK_NOFOLLOW);
@@ -1362,7 +1362,7 @@ DEFINE_SYSCALL3(errno_t, lchown,
 
 #ifdef __ARCH_WANT_SYSCALL_CHOWN32
 DEFINE_SYSCALL3(errno_t, chown32,
-                USER UNCHECKED char const *, filename,
+                NCX UNCHECKED char const *, filename,
                 __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_chown32), owner,
                 __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_chown32), group) {
 	return sys_fchownat_impl(AT_FDCWD, filename, (uid_t)owner, (gid_t)group, 0);
@@ -1371,7 +1371,7 @@ DEFINE_SYSCALL3(errno_t, chown32,
 
 #ifdef __ARCH_WANT_SYSCALL_CHOWN
 DEFINE_SYSCALL3(errno_t, chown,
-                USER UNCHECKED char const *, filename,
+                NCX UNCHECKED char const *, filename,
                 __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_chown), owner,
                 __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_chown), group) {
 	return sys_fchownat_impl(AT_FDCWD, filename, (uid_t)owner, (gid_t)group, 0);
@@ -1457,7 +1457,7 @@ DEFINE_SYSCALL1(errno_t, syncfs, fd_t, fd) {
      defined(__ARCH_WANT_SYSCALL_OPEN) ||   \
      defined(__ARCH_WANT_SYSCALL_CREAT))
 PRIVATE fd_t KCALL
-sys_openat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
+sys_openat_impl(fd_t dirfd, NCX UNCHECKED char const *filename,
                 oflag_t oflags, mode_t mode) {
 	fd_t result;
 	REF struct handle hand;
@@ -1480,7 +1480,7 @@ sys_openat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
 
 #ifdef __ARCH_WANT_SYSCALL_OPENAT
 DEFINE_SYSCALL4(fd_t, openat, fd_t, dirfd,
-                USER UNCHECKED char const *, filename,
+                NCX UNCHECKED char const *, filename,
                 oflag_t, oflags, mode_t, mode) {
 	return sys_openat_impl(dirfd, filename, oflags, mode);
 }
@@ -1488,7 +1488,7 @@ DEFINE_SYSCALL4(fd_t, openat, fd_t, dirfd,
 
 #ifdef __ARCH_WANT_SYSCALL_OPEN
 DEFINE_SYSCALL3(fd_t, open,
-                USER UNCHECKED char const *, filename,
+                NCX UNCHECKED char const *, filename,
                 oflag_t, oflags, mode_t, mode) {
 	return sys_openat_impl(AT_FDCWD, filename, oflags, mode);
 }
@@ -1496,7 +1496,7 @@ DEFINE_SYSCALL3(fd_t, open,
 
 #ifdef __ARCH_WANT_SYSCALL_CREAT
 DEFINE_SYSCALL2(fd_t, creat,
-                USER UNCHECKED char const *, filename,
+                NCX UNCHECKED char const *, filename,
                 mode_t, mode) {
 	return sys_openat_impl(AT_FDCWD, filename, O_CREAT | O_WRONLY | O_TRUNC, mode);
 }
@@ -1511,7 +1511,7 @@ DEFINE_SYSCALL2(fd_t, creat,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_FREALPATH4
 DEFINE_SYSCALL4(ssize_t, frealpath4,
-                fd_t, fd, USER UNCHECKED char *, buf,
+                fd_t, fd, NCX UNCHECKED char *, buf,
                 size_t, buflen, atflag_t, atflags) {
 	struct handle hand;
 	size_t result;
@@ -1592,8 +1592,8 @@ bad_handle_type:
 
 #ifdef __ARCH_WANT_SYSCALL_FREALPATHAT
 DEFINE_SYSCALL5(ssize_t, frealpathat,
-                fd_t, dirfd, USER UNCHECKED char const *, filename,
-                USER UNCHECKED char *, buf, size_t, buflen, atflag_t, atflags) {
+                fd_t, dirfd, NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED char *, buf, size_t, buflen, atflag_t, atflags) {
 	size_t result;
 	REF struct path *root;
 	REF struct path *containing_path;
@@ -1640,8 +1640,8 @@ DEFINE_SYSCALL5(ssize_t, frealpathat,
 /************************************************************************/
 LOCAL errno_t KCALL
 system_fstatat(fd_t dirfd,
-               USER UNCHECKED char const *filename,
-               USER CHECKED struct stat *statbuf,
+               NCX UNCHECKED char const *filename,
+               NCX struct stat *statbuf,
                atflag_t atflags) {
 	REF struct fnode *node;
 	validate_readable(filename, 1);
@@ -1655,7 +1655,7 @@ system_fstatat(fd_t dirfd,
 }
 
 LOCAL errno_t KCALL
-system_fstat(fd_t fd, USER CHECKED struct stat *statbuf) {
+system_fstat(fd_t fd, NCX struct stat *statbuf) {
 	struct handle hand;
 	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
@@ -1664,14 +1664,14 @@ system_fstat(fd_t fd, USER CHECKED struct stat *statbuf) {
 }
 
 LOCAL errno_t KCALL
-system_lstat(USER UNCHECKED char const *filename,
-             USER CHECKED struct stat *statbuf) {
+system_lstat(NCX UNCHECKED char const *filename,
+             NCX struct stat *statbuf) {
 	return system_fstatat(AT_FDCWD, filename, statbuf, AT_SYMLINK_NOFOLLOW);
 }
 
 LOCAL errno_t KCALL
-system_stat(USER UNCHECKED char const *filename,
-            USER CHECKED struct stat *statbuf) {
+system_stat(NCX UNCHECKED char const *filename,
+            NCX struct stat *statbuf) {
 	return system_fstatat(AT_FDCWD, filename, statbuf, 0);
 }
 
@@ -1686,8 +1686,8 @@ system_stat(USER UNCHECKED char const *filename,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_KFSTATAT
 DEFINE_SYSCALL4(errno_t, kfstatat, fd_t, dirfd,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct __kos_stat *, statbuf,
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct __kos_stat *, statbuf,
                 atflag_t, atflags) {
 	validate_writable(statbuf, sizeof(*statbuf));
 	return system_fstatat(dirfd, filename, statbuf, atflags);
@@ -1696,7 +1696,7 @@ DEFINE_SYSCALL4(errno_t, kfstatat, fd_t, dirfd,
 
 #ifdef __ARCH_WANT_SYSCALL_KFSTAT
 DEFINE_SYSCALL2(errno_t, kfstat, fd_t, fd,
-                USER UNCHECKED struct __kos_stat *, statbuf) {
+                NCX UNCHECKED struct __kos_stat *, statbuf) {
 	validate_writable(statbuf, sizeof(*statbuf));
 	return system_fstat(fd, statbuf);
 }
@@ -1704,8 +1704,8 @@ DEFINE_SYSCALL2(errno_t, kfstat, fd_t, fd,
 
 #ifdef __ARCH_WANT_SYSCALL_KLSTAT
 DEFINE_SYSCALL2(errno_t, klstat,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct __kos_stat *, statbuf) {
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct __kos_stat *, statbuf) {
 	validate_writable(statbuf, sizeof(*statbuf));
 	return system_lstat(filename, statbuf);
 }
@@ -1713,8 +1713,8 @@ DEFINE_SYSCALL2(errno_t, klstat,
 
 #ifdef __ARCH_WANT_SYSCALL_KSTAT
 DEFINE_SYSCALL2(errno_t, kstat,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct __kos_stat *, statbuf) {
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct __kos_stat *, statbuf) {
 	validate_writable(statbuf, sizeof(*statbuf));
 	return system_stat(filename, statbuf);
 }
@@ -1729,8 +1729,8 @@ DEFINE_SYSCALL2(errno_t, kstat,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_OLDFSTATAT
 DEFINE_SYSCALL4(errno_t, oldfstatat, fd_t, dirfd,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct linux_oldstat *, statbuf,
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct linux_oldstat *, statbuf,
                 atflag_t, atflags) {
 	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
@@ -1742,8 +1742,8 @@ DEFINE_SYSCALL4(errno_t, oldfstatat, fd_t, dirfd,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_OLDFSTATAT
 DEFINE_COMPAT_SYSCALL4(errno_t, oldfstatat, fd_t, dirfd,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct linux_oldstat *, statbuf,
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct linux_oldstat *, statbuf,
                        atflag_t, atflags) {
 	struct stat st;
 	compat_validate_writable(statbuf, sizeof(*statbuf));
@@ -1755,7 +1755,7 @@ DEFINE_COMPAT_SYSCALL4(errno_t, oldfstatat, fd_t, dirfd,
 
 #ifdef __ARCH_WANT_SYSCALL_OLDFSTAT
 DEFINE_SYSCALL2(errno_t, oldfstat, fd_t, fd,
-                USER UNCHECKED struct linux_oldstat *, statbuf) {
+                NCX UNCHECKED struct linux_oldstat *, statbuf) {
 	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
 	system_fstat(fd, &st);
@@ -1766,7 +1766,7 @@ DEFINE_SYSCALL2(errno_t, oldfstat, fd_t, fd,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_OLDFSTAT
 DEFINE_COMPAT_SYSCALL2(errno_t, oldfstat, fd_t, fd,
-                       USER UNCHECKED struct linux_oldstat *, statbuf) {
+                       NCX UNCHECKED struct linux_oldstat *, statbuf) {
 	struct stat st;
 	compat_validate_writable(statbuf, sizeof(*statbuf));
 	system_fstat(fd, &st);
@@ -1777,8 +1777,8 @@ DEFINE_COMPAT_SYSCALL2(errno_t, oldfstat, fd_t, fd,
 
 #ifdef __ARCH_WANT_SYSCALL_OLDLSTAT
 DEFINE_SYSCALL2(errno_t, oldlstat,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct linux_oldstat *, statbuf) {
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct linux_oldstat *, statbuf) {
 	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
 	system_lstat(filename, &st);
@@ -1789,8 +1789,8 @@ DEFINE_SYSCALL2(errno_t, oldlstat,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_OLDLSTAT
 DEFINE_COMPAT_SYSCALL2(errno_t, oldlstat,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct linux_oldstat *, statbuf) {
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct linux_oldstat *, statbuf) {
 	struct stat st;
 	compat_validate_writable(statbuf, sizeof(*statbuf));
 	system_lstat(filename, &st);
@@ -1801,8 +1801,8 @@ DEFINE_COMPAT_SYSCALL2(errno_t, oldlstat,
 
 #ifdef __ARCH_WANT_SYSCALL_OLDSTAT
 DEFINE_SYSCALL2(errno_t, oldstat,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct linux_oldstat *, statbuf) {
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct linux_oldstat *, statbuf) {
 	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
 	system_stat(filename, &st);
@@ -1813,8 +1813,8 @@ DEFINE_SYSCALL2(errno_t, oldstat,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_OLDSTAT
 DEFINE_COMPAT_SYSCALL2(errno_t, oldstat,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct linux_oldstat *, statbuf) {
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct linux_oldstat *, statbuf) {
 	struct stat st;
 	compat_validate_writable(statbuf, sizeof(*statbuf));
 	system_stat(filename, &st);
@@ -1833,8 +1833,8 @@ DEFINE_COMPAT_SYSCALL2(errno_t, oldstat,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_FSTATAT
 DEFINE_SYSCALL4(errno_t, fstatat, fd_t, dirfd,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct linux_stat32 *, statbuf,
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct linux_stat32 *, statbuf,
                 atflag_t, atflags) {
 	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
@@ -1846,8 +1846,8 @@ DEFINE_SYSCALL4(errno_t, fstatat, fd_t, dirfd,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_FSTATAT
 DEFINE_COMPAT_SYSCALL4(errno_t, fstatat, fd_t, dirfd,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_linux_stat32 *, statbuf,
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_linux_stat32 *, statbuf,
                        atflag_t, atflags) {
 	struct stat st;
 	compat_validate_writable(statbuf, sizeof(*statbuf));
@@ -1859,8 +1859,8 @@ DEFINE_COMPAT_SYSCALL4(errno_t, fstatat, fd_t, dirfd,
 
 #ifdef __ARCH_WANT_SYSCALL_FSTATAT64
 DEFINE_SYSCALL4(errno_t, fstatat64, fd_t, dirfd,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct linux_stat64 *, statbuf,
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct linux_stat64 *, statbuf,
                 atflag_t, atflags) {
 	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
@@ -1872,8 +1872,8 @@ DEFINE_SYSCALL4(errno_t, fstatat64, fd_t, dirfd,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_FSTATAT64
 DEFINE_COMPAT_SYSCALL4(errno_t, fstatat64, fd_t, dirfd,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_linux_stat64 *, statbuf,
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_linux_stat64 *, statbuf,
                        atflag_t, atflags) {
 	struct stat st;
 	compat_validate_writable(statbuf, sizeof(*statbuf));
@@ -1885,7 +1885,7 @@ DEFINE_COMPAT_SYSCALL4(errno_t, fstatat64, fd_t, dirfd,
 
 #ifdef __ARCH_WANT_SYSCALL_FSTAT
 DEFINE_SYSCALL2(errno_t, fstat, fd_t, fd,
-                USER UNCHECKED struct linux_stat32 *, statbuf) {
+                NCX UNCHECKED struct linux_stat32 *, statbuf) {
 	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
 	system_fstat(fd, &st);
@@ -1896,7 +1896,7 @@ DEFINE_SYSCALL2(errno_t, fstat, fd_t, fd,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_FSTAT
 DEFINE_COMPAT_SYSCALL2(errno_t, fstat, fd_t, fd,
-                       USER UNCHECKED struct compat_linux_stat32 *, statbuf) {
+                       NCX UNCHECKED struct compat_linux_stat32 *, statbuf) {
 	struct stat st;
 	compat_validate_writable(statbuf, sizeof(*statbuf));
 	system_fstat(fd, &st);
@@ -1907,7 +1907,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, fstat, fd_t, fd,
 
 #ifdef __ARCH_WANT_SYSCALL_FSTAT64
 DEFINE_SYSCALL2(errno_t, fstat64, fd_t, fd,
-                USER UNCHECKED struct linux_stat64 *, statbuf) {
+                NCX UNCHECKED struct linux_stat64 *, statbuf) {
 	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
 	system_fstat(fd, &st);
@@ -1918,7 +1918,7 @@ DEFINE_SYSCALL2(errno_t, fstat64, fd_t, fd,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_FSTAT64
 DEFINE_COMPAT_SYSCALL2(errno_t, fstat64, fd_t, fd,
-                       USER UNCHECKED struct compat_linux_stat64 *, statbuf) {
+                       NCX UNCHECKED struct compat_linux_stat64 *, statbuf) {
 	struct stat st;
 	compat_validate_writable(statbuf, sizeof(*statbuf));
 	system_fstat(fd, &st);
@@ -1929,8 +1929,8 @@ DEFINE_COMPAT_SYSCALL2(errno_t, fstat64, fd_t, fd,
 
 #ifdef __ARCH_WANT_SYSCALL_LSTAT
 DEFINE_SYSCALL2(errno_t, lstat,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct linux_stat32 *, statbuf) {
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct linux_stat32 *, statbuf) {
 	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
 	system_lstat(filename, &st);
@@ -1941,8 +1941,8 @@ DEFINE_SYSCALL2(errno_t, lstat,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_LSTAT
 DEFINE_COMPAT_SYSCALL2(errno_t, lstat,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_linux_stat32 *, statbuf) {
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_linux_stat32 *, statbuf) {
 	struct stat st;
 	compat_validate_writable(statbuf, sizeof(*statbuf));
 	system_lstat(filename, &st);
@@ -1953,8 +1953,8 @@ DEFINE_COMPAT_SYSCALL2(errno_t, lstat,
 
 #ifdef __ARCH_WANT_SYSCALL_LSTAT64
 DEFINE_SYSCALL2(errno_t, lstat64,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct linux_stat64 *, statbuf) {
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct linux_stat64 *, statbuf) {
 	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
 	system_lstat(filename, &st);
@@ -1965,8 +1965,8 @@ DEFINE_SYSCALL2(errno_t, lstat64,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_LSTAT64
 DEFINE_COMPAT_SYSCALL2(errno_t, lstat64,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_linux_stat64 *, statbuf) {
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_linux_stat64 *, statbuf) {
 	struct stat st;
 	compat_validate_writable(statbuf, sizeof(*statbuf));
 	system_lstat(filename, &st);
@@ -1977,8 +1977,8 @@ DEFINE_COMPAT_SYSCALL2(errno_t, lstat64,
 
 #ifdef __ARCH_WANT_SYSCALL_STAT
 DEFINE_SYSCALL2(errno_t, stat,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct linux_stat32 *, statbuf) {
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct linux_stat32 *, statbuf) {
 	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
 	system_stat(filename, &st);
@@ -1989,8 +1989,8 @@ DEFINE_SYSCALL2(errno_t, stat,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_STAT
 DEFINE_COMPAT_SYSCALL2(errno_t, stat,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_linux_stat32 *, statbuf) {
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_linux_stat32 *, statbuf) {
 	struct stat st;
 	compat_validate_writable(statbuf, sizeof(*statbuf));
 	system_stat(filename, &st);
@@ -2001,8 +2001,8 @@ DEFINE_COMPAT_SYSCALL2(errno_t, stat,
 
 #ifdef __ARCH_WANT_SYSCALL_STAT64
 DEFINE_SYSCALL2(errno_t, stat64,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct linux_stat64 *, statbuf) {
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct linux_stat64 *, statbuf) {
 	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
 	system_stat(filename, &st);
@@ -2013,8 +2013,8 @@ DEFINE_SYSCALL2(errno_t, stat64,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_STAT64
 DEFINE_COMPAT_SYSCALL2(errno_t, stat64,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_linux_stat64 *, statbuf) {
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_linux_stat64 *, statbuf) {
 	struct stat st;
 	compat_validate_writable(statbuf, sizeof(*statbuf));
 	system_stat(filename, &st);
@@ -2034,8 +2034,8 @@ DEFINE_COMPAT_SYSCALL2(errno_t, stat64,
      defined(__ARCH_WANT_SYSCALL_READLINKAT) ||  \
      defined(__ARCH_WANT_SYSCALL_READLINK))
 PRIVATE ssize_t KCALL
-sys_freadlinkat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
-                     USER UNCHECKED char *buf, size_t buflen, atflag_t atflags) {
+sys_freadlinkat_impl(fd_t dirfd, NCX UNCHECKED char const *filename,
+                     NCX UNCHECKED char *buf, size_t buflen, atflag_t atflags) {
 	size_t result;
 	REF struct fnode *node;
 	validate_readable(filename, 1);
@@ -2073,24 +2073,24 @@ sys_freadlinkat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
 
 #ifdef __ARCH_WANT_SYSCALL_FREADLINKAT
 DEFINE_SYSCALL5(ssize_t, freadlinkat,
-                fd_t, dirfd, USER UNCHECKED char const *, filename,
-                USER UNCHECKED char *, buf, size_t, buflen, atflag_t, atflags) {
+                fd_t, dirfd, NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED char *, buf, size_t, buflen, atflag_t, atflags) {
 	return sys_freadlinkat_impl(dirfd, filename, buf, buflen, atflags);
 }
 #endif /* __ARCH_WANT_SYSCALL_FREADLINKAT */
 
 #ifdef __ARCH_WANT_SYSCALL_READLINKAT
 DEFINE_SYSCALL4(ssize_t, readlinkat,
-                fd_t, dirfd, USER UNCHECKED char const *, filename,
-                USER UNCHECKED char *, buf, size_t, buflen) {
+                fd_t, dirfd, NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED char *, buf, size_t, buflen) {
 	return sys_freadlinkat_impl(dirfd, filename, buf, buflen, 0);
 }
 #endif /* __ARCH_WANT_SYSCALL_READLINKAT */
 
 #ifdef __ARCH_WANT_SYSCALL_READLINK
 DEFINE_SYSCALL3(ssize_t, readlink,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED char *, buf, size_t, buflen) {
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED char *, buf, size_t, buflen) {
 	return sys_freadlinkat_impl(AT_FDCWD, filename, buf, buflen, 0);
 }
 #endif /* __ARCH_WANT_SYSCALL_READLINK */
@@ -2135,8 +2135,8 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 	 * the exec. Note that the `TASK_FUSERPROCMASK' flag itself
 	 * is later unset by `reset_user_except_handler()' */
 	if (thread_flags & TASK_FUSERPROCMASK) {
-		USER CHECKED struct userprocmask *um;
-		USER UNCHECKED sigset_t *um_sigset;
+		NCX struct userprocmask *um;
+		NCX UNCHECKED sigset_t *um_sigset;
 		size_t um_sigsiz;
 		um        = PERTASK_GET(this_userprocmask_address);
 		um_sigset = um->pm_sigmask;
@@ -2187,7 +2187,7 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 			 * using  a NULL-pointer in `pm_sigmask' for this, so that's what we
 			 * rely on here (s.a. `libc_sigprocmask(3)') */
 			if (old_flags & TASK_FUSERPROCMASK_AFTER_VFORK) {
-				USER CHECKED struct userprocmask *um;
+				NCX struct userprocmask *um;
 				um = PERTASK_GET(this_userprocmask_address);
 				printk(KERN_DEBUG "[userprocmask:%p] Uninstall during exec after vfork\n", um);
 				TRY {
@@ -2355,18 +2355,18 @@ error_completion:
 
 
 #ifdef __ARCH_HAVE_COMPAT
-#define KERNEL_EXECVEAT_ARGV_TYPE USER UNCHECKED void const *
-#define KERNEL_EXECVEAT_ENVP_TYPE USER UNCHECKED void const *
+#define KERNEL_EXECVEAT_ARGV_TYPE NCX UNCHECKED void const *
+#define KERNEL_EXECVEAT_ENVP_TYPE NCX UNCHECKED void const *
 #else /* __ARCH_HAVE_COMPAT */
-#define KERNEL_EXECVEAT_ARGV_TYPE USER UNCHECKED char const *USER UNCHECKED const *
-#define KERNEL_EXECVEAT_ENVP_TYPE USER UNCHECKED char const *USER UNCHECKED const *
+#define KERNEL_EXECVEAT_ARGV_TYPE NCX UNCHECKED char const *NCX UNCHECKED const *
+#define KERNEL_EXECVEAT_ENVP_TYPE NCX UNCHECKED char const *NCX UNCHECKED const *
 #endif /* !__ARCH_HAVE_COMPAT */
 
 
 /* Implementation of the execv() system call. */
 INTERN struct icpustate *KCALL
 kernel_execveat(fd_t dirfd,
-                USER UNCHECKED char const *pathname,
+                NCX UNCHECKED char const *pathname,
                 KERNEL_EXECVEAT_ARGV_TYPE argv,
                 KERNEL_EXECVEAT_ENVP_TYPE envp,
                 atflag_t atflags,
@@ -2519,7 +2519,7 @@ sys_execveat_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 
 	/* Actually service the exec() system call. */
 	ctx->rc_state = kernel_execveat((fd_t)ctx->rc_scinfo.rsi_regs[0],
-	                                (USER UNCHECKED char const *)ctx->rc_scinfo.rsi_regs[1],
+	                                (NCX UNCHECKED char const *)ctx->rc_scinfo.rsi_regs[1],
 	                                (KERNEL_EXECVEAT_ARGV_TYPE)ctx->rc_scinfo.rsi_regs[2],
 	                                (KERNEL_EXECVEAT_ENVP_TYPE)ctx->rc_scinfo.rsi_regs[3],
 	                                (atflag_t)ctx->rc_scinfo.rsi_regs[4],
@@ -2531,9 +2531,9 @@ sys_execveat_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 }
 
 DEFINE_SYSCALL5(errno_t, execveat, fd_t, dirfd,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED char const *USER UNCHECKED const *, argv,
-                USER UNCHECKED char const *USER UNCHECKED const *, envp,
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED char const *NCX UNCHECKED const *, argv,
+                NCX UNCHECKED char const *NCX UNCHECKED const *, envp,
                 atflag_t, atflags) {
 	(void)dirfd;
 	(void)filename;
@@ -2555,9 +2555,9 @@ compat_sys_execveat_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)
 
 	/* Actually service the exec() system call. */
 	ctx->rc_state = kernel_execveat((fd_t)ctx->rc_scinfo.rsi_regs[0],
-	                                (USER UNCHECKED char const *)ctx->rc_scinfo.rsi_regs[1],
-	                                (USER UNCHECKED void const *)ctx->rc_scinfo.rsi_regs[2],
-	                                (USER UNCHECKED void const *)ctx->rc_scinfo.rsi_regs[3],
+	                                (NCX UNCHECKED char const *)ctx->rc_scinfo.rsi_regs[1],
+	                                (NCX UNCHECKED void const *)ctx->rc_scinfo.rsi_regs[2],
+	                                (NCX UNCHECKED void const *)ctx->rc_scinfo.rsi_regs[3],
 	                                (atflag_t)ctx->rc_scinfo.rsi_regs[4],
 	                                true,
 	                                ctx->rc_state);
@@ -2567,9 +2567,9 @@ compat_sys_execveat_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)
 }
 
 DEFINE_COMPAT_SYSCALL5(errno_t, execveat, fd_t, dirfd,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED compat_ptr(char const) USER UNCHECKED const *, argv,
-                       USER UNCHECKED compat_ptr(char const) USER UNCHECKED const *, envp,
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED compat_ptr(char const) NCX UNCHECKED const *, argv,
+                       NCX UNCHECKED compat_ptr(char const) NCX UNCHECKED const *, envp,
                        atflag_t, atflags) {
 	(void)dirfd;
 	(void)filename;
@@ -2591,7 +2591,7 @@ sys_execve_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 
 	/* Actually service the exec() system call. */
 	ctx->rc_state = kernel_execveat(AT_FDCWD,
-	                                (USER UNCHECKED char const *)ctx->rc_scinfo.rsi_regs[0],
+	                                (NCX UNCHECKED char const *)ctx->rc_scinfo.rsi_regs[0],
 	                                (KERNEL_EXECVEAT_ARGV_TYPE)ctx->rc_scinfo.rsi_regs[1],
 	                                (KERNEL_EXECVEAT_ENVP_TYPE)ctx->rc_scinfo.rsi_regs[2],
 	                                0, IF_ARCH_HAVE_COMPAT(false,) ctx->rc_state);
@@ -2601,9 +2601,9 @@ sys_execve_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 }
 
 DEFINE_SYSCALL3(errno_t, execve,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED char const *USER UNCHECKED const *, argv,
-                USER UNCHECKED char const *USER UNCHECKED const *, envp) {
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED char const *NCX UNCHECKED const *, argv,
+                NCX UNCHECKED char const *NCX UNCHECKED const *, envp) {
 	(void)filename;
 	(void)argv;
 	(void)envp;
@@ -2622,7 +2622,7 @@ compat_sys_execve_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) 
 
 	/* Actually service the exec() system call. */
 	ctx->rc_state = kernel_execveat(AT_FDCWD,
-	                                (USER UNCHECKED char const *)ctx->rc_scinfo.rsi_regs[0],
+	                                (NCX UNCHECKED char const *)ctx->rc_scinfo.rsi_regs[0],
 	                                (KERNEL_EXECVEAT_ARGV_TYPE)ctx->rc_scinfo.rsi_regs[1],
 	                                (KERNEL_EXECVEAT_ENVP_TYPE)ctx->rc_scinfo.rsi_regs[2],
 	                                0,
@@ -2634,9 +2634,9 @@ compat_sys_execve_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) 
 }
 
 DEFINE_COMPAT_SYSCALL3(errno_t, execve,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED compat_ptr(char const) USER UNCHECKED const *, argv,
-                       USER UNCHECKED compat_ptr(char const) USER UNCHECKED const *, envp) {
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED compat_ptr(char const) NCX UNCHECKED const *, argv,
+                       NCX UNCHECKED compat_ptr(char const) NCX UNCHECKED const *, envp) {
 	(void)filename;
 	(void)argv;
 	(void)envp;
@@ -2676,7 +2676,7 @@ DEFINE_SYSCALL0(syscall_slong_t, getdrives) {
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_FSTATFS
 DEFINE_SYSCALL2(errno_t, fstatfs, fd_t, fd,
-                USER UNCHECKED struct __statfs32 *, result) {
+                NCX UNCHECKED struct __statfs32 *, result) {
 	REF struct fsuper *super;
 #ifndef _STATFS_MATCHES_STATFS64
 	struct statfs data;
@@ -2701,7 +2701,7 @@ DEFINE_SYSCALL2(errno_t, fstatfs, fd_t, fd,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_FSTATFS
 DEFINE_COMPAT_SYSCALL2(errno_t, fstatfs, fd_t, fd,
-                       USER UNCHECKED struct compat_statfs32 *, result) {
+                       NCX UNCHECKED struct compat_statfs32 *, result) {
 	REF struct fsuper *super;
 	struct statfs data;
 	validate_writable(result, sizeof(*result));
@@ -2718,7 +2718,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, fstatfs, fd_t, fd,
 
 #ifdef __ARCH_WANT_SYSCALL_FSTATFS64
 DEFINE_SYSCALL2(errno_t, fstatfs64, fd_t, fd,
-                USER UNCHECKED struct __statfs64 *, result) {
+                NCX UNCHECKED struct __statfs64 *, result) {
 	REF struct fsuper *super;
 	validate_writable(result, sizeof(*result));
 	super = handles_lookupfsuper_relaxed(fd);
@@ -2740,7 +2740,7 @@ DEFINE_SYSCALL2(errno_t, fstatfs64, fd_t, fd,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_FSTATFS64
 DEFINE_COMPAT_SYSCALL2(errno_t, fstatfs64, fd_t, fd,
-                       USER UNCHECKED struct compat_statfs64 *, result) {
+                       NCX UNCHECKED struct compat_statfs64 *, result) {
 	REF struct fsuper *super;
 	struct statfs data;
 	validate_writable(result, sizeof(*result));
@@ -2756,7 +2756,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, fstatfs64, fd_t, fd,
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_FSTATFS64 */
 
 PRIVATE REF struct fsuper *KCALL
-get_super_from_path(USER CHECKED char const *filename) {
+get_super_from_path(NCX char const *filename) {
 	REF struct fnode *node;
 	REF struct fsuper *result;
 	/* Traverse the given path in its entirety. */
@@ -2768,8 +2768,8 @@ get_super_from_path(USER CHECKED char const *filename) {
 
 #ifdef __ARCH_WANT_SYSCALL_STATFS
 DEFINE_SYSCALL2(errno_t, statfs,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct __statfs32 *, result) {
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct __statfs32 *, result) {
 	REF struct fsuper *super;
 #ifndef _STATFS_MATCHES_STATFS64
 	struct statfs data;
@@ -2795,8 +2795,8 @@ DEFINE_SYSCALL2(errno_t, statfs,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_STATFS
 DEFINE_COMPAT_SYSCALL2(errno_t, statfs,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_statfs32 *, result) {
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_statfs32 *, result) {
 	REF struct fsuper *super;
 	struct statfs data;
 	validate_readable(filename, 1);
@@ -2814,8 +2814,8 @@ DEFINE_COMPAT_SYSCALL2(errno_t, statfs,
 
 #ifdef __ARCH_WANT_SYSCALL_STATFS64
 DEFINE_SYSCALL2(errno_t, statfs64,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct __statfs64 *, result) {
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct __statfs64 *, result) {
 	REF struct fsuper *super;
 	validate_readable(filename, 1);
 	validate_writable(result, sizeof(*result));
@@ -2830,8 +2830,8 @@ DEFINE_SYSCALL2(errno_t, statfs64,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_STATFS64
 DEFINE_COMPAT_SYSCALL2(errno_t, statfs64,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_statfs64 *, result) {
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_statfs64 *, result) {
 	struct statfs st;
 	REF struct fsuper *super;
 	validate_readable(filename, 1);
@@ -2904,8 +2904,8 @@ fnode_request_current_timestamps(struct fnode *__restrict node)
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_UTIME
 DEFINE_SYSCALL2(errno_t, utime,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct utimbuf32 const *, times) {
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct utimbuf32 const *, times) {
 	struct timespec atm, mtm;
 	REF struct fnode *node;
 	validate_readable(filename, 1);
@@ -2931,8 +2931,8 @@ DEFINE_SYSCALL2(errno_t, utime,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_UTIME
 DEFINE_COMPAT_SYSCALL2(errno_t, utime,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_utimbuf32 const *, times) {
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_utimbuf32 const *, times) {
 	struct timespec atm, mtm;
 	REF struct fnode *node;
 	compat_validate_readable(filename, 1);
@@ -2961,12 +2961,12 @@ DEFINE_COMPAT_SYSCALL2(errno_t, utime,
      defined(__ARCH_WANT_SYSCALL_UTIME_TIME64))
 #ifdef __ARCH_WANT_SYSCALL_UTIME64
 DEFINE_SYSCALL2(errno_t, utime64,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct utimbuf64 const *, times)
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct utimbuf64 const *, times)
 #else /* __ARCH_WANT_SYSCALL_UTIME64 */
 DEFINE_SYSCALL2(errno_t, utime_time64,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct utimbuf64 const *, times)
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct utimbuf64 const *, times)
 #endif /* !__ARCH_WANT_SYSCALL_UTIME64 */
 {
 	struct timespec atm, mtm;
@@ -2995,8 +2995,8 @@ DEFINE_SYSCALL2(errno_t, utime_time64,
 #if (defined(__ARCH_WANT_COMPAT_SYSCALL_UTIME64) || \
      defined(__ARCH_WANT_COMPAT_SYSCALL_UTIME_TIME64))
 DEFINE_COMPAT_SYSCALL2(errno_t, utime64,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_utimbuf64 const *, times) {
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_utimbuf64 const *, times) {
 	struct timespec atm, mtm;
 	REF struct fnode *node;
 	compat_validate_readable(filename, 1);
@@ -3028,8 +3028,8 @@ DEFINE_COMPAT_SYSCALL2(errno_t, utime64,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_UTIMES
 DEFINE_SYSCALL2(errno_t, utimes,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct timeval32 const *, times) {
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct timeval32 const *, times) {
 	struct timespec atm, mtm;
 	REF struct fnode *node;
 	validate_readable(filename, 1);
@@ -3053,8 +3053,8 @@ DEFINE_SYSCALL2(errno_t, utimes,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_UTIMES
 DEFINE_COMPAT_SYSCALL2(errno_t, utimes,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_timeval32 const *, times) {
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_timeval32 const *, times) {
 	struct timespec atm, mtm;
 	REF struct fnode *node;
 	compat_validate_readable(filename, 1);
@@ -3080,12 +3080,12 @@ DEFINE_COMPAT_SYSCALL2(errno_t, utimes,
      defined(__ARCH_WANT_SYSCALL_UTIMES_TIME64))
 #ifdef __ARCH_WANT_SYSCALL_UTIMES64
 DEFINE_SYSCALL2(errno_t, utimes64,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct timeval64 const *, times)
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct timeval64 const *, times)
 #else /* __ARCH_WANT_SYSCALL_UTIMES64 */
 DEFINE_SYSCALL2(errno_t, utimes_time64,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct timeval64 const *, times)
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct timeval64 const *, times)
 #endif /* !__ARCH_WANT_SYSCALL_UTIMES64 */
 {
 	struct timespec atm, mtm;
@@ -3113,12 +3113,12 @@ DEFINE_SYSCALL2(errno_t, utimes_time64,
      defined(__ARCH_WANT_COMPAT_SYSCALL_UTIMES_TIME64))
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_UTIMES64
 DEFINE_COMPAT_SYSCALL2(errno_t, utimes64,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_timeval64 const *, times)
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_timeval64 const *, times)
 #else /* __ARCH_WANT_COMPAT_SYSCALL_UTIMES64 */
 DEFINE_COMPAT_SYSCALL2(errno_t, utimes_time64,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_timeval64 const *, times)
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_timeval64 const *, times)
 #endif /* !__ARCH_WANT_COMPAT_SYSCALL_UTIMES64 */
 {
 	struct timespec atm, mtm;
@@ -3155,7 +3155,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, utimes_time64,
      defined(__ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT64) || \
      defined(__ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT_TIME64))
 PRIVATE ATTR_RETNONNULL WUNUSED REF struct fnode *KCALL
-lookup_inode_for_futimesat(fd_t dirfd, USER UNCHECKED char const *filename) {
+lookup_inode_for_futimesat(fd_t dirfd, NCX UNCHECKED char const *filename) {
 	REF struct fnode *result;
 	if (filename) {
 		validate_readable(filename, 1);
@@ -3169,8 +3169,8 @@ lookup_inode_for_futimesat(fd_t dirfd, USER UNCHECKED char const *filename) {
 
 #ifdef __ARCH_WANT_SYSCALL_FUTIMESAT
 DEFINE_SYSCALL3(errno_t, futimesat, fd_t, dirfd,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct timeval32 const *, times) {
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct timeval32 const *, times) {
 	struct timespec atm, mtm;
 	REF struct fnode *node;
 	validate_readable(filename, 1);
@@ -3194,8 +3194,8 @@ DEFINE_SYSCALL3(errno_t, futimesat, fd_t, dirfd,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT
 DEFINE_COMPAT_SYSCALL3(errno_t, futimesat, fd_t, dirfd,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_timeval32 const *, times) {
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_timeval32 const *, times) {
 	struct timespec atm, mtm;
 	REF struct fnode *node;
 	node = lookup_inode_for_futimesat(dirfd, filename);
@@ -3220,12 +3220,12 @@ DEFINE_COMPAT_SYSCALL3(errno_t, futimesat, fd_t, dirfd,
      defined(__ARCH_WANT_SYSCALL_FUTIMESAT_TIME64))
 #ifdef __ARCH_WANT_SYSCALL_FUTIMESAT64
 DEFINE_SYSCALL3(errno_t, futimesat64, fd_t, dirfd,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct timeval64 const *, times)
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct timeval64 const *, times)
 #else /* __ARCH_WANT_SYSCALL_FUTIMESAT64 */
 DEFINE_SYSCALL3(errno_t, futimesat_time64, fd_t, dirfd,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct timeval64 const *, times)
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct timeval64 const *, times)
 #endif /* !__ARCH_WANT_SYSCALL_FUTIMESAT64 */
 {
 	struct timespec atm, mtm;
@@ -3252,12 +3252,12 @@ DEFINE_SYSCALL3(errno_t, futimesat_time64, fd_t, dirfd,
      defined(__ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT_TIME64))
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT64
 DEFINE_COMPAT_SYSCALL3(errno_t, futimesat64, fd_t, dirfd,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_timeval64 const *, times)
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_timeval64 const *, times)
 #else /* __ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT64 */
 DEFINE_COMPAT_SYSCALL3(errno_t, futimesat_time64, fd_t, dirfd,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_timeval64 const *, times)
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_timeval64 const *, times)
 #endif /* !__ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT64 */
 {
 	struct timespec atm, mtm;
@@ -3293,7 +3293,7 @@ DEFINE_COMPAT_SYSCALL3(errno_t, futimesat_time64, fd_t, dirfd,
      defined(__ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT64) || \
      defined(__ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT_TIME64))
 PRIVATE ATTR_RETNONNULL WUNUSED REF struct fnode *KCALL
-lookup_inode_for_utimensat(fd_t dirfd, USER UNCHECKED char const *filename,
+lookup_inode_for_utimensat(fd_t dirfd, NCX UNCHECKED char const *filename,
                            atflag_t atflags) {
 	REF struct fnode *result;
 	if (filename) {
@@ -3314,8 +3314,8 @@ lookup_inode_for_utimensat(fd_t dirfd, USER UNCHECKED char const *filename,
 
 #ifdef __ARCH_WANT_SYSCALL_UTIMENSAT
 DEFINE_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct timespec32 const *, times,
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct timespec32 const *, times,
                 atflag_t, atflags) {
 	struct timespec atm, mtm, btm;
 	struct timespec *patm, *pmtm;
@@ -3376,8 +3376,8 @@ do_touch:
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT
 DEFINE_COMPAT_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_timespec32 const *, times,
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_timespec32 const *, times,
                        atflag_t, atflags) {
 	struct timespec atm, mtm, btm;
 	struct timespec *patm, *pmtm;
@@ -3440,13 +3440,13 @@ do_touch:
      defined(__ARCH_WANT_SYSCALL_UTIMENSAT_TIME64))
 #ifdef __ARCH_WANT_SYSCALL_UTIMENSAT64
 DEFINE_SYSCALL4(errno_t, utimensat64, fd_t, dirfd,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct timespec64 const *, times,
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct timespec64 const *, times,
                 atflag_t, atflags)
 #else /* __ARCH_WANT_SYSCALL_UTIMENSAT64 */
 DEFINE_SYSCALL4(errno_t, utimensat_time64, fd_t, dirfd,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct timespec64 const *, times,
+                NCX UNCHECKED char const *, filename,
+                NCX UNCHECKED struct timespec64 const *, times,
                 atflag_t, atflags)
 #endif /* !__ARCH_WANT_SYSCALL_UTIMENSAT64 */
 {
@@ -3511,13 +3511,13 @@ do_touch:
      defined(__ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT_TIME64))
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT64
 DEFINE_COMPAT_SYSCALL4(errno_t, utimensat64, fd_t, dirfd,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_timespec64 const *, times,
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_timespec64 const *, times,
                        atflag_t, atflags)
 #else /* __ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT64 */
 DEFINE_COMPAT_SYSCALL4(errno_t, utimensat_time64, fd_t, dirfd,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_timespec64 const *, times,
+                       NCX UNCHECKED char const *, filename,
+                       NCX UNCHECKED struct compat_timespec64 const *, times,
                        atflag_t, atflags)
 #endif /* !__ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT64 */
 {

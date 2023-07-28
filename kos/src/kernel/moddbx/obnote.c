@@ -137,7 +137,7 @@ PRIVATE ATTR_PURE WUNUSED bool KCALL verify_cpu(struct cpu *me) {
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_task)(pformatprinter printer, void *arg,
-                         CHECKED void const *pointer,
+                         NCX void const *pointer,
                          unsigned int *__restrict pstatus) {
 	ssize_t temp, result = 0;
 	struct task *thread = (struct task *)pointer;
@@ -205,7 +205,7 @@ badobj:
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_taskpid)(pformatprinter printer, void *arg,
-                            CHECKED void const *pointer,
+                            NCX void const *pointer,
                             unsigned int *__restrict pstatus) {
 	ssize_t result;
 	struct taskpid *thread = (struct taskpid *)pointer;
@@ -254,7 +254,7 @@ badobj:
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_module)(pformatprinter printer, void *arg,
-                           CHECKED void const *pointer,
+                           NCX void const *pointer,
                            unsigned int *__restrict pstatus) {
 	struct module *me = (struct module *)pointer;
 	char const *module_name;
@@ -314,7 +314,7 @@ NOTHROW(FCALL get__userelf_module_free)(void) {
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_module_section)(pformatprinter printer, void *arg,
-                                   CHECKED void const *pointer,
+                                   NCX void const *pointer,
                                    unsigned int *__restrict pstatus) {
 	struct module_section *me = (struct module_section *)pointer;
 	char const *module_name;
@@ -475,7 +475,7 @@ NOTHROW(KCALL get_dirent_type_name)(unsigned char dt_type) {
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_fdirent_ex)(pformatprinter printer, void *arg,
-                               CHECKED void const *pointer,
+                               NCX void const *pointer,
                                unsigned int *__restrict pstatus,
                                bool print_type) {
 	ssize_t result, temp;
@@ -514,7 +514,7 @@ err:
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_fdirent)(pformatprinter printer, void *arg,
-                            CHECKED void const *pointer,
+                            NCX void const *pointer,
                             unsigned int *__restrict pstatus) {
 	return note_fdirent_ex(printer, arg, pointer, pstatus, true);
 }
@@ -522,7 +522,7 @@ NOTHROW(KCALL note_fdirent)(pformatprinter printer, void *arg,
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_cpu)(pformatprinter printer, void *arg,
-                        CHECKED void const *pointer,
+                        NCX void const *pointer,
                         unsigned int *__restrict pstatus) {
 	struct cpu *me = (struct cpu *)pointer;
 	unsigned int id;
@@ -544,7 +544,7 @@ badobj:
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_path_impl)(pformatprinter printer, void *arg,
-                              CHECKED void const *pointer,
+                              NCX void const *pointer,
                               unsigned int *__restrict pstatus,
                               bool want_root_directory_slash) {
 	ssize_t temp, result;
@@ -596,15 +596,15 @@ badobj:
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_path)(pformatprinter printer, void *arg,
-                         CHECKED void const *pointer,
+                         NCX void const *pointer,
                          unsigned int *__restrict pstatus) {
 	return note_path_impl(printer, arg, pointer, pstatus, true);
 }
 
 PRIVATE NONNULL((1, 4, 5)) ssize_t
 NOTHROW(KCALL note_pathpair)(pformatprinter printer, void *arg,
-                             CHECKED struct path const *p,
-                             CHECKED struct fdirent const *d,
+                             NCX struct path const *p,
+                             NCX struct fdirent const *d,
                              unsigned int *__restrict pstatus) {
 	ssize_t temp, result = 0;
 	if (p) {
@@ -628,7 +628,7 @@ err:
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_mman)(pformatprinter printer, void *arg,
-                         CHECKED void const *pointer,
+                         NCX void const *pointer,
                          unsigned int *__restrict pstatus) {
 	ssize_t result;
 	struct mman *me = (struct mman *)pointer;
@@ -712,7 +712,7 @@ NOTHROW(FCALL mfile_known_name)(struct mfile *__restrict self,
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_mnode)(pformatprinter printer, void *arg,
-                          CHECKED void const *pointer,
+                          NCX void const *pointer,
                           unsigned int *__restrict pstatus) {
 	ssize_t result, temp;
 	struct mnode *me = (struct mnode *)pointer;
@@ -822,7 +822,7 @@ badobj:
 }
 
 PRIVATE NONNULL((1, 2, 3, 4)) bool FCALL
-mpart_tree_extract_name(CHECKED struct mpart *self,
+mpart_tree_extract_name(NCX struct mpart *self,
                         struct path **p_file_path,
                         struct fdirent **p_file_dent,
                         unsigned int *__restrict pstatus,
@@ -913,7 +913,7 @@ badobj:
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_mfile)(pformatprinter printer, void *arg,
-                          CHECKED void const *pointer,
+                          NCX void const *pointer,
                           unsigned int *__restrict pstatus) {
 	ssize_t result, temp;
 	struct mfile *me = (struct mfile *)pointer;
@@ -1051,7 +1051,7 @@ badobj:
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_fsuper)(pformatprinter printer, void *arg,
-                           CHECKED void const *pointer,
+                           NCX void const *pointer,
                            unsigned int *__restrict pstatus) {
 	struct fsuper *me = (struct fsuper *)pointer;
 	return note_mfile(printer, arg, &me->fs_root, pstatus);
@@ -1059,7 +1059,7 @@ NOTHROW(KCALL note_fsuper)(pformatprinter printer, void *arg,
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_flatsuper)(pformatprinter printer, void *arg,
-                              CHECKED void const *pointer,
+                              NCX void const *pointer,
                               unsigned int *__restrict pstatus) {
 	struct flatsuper *me = (struct flatsuper *)pointer;
 	return note_mfile(printer, arg, &me->ffs_super, pstatus);
@@ -1068,7 +1068,7 @@ NOTHROW(KCALL note_flatsuper)(pformatprinter printer, void *arg,
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_mpart)(pformatprinter printer, void *arg,
-                          CHECKED void const *pointer,
+                          NCX void const *pointer,
                           unsigned int *__restrict pstatus) {
 	ssize_t result, temp;
 	struct mpart *me = (struct mpart *)pointer;
@@ -1151,7 +1151,7 @@ badobj:
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_filehandle_impl)(pformatprinter printer, void *arg,
-                                    CHECKED void const *pointer,
+                                    NCX void const *pointer,
                                     unsigned int *__restrict pstatus,
                                     bool is_dirhandle) {
 	ssize_t result;
@@ -1193,14 +1193,14 @@ badobj:
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_filehandle)(pformatprinter printer, void *arg,
-                               CHECKED void const *pointer,
+                               NCX void const *pointer,
                                unsigned int *__restrict pstatus) {
 	return note_filehandle_impl(printer, arg, pointer, pstatus, false);
 }
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_dirhandle)(pformatprinter printer, void *arg,
-                              CHECKED void const *pointer,
+                              NCX void const *pointer,
                               unsigned int *__restrict pstatus) {
 	return note_filehandle_impl(printer, arg, pointer, pstatus, true);
 }
@@ -1208,7 +1208,7 @@ NOTHROW(KCALL note_dirhandle)(pformatprinter printer, void *arg,
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_mfutex)(pformatprinter printer, void *arg,
-                           CHECKED void const *pointer,
+                           NCX void const *pointer,
                            unsigned int *__restrict pstatus) {
 	ssize_t result, temp;
 	struct mfutex *me = (struct mfutex *)pointer;
@@ -1310,7 +1310,7 @@ badobj:
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_mfutexfd)(pformatprinter printer, void *arg,
-                             CHECKED void const *pointer,
+                             NCX void const *pointer,
                              unsigned int *__restrict pstatus) {
 	ssize_t result, temp;
 	struct mfutexfd *me = (struct mfutexfd *)pointer;
@@ -1349,12 +1349,12 @@ err:
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_handle)(pformatprinter printer, void *arg,
-                           CHECKED void const *pointer,
+                           NCX void const *pointer,
                            unsigned int *__restrict pstatus);
 
 PRIVATE NONNULL((1, 4, 5)) ssize_t
 NOTHROW(KCALL print_path_with_prefix)(pformatprinter printer, void *arg,
-                                      CHECKED void const *pointer,
+                                      NCX void const *pointer,
                                       unsigned int *__restrict pstatus,
                                       char const *__restrict prefix) {
 	ssize_t result, temp;
@@ -1456,7 +1456,7 @@ badobj:
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_fd_t)(pformatprinter printer, void *arg,
-                         CHECKED void const *pointer,
+                         NCX void const *pointer,
                          unsigned int *__restrict pstatus) {
 	fd_t fdval;
 	TRY {
@@ -1472,7 +1472,7 @@ badobj:
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_pollfd)(pformatprinter printer, void *arg,
-                           CHECKED void const *pointer,
+                           NCX void const *pointer,
                            unsigned int *__restrict pstatus) {
 	struct pollfd *me;
 	fd_t fd;
@@ -1557,7 +1557,7 @@ NOTHROW(KCALL note_time_t_value)(pformatprinter printer, void *arg, time_t value
 #undef NEED__note_timeu32_t
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL _note_timeu32_t)(pformatprinter printer, void *arg,
-                               CHECKED void const *pointer,
+                               NCX void const *pointer,
                                unsigned int *__restrict pstatus) {
 	time_t tmval;
 	TRY {
@@ -1577,7 +1577,7 @@ badobj:
 #undef NEED__note_timeu64_t
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL _note_timeu64_t)(pformatprinter printer, void *arg,
-                               CHECKED void const *pointer,
+                               NCX void const *pointer,
                                unsigned int *__restrict pstatus) {
 	time_t tmval;
 	TRY {
@@ -1637,7 +1637,7 @@ badobj:
 #define DEFINE_TIMESTRUCT_NOTE(name, T, note_time_value, a, b)     \
 	PRIVATE NONNULL((1, 4)) ssize_t                                \
 	NOTHROW(KCALL name)(pformatprinter printer, void *arg,         \
-	                    CHECKED void const *pointer,               \
+	                    NCX void const *pointer,               \
 	                    unsigned int *__restrict pstatus) {        \
 		T tv;                                                      \
 		TRY {                                                      \
@@ -1732,7 +1732,7 @@ NOTHROW(KCALL note_ktime_t_value)(pformatprinter printer, void *arg,
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_ktime_t)(pformatprinter printer, void *arg,
-                            CHECKED void const *pointer,
+                            NCX void const *pointer,
                             unsigned int *__restrict pstatus) {
 	ktime_t tmval;
 	TRY {
@@ -1851,7 +1851,7 @@ NOTHROW(KCALL obnote_entry_byname)(char const *__restrict name) {
 
 PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_handle)(pformatprinter printer, void *arg,
-                           CHECKED void const *pointer,
+                           NCX void const *pointer,
                            unsigned int *__restrict pstatus) {
 	static char const accmode[4][2] = {
 		[IO_RDONLY]   = { 'r', 'o' },
@@ -1914,7 +1914,7 @@ err:
  * @return: * :     The usual pformatprinter return value. */
 PUBLIC NONNULL((1, 4, 5)) ssize_t
 NOTHROW(KCALL obnote_print)(pformatprinter printer, void *arg,
-                            CHECKED void const *pointer,
+                            NCX void const *pointer,
                             char const *__restrict name,
                             unsigned int *__restrict pstatus) {
 	struct obnote_entry const *ent;

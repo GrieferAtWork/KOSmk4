@@ -1231,24 +1231,24 @@ PRIVATE uintptr_t const mach_breg_offset[8] = {
 /* Memory accessors */
 #define DEFINE_MEMORY_FUNCTIONS(bwlq, T)                                                \
 	PRIVATE WUNUSED NONNULL((1)) T KCALL                                                \
-	rtm_read##bwlq(struct rtm_machstate *__restrict self, USER void const *addr) {      \
+	rtm_read##bwlq(struct rtm_machstate *__restrict self, NCX void const *addr) {      \
 		T result;                                                                       \
 		rtm_memory_read(&self->r_mem, addr, &result, sizeof(T));                        \
 		return result;                                                                  \
 	}                                                                                   \
 	PRIVATE NONNULL((1)) void KCALL                                                     \
-	rtm_write##bwlq(struct rtm_machstate *__restrict self, USER void *addr, T value) {  \
+	rtm_write##bwlq(struct rtm_machstate *__restrict self, NCX void *addr, T value) {  \
 		rtm_memory_write(&self->r_mem, addr, &value, sizeof(T));                        \
 	}                                                                                   \
 	PRIVATE WUNUSED NONNULL((1)) T KCALL                                                \
-	rtm_xch##bwlq(struct rtm_machstate *__restrict self, USER void *addr, T value) {    \
+	rtm_xch##bwlq(struct rtm_machstate *__restrict self, NCX void *addr, T value) {    \
 		T result;                                                                       \
 		rtm_memory_read(&self->r_mem, addr, &result, sizeof(T));                        \
 		rtm_memory_write(&self->r_mem, addr, &value, sizeof(T));                        \
 		return result;                                                                  \
 	}                                                                                   \
 	PRIVATE NONNULL((1)) T KCALL                                                        \
-	rtm_fetchadd##bwlq(struct rtm_machstate *__restrict self, USER void *addr, T rhs) { \
+	rtm_fetchadd##bwlq(struct rtm_machstate *__restrict self, NCX void *addr, T rhs) { \
 		T result, newval;                                                               \
 		rtm_memory_read(&self->r_mem, addr, &result, sizeof(T));                        \
 		newval = result + rhs;                                                          \
@@ -1256,7 +1256,7 @@ PRIVATE uintptr_t const mach_breg_offset[8] = {
 		return result;                                                                  \
 	}                                                                                   \
 	PRIVATE NONNULL((1)) T KCALL                                                        \
-	rtm_fetchsub##bwlq(struct rtm_machstate *__restrict self, USER void *addr, T rhs) { \
+	rtm_fetchsub##bwlq(struct rtm_machstate *__restrict self, NCX void *addr, T rhs) { \
 		T result, newval;                                                               \
 		rtm_memory_read(&self->r_mem, addr, &result, sizeof(T));                        \
 		newval = result - rhs;                                                          \
@@ -1264,7 +1264,7 @@ PRIVATE uintptr_t const mach_breg_offset[8] = {
 		return result;                                                                  \
 	}                                                                                   \
 	PRIVATE NONNULL((1)) T KCALL                                                        \
-	rtm_fetchand##bwlq(struct rtm_machstate *__restrict self, USER void *addr, T rhs) { \
+	rtm_fetchand##bwlq(struct rtm_machstate *__restrict self, NCX void *addr, T rhs) { \
 		T result, newval;                                                               \
 		rtm_memory_read(&self->r_mem, addr, &result, sizeof(T));                        \
 		newval = result & rhs;                                                          \
@@ -1272,7 +1272,7 @@ PRIVATE uintptr_t const mach_breg_offset[8] = {
 		return result;                                                                  \
 	}                                                                                   \
 	PRIVATE NONNULL((1)) T KCALL                                                        \
-	rtm_fetchor##bwlq(struct rtm_machstate *__restrict self, USER void *addr, T rhs) {  \
+	rtm_fetchor##bwlq(struct rtm_machstate *__restrict self, NCX void *addr, T rhs) {  \
 		T result, newval;                                                               \
 		rtm_memory_read(&self->r_mem, addr, &result, sizeof(T));                        \
 		newval = result | rhs;                                                          \
@@ -1280,7 +1280,7 @@ PRIVATE uintptr_t const mach_breg_offset[8] = {
 		return result;                                                                  \
 	}                                                                                   \
 	PRIVATE NONNULL((1)) T KCALL                                                        \
-	rtm_fetchxor##bwlq(struct rtm_machstate *__restrict self, USER void *addr, T rhs) { \
+	rtm_fetchxor##bwlq(struct rtm_machstate *__restrict self, NCX void *addr, T rhs) { \
 		T result, newval;                                                               \
 		rtm_memory_read(&self->r_mem, addr, &result, sizeof(T));                        \
 		newval = result ^ rhs;                                                          \
@@ -1298,7 +1298,7 @@ DEFINE_MEMORY_FUNCTIONS(q, u64)
 #define DEFINE_CMPXCH_FUNCTIONS(bwlq, T)                              \
 	PRIVATE NONNULL((1)) T KCALL                                      \
 	rtm_cmpxch##bwlq(struct rtm_machstate *__restrict self,           \
-	                 USER void *addr, T oldval, T newval) {           \
+	                 NCX void *addr, T oldval, T newval) {           \
 		T result;                                                     \
 		rtm_memory_read(&self->r_mem, addr, &result, sizeof(T));      \
 		if (CMPXCH_OPERANDS_EQ(result, oldval))                       \

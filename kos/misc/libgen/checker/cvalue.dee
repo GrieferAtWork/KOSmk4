@@ -214,9 +214,9 @@ final class CValue {
 
 		/* Special case for C++ L-Value types. */
 		if (newTyp is CLValueType) {
-			return inplaceRef(this)
-				.inplaceCast(this, CTypeRef(checker.TARGET_CPointerType(newTyp.base)), explicit)
-				.inplaceInd(this);
+			return inplaceRef(checker)
+				.inplaceCast(checker, CTypeRef(checker.TARGET_CPointerType(newTyp.base)), explicit)
+				.inplaceInd(checker);
 		}
 
 		/* Cast between function types isn't allowed (you can only cast function pointers) */

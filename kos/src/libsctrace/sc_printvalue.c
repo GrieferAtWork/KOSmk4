@@ -1547,7 +1547,7 @@ NOTHROW_CB(CC print_clockid_t)(pformatprinter printer, void *arg, clockid_t cloc
 #ifdef NEED_print_string
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_string)(pformatprinter printer, void *arg,
-                                USER UNCHECKED char const *str,
+                                NCX UNCHECKED char const *str,
                                 struct sc_argument *length_link) {
 	ssize_t result;
 	if (!str) {
@@ -1576,12 +1576,12 @@ NOTHROW_CB_NCX(CC print_string)(pformatprinter printer, void *arg,
 #ifdef NEED_print_bytes
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_bytes)(pformatprinter printer, void *arg,
-                               USER CHECKED void const *buf, size_t len) {
+                               NCX void const *buf, size_t len) {
 	ssize_t temp, result = 0;
 	size_t i;
 	for (i = 0; i < len; ++i) {
 		byte_t b;
-		b = ((USER CHECKED byte_t const *)buf)[i];
+		b = ((NCX byte_t const *)buf)[i];
 		if (i != 0)
 			PRINT("," SYNSPACE);
 		PRINTF("%#.2" PRIx8, b);
@@ -1621,7 +1621,7 @@ NOTHROW(CC is_printable_character)(char ch) {
 }
 
 PRIVATE ATTR_PURE WUNUSED bool
-NOTHROW_NCX(CC is_printable_string)(USER CHECKED char const *str,
+NOTHROW_NCX(CC is_printable_string)(NCX char const *str,
                                     size_t length) {
 	size_t i;
 	size_t num_printable = 0;
@@ -1635,7 +1635,7 @@ NOTHROW_NCX(CC is_printable_string)(USER CHECKED char const *str,
 
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_string_or_buffer)(pformatprinter printer, void *arg,
-                                          USER UNCHECKED void const *buf,
+                                          NCX UNCHECKED void const *buf,
                                           size_t length) {
 	ssize_t result, temp;
 	if (!buf) {
@@ -1858,7 +1858,7 @@ NOTHROW_CB(CC print_segfault)(pformatprinter printer, void *arg) {
 #ifdef NEED_print_pollfds
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_pollfds)(pformatprinter printer, void *arg,
-                                 USER CHECKED struct pollfd const *fds, size_t count) {
+                                 NCX struct pollfd const *fds, size_t count) {
 	ssize_t temp, result = 0;
 	size_t i, used_count = count;
 	if (used_count > LIMIT_POLLFDS)
@@ -2684,7 +2684,7 @@ done:
 
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_termio_common)(pformatprinter printer, void *arg,
-                                       USER CHECKED struct termios const *ios,
+                                       NCX struct termios const *ios,
                                        size_t nccs, bool have_speed) {
 	bool is_first;
 	size_t i;
@@ -2747,7 +2747,7 @@ err:
 #ifdef NEED_print_termio
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_termio)(pformatprinter printer, void *arg,
-                                USER UNCHECKED struct termio const *ios) {
+                                NCX UNCHECKED struct termio const *ios) {
 	struct termios common_ios;
 	static_assert(sizeof(common_ios.c_cc[0]) == sizeof(ios->c_cc[0]));
 	static_assert(COMPILER_LENOF(common_ios.c_cc) >= COMPILER_LENOF(ios->c_cc));
@@ -2766,7 +2766,7 @@ NOTHROW_CB_NCX(CC print_termio)(pformatprinter printer, void *arg,
 #ifdef NEED_print_termios
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_termios)(pformatprinter printer, void *arg,
-                                 USER UNCHECKED struct termios const *ios) {
+                                 NCX UNCHECKED struct termios const *ios) {
 	validate_readable(ios, sizeof(*ios));
 	return print_termio_common(printer, arg, ios, COMPILER_LENOF(ios->c_cc), true);
 }
@@ -2776,7 +2776,7 @@ NOTHROW_CB_NCX(CC print_termios)(pformatprinter printer, void *arg,
 #ifdef NEED_print_termios2
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_termios2)(pformatprinter printer, void *arg,
-                                  USER UNCHECKED struct termios2 const *ios) {
+                                  NCX UNCHECKED struct termios2 const *ios) {
 	struct termios common_ios;
 	static_assert(sizeof(common_ios.c_cc[0]) == sizeof(ios->c_cc[0]));
 	static_assert(COMPILER_LENOF(common_ios.c_cc) >= COMPILER_LENOF(ios->c_cc));
@@ -2797,7 +2797,7 @@ NOTHROW_CB_NCX(CC print_termios2)(pformatprinter printer, void *arg,
 #ifdef NEED_print_termiox
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_termiox)(pformatprinter printer, void *arg,
-                                 USER UNCHECKED struct termiox const *ios) {
+                                 NCX UNCHECKED struct termiox const *ios) {
 	size_t i;
 	ssize_t result, temp;
 	static_assert(sizeof(ios->x_hflag) == 2);
@@ -2830,7 +2830,7 @@ err:
 #ifdef NEED_print_winsize
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_winsize)(pformatprinter printer, void *arg,
-                                 USER UNCHECKED struct winsize const *ws) {
+                                 NCX UNCHECKED struct winsize const *ws) {
 	ssize_t result;
 	static_assert(sizeof(ws->ws_row) == 2);
 	static_assert(sizeof(ws->ws_col) == 2);
@@ -2991,7 +2991,7 @@ NOTHROW_CB(CC print_tcflush_arg)(pformatprinter printer, void *arg,
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_ioctl_arg_fallback)(pformatprinter printer, void *arg,
                                             syscall_ulong_t command,
-                                            USER UNCHECKED void *io_arg) {
+                                            NCX UNCHECKED void *io_arg) {
 	ssize_t result, temp;
 	if (!io_arg) {
 		result = (*printer)(arg, NULLSTR, COMPILER_STRLEN(NULLSTR));
@@ -3020,7 +3020,7 @@ err:
 
 PRIVATE WUNUSED intmax_t
 NOTHROW_NCX(CC print_ioctl_getarg_intptr)(syscall_ulong_t command,
-                                          USER UNCHECKED void *io_arg,
+                                          NCX UNCHECKED void *io_arg,
                                           size_t default_size) {
 	intmax_t value;
 	size_t intsize = _IOC_SIZE(command);
@@ -3046,7 +3046,7 @@ NOTHROW_NCX(CC print_ioctl_getarg_intptr)(syscall_ulong_t command,
 
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_ioctl_arg_intptr)(pformatprinter printer, void *arg,
-                                          syscall_ulong_t command, USER UNCHECKED void *io_arg,
+                                          syscall_ulong_t command, NCX UNCHECKED void *io_arg,
                                           size_t default_size) {
 	intmax_t value = print_ioctl_getarg_intptr(command, io_arg, default_size);
 	return format_printf(printer, arg, "{" SYNSPACE "%" PRIdMAX SYNSPACE "}", value);
@@ -3076,7 +3076,7 @@ NOTHROW(CC libsc_ioctl_voidarg)(syscall_ulong_t command) {
 
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_ioctl_arg)(pformatprinter printer, void *arg,
-                                   syscall_ulong_t command, USER UNCHECKED void *io_arg) {
+                                   syscall_ulong_t command, NCX UNCHECKED void *io_arg) {
 	ssize_t result;
 	switch (command & IOCTL_CMDMASK) {
 
@@ -3112,29 +3112,29 @@ NOTHROW_CB_NCX(CC print_ioctl_arg)(pformatprinter printer, void *arg,
 	case (TCSETS & IOCTL_CMDMASK):
 	case (TCSETSW & IOCTL_CMDMASK):
 	case (TCSETSF & IOCTL_CMDMASK):
-		result = print_termio(printer, arg, (USER UNCHECKED struct termio const *)io_arg);
+		result = print_termio(printer, arg, (NCX UNCHECKED struct termio const *)io_arg);
 		break;
 
 	case (TCSETA & IOCTL_CMDMASK):
 	case (TCSETAW & IOCTL_CMDMASK):
 	case (TCSETAF & IOCTL_CMDMASK):
-		result = print_termios(printer, arg, (USER UNCHECKED struct termios const *)io_arg);
+		result = print_termios(printer, arg, (NCX UNCHECKED struct termios const *)io_arg);
 		break;
 
 	case (TCSETS2 & IOCTL_CMDMASK):
 	case (TCSETSW2 & IOCTL_CMDMASK):
 	case (TCSETSF2 & IOCTL_CMDMASK):
-		result = print_termios2(printer, arg, (USER UNCHECKED struct termios2 const *)io_arg);
+		result = print_termios2(printer, arg, (NCX UNCHECKED struct termios2 const *)io_arg);
 		break;
 
 	case (TCSETX & IOCTL_CMDMASK):
 	case (TCSETXF & IOCTL_CMDMASK):
 	case (TCSETXW & IOCTL_CMDMASK):
-		result = print_termiox(printer, arg, (USER UNCHECKED struct termiox const *)io_arg);
+		result = print_termiox(printer, arg, (NCX UNCHECKED struct termiox const *)io_arg);
 		break;
 
 	case (TIOCSWINSZ & IOCTL_CMDMASK):
-		result = print_winsize(printer, arg, (USER UNCHECKED struct winsize const *)io_arg);
+		result = print_winsize(printer, arg, (NCX UNCHECKED struct winsize const *)io_arg);
 		break;
 
 	case (TCSBRK & IOCTL_CMDMASK):
@@ -3184,7 +3184,7 @@ NOTHROW_CB_NCX(CC print_ioctl_arg)(pformatprinter printer, void *arg,
 #ifdef NEED_print_string_vector
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_string_vector)(pformatprinter printer, void *arg,
-                                       USER UNCHECKED char const *USER UNCHECKED const *vector
+                                       NCX UNCHECKED char const *NCX UNCHECKED const *vector
 #ifdef HAVE_STRING_VECTOR_POINTER_SIZE
                                        ,
                                        size_t sizeof_pointer
@@ -3203,13 +3203,13 @@ NOTHROW_CB_NCX(CC print_string_vector)(pformatprinter printer, void *arg,
 		if unlikely(result < 0)
 			goto done;
 		for (i = 0;; ++i) {
-			USER UNCHECKED char const *string;
+			NCX UNCHECKED char const *string;
 			TRY {
 #ifdef HAVE_STRING_VECTOR_POINTER_SIZE
 				if (sizeof_pointer == 4) {
-					string = (USER UNCHECKED char const *)(uintptr_t)((uint32_t *)vector)[i];
+					string = (NCX UNCHECKED char const *)(uintptr_t)((uint32_t *)vector)[i];
 				} else {
-					string = (USER UNCHECKED char const *)(uintptr_t)((uint64_t *)vector)[i];
+					string = (NCX UNCHECKED char const *)(uintptr_t)((uint64_t *)vector)[i];
 				}
 #else /* HAVE_STRING_VECTOR_POINTER_SIZE */
 				string = vector[i];
@@ -3501,16 +3501,16 @@ err:
 #ifdef NEED_print_sockaddr
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_sockaddr)(pformatprinter printer, void *arg,
-                                  USER CHECKED struct sockaddr const *sa,
+                                  NCX struct sockaddr const *sa,
                                   socklen_t len) {
 	ssize_t temp, result = 0;
 	sa_family_t family = AF_UNSPEC;
-	USER CHECKED byte_t const *payload_data;
+	NCX byte_t const *payload_data;
 	size_t payload_len = 0;
 #ifdef HAVE_SYNFIELD
 	char const *family_prefix;
 #endif /* HAVE_SYNFIELD */
-	payload_data = (USER CHECKED byte_t const *)sa + offsetafter(struct sockaddr, sa_family);
+	payload_data = (NCX byte_t const *)sa + offsetafter(struct sockaddr, sa_family);
 	if likely(len >= offsetafter(struct sockaddr, sa_family)) {
 		payload_len = len - offsetafter(struct sockaddr, sa_family);
 		family      = sa->sa_family;
@@ -3538,10 +3538,10 @@ NOTHROW_CB_NCX(CC print_sockaddr)(pformatprinter printer, void *arg,
 	case AF_INET: {
 		/* struct sockaddr_in */
 		char buf[INET_NTOA_R_MAXLEN];
-		USER CHECKED struct sockaddr_in const *sin;
+		NCX struct sockaddr_in const *sin;
 		if unlikely(len < offsetafter(struct sockaddr_in, sin_addr))
 			goto fallback;
-		sin = (USER CHECKED struct sockaddr_in const *)sa;
+		sin = (NCX struct sockaddr_in const *)sa;
 		PRINTF("," SYNSPACE SYNFIELD("sin_port") "%" PRIu16
 		       "," SYNSPACE SYNFIELD("sin_addr") "%q",
 		       sin->sin_port, inet_ntoa_r(sin->sin_addr, buf));
@@ -3787,7 +3787,7 @@ NOTHROW_CB(CC print_f_lock)(pformatprinter printer, void *arg,
 #ifdef NEED_print_flock64
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_flock64)(pformatprinter printer, void *arg,
-                                 USER CHECKED struct flock64 const *obj) {
+                                 NCX struct flock64 const *obj) {
 	ssize_t result, temp;
 	result = DOPRINT("{" SYNSPACE SYNFIELD("l_type"));
 	if unlikely(result < 0)
@@ -3815,7 +3815,7 @@ err:
 #ifdef NEED_print_f_owner_ex
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_f_owner_ex)(pformatprinter printer, void *arg,
-                                    USER CHECKED struct f_owner_ex const *obj) {
+                                    NCX struct f_owner_ex const *obj) {
 	ssize_t result, temp;
 	result = DOPRINT("{" SYNSPACE SYNFIELD("type"));
 	if unlikely(result < 0)
@@ -3840,7 +3840,7 @@ err:
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_fcntl_arg)(pformatprinter printer, void *arg,
                                    syscall_ulong_t cmd,
-                                   USER UNCHECKED void *fcntl_arg) {
+                                   NCX UNCHECKED void *fcntl_arg) {
 	ssize_t result;
 	switch (cmd) {
 
@@ -3897,9 +3897,9 @@ NOTHROW_CB_NCX(CC print_fcntl_arg)(pformatprinter printer, void *arg,
 	case F_OFD_SETLK:
 	case F_OFD_SETLKW: {
 		struct flock64 lck64;
-		USER CHECKED struct flock const *ulck;
+		NCX struct flock const *ulck;
 		validate_readable(fcntl_arg, sizeof(struct flock));
-		ulck = (USER CHECKED struct flock const *)fcntl_arg;
+		ulck = (NCX struct flock const *)fcntl_arg;
 		lck64.l_type   = ulck->l_type;
 		lck64.l_whence = ulck->l_whence;
 		lck64.l_start  = ulck->l_start;
@@ -3912,13 +3912,13 @@ NOTHROW_CB_NCX(CC print_fcntl_arg)(pformatprinter printer, void *arg,
 	case F_SETLK64:
 	case F_SETLKW64:
 		validate_readable(fcntl_arg, sizeof(struct flock64));
-		result = print_flock64(printer, arg, (USER CHECKED struct flock64 const *)fcntl_arg);
+		result = print_flock64(printer, arg, (NCX struct flock64 const *)fcntl_arg);
 		break;
 #endif /* F_GETLK != F_GETLK64 */
 
 	case F_SETOWN_EX:
 		validate_readable(fcntl_arg, sizeof(struct f_owner_ex));
-		result = print_f_owner_ex(printer, arg, (USER CHECKED struct f_owner_ex const *)fcntl_arg);
+		result = print_f_owner_ex(printer, arg, (NCX struct f_owner_ex const *)fcntl_arg);
 		break;
 
 	case F_SETOWN:
@@ -3967,7 +3967,7 @@ NOTHROW_CB_NCX(CC print_fcntl_arg)(pformatprinter printer, void *arg,
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_iovec_entry)(pformatprinter printer, void *arg,
                                      bool print_content,
-                                     USER UNCHECKED void *iov_base,
+                                     NCX UNCHECKED void *iov_base,
                                      size_t iov_len) {
 	ssize_t result, temp;
 	result = DOPRINT("{" SYNSPACE SYNFIELD("iov_base"));
@@ -3976,7 +3976,7 @@ NOTHROW_CB_NCX(CC print_iovec_entry)(pformatprinter printer, void *arg,
 	if (print_content) {
 		validate_readable(iov_base, iov_len);
 		DO(print_string_or_buffer(printer, arg,
-		                          (USER CHECKED char const *)iov_base,
+		                          (NCX char const *)iov_base,
 		                          iov_len));
 	} else {
 		PRINTF("%#" PRIxPTR, iov_base);
@@ -4002,16 +4002,16 @@ NOTHROW_CB_NCX(CC print_iovec_n)(pformatprinter printer, void *arg, bool print_c
 	print_iovec_n(printer, arg, print_content, iov, count, sizeof(struct iovecx32))
 #define print_iovecx64(printer, arg, print_content, iov, count) \
 	print_iovec_n(printer, arg, print_content, iov, count, sizeof(struct iovecx64))
-                                 USER CHECKED void const *iov,
+                                 NCX void const *iov,
                                  size_t count,
                                  size_t iov_ent_size
 #elif defined(NEED_print_iovecx32)
 #define print_iovecx32 print_iovec_n
-                                 USER CHECKED struct iovecx32 const *iov,
+                                 NCX struct iovecx32 const *iov,
                                  size_t count
 #else /* ... */
 #define print_iovecx64 print_iovec_n
-                                 USER CHECKED struct iovecx64 const *iov,
+                                 NCX struct iovecx64 const *iov,
                                  size_t count
 #endif /* !... */
                                  ) {
@@ -4065,7 +4065,7 @@ err:
 #ifdef NEED_print_fdset
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_fdset)(pformatprinter printer, void *arg,
-                               USER CHECKED fd_set const *set,
+                               NCX fd_set const *set,
                                size_t nfds) {
 	size_t would_print_count = 0;
 	ssize_t temp, result;
@@ -4293,7 +4293,7 @@ NOTHROW_CB(CC print_sockopt_optname)(pformatprinter printer, void *arg,
 #ifdef NEED_print_sigset
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_sigset)(pformatprinter printer, void *arg,
-                                USER UNCHECKED sigset_t const *sigset,
+                                NCX UNCHECKED sigset_t const *sigset,
                                 size_t sigsetsize) {
 	__CRT_PRIVATE_UINT(__SIZEOF_SIGNO_T__) signo_limit;
 	signo_t signo_max = NSIG - 1;
@@ -4421,43 +4421,43 @@ err:
 #ifdef NEED_print_sigmask_sigset_and_len_sizearg
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_sigmask_sigset_and_len)(pformatprinter printer, void *arg,
-                                                USER CHECKED void *ptr,
+                                                NCX void *ptr,
                                                 size_t sizeof_pointer)
 #else /* NEED_print_sigmask_sigset_and_len_sizearg */
 #define print_sigmask_sigset_and_len(printer, arg, ptr, sizeof_pointer) \
 	print_sigmask_sigset_and_len_impl(printer, arg, ptr)
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_sigmask_sigset_and_len_impl)(pformatprinter printer, void *arg,
-                                                     USER CHECKED void *ptr)
+                                                     NCX void *ptr)
 #endif /* !NEED_print_sigmask_sigset_and_len_sizearg */
 {
 	ssize_t temp, result;
-	USER UNCHECKED sigset_t const *ss_ptr;
+	NCX UNCHECKED sigset_t const *ss_ptr;
 	size_t ss_len;
 	/* Extract the sigset pointer and length from the user-provided argument extension. */
 #ifdef NEED_print_sigmask_sigset_and_len_sizearg
 #ifdef NEED_print_sigmask_sigset_and_len_x32
 	if (sizeof_pointer == 4) {
-		ss_ptr = (USER UNCHECKED sigset_t const *)(uintptr_t)(*(uint32_t USER CHECKED const *)((byte_t *)ptr + 0));
-		ss_len = (size_t)(*(uint32_t USER CHECKED const *)((byte_t *)ptr + 4));
+		ss_ptr = (NCX UNCHECKED sigset_t const *)(uintptr_t)(*(uint32_t NCX const *)((byte_t *)ptr + 0));
+		ss_len = (size_t)(*(uint32_t NCX const *)((byte_t *)ptr + 4));
 	} else
 #endif /* NEED_print_sigmask_sigset_and_len_x32 */
 #ifdef NEED_print_sigmask_sigset_and_len_x64
 	IF_NEED_print_sigmask_sigset_and_len_misc(if (sizeof_pointer == 8)) {
-		ss_ptr = (USER UNCHECKED sigset_t const *)(uintptr_t)(*(uint64_t USER CHECKED const *)((byte_t *)ptr + 0));
-		ss_len = (size_t)(*(uint64_t USER CHECKED const *)((byte_t *)ptr + 8));
+		ss_ptr = (NCX UNCHECKED sigset_t const *)(uintptr_t)(*(uint64_t NCX const *)((byte_t *)ptr + 0));
+		ss_len = (size_t)(*(uint64_t NCX const *)((byte_t *)ptr + 8));
 	}
 	IF_NEED_print_sigmask_sigset_and_len_misc(else)
 #endif /* NEED_print_sigmask_sigset_and_len_x64 */
 #ifdef NEED_print_sigmask_sigset_and_len_misc
 	{
-		ss_ptr = *(USER UNCHECKED sigset_t const *USER CHECKED const *)((byte_t *)ptr + 0);
-		ss_len = *(size_t USER CHECKED const *)((byte_t *)ptr + sizeof(void *));
+		ss_ptr = *(NCX UNCHECKED sigset_t const *NCX const *)((byte_t *)ptr + 0);
+		ss_len = *(size_t NCX const *)((byte_t *)ptr + sizeof(void *));
 	}
 #endif /* NEED_print_sigmask_sigset_and_len_misc */
 #else /* NEED_print_sigmask_sigset_and_len_sizearg */
-	ss_ptr = *(USER UNCHECKED sigset_t const *USER CHECKED const *)((byte_t *)ptr + 0);
-	ss_len = *(size_t USER CHECKED const *)((byte_t *)ptr + sizeof(void *));
+	ss_ptr = *(NCX UNCHECKED sigset_t const *NCX const *)((byte_t *)ptr + 0);
+	ss_len = *(size_t NCX const *)((byte_t *)ptr + sizeof(void *));
 #endif /* !NEED_print_sigmask_sigset_and_len_sizearg */
 	result = DOPRINT("{" SYNSPACE SYNFIELD("ss_ptr"));
 	if unlikely(result < 0)
@@ -4783,10 +4783,10 @@ NOTHROW_CB(CC print_sigaction_flags)(pformatprinter printer, void *arg,
 #ifdef NEED_print_sigaction
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_sigaction)(pformatprinter printer, void *arg,
-                                   USER UNCHECKED sighandler_t sa_handler,
-                                   USER CHECKED sigset_t *sa_mask, size_t sigsetsize,
+                                   NCX UNCHECKED sighandler_t sa_handler,
+                                   NCX sigset_t *sa_mask, size_t sigsetsize,
                                    syscall_ulong_t sa_flags,
-                                   USER UNCHECKED void *sa_restorer) {
+                                   NCX UNCHECKED void *sa_restorer) {
 	ssize_t temp, result;
 	result = DOPRINT("{" SYNSPACE SYNFIELD("sa_handler"));
 	if unlikely(result < 0)
@@ -4836,7 +4836,7 @@ NOTHROW_CB(CC print_epoll_create1_flags)(pformatprinter printer, void *arg,
 #ifdef NEED_print_epoll_event
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_epoll_event)(pformatprinter printer, void *arg,
-                                     USER CHECKED struct epoll_event const *ee) {
+                                     NCX struct epoll_event const *ee) {
 	ssize_t temp, result;
 	result = DOPRINT("{" SYNSPACE SYNFIELD("events"));
 	if unlikely(result < 0)
@@ -5141,7 +5141,7 @@ err:
 #if defined(NEED_print_clone_args) || defined(__DEEMON__)
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_clone_args)(pformatprinter printer, void *arg,
-                                    USER UNCHECKED struct clone_args const *_user_cargs,
+                                    NCX UNCHECKED struct clone_args const *_user_cargs,
                                     size_t sizeof_args) {
 	ssize_t temp, result;
 	struct clone_args cargs;
@@ -5172,7 +5172,7 @@ NOTHROW_CB_NCX(CC print_clone_args)(pformatprinter printer, void *arg,
 	if (sizeof_args >= offsetafter(struct clone_args, ca_set_tid_size)) {
 		if (cargs.ca_set_tid_size != 0) {
 			size_t i, count;
-			USER UNCHECKED pid_t const *pid_array = (USER UNCHECKED pid_t const *)cargs.ca_set_tid;
+			NCX UNCHECKED pid_t const *pid_array = (NCX UNCHECKED pid_t const *)cargs.ca_set_tid;
 			validate_readablem(pid_array, cargs.ca_set_tid_size, sizeof(size_t));
 			count = cargs.ca_set_tid_size;
 			if (count > LIMIT_STRINGVECTOR)
@@ -5771,7 +5771,7 @@ for (local c: knownCases.sorted()) {
 #ifdef HAVE_SC_REPR_STRUCT_CLONE_ARGS
 	case SC_REPR_STRUCT_CLONE_ARGS:
 		result = print_clone_args(printer, arg,
-		                          (USER UNCHECKED struct clone_args const *)(uintptr_t)value.sv_u64,
+		                          (NCX UNCHECKED struct clone_args const *)(uintptr_t)value.sv_u64,
 		                          link ? (size_t)link->sa_value.sv_u64 : sizeof(struct clone_args));
 		break;
 #endif /* HAVE_SC_REPR_STRUCT_CLONE_ARGS */
@@ -5828,8 +5828,8 @@ for (local c: knownCases.sorted()) {
 
 #ifdef HAVE_SC_REPR_STRUCT_EPOLL_EVENT
 	case SC_REPR_STRUCT_EPOLL_EVENT: {
-		USER UNCHECKED struct epoll_event const *ee;
-		ee = (USER UNCHECKED struct epoll_event const *)(uintptr_t)value.sv_u64;
+		NCX UNCHECKED struct epoll_event const *ee;
+		ee = (NCX UNCHECKED struct epoll_event const *)(uintptr_t)value.sv_u64;
 		if (!ee)
 			goto do_pointer;
 		validate_readable(ee, sizeof(*ee));
@@ -5852,9 +5852,9 @@ for (local c: knownCases.sorted()) {
 	case SC_REPR_STRUCT_KERNEL_SIGACTION:
 #endif /* HAVE_SC_REPR_STRUCT_KERNEL_SIGACTION && __ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION */
 	{
-		USER UNCHECKED struct sigaction *sa;
+		NCX UNCHECKED struct sigaction *sa;
 		size_t sigsetsize = sizeof(sa->sa_mask);
-		sa = (USER UNCHECKED struct sigaction *)(uintptr_t)value.sv_u64;
+		sa = (NCX UNCHECKED struct sigaction *)(uintptr_t)value.sv_u64;
 		if (link)
 			sigsetsize = (size_t)link->sa_value.sv_u64;
 		if (!sa || sigsetsize != sizeof(sa->sa_mask))
@@ -5863,7 +5863,7 @@ for (local c: knownCases.sorted()) {
 		result = print_sigaction(printer,
 		                         arg,
 		                         (sighandler_t)(void *)sa->sa_handler,
-		                         (USER CHECKED sigset_t *)&sa->sa_mask,
+		                         (NCX sigset_t *)&sa->sa_mask,
 		                         sigsetsize,
 		                         sa->sa_flags,
 		                         (void *)sa->sa_restorer);
@@ -5879,9 +5879,9 @@ for (local c: knownCases.sorted()) {
 	case SC_REPR_STRUCT_KERNEL_SIGACTIONX32:
 #endif /* HAVE_SC_REPR_STRUCT_KERNEL_SIGACTIONX32 && __ARCH_HAVE_KERNEL_SIGACTIONX32_IS_LIBC_SIGACTIONX32 */
 	{
-		USER UNCHECKED struct __sigactionx32 *sa;
+		NCX UNCHECKED struct __sigactionx32 *sa;
 		size_t sigsetsize = sizeof(sa->sa_mask);
-		sa = (USER UNCHECKED struct __sigactionx32 *)(uintptr_t)value.sv_u64;
+		sa = (NCX UNCHECKED struct __sigactionx32 *)(uintptr_t)value.sv_u64;
 		if (link)
 			sigsetsize = (size_t)link->sa_value.sv_u64;
 		if (!sa)
@@ -5890,7 +5890,7 @@ for (local c: knownCases.sorted()) {
 		result = print_sigaction(printer,
 		                         arg,
 		                         (sighandler_t)(void *)sa->sa_handler,
-		                         (USER CHECKED sigset_t *)&sa->sa_mask,
+		                         (NCX sigset_t *)&sa->sa_mask,
 		                         sigsetsize,
 		                         sa->sa_flags,
 		                         (void *)sa->sa_restorer);
@@ -5906,9 +5906,9 @@ for (local c: knownCases.sorted()) {
 	case SC_REPR_STRUCT_KERNEL_SIGACTIONX64:
 #endif /* HAVE_SC_REPR_STRUCT_KERNEL_SIGACTIONX64 && __ARCH_HAVE_KERNEL_SIGACTIONX64_IS_LIBC_SIGACTIONX64 */
 	{
-		USER UNCHECKED struct __sigactionx64 *sa;
+		NCX UNCHECKED struct __sigactionx64 *sa;
 		size_t sigsetsize = sizeof(sa->sa_mask);
-		sa = (USER UNCHECKED struct __sigactionx64 *)(uintptr_t)value.sv_u64;
+		sa = (NCX UNCHECKED struct __sigactionx64 *)(uintptr_t)value.sv_u64;
 		if (link)
 			sigsetsize = (size_t)link->sa_value.sv_u64;
 		if (!sa || sigsetsize != sizeof(sa->sa_mask))
@@ -5917,7 +5917,7 @@ for (local c: knownCases.sorted()) {
 		result = print_sigaction(printer,
 		                         arg,
 		                         (sighandler_t)(void *)sa->sa_handler,
-		                         (USER CHECKED sigset_t *)&sa->sa_mask,
+		                         (NCX sigset_t *)&sa->sa_mask,
 		                         sigsetsize,
 		                         sa->sa_flags,
 		                         (void *)sa->sa_restorer);
@@ -5926,9 +5926,9 @@ for (local c: knownCases.sorted()) {
 
 #if defined(HAVE_SC_REPR_STRUCT_KERNEL_SIGACTION) && !defined(__ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION)
 	case SC_REPR_STRUCT_KERNEL_SIGACTION: {
-		USER UNCHECKED struct __kernel_sigaction *sa;
+		NCX UNCHECKED struct __kernel_sigaction *sa;
 		size_t sigsetsize = sizeof(sa->sa_mask);
-		sa = (USER UNCHECKED struct __kernel_sigaction *)(uintptr_t)value.sv_u64;
+		sa = (NCX UNCHECKED struct __kernel_sigaction *)(uintptr_t)value.sv_u64;
 		if (link)
 			sigsetsize = (size_t)link->sa_value.sv_u64;
 		if (!sa || sigsetsize != sizeof(sa->sa_mask))
@@ -5937,7 +5937,7 @@ for (local c: knownCases.sorted()) {
 		result = print_sigaction(printer,
 		                         arg,
 		                         (sighandler_t)(void *)sa->sa_handler,
-		                         (USER CHECKED sigset_t *)&sa->sa_mask,
+		                         (NCX sigset_t *)&sa->sa_mask,
 		                         sigsetsize,
 		                         sa->sa_flags,
 		                         (void *)sa->sa_restorer);
@@ -5946,9 +5946,9 @@ for (local c: knownCases.sorted()) {
 
 #if defined(HAVE_SC_REPR_STRUCT_KERNEL_SIGACTIONX32) && !defined(__ARCH_HAVE_KERNEL_SIGACTIONX32_IS_LIBC_SIGACTIONX32)
 	case SC_REPR_STRUCT_KERNEL_SIGACTIONX32: {
-		USER UNCHECKED struct __kernel_sigactionx32 *sa;
+		NCX UNCHECKED struct __kernel_sigactionx32 *sa;
 		size_t sigsetsize = sizeof(sa->sa_mask);
-		sa = (USER UNCHECKED struct __kernel_sigactionx32 *)(uintptr_t)value.sv_u64;
+		sa = (NCX UNCHECKED struct __kernel_sigactionx32 *)(uintptr_t)value.sv_u64;
 		if (link)
 			sigsetsize = (size_t)link->sa_value.sv_u64;
 		if (!sa)
@@ -5957,7 +5957,7 @@ for (local c: knownCases.sorted()) {
 		result = print_sigaction(printer,
 		                         arg,
 		                         (sighandler_t)(void *)sa->sa_handler,
-		                         (USER CHECKED sigset_t *)&sa->sa_mask,
+		                         (NCX sigset_t *)&sa->sa_mask,
 		                         sigsetsize,
 		                         sa->sa_flags,
 		                         (void *)sa->sa_restorer);
@@ -5966,9 +5966,9 @@ for (local c: knownCases.sorted()) {
 
 #if defined(HAVE_SC_REPR_STRUCT_KERNEL_SIGACTIONX64) && !defined(__ARCH_HAVE_KERNEL_SIGACTIONX64_IS_LIBC_SIGACTIONX64)
 	case SC_REPR_STRUCT_KERNEL_SIGACTIONX64: {
-		USER UNCHECKED struct __kernel_sigactionx64 *sa;
+		NCX UNCHECKED struct __kernel_sigactionx64 *sa;
 		size_t sigsetsize = sizeof(sa->sa_mask);
-		sa = (USER UNCHECKED struct __kernel_sigactionx64 *)(uintptr_t)value.sv_u64;
+		sa = (NCX UNCHECKED struct __kernel_sigactionx64 *)(uintptr_t)value.sv_u64;
 		if (link)
 			sigsetsize = (size_t)link->sa_value.sv_u64;
 		if (!sa || sigsetsize != sizeof(sa->sa_mask))
@@ -5977,7 +5977,7 @@ for (local c: knownCases.sorted()) {
 		result = print_sigaction(printer,
 		                         arg,
 		                         (sighandler_t)(void *)sa->sa_handler,
-		                         (USER CHECKED sigset_t *)&sa->sa_mask,
+		                         (NCX sigset_t *)&sa->sa_mask,
 		                         sigsetsize,
 		                         sa->sa_flags,
 		                         (void *)sa->sa_restorer);
@@ -5986,9 +5986,9 @@ for (local c: knownCases.sorted()) {
 
 #ifdef HAVE_SC_REPR_STRUCT_OLD_KERNEL_SIGACTION
 	case SC_REPR_STRUCT_OLD_KERNEL_SIGACTION: {
-		USER UNCHECKED struct __kernel_sigaction *sa;
+		NCX UNCHECKED struct __kernel_sigaction *sa;
 		size_t sigsetsize = sizeof(sa->sa_mask);
-		sa = (USER UNCHECKED struct __kernel_sigaction *)(uintptr_t)value.sv_u64;
+		sa = (NCX UNCHECKED struct __kernel_sigaction *)(uintptr_t)value.sv_u64;
 		if (link)
 			sigsetsize = (size_t)link->sa_value.sv_u64;
 		if (!sa || sigsetsize != sizeof(sa->sa_mask))
@@ -5997,7 +5997,7 @@ for (local c: knownCases.sorted()) {
 		result = print_sigaction(printer,
 		                         arg,
 		                         (sighandler_t)(void *)sa->sa_handler,
-		                         (USER CHECKED sigset_t *)&sa->sa_mask,
+		                         (NCX sigset_t *)&sa->sa_mask,
 		                         sigsetsize,
 		                         sa->sa_flags,
 		                         (void *)sa->sa_restorer);
@@ -6006,9 +6006,9 @@ for (local c: knownCases.sorted()) {
 
 #ifdef HAVE_SC_REPR_STRUCT_OLD_KERNEL_SIGACTIONX32
 	case SC_REPR_STRUCT_OLD_KERNEL_SIGACTIONX32: {
-		USER UNCHECKED struct __kernel_sigactionx32 *sa;
+		NCX UNCHECKED struct __kernel_sigactionx32 *sa;
 		size_t sigsetsize = sizeof(sa->sa_mask);
-		sa = (USER UNCHECKED struct __kernel_sigactionx32 *)(uintptr_t)value.sv_u64;
+		sa = (NCX UNCHECKED struct __kernel_sigactionx32 *)(uintptr_t)value.sv_u64;
 		if (link)
 			sigsetsize = (size_t)link->sa_value.sv_u64;
 		if (!sa)
@@ -6017,7 +6017,7 @@ for (local c: knownCases.sorted()) {
 		result = print_sigaction(printer,
 		                         arg,
 		                         (sighandler_t)(void *)sa->sa_handler,
-		                         (USER CHECKED sigset_t *)&sa->sa_mask,
+		                         (NCX sigset_t *)&sa->sa_mask,
 		                         sigsetsize,
 		                         sa->sa_flags,
 		                         (void *)sa->sa_restorer);
@@ -6026,9 +6026,9 @@ for (local c: knownCases.sorted()) {
 
 #ifdef HAVE_SC_REPR_STRUCT_OLD_KERNEL_SIGACTIONX64
 	case SC_REPR_STRUCT_OLD_KERNEL_SIGACTIONX64: {
-		USER UNCHECKED struct __kernel_sigactionx64 *sa;
+		NCX UNCHECKED struct __kernel_sigactionx64 *sa;
 		size_t sigsetsize = sizeof(sa->sa_mask);
-		sa = (USER UNCHECKED struct __kernel_sigactionx64 *)(uintptr_t)value.sv_u64;
+		sa = (NCX UNCHECKED struct __kernel_sigactionx64 *)(uintptr_t)value.sv_u64;
 		if (link)
 			sigsetsize = (size_t)link->sa_value.sv_u64;
 		if (!sa || sigsetsize != sizeof(sa->sa_mask))
@@ -6037,7 +6037,7 @@ for (local c: knownCases.sorted()) {
 		result = print_sigaction(printer,
 		                         arg,
 		                         (sighandler_t)(void *)sa->sa_handler,
-		                         (USER CHECKED sigset_t *)&sa->sa_mask,
+		                         (NCX sigset_t *)&sa->sa_mask,
 		                         sigsetsize,
 		                         sa->sa_flags,
 		                         (void *)sa->sa_restorer);
@@ -6074,11 +6074,11 @@ for (local c: knownCases.sorted()) {
 
 #ifdef HAVE_SC_REPR_STRUCT_SIGSET
 	case SC_REPR_STRUCT_SIGSET: {
-		USER UNCHECKED sigset_t *sigset;
+		NCX UNCHECKED sigset_t *sigset;
 		size_t sigsetsize;
 		if unlikely(!link)
 			goto do_pointer;
-		sigset = (USER UNCHECKED sigset_t *)(uintptr_t)value.sv_u64;
+		sigset = (NCX UNCHECKED sigset_t *)(uintptr_t)value.sv_u64;
 		if (!sigset)
 			goto do_pointer;
 		sigsetsize = (size_t)(syscall_ulong_t)link->sa_value.sv_u64;
@@ -6088,8 +6088,8 @@ for (local c: knownCases.sorted()) {
 
 #ifdef HAVE_SC_REPR_STRUCT_SIGSET_WITH_SIZE
 	case SC_REPR_STRUCT_SIGSET_WITH_SIZE: {
-		USER UNCHECKED void *valptr;
-		valptr = (USER UNCHECKED void *)(uintptr_t)(syscall_ulong_t)value.sv_u64;
+		NCX UNCHECKED void *valptr;
+		valptr = (NCX UNCHECKED void *)(uintptr_t)(syscall_ulong_t)value.sv_u64;
 		if (!valptr)
 			goto do_pointer;
 		validate_readable(valptr, sizeof(void *) + sizeof(size_t));
@@ -6099,8 +6099,8 @@ for (local c: knownCases.sorted()) {
 
 #ifdef HAVE_SC_REPR_STRUCT_SIGSET_WITH_SIZE_X32
 	case SC_REPR_STRUCT_SIGSET_WITH_SIZE_X32: {
-		USER UNCHECKED void *valptr;
-		valptr = (USER UNCHECKED void *)(uintptr_t)(syscall_ulong_t)value.sv_u64;
+		NCX UNCHECKED void *valptr;
+		valptr = (NCX UNCHECKED void *)(uintptr_t)(syscall_ulong_t)value.sv_u64;
 		if (!valptr)
 			goto do_pointer;
 		validate_readable(valptr, 2 * 4);
@@ -6110,8 +6110,8 @@ for (local c: knownCases.sorted()) {
 
 #ifdef HAVE_SC_REPR_STRUCT_SIGSET_WITH_SIZE_X64
 	case SC_REPR_STRUCT_SIGSET_WITH_SIZE_X64: {
-		USER UNCHECKED void *valptr;
-		valptr = (USER UNCHECKED void *)(uintptr_t)(syscall_ulong_t)value.sv_u64;
+		NCX UNCHECKED void *valptr;
+		valptr = (NCX UNCHECKED void *)(uintptr_t)(syscall_ulong_t)value.sv_u64;
 		if (!valptr)
 			goto do_pointer;
 		validate_readable(valptr, 2 * 8);
@@ -6188,11 +6188,11 @@ for (local c: knownCases.sorted()) {
 
 #ifdef HAVE_SC_REPR_STRUCT_FDSET
 	case SC_REPR_STRUCT_FDSET: {
-		USER UNCHECKED fd_set *fdset;
+		NCX UNCHECKED fd_set *fdset;
 		size_t nfds;
 		if unlikely(!link)
 			goto do_pointer;
-		fdset = (USER UNCHECKED fd_set *)(uintptr_t)value.sv_u64;
+		fdset = (NCX UNCHECKED fd_set *)(uintptr_t)value.sv_u64;
 		if unlikely(!fdset)
 			goto do_pointer;
 		nfds = (size_t)link->sa_value.sv_u64;
@@ -6239,11 +6239,11 @@ for (local c: knownCases.sorted()) {
 #define _IS_IOVECX32_C _IS_IOVECX32_C_2
 #endif /* ... */
 	{
-		USER UNCHECKED struct iovecx32 *iov;
+		NCX UNCHECKED struct iovecx32 *iov;
 		size_t count;
 		if unlikely(!link)
 			goto do_pointer;
-		iov = (USER UNCHECKED struct iovecx32 *)(uintptr_t)value.sv_u64;
+		iov = (NCX UNCHECKED struct iovecx32 *)(uintptr_t)value.sv_u64;
 		if unlikely(!iov)
 			goto do_pointer;
 		count = (size_t)link->sa_value.sv_u64;
@@ -6303,11 +6303,11 @@ for (local c: knownCases.sorted()) {
 #define _IS_IOVECX64_C _IS_IOVECX64_C_2
 #endif /* ... */
 	{
-		USER UNCHECKED struct iovecx64 *iov;
+		NCX UNCHECKED struct iovecx64 *iov;
 		size_t count;
 		if unlikely(!link)
 			goto do_pointer;
-		iov = (USER UNCHECKED struct iovecx64 *)(uintptr_t)value.sv_u64;
+		iov = (NCX UNCHECKED struct iovecx64 *)(uintptr_t)value.sv_u64;
 		if unlikely(!iov)
 			goto do_pointer;
 		count = (size_t)link->sa_value.sv_u64;
@@ -6339,11 +6339,11 @@ for (local c: knownCases.sorted()) {
 
 #ifdef HAVE_SC_REPR_STRUCT_SOCKADDR
 	case SC_REPR_STRUCT_SOCKADDR: {
-		USER UNCHECKED struct sockaddr *sa;
+		NCX UNCHECKED struct sockaddr *sa;
 		socklen_t len;
 		if (!link)
 			goto do_pointer;
-		sa  = (USER UNCHECKED struct sockaddr *)(uintptr_t)value.sv_u64;
+		sa  = (NCX UNCHECKED struct sockaddr *)(uintptr_t)value.sv_u64;
 		len = (socklen_t)link->sa_value.sv_u64;
 		validate_readable(sa, len);
 		result = print_sockaddr(printer, arg, sa, len);
@@ -6421,7 +6421,7 @@ for (local c: knownCases.sorted()) {
 #ifdef HAVE_SC_REPR_STRING_VECTOR
 	case SC_REPR_STRING_VECTOR:
 		result = print_string_vector(printer, arg,
-		                             (USER UNCHECKED char const *USER UNCHECKED const *)(uintptr_t)value.sv_u64
+		                             (NCX UNCHECKED char const *NCX UNCHECKED const *)(uintptr_t)value.sv_u64
 #ifdef HAVE_STRING_VECTOR_POINTER_SIZE
 		                             ,
 		                             sizeof(void *)
@@ -6433,7 +6433,7 @@ for (local c: knownCases.sorted()) {
 #ifdef HAVE_SC_REPR_STRING_VECTOR32
 	case SC_REPR_STRING_VECTOR32:
 		result = print_string_vector(printer, arg,
-		                             (USER UNCHECKED char const *USER UNCHECKED const *)(uintptr_t)value.sv_u64
+		                             (NCX UNCHECKED char const *NCX UNCHECKED const *)(uintptr_t)value.sv_u64
 #ifdef HAVE_STRING_VECTOR_POINTER_SIZE
 		                             ,
 		                             4
@@ -6445,7 +6445,7 @@ for (local c: knownCases.sorted()) {
 #ifdef HAVE_SC_REPR_STRING_VECTOR64
 	case SC_REPR_STRING_VECTOR64:
 		result = print_string_vector(printer, arg,
-		                             (USER UNCHECKED char const *USER UNCHECKED const *)(uintptr_t)value.sv_u64
+		                             (NCX UNCHECKED char const *NCX UNCHECKED const *)(uintptr_t)value.sv_u64
 #ifdef HAVE_STRING_VECTOR_POINTER_SIZE
 		                             ,
 		                             8
@@ -6458,8 +6458,8 @@ for (local c: knownCases.sorted()) {
 #define DO_REPR_STRUCT_TIMEVAL_VEC2(struct_timeval_typecode)                      \
 	do {                                                                          \
 		struct timeval tsv[2];                                                    \
-		USER UNCHECKED struct_timeval_typecode *utms;                             \
-		utms = (USER UNCHECKED struct_timeval_typecode *)(uintptr_t)value.sv_u64; \
+		NCX UNCHECKED struct_timeval_typecode *utms;                             \
+		utms = (NCX UNCHECKED struct_timeval_typecode *)(uintptr_t)value.sv_u64; \
 		if unlikely(!utms)                                                        \
 			goto do_null_pointer;                                                 \
 		validate_readable(utms, 2 * sizeof(struct_timeval_typecode));             \
@@ -6512,8 +6512,8 @@ for (local c: knownCases.sorted()) {
 #define DO_REPR_STRUCT_TIMEVAL(struct_timeval_typecode)                           \
 	do {                                                                          \
 		struct timeval ts;                                                        \
-		USER UNCHECKED struct_timeval_typecode *utms;                             \
-		utms = (USER UNCHECKED struct_timeval_typecode *)(uintptr_t)value.sv_u64; \
+		NCX UNCHECKED struct_timeval_typecode *utms;                             \
+		utms = (NCX UNCHECKED struct_timeval_typecode *)(uintptr_t)value.sv_u64; \
 		if unlikely(!utms)                                                        \
 			goto do_null_pointer;                                                 \
 		validate_readable(utms, sizeof(struct_timeval_typecode));                 \
@@ -6597,8 +6597,8 @@ do_struct_timevalx64:
 	do {                                                                           \
 		size_t count = 2;                                                          \
 		struct timespec tsv[3];                                                    \
-		USER UNCHECKED struct_timespec_typecode *utms;                             \
-		utms = (USER UNCHECKED struct_timespec_typecode *)(uintptr_t)value.sv_u64; \
+		NCX UNCHECKED struct_timespec_typecode *utms;                             \
+		utms = (NCX UNCHECKED struct_timespec_typecode *)(uintptr_t)value.sv_u64; \
 		if unlikely(!utms)                                                         \
 			goto do_null_pointer;                                                  \
 		if (link && ((syscall_ulong_t)link->sa_value.sv_u64 & AT_CHANGE_BTIME))    \
@@ -6701,8 +6701,8 @@ do_struct_timevalx64:
 #define DO_REPR_STRUCT_TIMESPEC(struct_timespec_typecode)                          \
 	do {                                                                           \
 		struct timespec ts;                                                        \
-		USER UNCHECKED struct_timespec_typecode *utms;                             \
-		utms = (USER UNCHECKED struct_timespec_typecode *)(uintptr_t)value.sv_u64; \
+		NCX UNCHECKED struct_timespec_typecode *utms;                             \
+		utms = (NCX UNCHECKED struct_timespec_typecode *)(uintptr_t)value.sv_u64; \
 		if unlikely(!utms)                                                         \
 			goto do_null_pointer;                                                  \
 		validate_readable(utms, sizeof(struct_timespec_typecode));                 \
@@ -6784,11 +6784,11 @@ do_struct_timespecx64:
 
 #ifdef HAVE_SC_REPR_STRUCT_POLLFD
 	case SC_REPR_STRUCT_POLLFD: {
-		USER UNCHECKED struct pollfd *fds;
+		NCX UNCHECKED struct pollfd *fds;
 		size_t count = 1;
 		if (link)
 			count = (size_t)link->sa_value.sv_u64;
-		fds = (USER UNCHECKED struct pollfd *)(uintptr_t)value.sv_u64;
+		fds = (NCX UNCHECKED struct pollfd *)(uintptr_t)value.sv_u64;
 		if unlikely(!fds)
 			goto do_null_pointer;
 		validate_readablem(fds, count, sizeof(struct pollfd));

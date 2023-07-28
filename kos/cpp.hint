@@ -1110,12 +1110,10 @@
 #define __PHYS
 #define VIRT
 #define __VIRT
-#define USER
-#define __USER
+#define NCX
+#define __NCX
 #define KERNEL
 #define __KERNEL
-#define CHECKED
-#define __CHECKED
 #define UNCHECKED
 #define __UNCHECKED
 #define WEAK

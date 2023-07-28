@@ -252,8 +252,7 @@
 #if !defined(__NO_KOS_SYSTEM_HEADERS__) && defined(_KOS_ANNO_H)
 #define PHYS            __PHYS
 #define VIRT            __VIRT
-#define USER            __USER
-#define CHECKED         __CHECKED
+#define NCX             __NCX
 #define UNCHECKED       __UNCHECKED
 #define REF             __REF
 #define REF_IF          __REF_IF

@@ -99,13 +99,13 @@ FUNDEF NOBLOCK void NOTHROW(KCALL fpustate_savecpu)(void);
  * a new state will be allocated before returning. */
 #ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_LOADFROM
 FUNDEF NOBLOCK void KCALL
-fpustate_loadfrom(USER CHECKED struct fpustate const *state)
+fpustate_loadfrom(NCX struct fpustate const *state)
 		THROWS(E_SEGFAULT, E_BADALLOC);
 #endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_LOADFROM */
 #ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_SAVEINTO
 /* Return the pointer that must eventually be passed to `fpustate_loadfrom()' */
 FUNDEF NOBLOCK void KCALL
-fpustate_saveinto(USER CHECKED struct fpustate *state)
+fpustate_saveinto(NCX struct fpustate *state)
 		THROWS(E_SEGFAULT);
 #endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_SAVEINTO */
 

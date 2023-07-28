@@ -91,7 +91,7 @@ filehandle_new(struct mfile *__restrict self,
 DEFINE_HANDLE_REFCNT_FUNCTIONS(filehandle, struct filehandle);
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
-handle_filehandle_read(struct filehandle *__restrict self, USER CHECKED void *dst,
+handle_filehandle_read(struct filehandle *__restrict self, NCX void *dst,
                        size_t num_bytes, iomode_t mode) THROWS(...) {
 	size_t result;
 	uint64_t oldpos, newpos;
@@ -106,7 +106,7 @@ again:
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_filehandle_write(struct filehandle *__restrict self,
-                        USER CHECKED void const *src,
+                        NCX void const *src,
                         size_t num_bytes, iomode_t mode) THROWS(...) {
 	size_t result;
 	/* Deal with O_APPEND */
@@ -133,13 +133,13 @@ again:
 }
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
-handle_filehandle_pread(struct filehandle *__restrict self, USER CHECKED void *dst,
+handle_filehandle_pread(struct filehandle *__restrict self, NCX void *dst,
                         size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
 	return mfile_upread(self->fh_file, dst, num_bytes, addr, mode);
 }
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
-handle_filehandle_pwrite(struct filehandle *__restrict self, USER CHECKED void const *src,
+handle_filehandle_pwrite(struct filehandle *__restrict self, NCX void const *src,
                          size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
 	return mfile_upwrite(self->fh_file, src, num_bytes, addr, mode);
 }
@@ -248,7 +248,7 @@ done:
 
 INTERN NONNULL((1)) syscall_slong_t KCALL
 handle_filehandle_ioctl(struct filehandle *__restrict self, ioctl_t cmd,
-                        USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+                        NCX UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	return mfile_uioctl(self->fh_file, cmd, arg, mode);
 }
 
@@ -287,7 +287,7 @@ handle_filehandle_datasync(struct filehandle *__restrict self) THROWS(...) {
 
 INTERN NONNULL((1)) void KCALL
 handle_filehandle_stat(struct filehandle *__restrict self,
-                       USER CHECKED struct stat *result) THROWS(...) {
+                       NCX struct stat *result) THROWS(...) {
 	mfile_ustat(self->fh_file, result);
 }
 

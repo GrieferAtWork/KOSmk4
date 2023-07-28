@@ -52,7 +52,7 @@ struct clnknode
 /************************************************************************/
 FUNDEF WUNUSED NONNULL((1)) size_t KCALL
 clnknode_v_readlink(struct flnknode *__restrict self,
-                    USER CHECKED /*utf-8*/ char *buf,
+                    NCX /*utf-8*/ char *buf,
                     size_t bufsize)
 		THROWS(E_SEGFAULT);
 FUNDEF ATTR_CONST ATTR_RETNONNULL WUNUSED NONNULL((1)) char const *
@@ -90,7 +90,7 @@ _clnknode_alloc(struct fsuper *__restrict super, size_t text_length)
  * link-node with `text_length'  characters copied from  `text'. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct clnknode *FCALL
 _clnknode_new(struct fsuper *__restrict super,
-              USER CHECKED char const *text, size_t text_length)
+              NCX char const *text, size_t text_length)
 		THROWS(E_BADALLOC, E_SEGFAULT);
 
 

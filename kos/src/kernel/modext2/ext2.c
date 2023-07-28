@@ -768,7 +768,7 @@ NOTHROW(KCALL ext2_dir_v_destroy)(struct mfile *__restrict self) {
 
 PRIVATE BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 ext2_lnk_v_readlink(struct flnknode *__restrict self,
-                    USER CHECKED /*utf-8*/ char *buf,
+                    NCX /*utf-8*/ char *buf,
                     size_t bufsize)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	size_t lnksize = (size_t)_atomic64_val(self->mf_filesize);
@@ -1020,7 +1020,7 @@ PRIVATE struct flatsuper_ops const ext2_super_ops = {
 /************************************************************************/
 PRIVATE BLOCKING WUNUSED NONNULL((1)) struct fsuper *KCALL
 ext2_openfs(struct ffilesys *__restrict UNUSED(filesys),
-            struct mfile *dev, UNCHECKED USER char *args) {
+            struct mfile *dev, NCX UNCHECKED char *args) {
 	struct ext2super *result;
 	Ext2DiskSuperblock *desc;
 	u32 num_block_groups;

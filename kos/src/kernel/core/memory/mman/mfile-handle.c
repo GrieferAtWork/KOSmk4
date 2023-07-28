@@ -73,7 +73,7 @@ DECL_BEGIN
  *  - BLKGETSIZE, BLKGETSIZE64 */
 PUBLIC BLOCKING NONNULL((1)) syscall_slong_t KCALL
 mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-              USER UNCHECKED void *arg, iomode_t mode)
+              NCX UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 #define typeof_field(s, m) typeof(((s *)0)->m)
 #define sizeof_field(s, m) sizeof(((s *)0)->m)
@@ -121,7 +121,7 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		uintptr_t mask, flag, inode_flags;
 		if unlikely(!IO_CANWRITE(mode))
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_SETPROPERTY, mode);
-		arg = (USER CHECKED void *)validate_readable(arg, _IOC_SIZE(cmd));
+		arg = (NCX void *)validate_readable(arg, _IOC_SIZE(cmd));
 		if (_IOC_SIZE(cmd) == sizeof(u32)) {
 			inode_flags = (uintptr_t)UNALIGNED_GET32(arg);
 		} else {
@@ -141,9 +141,9 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	}	break;
 
 	case FILE_IOC_BLKSHIFT: {
-		USER CHECKED struct file_blkshift *info;
+		NCX struct file_blkshift *info;
 		/* Query ioctl for buffer requirements of `O_DIRECT' */
-		info = (USER CHECKED struct file_blkshift *)validate_writable(arg, sizeof(struct file_blkshift));
+		info = (NCX struct file_blkshift *)validate_writable(arg, sizeof(struct file_blkshift));
 		COMPILER_WRITE_BARRIER();
 		info->fbs_blck = self->mf_blockshift;
 		info->fbs_ioba = self->mf_iobashift;
@@ -151,12 +151,12 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	}	break;
 
 	case FILE_IOC_MKUALIGN: {
-		USER CHECKED struct file_mkualign *info;
+		NCX struct file_mkualign *info;
 		REF struct mfile *ma_wrapper;
 		REF struct filehandle *ma_handle;
 		struct handle hand;
 		pos_t offset;
-		info   = (USER CHECKED struct file_mkualign *)validate_readwrite(arg, sizeof(struct file_mkualign));
+		info   = (NCX struct file_mkualign *)validate_readwrite(arg, sizeof(struct file_mkualign));
 		offset = (pos_t)info->fmua_offset;
 		COMPILER_READ_BARRIER();
 
@@ -200,9 +200,9 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	case FILE_IOC_TAILREAD: {
 		pos_t offset;
 		size_t num_bytes;
-		USER CHECKED void *buf;
-		USER CHECKED struct file_tailread *info;
-		info = (USER CHECKED struct file_tailread *)validate_readwrite(arg, sizeof(struct file_tailread));
+		NCX void *buf;
+		NCX struct file_tailread *info;
+		info = (NCX struct file_tailread *)validate_readwrite(arg, sizeof(struct file_tailread));
 		/* Load arguments. */
 		buf       = info->ftr_buf;
 		num_bytes = info->ftr_siz;
@@ -369,7 +369,7 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 			size_t maxlen = _IOC_SIZE(cmd); /* Usually `sizeof(char[FSLABEL_MAX])' */
 			(void)maxlen;
 			super = mfile_asnode(self)->fn_super;
-			if (fsuper_getlabel(super, (USER CHECKED char *)validate_writable(arg, maxlen)))
+			if (fsuper_getlabel(super, (NCX char *)validate_writable(arg, maxlen)))
 				return 0;
 		}
 		break;
@@ -377,10 +377,10 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	case _IO_WITHSIZE(FS_IOC_SETFSLABEL, 0):
 		if (mfile_isnode(self)) {
 			struct fsuper *super;
-			USER CHECKED char const *labelname;
+			NCX char const *labelname;
 			size_t labelsize = _IOC_SIZE(cmd); /* Usually `sizeof(char[FSLABEL_MAX])' */
 			super = mfile_asnode(self)->fn_super;
-			labelname = (USER CHECKED char const *)validate_readable(arg, 1);
+			labelname = (NCX char const *)validate_readable(arg, 1);
 			labelsize = strnlen(labelname, labelsize / sizeof(char));
 			/* As per the specs, only a SYS_ADMIN can issue this command! */
 			require(CAP_SYS_ADMIN);
@@ -510,7 +510,7 @@ DEFINE_HANDLE_REFCNT_FUNCTIONS(mfile, struct mfile);
 
 INTERN BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 handle_mfile_read(struct mfile *__restrict self,
-                  USER CHECKED void *dst,
+                  NCX void *dst,
                   size_t num_bytes, iomode_t mode)
 		THROWS(...) {
 	struct mfile_stream_ops const *stream;
@@ -530,7 +530,7 @@ handle_mfile_read(struct mfile *__restrict self,
 
 INTERN BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 handle_mfile_write(struct mfile *__restrict self,
-                   USER CHECKED void const *src,
+                   NCX void const *src,
                    size_t num_bytes, iomode_t mode)
 		THROWS(...) {
 	struct mfile_stream_ops const *stream;
@@ -552,7 +552,7 @@ handle_mfile_write(struct mfile *__restrict self,
 
 PUBLIC WUNUSED NONNULL((1)) size_t KCALL
 mfile_utailwrite(struct mfile *__restrict self,
-                 USER CHECKED void const *src,
+                 NCX void const *src,
                  size_t num_bytes, iomode_t mode)
 		THROWS(...) {
 	struct mfile_stream_ops const *stream;
@@ -594,7 +594,7 @@ NOTHROW(FCALL shoud_handle_direct_io_bad_usage)(iomode_t mode) {
 
 INTERN BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 handle_mfile_pread(struct mfile *__restrict self,
-                   USER CHECKED void *dst, size_t num_bytes,
+                   NCX void *dst, size_t num_bytes,
                    pos_t addr, iomode_t mode)
 		THROWS(...) {
 	struct mfile_stream_ops const *stream;
@@ -635,7 +635,7 @@ handle_mfile_pread(struct mfile *__restrict self,
 
 INTERN BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 handle_mfile_pwrite(struct mfile *__restrict self,
-                    USER CHECKED void const *src, size_t num_bytes,
+                    NCX void const *src, size_t num_bytes,
                     pos_t addr, iomode_t mode)
 		THROWS(...) {
 	struct mfile_stream_ops const *stream;
@@ -986,11 +986,11 @@ handle_mfile_seek(struct mfile *__restrict self,
 
 INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_mfile_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-                   USER UNCHECKED void *arg, iomode_t mode)
+                   NCX UNCHECKED void *arg, iomode_t mode)
 		THROWS(...) {
 	BLOCKING NONNULL_T((1)) syscall_slong_t
 	(KCALL *mso_ioctl)(struct mfile *__restrict self, ioctl_t cmd,
-	                   USER UNCHECKED void *arg, iomode_t mode);
+	                   NCX UNCHECKED void *arg, iomode_t mode);
 	struct mfile_stream_ops const *stream;
 	mso_ioctl = &mfile_v_ioctl;
 	stream    = self->mf_ops->mo_stream;
@@ -1109,7 +1109,7 @@ handle_mfile_datasync(struct mfile *__restrict self)
 
 INTERN BLOCKING NONNULL((1)) void KCALL
 handle_mfile_stat(struct mfile *__restrict self,
-                  USER CHECKED struct stat *result)
+                  NCX struct stat *result)
 		THROWS(...) {
 	dev_t st_dev;
 	ino_t st_ino;

@@ -530,8 +530,8 @@ fnode_chmod(struct fnode *__restrict self, mode_t perm_mask,
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID:gid: [...] */
 FUNDEF NONNULL((1)) void KCALL
 fnode_chown(struct fnode *__restrict self, uid_t owner, gid_t group,
-            USER CHECKED uid_t *pold_owner DFL(__NULLPTR),
-            USER CHECKED gid_t *pold_group DFL(__NULLPTR),
+            NCX uid_t *pold_owner DFL(__NULLPTR),
+            NCX gid_t *pold_group DFL(__NULLPTR),
             __BOOL check_permissions DFL(1))
 		THROWS(E_SEGFAULT, E_FSERROR_READONLY, E_INSUFFICIENT_RIGHTS, E_INVALID_ARGUMENT_BAD_VALUE);
 

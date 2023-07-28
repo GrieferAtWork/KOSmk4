@@ -117,7 +117,7 @@ DEFINE_REFCNT_FUNCTIONS(struct fdirent, fd_refcnt, fdirent_destroy)
  * This function is used by various APIs related to file lookup.
  * @throw: E_SEGFAULT: Failed to access the given `text'. */
 FUNDEF ATTR_PURE WUNUSED uintptr_t FCALL
-fdirent_hash(CHECKED USER /*utf-8*/ char const *text, u16 textlen)
+fdirent_hash(NCX /*utf-8*/ char const *text, u16 textlen)
 		THROWS(E_SEGFAULT);
 #define FDIRENT_EMPTY_HASH 0 /* == fdirent_hash("", 0) */
 

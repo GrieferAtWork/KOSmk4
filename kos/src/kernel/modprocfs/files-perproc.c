@@ -131,12 +131,12 @@ DECL_BEGIN
 	        pformatprinter printer_, void *arg,                         \
 	        pos_t offset_hint);                                        \
 	INTDEF WUNUSED NONNULL((1)) size_t KCALL                            \
-	writer(struct mfile *__restrict self, USER CHECKED void const *src, \
+	writer(struct mfile *__restrict self, NCX void const *src, \
 	       size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 #define MKLNK(ops_symbol_name, readlink)       \
 	INTDEF WUNUSED NONNULL((1)) size_t KCALL   \
 	readlink(struct flnknode *__restrict self, \
-	         USER CHECKED /*utf-8*/ char *buf, \
+	         NCX /*utf-8*/ char *buf, \
 	         size_t bufsize)                   \
 			THROWS(E_SEGFAULT, E_IOERROR, ...);
 #include "perproc.def"
@@ -224,7 +224,7 @@ INTERN_CONST struct fnode_perm_ops const procfs_perproc_v_perm_ops = {
 
 PRIVATE NONNULL((1)) void KCALL
 procfs_perproc_v_stat_common(struct mfile *__restrict self,
-                             USER CHECKED struct stat *result)
+                             NCX struct stat *result)
 		THROWS(...) {
 	struct fnode *me        = mfile_asnode(self);
 	REF struct task *thread = taskpid_gettask(me->fn_fsdata);
@@ -262,7 +262,7 @@ procfs_perproc_v_stat_common(struct mfile *__restrict self,
 
 INTERN NONNULL((1)) void KCALL
 procfs_perproc_dir_v_stat(struct mfile *__restrict self,
-                          USER CHECKED struct stat *result)
+                          NCX struct stat *result)
 		THROWS(...) {
 	procfs_perproc_v_stat_common(self, result);
 	fdirnode_v_stat(self, result);
@@ -270,7 +270,7 @@ procfs_perproc_dir_v_stat(struct mfile *__restrict self,
 
 INTERN NONNULL((1)) void KCALL
 procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
-                                USER CHECKED struct stat *result)
+                                NCX struct stat *result)
 		THROWS(...) {
 	procfs_perproc_v_stat_common(self, result);
 	printnode_v_stat(self, result);
@@ -278,7 +278,7 @@ procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
 
 INTERN NONNULL((1)) void KCALL
 procfs_perproc_lnknode_v_stat(struct mfile *__restrict self,
-                              USER CHECKED struct stat *result)
+                              NCX struct stat *result)
 		THROWS(...) {
 	size_t lnksize;
 	struct flnknode *me            = mfile_aslnk(self);
@@ -335,7 +335,7 @@ INTERN_CONST struct mfile_stream_ops const procfs_perproc_dir_v_stream_ops = {
 /* Helper for printing `struct fs' member paths. */
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
 ProcFS_PerProc_FsSpecificPath_ReadLink(struct flnknode *__restrict self,
-                                       USER CHECKED /*utf-8*/ char *buf,
+                                       NCX /*utf-8*/ char *buf,
                                        size_t bufsize,
                                        ptrdiff_t struct_fs_offsetof_path)
 		THROWS(E_SEGFAULT, ...) {
@@ -389,7 +389,7 @@ ProcFS_PerProc_FsSpecificPath_WalkLink(struct flnknode *__restrict self,
 /************************************************************************/
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
 procfs_pp_cwd_v_readlink(struct flnknode *__restrict self,
-                         USER CHECKED /*utf-8*/ char *buf,
+                         NCX /*utf-8*/ char *buf,
                          size_t bufsize)
 		THROWS(E_SEGFAULT, ...) {
 	return ProcFS_PerProc_FsSpecificPath_ReadLink(self, buf, bufsize, offsetof(struct fs, fs_cwd));
@@ -427,7 +427,7 @@ INTERN_CONST struct flnknode_ops const procfs_pp_cwd = {
 /************************************************************************/
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
 procfs_pp_root_v_readlink(struct flnknode *__restrict self,
-                          USER CHECKED /*utf-8*/ char *buf,
+                          NCX /*utf-8*/ char *buf,
                           size_t bufsize)
 		THROWS(E_SEGFAULT, ...) {
 	return ProcFS_PerProc_FsSpecificPath_ReadLink(self, buf, bufsize, offsetof(struct fs, fs_root));
@@ -465,7 +465,7 @@ INTERN_CONST struct flnknode_ops const procfs_pp_root = {
 /************************************************************************/
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
 ProcFS_PerProc_Exe_Printer(struct flnknode *__restrict self,
-                           USER CHECKED /*utf-8*/ char *buf,
+                           NCX /*utf-8*/ char *buf,
                            size_t bufsize)
 		THROWS(E_SEGFAULT, ...) {
 	REF struct task *thread;
@@ -564,7 +564,7 @@ INTERN_CONST struct flnknode_ops const procfs_pp_exe = {
  * NOTE: The trailing NUL-character is also printed by this function! */
 PRIVATE NONNULL((1, 2)) ssize_t KCALL
 print_userspace_cstring(struct mman *__restrict mm, pformatprinter printer,
-                        void *arg, USER CHECKED char const *cstr) {
+                        void *arg, NCX char const *cstr) {
 	char buf[512], *endptr;
 	size_t num_bytes;
 again:
@@ -591,7 +591,7 @@ again:
 
 INTERN NONNULL((1, 2)) void KCALL
 ProcFS_PrintUserSpaceStringArray(struct mman *__restrict mm, pformatprinter printer, void *arg,
-                                 size_t strc, char const *USER UNCHECKED const *USER CHECKED strv) {
+                                 size_t strc, char const *NCX UNCHECKED const *NCX strv) {
 	size_t i;
 
 	/* Verify bounds. */
@@ -602,13 +602,13 @@ ProcFS_PrintUserSpaceStringArray(struct mman *__restrict mm, pformatprinter prin
 	if unlikely(!ADDRRANGE_ISUSER(strv, i))
 		return;
 	while (strc) {
-		USER UNCHECKED char const *strings[32];
+		NCX UNCHECKED char const *strings[32];
 		size_t count = strc;
 		if (count > lengthof(strings))
 			count = lengthof(strings);
-		mman_read(mm, strv, strings, count * sizeof(USER UNCHECKED char const *));
+		mman_read(mm, strv, strings, count * sizeof(NCX UNCHECKED char const *));
 		for (i = 0; i < count; ++i) {
-			USER UNCHECKED char const *str = strings[i];
+			NCX UNCHECKED char const *str = strings[i];
 			if (!str || !ADDR_ISUSER(str))
 				return;
 			if (print_userspace_cstring(mm, printer, arg, str))
@@ -622,7 +622,7 @@ ProcFS_PrintUserSpaceStringArray(struct mman *__restrict mm, pformatprinter prin
 #ifdef __ARCH_HAVE_COMPAT
 INTERN NONNULL((1, 2)) void KCALL
 ProcFS_PrintCompatUserSpaceStringArray(struct mman *__restrict mm, pformatprinter printer, void *arg,
-                                       size_t strc, compat_uintptr_t USER UNCHECKED const *USER CHECKED strv) {
+                                       size_t strc, compat_uintptr_t NCX UNCHECKED const *NCX strv) {
 	size_t i;
 
 	/* Verify bounds. */
@@ -633,17 +633,17 @@ ProcFS_PrintCompatUserSpaceStringArray(struct mman *__restrict mm, pformatprinte
 	if unlikely(!ADDRRANGE_ISUSER(strv, i))
 		return;
 	while (strc) {
-		USER UNCHECKED compat_uintptr_t strings[32];
+		NCX UNCHECKED compat_uintptr_t strings[32];
 		size_t count = strc;
 		if (count > lengthof(strings))
 			count = lengthof(strings);
-		mman_read(mm, strv, strings, count * sizeof(USER UNCHECKED compat_uintptr_t));
+		mman_read(mm, strv, strings, count * sizeof(NCX UNCHECKED compat_uintptr_t));
 		for (i = 0; i < count; ++i) {
-			USER UNCHECKED compat_uintptr_t str = strings[i];
+			NCX UNCHECKED compat_uintptr_t str = strings[i];
 			if (!str || !ADDR_ISUSER(str))
 				return;
 			if (print_userspace_cstring(mm, printer, arg,
-			                            (USER CHECKED char const *)(uintptr_t)str))
+			                            (NCX char const *)(uintptr_t)str))
 				return;
 		}
 		strv += count;
@@ -660,9 +660,9 @@ struct _peb_cmdline_buffer {
 #elif (OFFSET_PROCESS_PEB_ARGC + __SIZEOF_SIZE_T__) > OFFSET_PROCESS_PEB_ARGV
 #error "Invalid offsets"
 #endif /* ... */
-	char const *USER UNCHECKED const *USER UNCHECKED pp_argv;
+	char const *NCX UNCHECKED const *NCX UNCHECKED pp_argv;
 #else /* OFFSET_PROCESS_PEB_ARGC < OFFSET_PROCESS_PEB_ARGV */
-	char const *USER UNCHECKED const *USER UNCHECKED pp_argv;
+	char const *NCX UNCHECKED const *NCX UNCHECKED pp_argv;
 #if (OFFSET_PROCESS_PEB_ARGV + __SIZEOF_SIZE_T__) < OFFSET_PROCESS_PEB_ARGC
 	byte_t __pp_pad[OFFSET_PROCESS_PEB_ARGC - (OFFSET_PROCESS_PEB_ARGV + __SIZEOF_SIZE_T__)];
 #elif (OFFSET_PROCESS_PEB_ARGV + __SIZEOF_SIZE_T__) > OFFSET_PROCESS_PEB_ARGC
@@ -674,7 +674,7 @@ struct _peb_cmdline_buffer {
 
 PRIVATE NONNULL((1, 2)) void KCALL
 peb_print_cmdline(struct mman *__restrict mm, pformatprinter printer,
-                  void *arg, USER CHECKED struct process_peb const *peb) {
+                  void *arg, NCX struct process_peb const *peb) {
 	struct _peb_cmdline_buffer info;
 	mman_read(mm, (byte_t const *)peb + OFFSET_PROCESS_PEB_ARGC, &info, sizeof(info));
 	ProcFS_PrintUserSpaceStringArray(mm, printer, arg, info.pp_argc, info.pp_argv);
@@ -703,7 +703,7 @@ struct _compat_peb_cmdline_buffer {
 
 PRIVATE NONNULL((1, 2)) void KCALL
 compat_peb_print_cmdline(struct mman *__restrict mm, pformatprinter printer,
-                         void *arg, USER CHECKED struct compat_process_peb const *peb) {
+                         void *arg, NCX struct compat_process_peb const *peb) {
 	struct _compat_peb_cmdline_buffer info;
 	mman_read(mm, (byte_t const *)peb + OFFSET_COMPAT_PROCESS_PEB_ARGC, &info, sizeof(info));
 	ProcFS_PrintCompatUserSpaceStringArray(mm, printer, arg, info.pp_argc, info.pp_argv);
@@ -716,7 +716,7 @@ procfs_pp_cmdline_print(struct printnode *__restrict self,
                         pos_t UNUSED(offset_hint)) {
 	REF struct task *thread;
 	REF struct mman *threadmm;
-	USER CHECKED void *peb;
+	NCX void *peb;
 
 	/* Lookup the relevant mman. */
 	thread   = taskpid_gettask_srch(self->fn_fsdata);
@@ -741,12 +741,12 @@ procfs_pp_cmdline_print(struct printnode *__restrict self,
 #ifdef __ARCH_HAVE_COMPAT
 	if (atomic_read(&FORMMAN(threadmm, thismman_execinfo).mei_peb_iscompat)) {
 		compat_peb_print_cmdline(threadmm, printer, arg,
-		                         (USER CHECKED struct compat_process_peb const *)peb);
+		                         (NCX struct compat_process_peb const *)peb);
 	} else
 #endif /* __ARCH_HAVE_COMPAT */
 	{
 		peb_print_cmdline(threadmm, printer, arg,
-		                  (USER CHECKED struct process_peb const *)peb);
+		                  (NCX struct process_peb const *)peb);
 	}
 }
 
@@ -768,7 +768,7 @@ procfs_pp_comm_print(struct printnode *__restrict self,
 }
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
-procfs_pp_comm_write(struct mfile *__restrict self, USER CHECKED void const *src,
+procfs_pp_comm_write(struct mfile *__restrict self, NCX void const *src,
                      size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
 	REF struct task *thread;
 	struct printnode *me = mfile_asprintnode(self);
@@ -809,9 +809,9 @@ struct _peb_environ_buffer {
 #elif (OFFSET_PROCESS_PEB_ENVC + __SIZEOF_SIZE_T__) > OFFSET_PROCESS_PEB_ENVP
 #error "Invalid offsets"
 #endif /* ... */
-	char const *USER UNCHECKED const *USER UNCHECKED pp_envp;
+	char const *NCX UNCHECKED const *NCX UNCHECKED pp_envp;
 #else /* OFFSET_PROCESS_PEB_ENVC < OFFSET_PROCESS_PEB_ENVP */
-	char const *USER UNCHECKED const *USER UNCHECKED pp_envp;
+	char const *NCX UNCHECKED const *NCX UNCHECKED pp_envp;
 #if (OFFSET_PROCESS_PEB_ENVP + __SIZEOF_SIZE_T__) < OFFSET_PROCESS_PEB_ENVC
 	byte_t __pp_pad[OFFSET_PROCESS_PEB_ENVC - (OFFSET_PROCESS_PEB_ENVP + __SIZEOF_SIZE_T__)];
 #elif (OFFSET_PROCESS_PEB_ENVP + __SIZEOF_SIZE_T__) > OFFSET_PROCESS_PEB_ENVC
@@ -823,7 +823,7 @@ struct _peb_environ_buffer {
 
 PRIVATE NONNULL((1, 2)) void KCALL
 peb_print_environ(struct mman *__restrict mm, pformatprinter printer,
-                   void *arg, USER CHECKED struct process_peb const *peb) {
+                   void *arg, NCX struct process_peb const *peb) {
 	struct _peb_environ_buffer info;
 	mman_read(mm, (byte_t const *)peb + OFFSET_PROCESS_PEB_ENVC, &info, sizeof(info));
 	ProcFS_PrintUserSpaceStringArray(mm, printer, arg, info.pp_envc, info.pp_envp);
@@ -852,7 +852,7 @@ struct _compat_peb_environ_buffer {
 
 PRIVATE NONNULL((1, 2)) void KCALL
 compat_peb_print_environ(struct mman *__restrict mm, pformatprinter printer,
-                         void *arg, USER CHECKED struct compat_process_peb const *peb) {
+                         void *arg, NCX struct compat_process_peb const *peb) {
 	struct _compat_peb_environ_buffer info;
 	mman_read(mm, (byte_t const *)peb + OFFSET_COMPAT_PROCESS_PEB_ENVC, &info, sizeof(info));
 	ProcFS_PrintCompatUserSpaceStringArray(mm, printer, arg, info.pp_envc, info.pp_envp);
@@ -865,7 +865,7 @@ procfs_pp_environ_print(struct printnode *__restrict self,
                         pos_t UNUSED(offset_hint)) {
 	REF struct task *thread;
 	REF struct mman *threadmm;
-	USER CHECKED void *peb;
+	NCX void *peb;
 
 	/* Lookup the relevant mman. */
 	thread   = taskpid_gettask_srch(self->fn_fsdata);
@@ -876,12 +876,12 @@ procfs_pp_environ_print(struct printnode *__restrict self,
 #ifdef __ARCH_HAVE_COMPAT
 	if (atomic_read(&FORMMAN(threadmm, thismman_execinfo).mei_peb_iscompat)) {
 		compat_peb_print_environ(threadmm, printer, arg,
-		                         (USER CHECKED struct compat_process_peb const *)peb);
+		                         (NCX struct compat_process_peb const *)peb);
 	} else
 #endif /* __ARCH_HAVE_COMPAT */
 	{
 		peb_print_environ(threadmm, printer, arg,
-		                  (USER CHECKED struct process_peb const *)peb);
+		                  (NCX struct process_peb const *)peb);
 	}
 }
 
@@ -1729,7 +1729,7 @@ procfs_pp_kos_peb_addr_print(struct printnode *__restrict self,
                              pos_t UNUSED(offset_hint)) {
 	REF struct task *thread;
 	REF struct mman *threadmm;
-	USER CHECKED void *peb;
+	NCX void *peb;
 
 	/* Lookup the relevant mman. */
 	thread   = taskpid_gettask_srch(self->fn_fsdata);
@@ -1741,12 +1741,12 @@ procfs_pp_kos_peb_addr_print(struct printnode *__restrict self,
 }
 
 INTERN NONNULL((1, 2)) size_t KCALL
-procfs_pp_kos_peb_addr_write(struct mfile *__restrict self, USER CHECKED void const *src,
+procfs_pp_kos_peb_addr_write(struct mfile *__restrict self, NCX void const *src,
                              size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) {
 	struct printnode *me = mfile_asprintnode(self);
 	REF struct task *thread;
 	REF struct mman *threadmm;
-	USER CHECKED void *peb;
+	NCX void *peb;
 	/* Can only write at addr=0 */
 	if (addr != 0)
 		THROW(E_IOERROR_BADBOUNDS, E_IOERROR_SUBSYSTEM_FILE);
@@ -1794,7 +1794,7 @@ procfs_pp_kos_peb_compat_print(struct printnode *__restrict self,
 }
 
 INTERN NONNULL((1, 2)) size_t KCALL
-procfs_pp_kos_peb_compat_write(struct mfile *__restrict self, USER CHECKED void const *src,
+procfs_pp_kos_peb_compat_write(struct mfile *__restrict self, NCX void const *src,
                                size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) {
 	struct printnode *me = mfile_asprintnode(self);
 	REF struct task *thread;
@@ -1844,7 +1844,7 @@ procfs_pp_x86_iopl_print(struct printnode *__restrict self,
 }
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
-procfs_pp_x86_iopl_write(struct mfile *__restrict self, USER CHECKED void const *src,
+procfs_pp_x86_iopl_write(struct mfile *__restrict self, NCX void const *src,
                          size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
 	struct fnode *me = mfile_asnode(self);
 	unsigned int new_iopl;
@@ -1904,7 +1904,7 @@ NOTHROW(KCALL procfs_fd_lnknode_v_destroy)(struct mfile *__restrict self) {
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
 procfs_fd_lnknode_v_readlink(struct flnknode *__restrict self,
-                             USER CHECKED /*utf-8*/ char *buf,
+                             NCX /*utf-8*/ char *buf,
                              size_t bufsize)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	struct procfs_fd_lnknode *me;
@@ -2243,7 +2243,7 @@ NOTHROW(KCALL procfs_fd_enum_v_fini)(struct fdirenum *__restrict self) {
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-procfs_fd_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+procfs_fd_enum_v_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                          size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(...) {
 	unsigned int index, newindex;
@@ -2715,7 +2715,7 @@ notanfd:
 
 #define procfs_fdinfo_enum_v_fini procfs_fd_enum_v_fini
 PRIVATE NONNULL((1)) size_t KCALL
-procfs_fdinfo_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+procfs_fdinfo_enum_v_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                              size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(...) {
 	unsigned int index, newindex;
@@ -2818,7 +2818,7 @@ NOTHROW(KCALL perproc_mapfile_lnknode_v_destroy)(struct mfile *__restrict self) 
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
 perproc_mapfile_lnknode_v_readlink(struct flnknode *__restrict self,
-                                   USER CHECKED /*utf-8*/ char *buf,
+                                   NCX /*utf-8*/ char *buf,
                                    size_t bufsize)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	struct perproc_mapfile_lnknode *me;
@@ -2921,7 +2921,7 @@ procfs_perproc_map_files_v_lookup(struct fdirnode *__restrict self,
 	REF struct perproc_mapfile_dirent *result;
 	struct mmapinfo mminfo;
 	uintptr_t minaddr, endaddr;
-	USER CHECKED char const *reader, *end;
+	NCX char const *reader, *end;
 	unsigned int state;
 #define STATE_MIN0 0
 #define STATE_MIN  1
@@ -2972,7 +2972,7 @@ procfs_perproc_map_files_v_lookup(struct fdirnode *__restrict self,
 		mm = task_getmman(thread);
 		decref_unlikely(thread);
 		FINALLY_DECREF_UNLIKELY(mm);
-		if unlikely(!mman_mapinfo(mm, &mminfo, (USER UNCHECKED void *)minaddr))
+		if unlikely(!mman_mapinfo(mm, &mminfo, (NCX UNCHECKED void *)minaddr))
 			return NULL;
 	}
 
@@ -3045,7 +3045,7 @@ NOTHROW(KCALL perproc_mapfile_direnum_v_fini)(struct fdirenum *__restrict self) 
 }
 
 PRIVATE BLOCKING NONNULL((1)) size_t KCALL
-perproc_mapfile_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+perproc_mapfile_direnum_v_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                                   size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	ssize_t result;
@@ -3318,7 +3318,7 @@ NOTHROW(KCALL get_greatest_child_pid_plus_one)(struct taskpid *__restrict master
 
 
 PRIVATE BLOCKING NONNULL((1)) size_t KCALL
-procfs_task_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+procfs_task_direnum_v_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                               size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	REF struct taskpid *pid;
@@ -3518,7 +3518,7 @@ procfs_perproc_drivelnk_getroot(struct procfs_perproc_drivelnk *__restrict self)
 
 PRIVATE BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 procfs_perproc_dcwdlink_v_readlink(struct flnknode *__restrict self,
-                                   USER CHECKED /*utf-8*/ char *buf,
+                                   NCX /*utf-8*/ char *buf,
                                    size_t bufsize)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	struct procfs_perproc_drivelnk *me;
@@ -3536,7 +3536,7 @@ procfs_perproc_dcwdlink_v_readlink(struct flnknode *__restrict self,
 
 PRIVATE BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 procfs_perproc_drivelink_v_readlink(struct flnknode *__restrict self,
-                                    USER CHECKED /*utf-8*/ char *buf,
+                                    NCX /*utf-8*/ char *buf,
                                     size_t bufsize)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	struct procfs_perproc_drivelnk *me;
@@ -3818,7 +3818,7 @@ NOTHROW(KCALL procfs_perproc_drives_enum_v_fini)(struct fdirenum *__restrict sel
 }
 
 PRIVATE BLOCKING NONNULL((1, 5)) size_t KCALL
-procfs_perproc_drives_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+procfs_perproc_drives_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                               size_t bufsize, readdir_mode_t readdir_mode,
                               struct flnknode_ops const *__restrict ops)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
@@ -3860,14 +3860,14 @@ again:
 }
 
 PRIVATE BLOCKING NONNULL((1)) size_t KCALL
-procfs_perproc_dcwd_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+procfs_perproc_dcwd_enum_v_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                                    size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	return procfs_perproc_drives_readdir(self, buf, bufsize, readdir_mode, &procfs_perproc_dcwdlink_ops);
 }
 
 PRIVATE BLOCKING NONNULL((1)) size_t KCALL
-procfs_perproc_drives_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+procfs_perproc_drives_enum_v_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                                      size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	return procfs_perproc_drives_readdir(self, buf, bufsize, readdir_mode, &procfs_perproc_drivelink_ops);

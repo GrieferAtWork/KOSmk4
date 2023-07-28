@@ -35,7 +35,7 @@ DECL_BEGIN
 PUBLIC NONNULL((1)) void KCALL
 mpart_ll_writemem(struct mpart *__restrict self,
                   mpart_reladdr_t offset,
-                  USER CHECKED void const *src,
+                  NCX void const *src,
                   size_t num_bytes)
 		THROWS(E_SEGFAULT)
 #define LOCAL_doio(part_physaddr, num_bytes, request_offset) \

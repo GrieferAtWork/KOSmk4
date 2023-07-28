@@ -239,7 +239,7 @@ NOTHROW(FCALL GDB_DecodeHexInplaceString)(char *ptr) {
 /* Print a message while in non-stop or all-stop mode.
  * @return: * : The total number of printed bytes. */
 INTERN size_t FCALL
-GDBServer_PrintMessageInNonStopMode(USER CHECKED char const *message,
+GDBServer_PrintMessageInNonStopMode(NCX char const *message,
                                     size_t message_length) {
 	return (size_t)syslog_printer(SYSLOG_LEVEL_RAW,
 	                              message,
@@ -249,7 +249,7 @@ GDBServer_PrintMessageInNonStopMode(USER CHECKED char const *message,
 /* Print a message while in non-stop or all-stop mode.
  * @return: * : The total number of printed bytes. */
 INTERN size_t FCALL
-GDBServer_PrintMessageInAllStopMode(USER CHECKED char const *message,
+GDBServer_PrintMessageInAllStopMode(NCX char const *message,
                                     size_t message_length) {
 	size_t result = message_length;
 	if likely(message_length != 0) {

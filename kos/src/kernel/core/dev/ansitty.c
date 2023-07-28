@@ -45,19 +45,19 @@ DECL_BEGIN
 
 PUBLIC NONNULL((1)) size_t KCALL
 ansittydev_v_write(struct mfile *__restrict self,
-                   USER CHECKED void const *src,
+                   NCX void const *src,
                    size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
 	struct ansittydev *me = mfile_asansitty(self);
 #if !defined(NDEBUG) && 0
 	printk(KERN_DEBUG "[ansittydev_v_write] %$q\n", num_bytes, src);
 #endif
-	return (size_t)ansitty_printer(&me->at_ansi, (USER CHECKED char const *)src, num_bytes);
+	return (size_t)ansitty_printer(&me->at_ansi, (NCX char const *)src, num_bytes);
 }
 
 
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 ansittydev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-                   USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+                   NCX UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct ansittydev *me = mfile_asansitty(self);
 	switch (cmd) {
 

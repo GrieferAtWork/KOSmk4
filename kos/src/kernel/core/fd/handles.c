@@ -657,7 +657,7 @@ handles_install_into_simple(fd_t fd, struct handle const *__restrict nhand)
  * @return: * : The file descriptor slot into which `hand' was installed. */
 PUBLIC BLOCKING NONNULL((1)) fd_t FCALL
 handles_install_openfd(struct handle const *__restrict hand,
-                       USER UNCHECKED struct openfd *data)
+                       NCX UNCHECKED struct openfd *data)
 		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK,

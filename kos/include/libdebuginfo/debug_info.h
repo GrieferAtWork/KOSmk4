@@ -140,66 +140,66 @@ typedef struct di_debuginfo_component_attrib_struct {
 } di_debuginfo_component_attrib_t;
 
 typedef struct di_debuginfo_component_struct {
-	__UINTPTR_HALF_TYPE__                            dic_tag;         /* Component tag (one of `DW_TAG_*'; e.g. `DW_TAG_compile_unit') */
-	__uint8_t                                        dic_haschildren; /* `DW_CHILDREN_yes' if follow-up on this entry is a child */
+	__UINTPTR_HALF_TYPE__                        dic_tag;         /* Component tag (one of `DW_TAG_*'; e.g. `DW_TAG_compile_unit') */
+	__uint8_t                                    dic_haschildren; /* `DW_CHILDREN_yes' if follow-up on this entry is a child */
 #if __SIZEOF_POINTER__ >= 4
-	__uint8_t                                      __dic_pad[(sizeof(void *) / 2) - 1]; /* ... */
+	__uint8_t                                  __dic_pad[(sizeof(void *) / 2) - 1]; /* ... */
 #endif /* __SIZEOF_POINTER__ >= 4 */
-	__CHECKED di_debuginfo_component_attrib_t const *dic_attrib;      /* [1..1] Pointer to the list of (attr_name, attr_form) ULEB pairs
-	                                                                   *        of this entry. This list is terminated by a pair (0, 0). */
+	__NCX di_debuginfo_component_attrib_t const *dic_attrib;      /* [1..1] Pointer to the list of (attr_name, attr_form) ULEB pairs
+	                                                               *        of this entry. This list is terminated by a pair (0, 0). */
 } di_debuginfo_component_t;
 
 typedef struct di_rnglists_sections_struct {
 	/* NOTE: The order of members in this struct is important!
 	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
-	__CHECKED __byte_t const *drs_debug_rnglists_start;  /* [0..1] `.debug_rnglists' start */
-	__CHECKED __byte_t const *drs_debug_rnglists_end;    /* [0..1] `.debug_rnglists' end */
-	__CHECKED __byte_t const *drs_debug_ranges_start;    /* [0..1] `.debug_ranges' start */
-	__CHECKED __byte_t const *drs_debug_ranges_end;      /* [0..1] `.debug_ranges' end */
+	__NCX __byte_t const *drs_debug_rnglists_start;  /* [0..1] `.debug_rnglists' start */
+	__NCX __byte_t const *drs_debug_rnglists_end;    /* [0..1] `.debug_rnglists' end */
+	__NCX __byte_t const *drs_debug_ranges_start;    /* [0..1] `.debug_ranges' start */
+	__NCX __byte_t const *drs_debug_ranges_end;      /* [0..1] `.debug_ranges' end */
 } di_rnglists_sections_t;
 
 typedef struct di_string_sections_struct {
 	/* NOTE: The order of members in this struct is important!
 	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
-	__CHECKED __byte_t const *dss_debug_str_start;      /* [0..1] `.debug_str' start */
-	__CHECKED __byte_t const *dss_debug_str_end;        /* [0..1] `.debug_str' end */
-	__CHECKED __byte_t const *dss_debug_line_str_start; /* [0..1] `.debug_str' start */
-	__CHECKED __byte_t const *dss_debug_line_str_end;   /* [0..1] `.debug_str' end */
+	__NCX __byte_t const *dss_debug_str_start;      /* [0..1] `.debug_str' start */
+	__NCX __byte_t const *dss_debug_str_end;        /* [0..1] `.debug_str' end */
+	__NCX __byte_t const *dss_debug_line_str_start; /* [0..1] `.debug_str' start */
+	__NCX __byte_t const *dss_debug_line_str_end;   /* [0..1] `.debug_str' end */
 } di_string_sections_t;
 
 typedef struct di_debuginfo_cu_parser_sections_struct {
 	/* NOTE: The order of members in this struct is important!
 	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
-	__CHECKED __byte_t const *cps_debug_loclists_start; /* [0..1][const] `.debug_loclists' start */
-	__CHECKED __byte_t const *cps_debug_loclists_end;   /* [0..1][const] `.debug_loclists' end */
-	__CHECKED __byte_t const *cps_debug_loc_start;      /* [0..1][const] `.debug_loc' start */
-	__CHECKED __byte_t const *cps_debug_loc_end;        /* [0..1][const] `.debug_loc' end */
-	__CHECKED __byte_t const *cps_debug_abbrev_start;   /* [1..1][const] `.debug_abbrev' start */
-	__CHECKED __byte_t const *cps_debug_abbrev_end;     /* [1..1][const] `.debug_abbrev' end */
-	__CHECKED __byte_t const *cps_debug_info_start;     /* [0..1][const] `.debug_info' start */
-	__CHECKED __byte_t const *cps_debug_info_end;       /* [0..1][const] `.debug_info' end */
+	__NCX __byte_t const *cps_debug_loclists_start; /* [0..1][const] `.debug_loclists' start */
+	__NCX __byte_t const *cps_debug_loclists_end;   /* [0..1][const] `.debug_loclists' end */
+	__NCX __byte_t const *cps_debug_loc_start;      /* [0..1][const] `.debug_loc' start */
+	__NCX __byte_t const *cps_debug_loc_end;        /* [0..1][const] `.debug_loc' end */
+	__NCX __byte_t const *cps_debug_abbrev_start;   /* [1..1][const] `.debug_abbrev' start */
+	__NCX __byte_t const *cps_debug_abbrev_end;     /* [1..1][const] `.debug_abbrev' end */
+	__NCX __byte_t const *cps_debug_info_start;     /* [0..1][const] `.debug_info' start */
+	__NCX __byte_t const *cps_debug_info_end;       /* [0..1][const] `.debug_info' end */
 	/*BEGIN:compat(di_string_sections_t)*/
-	__CHECKED __byte_t const *cps_debug_str_start;      /* [0..1][const] `.debug_str' start
-	                                                     * NOTE: When set equal to `cps_debug_str_end', strings referring to
-	                                                     *       this section will be returned  as `???' (3 question  marks) */
-	__CHECKED __byte_t const *cps_debug_str_end;        /* [0..1][const] `.debug_str' end */
-	__CHECKED __byte_t const *cps_debug_line_str_start; /* [0..1][const] `.debug_line_str' start
-	                                                     * NOTE: When set equal to `cps_debug_line_str_end', strings referring
-	                                                     *       to  this section will be returned as `???' (3 question marks) */
-	__CHECKED __byte_t const *cps_debug_line_str_end;   /* [0..1][const] `.debug_line_str' end */
+	__NCX __byte_t const *cps_debug_str_start;      /* [0..1][const] `.debug_str' start
+	                                                 * NOTE: When set equal to `cps_debug_str_end', strings referring to
+	                                                 *       this section will be returned  as `???' (3 question  marks) */
+	__NCX __byte_t const *cps_debug_str_end;        /* [0..1][const] `.debug_str' end */
+	__NCX __byte_t const *cps_debug_line_str_start; /* [0..1][const] `.debug_line_str' start
+	                                                 * NOTE: When set equal to `cps_debug_line_str_end', strings referring
+	                                                 *       to  this section will be returned as `???' (3 question marks) */
+	__NCX __byte_t const *cps_debug_line_str_end;   /* [0..1][const] `.debug_line_str' end */
 	/*END:compat(di_string_sections_t)*/
 } di_debuginfo_cu_parser_sections_t;
 #define di_debuginfo_cu_parser_sections_as_di_string_sections(self) \
 	((di_string_sections_t *)&(self)->cps_debug_str_start)
 
 typedef struct di_debuginfo_cu_abbrev_cache_entry_struct {
-	__uintptr_t               ace_code; /* The abbreviation code (or 0 if this cache entry is unused) */
-	__CHECKED __byte_t const *ace_data; /* [1..1][valid_if(ace_code)] Abbreviation code data.
-	                                     * This pointer points into the .debug_info section and should be loaded as:
-	                                     * >> byte_t const *reader = ace_data;
-	                                     * >> component.dic_tag         = dwarf_decode_uleb128(&reader);
-	                                     * >> component.dic_haschildren = *reader++;
-	                                     * >> component.dic_attrib      = reader; */
+	__uintptr_t           ace_code; /* The abbreviation code (or 0 if this cache entry is unused) */
+	__NCX __byte_t const *ace_data; /* [1..1][valid_if(ace_code)] Abbreviation code data.
+	                                 * This pointer points into the .debug_info section and should be loaded as:
+	                                 * >> byte_t const *reader = ace_data;
+	                                 * >> component.dic_tag         = dwarf_decode_uleb128(&reader);
+	                                 * >> component.dic_haschildren = *reader++;
+	                                 * >> component.dic_attrib      = reader; */
 } di_debuginfo_cu_abbrev_cache_entry_t;
 
 
@@ -208,7 +208,7 @@ typedef struct di_debuginfo_cu_abbrev_cache_entry_struct {
 #define DEBUGINFO_ABBREV_CACHE_MINSIZE 16
 
 typedef struct di_debuginfo_cu_abbrev_struct {
-	__CHECKED __byte_t const             *dua_abbrev;     /* [1..1][const] Starting address of debug abbreviations (in .debug_abbrev). */
+	__NCX __byte_t const                 *dua_abbrev;     /* [1..1][const] Starting address of debug abbreviations (in .debug_abbrev). */
 	di_debuginfo_cu_abbrev_cache_entry_t *dua_cache_list; /* [1..dua_cache_size][owned_if(!= dua_stcache)] Cache vector, or (di_debuginfo_cu_abbrev_cache_entry_t *)-1 if unused. */
 	__size_t                              dua_cache_size; /* Allocated (dua_cache_list != dua_stcache) or initialized (dua_cache_list == dua_stcache) cache size. */
 	__size_t                              dua_cache_next; /* Index to the cache entry that should be overwritten next. */
@@ -216,11 +216,11 @@ typedef struct di_debuginfo_cu_abbrev_struct {
 } di_debuginfo_cu_abbrev_t;
 
 typedef struct di_debuginfo_cu_simple_parser_struct {
-	__CHECKED __byte_t const *dsp_cu_info_end; /* [1..1][const] End address of debug information data (usually in .debug_info). */
-	__CHECKED __byte_t const *dsp_cu_info_pos; /* [1..1][>= dup_cu_info_hdr && <= dup_base.dsp_cu_info_pos] Current position in debug information data (usually in .debug_info). */
-	__uint8_t                 dsp_ptrsize;     /* Pointer size (4 in 32-bit DWARF; 8 in 64-bit DWARF). */
-	__uint8_t                 dsp_addrsize;    /* Address size */
-	__uint16_t                dsp_version;     /* DWARF version */
+	__NCX __byte_t const *dsp_cu_info_end; /* [1..1][const] End address of debug information data (usually in .debug_info). */
+	__NCX __byte_t const *dsp_cu_info_pos; /* [1..1][>= dup_cu_info_hdr && <= dup_base.dsp_cu_info_pos] Current position in debug information data (usually in .debug_info). */
+	__uint8_t             dsp_ptrsize;     /* Pointer size (4 in 32-bit DWARF; 8 in 64-bit DWARF). */
+	__uint8_t             dsp_addrsize;    /* Address size */
+	__uint16_t            dsp_version;     /* DWARF version */
 } di_debuginfo_cu_simple_parser_t;
 
 typedef struct di_debuginfo_cu_parser_struct
@@ -240,7 +240,7 @@ typedef struct di_debuginfo_cu_parser_struct
 	di_debuginfo_cu_abbrev_t                *dup_cu_abbrev;   /* [1..1][const] Abbreviation code controller. */
 	di_debuginfo_component_t                 dup_comp;        /* The component currently being parsed. */
 	__uintptr_t                              dup_child_depth; /* The child-recursion-depth of `dp_comp' */
-	__CHECKED __byte_t const                *dup_cu_info_hdr; /* [1..1][const] Address of the debug information header (in .debug_info). */
+	__NCX __byte_t const                    *dup_cu_info_hdr; /* [1..1][const] Address of the debug information header (in .debug_info). */
 } di_debuginfo_cu_parser_t;
 
 #ifndef __di_debuginfo_location_t_defined
@@ -248,9 +248,9 @@ typedef struct di_debuginfo_cu_parser_struct
 /* NOTE: The user-interface API for this type is exported
  *       by  `libunwind',  rather  than   `libdebuginfo'! */
 typedef struct di_debuginfo_location_struct {
-	__CHECKED __byte_t const *l_expr;   /* [0..1] Pointer to a CFI expression (for use with `unwind_emulator_exec') for the pointed-to expression. */
-	__CHECKED __byte_t const *l_llist4; /* [0..1] Pointer to a CFI location list (points into the `.debug_loc' section). */
-	__CHECKED __byte_t const *l_llist5; /* [0..1] Pointer to a CFI location list (points into the `.debug_loclists' section). */
+	__NCX __byte_t const *l_expr;   /* [0..1] Pointer to a CFI expression (for use with `unwind_emulator_exec') for the pointed-to expression. */
+	__NCX __byte_t const *l_llist4; /* [0..1] Pointer to a CFI location list (points into the `.debug_loc' section). */
+	__NCX __byte_t const *l_llist5; /* [0..1] Pointer to a CFI location list (points into the `.debug_loclists' section). */
 } di_debuginfo_location_t;
 #endif /* !__di_debuginfo_location_t_defined */
 
@@ -312,20 +312,20 @@ typedef struct di_debuginfo_location_struct {
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 typedef __ATTR_NONNULL_T((1, 3, 4, 5)) debuginfo_errno_t
-__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_LOADUNIT)(__CHECKED __byte_t const **__restrict pdebug_info_reader,
-                                                                __CHECKED __byte_t const *debug_info_end,
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_LOADUNIT)(__NCX __byte_t const **__restrict pdebug_info_reader,
+                                                                __NCX __byte_t const *debug_info_end,
                                                                 di_debuginfo_cu_parser_sections_t const *__restrict sectinfo,
                                                                 di_debuginfo_cu_parser_t *__restrict result,
                                                                 di_debuginfo_cu_abbrev_t *__restrict abbrev,
-                                                                __CHECKED __byte_t const *first_component_pointer);
+                                                                __NCX __byte_t const *first_component_pointer);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3, 4, 5)) debuginfo_errno_t
-__NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_loadunit)(__CHECKED __byte_t const **__restrict pdebug_info_reader,
-                                                            __CHECKED __byte_t const *debug_info_end,
+__NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_loadunit)(__NCX __byte_t const **__restrict pdebug_info_reader,
+                                                            __NCX __byte_t const *debug_info_end,
                                                             di_debuginfo_cu_parser_sections_t const *__restrict sectinfo,
                                                             di_debuginfo_cu_parser_t *__restrict result,
                                                             di_debuginfo_cu_abbrev_t *__restrict abbrev,
-                                                            __CHECKED __byte_t const *first_component_pointer);
+                                                            __NCX __byte_t const *first_component_pointer);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 
@@ -345,12 +345,12 @@ __NOTHROW(LIBDEBUGINFO_CC debuginfo_cu_abbrev_fini)(di_debuginfo_cu_abbrev_t *__
 typedef __ATTR_NONNULL_T((1, 3)) void
 __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_SKIPFORM)(di_debuginfo_cu_simple_parser_t *__restrict self,
                                                                 dwarf_uleb128_t form,
-                                                                __CHECKED __byte_t const **__restrict p_attr_reader);
+                                                                __NCX __byte_t const **__restrict p_attr_reader);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) void
 __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_skipform)(di_debuginfo_cu_simple_parser_t *__restrict self,
                                                             dwarf_uleb128_t form,
-                                                            __CHECKED __byte_t const **__restrict p_attr_reader);
+                                                            __NCX __byte_t const **__restrict p_attr_reader);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 /* Start a new component.
@@ -376,11 +376,11 @@ LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debug
  * debug information start location of the next componet within  `*p_dip' */
 typedef __ATTR_NONNULL_T((1, 2)) __BOOL
 __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_NEXT_WITH_DIP)(di_debuginfo_cu_parser_t *__restrict self,
-                                                                     __CHECKED __byte_t const **__restrict p_dip);
+                                                                     __NCX __byte_t const **__restrict p_dip);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2)) __BOOL
 __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_next_with_dip)(di_debuginfo_cu_parser_t *__restrict self,
-                                                                 __CHECKED __byte_t const **__restrict p_dip);
+                                                                 __NCX __byte_t const **__restrict p_dip);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 
@@ -407,25 +407,25 @@ typedef struct di_debuginfo_block_struct {
  *  - debuginfo_cu_parser_getref():    DW_FORM_ref_addr, DW_FORM_ref1, DW_FORM_ref2, DW_FORM_ref4, DW_FORM_ref8, DW_FORM_ref_sig8, DW_FORM_ref_udata, DW_FORM_ref_sup4, DW_FORM_ref_sig8, DW_FORM_ref_sup8
  *  - debuginfo_cu_parser_getexpr():   DW_FORM_exprloc
  *  - debuginfo_cu_parser_getblock():  DW_FORM_block, DW_FORM_block1, DW_FORM_block2, DW_FORM_block4 */
-typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETSTRING)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, __CHECKED char const **__restrict presult);
-typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETSTRING_EX)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __CHECKED char const **__restrict presult, di_string_sections_t const *__restrict sections);
+typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETSTRING)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, __NCX char const **__restrict presult);
+typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETSTRING_EX)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __NCX char const **__restrict presult, di_string_sections_t const *__restrict sections);
 typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETADDR)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult);
-typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETCONST)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult, __CHECKED __byte_t const *attr_reader);
-typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETCONST64)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult, __CHECKED __byte_t const *attr_reader);
-typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETCONST128)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __hybrid_uint128_t *__restrict presult, __CHECKED __byte_t const *attr_reader);
+typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETCONST)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult, __NCX __byte_t const *attr_reader);
+typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETCONST64)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult, __NCX __byte_t const *attr_reader);
+typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETCONST128)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __hybrid_uint128_t *__restrict presult, __NCX __byte_t const *attr_reader);
 typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETFLAG)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __BOOL *__restrict presult);
-typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETREF)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, __CHECKED __byte_t const **__restrict presult);
+typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETREF)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, __NCX __byte_t const **__restrict presult);
 typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETEXPR)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, di_debuginfo_location_t *__restrict result);
 typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETBLOCK)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, di_debuginfo_block_t *__restrict result);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, __CHECKED char const **__restrict presult);
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getstring_ex)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __CHECKED char const **__restrict presult, di_string_sections_t const *__restrict sections);
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, __NCX char const **__restrict presult);
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getstring_ex)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __NCX char const **__restrict presult, di_string_sections_t const *__restrict sections);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getaddr)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult);
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getconst)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult, __CHECKED __byte_t const *attr_reader);
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getconst64)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uint64_t *__restrict presult, __CHECKED __byte_t const *attr_reader);
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getconst128)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __hybrid_uint128_t *__restrict presult, __CHECKED __byte_t const *attr_reader);
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getconst)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult, __NCX __byte_t const *attr_reader);
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getconst64)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uint64_t *__restrict presult, __NCX __byte_t const *attr_reader);
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getconst128)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __hybrid_uint128_t *__restrict presult, __NCX __byte_t const *attr_reader);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getflag)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __BOOL *__restrict presult);
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getref)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, __CHECKED __byte_t const **__restrict presult);
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getref)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, __NCX __byte_t const **__restrict presult);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getexpr)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, di_debuginfo_location_t *__restrict result);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getblock)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, di_debuginfo_block_t *__restrict result);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
@@ -441,8 +441,8 @@ typedef struct {
 
 typedef struct {
 	di_debuginfo_rnglists_t const *ri_ranges;   /* [1..1][const] The underlying range object. */
-	__CHECKED __byte_t const      *ri_pos;      /* [1..1] Current iterator position (or >= ri_end if the iterator was exhausted) */
-	__CHECKED __byte_t const      *ri_end;      /* [1..1][const] Iterator end position */
+	__NCX __byte_t const          *ri_pos;      /* [1..1] Current iterator position (or >= ri_end if the iterator was exhausted) */
+	__NCX __byte_t const          *ri_end;      /* [1..1][const] Iterator end position */
 	__uintptr_t                    ri_cubase;   /* Initial base */
 	__uint8_t                      ri_addrsize; /* [const] Address size. */
 	__uint8_t                      ri_isranges; /* [const] Non-zero if using the old `.debug_ranges'. */
@@ -546,9 +546,9 @@ typedef struct di_debuginfo_compile_unit_struct {
 	                                       * to this CU's address-to-line data blob.
 	                                       * If unknown,  set to  `(__uintptr_t)-1' (but  always assume  undefined
 	                                       * if this offset points past- or at the end of the .debug_line section) */
-	__CHECKED char const   *cu_name;      /* [0..1] Name of the compilation unit. */
-	__CHECKED char const   *cu_comp_dir;  /* [0..1] Path to  the compiler  base  directory (prepended  before  filenames,
-	                                       * this is essentially the getcwd() of the compiler when the CU was assembled). */
+	__NCX char const       *cu_name;      /* [0..1] Name of the compilation unit. */
+	__NCX char const       *cu_comp_dir;  /* [0..1] Path to  the compiler  base  directory (prepended  before  filenames,
+	                                           * this is essentially the getcwd() of the compiler when the CU was assembled). */
 } di_debuginfo_compile_unit_t;
 #define di_debuginfo_compile_unit_as_simple(self) ((di_debuginfo_compile_unit_simple_t *)&(self)->cu_ranges)
 
@@ -564,8 +564,8 @@ typedef struct di_debuginfo_subprogram_struct {
 #define DW_SUBPROGRAM_FEXTERN   0x00000001 /* The function is either INTERN or PUBLIC */
 #define DW_SUBPROGRAM_FNORETURN 0x00000002 /* The function is either NORETURN */
 	__uintptr_t             sp_flags;        /* Function flags (Set of `DW_SUBPROGRAM_F*') */
-	__CHECKED char const   *sp_name;         /* [0..1] Name of the function. */
-	__CHECKED char const   *sp_rawname;      /* [0..1] Raw (linkage) name of the function. */
+	__NCX char const       *sp_name;         /* [0..1] Name of the function. */
+	__NCX char const       *sp_rawname;      /* [0..1] Raw (linkage) name of the function. */
 	di_debuginfo_location_t sp_frame_base;   /* Frame base expression. */
 	di_debuginfo_rnglists_t sp_ranges;       /* Program counter ranges. */
 	__uintptr_t             sp_decl_file;    /* Declaring file index (used with the addr2line program pointed
@@ -576,24 +576,24 @@ typedef struct di_debuginfo_subprogram_struct {
 
 typedef struct di_debuginfo_inlined_subroutine_struct {
 	/* For `DW_TAG_inlined_subroutine' */
-	__CHECKED __byte_t const *is_subprogram;    /* [0..1] Pointer to the debug_info for the function's declaration (i.e. its `DW_TAG_subprogram').
-	                                             * To load this structure, do the following:
-	                                             * >> if ((...).is_subprogram != NULL) {
-	                                             * >>     parser.dsp_cu_info_pos = (...).is_subprogram;
-	                                             * >>     debuginfo_cu_parser_next(&parser);
-	                                             * >>     if (parser.dup_comp.dic_tag == DW_TAG_subprogram) {
-	                                             * >>         di_debuginfo_subprogram_t prog;
-	                                             * >>         if (debuginfo_cu_parser_loadattr_subprogram(&parser, &prog) == DEBUG_INFO_ERROR_SUCCESS) {
-	                                             * >>             // Success
-	                                             * >>             ...
-	                                             * >>         }
-	                                             * >>     }
-	                                             * >> } */
-	di_debuginfo_rnglists_t   is_ranges;        /* Program counter ranges. */
-	__uintptr_t               is_call_file;     /* Call source file index (used with the addr2line program pointed
-	                                             * to by the associated CU's  `cu_stmt_list') (or 0 if  undefined) */
-	__uintptr_t               is_call_line;     /* Call source line number (or 0 if undefined) */
-	__uintptr_t               is_call_column;   /* Call source column offset (or 0 if undefined) */
+	__NCX __byte_t const   *is_subprogram;    /* [0..1] Pointer to the debug_info for the function's declaration (i.e. its `DW_TAG_subprogram').
+	                                           * To load this structure, do the following:
+	                                           * >> if ((...).is_subprogram != NULL) {
+	                                           * >>     parser.dsp_cu_info_pos = (...).is_subprogram;
+	                                           * >>     debuginfo_cu_parser_next(&parser);
+	                                           * >>     if (parser.dup_comp.dic_tag == DW_TAG_subprogram) {
+	                                           * >>         di_debuginfo_subprogram_t prog;
+	                                           * >>         if (debuginfo_cu_parser_loadattr_subprogram(&parser, &prog) == DEBUG_INFO_ERROR_SUCCESS) {
+	                                           * >>             // Success
+	                                           * >>             ...
+	                                           * >>         }
+	                                           * >>     }
+	                                           * >> } */
+	di_debuginfo_rnglists_t is_ranges;        /* Program counter ranges. */
+	__uintptr_t             is_call_file;     /* Call source file index (used with the addr2line program pointed
+	                                           * to by the associated CU's  `cu_stmt_list') (or 0 if  undefined) */
+	__uintptr_t             is_call_line;     /* Call source line number (or 0 if undefined) */
+	__uintptr_t             is_call_column;   /* Call source column offset (or 0 if undefined) */
 } di_debuginfo_inlined_subroutine_t;
 
 typedef struct di_debuginfo_lexical_block_struct {
@@ -603,43 +603,43 @@ typedef struct di_debuginfo_lexical_block_struct {
 
 typedef struct di_debuginfo_type_struct {
 	/* For `DW_TAG_*_type' */
-	__CHECKED char const     *t_name;        /* [0..1] Name of the type. */
-	__CHECKED char const     *t_rawname;     /* [0..1] Raw (linkage) name of the type. */
-	__uintptr_t               t_decl_file;   /* Declaring file index (used with the addr2line program pointed
-	                                          * to by the associated CU's `cu_stmt_list') (or 0 if undefined) */
-	__uintptr_t               t_decl_line;   /* Declaring line number (or 0 if undefined) */
-	__uintptr_t               t_decl_column; /* Declaring column offset (or 0 if undefined) */
-	__uintptr_t               t_sizeof;      /* Size of this type (in bytes) (or 0 if undefined) */
-	__CHECKED __byte_t const *t_type;        /* [0..1] Underlying type (e.g. array element type). */
-	__uintptr_t               t_encoding;    /* Value of `DW_AT_encoding' (one of `DW_ATE_*', or 0 if undefined) */
+	__NCX char const     *t_name;        /* [0..1] Name of the type. */
+	__NCX char const     *t_rawname;     /* [0..1] Raw (linkage) name of the type. */
+	__uintptr_t           t_decl_file;   /* Declaring file index (used with the addr2line program pointed
+	                                      * to by the associated CU's `cu_stmt_list') (or 0 if undefined) */
+	__uintptr_t           t_decl_line;   /* Declaring line number (or 0 if undefined) */
+	__uintptr_t           t_decl_column; /* Declaring column offset (or 0 if undefined) */
+	__uintptr_t           t_sizeof;      /* Size of this type (in bytes) (or 0 if undefined) */
+	__NCX __byte_t const *t_type;        /* [0..1] Underlying type (e.g. array element type). */
+	__uintptr_t           t_encoding;    /* Value of `DW_AT_encoding' (one of `DW_ATE_*', or 0 if undefined) */
 } di_debuginfo_type_t;
 
 
 typedef struct di_debuginfo_member_struct {
 	/* For `DW_TAG_member' */
-	__CHECKED __byte_t const *m_type;        /* [0..1] Pointer  to  the  debug_info  for  the  member's  type  (which  is  one  of   `DW_TAG_*_type').
-	                                          * To load this structure, create a copy of your parser and assign this pointer to it's `dsp_cu_info_pos'
-	                                          * field. Afterwards, call `debuginfo_cu_parser_next()' to load the pointed-to component. */
-	__CHECKED char const     *m_name;        /* [0..1] Name of the member. */
-	__uintptr_t               m_decl_file;   /* Declaring file index (used with the addr2line program pointed
-	                                          * to by the associated CU's `cu_stmt_list') (or 0 if undefined) */
-	__uintptr_t               m_decl_line;   /* Declaring line number (or 0 if undefined) */
-	__uintptr_t               m_decl_column; /* Declaring column offset (or 0 if undefined) */
-	__uintptr_t               m_offset;      /* offsetof() this member (or (uintptr_t)-1 if undefined) */
-	__uintptr_t               m_bit_size;    /* Number of bits apart of a bit-field (or `0' if this isn't a bit-field) */
-	__uintptr_t               m_bit_offset;  /* Number of bits to the left of the leftmost (most significant) bit of the bit field value. */
+	__NCX __byte_t const *m_type;        /* [0..1] Pointer  to  the  debug_info  for  the  member's  type  (which  is  one  of   `DW_TAG_*_type').
+	                                      * To load this structure, create a copy of your parser and assign this pointer to it's `dsp_cu_info_pos'
+	                                      * field. Afterwards, call `debuginfo_cu_parser_next()' to load the pointed-to component. */
+	__NCX char const     *m_name;        /* [0..1] Name of the member. */
+	__uintptr_t           m_decl_file;   /* Declaring file index (used with the addr2line program pointed
+	                                      * to by the associated CU's `cu_stmt_list') (or 0 if undefined) */
+	__uintptr_t           m_decl_line;   /* Declaring line number (or 0 if undefined) */
+	__uintptr_t           m_decl_column; /* Declaring column offset (or 0 if undefined) */
+	__uintptr_t           m_offset;      /* offsetof() this member (or (uintptr_t)-1 if undefined) */
+	__uintptr_t           m_bit_size;    /* Number of bits apart of a bit-field (or `0' if this isn't a bit-field) */
+	__uintptr_t           m_bit_offset;  /* Number of bits to the left of the leftmost (most significant) bit of the bit field value. */
 } di_debuginfo_member_t;
 
 typedef struct di_debuginfo_variable_struct {
 	/* For `DW_TAG_variable' / `DW_TAG_formal_parameter' */
-	__CHECKED __byte_t const *v_type;        /* [0..1] Type of this variable. */
-	di_debuginfo_location_t   v_location;    /* CFI expression to decode the storage location of this variable. */
-	__CHECKED char const     *v_name;        /* [0..1] Name of the variable. */
-	__CHECKED char const     *v_rawname;     /* [0..1] Raw (linkage) name of the variable. */
-	__uintptr_t               v_decl_file;   /* Declaring file index (used with the addr2line program pointed
-	                                          * to by the associated CU's `cu_stmt_list') (or 0 if undefined) */
-	__uintptr_t               v_decl_line;   /* Declaring line number (or 0 if undefined) */
-	__uintptr_t               v_decl_column; /* Declaring column offset (or 0 if undefined) */
+	__NCX __byte_t const   *v_type;        /* [0..1] Type of this variable. */
+	di_debuginfo_location_t v_location;    /* CFI expression to decode the storage location of this variable. */
+	__NCX char const       *v_name;        /* [0..1] Name of the variable. */
+	__NCX char const       *v_rawname;     /* [0..1] Raw (linkage) name of the variable. */
+	__uintptr_t             v_decl_file;   /* Declaring file index (used with the addr2line program pointed
+	                                        * to by the associated CU's `cu_stmt_list') (or 0 if undefined) */
+	__uintptr_t             v_decl_line;   /* Declaring line number (or 0 if undefined) */
+	__uintptr_t             v_decl_column; /* Declaring column offset (or 0 if undefined) */
 } di_debuginfo_variable_t;
 
 /* Load attributes specific to a certain component:
@@ -725,7 +725,7 @@ typedef __ATTR_NONNULL_T((1, 3, 4)) __ssize_t
 (LIBDEBUGINFO_CC *PDEBUGINFO_PRINT_VALUE)(__pformatprinter printer, void *arg,
                                           di_debuginfo_cu_parser_t const *__restrict parser,
                                           di_debuginfo_type_t const *__restrict type,
-                                          __CHECKED char const *varname, __CHECKED void const *data,
+                                          __NCX char const *varname, __NCX void const *data,
                                           __size_t datasize, __size_t newline_indentation,
                                           debuginfo_print_format_t format_printer,
                                           void *format_arg, unsigned int flags);
@@ -733,7 +733,7 @@ typedef __ATTR_NONNULL_T((1, 3, 4)) __ssize_t
 (LIBDEBUGINFO_CC *PDEBUGINFO_PRINT_TYPENAME)(__pformatprinter printer, void *arg,
                                              di_debuginfo_cu_parser_t const *__restrict parser,
                                              di_debuginfo_type_t const *__restrict type,
-                                             __CHECKED char const *varname,
+                                             __NCX char const *varname,
                                              debuginfo_print_format_t format_printer,
                                              void *format_arg);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
@@ -741,7 +741,7 @@ LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3, 4)) __ssize_t LIBDEBUGINFO_CC
 debuginfo_print_value(__pformatprinter printer, void *arg,
                       di_debuginfo_cu_parser_t const *__restrict parser,
                       di_debuginfo_type_t const *__restrict type,
-                      __CHECKED char const *varname, __CHECKED void const *data,
+                      __NCX char const *varname, __NCX void const *data,
                       __size_t datasize, __size_t newline_indentation,
                       debuginfo_print_format_t format_printer,
                       void *format_arg, unsigned int flags);
@@ -749,7 +749,7 @@ LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3, 4)) __ssize_t LIBDEBUGINFO_CC
 debuginfo_print_typename(__pformatprinter printer, void *arg,
                          di_debuginfo_cu_parser_t const *__restrict parser,
                          di_debuginfo_type_t const *__restrict type,
-                         __CHECKED char const *varname,
+                         __NCX char const *varname,
                          debuginfo_print_format_t format_printer,
                          void *format_arg);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
@@ -763,31 +763,31 @@ debuginfo_print_typename(__pformatprinter printer, void *arg,
 typedef struct di_enum_locals_sections_struct {
 	/* NOTE: The order of members in this struct is important!
 	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
-	__CHECKED __byte_t const *el_debug_addr_start;     /* [0..1] `.debug_addr' start */
-	__CHECKED __byte_t const *el_debug_addr_end;       /* [0..1] `.debug_addr' end */
+	__NCX __byte_t const *el_debug_addr_start;     /* [0..1] `.debug_addr' start */
+	__NCX __byte_t const *el_debug_addr_end;       /* [0..1] `.debug_addr' end */
 	/*BEGIN:compat(di_debuginfo_cu_parser_sections_t)*/
-	__CHECKED __byte_t const *el_debug_loclists_start; /* [0..1] `.debug_loclists' start */
-	__CHECKED __byte_t const *el_debug_loclists_end;   /* [0..1] `.debug_loclists' end */
-	__CHECKED __byte_t const *el_debug_loc_start;      /* [0..1] `.debug_loc' start */
-	__CHECKED __byte_t const *el_debug_loc_end;        /* [0..1] `.debug_loc' end */
-	__CHECKED __byte_t const *el_debug_abbrev_start;   /* [0..1] `.debug_abbrev' start */
-	__CHECKED __byte_t const *el_debug_abbrev_end;     /* [0..1] `.debug_abbrev' end */
-	__CHECKED __byte_t const *el_debug_info_start;     /* [0..1] `.debug_info' start */
-	__CHECKED __byte_t const *el_debug_info_end;       /* [0..1] `.debug_info' end */
+	__NCX __byte_t const *el_debug_loclists_start; /* [0..1] `.debug_loclists' start */
+	__NCX __byte_t const *el_debug_loclists_end;   /* [0..1] `.debug_loclists' end */
+	__NCX __byte_t const *el_debug_loc_start;      /* [0..1] `.debug_loc' start */
+	__NCX __byte_t const *el_debug_loc_end;        /* [0..1] `.debug_loc' end */
+	__NCX __byte_t const *el_debug_abbrev_start;   /* [0..1] `.debug_abbrev' start */
+	__NCX __byte_t const *el_debug_abbrev_end;     /* [0..1] `.debug_abbrev' end */
+	__NCX __byte_t const *el_debug_info_start;     /* [0..1] `.debug_info' start */
+	__NCX __byte_t const *el_debug_info_end;       /* [0..1] `.debug_info' end */
 	/*BEGIN:compat(di_string_sections_t)*/
-	__CHECKED __byte_t const *el_debug_str_start;      /* [0..1] `.debug_str' start */
-	__CHECKED __byte_t const *el_debug_str_end;        /* [0..1] `.debug_str' end */
-	__CHECKED __byte_t const *el_debug_line_str_start; /* [0..1] `.debug_str' start */
-	__CHECKED __byte_t const *el_debug_line_str_end;   /* [0..1] `.debug_str' end */
+	__NCX __byte_t const *el_debug_str_start;      /* [0..1] `.debug_str' start */
+	__NCX __byte_t const *el_debug_str_end;        /* [0..1] `.debug_str' end */
+	__NCX __byte_t const *el_debug_line_str_start; /* [0..1] `.debug_str' start */
+	__NCX __byte_t const *el_debug_line_str_end;   /* [0..1] `.debug_str' end */
 	/*END:compat(di_string_sections_t)*/
 	/*END:compat(di_debuginfo_cu_parser_sections_t)*/
-	__CHECKED __byte_t const *el_debug_aranges_start;  /* [0..1] `.debug_aranges' start */
-	__CHECKED __byte_t const *el_debug_aranges_end;    /* [0..1] `.debug_aranges' end */
+	__NCX __byte_t const *el_debug_aranges_start;  /* [0..1] `.debug_aranges' start */
+	__NCX __byte_t const *el_debug_aranges_end;    /* [0..1] `.debug_aranges' end */
 	/*BEGIN:compat(di_rnglists_sections_t)*/
-	__CHECKED __byte_t const *el_debug_rnglists_start; /* [0..1] `.debug_rnglists' start */
-	__CHECKED __byte_t const *el_debug_rnglists_end;   /* [0..1] `.debug_rnglists' end */
-	__CHECKED __byte_t const *el_debug_ranges_start;   /* [0..1] `.debug_ranges' start */
-	__CHECKED __byte_t const *el_debug_ranges_end;     /* [0..1] `.debug_ranges' end */
+	__NCX __byte_t const *el_debug_rnglists_start; /* [0..1] `.debug_rnglists' start */
+	__NCX __byte_t const *el_debug_rnglists_end;   /* [0..1] `.debug_rnglists' end */
+	__NCX __byte_t const *el_debug_ranges_start;   /* [0..1] `.debug_ranges' start */
+	__NCX __byte_t const *el_debug_ranges_end;     /* [0..1] `.debug_ranges' end */
 	/*END:compat(di_rnglists_sections_t)*/
 } di_enum_locals_sections_t;
 
@@ -825,49 +825,49 @@ debuginfo_enum_locals(di_enum_locals_sections_t const *__restrict sectinfo,
 /* Super-structure containing pointers for _all_ debug-related sections */
 typedef struct di_debug_sections_struct {
 	/*BEGIN:compat(unwind_emulator_sections_t)*/
-	__CHECKED __byte_t const *ds_eh_frame_hdr_start;   /* [0..1] `.eh_frame_hdr' start */
-	__CHECKED __byte_t const *ds_eh_frame_hdr_end;     /* [0..1] `.eh_frame_hdr' end */
-	__CHECKED __byte_t const *ds_eh_frame_start;       /* [0..1] `.eh_frame' start */
-	__CHECKED __byte_t const *ds_eh_frame_end;         /* [0..1] `.eh_frame' end */
-	__CHECKED __byte_t const *ds_debug_frame_start;    /* [0..1] `.debug_frame' start */
-	__CHECKED __byte_t const *ds_debug_frame_end;      /* [0..1] `.debug_frame' end */
+	__NCX __byte_t const *ds_eh_frame_hdr_start;   /* [0..1] `.eh_frame_hdr' start */
+	__NCX __byte_t const *ds_eh_frame_hdr_end;     /* [0..1] `.eh_frame_hdr' end */
+	__NCX __byte_t const *ds_eh_frame_start;       /* [0..1] `.eh_frame' start */
+	__NCX __byte_t const *ds_eh_frame_end;         /* [0..1] `.eh_frame' end */
+	__NCX __byte_t const *ds_debug_frame_start;    /* [0..1] `.debug_frame' start */
+	__NCX __byte_t const *ds_debug_frame_end;      /* [0..1] `.debug_frame' end */
 	/*BEGIN:compat(di_enum_locals_sections_t)*/
-	__CHECKED __byte_t const *ds_debug_addr_start;     /* [0..1] `.debug_addr' start */
-	__CHECKED __byte_t const *ds_debug_addr_end;       /* [0..1] `.debug_addr' end */
+	__NCX __byte_t const *ds_debug_addr_start;     /* [0..1] `.debug_addr' start */
+	__NCX __byte_t const *ds_debug_addr_end;       /* [0..1] `.debug_addr' end */
 	/*BEGIN:compat(di_debuginfo_cu_parser_sections_t)*/
-	__CHECKED __byte_t const *ds_debug_loclists_start; /* [0..1] `.debug_loclists' start */
-	__CHECKED __byte_t const *ds_debug_loclists_end;   /* [0..1] `.debug_loclists' end */
-	__CHECKED __byte_t const *ds_debug_loc_start;      /* [0..1] `.debug_loc' start */
-	__CHECKED __byte_t const *ds_debug_loc_end;        /* [0..1] `.debug_loc' end */
+	__NCX __byte_t const *ds_debug_loclists_start; /* [0..1] `.debug_loclists' start */
+	__NCX __byte_t const *ds_debug_loclists_end;   /* [0..1] `.debug_loclists' end */
+	__NCX __byte_t const *ds_debug_loc_start;      /* [0..1] `.debug_loc' start */
+	__NCX __byte_t const *ds_debug_loc_end;        /* [0..1] `.debug_loc' end */
 	/*BEGIN:compat(di_addr2line_sections_t)*/
-	__CHECKED __byte_t const *ds_debug_abbrev_start;   /* [0..1] `.debug_abbrev' start */
-	__CHECKED __byte_t const *ds_debug_abbrev_end;     /* [0..1] `.debug_abbrev' end */
-	__CHECKED __byte_t const *ds_debug_info_start;     /* [0..1] `.debug_info' start */
-	__CHECKED __byte_t const *ds_debug_info_end;       /* [0..1] `.debug_info' end */
+	__NCX __byte_t const *ds_debug_abbrev_start;   /* [0..1] `.debug_abbrev' start */
+	__NCX __byte_t const *ds_debug_abbrev_end;     /* [0..1] `.debug_abbrev' end */
+	__NCX __byte_t const *ds_debug_info_start;     /* [0..1] `.debug_info' start */
+	__NCX __byte_t const *ds_debug_info_end;       /* [0..1] `.debug_info' end */
 	/*END:compat(unwind_emulator_sections_t)*/
 	/*BEGIN:compat(di_string_sections_t)*/
-	__CHECKED __byte_t const *ds_debug_str_start;      /* [0..1] `.debug_str' start */
-	__CHECKED __byte_t const *ds_debug_str_end;        /* [0..1] `.debug_str' end */
-	__CHECKED __byte_t const *ds_debug_line_str_start; /* [0..1] `.debug_line_str' start */
-	__CHECKED __byte_t const *ds_debug_line_str_end;   /* [0..1] `.debug_line_str' end */
+	__NCX __byte_t const *ds_debug_str_start;      /* [0..1] `.debug_str' start */
+	__NCX __byte_t const *ds_debug_str_end;        /* [0..1] `.debug_str' end */
+	__NCX __byte_t const *ds_debug_line_str_start; /* [0..1] `.debug_line_str' start */
+	__NCX __byte_t const *ds_debug_line_str_end;   /* [0..1] `.debug_line_str' end */
 	/*END:compat(di_string_sections_t)*/
 	/*END:compat(di_debuginfo_cu_parser_sections_t)*/
-	__CHECKED __byte_t const *ds_debug_aranges_start;  /* [0..1] `.debug_aranges' start */
-	__CHECKED __byte_t const *ds_debug_aranges_end;    /* [0..1] `.debug_aranges' end */
+	__NCX __byte_t const *ds_debug_aranges_start;  /* [0..1] `.debug_aranges' start */
+	__NCX __byte_t const *ds_debug_aranges_end;    /* [0..1] `.debug_aranges' end */
 	/*BEGIN:compat(di_rnglists_sections_t)*/
-	__CHECKED __byte_t const *ds_debug_rnglists_start; /* [0..1] `.debug_rnglists' start */
-	__CHECKED __byte_t const *ds_debug_rnglists_end;   /* [0..1] `.debug_rnglists' end */
-	__CHECKED __byte_t const *ds_debug_ranges_start;   /* [0..1] `.debug_ranges' start */
-	__CHECKED __byte_t const *ds_debug_ranges_end;     /* [0..1] `.debug_ranges' end */
+	__NCX __byte_t const *ds_debug_rnglists_start; /* [0..1] `.debug_rnglists' start */
+	__NCX __byte_t const *ds_debug_rnglists_end;   /* [0..1] `.debug_rnglists' end */
+	__NCX __byte_t const *ds_debug_ranges_start;   /* [0..1] `.debug_ranges' start */
+	__NCX __byte_t const *ds_debug_ranges_end;     /* [0..1] `.debug_ranges' end */
 	/*END:compat(di_rnglists_sections_t)*/
 	/*END:compat(di_enum_locals_sections_t)*/
-	__CHECKED __byte_t const *ds_debug_line_start;     /* [0..1] `.debug_line' start */
-	__CHECKED __byte_t const *ds_debug_line_end;       /* [0..1] `.debug_line' end */
-	__CHECKED __byte_t const *ds_strtab_start;         /* [0..1] `.strtab' / `.dynstr' start */
-	__CHECKED __byte_t const *ds_strtab_end;           /* [0..1] `.strtab' / `.dynstr' end */
-	__CHECKED __byte_t const *ds_symtab_start;         /* [0..1] `.symtab' / `.dynsym' start */
-	__CHECKED __byte_t const *ds_symtab_end;           /* [0..1] `.symtab' / `.dynsym' end */
-	__size_t                  ds_symtab_ent;           /* Entity size of `.symtab' / `.dynsym' */
+	__NCX __byte_t const *ds_debug_line_start;     /* [0..1] `.debug_line' start */
+	__NCX __byte_t const *ds_debug_line_end;       /* [0..1] `.debug_line' end */
+	__NCX __byte_t const *ds_strtab_start;         /* [0..1] `.strtab' / `.dynstr' start */
+	__NCX __byte_t const *ds_strtab_end;           /* [0..1] `.strtab' / `.dynstr' end */
+	__NCX __byte_t const *ds_symtab_start;         /* [0..1] `.symtab' / `.dynsym' start */
+	__NCX __byte_t const *ds_symtab_end;           /* [0..1] `.symtab' / `.dynsym' end */
+	__size_t              ds_symtab_ent;           /* Entity size of `.symtab' / `.dynsym' */
 	/*END:compat(di_addr2line_sections_t)*/
 } di_debug_sections_t;
 

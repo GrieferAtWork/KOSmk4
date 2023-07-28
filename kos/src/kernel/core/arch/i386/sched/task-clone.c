@@ -172,10 +172,10 @@ sys_clone64_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	bzero(&cargs, sizeof(cargs));
 	cargs.tca_flags       = ctx->rc_scinfo.rsi_regs[0] & ~CSIGNAL;              /* clone_flags */
 	cargs.tca_exit_signal = ctx->rc_scinfo.rsi_regs[0] & CSIGNAL;               /* clone_flags */
-	cargs.tca_pidfd       = (USER UNCHECKED fd_t *)ctx->rc_scinfo.rsi_regs[2];  /* parent_tidptr */
-	cargs.tca_parent_tid  = (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[2]; /* parent_tidptr */
-	cargs.tca_child_tid   = (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[3]; /* child_tidptr */
-	cargs.tca_stack       = (USER UNCHECKED void *)ctx->rc_scinfo.rsi_regs[1];  /* child_stack */
+	cargs.tca_pidfd       = (NCX UNCHECKED fd_t *)ctx->rc_scinfo.rsi_regs[2];  /* parent_tidptr */
+	cargs.tca_parent_tid  = (NCX UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[2]; /* parent_tidptr */
+	cargs.tca_child_tid   = (NCX UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[3]; /* child_tidptr */
+	cargs.tca_stack       = (NCX UNCHECKED void *)ctx->rc_scinfo.rsi_regs[1];  /* child_stack */
 	cargs.tca_arch.atca_x86_gsbase = x86_get_user_gsbase();
 	cargs.tca_arch.atca_x86_fsbase = ctx->rc_scinfo.rsi_regs[4];
 	if (!(ctx->rc_scinfo.rsi_regs[0] & CLONE_SETTLS))
@@ -191,9 +191,9 @@ sys_clone64_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 
 DEFINE_SYSCALL64_5(pid_t, clone,
                    syscall_ulong_t, flags,
-                   USER UNCHECKED void *, child_stack,
-                   USER UNCHECKED pid_t *, ptid,
-                   USER UNCHECKED pid_t *, ctid,
+                   NCX UNCHECKED void *, child_stack,
+                   NCX UNCHECKED pid_t *, ptid,
+                   NCX UNCHECKED pid_t *, ctid,
                    uintptr_t, newtls) {
 	(void)flags;
 	(void)child_stack;
@@ -219,10 +219,10 @@ sys_clone32_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	bzero(&cargs, sizeof(cargs));
 	cargs.tca_flags       = ctx->rc_scinfo.rsi_regs[0] & ~CSIGNAL;              /* clone_flags */
 	cargs.tca_exit_signal = ctx->rc_scinfo.rsi_regs[0] & CSIGNAL;               /* clone_flags */
-	cargs.tca_pidfd       = (USER UNCHECKED fd_t *)ctx->rc_scinfo.rsi_regs[2];  /* parent_tidptr */
-	cargs.tca_parent_tid  = (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[2]; /* parent_tidptr */
-	cargs.tca_child_tid   = (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[4]; /* child_tidptr */
-	cargs.tca_stack       = (USER UNCHECKED void *)ctx->rc_scinfo.rsi_regs[1];  /* child_stack */
+	cargs.tca_pidfd       = (NCX UNCHECKED fd_t *)ctx->rc_scinfo.rsi_regs[2];  /* parent_tidptr */
+	cargs.tca_parent_tid  = (NCX UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[2]; /* parent_tidptr */
+	cargs.tca_child_tid   = (NCX UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[4]; /* child_tidptr */
+	cargs.tca_stack       = (NCX UNCHECKED void *)ctx->rc_scinfo.rsi_regs[1];  /* child_stack */
 	cargs.tca_arch.atca_x86_fsbase = x86_get_user_fsbase();
 	cargs.tca_arch.atca_x86_gsbase = ctx->rc_scinfo.rsi_regs[3];
 	if (!(ctx->rc_scinfo.rsi_regs[0] & CLONE_SETTLS))
@@ -238,10 +238,10 @@ sys_clone32_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 
 DEFINE_SYSCALL32_5(pid_t, clone,
                    syscall_ulong_t, flags,
-                   USER UNCHECKED void *, child_stack,
-                   USER UNCHECKED pid_t *, ptid,
+                   NCX UNCHECKED void *, child_stack,
+                   NCX UNCHECKED pid_t *, ptid,
                    uintptr_t, newtls,
-                   USER UNCHECKED pid_t *, ctid) {
+                   NCX UNCHECKED pid_t *, ctid) {
 	(void)flags;
 	(void)child_stack;
 	(void)ptid;

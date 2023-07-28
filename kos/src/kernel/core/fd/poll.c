@@ -145,7 +145,7 @@ PRIVATE poll_mode_t KCALL do_poll_handle(struct handle &hnd,
 /* Low-level implementations for the user-space poll() and select() system calls. */
 #ifdef WANT_SYS_POLL
 PRIVATE size_t KCALL
-do_poll_scan(USER CHECKED struct pollfd *fds, size_t nfds) {
+do_poll_scan(NCX struct pollfd *fds, size_t nfds) {
 	size_t i, result = 0;
 	assert(!task_wasconnected());
 	for (i = 0; i < nfds; ++i) {
@@ -199,7 +199,7 @@ do_poll_scan(USER CHECKED struct pollfd *fds, size_t nfds) {
 }
 
 PRIVATE size_t KCALL
-do_poll(USER CHECKED struct pollfd *fds,
+do_poll(NCX struct pollfd *fds,
         size_t nfds, ktime_t abs_timeout) {
 	size_t result;
 	/* TODO: Special optimization for when  `abs_timeout == KTIME_NONBLOCK'!
@@ -225,7 +225,7 @@ again:
 }
 
 PRIVATE size_t KCALL
-do_poll_with_sigmask(USER CHECKED struct pollfd *fds,
+do_poll_with_sigmask(NCX struct pollfd *fds,
                      size_t nfds, ktime_t abs_timeout,
                      sigset_t const *__restrict sigmask) {
 	size_t result;
@@ -252,9 +252,9 @@ again:
 #ifdef WANT_SYS_SELECT
 PRIVATE size_t KCALL
 do_select_scan(size_t nfds,
-               USER CHECKED fd_set *readfds,
-               USER CHECKED fd_set *writefds,
-               USER CHECKED fd_set *exceptfds) {
+               NCX fd_set *readfds,
+               NCX fd_set *writefds,
+               NCX fd_set *exceptfds) {
 	typedef u8 fds_word_t;
 	enum { BITS_PER_FDS_WORD = 8 };
 	size_t nfds_words, i, result = 0;
@@ -340,9 +340,9 @@ do_select_scan(size_t nfds,
 
 PRIVATE size_t KCALL
 do_select(size_t nfds,
-          USER CHECKED fd_set *readfds,
-          USER CHECKED fd_set *writefds,
-          USER CHECKED fd_set *exceptfds,
+          NCX fd_set *readfds,
+          NCX fd_set *writefds,
+          NCX fd_set *exceptfds,
           ktime_t abs_timeout) {
 	size_t result;
 again:
@@ -366,9 +366,9 @@ again:
 
 PRIVATE size_t KCALL
 do_select_with_sigmask(size_t nfds,
-                       USER CHECKED fd_set *readfds,
-                       USER CHECKED fd_set *writefds,
-                       USER CHECKED fd_set *exceptfds,
+                       NCX fd_set *readfds,
+                       NCX fd_set *writefds,
+                       NCX fd_set *exceptfds,
                        ktime_t abs_timeout,
                        sigset_t const *__restrict sigmask) {
 	size_t result;
@@ -394,7 +394,7 @@ again:
 
 #ifdef __ARCH_WANT_SYSCALL_POLL
 DEFINE_SYSCALL3(ssize_t, poll,
-                USER UNCHECKED struct pollfd *, fds,
+                NCX UNCHECKED struct pollfd *, fds,
                 size_t, nfds, syscall_slong_t, timeout) {
 	size_t result;
 	validate_readwritem(fds, nfds, sizeof(struct pollfd));
@@ -419,8 +419,8 @@ DEFINE_SYSCALL3(ssize_t, poll,
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *
 sys_ppoll_generic(struct icpustate *__restrict state,
                   struct rpc_syscall_info *__restrict sc_info,
-                  USER UNCHECKED struct pollfd *fds, size_t nfds, ktime_t abs_timeout,
-                  USER UNCHECKED sigset_t const *sigmask, size_t sigsetsize) {
+                  NCX UNCHECKED struct pollfd *fds, size_t nfds, ktime_t abs_timeout,
+                  NCX UNCHECKED sigset_t const *sigmask, size_t sigsetsize) {
 	size_t result;
 	validate_readwritem(fds, nfds, sizeof(struct pollfd));
 	if (sigmask) {
@@ -458,10 +458,10 @@ again:
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 sys_ppoll_impl(struct icpustate *__restrict state,
                struct rpc_syscall_info *__restrict sc_info) {
-	USER UNCHECKED struct pollfd *fds                  = (USER UNCHECKED struct pollfd *)sc_info->rsi_regs[0];
+	NCX UNCHECKED struct pollfd *fds                  = (NCX UNCHECKED struct pollfd *)sc_info->rsi_regs[0];
 	size_t nfds                                        = (size_t)sc_info->rsi_regs[1];
-	USER UNCHECKED struct timespec32 const *timeout_ts = (USER UNCHECKED struct timespec32 const *)sc_info->rsi_regs[2];
-	USER UNCHECKED sigset_t const *sigmask             = (USER UNCHECKED sigset_t const *)sc_info->rsi_regs[3];
+	NCX UNCHECKED struct timespec32 const *timeout_ts = (NCX UNCHECKED struct timespec32 const *)sc_info->rsi_regs[2];
+	NCX UNCHECKED sigset_t const *sigmask             = (NCX UNCHECKED sigset_t const *)sc_info->rsi_regs[3];
 	size_t sigsetsize                                  = (size_t)sc_info->rsi_regs[4];
 	ktime_t abs_timeout;
 	abs_timeout = KTIME_INFINITE;
@@ -487,9 +487,9 @@ sys_ppoll_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 }
 
 DEFINE_SYSCALL5(ssize_t, ppoll,
-                USER UNCHECKED struct pollfd *, fds, size_t, nfds,
-                USER UNCHECKED struct timespec32 const *, timeout_ts,
-                USER UNCHECKED sigset_t const *, sigmask,
+                NCX UNCHECKED struct pollfd *, fds, size_t, nfds,
+                NCX UNCHECKED struct timespec32 const *, timeout_ts,
+                NCX UNCHECKED sigset_t const *, sigmask,
                 size_t, sigsetsize) {
 	size_t result;
 	ktime_t abs_timeout;
@@ -516,10 +516,10 @@ DEFINE_SYSCALL5(ssize_t, ppoll,
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 sys_compat_ppoll_impl(struct icpustate *__restrict state,
                       struct rpc_syscall_info *__restrict sc_info) {
-	USER UNCHECKED struct pollfd *fds                         = (USER UNCHECKED struct pollfd *)sc_info->rsi_regs[0];
+	NCX UNCHECKED struct pollfd *fds                         = (NCX UNCHECKED struct pollfd *)sc_info->rsi_regs[0];
 	size_t nfds                                               = (size_t)sc_info->rsi_regs[1];
-	USER UNCHECKED struct compat_timespec32 const *timeout_ts = (USER UNCHECKED struct compat_timespec32 const *)sc_info->rsi_regs[2];
-	USER UNCHECKED compat_sigset_t const *sigmask             = (USER UNCHECKED compat_sigset_t const *)sc_info->rsi_regs[3];
+	NCX UNCHECKED struct compat_timespec32 const *timeout_ts = (NCX UNCHECKED struct compat_timespec32 const *)sc_info->rsi_regs[2];
+	NCX UNCHECKED compat_sigset_t const *sigmask             = (NCX UNCHECKED compat_sigset_t const *)sc_info->rsi_regs[3];
 	size_t sigsetsize                                         = (size_t)sc_info->rsi_regs[4];
 	ktime_t abs_timeout;
 	abs_timeout = KTIME_INFINITE;
@@ -545,9 +545,9 @@ sys_compat_ppoll_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 }
 
 DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll,
-                       USER UNCHECKED struct pollfd *, fds, size_t, nfds,
-                       USER UNCHECKED struct compat_timespec32 const *, timeout_ts,
-                       USER UNCHECKED compat_sigset_t const *, sigmask,
+                       NCX UNCHECKED struct pollfd *, fds, size_t, nfds,
+                       NCX UNCHECKED struct compat_timespec32 const *, timeout_ts,
+                       NCX UNCHECKED compat_sigset_t const *, sigmask,
                        size_t, sigsetsize) {
 	size_t result;
 	ktime_t abs_timeout;
@@ -574,10 +574,10 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll,
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 sys_ppoll_time64_impl(struct icpustate *__restrict state,
                              struct rpc_syscall_info *__restrict sc_info) {
-	USER UNCHECKED struct pollfd *fds                  = (USER UNCHECKED struct pollfd *)sc_info->rsi_regs[0];
+	NCX UNCHECKED struct pollfd *fds                  = (NCX UNCHECKED struct pollfd *)sc_info->rsi_regs[0];
 	size_t nfds                                        = (size_t)sc_info->rsi_regs[1];
-	USER UNCHECKED struct timespec64 const *timeout_ts = (USER UNCHECKED struct timespec64 const *)sc_info->rsi_regs[2];
-	USER UNCHECKED sigset_t const *sigmask             = (USER UNCHECKED sigset_t const *)sc_info->rsi_regs[3];
+	NCX UNCHECKED struct timespec64 const *timeout_ts = (NCX UNCHECKED struct timespec64 const *)sc_info->rsi_regs[2];
+	NCX UNCHECKED sigset_t const *sigmask             = (NCX UNCHECKED sigset_t const *)sc_info->rsi_regs[3];
 	size_t sigsetsize                                  = (size_t)sc_info->rsi_regs[4];
 	ktime_t abs_timeout;
 	abs_timeout = KTIME_INFINITE;
@@ -603,9 +603,9 @@ sys_ppoll_time64_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 }
 
 DEFINE_SYSCALL5(ssize_t, ppoll_time64,
-                USER UNCHECKED struct pollfd *, fds, size_t, nfds,
-                USER UNCHECKED struct timespec64 const *, timeout_ts,
-                USER UNCHECKED sigset_t const *, sigmask,
+                NCX UNCHECKED struct pollfd *, fds, size_t, nfds,
+                NCX UNCHECKED struct timespec64 const *, timeout_ts,
+                NCX UNCHECKED sigset_t const *, sigmask,
                 size_t, sigsetsize) {
 	size_t result;
 	ktime_t abs_timeout;
@@ -632,10 +632,10 @@ DEFINE_SYSCALL5(ssize_t, ppoll_time64,
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 sys_compat_ppoll_time64_impl(struct icpustate *__restrict state,
                              struct rpc_syscall_info *__restrict sc_info) {
-	USER UNCHECKED struct pollfd *fds                         = (USER UNCHECKED struct pollfd *)sc_info->rsi_regs[0];
+	NCX UNCHECKED struct pollfd *fds                         = (NCX UNCHECKED struct pollfd *)sc_info->rsi_regs[0];
 	size_t nfds                                               = (size_t)sc_info->rsi_regs[1];
-	USER UNCHECKED struct compat_timespec64 const *timeout_ts = (USER UNCHECKED struct compat_timespec64 const *)sc_info->rsi_regs[2];
-	USER UNCHECKED compat_sigset_t const *sigmask             = (USER UNCHECKED compat_sigset_t const *)sc_info->rsi_regs[3];
+	NCX UNCHECKED struct compat_timespec64 const *timeout_ts = (NCX UNCHECKED struct compat_timespec64 const *)sc_info->rsi_regs[2];
+	NCX UNCHECKED compat_sigset_t const *sigmask             = (NCX UNCHECKED compat_sigset_t const *)sc_info->rsi_regs[3];
 	size_t sigsetsize                                         = (size_t)sc_info->rsi_regs[4];
 	ktime_t abs_timeout;
 	abs_timeout = KTIME_INFINITE;
@@ -661,9 +661,9 @@ sys_compat_ppoll_time64_rpc(struct rpc_context *__restrict ctx, void *UNUSED(coo
 }
 
 DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll_time64,
-                       USER UNCHECKED struct pollfd *, fds, size_t, nfds,
-                       USER UNCHECKED struct compat_timespec64 const *, timeout_ts,
-                       USER UNCHECKED compat_sigset_t const *, sigmask,
+                       NCX UNCHECKED struct pollfd *, fds, size_t, nfds,
+                       NCX UNCHECKED struct compat_timespec64 const *, timeout_ts,
+                       NCX UNCHECKED compat_sigset_t const *, sigmask,
                        size_t, sigsetsize) {
 	size_t result;
 	ktime_t abs_timeout;
@@ -690,16 +690,16 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll_time64,
      defined(__ARCH_WANT_SYSCALL__NEWSELECT))
 #ifdef __ARCH_WANT_SYSCALL__NEWSELECT
 DEFINE_SYSCALL5(ssize_t, _newselect, size_t, nfds,
-                USER UNCHECKED fd_set *, readfds,
-                USER UNCHECKED fd_set *, writefds,
-                USER UNCHECKED fd_set *, exceptfds,
-                USER UNCHECKED struct timeval32 *, timeout)
+                NCX UNCHECKED fd_set *, readfds,
+                NCX UNCHECKED fd_set *, writefds,
+                NCX UNCHECKED fd_set *, exceptfds,
+                NCX UNCHECKED struct timeval32 *, timeout)
 #else /* __ARCH_WANT_SYSCALL__NEWSELECT */
 DEFINE_SYSCALL5(ssize_t, select, size_t, nfds,
-                USER UNCHECKED fd_set *, readfds,
-                USER UNCHECKED fd_set *, writefds,
-                USER UNCHECKED fd_set *, exceptfds,
-                USER UNCHECKED struct timeval32 *, timeout)
+                NCX UNCHECKED fd_set *, readfds,
+                NCX UNCHECKED fd_set *, writefds,
+                NCX UNCHECKED fd_set *, exceptfds,
+                NCX UNCHECKED struct timeval32 *, timeout)
 #endif /* !__ARCH_WANT_SYSCALL__NEWSELECT */
 {
 	size_t result;
@@ -722,12 +722,12 @@ DEFINE_SYSCALL5(ssize_t, select, size_t, nfds,
 #if (defined(__ARCH_WANT_SYSCALL_SELECT) && \
      defined(__ARCH_WANT_SYSCALL__NEWSELECT))
 DEFINE_SYSCALL1(ssize_t, select,
-                USER UNCHECKED struct sel_arg_struct const *, arg) {
+                NCX UNCHECKED struct sel_arg_struct const *, arg) {
 	ulongptr_t n;                         /* nfds argument */
-	USER UNCHECKED fd_set *inp;           /* Read fd-set */
-	USER UNCHECKED fd_set *outp;          /* Write fd-set */
-	USER UNCHECKED fd_set *exp;           /* Except fd-set */
-	USER UNCHECKED struct timeval32 *tvp; /* Timeout argument */
+	NCX UNCHECKED fd_set *inp;           /* Read fd-set */
+	NCX UNCHECKED fd_set *outp;          /* Write fd-set */
+	NCX UNCHECKED fd_set *exp;           /* Except fd-set */
+	NCX UNCHECKED struct timeval32 *tvp; /* Timeout argument */
 	validate_readable(arg, sizeof(*arg));
 	COMPILER_READ_BARRIER();
 	n    = arg->n;
@@ -745,16 +745,16 @@ DEFINE_SYSCALL1(ssize_t, select,
      defined(__ARCH_WANT_SYSCALL_SELECT_TIME64))
 #ifdef __ARCH_WANT_SYSCALL_SELECT64
 DEFINE_SYSCALL5(ssize_t, select64, size_t, nfds,
-                USER UNCHECKED fd_set *, readfds,
-                USER UNCHECKED fd_set *, writefds,
-                USER UNCHECKED fd_set *, exceptfds,
-                USER UNCHECKED struct timeval64 *, timeout)
+                NCX UNCHECKED fd_set *, readfds,
+                NCX UNCHECKED fd_set *, writefds,
+                NCX UNCHECKED fd_set *, exceptfds,
+                NCX UNCHECKED struct timeval64 *, timeout)
 #else /* __ARCH_WANT_SYSCALL_SELECT64 */
 DEFINE_SYSCALL5(ssize_t, select_time64, size_t, nfds,
-                USER UNCHECKED fd_set *, readfds,
-                USER UNCHECKED fd_set *, writefds,
-                USER UNCHECKED fd_set *, exceptfds,
-                USER UNCHECKED struct timeval64 *, timeout)
+                NCX UNCHECKED fd_set *, readfds,
+                NCX UNCHECKED fd_set *, writefds,
+                NCX UNCHECKED fd_set *, exceptfds,
+                NCX UNCHECKED struct timeval64 *, timeout)
 #endif /* !__ARCH_WANT_SYSCALL_SELECT64 */
 {
 	size_t result;
@@ -779,10 +779,10 @@ DEFINE_SYSCALL5(ssize_t, select_time64, size_t, nfds,
      defined(__ARCH_WANT_COMPAT_SYSCALL__NEWSELECT))
 PRIVATE ssize_t KCALL
 compat_sys_select_impl(size_t nfds,
-                       USER UNCHECKED fd_set *readfds,
-                       USER UNCHECKED fd_set *writefds,
-                       USER UNCHECKED fd_set *exceptfds,
-                       USER UNCHECKED struct compat_timeval32 *timeout) {
+                       NCX UNCHECKED fd_set *readfds,
+                       NCX UNCHECKED fd_set *writefds,
+                       NCX UNCHECKED fd_set *exceptfds,
+                       NCX UNCHECKED struct compat_timeval32 *timeout) {
 	size_t result;
 	ktime_t abs_timeout;
 	compat_validate_readwritem_opt(readfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
@@ -802,16 +802,16 @@ compat_sys_select_impl(size_t nfds,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL__NEWSELECT
 DEFINE_COMPAT_SYSCALL5(ssize_t, _newselect, size_t, nfds,
-                       USER UNCHECKED fd_set *, readfds,
-                       USER UNCHECKED fd_set *, writefds,
-                       USER UNCHECKED fd_set *, exceptfds,
-                       USER UNCHECKED struct compat_timeval32 *, timeout)
+                       NCX UNCHECKED fd_set *, readfds,
+                       NCX UNCHECKED fd_set *, writefds,
+                       NCX UNCHECKED fd_set *, exceptfds,
+                       NCX UNCHECKED struct compat_timeval32 *, timeout)
 #else /* __ARCH_WANT_COMPAT_SYSCALL__NEWSELECT */
 DEFINE_COMPAT_SYSCALL5(ssize_t, select, size_t, nfds,
-                       USER UNCHECKED fd_set *, readfds,
-                       USER UNCHECKED fd_set *, writefds,
-                       USER UNCHECKED fd_set *, exceptfds,
-                       USER UNCHECKED struct compat_timeval32 *, timeout)
+                       NCX UNCHECKED fd_set *, readfds,
+                       NCX UNCHECKED fd_set *, writefds,
+                       NCX UNCHECKED fd_set *, exceptfds,
+                       NCX UNCHECKED struct compat_timeval32 *, timeout)
 #endif /* !__ARCH_WANT_COMPAT_SYSCALL__NEWSELECT */
 {
 	return compat_sys_select_impl(nfds,
@@ -824,7 +824,7 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, select, size_t, nfds,
 #if (defined(__ARCH_WANT_COMPAT_SYSCALL_SELECT) && \
      defined(__ARCH_WANT_COMPAT_SYSCALL__NEWSELECT))
 DEFINE_COMPAT_SYSCALL1(ssize_t, select,
-                       USER UNCHECKED struct compat_sel_arg_struct const *, arg) {
+                       NCX UNCHECKED struct compat_sel_arg_struct const *, arg) {
 	compat_ulongptr_t n;                     /* nfds argument */
 	compat_ptr(fd_set) inp;                  /* Read fd-set */
 	compat_ptr(fd_set) outp;                 /* Write fd-set */
@@ -847,16 +847,16 @@ DEFINE_COMPAT_SYSCALL1(ssize_t, select,
      defined(__ARCH_WANT_COMPAT_SYSCALL_SELECT_TIME64))
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SELECT64
 DEFINE_COMPAT_SYSCALL5(ssize_t, select64, size_t, nfds,
-                       USER UNCHECKED fd_set *, readfds,
-                       USER UNCHECKED fd_set *, writefds,
-                       USER UNCHECKED fd_set *, exceptfds,
-                       USER UNCHECKED struct compat_timeval64 *, timeout)
+                       NCX UNCHECKED fd_set *, readfds,
+                       NCX UNCHECKED fd_set *, writefds,
+                       NCX UNCHECKED fd_set *, exceptfds,
+                       NCX UNCHECKED struct compat_timeval64 *, timeout)
 #else /* __ARCH_WANT_COMPAT_SYSCALL_SELECT64 */
 DEFINE_COMPAT_SYSCALL5(ssize_t, select_time64, size_t, nfds,
-                       USER UNCHECKED fd_set *, readfds,
-                       USER UNCHECKED fd_set *, writefds,
-                       USER UNCHECKED fd_set *, exceptfds,
-                       USER UNCHECKED struct compat_timeval64 *, timeout)
+                       NCX UNCHECKED fd_set *, readfds,
+                       NCX UNCHECKED fd_set *, writefds,
+                       NCX UNCHECKED fd_set *, exceptfds,
+                       NCX UNCHECKED struct compat_timeval64 *, timeout)
 #endif /* !__ARCH_WANT_COMPAT_SYSCALL_SELECT64 */
 {
 	size_t result;
@@ -884,9 +884,9 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, select_time64, size_t, nfds,
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *
 sys_pselect_generic(struct icpustate *__restrict state,
                     struct rpc_syscall_info *__restrict sc_info, size_t nfds,
-                    USER UNCHECKED fd_set *readfds, USER UNCHECKED fd_set *writefds,
-                    USER UNCHECKED fd_set *exceptfds, ktime_t abs_timeout,
-                    USER UNCHECKED sigset_t const *sigmask, size_t sigsetsize) {
+                    NCX UNCHECKED fd_set *readfds, NCX UNCHECKED fd_set *writefds,
+                    NCX UNCHECKED fd_set *exceptfds, ktime_t abs_timeout,
+                    NCX UNCHECKED sigset_t const *sigmask, size_t sigsetsize) {
 	size_t result;
 	validate_readwritem_opt(readfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
 	validate_readwritem_opt(writefds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
@@ -929,11 +929,11 @@ INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 sys_pselect6_impl(struct icpustate *__restrict state,
                   struct rpc_syscall_info *__restrict sc_info) {
 	size_t nfds                                                          = (size_t)sc_info->rsi_regs[0];
-	USER UNCHECKED fd_set *readfds                                       = (USER UNCHECKED fd_set *)sc_info->rsi_regs[1];
-	USER UNCHECKED fd_set *writefds                                      = (USER UNCHECKED fd_set *)sc_info->rsi_regs[2];
-	USER UNCHECKED fd_set *exceptfds                                     = (USER UNCHECKED fd_set *)sc_info->rsi_regs[3];
-	USER UNCHECKED struct timespec32 const *timeout                      = (USER UNCHECKED struct timespec32 const *)sc_info->rsi_regs[4];
-	USER UNCHECKED struct sigset_with_size const *sigmask_sigset_and_len = (USER UNCHECKED struct sigset_with_size const *)sc_info->rsi_regs[5];
+	NCX UNCHECKED fd_set *readfds                                       = (NCX UNCHECKED fd_set *)sc_info->rsi_regs[1];
+	NCX UNCHECKED fd_set *writefds                                      = (NCX UNCHECKED fd_set *)sc_info->rsi_regs[2];
+	NCX UNCHECKED fd_set *exceptfds                                     = (NCX UNCHECKED fd_set *)sc_info->rsi_regs[3];
+	NCX UNCHECKED struct timespec32 const *timeout                      = (NCX UNCHECKED struct timespec32 const *)sc_info->rsi_regs[4];
+	NCX UNCHECKED struct sigset_with_size const *sigmask_sigset_and_len = (NCX UNCHECKED struct sigset_with_size const *)sc_info->rsi_regs[5];
 	struct sigset_with_size ss;
 	ktime_t abs_timeout;
 	memcpy(&ss, validate_readable(sigmask_sigset_and_len, sizeof(ss)), sizeof(ss));
@@ -962,11 +962,11 @@ sys_pselect6_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 }
 
 DEFINE_SYSCALL6(ssize_t, pselect6, size_t, nfds,
-                USER UNCHECKED fd_set *, readfds,
-                USER UNCHECKED fd_set *, writefds,
-                USER UNCHECKED fd_set *, exceptfds,
-                USER UNCHECKED struct timespec32 const *, timeout,
-                USER UNCHECKED struct sigset_with_size const *, sigmask_sigset_with_size) {
+                NCX UNCHECKED fd_set *, readfds,
+                NCX UNCHECKED fd_set *, writefds,
+                NCX UNCHECKED fd_set *, exceptfds,
+                NCX UNCHECKED struct timespec32 const *, timeout,
+                NCX UNCHECKED struct sigset_with_size const *, sigmask_sigset_with_size) {
 	size_t result;
 	ktime_t abs_timeout;
 	validate_readable(sigmask_sigset_with_size, sizeof(*sigmask_sigset_with_size));
@@ -995,11 +995,11 @@ INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 sys_pselect6_time64_impl(struct icpustate *__restrict state,
                          struct rpc_syscall_info *__restrict sc_info) {
 	size_t nfds                                                          = (size_t)sc_info->rsi_regs[0];
-	USER UNCHECKED fd_set *readfds                                       = (USER UNCHECKED fd_set *)sc_info->rsi_regs[1];
-	USER UNCHECKED fd_set *writefds                                      = (USER UNCHECKED fd_set *)sc_info->rsi_regs[2];
-	USER UNCHECKED fd_set *exceptfds                                     = (USER UNCHECKED fd_set *)sc_info->rsi_regs[3];
-	USER UNCHECKED struct timespec64 const *timeout                      = (USER UNCHECKED struct timespec64 const *)sc_info->rsi_regs[4];
-	USER UNCHECKED struct sigset_with_size const *sigmask_sigset_and_len = (USER UNCHECKED struct sigset_with_size const *)sc_info->rsi_regs[5];
+	NCX UNCHECKED fd_set *readfds                                       = (NCX UNCHECKED fd_set *)sc_info->rsi_regs[1];
+	NCX UNCHECKED fd_set *writefds                                      = (NCX UNCHECKED fd_set *)sc_info->rsi_regs[2];
+	NCX UNCHECKED fd_set *exceptfds                                     = (NCX UNCHECKED fd_set *)sc_info->rsi_regs[3];
+	NCX UNCHECKED struct timespec64 const *timeout                      = (NCX UNCHECKED struct timespec64 const *)sc_info->rsi_regs[4];
+	NCX UNCHECKED struct sigset_with_size const *sigmask_sigset_and_len = (NCX UNCHECKED struct sigset_with_size const *)sc_info->rsi_regs[5];
 	struct sigset_with_size ss;
 	ktime_t abs_timeout;
 	memcpy(&ss, validate_readable(sigmask_sigset_and_len, sizeof(ss)), sizeof(ss));
@@ -1028,11 +1028,11 @@ sys_pselect6_time64_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)
 }
 
 DEFINE_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
-                USER UNCHECKED fd_set *, readfds,
-                USER UNCHECKED fd_set *, writefds,
-                USER UNCHECKED fd_set *, exceptfds,
-                USER UNCHECKED struct timespec64 const *, timeout,
-                USER UNCHECKED struct sigset_with_size const *, sigmask_sigset_and_len) {
+                NCX UNCHECKED fd_set *, readfds,
+                NCX UNCHECKED fd_set *, writefds,
+                NCX UNCHECKED fd_set *, exceptfds,
+                NCX UNCHECKED struct timespec64 const *, timeout,
+                NCX UNCHECKED struct sigset_with_size const *, sigmask_sigset_and_len) {
 	size_t result;
 	ktime_t abs_timeout;
 	validate_readable(sigmask_sigset_and_len, sizeof(*sigmask_sigset_and_len));
@@ -1061,11 +1061,11 @@ INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 sys_compat_pselect6_impl(struct icpustate *__restrict state,
                          struct rpc_syscall_info *__restrict sc_info) {
 	size_t nfds                                                                 = (size_t)sc_info->rsi_regs[0];
-	USER UNCHECKED fd_set *readfds                                              = (USER UNCHECKED fd_set *)sc_info->rsi_regs[1];
-	USER UNCHECKED fd_set *writefds                                             = (USER UNCHECKED fd_set *)sc_info->rsi_regs[2];
-	USER UNCHECKED fd_set *exceptfds                                            = (USER UNCHECKED fd_set *)sc_info->rsi_regs[3];
-	USER UNCHECKED struct compat_timespec32 const *timeout                      = (USER UNCHECKED struct compat_timespec32 const *)sc_info->rsi_regs[4];
-	USER UNCHECKED struct compat_sigset_with_size const *sigmask_sigset_and_len = (USER UNCHECKED struct compat_sigset_with_size const *)sc_info->rsi_regs[5];
+	NCX UNCHECKED fd_set *readfds                                              = (NCX UNCHECKED fd_set *)sc_info->rsi_regs[1];
+	NCX UNCHECKED fd_set *writefds                                             = (NCX UNCHECKED fd_set *)sc_info->rsi_regs[2];
+	NCX UNCHECKED fd_set *exceptfds                                            = (NCX UNCHECKED fd_set *)sc_info->rsi_regs[3];
+	NCX UNCHECKED struct compat_timespec32 const *timeout                      = (NCX UNCHECKED struct compat_timespec32 const *)sc_info->rsi_regs[4];
+	NCX UNCHECKED struct compat_sigset_with_size const *sigmask_sigset_and_len = (NCX UNCHECKED struct compat_sigset_with_size const *)sc_info->rsi_regs[5];
 	struct compat_sigset_with_size ss;
 	ktime_t abs_timeout;
 	memcpy(&ss, compat_validate_readable(sigmask_sigset_and_len, sizeof(ss)), sizeof(ss));
@@ -1094,11 +1094,11 @@ sys_compat_pselect6_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)
 }
 
 DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6, size_t, nfds,
-                       USER UNCHECKED fd_set *, readfds,
-                       USER UNCHECKED fd_set *, writefds,
-                       USER UNCHECKED fd_set *, exceptfds,
-                       USER UNCHECKED struct compat_timespec32 const *, timeout,
-                       USER UNCHECKED struct compat_sigset_with_size const *, sigmask_sigset_and_len) {
+                       NCX UNCHECKED fd_set *, readfds,
+                       NCX UNCHECKED fd_set *, writefds,
+                       NCX UNCHECKED fd_set *, exceptfds,
+                       NCX UNCHECKED struct compat_timespec32 const *, timeout,
+                       NCX UNCHECKED struct compat_sigset_with_size const *, sigmask_sigset_and_len) {
 	size_t result;
 	ktime_t abs_timeout;
 	compat_validate_readable(sigmask_sigset_and_len, sizeof(*sigmask_sigset_and_len));
@@ -1127,11 +1127,11 @@ INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 sys_compat_pselect6_time64_impl(struct icpustate *__restrict state,
                                 struct rpc_syscall_info *__restrict sc_info) {
 	size_t nfds                                                                 = (size_t)sc_info->rsi_regs[0];
-	USER UNCHECKED fd_set *readfds                                              = (USER UNCHECKED fd_set *)sc_info->rsi_regs[1];
-	USER UNCHECKED fd_set *writefds                                             = (USER UNCHECKED fd_set *)sc_info->rsi_regs[2];
-	USER UNCHECKED fd_set *exceptfds                                            = (USER UNCHECKED fd_set *)sc_info->rsi_regs[3];
-	USER UNCHECKED struct compat_timespec64 const *timeout                      = (USER UNCHECKED struct compat_timespec64 const *)sc_info->rsi_regs[4];
-	USER UNCHECKED struct compat_sigset_with_size const *sigmask_sigset_and_len = (USER UNCHECKED struct compat_sigset_with_size const *)sc_info->rsi_regs[5];
+	NCX UNCHECKED fd_set *readfds                                              = (NCX UNCHECKED fd_set *)sc_info->rsi_regs[1];
+	NCX UNCHECKED fd_set *writefds                                             = (NCX UNCHECKED fd_set *)sc_info->rsi_regs[2];
+	NCX UNCHECKED fd_set *exceptfds                                            = (NCX UNCHECKED fd_set *)sc_info->rsi_regs[3];
+	NCX UNCHECKED struct compat_timespec64 const *timeout                      = (NCX UNCHECKED struct compat_timespec64 const *)sc_info->rsi_regs[4];
+	NCX UNCHECKED struct compat_sigset_with_size const *sigmask_sigset_and_len = (NCX UNCHECKED struct compat_sigset_with_size const *)sc_info->rsi_regs[5];
 	struct compat_sigset_with_size ss;
 	ktime_t abs_timeout;
 	memcpy(&ss, compat_validate_readable(sigmask_sigset_and_len, sizeof(ss)), sizeof(ss));
@@ -1159,11 +1159,11 @@ sys_compat_pselect6_time64_rpc(struct rpc_context *__restrict ctx, void *UNUSED(
 }
 
 DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
-                       USER UNCHECKED fd_set *, readfds,
-                       USER UNCHECKED fd_set *, writefds,
-                       USER UNCHECKED fd_set *, exceptfds,
-                       USER UNCHECKED struct compat_timespec64 const *, timeout,
-                       USER UNCHECKED struct compat_sigset_with_size const *, sigmask_sigset_and_len) {
+                       NCX UNCHECKED fd_set *, readfds,
+                       NCX UNCHECKED fd_set *, writefds,
+                       NCX UNCHECKED fd_set *, exceptfds,
+                       NCX UNCHECKED struct compat_timespec64 const *, timeout,
+                       NCX UNCHECKED struct compat_sigset_with_size const *, sigmask_sigset_and_len) {
 	size_t result;
 	ktime_t abs_timeout;
 	compat_validate_readable(sigmask_sigset_and_len, sizeof(*sigmask_sigset_and_len));

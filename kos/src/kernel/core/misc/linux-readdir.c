@@ -311,7 +311,7 @@ readdir_buffer_getfpos(struct readdir_buffer *__restrict self) {
 typedef typeof(((struct old_linux_dirent *)0)->d_ino) old_linux_dirent_ino_t;
 typedef typeof(((struct old_linux_dirent *)0)->d_offset) old_linux_dirent_off_t;
 DEFINE_SYSCALL2(syscall_slong_t, readdir, fd_t, fd,
-                USER UNCHECKED struct old_linux_dirent *, buf) {
+                NCX UNCHECKED struct old_linux_dirent *, buf) {
 	struct readdir_buffer rb;
 	struct dirent *ent;
 	readdir_buffer_init(&rb, fd);
@@ -350,7 +350,7 @@ DEFINE_SYSCALL2(syscall_slong_t, readdir, fd_t, fd,
 typedef typeof(((struct compat_old_linux_dirent *)0)->d_ino) compat_old_linux_dirent_ino_t;
 typedef typeof(((struct compat_old_linux_dirent *)0)->d_offset) compat_old_linux_dirent_off_t;
 DEFINE_COMPAT_SYSCALL2(syscall_slong_t, readdir, fd_t, fd,
-                       USER UNCHECKED struct compat_old_linux_dirent *, buf) {
+                       NCX UNCHECKED struct compat_old_linux_dirent *, buf) {
 
 	struct readdir_buffer rb;
 	struct dirent *ent;
@@ -390,7 +390,7 @@ DEFINE_COMPAT_SYSCALL2(syscall_slong_t, readdir, fd_t, fd,
 typedef typeof(((struct linux_dirent *)0)->d_ino) linux_dirent_ino_t;
 typedef typeof(((struct linux_dirent *)0)->d_off) linux_dirent_off_t;
 DEFINE_SYSCALL3(ssize_t, getdents, fd_t, fd,
-                USER UNCHECKED struct linux_dirent *, buf,
+                NCX UNCHECKED struct linux_dirent *, buf,
                 size_t, buflen) {
 	ssize_t result = 0;
 	struct readdir_buffer rb;
@@ -430,7 +430,7 @@ DEFINE_SYSCALL3(ssize_t, getdents, fd_t, fd,
 		buf->d_off = (linux_dirent_off_t)readdir_buffer_getfpos(&rb);
 		COMPILER_BARRIER();
 		++result;
-		buf = (USER UNCHECKED struct linux_dirent *)((byte_t *)buf + reclen);
+		buf = (NCX UNCHECKED struct linux_dirent *)((byte_t *)buf + reclen);
 		buflen -= reclen;
 	}
 done:
@@ -442,7 +442,7 @@ done:
 typedef typeof(((struct compat_linux_dirent *)0)->d_ino) compat_linux_dirent_ino_t;
 typedef typeof(((struct compat_linux_dirent *)0)->d_off) compat_linux_dirent_off_t;
 DEFINE_COMPAT_SYSCALL3(ssize_t, getdents, fd_t, fd,
-                       USER UNCHECKED struct compat_linux_dirent *, buf,
+                       NCX UNCHECKED struct compat_linux_dirent *, buf,
                        size_t, buflen) {
 	ssize_t result = 0;
 	struct readdir_buffer rb;
@@ -482,7 +482,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, getdents, fd_t, fd,
 		buf->d_off = (compat_linux_dirent_off_t)readdir_buffer_getfpos(&rb);
 		COMPILER_BARRIER();
 		++result;
-		buf = (USER UNCHECKED struct compat_linux_dirent *)((byte_t *)buf + reclen);
+		buf = (NCX UNCHECKED struct compat_linux_dirent *)((byte_t *)buf + reclen);
 		buflen -= reclen;
 	}
 done:
@@ -494,7 +494,7 @@ done:
 typedef typeof(((struct linux_dirent64 *)0)->d_ino) linux_dirent64_ino_t;
 typedef typeof(((struct linux_dirent64 *)0)->d_off) linux_dirent64_off_t;
 DEFINE_SYSCALL3(ssize_t, getdents64, fd_t, fd,
-                USER UNCHECKED struct linux_dirent64 *, buf,
+                NCX UNCHECKED struct linux_dirent64 *, buf,
                 size_t, buflen) {
 	ssize_t result = 0;
 	struct readdir_buffer rb;
@@ -533,7 +533,7 @@ DEFINE_SYSCALL3(ssize_t, getdents64, fd_t, fd,
 		buf->d_off = (linux_dirent64_off_t)readdir_buffer_getfpos(&rb);
 		COMPILER_BARRIER();
 		++result;
-		buf = (USER UNCHECKED struct linux_dirent64 *)((byte_t *)buf + reclen);
+		buf = (NCX UNCHECKED struct linux_dirent64 *)((byte_t *)buf + reclen);
 		buflen -= reclen;
 	}
 done:

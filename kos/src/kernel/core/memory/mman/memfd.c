@@ -119,7 +119,7 @@ PRIVATE struct fdirent_ops const memfd_name_ops = {
 /* Construct a new mem-fd object (s.a. `memfd_create(2)')
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_NAME_TOO_LONG: [...] */
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct memfd *FCALL
-memfd_new(USER CHECKED char const *name)
+memfd_new(NCX char const *name)
 		THROWS(E_SEGFAULT, E_BADALLOC, E_INVALID_ARGUMENT_BAD_VALUE) {
 	REF struct fdirent *memfd_name;
 	REF struct memfd *result;
@@ -167,7 +167,7 @@ memfd_new(USER CHECKED char const *name)
 /* Wrapper  for `memfd_new()' that  packages the memfd  inside of a filehandle,
  * thus allowing all of the normal read(2) / write(2) operations on it as well. */
 PRIVATE ATTR_RETNONNULL WUNUSED REF struct filehandle *FCALL
-memfd_new_with_filehandle(USER CHECKED char const *name)
+memfd_new_with_filehandle(NCX char const *name)
 		THROWS(E_SEGFAULT, E_BADALLOC, E_INVALID_ARGUMENT_BAD_VALUE) {
 	REF struct memfd *mfd = memfd_new(name);
 	FINALLY_DECREF_UNLIKELY(mfd);
@@ -176,7 +176,7 @@ memfd_new_with_filehandle(USER CHECKED char const *name)
 
 
 DEFINE_SYSCALL2(fd_t, memfd_create,
-                USER UNCHECKED char const *, name,
+                NCX UNCHECKED char const *, name,
                 syscall_ulong_t, flags) {
 	fd_t resfd;
 	iomode_t mode;

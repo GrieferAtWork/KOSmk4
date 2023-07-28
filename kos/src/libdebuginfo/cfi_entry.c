@@ -131,38 +131,38 @@ struct unwind_register {
 
 struct cfientry_sections {
 	/*BEGIN:compat(unwind_emulator_sections_t)*/
-	CHECKED byte_t const *ds_eh_frame_hdr_start;   /* [0..1][valid_if(:ce_s_eh_frame_hdr)] `.eh_frame_hdr' start */
-	CHECKED byte_t const *ds_eh_frame_hdr_end;     /* [0..1][valid_if(:ce_s_eh_frame_hdr)] `.eh_frame_hdr' end */
-	CHECKED byte_t const *ds_eh_frame_start;       /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' start */
-	CHECKED byte_t const *ds_eh_frame_end;         /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' end */
-	CHECKED byte_t const *ds_debug_frame_start;    /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' start */
-	CHECKED byte_t const *ds_debug_frame_end;      /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' end */
-	CHECKED byte_t const *ds_debug_addr_start;     /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' start */
-	CHECKED byte_t const *ds_debug_addr_end;       /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' end */
+	NCX byte_t const *ds_eh_frame_hdr_start;   /* [0..1][valid_if(:ce_s_eh_frame_hdr)] `.eh_frame_hdr' start */
+	NCX byte_t const *ds_eh_frame_hdr_end;     /* [0..1][valid_if(:ce_s_eh_frame_hdr)] `.eh_frame_hdr' end */
+	NCX byte_t const *ds_eh_frame_start;       /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' start */
+	NCX byte_t const *ds_eh_frame_end;         /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' end */
+	NCX byte_t const *ds_debug_frame_start;    /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' start */
+	NCX byte_t const *ds_debug_frame_end;      /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' end */
+	NCX byte_t const *ds_debug_addr_start;     /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' start */
+	NCX byte_t const *ds_debug_addr_end;       /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' end */
 	/*BEGIN:compat(di_debuginfo_cu_parser_sections_t)*/
-	CHECKED byte_t const *ds_debug_loclists_start; /* [0..1][valid_if(:ce_s_debug_loclists)] `.debug_loclists' start */
-	CHECKED byte_t const *ds_debug_loclists_end;   /* [0..1][valid_if(:ce_s_debug_loclists)] `.debug_loclists' end */
-	CHECKED byte_t const *ds_debug_loc_start;      /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' start */
-	CHECKED byte_t const *ds_debug_loc_end;        /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' end */
-	CHECKED byte_t const *ds_debug_abbrev_start;   /* [0..1][const] `.debug_abbrev' start */
-	CHECKED byte_t const *ds_debug_abbrev_end;     /* [0..1][const] `.debug_abbrev' end */
-	CHECKED byte_t const *ds_debug_info_start;     /* [0..1][const] `.debug_info' start */
-	CHECKED byte_t const *ds_debug_info_end;       /* [0..1][const] `.debug_info' end */
+	NCX byte_t const *ds_debug_loclists_start; /* [0..1][valid_if(:ce_s_debug_loclists)] `.debug_loclists' start */
+	NCX byte_t const *ds_debug_loclists_end;   /* [0..1][valid_if(:ce_s_debug_loclists)] `.debug_loclists' end */
+	NCX byte_t const *ds_debug_loc_start;      /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' start */
+	NCX byte_t const *ds_debug_loc_end;        /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' end */
+	NCX byte_t const *ds_debug_abbrev_start;   /* [0..1][const] `.debug_abbrev' start */
+	NCX byte_t const *ds_debug_abbrev_end;     /* [0..1][const] `.debug_abbrev' end */
+	NCX byte_t const *ds_debug_info_start;     /* [0..1][const] `.debug_info' start */
+	NCX byte_t const *ds_debug_info_end;       /* [0..1][const] `.debug_info' end */
 	/*END:compat(unwind_emulator_sections_t)*/
 	/*BEGIN:compat(di_string_sections_t)*/
-	CHECKED byte_t const *ds_debug_str_start;      /* [0..0][const] Always NULL */
-	CHECKED byte_t const *ds_debug_str_end;        /* [0..0][const] Always NULL */
-	CHECKED byte_t const *ds_debug_str_line_start; /* [0..0][const] Always NULL */
-	CHECKED byte_t const *ds_debug_str_line_end;   /* [0..0][const] Always NULL */
+	NCX byte_t const *ds_debug_str_start;      /* [0..0][const] Always NULL */
+	NCX byte_t const *ds_debug_str_end;        /* [0..0][const] Always NULL */
+	NCX byte_t const *ds_debug_str_line_start; /* [0..0][const] Always NULL */
+	NCX byte_t const *ds_debug_str_line_end;   /* [0..0][const] Always NULL */
 	/*END:compat(di_string_sections_t)*/
 	/*END:compat(di_debuginfo_cu_parser_sections_t)*/
-	CHECKED byte_t const *ds_debug_aranges_start;  /* [0..1][const] `.debug_aranges' start */
-	CHECKED byte_t const *ds_debug_aranges_end;    /* [0..1][const] `.debug_aranges' end */
+	NCX byte_t const *ds_debug_aranges_start;  /* [0..1][const] `.debug_aranges' start */
+	NCX byte_t const *ds_debug_aranges_end;    /* [0..1][const] `.debug_aranges' end */
 	/*BEGIN:compat(di_rnglists_sections_t)*/
-	CHECKED byte_t const *ds_debug_rnglists_start; /* [0..1][valid_if(:ce_s_debug_rnglists)] `.debug_rnglists' start */
-	CHECKED byte_t const *ds_debug_rnglists_end;   /* [0..1][valid_if(:ce_s_debug_rnglists)] `.debug_rnglists' end */
-	CHECKED byte_t const *ds_debug_ranges_start;   /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' start */
-	CHECKED byte_t const *ds_debug_ranges_end;     /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' end */
+	NCX byte_t const *ds_debug_rnglists_start; /* [0..1][valid_if(:ce_s_debug_rnglists)] `.debug_rnglists' start */
+	NCX byte_t const *ds_debug_rnglists_end;   /* [0..1][valid_if(:ce_s_debug_rnglists)] `.debug_rnglists' end */
+	NCX byte_t const *ds_debug_ranges_start;   /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' start */
+	NCX byte_t const *ds_debug_ranges_end;     /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' end */
 	/*END:compat(di_rnglists_sections_t)*/
 };
 #define cfientry_sections_as_unwind_emulator_sections(self)        ((unwind_emulator_sections_t *)&(self)->ds_eh_frame_hdr_start)
@@ -652,7 +652,7 @@ NOTHROW_NCX(CC is_cfi_expression_a_simple_register_push)(struct cfientry *__rest
                                                          di_debuginfo_location_t const *__restrict loc,
                                                          unwind_regno_t dw_regno) {
 	size_t length;
-	CHECKED byte_t const *expr;
+	NCX byte_t const *expr;
 	expr = debuginfo_location_select(loc, self->cr_cu.cu_ranges.r_startpc,
 	                                 self->ce_modrelpc,
 	                                 self->ce_parser.dsp_addrsize, &length);
@@ -1150,12 +1150,12 @@ done:
  * @return: UNWIND_EMULATOR_*:       ... */
 INTERN WUNUSED NONNULL((1)) unwind_errno_t
 NOTHROW_NCX(CC libdi_debuginfo_run_entry_value_emulator)(unwind_emulator_t *__restrict self,
-                                                         CHECKED byte_t const *cfi_start_pc,
-                                                         CHECKED byte_t const *cfi_end_pc) {
+                                                         NCX byte_t const *cfi_start_pc,
+                                                         NCX byte_t const *cfi_end_pc) {
 	unwind_errno_t result;
-	CHECKED byte_t const *saved_pc;
-	CHECKED byte_t const *saved_pc_start;
-	CHECKED byte_t const *saved_pc_end;
+	NCX byte_t const *saved_pc;
+	NCX byte_t const *saved_pc_start;
+	NCX byte_t const *saved_pc_end;
 	unwind_setreg_t saved_regset;
 
 #ifndef __KERNEL__

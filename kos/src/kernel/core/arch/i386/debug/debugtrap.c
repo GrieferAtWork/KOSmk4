@@ -219,7 +219,7 @@ kernel_debugtraps_get(struct kernel_debugtraps *__restrict handlers)
 
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
 sys_do_debugtrap32_impl(struct icpustate *__restrict return_state,
-                        USER UNCHECKED struct ucpustate32 const *ustate,
+                        NCX UNCHECKED struct ucpustate32 const *ustate,
                         struct debugtrap_reason const *__restrict reason) {
 	if (ustate) {
 		u16 gs, fs, es, ds, ss, cs;
@@ -290,7 +290,7 @@ sys_do_debugtrap32_impl(struct icpustate *__restrict return_state,
 #ifdef __x86_64__
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
 sys_do_debugtrap64_impl(struct icpustate *__restrict return_state,
-                        USER UNCHECKED struct ucpustate64 const *ustate,
+                        NCX UNCHECKED struct ucpustate64 const *ustate,
                         struct debugtrap_reason const *__restrict reason) {
 	if (ustate) {
 		u16 gs, fs, es, ds, ss, cs;
@@ -337,13 +337,13 @@ sys_do_debugtrap64_impl(struct icpustate *__restrict return_state,
 
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 sys_debugtrap32_impl(struct icpustate *__restrict return_state,
-                     USER UNCHECKED struct ucpustate32 const *ustate,
-                     USER UNCHECKED struct debugtrap_reason32 const *ureason);
+                     NCX UNCHECKED struct ucpustate32 const *ustate,
+                     NCX UNCHECKED struct debugtrap_reason32 const *ureason);
 #ifdef __x86_64__
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 sys_debugtrap64_impl(struct icpustate *__restrict return_state,
-                     USER UNCHECKED struct ucpustate64 const *ustate,
-                     USER UNCHECKED struct debugtrap_reason64 const *ureason);
+                     NCX UNCHECKED struct ucpustate64 const *ustate,
+                     NCX UNCHECKED struct debugtrap_reason64 const *ureason);
 #endif /* __x86_64__ */
 
 
@@ -368,8 +368,8 @@ sys_debugtrap_rpc32(struct rpc_context *__restrict ctx,
 
 	/* Do the system call. */
 	ctx->rc_state = sys_debugtrap32_impl(ctx->rc_state,
-	                                     (USER UNCHECKED struct ucpustate32 const *)ctx->rc_scinfo.rsi_regs[0],
-	                                     (USER UNCHECKED struct debugtrap_reason32 const *)ctx->rc_scinfo.rsi_regs[1]);
+	                                     (NCX UNCHECKED struct ucpustate32 const *)ctx->rc_scinfo.rsi_regs[0],
+	                                     (NCX UNCHECKED struct debugtrap_reason32 const *)ctx->rc_scinfo.rsi_regs[1]);
 
 	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
 	ctx->rc_context = RPC_REASONCTX_SYSRET;
@@ -384,8 +384,8 @@ sys_debugtrap_rpc64(struct rpc_context *__restrict ctx,
 
 	/* Do the system call. */
 	ctx->rc_state = sys_debugtrap64_impl(ctx->rc_state,
-	                                     (USER UNCHECKED struct ucpustate64 const *)ctx->rc_scinfo.rsi_regs[0],
-	                                     (USER UNCHECKED struct debugtrap_reason64 const *)ctx->rc_scinfo.rsi_regs[1]);
+	                                     (NCX UNCHECKED struct ucpustate64 const *)ctx->rc_scinfo.rsi_regs[0],
+	                                     (NCX UNCHECKED struct debugtrap_reason64 const *)ctx->rc_scinfo.rsi_regs[1]);
 
 	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
 	ctx->rc_context = RPC_REASONCTX_SYSRET;
@@ -393,8 +393,8 @@ sys_debugtrap_rpc64(struct rpc_context *__restrict ctx,
 #endif /* __x86_64__ */
 
 DEFINE_SYSCALL2(errno_t, debugtrap,
-                USER UNCHECKED struct ucpustate const *, state,
-                USER UNCHECKED struct debugtrap_reason const *, reason) {
+                NCX UNCHECKED struct ucpustate const *, state,
+                NCX UNCHECKED struct debugtrap_reason const *, reason) {
 	(void)state;
 	(void)reason;
 	if (kernel_debugtrap_enabled()) {
@@ -411,8 +411,8 @@ DEFINE_SYSCALL2(errno_t, debugtrap,
 
 #ifdef __x86_64__
 DEFINE_SYSCALL32_2(errno_t, debugtrap,
-                   USER UNCHECKED struct ucpustate32 const *, state,
-                   USER UNCHECKED struct debugtrap_reason32 const *, reason) {
+                   NCX UNCHECKED struct ucpustate32 const *, state,
+                   NCX UNCHECKED struct debugtrap_reason32 const *, reason) {
 	(void)state;
 	(void)reason;
 	if (kernel_debugtrap_enabled()) {

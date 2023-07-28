@@ -37,7 +37,7 @@
 DECL_BEGIN
 
 LOCAL ATTR_PURE WUNUSED NONNULL((1)) u32
-NOTHROW_NCX(CC gnu_symhash)(USER char const *name)
+NOTHROW_NCX(CC gnu_symhash)(NCX char const *name)
 		THROWS(E_SEGFAULT) {
 	u32 h = 5381;
 	for (; *name; ++name) {
@@ -47,7 +47,7 @@ NOTHROW_NCX(CC gnu_symhash)(USER char const *name)
 }
 
 LOCAL ATTR_PURE WUNUSED NONNULL((1)) u32
-NOTHROW_NCX(CC elf_symhash)(USER char const *name)
+NOTHROW_NCX(CC elf_symhash)(NCX char const *name)
 		THROWS(E_SEGFAULT) {
 	u32 h = 0;
 	for (; *name; ++name) {
@@ -77,8 +77,8 @@ NOTHROW_NCX(CC elf_symhash)(USER char const *name)
  * NOTE: This function ~may~ set `dlerror()' when returning `NULL' in
  *       case of the error is the  result of a corrupted hash  table. */
 INTERN WUNUSED NONNULL((1, 2, 3, 4)) ElfW(Sym) const *
-NOTHROW_NCX(CC DlModule_ElfGetLocalSymbol)(USER DlModule *self,
-                                           USER char const *name,
+NOTHROW_NCX(CC DlModule_ElfGetLocalSymbol)(NCX DlModule *self,
+                                           NCX char const *name,
                                            uintptr_t *__restrict phash_elf,
                                            uintptr_t *__restrict phash_gnu)
 		THROWS(E_SEGFAULT) {

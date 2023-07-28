@@ -136,47 +136,47 @@ struct cmodsym {
 	 *    define its own version of e.g. `struct tm'.
 	 *    In this case, an attempt is made to only store a single instance of
 	 *    `struct tm', which will appear within the per-module symbol  table. */
-	CHECKED char const *cms_name; /* [1..1] Symbol name (usually points into `.debug_str', and
-	                               * owned by  the reference  held by  `cmodule::cm_sectrefs')
-	                               * By  default, this  name is  the string  pointed-to by the
-	                               * `DW_AT_linkage_name'  attribute,  but  uses  `DW_AT_name'
-	                               * as a fallback. */
-	uintptr_t           cms_dip;  /* [1..1] Debug  information  pointer  for  this  symbol  & namespace.
-	                               * Use this pointer to load the associated DWARF debug info by passing
-	                               * it to  `cmodunit_parser_from_dip()' or  `cmodule_parser_from_dip()'
-	                               * The resulting  parser's `dup_comp.dic_tag'  will  then be  one  of:
-	                               *   - DW_TAG_structure_type
-	                               *      - Namespace collisions with
-	                               *   - DW_TAG_namespace   // TODO: Handling of namespace members
-	                               *   - DW_TAG_subprogram
-	                               *      - Only if a `DW_AT_entry_pc' or `DW_AT_low_pc' tag is contained (which in
-	                               *        turn translates to the symbol's address at runtime)
-	                               *   - DW_TAG_label
-	                               *   - DW_TAG_variable  (with a `DW_AT_location' that is expected to
-	                               *                       contain `DW_OP_addr' or `DW_OP_form_tls_address')
-	                               *   - DW_TAG_enumerator
-	                               * NOTE: Recursive  components  are _NOT_  included if  they originate
-	                               *       from inside `DW_TAG_subprogram', `DW_TAG_inlined_subroutine'.
-	                               *       In general, only  globally visible symbols  are included,  as
-	                               *       would be accessible from within an unnamed function placed at
-	                               *       the end of the associated CU.
-	                               *
-	                               * Load debug info for this symbol by:
-	                               * >> di_debuginfo_cu_parser_t parser;
-	                               * >> cmodule_parser_from_dip(mod, cmodsym_getdip(sym, mod), &parser);
-	                               * >> switch (parser.dup_comp.dic_tag) {
-	                               * >>
-	                               * >> case DW_TAG_structure_type:
-	                               * >>     ...
-	                               * >>
-	                               * >> case DW_TAG_subprogram:
-	                               * >>     ...
-	                               * >>
-	                               * >> case ...:
-	                               * >>     ...
-	                               * >>
-	                               * >> default: break;
-	                               * >> } */
+	NCX char const *cms_name; /* [1..1] Symbol name (usually points into `.debug_str', and
+	                           * owned by  the reference  held by  `cmodule::cm_sectrefs')
+	                           * By  default, this  name is  the string  pointed-to by the
+	                           * `DW_AT_linkage_name'  attribute,  but  uses  `DW_AT_name'
+	                           * as a fallback. */
+	uintptr_t       cms_dip;  /* [1..1] Debug  information  pointer  for  this  symbol  & namespace.
+	                           * Use this pointer to load the associated DWARF debug info by passing
+	                           * it to  `cmodunit_parser_from_dip()' or  `cmodule_parser_from_dip()'
+	                           * The resulting  parser's `dup_comp.dic_tag'  will  then be  one  of:
+	                           *   - DW_TAG_structure_type
+	                           *      - Namespace collisions with
+	                           *   - DW_TAG_namespace   // TODO: Handling of namespace members
+	                           *   - DW_TAG_subprogram
+	                           *      - Only if a `DW_AT_entry_pc' or `DW_AT_low_pc' tag is contained (which in
+	                           *        turn translates to the symbol's address at runtime)
+	                           *   - DW_TAG_label
+	                           *   - DW_TAG_variable  (with a `DW_AT_location' that is expected to
+	                           *                       contain `DW_OP_addr' or `DW_OP_form_tls_address')
+	                           *   - DW_TAG_enumerator
+	                           * NOTE: Recursive  components  are _NOT_  included if  they originate
+	                           *       from inside `DW_TAG_subprogram', `DW_TAG_inlined_subroutine'.
+	                           *       In general, only  globally visible symbols  are included,  as
+	                           *       would be accessible from within an unnamed function placed at
+	                           *       the end of the associated CU.
+	                           *
+	                           * Load debug info for this symbol by:
+	                           * >> di_debuginfo_cu_parser_t parser;
+	                           * >> cmodule_parser_from_dip(mod, cmodsym_getdip(sym, mod), &parser);
+	                           * >> switch (parser.dup_comp.dic_tag) {
+	                           * >>
+	                           * >> case DW_TAG_structure_type:
+	                           * >>     ...
+	                           * >>
+	                           * >> case DW_TAG_subprogram:
+	                           * >>     ...
+	                           * >>
+	                           * >> case ...:
+	                           * >>     ...
+	                           * >>
+	                           * >> default: break;
+	                           * >> } */
 };
 
 #if __SIZEOF_POINTER__ == 4
@@ -194,7 +194,7 @@ struct cmodsym {
  *       dip = DebugInfoPointer   (offset into .debug_info)
  *       mip = MixedInfoPointer   (offset into MODULE.cm_mixed.mss_symv) */
 #define cmodsym_getdip(self, mod)     ((mod)->cm_sections.ds_debug_info_start + ((self)->cms_dip & CMODSYM_DIP_DIPMASK))
-#define cmodsym_getsip(self, mod)     ((CHECKED CLinkerSymbol const *)((mod)->cm_sections.ds_symtab_start + ((self)->cms_dip & CMODSYM_DIP_DIPMASK)))
+#define cmodsym_getsip(self, mod)     ((NCX CLinkerSymbol const *)((mod)->cm_sections.ds_symtab_start + ((self)->cms_dip & CMODSYM_DIP_DIPMASK)))
 #define cmodsym_getmip(self, mod)     ((struct cmodmixsym const *)((byte_t const *)(mod)->cm_mixed.mss_symv + ((self)->cms_dip & CMODSYM_DIP_DIPMASK)))
 #define cmodsym_makedip(mod, dip, ns) ((uintptr_t)((dip) - (mod)->cm_sections.ds_debug_info_start) | (ns))
 #define cmodsym_makesip(mod, sip)     ((uintptr_t)((sip) - (mod)->cm_sections.ds_symtab_start) | CMODSYM_DIP_NS_SYMTAB)
@@ -244,8 +244,8 @@ struct cmodsymtab {
 #define cmodsymtab_syma(self) (dbx_malloc_usable_size((self)->mst_symv) / sizeof(struct cmodsym))
 
 struct cmodmixsym {
-	CHECKED byte_t        const *ms_dip; /* [1..1] Absolute pointer (apart of .debug_info) for debug information. */
-	CHECKED CLinkerSymbol const *ms_sip; /* [1..1] Absolute pointer (apart of .symtab/.dynsym) for address information. */
+	NCX byte_t        const *ms_dip; /* [1..1] Absolute pointer (apart of .debug_info) for debug information. */
+	NCX CLinkerSymbol const *ms_sip; /* [1..1] Absolute pointer (apart of .symtab/.dynsym) for address information. */
 };
 
 struct cmodmixsymtab {
@@ -257,7 +257,7 @@ struct cmodmixsymtab {
 
 struct cmodunit {
 	/* CModule CompilationUnit */
-	CHECKED byte_t const    *cu_di_start; /* [1..1] .debug_info start (s.a. `di_debuginfo_cu_parser_t::dup_cu_info_hdr'). */
+	NCX byte_t const        *cu_di_start; /* [1..1] .debug_info start (s.a. `di_debuginfo_cu_parser_t::dup_cu_info_hdr'). */
 	struct cmodsymtab        cu_symbols;  /* Per-unit symbols (who's names collide with other per-module symbols).
 	                                       * NOTE: `.mst_symv == (struct cmodsym *)-1' if symbols from this CU have
 	                                       *       yet to be loaded. Also note  that when symbols are loaded,  this
@@ -280,7 +280,7 @@ FUNDEF NONNULL((1, 2, 3)) void
 NOTHROW_NCX(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
                                             struct cmodule const *__restrict mod,
                                             di_debuginfo_cu_parser_t *__restrict result,
-                                            CHECKED byte_t const *dip);
+                                            NCX byte_t const *dip);
 
 
 struct cmodule {
@@ -424,7 +424,7 @@ NOTHROW_NCX(FCALL cmodule_loadsyms)(struct cmodule *__restrict self);
  *             symbol instead. */
 FUNDEF WUNUSED NONNULL((1)) struct cmodsym const *
 NOTHROW_NCX(FCALL cmodule_getsym)(struct cmodule *__restrict self,
-                                  CHECKED char const *name, size_t namelen,
+                                  NCX char const *name, size_t namelen,
                                   uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 
 
@@ -437,7 +437,7 @@ NOTHROW_NCX(FCALL cmodule_getsym)(struct cmodule *__restrict self,
  * @return: NULL: Error: No such symbol.
  * @return: NULL: Error: Operation was interrupted. */
 FUNDEF WUNUSED NONNULL((3)) struct cmodsym const *
-NOTHROW_NCX(FCALL cmodule_getsym_global)(CHECKED char const *name, size_t namelen,
+NOTHROW_NCX(FCALL cmodule_getsym_global)(NCX char const *name, size_t namelen,
                                          REF struct cmodule **__restrict presult_module,
                                          uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 
@@ -448,7 +448,7 @@ NOTHROW_NCX(FCALL cmodule_getsym_global)(CHECKED char const *name, size_t namele
  * different address spaces. */
 FUNDEF WUNUSED NONNULL((4)) struct cmodsym const *
 NOTHROW_NCX(FCALL cmodule_getsym_withhint)(struct cmodule *start_module,
-                                           CHECKED char const *name, size_t namelen,
+                                           NCX char const *name, size_t namelen,
                                            REF struct cmodule **__restrict presult_module,
                                            uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 
@@ -462,7 +462,7 @@ NOTHROW_NCX(FCALL cmodule_getsym_withhint)(struct cmodule *start_module,
 FUNDEF NONNULL((1, 2)) void
 NOTHROW_NCX(FCALL cmodule_parser_from_dip)(struct cmodule const *__restrict self,
                                            di_debuginfo_cu_parser_t *__restrict result,
-                                           CHECKED byte_t const *dip);
+                                           NCX byte_t const *dip);
 
 /* Try to find the compilation unit that contains `module_relative_pc'
  * If  no such unit  can be located, `NULL'  will be returned instead. */
@@ -474,13 +474,13 @@ NOTHROW_NCX(FCALL cmodule_findunit_from_pc)(struct cmodule const *__restrict sel
  * If no such unit can be located, `NULL' will be returned instead. */
 FUNDEF ATTR_PURE WUNUSED NONNULL((1)) struct cmodunit *
 NOTHROW_NCX(FCALL cmodule_findunit_from_dip)(struct cmodule const *__restrict self,
-                                             CHECKED byte_t const *dip);
+                                             NCX byte_t const *dip);
 
 /* Simple wrapper for a pair `REF struct cmodule *mod' + `byte_t const *dip'
  * that can be  used to  reference and store  arbitrary debug-info  objects. */
 struct cmoduledip {
 	REF struct cmodule   *cd_mod; /* [1..1] CModule. */
-	CHECKED byte_t const *cd_dip; /* [1..1] DIP pointer. */
+	NCX byte_t const *cd_dip; /* [1..1] DIP pointer. */
 };
 #define cmoduledip_fini(self)           decref((self)->cd_mod)
 #define cmoduledip_parser(self, result) cmodule_parser_from_dip((self)->cd_mod, result, (self)->cd_dip)
@@ -502,7 +502,7 @@ struct cmodsyminfo {
 	 * is the case, these fields can be loaded lazily via `cmod_symenum_loadinfo()' */
 	di_debuginfo_compile_unit_t clv_cu;        /* Compilation unit debug-info. */
 	di_debuginfo_cu_parser_t    clv_parser;    /* Parser. */
-	CHECKED byte_t const       *clv_dip;       /* [0..1] Debug information pointer. */
+	NCX byte_t const           *clv_dip;       /* [0..1] Debug information pointer. */
 	union {
 		/* The following are selected based upon `clv_parser.dup_comp.dic_tag' */
 		struct {                               /* Variable */
@@ -513,10 +513,10 @@ struct cmodsyminfo {
 				};
 				byte_t _v_objdata[sizeof(di_debuginfo_location_t) * 2]; /* Inline buffer for object data. */
 			};
-			CHECKED byte_t const *v_typeinfo;    /* [0..1] Type information. */
-			CHECKED void         *v_objaddr;     /* [?..?] Object address (or `NULL' when `!v_gotaddr') */
-			bool                  v_gotaddr;     /* Set to true if `v_gotaddr' is valid. */
-		} s_var;                                 /* [!cmodsyminfo_istype] Variable or parameter. */
+			NCX byte_t const *v_typeinfo;    /* [0..1] Type information. */
+			NCX void         *v_objaddr;     /* [?..?] Object address (or `NULL' when `!v_gotaddr') */
+			bool              v_gotaddr;     /* Set to true if `v_gotaddr' is valid. */
+		} s_var;                             /* [!cmodsyminfo_istype] Variable or parameter. */
 	} clv_data;
 };
 #define cmodsyminfo_istype(self) cmodsym_istype(&(self)->clv_symbol)
@@ -543,7 +543,7 @@ struct cmodsyminfo {
  * @return: DBX_EINTR:  Operation was interrupted. */
 FUNDEF NONNULL((1)) dbx_errno_t
 NOTHROW_NCX(FCALL cmod_syminfo)(/*in|out*/ struct cmodsyminfo *__restrict info,
-                                CHECKED char const *name, size_t namelen,
+                                NCX char const *name, size_t namelen,
                                 uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 
 /* Same as `cmod_syminfo()', but  the caller is not  required to fill in  information
@@ -557,7 +557,7 @@ NOTHROW_NCX(FCALL cmod_syminfo)(/*in|out*/ struct cmodsyminfo *__restrict info,
  * @return: DBX_EINTR:  Operation was interrupted. */
 FUNDEF NONNULL((1)) dbx_errno_t
 NOTHROW_NCX(FCALL cmod_syminfo_local)(/*out*/ struct cmodsyminfo *__restrict info,
-                                      CHECKED char const *name, size_t namelen,
+                                      NCX char const *name, size_t namelen,
                                       uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 #define cmod_syminfo_local_fini(info) decref((info)->clv_mod)
 
@@ -621,7 +621,7 @@ NOTHROW_NCX(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info);
 FUNDEF NONNULL((1, 2)) ssize_t
 NOTHROW_CB_NCX(FCALL cmod_symenum)(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
                                    cmod_symenum_callback_t cb,
-                                   CHECKED char const *startswith_name,
+                                   NCX char const *startswith_name,
                                    size_t startswith_namelen,
                                    uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL),
                                    uintptr_t scope DFL(CMOD_SYMENUM_SCOPE_FNORMAL));
@@ -641,7 +641,7 @@ NOTHROW_CB_NCX(FCALL cmod_symenum)(/*in|out(undef)*/ struct cmodsyminfo *__restr
 FUNDEF NONNULL((1, 2)) ssize_t
 NOTHROW_CB_NCX(FCALL cmod_symenum_local)(/*in(oob_only)|out(undef)*/ struct cmodsyminfo *__restrict info,
                                          cmod_symenum_callback_t cb,
-                                         CHECKED char const *startswith_name,
+                                         NCX char const *startswith_name,
                                          size_t startswith_namelen,
                                          uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL),
                                          uintptr_t scope DFL(CMOD_SYMENUM_SCOPE_FNORMAL));

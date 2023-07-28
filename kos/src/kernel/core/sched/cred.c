@@ -1051,9 +1051,9 @@ DEFINE_SYSCALL3(errno_t, setresgid32,
 #ifdef __ARCH_WANT_SYSCALL_GETRESUID
 typedef TYPEOF_DEREF(SYSCALL_ARG_TYPE_OF(getresuid, 0)) getresuid_id_t;
 DEFINE_SYSCALL3(errno_t, getresuid,
-                USER UNCHECKED getresuid_id_t *, pruid,
-                USER UNCHECKED getresuid_id_t *, peuid,
-                USER UNCHECKED getresuid_id_t *, psuid) {
+                NCX UNCHECKED getresuid_id_t *, pruid,
+                NCX UNCHECKED getresuid_id_t *, peuid,
+                NCX UNCHECKED getresuid_id_t *, psuid) {
 #ifdef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	enum {
 		ruid = 0,
@@ -1090,9 +1090,9 @@ DEFINE_SYSCALL3(errno_t, getresuid,
 #ifdef __ARCH_WANT_SYSCALL_GETRESUID32
 typedef TYPEOF_DEREF(SYSCALL_ARG_TYPE_OF(getresuid32, 0)) getresuid32_id_t;
 DEFINE_SYSCALL3(errno_t, getresuid32,
-                USER UNCHECKED getresuid32_id_t *, pruid,
-                USER UNCHECKED getresuid32_id_t *, peuid,
-                USER UNCHECKED getresuid32_id_t *, psuid) {
+                NCX UNCHECKED getresuid32_id_t *, pruid,
+                NCX UNCHECKED getresuid32_id_t *, peuid,
+                NCX UNCHECKED getresuid32_id_t *, psuid) {
 #ifdef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	enum {
 		ruid = 0,
@@ -1129,9 +1129,9 @@ DEFINE_SYSCALL3(errno_t, getresuid32,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_GETRESUID
 typedef TYPEOF_DEREF(COMPAT_SYSCALL_ARG_TYPE_OF(getresuid, 0)) compat_getresuid_id_t;
 DEFINE_COMPAT_SYSCALL3(errno_t, getresuid,
-                       USER UNCHECKED compat_getresuid_id_t *, pruid,
-                       USER UNCHECKED compat_getresuid_id_t *, peuid,
-                       USER UNCHECKED compat_getresuid_id_t *, psuid) {
+                       NCX UNCHECKED compat_getresuid_id_t *, pruid,
+                       NCX UNCHECKED compat_getresuid_id_t *, peuid,
+                       NCX UNCHECKED compat_getresuid_id_t *, psuid) {
 #ifdef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	enum {
 		ruid = 0,
@@ -1168,9 +1168,9 @@ DEFINE_COMPAT_SYSCALL3(errno_t, getresuid,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_GETRESUID32
 typedef TYPEOF_DEREF(COMPAT_SYSCALL_ARG_TYPE_OF(getresuid32, 0)) compat_getresuid32_id_t;
 DEFINE_COMPAT_SYSCALL3(errno_t, getresuid32,
-                       USER UNCHECKED compat_getresuid32_id_t *, pruid,
-                       USER UNCHECKED compat_getresuid32_id_t *, peuid,
-                       USER UNCHECKED compat_getresuid32_id_t *, psuid) {
+                       NCX UNCHECKED compat_getresuid32_id_t *, pruid,
+                       NCX UNCHECKED compat_getresuid32_id_t *, peuid,
+                       NCX UNCHECKED compat_getresuid32_id_t *, psuid) {
 #ifdef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	enum {
 		ruid = 0,
@@ -1211,9 +1211,9 @@ DEFINE_COMPAT_SYSCALL3(errno_t, getresuid32,
 #ifdef __ARCH_WANT_SYSCALL_GETRESGID
 typedef TYPEOF_DEREF(SYSCALL_ARG_TYPE_OF(getresgid, 0)) getresgid_id_t;
 DEFINE_SYSCALL3(errno_t, getresgid,
-                USER UNCHECKED getresgid_id_t *, prgid,
-                USER UNCHECKED getresgid_id_t *, pegid,
-                USER UNCHECKED getresgid_id_t *, psgid) {
+                NCX UNCHECKED getresgid_id_t *, prgid,
+                NCX UNCHECKED getresgid_id_t *, pegid,
+                NCX UNCHECKED getresgid_id_t *, psgid) {
 #ifdef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	enum {
 		rgid = 0,
@@ -1250,9 +1250,9 @@ DEFINE_SYSCALL3(errno_t, getresgid,
 #ifdef __ARCH_WANT_SYSCALL_GETRESGID32
 typedef TYPEOF_DEREF(SYSCALL_ARG_TYPE_OF(getresgid32, 0)) getresgid32_id_t;
 DEFINE_SYSCALL3(errno_t, getresgid32,
-                USER UNCHECKED getresgid32_id_t *, prgid,
-                USER UNCHECKED getresgid32_id_t *, pegid,
-                USER UNCHECKED getresgid32_id_t *, psgid) {
+                NCX UNCHECKED getresgid32_id_t *, prgid,
+                NCX UNCHECKED getresgid32_id_t *, pegid,
+                NCX UNCHECKED getresgid32_id_t *, psgid) {
 #ifdef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	enum {
 		rgid = 0,
@@ -1289,9 +1289,9 @@ DEFINE_SYSCALL3(errno_t, getresgid32,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_GETRESGID
 typedef TYPEOF_DEREF(COMPAT_SYSCALL_ARG_TYPE_OF(getresgid, 0)) compat_getresgid_id_t;
 DEFINE_COMPAT_SYSCALL3(errno_t, getresgid,
-                       USER UNCHECKED compat_getresgid_id_t *, prgid,
-                       USER UNCHECKED compat_getresgid_id_t *, pegid,
-                       USER UNCHECKED compat_getresgid_id_t *, psgid) {
+                       NCX UNCHECKED compat_getresgid_id_t *, prgid,
+                       NCX UNCHECKED compat_getresgid_id_t *, pegid,
+                       NCX UNCHECKED compat_getresgid_id_t *, psgid) {
 #ifdef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	enum {
 		rgid = 0,
@@ -1328,9 +1328,9 @@ DEFINE_COMPAT_SYSCALL3(errno_t, getresgid,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_GETRESGID32
 typedef TYPEOF_DEREF(COMPAT_SYSCALL_ARG_TYPE_OF(getresgid32, 0)) compat_getresgid32_id_t;
 DEFINE_COMPAT_SYSCALL3(errno_t, getresgid32,
-                       USER UNCHECKED compat_getresgid32_id_t *, prgid,
-                       USER UNCHECKED compat_getresgid32_id_t *, pegid,
-                       USER UNCHECKED compat_getresgid32_id_t *, psgid) {
+                       NCX UNCHECKED compat_getresgid32_id_t *, prgid,
+                       NCX UNCHECKED compat_getresgid32_id_t *, pegid,
+                       NCX UNCHECKED compat_getresgid32_id_t *, psgid) {
 	compat_getresgid32_id_t rgid, egid, sgid;
 	struct cred *self = THIS_CRED;
 	cred_read(self);
@@ -1372,7 +1372,7 @@ DEFINE_COMPAT_SYSCALL3(errno_t, getresgid32,
 extern "C++" {
 template<class GID_T>
 PRIVATE ssize_t KCALL
-sys_getgroups_impl(size_t count, USER UNCHECKED GID_T *list) {
+sys_getgroups_impl(size_t count, NCX UNCHECKED GID_T *list) {
 #ifdef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	validate_writablem(list, count, sizeof(GID_T));
 	return 0;
@@ -1405,28 +1405,28 @@ sys_getgroups_impl(size_t count, USER UNCHECKED GID_T *list) {
 
 #ifdef __ARCH_WANT_SYSCALL_GETGROUPS
 DEFINE_SYSCALL2(ssize_t, getgroups, size_t, count,
-                USER UNCHECKED SYSCALL_ARG_TYPE_OF(getgroups, 1), list) {
+                NCX UNCHECKED SYSCALL_ARG_TYPE_OF(getgroups, 1), list) {
 	return sys_getgroups_impl(count, list);
 }
 #endif /* __ARCH_WANT_SYSCALL_GETGROUPS */
 
 #ifdef __ARCH_WANT_SYSCALL_GETGROUPS32
 DEFINE_SYSCALL2(ssize_t, getgroups32, size_t, count,
-                USER UNCHECKED SYSCALL_ARG_TYPE_OF(getgroups32, 1), list) {
+                NCX UNCHECKED SYSCALL_ARG_TYPE_OF(getgroups32, 1), list) {
 	return sys_getgroups_impl(count, list);
 }
 #endif /* __ARCH_WANT_SYSCALL_GETGROUPS32 */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_GETGROUPS
 DEFINE_COMPAT_SYSCALL2(ssize_t, getgroups, size_t, count,
-                       USER UNCHECKED COMPAT_SYSCALL_ARG_TYPE_OF(getgroups, 1), list) {
+                       NCX UNCHECKED COMPAT_SYSCALL_ARG_TYPE_OF(getgroups, 1), list) {
 	return sys_getgroups_impl(count, list);
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_GETGROUPS */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_GETGROUPS32
 DEFINE_COMPAT_SYSCALL2(ssize_t, getgroups32, size_t, count,
-                       USER UNCHECKED COMPAT_SYSCALL_ARG_TYPE_OF(getgroups32, 1), list) {
+                       NCX UNCHECKED COMPAT_SYSCALL_ARG_TYPE_OF(getgroups32, 1), list) {
 	return sys_getgroups_impl(count, list);
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_GETGROUPS32 */
@@ -1453,7 +1453,7 @@ extern "C++" {
  * an `E_INSUFFICIENT_RIGHTS' exception is thrown. */
 template<class GID_T>
 PRIVATE ATTR_RETNONNULL WUNUSED REF struct cred_groups *KCALL
-cred_groups_new(USER UNCHECKED GID_T const *groups,
+cred_groups_new(NCX UNCHECKED GID_T const *groups,
                 size_t ngroups, size_t max_ngroups)
 		THROWS(E_SEGFAULT, E_BADALLOC, E_INSUFFICIENT_RIGHTS) {
 	size_t count;
@@ -1534,7 +1534,7 @@ next_gid:
 
 template<class GID_T>
 PRIVATE errno_t KCALL
-sys_setgroups_impl(size_t count, USER UNCHECKED GID_T const *groups) {
+sys_setgroups_impl(size_t count, NCX UNCHECKED GID_T const *groups) {
 	REF struct cred_groups *set;
 	size_t max;
 	set = arref_get(&THIS_CRED->c_groups);
@@ -1554,28 +1554,28 @@ sys_setgroups_impl(size_t count, USER UNCHECKED GID_T const *groups) {
 
 #ifdef __ARCH_WANT_SYSCALL_SETGROUPS
 DEFINE_SYSCALL2(errno_t, setgroups, size_t, count,
-                USER UNCHECKED SYSCALL_ARG_TYPE_OF(setgroups, 1), list) {
+                NCX UNCHECKED SYSCALL_ARG_TYPE_OF(setgroups, 1), list) {
 	return sys_setgroups_impl(count, list);
 }
 #endif /* __ARCH_WANT_SYSCALL_SETGROUPS */
 
 #ifdef __ARCH_WANT_SYSCALL_SETGROUPS32
 DEFINE_SYSCALL2(errno_t, setgroups32, size_t, count,
-                USER UNCHECKED SYSCALL_ARG_TYPE_OF(setgroups32, 1), list) {
+                NCX UNCHECKED SYSCALL_ARG_TYPE_OF(setgroups32, 1), list) {
 	return sys_setgroups_impl(count, list);
 }
 #endif /* __ARCH_WANT_SYSCALL_SETGROUPS32 */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SETGROUPS
 DEFINE_COMPAT_SYSCALL2(errno_t, setgroups, size_t, count,
-                       USER UNCHECKED COMPAT_SYSCALL_ARG_TYPE_OF(setgroups, 1), list) {
+                       NCX UNCHECKED COMPAT_SYSCALL_ARG_TYPE_OF(setgroups, 1), list) {
 	return sys_setgroups_impl(count, list);
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SETGROUPS */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SETGROUPS32
 DEFINE_COMPAT_SYSCALL2(errno_t, setgroups32, size_t, count,
-                       USER UNCHECKED COMPAT_SYSCALL_ARG_TYPE_OF(setgroups32, 1), list) {
+                       NCX UNCHECKED COMPAT_SYSCALL_ARG_TYPE_OF(setgroups32, 1), list) {
 	return sys_setgroups_impl(count, list);
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SETGROUPS32 */

@@ -194,8 +194,8 @@ this_kernel_sigmask = SIGSET_INIT_EMPTY;
 PRIVATE ATTR_PURE WUNUSED bool FCALL
 usersigmask_ismasked_chk(signo_t signo) THROWS(E_SEGFAULT) {
 	ulongptr_t mask, word;
-	USER CHECKED struct userprocmask *umask;
-	USER UNCHECKED sigset_t *usigset;
+	NCX struct userprocmask *umask;
+	NCX UNCHECKED sigset_t *usigset;
 	bool result;
 
 	/* Load the address of the userprocmask descriptor. */
@@ -305,8 +305,8 @@ PRIVATE NOBLOCK NOPREEMPT ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW(FCALL sigmask_ismasked_in_userprocmask_nopf)(struct task *__restrict self,
                                                      signo_t signo) {
 	int result = SIGMASK_ISMASKED_NOPF_FAULT;
-	USER CHECKED struct userprocmask *um;
-	USER UNCHECKED sigset_t *current_sigmask;
+	NCX struct userprocmask *um;
+	NCX UNCHECKED sigset_t *current_sigmask;
 	struct mman *mymm, *threadmm;
 	/* NOTE: This read is safe, since `self' is running on  THIS_CPU,
 	 *       the `this_userprocmask_address'  field is  write-private
@@ -389,8 +389,8 @@ done:
 PRIVATE NOBLOCK NOPREEMPT ATTR_PURE WUNUSED int
 NOTHROW(FCALL sigmask_ismasked_in_my_userprocmask_nopf)(signo_t signo) {
 	int result = SIGMASK_ISMASKED_NOPF_FAULT;
-	USER CHECKED struct userprocmask *um;
-	USER UNCHECKED sigset_t *current_sigmask;
+	NCX struct userprocmask *um;
+	NCX UNCHECKED sigset_t *current_sigmask;
 	um = PERTASK_GET(this_userprocmask_address);
 
 	/* Use memcpy_nopf() to read the thread's current signal mask pointer. */
@@ -767,8 +767,8 @@ NOTHROW(FCALL sigmask_setmask)(sigset_t const *__restrict mask)
 	bool changed;
 #ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
-		USER CHECKED struct userprocmask *um;
-		USER UNCHECKED sigset_t *umask;
+		NCX struct userprocmask *um;
+		NCX UNCHECKED sigset_t *umask;
 		sigset_t new_umask;
 		sigset_t current_umask;
 		size_t umasksize;
@@ -821,7 +821,7 @@ NOTHROW(FCALL sigmask_setmask)(sigset_t const *__restrict mask)
 
 /* Helper wrapper for `sigmask_setmask()' that takes a signal-set from user-space. */
 PUBLIC bool FCALL
-sigmask_setmask_from_user(USER CHECKED sigset_t const *mask, size_t size)
+sigmask_setmask_from_user(NCX sigset_t const *mask, size_t size)
 		THROWS(E_SEGFAULT) {
 	sigset_t newmask;
 	if (size > sizeof(sigset_t))
@@ -843,8 +843,8 @@ PUBLIC NONNULL((1)) void FCALL
 sigmask_getmask(sigset_t *__restrict mask)
 		THROWS(E_SEGFAULT) {
 	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
-		USER CHECKED struct userprocmask *um;
-		USER UNCHECKED sigset_t *umask;
+		NCX struct userprocmask *um;
+		NCX UNCHECKED sigset_t *umask;
 		size_t umasksize;
 		um        = PERTASK_GET(this_userprocmask_address);
 		umask     = um->pm_sigmask;
@@ -874,8 +874,8 @@ sigmask_getmask_word0(void) THROWS(E_SEGFAULT) {
 		byte_t bytes[sizeof(ulongptr_t)];
 	} result;
 	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
-		USER CHECKED struct userprocmask *um;
-		USER UNCHECKED sigset_t *umask;
+		NCX struct userprocmask *um;
+		NCX UNCHECKED sigset_t *umask;
 		size_t umasksize;
 		um        = PERTASK_GET(this_userprocmask_address);
 		umask     = um->pm_sigmask;
@@ -911,8 +911,8 @@ sigmask_getmask_word(size_t index)
 		byte_t bytes[sizeof(ulongptr_t)];
 	} result;
 	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
-		USER CHECKED struct userprocmask *um;
-		USER UNCHECKED sigset_t *umask;
+		NCX struct userprocmask *um;
+		NCX UNCHECKED sigset_t *umask;
 		size_t umasksize, skip;
 		um        = PERTASK_GET(this_userprocmask_address);
 		umask     = um->pm_sigmask;
@@ -976,8 +976,8 @@ NOTHROW(FCALL sigmask_blockmask)(sigset_t const *__restrict these)
 #ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		signo_t sigbase;
-		USER CHECKED struct userprocmask *um;
-		USER UNCHECKED sigset_t *umask;
+		NCX struct userprocmask *um;
+		NCX UNCHECKED sigset_t *umask;
 		size_t umasksize;
 		um        = PERTASK_GET(this_userprocmask_address);
 		umask     = um->pm_sigmask;
@@ -989,30 +989,30 @@ NOTHROW(FCALL sigmask_blockmask)(sigset_t const *__restrict these)
 		sigbase = 0;
 		while (umasksize >= sizeof(ulongptr_t)) {
 			ulongptr_t word, blck, nwrd;
-			word = UNALIGNED_GET((USER CHECKED ulongptr_t const *)umask);
+			word = UNALIGNED_GET((NCX ulongptr_t const *)umask);
 			blck = *(ulongptr_t const *)these;
 			nwrd = word | blck;
 			if (nwrd != word) {
 				nwrd = copy_nmi_signal_mask_bits(nwrd, word, sigbase);
 				if (nwrd != word)
-					UNALIGNED_SET((USER CHECKED ulongptr_t *)umask, nwrd);
+					UNALIGNED_SET((NCX ulongptr_t *)umask, nwrd);
 			}
-			umask = (USER CHECKED sigset_t *)((byte_t *)umask + sizeof(ulongptr_t));
+			umask = (NCX sigset_t *)((byte_t *)umask + sizeof(ulongptr_t));
 			these = (sigset_t const *)((byte_t const *)these + sizeof(ulongptr_t));
 			umasksize -= sizeof(ulongptr_t);
 			sigbase += sizeof(ulongptr_t) * NBBY;
 		}
 		while (umasksize) {
 			byte_t word, blck, nwrd;
-			word = *(USER CHECKED byte_t const *)umask;
+			word = *(NCX byte_t const *)umask;
 			blck = *(byte_t const *)these;
 			nwrd = word | blck;
 			if (nwrd != word) {
 				nwrd = (byte_t)copy_nmi_signal_mask_bits(nwrd, word, sigbase);
 				if (nwrd != word)
-					*(USER CHECKED byte_t *)umask = nwrd;
+					*(NCX byte_t *)umask = nwrd;
 			}
-			umask = (USER CHECKED sigset_t *)((byte_t *)umask + 1);
+			umask = (NCX sigset_t *)((byte_t *)umask + 1);
 			these = (sigset_t const *)((byte_t const *)these + 1);
 			umasksize -= 1;
 		}
@@ -1048,8 +1048,8 @@ NOTHROW(FCALL sigmask_unblockmask)(sigset_t const *__restrict these)
 #ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		signo_t sigbase;
-		USER CHECKED struct userprocmask *um;
-		USER UNCHECKED sigset_t *umask;
+		NCX struct userprocmask *um;
+		NCX UNCHECKED sigset_t *umask;
 		size_t umasksize;
 		um        = PERTASK_GET(this_userprocmask_address);
 		umask     = um->pm_sigmask;
@@ -1062,34 +1062,34 @@ NOTHROW(FCALL sigmask_unblockmask)(sigset_t const *__restrict these)
 		sigbase = 0;
 		while (umasksize >= sizeof(ulongptr_t)) {
 			ulongptr_t word, blck, nwrd;
-			word = UNALIGNED_GET((USER CHECKED ulongptr_t const *)umask);
+			word = UNALIGNED_GET((NCX ulongptr_t const *)umask);
 			blck = *(ulongptr_t const *)these;
 			nwrd = word & ~blck;
 			if (nwrd != word) {
 				nwrd = copy_nmi_signal_mask_bits(nwrd, word, sigbase);
 				if (nwrd != word) {
-					UNALIGNED_SET((USER CHECKED ulongptr_t *)umask, nwrd);
+					UNALIGNED_SET((NCX ulongptr_t *)umask, nwrd);
 					result = true;
 				}
 			}
-			umask = (USER CHECKED sigset_t *)((byte_t *)umask + sizeof(ulongptr_t));
+			umask = (NCX sigset_t *)((byte_t *)umask + sizeof(ulongptr_t));
 			these = (sigset_t const *)((byte_t const *)these + sizeof(ulongptr_t));
 			umasksize -= sizeof(ulongptr_t);
 			sigbase += sizeof(ulongptr_t) * NBBY;
 		}
 		while (umasksize) {
 			byte_t word, blck, nwrd;
-			word = *(USER CHECKED byte_t const *)umask;
+			word = *(NCX byte_t const *)umask;
 			blck = *(byte_t const *)these;
 			nwrd = word & ~blck;
 			if (nwrd != word) {
 				nwrd = (byte_t)copy_nmi_signal_mask_bits(nwrd, word, sigbase);
 				if (nwrd != word) {
-					*(USER CHECKED byte_t *)umask = nwrd;
+					*(NCX byte_t *)umask = nwrd;
 					result = true;
 				}
 			}
-			umask = (USER CHECKED sigset_t *)((byte_t *)umask + 1);
+			umask = (NCX sigset_t *)((byte_t *)umask + 1);
 			these = (sigset_t const *)((byte_t const *)these + 1);
 			umasksize -= 1;
 		}
@@ -1138,8 +1138,8 @@ NOTHROW(FCALL sigmask_getmask_and_setmask)(sigset_t *__restrict oldmask,
 	assert(!nmiismember(newmask));
 #ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
-		USER CHECKED struct userprocmask *um;
-		USER UNCHECKED sigset_t *umask;
+		NCX struct userprocmask *um;
+		NCX UNCHECKED sigset_t *umask;
 		size_t umasksize;
 		um        = PERTASK_GET(this_userprocmask_address);
 		umask     = um->pm_sigmask;
@@ -1197,8 +1197,8 @@ NOTHROW(FCALL sigmask_getmask_and_blockmask)(sigset_t *__restrict oldmask,
 #ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		sigset_t newmask;
-		USER CHECKED struct userprocmask *um;
-		USER UNCHECKED sigset_t *umask;
+		NCX struct userprocmask *um;
+		NCX UNCHECKED sigset_t *umask;
 		size_t umasksize;
 		um        = PERTASK_GET(this_userprocmask_address);
 		umask     = um->pm_sigmask;
@@ -1254,8 +1254,8 @@ NOTHROW(FCALL sigmask_getmask_and_unblockmask)(sigset_t *__restrict oldmask,
 #ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		sigset_t newmask;
-		USER CHECKED struct userprocmask *um;
-		USER UNCHECKED sigset_t *umask;
+		NCX struct userprocmask *um;
+		NCX UNCHECKED sigset_t *umask;
 		size_t umasksize;
 		um        = PERTASK_GET(this_userprocmask_address);
 		umask     = um->pm_sigmask;
@@ -1317,8 +1317,8 @@ NOTHROW(FCALL sigmask_getmask_and_unblockmask)(sigset_t *__restrict oldmask,
      defined(__ARCH_WANT_COMPAT_SYSCALL_SIGPROCMASK))
 PRIVATE errno_t KCALL
 sys_sigprocmask_impl(syscall_ulong_t how,
-                     UNCHECKED USER sigset_t const *set,
-                     UNCHECKED USER sigset_t *oset,
+                     NCX UNCHECKED sigset_t const *set,
+                     NCX UNCHECKED sigset_t *oset,
                      size_t sigsetsize) {
 	size_t overflow = 0;
 	if (sigsetsize > sizeof(sigset_t)) {
@@ -1399,30 +1399,30 @@ sys_sigprocmask_impl(syscall_ulong_t how,
 
 #ifdef __ARCH_WANT_SYSCALL_RT_SIGPROCMASK
 DEFINE_SYSCALL4(errno_t, rt_sigprocmask, syscall_ulong_t, how,
-                UNCHECKED USER sigset_t const *, set,
-                UNCHECKED USER sigset_t *, oset, size_t, sigsetsize) {
+                NCX UNCHECKED sigset_t const *, set,
+                NCX UNCHECKED sigset_t *, oset, size_t, sigsetsize) {
 	return sys_sigprocmask_impl(how, set, oset, sigsetsize);
 }
 #endif /* __ARCH_WANT_SYSCALL_RT_SIGPROCMASK */
 
 #ifdef __ARCH_WANT_SYSCALL_SIGPROCMASK
 DEFINE_SYSCALL3(errno_t, sigprocmask, syscall_ulong_t, how,
-                UNCHECKED USER struct __old_sigset_struct const *, set,
-                UNCHECKED USER struct __old_sigset_struct *, oset) {
+                NCX UNCHECKED struct __old_sigset_struct const *, set,
+                NCX UNCHECKED struct __old_sigset_struct *, oset) {
 	return sys_sigprocmask_impl(how,
-	                            (UNCHECKED USER sigset_t const *)set,
-	                            (UNCHECKED USER sigset_t *)oset,
+	                            (NCX UNCHECKED sigset_t const *)set,
+	                            (NCX UNCHECKED sigset_t *)oset,
 	                            sizeof(struct __old_sigset_struct));
 }
 #endif /* __ARCH_WANT_SYSCALL_SIGPROCMASK */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SIGPROCMASK
 DEFINE_COMPAT_SYSCALL3(errno_t, sigprocmask, syscall_ulong_t, how,
-                       UNCHECKED USER struct __compat_old_sigset_struct const *, set,
-                       UNCHECKED USER struct __compat_old_sigset_struct *, oset) {
+                       NCX UNCHECKED struct __compat_old_sigset_struct const *, set,
+                       NCX UNCHECKED struct __compat_old_sigset_struct *, oset) {
 	return sys_sigprocmask_impl(how,
-	                            (UNCHECKED USER sigset_t const *)set,
-	                            (UNCHECKED USER sigset_t *)oset,
+	                            (NCX UNCHECKED sigset_t const *)set,
+	                            (NCX UNCHECKED sigset_t *)oset,
 	                            sizeof(struct __compat_old_sigset_struct));
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGPROCMASK */
@@ -1488,7 +1488,7 @@ DEFINE_COMPAT_SYSCALL1(uint32_t, ssetmask, uint32_t, new_sigmask) {
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_RT_SIGPENDING
 DEFINE_SYSCALL2(errno_t, rt_sigpending,
-                UNCHECKED USER sigset_t *, uset,
+                NCX UNCHECKED sigset_t *, uset,
                 size_t, sigsetsize) {
 	sigset_t pending;
 	validate_writable(uset, sigsetsize);
@@ -1512,15 +1512,15 @@ DEFINE_SYSCALL2(errno_t, rt_sigpending,
 
 #ifdef __ARCH_WANT_SYSCALL_SIGPENDING
 DEFINE_SYSCALL1(errno_t, sigpending,
-                UNCHECKED USER struct __old_sigset_struct *, uset) {
-	return sys_rt_sigpending((USER UNCHECKED sigset_t *)uset, sizeof(struct __old_sigset_struct));
+                NCX UNCHECKED struct __old_sigset_struct *, uset) {
+	return sys_rt_sigpending((NCX UNCHECKED sigset_t *)uset, sizeof(struct __old_sigset_struct));
 }
 #endif /* __ARCH_WANT_SYSCALL_SIGPENDING */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SIGPENDING
 DEFINE_COMPAT_SYSCALL1(errno_t, sigpending,
-                       UNCHECKED USER struct __compat_old_sigset_struct *, uset) {
-	return sys_rt_sigpending((USER UNCHECKED sigset_t *)uset, sizeof(struct __compat_old_sigset_struct));
+                       NCX UNCHECKED struct __compat_old_sigset_struct *, uset) {
+	return sys_rt_sigpending((NCX UNCHECKED sigset_t *)uset, sizeof(struct __compat_old_sigset_struct));
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGPENDING */
 
@@ -1540,8 +1540,8 @@ sys_sigsuspend_impl(struct icpustate *__restrict state,
                     struct rpc_syscall_info *__restrict sc_info,
                     size_t sigsetsize) {
 	sigset_t not_these;
-	USER UNCHECKED sigset_t const *unot_these;
-	unot_these = (USER UNCHECKED sigset_t const *)sc_info->rsi_regs[0];
+	NCX UNCHECKED sigset_t const *unot_these;
+	unot_these = (NCX UNCHECKED sigset_t const *)sc_info->rsi_regs[0];
 	validate_readable(unot_these, sigsetsize);
 	if (sigsetsize > sizeof(sigset_t))
 		sigsetsize = sizeof(sigset_t);
@@ -1589,7 +1589,7 @@ sys_rt_sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) 
 }
 
 DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
-                USER UNCHECKED sigset_t const *, unot_these,
+                NCX UNCHECKED sigset_t const *, unot_these,
                 size_t, sigsetsize) {
 	(void)unot_these;
 	(void)sigsetsize;
@@ -1610,7 +1610,7 @@ sys_sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 }
 
 DEFINE_SYSCALL1(errno_t, sigsuspend,
-                USER UNCHECKED struct __old_sigset_struct const *, unot_these) {
+                NCX UNCHECKED struct __old_sigset_struct const *, unot_these) {
 	(void)unot_these;
 
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
@@ -1629,7 +1629,7 @@ sys_compat_sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cooki
 }
 
 DEFINE_COMPAT_SYSCALL1(errno_t, sigsuspend,
-                       USER UNCHECKED struct __compat_old_sigset_struct const *, unot_these) {
+                       NCX UNCHECKED struct __compat_old_sigset_struct const *, unot_these) {
 	(void)unot_these;
 
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */

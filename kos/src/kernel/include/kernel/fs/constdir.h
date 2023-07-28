@@ -109,7 +109,7 @@ DATDEF struct fdirenum_ops const constdirenum_ops;
 FUNDEF NOBLOCK NONNULL((1)) void /* no-op */
 NOTHROW(KCALL constdirenum_v_fini)(struct fdirenum *__restrict self);
 FUNDEF NONNULL((1)) size_t KCALL
-constdirenum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+constdirenum_v_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                        size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
 		THROWS(E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) pos_t KCALL

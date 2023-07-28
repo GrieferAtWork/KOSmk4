@@ -44,7 +44,7 @@ libdl_dltlsbase(DlModule *__restrict self) THROWS(...)
  * @return: * :   Pointer to the base of the TLS segment associated with `tls_handle' within the calling thread.
  * @return: NULL: Invalid `tls_handle', or allocation/initialization failed. (s.a. `dlerror()') */
 INTERN WUNUSED void *__DLFCN_DLTLSADDR2_CC
-libdl_dltlsaddr2(USER DlModule *self, USER struct dltls_segment *seg) THROWS(E_SEGFAULT, ...)
+libdl_dltlsaddr2(NCX DlModule *self, NCX struct dltls_segment *seg) THROWS(E_SEGFAULT, ...)
 #endif /* !FAIL_ON_ERROR */
 {
 #ifdef FAIL_ON_ERROR

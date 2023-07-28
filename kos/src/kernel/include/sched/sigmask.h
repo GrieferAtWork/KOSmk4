@@ -168,7 +168,7 @@ NOTHROW(FCALL sigmask_setmask)(sigset_t const *__restrict mask);
 
 /* Helper wrapper for `sigmask_setmask()' that takes a signal-set from user-space. */
 FUNDEF __BOOL FCALL
-sigmask_setmask_from_user(USER CHECKED sigset_t const *mask, size_t size)
+sigmask_setmask_from_user(NCX sigset_t const *mask, size_t size)
 		THROWS(E_SEGFAULT);
 
 /* Get the calling thread's current signal mask. */

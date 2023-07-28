@@ -48,8 +48,8 @@ struct mfile;
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 elfexec_init_entry(struct icpustate *__restrict user_state,
                    KERNEL ElfW(Ehdr) const *__restrict ehdr,
-                   USER void *peb_address, USER void *ustack_base,
-                   size_t ustack_size, USER void const *entry_pc);
+                   NCX void *peb_address, NCX void *ustack_base,
+                   size_t ustack_size, NCX void const *entry_pc);
 #endif /* !CONFIG_EXEC_ARCH_HEADER_DEFINES_ELFEXEC_INIT_ENTRY */
 
 /* Initialize the RTLD user-space library for runtime linking. */
@@ -63,8 +63,8 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
                   KERNEL ElfW(Phdr) const *__restrict phdr_vec,
                   ElfW(Half) phdr_cnt,
                   void *application_loadaddr, void *linker_loadaddr,
-                  USER void *peb_address, USER void *ustack_base,
-                  size_t ustack_size, USER void const *entry_pc);
+                  NCX void *peb_address, NCX void *ustack_base,
+                  size_t ustack_size, NCX void const *entry_pc);
 #endif /* !CONFIG_EXEC_ARCH_HEADER_DEFINES_ELFEXEC_INIT_RTLD */
 
 /* Low-level arch-specific exec functions for compatibility mode */
@@ -75,8 +75,8 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 compat_elfexec_init_entry(struct icpustate *__restrict user_state,
                           KERNEL COMPAT_ElfW(Ehdr) const *__restrict ehdr,
-                          USER void *peb_address, USER void *ustack_base,
-                          size_t ustack_size, USER void const *entry_pc);
+                          NCX void *peb_address, NCX void *ustack_base,
+                          size_t ustack_size, NCX void const *entry_pc);
 #endif /* !EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_ENTRY */
 
 /* Initialize the RTLD user-space library for runtime linking. */
@@ -90,8 +90,8 @@ compat_elfexec_init_rtld(struct icpustate *__restrict user_state,
                          KERNEL COMPAT_ElfW(Phdr) const *__restrict phdr_vec,
                          COMPAT_ElfW(Half) phdr_cnt,
                          void *application_loadaddr, void *linker_loadaddr,
-                         USER void *peb_address, USER void *ustack_base,
-                         size_t ustack_size, USER void const *entry_pc);
+                         NCX void *peb_address, NCX void *ustack_base,
+                         size_t ustack_size, NCX void const *entry_pc);
 #endif /* !EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_RTLD */
 #endif /* __ARCH_HAVE_COMPAT */
 

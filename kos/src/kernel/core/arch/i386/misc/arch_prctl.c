@@ -79,7 +79,7 @@ PRIVATE void KCALL arch_set_cpuid(bool enabled) {
 #ifdef __ARCH_WANT_SYSCALL_ARCH_PRCTL
 DEFINE_SYSCALL2(syscall_slong_t, arch_prctl,
                 unsigned int, command,
-                USER UNCHECKED uintptr_t *, addr) {
+                NCX UNCHECKED uintptr_t *, addr) {
 	/* Predict (and optimize for) the use by libdl, which uses
 	 * this system call to assign  the address of the  initial
 	 * TLS segment.
@@ -100,11 +100,11 @@ DEFINE_SYSCALL2(syscall_slong_t, arch_prctl,
 		break;
 
 	case ARCH_GET_FS:
-		*(USER CHECKED uintptr_t *)validate_writable(addr, sizeof(uintptr_t)) = GET_USER_FSBASE();
+		*(NCX uintptr_t *)validate_writable(addr, sizeof(uintptr_t)) = GET_USER_FSBASE();
 		break;
 
 	case ARCH_GET_GS:
-		*(USER CHECKED uintptr_t *)validate_writable(addr, sizeof(uintptr_t)) = GET_USER_GSBASE();
+		*(NCX uintptr_t *)validate_writable(addr, sizeof(uintptr_t)) = GET_USER_GSBASE();
 		break;
 
 	case ARCH_GET_CPUID:
@@ -126,7 +126,7 @@ DEFINE_SYSCALL2(syscall_slong_t, arch_prctl,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_ARCH_PRCTL
 DEFINE_COMPAT_SYSCALL2(syscall_slong_t, arch_prctl,
                        unsigned int, command,
-                       USER UNCHECKED compat_uintptr_t *, addr) {
+                       NCX UNCHECKED compat_uintptr_t *, addr) {
 	/* Predict (and optimize for) the use by libdl, which uses
 	 * this system call to assign  the address of the  initial
 	 * TLS segment.
@@ -142,11 +142,11 @@ DEFINE_COMPAT_SYSCALL2(syscall_slong_t, arch_prctl,
 		break;
 
 	case ARCH_GET_FS:
-		*(USER CHECKED compat_uintptr_t *)compat_validate_writable(addr, sizeof(compat_uintptr_t)) = GET_USER_FSBASE();
+		*(NCX compat_uintptr_t *)compat_validate_writable(addr, sizeof(compat_uintptr_t)) = GET_USER_FSBASE();
 		break;
 
 	case ARCH_GET_GS:
-		*(USER CHECKED compat_uintptr_t *)compat_validate_writable(addr, sizeof(compat_uintptr_t)) = GET_USER_GSBASE();
+		*(NCX compat_uintptr_t *)compat_validate_writable(addr, sizeof(compat_uintptr_t)) = GET_USER_GSBASE();
 		break;
 
 	case ARCH_GET_CPUID:

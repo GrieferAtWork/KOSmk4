@@ -195,7 +195,7 @@ NOTHROW(KCALL iov_physbuffer_memset)(struct iov_physbuffer const *__restrict sel
 
 PUBLIC NONNULL((1)) void KCALL
 iov_buffer_copyfrommem(struct iov_buffer const *__restrict self, uintptr_t dst_offset,
-                       USER CHECKED void const *__restrict src, size_t num_bytes)
+                       NCX void const *__restrict src, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
 	struct iov_entry ent;
 	IOV_BUFFER_FOREACH_N(ent, self) {
@@ -217,7 +217,7 @@ iov_buffer_copyfrommem(struct iov_buffer const *__restrict self, uintptr_t dst_o
 PUBLIC NONNULL((1)) void KCALL
 iov_physbuffer_copyfrommem(struct iov_physbuffer const *__restrict self,
                            uintptr_t dst_offset,
-                           USER CHECKED void const *src, size_t num_bytes)
+                           NCX void const *src, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
 	struct iov_physentry ent;
 	IOV_PHYSBUFFER_FOREACH_N(ent, self) {
@@ -238,7 +238,7 @@ iov_physbuffer_copyfrommem(struct iov_physbuffer const *__restrict self,
 
 PUBLIC NONNULL((1)) void KCALL
 iov_buffer_copytomem(struct iov_buffer const *__restrict self,
-                     USER CHECKED void *__restrict dst,
+                     NCX void *__restrict dst,
                      uintptr_t src_offset, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
 	struct iov_entry ent;
@@ -264,7 +264,7 @@ iov_buffer_copytomem(struct iov_buffer const *__restrict self,
 
 PUBLIC NONNULL((1)) void KCALL
 iov_physbuffer_copytomem(struct iov_physbuffer const *__restrict self,
-                         USER CHECKED void *dst,
+                         NCX void *dst,
                          uintptr_t src_offset, size_t num_bytes)
        THROWS(E_SEGFAULT) {
 	struct iov_physentry ent;

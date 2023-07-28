@@ -80,7 +80,7 @@ DECL_BEGIN
 /* Return a pointer to the internal mode descriptor matching `mode' */
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct svga_modeinfo const *FCALL
 svgadev_findmode(struct svgadev *__restrict self,
-                 USER CHECKED struct svga_modeinfo const *mode)
+                 NCX struct svga_modeinfo const *mode)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
 	struct svga_modeinfo const *result;
 	size_t i;
@@ -95,7 +95,7 @@ svgadev_findmode(struct svgadev *__restrict self,
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 svgadev_ioctl_getdefmode(struct svgadev *__restrict self,
-                         USER UNCHECKED struct svga_modeinfo *modeinfo)
+                         NCX UNCHECKED struct svga_modeinfo *modeinfo)
 		THROWS(E_SEGFAULT) {
 	validate_writable(modeinfo, sizeof(*modeinfo));
 	memcpy(modeinfo, self->svd_defmode, sizeof(*self->svd_defmode));
@@ -104,9 +104,9 @@ svgadev_ioctl_getdefmode(struct svgadev *__restrict self,
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 svgadev_ioctl_setdefmode(struct svgadev *__restrict self,
-                         USER UNCHECKED struct svga_modeinfo const *modeinfo)
+                         NCX UNCHECKED struct svga_modeinfo const *modeinfo)
 		THROWS(E_SEGFAULT, E_INSUFFICIENT_RIGHTS) {
-	USER CHECKED struct svga_modeinfo const *reqmode;
+	NCX struct svga_modeinfo const *reqmode;
 	require(CAP_SYS_RAWIO);
 	validate_readable(modeinfo, sizeof(*modeinfo));
 	reqmode = svgadev_findmode(self, modeinfo);
@@ -116,7 +116,7 @@ svgadev_ioctl_setdefmode(struct svgadev *__restrict self,
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 svgadev_ioctl_lsmodes(struct svgadev *__restrict self,
-                      USER UNCHECKED struct svga_lsmodes *info)
+                      NCX UNCHECKED struct svga_lsmodes *info)
 		THROWS(E_SEGFAULT, E_INSUFFICIENT_RIGHTS) {
 	size_t i, ncopy, count;
 	struct svga_lsmodes req;
@@ -145,7 +145,7 @@ svgadev_ioctl_lsmodes(struct svgadev *__restrict self,
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 svgadev_ioctl_getcsname(struct svgadev *__restrict self,
-                        USER UNCHECKED char *result)
+                        NCX UNCHECKED char *result)
 		THROWS(E_SEGFAULT, E_INSUFFICIENT_RIGHTS) {
 	validate_writable(result, SVGA_CSNAMELEN * sizeof(char));
 	memcpy(result, self->svd_csdriver->scd_name,
@@ -181,7 +181,7 @@ cs_strings_printer_cb(void *arg,
 		me->csp_reqbuf += (len + 1) * sizeof(char);
 		if (len > me->csp_req.svs_bufsz)
 			len = me->csp_req.svs_bufsz;
-		me->csp_req.svs_buf = (USER CHECKED char *)mempcpy(me->csp_req.svs_buf,
+		me->csp_req.svs_buf = (NCX char *)mempcpy(me->csp_req.svs_buf,
 		                                                   str, len);
 		me->csp_req.svs_bufsz -= len;
 	}
@@ -194,7 +194,7 @@ cs_strings_printer_cb(void *arg,
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 svgadev_ioctl_getcsstrings(struct svgadev *__restrict self,
-                           USER UNCHECKED struct svga_strings *info)
+                           NCX UNCHECKED struct svga_strings *info)
 		THROWS(E_SEGFAULT, E_INSUFFICIENT_RIGHTS) {
 	struct cs_strings_printer req;
 	validate_readwrite(info, sizeof(*info));
@@ -248,7 +248,7 @@ svgalck_v_restore(struct vidlck *__restrict self,
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 svgalck_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-                USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+                NCX UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct svgalck *me = vidlck_assvga(self);
 	switch (cmd) {
 
@@ -268,7 +268,7 @@ svgalck_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		struct svgadev *dv = viddev_assvga(me->vlc_dev);
 		struct svga_modeinfo const *newmode;
 		validate_readable(arg, sizeof(struct svga_modeinfo));
-		newmode = svgadev_findmode(viddev_assvga(me->vlc_dev), (USER CHECKED struct svga_modeinfo *)arg);
+		newmode = svgadev_findmode(viddev_assvga(me->vlc_dev), (NCX struct svga_modeinfo *)arg);
 		viddev_acquire(dv);
 		RAII_FINALLY { viddev_release(dv); };
 
@@ -293,15 +293,15 @@ svgalck_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	}	break;
 
 	case SVGA_IOC_GETDEFMODE:
-		return svgadev_ioctl_getdefmode(viddev_assvga(me->vlc_dev), (USER UNCHECKED struct svga_modeinfo *)arg);
+		return svgadev_ioctl_getdefmode(viddev_assvga(me->vlc_dev), (NCX UNCHECKED struct svga_modeinfo *)arg);
 	case SVGA_IOC_SETDEFMODE:
-		return svgadev_ioctl_setdefmode(viddev_assvga(me->vlc_dev), (USER UNCHECKED struct svga_modeinfo const *)arg);
+		return svgadev_ioctl_setdefmode(viddev_assvga(me->vlc_dev), (NCX UNCHECKED struct svga_modeinfo const *)arg);
 	case SVGA_IOC_LSMODES:
-		return svgadev_ioctl_lsmodes(viddev_assvga(me->vlc_dev), (USER UNCHECKED struct svga_lsmodes *)arg);
+		return svgadev_ioctl_lsmodes(viddev_assvga(me->vlc_dev), (NCX UNCHECKED struct svga_lsmodes *)arg);
 	case SVGA_IOC_GETCSNAME:
-		return svgadev_ioctl_getcsname(viddev_assvga(me->vlc_dev), (USER UNCHECKED char *)arg);
+		return svgadev_ioctl_getcsname(viddev_assvga(me->vlc_dev), (NCX UNCHECKED char *)arg);
 	case SVGA_IOC_CSSTRINGS:
-		return svgadev_ioctl_getcsstrings(viddev_assvga(me->vlc_dev), (USER UNCHECKED struct svga_strings *)arg);
+		return svgadev_ioctl_getcsstrings(viddev_assvga(me->vlc_dev), (NCX UNCHECKED struct svga_strings *)arg);
 
 	default:
 		break;
@@ -526,7 +526,7 @@ svgatty_settty_with_winch(struct svgatty *__restrict self,
 /************************************************************************/
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 svgatty_ioctl_getmode(struct svgatty *__restrict self,
-                      USER UNCHECKED struct svga_modeinfo *modeinfo) {
+                      NCX UNCHECKED struct svga_modeinfo *modeinfo) {
 	REF struct svga_ttyaccess *tty;
 	validate_writable(modeinfo, sizeof(*modeinfo));
 	tty = vidttyaccess_assvga(arref_get(&self->vty_tty));
@@ -537,7 +537,7 @@ svgatty_ioctl_getmode(struct svgatty *__restrict self,
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 svgatty_ioctl_setmode(struct svgatty *__restrict self,
-                      USER UNCHECKED struct svga_modeinfo const *modeinfo) {
+                      NCX UNCHECKED struct svga_modeinfo const *modeinfo) {
 	REF struct svga_ttyaccess *newtty;
 	struct svga_modeinfo const *newmode;
 	validate_readable(modeinfo, sizeof(*modeinfo));
@@ -561,24 +561,24 @@ svgatty_ioctl_setmode(struct svgatty *__restrict self,
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 svgatty_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-                USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+                NCX UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct svgatty *me = (struct svgatty *)mfile_asansitty(self);
 	switch (cmd) {
 
 	case SVGA_IOC_GETMODE:
-		return svgatty_ioctl_getmode(me, (USER UNCHECKED struct svga_modeinfo *)arg);
+		return svgatty_ioctl_getmode(me, (NCX UNCHECKED struct svga_modeinfo *)arg);
 	case SVGA_IOC_SETMODE:
-		return svgatty_ioctl_setmode(me, (USER UNCHECKED struct svga_modeinfo const *)arg);
+		return svgatty_ioctl_setmode(me, (NCX UNCHECKED struct svga_modeinfo const *)arg);
 	case SVGA_IOC_GETDEFMODE:
-		return svgadev_ioctl_getdefmode(viddev_assvga(me->vty_dev), (USER UNCHECKED struct svga_modeinfo *)arg);
+		return svgadev_ioctl_getdefmode(viddev_assvga(me->vty_dev), (NCX UNCHECKED struct svga_modeinfo *)arg);
 	case SVGA_IOC_SETDEFMODE:
-		return svgadev_ioctl_setdefmode(viddev_assvga(me->vty_dev), (USER UNCHECKED struct svga_modeinfo const *)arg);
+		return svgadev_ioctl_setdefmode(viddev_assvga(me->vty_dev), (NCX UNCHECKED struct svga_modeinfo const *)arg);
 	case SVGA_IOC_LSMODES:
-		return svgadev_ioctl_lsmodes(viddev_assvga(me->vty_dev), (USER UNCHECKED struct svga_lsmodes *)arg);
+		return svgadev_ioctl_lsmodes(viddev_assvga(me->vty_dev), (NCX UNCHECKED struct svga_lsmodes *)arg);
 	case SVGA_IOC_GETCSNAME:
-		return svgadev_ioctl_getcsname(viddev_assvga(me->vty_dev), (USER UNCHECKED char *)arg);
+		return svgadev_ioctl_getcsname(viddev_assvga(me->vty_dev), (NCX UNCHECKED char *)arg);
 	case SVGA_IOC_CSSTRINGS:
-		return svgadev_ioctl_getcsstrings(viddev_assvga(me->vty_dev), (USER UNCHECKED struct svga_strings *)arg);
+		return svgadev_ioctl_getcsstrings(viddev_assvga(me->vty_dev), (NCX UNCHECKED struct svga_strings *)arg);
 
 	default:
 		break;
@@ -766,7 +766,7 @@ NOTHROW(KCALL svgadev_v_destroy)(struct mfile *__restrict self) {
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 svgadev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-                USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+                NCX UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct svgadev *me = mfile_assvgadev(self);
 	switch (cmd) {
 
@@ -784,23 +784,23 @@ svgadev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	}	break;
 
 	case SVGA_IOC_GETDEFMODE:
-		return svgadev_ioctl_getdefmode(me, (USER UNCHECKED struct svga_modeinfo *)arg);
+		return svgadev_ioctl_getdefmode(me, (NCX UNCHECKED struct svga_modeinfo *)arg);
 	case SVGA_IOC_SETDEFMODE:
-		return svgadev_ioctl_setdefmode(me, (USER UNCHECKED struct svga_modeinfo const *)arg);
+		return svgadev_ioctl_setdefmode(me, (NCX UNCHECKED struct svga_modeinfo const *)arg);
 	case SVGA_IOC_LSMODES:
-		return svgadev_ioctl_lsmodes(me, (USER UNCHECKED struct svga_lsmodes *)arg);
+		return svgadev_ioctl_lsmodes(me, (NCX UNCHECKED struct svga_lsmodes *)arg);
 	case SVGA_IOC_GETCSNAME:
-		return svgadev_ioctl_getcsname(me, (USER UNCHECKED char *)arg);
+		return svgadev_ioctl_getcsname(me, (NCX UNCHECKED char *)arg);
 	case SVGA_IOC_CSSTRINGS:
-		return svgadev_ioctl_getcsstrings(me, (USER UNCHECKED struct svga_strings *)arg);
+		return svgadev_ioctl_getcsstrings(me, (NCX UNCHECKED struct svga_strings *)arg);
 
 	case SVGA_IOC_MAKETTY: {
-		USER CHECKED struct svga_maketty *info;
-		USER CHECKED char const *name;
+		NCX struct svga_maketty *info;
+		NCX char const *name;
 		struct handle hand;
 		REF struct svgatty *tty;
 		require(CAP_SYS_RAWIO);
-		info = (USER CHECKED struct svga_maketty *)arg;
+		info = (NCX struct svga_maketty *)arg;
 		validate_readable(info, sizeof(*info));
 		name = atomic_read(&info->smt_name);
 		validate_readable(name, 1);

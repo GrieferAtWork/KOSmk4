@@ -64,7 +64,7 @@ DECL_BEGIN
 DEFINE_HANDLE_REFCNT_FUNCTIONS(pidfd, struct taskpid);
 INTERN void KCALL
 handle_pidfd_stat(struct taskpid *__restrict self,
-                  USER CHECKED struct stat *result) {
+                  NCX struct stat *result) {
 	bzero(result, sizeof(*result));
 	/* TODO: st_atim: End of the latest quantum */
 	/* TODO: st_mtim: Start of the latest quantum */
@@ -105,7 +105,7 @@ require_pidfd_open(struct taskpid *__restrict self) {
 
 INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_pidfd_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
-                   USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+                   NCX UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	switch (cmd) {
 
 	case PIDFD_IOC_OPENPID: {
@@ -114,7 +114,7 @@ handle_pidfd_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 		hand.h_mode = mode;
 		hand.h_data = taskpid_getprocpid(self);
 		require_pidfd_open((struct taskpid *)hand.h_data);
-		return handles_install_openfd(hand, (USER UNCHECKED struct openfd *)arg);
+		return handles_install_openfd(hand, (NCX UNCHECKED struct openfd *)arg);
 	}	break;
 
 	case PIDFD_IOC_OPENPPID: {
@@ -124,7 +124,7 @@ handle_pidfd_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 		hand.h_data = taskpid_getparentprocesspid(self);
 		FINALLY_DECREF_UNLIKELY((struct taskpid *)hand.h_data);
 		require_pidfd_open((struct taskpid *)hand.h_data);
-		return handles_install_openfd(hand, (USER UNCHECKED struct openfd *)arg);
+		return handles_install_openfd(hand, (NCX UNCHECKED struct openfd *)arg);
 	}	break;
 
 	case PIDFD_IOC_EXITCODE: {
@@ -283,10 +283,10 @@ pidfd_send_signal_impl(fd_t pidfd,
 #ifdef __ARCH_WANT_SYSCALL_PIDFD_SEND_SIGNAL
 INTDEF NONNULL((1)) void KCALL /* from "posix-signal.c" */
 siginfo_from_user(siginfo_t *__restrict info, signo_t usigno,
-                  USER UNCHECKED siginfo_t const *uinfo);
+                  NCX UNCHECKED siginfo_t const *uinfo);
 DEFINE_SYSCALL4(errno_t, pidfd_send_signal,
                 fd_t, pidfd, signo_t, usigno,
-                USER UNCHECKED siginfo_t const *, uinfo,
+                NCX UNCHECKED siginfo_t const *, uinfo,
                 syscall_ulong_t, flags) {
 	siginfo_t info;
 	siginfo_from_user(&info, usigno, uinfo);
@@ -297,10 +297,10 @@ DEFINE_SYSCALL4(errno_t, pidfd_send_signal,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_PIDFD_SEND_SIGNAL
 INTDEF NONNULL((1)) void KCALL /* from "posix-signal.c" */
 siginfo_from_compat_user(siginfo_t *__restrict info, signo_t usigno,
-                         USER UNCHECKED compat_siginfo_t const *uinfo);
+                         NCX UNCHECKED compat_siginfo_t const *uinfo);
 DEFINE_COMPAT_SYSCALL4(errno_t, pidfd_send_signal,
                        fd_t, pidfd, signo_t, usigno,
-                       USER UNCHECKED compat_siginfo_t const *, uinfo,
+                       NCX UNCHECKED compat_siginfo_t const *, uinfo,
                        syscall_ulong_t, flags) {
 	siginfo_t info;
 	siginfo_from_compat_user(&info, usigno, uinfo);

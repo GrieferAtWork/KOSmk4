@@ -52,15 +52,15 @@
 DECL_BEGIN
 
 FUNDEF ATTR_COLD ATTR_NORETURN void FCALL
-_except_throw_unmapped_user_rd(UNCHECKED USER void const *addr)
+_except_throw_unmapped_user_rd(NCX UNCHECKED void const *addr)
 		THROWS(E_SEGFAULT_UNMAPPED)
 		ASMNAME("except_throw_unmapped_user_rd");
 FUNDEF ATTR_COLD ATTR_NORETURN void FCALL
-_except_throw_unmapped_user_wr(UNCHECKED USER void const *addr)
+_except_throw_unmapped_user_wr(NCX UNCHECKED void const *addr)
 		THROWS(E_SEGFAULT_UNMAPPED)
 		ASMNAME("except_throw_unmapped_user_wr");
 FUNDEF ATTR_COLD ATTR_NORETURN void FCALL
-_except_throw_noexec_user(UNCHECKED USER void const *addr)
+_except_throw_noexec_user(NCX UNCHECKED void const *addr)
 		THROWS(E_SEGFAULT_NOTEXECUTABLE)
 		ASMNAME("except_throw_noexec_user");
 
@@ -81,32 +81,32 @@ _except_throw_noexec_user(UNCHECKED USER void const *addr)
  *                 these functions are used to deny the user access to such memory.
  * @throw E_SEGFAULT: User-space has not been granted access to the given address range. */
 #ifdef __INTELLISENSE__
-FUNDEF CHECKED USER void const *FCALL validate_user(UNCHECKED USER void const *base, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void const *FCALL validate_user_opt(UNCHECKED USER void const *base, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void const *FCALL validate_userm(UNCHECKED USER void const *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void const *FCALL validate_userm_opt(UNCHECKED USER void const *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void const *FCALL validate_useraddr(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void const *FCALL validate_useraddr_opt(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void const *FCALL validate_readable(UNCHECKED USER void const *base, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void const *FCALL validate_readable_opt(UNCHECKED USER void const *base, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void const *FCALL validate_readablem(UNCHECKED USER void const *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void const *FCALL validate_readablem_opt(UNCHECKED USER void const *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void const *FCALL validate_readableaddr(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void const *FCALL validate_readableaddr_opt(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void *FCALL validate_writable(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void *FCALL validate_writable_opt(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void *FCALL validate_writablem(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void *FCALL validate_writablem_opt(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void *FCALL validate_writableaddr(UNCHECKED USER void *addr) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void *FCALL validate_writableaddr_opt(UNCHECKED USER void *addr) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void *FCALL validate_readwrite(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void *FCALL validate_readwrite_opt(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void *FCALL validate_readwritem(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void *FCALL validate_readwritem_opt(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void *FCALL validate_readwriteaddr(UNCHECKED USER void *addr) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void *FCALL validate_readwriteaddr_opt(UNCHECKED USER void *addr) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void const *FCALL validate_executable(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT);
-FUNDEF CHECKED USER void const *FCALL validate_executable_opt(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT);
+FUNDEF NCX void const *FCALL validate_user(NCX UNCHECKED void const *base, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF NCX void const *FCALL validate_user_opt(NCX UNCHECKED void const *base, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF NCX void const *FCALL validate_userm(NCX UNCHECKED void const *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
+FUNDEF NCX void const *FCALL validate_userm_opt(NCX UNCHECKED void const *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
+FUNDEF NCX void const *FCALL validate_useraddr(NCX UNCHECKED void const *addr) THROWS(E_SEGFAULT);
+FUNDEF NCX void const *FCALL validate_useraddr_opt(NCX UNCHECKED void const *addr) THROWS(E_SEGFAULT);
+FUNDEF NCX void const *FCALL validate_readable(NCX UNCHECKED void const *base, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF NCX void const *FCALL validate_readable_opt(NCX UNCHECKED void const *base, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF NCX void const *FCALL validate_readablem(NCX UNCHECKED void const *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
+FUNDEF NCX void const *FCALL validate_readablem_opt(NCX UNCHECKED void const *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
+FUNDEF NCX void const *FCALL validate_readableaddr(NCX UNCHECKED void const *addr) THROWS(E_SEGFAULT);
+FUNDEF NCX void const *FCALL validate_readableaddr_opt(NCX UNCHECKED void const *addr) THROWS(E_SEGFAULT);
+FUNDEF NCX void *FCALL validate_writable(NCX UNCHECKED void *base, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF NCX void *FCALL validate_writable_opt(NCX UNCHECKED void *base, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF NCX void *FCALL validate_writablem(NCX UNCHECKED void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
+FUNDEF NCX void *FCALL validate_writablem_opt(NCX UNCHECKED void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
+FUNDEF NCX void *FCALL validate_writableaddr(NCX UNCHECKED void *addr) THROWS(E_SEGFAULT);
+FUNDEF NCX void *FCALL validate_writableaddr_opt(NCX UNCHECKED void *addr) THROWS(E_SEGFAULT);
+FUNDEF NCX void *FCALL validate_readwrite(NCX UNCHECKED void *base, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF NCX void *FCALL validate_readwrite_opt(NCX UNCHECKED void *base, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF NCX void *FCALL validate_readwritem(NCX UNCHECKED void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
+FUNDEF NCX void *FCALL validate_readwritem_opt(NCX UNCHECKED void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
+FUNDEF NCX void *FCALL validate_readwriteaddr(NCX UNCHECKED void *addr) THROWS(E_SEGFAULT);
+FUNDEF NCX void *FCALL validate_readwriteaddr_opt(NCX UNCHECKED void *addr) THROWS(E_SEGFAULT);
+FUNDEF NCX void const *FCALL validate_executable(NCX UNCHECKED void const *addr) THROWS(E_SEGFAULT);
+FUNDEF NCX void const *FCALL validate_executable_opt(NCX UNCHECKED void const *addr) THROWS(E_SEGFAULT);
 #elif defined(__CHECKER__)
 #define validate_user(base, num_bytes)                               __builtin_remove_noderef(base)
 #define validate_user_opt(base, num_bytes)                           __builtin_remove_noderef(base)
@@ -135,9 +135,9 @@ FUNDEF CHECKED USER void const *FCALL validate_executable_opt(UNCHECKED USER voi
 #define validate_executable(addr)                                    __builtin_remove_noderef(addr)
 #define validate_executable_opt(addr)                                __builtin_remove_noderef(addr)
 #else /* ... */
-EIDECLARE(, USER CHECKED void const *, , FCALL, validate_readableaddr, (UNCHECKED USER void const *addr), THROWS(E_SEGFAULT) { if unlikely(!_ADDR_ISUSER(addr)) _except_throw_unmapped_user_rd(addr); return addr; })
-EIDECLARE(, USER CHECKED void *, , FCALL, validate_writableaddr, (UNCHECKED USER void *addr), THROWS(E_SEGFAULT) { if unlikely(!_ADDR_ISUSER(addr)) _except_throw_unmapped_user_wr(addr); return addr; })
-EIDECLARE(, USER CHECKED void const *, , FCALL, validate_executable, (UNCHECKED USER void const *addr), THROWS(E_SEGFAULT) { if unlikely(!_ADDR_ISUSER(addr)) _except_throw_noexec_user(addr); return addr; })
+EIDECLARE(, NCX void const *, , FCALL, validate_readableaddr, (NCX UNCHECKED void const *addr), THROWS(E_SEGFAULT) { if unlikely(!_ADDR_ISUSER(addr)) _except_throw_unmapped_user_rd(addr); return addr; })
+EIDECLARE(, NCX void *, , FCALL, validate_writableaddr, (NCX UNCHECKED void *addr), THROWS(E_SEGFAULT) { if unlikely(!_ADDR_ISUSER(addr)) _except_throw_unmapped_user_wr(addr); return addr; })
+EIDECLARE(, NCX void const *, , FCALL, validate_executable, (NCX UNCHECKED void const *addr), THROWS(E_SEGFAULT) { if unlikely(!_ADDR_ISUSER(addr)) _except_throw_noexec_user(addr); return addr; })
 #define validate_user(base, num_bytes)                           validate_readableaddr(base)
 #define validate_userm(base, num_items, item_size_in_bytes)      validate_readableaddr(base)
 #define validate_useraddr(addr)                                  validate_readableaddr(addr)
@@ -279,17 +279,17 @@ EIDECLARE(, USER CHECKED void const *, , FCALL, validate_executable, (UNCHECKED 
 #endif /* __ARCH_HAVE_COMPAT */
 
 
-#define validate_and_read(ptr)                                                                               \
-	({                                                                                                       \
-		__auto_type __vr_res = *(USER CHECKED typeof(*(ptr)) const *)validate_readable(ptr, sizeof(*(ptr))); \
-		COMPILER_READ_BARRIER();                                                                             \
-		__vr_res;                                                                                            \
+#define validate_and_read(ptr)                                                                  \
+	({                                                                                          \
+		__auto_type __vr_res = *(typeof(*(ptr)) const *)validate_readable(ptr, sizeof(*(ptr))); \
+		COMPILER_READ_BARRIER();                                                                \
+		__vr_res;                                                                               \
 	})
-#define validate_and_write(ptr, val)                                                    \
-	({                                                                                  \
-		*(USER CHECKED typeof(*(ptr)) *)validate_writable(ptr, sizeof(*(ptr))) = (val); \
-		COMPILER_WRITE_BARRIER();                                                       \
-		(void)0;                                                                        \
+#define validate_and_write(ptr, val)                                       \
+	({                                                                     \
+		*(typeof(*(ptr)) *)validate_writable(ptr, sizeof(*(ptr))) = (val); \
+		COMPILER_WRITE_BARRIER();                                          \
+		(void)0;                                                           \
 	})
 
 
@@ -299,61 +299,61 @@ EIDECLARE(, USER CHECKED void const *, , FCALL, validate_executable, (UNCHECKED 
 
 /* Read a boolean value from a a variable-sized (but defaulting to sizeof(int)) buffer `arg' */
 FUNDEF WUNUSED __BOOL FCALL
-ioctl_intarg_getbool(ioctl_t cmd, USER UNCHECKED void *arg)
+ioctl_intarg_getbool(ioctl_t cmd, NCX UNCHECKED void *arg)
 		THROWS(E_SEGFAULT);
 
 /* Write a boolean 0/1 value into a variable-sized (but defaulting to sizeof(int)) buffer `arg'
  * @return: 0 : Always returns `0' */
 FUNDEF syscall_slong_t FCALL
-ioctl_intarg_setbool(ioctl_t cmd, USER UNCHECKED void *arg, __BOOL value)
+ioctl_intarg_setbool(ioctl_t cmd, NCX UNCHECKED void *arg, __BOOL value)
 		THROWS(E_SEGFAULT);
 
 /* Read a 32-bit-value from a a variable-sized (but defaulting to 4) buffer `arg'
  * - When an invalid size is encoded in `cmd', throw `E_INVALID_ARGUMENT_UNKNOWN_COMMAND' */
 FUNDEF WUNUSED u32 FCALL
-ioctl_intarg_getu32(ioctl_t cmd, USER UNCHECKED void *arg)
+ioctl_intarg_getu32(ioctl_t cmd, NCX UNCHECKED void *arg)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 FUNDEF WUNUSED u16 FCALL
-ioctl_intarg_getu16(ioctl_t cmd, USER UNCHECKED void *arg)
+ioctl_intarg_getu16(ioctl_t cmd, NCX UNCHECKED void *arg)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 FUNDEF WUNUSED u8 FCALL
-ioctl_intarg_getu8(ioctl_t cmd, USER UNCHECKED void *arg)
+ioctl_intarg_getu8(ioctl_t cmd, NCX UNCHECKED void *arg)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
 /* Read a 64-bit-value from a a variable-sized (but defaulting to 8) buffer `arg'
  * - When an invalid size is encoded in `cmd', throw `E_INVALID_ARGUMENT_UNKNOWN_COMMAND' */
 FUNDEF WUNUSED u64 FCALL
-ioctl_intarg_getu64(ioctl_t cmd, USER UNCHECKED void *arg)
+ioctl_intarg_getu64(ioctl_t cmd, NCX UNCHECKED void *arg)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
 /* Write a 32-bit-value into a variable-sized (but defaulting to 4) buffer `arg'
  * @return: 0 : Always returns `0' */
 FUNDEF syscall_slong_t FCALL
-ioctl_intarg_setu32(ioctl_t cmd, USER UNCHECKED void *arg, u32 value)
+ioctl_intarg_setu32(ioctl_t cmd, NCX UNCHECKED void *arg, u32 value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 FUNDEF syscall_slong_t FCALL
-ioctl_intarg_sets32(ioctl_t cmd, USER UNCHECKED void *arg, s32 value)
+ioctl_intarg_sets32(ioctl_t cmd, NCX UNCHECKED void *arg, s32 value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 FUNDEF syscall_slong_t FCALL
-ioctl_intarg_setu16(ioctl_t cmd, USER UNCHECKED void *arg, u16 value)
+ioctl_intarg_setu16(ioctl_t cmd, NCX UNCHECKED void *arg, u16 value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 FUNDEF syscall_slong_t FCALL
-ioctl_intarg_sets16(ioctl_t cmd, USER UNCHECKED void *arg, s16 value)
+ioctl_intarg_sets16(ioctl_t cmd, NCX UNCHECKED void *arg, s16 value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 FUNDEF syscall_slong_t FCALL
-ioctl_intarg_setu8(ioctl_t cmd, USER UNCHECKED void *arg, u8 value)
+ioctl_intarg_setu8(ioctl_t cmd, NCX UNCHECKED void *arg, u8 value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 FUNDEF syscall_slong_t FCALL
-ioctl_intarg_sets8(ioctl_t cmd, USER UNCHECKED void *arg, s8 value)
+ioctl_intarg_sets8(ioctl_t cmd, NCX UNCHECKED void *arg, s8 value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
 /* Write a 64-bit-value into a variable-sized (but defaulting to 8) buffer `arg'
  * @return: 0 : Always returns `0' */
 FUNDEF syscall_slong_t FCALL
-ioctl_intarg_setu64(ioctl_t cmd, USER UNCHECKED void *arg, u64 value)
+ioctl_intarg_setu64(ioctl_t cmd, NCX UNCHECKED void *arg, u64 value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 FUNDEF syscall_slong_t FCALL
-ioctl_intarg_sets64(ioctl_t cmd, USER UNCHECKED void *arg, s64 value)
+ioctl_intarg_sets64(ioctl_t cmd, NCX UNCHECKED void *arg, s64 value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
 #define _IOCTL_INTARG_GETS1 (s8)ioctl_intarg_getu8
@@ -397,13 +397,13 @@ ioctl_intarg_sets64(ioctl_t cmd, USER UNCHECKED void *arg, s64 value)
  * - This function includes special handling for compatibility (if present and necessary)
  * - When an invalid size is encoded in `cmd', throw `E_INVALID_ARGUMENT_UNKNOWN_COMMAND' */
 FUNDEF WUNUSED size_t FCALL
-ioctl_intarg_getsize(ioctl_t cmd, USER UNCHECKED void *arg)
+ioctl_intarg_getsize(ioctl_t cmd, NCX UNCHECKED void *arg)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
 /* Write a size_t-value into a variable-sized (but defaulting to sizeof(size_t)) buffer `arg'
  * @return: 0 : Always returns `0' */
 FUNDEF syscall_slong_t FCALL
-ioctl_intarg_setsize(ioctl_t cmd, USER UNCHECKED void *arg, size_t value)
+ioctl_intarg_setsize(ioctl_t cmd, NCX UNCHECKED void *arg, size_t value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
 DECL_END

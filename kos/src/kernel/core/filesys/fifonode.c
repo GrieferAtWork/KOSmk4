@@ -67,7 +67,7 @@ ffifonode_v_open(struct mfile *__restrict self,
 }
 
 PUBLIC BLOCKING WUNUSED NONNULL((1)) size_t KCALL
-ffifonode_v_read(struct mfile *__restrict self, USER CHECKED void *dst,
+ffifonode_v_read(struct mfile *__restrict self, NCX void *dst,
                  size_t num_bytes, iomode_t mode) THROWS(...) {
 	size_t result;
 	struct ffifonode *me = mfile_asfifo(self);
@@ -168,7 +168,7 @@ again_read_ent:
 INTDEF ATTR_NORETURN void KCALL pipe_throw_broken_pipe(void);
 
 PUBLIC BLOCKING WUNUSED NONNULL((1)) size_t KCALL
-ffifonode_v_write(struct mfile *__restrict self, USER CHECKED void const *src,
+ffifonode_v_write(struct mfile *__restrict self, NCX void const *src,
                   size_t num_bytes, iomode_t mode) THROWS(...) {
 	size_t result;
 	struct ffifonode *me = mfile_asfifo(self);
@@ -288,7 +288,7 @@ ffifonode_v_truncate(struct mfile *__restrict self, pos_t new_size)
 /* Fills in `st_size' with `mfile_asfifo(self)->ff_buffer.rb_avail' */
 PUBLIC NONNULL((1)) void KCALL
 ffifonode_v_stat(struct mfile *__restrict self,
-                 USER CHECKED struct stat *result)
+                 NCX struct stat *result)
 		THROWS(E_SEGFAULT) {
 	struct ffifonode *me;
 	size_t avail;
@@ -300,11 +300,11 @@ ffifonode_v_stat(struct mfile *__restrict self,
 
 INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL /* From "misc/pipe.c" */
 ringbuffer_ioctl(struct ringbuffer *__restrict self, ioctl_t cmd,
-                 USER UNCHECKED void *arg, iomode_t mode);
+                 NCX UNCHECKED void *arg, iomode_t mode);
 
 PUBLIC BLOCKING NONNULL((1)) syscall_slong_t KCALL
 ffifonode_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-                  USER UNCHECKED void *arg, iomode_t mode)
+                  NCX UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 	struct ffifonode *me = mfile_asfifo(self);
 	syscall_slong_t result;

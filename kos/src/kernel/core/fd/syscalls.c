@@ -249,7 +249,7 @@ DEFINE_SYSCALL1(errno_t, fdatasync, fd_t, fd) {
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_KREADDIR
 DEFINE_SYSCALL4(ssize_t, kreaddir,
-                fd_t, fd, USER UNCHECKED struct dirent *, buf,
+                fd_t, fd, NCX UNCHECKED struct dirent *, buf,
                 size_t, bufsize, syscall_ulong_t, mode) {
 	size_t result;
 	struct handle hand;
@@ -288,7 +288,7 @@ DEFINE_SYSCALL4(ssize_t, kreaddir,
 				break;
 			}
 			/* Move the buffer past this entry. */
-			buf = (USER struct dirent *)((byte_t *)buf + partial);
+			buf = (NCX struct dirent *)((byte_t *)buf + partial);
 			bufsize -= partial;
 			result += partial;
 			/* Align the buffer by INodes (8 bytes). */
@@ -297,7 +297,7 @@ DEFINE_SYSCALL4(ssize_t, kreaddir,
 				alignoff = sizeof(ino64_t) - alignoff;
 				if (bufsize < alignoff)
 					break;
-				buf = (USER struct dirent *)((byte_t *)buf + alignoff);
+				buf = (NCX struct dirent *)((byte_t *)buf + alignoff);
 				bufsize -= alignoff;
 				result += alignoff;
 			}
@@ -360,7 +360,7 @@ DEFINE_SYSCALL5(ssize_t, kreaddirf,
 				break;
 			}
 			/* Move the buffer past this entry. */
-			buf = (USER struct dirent *)((byte_t *)buf + partial);
+			buf = (NCX struct dirent *)((byte_t *)buf + partial);
 			bufsize -= partial;
 			result += partial;
 			/* Align the buffer by INodes (8 bytes). */
@@ -369,7 +369,7 @@ DEFINE_SYSCALL5(ssize_t, kreaddirf,
 				alignoff = sizeof(ino64_t) - alignoff;
 				if (bufsize < alignoff)
 					break;
-				buf = (USER struct dirent *)((byte_t *)buf + alignoff);
+				buf = (NCX struct dirent *)((byte_t *)buf + alignoff);
 				bufsize -= alignoff;
 				result += alignoff;
 			}

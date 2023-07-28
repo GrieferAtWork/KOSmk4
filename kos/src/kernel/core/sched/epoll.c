@@ -863,7 +863,7 @@ PUBLIC NONNULL((1, 2)) bool KCALL
 epoll_controller_addmonitor(struct epoll_controller *__restrict self,
                             struct handle const *__restrict hand,
                             uint32_t fd_key,
-                            USER CHECKED struct epoll_event const *info)
+                            NCX struct epoll_event const *info)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT,
 		       E_ILLEGAL_REFERENCE_LOOP) {
 	struct epoll_handle_monitor *newmon;
@@ -1278,7 +1278,7 @@ PUBLIC NONNULL((1, 2)) bool KCALL
 epoll_controller_modmonitor(struct epoll_controller *__restrict self,
                             struct handle const *__restrict hand,
                             uint32_t fd_key,
-                            USER CHECKED struct epoll_event const *info)
+                            NCX struct epoll_event const *info)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT) {
 	struct epoll_event new_events;
 	memcpy(&new_events, info, sizeof(struct epoll_event));
@@ -1481,7 +1481,7 @@ NOTHROW(FCALL epoll_handle_monitor_dc_chain)(struct epoll_handle_monitor *chain)
  *              monitor becomes raised, `self->ec_avail' will be send. */
 PUBLIC NONNULL((1)) size_t KCALL
 epoll_controller_trywait(struct epoll_controller *__restrict self,
-                         USER CHECKED struct epoll_event *events,
+                         NCX struct epoll_event *events,
                          size_t maxevents)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT) {
 	/* Return value. */
@@ -1729,7 +1729,7 @@ done:
  * `epoll_controller_trywait()') */
 PUBLIC BLOCKING NONNULL((1)) size_t KCALL
 epoll_controller_wait(struct epoll_controller *__restrict self,
-                      USER CHECKED struct epoll_event *events,
+                      NCX struct epoll_event *events,
                       size_t maxevents, ktime_t abs_timeout)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT) {
 	size_t result;
@@ -1758,7 +1758,7 @@ again:
 
 PUBLIC NONNULL((1, 4)) size_t KCALL
 epoll_controller_wait_with_sigmask(struct epoll_controller *__restrict self,
-                                   USER CHECKED struct epoll_event *events,
+                                   NCX struct epoll_event *events,
                                    size_t maxevents,
                                    sigset_t const *__restrict sigmask,
                                    ktime_t abs_timeout)
@@ -1842,19 +1842,19 @@ PRIVATE NONNULL((1, 2)) bool KCALL
 epoll_create_rpc_monitor(struct epoll_controller *__restrict self,
                          struct handle const *__restrict fd_handle,
                          uint32_t fd, uint32_t events,
-                         USER CHECKED struct epoll_rpc_program const *info) {
+                         NCX struct epoll_rpc_program const *info) {
 	pid_t target_tid;
 	syscall_ulong_t mode;
-	USER CHECKED void const *program;
-	USER CHECKED void const *params;
+	NCX void const *program;
+	NCX void const *params;
 	size_t max_param_count;
 	struct epoll_monitor_rpc *rpc;
 
 	/* Load RPC info. */
 	target_tid      = info->erp_target;
 	mode            = info->erp_mode;
-	program         = (USER CHECKED void const *)(uintptr_t)info->erp_prog;
-	params          = (USER CHECKED void const *)(uintptr_t)info->erp_params;
+	program         = (NCX void const *)(uintptr_t)info->erp_prog;
+	params          = (NCX void const *)(uintptr_t)info->erp_params;
 	max_param_count = (size_t)info->erp_max_param_count;
 	validate_readable(program, 1);
 	validate_readable(params, 1); /* Yes: only validate 1 byte (because the copy is done linearly,
@@ -1881,7 +1881,7 @@ epoll_create_rpc_monitor(struct epoll_controller *__restrict self,
 	/* Allocate the new RPC controller. */
 	{
 		size_t struct_size = offsetof(struct epoll_monitor_rpc, emr_rpc.pr_user.pur_argv) +
-		                     max_param_count * sizeof(USER UNCHECKED void *);
+		                     max_param_count * sizeof(NCX UNCHECKED void *);
 		if (struct_size < offsetafter(struct epoll_monitor_rpc, emr_rpc.pr_user.pur_error))
 			struct_size = offsetafter(struct epoll_monitor_rpc, emr_rpc.pr_user.pur_error);
 		rpc = (struct epoll_monitor_rpc *)pending_rpc_alloc(struct_size, GFP_NORMAL);
@@ -1891,8 +1891,8 @@ epoll_create_rpc_monitor(struct epoll_controller *__restrict self,
 		/* Copy RPC arguments. */
 #ifdef __ARCH_HAVE_COMPAT
 		if (syscall_iscompat()) {
-			__ARCH_COMPAT_PTR(USER UNCHECKED void const) USER UNCHECKED const *params_v;
-			params_v = (__ARCH_COMPAT_PTR(USER UNCHECKED void const) USER UNCHECKED const *)params;
+			__ARCH_COMPAT_PTR(NCX UNCHECKED void const) NCX UNCHECKED const *params_v;
+			params_v = (__ARCH_COMPAT_PTR(NCX UNCHECKED void const) NCX UNCHECKED const *)params;
 			size_t i;
 			for (i = 0; i < max_param_count; ++i)
 				rpc->emr_rpc.pr_user.pur_argv[i] = params_v[i];
@@ -1900,7 +1900,7 @@ epoll_create_rpc_monitor(struct epoll_controller *__restrict self,
 #endif /* __ARCH_HAVE_COMPAT */
 		{
 			memcpy(rpc->emr_rpc.pr_user.pur_argv, params,
-			       max_param_count, sizeof(USER UNCHECKED void *));
+			       max_param_count, sizeof(NCX UNCHECKED void *));
 		}
 
 		/* Lookup the target thread. */
@@ -1932,7 +1932,7 @@ epoll_create_rpc_monitor(struct epoll_controller *__restrict self,
 
 DEFINE_SYSCALL4(errno_t, epoll_ctl,
                 fd_t, epfd, syscall_ulong_t, op, fd_t, fd,
-                USER UNCHECKED struct epoll_event *, info) {
+                NCX UNCHECKED struct epoll_event *, info) {
 	errno_t result = -EOK;
 	REF struct epoll_controller *self;
 	REF struct handle fd_handle;
@@ -1962,11 +1962,11 @@ DEFINE_SYSCALL4(errno_t, epoll_ctl,
 #ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 	case EPOLL_CTL_RPC_PROG: {
 		struct epoll_event eventinfo;
-		USER CHECKED struct epoll_rpc_program const *program;
+		NCX struct epoll_rpc_program const *program;
 		validate_readable(info, sizeof(*info));
 		memcpy(&eventinfo, info, sizeof(struct epoll_event));
 		validate_readable(eventinfo.data.ptr, sizeof(struct epoll_rpc_program));
-		program = (USER CHECKED struct epoll_rpc_program const *)eventinfo.data.ptr;
+		program = (NCX struct epoll_rpc_program const *)eventinfo.data.ptr;
 		/* Create the RPC monitor. */
 		if (!epoll_create_rpc_monitor(self, &fd_handle, (uint32_t)fd,
 		                              eventinfo.events, program))
@@ -1985,7 +1985,7 @@ DEFINE_SYSCALL4(errno_t, epoll_ctl,
 
 #ifdef __ARCH_WANT_SYSCALL_EPOLL_WAIT
 DEFINE_SYSCALL4(ssize_t, epoll_wait,
-                fd_t, epfd, USER UNCHECKED struct epoll_event *, events,
+                fd_t, epfd, NCX UNCHECKED struct epoll_event *, events,
                 size_t, maxevents, syscall_slong_t, timeout) {
 	size_t result;
 	REF struct epoll_controller *self;
@@ -2017,10 +2017,10 @@ INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 sys_epoll_pwait_impl(struct icpustate *__restrict state,
                      struct rpc_syscall_info *__restrict sc_info) {
 	fd_t epfd                                 = (fd_t)sc_info->rsi_regs[0];
-	USER UNCHECKED struct epoll_event *events = (USER UNCHECKED struct epoll_event *)sc_info->rsi_regs[1];
+	NCX UNCHECKED struct epoll_event *events = (NCX UNCHECKED struct epoll_event *)sc_info->rsi_regs[1];
 	size_t maxevents                          = (size_t)sc_info->rsi_regs[2];
 	syscall_slong_t timeout                   = (syscall_slong_t)sc_info->rsi_regs[3];
-	USER UNCHECKED sigset_t const *sigmask    = (USER UNCHECKED sigset_t const *)sc_info->rsi_regs[4];
+	NCX UNCHECKED sigset_t const *sigmask    = (NCX UNCHECKED sigset_t const *)sc_info->rsi_regs[4];
 	size_t sigsetsize                         = (size_t)sc_info->rsi_regs[5];
 	if (sigmask) {
 		size_t result;
@@ -2089,9 +2089,9 @@ sys_epoll_pwait_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 }
 
 DEFINE_SYSCALL6(ssize_t, epoll_pwait,
-                fd_t, epfd, USER UNCHECKED struct epoll_event *, events,
+                fd_t, epfd, NCX UNCHECKED struct epoll_event *, events,
                 size_t, maxevents, syscall_slong_t, timeout,
-                USER UNCHECKED sigset_t const *, sigmask, size_t, sigsetsize) {
+                NCX UNCHECKED sigset_t const *, sigmask, size_t, sigsetsize) {
 	ssize_t result;
 	if (sigmask) {
 		(void)sigsetsize;

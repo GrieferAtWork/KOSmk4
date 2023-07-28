@@ -551,18 +551,18 @@ FUNDEF NOBLOCK WUNUSED REF struct driver *NOTHROW(FCALL driver_next)(struct modu
  * relative to the calling thread's current CWD, however absolute paths
  * are interpreted relative to `vfs_kernel' (i.e. are _NOT_ affected by
  * chroot(2)) */
-FUNDEF WUNUSED REF struct driver *FCALL driver_fromname(USER CHECKED char const *driver_name) THROWS(E_SEGFAULT);
-FUNDEF WUNUSED REF struct driver *FCALL driver_fromname_with_len(USER CHECKED char const *driver_name, size_t driver_name_len) THROWS(E_SEGFAULT);
-FUNDEF WUNUSED REF struct driver *FCALL driver_fromfilename(USER CHECKED char const *driver_filename) THROWS(E_SEGFAULT);
-FUNDEF WUNUSED REF struct driver *FCALL driver_fromfilename_with_len(USER CHECKED char const *driver_filename, size_t driver_name_len) THROWS(E_SEGFAULT);
+FUNDEF WUNUSED REF struct driver *FCALL driver_fromname(NCX char const *driver_name) THROWS(E_SEGFAULT);
+FUNDEF WUNUSED REF struct driver *FCALL driver_fromname_with_len(NCX char const *driver_name, size_t driver_name_len) THROWS(E_SEGFAULT);
+FUNDEF WUNUSED REF struct driver *FCALL driver_fromfilename(NCX char const *driver_filename) THROWS(E_SEGFAULT);
+FUNDEF WUNUSED REF struct driver *FCALL driver_fromfilename_with_len(NCX char const *driver_filename, size_t driver_name_len) THROWS(E_SEGFAULT);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF struct driver *NOTHROW(FCALL driver_fromfile)(struct mfile *__restrict driver_file);
 #ifdef __cplusplus
 extern "C++" {
 FUNDEF WUNUSED REF struct driver *FCALL
-driver_fromname(USER CHECKED char const *driver_name, size_t driver_name_len)
+driver_fromname(NCX char const *driver_name, size_t driver_name_len)
 	THROWS(E_SEGFAULT) ASMNAME("driver_fromname_with_len");
 FUNDEF WUNUSED REF struct driver *FCALL
-driver_fromfilename(USER CHECKED char const *driver_filename, size_t driver_name_len)
+driver_fromfilename(NCX char const *driver_filename, size_t driver_name_len)
 	THROWS(E_SEGFAULT) ASMNAME("driver_fromfilename_with_len");
 } /* extern "C++" */
 #endif /* __cplusplus */
@@ -592,7 +592,7 @@ driver_getfile(struct driver *__restrict self)
 struct driver_syminfo {
 	uint32_t                 dsi_elfhash; /* [in|out] ELF symbol name hash. */
 	uint32_t                 dsi_gnuhash; /* [in|out] GNU symbol name hash. */
-	USER CHECKED char const *dsi_name;    /* [1..1][in] Symbol name */
+	NCX char const *dsi_name;    /* [1..1][in] Symbol name */
 	void                    *dsi_addr;    /* [out] Symbol address. (absolute) */
 	size_t                   dsi_size;    /* [out] Symbol size. */
 	unsigned char            dsi_bind;    /* [out] Symbol binding (one of `STB_GLOBAL' or `STB_WEAK') */
@@ -640,14 +640,14 @@ driver_dlsym_global(struct driver_syminfo *__restrict info)
 /* Helper wrappers for the above functions that simply take the
  * name of the symbol and will return its address, or `NULL' if
  * no such symbol could be found. */
-FUNDEF BLOCKING WUNUSED NONNULL((1)) void *FCALL driver_dlsym_local_f(struct driver *__restrict self, USER CHECKED char const *name) THROWS(E_SEGFAULT, ...);
-FUNDEF BLOCKING WUNUSED NONNULL((1)) void *FCALL driver_dlsym_f(struct driver *__restrict self, USER CHECKED char const *name) THROWS(E_SEGFAULT, ...);
-FUNDEF BLOCKING WUNUSED void *FCALL driver_dlsym_global_f(USER CHECKED char const *name) THROWS(E_SEGFAULT, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) void *FCALL driver_dlsym_local_f(struct driver *__restrict self, NCX char const *name) THROWS(E_SEGFAULT, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) void *FCALL driver_dlsym_f(struct driver *__restrict self, NCX char const *name) THROWS(E_SEGFAULT, ...);
+FUNDEF BLOCKING WUNUSED void *FCALL driver_dlsym_global_f(NCX char const *name) THROWS(E_SEGFAULT, ...);
 #ifdef __cplusplus
 extern "C++" {
-FUNDEF BLOCKING WUNUSED NONNULL((1)) void *FCALL driver_dlsym_local(struct driver *__restrict self, USER CHECKED char const *name) THROWS(E_SEGFAULT, ...) ASMNAME("driver_dlsym_local_f");
-FUNDEF BLOCKING WUNUSED void *FCALL driver_dlsym_global(USER CHECKED char const *name) THROWS(E_SEGFAULT, ...) ASMNAME("driver_dlsym_global_f");
-FUNDEF BLOCKING WUNUSED NONNULL((1)) void *FCALL driver_dlsym(struct driver *__restrict self, USER CHECKED char const *name) THROWS(E_SEGFAULT, ...) ASMNAME("driver_dlsym_f");
+FUNDEF BLOCKING WUNUSED NONNULL((1)) void *FCALL driver_dlsym_local(struct driver *__restrict self, NCX char const *name) THROWS(E_SEGFAULT, ...) ASMNAME("driver_dlsym_local_f");
+FUNDEF BLOCKING WUNUSED void *FCALL driver_dlsym_global(NCX char const *name) THROWS(E_SEGFAULT, ...) ASMNAME("driver_dlsym_global_f");
+FUNDEF BLOCKING WUNUSED NONNULL((1)) void *FCALL driver_dlsym(struct driver *__restrict self, NCX char const *name) THROWS(E_SEGFAULT, ...) ASMNAME("driver_dlsym_f");
 } /* extern "C++" */
 #endif /* __cplusplus */
 
@@ -755,17 +755,17 @@ FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
 driver_loadmod_file(struct mfile *__restrict driver_file,
                     struct path *driver_path DFL(__NULLPTR),
                     struct fdirent *driver_dentry DFL(__NULLPTR),
-                    USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
+                    NCX char const *driver_cmdline DFL(__NULLPTR),
                     __BOOL *pnew_driver_loaded DFL(__NULLPTR))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR, ...);
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED ATTR_INS(1, 2) REF struct driver *KCALL
-driver_loadmod_blob(USER CHECKED void const *base, size_t num_bytes,
-                    USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
+driver_loadmod_blob(NCX void const *base, size_t num_bytes,
+                    NCX char const *driver_cmdline DFL(__NULLPTR),
                     __BOOL *pnew_driver_loaded DFL(__NULLPTR))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR, ...);
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct driver *KCALL
-driver_loadmod(USER CHECKED char const *driver_name,
-               USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
+driver_loadmod(NCX char const *driver_name,
+               NCX char const *driver_cmdline DFL(__NULLPTR),
                __BOOL *pnew_driver_loaded DFL(__NULLPTR))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_FSERROR, E_IOERROR, ...);
 #ifdef __cplusplus
@@ -774,13 +774,13 @@ FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
 driver_loadmod(struct mfile *__restrict driver_file,
                struct path *driver_path DFL(__NULLPTR),
                struct fdirent *driver_dentry DFL(__NULLPTR),
-               USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
+               NCX char const *driver_cmdline DFL(__NULLPTR),
                __BOOL *pnew_driver_loaded DFL(__NULLPTR))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR, ...)
 		ASMNAME("driver_loadmod_file");
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED ATTR_INS(1, 2) REF struct driver *KCALL
-driver_loadmod(USER CHECKED void const *base, size_t num_bytes,
-               USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
+driver_loadmod(NCX void const *base, size_t num_bytes,
+               NCX char const *driver_cmdline DFL(__NULLPTR),
                __BOOL *pnew_driver_loaded DFL(__NULLPTR))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR, ...)
 		ASMNAME("driver_loadmod_blob");
@@ -796,17 +796,17 @@ FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
 driver_insmod_file(struct mfile *__restrict driver_file,
                    struct path *driver_path DFL(__NULLPTR),
                    struct fdirent *driver_dentry DFL(__NULLPTR),
-                   USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
+                   NCX char const *driver_cmdline DFL(__NULLPTR),
                    __BOOL *pnew_driver_loaded DFL(__NULLPTR))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR, ...);
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED ATTR_INS(1, 2) REF struct driver *KCALL
-driver_insmod_blob(USER CHECKED void const *base, size_t num_bytes,
-                   USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
+driver_insmod_blob(NCX void const *base, size_t num_bytes,
+                   NCX char const *driver_cmdline DFL(__NULLPTR),
                    __BOOL *pnew_driver_loaded DFL(__NULLPTR))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR, ...);
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct driver *KCALL
-driver_insmod(USER CHECKED char const *driver_name,
-              USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
+driver_insmod(NCX char const *driver_name,
+              NCX char const *driver_cmdline DFL(__NULLPTR),
               __BOOL *pnew_driver_loaded DFL(__NULLPTR))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_FSERROR, E_IOERROR, ...);
 #ifdef __cplusplus
@@ -815,13 +815,13 @@ FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
 driver_insmod(struct mfile *__restrict driver_file,
               struct path *driver_path DFL(__NULLPTR),
               struct fdirent *driver_dentry DFL(__NULLPTR),
-              USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
+              NCX char const *driver_cmdline DFL(__NULLPTR),
               __BOOL *pnew_driver_loaded DFL(__NULLPTR))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR, ...)
 		ASMNAME("driver_insmod_file");
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED ATTR_INS(1, 2) REF struct driver *KCALL
-driver_insmod(USER CHECKED void const *base, size_t num_bytes,
-              USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
+driver_insmod(NCX void const *base, size_t num_bytes,
+              NCX char const *driver_cmdline DFL(__NULLPTR),
               __BOOL *pnew_driver_loaded DFL(__NULLPTR))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR, ...)
 		ASMNAME("driver_insmod_blob");
@@ -886,7 +886,7 @@ driver_try_decref_and_delmod(/*inherit(always)*/ REF struct driver *__restrict s
  * @param: flags: Set of `DRIVER_DELMOD_F_*'
  * @return: * :   One of `DRIVER_DELMOD_ST_*' */
 FUNDEF BLOCKING unsigned int FCALL
-driver_delmod(USER CHECKED char const *driver_name,
+driver_delmod(NCX char const *driver_name,
               unsigned int flags DFL(DRIVER_DELMOD_F_NORMAL))
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF BLOCKING NONNULL((1)) unsigned int FCALL

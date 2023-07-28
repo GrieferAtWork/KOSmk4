@@ -39,31 +39,31 @@ typedef struct di_addr2line_sections_struct {
 	/* Debug information sections required for implementing addr2line.
 	 * NOTE: The order of members in this struct is important!
 	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
-	__CHECKED __byte_t const *ds_debug_abbrev_start;   /* [0..1] `.debug_abbrev' start */
-	__CHECKED __byte_t const *ds_debug_abbrev_end;     /* [0..1] `.debug_abbrev' end */
-	__CHECKED __byte_t const *ds_debug_info_start;     /* [0..1] `.debug_info' start */
-	__CHECKED __byte_t const *ds_debug_info_end;       /* [0..1] `.debug_info' end */
+	__NCX __byte_t const *ds_debug_abbrev_start;   /* [0..1] `.debug_abbrev' start */
+	__NCX __byte_t const *ds_debug_abbrev_end;     /* [0..1] `.debug_abbrev' end */
+	__NCX __byte_t const *ds_debug_info_start;     /* [0..1] `.debug_info' start */
+	__NCX __byte_t const *ds_debug_info_end;       /* [0..1] `.debug_info' end */
 	/*BEGIN:compat(di_string_sections_t)*/
-	__CHECKED __byte_t const *ds_debug_str_start;      /* [0..1] `.debug_str' start */
-	__CHECKED __byte_t const *ds_debug_str_end;        /* [0..1] `.debug_str' end */
-	__CHECKED __byte_t const *ds_debug_line_str_start; /* [0..1] `.debug_line_str' start */
-	__CHECKED __byte_t const *ds_debug_line_str_end;   /* [0..1] `.debug_line_str' end */
+	__NCX __byte_t const *ds_debug_str_start;      /* [0..1] `.debug_str' start */
+	__NCX __byte_t const *ds_debug_str_end;        /* [0..1] `.debug_str' end */
+	__NCX __byte_t const *ds_debug_line_str_start; /* [0..1] `.debug_line_str' start */
+	__NCX __byte_t const *ds_debug_line_str_end;   /* [0..1] `.debug_line_str' end */
 	/*END:compat(di_string_sections_t)*/
-	__CHECKED __byte_t const *ds_debug_aranges_start;  /* [0..1] `.debug_aranges' start */
-	__CHECKED __byte_t const *ds_debug_aranges_end;    /* [0..1] `.debug_aranges' end */
+	__NCX __byte_t const *ds_debug_aranges_start;  /* [0..1] `.debug_aranges' start */
+	__NCX __byte_t const *ds_debug_aranges_end;    /* [0..1] `.debug_aranges' end */
 	/*BEGIN:compat(di_rnglists_sections_t)*/
-	__CHECKED __byte_t const *ds_debug_rnglists_start; /* [0..1] `.debug_rnglists' start */
-	__CHECKED __byte_t const *ds_debug_rnglists_end;   /* [0..1] `.debug_rnglists' end */
-	__CHECKED __byte_t const *ds_debug_ranges_start;   /* [0..1] `.debug_ranges' start */
-	__CHECKED __byte_t const *ds_debug_ranges_end;     /* [0..1] `.debug_ranges' end */
+	__NCX __byte_t const *ds_debug_rnglists_start; /* [0..1] `.debug_rnglists' start */
+	__NCX __byte_t const *ds_debug_rnglists_end;   /* [0..1] `.debug_rnglists' end */
+	__NCX __byte_t const *ds_debug_ranges_start;   /* [0..1] `.debug_ranges' start */
+	__NCX __byte_t const *ds_debug_ranges_end;     /* [0..1] `.debug_ranges' end */
 	/*END:compat(di_rnglists_sections_t)*/
-	__CHECKED __byte_t const *ds_debug_line_start;     /* [0..1] `.debug_line' start */
-	__CHECKED __byte_t const *ds_debug_line_end;       /* [0..1] `.debug_line' end */
-	__CHECKED __byte_t const *ds_strtab_start;         /* [0..1] `.strtab' / `.dynstr' start */
-	__CHECKED __byte_t const *ds_strtab_end;           /* [0..1] `.strtab' / `.dynstr' end */
-	__CHECKED __byte_t const *ds_symtab_start;         /* [0..1] `.symtab' / `.dynsym' start */
-	__CHECKED __byte_t const *ds_symtab_end;           /* [0..1] `.symtab' / `.dynsym' end */
-	__size_t                  ds_symtab_ent;           /* Entity size of `.symtab' / `.dynsym' */
+	__NCX __byte_t const *ds_debug_line_start;     /* [0..1] `.debug_line' start */
+	__NCX __byte_t const *ds_debug_line_end;       /* [0..1] `.debug_line' end */
+	__NCX __byte_t const *ds_strtab_start;         /* [0..1] `.strtab' / `.dynstr' start */
+	__NCX __byte_t const *ds_strtab_end;           /* [0..1] `.strtab' / `.dynstr' end */
+	__NCX __byte_t const *ds_symtab_start;         /* [0..1] `.symtab' / `.dynsym' start */
+	__NCX __byte_t const *ds_symtab_end;           /* [0..1] `.symtab' / `.dynsym' end */
+	__size_t              ds_symtab_ent;           /* Entity size of `.symtab' / `.dynsym' */
 } di_addr2line_sections_t;
 #define di_addr2line_sections_as_di_string_sections(x) \
 	((di_string_sections_t *)&(x)->ds_debug_str_start)
@@ -153,25 +153,25 @@ typedef struct {
 	 * >> 	return result;
 	 * >> }
 	 */
-	__uintptr_t           al_levelcnt;  /* The number of available source levels (The argument
-	                                     * passed  to  `level'  must  be  smaller  than  this) */
-	__uintptr_t           al_symstart;  /* Starting address of the surrounding symbol (module-relative). */
-	__uintptr_t           al_symend;    /* End address of the surrounding symbol (module-relative). */
-	__uintptr_t           al_linestart; /* Starting address of the associated source location (module-relative). */
-	__uintptr_t           al_lineend;   /* End address of the associated source location (module-relative). */
-	__uintptr_t           al_linediscr; /* Source location discriminator. */
-	__CHECKED char const *al_rawname;   /* [0..1] Raw name of the surrounding symbol. */
-	__CHECKED char const *al_name;      /* [0..1] Symbol name of the surrounding symbol (managed). */
-	__CHECKED char const *al_cuname;    /* [0..1] Name of the associated compilation unit (aka. __BASENAME__). */
-	__CHECKED char const *al_cubase;    /* [0..1] First component of the associated source file. */
-	__CHECKED char const *al_srcpath;   /* [0..1] Second component of the associated source file. */
-	__CHECKED char const *al_srcfile;   /* [0..1] Third component of the associated source file. */
-	__uintptr_t           al_srcline;   /* Source line number (1-based; 0 if unknown) */
-	__uintptr_t           al_srccol;    /* Source column number (1-based; 0 if unknown) */
-	__CHECKED char const *al_dclpath;   /* [0..1] Second component of the source file that declared the function. */
-	__CHECKED char const *al_dclfile;   /* [0..1] Third component of the source file that declared the function. */
-	__uintptr_t           al_dclline;   /* Declaration source line number of the surrounding function (1-based; 0 if unknown) */
-	__uintptr_t           al_dclcol;    /* Declaration source column number of the surrounding function (1-based; 0 if unknown) */
+	__uintptr_t       al_levelcnt;  /* The number of available source levels (The argument
+	                                 * passed  to  `level'  must  be  smaller  than  this) */
+	__uintptr_t       al_symstart;  /* Starting address of the surrounding symbol (module-relative). */
+	__uintptr_t       al_symend;    /* End address of the surrounding symbol (module-relative). */
+	__uintptr_t       al_linestart; /* Starting address of the associated source location (module-relative). */
+	__uintptr_t       al_lineend;   /* End address of the associated source location (module-relative). */
+	__uintptr_t       al_linediscr; /* Source location discriminator. */
+	__NCX char const *al_rawname;   /* [0..1] Raw name of the surrounding symbol. */
+	__NCX char const *al_name;      /* [0..1] Symbol name of the surrounding symbol (managed). */
+	__NCX char const *al_cuname;    /* [0..1] Name of the associated compilation unit (aka. __BASENAME__). */
+	__NCX char const *al_cubase;    /* [0..1] First component of the associated source file. */
+	__NCX char const *al_srcpath;   /* [0..1] Second component of the associated source file. */
+	__NCX char const *al_srcfile;   /* [0..1] Third component of the associated source file. */
+	__uintptr_t       al_srcline;   /* Source line number (1-based; 0 if unknown) */
+	__uintptr_t       al_srccol;    /* Source column number (1-based; 0 if unknown) */
+	__NCX char const *al_dclpath;   /* [0..1] Second component of the source file that declared the function. */
+	__NCX char const *al_dclfile;   /* [0..1] Third component of the source file that declared the function. */
+	__uintptr_t       al_dclline;   /* Declaration source line number of the surrounding function (1-based; 0 if unknown) */
+	__uintptr_t       al_dclcol;    /* Declaration source column number of the surrounding function (1-based; 0 if unknown) */
 } di_debug_addr2line_t;
 
 
@@ -243,15 +243,15 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debug_addr2line)(di_addr2line_sections_t const *__
  */
 typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE_PRINT_FILENAME)(__pformatprinter printer, void *arg,
-                                                   __CHECKED char const *cubase,
-                                                   __CHECKED char const *pathname,
-                                                   __CHECKED char const *filename);
+                                                   __NCX char const *cubase,
+                                                   __NCX char const *pathname,
+                                                   __NCX char const *filename);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __ssize_t
 (LIBDEBUGINFO_CC debug_addr2line_print_filename)(__pformatprinter printer, void *arg,
-                                                 __CHECKED char const *cubase,
-                                                 __CHECKED char const *pathname,
-                                                 __CHECKED char const *filename);
+                                                 __NCX char const *cubase,
+                                                 __NCX char const *pathname,
+                                                 __NCX char const *filename);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 /* Load debug sections, given a handle to a module, as returned by dlopen()

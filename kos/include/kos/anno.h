@@ -50,8 +50,7 @@
 #include <kos/except/checker.h>
 #define __PHYS        __ATTR_PHYS
 #define __VIRT        __ATTR_VIRT
-#define __USER        __ATTR_USER
-#define __CHECKED     __ATTR_CHECKED
+#define __NCX         __ATTR_NCX
 #define __UNCHECKED   __ATTR_UNCHECKED
 #define __NOBLOCK     __ATTR_NOBLOCK
 #define __NOBLOCK_IF  __ATTR_NOBLOCK_IF
@@ -63,9 +62,8 @@
 #else /* __CHECKER__ */
 #define __PHYS            /* Annotation for physical pointers */
 #define __VIRT            /* Annotation for virtual pointers */
-#define __USER            /* Annotation for user-space memory (default outside kernel). */
-#define __CHECKED         /* Annotation for checked memory (access may result in sporadic E_SEGFAULT and E_BADALLOC) */
-#define __UNCHECKED       /* Annotation for unchecked memory (like `CHECKED', but access is not allowed) */
+#define __NCX             /* Annotation for memory which (when accessed) may cause sporadic exceptions. */
+#define __UNCHECKED       /* Annotation for unchecked memory (like `NCX', but access is not allowed) */
 #define __NOBLOCK         /* Annotation for functions that are guarantied to never block,
                            * making them safe to-be called from any asynchronous context. */
 #define __NOBLOCK_IF(x)   /* Same as `__NOBLOCK', but only when `x' is true. */
@@ -117,8 +115,7 @@
 #ifdef __GUARD_HYBRID_COMPILER_H
 #define PHYS            __PHYS
 #define VIRT            __VIRT
-#define USER            __USER
-#define CHECKED         __CHECKED
+#define NCX             __NCX
 #define UNCHECKED       __UNCHECKED
 #define REF             __REF
 #define REF_IF          __REF_IF

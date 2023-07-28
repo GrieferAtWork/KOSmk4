@@ -352,7 +352,7 @@ done:
  *                                             looks like it's been corrupted... :( */
 PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) REF struct fsuper *FCALL
 ffilesys_open(struct ffilesys *__restrict self, bool *__restrict pnewly_created,
-              struct mfile *dev, UNCHECKED USER char *args)
+              struct mfile *dev, NCX UNCHECKED char *args)
 		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_MOUNT_UNSUPPORTED_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, ...) {
 	REF struct fsuper *result;
@@ -574,7 +574,7 @@ ffilesys_next(struct ffilesys *prev) THROWS(E_WOULDBLOCK) {
  * @return: NULL: `dev' doesn't contain any known filesystem. */
 PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct fsuper *FCALL
 ffilesys_opendev(bool *__restrict pnewly_created,
-                 struct mfile *__restrict dev, UNCHECKED USER char *args)
+                 struct mfile *__restrict dev, NCX UNCHECKED char *args)
 		THROWS(E_BADALLOC, E_FSERROR_MOUNT_UNSUPPORTED_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, ...) {
 	REF struct ffilesys *iter, *next;
@@ -611,7 +611,7 @@ ffilesys_opendev(bool *__restrict pnewly_created,
  * @return: * :   The named filesystem type.
  * @return: NULL: No such filesystem. */
 PUBLIC WUNUSED NONNULL((1)) REF struct ffilesys *FCALL
-ffilesys_byname(USER CHECKED char const *name, size_t namelen)
+ffilesys_byname(NCX char const *name, size_t namelen)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
 	REF struct ffilesys *iter, *next;
 	for (iter = NULL;;) {

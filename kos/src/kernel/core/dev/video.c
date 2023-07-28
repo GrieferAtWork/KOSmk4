@@ -292,7 +292,7 @@ NOTHROW(KCALL vidtty_v_destroy)(struct mfile *__restrict self) {
 
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 vidtty_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-               USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+               NCX UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct vidtty *me = mfile_asvidtty(self);
 	switch (cmd) {
 
@@ -306,10 +306,10 @@ vidtty_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	case _IO_WITHTYPE(TIOCGWINSZ, struct winsize): {
 		/* Because we know the actual cell sizes, we can implement
 		 * GWINSZ  more correctly than the generic ansitty's ioctl */
-		USER CHECKED struct winsize *result;
+		NCX struct winsize *result;
 		REF struct vidttyaccess *tty;
 		validate_writable(arg, sizeof(struct winsize));
-		result = (USER CHECKED struct winsize *)arg;
+		result = (NCX struct winsize *)arg;
 		tty    = vidtty_getaccess(me);
 		FINALLY_DECREF_UNLIKELY(tty);
 		result->ws_col    = (typeof(result->ws_col))tty->vta_resx;
@@ -321,8 +321,8 @@ vidtty_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 
 	case VID_IOC_GETTTYINFO: {
 		REF struct vidttyaccess *tty;
-		USER CHECKED struct vidttyinfo *info;
-		info = (USER CHECKED struct vidttyinfo *)arg;
+		NCX struct vidttyinfo *info;
+		info = (NCX struct vidttyinfo *)arg;
 		validate_writable(info, sizeof(*info));
 		tty = vidtty_getaccess(me);
 		FINALLY_DECREF_UNLIKELY(tty);
@@ -400,8 +400,8 @@ vidtty_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 			cur.vtc_word = tty->vta_cursor.vtc_word;
 			atomic_lock_release(&tty->vta_lock);
 		}
-		((USER CHECKED uint16_t *)arg)[0] = cur.vtc_cellx;
-		((USER CHECKED uint16_t *)arg)[1] = cur.vtc_celly;
+		((NCX uint16_t *)arg)[0] = cur.vtc_cellx;
+		((NCX uint16_t *)arg)[1] = cur.vtc_celly;
 		return 0;
 	}	break;
 
@@ -409,8 +409,8 @@ vidtty_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		REF struct vidttyaccess *tty;
 		union vidtty_cursor cur;
 		validate_readable(arg, 4);
-		cur.vtc_cellx = ((USER CHECKED uint16_t const *)arg)[0];
-		cur.vtc_celly = ((USER CHECKED uint16_t const *)arg)[1];
+		cur.vtc_cellx = ((NCX uint16_t const *)arg)[0];
+		cur.vtc_celly = ((NCX uint16_t const *)arg)[1];
 		tty           = vidtty_getaccess(me);
 		FINALLY_DECREF_UNLIKELY(tty);
 
@@ -1046,7 +1046,7 @@ got_active:
 /* Default operators for `struct viddev'. */
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 viddev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-               USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+               NCX UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct viddev *me = mfile_asviddev(self);
 	switch (cmd) {
 
@@ -1066,7 +1066,7 @@ viddev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		hand.h_type = HANDLE_TYPE_MFILE;
 		hand.h_mode = IO_RDWR;
 		hand.h_data = lck;
-		return handles_install_openfd(hand, (USER UNCHECKED struct openfd *)arg);
+		return handles_install_openfd(hand, (NCX UNCHECKED struct openfd *)arg);
 	}	break;
 
 	default:
@@ -1089,7 +1089,7 @@ viddev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 }
 
 PUBLIC BLOCKING WUNUSED NONNULL((1)) size_t KCALL
-viddev_v_write(struct mfile *__restrict self, USER CHECKED void const *src,
+viddev_v_write(struct mfile *__restrict self, NCX void const *src,
                size_t num_bytes, iomode_t mode) THROWS(...) {
 	/* Direct writes to an video device go to the currently active tty. */
 	struct viddev *me = (struct viddev *)mfile_asansitty(self);

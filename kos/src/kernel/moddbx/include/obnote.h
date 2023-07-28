@@ -57,7 +57,7 @@ DECL_BEGIN
  * @return: * :     The usual pformatprinter return value. */
 typedef NONNULL_T((1, 4)) ssize_t
 (KCALL *obnote_callback_t)(__pformatprinter printer, void *arg,
-                           CHECKED void const *pointer,
+                           NCX void const *pointer,
                            unsigned int *__restrict pstatus);
 
 struct obnote_entry {
@@ -71,8 +71,8 @@ struct obnote_entry {
  * @return: * :     The usual pformatprinter return value. */
 FUNDEF NONNULL((1, 4, 5)) ssize_t
 NOTHROW(KCALL obnote_print)(__pformatprinter printer, void *arg,
-                            CHECKED void const *pointer,
-                            CHECKED char const *name,
+                            NCX void const *pointer,
+                            NCX char const *name,
                             unsigned int *__restrict pstatus);
 
 DECL_END

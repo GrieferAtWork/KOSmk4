@@ -26,8 +26,8 @@
 DECL_BEGIN
 
 /* Get/set the current user-space TLS pointer */
-FUNDEF WUNUSED USER void *NOTHROW(KCALL arm_get_user_tlsbase)(void);
-FUNDEF void NOTHROW(KCALL arm_set_user_tlsbase)(USER void *newtls);
+FUNDEF WUNUSED NCX void *NOTHROW(KCALL arm_get_user_tlsbase)(void);
+FUNDEF void NOTHROW(KCALL arm_set_user_tlsbase)(NCX void *newtls);
 
 DECL_END
 #endif /* __CC__ */

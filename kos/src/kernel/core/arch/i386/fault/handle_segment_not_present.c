@@ -98,10 +98,10 @@ again:
 		bzero(&cargs, sizeof(cargs));
 		cargs.tca_flags       = sc_info.rsi_regs[0] & ~CSIGNAL;              /* clone_flags */
 		cargs.tca_exit_signal = sc_info.rsi_regs[0] & CSIGNAL;               /* clone_flags */
-		cargs.tca_pidfd       = (USER UNCHECKED fd_t *)sc_info.rsi_regs[2];  /* parent_tidptr */
-		cargs.tca_parent_tid  = (USER UNCHECKED pid_t *)sc_info.rsi_regs[2]; /* parent_tidptr */
-		cargs.tca_child_tid   = (USER UNCHECKED pid_t *)sc_info.rsi_regs[4]; /* child_tidptr */
-		cargs.tca_stack       = (USER UNCHECKED void *)sc_info.rsi_regs[1];  /* child_stack */
+		cargs.tca_pidfd       = (NCX UNCHECKED fd_t *)sc_info.rsi_regs[2];  /* parent_tidptr */
+		cargs.tca_parent_tid  = (NCX UNCHECKED pid_t *)sc_info.rsi_regs[2]; /* parent_tidptr */
+		cargs.tca_child_tid   = (NCX UNCHECKED pid_t *)sc_info.rsi_regs[4]; /* child_tidptr */
+		cargs.tca_stack       = (NCX UNCHECKED void *)sc_info.rsi_regs[1];  /* child_stack */
 		cargs.tca_arch.atca_x86_fsbase = x86_get_user_fsbase();
 		cargs.tca_arch.atca_x86_gsbase = sc_info.rsi_regs[3];
 		if (!(sc_info.rsi_regs[0] & CLONE_SETTLS))

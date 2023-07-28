@@ -292,10 +292,10 @@ FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct device *NOTHROW(FCALL devfs_bynametre
 
 /* Helper macros for operating on `devfs_byname_tree' while holding the proper lock to `devfs_byname_lock' */
 FUNDEF ATTR_PURE WUNUSED struct device *FCALL
-devfs_byname_locate(USER CHECKED char const *name, u16 namelen)
+devfs_byname_locate(NCX char const *name, u16 namelen)
 		THROWS(E_SEGFAULT);
 FUNDEF ATTR_PURE WUNUSED struct device *FCALL
-devfs_byname_caselocate(USER CHECKED char const *name, u16 namelen)
+devfs_byname_caselocate(NCX char const *name, u16 namelen)
 		THROWS(E_SEGFAULT);
 #define devfs_byname_insert(node)     devfs_bynametree_insert(&devfs_byname_tree, node)
 #define devfs_byname_removenode(node) devfs_bynametree_removenode(&devfs_byname_tree, node)
@@ -410,7 +410,7 @@ NOTHROW(FCALL device_lookup_byino_nx)(ino_t ino);
  * @param: st_mode: Either `0', `S_IFCHR' or `S_IFBLK'
  * @return: NULL: No such device. */
 FUNDEF WUNUSED REF struct device *FCALL
-device_lookup_byname(USER CHECKED char const *name,
+device_lookup_byname(NCX char const *name,
                      size_t namelen, mode_t st_mode DFL(0))
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 
@@ -434,7 +434,7 @@ device_lookup_bypartuuid(uuid_t const *__restrict uuid)
  *      re-return if non-NULL
  *  #5: If all else failed, return `NULL' */
 FUNDEF WUNUSED REF struct device *FCALL
-device_lookup_bystring(USER CHECKED char const *string,
+device_lookup_bystring(NCX char const *string,
                        size_t stringlen, mode_t st_mode DFL(0))
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 

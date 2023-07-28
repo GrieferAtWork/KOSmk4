@@ -133,7 +133,7 @@ struct unlockinfo;
  * mappings below this address always fails.
  *
  * The value of this variable is exposed in `/proc/sys/vm/mmap_min_addr' */
-DATDEF USER CHECKED void *mman_getunmapped_user_minaddr;
+DATDEF NCX void *mman_getunmapped_user_minaddr;
 
 /* Default base address for user-space  memory mappings. When trying to  find
  * an unmapped area within a user-space mman, the FIXED flag isn't given, and
@@ -143,11 +143,11 @@ DATDEF USER CHECKED void *mman_getunmapped_user_minaddr;
  * Afterwards, the actual address to-be returned will be calculated normally.
  *
  * By default, this variable is set to `KERNEL_MHINT_USER_HEAP' */
-DATDEF USER CHECKED void *mman_getunmapped_user_defbase;
+DATDEF NCX void *mman_getunmapped_user_defbase;
 
 /* Same as `mman_getunmapped_user_defbase', but used
  * instead  when  the  `MAP_STACK'  flag  is  given. */
-DATDEF USER CHECKED void *mman_getunmapped_user_stkbase;
+DATDEF NCX void *mman_getunmapped_user_stkbase;
 
 /* [lock(ATOMIC)]
  * Additional flags that are always or'd to those given to `mman_findunmapped()'

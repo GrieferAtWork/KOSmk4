@@ -68,7 +68,7 @@ NOTHROW(FCALL panic_critical_thread_exited)(struct task *__restrict caller) {
 
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL maybe_clear_tid_address)(struct task *__restrict caller) {
-	USER CHECKED pid_t *addr;
+	NCX pid_t *addr;
 	addr = FORTASK(caller, this_tid_address);
 	if (addr == NULL)
 		return;
@@ -78,8 +78,8 @@ NOTHROW(FCALL maybe_clear_tid_address)(struct task *__restrict caller) {
 		uintptr_t my_flags = PERTASK_GET(this_task.t_flags);
 		if (my_flags & TASK_FVFORK) {
 			if unlikely(my_flags & TASK_FUSERPROCMASK_AFTER_VFORK) {
-				USER CHECKED struct userprocmask *um;
-				um = (USER CHECKED struct userprocmask *)addr;
+				NCX struct userprocmask *um;
+				um = (NCX struct userprocmask *)addr;
 				/* Handle the special case of a vfork()'d thread having
 				 * initialized their parent thread's userprocmask  data
 				 * structure.

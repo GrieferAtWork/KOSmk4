@@ -428,7 +428,7 @@ DEFINE_SYSCALL2(errno_t, tkill, pid_t, tid, signo_t, signo) {
 /* Fill in `info' from `usigno' + `uinfo' */
 INTERN NONNULL((1)) void KCALL
 siginfo_from_user(siginfo_t *__restrict info, signo_t usigno,
-                  USER UNCHECKED siginfo_t const *uinfo) {
+                  NCX UNCHECKED siginfo_t const *uinfo) {
 	if unlikely(!sigvalid(usigno)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
@@ -457,7 +457,7 @@ siginfo_from_user(siginfo_t *__restrict info, signo_t usigno,
 #ifdef __ARCH_HAVE_COMPAT
 INTERN NONNULL((1)) void KCALL
 siginfo_from_compat_user(siginfo_t *__restrict info, signo_t usigno,
-                         USER UNCHECKED compat_siginfo_t const *uinfo) {
+                         NCX UNCHECKED compat_siginfo_t const *uinfo) {
 	if unlikely(!sigvalid(usigno)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
@@ -486,7 +486,7 @@ siginfo_from_compat_user(siginfo_t *__restrict info, signo_t usigno,
 #ifdef __ARCH_WANT_SYSCALL_RT_SIGQUEUEINFO
 DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
                 pid_t, pid, signo_t, signo,
-                USER UNCHECKED siginfo_t const *, uinfo) {
+                NCX UNCHECKED siginfo_t const *, uinfo) {
 	REF struct taskpid *target;
 	siginfo_t info;
 	siginfo_from_user(&info, signo, uinfo);
@@ -510,7 +510,7 @@ DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
 #ifdef __ARCH_WANT_SYSCALL_RT_TGSIGQUEUEINFO
 DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
                 pid_t, pid, pid_t, tid, signo_t, signo,
-                USER UNCHECKED siginfo_t const *, uinfo) {
+                NCX UNCHECKED siginfo_t const *, uinfo) {
 	siginfo_t info;
 	REF struct task *target;
 	struct taskpid *leader;
@@ -545,7 +545,7 @@ DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_RT_SIGQUEUEINFO
 DEFINE_COMPAT_SYSCALL3(errno_t, rt_sigqueueinfo,
                        pid_t, pid, signo_t, signo,
-                       USER UNCHECKED compat_siginfo_t const *, uinfo) {
+                       NCX UNCHECKED compat_siginfo_t const *, uinfo) {
 	REF struct taskpid *target;
 	struct taskpid *mypid = task_gettaskpid();
 	siginfo_t info;
@@ -569,7 +569,7 @@ DEFINE_COMPAT_SYSCALL3(errno_t, rt_sigqueueinfo,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_RT_TGSIGQUEUEINFO
 DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
                        pid_t, pid, pid_t, tid, signo_t, signo,
-                       USER UNCHECKED compat_siginfo_t const *, uinfo) {
+                       NCX UNCHECKED compat_siginfo_t const *, uinfo) {
 	siginfo_t info;
 	REF struct task *target;
 	struct taskpid *leader;
@@ -622,7 +622,7 @@ DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
  * @return: * : The accepted signal number */
 PRIVATE NONNULL((1)) signo_t KCALL
 signal_waitfor(sigset_t const *__restrict these,
-               CHECKED USER siginfo_t *uinfo,
+               NCX siginfo_t *uinfo,
                ktime_t abs_timeout) {
 	assert(!task_wasconnected());
 	assert(PREEMPTION_ENABLED());
@@ -681,9 +681,9 @@ signal_waitfor(sigset_t const *__restrict these,
 
 #ifdef __ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT
 DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
-                UNCHECKED USER sigset_t const *, uthese,
-                UNCHECKED USER siginfo_t *, uinfo,
-                UNCHECKED USER struct timespec32 const *, uts,
+                NCX UNCHECKED sigset_t const *, uthese,
+                NCX UNCHECKED siginfo_t *, uinfo,
+                NCX UNCHECKED struct timespec32 const *, uts,
                 size_t, sigsetsize) {
 	sigset_t these;
 	syscall_slong_t result;
@@ -716,15 +716,15 @@ DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
      defined(__ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT_TIME64))
 #ifdef __ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT64
 DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait64,
-                UNCHECKED USER sigset_t const *, uthese,
-                UNCHECKED USER siginfo_t *, uinfo,
-                UNCHECKED USER struct timespec64 const *, uts,
+                NCX UNCHECKED sigset_t const *, uthese,
+                NCX UNCHECKED siginfo_t *, uinfo,
+                NCX UNCHECKED struct timespec64 const *, uts,
                 size_t, sigsetsize)
 #else /* __ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT64 */
 DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
-                UNCHECKED USER sigset_t const *, uthese,
-                UNCHECKED USER siginfo_t *, uinfo,
-                UNCHECKED USER struct timespec64 const *, uts,
+                NCX UNCHECKED sigset_t const *, uthese,
+                NCX UNCHECKED siginfo_t *, uinfo,
+                NCX UNCHECKED struct timespec64 const *, uts,
                 size_t, sigsetsize)
 #endif /* !__ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT64 */
 {
@@ -756,9 +756,9 @@ DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT
 DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
-                       UNCHECKED USER compat_sigset_t const *, uthese,
-                       UNCHECKED USER compat_siginfo_t *, uinfo,
-                       UNCHECKED USER struct compat_timespec32 const *, uts,
+                       NCX UNCHECKED compat_sigset_t const *, uthese,
+                       NCX UNCHECKED compat_siginfo_t *, uinfo,
+                       NCX UNCHECKED struct compat_timespec32 const *, uts,
                        size_t, sigsetsize) {
 	sigset_t these;
 	siginfo_t info;
@@ -794,15 +794,15 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
      defined(__ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT_TIME64))
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64
 DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait64,
-                       UNCHECKED USER compat_sigset_t const *, uthese,
-                       UNCHECKED USER compat_siginfo_t *, uinfo,
-                       UNCHECKED USER struct compat_timespec64 const *, uts,
+                       NCX UNCHECKED compat_sigset_t const *, uthese,
+                       NCX UNCHECKED compat_siginfo_t *, uinfo,
+                       NCX UNCHECKED struct compat_timespec64 const *, uts,
                        size_t, sigsetsize)
 #else /* __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64 */
 DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
-                       UNCHECKED USER compat_sigset_t const *, uthese,
-                       UNCHECKED USER compat_siginfo_t *, uinfo,
-                       UNCHECKED USER struct compat_timespec64 const *, uts,
+                       NCX UNCHECKED compat_sigset_t const *, uthese,
+                       NCX UNCHECKED compat_siginfo_t *, uinfo,
+                       NCX UNCHECKED struct compat_timespec64 const *, uts,
                        size_t, sigsetsize)
 #endif /* !__ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64 */
 {

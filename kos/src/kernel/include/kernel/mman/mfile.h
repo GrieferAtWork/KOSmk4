@@ -185,7 +185,7 @@ struct mfile_stream_ops {
 	 * either document that read(2) returns different data than pread(2)/mmap(2),
 	 * or disallow use of the later with `mf_filesize = 0, MFILE_F_FIXEDFILESIZE' */
 	BLOCKING WUNUSED_T NONNULL_T((1)) size_t
-	(KCALL *mso_read)(struct mfile *__restrict self, USER CHECKED void *dst,
+	(KCALL *mso_read)(struct mfile *__restrict self, NCX void *dst,
 	                  size_t num_bytes, iomode_t mode) THROWS(...);
 	BLOCKING WUNUSED_T NONNULL_T((1, 2)) size_t
 	(KCALL *mso_readv)(struct mfile *__restrict self, struct iov_buffer *__restrict dst,
@@ -196,7 +196,7 @@ struct mfile_stream_ops {
 	 * either document that write(2) affects different data than pwrite(2)/mmap(2),
 	 * or disallow use of the later with `mf_filesize = 0, MFILE_F_FIXEDFILESIZE' */
 	BLOCKING WUNUSED_T NONNULL_T((1)) size_t
-	(KCALL *mso_write)(struct mfile *__restrict self, USER CHECKED void const *src,
+	(KCALL *mso_write)(struct mfile *__restrict self, NCX void const *src,
 	                   size_t num_bytes, iomode_t mode) THROWS(...);
 	BLOCKING WUNUSED_T NONNULL_T((1, 2)) size_t
 	(KCALL *mso_writev)(struct mfile *__restrict self, struct iov_buffer *__restrict src,
@@ -207,13 +207,13 @@ struct mfile_stream_ops {
 	 * The pread/pwrite callbacks are only called by handle_pread() and handle_pwrite(),
 	 * and  if  not given,  will default  to  using `mfile_read()'  and `mfile_write()'. */
 	BLOCKING WUNUSED_T NONNULL_T((1)) size_t
-	(KCALL *mso_pread)(struct mfile *__restrict self, USER CHECKED void *dst,
+	(KCALL *mso_pread)(struct mfile *__restrict self, NCX void *dst,
 	                   size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 	BLOCKING WUNUSED_T NONNULL_T((1, 2)) size_t
 	(KCALL *mso_preadv)(struct mfile *__restrict self, struct iov_buffer *__restrict dst,
 	                    size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 	BLOCKING WUNUSED_T NONNULL_T((1)) size_t
-	(KCALL *mso_pwrite)(struct mfile *__restrict self, USER CHECKED void const *src,
+	(KCALL *mso_pwrite)(struct mfile *__restrict self, NCX void const *src,
 	                    size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 	BLOCKING WUNUSED_T NONNULL_T((1, 2)) size_t
 	(KCALL *mso_pwritev)(struct mfile *__restrict self, struct iov_buffer *__restrict src,
@@ -283,7 +283,7 @@ struct mfile_stream_ops {
 	 *   - st_rdev */
 	BLOCKING NONNULL_T((1)) void
 	(KCALL *mso_stat)(struct mfile *__restrict self,
-	                  USER CHECKED struct stat *result)
+	                  NCX struct stat *result)
 			THROWS(...);
 
 	/* [0..1] Implementation for poll(2): Connect to signals.
@@ -309,7 +309,7 @@ struct mfile_stream_ops {
 	 * When `NULL', same as `mfile_v_ioctl'. */
 	BLOCKING NONNULL_T((1)) syscall_slong_t
 	(KCALL *mso_ioctl)(struct mfile *__restrict self, ioctl_t cmd,
-	                   USER UNCHECKED void *arg, iomode_t mode)
+	                   NCX UNCHECKED void *arg, iomode_t mode)
 			THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 
 	/* [0..1] Try  to cast the given mem-file into a different handle type.
@@ -387,7 +387,7 @@ struct mfile_stream_ops {
  *  - BLKGETSIZE, BLKGETSIZE64 */
 FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL
 mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-              USER UNCHECKED void *arg, iomode_t mode)
+              NCX UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 
 /* Constructs a wrapper object that implements seeking, allowing normal reads/writes to
@@ -1531,31 +1531,31 @@ mfile_chflags(struct mfile *__restrict self, uintptr_t mask,
  *   the initial file-offset was already `> sf_filesize_max'), then an error
  *   `E_FSERROR_FILE_TOO_BIG' is thrown instead. (iow: `0' is never returned
  *   if a non-zero buffer is given) */
-FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_read(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_read(struct mfile *__restrict self, NCX void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_read_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL mfile_readv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL mfile_readv_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF BLOCKING NONNULL((1)) size_t KCALL mfile_write(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL mfile_write(struct mfile *__restrict self, NCX void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1)) size_t KCALL mfile_write_p(struct mfile *__restrict self, physaddr_t src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mfile_writev(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mfile_writev_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Read/write functions that will attempt to read/write all requested data. */
-FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_readall(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_readall(struct mfile *__restrict self, NCX void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_readall_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) void KCALL mfile_readallv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) void KCALL mfile_readallv_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_writeall(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_writeall(struct mfile *__restrict self, NCX void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_writeall_p(struct mfile *__restrict self, physaddr_t src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) void KCALL mfile_writeallv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) void KCALL mfile_writeallv_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Use tailread() to block instead of returning 0 for EOF; use tailwrite() for O_APPEND. */
-FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_tailread(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_tailread(struct mfile *__restrict self, NCX void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_tailread_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL mfile_tailreadv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL mfile_tailreadv_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF BLOCKING NONNULL((1)) size_t KCALL mfile_tailwrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL mfile_tailwrite(struct mfile *__restrict self, NCX void const *src, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1)) size_t KCALL mfile_tailwrite_p(struct mfile *__restrict self, physaddr_t src, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mfile_tailwritev(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mfile_tailwritev_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
@@ -1563,9 +1563,9 @@ FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mfile_tailwritev_p(struct mfile *__
 /* Same as the above, but these use an intermediate (stack) buffer for  transfer.
  * As such, these functions are called by the above when `memcpy_nopf()' produces
  * transfer errors that cannot be resolved by `mman_prefault()' */
-FUNDEF BLOCKING NONNULL((1)) size_t KCALL _mfile_buffered_read(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF BLOCKING NONNULL((1)) size_t KCALL _mfile_buffered_write(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF BLOCKING NONNULL((1)) size_t KCALL _mfile_buffered_tailwrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL _mfile_buffered_read(struct mfile *__restrict self, NCX void *dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL _mfile_buffered_write(struct mfile *__restrict self, NCX void const *src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL _mfile_buffered_tailwrite(struct mfile *__restrict self, NCX void const *src, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL _mfile_buffered_readv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL _mfile_buffered_writev(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL _mfile_buffered_tailwritev(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
@@ -1574,11 +1574,11 @@ FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL _mfile_buffered_tailwritev(struct m
  * the unified I/O buffer and directly talk to `mo_(load|save)blocks')
  * - Trying to use these when the given buffer is VIO causes E_SEGFAULT_UNMAPPED,E_SEGFAULT_CONTEXT_VIO
  * - Alignment requirements are checked by these functions (`E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BAD*') */
-FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_direct_read(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_direct_read(struct mfile *__restrict self, NCX void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_direct_read_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL mfile_direct_readv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL mfile_direct_readv_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
-FUNDEF BLOCKING NONNULL((1)) size_t KCALL mfile_direct_write(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL mfile_direct_write(struct mfile *__restrict self, NCX void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
 FUNDEF BLOCKING NONNULL((1)) size_t KCALL mfile_direct_write_p(struct mfile *__restrict self, physaddr_t src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mfile_direct_writev(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mfile_direct_writev_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
@@ -1586,19 +1586,19 @@ FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mfile_direct_writev_p(struct mfile 
 /* Same as above, but these are the "async"-io versions
  * NOTE: The virtual functions here will asynchronously and automatically
  *       release DMA locks when  the associated I/O operations  complete. */
-FUNDEF BLOCKING WUNUSED NONNULL((1, 5)) size_t KCALL mfile_direct_read_async(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1, 5)) size_t KCALL mfile_direct_read_async(struct mfile *__restrict self, NCX void *dst, size_t num_bytes, pos_t src_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 5)) size_t KCALL mfile_direct_read_async_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2, 6)) size_t KCALL mfile_direct_readv_async(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2, 6)) size_t KCALL mfile_direct_readv_async_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
-FUNDEF BLOCKING NONNULL((1, 5)) size_t KCALL mfile_direct_write_async(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+FUNDEF BLOCKING NONNULL((1, 5)) size_t KCALL mfile_direct_write_async(struct mfile *__restrict self, NCX void const *src, size_t num_bytes, pos_t dst_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
 FUNDEF BLOCKING NONNULL((1, 5)) size_t KCALL mfile_direct_write_async_p(struct mfile *__restrict self, physaddr_t src, size_t num_bytes, pos_t dst_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
 FUNDEF BLOCKING NONNULL((1, 2, 6)) size_t KCALL mfile_direct_writev_async(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
 FUNDEF BLOCKING NONNULL((1, 2, 6)) size_t KCALL mfile_direct_writev_async_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
 
 /* Helpers for directly reading/writing to/from VIO space. */
 #ifdef LIBVIO_CONFIG_ENABLED
-FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_vioread(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_viowrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_vioread(struct mfile *__restrict self, NCX void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_viowrite(struct mfile *__restrict self, NCX void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_vioread_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_viowrite_p(struct mfile *__restrict self, physaddr_t src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) void KCALL mfile_vioreadv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
@@ -1637,24 +1637,24 @@ DATDEF struct mfile_ops const mfile_anon_ops[BITSOF(void *)];
 
 
 /* User-visible mem-file access API. (same as the handle access API) */
-FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_uread(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_uwrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_utailwrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_upread(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_upwrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_uread(struct mfile *__restrict self, NCX void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_uwrite(struct mfile *__restrict self, NCX void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_utailwrite(struct mfile *__restrict self, NCX void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_upread(struct mfile *__restrict self, NCX void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_upwrite(struct mfile *__restrict self, NCX void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL mfile_ureadv(struct mfile *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL mfile_uwritev(struct mfile *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL mfile_utailwritev(struct mfile *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL mfile_upreadv(struct mfile *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL mfile_upwritev(struct mfile *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 FUNDEF BLOCKING NONNULL((1)) pos_t KCALL mfile_useek(struct mfile *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL mfile_uioctl(struct mfile *__restrict self, ioctl_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL mfile_uioctl(struct mfile *__restrict self, ioctl_t cmd, NCX UNCHECKED void *arg, iomode_t mode) THROWS(...);
 FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_utruncate(struct mfile *__restrict self, pos_t new_size) THROWS(...);
 FUNDEF BLOCKING NONNULL((1, 2)) void KCALL mfile_ummap(struct mfile *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 FUNDEF BLOCKING NONNULL((1)) pos_t KCALL mfile_uallocate(struct mfile *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
 FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_usync(struct mfile *__restrict self) THROWS(...);
 FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_udatasync(struct mfile *__restrict self) THROWS(...);
-FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_ustat(struct mfile *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_ustat(struct mfile *__restrict self, NCX struct stat *result) THROWS(...);
 FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_upollconnect(struct mfile *__restrict self, poll_mode_t what) THROWS(...);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL mfile_upolltest(struct mfile *__restrict self, poll_mode_t what) THROWS(...);
 FUNDEF BLOCKING NONNULL((1)) REF void *KCALL mfile_utryas(struct mfile *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);

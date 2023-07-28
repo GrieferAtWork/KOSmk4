@@ -78,12 +78,12 @@ DECL_BEGIN
 /* Futex system call used for linux compatibility.
  * When targeting KOS specifically, you are advised to make use of lfutex() instead */
 PRIVATE syscall_slong_t KCALL
-sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
+sys_futex_impl(NCX UNCHECKED uint32_t *uaddr,
                syscall_ulong_t futex_op,
                uint32_t val,
                ktime_t timeout,
                uint32_t val2,
-               USER UNCHECKED uint32_t *uaddr2,
+               NCX UNCHECKED uint32_t *uaddr2,
                uint32_t val3) {
 	syscall_slong_t result;
 	REF struct mfutex *f;
@@ -153,11 +153,11 @@ sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
 
 #ifdef __ARCH_WANT_SYSCALL_FUTEX
 DEFINE_SYSCALL6(syscall_slong_t, futex,
-                USER UNCHECKED uint32_t *, uaddr,
+                NCX UNCHECKED uint32_t *, uaddr,
                 syscall_ulong_t, futex_op,
                 uint32_t, val,
-                USER UNCHECKED struct timespec32 const *, timeout_or_val2,
-                USER UNCHECKED uint32_t *, uaddr2,
+                NCX UNCHECKED struct timespec32 const *, timeout_or_val2,
+                NCX UNCHECKED uint32_t *, uaddr2,
                 uint32_t, val3) {
 	syscall_slong_t result;
 	ktime_t timeout = KTIME_INFINITE;
@@ -178,11 +178,11 @@ DEFINE_SYSCALL6(syscall_slong_t, futex,
 
 #ifdef __ARCH_WANT_SYSCALL_FUTEX_TIME64
 DEFINE_SYSCALL6(syscall_slong_t, futex_time64,
-                USER UNCHECKED uint32_t *, uaddr,
+                NCX UNCHECKED uint32_t *, uaddr,
                 syscall_ulong_t, futex_op,
                 uint32_t, val,
-                USER UNCHECKED struct timespec64 const *, timeout_or_val2,
-                USER UNCHECKED uint32_t *, uaddr2,
+                NCX UNCHECKED struct timespec64 const *, timeout_or_val2,
+                NCX UNCHECKED uint32_t *, uaddr2,
                 uint32_t, val3) {
 	syscall_slong_t result;
 	ktime_t timeout = KTIME_INFINITE;
@@ -203,11 +203,11 @@ DEFINE_SYSCALL6(syscall_slong_t, futex_time64,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_FUTEX
 DEFINE_COMPAT_SYSCALL6(syscall_slong_t, futex,
-                       USER UNCHECKED uint32_t *, uaddr,
+                       NCX UNCHECKED uint32_t *, uaddr,
                        syscall_ulong_t, futex_op,
                        uint32_t, val,
-                       USER UNCHECKED struct compat_timespec32 const *, timeout_or_val2,
-                       USER UNCHECKED uint32_t *, uaddr2,
+                       NCX UNCHECKED struct compat_timespec32 const *, timeout_or_val2,
+                       NCX UNCHECKED uint32_t *, uaddr2,
                        uint32_t, val3) {
 	syscall_slong_t result;
 	ktime_t timeout = KTIME_INFINITE;
@@ -228,11 +228,11 @@ DEFINE_COMPAT_SYSCALL6(syscall_slong_t, futex,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_FUTEX_TIME64
 DEFINE_COMPAT_SYSCALL6(syscall_slong_t, futex_time64,
-                       USER UNCHECKED uint32_t *, uaddr,
+                       NCX UNCHECKED uint32_t *, uaddr,
                        syscall_ulong_t, futex_op,
                        uint32_t, val,
-                       USER UNCHECKED struct compat_timespec64 const *, timeout_or_val2,
-                       USER UNCHECKED uint32_t *, uaddr2,
+                       NCX UNCHECKED struct compat_timespec64 const *, timeout_or_val2,
+                       NCX UNCHECKED uint32_t *, uaddr2,
                        uint32_t, val3) {
 	syscall_slong_t result;
 	ktime_t timeout = KTIME_INFINITE;

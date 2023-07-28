@@ -175,7 +175,7 @@ struct clocktype {
 	 *
 	 * This function should  be used  to calculate a  timeout for  the
 	 * earliest possible point in time when `(*ct_gettime)() >= *p_ts' */
-	WUNUSED_T ktime_t (FCALL *ct_astimeout)(clockid_t clockid, USER CHECKED struct timespec const *p_ts)
+	WUNUSED_T ktime_t (FCALL *ct_astimeout)(clockid_t clockid, NCX struct timespec const *p_ts)
 			THROWS(...);
 
 	/* [1..1]
@@ -346,8 +346,8 @@ timer_gettime(struct timer *__restrict self)
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC: ... */
 FUNDEF NONNULL((1)) void FCALL
 timer_settime(struct timer *__restrict self,
-              /*[0..1]*/ USER CHECKED struct itimerspec const *value,
-              /*[0..1]*/ USER CHECKED struct itimerspec *old_value)
+              /*[0..1]*/ NCX struct itimerspec const *value,
+              /*[0..1]*/ NCX struct itimerspec *old_value)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE);
 
 
@@ -388,8 +388,8 @@ FUNDEF WUNUSED REF struct timerfd *FCALL timerfd_create(clockid_t clockid)
 #define timerfd_gettime(self) timer_gettime(&(self)->tfd_timer)
 FUNDEF NONNULL((1)) void FCALL
 timerfd_settime(struct timerfd *__restrict self,
-                /*[0..1]*/ USER CHECKED struct itimerspec const *value,
-                /*[0..1]*/ USER CHECKED struct itimerspec *old_value)
+                /*[0..1]*/ NCX struct itimerspec const *value,
+                /*[0..1]*/ NCX struct itimerspec *old_value)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) uint64_t FCALL
 timerfd_trywaitfor(struct timerfd *__restrict self)

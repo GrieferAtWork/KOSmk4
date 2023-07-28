@@ -65,7 +65,7 @@ ptyslave_v_oprinter(struct terminal *__restrict term,
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 ptyslave_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-                 USER UNCHECKED void *arg, iomode_t mode)
+                 NCX UNCHECKED void *arg, iomode_t mode)
 		THROWS(...) {
 	struct ptyslave *me = mfile_asptyslave(self);
 	switch (cmd) {
@@ -125,7 +125,7 @@ NOTHROW(KCALL ptymaster_v_destroy)(struct mfile *__restrict self) {
 
 PRIVATE NONNULL((1)) size_t KCALL
 ptymaster_v_read(struct mfile *__restrict self,
-                 USER CHECKED void *dst,
+                 NCX void *dst,
                  size_t num_bytes, iomode_t mode)
 		THROWS(...) {
 	struct ptymaster *me = mfile_asptymaster(self);
@@ -170,7 +170,7 @@ again_read:
 
 PRIVATE NONNULL((1)) size_t KCALL
 ptymaster_v_write(struct mfile *__restrict self,
-                  USER CHECKED void const *src,
+                  NCX void const *src,
                   size_t num_bytes, iomode_t mode)
 		THROWS(...) {
 	struct ptymaster *me = mfile_asptymaster(self);
@@ -222,7 +222,7 @@ again_write:
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 ptymaster_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-                  USER UNCHECKED void *arg, iomode_t mode)
+                  NCX UNCHECKED void *arg, iomode_t mode)
 		THROWS(...) {
 	struct ptymaster *me = mfile_asptymaster(self);
 	REF struct ptyslave *slave;
@@ -243,7 +243,7 @@ ptymaster_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 
 PRIVATE NONNULL((1)) void KCALL
 ptymaster_v_stat(struct mfile *__restrict self,
-                 USER CHECKED struct stat *result)
+                 NCX struct stat *result)
 		THROWS(...) {
 	struct ptymaster *me = mfile_asptymaster(self);
 	REF struct ptyslave *slave;
@@ -468,8 +468,8 @@ register_pty_pair(struct ptymaster *__restrict master,
 PUBLIC NONNULL((1, 2)) void KCALL
 pty_alloc(REF struct ptymaster **__restrict p_master,
           REF struct ptyslave **__restrict p_slave,
-          USER CHECKED struct termios const *termp,
-          USER CHECKED struct winsize const *winp)
+          NCX struct termios const *termp,
+          NCX struct winsize const *winp)
 		THROWS(E_BADALLOC) {
 	struct ptymaster *master;
 	struct ptyslave *slave;
@@ -532,11 +532,11 @@ pty_alloc(REF struct ptymaster **__restrict p_master,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_OPENPTY
 DEFINE_SYSCALL5(errno_t, openpty,
-                USER UNCHECKED fd_t *, amaster,
-                USER UNCHECKED fd_t *, aslave,
-                USER UNCHECKED char *, name,
-                USER UNCHECKED struct termios const *, termp,
-                USER UNCHECKED struct winsize const *, winp) {
+                NCX UNCHECKED fd_t *, amaster,
+                NCX UNCHECKED fd_t *, aslave,
+                NCX UNCHECKED char *, name,
+                NCX UNCHECKED struct termios const *, termp,
+                NCX UNCHECKED struct winsize const *, winp) {
 	struct handle_install_data minstall;
 	struct handle_install_data sinstall;
 	fd_t mfd, sfd;

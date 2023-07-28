@@ -51,7 +51,7 @@ NOTHROW(FCALL task_serve_with_icpustate_nx)(struct icpustate *__restrict state)
 #else /* DEFINE_task_serve_with_icpustate */
 PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 task_serve_with_icpustate_and_sigmask(struct icpustate *__restrict state,
-                                      USER CHECKED sigset_t const *sigmask)
+                                      NCX sigset_t const *sigmask)
 		THROWS(E_SEGFAULT, E_INTERRUPT_USER_RPC, ...)
 #define LOCAL_HAVE_SIGMASK
 #endif /* !DEFINE_task_serve_with_icpustate */

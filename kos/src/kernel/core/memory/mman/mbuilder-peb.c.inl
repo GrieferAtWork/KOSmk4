@@ -112,11 +112,11 @@ DECL_BEGIN
 PUBLIC WUNUSED NONNULL((1)) UNCHECKED void *KCALL
 MY_MBUILDER_ALLOC_PEB(struct mbuilder_norpc *__restrict self,
                       size_t argc_inject, KERNEL char const *const *argv_inject,
-                      USER UNCHECKED IN_PTR(char const) USER CHECKED const *argv,
-                      USER UNCHECKED IN_PTR(char const) USER CHECKED const *envp)
+                      NCX UNCHECKED IN_PTR(char const) NCX const *argv,
+                      NCX UNCHECKED IN_PTR(char const) NCX const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
 #define read_once_in_charp(p) \
-	(USER UNCHECKED IN_PTR(char const))read_once((IN_UIP *)(p))
+	(NCX UNCHECKED IN_PTR(char const))read_once((IN_UIP *)(p))
 #if OU_POINTERSIZE == __SIZEOF_POINTER__
 	typedef struct process_peb peb_t;
 #elif OU_POINTERSIZE == 4
@@ -132,8 +132,8 @@ MY_MBUILDER_ALLOC_PEB(struct mbuilder_norpc *__restrict self,
 	byte_t *peb_temp_base;
 	PAGEDIR_PAGEALIGNED UNCHECKED void *result;
 	struct mbnode *stolen_node;
-	USER UNCHECKED IN_PTR(char const) string;
-	USER UNCHECKED IN_PTR(char const) USER CHECKED const *iter;
+	NCX UNCHECKED IN_PTR(char const) string;
+	NCX UNCHECKED IN_PTR(char const) NCX const *iter;
 
 again:
 	argc_user          = 0;
@@ -185,22 +185,22 @@ again:
 	                                   PAGESIZE);
 	TRY {
 		byte_t *writer;
-		USER OU_UIP *peb_argv;
-		USER OU_UIP *peb_envp;
-		USER peb_t *peb;
+		NCX OU_UIP *peb_argv;
+		NCX OU_UIP *peb_envp;
+		NCX peb_t *peb;
 		size_t strings_total_copied;
 
 		/* Initialize the PEB. */
 		writer   = peb_temp_base + offsetafter(peb_t, pp_envp);
-		peb_argv = (USER OU_UIP *)writer;
+		peb_argv = (NCX OU_UIP *)writer;
 		writer += (argc_inject + argc_user + 1) * OU_POINTERSIZE;
-		peb_envp = (USER OU_UIP *)writer;
+		peb_envp = (NCX OU_UIP *)writer;
 		writer += (envc_user + 1) * OU_POINTERSIZE;
-		peb = (USER peb_t *)peb_temp_base;
+		peb = (NCX peb_t *)peb_temp_base;
 		peb->pp_argc = argc_inject + argc_user;
-		peb->pp_argv = (USER OU_PTR(USER OU_PTR(char)))(OU_UIP)(uintptr_t)((byte_t *)peb_argv - (uintptr_t)peb_temp_base);
+		peb->pp_argv = (NCX OU_PTR(NCX OU_PTR(char)))(OU_UIP)(uintptr_t)((byte_t *)peb_argv - (uintptr_t)peb_temp_base);
 		peb->pp_envc = envc_user;
-		peb->pp_envp = (USER OU_PTR(USER OU_PTR(char)))(OU_UIP)(uintptr_t)((byte_t *)peb_envp - (uintptr_t)peb_temp_base);
+		peb->pp_envp = (NCX OU_PTR(NCX OU_PTR(char)))(OU_UIP)(uintptr_t)((byte_t *)peb_envp - (uintptr_t)peb_temp_base);
 
 		/* Copy strings. */
 		strings_total_copied = 0;

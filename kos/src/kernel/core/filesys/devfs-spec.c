@@ -76,7 +76,7 @@ DECL_BEGIN
 /************************************************************************/
 PRIVATE BLOCKING NONNULL((1)) void KCALL
 devfs_spec_v_stat_with_boottime(struct mfile *__restrict self,
-                                USER CHECKED struct stat *result)
+                                NCX struct stat *result)
 		THROWS(...) {
 	result->st_atime     = boottime.tv_sec;
 	result->st_atimensec = boottime.tv_nsec;
@@ -99,7 +99,7 @@ INTERN_CONST struct mfile_stream_ops const devfs_spec_v_stream_ops_with_boottime
 /* Decode a string such as "4:5" into a devno.
  * When the given `name' can't be decoded as such, return `MKDEV_BADDEV' */
 PRIVATE ATTR_PURE WUNUSED dev_t KCALL
-decode_devno(USER CHECKED char const *name, u16 namelen)
+decode_devno(NCX char const *name, u16 namelen)
 		THROWS(E_SEGFAULT) {
 	char const *end = name + namelen;
 	char ch;
@@ -169,7 +169,7 @@ NOTHROW(KCALL devicelink_v_destroy)(struct mfile *__restrict self) {
 
 PRIVATE BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 devicelink_v_readlink(struct flnknode *__restrict self,
-                      USER CHECKED /*utf-8*/ char *buf,
+                      NCX /*utf-8*/ char *buf,
                       size_t bufsize) {
 	struct devicelink *me = (struct devicelink *)self;
 	return snprintf(buf, bufsize, "%s%$s",
@@ -345,7 +345,7 @@ devfs_block_v_lookup(struct fdirnode *__restrict UNUSED(self),
 }
 
 PRIVATE BLOCKING NONNULL((1)) size_t KCALL
-devfs_block_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+devfs_block_enum_v_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                            size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	char namebuf[lengthof("" PRIMAXuN(__SIZEOF_MAJOR_T__) ":"
@@ -442,7 +442,7 @@ devfs_char_v_lookup(struct fdirnode *__restrict UNUSED(self),
 }
 
 PRIVATE BLOCKING NONNULL((1)) size_t KCALL
-devfs_char_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+devfs_char_enum_v_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                           size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	char namebuf[lengthof("" PRIMAXuN(__SIZEOF_MAJOR_T__) ":"

@@ -556,8 +556,8 @@ done_handptr:
 #ifdef WANT_SIGACTION
 PRIVATE void KCALL
 sys_sigaction_impl(signo_t signo,
-                   CHECKED USER struct kernel_sigaction const *act,
-                   CHECKED USER struct kernel_sigaction *oact,
+                   NCX struct kernel_sigaction const *act,
+                   NCX struct kernel_sigaction *oact,
                    size_t sigsetsize) {
 	struct kernel_sigaction ohandler;
 	struct sighand *hand;
@@ -630,8 +630,8 @@ no_old_handler:
 
 #ifdef __ARCH_WANT_SYSCALL_RT_SIGACTION
 DEFINE_SYSCALL4(errno_t, rt_sigaction, signo_t, signo,
-                UNCHECKED USER struct kernel_sigaction const *, act,
-                UNCHECKED USER struct kernel_sigaction *, oact,
+                NCX UNCHECKED struct kernel_sigaction const *, act,
+                NCX UNCHECKED struct kernel_sigaction *, oact,
                 size_t, sigsetsize) {
 	/* Validate user-structure pointers. */
 	validate_readable_opt(act, offsetof(struct kernel_sigaction, sa_mask) + sigsetsize);
@@ -643,8 +643,8 @@ DEFINE_SYSCALL4(errno_t, rt_sigaction, signo_t, signo,
 
 #ifdef __ARCH_WANT_SYSCALL_SIGACTION
 DEFINE_SYSCALL3(errno_t, sigaction, signo_t, signo,
-                UNCHECKED USER struct __old_kernel_sigaction const *, old_act,
-                UNCHECKED USER struct __old_kernel_sigaction *, old_oact) {
+                NCX UNCHECKED struct __old_kernel_sigaction const *, old_act,
+                NCX UNCHECKED struct __old_kernel_sigaction *, old_oact) {
 	alignas(alignof(struct kernel_sigaction))
 	byte_t _buf_act[offsetof(struct kernel_sigaction, sa_mask) +
 	                sizeof(struct __old_sigset_struct)];
@@ -682,8 +682,8 @@ DEFINE_SYSCALL3(errno_t, sigaction, signo_t, signo,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_RT_SIGACTION
 DEFINE_COMPAT_SYSCALL4(compat_errno_t, rt_sigaction, compat_signo_t, signo,
-                       UNCHECKED USER struct __compat_kernel_sigaction const *, compat_act,
-                       UNCHECKED USER struct __compat_kernel_sigaction *, compat_oact,
+                       NCX UNCHECKED struct __compat_kernel_sigaction const *, compat_act,
+                       NCX UNCHECKED struct __compat_kernel_sigaction *, compat_oact,
                        size_t, sigsetsize) {
 	size_t overflow = 0;
 	struct kernel_sigaction _buf_act, _buf_oact;
@@ -747,8 +747,8 @@ DEFINE_COMPAT_SYSCALL4(compat_errno_t, rt_sigaction, compat_signo_t, signo,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SIGACTION
 DEFINE_COMPAT_SYSCALL3(compat_errno_t, sigaction, compat_signo_t, signo,
-                       UNCHECKED USER struct __compat_old_kernel_sigaction const *, old_act,
-                       UNCHECKED USER struct __compat_old_kernel_sigaction *, old_oact) {
+                       NCX UNCHECKED struct __compat_old_kernel_sigaction const *, old_act,
+                       NCX UNCHECKED struct __compat_old_kernel_sigaction *, old_oact) {
 	alignas(alignof(struct kernel_sigaction))
 	byte_t _buf_act[offsetof(struct kernel_sigaction, sa_mask) +
 	                sizeof(struct __old_sigset_struct)];
@@ -787,7 +787,7 @@ DEFINE_COMPAT_SYSCALL3(compat_errno_t, sigaction, compat_signo_t, signo,
 #ifdef __ARCH_WANT_SYSCALL_SIGNAL
 DEFINE_SYSCALL2(sighandler_t, signal,
                 signo_t, signo,
-                UNCHECKED USER sighandler_t, handler) {
+                NCX UNCHECKED sighandler_t, handler) {
 	alignas(alignof(struct kernel_sigaction))
 	byte_t _buf_act[offsetof(struct kernel_sigaction, sa_mask)];
 	alignas(alignof(struct kernel_sigaction))
@@ -808,7 +808,7 @@ DEFINE_SYSCALL2(sighandler_t, signal,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SIGNAL
 DEFINE_COMPAT_SYSCALL2(compat_sighandler_t, signal,
                        compat_signo_t, signo,
-                       UNCHECKED USER compat_sighandler_t, handler) {
+                       NCX UNCHECKED compat_sighandler_t, handler) {
 	alignas(alignof(struct kernel_sigaction))
 	byte_t _buf_act[offsetof(struct kernel_sigaction, sa_mask)];
 	alignas(alignof(struct kernel_sigaction))

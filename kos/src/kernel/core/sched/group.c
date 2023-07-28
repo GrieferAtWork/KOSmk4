@@ -994,9 +994,9 @@ PRIVATE NONNULL((1, 2)) pid_t KCALL
 fill_wait_info(struct taskpid *__restrict proc,
                struct taskpid *__restrict child,
                uint16_t status,
-               USER CHECKED int32_t *wstatus,
-               USER CHECKED siginfo_t *infop,
-               USER CHECKED struct rusage *ru) {
+               NCX int32_t *wstatus,
+               NCX siginfo_t *infop,
+               NCX struct rusage *ru) {
 	pid_t result;
 	result = taskpid_getnstid_s(child, proc->tp_ns);
 
@@ -1038,9 +1038,9 @@ fill_wait_info(struct taskpid *__restrict proc,
 PRIVATE pid_t KCALL
 waitfor_children(idtype_t which, id_t which_pid,
                  syscall_ulong_t options,
-                 USER CHECKED int32_t *wstatus,
-                 USER CHECKED siginfo_t *infop,
-                 USER CHECKED struct rusage *ru) {
+                 NCX int32_t *wstatus,
+                 NCX siginfo_t *infop,
+                 NCX struct rusage *ru) {
 	struct taskpid *proc = task_getprocpid();
 	struct procctl *ctl  = taskpid_getprocctl(proc);
 
@@ -1213,9 +1213,9 @@ err_EAGAIN:
 #ifdef __ARCH_WANT_SYSCALL_WAITID
 DEFINE_SYSCALL5(pid_t, waitid,
                 syscall_ulong_t, which, id_t, upid,
-                USER UNCHECKED siginfo_t *, infop,
+                NCX UNCHECKED siginfo_t *, infop,
                 syscall_ulong_t, options,
-                USER UNCHECKED struct __rusage32 *, ru) {
+                NCX UNCHECKED struct __rusage32 *, ru) {
 	pid_t result;
 	VALIDATE_FLAGSET(options,
 	                 WNOHANG | WNOREAP | WEXITED | WSTOPPED | WCONTINUED,
@@ -1251,9 +1251,9 @@ DEFINE_SYSCALL5(pid_t, waitid,
 #ifdef __ARCH_WANT_SYSCALL_WAITID64
 DEFINE_SYSCALL5(pid_t, waitid64,
                 syscall_ulong_t, which, id_t, upid,
-                USER UNCHECKED siginfo_t *, infop,
+                NCX UNCHECKED siginfo_t *, infop,
                 syscall_ulong_t, options,
-                USER UNCHECKED struct rusage64 *, ru) {
+                NCX UNCHECKED struct rusage64 *, ru) {
 	pid_t result;
 	VALIDATE_FLAGSET(options,
 	                 WNOHANG | WNOREAP | WEXITED | WSTOPPED | WCONTINUED,
@@ -1289,9 +1289,9 @@ DEFINE_SYSCALL5(pid_t, waitid64,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_WAITID
 DEFINE_COMPAT_SYSCALL5(pid_t, waitid,
                        syscall_ulong_t, which, id_t, upid,
-                       USER UNCHECKED compat_siginfo_t *, infop,
+                       NCX UNCHECKED compat_siginfo_t *, infop,
                        syscall_ulong_t, options,
-                       USER UNCHECKED struct compat_rusage32 *, ru) {
+                       NCX UNCHECKED struct compat_rusage32 *, ru) {
 	pid_t result;
 	siginfo_t info;
 	VALIDATE_FLAGSET(options,
@@ -1328,9 +1328,9 @@ DEFINE_COMPAT_SYSCALL5(pid_t, waitid,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_WAITID64
 DEFINE_COMPAT_SYSCALL5(pid_t, waitid64,
                        syscall_ulong_t, which, id_t, upid,
-                       USER UNCHECKED compat_siginfo_t *, infop,
+                       NCX UNCHECKED compat_siginfo_t *, infop,
                        syscall_ulong_t, options,
-                       USER UNCHECKED struct compat_rusage64 *, ru) {
+                       NCX UNCHECKED struct compat_rusage64 *, ru) {
 	pid_t result;
 	siginfo_t info;
 	VALIDATE_FLAGSET(options,
@@ -1382,9 +1382,9 @@ DEFINE_COMPAT_SYSCALL3(pid_t, waitpid,
 
 #ifdef __ARCH_WANT_SYSCALL_WAIT4
 DEFINE_SYSCALL4(pid_t, wait4, pid_t, upid,
-                USER UNCHECKED int32_t *, wstatus,
+                NCX UNCHECKED int32_t *, wstatus,
                 syscall_ulong_t, options,
-                USER UNCHECKED struct __rusage32 *, ru) {
+                NCX UNCHECKED struct __rusage32 *, ru) {
 	idtype_t which;
 	pid_t result;
 	VALIDATE_FLAGSET(options,
@@ -1425,9 +1425,9 @@ DEFINE_SYSCALL4(pid_t, wait4, pid_t, upid,
 
 #ifdef __ARCH_WANT_SYSCALL_WAIT4_64
 DEFINE_SYSCALL4(pid_t, wait4_64, pid_t, upid,
-                USER UNCHECKED int32_t *, wstatus,
+                NCX UNCHECKED int32_t *, wstatus,
                 syscall_ulong_t, options,
-                USER UNCHECKED struct rusage64 *, ru) {
+                NCX UNCHECKED struct rusage64 *, ru) {
 	idtype_t which;
 	pid_t result;
 	VALIDATE_FLAGSET(options,
@@ -1468,9 +1468,9 @@ DEFINE_SYSCALL4(pid_t, wait4_64, pid_t, upid,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_WAIT4
 DEFINE_COMPAT_SYSCALL4(pid_t, wait4, pid_t, upid,
-                       USER UNCHECKED int32_t *, wstatus,
+                       NCX UNCHECKED int32_t *, wstatus,
                        syscall_ulong_t, options,
-                       USER UNCHECKED struct compat_rusage32 *, ru) {
+                       NCX UNCHECKED struct compat_rusage32 *, ru) {
 	idtype_t which;
 	pid_t result;
 	VALIDATE_FLAGSET(options,
@@ -1507,9 +1507,9 @@ DEFINE_COMPAT_SYSCALL4(pid_t, wait4, pid_t, upid,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_WAIT4_64
 DEFINE_COMPAT_SYSCALL4(pid_t, wait4_64, pid_t, upid,
-                       USER UNCHECKED int32_t *, wstatus,
+                       NCX UNCHECKED int32_t *, wstatus,
                        syscall_ulong_t, options,
-                       USER UNCHECKED struct compat_rusage64 *, ru) {
+                       NCX UNCHECKED struct compat_rusage64 *, ru) {
 	idtype_t which;
 	pid_t result;
 	VALIDATE_FLAGSET(options,

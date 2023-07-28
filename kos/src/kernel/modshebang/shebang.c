@@ -100,7 +100,7 @@ path_aprinter(void *arg, char const *__restrict data, size_t datalen) {
 
 PRIVATE WUNUSED NONNULL((1)) char *KCALL
 path_aprintent_ex(struct path *__restrict self,
-                  USER CHECKED char const *dentry_name,
+                  NCX char const *dentry_name,
                   u16 dentry_namelen, struct path *root)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
 	size_t reqlen;
@@ -124,7 +124,7 @@ path_aprintent_ex(struct path *__restrict self,
 
 PRIVATE WUNUSED NONNULL((1)) char *KCALL
 path_aprintent(struct path *__restrict self,
-               USER CHECKED char const *dentry_name,
+               NCX char const *dentry_name,
                u16 dentry_namelen)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
 	REF struct path *root = fs_getroot(THIS_FS);

@@ -40,7 +40,7 @@ DECL_BEGIN
  * caches for quick (O(log2)) repeated access to an FDE located within a known
  * function. */
 INTDEF NONNULL((2)) unwind_errno_t
-NOTHROW_NCX(CC libuw_unwind_fde_find)(CHECKED void const *absolute_pc,
+NOTHROW_NCX(CC libuw_unwind_fde_find)(VIRT void const *absolute_pc,
                                       unwind_fde_t *__restrict result);
 
 
@@ -52,7 +52,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_find)(CHECKED void const *absolute_pc,
  *       `absolute_pc >= start && absolute_pc < end'
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
 INTDEF NONNULL((2, 4)) unwind_errno_t CC
-linuw_unwind(CHECKED void const *absolute_pc,
+linuw_unwind(VIRT void const *absolute_pc,
              unwind_getreg_t reg_getter, void const *reg_getter_arg,
              unwind_setreg_t reg_setter, void *reg_setter_arg);
 

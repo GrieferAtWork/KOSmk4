@@ -47,7 +47,7 @@ DECL_BEGIN
  * @return: DBX_ENOMEM: Insufficient memory. */
 PUBLIC NONNULL((1, 2)) dbx_errno_t
 NOTHROW_CB_NCX(FCALL cparser_autocomplete)(struct cparser const *__restrict self,
-                                           CHECKED char const *__restrict str, size_t len) {
+                                           NCX char const *__restrict str, size_t len) {
 	enum { STACK_LIMIT = 256 };
 	size_t mylen;
 	size_t total_len;
@@ -84,7 +84,7 @@ NOTHROW_CB_NCX(FCALL cparser_autocomplete)(struct cparser const *__restrict self
 PUBLIC NONNULL((1)) void
 NOTHROW_NCX(FCALL cparser_yield)(struct cparser *__restrict self) {
 	char32_t ch;
-	CHECKED char const *iter, *end;
+	NCX char const *iter, *end;
 	iter = self->c_tokend;
 	end  = self->c_end;
 again:

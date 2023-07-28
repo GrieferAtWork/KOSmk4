@@ -147,7 +147,7 @@ liblinebuffer_rewrite(struct linebuffer *__restrict self,
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
 INTERN NONNULL((1)) linebuffer_retval_t CC
 liblinebuffer_write(struct linebuffer *__restrict self,
-                    USER CHECKED void const *src, size_t num_bytes)
+                    NCX void const *src, size_t num_bytes)
 		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
 		              THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT)) {
 	linebuffer_retval_t temp, result = 0;
@@ -214,7 +214,7 @@ done:
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
 INTERN NONNULL((1)) linebuffer_retval_t CC
 liblinebuffer_writesome(struct linebuffer *__restrict self,
-                        USER CHECKED void const *src, size_t num_bytes)
+                        NCX void const *src, size_t num_bytes)
 		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
 		              THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT)) {
 	linebuffer_retval_t result;
@@ -263,7 +263,7 @@ again:
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
 INTERN NONNULL((1)) linebuffer_retval_t CC
 liblinebuffer_write_nonblock(struct linebuffer *__restrict self,
-                             USER CHECKED void const *src, size_t num_bytes)
+                             NCX void const *src, size_t num_bytes)
 		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_BADALLOC),
 		              THROWS(E_SEGFAULT, E_WOULDBLOCK)) {
 #ifdef __KERNEL__

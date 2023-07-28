@@ -53,8 +53,8 @@ DECL_BEGIN
  * @throw: E_INSUFFICIENT_RIGHTS: Tried to exceed `mfutexfd_maxexpr' w/o `CAP_SYS_RESOURCE' */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfutexfd *FCALL
 LOCAL_mfutexfd_new(REF struct mfutex *__restrict futex,
-                   USER UNCHECKED void *base,
-                   USER CHECKED LOCAL_struct_lfutexexpr const *expr)
+                   NCX UNCHECKED void *base,
+                   NCX LOCAL_struct_lfutexexpr const *expr)
 		THROWS(E_BADALLOC, E_SEGFAULT, E_INSUFFICIENT_RIGHTS) {
 	REF struct mfutexfd *result;
 	size_t count = 0;

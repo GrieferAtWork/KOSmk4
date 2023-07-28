@@ -122,10 +122,10 @@ userexcept_callsignal(struct icpustate *__restrict state,
  * WARNING: This function may not necessarily return normally, or by throwing an exception! */
 INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 sys_ksigreturn32_impl(struct icpustate *__restrict state,
-                      USER UNCHECKED struct ucpustate32 const *restore_cpu,
-                      USER UNCHECKED struct fpustate32 const *restore_fpu,
-                      USER UNCHECKED struct __sigset_with_sizex32 const *restore_sigmask,
-                      USER UNCHECKED struct rpc_syscall_info32 const *restart_sc_info) {
+                      NCX UNCHECKED struct ucpustate32 const *restore_cpu,
+                      NCX UNCHECKED struct fpustate32 const *restore_fpu,
+                      NCX UNCHECKED struct __sigset_with_sizex32 const *restore_sigmask,
+                      NCX UNCHECKED struct rpc_syscall_info32 const *restart_sc_info) {
 	struct __sigset_with_sizex32 rmask;
 
 	/* TODO: `i386_validate_readable()'  (validate_readable() on i386; compat_validate_readable() on x86_64) */
@@ -190,7 +190,7 @@ sys_ksigreturn32_impl(struct icpustate *__restrict state,
 
 	/* Restore the given signal mask. */
 	if (rmask.sws_sigset != NULL) {
-		if (sigmask_setmask_from_user((USER CHECKED sigset_t const *)(void *)rmask.sws_sigset,
+		if (sigmask_setmask_from_user((NCX sigset_t const *)(void *)rmask.sws_sigset,
 		                              rmask.sws_sigsiz)) {
 			/* If the signal mask changed (technically only needed if it became
 			 * less restrictive), then ensure that pending signals are  checked
@@ -237,16 +237,16 @@ sys_ksigreturn32_impl(struct icpustate *__restrict state,
 PRIVATE ABNORMAL_RETURN NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_ksigreturn32_rpc(struct rpc_context *__restrict ctx,
                      void *UNUSED(cookie)) {
-	USER UNCHECKED struct ucpustate32 const *restore_cpu;
-	USER UNCHECKED struct fpustate32 const *restore_fpu;
-	USER UNCHECKED struct __sigset_with_sizex32 const *restore_sigmask;
-	USER UNCHECKED struct rpc_syscall_info32 const *restart_sc_info;
+	NCX UNCHECKED struct ucpustate32 const *restore_cpu;
+	NCX UNCHECKED struct fpustate32 const *restore_fpu;
+	NCX UNCHECKED struct __sigset_with_sizex32 const *restore_sigmask;
+	NCX UNCHECKED struct rpc_syscall_info32 const *restart_sc_info;
 	if unlikely(ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
-	restore_cpu     = (USER UNCHECKED struct ucpustate32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_RESTORE_CPU];
-	restore_fpu     = (USER UNCHECKED struct fpustate32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_RESTORE_FPU];
-	restore_sigmask = (USER UNCHECKED struct __sigset_with_sizex32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_RESTORE_SIGMASK];
-	restart_sc_info = (USER UNCHECKED struct rpc_syscall_info32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_SC_INFO];
+	restore_cpu     = (NCX UNCHECKED struct ucpustate32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_RESTORE_CPU];
+	restore_fpu     = (NCX UNCHECKED struct fpustate32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_RESTORE_FPU];
+	restore_sigmask = (NCX UNCHECKED struct __sigset_with_sizex32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_RESTORE_SIGMASK];
+	restart_sc_info = (NCX UNCHECKED struct rpc_syscall_info32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_SC_INFO];
 
 	ctx->rc_state = sys_ksigreturn32_impl(ctx->rc_state, restore_cpu,
 	                                      restore_fpu, restore_sigmask,
@@ -257,12 +257,12 @@ sys_ksigreturn32_rpc(struct rpc_context *__restrict ctx,
 }
 
 DEFINE_SYSCALL32_6(void, ksigreturn,
-                   USER UNCHECKED struct fpustate32 const *, restore_fpu,
+                   NCX UNCHECKED struct fpustate32 const *, restore_fpu,
                    syscall_ulong_t, unused1,
                    syscall_ulong_t, unused2,
-                   USER UNCHECKED struct __sigset_with_sizex32 const *, restore_sigmask,
-                   USER UNCHECKED struct rpc_syscall_info32 const *, sc_info,
-                   USER UNCHECKED struct ucpustate32 const *, restore_cpu) {
+                   NCX UNCHECKED struct __sigset_with_sizex32 const *, restore_sigmask,
+                   NCX UNCHECKED struct rpc_syscall_info32 const *, sc_info,
+                   NCX UNCHECKED struct ucpustate32 const *, restore_cpu) {
 	(void)restore_fpu;
 	(void)unused1;
 	(void)unused2;
@@ -291,10 +291,10 @@ DEFINE_SYSCALL32_6(void, ksigreturn,
  * WARNING: This function may not necessarily return normally, or by throwing an exception! */
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 sys_ksigreturn64_impl(struct icpustate *__restrict state,
-                      USER UNCHECKED struct ucpustate64 const *restore_cpu,
-                      USER UNCHECKED struct fpustate64 const *restore_fpu,
-                      USER UNCHECKED struct __sigset_with_sizex64 const *restore_sigmask,
-                      USER UNCHECKED struct rpc_syscall_info64 const *restart_sc_info) {
+                      NCX UNCHECKED struct ucpustate64 const *restore_cpu,
+                      NCX UNCHECKED struct fpustate64 const *restore_fpu,
+                      NCX UNCHECKED struct __sigset_with_sizex64 const *restore_sigmask,
+                      NCX UNCHECKED struct rpc_syscall_info64 const *restart_sc_info) {
 	struct __sigset_with_sizex64 rmask;
 	/* Validate arguments. */
 	validate_readable(restore_cpu, sizeof(*restore_cpu));
@@ -385,16 +385,16 @@ sys_ksigreturn64_impl(struct icpustate *__restrict state,
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_ksigreturn64_rpc(struct rpc_context *__restrict ctx,
                      void *UNUSED(cookie)) {
-	USER UNCHECKED struct ucpustate64 const *restore_cpu;
-	USER UNCHECKED struct fpustate64 const *restore_fpu;
-	USER UNCHECKED struct __sigset_with_sizex64 const *restore_sigmask;
-	USER UNCHECKED struct rpc_syscall_info64 const *restart_sc_info;
+	NCX UNCHECKED struct ucpustate64 const *restore_cpu;
+	NCX UNCHECKED struct fpustate64 const *restore_fpu;
+	NCX UNCHECKED struct __sigset_with_sizex64 const *restore_sigmask;
+	NCX UNCHECKED struct rpc_syscall_info64 const *restart_sc_info;
 	if unlikely(ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
-	restore_cpu     = (USER UNCHECKED struct ucpustate64 const *)gpregs_getpbp(&ctx->rc_state->ics_gpregs);
-	restore_fpu     = (USER UNCHECKED struct fpustate64 const *)gpregs_getpbx(&ctx->rc_state->ics_gpregs);
-	restore_sigmask = (USER UNCHECKED struct __sigset_with_sizex64 const *)gpregs_getp12(&ctx->rc_state->ics_gpregs);
-	restart_sc_info = (USER UNCHECKED struct rpc_syscall_info64 const *)gpregs_getp13(&ctx->rc_state->ics_gpregs);
+	restore_cpu     = (NCX UNCHECKED struct ucpustate64 const *)gpregs_getpbp(&ctx->rc_state->ics_gpregs);
+	restore_fpu     = (NCX UNCHECKED struct fpustate64 const *)gpregs_getpbx(&ctx->rc_state->ics_gpregs);
+	restore_sigmask = (NCX UNCHECKED struct __sigset_with_sizex64 const *)gpregs_getp12(&ctx->rc_state->ics_gpregs);
+	restart_sc_info = (NCX UNCHECKED struct rpc_syscall_info64 const *)gpregs_getp13(&ctx->rc_state->ics_gpregs);
 
 	ctx->rc_state = sys_ksigreturn64_impl(ctx->rc_state, restore_cpu,
 	                                      restore_fpu, restore_sigmask,

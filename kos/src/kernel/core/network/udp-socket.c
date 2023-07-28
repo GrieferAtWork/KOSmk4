@@ -45,14 +45,14 @@
 
 DECL_BEGIN
 
-PRIVATE USER CHECKED struct sockaddr_in const *KCALL
-udp_verify_sockaddr(USER CHECKED struct sockaddr const *addr,
+PRIVATE NCX struct sockaddr_in const *KCALL
+udp_verify_sockaddr(NCX struct sockaddr const *addr,
                     socklen_t addr_len) {
-	USER CHECKED struct sockaddr_in *in;
+	NCX struct sockaddr_in *in;
 	sa_family_t fam;
 	if unlikely(addr_len < sizeof(struct sockaddr_in))
 		THROW(E_BUFFER_TOO_SMALL, sizeof(struct sockaddr_in), addr_len);
-	in = (USER CHECKED struct sockaddr_in *)addr;
+	in = (NCX struct sockaddr_in *)addr;
 	fam = atomic_read(&in->sin_family);
 	if (fam != AF_INET) {
 		THROW(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
@@ -127,12 +127,12 @@ NOTHROW(KCALL udp_fini)(struct socket *__restrict self) {
 
 PRIVATE NONNULL((1)) socklen_t KCALL
 udp_getsockname(struct socket *__restrict self,
-                USER CHECKED struct sockaddr *addr,
+                NCX struct sockaddr *addr,
                 socklen_t addr_len) {
 	struct udp_socket *me;
-	USER CHECKED struct sockaddr_in *in;
+	NCX struct sockaddr_in *in;
 	me = (struct udp_socket *)self;
-	in = (USER CHECKED struct sockaddr_in *)addr;
+	in = (NCX struct sockaddr_in *)addr;
 	if likely(addr_len >= offsetafter(struct sockaddr_in, sin_family))
 		in->sin_family = AF_INET;
 	if likely(addr_len >= offsetafter(struct sockaddr_in, sin_port))
@@ -144,13 +144,13 @@ udp_getsockname(struct socket *__restrict self,
 
 PRIVATE NONNULL((1)) socklen_t KCALL
 udp_getpeername(struct socket *__restrict self,
-                USER CHECKED struct sockaddr *addr,
+                NCX struct sockaddr *addr,
                 socklen_t addr_len)
 		THROWS(E_ILLEGAL_BECAUSE_NOT_READY) {
 	struct udp_socket *me;
-	USER CHECKED struct sockaddr_in *in;
+	NCX struct sockaddr_in *in;
 	me = (struct udp_socket *)self;
-	in = (USER CHECKED struct sockaddr_in *)addr;
+	in = (NCX struct sockaddr_in *)addr;
 	if (!(me->us_state & UDP_SOCKET_STATE_F_HASPEER)) {
 		THROW(E_ILLEGAL_BECAUSE_NOT_READY,
 		      E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED);
@@ -167,11 +167,11 @@ udp_getpeername(struct socket *__restrict self,
 
 PRIVATE NONNULL((1)) void KCALL
 udp_bind(struct socket *__restrict self,
-         USER CHECKED struct sockaddr const *addr,
+         NCX struct sockaddr const *addr,
          socklen_t addr_len)
 		THROWS(E_ILLEGAL_BECAUSE_NOT_READY) {
 	struct udp_socket *me;
-	USER CHECKED struct sockaddr_in const *in;
+	NCX struct sockaddr_in const *in;
 	me = (struct udp_socket *)self;
 	in = udp_verify_sockaddr(addr, addr_len);
 
@@ -204,10 +204,10 @@ udp_bind(struct socket *__restrict self,
 
 PRIVATE NONNULL((1, 4)) void KCALL
 udp_connect(struct socket *__restrict self,
-            USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
+            NCX struct sockaddr const *addr, socklen_t addr_len,
             /*out*/ struct aio_handle *__restrict aio) {
 	struct udp_socket *me;
-	USER CHECKED struct sockaddr_in const *in;
+	NCX struct sockaddr_in const *in;
 	me = (struct udp_socket *)self;
 	in = udp_verify_sockaddr(addr, addr_len);
 
@@ -231,12 +231,12 @@ udp_connect(struct socket *__restrict self,
 PRIVATE NONNULL((1, 2, 8)) void KCALL
 udp_sendtov(struct socket *__restrict self,
             struct iov_buffer const *__restrict buf, size_t bufsize,
-            /*?..1*/ USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
+            /*?..1*/ NCX struct sockaddr const *addr, socklen_t addr_len,
             struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
             /*out*/ struct aio_handle *__restrict aio) {
 	struct udp_socket *me;
 	struct nicdev *dev;
-	USER CHECKED struct sockaddr_in const *in;
+	NCX struct sockaddr_in const *in;
 	REF struct nic_packet *packet;
 	(void)msg_flags;
 
@@ -307,9 +307,9 @@ udp_sendtov(struct socket *__restrict self,
 PRIVATE NONNULL((1, 2)) size_t KCALL
 udp_recvfromv(struct socket *__restrict self,
               struct iov_buffer const *__restrict buf, size_t bufsize,
-              /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
-              /*?..1*/ USER CHECKED socklen_t *preq_addr_len,
-              /*0..1*/ USER CHECKED u32 *presult_flags,
+              /*?..1*/ NCX struct sockaddr *addr, socklen_t addr_len,
+              /*?..1*/ NCX socklen_t *preq_addr_len,
+              /*0..1*/ NCX u32 *presult_flags,
               struct ancillary_rmessage const *msg_control,
               syscall_ulong_t msg_flags,
               ktime_t abs_timeout)

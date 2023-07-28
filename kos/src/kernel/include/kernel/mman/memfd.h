@@ -54,7 +54,7 @@ DATDEF struct mfile_ops const memfd_ops;
 /* Construct a new mem-fd object (s.a. `memfd_create(2)')
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_NAME_TOO_LONG: [...] */
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct memfd *FCALL
-memfd_new(USER CHECKED char const *name)
+memfd_new(NCX char const *name)
 		THROWS(E_SEGFAULT, E_BADALLOC, E_INVALID_ARGUMENT_BAD_VALUE);
 
 DECL_END

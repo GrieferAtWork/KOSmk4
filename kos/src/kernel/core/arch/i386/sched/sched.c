@@ -219,7 +219,7 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 
 DEFINE_SYSCALL32_3(syscall_slong_t, modify_ldt,
                    syscall_ulong_t, func,
-                   USER UNCHECKED void *, ptr,
+                   NCX UNCHECKED void *, ptr,
                    syscall_ulong_t, bytecount) {
 	switch (func) {
 

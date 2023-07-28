@@ -50,11 +50,11 @@ INTERN NONNULL((1, 4)) unwind_errno_t
 #else /* DEBUG_FRAME */
 INTERN NONNULL((1, 3)) unwind_errno_t
 #endif /* !DEBUG_FRAME */
-NOTHROW_NCX(CC libuw_unwind_fde_load)(CHECKED byte_t const **__restrict peh_frame_reader,
+NOTHROW_NCX(CC libuw_unwind_fde_load)(NCX byte_t const **__restrict peh_frame_reader,
 #ifdef DEBUG_FRAME
-                                      CHECKED byte_t const *eh_frame_start,
+                                      NCX byte_t const *eh_frame_start,
 #endif /* DEBUG_FRAME */
-                                      CHECKED byte_t const *eh_frame_end,
+                                      NCX byte_t const *eh_frame_end,
                                       unwind_fde_t *__restrict result,
                                       uint8_t sizeof_address)
 #else /* !FIND_SPECIFIC_ADDRESS */
@@ -63,23 +63,23 @@ NOTHROW_NCX(CC libuw_unwind_fde_load)(CHECKED byte_t const **__restrict peh_fram
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `absolute_pc'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 INTERN NONNULL((4)) unwind_errno_t
-NOTHROW_NCX(CC libuw_unwind_fde_scan)(CHECKED byte_t const *reader,
-                                      CHECKED byte_t const *eh_frame_end,
-                                      CHECKED void const *absolute_pc,
+NOTHROW_NCX(CC libuw_unwind_fde_scan)(NCX byte_t const *reader,
+                                      NCX byte_t const *eh_frame_end,
+                                      VIRT void const *absolute_pc,
                                       unwind_fde_t *__restrict result,
                                       uint8_t sizeof_address)
 #endif /* FIND_SPECIFIC_ADDRESS */
 {
 #ifndef FIND_SPECIFIC_ADDRESS
-	CHECKED byte_t const *reader = *peh_frame_reader;
+	NCX byte_t const *reader = *peh_frame_reader;
 #ifndef DEBUG_FRAME
-	CHECKED byte_t const *eh_frame_start = reader;
+	NCX byte_t const *eh_frame_start = reader;
 #endif /* DEBUG_FRAME */
 #else /* !FIND_SPECIFIC_ADDRESS */
-	CHECKED byte_t const *eh_frame_start = reader;
+	NCX byte_t const *eh_frame_start = reader;
 #endif /* !FIND_SPECIFIC_ADDRESS */
-	CHECKED byte_t const *next_chunk;
-	CHECKED byte_t const *cie_reader, *fde_reader;
+	NCX byte_t const *next_chunk;
+	NCX byte_t const *cie_reader, *fde_reader;
 	size_t length;
 #ifdef DEBUG_FRAME
 	uintptr_t cie_offset;
@@ -89,8 +89,8 @@ NOTHROW_NCX(CC libuw_unwind_fde_scan)(CHECKED byte_t const *reader,
 	uint8_t enclsda;
 	uint8_t version;
 	uint8_t used_sizeof_address;
-	CHECKED char const *cie_augstr;
-	CHECKED struct CIE const *cie;
+	NCX char const *cie_augstr;
+	NCX struct CIE const *cie;
 
 	/* Must initialize the FBASE field. Otherwise, maliciously crafted  CFI
 	 * instrumentation could access the FBASE field before it is *normally*
@@ -174,7 +174,7 @@ again:
 		char const *aug_iter = cie_augstr;
 		/* Interpret the augmentation string. */
 		uintptr_t aug_length;
-		CHECKED byte_t const *aug_end;
+		NCX byte_t const *aug_end;
 		aug_length = dwarf_decode_uleb128(&cie_reader); /* uleb128_t cie_auglen */
 		aug_end    = cie_reader + aug_length;
 		if unlikely(aug_end < cie_reader || aug_end > eh_frame_end) {
@@ -246,7 +246,7 @@ again:
 	/* Parse augmentation data of the FDE. */
 	if (cie_augstr[0] == 'z') {
 		uintptr_t aug_length;
-		CHECKED byte_t const *aug_end;
+		NCX byte_t const *aug_end;
 		aug_length = dwarf_decode_uleb128(&fde_reader); /* c_auglength */
 		aug_end    = fde_reader + aug_length;
 		while (*++cie_augstr && fde_reader <= aug_end) {

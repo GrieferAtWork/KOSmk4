@@ -470,7 +470,7 @@ struct ne2k_upload_printer_data {
 
 PRIVATE void KCALL
 Ne2k_PrintData(struct ne2k_upload_printer_data *__restrict self,
-               USER CHECKED void const *data, size_t num_bytes) {
+               NCX void const *data, size_t num_bytes) {
 	if unlikely(self->nup_hashalf) {
 		union {
 			u16 w;

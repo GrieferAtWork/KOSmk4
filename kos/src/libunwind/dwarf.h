@@ -31,14 +31,14 @@
 
 DECL_BEGIN
 
-/* Decode a signed/unsigned LEB128 integer and advance `*preader' */
+/* Decode a signed/unsigned LEB128 integer and advance `*p_reader' */
 INTDEF NONNULL((1)) dwarf_sleb128_t
-NOTHROW_NCX(CC libuw_dwarf_decode_sleb128)(CHECKED byte_t const **__restrict preader);
+NOTHROW_NCX(CC libuw_dwarf_decode_sleb128)(NCX byte_t const **__restrict p_reader);
 INTDEF NONNULL((1)) dwarf_uleb128_t
-NOTHROW_NCX(CC libuw_dwarf_decode_uleb128)(CHECKED byte_t const **__restrict preader);
+NOTHROW_NCX(CC libuw_dwarf_decode_uleb128)(NCX byte_t const **__restrict p_reader);
 
-INTDEF NONNULL((1)) CHECKED byte_t *
-NOTHROW_NCX(CC libuw_dwarf_decode_pointer)(CHECKED byte_t const **__restrict preader,
+INTDEF NONNULL((1)) NCX byte_t *
+NOTHROW_NCX(CC libuw_dwarf_decode_pointer)(NCX byte_t const **__restrict p_reader,
                                            uint8_t encoding, uint8_t addrsize,
                                            struct unwind_bases *dw_bases);
 

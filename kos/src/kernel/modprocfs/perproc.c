@@ -131,7 +131,7 @@ NOTHROW(KCALL procfs_perproc_v_destroy)(struct mfile *__restrict self) {
 /* Operators for per-process directories */
 INTDEF NONNULL((1)) void KCALL
 procfs_perproc_dir_v_stat(struct mfile *__restrict self,
-                          USER CHECKED struct stat *result)
+                          NCX struct stat *result)
 		THROWS(...);
 #define procfs_perproc_dir_v_free     procfs_perproc_v_free
 #define procfs_perproc_dir_v_destroy  procfs_perproc_v_destroy
@@ -570,7 +570,7 @@ INTDEF struct mfile_stream_ops const procfs_perproc_lnknode_v_stream_ops;
 INTDEF struct mfile_stream_ops const procfs_perproc_printnode_v_stream_ops;
 INTDEF NONNULL((1)) void KCALL
 procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
-                                USER CHECKED struct stat *result)
+                                NCX struct stat *result)
 		THROWS(...);
 
 #define MKDIR_BEGIN(ops_symbol_name)                                             \
@@ -627,7 +627,7 @@ procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
 	        pformatprinter printer_, void *arg,                                \
 	        pos_t offset_hint);                                                \
 	INTDEF WUNUSED NONNULL((1)) size_t KCALL                                   \
-	writer(struct mfile *__restrict self, USER CHECKED void const *src,        \
+	writer(struct mfile *__restrict self, NCX void const *src,        \
 	       size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);           \
 	PRIVATE struct mfile_stream_ops const __##ops_symbol_name##_stream_ops = { \
 		.mso_pread  = &printnode_v_pread,                                      \
@@ -653,7 +653,7 @@ procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
 #define MKLNK(ops_symbol_name, readlink)                            \
 	INTDEF WUNUSED NONNULL((1)) size_t KCALL                        \
 	readlink(struct flnknode *__restrict self,                      \
-	         USER CHECKED /*utf-8*/ char *buf,                      \
+	         NCX /*utf-8*/ char *buf,                      \
 	         size_t bufsize)                                        \
 			THROWS(E_SEGFAULT, E_IOERROR, ...);                     \
 	INTERN_CONST struct flnknode_ops const ops_symbol_name = {      \
@@ -705,7 +705,7 @@ procfs_perproc_root_v_enum(struct fdirenum *__restrict result) {
 
 PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
 procfs_perproc_root_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-                            USER UNCHECKED void *arg, iomode_t mode)
+                            NCX UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 	struct fdirnode *me = mfile_asdir(self);
 

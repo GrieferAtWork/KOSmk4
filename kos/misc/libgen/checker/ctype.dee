@@ -27,6 +27,7 @@ import ctypes;
 #define IDENTICAL(a, b) (type(a) === type(b) && ((a) == (b)))
 
 global CPointerType;
+global CLValueType;
 global CFunctionType;
 
 global C_INT;
@@ -172,7 +173,7 @@ global final CTYPEREF_FLAG_NONSENSE_PTRBASE_REGULAR = CTYPEREF_FLAG_NORETURN | C
 
 global final PRETTY_NOTHROW_LEVEL_NAME: {int: string} = {
 	0 : "NOTHROW",
-	1 : "CHECKED",
+	1 : "NCX",
 	2 : "BLOCKING",
 };
 function getPrettyNothrowLevelName(level: int | string): string {
@@ -1189,7 +1190,7 @@ class CLValueType: CType {
 	}
 	public function dumpValue(checker: Checker, data: Bytes, offset: int, indent: int = -1): string {
 		local intVal: int = this.peek(checker, data, offset);
-		return intVal ? f"*({base.tostr("*" + varname)}){intVal.hex()}ul" : "0";
+		return intVal ? f"*({base.tostr("*")}){intVal.hex()}ul" : "0";
 	}
 	public operator hash(): int -> hash(base);
 	public operator == (other: CLValueType): bool -> base == other.base;

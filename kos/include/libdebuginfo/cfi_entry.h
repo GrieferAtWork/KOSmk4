@@ -58,13 +58,13 @@ struct unwind_emulator_struct;
  * @return: UNWIND_EMULATOR_*:       ... */
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) unwind_errno_t
 __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_RUN_ENTRY_VALUE_EMULATOR)(struct unwind_emulator_struct *__restrict self,
-                                                                      __CHECKED __byte_t const *cfi_start_pc,
-                                                                      __CHECKED __byte_t const *cfi_end_pc);
+                                                                      __NCX __byte_t const *cfi_start_pc,
+                                                                      __NCX __byte_t const *cfi_end_pc);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) unwind_errno_t
 __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_run_entry_value_emulator)(struct unwind_emulator_struct *__restrict self,
-                                                                  __CHECKED __byte_t const *cfi_start_pc,
-                                                                  __CHECKED __byte_t const *cfi_end_pc);
+                                                                  __NCX __byte_t const *cfi_start_pc,
+                                                                  __NCX __byte_t const *cfi_end_pc);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 

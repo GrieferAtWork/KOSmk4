@@ -38,14 +38,14 @@ DECL_BEGIN
 #define DEBUGTRAP_REASON64_STRUCT  struct debugtrap_reason32
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 sys_debugtrap32_impl(struct icpustate *__restrict return_state,
-                     USER UNCHECKED struct ucpustate32 const *ustate,
-                     USER UNCHECKED struct debugtrap_reason32 const *ureason)
+                     NCX UNCHECKED struct ucpustate32 const *ustate,
+                     NCX UNCHECKED struct debugtrap_reason32 const *ureason)
 #else /* DEFINE_DEBUGTRAP_WIDTH == 4 */
 #define DEBUGTRAP_REASON64_STRUCT  struct debugtrap_reason64
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 sys_debugtrap64_impl(struct icpustate *__restrict return_state,
-                     USER UNCHECKED struct ucpustate64 const *ustate,
-                     USER UNCHECKED struct debugtrap_reason64 const *ureason)
+                     NCX UNCHECKED struct ucpustate64 const *ustate,
+                     NCX UNCHECKED struct debugtrap_reason64 const *ureason)
 #endif /* DEFINE_DEBUGTRAP_WIDTH != 4 */
 {
 	struct debugtrap_reason reason;

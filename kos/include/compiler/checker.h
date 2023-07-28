@@ -301,7 +301,7 @@
  *
  * Levels are defined as follows:
  * 0: NOTHROW:     Always nothrow; if this function *were* to throw an exception, that's a crash
- * 1: CHECKED:     Memory that has been checked, but might still throw an exception upon access
+ * 1: NCX:         Memory that has been checked, but might still throw an exception upon access
  *                 due to OOM, some other thread unmapping memory, etc.
  * 2: NOTHROW_RPC: This function always can throw exception because it serves RPCs
  *
@@ -332,15 +332,10 @@
 #define __NOTHROW_RPC_NOKOS     __checker_attribute__(__nothrow__(2))
 #define __CXX_NOEXCEPT_RPC_PURE __checker_attribute__(__nothrow__(2))
 
-/* TODO: `CHECKED'        should become `NCX' */
-/* TODO: `USER CHECKED'   should become `NCX' */
-/* TODO: `USER UNCHECKED' should become `NCX UNCHECKED' (And `UNCHECKED' should only be `__attribute__((noderef))') */
 #define __ATTR_NCX              __checker_attribute__(__nothrow__(1))
-#define __ATTR_USER             __checker_attribute__(__nothrow__(1))
-#define __ATTR_UNCHECKED        __checker_attribute__(__noderef__, __nothrow__(1))
+#define __ATTR_UNCHECKED        __checker_attribute__(__noderef__)
 #define __ATTR_PHYS             __checker_attribute__(__noderef__) /* Physical pointer, only for arithmetic */
 #define __ATTR_VIRT             __checker_attribute__(__noderef__) /* Virtual pointer, only for arithmetic */
-#define __ATTR_CHECKED          __checker_attribute__(__deref__, __nothrow__(1))
 #define __ATTR_BLOCKING         __checker_attribute__(__throws__(E_INTERRUPT))
 #define __ATTR_BLOCKING_IF(...) __checker_attribute__(__throws__(E_INTERRUPT)) /* XXX: Condition */
 

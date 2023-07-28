@@ -97,7 +97,7 @@ DECL_BEGIN
 
 PRIVATE NONNULL((1, 3)) void KCALL
 LOCAL_ucpustate_decode(struct icpustate const *__restrict return_state,
-                       USER CHECKED LOCAL_struct_ucpustate const *ust,
+                       NCX LOCAL_struct_ucpustate const *ust,
                        struct ucpustate *__restrict result)
 		THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
 #ifdef DEFINE_sys32_coredump
@@ -130,10 +130,10 @@ LOCAL_ucpustate_decode(struct icpustate const *__restrict return_state,
 
 INTERN ATTR_NORETURN NONNULL((1)) void FCALL
 LOCAL_sys_coredump_impl(struct icpustate *__restrict return_state,
-                        USER UNCHECKED LOCAL_struct_ucpustate const *curr_state,
-                        USER UNCHECKED LOCAL_struct_ucpustate const *orig_state,
-                        USER UNCHECKED LOCAL_uintptr_t const *const *traceback_vector, size_t traceback_length,
-                        USER UNCHECKED LOCAL_union_coredump_info const *reason,
+                        NCX UNCHECKED LOCAL_struct_ucpustate const *curr_state,
+                        NCX UNCHECKED LOCAL_struct_ucpustate const *orig_state,
+                        NCX UNCHECKED LOCAL_uintptr_t const *const *traceback_vector, size_t traceback_length,
+                        NCX UNCHECKED LOCAL_union_coredump_info const *reason,
                         unwind_errno_t unwind_error) {
 	struct ucpustate curr_ustate, orig_ustate;
 	void **utb_vector;
@@ -259,11 +259,11 @@ LOCAL_sys_coredump_rpc(struct rpc_context *__restrict ctx,
 	if unlikely(ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
 	LOCAL_sys_coredump_impl(ctx->rc_state,
-	                        (USER UNCHECKED LOCAL_struct_ucpustate const *)ctx->rc_scinfo.rsi_regs[0],
-	                        (USER UNCHECKED LOCAL_struct_ucpustate const *)ctx->rc_scinfo.rsi_regs[1],
-	                        (USER UNCHECKED LOCAL_uintptr_t const *const *)ctx->rc_scinfo.rsi_regs[2],
+	                        (NCX UNCHECKED LOCAL_struct_ucpustate const *)ctx->rc_scinfo.rsi_regs[0],
+	                        (NCX UNCHECKED LOCAL_struct_ucpustate const *)ctx->rc_scinfo.rsi_regs[1],
+	                        (NCX UNCHECKED LOCAL_uintptr_t const *const *)ctx->rc_scinfo.rsi_regs[2],
 	                        (size_t)ctx->rc_scinfo.rsi_regs[3],
-	                        (USER UNCHECKED LOCAL_union_coredump_info const *)ctx->rc_scinfo.rsi_regs[4],
+	                        (NCX UNCHECKED LOCAL_union_coredump_info const *)ctx->rc_scinfo.rsi_regs[4],
 	                        (unwind_errno_t)ctx->rc_scinfo.rsi_regs[5]);
 }
 
@@ -272,19 +272,19 @@ LOCAL_sys_coredump_rpc(struct rpc_context *__restrict ctx,
 /************************************************************************/
 #ifdef DEFINE_sys64_coredump
 DEFINE_SYSCALL64_6(errno_t, coredump,
-                   USER UNCHECKED LOCAL_struct_ucpustate const *, curr_state,
-                   USER UNCHECKED LOCAL_struct_ucpustate const *, orig_state,
-                   USER UNCHECKED LOCAL_pointer(void const) const *, traceback_vector,
+                   NCX UNCHECKED LOCAL_struct_ucpustate const *, curr_state,
+                   NCX UNCHECKED LOCAL_struct_ucpustate const *, orig_state,
+                   NCX UNCHECKED LOCAL_pointer(void const) const *, traceback_vector,
                    size_t, traceback_length,
-                   USER UNCHECKED LOCAL_union_coredump_info const *, reason,
+                   NCX UNCHECKED LOCAL_union_coredump_info const *, reason,
                    unwind_errno_t, unwind_error)
 #else /* DEFINE_sys64_coredump */
 DEFINE_SYSCALL32_6(errno_t, coredump,
-                   USER UNCHECKED LOCAL_struct_ucpustate const *, curr_state,
-                   USER UNCHECKED LOCAL_struct_ucpustate const *, orig_state,
-                   USER UNCHECKED LOCAL_pointer(void const) const *, traceback_vector,
+                   NCX UNCHECKED LOCAL_struct_ucpustate const *, curr_state,
+                   NCX UNCHECKED LOCAL_struct_ucpustate const *, orig_state,
+                   NCX UNCHECKED LOCAL_pointer(void const) const *, traceback_vector,
                    size_t, traceback_length,
-                   USER UNCHECKED LOCAL_union_coredump_info const *, reason,
+                   NCX UNCHECKED LOCAL_union_coredump_info const *, reason,
                    unwind_errno_t, unwind_error)
 #endif /* !DEFINE_sys64_coredump */
 {

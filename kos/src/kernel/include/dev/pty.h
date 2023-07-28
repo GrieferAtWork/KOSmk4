@@ -126,8 +126,8 @@ DATDEF struct chrdev_ops const ptymaster_ops;
 FUNDEF NONNULL((1, 2)) void KCALL
 pty_alloc(REF struct ptymaster **__restrict p_master,
           REF struct ptyslave **__restrict p_slave,
-          USER CHECKED struct termios const *termp,
-          USER CHECKED struct winsize const *winp)
+          NCX struct termios const *termp,
+          NCX struct winsize const *winp)
 		THROWS(E_BADALLOC);
 
 

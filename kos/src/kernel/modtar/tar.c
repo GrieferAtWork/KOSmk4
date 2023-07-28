@@ -898,7 +898,7 @@ NOTHROW(KCALL tardirenum_v_fini)(struct fdirenum *__restrict self) {
 __pragma_GCC_diagnostic_push_ignored(Wmaybe_uninitialized)
 
 PRIVATE BLOCKING NONNULL((1)) size_t KCALL
-tardirenum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+tardirenum_v_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                      size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	REF struct tarfile *tf;
@@ -1792,7 +1792,7 @@ return_tf_after_wrlock:
 
 PRIVATE WUNUSED NONNULL((1, 2)) struct fsuper *KCALL
 tarfs_open(struct ffilesys *__restrict UNUSED(filesys),
-           struct mfile *dev, UNCHECKED USER char *UNUSED(args)) {
+           struct mfile *dev, NCX UNCHECKED char *UNUSED(args)) {
 	struct tarsuper *result;
 	struct tarhdr *hdr;
 	struct tarfile *firstfile;

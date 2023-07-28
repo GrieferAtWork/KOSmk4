@@ -55,8 +55,8 @@ DECL_BEGIN
 #ifdef __CC__
 struct user_except_handler {
 	uintptr_t                     ueh_mode;    /* Handler mode (One of `EXCEPT_HANDLER_MODE_*' + set of `EXCEPT_HANDLER_FLAG_*') */
-	USER CHECKED except_handler_t ueh_handler; /* [valid_if(EXCEPT_HANDLER_FLAG_SETHANDLER)] Handler entry point */
-	USER CHECKED void            *ueh_stack;   /* Handler stack  (or `EXCEPT_HANDLER_SP_CURRENT'  when not  set)
+	NCX except_handler_t ueh_handler; /* [valid_if(EXCEPT_HANDLER_FLAG_SETHANDLER)] Handler entry point */
+	NCX void            *ueh_stack;   /* Handler stack  (or `EXCEPT_HANDLER_SP_CURRENT'  when not  set)
 	                                            * NOTE: This pointer also doubles as the user-space sigaltstack! */
 };
 
@@ -81,7 +81,7 @@ DATDEF ATTR_PERTASK struct user_except_handler this_user_except_handler;
  * the given `ctid' to be used as  the initial value for `this_tid_address', while  the
  * `CLONE_CHILD_SETTID' flag will cause the same address to be filled with the thread's
  * TID. */
-DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
+DATDEF ATTR_PERTASK NCX pid_t *this_tid_address;
 
 
 
@@ -370,7 +370,7 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  */
 #ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 /* [valid_if(THIS_TASK->t_flags & TASK_FUSERPROCMASK)][lock(PRIVATE(THIS_TASK))] */
-DATDEF ATTR_PERTASK USER CHECKED struct userprocmask *
+DATDEF ATTR_PERTASK NCX struct userprocmask *
 this_userprocmask_address ASMNAME("this_tid_address");
 #endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 

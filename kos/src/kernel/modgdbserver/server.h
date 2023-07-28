@@ -133,8 +133,8 @@ INTDEF WUNUSED bool NOTHROW(FCALL GDBPacket_SendError)(u8 error_code);
 
 /* Print a message while in non-stop or all-stop mode.
  * @return: * : The total number of printed bytes. */
-INTDEF size_t FCALL GDBServer_PrintMessageInNonStopMode(USER CHECKED char const *message, size_t message_length);
-INTDEF size_t FCALL GDBServer_PrintMessageInAllStopMode(USER CHECKED char const *message, size_t message_length);
+INTDEF size_t FCALL GDBServer_PrintMessageInNonStopMode(NCX char const *message, size_t message_length);
+INTDEF size_t FCALL GDBServer_PrintMessageInAllStopMode(NCX char const *message, size_t message_length);
 
 
 #undef fromhex

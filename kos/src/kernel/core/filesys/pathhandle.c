@@ -44,25 +44,25 @@ DECL_BEGIN
 DEFINE_HANDLE_REFCNT_FUNCTIONS(path, struct path);
 
 INTDEF WUNUSED NONNULL((1)) size_t KCALL
-handle_path_read(struct path *__restrict self, USER CHECKED void *dst,
+handle_path_read(struct path *__restrict self, NCX void *dst,
                  size_t num_bytes, iomode_t mode) THROWS(...) {
 	return mfile_uread(self->p_dir, dst, num_bytes, mode);
 }
 
 INTDEF WUNUSED NONNULL((1)) size_t KCALL
-handle_path_write(struct path *__restrict self, USER CHECKED void const *src,
+handle_path_write(struct path *__restrict self, NCX void const *src,
                   size_t num_bytes, iomode_t mode) THROWS(...) {
 	return mfile_uwrite(self->p_dir, src, num_bytes, mode);
 }
 
 INTDEF WUNUSED NONNULL((1)) size_t KCALL
-handle_path_pread(struct path *__restrict self, USER CHECKED void *dst,
+handle_path_pread(struct path *__restrict self, NCX void *dst,
                   size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
 	return mfile_upread(self->p_dir, dst, num_bytes, addr, mode);
 }
 
 INTDEF WUNUSED NONNULL((1)) size_t KCALL
-handle_path_pwrite(struct path *__restrict self, USER CHECKED void const *src,
+handle_path_pwrite(struct path *__restrict self, NCX void const *src,
                    size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
 	return mfile_upwrite(self->p_dir, src, num_bytes, addr, mode);
 }
@@ -101,7 +101,7 @@ handle_path_seek(struct path *__restrict self,
 
 INTDEF NONNULL((1)) syscall_slong_t KCALL
 handle_path_ioctl(struct path *__restrict self, ioctl_t cmd,
-                  USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+                  NCX UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	return mfile_uioctl(self->p_dir, cmd, arg, mode);
 }
 
@@ -147,7 +147,7 @@ handle_path_datasync(struct path *__restrict self) THROWS(...) {
 
 INTDEF NONNULL((1)) void KCALL
 handle_path_stat(struct path *__restrict self,
-                 USER CHECKED struct stat *result) THROWS(...) {
+                 NCX struct stat *result) THROWS(...) {
 	mfile_ustat(self->p_dir, result);
 }
 

@@ -43,7 +43,7 @@ DECL_BEGIN
  * is invoked before the returned string is copied into the supplied buffer. */
 PUBLIC BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 flnknode_v_readlink_default(struct flnknode *__restrict self,
-                            USER CHECKED /*utf-8*/ char *buf,
+                            NCX /*utf-8*/ char *buf,
                             size_t bufsize)
 			THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	size_t result;
@@ -68,7 +68,7 @@ flnknode_v_readlink_default(struct flnknode *__restrict self,
  * with  the return value  of the `lno_readlink()' operator. */
 PUBLIC BLOCKING NONNULL((1)) void KCALL
 flnknode_v_stat_readlink_size(struct mfile *__restrict self,
-                              USER CHECKED struct stat *result)
+                              NCX struct stat *result)
 		THROWS(...) {
 	struct flnknode *me = mfile_aslnk(self);
 	struct flnknode_ops const *ops;
@@ -101,7 +101,7 @@ PUBLIC_CONST struct mfile_stream_ops const flnknode_v_stream_ops_readlink_size =
 #ifndef __OPTIMIZE_SIZE__
 PUBLIC WUNUSED NONNULL((1)) size_t KCALL
 clnknode_v_readlink(struct flnknode *__restrict self,
-                    USER CHECKED /*utf-8*/ char *buf,
+                    NCX /*utf-8*/ char *buf,
                     size_t bufsize)
 		THROWS(E_SEGFAULT) {
 	struct clnknode *me;
@@ -173,7 +173,7 @@ _clnknode_alloc(struct fsuper *__restrict super, size_t text_length)
  * link-node with `text_length'  characters copied from  `text'. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct clnknode *FCALL
 _clnknode_new(struct fsuper *__restrict super,
-              USER CHECKED char const *text, size_t text_length)
+              NCX char const *text, size_t text_length)
 		THROWS(E_BADALLOC, E_SEGFAULT) {
 	REF struct clnknode *result;
 	result = _clnknode_alloc(super, text_length);

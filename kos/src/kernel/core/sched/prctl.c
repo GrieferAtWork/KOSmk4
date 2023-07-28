@@ -84,8 +84,8 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 		break;
 
 	case PR_GET_PDEATHSIG:
-		validate_readable((USER UNCHECKED signo_t *)arg2, sizeof(signo_t));
-		*(USER CHECKED signo_t *)arg2 = mypid->tp_SIGCLD;
+		validate_readable((NCX UNCHECKED signo_t *)arg2, sizeof(signo_t));
+		*(NCX signo_t *)arg2 = mypid->tp_SIGCLD;
 		break;
 
 	/* TODO: PR_GET_DUMPABLE */
@@ -129,24 +129,24 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 #ifdef CONFIG_HAVE_KERNEL_TASK_COMM
 	case PR_SET_NAME: {
 		char buf[TASK_COMM_LEN];
-		USER CHECKED char const *name;
-		name = (USER CHECKED char const *)validate_readableaddr((USER UNCHECKED char const *)arg2);
+		NCX char const *name;
+		name = (NCX char const *)validate_readableaddr((NCX UNCHECKED char const *)arg2);
 		strlcpy(buf, name, TASK_COMM_LEN);
 		task_setcomm(buf);
 	}	break;
 
 	case PR_GET_NAME: {
 		char buf[TASK_COMM_LEN];
-		USER CHECKED char *name;
+		NCX char *name;
 		memcpy(buf, FORTASK(me, this_comm), sizeof(buf));
-		name = (USER CHECKED char *)validate_writableaddr((USER UNCHECKED char *)arg2);
+		name = (NCX char *)validate_writableaddr((NCX UNCHECKED char *)arg2);
 		memcpy(name, buf, strlen(buf) + 1, sizeof(char));
 	}	break;
 #endif /* CONFIG_HAVE_KERNEL_TASK_COMM */
 
 	case PR_GET_ENDIAN: {
-		USER CHECKED int *pmode;
-		pmode  = (USER CHECKED int *)validate_writable((USER UNCHECKED int *)arg2, sizeof(int));
+		NCX int *pmode;
+		pmode  = (NCX int *)validate_writable((NCX UNCHECKED int *)arg2, sizeof(int));
 		*pmode = NATIVE_ENDIAN;
 	}	break;
 
@@ -297,13 +297,13 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 		uintptr_t tidaddr = (uintptr_t)FORTASK(me, this_tid_address);
 #ifdef __ARCH_HAVE_COMPAT
 		if (syscall_iscompat()) {
-			*(USER CHECKED compat_uintptr_t *)compat_validate_writable(
-			(USER UNCHECKED void *)arg2, sizeof(compat_uintptr_t)) = (compat_uintptr_t)tidaddr;
+			*(NCX compat_uintptr_t *)compat_validate_writable(
+			(NCX UNCHECKED void *)arg2, sizeof(compat_uintptr_t)) = (compat_uintptr_t)tidaddr;
 		} else
 #endif /* __ARCH_HAVE_COMPAT */
 		{
-			*(USER CHECKED uintptr_t *)validate_writable(
-			(USER UNCHECKED void *)arg2, sizeof(uintptr_t)) = tidaddr;
+			*(NCX uintptr_t *)validate_writable(
+			(NCX UNCHECKED void *)arg2, sizeof(uintptr_t)) = tidaddr;
 		}
 	}	break;
 

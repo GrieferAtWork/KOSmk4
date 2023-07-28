@@ -320,11 +320,10 @@ DEFINE_DBG_BZERO_OBJECT(dmesg_consistent);
  * @return: false: The message's checksum did not match (this likely means  that
  *                 the end of the dmesg backlog was reached, since another entry
  *                 was probably responsible for overwriting this one's message) */
-PUBLIC bool KCALL
-dmesg_getmessage(USER CHECKED char *buffer,
-                 size_t message_offset,
-                 size_t message_length)
-		THROWS(E_SEGFAULT) {
+PUBLIC bool
+NOTHROW_NCX(KCALL dmesg_getmessage)(NCX char *buffer,
+                                    size_t message_offset,
+                                    size_t message_length) {
 	size_t i;
 	u8 nul, chksum, real_chksum = 0;
 	for (i = 0; i < message_length; ++i, ++message_offset) {
@@ -359,9 +358,9 @@ dmesg_getmessage(USER CHECKED char *buffer,
  *                   If `*callback' was never invoked, or always returned
  *                   `0', `0'  will also  be returned  by this  function.
  * @return: < 0:     The propagation of the first negative return value of `*callback'. */
-PUBLIC NONNULL((1)) ssize_t KCALL
-dmesg_enum(dmesg_enum_t callback, void *arg,
-           unsigned int offset, unsigned int limit) {
+PUBLIC NONNULL((1)) ssize_t
+NOTHROW_CB(KCALL dmesg_enum)(dmesg_enum_t callback, void *arg,
+                             unsigned int offset, unsigned int limit) {
 	ssize_t callback_temp, result = 0;
 	struct syslog_packet packet;
 	size_t message_end_offset;
@@ -468,9 +467,9 @@ err:
 
 
 struct dmesg_getpacket_data {
-	USER CHECKED struct syslog_packet *dg_buf;        /* [1..1] Buffer */
-	USER CHECKED unsigned int         *dp_plevel;     /* [0..1] Level pointer. */
-	u16                                dg_msg_buflen; /* Message buffer length. */
+	NCX struct syslog_packet *dg_buf;        /* [1..1] Buffer */
+	NCX unsigned int         *dp_plevel;     /* [0..1] Level pointer. */
+	u16                       dg_msg_buflen; /* Message buffer length. */
 };
 
 PRIVATE NONNULL((2)) ssize_t KCALL
@@ -495,10 +494,10 @@ dmesg_getpacket_callback(void *arg, struct syslog_packet *__restrict packet,
  * @return: > msg_buflen:          The required buffer size for `buf->sp_msg'
  * @return: >= 0 && <= msg_buflen: [== buf->sp_len] Success
  * @return: < 0:                   No such syslog packet. */
-PUBLIC s16 KCALL
-dmesg_getpacket(USER CHECKED struct syslog_packet *buf,
-                USER CHECKED unsigned int *plevel,
-                u16 msg_buflen, unsigned int nth) {
+PUBLIC s16
+NOTHROW_NCX(KCALL dmesg_getpacket)(NCX struct syslog_packet *buf,
+                                   NCX unsigned int *plevel,
+                                   u16 msg_buflen, unsigned int nth) {
 	ssize_t error;
 	struct dmesg_getpacket_data data;
 	data.dg_buf        = buf;

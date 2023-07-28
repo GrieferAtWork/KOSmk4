@@ -83,7 +83,7 @@ PUBLIC ATTR_PERTASK ATTR_ALIGN(struct user_except_handler) this_user_except_hand
  * the given `ctid' to be used as  the initial value for `this_tid_address', while  the
  * `CLONE_CHILD_SETTID' flag will cause the same address to be filled with the thread's
  * TID. */
-PUBLIC ATTR_PERTASK ATTR_ALIGN(USER CHECKED pid_t *) this_tid_address = NULL;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(NCX pid_t *) this_tid_address = NULL;
 
 DEFINE_PERMMAN_ONEXEC(reset_user_except_handler);
 PRIVATE ATTR_USED NOBLOCK void
@@ -105,9 +105,9 @@ NOTHROW(KCALL reset_user_except_handler)(void) {
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_GET_EXCEPTION_HANDLER
 DEFINE_SYSCALL3(errno_t, get_exception_handler,
-                USER UNCHECKED syscall_ulong_t *, pmode,
-                USER UNCHECKED except_handler_t *, phandler,
-                USER UNCHECKED void **, phandler_sp) {
+                NCX UNCHECKED syscall_ulong_t *, pmode,
+                NCX UNCHECKED except_handler_t *, phandler,
+                NCX UNCHECKED void **, phandler_sp) {
 	struct user_except_handler *exc;
 	exc = &PERTASK(this_user_except_handler);
 	if (pmode) {
@@ -131,9 +131,9 @@ DEFINE_SYSCALL3(errno_t, get_exception_handler,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_GET_EXCEPTION_HANDLER
 DEFINE_COMPAT_SYSCALL3(errno_t, get_exception_handler,
-                       USER UNCHECKED compat_syscall_ulong_t *, pmode,
-                       USER UNCHECKED compat_except_handler_t *, phandler,
-                       USER UNCHECKED compat_ptr(void) *, phandler_sp) {
+                       NCX UNCHECKED compat_syscall_ulong_t *, pmode,
+                       NCX UNCHECKED compat_except_handler_t *, phandler,
+                       NCX UNCHECKED compat_ptr(void) *, phandler_sp) {
 	struct user_except_handler *exc;
 	exc = &PERTASK(this_user_except_handler);
 	if (pmode) {
@@ -158,8 +158,8 @@ DEFINE_COMPAT_SYSCALL3(errno_t, get_exception_handler,
 #ifdef __ARCH_WANT_SYSCALL_SET_EXCEPTION_HANDLER
 DEFINE_SYSCALL3(errno_t, set_exception_handler,
                 syscall_ulong_t, mode,
-                USER UNCHECKED except_handler_t, handler,
-                USER UNCHECKED void *, handler_sp) {
+                NCX UNCHECKED except_handler_t, handler,
+                NCX UNCHECKED void *, handler_sp) {
 	struct user_except_handler *exc;
 	exc = &PERTASK(this_user_except_handler);
 	if unlikely((mode & EXCEPT_HANDLER_MODE_MASK) > EXCEPT_HANDLER_MODE_SIGHAND) {
@@ -207,8 +207,8 @@ DEFINE_SYSCALL3(errno_t, set_exception_handler,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_SIGALTSTACK
 DEFINE_SYSCALL2(errno_t, sigaltstack,
-                USER UNCHECKED struct sigaltstack const *, ss,
-                USER UNCHECKED struct sigaltstack *, oss) {
+                NCX UNCHECKED struct sigaltstack const *, ss,
+                NCX UNCHECKED struct sigaltstack *, oss) {
 	void *sp;
 	if (oss) {
 		validate_writable(oss, sizeof(*oss));
@@ -273,8 +273,8 @@ DEFINE_SYSCALL2(errno_t, sigaltstack,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SIGALTSTACK
 DEFINE_COMPAT_SYSCALL2(errno_t, sigaltstack,
-                       USER UNCHECKED struct compat_sigaltstack const *, ss,
-                       USER UNCHECKED struct compat_sigaltstack *, oss) {
+                       NCX UNCHECKED struct compat_sigaltstack const *, ss,
+                       NCX UNCHECKED struct compat_sigaltstack *, oss) {
 	void *sp;
 	if (oss) {
 		validate_writable(oss, sizeof(*oss));
@@ -342,8 +342,8 @@ DEFINE_COMPAT_SYSCALL2(errno_t, sigaltstack,
 
 #ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 PRIVATE void KCALL
-load_userprocmask_into_kernelspace(USER CHECKED struct userprocmask *ctl) {
-	USER UNCHECKED sigset_t *old_sigset;
+load_userprocmask_into_kernelspace(NCX struct userprocmask *ctl) {
+	NCX UNCHECKED sigset_t *old_sigset;
 	size_t old_sigsetsize;
 	sigset_t newmask;
 
@@ -375,12 +375,12 @@ load_userprocmask_into_kernelspace(USER CHECKED struct userprocmask *ctl) {
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_SET_TID_ADDRESS
 DEFINE_SYSCALL1(pid_t, set_tid_address,
-                USER UNCHECKED pid_t *, tidptr) {
+                NCX UNCHECKED pid_t *, tidptr) {
 	validate_writable_opt(tidptr, sizeof(*tidptr));
 #ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	/* Disable userprocmask, if it was enabled. */
 	if unlikely(PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
-		USER CHECKED struct userprocmask *old_ctl;
+		NCX struct userprocmask *old_ctl;
 		old_ctl = PERTASK_GET(this_userprocmask_address);
 
 		/* Load the final userprocmask into kernelspace */
@@ -405,9 +405,9 @@ DEFINE_SYSCALL1(pid_t, set_tid_address,
 #ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 #ifdef __ARCH_WANT_SYSCALL_SET_USERPROCMASK_ADDRESS
 DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
-                USER UNCHECKED struct userprocmask *, ctl) {
+                NCX UNCHECKED struct userprocmask *, ctl) {
 	if unlikely(PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
-		USER CHECKED struct userprocmask *old_ctl;
+		NCX struct userprocmask *old_ctl;
 		old_ctl = PERTASK_GET(this_userprocmask_address);
 		/* Check for special case: Nothing changed. */
 		if unlikely(old_ctl == ctl)
@@ -426,7 +426,7 @@ DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
 		size_t sigsetsize, overflow;
 		sigset_t initial_pending;
 		uintptr_t initial_flags;
-		USER UNCHECKED sigset_t *new_sigset;
+		NCX UNCHECKED sigset_t *new_sigset;
 
 		/* Enable USERPROCMASK mode. */
 		validate_readwrite_opt(ctl, sizeof(*ctl));

@@ -84,10 +84,10 @@ PUBLIC size_t socket_default_sndbufmax = 65536;
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL iov_buffer_init)(struct iov_buffer *__restrict self,
-                               USER CHECKED void const *buf, size_t buflen) {
+                               NCX void const *buf, size_t buflen) {
 	self->iv_entc          = 1;
 	self->iv_entv          = &self->iv_head;
-	self->iv_head.ive_base = (USER CHECKED byte_t *)buf;
+	self->iv_head.ive_base = (NCX byte_t *)buf;
 	self->iv_head.ive_size = buflen;
 	self->iv_last          = buflen;
 }
@@ -229,7 +229,7 @@ DEFINE_INTERN_ALIAS(handle_socket_polltest, socket_polltest);
  * @return: * : One of `SOCKET_CONNECT_*' */
 PUBLIC NONNULL((1)) int KCALL
 socket_connect(struct socket *__restrict self,
-               USER CHECKED struct sockaddr const *addr,
+               NCX struct sockaddr const *addr,
                socklen_t addr_len, iomode_t mode)
 		THROWS(E_NET_ADDRESS_IN_USE, E_ILLEGAL_BECAUSE_NOT_READY,
 		       E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
@@ -338,7 +338,7 @@ do_blocking_connect:
 /* Use getpeeraddr() + sendto() */
 PRIVATE ATTR_NOINLINE NONNULL((1, 6)) socklen_t KCALL
 socket_asendto_peer_impl(struct socket *__restrict self,
-                         USER CHECKED void const *buf, size_t bufsize,
+                         NCX void const *buf, size_t bufsize,
                          struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                          /*out*/ struct aio_handle *__restrict aio, socklen_t buflen)
 		THROWS_INDIRECT(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_MESSAGE_TOO_LONG,
@@ -367,7 +367,7 @@ socket_asendto_peer_impl(struct socket *__restrict self,
 /* Use getpeeraddr() + sendto() */
 PRIVATE NONNULL((1, 6)) void KCALL
 socket_asendto_peer(struct socket *__restrict self,
-                    USER CHECKED void const *buf, size_t bufsize,
+                    NCX void const *buf, size_t bufsize,
                     struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                     /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_MESSAGE_TOO_LONG,
@@ -402,7 +402,7 @@ socket_asendto_peer(struct socket *__restrict self,
  * @throws: E_NET_SHUTDOWN:                                                             [...] */
 PUBLIC NONNULL((1, 6)) void KCALL
 socket_asend(struct socket *__restrict self,
-             USER CHECKED void const *buf, size_t bufsize,
+             NCX void const *buf, size_t bufsize,
              struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
              /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_MESSAGE_TOO_LONG,
@@ -530,7 +530,7 @@ waitfor_send_aio(struct socket *__restrict self,
  * @return: * : The actual number of sent bytes (as returned by AIO) */
 PUBLIC NONNULL((1)) size_t KCALL
 socket_send(struct socket *__restrict self,
-            USER CHECKED void const *buf, size_t bufsize,
+            NCX void const *buf, size_t bufsize,
             struct ancillary_message const *msg_control,
             syscall_ulong_t msg_flags, iomode_t mode)
 		THROWS(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_MESSAGE_TOO_LONG,
@@ -748,7 +748,7 @@ PRIVATE struct async_ops const connect_and_send_cb = {
 PRIVATE NONNULL((1, 2, 8)) void KCALL
 socket_asendtov_connect_and_send(struct socket *__restrict self,
                                  struct iov_buffer const *__restrict buf, size_t bufsize,
-                                 /*?..1*/ USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
+                                 /*?..1*/ NCX struct sockaddr const *addr, socklen_t addr_len,
                                  struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                                  /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
@@ -827,8 +827,8 @@ socket_asendtov_connect_and_send(struct socket *__restrict self,
  * @throws: E_BUFFER_TOO_SMALL: The given `addr_len' is too small */
 PUBLIC NONNULL((1, 8)) void KCALL
 socket_asendto(struct socket *__restrict self,
-               USER CHECKED void const *buf, size_t bufsize,
-               /*?..1*/ USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
+               NCX void const *buf, size_t bufsize,
+               /*?..1*/ NCX struct sockaddr const *addr, socklen_t addr_len,
                struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
@@ -854,7 +854,7 @@ socket_asendto(struct socket *__restrict self,
 PUBLIC NONNULL((1, 2, 8)) void KCALL
 socket_asendtov(struct socket *__restrict self,
                 struct iov_buffer const *__restrict buf, size_t bufsize,
-                /*?..1*/ USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
+                /*?..1*/ NCX struct sockaddr const *addr, socklen_t addr_len,
                 struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                 /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
@@ -886,8 +886,8 @@ socket_asendtov(struct socket *__restrict self,
  * @return: * : The actual number of sent bytes (as returned by AIO) */
 PUBLIC NONNULL((1)) size_t KCALL
 socket_sendto(struct socket *__restrict self,
-              USER CHECKED void const *buf, size_t bufsize,
-              /*?..1*/ USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
+              NCX void const *buf, size_t bufsize,
+              /*?..1*/ NCX struct sockaddr const *addr, socklen_t addr_len,
               struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
               iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
@@ -936,7 +936,7 @@ socket_sendto(struct socket *__restrict self,
 PUBLIC NONNULL((1, 2)) size_t KCALL
 socket_sendtov(struct socket *__restrict self,
                struct iov_buffer const *__restrict buf, size_t bufsize,
-               /*?..1*/ USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
+               /*?..1*/ NCX struct sockaddr const *addr, socklen_t addr_len,
                struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
@@ -989,7 +989,7 @@ socket_sendtov(struct socket *__restrict self,
 PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
 socket_recvfrom_peer(struct socket *__restrict self,
                      struct iov_buffer const *__restrict buf, size_t bufsize,
-                     /*0..1*/ USER CHECKED u32 *presult_flags,
+                     /*0..1*/ NCX u32 *presult_flags,
                      struct ancillary_rmessage const *msg_control,
                      syscall_ulong_t msg_flags,
                      ktime_t abs_timeout)
@@ -1094,8 +1094,8 @@ again_receive:
  * @throws: E_NET_TIMEOUT: The given `timeout' (or default SO_RCVTIMEO-timeout) expired */
 PUBLIC WUNUSED NONNULL((1)) size_t KCALL
 socket_recv(struct socket *__restrict self,
-            USER CHECKED void *buf, size_t bufsize,
-            /*0..1*/ USER CHECKED u32 *presult_flags,
+            NCX void *buf, size_t bufsize,
+            /*0..1*/ NCX u32 *presult_flags,
             struct ancillary_rmessage const *msg_control,
             syscall_ulong_t msg_flags,
             ktime_t abs_timeout)
@@ -1132,7 +1132,7 @@ socket_recv(struct socket *__restrict self,
 PUBLIC WUNUSED NONNULL((1, 2)) size_t KCALL
 socket_recvv(struct socket *__restrict self,
              struct iov_buffer const *__restrict buf, size_t bufsize,
-             /*0..1*/ USER CHECKED u32 *presult_flags,
+             /*0..1*/ NCX u32 *presult_flags,
              struct ancillary_rmessage const *msg_control,
              syscall_ulong_t msg_flags,
              ktime_t abs_timeout)
@@ -1181,10 +1181,10 @@ socket_recvv(struct socket *__restrict self,
  * @throws: E_WOULDBLOCK: MSG_DONTWAIT was given, and the operation would have blocked. */
 PUBLIC WUNUSED NONNULL((1)) size_t KCALL
 socket_recvfrom(struct socket *__restrict self,
-                USER CHECKED void *buf, size_t bufsize,
-                /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
-                /*?..1*/ USER CHECKED socklen_t *preq_addr_len,
-                /*0..1*/ USER CHECKED u32 *presult_flags,
+                NCX void *buf, size_t bufsize,
+                /*?..1*/ NCX struct sockaddr *addr, socklen_t addr_len,
+                /*?..1*/ NCX socklen_t *preq_addr_len,
+                /*0..1*/ NCX u32 *presult_flags,
                 struct ancillary_rmessage const *msg_control,
                 syscall_ulong_t msg_flags,
                 ktime_t abs_timeout)
@@ -1231,9 +1231,9 @@ socket_recvfrom(struct socket *__restrict self,
 PUBLIC WUNUSED NONNULL((1, 2)) size_t KCALL
 socket_recvfromv(struct socket *__restrict self,
                  struct iov_buffer const *__restrict buf, size_t bufsize,
-                 /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
-                 /*?..1*/ USER CHECKED socklen_t *preq_addr_len,
-                 /*0..1*/ USER CHECKED u32 *presult_flags,
+                 /*?..1*/ NCX struct sockaddr *addr, socklen_t addr_len,
+                 /*?..1*/ NCX socklen_t *preq_addr_len,
+                 /*0..1*/ NCX u32 *presult_flags,
                  struct ancillary_rmessage const *msg_control,
                  syscall_ulong_t msg_flags,
                  ktime_t abs_timeout)
@@ -1336,7 +1336,7 @@ socket_shutdown(struct socket *__restrict self,
 		result = sizeof(int);                                  \
 		if (optlen >= sizeof(int)) {                           \
 			COMPILER_WRITE_BARRIER();                          \
-			UNALIGNED_SET((USER CHECKED unsigned int *)optval, \
+			UNALIGNED_SET((NCX unsigned int *)optval, \
 			              (value));                            \
 			COMPILER_WRITE_BARRIER();                          \
 		}                                                      \
@@ -1346,7 +1346,7 @@ socket_shutdown(struct socket *__restrict self,
 PRIVATE NONNULL((1)) socklen_t KCALL
 socket_getsockopt_default(struct socket *__restrict self,
                           syscall_ulong_t level, syscall_ulong_t optname,
-                          USER CHECKED void *optval,
+                          NCX void *optval,
                           socklen_t optlen, iomode_t mode) {
 	socklen_t result = 0;
 	(void)self;
@@ -1380,7 +1380,7 @@ done:
 
 
 PRIVATE socklen_t KCALL
-return_u32(USER CHECKED void *optval, socklen_t optlen, u32 value) {
+return_u32(NCX void *optval, socklen_t optlen, u32 value) {
 	if (optlen >= 4) {
 		UNALIGNED_SET32(optval, value);
 		return 4;
@@ -1406,7 +1406,7 @@ return_u32(USER CHECKED void *optval, socklen_t optlen, u32 value) {
 #define return_size_t return_u64
 
 PRIVATE socklen_t KCALL
-return_u64(USER CHECKED void *optval, socklen_t optlen, u64 value) {
+return_u64(NCX void *optval, socklen_t optlen, u64 value) {
 	if (optlen >= 8) {
 		UNALIGNED_SET64(optval, value);
 		return 8;
@@ -1442,13 +1442,13 @@ return_u64(USER CHECKED void *optval, socklen_t optlen, u64 value) {
 #endif /* __SIZEOF_INT__ > 4 */
 
 PRIVATE socklen_t KCALL
-return_timeval(USER CHECKED void *optval, socklen_t optlen,
+return_timeval(NCX void *optval, socklen_t optlen,
                ktime_t value) {
 	struct timespec ts;
 	ts.tv_sec  = value / NSEC_PER_SEC;
 	ts.tv_nsec = value % NSEC_PER_SEC;
 	if (optlen == __SIZEOF_TIMEVAL32) {
-		USER CHECKED struct timeval32 *res;
+		NCX struct timeval32 *res;
 		res = (struct timeval32 *)optval;
 		res->tv_sec  = (typeof(res->tv_sec))(ts.tv_sec);
 		res->tv_usec = (typeof(res->tv_usec))(ts.tv_nsec / NSEC_PER_USEC);
@@ -1456,7 +1456,7 @@ return_timeval(USER CHECKED void *optval, socklen_t optlen,
 	}
 #if __SIZEOF_TIMEVAL32 != __SIZEOF_TIMEVAL64
 	if (optlen == __SIZEOF_TIMEVAL64) {
-		USER CHECKED struct timeval64 *res;
+		NCX struct timeval64 *res;
 		res = (struct timeval64 *)optval;
 		res->tv_sec  = (typeof(res->tv_sec))(ts.tv_sec);
 		res->tv_usec = (typeof(res->tv_usec))(ts.tv_nsec / NSEC_PER_USEC);
@@ -1467,7 +1467,7 @@ return_timeval(USER CHECKED void *optval, socklen_t optlen,
 #if (__SIZEOF_COMPAT_TIMEVAL32 != __SIZEOF_TIMEVAL32 && \
      __SIZEOF_COMPAT_TIMEVAL32 != __SIZEOF_TIMEVAL64)
 	if (optlen == __SIZEOF_COMPAT_TIMEVAL32) {
-		USER CHECKED struct compat_timeval32 *res;
+		NCX struct compat_timeval32 *res;
 		res = (struct compat_timeval32 *)optval;
 		res->tv_sec  = (typeof(res->tv_sec))(ts.tv_sec);
 		res->tv_usec = (typeof(res->tv_usec))(ts.tv_nsec / NSEC_PER_USEC);
@@ -1478,7 +1478,7 @@ return_timeval(USER CHECKED void *optval, socklen_t optlen,
      __SIZEOF_COMPAT_TIMEVAL64 != __SIZEOF_TIMEVAL64 && \
      __SIZEOF_COMPAT_TIMEVAL64 != __SIZEOF_COMPAT_TIMEVAL32)
 	if (optlen == __SIZEOF_COMPAT_TIMEVAL64) {
-		USER CHECKED struct compat_timeval64 *res;
+		NCX struct compat_timeval64 *res;
 		res = (struct compat_timeval64 *)optval;
 		res->tv_sec  = (typeof(res->tv_sec))(ts.tv_sec);
 		res->tv_usec = (typeof(res->tv_usec))(ts.tv_nsec / NSEC_PER_USEC);
@@ -1500,7 +1500,7 @@ return_timeval(USER CHECKED void *optval, socklen_t optlen,
 PUBLIC NONNULL((1)) socklen_t KCALL
 socket_getsockopt(struct socket *__restrict self,
                   syscall_ulong_t level, syscall_ulong_t optname,
-                  USER CHECKED void *optval,
+                  NCX void *optval,
                   socklen_t optlen, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_SOCKET_OPT) {
 	socklen_t result;
@@ -1573,7 +1573,7 @@ return_intval:
 
 		case SO_PEERNAME:
 			/* seems to be an alias for `getpeername()' */
-			result = socket_getpeername(self, (USER CHECKED struct sockaddr *)optval, optlen);
+			result = socket_getpeername(self, (NCX struct sockaddr *)optval, optlen);
 			goto done;
 
 		case SO_RCVBUF:
@@ -1650,12 +1650,12 @@ done:
 
 
 PRIVATE ATTR_PURE bool KCALL
-extract_bool(USER CHECKED void const *optval,
+extract_bool(NCX void const *optval,
              socklen_t optlen) {
 	socklen_t i;
 #ifndef __OPTIMIZE_SIZE__
 	if likely(optlen == sizeof(int))
-		return UNALIGNED_GET((USER CHECKED unsigned int const *)optval) != 0;
+		return UNALIGNED_GET((NCX unsigned int const *)optval) != 0;
 #endif /* !__OPTIMIZE_SIZE__ */
 	for (i = 0; i < optlen; ++i) {
 		byte_t b = ((byte_t const *)optval)[i];
@@ -1667,7 +1667,7 @@ extract_bool(USER CHECKED void const *optval,
 
 PRIVATE void KCALL
 set_message_flag(struct socket *__restrict self,
-                 USER CHECKED void const *optval,
+                 NCX void const *optval,
                  socklen_t optlen, uintptr_t flag) {
 	if (extract_bool(optval, optlen)) {
 		atomic_or(&self->sk_msgflags, flag);
@@ -1677,7 +1677,7 @@ set_message_flag(struct socket *__restrict self,
 }
 
 PRIVATE size_t KCALL
-extract_size_t_dfl_int(USER CHECKED void const *optval,
+extract_size_t_dfl_int(NCX void const *optval,
                        socklen_t optlen) {
 	size_t result;
 	switch (optlen) {
@@ -1712,10 +1712,10 @@ extract_size_t_dfl_int(USER CHECKED void const *optval,
 }
 
 PRIVATE void KCALL
-extract_timeval(USER CHECKED void const *optval, socklen_t optlen,
+extract_timeval(NCX void const *optval, socklen_t optlen,
                 struct timeval *__restrict result) {
 	if (optlen == __SIZEOF_TIMEVAL32) {
-		USER CHECKED struct timeval32 const *val;
+		NCX struct timeval32 const *val;
 		val = (struct timeval32 const *)optval;
 		result->tv_sec  = (time_t)val->tv_sec;
 		result->tv_usec = (suseconds_t)val->tv_usec;
@@ -1723,7 +1723,7 @@ extract_timeval(USER CHECKED void const *optval, socklen_t optlen,
 	}
 #if __SIZEOF_TIMEVAL32 != __SIZEOF_TIMEVAL64
 	if (optlen == __SIZEOF_TIMEVAL64) {
-		USER CHECKED struct timeval64 const *val;
+		NCX struct timeval64 const *val;
 		val = (struct timeval64 const *)optval;
 		result->tv_sec  = (time_t)val->tv_sec;
 		result->tv_usec = (suseconds_t)val->tv_usec;
@@ -1734,7 +1734,7 @@ extract_timeval(USER CHECKED void const *optval, socklen_t optlen,
 #if (__SIZEOF_COMPAT_TIMEVAL32 != __SIZEOF_TIMEVAL32 && \
      __SIZEOF_COMPAT_TIMEVAL32 != __SIZEOF_TIMEVAL64)
 	if (optlen == __SIZEOF_COMPAT_TIMEVAL32) {
-		USER CHECKED struct compat_timeval32 const *val;
+		NCX struct compat_timeval32 const *val;
 		val = (struct compat_timeval32 const *)optval;
 		result->tv_sec  = (time_t)val->tv_sec;
 		result->tv_usec = (suseconds_t)val->tv_usec;
@@ -1745,7 +1745,7 @@ extract_timeval(USER CHECKED void const *optval, socklen_t optlen,
      __SIZEOF_COMPAT_TIMEVAL64 != __SIZEOF_TIMEVAL64 && \
      __SIZEOF_COMPAT_TIMEVAL64 != __SIZEOF_COMPAT_TIMEVAL32)
 	if (optlen == __SIZEOF_COMPAT_TIMEVAL64) {
-		USER CHECKED struct compat_timeval64 const *val;
+		NCX struct compat_timeval64 const *val;
 		val = (struct compat_timeval64 const *)optval;
 		result->tv_sec  = (time_t)val->tv_sec;
 		result->tv_usec = (suseconds_t)val->tv_usec;
@@ -1761,7 +1761,7 @@ extract_timeval(USER CHECKED void const *optval, socklen_t optlen,
 }
 
 PRIVATE ktime_t KCALL
-extract_timeval_as_relktime(USER CHECKED void const *optval, socklen_t optlen) {
+extract_timeval_as_relktime(NCX void const *optval, socklen_t optlen) {
 	struct timeval tv;
 	extract_timeval(optval, optlen, &tv);
 	return relktime_from_user_rel(&tv);
@@ -1775,7 +1775,7 @@ extract_timeval_as_relktime(USER CHECKED void const *optval, socklen_t optlen) {
 PUBLIC NONNULL((1)) void KCALL
 socket_setsockopt(struct socket *__restrict self,
                   syscall_ulong_t level, syscall_ulong_t optname,
-                  USER CHECKED void const *optval,
+                  NCX void const *optval,
                   socklen_t optlen, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_SOCKET_OPT, E_BUFFER_TOO_SMALL) {
 	/* Builtin socket options. */
@@ -1889,7 +1889,7 @@ done:
  * @throws: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND: [...] */
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 socket_ioctl(struct socket *__restrict self, ioctl_t cmd,
-             USER UNCHECKED void *arg, iomode_t mode)
+             NCX UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) {
 	syscall_slong_t result;
 	/* TODO: Builtin socket ioctls. */
@@ -1976,7 +1976,7 @@ DEFINE_HANDLE_REFCNT_FUNCTIONS_WITH_WEAKREF_SUPPORT(socket, struct socket);
 
 /* read() and write() operators for socket handles. */
 INTERN WUNUSED NONNULL((1)) size_t KCALL
-handle_socket_read(struct socket *__restrict self, USER CHECKED void *dst,
+handle_socket_read(struct socket *__restrict self, NCX void *dst,
                    size_t num_bytes, iomode_t mode) THROWS(...) {
 	syscall_ulong_t msg_flags = 0;
 	if (mode & IO_NONBLOCK)
@@ -1985,14 +1985,14 @@ handle_socket_read(struct socket *__restrict self, USER CHECKED void *dst,
 }
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
-handle_socket_write(struct socket *__restrict self, USER CHECKED void const *src,
+handle_socket_write(struct socket *__restrict self, NCX void const *src,
                     size_t num_bytes, iomode_t mode) THROWS(...)  {
 	return socket_send(self, src, num_bytes, NULL, 0, mode);
 }
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_socket_pread(struct socket *__restrict self,
-                    USER CHECKED void *dst, size_t num_bytes,
+                    NCX void *dst, size_t num_bytes,
                     pos_t addr, iomode_t mode) THROWS(...) {
 	if (addr != 0)
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_PREAD);
@@ -2001,7 +2001,7 @@ handle_socket_pread(struct socket *__restrict self,
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_socket_pwrite(struct socket *__restrict self,
-                     USER CHECKED void const *src, size_t num_bytes,
+                     NCX void const *src, size_t num_bytes,
                      pos_t addr, iomode_t mode) THROWS(...) {
 	if (addr != 0)
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_PREAD);
@@ -2047,7 +2047,7 @@ handle_socket_pwritev(struct socket *__restrict self,
 
 INTERN NONNULL((1)) void KCALL
 handle_socket_stat(struct socket *__restrict self,
-                   USER CHECKED struct stat *result) THROWS(...) {
+                   NCX struct stat *result) THROWS(...) {
 	(void)self;
 	result->st_mode = S_IFSOCK;
 }

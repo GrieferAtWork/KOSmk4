@@ -35,10 +35,10 @@
 DECL_BEGIN
 
 #if defined(DEFINE_mfile_vioread)
-#define LOCAL_buffer_t     USER CHECKED void *
+#define LOCAL_buffer_t     NCX void *
 #define LOCAL_mfile_vio_rw mfile_vioread
 #elif defined(DEFINE_mfile_viowrite)
-#define LOCAL_buffer_t     USER CHECKED void const *
+#define LOCAL_buffer_t     NCX void const *
 #define LOCAL_mfile_vio_rw mfile_viowrite
 #elif defined(DEFINE_mfile_vioread_p)
 #define LOCAL_BUFFER_IS_PHYS

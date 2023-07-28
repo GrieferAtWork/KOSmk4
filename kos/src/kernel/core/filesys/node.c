@@ -676,7 +676,7 @@ again_check_permissions:
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID:gid: [...] */
 PUBLIC NONNULL((1)) void KCALL
 fnode_chown(struct fnode *__restrict self, uid_t owner, gid_t group,
-            USER CHECKED uid_t *pold_owner, USER CHECKED gid_t *pold_group,
+            NCX uid_t *pold_owner, NCX gid_t *pold_group,
             bool check_permissions)
 		THROWS(E_SEGFAULT, E_FSERROR_READONLY,
 		       E_INSUFFICIENT_RIGHTS, E_INVALID_ARGUMENT_BAD_VALUE) {

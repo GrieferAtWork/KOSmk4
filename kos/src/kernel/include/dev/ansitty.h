@@ -88,11 +88,11 @@ struct ansittydev
 #define ansittydev_v_tryas   chrdev_v_tryas
 FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This read operator is _MANDATORY_ and may not be overwritten by sub-classes! */
 ansittydev_v_write(struct mfile *__restrict self,
-                   USER CHECKED void const *src,
+                   NCX void const *src,
                    size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
 ansittydev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-                   USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+                   NCX UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Mandatory TTY operators for ansitty objects. (automatically installed) */
 FUNDEF NONNULL((1)) void LIBANSITTY_CC __ansittydev_v_output(struct ansitty *__restrict self, void const *data, size_t datalen) ASMNAME("ansittydev_v_output");

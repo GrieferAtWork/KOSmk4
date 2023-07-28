@@ -67,7 +67,7 @@ DECL_BEGIN
  * @return: -ETIMEDOUT: The given timeout has expired. */
 PRIVATE syscall_slong_t KCALL
 LOCAL_task_waitfor_futex(syscall_ulong_t flags,
-                         USER UNCHECKED LOCAL_struct_timespec64 const *timeout) {
+                         NCX UNCHECKED LOCAL_struct_timespec64 const *timeout) {
 	ktime_t tmo;
 
 	/* Mask flag bits. */
@@ -107,9 +107,9 @@ LOCAL_task_waitfor_futex(syscall_ulong_t flags,
 }
 
 PRIVATE ATTR_NOINLINE syscall_slong_t KCALL
-LOCAL_sys_lfutex_makefd_impl(USER UNCHECKED LOCAL_lfutex_t *uaddr,
+LOCAL_sys_lfutex_makefd_impl(NCX UNCHECKED LOCAL_lfutex_t *uaddr,
                              syscall_ulong_t futex_op, LOCAL_lfutex_t val,
-                             USER UNCHECKED LOCAL_struct_timespec64 const *timeout,
+                             NCX UNCHECKED LOCAL_struct_timespec64 const *timeout,
                              LOCAL_lfutex_t val2) {
 	fd_t resfd;
 	struct handle_install_data install;
@@ -157,17 +157,17 @@ LOCAL_sys_lfutex_makefd_impl(USER UNCHECKED LOCAL_lfutex_t *uaddr,
                                   : defined(__ARCH_WANT_SYSCALL_LFUTEX))
 #ifdef DEFINE_COMPAT_FUTEX
 DEFINE_COMPAT_SYSCALL5(syscall_slong_t, lfutex,
-                       USER UNCHECKED LOCAL_lfutex_t *, uaddr,
+                       NCX UNCHECKED LOCAL_lfutex_t *, uaddr,
                        syscall_ulong_t, futex_op,
                        LOCAL_lfutex_t, val,
-                       USER UNCHECKED LOCAL_struct_timespec64 const *, timeout,
+                       NCX UNCHECKED LOCAL_struct_timespec64 const *, timeout,
                        LOCAL_lfutex_t, val2)
 #else /* DEFINE_COMPAT_FUTEX */
 DEFINE_SYSCALL5(syscall_slong_t, lfutex,
-                USER UNCHECKED LOCAL_lfutex_t *, uaddr,
+                NCX UNCHECKED LOCAL_lfutex_t *, uaddr,
                 syscall_ulong_t, futex_op,
                 LOCAL_lfutex_t, val,
-                USER UNCHECKED LOCAL_struct_timespec64 const *, timeout,
+                NCX UNCHECKED LOCAL_struct_timespec64 const *, timeout,
                 LOCAL_lfutex_t, val2)
 #endif /* !DEFINE_COMPAT_FUTEX */
 {
@@ -316,10 +316,10 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_BELOW, atomic_read(uaddr) < val);
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_BITMASK, (atomic_read(uaddr) & val) == val2);
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL_BITMASK, (atomic_read(uaddr) & val) != val2);
-	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_EX, bcmp(uaddr, (USER CHECKED void const *)(uintptr_t)val, val2) == 0, LOCAL_validate_readable((USER UNCHECKED void const *)(uintptr_t)val, val2));
-	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL_EX, bcmp(uaddr, (USER CHECKED void const *)(uintptr_t)val, val2) != 0, LOCAL_validate_readable((USER UNCHECKED void const *)(uintptr_t)val, val2));
-	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_ABOVE_EX, memcmp(uaddr, (USER CHECKED void const *)(uintptr_t)val, val2) > 0, LOCAL_validate_readable((USER UNCHECKED void const *)(uintptr_t)val, val2));
-	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_BELOW_EX, memcmp(uaddr, (USER CHECKED void const *)(uintptr_t)val, val2) < 0, LOCAL_validate_readable((USER UNCHECKED void const *)(uintptr_t)val, val2));
+	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_EX, bcmp(uaddr, (NCX void const *)(uintptr_t)val, val2) == 0, LOCAL_validate_readable((NCX UNCHECKED void const *)(uintptr_t)val, val2));
+	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL_EX, bcmp(uaddr, (NCX void const *)(uintptr_t)val, val2) != 0, LOCAL_validate_readable((NCX UNCHECKED void const *)(uintptr_t)val, val2));
+	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_ABOVE_EX, memcmp(uaddr, (NCX void const *)(uintptr_t)val, val2) > 0, LOCAL_validate_readable((NCX UNCHECKED void const *)(uintptr_t)val, val2));
+	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_BELOW_EX, memcmp(uaddr, (NCX void const *)(uintptr_t)val, val2) < 0, LOCAL_validate_readable((NCX UNCHECKED void const *)(uintptr_t)val, val2));
 #undef DEFINE_WAIT_WHILE_OPERATOR
 
 	default:
@@ -346,17 +346,17 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
                                   : defined(__ARCH_WANT_SYSCALL_LFUTEXEXPR))
 #ifdef DEFINE_COMPAT_FUTEX
 DEFINE_COMPAT_SYSCALL5(errno_t, lfutexexpr,
-                       USER UNCHECKED LOCAL_lfutex_t *, ulockaddr,
-                       USER UNCHECKED void *, base,
-                       USER UNCHECKED LOCAL_struct_lfutexexpr const *, expr,
-                       USER UNCHECKED LOCAL_struct_timespec64 const *, timeout,
+                       NCX UNCHECKED LOCAL_lfutex_t *, ulockaddr,
+                       NCX UNCHECKED void *, base,
+                       NCX UNCHECKED LOCAL_struct_lfutexexpr const *, expr,
+                       NCX UNCHECKED LOCAL_struct_timespec64 const *, timeout,
                        syscall_ulong_t, flags)
 #else /* DEFINE_COMPAT_FUTEX */
 DEFINE_SYSCALL5(errno_t, lfutexexpr,
-                USER UNCHECKED LOCAL_lfutex_t *, ulockaddr,
-                USER UNCHECKED void *, base,
-                USER UNCHECKED LOCAL_struct_lfutexexpr const *, expr,
-                USER UNCHECKED LOCAL_struct_timespec64 const *, timeout,
+                NCX UNCHECKED LOCAL_lfutex_t *, ulockaddr,
+                NCX UNCHECKED void *, base,
+                NCX UNCHECKED LOCAL_struct_lfutexexpr const *, expr,
+                NCX UNCHECKED LOCAL_struct_timespec64 const *, timeout,
                 syscall_ulong_t, flags)
 #endif /* !DEFINE_COMPAT_FUTEX */
 {
@@ -402,9 +402,9 @@ DEFINE_SYSCALL5(errno_t, lfutexexpr,
 		for (;; ++iter) {
 			errno_t expr_result;
 			syscall_ulong_t cond;
-			USER CHECKED LOCAL_uintptr_t *uaddr;
+			NCX LOCAL_uintptr_t *uaddr;
 			cond  = atomic_read(&iter->fe_condition);
-			uaddr = (USER UNCHECKED LOCAL_uintptr_t *)((USER UNCHECKED byte_t *)base +
+			uaddr = (NCX UNCHECKED LOCAL_uintptr_t *)((NCX UNCHECKED byte_t *)base +
 			                                           atomic_read(&iter->fe_offset));
 			/* !!! Don't use LOCAL_validate_readable here -- (base+fe_offset might produce large pointers) */
 			validate_readable(uaddr, sizeof(*uaddr));
@@ -443,9 +443,9 @@ DEFINE_SYSCALL5(errno_t, lfutexexpr,
 			case LFUTEX_WAIT_WHILE_BELOW_EX: {
 				/* Compare variable-sized memory blobs. */
 				size_t num_bytes = iter->fe_val2;
-				USER CHECKED void const *rhs;
+				NCX void const *rhs;
 				int cmp;
-				rhs = (USER UNCHECKED byte_t *)base + iter->fe_val;
+				rhs = (NCX UNCHECKED byte_t *)base + iter->fe_val;
 				COMPILER_READ_BARRIER();
 				/* !!! Don't use LOCAL_validate_readable here -- (base+fe_val might produce large pointers) */
 				rhs = validate_readable(rhs, num_bytes);

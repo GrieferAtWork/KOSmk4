@@ -543,7 +543,7 @@ NOTHROW(FCALL path_cldlist_insert)(struct path *__restrict self,
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: `self' was marked as `PATH_CLDLIST_DELETED' */
 PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct path *KCALL
 path_lookupchild(struct path *__restrict self,
-                 USER CHECKED /*utf-8*/ char const *name,
+                 NCX /*utf-8*/ char const *name,
                  u16 namelen, uintptr_t namehash, atflag_t atflags)
 		THROWS(E_FSERROR_DELETED, E_WOULDBLOCK, E_SEGFAULT) {
 	REF struct path *result;
@@ -570,7 +570,7 @@ path_lookupchild(struct path *__restrict self,
 /* Same as `path_lookupchild()', but caller must be holding a lock `path_cldlock_read(self)' */
 PUBLIC WUNUSED NONNULL((1)) struct path *KCALL
 path_lookupchild_withlock(struct path *__restrict self,
-                          USER CHECKED /*utf-8*/ char const *name,
+                          NCX /*utf-8*/ char const *name,
                           u16 namelen, uintptr_t namehash, atflag_t atflags)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT) {
 	uintptr_t i, perturb;
@@ -622,7 +622,7 @@ path_lookupchild_withlock(struct path *__restrict self,
 
 PUBLIC WUNUSED NONNULL((1)) REF struct path *KCALL
 path_lookupchildref_withlock(struct path *__restrict self,
-                             /*utf-8*/ USER CHECKED char const *name,
+                             /*utf-8*/ NCX char const *name,
                              u16 namelen, uintptr_t namehash,
                              atflag_t atflags)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT) {
@@ -907,7 +907,7 @@ again:
  * @throw: E_BADALLOC:                        ... */
 PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct path *KCALL
 path_expandchild(struct path *__restrict self, u32 *__restrict premaining_symlinks,
-                 USER CHECKED /*utf-8*/ char const *name,
+                 NCX /*utf-8*/ char const *name,
                  u16 namelen, uintptr_t namehash, atflag_t atflags)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY,
@@ -1091,7 +1091,7 @@ path_walklinknode(struct path *__restrict self,
  */
 PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 path_expandchildnode(struct path *__restrict self, u32 *__restrict premaining_symlinks,
-                     USER CHECKED /*utf-8*/ char const *name,
+                     NCX /*utf-8*/ char const *name,
                      u16 namelen, uintptr_t namehash, atflag_t atflags,
                      /*out[1..1]_opt*/ REF struct path **presult_path,
                      /*out[1..1]_opt*/ REF struct fdirent **presult_dirent)
@@ -1274,8 +1274,8 @@ again_lookup_dent:
  *  - Other flags are silently ignored. */
 PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((2)) REF struct path *KCALL
 path_traverse_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
-                 USER CHECKED /*utf-8*/ char const *upath,
-                 /*out_opt*/ USER CHECKED /*utf-8*/ char const **plastseg,
+                 NCX /*utf-8*/ char const *upath,
+                 /*out_opt*/ NCX /*utf-8*/ char const **plastseg,
                  /*out_opt*/ u16 *plastlen, atflag_t atflags)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY, E_IOERROR,
@@ -1408,7 +1408,7 @@ do_drive_root_rel:
 	TRY {
 		char ch;
 		size_t seg_len;
-		USER CHECKED /*utf-8*/ char const *seg_str;
+		NCX /*utf-8*/ char const *seg_str;
 
 		/* Load the next path-segment. */
 next_segment:
@@ -1620,8 +1620,8 @@ done:
 /* Same as `path_traverse_ex',  but automatically keep  track of symlinks,  as
  * well as pass `cwd = fd_cwd == AT_FDCWD ? NULL : handles_lookuppath(fd_cwd)' */
 PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct path *KCALL
-path_traverse(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath,
-              /*out_opt*/ USER CHECKED /*utf-8*/ char const **plastseg,
+path_traverse(fd_t fd_cwd, NCX /*utf-8*/ char const *upath,
+              /*out_opt*/ NCX /*utf-8*/ char const **plastseg,
               /*out_opt*/ u16 *plastlen, atflag_t atflags)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY,
@@ -1641,7 +1641,7 @@ path_traverse(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath,
  * @param: atflags: Set of: `AT_DOSPATH | AT_NO_AUTOMOUNT | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW' */
 PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct fnode *KCALL
 path_traversefull_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
-                     USER CHECKED /*utf-8*/ char const *upath, atflag_t atflags,
+                     NCX /*utf-8*/ char const *upath, atflag_t atflags,
                      /*out[1..1]_opt*/ REF struct path **presult_path,
                      /*out[1..1]_opt*/ REF struct fdirent **presult_dirent)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
@@ -1649,7 +1649,7 @@ path_traversefull_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 		       E_IOERROR, E_BADALLOC, ...) {
 	REF struct fnode *result;
 	REF struct path *rpath;
-	USER CHECKED /*utf-8*/ char const *lastseg;
+	NCX /*utf-8*/ char const *lastseg;
 	u16 lastlen;
 
 	/* Traverse everything except for the last path component. */
@@ -1680,7 +1680,7 @@ path_traversefull_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 /* Helper wrapper that combines `path_traverse()' with `path_expandchildnode()'
  * @param: atflags: Set of: `AT_DOSPATH | AT_NO_AUTOMOUNT | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW' */
 PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct fnode *KCALL
-path_traversefull(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath, atflag_t atflags,
+path_traversefull(fd_t fd_cwd, NCX /*utf-8*/ char const *upath, atflag_t atflags,
                   /*out[1..1]_opt*/ REF struct path **presult_path,
                   /*out[1..1]_opt*/ REF struct fdirent **presult_dirent)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
@@ -1803,7 +1803,7 @@ PUBLIC_CONST unsigned int const fnode_access_accmode[O_ACCMODE + 1] = {
 /* Open (or create) a file, the same way user-space open(2) works. */
 PUBLIC BLOCKING WUNUSED NONNULL((2)) REF struct handle KCALL
 path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
-             USER CHECKED char const *filename,
+             NCX char const *filename,
              oflag_t oflags, mode_t mode) {
 	atflag_t atflags;
 	REF struct handle result;
@@ -2180,7 +2180,7 @@ again_handle_traversed_file:
 
 
 PUBLIC BLOCKING WUNUSED REF struct handle KCALL
-path_open(fd_t fd_cwd, USER CHECKED char const *filename,
+path_open(fd_t fd_cwd, NCX char const *filename,
           oflag_t oflags, mode_t mode) {
 	REF struct path *used_cwd;
 	u32 remaining_symlinks = atomic_read_relaxed(&THIS_FS->fs_lnkmax);

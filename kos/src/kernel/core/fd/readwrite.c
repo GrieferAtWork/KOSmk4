@@ -75,7 +75,7 @@ DEFINE_SYSCALL3(int64_t, lseek64,
 
 #ifdef __ARCH_WANT_SYSCALL__LLSEEK
 DEFINE_SYSCALL4(errno_t, _llseek, fd_t, fd, int64_t, offset,
-                USER UNCHECKED uint64_t *, result,
+                NCX UNCHECKED uint64_t *, result,
                 syscall_ulong_t, whence) {
 	uint64_t retpos;
 	validate_writable(result, sizeof(*result));
@@ -88,7 +88,7 @@ DEFINE_SYSCALL4(errno_t, _llseek, fd_t, fd, int64_t, offset,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL__LLSEEK
 DEFINE_COMPAT_SYSCALL4(errno_t, _llseek,
                        fd_t, fd, int64_t, offset,
-                       USER UNCHECKED uint64_t *, result,
+                       NCX UNCHECKED uint64_t *, result,
                        syscall_ulong_t, whence) {
 	uint64_t retpos;
 	compat_validate_writable(result, sizeof(*result));
@@ -111,7 +111,7 @@ DEFINE_COMPAT_SYSCALL4(errno_t, _llseek,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_READ
 DEFINE_SYSCALL3(ssize_t, read, fd_t, fd,
-                USER UNCHECKED void *, buf, size_t, bufsize) {
+                NCX UNCHECKED void *, buf, size_t, bufsize) {
 	size_t result;
 	struct handle hand;
 	hand = handles_lookup(fd);
@@ -126,7 +126,7 @@ DEFINE_SYSCALL3(ssize_t, read, fd_t, fd,
 
 #ifdef __ARCH_WANT_SYSCALL_WRITE
 DEFINE_SYSCALL3(ssize_t, write, fd_t, fd,
-                USER UNCHECKED void const *, buf, size_t, bufsize) {
+                NCX UNCHECKED void const *, buf, size_t, bufsize) {
 	size_t result;
 	struct handle hand;
 	hand = handles_lookup(fd);
@@ -141,7 +141,7 @@ DEFINE_SYSCALL3(ssize_t, write, fd_t, fd,
 
 #ifdef __ARCH_WANT_SYSCALL_READF
 DEFINE_SYSCALL4(ssize_t, readf,
-                fd_t, fd, USER UNCHECKED void *, buf,
+                fd_t, fd, NCX UNCHECKED void *, buf,
                 size_t, bufsize, iomode_t, mode) {
 	size_t result;
 	struct handle hand;
@@ -161,7 +161,7 @@ DEFINE_SYSCALL4(ssize_t, readf,
 
 #ifdef __ARCH_WANT_SYSCALL_WRITEF
 DEFINE_SYSCALL4(ssize_t, writef,
-                fd_t, fd, USER UNCHECKED void const *, buf,
+                fd_t, fd, NCX UNCHECKED void const *, buf,
                 size_t, bufsize, iomode_t, mode) {
 	size_t result;
 	struct handle hand;
@@ -188,7 +188,7 @@ DEFINE_SYSCALL4(ssize_t, writef,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_PREAD64
 DEFINE_SYSCALL4(ssize_t, pread64, fd_t, fd,
-                USER UNCHECKED void *, buf,
+                NCX UNCHECKED void *, buf,
                 size_t, bufsize, uint64_t, offset) {
 	size_t result;
 	struct handle hand;
@@ -204,7 +204,7 @@ DEFINE_SYSCALL4(ssize_t, pread64, fd_t, fd,
 
 #ifdef __ARCH_WANT_SYSCALL_PWRITE64
 DEFINE_SYSCALL4(ssize_t, pwrite64, fd_t, fd,
-                USER UNCHECKED void const *, buf,
+                NCX UNCHECKED void const *, buf,
                 size_t, bufsize, uint64_t, offset) {
 	size_t result;
 	struct handle hand;
@@ -220,7 +220,7 @@ DEFINE_SYSCALL4(ssize_t, pwrite64, fd_t, fd,
 
 #ifdef __ARCH_WANT_SYSCALL_PREAD64F
 DEFINE_SYSCALL5(ssize_t, pread64f,
-                fd_t, fd, USER UNCHECKED void *, buf,
+                fd_t, fd, NCX UNCHECKED void *, buf,
                 size_t, bufsize, uint64_t, offset, iomode_t, mode) {
 	size_t result;
 	struct handle hand;
@@ -240,7 +240,7 @@ DEFINE_SYSCALL5(ssize_t, pread64f,
 
 #ifdef __ARCH_WANT_SYSCALL_PWRITE64F
 DEFINE_SYSCALL5(ssize_t, pwrite64f,
-                fd_t, fd, USER UNCHECKED void const *, buf,
+                fd_t, fd, NCX UNCHECKED void const *, buf,
                 size_t, bufsize, uint64_t, offset, iomode_t, mode) {
 	size_t result;
 	struct handle hand;
@@ -267,7 +267,7 @@ DEFINE_SYSCALL5(ssize_t, pwrite64f,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_PREADV
 DEFINE_SYSCALL3(ssize_t, readv, fd_t, fd,
-                USER UNCHECKED struct iovec const *, iov,
+                NCX UNCHECKED struct iovec const *, iov,
                 size_t, count) {
 	size_t result, num_bytes;
 	struct handle hand;
@@ -288,7 +288,7 @@ DEFINE_SYSCALL3(ssize_t, readv, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER UNCHECKED byte_t *)iov[i].iov_base;
+			entries[i].ive_base = (NCX UNCHECKED byte_t *)iov[i].iov_base;
 			entries[i].ive_size = iov[i].iov_len;
 			COMPILER_READ_BARRIER();
 			validate_writable(entries[i].ive_base, entries[i].ive_size);
@@ -306,7 +306,7 @@ DEFINE_SYSCALL3(ssize_t, readv, fd_t, fd,
 
 #ifdef __ARCH_WANT_SYSCALL_PWRITEV
 DEFINE_SYSCALL3(ssize_t, writev, fd_t, fd,
-                USER UNCHECKED struct iovec const *, iov,
+                NCX UNCHECKED struct iovec const *, iov,
                 size_t, count) {
 	size_t result, num_bytes;
 	struct handle hand;
@@ -327,7 +327,7 @@ DEFINE_SYSCALL3(ssize_t, writev, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER UNCHECKED byte_t *)iov[i].iov_base;
+			entries[i].ive_base = (NCX UNCHECKED byte_t *)iov[i].iov_base;
 			entries[i].ive_size = iov[i].iov_len;
 			COMPILER_READ_BARRIER();
 			validate_readable(entries[i].ive_base, entries[i].ive_size);
@@ -345,7 +345,7 @@ DEFINE_SYSCALL3(ssize_t, writev, fd_t, fd,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_PREADV
 DEFINE_COMPAT_SYSCALL3(ssize_t, readv, fd_t, fd,
-                       USER UNCHECKED struct compat_iovec const *, iov,
+                       NCX UNCHECKED struct compat_iovec const *, iov,
                        size_t, count) {
 	size_t result, num_bytes;
 	struct handle hand;
@@ -366,7 +366,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, readv, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER UNCHECKED byte_t *)(void *)(uintptr_t)(*(compat_uintptr_t const *)&iov[i].iov_base);
+			entries[i].ive_base = (NCX UNCHECKED byte_t *)(void *)(uintptr_t)(*(compat_uintptr_t const *)&iov[i].iov_base);
 			entries[i].ive_size = iov[i].iov_len;
 			COMPILER_READ_BARRIER();
 			compat_validate_writable(entries[i].ive_base, entries[i].ive_size);
@@ -384,7 +384,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, readv, fd_t, fd,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_PWRITEV
 DEFINE_COMPAT_SYSCALL3(ssize_t, writev, fd_t, fd,
-                       USER UNCHECKED struct compat_iovec const *, iov,
+                       NCX UNCHECKED struct compat_iovec const *, iov,
                        size_t, count) {
 	size_t result, num_bytes;
 	struct handle hand;
@@ -405,7 +405,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, writev, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER UNCHECKED byte_t *)(void *)(uintptr_t)(*(compat_uintptr_t *)&iov[i].iov_base);
+			entries[i].ive_base = (NCX UNCHECKED byte_t *)(void *)(uintptr_t)(*(compat_uintptr_t *)&iov[i].iov_base);
 			entries[i].ive_size = iov[i].iov_len;
 			COMPILER_READ_BARRIER();
 			compat_validate_readable(entries[i].ive_base, entries[i].ive_size);
@@ -430,7 +430,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, writev, fd_t, fd,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_PREADV
 DEFINE_SYSCALL4(ssize_t, preadv, fd_t, fd,
-                USER UNCHECKED struct iovec const *, iov,
+                NCX UNCHECKED struct iovec const *, iov,
                 size_t, count, uint64_t, offset) {
 	size_t result, num_bytes;
 	struct handle hand;
@@ -451,7 +451,7 @@ DEFINE_SYSCALL4(ssize_t, preadv, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER UNCHECKED byte_t *)iov[i].iov_base;
+			entries[i].ive_base = (NCX UNCHECKED byte_t *)iov[i].iov_base;
 			entries[i].ive_size = iov[i].iov_len;
 			COMPILER_READ_BARRIER();
 			validate_writable(entries[i].ive_base, entries[i].ive_size);
@@ -469,7 +469,7 @@ DEFINE_SYSCALL4(ssize_t, preadv, fd_t, fd,
 
 #ifdef __ARCH_WANT_SYSCALL_PWRITEV
 DEFINE_SYSCALL4(ssize_t, pwritev, fd_t, fd,
-                USER UNCHECKED struct iovec const *, iov,
+                NCX UNCHECKED struct iovec const *, iov,
                 size_t, count, uint64_t, offset) {
 	size_t result, num_bytes;
 	struct handle hand;
@@ -490,7 +490,7 @@ DEFINE_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER UNCHECKED byte_t *)iov[i].iov_base;
+			entries[i].ive_base = (NCX UNCHECKED byte_t *)iov[i].iov_base;
 			entries[i].ive_size = iov[i].iov_len;
 			COMPILER_READ_BARRIER();
 			validate_readable(entries[i].ive_base, entries[i].ive_size);
@@ -508,7 +508,7 @@ DEFINE_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_PREADV
 DEFINE_COMPAT_SYSCALL4(ssize_t, preadv, fd_t, fd,
-                       USER UNCHECKED struct compat_iovec const *, iov,
+                       NCX UNCHECKED struct compat_iovec const *, iov,
                        size_t, count, uint64_t, offset) {
 	size_t result, num_bytes;
 	struct handle hand;
@@ -529,7 +529,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, preadv, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER UNCHECKED byte_t *)(void *)(uintptr_t)(*(compat_uintptr_t *)&iov[i].iov_base);
+			entries[i].ive_base = (NCX UNCHECKED byte_t *)(void *)(uintptr_t)(*(compat_uintptr_t *)&iov[i].iov_base);
 			entries[i].ive_size = iov[i].iov_len;
 			COMPILER_READ_BARRIER();
 			compat_validate_writable(entries[i].ive_base, entries[i].ive_size);
@@ -547,7 +547,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, preadv, fd_t, fd,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_PWRITEV
 DEFINE_COMPAT_SYSCALL4(ssize_t, pwritev, fd_t, fd,
-                       USER UNCHECKED struct compat_iovec const *, iov,
+                       NCX UNCHECKED struct compat_iovec const *, iov,
                        size_t, count, uint64_t, offset) {
 	size_t result, num_bytes;
 	struct handle hand;
@@ -568,7 +568,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER UNCHECKED byte_t *)(void *)(uintptr_t)(*(compat_uintptr_t const *)&iov[i].iov_base);
+			entries[i].ive_base = (NCX UNCHECKED byte_t *)(void *)(uintptr_t)(*(compat_uintptr_t const *)&iov[i].iov_base);
 			entries[i].ive_size = iov[i].iov_len;
 			COMPILER_READ_BARRIER();
 			compat_validate_readable(entries[i].ive_base, entries[i].ive_size);

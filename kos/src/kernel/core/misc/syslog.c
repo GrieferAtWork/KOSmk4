@@ -562,7 +562,7 @@ PRIVATE ATTR_BSS struct syslog_buffer syslog_buffers[SYSLOG_LEVEL_COUNT] = {};
 /* Append some amount of the given data to a given packet */
 LOCAL unsigned int FCALL
 syslog_packet_append_impl(struct syslog_packet *__restrict self,
-                          USER CHECKED char const *data,
+                          NCX char const *data,
                           unsigned int datalen,
                           unsigned int level)
 		THROWS(E_SEGFAULT) {
@@ -704,7 +704,7 @@ done:
 /* Append all given data to a given packet */
 LOCAL void FCALL
 syslog_packet_append(struct syslog_packet *__restrict self,
-                     USER CHECKED char const *data,
+                     NCX char const *data,
                      unsigned int datalen,
                      unsigned int level)
 		THROWS(E_SEGFAULT) {
@@ -741,7 +741,7 @@ syslog_packet_append(struct syslog_packet *__restrict self,
  * @return: * : Always re-returns `datalen' */
 PUBLIC ssize_t FORMATPRINTER_CC
 syslog_printer(void *level,
-               USER CHECKED char const *data,
+               NCX char const *data,
                size_t datalen)
 		THROWS(E_SEGFAULT) {
 	ssize_t result = (ssize_t)datalen;

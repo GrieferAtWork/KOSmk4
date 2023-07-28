@@ -68,7 +68,7 @@ struct procfs_regfile
 	/* [1..1] Print callback. */
 	void (KCALL *prf_print)(pformatprinter printer, void *arg, pos_t offset_hint);
 	/* [0..1] Write callback. (when NULL, file is read-only) */
-	void (KCALL *prf_write)(USER CHECKED void const *buf, size_t bufsize);
+	void (KCALL *prf_write)(NCX void const *buf, size_t bufsize);
 };
 
 struct procfs_txtfile
@@ -150,16 +150,16 @@ INTDEF NONNULL((1)) ssize_t FCALL ProcFS_PrintU64(pformatprinter printer, void *
  * If the buffer has an incorrect length, then a `E_BUFFER_TOO_SMALL'
  * exception is thrown instead. */
 INTDEF NONNULL((1)) bool FCALL
-ProcFS_ParseBool(USER CHECKED void const *buf, size_t bufsize)
+ProcFS_ParseBool(NCX void const *buf, size_t bufsize)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL);
 INTDEF NONNULL((1)) u32 FCALL
-ProcFS_ParseU32(USER CHECKED void const *buf, size_t bufsize, u32 minval DFL(0), u32 maxval DFL((u32)-1))
+ProcFS_ParseU32(NCX void const *buf, size_t bufsize, u32 minval DFL(0), u32 maxval DFL((u32)-1))
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL);
 INTDEF NONNULL((1)) u64 FCALL
-ProcFS_ParseU64(USER CHECKED void const *buf, size_t bufsize, u64 minval DFL(0), u64 maxval DFL((u64)-1))
+ProcFS_ParseU64(NCX void const *buf, size_t bufsize, u64 minval DFL(0), u64 maxval DFL((u64)-1))
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL);
-INTDEF NONNULL((1)) USER UNCHECKED void *FCALL
-ProcFS_ParsePtr(USER CHECKED void const *buf, size_t bufsize)
+INTDEF NONNULL((1)) NCX UNCHECKED void *FCALL
+ProcFS_ParsePtr(NCX void const *buf, size_t bufsize)
 		THROWS(E_SEGFAULT, E_BUFFER_TOO_SMALL);
 
 #if __SIZEOF_SIZE_T__ >= 8

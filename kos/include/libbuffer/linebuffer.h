@@ -225,14 +225,14 @@ LIBBUFFER_DECL __ATTR_NONNULL((1, 2)) __KERNEL_SELECT(__size_t, __ssize_t)
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
 typedef __ATTR_NONNULL_T((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PLINEBUFFER_WRITE)(struct linebuffer *__restrict __self,
-                                  __USER __CHECKED void const *__src,
+                                  __NCX void const *__src,
                                   __size_t __num_bytes)
 		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
 		                __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT));
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 LIBBUFFER_DECL __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC linebuffer_write)(struct linebuffer *__restrict __self,
-                                __USER __CHECKED void const *__src,
+                                __NCX void const *__src,
                                 __size_t __num_bytes)
 		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
 		                __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT));
@@ -245,14 +245,14 @@ LIBBUFFER_DECL __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
 typedef __ATTR_NONNULL_T((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PLINEBUFFER_WRITESOME)(struct linebuffer *__restrict __self,
-                                      __USER __CHECKED void const *__src,
+                                      __NCX void const *__src,
                                       __size_t __num_bytes)
 		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
 		                __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT));
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 LIBBUFFER_DECL __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC linebuffer_writesome)(struct linebuffer *__restrict __self,
-                                    __USER __CHECKED void const *__src,
+                                    __NCX void const *__src,
                                     __size_t __num_bytes)
 		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
 		                __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT));
@@ -264,14 +264,14 @@ LIBBUFFER_DECL __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
 typedef __ATTR_NONNULL_T((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PLINEBUFFER_WRITE_NONBLOCK)(struct linebuffer *__restrict __self,
-                                           __USER __CHECKED void const *__src,
+                                           __NCX void const *__src,
                                            __size_t __num_bytes)
 		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_BADALLOC),
 		                __THROWS(E_SEGFAULT, E_WOULDBLOCK));
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 LIBBUFFER_DECL __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC linebuffer_write_nonblock)(struct linebuffer *__restrict __self,
-                                         __USER __CHECKED void const *__src,
+                                         __NCX void const *__src,
                                          __size_t __num_bytes)
 		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_BADALLOC),
 		                __THROWS(E_SEGFAULT, E_WOULDBLOCK));

@@ -312,7 +312,7 @@ PRIVATE struct flatsuper_ops const iso9660_super_ops = {
 
 PRIVATE WUNUSED NONNULL((1, 2)) struct fsuper *KCALL
 iso9660_openfs(struct ffilesys *__restrict UNUSED(filesys),
-               struct mfile *dev, UNCHECKED USER char *args) {
+               struct mfile *dev, NCX UNCHECKED char *args) {
 	struct flatsuper *result;
 	VolumeDescriptor *desc;
 	pos_t offset, second_volume_offset;

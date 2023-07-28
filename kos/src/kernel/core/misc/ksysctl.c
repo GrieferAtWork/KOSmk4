@@ -88,7 +88,7 @@ INTDEF struct driver_libpath_struct default_library_path;
      defined(__ARCH_WANT_SYSCALL_FINIT_MODULE))
 PRIVATE ATTR_RETNONNULL WUNUSED REF struct driver *KCALL
 load_driver_from_file_handles(fd_t fd_node, fd_t fd_path, fd_t fd_dent,
-                              USER CHECKED char const *driver_cmdline,
+                              NCX char const *driver_cmdline,
                               bool *pnew_driver_loaded,
                               unsigned int flags) {
 	REF struct driver *result;
@@ -146,7 +146,7 @@ load_driver_from_file_handles(fd_t fd_node, fd_t fd_path, fd_t fd_dent,
 #ifdef __ARCH_WANT_SYSCALL_KSYSCTL
 DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
                 ioctl_t, command,
-                USER UNCHECKED void *, arg) {
+                NCX UNCHECKED void *, arg) {
 	switch (command) {
 
 	case KSYSCTL_SYSTEM_CLEARCACHES: {
@@ -224,14 +224,14 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		temp.h_mode = IO_RDWR;
 		temp.h_data = get_driver_loadlist();
 		FINALLY_DECREF_UNLIKELY((struct driver_loadlist *)temp.h_data);
-		return handles_install_openfd(temp, (USER UNCHECKED struct openfd *)arg);
+		return handles_install_openfd(temp, (NCX UNCHECKED struct openfd *)arg);
 	}	break;
 
 	case KSYSCTL_DRIVER_INSMOD: {
-		USER CHECKED struct ksysctl_driver_insmod *data;
+		NCX struct ksysctl_driver_insmod *data;
 		size_t struct_size;
 		u16 format;
-		USER CHECKED char const *commandline;
+		NCX char const *commandline;
 		bool new_driver_loaded;
 		REF struct driver *drv;
 		unsigned int insmod_flags;
@@ -251,7 +251,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		switch (format) {
 
 		case KSYSCTL_DRIVER_FORMAT_BLOB: {
-			USER CHECKED void const *base;
+			NCX void const *base;
 			size_t size;
 			base = read_once(&data->im_blob.b_base);
 			size = read_once(&data->im_blob.b_size);
@@ -273,7 +273,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		}	break;
 
 		case KSYSCTL_DRIVER_FORMAT_NAME: {
-			USER CHECKED char const *name;
+			NCX char const *name;
 			name = read_once(&data->im_name);
 			validate_readable(name, 1);
 			require(CAP_SYS_MODULE);
@@ -303,7 +303,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 	}	break;
 
 	case KSYSCTL_DRIVER_DELMOD: {
-		USER CHECKED struct ksysctl_driver_delmod *data;
+		NCX struct ksysctl_driver_delmod *data;
 		size_t struct_size;
 		u16 format;
 		unsigned int delmod_flags, error;
@@ -338,7 +338,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		}	break;
 
 		case KSYSCTL_DRIVER_FORMAT_NAME: {
-			USER CHECKED char const *name;
+			NCX char const *name;
 			name = read_once(&data->dm_name);
 			validate_readable(name, 1);
 			require(CAP_SYS_MODULE);
@@ -354,12 +354,12 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 	}	break;
 
 	case KSYSCTL_DRIVER_GETMOD: {
-		USER CHECKED struct ksysctl_driver_getmod *data;
+		NCX struct ksysctl_driver_getmod *data;
 		size_t struct_size;
 		u16 format;
 		REF struct driver *drv;
 		validate_readwrite(arg, sizeof(struct ksysctl_driver_getmod));
-		data        = (USER CHECKED struct ksysctl_driver_getmod *)arg;
+		data        = (NCX struct ksysctl_driver_getmod *)arg;
 		struct_size = read_once(&data->gm_struct_size);
 		if (struct_size != sizeof(struct ksysctl_driver_getmod))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct ksysctl_driver_getmod), struct_size);
@@ -382,7 +382,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		}	break;
 
 		case KSYSCTL_DRIVER_FORMAT_NAME: {
-			USER CHECKED char const *name;
+			NCX char const *name;
 			name = read_once(&data->gm_name);
 			validate_readable(name, 1);
 			require(CAP_SYS_MODULE);
@@ -407,9 +407,9 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 	}	break;
 
 	case KSYSCTL_DRIVER_GET_LIBRARY_PATH: {
-		USER CHECKED struct ksysctl_driver_get_library_path *data;
+		NCX struct ksysctl_driver_get_library_path *data;
 		size_t struct_size, bufsize, reqsize;
-		USER UNCHECKED char *buffer;
+		NCX UNCHECKED char *buffer;
 		REF struct driver_libpath_struct *libpath;
 		validate_readwrite(arg, sizeof(struct ksysctl_driver_get_library_path));
 		data        = (struct ksysctl_driver_get_library_path *)arg;
@@ -444,8 +444,8 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 	}	break;
 
 	case KSYSCTL_DRIVER_SET_LIBRARY_PATH: {
-		USER CHECKED struct ksysctl_driver_set_library_path *data;
-		USER UNCHECKED char const *oldpath, *newpath;
+		NCX struct ksysctl_driver_set_library_path *data;
+		NCX UNCHECKED char const *oldpath, *newpath;
 		REF struct driver_libpath_struct *newpath_string;
 		size_t struct_size;
 		validate_readwrite(arg, sizeof(struct ksysctl_driver_set_library_path));
@@ -517,7 +517,7 @@ again_get_oldpath:
 		temp.h_type = HANDLE_TYPE_MODULE;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = &kernel_driver;
-		return handles_install_openfd(temp, (USER UNCHECKED struct openfd *)arg);
+		return handles_install_openfd(temp, (NCX UNCHECKED struct openfd *)arg);
 	}	break;
 
 	case KSYSCTL_OPEN_BOOT_TASK: {
@@ -526,7 +526,7 @@ again_get_oldpath:
 		temp.h_type = HANDLE_TYPE_PIDFD;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = FORTASK(&boottask, this_taskpid);
-		return handles_install_openfd(temp, (USER UNCHECKED struct openfd *)arg);
+		return handles_install_openfd(temp, (NCX UNCHECKED struct openfd *)arg);
 	}	break;
 
 #ifdef CONFIG_HAVE_KERNEL_HACKY_REBOOT
@@ -552,8 +552,8 @@ again_get_oldpath:
 
 #ifdef __ARCH_WANT_SYSCALL_INIT_MODULE
 DEFINE_SYSCALL3(errno_t, init_module,
-                USER UNCHECKED void const *, module_image, size_t, len,
-                USER UNCHECKED char const *, uargs) {
+                NCX UNCHECKED void const *, module_image, size_t, len,
+                NCX UNCHECKED char const *, uargs) {
 	REF struct driver *drv;
 	validate_readable(module_image, len);
 	validate_readable(uargs, 1);
@@ -566,7 +566,7 @@ DEFINE_SYSCALL3(errno_t, init_module,
 
 #ifdef __ARCH_WANT_SYSCALL_FINIT_MODULE
 DEFINE_SYSCALL3(errno_t, finit_module, fd_t, fd,
-                USER UNCHECKED char const *, uargs,
+                NCX UNCHECKED char const *, uargs,
                 syscall_ulong_t, flags) {
 	REF struct driver *drv;
 	(void)flags; /* Ignored... (for now) */
@@ -580,7 +580,7 @@ DEFINE_SYSCALL3(errno_t, finit_module, fd_t, fd,
 
 #ifdef __ARCH_WANT_SYSCALL_DELETE_MODULE
 DEFINE_SYSCALL2(errno_t, delete_module,
-                USER UNCHECKED char const *, name,
+                NCX UNCHECKED char const *, name,
                 oflag_t, flags) {
 	unsigned int error;
 	unsigned int delmod_flags;

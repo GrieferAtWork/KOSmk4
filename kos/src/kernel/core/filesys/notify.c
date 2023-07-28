@@ -1301,9 +1301,9 @@ DEFINE_HANDLE_REFCNT_FUNCTIONS(notifyfd, struct notifyfd);
 
 PRIVATE BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 handle_notifyfd_read_nonblock(struct notifyfd *__restrict self,
-                              USER CHECKED void *dst,
+                              NCX void *dst,
                               size_t num_bytes) THROWS(...) {
-	USER CHECKED struct inotify_event *uevent;
+	NCX struct inotify_event *uevent;
 	struct notifyfd_event ne;
 	struct notifyfd_event *slot;
 	size_t reqsize;
@@ -1336,7 +1336,7 @@ again:
 	}
 
 	/* Copy the entry to user-space. */
-	uevent = (USER CHECKED struct inotify_event *)dst;
+	uevent = (NCX struct inotify_event *)dst;
 	umask  = ne.mfe_mask;
 	if (ne.nfe_wd & NOTIFYFD_EVENT_ISDIR_FLAG)
 		umask |= IN_ISDIR;
@@ -1372,7 +1372,7 @@ again:
 
 
 INTERN BLOCKING WUNUSED NONNULL((1)) size_t KCALL
-handle_notifyfd_read(struct notifyfd *__restrict self, USER CHECKED void *dst,
+handle_notifyfd_read(struct notifyfd *__restrict self, NCX void *dst,
                      size_t num_bytes, iomode_t mode) THROWS(...) {
 	size_t result;
 	while ((result = handle_notifyfd_read_nonblock(self, dst, num_bytes)) == 0) {
@@ -1464,7 +1464,7 @@ DEFINE_SYSCALL1(fd_t, inotify_init1, syscall_ulong_t, flags) {
      defined(__ARCH_WANT_SYSCALL_INOTIFY_ADD_WATCH_AT))
 PRIVATE int KCALL
 sys_inotify_add_watch_impl(fd_t notify_fd, fd_t dfd,
-                           USER UNCHECKED char const *pathname,
+                           NCX UNCHECKED char const *pathname,
                            atflag_t atflags, uint32_t mask) {
 	REF struct notifyfd *self;
 	REF struct mfile *file;
@@ -1498,7 +1498,7 @@ sys_inotify_add_watch_impl(fd_t notify_fd, fd_t dfd,
 
 #ifdef __ARCH_WANT_SYSCALL_INOTIFY_ADD_WATCH
 DEFINE_SYSCALL3(int, inotify_add_watch, fd_t, notify_fd,
-                USER UNCHECKED char const *, pathname,
+                NCX UNCHECKED char const *, pathname,
                 uint32_t, mask) {
 	atflag_t atflags = 0;
 	if (mask & IN_DONT_FOLLOW) {
@@ -1512,7 +1512,7 @@ DEFINE_SYSCALL3(int, inotify_add_watch, fd_t, notify_fd,
 
 #ifdef __ARCH_WANT_SYSCALL_INOTIFY_ADD_WATCH_AT
 DEFINE_SYSCALL5(int, inotify_add_watch_at, fd_t, notify_fd,
-                fd_t, dfd, USER UNCHECKED char const *, pathname,
+                fd_t, dfd, NCX UNCHECKED char const *, pathname,
                 atflag_t, atflags, uint32_t, mask) {
 	return sys_inotify_add_watch_impl(notify_fd, dfd, pathname, atflags, mask);
 }

@@ -1413,6 +1413,10 @@ done:
 					}
 				}
 				argTypeRef.fixNonsensicalAttributes(this);
+				/* Hide L-value types in argument types (this just  makes
+				 * things a little easier, though not fully compliant...) */
+				if (argTypeRef.typ is CLValueType)
+					argTypeRef = argTypeRef.typ.base;
 				func.args.append((argTypeRef, argName));
 				if (this.tok != ",")
 					break;
@@ -1775,7 +1779,7 @@ prefix_again:
 			val = parseTypedExpr(typeref);
 			isUnreachable = savedIsUnreachable;
 			/* Override the declaration's type so pointer attributes are inherited
-			 * >> void foo(USER CHECKED void *p) {
+			 * >> void foo(NCX void *p) {
 			 * >>     void *x = p; // Here, `x' automatically inherits pointer attributes from `p'
 			 * >> } */
 			decl.typeref = val.typeref;
@@ -4749,8 +4753,16 @@ again:
 				local oldSymbolTypeRef: CTypeRef = oldSymbol.typeref;
 				local newSymbolTypeRef: CTypeRef = newSymbol.typeref;
 				this.pushWarnLocationOverride(newSymbol.decl);
-				deepcopy(oldSymbolTypeRef).redeclarationImport(this, newSymbolTypeRef,
-					newSymbolName, oldSymbolName, oldSymbol.decl);
+				if (oldSymbolTypeRef.redeclarationEquals(newSymbolTypeRef)) {
+					deepcopy(oldSymbolTypeRef).redeclarationImport(this, newSymbolTypeRef,
+						newSymbolName, oldSymbolName, oldSymbol.decl);
+				} else {
+					this.warn("-Wdecl",
+						f"redeclaration of `{newSymbolTypeRef.tostr(newSymbolName)}'"
+						f"{this.formatMessageAddend(oldSymbol.decl, f'previously declared as `{
+							oldSymbolTypeRef.tostr(oldSymbolName)
+						}\'')}");
+				}
 				this.popWarnLocationOverride();
 			}
 		}

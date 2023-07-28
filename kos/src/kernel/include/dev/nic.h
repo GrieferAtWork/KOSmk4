@@ -49,8 +49,8 @@ struct nicdev;
 #ifndef __iov_entry_defined
 #define __iov_entry_defined
 struct iov_entry {
-	USER CHECKED byte_t *ive_base; /* [?..ive_size] Virtual base address of the buffer. */
-	size_t               ive_size; /* Buffer size of `ive_base' (in bytes) */
+	NCX byte_t *ive_base; /* [?..ive_size] Virtual base address of the buffer. */
+	size_t      ive_size; /* Buffer size of `ive_base' (in bytes) */
 };
 #endif /* !__iov_entry_defined */
 
@@ -121,7 +121,7 @@ struct nic_packet {
 #define nic_packet_size(self) \
 	(nic_packet_headtailsize(self) + (self)->np_payloads)
 
-/* Invoke `cb(USER CHECKED void *base, size_t num_bytes)' (where `num_bytes' may be 0)
+/* Invoke `cb(NCX void *base, size_t num_bytes)' (where `num_bytes' may be 0)
  * over each of the different parts of the given packet.
  * TODO: Get rid of this macro. - Instead, add a helper for enumerating
  *       I/O   segments  containing  data  for  packet  payload  parts. */
@@ -249,7 +249,7 @@ NOTHROW(KCALL nicdev_v_destroy)(struct mfile *__restrict self);
 DATDEF struct mfile_stream_ops const nicdev_v_stream_ops;
 FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This write operator is _MANDATORY_ and may not be overwritten by sub-classes! */
 nicdev_v_write(struct mfile *__restrict self,
-               USER CHECKED void const *src,
+               NCX void const *src,
                size_t num_bytes, iomode_t mode) THROWS(...);
 
 
@@ -303,7 +303,7 @@ nicdev_v_write(struct mfile *__restrict self,
  * sizes to be included alongside the payload. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
 nicdev_newpacket(struct nicdev const *__restrict self,
-                 USER CHECKED void const *payload, size_t payload_size,
+                 NCX void const *payload, size_t payload_size,
                  size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct nic_packet *KCALL

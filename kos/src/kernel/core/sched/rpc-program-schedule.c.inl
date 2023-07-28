@@ -161,7 +161,7 @@ rpc_schedule_in_this_task(struct pending_rpc *__restrict rpc,
 				 * and let the original be lazily cleaned up. */
 				struct pending_rpc *copy;
 				size_t struct_size = offsetof(struct pending_rpc, pr_user.pur_argv) +
-				                     rpc->pr_user.pur_argc * sizeof(USER UNCHECKED void *);
+				                     rpc->pr_user.pur_argc * sizeof(NCX UNCHECKED void *);
 				if (struct_size < offsetafter(struct pending_rpc, pr_user.pur_error))
 					struct_size = offsetafter(struct pending_rpc, pr_user.pur_error);
 				copy = (struct pending_rpc *)pending_rpc_alloc(struct_size, GFP_NORMAL);
@@ -216,14 +216,14 @@ rpc_schedule_in_this_task(struct pending_rpc *__restrict rpc,
 #ifdef DEFINE_compat_sys_rpc_schedule
 DEFINE_COMPAT_SYSCALL5(errno_t, rpc_schedule,
                        pid_t, target_tid, syscall_ulong_t, mode,
-                       USER UNCHECKED void const *, program,
-                       __ARCH_COMPAT_PTR(USER UNCHECKED void const) USER UNCHECKED const *, params,
+                       NCX UNCHECKED void const *, program,
+                       __ARCH_COMPAT_PTR(NCX UNCHECKED void const) NCX UNCHECKED const *, params,
                        size_t, max_param_count)
 #else /* DEFINE_compat_sys_rpc_schedule */
 DEFINE_SYSCALL5(errno_t, rpc_schedule,
                 pid_t, target_tid, syscall_ulong_t, mode,
-                USER UNCHECKED void const *, program,
-                USER UNCHECKED void const *USER UNCHECKED const *, params,
+                NCX UNCHECKED void const *, program,
+                NCX UNCHECKED void const *NCX UNCHECKED const *, params,
                 size_t, max_param_count)
 #endif /* !DEFINE_compat_sys_rpc_schedule */
 {
@@ -303,7 +303,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 	/* Allocate the new RPC controller. */
 	{
 		size_t struct_size = offsetof(struct pending_rpc, pr_user.pur_argv) +
-		                     max_param_count * sizeof(USER UNCHECKED void *);
+		                     max_param_count * sizeof(NCX UNCHECKED void *);
 		if (struct_size < offsetafter(struct pending_rpc, pr_user.pur_error))
 			struct_size = offsetafter(struct pending_rpc, pr_user.pur_error);
 		rpc = (struct pending_rpc *)pending_rpc_alloc(struct_size, GFP_NORMAL);
@@ -317,7 +317,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 			rpc->pr_user.pur_argv[i] = params[i];
 #else /* DEFINE_compat_sys_rpc_schedule */
 		memcpy(rpc->pr_user.pur_argv, params,
-		       max_param_count, sizeof(USER UNCHECKED void *));
+		       max_param_count, sizeof(NCX UNCHECKED void *));
 #endif /* !DEFINE_compat_sys_rpc_schedule */
 	} EXCEPT {
 		pending_rpc_free(rpc);

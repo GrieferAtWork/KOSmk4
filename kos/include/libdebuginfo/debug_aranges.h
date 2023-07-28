@@ -45,14 +45,14 @@ __DECL_BEGIN
  * @return: DEBUG_INFO_ERROR_NOFRAME: ...
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 typedef __ATTR_NONNULL_T((3)) debuginfo_errno_t
-__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGARANGES_LOCATE)(__CHECKED __byte_t const *debug_aranges_start,
-                                                       __CHECKED __byte_t const *debug_aranges_end,
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGARANGES_LOCATE)(__NCX __byte_t const *debug_aranges_start,
+                                                       __NCX __byte_t const *debug_aranges_end,
                                                        __uintptr_t *__restrict pdebug_info_cu_offset,
                                                        __uintptr_t module_relative_pc);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((3)) debuginfo_errno_t
-__NOTHROW_NCX(LIBDEBUGINFO_CC debugaranges_locate)(__CHECKED __byte_t const *debug_aranges_start,
-                                                   __CHECKED __byte_t const *debug_aranges_end,
+__NOTHROW_NCX(LIBDEBUGINFO_CC debugaranges_locate)(__NCX __byte_t const *debug_aranges_start,
+                                                   __NCX __byte_t const *debug_aranges_end,
                                                    __uintptr_t *__restrict pdebug_info_cu_offset,
                                                    __uintptr_t module_relative_pc);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */

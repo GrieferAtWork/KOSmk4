@@ -150,10 +150,10 @@ PRIVATE
 NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                             IF_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t *common_init_regs,)
                                             IF_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT(byte_t *uncommon_init_regs,)
-                                            CHECKED byte_t const *reader,
-                                            CHECKED byte_t const *end,
+                                            NCX byte_t const *reader,
+                                            NCX byte_t const *end,
                                             unwind_cfa_state_t *__restrict result,
-                                            CHECKED void const *absolute_pc)
+                                            VIRT void const *absolute_pc)
 #elif defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE)
 /* Behaves  identical to `unwind_fde_exec()', and doesn't actually ever have to be
  * used, but performes better than `unwind_fde_exec()' when unwinding SIGNAL_FRAME
@@ -180,10 +180,10 @@ PRIVATE
 NOTHROW_NCX(CC libuw_unwind_sigframe_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                      IF_CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t *common_init_regs,)
                                                      IF_CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT(byte_t *uncommon_init_regs,)
-                                                     CHECKED byte_t const *reader,
-                                                     CHECKED byte_t const *end,
+                                                     NCX byte_t const *reader,
+                                                     NCX byte_t const *end,
                                                      unwind_cfa_sigframe_state_t *__restrict result,
-                                                     CHECKED void const *absolute_pc)
+                                                     VIRT void const *absolute_pc)
 #elif defined(EH_FRAME_FDE_EXEC_CFA_LANDING_STATE)
 /* Internal helper for calculating landing-pad rules. */
 PRIVATE
@@ -198,11 +198,11 @@ PRIVATE
 NOTHROW_NCX(CC libuw_unwind_landing_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                     IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t *common_init_regs,)
                                                     IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(byte_t *uncommon_init_regs,)
-                                                    CHECKED byte_t const *reader,
-                                                    CHECKED byte_t const *landing_start_reader,
-                                                    CHECKED byte_t const *end,
+                                                    NCX byte_t const *reader,
+                                                    NCX byte_t const *landing_start_reader,
+                                                    NCX byte_t const *end,
                                                     _unwind_cfa_landing_state_t *__restrict result,
-                                                    CHECKED void const *absolute_pc)
+                                                    VIRT void const *absolute_pc)
 #elif defined(EH_FRAME_FDE_EXEC_CFA_VALUE)
 /* Same as `unwind_fde_exec()', however only calculate the CFA restore descriptor.
  * @return: UNWIND_SUCCESS:                 ...
@@ -212,10 +212,10 @@ NOTHROW_NCX(CC libuw_unwind_landing_fde_exec_until)(unwind_fde_t *__restrict sel
  * @return: UNWIND_BADALLOC:                ... */
 PRIVATE NONNULL((1, 2, 3, 4)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
-                                                CHECKED byte_t const *reader,
-                                                CHECKED byte_t const *end,
+                                                NCX byte_t const *reader,
+                                                NCX byte_t const *end,
                                                 unwind_cfa_value_t *__restrict result,
-                                                CHECKED void const *absolute_pc)
+                                                VIRT void const *absolute_pc)
 #elif defined(EH_FRAME_FDE_EXEC_CFA_RULE)
 /* Similar  to  `unwind_fde_exec()',   but  used   to  calculate   the
  * unwind  rule   for  `dw_regno'   at   the  given   text   location.
@@ -232,11 +232,11 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa_until)(unwind_fde_t *__restrict self, /
  * @return: UNWIND_BADALLOC:                ... */
 PRIVATE NONNULL((1, 2, 3, 4)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
-                                                 CHECKED byte_t const *reader,
-                                                 CHECKED byte_t const *end,
+                                                 NCX byte_t const *reader,
+                                                 NCX byte_t const *end,
                                                  unwind_cfa_register_t *__restrict rule,
                                                  unwind_regno_t dw_regno,
-                                                 CHECKED void const *absolute_pc)
+                                                 VIRT void const *absolute_pc)
 #endif /* ... */
 {
 #ifdef EH_FRAME_FDE_EXEC_CFA_LANDING_STATE

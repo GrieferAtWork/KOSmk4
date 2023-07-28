@@ -136,7 +136,7 @@ NOTHROW(KCALL task_unmap_stack_and_free)(struct task *__restrict self);
 
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 clone_set_child_tid(struct rpc_context *__restrict UNUSED(ctx), void *cookie) {
-	atomic_write((USER CHECKED pid_t *)cookie, task_gettid());
+	atomic_write((NCX pid_t *)cookie, task_gettid());
 }
 
 PRIVATE NONNULL((1)) void FCALL
@@ -171,8 +171,8 @@ waitfor_vfork_completion(struct task *__restrict thread)
 
 #ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 PRIVATE NONNULL((4)) void KCALL
-restore_userprocmask_after_vfork(USER CHECKED struct userprocmask *um,
-                                 USER CHECKED sigset_t *umask,
+restore_userprocmask_after_vfork(NCX struct userprocmask *um,
+                                 NCX sigset_t *umask,
                                  size_t umasksize,
                                  sigset_t const *__restrict saved) {
 #if 0 /* Don't do this! -- See comment below */
@@ -184,21 +184,21 @@ restore_userprocmask_after_vfork(USER CHECKED struct userprocmask *um,
 	 *       reside in read-only memory! */
 	while (umasksize >= sizeof(ulongptr_t)) {
 		ulongptr_t oword, nword;
-		oword = UNALIGNED_GET((USER CHECKED ulongptr_t const *)umask);
+		oword = UNALIGNED_GET((NCX ulongptr_t const *)umask);
 		nword = *(ulongptr_t const *)saved;
 		if (nword != oword)
-			UNALIGNED_SET((USER CHECKED ulongptr_t *)umask, nword);
-		umask = (USER CHECKED sigset_t *)((byte_t *)umask + sizeof(ulongptr_t));
+			UNALIGNED_SET((NCX ulongptr_t *)umask, nword);
+		umask = (NCX sigset_t *)((byte_t *)umask + sizeof(ulongptr_t));
 		saved = (sigset_t const *)((byte_t const *)saved + sizeof(ulongptr_t));
 		umasksize -= sizeof(ulongptr_t);
 	}
 	while (umasksize) {
 		byte_t oword, nword;
-		oword = *(USER CHECKED byte_t const *)umask;
+		oword = *(NCX byte_t const *)umask;
 		nword = *(byte_t const *)saved;
 		if (nword != oword)
-			*(USER CHECKED byte_t *)umask = nword;
-		umask = (USER CHECKED sigset_t *)((byte_t *)umask + 1);
+			*(NCX byte_t *)umask = nword;
+		umask = (NCX sigset_t *)((byte_t *)umask + 1);
 		saved = (sigset_t const *)((byte_t const *)saved + 1);
 		umasksize -= 1;
 	}
@@ -259,7 +259,7 @@ inherit_parent_userprocmask:
 			 *
 			 * In other words: We must copy `um->pm_sigmask' into `FORTASK(result, this_kernel_sigmask)'
 			 */
-			USER UNCHECKED sigset_t *parent_umask;
+			NCX UNCHECKED sigset_t *parent_umask;
 			size_t parent_umasksize;
 			parent_umask     = um->pm_sigmask;
 			parent_umasksize = um->pm_sigsize;
@@ -390,12 +390,12 @@ PRIVATE NONNULL((1, 2)) void FCALL
 task_clone_thrdpid(struct task *__restrict result,
                    struct task *__restrict caller,
                    uint64_t clone_flags,
-                   USER UNCHECKED pid_t *parent_tidptr);
+                   NCX UNCHECKED pid_t *parent_tidptr);
 PRIVATE NONNULL((1, 2)) void FCALL
 task_clone_procpid(struct task *__restrict result,
                    struct task *__restrict caller,
                    uint64_t clone_flags,
-                   USER UNCHECKED pid_t *parent_tidptr);
+                   NCX UNCHECKED pid_t *parent_tidptr);
 #else /* __INTELLISENSE__ */
 DECL_END
 
@@ -857,8 +857,8 @@ do_clone_pid:
 			 * parent process is resumed. */
 			if (caller->t_flags & TASK_FUSERPROCMASK) {
 				sigset_t saved_umask;
-				USER CHECKED struct userprocmask *um;
-				USER UNCHECKED sigset_t *umask;
+				NCX struct userprocmask *um;
+				NCX UNCHECKED sigset_t *umask;
 				size_t umasksize;
 				um        = PERTASK_GET(this_userprocmask_address);
 				umask     = um->pm_sigmask;
@@ -972,7 +972,7 @@ NOTHROW(FCALL _task_init_relocations)(struct task *__restrict self) {
 #ifdef __ARCH_WANT_SYSCALL_CLONE3
 INTERN NONNULL((1)) pid_t FCALL
 sys_clone3_impl(struct icpustate const *__restrict state,
-                USER UNCHECKED struct clone_args *cl_args,
+                NCX UNCHECKED struct clone_args *cl_args,
                 size_t size) {
 	pid_t cpid;
 	REF struct task *child;
@@ -989,7 +989,7 @@ sys_clone3_impl(struct icpustate const *__restrict state,
 		ATTR_FALLTHROUGH
 	case 64: {
 		size_t stacksize;
-		USER UNCHECKED void *stackbase;
+		NCX UNCHECKED void *stackbase;
 		validate_readable(cl_args, size);
 		cargs.tca_flags       = cl_args->ca_flags;
 		cargs.tca_pidfd       = cl_args->ca_pidfd;
@@ -1007,9 +1007,9 @@ sys_clone3_impl(struct icpustate const *__restrict state,
 			cargs.tca_stack = stackbase;
 		} else {
 #ifdef icpustate_getusersp
-			cargs.tca_stack = (USER UNCHECKED void *)icpustate_getusersp(state);
+			cargs.tca_stack = (NCX UNCHECKED void *)icpustate_getusersp(state);
 #else /* icpustate_getusersp */
-			cargs.tca_stack = (USER UNCHECKED void *)icpustate_getsp(state);
+			cargs.tca_stack = (NCX UNCHECKED void *)icpustate_getsp(state);
 #endif /* !icpustate_getusersp */
 		}
 
@@ -1048,7 +1048,7 @@ sys_clone3_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
 	cpid = sys_clone3_impl(ctx->rc_state,
-	                       (USER UNCHECKED struct clone_args *)ctx->rc_scinfo.rsi_regs[0],
+	                       (NCX UNCHECKED struct clone_args *)ctx->rc_scinfo.rsi_regs[0],
 	                       (size_t)ctx->rc_scinfo.rsi_regs[1]);
 	icpustate_setreturn(ctx->rc_state, cpid);
 
@@ -1057,7 +1057,7 @@ sys_clone3_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 }
 
 DEFINE_SYSCALL2(syscall_slong_t, clone3,
-                USER UNCHECKED struct clone_args *, cl_args,
+                NCX UNCHECKED struct clone_args *, cl_args,
                 size_t, size) {
 	(void)cl_args;
 	(void)size;

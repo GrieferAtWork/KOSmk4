@@ -199,7 +199,7 @@ INTERN ATTR_NORETURN void KCALL pipe_throw_broken_pipe(void) {
 
 INTERN size_t KCALL
 handle_pipe_read(struct pipe *__restrict self,
-                 USER CHECKED void *dst,
+                 NCX void *dst,
                  size_t num_bytes, iomode_t mode) {
 	size_t result;
 	if (mode & IO_NONBLOCK) {
@@ -214,7 +214,7 @@ handle_pipe_read(struct pipe *__restrict self,
 
 INTERN size_t KCALL
 handle_pipe_write(struct pipe *__restrict self,
-                  USER CHECKED void const *src,
+                  NCX void const *src,
                   size_t num_bytes, iomode_t mode) {
 	size_t result;
 	if (mode & IO_NONBLOCK) {
@@ -294,7 +294,7 @@ handle_pipe_truncate(struct pipe *__restrict self,
 
 INTERN void KCALL
 handle_pipe_stat(struct pipe *__restrict self,
-                 USER CHECKED struct stat *result) {
+                 NCX struct stat *result) {
 	size_t size;
 	size = atomic_read(&self->p_buffer.rb_avail);
 	bzero(result, sizeof(*result));
@@ -329,7 +329,7 @@ handle_pipe_polltest(struct pipe *__restrict self, poll_mode_t what) {
 /* Handle operators for pipe reader / pipe writer wrappers. */
 INTERN size_t KCALL
 handle_pipe_reader_read(struct pipe_reader *__restrict self,
-                        USER CHECKED void *dst,
+                        NCX void *dst,
                         size_t num_bytes, iomode_t mode) {
 	return handle_pipe_read(self->pr_pipe, dst, num_bytes, mode);
 }
@@ -353,7 +353,7 @@ handle_pipe_reader_seek(struct pipe_reader *__restrict self,
 
 INTERN void KCALL
 handle_pipe_reader_stat(struct pipe_reader *__restrict self,
-                        USER CHECKED struct stat *result) {
+                        NCX struct stat *result) {
 	handle_pipe_stat(self->pr_pipe, result);
 }
 
@@ -377,7 +377,7 @@ handle_pipe_reader_polltest(struct pipe_reader *__restrict self,
 
 INTERN size_t KCALL
 handle_pipe_writer_write(struct pipe_writer *__restrict self,
-                         USER CHECKED void const *src,
+                         NCX void const *src,
                          size_t num_bytes, iomode_t mode) {
 	return handle_pipe_write(self->pw_pipe, src, num_bytes, mode);
 }
@@ -406,7 +406,7 @@ handle_pipe_writer_truncate(struct pipe_writer *__restrict self,
 
 INTERN void KCALL
 handle_pipe_writer_stat(struct pipe_writer *__restrict self,
-                        USER CHECKED struct stat *result) {
+                        NCX struct stat *result) {
 	handle_pipe_stat(self->pw_pipe, result);
 }
 
@@ -430,19 +430,19 @@ handle_pipe_writer_polltest(struct pipe_writer *__restrict self, poll_mode_t wha
 /* Return -EINVAL if `cmd' isn't recognized. */
 INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 ringbuffer_ioctl(struct ringbuffer *__restrict self, ioctl_t cmd,
-                 USER UNCHECKED void *arg, iomode_t mode) {
+                 NCX UNCHECKED void *arg, iomode_t mode) {
 	switch (cmd) {
 
 	case PIPE_IOC_PEEK: {
-		USER CHECKED struct pipe_peek *info;
-		USER CHECKED byte_t *buf;
+		NCX struct pipe_peek *info;
+		NCX byte_t *buf;
 		size_t offset, count, total;
 		if unlikely(!IO_CANREAD(mode))
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_READ, mode);
-		info = (USER CHECKED struct pipe_peek *)arg;
+		info = (NCX struct pipe_peek *)arg;
 		validate_readwrite(info, sizeof(*info));
 		COMPILER_READ_BARRIER();
-		buf    = (USER CHECKED byte_t *)info->pp_buf;
+		buf    = (NCX byte_t *)info->pp_buf;
 		offset = (size_t)info->pp_bufof;
 		count  = (size_t)info->pp_bufsz;
 		COMPILER_READ_BARRIER();
@@ -528,7 +528,7 @@ handle_copy_error:
 
 INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_pipe_ioctl(struct pipe *__restrict self, ioctl_t cmd,
-                  USER UNCHECKED void *arg, iomode_t mode) {
+                  NCX UNCHECKED void *arg, iomode_t mode) {
 	syscall_slong_t result;
 	result = ringbuffer_ioctl(&self->p_buffer, cmd, arg, mode);
 	if (result == -EINVAL) {
@@ -541,13 +541,13 @@ handle_pipe_ioctl(struct pipe *__restrict self, ioctl_t cmd,
 
 INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_pipe_reader_ioctl(struct pipe_reader *__restrict self, ioctl_t cmd,
-                         USER UNCHECKED void *arg, iomode_t mode) {
+                         NCX UNCHECKED void *arg, iomode_t mode) {
 	return handle_pipe_ioctl(self->pr_pipe, cmd, arg, (mode & ~IO_ACCMODE) | IO_RDONLY);
 }
 
 INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_pipe_writer_ioctl(struct pipe_writer *__restrict self, ioctl_t cmd,
-                         USER UNCHECKED void *arg, iomode_t mode) {
+                         NCX UNCHECKED void *arg, iomode_t mode) {
 	return handle_pipe_ioctl(self->pw_pipe, cmd, arg, (mode & ~IO_ACCMODE) | IO_WRONLY);
 }
 
@@ -566,7 +566,7 @@ static_assert(IO_NONBLOCK == IO_FROM_OPENFLAG(O_NONBLOCK));
      defined(__ARCH_WANT_SYSCALL_PIPE) ||  \
      defined(__ARCH_WANT_COMPAT_SYSCALL_PIPE))
 PRIVATE errno_t KCALL
-sys_pipe2_impl(USER UNCHECKED fd_t *pipedes, oflag_t flags) {
+sys_pipe2_impl(NCX UNCHECKED fd_t *pipedes, oflag_t flags) {
 	struct handle_install_data rinstall;
 	struct handle_install_data winstall;
 	fd_t rfd, wfd;
@@ -620,20 +620,20 @@ sys_pipe2_impl(USER UNCHECKED fd_t *pipedes, oflag_t flags) {
 
 #ifdef __ARCH_WANT_SYSCALL_PIPE2
 DEFINE_SYSCALL2(errno_t, pipe2,
-                USER UNCHECKED fd_t *, pipedes,
+                NCX UNCHECKED fd_t *, pipedes,
                 oflag_t, flags) {
 	return sys_pipe2_impl(pipedes, flags);
 }
 #endif /* __ARCH_WANT_SYSCALL_PIPE2 */
 
 #ifdef __ARCH_WANT_SYSCALL_PIPE
-DEFINE_SYSCALL1(errno_t, pipe, USER UNCHECKED fd_t *, pipedes) {
+DEFINE_SYSCALL1(errno_t, pipe, NCX UNCHECKED fd_t *, pipedes) {
 	return sys_pipe2_impl(pipedes, 0);
 }
 #endif /* __ARCH_WANT_SYSCALL_PIPE */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_PIPE
-DEFINE_COMPAT_SYSCALL1(errno_t, pipe, USER UNCHECKED fd_t *, pipedes) {
+DEFINE_COMPAT_SYSCALL1(errno_t, pipe, NCX UNCHECKED fd_t *, pipedes) {
 	return sys_pipe2_impl(pipedes, 0);
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_PIPE */

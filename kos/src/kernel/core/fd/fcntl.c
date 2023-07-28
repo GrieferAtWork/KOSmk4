@@ -115,7 +115,7 @@ again:
 
 PRIVATE syscall_slong_t KCALL
 sys_fcntl_impl(fd_t fd, fcntl_t command,
-               UNCHECKED USER void *arg) {
+               NCX UNCHECKED void *arg) {
 	struct handman *man = THIS_HANDMAN;
 	switch (command) {
 
@@ -431,7 +431,7 @@ sys_fcntl_impl(fd_t fd, fcntl_t command,
 
 #ifdef __ARCH_WANT_SYSCALL_FCNTL
 DEFINE_SYSCALL3(syscall_slong_t, fcntl, fd_t, fd,
-                fcntl_t, command, UNCHECKED USER void *, arg) {
+                fcntl_t, command, NCX UNCHECKED void *, arg) {
 	return sys_fcntl_impl(fd, command, arg);
 }
 #endif /* __ARCH_WANT_SYSCALL_FCNTL */

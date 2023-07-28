@@ -62,7 +62,7 @@ DEFINE_INTERN_ALIAS(handle_eventfd_sema_refcnt, handle_eventfd_fence_refcnt);
 
 INTERN BLOCKING size_t KCALL
 handle_eventfd_fence_read(struct eventfd *__restrict self,
-                          USER CHECKED void *dst,
+                          NCX void *dst,
                           size_t num_bytes, iomode_t mode) {
 	/* Fence-like read-operation */
 	u64 val;
@@ -97,7 +97,7 @@ again:
 
 INTERN BLOCKING size_t KCALL
 handle_eventfd_sema_read(struct eventfd *__restrict self,
-                         USER CHECKED void *dst,
+                         NCX void *dst,
                          size_t num_bytes, iomode_t mode) {
 	/* Semaphore-like read-operation */
 	u64 val;
@@ -137,7 +137,7 @@ handle_eventfd_sema_read(struct eventfd *__restrict self,
 
 INTERN BLOCKING size_t KCALL
 handle_eventfd_fence_write(struct eventfd *__restrict self,
-                           USER CHECKED void const *src,
+                           NCX void const *src,
                            size_t num_bytes, iomode_t UNUSED(mode)) {
 	u64 val, oldval, newval;
 	if unlikely(num_bytes < 8) {

@@ -82,7 +82,7 @@ NOTHROW(KCALL get_free_ram_in_pages)(void) {
 }
 
 PRIVATE void KCALL
-do_sysinfo(USER CHECKED struct sysinfo *info) {
+do_sysinfo(NCX struct sysinfo *info) {
 	size_t total, free, used;
 	total = get_total_ram_in_pages();
 	free  = get_free_ram_in_pages();
@@ -113,7 +113,7 @@ do_sysinfo(USER CHECKED struct sysinfo *info) {
 
 #ifdef __ARCH_WANT_SYSCALL_SYSINFO
 DEFINE_SYSCALL1(errno_t, sysinfo,
-                USER UNCHECKED struct sysinfo *, info) {
+                NCX UNCHECKED struct sysinfo *, info) {
 	validate_writable(info, sizeof(*info));
 	do_sysinfo(info);
 	return -EOK;
@@ -121,7 +121,7 @@ DEFINE_SYSCALL1(errno_t, sysinfo,
 #endif /* __ARCH_WANT_SYSCALL_SYSINFO */
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SYSINFO
 DEFINE_COMPAT_SYSCALL1(errno_t, sysinfo,
-                       USER UNCHECKED struct compat_sysinfo *, info) {
+                       NCX UNCHECKED struct compat_sysinfo *, info) {
 	struct sysinfo si;
 	validate_writable(info, sizeof(*info));
 	bzero(&si, sizeof(si));

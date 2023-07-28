@@ -91,22 +91,22 @@ ProcFS_PrintU64(pformatprinter printer, void *arg, u64 value) {
  * `E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER'
  * exception is thrown. */
 INTERN NONNULL((1)) bool FCALL
-ProcFS_ParseBool(USER CHECKED void const *buf, size_t bufsize)
+ProcFS_ParseBool(NCX void const *buf, size_t bufsize)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL) {
-	USER CHECKED char const *endp;
+	NCX char const *endp;
 	bool result;
 	char mode;
-	endp = (USER CHECKED char const *)buf + bufsize;
-	while (endp > (USER CHECKED char const *)buf &&
+	endp = (NCX char const *)buf + bufsize;
+	while (endp > (NCX char const *)buf &&
 	       unicode_isspace(endp[-1]))
 		--endp;
-	while ((USER CHECKED char const *)buf < endp &&
+	while ((NCX char const *)buf < endp &&
 	       unicode_isspace(((char const *)buf)[0]))
-		buf = (USER CHECKED char const *)buf + 1;
-	bufsize = (size_t)(endp - (USER CHECKED char const *)buf);
+		buf = (NCX char const *)buf + 1;
+	bufsize = (size_t)(endp - (NCX char const *)buf);
 	if (bufsize != 1)
 		THROW(E_BUFFER_TOO_SMALL, 1, bufsize);
-	mode = atomic_read((USER CHECKED char *)buf);
+	mode = atomic_read((NCX char *)buf);
 	if (mode == '0') {
 		result = false;
 	} else if (mode == '1') {
@@ -120,21 +120,21 @@ ProcFS_ParseBool(USER CHECKED void const *buf, size_t bufsize)
 }
 
 INTERN NONNULL((1)) u32 FCALL
-ProcFS_ParseU32(USER CHECKED void const *buf, size_t bufsize, u32 minval, u32 maxval)
+ProcFS_ParseU32(NCX void const *buf, size_t bufsize, u32 minval, u32 maxval)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL) {
 	char intbuf[lengthof(PRIMAXu32) + 1];
-	USER CHECKED char const *endp;
-	USER CHECKED char *real_endp;
+	NCX char const *endp;
+	NCX char *real_endp;
 	u32 result;
 	bufsize /= sizeof(char);
-	endp = (USER CHECKED char const *)buf + bufsize;
-	while (endp > (USER CHECKED char const *)buf &&
+	endp = (NCX char const *)buf + bufsize;
+	while (endp > (NCX char const *)buf &&
 	       unicode_isspace(endp[-1]))
 		--endp;
-	while ((USER CHECKED char const *)buf < endp &&
-	       unicode_isspace(((USER CHECKED char const *)buf)[0]))
-		buf = (USER CHECKED char const *)buf + 1;
-	bufsize = (size_t)(endp - (USER CHECKED char const *)buf);
+	while ((NCX char const *)buf < endp &&
+	       unicode_isspace(((NCX char const *)buf)[0]))
+		buf = (NCX char const *)buf + 1;
+	bufsize = (size_t)(endp - (NCX char const *)buf);
 	if unlikely(bufsize < 1)
 		THROW(E_BUFFER_TOO_SMALL, sizeof(char), bufsize * sizeof(char));
 	if unlikely(bufsize >= lengthof(intbuf) - 1)
@@ -155,21 +155,21 @@ ProcFS_ParseU32(USER CHECKED void const *buf, size_t bufsize, u32 minval, u32 ma
 }
 
 INTERN NONNULL((1)) u64 FCALL
-ProcFS_ParseU64(USER CHECKED void const *buf, size_t bufsize, u64 minval, u64 maxval)
+ProcFS_ParseU64(NCX void const *buf, size_t bufsize, u64 minval, u64 maxval)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL) {
 	char intbuf[lengthof(PRIMAXu64) + 1];
-	USER CHECKED char const *endp;
-	USER CHECKED char *real_endp;
+	NCX char const *endp;
+	NCX char *real_endp;
 	u64 result;
 	bufsize /= sizeof(char);
-	endp = (USER CHECKED char const *)buf + bufsize;
-	while (endp > (USER CHECKED char const *)buf &&
+	endp = (NCX char const *)buf + bufsize;
+	while (endp > (NCX char const *)buf &&
 	       unicode_isspace(endp[-1]))
 		--endp;
-	while ((USER CHECKED char const *)buf < endp &&
-	       unicode_isspace(((USER CHECKED char const *)buf)[0]))
-		buf = (USER CHECKED char const *)buf + 1;
-	bufsize = (size_t)(endp - (USER CHECKED char const *)buf);
+	while ((NCX char const *)buf < endp &&
+	       unicode_isspace(((NCX char const *)buf)[0]))
+		buf = (NCX char const *)buf + 1;
+	bufsize = (size_t)(endp - (NCX char const *)buf);
 	if unlikely(bufsize < 1)
 		THROW(E_BUFFER_TOO_SMALL, sizeof(char), bufsize * sizeof(char));
 	if unlikely(bufsize >= lengthof(intbuf) - 1)
@@ -189,42 +189,42 @@ ProcFS_ParseU64(USER CHECKED void const *buf, size_t bufsize, u64 minval, u64 ma
 	return result;
 }
 
-INTERN NONNULL((1)) USER UNCHECKED void *FCALL
-ProcFS_ParsePtr(USER CHECKED void const *buf, size_t bufsize)
+INTERN NONNULL((1)) NCX UNCHECKED void *FCALL
+ProcFS_ParsePtr(NCX void const *buf, size_t bufsize)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL) {
 	char intbuf[lengthof(PRIMAXxPTR)];
-	USER CHECKED char const *endp;
-	USER CHECKED char *real_endp;
-	USER UNCHECKED void *result;
+	NCX char const *endp;
+	NCX char *real_endp;
+	NCX UNCHECKED void *result;
 	bufsize /= sizeof(char);
-	endp = (USER CHECKED char const *)buf + bufsize;
-	while (endp > (USER CHECKED char const *)buf &&
+	endp = (NCX char const *)buf + bufsize;
+	while (endp > (NCX char const *)buf &&
 	       unicode_isspace(endp[-1]))
 		--endp;
-	while ((USER CHECKED char const *)buf < endp &&
-	       unicode_isspace(((USER CHECKED char const *)buf)[0]))
-		buf = (USER CHECKED char const *)buf + 1;
-	if ((USER CHECKED char const *)buf < endp && ((USER CHECKED char const *)buf)[0] == '0') {
+	while ((NCX char const *)buf < endp &&
+	       unicode_isspace(((NCX char const *)buf)[0]))
+		buf = (NCX char const *)buf + 1;
+	if ((NCX char const *)buf < endp && ((NCX char const *)buf)[0] == '0') {
 		char ch;
-		buf = (USER CHECKED char const *)buf + 1;
-		if ((USER CHECKED char const *)buf >= endp)
+		buf = (NCX char const *)buf + 1;
+		if ((NCX char const *)buf >= endp)
 			return (void *)0;
-		ch = ((USER CHECKED char const *)buf)[0];
+		ch = ((NCX char const *)buf)[0];
 		if (ch == 'x' || ch == 'X') {
-			buf = (USER CHECKED char const *)buf + 1;
-			if unlikely((USER CHECKED char const *)buf >= endp) {
+			buf = (NCX char const *)buf + 1;
+			if unlikely((NCX char const *)buf >= endp) {
 				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 				      E_INVALID_ARGUMENT_CONTEXT_BAD_POINTER_STRING);
 			}
 skip_leading_zeroes:
-			while ((USER CHECKED char const *)buf < endp &&
-			       ((USER CHECKED char const *)buf)[0] == '0')
-				buf = (USER CHECKED char const *)buf + 1;
+			while ((NCX char const *)buf < endp &&
+			       ((NCX char const *)buf)[0] == '0')
+				buf = (NCX char const *)buf + 1;
 		} else if (ch == '0') {
 			goto skip_leading_zeroes;
 		}
 	}
-	bufsize = (size_t)(endp - (USER CHECKED char const *)buf);
+	bufsize = (size_t)(endp - (NCX char const *)buf);
 	if unlikely(bufsize < 1)
 		THROW(E_BUFFER_TOO_SMALL, sizeof(char), bufsize * sizeof(char));
 	if unlikely(bufsize >= lengthof(intbuf) - 1)
@@ -234,9 +234,9 @@ skip_leading_zeroes:
 	COMPILER_READ_BARRIER();
 	intbuf[bufsize] = 0;
 #if __SIZEOF_POINTER__ >= 8
-	result = (USER UNCHECKED void *)strtou64(intbuf, &real_endp, 16);
+	result = (NCX UNCHECKED void *)strtou64(intbuf, &real_endp, 16);
 #else /* __SIZEOF_POINTER__ >= 8 */
-	result = (USER UNCHECKED void *)strtou32(intbuf, &real_endp, 16);
+	result = (NCX UNCHECKED void *)strtou32(intbuf, &real_endp, 16);
 #endif /* __SIZEOF_POINTER__ < 8 */
 	if (real_endp != intbuf + bufsize)
 		THROW(E_BUFFER_TOO_SMALL, (size_t)(real_endp - intbuf), bufsize);
@@ -260,7 +260,7 @@ procfs_regfile_v_print(struct printnode *__restrict self,
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-procfs_regfile_v_pwrite(struct mfile *__restrict self, USER CHECKED void const *src,
+procfs_regfile_v_pwrite(struct mfile *__restrict self, NCX void const *src,
                         size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
 	struct procfs_regfile *me = (struct procfs_regfile *)mfile_asprintnode(self);
 	/* Need write operator. */
@@ -473,7 +473,7 @@ find_first_taskpid_greater_or_equal(struct pidns *__restrict ns,
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-procfs_root_direnum_ops_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+procfs_root_direnum_ops_v_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                                   size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(...) {
 	size_t index, newindex;

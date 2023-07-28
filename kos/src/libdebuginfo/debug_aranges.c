@@ -58,11 +58,11 @@ DECL_BEGIN
  * @return: DEBUG_INFO_ERROR_NOFRAME: ...
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 INTERN TEXTSECTION NONNULL((3)) debuginfo_errno_t
-NOTHROW_NCX(CC libdi_debugaranges_locate)(CHECKED byte_t const *debug_aranges_start,
-                                          CHECKED byte_t const *debug_aranges_end,
+NOTHROW_NCX(CC libdi_debugaranges_locate)(NCX byte_t const *debug_aranges_start,
+                                          NCX byte_t const *debug_aranges_end,
                                           uintptr_t *__restrict pdebug_info_cu_offset,
                                           uintptr_t module_relative_pc) {
-	CHECKED byte_t const *reader, *next;
+	NCX byte_t const *reader, *next;
 	uintptr_t debug_info_cu_offset;
 	reader = debug_aranges_start;
 	while (reader < debug_aranges_end) {

@@ -92,9 +92,9 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 #endif /* !__x86_64__ */
 
 	/* Base addresses for user-space. */
-	USER CHECKED void *libdl_base;
-	USER CHECKED void *peb_base;
-	USER CHECKED void *stack_base;
+	NCX void *libdl_base;
+	NCX void *peb_base;
+	NCX void *stack_base;
 
 	/* Read offset of NT header */
 	mfile_readall(args->ea_xfile, &e_lfanew, sizeof(e_lfanew),
@@ -404,7 +404,7 @@ done_bss:
 	} /* Scope (for `mbuilder_fini()') */
 
 	{
-		USER CHECKED byte_t *stack_end;
+		NCX byte_t *stack_end;
 		REF struct mman *oldmman = THIS_MMAN;
 		struct icpustate *state;
 
@@ -418,14 +418,14 @@ done_bss:
 			void *entrypoint;
 			/* Pass important information onto the stack
 			 * and set-up the user-space register state. */
-			stack_end = (USER CHECKED byte_t *)stack_base + USER_STACK_SIZE;
+			stack_end = (NCX byte_t *)stack_base + USER_STACK_SIZE;
 #ifdef __x86_64__
 #define PUSHP(val)                                                                        \
 	(stack_end -= sizeof_pointer,                                                         \
-	 IS_NATIVE ? (void)(*(USER CHECKED uint64_t *)stack_end = (uint64_t)(uintptr_t)(val)) \
-	           : (void)(*(USER CHECKED uint32_t *)stack_end = (uint32_t)(uintptr_t)(val)))
+	 IS_NATIVE ? (void)(*(NCX uint64_t *)stack_end = (uint64_t)(uintptr_t)(val)) \
+	           : (void)(*(NCX uint32_t *)stack_end = (uint32_t)(uintptr_t)(val)))
 #else /* __x86_64__ */
-#define PUSHP(val) (void)(stack_end -= sizeof(uintptr_t), *(USER CHECKED uintptr_t *)stack_end = (uintptr_t)(val))
+#define PUSHP(val) (void)(stack_end -= sizeof(uintptr_t), *(NCX uintptr_t *)stack_end = (uintptr_t)(val))
 #endif /* !__x86_64__ */
 
 
@@ -446,17 +446,17 @@ done_bss:
 					reqlen = path_sprintent(args->ea_xpath,
 					                        args->ea_xdentry->fd_name,
 					                        args->ea_xdentry->fd_namelen,
-					                        (USER char *)stack_end - buflen,
+					                        (NCX char *)stack_end - buflen,
 					                        buflen, AT_PATHPRINT_INCTRAIL, myroot);
 				} else if (args->ea_xdentry) {
-					reqlen = snprintf((USER char *)stack_end - buflen, buflen,
+					reqlen = snprintf((NCX char *)stack_end - buflen, buflen,
 					                  "%$s", (size_t)args->ea_xdentry->fd_namelen,
 					                  args->ea_xdentry->fd_name) +
 					         1;
 				} else {
 					reqlen = 1;
 					if (buflen)
-						((USER char *)stack_end - buflen)[0] = '\0';
+						((NCX char *)stack_end - buflen)[0] = '\0';
 				}
 				ok     = reqlen <= buflen;
 				buflen = (reqlen + sizeof_pointer - 1) & ~(sizeof_pointer - 1);

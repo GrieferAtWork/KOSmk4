@@ -1039,7 +1039,7 @@ handles_install(struct handle const &__restrict hand, fd_t minfd DFL(0))
  * @return: * : The file descriptor slot into which `hand' was installed. */
 FUNDEF BLOCKING NONNULL((1)) fd_t FCALL
 handles_install_openfd(struct handle const *__restrict hand,
-                       USER UNCHECKED struct openfd *data)
+                       NCX UNCHECKED struct openfd *data)
 		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK,
@@ -1048,7 +1048,7 @@ handles_install_openfd(struct handle const *__restrict hand,
 extern "C++" {
 FUNDEF BLOCKING fd_t FCALL
 handles_install_openfd(struct handle const &__restrict hand,
-                       USER UNCHECKED struct openfd *data)
+                       NCX UNCHECKED struct openfd *data)
 		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK,

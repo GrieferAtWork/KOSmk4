@@ -40,9 +40,9 @@ DECL_BEGIN
  * @return: NULL: All defined symbols have an address > module_relative_pc
  * @return: NULL: The given symbol table is empty, too small, or corrupted.
  * @return: NULL: The given `symtab_entsize' is neither `sizeof(Elf32_Sym)', nor `sizeof(Elf64_Sym)' */
-INTDEF ATTR_PURE WUNUSED CHECKED byte_t const *
-NOTHROW_NCX(CC libdi_symtab_scantable)(CHECKED byte_t const *symtab_start,
-                                       CHECKED byte_t const *symtab_end,
+INTDEF ATTR_PURE WUNUSED NCX byte_t const *
+NOTHROW_NCX(CC libdi_symtab_scantable)(NCX byte_t const *symtab_start,
+                                       NCX byte_t const *symtab_end,
                                        size_t symtab_entsize,
                                        uintptr_t module_relative_pc);
 

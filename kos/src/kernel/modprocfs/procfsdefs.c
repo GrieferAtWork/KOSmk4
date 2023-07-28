@@ -110,14 +110,14 @@ INTERN struct fregnode procfs_r_kos_leaks = {{
 	INTDEF struct procfs_regfile symbol_name;
 #define MKREG_RW(symbol_name, perm, printer, writer)                                 \
 	INTDEF void KCALL printer(pformatprinter printer, void *arg, pos_t offset_hint); \
-	INTDEF void KCALL writer(USER CHECKED void const *buf, size_t bufsize);          \
+	INTDEF void KCALL writer(NCX void const *buf, size_t bufsize);          \
 	INTDEF struct procfs_regfile symbol_name;
 #define MKREG_CONSTSTR(symbol_name, perm, string_ptr) \
 	INTDEF struct procfs_txtfile symbol_name;
 #define MKLNK(symbol_name, perm, readlink)            \
 	INTDEF WUNUSED NONNULL((1)) size_t KCALL          \
 	readlink(struct flnknode *__restrict self,        \
-	         USER CHECKED /*utf-8*/ char *buf,        \
+	         NCX /*utf-8*/ char *buf,        \
 	         size_t bufsize) THROWS(E_SEGFAULT, ...); \
 	INTDEF struct flnknode symbol_name;
 #include "procfs.def"

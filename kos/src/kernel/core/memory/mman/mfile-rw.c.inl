@@ -264,10 +264,10 @@ DECL_BEGIN
 #define LOCAL_buffer_t           struct iov_buffer const *__restrict
 #define LOCAL_buffer_ent_t       struct iov_entry
 #elif defined(LOCAL_WRITING)
-#define LOCAL_buffer_t           USER CHECKED void const *
+#define LOCAL_buffer_t           NCX void const *
 #define LOCAL_ubuffer_t          uintptr_t
 #else /* ... */
-#define LOCAL_buffer_t           USER CHECKED void *
+#define LOCAL_buffer_t           NCX void *
 #define LOCAL_ubuffer_t          uintptr_t
 #endif /* !... */
 

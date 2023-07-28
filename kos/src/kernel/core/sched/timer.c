@@ -102,7 +102,7 @@ clock_realtime_gettime(clockid_t clockid) {
 
 PRIVATE WUNUSED ktime_t FCALL
 clock_realtime_astimeout(clockid_t clockid,
-                         USER CHECKED struct timespec const *__restrict p_ts) {
+                         NCX struct timespec const *__restrict p_ts) {
 	(void)clockid;
 	return ktime_from_user(p_ts);
 }
@@ -126,7 +126,7 @@ clock_boottime_gettime(clockid_t clockid) {
 
 PRIVATE WUNUSED ktime_t FCALL
 clock_boottime_astimeout(clockid_t clockid,
-                         USER CHECKED struct timespec const *__restrict p_ts) {
+                         NCX struct timespec const *__restrict p_ts) {
 	(void)clockid;
 	return relktime_from_user_rel(p_ts);
 }
@@ -148,7 +148,7 @@ clock_notsup_getres(clockid_t clockid) {
 }
 
 PRIVATE WUNUSED ktime_t FCALL
-clock_notsup_astimeout(clockid_t clockid, USER CHECKED struct timespec const *p_ts) {
+clock_notsup_astimeout(clockid_t clockid, NCX struct timespec const *p_ts) {
 	(void)p_ts;
 	THROW(E_NOT_IMPLEMENTED_UNSUPPORTED, clockid);
 }
@@ -177,7 +177,7 @@ clock_thread_cputime_gettime(clockid_t clockid) {
 }
 
 PRIVATE WUNUSED ktime_t FCALL
-clock_thread_cputime_astimeout(clockid_t clockid, USER CHECKED struct timespec const *p_ts) {
+clock_thread_cputime_astimeout(clockid_t clockid, NCX struct timespec const *p_ts) {
 	struct task *me = THIS_TASK;
 	struct timespec ts;
 	struct timespec now_ts;
@@ -516,8 +516,8 @@ validate_tv_nsec(ulongptr_t tv_nsec)
 /* Set the configuration of `self' */
 PUBLIC NONNULL((1)) void FCALL
 timer_settime(struct timer *__restrict self,
-              /*[0..1]*/ USER CHECKED struct itimerspec const *value,
-              /*[0..1]*/ USER CHECKED struct itimerspec *old_value)
+              /*[0..1]*/ NCX struct itimerspec const *value,
+              /*[0..1]*/ NCX struct itimerspec *old_value)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
 	if (value != NULL) {
 		struct itimerspec config, old_config;
@@ -685,8 +685,8 @@ timerfd_create(clockid_t clockid)
 
 PUBLIC NONNULL((1)) void FCALL
 timerfd_settime(struct timerfd *__restrict self,
-                /*[0..1]*/ USER CHECKED struct itimerspec const *value,
-                /*[0..1]*/ USER CHECKED struct itimerspec *old_value)
+                /*[0..1]*/ NCX struct itimerspec const *value,
+                /*[0..1]*/ NCX struct itimerspec *old_value)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
 	if (value != NULL) {
 		struct itimerspec config, old_config;
@@ -780,7 +780,7 @@ timerfd_start_async_timeout_notifier(struct timerfd *__restrict self)
 DEFINE_HANDLE_REFCNT_FUNCTIONS(timerfd, struct timerfd);
 
 INTERN BLOCKING WUNUSED NONNULL((1)) size_t KCALL
-handle_timerfd_read(struct timerfd *__restrict self, USER CHECKED void *dst,
+handle_timerfd_read(struct timerfd *__restrict self, NCX void *dst,
                     size_t num_bytes, iomode_t mode) THROWS(...) {
 	uint64_t num_overruns;
 	if unlikely(num_bytes < 8) {
@@ -805,7 +805,7 @@ handle_timerfd_read(struct timerfd *__restrict self, USER CHECKED void *dst,
 
 INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_timerfd_ioctl(struct timerfd *__restrict self, ioctl_t cmd,
-                     USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+                     NCX UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	(void)mode;
 	switch (cmd) {
 
@@ -835,7 +835,7 @@ handle_timerfd_ioctl(struct timerfd *__restrict self, ioctl_t cmd,
 
 INTERN BLOCKING NONNULL((1)) void KCALL
 handle_timerfd_stat(struct timerfd *__restrict self,
-                    USER CHECKED struct stat *result) THROWS(...) {
+                    NCX struct stat *result) THROWS(...) {
 	struct timespec now;
 	struct timespec next_expire;
 	now = timer_getclocknow(&self->tfd_timer);
@@ -946,8 +946,8 @@ DEFINE_SYSCALL2(fd_t, timerfd_create,
 #ifdef __ARCH_WANT_SYSCALL_TIMERFD_SETTIME
 DEFINE_SYSCALL4(errno_t, timerfd_settime,
                 fd_t, fd, syscall_ulong_t, flags,
-                USER UNCHECKED struct itimerspec32 const *, p_new_config,
-                USER UNCHECKED struct itimerspec32 *, p_old_config) {
+                NCX UNCHECKED struct itimerspec32 const *, p_new_config,
+                NCX UNCHECKED struct itimerspec32 *, p_old_config) {
 	struct itimerspec new_config, old_config;
 	REF struct timerfd *self = handles_lookuptimerfd(fd);
 	FINALLY_DECREF_UNLIKELY(self);
@@ -984,8 +984,8 @@ DEFINE_SYSCALL4(errno_t, timerfd_settime,
 #ifdef __ARCH_WANT_SYSCALL_TIMERFD_SETTIME64
 DEFINE_SYSCALL4(errno_t, timerfd_settime64,
                 fd_t, fd, syscall_ulong_t, flags,
-                USER UNCHECKED struct itimerspec64 const *, p_new_config,
-                USER UNCHECKED struct itimerspec64 *, p_old_config) {
+                NCX UNCHECKED struct itimerspec64 const *, p_new_config,
+                NCX UNCHECKED struct itimerspec64 *, p_old_config) {
 	struct itimerspec new_config, old_config;
 	REF struct timerfd *self = handles_lookuptimerfd(fd);
 	FINALLY_DECREF_UNLIKELY(self);
@@ -1022,8 +1022,8 @@ DEFINE_SYSCALL4(errno_t, timerfd_settime64,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_TIMERFD_SETTIME
 DEFINE_COMPAT_SYSCALL4(errno_t, timerfd_settime,
                        fd_t, fd, syscall_ulong_t, flags,
-                       USER UNCHECKED struct compat_itimerspec32 const *, p_new_config,
-                       USER UNCHECKED struct compat_itimerspec32 *, p_old_config) {
+                       NCX UNCHECKED struct compat_itimerspec32 const *, p_new_config,
+                       NCX UNCHECKED struct compat_itimerspec32 *, p_old_config) {
 	struct itimerspec new_config, old_config;
 	REF struct timerfd *self = handles_lookuptimerfd(fd);
 	FINALLY_DECREF_UNLIKELY(self);
@@ -1060,8 +1060,8 @@ DEFINE_COMPAT_SYSCALL4(errno_t, timerfd_settime,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_TIMERFD_SETTIME64
 DEFINE_COMPAT_SYSCALL4(errno_t, timerfd_settime64,
                        fd_t, fd, syscall_ulong_t, flags,
-                       USER UNCHECKED struct compat_itimerspec64 const *, p_new_config,
-                       USER UNCHECKED struct compat_itimerspec64 *, p_old_config) {
+                       NCX UNCHECKED struct compat_itimerspec64 const *, p_new_config,
+                       NCX UNCHECKED struct compat_itimerspec64 *, p_old_config) {
 	struct itimerspec new_config, old_config;
 	REF struct timerfd *self = handles_lookuptimerfd(fd);
 	FINALLY_DECREF_UNLIKELY(self);
@@ -1097,7 +1097,7 @@ DEFINE_COMPAT_SYSCALL4(errno_t, timerfd_settime64,
 
 #ifdef __ARCH_WANT_SYSCALL_TIMERFD_GETTIME
 DEFINE_SYSCALL2(errno_t, timerfd_gettime,
-                fd_t, fd, USER UNCHECKED struct itimerspec32 *, p_config) {
+                fd_t, fd, NCX UNCHECKED struct itimerspec32 *, p_config) {
 	struct itimerspec config;
 	REF struct timerfd *self = handles_lookuptimerfd(fd);
 	FINALLY_DECREF_UNLIKELY(self);
@@ -1114,7 +1114,7 @@ DEFINE_SYSCALL2(errno_t, timerfd_gettime,
 
 #ifdef __ARCH_WANT_SYSCALL_TIMERFD_GETTIME64
 DEFINE_SYSCALL2(errno_t, timerfd_gettime64,
-                fd_t, fd, USER UNCHECKED struct itimerspec64 *, p_config) {
+                fd_t, fd, NCX UNCHECKED struct itimerspec64 *, p_config) {
 	struct itimerspec config;
 	REF struct timerfd *self = handles_lookuptimerfd(fd);
 	FINALLY_DECREF_UNLIKELY(self);
@@ -1131,7 +1131,7 @@ DEFINE_SYSCALL2(errno_t, timerfd_gettime64,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_TIMERFD_GETTIME
 DEFINE_COMPAT_SYSCALL2(errno_t, timerfd_gettime,
-                       fd_t, fd, USER UNCHECKED struct compat_itimerspec32 *, p_config) {
+                       fd_t, fd, NCX UNCHECKED struct compat_itimerspec32 *, p_config) {
 	struct itimerspec config;
 	REF struct timerfd *self = handles_lookuptimerfd(fd);
 	FINALLY_DECREF_UNLIKELY(self);
@@ -1148,7 +1148,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, timerfd_gettime,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_TIMERFD_GETTIME64
 DEFINE_COMPAT_SYSCALL2(errno_t, timerfd_gettime64,
-                       fd_t, fd, USER UNCHECKED struct compat_itimerspec64 *, p_config) {
+                       fd_t, fd, NCX UNCHECKED struct compat_itimerspec64 *, p_config) {
 	struct itimerspec config;
 	REF struct timerfd *self = handles_lookuptimerfd(fd);
 	FINALLY_DECREF_UNLIKELY(self);
@@ -1173,7 +1173,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, timerfd_gettime64,
 #ifdef __ARCH_WANT_SYSCALL_CLOCK_GETTIME
 DEFINE_SYSCALL2(errno_t, clock_gettime,
                 clockid_t, clockid,
-                USER UNCHECKED struct timespec32 *, res) {
+                NCX UNCHECKED struct timespec32 *, res) {
 	struct timespec ts;
 	struct clocktype const *ct;
 	validate_writable(res, sizeof(*res));
@@ -1189,7 +1189,7 @@ DEFINE_SYSCALL2(errno_t, clock_gettime,
 #ifdef __ARCH_WANT_SYSCALL_CLOCK_GETTIME_TIME64
 DEFINE_SYSCALL2(errno_t, clock_gettime_time64,
                 clockid_t, clockid,
-                USER UNCHECKED struct timespec64 *, res) {
+                NCX UNCHECKED struct timespec64 *, res) {
 	struct timespec ts;
 	struct clocktype const *ct;
 	validate_writable(res, sizeof(*res));
@@ -1205,7 +1205,7 @@ DEFINE_SYSCALL2(errno_t, clock_gettime_time64,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_CLOCK_GETTIME
 DEFINE_COMPAT_SYSCALL2(errno_t, clock_gettime,
                        clockid_t, clockid,
-                       USER UNCHECKED struct compat_timespec32 *, res) {
+                       NCX UNCHECKED struct compat_timespec32 *, res) {
 	struct timespec ts;
 	struct clocktype const *ct;
 	compat_validate_writable(res, sizeof(*res));
@@ -1221,7 +1221,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, clock_gettime,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_CLOCK_GETTIME_TIME64
 DEFINE_COMPAT_SYSCALL2(errno_t, clock_gettime_time64,
                        clockid_t, clockid,
-                       USER UNCHECKED struct compat_timespec64 *, res) {
+                       NCX UNCHECKED struct compat_timespec64 *, res) {
 	struct timespec ts;
 	struct clocktype const *ct;
 	compat_validate_writable(res, sizeof(*res));
@@ -1237,7 +1237,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, clock_gettime_time64,
 #ifdef __ARCH_WANT_SYSCALL_CLOCK_GETRES
 DEFINE_SYSCALL2(errno_t, clock_getres,
                 clockid_t, clockid,
-                USER UNCHECKED struct timespec32 *, res) {
+                NCX UNCHECKED struct timespec32 *, res) {
 	struct timespec ts;
 	struct clocktype const *ct;
 	validate_writable(res, sizeof(*res));
@@ -1253,7 +1253,7 @@ DEFINE_SYSCALL2(errno_t, clock_getres,
 #ifdef __ARCH_WANT_SYSCALL_CLOCK_GETRES_TIME64
 DEFINE_SYSCALL2(errno_t, clock_getres_time64,
                 clockid_t, clockid,
-                USER UNCHECKED struct timespec64 *, res) {
+                NCX UNCHECKED struct timespec64 *, res) {
 	struct timespec ts;
 	struct clocktype const *ct;
 	validate_writable(res, sizeof(*res));
@@ -1269,7 +1269,7 @@ DEFINE_SYSCALL2(errno_t, clock_getres_time64,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_CLOCK_GETRES
 DEFINE_COMPAT_SYSCALL2(errno_t, clock_getres,
                        clockid_t, clockid,
-                       USER UNCHECKED struct compat_timespec32 *, res) {
+                       NCX UNCHECKED struct compat_timespec32 *, res) {
 	struct timespec ts;
 	struct clocktype const *ct;
 	compat_validate_writable(res, sizeof(*res));
@@ -1285,7 +1285,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, clock_getres,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_CLOCK_GETRES_TIME64
 DEFINE_COMPAT_SYSCALL2(errno_t, clock_getres_time64,
                        clockid_t, clockid,
-                       USER UNCHECKED struct compat_timespec64 *, res) {
+                       NCX UNCHECKED struct compat_timespec64 *, res) {
 	struct timespec ts;
 	struct clocktype const *ct;
 	compat_validate_writable(res, sizeof(*res));
@@ -1374,16 +1374,16 @@ again_waitfor:
 #ifdef __ARCH_WANT_SYSCALL_CLOCK_NANOSLEEP
 PRIVATE NONNULL((1, 2)) void FCALL
 sys_clock_nanosleep_encode_remaining(void *arg, struct timespec const *__restrict remaining) {
-	USER CHECKED struct timespec32 *res;
-	res = (USER CHECKED struct timespec32 *)arg;
+	NCX struct timespec32 *res;
+	res = (NCX struct timespec32 *)arg;
 	res->tv_sec  = (typeof(res->tv_sec))remaining->tv_sec;
 	res->tv_nsec = (typeof(res->tv_nsec))remaining->tv_nsec;
 }
 
 DEFINE_SYSCALL4(errno_t, clock_nanosleep,
                 clockid_t, clockid, syscall_ulong_t, flags,
-                USER UNCHECKED struct timespec32 const *, requested_time,
-                USER UNCHECKED struct timespec32 *, remaining) {
+                NCX UNCHECKED struct timespec32 const *, requested_time,
+                NCX UNCHECKED struct timespec32 *, remaining) {
 	struct timespec req;
 	validate_readable(requested_time, sizeof(*requested_time));
 	validate_writable_opt(remaining, sizeof(*remaining));
@@ -1399,16 +1399,16 @@ DEFINE_SYSCALL4(errno_t, clock_nanosleep,
 #ifdef __ARCH_WANT_SYSCALL_CLOCK_NANOSLEEP_TIME64
 PRIVATE NONNULL((1, 2)) void FCALL
 sys_clock_nanosleep_time64_encode_remaining(void *arg, struct timespec const *__restrict remaining) {
-	USER CHECKED struct timespec64 *res;
-	res = (USER CHECKED struct timespec64 *)arg;
+	NCX struct timespec64 *res;
+	res = (NCX struct timespec64 *)arg;
 	res->tv_sec  = (typeof(res->tv_sec))remaining->tv_sec;
 	res->tv_nsec = (typeof(res->tv_nsec))remaining->tv_nsec;
 }
 
 DEFINE_SYSCALL4(errno_t, clock_nanosleep_time64,
                 clockid_t, clockid, syscall_ulong_t, flags,
-                USER UNCHECKED struct timespec64 const *, requested_time,
-                USER UNCHECKED struct timespec64 *, remaining) {
+                NCX UNCHECKED struct timespec64 const *, requested_time,
+                NCX UNCHECKED struct timespec64 *, remaining) {
 	struct timespec req;
 	validate_readable(requested_time, sizeof(*requested_time));
 	validate_writable_opt(remaining, sizeof(*remaining));
@@ -1424,16 +1424,16 @@ DEFINE_SYSCALL4(errno_t, clock_nanosleep_time64,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_CLOCK_NANOSLEEP
 PRIVATE NONNULL((1, 2)) void FCALL
 sys_clock_nanosleep_compat_encode_remaining(void *arg, struct timespec const *__restrict remaining) {
-	USER CHECKED struct compat_timespec32 *res;
-	res = (USER CHECKED struct compat_timespec32 *)arg;
+	NCX struct compat_timespec32 *res;
+	res = (NCX struct compat_timespec32 *)arg;
 	res->tv_sec  = (typeof(res->tv_sec))remaining->tv_sec;
 	res->tv_nsec = (typeof(res->tv_nsec))remaining->tv_nsec;
 }
 
 DEFINE_COMPAT_SYSCALL4(errno_t, clock_nanosleep,
                        clockid_t, clockid, syscall_ulong_t, flags,
-                       USER UNCHECKED struct compat_timespec32 const *, requested_time,
-                       USER UNCHECKED struct compat_timespec32 *, remaining) {
+                       NCX UNCHECKED struct compat_timespec32 const *, requested_time,
+                       NCX UNCHECKED struct compat_timespec32 *, remaining) {
 	struct timespec req;
 	compat_validate_readable(requested_time, sizeof(*requested_time));
 	compat_validate_writable_opt(remaining, sizeof(*remaining));
@@ -1449,16 +1449,16 @@ DEFINE_COMPAT_SYSCALL4(errno_t, clock_nanosleep,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_CLOCK_NANOSLEEP_TIME64
 PRIVATE NONNULL((1, 2)) void FCALL
 sys_clock_nanosleep_time64_compat_encode_remaining(void *arg, struct timespec const *__restrict remaining) {
-	USER CHECKED struct compat_timespec64 *res;
-	res = (USER CHECKED struct compat_timespec64 *)arg;
+	NCX struct compat_timespec64 *res;
+	res = (NCX struct compat_timespec64 *)arg;
 	res->tv_sec  = (typeof(res->tv_sec))remaining->tv_sec;
 	res->tv_nsec = (typeof(res->tv_nsec))remaining->tv_nsec;
 }
 
 DEFINE_COMPAT_SYSCALL4(errno_t, clock_nanosleep_time64,
                        clockid_t, clockid, syscall_ulong_t, flags,
-                       USER UNCHECKED struct compat_timespec64 const *, requested_time,
-                       USER UNCHECKED struct compat_timespec64 *, remaining) {
+                       NCX UNCHECKED struct compat_timespec64 const *, requested_time,
+                       NCX UNCHECKED struct compat_timespec64 *, remaining) {
 	struct timespec req;
 	compat_validate_readable(requested_time, sizeof(*requested_time));
 	compat_validate_writable_opt(remaining, sizeof(*remaining));

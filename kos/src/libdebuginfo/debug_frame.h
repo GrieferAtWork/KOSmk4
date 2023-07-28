@@ -36,10 +36,10 @@ DECL_BEGIN
  * written back to `*pdebug_frame_reader' after a previous call to `unwind_fde_load_df()'.
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-INTDEF NONNULL((1, 2, 3, 4)) unwind_errno_t
-NOTHROW_NCX(CC libdi_unwind_fde_load_df)(CHECKED byte_t const **__restrict pdebug_frame_reader,
-                                         CHECKED byte_t const *debug_frame_start,
-                                         CHECKED byte_t const *debug_frame_end,
+INTDEF NONNULL((1, 4)) unwind_errno_t
+NOTHROW_NCX(CC libdi_unwind_fde_load_df)(NCX byte_t const **__restrict pdebug_frame_reader,
+                                         NCX byte_t const *debug_frame_start,
+                                         NCX byte_t const *debug_frame_end,
                                          unwind_fde_t *__restrict result,
                                          uint8_t sizeof_address);
 
@@ -49,10 +49,10 @@ NOTHROW_NCX(CC libdi_unwind_fde_load_df)(CHECKED byte_t const **__restrict pdebu
  * @assume(!return || result->f_pcend > absolute_pc);
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `absolute_pc'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-INTDEF NONNULL((1, 2, 4)) unwind_errno_t
-NOTHROW_NCX(CC libdi_unwind_fde_scan_df)(CHECKED byte_t const *debug_frame_start,
-                                         CHECKED byte_t const *debug_frame_end,
-                                         CHECKED void const *absolute_pc,
+INTDEF NONNULL((4)) unwind_errno_t
+NOTHROW_NCX(CC libdi_unwind_fde_scan_df)(NCX byte_t const *debug_frame_start,
+                                         NCX byte_t const *debug_frame_end,
+                                         VIRT void const *absolute_pc,
                                          unwind_fde_t *__restrict result,
                                          uint8_t sizeof_address);
 

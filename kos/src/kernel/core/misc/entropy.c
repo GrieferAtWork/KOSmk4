@@ -268,7 +268,7 @@ NOTHROW(FCALL entropy_give_nopr)(void const *buf, size_t num_bits) {
  * either wait for data to become available, throw an  error
  * `E_WOULDBLOCK', or return `0' (under `IO_NODATAZERO') */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) size_t FCALL
-entropy_read(USER CHECKED void *buf, size_t num_bytes, iomode_t mode)
+entropy_read(NCX void *buf, size_t num_bytes, iomode_t mode)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
 	size_t result = 0;
 	byte_t temp_buf[64];
@@ -301,7 +301,7 @@ entropy_read(USER CHECKED void *buf, size_t num_bytes, iomode_t mode)
 		}
 
 		/* Copy data into userspace. */
-		buf = (USER CHECKED byte_t *)mempcpy(buf, temp_buf, take_bytes);
+		buf = (NCX byte_t *)mempcpy(buf, temp_buf, take_bytes);
 		num_bytes -= take_bytes;
 		result += take_bytes;
 	}
@@ -313,7 +313,7 @@ entropy_read(USER CHECKED void *buf, size_t num_bytes, iomode_t mode)
  * potentially  waiting until enough entropy has been generated
  * before returning. */
 PUBLIC NOBLOCK NONNULL((1)) void FCALL
-entropy_readall(USER CHECKED void *buf, size_t num_bytes)
+entropy_readall(NCX void *buf, size_t num_bytes)
 		THROWS(E_WOULDBLOCK, E_INTERRUPT, E_SEGFAULT) {
 	while (num_bytes) {
 		size_t ok;
@@ -330,7 +330,7 @@ entropy_readall(USER CHECKED void *buf, size_t num_bytes)
  * This function uses a  PRNG which may be  seeded at random points  in
  * time (but at least once during boot) to generate numbers. */
 PUBLIC NOBLOCK NONNULL((1)) void FCALL
-urandom_read(USER CHECKED void *buf, size_t num_bytes)
+urandom_read(NCX void *buf, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
 	while (num_bytes >= 4) {
 		u32 val = krand32();
@@ -353,7 +353,7 @@ urandom_read(USER CHECKED void *buf, size_t num_bytes)
 
 /* Define the primary entropy-related system call. */
 DEFINE_SYSCALL3(ssize_t, getrandom,
-                USER UNCHECKED void *, buf, size_t, num_bytes,
+                NCX UNCHECKED void *, buf, size_t, num_bytes,
                 syscall_ulong_t, flags) {
 	ssize_t result;
 

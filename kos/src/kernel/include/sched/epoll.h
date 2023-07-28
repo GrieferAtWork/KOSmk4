@@ -230,7 +230,7 @@ FUNDEF NONNULL((1, 2)) bool KCALL
 epoll_controller_addmonitor(struct epoll_controller *__restrict self,
                             struct handle const *__restrict hand,
                             uint32_t fd_key,
-                            USER CHECKED struct epoll_event const *info)
+                            NCX struct epoll_event const *info)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT,
 		       E_ILLEGAL_REFERENCE_LOOP);
 
@@ -267,7 +267,7 @@ FUNDEF NONNULL((1, 2)) bool KCALL
 epoll_controller_modmonitor(struct epoll_controller *__restrict self,
                             struct handle const *__restrict hand,
                             uint32_t fd_key,
-                            USER CHECKED struct epoll_event const *info)
+                            NCX struct epoll_event const *info)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT);
 
 /* Delete the monitor for `hand:fd_key' within the given epoll controller.
@@ -301,7 +301,7 @@ epoll_controller_delmonitor(struct epoll_controller *__restrict self,
  *              monitor becomes raised, `self->ec_avail' will be send. */
 FUNDEF NONNULL((1)) size_t KCALL
 epoll_controller_trywait(struct epoll_controller *__restrict self,
-                         USER CHECKED struct epoll_event *events,
+                         NCX struct epoll_event *events,
                          size_t maxevents)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT);
 
@@ -314,7 +314,7 @@ epoll_controller_trywait(struct epoll_controller *__restrict self,
  * `epoll_controller_trywait()') */
 FUNDEF BLOCKING NONNULL((1)) size_t KCALL
 epoll_controller_wait(struct epoll_controller *__restrict self,
-                      USER CHECKED struct epoll_event *events,
+                      NCX struct epoll_event *events,
                       size_t maxevents,
                       ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT);
@@ -327,7 +327,7 @@ typedef struct __sigset_struct sigset_t;
 
 FUNDEF NONNULL((1, 4)) size_t KCALL
 epoll_controller_wait_with_sigmask(struct epoll_controller *__restrict self,
-                                   USER CHECKED struct epoll_event *events,
+                                   NCX struct epoll_event *events,
                                    size_t maxevents,
                                    sigset_t const *__restrict sigmask,
                                    ktime_t abs_timeout DFL(KTIME_INFINITE))

@@ -58,7 +58,7 @@ __DECL_BEGIN
 
 typedef __ATTR_INS_T(2, 3) __SSIZE_TYPE__
 (__WFORMATPRINTER_CC *__pwformatprinter)(void *__arg,
-                                         __CHECKED __WCHAR_TYPE__ const *__restrict __data,
+                                         __NCX __WCHAR_TYPE__ const *__restrict __data,
                                          __SIZE_TYPE__ __datalen);
 
 __DECL_END

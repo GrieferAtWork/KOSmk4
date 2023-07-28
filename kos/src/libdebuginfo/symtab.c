@@ -55,16 +55,16 @@ DECL_BEGIN
  * @return: NULL: All defined symbols have an address > module_relative_pc
  * @return: NULL: The given symbol table is empty, too small, or corrupted.
  * @return: NULL: The given `symtab_entsize' is neither `sizeof(Elf32_Sym)', nor `sizeof(Elf64_Sym)' */
-INTERN TEXTSECTION ATTR_PURE WUNUSED CHECKED byte_t const *
-NOTHROW_NCX(CC libdi_symtab_scantable)(CHECKED byte_t const *symtab_start,
-                                       CHECKED byte_t const *symtab_end,
+INTERN TEXTSECTION ATTR_PURE WUNUSED NCX byte_t const *
+NOTHROW_NCX(CC libdi_symtab_scantable)(NCX byte_t const *symtab_start,
+                                       NCX byte_t const *symtab_end,
                                        size_t symtab_entsize,
                                        uintptr_t module_relative_pc) {
-	CHECKED byte_t const *result;
+	NCX byte_t const *result;
 	if (symtab_start >= symtab_end)
 		goto done_null;
 	if (symtab_entsize == sizeof(Elf32_Sym)) {
-		CHECKED Elf32_Sym const *iter;
+		NCX Elf32_Sym const *iter;
 		Elf32_Addr result_value;
 		symtab_end -= (sizeof(Elf32_Sym) - 1);
 		for (iter = (Elf32_Sym const *)symtab_start;
@@ -101,7 +101,7 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(CHECKED byte_t const *symtab_start,
 			}
 		}
 	} else if (symtab_entsize == sizeof(Elf64_Sym)) {
-		CHECKED Elf64_Sym const *iter;
+		NCX Elf64_Sym const *iter;
 		Elf64_Addr result_value;
 		symtab_end -= (sizeof(Elf64_Sym) - 1);
 		for (iter = (Elf64_Sym const *)symtab_start;

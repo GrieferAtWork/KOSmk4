@@ -146,7 +146,7 @@ nic_packetlist_reserve(struct nic_packetlist *__restrict self,
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct nic_packet *KCALL
 nic_packetlist_newpacket(struct nic_packetlist *__restrict self,
                          struct nicdev const *__restrict dev,
-                         USER CHECKED void const *payload, size_t payload_size,
+                         NCX void const *payload, size_t payload_size,
                          size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC) {
 	REF struct nic_packet *packet;

@@ -63,7 +63,7 @@ struct cvalue_cfiexpr {
 	uint8_t                 v_addrsize;          /* == di_debuginfo_cu_simple_parser_t::dsp_addrsize */
 	uint8_t                 v_ptrsize;           /* == di_debuginfo_cu_simple_parser_t::dsp_ptrsize */
 	bool                    v_gotaddr;           /* True if `v_objaddr' is valid. */
-	CHECKED void           *v_objaddr;           /* [?..?] Object address (or `NULL' when `!v_gotaddr'). */
+	NCX void               *v_objaddr;           /* [?..?] Object address (or `NULL' when `!v_gotaddr'). */
 };
 
 
@@ -92,9 +92,9 @@ struct cvalue {
 	struct ctyperef cv_type; /* Value type. */
 	uintptr_t       cv_kind; /* Value kind (one of `CVALUE_KIND_*') */
 	union {
-		USER void *cv_addr;                         /* [valid_if(CVALUE_KIND_ADDR)] In-memory address of this value. */
-		byte_t    *cv_data;                         /* [valid_if(CVALUE_KIND_DATA)][1..1][owned] In-line data. */
-		byte_t     cv_idata[CVALUE_INLINE_MAXSIZE]; /* [valid_if(CVALUE_KIND_IDATA)] In-line data. */
+		NCX void   *cv_addr;                         /* [valid_if(CVALUE_KIND_ADDR)] In-memory address of this value. */
+		byte_t     *cv_data;                         /* [valid_if(CVALUE_KIND_DATA)][1..1][owned] In-line data. */
+		byte_t      cv_idata[CVALUE_INLINE_MAXSIZE]; /* [valid_if(CVALUE_KIND_IDATA)] In-line data. */
 
 		struct {
 			struct cvalue_cfiexpr v_expr;   /* CFI expression. */
@@ -165,14 +165,14 @@ DATDEF __BOOL cexpr_forcewrite;
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOMEM: Insufficient memory. */
 FUNDEF NONNULL((1)) dbx_errno_t /* Push `*(typ *)addr' */
-NOTHROW(FCALL cexpr_pushaddr)(struct ctyperef const *__restrict typ, USER void *addr);
+NOTHROW(FCALL cexpr_pushaddr)(struct ctyperef const *__restrict typ, NCX void *addr);
 FUNDEF NONNULL((1, 2)) dbx_errno_t /* Push a CFI expression. */
 NOTHROW(FCALL cexpr_pushexpr)(struct ctyperef const *__restrict typ,
                               struct cvalue_cfiexpr const *__restrict expr,
                               size_t buflen, size_t bufoff);
 FUNDEF NONNULL((1)) dbx_errno_t /* Push `(typ)(*(typ const *)data)' */
 NOTHROW_NCX(FCALL cexpr_pushdata)(struct ctyperef const *__restrict typ,
-                                  CHECKED void const *data);
+                                  NCX void const *data);
 FUNDEF NONNULL((1)) dbx_errno_t /* Push `(typ)value' */
 NOTHROW(FCALL cexpr_pushint)(struct ctyperef const *__restrict typ,
                              __UINTMAX_TYPE__ value);
@@ -187,10 +187,10 @@ NOTHROW(FCALL cexpr_pushregister_by_id)(cpu_regno_t regno);
 /* Same as above, but only require basic typ
  * information (typ flags, and name are pushed as 0/NULL) */
 FUNDEF NONNULL((1)) dbx_errno_t /* Push `*(typ *)addr' */
-NOTHROW(FCALL cexpr_pushaddr_simple)(struct ctype *__restrict typ, USER void *addr);
+NOTHROW(FCALL cexpr_pushaddr_simple)(struct ctype *__restrict typ, NCX void *addr);
 FUNDEF NONNULL((1)) dbx_errno_t /* Push `(typ)(*(typ const *)data)' */
 NOTHROW_NCX(FCALL cexpr_pushdata_simple)(struct ctype *__restrict typ,
-                                         CHECKED void const *data);
+                                         NCX void const *data);
 FUNDEF NONNULL((1)) dbx_errno_t /* Push `(typ)value' */
 NOTHROW(FCALL cexpr_pushint_simple)(struct ctype *__restrict typ,
                                     __UINTMAX_TYPE__ value);
@@ -238,7 +238,7 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_rrot)(size_t n);
  * @return: DBX_EINTERN: Internal error. */
 FUNDEF WUNUSED NONNULL((1, 2)) dbx_errno_t
 NOTHROW(FCALL cexpr_getdata_ex)(struct cvalue *__restrict self,
-                                CHECKED byte_t **__restrict presult);
+                                NCX byte_t **__restrict presult);
 
 /* Return the actual size of the given `self' stack element. (s.a. `ctype_sizeof()') */
 #define cexpr_getsize_ex(self) ctype_sizeof((self)->cv_type.ct_typ)
@@ -305,7 +305,7 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_promote)(void);
  * @return: DBX_ESYNTAX: The C expression stack top-element isn't a struct/union.
  * @return: DBX_ENOENT:  The given `name' doesn't name a member of the top-element struct. */
 FUNDEF NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL cexpr_field)(CHECKED char const *name, size_t namelen);
+NOTHROW_NCX(FCALL cexpr_field)(NCX char const *name, size_t namelen);
 
 /* Ref/Deref the c-expression-stack top element.
  * @return: DBX_EOK:     Success.
@@ -400,7 +400,7 @@ FUNDEF NONNULL((1)) dbx_errno_t
 NOTHROW_NCX(FCALL cexpr_pushsymbol)(struct cmodsyminfo *__restrict sym,
                                     __BOOL automatic_symbol_addend DFL(1));
 FUNDEF NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL cexpr_pushsymbol_byname)(CHECKED char const *name, size_t namelen,
+NOTHROW_NCX(FCALL cexpr_pushsymbol_byname)(NCX char const *name, size_t namelen,
                                            __BOOL automatic_symbol_addend DFL(1));
 
 /* Push a register with its native typing, given its `name'
@@ -408,7 +408,7 @@ NOTHROW_NCX(FCALL cexpr_pushsymbol_byname)(CHECKED char const *name, size_t name
  * @return: DBX_ENOMEM: Insufficient memory.
  * @return: DBX_ENOENT: No register matches the given `name' */
 FUNDEF NONNULL((1)) dbx_errno_t
-NOTHROW_NCX(FCALL cexpr_pushregister)(CHECKED char const *name, size_t namelen);
+NOTHROW_NCX(FCALL cexpr_pushregister)(NCX char const *name, size_t namelen);
 
 
 /* Arch-specific handler to perform a function call to a C function

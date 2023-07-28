@@ -55,7 +55,7 @@ DECL_BEGIN
  * sizes to be included alongside the payload. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
 nicdev_newpacket(struct nicdev const *__restrict self,
-                     USER CHECKED void const *payload, size_t payload_size,
+                     NCX void const *payload, size_t payload_size,
                      size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC) {
 	REF struct nic_packet *result;
@@ -181,7 +181,7 @@ nicdev_send_background(struct nicdev *__restrict self,
 /* Default write-operator for NIC devices. */
 PUBLIC NONNULL((1)) size_t KCALL
 nicdev_v_write(struct mfile *__restrict self,
-               USER CHECKED void const *src,
+               NCX void const *src,
                size_t num_bytes, iomode_t UNUSED(mode))
 		THROWS(...) {
 	struct nicdev *me = mfile_asnic(self);

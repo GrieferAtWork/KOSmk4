@@ -86,8 +86,8 @@ __LOCAL __NOPREEMPT __ATTR_NONNULL((1)) void __NOTHROW(atomic_lock_waitfor_nopr)
 #define atomic_lock_acquire(self) atomic_lock_acquire_nopr(self)
 #define atomic_lock_waitfor(self) atomic_lock_waitfor_nopr(self)
 #else /* __HYBRID_PREEMPTION_TRYYIELD_IS_HYBRID_YIELD */
-__LOCAL __ATTR_NONNULL((1)) void (atomic_lock_acquire)(struct atomic_lock *__restrict __self);
-__LOCAL __ATTR_NONNULL((1)) void (atomic_lock_waitfor)(struct atomic_lock *__restrict __self);
+__LOCAL __ATTR_NONNULL((1)) void (atomic_lock_acquire)(struct atomic_lock *__restrict __self) __THROWS(E_WOULDBLOCK_PREEMPTED);
+__LOCAL __ATTR_NONNULL((1)) void (atomic_lock_waitfor)(struct atomic_lock *__restrict __self) __THROWS(E_WOULDBLOCK_PREEMPTED);
 #endif /* !__HYBRID_PREEMPTION_TRYYIELD_IS_HYBRID_YIELD */
 
 #define atomic_lock_release_nopr atomic_lock_release

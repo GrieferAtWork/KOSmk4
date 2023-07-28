@@ -84,7 +84,7 @@ NOTHROW(KCALL constdirenum_v_fini)(struct fdirenum *__restrict UNUSED(self)) {
 }
 
 PUBLIC NONNULL((1)) size_t KCALL
-constdirenum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+constdirenum_v_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                        size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(...) {
 	size_t index;

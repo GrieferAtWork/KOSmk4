@@ -44,7 +44,7 @@ DECL_BEGIN
 /* Default operators for `struct fdirnode_ops' */
 PUBLIC NONNULL((1)) void KCALL /* Writes `0' into `st_size' and `st_blocks' */
 printnode_v_stat(struct mfile *__restrict UNUSED(self),
-                 USER CHECKED struct stat *result)
+                 NCX struct stat *result)
 		THROWS(E_SEGFAULT) {
 	result->st_size   = 0;
 	result->st_blocks = 0;
@@ -52,9 +52,9 @@ printnode_v_stat(struct mfile *__restrict UNUSED(self),
 
 
 struct vprinter_data {
-	USER CHECKED byte_t *vpd_buf; /* [?..?] Destination buffer. */
-	size_t               vpd_siz; /* Remaining buffer space. */
-	pos_t                vpd_pos; /* # of leading bytes to skip. */
+	NCX byte_t *vpd_buf; /* [?..?] Destination buffer. */
+	size_t      vpd_siz; /* Remaining buffer space. */
+	pos_t       vpd_pos; /* # of leading bytes to skip. */
 };
 
 PRIVATE NONNULL((1)) ssize_t FORMATPRINTER_CC
@@ -85,7 +85,7 @@ vprinter_cb(void *arg, char const *__restrict data, size_t datalen) {
 
 
 PUBLIC BLOCKING WUNUSED NONNULL((1)) size_t KCALL /* Populates `dst' via `pno_print' */
-printnode_v_pread(struct mfile *__restrict self, USER CHECKED void *dst,
+printnode_v_pread(struct mfile *__restrict self, NCX void *dst,
                   size_t num_bytes, pos_t addr, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, ...) {
 	struct vprinter_data data;
@@ -95,7 +95,7 @@ printnode_v_pread(struct mfile *__restrict self, USER CHECKED void *dst,
 	ops = printnode_getops(me);
 
 	/* Fill in printer data. */
-	data.vpd_buf = (USER CHECKED byte_t *)dst;
+	data.vpd_buf = (NCX byte_t *)dst;
 	data.vpd_siz = num_bytes;
 	data.vpd_pos = addr;
 

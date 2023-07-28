@@ -262,7 +262,7 @@ PUBLIC BLOCKING void KCALL fsuper_syncall(void)
  * @return: false: `self' doesn't have a volume label. */
 PUBLIC BLOCKING WUNUSED NONNULL((1)) bool KCALL
 fsuper_getlabel(struct fsuper *__restrict self,
-                USER CHECKED char buf[FSLABEL_MAX])
+                NCX char buf[FSLABEL_MAX])
 		THROWS(E_IOERROR, E_SEGFAULT, ...) {
 	struct fsuper_ops const *ops = fsuper_getops(self);
 	if (ops->so_getlabel != NULL)
@@ -286,7 +286,7 @@ fsuper_getlabel(struct fsuper *__restrict self,
  * @throws: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG:namelen: [...] */
 PUBLIC BLOCKING WUNUSED NONNULL((1)) bool KCALL
 fsuper_setlabel(struct fsuper *__restrict self,
-                USER CHECKED char const *name, size_t namelen)
+                NCX char const *name, size_t namelen)
 		THROWS(E_IOERROR, E_FSERROR_READONLY, E_SEGFAULT,
 		       E_INVALID_ARGUMENT_BAD_VALUE, ...) {
 	struct fsuper_ops const *ops = fsuper_getops(self);
@@ -756,7 +756,7 @@ NOTHROW(FCALL fsuper_delete_impl)(REF struct fsuper *__restrict self) {
 /* Gather information about the filesystem and store that information in `*result' */
 PUBLIC BLOCKING NONNULL((1)) void FCALL
 fsuper_statfs(struct fsuper *__restrict self,
-              USER CHECKED struct statfs *result)
+              NCX struct statfs *result)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	struct fsuper_ops const *ops = fsuper_getops(self);
 

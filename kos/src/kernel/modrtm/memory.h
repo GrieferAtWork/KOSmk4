@@ -208,7 +208,7 @@ NOTHROW(FCALL rtm_memory_fini)(struct rtm_memory *__restrict self);
  * @throw: E_SEGFAULT: Faulty `addr', or `addr' points into a VIO mapping.
  * @throw: E_BADALLOC: Not enough memory, or `rtm_memory_limit' has been reached. */
 INTDEF NONNULL((1, 3)) void FCALL
-rtm_memory_read(struct rtm_memory *__restrict self, USER void const *addr,
+rtm_memory_read(struct rtm_memory *__restrict self, NCX void const *addr,
                 void *__restrict buf, size_t num_bytes)
 		THROWS(E_BADALLOC, E_SEGFAULT);
 
@@ -216,7 +216,7 @@ rtm_memory_read(struct rtm_memory *__restrict self, USER void const *addr,
  * @throw: E_SEGFAULT: Faulty `addr', or `addr' points into a VIO mapping.
  * @throw: E_BADALLOC: Not enough memory, or `rtm_memory_limit' has been reached. */
 INTDEF NONNULL((1, 3)) void FCALL
-rtm_memory_write(struct rtm_memory *__restrict self, USER void *addr,
+rtm_memory_write(struct rtm_memory *__restrict self, NCX void *addr,
                  void const *__restrict buf, size_t num_bytes)
 		THROWS(E_BADALLOC, E_SEGFAULT);
 
@@ -266,7 +266,7 @@ rtm_memory_apply(struct rtm_memory const *__restrict self);
 INTDEF NONNULL((1)) void FCALL
 rtm_memory_schedule_sys_syslog(struct rtm_memory *__restrict self,
                                syscall_ulong_t level,
-                               USER char const *str, size_t len);
+                               NCX char const *str, size_t len);
 #define rtm_sys_syslog(mem, level, str, len) \
 	(rtm_memory_schedule_sys_syslog(mem, level, str, len), (ssize_t)(len))
 #endif /* CONFIG_MODRTM_PENDING_SYSTEM_CALLS */

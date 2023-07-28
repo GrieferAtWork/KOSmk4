@@ -125,8 +125,8 @@ rpc_syscall_info_get32_sysenter_icpustate(struct rpc_syscall_info *__restrict se
 	self->rsi_regs[3] = gpregs_getpsi(&state->ics_gpregs);
 	regcount = kernel_syscall32_regcnt(self->rsi_sysno);
 	if (regcount >= 5) {
-		USER u32 *ebp;
-		ebp = (USER u32 *)(uintptr_t)(u32)gpregs_getpbp(&state->ics_gpregs);
+		NCX u32 *ebp;
+		ebp = (NCX u32 *)(uintptr_t)(u32)gpregs_getpbp(&state->ics_gpregs);
 		validate_readable(ebp, 4);
 		self->rsi_regs[4] = __hybrid_atomic_load(&ebp[0], __ATOMIC_ACQUIRE);
 		self->rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(4);
@@ -188,9 +188,9 @@ rpc_syscall_info_get32_cdecl_icpustate(struct rpc_syscall_info *__restrict self,
 	self->rsi_sysno = sysno;
 	regcount = kernel_syscall32_regcnt(sysno);
 	if (regcount) {
-		USER u32 *esp;
+		NCX u32 *esp;
 		unsigned int i;
-		esp = (USER u32 *)(uintptr_t)(u32)icpustate_getuserpsp(state);
+		esp = (NCX u32 *)(uintptr_t)(u32)icpustate_getuserpsp(state);
 		validate_readable(esp, (size_t)regcount * 4);
 		for (i = 0; i < regcount; ++i) {
 			self->rsi_regs[i] = __hybrid_atomic_load(&esp[i], __ATOMIC_ACQUIRE);
@@ -209,13 +209,13 @@ NOTHROW(FCALL rpc_syscall_info_get32_lcall7_ucpustate_nx)(struct rpc_syscall_inf
 	/* NOTE: By  being  a program  counter from  user-space, PC
 	 *       is  implicitly checked by the fact that user-space
 	 *       will have invoked the instruction from user-space. */
-	USER CHECKED byte_t const *pc;
+	NCX byte_t const *pc;
 	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_LCALL7_32;
 	if (ucpustate_getpflags(state) & EFLAGS_DF)
 		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	self->rsi_sysno = gpregs_getpax(&state->ucs_gpregs);
 	/* lcall $7, $? -- { 0x9a, ?, ?, ?, ?, 0x07, 0x00 } */
-	pc = (USER CHECKED byte_t const *)ucpustate_getpc(state);
+	pc = (NCX byte_t const *)ucpustate_getpc(state);
 	if (__hybrid_unaligned_getle8(pc - 7) == 0x9a &&
 		__hybrid_unaligned_getle16(pc - 2) == 0x0007) {
 		/* This really is an lcall7 instruction */
@@ -226,8 +226,8 @@ NOTHROW(FCALL rpc_syscall_info_get32_lcall7_ucpustate_nx)(struct rpc_syscall_inf
 	}
 	argc = kernel_syscall32_regcnt(self->rsi_sysno);
 	if (argc != 0) {
-		USER UNCHECKED u32 const *sp;
-		sp = (USER UNCHECKED u32 const *)gpregs_getpsp(&state->ucs_gpregs);
+		NCX UNCHECKED u32 const *sp;
+		sp = (NCX UNCHECKED u32 const *)gpregs_getpsp(&state->ucs_gpregs);
 #ifndef __INTELLISENSE__
 		if (ADDR_ISUSER(sp)) {
 			NESTED_TRY {

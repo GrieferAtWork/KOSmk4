@@ -222,7 +222,7 @@ ttydev_v_raise(struct terminal *__restrict self,
 /* Default tty operators. */
 PUBLIC NONNULL((1)) size_t KCALL
 ttydev_v_read(struct mfile *__restrict self,
-              USER CHECKED void *dst,
+              NCX void *dst,
               size_t num_bytes, iomode_t mode) THROWS(...) {
 	size_t result;
 	struct ttydev *me = mfile_astty(self);
@@ -235,7 +235,7 @@ ttydev_v_read(struct mfile *__restrict self,
 
 PUBLIC NONNULL((1)) size_t KCALL
 ttydev_v_write(struct mfile *__restrict self,
-               USER CHECKED void const *src,
+               NCX void const *src,
                size_t num_bytes, iomode_t mode) THROWS(...) {
 	ssize_t result;
 	struct ttydev *me = mfile_astty(self);
@@ -317,8 +317,8 @@ done_caller_grp:
 
 
 PRIVATE NONNULL((1, 2)) void KCALL
-termios_to_termios2(USER CHECKED struct termios2 *__restrict dst,
-                    USER CHECKED struct termios const *__restrict src) {
+termios_to_termios2(NCX struct termios2 *__restrict dst,
+                    NCX struct termios const *__restrict src) {
 	dst->c_iflag = src->c_iflag;
 	dst->c_oflag = src->c_oflag;
 	dst->c_cflag = src->c_cflag;
@@ -333,8 +333,8 @@ termios_to_termios2(USER CHECKED struct termios2 *__restrict dst,
 }
 
 PRIVATE NONNULL((1, 2)) void KCALL
-termios2_to_termios(USER CHECKED struct termios *__restrict dst,
-                    USER CHECKED struct termios2 const *__restrict src) {
+termios2_to_termios(NCX struct termios *__restrict dst,
+                    NCX struct termios2 const *__restrict src) {
 	dst->c_iflag = src->c_iflag;
 	dst->c_oflag = src->c_oflag;
 	dst->c_cflag = src->c_cflag;
@@ -350,8 +350,8 @@ termios2_to_termios(USER CHECKED struct termios *__restrict dst,
 }
 
 PRIVATE NONNULL((1, 2)) void KCALL
-termios_to_termio(USER CHECKED struct termio *__restrict dst,
-                  USER CHECKED struct termios const *__restrict src) {
+termios_to_termio(NCX struct termio *__restrict dst,
+                  NCX struct termios const *__restrict src) {
 	dst->c_iflag = (u16)src->c_iflag;
 	dst->c_oflag = (u16)src->c_oflag;
 	dst->c_cflag = (u16)src->c_cflag;
@@ -364,8 +364,8 @@ termios_to_termio(USER CHECKED struct termio *__restrict dst,
 }
 
 PRIVATE NONNULL((1, 2)) void KCALL
-termio_to_termios(USER CHECKED struct termios *__restrict dst,
-                  USER CHECKED struct termio const *__restrict src) {
+termio_to_termios(NCX struct termios *__restrict dst,
+                  NCX struct termio const *__restrict src) {
 	dst->c_iflag = src->c_iflag;
 	dst->c_oflag = src->c_oflag;
 	dst->c_cflag = src->c_cflag;
@@ -381,8 +381,8 @@ termio_to_termios(USER CHECKED struct termios *__restrict dst,
 }
 
 PRIVATE NONNULL((1, 2)) void KCALL
-termios_to_termiox(USER CHECKED struct termiox *__restrict dst,
-                   USER CHECKED struct termios const *__restrict src) {
+termios_to_termiox(NCX struct termiox *__restrict dst,
+                   NCX struct termios const *__restrict src) {
 	/* I have no idea if this flag-mapping is even correct... */
 	dst->x_hflag = (u16)src->c_iflag;
 	dst->x_cflag = (u16)src->c_oflag;
@@ -394,8 +394,8 @@ termios_to_termiox(USER CHECKED struct termiox *__restrict dst,
 }
 
 PRIVATE NONNULL((1, 2)) void KCALL
-termiox_to_termios(USER CHECKED struct termios *__restrict dst,
-                   USER CHECKED struct termiox const *__restrict src) {
+termiox_to_termios(NCX struct termios *__restrict dst,
+                   NCX struct termiox const *__restrict src) {
 	dst->c_iflag = src->x_hflag;
 	dst->c_oflag = src->x_cflag;
 	dst->c_lflag = src->x_sflag;
@@ -417,7 +417,7 @@ termiox_to_termios(USER CHECKED struct termios *__restrict dst,
 /* @return: -EINVAL: Unsupported `cmd' */
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 _ttydev_tryioctl(struct mfile *__restrict self, ioctl_t cmd,
-                 USER UNCHECKED void *arg, iomode_t UNUSED(mode)) THROWS(...) {
+                 NCX UNCHECKED void *arg, iomode_t UNUSED(mode)) THROWS(...) {
 	struct ttydev *me = mfile_astty(self);
 	assert(mfile_istty(self));
 	switch (cmd) {
@@ -428,7 +428,7 @@ _ttydev_tryioctl(struct mfile *__restrict self, ioctl_t cmd,
 	case _IO_WITHTYPE(TCGETS, struct termio) | _IOC_OUT:
 		validate_writable(arg, sizeof(struct termio));
 		COMPILER_WRITE_BARRIER();
-		termios_to_termio((USER CHECKED struct termio *)arg, &me->t_term.t_ios);
+		termios_to_termio((NCX struct termio *)arg, &me->t_term.t_ios);
 		return 0;
 
 	case TCSETS:
@@ -446,7 +446,7 @@ _ttydev_tryioctl(struct mfile *__restrict self, ioctl_t cmd,
 		struct termios new_io;
 		validate_readable(arg, sizeof(struct termio));
 		COMPILER_READ_BARRIER();
-		termio_to_termios(&new_io, (USER CHECKED struct termio *)arg);
+		termio_to_termios(&new_io, (NCX struct termio *)arg);
 		COMPILER_READ_BARRIER();
 		/* DRIVER: if (cmd != TCSETS) WAIT_FOR_UNWRITTEN_DATA_TO_BE_TRANSMITTED(); */
 		if (_IOC_NR(cmd) == _IOC_NR(TCSETSW)) /* Clear the input buffer */
@@ -493,7 +493,7 @@ _ttydev_tryioctl(struct mfile *__restrict self, ioctl_t cmd,
 	case TCGETS2: {
 		validate_writable(arg, sizeof(struct termios2));
 		COMPILER_WRITE_BARRIER();
-		termios_to_termios2((USER CHECKED struct termios2 *)arg, &me->t_term.t_ios);
+		termios_to_termios2((NCX struct termios2 *)arg, &me->t_term.t_ios);
 		return 0;
 	}	break;
 
@@ -503,7 +503,7 @@ _ttydev_tryioctl(struct mfile *__restrict self, ioctl_t cmd,
 		struct termios new_io;
 		validate_readable(arg, sizeof(struct termios2));
 		COMPILER_READ_BARRIER();
-		termios2_to_termios(&new_io, (USER CHECKED struct termios2 *)arg);
+		termios2_to_termios(&new_io, (NCX struct termios2 *)arg);
 		COMPILER_READ_BARRIER();
 		/* DRIVER: if (cmd != TCSETS2) WAIT_FOR_UNWRITTEN_DATA_TO_BE_TRANSMITTED(); */
 		if (cmd == TCSETSW2) /* Clear the input buffer */
@@ -689,7 +689,7 @@ again_TIOCNOTTY:
 	case _IO_WITHTYPE(TCGETX, struct termiox) | _IOC_OUT:
 		validate_writable(arg, sizeof(struct termiox));
 		COMPILER_WRITE_BARRIER();
-		termios_to_termiox((USER CHECKED struct termiox *)arg, &me->t_term.t_ios);
+		termios_to_termiox((NCX struct termiox *)arg, &me->t_term.t_ios);
 		return 0;
 
 	case TCSETX:
@@ -707,7 +707,7 @@ again_TIOCNOTTY:
 		struct termios new_io;
 		validate_readable(arg, sizeof(struct termiox));
 		COMPILER_READ_BARRIER();
-		termiox_to_termios(&new_io, (USER CHECKED struct termiox *)arg);
+		termiox_to_termios(&new_io, (NCX struct termiox *)arg);
 		COMPILER_READ_BARRIER();
 		/* DRIVER: if (cmd != TCSETS) WAIT_FOR_UNWRITTEN_DATA_TO_BE_TRANSMITTED(); */
 		if (_IOC_NR(cmd) == _IOC_NR(TCSETXF)) /* Clear the input buffer */
@@ -939,7 +939,7 @@ again_TIOCNOTTY:
 
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 ttydev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-               USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+               NCX UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	syscall_slong_t result;
 	result = _ttydev_tryioctl(self, cmd, arg, mode);
 	if (result == -EINVAL)
@@ -983,7 +983,7 @@ ttydev_v_polltest(struct mfile *__restrict self,
 
 PUBLIC NONNULL((1)) void KCALL
 ttydev_v_stat(struct mfile *__restrict self,
-              USER CHECKED struct stat *result) THROWS(...) {
+              NCX struct stat *result) THROWS(...) {
 	struct ttydev *me = mfile_astty(self);
 	assert(mfile_istty(self));
 

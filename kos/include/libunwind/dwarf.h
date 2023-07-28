@@ -60,27 +60,27 @@ __DECL_BEGIN
 typedef __intptr_t  dwarf_sleb128_t;
 typedef __uintptr_t dwarf_uleb128_t;
 
-/* Decode a signed/unsigned LEB128 integer and advance `*preader' */
+/* Decode a signed/unsigned LEB128 integer and advance `*p_reader' */
 typedef __ATTR_NONNULL_T((1)) dwarf_sleb128_t
-__NOTHROW_NCX_T(LIBUNWIND_CC *PDWARF_DECODE_SLEB128)(__CHECKED __byte_t const **__restrict preader);
+__NOTHROW_NCX_T(LIBUNWIND_CC *PDWARF_DECODE_SLEB128)(__NCX __byte_t const **__restrict p_reader);
 typedef __ATTR_NONNULL_T((1)) dwarf_uleb128_t
-__NOTHROW_NCX_T(LIBUNWIND_CC *PDWARF_DECODE_ULEB128)(__CHECKED __byte_t const **__restrict preader);
+__NOTHROW_NCX_T(LIBUNWIND_CC *PDWARF_DECODE_ULEB128)(__NCX __byte_t const **__restrict p_reader);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1)) dwarf_sleb128_t
-__NOTHROW_NCX(LIBUNWIND_CC dwarf_decode_sleb128)(__CHECKED __byte_t const **__restrict preader);
+__NOTHROW_NCX(LIBUNWIND_CC dwarf_decode_sleb128)(__NCX __byte_t const **__restrict p_reader);
 LIBUNWIND_DECL __ATTR_NONNULL((1)) dwarf_uleb128_t
-__NOTHROW_NCX(LIBUNWIND_CC dwarf_decode_uleb128)(__CHECKED __byte_t const **__restrict preader);
+__NOTHROW_NCX(LIBUNWIND_CC dwarf_decode_uleb128)(__NCX __byte_t const **__restrict p_reader);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 struct unwind_bases;
 
-typedef __ATTR_NONNULL_T((1)) __CHECKED __byte_t *
-__NOTHROW_NCX_T(LIBUNWIND_CC *PDWARF_DECODE_POINTER)(__CHECKED __byte_t const **__restrict preader,
+typedef __ATTR_NONNULL_T((1)) __NCX __byte_t *
+__NOTHROW_NCX_T(LIBUNWIND_CC *PDWARF_DECODE_POINTER)(__NCX __byte_t const **__restrict p_reader,
                                                      __uint8_t encoding, __uint8_t addrsize,
                                                      struct unwind_bases *dw_bases);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1)) __CHECKED __byte_t *
-__NOTHROW_NCX(LIBUNWIND_CC dwarf_decode_pointer)(__CHECKED __byte_t const **__restrict preader,
+LIBUNWIND_DECL __ATTR_NONNULL((1)) __NCX __byte_t *
+__NOTHROW_NCX(LIBUNWIND_CC dwarf_decode_pointer)(__NCX __byte_t const **__restrict p_reader,
                                                  __uint8_t encoding, __uint8_t addrsize,
                                                  struct unwind_bases *dw_bases);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */

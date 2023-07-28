@@ -207,7 +207,7 @@ union word64 {
  * and  the  VIO   address  range   `self->vea_ptrlo...self->vea_ptrhi' */
 PRIVATE NONNULL((1)) void CC
 libviocore_read_with_partial_overlap(struct vio_emulate_args *__restrict self,
-                                     __USER __UNCHECKED void const *addr,
+                                     NCX UNCHECKED void const *addr,
                                      size_t num_bytes, void *resbuf) {
 	assert(!IS_VIO_ADDR_FULL(self, addr, num_bytes));
 	assert(IS_VIO_ADDR_PART(self, addr, num_bytes));
@@ -241,7 +241,7 @@ libviocore_read_with_partial_overlap(struct vio_emulate_args *__restrict self,
  * and   the   VIO  address   range  `self->vea_ptrlo...self->vea_ptrhi' */
 PRIVATE NONNULL((1)) void CC
 libviocore_write_with_partial_overlap(struct vio_emulate_args *__restrict self,
-                                      __USER __UNCHECKED void *addr,
+                                      NCX UNCHECKED void *addr,
                                       size_t num_bytes, void const *srcbuf) {
 	assert(!IS_VIO_ADDR_FULL(self, addr, num_bytes));
 	assert(IS_VIO_ADDR_PART(self, addr, num_bytes));
@@ -279,7 +279,7 @@ libviocore_write_with_partial_overlap(struct vio_emulate_args *__restrict self,
  * NOTE: `oldbuf' and `newbuf' are not allowed to overlap, or be the same! */
 PRIVATE NONNULL((1)) void CC
 libviocore_xch_with_partial_overlap(struct vio_emulate_args *__restrict self,
-                                    __USER __UNCHECKED void *addr, size_t num_bytes,
+                                    NCX UNCHECKED void *addr, size_t num_bytes,
                                     void *__restrict oldbuf,
                                     void const *__restrict newbuf) {
 	assert(!IS_VIO_ADDR_FULL(self, addr, num_bytes));
@@ -326,7 +326,7 @@ libviocore_xch_with_partial_overlap(struct vio_emulate_args *__restrict self,
 	libviocore_readb(self, (void const *)(uintptr_t)(addr))
 PRIVATE NONNULL((1)) u8 CC
 libviocore_readb(struct vio_emulate_args *__restrict self,
-                 __USER __UNCHECKED void const *addr) {
+                 NCX UNCHECKED void const *addr) {
 	u8 result;
 	if likely(IS_VIO_ADDR_FULL(self, addr, 1)) {
 		result = vio_readb(&self->vea_args, GET_VIO_ADDR(self, addr));
@@ -343,7 +343,7 @@ libviocore_readb(struct vio_emulate_args *__restrict self,
 	libviocore_readw(self, (void const *)(uintptr_t)(addr))
 PRIVATE NONNULL((1)) u16 CC
 libviocore_readw(struct vio_emulate_args *__restrict self,
-                 __USER __UNCHECKED void const *addr) {
+                 NCX UNCHECKED void const *addr) {
 	u16 result;
 	if likely(IS_VIO_ADDR_FULL(self, addr, 2)) {
 		result = vio_readw(&self->vea_args, GET_VIO_ADDR(self, addr));
@@ -361,7 +361,7 @@ libviocore_readw(struct vio_emulate_args *__restrict self,
 	libviocore_readl(self, (void const *)(uintptr_t)(addr))
 PRIVATE NONNULL((1)) u32 CC
 libviocore_readl(struct vio_emulate_args *__restrict self,
-                 __USER __UNCHECKED void const *addr) {
+                 NCX UNCHECKED void const *addr) {
 	u32 result;
 	if likely(IS_VIO_ADDR_FULL(self, addr, 4)) {
 		result = vio_readl(&self->vea_args, GET_VIO_ADDR(self, addr));
@@ -380,7 +380,7 @@ libviocore_readl(struct vio_emulate_args *__restrict self,
 	libviocore_readq(self, (void const *)(uintptr_t)(addr))
 PRIVATE NONNULL((1)) u64 CC
 libviocore_readq(struct vio_emulate_args *__restrict self,
-                 __USER __UNCHECKED void const *addr) {
+                 NCX UNCHECKED void const *addr) {
 	u64 result;
 	if likely(IS_VIO_ADDR_FULL(self, addr, 8)) {
 		result = vio_readq(&self->vea_args, GET_VIO_ADDR(self, addr));
@@ -399,7 +399,7 @@ libviocore_readq(struct vio_emulate_args *__restrict self,
 	libviocore_writeb(self, (void *)(uintptr_t)(addr), v)
 PRIVATE NONNULL((1)) void CC
 libviocore_writeb(struct vio_emulate_args *__restrict self,
-                  __USER __UNCHECKED void *addr, u8 value) {
+                  NCX UNCHECKED void *addr, u8 value) {
 	if likely(IS_VIO_ADDR_FULL(self, addr, 1)) {
 		vio_writeb(&self->vea_args, GET_VIO_ADDR(self, addr), value);
 	} else {
@@ -413,7 +413,7 @@ libviocore_writeb(struct vio_emulate_args *__restrict self,
 	libviocore_writew(self, (void *)(uintptr_t)(addr), v)
 PRIVATE NONNULL((1)) void CC
 libviocore_writew(struct vio_emulate_args *__restrict self,
-                  __USER __UNCHECKED void *addr, u16 value) {
+                  NCX UNCHECKED void *addr, u16 value) {
 	if likely(IS_VIO_ADDR_FULL(self, addr, 2)) {
 		vio_writew(&self->vea_args, GET_VIO_ADDR(self, addr), value);
 	} else if unlikely(IS_VIO_ADDR_PART(self, addr, 2)) {
@@ -429,7 +429,7 @@ libviocore_writew(struct vio_emulate_args *__restrict self,
 	libviocore_writel(self, (void *)(uintptr_t)(addr), v)
 PRIVATE NONNULL((1)) void CC
 libviocore_writel(struct vio_emulate_args *__restrict self,
-                  __USER __UNCHECKED void *addr, u32 value) {
+                  NCX UNCHECKED void *addr, u32 value) {
 	if likely(IS_VIO_ADDR_FULL(self, addr, 4)) {
 		vio_writel(&self->vea_args, GET_VIO_ADDR(self, addr), value);
 	} else if unlikely(IS_VIO_ADDR_PART(self, addr, 4)) {
@@ -446,7 +446,7 @@ libviocore_writel(struct vio_emulate_args *__restrict self,
 	libviocore_writeq(self, (void *)(uintptr_t)(addr), v)
 PRIVATE NONNULL((1)) void CC
 libviocore_writeq(struct vio_emulate_args *__restrict self,
-                  __USER __UNCHECKED void *addr, u64 value) {
+                  NCX UNCHECKED void *addr, u64 value) {
 	if likely(IS_VIO_ADDR_FULL(self, addr, 8)) {
 		vio_writeq(&self->vea_args, GET_VIO_ADDR(self, addr), value);
 	} else if unlikely(IS_VIO_ADDR_PART(self, addr, 8)) {
@@ -463,7 +463,7 @@ libviocore_writeq(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_xchb(self, (void *)(uintptr_t)(addr), addend, force_atomic)
 PRIVATE NONNULL((1)) u8 CC
 libviocore_atomic_xchb(struct vio_emulate_args *__restrict self,
-                       __USER __UNCHECKED void *addr, u8 value,
+                       NCX UNCHECKED void *addr, u8 value,
                        bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
@@ -486,7 +486,7 @@ libviocore_atomic_xchb(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_xchw(self, (void *)(uintptr_t)(addr), addend, force_atomic)
 PRIVATE NONNULL((1)) u16 CC
 libviocore_atomic_xchw(struct vio_emulate_args *__restrict self,
-                       __USER __UNCHECKED void *addr, u16 value,
+                       NCX UNCHECKED void *addr, u16 value,
                        bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
@@ -513,7 +513,7 @@ libviocore_atomic_xchw(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_xchl(self, (void *)(uintptr_t)(addr), addend, force_atomic)
 PRIVATE NONNULL((1)) u32 CC
 libviocore_atomic_xchl(struct vio_emulate_args *__restrict self,
-                       __USER __UNCHECKED void *addr, u32 value,
+                       NCX UNCHECKED void *addr, u32 value,
                        bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
@@ -541,7 +541,7 @@ libviocore_atomic_xchl(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_xchq(self, (void *)(uintptr_t)(addr), addend, force_atomic)
 PRIVATE NONNULL((1)) u64 CC
 libviocore_atomic_xchq(struct vio_emulate_args *__restrict self,
-                       __USER __UNCHECKED void *addr, u64 value,
+                       NCX UNCHECKED void *addr, u64 value,
                        bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
@@ -569,7 +569,7 @@ libviocore_atomic_xchq(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchaddb(self, (void *)(uintptr_t)(addr), addend, force_atomic)
 PRIVATE NONNULL((1)) u8 CC
 libviocore_atomic_fetchaddb(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u8 value,
+                            NCX UNCHECKED void *addr, u8 value,
                             bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
@@ -592,7 +592,7 @@ libviocore_atomic_fetchaddb(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchaddw(self, (void *)(uintptr_t)(addr), addend, force_atomic)
 PRIVATE NONNULL((1)) u16 CC
 libviocore_atomic_fetchaddw(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u16 value,
+                            NCX UNCHECKED void *addr, u16 value,
                             bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
@@ -622,7 +622,7 @@ libviocore_atomic_fetchaddw(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchaddl(self, (void *)(uintptr_t)(addr), addend, force_atomic)
 PRIVATE NONNULL((1)) u32 CC
 libviocore_atomic_fetchaddl(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u32 value,
+                            NCX UNCHECKED void *addr, u32 value,
                             bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
@@ -653,7 +653,7 @@ libviocore_atomic_fetchaddl(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchaddq(self, (void *)(uintptr_t)(addr), addend, force_atomic)
 PRIVATE NONNULL((1)) u64 CC
 libviocore_atomic_fetchaddq(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u64 value,
+                            NCX UNCHECKED void *addr, u64 value,
                             bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
@@ -684,7 +684,7 @@ libviocore_atomic_fetchaddq(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchsubb(self, (void *)(uintptr_t)(addr), subend, force_atomic)
 PRIVATE NONNULL((1)) u8 CC
 libviocore_atomic_fetchsubb(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u8 value,
+                            NCX UNCHECKED void *addr, u8 value,
                             bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
@@ -707,7 +707,7 @@ libviocore_atomic_fetchsubb(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchsubw(self, (void *)(uintptr_t)(addr), subend, force_atomic)
 PRIVATE NONNULL((1)) u16 CC
 libviocore_atomic_fetchsubw(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u16 value,
+                            NCX UNCHECKED void *addr, u16 value,
                             bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
@@ -737,7 +737,7 @@ libviocore_atomic_fetchsubw(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchsubl(self, (void *)(uintptr_t)(addr), subend, force_atomic)
 PRIVATE NONNULL((1)) u32 CC
 libviocore_atomic_fetchsubl(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u32 value,
+                            NCX UNCHECKED void *addr, u32 value,
                             bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
@@ -768,7 +768,7 @@ libviocore_atomic_fetchsubl(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchsubq(self, (void *)(uintptr_t)(addr), subend, force_atomic)
 PRIVATE NONNULL((1)) u64 CC
 libviocore_atomic_fetchsubq(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u64 value,
+                            NCX UNCHECKED void *addr, u64 value,
                             bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
@@ -799,7 +799,7 @@ libviocore_atomic_fetchsubq(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchandb(self, (void *)(uintptr_t)(addr), andend, force_atomic)
 PRIVATE NONNULL((1)) u8 CC
 libviocore_atomic_fetchandb(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u8 value,
+                            NCX UNCHECKED void *addr, u8 value,
                             bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
@@ -822,7 +822,7 @@ libviocore_atomic_fetchandb(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchandw(self, (void *)(uintptr_t)(addr), andend, force_atomic)
 PRIVATE NONNULL((1)) u16 CC
 libviocore_atomic_fetchandw(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u16 value,
+                            NCX UNCHECKED void *addr, u16 value,
                             bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
@@ -852,7 +852,7 @@ libviocore_atomic_fetchandw(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchandl(self, (void *)(uintptr_t)(addr), andend, force_atomic)
 PRIVATE NONNULL((1)) u32 CC
 libviocore_atomic_fetchandl(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u32 value,
+                            NCX UNCHECKED void *addr, u32 value,
                             bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
@@ -883,7 +883,7 @@ libviocore_atomic_fetchandl(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchandq(self, (void *)(uintptr_t)(addr), andend, force_atomic)
 PRIVATE NONNULL((1)) u64 CC
 libviocore_atomic_fetchandq(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u64 value,
+                            NCX UNCHECKED void *addr, u64 value,
                             bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
@@ -914,7 +914,7 @@ libviocore_atomic_fetchandq(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchorb(self, (void *)(uintptr_t)(addr), orend, force_atomic)
 PRIVATE NONNULL((1)) u8 CC
 libviocore_atomic_fetchorb(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u8 value,
+                            NCX UNCHECKED void *addr, u8 value,
                             bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
@@ -937,7 +937,7 @@ libviocore_atomic_fetchorb(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchorw(self, (void *)(uintptr_t)(addr), orend, force_atomic)
 PRIVATE NONNULL((1)) u16 CC
 libviocore_atomic_fetchorw(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u16 value,
+                            NCX UNCHECKED void *addr, u16 value,
                             bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
@@ -967,7 +967,7 @@ libviocore_atomic_fetchorw(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchorl(self, (void *)(uintptr_t)(addr), orend, force_atomic)
 PRIVATE NONNULL((1)) u32 CC
 libviocore_atomic_fetchorl(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u32 value,
+                            NCX UNCHECKED void *addr, u32 value,
                             bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
@@ -998,7 +998,7 @@ libviocore_atomic_fetchorl(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchorq(self, (void *)(uintptr_t)(addr), orend, force_atomic)
 PRIVATE NONNULL((1)) u64 CC
 libviocore_atomic_fetchorq(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u64 value,
+                            NCX UNCHECKED void *addr, u64 value,
                             bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
@@ -1029,7 +1029,7 @@ libviocore_atomic_fetchorq(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchxorb(self, (void *)(uintptr_t)(addr), xorend, force_atomic)
 PRIVATE NONNULL((1)) u8 CC
 libviocore_atomic_fetchxorb(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u8 value,
+                            NCX UNCHECKED void *addr, u8 value,
                             bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
@@ -1052,7 +1052,7 @@ libviocore_atomic_fetchxorb(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchxorw(self, (void *)(uintptr_t)(addr), xorend, force_atomic)
 PRIVATE NONNULL((1)) u16 CC
 libviocore_atomic_fetchxorw(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u16 value,
+                            NCX UNCHECKED void *addr, u16 value,
                             bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
@@ -1082,7 +1082,7 @@ libviocore_atomic_fetchxorw(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchxorl(self, (void *)(uintptr_t)(addr), xorend, force_atomic)
 PRIVATE NONNULL((1)) u32 CC
 libviocore_atomic_fetchxorl(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u32 value,
+                            NCX UNCHECKED void *addr, u32 value,
                             bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
@@ -1113,7 +1113,7 @@ libviocore_atomic_fetchxorl(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchxorq(self, (void *)(uintptr_t)(addr), xorend, force_atomic)
 PRIVATE NONNULL((1)) u64 CC
 libviocore_atomic_fetchxorq(struct vio_emulate_args *__restrict self,
-                            __USER __UNCHECKED void *addr, u64 value,
+                            NCX UNCHECKED void *addr, u64 value,
                             bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
@@ -1144,7 +1144,7 @@ libviocore_atomic_fetchxorq(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_cmpxchb(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) u8 CC
 libviocore_atomic_cmpxchb(struct vio_emulate_args *__restrict self,
-                          __USER __UNCHECKED void *addr,
+                          NCX UNCHECKED void *addr,
                           u8 oldval, u8 newval, bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
@@ -1169,7 +1169,7 @@ libviocore_atomic_cmpxchb(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_cmpxchw(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) u16 CC
 libviocore_atomic_cmpxchw(struct vio_emulate_args *__restrict self,
-                          __USER __UNCHECKED void *addr,
+                          NCX UNCHECKED void *addr,
                           u16 oldval, u16 newval, bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
@@ -1200,7 +1200,7 @@ libviocore_atomic_cmpxchw(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_cmpxchl(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) u32 CC
 libviocore_atomic_cmpxchl(struct vio_emulate_args *__restrict self,
-                          __USER __UNCHECKED void *addr,
+                          NCX UNCHECKED void *addr,
                           u32 oldval, u32 newval, bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
@@ -1231,7 +1231,7 @@ libviocore_atomic_cmpxchl(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_cmpxchq(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) u64 CC
 libviocore_atomic_cmpxchq(struct vio_emulate_args *__restrict self,
-                          __USER __UNCHECKED void *addr,
+                          NCX UNCHECKED void *addr,
                           u64 oldval, u64 newval, bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
@@ -1263,7 +1263,7 @@ libviocore_atomic_cmpxchq(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_cmpxch_or_writeb(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) bool CC
 libviocore_atomic_cmpxch_or_writeb(struct vio_emulate_args *__restrict self,
-                                   __USER __UNCHECKED void *addr,
+                                   NCX UNCHECKED void *addr,
                                    u8 oldval, u8 newval, bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
@@ -1289,7 +1289,7 @@ libviocore_atomic_cmpxch_or_writeb(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_cmpxch_or_writew(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) bool CC
 libviocore_atomic_cmpxch_or_writew(struct vio_emulate_args *__restrict self,
-                                   __USER __UNCHECKED void *addr,
+                                   NCX UNCHECKED void *addr,
                                    u16 oldval, u16 newval, bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
@@ -1317,7 +1317,7 @@ libviocore_atomic_cmpxch_or_writew(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_cmpxch_or_writel(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) bool CC
 libviocore_atomic_cmpxch_or_writel(struct vio_emulate_args *__restrict self,
-                                   __USER __UNCHECKED void *addr,
+                                   NCX UNCHECKED void *addr,
                                    u32 oldval, u32 newval, bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
@@ -1346,7 +1346,7 @@ libviocore_atomic_cmpxch_or_writel(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_cmpxch_or_writeq(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) u64 CC
 libviocore_atomic_cmpxch_or_writeq(struct vio_emulate_args *__restrict self,
-                                   __USER __UNCHECKED void *addr,
+                                   NCX UNCHECKED void *addr,
                                    u64 oldval, u64 newval, bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
@@ -1374,7 +1374,7 @@ libviocore_atomic_cmpxch_or_writeq(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_cmpxchx(self, addr, oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) uint128_t CC
 libviocore_atomic_cmpxchx(struct vio_emulate_args *__restrict self,
-                          __USER __UNCHECKED void *addr,
+                          NCX UNCHECKED void *addr,
                           uint128_t oldval, uint128_t newval, bool force_atomic) {
 	uint128_t result;
 	COMPILER_BARRIER();

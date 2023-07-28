@@ -46,11 +46,11 @@ __DECL_BEGIN
  * caches for quick (O(log2)) repeated access to an FDE located within a known
  * function. */
 typedef __ATTR_NONNULL_T((2)) unwind_errno_t
-__NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_FIND)(__CHECKED void const *__absolute_pc,
+__NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_FIND)(__VIRT void const *__absolute_pc,
                                                 unwind_fde_t *__restrict __result);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((2)) unwind_errno_t
-__NOTHROW_NCX(LIBUNWIND_CC unwind_fde_find)(__CHECKED void const *__absolute_pc,
+__NOTHROW_NCX(LIBUNWIND_CC unwind_fde_find)(__VIRT void const *__absolute_pc,
                                             unwind_fde_t *__restrict __result);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
@@ -63,12 +63,12 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_find)(__CHECKED void const *__absolute_pc,
  *       `absolute_pc >= start && absolute_pc < end'
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
 typedef __ATTR_NONNULL_T((2, 4)) unwind_errno_t
-(LIBUNWIND_CC *PUNWIND)(__CHECKED void const *__absolute_pc,
+(LIBUNWIND_CC *PUNWIND)(__VIRT void const *__absolute_pc,
                         unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
                         unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((2, 4)) unwind_errno_t
-(LIBUNWIND_CC unwind)(__CHECKED void const *__absolute_pc,
+(LIBUNWIND_CC unwind)(__VIRT void const *__absolute_pc,
                       unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
                       unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */

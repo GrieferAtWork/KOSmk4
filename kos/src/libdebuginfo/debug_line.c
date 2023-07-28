@@ -56,7 +56,7 @@ DECL_BEGIN
 PRIVATE NONNULL((1, 2)) bool
 NOTHROW_NCX(CC skip_fileinfo)(di_debuginfo_cu_simple_parser_t *__restrict parser,
                               di_debugline_fileinfo_format_t const *__restrict format) {
-	CHECKED byte_t const *fmtreader;
+	NCX byte_t const *fmtreader;
 	uint8_t fmtcount;
 	fmtreader = (byte_t const *)format;
 	fmtcount  = *(uint8_t const *)fmtreader;
@@ -77,7 +77,7 @@ NOTHROW_NCX(CC skip_fileinfo)(di_debuginfo_cu_simple_parser_t *__restrict parser
 PRIVATE NONNULL((1)) size_t
 NOTHROW_NCX(CC debugline_unit_count_dwarf4_numfiles)(di_debugline_unit_t const *__restrict self) {
 	size_t result = 0;
-	CHECKED byte_t const *reader;
+	NCX byte_t const *reader;
 	reader = self->dlu_filedata;
 	for (;;) {
 		if (!*(char *)reader)
@@ -97,13 +97,13 @@ NOTHROW_NCX(CC debugline_unit_count_dwarf4_numfiles)(di_debugline_unit_t const *
 PRIVATE WUNUSED NONNULL((1)) byte_t const *
 NOTHROW_NCX(CC debugline_unit_get_extra_file)(di_debugline_unit_t const *__restrict self,
                                               dwarf_uleb128_t nth) {
-	CHECKED byte_t const *reader = self->dlu_textbase;
+	NCX byte_t const *reader = self->dlu_textbase;
 	while (reader < self->dlu_cuend) {
 		uint8_t opcode = *reader++;
 		switch (opcode) {
 
 		case DW_LNS_extended_op: {
-			CHECKED byte_t const *ext_data;
+			NCX byte_t const *ext_data;
 			uintptr_t temp;
 			temp     = dwarf_decode_uleb128(&reader);
 			ext_data = reader;
@@ -202,7 +202,7 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t *__restrict self, /
 
 	/* Decode our own entry! */
 	{
-		CHECKED byte_t const *fmtreader;
+		NCX byte_t const *fmtreader;
 		uint8_t fmtcount;
 		fmtreader = (byte_t const *)self->dlu_filefmt;
 		fmtcount  = *(uint8_t const *)fmtreader;
@@ -252,7 +252,7 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t *__restrict self, /
 
 	/* Decode our path index! */
 	{
-		CHECKED byte_t const *fmtreader;
+		NCX byte_t const *fmtreader;
 		uint8_t fmtcount;
 		fmtreader = (byte_t const *)self->dlu_pathfmt;
 		fmtcount  = *(uint8_t const *)fmtreader;
@@ -349,12 +349,12 @@ PRIVATE byte_t const dwarf4_lne_filefmt[] = {
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 INTERN TEXTSECTION NONNULL((1, 3)) debuginfo_errno_t
-NOTHROW_NCX(CC libdi_debugline_loadunit)(CHECKED byte_t const **__restrict preader,
-                                         CHECKED byte_t const *text_end,
+NOTHROW_NCX(CC libdi_debugline_loadunit)(NCX byte_t const **__restrict preader,
+                                         NCX byte_t const *text_end,
                                          di_debugline_unit_t *__restrict result) {
 	uintptr_t length;
-	CHECKED byte_t const *reader;
-	CHECKED byte_t const *next_cu, *cu_text;
+	NCX byte_t const *reader;
+	NCX byte_t const *next_cu, *cu_text;
 	reader = *preader;
 again:
 	if (reader >= text_end)
@@ -529,7 +529,7 @@ INTERN TEXTSECTION NONNULL((1, 2)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debugline_scanunit)(di_debugline_unit_t const *__restrict self,
                                          di_debugline_info_t *__restrict result,
                                          uintptr_t module_relative_pc) {
-	CHECKED byte_t const *reader = self->dlu_textbase;
+	NCX byte_t const *reader = self->dlu_textbase;
 	dl_registers_t old_state, state;
 #define RESET_STATE()                                                        \
 	(bzero(&state, sizeof(state)),                                           \
@@ -582,7 +582,7 @@ found_state:
 			switch (opcode) {
 
 			case DW_LNS_extended_op: {
-				CHECKED byte_t const *ext_data;
+				NCX byte_t const *ext_data;
 				uintptr_t temp;
 				temp     = dwarf_decode_uleb128(&reader);
 				ext_data = reader;

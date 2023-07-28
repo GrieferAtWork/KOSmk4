@@ -145,7 +145,7 @@ struct ffilesys {
 		 * @return: NULL: `dev' cannot be mounted using this filesystem. */
 		BLOCKING WUNUSED_T NONNULL_T((1)) struct fsuper *
 		(KCALL *ffs_open)(struct ffilesys *__restrict filesys,
-		                  struct mfile *dev, UNCHECKED USER char *args)
+		                  struct mfile *dev, NCX UNCHECKED char *args)
 				THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_CORRUPTED_FILE_SYSTEM, ...);
 
 		/* [1..1][valid_if(FFILESYS_F_SINGLE)]
@@ -215,7 +215,7 @@ DATDEF struct lockop_slist ffilesys_formats_lops;   /* Lock operations for `ffil
  *                                             looks like it's been corrupted... :( */
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) REF struct fsuper *FCALL
 ffilesys_open(struct ffilesys *__restrict self, __BOOL *__restrict pnewly_created,
-              struct mfile *dev, UNCHECKED USER char *args)
+              struct mfile *dev, NCX UNCHECKED char *args)
 		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_MOUNT_UNSUPPORTED_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, ...);
 
@@ -230,7 +230,7 @@ ffilesys_open(struct ffilesys *__restrict self, __BOOL *__restrict pnewly_create
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) REF struct fsuper *FCALL
 ffilesys_opendev(__BOOL *__restrict pnewly_created,
                  struct mfile *__restrict dev,
-                 UNCHECKED USER char *args)
+                 NCX UNCHECKED char *args)
 		THROWS(E_BADALLOC, E_FSERROR_MOUNT_UNSUPPORTED_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, ...);
 
@@ -250,7 +250,7 @@ NOTHROW(FCALL ffilesys_open_done)(struct mfile *__restrict dev);
  * @return: * :   The named filesystem type.
  * @return: NULL: No such filesystem. */
 FUNDEF WUNUSED NONNULL((1)) REF struct ffilesys *FCALL
-ffilesys_byname(USER CHECKED char const *name, size_t namelen)
+ffilesys_byname(NCX char const *name, size_t namelen)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 
 

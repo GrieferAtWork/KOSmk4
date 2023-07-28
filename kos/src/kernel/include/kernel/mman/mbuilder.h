@@ -538,8 +538,8 @@ mbuilder_map_res(struct mbuilder_norpc *__restrict self,
 FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
 mbuilder_alloc_peb(struct mbuilder_norpc *__restrict self,
                    size_t argc_inject, KERNEL char const *const *argv_inject,
-                   USER UNCHECKED char const *USER CHECKED const *argv,
-                   USER UNCHECKED char const *USER CHECKED const *envp)
+                   NCX UNCHECKED char const *NCX const *argv,
+                   NCX UNCHECKED char const *NCX const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 
 #ifdef __ARCH_HAVE_COMPAT
@@ -550,20 +550,20 @@ mbuilder_alloc_peb(struct mbuilder_norpc *__restrict self,
 FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
 mbuilder_alloc_peb32(struct mbuilder_norpc *__restrict self,
                      size_t argc_inject, KERNEL char const *const *argv_inject,
-                     USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *argv,
-                     USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *envp)
+                     NCX UNCHECKED __HYBRID_PTR32(char const) NCX const *argv,
+                     NCX UNCHECKED __HYBRID_PTR32(char const) NCX const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
 mbuilder_alloc_peb32_p64(struct mbuilder_norpc *__restrict self,
                          size_t argc_inject, KERNEL char const *const *argv_inject,
-                         USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *argv,
-                         USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *envp)
+                         NCX UNCHECKED __HYBRID_PTR64(char const) NCX const *argv,
+                         NCX UNCHECKED __HYBRID_PTR64(char const) NCX const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
 mbuilder_alloc_peb64_p32(struct mbuilder_norpc *__restrict self,
                          size_t argc_inject, KERNEL char const *const *argv_inject,
-                         USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *argv,
-                         USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *envp)
+                         NCX UNCHECKED __HYBRID_PTR32(char const) NCX const *argv,
+                         NCX UNCHECKED __HYBRID_PTR32(char const) NCX const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 #elif __ARCH_COMPAT_SIZEOF_POINTER == 8
 #define mbuilder_alloc_peb32     mbuilder_alloc_peb
@@ -572,20 +572,20 @@ mbuilder_alloc_peb64_p32(struct mbuilder_norpc *__restrict self,
 FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
 mbuilder_alloc_peb64(struct mbuilder_norpc *__restrict self,
                      size_t argc_inject, KERNEL char const *const *argv_inject,
-                     USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *argv,
-                     USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *envp)
+                     NCX UNCHECKED __HYBRID_PTR64(char const) NCX const *argv,
+                     NCX UNCHECKED __HYBRID_PTR64(char const) NCX const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
 mbuilder_alloc_peb64_p32(struct mbuilder_norpc *__restrict self,
                          size_t argc_inject, KERNEL char const *const *argv_inject,
-                         USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *argv,
-                         USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *envp)
+                         NCX UNCHECKED __HYBRID_PTR32(char const) NCX const *argv,
+                         NCX UNCHECKED __HYBRID_PTR32(char const) NCX const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
 mbuilder_alloc_peb32_p64(struct mbuilder_norpc *__restrict self,
                          size_t argc_inject, KERNEL char const *const *argv_inject,
-                         USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *argv,
-                         USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *envp)
+                         NCX UNCHECKED __HYBRID_PTR64(char const) NCX const *argv,
+                         NCX UNCHECKED __HYBRID_PTR64(char const) NCX const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 #else
 #error "Unsupported `__ARCH_COMPAT_SIZEOF_POINTER'"

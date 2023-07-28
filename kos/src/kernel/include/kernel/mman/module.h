@@ -77,7 +77,7 @@ struct module_section_ops {
 	 *          `SHF_ALLOC'  flag set, the returned buffer obviously
 	 *          resides in user-space, also meaning that it may only
 	 *          be accessed while the correct mman/pagedir is active */
-	BLOCKING WUNUSED_T NONNULL_T((1)) USER CHECKED byte_t *
+	BLOCKING WUNUSED_T NONNULL_T((1)) NCX byte_t *
 	(FCALL *ms_getaddr)(struct module_section *__restrict self);
 
 	/* [1..1] Similar  to `ms_getaddr' (and  identical in case of
@@ -138,7 +138,7 @@ DEFINE_REFCNT_FUNCTIONS(struct module_section, ms_refcnt, module_section_destroy
 /* Wrappers for module section operators. */
 #ifdef __INTELLISENSE__
 BLOCKING WUNUSED NONNULL((1)) char const *(module_section_getname)(struct module_section *__restrict self);
-BLOCKING WUNUSED NONNULL((1)) USER CHECKED byte_t *(module_section_getaddr)(struct module_section *__restrict self);
+BLOCKING WUNUSED NONNULL((1)) NCX byte_t *(module_section_getaddr)(struct module_section *__restrict self);
 BLOCKING WUNUSED NONNULL((1)) KERNEL byte_t *(module_section_getaddr_alias)(struct module_section *__restrict self);
 BLOCKING WUNUSED NONNULL((1, 2)) KERNEL byte_t *(module_section_getaddr_inflate)(struct module_section *__restrict self, size_t *__restrict psize);
 #else /* __INTELLISENSE__ */
@@ -150,7 +150,7 @@ BLOCKING WUNUSED NONNULL((1, 2)) KERNEL byte_t *(module_section_getaddr_inflate)
 
 /* Same as the functions above, but preserve the current exception, and return `NULL' on error. */
 FUNDEF BLOCKING WUNUSED NONNULL((1)) char const *NOTHROW(FCALL module_section_getname_nx)(struct module_section *__restrict self);
-FUNDEF BLOCKING WUNUSED NONNULL((1)) USER CHECKED byte_t *NOTHROW(FCALL module_section_getaddr_nx)(struct module_section *__restrict self);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) NCX byte_t *NOTHROW(FCALL module_section_getaddr_nx)(struct module_section *__restrict self);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_alias_nx)(struct module_section *__restrict self);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_inflate_nx)(struct module_section *__restrict self, size_t *__restrict psize);
 
@@ -186,7 +186,7 @@ struct module_ops {
 	 * If   the  given  `section_name'  isn't  valid,  return  `NULL'. */
 	BLOCKING WUNUSED_T NONNULL_T((1)) REF struct module_section *
 	(FCALL *mo_locksection)(struct module *__restrict self,
-	                        USER CHECKED char const *section_name);
+	                        NCX char const *section_name);
 
 	/* [1..1] Return a reference for a module section, given its index.
 	 * If   the  given  `section_index'  isn't  valid,  return  `NULL'. */
@@ -277,7 +277,7 @@ NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(WEAK REF struct module *_
 
 /* Wrappers for module operators. */
 #ifdef __INTELLISENSE__
-BLOCKING WUNUSED NONNULL((1)) REF struct module_section *(module_locksection)(struct module *__restrict self, USER CHECKED char const *section_name);
+BLOCKING WUNUSED NONNULL((1)) REF struct module_section *(module_locksection)(struct module *__restrict self, NCX char const *section_name);
 BLOCKING WUNUSED NONNULL((1)) REF struct module_section *(module_locksection_index)(struct module *__restrict self, unsigned int section_index);
 BLOCKING WUNUSED NONNULL((1, 3)) __BOOL (module_sectinfo)(struct module *__restrict self, uintptr_t module_relative_addr, struct module_sectinfo *__restrict info);
 /* Return the module's text/data base address, as used during unwinding. */
@@ -356,13 +356,13 @@ module_printpath_or_name(struct module *__restrict self, __pformatprinter printe
  * inspected in order to check if a module has been loaded to that location.
  * If no module exists at `addr', return `NULL'. */
 FUNDEF BLOCKING WUNUSED REF struct module *FCALL
-module_fromaddr(USER CHECKED void const *addr);
+module_fromaddr(NCX void const *addr);
 
 /* Search for, and return a reference to the lowest available module, such
  * that  `return->md_loadstart >= addr'. If no  such module exists, simply
  * return `NULL' instead. */
 FUNDEF WUNUSED REF struct module *FCALL
-module_aboveaddr(USER CHECKED void const *addr);
+module_aboveaddr(NCX void const *addr);
 
 /* Return  a  reference  to  the  first  module  different  from  `prev',  such  that
  * `return->md_loadstart > prev->md_loadstart'.  When   `prev == NULL',  return   the
@@ -375,8 +375,8 @@ module_next(struct module *prev);
 /* Same as  the functions  above, but  preserve/restore the  old
  * exception if one ends up being thrown by the above functions,
  * and simply return `NULL', rather than RETHROW()-ing it. */
-FUNDEF BLOCKING WUNUSED REF struct module *NOTHROW(FCALL module_fromaddr_nx)(USER CHECKED void const *addr);
-FUNDEF BLOCKING WUNUSED REF struct module *NOTHROW(FCALL module_aboveaddr_nx)(USER CHECKED void const *addr);
+FUNDEF BLOCKING WUNUSED REF struct module *NOTHROW(FCALL module_fromaddr_nx)(NCX void const *addr);
+FUNDEF BLOCKING WUNUSED REF struct module *NOTHROW(FCALL module_aboveaddr_nx)(NCX void const *addr);
 FUNDEF BLOCKING WUNUSED REF struct module *NOTHROW(FCALL module_next_nx)(struct module *prev);
 #define module_first_nx() module_aboveaddr_nx((void const *)0)
 
@@ -384,11 +384,11 @@ FUNDEF BLOCKING WUNUSED REF struct module *NOTHROW(FCALL module_next_nx)(struct 
  * usual THIS_MMAN/mman_kernel hybrid-combo, based on the given
  * `addr', operate exclusively on the given mman `self'
  * @param: self: The mman who's modules should be enumerated. */
-FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL mman_module_fromaddr(struct mman *__restrict self, USER CHECKED void const *addr);
-FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL mman_module_aboveaddr(struct mman *__restrict self, USER CHECKED void const *addr);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL mman_module_fromaddr(struct mman *__restrict self, NCX void const *addr);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL mman_module_aboveaddr(struct mman *__restrict self, NCX void const *addr);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL mman_module_next(struct mman *__restrict self, struct module *prev);
-FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_fromaddr_nx)(struct mman *__restrict self, USER CHECKED void const *addr);
-FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_aboveaddr_nx)(struct mman *__restrict self, USER CHECKED void const *addr);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_fromaddr_nx)(struct mman *__restrict self, NCX void const *addr);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_aboveaddr_nx)(struct mman *__restrict self, NCX void const *addr);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_next_nx)(struct mman *__restrict self, struct module *prev);
 #define mman_module_first(self)    mman_module_aboveaddr(self, (void const *)0)
 #define mman_module_first_nx(self) mman_module_aboveaddr_nx(self, (void const *)0)

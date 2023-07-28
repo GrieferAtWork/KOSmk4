@@ -22,10 +22,8 @@
 #define __PHYS
 #define VIRT
 #define __VIRT
-#define USER
-#define __USER
-#define CHECKED
-#define __CHECKED
+#define NCX
+#define __NCX
 #define UNCHECKED
 #define __UNCHECKED
 #define KERNEL

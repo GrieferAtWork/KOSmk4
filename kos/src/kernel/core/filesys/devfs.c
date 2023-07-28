@@ -105,7 +105,7 @@ DECL_BEGIN
 
 /* Helper macros for operating on `devfs_byname_tree' while holding the proper lock to `devfs_byname_lock' */
 PUBLIC ATTR_PURE WUNUSED struct device *FCALL
-devfs_byname_locate(USER CHECKED char const *name, u16 namelen)
+devfs_byname_locate(NCX char const *name, u16 namelen)
 		THROWS(E_SEGFAULT) {
 	struct device *root = devfs_byname_tree;
 	while (root) {
@@ -126,7 +126,7 @@ devfs_byname_locate(USER CHECKED char const *name, u16 namelen)
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) struct device *FCALL
 devfs_byname_caselocate_in(struct device *__restrict root,
-                           USER CHECKED char const *name,
+                           NCX char const *name,
                            u16 namelen)
 		THROWS(E_SEGFAULT) {
 	struct devdirent *dent;
@@ -154,7 +154,7 @@ again:
 }
 
 PUBLIC ATTR_PURE WUNUSED struct device *FCALL
-devfs_byname_caselocate(USER CHECKED char const *name, u16 namelen)
+devfs_byname_caselocate(NCX char const *name, u16 namelen)
 		THROWS(E_SEGFAULT) {
 	struct device *root = devfs_byname_tree;
 	if likely(root != NULL)
@@ -444,7 +444,7 @@ devfs_root_next(struct fdirent *__restrict self)
 
 
 PRIVATE NONNULL((1)) size_t KCALL
-devfs_root_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+devfs_root_direnum_v_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                              size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(...) {
 	ssize_t result;
@@ -1233,11 +1233,11 @@ devfs_super_v_attach_notify(struct fdirnode *__restrict self)
 
 INTDEF NONNULL((1)) void KCALL /* From "./null.c" */
 nullfile_v_stat(struct mfile *__restrict self,
-                USER CHECKED struct stat *result);
+                NCX struct stat *result);
 
 PRIVATE NONNULL((1)) void KCALL /* From "./null.c" */
 devfs_super_v_stat(struct mfile *__restrict self,
-                   USER CHECKED struct stat *result) {
+                   NCX struct stat *result) {
 	fdirnode_v_stat(self, result); /* stat("/dev") has normal dir-based stat behavior */
 	nullfile_v_stat(self, result); /* stat("/dev") returns `boottime' timestamps! */
 }
@@ -1974,7 +1974,7 @@ NOTHROW(FCALL device_lookup_byino_nx)(ino_t ino) {
  * @param: st_mode: Either `0', `S_IFCHR' or `S_IFBLK'
  * @return: NULL: No such device. */
 PUBLIC WUNUSED REF struct device *FCALL
-device_lookup_byname(USER CHECKED char const *name,
+device_lookup_byname(NCX char const *name,
                      size_t namelen, mode_t st_mode)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
 	REF struct device *result;
@@ -2050,7 +2050,7 @@ device_lookup_bypartuuid(uuid_t const *__restrict uuid)
  *      re-return if non-NULL
  *  #5: If all else failed, return `NULL' */
 FUNDEF WUNUSED REF struct device *FCALL
-device_lookup_bystring(USER CHECKED char const *string,
+device_lookup_bystring(NCX char const *string,
                        size_t stringlen, mode_t st_mode)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
 	REF struct device *result;

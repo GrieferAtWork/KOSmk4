@@ -156,7 +156,7 @@ NOTHROW(FCALL syslog_packet_broadcast)(struct syslog_packet const *__restrict se
  * @return: * : Always re-returns `datalen' */
 FUNDEF ssize_t __FORMATPRINTER_CC
 syslog_printer(void *level,
-               USER CHECKED char const *data,
+               NCX char const *data,
                size_t datalen)
 		THROWS(E_SEGFAULT);
 

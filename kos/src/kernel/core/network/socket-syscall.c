@@ -114,7 +114,7 @@ DEFINE_SYSCALL3(fd_t, socket,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_BIND
 DEFINE_SYSCALL3(errno_t, bind, fd_t, sockfd,
-                USER UNCHECKED struct sockaddr const *, addr,
+                NCX UNCHECKED struct sockaddr const *, addr,
                 socklen_t, addr_len) {
 	REF struct socket *sock;
 	validate_readable(addr, addr_len);
@@ -134,7 +134,7 @@ DEFINE_SYSCALL3(errno_t, bind, fd_t, sockfd,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_CONNECT
 DEFINE_SYSCALL3(errno_t, connect, fd_t, sockfd,
-                USER UNCHECKED struct sockaddr const *, addr,
+                NCX UNCHECKED struct sockaddr const *, addr,
                 socklen_t, addr_len) {
 	struct handle sock;
 	validate_readable(addr, addr_len);
@@ -183,8 +183,8 @@ DEFINE_SYSCALL2(errno_t, listen, fd_t, sockfd,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_ACCEPT
 DEFINE_SYSCALL3(fd_t, accept, fd_t, sockfd,
-                USER UNCHECKED struct sockaddr *, addr,
-                USER UNCHECKED socklen_t *, addr_len) {
+                NCX UNCHECKED struct sockaddr *, addr,
+                NCX UNCHECKED socklen_t *, addr_len) {
 	REF struct handle sock;
 	REF struct socket *result;
 	struct handle_install_data install;
@@ -241,8 +241,8 @@ DEFINE_SYSCALL3(fd_t, accept, fd_t, sockfd,
 
 #ifdef __ARCH_WANT_SYSCALL_ACCEPT4
 DEFINE_SYSCALL4(fd_t, accept4, fd_t, sockfd,
-                USER UNCHECKED struct sockaddr *, addr,
-                USER UNCHECKED socklen_t *, addr_len,
+                NCX UNCHECKED struct sockaddr *, addr,
+                NCX UNCHECKED socklen_t *, addr_len,
                 syscall_ulong_t, sock_flags) {
 	REF struct handle sock;
 	REF struct socket *result;
@@ -320,8 +320,8 @@ DEFINE_SYSCALL4(fd_t, accept4, fd_t, sockfd,
 DEFINE_SYSCALL5(errno_t, getsockopt, fd_t, sockfd,
                 syscall_ulong_t, level,
                 syscall_ulong_t, optname,
-                USER UNCHECKED void *, optval,
-                USER UNCHECKED socklen_t *, optlen) {
+                NCX UNCHECKED void *, optval,
+                NCX UNCHECKED socklen_t *, optlen) {
 	REF struct handle sock;
 	socklen_t avail_optlen, req_optlen;
 	validate_readwrite(optlen, sizeof(*optlen));
@@ -358,8 +358,8 @@ DEFINE_SYSCALL5(errno_t, getsockopt, fd_t, sockfd,
 DEFINE_SYSCALL5(errno_t, setsockopt, fd_t, sockfd,
                 syscall_ulong_t, level,
                 syscall_ulong_t, optname,
-                USER UNCHECKED void const *, optval,
-                USER UNCHECKED socklen_t, optlen) {
+                NCX UNCHECKED void const *, optval,
+                NCX UNCHECKED socklen_t, optlen) {
 	REF struct handle sock;
 	validate_readable(optval, optlen);
 	sock = handles_lookup(sockfd);
@@ -393,8 +393,8 @@ DEFINE_SYSCALL5(errno_t, setsockopt, fd_t, sockfd,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_GETSOCKNAME
 DEFINE_SYSCALL3(errno_t, getsockname, fd_t, sockfd,
-                USER UNCHECKED struct sockaddr *, addr,
-                USER UNCHECKED socklen_t *, addr_len) {
+                NCX UNCHECKED struct sockaddr *, addr,
+                NCX UNCHECKED socklen_t *, addr_len) {
 	socklen_t req_addr_len, avail_addr_len;
 	REF struct socket *sock;
 	validate_readwrite(addr_len, sizeof(*addr_len));
@@ -417,8 +417,8 @@ DEFINE_SYSCALL3(errno_t, getsockname, fd_t, sockfd,
 
 #ifdef __ARCH_WANT_SYSCALL_GETPEERNAME
 DEFINE_SYSCALL3(errno_t, getpeername, fd_t, sockfd,
-                USER UNCHECKED struct sockaddr *, addr,
-                USER UNCHECKED socklen_t *, addr_len) {
+                NCX UNCHECKED struct sockaddr *, addr,
+                NCX UNCHECKED socklen_t *, addr_len) {
 	socklen_t req_addr_len, avail_addr_len;
 	REF struct socket *sock;
 	validate_readwrite(addr_len, sizeof(*addr_len));
@@ -448,7 +448,7 @@ DEFINE_SYSCALL3(errno_t, getpeername, fd_t, sockfd,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_SEND
 DEFINE_SYSCALL4(ssize_t, send, fd_t, sockfd,
-                USER UNCHECKED void const *, buf, size_t, bufsize,
+                NCX UNCHECKED void const *, buf, size_t, bufsize,
                 syscall_ulong_t, msg_flags) {
 	size_t result;
 	REF struct handle sock;
@@ -481,8 +481,8 @@ DEFINE_SYSCALL4(ssize_t, send, fd_t, sockfd,
 
 #ifdef __ARCH_WANT_SYSCALL_SENDTO
 DEFINE_SYSCALL6(ssize_t, sendto, fd_t, sockfd,
-                USER UNCHECKED void const *, buf, size_t, bufsize, syscall_ulong_t, msg_flags,
-                USER UNCHECKED struct sockaddr const *, addr, socklen_t, addr_len) {
+                NCX UNCHECKED void const *, buf, size_t, bufsize, syscall_ulong_t, msg_flags,
+                NCX UNCHECKED struct sockaddr const *, addr, socklen_t, addr_len) {
 	size_t result;
 	REF struct handle sock;
 	VALIDATE_FLAGSET(msg_flags,
@@ -521,7 +521,7 @@ DEFINE_SYSCALL6(ssize_t, sendto, fd_t, sockfd,
 
 #ifdef __ARCH_WANT_SYSCALL_SENDMSG
 DEFINE_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
-                USER UNCHECKED struct msghdr const *, message,
+                NCX UNCHECKED struct msghdr const *, message,
                 syscall_ulong_t, msg_flags) {
 	size_t result;
 	REF struct handle sock;
@@ -583,7 +583,7 @@ DEFINE_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 				validate_readable(vec.iov_base, vec.iov_len);
 				if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 					THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-				iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+				iov_vec[iov_i].ive_base = (NCX byte_t *)vec.iov_base;
 				iov_vec[iov_i].ive_size = vec.iov_len;
 			}
 			iov.iv_entc         = msg.msg_iovlen;
@@ -617,7 +617,7 @@ DEFINE_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SENDMSG
 DEFINE_COMPAT_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
-                       USER UNCHECKED struct compat_msghdr const *, message,
+                       NCX UNCHECKED struct compat_msghdr const *, message,
                        syscall_ulong_t, msg_flags) {
 	size_t result;
 	REF struct handle sock;
@@ -680,7 +680,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 				compat_validate_readable(vec.iov_base, vec.iov_len);
 				if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 					THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-				iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+				iov_vec[iov_i].ive_base = (NCX byte_t *)vec.iov_base;
 				iov_vec[iov_i].ive_size = vec.iov_len;
 			}
 			iov.iv_entc         = msg.msg_iovlen;
@@ -714,7 +714,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 
 #ifdef __ARCH_WANT_SYSCALL_SENDMMSG
 DEFINE_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
-                USER UNCHECKED struct mmsghdr *, vmessages,
+                NCX UNCHECKED struct mmsghdr *, vmessages,
                 size_t, vlen, syscall_ulong_t, msg_flags) {
 	size_t i;
 	REF struct handle sock;
@@ -778,7 +778,7 @@ DEFINE_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 					validate_readable(vec.iov_base, vec.iov_len);
 					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+					iov_vec[iov_i].ive_base = (NCX byte_t *)vec.iov_base;
 					iov_vec[iov_i].ive_size = vec.iov_len;
 				}
 				iov.iv_entc         = msg.msg_iovlen;
@@ -829,7 +829,7 @@ done:
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SENDMMSG
 DEFINE_COMPAT_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
-                       USER UNCHECKED struct compat_mmsghdr *, vmessages,
+                       NCX UNCHECKED struct compat_mmsghdr *, vmessages,
                        size_t, vlen, syscall_ulong_t, msg_flags) {
 	size_t i;
 	REF struct handle sock;
@@ -894,7 +894,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 					compat_validate_readable(vec.iov_base, vec.iov_len);
 					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+					iov_vec[iov_i].ive_base = (NCX byte_t *)vec.iov_base;
 					iov_vec[iov_i].ive_size = vec.iov_len;
 				}
 				iov.iv_entc         = msg.msg_iovlen;
@@ -952,7 +952,7 @@ done:
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_RECV
 DEFINE_SYSCALL4(ssize_t, recv, fd_t, sockfd,
-                USER UNCHECKED void *, buf, size_t, bufsize,
+                NCX UNCHECKED void *, buf, size_t, bufsize,
                 syscall_ulong_t, msg_flags) {
 	size_t result;
 	REF struct handle sock;
@@ -991,10 +991,10 @@ DEFINE_SYSCALL4(ssize_t, recv, fd_t, sockfd,
 
 #ifdef __ARCH_WANT_SYSCALL_RECVFROM
 DEFINE_SYSCALL6(ssize_t, recvfrom, fd_t, sockfd,
-                USER UNCHECKED void *, buf, size_t, bufsize,
+                NCX UNCHECKED void *, buf, size_t, bufsize,
                 syscall_ulong_t, msg_flags,
-                USER UNCHECKED struct sockaddr *, addr,
-                USER UNCHECKED socklen_t *, addr_len) {
+                NCX UNCHECKED struct sockaddr *, addr,
+                NCX UNCHECKED socklen_t *, addr_len) {
 	size_t result;
 	REF struct handle sock;
 	socklen_t avail_addr_len = 0;
@@ -1052,7 +1052,7 @@ DEFINE_SYSCALL6(ssize_t, recvfrom, fd_t, sockfd,
 
 #ifdef __ARCH_WANT_SYSCALL_RECVMSG
 DEFINE_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
-                USER UNCHECKED struct msghdr *, message,
+                NCX UNCHECKED struct msghdr *, message,
                 syscall_ulong_t, msg_flags) {
 	size_t result;
 	REF struct handle sock;
@@ -1094,7 +1094,7 @@ DEFINE_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 			pcontrol               = &control;
 			control.am_control     = msg.msg_control;
 			control.am_controllen  = msg.msg_controllen;
-			control.am_controlused = (USER CHECKED size_t *)&message->msg_controllen; /* Write-back */
+			control.am_controlused = (NCX size_t *)&message->msg_controllen; /* Write-back */
 		}
 		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen, sizeof(struct iov_entry));
 		RAII_FINALLY { freea(iov_vec); };
@@ -1120,7 +1120,7 @@ DEFINE_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 				validate_writable(vec.iov_base, vec.iov_len);
 				if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 					THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-				iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+				iov_vec[iov_i].ive_base = (NCX byte_t *)vec.iov_base;
 				iov_vec[iov_i].ive_size = vec.iov_len;
 			}
 			iov.iv_entc         = msg.msg_iovlen;
@@ -1155,7 +1155,7 @@ DEFINE_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_RECVMSG
 DEFINE_COMPAT_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
-                       USER UNCHECKED struct compat_msghdr *, message,
+                       NCX UNCHECKED struct compat_msghdr *, message,
                        syscall_ulong_t, msg_flags) {
 	size_t result;
 	REF struct handle sock;
@@ -1223,7 +1223,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 				compat_validate_writable(vec.iov_base, vec.iov_len);
 				if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 					THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-				iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+				iov_vec[iov_i].ive_base = (NCX byte_t *)vec.iov_base;
 				iov_vec[iov_i].ive_size = vec.iov_len;
 			}
 			iov.iv_entc         = msg.msg_iovlen;
@@ -1261,7 +1261,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
      defined(__ARCH_WANT_SYSCALL_RECVMMSG_TIME64))
 PRIVATE ssize_t KCALL
 sys_recvmmsg_impl(fd_t sockfd,
-                  USER UNCHECKED struct mmsghdr *vmessages,
+                  NCX UNCHECKED struct mmsghdr *vmessages,
                   size_t vlen, syscall_ulong_t msg_flags,
                   ktime_t abs_timeout) {
 	size_t i;
@@ -1309,7 +1309,7 @@ sys_recvmmsg_impl(fd_t sockfd,
 			pcontrol               = &control;
 			control.am_control     = msg.msg_control;
 			control.am_controllen  = msg.msg_controllen;
-			control.am_controlused = (USER CHECKED size_t *)&vmessages[i].msg_hdr.msg_controllen; /* Write-back */
+			control.am_controlused = (NCX size_t *)&vmessages[i].msg_hdr.msg_controllen; /* Write-back */
 		}
 		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen, sizeof(struct iov_entry));
 		{
@@ -1335,7 +1335,7 @@ sys_recvmmsg_impl(fd_t sockfd,
 					validate_writable(vec.iov_base, vec.iov_len);
 					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+					iov_vec[iov_i].ive_base = (NCX byte_t *)vec.iov_base;
 					iov_vec[iov_i].ive_size = vec.iov_len;
 				}
 				iov.iv_entc         = msg.msg_iovlen;
@@ -1388,9 +1388,9 @@ done:
 
 #ifdef __ARCH_WANT_SYSCALL_RECVMMSG
 DEFINE_SYSCALL5(ssize_t, recvmmsg, fd_t, sockfd,
-                USER UNCHECKED struct mmsghdr *, vmessages,
+                NCX UNCHECKED struct mmsghdr *, vmessages,
                 size_t, vlen, syscall_ulong_t, msg_flags,
-                USER UNCHECKED struct timespec32 const *, timeout) {
+                NCX UNCHECKED struct timespec32 const *, timeout) {
 	size_t result;
 	ktime_t abs_timeout = KTIME_INFINITE;
 	if (timeout) {
@@ -1410,14 +1410,14 @@ DEFINE_SYSCALL5(ssize_t, recvmmsg, fd_t, sockfd,
      defined(__ARCH_WANT_SYSCALL_RECVMMSG_TIME64))
 #ifdef __ARCH_WANT_SYSCALL_RECVMMSG64
 DEFINE_SYSCALL5(ssize_t, recvmmsg64, fd_t, sockfd,
-                USER UNCHECKED struct mmsghdr *, vmessages,
+                NCX UNCHECKED struct mmsghdr *, vmessages,
                 size_t, vlen, syscall_ulong_t, msg_flags,
-                USER UNCHECKED struct timespec64 const *, timeout)
+                NCX UNCHECKED struct timespec64 const *, timeout)
 #else /* __ARCH_WANT_SYSCALL_RECVMMSG64 */
 DEFINE_SYSCALL5(ssize_t, recvmmsg_time64, fd_t, sockfd,
-                USER UNCHECKED struct mmsghdr *, vmessages,
+                NCX UNCHECKED struct mmsghdr *, vmessages,
                 size_t, vlen, syscall_ulong_t, msg_flags,
-                USER UNCHECKED struct timespec64 const *, timeout)
+                NCX UNCHECKED struct timespec64 const *, timeout)
 #endif /* !__ARCH_WANT_SYSCALL_RECVMMSG64 */
 {
 	size_t result;
@@ -1441,7 +1441,7 @@ DEFINE_SYSCALL5(ssize_t, recvmmsg_time64, fd_t, sockfd,
      defined(__ARCH_WANT_COMPAT_SYSCALL_RECVMMSG_TIME64))
 PRIVATE ssize_t KCALL
 compat_sys_recvmmsg_impl(fd_t sockfd,
-                         USER UNCHECKED struct compat_mmsghdr *vmessages,
+                         NCX UNCHECKED struct compat_mmsghdr *vmessages,
                          size_t vlen, syscall_ulong_t msg_flags,
                          ktime_t abs_timeout) {
 	size_t i;
@@ -1516,7 +1516,7 @@ compat_sys_recvmmsg_impl(fd_t sockfd,
 					validate_writable(vec.iov_base, vec.iov_len);
 					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+					iov_vec[iov_i].ive_base = (NCX byte_t *)vec.iov_base;
 					iov_vec[iov_i].ive_size = vec.iov_len;
 				}
 				iov.iv_entc         = msg.msg_iovlen;
@@ -1569,9 +1569,9 @@ done:
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_RECVMMSG
 DEFINE_COMPAT_SYSCALL5(ssize_t, recvmmsg, fd_t, sockfd,
-                       USER UNCHECKED struct compat_mmsghdr *, vmessages,
+                       NCX UNCHECKED struct compat_mmsghdr *, vmessages,
                        size_t, vlen, syscall_ulong_t, msg_flags,
-                       USER UNCHECKED struct compat_timespec32 const *, timeout) {
+                       NCX UNCHECKED struct compat_timespec32 const *, timeout) {
 	ssize_t result;
 	ktime_t abs_timeout = KTIME_INFINITE;
 	if (timeout) {
@@ -1589,14 +1589,14 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, recvmmsg, fd_t, sockfd,
      defined(__ARCH_WANT_COMPAT_SYSCALL_RECVMMSG_TIME64))
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_RECVMMSG64
 DEFINE_COMPAT_SYSCALL5(ssize_t, recvmmsg64, fd_t, sockfd,
-                       USER UNCHECKED struct compat_mmsghdr *, vmessages,
+                       NCX UNCHECKED struct compat_mmsghdr *, vmessages,
                        size_t, vlen, syscall_ulong_t, msg_flags,
-                       USER UNCHECKED struct compat_timespec64 const *, timeout)
+                       NCX UNCHECKED struct compat_timespec64 const *, timeout)
 #else /* __ARCH_WANT_COMPAT_SYSCALL_RECVMMSG64 */
 DEFINE_COMPAT_SYSCALL5(ssize_t, recvmmsg_time64, fd_t, sockfd,
-                       USER UNCHECKED struct compat_mmsghdr *, vmessages,
+                       NCX UNCHECKED struct compat_mmsghdr *, vmessages,
                        size_t, vlen, syscall_ulong_t, msg_flags,
-                       USER UNCHECKED struct compat_timespec64 const *, timeout)
+                       NCX UNCHECKED struct compat_timespec64 const *, timeout)
 #endif /* !__ARCH_WANT_COMPAT_SYSCALL_RECVMMSG64 */
 {
 	ssize_t result;
@@ -1674,7 +1674,7 @@ PRIVATE u8 const sys_socketcall_argc[] = {
 #ifdef __ARCH_WANT_SYSCALL_SOCKETCALL
 DEFINE_SYSCALL2(syscall_slong_t, socketcall,
                 syscall_ulong_t, call,
-                USER CHECKED syscall_ulong_t *, args) {
+                NCX syscall_ulong_t *, args) {
 	syscall_slong_t result;
 	syscall_ulong_t argv[SYS_SOCKETCALL_ARGC_MAX];
 
@@ -1699,13 +1699,13 @@ DEFINE_SYSCALL2(syscall_slong_t, socketcall,
 
 #ifdef __ARCH_WANT_SYSCALL_BIND
 	case SYS_BIND:
-		result = sys_bind(argv[0], (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1], argv[2]);
+		result = sys_bind(argv[0], (NCX UNCHECKED struct sockaddr *)(uintptr_t)argv[1], argv[2]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_BIND */
 
 #ifdef __ARCH_WANT_SYSCALL_CONNECT
 	case SYS_CONNECT:
-		result = sys_connect(argv[0], (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1], argv[2]);
+		result = sys_connect(argv[0], (NCX UNCHECKED struct sockaddr *)(uintptr_t)argv[1], argv[2]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_CONNECT */
 
@@ -1718,50 +1718,50 @@ DEFINE_SYSCALL2(syscall_slong_t, socketcall,
 #ifdef __ARCH_WANT_SYSCALL_ACCEPT
 	case SYS_ACCEPT:
 		result = sys_accept(argv[0],
-		                    (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
-		                    (USER UNCHECKED socklen_t *)(uintptr_t)argv[2]);
+		                    (NCX UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                    (NCX UNCHECKED socklen_t *)(uintptr_t)argv[2]);
 		break;
 #elif defined(__ARCH_WANT_SYSCALL_ACCEPT4)
 	case SYS_ACCEPT:
 		result = sys_accept4(argv[0],
-		                     (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
-		                     (USER UNCHECKED socklen_t *)(uintptr_t)argv[2], 0);
+		                     (NCX UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                     (NCX UNCHECKED socklen_t *)(uintptr_t)argv[2], 0);
 		break;
 #endif /* ... */
 
 #ifdef __ARCH_WANT_SYSCALL_GETSOCKNAME
 	case SYS_GETSOCKNAME:
 		result = sys_getsockname(argv[0],
-		                         (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
-		                         (USER UNCHECKED socklen_t *)(uintptr_t)argv[2]);
+		                         (NCX UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                         (NCX UNCHECKED socklen_t *)(uintptr_t)argv[2]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_GETSOCKNAME */
 
 #ifdef __ARCH_WANT_SYSCALL_GETSOCKNAME
 	case SYS_GETPEERNAME:
 		result = sys_getpeername(argv[0],
-		                         (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
-		                         (USER UNCHECKED socklen_t *)(uintptr_t)argv[2]);
+		                         (NCX UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                         (NCX UNCHECKED socklen_t *)(uintptr_t)argv[2]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_GETSOCKNAME */
 
 #ifdef __ARCH_WANT_SYSCALL_SOCKETPAIR
 	case SYS_SOCKETPAIR:
 		result = sys_socketpair(argv[0], argv[1], argv[2],
-		                        (USER UNCHECKED fd_t *)(uintptr_t)argv[3]);
+		                        (NCX UNCHECKED fd_t *)(uintptr_t)argv[3]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_SOCKETPAIR */
 
 #ifdef __ARCH_WANT_SYSCALL_SEND
 	case SYS_SEND:
 		result = sys_send(argv[0],
-		                  (USER UNCHECKED void const *)(uintptr_t)argv[1],
+		                  (NCX UNCHECKED void const *)(uintptr_t)argv[1],
 		                  argv[2], argv[3]);
 		break;
 #elif defined(__ARCH_WANT_SYSCALL_SENDTO)
 	case SYS_SEND:
 		result = sys_sendto(argv[0],
-		                    (USER UNCHECKED void const *)(uintptr_t)argv[1],
+		                    (NCX UNCHECKED void const *)(uintptr_t)argv[1],
 		                    argv[2], argv[3], NULL, 0);
 		break;
 #endif /* ... */
@@ -1769,29 +1769,29 @@ DEFINE_SYSCALL2(syscall_slong_t, socketcall,
 #ifdef __ARCH_WANT_SYSCALL_RECV
 	case SYS_RECV:
 		result = sys_recv(argv[0],
-		                  (USER UNCHECKED void *)(uintptr_t)argv[1],
+		                  (NCX UNCHECKED void *)(uintptr_t)argv[1],
 		                  argv[2], argv[3]);
 		break;
 #elif defined(__ARCH_WANT_SYSCALL_RECVFROM)
 	case SYS_RECV:
 		result = sys_recvfrom(argv[0],
-		                      (USER UNCHECKED void *)(uintptr_t)argv[1],
+		                      (NCX UNCHECKED void *)(uintptr_t)argv[1],
 		                      argv[2], argv[3], NULL, 0);
 		break;
 #endif /* ... */
 
 #ifdef __ARCH_WANT_SYSCALL_SENDTO
 	case SYS_SENDTO:
-		result = sys_sendto(argv[0], (USER UNCHECKED void const *)(uintptr_t)argv[1], argv[2],
-		                    argv[3], (USER UNCHECKED struct sockaddr const *)(uintptr_t)argv[4], argv[5]);
+		result = sys_sendto(argv[0], (NCX UNCHECKED void const *)(uintptr_t)argv[1], argv[2],
+		                    argv[3], (NCX UNCHECKED struct sockaddr const *)(uintptr_t)argv[4], argv[5]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_SENDTO */
 
 #ifdef __ARCH_WANT_SYSCALL_RECVFROM
 	case SYS_RECVFROM:
-		result = sys_recvfrom(argv[0], (USER UNCHECKED void *)(uintptr_t)argv[1], argv[2],
-		                      argv[3], (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[4],
-		                      (USER UNCHECKED socklen_t *)(uintptr_t)argv[5]);
+		result = sys_recvfrom(argv[0], (NCX UNCHECKED void *)(uintptr_t)argv[1], argv[2],
+		                      argv[3], (NCX UNCHECKED struct sockaddr *)(uintptr_t)argv[4],
+		                      (NCX UNCHECKED socklen_t *)(uintptr_t)argv[5]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_RECVFROM */
 
@@ -1804,7 +1804,7 @@ DEFINE_SYSCALL2(syscall_slong_t, socketcall,
 #ifdef __ARCH_WANT_SYSCALL_SETSOCKOPT
 	case SYS_SETSOCKOPT:
 		result = sys_setsockopt(argv[0], argv[1], argv[2],
-		                        (USER UNCHECKED void const *)(uintptr_t)argv[3],
+		                        (NCX UNCHECKED void const *)(uintptr_t)argv[3],
 		                        argv[4]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_SETSOCKOPT */
@@ -1812,15 +1812,15 @@ DEFINE_SYSCALL2(syscall_slong_t, socketcall,
 #ifdef __ARCH_WANT_SYSCALL_GETSOCKOPT
 	case SYS_GETSOCKOPT:
 		result = sys_getsockopt(argv[0], argv[1], argv[2],
-		                        (USER UNCHECKED void *)(uintptr_t)argv[3],
-		                        (USER UNCHECKED socklen_t *)(uintptr_t)argv[4]);
+		                        (NCX UNCHECKED void *)(uintptr_t)argv[3],
+		                        (NCX UNCHECKED socklen_t *)(uintptr_t)argv[4]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_GETSOCKOPT */
 
 #ifdef __ARCH_WANT_SYSCALL_SENDMSG
 	case SYS_SENDMSG:
 		result = sys_sendmsg(argv[0],
-		                     (USER UNCHECKED struct msghdr const *)(uintptr_t)argv[1],
+		                     (NCX UNCHECKED struct msghdr const *)(uintptr_t)argv[1],
 		                     argv[2]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_SENDMSG */
@@ -1828,7 +1828,7 @@ DEFINE_SYSCALL2(syscall_slong_t, socketcall,
 #ifdef __ARCH_WANT_SYSCALL_RECVMSG
 	case SYS_RECVMSG:
 		result = sys_recvmsg(argv[0],
-		                     (USER UNCHECKED struct msghdr *)(uintptr_t)argv[1],
+		                     (NCX UNCHECKED struct msghdr *)(uintptr_t)argv[1],
 		                     argv[2]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_RECVMSG */
@@ -1836,22 +1836,22 @@ DEFINE_SYSCALL2(syscall_slong_t, socketcall,
 #ifdef __ARCH_WANT_SYSCALL_ACCEPT4
 	case SYS_ACCEPT4:
 		result = sys_accept4(argv[0],
-		                     (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
-		                     (USER UNCHECKED socklen_t *)(uintptr_t)argv[2],
+		                     (NCX UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                     (NCX UNCHECKED socklen_t *)(uintptr_t)argv[2],
 		                     argv[3]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_ACCEPT4 */
 
 #ifdef __ARCH_WANT_SYSCALL_RECVMMSG
 	case SYS_RECVMMSG:
-		result = sys_recvmmsg(argv[0], (USER UNCHECKED struct mmsghdr *)(uintptr_t)argv[1], argv[2],
-		                      argv[3], (USER UNCHECKED struct timespec32 const *)(uintptr_t)argv[4]);
+		result = sys_recvmmsg(argv[0], (NCX UNCHECKED struct mmsghdr *)(uintptr_t)argv[1], argv[2],
+		                      argv[3], (NCX UNCHECKED struct timespec32 const *)(uintptr_t)argv[4]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_RECVMMSG */
 
 #ifdef __ARCH_WANT_SYSCALL_SENDMMSG
 	case SYS_SENDMMSG:
-		result = sys_sendmmsg(argv[0], (USER UNCHECKED struct mmsghdr *)(uintptr_t)argv[1],
+		result = sys_sendmmsg(argv[0], (NCX UNCHECKED struct mmsghdr *)(uintptr_t)argv[1],
 		                      argv[2], argv[3]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_SENDMMSG */
@@ -1883,7 +1883,7 @@ err_badcall:
 
 DEFINE_COMPAT_SYSCALL2(compat_syscall_slong_t, socketcall,
                        compat_syscall_ulong_t, call,
-                       USER CHECKED compat_syscall_ulong_t *, args) {
+                       NCX compat_syscall_ulong_t *, args) {
 	compat_syscall_slong_t result;
 	compat_syscall_ulong_t argv[SYS_SOCKETCALL_ARGC_MAX];
 
@@ -1908,13 +1908,13 @@ DEFINE_COMPAT_SYSCALL2(compat_syscall_slong_t, socketcall,
 
 #ifdef __ARCH_WANT_SYSCALL_BIND
 	case SYS_BIND:
-		result = sys_bind(argv[0], (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1], argv[2]);
+		result = sys_bind(argv[0], (NCX UNCHECKED struct sockaddr *)(uintptr_t)argv[1], argv[2]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_BIND */
 
 #ifdef __ARCH_WANT_SYSCALL_CONNECT
 	case SYS_CONNECT:
-		result = sys_connect(argv[0], (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1], argv[2]);
+		result = sys_connect(argv[0], (NCX UNCHECKED struct sockaddr *)(uintptr_t)argv[1], argv[2]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_CONNECT */
 
@@ -1927,14 +1927,14 @@ DEFINE_COMPAT_SYSCALL2(compat_syscall_slong_t, socketcall,
 #ifdef __ARCH_WANT_SYSCALL_ACCEPT
 	case SYS_ACCEPT:
 		result = sys_accept(argv[0],
-		                    (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
-		                    (USER UNCHECKED socklen_t *)(uintptr_t)argv[2]);
+		                    (NCX UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                    (NCX UNCHECKED socklen_t *)(uintptr_t)argv[2]);
 		break;
 #elif defined(__ARCH_WANT_SYSCALL_ACCEPT4)
 	case SYS_ACCEPT:
 		result = sys_accept4(argv[0],
-		                     (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
-		                     (USER UNCHECKED socklen_t *)(uintptr_t)argv[2],
+		                     (NCX UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                     (NCX UNCHECKED socklen_t *)(uintptr_t)argv[2],
 		                     argv[3]);
 		break;
 #endif /* ... */
@@ -1942,36 +1942,36 @@ DEFINE_COMPAT_SYSCALL2(compat_syscall_slong_t, socketcall,
 #ifdef __ARCH_WANT_SYSCALL_GETSOCKNAME
 	case SYS_GETSOCKNAME:
 		result = sys_getsockname(argv[0],
-		                         (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
-		                         (USER UNCHECKED socklen_t *)(uintptr_t)argv[2]);
+		                         (NCX UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                         (NCX UNCHECKED socklen_t *)(uintptr_t)argv[2]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_GETSOCKNAME */
 
 #ifdef __ARCH_WANT_SYSCALL_GETSOCKNAME
 	case SYS_GETPEERNAME:
 		result = sys_getpeername(argv[0],
-		                         (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
-		                         (USER UNCHECKED socklen_t *)(uintptr_t)argv[2]);
+		                         (NCX UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                         (NCX UNCHECKED socklen_t *)(uintptr_t)argv[2]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_GETSOCKNAME */
 
 #ifdef __ARCH_WANT_SYSCALL_SOCKETPAIR
 	case SYS_SOCKETPAIR:
 		result = sys_socketpair(argv[0], argv[1], argv[2],
-		                        (USER UNCHECKED fd_t *)(uintptr_t)argv[3]);
+		                        (NCX UNCHECKED fd_t *)(uintptr_t)argv[3]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_SOCKETPAIR */
 
 #ifdef __ARCH_WANT_SYSCALL_SEND
 	case SYS_SEND:
 		result = sys_send(argv[0],
-		                  (USER UNCHECKED void const *)(uintptr_t)argv[1],
+		                  (NCX UNCHECKED void const *)(uintptr_t)argv[1],
 		                  argv[2], argv[3]);
 		break;
 #elif defined(__ARCH_WANT_SYSCALL_SENDTO)
 	case SYS_SEND:
 		result = sys_sendto(argv[0],
-		                    (USER UNCHECKED void const *)(uintptr_t)argv[1],
+		                    (NCX UNCHECKED void const *)(uintptr_t)argv[1],
 		                    argv[2], argv[3], NULL, 0);
 		break;
 #endif /* ... */
@@ -1979,29 +1979,29 @@ DEFINE_COMPAT_SYSCALL2(compat_syscall_slong_t, socketcall,
 #ifdef __ARCH_WANT_SYSCALL_RECV
 	case SYS_RECV:
 		result = sys_recv(argv[0],
-		                  (USER UNCHECKED void *)(uintptr_t)argv[1],
+		                  (NCX UNCHECKED void *)(uintptr_t)argv[1],
 		                  argv[2], argv[3]);
 		break;
 #elif defined(__ARCH_WANT_SYSCALL_RECVFROM)
 	case SYS_RECV:
 		result = sys_recvfrom(argv[0],
-		                      (USER UNCHECKED void *)(uintptr_t)argv[1],
+		                      (NCX UNCHECKED void *)(uintptr_t)argv[1],
 		                      argv[2], argv[3], NULL, 0);
 		break;
 #endif /* ... */
 
 #ifdef __ARCH_WANT_SYSCALL_SENDTO
 	case SYS_SENDTO:
-		result = sys_sendto(argv[0], (USER UNCHECKED void const *)(uintptr_t)argv[1], argv[2],
-		                    argv[3], (USER UNCHECKED struct sockaddr const *)(uintptr_t)argv[4], argv[5]);
+		result = sys_sendto(argv[0], (NCX UNCHECKED void const *)(uintptr_t)argv[1], argv[2],
+		                    argv[3], (NCX UNCHECKED struct sockaddr const *)(uintptr_t)argv[4], argv[5]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_SENDTO */
 
 #ifdef __ARCH_WANT_SYSCALL_RECVFROM
 	case SYS_RECVFROM:
-		result = sys_recvfrom(argv[0], (USER UNCHECKED void *)(uintptr_t)argv[1], argv[2],
-		                      argv[3], (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[4],
-		                      (USER UNCHECKED socklen_t *)(uintptr_t)argv[5]);
+		result = sys_recvfrom(argv[0], (NCX UNCHECKED void *)(uintptr_t)argv[1], argv[2],
+		                      argv[3], (NCX UNCHECKED struct sockaddr *)(uintptr_t)argv[4],
+		                      (NCX UNCHECKED socklen_t *)(uintptr_t)argv[5]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_RECVFROM */
 
@@ -2014,7 +2014,7 @@ DEFINE_COMPAT_SYSCALL2(compat_syscall_slong_t, socketcall,
 #ifdef __ARCH_WANT_SYSCALL_SETSOCKOPT
 	case SYS_SETSOCKOPT:
 		result = sys_setsockopt(argv[0], argv[1], argv[2],
-		                        (USER UNCHECKED void const *)(uintptr_t)argv[3],
+		                        (NCX UNCHECKED void const *)(uintptr_t)argv[3],
 		                        argv[4]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_SETSOCKOPT */
@@ -2022,15 +2022,15 @@ DEFINE_COMPAT_SYSCALL2(compat_syscall_slong_t, socketcall,
 #ifdef __ARCH_WANT_SYSCALL_GETSOCKOPT
 	case SYS_GETSOCKOPT:
 		result = sys_getsockopt(argv[0], argv[1], argv[2],
-		                        (USER UNCHECKED void *)(uintptr_t)argv[3],
-		                        (USER UNCHECKED socklen_t *)(uintptr_t)argv[4]);
+		                        (NCX UNCHECKED void *)(uintptr_t)argv[3],
+		                        (NCX UNCHECKED socklen_t *)(uintptr_t)argv[4]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_GETSOCKOPT */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SENDMSG
 	case SYS_SENDMSG:
 		result = compat_sys_sendmsg(argv[0],
-		                            (USER UNCHECKED struct compat_msghdr const *)(uintptr_t)argv[1],
+		                            (NCX UNCHECKED struct compat_msghdr const *)(uintptr_t)argv[1],
 		                            argv[2]);
 		break;
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SENDMSG */
@@ -2038,7 +2038,7 @@ DEFINE_COMPAT_SYSCALL2(compat_syscall_slong_t, socketcall,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_RECVMSG
 	case SYS_RECVMSG:
 		result = compat_sys_recvmsg(argv[0],
-		                            (USER UNCHECKED struct compat_msghdr *)(uintptr_t)argv[1],
+		                            (NCX UNCHECKED struct compat_msghdr *)(uintptr_t)argv[1],
 		                            argv[2]);
 		break;
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_RECVMSG */
@@ -2046,22 +2046,22 @@ DEFINE_COMPAT_SYSCALL2(compat_syscall_slong_t, socketcall,
 #ifdef __ARCH_WANT_SYSCALL_ACCEPT4
 	case SYS_ACCEPT4:
 		result = sys_accept4(argv[0],
-		                     (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
-		                     (USER UNCHECKED socklen_t *)(uintptr_t)argv[2],
+		                     (NCX UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                     (NCX UNCHECKED socklen_t *)(uintptr_t)argv[2],
 		                     argv[3]);
 		break;
 #endif /* __ARCH_WANT_SYSCALL_ACCEPT4 */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_RECVMMSG
 	case SYS_RECVMMSG:
-		result = compat_sys_recvmmsg(argv[0], (USER UNCHECKED struct compat_mmsghdr *)(uintptr_t)argv[1], argv[2],
-		                             argv[3], (USER UNCHECKED struct compat_timespec32 const *)(uintptr_t)argv[4]);
+		result = compat_sys_recvmmsg(argv[0], (NCX UNCHECKED struct compat_mmsghdr *)(uintptr_t)argv[1], argv[2],
+		                             argv[3], (NCX UNCHECKED struct compat_timespec32 const *)(uintptr_t)argv[4]);
 		break;
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_RECVMMSG */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SENDMMSG
 	case SYS_SENDMMSG:
-		result = compat_sys_sendmmsg(argv[0], (USER UNCHECKED struct compat_mmsghdr *)(uintptr_t)argv[1],
+		result = compat_sys_sendmmsg(argv[0], (NCX UNCHECKED struct compat_mmsghdr *)(uintptr_t)argv[1],
 		                             argv[2], argv[3]);
 		break;
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SENDMMSG */

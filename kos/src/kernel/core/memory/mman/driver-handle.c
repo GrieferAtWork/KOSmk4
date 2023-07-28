@@ -71,7 +71,7 @@ require_driver(struct module *__restrict self) {
 
 
 INTERN BLOCKING WUNUSED NONNULL((1)) size_t KCALL
-handle_module_pread(struct module *__restrict self, USER CHECKED void *dst,
+handle_module_pread(struct module *__restrict self, NCX void *dst,
                     size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
 	uintptr_t base;
 	size_t max_io;
@@ -90,7 +90,7 @@ handle_module_pread(struct module *__restrict self, USER CHECKED void *dst,
 }
 
 INTERN BLOCKING NONNULL((1)) size_t KCALL
-handle_module_pwrite(struct module *__restrict self, USER CHECKED void const *src,
+handle_module_pwrite(struct module *__restrict self, NCX void const *src,
                      size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
 	uintptr_t base;
 	size_t max_io;
@@ -145,7 +145,7 @@ handle_module_pwritev(struct module *__restrict self, struct iov_buffer *__restr
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 driver_ioctl_getstring(struct module *__restrict self, uint64_t index,
-                       USER CHECKED struct mod_string *info) {
+                       NCX struct mod_string *info) {
 	size_t result;
 	struct format_snprintf_data pdat;
 	pdat.sd_buffer = info->ms_buf;
@@ -200,16 +200,16 @@ driver_ioctl_getstring(struct module *__restrict self, uint64_t index,
 
 INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_module_ioctl(struct module *__restrict self, ioctl_t cmd,
-                    USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+                    NCX UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	switch (cmd) {
 
 	case MOD_IOC_GETOBJECT: {
 		struct driver *me;
 		struct handle hand;
-		USER CHECKED struct mod_object *info;
+		NCX struct mod_object *info;
 		uint64_t index;
 		validate_readwrite(arg, sizeof(*info));
-		info  = (USER CHECKED struct mod_object *)arg;
+		info  = (NCX struct mod_object *)arg;
 		index = info->mo_index;
 		COMPILER_READ_BARRIER();
 		me = require_driver(self);
@@ -226,19 +226,19 @@ handle_module_ioctl(struct module *__restrict self, ioctl_t cmd,
 	}	break;
 
 	case MOD_IOC_GETSTRING: {
-		USER CHECKED struct mod_string *info;
+		NCX struct mod_string *info;
 		uint64_t index;
 		validate_readwrite(arg, sizeof(*info));
-		info  = (USER CHECKED struct mod_string *)arg;
+		info  = (NCX struct mod_string *)arg;
 		index = info->ms_index;
 		COMPILER_READ_BARRIER();
 		return driver_ioctl_getstring(self, index, info);
 	}	break;
 
 	case MOD_IOC_LOADINFO: {
-		USER CHECKED struct mod_loadinfo *info;
+		NCX struct mod_loadinfo *info;
 		validate_readwrite(arg, sizeof(*info));
-		info = (USER CHECKED struct mod_loadinfo *)arg;
+		info = (NCX struct mod_loadinfo *)arg;
 		require(CAP_SYS_MODULE);
 		COMPILER_WRITE_BARRIER();
 		info->mli_loadaddr  = (uintptr_t)self->md_loadaddr;
@@ -285,15 +285,15 @@ handle_module_ioctl(struct module *__restrict self, ioctl_t cmd,
 
 INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_driver_loadlist_ioctl(struct driver_loadlist *__restrict self, ioctl_t cmd,
-                             USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+                             NCX UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	switch (cmd) {
 
 	case MOD_IOC_GETOBJECT: {
 		struct handle hand;
-		USER CHECKED struct mod_object *info;
+		NCX struct mod_object *info;
 		uint64_t index;
 		validate_readwrite(arg, sizeof(*info));
-		info  = (USER CHECKED struct mod_object *)arg;
+		info  = (NCX struct mod_object *)arg;
 		index = info->mo_index;
 		COMPILER_READ_BARRIER();
 		if (index >= (uint64_t)self->dll_count)
@@ -310,10 +310,10 @@ handle_driver_loadlist_ioctl(struct driver_loadlist *__restrict self, ioctl_t cm
 
 	case MOD_IOC_GETSTRING: {
 		REF struct driver *drv;
-		USER CHECKED struct mod_string *info;
+		NCX struct mod_string *info;
 		uint64_t index;
 		validate_readwrite(arg, sizeof(*info));
-		info  = (USER CHECKED struct mod_string *)arg;
+		info  = (NCX struct mod_string *)arg;
 		index = info->ms_index;
 		COMPILER_READ_BARRIER();
 		if (index >= (uint64_t)self->dll_count)

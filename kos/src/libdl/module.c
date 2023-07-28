@@ -87,7 +87,7 @@ dlmodule_finalizers_run(struct dlmodule_finalizers *__restrict self)
 
 /* DlModule functions */
 INTERN NONNULL((1)) void CC
-DlModule_Destroy(USER DlModule *self)
+DlModule_Destroy(NCX DlModule *self)
 		THROWS(E_SEGFAULT, ...) {
 
 	/* Unbind the module from the list of all modules. */
@@ -254,7 +254,7 @@ again_free_sections:
 
 /* DlModule functions */
 INTERN NONNULL((1)) void
-NOTHROW_NCX(CC DlModule_Free)(USER DlModule *self)
+NOTHROW_NCX(CC DlModule_Free)(NCX DlModule *self)
 		THROWS(E_SEGFAULT) {
 	free(self);
 }
@@ -264,7 +264,7 @@ INTDEF WUNUSED fd_t NOTHROW_RPC(CC reopen_bigfd)(fd_t fd);
 
 /* Lazily allocate if necessary, and return the file descriptor for `self' */
 INTERN WUNUSED NONNULL((1)) fd_t
-NOTHROW_NCX(CC DlModule_GetFd)(USER DlModule *self)
+NOTHROW_NCX(CC DlModule_GetFd)(NCX DlModule *self)
 		THROWS(E_SEGFAULT) {
 	fd_t result = self->dm_file;
 	if (result == -1) {
@@ -296,7 +296,7 @@ err:
  *  - self->dm_elf.de_shdr
  * @return: NULL: Error */
 INTERN WUNUSED NONNULL((1)) ElfW(Shdr) *
-NOTHROW_NCX(CC DlModule_ElfGetShdrs)(USER DlModule *self)
+NOTHROW_NCX(CC DlModule_ElfGetShdrs)(NCX DlModule *self)
 		THROWS(E_SEGFAULT) {
 	fd_t fd;
 	ElfW(Shdr) *result;
@@ -426,7 +426,7 @@ err:
  * @return: * : The # of symbols in `de_dynsym_tab'
  * @return: 0 : Error (dlerror() was modified) */
 INTERN WUNUSED NONNULL((1)) size_t
-NOTHROW_NCX(CC DlModule_ElfGetDynSymCnt)(USER DlModule *self)
+NOTHROW_NCX(CC DlModule_ElfGetDynSymCnt)(NCX DlModule *self)
 		THROWS(E_SEGFAULT) {
 	size_t result;
 	assert(!self->dm_ops);
@@ -500,8 +500,8 @@ NOTHROW_NCX(CC DlModule_ElfGetDynSymCnt)(USER DlModule *self)
  * @return: NULL:             Error (w/ dlerror() set)
  * @return: (ElfW(Shdr) *)-1: Not found (w/o dlerror() set) */
 INTERN WUNUSED NONNULL((1, 2)) ElfW(Shdr) *
-NOTHROW_NCX(CC DlModule_ElfGetSection)(USER DlModule *self,
-                                       USER char const *name)
+NOTHROW_NCX(CC DlModule_ElfGetSection)(NCX DlModule *self,
+                                       NCX char const *name)
 		THROWS(E_SEGFAULT) {
 	ElfW(Shdr) *result;
 	uint16_t i;

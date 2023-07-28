@@ -700,7 +700,7 @@ NOTHROW(KCALL mousedev_hwheel_nopr)(struct mousedev *__restrict self,
 /* Mouse character device operators */
 PUBLIC NONNULL((1)) size_t KCALL
 mousedev_v_read(struct mfile *__restrict self,
-                USER CHECKED void *dst, size_t num_bytes,
+                NCX void *dst, size_t num_bytes,
                 iomode_t mode) THROWS(...) {
 	struct mousedev *me = mfile_asmouse(self);
 	mouse_packet_t packet;
@@ -741,7 +741,7 @@ empty:
 
 PUBLIC NONNULL((1)) void KCALL
 mousedev_v_stat(struct mfile *__restrict self,
-                USER CHECKED struct stat *result) THROWS(...) {
+                NCX struct stat *result) THROWS(...) {
 	struct mousedev *me  = mfile_asmouse(self);
 	uintptr_half_t count = atomic_read(&me->md_buf.mb_bufstate.bs_state.s_used);
 
@@ -781,7 +781,7 @@ mousedev_v_polltest(struct mfile *__restrict self,
 
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 mousedev_v_ioctl(struct mfile *__restrict self,
-                 ioctl_t cmd, USER UNCHECKED void *arg,
+                 ioctl_t cmd, NCX UNCHECKED void *arg,
                  iomode_t mode) THROWS(...) {
 	struct mousedev *me = mfile_asmouse(self);
 	(void)mode;
@@ -792,13 +792,13 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 		validate_writable(arg, sizeof(int));
 		result = (me->md_flags & MOUSE_DEVICE_FLAG_GENABS) ? 1 : 0;
 		COMPILER_WRITE_BARRIER();
-		*(USER CHECKED int *)arg = result;
+		*(NCX int *)arg = result;
 	}	break;
 
 	case MOUSEIO_SETABSMODE: {
 		int mode;
 		validate_readable(arg, sizeof(int));
-		mode = *(USER CHECKED int const *)arg;
+		mode = *(NCX int const *)arg;
 		if (mode == 0) {
 			atomic_and(&me->md_flags, ~MOUSE_DEVICE_FLAG_GENABS);
 		} else if (mode == 1) {
@@ -897,13 +897,13 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 		validate_writable(arg, sizeof(u32));
 		buttons = atomic_read(&me->md_state.ms_buttons);
 		COMPILER_WRITE_BARRIER();
-		*(USER CHECKED u32 *)arg = buttons;
+		*(NCX u32 *)arg = buttons;
 	}	break;
 
 	case MOUSEIO_SETBUTTONS: {
 		u32 new_buttons;
 		validate_readable(arg, sizeof(u32));
-		new_buttons = *(USER CHECKED u32 const *)arg;
+		new_buttons = *(NCX u32 const *)arg;
 		COMPILER_READ_BARRIER();
 		if (!mousedev_button(me, (u32)~0, new_buttons))
 			goto err_buffer_full;
@@ -922,14 +922,14 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 		                           &button.mfb_new_buttons))
 			goto err_buffer_full;
 		COMPILER_WRITE_BARRIER();
-		((USER CHECKED struct mouse_fake_button *)arg)->mfb_old_buttons = button.mfb_old_buttons;
-		((USER CHECKED struct mouse_fake_button *)arg)->mfb_new_buttons = button.mfb_new_buttons;
+		((NCX struct mouse_fake_button *)arg)->mfb_old_buttons = button.mfb_old_buttons;
+		((NCX struct mouse_fake_button *)arg)->mfb_new_buttons = button.mfb_new_buttons;
 	}	break;
 
 	case MOUSEIO_PUTVWHEEL: {
 		s32 relmove;
 		validate_readable(arg, sizeof(s32));
-		relmove = *(USER CHECKED s32 const *)arg;
+		relmove = *(NCX s32 const *)arg;
 		COMPILER_READ_BARRIER();
 		if (!mousedev_vwheel(me, relmove))
 			goto err_buffer_full;
@@ -938,7 +938,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 	case MOUSEIO_PUTHWHEEL: {
 		s32 relmove;
 		validate_readable(arg, sizeof(s32));
-		relmove = *(USER CHECKED s32 const *)arg;
+		relmove = *(NCX s32 const *)arg;
 		COMPILER_READ_BARRIER();
 		if (!mousedev_hwheel(me, relmove))
 			goto err_buffer_full;

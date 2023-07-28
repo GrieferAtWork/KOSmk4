@@ -135,7 +135,7 @@ __ARM_NOPF_DEFFUN(arm_nopf_ldrb_r0_Br0B) /* ldrb r0, [r0] # read byte */
  * Return `true' on success, `false' on fault */
 #define __arch_readb_nopf __arch_readb_nopf
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __BOOL
-__NOTHROW(__arch_readb_nopf)(__USER __CHECKED void const *__addr, __uint8_t *__presult) {
+__NOTHROW(__arch_readb_nopf)(__NCX void const *__addr, __uint8_t *__presult) {
 	__BOOL __error;
 	__register_var(__uint32_t, __r0, "r0");
 	__asm__ __volatile__(__ARM_NOPF_CALLASM(arm_nopf_ldrb_r0_Br0B)
@@ -155,7 +155,7 @@ __ARM_NOPF_DEFFUN(arm_nopf_ldrh_r0_Br0B) /* ldrh r0, [r0] # read word */
  * Return `true' on success, `false' on fault */
 #define __arch_readw_nopf __arch_readw_nopf
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __BOOL
-__NOTHROW(__arch_readw_nopf)(__USER __CHECKED void const *__addr, __uint16_t *__presult) {
+__NOTHROW(__arch_readw_nopf)(__NCX void const *__addr, __uint16_t *__presult) {
 	__BOOL __error;
 	__register_var(__uint32_t, __r0, "r0");
 	__asm__ __volatile__(__ARM_NOPF_CALLASM(arm_nopf_ldrh_r0_Br0B)
@@ -175,7 +175,7 @@ __ARM_NOPF_DEFFUN(arm_nopf_ldr_r0_Br0B) /* ldr r0, [r0] # read dword */
  * Return `true' on success, `false' on fault */
 #define __arch_readl_nopf __arch_readl_nopf
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __BOOL
-__NOTHROW(__arch_readl_nopf)(__USER __CHECKED void const *__addr, __uint32_t *__presult) {
+__NOTHROW(__arch_readl_nopf)(__NCX void const *__addr, __uint32_t *__presult) {
 	__BOOL __error;
 	__register_var(__uint32_t, __r0, "r0");
 	__asm__ __volatile__(__ARM_NOPF_CALLASM(arm_nopf_ldr_r0_Br0B)
@@ -197,7 +197,7 @@ __ARM_NOPF_DEFFUN(arm_nopf_ldrd_r0_r1_Br0B) /* ldrd r0, r1, [r0] # read qword */
  * Return `true' on success, `false' on fault */
 #define __arch_readq_nopf __arch_readq_nopf
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __BOOL
-__NOTHROW(__arch_readq_nopf)(__USER __CHECKED void const *__addr, __uint64_t *__presult) {
+__NOTHROW(__arch_readq_nopf)(__NCX void const *__addr, __uint64_t *__presult) {
 	__BOOL __error;
 	__register_var(__uint32_t, __r0, "r0");
 	__register_var(__uint32_t, __r1, "r1");
@@ -221,7 +221,7 @@ __ARM_NOPF_DEFFUN(arm_nopf_strb_r0_Br1B) /* strb r0, [r1] # write byte */
  * Return  `true'  on  success,  `false'  on  error */
 #define __arch_writeb_nopf __arch_writeb_nopf
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_writeb_nopf)(__USER __CHECKED void const *__addr, __uint8_t __val) {
+__NOTHROW(__arch_writeb_nopf)(__NCX void const *__addr, __uint8_t __val) {
 	__BOOL __error;
 	__register_var(__uint32_t, __r0, "r0") = (__uint32_t)__val;
 	__register_var(__uint32_t, __r1, "r1") = (__uint32_t)__addr;
@@ -241,7 +241,7 @@ __ARM_NOPF_DEFFUN(arm_nopf_strh_r0_Br1B) /* strh r0, [r1] # write word */
  * Return  `true'  on  success,  `false'  on  error */
 #define __arch_writew_nopf __arch_writew_nopf
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_writew_nopf)(__USER __CHECKED void const *__addr, __uint16_t __val) {
+__NOTHROW(__arch_writew_nopf)(__NCX void const *__addr, __uint16_t __val) {
 	__BOOL __error;
 	__register_var(__uint32_t, __r0, "r0") = (__uint32_t)__val;
 	__register_var(__uint32_t, __r1, "r1") = (__uint32_t)__addr;
@@ -261,7 +261,7 @@ __ARM_NOPF_DEFFUN(arm_nopf_str_r0_Br1B) /* str r0, [r1] # write dword */
  * Return  `true'  on  success,  `false'  on  error */
 #define __arch_writel_nopf __arch_writel_nopf
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_writel_nopf)(__USER __CHECKED void const *__addr, __uint32_t __val) {
+__NOTHROW(__arch_writel_nopf)(__NCX void const *__addr, __uint32_t __val) {
 	__BOOL __error;
 	__register_var(__uint32_t, __r0, "r0") = (__uint32_t)__val;
 	__register_var(__uint32_t, __r1, "r1") = (__uint32_t)__addr;
@@ -283,7 +283,7 @@ __ARM_NOPF_DEFFUN(arm_nopf_strd_r0_r1_Br2B) /* strd r0, r1, [r2] # write qword *
  * Return  `true'  on  success,  `false'  on  error */
 #define __arch_writeq_nopf __arch_writeq_nopf
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
-__NOTHROW(__arch_writeq_nopf)(__USER __CHECKED void const *__addr, __uint64_t __val) {
+__NOTHROW(__arch_writeq_nopf)(__NCX void const *__addr, __uint64_t __val) {
 	__BOOL __error;
 	__register_var(__uint32_t, __r0, "r0") = (__uint32_t)__val;
 	__register_var(__uint32_t, __r1, "r1") = (__uint32_t)(__val >> 32);
@@ -331,7 +331,7 @@ __ARM_NOPF_DEFFUN(arm_nopf_cmpxchb) /* ... */
 
 #define __arch_atomic_cmpxchb_nopf __arch_atomic_cmpxchb_nopf
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((4)) __BOOL
-__NOTHROW(__arch_atomic_cmpxchb_nopf)(__USER __CHECKED void *__addr,
+__NOTHROW(__arch_atomic_cmpxchb_nopf)(__NCX void *__addr,
                                       __uint8_t __oldval, __uint8_t __newval,
                                       __uint8_t *__preal_oldval) {
 	__BOOL __error;
@@ -357,7 +357,7 @@ __ARM_NOPF_DEFFUN(arm_nopf_cmpxchh) /* ... */
 
 #define __arch_atomic_cmpxchw_nopf __arch_atomic_cmpxchw_nopf
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((4)) __BOOL
-__NOTHROW(__arch_atomic_cmpxchw_nopf)(__USER __CHECKED void *__addr,
+__NOTHROW(__arch_atomic_cmpxchw_nopf)(__NCX void *__addr,
                                       __uint16_t __oldval, __uint16_t __newval,
                                       __uint16_t *__preal_oldval) {
 	__BOOL __error;
@@ -383,7 +383,7 @@ __ARM_NOPF_DEFFUN(arm_nopf_cmpxch) /* ... */
 
 #define __arch_atomic_cmpxchl_nopf __arch_atomic_cmpxchl_nopf
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((4)) __BOOL
-__NOTHROW(__arch_atomic_cmpxchl_nopf)(__USER __CHECKED void *__addr,
+__NOTHROW(__arch_atomic_cmpxchl_nopf)(__NCX void *__addr,
                                       __uint32_t __oldval, __uint32_t __newval,
                                       __uint32_t *__preal_oldval) {
 	__BOOL __error;
@@ -437,7 +437,7 @@ __ARM_NOPF_DEFFUN(arm_nopf_cmpxchd) /* ... */
 
 #define __arch_atomic_cmpxchq_nopf __arch_atomic_cmpxchq_nopf
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((4)) __BOOL
-__NOTHROW(__arch_atomic_cmpxchq_nopf)(__USER __CHECKED void *__addr,
+__NOTHROW(__arch_atomic_cmpxchq_nopf)(__NCX void *__addr,
                                       __uint64_t __oldval, __uint64_t __newval,
                                       __uint64_t *__preal_oldval) {
 	__BOOL __error;

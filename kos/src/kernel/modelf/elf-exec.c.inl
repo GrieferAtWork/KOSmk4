@@ -41,9 +41,9 @@
 #include <kernel/mman/ramfile.h>
 
 #ifdef LOCAL_EXEC_ARGV_SIZE
-#define LOCAL_STRINGARRAY_TYPE USER CHECKED void const *
+#define LOCAL_STRINGARRAY_TYPE NCX void const *
 #else /* LOCAL_EXEC_ARGV_SIZE */
-#define LOCAL_STRINGARRAY_TYPE USER UNCHECKED LOCAL_PTR(char const) USER CHECKED const *
+#define LOCAL_STRINGARRAY_TYPE NCX UNCHECKED LOCAL_PTR(char const) NCX const *
 #endif /* !LOCAL_EXEC_ARGV_SIZE */
 
 DECL_BEGIN
@@ -239,7 +239,7 @@ done_PT_LOAD_bss:
 #error "Unsupported `__ARCH_COMPAT_SIZEOF_POINTER'"
 #endif /* __ARCH_COMPAT_SIZEOF_POINTER != ... */
 		{
-			typedef USER UNCHECKED PTR32(char const) USER CHECKED const *vec_t;
+			typedef NCX UNCHECKED PTR32(char const) NCX const *vec_t;
 #if LOCAL_POINTERSIZE == 4
 			peb_base = mbuilder_alloc_peb32_p32(&builder,
 			                                    args->ea_argc_inject,
@@ -254,7 +254,7 @@ done_PT_LOAD_bss:
 			                                    (vec_t)args->ea_envp);
 #endif /* LOCAL_POINTERSIZE != 4 */
 		} else {
-			typedef USER UNCHECKED PTR64(char const) USER CHECKED const *vec_t;
+			typedef NCX UNCHECKED PTR64(char const) NCX const *vec_t;
 #if LOCAL_POINTERSIZE == 4
 			peb_base = mbuilder_alloc_peb32_p64(&builder,
 			                                    args->ea_argc_inject,
@@ -305,9 +305,9 @@ done_PT_LOAD_bss:
 		}
 		TRY {
 			size_t ustack_size;
-			USER void *entry_pc;
+			NCX void *entry_pc;
 			ustack_size = USER_STACK_SIZE;
-			entry_pc    = (USER void *)(uintptr_t)ehdr->e_entry;
+			entry_pc    = (NCX void *)(uintptr_t)ehdr->e_entry;
 			if (linker_base != (void *)-1) {
 				/* Initialize such that we make use of the dynamic linker. */
 				args->ea_state = LOCAL_FUNC(elfexec_init_rtld)(/* user_state:           */ args->ea_state,

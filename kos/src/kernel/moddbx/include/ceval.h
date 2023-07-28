@@ -73,7 +73,7 @@ NOTHROW_CB_NCX(FCALL cexpr_pushparse)(struct cparser *__restrict self);
  * @return: DBX_EOK: Success
  * @return: * :      Error (the effective c-expression-stack-size is unaltered) */
 FUNDEF dbx_errno_t
-NOTHROW_CB_NCX(FCALL cexpr_pusheval)(CHECKED char const *expr,
+NOTHROW_CB_NCX(FCALL cexpr_pusheval)(NCX char const *expr,
                                      size_t maxlen DFL((size_t)-1));
 
 /* Parse a named type from  `self'. This function expects  that
@@ -96,7 +96,7 @@ NOTHROW_CB_NCX(FCALL cexpr_pusheval)(CHECKED char const *expr,
 FUNDEF WUNUSED NONNULL((1, 2)) dbx_errno_t
 NOTHROW_CB_NCX(FCALL ctype_eval)(struct cparser *__restrict self,
                                  /*out:ref*/ struct ctyperef *__restrict p_result,
-                                 CHECKED char const **p_varname, size_t *p_varname_len);
+                                 NCX char const **p_varname, size_t *p_varname_len);
 
 DECL_END
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */

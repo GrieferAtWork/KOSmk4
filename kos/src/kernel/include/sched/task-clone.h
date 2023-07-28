@@ -133,11 +133,11 @@ struct task_clone_args {
 	union {
 		struct task_clone_kargs         tca_kthread;     /* [valid_if(init_state == NULL)] */
 		struct {
-			USER UNCHECKED fd_t        *tca_pidfd;       /* [valid_if(CLONE_PIDFD)] Where to store pidfd */
-			USER UNCHECKED pid_t       *tca_child_tid;   /* [valid_if(CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID)] Store child TID here in child memory */
-			USER UNCHECKED pid_t       *tca_parent_tid;  /* [valid_if(CLONE_PARENT_SETTID)] Store child TID here in parent memory */
-			USER UNCHECKED void        *tca_stack;       /* Child stack starting address */
-			USER UNCHECKED pid_t const *tca_set_tid;     /* [0..tca_set_tid] set-tid array base */
+			NCX UNCHECKED fd_t         *tca_pidfd;       /* [valid_if(CLONE_PIDFD)] Where to store pidfd */
+			NCX UNCHECKED pid_t        *tca_child_tid;   /* [valid_if(CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID)] Store child TID here in child memory */
+			NCX UNCHECKED pid_t        *tca_parent_tid;  /* [valid_if(CLONE_PARENT_SETTID)] Store child TID here in parent memory */
+			NCX UNCHECKED void         *tca_stack;       /* Child stack starting address */
+			NCX UNCHECKED pid_t const  *tca_set_tid;     /* [0..tca_set_tid] set-tid array base */
 			size_t                      tca_set_tid_siz; /* set-tid array length */
 			fd_t                        tca_cgroup;      /* [valid_if(CLONE_INTO_CGROUP)] cgroup file descriptor */
 #ifdef ARCH_HAVE_ARCH_TASK_CLONE_ARGS

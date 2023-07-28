@@ -85,14 +85,14 @@ DEFINE_REFCNT_FUNCTIONS(struct mfutexfd, mfd_refcnt, mfutexfd_destroy);
  * @throw: E_INSUFFICIENT_RIGHTS: Tried to exceed `mfutexfd_maxexpr' w/o `CAP_SYS_RESOURCE' */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfutexfd *FCALL
 mfutexfd_new(REF struct mfutex *__restrict futex,
-             USER UNCHECKED void *base,
-             USER CHECKED struct lfutexexpr const *expr)
+             NCX UNCHECKED void *base,
+             NCX struct lfutexexpr const *expr)
 		THROWS(E_BADALLOC, E_SEGFAULT, E_INSUFFICIENT_RIGHTS);
 #ifdef __ARCH_HAVE_COMPAT
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfutexfd *FCALL
 compat_mfutexfd_new(REF struct mfutex *__restrict futex,
-                    USER UNCHECKED void *base,
-                    USER CHECKED struct compat_lfutexexpr const *expr)
+                    NCX UNCHECKED void *base,
+                    NCX struct compat_lfutexexpr const *expr)
 		THROWS(E_BADALLOC, E_SEGFAULT, E_INSUFFICIENT_RIGHTS);
 #endif /* __ARCH_HAVE_COMPAT */
 

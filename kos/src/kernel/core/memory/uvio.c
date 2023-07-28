@@ -491,7 +491,7 @@ NOTHROW(KCALL uvio_server_has_request_with_status)(struct uvio const *__restrict
 /* Try to read one request into `*req' */
 PRIVATE WUNUSED NONNULL((1)) bool KCALL
 uvio_server_readone_nonblock(struct uvio *__restrict self,
-                             USER CHECKED struct uvio_request *req) THROWS(...) {
+                             NCX struct uvio_request *req) THROWS(...) {
 	unsigned int reqid;
 	struct kernel_uvio_request *slot;
 	for (reqid = 0; reqid < CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS; ++reqid) {
@@ -569,10 +569,10 @@ badslot:
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
 uvio_server_read(struct mfile *__restrict self,
-                 USER CHECKED void *dst,
+                 NCX void *dst,
                  size_t num_bytes, iomode_t mode) THROWS(...) {
 	struct uvio *me = mfile_asuvio(self);
-	USER CHECKED struct uvio_request *req;
+	NCX struct uvio_request *req;
 	assert(!task_wasconnected());
 
 	/* Have the caller check for (IO_NONBLOCK), or wait (!IO_NONBLOCK)  until
@@ -586,7 +586,7 @@ uvio_server_read(struct mfile *__restrict self,
 		      sizeof(struct uvio_request),
 		      num_bytes);
 	}
-	req = (USER CHECKED struct uvio_request *)dst;
+	req = (NCX struct uvio_request *)dst;
 try_readone:
 	if (uvio_server_readone_nonblock(me, req))
 		return sizeof(struct uvio_request);
@@ -614,7 +614,7 @@ try_readone:
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
 uvio_server_write(struct mfile *__restrict self,
-                  USER CHECKED void const *src,
+                  NCX void const *src,
                   size_t num_bytes,
                   iomode_t UNUSED(mode)) THROWS(...) {
 	struct uvio *me = mfile_asuvio(self);
@@ -659,7 +659,7 @@ uvio_server_write(struct mfile *__restrict self,
 
 	case UVIO_OPCODE_EXCEPT: {
 		struct kernel_uvio_except except;
-		USER CHECKED struct uvio_response_except *full_response;
+		NCX struct uvio_response_except *full_response;
 		static_assert(sizeof(except_code_t) == sizeof(uintptr_t));
 		result = sizeof(struct uvio_response_except);
 		if unlikely(num_bytes < result) {
@@ -669,7 +669,7 @@ err_buffer_too_small:
 		}
 		/* Read exception data. */
 		COMPILER_READ_BARRIER();
-		full_response = (USER CHECKED struct uvio_response_except *)src;
+		full_response = (NCX struct uvio_response_except *)src;
 		except.kue_code = (except_code_t)full_response->ur_except_code;
 		memcpy(except.kue_pointers, full_response->ur_except_ptrs,
 		       EXCEPTION_DATA_POINTERS, sizeof(uintptr_t));
@@ -695,13 +695,13 @@ complete_slot_with_except:
 #ifdef __ARCH_HAVE_COMPAT
 	case UVIO_OPCODE_EXCEPT_COMPAT: {
 		unsigned int i;
-		USER CHECKED struct uvio_response_except_compat *full_response;
+		NCX struct uvio_response_except_compat *full_response;
 		result = sizeof(struct uvio_response_except_compat);
 		if unlikely(num_bytes < result)
 			goto err_buffer_too_small;
 		/* Read exception data. */
 		COMPILER_READ_BARRIER();
-		full_response = (USER CHECKED struct uvio_response_except_compat *)src;
+		full_response = (NCX struct uvio_response_except_compat *)src;
 		except.kue_code = (except_code_t)full_response->ur_except_code;
 		for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 			except.kue_pointers[i] = (uintptr_t)full_response->ur_except_ptrs[i];
@@ -756,7 +756,7 @@ complete_slot_nostatus:
 	case UVIO_OPCODE_XORB:
 	case UVIO_OPCODE_CMPXCHB: {
 		uint8_t retval;
-		USER CHECKED struct uvio_response_readb *full_response;
+		NCX struct uvio_response_readb *full_response;
 		result = sizeof(struct uvio_response_readb);
 		if unlikely(num_bytes < result)
 			goto err_buffer_too_small;
@@ -765,7 +765,7 @@ complete_slot_nostatus:
 
 		/* Read in the return value. */
 		COMPILER_READ_BARRIER();
-		full_response = (USER CHECKED struct uvio_response_readb *)src;
+		full_response = (NCX struct uvio_response_readb *)src;
 		retval        = full_response->ur_result;
 		COMPILER_READ_BARRIER();
 
@@ -792,7 +792,7 @@ complete_slot_nostatus:
 	case UVIO_OPCODE_XORW:
 	case UVIO_OPCODE_CMPXCHW: {
 		uint16_t retval;
-		USER CHECKED struct uvio_response_readw *full_response;
+		NCX struct uvio_response_readw *full_response;
 		result = sizeof(struct uvio_response_readw);
 		if unlikely(num_bytes < result)
 			goto err_buffer_too_small;
@@ -801,7 +801,7 @@ complete_slot_nostatus:
 
 		/* Read in the return value. */
 		COMPILER_READ_BARRIER();
-		full_response = (USER CHECKED struct uvio_response_readw *)src;
+		full_response = (NCX struct uvio_response_readw *)src;
 		retval        = full_response->ur_result;
 		COMPILER_READ_BARRIER();
 
@@ -828,7 +828,7 @@ complete_slot_nostatus:
 	case UVIO_OPCODE_XORL:
 	case UVIO_OPCODE_CMPXCHL: {
 		uint32_t retval;
-		USER CHECKED struct uvio_response_readl *full_response;
+		NCX struct uvio_response_readl *full_response;
 		result = sizeof(struct uvio_response_readl);
 		if unlikely(num_bytes < result)
 			goto err_buffer_too_small;
@@ -837,7 +837,7 @@ complete_slot_nostatus:
 
 		/* Read in the return value. */
 		COMPILER_READ_BARRIER();
-		full_response = (USER CHECKED struct uvio_response_readl *)src;
+		full_response = (NCX struct uvio_response_readl *)src;
 		retval        = full_response->ur_result;
 		COMPILER_READ_BARRIER();
 
@@ -870,7 +870,7 @@ complete_slot_nostatus:
 #endif /* LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 	{
 		uint64_t retval;
-		USER CHECKED struct uvio_response_readq *full_response;
+		NCX struct uvio_response_readq *full_response;
 		result = sizeof(struct uvio_response_readq);
 		if unlikely(num_bytes < result)
 			goto err_buffer_too_small;
@@ -879,7 +879,7 @@ complete_slot_nostatus:
 
 		/* Read in the return value. */
 		COMPILER_READ_BARRIER();
-		full_response = (USER CHECKED struct uvio_response_readq *)src;
+		full_response = (NCX struct uvio_response_readq *)src;
 		retval        = full_response->ur_result;
 		COMPILER_READ_BARRIER();
 
@@ -901,7 +901,7 @@ complete_slot_nostatus:
 #ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
 	case UVIO_OPCODE_CMPXCHX: {
 		uint128_t retval;
-		USER CHECKED struct uvio_response_readx *full_response;
+		NCX struct uvio_response_readx *full_response;
 		result = sizeof(struct uvio_response_readx);
 		if unlikely(num_bytes < result)
 			goto err_buffer_too_small;
@@ -910,7 +910,7 @@ complete_slot_nostatus:
 
 		/* Read in the return value. */
 		COMPILER_READ_BARRIER();
-		full_response = (USER CHECKED struct uvio_response_readx *)src;
+		full_response = (NCX struct uvio_response_readx *)src;
 		retval        = full_response->ur_result;
 		COMPILER_READ_BARRIER();
 

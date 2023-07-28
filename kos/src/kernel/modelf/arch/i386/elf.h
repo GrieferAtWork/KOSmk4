@@ -49,8 +49,8 @@ struct mfile;
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 elfexec_init_entry32(struct icpustate *__restrict user_state,
                      Elf32_Ehdr const *__restrict ehdr,
-                     USER void *peb_address, USER void *ustack_base,
-                     size_t ustack_size, USER void *entry_pc);
+                     NCX void *peb_address, NCX void *ustack_base,
+                     size_t ustack_size, NCX void *entry_pc);
 
 /* Initialize the RTLD user-space library for runtime linking. */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 4, 5, 6)) struct icpustate *KCALL
@@ -61,8 +61,8 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
                     Elf32_Ehdr const *__restrict ehdr,
                     Elf32_Phdr const *__restrict phdr_vec, Elf32_Half phdr_cnt,
                     void *application_loadaddr, void *linker_loadaddr,
-                    USER void *peb_address, USER void *ustack_base,
-                    size_t ustack_size, USER void *entry_pc);
+                    NCX void *peb_address, NCX void *ustack_base,
+                    size_t ustack_size, NCX void *entry_pc);
 #endif /* __x86_64__ */
 
 DECL_END

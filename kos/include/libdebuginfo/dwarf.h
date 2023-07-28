@@ -679,34 +679,34 @@
 __DECL_BEGIN
 
 /* Similar to the functions from `libunwind(3)', but these decode into a 64-bit integer! */
-typedef __ATTR_RETNONNULL_T __ATTR_NONNULL_T((2)) __CHECKED __byte_t const *
-__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDWARF_DECODE_SLEB128_64)(__CHECKED __byte_t const *reader,
+typedef __ATTR_RETNONNULL_T __ATTR_NONNULL_T((2)) __NCX __byte_t const *
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDWARF_DECODE_SLEB128_64)(__NCX __byte_t const *reader,
                                                            __int64_t *__restrict p_result);
-typedef __ATTR_RETNONNULL_T __ATTR_NONNULL_T((2)) __CHECKED __byte_t const *
-__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDWARF_DECODE_ULEB128_64)(__CHECKED __byte_t const *reader,
+typedef __ATTR_RETNONNULL_T __ATTR_NONNULL_T((2)) __NCX __byte_t const *
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDWARF_DECODE_ULEB128_64)(__NCX __byte_t const *reader,
                                                            __uint64_t *__restrict p_result);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
-LIBDEBUGINFO_DECL __ATTR_RETNONNULL __ATTR_NONNULL((2)) __CHECKED __byte_t const *
-__NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_sleb128_64)(__CHECKED __byte_t const *reader,
+LIBDEBUGINFO_DECL __ATTR_RETNONNULL __ATTR_NONNULL((2)) __NCX __byte_t const *
+__NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_sleb128_64)(__NCX __byte_t const *reader,
                                                        __int64_t *__restrict p_result);
-LIBDEBUGINFO_DECL __ATTR_RETNONNULL __ATTR_NONNULL((2)) __CHECKED __byte_t const *
-__NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_uleb128_64)(__CHECKED __byte_t const *reader,
+LIBDEBUGINFO_DECL __ATTR_RETNONNULL __ATTR_NONNULL((2)) __NCX __byte_t const *
+__NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_uleb128_64)(__NCX __byte_t const *reader,
                                                        __uint64_t *__restrict p_result);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 /* Similar to the functions from `libunwind(3)', but these actually decode into a 128-bit integer! */
-typedef __ATTR_RETNONNULL_T __ATTR_NONNULL_T((2)) __CHECKED __byte_t const *
-__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDWARF_DECODE_SLEB128_128)(__CHECKED __byte_t const *reader,
+typedef __ATTR_RETNONNULL_T __ATTR_NONNULL_T((2)) __NCX __byte_t const *
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDWARF_DECODE_SLEB128_128)(__NCX __byte_t const *reader,
                                                             __hybrid_int128_t *__restrict p_result);
-typedef __ATTR_RETNONNULL_T __ATTR_NONNULL_T((2)) __CHECKED __byte_t const *
-__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDWARF_DECODE_ULEB128_128)(__CHECKED __byte_t const *reader,
+typedef __ATTR_RETNONNULL_T __ATTR_NONNULL_T((2)) __NCX __byte_t const *
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDWARF_DECODE_ULEB128_128)(__NCX __byte_t const *reader,
                                                             __hybrid_uint128_t *__restrict p_result);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
-LIBDEBUGINFO_DECL __ATTR_RETNONNULL __ATTR_NONNULL((2)) __CHECKED __byte_t const *
-__NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_sleb128_128)(__CHECKED __byte_t const *reader,
+LIBDEBUGINFO_DECL __ATTR_RETNONNULL __ATTR_NONNULL((2)) __NCX __byte_t const *
+__NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_sleb128_128)(__NCX __byte_t const *reader,
                                                         __hybrid_int128_t *__restrict p_result);
-LIBDEBUGINFO_DECL __ATTR_RETNONNULL __ATTR_NONNULL((2)) __CHECKED __byte_t const *
-__NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_uleb128_128)(__CHECKED __byte_t const *reader,
+LIBDEBUGINFO_DECL __ATTR_RETNONNULL __ATTR_NONNULL((2)) __NCX __byte_t const *
+__NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_uleb128_128)(__NCX __byte_t const *reader,
                                                         __hybrid_uint128_t *__restrict p_result);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 

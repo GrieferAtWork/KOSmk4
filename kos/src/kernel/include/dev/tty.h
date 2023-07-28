@@ -108,17 +108,17 @@ ttydev_v_open(struct mfile *__restrict self,
 #define ttydev_v_wrattr  chrdev_v_wrattr
 #define ttydev_v_tryas   chrdev_v_tryas
 FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This read operator is _MANDATORY_ and may NOT be overwritten by sub-classes! */
-ttydev_v_read(struct mfile *__restrict self, USER CHECKED void *dst,
+ttydev_v_read(struct mfile *__restrict self, NCX void *dst,
               size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This write operator is _MANDATORY_ and may NOT be overwritten by sub-classes! */
-ttydev_v_write(struct mfile *__restrict self, USER CHECKED void const *src,
+ttydev_v_write(struct mfile *__restrict self, NCX void const *src,
                size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
 ttydev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-               USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+               NCX UNCHECKED void *arg, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) void KCALL
 ttydev_v_stat(struct mfile *__restrict self,
-              USER CHECKED struct stat *result) THROWS(...);
+              NCX struct stat *result) THROWS(...);
 FUNDEF NONNULL((1)) void KCALL
 ttydev_v_pollconnect(struct mfile *__restrict self,
                      poll_mode_t what) THROWS(...);
@@ -129,7 +129,7 @@ ttydev_v_polltest(struct mfile *__restrict self,
 /* @return: -EINVAL: Unsupported `cmd' */
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
 _ttydev_tryioctl(struct mfile *__restrict self, ioctl_t cmd,
-                 USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+                 NCX UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Initialize common+basic fields. The caller must still initialize:
  *  - self->_ttydev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags |= MFILE_FN_GLOBAL_REF;  # s.a. `device_registerf()'

@@ -218,7 +218,7 @@ ms_scsi_doio(struct ms_scsi_device *__restrict self,
 
 PRIVATE NONNULL((1, 5)) void KCALL
 ms_scsi_read(struct blkdev *__restrict self,
-             USER CHECKED void *dst, size_t num_sectors,
+             NCX void *dst, size_t num_sectors,
              lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct ms_scsi_device *me;
@@ -277,7 +277,7 @@ ms_scsi_readv_phys(struct blkdev *__restrict self,
 
 PRIVATE NONNULL((1, 5)) void KCALL
 ms_scsi_write(struct blkdev *__restrict self,
-              USER CHECKED void const *src, size_t num_sectors,
+              NCX void const *src, size_t num_sectors,
               lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct ms_scsi_device *me;

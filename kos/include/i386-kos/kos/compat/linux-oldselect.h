@@ -51,11 +51,11 @@ __DECL_BEGIN
 
 struct __fd_set_struct;
 struct sel_arg_structx32 {
-	__ULONG32_TYPE__                              n;    /* nfds argument */
-	__USER __HYBRID_PTR32(struct __fd_set_struct) inp;  /* Read fd-set */
-	__USER __HYBRID_PTR32(struct __fd_set_struct) outp; /* Write fd-set */
-	__USER __HYBRID_PTR32(struct __fd_set_struct) exp;  /* Except fd-set */
-	__USER __HYBRID_PTR32(struct __timevalx32)    tvp;  /* Timeout argument */
+	__ULONG32_TYPE__                             n;    /* nfds argument */
+	__NCX __HYBRID_PTR32(struct __fd_set_struct) inp;  /* Read fd-set */
+	__NCX __HYBRID_PTR32(struct __fd_set_struct) outp; /* Write fd-set */
+	__NCX __HYBRID_PTR32(struct __fd_set_struct) exp;  /* Except fd-set */
+	__NCX __HYBRID_PTR32(struct __timevalx32)    tvp;  /* Timeout argument */
 };
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO

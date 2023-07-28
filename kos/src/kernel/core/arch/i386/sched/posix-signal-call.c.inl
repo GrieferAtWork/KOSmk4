@@ -140,15 +140,15 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
                             siginfo_t const *__restrict siginfo,
                             struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT) {
-	USER CHECKED byte_t *usp, *orig_usp;
+	NCX byte_t *usp, *orig_usp;
 	bool must_restore_sigmask;
 	sigset_t old_sigmask;
-	USER CHECKED LOCAL_siginfo_t *user_siginfo;
-	USER CHECKED LOCAL_ucontext_t *user_ucontext;
-	USER CHECKED LOCAL_struct_sigset_with_size *user_sigset;
-	USER CHECKED LOCAL_struct_fpustate *user_fpustate;
-	USER CHECKED LOCAL_struct_rpc_syscall_info *user_sc_info;
-	USER CHECKED LOCAL_uintptr_t user_rstor;
+	NCX LOCAL_siginfo_t *user_siginfo;
+	NCX LOCAL_ucontext_t *user_ucontext;
+	NCX LOCAL_struct_sigset_with_size *user_sigset;
+	NCX LOCAL_struct_fpustate *user_fpustate;
+	NCX LOCAL_struct_rpc_syscall_info *user_sc_info;
+	NCX LOCAL_uintptr_t user_rstor;
 	assert(sigvalid(siginfo->si_signo));
 
 	/* Figure out how, and if we need to mask signals. */
@@ -172,12 +172,12 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	}
 
 	/* Figure out which stack we should write data to. */
-	orig_usp = (USER CHECKED byte_t *)icpustate_getusersp(state);
+	orig_usp = (NCX byte_t *)icpustate_getusersp(state);
 	usp      = orig_usp;
 	/* Check if sigaltstack should be used. */
 	if (action->sa_flags & SA_ONSTACK) {
 		/* TODO: SS_AUTODISARM */
-		usp = (USER CHECKED byte_t *)PERTASK_GET(this_user_except_handler.ueh_stack);
+		usp = (NCX byte_t *)PERTASK_GET(this_user_except_handler.ueh_stack);
 	}
 #ifdef DEFINE_x86_userexcept_callsignal64
 	else {
@@ -187,9 +187,9 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 
 	/* Force proper alignment. */
 #ifdef DEFINE_x86_userexcept_callsignal32
-	usp = (USER CHECKED byte_t *)((uintptr_t)usp & ~3);
+	usp = (NCX byte_t *)((uintptr_t)usp & ~3);
 #else /* DEFINE_x86_userexcept_callsignal32 */
-	usp = (USER CHECKED byte_t *)((uintptr_t)usp & ~7);
+	usp = (NCX byte_t *)((uintptr_t)usp & ~7);
 #endif /* !DEFINE_x86_userexcept_callsignal32 */
 
 	/* At this point, the following options affect how we need to set up the stack:
@@ -296,14 +296,14 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 		 *       that sys_ksigreturn(2) will be able to restore it upon being
 		 *       called. */
 		if (must_restore_sigmask) {
-			USER CHECKED sigset_t *user_sigbuf;
+			NCX sigset_t *user_sigbuf;
 			usp -= sizeof(sigset_t);
-			user_sigbuf = (USER CHECKED sigset_t *)usp;
+			user_sigbuf = (NCX sigset_t *)usp;
 			usp -= sizeof(LOCAL_struct_sigset_with_size);
-			user_sigset = (USER CHECKED LOCAL_struct_sigset_with_size *)usp;
+			user_sigset = (NCX LOCAL_struct_sigset_with_size *)usp;
 			validate_writable(usp, sizeof(LOCAL_struct_sigset_with_size) + sizeof(sigset_t));
 			COMPILER_WRITE_BARRIER();
-			user_sigbuf = (USER CHECKED sigset_t *)memcpy(user_sigbuf, &old_sigmask, sizeof(sigset_t));
+			user_sigbuf = (NCX sigset_t *)memcpy(user_sigbuf, &old_sigmask, sizeof(sigset_t));
 			user_sigset->sws_sigset = (typeof(user_sigset->sws_sigset))(uintptr_t)user_sigbuf;
 			user_sigset->sws_sigsiz = (typeof(user_sigset->sws_sigsiz))sizeof(sigset_t);
 		}
@@ -363,7 +363,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 		sizeof_sc_info = (offsetof(LOCAL_struct_rpc_syscall_info, rsi_regs)) +
 		                 (argc * sizeof(LOCAL_uintptr_t));
 		usp -= sizeof_sc_info;
-		user_sc_info = (USER CHECKED LOCAL_struct_rpc_syscall_info *)usp;
+		user_sc_info = (NCX LOCAL_struct_rpc_syscall_info *)usp;
 		validate_writable(user_sc_info, sizeof_sc_info);
 		COMPILER_WRITE_BARRIER();
 		LOCAL_rpc_syscall_info_encode(sc_info, user_sc_info, argc);
@@ -415,7 +415,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	/* SYSVABI specs require the stack pointer to be 16-byte aligned _BEFORE_ the call.
 	 * This way, after +8 for the return  address and +8 for a potential  `pushq %rbp',
 	 * the stack will be 16-byte aligned once again. */
-	usp = (USER CHECKED byte_t *)FLOOR_ALIGN((uintptr_t)usp, 16);
+	usp = (NCX byte_t *)FLOOR_ALIGN((uintptr_t)usp, 16);
 
 	/* Push return address */
 	usp -= 8;

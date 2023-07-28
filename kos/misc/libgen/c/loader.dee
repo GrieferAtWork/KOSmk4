@@ -89,8 +89,7 @@ global final SIMPLE_ATTRIBUTE_ANNOTATIONS: {string: string} = {
 @@Same as @SIMPLE_ATTRIBUTE_ANNOTATIONS, but defines annotations from <kos/anno.h>
 global final SIMPLE_KOS_ATTRIBUTE_ANNOTATIONS: {string: string} = {
 	"noblock"   : "__NOBLOCK",
-	"user"      : "__USER",
-	"checked"   : "__CHECKED",
+	"ncx"       : "__NCX",
 	"unchecked" : "__UNCHECKED",
 };
 

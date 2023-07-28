@@ -498,59 +498,59 @@ NOTHROW(FCALL reltimespec_to_relktime)(struct timespec const &__restrict rel_tim
  * @throw: E_SEGFAULT:                                                                ...
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC:  ...
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC: ... */
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_timespec32(USER CHECKED struct __timespec32 const *__restrict abs_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timespec32);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_timespec64(USER CHECKED struct __timespec64 const *__restrict abs_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timespec64);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_reltimespec32(USER CHECKED struct __timespec32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_reltimespec32);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_reltimespec64(USER CHECKED struct __timespec64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_reltimespec64);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_timeval32(USER CHECKED struct __timeval32 const *__restrict abs_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timeval32);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_timeval64(USER CHECKED struct __timeval64 const *__restrict abs_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timeval64);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_reltimeval32(USER CHECKED struct __timeval32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_reltimeval32);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_reltimeval64(USER CHECKED struct __timeval64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_reltimeval64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_timespec32(NCX struct __timespec32 const *__restrict abs_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timespec32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_timespec64(NCX struct __timespec64 const *__restrict abs_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timespec64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_reltimespec32(NCX struct __timespec32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_reltimespec32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_reltimespec64(NCX struct __timespec64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_reltimespec64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_timeval32(NCX struct __timeval32 const *__restrict abs_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timeval32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_timeval64(NCX struct __timeval64 const *__restrict abs_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timeval64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_reltimeval32(NCX struct __timeval32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_reltimeval32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_reltimeval64(NCX struct __timeval64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_reltimeval64);
 #ifdef __ARCH_HAVE_COMPAT
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_compat_timespec32(USER CHECKED struct compat_timespec32 const *__restrict abs_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timespec32);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_compat_timespec64(USER CHECKED struct compat_timespec64 const *__restrict abs_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timespec64);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_compat_reltimespec32(USER CHECKED struct compat_timespec32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_compat_reltimespec32);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_compat_reltimespec64(USER CHECKED struct compat_timespec64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_compat_reltimespec64);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_compat_timeval32(USER CHECKED struct compat_timeval32 const *__restrict abs_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timeval32);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_compat_timeval64(USER CHECKED struct compat_timeval64 const *__restrict abs_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timeval64);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_compat_reltimeval32(USER CHECKED struct compat_timeval32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_compat_reltimeval32);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_compat_reltimeval64(USER CHECKED struct compat_timeval64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_compat_reltimeval64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_compat_timespec32(NCX struct compat_timespec32 const *__restrict abs_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timespec32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_compat_timespec64(NCX struct compat_timespec64 const *__restrict abs_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timespec64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_compat_reltimespec32(NCX struct compat_timespec32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_compat_reltimespec32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_compat_reltimespec64(NCX struct compat_timespec64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_compat_reltimespec64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_compat_timeval32(NCX struct compat_timeval32 const *__restrict abs_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timeval32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user_compat_timeval64(NCX struct compat_timeval64 const *__restrict abs_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timeval64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_compat_reltimeval32(NCX struct compat_timeval32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_compat_reltimeval32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_compat_reltimeval64(NCX struct compat_timeval64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_compat_reltimeval64);
 #endif /* __ARCH_HAVE_COMPAT */
 
 
 #ifdef __cplusplus
 extern "C++" {
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(USER CHECKED struct __timespec32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timespec32);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_rel(USER CHECKED struct __timespec32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_reltimespec32);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(USER CHECKED struct __timeval32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timeval32);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_rel(USER CHECKED struct __timeval32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_reltimeval32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(NCX struct __timespec32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timespec32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_rel(NCX struct __timespec32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_reltimespec32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(NCX struct __timeval32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timeval32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_rel(NCX struct __timeval32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_reltimeval32);
 #ifndef __HAVE_TIMESPEC32_IS_TIMESPEC64
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(USER CHECKED struct __timespec64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timespec64);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_rel(USER CHECKED struct __timespec64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_reltimespec64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(NCX struct __timespec64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timespec64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_rel(NCX struct __timespec64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_reltimespec64);
 #endif /* !__HAVE_TIMESPEC32_IS_TIMESPEC64 */
 #ifndef __HAVE_TIMEVAL32_IS_TIMEVAL64
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(USER CHECKED struct __timeval64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timeval64);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_rel(USER CHECKED struct __timeval64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_reltimeval64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(NCX struct __timeval64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_timeval64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_rel(NCX struct __timeval64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_reltimeval64);
 #endif /* !__HAVE_TIMEVAL32_IS_TIMEVAL64 */
 #ifdef __ARCH_HAVE_COMPAT
 #if !defined(__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC32) && !defined(__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC64)
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(USER CHECKED struct compat_timespec32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timespec32);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_rel(USER CHECKED struct compat_timespec32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) ASMNAME(__ASMNAME_relktime_from_user_compat_reltimespec32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(NCX struct compat_timespec32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timespec32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_rel(NCX struct compat_timespec32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) ASMNAME(__ASMNAME_relktime_from_user_compat_reltimespec32);
 #endif /* !__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC32 && !__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC64 */
 #ifndef __HAVE_COMPAT_TIMESPEC32_IS_COMPAT_TIMESPEC64
 #if !defined(__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC32) && !defined(__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC64)
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(USER CHECKED struct compat_timespec64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timespec64);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_rel(USER CHECKED struct compat_timespec64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) ASMNAME(__ASMNAME_relktime_from_user_compat_reltimespec64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(NCX struct compat_timespec64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timespec64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_rel(NCX struct compat_timespec64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INSPECID_ARGUMENT_BAD_SPECUE) ASMNAME(__ASMNAME_relktime_from_user_compat_reltimespec64);
 #endif /* !__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC32 && !__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC64 */
 #endif /* !__HAVE_COMPAT_TIMESPEC32_IS_COMPAT_TIMESPEC64 */
 #if !defined(__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL32) && !defined(__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL64)
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(USER CHECKED struct compat_timeval32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timeval32);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_rel(USER CHECKED struct compat_timeval32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_compat_reltimeval32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(NCX struct compat_timeval32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timeval32);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_rel(NCX struct compat_timeval32 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_compat_reltimeval32);
 #endif /* !__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL32 && !__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL64 */
 #ifndef __HAVE_COMPAT_TIMEVAL32_IS_COMPAT_TIMEVAL64
 #if !defined(__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL32) && !defined(__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL64)
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(USER CHECKED struct compat_timeval64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timeval64);
-FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_rel(USER CHECKED struct compat_timeval64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_compat_reltimeval64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL ktime_from_user(NCX struct compat_timeval64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_ktime_from_user_compat_timeval64);
+FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_rel(NCX struct compat_timeval64 const *__restrict rel_time) THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) ASMNAME(__ASMNAME_relktime_from_user_compat_reltimeval64);
 #endif /* !__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL32 && !__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL64 */
 #endif /* !__HAVE_COMPAT_TIMEVAL32_IS_COMPAT_TIMEVAL64 */
 #endif /* __ARCH_HAVE_COMPAT */

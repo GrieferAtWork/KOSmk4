@@ -48,7 +48,7 @@ DECL_BEGIN
 
 #if defined(DEFINE_mpart_read)
 #define LOCAL_READING
-#define LOCAL_buffer_t           USER CHECKED void *
+#define LOCAL_buffer_t           NCX void *
 #define LOCAL_ubuffer_t          uintptr_t
 #define LOCAL_mfile_vio_rw       mfile_vioread
 #define LOCAL_mpart_rw           mpart_read
@@ -58,7 +58,7 @@ DECL_BEGIN
 	copyfromphys_nopf((byte_t *)buffer + (buffer_offset), mpart_physaddr, num_bytes)
 #elif defined(DEFINE_mpart_write)
 #define LOCAL_WRITING
-#define LOCAL_buffer_t           USER CHECKED void const *
+#define LOCAL_buffer_t           NCX void const *
 #define LOCAL_ubuffer_t          uintptr_t
 #define LOCAL_mfile_vio_rw       mfile_viowrite
 #define LOCAL_mpart_rw           mpart_write

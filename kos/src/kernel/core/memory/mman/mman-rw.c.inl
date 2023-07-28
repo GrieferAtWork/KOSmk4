@@ -51,13 +51,13 @@ DECL_BEGIN
  *               - `buf + num_bytes - return ... buf + num_bytes - 1' */
 PUBLIC NOBLOCK NONNULL((1)) size_t
 NOTHROW(KCALL mman_read_nopf)(struct mman *__restrict self, UNCHECKED void const *addr,
-                              USER CHECKED void *buf, size_t num_bytes)
+                              NCX void *buf, size_t num_bytes)
 #define LOCAL_IS_NOPF
 #define LOCAL_IS_READING
 #elif defined(DEFINE_mman_write_nopf)
 PUBLIC NOBLOCK NONNULL((1)) size_t
 NOTHROW(KCALL mman_write_nopf)(struct mman *__restrict self, UNCHECKED void *addr,
-                               USER CHECKED void const *buf, size_t num_bytes)
+                               NCX void const *buf, size_t num_bytes)
 #define LOCAL_IS_NOPF
 #define LOCAL_IS_WRITING
 #elif defined(DEFINE_mman_memset_nopf)
@@ -76,14 +76,14 @@ NOTHROW(KCALL mman_memset_nopf)(struct mman *__restrict self, UNCHECKED void *ad
  * @param: force_writable_destination: When true, force `addr' to be writable, invoking COW as needed. */
 PUBLIC BLOCKING void KCALL
 mman_read(struct mman *__restrict self,
-          UNCHECKED void const *addr, USER CHECKED void *buf,
+          UNCHECKED void const *addr, NCX void *buf,
           size_t num_bytes, bool force_readable_source)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK)
 #define LOCAL_IS_READING
 #elif defined(DEFINE_mman_write)
 PUBLIC BLOCKING void KCALL
 mman_write(struct mman *__restrict self,
-           UNCHECKED void *addr, USER CHECKED void const *buf,
+           UNCHECKED void *addr, NCX void const *buf,
            size_t num_bytes, bool force_writable_destination)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK)
 #define LOCAL_IS_WRITING

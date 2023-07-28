@@ -198,8 +198,8 @@ again_lock_cred:
 #ifdef __ARCH_WANT_SYSCALL_PRLIMIT64
 DEFINE_SYSCALL4(errno_t, prlimit64,
                 pid_t, pid, syscall_ulong_t, resource,
-                USER UNCHECKED struct rlimit64 const *, new_rlim,
-                USER UNCHECKED struct rlimit64 *, old_rlim) {
+                NCX UNCHECKED struct rlimit64 const *, new_rlim,
+                NCX UNCHECKED struct rlimit64 *, old_rlim) {
 	errno_t result;
 	struct rlimit64 knewlim, koldlim;
 	validate_writable_opt(old_rlim, sizeof(*old_rlim));
@@ -224,7 +224,7 @@ DEFINE_SYSCALL4(errno_t, prlimit64,
 
 #ifdef __ARCH_WANT_SYSCALL_GETRLIMIT
 DEFINE_SYSCALL2(errno_t, getrlimit, syscall_ulong_t, resource,
-                USER UNCHECKED struct __rlimit32 *, old_rlim) {
+                NCX UNCHECKED struct __rlimit32 *, old_rlim) {
 	errno_t result;
 	struct rlimit64 koldlim;
 	validate_writable(old_rlim, sizeof(*old_rlim));
@@ -238,7 +238,7 @@ DEFINE_SYSCALL2(errno_t, getrlimit, syscall_ulong_t, resource,
 
 #ifdef __ARCH_WANT_SYSCALL_SETRLIMIT
 DEFINE_SYSCALL2(errno_t, setrlimit, syscall_ulong_t, resource,
-                USER UNCHECKED struct __rlimit32 const *, new_rlim) {
+                NCX UNCHECKED struct __rlimit32 const *, new_rlim) {
 	errno_t result;
 	struct rlimit64 knewlim;
 	validate_readable(new_rlim, sizeof(*new_rlim));
@@ -252,8 +252,8 @@ DEFINE_SYSCALL2(errno_t, setrlimit, syscall_ulong_t, resource,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_PRLIMIT64
 DEFINE_COMPAT_SYSCALL4(errno_t, prlimit64,
                        pid_t, pid, syscall_ulong_t, resource,
-                       USER UNCHECKED struct compat_rlimit64 const *, new_rlim,
-                       USER UNCHECKED struct compat_rlimit64 *, old_rlim) {
+                       NCX UNCHECKED struct compat_rlimit64 const *, new_rlim,
+                       NCX UNCHECKED struct compat_rlimit64 *, old_rlim) {
 	errno_t result;
 	struct rlimit64 knewlim, koldlim;
 	validate_writable_opt(old_rlim, sizeof(*old_rlim));
@@ -278,7 +278,7 @@ DEFINE_COMPAT_SYSCALL4(errno_t, prlimit64,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_GETRLIMIT
 DEFINE_COMPAT_SYSCALL2(errno_t, getrlimit, syscall_ulong_t, resource,
-                       USER UNCHECKED struct compat_rlimit32 *, old_rlim) {
+                       NCX UNCHECKED struct compat_rlimit32 *, old_rlim) {
 	errno_t result;
 	struct rlimit64 koldlim;
 	validate_writable(old_rlim, sizeof(*old_rlim));
@@ -292,7 +292,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, getrlimit, syscall_ulong_t, resource,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SETRLIMIT
 DEFINE_COMPAT_SYSCALL2(errno_t, setrlimit, syscall_ulong_t, resource,
-                       USER UNCHECKED struct compat_rlimit32 const *, new_rlim) {
+                       NCX UNCHECKED struct compat_rlimit32 const *, new_rlim) {
 	errno_t result;
 	struct rlimit64 knewlim;
 	validate_readable(new_rlim, sizeof(*new_rlim));

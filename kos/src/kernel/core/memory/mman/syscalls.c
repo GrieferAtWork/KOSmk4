@@ -64,7 +64,7 @@ DECL_BEGIN
 /* munmap()                                                             */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_MUNMAP
-DEFINE_SYSCALL2(errno_t, munmap, USER UNCHECKED void *, addr, size_t, length) {
+DEFINE_SYSCALL2(errno_t, munmap, NCX UNCHECKED void *, addr, size_t, length) {
 	mman_unmap(THIS_MMAN, addr, length, MMAN_UNMAP_NOKERNPART);
 	return -EOK;
 }
@@ -79,7 +79,7 @@ DEFINE_SYSCALL2(errno_t, munmap, USER UNCHECKED void *, addr, size_t, length) {
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_MPROTECT
 DEFINE_SYSCALL3(errno_t, mprotect,
-                USER UNCHECKED void *, addr,
+                NCX UNCHECKED void *, addr,
                 size_t, length,
                 syscall_ulong_t, prot) {
 	VALIDATE_FLAGSET(prot,
@@ -107,7 +107,7 @@ DEFINE_SYSCALL3(errno_t, mprotect,
 
 #ifdef WANT_MMAP
 PRIVATE void *KCALL
-sys_mmap_impl(USER UNCHECKED void *addr, size_t length, syscall_ulong_t prot,
+sys_mmap_impl(NCX UNCHECKED void *addr, size_t length, syscall_ulong_t prot,
               syscall_ulong_t flags, fd_t fd, pos_t file_offset) {
 	void *result;
 	struct handle_mmap_info file;
@@ -269,7 +269,7 @@ sys_mmap_impl(USER UNCHECKED void *addr, size_t length, syscall_ulong_t prot,
 
 #ifdef __ARCH_WANT_SYSCALL_MMAP
 DEFINE_SYSCALL6(void *, mmap,
-                USER UNCHECKED void *, addr, size_t, length, syscall_ulong_t, prot,
+                NCX UNCHECKED void *, addr, size_t, length, syscall_ulong_t, prot,
                 syscall_ulong_t, flags, fd_t, fd, syscall_ulong_t, offset) {
 	pos_t file_offset = (pos_t)offset;
 	if (flags & MAP_OFFSET64_POINTER) {
@@ -285,7 +285,7 @@ DEFINE_SYSCALL6(void *, mmap,
 
 #ifdef __ARCH_WANT_SYSCALL_MMAP2
 DEFINE_SYSCALL6(void *, mmap2,
-                USER UNCHECKED void *, addr, size_t, length, syscall_ulong_t, prot,
+                NCX UNCHECKED void *, addr, size_t, length, syscall_ulong_t, prot,
                 syscall_ulong_t, flags, fd_t, fd, syscall_ulong_t, pgoffset) {
 	return sys_mmap_impl(addr, length, prot, flags, fd, (pos_t)pgoffset * PAGESIZE);
 }
@@ -293,7 +293,7 @@ DEFINE_SYSCALL6(void *, mmap2,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_MMAP2
 DEFINE_COMPAT_SYSCALL6(void *, mmap2,
-                       USER UNCHECKED void *, addr, size_t, length, syscall_ulong_t, prot,
+                       NCX UNCHECKED void *, addr, size_t, length, syscall_ulong_t, prot,
                        syscall_ulong_t, flags, fd_t, fd, syscall_ulong_t, pgoffset) {
 	return sys_mmap_impl(addr, length, prot, flags, fd, (pos_t)pgoffset * PAGESIZE);
 }
@@ -307,8 +307,8 @@ DEFINE_COMPAT_SYSCALL6(void *, mmap2,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_MREMAP
 DEFINE_SYSCALL5(void *, mremap,
-                USER UNCHECKED void *, old_address, size_t, old_size, size_t, new_size,
-                syscall_ulong_t, flags, USER UNCHECKED void *, new_address) {
+                NCX UNCHECKED void *, old_address, size_t, old_size, size_t, new_size,
+                syscall_ulong_t, flags, NCX UNCHECKED void *, new_address) {
 	void *result;
 
 	/* Validate flags. */
@@ -344,7 +344,7 @@ DEFINE_SYSCALL5(void *, mremap,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_MLOCK
 DEFINE_SYSCALL2(errno_t, mlock,
-                USER UNCHECKED void const *, addr, size_t, len) {
+                NCX UNCHECKED void const *, addr, size_t, len) {
 	mman_mlock(THIS_MMAN, addr, len);
 	return EOK;
 }
@@ -352,7 +352,7 @@ DEFINE_SYSCALL2(errno_t, mlock,
 
 #ifdef __ARCH_WANT_SYSCALL_MLOCK2
 DEFINE_SYSCALL3(errno_t, mlock2,
-                USER UNCHECKED void const *, addr, size_t, len,
+                NCX UNCHECKED void const *, addr, size_t, len,
                 syscall_ulong_t, flags) {
 	VALIDATE_FLAGSET(flags, 0 | MLOCK_ONFAULT,
 	                 E_INVALID_ARGUMENT_CONTEXT_MLOCK2_FLAGS);
@@ -363,7 +363,7 @@ DEFINE_SYSCALL3(errno_t, mlock2,
 
 #ifdef __ARCH_WANT_SYSCALL_MUNLOCK
 DEFINE_SYSCALL2(errno_t, munlock,
-                USER UNCHECKED void const *, addr, size_t, len) {
+                NCX UNCHECKED void const *, addr, size_t, len) {
 	mman_munlock(THIS_MMAN, addr, len);
 	return EOK;
 }
@@ -399,7 +399,7 @@ DEFINE_SYSCALL0(errno_t, munlockall) {
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_MSYNC
 DEFINE_SYSCALL3(errno_t, msync,
-                USER UNCHECKED void *, addr, size_t, len,
+                NCX UNCHECKED void *, addr, size_t, len,
                 syscall_ulong_t, flags) {
 	VALIDATE_FLAGSET(flags, MS_SYNC | MS_ASYNC | MS_INVALIDATE,
 	                 E_INVALID_ARGUMENT_CONTEXT_MSYNC_FLAGS);
@@ -424,15 +424,15 @@ DEFINE_SYSCALL3(errno_t, msync,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_MINCORE
 DEFINE_SYSCALL3(errno_t, mincore,
-                USER UNCHECKED void *, addr, size_t, len,
-                USER UNCHECKED uint8_t *, vec) {
+                NCX UNCHECKED void *, addr, size_t, len,
+                NCX UNCHECKED uint8_t *, vec) {
 #define MPART_BLOCK_ST_MINCORE(st) ((st) >= MPART_BLOCK_ST_LOAD)
 	static_assert(!MPART_BLOCK_ST_MINCORE(MPART_BLOCK_ST_NDEF));
 	static_assert(!MPART_BLOCK_ST_MINCORE(MPART_BLOCK_ST_INIT));
 	static_assert(MPART_BLOCK_ST_MINCORE(MPART_BLOCK_ST_LOAD));
 	static_assert(MPART_BLOCK_ST_MINCORE(MPART_BLOCK_ST_CHNG));
-	USER UNCHECKED byte_t *maxaddr;
-	USER CHECKED PAGEDIR_PAGEALIGNED byte_t *iter;
+	NCX UNCHECKED byte_t *maxaddr;
+	NCX PAGEDIR_PAGEALIGNED byte_t *iter;
 	struct mman *mm = THIS_MMAN;
 	if unlikely(!IS_ALIGNED((uintptr_t)addr, PAGESIZE)) {
 		THROW(E_INVALID_ARGUMENT_BAD_ALIGNMENT,
@@ -475,10 +475,10 @@ err_badlen:
 		pages_before = (size_t)((byte_t *)USERSPACE_START - (byte_t *)addr) / PAGESIZE;
 		bzero(vec, pages_before, sizeof(uint8_t));
 		vec += pages_before;
-		addr = (USER UNCHECKED void *)USERSPACE_START;
+		addr = (NCX UNCHECKED void *)USERSPACE_START;
 	}
 #endif /* USERSPACE_START != 0 */
-	for (iter = (USER CHECKED PAGEDIR_PAGEALIGNED byte_t *)addr;
+	for (iter = (NCX PAGEDIR_PAGEALIGNED byte_t *)addr;
 	     iter < maxaddr;) {
 		struct mnode *node;
 		struct mpart *part;

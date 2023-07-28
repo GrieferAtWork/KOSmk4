@@ -53,7 +53,7 @@ DECL_BEGIN
 DEFINE_HANDLE_REFCNT_FUNCTIONS(signalfd, struct signalfd);
 
 PRIVATE ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct signalfd *KCALL
-signalfd_create(USER CHECKED sigset_t const *mask, size_t sigsetsize)
+signalfd_create(NCX sigset_t const *mask, size_t sigsetsize)
 		THROWS(E_BADALLOC, E_SEGFAULT) {
 	struct signalfd *result;
 	result = signalfd_alloc();
@@ -73,7 +73,7 @@ signalfd_create(USER CHECKED sigset_t const *mask, size_t sigsetsize)
 
 INTERN size_t KCALL
 handle_signalfd_read(struct signalfd *__restrict self,
-                     USER CHECKED void *dst,
+                     NCX void *dst,
                      size_t num_bytes, iomode_t mode) {
 	size_t result;
 	assert(!task_wasconnected());
@@ -85,7 +85,7 @@ handle_signalfd_read(struct signalfd *__restrict self,
 	result = 0;
 	for (;;) {
 		struct pending_rpc *rpc;
-		USER CHECKED struct signalfd_siginfo *usi;
+		NCX struct signalfd_siginfo *usi;
 		rpc = task_rpc_pending_steal_posix_signal(&self->sf_mask);
 		if (!rpc)
 			rpc = proc_rpc_pending_steal_posix_signal(&self->sf_mask);
@@ -127,7 +127,7 @@ handle_signalfd_read(struct signalfd *__restrict self,
 		assert(rpc);
 		assert(!(rpc->pr_flags & RPC_CONTEXT_KERN));
 		assert(rpc->pr_flags & RPC_CONTEXT_SIGNAL);
-		usi = (USER CHECKED struct signalfd_siginfo *)dst;
+		usi = (NCX struct signalfd_siginfo *)dst;
 
 		/* Fill in the user-space signalfd info buffer. */
 		{
@@ -197,7 +197,7 @@ handle_signalfd_polltest(struct signalfd *__restrict self,
 
 PRIVATE ATTR_NOINLINE void KCALL
 update_signalfd(fd_t fd,
-                USER CHECKED sigset_t const *sigmask,
+                NCX sigset_t const *sigmask,
                 size_t sigsetsize) {
 	sigset_t newmask;
 	REF struct signalfd *sfd;
@@ -234,7 +234,7 @@ update_signalfd(fd_t fd,
 }
 
 DEFINE_SYSCALL4(fd_t, signalfd4, fd_t, fd,
-                USER UNCHECKED sigset_t const *, sigmask,
+                NCX UNCHECKED sigset_t const *, sigmask,
                 size_t, sigsetsize, syscall_ulong_t, flags) {
 	fd_t result;
 	/* NOTE: Yes, validate `flags' even in the `fd == -1' case
@@ -276,7 +276,7 @@ DEFINE_SYSCALL4(fd_t, signalfd4, fd_t, fd,
 
 #ifdef __ARCH_WANT_SYSCALL_SIGNALFD
 DEFINE_SYSCALL3(fd_t, signalfd, fd_t, fd,
-                USER UNCHECKED sigset_t const *, sigmask,
+                NCX UNCHECKED sigset_t const *, sigmask,
                 size_t, sigsetsize) {
 	return sys_signalfd4(fd, sigmask, sigsetsize, 0);
 }

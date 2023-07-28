@@ -117,7 +117,7 @@ misaligned_mfile_v_loadblocks(struct mfile *__restrict self, pos_t addr,
 
 
 PRIVATE BLOCKING WUNUSED NONNULL((1)) size_t KCALL
-misaligned_mfile_v_pread(struct mfile *__restrict self, USER CHECKED void *dst,
+misaligned_mfile_v_pread(struct mfile *__restrict self, NCX void *dst,
                          size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
 	struct misaligned_mfile *me;
 	me = mfile_asmisaligned(self);

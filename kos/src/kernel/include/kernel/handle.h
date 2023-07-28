@@ -124,14 +124,14 @@ struct handle_types {
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)
 	 * @return: 0 : EOF has been reached
 	 * @return: * : The amount of read/written bytes (`<= num_bytes') */
-	size_t (BLOCKING WUNUSED_T NONNULL_T((1)) KCALL *h_read[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-	size_t (BLOCKING WUNUSED_T NONNULL_T((1)) KCALL *h_write[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+	size_t (BLOCKING WUNUSED_T NONNULL_T((1)) KCALL *h_read[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, NCX void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+	size_t (BLOCKING WUNUSED_T NONNULL_T((1)) KCALL *h_write[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, NCX void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 
 	/* Position-based read/write primitives.
 	 * @throws: * : Same as `h_read' / `h_write'
 	 * @return: * : Same as `h_read' / `h_write' */
-	size_t (BLOCKING WUNUSED_T NONNULL_T((1)) KCALL *h_pread[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-	size_t (BLOCKING WUNUSED_T NONNULL_T((1)) KCALL *h_pwrite[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+	size_t (BLOCKING WUNUSED_T NONNULL_T((1)) KCALL *h_pread[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, NCX void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+	size_t (BLOCKING WUNUSED_T NONNULL_T((1)) KCALL *h_pwrite[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, NCX void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 
 	/* Vector-based read/write primitives.
 	 * @throws: * : Same as `h_read' / `h_write'
@@ -144,7 +144,7 @@ struct handle_types {
 	/* Read a directory entry from the given handle.
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)
 	 * @return: * : The required buffer size for the current entry */
-	size_t (BLOCKING NONNULL_T((1)) KCALL *h_readdir[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED struct dirent *buf,
+	size_t (BLOCKING NONNULL_T((1)) KCALL *h_readdir[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, NCX struct dirent *buf,
 	                                                                   size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
 			THROWS(...);
 
@@ -158,7 +158,7 @@ struct handle_types {
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)
 	 * @throws: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND: [...] */
 	syscall_slong_t (BLOCKING NONNULL_T((1)) KCALL *h_ioctl[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, ioctl_t cmd,
-	                                                                          USER UNCHECKED void *arg, iomode_t mode)
+	                                                                          NCX UNCHECKED void *arg, iomode_t mode)
 			THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 
 	/* Change the effective size of the object (s.a. `ftruncate()'). */
@@ -183,7 +183,7 @@ struct handle_types {
 	/* Gather stat-information (s.a. `fstat()')
 	 * NOTE: The given `result' will _NOT_ have been initialized already! */
 	void (BLOCKING NONNULL_T((1)) KCALL *h_stat[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr,
-	                                                              USER CHECKED struct stat *result)
+	                                                              NCX struct stat *result)
 			THROWS(...);
 
 	/* Connect to the signals for monitoring `what' */
@@ -293,7 +293,7 @@ handle_datasize(struct handle const &__restrict self,
 #define /*BLOCKING*/ handle_printlink(self, printer, arg)                     HANDLE_FUNC(self, h_printlink)((self).h_data, printer, arg)
 
 FORCELOCAL BLOCKING ATTR_ARTIFICIAL WUNUSED NONNULL((1)) poll_mode_t KCALL
-_handle_poll(struct handle *__restrict self, poll_mode_t what) {
+_handle_poll(struct handle *__restrict self, poll_mode_t what) THROWS(...) {
 	poll_mode_t result;
 #ifndef __OPTIMIZE_SIZE__
 	result = handle_polltest(*self, what);

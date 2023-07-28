@@ -66,31 +66,31 @@ struct icpustate;
 #ifdef ARCH_X86_HAVE_EMULOCK_CMPXCHB
 FUNDEF u8 KCALL
 x86_emulock_cmpxchb(struct icpustate **__restrict pstate,
-                    USER CHECKED u8 *addr, u8 oldval, u8 newval);
+                    NCX u8 *addr, u8 oldval, u8 newval);
 #endif /* ARCH_X86_HAVE_EMULOCK_CMPXCHB */
 
 #ifdef ARCH_X86_HAVE_EMULOCK_CMPXCHW
 FUNDEF u16 KCALL
 x86_emulock_cmpxchw(struct icpustate **__restrict pstate,
-                    USER CHECKED u16 *addr, u16 oldval, u16 newval);
+                    NCX u16 *addr, u16 oldval, u16 newval);
 #endif /* ARCH_X86_HAVE_EMULOCK_CMPXCHW */
 
 #ifdef ARCH_X86_HAVE_EMULOCK_CMPXCHL
 FUNDEF u32 KCALL
 x86_emulock_cmpxchl(struct icpustate **__restrict pstate,
-                    USER CHECKED u32 *addr, u32 oldval, u32 newval);
+                    NCX u32 *addr, u32 oldval, u32 newval);
 #endif /* ARCH_X86_HAVE_EMULOCK_CMPXCHL */
 
 #ifdef ARCH_X86_HAVE_EMULOCK_CMPXCHQ
 FUNDEF u64 KCALL
 x86_emulock_cmpxchq(struct icpustate **__restrict pstate,
-                    USER CHECKED u64 *addr, u64 oldval, u64 newval);
+                    NCX u64 *addr, u64 oldval, u64 newval);
 #endif /* ARCH_X86_HAVE_EMULOCK_CMPXCHQ */
 
 #ifdef ARCH_X86_HAVE_EMULOCK_CMPXCHX
 FUNDEF uint128_t KCALL
 x86_emulock_cmpxchx(struct icpustate **__restrict pstate,
-                    USER CHECKED uint128_t *addr,
+                    NCX uint128_t *addr,
                     uint128_t oldval,
                     uint128_t newval);
 #endif /* ARCH_X86_HAVE_EMULOCK_CMPXCHX */

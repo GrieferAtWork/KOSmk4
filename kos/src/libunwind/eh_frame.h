@@ -41,8 +41,8 @@ DECL_BEGIN
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 INTDEF NONNULL((1, 3)) unwind_errno_t
-NOTHROW_NCX(CC libuw_unwind_fde_load)(CHECKED byte_t const **__restrict peh_frame_reader,
-                                      CHECKED byte_t const *eh_frame_end,
+NOTHROW_NCX(CC libuw_unwind_fde_load)(NCX byte_t const **__restrict peh_frame_reader,
+                                      NCX byte_t const *eh_frame_end,
                                       unwind_fde_t *__restrict result,
                                       uint8_t sizeof_address);
 
@@ -51,9 +51,9 @@ NOTHROW_NCX(CC libuw_unwind_fde_load)(CHECKED byte_t const **__restrict peh_fram
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `absolute_pc'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 INTDEF NONNULL((4)) unwind_errno_t
-NOTHROW_NCX(CC libuw_unwind_fde_scan)(CHECKED byte_t const *eh_frame_start,
-                                      CHECKED byte_t const *eh_frame_end,
-                                      CHECKED void const *absolute_pc,
+NOTHROW_NCX(CC libuw_unwind_fde_scan)(NCX byte_t const *eh_frame_start,
+                                      NCX byte_t const *eh_frame_end,
+                                      VIRT void const *absolute_pc,
                                       unwind_fde_t *__restrict result,
                                       uint8_t sizeof_address);
 
@@ -76,7 +76,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_scan)(CHECKED byte_t const *eh_frame_start,
 INTDEF NONNULL((1, 2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                       unwind_cfa_state_t *__restrict result,
-                                      CHECKED void const *absolute_pc);
+                                      VIRT void const *absolute_pc);
 
 /* Behaves  identical to `unwind_fde_exec()', and doesn't actually ever have to be
  * used, but performes better than `unwind_fde_exec()' when unwinding SIGNAL_FRAME
@@ -94,7 +94,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t *__restrict self, /* Only non
 INTDEF NONNULL((1, 2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                unwind_cfa_sigframe_state_t *__restrict result,
-                                               CHECKED void const *absolute_pc);
+                                               VIRT void const *absolute_pc);
 
 /* Behaves similar to `unwind_fde_exec()', but must  be used to calculate the  CFA
  * for the purpose of jumping to a  custom `landingpad_pc' as part of handling  an
@@ -113,8 +113,8 @@ NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t *__restrict self, /*
 INTDEF NONNULL((1, 2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                               unwind_cfa_landing_state_t *__restrict result,
-                                              CHECKED void const *absolute_pc,
-                                              CHECKED void const *landingpad_pc);
+                                              VIRT void const *absolute_pc,
+                                              NCX void const *landingpad_pc);
 
 /* Similar to `unwind_fde_exec()', but used to calculate the unwind rule
  * for `dw_regno' at the given text location. This is used to  implement
@@ -133,7 +133,7 @@ INTDEF NONNULL((1, 2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_rule)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                       unwind_cfa_register_t *__restrict result,
                                       unwind_regno_t dw_regno,
-                                      CHECKED void const *absolute_pc);
+                                      VIRT void const *absolute_pc);
 
 /* Same as `unwind_fde_exec()', however only calculate the CFA restore descriptor.
  * @return: UNWIND_SUCCESS:                 ...
@@ -144,7 +144,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_rule)(unwind_fde_t *__restrict self, /* Only non
 INTDEF NONNULL((1, 2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                           unwind_cfa_value_t *__restrict result,
-                                          CHECKED void const *absolute_pc);
+                                          VIRT void const *absolute_pc);
 
 /* Apply  a given CFA  unwind state in order  to apply register information
  * from `reg_getter'  to `reg_setter'.  Note  however that  only  registers
@@ -163,7 +163,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa)(unwind_fde_t *__restrict self, /* Only
 INTDEF NONNULL((1, 2, 4, 6)) unwind_errno_t CC
 libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
                        unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
-                       CHECKED void const *absolute_pc,
+                       VIRT void const *absolute_pc,
                        unwind_getreg_t reg_getter, void const *reg_getter_arg,
                        unwind_setreg_t reg_setter, void *reg_setter_arg);
 
@@ -178,7 +178,7 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
 INTDEF NONNULL((1, 2, 4, 6)) unwind_errno_t CC
 libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
                                 unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
-                                CHECKED void const *absolute_pc,
+                                VIRT void const *absolute_pc,
                                 unwind_getreg_t reg_getter, void const *reg_getter_arg,
                                 unwind_setreg_t reg_setter, void *reg_setter_arg);
 
@@ -193,7 +193,7 @@ libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
 INTDEF NONNULL((1, 2, 4, 6)) unwind_errno_t CC
 libuw_unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict self,
                                unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
-                               CHECKED void const *absolute_pc,
+                               VIRT void const *absolute_pc,
                                unwind_getreg_t reg_getter, void const *reg_getter_arg,
                                unwind_setreg_t reg_setter, void *reg_setter_arg);
 

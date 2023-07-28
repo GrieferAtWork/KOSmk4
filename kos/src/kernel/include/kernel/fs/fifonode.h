@@ -171,13 +171,13 @@ ffifonode_v_open(struct mfile *__restrict self,
                  oflag_t oflags)
 		THROWS(E_BADALLOC, E_ILLEGAL_IO_OPERATION, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL
-ffifonode_v_read(struct mfile *__restrict self, USER CHECKED void *dst,
+ffifonode_v_read(struct mfile *__restrict self, NCX void *dst,
                  size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL
 ffifonode_v_readv(struct mfile *__restrict self, struct iov_buffer *__restrict dst,
                   size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL
-ffifonode_v_write(struct mfile *__restrict self, USER CHECKED void const *src,
+ffifonode_v_write(struct mfile *__restrict self, NCX void const *src,
                   size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL
 ffifonode_v_writev(struct mfile *__restrict self, struct iov_buffer *__restrict src,
@@ -189,11 +189,11 @@ ffifonode_v_truncate(struct mfile *__restrict self, pos_t new_size)
 /* Fills in `st_size' with `mfile_asfifo(self)->ff_buffer.rb_avail' */
 FUNDEF NONNULL((1)) void KCALL
 ffifonode_v_stat(struct mfile *__restrict self,
-                 USER CHECKED struct stat *result)
+                 NCX struct stat *result)
 		THROWS(E_SEGFAULT);
 FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL
 ffifonode_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-                  USER UNCHECKED void *arg, iomode_t mode)
+                  NCX UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ffifonode_v_destroy)(struct mfile *__restrict self);

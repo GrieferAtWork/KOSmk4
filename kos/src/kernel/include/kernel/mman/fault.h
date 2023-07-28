@@ -69,7 +69,7 @@ struct iov_buffer;
  *              `memcpy_nopf'), and dealing with any potential E_SEGFAULT error.
  * @param: flags: Set of `MMAN_FAULT_F_*' */
 FUNDEF BLOCKING size_t FCALL
-mman_prefault(USER CHECKED void const *addr,
+mman_prefault(NCX void const *addr,
               size_t num_bytes, unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
@@ -109,7 +109,7 @@ mman_prefaultv(struct iov_buffer const *__restrict buffer,
  * @param: E_FSERROR_READONLY: Attempted to write-fault a SHARED mapping of a READONLY file. */
 FUNDEF BLOCKING NONNULL((1)) void FCALL
 mman_forcefault(struct mman *__restrict self,
-                USER CHECKED void const *addr,
+                NCX void const *addr,
                 size_t num_bytes, unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_FSERROR_READONLY, ...);
 

@@ -49,17 +49,17 @@ FUNDEF NOBLOCK void NOTHROW(FCALL x86_fpustate_init)(struct fpustate *__restrict
  * emulated if those instructions aren't supported.
  * NOTE: On x86_64, `x86_fxsave()' and `x86_fxrstor()' map to the 64-bit variants of the
  *       individual instruction. - To use the 32-bit variants, use the functions  below. */
-FUNDEF NOBLOCK void FCALL x86_fxsave(USER CHECKED struct xfpustate *state) THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void FCALL x86_fxrstor(USER CHECKED struct xfpustate const *state) THROWS(E_SEGFAULT);
+FUNDEF NOBLOCK void FCALL x86_fxsave(NCX struct xfpustate *state) THROWS(E_SEGFAULT);
+FUNDEF NOBLOCK void FCALL x86_fxrstor(NCX struct xfpustate const *state) THROWS(E_SEGFAULT);
 #ifdef __x86_64__
 struct xfpustate32;
-FUNDEF NOBLOCK void FCALL x86_fxsave32(USER CHECKED struct xfpustate32 *state) THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void FCALL x86_fxrstor32(USER CHECKED struct xfpustate32 const *state) THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void FCALL x86_fxsave64(USER CHECKED struct xfpustate *state) THROWS(E_SEGFAULT) ASMNAME("x86_fxsave");
-FUNDEF NOBLOCK void FCALL x86_fxrstor64(USER CHECKED struct xfpustate const *state) THROWS(E_SEGFAULT) ASMNAME("x86_fxrstor");
+FUNDEF NOBLOCK void FCALL x86_fxsave32(NCX struct xfpustate32 *state) THROWS(E_SEGFAULT);
+FUNDEF NOBLOCK void FCALL x86_fxrstor32(NCX struct xfpustate32 const *state) THROWS(E_SEGFAULT);
+FUNDEF NOBLOCK void FCALL x86_fxsave64(NCX struct xfpustate *state) THROWS(E_SEGFAULT) ASMNAME("x86_fxsave");
+FUNDEF NOBLOCK void FCALL x86_fxrstor64(NCX struct xfpustate const *state) THROWS(E_SEGFAULT) ASMNAME("x86_fxrstor");
 #else /* __x86_64__ */
-FUNDEF NOBLOCK void FCALL x86_fxsave32(USER CHECKED struct xfpustate *state) THROWS(E_SEGFAULT) ASMNAME("x86_fxsave");
-FUNDEF NOBLOCK void FCALL x86_fxrstor32(USER CHECKED struct xfpustate const *state) THROWS(E_SEGFAULT) ASMNAME("x86_fxrstor");
+FUNDEF NOBLOCK void FCALL x86_fxsave32(NCX struct xfpustate *state) THROWS(E_SEGFAULT) ASMNAME("x86_fxsave");
+FUNDEF NOBLOCK void FCALL x86_fxrstor32(NCX struct xfpustate const *state) THROWS(E_SEGFAULT) ASMNAME("x86_fxrstor");
 #endif /* !__x86_64__ */
 
 /* The value that will always be written to `struct xfpustate::fs_mxcsr_mask' */
@@ -68,10 +68,10 @@ DATDEF u32 const x86_fxsave_mxcsr_mask;
 #ifdef __x86_64__
 struct fpustate32;
 FUNDEF NOBLOCK void FCALL
-fpustate32_loadfrom(USER CHECKED struct fpustate32 const *state)
+fpustate32_loadfrom(NCX struct fpustate32 const *state)
 		THROWS(E_SEGFAULT, E_BADALLOC);
 FUNDEF NOBLOCK void FCALL
-fpustate32_saveinto(USER CHECKED struct fpustate32 *state)
+fpustate32_saveinto(NCX struct fpustate32 *state)
 		THROWS(E_SEGFAULT);
 #define fpustate64_loadfrom fpustate_loadfrom
 #define fpustate64_saveinto fpustate_saveinto

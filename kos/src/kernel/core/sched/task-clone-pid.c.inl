@@ -39,14 +39,14 @@ PRIVATE NONNULL((1, 2)) void FCALL
 task_clone_thrdpid(struct task *__restrict result,
                    struct task *__restrict caller,
                    uint64_t clone_flags,
-                   USER UNCHECKED pid_t *parent_tidptr)
+                   NCX UNCHECKED pid_t *parent_tidptr)
 #define LOCAL_IS_THRD
 #else /* DEFINE_task_clone_thrdpid */
 PRIVATE NONNULL((1, 2)) void FCALL
 task_clone_procpid(struct task *__restrict result,
                    struct task *__restrict caller,
                    uint64_t clone_flags,
-                   USER UNCHECKED pid_t *parent_tidptr)
+                   NCX UNCHECKED pid_t *parent_tidptr)
 #define LOCAL_IS_PROC
 #endif /* !DEFINE_task_clone_thrdpid */
 {
@@ -458,8 +458,8 @@ sig_endread_and_release_locks_and_force_do_task_serve:
 						continue;
 					if (!have_caller_sigmask) {
 						/* Copy the calling thread's userprocmask so we can use that one! */
-						USER CHECKED struct userprocmask *um;
-						USER UNCHECKED sigset_t *umask;
+						NCX struct userprocmask *um;
+						NCX UNCHECKED sigset_t *umask;
 						size_t umasksize;
 unlock_everything_and_do_load_userprocmask:
 						_procctl_sig_endread(caller_ctl);

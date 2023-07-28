@@ -45,11 +45,11 @@ __DECL_BEGIN
 
 struct __fd_set_struct;
 struct sel_arg_struct {
-	__ULONGPTR_TYPE__              n;    /* nfds argument */
-	__USER struct __fd_set_struct *inp;  /* Read fd-set */
-	__USER struct __fd_set_struct *outp; /* Write fd-set */
-	__USER struct __fd_set_struct *exp;  /* Except fd-set */
-	__USER struct __timeval32     *tvp;  /* Timeout argument */
+	__ULONGPTR_TYPE__             n;    /* nfds argument */
+	__NCX struct __fd_set_struct *inp;  /* Read fd-set */
+	__NCX struct __fd_set_struct *outp; /* Write fd-set */
+	__NCX struct __fd_set_struct *exp;  /* Except fd-set */
+	__NCX struct __timeval32     *tvp;  /* Timeout argument */
 };
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO

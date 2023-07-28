@@ -67,7 +67,7 @@ NOTHROW(KCALL fdirenum_empty_v_fini)(struct fdirenum *__restrict UNUSED(self)) {
 }
 
 PRIVATE BLOCKING NONNULL((1)) size_t KCALL
-fdirenum_empty_v_readdir(struct fdirenum *__restrict UNUSED(self), USER CHECKED struct dirent *UNUSED(buf),
+fdirenum_empty_v_readdir(struct fdirenum *__restrict UNUSED(self), NCX struct dirent *UNUSED(buf),
                          size_t UNUSED(bufsize), readdir_mode_t UNUSED(readdir_mode), iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	COMPILER_IMPURE();
@@ -119,10 +119,10 @@ PUBLIC_CONST struct fdirenum_ops const fdirenum_empty_ops = {
  * @return: >= 0: Advance directory position to next entry and re-return this value.
  * @return: <  0: Keep current directory position and re-return bitwise inverse ('~') of this value. */
 PUBLIC WUNUSED ssize_t FCALL
-fdirenum_feedent_ex(USER CHECKED struct dirent *buf,
+fdirenum_feedent_ex(NCX struct dirent *buf,
                     size_t bufsize, readdir_mode_t readdir_mode,
                     ino_t feed_d_ino, unsigned char feed_d_type,
-                    u16 feed_d_namlen, USER CHECKED char const *feed_d_name)
+                    u16 feed_d_namlen, NCX char const *feed_d_name)
 		THROWS(E_SEGFAULT) {
 	size_t result;
 	result = ((offsetof(struct dirent, d_name)) +
@@ -154,7 +154,7 @@ fdirenum_feedent_ex(USER CHECKED struct dirent *buf,
 
 /* Same as `fdirenum_feedent_ex()', but feed values from `ent' */
 PUBLIC BLOCKING WUNUSED NONNULL((4, 5)) ssize_t FCALL
-fdirenum_feedent(USER CHECKED struct dirent *buf,
+fdirenum_feedent(NCX struct dirent *buf,
                  size_t bufsize, readdir_mode_t readdir_mode,
                  struct fdirent *__restrict ent,
                  struct fdirnode *__restrict dir)
@@ -188,7 +188,7 @@ fdirenum_feedent(USER CHECKED struct dirent *buf,
 
 /* Same as `fdirenum_feedent()', but may only be used when `ent' doesn't implement `fdo_getino' */
 PUBLIC WUNUSED NONNULL((4)) ssize_t FCALL
-fdirenum_feedent_fast(USER CHECKED struct dirent *buf,
+fdirenum_feedent_fast(NCX struct dirent *buf,
                       size_t bufsize, readdir_mode_t readdir_mode,
                       struct fdirent *__restrict ent)
 		THROWS(E_SEGFAULT) {
@@ -245,7 +245,7 @@ fdirnode_v_open(struct mfile *__restrict self,
 /* Writes `st_blocks = 1;', `st_size = mfile_getblocksize(self);' */
 PUBLIC NONNULL((1)) void KCALL
 fdirnode_v_stat(struct mfile *__restrict self,
-                USER CHECKED struct stat *result)
+                NCX struct stat *result)
 		THROWS(E_SEGFAULT) {
 	result->st_blocks = (typeof(result->st_blocks))1;
 	result->st_size   = (typeof(result->st_size))mfile_getblocksize(self);
@@ -316,11 +316,11 @@ again:
  *                or a segment of the path isn't a directory) */
 PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct fnode *FCALL
 fdirnode_lookup_path(struct fdirnode *__restrict self,
-                     USER CHECKED char const *path)
+                     NCX char const *path)
 		THROWS(E_SEGFAULT, E_BADALLOC, E_IOERROR, ...) {
 	REF struct fnode *result = mfile_asnode(incref(self));
 	for (;;) {
-		USER CHECKED char const *sep;
+		NCX char const *sep;
 		size_t partlen;
 		TRY {
 			sep = strchrnul(path, '/');

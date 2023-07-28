@@ -118,14 +118,14 @@ NOTHROW(FCALL nameof_special_file)(struct mfile *__restrict self);
 	INTDEF struct procfs_regfile symbol_name;
 #define MKREG_RW(symbol_name, perm, printer, writer)                                  \
 	INTDEF void KCALL printer(pformatprinter printer, void *arg, pos_t offset_hint); \
-	INTDEF void KCALL writer(USER CHECKED void const *buf, size_t bufsize);           \
+	INTDEF void KCALL writer(NCX void const *buf, size_t bufsize);           \
 	INTDEF struct procfs_regfile symbol_name;
 #define MKREG_CONSTSTR(symbol_name, perm, string_ptr) \
 	INTDEF struct procfs_txtfile symbol_name;
 #define MKLNK(symbol_name, perm, readlink)            \
 	INTDEF WUNUSED NONNULL((1)) size_t KCALL          \
 	readlink(struct flnknode *__restrict self,        \
-	         USER CHECKED /*utf-8*/ char *buf,        \
+	         NCX /*utf-8*/ char *buf,        \
 	         size_t bufsize) THROWS(E_SEGFAULT, ...); \
 	INTDEF struct flnknode symbol_name;
 #include "procfs.def"
@@ -158,7 +158,7 @@ print_size_with_unit(pformatprinter printer, void *arg, uint64_t sizeval) {
 /************************************************************************/
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 procfs_self_printer(struct flnknode *__restrict UNUSED(self),
-                    USER CHECKED /*utf-8*/ char *buf, size_t bufsize)
+                    NCX /*utf-8*/ char *buf, size_t bufsize)
 		THROWS(E_SEGFAULT, ...) {
 	return snprintf(buf, bufsize, "%" PRIuN(__SIZEOF_PID_T__), task_getpid());
 }
@@ -169,7 +169,7 @@ procfs_self_printer(struct flnknode *__restrict UNUSED(self),
 /************************************************************************/
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 procfs_threadself_printer(struct flnknode *__restrict UNUSED(self),
-                          USER CHECKED /*utf-8*/ char *buf, size_t bufsize)
+                          NCX /*utf-8*/ char *buf, size_t bufsize)
 		THROWS(E_SEGFAULT, ...) {
 	return snprintf(buf, bufsize, "%" PRIuN(__SIZEOF_PID_T__) "/task/"
 	                              "%" PRIuN(__SIZEOF_PID_T__),
@@ -228,7 +228,7 @@ procfs_filesystems_printer(pformatprinter printer, void *arg,
 /************************************************************************/
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 procfs_mounts_printer(struct flnknode *__restrict UNUSED(self),
-                      USER CHECKED /*utf-8*/ char *buf, size_t bufsize)
+                      NCX /*utf-8*/ char *buf, size_t bufsize)
 		THROWS(E_SEGFAULT, ...) {
 	return snprintf(buf, bufsize, "%" PRIuN(__SIZEOF_PID_T__) "/mounts", task_getpid());
 }
@@ -428,7 +428,7 @@ procfs_kos_fs_allow_fs_oob_print(pformatprinter printer, void *arg,
 	ProcFS_PrintBool(printer, arg, fsuper_allow_fs_oob);
 }
 INTERN void KCALL
-procfs_kos_fs_allow_fs_oob_write(USER CHECKED void const *buf,
+procfs_kos_fs_allow_fs_oob_write(NCX void const *buf,
                                  size_t bufsize) {
 	bool newval;
 	newval = ProcFS_ParseBool(buf, bufsize);
@@ -1351,7 +1351,7 @@ procfs_kos_cc_max_attempts_print(pformatprinter printer, void *arg,
 	ProcFS_PrintUInt(printer, arg, system_cc_maxattempts);
 }
 INTERN void KCALL
-procfs_kos_cc_max_attempts_write(USER CHECKED void const *buf,
+procfs_kos_cc_max_attempts_write(NCX void const *buf,
                                  size_t bufsize) {
 	unsigned int newmax;
 	newmax = ProcFS_ParseUInt(buf, bufsize, 0, UINT_MAX);
@@ -1370,7 +1370,7 @@ procfs_kos_futexfd_maxexpr_print(pformatprinter printer, void *arg,
 	ProcFS_PrintSize(printer, arg, mfutexfd_maxexpr);
 }
 INTERN void KCALL
-procfs_kos_futexfd_maxexpr_write(USER CHECKED void const *buf,
+procfs_kos_futexfd_maxexpr_write(NCX void const *buf,
                                  size_t bufsize) {
 	size_t newmax;
 	newmax = ProcFS_ParseSize(buf, bufsize, 1, SIZE_MAX);
@@ -1382,7 +1382,7 @@ procfs_kos_futexfd_maxexpr_write(USER CHECKED void const *buf,
 
 #if defined(__x86_64__) || defined(__i386__)
 PRIVATE void KCALL
-KeepIopl_Write(USER CHECKED void const *buf, size_t bufsize, bool *pvalue) {
+KeepIopl_Write(NCX void const *buf, size_t bufsize, bool *pvalue) {
 	bool new_value;
 	new_value = ProcFS_ParseBool(buf, bufsize);
 	for (;;) {
@@ -1416,7 +1416,7 @@ ProcFS_Sys_X86_KeepIopl_Fork_Print(pformatprinter printer, void *arg,
 }
 
 INTERN void KCALL
-ProcFS_Sys_X86_KeepIopl_Fork_Write(USER CHECKED void const *buf,
+ProcFS_Sys_X86_KeepIopl_Fork_Write(NCX void const *buf,
                                    size_t bufsize) {
 	KeepIopl_Write(buf, bufsize, &x86_iopl_keep_after_fork);
 }
@@ -1432,7 +1432,7 @@ ProcFS_Sys_X86_KeepIopl_Clone_Print(pformatprinter printer, void *arg,
 }
 
 INTERN void KCALL
-ProcFS_Sys_X86_KeepIopl_Clone_Write(USER CHECKED void const *buf,
+ProcFS_Sys_X86_KeepIopl_Clone_Write(NCX void const *buf,
                                     size_t bufsize) {
 	KeepIopl_Write(buf, bufsize, &x86_iopl_keep_after_clone);
 }
@@ -1452,7 +1452,7 @@ ProcFS_Sys_X86_KeepIopl_Exec_Print(pformatprinter printer, void *arg,
 }
 
 INTERN void KCALL
-ProcFS_Sys_X86_KeepIopl_Exec_Write(USER CHECKED void const *buf, size_t bufsize) {
+ProcFS_Sys_X86_KeepIopl_Exec_Write(NCX void const *buf, size_t bufsize) {
 	bool keep;
 	union x86_user_eflags_mask_union oldmask, newmask;
 	KeepIopl_Write(buf, bufsize, &keep);
@@ -1481,7 +1481,7 @@ procfs_sys_fs_pipemaxsize_print(pformatprinter printer, void *arg,
 }
 
 INTERN void KCALL
-procfs_sys_fs_pipemaxsize_write(USER CHECKED void const *buf,
+procfs_sys_fs_pipemaxsize_write(NCX void const *buf,
                                 size_t bufsize) {
 	size_t oldsize, newsize;
 	/* Setting  it lower than the default limit  can't be done, since the default
@@ -1506,7 +1506,7 @@ procfs_sys_fs_inotify_maxqueuedevents_print(pformatprinter printer, void *arg,
 }
 
 INTERN void KCALL
-procfs_sys_fs_inotify_maxqueuedevents_write(USER CHECKED void const *buf,
+procfs_sys_fs_inotify_maxqueuedevents_write(NCX void const *buf,
                                             size_t bufsize) {
 	unsigned int new_maxevents;
 	new_maxevents = ProcFS_ParseUInt(buf, bufsize, 1, (unsigned int)0x10000);
@@ -1525,15 +1525,15 @@ ProcFS_Sys_Kernel_Domainname_Print(pformatprinter printer, void *arg,
 }
 
 INTERN void KCALL
-ProcFS_Sys_Kernel_Domainname_Write(USER CHECKED void const *buf,
+ProcFS_Sys_Kernel_Domainname_Write(NCX void const *buf,
                                    size_t bufsize) {
 	char temp[_UTSNAME_DOMAIN_LENGTH];
-	USER CHECKED char const *endp;
-	endp = (USER CHECKED char const *)buf + bufsize;
-	while (endp > (USER CHECKED char const *)buf &&
+	NCX char const *endp;
+	endp = (NCX char const *)buf + bufsize;
+	while (endp > (NCX char const *)buf &&
 	       unicode_islf(endp[-1]))
 		--endp;
-	bufsize = (size_t)(endp - (USER CHECKED char const *)buf);
+	bufsize = (size_t)(endp - (NCX char const *)buf);
 	if (bufsize > _UTSNAME_DOMAIN_LENGTH)
 		THROW(E_BUFFER_TOO_SMALL, bufsize, _UTSNAME_DOMAIN_LENGTH);
 	cred_require_sysadmin();
@@ -1554,15 +1554,15 @@ ProcFS_Sys_Kernel_Hostname_Print(pformatprinter printer, void *arg,
 }
 
 INTERN void KCALL
-ProcFS_Sys_Kernel_Hostname_Write(USER CHECKED void const *buf,
+ProcFS_Sys_Kernel_Hostname_Write(NCX void const *buf,
                                  size_t bufsize) {
 	char temp[_UTSNAME_NODENAME_LENGTH];
-	USER CHECKED char const *endp;
-	endp = (USER CHECKED char const *)buf + bufsize;
-	while (endp > (USER CHECKED char const *)buf &&
+	NCX char const *endp;
+	endp = (NCX char const *)buf + bufsize;
+	while (endp > (NCX char const *)buf &&
 	       unicode_islf(endp[-1]))
 		--endp;
-	bufsize = (size_t)(endp - (USER CHECKED char const *)buf);
+	bufsize = (size_t)(endp - (NCX char const *)buf);
 	if (bufsize > _UTSNAME_NODENAME_LENGTH)
 		THROW(E_BUFFER_TOO_SMALL, bufsize, _UTSNAME_NODENAME_LENGTH);
 	cred_require_sysadmin();
@@ -1583,7 +1583,7 @@ ProcFS_Sys_Kernel_PidMax_Print(pformatprinter printer, void *arg,
 }
 
 INTERN void KCALL
-ProcFS_Sys_Kernel_PidMax_Write(USER CHECKED void const *buf,
+ProcFS_Sys_Kernel_PidMax_Write(NCX void const *buf,
                                size_t bufsize) {
 	upid_t newvalue;
 	newvalue = ProcFS_ParseUPid(buf, bufsize, PID_MIN, PID_MAX);
@@ -1601,7 +1601,7 @@ ProcFS_Sys_Kernel_RandomizeVaSpace_Print(pformatprinter printer, void *arg,
 }
 
 INTERN void KCALL
-ProcFS_Sys_Kernel_RandomizeVaSpace_Write(USER CHECKED void const *buf,
+ProcFS_Sys_Kernel_RandomizeVaSpace_Write(NCX void const *buf,
                                          size_t bufsize) {
 	unsigned int mode;
 	mode = ProcFS_ParseUInt(buf, bufsize, 0, 2);
@@ -1619,7 +1619,7 @@ ProcFS_Sys_Kernel_SchedChildRunsFirst_Print(pformatprinter printer, void *arg,
 }
 
 INTERN void KCALL
-ProcFS_Sys_Kernel_SchedChildRunsFirst_Write(USER CHECKED void const *buf,
+ProcFS_Sys_Kernel_SchedChildRunsFirst_Write(NCX void const *buf,
                                             size_t bufsize) {
 	bool mode;
 	mode = ProcFS_ParseBool(buf, bufsize);
@@ -1641,7 +1641,7 @@ ProcFS_Sys_Net_Core_RmemDefault_Print(pformatprinter printer, void *arg,
 }
 
 INTERN void KCALL
-ProcFS_Sys_Net_Core_RmemDefault_Write(USER CHECKED void const *buf, size_t bufsize) {
+ProcFS_Sys_Net_Core_RmemDefault_Write(NCX void const *buf, size_t bufsize) {
 	size_t newval;
 	newval = ProcFS_ParseSize(buf, bufsize, SOCKET_RCVBUFMIN, socket_default_rcvbufmax);
 	atomic_write(&socket_default_rcvbufsiz, newval);
@@ -1658,7 +1658,7 @@ ProcFS_Sys_Net_Core_WmemDefault_Print(pformatprinter printer, void *arg,
 }
 
 INTERN void KCALL
-ProcFS_Sys_Net_Core_WmemDefault_Write(USER CHECKED void const *buf, size_t bufsize) {
+ProcFS_Sys_Net_Core_WmemDefault_Write(NCX void const *buf, size_t bufsize) {
 	size_t newval;
 	newval = ProcFS_ParseSize(buf, bufsize, SOCKET_SNDBUFMIN, socket_default_sndbufmax);
 	atomic_write(&socket_default_sndbufsiz, newval);
@@ -1675,7 +1675,7 @@ ProcFS_Sys_Net_Core_RmemMax_Print(pformatprinter printer, void *arg,
 }
 
 INTERN void KCALL
-ProcFS_Sys_Net_Core_RmemMax_Write(USER CHECKED void const *buf, size_t bufsize) {
+ProcFS_Sys_Net_Core_RmemMax_Write(NCX void const *buf, size_t bufsize) {
 	size_t newval, old_dfl;
 	newval = ProcFS_ParseSize(buf, bufsize, SOCKET_RCVBUFMIN);
 	atomic_write(&socket_default_rcvbufmax, newval);
@@ -1698,7 +1698,7 @@ ProcFS_Sys_Net_Core_WmemMax_Print(pformatprinter printer, void *arg,
 }
 
 INTERN void KCALL
-ProcFS_Sys_Net_Core_WmemMax_Write(USER CHECKED void const *buf, size_t bufsize) {
+ProcFS_Sys_Net_Core_WmemMax_Write(NCX void const *buf, size_t bufsize) {
 	size_t newval, old_dfl;
 	newval = ProcFS_ParseSize(buf, bufsize, SOCKET_SNDBUFMIN);
 	atomic_write(&socket_default_sndbufmax, newval);
@@ -1810,7 +1810,7 @@ get_nth_leak(struct memleaks *__restrict self, uint64_t nth)
 
 PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
 memleaks_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
-                 USER UNCHECKED void *arg, iomode_t mode)
+                 NCX UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 	struct memleaks *me = (struct memleaks *)mfile_asprintnode(self);
 	switch (cmd) {
@@ -1818,9 +1818,9 @@ memleaks_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	case LEAKS_IOC_LEAKATTR: {
 		memleak_t leak;
 		uintptr_t attr, aval;
-		USER CHECKED struct leakattr *info;
+		NCX struct leakattr *info;
 		validate_writable(arg, sizeof(struct leakattr));
-		info = (USER CHECKED struct leakattr *)arg;
+		info = (NCX struct leakattr *)arg;
 		attr = decode_leakattr(info->la_attr);
 		leak = get_nth_leak(me, info->la_index);
 		aval = (uintptr_t)memleak_getattr(leak, attr);
@@ -1832,11 +1832,11 @@ memleaks_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 
 	case LEAKS_IOC_LEAKTB: {
 		memleak_t leak;
-		USER CHECKED struct leaktb *info;
+		NCX struct leaktb *info;
 		size_t i, count, req;
-		USER CHECKED uint64_t *uvec;
+		NCX uint64_t *uvec;
 		validate_readwrite(arg, sizeof(struct leaktb));
-		info  = (USER CHECKED struct leaktb *)arg;
+		info  = (NCX struct leaktb *)arg;
 		leak  = get_nth_leak(me, info->lt_index);
 		count = (size_t)info->lt_count;
 		uvec  = info->lt_elemp;
@@ -1856,11 +1856,11 @@ memleaks_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		byte_t const *leak_addr;
 		size_t leak_size;
 		memleak_t leak;
-		USER CHECKED struct leakmem *info;
+		NCX struct leakmem *info;
 		size_t size, offs, _temp;
-		USER CHECKED byte_t *ubuf;
+		NCX byte_t *ubuf;
 		validate_readwrite(arg, sizeof(struct leakmem));
-		info = (USER CHECKED struct leakmem *)arg;
+		info = (NCX struct leakmem *)arg;
 		leak = get_nth_leak(me, info->lm_index);
 		offs = (size_t)info->lm_offset;
 		size = (size_t)info->lm_size;

@@ -471,7 +471,7 @@ NOTHROW(KCALL UnixSocket_Fini)(struct socket *__restrict self) {
 
 PRIVATE NONNULL((1)) socklen_t KCALL
 UnixSocket_GetName(UnixSocket *__restrict self,
-                   USER CHECKED struct sockaddr_un *addr,
+                   NCX struct sockaddr_un *addr,
                    socklen_t addr_len,
                    bool error_if_not_bound) {
 	size_t result, bufsize;
@@ -521,38 +521,38 @@ UnixSocket_GetName(UnixSocket *__restrict self,
 
 PRIVATE NONNULL((1)) socklen_t KCALL
 UnixSocket_GetSockName(struct socket *__restrict self,
-                       USER CHECKED struct sockaddr *addr,
+                       NCX struct sockaddr *addr,
                        socklen_t addr_len) {
 	return UnixSocket_GetName((UnixSocket *)self,
-	                          (USER CHECKED struct sockaddr_un *)addr,
+	                          (NCX struct sockaddr_un *)addr,
 	                          addr_len, false);
 }
 
 PRIVATE NONNULL((1)) socklen_t KCALL
 UnixSocket_GetPeerName(struct socket *__restrict self,
-                       USER CHECKED struct sockaddr *addr,
+                       NCX struct sockaddr *addr,
                        socklen_t addr_len)
 		THROWS(E_ILLEGAL_BECAUSE_NOT_READY) {
 	return UnixSocket_GetName((UnixSocket *)self,
-	                          (USER CHECKED struct sockaddr_un *)addr,
+	                          (NCX struct sockaddr_un *)addr,
 	                          addr_len, true);
 }
 
 
 PRIVATE NONNULL((1)) void KCALL
 UnixSocket_Bind(struct socket *__restrict self,
-                USER CHECKED struct sockaddr const *addr,
+                NCX struct sockaddr const *addr,
                 socklen_t addr_len)
 		THROWS(E_NET_ADDRESS_IN_USE, E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
 		       E_ILLEGAL_BECAUSE_NOT_READY, E_BUFFER_TOO_SMALL) {
 	size_t pathlen;
 	UnixSocket *me = (UnixSocket *)self;
-	USER CHECKED struct sockaddr_un *addr_un;
+	NCX struct sockaddr_un *addr_un;
 	REF struct path *bind_path;
 	char *nulterm_filename;
 	struct fmkfile_info mki;
 
-	addr_un = (USER CHECKED struct sockaddr_un *)addr;
+	addr_un = (NCX struct sockaddr_un *)addr;
 
 	/* We need  at  least  1  character  in  the  path-buffer.
 	 * The shortest valid bind-path is a single-character path
@@ -754,7 +754,7 @@ PRIVATE struct async_ops const UnixSocket_WaitForAccept = {
 
 PRIVATE NONNULL((1)) void KCALL
 UnixSocket_Connect(struct socket *__restrict self,
-                   USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
+                   NCX struct sockaddr const *addr, socklen_t addr_len,
                    /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_NET_ADDRESS_IN_USE, E_ILLEGAL_BECAUSE_NOT_READY,
 		                E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
@@ -766,8 +766,8 @@ UnixSocket_Connect(struct socket *__restrict self,
 	REF struct fsocknode *bind_node;
 	REF struct path *bind_path;
 	REF struct fdirent *bind_name;
-	USER CHECKED struct sockaddr_un *addr_un;
-	addr_un = (USER CHECKED struct sockaddr_un *)addr;
+	NCX struct sockaddr_un *addr_un;
+	addr_un = (NCX struct sockaddr_un *)addr;
 
 	/* We need  at  least  1  character  in  the  path-buffer.
 	 * The shortest valid bind-path is a single-character path
@@ -1502,7 +1502,7 @@ again_start_packet:
 PRIVATE NONNULL((1, 2)) size_t KCALL
 UnixSocket_Recvv(struct socket *__restrict self,
                  struct iov_buffer const *__restrict buf, size_t bufsize,
-                 /*0..1*/ USER CHECKED u32 *presult_flags,
+                 /*0..1*/ NCX u32 *presult_flags,
                  struct ancillary_rmessage const *msg_control,
                  syscall_ulong_t msg_flags,
                  ktime_t abs_timeout)
@@ -1784,7 +1784,7 @@ not_connected:
 PRIVATE NONNULL((1)) socklen_t KCALL
 UnixSocket_GetSockOpt(struct socket *__restrict self,
                       syscall_ulong_t level, syscall_ulong_t optname,
-                      USER CHECKED void *optval,
+                      NCX void *optval,
                       socklen_t optlen, iomode_t UNUSED(mode))
 		THROWS(E_INVALID_ARGUMENT_SOCKET_OPT) {
 	struct unix_socket *me;

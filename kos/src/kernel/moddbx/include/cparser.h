@@ -71,9 +71,9 @@ enum {
 
 struct cparser {
 	unsigned int          c_tok;      /* C Token kind. (single-character, or one of `CTOKEN_TOK_*') */
-	CHECKED char const   *c_tokstart; /* [1..1] Start character of `c_tok' */
-	CHECKED char const   *c_tokend;   /* [1..1] End character of `c_tok' */
-	CHECKED char const   *c_end;      /* [1..1][const] End of text to-be parsed (NOTE: must point to a NUL-character!) */
+	NCX char const       *c_tokstart; /* [1..1] Start character of `c_tok' */
+	NCX char const       *c_tokend;   /* [1..1] End character of `c_tok' */
+	NCX char const       *c_end;      /* [1..1][const] End of text to-be parsed (NOTE: must point to a NUL-character!) */
 	dbg_autocomplete_cb_t c_autocom;  /* [0..1] Auto-completion callback: When `CTOKEN_TOK_EOF' is reached in certain
 	                                   *        positions while parsing an expression, and this callback is NULL, then
 	                                   *        this callback will  be invoked  with a list  of possible  continuation
@@ -87,7 +87,7 @@ struct cparser {
  * @return: DBX_ENOMEM: Insufficient memory. */
 FUNDEF NONNULL((1, 2)) dbx_errno_t
 NOTHROW_CB_NCX(FCALL cparser_autocomplete)(struct cparser const *__restrict self,
-                                           CHECKED char const *__restrict str, size_t len);
+                                           NCX char const *__restrict str, size_t len);
 
 #define cparser_init(self, str, len)                         \
 	((self)->c_end     = ((self)->c_tokend = (str)) + (len), \

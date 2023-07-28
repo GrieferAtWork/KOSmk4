@@ -175,7 +175,7 @@ NOTHROW_CB_NCX(KCALL ctype_printprefix)(struct ctyperef const *__restrict self,
 	/* Check for simple case: the type has a name. */
 	ssize_t temp, result = 0;
 	char const *prefix;
-	CHECKED char const *type_name;
+	NCX char const *type_name;
 	struct ctype *typ;
 again:
 	typ       = self->ct_typ;
@@ -334,7 +334,7 @@ NOTHROW(FCALL cc_attribute)(uintptr_t cc) {
 PRIVATE NONNULL((1, 2)) ssize_t
 NOTHROW_CB_NCX(KCALL ctype_printsuffix_head)(struct ctyperef *__restrict self,
                                              struct cprinter const *__restrict printer,
-                                             CHECKED char const *varname, size_t varname_len) {
+                                             NCX char const *varname, size_t varname_len) {
 	ssize_t temp, result = 0;
 	struct ctype *typ;
 again:
@@ -530,7 +530,7 @@ err:
 PUBLIC NONNULL((1, 2)) ssize_t
 NOTHROW_CB_NCX(KCALL ctyperef_printname)(struct ctyperef const *__restrict self,
                                          struct cprinter const *__restrict printer,
-                                         CHECKED char const *varname, size_t varname_len) {
+                                         NCX char const *varname, size_t varname_len) {
 	ssize_t temp, result;
 	struct ctyperef me;
 
@@ -552,7 +552,7 @@ err:
 PUBLIC NONNULL((1, 2)) ssize_t
 NOTHROW_CB_NCX(KCALL ctype_printname)(struct ctype const *__restrict self,
                                       struct cprinter const *__restrict printer,
-                                      CHECKED char const *varname, size_t varname_len) {
+                                      NCX char const *varname, size_t varname_len) {
 	struct ctyperef ct;
 	bzero(&ct, sizeof(ct));
 	ct.ct_typ = (struct ctype *)self;
@@ -587,7 +587,7 @@ NOTHROW_NCX(FORMATPRINTER_CC indent_printer)(void *arg, char const *__restrict d
 
 PRIVATE NONNULL((1)) size_t
 NOTHROW_CB_NCX(KCALL ctype_printvalue_nextindent)(struct ctyperef const *__restrict self,
-                                                  CHECKED void const *buf, unsigned int flags,
+                                                  NCX void const *buf, unsigned int flags,
                                                   size_t firstline_indent, size_t newline_indent,
                                                   size_t newline_tab, size_t maxlinelen,
                                                   bool *pcontains_newline,
@@ -646,11 +646,11 @@ PRIVATE struct cprinter const lenprinter = {
 #define CSTRING_KIND_INVALID ((unsigned int)-1)
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(KCALL ctype_printcstring)(struct cprinter const *__restrict printer,
-                                         CHECKED void const *buf, size_t len,
+                                         NCX void const *buf, size_t len,
                                          unsigned int kind) {
 	ssize_t temp, result = 0;
 	char prefix[2], *ptr;
-	CHECKED byte_t const *reader, *end;
+	NCX byte_t const *reader, *end;
 	FORMAT(DEBUGINFO_PRINT_FORMAT_STRING_PREFIX);
 	ptr = prefix;
 	switch (kind) {
@@ -722,7 +722,7 @@ err_segfault:
 
 
 struct ctype_printstruct_ismultiline_data {
-	CHECKED void const *buf;              /* [const] */
+	NCX void const *buf;              /* [const] */
 	unsigned int        flags;            /* [const] Flags for printing the field */
 	unsigned int        inner_flags;      /* [const] Flags for printing the pointed-to object */
 	size_t              firstline_indent; /* [in|out] */
@@ -768,7 +768,7 @@ NOTHROW_CB_NCX(KCALL ctype_printstruct_ismultiline_callback)(void *cookie,
 		arg->out_contains_lf = true;
 	} else {
 		struct ctyperef member_type;
-		CHECKED byte_t const *member_addr;
+		NCX byte_t const *member_addr;
 
 		/* Load type information for this member. */
 		if (ctype_fromdw(mod, cu, parser, member->m_type, &member_type) != DBX_EOK)
@@ -804,7 +804,7 @@ NOTHROW(KCALL ctype_struct_is_nonempty_callback)(void *UNUSED(cookie),
 
 struct ctype_printstruct_data {
 	struct cprinter const *printer;          /* [const][1..1] */
-	CHECKED void const    *buf;              /* [const] */
+	NCX void const        *buf;              /* [const] */
 	unsigned int           flags;            /* [const] Flags for printing the field */
 	unsigned int           inner_flags;      /* [const] Flags for printing the pointed-to object */
 	size_t                 firstline_indent; /* [in|out] */
@@ -824,7 +824,7 @@ NOTHROW_CB_NCX(KCALL ctype_printstruct_callback)(void *cookie,
 	ssize_t temp, result = 0;
 	struct ctype_printstruct_data *arg;
 	struct ctyperef member_type;
-	CHECKED byte_t const *member_addr;
+	NCX byte_t const *member_addr;
 	size_t prefix_length, next_indent;
 	size_t elem_indent, name_length;
 	struct cprinter const *printer;
@@ -974,7 +974,7 @@ err:
 }
 
 PRIVATE bool
-NOTHROW(KCALL dbg_strlen)(USER CHECKED void const *addr,
+NOTHROW(KCALL dbg_strlen)(NCX void const *addr,
                           size_t *__restrict presult) {
 	size_t result = 0;
 	char buf[17];
@@ -996,7 +996,7 @@ NOTHROW(KCALL dbg_strlen)(USER CHECKED void const *addr,
 }
 
 PRIVATE bool
-NOTHROW(KCALL dbg_strlen16)(USER CHECKED void const *addr,
+NOTHROW(KCALL dbg_strlen16)(NCX void const *addr,
                             size_t *__restrict presult) {
 	size_t result = 0;
 	u16 buf[17];
@@ -1018,7 +1018,7 @@ NOTHROW(KCALL dbg_strlen16)(USER CHECKED void const *addr,
 }
 
 PRIVATE bool
-NOTHROW(KCALL dbg_strlen32)(USER CHECKED void const *addr,
+NOTHROW(KCALL dbg_strlen32)(NCX void const *addr,
                             size_t *__restrict presult) {
 	size_t result = 0;
 	u32 buf[17];
@@ -1045,8 +1045,8 @@ NOTHROW(KCALL dbg_strlen32)(USER CHECKED void const *addr,
  * @return: false: Memory is not equal.
  * @return: false: Accessing memory failed. */
 PRIVATE bool
-NOTHROW(KCALL dbg_eqmemory)(USER CHECKED void const *a,
-                            USER CHECKED void const *b,
+NOTHROW(KCALL dbg_eqmemory)(NCX void const *a,
+                            NCX void const *b,
                             size_t num_bytes) {
 	byte_t a_buf[64];
 	byte_t b_buf[64];
@@ -1069,8 +1069,8 @@ NOTHROW(KCALL dbg_eqmemory)(USER CHECKED void const *a,
 
 PRIVATE NONNULL((1, 5)) ssize_t
 NOTHROW_CB_NCX(KCALL print_a2l_symbol)(struct cprinter const *__restrict printer,
-                                       CHECKED void const *ptr,
-                                       CHECKED char const *name,
+                                       NCX void const *ptr,
+                                       NCX char const *name,
                                        uintptr_t offset, module_t *__restrict mod) {
 	ssize_t temp, result = 0;
 	FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
@@ -1125,7 +1125,7 @@ NOTHROW(KCALL get_name_and_offset_of_containing_sections)(uintptr_t module_relat
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
 NOTHROW_CB_NCX(KCALL print_object_note)(char const *__restrict name,
                                         struct cprinter const *__restrict printer,
-                                        CHECKED void const *ptr) {
+                                        NCX void const *ptr) {
 	ssize_t temp, result = 0;
 	unsigned int status;
 	/* Custom representations of pointers to objects from the kernel core. */
@@ -1154,7 +1154,7 @@ err:
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
 NOTHROW_CB_NCX(KCALL print_named_struct)(struct ctype *__restrict self,
                                          struct cprinter const *__restrict printer,
-                                         CHECKED void const *ptr) {
+                                         NCX void const *ptr) {
 	ssize_t temp, result = 0;
 	struct cmodule *mod;
 	mod = self->ct_struct.ct_info.cd_mod;
@@ -1180,7 +1180,7 @@ err:
 PRIVATE ATTR_NOINLINE NONNULL((1, 2, 4)) ssize_t
 NOTHROW_CB_NCX(KCALL print_named_pointer)(struct ctyperef const *__restrict self,
                                           struct cprinter const *__restrict printer,
-                                          CHECKED void const *ptr,
+                                          NCX void const *ptr,
                                           bool *__restrict pdid_print_something) {
 	ssize_t temp, result = 0;
 	bool is_void_pointer;
@@ -1444,7 +1444,7 @@ err:
 PRIVATE ATTR_NOINLINE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(KCALL print_function)(struct ctyperef const *__restrict self,
                                      struct cprinter const *__restrict printer,
-                                     CHECKED void const *ptr, unsigned int flags,
+                                     NCX void const *ptr, unsigned int flags,
                                      size_t firstline_indent, size_t newline_indent,
                                      size_t newline_tab, size_t maxlinelen) {
 	/* Check if `ptr' is a text-/data-pointer. */
@@ -1575,7 +1575,7 @@ done:
 
 PRIVATE ATTR_NOINLINE NONNULL((1, 5)) dbx_errno_t
 NOTHROW_CB_NCX(KCALL do_print_int128)(struct cprinter const *__restrict printer,
-                                      CHECKED void const *ptr, bool is_unsigned,
+                                      NCX void const *ptr, bool is_unsigned,
                                       unsigned int flags, ssize_t *__restrict p_result) {
 	ssize_t temp, result;
 	union int128_union {
@@ -1637,9 +1637,9 @@ err:
 PRIVATE WUNUSED NONNULL((1, 2, 4)) dbx_errno_t
 NOTHROW_CB_NCX(KCALL print_special_struct)(struct ctyperef const *__restrict self,
                                            struct cprinter const *__restrict printer,
-                                           CHECKED void const *ptr, ssize_t *__restrict p_result,
+                                           NCX void const *ptr, ssize_t *__restrict p_result,
                                            unsigned int flags) {
-	CHECKED char const *raw_name /*= NULL*/;
+	NCX char const *raw_name /*= NULL*/;
 	struct ctype *typ = self->ct_typ;
 
 	/* Caller should  have already  ensured  that this  is  a
@@ -1657,7 +1657,7 @@ NOTHROW_CB_NCX(KCALL print_special_struct)(struct ctyperef const *__restrict sel
 	 * - `__hybrid_uint128_t'       (from `<hybrid/int128.h>')
 	 */
 	if (typ->ct_struct.ct_sizeof == 16) {
-		CHECKED char const *name;
+		NCX char const *name;
 		bool is_unsigned;
 		/*if (raw_name == NULL)*/ {
 			raw_name = ctype_struct_getname(typ);
@@ -1726,7 +1726,7 @@ NOTHROW_CB_NCX(KCALL print_special_struct)(struct ctyperef const *__restrict sel
 PUBLIC NONNULL((1, 2)) ssize_t
 NOTHROW_CB_NCX(KCALL ctype_printvalue)(struct ctyperef const *__restrict self,
                                        struct cprinter const *__restrict printer,
-                                       CHECKED void const *buf, unsigned int flags,
+                                       NCX void const *buf, unsigned int flags,
                                        size_t firstline_indent, size_t newline_indent,
                                        size_t newline_tab, size_t maxlinelen) {
 	/* TODO: This function is insanely inefficient for deeply nested
@@ -2194,7 +2194,7 @@ do_print_no_recursion_dots_and_rbrace:
 					/* Automatically determine if we need multi-line. */
 					for (i = 0; i < used_length; ++i) {
 						size_t index_hi;
-						CHECKED byte_t const *elem_addr;
+						NCX byte_t const *elem_addr;
 						elem_addr = (byte_t const *)buf + i * elem_size;
 						index_hi  = i;
 						if (!(flags & CTYPE_PRINTVALUE_FLAG_NOARRAYRANGE)) {
@@ -2204,7 +2204,7 @@ do_print_no_recursion_dots_and_rbrace:
 							 * use of `[lo ... hi] = value',  instead of  having
 							 * to use `value, value, value, ..., value, value' */
 							while (index_hi + 1 < used_length) {
-								CHECKED byte_t const *next_addr;
+								NCX byte_t const *next_addr;
 								next_addr = (byte_t const *)buf + (index_hi + 1) * elem_size;
 								if (!dbg_eqmemory(elem_addr, next_addr, elem_size))
 									break;
@@ -2254,7 +2254,7 @@ do_print_no_recursion_dots_and_rbrace:
 					firstline_indent = newline_indent;
 				}
 				for (i = 0; i < used_length; ++i) {
-					CHECKED byte_t const *elem_addr;
+					NCX byte_t const *elem_addr;
 					size_t elem_indent = firstline_indent;
 					size_t index_hi;
 					elem_addr = (byte_t const *)buf + i * elem_size;
@@ -2268,7 +2268,7 @@ do_print_no_recursion_dots_and_rbrace:
 						 * use of `[lo ... hi] = value',  instead of  having
 						 * to use `value, value, value, ..., value, value' */
 						while (index_hi + 1 < used_length) {
-							CHECKED byte_t const *next_addr;
+							NCX byte_t const *next_addr;
 							next_addr = (byte_t const *)buf + (index_hi + 1) * elem_size;
 							if (!dbg_eqmemory(elem_addr, next_addr, elem_size))
 								break;

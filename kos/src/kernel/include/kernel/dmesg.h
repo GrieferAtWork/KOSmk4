@@ -110,11 +110,10 @@ DATDEF struct syslog_sink dmesg_sink;
  * @return: false: The message's checksum did not match (this likely means  that
  *                 the end of the dmesg backlog was reached, since another entry
  *                 was probably responsible for overwriting this one's message) */
-FUNDEF bool KCALL
-dmesg_getmessage(USER CHECKED char *buffer,
-                 size_t message_offset,
-                 size_t message_length)
-		THROWS(E_SEGFAULT);
+FUNDEF bool
+NOTHROW_NCX(KCALL dmesg_getmessage)(NCX char *buffer,
+                                    size_t message_offset,
+                                    size_t message_length);
 
 /* Callback for `dmesg_enum()'
  * @param: arg:    The same value originally given to `dmesg_enum()'
@@ -142,10 +141,10 @@ typedef NONNULL_T((2)) ssize_t
  *                   If `*callback' was never invoked, or always returned
  *                   `0', `0'  will also  be returned  by this  function.
  * @return: < 0:     The propagation of the first negative return value of `*callback'. */
-FUNDEF NONNULL((1)) ssize_t KCALL
-dmesg_enum(dmesg_enum_t callback, void *arg,
-           unsigned int offset DFL(0),
-           unsigned int limit DFL((unsigned int)-1));
+FUNDEF NONNULL((1)) ssize_t
+NOTHROW_CB(KCALL dmesg_enum)(dmesg_enum_t callback, void *arg,
+                             unsigned int offset DFL(0),
+                             unsigned int limit DFL((unsigned int)-1));
 
 /* Lookup the `nth' latest dmesg packet, and store it within `buf'
  * @param: buf:        The packet buffer (must be non-NULL)
@@ -154,10 +153,10 @@ dmesg_enum(dmesg_enum_t callback, void *arg,
  * @return: > msg_buflen:          The required buffer size for `buf->sp_msg'
  * @return: >= 0 && <= msg_buflen: [== buf->sp_len] Success
  * @return: < 0:                   No such syslog packet. */
-FUNDEF s16 KCALL
-dmesg_getpacket(USER CHECKED struct syslog_packet *buf,
-                USER CHECKED unsigned int *plevel,
-                u16 msg_buflen, unsigned int nth);
+FUNDEF s16
+NOTHROW_NCX(KCALL dmesg_getpacket)(NCX struct syslog_packet *buf,
+                                   NCX unsigned int *plevel,
+                                   u16 msg_buflen, unsigned int nth);
 
 DECL_END
 #endif /* __CC__ */

@@ -369,7 +369,7 @@ clear_extension_table(struct dltls_segment *__restrict self)
 
 /* Free a previously allocated static TLS segment (usually called by `pthread_exit(3)' and friends). */
 INTERN NONNULL((1)) int DLFCN_CC
-libdl_dltlsfreeseg(USER struct dltls_segment *seg)
+libdl_dltlsfreeseg(NCX struct dltls_segment *seg)
 		THROWS(E_SEGFAULT, ...) {
 	if unlikely(!DL_VERIFY_TLS_SEGMENT(seg))
 		goto err_badptr;
@@ -462,10 +462,10 @@ err_badptr:
  * @return: NULL:          Failed to allocate the TLS segment (s.a. `dlerror()') */
 INTERN WUNUSED DlModule *
 NOTHROW(DLFCN_CC libdl_dltlsalloc)(size_t num_bytes, size_t min_alignment,
-                                   USER void const *template_data, size_t template_size,
-                                   void (DLFCN_CC USER *perthread_init)(void *arg, void *base, void *tls_segment),
-                                   void (DLFCN_CC USER *perthread_fini)(void *arg, void *base, void *tls_segment),
-                                   USER void *perthread_callback_arg) {
+                                   NCX void const *template_data, size_t template_size,
+                                   void (DLFCN_CC NCX *perthread_init)(void *arg, void *base, void *tls_segment),
+                                   void (DLFCN_CC NCX *perthread_fini)(void *arg, void *base, void *tls_segment),
+                                   NCX void *perthread_callback_arg) {
 	DlModule *result;
 	if unlikely(template_size > num_bytes) {
 		dl_seterrorf("TLS template size (%" PRIuSIZ ") is greater than TLS memory size (%" PRIuSIZ ")",
@@ -520,7 +520,7 @@ err:
 
 /* Free a TLS segment previously allocated with `dltlsalloc(3D)' */
 INTERN int
-NOTHROW_NCX(DLFCN_CC libdl_dltlsfree)(USER DlModule *self)
+NOTHROW_NCX(DLFCN_CC libdl_dltlsfree)(NCX DlModule *self)
 		THROWS(E_SEGFAULT) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_nullmodule;
@@ -551,7 +551,7 @@ DEFINE_PUBLIC_ALIAS(dltlsaddr2, libdl_dltlsaddr2);
 /* Similar to `libdl_dltlsaddr()', but do no lazy allocation
  * and return NULL if the module doesn't have a TLS segment. */
 INTERN WUNUSED NONNULL((1)) void *
-NOTHROW_NCX(CC DlModule_TryGetTLSAddr)(USER DlModule *self)
+NOTHROW_NCX(CC DlModule_TryGetTLSAddr)(NCX DlModule *self)
 		THROWS(E_SEGFAULT) {
 	byte_t *result;
 	struct dltls_segment *tls;
@@ -573,7 +573,7 @@ NOTHROW_NCX(CC DlModule_TryGetTLSAddr)(USER DlModule *self)
 
 
 INTERN WUNUSED void *__DLFCN_DLTLSADDR_CC
-libdl_dltlsaddr(USER DlModule *self) THROWS(E_SEGFAULT, ...) {
+libdl_dltlsaddr(NCX DlModule *self) THROWS(E_SEGFAULT, ...) {
 	void *result;
 	struct dltls_segment *seg;
 	RD_TLS_BASE_REGISTER(*(void **)&seg);

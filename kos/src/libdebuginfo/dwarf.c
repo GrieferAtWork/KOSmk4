@@ -43,8 +43,8 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 DECL_BEGIN
 
 /* Similar to the functions from `libunwind(3)', but decode into a 64-bit integer! */
-INTERN ATTR_RETNONNULL NONNULL((2)) CHECKED byte_t const *
-NOTHROW_NCX(CC libdi_dwarf_decode_sleb128_64)(CHECKED byte_t const *reader,
+INTERN ATTR_RETNONNULL NONNULL((2)) NCX byte_t const *
+NOTHROW_NCX(CC libdi_dwarf_decode_sleb128_64)(NCX byte_t const *reader,
                                               int64_t *__restrict p_result) {
 	byte_t byte;
 	shift_t shift = 0;
@@ -61,8 +61,8 @@ NOTHROW_NCX(CC libdi_dwarf_decode_sleb128_64)(CHECKED byte_t const *reader,
 	return reader;
 }
 
-INTERN ATTR_RETNONNULL NONNULL((2)) CHECKED byte_t const *
-NOTHROW_NCX(CC libdi_dwarf_decode_uleb128_64)(CHECKED byte_t const *reader,
+INTERN ATTR_RETNONNULL NONNULL((2)) NCX byte_t const *
+NOTHROW_NCX(CC libdi_dwarf_decode_uleb128_64)(NCX byte_t const *reader,
                                               uint64_t *__restrict p_result) {
 	byte_t byte;
 	shift_t shift = 0;
@@ -79,8 +79,8 @@ NOTHROW_NCX(CC libdi_dwarf_decode_uleb128_64)(CHECKED byte_t const *reader,
 
 
 /* Similar to the functions from `libunwind(3)', but these actually decode into a 128-bit integer! */
-INTERN ATTR_RETNONNULL NONNULL((2)) CHECKED byte_t const *
-NOTHROW_NCX(CC libdi_dwarf_decode_sleb128_128)(CHECKED byte_t const *reader,
+INTERN ATTR_RETNONNULL NONNULL((2)) NCX byte_t const *
+NOTHROW_NCX(CC libdi_dwarf_decode_sleb128_128)(NCX byte_t const *reader,
                                                int128_t *__restrict p_result) {
 	byte_t byte;
 	shift_t shift = 0;
@@ -105,8 +105,8 @@ NOTHROW_NCX(CC libdi_dwarf_decode_sleb128_128)(CHECKED byte_t const *reader,
 	return reader;
 }
 
-INTERN ATTR_RETNONNULL NONNULL((2)) CHECKED byte_t const *
-NOTHROW_NCX(CC libdi_dwarf_decode_uleb128_128)(CHECKED byte_t const *reader,
+INTERN ATTR_RETNONNULL NONNULL((2)) NCX byte_t const *
+NOTHROW_NCX(CC libdi_dwarf_decode_uleb128_128)(NCX byte_t const *reader,
                                                uint128_t *__restrict p_result) {
 	byte_t byte;
 	shift_t shift = 0;

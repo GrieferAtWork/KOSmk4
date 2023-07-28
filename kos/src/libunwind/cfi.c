@@ -452,7 +452,7 @@ err:
 INTERN NONNULL((1, 2, 4)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_ste_addr)(unwind_ste_t const *__restrict self,
                                       unwind_getreg_t regget, void const *regget_arg,
-                                      CHECKED void **__restrict paddr) {
+                                      NCX void **__restrict paddr) {
 	unwind_errno_t error;
 	switch (self->s_type) {
 
@@ -505,7 +505,7 @@ err:
 INTERN NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_ste_read)(unwind_ste_t const *__restrict self, uint8_t addrsize,
                                       unwind_getreg_t regget, void const *regget_arg,
-                                      CHECKED void *dst, size_t num_bits,
+                                      NCX void *dst, size_t num_bits,
                                       size_t dst_left_shift, size_t src_left_shift) {
 	unwind_errno_t error;
 	(void)addrsize;
@@ -607,7 +607,7 @@ INTERN NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_ste_write)(unwind_ste_t const *__restrict self, uint8_t addrsize,
                                        /*[1..1]*/ unwind_getreg_t regget, void const *regget_arg,
                                        /*[0..1]*/ unwind_setreg_t regset, void *regset_arg,
-                                       CHECKED void const *src, size_t num_bits,
+                                       NCX void const *src, size_t num_bits,
                                        size_t dst_left_shift, size_t src_left_shift) {
 	unwind_errno_t error;
 	(void)addrsize;
@@ -1844,8 +1844,8 @@ err_no_return_value:
  * @param: addrsize: Size of a target address.
  * @param: ptrsize:  Size of a DWARF pointer (4 for 32-bit dwarf; 8 for 64-bit dwarf).
  * @return: NULL: The instruction at `unwind_pc' wasn't recognized. */
-INTERN ATTR_PURE WUNUSED CHECKED byte_t const *
-NOTHROW_NCX(CC libuw_unwind_instruction_succ)(CHECKED byte_t const *unwind_pc,
+INTERN ATTR_PURE WUNUSED NCX byte_t const *
+NOTHROW_NCX(CC libuw_unwind_instruction_succ)(NCX byte_t const *unwind_pc,
                                               uint8_t addrsize, uint8_t ptrsize) {
 	byte_t op = *unwind_pc++;
 	switch (op) {
@@ -2024,7 +2024,7 @@ skip_1_uleb128:
 
 /* Return a pointer to a CFI expression that is applicable for `module_relative_pc'
  * If no such expression exists, return `NULL' instead. */
-INTERN WUNUSED NONNULL((1, 5)) CHECKED byte_t const *
+INTERN WUNUSED NONNULL((1, 5)) NCX byte_t const *
 NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *__restrict self,
                                                 uintptr_t cu_base,
                                                 uintptr_t module_relative_pc,
@@ -2274,10 +2274,10 @@ libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self
                                   unwind_getreg_t regget, void *regget_arg,
                                   struct di_debuginfo_compile_unit_simple_struct const *cu,
                                   uintptr_t module_relative_pc, uintptr_t module_addroffset,
-                                  CHECKED void *buf, size_t bufsize,
+                                  NCX void *buf, size_t bufsize,
                                   size_t *__restrict pnum_written_bits,
                                   di_debuginfo_location_t const *frame_base_expression,
-                                  CHECKED void const *objaddr, uint8_t addrsize, uint8_t ptrsize) {
+                                  NCX void const *objaddr, uint8_t addrsize, uint8_t ptrsize) {
 	unwind_ste_t ste_top;
 	unwind_emulator_t emulator;
 	size_t expr_length;
@@ -2335,10 +2335,10 @@ libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self
                                   unwind_setreg_t regset, void *regset_arg,
                                   struct di_debuginfo_compile_unit_simple_struct const *cu,
                                   uintptr_t module_relative_pc, uintptr_t module_addroffset,
-                                  CHECKED void const *buf, size_t bufsize,
+                                  NCX void const *buf, size_t bufsize,
                                   size_t *__restrict pnum_read_bits,
                                   di_debuginfo_location_t const *frame_base_expression,
-                                  CHECKED void *objaddr, uint8_t addrsize, uint8_t ptrsize) {
+                                  NCX void *objaddr, uint8_t addrsize, uint8_t ptrsize) {
 	unwind_ste_t ste_top;
 	unwind_emulator_t emulator;
 	size_t expr_length;

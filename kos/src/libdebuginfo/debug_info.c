@@ -279,8 +279,8 @@ NOTHROW(CC libdi_debuginfo_cu_abbrev_fini)(di_debuginfo_cu_abbrev_t *__restrict 
 
 #if 0
 PRIVATE bool
-NOTHROW_NCX(CC abbrev_lookup)(CHECKED byte_t const *reader,
-                              CHECKED byte_t const *abbrev_end,
+NOTHROW_NCX(CC abbrev_lookup)(NCX byte_t const *reader,
+                              NCX byte_t const *abbrev_end,
                               di_debuginfo_component_t *__restrict result,
                               uintptr_t abbrev_code) {
 	while (reader < abbrev_end) {
@@ -312,9 +312,9 @@ NOTHROW_NCX(CC abbrev_lookup)(CHECKED byte_t const *reader,
 }
 #endif
 
-PRIVATE WUNUSED CHECKED byte_t const *
-NOTHROW_NCX(CC abbrev_findcache)(CHECKED byte_t const *reader,
-                                 CHECKED byte_t const *abbrev_end,
+PRIVATE WUNUSED NCX byte_t const *
+NOTHROW_NCX(CC abbrev_findcache)(NCX byte_t const *reader,
+                                 NCX byte_t const *abbrev_end,
                                  uintptr_t abbrev_code) {
 	while (reader < abbrev_end) {
 		uintptr_t code;
@@ -341,7 +341,7 @@ NOTHROW_NCX(CC abbrev_findcache)(CHECKED byte_t const *reader,
 }
 
 PRIVATE NONNULL((2)) void
-NOTHROW_NCX(CC abbrev_loadcache)(CHECKED byte_t const *ace_data,
+NOTHROW_NCX(CC abbrev_loadcache)(NCX byte_t const *ace_data,
                                  di_debuginfo_component_t *__restrict result) {
 	result->dic_tag         = dwarf_decode_uleb128((byte_t const **)&ace_data);
 	result->dic_haschildren = *ace_data++;
@@ -352,7 +352,7 @@ NOTHROW_NCX(CC abbrev_loadcache)(CHECKED byte_t const *ace_data,
 
 PRIVATE NONNULL((1, 2)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__restrict self,
-                                                 CHECKED byte_t const *abbrev_end,
+                                                 NCX byte_t const *abbrev_end,
                                                  di_debuginfo_component_t *__restrict result,
                                                  uintptr_t abbrev_code) {
 #if 0
@@ -360,7 +360,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__res
 #else
 	size_t i;
 	di_debuginfo_cu_abbrev_cache_entry_t *list;
-	CHECKED byte_t const *cache_pointer;
+	NCX byte_t const *cache_pointer;
 	list = self->dua_cache_list;
 	if (list == self->dua_stcache ||
 	    list == (di_debuginfo_cu_abbrev_cache_entry_t *)-1) {
@@ -490,14 +490,14 @@ do_fill_dynamic_cache:
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 INTERN TEXTSECTION NONNULL((1, 3, 4, 5)) debuginfo_errno_t
-NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadunit)(CHECKED byte_t const **__restrict pdebug_info_reader,
-                                                   CHECKED byte_t const *debug_info_end,
+NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadunit)(NCX byte_t const **__restrict pdebug_info_reader,
+                                                   NCX byte_t const *debug_info_end,
                                                    di_debuginfo_cu_parser_sections_t const *__restrict sectinfo,
                                                    di_debuginfo_cu_parser_t *__restrict result,
                                                    di_debuginfo_cu_abbrev_t *__restrict abbrev,
-                                                   CHECKED byte_t const *first_component_pointer) {
+                                                   NCX byte_t const *first_component_pointer) {
 	uintptr_t temp;
-	CHECKED byte_t const *reader;
+	NCX byte_t const *reader;
 	uint8_t unit_type;
 	reader = *pdebug_info_reader;
 again:
@@ -766,7 +766,7 @@ again:
  * debug information start location of the next componet within  `*p_dip' */
 INTERN TEXTSECTION NONNULL((1, 2)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_next_with_dip)(di_debuginfo_cu_parser_t *__restrict self,
-                                                        CHECKED byte_t const **__restrict p_dip) {
+                                                        NCX byte_t const **__restrict p_dip) {
 	uintptr_t abbrev_code;
 	if (self->dup_comp.dic_haschildren != DW_CHILDREN_no)
 		++self->dup_child_depth;
@@ -797,7 +797,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextchild)(di_debuginfo_cu_parser_t *__
 
 INTERN TEXTSECTION NONNULL((1)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextsibling)(di_debuginfo_cu_parser_t *__restrict self) {
-	CHECKED byte_t const *reader;
+	NCX byte_t const *reader;
 	if (self->dup_comp.dic_haschildren != DW_CHILDREN_no)
 		return false;
 	reader = self->dsp_cu_info_pos;
@@ -809,7 +809,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextsibling)(di_debuginfo_cu_parser_t *
 
 INTERN TEXTSECTION NONNULL((1)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextparent)(di_debuginfo_cu_parser_t *__restrict self) {
-	CHECKED byte_t const *reader;
+	NCX byte_t const *reader;
 	if (self->dup_comp.dic_haschildren != DW_CHILDREN_no)
 		return false;
 	reader = self->dsp_cu_info_pos;
@@ -848,16 +848,16 @@ INTERN_CONST STRINGSECTION char const unknown_string[] = "??" "?";
  *  - debuginfo_cu_parser_getblock():  DW_FORM_block, DW_FORM_block1, DW_FORM_block2, DW_FORM_block4 */
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self,
-                                                    uintptr_t form, CHECKED char const **__restrict presult) {
+                                                    uintptr_t form, NCX char const **__restrict presult) {
 	return libdi_debuginfo_cu_parser_getstring_ex(self, form, presult,
 	                                              di_debuginfo_cu_parser_sections_as_di_string_sections(self->dup_sections));
 }
 
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring_ex)(di_debuginfo_cu_simple_parser_t const *__restrict self,
-                                                       uintptr_t form, CHECKED char const **__restrict presult,
+                                                       uintptr_t form, NCX char const **__restrict presult,
                                                        di_string_sections_t const *__restrict sections) {
-	CHECKED byte_t const *reader;
+	NCX byte_t const *reader;
 	reader = self->dsp_cu_info_pos;
 decode_form:
 	switch (form) {
@@ -930,7 +930,7 @@ err:
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getaddr)(di_debuginfo_cu_simple_parser_t const *__restrict self,
                                                   uintptr_t form, uintptr_t *__restrict presult) {
-	CHECKED byte_t const *reader;
+	NCX byte_t const *reader;
 	reader = self->dsp_cu_info_pos;
 decode_form:
 	switch (form) {
@@ -982,8 +982,8 @@ decode_form:
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst)(di_debuginfo_cu_simple_parser_t const *__restrict self,
                                                    uintptr_t form, uintptr_t *__restrict presult,
-                                                   CHECKED byte_t const *attr_reader) {
-	CHECKED byte_t const *reader;
+                                                   NCX byte_t const *attr_reader) {
+	NCX byte_t const *reader;
 	reader = self->dsp_cu_info_pos;
 decode_form:
 	switch (form) {
@@ -1053,8 +1053,8 @@ decode_form:
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst64)(di_debuginfo_cu_simple_parser_t const *__restrict self,
                                                      uintptr_t form, uint64_t *__restrict presult,
-                                                     CHECKED byte_t const *attr_reader) {
-	CHECKED byte_t const *reader;
+                                                     NCX byte_t const *attr_reader) {
+	NCX byte_t const *reader;
 	reader = self->dsp_cu_info_pos;
 decode_form:
 	switch (form) {
@@ -1127,8 +1127,8 @@ decode_form:
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst128)(di_debuginfo_cu_simple_parser_t const *__restrict self,
                                                       uintptr_t form, uint128_t *__restrict presult,
-                                                      CHECKED byte_t const *attr_reader) {
-	CHECKED byte_t const *reader;
+                                                      NCX byte_t const *attr_reader) {
+	NCX byte_t const *reader;
 	reader = self->dsp_cu_info_pos;
 decode_form:
 	switch (form) {
@@ -1187,7 +1187,7 @@ decode_form:
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getflag)(di_debuginfo_cu_simple_parser_t const *__restrict self,
                                                   uintptr_t form, bool *__restrict presult) {
-	CHECKED byte_t const *reader;
+	NCX byte_t const *reader;
 	reader = self->dsp_cu_info_pos;
 decode_form:
 	switch (form) {
@@ -1217,15 +1217,15 @@ decode_form:
  * info.
  * @return: * : Pointer into `.debug_info' (WARNING: probably not part of caller's CU)
  * @return: NULL: Type information not found. */
-PRIVATE WUNUSED NONNULL((1, 2)) CHECKED byte_t const *
-NOTHROW_NCX(CC find_typeunit_by_signature)(CHECKED byte_t const *reader,
-                                           CHECKED byte_t const *end,
+PRIVATE WUNUSED NONNULL((1, 2)) NCX byte_t const *
+NOTHROW_NCX(CC find_typeunit_by_signature)(NCX byte_t const *reader,
+                                           NCX byte_t const *end,
                                            uint64_t signature) {
 	while ((reader + 8) < end) {
 		uintptr_t length;
 		uint8_t ptrsize, unit_type;
 		uint16_t version;
-		CHECKED byte_t const *nextptr, *header;
+		NCX byte_t const *nextptr, *header;
 		uint64_t type_signature;
 
 		/* 7.5.1.1   Compilation Unit Header */
@@ -1292,8 +1292,8 @@ err_corrupt:
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getref)(di_debuginfo_cu_parser_t const *__restrict self,
                                                  uintptr_t form,
-                                                 CHECKED byte_t const **__restrict presult) {
-	CHECKED byte_t const *reader;
+                                                 NCX byte_t const **__restrict presult) {
+	NCX byte_t const *reader;
 	uintptr_t offset;
 	reader = self->dsp_cu_info_pos;
 decode_form:
@@ -1379,7 +1379,7 @@ INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getexpr)(di_debuginfo_cu_parser_t const *__restrict self,
                                                   uintptr_t form,
                                                   di_debuginfo_location_t *__restrict result) {
-	CHECKED byte_t const *reader;
+	NCX byte_t const *reader;
 	reader = self->dsp_cu_info_pos;
 decode_form:
 	switch (form) {
@@ -1432,7 +1432,7 @@ INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getblock)(di_debuginfo_cu_simple_parser_t const *__restrict self,
                                                    uintptr_t form,
                                                    di_debuginfo_block_t *__restrict result) {
-	CHECKED byte_t const *reader;
+	NCX byte_t const *reader;
 	reader = self->dsp_cu_info_pos;
 decode_form:
 	switch (form) {
@@ -1857,7 +1857,7 @@ err:
 PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2, 3)) bool
 NOTHROW_NCX(CC ao_loadattr_type)(di_debuginfo_cu_parser_t *__restrict self,
                                  di_debuginfo_type_t *__restrict result,
-                                 CHECKED byte_t const *abstract_origin) {
+                                 NCX byte_t const *abstract_origin) {
 	di_debuginfo_cu_parser_t pp;
 	memcpy(&pp, self, sizeof(pp));
 	pp.dsp_cu_info_pos = abstract_origin;
@@ -1929,7 +1929,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_type)(di_debuginfo_cu_parser_t
 		switch (attr.dica_name) {
 
 		case DW_AT_abstract_origin: {
-			CHECKED byte_t const *abstract_origin;
+			NCX byte_t const *abstract_origin;
 			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form,
 			                                              &abstract_origin))
 				ERROR(err);
@@ -2026,7 +2026,7 @@ err:
 PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2)) bool
 NOTHROW_NCX(CC ao_loadattr_member)(di_debuginfo_cu_parser_t *__restrict self,
                                    di_debuginfo_member_t *__restrict result,
-                                   CHECKED byte_t const *abstract_origin) {
+                                   NCX byte_t const *abstract_origin) {
 	di_debuginfo_cu_parser_t pp;
 	memcpy(&pp, self, sizeof(pp));
 	pp.dsp_cu_info_pos = abstract_origin;
@@ -2050,7 +2050,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_member)(di_debuginfo_cu_parser
 		switch (attr.dica_name) {
 
 		case DW_AT_abstract_origin: {
-			CHECKED byte_t const *abstract_origin;
+			NCX byte_t const *abstract_origin;
 			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form,
 			                                              &abstract_origin))
 				ERROR(err);
@@ -2126,7 +2126,7 @@ err:
 PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2, 3)) bool
 NOTHROW_NCX(CC ao_loadattr_variable)(di_debuginfo_cu_parser_t *__restrict self,
                                      di_debuginfo_variable_t *__restrict result,
-                                     CHECKED byte_t const *abstract_origin) {
+                                     NCX byte_t const *abstract_origin) {
 	di_debuginfo_cu_parser_t pp;
 	memcpy(&pp, self, sizeof(pp));
 	pp.dsp_cu_info_pos = abstract_origin;
@@ -2151,7 +2151,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_variable)(di_debuginfo_cu_pars
 		switch (attr.dica_name) {
 
 		case DW_AT_abstract_origin: {
-			CHECKED byte_t const *abstract_origin;
+			NCX byte_t const *abstract_origin;
 			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form,
 			                                              &abstract_origin))
 				ERROR(err);
@@ -2246,9 +2246,9 @@ NOTHROW(CC need_space)(char a, char b) {
 
 PRIVATE TEXTSECTION NONNULL((1)) ssize_t CC
 libdi_debuginfo_print_typename_and_varname(pformatprinter printer, void *arg,
-                                           CHECKED char const *type_name,
+                                           NCX char const *type_name,
                                            struct varname_prefix *vn_prefix,
-                                           CHECKED char const *varname,
+                                           NCX char const *varname,
                                            debuginfo_print_format_t format_printer,
                                            void *format_arg) {
 	ssize_t result = 0, temp;
@@ -2289,14 +2289,14 @@ libdi_debuginfo_do_print_typename(pformatprinter printer, void *arg,
                                   di_debuginfo_cu_parser_t const *__restrict parser,
                                   di_debuginfo_type_t const *__restrict type,
                                   struct varname_prefix *vn_prefix,
-                                  CHECKED char const *varname,
+                                  NCX char const *varname,
                                   debuginfo_print_format_t format_printer,
                                   void *format_arg) {
 	ssize_t result, temp;
 	di_debuginfo_cu_parser_t pp;
 	di_debuginfo_type_t inner_type;
 	struct varname_prefix new_prefix;
-	CHECKED char const *type_name = type->t_name;
+	NCX char const *type_name = type->t_name;
 	if unlikely(!type_name)
 		type_name = type->t_rawname;
 	switch (parser->dup_comp.dic_tag) {
@@ -2635,7 +2635,7 @@ INTERN TEXTSECTION NONNULL((1, 3, 4)) ssize_t CC
 libdi_debuginfo_print_typename(pformatprinter printer, void *arg,
                                di_debuginfo_cu_parser_t const *__restrict parser,
                                di_debuginfo_type_t const *__restrict type,
-                               CHECKED char const *varname,
+                               NCX char const *varname,
                                debuginfo_print_format_t format_printer,
                                void *format_arg) {
 	return libdi_debuginfo_do_print_typename(printer,

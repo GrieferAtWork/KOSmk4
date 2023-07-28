@@ -57,8 +57,8 @@ DECL_BEGIN
  * @return: UNWIND_EMULATOR_*:       ... */
 INTDEF WUNUSED NONNULL((1)) unwind_errno_t
 NOTHROW_NCX(CC libdi_debuginfo_run_entry_value_emulator)(struct unwind_emulator_struct *__restrict self,
-                                                         CHECKED byte_t const *cfi_start_pc,
-                                                         CHECKED byte_t const *cfi_end_pc);
+                                                         NCX byte_t const *cfi_start_pc,
+                                                         NCX byte_t const *cfi_end_pc);
 
 DECL_END
 

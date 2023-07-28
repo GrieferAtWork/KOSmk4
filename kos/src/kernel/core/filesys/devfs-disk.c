@@ -104,7 +104,7 @@ PRIVATE WUNUSED NONNULL((1)) struct devicelink_dirent *FCALL
 devdiskruledir_unescape(struct flookup_info *__restrict info)
 		THROWS(E_SEGFAULT, E_BADALLOC) {
 	struct devicelink_dirent *result;
-	USER CHECKED char const *src, *end;
+	NCX char const *src, *end;
 	char *dst;
 	if unlikely(!info->flu_namelen)
 		return NULL;
@@ -264,9 +264,9 @@ DEFINE_PUBLIC_SYMBOL(devdiskruledir_v_enumsz, SIZEOF_DEVRULEENUM, 0);
 
 
 struct devdiskruledir_readdata {
-	/*USER CHECKED*/ char *rd_buf;     /* File name buffer */
-	size_t                 rd_bufsize; /* File name buffer size */
-	size_t                 rd_reqsize; /* Required name size */
+	NCX char *rd_buf;     /* File name buffer */
+	size_t    rd_bufsize; /* File name buffer size */
+	size_t    rd_reqsize; /* Required name size */
 };
 
 
@@ -297,7 +297,7 @@ escape_printer(void *arg, /*utf-8*/ char const *__restrict data, size_t datalen)
 
 
 PRIVATE BLOCKING NONNULL((1)) size_t KCALL
-devruleenum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+devruleenum_v_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                       size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	bool should_yield;
@@ -584,7 +584,7 @@ NOTHROW(KCALL disk_enum_v_fini)(struct fdirenum *__restrict self) {
 }
 
 PRIVATE BLOCKING NONNULL((1)) size_t KCALL
-disk_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+disk_enum_v_readdir(struct fdirenum *__restrict self, NCX struct dirent *buf,
                     size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	size_t lo, hi;

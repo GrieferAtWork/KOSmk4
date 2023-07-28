@@ -56,10 +56,10 @@ struct pending_user_rpc {
 	REF struct mman *pur_mman;   /* [1..1][const] The mman within which `pur_prog' resides. */
 	union {
 		struct {
-			USER CHECKED void const   *pur_prog;       /* [1..1][const] Userspace RPC program */
-			size_t                     pur_argc;       /* [const] # of program arguments. */
-			USER UNCHECKED void const *pur_argv[1024]; /* [?..?][pur_argc][const]  Vector   of   program   arguments.
-			                                            * Should be flexible, but GCC sucks and doesn't allow that... */
+			NCX void const           *pur_prog;       /* [1..1][const] Userspace RPC program */
+			size_t                    pur_argc;       /* [const] # of program arguments. */
+			NCX UNCHECKED void const *pur_argv[1024]; /* [?..?][pur_argc][const]  Vector   of   program   arguments.
+			                                           * Should be flexible, but GCC sucks and doesn't allow that... */
 		};
 		struct {
 			__except_code_t               e_code; /* Exception code. */

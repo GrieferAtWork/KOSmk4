@@ -383,20 +383,20 @@ NOTHROW(FCALL path_cldlist_insert)(struct path *__restrict self,
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: `self' was marked as `PATH_CLDLIST_DELETED' */
 FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct path *KCALL
 path_lookupchild(struct path *__restrict self,
-                 /*utf-8*/ USER CHECKED char const *name,
+                 /*utf-8*/ NCX char const *name,
                  u16 namelen, uintptr_t namehash,
                  atflag_t atflags DFL(0))
 		THROWS(E_FSERROR_DELETED, E_WOULDBLOCK, E_SEGFAULT);
 /* Same as `path_lookupchild()', but caller must be holding a lock `path_cldlock_read(self)' */
 FUNDEF WUNUSED NONNULL((1)) struct path *KCALL
 path_lookupchild_withlock(struct path *__restrict self,
-                          /*utf-8*/ USER CHECKED char const *name,
+                          /*utf-8*/ NCX char const *name,
                           u16 namelen, uintptr_t namehash,
                           atflag_t atflags DFL(0))
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT);
 FUNDEF WUNUSED NONNULL((1)) REF struct path *KCALL
 path_lookupchildref_withlock(struct path *__restrict self,
-                             /*utf-8*/ USER CHECKED char const *name,
+                             /*utf-8*/ NCX char const *name,
                              u16 namelen, uintptr_t namehash,
                              atflag_t atflags DFL(0))
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT);
@@ -430,7 +430,7 @@ path_lookupchildref_withlock(struct path *__restrict self,
  * @throw: E_BADALLOC:                        ... */
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct path *KCALL
 path_expandchild(struct path *__restrict self, u32 *__restrict premaining_symlinks,
-                 /*utf-8*/ USER CHECKED char const *name,
+                 /*utf-8*/ NCX char const *name,
                  u16 namelen, uintptr_t namehash, atflag_t atflags DFL(0))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY,
@@ -449,7 +449,7 @@ path_expandchild(struct path *__restrict self, u32 *__restrict premaining_symlin
  */
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 path_expandchildnode(struct path *__restrict self, u32 *__restrict premaining_symlinks,
-                     /*utf-8*/ USER CHECKED char const *name,
+                     /*utf-8*/ NCX char const *name,
                      u16 namelen, uintptr_t namehash, atflag_t atflags DFL(0),
                      /*out[1..1]_opt*/ REF struct path **presult_path DFL(__NULLPTR),
                      /*out[1..1]_opt*/ REF struct fdirent **presult_dirent DFL(__NULLPTR))
@@ -516,8 +516,8 @@ path_expandchildnode(struct path *__restrict self, u32 *__restrict premaining_sy
  *  - Other flags are silently ignored. */
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((2)) REF struct path *KCALL
 path_traverse_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
-                 /*utf-8*/ USER CHECKED char const *upath,
-                 /*out_opt*/ /*utf-8*/ USER CHECKED char const **plastseg DFL(__NULLPTR),
+                 /*utf-8*/ NCX char const *upath,
+                 /*out_opt*/ /*utf-8*/ NCX char const **plastseg DFL(__NULLPTR),
                  /*out_opt*/ u16 *plastlen DFL(__NULLPTR), atflag_t atflags DFL(0))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY, E_IOERROR,
@@ -526,8 +526,8 @@ path_traverse_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 /* Same as `path_traverse_ex',  but automatically keep  track of symlinks,  as
  * well as pass `cwd = fd_cwd == AT_FDCWD ? NULL : handles_lookuppath(fd_cwd)' */
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct path *KCALL
-path_traverse(fd_t fd_cwd, /*utf-8*/ USER CHECKED char const *upath,
-              /*out_opt*/ /*utf-8*/ USER CHECKED char const **plastseg DFL(__NULLPTR),
+path_traverse(fd_t fd_cwd, /*utf-8*/ NCX char const *upath,
+              /*out_opt*/ /*utf-8*/ NCX char const **plastseg DFL(__NULLPTR),
               /*out_opt*/ u16 *plastlen DFL(__NULLPTR), atflag_t atflags DFL(0))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY,
@@ -546,7 +546,7 @@ path_traverse(fd_t fd_cwd, /*utf-8*/ USER CHECKED char const *upath,
  * @param: atflags: Set of: `AT_DOSPATH | AT_NO_AUTOMOUNT | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW' */
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct fnode *KCALL
 path_traversefull_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
-                     /*utf-8*/ USER CHECKED char const *upath, atflag_t atflags DFL(0),
+                     /*utf-8*/ NCX char const *upath, atflag_t atflags DFL(0),
                      /*out[1..1]_opt*/ REF struct path **presult_path DFL(__NULLPTR),
                      /*out[1..1]_opt*/ REF struct fdirent **presult_dirent DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
@@ -556,7 +556,7 @@ path_traversefull_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 /* Helper wrapper that combines `path_traverse()' with `path_expandchildnode()'
  * @param: atflags: Set of: `AT_DOSPATH | AT_NO_AUTOMOUNT | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW' */
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct fnode *KCALL
-path_traversefull(fd_t fd_cwd, /*utf-8*/ USER CHECKED char const *upath, atflag_t atflags DFL(0),
+path_traversefull(fd_t fd_cwd, /*utf-8*/ NCX char const *upath, atflag_t atflags DFL(0),
                   /*out[1..1]_opt*/ REF struct path **presult_path DFL(__NULLPTR),
                   /*out[1..1]_opt*/ REF struct fdirent **presult_dirent DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
@@ -579,7 +579,7 @@ path_traversefull(fd_t fd_cwd, /*utf-8*/ USER CHECKED char const *upath, atflag_
  * @throw: E_BADALLOC:                    ... */
 FUNDEF BLOCKING NONNULL((1)) void KCALL
 path_remove(struct path *__restrict self,
-            /*utf-8*/ USER CHECKED char const *name, u16 namelen, atflag_t atflags DFL(0),
+            /*utf-8*/ NCX char const *name, u16 namelen, atflag_t atflags DFL(0),
             /*out[1..1]_opt*/ REF struct fnode **pdeleted_node DFL(__NULLPTR),
             /*out[1..1]_opt*/ REF struct fdirent **pdeleted_dirent DFL(__NULLPTR),
             /*out[0..1]_opt*/ REF struct path **pdeleted_path DFL(__NULLPTR))
@@ -614,8 +614,8 @@ path_remove(struct path *__restrict self,
  * @throw: E_IOERROR:                         ...
  * @throw: E_BADALLOC:                        ... */
 FUNDEF BLOCKING NONNULL((1, 4)) void KCALL
-path_rename(struct path *oldpath, /*utf-8*/ USER CHECKED char const *oldname, u16 oldnamelen,
-            struct path *newpath, /*utf-8*/ USER CHECKED char const *newname, u16 newnamelen,
+path_rename(struct path *oldpath, /*utf-8*/ NCX char const *oldname, u16 oldnamelen,
+            struct path *newpath, /*utf-8*/ NCX char const *newname, u16 newnamelen,
             atflag_t atflags DFL(0), __BOOL check_permissions DFL(1),
             /*out[1..1]_opt*/ REF struct fdirent **pold_dirent DFL(__NULLPTR),
             /*out[1..1]_opt*/ REF struct fdirent **pnew_dirent DFL(__NULLPTR),
@@ -657,7 +657,7 @@ path_print(struct path *__restrict self, __pformatprinter printer, void *arg,
  * path may be invalid. */
 FUNDEF NONNULL((1, 4)) ssize_t KCALL
 path_printent(struct path *__restrict self,
-              CHECKED char const *dentry_name, u16 dentry_namelen,
+              NCX char const *dentry_name, u16 dentry_namelen,
               __pformatprinter printer, void *arg,
               atflag_t atflags DFL(AT_PATHPRINT_INCTRAIL),
               struct path *root DFL(__NULLPTR))
@@ -667,26 +667,26 @@ path_printent(struct path *__restrict self,
 /* Helper functions for printing a path into a user-space buffer.
  * @return: * : The required buffer size (including a trailing NUL-character) */
 FUNDEF NONNULL((1)) size_t KCALL
-path_sprint(struct path *__restrict self, USER CHECKED char *buffer, size_t buflen,
+path_sprint(struct path *__restrict self, NCX char *buffer, size_t buflen,
             atflag_t atflags DFL(0), struct path *root DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 FUNDEF NONNULL((1)) size_t KCALL
 path_sprintent(struct path *__restrict self,
-               USER CHECKED char const *dentry_name, u16 dentry_namelen,
-               USER CHECKED char *buffer, size_t buflen,
+               NCX char const *dentry_name, u16 dentry_namelen,
+               NCX char *buffer, size_t buflen,
                atflag_t atflags DFL(AT_PATHPRINT_INCTRAIL),
                struct path *root DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 /* Like above, but don't print a trailing NUL and return length w/o said NUL
  * @return: * : The required buffer size (excluding a trailing NUL, which also isn't printed) */
 FUNDEF NONNULL((1)) size_t KCALL
-path_sprint_without_nul(struct path *__restrict self, USER CHECKED char *buffer, size_t buflen,
+path_sprint_without_nul(struct path *__restrict self, NCX char *buffer, size_t buflen,
                         atflag_t atflags DFL(0), struct path *root DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 FUNDEF NONNULL((1)) size_t KCALL
 path_sprintent_without_nul(struct path *__restrict self,
-                           USER CHECKED char const *dentry_name, u16 dentry_namelen,
-                           USER CHECKED char *buffer, size_t buflen,
+                           NCX char const *dentry_name, u16 dentry_namelen,
+                           NCX char *buffer, size_t buflen,
                            atflag_t atflags DFL(AT_PATHPRINT_INCTRAIL),
                            struct path *root DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT);
@@ -780,10 +780,10 @@ path_umount(struct pathmount *__restrict self, uintptr_t umount_flags DFL(0))
 /* Open (or create) a file, the same way user-space open(2) works. */
 FUNDEF BLOCKING WUNUSED NONNULL((2)) REF struct handle KCALL
 path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
-             USER CHECKED char const *filename,
+             NCX char const *filename,
              oflag_t oflags, mode_t mode DFL(0));
 FUNDEF BLOCKING WUNUSED REF struct handle KCALL
-path_open(fd_t fd_cwd, USER CHECKED char const *filename,
+path_open(fd_t fd_cwd, NCX char const *filename,
           oflag_t oflags, mode_t mode DFL(0));
 
 /* Sets of `R_OK | W_OK' corresponding to the specified access-mode. */

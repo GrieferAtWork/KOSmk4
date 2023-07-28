@@ -99,7 +99,7 @@ PUBLIC struct utsname kernel_uname = {
 
 #ifdef __ARCH_WANT_SYSCALL_OLDOLDUNAME
 DEFINE_SYSCALL1(errno_t, oldolduname,
-                USER UNCHECKED struct linux_oldolduname *, name) {
+                NCX UNCHECKED struct linux_oldolduname *, name) {
 	validate_writable(name, sizeof(*name));
 	COPY_UNAME_FIELD(name->sysname, kernel_uname.sysname);
 	COPY_UNAME_FIELD(name->nodename, kernel_uname.nodename);
@@ -112,7 +112,7 @@ DEFINE_SYSCALL1(errno_t, oldolduname,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_OLDOLDUNAME
 DEFINE_COMPAT_SYSCALL1(errno_t, oldolduname,
-                       USER UNCHECKED struct linux_oldolduname *, name) {
+                       NCX UNCHECKED struct linux_oldolduname *, name) {
 	compat_validate_writable(name, sizeof(*name));
 	COPY_UNAME_FIELD(name->sysname, kernel_uname.sysname);
 	COPY_UNAME_FIELD(name->nodename, kernel_uname.nodename);
@@ -125,7 +125,7 @@ DEFINE_COMPAT_SYSCALL1(errno_t, oldolduname,
 
 #ifdef __ARCH_WANT_SYSCALL_OLDUNAME
 DEFINE_SYSCALL1(errno_t, olduname,
-                USER UNCHECKED struct linux_olduname *, name) {
+                NCX UNCHECKED struct linux_olduname *, name) {
 	validate_writable(name, sizeof(*name));
 	COPY_UNAME_FIELD(name->sysname, kernel_uname.sysname);
 	COPY_UNAME_FIELD(name->nodename, kernel_uname.nodename);
@@ -138,7 +138,7 @@ DEFINE_SYSCALL1(errno_t, olduname,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_OLDUNAME
 DEFINE_COMPAT_SYSCALL1(errno_t, olduname,
-                       USER UNCHECKED struct linux_olduname *, name) {
+                       NCX UNCHECKED struct linux_olduname *, name) {
 	compat_validate_writable(name, sizeof(*name));
 	COPY_UNAME_FIELD(name->sysname, kernel_uname.sysname);
 	COPY_UNAME_FIELD(name->nodename, kernel_uname.nodename);
@@ -152,7 +152,7 @@ DEFINE_COMPAT_SYSCALL1(errno_t, olduname,
 
 #ifdef __ARCH_WANT_SYSCALL_UNAME
 DEFINE_SYSCALL1(errno_t, uname,
-                USER UNCHECKED struct utsname *, name) {
+                NCX UNCHECKED struct utsname *, name) {
 	validate_writable(name, sizeof(*name));
 	memcpy(name, &kernel_uname, sizeof(*name));
 	return -EOK;
@@ -168,7 +168,7 @@ DEFINE_SYSCALL1(errno_t, uname,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_SETHOSTNAME
 DEFINE_SYSCALL2(errno_t, sethostname,
-                USER UNCHECKED char const *, name,
+                NCX UNCHECKED char const *, name,
                 size_t, namelen) {
 	char temp[_UTSNAME_NODENAME_LENGTH];
 	validate_readable(name, namelen);
@@ -185,7 +185,7 @@ DEFINE_SYSCALL2(errno_t, sethostname,
 
 #ifdef __ARCH_WANT_SYSCALL_SETDOMAINNAME
 DEFINE_SYSCALL2(errno_t, setdomainname,
-                USER UNCHECKED char const *, name,
+                NCX UNCHECKED char const *, name,
                 size_t, namelen) {
 	char temp[_UTSNAME_DOMAIN_LENGTH];
 	validate_readable(name, namelen);

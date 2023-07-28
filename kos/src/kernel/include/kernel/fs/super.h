@@ -116,7 +116,7 @@ struct fsuper_ops {
 	 *                 is skipped as well) */
 	BLOCKING WUNUSED_T NONNULL_T((1)) __BOOL
 	(KCALL *so_getlabel)(struct fsuper *__restrict self,
-	                     USER CHECKED char buf[FSLABEL_MAX])
+	                     NCX char buf[FSLABEL_MAX])
 			THROWS(E_IOERROR, E_SEGFAULT, ...);
 
 	/* [0..1] Set volume label, directly writing the new value to disk.
@@ -125,7 +125,7 @@ struct fsuper_ops {
 	 * @throws: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG:namelen: [...] */
 	BLOCKING WUNUSED_T NONNULL_T((1)) __BOOL
 	(KCALL *so_setlabel)(struct fsuper *__restrict self,
-	                     USER CHECKED char const *name, size_t namelen)
+	                     NCX char const *name, size_t namelen)
 			THROWS(E_IOERROR, E_FSERROR_READONLY, E_SEGFAULT,
 			       E_INVALID_ARGUMENT_BAD_VALUE, ...);
 
@@ -170,7 +170,7 @@ struct fsuper_ops {
 	 *   - f_fsid */
 	BLOCKING NONNULL_T((1)) void
 	(KCALL *so_statfs)(struct fsuper *__restrict self,
-	                   USER CHECKED struct statfs *result)
+	                   NCX struct statfs *result)
 			THROWS(E_SEGFAULT, E_IOERROR, ...);
 
 	/* [0..1]
@@ -567,7 +567,7 @@ FUNDEF BLOCKING void KCALL fsuper_syncall(void)
  * @return: false: `self' doesn't have a volume label. */
 FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL KCALL
 fsuper_getlabel(struct fsuper *__restrict self,
-                USER CHECKED char buf[FSLABEL_MAX])
+                NCX char buf[FSLABEL_MAX])
 		THROWS(E_IOERROR, E_SEGFAULT, ...);
 
 /* Set the label of the given superblock and store it in `buf'
@@ -576,7 +576,7 @@ fsuper_getlabel(struct fsuper *__restrict self,
  * @throws: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG:namelen: [...] */
 FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL KCALL
 fsuper_setlabel(struct fsuper *__restrict self,
-                USER CHECKED char const *name, size_t namelen)
+                NCX char const *name, size_t namelen)
 		THROWS(E_IOERROR, E_FSERROR_READONLY, E_SEGFAULT,
 		       E_INVALID_ARGUMENT_BAD_VALUE, ...);
 
@@ -611,7 +611,7 @@ NOTHROW(FCALL fsuper_delete_impl)(struct fsuper *__restrict self);
 /* Gather information about the filesystem and store that information in `*result' */
 FUNDEF BLOCKING NONNULL((1)) void FCALL
 fsuper_statfs(struct fsuper *__restrict self,
-              USER CHECKED struct statfs *result)
+              NCX struct statfs *result)
 		THROWS(E_SEGFAULT, E_IOERROR, ...);
 
 DECL_END

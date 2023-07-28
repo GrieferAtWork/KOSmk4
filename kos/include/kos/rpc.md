@@ -792,8 +792,8 @@ sys_rt_sigsuspend_impl(struct icpustate *__restrict state,
                        struct rpc_syscall_info *__restrict sc_info) {
 	sigset_t these;
 	size_t sigsetsize;
-	USER UNCHECKED sigset_t *uthese;
-	uthese     = (USER UNCHECKED sigset_t *)sc_info->rsi_regs[0];
+	NCX UNCHECKED sigset_t *uthese;
+	uthese     = (NCX UNCHECKED sigset_t *)sc_info->rsi_regs[0];
 	sigsetsize = (size_t)sc_info->rsi_regs[1];
 
 	validate_readable(uthese, sigsetsize);
@@ -845,7 +845,7 @@ sys_rt_sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) 
 }
 
 DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
-                USER UNCHECKED sigset_t const *, uthese,
+                NCX UNCHECKED sigset_t const *, uthese,
                 size_t, sigsetsize) {
 	(void)uthese;
 	(void)sigsetsize;
