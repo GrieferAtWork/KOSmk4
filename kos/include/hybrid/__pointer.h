@@ -24,8 +24,8 @@
 
 #if (defined(_MSC_VER) && !defined(__clang__)) || defined(__CHECKER__)
 /* MSVC already has this kind of functionality built into the compiler. */
-#define __HYBRID_FUNCPTR32(return, cc, name, args) return (CC * __ptr32 name) args
-#define __HYBRID_FUNCPTR64(return, cc, name, args) return (CC * __ptr64 name) args
+#define __HYBRID_FUNCPTR32(return, cc, name, args) return (cc *__ptr32 name) args
+#define __HYBRID_FUNCPTR64(return, cc, name, args) return (cc *__ptr64 name) args
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __HYBRID_PTR32(...) __VA_ARGS__ *__ptr32
 #define __HYBRID_PTR64(...) __VA_ARGS__ *__ptr64
