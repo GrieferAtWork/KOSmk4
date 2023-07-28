@@ -43,16 +43,16 @@ DECL_BEGIN
 #ifdef DEFINE_task_serve_with_icpustate
 PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 task_serve_with_icpustate(struct icpustate *__restrict state)
-		THROWS(E_INTERRUPT_USER_RPC, ...)
+		THROWS(E_INTERRUPT_USER_RPC)
 #elif defined(DEFINE_task_serve_with_icpustate_nx)
 PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL task_serve_with_icpustate_nx)(struct icpustate *__restrict state)
 #define LOCAL_NOEXCEPT
 #else /* DEFINE_task_serve_with_icpustate */
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 task_serve_with_icpustate_and_sigmask(struct icpustate *__restrict state,
-                                      NCX sigset_t const *sigmask)
-		THROWS(E_SEGFAULT, E_INTERRUPT_USER_RPC, ...)
+                                      sigset_t const *__restrict sigmask)
+		THROWS(E_INTERRUPT)
 #define LOCAL_HAVE_SIGMASK
 #endif /* !DEFINE_task_serve_with_icpustate */
 {

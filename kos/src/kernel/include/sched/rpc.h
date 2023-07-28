@@ -66,7 +66,7 @@ typedef struct __sigset_struct sigset_t;
 FUNDEF NONNULL((1, 3)) __BOOL KCALL
 task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
               prpc_exec_callback_t func, void *cookie DFL(__NULLPTR))
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INTERRUPT_USER_RPC);
 
 /* Helper wrapper for executing the given RPC `func' after
  * unwind the current system  call. This is identical  to:
@@ -93,12 +93,12 @@ task_rpc_userunwind(prpc_exec_callback_t func, void *cookie DFL(__NULLPTR))
  *                 preemption was re-enabled if it was disabled before.
  * @return: false: No  RPC needed to be served, and preemption
  *                 remains disabled if it was disabled before. */
-FUNDEF BLOCKING __BOOL (FCALL task_serve)(void) THROWS(E_INTERRUPT_USER_RPC, ...);
+FUNDEF BLOCKING __BOOL (FCALL task_serve)(void) THROWS(E_INTERRUPT);
 
 /* Literally the same as `task_serve()',  but doesn't include the  inline
  * optimization that tests for `TASK_FRPC' before calling `task_serve()'.
  * Call this one if you're fairly certain that RPCs are really pending. */
-FUNDEF BLOCKING __BOOL (FCALL _task_serve)(void) THROWS(E_INTERRUPT_USER_RPC, ...) ASMNAME("task_serve");
+FUNDEF BLOCKING __BOOL (FCALL _task_serve)(void) THROWS(E_INTERRUPT) ASMNAME("task_serve");
 
 /* Arch-specific function:
  * Same as `task_serve()', but only sevice RPCs that were scheduled as no-throw.
@@ -110,21 +110,21 @@ FUNDEF BLOCKING WUNUSED unsigned int NOTHROW(FCALL task_serve_nx)(void);
  * Used for the implementation of `sigsuspend(2)' */
 FUNDEF BLOCKING NONNULL((1)) __BOOL FCALL
 task_serve_with_sigmask(sigset_t const *__restrict sigmask)
-		THROWS(E_INTERRUPT_USER_RPC, ...);
+		THROWS(E_INTERRUPT);
 
 
 /* Automatically updates `state' to include the intended return value for `task_serve()'! */
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 task_serve_with_icpustate(struct icpustate *__restrict state)
-		THROWS(E_INTERRUPT_USER_RPC, ...);
+		THROWS(E_INTERRUPT);
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 task_serve_with_icpustate_and_sigmask(struct icpustate *__restrict state,
                                       sigset_t const *__restrict sigmask)
-		THROWS(E_INTERRUPT_USER_RPC, ...);
+		THROWS(E_INTERRUPT);
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL task_serve_with_icpustate_nx)(struct icpustate *__restrict state);
 
-#if !defined(__OPTIMIZE_SIZE__) && !defined(__INTELLISENSE__)
+#if !defined(__OPTIMIZE_SIZE__) && !defined(__INTELLISENSE__) && !defined(__CHECKER__)
 DECL_END
 #include <sched/task.h>
 #include <sched/pertask.h>
@@ -132,7 +132,7 @@ DECL_BEGIN
 /* Inline optimizations for task service calls: when `TASK_FRPC' isn't set, serve calls are no-ops. */
 #define task_serve()    (PERTASK_TESTMASK(((struct task *)0)->t_flags, TASK_FRPC) && (task_serve)())
 #define task_serve_nx() (PERTASK_TESTMASK(((struct task *)0)->t_flags, TASK_FRPC) ? (task_serve_nx)() : TASK_SERVE_NX_NORMAL)
-#endif /* !__OPTIMIZE_SIZE__ && !__INTELLISENSE__ */
+#endif /* !__OPTIMIZE_SIZE__ && !__INTELLISENSE__ && !__CHECKER__ */
 
 DECL_END
 #endif /* __CC__ */
