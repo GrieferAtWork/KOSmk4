@@ -726,8 +726,8 @@ default_case:
 						if (fieldName == existingName)
 							this.err(f"Duplicate field {repr fieldName} in struct type");
 					}
-					tr.typ.fieldsByDeclarationOrder.append((fieldType, fieldName));
 				}
+				tr.typ.fieldsByDeclarationOrder.append((fieldType, fieldName));
 				/* Use a WeakRef to prevent a reference loop */
 				if (gc.isreferring(fieldType.typ, structType))
 					fieldType.typ = WeakRef(fieldType.typ);
@@ -2742,7 +2742,7 @@ return_void_value:
 					if (fieldsByDeclarationOrderNextIndex >= #typ.fieldsByDeclarationOrder)
 						this.err(f"More field initializers after end of `{typ}'");
 				}
-				fieldName = typ.fieldsByDeclarationOrder[fieldsByDeclarationOrderNextIndex].last;
+				fieldType, fieldName = typ.fieldsByDeclarationOrder[fieldsByDeclarationOrderNextIndex]...;
 				++fieldsByDeclarationOrderNextIndex;
 				if (!fieldName) {
 					/* Initialize transparent struct/union */
