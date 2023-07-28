@@ -34,37 +34,37 @@
 DECL_BEGIN
 
 INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_info *
-NOTHROW_NCX(LIBCCALL libc_except_info)(void) {
+NOTHROW(LIBCCALL libc_except_info)(void) {
 	return &THIS_EXCEPTION_INFO;
 }
 
 INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_data *
-NOTHROW_NCX(LIBCCALL libc_except_data)(void) {
+NOTHROW(LIBCCALL libc_except_data)(void) {
 	return &THIS_EXCEPTION_DATA;
 }
 
 INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED except_register_state_t *
-NOTHROW_NCX(LIBCCALL libc_except_register_state)(void) {
+NOTHROW(LIBCCALL libc_except_register_state)(void) {
 	return &THIS_EXCEPTION_STATE;
 }
 
 INTERN ATTR_PURE WUNUSED except_code_t
-NOTHROW_NCX(LIBCCALL libc_except_code)(void) {
+NOTHROW(LIBCCALL libc_except_code)(void) {
 	return PERTASK_GET(this_exception_code);
 }
 
 INTERN ATTR_PURE WUNUSED bool
-NOTHROW_NCX(LIBCCALL libc_except_active)(void) {
+NOTHROW(LIBCCALL libc_except_active)(void) {
 	return PERTASK_NE(this_exception_code, EXCEPT_CODEOF(E_OK));
 }
 
 INTERN ATTR_PURE WUNUSED except_class_t
-NOTHROW_NCX(LIBCCALL libc_except_class)(void) {
+NOTHROW(LIBCCALL libc_except_class)(void) {
 	return PERTASK_GET(this_exception_class);
 }
 
 INTERN ATTR_PURE WUNUSED except_subclass_t
-NOTHROW_NCX(LIBCCALL libc_except_subclass)(void) {
+NOTHROW(LIBCCALL libc_except_subclass)(void) {
 	return PERTASK_GET(this_exception_subclass);
 }
 
