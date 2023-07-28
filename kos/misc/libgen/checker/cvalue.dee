@@ -1395,14 +1395,14 @@ final class CScope: CNamespace {
 	public member onPopCallbacks: {Callable...} | none = none;
 
 	@@Register a callback that should be invoked when the scope is popped
-	public function onPopRegister(cb: Callable) {
+	public function registerOnPop(cb: Callable) {
 		if (onPopCallbacks is none)
 			onPopCallbacks = [];
 		onPopCallbacks.pushfront(cb);
 	}
 
 	@@Called when the scope is popped (s.a. @CNamespace.onPop)
-	public function onPop() {
+	public function invokeOnPopCallbacks() {
 		for (local cb: onPopCallbacks)
 			cb();
 	}

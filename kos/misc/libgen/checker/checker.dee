@@ -109,7 +109,16 @@ final class Checker: CParser {
 		namespaceStack.pushfront(ns);
 	}
 	function popNamespace() {
-		namespaceStack.popfront().onPop();
+		local popped: CNamespace = namespaceStack.popfront();
+		if (popped is CScope) {
+			local current: CNamespace = namespaceStack.first;
+			if (current is CScope &&
+			    current.onPopCallbacks === popped.onPopCallbacks) {
+				/* Don't invoke callbacks (yet) */
+			} else {
+				popped.invokeOnPopCallbacks();
+			}
+		}
 	}
 
 	/* Target-specific types */
@@ -3720,7 +3729,7 @@ return_unknown_void_pointer:
 				if (valuePointerBaseTypeRef.flags & CTYPEREF_FLAG_NODEREF) {
 					valuePointerBaseTypeRef.flags &= ~CTYPEREF_FLAG_NODEREF;
 					/* Restore the NODEREF flag at the end of the current scope. */
-					namespaceStack.first.onPopRegister(() -> {
+					namespaceStack.first.registerOnPop(() -> {
 						valuePointerBaseTypeRef.flags |= CTYPEREF_FLAG_NODEREF;
 					});
 				}
