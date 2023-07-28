@@ -671,6 +671,9 @@ again:
 
 		case "":
 		case "}":
+		case ")":
+		case "]":
+		case ">":
 			break;
 
 		case ";":
@@ -2082,6 +2085,9 @@ again:
 
 		case "":
 		case "}":
+		case ")":
+		case "]":
+		case ">":
 			break;
 
 		case ";":
@@ -2596,7 +2602,7 @@ default_case:
 	function parseStatements() {
 		do {
 			parseStatement();
-		} while (this.tok !in ["", "}"]);
+		} while (this.tok !in ["", "}", ")", "]", ">"]);
 	}
 
 	function parseArrayInitializer(typeref: CTypeRef): CValue {
@@ -3385,6 +3391,9 @@ again:
 
 		case "":
 		case "}":
+		case ")":
+		case "]":
+		case ">":
 			break;
 
 		case ";":
