@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0269781 */
+/* HASH CRC-32:0xf0130387 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -296,7 +296,7 @@ __COMPILER_CEIDECLARE(__BLOCKING __ATTR_INOUT(1),void,__THROWING,__FCALL,shared_
 #elif defined(__CRT_HAVE_shared_recursive_lock_acquire)
 /* >> shared_recursive_lock_acquire(3)
  * Acquire a recursive lock to the given shared_recursive_lock. */
-__LIBC __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_lock_acquire)(struct shared_recursive_lock *__restrict __self) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_lock_acquire");
+__LIBC __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_lock_acquire)(struct shared_recursive_lock *__restrict __self) __THROWS(E_WOULDBLOCK, E_INTERRUPT) __CASMNAME_SAME("shared_recursive_lock_acquire");
 #elif defined(__CRT_HAVE_shared_lock_acquire) || defined(__KERNEL__) || defined(__shared_lock_wait_impl)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_shared_lock_acquire_defined
@@ -319,7 +319,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 /* >> shared_recursive_lock_acquire(3)
  * Acquire a recursive lock to the given shared_recursive_lock. */
-__LOCAL __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_lock_acquire)(struct shared_recursive_lock *__restrict __self) __THROWS(E_WOULDBLOCK, ...) {
+__LOCAL __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_lock_acquire)(struct shared_recursive_lock *__restrict __self) __THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
 		++__self->sr_rcnt; /* Recursive aquisition */
@@ -388,7 +388,7 @@ __COMPILER_CEIDECLARE(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWIN
  * Acquire a recursive lock to the given shared_recursive_lock.
  * @return: true:  Successfully acquired a recursive lock.
  * @return: false: The given `abs_timeout' has expired. */
-__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_lock_acquire_with_timeout)(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_lock_acquire_with_timeout");
+__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_lock_acquire_with_timeout)(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, E_INTERRUPT) __CASMNAME_SAME("shared_recursive_lock_acquire_with_timeout");
 #elif defined(__CRT_HAVE_shared_recursive_lock_acquire_with_timeout64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_recursive_lock_acquire_with_timeout(3), shared_recursive_lock_acquire_with_timeout64(3)
  * Acquire a recursive lock to the given shared_recursive_lock.
@@ -429,7 +429,7 @@ __NAMESPACE_LOCAL_END
  * Acquire a recursive lock to the given shared_recursive_lock.
  * @return: true:  Successfully acquired a recursive lock.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_lock_acquire_with_timeout)(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_lock_acquire_with_timeout)(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
@@ -477,7 +477,7 @@ __COMPILER_CEIDECLARE(__BLOCKING __ATTR_INOUT(1),void,__THROWING,__FCALL,shared_
 #elif defined(__CRT_HAVE_shared_recursive_lock_waitfor)
 /* >> shared_recursive_lock_waitfor(3)
  * Wait until acquiring a recursive lock to `self' no longer blocks */
-__LIBC __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_lock_waitfor)(struct shared_recursive_lock *__restrict __self) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_lock_waitfor");
+__LIBC __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_lock_waitfor)(struct shared_recursive_lock *__restrict __self) __THROWS(E_WOULDBLOCK, E_INTERRUPT) __CASMNAME_SAME("shared_recursive_lock_waitfor");
 #elif defined(__CRT_HAVE_shared_lock_waitfor) || defined(__KERNEL__) || defined(__shared_lock_wait_impl)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_shared_lock_waitfor_defined
@@ -500,7 +500,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 /* >> shared_recursive_lock_waitfor(3)
  * Wait until acquiring a recursive lock to `self' no longer blocks */
-__LOCAL __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_lock_waitfor)(struct shared_recursive_lock *__restrict __self) __THROWS(E_WOULDBLOCK, ...) {
+__LOCAL __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_lock_waitfor)(struct shared_recursive_lock *__restrict __self) __THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self))
 		return;
@@ -552,7 +552,7 @@ __COMPILER_CEIDECLARE(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWIN
  * Wait until acquiring a recursive lock to `self' no longer blocks
  * @return: true:  A lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_lock_waitfor_with_timeout)(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_lock_waitfor_with_timeout");
+__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_lock_waitfor_with_timeout)(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, E_INTERRUPT) __CASMNAME_SAME("shared_recursive_lock_waitfor_with_timeout");
 #elif defined(__CRT_HAVE_shared_recursive_lock_waitfor_with_timeout64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_recursive_lock_waitfor_with_timeout(3), shared_recursive_lock_waitfor_with_timeout64(3)
  * Wait until acquiring a recursive lock to `self' no longer blocks
@@ -593,7 +593,7 @@ __NAMESPACE_LOCAL_END
  * Wait until acquiring a recursive lock to `self' no longer blocks
  * @return: true:  A lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_lock_waitfor_with_timeout)(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_lock_waitfor_with_timeout)(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self))
 		return 1;
@@ -662,7 +662,7 @@ __COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_
  * Acquire a recursive lock to the given shared_recursive_lock.
  * @return: true:  Successfully acquired a recursive lock.
  * @return: false: The given `abs_timeout' has expired. */
-__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_lock_acquire_with_timeout64)(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_lock_acquire_with_timeout64");
+__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_lock_acquire_with_timeout64)(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, E_INTERRUPT) __CASMNAME_SAME("shared_recursive_lock_acquire_with_timeout64");
 #elif (defined(__CRT_HAVE_shared_lock_acquire_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_shared_lock_acquire_with_timeout64) || defined(__shared_lock_wait_impl_timeout64)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_shared_lock_acquire_with_timeout64_defined
@@ -697,7 +697,7 @@ __NAMESPACE_LOCAL_END
  * Acquire a recursive lock to the given shared_recursive_lock.
  * @return: true:  Successfully acquired a recursive lock.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_lock_acquire_with_timeout64)(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_lock_acquire_with_timeout64)(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
@@ -765,7 +765,7 @@ __COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_
  * Wait until acquiring a recursive lock to `self' no longer blocks
  * @return: true:  A lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_lock_waitfor_with_timeout64)(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_recursive_lock_waitfor_with_timeout64");
+__LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_lock_waitfor_with_timeout64)(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, E_INTERRUPT) __CASMNAME_SAME("shared_recursive_lock_waitfor_with_timeout64");
 #elif (defined(__CRT_HAVE_shared_lock_waitfor_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_shared_lock_waitfor_with_timeout64) || defined(__shared_lock_wait_impl_timeout64)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_shared_lock_waitfor_with_timeout64_defined
@@ -800,7 +800,7 @@ __NAMESPACE_LOCAL_END
  * Wait until acquiring a recursive lock to `self' no longer blocks
  * @return: true:  A lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_lock_waitfor_with_timeout64)(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_lock_waitfor_with_timeout64)(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self))
 		return 1;
@@ -910,7 +910,7 @@ extern "C++" {
  * Acquire a recursive lock to the given shared_recursive_lock.
  * @return: true:  Successfully acquired a recursive lock.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_lock_acquire)(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_lock_acquire)(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
@@ -1017,7 +1017,7 @@ extern "C++" {
  * Wait until acquiring a recursive lock to `self' no longer blocks
  * @return: true:  A lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_lock_waitfor)(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursive_lock_waitfor)(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self))
 		return 1;
@@ -1127,7 +1127,7 @@ extern "C++" {
  * Acquire a recursive lock to the given shared_recursive_lock.
  * @return: true:  Successfully acquired a recursive lock.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_lock_acquire)(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_lock_acquire)(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
@@ -1234,7 +1234,7 @@ extern "C++" {
  * Wait until acquiring a recursive lock to `self' no longer blocks
  * @return: true:  A lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_lock_waitfor)(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
+__LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCALL shared_recursive_lock_waitfor)(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self))
 		return 1;

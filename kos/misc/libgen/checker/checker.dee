@@ -240,6 +240,12 @@ final class Checker: CParser {
 		return code.hex();
 	}
 
+	@@Like  @exceptCodeNames, but remove codes that are super-
+	@@classes of other exceptions that are also part of @codes
+	function simpleExceptCodeNames(codes: {int...}): {string...} {
+		return exceptCodeNames(simplifyThrowsSet(codes));
+	}
+
 	function exceptCodeNames(codes: {int...}): {string...} {
 		local hasCb = false;
 		local hasAny = false;
@@ -1781,16 +1787,32 @@ prefix_again:
 				/* Don't allow extra definitions here, and don't require a ';' */
 				return true;
 			}
-			if (this.tok != "=") {
+			local val: CValue;
+			if (this.tok == "=") {
+				this.next();
+				local savedIsUnreachable: bool = isUnreachable;
+				isUnreachable = false;
+				val = parseTypedExpr(typeref);
+				isUnreachable = savedIsUnreachable;
+			} else if (this.tok == "(" && cxx) {
+				this.next();
+				local savedIsUnreachable: bool = isUnreachable;
+				isUnreachable = false;
+				val = parseTypedExpr(typeref);
+				isUnreachable = savedIsUnreachable;
+				this.skip(")");
+			} else if (this.tok == "{" && cxx) {
+				this.next();
+				local savedIsUnreachable: bool = isUnreachable;
+				isUnreachable = false;
+				val = parseTypedExpr(typeref);
+				isUnreachable = savedIsUnreachable;
+				this.skip("}");
+			} else {
 				LOG_DECL(typeref);
 				continue;
 			}
-			this.next();
-			local val: CValue;
-			local savedIsUnreachable: bool = isUnreachable;
-			isUnreachable = false;
-			val = parseTypedExpr(typeref);
-			isUnreachable = savedIsUnreachable;
+
 			/* Override the declaration's type so pointer attributes are inherited
 			 * >> void foo(NCX void *p) {
 			 * >>     void *x = p; // Here, `x' automatically inherits pointer attributes from `p'
@@ -1804,7 +1826,8 @@ prefix_again:
 #if 0 /* FIXME: This doesn't work because `static int x = 0, *y = &x;' isn't known at compile-time,
        *        but is still OK  when it comes  to static initialization  (rather than have  simple
        *        Bytes blobs, we need something more sophisticated to keep track of embedded symbols
-       *        in the form of virtual relocations) */
+       *        in the form of virtual relocations)
+       * NOTE: This also needs to work: `int a, b; struct { void *x, *y; } f = { &a, &b };' */
 					if (namespaceStack.first !is CScope ||
 					    storageClass in ["static", "extern"]) {
 						this.warn("-Wconst", f"Non-constant static initializer for `{decl}'");
@@ -1858,7 +1881,7 @@ prefix_again:
 		if (missingThrows && (THROWS_ANY !in callerThrows)) {
 			this.warn("-Wthrows",
 				f"Function `{currentFunctionName}' is missing annotations "
-				f"`THROWS({", ".join(exceptCodeNames(simplifyThrowsSet(missingThrows)))})', "
+				f"`THROWS({", ".join(simpleExceptCodeNames(missingThrows))})', "
 				f"because {getReason(missingThrows)}");
 		}
 	}
@@ -1922,7 +1945,7 @@ prefix_again:
 				this.warn("-Wnothrow",
 					f"`THROWS(...)' is more broad than it needs to be. "
 					f"Use `THROWS({", ".join(
-						exceptCodeNames(simplifyThrowsSet(thrownButNotAnnotated))
+						simpleExceptCodeNames(thrownButNotAnnotated)
 					)})' instead");
 			}
 			local neverThrownExceptions: Set with int = HashSet(functionThrows - bodyThrows);
@@ -1938,7 +1961,7 @@ prefix_again:
 
 				this.warn("-Wnothrow",
 					f"Exceptions `THROWS({", ".join(
-						exceptCodeNames(simplifyThrowsSet(neverThrownExceptions))
+						simpleExceptCodeNames(neverThrownExceptions)
 					)})' are never thrown");
 			}
 		}

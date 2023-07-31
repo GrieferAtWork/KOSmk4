@@ -147,7 +147,7 @@ $bool shared_recursive_lock_release_ex([[inout]] struct shared_recursive_lock *_
 @@>> shared_recursive_lock_acquire(3)
 @@Acquire a recursive lock to the given shared_recursive_lock.
 [[decl_include("<kos/anno.h>", "<kos/bits/shared-recursive-lock.h>")]]
-[[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, E_INTERRUPT)]]
 [[requires_function(shared_lock_acquire)]]
 void shared_recursive_lock_acquire([[inout]] struct shared_recursive_lock *__restrict self) {
 	__COMPILER_WORKAROUND_GCC_105689(self);
@@ -169,7 +169,7 @@ void shared_recursive_lock_acquire([[inout]] struct shared_recursive_lock *__res
 @@@return: true:  Successfully acquired a recursive lock.
 @@@return: false: The given `abs_timeout' has expired.
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-recursive-lock.h>")]]
-[[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
+[[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, E_INTERRUPT), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_recursive_lock_acquire_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")(defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_recursive_lock_acquire_with_timeout64")]]
 [[requires_function(shared_lock_acquire_with_timeout)]]
@@ -202,7 +202,7 @@ $bool shared_recursive_lock_acquire_with_timeout([[inout]] struct shared_recursi
 @@>> shared_recursive_lock_waitfor(3)
 @@Wait until acquiring a recursive lock to `self' no longer blocks
 [[decl_include("<kos/anno.h>", "<kos/bits/shared-recursive-lock.h>")]]
-[[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, E_INTERRUPT)]]
 [[requires_function(shared_lock_waitfor)]]
 void shared_recursive_lock_waitfor([[inout]] struct shared_recursive_lock *__restrict self) {
 	__COMPILER_WORKAROUND_GCC_105689(self);
@@ -217,7 +217,7 @@ void shared_recursive_lock_waitfor([[inout]] struct shared_recursive_lock *__res
 @@@return: true:  A lock became available.
 @@@return: false: The given `abs_timeout' has expired.
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-recursive-lock.h>")]]
-[[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
+[[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, E_INTERRUPT), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_recursive_lock_waitfor_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")(defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_recursive_lock_waitfor_with_timeout64")]]
 [[requires_function(shared_lock_waitfor_with_timeout)]]
@@ -237,7 +237,7 @@ $bool shared_recursive_lock_waitfor_with_timeout([[inout]] struct shared_recursi
 %#ifdef __USE_TIME64
 [[preferred_time64_variant_of(shared_recursive_lock_acquire_with_timeout), doc_alias("shared_recursive_lock_acquire_with_timeout")]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-recursive-lock.h>", "<bits/os/timespec.h>")]]
-[[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, E_INTERRUPT)]]
 [[requires_function(shared_lock_acquire_with_timeout64)]]
 $bool shared_recursive_lock_acquire_with_timeout64([[inout]] struct shared_recursive_lock *__restrict self,
                                                    [[in_opt]] struct timespec64 const *abs_timeout) {
@@ -259,7 +259,7 @@ $bool shared_recursive_lock_acquire_with_timeout64([[inout]] struct shared_recur
 
 [[preferred_time64_variant_of(shared_recursive_lock_waitfor_with_timeout), doc_alias("shared_recursive_lock_waitfor_with_timeout")]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-recursive-lock.h>", "<bits/os/timespec.h>")]]
-[[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, E_INTERRUPT)]]
 [[requires_function(shared_lock_waitfor_with_timeout64)]]
 $bool shared_recursive_lock_waitfor_with_timeout64([[inout]] struct shared_recursive_lock *__restrict self,
                                                    [[in_opt]] struct timespec64 const *abs_timeout) {

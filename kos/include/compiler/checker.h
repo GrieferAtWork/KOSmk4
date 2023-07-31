@@ -336,6 +336,10 @@
 #define __ATTR_UNCHECKED        __checker_attribute__(__noderef__)
 #define __ATTR_PHYS             __checker_attribute__(__noderef__) /* Physical pointer, only for arithmetic */
 #define __ATTR_VIRT             __checker_attribute__(__noderef__) /* Virtual pointer, only for arithmetic */
+/* TODO: `__ATTR_BLOCKING' should be a no-op for now, and places that use it should
+ *       explicitly be annotated as THROWS(E_INTERRUPT) (if appropriate). Later on,
+ *       this annotation should then become some  special tag that warns if  called
+ *       from a `__ATTR_NOBLOCK' function. */
 #define __ATTR_BLOCKING         __checker_attribute__(__throws__(E_INTERRUPT))
 #define __ATTR_BLOCKING_IF(...) __checker_attribute__(__throws__(E_INTERRUPT)) /* XXX: Condition */
 

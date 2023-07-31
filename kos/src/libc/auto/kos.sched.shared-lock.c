@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15a66460 */
+/* HASH CRC-32:0xbbe87ccd */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,7 +101,7 @@ NOTHROW_NCX(__FCALL libc_shared_lock_release_ex)(struct shared_lock *__restrict 
 /* >> shared_lock_acquire(3)
  * Acquire a lock to the given shared_lock. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
-(__FCALL libc_shared_lock_acquire)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+(__FCALL libc_shared_lock_acquire)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
 	while (!__shared_lock_tryacquire(self)) {
@@ -130,7 +130,7 @@ success:
  * @return: false: The given `abs_timeout' has expired. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_lock_acquire_with_timeout)(struct shared_lock *__restrict self,
-                                                __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+                                                __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
 	while (!__shared_lock_tryacquire(self)) {
@@ -158,7 +158,7 @@ success:
 /* >> shared_lock_waitfor(3)
  * Wait for `self' to become available. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
-(__FCALL libc_shared_lock_waitfor)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+(__FCALL libc_shared_lock_waitfor)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
 	while (!__shared_lock_available(self)) {
@@ -185,7 +185,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
  * @return: false: The given `abs_timeout' has expired. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_lock_waitfor_with_timeout)(struct shared_lock *__restrict self,
-                                                __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+                                                __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
 	while (!__shared_lock_available(self)) {
@@ -221,7 +221,7 @@ DEFINE_INTERN_ALIAS(libc_shared_lock_acquire_with_timeout64, libc_shared_lock_ac
  * @return: false: The given `abs_timeout' has expired. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2) bool
 (__FCALL libc_shared_lock_acquire_with_timeout64)(struct shared_lock *__restrict self,
-                                                  struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+                                                  struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__shared_lock_acquire_or_wait_impl(self, {
 		if (!__shared_lock_wait_impl_timeout64(self, abs_timeout))
 			return false; /* Timeout */
@@ -239,7 +239,7 @@ DEFINE_INTERN_ALIAS(libc_shared_lock_waitfor_with_timeout64, libc_shared_lock_wa
  * @return: false: The given `abs_timeout' has expired. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2) bool
 (__FCALL libc_shared_lock_waitfor_with_timeout64)(struct shared_lock *__restrict self,
-                                                  struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+                                                  struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__shared_lock_waitfor_or_wait_impl(self, {
 		if (!__shared_lock_wait_impl_timeout64(self, abs_timeout))
 			return false; /* Timeout */
@@ -257,7 +257,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) AT
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
-(__FCALL libc_shared_lock_acquire_nx)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+(__FCALL libc_shared_lock_acquire_nx)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__hybrid_assert(!task_wasconnected());
 	while (!__shared_lock_tryacquire(self)) {
 		TASK_POLL_BEFORE_CONNECT({
@@ -285,7 +285,7 @@ success:
  * @return: false: There are pending X-RPCs that could not be serviced. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_lock_acquire_with_timeout_nx)(struct shared_lock *__restrict self,
-                                                   __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+                                                   __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__hybrid_assert(!task_wasconnected());
 	while (!__shared_lock_tryacquire(self)) {
 		TASK_POLL_BEFORE_CONNECT({
@@ -311,7 +311,7 @@ success:
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
-(__FCALL libc_shared_lock_waitfor_nx)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+(__FCALL libc_shared_lock_waitfor_nx)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__hybrid_assert(!task_wasconnected());
 	while (!__shared_lock_available(self)) {
 		TASK_POLL_BEFORE_CONNECT({
@@ -339,7 +339,7 @@ success:
  * @return: false: There are pending X-RPCs that could not be serviced. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_lock_waitfor_with_timeout_nx)(struct shared_lock *__restrict self,
-                                                   __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+                                                   __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__hybrid_assert(!task_wasconnected());
 	while (!__shared_lock_available(self)) {
 		TASK_POLL_BEFORE_CONNECT({

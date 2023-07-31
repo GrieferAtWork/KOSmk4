@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39200d53 */
+/* HASH CRC-32:0x5a6c06c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,7 +78,7 @@ NOTHROW(__FCALL libc_shared_recursive_lock_release_ex)(struct shared_recursive_l
 /* >> shared_recursive_lock_acquire(3)
  * Acquire a recursive lock to the given shared_recursive_lock. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
-(__FCALL libc_shared_recursive_lock_acquire)(struct shared_recursive_lock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+(__FCALL libc_shared_recursive_lock_acquire)(struct shared_recursive_lock *__restrict self) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self)) {
 		++self->sr_rcnt; /* Recursive aquisition */
@@ -97,7 +97,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
  * @return: false: The given `abs_timeout' has expired. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_recursive_lock_acquire_with_timeout)(struct shared_recursive_lock *__restrict self,
-                                                          __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+                                                          __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	bool result;
 	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self)) {
@@ -116,7 +116,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 /* >> shared_recursive_lock_waitfor(3)
  * Wait until acquiring a recursive lock to `self' no longer blocks */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
-(__FCALL libc_shared_recursive_lock_waitfor)(struct shared_recursive_lock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+(__FCALL libc_shared_recursive_lock_waitfor)(struct shared_recursive_lock *__restrict self) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self))
 		return;
@@ -128,7 +128,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
  * @return: false: The given `abs_timeout' has expired. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bool
 (__FCALL libc_shared_recursive_lock_waitfor_with_timeout)(struct shared_recursive_lock *__restrict self,
-                                                          __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+                                                          __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self))
 		return true;
@@ -144,7 +144,7 @@ DEFINE_INTERN_ALIAS(libc_shared_recursive_lock_acquire_with_timeout64, libc_shar
  * @return: false: The given `abs_timeout' has expired. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2) bool
 (__FCALL libc_shared_recursive_lock_acquire_with_timeout64)(struct shared_recursive_lock *__restrict self,
-                                                            struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+                                                            struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	bool result;
 	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self)) {
@@ -171,7 +171,7 @@ DEFINE_INTERN_ALIAS(libc_shared_recursive_lock_waitfor_with_timeout64, libc_shar
  * @return: false: The given `abs_timeout' has expired. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2) bool
 (__FCALL libc_shared_recursive_lock_waitfor_with_timeout64)(struct shared_recursive_lock *__restrict self,
-                                                            struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+                                                            struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self))
 		return true;

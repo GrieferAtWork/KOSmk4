@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x899b398f */
+/* HASH CRC-32:0xc9abab0f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(shared_lock_waitfor_with_timeout64) __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL
-(__FCALL __LIBC_LOCAL_NAME(shared_lock_waitfor_with_timeout64))(struct shared_lock *__restrict __self, struct __timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, ...) {
+(__FCALL __LIBC_LOCAL_NAME(shared_lock_waitfor_with_timeout64))(struct shared_lock *__restrict __self, struct __timespec64 const *__abs_timeout) __THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	__shared_lock_waitfor_or_wait_impl(__self, {
 		if (!__shared_lock_wait_impl_timeout64(__self, __abs_timeout))
 			return 0; /* Timeout */

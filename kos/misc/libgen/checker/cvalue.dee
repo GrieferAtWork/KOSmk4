@@ -425,9 +425,9 @@ warn_function_pointer_cast_changes_nothrow_level:
 								if (newThrows) {
 									checker.warn("-Wcast",
 										f"Retaining `THROWS({', '.join(
-											checker.exceptCodeNames(oldThrows))})` "
+											checker.simpleExceptCodeNames(oldThrows))})` "
 										f"instead of `THROWS({', '.join(
-											checker.exceptCodeNames(newThrows))})`");
+											checker.simpleExceptCodeNames(newThrows))})`");
 								}
 								newPointerBase = copy newPointerBase;
 								newPointerBase.attribThrows = oldThrows;
@@ -444,7 +444,7 @@ warn_function_pointer_cast_changes_nothrow_level:
 								extraInfo = getExtraCannotRetainInfo();
 							checker.warn("-Wthrows",
 								f"Cannot retain `THROWS({', '.join(
-									checker.exceptCodeNames(oldThrows - newThrows)
+									checker.simpleExceptCodeNames(oldThrows - newThrows)
 								)})' "
 								f"in cast to `{newTyp}'{extraInfo}");
 						}

@@ -216,7 +216,7 @@ final class CTypeAttributes {
 			if (throws != {THROWS_CB}) {
 				checker.warn("-Wattribute",
 					f"Function type annotated as both `{getPrettyNothrowLevelName(nothrow)}' "
-					f"and `THROWS({", ".join(checker.exceptCodeNames(throws))})'");
+					f"and `THROWS({", ".join(checker.simpleExceptCodeNames(throws))})'");
 				throws = none;
 			}
 		}
@@ -247,7 +247,7 @@ final class CTypeAttributes {
 				yield f"throws({', '.join(
 					checker is none
 					? for (local id: missingThrows) { -1 : '*', 0 : '...' }.get(id, id.hex())
-					: checker.exceptCodeNames(missingThrows)
+					: checker.simpleExceptCodeNames(missingThrows)
 				)})";
 			}
 		}
