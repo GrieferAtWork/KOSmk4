@@ -1117,7 +1117,7 @@ RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_NONNULL((1, 2)), void,
 
 #if (defined(RBTREE_WANT_TRYINSERT) || !defined(RBTREE_OMIT_INSERT) ||   \
      !defined(RBTREE_OMIT_REMOVENODE) || !defined(RBTREE_OMIT_REMOVE) || \
-     defined(RBTREE_WANT_RREMOVE))
+     defined(RBTREE_WANT_RREMOVE) || defined(RBTREE_WANT__INSERT_REPAIR))
 /* Have `self' swap positions with its rhs-child.
  *
  *          parent         >>        parent
@@ -1198,38 +1198,7 @@ RBTREE_DEFINE_FUNCTION(__LOCAL, __ATTR_NONNULL((1)), void,
 #endif /* ... */
 
 
-#if defined(RBTREE_WANT_TRYINSERT) || !defined(RBTREE_OMIT_INSERT)
-/* @return: * : The newly set parent-node of `node' */
-RBTREE_DEFINE_FUNCTION(__LOCAL, __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)), RBTREE_T *,
-                       RBTREE_NOTHROW, RBTREE_CC, RBTREE(_insert_worker),
-                       (RBTREE_T *__restrict root, RBTREE_T *__restrict node RBTREE_SLOT__PARAMS),
-                       (root, node RBTREE_SLOT__ARGS)) {
-again:
-	RBTREE_ASSERT(!_RBTREE_OVERLAPPING(root, node));
-	if (RBTREE_KEY_LO(RBTREE_GETMAXKEY(node), RBTREE_GETMINKEY(root))) {
-		RBTREE_LOCVAR(RBTREE_T *, nextnode);
-		nextnode = RBTREE_GETLHS(root);
-		if (RBTREE_NODE_NOT_ISNULL(nextnode)) {
-			root = nextnode;
-			goto again;
-		}
-		RBTREE_SETLHS(root, node);
-	} else {
-		RBTREE_LOCVAR(RBTREE_T *, nextnode);
-		nextnode = RBTREE_GETRHS(root);
-		if (RBTREE_NODE_NOT_ISNULL(nextnode)) {
-			root = nextnode;
-			goto again;
-		}
-		RBTREE_SETRHS(root, node);
-	}
-	RBTREE_SETPAR(node, root);
-	RBTREE_SETLHS(node, RBTREE_NULL);
-	RBTREE_SETRHS(node, RBTREE_NULL);
-	RBTREE_SETRED(node);
-	return root;
-}
-
+#if defined(RBTREE_WANT_TRYINSERT) || defined(RBTREE_WANT__INSERT_REPAIR) || !defined(RBTREE_OMIT_INSERT)
 RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_NONNULL((1, 2, 3)), void,
                        RBTREE_NOTHROW, RBTREE_CC, RBTREE(_insert_repair),
                        (RBTREE_T **__restrict p_root, RBTREE_T *__restrict node, RBTREE_T *__restrict parent RBTREE_SLOT__PARAMS),
@@ -1323,6 +1292,37 @@ again:
 #endif /* RBTREE_WANT_TRYINSERT || !RBTREE_OMIT_INSERT */
 
 #ifndef RBTREE_OMIT_INSERT
+/* @return: * : The newly set parent-node of `node' */
+RBTREE_DEFINE_FUNCTION(__LOCAL, __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)), RBTREE_T *,
+                       RBTREE_NOTHROW, RBTREE_CC, RBTREE(_insert_worker),
+                       (RBTREE_T *__restrict root, RBTREE_T *__restrict node RBTREE_SLOT__PARAMS),
+                       (root, node RBTREE_SLOT__ARGS)) {
+again:
+	RBTREE_ASSERT(!_RBTREE_OVERLAPPING(root, node));
+	if (RBTREE_KEY_LO(RBTREE_GETMAXKEY(node), RBTREE_GETMINKEY(root))) {
+		RBTREE_LOCVAR(RBTREE_T *, nextnode);
+		nextnode = RBTREE_GETLHS(root);
+		if (RBTREE_NODE_NOT_ISNULL(nextnode)) {
+			root = nextnode;
+			goto again;
+		}
+		RBTREE_SETLHS(root, node);
+	} else {
+		RBTREE_LOCVAR(RBTREE_T *, nextnode);
+		nextnode = RBTREE_GETRHS(root);
+		if (RBTREE_NODE_NOT_ISNULL(nextnode)) {
+			root = nextnode;
+			goto again;
+		}
+		RBTREE_SETRHS(root, node);
+	}
+	RBTREE_SETPAR(node, root);
+	RBTREE_SETLHS(node, RBTREE_NULL);
+	RBTREE_SETRHS(node, RBTREE_NULL);
+	RBTREE_SETRED(node);
+	return root;
+}
+
 /* Insert the given node into the given tree. The caller must ensure
  * that no  already-existing node  overlaps  with the  given  `node' */
 RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_NONNULL((1, 2)), void,
@@ -1373,11 +1373,6 @@ RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_WUNUSED __ATTR_NONNULL((1, 2)), __BOO
 		return RBTREE_TRUE;
 	}
 again:
-	/* Gracefully fail if the given range is already mapped. */
-	if (_RBTREE_OVERLAPPING(root, node)) {
-		_RBTREE_VALIDATE(RBTREE_PROOT_GET(p_root));
-		return RBTREE_FALSE;
-	}
 	if (RBTREE_KEY_LO(RBTREE_GETMAXKEY(node), RBTREE_GETMINKEY(root))) {
 		RBTREE_LOCVAR(RBTREE_T *, nextnode);
 		nextnode = RBTREE_GETLHS(root);
@@ -1386,7 +1381,7 @@ again:
 			goto again;
 		}
 		RBTREE_SETLHS(root, node);
-	} else {
+	} else if (RBTREE_KEY_GR(RBTREE_GETMINKEY(node), RBTREE_GETMAXKEY(root))) {
 		RBTREE_LOCVAR(RBTREE_T *, nextnode);
 		nextnode = RBTREE_GETRHS(root);
 		if (RBTREE_NODE_NOT_ISNULL(nextnode)) {
@@ -1394,6 +1389,10 @@ again:
 			goto again;
 		}
 		RBTREE_SETRHS(root, node);
+	} else {
+		/* Gracefully fail if the given range is already mapped. */
+		_RBTREE_VALIDATE(RBTREE_PROOT_GET(p_root));
+		return RBTREE_FALSE;
 	}
 	RBTREE_SETPAR(node, root);
 	RBTREE_SETLHS(node, RBTREE_NULL);
@@ -1917,14 +1916,14 @@ RBTREE_NOTHROW_U(RBTREE_CC RBTREE(minmaxlocate))(RBTREE_T *root,
 			iter = RBTREE_GETLHS(min_node);
 			if (RBTREE_NODE_ISNULL(iter))
 				break;
-			if (RBTREE_KEY_GE(RBTREE_GETMAXKEY(iter), minkey)) {
+			if (!RBTREE_KEY_GR(minkey, RBTREE_GETMAXKEY(iter))) {
 				min_node = iter;
 				continue;
 			}
 			/* Check if we can find an in-range key in iter->RHS[->RHS...] */
 			iter = RBTREE_GETRHS(iter);
 			while (RBTREE_NODE_NOT_ISNULL(iter)) {
-				if (RBTREE_KEY_GE(RBTREE_GETMAXKEY(iter), minkey)) {
+				if (!RBTREE_KEY_GR(minkey, RBTREE_GETMAXKEY(iter))) {
 					min_node = iter;
 					break;
 				}
@@ -1937,14 +1936,14 @@ RBTREE_NOTHROW_U(RBTREE_CC RBTREE(minmaxlocate))(RBTREE_T *root,
 			iter = RBTREE_GETRHS(max_node);
 			if (RBTREE_NODE_ISNULL(iter))
 				break;
-			if (RBTREE_KEY_LE(RBTREE_GETMINKEY(iter), maxkey)) {
+			if (!RBTREE_KEY_LO(maxkey, RBTREE_GETMINKEY(iter))) {
 				max_node = iter;
 				continue;
 			}
 			/* Check if we can find an in-range key in iter->LHS[->LHS...] */
 			iter = RBTREE_GETLHS(iter);
 			while (RBTREE_NODE_NOT_ISNULL(iter)) {
-				if (RBTREE_KEY_LE(RBTREE_GETMINKEY(iter), maxkey)) {
+				if (!RBTREE_KEY_LO(maxkey, RBTREE_GETMINKEY(iter))) {
 					max_node = iter;
 					break;
 				}
@@ -1963,7 +1962,7 @@ RBTREE_NOTHROW_U(RBTREE_CC RBTREE(minmaxlocate))(RBTREE_T *root,
 #endif /* !RBTREE_LEFT_LEANING */
 			if (RBTREE_NODE_ISNULL(iter))
 				break;
-			if (RBTREE_KEY_LO(RBTREE_GETMAXKEY(iter), minkey))
+			if (RBTREE_KEY_GR(minkey, RBTREE_GETMAXKEY(iter)))
 				break;
 			min_node = iter;
 		}
@@ -1975,7 +1974,7 @@ RBTREE_NOTHROW_U(RBTREE_CC RBTREE(minmaxlocate))(RBTREE_T *root,
 #endif /* !RBTREE_LEFT_LEANING */
 			if (RBTREE_NODE_ISNULL(iter))
 				break;
-			if (RBTREE_KEY_GR(RBTREE_GETMINKEY(iter), maxkey))
+			if (RBTREE_KEY_LO(maxkey, RBTREE_GETMINKEY(iter)))
 				break;
 			max_node = iter;
 		}
