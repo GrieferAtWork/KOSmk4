@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6348a7a9 */
+/* HASH CRC-32:0x1361f819 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Unlink_defined
 #define __local___localdep_Unlink_defined
 #ifdef __CRT_HAVE_Unlink
-__CREDIRECT_VOID(__ATTR_IN(1),__THROWING,__localdep_Unlink,(char const *__file),Unlink,(__file))
+__CREDIRECT_VOID(__ATTR_IN(1),__THROWING(...),__localdep_Unlink,(char const *__file),Unlink,(__file))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.unistd/Unlink.h>

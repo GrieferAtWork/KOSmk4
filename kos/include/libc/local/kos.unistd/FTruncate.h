@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46b5c2d0 */
+/* HASH CRC-32:0x86a3af7d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_FTruncate64_defined
 #define __local___localdep_FTruncate64_defined
 #if defined(__CRT_HAVE_FTruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT_VOID(,__THROWING,__localdep_FTruncate64,(__fd_t __fd, __pos64_t __length),FTruncate,(__fd,__length))
+__CREDIRECT_VOID(,__THROWING(...),__localdep_FTruncate64,(__fd_t __fd, __pos64_t __length),FTruncate,(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate64)
-__CREDIRECT_VOID(,__THROWING,__localdep_FTruncate64,(__fd_t __fd, __pos64_t __length),FTruncate64,(__fd,__length))
+__CREDIRECT_VOID(,__THROWING(...),__localdep_FTruncate64,(__fd_t __fd, __pos64_t __length),FTruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.unistd/FTruncate64.h>
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_FTruncate64_defined */
 #if !defined(__local___localdep_crt_FTruncate32_defined) && defined(__CRT_HAVE_FTruncate)
 #define __local___localdep_crt_FTruncate32_defined
-__CREDIRECT(,int,__THROWING,__localdep_crt_FTruncate32,(__fd_t __fd, __pos32_t __length),FTruncate,(__fd,__length))
+__CREDIRECT(,int,__THROWING(...),__localdep_crt_FTruncate32,(__fd_t __fd, __pos32_t __length),FTruncate,(__fd,__length))
 #endif /* !__local___localdep_crt_FTruncate32_defined && __CRT_HAVE_FTruncate */
 __LOCAL_LIBC(FTruncate) void
 (__LIBCCALL __LIBC_LOCAL_NAME(FTruncate))(__fd_t __fd, __pos_t __length) __THROWS(...) {

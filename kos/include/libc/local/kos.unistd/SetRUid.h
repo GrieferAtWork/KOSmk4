@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e3e42d0 */
+/* HASH CRC-32:0xf0d3acce */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_SetREUid_defined
 #define __local___localdep_SetREUid_defined
-__CREDIRECT_VOID(,__THROWING,__localdep_SetREUid,(__uid_t __ruid, __uid_t __euid),SetREUid,(__ruid,__euid))
+__CREDIRECT_VOID(,__THROWING(...),__localdep_SetREUid,(__uid_t __ruid, __uid_t __euid),SetREUid,(__ruid,__euid))
 #endif /* !__local___localdep_SetREUid_defined */
 __LOCAL_LIBC(SetRUid) void
 (__LIBCCALL __LIBC_LOCAL_NAME(SetRUid))(__uid_t __ruid) __THROWS(...) {

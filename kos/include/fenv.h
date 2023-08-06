@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x779646e3 */
+/* HASH CRC-32:0x64868069 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -131,7 +131,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(feclearexcept, __FORCELOCAL __ATTR_ARTIFICIAL in
 #if defined(__fast_feraiseexcept_defined) && defined(__CRT_HAVE_feraiseexcept)
 /* >> feraiseexcept(3)
  * @param: excepts: Set of `FE_*' */
-__CEIDECLARE(,int,__THROWING,feraiseexcept,(int __excepts),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feraiseexcept))(__excepts); })
+__CEIDECLARE(,int,__THROWING(...),feraiseexcept,(int __excepts),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feraiseexcept))(__excepts); })
 #elif defined(__fast_feraiseexcept_defined)
 /* >> feraiseexcept(3)
  * @param: excepts: Set of `FE_*' */
@@ -139,7 +139,7 @@ __FORCELOCAL int (__LIBCCALL feraiseexcept)(int __excepts) __THROWS(...) { retur
 #elif defined(__CRT_HAVE_feraiseexcept)
 /* >> feraiseexcept(3)
  * @param: excepts: Set of `FE_*' */
-__CDECLARE(,int,__THROWING,feraiseexcept,(int __excepts),(__excepts))
+__CDECLARE(,int,__THROWING(...),feraiseexcept,(int __excepts),(__excepts))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/fenv/feraiseexcept.h>

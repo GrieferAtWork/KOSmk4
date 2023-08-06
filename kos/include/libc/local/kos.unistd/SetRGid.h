@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaee908e8 */
+/* HASH CRC-32:0x1f782eb8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_SetREGid_defined
 #define __local___localdep_SetREGid_defined
-__CREDIRECT_VOID(,__THROWING,__localdep_SetREGid,(__gid_t __rgid, __gid_t __egid),SetREGid,(__rgid,__egid))
+__CREDIRECT_VOID(,__THROWING(...),__localdep_SetREGid,(__gid_t __rgid, __gid_t __egid),SetREGid,(__rgid,__egid))
 #endif /* !__local___localdep_SetREGid_defined */
 __LOCAL_LIBC(SetRGid) void
 (__LIBCCALL __LIBC_LOCAL_NAME(SetRGid))(__gid_t __rgid) __THROWS(...) {

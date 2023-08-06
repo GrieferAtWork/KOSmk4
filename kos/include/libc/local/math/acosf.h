@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbfec0cf */
+/* HASH CRC-32:0xabd1c35a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,int,__THROWING,__localdep_feraiseexcept,(int __excepts),feraiseexcept,(__excepts))
+__CREDIRECT(,int,__THROWING(...),__localdep_feraiseexcept,(int __excepts),feraiseexcept,(__excepts))
 #else /* __CRT_HAVE_feraiseexcept */
 __NAMESPACE_LOCAL_END
 #include <libc/local/fenv/feraiseexcept.h>

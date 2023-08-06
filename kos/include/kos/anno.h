@@ -58,7 +58,7 @@
 #define __BLOCKING_IF __ATTR_BLOCKING_IF
 #define __NOPREEMPT   __ATTR_NOPREEMPT
 #define __THROWS      __ATTR_THROWS
-#define __THROWING    __ATTR_THROWING
+#define __THROWING    __ATTR_THROWS
 #else /* __CHECKER__ */
 #define __PHYS            /* Annotation for physical pointers */
 #define __VIRT            /* Annotation for virtual pointers */
@@ -85,10 +85,11 @@
                            * exceptions, meaning that technically  speaking, `E_SEGFAULT' would also  imply
                            * `...'). Any function that isn't `__NOTHROW()' is still always allowed to throw
                            * any error that isn't apart of the `__THROWS()' set. */
+#define __THROWING(...)   /* Like `__THROWS', but used where `__NOTHROW' would go */
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
 #define __THROWS(e...)    /* ... */
+#define __THROWING(e...)  /* Like `__THROWS', but used where `__NOTHROW' would go */
 #endif /* ... */
-#define __THROWING        /* Use in place of __NOTHROW() for the same effect as `__THROWS(...)' */
 #endif /* !__CHECKER__ */
 
 #define __ABNORMAL_RETURN /* Annotation for functions that (may) not return normally, or by throwing an exception.
@@ -108,8 +109,9 @@
 #undef __THROWS
 #define __THROWS(...) noexcept(false)
 #undef __THROWING
-#define __THROWING(...) (__VA_ARGS__) __PRIVATE_THROWING
-#define __PRIVATE_THROWING(...) (__VA_ARGS__) noexcept(false)
+#define __THROWING(...) __PRIVATE_THROWING
+#define __PRIVATE_THROWING(...) (__VA_ARGS__) __PRIVATE_THROWING2
+#define __PRIVATE_THROWING2(...) (__VA_ARGS__) noexcept(false)
 #endif /* __clang_tidy__ && __cplusplus */
 
 #ifdef __GUARD_HYBRID_COMPILER_H

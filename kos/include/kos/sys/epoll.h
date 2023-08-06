@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21f78c95 */
+/* HASH CRC-32:0x8a33cb5b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ typedef struct __sigset_struct sigset_t;
  * Deprecated alias for `epoll_create1(0)' (the `size' argument is ignored)
  * @return: * : The newly created epoll control descriptor.
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__THROWING,EPollCreate,(__STDC_INT_AS_SIZE_T __size),(__size))
+__CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__THROWING(...),EPollCreate,(__STDC_INT_AS_SIZE_T __size),(__size))
 /* >> epoll_create1(2)
  * Create  a new epoll control descriptor which can be used for
  * monitoring of pollable events happening in registered files.
@@ -50,7 +50,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__THROWING,EPollCreate,(__STDC_INT_AS_SIZE_
  * @return: * :   The newly created epoll control descriptor.
  * @return: -1:   Error (s.a. `errno')
  * @throw: E_INVALID_ARGUMENT_UNKNOWN_FLAG:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS: [...] */
-__CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__THROWING,EPollCreate1,(__STDC_INT_AS_UINT_T __flags),(__flags))
+__CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__THROWING(...),EPollCreate1,(__STDC_INT_AS_UINT_T __flags),(__flags))
 /* >> epoll_ctl(2)
  * Manipulate a given  epoll controller  `epfd', as previously  returned by  `epoll_create1(2)'
  * in order to register (`EPOLL_CTL_ADD'), remove (`EPOLL_CTL_DEL') or modify (`EPOLL_CTL_MOD')
@@ -65,7 +65,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__THROWING,EPollCreate1,(__STDC_INT_AS_UINT
  * @throw: E_ILLEGAL_REFERENCE_LOOP: The  given  `fd'  is  another  epoll  that either
  *                                   forms a loop with `epfd', or has too many nested.
  * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...] */
-__CDECLARE_VOID_OPT(,__THROWING,EPollCtl,(__fd_t __epfd, __epoll_ctl_t __op, __fd_t __fd, struct epoll_event *___event),(__epfd,__op,__fd,___event))
+__CDECLARE_VOID_OPT(,__THROWING(...),EPollCtl,(__fd_t __epfd, __epoll_ctl_t __op, __fd_t __fd, struct epoll_event *___event),(__epfd,__op,__fd,___event))
 /* >> epoll_wait(2)
  * Wait until at least one of the conditions monitored by `epfd' to be met.
  * @param: epfd:      The epoll controller on which to wait.
@@ -79,7 +79,7 @@ __CDECLARE_VOID_OPT(,__THROWING,EPollCtl,(__fd_t __epfd, __epoll_ctl_t __op, __f
  *                    items of `events')
  * @return: 0:        No events happened before `timeout' expired.
  * @return: -1:       Error (s.a. `errno') */
-__CDECLARE_OPT(__ATTR_INOUTS(2, 3),__STDC_UINT_AS_SIZE_T,__THROWING,EPollWait,(__fd_t __epfd, struct epoll_event *__events, __STDC_UINT_AS_SIZE_T __maxevents, int __timeout),(__epfd,__events,__maxevents,__timeout))
+__CDECLARE_OPT(__ATTR_INOUTS(2, 3),__STDC_UINT_AS_SIZE_T,__THROWING(...),EPollWait,(__fd_t __epfd, struct epoll_event *__events, __STDC_UINT_AS_SIZE_T __maxevents, int __timeout),(__epfd,__events,__maxevents,__timeout))
 /* >> epoll_pwait(2)
  * Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
  * waiting.  Wait until at least one of the conditions monitored by `epfd' to be met.
@@ -95,7 +95,7 @@ __CDECLARE_OPT(__ATTR_INOUTS(2, 3),__STDC_UINT_AS_SIZE_T,__THROWING,EPollWait,(_
  *                    items of `events')
  * @return: 0:        No events happened before `timeout' expired.
  * @return: -1:       Error (s.a. `errno') */
-__CDECLARE_OPT(__ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_UINT_AS_SIZE_T,__THROWING,EPollPWait,(__fd_t __epfd, struct epoll_event *__events, __STDC_UINT_AS_SIZE_T __maxevents, int __timeout, sigset_t const *__ss),(__epfd,__events,__maxevents,__timeout,__ss))
+__CDECLARE_OPT(__ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_UINT_AS_SIZE_T,__THROWING(...),EPollPWait,(__fd_t __epfd, struct epoll_event *__events, __STDC_UINT_AS_SIZE_T __maxevents, int __timeout, sigset_t const *__ss),(__epfd,__events,__maxevents,__timeout,__ss))
 
 #ifdef __USE_KOS
 #ifndef __prpc_exec_callback_t_defined
@@ -142,7 +142,7 @@ typedef __ATTR_NONNULL_T((1)) void
  *                             intact, and the  RPC will be  discarded as  soon
  *                             as an attempt to send it is made, or the monitor
  *                             is manually deleted via `EPOLL_CTL_DEL' */
-__CDECLARE_VOID_OPT(__ATTR_IN(3) __ATTR_NONNULL((6)),__THROWING,EPollRpcExec,(__fd_t __epfd, __fd_t __fd, struct epoll_event const *___event, __pid_t __target_tid, unsigned int __mode, prpc_exec_callback_t __func),(__epfd,__fd,___event,__target_tid,__mode,__func))
+__CDECLARE_VOID_OPT(__ATTR_IN(3) __ATTR_NONNULL((6)),__THROWING(...),EPollRpcExec,(__fd_t __epfd, __fd_t __fd, struct epoll_event const *___event, __pid_t __target_tid, unsigned int __mode, prpc_exec_callback_t __func),(__epfd,__fd,___event,__target_tid,__mode,__func))
 #endif /* __USE_KOS */
 
 __SYSDECL_END

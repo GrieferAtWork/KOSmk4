@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x214cc038 */
+/* HASH CRC-32:0xb2545987 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_IN(2) __ATTR_OUTS(3, 4),__SIZE_TYPE__,__THROWING,__localdep_ReadLinkAt,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, __SIZE_TYPE__ __buflen),ReadLinkAt,(__dfd,__path,__buf,__buflen))
+__CREDIRECT(__ATTR_IN(2) __ATTR_OUTS(3, 4),__SIZE_TYPE__,__THROWING(...),__localdep_ReadLinkAt,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, __SIZE_TYPE__ __buflen),ReadLinkAt,(__dfd,__path,__buf,__buflen))
 #endif /* !__local___localdep_ReadLinkAt_defined */
 __LOCAL_LIBC(ReadLink) __ATTR_IN(1) __ATTR_OUTS(2, 3) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(ReadLink))(char const *__restrict __path, char *__restrict __buf, __SIZE_TYPE__ __buflen) __THROWS(...) {

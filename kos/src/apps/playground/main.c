@@ -1039,7 +1039,7 @@ int main_dumpdebug(int argc, char *argv[], char *envp[]) {
 		/* FIXME: Compiler error because of ambiguity as a result of
 		 * >> namespace std { }
 		 * >> using namespace std;
-		 * >> __CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,__THROWING,exit,(int __status),{ __builtin_exit(__status); })
+		 * >> __CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,__THROWING(...),exit,(int __status),{ __builtin_exit(__status); })
 		 * >> namespace std {
 		 * >> __NAMESPACE_GLB_USING_OR_IMPL(exit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL exit)(int __status) __THROWS(...) { (:: exit)(__status); })
 		 * >> }

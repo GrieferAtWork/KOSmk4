@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1278c9b7 */
+/* HASH CRC-32:0x41891b34 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_PRead64_defined
 #define __local___localdep_PRead64_defined
 #if defined(__CRT_HAVE_PRead) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_PRead64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING(...),__localdep_PRead64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead64)
-__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_PRead64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PRead64,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING(...),__localdep_PRead64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PRead64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.unistd/PRead64.h>

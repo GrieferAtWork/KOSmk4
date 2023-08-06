@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d1ef1a6 */
+/* HASH CRC-32:0xeb755198 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_OpenAt32_defined
 #define __local___localdep_OpenAt32_defined
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__fd_t,__THROWING,__localdep_OpenAt32,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__fd_t,__THROWING(...),__localdep_OpenAt32,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #endif /* !__local___localdep_OpenAt32_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/os/oflags.h>

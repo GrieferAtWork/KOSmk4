@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xebb71538 */
+/* HASH CRC-32:0x1af7211 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Malloc_defined
 #define __local___localdep_Malloc_defined
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__THROWING,__localdep_Malloc,(__SIZE_TYPE__ __num_bytes),Malloc,(__num_bytes))
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__THROWING(E_BADALLOC),__localdep_Malloc,(__SIZE_TYPE__ __num_bytes),Malloc,(__num_bytes))
 #endif /* !__local___localdep_Malloc_defined */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined

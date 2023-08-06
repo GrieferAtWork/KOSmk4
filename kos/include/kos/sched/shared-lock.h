@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd635ca4 */
+/* HASH CRC-32:0x50f41f1a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -161,7 +161,7 @@ __LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_lock_acq
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_lock_acquire_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_lock_acquire_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
 #elif defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout)
 #include <libc/local/kos.sched.shared-lock/shared_lock_acquire_with_timeout.h>
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
@@ -191,7 +191,7 @@ __LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_lock_wai
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_lock_waitfor_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_lock_waitfor_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
 #elif defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout)
 #include <libc/local/kos.sched.shared-lock/shared_lock_waitfor_with_timeout.h>
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
@@ -206,7 +206,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(shared_lock_waitfor_with_timeout, __FORCELOCAL _
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,shared_lock_acquire_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_lock_acquire_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_acquire_with_timeout64)
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
@@ -226,7 +226,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(shared_lock_acquire_with_timeout64, __FORCELOCAL
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,shared_lock_waitfor_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_lock_waitfor_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_waitfor_with_timeout64)
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
@@ -321,13 +321,13 @@ extern "C++" {
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_lock_acquire,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_lock_acquire,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_acquire_with_timeout64) && !defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_lock_acquire,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_lock_acquire,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
 #elif defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout)
 } /* extern "C++" */
 #include <libc/local/kos.sched.shared-lock/shared_lock_acquire_with_timeout.h>
@@ -343,13 +343,13 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL 
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_lock_waitfor,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_lock_waitfor,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_waitfor_with_timeout64) && !defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_lock_waitfor,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_lock_waitfor,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
 #elif defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout)
 } /* extern "C++" */
 #include <libc/local/kos.sched.shared-lock/shared_lock_waitfor_with_timeout.h>
@@ -368,13 +368,13 @@ extern "C++" {
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,shared_lock_acquire,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_lock_acquire,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_acquire_with_timeout64)
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,shared_lock_acquire,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_lock_acquire,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
 #elif defined(__shared_lock_wait_impl_timeout64)
 } /* extern "C++" */
 #include <libc/local/kos.sched.shared-lock/shared_lock_acquire_with_timeout64.h>
@@ -390,13 +390,13 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,shared_lock_waitfor,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_lock_waitfor,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_waitfor_with_timeout64)
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,shared_lock_waitfor,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_lock_waitfor,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
 #elif defined(__shared_lock_wait_impl_timeout64)
 } /* extern "C++" */
 #include <libc/local/kos.sched.shared-lock/shared_lock_waitfor_with_timeout64.h>
@@ -418,7 +418,7 @@ extern "C++" {
  * @return: false: The given `abs_timeout' has expired.
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_lock_acquire_nx,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout_nx,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_lock_acquire_nx,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout_nx,(__self,__abs_timeout))
 #elif defined(__KERNEL__)
 } /* extern "C++" */
 #include <libc/local/kos.sched.shared-lock/shared_lock_acquire_with_timeout_nx.h>
@@ -438,7 +438,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL 
  * @return: false: The given `abs_timeout' has expired.
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_lock_waitfor_nx,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout_nx,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_lock_waitfor_nx,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout_nx,(__self,__abs_timeout))
 #elif defined(__KERNEL__)
 } /* extern "C++" */
 #include <libc/local/kos.sched.shared-lock/shared_lock_waitfor_with_timeout_nx.h>

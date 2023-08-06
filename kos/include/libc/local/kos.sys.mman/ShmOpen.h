@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x959d4fd7 */
+/* HASH CRC-32:0xabf7a4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,14 +30,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_MkDir_defined) && defined(__CRT_HAVE_MkDir)
 #define __local___localdep_MkDir_defined
-__CREDIRECT_VOID(__ATTR_IN(1),__THROWING,__localdep_MkDir,(char const *__pathname, __mode_t __mode),MkDir,(__pathname,__mode))
+__CREDIRECT_VOID(__ATTR_IN(1),__THROWING(...),__localdep_MkDir,(char const *__pathname, __mode_t __mode),MkDir,(__pathname,__mode))
 #endif /* !__local___localdep_MkDir_defined && __CRT_HAVE_MkDir */
 #ifndef __local___localdep_Open_defined
 #define __local___localdep_Open_defined
 #if defined(__CRT_HAVE_Open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING,__localdep_Open,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING(...),__localdep_Open,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_Open64) && (defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING,__localdep_Open,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING(...),__localdep_Open,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.fcntl/Open.h>

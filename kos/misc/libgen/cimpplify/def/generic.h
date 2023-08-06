@@ -48,8 +48,8 @@
 #define __ABNORMAL_RETURN
 #define THROWS(...)
 #define __THROWS(...)
-#define THROWING
-#define __THROWING
+#define THROWING(...)
+#define __THROWING(...)
 
 #xdefine __SIZEOF_FD_T__             __SIZEOF_INT__
 #xdefine __SIZEOF_ERRNO_T__          __SIZEOF_INT__

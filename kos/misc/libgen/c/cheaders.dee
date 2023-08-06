@@ -479,7 +479,7 @@ class FunctionPrototype {
 	public member attributes: {(string | UserString | Callable)...} = ();
 
 	@@The nothrow behavior of this function. Should be one of:
-	@@  - @"":                   Unspecified (assume THROWING, but don't warn if used from NOTHROW)
+	@@  - @"":                   No annotation
 	@@  - @"NOTHROW":            Function doesn't throw
 	@@  - @"NOTHROW_NCX":        Function is nothrow when: #if !defined(__NON_CALL_EXCEPTIONS)
 	@@  - @"NOTHROW_RPC":        Function is nothrow when: #if !defined(__NON_CALL_EXCEPTIONS) && defined(__NO_RPC_EXCEPTIONS)
@@ -646,10 +646,12 @@ class FunctionPrototype {
 	@@The caller must ensure that @isNothrowThrowing is @true
 	public property nothrowThrowingSpec: string = {
 		get(): bool {
-			local nts = str nothrow;
+			local nts: string = str nothrow;
+			local exceptionListStart: int = nts.index("(") + 1;
+			local exceptionList: string = nts[exceptionListStart:nts.indexmatch("(", ")", exceptionListStart)];
 			if (nts.startswith("THROWS("))
-				return "THROWING";
-			return "__THROWING";
+				return f"THROWING({exceptionList})";
+			return f"__THROWING({exceptionList})";
 		}
 	}
 

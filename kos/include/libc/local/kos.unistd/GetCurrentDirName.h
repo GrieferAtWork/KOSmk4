@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x790d70e0 */
+/* HASH CRC-32:0x5a3e3460 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_OUTS(1, 2),char *,__THROWING,__localdep_GetCwd,(char *__buf, __SIZE_TYPE__ __bufsize),GetCwd,(__buf,__bufsize))
+__CREDIRECT(__ATTR_OUTS(1, 2),char *,__THROWING(...),__localdep_GetCwd,(char *__buf, __SIZE_TYPE__ __bufsize),GetCwd,(__buf,__bufsize))
 #endif /* !__local___localdep_GetCwd_defined */
 __LOCAL_LIBC(GetCurrentDirName) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED char *
 (__LIBCCALL __LIBC_LOCAL_NAME(GetCurrentDirName))(void) __THROWS(...) {

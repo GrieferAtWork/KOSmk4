@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf620109 */
+/* HASH CRC-32:0x77edb993 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,7 +110,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(errc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORE
 #ifdef __CRT_HAVE_verrc
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
-__CDECLARE_VOID(__ATTR_NORETURN __ATTR_IN_OPT(3) __ATTR_LIBC_PRINTF(3, 0),__THROWING,verrc,(int __status, __errno_t __used_errno, char const *__format, __builtin_va_list __args),(__status,__used_errno,__format,__args))
+__CDECLARE_VOID(__ATTR_NORETURN __ATTR_IN_OPT(3) __ATTR_LIBC_PRINTF(3, 0),__THROWING(...),verrc,(int __status, __errno_t __used_errno, char const *__format, __builtin_va_list __args),(__status,__used_errno,__format,__args))
 #else /* __CRT_HAVE_verrc */
 #include <libc/template/stdstreams.h>
 #include <libc/template/program_invocation_name.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ee87ade */
+/* HASH CRC-32:0xb871856b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __SYSDECL_BEGIN
 #include <kos/anno.h>
 /* >> feraiseexcept(3)
  * @param: excepts: Set of `FE_*' */
-__CREDIRECT(,int,__THROWING,__libc_core_feraiseexcept,(int __excepts),feraiseexcept,(__excepts))
+__CREDIRECT(,int,__THROWING(...),__libc_core_feraiseexcept,(int __excepts),feraiseexcept,(__excepts))
 #else /* __CRT_HAVE_feraiseexcept */
 #include <libc/local/fenv/feraiseexcept.h>
 /* >> feraiseexcept(3)

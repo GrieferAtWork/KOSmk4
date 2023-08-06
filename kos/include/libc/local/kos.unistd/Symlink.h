@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x775660f8 */
+/* HASH CRC-32:0x21cf7153 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_IN(1) __ATTR_IN(3),__THROWING,__localdep_SymlinkAt,(char const *__link_text, __fd_t __tofd, char const *__target_path),SymlinkAt,(__link_text,__tofd,__target_path))
+__CREDIRECT_VOID(__ATTR_IN(1) __ATTR_IN(3),__THROWING(...),__localdep_SymlinkAt,(char const *__link_text, __fd_t __tofd, char const *__target_path),SymlinkAt,(__link_text,__tofd,__target_path))
 #endif /* !__local___localdep_SymlinkAt_defined */
 __LOCAL_LIBC(Symlink) __ATTR_IN(1) __ATTR_IN(2) void
 (__LIBCCALL __LIBC_LOCAL_NAME(Symlink))(char const *__link_text, char const *__target_path) __THROWS(...) {

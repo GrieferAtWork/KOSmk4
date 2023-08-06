@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x982d42ea */
+/* HASH CRC-32:0x9d64e815 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,13 +37,13 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-__CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__THROWING,Malloc,(size_t __num_bytes),(__num_bytes))
-__CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__THROWING,Calloc,(size_t __count, size_t __num_bytes),(__count,__num_bytes))
-__CDECLARE_OPT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__THROWING,Realloc,(void *__mallptr, size_t __num_bytes),(__mallptr,__num_bytes))
-__CDECLARE_OPT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__THROWING,Memalign,(size_t __alignment, size_t __num_bytes),(__alignment,__num_bytes))
-__CDECLARE_OPT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALL_PAGEALIGNED __ATTR_ALLOC_SIZE((1)),void *,__THROWING,PValloc,(size_t __num_bytes),(__num_bytes))
+__CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__THROWING(E_BADALLOC),Malloc,(size_t __num_bytes),(__num_bytes))
+__CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__THROWING(E_BADALLOC),Calloc,(size_t __count, size_t __num_bytes),(__count,__num_bytes))
+__CDECLARE_OPT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__THROWING(E_BADALLOC),Realloc,(void *__mallptr, size_t __num_bytes),(__mallptr,__num_bytes))
+__CDECLARE_OPT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__THROWING(E_BADALLOC),Memalign,(size_t __alignment, size_t __num_bytes),(__alignment,__num_bytes))
+__CDECLARE_OPT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALL_PAGEALIGNED __ATTR_ALLOC_SIZE((1)),void *,__THROWING(E_BADALLOC),PValloc,(size_t __num_bytes),(__num_bytes))
 #ifdef __CRT_HAVE_Valloc
-__CDECLARE(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALL_PAGEALIGNED __ATTR_ALLOC_SIZE((1)),void *,__THROWING,Valloc,(size_t __num_bytes),(__num_bytes))
+__CDECLARE(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALL_PAGEALIGNED __ATTR_ALLOC_SIZE((1)),void *,__THROWING(E_BADALLOC),Valloc,(size_t __num_bytes),(__num_bytes))
 #elif defined(__CRT_HAVE_Memalign)
 #include <libc/local/kos.malloc/Valloc.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(Valloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALL_PAGEALIGNED __ATTR_ALLOC_SIZE((1)) void *(__LIBCCALL Valloc)(size_t __num_bytes) __THROWS(E_BADALLOC) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Valloc))(__num_bytes); })
@@ -51,14 +51,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Valloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MA
 
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_MemDup
-__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_INS(1, 2),void *,__THROWING,MemDup,(void const *__restrict __ptr, size_t __num_bytes),(__ptr,__num_bytes))
+__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_INS(1, 2),void *,__THROWING(E_BADALLOC),MemDup,(void const *__restrict __ptr, size_t __num_bytes),(__ptr,__num_bytes))
 #elif defined(__CRT_HAVE_Malloc)
 #include <libc/local/kos.malloc/MemDup.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(MemDup, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_INS(1, 2) void *(__LIBCCALL MemDup)(void const *__restrict __ptr, size_t __num_bytes) __THROWS(E_BADALLOC) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(MemDup))(__ptr, __num_bytes); })
 #endif /* ... */
 #ifdef __CRT_HAVE_MemCDup
 /* @throws: E_BADALLOC: ... */
-__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_INS(1, 3),void *,__THROWING,MemCDup,(void const *__restrict __ptr, int __needle, size_t __num_bytes),(__ptr,__needle,__num_bytes))
+__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_INS(1, 3),void *,__THROWING(E_BADALLOC),MemCDup,(void const *__restrict __ptr, int __needle, size_t __num_bytes),(__ptr,__needle,__num_bytes))
 #elif defined(__CRT_HAVE_MemDup) || defined(__CRT_HAVE_Malloc)
 #include <libc/local/kos.malloc/MemCDup.h>
 /* @throws: E_BADALLOC: ... */

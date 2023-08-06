@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c1d10dd */
+/* HASH CRC-32:0xecc1c59 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,9 +31,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Open64_defined
 #define __local___localdep_Open64_defined
 #if defined(__CRT_HAVE_Open) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING,__localdep_Open64,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING(...),__localdep_Open64,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_Open64)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING,__localdep_Open64,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING(...),__localdep_Open64,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif (defined(__AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.fcntl/Open64.h>
@@ -46,9 +46,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_OpenAt_defined
 #define __local___localdep_OpenAt_defined
 #if defined(__CRT_HAVE_OpenAt) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__fd_t,__THROWING,__localdep_OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__fd_t,__THROWING(...),__localdep_OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_OpenAt64) && (defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__fd_t,__THROWING,__localdep_OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__fd_t,__THROWING(...),__localdep_OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.fcntl/OpenAt.h>

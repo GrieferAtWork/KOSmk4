@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d299b4f */
+/* HASH CRC-32:0x5feb4ff8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -251,7 +251,7 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,rpc_interrupt,(__pid_t __target_tid, unsigned 
  *                             still many  reasons outside  of your  control
  *                             for why  it may  terminate immediately  after
  *                             the RPC program finished. */
-__CDECLARE_VOID_OPT(__ATTR_IN(3) __ATTR_INS(4, 5),__THROWING,RpcSchedule,(__pid_t __target_tid, unsigned int __mode, void const *__program, void const *const *__params, __SIZE_TYPE__ __max_param_count),(__target_tid,__mode,__program,__params,__max_param_count))
+__CDECLARE_VOID_OPT(__ATTR_IN(3) __ATTR_INS(4, 5),__THROWING(...),RpcSchedule,(__pid_t __target_tid, unsigned int __mode, void const *__program, void const *const *__params, __SIZE_TYPE__ __max_param_count),(__target_tid,__mode,__program,__params,__max_param_count))
 /* >> rpc_exec(3)
  * Send an RPC to `target_tid' (which must be a thread within the  current
  * process). The RPC will modify  the target thread's register state  such
@@ -276,7 +276,7 @@ __CDECLARE_VOID_OPT(__ATTR_IN(3) __ATTR_INS(4, 5),__THROWING,RpcSchedule,(__pid_
  *                             still many  reasons outside  of your  control
  *                             for why  it may  terminate immediately  after
  *                             the RPC program finished. */
-__CDECLARE_VOID_OPT(__ATTR_NONNULL((3)),__THROWING,RpcExec,(__pid_t __target_tid, unsigned int __mode, prpc_exec_callback_t __func, void *__cookie),(__target_tid,__mode,__func,__cookie))
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((3)),__THROWING(...),RpcExec,(__pid_t __target_tid, unsigned int __mode, prpc_exec_callback_t __func, void *__cookie),(__target_tid,__mode,__func,__cookie))
 /* >> rpc_interrupt(3)
  * Send an RPC to `target_tid' (which must be a thread within the current
  * process).  The RPC won't do anything except causing an in-progress (or
@@ -303,7 +303,7 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((3)),__THROWING,RpcExec,(__pid_t __target_tid
  *                            still many  reasons outside  of your  control
  *                            for why  it may  terminate immediately  after
  *                            the RPC program finished. */
-__CDECLARE_VOID_OPT(,__THROWING,RpcInterrupt,(__pid_t __target_tid, unsigned int __mode),(__target_tid,__mode))
+__CDECLARE_VOID_OPT(,__THROWING(...),RpcInterrupt,(__pid_t __target_tid, unsigned int __mode),(__target_tid,__mode))
 
 __SYSDECL_END
 #endif /* __CC__ */

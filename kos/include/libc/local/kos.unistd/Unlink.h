@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cd09bf2 */
+/* HASH CRC-32:0xaf75e32e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_IN(2),__THROWING,__localdep_UnlinkAt,(__fd_t __dfd, char const *__name, __atflag_t __flags),UnlinkAt,(__dfd,__name,__flags))
+__CREDIRECT_VOID(__ATTR_IN(2),__THROWING(...),__localdep_UnlinkAt,(__fd_t __dfd, char const *__name, __atflag_t __flags),UnlinkAt,(__dfd,__name,__flags))
 #endif /* !__local___localdep_UnlinkAt_defined */
 __LOCAL_LIBC(Unlink) __ATTR_IN(1) void
 (__LIBCCALL __LIBC_LOCAL_NAME(Unlink))(char const *__file) __THROWS(...) {

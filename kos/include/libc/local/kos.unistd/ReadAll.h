@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x136e94a3 */
+/* HASH CRC-32:0x401a85cc */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Read_defined
 #define __local___localdep_Read_defined
-__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_Read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),Read,(__fd,__buf,__bufsize))
+__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING(...),__localdep_Read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),Read,(__fd,__buf,__bufsize))
 #endif /* !__local___localdep_Read_defined */
 #ifndef __local___localdep_lseek_defined
 #define __local___localdep_lseek_defined

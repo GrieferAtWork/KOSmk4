@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2aa1c4c9 */
+/* HASH CRC-32:0xc8933bd8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Write_defined
 #define __local___localdep_Write_defined
-__CREDIRECT(__ATTR_INS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_Write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),Write,(__fd,__buf,__bufsize))
+__CREDIRECT(__ATTR_INS(2, 3),__SIZE_TYPE__,__THROWING(...),__localdep_Write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),Write,(__fd,__buf,__bufsize))
 #endif /* !__local___localdep_Write_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>

@@ -356,7 +356,6 @@
 #define __ATTR_BLOCKING_IF(...) __checker_attribute__(__throws__(E_INTERRUPT)) /* XXX: Condition */
 
 #define __ATTR_THROWS(...)      __checker_attribute__(__throws__(__VA_ARGS__))
-#define __ATTR_THROWING         __checker_attribute__(__throws__(...))
 
 #define __ATTR_NOBLOCK          __checker_attribute__(__tag__("NOBLOCK"))
 #define __ATTR_NOBLOCK_IF(...)  __checker_attribute__(__tag__("NOBLOCK")) /* XXX: Condition */

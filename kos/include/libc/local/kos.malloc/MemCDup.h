@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x407e1f29 */
+/* HASH CRC-32:0x22447daa */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_MemDup_defined
 #define __local___localdep_MemDup_defined
 #ifdef __CRT_HAVE_MemDup
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_INS(1, 2),void *,__THROWING,__localdep_MemDup,(void const *__restrict __ptr, __SIZE_TYPE__ __num_bytes),MemDup,(__ptr,__num_bytes))
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_INS(1, 2),void *,__THROWING(E_BADALLOC),__localdep_MemDup,(void const *__restrict __ptr, __SIZE_TYPE__ __num_bytes),MemDup,(__ptr,__num_bytes))
 #elif defined(__CRT_HAVE_Malloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.malloc/MemDup.h>

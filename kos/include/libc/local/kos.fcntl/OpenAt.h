@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb5f4aee */
+/* HASH CRC-32:0x1c03fb79 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,14 +28,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_OpenAt32_defined) && defined(__CRT_HAVE_OpenAt)
 #define __local___localdep_OpenAt32_defined
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__fd_t,__THROWING,__localdep_OpenAt32,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__fd_t,__THROWING(...),__localdep_OpenAt32,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #endif /* !__local___localdep_OpenAt32_defined && __CRT_HAVE_OpenAt */
 #ifndef __local___localdep_OpenAt64_defined
 #define __local___localdep_OpenAt64_defined
 #if defined(__CRT_HAVE_OpenAt) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__fd_t,__THROWING,__localdep_OpenAt64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__fd_t,__THROWING(...),__localdep_OpenAt64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_OpenAt64)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__fd_t,__THROWING,__localdep_OpenAt64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__fd_t,__THROWING(...),__localdep_OpenAt64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_OpenAt)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.fcntl/OpenAt64.h>

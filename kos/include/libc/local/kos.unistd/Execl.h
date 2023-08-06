@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99573ab1 */
+/* HASH CRC-32:0x5a94bc7f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_IN(1) __ATTR_IN(2),__THROWING,__localdep_Execv,(char const *__restrict __path, __TARGV),Execv,(__path,___argv))
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_IN(1) __ATTR_IN(2),__THROWING(...),__localdep_Execv,(char const *__restrict __path, __TARGV),Execv,(__path,___argv))
 #endif /* !__local___localdep_Execv_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>

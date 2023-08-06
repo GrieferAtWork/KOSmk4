@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47262a73 */
+/* HASH CRC-32:0xef6ecaee */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_CREDIRECT_VOID(__LIBC,__BLOCKING __ATTR_INOUT(1),__THROWING,__FCALL,__localdep_shared_lock_waitfor,(struct shared_lock *__restrict __self),shared_lock_waitfor,(__self))
+__COMPILER_CREDIRECT_VOID(__LIBC,__BLOCKING __ATTR_INOUT(1),__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor,(struct shared_lock *__restrict __self),shared_lock_waitfor,(__self))
 #elif defined(__KERNEL__) || defined(__shared_lock_wait_impl)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_waitfor.h>

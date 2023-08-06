@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf36c053 */
+/* HASH CRC-32:0xc75e4f70 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_MMap32_defined
 #define __local___localdep_MMap32_defined
-__CREDIRECT(__ATTR_ACCESS_NONE(1),void *,__THROWING,__localdep_MMap32,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos32_t __offset),MMap,(__addr,__len,__prot,__flags,__fd,__offset))
+__CREDIRECT(__ATTR_ACCESS_NONE(1),void *,__THROWING(...),__localdep_MMap32,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos32_t __offset),MMap,(__addr,__len,__prot,__flags,__fd,__offset))
 #endif /* !__local___localdep_MMap32_defined */
 __LOCAL_LIBC(MMap64) __ATTR_WUNUSED __ATTR_ACCESS_NONE(1) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(MMap64))(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos64_t __offset) __THROWS(...) {

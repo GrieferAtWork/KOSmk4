@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xebbd5ae7 */
+/* HASH CRC-32:0xff1ea1a6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ __LIBC __ATTR_WUNUSED __ATTR_IN(1) __fd_t (__VLIBCCALL Open)(char const *__filen
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING,Open,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING(...),Open,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_Open64) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open)
@@ -93,11 +93,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Open, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNU
 #if defined(__CRT_HAVE_Creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING,Creat,(char const *__filename, __mode_t __mode),(__filename,__mode))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING(...),Creat,(char const *__filename, __mode_t __mode),(__filename,__mode))
 #elif defined(__CRT_HAVE_Creat64) && (defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING,Creat,(char const *__filename, __mode_t __mode),Creat64,(__filename,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING(...),Creat,(char const *__filename, __mode_t __mode),Creat64,(__filename,__mode))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_Open64) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open)
@@ -122,7 +122,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Creat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING,Open64,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING(...),Open64,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_Open64)
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -163,11 +163,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Open64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #if defined(__CRT_HAVE_Creat) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING,Creat64,(char const *__filename, __mode_t __mode),Creat,(__filename,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING(...),Creat64,(char const *__filename, __mode_t __mode),Creat,(__filename,__mode))
 #elif defined(__CRT_HAVE_Creat64)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING,Creat64,(char const *__filename, __mode_t __mode),(__filename,__mode))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__THROWING(...),Creat64,(char const *__filename, __mode_t __mode),(__filename,__mode))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_Open64) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open)
@@ -207,7 +207,7 @@ __LIBC __ATTR_WUNUSED __ATTR_IN(2) __fd_t (__VLIBCCALL OpenAt)(__fd_t __dirfd, c
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__fd_t,__THROWING,OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__fd_t,__THROWING(...),OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt)
 #include <libc/local/kos.fcntl/OpenAt.h>
 /* >> open(2), open64(2), openat(2), openat64(2)
@@ -242,7 +242,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(OpenAt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__fd_t,__THROWING,OpenAt64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__fd_t,__THROWING(...),OpenAt64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_OpenAt64)
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'

@@ -275,10 +275,10 @@
 #define NOTHROW_USER_T
 #define __NOTHROW_USER
 #define __NOTHROW_USER_T
-#define THROWING
-#define THROWING_T
-#define __THROWING
-#define __THROWING_T
+#define THROWING(...)
+#define THROWING_T(...)
+#define __THROWING(...)
+#define __THROWING_T(...)
 
 #define ASMCALL
 #define __ASMCALL

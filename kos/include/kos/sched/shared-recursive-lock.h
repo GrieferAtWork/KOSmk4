@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0130387 */
+/* HASH CRC-32:0x14ca2679 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -265,7 +265,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_shared_lock_acquire
 /* >> shared_lock_acquire(3)
  * Acquire a lock to the given shared_lock. */
-__COMPILER_CREDIRECT_VOID(__LIBC,__BLOCKING __ATTR_INOUT(1),__THROWING,__FCALL,__localdep_shared_lock_acquire,(struct shared_lock *__restrict __self),shared_lock_acquire,(__self))
+__COMPILER_CREDIRECT_VOID(__LIBC,__BLOCKING __ATTR_INOUT(1),__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_acquire,(struct shared_lock *__restrict __self),shared_lock_acquire,(__self))
 #elif defined(__KERNEL__) || defined(__shared_lock_wait_impl)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_acquire.h>
@@ -280,7 +280,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 /* >> shared_recursive_lock_acquire(3)
  * Acquire a recursive lock to the given shared_recursive_lock. */
-__COMPILER_CEIDECLARE(__BLOCKING __ATTR_INOUT(1),void,__THROWING,__FCALL,shared_recursive_lock_acquire,(struct shared_recursive_lock *__restrict __self),{
+__COMPILER_CEIDECLARE(__BLOCKING __ATTR_INOUT(1),void,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_acquire,(struct shared_recursive_lock *__restrict __self),{
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
 		++__self->sr_rcnt; /* Recursive aquisition */
@@ -304,7 +304,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_shared_lock_acquire
 /* >> shared_lock_acquire(3)
  * Acquire a lock to the given shared_lock. */
-__COMPILER_CREDIRECT_VOID(__LIBC,__BLOCKING __ATTR_INOUT(1),__THROWING,__FCALL,__localdep_shared_lock_acquire,(struct shared_lock *__restrict __self),shared_lock_acquire,(__self))
+__COMPILER_CREDIRECT_VOID(__LIBC,__BLOCKING __ATTR_INOUT(1),__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_acquire,(struct shared_lock *__restrict __self),shared_lock_acquire,(__self))
 #elif defined(__KERNEL__) || defined(__shared_lock_wait_impl)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_acquire.h>
@@ -342,13 +342,13 @@ __NAMESPACE_LOCAL_BEGIN
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_acquire_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_acquire_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_acquire_with_timeout64) && !defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_acquire_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_acquire_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
 #elif defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_acquire_with_timeout.h>
@@ -367,7 +367,7 @@ __NAMESPACE_LOCAL_END
  * Acquire a recursive lock to the given shared_recursive_lock.
  * @return: true:  Successfully acquired a recursive lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CEIDECLARE(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_recursive_lock_acquire_with_timeout,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),{
+__COMPILER_CEIDECLARE(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_acquire_with_timeout,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),{
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
@@ -394,7 +394,7 @@ __LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursiv
  * Acquire a recursive lock to the given shared_recursive_lock.
  * @return: true:  Successfully acquired a recursive lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_recursive_lock_acquire_with_timeout,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_recursive_lock_acquire_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_acquire_with_timeout,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_recursive_lock_acquire_with_timeout64,(__self,__abs_timeout))
 #elif (defined(__CRT_HAVE_shared_lock_acquire_with_timeout) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_shared_lock_acquire_with_timeout64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_shared_lock_acquire_with_timeout_defined
@@ -404,13 +404,13 @@ __NAMESPACE_LOCAL_BEGIN
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_acquire_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_acquire_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_acquire_with_timeout64) && !defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_acquire_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_acquire_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
 #elif defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_acquire_with_timeout.h>
@@ -453,7 +453,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_shared_lock_waitfor
 /* >> shared_lock_waitfor(3)
  * Wait for `self' to become available. */
-__COMPILER_CREDIRECT_VOID(__LIBC,__BLOCKING __ATTR_INOUT(1),__THROWING,__FCALL,__localdep_shared_lock_waitfor,(struct shared_lock *__restrict __self),shared_lock_waitfor,(__self))
+__COMPILER_CREDIRECT_VOID(__LIBC,__BLOCKING __ATTR_INOUT(1),__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor,(struct shared_lock *__restrict __self),shared_lock_waitfor,(__self))
 #elif defined(__KERNEL__) || defined(__shared_lock_wait_impl)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_waitfor.h>
@@ -468,7 +468,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 /* >> shared_recursive_lock_waitfor(3)
  * Wait until acquiring a recursive lock to `self' no longer blocks */
-__COMPILER_CEIDECLARE(__BLOCKING __ATTR_INOUT(1),void,__THROWING,__FCALL,shared_recursive_lock_waitfor,(struct shared_recursive_lock *__restrict __self),{
+__COMPILER_CEIDECLARE(__BLOCKING __ATTR_INOUT(1),void,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_waitfor,(struct shared_recursive_lock *__restrict __self),{
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self))
 		return;
@@ -485,7 +485,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_shared_lock_waitfor
 /* >> shared_lock_waitfor(3)
  * Wait for `self' to become available. */
-__COMPILER_CREDIRECT_VOID(__LIBC,__BLOCKING __ATTR_INOUT(1),__THROWING,__FCALL,__localdep_shared_lock_waitfor,(struct shared_lock *__restrict __self),shared_lock_waitfor,(__self))
+__COMPILER_CREDIRECT_VOID(__LIBC,__BLOCKING __ATTR_INOUT(1),__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor,(struct shared_lock *__restrict __self),shared_lock_waitfor,(__self))
 #elif defined(__KERNEL__) || defined(__shared_lock_wait_impl)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_waitfor.h>
@@ -516,13 +516,13 @@ __NAMESPACE_LOCAL_BEGIN
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_waitfor_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_waitfor_with_timeout64) && !defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_waitfor_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
 #elif defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_waitfor_with_timeout.h>
@@ -541,7 +541,7 @@ __NAMESPACE_LOCAL_END
  * Wait until acquiring a recursive lock to `self' no longer blocks
  * @return: true:  A lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CEIDECLARE(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_recursive_lock_waitfor_with_timeout,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),{
+__COMPILER_CEIDECLARE(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_waitfor_with_timeout,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),{
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self))
 		return 1;
@@ -558,7 +558,7 @@ __LIBC __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursiv
  * Wait until acquiring a recursive lock to `self' no longer blocks
  * @return: true:  A lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_recursive_lock_waitfor_with_timeout,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_recursive_lock_waitfor_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_waitfor_with_timeout,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_recursive_lock_waitfor_with_timeout64,(__self,__abs_timeout))
 #elif (defined(__CRT_HAVE_shared_lock_waitfor_with_timeout) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_shared_lock_waitfor_with_timeout64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_shared_lock_waitfor_with_timeout_defined
@@ -568,13 +568,13 @@ __NAMESPACE_LOCAL_BEGIN
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_waitfor_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_waitfor_with_timeout64) && !defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_waitfor_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
 #elif defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_waitfor_with_timeout.h>
@@ -610,13 +610,13 @@ __NAMESPACE_LOCAL_BEGIN
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_acquire_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_acquire_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_acquire_with_timeout64)
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_acquire_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_acquire_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
 #elif defined(__shared_lock_wait_impl_timeout64)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_acquire_with_timeout64.h>
@@ -635,7 +635,7 @@ __NAMESPACE_LOCAL_END
  * Acquire a recursive lock to the given shared_recursive_lock.
  * @return: true:  Successfully acquired a recursive lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,shared_recursive_lock_acquire_with_timeout64,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_acquire_with_timeout,{
+__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_acquire_with_timeout64,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_acquire_with_timeout,{
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
@@ -656,7 +656,7 @@ __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2
  * Acquire a recursive lock to the given shared_recursive_lock.
  * @return: true:  Successfully acquired a recursive lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,shared_recursive_lock_acquire_with_timeout64,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_acquire_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_acquire_with_timeout64,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_acquire_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_recursive_lock_acquire_with_timeout64)
 /* >> shared_recursive_lock_acquire_with_timeout(3), shared_recursive_lock_acquire_with_timeout64(3)
  * Acquire a recursive lock to the given shared_recursive_lock.
@@ -672,13 +672,13 @@ __NAMESPACE_LOCAL_BEGIN
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_acquire_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_acquire_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_acquire_with_timeout64)
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_acquire_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_acquire_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
 #elif defined(__shared_lock_wait_impl_timeout64)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_acquire_with_timeout64.h>
@@ -723,13 +723,13 @@ __NAMESPACE_LOCAL_BEGIN
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_waitfor_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_waitfor_with_timeout64)
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_waitfor_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
 #elif defined(__shared_lock_wait_impl_timeout64)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_waitfor_with_timeout64.h>
@@ -748,7 +748,7 @@ __NAMESPACE_LOCAL_END
  * Wait until acquiring a recursive lock to `self' no longer blocks
  * @return: true:  A lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,shared_recursive_lock_waitfor_with_timeout64,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_waitfor_with_timeout,{
+__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_waitfor_with_timeout64,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_waitfor_with_timeout,{
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self))
 		return 1;
@@ -759,7 +759,7 @@ __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2
  * Wait until acquiring a recursive lock to `self' no longer blocks
  * @return: true:  A lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,shared_recursive_lock_waitfor_with_timeout64,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_waitfor_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_waitfor_with_timeout64,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_waitfor_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_recursive_lock_waitfor_with_timeout64)
 /* >> shared_recursive_lock_waitfor_with_timeout(3), shared_recursive_lock_waitfor_with_timeout64(3)
  * Wait until acquiring a recursive lock to `self' no longer blocks
@@ -775,13 +775,13 @@ __NAMESPACE_LOCAL_BEGIN
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_waitfor_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_waitfor_with_timeout64)
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_waitfor_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
 #elif defined(__shared_lock_wait_impl_timeout64)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_waitfor_with_timeout64.h>
@@ -820,13 +820,13 @@ __NAMESPACE_LOCAL_BEGIN
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_acquire_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_acquire_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_acquire_with_timeout64) && !defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_acquire_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_acquire_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
 #elif defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_acquire_with_timeout.h>
@@ -846,7 +846,7 @@ extern "C++" {
  * Acquire a recursive lock to the given shared_recursive_lock.
  * @return: true:  Successfully acquired a recursive lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_recursive_lock_acquire,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_recursive_lock_acquire_with_timeout,{
+__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_acquire,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_recursive_lock_acquire_with_timeout,{
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
@@ -867,13 +867,13 @@ __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWI
  * Acquire a recursive lock to the given shared_recursive_lock.
  * @return: true:  Successfully acquired a recursive lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_recursive_lock_acquire,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_recursive_lock_acquire_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_acquire,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_recursive_lock_acquire_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_recursive_lock_acquire_with_timeout64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_recursive_lock_acquire_with_timeout(3), shared_recursive_lock_acquire_with_timeout64(3)
  * Acquire a recursive lock to the given shared_recursive_lock.
  * @return: true:  Successfully acquired a recursive lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_recursive_lock_acquire,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_recursive_lock_acquire_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_acquire,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_recursive_lock_acquire_with_timeout64,(__self,__abs_timeout))
 #elif (defined(__CRT_HAVE_shared_lock_acquire_with_timeout) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_shared_lock_acquire_with_timeout64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout)
 } /* extern "C++" */
 __NAMESPACE_LOCAL_BEGIN
@@ -884,13 +884,13 @@ __NAMESPACE_LOCAL_BEGIN
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_acquire_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_acquire_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_acquire_with_timeout64) && !defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_acquire_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_acquire_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
 #elif defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_acquire_with_timeout.h>
@@ -937,13 +937,13 @@ __NAMESPACE_LOCAL_BEGIN
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_waitfor_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_waitfor_with_timeout64) && !defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_waitfor_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
 #elif defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_waitfor_with_timeout.h>
@@ -963,7 +963,7 @@ extern "C++" {
  * Wait until acquiring a recursive lock to `self' no longer blocks
  * @return: true:  A lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_recursive_lock_waitfor,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_recursive_lock_waitfor_with_timeout,{
+__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_waitfor,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_recursive_lock_waitfor_with_timeout,{
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self))
 		return 1;
@@ -974,13 +974,13 @@ __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWI
  * Wait until acquiring a recursive lock to `self' no longer blocks
  * @return: true:  A lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_recursive_lock_waitfor,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_recursive_lock_waitfor_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_waitfor,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_recursive_lock_waitfor_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_recursive_lock_waitfor_with_timeout64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_recursive_lock_waitfor_with_timeout(3), shared_recursive_lock_waitfor_with_timeout64(3)
  * Wait until acquiring a recursive lock to `self' no longer blocks
  * @return: true:  A lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,shared_recursive_lock_waitfor,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_recursive_lock_waitfor_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_waitfor,(struct shared_recursive_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_recursive_lock_waitfor_with_timeout64,(__self,__abs_timeout))
 #elif (defined(__CRT_HAVE_shared_lock_waitfor_with_timeout) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_shared_lock_waitfor_with_timeout64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout)
 } /* extern "C++" */
 __NAMESPACE_LOCAL_BEGIN
@@ -991,13 +991,13 @@ __NAMESPACE_LOCAL_BEGIN
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_waitfor_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_waitfor_with_timeout64) && !defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_waitfor_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor_with_timeout,(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
 #elif defined(__KERNEL__) || defined(__shared_lock_wait_impl_timeout)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_waitfor_with_timeout.h>
@@ -1037,13 +1037,13 @@ __NAMESPACE_LOCAL_BEGIN
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_acquire_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_acquire_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_acquire_with_timeout64)
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_acquire_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_acquire_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
 #elif defined(__shared_lock_wait_impl_timeout64)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_acquire_with_timeout64.h>
@@ -1063,7 +1063,7 @@ extern "C++" {
  * Acquire a recursive lock to the given shared_recursive_lock.
  * @return: true:  Successfully acquired a recursive lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,shared_recursive_lock_acquire,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_acquire_with_timeout,{
+__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_acquire,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_acquire_with_timeout,{
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
@@ -1084,13 +1084,13 @@ __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2
  * Acquire a recursive lock to the given shared_recursive_lock.
  * @return: true:  Successfully acquired a recursive lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,shared_recursive_lock_acquire,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_acquire_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_acquire,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_acquire_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_recursive_lock_acquire_with_timeout64)
 /* >> shared_recursive_lock_acquire_with_timeout(3), shared_recursive_lock_acquire_with_timeout64(3)
  * Acquire a recursive lock to the given shared_recursive_lock.
  * @return: true:  Successfully acquired a recursive lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,shared_recursive_lock_acquire,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_acquire_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_acquire,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_acquire_with_timeout64,(__self,__abs_timeout))
 #elif (defined(__CRT_HAVE_shared_lock_acquire_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_shared_lock_acquire_with_timeout64) || defined(__shared_lock_wait_impl_timeout64)
 } /* extern "C++" */
 __NAMESPACE_LOCAL_BEGIN
@@ -1101,13 +1101,13 @@ __NAMESPACE_LOCAL_BEGIN
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_acquire_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_acquire_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_acquire_with_timeout64)
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_acquire_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_acquire_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_acquire_with_timeout64,(__self,__abs_timeout))
 #elif defined(__shared_lock_wait_impl_timeout64)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_acquire_with_timeout64.h>
@@ -1154,13 +1154,13 @@ __NAMESPACE_LOCAL_BEGIN
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_waitfor_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_waitfor_with_timeout64)
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_waitfor_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
 #elif defined(__shared_lock_wait_impl_timeout64)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_waitfor_with_timeout64.h>
@@ -1180,7 +1180,7 @@ extern "C++" {
  * Wait until acquiring a recursive lock to `self' no longer blocks
  * @return: true:  A lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,shared_recursive_lock_waitfor,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_waitfor_with_timeout,{
+__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_waitfor,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_waitfor_with_timeout,{
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self))
 		return 1;
@@ -1191,13 +1191,13 @@ __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2
  * Wait until acquiring a recursive lock to `self' no longer blocks
  * @return: true:  A lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,shared_recursive_lock_waitfor,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_waitfor_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_waitfor,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_waitfor_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_recursive_lock_waitfor_with_timeout64)
 /* >> shared_recursive_lock_waitfor_with_timeout(3), shared_recursive_lock_waitfor_with_timeout64(3)
  * Wait until acquiring a recursive lock to `self' no longer blocks
  * @return: true:  A lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,shared_recursive_lock_waitfor,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_waitfor_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,shared_recursive_lock_waitfor,(struct shared_recursive_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_lock_waitfor_with_timeout64,(__self,__abs_timeout))
 #elif (defined(__CRT_HAVE_shared_lock_waitfor_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_shared_lock_waitfor_with_timeout64) || defined(__shared_lock_wait_impl_timeout64)
 } /* extern "C++" */
 __NAMESPACE_LOCAL_BEGIN
@@ -1208,13 +1208,13 @@ __NAMESPACE_LOCAL_BEGIN
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_waitfor_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout,(__self,__abs_timeout))
 #elif defined(__CRT_HAVE_shared_lock_waitfor_with_timeout64)
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING,__FCALL,__localdep_shared_lock_waitfor_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2),__BOOL,__THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,__localdep_shared_lock_waitfor_with_timeout64,(struct shared_lock *__restrict __self, struct timespec64 const *__abs_timeout),shared_lock_waitfor_with_timeout64,(__self,__abs_timeout))
 #elif defined(__shared_lock_wait_impl_timeout64)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sched.shared-lock/shared_lock_waitfor_with_timeout64.h>

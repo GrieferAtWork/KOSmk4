@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb7d891d */
+/* HASH CRC-32:0x14b9c87f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,17 +29,17 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_fclose,(__FILE *__restrict __stream),fclose,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING(...),__localdep_fclose,(__FILE *__restrict __stream),fclose,(__stream))
 #elif defined(__CRT_HAVE__fclose_nolock)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_fclose,(__FILE *__restrict __stream),_fclose_nolock,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING(...),__localdep_fclose,(__FILE *__restrict __stream),_fclose_nolock,(__stream))
 #elif defined(__CRT_HAVE__IO_fclose)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_fclose,(__FILE *__restrict __stream),_IO_fclose,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING(...),__localdep_fclose,(__FILE *__restrict __stream),_IO_fclose,(__stream))
 #else /* ... */
 #undef __local___localdep_fclose_defined
 #endif /* !... */

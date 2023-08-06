@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e2d3698 */
+/* HASH CRC-32:0xc565d351 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_PWrite32_defined
 #define __local___localdep_PWrite32_defined
-__CREDIRECT(__ATTR_INS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_PWrite32,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),PWrite,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_INS(2, 3),__SIZE_TYPE__,__THROWING(...),__localdep_PWrite32,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),PWrite,(__fd,__buf,__bufsize,__offset))
 #endif /* !__local___localdep_PWrite32_defined */
 __LOCAL_LIBC(PWrite64) __ATTR_INS(2, 3) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(PWrite64))(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset) __THROWS(...) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a41acba */
+/* HASH CRC-32:0x2cfa611c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_FUTimens32_defined
 #define __local___localdep_FUTimens32_defined
-__CREDIRECT_VOID(,__THROWING,__localdep_FUTimens32,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),FUTimens,(__fd,__times))
+__CREDIRECT_VOID(,__THROWING(...),__localdep_FUTimens32,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),FUTimens,(__fd,__times))
 #endif /* !__local___localdep_FUTimens32_defined */
 __LOCAL_LIBC(FUTimens64) __ATTR_IN_OPT(2) void
 (__LIBCCALL __LIBC_LOCAL_NAME(FUTimens64))(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]) __THROWS(...) {
