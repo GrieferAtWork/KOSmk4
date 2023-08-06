@@ -548,9 +548,15 @@ err_bad_op:
 		local typ: CType = typeref.typ;
 		if (typ !is CStructType)
 			checker.err(f"Cannot access field `{fieldName}' of non-struct-type `{typ}'");
-		local fieldInfo: (CTypeRef, int) | none = typ.getField(fieldName);
+		local fieldInfo: (CTypeRef, int) | CSymbol | none = typ.getField(fieldName);
 		if (fieldInfo is none) {
 			checker.err(f"No such field `{fieldName}' in `{typ}'");
+		} else if (fieldInfo is CSymbol) {
+			/* Special case for c++ struct member functions */
+			kind    = CVALUE_LSYMBOL;
+			typeref = fieldInfo.typeref;
+			data    = fieldInfo;
+			offset  = 0;
 		} else {
 			/* Load the field in question */
 			local cv: int = typeref.flags & CTYPEREF_FLAG_CV;

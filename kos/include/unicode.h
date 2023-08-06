@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3bc0ad7 */
+/* HASH CRC-32:0xa42a21ba */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -827,7 +827,7 @@ __NOTHROW_NCX(__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ char32_t const
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This  function   will   write   at  most   `UNICODE_UTF32_CURLEN'   dwords   to   `dst' */
 __LOCAL __ATTR_RETNONNULL __ATTR_OUT(1) char32_t *
-(__LIBCCALL unicode_writeutf32)(/*utf-32*/ char32_t *__restrict __dst, char32_t __ch) {
+__NOTHROW_NCX(__LIBCCALL unicode_writeutf32)(/*utf-32*/ char32_t *__restrict __dst, char32_t __ch) {
 	*__dst++ = __ch;
 	return __dst;
 }
@@ -836,25 +836,25 @@ __LOCAL __ATTR_RETNONNULL __ATTR_OUT(1) char32_t *
 /* >> unicode_len8to16(3)
  * Return the number of utf-16 words needed to encode a given utf-8 string
  * HINT: This is the exact number of words written by `unicode_8to16(3)' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_INS(1, 2),size_t,__NOTHROW_NCX,unicode_len8to16,(char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes),(__utf8_text,__utf8_bytes))
+__CDECLARE(__ATTR_WUNUSED __ATTR_INS(1, 2),__SIZE_TYPE__,__NOTHROW_NCX,unicode_len8to16,(char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes),(__utf8_text,__utf8_bytes))
 #else /* __CRT_HAVE_unicode_len8to16 */
 #include <libc/local/unicode/unicode_len8to16.h>
 /* >> unicode_len8to16(3)
  * Return the number of utf-16 words needed to encode a given utf-8 string
  * HINT: This is the exact number of words written by `unicode_8to16(3)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_len8to16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INS(1, 2) size_t __NOTHROW_NCX(__LIBCCALL unicode_len8to16)(char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_len8to16))(__utf8_text, __utf8_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_len8to16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INS(1, 2) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL unicode_len8to16)(char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_len8to16))(__utf8_text, __utf8_bytes); })
 #endif /* !__CRT_HAVE_unicode_len8to16 */
 #ifdef __CRT_HAVE_unicode_len8to32
 /* >> unicode_len8to32(3)
  * Return the number of utf-32 character needed to encode a given utf-8 string
  * HINT: This is the exact number of words written by `unicode_8to32(3)' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_INS(1, 2),size_t,__NOTHROW_NCX,unicode_len8to32,(char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes),(__utf8_text,__utf8_bytes))
+__CDECLARE(__ATTR_WUNUSED __ATTR_INS(1, 2),__SIZE_TYPE__,__NOTHROW_NCX,unicode_len8to32,(char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes),(__utf8_text,__utf8_bytes))
 #else /* __CRT_HAVE_unicode_len8to32 */
 #include <libc/local/unicode/unicode_len8to32.h>
 /* >> unicode_len8to32(3)
  * Return the number of utf-32 character needed to encode a given utf-8 string
  * HINT: This is the exact number of words written by `unicode_8to32(3)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_len8to32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INS(1, 2) size_t __NOTHROW_NCX(__LIBCCALL unicode_len8to32)(char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_len8to32))(__utf8_text, __utf8_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_len8to32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INS(1, 2) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL unicode_len8to32)(char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_len8to32))(__utf8_text, __utf8_bytes); })
 #endif /* !__CRT_HAVE_unicode_len8to32 */
 #ifdef __CRT_HAVE_unicode_8to16
 /* >> unicode_8to16(3)

@@ -23,7 +23,7 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#if defined(__cplusplus) && defined(__USE_KOS) && !defined(__CHECKER__)
+#if defined(__cplusplus) && defined(__USE_KOS)
 #include <__stdcxx.h>
 
 #include <hybrid/__overflow.h>

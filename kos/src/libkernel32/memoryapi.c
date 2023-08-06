@@ -48,8 +48,8 @@ libk32_VirtualQuery(LPCVOID lpAddress, PMEMORY_BASIC_INFORMATION lpBuffer, SIZE_
 	return 0;
 }
 
-PRIVATE int WINAPI
-libk32_MmanProtFromNtProt(DWORD flProtect) {
+PRIVATE ATTR_CONST int
+NOTHROW(WINAPI libk32_MmanProtFromNtProt)(DWORD flProtect) {
 	int prot;
 	if (flProtect & (PAGE_EXECUTE_WRITECOPY | PAGE_EXECUTE_READWRITE)) {
 		prot = PROT_READ | PROT_WRITE | PROT_EXEC;

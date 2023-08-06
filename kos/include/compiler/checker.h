@@ -165,6 +165,18 @@
 #define __GCC_HAS_BUILTIN___atomic_fetch_nand
 #define __GCC_HAS_BUILTIN___builtin_assume
 #define __GCC_HAS_BUILTIN___builtin_choose_expr
+#define __GCC_HAS_BUILTIN___builtin_isgreater
+#define __GCC_HAS_BUILTIN___builtin_isgreaterequal
+#define __GCC_HAS_BUILTIN___builtin_isless
+#define __GCC_HAS_BUILTIN___builtin_islessequal
+#define __GCC_HAS_BUILTIN___builtin_islessgreater
+#define __GCC_HAS_BUILTIN___builtin_isunordered
+#define __GCC_HAS_BUILTIN___builtin_iseqsig
+#define __GCC_HAS_BUILTIN___builtin_isfinite
+#define __GCC_HAS_BUILTIN___builtin_isinf_sign
+#define __GCC_HAS_BUILTIN___builtin_isnormal
+#define __GCC_HAS_BUILTIN___builtin_signbit
+#define __GCC_HAS_BUILTIN___builtin_fpclassify
 
 /************************************************************************/
 /* Checker-specific builtins                                            */
@@ -517,7 +529,23 @@
 
 #define __COMPILER_HAVE_BUG_BLOATY_CXX_USING 0
 
-/* Atomic builtins (only need to emulate semantics ). */
+/* Floating-point builtins */
+#define __builtin_isgreater(x, y)      __builtin_rvoid(((x) + (y), 0))
+#define __builtin_isgreaterequal(x, y) __builtin_rvoid(((x) + (y), 0))
+#define __builtin_isless(x, y)         __builtin_rvoid(((x) + (y), 0))
+#define __builtin_islessequal(x, y)    __builtin_rvoid(((x) + (y), 0))
+#define __builtin_islessgreater(x, y)  __builtin_rvoid(((x) + (y), 0))
+#define __builtin_isunordered(u, v)    __builtin_rvoid(((u) + (v), 0))
+#define __builtin_iseqsig(x, y)        __builtin_rvoid(((x) + (y), 0))
+#define __builtin_isfinite(x)          __builtin_rvoid((x, 0))
+#define __builtin_isinf_sign(x)        __builtin_rvoid((x, 0))
+#define __builtin_isnormal(x)          __builtin_rvoid((x, 0))
+#define __builtin_signbit(x)           __builtin_rvoid((x, 0))
+#define __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, x) \
+	__builtin_rvoid((FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, x, 0))
+
+
+/* Atomic builtins (only need to emulate semantics). */
 #define __atomic_load_n(ptr, memorder)                 __builtin_rvoid(*(ptr))
 #define __atomic_load(ptr, p_ret, memorder)            (void)(__builtin_void(*(p_ret)) = __builtin_rvoid(*(ptr)))
 #define __atomic_store_n(ptr, val, memorder)           (void)(__builtin_void(*(ptr)) = (val))

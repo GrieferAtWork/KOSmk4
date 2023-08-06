@@ -36,6 +36,8 @@ global CStructType;
 global CArrayType;
 global CEnumType;
 global CCoreFloatType;
+global CSymbol;
+global CSymbolTemplate;
 
 global C_INT;
 global C_LONG;
@@ -56,6 +58,7 @@ class CType: WeakRefAble {
 	// function tostr(varname: string = ""): string;
 	// property sizeof: int;
 	property alignof: int = { get(): int -> this.sizeof; };
+	property unwindWeakRef: CType = { get(): CType -> this; };
 
 	@@Check if this type can be converted to @other
 	function isConvertibleTo(other: CType, explicit: bool = false): bool {
@@ -403,7 +406,13 @@ final class CTypeRef {
 		get(): CTypeRef {
 			if (typ is WeakRef) {
 				local result = copy this;
-				result.typ = typ.value;
+				result.typ = typ.value.unwindWeakRef;
+				return result;
+			}
+			local newTyp = typ.unwindWeakRef;
+			if (typ !== newTyp) {
+				local result = copy this;
+				result.typ = newTyp;
 				return result;
 			}
 			return this;
@@ -553,11 +562,14 @@ final class CTypeRef {
 	@@typedef int FOO;
 	@@const FOO x = 42; // "FOO" is inherited/merged-into "const"
 	@@```
-	function importTypedef(typedef: CTypeRef) {
+	function importTypedef(checker: Checker, typedef: CTypeRef) {
 		flags |= typedef.flags;
 		if (typedef.attrib !is none)
 			requireAttrib.importFrom(typedef.attrib);
-		typ = typedef.typ;
+		local newType: CType = typedef.typ;
+		if (newType in checker.incompleteStructTypes)
+			newType = WeakRef(newType);
+		typ = newType;
 	}
 
 	@@Move attributes that have no meaning for pointers to @dst
@@ -1185,8 +1197,19 @@ class CPointerType: CType {
 
 	@@Pointer base type.
 	public member base: CTypeRef;
-	function fixNonsensicalAttributes(checker: Checker)
+	public function fixNonsensicalAttributes(checker: Checker)
 		-> base.fixNonsensicalPointerBaseAttributes(checker);
+
+	public property unwindWeakRef: CType = {
+		get(): CType {
+			local resBase = base.unwindWeakRef;
+			if (resBase === base)
+				return this;
+			local res = copy this;
+			res.base = resBase;
+			return res;
+		}
+	}
 
 	function redeclarationImport(checker: Checker, other: CType,
 	                             newName: string = "", oldName: string = "",
@@ -1248,6 +1271,17 @@ class CLValueType: CType {
 	function fixNonsensicalAttributes(checker: Checker)
 		-> base.fixNonsensicalPointerBaseAttributes(checker);
 
+	public property unwindWeakRef: CType = {
+		get(): CType {
+			local resBase = base.unwindWeakRef;
+			if (resBase === base)
+				return this;
+			local res = copy this;
+			res.base = resBase;
+			return res;
+		}
+	}
+
 	function redeclarationImport(checker: Checker, other: CType,
 	                             newName: string = "", oldName: string = "",
 	                             oldDeclFlc: (string, int, int) | none = none)
@@ -1277,7 +1311,8 @@ final class CStructType: CType {
 	public member name: string;
 	public member isUnion: bool;
 	public member base: CStructType | none = none;
-	public member fields: {string: (CTypeRef, int)} = Dict();
+	@@Struct fields and C++ member functions
+	public member fields: {string: (CTypeRef, int) | CSymbol} = Dict();
 	public member fieldsByDeclarationOrder: {(CTypeRef, string)...} = [];
 
 	public operator hash(): int -> Object.id(this);
@@ -1353,11 +1388,11 @@ final class CStructType: CType {
 		return varname ? f"{structRepr} {varname}" : structRepr;
 	}
 
-	public function getField(name: string): (CTypeRef, int) | none {
+	public function getField(name: string): (CTypeRef, int) | CSymbol | none {
 		local result = fields.get(name);
 		if (result is none && base !is none)
 			result = base.getField(name);
-		if (result !is none)
+		if (result !is none && result !is CSymbol)
 			result = (result.first.unwindWeakRef, result.last);
 		return result;
 	}
@@ -1367,6 +1402,8 @@ final class CStructType: CType {
 			if (base !is none)
 				yield base.foreachField...;
 			for (local name, typAndOffset: fields) {
+				if (typAndOffset is CSymbol)
+					continue;
 				local typ, offset = typAndOffset...;
 				yield (name, typ.unwindWeakRef, offset);
 			}
@@ -1453,6 +1490,38 @@ final class CFunctionType: CType {
 	public member isVarArgs: bool = false;
 	public property sizeof: int = { get(): int -> 0; };
 	public property alignof: int = { get(): int -> 1; };
+
+	public property unwindWeakRef: CType = {
+		get(): CType {
+			local resReturnType = returnType.unwindWeakRef;
+			if (resReturnType !== this) {
+				local result = copy this;
+				result.returnType = resReturnType;
+				result.args = List(
+					for (local argTypeRef, argName: args)
+						(argTypeRef.unwindWeakRef, argName)
+				);
+				return result;
+			}
+			for (local i: [:#args]) {
+				local argTypeRef = args[i].first;
+				local resArgTypeRef = argTypeRef.unwindWeakRef;
+				if (argTypeRef !== resArgTypeRef) {
+					local result = copy this;
+					result.returnType = resReturnType;
+					result.args = copy result.args;
+					result.args[i] = (resArgTypeRef, args[i].last);
+					for (++i; i < #args; ++i) {
+						local argName;
+						argTypeRef, argName = args[i]...;
+						result.args[i] = (argTypeRef.unwindWeakRef, argName);
+					}
+					return result;
+				}
+			}
+			return this;
+		}
+	}
 
 	@@Evaluations to @true if there are pointer-arguments that are neither `restrict`, not `[[nonnull]]`
 	public property hasNotRestrictNotNonnullPointerArguments: bool = {
@@ -1729,8 +1798,6 @@ class CSymbol {
 		}
 	}
 }
-
-global CSymbolTemplate;
 
 @@Sub-class for overloaded function-like symbols (needed for overloads)
 @@NOTE: The primary symbol element should not be used, and its fields are unbound!

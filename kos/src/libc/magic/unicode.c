@@ -1118,7 +1118,7 @@ __NOTHROW_NCX(__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ char32_t const
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This  function   will   write   at  most   `UNICODE_UTF32_CURLEN'   dwords   to   `dst' */
 __LOCAL __ATTR_RETNONNULL __ATTR_OUT(1) char32_t *
-(__LIBCCALL unicode_writeutf32)(/*utf-32*/ char32_t *__restrict __dst, char32_t __ch) {
+__NOTHROW_NCX(__LIBCCALL unicode_writeutf32)(/*utf-32*/ char32_t *__restrict __dst, char32_t __ch) {
 	*__dst++ = __ch;
 	return __dst;
 }
@@ -1130,8 +1130,8 @@ __LOCAL __ATTR_RETNONNULL __ATTR_OUT(1) char32_t *
 @@Return the number of utf-16 words needed to encode a given utf-8 string
 @@HINT: This is the exact number of words written by `unicode_8to16(3)'
 [[wunused, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-size_t unicode_len8to16([[in(utf8_bytes)]] /*utf-8*/ char const *__restrict utf8_text,
-                        $size_t utf8_bytes) {
+$size_t unicode_len8to16([[in(utf8_bytes)]] /*utf-8*/ char const *__restrict utf8_text,
+                         $size_t utf8_bytes) {
 	size_t result = 0;
 	char const *utf8_end = utf8_text + utf8_bytes;
 	while (utf8_text < utf8_end) {
@@ -1152,8 +1152,8 @@ size_t unicode_len8to16([[in(utf8_bytes)]] /*utf-8*/ char const *__restrict utf8
 @@Return the number of utf-32 character needed to encode a given utf-8 string
 @@HINT: This is the exact number of words written by `unicode_8to32(3)'
 [[wunused, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-size_t unicode_len8to32([[in(utf8_bytes)]] /*utf-8*/ char const *__restrict utf8_text,
-                        $size_t utf8_bytes) {
+$size_t unicode_len8to32([[in(utf8_bytes)]] /*utf-8*/ char const *__restrict utf8_text,
+                         $size_t utf8_bytes) {
 	size_t result = 0;
 	char const *utf8_end = utf8_text + utf8_bytes;
 	while (utf8_text < utf8_end) {

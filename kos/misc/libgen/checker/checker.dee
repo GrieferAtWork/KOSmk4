@@ -155,6 +155,9 @@ final class Checker: CParser {
 	@@Value of @currentTryBlockExceptions, but only gets assigned while inside of `catch`
 	public member currentCatchBlockExceptions: {int...} | none = none;
 
+	@@Set of struct types that are currently being constructed (and are thus incomplete)
+	public member incompleteStructTypes: Set with CStructType = UniqueSet();
+
 	private member isInExternC: bool = false;         /* True inside of an extern-C block */
 	private member isInSwitchStatement: bool = false; /* True inside of a switch-statement */
 	private member isInLoop: bool = false;            /* True inside of a loop-statement */
@@ -679,8 +682,8 @@ again:
 	}
 
 	private member _anonStructMemberId: int = 0;
-	function parseStructMembers(tr: CTypeRef, structType: CStructType,
-	                            fields: {(CTypeRef, string)...}) {
+	function parseStructMembers(tr: CTypeRef, fields: {(CTypeRef, string)...},
+	                            cxxFunctions: {string: (CTypeRef, Bytes | none, (string, int, int))}) {
 again:
 		switch (this.tok) {
 
@@ -733,10 +736,30 @@ default_case:
 							this.err(f"Duplicate field {repr fieldName} in struct type");
 					}
 				}
+				if (fieldName && fieldType.typ is CFunctionType) {
+					if (!cxx)
+						this.err("Struct member functions are only accepted in c++");
+					if (fieldName in cxxFunctions)
+						this.err(f"Duplicate c++ struct member function `{fieldName}'");
+					/* Parse extra const/volatile qualifiers (these will apply to the this-symbol) */
+					parseCTypeRefConstVolatile(fieldType);
+					local bodyInit: Bytes | none;
+					local bodyDecl: (string, int, int);
+					if (this.tok == ";") {
+						bodyInit = none;
+						bodyDecl = this.flc;
+						this.next();
+					} else {
+						this.skip("{");
+						local backup = this.subChunkBegin();
+						parseSkipUntil("}");
+						bodyInit, bodyDecl = this.subChunkEnd(backup)...;
+						this.skip("}");
+					}
+					cxxFunctions[fieldName] = (fieldType, bodyInit, bodyDecl);
+					goto again;
+				}
 				tr.typ.fieldsByDeclarationOrder.append((fieldType, fieldName));
-				/* Use a WeakRef to prevent a reference loop */
-				if (gc.isreferring(fieldType.typ, structType))
-					fieldType.typ = WeakRef(fieldType.typ);
 				fields.append((fieldType, fieldName));
 			}
 			this.skip(";");
@@ -801,9 +824,13 @@ default_case:
 			if (this.tok != "{")
 				return struct;
 		}
+
+		/* Parse the struct body. */
+		incompleteStructTypes.insert(struct);
 		this.skip("{");
 		local fields: {(CTypeRef, string)...} = [];
-		parseStructMembers(tr, struct, fields);
+		local cxxFunctions: {string: (CTypeRef, Bytes | none, (string, int, int))} = cxx ? Dict() : {};
+		parseStructMembers(tr, fields, cxxFunctions);
 		this.skip("}");
 		parseCTypeRefAttributes(tr);
 
@@ -852,7 +879,68 @@ default_case:
 				finalStructAlign = structAlign;
 			struct._alignof = finalStructAlign;
 		}
+		incompleteStructTypes.remove(struct);
+
+		if (cxxFunctions) {
+			/* Define c++ functions */
+			for (local name, specs: cxxFunctions) {
+				local cxxFunctionSymbol: CSymbol = CSymbol(
+					name:    name,
+					decl:    specs[2],
+					typeref: specs[0].unwindWeakRef,
+					val:     none);
+				if (!struct.fields.setnew(name, cxxFunctionSymbol)) {
+					this.errAt(cxxFunctionSymbol.decl,
+						f"Duplicate declaration of symbol `{name}' in `{struct}'");
+				}
+			}
+
+			/* Compile c++ functions */
+			for (local name, specs: cxxFunctions) {
+				local bodyInit = specs[1];
+				if (bodyInit !is none) {
+					local functionSymbol: CSymbol = struct.fields[name];
+					functionSymbol.val = instantiateCxxStructMemberFunction(
+						struct, name, functionSymbol.typeref,
+						specs[1], functionSymbol.decl);
+				}
+			}
+		}
 		return struct;
+	}
+
+	function instantiateCxxStructMemberFunction(structType: CStructType,
+	                                            functionName: string, functionType: CTypeRef,
+	                                            bodyInit: Bytes, bodyDecl: (string, int, int)): Bytes | none {
+		local backup = this.subChunkPush(bodyInit, bodyDecl);
+		local _me = this; // FIXME: Workaround for deemon bug
+		local result = parseFunctionBody(functionType, functionName, extraSetup: () -> {
+			local scope: CScope = _me.namespaceStack.first;
+			local scopeSymols: {string: CSymbol | CSymbolTemplate} = scope.symbols;
+			local flc = _me.flc;
+			for (local fieldName, fieldSpecs: structType.fields) {
+				local fieldType: CTypeRef = fieldSpecs is CSymbol
+					? fieldSpecs.typeref
+					: fieldSpecs.first;
+				scopeSymols[fieldName] = CSymbol(
+					name: fieldName,
+					decl: fieldSpecs is CSymbol ? fieldSpecs.decl : flc,
+					typeref: fieldType,
+					val: none);
+			}
+			/* Define the special "this"-symbol */
+			scopeSymols["this"] = CSymbol(
+				name:    "this",
+				decl:    flc,
+				typeref: CTypeRef(
+					_me.TARGET_CPointerType(CTypeRef(structType, flags: functionType.flags)),
+					flags: CTYPEREF_FLAG_CONST),
+				val:     none);
+		});
+		if (this.tok)
+			this.err(f"Unrecognized token `{this.tok}' after struct member function");
+		this.subChunkPop(backup);
+		return result;
 	}
 
 	function parseEnumMembers(ns: CNamespace, enumTypeRef: CTypeRef) {
@@ -1190,6 +1278,8 @@ lookup_struct_in_namespace:
 						true:  "unionSymbols",
 						false: "structSymbols",
 					}[isUnion], errorIfNotFound: true);
+					if (tr.typ in incompleteStructTypes)
+						tr.typ = WeakRef(tr.typ);
 					if (this.tok == "<")
 						goto resolve_template_typedef;
 					parseCTypeRefAttributes(tr);
@@ -1335,7 +1425,7 @@ resolve_template_typedef:
 					typedef = instantiateTemplate(typedef, templateParamValues);
 					this.skip(">");
 				}
-				tr.importTypedef(typedef);
+				tr.importTypedef(this, typedef);
 				goto done;
 			}	break;
 
@@ -1447,7 +1537,7 @@ done:
 			parseCTypeRefAttributes(tr);
 			if (this.tok == "noexcept" && cxx) {
 				/* c++ noexcept attribute -> parse like `__attribute__((nothrow(0)))` */
-				tr.requireAttrib.nothrow = 0;
+				tr.requireAttrib.nothrow = "0";
 				this.next();
 				parseCTypeRefAttributes(tr);
 			}
@@ -1890,7 +1980,8 @@ prefix_again:
 	}
 
 	@@Returns the function's return value
-	function parseFunctionBody(funTypRef: CTypeRef, name: string): Bytes | none {
+	function parseFunctionBody(funTypRef: CTypeRef, name: string,
+	                           extraSetup: Callable | none = none): Bytes | none {
 		/* Push a namespace for the function's body. */
 		local fnScope: CScope = CScope();
 		fnScope.symbols = Dict();
@@ -1921,6 +2012,9 @@ prefix_again:
 		isUnreachable                       = false;
 		isInTryBlock                        = false;
 		encounteredAsm                      = false;
+
+		/* Invoke caller-defined setup hook */
+		extraSetup();
 
 		/* Parse the function body. */
 		parseStatements();
@@ -4227,18 +4321,6 @@ again_builtin_container_of_suffix:
 		// TODO: double __builtin_nan(char const *str);
 		// TODO: float __builtin_nanf(char const *str);
 		// TODO: long double __builtin_nanl(char const *str);
-		// TODO: bool __builtin_isgreater(TFLOAT x, TFLOAT y);
-		// TODO: bool __builtin_isgreaterequal(TFLOAT x, TFLOAT y);
-		// TODO: bool __builtin_isless(TFLOAT x, TFLOAT y);
-		// TODO: bool __builtin_islessequal(TFLOAT x, TFLOAT y);
-		// TODO: bool __builtin_islessgreater(TFLOAT x, TFLOAT y);
-		// TODO: bool __builtin_isunordered(TFLOAT u, TFLOAT v);
-		// TODO: int __builtin_fpclassify(int FP_NAN, int FP_INFINITE, int FP_NORMAL, int FP_SUBNORMAL, int FP_ZERO, TFLOAT x);
-		// TODO: bool __builtin_iseqsig(TFLOAT x, TFLOAT y);
-		// TODO: bool __builtin_isfinite(TFLOAT x);
-		// TODO: bool __builtin_isinf_sign(TFLOAT x);
-		// TODO: bool __builtin_isnormal(TFLOAT x);
-		// TODO: bool __builtin_signbit(TFLOAT x);
 
 		case "(": {
 			this.next();

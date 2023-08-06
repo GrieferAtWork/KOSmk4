@@ -38,23 +38,23 @@ DECL_BEGIN
 /************************************************************************/
 /* <STRING.H>-STYLE FUNCTIONS                                           */
 /************************************************************************/
-INTERN ATTR_PURE int WINAPI
-libk32_lstrcmpA(LPCSTR lpString1, LPCSTR lpString2) {
+INTERN ATTR_PURE int
+NOTHROW_NCX(WINAPI libk32_lstrcmpA)(LPCSTR lpString1, LPCSTR lpString2) {
 	return strcmp(lpString1, lpString2);
 }
 
-INTERN ATTR_PURE int WINAPI
-libk32_lstrcmpW(LPCWSTR lpString1, LPCWSTR lpString2) {
+INTERN ATTR_PURE int
+NOTHROW_NCX(WINAPI libk32_lstrcmpW)(LPCWSTR lpString1, LPCWSTR lpString2) {
 	return c16cmp(lpString1, lpString2);
 }
 
-INTERN ATTR_PURE int WINAPI
-libk32_lstrcmpiA(LPCSTR lpString1, LPCSTR lpString2) {
+INTERN ATTR_PURE int
+NOTHROW_NCX(WINAPI libk32_lstrcmpiA)(LPCSTR lpString1, LPCSTR lpString2) {
 	return strcasecmp(lpString1, lpString2);
 }
 
-INTERN ATTR_PURE int WINAPI
-libk32_lstrcmpiW(LPCWSTR lpString1, LPCWSTR lpString2) {
+INTERN ATTR_PURE int
+NOTHROW_NCX(WINAPI libk32_lstrcmpiW)(LPCWSTR lpString1, LPCWSTR lpString2) {
 	return c16casecmp(lpString1, lpString2);
 }
 
@@ -94,23 +94,23 @@ libk32_lstrcpyW(LPWSTR lpString1, LPCWSTR lpString2) {
 	return NULL;
 }
 
-INTERN LPSTR WINAPI
-libk32_lstrcatA(LPSTR lpString1, LPCSTR lpString2) {
+INTERN LPSTR
+NOTHROW_NCX(WINAPI libk32_lstrcatA)(LPSTR lpString1, LPCSTR lpString2) {
 	return strcat(lpString1, lpString2);
 }
 
-INTERN LPWSTR WINAPI
-libk32_lstrcatW(LPWSTR lpString1, LPCWSTR lpString2) {
+INTERN LPWSTR
+NOTHROW_NCX(WINAPI libk32_lstrcatW)(LPWSTR lpString1, LPCWSTR lpString2) {
 	return c16cat(lpString1, lpString2);
 }
 
-INTERN ATTR_PURE int WINAPI
-libk32_lstrlenA(LPCSTR lpString) {
+INTERN ATTR_PURE int
+NOTHROW_NCX(WINAPI libk32_lstrlenA)(LPCSTR lpString) {
 	return !lpString ? 0 : (int)(unsigned int)strlen(lpString);
 }
 
-INTERN ATTR_PURE int WINAPI
-libk32_lstrlenW(LPCWSTR lpString) {
+INTERN ATTR_PURE int
+NOTHROW_NCX(WINAPI libk32_lstrlenW)(LPCWSTR lpString) {
 	return !lpString ? 0 : (int)(unsigned int)c16len(lpString);
 }
 
