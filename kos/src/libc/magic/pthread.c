@@ -1317,11 +1317,7 @@ again:
 			                      __PTHREAD_ONCE_INIT,
 			                      __ATOMIC_RELEASE);
 @@pp_endif@@
-@@pp_if $has_function(except_rethrow)@@
-			except_rethrow();
-@@pp_else@@
 			@throw@;
-@@pp_endif@@
 		}
 @@pp_else@@
 		(*init_routine)();
@@ -1466,7 +1462,7 @@ struct __pthread_cleanup_frame {
 
 %#if defined(__GNUC__) && defined(__EXCEPTIONS)
 %{
-#ifdef __cplusplus
+#if defined(__cplusplus) && !defined(__CHECKER__)
 /* Class to handle cancellation handler invocation. */
 class __pthread_cleanup_class {
 	void (__LIBKCALL *__cancel_routine)(void *);
@@ -1523,7 +1519,7 @@ public:
 		__clframe.__setdoit(execute);           \
 	}	__WHILE0
 #endif /* __USE_GNU */
-#else /* __cplusplus */
+#else /* __cplusplus && !__CHECKER__ */
 }
 
 @@Function called to call the cleanup handler. As an extern inline
@@ -1580,7 +1576,7 @@ void __pthread_cleanup_routine([[inout]] struct __pthread_cleanup_frame *frame) 
 	}	__WHILE0
 
 #endif /* __USE_GNU */
-#endif /* !__cplusplus */
+#endif /* !__cplusplus || __CHECKER__ */
 }
 
 %#else /* __GNUC__ && __EXCEPTIONS */

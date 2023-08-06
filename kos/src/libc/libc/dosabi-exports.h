@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8cd2127 */
+/* HASH CRC-32:0xe7b4056f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@ DEFINE_PUBLIC_ALIAS(DOS$__argz_add, libd_argz_add);
 DEFINE_PUBLIC_ALIAS(DOS$argz_add, libd_argz_add);
 DEFINE_PUBLIC_ALIAS(DOS$__argz_add_sep, libd_argz_add_sep);
 DEFINE_PUBLIC_ALIAS(DOS$argz_add_sep, libd_argz_add_sep);
-DEFINE_PUBLIC_ALIAS(DOS$__argz_add_sep, libd_argz_delete);
+DEFINE_PUBLIC_ALIAS(DOS$__argz_delete, libd_argz_delete);
 DEFINE_PUBLIC_ALIAS(DOS$argz_delete, libd_argz_delete);
 DEFINE_PUBLIC_ALIAS(DOS$__argz_insert, libd_argz_insert);
 DEFINE_PUBLIC_ALIAS(DOS$argz_insert, libd_argz_insert);

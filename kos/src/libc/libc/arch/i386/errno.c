@@ -32,6 +32,7 @@
 #if !defined(__x86_64__) && defined(__i386__)
 #include <hybrid/unaligned.h>
 
+#include <kos/except.h>
 #include <kos/exec/elf.h>
 #include <kos/exec/idata.h>
 #include <kos/sys/mman.h>
@@ -119,7 +120,7 @@ NOTHROW(LIBCCALL nontls_errno_redirect)(void) {
 
 	/* Acquire write access to the affected functions */
 	core_size = (size_t)(__libc_errno_access_core_end - __libc_errno_access_core_start);
-	MProtect(__libc_errno_access_core_start, core_size, PROT_READ | PROT_WRITE | PROT_EXEC);
+	NOEXCEPT_DO(MProtect(__libc_errno_access_core_start, core_size, PROT_READ | PROT_WRITE | PROT_EXEC));
 #define PUTB(b) (*writer++ = (b))
 #define PUTL(l) (UNALIGNED_SET32(writer, (uintptr_t)(l)), writer += 4)
 
@@ -176,7 +177,7 @@ NOTHROW(LIBCCALL nontls_errno_redirect)(void) {
 	PUTB(0xc3);
 
 	/* Revoke write access from the affected functions */
-	MProtect(__libc_errno_access_core_start, core_size, PROT_READ | PROT_EXEC);
+	NOEXCEPT_DO(MProtect(__libc_errno_access_core_start, core_size, PROT_READ | PROT_EXEC));
 
 	/* Remember that we did this whole re-assignment thingy. */
 	COMPILER_WRITE_BARRIER();

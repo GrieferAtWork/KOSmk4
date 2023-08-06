@@ -462,7 +462,8 @@
 #define __restrict restrict
 #define __restrict__ restrict
 #define __restrict_arr restrict
-#define __register /* Nothing */
+#define __register     /* Nothing */
+#define _Complex       /* Nothing */
 
 #define __COMPILER_HAVE_VARIABLE_LENGTH_ARRAYS
 #define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[]

@@ -77,7 +77,7 @@ typedef __uintptr_t lfutex_t;
 #define LFUTEXEXPR_TEXACT_BITS(Type, Field, bitmask, setmask)     LFUTEXEXPR_INIT(__builtin_offsetof(Type, Field), LFUTEX_WAIT_WHILE_BITMASK, bitmask, setmask) /* (x & bitmask) == setmask */
 #define LFUTEXEXPR_TNOT_EXACT_BITS(Type, Field, bitmask, setmask) LFUTEXEXPR_INIT(__builtin_offsetof(Type, Field), LFUTEX_WAIT_UNTIL_BITMASK, bitmask, setmask) /* (x & bitmask) != setmask */
 
-#ifdef __cplusplus
+#if defined(__cplusplus) && !defined(__CHECKER__)
 __NAMESPACE_INT_BEGIN
 extern "C++" {
 
@@ -173,7 +173,7 @@ __NAMESPACE_INT_END
 	(__NAMESPACE_INT_SYM __LFutexExprOffset(__builtin_offsetof(Type, Field)))
 #define LFUTEXEXPR_OFFSET(offset) \
 	(__NAMESPACE_INT_SYM __LFutexExprOffset(offset))
-#endif /* __cplusplus */
+#endif /* __cplusplus && !__CHECKER__ */
 
 };
 

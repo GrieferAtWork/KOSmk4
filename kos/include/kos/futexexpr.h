@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd796cc38 */
+/* HASH CRC-32:0x6cadaf46 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,7 +73,7 @@ typedef __uintptr_t lfutex_t;
 #define LFUTEXEXPR_TEXACT_BITS(Type, Field, bitmask, setmask)     LFUTEXEXPR_INIT(__builtin_offsetof(Type, Field), LFUTEX_WAIT_WHILE_BITMASK, bitmask, setmask) /* (x & bitmask) == setmask */
 #define LFUTEXEXPR_TNOT_EXACT_BITS(Type, Field, bitmask, setmask) LFUTEXEXPR_INIT(__builtin_offsetof(Type, Field), LFUTEX_WAIT_UNTIL_BITMASK, bitmask, setmask) /* (x & bitmask) != setmask */
 
-#ifdef __cplusplus
+#if defined(__cplusplus) && !defined(__CHECKER__)
 __NAMESPACE_INT_BEGIN
 extern "C++" {
 
@@ -169,7 +169,7 @@ __NAMESPACE_INT_END
 	(__NAMESPACE_INT_SYM __LFutexExprOffset(__builtin_offsetof(Type, Field)))
 #define LFUTEXEXPR_OFFSET(offset) \
 	(__NAMESPACE_INT_SYM __LFutexExprOffset(offset))
-#endif /* __cplusplus */
+#endif /* __cplusplus && !__CHECKER__ */
 
 #if defined(__CRT_HAVE_lfutexexpr) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> lfutexexpr(2), lfutexexpr64(2)

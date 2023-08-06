@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd32dab5f */
+/* HASH CRC-32:0xbbe3a5f1 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,6 @@
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_except_rethrow_defined) && defined(__CRT_HAVE_except_rethrow)
-#define __local___localdep_except_rethrow_defined
-__COMPILER_CREDIRECT_VOID(__LIBC,__ATTR_COLD __ATTR_NORETURN,,__LIBKCALL,__localdep_except_rethrow,(void),except_rethrow,())
-#endif /* !__local___localdep_except_rethrow_defined && __CRT_HAVE_except_rethrow */
 #ifndef __local___localdep_futex_waitwhile_defined
 #define __local___localdep_futex_waitwhile_defined
 #ifdef __CRT_HAVE_futex_waitwhile
@@ -121,11 +117,7 @@ __again:
 			                      __PTHREAD_ONCE_INIT,
 			                      __ATOMIC_RELEASE);
 #endif /* !__PRIVATE_PTHREAD_ONCE_USES_FUTEX */
-#ifdef __CRT_HAVE_except_rethrow
-			(__NAMESPACE_LOCAL_SYM __localdep_except_rethrow)();
-#else /* __CRT_HAVE_except_rethrow */
 			throw;
-#endif /* !__CRT_HAVE_except_rethrow */
 		}
 #else /* __cplusplus */
 		(*__init_routine)();

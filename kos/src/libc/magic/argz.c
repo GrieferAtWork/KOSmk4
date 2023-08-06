@@ -409,7 +409,7 @@ again_check_ch:
 @@of the given `pargz...+=pargz_len', and not just a string equal to one
 @@of the elements... (took me a while to realize this one)
 [[decl_include("<hybrid/typecore.h>")]]
-[[export_alias("__argz_add_sep")]]
+[[export_alias("__argz_delete")]]
 void argz_delete([[inout]] char **__restrict pargz,
                  [[inout]] size_t *__restrict pargz_len,
                  [[in_opt]] char *entry) {

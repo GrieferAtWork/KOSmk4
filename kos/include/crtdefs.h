@@ -492,7 +492,9 @@ __LOCAL void (__LIBDCALL _invalid_parameter)(__WCHAR16_TYPE__ const *__UNUSED(__
                                              __WCHAR16_TYPE__ const *__UNUSED(__func),
                                              __WCHAR16_TYPE__ const *__UNUSED(__file),
                                              unsigned int __UNUSED(__line),
-                                             __UINTPTR_TYPE__ __UNUSED(__zero)) {}
+                                             __UINTPTR_TYPE__ __UNUSED(__zero)) {
+	__COMPILER_IMPURE();
+}
 #endif /* !__CRT_HAVE__invalid_parameter */
 #else /* _DEBUG */
 #ifdef __CRT_HAVE__invalid_parameter_noinfo
@@ -514,6 +516,7 @@ __COMPILER_REDIRECT_VOID(_CRTIMP,__ATTR_NORETURN,,__LIBDCALL,_invalid_parameter_
 __COMPILER_REDIRECT_VOID(_CRTIMP,__ATTR_NORETURN,,__LIBDCALL,_invalid_parameter_noinfo_noreturn,(void),_exit,())
 #else /* ... */
 __LOCAL __ATTR_NORETURN void (__LIBDCALL _invalid_parameter_noinfo_noreturn)(void) {
+	__COMPILER_IMPURE();
 	for (;;) {
 	}
 }
@@ -533,6 +536,7 @@ __LOCAL __ATTR_NORETURN void
                             __WCHAR16_TYPE__ const *__UNUSED(__file),
                             unsigned int __UNUSED(__line),
                             __UINTPTR_TYPE__ __UNUSED(__zero)) {
+	__COMPILER_IMPURE();
 	for (;;) {
 	}
 }

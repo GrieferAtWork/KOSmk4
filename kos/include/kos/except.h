@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a5b0a49 */
+/* HASH CRC-32:0xcf71eaf1 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -532,12 +532,32 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_except_check_no_nesting, __FORCELOCAL __ATTR_AR
 #if !defined(NESTED_EXCEPTION) && defined(__NESTED_EXCEPTION)
 #define NESTED_EXCEPTION __NESTED_EXCEPTION
 #endif /* !NESTED_EXCEPTION && __NESTED_EXCEPTION */
-#if !defined(NOTHROW_BEGIN) && defined(__NOTHROW_BEGIN)
-#define NOTHROW_BEGIN __NOTHROW_BEGIN
-#endif /* !NOTHROW_BEGIN && __NOTHROW_BEGIN */
-#if !defined(NOTHROW_END) && defined(__NOTHROW_END)
-#define NOTHROW_END __NOTHROW_END
-#endif /* !NOTHROW_END && __NOTHROW_END */
+#if !defined(NOEXCEPT_START) && defined(__NOEXCEPT_START)
+#define NOEXCEPT_START __NOEXCEPT_START
+#endif /* !NOEXCEPT_START && __NOEXCEPT_START */
+#if !defined(NOEXCEPT_END) && defined(__NOEXCEPT_END)
+#define NOEXCEPT_END __NOEXCEPT_END
+#endif /* !NOEXCEPT_END && __NOEXCEPT_END */
+#ifndef NOEXCEPT_DO
+#ifdef __NOEXCEPT_START_IS_NOOP
+#define NOEXCEPT_DO(expr) (void)(expr)
+#elif defined(__NOEXCEPT_START) && defined(__NOEXCEPT_END) && !defined(__NO_XBLOCK)
+#define NOEXCEPT_DO(expr)  \
+	({                     \
+		__NOEXCEPT_START { \
+			(expr);        \
+		}                  \
+		__NOEXCEPT_END;    \
+		(void)0;           \
+	})
+#elif defined(__NOEXCEPT_START) && defined(__NOEXCEPT_END)
+#define NOEXCEPT_DO(expr) \
+	__NOEXCEPT_START {    \
+		(expr);           \
+	}                     \
+	__NOEXCEPT_END
+#endif /* ... */
+#endif /* !NOEXCEPT_DO */
 #if !defined(RAII_FINALLY) && defined(__RAII_FINALLY)
 #define RAII_FINALLY __RAII_FINALLY
 #endif /* !RAII_FINALLY && __RAII_FINALLY */

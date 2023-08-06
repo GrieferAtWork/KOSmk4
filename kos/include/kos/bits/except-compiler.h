@@ -30,9 +30,9 @@
  *       project... */
 #ifdef __cplusplus
 #ifdef __CHECKER__
-#define __RAII_FINALLY  __IF1
-#define __NOTHROW_BEGIN noexcept {
-#define __NOTHROW_END   }
+#define __RAII_FINALLY   __IF1
+#define __NOEXCEPT_START do noexcept
+#define __NOEXCEPT_END   __WHILE0
 #else /* __CHECKER__ */
 extern "C++" {
 __NAMESPACE_INT_BEGIN
@@ -58,31 +58,35 @@ __NAMESPACE_INT_END
 #endif /* !__COMPILER_UNIQUE */
 #define __RAII_FINALLY       auto __COMPILER_UNIQUE(__raii_finally) = __NAMESPACE_INT_SYM __FinallyBase()->*[&]
 
-/* Using NOTHROW_BEGIN ... NOTHROW_END, you can construct blocks of code
- * that will trigger undefined behavior  if they cause an exception.  In
- * debug-mode,  this undefined behavior includes panic/coredump, similar
+/* Using NOEXCEPT_START ... NOEXCEPT_END, you can construct blocks of code
+ * that will trigger  undefined behavior  if they cause  an exception.  In
+ * debug-mode, this  undefined behavior  includes panic/coredump,  similar
  * to when an exception is propagated through a NOTHROW function. */
-#ifndef __NOTHROW_BEGIN
-#if !defined(NDEBUG) && !defined(NDEBUG_EXCEPT) && !defined(NDEBUG_NOTHROW)
-#define __NOTHROW_BEGIN do try
-#define __NOTHROW_END   catch(...) { __builtin_unreachable(); } __WHILE0
-#else /* !NDEBUG && !NDEBUG_EXCEPT && !NDEBUG_NOTHROW */
+#ifndef __NOEXCEPT_START
+#ifdef __GNUC__
 /* Sadly, GCC doesn't see the optimization potential when  encountering
  * a catch-block that consists of nothing but `__builtin_unreachable()'
  *
  * It should be obvious that such a construct could be optimized into
  * a section of code that can be considered as NOTHROW, similar to an
  * inline function declared as NOTHROW. */
-#define __NOTHROW_BEGIN do
-#define __NOTHROW_END   __WHILE0
-#endif /* NDEBUG || NDEBUG_EXCEPT || NDEBUG_NOTHROW */
+#elif !defined(NDEBUG) && !defined(NDEBUG_EXCEPT) && !defined(NDEBUG_NOTHROW)
+#define __NOEXCEPT_START do try
+#define __NOEXCEPT_END   catch(...) { __builtin_unreachable(); } __WHILE0
+#endif /* ... */
+#endif /* !__NOEXCEPT_START */
 #endif /* !__CHECKER__ */
-#endif /* !__NOTHROW_BEGIN */
 
 #ifndef __TRY
 #define __TRY    try
 #define __EXCEPT catch(...)
 #endif /* !__TRY */
 #endif /* __cplusplus */
+
+#ifndef __NOEXCEPT_START
+#define __NOEXCEPT_START_IS_NOOP
+#define __NOEXCEPT_START do
+#define __NOEXCEPT_END   __WHILE0
+#endif /* !__NOEXCEPT_START */
 
 #endif /* !_KOS_BITS_EXCEPT_COMPILER_H */

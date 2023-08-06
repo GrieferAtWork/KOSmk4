@@ -94,7 +94,7 @@ NOTHROW_NCX(CC debugline_unit_count_dwarf4_numfiles)(di_debugline_unit_t const *
 }
 
 /* Find the data-blob associated with the `nth' extended file descriptor. */
-PRIVATE WUNUSED NONNULL((1)) byte_t const *
+PRIVATE WUNUSED NONNULL((1)) NCX byte_t const *
 NOTHROW_NCX(CC debugline_unit_get_extra_file)(di_debugline_unit_t const *__restrict self,
                                               dwarf_uleb128_t nth) {
 	NCX byte_t const *reader = self->dlu_textbase;
@@ -170,6 +170,7 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t *__restrict self, /
 		if (!index)
 			return;
 		--index;
+
 		/* Lazily calculate file counts. */
 		if (self->dlu_filecount == 0)
 			self->dlu_filecount = debugline_unit_count_dwarf4_numfiles(self);
@@ -186,8 +187,7 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t *__restrict self, /
 		/* Must be an extended file (~ala `DW_LNE_define_file')
 		 * NOTE: Officially, these were removed  in dwarf-5, but since  we
 		 *       also support dwarf-4, we still have to support them also!
-		 * s.a. DWARF4.pdf -- Section 6.2.5.3 -- 3. DW_LNE_define_file
-		 */
+		 * s.a. DWARF4.pdf -- Section 6.2.5.3 -- 3. DW_LNE_define_file */
 		index -= self->dlu_filecount;
 		parser.dsp_cu_info_pos = debugline_unit_get_extra_file(self, index);
 		if unlikely(!parser.dsp_cu_info_pos)
@@ -472,8 +472,9 @@ again:
 		result->dlu_filecount = dwarf_decode_uleb128(&reader); /* file_names_count */
 		result->dlu_filedata  = reader;                        /* file_names */
 	} else {
-		result->dlu_pathfmt   = (di_debugline_fileinfo_format_t const *)dwarf4_lne_pathfmt;
-		result->dlu_filefmt   = (di_debugline_fileinfo_format_t const *)dwarf4_lne_filefmt;
+		result->dlu_pathfmt = (di_debugline_fileinfo_format_t const *)dwarf4_lne_pathfmt;
+		result->dlu_filefmt = (di_debugline_fileinfo_format_t const *)dwarf4_lne_filefmt;
+
 		/* Scan path table. */
 		result->dlu_pathdata  = reader;
 		result->dlu_pathcount = 0;

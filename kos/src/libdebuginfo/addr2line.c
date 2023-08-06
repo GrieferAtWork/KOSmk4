@@ -118,13 +118,13 @@ NOTHROW_NCX(CC search_symtab)(di_addr2line_sections_t const *__restrict sections
 		                           (char *)sections->ds_strtab_start))
 			result->al_rawname = (char *)sections->ds_strtab_start + name_offset;
 	}
-	/* Special case: The  kernel  core doesn't  include  its internal  `.symtab'  as part  of  its binary
-	 *               image. This, combined  with the  fact that  the kernel  uses a  custom protocol  for
-	 *               declaring its exported symbols requires special handling if the caller is requesting
-	 *               information about the core itself.
-	 *               In this case, we can use the driver-api function `driver_symbol_at()', which includes
-	 *               special  handling for reversing the names of  public functions exported by the kernel
-	 *               core (However, this doesn't work for private/internal functions...)
+	/* Special case: The kernel core doesn't include its internal `.symtab' as part of its  binary
+	 *               image. This, combined with  the fact that the  kernel uses a custom  protocol
+	 *               for declaring its exported symbols requires special handling if the caller is
+	 *               requesting information about the core itself.
+	 * In this case, we can use the driver-api function `driver_dladdr_local()', which includes
+	 * special handling for reversing the names of public functions exported by the kernel core
+	 * (However, this doesn't work for private/internal functions...)
 	 * TODO: A similar special case should exist for `libdl.so'! */
 #ifdef __KERNEL__
 	else if (sections->ds_debug_line_start == __kernel_debug_line_start) {
@@ -216,8 +216,8 @@ again:
 			goto err_corrupt;
 		if (!assume_correct_cu) {
 			error = libdi_debuginfo_rnglists_contains(&cu.cu_ranges, self,
-			                                        cu.cu_ranges.r_startpc, module_relative_pc,
-			                                        di_addr2line_sections_as_di_rnglists_sections(sections));
+			                                          cu.cu_ranges.r_startpc, module_relative_pc,
+			                                          di_addr2line_sections_as_di_rnglists_sections(sections));
 			if (error == DEBUG_INFO_ERROR_NOFRAME)
 				goto next_root;
 		}
@@ -258,6 +258,7 @@ again_cu_component:
 						libdi_debuginfo_cu_parser_skipattr(self);
 					}
 				}
+
 				/* >> inline __attribute__((always_inline)) void inline_function(void) {
 				 * >> 	__asm__("nop");
 				 * >> }
@@ -276,6 +277,7 @@ again_cu_component:
 				 * LEVEL(1, test_function()) --> inline_function2
 				 * LEVEL(2, test_function()) --> test_function
 				 */
+
 				/* Search for inlined sub-programs */
 				if (!self->dup_comp.dic_haschildren) {
 					/* No children --> no sub-programs! */
@@ -288,6 +290,7 @@ again_cu_component:
 fill_result_sp:
 					result->al_rawname = sp.sp_rawname;
 					result->al_name    = sp.sp_name;
+
 					/* Scan the symbol tables for names. */
 					if (!sp.sp_rawname && !sp.sp_name)
 						search_symtab(sections, result, module_relative_pc, false);
@@ -305,6 +308,7 @@ fill_result_sp:
 						libdi_debugline_loadfile(&unit, sp.sp_decl_file,
 						                         di_debug_addr2line_dclas_debugline_fileinfo(result),
 						                         di_addr2line_sections_as_di_string_sections(sections));
+
 						/* Scan this CU for source-level information. */
 						error = libdi_debugline_scanunit(&unit, &info, module_relative_pc);
 						if (error == DEBUG_INFO_ERROR_SUCCESS) {
@@ -343,6 +347,7 @@ fill_result_sp_any_cu:
 					}
 					goto fill_result_debugline_failure;
 				}
+
 				/* Figure out how many levels of line function recursion are present at this location. */
 				inline_recursion        = 1;
 				subprogram_child_start  = self->dsp_cu_info_pos;
@@ -357,6 +362,7 @@ fill_result_sp_any_cu:
 						uintptr_t innermost_inline_symend;
 						if (!libdi_debuginfo_cu_parser_loadattr_inlined_subroutine(self, &is))
 							break;
+
 						/* Check if our PC is apart of the inline-function's body. */
 						error = libdi_debuginfo_rnglists_contains_ex(&is.is_ranges, self,
 						                                           cu.cu_ranges.r_startpc,
@@ -403,6 +409,7 @@ fill_result_sp_any_cu:
 					}
 					goto fill_result_sp;
 				}
+
 				/* Request for source information about an inline function call-site.
 				 * For  this,   we  must   gather  information   from  2   locations:
 				 * - The addr2line file/line/col information must be taken from the first
@@ -416,6 +423,7 @@ fill_result_sp_any_cu:
 				 *   this  information must instead be taken directly from the original `SP'!
 				 */
 				inline_recursion = (inline_recursion - level) - 1;
+
 				/* `inline_recursion' now  specifies the  number of  inline functions  to  skip
 				 * before the one containing the call-site source location information required
 				 * to  fill  in  the  file/line/col  information  of  the  result  is  reached.
@@ -472,6 +480,7 @@ fill_result_sp_any_cu:
 						libdi_debuginfo_cu_parser_skipattr(self);
 					}
 				}
+
 				/* At this point, the resulting file/line/col information
 				 * is available via the  call-site fields of `is',  while
 				 * information about  the containing  function is  stored
@@ -479,6 +488,7 @@ fill_result_sp_any_cu:
 				result->al_linediscr = 0;
 				result->al_rawname   = sp.sp_rawname;
 				result->al_name      = sp.sp_name;
+
 				/* Scan the symbol tables for names. */
 				if (!sp.sp_rawname && !sp.sp_name)
 					search_symtab(sections, result, module_relative_pc, false);
@@ -492,6 +502,7 @@ fill_result_sp_any_cu:
 				result->al_srcfile = NULL;
 				result->al_dclpath = NULL;
 				result->al_dclfile = NULL;
+
 				/* Load the debug_line program so we can decode file names. */
 				if (cu.cu_stmt_list < (size_t)(sections->ds_debug_line_end - sections->ds_debug_line_start)) {
 					debug_line_reader = sections->ds_debug_line_start + cu.cu_stmt_list;
@@ -516,6 +527,7 @@ fill_result_sp_any_cu:
 				break;
 			}
 		}
+
 		/* We're supposed to be apart of this CU, but couldn't find the associated function.
 		 * -> In any case, manually scan through the .debug_line tab (if it exists) */
 		error = scan_cu_stmt_list(&cu, sections, result, module_relative_pc, level);
@@ -528,7 +540,6 @@ done_scan_cu_stmt_list:
 			return error;
 		goto done;
 	}	break;
-
 
 	default:
 /*next_root_skipattr:*/
@@ -648,6 +659,7 @@ err_nodata:
 							goto done_success;
 						if (error == DEBUG_INFO_ERROR_NOLEVEL)
 							goto err_nodata;
+
 						/* If the CU doesn't contain information and we're not supposed to try
 						 * hard, trust the contents of  the .debug_aranges section and  assume
 						 * that no information for the specified address exists. */
@@ -662,6 +674,7 @@ err_nodata:
 					goto err_nodata_nolevel;
 			}
 		}
+
 		/* Search every CU for the specified location. */
 		has_corruptions = false;
 		cu_start        = sections->ds_debug_info_start;
@@ -670,6 +683,7 @@ err_nodata:
 			                                           &cu_sections, &cu, &abbrev, NULL);
 			if (error != DEBUG_INFO_ERROR_SUCCESS)
 				break;
+
 			/* Search the CU */
 			error = search_cu(&cu, sections, result, module_relative_pc, level, false);
 			libdi_debuginfo_cu_abbrev_fini(&abbrev);
@@ -698,6 +712,7 @@ err_nodata:
 			error = libdi_debugline_loadunit(&reader, sections->ds_debug_line_end, &unit);
 			if unlikely(error != DEBUG_INFO_ERROR_SUCCESS)
 				goto err_forward;
+
 			/* Scan this CU for source-level information. */
 			error = libdi_debugline_scanunit(&unit, &info, module_relative_pc);
 			if unlikely(error == DEBUG_INFO_ERROR_CORRUPT)
@@ -717,6 +732,7 @@ err_nodata:
 				result->al_linediscr = (uintptr_t)info.dl_discriminator;
 				result->al_rawname   = NULL;
 				result->al_name      = NULL;
+
 				/* Scan the symbol tables for names. */
 				search_symtab(sections, result, module_relative_pc, false);
 				result->al_cuname = NULL;
@@ -756,7 +772,7 @@ libdi_debug_addr2line_print_filename(pformatprinter printer, void *arg,
 	if (pathname && (pathname[0] == '/' || pathname[0] == '\\' ||
 	                 (isalpha(pathname[0]) && pathname[1] == ':'))) {
 		cubase = NULL; /* `pathname' is an absolute path (can happen for
-		                *  system include paths such as /usr/include) */
+		                * system include paths  such as  `/usr/include') */
 	}
 	for (strid = 0; strid < 2; ++strid) {
 		char const *str;
@@ -861,6 +877,7 @@ set_no_extened_debug_info:
 			module_section_decref(dl_sections->dl_debug_info);
 			goto set_no_extened_debug_info;
 		}
+
 		/* All all of the remaining debug information sections (which are optional, though) */
 		dl_sections->dl_debug_aranges  = locksection(secname_debug_aranges);
 		dl_sections->dl_debug_str      = locksection(secname_debug_str);
@@ -897,6 +914,7 @@ err_no_data:
 		}
 	}
 #undef locksection
+
 	/* Support for compressed sections. */
 #define LOAD_SECTION(sect, lv_start, lv_end)                                         \
 	do {                                                                             \

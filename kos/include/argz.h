@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac191ba1 */
+/* HASH CRC-32:0xc0854aef */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -674,7 +674,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2) erro
  * of the given `pargz...+=pargz_len', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
 __CDECLARE_VOID(__ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_IN_OPT(3),__NOTHROW_NCX,argz_delete,(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__entry),(__pargz,__pargz_len,__entry))
-#elif defined(__CRT_HAVE___argz_add_sep)
+#elif defined(__CRT_HAVE___argz_delete)
 /* >> argz_delete(3)
  * Find the index  of `entry' inside  of `pargz...+=pargz_len', and,  if
  * found, remove that entry by shifting all following elements downwards
@@ -682,7 +682,7 @@ __CDECLARE_VOID(__ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_IN_OPT(3),__NOTHROW_NCX,a
  * Note that `entry' must  be the actual pointer  to one of the  elements
  * of the given `pargz...+=pargz_len', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
-__CREDIRECT_VOID(__ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_IN_OPT(3),__NOTHROW_NCX,argz_delete,(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__entry),__argz_add_sep,(__pargz,__pargz_len,__entry))
+__CREDIRECT_VOID(__ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_IN_OPT(3),__NOTHROW_NCX,argz_delete,(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__entry),__argz_delete,(__pargz,__pargz_len,__entry))
 #else /* ... */
 #include <libc/local/argz/argz_delete.h>
 /* >> argz_delete(3)
@@ -703,7 +703,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(argz_delete, __FORCELOCAL __ATTR_ARTIFICIAL __AT
  * of the given `pargz...+=pargz_len', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
 __CREDIRECT_VOID(__ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_IN_OPT(3),__NOTHROW_NCX,__argz_delete,(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__entry),argz_delete,(__pargz,__pargz_len,__entry))
-#elif defined(__CRT_HAVE___argz_add_sep)
+#elif defined(__CRT_HAVE___argz_delete)
 /* >> argz_delete(3)
  * Find the index  of `entry' inside  of `pargz...+=pargz_len', and,  if
  * found, remove that entry by shifting all following elements downwards
@@ -711,7 +711,7 @@ __CREDIRECT_VOID(__ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_IN_OPT(3),__NOTHROW_NCX,
  * Note that `entry' must  be the actual pointer  to one of the  elements
  * of the given `pargz...+=pargz_len', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
-__CREDIRECT_VOID(__ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_IN_OPT(3),__NOTHROW_NCX,__argz_delete,(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__entry),__argz_add_sep,(__pargz,__pargz_len,__entry))
+__CDECLARE_VOID(__ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_IN_OPT(3),__NOTHROW_NCX,__argz_delete,(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__entry),(__pargz,__pargz_len,__entry))
 #else /* ... */
 #include <libc/local/argz/argz_delete.h>
 /* >> argz_delete(3)

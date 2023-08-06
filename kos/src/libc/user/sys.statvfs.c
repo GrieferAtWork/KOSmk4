@@ -30,9 +30,9 @@
 DECL_BEGIN
 
 
-FORCELOCAL void LIBCCALL
-statfs_to_statvfs(struct statvfs *__restrict dst,
-                  struct statfs const *__restrict src) {
+FORCELOCAL void
+NOTHROW_NCX(LIBCCALL statfs_to_statvfs)(struct statvfs *__restrict dst,
+                                        struct statfs const *__restrict src) {
 	dst->f_bsize   = src->f_bsize;
 	dst->f_frsize  = src->f_frsize;
 	dst->f_blocks  = src->f_blocks;
@@ -53,9 +53,9 @@ statfs_to_statvfs(struct statvfs *__restrict dst,
 	dst->f_namemax = src->f_namelen;
 }
 
-FORCELOCAL void LIBCCALL
-statfs64_to_statvfs64(struct statvfs64 *__restrict dst,
-                      struct statfs64 const *__restrict src) {
+FORCELOCAL void
+NOTHROW_NCX(LIBCCALL statfs64_to_statvfs64)(struct statvfs64 *__restrict dst,
+                                            struct statfs64 const *__restrict src) {
 	dst->f_bsize   = src->f_bsize;
 	dst->f_frsize  = src->f_frsize;
 	dst->f_blocks  = src->f_blocks;

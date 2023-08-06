@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2987571 */
+/* HASH CRC-32:0x97fb5ef6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,11 +46,11 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_VOID(__ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_IN_OPT(3),__NOTHROW_NCX,__localdep_argz_delete,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char *__entry),argz_delete,(__pargz,__pargz_len,__entry))
-#elif defined(__CRT_HAVE___argz_add_sep)
+#elif defined(__CRT_HAVE___argz_delete)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_IN_OPT(3),__NOTHROW_NCX,__localdep_argz_delete,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char *__entry),__argz_add_sep,(__pargz,__pargz_len,__entry))
+__CREDIRECT_VOID(__ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_IN_OPT(3),__NOTHROW_NCX,__localdep_argz_delete,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char *__entry),__argz_delete,(__pargz,__pargz_len,__entry))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/argz/argz_delete.h>

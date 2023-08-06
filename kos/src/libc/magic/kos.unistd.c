@@ -300,7 +300,7 @@ ssize_t WritePrinter(/*fd_t*/ void *fd,
 %(auto_header){
 #if !defined(__KERNEL__) && (defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__)
 /* Define the libc internal header variant as an alias for WriteAll() when it would otherwise not be defined. */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(__FORMATPRINTER_CC libc_WritePrinter)(void *fd, char const *__restrict buf, size_t bufsize) ASMNAME("libc_WriteAll") THROWS(...);
+INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(__FORMATPRINTER_CC libc_WritePrinter)(void *fd, char const *__restrict buf, size_t bufsize) THROWS(...) ASMNAME("libc_WriteAll");
 #endif /* !__KERNEL__ && (__LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_INT__ == __SIZEOF_POINTER__) */
 }
 

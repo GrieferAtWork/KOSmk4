@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd69cbf2d */
+/* HASH CRC-32:0xc11a0f3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/pthread.h"
-#include "../user/kos.except.h"
 #include "../user/kos.futex.h"
 #include "../user/sched.h"
 #include "../user/unistd.h"
@@ -99,11 +98,7 @@ again:
 			                      __PTHREAD_ONCE_INIT,
 			                      __ATOMIC_RELEASE);
 #endif /* !__PRIVATE_PTHREAD_ONCE_USES_FUTEX */
-
-			libc_except_rethrow();
-
-
-
+			throw;
 		}
 #else /* __cplusplus */
 		(*init_routine)();

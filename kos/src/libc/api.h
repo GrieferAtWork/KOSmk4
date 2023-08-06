@@ -318,13 +318,18 @@ INTDEF atflag_t libd_AT_DOSPATH; /* Either `0' or `AT_DOSPATH' */
 #define libd_have_dosfs() (libd_O_DOSPATH != 0)
 
 
-#if 1
-#define LIBC_HAVE_LOG_UNIMPLEMENTED 1
+#ifdef __CHECKER__
+#define LIBC_HAVE_LOG_UNIMPLEMENTED
+#define CRT_UNIMPLEMENTED(name) COMPILER_IMPURE()
+#define CRT_UNIMPLEMENTEDF(...) COMPILER_IMPURE()
+#elif 1
+#define LIBC_HAVE_LOG_UNIMPLEMENTED
 INTDEF void LIBCCALL libc_unimplemented(char const *__restrict name);
 INTDEF void VLIBCCALL libc_unimplementedf(char const *__restrict format, ...);
 #define CRT_UNIMPLEMENTED(name) libc_unimplemented(name)
 #define CRT_UNIMPLEMENTEDF(...) libc_unimplementedf(__VA_ARGS__)
 #else
+#undef LIBC_HAVE_LOG_UNIMPLEMENTED
 #define CRT_UNIMPLEMENTED(name) (void)0
 #define CRT_UNIMPLEMENTEDF(...) (void)0
 #endif

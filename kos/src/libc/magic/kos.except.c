@@ -2208,12 +2208,32 @@ void _except_check_no_nesting(void) {
 #if !defined(NESTED_EXCEPTION) && defined(__NESTED_EXCEPTION)
 #define NESTED_EXCEPTION __NESTED_EXCEPTION
 #endif /* !NESTED_EXCEPTION && __NESTED_EXCEPTION */
-#if !defined(NOTHROW_BEGIN) && defined(__NOTHROW_BEGIN)
-#define NOTHROW_BEGIN __NOTHROW_BEGIN
-#endif /* !NOTHROW_BEGIN && __NOTHROW_BEGIN */
-#if !defined(NOTHROW_END) && defined(__NOTHROW_END)
-#define NOTHROW_END __NOTHROW_END
-#endif /* !NOTHROW_END && __NOTHROW_END */
+#if !defined(NOEXCEPT_START) && defined(__NOEXCEPT_START)
+#define NOEXCEPT_START __NOEXCEPT_START
+#endif /* !NOEXCEPT_START && __NOEXCEPT_START */
+#if !defined(NOEXCEPT_END) && defined(__NOEXCEPT_END)
+#define NOEXCEPT_END __NOEXCEPT_END
+#endif /* !NOEXCEPT_END && __NOEXCEPT_END */
+#ifndef NOEXCEPT_DO
+#ifdef __NOEXCEPT_START_IS_NOOP
+#define NOEXCEPT_DO(expr) (void)(expr)
+#elif defined(__NOEXCEPT_START) && defined(__NOEXCEPT_END) && !defined(__NO_XBLOCK)
+#define NOEXCEPT_DO(expr)  \
+	({                     \
+		__NOEXCEPT_START { \
+			(expr);        \
+		}                  \
+		__NOEXCEPT_END;    \
+		(void)0;           \
+	})
+#elif defined(__NOEXCEPT_START) && defined(__NOEXCEPT_END)
+#define NOEXCEPT_DO(expr) \
+	__NOEXCEPT_START {    \
+		(expr);           \
+	}                     \
+	__NOEXCEPT_END
+#endif /* ... */
+#endif /* !NOEXCEPT_DO */
 #if !defined(RAII_FINALLY) && defined(__RAII_FINALLY)
 #define RAII_FINALLY __RAII_FINALLY
 #endif /* !RAII_FINALLY && __RAII_FINALLY */

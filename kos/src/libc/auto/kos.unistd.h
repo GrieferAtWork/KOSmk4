@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa546c763 */
+/* HASH CRC-32:0xa4f48df2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,7 +79,7 @@ INTDEF ATTR_INS(2, 3) ssize_t (__FORMATPRINTER_CC libc_WritePrinter)(void *fd, c
 #endif /* !__KERNEL__ && (!__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_INT__ != __SIZEOF_POINTER__) */
 #if !defined(__KERNEL__) && (defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__)
 /* Define the libc internal header variant as an alias for WriteAll() when it would otherwise not be defined. */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(__FORMATPRINTER_CC libc_WritePrinter)(void *fd, char const *__restrict buf, size_t bufsize) ASMNAME("libc_WriteAll") THROWS(...);
+INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(__FORMATPRINTER_CC libc_WritePrinter)(void *fd, char const *__restrict buf, size_t bufsize) THROWS(...) ASMNAME("libc_WriteAll");
 #endif /* !__KERNEL__ && (__LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_INT__ == __SIZEOF_POINTER__) */
 #ifndef __KERNEL__
 /* >> preadall(3), preadall64(3)

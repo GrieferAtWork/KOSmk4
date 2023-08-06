@@ -637,7 +637,7 @@ err_bad_op:
 			}
 			if (checker.currentFunctionTypeRef !is none) {
 				local pointerNoThrow: string | none = typeref.attribNothrow;
-				if (pointerNoThrow !is none) {
+				if (pointerNoThrow !is none && !pointerNoThrow.startswith("*")) {
 					/* Issue a warning if:
 					 * - The current function doesn't have a __attribute__((nothrow(N))) attribute
 					 * - The current function has a nothrow level N that is lower than `pointerNoThrow' */

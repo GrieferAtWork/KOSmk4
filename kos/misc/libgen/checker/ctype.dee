@@ -27,8 +27,15 @@ import ctypes;
 #define IDENTICAL(a, b) (type(a) === type(b) && ((a) == (b)))
 
 global CPointerType;
+global CPointerType32;
+global CPointerType64;
 global CLValueType;
 global CFunctionType;
+global CCoreType;
+global CStructType;
+global CArrayType;
+global CEnumType;
+global CCoreFloatType;
 
 global C_INT;
 global C_LONG;
@@ -37,6 +44,7 @@ global C_UNSIGNED;
 global C_NUMERIC;
 
 global C_void;
+global C_int;
 
 
 class CType: WeakRefAble {
@@ -323,6 +331,36 @@ final class CTypeAttributes {
 	}
 }
 
+function simplifyType(checker: Checker, typ: CType): CType {
+	if (typ is CEnumType)
+		return typ.base;
+	if (typ is CPointerType32)
+		return C_int;
+	if (typ is CPointerType64)
+		return checker.TARGET_C_llong;
+	return typ;
+}
+
+function ceilAlign(x: int, a: int): int {
+	return (x + a - 1) & -a;
+}
+
+@@Check if @this @CTypeRef is binary-compatible with @newTypeRef
+function binaryConvertibleTo(checker: Checker, oldType: CType, newType: CType, localAlign: int = 1): bool {
+	oldType = simplifyType(checker, oldType);
+	newType = simplifyType(checker, newType);
+	if (oldType === newType)
+		return true;
+	if ((oldType is CArrayType || oldType is CStructType || oldType is CCoreType) &&
+		(newType is CArrayType || newType is CStructType || newType is CCoreType)) {
+		return ceilAlign(oldType.sizeof, localAlign) >= ceilAlign(newType.sizeof, localAlign) &&
+			   ceilAlign(oldType.alignof, localAlign) >= ceilAlign(newType.alignof, localAlign);
+	}
+	if (oldType is CFunctionType && newType is CFunctionType)
+		return oldType.binaryCompatibleWith(checker, newType);
+	return false;
+}
+
 
 final class CTypeRef {
 	this = default;
@@ -505,8 +543,8 @@ final class CTypeRef {
 			}
 			checker.warn("-Wdecl", message);
 		}
-		assert type(typ) === type(other.typ);
-		typ.redeclarationImport(checker, other.typ, newName, oldName, oldDeclFlc);
+		if (type(typ) === type(other.typ))
+			typ.redeclarationImport(checker, other.typ, newName, oldName, oldDeclFlc);
 	}
 
 	@@Import specifications from a fixed @typedef into @this
@@ -528,13 +566,13 @@ final class CTypeRef {
 			dst.flags |= flags & CTYPEREF_FLAG_NONSENSE_PTRBASE_REGULAR;
 			flags &= ~CTYPEREF_FLAG_NONSENSE_PTRBASE_REGULAR;
 		}
-		local attrib: CTypeAttributes | none = this.attrib;
-		if (attrib !is none) {
+		local myAttrib: CTypeAttributes | none = attrib;
+		if (myAttrib !is none) {
 			for (local moveAttrib: CTYPEATTRIBUTES_NONSENSE_PTRBASE_REGULAR) {
-				local value = attrib.operator . (moveAttrib);
+				local value = myAttrib.operator . (moveAttrib);
 				if (value !is none) {
 					dst.requireAttrib.operator . (moveAttrib) = value;
-					attrib.operator . (moveAttrib) = none;
+					myAttrib.operator . (moveAttrib) = none;
 				}
 			}
 		}
@@ -565,6 +603,7 @@ final class CTypeRef {
 				       innerMostReturnPointerBaseTypeRef.typ is CLValueType)
 					innerMostReturnPointerBaseTypeRef = innerMostReturnPointerBaseTypeRef.typ.base;
 				innerMostReturnPointerBaseTypeRef.moveNonPointerAttributes(this);
+				attrib = this.attrib;
 			}
 			if (flags & CTYPEREF_FLAG_NONSENSE_FUNCTION) {
 				if (flags & CTYPEREF_FLAG_NONNULL) {
@@ -648,6 +687,7 @@ final class CTypeRef {
 				       innerMostReturnPointerBaseTypeRef.typ is CLValueType)
 					innerMostReturnPointerBaseTypeRef = innerMostReturnPointerBaseTypeRef.typ.base;
 				innerMostReturnPointerBaseTypeRef.moveNonPointerAttributes(this);
+				attrib = this.attrib;
 			}
 			if (flags & CTYPEREF_FLAG_NONSENSE_PTRBASE_FUNCTION) {
 				if (flags & CTYPEREF_FLAG_NONNULL) {
@@ -845,6 +885,8 @@ final class CCoreIntType: CCoreType {
 			f"alignof: {repr this.alignof}, "
 			f"signed: {repr signed})";
 	public function isConvertibleTo(other: CType, explicit: bool = false): bool {
+		if (other is CEnumType)
+			other = other.base;
 		return (other in C_NUMERIC) ||
 		       (other is CPointerType);
 	}
@@ -871,6 +913,12 @@ final class CCoreIntType: CCoreType {
 
 final class CCoreBoolType: CCoreType {
 	this = super;
+	public function isConvertibleTo(other: CType, explicit: bool = false): bool {
+		if (other is CEnumType)
+			other = other.base;
+		return (other in C_NUMERIC) ||
+		       (other is CPointerType);
+	}
 	public function dumpValue(checker: Checker, data: Bytes, offset: int, indent: int = -1): string {
 		return str !!peek(checker, data, offset);
 	}
@@ -1217,7 +1265,7 @@ class CLValueType: CType {
 	public operator != (other: CLValueType): bool -> base != other.base;
 	function isConvertibleTo(other: CType, explicit: bool = false): bool {
 		if (other !is CLValueType)
-			return base.isConvertibleTo(other.base, explicit);
+			return base.isConvertibleTo(other, explicit);
 		if (explicit)
 			return true;
 		return base.isConvertibleToWithFlags(other.base, explicit);
@@ -1227,6 +1275,7 @@ class CLValueType: CType {
 final class CStructType: CType {
 	this = default;
 	public member name: string;
+	public member isUnion: bool;
 	public member base: CStructType | none = none;
 	public member fields: {string: (CTypeRef, int)} = Dict();
 	public member fieldsByDeclarationOrder: {(CTypeRef, string)...} = [];
@@ -1381,13 +1430,14 @@ final class CEnumType: CType {
 	public operator == (other: CStructType) -> this === other;
 	public operator != (other: CStructType) -> this !== other;
 	function isConvertibleTo(other: CType, explicit: bool = false): bool {
-#if 1
+		if (other is CEnumType) {
+			if (this === other)
+				return true;
+			if (!explicit)
+				return false;
+			return base.isConvertibleTo(other.base, true);
+		}
 		return base.isConvertibleTo(other, explicit);
-#else
-		if (explicit)
-			return base.isConvertibleTo(other, explicit);
-		return this === other;
-#endif
 	}
 	function tostr(varname: string = ""): string {
 		return varname ? f"enum {name} {varname}" : f"enum {name}";
@@ -1453,6 +1503,29 @@ final class CFunctionType: CType {
 					f"{oldName}.{otherArgName}",
 					oldDeclFlc);
 		}
+	}
+
+	function binaryArgsSize(checker: Checker): int {
+		local result = 0;
+		local sizeofPointer = checker.TARGET_SIZEOF_POINTER;
+		if (returnType is CStructType)
+			result += sizeofPointer; /* Struct return is done with an implicit pointer argument inserted at the front */
+		for (local typeref, none: args) {
+			result = ceilAlign(result, typeref.alignof);
+			result += ceilAlign(typeref.sizeof, sizeofPointer);
+		}
+		return result;
+	}
+
+	function binaryCompatibleWith(checker: Checker, newType: CFunctionType): bool {
+		/* TODO: Assert compatible calling conventions */
+		local sizeofPointer = checker.TARGET_SIZEOF_POINTER;
+		if (!binaryConvertibleTo(checker, returnType, newType.returnType, sizeofPointer))
+			return false;
+		local oldArgsSize = binaryArgsSize(checker);
+		local newArgsSize = newType.binaryArgsSize(checker);
+		/* TODO: For STDCALL, this check needs to be `oldArgsSize == newArgsSize' */
+		return oldArgsSize <= newArgsSize;
 	}
 
 	public operator hash(): int -> hash(returnType, isVarArgs, args.each.first);

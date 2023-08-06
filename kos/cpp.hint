@@ -1314,6 +1314,10 @@
 #define __NESTED_TRY
 #define UNNESTED_TRY
 #define __UNNESTED_TRY
+#define NOEXCEPT_START
+#define __NOEXCEPT_START
+#define NOEXCEPT_END
+#define __NOEXCEPT_END
 #define EXCEPT
 #define __EXCEPT
 #define RETHROW() throw

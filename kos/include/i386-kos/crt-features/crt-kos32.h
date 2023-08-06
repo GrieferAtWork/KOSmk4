@@ -379,6 +379,7 @@
 #define __CRT_HAVE___argz_count
 #define __CRT_HAVE___argz_create
 #define __CRT_HAVE___argz_create_sep
+#define __CRT_HAVE___argz_delete
 #define __CRT_HAVE___argz_extract
 #define __CRT_HAVE___argz_insert
 #define __CRT_HAVE___argz_next

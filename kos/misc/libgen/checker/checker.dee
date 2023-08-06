@@ -748,12 +748,15 @@ default_case:
 
 	function parseStruct(structName: string, tr: CTypeRef, isUnion: bool): CStructType {
 		local struct: CStructType;
+		local qualifiedStructName: string = structName;
+		if (qualifiedStructName)
+			qualifiedStructName = f"{currentNamespacePrefix}{qualifiedStructName}";
 		if (structName) {
 			local tabName: string = isUnion ? "unionSymbols" : "structSymbols";
 			/* Check if the struct was already defined somewhere */
 			struct = lookup(tabName, structName);
 			if (struct is none) {
-				struct = CStructType(name: structName);
+				struct = CStructType(name: qualifiedStructName, isUnion: isUnion);
 				local tab = namespaceStack.first.operator . (tabName);
 				if (tab is none)
 					namespaceStack.first.operator . (tabName) = tab = Dict();
@@ -780,7 +783,7 @@ default_case:
 				}
 			}
 		} else {
-			struct = CStructType(name: structName);
+			struct = CStructType(name: qualifiedStructName, isUnion: isUnion);
 		}
 		tr.typ = struct;
 		parseCTypeRefAttributes(tr);
@@ -1966,12 +1969,14 @@ prefix_again:
 			}
 		}
 
-		if (functionNothrow is none) {
+		if (encounteredAsm) {
+			/* Don't warn if the annotation is more restrictive than it needs to be. */
+		} else if (functionNothrow is none) {
 			/* Figure out which annotation the function should have (if any) */
 			local expectedAnnotation: string;
 			if (bodyThrows.remove(THROWS_OOB)) {
 				expectedAnnotation = "";
-			} else if (bodyThrows || encounteredAsm) {
+			} else if (bodyThrows) {
 				expectedAnnotation = "";
 			} else {
 				local bodyHasNcx = bodyThrows.remove(THROWS_NCX);
@@ -2250,6 +2255,25 @@ again:
 			this.next();
 			this.skip(";");
 			break;
+
+		case "noexcept": {
+			if (!cxx)
+				goto default_case;
+			local savedIsInTryBlock                        = isInTryBlock;
+			local savedCurrentTryBlockExceptions           = currentTryBlockExceptions;
+			local savedCurrentTryBlockGreatestNothrowLevel = currentTryBlockGreatestNothrowLevel;
+			currentTryBlockExceptions           = HashSet();
+			currentTryBlockGreatestNothrowLevel = -1;
+			this.next();
+
+			/* Suppress warnings about unhandled exceptions in the associated statement. */
+			isInTryBlock = true;
+			this.parseStatement();
+
+			isInTryBlock                        = savedCurrentTryBlockExceptions;
+			currentTryBlockExceptions           = savedCurrentTryBlockExceptions;
+			currentTryBlockGreatestNothrowLevel = savedCurrentTryBlockGreatestNothrowLevel;
+		}	break;
 
 		case "try": {
 			if (!cxx)
@@ -3494,23 +3518,24 @@ again:
 					imports.append(ns);
 				}
 			} else {
+				local name: string;
+				local element: Object | none;
+				local tab: {string: Object} | none;
 				if (this.tok.issymbol() && this.nextTokIsEquals()) {
 					/* using foo = bar; */
-					local name: string = this.parseSymbolName();
+					name = this.parseSymbolName();
 					this.skip("=");
-					local newTypeRef: CTypeRef | none = nsLookupChain("typedefs");
-					if (newTypeRef is none)
+					element = nsLookupChain("typedefs");
+					if (element is none)
 						this.err(f"No such symbol/typedef `{this.tok}'");
-					local tab: {string: CTypeRef} | none = namespaceStack.first.typedefs;
+					tab = namespaceStack.first.typedefs;
 					local existingTypeRef: CTypeRef | none = tab.get(name);
-					if (existingTypeRef !is none && existingTypeRef != newTypeRef)
+					if (existingTypeRef !is none && existingTypeRef != element)
 						this.err(f"Duplicate declaration of {name}");
 					if (tab is none)
 						namespaceStack.first.typedefs = tab = Dict();
-					tab[name] = newTypeRef;
 				} else {
 					local tabName: string;
-					local element: Object | none;
 					for (tabName: ["symbols", "typedefs"]) {
 						element = nsLookupChain(tabName);
 						if (element !is none)
@@ -3518,14 +3543,29 @@ again:
 					}
 					if (element is none)
 						this.err(f"No such symbol/typedef `{this.tok}'");
-					local name: string = _nsLookupChildChainSymbolName;
-					local tab: {string: Object} | none = namespaceStack.first.operator . (tabName);
+					name = _nsLookupChildChainSymbolName;
+					tab = namespaceStack.first.operator . (tabName);
 					local existingElement: Object | none = tab.get(name);
-					if (existingElement !is none && existingElement != element)
+					if (existingElement !is none && !IDENTICAL(existingElement, element))
 						this.err(f"Duplicate declaration of {name}");
 					if (tab is none)
 						namespaceStack.first.operator . (tabName) = tab = Dict();
-					tab[name] = element;
+				}
+				tab[name] = element;
+				if (element is CTypeRef) {
+					local typ: CType = element.typ;
+					local extraTabName: string | none = none;
+					if (typ is CStructType) {
+						extraTabName = typ.isUnion ? "unionSymbols" : "structSymbols";
+					} else if (typ is CEnumType) {
+						extraTabName = "enumSymbols";
+					}
+					if (extraTabName !is none) {
+						tab = namespaceStack.first.operator . (extraTabName);
+						if (tab is none)
+							namespaceStack.first.operator . (extraTabName) = tab = Dict();
+						tab.setnew(name, typ);
+					}
 				}
 			}
 			this.skip(";");
@@ -4187,6 +4227,18 @@ again_builtin_container_of_suffix:
 		// TODO: double __builtin_nan(char const *str);
 		// TODO: float __builtin_nanf(char const *str);
 		// TODO: long double __builtin_nanl(char const *str);
+		// TODO: bool __builtin_isgreater(TFLOAT x, TFLOAT y);
+		// TODO: bool __builtin_isgreaterequal(TFLOAT x, TFLOAT y);
+		// TODO: bool __builtin_isless(TFLOAT x, TFLOAT y);
+		// TODO: bool __builtin_islessequal(TFLOAT x, TFLOAT y);
+		// TODO: bool __builtin_islessgreater(TFLOAT x, TFLOAT y);
+		// TODO: bool __builtin_isunordered(TFLOAT u, TFLOAT v);
+		// TODO: int __builtin_fpclassify(int FP_NAN, int FP_INFINITE, int FP_NORMAL, int FP_SUBNORMAL, int FP_ZERO, TFLOAT x);
+		// TODO: bool __builtin_iseqsig(TFLOAT x, TFLOAT y);
+		// TODO: bool __builtin_isfinite(TFLOAT x);
+		// TODO: bool __builtin_isinf_sign(TFLOAT x);
+		// TODO: bool __builtin_isnormal(TFLOAT x);
+		// TODO: bool __builtin_signbit(TFLOAT x);
 
 		case "(": {
 			this.next();
@@ -4795,13 +4847,46 @@ again:
 				local oldSymbolTypeRef: CTypeRef = oldSymbol.typeref;
 				local newSymbolTypeRef: CTypeRef = newSymbol.typeref;
 				this.pushWarnLocationOverride(newSymbol.decl);
-				if (oldSymbolTypeRef.redeclarationEquals(newSymbolTypeRef)) {
+				/* NOTE: Only check for binary compatibility here (not declaration compatibility) */
+				if (oldSymbol is COverloadedFunctionSymbol) {
+					for (oldSymbol: oldSymbol.overloads) {
+						if (oldSymbol is CSymbol) {
+							oldSymbolTypeRef = oldSymbol.typeref;
+							if (newSymbol is COverloadedFunctionSymbol) {
+								for (local overloadedNewSymbol: newSymbol.overloads) {
+									newSymbolTypeRef = overloadedNewSymbol.typeref;
+									if (binaryConvertibleTo(this, oldSymbolTypeRef.typ, newSymbolTypeRef.typ)) {
+										newSymbol = overloadedNewSymbol;
+										goto do_import_from_newSymbolTypeRef;
+									}
+								}
+							} else {
+								if (binaryConvertibleTo(this, oldSymbolTypeRef.typ, newSymbolTypeRef.typ))
+									goto do_import_from_newSymbolTypeRef;
+							}
+						}
+					}
+					goto warn_incompatible;
+				} else if (newSymbol is COverloadedFunctionSymbol) {
+					for (newSymbol: newSymbol.overloads) {
+						if (newSymbol is CSymbol) {
+							newSymbolTypeRef = newSymbol.typeref;
+							if (binaryConvertibleTo(this, oldSymbolTypeRef.typ, newSymbolTypeRef.typ))
+								goto do_import_from_newSymbolTypeRef;
+						}
+					}
+					goto warn_incompatible;
+				}
+				if (binaryConvertibleTo(this, oldSymbolTypeRef.typ, newSymbolTypeRef.typ)) {
+do_import_from_newSymbolTypeRef:
 					deepcopy(oldSymbolTypeRef).redeclarationImport(this, newSymbolTypeRef,
 						newSymbolName, oldSymbolName, oldSymbol.decl);
 				} else {
+warn_incompatible:
 					this.warn("-Wdecl",
-						f"redeclaration of `{newSymbolTypeRef.tostr(newSymbolName)}'"
-						f"{this.formatMessageAddend(oldSymbol.decl, f'previously declared as `{
+						f"binary incompatible alias `{newSymbolTypeRef.tostr(newSymbolName)}'"
+						f"{this.formatMessageAddend(oldSymbol.decl,
+						f'previously declared as `{
 							oldSymbolTypeRef.tostr(oldSymbolName)
 						}\'')}");
 				}

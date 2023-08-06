@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9822f11 */
+/* HASH CRC-32:0x6e0dbe4b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1284,7 +1284,7 @@ struct __pthread_cleanup_frame {
 	int               __cancel_type;
 };
 #if defined(__GNUC__) && defined(__EXCEPTIONS)
-#ifdef __cplusplus
+#if defined(__cplusplus) && !defined(__CHECKER__)
 /* Class to handle cancellation handler invocation. */
 class __pthread_cleanup_class {
 	void (__LIBKCALL *__cancel_routine)(void *);
@@ -1341,7 +1341,7 @@ public:
 		__clframe.__setdoit(execute);           \
 	}	__WHILE0
 #endif /* __USE_GNU */
-#else /* __cplusplus */
+#else /* __cplusplus && !__CHECKER__ */
 #ifdef __CRT_HAVE___pthread_cleanup_routine
 /* Function called to call the cleanup handler. As an extern inline
  * function the compiler is free to decide inlining the change when
@@ -1397,7 +1397,7 @@ __LOCAL void __NOTHROW_NCX(__LIBCCALL __pthread_cleanup_routine)(struct __pthrea
 	}	__WHILE0
 
 #endif /* __USE_GNU */
-#endif /* !__cplusplus */
+#endif /* !__cplusplus || __CHECKER__ */
 #else /* __GNUC__ && __EXCEPTIONS */
 /* Install  a cleanup handler: `routine' will be called with arguments `arg'
  * when  the thread is  canceled or calls  pthread_exit. `routine' will also
