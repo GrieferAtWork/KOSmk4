@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix `da_recursion` uninitialized during thread init"
-DEEMON_VERSION="325b82eec77f3e31722928a249f42a0a55913ecc"
+#     v -- "Add more features to RangeMap proxy wrappers"
+DEEMON_VERSION="11314a848798fcd026ff8d76825a055404cee8c9"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
