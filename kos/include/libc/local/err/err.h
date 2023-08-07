@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cbf2701 */
+/* HASH CRC-32:0x4431549a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,12 +25,11 @@
 #include <libc/template/program_invocation_name.h>
 #include <features.h>
 #if defined(__CRT_HAVE_verr) || defined(__CRT_HAVE_verrc) || ((defined(__CRT_HAVE_vwarnc) || (defined(__LOCAL_stderr) && defined(__LOCAL_program_invocation_short_name) && (defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))) && (defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit)))
-#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_verr_defined
 #define __local___localdep_verr_defined
 #ifdef __CRT_HAVE_verr
-__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_IN_OPT(2) __ATTR_LIBC_PRINTF(2, 0),__THROWING(...),__localdep_verr,(int __status, char const *__format, __builtin_va_list __args),verr,(__status,__format,__args))
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_IN_OPT(2) __ATTR_LIBC_PRINTF(2, 0),__NOTHROW_CB,__localdep_verr,(int __status, char const *__format, __builtin_va_list __args),verr,(__status,__format,__args))
 #elif defined(__CRT_HAVE_verrc) || ((defined(__CRT_HAVE_vwarnc) || (defined(__LOCAL_stderr) && defined(__LOCAL_program_invocation_short_name) && (defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))) && (defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/err/verr.h>
@@ -41,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_verr_defined */
 __LOCAL_LIBC(err) __ATTR_NORETURN __ATTR_IN_OPT(2) __ATTR_LIBC_PRINTF(2, 3) void
-(__VLIBCCALL __LIBC_LOCAL_NAME(err))(int __status, char const *__format, ...) __THROWS(...) {
+__NOTHROW_CB(__VLIBCCALL __LIBC_LOCAL_NAME(err))(int __status, char const *__format, ...) {
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
 	(__NAMESPACE_LOCAL_SYM __localdep_verr)(__status, __format, __args);

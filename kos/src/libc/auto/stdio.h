@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x885c50cf */
+/* HASH CRC-32:0x734cdef */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ INTDEF ATTR_IN(1) int NOTHROW_RPC(LIBCCALL libc_remove)(char const *filename);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fclose(3)
  * Close and destroy a given file `stream' */
-INTDEF ATTR_INOUT(1) int (LIBDCALL libd_fclose)(FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_INOUT(1) int NOTHROW_CB(LIBDCALL libd_fclose)(FILE *__restrict stream);
 /* >> fflush(3)
  * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 INTDEF int NOTHROW_CB(LIBDCALL libd_fflush)(FILE *stream);
@@ -136,13 +136,13 @@ INTDEF WUNUSED ATTR_INOUT(4) ATTR_OUT_OPT(1) size_t NOTHROW_CB(LIBDCALL libd_fre
 INTDEF ATTR_INOUT(4) ATTR_IN_OPT(1) size_t NOTHROW_CB(LIBDCALL libd_fwrite)(void const *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream);
 /* >> fseek(3)
  * Change the current in-file position of `stream' as a byte-offset from the start of the file */
-INTDEF ATTR_INOUT(1) int (LIBDCALL libd_fseek)(FILE *__restrict stream, long int off, int whence) THROWS(...);
+INTDEF ATTR_INOUT(1) int NOTHROW_CB(LIBDCALL libd_fseek)(FILE *__restrict stream, long int off, int whence);
 /* >> ftell(3)
  * Return the current in-file position of `stream' as a byte-offset from the start of the file */
-INTDEF WUNUSED ATTR_INOUT(1) long int (LIBDCALL libd_ftell)(FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED ATTR_INOUT(1) long int NOTHROW_CB(LIBDCALL libd_ftell)(FILE *__restrict stream);
 /* >> rewind(3)
  * Rewind the current in-file position of `stream' to its starting position */
-INTDEF ATTR_INOUT(1) void (LIBDCALL libd_rewind)(FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_INOUT(1) void NOTHROW_CB(LIBDCALL libd_rewind)(FILE *__restrict stream);
 /* >> clearerr(3)
  * Clear the error state of `stream', returning the stream to normal operations mode */
 INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBDCALL libd_clearerr)(FILE *__restrict stream);
@@ -175,10 +175,10 @@ INTDEF void NOTHROW_RPC(LIBCCALL libc_perror)(char const *message);
 /* >> fgetpos(3), fgetpos64(3)
  * Initialize   an   opaque  descriptor   `pos'   for  the   current   in-file  position   of  `stream'
  * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
-INTDEF ATTR_INOUT(1) ATTR_OUT(2) int (LIBDCALL libd_fgetpos)(FILE *__restrict stream, fpos_t *__restrict pos) THROWS(...);
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) int NOTHROW_CB(LIBDCALL libd_fgetpos)(FILE *__restrict stream, fpos_t *__restrict pos);
 /* >> fsetpos(3), fsetpos64(3)
  * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) int (LIBDCALL libd_fsetpos)(FILE *__restrict stream, fpos_t const *__restrict pos) THROWS(...);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) int NOTHROW_CB(LIBDCALL libd_fsetpos)(FILE *__restrict stream, fpos_t const *__restrict pos);
 /* >> fprintf(3), vfprintf(3)
  * Print  data  to  `stream',  following  `format'
  * Return the number of successfully printed bytes */
@@ -635,23 +635,23 @@ INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T NOTH
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-INTDEF ATTR_INOUT(1) int (LIBDCALL libd_fseeko)(FILE *__restrict stream, off_t off, int whence) THROWS(...);
+INTDEF ATTR_INOUT(1) int NOTHROW_CB(LIBDCALL libd_fseeko)(FILE *__restrict stream, off_t off, int whence);
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-INTDEF WUNUSED ATTR_INOUT(1) off_t (LIBDCALL libd_ftello)(FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED ATTR_INOUT(1) off_t NOTHROW_CB(LIBDCALL libd_ftello)(FILE *__restrict stream);
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-INTDEF ATTR_INOUT(1) int (LIBDCALL libd_fseeko64)(FILE *__restrict stream, off64_t off, int whence) THROWS(...);
+INTDEF ATTR_INOUT(1) int NOTHROW_CB(LIBDCALL libd_fseeko64)(FILE *__restrict stream, off64_t off, int whence);
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-INTDEF WUNUSED ATTR_INOUT(1) off64_t (LIBDCALL libd_ftello64)(FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED ATTR_INOUT(1) off64_t NOTHROW_CB(LIBDCALL libd_ftello64)(FILE *__restrict stream);
 /* >> fgetpos(3), fgetpos64(3)
  * Initialize   an   opaque  descriptor   `pos'   for  the   current   in-file  position   of  `stream'
  * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
-INTDEF ATTR_INOUT(1) ATTR_OUT(2) int (LIBDCALL libd_fgetpos64)(FILE *__restrict stream, fpos64_t *__restrict pos) THROWS(...);
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) int NOTHROW_CB(LIBDCALL libd_fgetpos64)(FILE *__restrict stream, fpos64_t *__restrict pos);
 /* >> fsetpos(3), fsetpos64(3)
  * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) int (LIBDCALL libd_fsetpos64)(FILE *__restrict stream, fpos64_t const *__restrict pos) THROWS(...);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) int NOTHROW_CB(LIBDCALL libd_fsetpos64)(FILE *__restrict stream, fpos64_t const *__restrict pos);
 /* >> fopen_printer(3)
  * Create and return a new write-only file-stream that will write to the given printer.
  * Note  that by default, the buffering is enabled for the file-stream, meaning you may
@@ -700,12 +700,12 @@ INTDEF ATTR_IN(2) ATTR_INOUT(3) FILE *NOTHROW_RPC(LIBDCALL libd_fdreopen)(fd_t f
 /* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
 INTDEF ATTR_IN(2) ATTR_INOUT(3) FILE *NOTHROW_RPC(LIBDCALL libd_fdreopen_unlocked)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
-INTDEF ATTR_INOUT(1) int (LIBDCALL libd_fseek_unlocked)(FILE *__restrict stream, long int off, int whence) THROWS(...);
-INTDEF WUNUSED ATTR_INOUT(1) long int (LIBDCALL libd_ftell_unlocked)(FILE *__restrict stream) THROWS(...);
-INTDEF ATTR_INOUT(1) int (LIBDCALL libd_fseeko_unlocked)(FILE *__restrict stream, off_t off, int whence) THROWS(...);
-INTDEF WUNUSED ATTR_INOUT(1) off_t (LIBDCALL libd_ftello_unlocked)(FILE *__restrict stream) THROWS(...);
-INTDEF ATTR_INOUT(1) ATTR_OUT(2) int (LIBDCALL libd_fgetpos_unlocked)(FILE *__restrict stream, fpos_t *__restrict pos) THROWS(...);
-INTDEF ATTR_IN(2) ATTR_INOUT(1) int (LIBDCALL libd_fsetpos_unlocked)(FILE *__restrict stream, fpos_t const *__restrict pos) THROWS(...);
+INTDEF ATTR_INOUT(1) int NOTHROW_CB(LIBDCALL libd_fseek_unlocked)(FILE *__restrict stream, long int off, int whence);
+INTDEF WUNUSED ATTR_INOUT(1) long int NOTHROW_CB(LIBDCALL libd_ftell_unlocked)(FILE *__restrict stream);
+INTDEF ATTR_INOUT(1) int NOTHROW_CB(LIBDCALL libd_fseeko_unlocked)(FILE *__restrict stream, off_t off, int whence);
+INTDEF WUNUSED ATTR_INOUT(1) off_t NOTHROW_CB(LIBDCALL libd_ftello_unlocked)(FILE *__restrict stream);
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) int NOTHROW_CB(LIBDCALL libd_fgetpos_unlocked)(FILE *__restrict stream, fpos_t *__restrict pos);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) int NOTHROW_CB(LIBDCALL libd_fsetpos_unlocked)(FILE *__restrict stream, fpos_t const *__restrict pos);
 INTDEF ATTR_INOUT(1) int NOTHROW_CB(LIBDCALL libd_getw_unlocked)(FILE *__restrict stream);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -734,7 +734,7 @@ INTDEF WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INOUT(3) ssize_t NOTHROW_CB(LIBD
 INTDEF WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INOUT(3) ssize_t NOTHROW_CB(LIBCCALL libc_getline_unlocked)(char **__restrict lineptr, size_t *__restrict pcount, FILE *__restrict stream);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_INOUT(1) void (LIBDCALL libd_rewind_unlocked)(FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_INOUT(1) void NOTHROW_CB(LIBDCALL libd_rewind_unlocked)(FILE *__restrict stream);
 INTDEF WUNUSED ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd_fisatty)(FILE *__restrict stream);
 /* >> fftruncate(3)
  * Truncate the given file `stream' to a length of `length' */
@@ -748,10 +748,10 @@ INTDEF ATTR_IN(1) __STDC_INT_AS_SSIZE_T NOTHROW_CB(LIBDCALL libd_puts_unlocked)(
 INTDEF ATTR_IN(1) __STDC_INT_AS_SSIZE_T NOTHROW_CB(LIBCCALL libc_puts_unlocked)(char const *__restrict string);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_INOUT(1) int (LIBDCALL libd_fseeko64_unlocked)(FILE *__restrict stream, off64_t off, int whence) THROWS(...);
-INTDEF WUNUSED ATTR_INOUT(1) off64_t (LIBDCALL libd_ftello64_unlocked)(FILE *__restrict stream) THROWS(...);
-INTDEF ATTR_INOUT(1) ATTR_OUT(2) int (LIBDCALL libd_fgetpos64_unlocked)(FILE *__restrict stream, fpos64_t *__restrict pos) THROWS(...);
-INTDEF ATTR_IN(2) ATTR_INOUT(1) int (LIBDCALL libd_fsetpos64_unlocked)(FILE *__restrict stream, fpos64_t const *__restrict pos) THROWS(...);
+INTDEF ATTR_INOUT(1) int NOTHROW_CB(LIBDCALL libd_fseeko64_unlocked)(FILE *__restrict stream, off64_t off, int whence);
+INTDEF WUNUSED ATTR_INOUT(1) off64_t NOTHROW_CB(LIBDCALL libd_ftello64_unlocked)(FILE *__restrict stream);
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) int NOTHROW_CB(LIBDCALL libd_fgetpos64_unlocked)(FILE *__restrict stream, fpos64_t *__restrict pos);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) int NOTHROW_CB(LIBDCALL libd_fsetpos64_unlocked)(FILE *__restrict stream, fpos64_t const *__restrict pos);
 /* >> fftruncate64(3)
  * Truncate the given file `stream' to a length of `length' */
 INTDEF ATTR_INOUT(1) int NOTHROW_CB(LIBDCALL libd_fftruncate64)(FILE *__restrict stream, __PIO_OFFSET64 length);

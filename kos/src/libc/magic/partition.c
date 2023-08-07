@@ -158,7 +158,7 @@ __STDC_INT_AS_UINT_T partition_union([[inout]] struct partition_def *self,
 @@Print classes (and  their elements) of  `self' to  `fp'
 @@The format used is: '[' ['(' [0 1 2 3 4]... ')']... ']'
 @@Example: "[(0 1 2 4 8)(3 6)(5 7)]"
-[[decl_include("<bits/crt/partition.h>")]]
+[[cp_stdio, decl_include("<bits/crt/partition.h>")]]
 [[impl_include("<bits/crt/partition.h>")]]
 [[requires_function(fprintf, fputc)]]
 void partition_print([[in]] struct partition_def __KOS_FIXED_CONST *self,

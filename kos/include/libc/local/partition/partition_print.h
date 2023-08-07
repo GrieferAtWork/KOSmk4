@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57da12c5 */
+/* HASH CRC-32:0xce4f8aa9 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,7 +86,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fputc_defined */
 __LOCAL_LIBC(partition_print) __ATTR_IN(1) __ATTR_INOUT(2) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(partition_print))(struct partition_def __KOS_FIXED_CONST *__self, __FILE *__fp) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(partition_print))(struct partition_def __KOS_FIXED_CONST *__self, __FILE *__fp) {
 	unsigned int __i;
 	(__NAMESPACE_LOCAL_SYM __localdep_fputc)('[', __fp);
 	for (__i = 0; __i < (unsigned int)__self->num_elements; ++__i) {

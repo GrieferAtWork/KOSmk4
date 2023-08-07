@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35240e0f */
+/* HASH CRC-32:0x5ca4b1b6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __SYSDECL_BEGIN
  * Also note that `stdout' is flushed before the message is printed.
  * If `status' is non-zero, follow up with a call to `exit(status)' */
 #if __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_FAST_USING_OR_IMPL(error, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL error)(int __status, __errno_t __errnum, const char *__format, ...) __THROWS(...) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(error))(__status, __errnum, __format, __builtin_va_arg_pack()); })
+__NAMESPACE_FAST_USING_OR_IMPL(error, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(3, 4) void __NOTHROW_CB(__VLIBCCALL error)(int __status, __errno_t __errnum, const char *__format, ...) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(error))(__status, __errnum, __format, __builtin_va_arg_pack()); })
 #else /* __has_builtin(__builtin_va_arg_pack) */
 #define error(...) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(error))(__VA_ARGS__)
 #endif /* !__has_builtin(__builtin_va_arg_pack) */
@@ -62,7 +62,7 @@ __NAMESPACE_FAST_USING_OR_IMPL(error, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
  * If `status' is non-zero, follow up with a call to `exit(status)' */
-__LIBC __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL error)(int __status, __errno_t __errnum, const char *__format, ...) __THROWS(...) __CASMNAME_SAME("error");
+__LIBC __ATTR_LIBC_PRINTF(3, 4) void __NOTHROW_CB(__VLIBCCALL error)(int __status, __errno_t __errnum, const char *__format, ...) __CASMNAME_SAME("error");
 #else /* ... */
 #include <libc/template/stdstreams.h>
 #include <libc/template/program_invocation_name.h>
@@ -75,7 +75,7 @@ __LIBC __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL error)(int __status, __errno_t
  * Also note that `stdout' is flushed before the message is printed.
  * If `status' is non-zero, follow up with a call to `exit(status)' */
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(error, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL error)(int __status, __errno_t __errnum, const char *__format, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error))(__status, __errnum, __format, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(error, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(3, 4) void __NOTHROW_CB(__VLIBCCALL error)(int __status, __errno_t __errnum, const char *__format, ...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error))(__status, __errnum, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define error(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
@@ -88,7 +88,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(error, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIB
  * Additionally,  when `error_one_per_line' is non-zero, consecutive calls to  this function that pass the same values
  * for `filename' and `line' will not produce the error message. */
 #if __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_FAST_USING_OR_IMPL(error_at_line, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(5, 6) void (__VLIBCCALL error_at_line)(int __status, __errno_t __errnum, char const *__filename, unsigned int __line, char const *__format, ...) __THROWS(...) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(error_at_line))(__status, __errnum, __filename, __line, __format, __builtin_va_arg_pack()); })
+__NAMESPACE_FAST_USING_OR_IMPL(error_at_line, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(5, 6) void __NOTHROW_CB(__VLIBCCALL error_at_line)(int __status, __errno_t __errnum, char const *__filename, unsigned int __line, char const *__format, ...) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(error_at_line))(__status, __errnum, __filename, __line, __format, __builtin_va_arg_pack()); })
 #else /* __has_builtin(__builtin_va_arg_pack) */
 #define error_at_line(...) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(error_at_line))(__VA_ARGS__)
 #endif /* !__has_builtin(__builtin_va_arg_pack) */
@@ -98,7 +98,7 @@ __NAMESPACE_FAST_USING_OR_IMPL(error_at_line, __FORCELOCAL __ATTR_ARTIFICIAL __A
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
  * Additionally,  when `error_one_per_line' is non-zero, consecutive calls to  this function that pass the same values
  * for `filename' and `line' will not produce the error message. */
-__LIBC __ATTR_LIBC_PRINTF(5, 6) void (__VLIBCCALL error_at_line)(int __status, __errno_t __errnum, char const *__filename, unsigned int __line, char const *__format, ...) __THROWS(...) __CASMNAME_SAME("error_at_line");
+__LIBC __ATTR_LIBC_PRINTF(5, 6) void __NOTHROW_CB(__VLIBCCALL error_at_line)(int __status, __errno_t __errnum, char const *__filename, unsigned int __line, char const *__format, ...) __CASMNAME_SAME("error_at_line");
 #else /* ... */
 #include <libc/template/stdstreams.h>
 #include <libc/template/program_invocation_name.h>
@@ -111,7 +111,7 @@ __LIBC __ATTR_LIBC_PRINTF(5, 6) void (__VLIBCCALL error_at_line)(int __status, _
  * Additionally,  when `error_one_per_line' is non-zero, consecutive calls to  this function that pass the same values
  * for `filename' and `line' will not produce the error message. */
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(error_at_line, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(5, 6) void (__VLIBCCALL error_at_line)(int __status, __errno_t __errnum, char const *__filename, unsigned int __line, char const *__format, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_at_line))(__status, __errnum, __filename, __line, __format, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(error_at_line, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(5, 6) void __NOTHROW_CB(__VLIBCCALL error_at_line)(int __status, __errno_t __errnum, char const *__filename, unsigned int __line, char const *__format, ...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_at_line))(__status, __errnum, __filename, __line, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define error_at_line(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_at_line))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */

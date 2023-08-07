@@ -109,7 +109,7 @@ global final SIMPLE_NOTHROW_ANNOTATIONS: {string: string} = {
 	 * Used  for  functions  that  are   already  CP  in  their  syscall   form. */
 	"cp_stdio"          : "NOTHROW_CB",
 	/* STDIO functions that may throw because of custom FILE cookies. */
-	"stdio_throws"      : "THROWS(...)",
+	"stdio_throws"      : "NOTHROW_CB",
 	"throws"            : "THROWS(...)",
 
 	/* Cancellation point */

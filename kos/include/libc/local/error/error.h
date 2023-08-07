@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7aa4b6ca */
+/* HASH CRC-32:0x92641b34 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #include <libc/template/program_invocation_name.h>
 #include <features.h>
 #if defined(__LOCAL_stdout) && (defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit)) && (defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)) && defined(__LOCAL_program_invocation_short_name)
-#include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_verror_defined
@@ -36,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_verror __LIBC_LOCAL_NAME(verror)
 #endif /* !__local___localdep_verror_defined */
 __LOCAL_LIBC(error) __ATTR_LIBC_PRINTF(3, 4) void
-(__VLIBCCALL __LIBC_LOCAL_NAME(error))(int __status, __errno_t __errnum, const char *__format, ...) __THROWS(...) {
+__NOTHROW_CB(__VLIBCCALL __LIBC_LOCAL_NAME(error))(int __status, __errno_t __errnum, const char *__format, ...) {
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
 	(__NAMESPACE_LOCAL_SYM __localdep_verror)(__status, __errnum, __format, __args);

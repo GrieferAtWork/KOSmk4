@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c608394 */
+/* HASH CRC-32:0xeb5cfb93 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,10 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_error_defined
 #ifdef __CRT_HAVE_error
 __NAMESPACE_LOCAL_END
-#include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__LIBC __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL __localdep_error)(int __status, __errno_t __errnum, const char *__format, ...) __THROWS(...) __CASMNAME("error");
+__LIBC __ATTR_LIBC_PRINTF(3, 4) void __NOTHROW_CB(__VLIBCCALL __localdep_error)(int __status, __errno_t __errnum, const char *__format, ...) __CASMNAME("error");
 #else /* __CRT_HAVE_error */
 __NAMESPACE_LOCAL_END
 #include <libc/template/stdstreams.h>

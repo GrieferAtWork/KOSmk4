@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaea383ec */
+/* HASH CRC-32:0x843e9323 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,10 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_errx_defined
 #define __local___localdep_errx_defined
 #ifdef __CRT_HAVE_errx
-__NAMESPACE_LOCAL_END
-#include <kos/anno.h>
-__NAMESPACE_LOCAL_BEGIN
-__LIBC __ATTR_NORETURN __ATTR_IN_OPT(2) __ATTR_LIBC_PRINTF(2, 3) void (__VLIBCCALL __localdep_errx)(int __status, char const *__format, ...) __THROWS(...) __CASMNAME("errx");
+__LIBC __ATTR_NORETURN __ATTR_IN_OPT(2) __ATTR_LIBC_PRINTF(2, 3) void __NOTHROW_CB(__VLIBCCALL __localdep_errx)(int __status, char const *__format, ...) __CASMNAME("errx");
 #elif defined(__CRT_HAVE_verrx) || ((defined(__CRT_HAVE_vwarnx) || (defined(__LOCAL_stderr) && defined(__LOCAL_program_invocation_short_name) && (defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))) && (defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/err/errx.h>

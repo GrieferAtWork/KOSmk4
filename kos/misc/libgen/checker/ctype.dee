@@ -1337,13 +1337,13 @@ final class CPointerType32: CPointerType {
 	this = super;
 	public property sizeof: int = { get() -> 4; };
 	public function peek(checker: Checker, data: Bytes, offset: int): int {
-		return int.frombytes(data[offset:offset + 4], checker.TARGET_ENDIAN, false);
+		return int.frombytes(data[offset:offset + 4], checker.TARGET_ENDIAN, true);
 	}
 	public function poke(checker: Checker, data: Bytes, offset: int, value: int) {
-		data[offset:offset + 4] = value.tobytes(4, checker.TARGET_ENDIAN, false);
+		data[offset:offset + 4] = value.tobytes(4, checker.TARGET_ENDIAN, true);
 	}
 	public function bytes(checker: Checker, value: int): Bytes {
-		return value.tobytes(4, checker.TARGET_ENDIAN, false);
+		return value.tobytes(4, checker.TARGET_ENDIAN, true);
 	}
 }
 
@@ -1351,13 +1351,13 @@ final class CPointerType64: CPointerType {
 	this = super;
 	public property sizeof: int = { get() -> 8; };
 	public function peek(checker: Checker, data: Bytes, offset: int): int {
-		return int.frombytes(data[offset:offset + 8], checker.TARGET_ENDIAN, false);
+		return int.frombytes(data[offset:offset + 8], checker.TARGET_ENDIAN, true);
 	}
 	public function poke(checker: Checker, data: Bytes, offset: int, value: int) {
-		data[offset:offset + 8] = value.tobytes(8, checker.TARGET_ENDIAN, false);
+		data[offset:offset + 8] = value.tobytes(8, checker.TARGET_ENDIAN, true);
 	}
 	public function bytes(checker: Checker, value: int): Bytes {
-		return value.tobytes(8, checker.TARGET_ENDIAN, false);
+		return value.tobytes(8, checker.TARGET_ENDIAN, true);
 	}
 }
 

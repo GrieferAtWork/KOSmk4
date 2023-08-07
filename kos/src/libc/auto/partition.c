@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5530205 */
+/* HASH CRC-32:0xff388535 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -123,8 +123,8 @@ NOTHROW_NCX(LIBCCALL libc_partition_union)(struct partition_def *self,
  * The format used is: '[' ['(' [0 1 2 3 4]... ')']... ']'
  * Example: "[(0 1 2 4 8)(3 6)(5 7)]" */
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_IN(1) ATTR_INOUT(2) void
-NOTHROW_NCX(LIBCCALL libc_partition_print)(struct partition_def __KOS_FIXED_CONST *self,
-                                           FILE *fp) {
+NOTHROW_CB(LIBCCALL libc_partition_print)(struct partition_def __KOS_FIXED_CONST *self,
+                                          FILE *fp) {
 	unsigned int i;
 	libc_fputc('[', fp);
 	for (i = 0; i < (unsigned int)self->num_elements; ++i) {

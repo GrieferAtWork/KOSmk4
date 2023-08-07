@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58f95eff */
+/* HASH CRC-32:0x72a4bae2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #include <libc/template/program_invocation_name.h>
 #include <features.h>
 #if defined(__LOCAL_stderr) && (defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit)) && (defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)) && defined(__LOCAL_program_invocation_short_name)
-#include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_exit_defined
@@ -216,7 +215,7 @@ __CSDECLARE(,unsigned int,error_message_count)
 #endif /* !__LOCAL_error_message_count */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(verror_at_line) __ATTR_LIBC_PRINTF(5, 0) void
-(__LIBCCALL __LIBC_LOCAL_NAME(verror_at_line))(int __status, __errno_t __errnum, char const *__filename, unsigned int __line, char const *__format, __builtin_va_list __args) __THROWS(...) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(verror_at_line))(int __status, __errno_t __errnum, char const *__filename, unsigned int __line, char const *__format, __builtin_va_list __args) {
 #ifdef __LOCAL_error_one_per_line
 	static char const *__last_filename = __NULLPTR;
 	static unsigned int __last_line = 0;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77edb993 */
+/* HASH CRC-32:0x40a5f90b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,7 +86,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vwarnc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN
 #ifdef __CRT_HAVE_errc
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
-__LIBC __ATTR_NORETURN __ATTR_IN_OPT(3) __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL errc)(int __status, __errno_t __used_errno, char const *__format, ...) __THROWS(...) __CASMNAME_SAME("errc");
+__LIBC __ATTR_NORETURN __ATTR_IN_OPT(3) __ATTR_LIBC_PRINTF(3, 4) void __NOTHROW_CB(__VLIBCCALL errc)(int __status, __errno_t __used_errno, char const *__format, ...) __CASMNAME_SAME("errc");
 #else /* __CRT_HAVE_errc */
 #include <libc/template/stdstreams.h>
 #include <libc/template/program_invocation_name.h>
@@ -96,7 +96,7 @@ __LIBC __ATTR_NORETURN __ATTR_IN_OPT(3) __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCA
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(errc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_IN_OPT(3) __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL errc)(int __status, __errno_t __used_errno, char const *__format, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(errc))(__status, __used_errno, __format, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(errc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_IN_OPT(3) __ATTR_LIBC_PRINTF(3, 4) void __NOTHROW_CB(__VLIBCCALL errc)(int __status, __errno_t __used_errno, char const *__format, ...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(errc))(__status, __used_errno, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define errc(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(errc))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
@@ -110,7 +110,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(errc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORE
 #ifdef __CRT_HAVE_verrc
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
-__CDECLARE_VOID(__ATTR_NORETURN __ATTR_IN_OPT(3) __ATTR_LIBC_PRINTF(3, 0),__THROWING(...),verrc,(int __status, __errno_t __used_errno, char const *__format, __builtin_va_list __args),(__status,__used_errno,__format,__args))
+__CDECLARE_VOID(__ATTR_NORETURN __ATTR_IN_OPT(3) __ATTR_LIBC_PRINTF(3, 0),__NOTHROW_CB,verrc,(int __status, __errno_t __used_errno, char const *__format, __builtin_va_list __args),(__status,__used_errno,__format,__args))
 #else /* __CRT_HAVE_verrc */
 #include <libc/template/stdstreams.h>
 #include <libc/template/program_invocation_name.h>
@@ -119,7 +119,7 @@ __CDECLARE_VOID(__ATTR_NORETURN __ATTR_IN_OPT(3) __ATTR_LIBC_PRINTF(3, 0),__THRO
 #include <libc/local/err/verrc.h>
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(verrc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_IN_OPT(3) __ATTR_LIBC_PRINTF(3, 0) void (__LIBCCALL verrc)(int __status, __errno_t __used_errno, char const *__format, __builtin_va_list __args) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(verrc))(__status, __used_errno, __format, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(verrc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_IN_OPT(3) __ATTR_LIBC_PRINTF(3, 0) void __NOTHROW_CB(__LIBCCALL verrc)(int __status, __errno_t __used_errno, char const *__format, __builtin_va_list __args) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(verrc))(__status, __used_errno, __format, __args); })
 #else /* (__CRT_HAVE_vwarnc || (__LOCAL_stderr && __LOCAL_program_invocation_short_name && (__CRT_HAVE_vfprintf || __CRT_HAVE__IO_vfprintf || __CRT_HAVE_vfprintf_s || __CRT_HAVE_vfprintf_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_putc || __CRT_HAVE_fputc || __CRT_HAVE__IO_putc || __CRT_HAVE_putc_unlocked || __CRT_HAVE_fputc_unlocked || __CRT_HAVE__putc_nolock || __CRT_HAVE__fputc_nolock || (__CRT_DOS && (__CRT_HAVE__flsbuf || __CRT_HAVE___swbuf)) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock))) && (__CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit || __CRT_HAVE_xexit) */
 #undef __verrc_defined
 #endif /* (!__CRT_HAVE_vwarnc && (!__LOCAL_stderr || !__LOCAL_program_invocation_short_name || (!__CRT_HAVE_vfprintf && !__CRT_HAVE__IO_vfprintf && !__CRT_HAVE_vfprintf_s && !__CRT_HAVE_vfprintf_unlocked && !__CRT_HAVE_file_printer && !__CRT_HAVE_file_printer_unlocked && !__CRT_HAVE_putc && !__CRT_HAVE_fputc && !__CRT_HAVE__IO_putc && !__CRT_HAVE_putc_unlocked && !__CRT_HAVE_fputc_unlocked && !__CRT_HAVE__putc_nolock && !__CRT_HAVE__fputc_nolock && (!__CRT_DOS || (!__CRT_HAVE__flsbuf && !__CRT_HAVE___swbuf)) && !__CRT_HAVE_fwrite && !__CRT_HAVE__IO_fwrite && !__CRT_HAVE_fwrite_s && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock))) || (!__CRT_HAVE_exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE__exit && !__CRT_HAVE__Exit && !__CRT_HAVE_xexit) */
