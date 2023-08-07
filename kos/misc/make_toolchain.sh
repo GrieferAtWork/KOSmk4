@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Add more features to RangeMap proxy wrappers"
-DEEMON_VERSION="11314a848798fcd026ff8d76825a055404cee8c9"
+#     v -- "Fix various problems/deadlocks with weakref objects"
+DEEMON_VERSION="9c24a43092a530660d643e8c66d59af3191a652b"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
