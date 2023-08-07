@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7efce73b */
+/* HASH CRC-32:0xe8be990f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -761,18 +761,18 @@ __CEIREDIRECT(__ATTR_CONST,__INTMAX_TYPE__,__NOTHROW,imaxabs,(__INTMAX_TYPE__ __
 __LOCAL __ATTR_CONST __INTMAX_TYPE__ __NOTHROW(__LIBCCALL imaxabs)(__INTMAX_TYPE__ __x) { return __x < 0 ? -__x : __x; }
 #endif /* !... */
 #ifdef __CRT_HAVE_imaxdiv
-__CDECLARE(__ATTR_CONST,struct __imaxdiv_struct,__NOTHROW,imaxdiv,(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom),(__numer,__denom))
+__CDECLARE(__ATTR_PURE,struct __imaxdiv_struct,__NOTHROW_NCX,imaxdiv,(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom),(__numer,__denom))
 #elif defined(__CRT_HAVE_div) && __SIZEOF_INTMAX_T__ == __SIZEOF_INT__
-__CREDIRECT(__ATTR_CONST,struct __imaxdiv_struct,__NOTHROW,imaxdiv,(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom),div,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE,struct __imaxdiv_struct,__NOTHROW_NCX,imaxdiv,(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom),div,(__numer,__denom))
 #elif defined(__CRT_HAVE_ldiv) && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_CONST,struct __imaxdiv_struct,__NOTHROW,imaxdiv,(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom),ldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE,struct __imaxdiv_struct,__NOTHROW_NCX,imaxdiv,(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom),ldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_lldiv) && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_CONST,struct __imaxdiv_struct,__NOTHROW,imaxdiv,(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom),lldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE,struct __imaxdiv_struct,__NOTHROW_NCX,imaxdiv,(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom),lldiv,(__numer,__denom))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/inttypes/imaxdiv.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(imaxdiv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST struct __imaxdiv_struct __NOTHROW(__LIBCCALL imaxdiv)(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(imaxdiv))(__numer, __denom); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(imaxdiv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE struct __imaxdiv_struct __NOTHROW_NCX(__LIBCCALL imaxdiv)(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(imaxdiv))(__numer, __denom); })
 #endif /* !... */
 #ifdef __CRT_HAVE_strtoimax
 __CDECLARE(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__INTMAX_TYPE__,__NOTHROW_NCX,strtoimax,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
