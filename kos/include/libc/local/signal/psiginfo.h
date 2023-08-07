@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6d7c2cf */
+/* HASH CRC-32:0x29af9ce6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,7 +95,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(psiginfo) __ATTR_IN(1) __ATTR_IN_OPT(2) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(psiginfo))(struct __siginfo_struct const *__pinfo, char const *__s) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(psiginfo))(struct __siginfo_struct const *__pinfo, char const *__s) {
 	char const *__text;
 	__text = (__NAMESPACE_LOCAL_SYM __localdep_sigabbrev_np)(__pinfo->si_signo);
 	if (__s && *__s)

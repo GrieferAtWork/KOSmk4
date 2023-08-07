@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d1b1cb */
+/* HASH CRC-32:0xccf0d133 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -378,23 +378,23 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_killpg)(pid_t pgrp, signo_t signo);
 /* >> psignal(3)
  * Same as `fprintf(stderr, "%s: %s\n", s, sigabbrev_np(signo) ? "SIG"+. : strdupf("Unknown signal %d", signo))'
  * When `s' is `NULL' or an empty string, omit the leading "%s: " from the format. */
-INTDEF void NOTHROW_NCX(LIBDCALL libd_psignal)(signo_t signo, char const *s);
+INTDEF void NOTHROW_CB(LIBDCALL libd_psignal)(signo_t signo, char const *s);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> psignal(3)
  * Same as `fprintf(stderr, "%s: %s\n", s, sigabbrev_np(signo) ? "SIG"+. : strdupf("Unknown signal %d", signo))'
  * When `s' is `NULL' or an empty string, omit the leading "%s: " from the format. */
-INTDEF void NOTHROW_NCX(LIBCCALL libc_psignal)(signo_t signo, char const *s);
+INTDEF void NOTHROW_CB(LIBCCALL libc_psignal)(signo_t signo, char const *s);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> psiginfo(3)
  * Similar to `psignal(3)', but instead print extended signal information from `*pinfo' */
-INTDEF ATTR_IN(1) ATTR_IN_OPT(2) void NOTHROW_NCX(LIBDCALL libd_psiginfo)(siginfo_t const *pinfo, char const *s);
+INTDEF ATTR_IN(1) ATTR_IN_OPT(2) void NOTHROW_CB(LIBDCALL libd_psiginfo)(siginfo_t const *pinfo, char const *s);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> psiginfo(3)
  * Similar to `psignal(3)', but instead print extended signal information from `*pinfo' */
-INTDEF ATTR_IN(1) ATTR_IN_OPT(2) void NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo, char const *s);
+INTDEF ATTR_IN(1) ATTR_IN_OPT(2) void NOTHROW_CB(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo, char const *s);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigcodename_np(3)

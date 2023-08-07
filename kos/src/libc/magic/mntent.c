@@ -90,7 +90,7 @@ int endmntent([[inout]] $FILE *stream) {
 }
 
 @@>> getmntent(3), getmntent_r(3)
-[[cp, decl_include("<bits/crt/db/mntent.h>")]]
+[[cp_stdio, decl_include("<bits/crt/db/mntent.h>")]]
 [[impl_include("<bits/crt/db/mntent.h>")]]
 [[requires_function(getmntent_r)]]
 struct mntent *getmntent([[inout]] $FILE *stream) {
@@ -111,7 +111,7 @@ struct mntent *getmntent([[inout]] $FILE *stream) {
 %
 %#ifdef __USE_MISC
 [[decl_include("<features.h>", "<bits/crt/db/mntent.h>")]]
-[[cp, doc_alias("getmntent"), export_alias("__getmntent_r")]]
+[[cp_stdio, doc_alias("getmntent"), export_alias("__getmntent_r")]]
 [[requires_function(fgets)]]
 struct mntent *getmntent_r([[inout]] $FILE *__restrict stream,
                            [[out]] struct mntent *__restrict result,

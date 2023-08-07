@@ -2223,7 +2223,7 @@ int killpg($pid_t pgrp, $signo_t signo) {
 @@>> psignal(3)
 @@Same as `fprintf(stderr, "%s: %s\n", s, sigabbrev_np(signo) ? "SIG"+. : strdupf("Unknown signal %d", signo))'
 @@When `s' is `NULL' or an empty string, omit the leading "%s: " from the format.
-[[guard, decl_include("<bits/types.h>")]]
+[[cp_stdio, guard, decl_include("<bits/types.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stderr) && $has_function(fprintf))]]
 void psignal($signo_t signo, [[nullable]] char const *s) {
@@ -2239,7 +2239,7 @@ void psignal($signo_t signo, [[nullable]] char const *s) {
 
 @@>> psiginfo(3)
 @@Similar to `psignal(3)', but instead print extended signal information from `*pinfo'
-[[guard, decl_include("<bits/os/siginfo.h>")]]
+[[cp_stdio, guard, decl_include("<bits/os/siginfo.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stderr) && $has_function(fprintf))]]
 [[impl_include("<asm/os/signal.h>", "<bits/crt/inttypes.h>", "<bits/types.h>")]]

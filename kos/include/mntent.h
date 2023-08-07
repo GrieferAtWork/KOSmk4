@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1775ac3c */
+/* HASH CRC-32:0x1945d10d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,24 +101,24 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(endmntent, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* ... */
 #ifdef __CRT_HAVE_getmntent
 /* >> getmntent(3), getmntent_r(3) */
-__CDECLARE(__ATTR_INOUT(1),struct mntent *,__NOTHROW_RPC,getmntent,(__FILE *__stream),(__stream))
+__CDECLARE(__ATTR_INOUT(1),struct mntent *,__NOTHROW_CB,getmntent,(__FILE *__stream),(__stream))
 #elif defined(__CRT_HAVE_getmntent_r) || defined(__CRT_HAVE___getmntent_r) || defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE__IO_fgets) || defined(__CRT_HAVE_fgets_unlocked) || ((defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow) || defined(__CRT_HAVE___srget))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked)))
 #include <libc/local/mntent/getmntent.h>
 /* >> getmntent(3), getmntent_r(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getmntent, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) struct mntent *__NOTHROW_RPC(__LIBCCALL getmntent)(__FILE *__stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getmntent))(__stream); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getmntent, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) struct mntent *__NOTHROW_CB(__LIBCCALL getmntent)(__FILE *__stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getmntent))(__stream); })
 #endif /* ... */
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_getmntent_r
 /* >> getmntent(3), getmntent_r(3) */
-__CDECLARE(__ATTR_INOUT(1) __ATTR_OUT(2) __ATTR_OUTS(3, 4),struct mntent *,__NOTHROW_RPC,getmntent_r,(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize),(__stream,__result,__buffer,__bufsize))
+__CDECLARE(__ATTR_INOUT(1) __ATTR_OUT(2) __ATTR_OUTS(3, 4),struct mntent *,__NOTHROW_CB,getmntent_r,(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize),(__stream,__result,__buffer,__bufsize))
 #elif defined(__CRT_HAVE___getmntent_r)
 /* >> getmntent(3), getmntent_r(3) */
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2) __ATTR_OUTS(3, 4),struct mntent *,__NOTHROW_RPC,getmntent_r,(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize),__getmntent_r,(__stream,__result,__buffer,__bufsize))
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2) __ATTR_OUTS(3, 4),struct mntent *,__NOTHROW_CB,getmntent_r,(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize),__getmntent_r,(__stream,__result,__buffer,__bufsize))
 #elif defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE__IO_fgets) || defined(__CRT_HAVE_fgets_unlocked) || ((defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow) || defined(__CRT_HAVE___srget))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked)))
 #include <libc/local/mntent/getmntent_r.h>
 /* >> getmntent(3), getmntent_r(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getmntent_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_OUT(2) __ATTR_OUTS(3, 4) struct mntent *__NOTHROW_RPC(__LIBCCALL getmntent_r)(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getmntent_r))(__stream, __result, __buffer, __bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getmntent_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_OUT(2) __ATTR_OUTS(3, 4) struct mntent *__NOTHROW_CB(__LIBCCALL getmntent_r)(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getmntent_r))(__stream, __result, __buffer, __bufsize); })
 #endif /* ... */
 #endif /* __USE_MISC */
 

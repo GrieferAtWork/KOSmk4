@@ -5425,7 +5425,6 @@ again_skip_annotation_rbracket:
 		 * used, but the function has the ATTR_CONST attribute, then warn that
 		 * the function should be annotated as nothrow. */
 		if (currentPrototype.nothrow != "NOTHROW") {
-			// self.warnAt(currentNameTokStart, f"TEST {repr currentName} {repr currentPrototype.attributes}");
 			for (local attr: currentPrototype.attributes) {
 				if (attr == "ATTR_CONST") {
 					self.warnAt(currentNameTokStart,

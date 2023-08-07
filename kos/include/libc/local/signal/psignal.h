@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2abdd9ce */
+/* HASH CRC-32:0x5341f561 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,7 +67,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_sigabbrev_np_defined */
 __LOCAL_LIBC(psignal) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(psignal))(__signo_t __signo, char const *__s) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(psignal))(__signo_t __signo, char const *__s) {
 	char const *__signam = (__NAMESPACE_LOCAL_SYM __localdep_sigabbrev_np)(__signo);
 	if (__s && *__s)
 		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "%s: ", __s);
