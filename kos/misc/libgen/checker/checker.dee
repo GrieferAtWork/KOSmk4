@@ -4960,24 +4960,25 @@ again:
 				this.pushWarnLocationOverride(newSymbol.decl);
 				/* NOTE: Only check for binary compatibility here (not declaration compatibility) */
 				if (oldSymbol is COverloadedFunctionSymbol) {
-					for (oldSymbol: oldSymbol.overloads) {
+					local savedOldSymbol = oldSymbol;
+					for (oldSymbol: savedOldSymbol.overloads) {
 						if (oldSymbol is CSymbol) {
 							oldSymbolTypeRef = oldSymbol.typeref;
 							if (newSymbol is COverloadedFunctionSymbol) {
-								for (local overloadedNewSymbol: newSymbol.overloads) {
-									newSymbolTypeRef = overloadedNewSymbol.typeref;
-									if (oldSymbolTypeRef.redeclarationEquals(newSymbolTypeRef)) {
-										newSymbol = overloadedNewSymbol;
+								local savedNewSymbol = newSymbol;
+								for (newSymbol: savedNewSymbol.overloads) {
+									newSymbolTypeRef = newSymbol.typeref;
+									if (oldSymbolTypeRef.redeclarationEquals(newSymbolTypeRef))
 										goto do_import_from_newSymbolTypeRef;
-									}
 								}
+								newSymbol = savedNewSymbol;
 							} else {
 								if (oldSymbolTypeRef.redeclarationEquals(newSymbolTypeRef))
 									goto do_import_from_newSymbolTypeRef;
 							}
 						}
 					}
-					for (oldSymbol: oldSymbol.overloads) {
+					for (oldSymbol: savedOldSymbol.overloads) {
 						if (oldSymbol is CSymbol) {
 							oldSymbolTypeRef = oldSymbol.typeref;
 							if (newSymbol is COverloadedFunctionSymbol) {
@@ -4994,22 +4995,25 @@ again:
 							}
 						}
 					}
+					oldSymbol = savedOldSymbol;
 					goto warn_incompatible;
 				} else if (newSymbol is COverloadedFunctionSymbol) {
-					for (newSymbol: newSymbol.overloads) {
+					local savedNewSymbol = newSymbol;
+					for (newSymbol: savedNewSymbol.overloads) {
 						if (newSymbol is CSymbol) {
 							newSymbolTypeRef = newSymbol.typeref;
 							if (oldSymbolTypeRef.redeclarationEquals(newSymbolTypeRef))
 								goto do_import_from_binary_newSymbolTypeRef;
 						}
 					}
-					for (newSymbol: newSymbol.overloads) {
+					for (newSymbol: savedNewSymbol.overloads) {
 						if (newSymbol is CSymbol) {
 							newSymbolTypeRef = newSymbol.typeref;
 							if (binaryConvertibleTo(this, oldSymbolTypeRef.typ, newSymbolTypeRef.typ))
 								goto do_import_from_binary_newSymbolTypeRef;
 						}
 					}
+					newSymbol = savedNewSymbol;
 					goto warn_incompatible;
 				}
 				if (oldSymbolTypeRef.redeclarationEquals(newSymbolTypeRef)) {
