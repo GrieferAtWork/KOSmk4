@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2774c67 */
+/* HASH CRC-32:0xc979c965 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__putwch_defined
 #define __local___localdep__putwch_defined
 #if defined(__CRT_HAVE__putwch_nolock) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(,__WINT_TYPE__,__NOTHROW_NCX,__localdep__putwch,(__WCHAR_TYPE__ __ch),_putwch_nolock,(__ch))
+__CREDIRECT(,__WINT_TYPE__,__NOTHROW_RPC,__localdep__putwch,(__WCHAR_TYPE__ __ch),_putwch_nolock,(__ch))
 #elif defined(__CRT_HAVE__putwch)
-__CREDIRECT(,__WINT_TYPE__,__NOTHROW_NCX,__localdep__putwch,(__WCHAR_TYPE__ __ch),_putwch,(__ch))
+__CREDIRECT(,__WINT_TYPE__,__NOTHROW_RPC,__localdep__putwch,(__WCHAR_TYPE__ __ch),_putwch,(__ch))
 #elif defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked))
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wconio/_putwch.h>
@@ -72,7 +72,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/template/stdtty.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_cputws) __ATTR_IN(1) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_cputws))(__WCHAR_TYPE__ const *__restrict __str) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_cputws))(__WCHAR_TYPE__ const *__restrict __str) {
 #if defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked))
 	__SIZE_TYPE__ __len = (__NAMESPACE_LOCAL_SYM __localdep_wcslen)(__str);
 	__SIZE_TYPE__ __ok  = (__NAMESPACE_LOCAL_SYM __localdep_file_wprinter)(__LOCAL_stdtty, __str, __len);

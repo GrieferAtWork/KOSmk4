@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x340af214 */
+/* HASH CRC-32:0x4604c691 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,12 +33,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep__getwche,(void),_getwche_nolock,())
+__CREDIRECT(__ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_RPC,__localdep__getwche,(void),_getwche_nolock,())
 #elif defined(__CRT_HAVE__getwche)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep__getwche,(void),_getwche,())
+__CREDIRECT(__ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_RPC,__localdep__getwche,(void),_getwche,())
 #elif defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE__getwche_nolock) || (defined(__ECHO) && defined(__TCSANOW) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked)) && (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE_getwc_unlocked) || defined(__CRT_HAVE__getwc_nolock) || defined(__CRT_HAVE__fgetwc_nolock) || defined(__CRT_HAVE_getwc) || defined(__CRT_HAVE_fgetwc)) && (defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wconio/_getwche.h>
@@ -73,7 +73,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_cgetws_s) __ATTR_OUT(3) __ATTR_OUTS(1, 2) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_cgetws_s))(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ *__restrict __p_readsize) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_cgetws_s))(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ *__restrict __p_readsize) {
 	__WCHAR_TYPE__ __ch;
 	if __unlikely(!__bufsize)
 		return __ENOSPC;

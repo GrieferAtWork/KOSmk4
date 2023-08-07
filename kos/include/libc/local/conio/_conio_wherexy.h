@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfddb095c */
+/* HASH CRC-32:0xf515b33c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__cputs_defined
 #define __local___localdep__cputs_defined
 #ifdef __CRT_HAVE__cputs
-__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_NCX,__localdep__cputs,(char const *__restrict __str),_cputs,(__str))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,__localdep__cputs,(char const *__restrict __str),_cputs,(__str))
 #elif (defined(__CRT_HAVE__putch_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__putch) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/conio/_cputs.h>
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__cscanf_defined
 #define __local___localdep__cscanf_defined
 #ifdef __CRT_HAVE__cscanf
-__LIBC __ATTR_WUNUSED __ATTR_IN(1) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep__cscanf)(char const *__format, ...) __CASMNAME("_cscanf");
+__LIBC __ATTR_WUNUSED __ATTR_IN(1) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL __localdep__cscanf)(char const *__format, ...) __CASMNAME("_cscanf");
 #elif defined(__CRT_HAVE__vcscanf) || defined(__CRT_HAVE__vcscanf_l) || defined(__CRT_HAVE___conio_common_vcscanf) || (((defined(__CRT_HAVE__getche_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__getche) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE__getche_nolock) || (defined(__ECHO) && defined(__TCSANOW) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked)) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || (!defined(__CRT_HAVE__filbuf) && !defined(__CRT_HAVE___uflow) && !defined(__CRT_HAVE___underflow) && !defined(__CRT_HAVE___srget)))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || (!defined(__CRT_HAVE__filbuf) && !defined(__CRT_HAVE___uflow) && !defined(__CRT_HAVE___underflow) && !defined(__CRT_HAVE___srget)))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || (!defined(__CRT_HAVE__filbuf) && !defined(__CRT_HAVE___uflow) && !defined(__CRT_HAVE___underflow) && !defined(__CRT_HAVE___srget)))) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow) || defined(__CRT_HAVE___srget))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)))))) && ((defined(__CRT_HAVE__ungetch_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__ungetch) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/conio/_cscanf.h>
@@ -56,9 +56,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__getch_defined
 #define __local___localdep__getch_defined
 #if defined(__CRT_HAVE__getch_nolock) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__getch,(void),_getch_nolock,())
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_RPC,__localdep__getch,(void),_getch_nolock,())
 #elif defined(__CRT_HAVE__getch)
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__getch,(void),_getch,())
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_RPC,__localdep__getch,(void),_getch,())
 #elif defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE__getch_nolock) || (defined(__ECHO) && defined(__TCSANOW) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked)) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || (!defined(__CRT_HAVE__filbuf) && !defined(__CRT_HAVE___uflow) && !defined(__CRT_HAVE___underflow) && !defined(__CRT_HAVE___srget)))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || (!defined(__CRT_HAVE__filbuf) && !defined(__CRT_HAVE___uflow) && !defined(__CRT_HAVE___underflow) && !defined(__CRT_HAVE___srget)))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || (!defined(__CRT_HAVE__filbuf) && !defined(__CRT_HAVE___uflow) && !defined(__CRT_HAVE___underflow) && !defined(__CRT_HAVE___srget)))) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow) || defined(__CRT_HAVE___srget))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/conio/_getch.h>
@@ -136,7 +136,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/inttypes.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_conio_wherexy) __ATTR_OUT(1) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_conio_wherexy))(__UINT16_TYPE__ __xy[2]) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_conio_wherexy))(__UINT16_TYPE__ __xy[2]) {
 #if defined(__KOS__) && defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked)) && (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
 	return (int)(__NAMESPACE_LOCAL_SYM __localdep_ioctl)((__NAMESPACE_LOCAL_SYM __localdep_fileno)(__LOCAL_stdtty), VID_IOC_GETCURSOR, __xy);
 #else /* __KOS__ && __CRT_HAVE_stdtty && (__CRT_HAVE_fileno || __CRT_HAVE__fileno || __CRT_HAVE_fileno_unlocked) && (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) */

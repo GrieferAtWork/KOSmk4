@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b0432b7 */
+/* HASH CRC-32:0x8e80833c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__getwche_defined
 #define __local___localdep__getwche_defined
 #if defined(__CRT_HAVE__getwche_nolock) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep__getwche,(void),_getwche_nolock,())
+__CREDIRECT(__ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_RPC,__localdep__getwche,(void),_getwche_nolock,())
 #elif defined(__CRT_HAVE__getwche)
-__CREDIRECT(__ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep__getwche,(void),_getwche,())
+__CREDIRECT(__ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_RPC,__localdep__getwche,(void),_getwche,())
 #elif defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE__getwche_nolock) || (defined(__ECHO) && defined(__TCSANOW) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked)) && (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE_getwc_unlocked) || defined(__CRT_HAVE__getwc_nolock) || defined(__CRT_HAVE__fgetwc_nolock) || defined(__CRT_HAVE_getwc) || defined(__CRT_HAVE_fgetwc)) && (defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wconio/_getwche.h>
@@ -84,7 +84,7 @@ __LOCAL_LIBC(__conio_common_vcwscanf_ungetc) __SSIZE_TYPE__
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__conio_common_vcwscanf) __ATTR_WUNUSED __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 0) __STDC_INT_AS_SSIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__conio_common_vcwscanf))(__UINT64_TYPE__ __options, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(__conio_common_vcwscanf))(__UINT64_TYPE__ __options, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args) {
 	(void)__options;
 	(void)__locale;
 	return (__NAMESPACE_LOCAL_SYM __localdep_format_vwscanf)(&__NAMESPACE_LOCAL_SYM __conio_common_vcwscanf_getc,

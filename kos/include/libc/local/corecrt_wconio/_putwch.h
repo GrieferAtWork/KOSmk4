@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b1a446d */
+/* HASH CRC-32:0xa4c50857 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/template/stdtty.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_putwch) __WINT_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_putwch))(__WCHAR_TYPE__ __ch) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_putwch))(__WCHAR_TYPE__ __ch) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fputwc)(__ch, __LOCAL_stdtty);
 }
 __NAMESPACE_LOCAL_END

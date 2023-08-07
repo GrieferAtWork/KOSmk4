@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe05556e7 */
+/* HASH CRC-32:0xa36932a0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vcwscanf_l_defined
 #define __local___localdep__vcwscanf_l_defined
 #ifdef __CRT_HAVE__vcwscanf_l
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_LIBC_WSCANF(1, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vcwscanf_l,(__WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vcwscanf_l,(__format,__locale,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_LIBC_WSCANF(1, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep__vcwscanf_l,(__WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vcwscanf_l,(__format,__locale,__args))
 #elif defined(__CRT_HAVE___conio_common_vcwscanf) || (((defined(__CRT_HAVE__getwche_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__getwche) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE__getwche_nolock) || (defined(__ECHO) && defined(__TCSANOW) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked)) && (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE_getwc_unlocked) || defined(__CRT_HAVE__getwc_nolock) || defined(__CRT_HAVE__fgetwc_nolock) || defined(__CRT_HAVE_getwc) || defined(__CRT_HAVE_fgetwc)) && (defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)))))) && ((defined(__CRT_HAVE__ungetwch_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__ungetwch) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wconio/_vcwscanf_l.h>
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep__vcwscanf_l_defined */
 __LOCAL_LIBC(_cwscanf_l) __ATTR_WUNUSED __ATTR_IN(1) __ATTR_LIBC_WSCANF(1, 3) __STDC_INT_AS_SSIZE_T
-__NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(_cwscanf_l))(__WCHAR_TYPE__ const *__format, __locale_t __locale, ...) {
+__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(_cwscanf_l))(__WCHAR_TYPE__ const *__format, __locale_t __locale, ...) {
 	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __locale);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77396efb */
+/* HASH CRC-32:0x379359e6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__cgets_s_defined
 #define __local___localdep__cgets_s_defined
 #ifdef __CRT_HAVE__cgets_s
-__CREDIRECT(__ATTR_OUT(3) __ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,__localdep__cgets_s,(char *__buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ *__restrict __p_readsize),_cgets_s,(__buf,__bufsize,__p_readsize))
+__CREDIRECT(__ATTR_OUT(3) __ATTR_OUTS(1, 2),__errno_t,__NOTHROW_RPC,__localdep__cgets_s,(char *__buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ *__restrict __p_readsize),_cgets_s,(__buf,__bufsize,__p_readsize))
 #elif ((defined(__CRT_HAVE__getch_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__getch) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE__getch_nolock) || (defined(__ECHO) && defined(__TCSANOW) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked)) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || (!defined(__CRT_HAVE__filbuf) && !defined(__CRT_HAVE___uflow) && !defined(__CRT_HAVE___underflow) && !defined(__CRT_HAVE___srget)))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || (!defined(__CRT_HAVE__filbuf) && !defined(__CRT_HAVE___uflow) && !defined(__CRT_HAVE___underflow) && !defined(__CRT_HAVE___srget)))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || (!defined(__CRT_HAVE__filbuf) && !defined(__CRT_HAVE___uflow) && !defined(__CRT_HAVE___underflow) && !defined(__CRT_HAVE___srget)))) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow) || defined(__CRT_HAVE___srget))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)))))) && ((defined(__CRT_HAVE__ungetch_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__ungetch) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/conio/_cgets_s.h>
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep__cgets_s_defined */
 __LOCAL_LIBC(_cgets) __ATTR_INOUT(1) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_cgets))(char *__restrict __buf) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_cgets))(char *__restrict __buf) {
 	char *__result = __buf + 2;
 	__SIZE_TYPE__ __readsize;
 	if ((__NAMESPACE_LOCAL_SYM __localdep__cgets_s)(__result, __buf[0], &__readsize) != 0)

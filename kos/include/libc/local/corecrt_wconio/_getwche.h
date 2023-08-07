@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb1ba40 */
+/* HASH CRC-32:0x25e1ab65 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__getwche_nolock_defined
 #define __local___localdep__getwche_nolock_defined
 #ifdef __CRT_HAVE__getwche_nolock
-__CREDIRECT(__ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep__getwche_nolock,(void),_getwche_nolock,())
+__CREDIRECT(__ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_RPC,__localdep__getwche_nolock,(void),_getwche_nolock,())
 #elif defined(__ECHO) && defined(__TCSANOW) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked)) && (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE_getwc_unlocked) || defined(__CRT_HAVE__getwc_nolock) || defined(__CRT_HAVE__fgetwc_nolock) || defined(__CRT_HAVE_getwc) || defined(__CRT_HAVE_fgetwc)) && (defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wconio/_getwche_nolock.h>
@@ -68,7 +68,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/template/stdtty.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_getwche) __ATTR_WUNUSED __WINT_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_getwche))(void) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_getwche))(void) {
 	__WINT_TYPE__ __result;
 #if (defined(__CRT_HAVE_flockfile) || defined(__CRT_HAVE__lock_file) || defined(__CRT_HAVE__IO_flockfile)) && (defined(__CRT_HAVE_funlockfile) || defined(__CRT_HAVE__unlock_file) || defined(__CRT_HAVE__IO_funlockfile))
 	__FILE *__fp = __LOCAL_stdtty;

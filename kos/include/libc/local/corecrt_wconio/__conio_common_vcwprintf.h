@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafd928c9 */
+/* HASH CRC-32:0xefadcd15 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/template/stdtty.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__conio_common_vcwprintf) __ATTR_IN(2) __ATTR_LIBC_WPRINTF(2, 0) __STDC_INT_AS_SSIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__conio_common_vcwprintf))(__UINT64_TYPE__ __options, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(__conio_common_vcwprintf))(__UINT64_TYPE__ __options, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args) {
 	return (__NAMESPACE_LOCAL_SYM __localdep___stdio_common_vfwprintf)(__options, __LOCAL_stdtty, __format, __locale, __args);
 }
 __NAMESPACE_LOCAL_END

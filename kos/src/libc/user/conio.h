@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3493808b */
+/* HASH CRC-32:0xcdb691c5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc__kbhit)(void);
+INTDEF WUNUSED int NOTHROW(LIBCCALL libc__kbhit)(void);
 #endif /* !__KERNEL__ */
 
 DECL_END

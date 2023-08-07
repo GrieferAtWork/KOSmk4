@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x173a603c */
+/* HASH CRC-32:0x4f03ba8a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ DECL_BEGIN
  * @return: * : The character read from the console
  * @return: -1: End-of-file on console */
 INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__getch)(void) {
+NOTHROW_RPC(LIBCCALL libc__getch)(void) {
 	int result;
 
 	FILE *fp = stdtty;
@@ -64,7 +64,7 @@ NOTHROW_NCX(LIBCCALL libc__getch)(void) {
  * @return: * : The character read from the console
  * @return: -1: End-of-file on console */
 INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__getch_nolock)(void) {
+NOTHROW_RPC(LIBCCALL libc__getch_nolock)(void) {
 	int result;
 	struct termios oios, nios;
 	FILE *fp = stdtty;
@@ -84,7 +84,7 @@ NOTHROW_NCX(LIBCCALL libc__getch_nolock)(void) {
  * @return: * : The character read from the console
  * @return: -1: End-of-file on console */
 INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__getche)(void) {
+NOTHROW_RPC(LIBCCALL libc__getche)(void) {
 	int result;
 
 	FILE *fp = stdtty;
@@ -105,7 +105,7 @@ NOTHROW_NCX(LIBCCALL libc__getche)(void) {
  * @return: * : The character read from the console
  * @return: -1: End-of-file on console */
 INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__getche_nolock)(void) {
+NOTHROW_RPC(LIBCCALL libc__getche_nolock)(void) {
 	int result;
 	struct termios oios, nios;
 	FILE *fp = stdtty;
@@ -121,12 +121,12 @@ NOTHROW_NCX(LIBCCALL libc__getche_nolock)(void) {
 }
 #include <libc/template/stdtty.h>
 INTERN ATTR_SECTION(".text.crt.dos.conio") int
-NOTHROW_NCX(LIBCCALL libc__putch)(int ch) {
+NOTHROW_RPC(LIBCCALL libc__putch)(int ch) {
 	return libc_fputc(ch, stdtty);
 }
 #include <libc/template/stdtty.h>
 INTERN ATTR_SECTION(".text.crt.dos.conio") int
-NOTHROW_NCX(LIBCCALL libc__putch_nolock)(int ch) {
+NOTHROW_RPC(LIBCCALL libc__putch_nolock)(int ch) {
 	return libc_fputc_unlocked(ch, stdtty);
 }
 #include <libc/template/stdtty.h>
@@ -140,7 +140,7 @@ NOTHROW_NCX(LIBCCALL libc__ungetch_nolock)(int ch) {
 	return libc_ungetc_unlocked(ch, stdtty);
 }
 INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_INOUT(1) char *
-NOTHROW_NCX(LIBCCALL libc__cgets)(char *__restrict buf) {
+NOTHROW_RPC(LIBCCALL libc__cgets)(char *__restrict buf) {
 	char *result = buf + 2;
 	size_t readsize;
 	if (libc__cgets_s(result, buf[0], &readsize) != 0)
@@ -149,7 +149,7 @@ NOTHROW_NCX(LIBCCALL libc__cgets)(char *__restrict buf) {
 	return result;
 }
 INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_OUT(3) ATTR_OUTS(1, 2) errno_t
-NOTHROW_NCX(LIBCCALL libc__cgets_s)(char *buf,
+NOTHROW_RPC(LIBCCALL libc__cgets_s)(char *buf,
                                     size_t bufsize,
                                     size_t *__restrict p_readsize) {
 	int ch;
@@ -176,7 +176,7 @@ NOTHROW_NCX(LIBCCALL libc__cgets_s)(char *buf,
 }
 #include <libc/template/stdtty.h>
 INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_IN(1) int
-NOTHROW_NCX(LIBCCALL libc__cputs)(char const *__restrict str) {
+NOTHROW_RPC(LIBCCALL libc__cputs)(char const *__restrict str) {
 
 
 
@@ -194,7 +194,7 @@ NOTHROW_NCX(LIBCCALL libc__cputs)(char const *__restrict str) {
 }
 #include <libc/template/stdtty.h>
 INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_IN(2) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(LIBCCALL libc___conio_common_vcprintf)(uint64_t options,
+NOTHROW_RPC(LIBCCALL libc___conio_common_vcprintf)(uint64_t options,
                                                    char const *format,
                                                    locale_t locale,
                                                    va_list args) {
@@ -202,7 +202,7 @@ NOTHROW_NCX(LIBCCALL libc___conio_common_vcprintf)(uint64_t options,
 }
 #include <libc/template/stdtty.h>
 INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_IN(2) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(LIBCCALL libc___conio_common_vcprintf_s)(uint64_t options,
+NOTHROW_RPC(LIBCCALL libc___conio_common_vcprintf_s)(uint64_t options,
                                                      char const *format,
                                                      locale_t locale,
                                                      va_list args) {
@@ -220,7 +220,7 @@ __LOCAL_LIBC(conio_common_vcscanf_ungetc) ssize_t
 }
 __NAMESPACE_LOCAL_END
 INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_IN(2) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(LIBCCALL libc___conio_common_vcscanf)(uint64_t options,
+NOTHROW_RPC(LIBCCALL libc___conio_common_vcscanf)(uint64_t options,
                                                   char const *format,
                                                   locale_t locale,
                                                   va_list args) {
@@ -232,14 +232,14 @@ NOTHROW_NCX(LIBCCALL libc___conio_common_vcscanf)(uint64_t options,
 }
 #include <corecrt_stdio_config.h>
 INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(LIBCCALL libc__vcprintf_l)(char const *format,
+NOTHROW_RPC(LIBCCALL libc__vcprintf_l)(char const *format,
                                        locale_t locale,
                                        va_list args) {
 	return libc___conio_common_vcprintf(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, format, locale, args);
 }
 #include <corecrt_stdio_config.h>
 INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(LIBCCALL libc__vcprintf_s_l)(char const *format,
+NOTHROW_RPC(LIBCCALL libc__vcprintf_s_l)(char const *format,
                                          locale_t locale,
                                          va_list args) {
 	return libc___conio_common_vcprintf_s(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, format, locale, args);
@@ -247,14 +247,14 @@ NOTHROW_NCX(LIBCCALL libc__vcprintf_s_l)(char const *format,
 DEFINE_INTERN_ALIAS(libc__vcprintf_p_l, libc__vcprintf_l);
 #include <corecrt_stdio_config.h>
 INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(LIBCCALL libc__vcscanf_l)(char const *format,
+NOTHROW_RPC(LIBCCALL libc__vcscanf_l)(char const *format,
                                       locale_t locale,
                                       va_list args) {
 	return libc___conio_common_vcscanf(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS, format, locale, args);
 }
 #include <corecrt_stdio_config.h>
 INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(LIBCCALL libc__vcscanf_s_l)(char const *format,
+NOTHROW_RPC(LIBCCALL libc__vcscanf_s_l)(char const *format,
                                         locale_t locale,
                                         va_list args) {
 	return libc___conio_common_vcscanf(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS |
@@ -262,30 +262,30 @@ NOTHROW_NCX(LIBCCALL libc__vcscanf_s_l)(char const *format,
 	                              format, locale, args);
 }
 INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(LIBCCALL libc__vcprintf)(char const *format,
+NOTHROW_RPC(LIBCCALL libc__vcprintf)(char const *format,
                                      va_list args) {
 	return libc__vcprintf_l(format, NULL, args);
 }
 INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(LIBCCALL libc__vcprintf_s)(char const *format,
+NOTHROW_RPC(LIBCCALL libc__vcprintf_s)(char const *format,
                                        va_list args) {
 	return libc__vcprintf_s_l(format, NULL, args);
 }
 DEFINE_INTERN_ALIAS(libc__vcprintf_p, libc__vcprintf);
 INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(LIBCCALL libc__vcscanf)(char const *format,
+NOTHROW_RPC(LIBCCALL libc__vcscanf)(char const *format,
                                     va_list args) {
 	return libc__vcscanf_l(format, NULL, args);
 }
 INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(LIBCCALL libc__vcscanf_s)(char const *format,
+NOTHROW_RPC(LIBCCALL libc__vcscanf_s)(char const *format,
                                       va_list args) {
 	return libc__vcscanf_s_l(format, NULL, args);
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.conio") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(VLIBDCALL libd__cprintf)(char const *format,
+NOTHROW_RPC(VLIBDCALL libd__cprintf)(char const *format,
                                      ...) {
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
@@ -297,7 +297,7 @@ NOTHROW_NCX(VLIBDCALL libd__cprintf)(char const *format,
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(VLIBCCALL libc__cprintf)(char const *format,
+NOTHROW_RPC(VLIBCCALL libc__cprintf)(char const *format,
                                      ...) {
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
@@ -309,7 +309,7 @@ NOTHROW_NCX(VLIBCCALL libc__cprintf)(char const *format,
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.conio") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 3) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(VLIBDCALL libd__cprintf_l)(char const *format,
+NOTHROW_RPC(VLIBDCALL libd__cprintf_l)(char const *format,
                                        locale_t locale,
                                        ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -322,7 +322,7 @@ NOTHROW_NCX(VLIBDCALL libd__cprintf_l)(char const *format,
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 3) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(VLIBCCALL libc__cprintf_l)(char const *format,
+NOTHROW_RPC(VLIBCCALL libc__cprintf_l)(char const *format,
                                        locale_t locale,
                                        ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -335,7 +335,7 @@ NOTHROW_NCX(VLIBCCALL libc__cprintf_l)(char const *format,
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.conio") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(VLIBDCALL libd__cprintf_s)(char const *format,
+NOTHROW_RPC(VLIBDCALL libd__cprintf_s)(char const *format,
                                        ...) {
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
@@ -347,7 +347,7 @@ NOTHROW_NCX(VLIBDCALL libd__cprintf_s)(char const *format,
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(VLIBCCALL libc__cprintf_s)(char const *format,
+NOTHROW_RPC(VLIBCCALL libc__cprintf_s)(char const *format,
                                        ...) {
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
@@ -359,7 +359,7 @@ NOTHROW_NCX(VLIBCCALL libc__cprintf_s)(char const *format,
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.conio") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 3) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(VLIBDCALL libd__cprintf_s_l)(char const *format,
+NOTHROW_RPC(VLIBDCALL libd__cprintf_s_l)(char const *format,
                                          locale_t locale,
                                          ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -372,7 +372,7 @@ NOTHROW_NCX(VLIBDCALL libd__cprintf_s_l)(char const *format,
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 3) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(VLIBCCALL libc__cprintf_s_l)(char const *format,
+NOTHROW_RPC(VLIBCCALL libc__cprintf_s_l)(char const *format,
                                          locale_t locale,
                                          ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -397,7 +397,7 @@ DEFINE_INTERN_ALIAS(libc__cprintf_p_l, libc__cprintf_l);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(VLIBDCALL libd__cscanf)(char const *format,
+NOTHROW_RPC(VLIBDCALL libd__cscanf)(char const *format,
                                     ...) {
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
@@ -409,7 +409,7 @@ NOTHROW_NCX(VLIBDCALL libd__cscanf)(char const *format,
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(VLIBCCALL libc__cscanf)(char const *format,
+NOTHROW_RPC(VLIBCCALL libc__cscanf)(char const *format,
                                     ...) {
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
@@ -421,7 +421,7 @@ NOTHROW_NCX(VLIBCCALL libc__cscanf)(char const *format,
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 3) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(VLIBDCALL libd__cscanf_l)(char const *format,
+NOTHROW_RPC(VLIBDCALL libd__cscanf_l)(char const *format,
                                       locale_t locale,
                                       ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -434,7 +434,7 @@ NOTHROW_NCX(VLIBDCALL libd__cscanf_l)(char const *format,
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 3) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(VLIBCCALL libc__cscanf_l)(char const *format,
+NOTHROW_RPC(VLIBCCALL libc__cscanf_l)(char const *format,
                                       locale_t locale,
                                       ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -447,7 +447,7 @@ NOTHROW_NCX(VLIBCCALL libc__cscanf_l)(char const *format,
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(VLIBDCALL libd__cscanf_s)(char const *format,
+NOTHROW_RPC(VLIBDCALL libd__cscanf_s)(char const *format,
                                       ...) {
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
@@ -459,7 +459,7 @@ NOTHROW_NCX(VLIBDCALL libd__cscanf_s)(char const *format,
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(VLIBCCALL libc__cscanf_s)(char const *format,
+NOTHROW_RPC(VLIBCCALL libc__cscanf_s)(char const *format,
                                       ...) {
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
@@ -471,7 +471,7 @@ NOTHROW_NCX(VLIBCCALL libc__cscanf_s)(char const *format,
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 3) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(VLIBDCALL libd__cscanf_s_l)(char const *format,
+NOTHROW_RPC(VLIBDCALL libd__cscanf_s_l)(char const *format,
                                         locale_t locale,
                                         ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -484,7 +484,7 @@ NOTHROW_NCX(VLIBDCALL libd__cscanf_s_l)(char const *format,
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 3) __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(VLIBCCALL libc__cscanf_s_l)(char const *format,
+NOTHROW_RPC(VLIBCCALL libc__cscanf_s_l)(char const *format,
                                         locale_t locale,
                                         ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -498,19 +498,19 @@ NOTHROW_NCX(VLIBCCALL libc__cscanf_s_l)(char const *format,
  * Clear all cells from the cursor (inclusive) until the end
  * of the  current  line.  (s.a.  `AC_EL(ANSITTY_EL_AFTER)') */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
-NOTHROW_NCX(LIBCCALL libc_clreol)(void) {
+NOTHROW_RPC(LIBCCALL libc_clreol)(void) {
 	libc__cputs("\033[K"); /* AC_EL(ANSITTY_EL_AFTER) */
 }
 /* >> clrscr(3)
  * Clear the entire screen (s.a. `AC_ED(ANSITTY_CLS_ALL)') */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
-NOTHROW_NCX(LIBCCALL libc_clrscr)(void) {
+NOTHROW_RPC(LIBCCALL libc_clrscr)(void) {
 	libc__cputs("\033[2J"); /* AC_ED(ANSITTY_CLS_ALL) */
 }
 /* >> gotoxy(3)
  * Set the cursor {x,y} position (s.a. `AC_CUP(y, x)') */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
-NOTHROW_NCX(LIBCCALL libc_gotoxy)(int x,
+NOTHROW_RPC(LIBCCALL libc_gotoxy)(int x,
                                   int y) {
 	libc__cprintf("\033[%d;%dH", y, x); /* AC_CUP(y, x) */
 }
@@ -518,38 +518,38 @@ NOTHROW_NCX(LIBCCALL libc_gotoxy)(int x,
  * Delete the line at the current cursor position, moving  the
  * screen contents underneath up one line. (s.a. `AC_DL("1")') */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
-NOTHROW_NCX(LIBCCALL libc_delline)(void) {
+NOTHROW_RPC(LIBCCALL libc_delline)(void) {
 	libc__cputs("\033[M"); /* AC_DL("1") */
 }
 /* >> insline(3)
  * Insert a blank line at the current cursor position, moving the
  * screen  contents underneath down one line. (s.a. `AC_IL("1")') */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
-NOTHROW_NCX(LIBCCALL libc_insline)(void) {
+NOTHROW_RPC(LIBCCALL libc_insline)(void) {
 	libc__cputs("\033[L"); /* AC_IL("1") */
 }
 /* >> highvideo(3)
  * Brighten text foreground color (s.a. `AC_FGBRIGHT') */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
-NOTHROW_NCX(LIBCCALL libc_highvideo)(void) {
+NOTHROW_RPC(LIBCCALL libc_highvideo)(void) {
 	libc__cputs("\033[1m"); /* AC_FGBRIGHT */
 }
 /* >> lowvideo(3)
  * Darken text foreground color (s.a. `AC_FGDARK') */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
-NOTHROW_NCX(LIBCCALL libc_lowvideo)(void) {
+NOTHROW_RPC(LIBCCALL libc_lowvideo)(void) {
 	libc__cputs("\033[2m"); /* AC_FGDARK */
 }
 /* >> normvideo(3)
  * Reset all graphics attributes to normal (s.a. `AC_DEFATTR') */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
-NOTHROW_NCX(LIBCCALL libc_normvideo)(void) {
+NOTHROW_RPC(LIBCCALL libc_normvideo)(void) {
 	libc__cputs("\033[m"); /* AC_DEFATTR */
 }
 /* >> textcolor(3)
  * @param: color: Color code (s.a. constants in `<conio.h>') */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
-NOTHROW_NCX(LIBCCALL libc_textcolor)(int color) {
+NOTHROW_RPC(LIBCCALL libc_textcolor)(int color) {
 	switch (color) {
 	case 0x0:        color = 30; break; /* AC_FG_BLACK   */
 	case 0x1:         color = 34; break; /* AC_FG_NAVY    */
@@ -574,7 +574,7 @@ NOTHROW_NCX(LIBCCALL libc_textcolor)(int color) {
 /* >> textbackground(3)
  * @param: color: Color code (s.a. constants in `<conio.h>') */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
-NOTHROW_NCX(LIBCCALL libc_textbackground)(int color) {
+NOTHROW_RPC(LIBCCALL libc_textbackground)(int color) {
 	switch (color) {
 	case 0x0:        color = 40;  break; /* AC_BG_BLACK   */
 	case 0x1:         color = 44;  break; /* AC_BG_NAVY    */
@@ -599,7 +599,7 @@ NOTHROW_NCX(LIBCCALL libc_textbackground)(int color) {
 /* >> textattr(3)
  * Set text attributes: `textcolor(attr & 0x0f)' and `textbackground((attr & 0xf0) >> 8)' */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
-NOTHROW_NCX(LIBCCALL libc_textattr)(int attr) {
+NOTHROW_RPC(LIBCCALL libc_textattr)(int attr) {
 	libc_textcolor(attr & 0x0f);
 	libc_textbackground((attr & 0xf0) >> 8);
 }
@@ -610,7 +610,7 @@ NOTHROW_NCX(LIBCCALL libc_textattr)(int attr) {
 /* >> clearkeybuf(3)
  * Flush all unread input (usually keyboard) data pending on the terminal */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
-NOTHROW_NCX(LIBCCALL libc_clearkeybuf)(void) {
+NOTHROW(LIBCCALL libc_clearkeybuf)(void) {
 	struct termios ios;
 	FILE *fp = stdtty;
 	fd_t fd  = libc_fileno(fp);
@@ -625,7 +625,7 @@ NOTHROW_NCX(LIBCCALL libc_clearkeybuf)(void) {
 /* >> _conio_getpass(3)
  * CONIO version of getpass(3). But note the slightly different variant from `<unistd.h>' */
 INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_IN(1) ATTR_INOUT(2) char *
-NOTHROW_NCX(LIBCCALL libc__conio_getpass)(const char *prompt,
+NOTHROW_RPC(LIBCCALL libc__conio_getpass)(const char *prompt,
                                           char *str) {
 	unsigned char buflen = (unsigned char)str[0];
 	char *result = libc_getpass_r(prompt, &str[2], buflen);
@@ -638,7 +638,7 @@ NOTHROW_NCX(LIBCCALL libc__conio_getpass)(const char *prompt,
 /* >> cputsxy(3)
  * Combination of `gotoxy(3)' and `cputs(3)' */
 INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_IN(3) void
-NOTHROW_NCX(LIBCCALL libc_cputsxy)(int x,
+NOTHROW_RPC(LIBCCALL libc_cputsxy)(int x,
                                    int y,
                                    char __KOS_FIXED_CONST *str) {
 	libc_gotoxy(x, y);
@@ -647,7 +647,7 @@ NOTHROW_NCX(LIBCCALL libc_cputsxy)(int x,
 /* >> putchxy(3)
  * Combination of `gotoxy(3)' and `putch(3)' */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
-NOTHROW_NCX(LIBCCALL libc_putchxy)(int x,
+NOTHROW_RPC(LIBCCALL libc_putchxy)(int x,
                                    int y,
                                    char ch) {
 	libc_gotoxy(x, y);
@@ -657,7 +657,7 @@ NOTHROW_NCX(LIBCCALL libc_putchxy)(int x,
 #include <kos/ioctl/video.h>
 #include <bits/crt/inttypes.h>
 INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_OUT(1) int
-NOTHROW_NCX(LIBCCALL libc__conio_wherexy)(uint16_t xy[2]) {
+NOTHROW_RPC(LIBCCALL libc__conio_wherexy)(uint16_t xy[2]) {
 
 
 
@@ -686,7 +686,7 @@ NOTHROW_NCX(LIBCCALL libc__conio_wherexy)(uint16_t xy[2]) {
 /* >> wherex(3)
  * Return the current cursor 'X' position (1-based) */
 INTERN ATTR_SECTION(".text.crt.dos.conio") int
-NOTHROW_NCX(LIBCCALL libc_wherex)(void) {
+NOTHROW_RPC(LIBCCALL libc_wherex)(void) {
 	uint16_t xy[2];
 	if (libc__conio_wherexy(xy))
 		return -1;
@@ -695,7 +695,7 @@ NOTHROW_NCX(LIBCCALL libc_wherex)(void) {
 /* >> wherey(3)
  * Return the current cursor 'Y' position (1-based) */
 INTERN ATTR_SECTION(".text.crt.dos.conio") int
-NOTHROW_NCX(LIBCCALL libc_wherey)(void) {
+NOTHROW_RPC(LIBCCALL libc_wherey)(void) {
 	uint16_t xy[2];
 	if (libc__conio_wherexy(xy))
 		return -1;
@@ -704,7 +704,7 @@ NOTHROW_NCX(LIBCCALL libc_wherey)(void) {
 /* >> window(3)
  * Set scroll range and margains to the specified rectangle (1-based) */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
-NOTHROW_NCX(LIBCCALL libc_window)(int left,
+NOTHROW_RPC(LIBCCALL libc_window)(int left,
                                   int top,
                                   int right,
                                   int bottom) {
@@ -721,7 +721,7 @@ NOTHROW_NCX(LIBCCALL libc_window)(int left,
  * Duplicate a  given rectangle  (1-based)  of on-screen  text  at
  * another location. Overlapping rectangles are handled correctly. */
 INTERN ATTR_SECTION(".text.crt.dos.conio") int
-NOTHROW_NCX(LIBCCALL libc_movetext)(int left,
+NOTHROW_RPC(LIBCCALL libc_movetext)(int left,
                                     int top,
                                     int right,
                                     int bottom,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51186210 */
+/* HASH CRC-32:0xab6cbbf */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,7 +108,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/template/stdtty.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(clearkeybuf) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clearkeybuf))(void) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(clearkeybuf))(void) {
 	struct termios __ios;
 	__FILE *__fp = __LOCAL_stdtty;
 	__fd_t __fd  = (__NAMESPACE_LOCAL_SYM __localdep_fileno)(__fp);

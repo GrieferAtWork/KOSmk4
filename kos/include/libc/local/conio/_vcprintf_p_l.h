@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdae7bca */
+/* HASH CRC-32:0xe8cd5d65 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_IN(2) __ATTR_LIBC_PRINTF_P(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___conio_common_vcprintf_p,(__UINT64_TYPE__ __options, char const *__format, __locale_t __locale, __builtin_va_list __args),__conio_common_vcprintf_p,(__options,__format,__locale,__args))
+__CREDIRECT(__ATTR_IN(2) __ATTR_LIBC_PRINTF_P(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep___conio_common_vcprintf_p,(__UINT64_TYPE__ __options, char const *__format, __locale_t __locale, __builtin_va_list __args),__conio_common_vcprintf_p,(__options,__format,__locale,__args))
 #elif defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfprintf_p) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock))
 __NAMESPACE_LOCAL_END
 #include <libc/local/conio/__conio_common_vcprintf_p.h>
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_END
 #include <corecrt_stdio_config.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_vcprintf_p_l) __ATTR_IN(1) __ATTR_LIBC_PRINTF_P(1, 0) __STDC_INT_AS_SSIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vcprintf_p_l))(char const *__format, __locale_t __locale, __builtin_va_list __args) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_vcprintf_p_l))(char const *__format, __locale_t __locale, __builtin_va_list __args) {
 	return (__NAMESPACE_LOCAL_SYM __localdep___conio_common_vcprintf_p)(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, __format, __locale, __args);
 }
 __NAMESPACE_LOCAL_END

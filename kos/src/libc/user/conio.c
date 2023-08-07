@@ -34,9 +34,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libc__kbhit,hash:CRC-32=0xbcfa11c8]]]*/
+/*[[[head:libc__kbhit,hash:CRC-32=0xcb5aaa5b]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__kbhit)(void)
+NOTHROW(LIBCCALL libc__kbhit)(void)
 /*[[[body:libc__kbhit]]]*/
 {
 	int result = 0;

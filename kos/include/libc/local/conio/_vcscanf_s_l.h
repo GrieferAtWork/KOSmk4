@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13212be0 */
+/* HASH CRC-32:0xd3518027 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_LIBC_SCANF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___conio_common_vcscanf,(__UINT64_TYPE__ __options, char const *__format, __locale_t __locale, __builtin_va_list __args),__conio_common_vcscanf,(__options,__format,__locale,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_LIBC_SCANF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep___conio_common_vcscanf,(__UINT64_TYPE__ __options, char const *__format, __locale_t __locale, __builtin_va_list __args),__conio_common_vcscanf,(__options,__format,__locale,__args))
 #elif ((defined(__CRT_HAVE__getche_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__getche) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE__getche_nolock) || (defined(__ECHO) && defined(__TCSANOW) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked)) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || (!defined(__CRT_HAVE__filbuf) && !defined(__CRT_HAVE___uflow) && !defined(__CRT_HAVE___underflow) && !defined(__CRT_HAVE___srget)))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || (!defined(__CRT_HAVE__filbuf) && !defined(__CRT_HAVE___uflow) && !defined(__CRT_HAVE___underflow) && !defined(__CRT_HAVE___srget)))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || (!defined(__CRT_HAVE__filbuf) && !defined(__CRT_HAVE___uflow) && !defined(__CRT_HAVE___underflow) && !defined(__CRT_HAVE___srget)))) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow) || defined(__CRT_HAVE___srget))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)))))) && ((defined(__CRT_HAVE__ungetch_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__ungetch) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/conio/__conio_common_vcscanf.h>
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_END
 #include <corecrt_stdio_config.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_vcscanf_s_l) __ATTR_WUNUSED __ATTR_IN(1) __ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SSIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vcscanf_s_l))(char const *__format, __locale_t __locale, __builtin_va_list __args) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_vcscanf_s_l))(char const *__format, __locale_t __locale, __builtin_va_list __args) {
 	return (__NAMESPACE_LOCAL_SYM __localdep___conio_common_vcscanf)(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS |
 	                              1,
 	                              __format, __locale, __args);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2449ad07 */
+/* HASH CRC-32:0x7cb73b5c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__conio_wherexy __LIBC_LOCAL_NAME(_conio_wherexy)
 #endif /* !__local___localdep__conio_wherexy_defined */
 __LOCAL_LIBC(wherey) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wherey))(void) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wherey))(void) {
 	__UINT16_TYPE__ __xy[2];
 	if ((__NAMESPACE_LOCAL_SYM __localdep__conio_wherexy)(__xy))
 		return -1;

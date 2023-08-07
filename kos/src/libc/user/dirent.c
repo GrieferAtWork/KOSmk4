@@ -702,8 +702,8 @@ struct glibc_dirent64 {
 #define get_glibc_dirent32_compat_libc5() libc_compat_islibc5()
 
 PRIVATE ATTR_SECTION(".text.crt.compat.linux.dirent")
-ATTR_RETNONNULL WUNUSED NONNULL((1)) struct glibc_dirent32 *__FCALL
-dirent_glibc32_to_libc5(struct glibc_dirent32 *__restrict self) {
+ATTR_RETNONNULL WUNUSED NONNULL((1)) struct glibc_dirent32 *
+NOTHROW_NCX(__FCALL dirent_glibc32_to_libc5)(struct glibc_dirent32 *__restrict self) {
 	/* Old versions of libc4/5 didn't have the `d_type' field.
 	 * Instead, their `struct dirent' matched `struct old_linux_direntx32',
 	 * which is identical to `struct glibc_dirent32', except that it  lacks
@@ -713,8 +713,8 @@ dirent_glibc32_to_libc5(struct glibc_dirent32 *__restrict self) {
 }
 
 PRIVATE ATTR_SECTION(".text.crt.compat.linux.dirent")
-ATTR_RETNONNULL WUNUSED NONNULL((1)) struct glibc_dirent32 *__FCALL
-dirent2glibc32(struct dirent *__restrict self) {
+ATTR_RETNONNULL WUNUSED NONNULL((1)) struct glibc_dirent32 *
+NOTHROW_NCX(__FCALL dirent2glibc32)(struct dirent *__restrict self) {
 	static_assert(offsetof(struct glibc_dirent32, d_ino) == offsetof(struct dirent, d_ino));
 	static_assert(offsetof(struct glibc_dirent32, d_reclen) == offsetof(struct dirent, d_namlen));
 	static_assert(offsetof(struct glibc_dirent32, d_type) == offsetof(struct dirent, d_type));

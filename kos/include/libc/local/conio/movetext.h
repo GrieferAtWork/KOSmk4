@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe62cf14f */
+/* HASH CRC-32:0xdde76c71 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,7 +102,7 @@ __NAMESPACE_LOCAL_END
 #include <parts/malloca.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(movetext) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(movetext))(int __left, int __top, int __right, int __bottom, int __destleft, int __desttop) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(movetext))(int __left, int __top, int __right, int __bottom, int __destleft, int __desttop) {
 	struct vidttyinfo __info;
 	struct vidttycelldata __data;
 	__fd_t __fd = (__NAMESPACE_LOCAL_SYM __localdep_fileno)(__LOCAL_stdtty);

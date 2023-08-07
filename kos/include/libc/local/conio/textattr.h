@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5635b759 */
+/* HASH CRC-32:0x79a39825 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_textbackground_defined
 #define __local___localdep_textbackground_defined
 #ifdef __CRT_HAVE_textbackground
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_textbackground,(int __color),textbackground,(__color))
+__CREDIRECT_VOID(,__NOTHROW_RPC,__localdep_textbackground,(int __color),textbackground,(__color))
 #elif defined(__CRT_HAVE__cprintf) || defined(__CRT_HAVE__vcprintf) || defined(__CRT_HAVE__vcprintf_l) || defined(__CRT_HAVE___conio_common_vcprintf) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfprintf) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/conio/textbackground.h>
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_textcolor_defined
 #define __local___localdep_textcolor_defined
 #ifdef __CRT_HAVE_textcolor
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_textcolor,(int __color),textcolor,(__color))
+__CREDIRECT_VOID(,__NOTHROW_RPC,__localdep_textcolor,(int __color),textcolor,(__color))
 #elif defined(__CRT_HAVE__cprintf) || defined(__CRT_HAVE__vcprintf) || defined(__CRT_HAVE__vcprintf_l) || defined(__CRT_HAVE___conio_common_vcprintf) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfprintf) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/conio/textcolor.h>
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_textcolor_defined */
 __LOCAL_LIBC(textattr) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(textattr))(int __attr) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(textattr))(int __attr) {
 	(__NAMESPACE_LOCAL_SYM __localdep_textcolor)(__attr & 0x0f);
 	(__NAMESPACE_LOCAL_SYM __localdep_textbackground)((__attr & 0xf0) >> 8);
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36a36139 */
+/* HASH CRC-32:0x830ae84a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -128,7 +128,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/template/stdtty.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_getwch_nolock) __ATTR_WUNUSED __WINT_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_getwch_nolock))(void) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_getwch_nolock))(void) {
 	__WINT_TYPE__ __result;
 	struct termios __oios, __nios;
 	__FILE *__fp = __LOCAL_stdtty;
