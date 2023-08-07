@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2427eac3 */
+/* HASH CRC-32:0x7533ee09 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5030,17 +5030,17 @@ NOTHROW_NCX(LIBKCALL libc__wdupenv_s)(char32_t **__restrict pbuf,
 }
 #include <libc/template/environ.h>
 INTERN ATTR_SECTION(".text.crt.dos.fs.environ") ATTR_OUT(1) errno_t
-NOTHROW_RPC(LIBCCALL libc__get_environ)(char ***p_environ) {
+NOTHROW_NCX(LIBCCALL libc__get_environ)(char ***p_environ) {
 	*p_environ = __LOCAL_environ;
 	return 0;
 }
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_OUT(1) errno_t
-NOTHROW_RPC(LIBDCALL libd__get_wenviron)(char16_t ***p_wenviron) {
+NOTHROW_NCX(LIBDCALL libd__get_wenviron)(char16_t ***p_wenviron) {
 	*p_wenviron = *libd___p__wenviron();
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_OUT(1) errno_t
-NOTHROW_RPC(LIBKCALL libc__get_wenviron)(char32_t ***p_wenviron) {
+NOTHROW_NCX(LIBKCALL libc__get_wenviron)(char32_t ***p_wenviron) {
 	*p_wenviron = *libc___p__wenviron();
 	return 0;
 }

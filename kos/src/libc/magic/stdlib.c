@@ -4141,7 +4141,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 #elif defined(__CRT_HAVE__get_environ)
 #ifndef ___get_environ_defined
 #define ___get_environ_defined
-__CDECLARE(,int,__NOTHROW,_get_environ,(char ***__p_environ),())
+__CDECLARE(,int,__NOTHROW_NCX,_get_environ,(char ***__p_environ),())
 #endif /* !___get_environ_defined */
 #ifndef _____get_environ_wrapper_defined
 #define _____get_environ_wrapper_defined
@@ -5554,7 +5554,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 #elif defined(__CRT_HAVE__get_environ)
 #ifndef ___get_environ_defined
 #define ___get_environ_defined
-__CDECLARE(,int,__NOTHROW,_get_environ,(char ***__p_environ),())
+__CDECLARE(,int,__NOTHROW_NCX,_get_environ,(char ***__p_environ),())
 #endif /* !___get_environ_defined */
 #ifndef _____get_environ_wrapper_defined
 #define _____get_environ_wrapper_defined
@@ -5677,7 +5677,7 @@ errno_t _wsearchenv_s([[in]] wchar_t const *file,
                       $size_t resultpath_len);
 
 
-[[cp, decl_include("<bits/types.h>")]]
+[[decl_include("<bits/types.h>")]]
 [[requires_include("<libc/template/environ.h>")]]
 [[requires(defined(__LOCAL_environ))]]
 [[impl_include("<libc/template/environ.h>")]]
@@ -5687,7 +5687,7 @@ errno_t _get_environ([[out]] char ***p_environ) {
 	return 0;
 }
 
-[[cp, wchar, decl_include("<bits/types.h>")]]
+[[wchar, decl_include("<bits/types.h>")]]
 [[requires_function(__p__wenviron)]]
 [[section(".text.crt.dos.wchar.fs.environ")]]
 errno_t _get_wenviron([[out]] wchar_t ***p_wenviron) {

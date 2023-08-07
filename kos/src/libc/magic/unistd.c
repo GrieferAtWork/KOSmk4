@@ -342,7 +342,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 #elif defined(__CRT_HAVE__get_environ)
 #ifndef ___get_environ_defined
 #define ___get_environ_defined
-__CDECLARE(,int,__NOTHROW,_get_environ,(char ***__p_environ),())
+__CDECLARE(,int,__NOTHROW_NCX,_get_environ,(char ***__p_environ),())
 #endif /* !___get_environ_defined */
 #ifndef _____get_environ_wrapper_defined
 #define _____get_environ_wrapper_defined
@@ -1897,7 +1897,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 #elif defined(__CRT_HAVE__get_environ)
 #ifndef ___get_environ_defined
 #define ___get_environ_defined
-__CDECLARE(,int,__NOTHROW,_get_environ,(char ***__p_environ),())
+__CDECLARE(,int,__NOTHROW_NCX,_get_environ,(char ***__p_environ),())
 #endif /* !___get_environ_defined */
 #ifndef _____get_environ_wrapper_defined
 #define _____get_environ_wrapper_defined
