@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x649f6aad */
+/* HASH CRC-32:0x77929231 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,9 +57,9 @@ __NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qsort_s))(void *__base, __SIZE_TYP
 	struct __NAMESPACE_LOCAL_SYM __invoke_compare_helper_s_data __data;
 	__data.__fun = __compar;
 	__data.__arg = __arg;
-	return (__NAMESPACE_LOCAL_SYM __localdep_qsort_r)(__base, __elem_count, __elem_size,
-	               &__NAMESPACE_LOCAL_SYM __invoke_compare_helper_s,
-	               &__data);
+	(__NAMESPACE_LOCAL_SYM __localdep_qsort_r)(__base, __elem_count, __elem_size,
+	        &__NAMESPACE_LOCAL_SYM __invoke_compare_helper_s,
+	        &__data);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_qsort_s_defined

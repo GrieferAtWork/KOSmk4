@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7533ee09 */
+/* HASH CRC-32:0xd076dfb4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3725,9 +3725,9 @@ NOTHROW_CB_NCX(LIBCCALL libc_qsort_s)(void *base,
 	struct __NAMESPACE_LOCAL_SYM __invoke_compare_helper_s_data data;
 	data.__fun = compar;
 	data.__arg = arg;
-	return libc_qsort_r(base, elem_count, elem_size,
-	               &__NAMESPACE_LOCAL_SYM __invoke_compare_helper_s,
-	               &data);
+	libc_qsort_r(base, elem_count, elem_size,
+	        &__NAMESPACE_LOCAL_SYM __invoke_compare_helper_s,
+	        &data);
 }
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") ATTR_IN(4) ATTR_OUT(1) ATTR_OUTS(2, 3) errno_t
 NOTHROW_NCX(LIBDCALL libd_getenv_s)(size_t *preqsize,

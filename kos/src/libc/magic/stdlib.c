@@ -4615,9 +4615,9 @@ void qsort_s([[inout(elem_count * elem_size)]] void *base, $size_t elem_count, $
 	struct __NAMESPACE_LOCAL_SYM __invoke_compare_helper_s_data data;
 	data.__fun = compar;
 	data.__arg = arg;
-	return qsort_r(base, elem_count, elem_size,
-	               &__NAMESPACE_LOCAL_SYM __invoke_compare_helper_s,
-	               &data);
+	qsort_r(base, elem_count, elem_size,
+	        &__NAMESPACE_LOCAL_SYM __invoke_compare_helper_s,
+	        &data);
 }
 %#endif  /* _CRT_ALGO_DEFINED */
 %
