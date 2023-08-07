@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa865cda5 */
+/* HASH CRC-32:0xd4e5a62d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(FSync) void
 (__LIBCCALL __LIBC_LOCAL_NAME(FSync))(__fd_t __fd) __THROWS(...) {
+	__COMPILER_IMPURE();
 	(void)__fd;
 	/* No-Op */
 }

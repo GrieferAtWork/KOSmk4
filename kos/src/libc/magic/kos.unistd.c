@@ -108,6 +108,7 @@ void Pipe([[out]] $fd_t pipedes[2]);
 [[userimpl, alias("FDataSync")]]
 [[section(".text.crt{|.dos}.except.io.sync")]]
 void FSync($fd_t fd) {
+	COMPILER_IMPURE();
 	(void)fd;
 	/* No-Op */
 }
@@ -815,6 +816,7 @@ size_t ConfStr(__STDC_INT_AS_UINT_T name, [[out(? <= buflen)]] char *buf, size_t
 [[throws, userimpl]]
 [[section(".text.crt{|.dos}.except.sched.param")]]
 int Nice(int inc) {
+	COMPILER_IMPURE();
 	(void)inc;
 	/* It should be sufficient to emulate this is a no-op. */
 	return 0;
@@ -971,6 +973,7 @@ void FTruncate64($fd_t fd, pos64_t length) {
 [[cp, throws, decl_include("<bits/types.h>"), doc_alias("fdatasync"), alias("FSync")]]
 [[userimpl, section(".text.crt{|.dos}.except.io.sync")]]
 void FDataSync($fd_t fd) {
+	COMPILER_IMPURE();
 	(void)fd;
 	/* No-Op */
 }
