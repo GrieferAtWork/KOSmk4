@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6260378e */
+/* HASH CRC-32:0x395639e2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -393,7 +393,7 @@ NOTHROW_NCX(LIBCCALL libc_tss_set)(tss_t tss_id,
 #include <asm/crt/limits.h>
 /* >> thr_min_stack(3) */
 INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_CONST WUNUSED size_t
-NOTHROW_NCX(LIBCCALL libc_thr_min_stack)(void) {
+NOTHROW(LIBCCALL libc_thr_min_stack)(void) {
 
 
 

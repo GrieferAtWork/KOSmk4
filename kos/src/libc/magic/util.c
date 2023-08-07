@@ -130,7 +130,7 @@ $fd_t opendev([[in]] char const *path, $oflag_t oflags,
 @@                 return of this function, `strdup("")' will be returned. (i.e.  NULL
 @@                 is only returned in case of an error; _NOT_ in case of end-of-file)
 @@@return: NULL:   Error (s.a. `errno' and `ferror(stream)')
-[[cp, wunused, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[cp_stdio, wunused, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<asm/crt/stdio.h>", "<asm/os/stdio.h>", "<asm/crt/util.h>")]]
 [[guard, requires_function(getline, fgetc, ungetc, realloc)]]
 [[section(".text.crt{|.dos}.FILE.locked.read.read")]]

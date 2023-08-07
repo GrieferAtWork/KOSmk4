@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2a3f5d2 */
+/* HASH CRC-32:0x2cdbc101 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_cimagl_defined
 #define __local___localdep_cimagl_defined
 #ifdef __CRT_HAVE_cimagl
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_cimagl,(long double _Complex __z),cimagl,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_cimagl,(long double _Complex __z),cimagl,(__z))
 #elif defined(__CRT_HAVE_cimag) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_cimagl,(long double _Complex __z),cimag,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_cimagl,(long double _Complex __z),cimag,(__z))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/cimagl.h>
@@ -61,7 +61,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_cproj_defined
 #define __local___localdep_cproj_defined
 #ifdef __CRT_HAVE_cproj
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double _Complex,__NOTHROW_NCX,__localdep_cproj,(double _Complex __z),cproj,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double _Complex,__NOTHROW,__localdep_cproj,(double _Complex __z),cproj,(__z))
 #elif defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__INFINITY) || defined(__HUGE_VAL)
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/cproj.h>
@@ -74,9 +74,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_creall_defined
 #define __local___localdep_creall_defined
 #ifdef __CRT_HAVE_creall
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_creall,(long double _Complex __z),creall,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_creall,(long double _Complex __z),creall,(__z))
 #elif defined(__CRT_HAVE_creal) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_creall,(long double _Complex __z),creal,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_creall,(long double _Complex __z),creal,(__z))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/creall.h>
@@ -106,7 +106,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_isinfl_defined */
 __LOCAL_LIBC(cprojl) __ATTR_CONST __ATTR_WUNUSED long double _Complex
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cprojl))(long double _Complex __z) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(cprojl))(long double _Complex __z) {
 #if defined(__CRT_HAVE_isinfl) || defined(__CRT_HAVE___isinfl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__INFINITYL) || defined(__HUGE_VALL) || defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__INFINITY) || defined(__HUGE_VAL)
 	union {
 		long double _Complex __x;

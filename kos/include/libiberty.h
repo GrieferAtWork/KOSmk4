@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb1850b1 */
+/* HASH CRC-32:0x88e9dd1f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -970,21 +970,21 @@ __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,getpwd,(void),())
 __NAMESPACE_LOCAL_USING_OR_IMPL(getpwd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL getpwd)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpwd))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_errno_max
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,errno_max,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,errno_max,(void),())
 #else /* __CRT_HAVE_errno_max */
 #include <asm/os/errno.h>
 #ifdef __ECOUNT
 #include <libc/local/libiberty/errno_max.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(errno_max, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL errno_max)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(errno_max))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(errno_max, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL errno_max)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(errno_max))(); })
 #endif /* __ECOUNT */
 #endif /* !__CRT_HAVE_errno_max */
 #ifdef __CRT_HAVE_signo_max
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,signo_max,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,signo_max,(void),())
 #else /* __CRT_HAVE_signo_max */
 #include <asm/os/signal.h>
 #ifdef __NSIG
 #include <libc/local/libiberty/signo_max.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(signo_max, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL signo_max)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(signo_max))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(signo_max, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL signo_max)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(signo_max))(); })
 #endif /* __NSIG */
 #endif /* !__CRT_HAVE_signo_max */
 #ifdef __CRT_HAVE_strtoerrno
@@ -1370,13 +1370,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unlink_if_ordinary, __FORCELOCAL __ATTR_ARTIFICI
 #endif /* ((__CRT_HAVE_klstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_klstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_lstat && (!__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) || (__CRT_HAVE_lstat64 && (__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64))) && (__CRT_HAVE_unlink || __CRT_HAVE__unlink || __CRT_HAVE___unlink || __CRT_HAVE___libc_unlink || (__AT_FDCWD && __CRT_HAVE_unlinkat)) */
 #endif /* !__CRT_HAVE_unlink_if_ordinary */
 #ifdef __CRT_HAVE_physmem_total
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,physmem_total,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,physmem_total,(void),())
 #else /* __CRT_HAVE_physmem_total */
 #include <asm/crt/confname.h>
 #include <asm/pagesize.h>
 #if (defined(__CRT_HAVE_getpagesize) || defined(__CRT_HAVE___getpagesize) || defined(__ARCH_PAGESIZE)) && (defined(__CRT_HAVE_sysconf) || defined(__CRT_HAVE___sysconf)) && defined(_SC_PHYS_PAGES)
 #include <libc/local/libiberty/physmem_total.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(physmem_total, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL physmem_total)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(physmem_total))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(physmem_total, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL physmem_total)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(physmem_total))(); })
 #endif /* (__CRT_HAVE_getpagesize || __CRT_HAVE___getpagesize || __ARCH_PAGESIZE) && (__CRT_HAVE_sysconf || __CRT_HAVE___sysconf) && _SC_PHYS_PAGES */
 #endif /* !__CRT_HAVE_physmem_total */
 #ifdef __CRT_HAVE_physmem_available

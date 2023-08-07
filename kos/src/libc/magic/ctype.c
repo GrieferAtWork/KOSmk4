@@ -927,14 +927,14 @@ int toupper_l(int ch, $locale_t locale) {
 
 @@>> issymstrt(3)
 @@Test if `ch' can appear at the start of a symbol/keyword/identifier
-[[const, wunused, decl_include("<hybrid/typecore.h>"), crt_name("__iscsymf")]]
+[[const, wunused, nothrow, decl_include("<hybrid/typecore.h>"), crt_name("__iscsymf")]]
 int issymstrt(int ch) {
 	return isalpha(ch) || ch == '_' || ch == '$';
 }
 
 @@>> issymcont(3)
 @@Test if `ch' can appear in the middle of a symbol/keyword/identifier
-[[const, wunused, decl_include("<hybrid/typecore.h>"), crt_name("__iscsym")]]
+[[const, wunused, nothrow, decl_include("<hybrid/typecore.h>"), crt_name("__iscsym")]]
 int issymcont(int ch) {
 	return isalnum(ch) || ch == '_' || ch == '$';
 }
@@ -1048,7 +1048,7 @@ __CSDECLARE(,int,__mb_cur_max)
 #endif /* !MB_CUR_MAX */
 }
 
-[[hidden, const, wunused]]
+[[hidden, const, wunused, nothrow]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<libc/template/MB_CUR_MAX.h>")]]
 [[export_alias("___mb_cur_max_func")]]
@@ -1057,7 +1057,7 @@ $size_t __ctype_get_mb_cur_max(void) {
 	return __LOCAL_MB_CUR_MAX;
 }
 
-[[guard, const, wunused]]
+[[guard, const, wunused, nothrow]]
 int ___mb_cur_max_func(void) = __ctype_get_mb_cur_max;
 
 [[impl_include("<libc/template/MB_CUR_MAX.h>")]]

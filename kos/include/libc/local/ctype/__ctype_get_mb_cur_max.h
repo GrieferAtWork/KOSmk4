@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefd152c3 */
+/* HASH CRC-32:0x6b4e4a14 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <libc/template/MB_CUR_MAX.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__ctype_get_mb_cur_max) __ATTR_CONST __ATTR_WUNUSED __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__ctype_get_mb_cur_max))(void) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__ctype_get_mb_cur_max))(void) {
 	return __LOCAL_MB_CUR_MAX;
 }
 __NAMESPACE_LOCAL_END

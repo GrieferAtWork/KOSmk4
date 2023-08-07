@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5967dd8 */
+/* HASH CRC-32:0x34279877 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,20 +45,20 @@ typedef size_t rsize_t;
  * Convert a single-byte into a wide character. If the given
  * character `ch' isn't valid, or  is `EOF', then `WEOF'  is
  * returned instead. */
-INTDEF ATTR_CONST WUNUSED wint16_t NOTHROW_NCX(LIBDCALL libd_btowc)(int ch);
+INTDEF ATTR_CONST WUNUSED wint16_t NOTHROW(LIBDCALL libd_btowc)(int ch);
 /* >> btowc(3)
  * Convert a single-byte into a wide character. If the given
  * character `ch' isn't valid, or  is `EOF', then `WEOF'  is
  * returned instead. */
-INTDEF ATTR_CONST WUNUSED wint32_t NOTHROW_NCX(LIBKCALL libc_btowc)(int ch);
+INTDEF ATTR_CONST WUNUSED wint32_t NOTHROW(LIBKCALL libc_btowc)(int ch);
 /* >> wctob(3)
  * Convert a wide-character into a single-byte character. If
  * doing so isn't possible, then `EOF' is returned  instead. */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd_wctob)(wint16_t ch);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_wctob)(wint16_t ch);
 /* >> wctob(3)
  * Convert a wide-character into a single-byte character. If
  * doing so isn't possible, then `EOF' is returned  instead. */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBKCALL libc_wctob)(wint32_t ch);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc_wctob)(wint32_t ch);
 /* >> mbrtowc(3) */
 INTDEF ATTR_INOUT_OPT(4) ATTR_IN_OPT(2) ATTR_OUT_OPT(1) size_t NOTHROW_NCX(LIBDCALL libd_mbrtowc)(char16_t *pwc, char const *__restrict str, size_t maxlen, mbstate_t *mbs);
 /* >> mbrtowc(3) */
@@ -307,12 +307,12 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_IN(1) char32_t *NOTHRO
  * Returns the number of columns needed to display `ch' in a system terminal
  * When `ch' cannot be  displayed at all, `-1'  is returned (but `errno'  is
  * never modified by this function). Zero-width characters return `0'. */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd_wcwidth)(char16_t ch);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_wcwidth)(char16_t ch);
 /* >> wcwidth(3)
  * Returns the number of columns needed to display `ch' in a system terminal
  * When `ch' cannot be  displayed at all, `-1'  is returned (but `errno'  is
  * never modified by this function). Zero-width characters return `0'. */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBKCALL libc_wcwidth)(char32_t ch);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc_wcwidth)(char32_t ch);
 /* >> wcswidth(3)
  * Returns the number of columns needed to display `str...+=wcslen(str, num_chars)'
  * in a system terminal. If any of the contained characters cannot be printed, then

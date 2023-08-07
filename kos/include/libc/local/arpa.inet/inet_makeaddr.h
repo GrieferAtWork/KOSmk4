@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc89f19c */
+/* HASH CRC-32:0xdb9a7722 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(inet_makeaddr) __ATTR_CONST __ATTR_WUNUSED struct in_addr
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_makeaddr))(__UINT32_TYPE__ __net, __UINT32_TYPE__ __host) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(inet_makeaddr))(__UINT32_TYPE__ __net, __UINT32_TYPE__ __host) {
 	struct in_addr __result;
 	__UINT32_TYPE__ __result_addr;
 	if (__net < IN_CLASSA_MAX) {

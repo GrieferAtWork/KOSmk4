@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdbfd583 */
+/* HASH CRC-32:0x86927125 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <libc/unicode.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcwidth) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcwidth))(__WCHAR_TYPE__ __ch) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(wcwidth))(__WCHAR_TYPE__ __ch) {
 	if (__libc_unicode_isprint(__ch))
 		return 1;
 	if (__ch == 0)

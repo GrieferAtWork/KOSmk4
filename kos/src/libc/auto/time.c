@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdeab04b6 */
+/* HASH CRC-32:0xf357f54e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -499,7 +499,7 @@ NOTHROW_NCX(LIBCCALL libc_timegm)(struct tm *tp) {
 /* >> dysize(3)
  * Return the number of days in YEAR */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_dysize)(__STDC_INT_AS_UINT_T year) {
+NOTHROW(LIBCCALL libc_dysize)(__STDC_INT_AS_UINT_T year) {
 	return __isleap(year) ? 366 : 365;
 }
 #include <bits/types.h>
@@ -947,22 +947,22 @@ NOTHROW_NCX(LIBCCALL libc_asctime_r)(struct tm const *__restrict tp,
 }
 #include <libc/template/daylight.h>
 INTERN ATTR_SECTION(".text.crt.time") ATTR_CONST ATTR_RETNONNULL WUNUSED int *
-NOTHROW_NCX(LIBDCALL libc___daylight)(void) {
+NOTHROW(LIBDCALL libc___daylight)(void) {
 	return &__LOCAL_daylight;
 }
 #include <libc/template/timezone.h>
 INTERN ATTR_SECTION(".text.crt.time") ATTR_CONST ATTR_RETNONNULL WUNUSED long *
-NOTHROW_NCX(LIBDCALL libc___timezone)(void) {
+NOTHROW(LIBDCALL libc___timezone)(void) {
 	return (long *)&__LOCAL_timezone;
 }
 #include <libc/template/tzname.h>
 INTERN ATTR_SECTION(".text.crt.time") ATTR_CONST ATTR_RETNONNULL WUNUSED char **
-NOTHROW_NCX(LIBDCALL libc___tzname)(void) {
+NOTHROW(LIBDCALL libc___tzname)(void) {
 	return __LOCAL_tzname;
 }
 #include <libc/template/dstbias.h>
 INTERN ATTR_SECTION(".text.crt.time") ATTR_CONST ATTR_RETNONNULL WUNUSED __LONG32_TYPE__ *
-NOTHROW_NCX(LIBDCALL libc___dstbias)(void) {
+NOTHROW(LIBDCALL libc___dstbias)(void) {
 	return &__LOCAL_dstbias;
 }
 #include <libc/template/daylight.h>

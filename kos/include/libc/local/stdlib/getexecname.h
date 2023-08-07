@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa98399a6 */
+/* HASH CRC-32:0x676a66bc */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #ifdef __LOCAL_program_invocation_name
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getexecname) __ATTR_CONST __ATTR_WUNUSED char const *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getexecname))(void) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(getexecname))(void) {
 	return __LOCAL_program_invocation_name;
 }
 __NAMESPACE_LOCAL_END

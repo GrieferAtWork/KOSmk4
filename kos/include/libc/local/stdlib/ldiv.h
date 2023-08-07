@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ad53120 */
+/* HASH CRC-32:0x36090fe8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <bits/crt/div.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ldiv) __ATTR_CONST __ATTR_WUNUSED struct __ldiv_struct
+__LOCAL_LIBC(ldiv) __ATTR_PURE __ATTR_WUNUSED struct __ldiv_struct
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ldiv))(long __numer, long __denom) {
 	struct __ldiv_struct __result;
 	__result.quot = __numer / __denom;

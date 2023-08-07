@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39660879 */
+/* HASH CRC-32:0x24880898 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcwidth_defined
 #define __local___localdep_wcwidth_defined
 #ifdef __CRT_HAVE_wcwidth
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wcwidth,(__WCHAR_TYPE__ __ch),wcwidth,(__ch))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_wcwidth,(__WCHAR_TYPE__ __ch),wcwidth,(__ch))
 #else /* __CRT_HAVE_wcwidth */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcwidth.h>

@@ -64,7 +64,7 @@ typedef __socklen_t socklen_t;
 
 @@>> inet_netof(3)
 @@Return the network-number-part of the Internet address `INADDR'
-[[const, wunused]]
+[[const, wunused, nothrow]]
 [[decl_include("<hybrid/typecore.h>", "<netinet/bits/in.h>")]]
 [[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 $uint32_t inet_netof(struct in_addr inaddr) {
@@ -80,7 +80,7 @@ $uint32_t inet_netof(struct in_addr inaddr) {
 
 @@>> inet_lnaof(3)
 @@Return the local-host-address-part of the Internet address `INADDR'
-[[const, wunused]]
+[[const, wunused, nothrow]]
 [[decl_include("<hybrid/typecore.h>", "<netinet/bits/in.h>")]]
 [[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 $uint32_t inet_lnaof(struct in_addr inaddr) {
@@ -99,7 +99,7 @@ $uint32_t inet_lnaof(struct in_addr inaddr) {
 @@the combination of its network (`net'), and host (`host') number.
 @@The `net' and `host' arguments  can later be re-extracted by  use
 @@of `inet_netof(3)' and `inet_lnaof(3)'
-[[const, wunused]]
+[[const, wunused, nothrow]]
 [[decl_include("<hybrid/typecore.h>", "<netinet/bits/in.h>")]]
 [[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 struct in_addr inet_makeaddr($uint32_t net, $uint32_t host) {

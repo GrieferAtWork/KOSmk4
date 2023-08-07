@@ -2781,7 +2781,7 @@ $errno_t pthread_setspecific(pthread_key_t key,
 @@@return: NULL: `key' had yet to be allocated for the calling thread,
 @@               and an  attempt  to  allocate  it  just  now  failed.
 @@@return: NULL: Invalid `key'.
-[[wunused, const, decl_include("<bits/crt/pthreadtypes.h>")]]
+[[wunused, pure, decl_include("<bits/crt/pthreadtypes.h>")]]
 void **pthread_getspecificptr_np(pthread_key_t key);
 %#endif /* __USE_KOS */
 

@@ -144,7 +144,7 @@ struct group *getgrent();
 @@Write the given entry `ent' into the given `stream'
 @@@return: 0 : Success
 @@@return: -1: Error (s.a. `errno')
-[[cp, decl_include("<bits/crt/db/group.h>")]]
+[[cp_stdio, decl_include("<bits/crt/db/group.h>")]]
 [[requires_function(fprintf_unlocked)]]
 [[impl_include("<libc/errno.h>")]]
 [[impl_include("<bits/types.h>")]]
@@ -249,7 +249,7 @@ int getgrent_r([[out]] struct group *__restrict resultbuf,
 
 %
 %#ifdef __USE_MISC
-[[cp, doc_alias("fgetgrent"), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
+[[cp_stdio, doc_alias("fgetgrent"), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 [[requires_function(fgetgrfiltered_r)]]
 int fgetgrent_r([[inout]] $FILE *__restrict stream,
                 [[out]] struct group *__restrict resultbuf,
@@ -265,7 +265,7 @@ int fgetgrent_r([[inout]] $FILE *__restrict stream,
 @@@return: 0 : (*result != NULL) Success
 @@@return: 0 : (*result == NULL) No entry for `gid'
 @@@return: * : Error (one of `E*' from `<errno.h>')
-[[cp, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
+[[cp_stdio, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 [[requires_function(fgetgrfiltered_r), impl_include("<libc/errno.h>")]]
 $errno_t fgetgrgid_r([[inout]] $FILE *__restrict stream, $gid_t gid,
                      [[out]] struct group *__restrict resultbuf,
@@ -286,7 +286,7 @@ $errno_t fgetgrgid_r([[inout]] $FILE *__restrict stream, $gid_t gid,
 @@@return: 0 : (*result != NULL) Success
 @@@return: 0 : (*result == NULL) No entry for `name'
 @@@return: * : Error (one of `E*' from `<errno.h>')
-[[cp, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
+[[cp_stdio, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 [[requires_function(fgetgrfiltered_r), impl_include("<libc/errno.h>")]]
 $errno_t fgetgrnam_r([[inout]] $FILE *__restrict stream,
                      [[in]] char const *__restrict name,
@@ -315,7 +315,7 @@ $errno_t fgetgrnam_r([[inout]] $FILE *__restrict stream,
 @@@return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
 @@                 Note that in this case, `errno' will have also been set to `ERANGE'
 @@@return: * :     Error (one of `E*' from `<errno.h>')
-[[static, cp, decl_include("<bits/types.h>", "<bits/crt/db/group.h>")]]
+[[static, cp_stdio, decl_include("<bits/types.h>", "<bits/crt/db/group.h>")]]
 [[impl_include("<libc/errno.h>", "<hybrid/typecore.h>", "<asm/os/syslog.h>")]]
 [[requires_function(fgetpos64, fsetpos64, fparseln, feof)]]
 $errno_t fgetgrfiltered_r([[inout]] $FILE *__restrict stream,
@@ -545,7 +545,7 @@ nextline:
 %
 %#ifdef __USE_MISC
 @@>> fgetgrent(3), fgetgrent_r(3)
-[[cp, decl_include("<bits/crt/db/group.h>")]]
+[[cp_stdio, decl_include("<bits/crt/db/group.h>")]]
 struct group *fgetgrent([[inout]] $FILE *__restrict stream);
 
 @@>> setgroups(2)

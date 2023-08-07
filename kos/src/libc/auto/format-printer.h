@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e9c37dd */
+/* HASH CRC-32:0xab37c726 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -277,7 +277,7 @@ INTDEF ATTR_PURE ATTR_INS(2, 3) NONNULL((2)) ssize_t NOTHROW_NCX(__FORMATPRINTER
 /* >> format_length(3)
  * Always re-return `datalen' and ignore all other arguments
  * Both the `arg'  and `data' arguments  are simply  ignored */
-INTDEF ATTR_CONST ATTR_INS(2, 3) NONNULL((2)) ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_length)(void *arg, char const *__restrict data, size_t datalen);
+INTDEF ATTR_CONST ATTR_INS(2, 3) NONNULL((2)) ssize_t NOTHROW(__FORMATPRINTER_CC libc_format_length)(void *arg, char const *__restrict data, size_t datalen);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> format_aprintf_pack(3)
  * Pack  and  finalize  a  given  aprintf  format printer

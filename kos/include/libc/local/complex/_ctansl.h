@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b829323 */
+/* HASH CRC-32:0x9a679402 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE__redupi) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep__redupil,(__LONGDOUBLE __x),_redupi,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep__redupil,(__LONGDOUBLE __x),_redupi,(__x))
 #else /* __CRT_HAVE__redupi && __ARCH_LONG_DOUBLE_IS_DOUBLE */
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/_redupil.h>
@@ -46,13 +46,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_cimagl_defined
 #define __local___localdep_cimagl_defined
 #ifdef __CRT_HAVE_cimagl
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_cimagl,(long double _Complex __z),cimagl,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_cimagl,(long double _Complex __z),cimagl,(__z))
 #else /* __CRT_HAVE_cimagl */
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_cimag) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_cimagl,(long double _Complex __z),cimag,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_cimagl,(long double _Complex __z),cimag,(__z))
 #else /* __CRT_HAVE_cimag && __ARCH_LONG_DOUBLE_IS_DOUBLE */
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/cimagl.h>
@@ -64,13 +64,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_creall_defined
 #define __local___localdep_creall_defined
 #ifdef __CRT_HAVE_creall
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_creall,(long double _Complex __z),creall,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_creall,(long double _Complex __z),creall,(__z))
 #else /* __CRT_HAVE_creall */
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_creal) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_creall,(long double _Complex __z),creal,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_creall,(long double _Complex __z),creal,(__z))
 #else /* __CRT_HAVE_creal && __ARCH_LONG_DOUBLE_IS_DOUBLE */
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/creall.h>
@@ -104,7 +104,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fabsl_defined */
 __LOCAL_LIBC(_ctansl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ctansl))(long double _Complex __z) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(_ctansl))(long double _Complex __z) {
 
 	/* Implementation derived from NetBSD. -- See the following copyright notice. */
 	/*-

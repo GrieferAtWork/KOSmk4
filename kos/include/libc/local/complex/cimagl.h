@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa601dd00 */
+/* HASH CRC-32:0xaaa62090 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(cimagl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cimagl))(long double _Complex __z) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(cimagl))(long double _Complex __z) {
 	union {
 		long double _Complex __x;
 		__LONGDOUBLE __parts[2];

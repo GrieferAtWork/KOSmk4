@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x454924b9 */
+/* HASH CRC-32:0xf5000e4f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #endif /* !__isleap */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(dysize) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dysize))(__STDC_INT_AS_UINT_T __year) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(dysize))(__STDC_INT_AS_UINT_T __year) {
 	return __isleap(__year) ? 366 : 365;
 }
 __NAMESPACE_LOCAL_END

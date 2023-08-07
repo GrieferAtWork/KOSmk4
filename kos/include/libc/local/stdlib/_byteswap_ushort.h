@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb47720d8 */
+/* HASH CRC-32:0x44498c64 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_byteswap_ushort) __ATTR_CONST __ATTR_WUNUSED __UINT16_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_byteswap_ushort))(__UINT16_TYPE__ __val) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(_byteswap_ushort))(__UINT16_TYPE__ __val) {
 	return __hybrid_bswap16(__val);
 }
 __NAMESPACE_LOCAL_END

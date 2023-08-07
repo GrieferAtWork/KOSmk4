@@ -1478,9 +1478,9 @@ NOTHROW_NCX(LIBKCALL libc_update_wenviron)(void) {
 	return 0;
 }
 
-/*[[[head:libd___p__wenviron,hash:CRC-32=0xd104e9d2]]]*/
+/*[[[head:libd___p__wenviron,hash:CRC-32=0x87c29721]]]*/
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
-NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void)
+NOTHROW(LIBDCALL libd___p__wenviron)(void)
 /*[[[body:libd___p__wenviron]]]*/
 {
 	if (libd_wenviron == NULL)
@@ -1489,9 +1489,9 @@ NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void)
 }
 /*[[[end:libd___p__wenviron]]]*/
 
-/*[[[head:libc___p__wenviron,hash:CRC-32=0x6f0d52ce]]]*/
+/*[[[head:libc___p__wenviron,hash:CRC-32=0x41ec1e33]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***
-NOTHROW_NCX(LIBKCALL libc___p__wenviron)(void)
+NOTHROW(LIBKCALL libc___p__wenviron)(void)
 /*[[[body:libc___p__wenviron]]]*/
 {
 	if (libc_wenviron == NULL)
@@ -2612,18 +2612,18 @@ NOTHROW_RPC(LIBCCALL libc_canonicalize_file_name)(char const *filename)
 /*[[[skip:libc_calloc]]]*/
 /*[[[skip:libc_realloc]]]*/
 
-/*[[[head:libc___p___argc,hash:CRC-32=0x247bbd5d]]]*/
+/*[[[head:libc___p___argc,hash:CRC-32=0x83476cd6]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED int *
-NOTHROW_NCX(LIBCCALL libc___p___argc)(void)
+NOTHROW(LIBCCALL libc___p___argc)(void)
 /*[[[body:libc___p___argc]]]*/
 {
 	return &__argc;
 }
 /*[[[end:libc___p___argc]]]*/
 
-/*[[[head:libc___p___argv,hash:CRC-32=0xc89484f3]]]*/
+/*[[[head:libc___p___argv,hash:CRC-32=0xd1d0ce72]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char ***
-NOTHROW_NCX(LIBCCALL libc___p___argv)(void)
+NOTHROW(LIBCCALL libc___p___argv)(void)
 /*[[[body:libc___p___argv]]]*/
 {
 	return &__argv;
@@ -2639,9 +2639,9 @@ PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libc___
 DEFINE_PUBLIC_IDATA(__wargv, libc___p___wargv, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_IDATA(DOS$__wargv, libd___p___wargv, __SIZEOF_POINTER__);
 
-/*[[[head:libd___p___wargv,hash:CRC-32=0x8148fe7c]]]*/
+/*[[[head:libd___p___wargv,hash:CRC-32=0xbae7ee2e]]]*/
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
-NOTHROW_NCX(LIBDCALL libd___p___wargv)(void)
+NOTHROW(LIBDCALL libd___p___wargv)(void)
 /*[[[body:libd___p___wargv]]]*/
 {
 	ATOMIC_ONCE_RUN(&libd___p___wargv_initialized, {
@@ -2651,9 +2651,9 @@ NOTHROW_NCX(LIBDCALL libd___p___wargv)(void)
 }
 /*[[[end:libd___p___wargv]]]*/
 
-/*[[[head:libc___p___wargv,hash:CRC-32=0xa62e593b]]]*/
+/*[[[head:libc___p___wargv,hash:CRC-32=0xfda1b2fe]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***
-NOTHROW_NCX(LIBKCALL libc___p___wargv)(void)
+NOTHROW(LIBKCALL libc___p___wargv)(void)
 /*[[[body:libc___p___wargv]]]*/
 {
 	ATOMIC_ONCE_RUN(&libc___p___wargv_initialized, {
@@ -2686,10 +2686,10 @@ PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libd___
 DEFINE_PUBLIC_IDATA(__initenv, libc___p___initenv, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_IDATA(DOS$__initenv, libd___p___initenv, __SIZEOF_POINTER__);
 
-/*[[[head:libc___p___initenv,hash:CRC-32=0x2f3a191d]]]*/
+/*[[[head:libc___p___initenv,hash:CRC-32=0x88c0a004]]]*/
 /* Access to the initial environment block */
 INTERN ATTR_SECTION(".text.crt.dos.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char ***
-NOTHROW_NCX(LIBCCALL libc___p___initenv)(void)
+NOTHROW(LIBCCALL libc___p___initenv)(void)
 /*[[[body:libc___p___initenv]]]*/
 {
 	ATOMIC_ONCE_RUN(&libc___p___initenv_initialized, {
@@ -2704,10 +2704,10 @@ NOTHROW_NCX(LIBDCALL libd_alloc_initenv)(void) {
 	return libd_alloc_environ(libc_get_initenv());
 }
 
-/*[[[head:libd___p___initenv,hash:CRC-32=0xa714881c]]]*/
+/*[[[head:libd___p___initenv,hash:CRC-32=0x2535deb8]]]*/
 /* Access to the initial environment block */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char ***
-NOTHROW_NCX(LIBDCALL libd___p___initenv)(void)
+NOTHROW(LIBDCALL libd___p___initenv)(void)
 /*[[[body:libd___p___initenv]]]*/
 {
 	ATOMIC_ONCE_RUN(&libd___p___initenv_initialized, {
@@ -2726,10 +2726,10 @@ PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libc___
 DEFINE_PUBLIC_IDATA(__winitenv, libc___p___winitenv, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_IDATA(DOS$__winitenv, libd___p___winitenv, __SIZEOF_POINTER__);
 
-/*[[[head:libd___p___winitenv,hash:CRC-32=0x6e247b16]]]*/
+/*[[[head:libd___p___winitenv,hash:CRC-32=0x81627022]]]*/
 /* Access to the initial environment block */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
-NOTHROW_NCX(LIBDCALL libd___p___winitenv)(void)
+NOTHROW(LIBDCALL libd___p___winitenv)(void)
 /*[[[body:libd___p___winitenv]]]*/
 {
 	ATOMIC_ONCE_RUN(&libd___p___winitenv_initialized, {
@@ -2739,10 +2739,10 @@ NOTHROW_NCX(LIBDCALL libd___p___winitenv)(void)
 }
 /*[[[end:libd___p___winitenv]]]*/
 
-/*[[[head:libc___p___winitenv,hash:CRC-32=0x208a5e9e]]]*/
+/*[[[head:libc___p___winitenv,hash:CRC-32=0x7c0cfe67]]]*/
 /* Access to the initial environment block */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***
-NOTHROW_NCX(LIBKCALL libc___p___winitenv)(void)
+NOTHROW(LIBKCALL libc___p___winitenv)(void)
 /*[[[body:libc___p___winitenv]]]*/
 {
 	ATOMIC_ONCE_RUN(&libc___p___winitenv_initialized, {
@@ -2791,9 +2791,9 @@ PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libc___
 DEFINE_PUBLIC_IDATA(_wpgmptr, libc___p__wpgmptr, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_IDATA(DOS$_wpgmptr, libd___p__wpgmptr, __SIZEOF_POINTER__);
 
-/*[[[head:libd___p__wpgmptr,hash:CRC-32=0x3fd7346b]]]*/
+/*[[[head:libd___p__wpgmptr,hash:CRC-32=0xef17771a]]]*/
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t **
-NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void)
+NOTHROW(LIBDCALL libd___p__wpgmptr)(void)
 /*[[[body:libd___p__wpgmptr]]]*/
 {
 	ATOMIC_ONCE_RUN(&libd___p__wpgmptr_initialized, {
@@ -2803,9 +2803,9 @@ NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void)
 }
 /*[[[end:libd___p__wpgmptr]]]*/
 
-/*[[[head:libc___p__wpgmptr,hash:CRC-32=0xc65340b2]]]*/
+/*[[[head:libc___p__wpgmptr,hash:CRC-32=0x76b3f854]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t **
-NOTHROW_NCX(LIBKCALL libc___p__wpgmptr)(void)
+NOTHROW(LIBKCALL libc___p__wpgmptr)(void)
 /*[[[body:libc___p__wpgmptr]]]*/
 {
 	ATOMIC_ONCE_RUN(&libc___p__wpgmptr_initialized, {
@@ -2963,9 +2963,9 @@ NOTHROW_NCX(LIBCCALL libc__get_purecall_handler)(void)
 INTERN ATTR_SECTION(".bss.crt.dos.FILE.utility") int libd__fmode = 0;
 DEFINE_PUBLIC_ALIAS(_fmode, libd__fmode);
 
-/*[[[head:libc___p__fmode,hash:CRC-32=0x75afe2d]]]*/
+/*[[[head:libc___p__fmode,hash:CRC-32=0x6c97165e]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") ATTR_CONST ATTR_RETNONNULL WUNUSED int *
-NOTHROW_NCX(LIBCCALL libc___p__fmode)(void)
+NOTHROW(LIBCCALL libc___p__fmode)(void)
 /*[[[body:libc___p__fmode]]]*/
 {
 	return &libd__fmode;

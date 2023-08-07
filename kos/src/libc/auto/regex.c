@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9bb5c7f */
+/* HASH CRC-32:0xe72c0635 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -106,7 +106,7 @@ NOTHROW_NCX(LIBCCALL libc_regfree)(regex_t *self) {
  * @return: * :   The human-readable description for `errcode'
  * @return: NULL: No description is available for `errcode' */
 INTERN ATTR_SECTION(".text.crt.utility.regex") ATTR_CONST WUNUSED char const *
-NOTHROW_NCX(LIBCCALL libc_regerrordesc_np)(int errcode) {
+NOTHROW(LIBCCALL libc_regerrordesc_np)(int errcode) {
 	char const *result;
 	switch (errcode) {
 

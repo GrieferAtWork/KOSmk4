@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83a1bae */
+/* HASH CRC-32:0xada1910 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,15 +36,15 @@ INTDEF ATTR_OUT(2) ATTR_OUT(3) void NOTHROW_NCX(LIBCCALL libc__cchshf)(float x, 
 INTDEF ATTR_OUT(2) ATTR_OUT(3) void NOTHROW_NCX(LIBCCALL libc__cchshl)(__LONGDOUBLE x, __LONGDOUBLE *c, __LONGDOUBLE *s);
 /* calculate cosh and sinh */
 INTDEF ATTR_OUT(2) ATTR_OUT(3) void NOTHROW_NCX(LIBCCALL libc__cchsh)(double x, double *c, double *s);
-INTDEF ATTR_CONST WUNUSED float NOTHROW_NCX(LIBCCALL libc__redupif)(float x);
-INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc__redupil)(__LONGDOUBLE x);
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc__redupi)(double x);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc__redupif)(float x);
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc__redupil)(__LONGDOUBLE x);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc__redupi)(double x);
 /* Taylor series expansion for cosh(2y) - cos(2x) */
-INTDEF ATTR_CONST WUNUSED float NOTHROW_NCX(LIBCCALL libc__ctansf)(float _Complex z);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc__ctansf)(float _Complex z);
 /* Taylor series expansion for cosh(2y) - cos(2x) */
-INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc__ctansl)(long double _Complex z);
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc__ctansl)(long double _Complex z);
 /* Taylor series expansion for cosh(2y) - cos(2x) */
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc__ctans)(double _Complex z);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc__ctans)(double _Complex z);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF float NOTHROW_NCX(LIBDCALL libd_cabsf)(float _Complex z);
@@ -155,28 +155,28 @@ INTDEF WUNUSED float NOTHROW_NCX(LIBDCALL libd_cargf)(float _Complex z);
 INTDEF WUNUSED float NOTHROW_NCX(LIBCCALL libc_cargf)(float _Complex z);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED float _Complex NOTHROW_NCX(LIBDCALL libd_conjf)(float _Complex z);
+INTDEF ATTR_CONST WUNUSED float _Complex NOTHROW(LIBDCALL libd_conjf)(float _Complex z);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED float _Complex NOTHROW_NCX(LIBCCALL libc_conjf)(float _Complex z);
+INTDEF ATTR_CONST WUNUSED float _Complex NOTHROW(LIBCCALL libc_conjf)(float _Complex z);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED float NOTHROW_NCX(LIBDCALL libd_crealf)(float _Complex z);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBDCALL libd_crealf)(float _Complex z);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED float NOTHROW_NCX(LIBCCALL libc_crealf)(float _Complex z);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_crealf)(float _Complex z);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED float NOTHROW_NCX(LIBDCALL libd_cimagf)(float _Complex z);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBDCALL libd_cimagf)(float _Complex z);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED float NOTHROW_NCX(LIBCCALL libc_cimagf)(float _Complex z);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_cimagf)(float _Complex z);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED float _Complex NOTHROW_NCX(LIBDCALL libd_cprojf)(float _Complex z);
+INTDEF ATTR_CONST WUNUSED float _Complex NOTHROW(LIBDCALL libd_cprojf)(float _Complex z);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED float _Complex NOTHROW_NCX(LIBCCALL libc_cprojf)(float _Complex z);
+INTDEF ATTR_CONST WUNUSED float _Complex NOTHROW(LIBCCALL libc_cprojf)(float _Complex z);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF double NOTHROW_NCX(LIBDCALL libd_cabs)(double _Complex z);
@@ -287,28 +287,28 @@ INTDEF WUNUSED double NOTHROW_NCX(LIBDCALL libd_carg)(double _Complex z);
 INTDEF WUNUSED double NOTHROW_NCX(LIBCCALL libc_carg)(double _Complex z);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED double _Complex NOTHROW_NCX(LIBDCALL libd_conj)(double _Complex z);
+INTDEF ATTR_CONST WUNUSED double _Complex NOTHROW(LIBDCALL libd_conj)(double _Complex z);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED double _Complex NOTHROW_NCX(LIBCCALL libc_conj)(double _Complex z);
+INTDEF ATTR_CONST WUNUSED double _Complex NOTHROW(LIBCCALL libc_conj)(double _Complex z);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBDCALL libd_creal)(double _Complex z);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd_creal)(double _Complex z);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_creal)(double _Complex z);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_creal)(double _Complex z);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBDCALL libd_cimag)(double _Complex z);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd_cimag)(double _Complex z);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_cimag)(double _Complex z);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_cimag)(double _Complex z);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED double _Complex NOTHROW_NCX(LIBDCALL libd_cproj)(double _Complex z);
+INTDEF ATTR_CONST WUNUSED double _Complex NOTHROW(LIBDCALL libd_cproj)(double _Complex z);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED double _Complex NOTHROW_NCX(LIBCCALL libc_cproj)(double _Complex z);
+INTDEF ATTR_CONST WUNUSED double _Complex NOTHROW(LIBCCALL libc_cproj)(double _Complex z);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_cabsl)(long double _Complex z);
@@ -419,28 +419,28 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_cargl)(long double _Comple
 INTDEF WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_cargl)(long double _Complex z);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED long double _Complex NOTHROW_NCX(LIBDCALL libd_conjl)(long double _Complex z);
+INTDEF ATTR_CONST WUNUSED long double _Complex NOTHROW(LIBDCALL libd_conjl)(long double _Complex z);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED long double _Complex NOTHROW_NCX(LIBCCALL libc_conjl)(long double _Complex z);
+INTDEF ATTR_CONST WUNUSED long double _Complex NOTHROW(LIBCCALL libc_conjl)(long double _Complex z);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_creall)(long double _Complex z);
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_creall)(long double _Complex z);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_creall)(long double _Complex z);
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_creall)(long double _Complex z);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_cimagl)(long double _Complex z);
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_cimagl)(long double _Complex z);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_cimagl)(long double _Complex z);
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_cimagl)(long double _Complex z);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED long double _Complex NOTHROW_NCX(LIBDCALL libd_cprojl)(long double _Complex z);
+INTDEF ATTR_CONST WUNUSED long double _Complex NOTHROW(LIBDCALL libd_cprojl)(long double _Complex z);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED long double _Complex NOTHROW_NCX(LIBCCALL libc_cprojl)(long double _Complex z);
+INTDEF ATTR_CONST WUNUSED long double _Complex NOTHROW(LIBCCALL libc_cprojl)(long double _Complex z);
 #endif /* !__KERNEL__ */
 
 DECL_END

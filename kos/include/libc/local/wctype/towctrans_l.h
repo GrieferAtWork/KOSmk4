@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbc4d393 */
+/* HASH CRC-32:0xf3b30a83 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_towctrans_defined
 #define __local___localdep_towctrans_defined
 #ifdef __CRT_HAVE_towctrans
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towctrans,(__WINT_TYPE__ __wc, __wctrans_t __desc),towctrans,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towctrans,(__WINT_TYPE__ __wc, __wctrans_t __desc),towctrans,(__wc,__desc))
 #elif defined(__CRT_HAVE___towctrans)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towctrans,(__WINT_TYPE__ __wc, __wctrans_t __desc),__towctrans,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towctrans,(__WINT_TYPE__ __wc, __wctrans_t __desc),__towctrans,(__wc,__desc))
 #elif defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/towctrans.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c1a0870 */
+/* HASH CRC-32:0x770843a9 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_iswsymcont_defined
 #define __local___localdep_iswsymcont_defined
 #ifdef __CRT_HAVE___iswcsym
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswsymcont,(__WINT_TYPE__ __wc),__iswcsym,(__wc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswsymcont,(__WINT_TYPE__ __wc),__iswcsym,(__wc))
 #else /* __CRT_HAVE___iswcsym */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/iswsymcont.h>

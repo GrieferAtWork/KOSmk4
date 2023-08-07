@@ -146,18 +146,18 @@ DEFINE_PUBLIC_ALIAS(_mbcasemap, libc__mbcasemap);
 #define _mbctype   (&GET_NOREL_GLOBAL(_mbctype))
 #define _mbcasemap (&GET_NOREL_GLOBAL(_mbcasemap))
 
-/*[[[head:libc___p__mbctype,hash:CRC-32=0xa2a91898]]]*/
+/*[[[head:libc___p__mbctype,hash:CRC-32=0xcd3197a]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_CONST ATTR_RETNONNULL WUNUSED unsigned char *
-NOTHROW_NCX(LIBCCALL libc___p__mbctype)(void)
+NOTHROW(LIBCCALL libc___p__mbctype)(void)
 /*[[[body:libc___p__mbctype]]]*/
 {
 	return _mbctype;
 }
 /*[[[end:libc___p__mbctype]]]*/
 
-/*[[[head:libc___p__mbcasemap,hash:CRC-32=0xacc82086]]]*/
+/*[[[head:libc___p__mbcasemap,hash:CRC-32=0xb7872f04]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_CONST ATTR_RETNONNULL WUNUSED unsigned char *
-NOTHROW_NCX(LIBCCALL libc___p__mbcasemap)(void)
+NOTHROW(LIBCCALL libc___p__mbcasemap)(void)
 /*[[[body:libc___p__mbcasemap]]]*/
 {
 	return _mbcasemap;

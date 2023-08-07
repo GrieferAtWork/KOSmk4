@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca0e91d3 */
+/* HASH CRC-32:0x191d1347 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -247,73 +247,73 @@ struct group_filter {
 #ifndef __htons_defined
 #define __htons_defined
 #ifdef __CRT_HAVE_htons
-__CEIDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,htons,(__UINT16_TYPE__ __hostword),{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
+__CEIDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW,htons,(__UINT16_TYPE__ __hostword),{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
 #elif defined(__CRT_HAVE_ntohs) && defined(__HYBRID_HTOBE_IS_BETOH)
-__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,htons,(__UINT16_TYPE__ __hostword),ntohs,{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
+__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW,htons,(__UINT16_TYPE__ __hostword),ntohs,{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
 #elif defined(__CRT_HAVE___htons)
-__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,htons,(__UINT16_TYPE__ __hostword),__htons,{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
+__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW,htons,(__UINT16_TYPE__ __hostword),__htons,{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
 #elif defined(__CRT_HAVE___ntohs) && defined(__HYBRID_HTOBE_IS_BETOH)
-__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,htons,(__UINT16_TYPE__ __hostword),__ntohs,{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
+__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW,htons,(__UINT16_TYPE__ __hostword),__ntohs,{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
 #else /* ... */
-__LOCAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL htons)(__UINT16_TYPE__ __hostword) { return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); }
+__LOCAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW(__LIBCCALL htons)(__UINT16_TYPE__ __hostword) { return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); }
 #endif /* !... */
 #endif /* !__htons_defined */
 #ifndef __ntohs_defined
 #define __ntohs_defined
 #ifdef __CRT_HAVE_ntohs
-__CEIDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,ntohs,(__UINT16_TYPE__ __netshort),{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
+__CEIDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW,ntohs,(__UINT16_TYPE__ __netshort),{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
 #elif defined(__CRT_HAVE_htons) && defined(__HYBRID_HTOBE_IS_BETOH)
-__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,ntohs,(__UINT16_TYPE__ __netshort),htons,{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
+__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW,ntohs,(__UINT16_TYPE__ __netshort),htons,{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
 #elif defined(__CRT_HAVE___ntohs)
-__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,ntohs,(__UINT16_TYPE__ __netshort),__ntohs,{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
+__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW,ntohs,(__UINT16_TYPE__ __netshort),__ntohs,{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
 #elif defined(__CRT_HAVE___htons) && defined(__HYBRID_HTOBE_IS_BETOH)
-__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,ntohs,(__UINT16_TYPE__ __netshort),__htons,{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
+__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW,ntohs,(__UINT16_TYPE__ __netshort),__htons,{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
 #else /* ... */
-__LOCAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohs)(__UINT16_TYPE__ __netshort) { return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); }
+__LOCAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW(__LIBCCALL ntohs)(__UINT16_TYPE__ __netshort) { return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); }
 #endif /* !... */
 #endif /* !__ntohs_defined */
 #ifndef __htonl_defined
 #define __htonl_defined
 #ifdef __CRT_HAVE_htonl
-__CEIDECLARE(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,htonl,(__UINT32_TYPE__ __hostlong),{ return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); })
+__CEIDECLARE(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW,htonl,(__UINT32_TYPE__ __hostlong),{ return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); })
 #elif defined(__CRT_HAVE_ntohl) && defined(__HYBRID_HTOBE_IS_BETOH)
-__CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,htonl,(__UINT32_TYPE__ __hostlong),ntohl,{ return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); })
+__CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW,htonl,(__UINT32_TYPE__ __hostlong),ntohl,{ return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); })
 #elif defined(__CRT_HAVE___htonl)
-__CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,htonl,(__UINT32_TYPE__ __hostlong),__htonl,{ return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); })
+__CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW,htonl,(__UINT32_TYPE__ __hostlong),__htonl,{ return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); })
 #elif defined(__CRT_HAVE___ntohl) && defined(__HYBRID_HTOBE_IS_BETOH)
-__CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,htonl,(__UINT32_TYPE__ __hostlong),__ntohl,{ return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); })
+__CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW,htonl,(__UINT32_TYPE__ __hostlong),__ntohl,{ return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); })
 #else /* ... */
-__LOCAL __ATTR_CONST __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL htonl)(__UINT32_TYPE__ __hostlong) { return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); }
+__LOCAL __ATTR_CONST __UINT32_TYPE__ __NOTHROW(__LIBCCALL htonl)(__UINT32_TYPE__ __hostlong) { return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); }
 #endif /* !... */
 #endif /* !__htonl_defined */
 #ifndef __ntohl_defined
 #define __ntohl_defined
 #ifdef __CRT_HAVE_ntohl
-__CEIDECLARE(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,ntohl,(__UINT32_TYPE__ __netlong),{ return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); })
+__CEIDECLARE(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW,ntohl,(__UINT32_TYPE__ __netlong),{ return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); })
 #elif defined(__CRT_HAVE_htonl) && defined(__HYBRID_HTOBE_IS_BETOH)
-__CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,ntohl,(__UINT32_TYPE__ __netlong),htonl,{ return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); })
+__CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW,ntohl,(__UINT32_TYPE__ __netlong),htonl,{ return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); })
 #elif defined(__CRT_HAVE___ntohl)
-__CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,ntohl,(__UINT32_TYPE__ __netlong),__ntohl,{ return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); })
+__CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW,ntohl,(__UINT32_TYPE__ __netlong),__ntohl,{ return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); })
 #elif defined(__CRT_HAVE___htonl) && defined(__HYBRID_HTOBE_IS_BETOH)
-__CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,ntohl,(__UINT32_TYPE__ __netlong),__htonl,{ return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); })
+__CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW,ntohl,(__UINT32_TYPE__ __netlong),__htonl,{ return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); })
 #else /* ... */
-__LOCAL __ATTR_CONST __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohl)(__UINT32_TYPE__ __netlong) { return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); }
+__LOCAL __ATTR_CONST __UINT32_TYPE__ __NOTHROW(__LIBCCALL ntohl)(__UINT32_TYPE__ __netlong) { return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); }
 #endif /* !... */
 #endif /* !__ntohl_defined */
 #if defined(__USE_KOS) && defined(__UINT64_TYPE__)
 #ifdef __CRT_HAVE_htonq
-__CEIDECLARE(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,htonq,(__UINT64_TYPE__ __hostquad),{ return (__UINT64_TYPE__)__hybrid_htobe64(__hostquad); })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT64_TYPE__,__NOTHROW,htonq,(__UINT64_TYPE__ __hostquad),{ return (__UINT64_TYPE__)__hybrid_htobe64(__hostquad); })
 #elif defined(__CRT_HAVE_ntohq) && defined(__HYBRID_HTOBE_IS_BETOH)
-__CEIREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,htonq,(__UINT64_TYPE__ __hostquad),ntohq,{ return (__UINT64_TYPE__)__hybrid_htobe64(__hostquad); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__UINT64_TYPE__,__NOTHROW,htonq,(__UINT64_TYPE__ __hostquad),ntohq,{ return (__UINT64_TYPE__)__hybrid_htobe64(__hostquad); })
 #else /* ... */
-__LOCAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL htonq)(__UINT64_TYPE__ __hostquad) { return (__UINT64_TYPE__)__hybrid_htobe64(__hostquad); }
+__LOCAL __ATTR_CONST __ATTR_WUNUSED __UINT64_TYPE__ __NOTHROW(__LIBCCALL htonq)(__UINT64_TYPE__ __hostquad) { return (__UINT64_TYPE__)__hybrid_htobe64(__hostquad); }
 #endif /* !... */
 #ifdef __CRT_HAVE_ntohq
-__CEIDECLARE(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,ntohq,(__UINT64_TYPE__ __netquad),{ return (__UINT64_TYPE__)__hybrid_betoh64(__netquad); })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT64_TYPE__,__NOTHROW,ntohq,(__UINT64_TYPE__ __netquad),{ return (__UINT64_TYPE__)__hybrid_betoh64(__netquad); })
 #elif defined(__CRT_HAVE_htonq) && defined(__HYBRID_HTOBE_IS_BETOH)
-__CEIREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,ntohq,(__UINT64_TYPE__ __netquad),htonq,{ return (__UINT64_TYPE__)__hybrid_betoh64(__netquad); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__UINT64_TYPE__,__NOTHROW,ntohq,(__UINT64_TYPE__ __netquad),htonq,{ return (__UINT64_TYPE__)__hybrid_betoh64(__netquad); })
 #else /* ... */
-__LOCAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohq)(__UINT64_TYPE__ __netquad) { return (__UINT64_TYPE__)__hybrid_betoh64(__netquad); }
+__LOCAL __ATTR_CONST __ATTR_WUNUSED __UINT64_TYPE__ __NOTHROW(__LIBCCALL ntohq)(__UINT64_TYPE__ __netquad) { return (__UINT64_TYPE__)__hybrid_betoh64(__netquad); }
 #endif /* !... */
 #endif /* __USE_KOS && __UINT64_TYPE__ */
 

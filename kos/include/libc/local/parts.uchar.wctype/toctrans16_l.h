@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb985d8a0 */
+/* HASH CRC-32:0x72d90085 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,13 +28,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_toctrans16_defined
 #define __local___localdep_toctrans16_defined
 #if defined(__CRT_HAVE_towctrans) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__localdep_toctrans16,(__WINT16_TYPE__ __wc, __wctrans_t __desc),towctrans,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__localdep_toctrans16,(__WINT16_TYPE__ __wc, __wctrans_t __desc),towctrans,(__wc,__desc))
 #elif defined(__CRT_HAVE_DOS$towctrans)
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__localdep_toctrans16,(__WINT16_TYPE__ __wc, __wctrans_t __desc),towctrans,(__wc,__desc))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__localdep_toctrans16,(__WINT16_TYPE__ __wc, __wctrans_t __desc),towctrans,(__wc,__desc))
 #elif defined(__CRT_HAVE___towctrans) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__localdep_toctrans16,(__WINT16_TYPE__ __wc, __wctrans_t __desc),__towctrans,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__localdep_toctrans16,(__WINT16_TYPE__ __wc, __wctrans_t __desc),__towctrans,(__wc,__desc))
 #elif defined(__CRT_HAVE_DOS$__towctrans)
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__localdep_toctrans16,(__WINT16_TYPE__ __wc, __wctrans_t __desc),__towctrans,(__wc,__desc))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__localdep_toctrans16,(__WINT16_TYPE__ __wc, __wctrans_t __desc),__towctrans,(__wc,__desc))
 #elif defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/towctrans.h>

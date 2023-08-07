@@ -153,8 +153,9 @@ __SYSDECL_BEGIN
 /* TODO: Figure out what these functions do and (try to) implement them */
 
 
+[[const, wunused, nothrow]]
 [[decl_include("<bits/crt/resolv.h>")]]
-[[const]] struct __res_state *__res_state(void);
+struct __res_state *__res_state(void);
 
 %[insert:pp_if($has_function(__res_state))]
 %#define _res (*__res_state())

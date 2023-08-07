@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfebcf167 */
+/* HASH CRC-32:0x30b1928d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -164,7 +164,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/util.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fparseln) __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN_OPT(4) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(3) char *
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fparseln))(__FILE *__stream, __SIZE_TYPE__ *__plen, __SIZE_TYPE__ *__plineno, char const __delim[3], __STDC_INT_AS_UINT_T __flags) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(fparseln))(__FILE *__stream, __SIZE_TYPE__ *__plen, __SIZE_TYPE__ *__plineno, char const __delim[3], __STDC_INT_AS_UINT_T __flags) {
 	char *__result;
 	__SIZE_TYPE__ __result_alloc;
 	__SIZE_TYPE__ __result_length;

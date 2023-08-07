@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37e12093 */
+/* HASH CRC-32:0xf9eb4127 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,12 +32,12 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* Function to get address of global `h_errno' variable */
-INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED int *NOTHROW_NCX(LIBCCALL libc___h_errno_location)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED int *NOTHROW(LIBCCALL libc___h_errno_location)(void);
 /* Print error indicated by `h_errno' variable on standard error.
  * if non-`NULL',  `str'  is  printed before  the  error  string. */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_herror)(char const *str);
 /* Return string associated with error `err_num' */
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_hstrerror)(int err_num);
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_hstrerror)(int err_num);
 /* Open host  data  base  files and  mark  them  as  staying
  * open even after a later search if `stay_open' is non-zero */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_sethostent)(int stay_open);
@@ -254,7 +254,7 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_getaddrinfo)(char const *__restrict name, c
 /* Free `addrinfo' structure `ai' including associated storage */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_freeaddrinfo)(struct addrinfo *ai);
 /* Convert error return from getaddrinfo() to a string */
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_gai_strerror)(int ecode);
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_gai_strerror)(int ecode);
 /* Translate a socket address to a location and service name */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_getnameinfo)(struct sockaddr const *__restrict sa, socklen_t salen, char *__restrict host, socklen_t hostlen, char *__restrict serv, socklen_t servlen, int flags);
 /* Enqueue `ent' requests from the `list'. If `mode' is GAI_WAIT wait until all

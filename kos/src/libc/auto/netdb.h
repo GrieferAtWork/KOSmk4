@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf9220fd */
+/* HASH CRC-32:0x19fba044 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ DECL_BEGIN
  * if non-`NULL',  `str'  is  printed before  the  error  string. */
 INTDEF void NOTHROW_RPC(LIBDCALL libd_herror)(char const *str);
 /* Return string associated with error `err_num' */
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBDCALL libd_hstrerror)(int err_num);
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_hstrerror)(int err_num);
 /* Open host  data  base  files and  mark  them  as  staying
  * open even after a later search if `stay_open' is non-zero */
 INTDEF void NOTHROW_RPC(LIBDCALL libd_sethostent)(int stay_open);
@@ -231,7 +231,7 @@ INTDEF int NOTHROW_RPC(LIBDCALL libd_getaddrinfo)(char const *__restrict name, c
 /* Free `addrinfo' structure `ai' including associated storage */
 INTDEF void NOTHROW_NCX(LIBDCALL libd_freeaddrinfo)(struct addrinfo *ai);
 /* Convert error return from getaddrinfo() to a string */
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBDCALL libd_gai_strerror)(int ecode);
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_gai_strerror)(int ecode);
 /* Translate a socket address to a location and service name */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_getnameinfo)(struct sockaddr const *__restrict sa, socklen_t salen, char *__restrict host, socklen_t hostlen, char *__restrict serv, socklen_t servlen, int flags);
 /* Enqueue `ent' requests from the `list'. If `mode' is GAI_WAIT wait until all

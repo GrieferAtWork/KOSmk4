@@ -27,9 +27,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libc___res_state,hash:CRC-32=0xe7539e71]]]*/
-INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_CONST struct __res_state *
-NOTHROW_NCX(LIBCCALL libc___res_state)(void)
+/*[[[head:libc___res_state,hash:CRC-32=0x53cc323e]]]*/
+INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_CONST WUNUSED struct __res_state *
+NOTHROW(LIBCCALL libc___res_state)(void)
 /*[[[body:libc___res_state]]]*/
 /*AUTO*/{
 	CRT_UNIMPLEMENTED("__res_state"); /* TODO */

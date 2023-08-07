@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8ddd538 */
+/* HASH CRC-32:0x2855a803 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_cimagl_defined
 #define __local___localdep_cimagl_defined
 #ifdef __CRT_HAVE_cimagl
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_cimagl,(long double _Complex __z),cimagl,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_cimagl,(long double _Complex __z),cimagl,(__z))
 #elif defined(__CRT_HAVE_cimag) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_cimagl,(long double _Complex __z),cimag,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_cimagl,(long double _Complex __z),cimag,(__z))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/cimagl.h>
@@ -62,9 +62,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_creall_defined
 #define __local___localdep_creall_defined
 #ifdef __CRT_HAVE_creall
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_creall,(long double _Complex __z),creall,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_creall,(long double _Complex __z),creall,(__z))
 #elif defined(__CRT_HAVE_creal) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_creall,(long double _Complex __z),creal,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_creall,(long double _Complex __z),creal,(__z))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/creall.h>

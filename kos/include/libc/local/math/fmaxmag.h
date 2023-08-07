@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d2b379b */
+/* HASH CRC-32:0x973508e0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_END
 #include <libm/fabs.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fmaxmag) __ATTR_CONST __ATTR_WUNUSED double
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmaxmag))(double __x, double __y) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmaxmag))(double __x, double __y) {
 	double __x_abs = __LIBM_MATHFUN(fabs, __x);
 	double __y_abs = __LIBM_MATHFUN(fabs, __y);
 	if (__LIBM_MATHFUN2(isgreater, __x_abs, __y_abs))

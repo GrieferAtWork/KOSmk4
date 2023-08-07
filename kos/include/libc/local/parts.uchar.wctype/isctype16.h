@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d170ab3 */
+/* HASH CRC-32:0x9acab8f3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/unicode.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(isctype16) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(isctype16))(__WINT16_TYPE__ __wc, __wctype_t __desc) {
+__NOTHROW(__LIBDCALL __LIBC_LOCAL_NAME(isctype16))(__WINT16_TYPE__ __wc, __wctype_t __desc) {
 	struct __unitraits const *__traits = (__NAMESPACE_LOCAL_SYM __localdep___unicode_descriptor)(__wc);
 	return (int)(__traits->__ut_flags & (__UINT16_TYPE__)__desc);
 }

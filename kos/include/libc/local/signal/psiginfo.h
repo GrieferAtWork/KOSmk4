@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad576cd9 */
+/* HASH CRC-32:0xa6d7c2cf */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,7 +81,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep_sigcodedesc_np,(__signo_t __signo, int __code),sigcodedesc_np,(__signo,__code))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigcodedesc_np,(__signo_t __signo, int __code),sigcodedesc_np,(__signo,__code))
 #else /* __CRT_HAVE_sigcodedesc_np */
 __NAMESPACE_LOCAL_END
 #include <libc/local/signal/sigcodedesc_np.h>

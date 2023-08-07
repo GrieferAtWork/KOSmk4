@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb03f2cbf */
+/* HASH CRC-32:0x90ca8e4e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <bits/crt/dos/corecrt_startup.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_query_app_type) __ATTR_CONST __ATTR_WUNUSED enum _crt_app_type
-__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_query_app_type))(void) {
+__NOTHROW(__LIBDCALL __LIBC_LOCAL_NAME(_query_app_type))(void) {
 	return (enum _crt_app_type)1;
 }
 __NAMESPACE_LOCAL_END

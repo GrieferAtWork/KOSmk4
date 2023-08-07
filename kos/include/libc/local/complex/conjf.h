@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabd9d8f4 */
+/* HASH CRC-32:0x47424219 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(conjf) __ATTR_CONST __ATTR_WUNUSED float _Complex
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(conjf))(float _Complex __z) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(conjf))(float _Complex __z) {
 	union {
 		float _Complex __x;
 		float __parts[2];

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4cb119c */
+/* HASH CRC-32:0xe687d759 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_redupif) __ATTR_CONST __ATTR_WUNUSED float
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_redupif))(float __x) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(_redupif))(float __x) {
 	/* Implementation derived from NetBSD. -- See the following copyright notice. */
 	/*-
 	 * Copyright (c) 2007 The NetBSD Foundation, Inc.

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d7c1c2f */
+/* HASH CRC-32:0x491427d9 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_cimag_defined
 #define __local___localdep_cimag_defined
 #ifdef __CRT_HAVE_cimag
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_cimag,(double _Complex __z),cimag,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_cimag,(double _Complex __z),cimag,(__z))
 #else /* __CRT_HAVE_cimag */
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/cimag.h>
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_creal_defined
 #define __local___localdep_creal_defined
 #ifdef __CRT_HAVE_creal
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_creal,(double _Complex __z),creal,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_creal,(double _Complex __z),creal,(__z))
 #else /* __CRT_HAVE_creal */
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/creal.h>

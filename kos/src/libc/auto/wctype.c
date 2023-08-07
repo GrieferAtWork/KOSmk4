@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71023b68 */
+/* HASH CRC-32:0x5e1651d6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -334,15 +334,15 @@ NOTHROW_NCX(LIBCCALL libc_wctrans)(char const *prop) {
 }
 #include <bits/crt/unicode.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint16_t
-NOTHROW_NCX(LIBDCALL libd_towctrans)(wint16_t wc,
-                                     wctrans_t desc) {
+NOTHROW(LIBDCALL libd_towctrans)(wint16_t wc,
+                                 wctrans_t desc) {
 	struct __unitraits const *traits = libc___unicode_descriptor(wc);
 	return wc + *((s32 const *)traits + (uintptr_t)desc);
 }
 #include <bits/crt/unicode.h>
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint32_t
-NOTHROW_NCX(LIBKCALL libc_towctrans)(wint32_t wc,
-                                     wctrans_t desc) {
+NOTHROW(LIBKCALL libc_towctrans)(wint32_t wc,
+                                 wctrans_t desc) {
 	struct __unitraits const *traits = libc___unicode_descriptor(wc);
 	return wc + *((s32 const *)traits + (uintptr_t)desc);
 }
@@ -386,15 +386,15 @@ NOTHROW_NCX(LIBCCALL libc_wctype)(char const *prop) {
 }
 #include <bits/crt/unicode.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBDCALL libd_iswctype)(wint16_t wc,
-                                    wctype_t desc) {
+NOTHROW(LIBDCALL libd_iswctype)(wint16_t wc,
+                                wctype_t desc) {
 	struct __unitraits const *traits = libc___unicode_descriptor(wc);
 	return (int)(traits->__ut_flags & (uint16_t)desc);
 }
 #include <bits/crt/unicode.h>
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBKCALL libc_iswctype)(wint32_t wc,
-                                    wctype_t desc) {
+NOTHROW(LIBKCALL libc_iswctype)(wint32_t wc,
+                                wctype_t desc) {
 	struct __unitraits const *traits = libc___unicode_descriptor(wc);
 	return (int)(traits->__ut_flags & (uint16_t)desc);
 }
@@ -816,7 +816,7 @@ NOTHROW_NCX(LIBCCALL libc_wctrans_l)(char const *prop,
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBDCALL libd___iswcsymf)(wint16_t wc) {
+NOTHROW(LIBDCALL libd___iswcsymf)(wint16_t wc) {
 
 	struct __unitraits const *traits = libc___unicode_descriptor(wc);
 	return (int)(traits->__ut_flags & __UNICODE_ISSYMSTRT);
@@ -828,7 +828,7 @@ NOTHROW_NCX(LIBDCALL libd___iswcsymf)(wint16_t wc) {
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBKCALL libc___iswcsymf)(wint32_t wc) {
+NOTHROW(LIBKCALL libc___iswcsymf)(wint32_t wc) {
 
 	struct __unitraits const *traits = libc___unicode_descriptor(wc);
 	return (int)(traits->__ut_flags & __UNICODE_ISSYMSTRT);
@@ -840,7 +840,7 @@ NOTHROW_NCX(LIBKCALL libc___iswcsymf)(wint32_t wc) {
 /* >> iswsymcont(3), iswsymcont_l(3)
  * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBDCALL libd___iswcsym)(wint16_t wc) {
+NOTHROW(LIBDCALL libd___iswcsym)(wint16_t wc) {
 
 	struct __unitraits const *traits = libc___unicode_descriptor(wc);
 	return (int)(traits->__ut_flags & __UNICODE_ISSYMCONT);
@@ -852,7 +852,7 @@ NOTHROW_NCX(LIBDCALL libd___iswcsym)(wint16_t wc) {
 /* >> iswsymcont(3), iswsymcont_l(3)
  * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBKCALL libc___iswcsym)(wint32_t wc) {
+NOTHROW(LIBKCALL libc___iswcsym)(wint32_t wc) {
 
 	struct __unitraits const *traits = libc___unicode_descriptor(wc);
 	return (int)(traits->__ut_flags & __UNICODE_ISSYMCONT);
@@ -930,7 +930,7 @@ NOTHROW_NCX(LIBKCALL libc__iswcsym_l)(wint32_t wc,
 #endif /* !__LIBKCALL_CALLER_CLEANUP */
 /* >> isleadbyte(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_isleadbyte)(int wc) {
+NOTHROW(LIBCCALL libc_isleadbyte)(int wc) {
 	return wc >= 192 && wc <= 255;
 }
 #ifdef __LIBKCALL_CALLER_CLEANUP

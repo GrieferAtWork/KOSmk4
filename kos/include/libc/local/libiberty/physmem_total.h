@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3e76b92 */
+/* HASH CRC-32:0x20d80b8b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,__localdep_sysconf,(__
 #endif /* !... */
 #endif /* !__local___localdep_sysconf_defined */
 __LOCAL_LIBC(physmem_total) __ATTR_CONST __ATTR_WUNUSED double
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(physmem_total))(void) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(physmem_total))(void) {
 	__SIZE_TYPE__ __pages    = (__NAMESPACE_LOCAL_SYM __localdep_sysconf)(_SC_PHYS_PAGES);
 	__SIZE_TYPE__ __pagesize = (__NAMESPACE_LOCAL_SYM __localdep_getpagesize)();
 	return (double)__pages * (double)__pagesize;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf6597f7 */
+/* HASH CRC-32:0xe7d3f5a6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -257,7 +257,7 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_regfree)(regex_t *self);
  * @param: errcode: Regex error code (one of `REG_*'; s.a. `reg_errcode_t')
  * @return: * :   The human-readable description for `errcode'
  * @return: NULL: No description is available for `errcode' */
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBDCALL libd_regerrordesc_np)(int errcode);
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_regerrordesc_np)(int errcode);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> regerrordesc_np(3)
@@ -265,7 +265,7 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBDCALL libd_regerrordesc_np)
  * @param: errcode: Regex error code (one of `REG_*'; s.a. `reg_errcode_t')
  * @return: * :   The human-readable description for `errcode'
  * @return: NULL: No description is available for `errcode' */
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_regerrordesc_np)(int errcode);
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_regerrordesc_np)(int errcode);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> re_comp(3)

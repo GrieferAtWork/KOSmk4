@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98b8096b */
+/* HASH CRC-32:0x45bbc323 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -305,7 +305,7 @@ INTDEF ATTR_ACCESS_NONE(2) int NOTHROW_NCX(LIBDCALL libd_tss_set)(tss_t tss_id, 
  * @return: thrd_error:   Error */
 INTDEF ATTR_ACCESS_NONE(2) int NOTHROW_NCX(LIBCCALL libc_tss_set)(tss_t tss_id, void *val);
 /* >> thr_min_stack(3) */
-INTDEF ATTR_CONST WUNUSED size_t NOTHROW_NCX(LIBCCALL libc_thr_min_stack)(void);
+INTDEF ATTR_CONST WUNUSED size_t NOTHROW(LIBCCALL libc_thr_min_stack)(void);
 #endif /* !__KERNEL__ */
 
 DECL_END

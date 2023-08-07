@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb93d44e2 */
+/* HASH CRC-32:0xc71069de */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -583,13 +583,13 @@ typedef __errno_t errno_t;
 #define ____errno_location_defined
 #ifdef __CRT_HAVE___errno_location
 /* >> __errno_location(3) */
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW,__errno_location,(void),())
 #elif defined(__CRT_HAVE__errno)
 /* >> __errno_location(3) */
-__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),_errno,())
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW,__errno_location,(void),_errno,())
 #elif defined(__CRT_HAVE___errno)
 /* >> __errno_location(3) */
-__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),__errno,())
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW,__errno_location,(void),__errno,())
 #else /* ... */
 #undef ____errno_location_defined
 #endif /* !... */
@@ -640,16 +640,16 @@ __CSDECLARE(,char *,__progname_full)
 #define ____p__pgmptr_defined
 #ifdef __CRT_HAVE___p__pgmptr
 /* Alias for argv[0], as passed to main() */
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p__pgmptr,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW,__p__pgmptr,(void),())
 #elif defined(__CRT_HAVE___p_program_invocation_name)
 /* Alias for argv[0], as passed to main() */
-__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p__pgmptr,(void),__p_program_invocation_name,())
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW,__p__pgmptr,(void),__p_program_invocation_name,())
 #else /* ... */
 #include <libc/template/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_name_p
 #include <libc/local/stdlib/__p__pgmptr.h>
 /* Alias for argv[0], as passed to main() */
-__NAMESPACE_LOCAL_USING_OR_IMPL(__p__pgmptr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBCCALL __p__pgmptr)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__p__pgmptr))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__p__pgmptr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED char **__NOTHROW(__LIBCCALL __p__pgmptr)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__p__pgmptr))(); })
 #else /* __LOCAL_program_invocation_name_p */
 #undef ____p__pgmptr_defined
 #endif /* !__LOCAL_program_invocation_name_p */
@@ -683,14 +683,14 @@ __CSDECLARE(,char *,__progname)
 #ifdef __CRT_HAVE___p_program_invocation_short_name
 /* >> __p_program_invocation_short_name(3)
  * Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p_program_invocation_short_name,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW,__p_program_invocation_short_name,(void),())
 #else /* __CRT_HAVE___p_program_invocation_short_name */
 #include <libc/template/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_short_name_p
 #include <libc/local/errno/__p_program_invocation_short_name.h>
 /* >> __p_program_invocation_short_name(3)
  * Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
-__NAMESPACE_LOCAL_USING_OR_IMPL(__p_program_invocation_short_name, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBCCALL __p_program_invocation_short_name)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__p_program_invocation_short_name))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__p_program_invocation_short_name, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED char **__NOTHROW(__LIBCCALL __p_program_invocation_short_name)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__p_program_invocation_short_name))(); })
 #else /* __LOCAL_program_invocation_short_name_p */
 #undef ____p_program_invocation_short_name_defined
 #endif /* !__LOCAL_program_invocation_short_name_p */

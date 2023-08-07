@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d150270 */
+/* HASH CRC-32:0xca45dd80 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(btowc) __ATTR_CONST __ATTR_WUNUSED __WINT_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(btowc))(int __ch) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(btowc))(int __ch) {
 	if (__ch >= 0 && __ch <= 0x7f)
 		return (__WINT_TYPE__)__ch;
 	return __WEOF;

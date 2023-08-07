@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66bc0ad7 */
+/* HASH CRC-32:0x1409ae8d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -355,8 +355,8 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_siginterrupt)(signo_t signo, __STDC_INT_AS_
  * @return: -1: Error (s.a. `errno') */
 INTDEF ATTR_IN_OPT(1) ATTR_OUT_OPT(2) int NOTHROW_NCX(LIBCCALL libc_sigaltstack)(struct sigaltstack const *ss, struct sigaltstack *oss);
 INTDEF WUNUSED signo_t NOTHROW_NCX(LIBCCALL libc___libc_allocate_rtsig)(int high);
-INTDEF ATTR_CONST WUNUSED signo_t NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmin)(void);
-INTDEF ATTR_CONST WUNUSED signo_t NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void);
+INTDEF ATTR_CONST WUNUSED signo_t NOTHROW(LIBCCALL libc___libc_current_sigrtmin)(void);
+INTDEF ATTR_CONST WUNUSED signo_t NOTHROW(LIBCCALL libc___libc_current_sigrtmax)(void);
 /* >> pthread_kill(3)
  * Portable function for sending a signal to a specific `pthread' within one's own process.
  * @return: EOK:    Success

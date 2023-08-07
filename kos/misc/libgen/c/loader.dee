@@ -5421,6 +5421,20 @@ again_skip_annotation_rbracket:
 			/* TODO: Warn about unnecessary includes (iow: ones that could also be served by smaller implications) */
 		}
 
+		/* Check for special case: when the default NOTHROW_NCX annotation  is
+		 * used, but the function has the ATTR_CONST attribute, then warn that
+		 * the function should be annotated as nothrow. */
+		if (currentPrototype.nothrow != "NOTHROW") {
+			// self.warnAt(currentNameTokStart, f"TEST {repr currentName} {repr currentPrototype.attributes}");
+			for (local attr: currentPrototype.attributes) {
+				if (attr == "ATTR_CONST") {
+					self.warnAt(currentNameTokStart,
+							f"Function {repr currentName} has [const], but not [nothrow]");
+					break;
+				}
+			}
+		}
+
 		/* Right now, @tok points at the first token after the prototype
 		 * This is going to be one of:
 		 *   "{"  - function implementation

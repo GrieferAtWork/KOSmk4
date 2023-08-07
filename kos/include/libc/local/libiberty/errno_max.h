@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0cc5d60 */
+/* HASH CRC-32:0xef3c5ddc */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #ifdef __ECOUNT
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(errno_max) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(errno_max))(void) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(errno_max))(void) {
 	return __ECOUNT - 1;
 }
 __NAMESPACE_LOCAL_END

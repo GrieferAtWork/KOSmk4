@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8b741a3 */
+/* HASH CRC-32:0xf9a5302f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2297,28 +2297,28 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(psiginfo, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  * Return a name of `code', as read from `siginfo_t::si_code',
  * and used  in  conjunction  with  a  given  signal  `signo'.
  * e.g.   `sigcodename_np(SIGILL, ILL_ILLOPC) -> "ILL_ILLOPC"' */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,sigcodename_np,(__signo_t __signo, int __code),(__signo,__code))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,sigcodename_np,(__signo_t __signo, int __code),(__signo,__code))
 #else /* __CRT_HAVE_sigcodename_np */
 #include <libc/local/signal/sigcodename_np.h>
 /* >> sigcodename_np(3)
  * Return a name of `code', as read from `siginfo_t::si_code',
  * and used  in  conjunction  with  a  given  signal  `signo'.
  * e.g.   `sigcodename_np(SIGILL, ILL_ILLOPC) -> "ILL_ILLOPC"' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigcodename_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL sigcodename_np)(__signo_t __signo, int __code) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigcodename_np))(__signo, __code); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigcodename_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL sigcodename_np)(__signo_t __signo, int __code) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigcodename_np))(__signo, __code); })
 #endif /* !__CRT_HAVE_sigcodename_np */
 #ifdef __CRT_HAVE_sigcodedesc_np
 /* >> sigcodedesc_np(3)
  * Return a textual description of `code', as read from `siginfo_t::si_code',
  * and used in conjunction with a given signal `signo'. This function is used
  * for the implementation of `psiginfo(3)' */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,sigcodedesc_np,(__signo_t __signo, int __code),(__signo,__code))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,sigcodedesc_np,(__signo_t __signo, int __code),(__signo,__code))
 #else /* __CRT_HAVE_sigcodedesc_np */
 #include <libc/local/signal/sigcodedesc_np.h>
 /* >> sigcodedesc_np(3)
  * Return a textual description of `code', as read from `siginfo_t::si_code',
  * and used in conjunction with a given signal `signo'. This function is used
  * for the implementation of `psiginfo(3)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigcodedesc_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL sigcodedesc_np)(__signo_t __signo, int __code) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigcodedesc_np))(__signo, __code); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigcodedesc_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL sigcodedesc_np)(__signo_t __signo, int __code) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigcodedesc_np))(__signo, __code); })
 #endif /* !__CRT_HAVE_sigcodedesc_np */
 #endif /* __USE_KOS */
 #endif /* __USE_XOPEN2K8 */
@@ -2422,20 +2422,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sigset, __FORCELOCAL __ATTR_ARTIFICIAL __sighand
 #endif /* __USE_XOPEN_EXTENDED */
 
 #ifdef __CRT_HAVE___libc_current_sigrtmin
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_sigrtmin,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW,__libc_current_sigrtmin,(void),())
 #elif defined(__CRT_HAVE___libc_current_sigrtmin_private)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_sigrtmin,(void),__libc_current_sigrtmin_private,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW,__libc_current_sigrtmin,(void),__libc_current_sigrtmin_private,())
 #elif defined(__SIGRTMIN)
 #include <libc/local/signal/__libc_current_sigrtmin.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmin)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmin))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW(__LIBCCALL __libc_current_sigrtmin)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmin))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE___libc_current_sigrtmax
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_sigrtmax,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW,__libc_current_sigrtmax,(void),())
 #elif defined(__CRT_HAVE___libc_current_sigrtmax_private)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_sigrtmax,(void),__libc_current_sigrtmax_private,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW,__libc_current_sigrtmax,(void),__libc_current_sigrtmax_private,())
 #elif defined(__SIGRTMAX)
 #include <libc/local/signal/__libc_current_sigrtmax.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmax, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmax)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmax))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmax, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW(__LIBCCALL __libc_current_sigrtmax)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmax))(); })
 #endif /* ... */
 
 #if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
@@ -2720,14 +2720,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(signalnumber, __FORCELOCAL __ATTR_ARTIFICIAL __A
  * Return the next-greater signal number that comes after `signo'
  * When  no such signal number exists, return `0'. When the given
  * `signo' is `0', return the lowest valid signal number. */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,signalnext,(__signo_t __signo),(__signo))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW,signalnext,(__signo_t __signo),(__signo))
 #else /* __CRT_HAVE_signalnext */
 #include <libc/local/signal/signalnext.h>
 /* >> signalnext(3)
  * Return the next-greater signal number that comes after `signo'
  * When  no such signal number exists, return `0'. When the given
  * `signo' is `0', return the lowest valid signal number. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(signalnext, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL signalnext)(__signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(signalnext))(__signo); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(signalnext, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW(__LIBCCALL signalnext)(__signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(signalnext))(__signo); })
 #endif /* !__CRT_HAVE_signalnext */
 #endif /* __USE_NETBSD */
 

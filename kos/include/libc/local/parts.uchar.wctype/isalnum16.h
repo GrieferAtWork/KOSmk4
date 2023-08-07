@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8f82be */
+/* HASH CRC-32:0xbf90fcba */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16tob_defined
 #define __local___localdep_c16tob_defined
 #if defined(__CRT_HAVE_wctob) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_c16tob,(__WINT16_TYPE__ __ch),wctob,(__ch))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_c16tob,(__WINT16_TYPE__ __ch),wctob,(__ch))
 #elif defined(__CRT_HAVE_DOS$wctob)
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_c16tob,(__WINT16_TYPE__ __ch),wctob,(__ch))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_c16tob,(__WINT16_TYPE__ __ch),wctob,(__ch))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wctob.h>

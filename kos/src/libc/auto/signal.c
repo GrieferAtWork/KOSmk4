@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x974afec3 */
+/* HASH CRC-32:0x471fcac */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -384,8 +384,8 @@ NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
  * and used  in  conjunction  with  a  given  signal  `signo'.
  * e.g.   `sigcodename_np(SIGILL, ILL_ILLOPC) -> "ILL_ILLOPC"' */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED char const *
-NOTHROW_NCX(LIBCCALL libc_sigcodename_np)(signo_t signo,
-                                          int code) {
+NOTHROW(LIBCCALL libc_sigcodename_np)(signo_t signo,
+                                      int code) {
 	char const *result = NULL;
 /*[[[deemon
 import util;
@@ -898,8 +898,8 @@ print("@@pp_endif@@");
  * and used in conjunction with a given signal `signo'. This function is used
  * for the implementation of `psiginfo(3)' */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED char const *
-NOTHROW_NCX(LIBCCALL libc_sigcodedesc_np)(signo_t signo,
-                                          int code) {
+NOTHROW(LIBCCALL libc_sigcodedesc_np)(signo_t signo,
+                                      int code) {
 	char const *result = libc_sigcodename_np(signo, code);
 	if (result)
 		result = libc_strend(result) + 1;
@@ -1073,7 +1073,7 @@ return_rt_signal:
  * When  no such signal number exists, return `0'. When the given
  * `signo' is `0', return the lowest valid signal number. */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED signo_t
-NOTHROW_NCX(LIBCCALL libc_signalnext)(signo_t signo) {
+NOTHROW(LIBCCALL libc_signalnext)(signo_t signo) {
 	if (signo >= (__NSIG - 1))
 		return 0;
 	return signo + 1;

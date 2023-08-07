@@ -487,7 +487,7 @@ long labs(long x) {
 
 [[if($extended_include_prefix("<hybrid/typecore.h>")
      __SIZEOF_INTMAX_T__ == __SIZEOF_INT__), export_as("imaxdiv")]]
-[[std, const, wunused, decl_include("<bits/crt/div.h>")]]
+[[std, pure, wunused, decl_include("<bits/crt/div.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("ldiv")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias(CNL_lldiv...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_INTMAX_T__), alias("imaxdiv")]]
@@ -501,7 +501,7 @@ struct __div_struct div(int numer, int denom) {
 
 [[if($extended_include_prefix("<hybrid/typecore.h>")
      __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), export_as("imaxdiv")]]
-[[std, const, wunused, decl_include("<bits/crt/div.h>")]]
+[[std, pure, wunused, decl_include("<bits/crt/div.h>")]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__, div)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(CNL_lldiv...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias("imaxdiv")]]
@@ -533,7 +533,7 @@ __LONGLONG llabs(__LONGLONG x) {
      __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ &&
      __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__),
   export_as("imaxdiv")]]
-[[std, const, wunused, decl_include("<bits/crt/div.h>")]]
+[[std, pure, wunused, decl_include("<bits/crt/div.h>")]]
 [[no_crt_self_import, no_crt_self_export, export_alias(CNL_lldiv...)]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, div)]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, ldiv)]]
@@ -3277,7 +3277,7 @@ int shexec([[in_opt]] char const *command) {
 
 @@>> getexecname(3)
 @@Returns the absolute filename of the main executable (s.a. `program_invocation_name')
-[[crt_dos_variant, const, wunused]]
+[[crt_dos_variant, const, wunused, nothrow]]
 [[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_program_invocation_name))]]
 [[impl_include("<libc/template/program_invocation_name.h>")]]
@@ -3567,7 +3567,7 @@ int l64a_r(long n, char *buf, __STDC_INT_AS_SIZE_T bufsize) {
 
 
 @@>> getprogname(3), setprogname(3)
-[[guard, const, wunused]]
+[[guard, const, wunused, nothrow]]
 [[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_program_invocation_short_name))]]
 char const *getprogname(void) {
@@ -3814,7 +3814,7 @@ typedef __mode_t mode_t;
 //TODO:void csetexpandtc(int);
 
 @@>> devname(3), devname_r(3)
-[[const, decl_include("<bits/types.h>")]]
+[[decl_include("<bits/types.h>")]]
 [[alias("__devname50")]]
 [[requires_function(devname_r)]]
 char *devname(dev_t dev, mode_t type) {
@@ -4081,7 +4081,7 @@ errno_t _set_errno(errno_t err);
 
 
 
-[[guard, const]]
+[[guard, const, nothrow]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt.dos.errno")]]
 $u32 *__doserrno();
@@ -4167,7 +4167,7 @@ __CSDECLARE(,int,__argc)
 #define __argc __argc
 #else /* __CRT_HAVE___argc */
 }
-[[nonnull, guard, const, wunused]]
+[[nonnull, guard, const, wunused, nothrow]]
 [[section(".text.crt.dos.application.init")]]
 int *__p___argc();
 %{
@@ -4182,7 +4182,7 @@ int *__p___argc();
 __CSDECLARE(,char **,__argv)
 #else /* __CRT_HAVE___argv */
 }
-[[nonnull, guard, const, wunused]]
+[[nonnull, guard, const, wunused, nothrow]]
 [[section(".text.crt.dos.application.init")]]
 char ***__p___argv();
 %{
@@ -4198,7 +4198,7 @@ __CSDECLARE(,wchar_t **,__wargv)
 #define __wargv __wargv
 #else /* __CRT_HAVE___wargv */
 }
-[[nonnull, guard, const, wunused, wchar]]
+[[nonnull, guard, const, wunused, nothrow, wchar]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt.dos.wchar.application.init")]]
 wchar_t ***__p___wargv();
@@ -4215,7 +4215,7 @@ __CSDECLARE(,wchar_t **,_wenviron)
 #define _wenviron _wenviron
 #else /* __CRT_HAVE__wenviron */
 }
-[[nonnull, guard, const, wunused, wchar]]
+[[nonnull, guard, const, wunused, nothrow, wchar]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt.dos.wchar.fs.environ")]]
 wchar_t ***__p__wenviron();
@@ -4232,7 +4232,7 @@ __CSDECLARE(,wchar_t *,_wpgmptr)
 #define _wpgmptr _wpgmptr
 #else /* __CRT_HAVE__wpgmptr */
 }
-[[nonnull, guard, const, wunused, wchar]]
+[[nonnull, guard, const, wunused, nothrow, wchar]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt.dos.wchar.application.init")]]
 wchar_t **__p__wpgmptr();
@@ -4275,7 +4275,7 @@ __CSDECLARE(,char *,__progname_full)
 }
 
 @@Alias for argv[0], as passed to main()
-[[nonnull, guard, const, wunused]]
+[[nonnull, guard, const, wunused, nothrow]]
 [[export_alias("__p_program_invocation_name")]]
 [[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_program_invocation_name_p))]]
@@ -4303,7 +4303,7 @@ __CSDECLARE(,char **,__initenv)
 #else /* __CRT_HAVE___initenv */
 }
 @@Access to the initial environment block
-[[nonnull, crt_dos_variant, guard, const, wunused]]
+[[nonnull, crt_dos_variant, guard, const, wunused, nothrow]]
 [[section(".text.crt.dos.fs.environ")]]
 char ***__p___initenv();
 %{
@@ -4319,7 +4319,7 @@ __CSDECLARE(,wchar_t **,__winitenv)
 #else /* __CRT_HAVE___winitenv */
 }
 @@Access to the initial environment block
-[[nonnull, guard, const, wunused, wchar]]
+[[nonnull, guard, const, wunused, nothrow, wchar]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt.dos.wchar.fs.environ")]]
 wchar_t ***__p___winitenv();
@@ -4408,7 +4408,7 @@ errno_t _get_wpgmptr(wchar_t **pvalue) {
 %#ifdef __CRT_HAVE__fmode
 %__CSDECLARE(,int,_fmode)
 %#else /* ... */
-[[guard, const, wunused]]
+[[guard, const, wunused, nothrow]]
 [[section(".text.crt.dos.FILE.utility")]]
 [[nonnull]] int *__p__fmode();
 %#ifdef ____p__fmode_defined
@@ -4512,14 +4512,14 @@ extern unsigned __int64 (_byteswap_uint64)(unsigned __int64 __x);
 #else /* _MSC_VER */
 }
 
-[[const, wunused, decl_include("<hybrid/typecore.h>")]]
+[[const, wunused, nothrow, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/__byteswap.h>")]]
 [[section(".text.crt.dos.math.utility")]]
 $u16 _byteswap_ushort($u16 val) {
 	return __hybrid_bswap16(val);
 }
 
-[[const, wunused, decl_include("<hybrid/typecore.h>")]]
+[[const, wunused, nothrow, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/__byteswap.h>")]]
 [[section(".text.crt.dos.math.utility")]]
 $u32 _byteswap_ulong($u32 val) {
@@ -4527,7 +4527,7 @@ $u32 _byteswap_ulong($u32 val) {
 }
 
 %#ifdef __UINT64_TYPE__
-[[const, wunused, decl_include("<hybrid/typecore.h>")]]
+[[const, wunused, nothrow, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/__byteswap.h>")]]
 [[section(".text.crt.dos.math.utility")]]
 $u64 _byteswap_uint64($u64 val) {

@@ -2844,7 +2844,7 @@ $intmax_t fromfpx(double x, int round, unsigned int width); /* TODO */
 [[wunused, decl_include("<hybrid/typecore.h>")]]
 $uintmax_t ufromfpx(double x, int round, unsigned int width); /* TODO */
 
-[[const, wunused]]
+[[const, wunused, nothrow]]
 [[requires_include("<ieee754.h>")]]
 [[requires($has_function(fmax) &&
            (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -2861,7 +2861,7 @@ double fmaxmag(double x, double y) {
 	return fmax(x, y);
 }
 
-[[const, wunused]]
+[[const, wunused, nothrow]]
 [[requires_include("<ieee754.h>")]]
 [[requires($has_function(fmin) &&
            (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -2939,7 +2939,7 @@ llogbl(*) %{generate(double2ldouble("llogb"))}
 %#endif /* __USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__ */
 
 @@>> _fdpcomp(3), _dpcomp(3), _ldpcomp(3)
-[[ignore, const, wunused]]
+[[ignore, const, wunused, nothrow]]
 [[section(".text.crt.dos.math.math")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/fcomp.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||

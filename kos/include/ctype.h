@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x175d8d7c */
+/* HASH CRC-32:0xb153b8b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -938,22 +938,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(toupper_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #ifdef __CRT_HAVE___iscsymf
 /* >> issymstrt(3)
  * Test if `ch' can appear at the start of a symbol/keyword/identifier */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymstrt,(int __ch),__iscsymf,(__ch))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,issymstrt,(int __ch),__iscsymf,(__ch))
 #else /* __CRT_HAVE___iscsymf */
 #include <libc/local/ctype/issymstrt.h>
 /* >> issymstrt(3)
  * Test if `ch' can appear at the start of a symbol/keyword/identifier */
-__NAMESPACE_LOCAL_USING_OR_IMPL(issymstrt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL issymstrt)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymstrt))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(issymstrt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL issymstrt)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymstrt))(__ch); })
 #endif /* !__CRT_HAVE___iscsymf */
 #ifdef __CRT_HAVE___iscsym
 /* >> issymcont(3)
  * Test if `ch' can appear in the middle of a symbol/keyword/identifier */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymcont,(int __ch),__iscsym,(__ch))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,issymcont,(int __ch),__iscsym,(__ch))
 #else /* __CRT_HAVE___iscsym */
 #include <libc/local/ctype/issymcont.h>
 /* >> issymcont(3)
  * Test if `ch' can appear in the middle of a symbol/keyword/identifier */
-__NAMESPACE_LOCAL_USING_OR_IMPL(issymcont, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL issymcont)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymcont))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(issymcont, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL issymcont)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymcont))(__ch); })
 #endif /* !__CRT_HAVE___iscsym */
 #endif /* __USE_KOS */
 
@@ -1055,12 +1055,12 @@ __CSDECLARE(,int,__mb_cur_max)
 #ifndef _____mb_cur_max_func_defined
 #define _____mb_cur_max_func_defined
 #ifdef __CRT_HAVE___ctype_get_mb_cur_max
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,___mb_cur_max_func,(void),__ctype_get_mb_cur_max,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,___mb_cur_max_func,(void),__ctype_get_mb_cur_max,())
 #elif defined(__CRT_HAVE____mb_cur_max_func)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,___mb_cur_max_func,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,___mb_cur_max_func,(void),())
 #else /* ... */
 #include <libc/local/ctype/__ctype_get_mb_cur_max.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL ___mb_cur_max_func)(void) { return (int)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__ctype_get_mb_cur_max))(); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL ___mb_cur_max_func)(void) { return (int)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__ctype_get_mb_cur_max))(); }
 #endif /* !... */
 #endif /* !_____mb_cur_max_func_defined */
 #ifdef __CRT_HAVE____mb_cur_max_l_func
@@ -1501,22 +1501,22 @@ __LOCAL __ATTR_CONST int __NOTHROW(__LIBCCALL __toascii)(int __c) { return __c &
 #ifdef __CRT_HAVE___iscsymf
 /* >> issymstrt(3)
  * Test if `ch' can appear at the start of a symbol/keyword/identifier */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__iscsymf,(int __ch),(__ch))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__iscsymf,(int __ch),(__ch))
 #else /* __CRT_HAVE___iscsymf */
 #include <libc/local/ctype/issymstrt.h>
 /* >> issymstrt(3)
  * Test if `ch' can appear at the start of a symbol/keyword/identifier */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __iscsymf)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymstrt))(__ch); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __iscsymf)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymstrt))(__ch); }
 #endif /* !__CRT_HAVE___iscsymf */
 #ifdef __CRT_HAVE___iscsym
 /* >> issymcont(3)
  * Test if `ch' can appear in the middle of a symbol/keyword/identifier */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__iscsym,(int __ch),(__ch))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__iscsym,(int __ch),(__ch))
 #else /* __CRT_HAVE___iscsym */
 #include <libc/local/ctype/issymcont.h>
 /* >> issymcont(3)
  * Test if `ch' can appear in the middle of a symbol/keyword/identifier */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __iscsym)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymcont))(__ch); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __iscsym)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymcont))(__ch); }
 #endif /* !__CRT_HAVE___iscsym */
 #endif /* __USE_DOS */
 

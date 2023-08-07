@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd97790e1 */
+/* HASH CRC-32:0xf469248d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fgetgrnam_r) __ATTR_IN(2) __ATTR_INOUT(1) __ATTR_OUT(3) __ATTR_OUT(6) __ATTR_OUTS(4, 5) __errno_t
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fgetgrnam_r))(__FILE *__restrict __stream, char const *__restrict __name, struct group *__restrict __resultbuf, char *__restrict __buffer, __SIZE_TYPE__ __buflen, struct group **__restrict __result) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(fgetgrnam_r))(__FILE *__restrict __stream, char const *__restrict __name, struct group *__restrict __resultbuf, char *__restrict __buffer, __SIZE_TYPE__ __buflen, struct group **__restrict __result) {
 	__errno_t __error;
 	__error = (__NAMESPACE_LOCAL_SYM __localdep_fgetgrfiltered_r)(__stream, __resultbuf, __buffer, __buflen,
 	                         __result, (__gid_t)-1, __name);

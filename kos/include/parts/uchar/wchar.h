@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20d0e624 */
+/* HASH CRC-32:0x3dd1440b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,100 +55,100 @@ typedef __WINT32_TYPE__ wint32_t;
  * Convert a single-byte into a wide character. If the given
  * character `ch' isn't valid, or  is `EOF', then `WEOF'  is
  * returned instead. */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,wint16_t,__NOTHROW_NCX,btoc16,(int __ch),btowc,(__ch))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,wint16_t,__NOTHROW,btoc16,(int __ch),btowc,(__ch))
 #elif defined(__CRT_HAVE_DOS$btowc)
 /* >> btowc(3)
  * Convert a single-byte into a wide character. If the given
  * character `ch' isn't valid, or  is `EOF', then `WEOF'  is
  * returned instead. */
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,wint16_t,__NOTHROW_NCX,btoc16,(int __ch),btowc,(__ch))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,wint16_t,__NOTHROW,btoc16,(int __ch),btowc,(__ch))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/btowc.h>
 /* >> btowc(3)
  * Convert a single-byte into a wide character. If the given
  * character `ch' isn't valid, or  is `EOF', then `WEOF'  is
  * returned instead. */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint16_t __NOTHROW_NCX(__LIBDCALL btoc16)(int __ch) { return (__WINT16_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(btowc))(__ch); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint16_t __NOTHROW(__LIBDCALL btoc16)(int __ch) { return (__WINT16_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(btowc))(__ch); }
 #else /* ... */
 #include <libc/local/parts.uchar.wchar/btoc16.h>
 /* >> btowc(3)
  * Convert a single-byte into a wide character. If the given
  * character `ch' isn't valid, or  is `EOF', then `WEOF'  is
  * returned instead. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(btoc16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint16_t __NOTHROW_NCX(__LIBDCALL btoc16)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(btoc16))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(btoc16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint16_t __NOTHROW(__LIBDCALL btoc16)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(btoc16))(__ch); })
 #endif /* !... */
 #if defined(__CRT_HAVE_btowc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> btowc(3)
  * Convert a single-byte into a wide character. If the given
  * character `ch' isn't valid, or  is `EOF', then `WEOF'  is
  * returned instead. */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,wint32_t,__NOTHROW_NCX,btoc32,(int __ch),btowc,(__ch))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,wint32_t,__NOTHROW,btoc32,(int __ch),btowc,(__ch))
 #elif defined(__CRT_HAVE_KOS$btowc)
 /* >> btowc(3)
  * Convert a single-byte into a wide character. If the given
  * character `ch' isn't valid, or  is `EOF', then `WEOF'  is
  * returned instead. */
-__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,wint32_t,__NOTHROW_NCX,btoc32,(int __ch),btowc,(__ch))
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,wint32_t,__NOTHROW,btoc32,(int __ch),btowc,(__ch))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/btowc.h>
 /* >> btowc(3)
  * Convert a single-byte into a wide character. If the given
  * character `ch' isn't valid, or  is `EOF', then `WEOF'  is
  * returned instead. */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint32_t __NOTHROW_NCX(__LIBKCALL btoc32)(int __ch) { return (__WINT32_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(btowc))(__ch); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint32_t __NOTHROW(__LIBKCALL btoc32)(int __ch) { return (__WINT32_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(btowc))(__ch); }
 #else /* ... */
 #include <libc/local/parts.uchar.wchar/btoc32.h>
 /* >> btowc(3)
  * Convert a single-byte into a wide character. If the given
  * character `ch' isn't valid, or  is `EOF', then `WEOF'  is
  * returned instead. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(btoc32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint32_t __NOTHROW_NCX(__LIBKCALL btoc32)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(btoc32))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(btoc32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint32_t __NOTHROW(__LIBKCALL btoc32)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(btoc32))(__ch); })
 #endif /* !... */
 #if defined(__CRT_HAVE_wctob) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> wctob(3)
  * Convert a wide-character into a single-byte character. If
  * doing so isn't possible, then `EOF' is returned  instead. */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,c16tob,(wint16_t __ch),wctob,(__ch))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,c16tob,(wint16_t __ch),wctob,(__ch))
 #elif defined(__CRT_HAVE_DOS$wctob)
 /* >> wctob(3)
  * Convert a wide-character into a single-byte character. If
  * doing so isn't possible, then `EOF' is returned  instead. */
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,c16tob,(wint16_t __ch),wctob,(__ch))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,c16tob,(wint16_t __ch),wctob,(__ch))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/wctob.h>
 /* >> wctob(3)
  * Convert a wide-character into a single-byte character. If
  * doing so isn't possible, then `EOF' is returned  instead. */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL c16tob)(wint16_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctob))((__WINT_TYPE__)__ch); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBDCALL c16tob)(wint16_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctob))((__WINT_TYPE__)__ch); }
 #else /* ... */
 #include <libc/local/parts.uchar.wchar/c16tob.h>
 /* >> wctob(3)
  * Convert a wide-character into a single-byte character. If
  * doing so isn't possible, then `EOF' is returned  instead. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(c16tob, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL c16tob)(wint16_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16tob))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16tob, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBDCALL c16tob)(wint16_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16tob))(__ch); })
 #endif /* !... */
 #if defined(__CRT_HAVE_wctob) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> wctob(3)
  * Convert a wide-character into a single-byte character. If
  * doing so isn't possible, then `EOF' is returned  instead. */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,c32tob,(wint32_t __ch),wctob,(__ch))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,c32tob,(wint32_t __ch),wctob,(__ch))
 #elif defined(__CRT_HAVE_KOS$wctob)
 /* >> wctob(3)
  * Convert a wide-character into a single-byte character. If
  * doing so isn't possible, then `EOF' is returned  instead. */
-__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,c32tob,(wint32_t __ch),wctob,(__ch))
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,c32tob,(wint32_t __ch),wctob,(__ch))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/wctob.h>
 /* >> wctob(3)
  * Convert a wide-character into a single-byte character. If
  * doing so isn't possible, then `EOF' is returned  instead. */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL c32tob)(wint32_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctob))((__WINT_TYPE__)__ch); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBKCALL c32tob)(wint32_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctob))((__WINT_TYPE__)__ch); }
 #else /* ... */
 #include <libc/local/parts.uchar.wchar/c32tob.h>
 /* >> wctob(3)
  * Convert a wide-character into a single-byte character. If
  * doing so isn't possible, then `EOF' is returned  instead. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(c32tob, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL c32tob)(wint32_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32tob))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32tob, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBKCALL c32tob)(wint32_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32tob))(__ch); })
 #endif /* !... */
 #if defined(__CRT_HAVE_mbrlen) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> mbrlen(3) */
@@ -1532,54 +1532,54 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32stold_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * Returns the number of columns needed to display `ch' in a system terminal
  * When `ch' cannot be  displayed at all, `-1'  is returned (but `errno'  is
  * never modified by this function). Zero-width characters return `0'. */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,c16width,(char16_t __ch),wcwidth,(__ch))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,c16width,(char16_t __ch),wcwidth,(__ch))
 #elif defined(__CRT_HAVE_DOS$wcwidth)
 /* >> wcwidth(3)
  * Returns the number of columns needed to display `ch' in a system terminal
  * When `ch' cannot be  displayed at all, `-1'  is returned (but `errno'  is
  * never modified by this function). Zero-width characters return `0'. */
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,c16width,(char16_t __ch),wcwidth,(__ch))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,c16width,(char16_t __ch),wcwidth,(__ch))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/wcwidth.h>
 /* >> wcwidth(3)
  * Returns the number of columns needed to display `ch' in a system terminal
  * When `ch' cannot be  displayed at all, `-1'  is returned (but `errno'  is
  * never modified by this function). Zero-width characters return `0'. */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL c16width)(char16_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcwidth))((__WCHAR_TYPE__)__ch); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBDCALL c16width)(char16_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcwidth))((__WCHAR_TYPE__)__ch); }
 #else /* ... */
 #include <libc/local/parts.uchar.wchar/c16width.h>
 /* >> wcwidth(3)
  * Returns the number of columns needed to display `ch' in a system terminal
  * When `ch' cannot be  displayed at all, `-1'  is returned (but `errno'  is
  * never modified by this function). Zero-width characters return `0'. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(c16width, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL c16width)(char16_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16width))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16width, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBDCALL c16width)(char16_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16width))(__ch); })
 #endif /* !... */
 #if defined(__CRT_HAVE_wcwidth) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> wcwidth(3)
  * Returns the number of columns needed to display `ch' in a system terminal
  * When `ch' cannot be  displayed at all, `-1'  is returned (but `errno'  is
  * never modified by this function). Zero-width characters return `0'. */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,c32width,(char32_t __ch),wcwidth,(__ch))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,c32width,(char32_t __ch),wcwidth,(__ch))
 #elif defined(__CRT_HAVE_KOS$wcwidth)
 /* >> wcwidth(3)
  * Returns the number of columns needed to display `ch' in a system terminal
  * When `ch' cannot be  displayed at all, `-1'  is returned (but `errno'  is
  * never modified by this function). Zero-width characters return `0'. */
-__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,c32width,(char32_t __ch),wcwidth,(__ch))
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,c32width,(char32_t __ch),wcwidth,(__ch))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/wcwidth.h>
 /* >> wcwidth(3)
  * Returns the number of columns needed to display `ch' in a system terminal
  * When `ch' cannot be  displayed at all, `-1'  is returned (but `errno'  is
  * never modified by this function). Zero-width characters return `0'. */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL c32width)(char32_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcwidth))((__WCHAR_TYPE__)__ch); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBKCALL c32width)(char32_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcwidth))((__WCHAR_TYPE__)__ch); }
 #else /* ... */
 #include <libc/local/parts.uchar.wchar/c32width.h>
 /* >> wcwidth(3)
  * Returns the number of columns needed to display `ch' in a system terminal
  * When `ch' cannot be  displayed at all, `-1'  is returned (but `errno'  is
  * never modified by this function). Zero-width characters return `0'. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(c32width, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL c32width)(char32_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32width))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32width, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBKCALL c32width)(char32_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32width))(__ch); })
 #endif /* !... */
 #endif /* __USE_XOPEN */
 

@@ -304,7 +304,7 @@ $ssize_t format_wwidth(void *arg, [[in(datalen)]] wchar_t const *__restrict data
 }
 
 
-[[const, cc(__WFORMATPRINTER_CC), decl_include("<bits/crt/wformat-printer.h>")]]
+[[const, nothrow, cc(__WFORMATPRINTER_CC), decl_include("<bits/crt/wformat-printer.h>")]]
 $ssize_t format_wlength(void *arg, wchar_t const *__restrict data, $size_t datalen) = format_length;
 
 

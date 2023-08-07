@@ -119,7 +119,7 @@ extern unsigned char _mbctype[];
 #define _mbctype _mbctype
 #else /* ... */
 }
-[[guard, const, nonnull, wunused]]
+[[guard, const, nonnull, wunused, nothrow]]
 unsigned char *__p__mbctype(void);
 %[insert:pp_if($has_function(__p__mbctype))]
 %#define _mbctype __p__mbctype()
@@ -138,7 +138,7 @@ extern unsigned char _mbcasemap[];
 #define _mbcasemap _mbcasemap
 #else /* ... */
 }
-[[guard, const, nonnull, wunused]]
+[[guard, const, nonnull, wunused, nothrow]]
 unsigned char *__p__mbcasemap(void);
 %[insert:pp_if($has_function(__p__mbcasemap))]
 %#define _mbcasemap __p__mbcasemap()

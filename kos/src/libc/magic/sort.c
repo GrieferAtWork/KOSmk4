@@ -52,7 +52,7 @@ typedef __size_t size_t;
 [[requires_function(qsort), impl_prefix(
 @@push_namespace(local)@@
 __LOCAL_LIBC(@sort_pointers_compar@) __ATTR_PURE int
-(__LIBCCALL sort_pointers_compar)(void const *a, void const *b) {
+__NOTHROW_NCX(__LIBCCALL sort_pointers_compar)(void const *a, void const *b) {
 	byte_t *lhs = *(byte_t **)a;
 	byte_t *rhs = *(byte_t **)b;
 @@pp_if __SIZEOF_POINTER__ < __SIZEOF_INT__@@

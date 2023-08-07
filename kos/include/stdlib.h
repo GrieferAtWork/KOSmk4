@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7fe13693 */
+/* HASH CRC-32:0x992c0dae */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -434,36 +434,36 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,labs,(long __x),_abs64,
 __LOCAL __ATTR_CONST __ATTR_WUNUSED long __NOTHROW(__LIBCCALL labs)(long __x) { return __x < 0 ? -__x : __x; }
 #endif /* !... */
 #ifdef __CRT_HAVE_div
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,div,(int __numer, int __denom),(__numer,__denom))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,div,(int __numer, int __denom),(__numer,__denom))
 #elif defined(__CRT_HAVE_ldiv) && __SIZEOF_INT__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,div,(int __numer, int __denom),ldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,div,(int __numer, int __denom),ldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_lldiv) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,div,(int __numer, int __denom),lldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,div,(int __numer, int __denom),lldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_qdiv) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,div,(int __numer, int __denom),qdiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,div,(int __numer, int __denom),qdiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_imaxdiv) && __SIZEOF_INT__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,div,(int __numer, int __denom),imaxdiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,div,(int __numer, int __denom),imaxdiv,(__numer,__denom))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/stdlib/div.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(div, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED struct __div_struct __NOTHROW_NCX(__LIBCCALL div)(int __numer, int __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(div))(__numer, __denom); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(div, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED struct __div_struct __NOTHROW_NCX(__LIBCCALL div)(int __numer, int __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(div))(__numer, __denom); })
 #endif /* !... */
 #ifdef __CRT_HAVE_ldiv
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,ldiv,(long __numer, long __denom),(__numer,__denom))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,ldiv,(long __numer, long __denom),(__numer,__denom))
 #elif defined(__CRT_HAVE_div) && __SIZEOF_LONG__ == __SIZEOF_INT__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,ldiv,(long __numer, long __denom),div,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,ldiv,(long __numer, long __denom),div,(__numer,__denom))
 #elif defined(__CRT_HAVE_lldiv) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,ldiv,(long __numer, long __denom),lldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,ldiv,(long __numer, long __denom),lldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_qdiv) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,ldiv,(long __numer, long __denom),qdiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,ldiv,(long __numer, long __denom),qdiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_imaxdiv) && __SIZEOF_LONG__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,ldiv,(long __numer, long __denom),imaxdiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,ldiv,(long __numer, long __denom),imaxdiv,(__numer,__denom))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/stdlib/ldiv.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(ldiv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED struct __ldiv_struct __NOTHROW_NCX(__LIBCCALL ldiv)(long __numer, long __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldiv))(__numer, __denom); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ldiv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED struct __ldiv_struct __NOTHROW_NCX(__LIBCCALL ldiv)(long __numer, long __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldiv))(__numer, __denom); })
 #endif /* !... */
 #ifdef __USE_ISOC99
 #if __has_builtin(__builtin_llabs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_llabs)
@@ -484,20 +484,20 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llabs,(__LONGLONG
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL llabs)(__LONGLONG __x) { return __x < 0 ? -__x : __x; }
 #endif /* !... */
 #ifdef __CRT_HAVE_lldiv
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,lldiv,(__LONGLONG __numer, __LONGLONG __denom),(__numer,__denom))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,lldiv,(__LONGLONG __numer, __LONGLONG __denom),(__numer,__denom))
 #elif defined(__CRT_HAVE_qdiv)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,lldiv,(__LONGLONG __numer, __LONGLONG __denom),qdiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,lldiv,(__LONGLONG __numer, __LONGLONG __denom),qdiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_div) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,lldiv,(__LONGLONG __numer, __LONGLONG __denom),div,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,lldiv,(__LONGLONG __numer, __LONGLONG __denom),div,(__numer,__denom))
 #elif defined(__CRT_HAVE_ldiv) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,lldiv,(__LONGLONG __numer, __LONGLONG __denom),ldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,lldiv,(__LONGLONG __numer, __LONGLONG __denom),ldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_imaxdiv) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,lldiv,(__LONGLONG __numer, __LONGLONG __denom),imaxdiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,lldiv,(__LONGLONG __numer, __LONGLONG __denom),imaxdiv,(__numer,__denom))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/stdlib/lldiv.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(lldiv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED struct __lldiv_struct __NOTHROW_NCX(__LIBCCALL lldiv)(__LONGLONG __numer, __LONGLONG __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lldiv))(__numer, __denom); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lldiv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED struct __lldiv_struct __NOTHROW_NCX(__LIBCCALL lldiv)(__LONGLONG __numer, __LONGLONG __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lldiv))(__numer, __denom); })
 #endif /* !... */
 #endif /* __USE_ISOC99 */
 #ifdef __cplusplus
@@ -521,22 +521,22 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),_abs64,{
 __LOCAL __ATTR_CONST __ATTR_WUNUSED long __NOTHROW(__LIBCCALL abs)(long __x) { return __x < 0 ? -__x : __x; }
 #endif /* !... */
 #ifdef __CRT_HAVE_ldiv
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),ldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),ldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_div) && __SIZEOF_LONG__ == __SIZEOF_INT__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),div,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),div,(__numer,__denom))
 #elif defined(__CRT_HAVE_lldiv) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),lldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),lldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_qdiv) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),qdiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),qdiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_imaxdiv) && __SIZEOF_LONG__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),imaxdiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),imaxdiv,(__numer,__denom))
 #else /* ... */
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/stdlib/ldiv.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED struct __ldiv_struct __NOTHROW_NCX(__LIBCCALL div)(long __numer, long __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldiv))(__numer, __denom); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED struct __ldiv_struct __NOTHROW_NCX(__LIBCCALL div)(long __numer, long __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldiv))(__numer, __denom); }
 #endif /* !... */
 } /* extern "C++" */
 #if defined(__USE_ISOC99) && defined(__COMPILER_HAVE_LONGLONG)
@@ -559,22 +559,22 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG _
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL abs)(__LONGLONG __x) { return __x < 0 ? -__x : __x; }
 #endif /* !... */
 #ifdef __CRT_HAVE_lldiv
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),lldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),lldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_qdiv)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),qdiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),qdiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_div) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),div,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),div,(__numer,__denom))
 #elif defined(__CRT_HAVE_ldiv) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),ldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),ldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_imaxdiv) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),imaxdiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),imaxdiv,(__numer,__denom))
 #else /* ... */
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/stdlib/lldiv.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED struct __lldiv_struct __NOTHROW_NCX(__LIBCCALL div)(__LONGLONG __numer, __LONGLONG __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lldiv))(__numer, __denom); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED struct __lldiv_struct __NOTHROW_NCX(__LIBCCALL div)(__LONGLONG __numer, __LONGLONG __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lldiv))(__numer, __denom); }
 #endif /* !... */
 } /* extern "C++" */
 #endif /* __USE_ISOC99 && __COMPILER_HAVE_LONGLONG */
@@ -3756,14 +3756,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ttyname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #ifdef __CRT_HAVE_getexecname
 /* >> getexecname(3)
  * Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,getexecname,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,getexecname,(void),())
 #else /* __CRT_HAVE_getexecname */
 #include <libc/template/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_name
 #include <libc/local/stdlib/getexecname.h>
 /* >> getexecname(3)
  * Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getexecname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL getexecname)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getexecname))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getexecname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL getexecname)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getexecname))(); })
 #endif /* __LOCAL_program_invocation_name */
 #endif /* !__CRT_HAVE_getexecname */
 #ifdef __CRT_HAVE_fdwalk
@@ -3934,13 +3934,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(l64a_r, __FORCELOCAL __ATTR_ARTIFICIAL int __NOT
 #define __getprogname_defined
 #ifdef __CRT_HAVE_getprogname
 /* >> getprogname(3), setprogname(3) */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,getprogname,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,getprogname,(void),())
 #else /* __CRT_HAVE_getprogname */
 #include <libc/template/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_short_name
 #include <libc/local/stdlib/getprogname.h>
 /* >> getprogname(3), setprogname(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getprogname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL getprogname)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getprogname))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getprogname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL getprogname)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getprogname))(); })
 #else /* __LOCAL_program_invocation_short_name */
 #undef __getprogname_defined
 #endif /* !__LOCAL_program_invocation_short_name */
@@ -4153,14 +4153,14 @@ typedef __mode_t mode_t;
 #endif /* !__mode_t_defined */
 #ifdef __CRT_HAVE_devname
 /* >> devname(3), devname_r(3) */
-__CDECLARE(__ATTR_CONST,char *,__NOTHROW_NCX,devname,(dev_t __dev, mode_t __type),(__dev,__type))
+__CDECLARE(,char *,__NOTHROW_NCX,devname,(dev_t __dev, mode_t __type),(__dev,__type))
 #elif defined(__CRT_HAVE___devname50)
 /* >> devname(3), devname_r(3) */
-__CREDIRECT(__ATTR_CONST,char *,__NOTHROW_NCX,devname,(dev_t __dev, mode_t __type),__devname50,(__dev,__type))
+__CREDIRECT(,char *,__NOTHROW_NCX,devname,(dev_t __dev, mode_t __type),__devname50,(__dev,__type))
 #elif defined(__CRT_HAVE_devname_r)
 #include <libc/local/stdlib/devname.h>
 /* >> devname(3), devname_r(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(devname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST char *__NOTHROW_NCX(__LIBCCALL devname)(dev_t __dev, mode_t __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(devname))(__dev, __type); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(devname, __FORCELOCAL __ATTR_ARTIFICIAL char *__NOTHROW_NCX(__LIBCCALL devname)(dev_t __dev, mode_t __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(devname))(__dev, __type); })
 #endif /* ... */
 /* >> devname(3), devname_r(3) */
 __CDECLARE_OPT(__ATTR_OUTS(3, 4),int,__NOTHROW_NCX,devname_r,(dev_t __dev, mode_t __type, char *__buf, __SIZE_TYPE__ __len),(__dev,__type,__buf,__len))
@@ -4302,18 +4302,18 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,qabs,(__LONGLONG 
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL qabs)(__LONGLONG __x) { return __x < 0 ? -__x : __x; }
 #endif /* !... */
 #ifdef __CRT_HAVE_lldiv
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,qdiv,(__LONGLONG __numer, __LONGLONG __denom),lldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,qdiv,(__LONGLONG __numer, __LONGLONG __denom),lldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_qdiv)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,qdiv,(__LONGLONG __numer, __LONGLONG __denom),(__numer,__denom))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,qdiv,(__LONGLONG __numer, __LONGLONG __denom),(__numer,__denom))
 #elif defined(__CRT_HAVE_div) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,qdiv,(__LONGLONG __numer, __LONGLONG __denom),div,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,qdiv,(__LONGLONG __numer, __LONGLONG __denom),div,(__numer,__denom))
 #elif defined(__CRT_HAVE_ldiv) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,qdiv,(__LONGLONG __numer, __LONGLONG __denom),ldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,qdiv,(__LONGLONG __numer, __LONGLONG __denom),ldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_imaxdiv) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,qdiv,(__LONGLONG __numer, __LONGLONG __denom),imaxdiv,(__numer,__denom))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,qdiv,(__LONGLONG __numer, __LONGLONG __denom),imaxdiv,(__numer,__denom))
 #else /* ... */
 #include <libc/local/stdlib/lldiv.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED struct __lldiv_struct __NOTHROW_NCX(__LIBCCALL qdiv)(__LONGLONG __numer, __LONGLONG __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lldiv))(__numer, __denom); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED struct __lldiv_struct __NOTHROW_NCX(__LIBCCALL qdiv)(__LONGLONG __numer, __LONGLONG __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lldiv))(__numer, __denom); }
 #endif /* !... */
 #ifdef __CRT_HAVE_strtoll_l
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGLONG,__NOTHROW_NCX,strtoq_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),strtoll_l,(__nptr,__endptr,__base,__locale))
@@ -4446,13 +4446,13 @@ typedef int (__LIBDCALL *_onexit_t)(void);
 #define ____errno_location_defined
 #ifdef __CRT_HAVE___errno_location
 /* >> __errno_location(3) */
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW,__errno_location,(void),())
 #elif defined(__CRT_HAVE__errno)
 /* >> __errno_location(3) */
-__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),_errno,())
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW,__errno_location,(void),_errno,())
 #elif defined(__CRT_HAVE___errno)
 /* >> __errno_location(3) */
-__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),__errno,())
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW,__errno_location,(void),__errno,())
 #else /* ... */
 #undef ____errno_location_defined
 #endif /* !... */
@@ -4466,7 +4466,7 @@ __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_set_errno,(errno_t __err),(__err))
 #endif /* !_CRT_ERRNO_DEFINED */
 #if !defined(____doserrno_defined) && defined(__CRT_HAVE___doserrno)
 #define ____doserrno_defined
-__CDECLARE(__ATTR_CONST,__UINT32_TYPE__ *,__NOTHROW_NCX,__doserrno,(void),())
+__CDECLARE(__ATTR_CONST,__UINT32_TYPE__ *,__NOTHROW,__doserrno,(void),())
 #endif /* !____doserrno_defined && __CRT_HAVE___doserrno */
 __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_get_doserrno,(__UINT32_TYPE__ *__perr),(__perr))
 __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_set_doserrno,(__UINT32_TYPE__ __err),(__err))
@@ -4534,7 +4534,7 @@ __CSDECLARE(,int,__argc)
 #else /* __CRT_HAVE___argc */
 #if !defined(____p___argc_defined) && defined(__CRT_HAVE___p___argc)
 #define ____p___argc_defined
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__p___argc,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW,__p___argc,(void),())
 #endif /* !____p___argc_defined && __CRT_HAVE___p___argc */
 #ifdef ____p___argc_defined
 #define __argc (*__p___argc())
@@ -4548,7 +4548,7 @@ __CSDECLARE(,char **,__argv)
 #else /* __CRT_HAVE___argv */
 #if !defined(____p___argv_defined) && defined(__CRT_HAVE___p___argv)
 #define ____p___argv_defined
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char ***,__NOTHROW_NCX,__p___argv,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char ***,__NOTHROW,__p___argv,(void),())
 #endif /* !____p___argv_defined && __CRT_HAVE___p___argv */
 #ifdef ____p___argv_defined
 #define __argv (*__p___argv())
@@ -4563,7 +4563,7 @@ __CSDECLARE(,wchar_t **,__wargv)
 #else /* __CRT_HAVE___wargv */
 #if !defined(____p___wargv_defined) && defined(__CRT_HAVE___p___wargv)
 #define ____p___wargv_defined
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_NCX,__p___wargv,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW,__p___wargv,(void),())
 #endif /* !____p___wargv_defined && __CRT_HAVE___p___wargv */
 #ifdef ____p___wargv_defined
 #define __wargv (*__p___wargv())
@@ -4578,7 +4578,7 @@ __CSDECLARE(,wchar_t **,_wenviron)
 #else /* __CRT_HAVE__wenviron */
 #if !defined(____p__wenviron_defined) && defined(__CRT_HAVE___p__wenviron)
 #define ____p__wenviron_defined
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_NCX,__p__wenviron,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW,__p__wenviron,(void),())
 #endif /* !____p__wenviron_defined && __CRT_HAVE___p__wenviron */
 #ifdef ____p__wenviron_defined
 #define _wenviron (*__p__wenviron())
@@ -4593,7 +4593,7 @@ __CSDECLARE(,wchar_t *,_wpgmptr)
 #else /* __CRT_HAVE__wpgmptr */
 #if !defined(____p__wpgmptr_defined) && defined(__CRT_HAVE___p__wpgmptr)
 #define ____p__wpgmptr_defined
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t **,__NOTHROW_NCX,__p__wpgmptr,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t **,__NOTHROW,__p__wpgmptr,(void),())
 #endif /* !____p__wpgmptr_defined && __CRT_HAVE___p__wpgmptr */
 #ifdef ____p__wpgmptr_defined
 #define _wpgmptr (*__p__wpgmptr())
@@ -4634,16 +4634,16 @@ __CSDECLARE(,char *,__progname_full)
 #define ____p__pgmptr_defined
 #ifdef __CRT_HAVE___p__pgmptr
 /* Alias for argv[0], as passed to main() */
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p__pgmptr,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW,__p__pgmptr,(void),())
 #elif defined(__CRT_HAVE___p_program_invocation_name)
 /* Alias for argv[0], as passed to main() */
-__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p__pgmptr,(void),__p_program_invocation_name,())
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW,__p__pgmptr,(void),__p_program_invocation_name,())
 #else /* ... */
 #include <libc/template/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_name_p
 #include <libc/local/stdlib/__p__pgmptr.h>
 /* Alias for argv[0], as passed to main() */
-__NAMESPACE_LOCAL_USING_OR_IMPL(__p__pgmptr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBCCALL __p__pgmptr)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__p__pgmptr))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__p__pgmptr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED char **__NOTHROW(__LIBCCALL __p__pgmptr)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__p__pgmptr))(); })
 #else /* __LOCAL_program_invocation_name_p */
 #undef ____p__pgmptr_defined
 #endif /* !__LOCAL_program_invocation_name_p */
@@ -4664,7 +4664,7 @@ __CSDECLARE(,char **,__initenv)
 #if !defined(____p___initenv_defined) && defined(__CRT_HAVE___p___initenv)
 #define ____p___initenv_defined
 /* Access to the initial environment block */
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char ***,__NOTHROW_NCX,__p___initenv,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char ***,__NOTHROW,__p___initenv,(void),())
 #endif /* !____p___initenv_defined && __CRT_HAVE___p___initenv */
 #ifdef ____p___initenv_defined
 #define __initenv (*__p___initenv())
@@ -4679,7 +4679,7 @@ __CSDECLARE(,wchar_t **,__winitenv)
 #if !defined(____p___winitenv_defined) && defined(__CRT_HAVE___p___winitenv)
 #define ____p___winitenv_defined
 /* Access to the initial environment block */
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_NCX,__p___winitenv,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW,__p___winitenv,(void),())
 #endif /* !____p___winitenv_defined && __CRT_HAVE___p___winitenv */
 #ifdef ____p___winitenv_defined
 #define __winitenv (*__p___winitenv())
@@ -4729,7 +4729,7 @@ __CSDECLARE(,int,_fmode)
 #else /* ... */
 #if !defined(____p__fmode_defined) && defined(__CRT_HAVE___p__fmode)
 #define ____p__fmode_defined
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__p__fmode,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW,__p__fmode,(void),())
 #endif /* !____p__fmode_defined && __CRT_HAVE___p__fmode */
 #ifdef ____p__fmode_defined
 #define _fmode (*__p__fmode())
@@ -4820,23 +4820,23 @@ extern unsigned __int64 (_byteswap_uint64)(unsigned __int64 __x);
 #endif /* !_byteswap_uint64 */
 #else /* _MSC_VER */
 #ifdef __CRT_HAVE__byteswap_ushort
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT16_TYPE__,__NOTHROW_NCX,_byteswap_ushort,(__UINT16_TYPE__ __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT16_TYPE__,__NOTHROW,_byteswap_ushort,(__UINT16_TYPE__ __val),(__val))
 #else /* __CRT_HAVE__byteswap_ushort */
 #include <libc/local/stdlib/_byteswap_ushort.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_byteswap_ushort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL _byteswap_ushort)(__UINT16_TYPE__ __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_byteswap_ushort))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_byteswap_ushort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __UINT16_TYPE__ __NOTHROW(__LIBCCALL _byteswap_ushort)(__UINT16_TYPE__ __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_byteswap_ushort))(__val); })
 #endif /* !__CRT_HAVE__byteswap_ushort */
 #ifdef __CRT_HAVE__byteswap_ulong
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT32_TYPE__,__NOTHROW_NCX,_byteswap_ulong,(__UINT32_TYPE__ __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT32_TYPE__,__NOTHROW,_byteswap_ulong,(__UINT32_TYPE__ __val),(__val))
 #else /* __CRT_HAVE__byteswap_ulong */
 #include <libc/local/stdlib/_byteswap_ulong.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_byteswap_ulong, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL _byteswap_ulong)(__UINT32_TYPE__ __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_byteswap_ulong))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_byteswap_ulong, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__ __NOTHROW(__LIBCCALL _byteswap_ulong)(__UINT32_TYPE__ __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_byteswap_ulong))(__val); })
 #endif /* !__CRT_HAVE__byteswap_ulong */
 #ifdef __UINT64_TYPE__
 #ifdef __CRT_HAVE__byteswap_uint64
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT64_TYPE__,__NOTHROW_NCX,_byteswap_uint64,(__UINT64_TYPE__ __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT64_TYPE__,__NOTHROW,_byteswap_uint64,(__UINT64_TYPE__ __val),(__val))
 #else /* __CRT_HAVE__byteswap_uint64 */
 #include <libc/local/stdlib/_byteswap_uint64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_byteswap_uint64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _byteswap_uint64)(__UINT64_TYPE__ __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_byteswap_uint64))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_byteswap_uint64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __UINT64_TYPE__ __NOTHROW(__LIBCCALL _byteswap_uint64)(__UINT64_TYPE__ __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_byteswap_uint64))(__val); })
 #endif /* !__CRT_HAVE__byteswap_uint64 */
 #endif /* __UINT64_TYPE__ */
 #ifndef _byteswap_ushort

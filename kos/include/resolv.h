@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67e58bd6 */
+/* HASH CRC-32:0xe19b2bb7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -131,7 +131,7 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-__CDECLARE_OPT(__ATTR_CONST,struct __res_state *,__NOTHROW_NCX,__res_state,(void),())
+__CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,struct __res_state *,__NOTHROW,__res_state,(void),())
 #ifdef __CRT_HAVE___res_state
 #define _res (*__res_state())
 #endif /* __CRT_HAVE___res_state */

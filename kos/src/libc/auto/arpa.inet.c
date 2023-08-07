@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc25b517 */
+/* HASH CRC-32:0xa71a43a8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ DECL_BEGIN
 /* >> inet_netof(3)
  * Return the network-number-part of the Internet address `INADDR' */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_CONST WUNUSED uint32_t
-NOTHROW_NCX(LIBCCALL libc_inet_netof)(struct in_addr inaddr) {
+NOTHROW(LIBCCALL libc_inet_netof)(struct in_addr inaddr) {
 	uint32_t addr = __hybrid_betoh32(inaddr.s_addr);
 	if (IN_CLASSA(addr)) {
 		return (addr & IN_CLASSA_NET) >> IN_CLASSA_NSHIFT;
@@ -51,7 +51,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_netof)(struct in_addr inaddr) {
 /* >> inet_lnaof(3)
  * Return the local-host-address-part of the Internet address `INADDR' */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_CONST WUNUSED uint32_t
-NOTHROW_NCX(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr) {
+NOTHROW(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr) {
 	uint32_t addr = __hybrid_betoh32(inaddr.s_addr);
 	if (IN_CLASSA(addr)) {
 		return addr & IN_CLASSA_HOST;
@@ -69,8 +69,8 @@ NOTHROW_NCX(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr) {
  * The `net' and `host' arguments  can later be re-extracted by  use
  * of `inet_netof(3)' and `inet_lnaof(3)' */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_CONST WUNUSED struct in_addr
-NOTHROW_NCX(LIBCCALL libc_inet_makeaddr)(uint32_t net,
-                                         uint32_t host) {
+NOTHROW(LIBCCALL libc_inet_makeaddr)(uint32_t net,
+                                     uint32_t host) {
 	struct in_addr result;
 	uint32_t result_addr;
 	if (net < IN_CLASSA_MAX) {

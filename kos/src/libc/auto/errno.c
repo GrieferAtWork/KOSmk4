@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25e71668 */
+/* HASH CRC-32:0xd95c0ce */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 /* >> __p_program_invocation_short_name(3)
  * Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
 INTERN ATTR_SECTION(".text.crt.errno.utility") ATTR_CONST ATTR_RETNONNULL WUNUSED char **
-NOTHROW_NCX(LIBCCALL libc___p_program_invocation_short_name)(void) {
+NOTHROW(LIBCCALL libc___p_program_invocation_short_name)(void) {
 	return &__LOCAL_program_invocation_short_name_p;
 }
 #endif /* !__KERNEL__ */

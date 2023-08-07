@@ -1137,7 +1137,7 @@ $ssize_t format_width(void *arg,
 @@>> format_length(3)
 @@Always re-return `datalen' and ignore all other arguments
 @@Both the `arg'  and `data' arguments  are simply  ignored
-[[kernel, const, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
+[[kernel, const, nothrow, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
 [[if(!defined(__KERNEL__)), kos_export_alias("format_wwidth")]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_length(void *arg,

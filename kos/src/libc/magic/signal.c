@@ -2319,7 +2319,7 @@ void psiginfo([[in]] siginfo_t const *pinfo,
 @@Return a name of `code', as read from `siginfo_t::si_code',
 @@and used  in  conjunction  with  a  given  signal  `signo'.
 @@e.g.   `sigcodename_np(SIGILL, ILL_ILLOPC) -> "ILL_ILLOPC"'
-[[kernel, const, wunused, decl_include("<bits/types.h>")]]
+[[kernel, const, wunused, nothrow, decl_include("<bits/types.h>")]]
 [[impl_include("<asm/os/signal.h>", "<asm/os/siginfo.h>")]]
 char const *sigcodename_np($signo_t signo, int code) {
 	char const *result = NULL;
@@ -2834,7 +2834,7 @@ print("@@pp_endif@@");
 @@Return a textual description of `code', as read from `siginfo_t::si_code',
 @@and used in conjunction with a given signal `signo'. This function is used
 @@for the implementation of `psiginfo(3)'
-[[kernel, const, wunused, decl_include("<bits/types.h>")]]
+[[kernel, const, wunused, nothrow, decl_include("<bits/types.h>")]]
 [[requires_function(sigcodename_np)]]
 char const *sigcodedesc_np($signo_t signo, int code) {
 	char const *result = sigcodename_np(signo, code);
@@ -3007,7 +3007,7 @@ err:
 [[export_alias("__libc_allocate_rtsig_private")]]
 $signo_t __libc_allocate_rtsig(int high);
 
-[[const, wunused, decl_include("<bits/types.h>")]]
+[[const, wunused, nothrow, decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/signal.h>")]]
 [[export_alias("__libc_current_sigrtmin_private")]]
 [[userimpl, requires(defined(__SIGRTMIN))]]
@@ -3015,7 +3015,7 @@ $signo_t __libc_current_sigrtmin() {
 	return __SIGRTMIN;
 }
 
-[[const, wunused, decl_include("<bits/types.h>")]]
+[[const, wunused, nothrow, decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/signal.h>")]]
 [[userimpl, requires(defined(__SIGRTMAX))]]
 [[export_alias("__libc_current_sigrtmax_private")]]
@@ -3193,7 +3193,7 @@ return_rt_signal:
 @@Return the next-greater signal number that comes after `signo'
 @@When  no such signal number exists, return `0'. When the given
 @@`signo' is `0', return the lowest valid signal number.
-[[const, wunused]]
+[[const, wunused, nothrow]]
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<asm/os/signal.h>")]]
 $signo_t signalnext($signo_t signo) {

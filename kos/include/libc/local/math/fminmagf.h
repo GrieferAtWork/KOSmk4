@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a3109f1 */
+/* HASH CRC-32:0x4c54c43a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fminmag_defined
 #define __local___localdep_fminmag_defined
 #ifdef __CRT_HAVE_fminmag
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_fminmag,(double __x, double __y),fminmag,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_fminmag,(double __x, double __y),fminmag,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/fminmag.h>
@@ -57,7 +57,7 @@ __NAMESPACE_LOCAL_END
 #include <libm/fabs.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fminmagf) __ATTR_CONST __ATTR_WUNUSED float
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fminmagf))(float __x, float __y) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fminmagf))(float __x, float __y) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 
 

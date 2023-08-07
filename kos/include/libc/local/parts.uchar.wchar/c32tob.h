@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5df2199e */
+/* HASH CRC-32:0x831aec93 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32tob) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32tob))(__WINT32_TYPE__ __ch) {
+__NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(c32tob))(__WINT32_TYPE__ __ch) {
 	if (__ch >= 0 && __ch <= 0x7f)
 		return (int)__ch;
 	return __EOF;

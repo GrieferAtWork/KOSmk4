@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x394911 */
+/* HASH CRC-32:0x1280542e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,13 +51,13 @@ __CDECLARE(,int,__NOTHROW_NCX,dehumanize_number,(char const *__str, __INT64_TYPE
 #define __getprogname_defined
 #ifdef __CRT_HAVE_getprogname
 /* >> getprogname(3), setprogname(3) */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,getprogname,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,getprogname,(void),())
 #else /* __CRT_HAVE_getprogname */
 #include <libc/template/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_short_name
 #include <libc/local/stdlib/getprogname.h>
 /* >> getprogname(3), setprogname(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getprogname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL getprogname)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getprogname))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getprogname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL getprogname)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getprogname))(); })
 #else /* __LOCAL_program_invocation_short_name */
 #undef __getprogname_defined
 #endif /* !__LOCAL_program_invocation_short_name */

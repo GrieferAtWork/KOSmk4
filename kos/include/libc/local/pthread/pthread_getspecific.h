@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ac2a309 */
+/* HASH CRC-32:0xb77c5a6e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_getspecificptr_np_defined
 #define __local___localdep_pthread_getspecificptr_np_defined
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,void **,__NOTHROW_NCX,__localdep_pthread_getspecificptr_np,(__pthread_key_t __key),pthread_getspecificptr_np,(__key))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,void **,__NOTHROW_NCX,__localdep_pthread_getspecificptr_np,(__pthread_key_t __key),pthread_getspecificptr_np,(__key))
 #endif /* !__local___localdep_pthread_getspecificptr_np_defined */
 __LOCAL_LIBC(pthread_getspecific) __ATTR_WUNUSED void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_getspecific))(__pthread_key_t __key) {

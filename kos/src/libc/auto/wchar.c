@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e074a9c */
+/* HASH CRC-32:0x268d6c38 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ DECL_BEGIN
  * character `ch' isn't valid, or  is `EOF', then `WEOF'  is
  * returned instead. */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED wint16_t
-NOTHROW_NCX(LIBDCALL libd_btowc)(int ch) {
+NOTHROW(LIBDCALL libd_btowc)(int ch) {
 	if (ch >= 0 && ch <= 0x7f)
 		return (wint16_t)ch;
 	return __WEOF16;
@@ -54,7 +54,7 @@ NOTHROW_NCX(LIBDCALL libd_btowc)(int ch) {
  * character `ch' isn't valid, or  is `EOF', then `WEOF'  is
  * returned instead. */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED wint32_t
-NOTHROW_NCX(LIBKCALL libc_btowc)(int ch) {
+NOTHROW(LIBKCALL libc_btowc)(int ch) {
 	if (ch >= 0 && ch <= 0x7f)
 		return (wint32_t)ch;
 	return __WEOF32;
@@ -64,7 +64,7 @@ NOTHROW_NCX(LIBKCALL libc_btowc)(int ch) {
  * Convert a wide-character into a single-byte character. If
  * doing so isn't possible, then `EOF' is returned  instead. */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBDCALL libd_wctob)(wint16_t ch) {
+NOTHROW(LIBDCALL libd_wctob)(wint16_t ch) {
 	if (ch >= 0 && ch <= 0x7f)
 		return (int)ch;
 	return EOF;
@@ -74,7 +74,7 @@ NOTHROW_NCX(LIBDCALL libd_wctob)(wint16_t ch) {
  * Convert a wide-character into a single-byte character. If
  * doing so isn't possible, then `EOF' is returned  instead. */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBKCALL libc_wctob)(wint32_t ch) {
+NOTHROW(LIBKCALL libc_wctob)(wint32_t ch) {
 	if (ch >= 0 && ch <= 0x7f)
 		return (int)ch;
 	return EOF;
@@ -2324,7 +2324,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsdup)(char32_t const *__restrict string) {
  * When `ch' cannot be  displayed at all, `-1'  is returned (but `errno'  is
  * never modified by this function). Zero-width characters return `0'. */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBDCALL libd_wcwidth)(char16_t ch) {
+NOTHROW(LIBDCALL libd_wcwidth)(char16_t ch) {
 	if (__libc_unicode_isprint(ch))
 		return 1;
 	if (ch == 0)
@@ -2337,7 +2337,7 @@ NOTHROW_NCX(LIBDCALL libd_wcwidth)(char16_t ch) {
  * When `ch' cannot be  displayed at all, `-1'  is returned (but `errno'  is
  * never modified by this function). Zero-width characters return `0'. */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBKCALL libc_wcwidth)(char32_t ch) {
+NOTHROW(LIBKCALL libc_wcwidth)(char32_t ch) {
 	if (__libc_unicode_isprint(ch))
 		return 1;
 	if (ch == 0)

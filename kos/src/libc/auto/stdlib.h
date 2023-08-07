@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x519e500 */
+/* HASH CRC-32:0x295e68ad */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,16 +58,16 @@ INTDEF ATTR_CONST WUNUSED long NOTHROW(LIBDCALL libd_labs)(long x);
 INTDEF ATTR_CONST WUNUSED long NOTHROW(LIBCCALL libc_labs)(long x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED struct __div_struct NOTHROW_NCX(LIBDCALL libd_div)(int numer, int denom);
+INTDEF ATTR_PURE WUNUSED struct __div_struct NOTHROW_NCX(LIBDCALL libd_div)(int numer, int denom);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED struct __div_struct NOTHROW_NCX(LIBCCALL libc_div)(int numer, int denom);
+INTDEF ATTR_PURE WUNUSED struct __div_struct NOTHROW_NCX(LIBCCALL libc_div)(int numer, int denom);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED ldiv_t NOTHROW_NCX(LIBDCALL libd_ldiv)(long numer, long denom);
+INTDEF ATTR_PURE WUNUSED ldiv_t NOTHROW_NCX(LIBDCALL libd_ldiv)(long numer, long denom);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED ldiv_t NOTHROW_NCX(LIBCCALL libc_ldiv)(long numer, long denom);
+INTDEF ATTR_PURE WUNUSED ldiv_t NOTHROW_NCX(LIBCCALL libc_ldiv)(long numer, long denom);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBDCALL libd_llabs)(__LONGLONG x);
@@ -76,10 +76,10 @@ INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBDCALL libd_llabs)(__LONGLONG x);
 INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llabs)(__LONGLONG x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED lldiv_t NOTHROW_NCX(LIBDCALL libd_lldiv)(__LONGLONG numer, __LONGLONG denom);
+INTDEF ATTR_PURE WUNUSED lldiv_t NOTHROW_NCX(LIBDCALL libd_lldiv)(__LONGLONG numer, __LONGLONG denom);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED lldiv_t NOTHROW_NCX(LIBCCALL libc_lldiv)(__LONGLONG numer, __LONGLONG denom);
+INTDEF ATTR_PURE WUNUSED lldiv_t NOTHROW_NCX(LIBCCALL libc_lldiv)(__LONGLONG numer, __LONGLONG denom);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_IN_OPT(1) int NOTHROW_NCX(LIBDCALL libd_mblen)(char const *str, size_t maxlen);
@@ -976,10 +976,10 @@ INTDEF ATTR_IN_OPT(1) int NOTHROW_RPC(LIBDCALL libd_shexec)(char const *command)
 INTDEF ATTR_IN_OPT(1) int NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command);
 /* >> getexecname(3)
  * Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBDCALL libd_getexecname)(void);
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_getexecname)(void);
 /* >> getexecname(3)
  * Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_getexecname)(void);
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_getexecname)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fdwalk(3)
@@ -1082,7 +1082,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_l64a_r)(long n, char *buf, __STDC_INT_AS_SI
  * @return: -1: Buffer too small (`errno' was not modified) */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_l64a_r)(long n, char *buf, __STDC_INT_AS_SIZE_T bufsize);
 /* >> getprogname(3), setprogname(3) */
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_getprogname)(void);
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_getprogname)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getprogname(3), setprogname(3) */
@@ -1202,11 +1202,11 @@ INTDEF WUNUSED ATTR_INOUT(1) fd_t NOTHROW_NCX(LIBCCALL libc_mkostemps64)(char *t
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> devname(3), devname_r(3) */
-INTDEF ATTR_CONST char *NOTHROW_NCX(LIBDCALL libd_devname)(dev_t dev, mode_t type);
+INTDEF char *NOTHROW_NCX(LIBDCALL libd_devname)(dev_t dev, mode_t type);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> devname(3), devname_r(3) */
-INTDEF ATTR_CONST char *NOTHROW_NCX(LIBCCALL libc_devname)(dev_t dev, mode_t type);
+INTDEF char *NOTHROW_NCX(LIBCCALL libc_devname)(dev_t dev, mode_t type);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> devname(3), devname_r(3) */
@@ -1290,7 +1290,7 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__set_doserrno)(u32 err);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Alias for argv[0], as passed to main() */
-INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char **NOTHROW_NCX(LIBCCALL libc___p__pgmptr)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char **NOTHROW(LIBCCALL libc___p__pgmptr)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF _purecall_handler NOTHROW_NCX(LIBDCALL libd__set_purecall_handler)(_purecall_handler __handler);
@@ -1336,22 +1336,22 @@ INTDEF ATTR_PURE WUNUSED ATTR_IN(1) __LONGLONG NOTHROW_NCX(LIBDCALL libd__atoll_
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) __LONGLONG NOTHROW_NCX(LIBCCALL libc__atoll_l)(char const *__restrict nptr, locale_t locale);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED u16 NOTHROW_NCX(LIBDCALL libd__byteswap_ushort)(u16 val);
+INTDEF ATTR_CONST WUNUSED u16 NOTHROW(LIBDCALL libd__byteswap_ushort)(u16 val);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED u16 NOTHROW_NCX(LIBCCALL libc__byteswap_ushort)(u16 val);
+INTDEF ATTR_CONST WUNUSED u16 NOTHROW(LIBCCALL libc__byteswap_ushort)(u16 val);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED u32 NOTHROW_NCX(LIBDCALL libd__byteswap_ulong)(u32 val);
+INTDEF ATTR_CONST WUNUSED u32 NOTHROW(LIBDCALL libd__byteswap_ulong)(u32 val);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED u32 NOTHROW_NCX(LIBCCALL libc__byteswap_ulong)(u32 val);
+INTDEF ATTR_CONST WUNUSED u32 NOTHROW(LIBCCALL libc__byteswap_ulong)(u32 val);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED u64 NOTHROW_NCX(LIBDCALL libd__byteswap_uint64)(u64 val);
+INTDEF ATTR_CONST WUNUSED u64 NOTHROW(LIBDCALL libd__byteswap_uint64)(u64 val);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED u64 NOTHROW_NCX(LIBCCALL libc__byteswap_uint64)(u64 val);
+INTDEF ATTR_CONST WUNUSED u64 NOTHROW(LIBCCALL libc__byteswap_uint64)(u64 val);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED ATTR_IN(1) ATTR_IN_OPT(2) NONNULL((5)) void *NOTHROW_CB_NCX(LIBDCALL libd_bsearch_s)(void const *key, void const *base, size_t elem_count, size_t elem_size, int (LIBDCALL *compar)(void *arg, void const *a, void const *b), void *arg);

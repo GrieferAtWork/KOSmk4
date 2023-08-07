@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5de2d150 */
+/* HASH CRC-32:0x4f84673f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,8 +53,8 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_IN(1) char *NOTHROW_NC
 #ifndef __KERNEL__
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_IN(1) char *NOTHROW_NCX(LIBCCALL libc_lrealpath)(char const *path);
 INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_getpwd)(void);
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_errno_max)(void);
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_signo_max)(void);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_errno_max)(void);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_signo_max)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED errno_t NOTHROW_NCX(LIBDCALL libd_strtoerrno)(char const *name);
@@ -265,7 +265,7 @@ INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd_unlink_if_ordinary)(char const *
  * @return:  1: File doesn't exist, isn't accessible, or not a "regular" file.
  * @return: -1: Unlink failed (s.a. `errno') */
 INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc_unlink_if_ordinary)(char const *filename);
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_physmem_total)(void);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_physmem_total)(void);
 INTDEF ATTR_PURE WUNUSED double NOTHROW_NCX(LIBCCALL libc_physmem_available)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

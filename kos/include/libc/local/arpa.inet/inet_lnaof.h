@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdfc597a */
+/* HASH CRC-32:0x700982a9 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(inet_lnaof) __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_lnaof))(struct in_addr __inaddr) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(inet_lnaof))(struct in_addr __inaddr) {
 	__UINT32_TYPE__ __addr = __hybrid_betoh32(__inaddr.s_addr);
 	if (IN_CLASSA(__addr)) {
 		return __addr & IN_CLASSA_HOST;

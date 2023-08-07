@@ -25,10 +25,10 @@
 
 DECL_BEGIN
 
-/*[[[head:libc___h_errno_location,hash:CRC-32=0x907dfeca]]]*/
+/*[[[head:libc___h_errno_location,hash:CRC-32=0x62884194]]]*/
 /* Function to get address of global `h_errno' variable */
 INTERN ATTR_SECTION(".text.crt.net.db") ATTR_CONST ATTR_RETNONNULL WUNUSED int *
-NOTHROW_NCX(LIBCCALL libc___h_errno_location)(void)
+NOTHROW(LIBCCALL libc___h_errno_location)(void)
 /*[[[body:libc___h_errno_location]]]*/
 /*AUTO*/{
 	CRT_UNIMPLEMENTED("__h_errno_location"); /* TODO */
@@ -50,10 +50,10 @@ NOTHROW_RPC(LIBCCALL libc_herror)(char const *str)
 }
 /*[[[end:libc_herror]]]*/
 
-/*[[[head:libc_hstrerror,hash:CRC-32=0x44c66b6b]]]*/
+/*[[[head:libc_hstrerror,hash:CRC-32=0xf839192c]]]*/
 /* Return string associated with error `err_num' */
 INTERN ATTR_SECTION(".text.crt.net.db") ATTR_CONST WUNUSED char const *
-NOTHROW_NCX(LIBCCALL libc_hstrerror)(int err_num)
+NOTHROW(LIBCCALL libc_hstrerror)(int err_num)
 /*[[[body:libc_hstrerror]]]*/
 /*AUTO*/{
 	(void)err_num;
@@ -1024,10 +1024,10 @@ NOTHROW_NCX(LIBCCALL libc_freeaddrinfo)(struct addrinfo *ai)
 }
 /*[[[end:libc_freeaddrinfo]]]*/
 
-/*[[[head:libc_gai_strerror,hash:CRC-32=0x83e84d8f]]]*/
+/*[[[head:libc_gai_strerror,hash:CRC-32=0x3a60935a]]]*/
 /* Convert error return from getaddrinfo() to a string */
 INTERN ATTR_SECTION(".text.crt.net.db") ATTR_CONST WUNUSED char const *
-NOTHROW_NCX(LIBCCALL libc_gai_strerror)(int ecode)
+NOTHROW(LIBCCALL libc_gai_strerror)(int ecode)
 /*[[[body:libc_gai_strerror]]]*/
 /*AUTO*/{
 	(void)ecode;

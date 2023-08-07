@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e5f12c6 */
+/* HASH CRC-32:0xe246adfc */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4395,8 +4395,8 @@ NOTHROW(LIBCCALL libc_roundeven)(double x) {
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
-NOTHROW_NCX(LIBCCALL libc_fmaxmag)(double x,
-                                   double y) {
+NOTHROW(LIBCCALL libc_fmaxmag)(double x,
+                               double y) {
 	double x_abs = __LIBM_MATHFUN(fabs, x);
 	double y_abs = __LIBM_MATHFUN(fabs, y);
 	if (__LIBM_MATHFUN2(isgreater, x_abs, y_abs))
@@ -4408,8 +4408,8 @@ NOTHROW_NCX(LIBCCALL libc_fmaxmag)(double x,
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
-NOTHROW_NCX(LIBCCALL libc_fminmag)(double x,
-                                   double y) {
+NOTHROW(LIBCCALL libc_fminmag)(double x,
+                               double y) {
 	double x_abs = __LIBM_MATHFUN(fabs, x);
 	double y_abs = __LIBM_MATHFUN(fabs, y);
 	if (__LIBM_MATHFUN2(isless, x_abs, y_abs))
@@ -4489,8 +4489,8 @@ NOTHROW_NCX(LIBCCALL libc_ufromfpxf)(float x,
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
-NOTHROW_NCX(LIBCCALL libc_fmaxmagf)(float x,
-                                    float y) {
+NOTHROW(LIBCCALL libc_fmaxmagf)(float x,
+                                float y) {
 
 
 
@@ -4509,8 +4509,8 @@ NOTHROW_NCX(LIBCCALL libc_fmaxmagf)(float x,
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
-NOTHROW_NCX(LIBCCALL libc_fminmagf)(float x,
-                                    float y) {
+NOTHROW(LIBCCALL libc_fminmagf)(float x,
+                                float y) {
 
 
 
@@ -4630,8 +4630,8 @@ DEFINE_INTERN_ALIAS(libc_fmaxmagl, libc_fmaxmag);
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
-NOTHROW_NCX(LIBCCALL libc_fmaxmagl)(__LONGDOUBLE x,
-                                    __LONGDOUBLE y) {
+NOTHROW(LIBCCALL libc_fmaxmagl)(__LONGDOUBLE x,
+                                __LONGDOUBLE y) {
 
 
 
@@ -4655,8 +4655,8 @@ DEFINE_INTERN_ALIAS(libc_fminmagl, libc_fminmag);
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
-NOTHROW_NCX(LIBCCALL libc_fminmagl)(__LONGDOUBLE x,
-                                    __LONGDOUBLE y) {
+NOTHROW(LIBCCALL libc_fminmagl)(__LONGDOUBLE x,
+                                __LONGDOUBLE y) {
 
 
 
@@ -4701,8 +4701,8 @@ NOTHROW_NCX(LIBCCALL libc_canonicalizel)(__LONGDOUBLE *cx,
 #include <libm/fcomp.h>
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__dpcomp)(double x,
-                                   double y) {
+NOTHROW(LIBCCALL libc__dpcomp)(double x,
+                               double y) {
 	int result = 0;
 	if (!__LIBM_MATHFUN2(isunordered, x, y)) {
 		if (__LIBM_MATHFUN2(isgreater, x, y))
@@ -4721,8 +4721,8 @@ NOTHROW_NCX(LIBCCALL libc__dpcomp)(double x,
 #include <libm/fcomp.h>
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__fdpcomp)(float x,
-                                    float y) {
+NOTHROW(LIBCCALL libc__fdpcomp)(float x,
+                                float y) {
 
 
 
@@ -4751,8 +4751,8 @@ DEFINE_INTERN_ALIAS(libc__ldpcomp, libc__dpcomp);
 #include <libm/fcomp.h>
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__ldpcomp)(__LONGDOUBLE x,
-                                    __LONGDOUBLE y) {
+NOTHROW(LIBCCALL libc__ldpcomp)(__LONGDOUBLE x,
+                                __LONGDOUBLE y) {
 
 
 

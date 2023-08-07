@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cd9e5ea */
+/* HASH CRC-32:0x614259e4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/os/siginfo.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sigcodename_np) __ATTR_CONST __ATTR_WUNUSED char const *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigcodename_np))(__signo_t __signo, int __code) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sigcodename_np))(__signo_t __signo, int __code) {
 	char const *__result = __NULLPTR;
 /*[[[deemon
 import util;

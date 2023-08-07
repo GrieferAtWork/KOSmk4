@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe74c740c */
+/* HASH CRC-32:0xa81162fc */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep___p___c16initenv_defined
 #define __local___localdep___p___c16initenv_defined
 #if defined(__CRT_HAVE___p___winitenv) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__CHAR16_TYPE__ ***,__NOTHROW_NCX,__localdep___p___c16initenv,(void),__p___winitenv,())
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__CHAR16_TYPE__ ***,__NOTHROW,__localdep___p___c16initenv,(void),__p___winitenv,())
 #elif defined(__CRT_HAVE_DOS$__p___winitenv)
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__CHAR16_TYPE__ ***,__NOTHROW_NCX,__localdep___p___c16initenv,(void),__p___winitenv,())
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__CHAR16_TYPE__ ***,__NOTHROW,__localdep___p___c16initenv,(void),__p___winitenv,())
 #else /* ... */
 #undef __local___localdep___p___c16initenv_defined
 #endif /* !... */

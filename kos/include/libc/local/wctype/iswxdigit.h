@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb01eaf12 */
+/* HASH CRC-32:0xd67964de */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wctob_defined
 #define __local___localdep_wctob_defined
 #ifdef __CRT_HAVE_wctob
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wctob,(__WINT_TYPE__ __ch),wctob,(__ch))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_wctob,(__WINT_TYPE__ __ch),wctob,(__ch))
 #else /* __CRT_HAVE_wctob */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wctob.h>

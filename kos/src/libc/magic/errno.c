@@ -1352,7 +1352,7 @@ typedef __errno_t errno_t;
 
 @@>> __errno_location(3)
 [[libc, guard, alias("_errno", "__errno"), wunused]]
-[[const, section(".text.crt{|.dos}.errno_access")]]
+[[const, nothrow, section(".text.crt{|.dos}.errno_access")]]
 [[decl_include("<bits/types.h>")]]
 [[nonnull]] $errno_t *__errno_location();
 
@@ -1475,7 +1475,7 @@ __CSDECLARE(,char *,__progname)
 
 @@>> __p_program_invocation_short_name(3)
 @@Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main()
-[[guard, const, wunused, nonnull]]
+[[guard, const, wunused, nothrow, nonnull]]
 [[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_program_invocation_short_name_p))]]
 char **__p_program_invocation_short_name() {

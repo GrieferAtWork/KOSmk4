@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63bff11 */
+/* HASH CRC-32:0x7ce3b2c2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,12 +101,12 @@ __ATTR_NONNULL((1)) void (FD_COPY)(fd_set const *__src, fd_set *__dst);
 #if (!defined(NDEBUG) && !defined(NDEBUG_BOUNDS) && \
      !defined(NDEBUG_FDELT) && !defined(__OPTIMIZE_SIZE__))
 #ifdef __CRT_HAVE___fdelt_chk
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_NCX,__fdelt_chk,(__LONGPTR_TYPE__ __fd),(__fd))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW,__fdelt_chk,(__LONGPTR_TYPE__ __fd),(__fd))
 #elif defined(__CRT_HAVE___fdelt_warn)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_NCX,__fdelt_chk,(__LONGPTR_TYPE__ __fd),__fdelt_warn,(__fd))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW,__fdelt_chk,(__LONGPTR_TYPE__ __fd),__fdelt_warn,(__fd))
 #else /* ... */
 #include <libc/local/sys.select/__fdelt_chk.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__fdelt_chk, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGPTR_TYPE__ __NOTHROW_NCX(__LIBCCALL __fdelt_chk)(__LONGPTR_TYPE__ __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fdelt_chk))(__fd); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__fdelt_chk, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGPTR_TYPE__ __NOTHROW(__LIBCCALL __fdelt_chk)(__LONGPTR_TYPE__ __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fdelt_chk))(__fd); })
 #endif /* !... */
 
 /* Override `__FD_ELT()' with an argument-checking variant. */

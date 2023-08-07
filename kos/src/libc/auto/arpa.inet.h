@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62046028 */
+/* HASH CRC-32:0x4c0aa810 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,22 +32,22 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> inet_netof(3)
  * Return the network-number-part of the Internet address `INADDR' */
-INTDEF ATTR_CONST WUNUSED uint32_t NOTHROW_NCX(LIBDCALL libd_inet_netof)(struct in_addr inaddr);
+INTDEF ATTR_CONST WUNUSED uint32_t NOTHROW(LIBDCALL libd_inet_netof)(struct in_addr inaddr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> inet_netof(3)
  * Return the network-number-part of the Internet address `INADDR' */
-INTDEF ATTR_CONST WUNUSED uint32_t NOTHROW_NCX(LIBCCALL libc_inet_netof)(struct in_addr inaddr);
+INTDEF ATTR_CONST WUNUSED uint32_t NOTHROW(LIBCCALL libc_inet_netof)(struct in_addr inaddr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> inet_lnaof(3)
  * Return the local-host-address-part of the Internet address `INADDR' */
-INTDEF ATTR_CONST WUNUSED uint32_t NOTHROW_NCX(LIBDCALL libd_inet_lnaof)(struct in_addr inaddr);
+INTDEF ATTR_CONST WUNUSED uint32_t NOTHROW(LIBDCALL libd_inet_lnaof)(struct in_addr inaddr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> inet_lnaof(3)
  * Return the local-host-address-part of the Internet address `INADDR' */
-INTDEF ATTR_CONST WUNUSED uint32_t NOTHROW_NCX(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr);
+INTDEF ATTR_CONST WUNUSED uint32_t NOTHROW(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> inet_makeaddr(3)
@@ -55,7 +55,7 @@ INTDEF ATTR_CONST WUNUSED uint32_t NOTHROW_NCX(LIBCCALL libc_inet_lnaof)(struct 
  * the combination of its network (`net'), and host (`host') number.
  * The `net' and `host' arguments  can later be re-extracted by  use
  * of `inet_netof(3)' and `inet_lnaof(3)' */
-INTDEF ATTR_CONST WUNUSED struct in_addr NOTHROW_NCX(LIBDCALL libd_inet_makeaddr)(uint32_t net, uint32_t host);
+INTDEF ATTR_CONST WUNUSED struct in_addr NOTHROW(LIBDCALL libd_inet_makeaddr)(uint32_t net, uint32_t host);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> inet_makeaddr(3)
@@ -63,7 +63,7 @@ INTDEF ATTR_CONST WUNUSED struct in_addr NOTHROW_NCX(LIBDCALL libd_inet_makeaddr
  * the combination of its network (`net'), and host (`host') number.
  * The `net' and `host' arguments  can later be re-extracted by  use
  * of `inet_netof(3)' and `inet_lnaof(3)' */
-INTDEF ATTR_CONST WUNUSED struct in_addr NOTHROW_NCX(LIBCCALL libc_inet_makeaddr)(uint32_t net, uint32_t host);
+INTDEF ATTR_CONST WUNUSED struct in_addr NOTHROW(LIBCCALL libc_inet_makeaddr)(uint32_t net, uint32_t host);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> inet_addr(3)

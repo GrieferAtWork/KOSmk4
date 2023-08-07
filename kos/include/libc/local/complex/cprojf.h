@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2791e9ff */
+/* HASH CRC-32:0x5db3d1db */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_cimagf_defined
 #define __local___localdep_cimagf_defined
 #ifdef __CRT_HAVE_cimagf
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW_NCX,__localdep_cimagf,(float _Complex __z),cimagf,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_cimagf,(float _Complex __z),cimagf,(__z))
 #else /* __CRT_HAVE_cimagf */
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/cimagf.h>
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_cproj_defined
 #define __local___localdep_cproj_defined
 #ifdef __CRT_HAVE_cproj
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double _Complex,__NOTHROW_NCX,__localdep_cproj,(double _Complex __z),cproj,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double _Complex,__NOTHROW,__localdep_cproj,(double _Complex __z),cproj,(__z))
 #elif defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__INFINITY) || defined(__HUGE_VAL)
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/cproj.h>
@@ -69,7 +69,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crealf_defined
 #define __local___localdep_crealf_defined
 #ifdef __CRT_HAVE_crealf
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW_NCX,__localdep_crealf,(float _Complex __z),crealf,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_crealf,(float _Complex __z),crealf,(__z))
 #else /* __CRT_HAVE_crealf */
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/crealf.h>
@@ -95,7 +95,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_isinff_defined */
 __LOCAL_LIBC(cprojf) __ATTR_CONST __ATTR_WUNUSED float _Complex
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cprojf))(float _Complex __z) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(cprojf))(float _Complex __z) {
 #if defined(__CRT_HAVE_isinff) || defined(__CRT_HAVE___isinff) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__INFINITYF) || defined(__HUGE_VALF) || defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__INFINITY) || defined(__HUGE_VAL)
 	union {
 		float _Complex __x;

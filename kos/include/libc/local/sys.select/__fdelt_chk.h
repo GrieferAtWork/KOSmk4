@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e85b72c */
+/* HASH CRC-32:0x9ec83001 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__fdelt_chk) __ATTR_CONST __ATTR_WUNUSED __LONGPTR_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__fdelt_chk))(__LONGPTR_TYPE__ __fd) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__fdelt_chk))(__LONGPTR_TYPE__ __fd) {
 	__hybrid_assertf(__fd >= 0 && __fd < __FD_SETSIZE,
 	                 "fd %ld cannot be used with `fd_set'",
 	                 (long int)__fd);

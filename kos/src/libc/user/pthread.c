@@ -4700,14 +4700,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setspecific)(pthread_key_t key,
 }
 /*[[[end:libc_pthread_setspecific]]]*/
 
-/*[[[head:libc_pthread_getspecificptr_np,hash:CRC-32=0x1c1fa9c4]]]*/
+/*[[[head:libc_pthread_getspecificptr_np,hash:CRC-32=0x939db1f4]]]*/
 /* >> pthread_getspecificptr_np(3)
  * Return a pointer to the per-thread storage location associated with `key'
  * @return: * :   The address read/written by `pthread_getspecific()' / `pthread_setspecific()'
  * @return: NULL: `key' had yet to be allocated for the calling thread,
  *                and an  attempt  to  allocate  it  just  now  failed.
  * @return: NULL: Invalid `key'. */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_CONST WUNUSED void **
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_PURE WUNUSED void **
 NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
 /*[[[body:libc_pthread_getspecificptr_np]]]*/
 {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd952c2b4 */
+/* HASH CRC-32:0x69547fed */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_errno_max_defined
 #define __local___localdep_errno_max_defined
 #ifdef __CRT_HAVE_errno_max
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_errno_max,(void),errno_max,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_errno_max,(void),errno_max,())
 #elif defined(__ECOUNT)
 __NAMESPACE_LOCAL_END
 #include <libc/local/libiberty/errno_max.h>

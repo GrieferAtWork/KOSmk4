@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x285d0ea4 */
+/* HASH CRC-32:0xac57a3c0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,15 +34,15 @@ __SYSDECL_BEGIN
 #ifdef __CRT_HAVE___errno_location
 #include <bits/types.h>
 /* >> __errno_location(3) */
-__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__libc_core___errno_location,(void),__errno_location,())
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW,__libc_core___errno_location,(void),__errno_location,())
 #elif defined(__CRT_HAVE__errno)
 #include <bits/types.h>
 /* >> __errno_location(3) */
-__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__libc_core___errno_location,(void),_errno,())
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW,__libc_core___errno_location,(void),_errno,())
 #elif defined(__CRT_HAVE___errno)
 #include <bits/types.h>
 /* >> __errno_location(3) */
-__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__libc_core___errno_location,(void),__errno,())
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW,__libc_core___errno_location,(void),__errno,())
 #else /* ... */
 #undef ____libc_core___errno_location_defined
 #endif /* !... */

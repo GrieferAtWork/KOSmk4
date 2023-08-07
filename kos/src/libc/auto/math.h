@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1530bb23 */
+/* HASH CRC-32:0x268fbc70 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2240,16 +2240,16 @@ INTDEF WUNUSED intmax_t NOTHROW_NCX(LIBDCALL libd_fromfp)(double x, int round, u
 INTDEF WUNUSED uintmax_t NOTHROW_NCX(LIBDCALL libd_ufromfp)(double x, int round, unsigned int width);
 INTDEF WUNUSED intmax_t NOTHROW_NCX(LIBDCALL libd_fromfpx)(double x, int round, unsigned int width);
 INTDEF WUNUSED uintmax_t NOTHROW_NCX(LIBDCALL libd_ufromfpx)(double x, int round, unsigned int width);
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBDCALL libd_fmaxmag)(double x, double y);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd_fmaxmag)(double x, double y);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_fmaxmag)(double x, double y);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_fmaxmag)(double x, double y);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBDCALL libd_fminmag)(double x, double y);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd_fminmag)(double x, double y);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_fminmag)(double x, double y);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_fminmag)(double x, double y);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
@@ -2304,16 +2304,16 @@ INTDEF WUNUSED uintmax_t NOTHROW_NCX(LIBDCALL libd_ufromfpxf)(float x, int round
 INTDEF WUNUSED uintmax_t NOTHROW_NCX(LIBCCALL libc_ufromfpxf)(float x, int roundf, unsigned int width);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED float NOTHROW_NCX(LIBDCALL libd_fmaxmagf)(float x, float y);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBDCALL libd_fmaxmagf)(float x, float y);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED float NOTHROW_NCX(LIBCCALL libc_fmaxmagf)(float x, float y);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_fmaxmagf)(float x, float y);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED float NOTHROW_NCX(LIBDCALL libd_fminmagf)(float x, float y);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBDCALL libd_fminmagf)(float x, float y);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED float NOTHROW_NCX(LIBCCALL libc_fminmagf)(float x, float y);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_fminmagf)(float x, float y);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
@@ -2368,16 +2368,16 @@ INTDEF WUNUSED uintmax_t NOTHROW_NCX(LIBDCALL libd_ufromfpxl)(__LONGDOUBLE x, in
 INTDEF WUNUSED uintmax_t NOTHROW_NCX(LIBCCALL libc_ufromfpxl)(__LONGDOUBLE x, int roundl, unsigned int width);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_fmaxmagl)(__LONGDOUBLE x, __LONGDOUBLE y);
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_fmaxmagl)(__LONGDOUBLE x, __LONGDOUBLE y);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_fmaxmagl)(__LONGDOUBLE x, __LONGDOUBLE y);
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_fmaxmagl)(__LONGDOUBLE x, __LONGDOUBLE y);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_fminmagl)(__LONGDOUBLE x, __LONGDOUBLE y);
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_fminmagl)(__LONGDOUBLE x, __LONGDOUBLE y);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_fminmagl)(__LONGDOUBLE x, __LONGDOUBLE y);
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_fminmagl)(__LONGDOUBLE x, __LONGDOUBLE y);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
@@ -2397,27 +2397,27 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_canonicalizel)(__LONGDOUBLE *cx, __LONGDOUB
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd__dpcomp)(double x, double y);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd__dpcomp)(double x, double y);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc__dpcomp)(double x, double y);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc__dpcomp)(double x, double y);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd__fdpcomp)(float x, float y);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd__fdpcomp)(float x, float y);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc__fdpcomp)(float x, float y);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc__fdpcomp)(float x, float y);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd__ldpcomp)(__LONGDOUBLE x, __LONGDOUBLE y);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd__ldpcomp)(__LONGDOUBLE x, __LONGDOUBLE y);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc__ldpcomp)(__LONGDOUBLE x, __LONGDOUBLE y);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc__ldpcomp)(__LONGDOUBLE x, __LONGDOUBLE y);
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) short NOTHROW_NCX(LIBDCALL libd__dtest)(double __KOS_FIXED_CONST *px);
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7edd5011 */
+/* HASH CRC-32:0x3fce4dc0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -190,30 +190,30 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW_NCX,cargf,(float _Complex __z),(__z))
 __NAMESPACE_LOCAL_USING_OR_IMPL(cargf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL cargf)(float _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cargf))(__z); })
 #endif /* ... */
 #ifdef __CRT_HAVE_conjf
-__CDECLARE_GCCNCX(__ATTR_CONST __ATTR_WUNUSED,float _Complex,__NOTHROW_NCX,conjf,(float _Complex __z),(__z))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float _Complex,__NOTHROW,conjf,(float _Complex __z),(__z))
 #else /* __CRT_HAVE_conjf */
 #include <libc/local/complex/conjf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(conjf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float _Complex __NOTHROW_NCX(__LIBCCALL conjf)(float _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(conjf))(__z); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(conjf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float _Complex __NOTHROW(__LIBCCALL conjf)(float _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(conjf))(__z); })
 #endif /* !__CRT_HAVE_conjf */
 #ifdef __CRT_HAVE_crealf
-__CDECLARE_GCCNCX(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW_NCX,crealf,(float _Complex __z),(__z))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,crealf,(float _Complex __z),(__z))
 #else /* __CRT_HAVE_crealf */
 #include <libc/local/complex/crealf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(crealf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL crealf)(float _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(crealf))(__z); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(crealf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL crealf)(float _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(crealf))(__z); })
 #endif /* !__CRT_HAVE_crealf */
 #ifdef __CRT_HAVE_cimagf
-__CDECLARE_GCCNCX(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW_NCX,cimagf,(float _Complex __z),(__z))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,cimagf,(float _Complex __z),(__z))
 #else /* __CRT_HAVE_cimagf */
 #include <libc/local/complex/cimagf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(cimagf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL cimagf)(float _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cimagf))(__z); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(cimagf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL cimagf)(float _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cimagf))(__z); })
 #endif /* !__CRT_HAVE_cimagf */
 #ifdef __CRT_HAVE_cprojf
-__CDECLARE_GCCNCX(__ATTR_CONST __ATTR_WUNUSED,float _Complex,__NOTHROW_NCX,cprojf,(float _Complex __z),(__z))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float _Complex,__NOTHROW,cprojf,(float _Complex __z),(__z))
 #else /* __CRT_HAVE_cprojf */
 #include <bits/math-constants.h>
 #if defined(__CRT_HAVE_isinff) || defined(__CRT_HAVE___isinff) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__INFINITYF) || defined(__HUGE_VALF) || defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__INFINITY) || defined(__HUGE_VAL) || defined(__CRT_HAVE_cproj)
 #include <libc/local/complex/cprojf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(cprojf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float _Complex __NOTHROW_NCX(__LIBCCALL cprojf)(float _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cprojf))(__z); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(cprojf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float _Complex __NOTHROW(__LIBCCALL cprojf)(float _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cprojf))(__z); })
 #endif /* __CRT_HAVE_isinff || __CRT_HAVE___isinff || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __INFINITYF || __HUGE_VALF || __CRT_HAVE_isinf || __CRT_HAVE___isinf || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __INFINITY || __HUGE_VAL || __CRT_HAVE_cproj */
 #endif /* !__CRT_HAVE_cprojf */
 #ifdef __CRT_HAVE_cabs
@@ -327,30 +327,30 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW_NCX,carg,(double _Complex __z),(__z))
 __NAMESPACE_LOCAL_USING_OR_IMPL(carg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL carg)(double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(carg))(__z); })
 #endif /* ... */
 #ifdef __CRT_HAVE_conj
-__CDECLARE_GCCNCX(__ATTR_CONST __ATTR_WUNUSED,double _Complex,__NOTHROW_NCX,conj,(double _Complex __z),(__z))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double _Complex,__NOTHROW,conj,(double _Complex __z),(__z))
 #else /* __CRT_HAVE_conj */
 #include <libc/local/complex/conj.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(conj, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double _Complex __NOTHROW_NCX(__LIBCCALL conj)(double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(conj))(__z); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(conj, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double _Complex __NOTHROW(__LIBCCALL conj)(double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(conj))(__z); })
 #endif /* !__CRT_HAVE_conj */
 #ifdef __CRT_HAVE_creal
-__CDECLARE_GCCNCX(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,creal,(double _Complex __z),(__z))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,creal,(double _Complex __z),(__z))
 #else /* __CRT_HAVE_creal */
 #include <libc/local/complex/creal.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(creal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL creal)(double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(creal))(__z); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(creal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL creal)(double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(creal))(__z); })
 #endif /* !__CRT_HAVE_creal */
 #ifdef __CRT_HAVE_cimag
-__CDECLARE_GCCNCX(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,cimag,(double _Complex __z),(__z))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,cimag,(double _Complex __z),(__z))
 #else /* __CRT_HAVE_cimag */
 #include <libc/local/complex/cimag.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(cimag, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL cimag)(double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cimag))(__z); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(cimag, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL cimag)(double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cimag))(__z); })
 #endif /* !__CRT_HAVE_cimag */
 #ifdef __CRT_HAVE_cproj
-__CDECLARE_GCCNCX(__ATTR_CONST __ATTR_WUNUSED,double _Complex,__NOTHROW_NCX,cproj,(double _Complex __z),(__z))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double _Complex,__NOTHROW,cproj,(double _Complex __z),(__z))
 #else /* __CRT_HAVE_cproj */
 #include <bits/math-constants.h>
 #if defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__INFINITY) || defined(__HUGE_VAL)
 #include <libc/local/complex/cproj.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(cproj, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double _Complex __NOTHROW_NCX(__LIBCCALL cproj)(double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cproj))(__z); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(cproj, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double _Complex __NOTHROW(__LIBCCALL cproj)(double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cproj))(__z); })
 #endif /* __CRT_HAVE_isinf || __CRT_HAVE___isinf || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __INFINITY || __HUGE_VAL */
 #endif /* !__CRT_HAVE_cproj */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -499,38 +499,38 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,cargl,(long double _Comple
 __NAMESPACE_LOCAL_USING_OR_IMPL(cargl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL cargl)(long double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cargl))(__z); })
 #endif /* ... */
 #ifdef __CRT_HAVE_conjl
-__CDECLARE_GCCNCX(__ATTR_CONST __ATTR_WUNUSED,long double _Complex,__NOTHROW_NCX,conjl,(long double _Complex __z),(__z))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double _Complex,__NOTHROW,conjl,(long double _Complex __z),(__z))
 #elif defined(__CRT_HAVE_conj) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT_GCCNCX(__ATTR_CONST __ATTR_WUNUSED,long double _Complex,__NOTHROW_NCX,conjl,(long double _Complex __z),conj,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double _Complex,__NOTHROW,conjl,(long double _Complex __z),conj,(__z))
 #else /* ... */
 #include <libc/local/complex/conjl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(conjl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED long double _Complex __NOTHROW_NCX(__LIBCCALL conjl)(long double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(conjl))(__z); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(conjl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED long double _Complex __NOTHROW(__LIBCCALL conjl)(long double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(conjl))(__z); })
 #endif /* !... */
 #ifdef __CRT_HAVE_creall
-__CDECLARE_GCCNCX(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,creall,(long double _Complex __z),(__z))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,creall,(long double _Complex __z),(__z))
 #elif defined(__CRT_HAVE_creal) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT_GCCNCX(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,creall,(long double _Complex __z),creal,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,creall,(long double _Complex __z),creal,(__z))
 #else /* ... */
 #include <libc/local/complex/creall.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(creall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL creall)(long double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(creall))(__z); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(creall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL creall)(long double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(creall))(__z); })
 #endif /* !... */
 #ifdef __CRT_HAVE_cimagl
-__CDECLARE_GCCNCX(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,cimagl,(long double _Complex __z),(__z))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cimagl,(long double _Complex __z),(__z))
 #elif defined(__CRT_HAVE_cimag) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT_GCCNCX(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,cimagl,(long double _Complex __z),cimag,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cimagl,(long double _Complex __z),cimag,(__z))
 #else /* ... */
 #include <libc/local/complex/cimagl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(cimagl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL cimagl)(long double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cimagl))(__z); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(cimagl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL cimagl)(long double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cimagl))(__z); })
 #endif /* !... */
 #ifdef __CRT_HAVE_cprojl
-__CDECLARE_GCCNCX(__ATTR_CONST __ATTR_WUNUSED,long double _Complex,__NOTHROW_NCX,cprojl,(long double _Complex __z),(__z))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double _Complex,__NOTHROW,cprojl,(long double _Complex __z),(__z))
 #elif defined(__CRT_HAVE_cproj) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT_GCCNCX(__ATTR_CONST __ATTR_WUNUSED,long double _Complex,__NOTHROW_NCX,cprojl,(long double _Complex __z),cproj,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double _Complex,__NOTHROW,cprojl,(long double _Complex __z),cproj,(__z))
 #else /* ... */
 #include <bits/math-constants.h>
 #if defined(__CRT_HAVE_isinfl) || defined(__CRT_HAVE___isinfl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__INFINITYL) || defined(__HUGE_VALL) || defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__INFINITY) || defined(__HUGE_VAL) || defined(__CRT_HAVE_cproj)
 #include <libc/local/complex/cprojl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(cprojl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED long double _Complex __NOTHROW_NCX(__LIBCCALL cprojl)(long double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cprojl))(__z); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(cprojl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED long double _Complex __NOTHROW(__LIBCCALL cprojl)(long double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cprojl))(__z); })
 #endif /* __CRT_HAVE_isinfl || __CRT_HAVE___isinfl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __INFINITYL || __HUGE_VALL || __CRT_HAVE_isinf || __CRT_HAVE___isinf || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __INFINITY || __HUGE_VAL || __CRT_HAVE_cproj */
 #endif /* !... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -545,31 +545,31 @@ extern "C++" {
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL carg)(float _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cargf))(__z); }
 #endif /* ... */
 #ifdef __CRT_HAVE_conjf
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float _Complex,__NOTHROW_NCX,conj,(float _Complex __z),conjf,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float _Complex,__NOTHROW,conj,(float _Complex __z),conjf,(__z))
 #else /* __CRT_HAVE_conjf */
 } /* extern "C++" */
 #include <libc/local/complex/conjf.h>
 extern "C++" {
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float _Complex __NOTHROW_NCX(__LIBCCALL conj)(float _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(conjf))(__z); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float _Complex __NOTHROW(__LIBCCALL conj)(float _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(conjf))(__z); }
 #endif /* !__CRT_HAVE_conjf */
 #ifdef __CRT_HAVE_crealf
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW_NCX,creal,(float _Complex __z),crealf,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,creal,(float _Complex __z),crealf,(__z))
 #else /* __CRT_HAVE_crealf */
 } /* extern "C++" */
 #include <libc/local/complex/crealf.h>
 extern "C++" {
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL creal)(float _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(crealf))(__z); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL creal)(float _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(crealf))(__z); }
 #endif /* !__CRT_HAVE_crealf */
 #ifdef __CRT_HAVE_cimagf
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW_NCX,cimag,(float _Complex __z),cimagf,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,cimag,(float _Complex __z),cimagf,(__z))
 #else /* __CRT_HAVE_cimagf */
 } /* extern "C++" */
 #include <libc/local/complex/cimagf.h>
 extern "C++" {
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL cimag)(float _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cimagf))(__z); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL cimag)(float _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cimagf))(__z); }
 #endif /* !__CRT_HAVE_cimagf */
 #ifdef __CRT_HAVE_cprojf
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float _Complex,__NOTHROW_NCX,cproj,(float _Complex __z),cprojf,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float _Complex,__NOTHROW,cproj,(float _Complex __z),cprojf,(__z))
 #else /* __CRT_HAVE_cprojf */
 } /* extern "C++" */
 #include <bits/math-constants.h>
@@ -578,7 +578,7 @@ extern "C++" {
 } /* extern "C++" */
 #include <libc/local/complex/cprojf.h>
 extern "C++" {
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float _Complex __NOTHROW_NCX(__LIBCCALL cproj)(float _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cprojf))(__z); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float _Complex __NOTHROW(__LIBCCALL cproj)(float _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cprojf))(__z); }
 #endif /* __CRT_HAVE_isinff || __CRT_HAVE___isinff || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __INFINITYF || __HUGE_VALF || __CRT_HAVE_isinf || __CRT_HAVE___isinf || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __INFINITY || __HUGE_VAL || __CRT_HAVE_cproj */
 #endif /* !__CRT_HAVE_cprojf */
 } /* extern "C++" */
@@ -595,39 +595,39 @@ extern "C++" {
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL carg)(long double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cargl))(__z); }
 #endif /* ... */
 #ifdef __CRT_HAVE_conjl
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double _Complex,__NOTHROW_NCX,conj,(long double _Complex __z),conjl,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double _Complex,__NOTHROW,conj,(long double _Complex __z),conjl,(__z))
 #elif defined(__CRT_HAVE_conj) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double _Complex,__NOTHROW_NCX,conj,(long double _Complex __z),conj,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double _Complex,__NOTHROW,conj,(long double _Complex __z),conj,(__z))
 #else /* ... */
 } /* extern "C++" */
 #include <libc/local/complex/conjl.h>
 extern "C++" {
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED long double _Complex __NOTHROW_NCX(__LIBCCALL conj)(long double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(conjl))(__z); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED long double _Complex __NOTHROW(__LIBCCALL conj)(long double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(conjl))(__z); }
 #endif /* !... */
 #ifdef __CRT_HAVE_creall
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,creal,(long double _Complex __z),creall,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,creal,(long double _Complex __z),creall,(__z))
 #elif defined(__CRT_HAVE_creal) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,creal,(long double _Complex __z),creal,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,creal,(long double _Complex __z),creal,(__z))
 #else /* ... */
 } /* extern "C++" */
 #include <libc/local/complex/creall.h>
 extern "C++" {
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL creal)(long double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(creall))(__z); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL creal)(long double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(creall))(__z); }
 #endif /* !... */
 #ifdef __CRT_HAVE_cimagl
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,cimag,(long double _Complex __z),cimagl,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cimag,(long double _Complex __z),cimagl,(__z))
 #elif defined(__CRT_HAVE_cimag) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,cimag,(long double _Complex __z),cimag,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cimag,(long double _Complex __z),cimag,(__z))
 #else /* ... */
 } /* extern "C++" */
 #include <libc/local/complex/cimagl.h>
 extern "C++" {
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL cimag)(long double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cimagl))(__z); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL cimag)(long double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cimagl))(__z); }
 #endif /* !... */
 #ifdef __CRT_HAVE_cprojl
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double _Complex,__NOTHROW_NCX,cproj,(long double _Complex __z),cprojl,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double _Complex,__NOTHROW,cproj,(long double _Complex __z),cprojl,(__z))
 #elif defined(__CRT_HAVE_cproj) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double _Complex,__NOTHROW_NCX,cproj,(long double _Complex __z),cproj,(__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double _Complex,__NOTHROW,cproj,(long double _Complex __z),cproj,(__z))
 #else /* ... */
 } /* extern "C++" */
 #include <bits/math-constants.h>
@@ -636,7 +636,7 @@ extern "C++" {
 } /* extern "C++" */
 #include <libc/local/complex/cprojl.h>
 extern "C++" {
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED long double _Complex __NOTHROW_NCX(__LIBCCALL cproj)(long double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cprojl))(__z); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED long double _Complex __NOTHROW(__LIBCCALL cproj)(long double _Complex __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cprojl))(__z); }
 #endif /* __CRT_HAVE_isinfl || __CRT_HAVE___isinfl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __INFINITYL || __HUGE_VALL || __CRT_HAVE_isinf || __CRT_HAVE___isinf || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __INFINITY || __HUGE_VAL || __CRT_HAVE_cproj */
 #endif /* !... */
 } /* extern "C++" */

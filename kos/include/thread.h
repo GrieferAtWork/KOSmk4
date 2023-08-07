@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba53ce3c */
+/* HASH CRC-32:0x500458c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -272,11 +272,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(thr_getspecific, __FORCELOCAL __ATTR_ARTIFICIAL 
 #define __thr_min_stack_defined
 #ifdef __CRT_HAVE_thr_min_stack
 /* >> thr_min_stack(3) */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,thr_min_stack,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW,thr_min_stack,(void),())
 #else /* __CRT_HAVE_thr_min_stack */
 #include <libc/local/threads/thr_min_stack.h>
 /* >> thr_min_stack(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(thr_min_stack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL thr_min_stack)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_min_stack))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(thr_min_stack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __SIZE_TYPE__ __NOTHROW(__LIBCCALL thr_min_stack)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_min_stack))(); })
 #endif /* !__CRT_HAVE_thr_min_stack */
 #endif /* !__thr_min_stack_defined */
 #ifdef __CRT_HAVE_pthread_getconcurrency

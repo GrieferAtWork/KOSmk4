@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x423ce533 */
+/* HASH CRC-32:0xfa8ccf28 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -388,18 +388,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_wwidth, __FORCELOCAL __ATTR_ARTIFICIAL __
 /* >> format_length(3)
  * Always re-return `datalen' and ignore all other arguments
  * Both the `arg'  and `data' arguments  are simply  ignored */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW_NCX,__WFORMATPRINTER_CC,format_wlength,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW,__WFORMATPRINTER_CC,format_wlength,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_format_wwidth) && !defined(__KERNEL__)
 /* >> format_length(3)
  * Always re-return `datalen' and ignore all other arguments
  * Both the `arg'  and `data' arguments  are simply  ignored */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW_NCX,__WFORMATPRINTER_CC,format_wlength,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW,__WFORMATPRINTER_CC,format_wlength,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
 #else /* ... */
 #include <libc/local/format-printer/format_length.h>
 /* >> format_length(3)
  * Always re-return `datalen' and ignore all other arguments
  * Both the `arg'  and `data' arguments  are simply  ignored */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_wlength)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_length))(__arg, (char const *)__data, __datalen); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __SSIZE_TYPE__ __NOTHROW(__WFORMATPRINTER_CC format_wlength)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_length))(__arg, (char const *)__data, __datalen); }
 #endif /* !... */
 
 #ifndef __format_waprintf_data_defined

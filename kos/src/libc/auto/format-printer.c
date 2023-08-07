@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10b0aac1 */
+/* HASH CRC-32:0x8ce92ca8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -855,9 +855,9 @@ NOTHROW_NCX(__FORMATPRINTER_CC libc_format_width)(void *arg,
  * Always re-return `datalen' and ignore all other arguments
  * Both the `arg'  and `data' arguments  are simply  ignored */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_CONST ATTR_INS(2, 3) NONNULL((2)) ssize_t
-NOTHROW_NCX(__FORMATPRINTER_CC libc_format_length)(void *arg,
-                                                   char const *__restrict data,
-                                                   size_t datalen) {
+NOTHROW(__FORMATPRINTER_CC libc_format_length)(void *arg,
+                                               char const *__restrict data,
+                                               size_t datalen) {
 	(void)arg;
 	(void)data;
 	return (ssize_t)datalen;

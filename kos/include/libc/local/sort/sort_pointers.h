@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa51e196d */
+/* HASH CRC-32:0x844ccffe */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sort_pointers_compar) __ATTR_PURE int
-(__LIBCCALL __sort_pointers_compar)(void const *__a, void const *__b) {
+__NOTHROW_NCX(__LIBCCALL __sort_pointers_compar)(void const *__a, void const *__b) {
 	__BYTE_TYPE__ *__lhs = *(__BYTE_TYPE__ **)__a;
 	__BYTE_TYPE__ *__rhs = *(__BYTE_TYPE__ **)__b;
 #if __SIZEOF_POINTER__ < __SIZEOF_INT__

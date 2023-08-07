@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10df6aac */
+/* HASH CRC-32:0xf9307408 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -867,7 +867,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(regfree, __FORCELOCAL __ATTR_ARTIFICIAL void __N
  * @param: errcode: Regex error code (one of `REG_*'; s.a. `reg_errcode_t')
  * @return: * :   The human-readable description for `errcode'
  * @return: NULL: No description is available for `errcode' */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,regerrordesc_np,(int __errcode),(__errcode))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,regerrordesc_np,(int __errcode),(__errcode))
 #else /* __CRT_HAVE_regerrordesc_np */
 #include <libc/local/regex/regerrordesc_np.h>
 /* >> regerrordesc_np(3)
@@ -875,7 +875,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,regerrordesc_n
  * @param: errcode: Regex error code (one of `REG_*'; s.a. `reg_errcode_t')
  * @return: * :   The human-readable description for `errcode'
  * @return: NULL: No description is available for `errcode' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(regerrordesc_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL regerrordesc_np)(int __errcode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(regerrordesc_np))(__errcode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(regerrordesc_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL regerrordesc_np)(int __errcode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(regerrordesc_np))(__errcode); })
 #endif /* !__CRT_HAVE_regerrordesc_np */
 #endif /* __USE_KOS */
 

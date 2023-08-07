@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ab9d6e8 */
+/* HASH CRC-32:0xc9ad007e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -182,7 +182,7 @@ NOTHROW_NCX(LIBCCALL libc__cchsh)(double x,
 	}
 }
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED float
-NOTHROW_NCX(LIBCCALL libc__redupif)(float x) {
+NOTHROW(LIBCCALL libc__redupif)(float x) {
 	/* Implementation derived from NetBSD. -- See the following copyright notice. */
 	/*-
 	 * Copyright (c) 2007 The NetBSD Foundation, Inc.
@@ -252,7 +252,7 @@ NOTHROW_NCX(LIBCCALL libc__redupif)(float x) {
 DEFINE_INTERN_ALIAS(libc__redupil, libc__redupi);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED __LONGDOUBLE
-NOTHROW_NCX(LIBCCALL libc__redupil)(__LONGDOUBLE x) {
+NOTHROW(LIBCCALL libc__redupil)(__LONGDOUBLE x) {
 	/* Implementation derived from NetBSD. -- See the following copyright notice. */
 	/*-
 	 * Copyright (c) 2007 The NetBSD Foundation, Inc.
@@ -319,7 +319,7 @@ NOTHROW_NCX(LIBCCALL libc__redupil)(__LONGDOUBLE x) {
 }
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED double
-NOTHROW_NCX(LIBCCALL libc__redupi)(double x) {
+NOTHROW(LIBCCALL libc__redupi)(double x) {
 	/* Implementation derived from NetBSD. -- See the following copyright notice. */
 	/*-
 	 * Copyright (c) 2007 The NetBSD Foundation, Inc.
@@ -386,7 +386,7 @@ NOTHROW_NCX(LIBCCALL libc__redupi)(double x) {
 }
 /* Taylor series expansion for cosh(2y) - cos(2x) */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED float
-NOTHROW_NCX(LIBCCALL libc__ctansf)(float _Complex z) {
+NOTHROW(LIBCCALL libc__ctansf)(float _Complex z) {
 
 	/* Implementation derived from NetBSD. -- See the following copyright notice. */
 	/*-
@@ -470,7 +470,7 @@ DEFINE_INTERN_ALIAS(libc__ctansl, libc__ctans);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* Taylor series expansion for cosh(2y) - cos(2x) */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED __LONGDOUBLE
-NOTHROW_NCX(LIBCCALL libc__ctansl)(long double _Complex z) {
+NOTHROW(LIBCCALL libc__ctansl)(long double _Complex z) {
 
 	/* Implementation derived from NetBSD. -- See the following copyright notice. */
 	/*-
@@ -551,7 +551,7 @@ NOTHROW_NCX(LIBCCALL libc__ctansl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* Taylor series expansion for cosh(2y) - cos(2x) */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED double
-NOTHROW_NCX(LIBCCALL libc__ctans)(double _Complex z) {
+NOTHROW(LIBCCALL libc__ctans)(double _Complex z) {
 	/* Implementation derived from NetBSD. -- See the following copyright notice. */
 	/*-
 	 * Copyright (c) 2007 The NetBSD Foundation, Inc.
@@ -1536,7 +1536,7 @@ NOTHROW_NCX(LIBCCALL libc_cargf)(float _Complex z) {
 
 }
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED float _Complex
-NOTHROW_NCX(LIBCCALL libc_conjf)(float _Complex z) {
+NOTHROW(LIBCCALL libc_conjf)(float _Complex z) {
 	union {
 		float _Complex x;
 		float parts[2];
@@ -1546,7 +1546,7 @@ NOTHROW_NCX(LIBCCALL libc_conjf)(float _Complex z) {
 	return v.x;
 }
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED float
-NOTHROW_NCX(LIBCCALL libc_crealf)(float _Complex z) {
+NOTHROW(LIBCCALL libc_crealf)(float _Complex z) {
 	union {
 		float _Complex x;
 		float parts[2];
@@ -1555,7 +1555,7 @@ NOTHROW_NCX(LIBCCALL libc_crealf)(float _Complex z) {
 	return v.parts[0];
 }
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED float
-NOTHROW_NCX(LIBCCALL libc_cimagf)(float _Complex z) {
+NOTHROW(LIBCCALL libc_cimagf)(float _Complex z) {
 	union {
 		float _Complex x;
 		float parts[2];
@@ -1565,7 +1565,7 @@ NOTHROW_NCX(LIBCCALL libc_cimagf)(float _Complex z) {
 }
 #include <bits/math-constants.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED float _Complex
-NOTHROW_NCX(LIBCCALL libc_cprojf)(float _Complex z) {
+NOTHROW(LIBCCALL libc_cprojf)(float _Complex z) {
 
 	union {
 		float _Complex x;
@@ -2420,7 +2420,7 @@ NOTHROW_NCX(LIBCCALL libc_carg)(double _Complex z) {
 	return libc_atan2(libc_cimag(z), libc_creal(z));
 }
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED double _Complex
-NOTHROW_NCX(LIBCCALL libc_conj)(double _Complex z) {
+NOTHROW(LIBCCALL libc_conj)(double _Complex z) {
 	union {
 		double _Complex x;
 		double parts[2];
@@ -2430,7 +2430,7 @@ NOTHROW_NCX(LIBCCALL libc_conj)(double _Complex z) {
 	return v.x;
 }
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED double
-NOTHROW_NCX(LIBCCALL libc_creal)(double _Complex z) {
+NOTHROW(LIBCCALL libc_creal)(double _Complex z) {
 	union {
 		double _Complex x;
 		double parts[2];
@@ -2439,7 +2439,7 @@ NOTHROW_NCX(LIBCCALL libc_creal)(double _Complex z) {
 	return v.parts[0];
 }
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED double
-NOTHROW_NCX(LIBCCALL libc_cimag)(double _Complex z) {
+NOTHROW(LIBCCALL libc_cimag)(double _Complex z) {
 	union {
 		double _Complex x;
 		double parts[2];
@@ -2449,7 +2449,7 @@ NOTHROW_NCX(LIBCCALL libc_cimag)(double _Complex z) {
 }
 #include <bits/math-constants.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED double _Complex
-NOTHROW_NCX(LIBCCALL libc_cproj)(double _Complex z) {
+NOTHROW(LIBCCALL libc_cproj)(double _Complex z) {
 	union {
 		double _Complex x;
 		double parts[2];
@@ -3466,7 +3466,7 @@ NOTHROW_NCX(LIBCCALL libc_cargl)(long double _Complex z) {
 DEFINE_INTERN_ALIAS(libc_conjl, libc_conj);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED long double _Complex
-NOTHROW_NCX(LIBCCALL libc_conjl)(long double _Complex z) {
+NOTHROW(LIBCCALL libc_conjl)(long double _Complex z) {
 	union {
 		long double _Complex x;
 		__LONGDOUBLE parts[2];
@@ -3481,7 +3481,7 @@ NOTHROW_NCX(LIBCCALL libc_conjl)(long double _Complex z) {
 DEFINE_INTERN_ALIAS(libc_creall, libc_creal);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED __LONGDOUBLE
-NOTHROW_NCX(LIBCCALL libc_creall)(long double _Complex z) {
+NOTHROW(LIBCCALL libc_creall)(long double _Complex z) {
 	union {
 		long double _Complex x;
 		__LONGDOUBLE parts[2];
@@ -3495,7 +3495,7 @@ NOTHROW_NCX(LIBCCALL libc_creall)(long double _Complex z) {
 DEFINE_INTERN_ALIAS(libc_cimagl, libc_cimag);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED __LONGDOUBLE
-NOTHROW_NCX(LIBCCALL libc_cimagl)(long double _Complex z) {
+NOTHROW(LIBCCALL libc_cimagl)(long double _Complex z) {
 	union {
 		long double _Complex x;
 		__LONGDOUBLE parts[2];
@@ -3510,7 +3510,7 @@ DEFINE_INTERN_ALIAS(libc_cprojl, libc_cproj);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/math-constants.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED long double _Complex
-NOTHROW_NCX(LIBCCALL libc_cprojl)(long double _Complex z) {
+NOTHROW(LIBCCALL libc_cprojl)(long double _Complex z) {
 
 	union {
 		long double _Complex x;

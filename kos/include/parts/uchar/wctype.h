@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6ddd3b8 */
+/* HASH CRC-32:0xdaa7ee50 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -721,73 +721,73 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBKC
 __NAMESPACE_LOCAL_USING_OR_IMPL(isblank32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBKCALL isblank32)(wint32_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isblank32))(__wc); })
 #endif /* !... */
 #if defined(__CRT_HAVE_towctrans) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,wint16_t,__NOTHROW_NCX,toctrans16,(wint16_t __wc, wctrans_t __desc),towctrans,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,wint16_t,__NOTHROW,toctrans16,(wint16_t __wc, wctrans_t __desc),towctrans,(__wc,__desc))
 #elif defined(__CRT_HAVE_DOS$towctrans)
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,wint16_t,__NOTHROW_NCX,toctrans16,(wint16_t __wc, wctrans_t __desc),towctrans,(__wc,__desc))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,wint16_t,__NOTHROW,toctrans16,(wint16_t __wc, wctrans_t __desc),towctrans,(__wc,__desc))
 #elif defined(__CRT_HAVE___towctrans) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,wint16_t,__NOTHROW_NCX,toctrans16,(wint16_t __wc, wctrans_t __desc),__towctrans,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,wint16_t,__NOTHROW,toctrans16,(wint16_t __wc, wctrans_t __desc),__towctrans,(__wc,__desc))
 #elif defined(__CRT_HAVE_DOS$__towctrans)
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,wint16_t,__NOTHROW_NCX,toctrans16,(wint16_t __wc, wctrans_t __desc),__towctrans,(__wc,__desc))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,wint16_t,__NOTHROW,toctrans16,(wint16_t __wc, wctrans_t __desc),__towctrans,(__wc,__desc))
 #elif defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor) && __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/towctrans.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint16_t __NOTHROW_NCX(__LIBDCALL toctrans16)(wint16_t __wc, wctrans_t __desc) { return (__WINT16_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towctrans))((__WINT_TYPE__)__wc, __desc); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint16_t __NOTHROW(__LIBDCALL toctrans16)(wint16_t __wc, wctrans_t __desc) { return (__WINT16_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towctrans))((__WINT_TYPE__)__wc, __desc); }
 #elif defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
 #include <libc/local/parts.uchar.wctype/toctrans16.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(toctrans16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint16_t __NOTHROW_NCX(__LIBDCALL toctrans16)(wint16_t __wc, wctrans_t __desc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(toctrans16))(__wc, __desc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(toctrans16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint16_t __NOTHROW(__LIBDCALL toctrans16)(wint16_t __wc, wctrans_t __desc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(toctrans16))(__wc, __desc); })
 #endif /* ... */
 #if defined(__CRT_HAVE_towctrans) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,wint32_t,__NOTHROW_NCX,toctrans32,(wint32_t __wc, wctrans_t __desc),towctrans,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,wint32_t,__NOTHROW,toctrans32,(wint32_t __wc, wctrans_t __desc),towctrans,(__wc,__desc))
 #elif defined(__CRT_HAVE_KOS$towctrans)
-__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,wint32_t,__NOTHROW_NCX,toctrans32,(wint32_t __wc, wctrans_t __desc),towctrans,(__wc,__desc))
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,wint32_t,__NOTHROW,toctrans32,(wint32_t __wc, wctrans_t __desc),towctrans,(__wc,__desc))
 #elif defined(__CRT_HAVE___towctrans) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,wint32_t,__NOTHROW_NCX,toctrans32,(wint32_t __wc, wctrans_t __desc),__towctrans,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,wint32_t,__NOTHROW,toctrans32,(wint32_t __wc, wctrans_t __desc),__towctrans,(__wc,__desc))
 #elif defined(__CRT_HAVE_KOS$__towctrans)
-__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,wint32_t,__NOTHROW_NCX,toctrans32,(wint32_t __wc, wctrans_t __desc),__towctrans,(__wc,__desc))
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,wint32_t,__NOTHROW,toctrans32,(wint32_t __wc, wctrans_t __desc),__towctrans,(__wc,__desc))
 #elif defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor) && __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/towctrans.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint32_t __NOTHROW_NCX(__LIBKCALL toctrans32)(wint32_t __wc, wctrans_t __desc) { return (__WINT32_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towctrans))((__WINT_TYPE__)__wc, __desc); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint32_t __NOTHROW(__LIBKCALL toctrans32)(wint32_t __wc, wctrans_t __desc) { return (__WINT32_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towctrans))((__WINT_TYPE__)__wc, __desc); }
 #elif defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
 #include <libc/local/parts.uchar.wctype/toctrans32.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(toctrans32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint32_t __NOTHROW_NCX(__LIBKCALL toctrans32)(wint32_t __wc, wctrans_t __desc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(toctrans32))(__wc, __desc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(toctrans32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint32_t __NOTHROW(__LIBKCALL toctrans32)(wint32_t __wc, wctrans_t __desc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(toctrans32))(__wc, __desc); })
 #endif /* ... */
 #endif /* __USE_ISOC99 */
 #if defined(__CRT_HAVE_iswctype) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),iswctype,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),iswctype,(__wc,__desc))
 #elif defined(__CRT_HAVE_DOS$iswctype)
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),iswctype,(__wc,__desc))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),iswctype,(__wc,__desc))
 #elif defined(__CRT_HAVE_is_wctype) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),is_wctype,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),is_wctype,(__wc,__desc))
 #elif defined(__CRT_HAVE_DOS$is_wctype)
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),is_wctype,(__wc,__desc))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),is_wctype,(__wc,__desc))
 #elif defined(__CRT_HAVE___iswctype) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),__iswctype,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),__iswctype,(__wc,__desc))
 #elif defined(__CRT_HAVE_DOS$__iswctype)
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),__iswctype,(__wc,__desc))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),__iswctype,(__wc,__desc))
 #elif defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor) && __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswctype.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL isctype16)(__WINT16_TYPE__ __wc, __wctype_t __desc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswctype))((__WINT_TYPE__)__wc, __desc); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBDCALL isctype16)(__WINT16_TYPE__ __wc, __wctype_t __desc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswctype))((__WINT_TYPE__)__wc, __desc); }
 #elif defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
 #include <libc/local/parts.uchar.wctype/isctype16.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(isctype16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL isctype16)(__WINT16_TYPE__ __wc, __wctype_t __desc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isctype16))(__wc, __desc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isctype16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBDCALL isctype16)(__WINT16_TYPE__ __wc, __wctype_t __desc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isctype16))(__wc, __desc); })
 #endif /* ... */
 #if defined(__CRT_HAVE_iswctype) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,isctype32,(__WINT32_TYPE__ __wc, __wctype_t __desc),iswctype,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isctype32,(__WINT32_TYPE__ __wc, __wctype_t __desc),iswctype,(__wc,__desc))
 #elif defined(__CRT_HAVE_KOS$iswctype)
-__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,isctype32,(__WINT32_TYPE__ __wc, __wctype_t __desc),iswctype,(__wc,__desc))
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isctype32,(__WINT32_TYPE__ __wc, __wctype_t __desc),iswctype,(__wc,__desc))
 #elif defined(__CRT_HAVE_is_wctype) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,isctype32,(__WINT32_TYPE__ __wc, __wctype_t __desc),is_wctype,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isctype32,(__WINT32_TYPE__ __wc, __wctype_t __desc),is_wctype,(__wc,__desc))
 #elif defined(__CRT_HAVE_KOS$is_wctype)
-__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,isctype32,(__WINT32_TYPE__ __wc, __wctype_t __desc),is_wctype,(__wc,__desc))
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isctype32,(__WINT32_TYPE__ __wc, __wctype_t __desc),is_wctype,(__wc,__desc))
 #elif defined(__CRT_HAVE___iswctype) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,isctype32,(__WINT32_TYPE__ __wc, __wctype_t __desc),__iswctype,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isctype32,(__WINT32_TYPE__ __wc, __wctype_t __desc),__iswctype,(__wc,__desc))
 #elif defined(__CRT_HAVE_KOS$__iswctype)
-__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,isctype32,(__WINT32_TYPE__ __wc, __wctype_t __desc),__iswctype,(__wc,__desc))
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isctype32,(__WINT32_TYPE__ __wc, __wctype_t __desc),__iswctype,(__wc,__desc))
 #elif defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor) && __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswctype.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL isctype32)(__WINT32_TYPE__ __wc, __wctype_t __desc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswctype))((__WINT_TYPE__)__wc, __desc); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBKCALL isctype32)(__WINT32_TYPE__ __wc, __wctype_t __desc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswctype))((__WINT_TYPE__)__wc, __desc); }
 #elif defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
 #include <libc/local/parts.uchar.wctype/isctype32.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(isctype32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL isctype32)(__WINT32_TYPE__ __wc, __wctype_t __desc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isctype32))(__wc, __desc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isctype32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBKCALL isctype32)(__WINT32_TYPE__ __wc, __wctype_t __desc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isctype32))(__wc, __desc); })
 #endif /* ... */
 
 #if defined(__USE_KOS) || defined(__USE_DOS)
@@ -2065,78 +2065,78 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(toctrans32_l, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #if defined(__CRT_HAVE___iswcsymf) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymstrt16,(__WINT16_TYPE__ __wc),__iswcsymf,(__wc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,issymstrt16,(__WINT16_TYPE__ __wc),__iswcsymf,(__wc))
 #elif defined(__CRT_HAVE_DOS$__iswcsymf)
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymstrt16,(__WINT16_TYPE__ __wc),__iswcsymf,(__wc))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,issymstrt16,(__WINT16_TYPE__ __wc),__iswcsymf,(__wc))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswsymstrt.h>
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL issymstrt16)(__WINT16_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymstrt))((__WINT_TYPE__)__wc); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBDCALL issymstrt16)(__WINT16_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymstrt))((__WINT_TYPE__)__wc); }
 #else /* ... */
 #include <libc/local/parts.uchar.wctype/issymstrt16.h>
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
-__NAMESPACE_LOCAL_USING_OR_IMPL(issymstrt16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL issymstrt16)(__WINT16_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymstrt16))(__wc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(issymstrt16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBDCALL issymstrt16)(__WINT16_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymstrt16))(__wc); })
 #endif /* !... */
 #if defined(__CRT_HAVE___iswcsymf) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymstrt32,(__WINT32_TYPE__ __wc),__iswcsymf,(__wc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,issymstrt32,(__WINT32_TYPE__ __wc),__iswcsymf,(__wc))
 #elif defined(__CRT_HAVE_KOS$__iswcsymf)
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
-__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymstrt32,(__WINT32_TYPE__ __wc),__iswcsymf,(__wc))
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,issymstrt32,(__WINT32_TYPE__ __wc),__iswcsymf,(__wc))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswsymstrt.h>
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL issymstrt32)(__WINT32_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymstrt))((__WINT_TYPE__)__wc); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBKCALL issymstrt32)(__WINT32_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymstrt))((__WINT_TYPE__)__wc); }
 #else /* ... */
 #include <libc/local/parts.uchar.wctype/issymstrt32.h>
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
-__NAMESPACE_LOCAL_USING_OR_IMPL(issymstrt32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL issymstrt32)(__WINT32_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymstrt32))(__wc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(issymstrt32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBKCALL issymstrt32)(__WINT32_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymstrt32))(__wc); })
 #endif /* !... */
 #if defined(__CRT_HAVE___iswcsym) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> iswsymcont(3), iswsymcont_l(3)
  * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymcont16,(__WINT16_TYPE__ __wc),__iswcsym,(__wc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,issymcont16,(__WINT16_TYPE__ __wc),__iswcsym,(__wc))
 #elif defined(__CRT_HAVE_DOS$__iswcsym)
 /* >> iswsymcont(3), iswsymcont_l(3)
  * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymcont16,(__WINT16_TYPE__ __wc),__iswcsym,(__wc))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,issymcont16,(__WINT16_TYPE__ __wc),__iswcsym,(__wc))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswsymcont.h>
 /* >> iswsymcont(3), iswsymcont_l(3)
  * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL issymcont16)(__WINT16_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymcont))((__WINT_TYPE__)__wc); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBDCALL issymcont16)(__WINT16_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymcont))((__WINT_TYPE__)__wc); }
 #else /* ... */
 #include <libc/local/parts.uchar.wctype/issymcont16.h>
 /* >> iswsymcont(3), iswsymcont_l(3)
  * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
-__NAMESPACE_LOCAL_USING_OR_IMPL(issymcont16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL issymcont16)(__WINT16_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymcont16))(__wc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(issymcont16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBDCALL issymcont16)(__WINT16_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymcont16))(__wc); })
 #endif /* !... */
 #if defined(__CRT_HAVE___iswcsym) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> iswsymcont(3), iswsymcont_l(3)
  * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymcont32,(__WINT32_TYPE__ __wc),__iswcsym,(__wc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,issymcont32,(__WINT32_TYPE__ __wc),__iswcsym,(__wc))
 #elif defined(__CRT_HAVE_KOS$__iswcsym)
 /* >> iswsymcont(3), iswsymcont_l(3)
  * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
-__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymcont32,(__WINT32_TYPE__ __wc),__iswcsym,(__wc))
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,issymcont32,(__WINT32_TYPE__ __wc),__iswcsym,(__wc))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswsymcont.h>
 /* >> iswsymcont(3), iswsymcont_l(3)
  * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL issymcont32)(__WINT32_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymcont))((__WINT_TYPE__)__wc); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBKCALL issymcont32)(__WINT32_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymcont))((__WINT_TYPE__)__wc); }
 #else /* ... */
 #include <libc/local/parts.uchar.wctype/issymcont32.h>
 /* >> iswsymcont(3), iswsymcont_l(3)
  * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
-__NAMESPACE_LOCAL_USING_OR_IMPL(issymcont32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL issymcont32)(__WINT32_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymcont32))(__wc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(issymcont32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBKCALL issymcont32)(__WINT32_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymcont32))(__wc); })
 #endif /* !... */
 #if defined(__CRT_HAVE__iswcsymf_l) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> iswsymstrt(3), iswsymstrt_l(3)

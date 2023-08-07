@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x216d841d */
+/* HASH CRC-32:0xf886ceab */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -145,7 +145,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/inttypes.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(putgrent) __ATTR_IN(1) __ATTR_INOUT(2) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(putgrent))(struct group const *__restrict __entry, __FILE *__restrict __stream) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(putgrent))(struct group const *__restrict __entry, __FILE *__restrict __stream) {
 	__STDC_INT_AS_SSIZE_T __error;
 #if __SIZEOF_GID_T__ == 1
 	char __gidbuf[__COMPILER_LENOF("255")];

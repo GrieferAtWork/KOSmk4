@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51ecc806 */
+/* HASH CRC-32:0x9543a1c7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,40 +30,40 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST uint16_t NOTHROW_NCX(LIBDCALL libd_htons)(uint16_t hostword);
+INTDEF ATTR_CONST uint16_t NOTHROW(LIBDCALL libd_htons)(uint16_t hostword);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST uint16_t NOTHROW_NCX(LIBCCALL libc_htons)(uint16_t hostword);
+INTDEF ATTR_CONST uint16_t NOTHROW(LIBCCALL libc_htons)(uint16_t hostword);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST uint16_t NOTHROW_NCX(LIBDCALL libd_ntohs)(uint16_t netshort);
+INTDEF ATTR_CONST uint16_t NOTHROW(LIBDCALL libd_ntohs)(uint16_t netshort);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST uint16_t NOTHROW_NCX(LIBCCALL libc_ntohs)(uint16_t netshort);
+INTDEF ATTR_CONST uint16_t NOTHROW(LIBCCALL libc_ntohs)(uint16_t netshort);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST uint32_t NOTHROW_NCX(LIBDCALL libd_htonl)(uint32_t hostlong);
+INTDEF ATTR_CONST uint32_t NOTHROW(LIBDCALL libd_htonl)(uint32_t hostlong);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST uint32_t NOTHROW_NCX(LIBCCALL libc_htonl)(uint32_t hostlong);
+INTDEF ATTR_CONST uint32_t NOTHROW(LIBCCALL libc_htonl)(uint32_t hostlong);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST uint32_t NOTHROW_NCX(LIBDCALL libd_ntohl)(uint32_t netlong);
+INTDEF ATTR_CONST uint32_t NOTHROW(LIBDCALL libd_ntohl)(uint32_t netlong);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST uint32_t NOTHROW_NCX(LIBCCALL libc_ntohl)(uint32_t netlong);
+INTDEF ATTR_CONST uint32_t NOTHROW(LIBCCALL libc_ntohl)(uint32_t netlong);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST uint64_t NOTHROW_NCX(LIBDCALL libd_htonq)(uint64_t hostquad);
+INTDEF ATTR_CONST WUNUSED uint64_t NOTHROW(LIBDCALL libd_htonq)(uint64_t hostquad);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST uint64_t NOTHROW_NCX(LIBCCALL libc_htonq)(uint64_t hostquad);
+INTDEF ATTR_CONST WUNUSED uint64_t NOTHROW(LIBCCALL libc_htonq)(uint64_t hostquad);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST uint64_t NOTHROW_NCX(LIBDCALL libd_ntohq)(uint64_t netquad);
+INTDEF ATTR_CONST WUNUSED uint64_t NOTHROW(LIBDCALL libd_ntohq)(uint64_t netquad);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST uint64_t NOTHROW_NCX(LIBCCALL libc_ntohq)(uint64_t netquad);
+INTDEF ATTR_CONST WUNUSED uint64_t NOTHROW(LIBCCALL libc_ntohq)(uint64_t netquad);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_RPC(LIBDCALL libd_bindresvport)(fd_t sockfd, struct sockaddr_in *sock_in);

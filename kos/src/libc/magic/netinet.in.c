@@ -268,7 +268,7 @@ struct group_filter {
 
 %[default:section(".text.crt{|.dos}.net.convert")]
 [[decl_include("<hybrid/typecore.h>")]]
-[[guard, const, impl_include("<hybrid/__byteswap.h>"), extern_inline]]
+[[guard, const, nothrow, impl_include("<hybrid/__byteswap.h>"), extern_inline]]
 [[if($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohs")]]
 [[export_alias("__htons")]]
 [[if($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH)), alias("__ntohs")]]
@@ -277,7 +277,7 @@ $uint16_t htons($uint16_t hostword) {
 }
 
 [[decl_include("<hybrid/typecore.h>")]]
-[[guard, const, impl_include("<hybrid/__byteswap.h>"), extern_inline]]
+[[guard, const, nothrow, impl_include("<hybrid/__byteswap.h>"), extern_inline]]
 [[alt_variant_of($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH), htons)]]
 [[export_alias("__ntohs")]]
 [[if($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH)), alias("__htons")]]
@@ -286,7 +286,7 @@ $uint16_t ntohs($uint16_t netshort) {
 }
 
 [[decl_include("<hybrid/typecore.h>")]]
-[[guard, const, impl_include("<hybrid/__byteswap.h>"), extern_inline]]
+[[guard, const, nothrow, impl_include("<hybrid/__byteswap.h>"), extern_inline]]
 [[if($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohl")]]
 [[export_alias("__htonl")]]
 [[if($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH)), alias("__ntohl")]]
@@ -295,7 +295,7 @@ $uint32_t htonl($uint32_t hostlong) {
 }
 
 [[decl_include("<hybrid/typecore.h>")]]
-[[guard, const, impl_include("<hybrid/__byteswap.h>"), extern_inline]]
+[[guard, const, nothrow, impl_include("<hybrid/__byteswap.h>"), extern_inline]]
 [[alt_variant_of($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH), htonl)]]
 [[export_alias("__ntohl")]]
 [[if($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH)), alias("__htonl")]]
@@ -305,14 +305,14 @@ $uint32_t ntohl($uint32_t netlong) {
 
 %#if defined(__USE_KOS) && defined(__UINT64_TYPE__)
 [[decl_include("<hybrid/typecore.h>")]]
-[[const, impl_include("<hybrid/__byteswap.h>"), extern_inline]]
+[[const, wunused, nothrow, impl_include("<hybrid/__byteswap.h>"), extern_inline]]
 [[if($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohq")]]
 $uint64_t htonq($uint64_t hostquad) {
 	return ($uint64_t)__hybrid_htobe64(hostquad);
 }
 
 [[decl_include("<hybrid/typecore.h>")]]
-[[const, impl_include("<hybrid/__byteswap.h>"), extern_inline]]
+[[const, wunused, nothrow, impl_include("<hybrid/__byteswap.h>"), extern_inline]]
 [[alt_variant_of($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH), htonq)]]
 $uint64_t ntohq($uint64_t netquad) {
 	return ($uint64_t)__hybrid_betoh64(netquad);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd2a8268 */
+/* HASH CRC-32:0xdf13c6a9 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -273,22 +273,22 @@ INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_toupper_l)(int ch, locale
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> issymstrt(3)
  * Test if `ch' can appear at the start of a symbol/keyword/identifier */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd___iscsymf)(int ch);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___iscsymf)(int ch);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> issymstrt(3)
  * Test if `ch' can appear at the start of a symbol/keyword/identifier */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc___iscsymf)(int ch);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___iscsymf)(int ch);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> issymcont(3)
  * Test if `ch' can appear in the middle of a symbol/keyword/identifier */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd___iscsym)(int ch);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___iscsym)(int ch);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> issymcont(3)
  * Test if `ch' can appear in the middle of a symbol/keyword/identifier */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc___iscsym)(int ch);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___iscsym)(int ch);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Returns non-zero if `(C & ~0x7f) == 0' */
@@ -325,7 +325,7 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd__toupper)(int ch);
 /* >> _toupper(3)
  * Same as `toupper(3)', but the caller must ensure that `islower(ch)' */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc__toupper)(int ch);
-INTDEF ATTR_CONST WUNUSED size_t NOTHROW_NCX(LIBCCALL libc___ctype_get_mb_cur_max)(void);
+INTDEF ATTR_CONST WUNUSED size_t NOTHROW(LIBCCALL libc___ctype_get_mb_cur_max)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_NCX(LIBDCALL libd____mb_cur_max_l_func)(locale_t locale);

@@ -143,6 +143,7 @@
 #define __GCC_HAS_BUILTIN___builtin_va_start
 #define __GCC_HAS_BUILTIN___builtin_va_arg
 #define __GCC_HAS_BUILTIN___builtin_va_end
+#define __GCC_HAS_BUILTIN___builtin_va_copy
 #define __GCC_HAS_BUILTIN___atomic_load_n
 #define __GCC_HAS_BUILTIN___atomic_load
 #define __GCC_HAS_BUILTIN___atomic_store_n
@@ -525,6 +526,7 @@
 #define __builtin_va_start(ap, last_arg) (void)0
 #define __builtin_va_arg(ap, T)          __builtin_void(*(T *)0)
 #define __builtin_va_end(ap)             (void)0
+#define __builtin_va_copy(dst, src)      (void)((dst) = (src))
 
 #define __COMPILER_HAVE_BUG_BLOATY_CXX_USING 0
 

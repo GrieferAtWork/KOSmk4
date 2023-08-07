@@ -70,7 +70,7 @@ NOTHROW_NCX(LIBCCALL libc_kos_fstat)(fd_t fd,
 	return libc_seterrno_syserr(error);
 }
 
-INTERN ATTR_SECTION(".text.crt.fs.stat") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.stat") NONNULL((2, 3)) int
 NOTHROW_NCX(LIBCCALL libc_kos_fstatat)(fd_t dirfd,
                                        char const *__restrict filename,
                                        struct __kos_stat *__restrict buf,
@@ -80,7 +80,7 @@ NOTHROW_NCX(LIBCCALL libc_kos_fstatat)(fd_t dirfd,
 	return libc_seterrno_syserr(error);
 }
 
-INTERN ATTR_SECTION(".text.crt.fs.stat") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.stat") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_kos_stat)(char const *__restrict filename,
                                     struct __kos_stat *__restrict buf) {
 	errno_t error;
@@ -91,7 +91,7 @@ NOTHROW_NCX(LIBCCALL libc_kos_stat)(char const *__restrict filename,
 	return libc_seterrno_syserr(error);
 }
 
-INTERN ATTR_SECTION(".text.crt.fs.stat") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.stat") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_kos_lstat)(char const *__restrict filename,
                                      struct __kos_stat *__restrict buf) {
 	errno_t error;
@@ -150,9 +150,9 @@ DEFINE_PUBLIC_ALIAS(DOS$fstat, libc_cyg_fstat);
 DEFINE_PUBLIC_ALIAS(DOS$fstat64, libc_cyg_fstat);
 DEFINE_PUBLIC_ALIAS(DOS$fstatat, libc_cyg_fstatat);
 DEFINE_PUBLIC_ALIAS(DOS$fstatat64, libc_cyg_fstatat);
-LOCAL ATTR_SECTION(".text.crt.dos.compat.cyg.fs.stat") NONNULL((1, 2)) void LIBCCALL
-convstat_kos2cyg(struct __cyg_stat *__restrict dst,
-                 struct __kos_stat const *__restrict src) {
+LOCAL ATTR_SECTION(".text.crt.dos.compat.cyg.fs.stat") NONNULL((1, 2)) void
+NOTHROW_NCX(LIBCCALL convstat_kos2cyg)(struct __cyg_stat *__restrict dst,
+                                       struct __kos_stat const *__restrict src) {
 	dst->st_dev           = (typeof(dst->st_dev))src->st_dev;
 	dst->st_ino           = (typeof(dst->st_ino))src->st_ino64;
 	dst->st_mode          = (typeof(dst->st_mode))src->st_mode;
@@ -244,9 +244,9 @@ DEFINE_INTERN_ALIAS(libc_fstat, libc_glc_fstat);
 DEFINE_INTERN_ALIAS(libc_fstat64, libc_glc_fstat64);
 DEFINE_INTERN_ALIAS(libc_fstatat, libc_glc_fstatat);
 DEFINE_INTERN_ALIAS(libc_fstatat64, libc_glc_fstatat64);
-LOCAL ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) void LIBCCALL
-convstat_kos2glc(struct __glc_stat *__restrict dst,
-                 struct __kos_stat const *__restrict src) {
+LOCAL ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) void
+NOTHROW_NCX(LIBCCALL convstat_kos2glc)(struct __glc_stat *__restrict dst,
+                                       struct __kos_stat const *__restrict src) {
 	dst->st_dev       = (typeof(dst->st_dev))src->st_dev;
 	dst->st_ino       = (typeof(dst->st_ino))src->st_ino32;
 	dst->st_mode      = (typeof(dst->st_mode))src->st_mode;
@@ -265,9 +265,9 @@ convstat_kos2glc(struct __glc_stat *__restrict dst,
 	dst->st_ctimensec = (typeof(dst->st_ctimensec))src->st_ctimensec;
 }
 
-LOCAL ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) void LIBCCALL
-convstat_kos2glc64(struct __glc_stat64 *__restrict dst,
-                   struct __kos_stat const *__restrict src) {
+LOCAL ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) void
+NOTHROW_NCX(LIBCCALL convstat_kos2glc64)(struct __glc_stat64 *__restrict dst,
+                                         struct __kos_stat const *__restrict src) {
 	dst->st_dev       = (typeof(dst->st_dev))src->st_dev;
 	dst->st_ino32     = (typeof(dst->st_ino32))src->st_ino32;
 	dst->st_mode      = (typeof(dst->st_mode))src->st_mode;
@@ -721,9 +721,9 @@ DEFINE_INTERN_ALIAS(libc__stat32i64, libc_dos_stat32i64);
 DEFINE_INTERN_ALIAS(libc__stat64, libc_dos_stat64);
 DEFINE_INTERN_ALIAS(libc__stat64i32, libc_dos_stat64);
 
-LOCAL ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) void LIBCCALL
-convstat_kos2dos32(struct __dos_stat32 *__restrict dst,
-                   struct __kos_stat const *__restrict src) {
+LOCAL ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) void
+NOTHROW_NCX(LIBCCALL convstat_kos2dos32)(struct __dos_stat32 *__restrict dst,
+                                         struct __kos_stat const *__restrict src) {
 	dst->st_dev     = (typeof(dst->st_dev))src->st_dev;
 	dst->st_ino     = (typeof(dst->st_ino))src->st_ino32;
 	dst->st_mode    = (typeof(dst->st_mode))src->st_mode;
@@ -736,9 +736,9 @@ convstat_kos2dos32(struct __dos_stat32 *__restrict dst,
 	dst->st_mtime32 = (typeof(dst->st_mtime32))src->st_mtime32;
 	dst->st_ctime32 = (typeof(dst->st_ctime32))src->st_ctime32;
 }
-LOCAL ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) void LIBCCALL
-convstat_kos2dos32i64(struct __dos_stat32i64 *__restrict dst,
-                      struct __kos_stat const *__restrict src) {
+LOCAL ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) void
+NOTHROW_NCX(LIBCCALL convstat_kos2dos32i64)(struct __dos_stat32i64 *__restrict dst,
+                                            struct __kos_stat const *__restrict src) {
 	dst->st_dev     = (typeof(dst->st_dev))src->st_dev;
 	dst->st_ino     = (typeof(dst->st_ino))src->st_ino32;
 	dst->st_mode    = (typeof(dst->st_mode))src->st_mode;
@@ -752,9 +752,9 @@ convstat_kos2dos32i64(struct __dos_stat32i64 *__restrict dst,
 	dst->st_ctime32 = (typeof(dst->st_ctime32))src->st_ctime32;
 }
 
-LOCAL ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) void LIBCCALL
-convstat_kos2dos64(struct __dos_stat64 *__restrict dst,
-                   struct __kos_stat const *__restrict src) {
+LOCAL ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) void
+NOTHROW_NCX(LIBCCALL convstat_kos2dos64)(struct __dos_stat64 *__restrict dst,
+                                         struct __kos_stat const *__restrict src) {
 	dst->st_dev     = (typeof(dst->st_dev))src->st_dev;
 	dst->st_ino     = (typeof(dst->st_ino))src->st_ino32;
 	dst->st_mode    = (typeof(dst->st_mode))src->st_mode;

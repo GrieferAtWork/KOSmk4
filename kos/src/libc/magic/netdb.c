@@ -280,7 +280,7 @@ struct gaicb {
 %
 %#if defined(__USE_MISC) || !defined(__USE_XOPEN2K8)
 @@Function to get address of global `h_errno' variable
-[[guard, const, wunused]]
+[[guard, const, wunused, nothrow]]
 [[nonnull]] int *__h_errno_location();
 
 %/* Error status for non-reentrant lookup functions.
@@ -298,7 +298,7 @@ struct gaicb {
 void herror(char const *str);
 
 @@Return string associated with error `err_num'
-[[const, wunused]]
+[[const, wunused, nothrow]]
 char const *hstrerror(int err_num);
 %#endif /* __USE_MISC */
 
@@ -678,7 +678,7 @@ int getaddrinfo(char const *__restrict name,
 void freeaddrinfo(struct addrinfo *ai);
 
 @@Convert error return from getaddrinfo() to a string
-[[const, wunused]]
+[[const, wunused, nothrow]]
 char const *gai_strerror(int ecode);
 
 @@Translate a socket address to a location and service name

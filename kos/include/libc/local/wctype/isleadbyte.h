@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe84c033a */
+/* HASH CRC-32:0xc9fac23a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(isleadbyte) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(isleadbyte))(int __wc) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isleadbyte))(int __wc) {
 	return __wc >= 192 && __wc <= 255;
 }
 __NAMESPACE_LOCAL_END

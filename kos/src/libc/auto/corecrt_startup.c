@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa43007af */
+/* HASH CRC-32:0xf4c3ae5f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <bits/crt/dos/corecrt_startup.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST WUNUSED _crt_app_type
-NOTHROW_NCX(LIBDCALL libc__query_app_type)(void) {
+NOTHROW(LIBDCALL libc__query_app_type)(void) {
 	return (_crt_app_type)1;
 }
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") errno_t

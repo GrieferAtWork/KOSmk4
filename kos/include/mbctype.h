@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb116a6f9 */
+/* HASH CRC-32:0x8bf6177e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,7 +80,7 @@ extern unsigned char _mbctype[];
 #else /* ... */
 #if !defined(____p__mbctype_defined) && defined(__CRT_HAVE___p__mbctype)
 #define ____p__mbctype_defined
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,unsigned char *,__NOTHROW_NCX,__p__mbctype,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,unsigned char *,__NOTHROW,__p__mbctype,(void),())
 #endif /* !____p__mbctype_defined && __CRT_HAVE___p__mbctype */
 #ifdef __CRT_HAVE___p__mbctype
 #define _mbctype __p__mbctype()
@@ -96,7 +96,7 @@ extern unsigned char _mbcasemap[];
 #else /* ... */
 #if !defined(____p__mbcasemap_defined) && defined(__CRT_HAVE___p__mbcasemap)
 #define ____p__mbcasemap_defined
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,unsigned char *,__NOTHROW_NCX,__p__mbcasemap,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,unsigned char *,__NOTHROW,__p__mbcasemap,(void),())
 #endif /* !____p__mbcasemap_defined && __CRT_HAVE___p__mbcasemap */
 #ifdef __CRT_HAVE___p__mbcasemap
 #define _mbcasemap __p__mbcasemap()

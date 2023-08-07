@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe636abe */
+/* HASH CRC-32:0x236b9ddc */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1204,12 +1204,12 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1) __time
 #ifdef __CRT_HAVE_dysize
 /* >> dysize(3)
  * Return the number of days in YEAR */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,dysize,(__STDC_INT_AS_UINT_T __year),(__year))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,dysize,(__STDC_INT_AS_UINT_T __year),(__year))
 #else /* __CRT_HAVE_dysize */
 #include <libc/local/time/dysize.h>
 /* >> dysize(3)
  * Return the number of days in YEAR */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dysize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL dysize)(__STDC_INT_AS_UINT_T __year) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dysize))(__year); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dysize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL dysize)(__STDC_INT_AS_UINT_T __year) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dysize))(__year); })
 #endif /* !__CRT_HAVE_dysize */
 
 #ifdef __USE_TIME64
@@ -1956,16 +1956,16 @@ typedef __errno_t errno_t;
 #define _tzname __tzname
 #endif /* !_tzname && __tzname */
 #if defined(__CRT_HAVE___dstbias) && defined(__CRT_DOS)
-__LIBC __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED __LONG32_TYPE__ *__NOTHROW_NCX(__LIBDCALL __dstbias)(void) __CASMNAME_SAME("__dstbias");
+__LIBC __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED __LONG32_TYPE__ *__NOTHROW(__LIBDCALL __dstbias)(void) __CASMNAME_SAME("__dstbias");
 #elif defined(__CRT_HAVE_DOS$__dstbias)
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__LONG32_TYPE__ *,__NOTHROW_NCX,__dstbias,(void),__dstbias,())
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__LONG32_TYPE__ *,__NOTHROW,__dstbias,(void),__dstbias,())
 #elif defined(__CRT_HAVE___p__dstbias)
-__COMPILER_CREDIRECT(__LIBC,__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__LONG32_TYPE__ *,__NOTHROW_NCX,__LIBDCALL,__dstbias,(void),__p__dstbias,())
+__COMPILER_CREDIRECT(__LIBC,__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__LONG32_TYPE__ *,__NOTHROW,__LIBDCALL,__dstbias,(void),__p__dstbias,())
 #else /* ... */
 #include <libc/template/dstbias.h>
 #ifdef __LOCAL_dstbias
 #include <libc/local/time/__dstbias.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__dstbias, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED __LONG32_TYPE__ *__NOTHROW_NCX(__LIBDCALL __dstbias)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__dstbias))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__dstbias, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED __LONG32_TYPE__ *__NOTHROW(__LIBDCALL __dstbias)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__dstbias))(); })
 #endif /* __LOCAL_dstbias */
 #endif /* !... */
 #ifndef ___dstbias

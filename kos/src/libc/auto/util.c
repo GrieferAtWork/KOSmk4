@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x815231f0 */
+/* HASH CRC-32:0xa0ad7ebd */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,11 +53,11 @@ DECL_BEGIN
  *                  is only returned in case of an error; _NOT_ in case of end-of-file)
  * @return: NULL:   Error (s.a. `errno' and `ferror(stream)') */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_INOUT(1) ATTR_IN_OPT(4) ATTR_OUT_OPT(2) ATTR_OUT_OPT(3) char *
-NOTHROW_RPC(LIBCCALL libc_fparseln)(FILE *stream,
-                                    size_t *plen,
-                                    size_t *plineno,
-                                    char const delim[3],
-                                    __STDC_INT_AS_UINT_T flags) {
+NOTHROW_CB(LIBCCALL libc_fparseln)(FILE *stream,
+                                   size_t *plen,
+                                   size_t *plineno,
+                                   char const delim[3],
+                                   __STDC_INT_AS_UINT_T flags) {
 	char *result;
 	size_t result_alloc;
 	size_t result_length;

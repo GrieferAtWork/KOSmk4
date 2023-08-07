@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b302ea5 */
+/* HASH CRC-32:0x128df7ac */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_btowc_defined
 #define __local___localdep_btowc_defined
 #ifdef __CRT_HAVE_btowc
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_btowc,(int __ch),btowc,(__ch))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_btowc,(int __ch),btowc,(__ch))
 #else /* __CRT_HAVE_btowc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/btowc.h>
@@ -57,7 +57,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wctob_defined
 #define __local___localdep_wctob_defined
 #ifdef __CRT_HAVE_wctob
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wctob,(__WINT_TYPE__ __ch),wctob,(__ch))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_wctob,(__WINT_TYPE__ __ch),wctob,(__ch))
 #else /* __CRT_HAVE_wctob */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wctob.h>

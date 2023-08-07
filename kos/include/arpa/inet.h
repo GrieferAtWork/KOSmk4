@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeffe35e */
+/* HASH CRC-32:0x276a458 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,22 +60,22 @@ typedef __socklen_t socklen_t;
 #ifdef __CRT_HAVE_inet_netof
 /* >> inet_netof(3)
  * Return the network-number-part of the Internet address `INADDR' */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT32_TYPE__,__NOTHROW_NCX,inet_netof,(struct in_addr __inaddr),(__inaddr))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT32_TYPE__,__NOTHROW,inet_netof,(struct in_addr __inaddr),(__inaddr))
 #else /* __CRT_HAVE_inet_netof */
 #include <libc/local/arpa.inet/inet_netof.h>
 /* >> inet_netof(3)
  * Return the network-number-part of the Internet address `INADDR' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(inet_netof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL inet_netof)(struct in_addr __inaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_netof))(__inaddr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(inet_netof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__ __NOTHROW(__LIBCCALL inet_netof)(struct in_addr __inaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_netof))(__inaddr); })
 #endif /* !__CRT_HAVE_inet_netof */
 #ifdef __CRT_HAVE_inet_lnaof
 /* >> inet_lnaof(3)
  * Return the local-host-address-part of the Internet address `INADDR' */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT32_TYPE__,__NOTHROW_NCX,inet_lnaof,(struct in_addr __inaddr),(__inaddr))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT32_TYPE__,__NOTHROW,inet_lnaof,(struct in_addr __inaddr),(__inaddr))
 #else /* __CRT_HAVE_inet_lnaof */
 #include <libc/local/arpa.inet/inet_lnaof.h>
 /* >> inet_lnaof(3)
  * Return the local-host-address-part of the Internet address `INADDR' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(inet_lnaof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL inet_lnaof)(struct in_addr __inaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_lnaof))(__inaddr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(inet_lnaof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__ __NOTHROW(__LIBCCALL inet_lnaof)(struct in_addr __inaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_lnaof))(__inaddr); })
 #endif /* !__CRT_HAVE_inet_lnaof */
 #ifdef __CRT_HAVE_inet_makeaddr
 /* >> inet_makeaddr(3)
@@ -83,7 +83,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_lnaof, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * the combination of its network (`net'), and host (`host') number.
  * The `net' and `host' arguments  can later be re-extracted by  use
  * of `inet_netof(3)' and `inet_lnaof(3)' */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,struct in_addr,__NOTHROW_NCX,inet_makeaddr,(__UINT32_TYPE__ __net, __UINT32_TYPE__ __host),(__net,__host))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,struct in_addr,__NOTHROW,inet_makeaddr,(__UINT32_TYPE__ __net, __UINT32_TYPE__ __host),(__net,__host))
 #else /* __CRT_HAVE_inet_makeaddr */
 #include <libc/local/arpa.inet/inet_makeaddr.h>
 /* >> inet_makeaddr(3)
@@ -91,7 +91,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,struct in_addr,__NOTHROW_NCX,inet_makeadd
  * the combination of its network (`net'), and host (`host') number.
  * The `net' and `host' arguments  can later be re-extracted by  use
  * of `inet_netof(3)' and `inet_lnaof(3)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(inet_makeaddr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED struct in_addr __NOTHROW_NCX(__LIBCCALL inet_makeaddr)(__UINT32_TYPE__ __net, __UINT32_TYPE__ __host) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_makeaddr))(__net, __host); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(inet_makeaddr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED struct in_addr __NOTHROW(__LIBCCALL inet_makeaddr)(__UINT32_TYPE__ __net, __UINT32_TYPE__ __host) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_makeaddr))(__net, __host); })
 #endif /* !__CRT_HAVE_inet_makeaddr */
 #ifdef __CRT_HAVE_inet_addr
 /* >> inet_addr(3)

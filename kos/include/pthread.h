@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e0dbe4b */
+/* HASH CRC-32:0x1b9bf077 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2578,7 +2578,7 @@ __CREDIRECT(__ATTR_ACCESS_NONE(2),__errno_t,__NOTHROW_NCX,pthread_setspecific,(p
  * @return: NULL: `key' had yet to be allocated for the calling thread,
  *                and an  attempt  to  allocate  it  just  now  failed.
  * @return: NULL: Invalid `key'. */
-__CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,void **,__NOTHROW_NCX,pthread_getspecificptr_np,(pthread_key_t __key),(__key))
+__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED,void **,__NOTHROW_NCX,pthread_getspecificptr_np,(pthread_key_t __key),(__key))
 #endif /* __USE_KOS */
 #ifdef __USE_XOPEN2K
 /* >> pthread_getcpuclockid(3)

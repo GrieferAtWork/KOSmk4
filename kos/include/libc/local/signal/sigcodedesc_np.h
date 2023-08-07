@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9ad0680 */
+/* HASH CRC-32:0x4bb9b243 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigcodename_np_defined
 #define __local___localdep_sigcodename_np_defined
 #ifdef __CRT_HAVE_sigcodename_np
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep_sigcodename_np,(__signo_t __signo, int __code),sigcodename_np,(__signo,__code))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigcodename_np,(__signo_t __signo, int __code),sigcodename_np,(__signo,__code))
 #else /* __CRT_HAVE_sigcodename_np */
 __NAMESPACE_LOCAL_END
 #include <libc/local/signal/sigcodename_np.h>
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strend */
 #endif /* !__local___localdep_strend_defined */
 __LOCAL_LIBC(sigcodedesc_np) __ATTR_CONST __ATTR_WUNUSED char const *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigcodedesc_np))(__signo_t __signo, int __code) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sigcodedesc_np))(__signo_t __signo, int __code) {
 	char const *__result = (__NAMESPACE_LOCAL_SYM __localdep_sigcodename_np)(__signo, __code);
 	if (__result)
 		__result = (__NAMESPACE_LOCAL_SYM __localdep_strend)(__result) + 1;

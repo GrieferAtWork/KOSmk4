@@ -1251,18 +1251,18 @@ NOTHROW_NCX(LIBCCALL libc___libc_allocate_rtsig)(int high)
 }
 /*[[[end:libc___libc_allocate_rtsig]]]*/
 
-/*[[[head:libc___libc_current_sigrtmin,hash:CRC-32=0x81e51c4a]]]*/
+/*[[[head:libc___libc_current_sigrtmin,hash:CRC-32=0x5ce84236]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED signo_t
-NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmin)(void)
+NOTHROW(LIBCCALL libc___libc_current_sigrtmin)(void)
 /*[[[body:libc___libc_current_sigrtmin]]]*/
 {
 	return libc_free_sigrtmin;
 }
 /*[[[end:libc___libc_current_sigrtmin]]]*/
 
-/*[[[head:libc___libc_current_sigrtmax,hash:CRC-32=0x4de86745]]]*/
+/*[[[head:libc___libc_current_sigrtmax,hash:CRC-32=0x90e53939]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED signo_t
-NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void)
+NOTHROW(LIBCCALL libc___libc_current_sigrtmax)(void)
 /*[[[body:libc___libc_current_sigrtmax]]]*/
 {
 	return libc_free_sigrtmax;

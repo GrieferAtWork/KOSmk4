@@ -131,7 +131,7 @@ __ATTR_NONNULL((1)) void (FD_COPY)(fd_set const *__src, fd_set *__dst);
 
 [[decl_include("<bits/types.h>"), export_alias("__fdelt_warn")]]
 [[impl_include("<asm/os/fd_set.h>", "<bits/os/fd_set.h>")]]
-[[wunused, const, impl_include("<hybrid/__assert.h>")]]
+[[wunused, const, nothrow, impl_include("<hybrid/__assert.h>")]]
 $longptr_t __fdelt_chk($longptr_t fd) {
 	__hybrid_assertf(fd >= 0 && fd < __FD_SETSIZE,
 	                 "fd %ld cannot be used with `fd_set'",

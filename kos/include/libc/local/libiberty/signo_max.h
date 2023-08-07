@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd515f14 */
+/* HASH CRC-32:0xcb9d58d3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #ifdef __NSIG
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(signo_max) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(signo_max))(void) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(signo_max))(void) {
 	return __NSIG - 1;
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xacec3ff0 */
+/* HASH CRC-32:0x1fd5138c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,10 +62,10 @@ __LIBC __ATTR_INOUT(2) int __NOTHROW_NCX(__LIBDCALL _seh_filter_dll)(__ULONG32_T
 __LIBC __ATTR_INOUT(2) int __NOTHROW_NCX(__LIBDCALL _seh_filter_exe)(__ULONG32_TYPE__ __xno, struct _EXCEPTION_POINTERS *__infp_ptrs) __CASMNAME_SAME("_seh_filter_exe");
 #endif /* __CRT_HAVE__seh_filter_exe */
 #ifdef __CRT_HAVE__query_app_type
-__LIBC __ATTR_CONST __ATTR_WUNUSED _crt_app_type __NOTHROW_NCX(__LIBDCALL _query_app_type)(void) __CASMNAME_SAME("_query_app_type");
+__LIBC __ATTR_CONST __ATTR_WUNUSED _crt_app_type __NOTHROW(__LIBDCALL _query_app_type)(void) __CASMNAME_SAME("_query_app_type");
 #else /* __CRT_HAVE__query_app_type */
 #include <libc/local/corecrt_startup/_query_app_type.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_query_app_type, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED _crt_app_type __NOTHROW_NCX(__LIBDCALL _query_app_type)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_query_app_type))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_query_app_type, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED _crt_app_type __NOTHROW(__LIBDCALL _query_app_type)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_query_app_type))(); })
 #endif /* !__CRT_HAVE__query_app_type */
 #ifdef __CRT_HAVE__set_app_type
 __LIBC void __NOTHROW_NCX(__LIBDCALL _set_app_type)(_crt_app_type __type) __CASMNAME_SAME("_set_app_type");

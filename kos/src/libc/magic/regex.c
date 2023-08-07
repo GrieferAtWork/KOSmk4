@@ -950,7 +950,7 @@ void regfree(regex_t *self) {
 @@@param: errcode: Regex error code (one of `REG_*'; s.a. `reg_errcode_t')
 @@@return: * :   The human-readable description for `errcode'
 @@@return: NULL: No description is available for `errcode'
-[[const, wunused, impl_include("<asm/crt/regex.h>")]]
+[[const, wunused, nothrow, impl_include("<asm/crt/regex.h>")]]
 char const *regerrordesc_np(int errcode) {
 	char const *result;
 	switch (errcode) {

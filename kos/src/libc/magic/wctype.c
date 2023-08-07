@@ -461,7 +461,7 @@ wctrans_t wctrans([[in]] char const *prop) {
 }
 
 [[decl_include("<hybrid/typecore.h>", "<bits/crt/wctype.h>")]]
-[[std, wchar, guard, const, wunused, export_alias("__towctrans")]]
+[[std, wchar, guard, const, wunused, nothrow, export_alias("__towctrans")]]
 [[requires(defined(__CRT_KOS) && $has_function(__unicode_descriptor))]]
 [[impl_include("<bits/crt/unicode.h>")]]
 wint_t towctrans(wint_t wc, wctrans_t desc) {
@@ -512,7 +512,7 @@ wctype_t wctype([[in]] char const *prop) {
 }
 
 [[decl_include("<hybrid/typecore.h>", "<bits/crt/wctype.h>")]]
-[[std, wchar, const, wunused, export_alias("is_wctype", "__iswctype")]]
+[[std, wchar, const, wunused, nothrow, export_alias("is_wctype", "__iswctype")]]
 [[requires(defined(__CRT_KOS) && $has_function(__unicode_descriptor))]]
 [[impl_include("<bits/crt/unicode.h>")]]
 int iswctype($wint_t wc, $wctype_t desc) {
@@ -842,7 +842,7 @@ $wctrans_t wctrans_l([[in]] char const *prop, $locale_t locale) {
 
 @@>> iswsymstrt(3), iswsymstrt_l(3)
 @@Check if `wc' may appear at the start of a symbol/keyword/identifier
-[[wchar, const, wunused, decl_include("<hybrid/typecore.h>")]]
+[[wchar, const, wunused, nothrow, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<bits/crt/unicode.h>"), crt_name("__iswcsymf")]]
 int iswsymstrt($wint_t wc) {
 @@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
@@ -855,7 +855,7 @@ int iswsymstrt($wint_t wc) {
 
 @@>> iswsymcont(3), iswsymcont_l(3)
 @@Check if `wc' may appear in the middle of a symbol/keyword/identifier
-[[wchar, const, wunused, decl_include("<hybrid/typecore.h>")]]
+[[wchar, const, wunused, nothrow, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<bits/crt/unicode.h>"), crt_name("__iswcsym")]]
 int iswsymcont($wint_t wc) {
 @@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
@@ -930,7 +930,7 @@ int iswsymcont_l($wint_t wc, $locale_t locale) {
 
 %
 @@>> isleadbyte(3)
-[[const, wunused]]
+[[const, wunused, nothrow]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 int isleadbyte(int wc) {
 	return wc >= 192 && wc <= 255;

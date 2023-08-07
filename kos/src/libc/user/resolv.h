@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8a76312 */
+/* HASH CRC-32:0x8400fda4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF ATTR_CONST struct __res_state *NOTHROW_NCX(LIBCCALL libc___res_state)(void);
+INTDEF ATTR_CONST WUNUSED struct __res_state *NOTHROW(LIBCCALL libc___res_state)(void);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_fp_nquery)(u_char const *a, int b, FILE *c);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_fp_query)(u_char const *a, FILE *b);
 INTDEF char const *NOTHROW_NCX(LIBCCALL libc_hostalias)(char const *a);

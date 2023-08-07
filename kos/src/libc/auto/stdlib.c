@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x837f5d92 */
+/* HASH CRC-32:0x1a5934be */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -239,7 +239,7 @@ NOTHROW(LIBCCALL libc_labs)(long x) {
 	return x < 0 ? -x : x;
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_INT__ */
-INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_CONST WUNUSED struct __div_struct
+INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_PURE WUNUSED struct __div_struct
 NOTHROW_NCX(LIBCCALL libc_div)(int numer,
                                int denom) {
 	div_t result;
@@ -251,7 +251,7 @@ NOTHROW_NCX(LIBCCALL libc_div)(int numer,
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_ldiv, libc_div);
 #else /* __SIZEOF_LONG__ == __SIZEOF_INT__ */
-INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_CONST WUNUSED ldiv_t
+INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_PURE WUNUSED ldiv_t
 NOTHROW_NCX(LIBCCALL libc_ldiv)(long numer,
                                 long denom) {
 	ldiv_t result;
@@ -277,7 +277,7 @@ DEFINE_INTERN_ALIAS(libc_lldiv, libc_div);
 #elif __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_lldiv, libc_ldiv);
 #else /* ... */
-INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_CONST WUNUSED lldiv_t
+INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_PURE WUNUSED lldiv_t
 NOTHROW_NCX(LIBCCALL libc_lldiv)(__LONGLONG numer,
                                  __LONGLONG denom) {
 	lldiv_t result;
@@ -2956,14 +2956,14 @@ NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command) {
 /* >> getexecname(3)
  * Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") ATTR_CONST WUNUSED char const *
-NOTHROW_NCX(LIBDCALL libd_getexecname)(void) {
+NOTHROW(LIBDCALL libd_getexecname)(void) {
 	return __LOCAL_program_invocation_name;
 }
 #include <libc/template/program_invocation_name.h>
 /* >> getexecname(3)
  * Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
 INTERN ATTR_SECTION(".text.crt.solaris") ATTR_CONST WUNUSED char const *
-NOTHROW_NCX(LIBCCALL libc_getexecname)(void) {
+NOTHROW(LIBCCALL libc_getexecname)(void) {
 	return __LOCAL_program_invocation_name;
 }
 #endif /* !__KERNEL__ */
@@ -3211,7 +3211,7 @@ NOTHROW_NCX(LIBCCALL libc_l64a_r)(long n,
 }
 /* >> getprogname(3), setprogname(3) */
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_CONST WUNUSED char const *
-NOTHROW_NCX(LIBCCALL libc_getprogname)(void) {
+NOTHROW(LIBCCALL libc_getprogname)(void) {
 	return program_invocation_short_name;
 }
 /* >> getprogname(3), setprogname(3) */
@@ -3416,7 +3416,7 @@ NOTHROW_NCX(LIBCCALL libc_mkostemps64)(char *template_,
 }
 #endif /* __O_LARGEFILE */
 /* >> devname(3), devname_r(3) */
-INTERN ATTR_SECTION(".text.crt.bsd") ATTR_CONST char *
+INTERN ATTR_SECTION(".text.crt.bsd") char *
 NOTHROW_NCX(LIBCCALL libc_devname)(dev_t dev,
                                    mode_t type) {
 	static char buf[64];
@@ -3543,7 +3543,7 @@ NOTHROW_NCX(LIBCCALL libc_strsuftollx)(char const *desc,
 #include <libc/template/program_invocation_name.h>
 /* Alias for argv[0], as passed to main() */
 INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char **
-NOTHROW_NCX(LIBCCALL libc___p__pgmptr)(void) {
+NOTHROW(LIBCCALL libc___p__pgmptr)(void) {
 	return &__LOCAL_program_invocation_name_p;
 }
 #include <libc/template/program_invocation_name.h>
@@ -3604,17 +3604,17 @@ NOTHROW_NCX(LIBCCALL libc__atoll_l)(char const *__restrict nptr,
 #endif /* !... */
 #include <hybrid/__byteswap.h>
 INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST WUNUSED u16
-NOTHROW_NCX(LIBCCALL libc__byteswap_ushort)(u16 val) {
+NOTHROW(LIBCCALL libc__byteswap_ushort)(u16 val) {
 	return __hybrid_bswap16(val);
 }
 #include <hybrid/__byteswap.h>
 INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST WUNUSED u32
-NOTHROW_NCX(LIBCCALL libc__byteswap_ulong)(u32 val) {
+NOTHROW(LIBCCALL libc__byteswap_ulong)(u32 val) {
 	return __hybrid_bswap32(val);
 }
 #include <hybrid/__byteswap.h>
 INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST WUNUSED u64
-NOTHROW_NCX(LIBCCALL libc__byteswap_uint64)(u64 val) {
+NOTHROW(LIBCCALL libc__byteswap_uint64)(u64 val) {
 	return __hybrid_bswap64(val);
 }
 #endif /* !__KERNEL__ */

@@ -242,7 +242,7 @@ __NAMESPACE_STD_USING(wint_t)
 @@Convert a single-byte into a wide character. If the given
 @@character `ch' isn't valid, or  is `EOF', then `WEOF'  is
 @@returned instead.
-[[wchar, std, const, wunused]]
+[[wchar, std, const, wunused, nothrow]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<asm/crt/stdio.h>")]]
 wint_t btowc(int ch) {
@@ -254,7 +254,7 @@ wint_t btowc(int ch) {
 @@>> wctob(3)
 @@Convert a wide-character into a single-byte character. If
 @@doing so isn't possible, then `EOF' is returned  instead.
-[[wchar, std, const, wunused]]
+[[wchar, std, const, wunused, nothrow]]
 [[impl_include("<asm/crt/stdio.h>")]]
 [[decl_include("<hybrid/typecore.h>")]]
 int wctob(wint_t ch) {
@@ -1409,7 +1409,7 @@ wcsdup(*) %{generate(str2wcs("strdup"))}
 @@When `ch' cannot be  displayed at all, `-1'  is returned (but `errno'  is
 @@never modified by this function). Zero-width characters return `0'.
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, const, wunused, impl_include("<libc/unicode.h>")]]
+[[wchar, const, wunused, nothrow, impl_include("<libc/unicode.h>")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 int wcwidth(wchar_t ch) {
 	if (__libc_unicode_isprint(ch))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e3e22c3 */
+/* HASH CRC-32:0x15b7e486 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #ifdef __LOCAL_program_invocation_short_name_p
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__p_program_invocation_short_name) __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED char **
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__p_program_invocation_short_name))(void) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__p_program_invocation_short_name))(void) {
 	return &__LOCAL_program_invocation_short_name_p;
 }
 __NAMESPACE_LOCAL_END

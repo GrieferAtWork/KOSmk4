@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfeb61a8 */
+/* HASH CRC-32:0xfd0db094 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_regerrordesc_np_defined
 #define __local___localdep_regerrordesc_np_defined
 #ifdef __CRT_HAVE_regerrordesc_np
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep_regerrordesc_np,(int __errcode),regerrordesc_np,(__errcode))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_regerrordesc_np,(int __errcode),regerrordesc_np,(__errcode))
 #else /* __CRT_HAVE_regerrordesc_np */
 __NAMESPACE_LOCAL_END
 #include <libc/local/regex/regerrordesc_np.h>

@@ -325,14 +325,14 @@ char *getpwd(void) {
 }
 
 
-[[wunused, const]]
+[[wunused, const, nothrow]]
 [[requires_include("<asm/os/errno.h>")]]
 [[requires(defined(__ECOUNT))]]
 int errno_max(void) {
 	return __ECOUNT - 1;
 }
 
-[[wunused, const]]
+[[wunused, const, nothrow]]
 [[requires_include("<asm/os/signal.h>")]]
 [[requires(defined(__NSIG))]]
 int signo_max(void) {
@@ -1134,7 +1134,7 @@ int unlink_if_ordinary([[in]] char const *filename) {
 	return unlink(filename);
 }
 
-[[wunused, const, requires_include("<asm/crt/confname.h>")]]
+[[wunused, const, nothrow, requires_include("<asm/crt/confname.h>")]]
 [[requires($has_function(getpagesize, sysconf) && defined(_SC_PHYS_PAGES))]]
 double physmem_total(void) {
 	size_t pages    = sysconf(_SC_PHYS_PAGES);

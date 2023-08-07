@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ddc4ee8 */
+/* HASH CRC-32:0x724ba70e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 #include <bits/os/fd_set.h>
 #include <hybrid/__assert.h>
 INTERN ATTR_SECTION(".text.crt.io.poll") ATTR_CONST WUNUSED longptr_t
-NOTHROW_NCX(LIBCCALL libc___fdelt_chk)(longptr_t fd) {
+NOTHROW(LIBCCALL libc___fdelt_chk)(longptr_t fd) {
 	__hybrid_assertf(fd >= 0 && fd < __FD_SETSIZE,
 	                 "fd %ld cannot be used with `fd_set'",
 	                 (long int)fd);

@@ -1262,7 +1262,7 @@ $time_t timelocal([[inout]] struct $tm *tp) = mktime;
 @@>> dysize(3)
 @@Return the number of days in YEAR
 [[decl_include("<features.h>")]]
-[[const, wunused, impl_prefix(DEFINE_ISLEAP)]]
+[[const, wunused, nothrow, impl_prefix(DEFINE_ISLEAP)]]
 int dysize(__STDC_INT_AS_UINT_T year) {
 	return __isleap(year) ? 366 : 365;
 }
@@ -2276,7 +2276,7 @@ typedef __errno_t errno_t;
 [[export_alias("DOS$__daylight"), if(defined(__CRT_DOS)), preferred_alias("__daylight")]]
 [[requires_include("<libc/template/daylight.h>"), requires(defined(__LOCAL_daylight))]]
 [[impl_include("<libc/template/daylight.h>"), export_alias("__p__daylight")]]
-[[wunused, const, nonnull]] int *__daylight(void) {
+[[wunused, const, nothrow, nonnull]] int *__daylight(void) {
 	return &__LOCAL_daylight;
 }
 
@@ -2284,7 +2284,7 @@ typedef __errno_t errno_t;
 [[export_alias("DOS$__timezone"), if(defined(__CRT_DOS)), preferred_alias("__timezone")]]
 [[requires_include("<libc/template/timezone.h>"), requires(defined(__LOCAL_timezone))]]
 [[impl_include("<libc/template/timezone.h>"), export_alias("__p__timezone")]]
-[[wunused, const, nonnull]] long *__timezone(void) {
+[[wunused, const, nothrow, nonnull]] long *__timezone(void) {
 	return (long *)&__LOCAL_timezone;
 }
 
@@ -2292,7 +2292,7 @@ typedef __errno_t errno_t;
 [[export_alias("DOS$__tzname"), if(defined(__CRT_DOS)), preferred_alias("__tzname")]]
 [[requires_include("<libc/template/tzname.h>"), requires(defined(__LOCAL_tzname))]]
 [[impl_include("<libc/template/tzname.h>"), export_alias("__p__tzname")]]
-[[wunused, const, nonnull]] char **__tzname(void) {
+[[wunused, const, nothrow, nonnull]] char **__tzname(void) {
 	return __LOCAL_tzname;
 }
 
@@ -2302,7 +2302,7 @@ typedef __errno_t errno_t;
 [[export_alias("DOS$__dstbias"), if(defined(__CRT_DOS)), preferred_alias("__dstbias")]]
 [[requires_include("<libc/template/dstbias.h>"), requires(defined(__LOCAL_dstbias))]]
 [[impl_include("<libc/template/dstbias.h>"), export_alias("__p__dstbias")]]
-[[wunused, const, nonnull]] __LONG32_TYPE__ *__dstbias(void) {
+[[wunused, const, nothrow, nonnull]] __LONG32_TYPE__ *__dstbias(void) {
 	return &__LOCAL_dstbias;
 }
 

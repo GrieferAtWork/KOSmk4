@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf1faf94 */
+/* HASH CRC-32:0x1a02a0e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -269,7 +269,7 @@ struct gaicb {
 #if !defined(____h_errno_location_defined) && defined(__CRT_HAVE___h_errno_location)
 #define ____h_errno_location_defined
 /* Function to get address of global `h_errno' variable */
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__h_errno_location,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW,__h_errno_location,(void),())
 #endif /* !____h_errno_location_defined && __CRT_HAVE___h_errno_location */
 /* Error status for non-reentrant lookup functions.
  * We use a macro to access always the thread-specific `h_errno' variable. */
@@ -283,7 +283,7 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__h
  * if non-`NULL',  `str'  is  printed before  the  error  string. */
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC,herror,(char const *__str),(__str))
 /* Return string associated with error `err_num' */
-__CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,hstrerror,(int __err_num),(__err_num))
+__CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,hstrerror,(int __err_num),(__err_num))
 #endif /* __USE_MISC */
 /* Open host  data  base  files and  mark  them  as  staying
  * open even after a later search if `stay_open' is non-zero */
@@ -536,7 +536,7 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,getaddrinfo,(char const *__restrict __name, ch
 /* Free `addrinfo' structure `ai' including associated storage */
 __CDECLARE_VOID_OPT(,__NOTHROW_NCX,freeaddrinfo,(struct addrinfo *__ai),(__ai))
 /* Convert error return from getaddrinfo() to a string */
-__CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,gai_strerror,(int __ecode),(__ecode))
+__CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,gai_strerror,(int __ecode),(__ecode))
 /* Translate a socket address to a location and service name */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,getnameinfo,(struct sockaddr const *__restrict __sa, socklen_t __salen, char *__restrict __host, socklen_t __hostlen, char *__restrict __serv, socklen_t __servlen, int __flags),(__sa,__salen,__host,__hostlen,__serv,__servlen,__flags))
 #endif /* __USE_XOPEN2K */

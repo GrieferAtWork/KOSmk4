@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12fa05a5 */
+/* HASH CRC-32:0x4aed5b10 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,17 +28,17 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_isctype16_defined
 #define __local___localdep_isctype16_defined
 #if defined(__CRT_HAVE_iswctype) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),iswctype,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),iswctype,(__wc,__desc))
 #elif defined(__CRT_HAVE_DOS$iswctype)
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),iswctype,(__wc,__desc))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),iswctype,(__wc,__desc))
 #elif defined(__CRT_HAVE_is_wctype) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),is_wctype,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),is_wctype,(__wc,__desc))
 #elif defined(__CRT_HAVE_DOS$is_wctype)
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),is_wctype,(__wc,__desc))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),is_wctype,(__wc,__desc))
 #elif defined(__CRT_HAVE___iswctype) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),__iswctype,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),__iswctype,(__wc,__desc))
 #elif defined(__CRT_HAVE_DOS$__iswctype)
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),__iswctype,(__wc,__desc))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),__iswctype,(__wc,__desc))
 #elif defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/iswctype.h>

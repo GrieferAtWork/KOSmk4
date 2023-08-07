@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56fc545e */
+/* HASH CRC-32:0xead17b20 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__dstbias) __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED __LONG32_TYPE__ *
-__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(__dstbias))(void) {
+__NOTHROW(__LIBDCALL __LIBC_LOCAL_NAME(__dstbias))(void) {
 	return &__LOCAL_dstbias;
 }
 __NAMESPACE_LOCAL_END

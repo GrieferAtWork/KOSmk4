@@ -153,7 +153,7 @@ void _cchsh(double x, [[out]] double *c, [[out]] double *s) {
 [[ldouble_variant_of("_redupi", ...)]]
 [[static]] _redupil(*) %{generate(double2ldouble("_redupi"))}
 
-[[static, const, wunused]]
+[[static, const, wunused, nothrow]]
 double _redupi(double x) {
 	COMPLEX_IMPL_COPYRIGHT_NOTICE
 	double t;
@@ -198,7 +198,7 @@ double _redupi(double x) {
 [[static]] _ctansl(*) %{generate(double2ldouble("_ctans"))}
 
 @@Taylor series expansion for cosh(2y) - cos(2x)
-[[static, const, wunused]]
+[[static, const, wunused, nothrow]]
 [[requires_function(fabs, creal, cimag, _redupi)]]
 double _ctans(double _Complex z) {
 	COMPLEX_IMPL_COPYRIGHT_NOTICE
@@ -651,7 +651,7 @@ double carg(double _Complex z) {
 	return atan2(cimag(z), creal(z));
 }
 
-[[const, wunused]]
+[[const, wunused, nothrow]]
 double _Complex conj(double _Complex z) {
 	union {
 		double _Complex x;
@@ -662,7 +662,7 @@ double _Complex conj(double _Complex z) {
 	return v.x;
 }
 
-[[const, wunused]]
+[[const, wunused, nothrow]]
 double creal(double _Complex z) {
 	union {
 		double _Complex x;
@@ -672,7 +672,7 @@ double creal(double _Complex z) {
 	return v.parts[0];
 }
 
-[[const, wunused]]
+[[const, wunused, nothrow]]
 double cimag(double _Complex z) {
 	union {
 		double _Complex x;
@@ -682,7 +682,7 @@ double cimag(double _Complex z) {
 	return v.parts[1];
 }
 
-[[const, wunused, requires_function(copysign, isinf)]]
+[[const, wunused, nothrow, requires_function(copysign, isinf)]]
 [[impl_include("<bits/math-constants.h>")]]
 double _Complex cproj(double _Complex z) {
 	union {

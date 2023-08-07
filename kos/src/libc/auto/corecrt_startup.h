@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa20bad97 */
+/* HASH CRC-32:0xb8733ed5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED _crt_app_type NOTHROW_NCX(LIBDCALL libc__query_app_type)(void);
+INTDEF ATTR_CONST WUNUSED _crt_app_type NOTHROW(LIBDCALL libc__query_app_type)(void);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libc__configure_narrow_argv)(_crt_argv_mode mode);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libc__configure_wide_argv)(_crt_argv_mode mode);
 INTDEF int NOTHROW_NCX(LIBDCALL libc__initialize_narrow_environment)(void);

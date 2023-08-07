@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56cbd268 */
+/* HASH CRC-32:0x9713e392 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_length) __ATTR_CONST __ATTR_INS(2, 3) __ATTR_NONNULL((2)) __SSIZE_TYPE__
-__NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_length))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
+__NOTHROW(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_length))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	(void)__arg;
 	(void)__data;
 	return (__SSIZE_TYPE__)__datalen;

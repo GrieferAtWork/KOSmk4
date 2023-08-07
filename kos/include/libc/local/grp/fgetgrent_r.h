@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ace2226 */
+/* HASH CRC-32:0xb841050a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_fgetgrfiltered_r __LIBC_LOCAL_NAME(fgetgrfiltered_r)
 #endif /* !__local___localdep_fgetgrfiltered_r_defined */
 __LOCAL_LIBC(fgetgrent_r) __ATTR_INOUT(1) __ATTR_OUT(2) __ATTR_OUT(5) __ATTR_OUTS(3, 4) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fgetgrent_r))(__FILE *__restrict __stream, struct group *__restrict __resultbuf, char *__restrict __buffer, __SIZE_TYPE__ __buflen, struct group **__restrict __result) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(fgetgrent_r))(__FILE *__restrict __stream, struct group *__restrict __resultbuf, char *__restrict __buffer, __SIZE_TYPE__ __buflen, struct group **__restrict __result) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fgetgrfiltered_r)(__stream, __resultbuf, __buffer, __buflen,
 	                        __result, (__gid_t)-1, __NULLPTR);
 }

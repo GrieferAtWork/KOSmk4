@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x489671a1 */
+/* HASH CRC-32:0xe8cea82e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <asm/os/signal.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(signalnext) __ATTR_CONST __ATTR_WUNUSED __signo_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(signalnext))(__signo_t __signo) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(signalnext))(__signo_t __signo) {
 	if (__signo >= (__NSIG - 1))
 		return 0;
 	return __signo + 1;

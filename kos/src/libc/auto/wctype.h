@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b13fb1e */
+/* HASH CRC-32:0x959c6bdf */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,16 +124,16 @@ INTDEF ATTR_PURE WUNUSED ATTR_IN(1) wctrans_t NOTHROW_NCX(LIBDCALL libd_wctrans)
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) wctrans_t NOTHROW_NCX(LIBCCALL libc_wctrans)(char const *prop);
-INTDEF ATTR_CONST WUNUSED wint16_t NOTHROW_NCX(LIBDCALL libd_towctrans)(wint16_t wc, wctrans_t desc);
-INTDEF ATTR_CONST WUNUSED wint32_t NOTHROW_NCX(LIBKCALL libc_towctrans)(wint32_t wc, wctrans_t desc);
+INTDEF ATTR_CONST WUNUSED wint16_t NOTHROW(LIBDCALL libd_towctrans)(wint16_t wc, wctrans_t desc);
+INTDEF ATTR_CONST WUNUSED wint32_t NOTHROW(LIBKCALL libc_towctrans)(wint32_t wc, wctrans_t desc);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) wctype_t NOTHROW_NCX(LIBDCALL libd_wctype)(char const *prop);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) wctype_t NOTHROW_NCX(LIBCCALL libc_wctype)(char const *prop);
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswctype)(wint16_t wc, wctype_t desc);
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBKCALL libc_iswctype)(wint32_t wc, wctype_t desc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswctype)(wint16_t wc, wctype_t desc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc_iswctype)(wint32_t wc, wctype_t desc);
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswascii)(wint16_t wc);
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc_iswascii)(wint32_t wc);
 /* >> iswcntrl_l(3) */
@@ -210,16 +210,16 @@ INTDEF WUNUSED ATTR_IN(1) wctrans_t NOTHROW_NCX(LIBDCALL libd_wctrans_l)(char co
 INTDEF WUNUSED ATTR_IN(1) wctrans_t NOTHROW_NCX(LIBCCALL libc_wctrans_l)(char const *prop, locale_t locale);
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd___iswcsymf)(wint16_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___iswcsymf)(wint16_t wc);
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBKCALL libc___iswcsymf)(wint32_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc___iswcsymf)(wint32_t wc);
 /* >> iswsymcont(3), iswsymcont_l(3)
  * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd___iswcsym)(wint16_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___iswcsym)(wint16_t wc);
 /* >> iswsymcont(3), iswsymcont_l(3)
  * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBKCALL libc___iswcsym)(wint32_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc___iswcsym)(wint32_t wc);
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd__iswcsymf_l)(wint16_t wc, locale_t locale);
@@ -235,11 +235,11 @@ INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc__iswcsym_l)(wint32_t wc, 
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> isleadbyte(3) */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd_isleadbyte)(int wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_isleadbyte)(int wc);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> isleadbyte(3) */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_isleadbyte)(int wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_isleadbyte)(int wc);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd__isleadbyte_l)(int wc, locale_t locale);

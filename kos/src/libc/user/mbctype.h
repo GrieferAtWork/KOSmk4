@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16f0244f */
+/* HASH CRC-32:0xd5236c69 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,8 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED unsigned char *NOTHROW_NCX(LIBCCALL libc___p__mbctype)(void);
-INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED unsigned char *NOTHROW_NCX(LIBCCALL libc___p__mbcasemap)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED unsigned char *NOTHROW(LIBCCALL libc___p__mbctype)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED unsigned char *NOTHROW(LIBCCALL libc___p__mbcasemap)(void);
 INTDEF int NOTHROW_NCX(LIBCCALL libc__setmbcp)(int cp);
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc__getmbcp)(void);
 INTDEF ATTR_PURE WUNUSED char32_t NOTHROW_NCX(LIBCCALL libc__mbctouni_l)(unsigned int ch, locale_t locale);

@@ -80,7 +80,7 @@ int _seh_filter_dll(__ULONG32_TYPE__ xno, [[inout]] struct _EXCEPTION_POINTERS *
 [[decl_include("<bits/crt/dos/corecrt_startup.h>")]]
 int _seh_filter_exe(__ULONG32_TYPE__ xno, [[inout]] struct _EXCEPTION_POINTERS *infp_ptrs);
 
-[[const, wunused, crt_dos_only]]
+[[const, wunused, nothrow, crt_dos_only]]
 [[decl_include("<bits/crt/dos/corecrt_startup.h>")]]
 [[impl_include("<bits/crt/dos/corecrt_startup.h>")]]
 _crt_app_type _query_app_type(void) {

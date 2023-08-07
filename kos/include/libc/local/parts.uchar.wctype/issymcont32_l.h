@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84a1eaf6 */
+/* HASH CRC-32:0xbf45ae7d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,9 +65,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_issymcont32_defined
 #define __local___localdep_issymcont32_defined
 #if defined(__CRT_HAVE___iswcsym) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_issymcont32,(__WINT32_TYPE__ __wc),__iswcsym,(__wc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_issymcont32,(__WINT32_TYPE__ __wc),__iswcsym,(__wc))
 #elif defined(__CRT_HAVE_KOS$__iswcsym)
-__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_issymcont32,(__WINT32_TYPE__ __wc),__iswcsym,(__wc))
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_issymcont32,(__WINT32_TYPE__ __wc),__iswcsym,(__wc))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/iswsymcont.h>

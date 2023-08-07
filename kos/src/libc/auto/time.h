@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac56404f */
+/* HASH CRC-32:0x3c79f838 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -196,12 +196,12 @@ INTDEF ATTR_PURE WUNUSED ATTR_INOUT(1) time_t NOTHROW_NCX(LIBCCALL libc_timegm)(
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> dysize(3)
  * Return the number of days in YEAR */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd_dysize)(__STDC_INT_AS_UINT_T year);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_dysize)(__STDC_INT_AS_UINT_T year);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> dysize(3)
  * Return the number of days in YEAR */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_dysize)(__STDC_INT_AS_UINT_T year);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_dysize)(__STDC_INT_AS_UINT_T year);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> stime(2), stime64(2)
@@ -479,10 +479,10 @@ INTDEF ATTR_IN(1) ATTR_OUT(2) char *NOTHROW_NCX(LIBDCALL libd_asctime_r)(struct 
  * Return in `buf' a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that   is   the   representation   of   `tp'   in   this   format */
 INTDEF ATTR_IN(1) ATTR_OUT(2) char *NOTHROW_NCX(LIBCCALL libc_asctime_r)(struct tm const *__restrict tp, char buf[26]);
-INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED int *NOTHROW_NCX(LIBDCALL libc___daylight)(void);
-INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED long *NOTHROW_NCX(LIBDCALL libc___timezone)(void);
-INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char **NOTHROW_NCX(LIBDCALL libc___tzname)(void);
-INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED __LONG32_TYPE__ *NOTHROW_NCX(LIBDCALL libc___dstbias)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED int *NOTHROW(LIBDCALL libc___daylight)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED long *NOTHROW(LIBDCALL libc___timezone)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char **NOTHROW(LIBDCALL libc___tzname)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED __LONG32_TYPE__ *NOTHROW(LIBDCALL libc___dstbias)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__get_daylight)(int *p_result);

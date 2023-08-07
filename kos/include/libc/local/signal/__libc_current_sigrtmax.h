@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb68d65f4 */
+/* HASH CRC-32:0x7a4ce9ff */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__libc_current_sigrtmax) __ATTR_CONST __ATTR_WUNUSED __signo_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__libc_current_sigrtmax))(void) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__libc_current_sigrtmax))(void) {
 	return __SIGRTMAX;
 }
 __NAMESPACE_LOCAL_END

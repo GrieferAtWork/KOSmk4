@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc9e561b */
+/* HASH CRC-32:0xf1421dc0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -172,11 +172,11 @@ NOTHROW_NCX(LIBCCALL libc_getpwd)(void) {
 	return result;
 }
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_errno_max)(void) {
+NOTHROW(LIBCCALL libc_errno_max)(void) {
 	return __ECOUNT - 1;
 }
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_signo_max)(void) {
+NOTHROW(LIBCCALL libc_signo_max)(void) {
 	return __NSIG - 1;
 }
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_PURE WUNUSED errno_t
@@ -921,7 +921,7 @@ NOTHROW_NCX(LIBCCALL libc_unlink_if_ordinary)(char const *filename) {
 	return libc_unlink(filename);
 }
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_CONST WUNUSED double
-NOTHROW_NCX(LIBCCALL libc_physmem_total)(void) {
+NOTHROW(LIBCCALL libc_physmem_total)(void) {
 	size_t pages    = libc_sysconf(_SC_PHYS_PAGES);
 	size_t pagesize = libc_getpagesize();
 	return (double)pages * (double)pagesize;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfcc4f54a */
+/* HASH CRC-32:0xcf004479 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -401,13 +401,13 @@ NOTHROW_NCX(LIBCCALL libc_toupper_l)(int ch,
 /* >> issymstrt(3)
  * Test if `ch' can appear at the start of a symbol/keyword/identifier */
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.ctype") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBCCALL libc___iscsymf)(int ch) {
+NOTHROW(LIBCCALL libc___iscsymf)(int ch) {
 	return libc_isalpha(ch) || ch == '_' || ch == '$';
 }
 /* >> issymcont(3)
  * Test if `ch' can appear in the middle of a symbol/keyword/identifier */
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.ctype") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBCCALL libc___iscsym)(int ch) {
+NOTHROW(LIBCCALL libc___iscsym)(int ch) {
 	return libc_isalnum(ch) || ch == '_' || ch == '$';
 }
 /* Returns non-zero if `(C & ~0x7f) == 0' */
@@ -434,7 +434,7 @@ NOTHROW(LIBCCALL libc__toupper)(int ch) {
 }
 #include <libc/template/MB_CUR_MAX.h>
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED size_t
-NOTHROW_NCX(LIBCCALL libc___ctype_get_mb_cur_max)(void) {
+NOTHROW(LIBCCALL libc___ctype_get_mb_cur_max)(void) {
 	return __LOCAL_MB_CUR_MAX;
 }
 #ifdef __LIBKCALL_CALLER_CLEANUP
