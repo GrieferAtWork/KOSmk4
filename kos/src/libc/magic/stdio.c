@@ -2195,8 +2195,8 @@ struct __memopen_cookie {
 	byte_t *moc_end;  /* [1..1] End-pointer */
 };
 
-__LOCAL_LIBC(@memopen_read@) ssize_t LIBCCALL
-memopen_read(void *cookie, void *buf, size_t num_bytes) {
+__LOCAL_LIBC(@memopen_read@) ssize_t
+NOTHROW_NCX(LIBCCALL memopen_read)(void *cookie, void *buf, size_t num_bytes) {
 	size_t maxlen;
 	struct __memopen_cookie *me;
 	me = (struct __memopen_cookie *)cookie;
@@ -2208,8 +2208,8 @@ memopen_read(void *cookie, void *buf, size_t num_bytes) {
 	return (size_t)maxlen;
 }
 
-__LOCAL_LIBC(@memopen_write@) ssize_t LIBCCALL
-memopen_write(void *cookie, void const *buf, size_t num_bytes) {
+__LOCAL_LIBC(@memopen_write@) ssize_t
+NOTHROW_NCX(LIBCCALL memopen_write)(void *cookie, void const *buf, size_t num_bytes) {
 	size_t maxlen;
 	struct __memopen_cookie *me;
 	me = (struct __memopen_cookie *)cookie;
@@ -2221,8 +2221,8 @@ memopen_write(void *cookie, void const *buf, size_t num_bytes) {
 	return (size_t)maxlen;
 }
 
-__LOCAL_LIBC(@memopen_seek@) off64_t LIBCCALL
-memopen_seek(void *cookie, off64_t off, int whence) {
+__LOCAL_LIBC(@memopen_seek@) off64_t
+NOTHROW(LIBCCALL memopen_seek)(void *cookie, off64_t off, int whence) {
 	pos64_t newpos;
 	struct __memopen_cookie *me;
 	size_t maxlen;
@@ -2265,8 +2265,8 @@ err_EOVERFLOW:
 @@pp_endif@@
 }
 
-__LOCAL_LIBC(@memopen_close@) int LIBCCALL
-memopen_close(void *cookie) {
+__LOCAL_LIBC(@memopen_close@) int
+NOTHROW(LIBCCALL memopen_close)(void *cookie) {
 @@pp_if $has_function(free)@@
 	free(cookie);
 @@pp_endif@@
@@ -2316,8 +2316,8 @@ struct __memstream_file {
 	byte_t  *mf_end;   /* [0..1] Allocated buffer end pointer. */
 };
 
-__LOCAL_LIBC(@memstream_read@) ssize_t LIBCCALL
-memstream_read(void *cookie, void *buf, size_t num_bytes) {
+__LOCAL_LIBC(@memstream_read@) ssize_t
+NOTHROW_NCX(LIBCCALL memstream_read)(void *cookie, void *buf, size_t num_bytes) {
 	struct __memstream_file *me;
 	size_t maxread;
 	me = (struct __memstream_file *)cookie;
@@ -2329,8 +2329,8 @@ memstream_read(void *cookie, void *buf, size_t num_bytes) {
 	return (ssize_t)maxread;
 }
 
-__LOCAL_LIBC(@memstream_write@) ssize_t LIBCCALL
-memstream_write(void *cookie, void const *buf, size_t num_bytes) {
+__LOCAL_LIBC(@memstream_write@) ssize_t
+NOTHROW_NCX(LIBCCALL memstream_write)(void *cookie, void const *buf, size_t num_bytes) {
 	struct __memstream_file *me;
 	size_t new_alloc, result = 0;
 	byte_t *new_buffer;
@@ -2398,8 +2398,8 @@ err:
 	return -1;
 }
 
-__LOCAL_LIBC(@memstream_seek@) off64_t LIBCCALL
-memstream_seek(void *cookie, off64_t off, int whence) {
+__LOCAL_LIBC(@memstream_seek@) off64_t
+NOTHROW(LIBCCALL memstream_seek)(void *cookie, off64_t off, int whence) {
 	struct __memstream_file *me;
 	off64_t new_pos;
 	me = (struct __memstream_file *)cookie;
@@ -2441,8 +2441,8 @@ err_EOVERFLOW:
 @@pp_endif@@
 }
 
-__LOCAL_LIBC(@memstream_close@) int LIBCCALL
-memstream_close(void *cookie) {
+__LOCAL_LIBC(@memstream_close@) int
+NOTHROW(LIBCCALL memstream_close)(void *cookie) {
 @@pp_if $has_function(free)@@
 	free(cookie);
 @@pp_endif@@
@@ -5119,7 +5119,7 @@ errno_t tmpfile_s([[out]] $FILE **pstream) {
 	return 0;
 }
 
-[[cp, wunused, decl_include("<hybrid/typecore.h>")]]
+[[cp_stdio, wunused, decl_include("<hybrid/typecore.h>")]]
 [[requires_function(fread)]]
 [[impl_include("<libc/errno.h>", "<hybrid/__overflow.h>")]]
 [[section(".text.crt.dos.FILE.locked.read.read")]]
@@ -5143,7 +5143,7 @@ $size_t fread_s([[out(return * elemsize <= elemcount * elemsize)]] void *__restr
 	return fread(buf, elemsize, elemcount, stream);
 }
 
-[[cp, wunused, decl_include("<hybrid/typecore.h>")]]
+[[cp_stdio, wunused, decl_include("<hybrid/typecore.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdin) && $has_function(fgets))]]
 [[impl_include("<libc/template/stdstreams.h>", "<libc/errno.h>")]]
@@ -5215,7 +5215,7 @@ $size_t _fread_nolock_s([[in(return * elemsize <= elemcount * elemsize)]] void *
 %[define(_CRT_INTERNAL_SCANF_LEGACY_MSVCRT_COMPATIBILITY       = 4)]
 
 %[default:section(".text.crt.dos.unicode.locale.format.printf")];
-[[decl_include("<features.h>", "<hybrid/typecore.h>"), requires_function(vfprintf)]]
+[[cp_stdio, decl_include("<features.h>", "<hybrid/typecore.h>"), requires_function(vfprintf)]]
 __STDC_INT_AS_SSIZE_T __stdio_common_vfprintf($uint64_t options, [[inout]] $FILE *stream,
                                               [[in, format]] char const *format,
                                               $locale_t locale, $va_list args) {
@@ -5224,14 +5224,15 @@ __STDC_INT_AS_SSIZE_T __stdio_common_vfprintf($uint64_t options, [[inout]] $FILE
 	return vfprintf(stream, format, args);
 }
 
-[[decl_include("<features.h>", "<hybrid/typecore.h>"), crt_intern_alias(__stdio_common_vfprintf), requires_function(__stdio_common_vfprintf)]]
+[[cp_stdio, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[crt_intern_alias(__stdio_common_vfprintf), requires_function(__stdio_common_vfprintf)]]
 __STDC_INT_AS_SSIZE_T __stdio_common_vfprintf_s($uint64_t options, [[inout]] $FILE *stream,
                                                 [[in, format]] char const *format,
                                                 $locale_t locale, $va_list args) {
 	return __stdio_common_vfprintf(options, stream, format, locale, args);
 }
 
-[[decl_include("<features.h>", "<hybrid/typecore.h>"), requires_function(vfprintf)]]
+[[cp_stdio, decl_include("<features.h>", "<hybrid/typecore.h>"), requires_function(vfprintf)]]
 [[crt_intern_alias("__stdio_common_vfprintf")]] /* Normal printf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T __stdio_common_vfprintf_p($uint64_t options, [[inout]] $FILE *stream,
                                                 [[in, format]] char const *format,
@@ -5291,7 +5292,7 @@ __STDC_INT_AS_SSIZE_T __stdio_common_vsprintf_p($uint64_t options, char *buf, $s
 }
 
 %[default:section(".text.crt.dos.FILE.locked.read.scanf")];
-[[decl_include("<features.h>", "<hybrid/typecore.h>"), wunused, requires_function(vfscanf)]]
+[[cp_stdio, decl_include("<features.h>", "<hybrid/typecore.h>"), wunused, requires_function(vfscanf)]]
 __STDC_INT_AS_SSIZE_T __stdio_common_vfscanf($uint64_t options, [[inout]] $FILE *stream,
                                              [[in, format]] char const *format,
                                              $locale_t locale, $va_list args) {
@@ -5383,21 +5384,21 @@ __STDC_INT_AS_SSIZE_T _vsnprintf_s_l([[out(? <= bufsize)]] char *buf, $size_t bu
 	__STDC_INT_AS_SSIZE_T result = __stdio_common_vsnprintf_s(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, buf, bufsize, maxsize, format, locale, args);
 	return result < 0 ? -1 : result;
 }
-[[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vfprintf_s)]]
+[[cp_stdio, decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vfprintf_s)]]
 __STDC_INT_AS_SSIZE_T _vfprintf_s_l([[inout]] $FILE *stream, [[in, format]] char const *format, $locale_t locale, $va_list args) {
 	return __stdio_common_vfprintf_s(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, stream, format, locale, args);
 }
-[[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vfprintf_p)]]
+[[cp_stdio, decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vfprintf_p)]]
 [[crt_intern_alias("_vfprintf_l")]] /* Normal printf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vfprintf_p_l([[inout]] $FILE *stream, [[in, format]] char const *format, $locale_t locale, $va_list args) {
 	return __stdio_common_vfprintf_p(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, stream, format, locale, args);
 }
 %[default:section(".text.crt.dos.FILE.locked.read.scanf")];
-[[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), wunused, requires_function(__stdio_common_vfscanf)]]
+[[cp_stdio, decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), wunused, requires_function(__stdio_common_vfscanf)]]
 __STDC_INT_AS_SSIZE_T _vfscanf_l([[inout]] $FILE *stream, [[in, format]] char const *format, $locale_t locale, $va_list args) {
 	return __stdio_common_vfscanf(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS, stream, format, locale, args);
 }
-[[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), crt_intern_alias("_vfscanf_l"),  wunused, requires_function(__stdio_common_vfscanf)]]
+[[cp_stdio, decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), crt_intern_alias("_vfscanf_l"),  wunused, requires_function(__stdio_common_vfscanf)]]
 __STDC_INT_AS_SSIZE_T _vfscanf_s_l([[inout]] $FILE *stream, [[in, format]] char const *format, $locale_t locale, $va_list args) {
 	return __stdio_common_vfscanf(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS | _CRT_INTERNAL_SCANF_SECURECRT, stream, format, locale, args);
 }
@@ -5415,17 +5416,17 @@ __STDC_INT_AS_SSIZE_T _vsnscanf_s_l([[in(? <= bufsize)]] char const *buf, $size_
 /* Direct aliases                                                       */
 /************************************************************************/
 %[default:section(".text.crt.dos.unicode.locale.format.printf")];
-[[decl_include("<features.h>"), requires_function(vprintf)]]
+[[cp_stdio, decl_include("<features.h>"), requires_function(vprintf)]]
 __STDC_INT_AS_SSIZE_T _vprintf_l([[in, format]] char const *format, $locale_t locale, $va_list args) {
 	(void)locale;
 	return vprintf(format, args);
 }
-[[decl_include("<features.h>"), requires_function(vfprintf)]]
+[[cp_stdio, decl_include("<features.h>"), requires_function(vfprintf)]]
 __STDC_INT_AS_SSIZE_T _vfprintf_l([[inout]] $FILE *stream, [[in, format]] char const *format, $locale_t locale, $va_list args) {
 	(void)locale;
 	return vfprintf(stream, format, args);
 }
-[[decl_include("<features.h>"), wunused, requires_function(vscanf)]]
+[[cp_stdio, decl_include("<features.h>"), wunused, requires_function(vscanf)]]
 __STDC_INT_AS_SSIZE_T _vscanf_l([[in, format]] char const *format, $locale_t locale, $va_list args) {
 	(void)locale;
 	return vscanf(format, args);
@@ -5441,12 +5442,12 @@ __STDC_INT_AS_SSIZE_T _vsprintf_l([[out]] char *buf, [[in, format]] char const *
 /* Misc. wrappers                                                       */
 /************************************************************************/
 %[default:section(".text.crt.dos.unicode.static.format.printf")];
-[[decl_include("<features.h>"), requires_function(_vfprintf_p_l)]]
+[[cp_stdio, decl_include("<features.h>"), requires_function(_vfprintf_p_l)]]
 [[crt_intern_alias("vfprintf")]] /* Normal printf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vfprintf_p([[inout]] $FILE *stream, [[in, format]] char const *format, $va_list args) {
 	return _vfprintf_p_l(stream, format, NULL, args);
 }
-[[decl_include("<features.h>"), requires_function(_vprintf_p_l)]]
+[[cp_stdio, decl_include("<features.h>"), requires_function(_vprintf_p_l)]]
 [[crt_intern_alias("vprintf")]] /* Normal printf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vprintf_p([[in, format]] char const *format, $va_list args) {
 	return _vprintf_p_l(format, NULL, args);
@@ -5503,13 +5504,13 @@ __STDC_INT_AS_SSIZE_T _vsnscanf_s([[in(? <= bufsize)]] char const *buf, $size_t 
 /* STD-stream wrapper functions                                         */
 /************************************************************************/
 %[default:section(".text.crt.dos.unicode.locale.format.printf")];
-[[decl_include("<features.h>"), impl_include("<libc/template/stdstreams.h>")]]
+[[cp_stdio, decl_include("<features.h>"), impl_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdout) && $has_function(_vfprintf_s_l))]]
 __STDC_INT_AS_SSIZE_T _vprintf_s_l([[in, format]] char const *format, $locale_t locale, $va_list args) {
 	return _vfprintf_s_l(stdout, format, locale, args);
 }
-[[decl_include("<features.h>"), impl_include("<libc/template/stdstreams.h>")]]
+[[cp_stdio, decl_include("<features.h>"), impl_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdout) && $has_function(_vfprintf_p_l))]]
 [[crt_intern_alias("_vprintf_l")]] /* Normal printf already supports positional arguments! */
@@ -5517,7 +5518,7 @@ __STDC_INT_AS_SSIZE_T _vprintf_p_l([[in, format]] char const *format, $locale_t 
 	return _vfprintf_p_l(stdout, format, locale, args);
 }
 %[default:section(".text.crt.dos.FILE.locked.read.scanf")];
-[[wunused, decl_include("<features.h>"), impl_include("<libc/template/stdstreams.h>")]]
+[[wunused, cp_stdio, decl_include("<features.h>"), impl_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdin) && $has_function(_vfscanf_s_l))]]
 __STDC_INT_AS_SSIZE_T _vscanf_s_l([[in, format]] char const *format, $locale_t locale, $va_list args) {
@@ -5529,22 +5530,22 @@ __STDC_INT_AS_SSIZE_T _vscanf_s_l([[in, format]] char const *format, $locale_t l
 /* Auto-generated printf wrapper functions                              */
 /************************************************************************/
 %[default:section(".text.crt.dos.unicode.locale.format.printf")];
-[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fprintf_l([[inout]] $FILE *stream, [[in, format]] char const *format, $locale_t locale, ...) %{printf("_vfprintf_l")}
-[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fprintf_s_l([[inout]] $FILE *stream, [[in, format]] char const *format, $locale_t locale, ...) %{printf("_vfprintf_s_l")}
+[[cp_stdio, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fprintf_l([[inout]] $FILE *stream, [[in, format]] char const *format, $locale_t locale, ...) %{printf("_vfprintf_l")}
+[[cp_stdio, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fprintf_s_l([[inout]] $FILE *stream, [[in, format]] char const *format, $locale_t locale, ...) %{printf("_vfprintf_s_l")}
 %[default:section(".text.crt.dos.unicode.static.format.printf")];
 [[crt_intern_alias("fprintf")]] /* Normal printf already supports positional arguments! */
-[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fprintf_p([[inout]] $FILE *stream, [[in, format]] char const *format, ...) %{printf("_vfprintf_p")}
+[[cp_stdio, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fprintf_p([[inout]] $FILE *stream, [[in, format]] char const *format, ...) %{printf("_vfprintf_p")}
 %[default:section(".text.crt.dos.unicode.locale.format.printf")];
 [[crt_intern_alias("_fprintf_l")]] /* Normal printf already supports positional arguments! */
-[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fprintf_p_l([[inout]] $FILE *stream, [[in, format]] char const *format, $locale_t locale, ...) %{printf("_vfprintf_p_l")}
-[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _printf_l([[in, format]] char const *format, $locale_t locale, ...) %{printf("_vprintf_l")}
-[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _printf_s_l([[in, format]] char const *format, $locale_t locale, ...) %{printf("_vprintf_s_l")}
+[[cp_stdio, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fprintf_p_l([[inout]] $FILE *stream, [[in, format]] char const *format, $locale_t locale, ...) %{printf("_vfprintf_p_l")}
+[[cp_stdio, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _printf_l([[in, format]] char const *format, $locale_t locale, ...) %{printf("_vprintf_l")}
+[[cp_stdio, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _printf_s_l([[in, format]] char const *format, $locale_t locale, ...) %{printf("_vprintf_s_l")}
 %[default:section(".text.crt.dos.unicode.static.format.printf")];
 [[crt_intern_alias("printf")]] /* Normal printf already supports positional arguments! */
-[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _printf_p([[in, format]] char const *format, ...) %{printf("_vprintf_p")}
+[[cp_stdio, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _printf_p([[in, format]] char const *format, ...) %{printf("_vprintf_p")}
 %[default:section(".text.crt.dos.unicode.locale.format.printf")];
 [[crt_intern_alias("_printf_l")]] /* Normal printf already supports positional arguments! */
-[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _printf_p_l([[in, format]] char const *format, $locale_t locale, ...) %{printf("_vprintf_p_l")}
+[[cp_stdio, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _printf_p_l([[in, format]] char const *format, $locale_t locale, ...) %{printf("_vprintf_p_l")}
 [[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _sprintf_l([[out]] char *buf, [[in, format]] char const *format, $locale_t locale, ...) %{printf("_vsprintf_l")}
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _sprintf_s_l([[out(? <= bufsize)]] char *buf, $size_t bufsize, [[in, format]] char const *format, $locale_t locale, ...) %{printf("_vsprintf_s_l")}
 [[crt_intern_alias("_sprintf_l")]] /* Normal printf already supports positional arguments! */
@@ -5575,10 +5576,10 @@ __STDC_INT_AS_SSIZE_T _vscanf_s_l([[in, format]] char const *format, $locale_t l
 [[crt_intern_alias("_scprintf")]] /* Normal printf already supports positional arguments! */
 [[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _scprintf_p([[in, format]] char const *format, ...) %{printf("_vscprintf_p")}
 %[default:section(".text.crt.dos.FILE.locked.read.scanf")];
-[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _fscanf_l([[inout]] $FILE *stream, [[in, format]] char const *format, $locale_t locale, ...) %{printf("_vfscanf_l")}
-[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _fscanf_s_l([[inout]] $FILE *stream, [[in, format]] char const *format, $locale_t locale, ...) %{printf("_vfscanf_s_l")}
-[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _scanf_l([[in, format]] char const *format, $locale_t locale, ...) %{printf("_vscanf_l")}
-[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _scanf_s_l([[in, format]] char const *format, $locale_t locale, ...) %{printf("_vscanf_s_l")}
+[[cp_stdio, decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _fscanf_l([[inout]] $FILE *stream, [[in, format]] char const *format, $locale_t locale, ...) %{printf("_vfscanf_l")}
+[[cp_stdio, decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _fscanf_s_l([[inout]] $FILE *stream, [[in, format]] char const *format, $locale_t locale, ...) %{printf("_vfscanf_s_l")}
+[[cp_stdio, decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _scanf_l([[in, format]] char const *format, $locale_t locale, ...) %{printf("_vscanf_l")}
+[[cp_stdio, decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _scanf_s_l([[in, format]] char const *format, $locale_t locale, ...) %{printf("_vscanf_s_l")}
 [[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _sscanf_l([[in]] char const *buf, [[in, format]] char const *format, $locale_t locale, ...) %{printf("_vsscanf_l")}
 [[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _sscanf_s_l([[in]] char const *buf, [[in, format]] char const *format, $locale_t locale, ...) %{printf("_vsscanf_s_l")}
 [[decl_include("<features.h>", "<hybrid/typecore.h>"), wunused]] __STDC_INT_AS_SSIZE_T _snscanf_l([[in(? <= bufsize)]] char const *buf, $size_t bufsize, [[in, format]] char const *format, $locale_t locale, ...) %{printf("_vsnscanf_l")}
@@ -5593,11 +5594,11 @@ __STDC_INT_AS_SSIZE_T _vscanf_s_l([[in, format]] char const *format, $locale_t l
 /************************************************************************/
 %#ifdef __USE_DOS_SLIB
 %[default:section(".text.crt.dos.unicode.static.format.printf")];
-[[decl_include("<features.h>"), requires_function(_vfprintf_s_l)]]
+[[cp_stdio, decl_include("<features.h>"), requires_function(_vfprintf_s_l)]]
 __STDC_INT_AS_SSIZE_T vfprintf_s([[inout]] $FILE *stream, [[in, format]] char const *format, $va_list args) {
 	return _vfprintf_s_l(stream, format, NULL, args);
 }
-[[decl_include("<features.h>"), requires_function(_vprintf_s_l)]]
+[[cp_stdio, decl_include("<features.h>"), requires_function(_vprintf_s_l)]]
 __STDC_INT_AS_SSIZE_T vprintf_s([[in, format]] char const *format, $va_list args) {
 	return _vprintf_s_l(format, NULL, args);
 }
@@ -5610,11 +5611,11 @@ __STDC_INT_AS_SSIZE_T vsnprintf_s([[out(? <= bufsize)]] char *buf, $size_t bufsi
 	return _vsnprintf_s_l(buf, bufsize, maxsize, format, NULL, args);
 }
 %[default:section(".text.crt.dos.FILE.locked.read.scanf")];
-[[decl_include("<features.h>"), requires_function(_vfscanf_s_l), wunused]]
+[[cp_stdio, decl_include("<features.h>"), requires_function(_vfscanf_s_l), wunused]]
 __STDC_INT_AS_SSIZE_T vfscanf_s([[inout]] $FILE *stream, [[in, format]] char const *format, $va_list args) {
 	return _vfscanf_s_l(stream, format, NULL, args);
 }
-[[decl_include("<features.h>"), requires_function(_vscanf_s_l), wunused]]
+[[cp_stdio, decl_include("<features.h>"), requires_function(_vscanf_s_l), wunused]]
 __STDC_INT_AS_SSIZE_T vscanf_s([[in, format]] char const *format, $va_list args) {
 	return _vscanf_s_l(format, NULL, args);
 }
@@ -5623,12 +5624,12 @@ __STDC_INT_AS_SSIZE_T vsscanf_s([[in]] char const *buf, [[in, format]] char cons
 	return _vsscanf_s_l(buf, format, NULL, args);
 }
 %[default:section(".text.crt.dos.unicode.static.format.printf")];
-[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T fprintf_s([[inout]] $FILE *stream, [[in, format]] char const *format, ...) %{printf("vfprintf_s")}
-[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T printf_s([[in, format]] char const *format, ...) %{printf("vprintf_s")}
+[[cp_stdio, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T fprintf_s([[inout]] $FILE *stream, [[in, format]] char const *format, ...) %{printf("vfprintf_s")}
+[[cp_stdio, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T printf_s([[in, format]] char const *format, ...) %{printf("vprintf_s")}
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T sprintf_s([[out(? <= bufsize)]] char *buf, $size_t bufsize, [[in, format]] char const *format, ...) %{printf("vsprintf_s")}
 %[default:section(".text.crt.dos.FILE.locked.read.scanf")];
-[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T fscanf_s([[inout]] $FILE *stream, [[in, format]] char const *format, ...) %{printf("vfscanf_s")}
-[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T scanf_s([[in, format]] char const *format, ...) %{printf("vscanf_s")}
+[[cp_stdio, decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T fscanf_s([[inout]] $FILE *stream, [[in, format]] char const *format, ...) %{printf("vfscanf_s")}
+[[cp_stdio, decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T scanf_s([[in, format]] char const *format, ...) %{printf("vscanf_s")}
 [[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T sscanf_s([[in]] char const *buf, [[in, format]] char const *format, ...) %{printf("vsscanf_s")}
 %#endif /* __USE_DOS_SLIB */
 %#endif /* __CC__ */

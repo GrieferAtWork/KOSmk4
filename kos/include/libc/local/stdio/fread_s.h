@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d13e1ad */
+/* HASH CRC-32:0x32047cbd */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/__overflow.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fread_s) __ATTR_WUNUSED __ATTR_INOUT(5) __ATTR_OUT_OPT(1) __SIZE_TYPE__
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fread_s))(void *__restrict __buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(fread_s))(void *__restrict __buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream) {
 	__SIZE_TYPE__ __reqbuf;
 	if (__hybrid_overflow_umul(__elemsize, __elemcount, &__reqbuf) ||
 	    __reqbuf > __bufsize) {

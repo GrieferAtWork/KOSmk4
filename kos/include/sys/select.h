@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ce3b2c2 */
+/* HASH CRC-32:0xdb4c4343 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -115,9 +115,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__fdelt_chk, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #define __FD_ELT __fdelt_chk
 #elif !defined(__NO_ATTR_WARNING) && (defined(__CRT_HAVE___fdelt_chk) || defined(__CRT_HAVE___fdelt_warn))
 #ifdef __CRT_HAVE___fdelt_chk
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED __ATTR_WARNING("fd number cannot be used with `fd_set'"),__LONGPTR_TYPE__,__NOTHROW_NCX,__fdelt_warn,(__LONGPTR_TYPE__ __fd),__fdelt_chk,(__fd))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED __ATTR_WARNING("fd number cannot be used with `fd_set'"),__LONGPTR_TYPE__,__NOTHROW,__fdelt_warn,(__LONGPTR_TYPE__ __fd),__fdelt_chk,(__fd))
 #else /* __CRT_HAVE___fdelt_chk */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_WARNING("fd number cannot be used with `fd_set'"),__LONGPTR_TYPE__,__NOTHROW_NCX,__fdelt_warn,(__LONGPTR_TYPE__ __fd),(__fd))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_WARNING("fd number cannot be used with `fd_set'"),__LONGPTR_TYPE__,__NOTHROW,__fdelt_warn,(__LONGPTR_TYPE__ __fd),(__fd))
 #endif /* !__CRT_HAVE___fdelt_chk */
 #define __FD_ELT(fd)                                                      \
 	(__builtin_constant_p(fd)                                             \

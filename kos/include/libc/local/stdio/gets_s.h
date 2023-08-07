@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc070db3a */
+/* HASH CRC-32:0x930129dc */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(gets_s) __ATTR_WUNUSED __ATTR_OUTS(1, 2) char *
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(gets_s))(char *__restrict __buf, __SIZE_TYPE__ __bufsize) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(gets_s))(char *__restrict __buf, __SIZE_TYPE__ __bufsize) {
 	if __unlikely(!__buf) {
 #ifdef __EINVAL
 		(void)__libc_seterrno(__EINVAL);

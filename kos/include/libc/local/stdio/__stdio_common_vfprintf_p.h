@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4edfc13b */
+/* HASH CRC-32:0x68e12c71 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_vfprintf_defined */
 __LOCAL_LIBC(__stdio_common_vfprintf_p) __ATTR_IN(3) __ATTR_INOUT(2) __ATTR_LIBC_PRINTF_P(3, 0) __STDC_INT_AS_SSIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__stdio_common_vfprintf_p))(__UINT64_TYPE__ __options, __FILE *__stream, char const *__format, __locale_t __locale, __builtin_va_list __args) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(__stdio_common_vfprintf_p))(__UINT64_TYPE__ __options, __FILE *__stream, char const *__format, __locale_t __locale, __builtin_va_list __args) {
 	/* NOTE: DOS positional arguments work the same as Glibc's, only that
 	 *       Glibc and KOS  already bake them  into the normal  `printf'. */
 	(void)__locale;

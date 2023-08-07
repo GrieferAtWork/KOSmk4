@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a1eee69 */
+/* HASH CRC-32:0x251b0239 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_vfprintf_defined */
 __LOCAL_LIBC(__stdio_common_vfprintf) __ATTR_IN(3) __ATTR_INOUT(2) __ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SSIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__stdio_common_vfprintf))(__UINT64_TYPE__ __options, __FILE *__stream, char const *__format, __locale_t __locale, __builtin_va_list __args) {
+__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(__stdio_common_vfprintf))(__UINT64_TYPE__ __options, __FILE *__stream, char const *__format, __locale_t __locale, __builtin_va_list __args) {
 	(void)__locale;
 	(void)__options;
 	return (__NAMESPACE_LOCAL_SYM __localdep_vfprintf)(__stream, __format, __args);

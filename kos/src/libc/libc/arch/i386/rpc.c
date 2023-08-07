@@ -151,8 +151,8 @@ rpc_exec_program[] = {
 
 
 ATTR_SECTION(".text.crt.sched.rpc")
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED void const *LIBCCALL
-libc_get_rpc_exec_program(void) {
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED void const *
+NOTHROW(LIBCCALL libc_get_rpc_exec_program)(void) {
 	if (_rpc_exec_program_restorer == NULL)
 		_rpc_exec_program_restorer = (void *)&libc_x86_rpc_restorer;
 	return rpc_exec_program;
@@ -260,8 +260,8 @@ rpc_interrupt_program[] = {
 
 
 ATTR_SECTION(".text.crt.sched.rpc")
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED void const *LIBCCALL
-libc_get_rpc_interrupt_program(void) {
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED void const *
+NOTHROW(LIBCCALL libc_get_rpc_interrupt_program)(void) {
 	if (_rpc_interrupt_program_restorer == NULL)
 		_rpc_interrupt_program_restorer = (void *)&libc_x86_rpc_restorer;
 	return rpc_interrupt_program;

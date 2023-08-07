@@ -147,9 +147,9 @@ $longptr_t __fdelt_chk($longptr_t fd) {
 #define __FD_ELT __fdelt_chk
 #elif !defined(__NO_ATTR_WARNING) && (defined(__CRT_HAVE___fdelt_chk) || defined(__CRT_HAVE___fdelt_warn))
 #ifdef __CRT_HAVE___fdelt_chk
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED __ATTR_WARNING("fd number cannot be used with `fd_set'"),__LONGPTR_TYPE__,__NOTHROW_NCX,__fdelt_warn,(__LONGPTR_TYPE__ __fd),__fdelt_chk,(__fd))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED __ATTR_WARNING("fd number cannot be used with `fd_set'"),__LONGPTR_TYPE__,__NOTHROW,__fdelt_warn,(__LONGPTR_TYPE__ __fd),__fdelt_chk,(__fd))
 #else /* __CRT_HAVE___fdelt_chk */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_WARNING("fd number cannot be used with `fd_set'"),__LONGPTR_TYPE__,__NOTHROW_NCX,__fdelt_warn,(__LONGPTR_TYPE__ __fd),(__fd))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_WARNING("fd number cannot be used with `fd_set'"),__LONGPTR_TYPE__,__NOTHROW,__fdelt_warn,(__LONGPTR_TYPE__ __fd),(__fd))
 #endif /* !__CRT_HAVE___fdelt_chk */
 #define __FD_ELT(fd)                                                      \
 	(__builtin_constant_p(fd)                                             \

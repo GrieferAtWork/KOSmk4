@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb5b54f6 */
+/* HASH CRC-32:0x711476b5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -135,8 +135,8 @@ struct __memstream_file {
 	__BYTE_TYPE__  *__mf_end;   /* [0..1] Allocated buffer end pointer. */
 };
 
-__LOCAL_LIBC(memstream_read) __SSIZE_TYPE__ __LIBCCALL
-__memstream_read(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes) {
+__LOCAL_LIBC(memstream_read) __SSIZE_TYPE__
+__NOTHROW_NCX(__LIBCCALL __memstream_read)(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes) {
 	struct __memstream_file *__me;
 	__SIZE_TYPE__ __maxread;
 	__me = (struct __memstream_file *)__cookie;
@@ -148,8 +148,8 @@ __memstream_read(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes) {
 	return (__SSIZE_TYPE__)__maxread;
 }
 
-__LOCAL_LIBC(memstream_write) __SSIZE_TYPE__ __LIBCCALL
-__memstream_write(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes) {
+__LOCAL_LIBC(memstream_write) __SSIZE_TYPE__
+__NOTHROW_NCX(__LIBCCALL __memstream_write)(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes) {
 	struct __memstream_file *__me;
 	__SIZE_TYPE__ __new_alloc, __result = 0;
 	__BYTE_TYPE__ *__new_buffer;
@@ -217,8 +217,8 @@ __err:
 	return -1;
 }
 
-__LOCAL_LIBC(memstream_seek) __off64_t __LIBCCALL
-__memstream_seek(void *__cookie, __off64_t __off, int __whence) {
+__LOCAL_LIBC(memstream_seek) __off64_t
+__NOTHROW(__LIBCCALL __memstream_seek)(void *__cookie, __off64_t __off, int __whence) {
 	struct __memstream_file *__me;
 	__off64_t __new_pos;
 	__me = (struct __memstream_file *)__cookie;
@@ -260,8 +260,8 @@ __err_EOVERFLOW:
 #endif /* !__EOVERFLOW */
 }
 
-__LOCAL_LIBC(memstream_close) int __LIBCCALL
-__memstream_close(void *__cookie) {
+__LOCAL_LIBC(memstream_close) int
+__NOTHROW(__LIBCCALL __memstream_close)(void *__cookie) {
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 	(__NAMESPACE_LOCAL_SYM __localdep_free)(__cookie);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */

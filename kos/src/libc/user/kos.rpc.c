@@ -30,8 +30,8 @@
 DECL_BEGIN
 
 /* These 2 functions are arch-specific */
-INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED void const *LIBCCALL libc_get_rpc_exec_program(void);
-INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED void const *LIBCCALL libc_get_rpc_interrupt_program(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED void const *NOTHROW(LIBCCALL libc_get_rpc_exec_program)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED void const *NOTHROW(LIBCCALL libc_get_rpc_interrupt_program)(void);
 
 
 /*[[[head:libc_rpc_schedule,hash:CRC-32=0xb00d9a41]]]*/
