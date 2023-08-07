@@ -45,7 +45,7 @@ __DECL_BEGIN
  */
 
 __LIBM_LOCAL_FUNC(isinff) __ATTR_WUNUSED __ATTR_CONST int
-(__LIBCCALL __ieee754_isinff)(__IEEE754_FLOAT_TYPE__ __x) {
+__NOTHROW(__LIBCCALL __ieee754_isinff)(__IEEE754_FLOAT_TYPE__ __x) {
 	__int32_t __ix;
 	__LIBM_GET_FLOAT_WORD(__ix, __x);
 	__ix &= 0x7fffffff;
@@ -67,7 +67,7 @@ __LIBM_LOCAL_FUNC(isinff) __ATTR_WUNUSED __ATTR_CONST int
  */
 
 __LIBM_LOCAL_FUNC(isinf) __ATTR_WUNUSED __ATTR_CONST int
-(__LIBCCALL __ieee754_isinf)(__IEEE754_DOUBLE_TYPE__ __x) {
+__NOTHROW(__LIBCCALL __ieee754_isinf)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__int32_t __hx, __lx;
 	__LIBM_EXTRACT_WORDS(__hx, __lx, __x);
 	__hx &= 0x7fffffff;
@@ -86,7 +86,7 @@ __LIBM_LOCAL_FUNC(isinf) __ATTR_WUNUSED __ATTR_CONST int
  */
 
 __LIBM_LOCAL_FUNC(isinfl) __ATTR_WUNUSED __ATTR_CONST int
-(__LIBCCALL __ieee854_isinfl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
+__NOTHROW(__LIBCCALL __ieee854_isinfl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__int32_t __se, __hx, __lx;
 	__LIBM_GET_LDOUBLE_WORDS(__se, __hx, __lx, __x);
 	__lx |= (__hx & __UINT32_C(0x7fffffff)) | ((__se & 0x7fff) ^ 0x7fff);

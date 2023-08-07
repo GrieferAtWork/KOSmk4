@@ -245,8 +245,8 @@ INTDEF ptrdiff_t file_uoffset;
 /* Pack/unpack a user-given FILE object. */
 #ifdef FILE_HAVE_UOFFSET
 #define file_fromuser(ptr)     ((FILE *)((byte_t *)(ptr) + file_uoffset))
-#define file_touser(ptr)       ((FILE *)((byte_t *)(ptr) - file_uoffset))
 #define file_fromuser_opt(ptr) ((FILE *)((ptr) ? (byte_t *)(ptr) + file_uoffset : (byte_t *)(ptr)))
+#define file_touser(ptr)       ((FILE *)((byte_t *)(ptr) - file_uoffset))
 #define file_touser_opt(ptr)   ((FILE *)((ptr) ? (byte_t *)(ptr) - file_uoffset : (byte_t *)(ptr)))
 #define file_free(self)        free((byte_t *)(self) - file_uoffset)
 INTDEF WUNUSED FILE *__FCALL file_calloc(size_t extsize); /* Defined in "../libc/compat.c" */

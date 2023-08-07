@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18624872 */
+/* HASH CRC-32:0xac56404f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,12 +42,12 @@ INTDEF WUNUSED clock_t NOTHROW_NCX(LIBCCALL libc_clock)(void);
 INTDEF ATTR_OUT_OPT(1) time_t NOTHROW_NCX(LIBDCALL libd_time)(time_t *timer);
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBDCALL libd_difftime)(time_t time1, time_t time0);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd_difftime)(time_t time1, time_t time0);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_difftime)(time_t time1, time_t time0);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_difftime)(time_t time1, time_t time0);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> mktime(3), mktime64(3)
@@ -131,12 +131,12 @@ INTDEF ATTR_IN(3) ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBCCALL libc_asctime_s)(c
 INTDEF ATTR_OUT_OPT(1) time64_t NOTHROW_NCX(LIBDCALL libd_time64)(time64_t *timer);
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBDCALL libd_difftime64)(time64_t time1, time64_t time0);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd_difftime64)(time64_t time1, time64_t time0);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_difftime64)(time64_t time1, time64_t time0);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_difftime64)(time64_t time1, time64_t time0);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> mktime(3), mktime64(3)

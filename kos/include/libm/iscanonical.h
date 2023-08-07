@@ -53,7 +53,7 @@ __DECL_BEGIN
    <https://www.gnu.org/licenses/>.  */
 
 __LIBM_LOCAL_FUNC(iscanonicall) __ATTR_WUNUSED __ATTR_CONST int
-(__LIBCCALL __ieee854_iscanonicall)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
+__NOTHROW(__LIBCCALL __ieee854_iscanonicall)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__uint32_t __se, __i0, __i1;
 	__int32_t __ix;
 	__BOOL __mant_high;

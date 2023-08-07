@@ -36,6 +36,7 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 
 #include <hybrid/sched/atomic-once.h>
 
+#include <kos/except.h>
 #include <kos/exec/elf.h>
 #include <kos/exec/idata.h>
 #include <kos/exec/ifunc.h>
@@ -305,7 +306,7 @@ INTERN WUNUSED ATTR_SECTION(".text.crt.FILE.std_files") FILE *__FCALL
 file_calloc(size_t extsize) {
 	FILE *result;
 	result = (FILE *)calloc(1, file_uoffset + sizeof(FILE) + extsize);
-	if (result)
+	if likely(result)
 		result = (FILE *)((byte_t *)result + file_uoffset);
 	return result;
 }
@@ -359,7 +360,7 @@ NOTHROW(CC linux_stdio_init)(bool is_2_1) {
 	/* XXX: Figure out what's supposed to be different when `is_2_1 == true' */
 
 	/* NOTE: Intentional crash if this Calloc() fails */
-	result = (struct linux_default_stdio_file *)Calloc(3, sizeof(struct linux_default_stdio_file));
+	NOEXCEPT_DO(result = (struct linux_default_stdio_file *)Calloc(3, sizeof(struct linux_default_stdio_file)));
 	memcpy(&result[0].ldsf_stdio, &libc_iob[0], sizeof(FILE));
 	memcpy(&result[1].ldsf_stdio, &libc_iob[1], sizeof(FILE));
 	memcpy(&result[2].ldsf_stdio, &libc_iob[2], sizeof(FILE));
@@ -453,8 +454,8 @@ libc_default_new_handler(void) {
 #undef __new_handler
 DEFINE_PUBLIC_IDATA(__new_handler, libc___new_handler, __SIZEOF_POINTER__);
 INTERN ATTR_SECTION(".bss.crt.compat.linux.heap") PNEW_HANDLER libc___new_handler = NULL;
-INTERN ATTR_SECTION(".text.crt.compat.linux.heap") PNEW_HANDLER *LIBCCALL
-libc___new_handler_cb(void) {
+INTERN ATTR_SECTION(".text.crt.compat.linux.heap") PNEW_HANDLER *
+NOTHROW(LIBCCALL libc___new_handler_cb)(void) {
 	if (libc___new_handler == NULL)
 		libc___new_handler = &libc_default_new_handler;
 	return &libc___new_handler;
@@ -528,9 +529,9 @@ libc___builtin_vec_new(void *ptr, size_t maxindex, size_t size,
 }
 
 DEFINE_PUBLIC_ALIAS(__throw_type_match, libc___throw_type_match);
-INTERN ATTR_PURE ATTR_SECTION(".text.crt.compat.linux.except") void *LIBCCALL
-libc___throw_type_match(void const *catch_type,
-                        void const *throw_type, void *obj) {
+INTERN ATTR_PURE ATTR_SECTION(".text.crt.compat.linux.except") void *
+NOTHROW_NCX(LIBCCALL libc___throw_type_match)(void const *catch_type,
+                                              void const *throw_type, void *obj) {
 	if (strcmp((char const *)catch_type, (char const *)throw_type) == 0)
 		return obj;
 	return NULL;
@@ -1143,8 +1144,8 @@ void LIBCCALL libc_init_libiconv_failed(void) {
 	syslog(LOG_ERR, libc_init_libiconv_failed_msg, dlerror());
 	exit(EXIT_FAILURE);
 }
-PRIVATE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc") void *
-NOTHROW_NCX(LIBCCALL libc_get_libiconv)(void) {
+PRIVATE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc")
+void *LIBCCALL libc_get_libiconv(void) {
 	void *result = libc_libiconv;
 	if (!result) {
 		result = dlopen(LIBICONV_LIBRARY_NAME, RTLD_LAZY | RTLD_LOCAL);
@@ -1157,8 +1158,8 @@ NOTHROW_NCX(LIBCCALL libc_get_libiconv)(void) {
 	}
 	return result;
 }
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc") NONNULL((1)) void *
-NOTHROW_NCX(FCALL libc_get_libiconv_symbol)(char const *__restrict name) {
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc") NONNULL((1))
+void *FCALL libc_get_libiconv_symbol(char const *__restrict name) {
 	void *lib, *res;
 	lib = libc_get_libiconv();
 	res = dlsym(lib, name);
@@ -1251,10 +1252,10 @@ libd___lconv_init(void) {
 	CRT_UNIMPLEMENTED("__lconv_init");
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.application.init") int LIBDCALL
-libd___getmainargs(int *pargc, char ***pargv,
-                   char ***penvp, int dowildcard,
-                   _startupinfo *pstartinfo) {
+INTERN ATTR_SECTION(".text.crt.dos.application.init") int
+NOTHROW_NCX(LIBDCALL libd___getmainargs)(int *pargc, char ***pargv,
+                                         char ***penvp, int dowildcard,
+                                         _startupinfo *pstartinfo) {
 	struct process_peb *peb = &__peb;
 	(void)dowildcard;
 	if (pargc != NULL)
@@ -1268,10 +1269,10 @@ libd___getmainargs(int *pargc, char ***pargv,
 	return 0;
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.application.init") int LIBDCALL
-libd___wgetmainargs(int *pargc, char16_t ***pargv,
-                    char16_t ***penvp, int dowildcard,
-                    _startupinfo *pstartinfo) {
+INTERN ATTR_SECTION(".text.crt.dos.application.init") int
+NOTHROW_NCX(LIBDCALL libd___wgetmainargs)(int *pargc, char16_t ***pargv,
+                                          char16_t ***penvp, int dowildcard,
+                                          _startupinfo *pstartinfo) {
 	(void)dowildcard;
 	if (pargc != NULL)
 		*pargc = *libc___p___argc();
@@ -1769,8 +1770,8 @@ static_assert(POLL_ERR < (N_SYS_POLLLIST + 1));
 static_assert(POLL_PRI < (N_SYS_POLLLIST + 1));
 static_assert(POLL_HUP < (N_SYS_POLLLIST + 1));
 
-PRIVATE ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL NONNULL((1)) char const **LIBCCALL
-libc_siginfolist_init(char const **list, unsigned int count, signo_t signo) {
+PRIVATE ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL NONNULL((1)) char const **
+NOTHROW(LIBCCALL libc_siginfolist_init)(char const **list, unsigned int count, signo_t signo) {
 	if (!list[count - 1]) {
 		unsigned int i;
 		for (i = 0; i < count; ++i) {

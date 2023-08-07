@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9eb716a */
+/* HASH CRC-32:0x72e0926f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,13 +36,13 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_crt_difftime
 #ifndef __local___localdep_difftime64_defined
 #define __local___localdep_difftime64_defined
 #if defined(__CRT_HAVE_difftime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),difftime,(__time1,__time0))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),difftime,(__time1,__time0))
 #elif defined(__CRT_HAVE_difftime64)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),difftime64,(__time1,__time0))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),difftime64,(__time1,__time0))
 #elif defined(__CRT_HAVE__difftime64)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),_difftime64,(__time1,__time0))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),_difftime64,(__time1,__time0))
 #elif defined(__CRT_HAVE___difftime64)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),__difftime64,(__time1,__time0))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),__difftime64,(__time1,__time0))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/difftime64.h>
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_difftime64_defined */
 __LOCAL_LIBC(difftime) __ATTR_CONST __ATTR_WUNUSED double
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(difftime))(__time_t __time1, __time_t __time0) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(difftime))(__time_t __time1, __time_t __time0) {
 #if defined(__CRT_HAVE_difftime) || defined(__CRT_HAVE__difftime32)
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_difftime32)((__time32_t)__time1, (__time32_t)__time0);
 #else /* __CRT_HAVE_difftime || __CRT_HAVE__difftime32 */

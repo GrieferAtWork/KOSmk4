@@ -40,8 +40,8 @@
 
 DECL_BEGIN
 
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) void *
-NOTHROW_NCX(FCALL libc_get_libiconv_symbol)(char const *__restrict name);
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) void *FCALL
+libc_get_libiconv_symbol(char const *__restrict name);
 #define DEFINE_LIBICONV_SYMBOL_BINDING(T, name)                                        \
 	PRIVATE ATTR_SECTION(".bss.crt.dos.mbstring") T pdyn_##name               = NULL;  \
 	PRIVATE ATTR_SECTION(".rodata.crt.dos.mbstring") char const name_##name[] = #name; \

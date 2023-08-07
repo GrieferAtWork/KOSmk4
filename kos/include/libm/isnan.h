@@ -45,7 +45,7 @@ __DECL_BEGIN
  */
 
 __LIBM_LOCAL_FUNC(isnanf) __ATTR_WUNUSED __ATTR_CONST int
-(__LIBCCALL __ieee754_isnanf)(__IEEE754_FLOAT_TYPE__ __x) {
+__NOTHROW(__LIBCCALL __ieee754_isnanf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__int32_t __ix;
 	__LIBM_GET_FLOAT_WORD(__ix, __x);
 	__ix &= 0x7fffffff;
@@ -67,7 +67,7 @@ __LIBM_LOCAL_FUNC(isnanf) __ATTR_WUNUSED __ATTR_CONST int
  */
 
 __LIBM_LOCAL_FUNC(isnan) __ATTR_WUNUSED __ATTR_CONST int
-(__LIBCCALL __ieee754_isnan)(__IEEE754_DOUBLE_TYPE__ __x) {
+__NOTHROW(__LIBCCALL __ieee754_isnan)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__int32_t __hx, __lx;
 	__LIBM_EXTRACT_WORDS(__hx, __lx, __x);
 	__hx &= 0x7fffffff;
@@ -82,7 +82,7 @@ __LIBM_LOCAL_FUNC(isnan) __ATTR_WUNUSED __ATTR_CONST int
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
 __LIBM_LOCAL_FUNC(isnanl) __ATTR_WUNUSED __ATTR_CONST int
-(__LIBCCALL __ieee854_isnanl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
+__NOTHROW(__LIBCCALL __ieee854_isnanl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__int32_t __se, __hx, __lx;
 	__LIBM_GET_LDOUBLE_WORDS(__se, __hx, __lx, __x);
 	__se = (__se & 0x7fff) << 1;

@@ -26,6 +26,7 @@
 #include <kos/syscalls.h>
 
 #include <syscall.h>
+#include <time.h>
 
 #include "sys.poll.h"
 
@@ -43,7 +44,7 @@ NOTHROW_RPC(LIBCCALL libc_poll)(struct pollfd *fds,
 	if (timeout < 0)
 		return ppoll64(fds, nfds, NULL, NULL);
 	tms.tv_sec  = (unsigned int)timeout / 1000;
-	tms.tv_nsec = ((unsigned int)timeout % 1000) * (__NSEC_PER_SEC / 1000);
+	tms.tv_nsec = ((unsigned int)timeout % 1000) * (NSEC_PER_SEC / 1000);
 	return ppoll64(fds, nfds, &tms, NULL);
 }
 /*[[[end:libc_poll]]]*/

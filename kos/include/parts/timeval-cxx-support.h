@@ -23,7 +23,7 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#if defined(__cplusplus) && defined(__USE_KOS)
+#if defined(__cplusplus) && defined(__USE_KOS) && !defined(__CHECKER__)
 #include <__stdcxx.h>
 
 #include <hybrid/__overflow.h>
@@ -172,7 +172,7 @@
 
 #define __TIMEVAL_CXX_SUPPORT2(SIZEOF_T, T, TV_SEC_TYPE, TV_USEC_TYPE) \
 	__CXX_CLASSMEMBER __NOBLOCK T                                      \
-	operator*(unsigned int __n, T const &__tmv)__CXX_NOEXCEPT {        \
+	operator*(unsigned int __n, T const &__tmv) __CXX_NOEXCEPT {       \
 		return __tmv * __n;                                            \
 	}
 #else /* __cplusplus && __USE_KOS */

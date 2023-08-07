@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x300afbbe */
+/* HASH CRC-32:0xdeab04b6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -225,8 +225,8 @@ overflow:
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_CONST WUNUSED double
-NOTHROW_NCX(LIBCCALL libc_difftime)(time_t time1,
-                                    time_t time0) {
+NOTHROW(LIBCCALL libc_difftime)(time_t time1,
+                                time_t time0) {
 
 
 
@@ -362,8 +362,8 @@ DEFINE_INTERN_ALIAS(libc_difftime64, libc_difftime);
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_CONST WUNUSED double
-NOTHROW_NCX(LIBCCALL libc_difftime64)(time64_t time1,
-                                      time64_t time0) {
+NOTHROW(LIBCCALL libc_difftime64)(time64_t time1,
+                                  time64_t time0) {
 
 
 

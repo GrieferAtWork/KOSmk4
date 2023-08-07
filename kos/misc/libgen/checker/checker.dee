@@ -743,6 +743,10 @@ default_case:
 						this.err(f"Duplicate c++ struct member function `{fieldName}'");
 					/* Parse extra const/volatile qualifiers (these will apply to the this-symbol) */
 					parseCTypeRefConstVolatile(fieldType);
+					if (this.tok == "noexcept") {
+						fieldType.attribNothrow = "0";
+						this.next();
+					}
 					local bodyInit: Bytes | none;
 					local bodyDecl: (string, int, int);
 					if (this.tok == ";") {
@@ -1645,8 +1649,7 @@ prefix_again:
 		} else {
 			/* Parse variable name */
 			if (!name && this.tok.issymbol()) {
-				name = this.tok;
-				this.next();
+				name = parseSymbolOrOperatorName();
 				parseCTypeRefAttributes(tr);
 			}
 			result = (tr, name);
@@ -1656,6 +1659,21 @@ prefix_again:
 		parseTypeRefInnerSuffix(tr);
 		parseCTypeRefAttributes(tr);
 
+		return result;
+	}
+
+	function parseSymbolOrOperatorName(): string {
+		local result = this.tok;
+		this.next();
+		if (result == "operator" && cxx) {
+			local tok = this.tok;
+			if (tok in OPERATORS1_BY_NAME ||
+			    tok in OPERATORS2_BY_NAME ||
+			    (tok.endswith("=") && tok[:-1] in OPERATORS2_BY_NAME)) {
+				result += tok;
+				this.next();
+			}
+		}
 		return result;
 	}
 
@@ -2920,11 +2938,19 @@ after_field_init:
 
 	function parseSkipUntil(oneOfTheseTokens: {string...}) {
 		local recursionStack: {string...} = [];
+		this.pushWarnLocationOverride(this.flc);
 		for (;;) {
 			if (!recursionStack && (this.tok in oneOfTheseTokens))
 				break;
 			switch (this.tok) {
-			case "(": case "<":
+			case "":
+				this.err(f"Did not encounter `{oneOfTheseTokens}' before EOF");
+				break;
+			case "<":
+				if (recursionStack || ">" !in oneOfTheseTokens)
+					break;
+				/* FALLTHRU */
+			case "(":
 			case "[": case "{":
 				recursionStack.append({
 					"(": ")",
@@ -2943,6 +2969,7 @@ after_field_init:
 			}
 			this.next();
 		}
+		this.popWarnLocationOverride();
 	}
 
 	@@Skip over `__attribute__((...))` and `[[...]]`
@@ -3943,6 +3970,8 @@ return_C_voidval:
 				: 0;
 			if (!isUnreachable) {
 				currentTryBlockExceptions.insert(exceptCode);
+				if (exceptCode > 0xffff)
+					currentTryBlockExceptions.insert(exceptCode & 0xffff); /* Implied super-class */
 				if (!isInTryBlock) {
 					/* Assert that `exceptCode' is part of the caller's throws-attribute */
 					verifyTopLevelThrows({exceptCode} as Set,

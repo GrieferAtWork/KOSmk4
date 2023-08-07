@@ -138,7 +138,7 @@ INTDEF LPMATHERR libc_pdyn_matherr; /* From "libc/matherr.c" */
 
 
 DEFINE_PUBLIC_ALIAS(__setusermatherr, libc___setusermatherr);
-INTERN ATTR_SECTION(".text.crt.dos.application.init") void
+INTERN ATTR_SECTION(".text.crt.dos.application.init") NONNULL((1)) void
 NOTHROW_NCX(LIBKCALL libc___setusermatherr)(int (LIBKCALL *fptr)(struct _exception *)) {
 	/* We've already asserted  that DOS's `struct _exception'  and
 	 * our `STRUCT_EXCEPTION'  are  binary  compatible  (s.a.  the
@@ -166,7 +166,7 @@ libd_usermatherr_wrapper(STRUCT_EXCEPTION *exc) {
 }
 
 DEFINE_PUBLIC_ALIAS(DOS$__setusermatherr, libd___setusermatherr);
-INTERN ATTR_SECTION(".text.crt.dos.application.init") void
+INTERN ATTR_SECTION(".text.crt.dos.application.init") NONNULL((1)) void
 NOTHROW_NCX(LIBDCALL libd___setusermatherr)(int (LIBDCALL *fptr)(struct _exception *)) {
 	/* Assign the function pointer to-be called by the wrapper. */
 	libd_usermatherr_fptr = fptr;

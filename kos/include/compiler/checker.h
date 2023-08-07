@@ -549,7 +549,7 @@
 #define __atomic_load(ptr, p_ret, memorder)            (void)(__builtin_void(*(p_ret)) = __builtin_rvoid(*(ptr)))
 #define __atomic_store_n(ptr, val, memorder)           (void)(__builtin_void(*(ptr)) = (val))
 #define __atomic_store(ptr, p_val, memorder)           (void)(__builtin_void(*(ptr)) = *(p_val))
-#define __atomic_exchange_n(ptr, val, memorder)        __builtin_rvoid(__builtin_void(*(ptr)) += (val))
+#define __atomic_exchange_n(ptr, val, memorder)        __builtin_rvoid(__builtin_void(*(ptr)) = (val))
 #define __atomic_exchange(ptr, p_val, p_ret, memorder) (void)(*(p_ret) = __atomic_exchange_n(ptr, *(p_val), memorder))
 #define __atomic_compare_exchange_n(ptr, p_expected, desired, weak, success_memorder, failure_memorder) \
 	(!__builtin_rvoid(__builtin_void(*(ptr)) = __builtin_rvoid(*(p_expected) = 0)))

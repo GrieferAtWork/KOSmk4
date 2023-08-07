@@ -39,8 +39,8 @@ __DECL_END
 #include <libm/isnan.h>
 __DECL_BEGIN
 __LIBM_LOCAL_FUNC(isunorderedf) __ATTR_WUNUSED __ATTR_CONST __BOOL
-(__LIBCCALL __ieee754_isunorderedf)(__IEEE754_FLOAT_TYPE__ __u,
-                                    __IEEE754_FLOAT_TYPE__ __v) {
+__NOTHROW(__LIBCCALL __ieee754_isunorderedf)(__IEEE754_FLOAT_TYPE__ __u,
+                                             __IEEE754_FLOAT_TYPE__ __v) {
 	return __ieee754_isnanf(__u) || __ieee754_isnanf(__v);
 }
 #endif /* !__ieee754_isunorderedf */
@@ -88,8 +88,8 @@ __DECL_END
 #include <libm/isnan.h>
 __DECL_BEGIN
 __LIBM_LOCAL_FUNC(isunordered) __ATTR_WUNUSED __ATTR_CONST __BOOL
-(__LIBCCALL __ieee754_isunordered)(__IEEE754_DOUBLE_TYPE__ __u,
-                                   __IEEE754_DOUBLE_TYPE__ __v) {
+__NOTHROW(__LIBCCALL __ieee754_isunordered)(__IEEE754_DOUBLE_TYPE__ __u,
+                                            __IEEE754_DOUBLE_TYPE__ __v) {
 	return __ieee754_isnan(__u) || __ieee754_isnan(__v);
 }
 #endif /* !__ieee754_isunordered */
@@ -137,8 +137,8 @@ __DECL_END
 #include <libm/isnan.h>
 __DECL_BEGIN
 __LIBM_LOCAL_FUNC(isunorderedl) __ATTR_WUNUSED __ATTR_CONST __BOOL
-(__LIBCCALL __ieee854_isunorderedl)(__IEEE854_LONG_DOUBLE_TYPE__ __u,
-                                    __IEEE854_LONG_DOUBLE_TYPE__ __v) {
+__NOTHROW(__LIBCCALL __ieee854_isunorderedl)(__IEEE854_LONG_DOUBLE_TYPE__ __u,
+                                             __IEEE854_LONG_DOUBLE_TYPE__ __v) {
 	return __ieee854_isnanl(__u) || __ieee854_isnanl(__v);
 }
 #endif /* !__ieee854_isunorderedl */

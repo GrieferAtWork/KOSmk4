@@ -50,29 +50,29 @@ global C_int;
 
 
 class CType: WeakRefAble {
-	operator == (other) { return other is CType; }
-	operator != (other) { return other !is CType; }
-	operator str() -> this.tostr();
+	public operator == (other) { return other is CType; }
+	public operator != (other) { return other !is CType; }
+	public operator str() -> this.tostr();
 
-	// function dumpValue(checker: Checker, data: Bytes, offset: int, indent: int = -1): string;
-	// function tostr(varname: string = ""): string;
-	// property sizeof: int;
-	property alignof: int = { get(): int -> this.sizeof; };
-	property unwindWeakRef: CType = { get(): CType -> this; };
+	// public function dumpValue(checker: Checker, data: Bytes, offset: int, indent: int = -1): string;
+	// public function tostr(varname: string = ""): string;
+	// public property sizeof: int;
+	public property alignof: int = { get(): int -> this.sizeof; };
+	public property unwindWeakRef: CType = { get(): CType -> this; };
 
 	@@Check if this type can be converted to @other
-	function isConvertibleTo(other: CType, explicit: bool = false): bool {
+	public function isConvertibleTo(other: CType, explicit: bool = false): bool {
 		return IDENTICAL(this, other);
 	}
 
 	@@Fix nonsensical attributes an warn where their presence is a user-error.
-	function fixNonsensicalAttributes(checker: Checker) {
+	public function fixNonsensicalAttributes(checker: Checker) {
 	}
 
 	@@Import added attributes/annotations during a re-declaration, and warn about this
-	function redeclarationImport(checker: Checker, other: CType,
-	                             newName: string = "", oldName: string = "",
-	                             oldDeclFlc: (string, int, int) | none = none) {
+	public function redeclarationImport(checker: Checker, other: CType,
+	                                    newName: string = "", oldName: string = "",
+	                                    oldDeclFlc: (string, int, int) | none = none) {
 	}
 }
 
@@ -1542,7 +1542,6 @@ final class CFunctionType: CType {
 	                             newName: string = "", oldName: string = "",
 	                             oldDeclFlc: (string, int, int) | none = none) {
 		returnType.redeclarationImport(checker, other.returnType, newName, oldName, oldDeclFlc);
-		assert #args == #other.args;
 		if (other.defaults) {
 			/* Default arguments can only be declared *once* */
 			if (checker.ignoreDuplicateDefaultArgumentDeclarations) {
@@ -1555,7 +1554,8 @@ final class CFunctionType: CType {
 					f"present in previous declaration of `{newName}'");
 			}
 		}
-		for (local i: [:#args]) {
+		local argc = {#args, #other.args} < ...;
+		for (local i: [:argc]) {
 			local argTypeRef: CTypeRef;
 			local argName: string;
 			argTypeRef, argName = args[i]...;

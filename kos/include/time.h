@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54bb68bf */
+/* HASH CRC-32:0xbe636abe */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -524,30 +524,30 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(time, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT_
 #ifdef __difftime_defined
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-__NAMESPACE_GLB_USING_OR_IMPL(difftime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL difftime)(time_t __time1, time_t __time0) { return :: difftime(__time1, __time0); })
+__NAMESPACE_GLB_USING_OR_IMPL(difftime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL difftime)(time_t __time1, time_t __time0) { return :: difftime(__time1, __time0); })
 #elif defined(__CRT_HAVE_difftime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,difftime,(time_t __time1, time_t __time0),(__time1,__time0))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,difftime,(time_t __time1, time_t __time0),(__time1,__time0))
 #elif defined(__CRT_HAVE__difftime32) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,difftime,(time_t __time1, time_t __time0),_difftime32,(__time1,__time0))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,difftime,(time_t __time1, time_t __time0),_difftime32,(__time1,__time0))
 #elif defined(__CRT_HAVE_difftime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,difftime,(time_t __time1, time_t __time0),difftime64,(__time1,__time0))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,difftime,(time_t __time1, time_t __time0),difftime64,(__time1,__time0))
 #elif defined(__CRT_HAVE__difftime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,difftime,(time_t __time1, time_t __time0),_difftime64,(__time1,__time0))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,difftime,(time_t __time1, time_t __time0),_difftime64,(__time1,__time0))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/time/difftime.h>
 __NAMESPACE_STD_BEGIN
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(difftime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL difftime)(time_t __time1, time_t __time0) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(difftime))(__time1, __time0); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(difftime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL difftime)(time_t __time1, time_t __time0) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(difftime))(__time1, __time0); })
 #endif /* !... */
 #endif /* !__std_difftime_defined */
 #endif /* !__NO_FPU */
@@ -828,24 +828,24 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(time64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OU
 #if defined(__CRT_HAVE_difftime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,difftime64,(__time64_t __time1, __time64_t __time0),difftime,(__time1,__time0))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,difftime64,(__time64_t __time1, __time64_t __time0),difftime,(__time1,__time0))
 #elif defined(__CRT_HAVE_difftime64)
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,difftime64,(__time64_t __time1, __time64_t __time0),(__time1,__time0))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,difftime64,(__time64_t __time1, __time64_t __time0),(__time1,__time0))
 #elif defined(__CRT_HAVE__difftime64)
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,difftime64,(__time64_t __time1, __time64_t __time0),_difftime64,(__time1,__time0))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,difftime64,(__time64_t __time1, __time64_t __time0),_difftime64,(__time1,__time0))
 #elif defined(__CRT_HAVE___difftime64)
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,difftime64,(__time64_t __time1, __time64_t __time0),__difftime64,(__time1,__time0))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,difftime64,(__time64_t __time1, __time64_t __time0),__difftime64,(__time1,__time0))
 #else /* ... */
 #include <libc/local/time/difftime64.h>
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(difftime64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL difftime64)(__time64_t __time1, __time64_t __time0) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(difftime64))(__time1, __time0); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(difftime64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL difftime64)(__time64_t __time1, __time64_t __time0) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(difftime64))(__time1, __time0); })
 #endif /* !... */
 #endif /* !__difftime64_defined */
 #endif /* !__NO_FPU */
@@ -2153,24 +2153,24 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LI
 #if defined(__CRT_HAVE_difftime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,_difftime64,(__time64_t __time1, __time64_t __time0),difftime,(__time1,__time0))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_difftime64,(__time64_t __time1, __time64_t __time0),difftime,(__time1,__time0))
 #elif defined(__CRT_HAVE_difftime64)
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,_difftime64,(__time64_t __time1, __time64_t __time0),difftime64,(__time1,__time0))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_difftime64,(__time64_t __time1, __time64_t __time0),difftime64,(__time1,__time0))
 #elif defined(__CRT_HAVE__difftime64)
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,_difftime64,(__time64_t __time1, __time64_t __time0),(__time1,__time0))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_difftime64,(__time64_t __time1, __time64_t __time0),(__time1,__time0))
 #elif defined(__CRT_HAVE___difftime64)
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,_difftime64,(__time64_t __time1, __time64_t __time0),__difftime64,(__time1,__time0))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_difftime64,(__time64_t __time1, __time64_t __time0),__difftime64,(__time1,__time0))
 #else /* ... */
 #include <libc/local/time/difftime64.h>
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL _difftime64)(__time64_t __time1, __time64_t __time0) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(difftime64))(__time1, __time0); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _difftime64)(__time64_t __time1, __time64_t __time0) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(difftime64))(__time1, __time0); }
 #endif /* !... */
 #endif /* !__NO_FPU */
 #ifdef __CRT_HAVE_localtime
