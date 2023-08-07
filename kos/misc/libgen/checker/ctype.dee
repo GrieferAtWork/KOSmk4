@@ -74,6 +74,10 @@ class CType: WeakRefAble {
 	                                    newName: string = "", oldName: string = "",
 	                                    oldDeclFlc: (string, int, int) | none = none) {
 	}
+	public function binaryRedeclarationImport(checker: Checker, other: CType,
+	                                          newName: string = "", oldName: string = "",
+	                                          oldDeclFlc: (string, int, int) | none = none) {
+	}
 }
 
 global final CTYPEREF_FLAG_CONST    = 0x0001;
@@ -102,6 +106,14 @@ global final CTYPEREF_FLAG_PACKED = 0x8000;
 global final CTYPEREF_FLAG_RELEVANT_FOR_EQUALITY =
 	CTYPEREF_FLAG_CONST | CTYPEREF_FLAG_VOLATILE |
 	CTYPEREF_FLAG_RESTRICT;
+
+
+@@Flags that can only be added (but not removed) during binary redeclaration
+global final CTYPEREF_FLAG_BINARY_REDECL_ADDONLY = CTYPEREF_FLAG_RESTRICT | CTYPEREF_FLAG_NONNULL;
+
+@@Flags that can only be removed (but not added) during binary redeclaration
+global final CTYPEREF_FLAG_BINARY_REDECL_REMONLY = CTYPEREF_FLAG_NORETURN;
+
 
 global final CTYPEREF_FLAGNAMES_KEYWORD: {int: string} = {
 	CTYPEREF_FLAG_CONST    : "const",
@@ -552,8 +564,71 @@ final class CTypeRef {
 			}
 			checker.warn("-Wdecl", message);
 		}
-		if (type(typ) === type(other.typ))
-			typ.redeclarationImport(checker, other.typ, newName, oldName, oldDeclFlc);
+		assert type(typ) === type(other.typ);
+		typ.redeclarationImport(checker, other.typ, newName, oldName, oldDeclFlc);
+	}
+
+	@@Similar to @redeclarationImport, but used to check attributes when doing a
+	@@re-declaration of a function where only binary compatibility is necessary,
+	@@where @other is the (possibly less restrictive) binary-compatible type.
+	function binaryRedeclarationImport(checker: Checker, other: CTypeRef,
+	                                   newName: string = "", oldName: string = "",
+	                                   oldDeclFlc: (string, int, int) | none = none) {
+		/* Check for changed flags. */
+		local flagsRemoved: int = 0;
+		local flagsAdded: int = 0;
+		if (flags != other.flags) {
+			flagsRemoved = (flags & ~other.flags) & CTYPEREF_FLAG_BINARY_REDECL_ADDONLY;
+			flagsAdded   = (other.flags & ~flags) & CTYPEREF_FLAG_BINARY_REDECL_REMONLY;
+		}
+
+		/* Check for changed attributes. */
+		local attribRemoved: {string...} = [];
+		local attribAdded: {string...} = [];
+		local oldNothrow: string | none = attribNothrow;
+		local newNothrow: string | none = other.attribNothrow;
+		if (oldNothrow !is none && newNothrow !is none && !newNothrow.startswith("*")) {
+			if (oldNothrow.startswith("*") || int(oldNothrow) > int(newNothrow)) {
+				attribRemoved.append(f"nothrow({oldNothrow})");
+				attribAdded.append(f"nothrow({newNothrow})");
+			}
+		}
+
+		/* Warnings for attributes that weren't present during the initial declaration. */
+		if (flagsRemoved || flagsAdded || attribRemoved || attribAdded) {
+			local addedKeywords: string = "";
+			local removedKeywords: string = "";
+			if (flagsAdded) {
+				if (attribAdded !is List)
+					attribAdded = List(attribAdded);
+				addedKeywords = " ".join(CTYPEREF_FLAGNAMES_TOSTR(CTYPEREF_FLAGNAMES_KEYWORD, flagsAdded));
+				attribAdded.extend(CTYPEREF_FLAGNAMES_TOSTR(CTYPEREF_FLAGNAMES_ATTRIB, flagsAdded));
+			}
+			if (flagsRemoved) {
+				if (attribRemoved !is List)
+					attribRemoved = List(attribRemoved);
+				removedKeywords = " ".join(CTYPEREF_FLAGNAMES_TOSTR(CTYPEREF_FLAGNAMES_KEYWORD, flagsRemoved));
+				attribRemoved.extend(CTYPEREF_FLAGNAMES_TOSTR(CTYPEREF_FLAGNAMES_ATTRIB, flagsRemoved));
+			}
+			if (attribAdded)
+				addedKeywords = f"__attribute__(({', '.join(attribAdded)})) {addedKeywords}".rstrip();
+			if (attribRemoved)
+				removedKeywords = f"__attribute__(({', '.join(attribRemoved)})) {removedKeywords}".rstrip();
+			local message = f"binary redeclaration of `{newName}' with different attributes: ";
+			if (addedKeywords && removedKeywords) {
+				message += f"added `{addedKeywords}' & removed `{removedKeywords}'";
+			} else if (addedKeywords) {
+				message += f"added `{addedKeywords}'";
+			} else {
+				message += f"removed `{removedKeywords}'";
+			}
+			if (oldDeclFlc !is none) {
+				message += checker.forceFormatMessageAddend(
+					oldDeclFlc, f"See previous declaration of `{oldName}'");
+			}
+			checker.warn("-Wdecl", message);
+		}
+		typ.binaryRedeclarationImport(checker, other.typ, newName, oldName, oldDeclFlc);
 	}
 
 	@@Import specifications from a fixed @typedef into @this
@@ -594,6 +669,8 @@ final class CTypeRef {
 	@@e.g. `__attribute((noreturn)) int i;`
 	function fixNonsensicalAttributes(checker: Checker) {
 		local typ: CType = this.typ;
+		if (typ is WeakRef)
+			typ = typ.value;
 		local attrib: CTypeAttributes | none = this.attrib;
 		local shouldWarn: CTypeRef | none = none;
 		if (typ is CFunctionType) {
@@ -677,6 +754,8 @@ final class CTypeRef {
 	@@Same as @fixNonsensicalAttributes, but called when @this @CTypeRef is the base of a @CPointerType
 	function fixNonsensicalPointerBaseAttributes(checker: Checker) {
 		local typ: CType = this.typ;
+		if (typ is WeakRef)
+			typ = typ.value;
 		local attrib: CTypeAttributes | none = this.attrib;
 		local shouldWarn: CTypeRef | none = none;
 
@@ -1192,6 +1271,21 @@ global final C_UNSIGNED: {CCoreType: CCoreType} = UniqueDict.Frozen({
 	C_int128_t_align8: C_uint128_t_align8,
 });
 
+function _pointerOrLValueBinaryRedeclarationImport(oldTypeBase: CType,
+                                                   checker: Checker, newType: CType,
+                                                   newName: string = "", oldName: string = "",
+                                                   oldDeclFlc: (string, int, int) | none = none) {
+	if (newType is CPointerType || newType is CLValueType) {
+		return oldTypeBase.binaryRedeclarationImport(
+			checker, newType.base, "*" + newName, "*" + oldName, oldDeclFlc);
+	} else {
+		checker.warn("-Wdecl",
+			f"Redeclaration as `{newType.tostr(newName)}'"
+			f"{checker.formatMessageAddend(oldDeclFlc,
+				f'previously declared as `{oldTypeBase.tostr("*" + oldName)}\'')}");
+	}
+}
+
 class CPointerType: CType {
 	this = default;
 
@@ -1215,6 +1309,10 @@ class CPointerType: CType {
 	                             newName: string = "", oldName: string = "",
 	                             oldDeclFlc: (string, int, int) | none = none)
 		-> base.redeclarationImport(checker, other.base, newName, oldName, oldDeclFlc);
+	function binaryRedeclarationImport(checker: Checker, other: CType,
+	                                   newName: string = "", oldName: string = "",
+	                                   oldDeclFlc: (string, int, int) | none = none)
+		-> _pointerOrLValueBinaryRedeclarationImport(base, checker, other, newName, oldName, oldDeclFlc);
 
 	function tostr(varname: string = ""): string {
 		return base.tostr("*" + varname);
@@ -1286,6 +1384,10 @@ class CLValueType: CType {
 	                             newName: string = "", oldName: string = "",
 	                             oldDeclFlc: (string, int, int) | none = none)
 		-> base.redeclarationImport(checker, other.base, newName, oldName, oldDeclFlc);
+	function binaryRedeclarationImport(checker: Checker, other: CType,
+	                                   newName: string = "", oldName: string = "",
+	                                   oldDeclFlc: (string, int, int) | none = none)
+		-> _pointerOrLValueBinaryRedeclarationImport(base, checker, other, newName, oldName, oldDeclFlc);
 
 	function tostr(varname: string = ""): string {
 		return base.tostr("&" + varname);
@@ -1541,6 +1643,7 @@ final class CFunctionType: CType {
 	function redeclarationImport(checker: Checker, other: CType,
 	                             newName: string = "", oldName: string = "",
 	                             oldDeclFlc: (string, int, int) | none = none) {
+		assert #args == #other.args;
 		returnType.redeclarationImport(checker, other.returnType, newName, oldName, oldDeclFlc);
 		if (other.defaults) {
 			/* Default arguments can only be declared *once* */
@@ -1554,8 +1657,7 @@ final class CFunctionType: CType {
 					f"present in previous declaration of `{newName}'");
 			}
 		}
-		local argc = {#args, #other.args} < ...;
-		for (local i: [:argc]) {
+		for (local i: [:#args]) {
 			local argTypeRef: CTypeRef;
 			local argName: string;
 			argTypeRef, argName = args[i]...;
@@ -1568,6 +1670,30 @@ final class CFunctionType: CType {
 			if (!otherArgName)
 				otherArgName = argName;
 			argTypeRef.redeclarationImport(checker, other.args[i].first,
+					f"{newName}.{argName}",
+					f"{oldName}.{otherArgName}",
+					oldDeclFlc);
+		}
+	}
+
+	function binaryRedeclarationImport(checker: Checker, other: CType,
+	                                   newName: string = "", oldName: string = "",
+	                                   oldDeclFlc: (string, int, int) | none = none) {
+		returnType.binaryRedeclarationImport(checker, other.returnType, newName, oldName, oldDeclFlc);
+		local commonArgc = { #args, #other.args } < ...;
+		for (local i: [:commonArgc]) {
+			local argTypeRef: CTypeRef;
+			local argName: string;
+			argTypeRef, argName = args[i]...;
+			local otherArgName = other.args[i].last;
+			if (!argName) {
+				/* Lazily import argument names when not already defined. */
+				argName = otherArgName;
+				args[i] = (argTypeRef, argName);
+			}
+			if (!otherArgName)
+				otherArgName = argName;
+			argTypeRef.binaryRedeclarationImport(checker, other.args[i].first,
 					f"{newName}.{argName}",
 					f"{oldName}.{otherArgName}",
 					oldDeclFlc);

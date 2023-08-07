@@ -4966,14 +4966,31 @@ again:
 							if (newSymbol is COverloadedFunctionSymbol) {
 								for (local overloadedNewSymbol: newSymbol.overloads) {
 									newSymbolTypeRef = overloadedNewSymbol.typeref;
-									if (binaryConvertibleTo(this, oldSymbolTypeRef.typ, newSymbolTypeRef.typ)) {
+									if (oldSymbolTypeRef.redeclarationEquals(newSymbolTypeRef)) {
 										newSymbol = overloadedNewSymbol;
 										goto do_import_from_newSymbolTypeRef;
 									}
 								}
 							} else {
-								if (binaryConvertibleTo(this, oldSymbolTypeRef.typ, newSymbolTypeRef.typ))
+								if (oldSymbolTypeRef.redeclarationEquals(newSymbolTypeRef))
 									goto do_import_from_newSymbolTypeRef;
+							}
+						}
+					}
+					for (oldSymbol: oldSymbol.overloads) {
+						if (oldSymbol is CSymbol) {
+							oldSymbolTypeRef = oldSymbol.typeref;
+							if (newSymbol is COverloadedFunctionSymbol) {
+								for (local overloadedNewSymbol: newSymbol.overloads) {
+									newSymbolTypeRef = overloadedNewSymbol.typeref;
+									if (binaryConvertibleTo(this, oldSymbolTypeRef.typ, newSymbolTypeRef.typ)) {
+										newSymbol = overloadedNewSymbol;
+										goto do_import_from_binary_newSymbolTypeRef;
+									}
+								}
+							} else {
+								if (binaryConvertibleTo(this, oldSymbolTypeRef.typ, newSymbolTypeRef.typ))
+									goto do_import_from_binary_newSymbolTypeRef;
 							}
 						}
 					}
@@ -4982,15 +4999,30 @@ again:
 					for (newSymbol: newSymbol.overloads) {
 						if (newSymbol is CSymbol) {
 							newSymbolTypeRef = newSymbol.typeref;
+							if (oldSymbolTypeRef.redeclarationEquals(newSymbolTypeRef))
+								goto do_import_from_binary_newSymbolTypeRef;
+						}
+					}
+					for (newSymbol: newSymbol.overloads) {
+						if (newSymbol is CSymbol) {
+							newSymbolTypeRef = newSymbol.typeref;
 							if (binaryConvertibleTo(this, oldSymbolTypeRef.typ, newSymbolTypeRef.typ))
-								goto do_import_from_newSymbolTypeRef;
+								goto do_import_from_binary_newSymbolTypeRef;
 						}
 					}
 					goto warn_incompatible;
 				}
-				if (binaryConvertibleTo(this, oldSymbolTypeRef.typ, newSymbolTypeRef.typ)) {
+				if (oldSymbolTypeRef.redeclarationEquals(newSymbolTypeRef)) {
 do_import_from_newSymbolTypeRef:
 					deepcopy(oldSymbolTypeRef).redeclarationImport(this, newSymbolTypeRef,
+						newSymbolName, oldSymbolName, oldSymbol.decl);
+				} else if (binaryConvertibleTo(this, oldSymbolTypeRef.typ, newSymbolTypeRef.typ)) {
+do_import_from_binary_newSymbolTypeRef:
+					/* Use a different method here that only warns about stuff like NOTHROW
+					 * being  added,  but doesn't  warn  about it  being  removed. Example:
+					 * >> // It's OK to define a NOTHROW+CONST function to implement a NOTHROW_NCX+PURE one.
+					 * >> DEFINE_PUBLIC_ALIAS(islower_l, libc_islower); */
+					deepcopy(oldSymbolTypeRef).binaryRedeclarationImport(this, newSymbolTypeRef,
 						newSymbolName, oldSymbolName, oldSymbol.decl);
 				} else {
 warn_incompatible:
