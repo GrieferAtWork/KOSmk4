@@ -77,10 +77,10 @@ DEFINE_PUBLIC_ALIAS(_mb_shift, libc__mb_shift);
 
 
 
-/*[[[head:libc_fgetwc_unlocked,hash:CRC-32=0x26533e4b]]]*/
+/*[[[head:libc_fgetwc_unlocked,hash:CRC-32=0xa9490e1d]]]*/
 /* >> fgetwc(3), getwc(3), fgetwc_unlocked(3), getwc_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.getc") ATTR_INOUT(1) wint32_t
-NOTHROW_CB(LIBKCALL libc_fgetwc_unlocked)(FILE *__restrict stream)
+NOTHROW_CB_NCX(LIBKCALL libc_fgetwc_unlocked)(FILE *__restrict stream)
 /*[[[body:libc_fgetwc_unlocked]]]*/
 {
 	wint32_t result;
@@ -120,10 +120,10 @@ done:
 }
 /*[[[end:libc_fgetwc_unlocked]]]*/
 
-/*[[[head:libd_fgetwc_unlocked,hash:CRC-32=0x3d479085]]]*/
+/*[[[head:libd_fgetwc_unlocked,hash:CRC-32=0x4364e3d1]]]*/
 /* >> fgetwc(3), getwc(3), fgetwc_unlocked(3), getwc_unlocked(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.getc") ATTR_INOUT(1) wint16_t
-NOTHROW_CB(LIBDCALL libd_fgetwc_unlocked)(FILE *__restrict stream)
+NOTHROW_CB_NCX(LIBDCALL libd_fgetwc_unlocked)(FILE *__restrict stream)
 /*[[[body:libd_fgetwc_unlocked]]]*/
 {
 	wint16_t result;
@@ -175,10 +175,10 @@ done:
 }
 /*[[[end:libd_fgetwc_unlocked]]]*/
 
-/*[[[head:libc_fgetwc,hash:CRC-32=0xe65beac7]]]*/
+/*[[[head:libc_fgetwc,hash:CRC-32=0xba9e9f8e]]]*/
 /* >> fgetwc(3), getwc(3), fgetwc_unlocked(3), getwc_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.getc") ATTR_INOUT(1) wint32_t
-NOTHROW_CB(LIBKCALL libc_fgetwc)(FILE *__restrict stream)
+NOTHROW_CB_NCX(LIBKCALL libc_fgetwc)(FILE *__restrict stream)
 /*[[[body:libc_fgetwc]]]*/
 {
 	wint32_t result;
@@ -196,10 +196,10 @@ NOTHROW_CB(LIBKCALL libc_fgetwc)(FILE *__restrict stream)
 }
 /*[[[end:libc_fgetwc]]]*/
 
-/*[[[head:libd_fgetwc,hash:CRC-32=0xd70f83c6]]]*/
+/*[[[head:libd_fgetwc,hash:CRC-32=0x21a94341]]]*/
 /* >> fgetwc(3), getwc(3), fgetwc_unlocked(3), getwc_unlocked(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.getc") ATTR_INOUT(1) wint16_t
-NOTHROW_CB(LIBDCALL libd_fgetwc)(FILE *__restrict stream)
+NOTHROW_CB_NCX(LIBDCALL libd_fgetwc)(FILE *__restrict stream)
 /*[[[body:libd_fgetwc]]]*/
 {
 	wint16_t result;
@@ -332,11 +332,11 @@ NOTHROW_NCX(LIBDCALL libd_ungetwc)(wint16_t wc,
 }
 /*[[[end:libd_ungetwc]]]*/
 
-/*[[[head:libc_fputwc_unlocked,hash:CRC-32=0xf70979db]]]*/
+/*[[[head:libc_fputwc_unlocked,hash:CRC-32=0xe2b8cfb0]]]*/
 /* >> fputwc(3), putwc(3), fputwc_unlocked(3), putwc_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.putc") ATTR_INOUT(2) wint32_t
-NOTHROW_CB(LIBKCALL libc_fputwc_unlocked)(char32_t wc,
-                                          FILE *__restrict stream)
+NOTHROW_CB_NCX(LIBKCALL libc_fputwc_unlocked)(char32_t wc,
+                                              FILE *__restrict stream)
 /*[[[body:libc_fputwc_unlocked]]]*/
 {
 	wint32_t result = (wint32_t)wc;
@@ -349,11 +349,11 @@ NOTHROW_CB(LIBKCALL libc_fputwc_unlocked)(char32_t wc,
 }
 /*[[[end:libc_fputwc_unlocked]]]*/
 
-/*[[[head:libd_fputwc_unlocked,hash:CRC-32=0xdce26ad3]]]*/
+/*[[[head:libd_fputwc_unlocked,hash:CRC-32=0x36b55701]]]*/
 /* >> fputwc(3), putwc(3), fputwc_unlocked(3), putwc_unlocked(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.putc") ATTR_INOUT(2) wint16_t
-NOTHROW_CB(LIBDCALL libd_fputwc_unlocked)(char16_t wc,
-                                          FILE *__restrict stream)
+NOTHROW_CB_NCX(LIBDCALL libd_fputwc_unlocked)(char16_t wc,
+                                              FILE *__restrict stream)
 /*[[[body:libd_fputwc_unlocked]]]*/
 {
 	wint16_t result = (wint16_t)wc;
@@ -366,11 +366,11 @@ NOTHROW_CB(LIBDCALL libd_fputwc_unlocked)(char16_t wc,
 }
 /*[[[end:libd_fputwc_unlocked]]]*/
 
-/*[[[head:libc_fputwc,hash:CRC-32=0x17ebc2a0]]]*/
+/*[[[head:libc_fputwc,hash:CRC-32=0x7faf09c8]]]*/
 /* >> fputwc(3), putwc(3), fputwc_unlocked(3), putwc_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.putc") ATTR_INOUT(2) wint32_t
-NOTHROW_CB(LIBKCALL libc_fputwc)(char32_t wc,
-                                 FILE *stream)
+NOTHROW_CB_NCX(LIBKCALL libc_fputwc)(char32_t wc,
+                                     FILE *stream)
 /*[[[body:libc_fputwc]]]*/
 {
 	ssize_t error;
@@ -391,11 +391,11 @@ NOTHROW_CB(LIBKCALL libc_fputwc)(char32_t wc,
 }
 /*[[[end:libc_fputwc]]]*/
 
-/*[[[head:libd_fputwc,hash:CRC-32=0xfcc5be36]]]*/
+/*[[[head:libd_fputwc,hash:CRC-32=0x4fb26230]]]*/
 /* >> fputwc(3), putwc(3), fputwc_unlocked(3), putwc_unlocked(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.putc") ATTR_INOUT(2) wint16_t
-NOTHROW_CB(LIBDCALL libd_fputwc)(char16_t wc,
-                                 FILE *stream)
+NOTHROW_CB_NCX(LIBDCALL libd_fputwc)(char16_t wc,
+                                     FILE *stream)
 /*[[[body:libd_fputwc]]]*/
 {
 	ssize_t error;
@@ -491,13 +491,13 @@ NOTHROW_NCX(LIBKCALL libc_fgetwln)(FILE *__restrict fp,
 
 
 
-/*[[[head:libc_file_wprinter,hash:CRC-32=0xa9c7d0f]]]*/
+/*[[[head:libc_file_wprinter,hash:CRC-32=0x98d00812]]]*/
 /* >> file_wprinter(3), file_wprinter_unlocked(3)
  * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.write") ATTR_INS(2, 3) NONNULL((1)) ssize_t
-NOTHROW_CB(LIBKCALL libc_file_wprinter)(void *arg,
-                                        char32_t const *__restrict data,
-                                        size_t datalen)
+NOTHROW_CB_NCX(LIBKCALL libc_file_wprinter)(void *arg,
+                                            char32_t const *__restrict data,
+                                            size_t datalen)
 /*[[[body:libc_file_wprinter]]]*/
 {
 	ssize_t result;
@@ -513,13 +513,13 @@ NOTHROW_CB(LIBKCALL libc_file_wprinter)(void *arg,
 }
 /*[[[end:libc_file_wprinter]]]*/
 
-/*[[[head:libc_file_wprinter_unlocked,hash:CRC-32=0x847251c7]]]*/
+/*[[[head:libc_file_wprinter_unlocked,hash:CRC-32=0x6fa76ae]]]*/
 /* >> file_wprinter(3), file_wprinter_unlocked(3)
  * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.write") ATTR_INS(2, 3) NONNULL((1)) ssize_t
-NOTHROW_CB(LIBKCALL libc_file_wprinter_unlocked)(void *arg,
-                                                 char32_t const *__restrict data,
-                                                 size_t datalen)
+NOTHROW_CB_NCX(LIBKCALL libc_file_wprinter_unlocked)(void *arg,
+                                                     char32_t const *__restrict data,
+                                                     size_t datalen)
 /*[[[body:libc_file_wprinter_unlocked]]]*/
 {
 	struct format_32to8_data format;
@@ -529,13 +529,13 @@ NOTHROW_CB(LIBKCALL libc_file_wprinter_unlocked)(void *arg,
 }
 /*[[[end:libc_file_wprinter_unlocked]]]*/
 
-/*[[[head:libd_file_wprinter,hash:CRC-32=0xc94b8ac]]]*/
+/*[[[head:libd_file_wprinter,hash:CRC-32=0x465bf114]]]*/
 /* >> file_wprinter(3), file_wprinter_unlocked(3)
  * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.write") ATTR_INS(2, 3) NONNULL((1)) ssize_t
-NOTHROW_CB(LIBDCALL libd_file_wprinter)(void *arg,
-                                        char16_t const *__restrict data,
-                                        size_t datalen)
+NOTHROW_CB_NCX(LIBDCALL libd_file_wprinter)(void *arg,
+                                            char16_t const *__restrict data,
+                                            size_t datalen)
 /*[[[body:libd_file_wprinter]]]*/
 {
 	ssize_t result;
@@ -551,13 +551,13 @@ NOTHROW_CB(LIBDCALL libd_file_wprinter)(void *arg,
 }
 /*[[[end:libd_file_wprinter]]]*/
 
-/*[[[head:libd_file_wprinter_unlocked,hash:CRC-32=0x124e3032]]]*/
+/*[[[head:libd_file_wprinter_unlocked,hash:CRC-32=0xa0674ecc]]]*/
 /* >> file_wprinter(3), file_wprinter_unlocked(3)
  * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.write") ATTR_INS(2, 3) NONNULL((1)) ssize_t
-NOTHROW_CB(LIBDCALL libd_file_wprinter_unlocked)(void *arg,
-                                                 char16_t const *__restrict data,
-                                                 size_t datalen)
+NOTHROW_CB_NCX(LIBDCALL libd_file_wprinter_unlocked)(void *arg,
+                                                     char16_t const *__restrict data,
+                                                     size_t datalen)
 /*[[[body:libd_file_wprinter_unlocked]]]*/
 {
 	ssize_t result;

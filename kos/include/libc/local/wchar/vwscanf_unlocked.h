@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb557de05 */
+/* HASH CRC-32:0x4df564a7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vfwscanf_unlocked_defined
 #define __local___localdep_vfwscanf_unlocked_defined
 #ifdef __CRT_HAVE_vfwscanf_unlocked
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __ATTR_LIBC_WSCANF(2, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_CB,__localdep_vfwscanf_unlocked,(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf_unlocked,(__stream,__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __ATTR_LIBC_WSCANF(2, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_CB_NCX,__localdep_vfwscanf_unlocked,(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf_unlocked,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_vfwscanf)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __ATTR_LIBC_WSCANF(2, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_CB,__localdep_vfwscanf_unlocked,(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __ATTR_LIBC_WSCANF(2, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_CB_NCX,__localdep_vfwscanf_unlocked,(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
 #elif (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE_getwc_unlocked) || defined(__CRT_HAVE__getwc_nolock) || defined(__CRT_HAVE__fgetwc_nolock) || defined(__CRT_HAVE_getwc) || defined(__CRT_HAVE_fgetwc)) && (defined(__CRT_HAVE_ungetwc_unlocked) || defined(__CRT_HAVE__ungetwc_nolock) || defined(__CRT_HAVE_ungetwc))
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/vfwscanf_unlocked.h>
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_vfwscanf_unlocked_defined */
 __LOCAL_LIBC(vwscanf_unlocked) __ATTR_WUNUSED __ATTR_IN(1) __ATTR_LIBC_WSCANF(1, 0) __STDC_INT_AS_SIZE_T
-__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(vwscanf_unlocked))(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args) {
+__NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vwscanf_unlocked))(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_vfwscanf_unlocked)(__LOCAL_stdin, __format, __args);
 }
 __NAMESPACE_LOCAL_END

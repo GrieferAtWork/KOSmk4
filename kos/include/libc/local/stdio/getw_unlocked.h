@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17a6caae */
+/* HASH CRC-32:0xd0047f45 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,22 +29,22 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(4) __ATTR_OUT_OPT(1),__SIZE_TYPE__,__NOTHROW_CB,__localdep_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread_unlocked,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(4) __ATTR_OUT_OPT(1),__SIZE_TYPE__,__NOTHROW_CB_NCX,__localdep_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread_unlocked,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE__fread_nolock)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(4) __ATTR_OUT_OPT(1),__SIZE_TYPE__,__NOTHROW_CB,__localdep_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fread_nolock,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(4) __ATTR_OUT_OPT(1),__SIZE_TYPE__,__NOTHROW_CB_NCX,__localdep_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fread_nolock,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE_fread)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(4) __ATTR_OUT_OPT(1),__SIZE_TYPE__,__NOTHROW_CB,__localdep_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(4) __ATTR_OUT_OPT(1),__SIZE_TYPE__,__NOTHROW_CB_NCX,__localdep_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE__IO_fread)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(4) __ATTR_OUT_OPT(1),__SIZE_TYPE__,__NOTHROW_CB,__localdep_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_IO_fread,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(4) __ATTR_OUT_OPT(1),__SIZE_TYPE__,__NOTHROW_CB_NCX,__localdep_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_IO_fread,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || (!defined(__CRT_HAVE__filbuf) && !defined(__CRT_HAVE___uflow) && !defined(__CRT_HAVE___underflow) && !defined(__CRT_HAVE___srget)))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || (!defined(__CRT_HAVE__filbuf) && !defined(__CRT_HAVE___uflow) && !defined(__CRT_HAVE___underflow) && !defined(__CRT_HAVE___srget)))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || (!defined(__CRT_HAVE__filbuf) && !defined(__CRT_HAVE___uflow) && !defined(__CRT_HAVE___underflow) && !defined(__CRT_HAVE___srget)))) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow) || defined(__CRT_HAVE___srget)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fread_unlocked.h>
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getw_unlocked) __ATTR_INOUT(1) int
-__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(getw_unlocked))(__FILE *__restrict __stream) {
+__NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getw_unlocked))(__FILE *__restrict __stream) {
 	__UINT16_TYPE__ __result;
 	return (__NAMESPACE_LOCAL_SYM __localdep_fread_unlocked)(&__result, sizeof(__result), 1, __stream)
 	       ? (int)(unsigned int)__result

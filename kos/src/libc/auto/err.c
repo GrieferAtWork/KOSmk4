@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xddb2da9a */
+/* HASH CRC-32:0x8b988d8d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,8 +36,8 @@ DECL_BEGIN
 /* >> warn(3), vwarn(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2) void
-NOTHROW_CB(VLIBDCALL libd_warn)(char const *format,
-                                ...) {
+NOTHROW_CB_NCX(VLIBDCALL libd_warn)(char const *format,
+                                    ...) {
 	va_list args;
 	va_start(args, format);
 	libc_vwarn(format, args);
@@ -48,8 +48,8 @@ NOTHROW_CB(VLIBDCALL libd_warn)(char const *format,
 /* >> warn(3), vwarn(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2) void
-NOTHROW_CB(VLIBCCALL libc_warn)(char const *format,
-                                ...) {
+NOTHROW_CB_NCX(VLIBCCALL libc_warn)(char const *format,
+                                    ...) {
 	va_list args;
 	va_start(args, format);
 	libc_vwarn(format, args);
@@ -59,8 +59,8 @@ NOTHROW_CB(VLIBCCALL libc_warn)(char const *format,
 /* >> warn(3), vwarn(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 0) void
-NOTHROW_CB(LIBCCALL libc_vwarn)(char const *format,
-                                va_list args) {
+NOTHROW_CB_NCX(LIBCCALL libc_vwarn)(char const *format,
+                                    va_list args) {
 	libc_vwarnc(__libc_geterrno_or(0), format, args);
 }
 #endif /* !__KERNEL__ */
@@ -68,9 +68,9 @@ NOTHROW_CB(LIBCCALL libc_vwarn)(char const *format,
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void
-NOTHROW_CB(VLIBDCALL libd_warnc)(errno_t used_errno,
-                                 char const *format,
-                                 ...) {
+NOTHROW_CB_NCX(VLIBDCALL libd_warnc)(errno_t used_errno,
+                                     char const *format,
+                                     ...) {
 	va_list args;
 	va_start(args, format);
 	libc_vwarnc(used_errno, format, args);
@@ -81,9 +81,9 @@ NOTHROW_CB(VLIBDCALL libd_warnc)(errno_t used_errno,
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void
-NOTHROW_CB(VLIBCCALL libc_warnc)(errno_t used_errno,
-                                 char const *format,
-                                 ...) {
+NOTHROW_CB_NCX(VLIBCCALL libc_warnc)(errno_t used_errno,
+                                     char const *format,
+                                     ...) {
 	va_list args;
 	va_start(args, format);
 	libc_vwarnc(used_errno, format, args);
@@ -94,9 +94,9 @@ NOTHROW_CB(VLIBCCALL libc_warnc)(errno_t used_errno,
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0) void
-NOTHROW_CB(LIBCCALL libc_vwarnc)(errno_t used_errno,
-                                 char const *format,
-                                 va_list args) {
+NOTHROW_CB_NCX(LIBCCALL libc_vwarnc)(errno_t used_errno,
+                                     char const *format,
+                                     va_list args) {
 
 	libc_flockfile(stderr);
 
@@ -116,8 +116,8 @@ NOTHROW_CB(LIBCCALL libc_vwarnc)(errno_t used_errno,
 /* >> warnx(3), vwarnx(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2) void
-NOTHROW_CB(VLIBDCALL libd_warnx)(char const *format,
-                                 ...) {
+NOTHROW_CB_NCX(VLIBDCALL libd_warnx)(char const *format,
+                                     ...) {
 	va_list args;
 	va_start(args, format);
 	libc_vwarnx(format, args);
@@ -128,8 +128,8 @@ NOTHROW_CB(VLIBDCALL libd_warnx)(char const *format,
 /* >> warnx(3), vwarnx(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2) void
-NOTHROW_CB(VLIBCCALL libc_warnx)(char const *format,
-                                 ...) {
+NOTHROW_CB_NCX(VLIBCCALL libc_warnx)(char const *format,
+                                     ...) {
 	va_list args;
 	va_start(args, format);
 	libc_vwarnx(format, args);
@@ -140,8 +140,8 @@ NOTHROW_CB(VLIBCCALL libc_warnx)(char const *format,
 /* >> warnx(3), vwarnx(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 0) void
-NOTHROW_CB(LIBCCALL libc_vwarnx)(char const *format,
-                                 va_list args) {
+NOTHROW_CB_NCX(LIBCCALL libc_vwarnx)(char const *format,
+                                     va_list args) {
 
 	libc_flockfile(stderr);
 
@@ -158,9 +158,9 @@ NOTHROW_CB(LIBCCALL libc_vwarnx)(char const *format,
 /* >> err(3), verr(3)
  * Same as `warn()', but follow up by calling `exit(status)' */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void
-NOTHROW_CB(VLIBDCALL libd_err)(int status,
-                               char const *format,
-                               ...) {
+NOTHROW_CB_NCX(VLIBDCALL libd_err)(int status,
+                                   char const *format,
+                                   ...) {
 	va_list args;
 	va_start(args, format);
 	libc_verr(status, format, args);
@@ -170,9 +170,9 @@ NOTHROW_CB(VLIBDCALL libd_err)(int status,
 /* >> err(3), verr(3)
  * Same as `warn()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void
-NOTHROW_CB(VLIBCCALL libc_err)(int status,
-                               char const *format,
-                               ...) {
+NOTHROW_CB_NCX(VLIBCCALL libc_err)(int status,
+                                   char const *format,
+                                   ...) {
 	va_list args;
 	va_start(args, format);
 	libc_verr(status, format, args);
@@ -181,9 +181,9 @@ NOTHROW_CB(VLIBCCALL libc_err)(int status,
 /* >> err(3), verr(3)
  * Same as `warn()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0) void
-NOTHROW_CB(LIBCCALL libc_verr)(int status,
-                               char const *format,
-                               va_list args) {
+NOTHROW_CB_NCX(LIBCCALL libc_verr)(int status,
+                                   char const *format,
+                                   va_list args) {
 	libc_verrc(status, __libc_geterrno_or(0), format, args);
 }
 #endif /* !__KERNEL__ */
@@ -191,10 +191,10 @@ NOTHROW_CB(LIBCCALL libc_verr)(int status,
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_IN_OPT(3) ATTR_LIBC_PRINTF(3, 4) void
-NOTHROW_CB(VLIBDCALL libd_errc)(int status,
-                                errno_t used_errno,
-                                char const *format,
-                                ...) {
+NOTHROW_CB_NCX(VLIBDCALL libd_errc)(int status,
+                                    errno_t used_errno,
+                                    char const *format,
+                                    ...) {
 	va_list args;
 	va_start(args, format);
 	libc_verrc(status, used_errno, format, args);
@@ -204,10 +204,10 @@ NOTHROW_CB(VLIBDCALL libd_errc)(int status,
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_IN_OPT(3) ATTR_LIBC_PRINTF(3, 4) void
-NOTHROW_CB(VLIBCCALL libc_errc)(int status,
-                                errno_t used_errno,
-                                char const *format,
-                                ...) {
+NOTHROW_CB_NCX(VLIBCCALL libc_errc)(int status,
+                                    errno_t used_errno,
+                                    char const *format,
+                                    ...) {
 	va_list args;
 	va_start(args, format);
 	libc_verrc(status, used_errno, format, args);
@@ -215,10 +215,10 @@ NOTHROW_CB(VLIBCCALL libc_errc)(int status,
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_IN_OPT(3) ATTR_LIBC_PRINTF(3, 0) void
-NOTHROW_CB(LIBCCALL libc_verrc)(int status,
-                                errno_t used_errno,
-                                char const *format,
-                                va_list args) {
+NOTHROW_CB_NCX(LIBCCALL libc_verrc)(int status,
+                                    errno_t used_errno,
+                                    char const *format,
+                                    va_list args) {
 	libc_vwarnc(used_errno, format, args);
 	libc_exit(status);
 }
@@ -227,9 +227,9 @@ NOTHROW_CB(LIBCCALL libc_verrc)(int status,
 /* >> errx(3), verrx(3)
  * Same as `warnx()', but follow up by calling `exit(status)' */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void
-NOTHROW_CB(VLIBDCALL libd_errx)(int status,
-                                char const *format,
-                                ...) {
+NOTHROW_CB_NCX(VLIBDCALL libd_errx)(int status,
+                                    char const *format,
+                                    ...) {
 	va_list args;
 	va_start(args, format);
 	libc_verrx(status, format, args);
@@ -239,9 +239,9 @@ NOTHROW_CB(VLIBDCALL libd_errx)(int status,
 /* >> errx(3), verrx(3)
  * Same as `warnx()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void
-NOTHROW_CB(VLIBCCALL libc_errx)(int status,
-                                char const *format,
-                                ...) {
+NOTHROW_CB_NCX(VLIBCCALL libc_errx)(int status,
+                                    char const *format,
+                                    ...) {
 	va_list args;
 	va_start(args, format);
 	libc_verrx(status, format, args);
@@ -249,9 +249,9 @@ NOTHROW_CB(VLIBCCALL libc_errx)(int status,
 /* >> errx(3), verrx(3)
  * Same as `warnx()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0) void
-NOTHROW_CB(LIBCCALL libc_verrx)(int status,
-                                char const *format,
-                                va_list args) {
+NOTHROW_CB_NCX(LIBCCALL libc_verrx)(int status,
+                                    char const *format,
+                                    va_list args) {
 	libc_vwarnx(format, args);
 	libc_exit(status);
 }

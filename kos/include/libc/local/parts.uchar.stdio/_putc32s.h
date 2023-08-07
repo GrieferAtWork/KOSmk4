@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e3d6d49 */
+/* HASH CRC-32:0x3baaec47 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,25 +29,25 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputc32s_defined
 #define __local___localdep_fputc32s_defined
 #if defined(__CRT_HAVE_fputws_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),fputws_unlocked,(__str,__stream))
+__CREDIRECT(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB_NCX,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),fputws_unlocked,(__str,__stream))
 #elif defined(__CRT_HAVE_KOS$fputws_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT_KOS(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),fputws_unlocked,(__str,__stream))
+__CREDIRECT_KOS(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB_NCX,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),fputws_unlocked,(__str,__stream))
 #elif defined(__CRT_HAVE__fputws_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),_fputws_nolock,(__str,__stream))
+__CREDIRECT(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB_NCX,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),_fputws_nolock,(__str,__stream))
 #elif defined(__CRT_HAVE_KOS$_fputws_nolock) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT_KOS(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),_fputws_nolock,(__str,__stream))
+__CREDIRECT_KOS(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB_NCX,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),_fputws_nolock,(__str,__stream))
 #elif defined(__CRT_HAVE_fputws) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),fputws,(__str,__stream))
+__CREDIRECT(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB_NCX,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),fputws,(__str,__stream))
 #elif defined(__CRT_HAVE_KOS$fputws)
-__CREDIRECT_KOS(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),fputws,(__str,__stream))
+__CREDIRECT_KOS(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB_NCX,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),fputws,(__str,__stream))
 #elif defined(__CRT_HAVE_fputws_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),fputws_unlocked,(__str,__stream))
+__CREDIRECT(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB_NCX,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),fputws_unlocked,(__str,__stream))
 #elif defined(__CRT_HAVE_KOS$fputws_unlocked)
-__CREDIRECT_KOS(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),fputws_unlocked,(__str,__stream))
+__CREDIRECT_KOS(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB_NCX,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),fputws_unlocked,(__str,__stream))
 #elif defined(__CRT_HAVE__fputws_nolock) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),_fputws_nolock,(__str,__stream))
+__CREDIRECT(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB_NCX,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),_fputws_nolock,(__str,__stream))
 #elif defined(__CRT_HAVE_KOS$_fputws_nolock)
-__CREDIRECT_KOS(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),_fputws_nolock,(__str,__stream))
+__CREDIRECT_KOS(__ATTR_IN(1) __ATTR_INOUT(2),__STDC_INT_AS_SIZE_T,__NOTHROW_CB_NCX,__localdep_fputc32s,(__CHAR32_TYPE__ const *__restrict __str, __FILE *__restrict __stream),_fputws_nolock,(__str,__stream))
 #elif (defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/fputws.h>

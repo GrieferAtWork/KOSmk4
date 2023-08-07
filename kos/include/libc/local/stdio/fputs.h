@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c102b0c */
+/* HASH CRC-32:0x1277c29c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,42 +30,42 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_INOUT(4) __ATTR_IN_OPT(1),__SIZE_TYPE__,__NOTHROW_CB,__localdep_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite_unlocked,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_INOUT(4) __ATTR_IN_OPT(1),__SIZE_TYPE__,__NOTHROW_CB_NCX,__localdep_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite_unlocked,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE__fwrite_nolock) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_INOUT(4) __ATTR_IN_OPT(1),__SIZE_TYPE__,__NOTHROW_CB,__localdep_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fwrite_nolock,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_INOUT(4) __ATTR_IN_OPT(1),__SIZE_TYPE__,__NOTHROW_CB_NCX,__localdep_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fwrite_nolock,(__buf,__elemsize,__elemcount,__stream))
 #elif __has_builtin(__builtin_fwrite) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fwrite)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CEIREDIRECT(__ATTR_INOUT(4) __ATTR_IN_OPT(1),__SIZE_TYPE__,__NOTHROW_CB,__localdep_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite,{ return __builtin_fwrite(__buf, __elemsize, __elemcount, __stream); })
+__CEIREDIRECT(__ATTR_INOUT(4) __ATTR_IN_OPT(1),__SIZE_TYPE__,__NOTHROW_CB_NCX,__localdep_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite,{ return __builtin_fwrite(__buf, __elemsize, __elemcount, __stream); })
 #elif defined(__CRT_HAVE_fwrite)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_INOUT(4) __ATTR_IN_OPT(1),__SIZE_TYPE__,__NOTHROW_CB,__localdep_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_INOUT(4) __ATTR_IN_OPT(1),__SIZE_TYPE__,__NOTHROW_CB_NCX,__localdep_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE__IO_fwrite)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_INOUT(4) __ATTR_IN_OPT(1),__SIZE_TYPE__,__NOTHROW_CB,__localdep_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_IO_fwrite,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_INOUT(4) __ATTR_IN_OPT(1),__SIZE_TYPE__,__NOTHROW_CB_NCX,__localdep_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_IO_fwrite,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE_fwrite_s)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_INOUT(4) __ATTR_IN_OPT(1),__SIZE_TYPE__,__NOTHROW_CB,__localdep_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite_s,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_INOUT(4) __ATTR_IN_OPT(1),__SIZE_TYPE__,__NOTHROW_CB_NCX,__localdep_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite_s,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE_fwrite_unlocked)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_INOUT(4) __ATTR_IN_OPT(1),__SIZE_TYPE__,__NOTHROW_CB,__localdep_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite_unlocked,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_INOUT(4) __ATTR_IN_OPT(1),__SIZE_TYPE__,__NOTHROW_CB_NCX,__localdep_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite_unlocked,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE__fwrite_nolock)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_INOUT(4) __ATTR_IN_OPT(1),__SIZE_TYPE__,__NOTHROW_CB,__localdep_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fwrite_nolock,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_INOUT(4) __ATTR_IN_OPT(1),__SIZE_TYPE__,__NOTHROW_CB_NCX,__localdep_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fwrite_nolock,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fwrite.h>
@@ -90,7 +90,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
 __LOCAL_LIBC(fputs) __ATTR_IN(1) __ATTR_INOUT(2) __STDC_INT_AS_SSIZE_T
-__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(fputs))(char const *__restrict __string, __FILE *__restrict __stream) {
+__NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fputs))(char const *__restrict __string, __FILE *__restrict __stream) {
 	__STDC_INT_AS_SIZE_T __result;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_fwrite)(__string,
 	                sizeof(char),

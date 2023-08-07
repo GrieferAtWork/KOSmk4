@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd6d69a8 */
+/* HASH CRC-32:0xc79afd2f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,7 +89,7 @@ INTDEF ATTR_PURE WUNUSED ATTR_IN(1) size_t NOTHROW_NCX(LIBCCALL libc___fpending_
  * Note that usually call this function isn't necessary, since the same already
  * happens automatically when  writing a line-feed  to any line-buffered  stdio
  * file (where line-buffered files are usually those opened on TTYs) */
-INTDEF void NOTHROW_CB(LIBCCALL libc__flushlbf)(void);
+INTDEF void NOTHROW_CB_NCX(LIBCCALL libc__flushlbf)(void);
 /* >> __fsetlocking(3)
  * Set the locking type for `stream' to `type'. This affects all stdio functions
  * that aren't already lock-less by nature (iow: everything but `*_unlocked(3)')

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b09558 */
+/* HASH CRC-32:0xdd243039 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,35 +28,35 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetc16_unlocked_defined
 #define __local___localdep_fgetc16_unlocked_defined
 #if defined(__CRT_HAVE_fgetwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_DOS$fgetwc_unlocked)
-__CREDIRECT_DOS(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT_DOS(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_DOS$getwc_unlocked)
-__CREDIRECT_DOS(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
+__CREDIRECT_DOS(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE__getwc_nolock) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),_getwc_nolock,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),_getwc_nolock,(__stream))
 #elif defined(__CRT_HAVE_DOS$_getwc_nolock)
-__CREDIRECT_DOS(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),_getwc_nolock,(__stream))
+__CREDIRECT_DOS(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),_getwc_nolock,(__stream))
 #elif defined(__CRT_HAVE__fgetwc_nolock) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #elif defined(__CRT_HAVE_DOS$_fgetwc_nolock)
-__CREDIRECT_DOS(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT_DOS(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #elif defined(__CRT_HAVE_getwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),getwc,(__stream))
 #elif defined(__CRT_HAVE_DOS$getwc)
-__CREDIRECT_DOS(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT_DOS(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),getwc,(__stream))
 #elif defined(__CRT_HAVE_fgetwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_DOS$fgetwc)
-__CREDIRECT_DOS(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT_DOS(__ATTR_INOUT(1),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc,(__stream))
 #else /* ... */
 #undef __local___localdep_fgetc16_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgetc16_unlocked_defined */
 __LOCAL_LIBC(getchar16_unlocked) __WINT16_TYPE__
-__NOTHROW_CB(__LIBDCALL __LIBC_LOCAL_NAME(getchar16_unlocked))(void) {
+__NOTHROW_CB_NCX(__LIBDCALL __LIBC_LOCAL_NAME(getchar16_unlocked))(void) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fgetc16_unlocked)(__LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END

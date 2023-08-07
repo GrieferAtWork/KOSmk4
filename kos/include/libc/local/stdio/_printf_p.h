@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d9c55cb */
+/* HASH CRC-32:0x5c941ea0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vprintf_p_defined
 #define __local___localdep__vprintf_p_defined
 #ifdef __CRT_HAVE__vprintf_p
-__CREDIRECT(__ATTR_IN(1) __ATTR_LIBC_PRINTF_P(1, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_CB,__localdep__vprintf_p,(char const *__format, __builtin_va_list __args),_vprintf_p,(__format,__args))
+__CREDIRECT(__ATTR_IN(1) __ATTR_LIBC_PRINTF_P(1, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_CB_NCX,__localdep__vprintf_p,(char const *__format, __builtin_va_list __args),_vprintf_p,(__format,__args))
 #elif defined(__CRT_HAVE__vprintf_p_l) || (defined(__LOCAL_stdout) && (defined(__CRT_HAVE__vfprintf_p_l) || defined(__CRT_HAVE___stdio_common_vfprintf_p) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/_vprintf_p.h>
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep__vprintf_p_defined */
 __LOCAL_LIBC(_printf_p) __ATTR_IN(1) __ATTR_LIBC_PRINTF_P(1, 2) __STDC_INT_AS_SSIZE_T
-__NOTHROW_CB(__VLIBCCALL __LIBC_LOCAL_NAME(_printf_p))(char const *__format, ...) {
+__NOTHROW_CB_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(_printf_p))(char const *__format, ...) {
 	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);

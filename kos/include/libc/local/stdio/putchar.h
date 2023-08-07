@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ddebb1c */
+/* HASH CRC-32:0x18eca1ef */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,31 +28,31 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputc_defined
 #define __local___localdep_fputc_defined
 #if defined(__USE_STDIO_UNLOCKED) && __has_builtin(__builtin_fputc_unlocked) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputc_unlocked)
-__CEIREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc_unlocked,{ return __builtin_fputc_unlocked(__ch, __stream); })
+__CEIREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB_NCX,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc_unlocked,{ return __builtin_fputc_unlocked(__ch, __stream); })
 #elif defined(__CRT_HAVE_putc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB,__localdep_fputc,(int __ch, __FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB_NCX,__localdep_fputc,(int __ch, __FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB_NCX,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE__putc_nolock) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_putc_nolock,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB_NCX,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_putc_nolock,(__ch,__stream))
 #elif defined(__CRT_HAVE__fputc_nolock) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_fputc_nolock,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB_NCX,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_fputc_nolock,(__ch,__stream))
 #elif __has_builtin(__builtin_fputc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputc)
-__CEIREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc,{ return __builtin_fputc(__ch, __stream); })
+__CEIREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB_NCX,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc,{ return __builtin_fputc(__ch, __stream); })
 #elif defined(__CRT_HAVE_putc)
-__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB,__localdep_fputc,(int __ch, __FILE *__restrict __stream),putc,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB_NCX,__localdep_fputc,(int __ch, __FILE *__restrict __stream),putc,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc)
-__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB_NCX,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc,(__ch,__stream))
 #elif defined(__CRT_HAVE__IO_putc)
-__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_IO_putc,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB_NCX,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_IO_putc,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc_unlocked)
-__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB,__localdep_fputc,(int __ch, __FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB_NCX,__localdep_fputc,(int __ch, __FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc_unlocked)
-__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB_NCX,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE__putc_nolock)
-__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_putc_nolock,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB_NCX,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_putc_nolock,(__ch,__stream))
 #elif defined(__CRT_HAVE__fputc_nolock)
-__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_fputc_nolock,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_CB_NCX,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_fputc_nolock,(__ch,__stream))
 #elif (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fputc.h>
@@ -63,7 +63,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fputc_defined */
 __LOCAL_LIBC(putchar) int
-__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(putchar))(int __ch) {
+__NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(putchar))(int __ch) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fputc)(__ch, __LOCAL_stdout);
 }
 __NAMESPACE_LOCAL_END

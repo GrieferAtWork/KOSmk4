@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x940e4cfa */
+/* HASH CRC-32:0x3e0d4b26 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fclose_defined
 #define __local___localdep_fclose_defined
 #ifdef __CRT_HAVE_fclose
-__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB,__localdep_fclose,(__FILE *__restrict __stream),fclose,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB_NCX,__localdep_fclose,(__FILE *__restrict __stream),fclose,(__stream))
 #elif defined(__CRT_HAVE__fclose_nolock)
-__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB,__localdep_fclose,(__FILE *__restrict __stream),_fclose_nolock,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB_NCX,__localdep_fclose,(__FILE *__restrict __stream),_fclose_nolock,(__stream))
 #elif defined(__CRT_HAVE__IO_fclose)
-__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB,__localdep_fclose,(__FILE *__restrict __stream),_IO_fclose,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB_NCX,__localdep_fclose,(__FILE *__restrict __stream),_IO_fclose,(__stream))
 #else /* ... */
 #undef __local___localdep_fclose_defined
 #endif /* !... */

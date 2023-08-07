@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ef08dd7 */
+/* HASH CRC-32:0xe0e0fe03 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,122 +32,122 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> warn(3), vwarn(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
-INTDEF ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2) void NOTHROW_CB(VLIBDCALL libd_warn)(char const *format, ...);
+INTDEF ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2) void NOTHROW_CB_NCX(VLIBDCALL libd_warn)(char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> warn(3), vwarn(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
-INTDEF ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2) void NOTHROW_CB(VLIBCCALL libc_warn)(char const *format, ...);
+INTDEF ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2) void NOTHROW_CB_NCX(VLIBCCALL libc_warn)(char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> warn(3), vwarn(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
-INTDEF ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 0) void NOTHROW_CB(LIBDCALL libd_vwarn)(char const *format, va_list args);
+INTDEF ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 0) void NOTHROW_CB_NCX(LIBDCALL libd_vwarn)(char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> warn(3), vwarn(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
-INTDEF ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 0) void NOTHROW_CB(LIBCCALL libc_vwarn)(char const *format, va_list args);
+INTDEF ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 0) void NOTHROW_CB_NCX(LIBCCALL libc_vwarn)(char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
-INTDEF ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void NOTHROW_CB(VLIBDCALL libd_warnc)(errno_t used_errno, char const *format, ...);
+INTDEF ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void NOTHROW_CB_NCX(VLIBDCALL libd_warnc)(errno_t used_errno, char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
-INTDEF ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void NOTHROW_CB(VLIBCCALL libc_warnc)(errno_t used_errno, char const *format, ...);
+INTDEF ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void NOTHROW_CB_NCX(VLIBCCALL libc_warnc)(errno_t used_errno, char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
-INTDEF ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0) void NOTHROW_CB(LIBDCALL libd_vwarnc)(errno_t used_errno, char const *format, va_list args);
+INTDEF ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0) void NOTHROW_CB_NCX(LIBDCALL libd_vwarnc)(errno_t used_errno, char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
-INTDEF ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0) void NOTHROW_CB(LIBCCALL libc_vwarnc)(errno_t used_errno, char const *format, va_list args);
+INTDEF ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0) void NOTHROW_CB_NCX(LIBCCALL libc_vwarnc)(errno_t used_errno, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> warnx(3), vwarnx(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
-INTDEF ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2) void NOTHROW_CB(VLIBDCALL libd_warnx)(char const *format, ...);
+INTDEF ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2) void NOTHROW_CB_NCX(VLIBDCALL libd_warnx)(char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> warnx(3), vwarnx(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
-INTDEF ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2) void NOTHROW_CB(VLIBCCALL libc_warnx)(char const *format, ...);
+INTDEF ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2) void NOTHROW_CB_NCX(VLIBCCALL libc_warnx)(char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> warnx(3), vwarnx(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
-INTDEF ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 0) void NOTHROW_CB(LIBDCALL libd_vwarnx)(char const *format, va_list args);
+INTDEF ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 0) void NOTHROW_CB_NCX(LIBDCALL libd_vwarnx)(char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> warnx(3), vwarnx(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
-INTDEF ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 0) void NOTHROW_CB(LIBCCALL libc_vwarnx)(char const *format, va_list args);
+INTDEF ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 0) void NOTHROW_CB_NCX(LIBCCALL libc_vwarnx)(char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> err(3), verr(3)
  * Same as `warn()', but follow up by calling `exit(status)' */
-INTDEF ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void NOTHROW_CB(VLIBDCALL libd_err)(int status, char const *format, ...);
+INTDEF ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void NOTHROW_CB_NCX(VLIBDCALL libd_err)(int status, char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> err(3), verr(3)
  * Same as `warn()', but follow up by calling `exit(status)' */
-INTDEF ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void NOTHROW_CB(VLIBCCALL libc_err)(int status, char const *format, ...);
+INTDEF ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void NOTHROW_CB_NCX(VLIBCCALL libc_err)(int status, char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> err(3), verr(3)
  * Same as `warn()', but follow up by calling `exit(status)' */
-INTDEF ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0) void NOTHROW_CB(LIBDCALL libd_verr)(int status, char const *format, va_list args);
+INTDEF ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0) void NOTHROW_CB_NCX(LIBDCALL libd_verr)(int status, char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> err(3), verr(3)
  * Same as `warn()', but follow up by calling `exit(status)' */
-INTDEF ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0) void NOTHROW_CB(LIBCCALL libc_verr)(int status, char const *format, va_list args);
+INTDEF ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0) void NOTHROW_CB_NCX(LIBCCALL libc_verr)(int status, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
-INTDEF ATTR_NORETURN ATTR_IN_OPT(3) ATTR_LIBC_PRINTF(3, 4) void NOTHROW_CB(VLIBDCALL libd_errc)(int status, errno_t used_errno, char const *format, ...);
+INTDEF ATTR_NORETURN ATTR_IN_OPT(3) ATTR_LIBC_PRINTF(3, 4) void NOTHROW_CB_NCX(VLIBDCALL libd_errc)(int status, errno_t used_errno, char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
-INTDEF ATTR_NORETURN ATTR_IN_OPT(3) ATTR_LIBC_PRINTF(3, 4) void NOTHROW_CB(VLIBCCALL libc_errc)(int status, errno_t used_errno, char const *format, ...);
+INTDEF ATTR_NORETURN ATTR_IN_OPT(3) ATTR_LIBC_PRINTF(3, 4) void NOTHROW_CB_NCX(VLIBCCALL libc_errc)(int status, errno_t used_errno, char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
-INTDEF ATTR_NORETURN ATTR_IN_OPT(3) ATTR_LIBC_PRINTF(3, 0) void NOTHROW_CB(LIBDCALL libd_verrc)(int status, errno_t used_errno, char const *format, va_list args);
+INTDEF ATTR_NORETURN ATTR_IN_OPT(3) ATTR_LIBC_PRINTF(3, 0) void NOTHROW_CB_NCX(LIBDCALL libd_verrc)(int status, errno_t used_errno, char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
-INTDEF ATTR_NORETURN ATTR_IN_OPT(3) ATTR_LIBC_PRINTF(3, 0) void NOTHROW_CB(LIBCCALL libc_verrc)(int status, errno_t used_errno, char const *format, va_list args);
+INTDEF ATTR_NORETURN ATTR_IN_OPT(3) ATTR_LIBC_PRINTF(3, 0) void NOTHROW_CB_NCX(LIBCCALL libc_verrc)(int status, errno_t used_errno, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> errx(3), verrx(3)
  * Same as `warnx()', but follow up by calling `exit(status)' */
-INTDEF ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void NOTHROW_CB(VLIBDCALL libd_errx)(int status, char const *format, ...);
+INTDEF ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void NOTHROW_CB_NCX(VLIBDCALL libd_errx)(int status, char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> errx(3), verrx(3)
  * Same as `warnx()', but follow up by calling `exit(status)' */
-INTDEF ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void NOTHROW_CB(VLIBCCALL libc_errx)(int status, char const *format, ...);
+INTDEF ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void NOTHROW_CB_NCX(VLIBCCALL libc_errx)(int status, char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> errx(3), verrx(3)
  * Same as `warnx()', but follow up by calling `exit(status)' */
-INTDEF ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0) void NOTHROW_CB(LIBDCALL libd_verrx)(int status, char const *format, va_list args);
+INTDEF ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0) void NOTHROW_CB_NCX(LIBDCALL libd_verrx)(int status, char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> errx(3), verrx(3)
  * Same as `warnx()', but follow up by calling `exit(status)' */
-INTDEF ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0) void NOTHROW_CB(LIBCCALL libc_verrx)(int status, char const *format, va_list args);
+INTDEF ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0) void NOTHROW_CB_NCX(LIBCCALL libc_verrx)(int status, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 
 DECL_END

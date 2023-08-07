@@ -166,10 +166,10 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endgrent)(void)
 }
 /*[[[end:libc_endgrent]]]*/
 
-/*[[[head:libc_fgetgrent,hash:CRC-32=0xbaffd1f2]]]*/
+/*[[[head:libc_fgetgrent,hash:CRC-32=0x6aec44d]]]*/
 /* >> fgetgrent(3), fgetgrent_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.grp") ATTR_INOUT(1) struct group *
-NOTHROW_CB(LIBCCALL libc_fgetgrent)(FILE *__restrict stream)
+NOTHROW_CB_NCX(LIBCCALL libc_fgetgrent)(FILE *__restrict stream)
 /*[[[body:libc_fgetgrent]]]*/
 {
 	return libc_fgetgrfiltered(stream, (uid_t)-1, NULL);

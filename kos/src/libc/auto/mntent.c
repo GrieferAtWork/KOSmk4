@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3c5f312 */
+/* HASH CRC-32:0xa5f34ecc */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream) {
 #include <bits/crt/db/mntent.h>
 /* >> getmntent(3), getmntent_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.mntent") ATTR_INOUT(1) struct mntent *
-NOTHROW_CB(LIBCCALL libc_getmntent)(FILE *stream) {
+NOTHROW_CB_NCX(LIBCCALL libc_getmntent)(FILE *stream) {
 
 	static struct mntent *ent = NULL;
 	static char *buf          = NULL;
@@ -58,10 +58,10 @@ NOTHROW_CB(LIBCCALL libc_getmntent)(FILE *stream) {
 }
 /* >> getmntent(3), getmntent_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.mntent") ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUTS(3, 4) struct mntent *
-NOTHROW_CB(LIBCCALL libc_getmntent_r)(FILE *__restrict stream,
-                                      struct mntent *__restrict result,
-                                      char *__restrict buffer,
-                                      __STDC_INT_AS_SIZE_T bufsize) {
+NOTHROW_CB_NCX(LIBCCALL libc_getmntent_r)(FILE *__restrict stream,
+                                          struct mntent *__restrict result,
+                                          char *__restrict buffer,
+                                          __STDC_INT_AS_SIZE_T bufsize) {
 	char *line;
 	do {
 		line = libc_fgets(buffer, bufsize, stream);
@@ -134,8 +134,8 @@ err:
  * @return: 0: Success
  * @return: 1: Error (WARNING: `errno' is left undefined) */
 INTERN ATTR_SECTION(".text.crt.database.mntent") ATTR_IN(2) ATTR_INOUT(1) int
-NOTHROW_CB(LIBCCALL libc_addmntent)(FILE *__restrict stream,
-                                    struct mntent const *__restrict mnt) {
+NOTHROW_CB_NCX(LIBCCALL libc_addmntent)(FILE *__restrict stream,
+                                        struct mntent const *__restrict mnt) {
 	if unlikely(!mnt ||
 	            !mnt->mnt_fsname || !mnt->mnt_dir ||
 	            !mnt->mnt_type || !mnt->mnt_opts)

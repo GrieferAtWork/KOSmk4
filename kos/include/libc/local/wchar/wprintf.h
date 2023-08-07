@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf82b4aa */
+/* HASH CRC-32:0xe2ca9c1c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,11 +29,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vwprintf_defined
 #define __local___localdep_vwprintf_defined
 #if defined(__CRT_HAVE_vwprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_IN(1) __ATTR_LIBC_WPRINTF(1, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_CB,__localdep_vwprintf,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwprintf_unlocked,(__format,__args))
+__CREDIRECT(__ATTR_IN(1) __ATTR_LIBC_WPRINTF(1, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_CB_NCX,__localdep_vwprintf,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwprintf_unlocked,(__format,__args))
 #elif defined(__CRT_HAVE_vwprintf)
-__CREDIRECT(__ATTR_IN(1) __ATTR_LIBC_WPRINTF(1, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_CB,__localdep_vwprintf,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwprintf,(__format,__args))
+__CREDIRECT(__ATTR_IN(1) __ATTR_LIBC_WPRINTF(1, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_CB_NCX,__localdep_vwprintf,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwprintf,(__format,__args))
 #elif defined(__CRT_HAVE_vwprintf_unlocked)
-__CREDIRECT(__ATTR_IN(1) __ATTR_LIBC_WPRINTF(1, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_CB,__localdep_vwprintf,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwprintf_unlocked,(__format,__args))
+__CREDIRECT(__ATTR_IN(1) __ATTR_LIBC_WPRINTF(1, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_CB_NCX,__localdep_vwprintf,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwprintf_unlocked,(__format,__args))
 #elif defined(__LOCAL_stdout) && (defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked))
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/vwprintf.h>
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_vwprintf_defined */
 __LOCAL_LIBC(wprintf) __ATTR_IN(1) __ATTR_LIBC_WPRINTF(1, 2) __STDC_INT_AS_SIZE_T
-__NOTHROW_CB(__VLIBCCALL __LIBC_LOCAL_NAME(wprintf))(__WCHAR_TYPE__ const *__restrict __format, ...) {
+__NOTHROW_CB_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(wprintf))(__WCHAR_TYPE__ const *__restrict __format, ...) {
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);

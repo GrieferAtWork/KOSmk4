@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5cfc47d */
+/* HASH CRC-32:0x9c09c4fb */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __SYSDECL_BEGIN
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
  * If `status' is non-zero, follow up with a call to `exit(status)' */
-__LIBC __ATTR_LIBC_PRINTF(3, 4) void __NOTHROW_CB(__VLIBCCALL __libc_core_error)(int __status, __errno_t __errnum, const char *__format, ...) __CASMNAME("error");
+__LIBC __ATTR_LIBC_PRINTF(3, 4) void __NOTHROW_CB_NCX(__VLIBCCALL __libc_core_error)(int __status, __errno_t __errnum, const char *__format, ...) __CASMNAME("error");
 #else /* __CRT_HAVE_error */
 #include <libc/template/stdstreams.h>
 #include <libc/template/program_invocation_name.h>
@@ -67,7 +67,7 @@ __LIBC __ATTR_LIBC_PRINTF(3, 4) void __NOTHROW_CB(__VLIBCCALL __libc_core_error)
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
  * Additionally,  when `error_one_per_line' is non-zero, consecutive calls to  this function that pass the same values
  * for `filename' and `line' will not produce the error message. */
-__LIBC __ATTR_LIBC_PRINTF(5, 6) void __NOTHROW_CB(__VLIBCCALL __libc_core_error_at_line)(int __status, __errno_t __errnum, char const *__filename, unsigned int __line, char const *__format, ...) __CASMNAME("error_at_line");
+__LIBC __ATTR_LIBC_PRINTF(5, 6) void __NOTHROW_CB_NCX(__VLIBCCALL __libc_core_error_at_line)(int __status, __errno_t __errnum, char const *__filename, unsigned int __line, char const *__format, ...) __CASMNAME("error_at_line");
 #else /* __CRT_HAVE_error_at_line */
 #include <libc/template/stdstreams.h>
 #include <libc/template/program_invocation_name.h>

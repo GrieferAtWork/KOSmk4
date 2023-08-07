@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c17514c */
+/* HASH CRC-32:0x9bdf9a10 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,14 +38,14 @@ INTDEF WUNUSED ATTR_IN(1) struct group *NOTHROW_RPC(LIBDCALL libd_getgrnam)(char
  * Write the given entry `ent' into the given `stream'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF ATTR_IN(1) ATTR_INOUT(2) int NOTHROW_CB(LIBDCALL libd_putgrent)(struct group const *__restrict entry, FILE *__restrict stream);
+INTDEF ATTR_IN(1) ATTR_INOUT(2) int NOTHROW_CB_NCX(LIBDCALL libd_putgrent)(struct group const *__restrict entry, FILE *__restrict stream);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> putgrent(3)
  * Write the given entry `ent' into the given `stream'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF ATTR_IN(1) ATTR_INOUT(2) int NOTHROW_CB(LIBCCALL libc_putgrent)(struct group const *__restrict entry, FILE *__restrict stream);
+INTDEF ATTR_IN(1) ATTR_INOUT(2) int NOTHROW_CB_NCX(LIBCCALL libc_putgrent)(struct group const *__restrict entry, FILE *__restrict stream);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getgrgid(3), getgrgid_r(3) */
@@ -55,11 +55,11 @@ INTDEF ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) int NOTHROW_RPC(LIBDCA
 /* >> getgrent(3), getgrent_r(3) */
 INTDEF ATTR_OUT(1) ATTR_OUT(4) ATTR_OUTS(2, 3) int NOTHROW_RPC(LIBDCALL libd_getgrent_r)(struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
 /* >> fgetgrent(3), fgetgrent_r(3) */
-INTDEF ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) int NOTHROW_CB(LIBDCALL libd_fgetgrent_r)(FILE *__restrict stream, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) int NOTHROW_CB_NCX(LIBDCALL libd_fgetgrent_r)(FILE *__restrict stream, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fgetgrent(3), fgetgrent_r(3) */
-INTDEF ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) int NOTHROW_CB(LIBCCALL libc_fgetgrent_r)(FILE *__restrict stream, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) int NOTHROW_CB_NCX(LIBCCALL libc_fgetgrent_r)(FILE *__restrict stream, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fgetgrgid_r(3)
@@ -67,7 +67,7 @@ INTDEF ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) int NOTHROW_CB(LIBC
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `gid'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-INTDEF ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_CB(LIBDCALL libd_fgetgrgid_r)(FILE *__restrict stream, gid_t gid, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
+INTDEF ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_CB_NCX(LIBDCALL libd_fgetgrgid_r)(FILE *__restrict stream, gid_t gid, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fgetgrgid_r(3)
@@ -75,7 +75,7 @@ INTDEF ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_CB(
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `gid'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-INTDEF ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_CB(LIBCCALL libc_fgetgrgid_r)(FILE *__restrict stream, gid_t gid, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
+INTDEF ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_CB_NCX(LIBCCALL libc_fgetgrgid_r)(FILE *__restrict stream, gid_t gid, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fgetgrnam_r(3)
@@ -83,7 +83,7 @@ INTDEF ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_CB(
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_CB(LIBDCALL libd_fgetgrnam_r)(FILE *__restrict stream, char const *__restrict name, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_CB_NCX(LIBDCALL libd_fgetgrnam_r)(FILE *__restrict stream, char const *__restrict name, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fgetgrnam_r(3)
@@ -91,7 +91,7 @@ INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t 
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_CB(LIBCCALL libc_fgetgrnam_r)(FILE *__restrict stream, char const *__restrict name, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_CB_NCX(LIBCCALL libc_fgetgrnam_r)(FILE *__restrict stream, char const *__restrict name, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
 /* >> fgetgrfiltered_r(3)
  * Filtered read from `stream'
  * @param: filtered_gid:  When not equal to `(gid_t)-1', require this GID
@@ -102,11 +102,11 @@ INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t 
  * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
  *                  Note that in this case, `errno' will have also been set to `ERANGE'
  * @return: * :     Error (one of `E*' from `<errno.h>') */
-INTDEF ATTR_INOUT(1) ATTR_IN_OPT(7) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) errno_t NOTHROW_CB(LIBCCALL libc_fgetgrfiltered_r)(FILE *__restrict stream, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result, gid_t filtered_gid, char const *filtered_name);
+INTDEF ATTR_INOUT(1) ATTR_IN_OPT(7) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) errno_t NOTHROW_CB_NCX(LIBCCALL libc_fgetgrfiltered_r)(FILE *__restrict stream, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result, gid_t filtered_gid, char const *filtered_name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fgetgrent(3), fgetgrent_r(3) */
-INTDEF ATTR_INOUT(1) struct group *NOTHROW_CB(LIBDCALL libd_fgetgrent)(FILE *__restrict stream);
+INTDEF ATTR_INOUT(1) struct group *NOTHROW_CB_NCX(LIBDCALL libd_fgetgrent)(FILE *__restrict stream);
 /* >> setgroups(2) */
 INTDEF ATTR_INS(2, 1) int NOTHROW_RPC(LIBDCALL libd_setgroups)(size_t count, gid_t const *groups);
 /* >> getgrouplist(3)

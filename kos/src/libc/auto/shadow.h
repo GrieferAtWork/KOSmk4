@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x320fc509 */
+/* HASH CRC-32:0x3409dcde */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,10 +49,10 @@ INTDEF WUNUSED ATTR_IN(1) struct spwd *NOTHROW_RPC(LIBDCALL libd_sgetspent)(char
 INTDEF WUNUSED ATTR_IN(1) struct spwd *NOTHROW_RPC(LIBCCALL libc_sgetspent)(char const *__restrict string);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_IN(1) ATTR_INOUT(2) int NOTHROW_CB(LIBDCALL libd_putspent)(struct spwd const *__restrict ent, FILE *__restrict stream);
+INTDEF ATTR_IN(1) ATTR_INOUT(2) int NOTHROW_CB_NCX(LIBDCALL libd_putspent)(struct spwd const *__restrict ent, FILE *__restrict stream);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_IN(1) ATTR_INOUT(2) int NOTHROW_CB(LIBCCALL libc_putspent)(struct spwd const *__restrict ent, FILE *__restrict stream);
+INTDEF ATTR_IN(1) ATTR_INOUT(2) int NOTHROW_CB_NCX(LIBCCALL libc_putspent)(struct spwd const *__restrict ent, FILE *__restrict stream);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_OUT(1) ATTR_OUT(4) ATTR_OUTS(2, 3) errno_t NOTHROW_RPC(LIBDCALL libd_getspent_r)(struct spwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result);

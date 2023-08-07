@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61834526 */
+/* HASH CRC-32:0xe69eb5fa */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,8 +62,8 @@ NOTHROW_NCX(LIBCCALL libc_nss_checkfieldlist)(char *const *list) {
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_IN(1) ATTR_INOUT(2) int
-NOTHROW_CB(LIBCCALL libc_putpwent)(struct passwd const *__restrict ent,
-                                   FILE *__restrict stream) {
+NOTHROW_CB_NCX(LIBCCALL libc_putpwent)(struct passwd const *__restrict ent,
+                                       FILE *__restrict stream) {
 	__STDC_INT_AS_SSIZE_T error;
 #if __SIZEOF_GID_T__ == 1
 	char gidbuf[COMPILER_LENOF("255")];

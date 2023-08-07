@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30b1928d */
+/* HASH CRC-32:0x4fc4421d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,27 +28,27 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetc_defined
 #define __local___localdep_fgetc_defined
 #if defined(__CRT_HAVE_fgetc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB,__localdep_fgetc,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB_NCX,__localdep_fgetc,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB,__localdep_fgetc,(__FILE *__restrict __stream),getc_unlocked,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB_NCX,__localdep_fgetc,(__FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif defined(__CRT_HAVE__getc_nolock) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB,__localdep_fgetc,(__FILE *__restrict __stream),_getc_nolock,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB_NCX,__localdep_fgetc,(__FILE *__restrict __stream),_getc_nolock,(__stream))
 #elif defined(__CRT_HAVE__fgetc_nolock) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB,__localdep_fgetc,(__FILE *__restrict __stream),_fgetc_nolock,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB_NCX,__localdep_fgetc,(__FILE *__restrict __stream),_fgetc_nolock,(__stream))
 #elif defined(__CRT_HAVE_getc)
-__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB,__localdep_fgetc,(__FILE *__restrict __stream),getc,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB_NCX,__localdep_fgetc,(__FILE *__restrict __stream),getc,(__stream))
 #elif defined(__CRT_HAVE_fgetc)
-__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB,__localdep_fgetc,(__FILE *__restrict __stream),fgetc,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB_NCX,__localdep_fgetc,(__FILE *__restrict __stream),fgetc,(__stream))
 #elif defined(__CRT_HAVE__IO_getc)
-__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB,__localdep_fgetc,(__FILE *__restrict __stream),_IO_getc,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB_NCX,__localdep_fgetc,(__FILE *__restrict __stream),_IO_getc,(__stream))
 #elif defined(__CRT_HAVE_fgetc_unlocked)
-__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB,__localdep_fgetc,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB_NCX,__localdep_fgetc,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked)
-__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB,__localdep_fgetc,(__FILE *__restrict __stream),getc_unlocked,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB_NCX,__localdep_fgetc,(__FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif defined(__CRT_HAVE__getc_nolock)
-__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB,__localdep_fgetc,(__FILE *__restrict __stream),_getc_nolock,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB_NCX,__localdep_fgetc,(__FILE *__restrict __stream),_getc_nolock,(__stream))
 #elif defined(__CRT_HAVE__fgetc_nolock)
-__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB,__localdep_fgetc,(__FILE *__restrict __stream),_fgetc_nolock,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_CB_NCX,__localdep_fgetc,(__FILE *__restrict __stream),_fgetc_nolock,(__stream))
 #elif (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow) || defined(__CRT_HAVE___srget))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fgetc.h>
@@ -75,15 +75,15 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #ifndef __local___localdep_getline_defined
 #define __local___localdep_getline_defined
 #if defined(__CRT_HAVE_getline_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT(3),__SSIZE_TYPE__,__NOTHROW_CB,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),getline_unlocked,(__lineptr,__pcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT(3),__SSIZE_TYPE__,__NOTHROW_CB_NCX,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),getline_unlocked,(__lineptr,__pcount,__stream))
 #elif defined(__CRT_HAVE_getline)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT(3),__SSIZE_TYPE__,__NOTHROW_CB,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),getline,(__lineptr,__pcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT(3),__SSIZE_TYPE__,__NOTHROW_CB_NCX,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),getline,(__lineptr,__pcount,__stream))
 #elif defined(__CRT_HAVE_getline_unlocked)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT(3),__SSIZE_TYPE__,__NOTHROW_CB,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),getline_unlocked,(__lineptr,__pcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT(3),__SSIZE_TYPE__,__NOTHROW_CB_NCX,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),getline_unlocked,(__lineptr,__pcount,__stream))
 #elif defined(__CRT_HAVE___getline)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT(3),__SSIZE_TYPE__,__NOTHROW_CB,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),__getline,(__lineptr,__pcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT(3),__SSIZE_TYPE__,__NOTHROW_CB_NCX,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),__getline,(__lineptr,__pcount,__stream))
 #elif defined(__CRT_HAVE__IO_getline)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT(3),__SSIZE_TYPE__,__NOTHROW_CB,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),_IO_getline,(__lineptr,__pcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT(3),__SSIZE_TYPE__,__NOTHROW_CB_NCX,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),_IO_getline,(__lineptr,__pcount,__stream))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/getline.h>
@@ -164,7 +164,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/util.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fparseln) __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN_OPT(4) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(3) char *
-__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(fparseln))(__FILE *__stream, __SIZE_TYPE__ *__plen, __SIZE_TYPE__ *__plineno, char const __delim[3], __STDC_INT_AS_UINT_T __flags) {
+__NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fparseln))(__FILE *__stream, __SIZE_TYPE__ *__plen, __SIZE_TYPE__ *__plineno, char const __delim[3], __STDC_INT_AS_UINT_T __flags) {
 	char *__result;
 	__SIZE_TYPE__ __result_alloc;
 	__SIZE_TYPE__ __result_length;

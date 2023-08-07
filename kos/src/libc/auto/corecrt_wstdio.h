@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9278dde6 */
+/* HASH CRC-32:0x3ada6b7c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,8 +30,8 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF ATTR_COLD ATTR_IN_OPT(1) void NOTHROW_CB(LIBDCALL libd__wperror)(char16_t const *__restrict message);
-INTDEF ATTR_COLD ATTR_IN_OPT(1) void NOTHROW_CB(LIBKCALL libc__wperror)(char32_t const *__restrict message);
+INTDEF ATTR_COLD ATTR_IN_OPT(1) void NOTHROW_CB_NCX(LIBDCALL libd__wperror)(char16_t const *__restrict message);
+INTDEF ATTR_COLD ATTR_IN_OPT(1) void NOTHROW_CB_NCX(LIBKCALL libc__wperror)(char32_t const *__restrict message);
 INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) FILE *NOTHROW_NCX(LIBDCALL libd__wfsopen)(char16_t const *filename, char16_t const *mode, __STDC_INT_AS_UINT_T sh_flag);
 INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) FILE *NOTHROW_NCX(LIBKCALL libc__wfsopen)(char32_t const *filename, char32_t const *mode, __STDC_INT_AS_UINT_T sh_flag);
 INTDEF WUNUSED ATTR_IN(2) FILE *NOTHROW_NCX(LIBDCALL libd__wfdopen)(fd_t fd, char16_t const *mode);

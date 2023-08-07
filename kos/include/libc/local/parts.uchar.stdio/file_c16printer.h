@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e1256f1 */
+/* HASH CRC-32:0x704859e2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,29 +28,29 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputc16_defined
 #define __local___localdep_fputc16_defined
 #if defined(__CRT_HAVE_fputwc_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$fputwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT_DOS(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$putwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT_DOS(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_fputwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$fputwc)
-__CREDIRECT_DOS(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$putwc)
-__CREDIRECT_DOS(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$fputwc_unlocked)
-__CREDIRECT_DOS(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$putwc_unlocked)
-__CREDIRECT_DOS(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_INOUT(2),__WINT16_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
 #else /* ... */
 #undef __local___localdep_fputc16_defined
 #endif /* !... */
@@ -59,7 +59,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(file_c16printer) __ATTR_INS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__
-__NOTHROW_CB(__LIBDCALL __LIBC_LOCAL_NAME(file_c16printer))(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
+__NOTHROW_CB_NCX(__LIBDCALL __LIBC_LOCAL_NAME(file_c16printer))(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < __datalen; ++__i) {
 		if ((__NAMESPACE_LOCAL_SYM __localdep_fputc16)(__data[__i], (__FILE *)__arg) == __WEOF16)

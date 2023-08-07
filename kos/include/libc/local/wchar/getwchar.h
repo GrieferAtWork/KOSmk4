@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13f2d04 */
+/* HASH CRC-32:0x2a57fb7b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,23 +29,23 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetwc_defined
 #define __local___localdep_fgetwc_defined
 #if defined(__CRT_HAVE_fgetwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_INOUT(1),__WINT_TYPE__,__NOTHROW_CB,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),__WINT_TYPE__,__NOTHROW_CB_NCX,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_INOUT(1),__WINT_TYPE__,__NOTHROW_CB,__localdep_fgetwc,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),__WINT_TYPE__,__NOTHROW_CB_NCX,__localdep_fgetwc,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fgetwc)
-__CREDIRECT(__ATTR_INOUT(1),__WINT_TYPE__,__NOTHROW_CB,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),__WINT_TYPE__,__NOTHROW_CB_NCX,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_getwc)
-__CREDIRECT(__ATTR_INOUT(1),__WINT_TYPE__,__NOTHROW_CB,__localdep_fgetwc,(__FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),__WINT_TYPE__,__NOTHROW_CB_NCX,__localdep_fgetwc,(__FILE *__restrict __stream),getwc,(__stream))
 #elif defined(__CRT_HAVE_fgetwc_unlocked)
-__CREDIRECT(__ATTR_INOUT(1),__WINT_TYPE__,__NOTHROW_CB,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),__WINT_TYPE__,__NOTHROW_CB_NCX,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getwc_unlocked)
-__CREDIRECT(__ATTR_INOUT(1),__WINT_TYPE__,__NOTHROW_CB,__localdep_fgetwc,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),__WINT_TYPE__,__NOTHROW_CB_NCX,__localdep_fgetwc,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
 #else /* ... */
 #undef __local___localdep_fgetwc_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgetwc_defined */
 __LOCAL_LIBC(getwchar) __WINT_TYPE__
-__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(getwchar))(void) {
+__NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getwchar))(void) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fgetwc)(__LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END

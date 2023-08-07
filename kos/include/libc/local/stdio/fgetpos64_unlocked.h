@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc26ec541 */
+/* HASH CRC-32:0x501572a0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,21 +29,21 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetpos64_defined
 #define __local___localdep_fgetpos64_defined
 #if defined(__CRT_HAVE_fgetpos_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__NOTHROW_CB,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__NOTHROW_CB_NCX,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos64_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__NOTHROW_CB,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__NOTHROW_CB_NCX,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__NOTHROW_CB,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos,(__stream,__pos))
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__NOTHROW_CB_NCX,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fgetpos) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__NOTHROW_CB,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),_IO_fgetpos,(__stream,__pos))
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__NOTHROW_CB_NCX,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),_IO_fgetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos64)
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__NOTHROW_CB,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos64,(__stream,__pos))
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__NOTHROW_CB_NCX,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos64,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fgetpos64)
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__NOTHROW_CB,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),_IO_fgetpos64,(__stream,__pos))
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__NOTHROW_CB_NCX,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),_IO_fgetpos64,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos_unlocked) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__NOTHROW_CB,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__NOTHROW_CB_NCX,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos64_unlocked)
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__NOTHROW_CB,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__NOTHROW_CB_NCX,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE___ftello64) || defined(__CRT_HAVE_ftell64) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE_ftell64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE__IO_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fgetpos64.h>
@@ -54,7 +54,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fgetpos64_defined */
 __LOCAL_LIBC(fgetpos64_unlocked) __ATTR_INOUT(1) __ATTR_OUT(2) int
-__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(fgetpos64_unlocked))(__FILE *__restrict __stream, __fpos64_t *__restrict __pos) {
+__NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fgetpos64_unlocked))(__FILE *__restrict __stream, __fpos64_t *__restrict __pos) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fgetpos64)(__stream, __pos);
 }
 __NAMESPACE_LOCAL_END

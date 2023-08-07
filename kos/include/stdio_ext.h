@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef8d5db9 */
+/* HASH CRC-32:0x5e54e6b5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -167,14 +167,14 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),size_t,__NOTHROW_NCX,__fpend
  * Note that usually call this function isn't necessary, since the same already
  * happens automatically when  writing a line-feed  to any line-buffered  stdio
  * file (where line-buffered files are usually those opened on TTYs) */
-__CDECLARE_VOID(,__NOTHROW_CB,_flushlbf,(void),())
+__CDECLARE_VOID(,__NOTHROW_CB_NCX,_flushlbf,(void),())
 #elif defined(__CRT_HAVE__IO_flush_all_linebuffered)
 /* >> _flushlbf(3)
  * Perform  a call  `fflush(stream)' for  every open  line-buffered stdio file.
  * Note that usually call this function isn't necessary, since the same already
  * happens automatically when  writing a line-feed  to any line-buffered  stdio
  * file (where line-buffered files are usually those opened on TTYs) */
-__CREDIRECT_VOID(,__NOTHROW_CB,_flushlbf,(void),_IO_flush_all_linebuffered,())
+__CREDIRECT_VOID(,__NOTHROW_CB_NCX,_flushlbf,(void),_IO_flush_all_linebuffered,())
 #endif /* ... */
 /* >> __fsetlocking(3)
  * Set the locking type for `stream' to `type'. This affects all stdio functions

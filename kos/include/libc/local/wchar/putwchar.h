@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d2dc6a0 */
+/* HASH CRC-32:0x4d305f2e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,23 +29,23 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputwc_defined
 #define __local___localdep_fputwc_defined
 #if defined(__CRT_HAVE_fputwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_INOUT(2),__WINT_TYPE__,__NOTHROW_CB,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_INOUT(2),__WINT_TYPE__,__NOTHROW_CB_NCX,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_INOUT(2),__WINT_TYPE__,__NOTHROW_CB,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_INOUT(2),__WINT_TYPE__,__NOTHROW_CB_NCX,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_fputwc)
-__CREDIRECT(__ATTR_INOUT(2),__WINT_TYPE__,__NOTHROW_CB,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT(__ATTR_INOUT(2),__WINT_TYPE__,__NOTHROW_CB_NCX,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc)
-__CREDIRECT(__ATTR_INOUT(2),__WINT_TYPE__,__NOTHROW_CB,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT(__ATTR_INOUT(2),__WINT_TYPE__,__NOTHROW_CB_NCX,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_fputwc_unlocked)
-__CREDIRECT(__ATTR_INOUT(2),__WINT_TYPE__,__NOTHROW_CB,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_INOUT(2),__WINT_TYPE__,__NOTHROW_CB_NCX,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc_unlocked)
-__CREDIRECT(__ATTR_INOUT(2),__WINT_TYPE__,__NOTHROW_CB,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_INOUT(2),__WINT_TYPE__,__NOTHROW_CB_NCX,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
 #else /* ... */
 #undef __local___localdep_fputwc_defined
 #endif /* !... */
 #endif /* !__local___localdep_fputwc_defined */
 __LOCAL_LIBC(putwchar) __WINT_TYPE__
-__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(putwchar))(__WCHAR_TYPE__ __wc) {
+__NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(putwchar))(__WCHAR_TYPE__ __wc) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fputwc)(__wc, __LOCAL_stdout);
 }
 __NAMESPACE_LOCAL_END

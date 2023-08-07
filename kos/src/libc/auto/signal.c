@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bf19e10 */
+/* HASH CRC-32:0x3a98008b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -291,8 +291,8 @@ NOTHROW_NCX(LIBCCALL libc_killpg)(pid_t pgrp,
  * Same as `fprintf(stderr, "%s: %s\n", s, sigabbrev_np(signo) ? "SIG"+. : strdupf("Unknown signal %d", signo))'
  * When `s' is `NULL' or an empty string, omit the leading "%s: " from the format. */
 INTERN ATTR_SECTION(".text.crt.sched.signal") void
-NOTHROW_CB(LIBCCALL libc_psignal)(signo_t signo,
-                                  char const *s) {
+NOTHROW_CB_NCX(LIBCCALL libc_psignal)(signo_t signo,
+                                      char const *s) {
 	char const *signam = libc_sigabbrev_np(signo);
 	if (s && *s)
 		libc_fprintf(stderr, "%s: ", s);
@@ -307,8 +307,8 @@ NOTHROW_CB(LIBCCALL libc_psignal)(signo_t signo,
 /* >> psiginfo(3)
  * Similar to `psignal(3)', but instead print extended signal information from `*pinfo' */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_IN(1) ATTR_IN_OPT(2) void
-NOTHROW_CB(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
-                                   char const *s) {
+NOTHROW_CB_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
+                                       char const *s) {
 	char const *text;
 	text = libc_sigabbrev_np(pinfo->si_signo);
 	if (s && *s)

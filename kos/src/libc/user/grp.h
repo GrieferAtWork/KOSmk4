@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34b2d8b */
+/* HASH CRC-32:0x54df6187 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ INTDEF ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) int NOTHROW_RPC(LIBCCA
 /* >> getgrent(3), getgrent_r(3) */
 INTDEF ATTR_OUT(1) ATTR_OUT(4) ATTR_OUTS(2, 3) int NOTHROW_RPC(LIBCCALL libc_getgrent_r)(struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
 /* >> fgetgrent(3), fgetgrent_r(3) */
-INTDEF ATTR_INOUT(1) struct group *NOTHROW_CB(LIBCCALL libc_fgetgrent)(FILE *__restrict stream);
+INTDEF ATTR_INOUT(1) struct group *NOTHROW_CB_NCX(LIBCCALL libc_fgetgrent)(FILE *__restrict stream);
 /* >> setgroups(2) */
 INTDEF ATTR_INS(2, 1) int NOTHROW_RPC(LIBCCALL libc_setgroups)(size_t count, gid_t const *groups);
 #endif /* !__KERNEL__ */

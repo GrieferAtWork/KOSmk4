@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcec221b */
+/* HASH CRC-32:0x607bdb94 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,35 +29,35 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputc32_defined
 #define __local___localdep_fputc32_defined
 #if defined(__CRT_HAVE_fputwc_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$fputwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT_KOS(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$putwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT_KOS(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_fputwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$fputwc)
-__CREDIRECT_KOS(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$putwc)
-__CREDIRECT_KOS(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$fputwc_unlocked)
-__CREDIRECT_KOS(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$putwc_unlocked)
-__CREDIRECT_KOS(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_INOUT(2),__WINT32_TYPE__,__NOTHROW_CB_NCX,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
 #else /* ... */
 #undef __local___localdep_fputc32_defined
 #endif /* !... */
 #endif /* !__local___localdep_fputc32_defined */
 __LOCAL_LIBC(putchar32) __WINT32_TYPE__
-__NOTHROW_CB(__LIBKCALL __LIBC_LOCAL_NAME(putchar32))(__CHAR32_TYPE__ __wc) {
+__NOTHROW_CB_NCX(__LIBKCALL __LIBC_LOCAL_NAME(putchar32))(__CHAR32_TYPE__ __wc) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fputc32)(__wc, __LOCAL_stdout);
 }
 __NAMESPACE_LOCAL_END

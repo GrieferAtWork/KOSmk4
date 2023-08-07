@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e9fbea1 */
+/* HASH CRC-32:0x7128ed3c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ DECL_BEGIN
 #include <libc/errno.h>
 #include <parts/printf-config.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno.utility") ATTR_COLD ATTR_IN_OPT(1) void
-NOTHROW_CB(LIBDCALL libd__wperror)(char16_t const *__restrict message) {
+NOTHROW_CB_NCX(LIBDCALL libd__wperror)(char16_t const *__restrict message) {
 
 
 
@@ -68,7 +68,7 @@ NOTHROW_CB(LIBDCALL libd__wperror)(char16_t const *__restrict message) {
 #include <libc/errno.h>
 #include <parts/printf-config.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.errno.utility") ATTR_COLD ATTR_IN_OPT(1) void
-NOTHROW_CB(LIBKCALL libc__wperror)(char32_t const *__restrict message) {
+NOTHROW_CB_NCX(LIBKCALL libc__wperror)(char32_t const *__restrict message) {
 
 
 

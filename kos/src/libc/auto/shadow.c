@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x836718c7 */
+/* HASH CRC-32:0xe54c8bdb */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,8 +51,8 @@ NOTHROW_RPC(LIBCCALL libc_sgetspent)(char const *__restrict string) {
 #include <hybrid/typecore.h>
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_IN(1) ATTR_INOUT(2) int
-NOTHROW_CB(LIBCCALL libc_putspent)(struct spwd const *__restrict ent,
-                                   FILE *__restrict stream) {
+NOTHROW_CB_NCX(LIBCCALL libc_putspent)(struct spwd const *__restrict ent,
+                                       FILE *__restrict stream) {
 	__STDC_INT_AS_SSIZE_T error;
 #if __SIZEOF_POINTER__ <= 1
 #define STR_LONGPTR_MAX  "127"

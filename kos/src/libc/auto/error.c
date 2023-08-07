@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9051972a */
+/* HASH CRC-32:0xd75c6d62 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,10 +67,10 @@ __CSDECLARE(,unsigned int,error_message_count)
 #include <libc/template/stdstreams.h>
 #include <libc/template/program_invocation_name.h>
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(3, 0) void
-NOTHROW_CB(LIBCCALL libc_verror)(int status,
-                                 errno_t errnum,
-                                 const char *format,
-                                 va_list args) {
+NOTHROW_CB_NCX(LIBCCALL libc_verror)(int status,
+                                     errno_t errnum,
+                                     const char *format,
+                                     va_list args) {
 
 	if (__LOCAL_error_print_progname) {
 		(*__LOCAL_error_print_progname)();
@@ -135,12 +135,12 @@ __CSDECLARE(,unsigned int,error_message_count)
 #endif /* ... */
 #endif /* !__LOCAL_error_message_count */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(5, 0) void
-NOTHROW_CB(LIBCCALL libc_verror_at_line)(int status,
-                                         errno_t errnum,
-                                         char const *filename,
-                                         unsigned int line,
-                                         char const *format,
-                                         va_list args) {
+NOTHROW_CB_NCX(LIBCCALL libc_verror_at_line)(int status,
+                                             errno_t errnum,
+                                             char const *filename,
+                                             unsigned int line,
+                                             char const *format,
+                                             va_list args) {
 
 	static char const *last_filename = NULL;
 	static unsigned int last_line = 0;
@@ -189,10 +189,10 @@ NOTHROW_CB(LIBCCALL libc_verror_at_line)(int status,
  * Also note that `stdout' is flushed before the message is printed.
  * If `status' is non-zero, follow up with a call to `exit(status)' */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(3, 4) void
-NOTHROW_CB(VLIBDCALL libd_error)(int status,
-                                 errno_t errnum,
-                                 const char *format,
-                                 ...) {
+NOTHROW_CB_NCX(VLIBDCALL libd_error)(int status,
+                                     errno_t errnum,
+                                     const char *format,
+                                     ...) {
 	va_list args;
 	va_start(args, format);
 	libc_verror(status, errnum, format, args);
@@ -206,10 +206,10 @@ NOTHROW_CB(VLIBDCALL libd_error)(int status,
  * Also note that `stdout' is flushed before the message is printed.
  * If `status' is non-zero, follow up with a call to `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(3, 4) void
-NOTHROW_CB(VLIBCCALL libc_error)(int status,
-                                 errno_t errnum,
-                                 const char *format,
-                                 ...) {
+NOTHROW_CB_NCX(VLIBCCALL libc_error)(int status,
+                                     errno_t errnum,
+                                     const char *format,
+                                     ...) {
 	va_list args;
 	va_start(args, format);
 	libc_verror(status, errnum, format, args);
@@ -223,12 +223,12 @@ NOTHROW_CB(VLIBCCALL libc_error)(int status,
  * Additionally,  when `error_one_per_line' is non-zero, consecutive calls to  this function that pass the same values
  * for `filename' and `line' will not produce the error message. */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(5, 6) void
-NOTHROW_CB(VLIBDCALL libd_error_at_line)(int status,
-                                         errno_t errnum,
-                                         char const *filename,
-                                         unsigned int line,
-                                         char const *format,
-                                         ...) {
+NOTHROW_CB_NCX(VLIBDCALL libd_error_at_line)(int status,
+                                             errno_t errnum,
+                                             char const *filename,
+                                             unsigned int line,
+                                             char const *format,
+                                             ...) {
 	va_list args;
 	va_start(args, format);
 	libc_verror_at_line(status, errnum, filename, line, format, args);
@@ -242,12 +242,12 @@ NOTHROW_CB(VLIBDCALL libd_error_at_line)(int status,
  * Additionally,  when `error_one_per_line' is non-zero, consecutive calls to  this function that pass the same values
  * for `filename' and `line' will not produce the error message. */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(5, 6) void
-NOTHROW_CB(VLIBCCALL libc_error_at_line)(int status,
-                                         errno_t errnum,
-                                         char const *filename,
-                                         unsigned int line,
-                                         char const *format,
-                                         ...) {
+NOTHROW_CB_NCX(VLIBCCALL libc_error_at_line)(int status,
+                                             errno_t errnum,
+                                             char const *filename,
+                                             unsigned int line,
+                                             char const *format,
+                                             ...) {
 	va_list args;
 	va_start(args, format);
 	libc_verror_at_line(status, errnum, filename, line, format, args);

@@ -106,10 +106,12 @@ global final SIMPLE_NOTHROW_ANNOTATIONS: {string: string} = {
 	"nothrow_rpc_pure"  : "NOTHROW_RPC_PURE",
 
 	/* CP for stdio (because of libio, custom FILE cookies may throw exceptions)
-	 * Used  for  functions  that  are   already  CP  in  their  syscall   form. */
-	"cp_stdio"          : "NOTHROW_CB",
+	 * Used  for  functions  that  are   already  CP  in  their  syscall   form.
+	 * NOTE: NXC is always in here as well since users may provide broken
+	 *       pointers for `FILE *' objects. */
+	"cp_stdio"          : "NOTHROW_CB_NCX",
 	/* STDIO functions that may throw because of custom FILE cookies. */
-	"stdio_throws"      : "NOTHROW_CB",
+	"stdio_throws"      : "NOTHROW_CB_NCX",
 	"throws"            : "THROWS(...)",
 
 	/* Cancellation point */

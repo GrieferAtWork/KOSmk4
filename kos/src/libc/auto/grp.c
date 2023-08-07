@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70f7cfd4 */
+/* HASH CRC-32:0x49807c02 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,8 +43,8 @@ DECL_BEGIN
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.database.grp") ATTR_IN(1) ATTR_INOUT(2) int
-NOTHROW_CB(LIBCCALL libc_putgrent)(struct group const *__restrict entry,
-                                   FILE *__restrict stream) {
+NOTHROW_CB_NCX(LIBCCALL libc_putgrent)(struct group const *__restrict entry,
+                                       FILE *__restrict stream) {
 	__STDC_INT_AS_SSIZE_T error;
 #if __SIZEOF_GID_T__ == 1
 	char gidbuf[COMPILER_LENOF("255")];
@@ -114,11 +114,11 @@ err_inval:
 }
 /* >> fgetgrent(3), fgetgrent_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.grp") ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) int
-NOTHROW_CB(LIBCCALL libc_fgetgrent_r)(FILE *__restrict stream,
-                                      struct group *__restrict resultbuf,
-                                      char *__restrict buffer,
-                                      size_t buflen,
-                                      struct group **__restrict result) {
+NOTHROW_CB_NCX(LIBCCALL libc_fgetgrent_r)(FILE *__restrict stream,
+                                          struct group *__restrict resultbuf,
+                                          char *__restrict buffer,
+                                          size_t buflen,
+                                          struct group **__restrict result) {
 	return libc_fgetgrfiltered_r(stream, resultbuf, buffer, buflen,
 	                        result, (gid_t)-1, NULL);
 }
@@ -129,12 +129,12 @@ NOTHROW_CB(LIBCCALL libc_fgetgrent_r)(FILE *__restrict stream,
  * @return: 0 : (*result == NULL) No entry for `gid'
  * @return: * : Error (one of `E*' from `<errno.h>') */
 INTERN ATTR_SECTION(".text.crt.database.grp") ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t
-NOTHROW_CB(LIBCCALL libc_fgetgrgid_r)(FILE *__restrict stream,
-                                      gid_t gid,
-                                      struct group *__restrict resultbuf,
-                                      char *__restrict buffer,
-                                      size_t buflen,
-                                      struct group **__restrict result) {
+NOTHROW_CB_NCX(LIBCCALL libc_fgetgrgid_r)(FILE *__restrict stream,
+                                          gid_t gid,
+                                          struct group *__restrict resultbuf,
+                                          char *__restrict buffer,
+                                          size_t buflen,
+                                          struct group **__restrict result) {
 	errno_t error;
 	error = libc_fgetgrfiltered_r(stream, resultbuf, buffer, buflen,
 	                         result, gid, NULL);
@@ -151,12 +151,12 @@ NOTHROW_CB(LIBCCALL libc_fgetgrgid_r)(FILE *__restrict stream,
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
 INTERN ATTR_SECTION(".text.crt.database.grp") ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t
-NOTHROW_CB(LIBCCALL libc_fgetgrnam_r)(FILE *__restrict stream,
-                                      char const *__restrict name,
-                                      struct group *__restrict resultbuf,
-                                      char *__restrict buffer,
-                                      size_t buflen,
-                                      struct group **__restrict result) {
+NOTHROW_CB_NCX(LIBCCALL libc_fgetgrnam_r)(FILE *__restrict stream,
+                                          char const *__restrict name,
+                                          struct group *__restrict resultbuf,
+                                          char *__restrict buffer,
+                                          size_t buflen,
+                                          struct group **__restrict result) {
 	errno_t error;
 	error = libc_fgetgrfiltered_r(stream, resultbuf, buffer, buflen,
 	                         result, (gid_t)-1, name);
@@ -180,13 +180,13 @@ NOTHROW_CB(LIBCCALL libc_fgetgrnam_r)(FILE *__restrict stream,
  *                  Note that in this case, `errno' will have also been set to `ERANGE'
  * @return: * :     Error (one of `E*' from `<errno.h>') */
 INTERN ATTR_SECTION(".text.crt.database.grp") ATTR_INOUT(1) ATTR_IN_OPT(7) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) errno_t
-NOTHROW_CB(LIBCCALL libc_fgetgrfiltered_r)(FILE *__restrict stream,
-                                           struct group *__restrict resultbuf,
-                                           char *__restrict buffer,
-                                           size_t buflen,
-                                           struct group **__restrict result,
-                                           gid_t filtered_gid,
-                                           char const *filtered_name) {
+NOTHROW_CB_NCX(LIBCCALL libc_fgetgrfiltered_r)(FILE *__restrict stream,
+                                               struct group *__restrict resultbuf,
+                                               char *__restrict buffer,
+                                               size_t buflen,
+                                               struct group **__restrict result,
+                                               gid_t filtered_gid,
+                                               char const *filtered_name) {
 	errno_t retval = 0;
 	char *dbline;
 	fpos64_t startpos, curpos;

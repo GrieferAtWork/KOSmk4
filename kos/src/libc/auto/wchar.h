@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34279877 */
+/* HASH CRC-32:0xebbf442f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -128,21 +128,21 @@ INTDEF ATTR_INS(2, 3) ATTR_OUTS(1, 3) size_t NOTHROW_NCX(LIBDCALL libd_wcsxfrm)(
 /* >> wcsxfrm(3) */
 INTDEF ATTR_INS(2, 3) ATTR_OUTS(1, 3) size_t NOTHROW_NCX(LIBKCALL libc_wcsxfrm)(char32_t *dst, char32_t const *__restrict src, size_t buflen);
 /* >> getwchar(3), getwchar_unlocked(3) */
-INTDEF wint16_t NOTHROW_CB(LIBDCALL libd_getwchar)(void);
+INTDEF wint16_t NOTHROW_CB_NCX(LIBDCALL libd_getwchar)(void);
 /* >> getwchar(3), getwchar_unlocked(3) */
-INTDEF wint32_t NOTHROW_CB(LIBKCALL libc_getwchar)(void);
+INTDEF wint32_t NOTHROW_CB_NCX(LIBKCALL libc_getwchar)(void);
 /* >> putwchar(3), putwchar_unlocked(3) */
-INTDEF wint16_t NOTHROW_CB(LIBDCALL libd_putwchar)(char16_t wc);
+INTDEF wint16_t NOTHROW_CB_NCX(LIBDCALL libd_putwchar)(char16_t wc);
 /* >> putwchar(3), putwchar_unlocked(3) */
-INTDEF wint32_t NOTHROW_CB(LIBKCALL libc_putwchar)(char32_t wc);
+INTDEF wint32_t NOTHROW_CB_NCX(LIBKCALL libc_putwchar)(char32_t wc);
 /* >> fgetws(3), fgetws_unlocked(3) */
-INTDEF WUNUSED ATTR_INOUT(3) ATTR_OUTS(1, 2) char16_t *NOTHROW_CB(LIBDCALL libd_fgetws)(char16_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream);
+INTDEF WUNUSED ATTR_INOUT(3) ATTR_OUTS(1, 2) char16_t *NOTHROW_CB_NCX(LIBDCALL libd_fgetws)(char16_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream);
 /* >> fgetws(3), fgetws_unlocked(3) */
-INTDEF WUNUSED ATTR_INOUT(3) ATTR_OUTS(1, 2) char32_t *NOTHROW_CB(LIBKCALL libc_fgetws)(char32_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream);
+INTDEF WUNUSED ATTR_INOUT(3) ATTR_OUTS(1, 2) char32_t *NOTHROW_CB_NCX(LIBKCALL libc_fgetws)(char32_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream);
 /* >> fputws(3), fputws_unlocked(3) */
-INTDEF ATTR_IN(1) ATTR_INOUT(2) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBDCALL libd_fputws)(char16_t const *__restrict str, FILE *__restrict stream);
+INTDEF ATTR_IN(1) ATTR_INOUT(2) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBDCALL libd_fputws)(char16_t const *__restrict str, FILE *__restrict stream);
 /* >> fputws(3), fputws_unlocked(3) */
-INTDEF ATTR_IN(1) ATTR_INOUT(2) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBKCALL libc_fputws)(char32_t const *__restrict str, FILE *__restrict stream);
+INTDEF ATTR_IN(1) ATTR_INOUT(2) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBKCALL libc_fputws)(char32_t const *__restrict str, FILE *__restrict stream);
 /* >> wcsftime(3) */
 INTDEF ATTR_IN(3) ATTR_IN(4) ATTR_LIBC_C16FTIME(3, 0) ATTR_OUTS(1, 2) size_t NOTHROW_NCX(LIBDCALL libd_wcsftime)(char16_t *__restrict buf, size_t buflen, char16_t const *__restrict format, struct tm const *__restrict tp);
 /* >> wcsftime(3) */
@@ -188,29 +188,29 @@ INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd_fwide)(FILE *fp, int mode);
 /* >> fwide(3) */
 INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc_fwide)(FILE *fp, int mode);
 /* >> fwprintf(3), vfwprintf(3), fwprintf_unlocked(3), vfwprintf_unlocked(3) */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C16PRINTF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_CB(VLIBDCALL libd_fwprintf)(FILE *__restrict stream, char16_t const *__restrict format, ...);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C16PRINTF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(VLIBDCALL libd_fwprintf)(FILE *__restrict stream, char16_t const *__restrict format, ...);
 /* >> fwprintf(3), vfwprintf(3), fwprintf_unlocked(3), vfwprintf_unlocked(3) */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C32PRINTF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_CB(VLIBKCALL libc_fwprintf)(FILE *__restrict stream, char32_t const *__restrict format, ...);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C32PRINTF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(VLIBKCALL libc_fwprintf)(FILE *__restrict stream, char32_t const *__restrict format, ...);
 /* >> fwprintf(3), vfwprintf(3), fwprintf_unlocked(3), vfwprintf_unlocked(3) */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C16PRINTF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBDCALL libd_vfwprintf)(FILE *__restrict stream, char16_t const *__restrict format, va_list args);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C16PRINTF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBDCALL libd_vfwprintf)(FILE *__restrict stream, char16_t const *__restrict format, va_list args);
 /* >> fwprintf(3), vfwprintf(3), fwprintf_unlocked(3), vfwprintf_unlocked(3) */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C32PRINTF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBKCALL libc_vfwprintf)(FILE *__restrict stream, char32_t const *__restrict format, va_list args);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C32PRINTF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBKCALL libc_vfwprintf)(FILE *__restrict stream, char32_t const *__restrict format, va_list args);
 /* >> wprintf(3), vwprintf(3), wprintf_unlocked(3), vwprintf_unlocked(3) */
-INTDEF ATTR_IN(1) ATTR_LIBC_C16PRINTF(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_CB(VLIBDCALL libd_wprintf)(char16_t const *__restrict format, ...);
+INTDEF ATTR_IN(1) ATTR_LIBC_C16PRINTF(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(VLIBDCALL libd_wprintf)(char16_t const *__restrict format, ...);
 /* >> wprintf(3), vwprintf(3), wprintf_unlocked(3), vwprintf_unlocked(3) */
-INTDEF ATTR_IN(1) ATTR_LIBC_C32PRINTF(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_CB(VLIBKCALL libc_wprintf)(char32_t const *__restrict format, ...);
+INTDEF ATTR_IN(1) ATTR_LIBC_C32PRINTF(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(VLIBKCALL libc_wprintf)(char32_t const *__restrict format, ...);
 /* >> wprintf(3), vwprintf(3), wprintf_unlocked(3), vwprintf_unlocked(3) */
-INTDEF ATTR_IN(1) ATTR_LIBC_C16PRINTF(1, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBDCALL libd_vwprintf)(char16_t const *__restrict format, va_list args);
+INTDEF ATTR_IN(1) ATTR_LIBC_C16PRINTF(1, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBDCALL libd_vwprintf)(char16_t const *__restrict format, va_list args);
 /* >> wprintf(3), vwprintf(3), wprintf_unlocked(3), vwprintf_unlocked(3) */
-INTDEF ATTR_IN(1) ATTR_LIBC_C32PRINTF(1, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBKCALL libc_vwprintf)(char32_t const *__restrict format, va_list args);
+INTDEF ATTR_IN(1) ATTR_LIBC_C32PRINTF(1, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBKCALL libc_vwprintf)(char32_t const *__restrict format, va_list args);
 /* >> fwscanf(3), vfwscanf(3), fwscanf_unlocked(3), vfwscanf_unlocked(3) */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C16SCANF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_CB(VLIBDCALL libd_fwscanf)(FILE *__restrict stream, char16_t const *__restrict format, ...);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C16SCANF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(VLIBDCALL libd_fwscanf)(FILE *__restrict stream, char16_t const *__restrict format, ...);
 /* >> fwscanf(3), vfwscanf(3), fwscanf_unlocked(3), vfwscanf_unlocked(3) */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C32SCANF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_CB(VLIBKCALL libc_fwscanf)(FILE *__restrict stream, char32_t const *__restrict format, ...);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C32SCANF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(VLIBKCALL libc_fwscanf)(FILE *__restrict stream, char32_t const *__restrict format, ...);
 /* >> wscanf(3), vwscanf(3), wscanf_unlocked(3), vwscanf_unlocked(3) */
-INTDEF ATTR_IN(1) ATTR_LIBC_C16SCANF(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_CB(VLIBDCALL libd_wscanf)(char16_t const *__restrict format, ...);
+INTDEF ATTR_IN(1) ATTR_LIBC_C16SCANF(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(VLIBDCALL libd_wscanf)(char16_t const *__restrict format, ...);
 /* >> wscanf(3), vwscanf(3), wscanf_unlocked(3), vwscanf_unlocked(3) */
-INTDEF ATTR_IN(1) ATTR_LIBC_C32SCANF(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_CB(VLIBKCALL libc_wscanf)(char32_t const *__restrict format, ...);
+INTDEF ATTR_IN(1) ATTR_LIBC_C32SCANF(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(VLIBKCALL libc_wscanf)(char32_t const *__restrict format, ...);
 /* >> swscanf(3), vswscanf(3) */
 INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_LIBC_C16SCANF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd_swscanf)(char16_t const *__restrict src, char16_t const *__restrict format, ...);
 /* >> swscanf(3), vswscanf(3) */
@@ -244,13 +244,13 @@ INTDEF ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) __ULONGLONG NOTHROW_NCX(LIBDCALL lib
 /* >> wcstoull(3) */
 INTDEF ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) __ULONGLONG NOTHROW_NCX(LIBKCALL libc_wcstoull)(char32_t const *__restrict nptr, char32_t **endptr, __STDC_INT_AS_UINT_T base);
 /* >> fwscanf(3), vfwscanf(3), fwscanf_unlocked(3), vfwscanf_unlocked(3) */
-INTDEF WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C16SCANF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBDCALL libd_vfwscanf)(FILE *__restrict stream, char16_t const *__restrict format, va_list args);
+INTDEF WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C16SCANF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBDCALL libd_vfwscanf)(FILE *__restrict stream, char16_t const *__restrict format, va_list args);
 /* >> fwscanf(3), vfwscanf(3), fwscanf_unlocked(3), vfwscanf_unlocked(3) */
-INTDEF WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C32SCANF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBKCALL libc_vfwscanf)(FILE *__restrict stream, char32_t const *__restrict format, va_list args);
+INTDEF WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C32SCANF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBKCALL libc_vfwscanf)(FILE *__restrict stream, char32_t const *__restrict format, va_list args);
 /* >> vwscanf(3) */
-INTDEF WUNUSED ATTR_IN(1) ATTR_LIBC_C16SCANF(1, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBDCALL libd_vwscanf)(char16_t const *__restrict format, va_list args);
+INTDEF WUNUSED ATTR_IN(1) ATTR_LIBC_C16SCANF(1, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBDCALL libd_vwscanf)(char16_t const *__restrict format, va_list args);
 /* >> vwscanf(3) */
-INTDEF WUNUSED ATTR_IN(1) ATTR_LIBC_C32SCANF(1, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBKCALL libc_vwscanf)(char32_t const *__restrict format, va_list args);
+INTDEF WUNUSED ATTR_IN(1) ATTR_LIBC_C32SCANF(1, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBKCALL libc_vwscanf)(char32_t const *__restrict format, va_list args);
 /* >> swscanf(3), vswscanf(3) */
 INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) ATTR_LIBC_C16SCANF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_vswscanf)(char16_t const *__restrict input, char16_t const *__restrict format, va_list args);
 /* >> swscanf(3), vswscanf(3) */
@@ -358,21 +358,21 @@ INTDEF ATTR_IN(1) ATTR_OUT_OPT(2) __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_wcstold
 /* >> wcstold_l(3) */
 INTDEF ATTR_IN(1) ATTR_OUT_OPT(2) __LONGDOUBLE NOTHROW_NCX(LIBKCALL libc_wcstold_l)(char32_t const *__restrict nptr, char32_t **endptr, locale_t locale);
 /* >> getwchar(3), getwchar_unlocked(3) */
-INTDEF wint16_t NOTHROW_CB(LIBDCALL libd_getwchar_unlocked)(void);
+INTDEF wint16_t NOTHROW_CB_NCX(LIBDCALL libd_getwchar_unlocked)(void);
 /* >> getwchar(3), getwchar_unlocked(3) */
-INTDEF wint32_t NOTHROW_CB(LIBKCALL libc_getwchar_unlocked)(void);
+INTDEF wint32_t NOTHROW_CB_NCX(LIBKCALL libc_getwchar_unlocked)(void);
 /* >> putwchar(3), putwchar_unlocked(3) */
-INTDEF wint16_t NOTHROW_CB(LIBDCALL libd_putwchar_unlocked)(char16_t wc);
+INTDEF wint16_t NOTHROW_CB_NCX(LIBDCALL libd_putwchar_unlocked)(char16_t wc);
 /* >> putwchar(3), putwchar_unlocked(3) */
-INTDEF wint32_t NOTHROW_CB(LIBKCALL libc_putwchar_unlocked)(char32_t wc);
+INTDEF wint32_t NOTHROW_CB_NCX(LIBKCALL libc_putwchar_unlocked)(char32_t wc);
 /* >> fgetws(3), fgetws_unlocked(3) */
-INTDEF ATTR_INOUT(3) ATTR_OUTS(1, 2) char16_t *NOTHROW_CB(LIBDCALL libd_fgetws_unlocked)(char16_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream);
+INTDEF ATTR_INOUT(3) ATTR_OUTS(1, 2) char16_t *NOTHROW_CB_NCX(LIBDCALL libd_fgetws_unlocked)(char16_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream);
 /* >> fgetws(3), fgetws_unlocked(3) */
-INTDEF ATTR_INOUT(3) ATTR_OUTS(1, 2) char32_t *NOTHROW_CB(LIBKCALL libc_fgetws_unlocked)(char32_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream);
+INTDEF ATTR_INOUT(3) ATTR_OUTS(1, 2) char32_t *NOTHROW_CB_NCX(LIBKCALL libc_fgetws_unlocked)(char32_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream);
 /* >> fputws(3), fputws_unlocked(3) */
-INTDEF ATTR_IN(1) ATTR_INOUT(2) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBDCALL libd_fputws_unlocked)(char16_t const *__restrict str, FILE *__restrict stream);
+INTDEF ATTR_IN(1) ATTR_INOUT(2) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBDCALL libd_fputws_unlocked)(char16_t const *__restrict str, FILE *__restrict stream);
 /* >> fputws(3), fputws_unlocked(3) */
-INTDEF ATTR_IN(1) ATTR_INOUT(2) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBKCALL libc_fputws_unlocked)(char32_t const *__restrict str, FILE *__restrict stream);
+INTDEF ATTR_IN(1) ATTR_INOUT(2) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBKCALL libc_fputws_unlocked)(char32_t const *__restrict str, FILE *__restrict stream);
 /* >> wcsftime_l(3) */
 INTDEF ATTR_IN(3) ATTR_IN(4) ATTR_LIBC_C16FTIME(3, 0) ATTR_OUTS(1, 2) size_t NOTHROW_NCX(LIBDCALL libd_wcsftime_l)(char16_t *__restrict buf, size_t maxsize, char16_t const *__restrict format, struct tm const *__restrict tp, locale_t locale);
 /* >> wcsftime_l(3) */
@@ -400,37 +400,37 @@ INTDEF WUNUSED NONNULL((1)) FILE *NOTHROW_NCX(LIBDCALL libd_fopen_wprinter)(__pc
  * @return: NULL: Insufficient memory. */
 INTDEF WUNUSED NONNULL((1)) FILE *NOTHROW_NCX(LIBKCALL libc_fopen_wprinter)(__pc32formatprinter printer, void *arg);
 /* >> fwprintf(3), vfwprintf(3), fwprintf_unlocked(3), vfwprintf_unlocked(3) */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C16PRINTF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBDCALL libd_vfwprintf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, va_list args);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C16PRINTF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBDCALL libd_vfwprintf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, va_list args);
 /* >> fwprintf(3), vfwprintf(3), fwprintf_unlocked(3), vfwprintf_unlocked(3) */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C32PRINTF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBKCALL libc_vfwprintf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, va_list args);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C32PRINTF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBKCALL libc_vfwprintf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, va_list args);
 /* >> fwprintf(3), vfwprintf(3), fwprintf_unlocked(3), vfwprintf_unlocked(3) */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C16PRINTF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_CB(VLIBDCALL libd_fwprintf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, ...);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C16PRINTF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(VLIBDCALL libd_fwprintf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, ...);
 /* >> fwprintf(3), vfwprintf(3), fwprintf_unlocked(3), vfwprintf_unlocked(3) */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C32PRINTF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_CB(VLIBKCALL libc_fwprintf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, ...);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C32PRINTF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(VLIBKCALL libc_fwprintf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, ...);
 /* >> wprintf(3), vwprintf(3), wprintf_unlocked(3), vwprintf_unlocked(3) */
-INTDEF ATTR_IN(1) ATTR_LIBC_C16PRINTF(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_CB(VLIBDCALL libd_wprintf_unlocked)(char16_t const *__restrict format, ...);
+INTDEF ATTR_IN(1) ATTR_LIBC_C16PRINTF(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(VLIBDCALL libd_wprintf_unlocked)(char16_t const *__restrict format, ...);
 /* >> wprintf(3), vwprintf(3), wprintf_unlocked(3), vwprintf_unlocked(3) */
-INTDEF ATTR_IN(1) ATTR_LIBC_C32PRINTF(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_CB(VLIBKCALL libc_wprintf_unlocked)(char32_t const *__restrict format, ...);
+INTDEF ATTR_IN(1) ATTR_LIBC_C32PRINTF(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(VLIBKCALL libc_wprintf_unlocked)(char32_t const *__restrict format, ...);
 /* >> wprintf(3), vwprintf(3), wprintf_unlocked(3), vwprintf_unlocked(3) */
-INTDEF ATTR_IN(1) ATTR_LIBC_C16PRINTF(1, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBDCALL libd_vwprintf_unlocked)(char16_t const *__restrict format, va_list args);
+INTDEF ATTR_IN(1) ATTR_LIBC_C16PRINTF(1, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBDCALL libd_vwprintf_unlocked)(char16_t const *__restrict format, va_list args);
 /* >> wprintf(3), vwprintf(3), wprintf_unlocked(3), vwprintf_unlocked(3) */
-INTDEF ATTR_IN(1) ATTR_LIBC_C32PRINTF(1, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBKCALL libc_vwprintf_unlocked)(char32_t const *__restrict format, va_list args);
+INTDEF ATTR_IN(1) ATTR_LIBC_C32PRINTF(1, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBKCALL libc_vwprintf_unlocked)(char32_t const *__restrict format, va_list args);
 /* >> fwscanf(3), vfwscanf(3), fwscanf_unlocked(3), vfwscanf_unlocked(3) */
-INTDEF WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C16SCANF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBDCALL libd_vfwscanf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, va_list args);
+INTDEF WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C16SCANF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBDCALL libd_vfwscanf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, va_list args);
 /* >> fwscanf(3), vfwscanf(3), fwscanf_unlocked(3), vfwscanf_unlocked(3) */
-INTDEF WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C32SCANF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBKCALL libc_vfwscanf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, va_list args);
+INTDEF WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C32SCANF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBKCALL libc_vfwscanf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, va_list args);
 /* >> vwscanf(3) */
-INTDEF WUNUSED ATTR_IN(1) ATTR_LIBC_C16SCANF(1, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBDCALL libd_vwscanf_unlocked)(char16_t const *__restrict format, va_list args);
+INTDEF WUNUSED ATTR_IN(1) ATTR_LIBC_C16SCANF(1, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBDCALL libd_vwscanf_unlocked)(char16_t const *__restrict format, va_list args);
 /* >> vwscanf(3) */
-INTDEF WUNUSED ATTR_IN(1) ATTR_LIBC_C32SCANF(1, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB(LIBKCALL libc_vwscanf_unlocked)(char32_t const *__restrict format, va_list args);
+INTDEF WUNUSED ATTR_IN(1) ATTR_LIBC_C32SCANF(1, 0) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(LIBKCALL libc_vwscanf_unlocked)(char32_t const *__restrict format, va_list args);
 /* >> fwscanf(3), vfwscanf(3), fwscanf_unlocked(3), vfwscanf_unlocked(3) */
-INTDEF WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C16SCANF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_CB(VLIBDCALL libd_fwscanf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, ...);
+INTDEF WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C16SCANF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(VLIBDCALL libd_fwscanf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, ...);
 /* >> fwscanf(3), vfwscanf(3), fwscanf_unlocked(3), vfwscanf_unlocked(3) */
-INTDEF WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C32SCANF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_CB(VLIBKCALL libc_fwscanf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, ...);
+INTDEF WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C32SCANF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(VLIBKCALL libc_fwscanf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, ...);
 /* >> wscanf(3), vwscanf(3), wscanf_unlocked(3), vwscanf_unlocked(3) */
-INTDEF WUNUSED ATTR_IN(1) ATTR_LIBC_C16SCANF(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_CB(VLIBDCALL libd_wscanf_unlocked)(char16_t const *__restrict format, ...);
+INTDEF WUNUSED ATTR_IN(1) ATTR_LIBC_C16SCANF(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(VLIBDCALL libd_wscanf_unlocked)(char16_t const *__restrict format, ...);
 /* >> wscanf(3), vwscanf(3), wscanf_unlocked(3), vwscanf_unlocked(3) */
-INTDEF WUNUSED ATTR_IN(1) ATTR_LIBC_C32SCANF(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_CB(VLIBKCALL libc_wscanf_unlocked)(char32_t const *__restrict format, ...);
+INTDEF WUNUSED ATTR_IN(1) ATTR_LIBC_C32SCANF(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_CB_NCX(VLIBKCALL libc_wscanf_unlocked)(char32_t const *__restrict format, ...);
 /* >> wcsend(3)
  * Same as `str + wcslen(str)' */
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_IN(1) char16_t *NOTHROW_NCX(LIBDCALL libd_wcsend)(char16_t const *__restrict str);

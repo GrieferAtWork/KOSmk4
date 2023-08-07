@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1413ff57 */
+/* HASH CRC-32:0xbe5d5918 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_ftruncate64_defined */
 __LOCAL_LIBC(fftruncate64_unlocked) __ATTR_INOUT(1) int
-__NOTHROW_CB(__LIBCCALL __LIBC_LOCAL_NAME(fftruncate64_unlocked))(__FILE *__restrict __stream, __PIO_OFFSET64 __length) {
+__NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fftruncate64_unlocked))(__FILE *__restrict __stream, __PIO_OFFSET64 __length) {
 	int __result = -1;
 	__fd_t __fd = (__NAMESPACE_LOCAL_SYM __localdep_fileno_unlocked)(__stream);
 	if __likely(__fd >= 0)
