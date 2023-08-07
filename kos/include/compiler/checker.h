@@ -209,6 +209,23 @@
  * NOTE: the annotation is only removed for the duration of the current scope */
 #define __GCC_HAS_BUILTIN___builtin_remove_noderef
 
+/* >> bool __builtin_tag_get(char const *name);
+ * Return true/false indicate of the tag `name' currently being enabled,
+ * as  per `__attribute__((tag(...)))' attributes,  as well as preceding
+ * uses of `__builtin_tag_set()'
+ *
+ * When the state of `name' is known, this evaluates to a  compile-time
+ * constant expression. Otherwise, it evaluations to a void-expression. */
+#define __GCC_HAS_BUILTIN___builtin_tag_get
+
+/* >> void __builtin_tag_set(char const *name, bool active);
+ * Set  the state of the tag `name' to `active'. The state of tags can
+ * be read  out using  `__builtin_tag_get()'.  When `active'  isn't  a
+ * compile-time constant expression, the state of `name' is marked  as
+ * unknown, such that `__builtin_tag_get()' for that same tag will not
+ * evaluate to a compile-time constant expression. */
+#define __GCC_HAS_BUILTIN___builtin_tag_set
+
 #ifndef __has_feature
 #define __NO_has_feature
 #define __has_feature(x) 0
@@ -352,7 +369,7 @@
 /* TODO: `__ATTR_BLOCKING' should be a no-op for now, and places that use it should
  *       explicitly be annotated as THROWS(E_INTERRUPT) (if appropriate). Later on,
  *       this annotation should then become some  special tag that warns if  called
- *       from a `__ATTR_NOBLOCK' function. */
+ *       from a `__ATTR_NOBLOCK' or `__ATTR_NOPREEMPT' function. */
 #define __ATTR_BLOCKING         __checker_attribute__(__throws__(E_INTERRUPT))
 #define __ATTR_BLOCKING_IF(...) __checker_attribute__(__throws__(E_INTERRUPT)) /* XXX: Condition */
 
@@ -361,7 +378,6 @@
 #define __ATTR_NOBLOCK          __checker_attribute__(__tag__("NOBLOCK"))
 #define __ATTR_NOBLOCK_IF(...)  __checker_attribute__(__tag__("NOBLOCK")) /* XXX: Condition */
 #define __ATTR_NOPREEMPT        __checker_attribute__(__tag__("NOPREEMPT"), __require_caller_tag__("NOPREEMPT"))
-
 
 #define __ATTR_NORETURN                      __checker_attribute__(__noreturn__)
 #define __ATTR_NOINLINE                      /* Nothing */

@@ -300,7 +300,7 @@ NOTHROW(KCALL x86_initialize_bootloader_drivers)(void) {
 
 
 INTERN ATTR_FREETEXT void
-NOTHROW(KCALL x86_load_mb1info)(PHYS u32 info) {
+NOTHROW(KCALL x86_load_mb1info)(/*PHYS*/ u32 info) {
 	VIRT mb_info_t *vinfo;
 	vinfo = (VIRT mb_info_t *)((uintptr_t)info + KERNEL_CORE_BASE);
 	if (vinfo->flags & MB_INFO_BOOTDEV) {
@@ -389,7 +389,7 @@ NOTHROW(KCALL x86_load_mb1info)(PHYS u32 info) {
 }
 
 INTERN ATTR_FREETEXT void
-NOTHROW(KCALL x86_load_mb2info)(PHYS u32 info) {
+NOTHROW(KCALL x86_load_mb2info)(/*PHYS*/ u32 info) {
 	/* Multiboot 2 information. */
 	struct mb2_tag *tag_begin, *tag_iter, *tag_end;
 	size_t mbt_min_size, temp;

@@ -216,6 +216,31 @@ final class Checker: CParser {
 		return none;
 	}
 
+	@@Return the active-state of the tag @name (@true/@false or @none if *unknown*)
+	function getTagValue(name: string): bool | none {
+		for (local ns: namespaceStack) {
+			local nsTagOverrides: {string: bool | none} | none = ns.tagOverrides;
+			if (nsTagOverrides is none)
+				continue;
+			local override: bool | none = nsTagOverrides.get(name, ns);
+			if (override !== ns)
+				return override;
+		}
+		/* Tag isn't explicitly marked ->  tag is considered as  inactive
+		 * Unknown only means  that the  tag was explicitly  set to  some
+		 * value, and that value could not be determined at compile-time. */
+		return false;
+	}
+
+	@@Filter @tagNames for all tags that are
+	function filterInactiveTags(tagNames: {string...}): {string...} {
+		for (local name: tagNames) {
+			local state: bool | none = getTagValue(name);
+			if (state === false)
+				yield name;
+		}
+	}
+
 	@@Return the prefix for the current namespace (e.g. @"std::")
 	@@When inside of the global namespace, return an empty string
 	property currentNamespacePrefix: string = {
@@ -2005,6 +2030,15 @@ prefix_again:
 		fnScope.symbols = Dict();
 		fnScope.name = name;
 
+		/* Import function tags. */
+		local funTags: (Set with string) | none = funTypRef.attrib.tags;
+		if (funTags) {
+			local fnTags: {string: bool | none} = Dict();
+			for (local tag: funTags)
+				fnTags[tag] = true;
+			fnScope.tagOverrides = fnTags;
+		}
+
 		/* Define local symbols for each of the function's arguments. */
 		for (local argTypeRef, argName: funTypRef.typ.args) {
 			if (!argName)
@@ -2552,6 +2586,19 @@ again:
 						}
 						parentScope.symbolValues[symbol] = ttValue;
 					}
+					local ttTagOverrides: {string: bool | none} | none = ttScope.tagOverrides;
+					local ffTagOverrides: {string: bool | none} | none = ffScope.tagOverrides;
+					if (ttTagOverrides !is none || ffTagOverrides !is none) {
+						ttTagOverrides = ttScope.requireTagOverrides;
+						ffTagOverrides = ffScope.requireTagOverrides;
+						for (local symbol: ttTagOverrides.keys | ffTagOverrides.keys) {
+							local ttValue: bool | none = ttTagOverrides.get(symbol);
+							local ffValue: bool | none = ffTagOverrides.get(symbol);
+							if (ttValue !== ffValue)
+								ttValue = none;
+							parentScope.tagOverrides[symbol] = ttValue;
+						}
+					}
 				}
 			}
 		}	break;
@@ -2611,12 +2658,13 @@ again:
 				/* The while-body is executed [1-n] times. In this case, we can only
 				 * inherit those its symbol value overrides if they remain unchanged
 				 * after a second iteration. */
-				if (!loopScope.symbolValues) {
+				if (!loopScope.symbolValues && !loopScope.tagOverrides) {
 					/* No value overrides -> don't need to check if we can inherit them! */
 				} else {
 					this.backupRestore(loopBodyLoc);
 					loopBodyLoc = none;
 					local pass1SymbolValues = loopScope.symbolValues;
+					local pass1TagOverrides = loopScope.tagOverrides;
 					loopScope.symbolValues = Dict();
 					pushNamespace(loopScope);
 					parseStatement();
@@ -2625,10 +2673,11 @@ again:
 					this.skip("(");
 					local secondPassWhileCond = parseExprRValue();
 					if (secondPassWhileCond !is none && whileVal == secondPassWhileCond) {
-						if (pass1SymbolValues == loopScope.symbolValues) {
-							/* Everything ended up the same -> can inherit */
+						/* When everything ended up the same -> can inherit */
+						if (pass1SymbolValues == loopScope.symbolValues)
 							namespaceStack.first.symbolValues.update(pass1SymbolValues);
-						}
+						if (pass1TagOverrides == loopScope.tagOverrides)
+							namespaceStack.first.requireTagOverrides.update(pass1TagOverrides);
 					}
 				}
 			} else if (whileVal.constExprValue(this)) {
@@ -2638,8 +2687,10 @@ again:
 			} else {
 				/* Special   case   for  `do { } while (0)'-loops   without  `break'.
 				 * Here, we can always inherit the contained scope's value overrides. */
-				if (!encounteredBreak)
+				if (!encounteredBreak) {
 					namespaceStack.first.symbolValues.update(loopScope.symbolValues);
+					namespaceStack.first.tagOverrides.update(loopScope.tagOverrides);
+				}
 			}
 
 			this.skip(")");
@@ -2754,8 +2805,10 @@ default_case:
 				isUnreachable = false;
 
 				/* Must clear all symbol value overrides */
-				for (local ns: namespaceStack)
+				for (local ns: namespaceStack) {
 					ns.symbolValues.clear();
+					ns.tagOverrides.clear();
+				}
 
 				goto again;
 			}
@@ -4160,6 +4213,41 @@ again_builtin_container_of_suffix:
 			return cvalueFromValue(this, C_int_typeref, this.lc.first);
 		}	break;
 
+		/* Tag control builtins */
+		case "__builtin_tag_get": {
+			/* int __builtin_tag_get(char const *name); */
+			this.next();
+			this.skip("(");
+			local tagName: CValue = this.parseExpr().inplaceCast(this, CTypeRef(
+				TARGET_CPointerType(CTypeRef(C_char, CTYPEREF_FLAG_CONST))));
+			this.skip(")");
+			local tagValue: bool | none = tagName.isConstExprString
+				? getTagValue(tagName.constExprString)
+				: none;
+			if (tagValue !is none)
+				return cvalueFromValue(this, C_bool_typeref, tagValue ? 1 : 0);
+			return CValue(CVALUE_RVOID, C_bool_typeref);
+		}	break;
+
+		case "__builtin_tag_set": {
+			/* int __builtin_tag_get(char const *name); */
+			this.next();
+			this.skip("(");
+			local tagName: CValue = this.parseExpr().inplaceCast(this, CTypeRef(
+				TARGET_CPointerType(CTypeRef(C_char, CTYPEREF_FLAG_CONST))));
+			this.skip(",");
+			local tagValue: CValue = this.parseExpr().inplaceCast(this, C_bool_typeref);
+			this.skip(")");
+			if (tagName.isConstExprString) {
+				local overrides = namespaceStack.first.requireTagOverrides;
+				local tagBool: bool | none = tagValue.isConstExpr
+					? !!tagValue.constExprValue(this)
+					: none;
+				overrides[tagName.constExprString] = tagBool;
+			}
+			goto return_C_voidval;
+		}	break;
+
 		case "__builtin_ffs":
 		case "__builtin_ffsl":
 		case "__builtin_ffsll":
@@ -4684,6 +4772,9 @@ again:
 		for (local symbol: scope.symbolValues.keys) {
 			parentScope.symbolValues[symbol] = none;
 		}
+		for (local tagName: scope.tagOverrides.keys) {
+			parentScope.requireTagOverrides[tagName] = none;
+		}
 	}
 
 	function parseExprCondSuffix(value: CValue): CValue {
@@ -4750,6 +4841,19 @@ again:
 					ttValue = none;
 				}
 				parentScope.symbolValues[symbol] = ttValue;
+			}
+			local ttTagOverrides: {string: bool | none} | none = ttScope.tagOverrides;
+			local ffTagOverrides: {string: bool | none} | none = ffScope.tagOverrides;
+			if (ttTagOverrides !is none || ffTagOverrides !is none) {
+				ttTagOverrides = ttScope.requireTagOverrides;
+				ffTagOverrides = ffScope.requireTagOverrides;
+				for (local symbol: ttTagOverrides.keys | ffTagOverrides.keys) {
+					local ttValue: bool | none = ttTagOverrides.get(symbol);
+					local ffValue: bool | none = ffTagOverrides.get(symbol);
+					if (ttValue !== ffValue)
+						ttValue = none;
+					parentScope.tagOverrides[symbol] = ttValue;
+				}
 			}
 			value = value.inplaceVoid
 				.inplaceCast(this, commonType(value.typeref, ffVal.typeref));

@@ -2104,6 +2104,7 @@ class CNamespace {
 
 	@@Only here so we don't need special handling when used as a @CScope
 	public property symbolValues = { get() -> none; };
+	public property tagOverrides = { get() -> none; };
 
 	@@@param tab: One of:
 	@@            - @"symbols": @CSymbol or @CSymbolTemplate

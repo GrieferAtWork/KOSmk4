@@ -845,7 +845,7 @@ again:
  * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
 PRIVATE ATTR_SECTION(".text.crt.utility.aio") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL waitfor_aio)(struct aio *const list[], size_t nent,
+NOTHROW_RPC(LIBCCALL waitfor_aio)(struct aio *const list[], size_t nent,
                                   struct timespec64 const *rel_timeout) {
 	errno_t error;
 	size_t i;

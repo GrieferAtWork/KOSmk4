@@ -107,6 +107,30 @@
  */
 #ifndef __CC__
 /* ... */
+#elif defined(__KOS__) && defined(__CHECKER__)
+#undef __NOPREEMPT
+#define __NOPREEMPT __ATTR_NOPREEMPT
+__DECL_BEGIN
+typedef int __hybrid_preemption_flag_t;
+#define __hybrid_preemption_flag_t __hybrid_preemption_flag_t
+__DECL_END
+
+#define __hybrid_preemption_ison()             __builtin_tag_get("NOPREEMPT")
+#define __hybrid_preemption_wason(p_flag)      (*(p_flag))
+#define __hybrid_preemption_pushoff(p_flag)    (*(p_flag) = __hybrid_preemption_ison(), __builtin_tag_set("NOPREEMPT", 0))
+#define __hybrid_preemption_pop(p_flag)        __builtin_tag_set("NOPREEMPT", *(p_flag))
+#define __hybrid_preemption_tryyield()         (void)0
+#define __hybrid_preemption_tryyield_f(p_flag) (void)0
+#define __hybrid_preemption_tryyield_nopr()    (void)0
+#ifdef __KERNEL__
+#define __HYBRID_PREEMPTION_OFF_VALUE 0
+#define __HYBRID_PREEMPTION_ON_VALUE  1
+#include <kernel/compiler.h> /* CONFIG_NO_SMP */
+#undef __HYBRID_PREEMPTION_NO_SMP
+#ifdef CONFIG_NO_SMP
+#define __HYBRID_PREEMPTION_NO_SMP
+#endif /* CONFIG_NO_SMP */
+#endif /* __KERNEL__ */
 #elif defined(__INTELLISENSE__)
 #ifndef __NOPREEMPT
 #define __NOPREEMPT /* Annotation for functions that may only be called with preemption disabled. */

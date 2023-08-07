@@ -65,8 +65,8 @@ INTDEF FREE void NOTHROW(KCALL x86_initialize_vboxgdb)(void);
 #endif /* CONFIG_HAVE_KERNEL_VBOXGDB */
 INTDEF FREE void NOTHROW(KCALL x86_initialize_cmos)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_paging)(void);
-INTDEF FREE void NOTHROW(KCALL x86_load_mb1info)(PHYS u32 info);
-INTDEF FREE void NOTHROW(KCALL x86_load_mb2info)(PHYS u32 info);
+INTDEF FREE void NOTHROW(KCALL x86_load_mb1info)(/*PHYS*/ u32 info);
+INTDEF FREE void NOTHROW(KCALL x86_load_mb2info)(/*PHYS*/ u32 info);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_default_memory_banks)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_memory_via_bios)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_smp)(void);

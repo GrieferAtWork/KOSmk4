@@ -33,6 +33,7 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <kernel/driver-param.h>
 #include <kernel/fpu.h> /* CONFIG_HAVE_FPU */
 #include <kernel/malloc.h>
+#include <kernel/except.h>
 #include <kernel/mman/driver.h>
 #include <kernel/memory.h>
 #include <kernel/printk.h>
@@ -349,7 +350,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	kernel_initialize_selftest();
 #endif /* CONFIG_HAVE_KERNEL_SELFTEST */
 
-	__hybrid_assert(!kmalloc_leaks());
+	NOEXCEPT_DO(__hybrid_assert(!kmalloc_leaks()));
 
 	/* Update the given initial user-state to start
 	 * executing /bin/init (or whatever was passed as `init=...') */

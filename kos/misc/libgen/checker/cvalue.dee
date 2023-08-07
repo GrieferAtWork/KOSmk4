@@ -158,6 +158,30 @@ final class CValue {
 		return typeref.typ.peek(checker, data, offset);
 	}
 
+	public property isConstExprString: bool = {
+		get(): bool {
+			local typ = typeref.typ;
+			return kind == CVALUE_ACONST && typ is CPointerType && typ.base.typ === C_char;
+		}
+	}
+
+	public property constExprStringBytes: Bytes = {
+		get(): Bytes {
+			assert isConstExprString;
+			local stroff = offset;
+			local strend = data.find(0, stroff);
+			if (strend < 0)
+				strend = #data;
+			return data[stroff:strend];
+		}
+	}
+
+	public property constExprString: string = {
+		get(): string {
+			return constExprStringBytes.decode("utf-8");
+		}
+	}
+
 #define MAKE_VOID() (kind &= CVALUE_RVALUE)
 	public property inplaceVoid: CValue = {
 		get(): CValue {
@@ -1192,8 +1216,7 @@ err_bad_op:
 			/* Check if the called function requires its caller to have a certain tag. */
 			local reqTags: Set with string = typeref.attribRequireCallerTags;
 			if (reqTags) {
-				local callerTags: Set with string = checker.currentFunctionTypeRef.attribTags;
-				local missingTags: Set with string = reqTags - callerTags;
+				local missingTags: Set with string = HashSet(checker.filterInactiveTags(reqTags));
 				if (missingTags) {
 					checker.warn("-Wtag",
 						f"Function `{checker.currentFunctionName}' is missing "
@@ -1399,8 +1422,19 @@ final class CScope: CNamespace {
 	@@Symbol value overrides (for when a function overrides the value of a pre-defined symbol)
 	public member symbolValues: {CSymbol: Bytes | none} = UniqueDict();
 
+	@@Overrides for context tags that currently active or inactive
+	public member tagOverrides: {string: bool | none} | none = none;
+
 	@@Callbacks that are invoked when the scope is popped
 	public member onPopCallbacks: {Callable...} | none = none;
+
+	public property requireTagOverrides: {string: bool | none} = {
+		get(): {string: bool | none} {
+			if (tagOverrides is none)
+				tagOverrides = Dict();
+			return tagOverrides;
+		}
+	}
 
 	@@Register a callback that should be invoked when the scope is popped
 	public function registerOnPop(cb: Callable) {
@@ -1420,6 +1454,7 @@ final class CScope: CNamespace {
 function createCScopeAlias(forScope: CScope): CScope {
 	local result: CScope = CScope();
 	result.symbolValues = forScope.symbolValues;
+	result.tagOverrides = forScope.tagOverrides;
 	if (forScope.onPopCallbacks is none)
 		forScope.onPopCallbacks = [];
 	result.onPopCallbacks = forScope.onPopCallbacks;
