@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a5934be */
+/* HASH CRC-32:0x2427eac3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -504,7 +504,7 @@ NOTHROW_NCX(LIBCCALL libc_atof)(char const *__restrict nptr) {
 #define ____vsscanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsscanf_getc) __format_word_t
-(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
+__NOTHROW_NCX(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
 	unsigned char const *reader = *(unsigned char const **)arg;
 	unsigned char result        = *reader++;
 	if (!result)
@@ -513,7 +513,7 @@ __LOCAL_LIBC(vsscanf_getc) __format_word_t
 	return (__format_word_t)result;
 }
 __LOCAL_LIBC(vsscanf_ungetc) ssize_t
-(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+__NOTHROW(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
 	--(*(unsigned char const **)arg);
 	return 0;
 }
@@ -594,7 +594,7 @@ NOTHROW_NCX(LIBCCALL libc_strtod)(char const *__restrict nptr,
 #define ____vsscanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsscanf_getc) __format_word_t
-(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
+__NOTHROW_NCX(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
 	unsigned char const *reader = *(unsigned char const **)arg;
 	unsigned char result        = *reader++;
 	if (!result)
@@ -603,7 +603,7 @@ __LOCAL_LIBC(vsscanf_getc) __format_word_t
 	return (__format_word_t)result;
 }
 __LOCAL_LIBC(vsscanf_ungetc) ssize_t
-(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+__NOTHROW(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
 	--(*(unsigned char const **)arg);
 	return 0;
 }
@@ -688,7 +688,7 @@ DEFINE_INTERN_ALIAS(libc_strtold, libc_strtod);
 #define ____vsscanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsscanf_getc) __format_word_t
-(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
+__NOTHROW_NCX(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
 	unsigned char const *reader = *(unsigned char const **)arg;
 	unsigned char result        = *reader++;
 	if (!result)
@@ -697,7 +697,7 @@ __LOCAL_LIBC(vsscanf_getc) __format_word_t
 	return (__format_word_t)result;
 }
 __LOCAL_LIBC(vsscanf_ungetc) ssize_t
-(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+__NOTHROW(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
 	--(*(unsigned char const **)arg);
 	return 0;
 }

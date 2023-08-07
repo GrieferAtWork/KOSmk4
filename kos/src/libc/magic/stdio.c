@@ -1536,7 +1536,7 @@ char *gets([[out]] char *__restrict buf) {
 #define ____vsscanf_getc_defined
 @@push_namespace(local)@@
 __LOCAL_LIBC(@vsscanf_getc@) __format_word_t
-(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
+__NOTHROW_NCX(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
 	unsigned char const *reader = *(unsigned char const **)arg;
 	unsigned char result        = *reader++;
 	if (!result)
@@ -1545,7 +1545,7 @@ __LOCAL_LIBC(@vsscanf_getc@) __format_word_t
 	return (__format_word_t)result;
 }
 __LOCAL_LIBC(@vsscanf_ungetc@) ssize_t
-(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+__NOTHROW(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
 	--(*(unsigned char const **)arg);
 	return 0;
 }

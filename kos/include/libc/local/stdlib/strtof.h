@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3915a776 */
+/* HASH CRC-32:0xff62d384 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ __NAMESPACE_LOCAL_END
 #define ____vsscanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsscanf_getc) __format_word_t
-(__FORMATPRINTER_CC __vsscanf_getc)(void *__arg) {
+__NOTHROW_NCX(__FORMATPRINTER_CC __vsscanf_getc)(void *__arg) {
 	unsigned char const *__reader = *(unsigned char const **)__arg;
 	unsigned char __result        = *__reader++;
 	if (!__result)
@@ -81,7 +81,7 @@ __LOCAL_LIBC(vsscanf_getc) __format_word_t
 	return (__format_word_t)__result;
 }
 __LOCAL_LIBC(vsscanf_ungetc) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vsscanf_ungetc)(void *__arg, __format_word_t __UNUSED(__word)) {
+__NOTHROW(__FORMATPRINTER_CC __vsscanf_ungetc)(void *__arg, __format_word_t __UNUSED(__word)) {
 	--(*(unsigned char const **)__arg);
 	return 0;
 }

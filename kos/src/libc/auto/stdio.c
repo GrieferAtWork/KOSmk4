@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61330e61 */
+/* HASH CRC-32:0xb2d451c4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -416,7 +416,7 @@ NOTHROW_CB(LIBCCALL libc_gets)(char *__restrict buf) {
 #define ____vsscanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsscanf_getc) __format_word_t
-(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
+__NOTHROW_NCX(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
 	unsigned char const *reader = *(unsigned char const **)arg;
 	unsigned char result        = *reader++;
 	if (!result)
@@ -425,7 +425,7 @@ __LOCAL_LIBC(vsscanf_getc) __format_word_t
 	return (__format_word_t)result;
 }
 __LOCAL_LIBC(vsscanf_ungetc) ssize_t
-(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+__NOTHROW(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
 	--(*(unsigned char const **)arg);
 	return 0;
 }
