@@ -323,7 +323,7 @@ $ssize_t aio_return([[inout]] struct aiocb *self);
 [[decl_include("<bits/types.h>", "<bits/crt/aiocb.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("aio_cancel")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("aio_cancel64")]]
-int aio_cancel($fd_t fd, [[nullable]] struct aiocb *self);
+int aio_cancel([[fdarg]] $fd_t fd, [[nullable]] struct aiocb *self);
 
 
 [[cp, ignore, nocrt, decl_include("<features.h>", "<bits/crt/aiocb.h>", "<bits/os/timespec.h>")]]
@@ -400,7 +400,7 @@ $ssize_t aio_return64([[inout]] struct aiocb64 *self);
 
 [[preferred_off64_variant_of(aio_cancel), doc_alias("aio_cancel")]]
 [[decl_include("<bits/crt/aiocb.h>")]]
-int aio_cancel64($fd_t fildes, [[nullable]] struct aiocb64 *self);
+int aio_cancel64([[fdarg]] $fd_t fildes, [[nullable]] struct aiocb64 *self);
 
 [[ignore, nocrt, doc_alias("aio_suspend")]]
 [[decl_include("<features.h>", "<bits/crt/aiocb.h>", "<bits/os/timespec.h>")]]

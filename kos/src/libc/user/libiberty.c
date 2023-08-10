@@ -97,8 +97,8 @@ INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.libiberty") void
 
 
 
-/*[[[head:libc_fdmatch,hash:CRC-32=0xd02e5611]]]*/
-INTERN ATTR_SECTION(".text.crt.libiberty") WUNUSED int
+/*[[[head:libc_fdmatch,hash:CRC-32=0x15c5f790]]]*/
+INTERN ATTR_SECTION(".text.crt.libiberty") WUNUSED ATTR_FDARG(1) ATTR_FDARG(2) int
 NOTHROW_NCX(LIBCCALL libc_fdmatch)(fd_t fd1,
                                    fd_t fd2)
 /*[[[body:libc_fdmatch]]]*/

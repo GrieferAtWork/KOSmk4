@@ -41,8 +41,8 @@ NOTHROW_NCX(LIBCCALL libc_statfs)(char const *file,
 }
 /*[[[end:libc_statfs]]]*/
 
-/*[[[head:libc_fstatfs,hash:CRC-32=0xe202da36]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") ATTR_OUT(2) int
+/*[[[head:libc_fstatfs,hash:CRC-32=0x8f2070ba]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") ATTR_FDARG(1) ATTR_OUT(2) int
 NOTHROW_NCX(LIBCCALL libc_fstatfs)(fd_t filedes,
                                    struct statfs *buf)
 /*[[[body:libc_fstatfs]]]*/
@@ -70,11 +70,11 @@ NOTHROW_NCX(LIBCCALL libc_statfs64)(const char *file,
 #endif /* MAGIC:alias */
 /*[[[end:libc_statfs64]]]*/
 
-/*[[[head:libc_fstatfs64,hash:CRC-32=0x3342c231]]]*/
+/*[[[head:libc_fstatfs64,hash:CRC-32=0x1ffab477]]]*/
 #ifdef _STATFS_MATCHES_STATFS64
 DEFINE_INTERN_ALIAS(libc_fstatfs64, libc_fstatfs);
 #else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") ATTR_OUT(2) int
+INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") ATTR_FDARG(1) ATTR_OUT(2) int
 NOTHROW_NCX(LIBCCALL libc_fstatfs64)(fd_t filedes,
                                      struct statfs64 *buf)
 /*[[[body:libc_fstatfs64]]]*/

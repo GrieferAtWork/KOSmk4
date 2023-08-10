@@ -1702,12 +1702,12 @@ done:
 
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB(CC print_sighandler_t)(pformatprinter printer, void *arg,
-                                  sighandler_t hand) {
+                                  NCX UNCHECKED void *hand) {
 	char const *name;
 	name = get_sighandler_t_name((intptr_t)(uintptr_t)hand);
 	if (name)
 		return format_printf(printer, arg, "SIG_%s", name);
-	return format_printf(printer, arg, "%#" PRIxPTR, *(void **)&hand);
+	return format_printf(printer, arg, "%#" PRIxPTR, hand);
 }
 #endif /* NEED_print_sighandler_t */
 
@@ -4783,7 +4783,7 @@ NOTHROW_CB(CC print_sigaction_flags)(pformatprinter printer, void *arg,
 #ifdef NEED_print_sigaction
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW_CB_NCX(CC print_sigaction)(pformatprinter printer, void *arg,
-                                   NCX UNCHECKED sighandler_t sa_handler,
+                                   NCX UNCHECKED void *sa_handler,
                                    NCX sigset_t *sa_mask, size_t sigsetsize,
                                    syscall_ulong_t sa_flags,
                                    NCX UNCHECKED void *sa_restorer) {
@@ -5862,7 +5862,7 @@ for (local c: knownCases.sorted()) {
 		validate_readable(sa, sizeof(*sa));
 		result = print_sigaction(printer,
 		                         arg,
-		                         (sighandler_t)(void *)sa->sa_handler,
+		                         (void *)sa->sa_handler,
 		                         (NCX sigset_t *)&sa->sa_mask,
 		                         sigsetsize,
 		                         sa->sa_flags,
@@ -5889,7 +5889,7 @@ for (local c: knownCases.sorted()) {
 		validate_readable(sa, sizeof(*sa));
 		result = print_sigaction(printer,
 		                         arg,
-		                         (sighandler_t)(void *)sa->sa_handler,
+		                         (void *)sa->sa_handler,
 		                         (NCX sigset_t *)&sa->sa_mask,
 		                         sigsetsize,
 		                         sa->sa_flags,
@@ -5916,7 +5916,7 @@ for (local c: knownCases.sorted()) {
 		validate_readable(sa, sizeof(*sa));
 		result = print_sigaction(printer,
 		                         arg,
-		                         (sighandler_t)(void *)sa->sa_handler,
+		                         (void *)sa->sa_handler,
 		                         (NCX sigset_t *)&sa->sa_mask,
 		                         sigsetsize,
 		                         sa->sa_flags,
@@ -5936,7 +5936,7 @@ for (local c: knownCases.sorted()) {
 		validate_readable(sa, sizeof(*sa));
 		result = print_sigaction(printer,
 		                         arg,
-		                         (sighandler_t)(void *)sa->sa_handler,
+		                         (void *)sa->sa_handler,
 		                         (NCX sigset_t *)&sa->sa_mask,
 		                         sigsetsize,
 		                         sa->sa_flags,
@@ -5956,7 +5956,7 @@ for (local c: knownCases.sorted()) {
 		validate_readable(sa, sizeof(*sa));
 		result = print_sigaction(printer,
 		                         arg,
-		                         (sighandler_t)(void *)sa->sa_handler,
+		                         (void *)sa->sa_handler,
 		                         (NCX sigset_t *)&sa->sa_mask,
 		                         sigsetsize,
 		                         sa->sa_flags,
@@ -5976,7 +5976,7 @@ for (local c: knownCases.sorted()) {
 		validate_readable(sa, sizeof(*sa));
 		result = print_sigaction(printer,
 		                         arg,
-		                         (sighandler_t)(void *)sa->sa_handler,
+		                         (void *)sa->sa_handler,
 		                         (NCX sigset_t *)&sa->sa_mask,
 		                         sigsetsize,
 		                         sa->sa_flags,
@@ -5996,7 +5996,7 @@ for (local c: knownCases.sorted()) {
 		validate_readable(sa, sizeof(*sa));
 		result = print_sigaction(printer,
 		                         arg,
-		                         (sighandler_t)(void *)sa->sa_handler,
+		                         (void *)sa->sa_handler,
 		                         (NCX sigset_t *)&sa->sa_mask,
 		                         sigsetsize,
 		                         sa->sa_flags,
@@ -6016,7 +6016,7 @@ for (local c: knownCases.sorted()) {
 		validate_readable(sa, sizeof(*sa));
 		result = print_sigaction(printer,
 		                         arg,
-		                         (sighandler_t)(void *)sa->sa_handler,
+		                         (void *)sa->sa_handler,
 		                         (NCX sigset_t *)&sa->sa_mask,
 		                         sigsetsize,
 		                         sa->sa_flags,
@@ -6036,7 +6036,7 @@ for (local c: knownCases.sorted()) {
 		validate_readable(sa, sizeof(*sa));
 		result = print_sigaction(printer,
 		                         arg,
-		                         (sighandler_t)(void *)sa->sa_handler,
+		                         (void *)sa->sa_handler,
 		                         (NCX sigset_t *)&sa->sa_mask,
 		                         sigsetsize,
 		                         sa->sa_flags,
@@ -6798,9 +6798,7 @@ do_struct_timespecx64:
 
 #ifdef HAVE_SC_REPR_SIGHANDLER_T
 	case SC_REPR_SIGHANDLER_T: {
-		sighandler_t hand;
-		*(void **)&hand = (void *)(uintptr_t)value.sv_u64;
-		result = print_sighandler_t(printer, arg, hand);
+		result = print_sighandler_t(printer, arg, (void *)(uintptr_t)value.sv_u64);
 	}	break;
 #endif /* HAVE_SC_REPR_SIGHANDLER_T */
 

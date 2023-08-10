@@ -123,7 +123,7 @@ int wlchmod([[in]] wchar_t const *filename, $mode_t mode) {
 %#if defined(__USE_KOS) && defined(__USE_ATFILE)
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_function(fmkdirat, convert_wcstombs)]]
-int wfmkdirat($fd_t dirfd,
+int wfmkdirat([[dirfd]] $fd_t dirfd,
               [[in]] wchar_t const *pathname,
               $mode_t mode, $atflag_t flags) {
 	int result;
@@ -140,7 +140,7 @@ int wfmkdirat($fd_t dirfd,
 
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_function(fmknodat, convert_wcstombs)]]
-int wfmknodat($fd_t dirfd, [[in]] wchar_t const *nodename,
+int wfmknodat([[dirfd]] $fd_t dirfd, [[in]] wchar_t const *nodename,
               $mode_t mode, $dev_t dev, $atflag_t flags) {
 	int result;
 	char *utf8_nodename;
@@ -181,7 +181,7 @@ int wmkfifo([[in]] wchar_t const *fifoname, $mode_t mode) {
 %#ifdef __USE_ATFILE
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_function(fchmodat, convert_wcstombs)]]
-int wfchmodat($fd_t dirfd, [[in]] wchar_t const *filename,
+int wfchmodat([[dirfd]] $fd_t dirfd, [[in]] wchar_t const *filename,
               $mode_t mode, $atflag_t flags) {
 	int result;
 	char *utf8_filename;
@@ -198,7 +198,7 @@ int wfchmodat($fd_t dirfd, [[in]] wchar_t const *filename,
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires($has_function(wfmkdirat) ||
            $has_function(mkdirat, convert_wcstombs))]]
-int wmkdirat($fd_t dirfd, [[in]] wchar_t const *pathname, $mode_t mode) {
+int wmkdirat([[dirfd]] $fd_t dirfd, [[in]] wchar_t const *pathname, $mode_t mode) {
 @@pp_if $has_function(wfmkdirat)@@
 	return wfmkdirat(dirfd, pathname, mode, 0);
 @@pp_else@@
@@ -219,7 +219,7 @@ int wmkdirat($fd_t dirfd, [[in]] wchar_t const *pathname, $mode_t mode) {
 [[requires_include("<asm/os/stat.h>"), impl_include("<asm/os/stat.h>")]]
 [[requires(($has_function(wmknodat) && defined(__S_IFIFO)) ||
            $has_function(mkfifoat, convert_wcstombs))]]
-int wmkfifoat($fd_t dirfd, [[in]] wchar_t const *fifoname, $mode_t mode) {
+int wmkfifoat([[dirfd]] $fd_t dirfd, [[in]] wchar_t const *fifoname, $mode_t mode) {
 @@pp_if $has_function(wmknodat) && defined(__S_IFIFO)@@
 	return wmknodat(dirfd, fifoname, mode | __S_IFIFO, 0);
 @@pp_else@@
@@ -265,7 +265,7 @@ int wmknod([[in]] wchar_t const *nodename, $mode_t mode, $dev_t dev) {
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires($has_function(wfmknodat) ||
            $has_function(mknodat, convert_wcstombs))]]
-int wmknodat($fd_t dirfd, [[in]] wchar_t const *nodename,
+int wmknodat([[dirfd]] $fd_t dirfd, [[in]] wchar_t const *nodename,
              $mode_t mode, $dev_t dev) {
 @@pp_if $has_function(wfmknodat)@@
 	return wfmknodat(dirfd, nodename, mode, dev, 0);
@@ -289,12 +289,12 @@ int wmknodat($fd_t dirfd, [[in]] wchar_t const *nodename,
 
 [[cp, ignore, doc_alias("wutimensat"), nocrt, alias("wutimensat")]]
 [[wchar, decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
-int crt_wutimensat32($fd_t dirfd, [[in]] wchar_t const *filename,
+int crt_wutimensat32([[dirfd]] $fd_t dirfd, [[in]] wchar_t const *filename,
                      [[in_opt]] struct $timespec32 const times[2 /*or:3*/],
                      $atflag_t flags);
 [[cp, ignore, doc_alias("wutimensat"), nocrt, alias("wutimensat64")]]
 [[wchar, decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
-int crt_wutimensat64($fd_t dirfd, [[in]] wchar_t const *filename,
+int crt_wutimensat64([[dirfd]] $fd_t dirfd, [[in]] wchar_t const *filename,
                      [[in_opt]] struct $timespec64 const times[2 /*or:3*/],
                      $atflag_t flags);
 
@@ -313,7 +313,7 @@ int crt_wutimensat64($fd_t dirfd, [[in]] wchar_t const *filename,
            $has_function(crt_wutimensat32) ||
            $has_function(utimensat, convert_wcstombs))]]
 [[impl_include("<asm/os/fcntl.h>")]]
-int wutimensat($fd_t dirfd, [[in]] wchar_t const *filename,
+int wutimensat([[dirfd]] $fd_t dirfd, [[in]] wchar_t const *filename,
                [[in_opt]] struct timespec const times[2 /*or:3*/],
                $atflag_t flags) {
 @@pp_if $has_function(crt_wutimensat32) && !defined(__BUILDING_LIBC)@@
@@ -384,7 +384,7 @@ int wutimensat($fd_t dirfd, [[in]] wchar_t const *filename,
 [[requires($has_function(utimensat64, convert_wcstombs) ||
            $has_function(crt_wutimensat32))]]
 [[impl_include("<asm/os/fcntl.h>")]]
-int wutimensat64($fd_t dirfd, [[in]] wchar_t const *filename,
+int wutimensat64([[dirfd]] $fd_t dirfd, [[in]] wchar_t const *filename,
                  [[in_opt]] struct timespec64 const times[2 /*or:3*/],
                  $atflag_t flags) {
 @@pp_if $has_function(utimensat64, convert_wcstombs)@@

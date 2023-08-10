@@ -2451,7 +2451,7 @@ char *realpath([[in]] char const *filename, char *resolved) {
 [[decl_include("<bits/types.h>")]]
 [[requires_function(frealpath4)]]
 [[section(".text.crt{|.dos}.fs.property")]]
-char *frealpath($fd_t fd, [[out_opt]] char *resolved, $size_t buflen) {
+char *frealpath([[fdarg]] $fd_t fd, [[out_opt]] char *resolved, $size_t buflen) {
 	return frealpath4(fd, resolved, buflen, 0);
 }
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED || __USE_KOS */
@@ -2472,7 +2472,7 @@ char *frealpath($fd_t fd, [[out_opt]] char *resolved, $size_t buflen) {
 [[cp, wunused, decl_include("<bits/types.h>")]]
 [[crt_dos_variant]]
 [[section(".text.crt{|.dos}.fs.property")]]
-char *frealpath4($fd_t fd, [[out_opt/*(buflen)*/]] char *resolved, $size_t buflen, $atflag_t flags);
+char *frealpath4([[fdarg]] $fd_t fd, [[out_opt/*(buflen)*/]] char *resolved, $size_t buflen, $atflag_t flags);
 
 @@>> frealpathat(2)
 @@Returns the absolute filesystem path for the specified file
@@ -2491,7 +2491,7 @@ char *frealpath4($fd_t fd, [[out_opt/*(buflen)*/]] char *resolved, $size_t bufle
 [[cp, wunused, decl_include("<bits/types.h>")]]
 [[crt_dos_variant]]
 [[section(".text.crt{|.dos}.fs.property")]]
-char *frealpathat($fd_t dirfd, [[in]] char const *filename,
+char *frealpathat([[dirfd]] $fd_t dirfd, [[in]] char const *filename,
                   [[out_opt/*(buflen)*/]] char *resolved,
                   $size_t buflen, $atflag_t flags);
 %#endif /* __USE_KOS */
@@ -2724,13 +2724,13 @@ char *mkdtemp([[inout]] char *template_) {
 
 [[decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.io.tty")]]
-int grantpt($fd_t fd);
+int grantpt([[fdarg]] $fd_t fd);
 
 [[decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TIOCSPTLCK))]]
 [[section(".text.crt{|.dos}.io.tty")]]
-int unlockpt($fd_t fd) {
+int unlockpt([[fdarg]] $fd_t fd) {
 	int action = 0;
 	if (ioctl(fd, __TIOCSPTLCK, &action))
 		return -1;
@@ -2743,7 +2743,7 @@ int unlockpt($fd_t fd) {
 [[wunused, decl_include("<bits/types.h>")]]
 [[crt_dos_variant, requires_function(ptsname_r)]]
 [[section(".text.crt{|.dos}.io.tty")]]
-char *ptsname($fd_t fd) {
+char *ptsname([[fdarg]] $fd_t fd) {
 	static char buf[64];
 	if unlikely(ptsname_r(fd, buf, sizeof(buf)))
 		return NULL;
@@ -2764,7 +2764,7 @@ $fd_t posix_openpt($oflag_t oflags);
 @@associated   with   the   master   descriptor   `fd'
 [[crt_dos_variant, decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.io.tty")]]
-int ptsname_r($fd_t fd, [[out(? <= buflen)]] char *buf, $size_t buflen);
+int ptsname_r([[fdarg]] $fd_t fd, [[out(? <= buflen)]] char *buf, $size_t buflen);
 %#endif /* __USE_GNU || __USE_NETBSD */
 
 %#ifdef __USE_GNU
@@ -3298,7 +3298,7 @@ char const *getexecname() {
 [[impl_include("<bits/os/dirent.h>")]]
 [[nothrow_cb_ncx, crt_dos_variant(callback(
 	cook: struct { auto walk = walk; auto arg = arg; },
-	wrap: ($cook *c, $fd_t fd): int { return (*c->walk)(c->arg, fd); },
+	wrap: ($cook *c, [[fdarg]] $fd_t fd): int { return (*c->walk)(c->arg, fd); },
 	impl: fdwalk((int (LIBCCALL *)(void *, $fd_t))&$wrap, &$cook),
 ))]]
 int fdwalk([[nonnull]] int (LIBCCALL *walk)(void *arg, $fd_t fd), void *arg) {
@@ -3499,7 +3499,7 @@ char *getbsize([[out]] int *headerlenp,
 [[decl_include("<bits/types.h>")]]
 [[requires_function(daemon_setup, fchdir, dup2)]]
 [[section(".text.crt{|.dos}.system.utility")]]
-int daemonfd($fd_t chdirfd, $fd_t nullfd) {
+int daemonfd([[fdarg_opt]] $fd_t chdirfd, [[fdarg_opt]] $fd_t nullfd) {
 	int error = daemon_setup();
 	if likely(error == 0) {
 		if (chdirfd != -1)
@@ -3517,9 +3517,9 @@ int daemonfd($fd_t chdirfd, $fd_t nullfd) {
 
 //TODO:char *devname($dev_t dev, $mode_t mode);
 //TODO:char *devname_r($dev_t dev, $mode_t mode, char *buf, __STDC_INT_AS_SIZE_T buflen);
-//TODO:char *fdevname($fd_t fd);
-//TODO:char *fdevname_r($fd_t fd, char *buf, __STDC_INT_AS_SIZE_T buflenint);
-//TODO:$fd_t mkostempsat($fd_t dirfd, char *template_, __STDC_INT_AS_SIZE_T suffixlen, $oflag_t flags);
+//TODO:char *fdevname([[fdarg]] $fd_t fd);
+//TODO:char *fdevname_r([[fdarg]] $fd_t fd, char *buf, __STDC_INT_AS_SIZE_T buflenint);
+//TODO:$fd_t mkostempsat([[dirfd]] $fd_t dirfd, char *template_, __STDC_INT_AS_SIZE_T suffixlen, $oflag_t flags);
 //TODO:extern char *suboptarg;
 //TODO:void srandomdev(void);
 

@@ -666,7 +666,7 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 [[decl_include("<features.h>", "<bits/types.h>")]]
 [[doc_alias("mmap"), ignore, nocrt, alias("mmap", "__mmap")]]
 void *mmap32([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
-             __STDC_INT_AS_UINT_T flags, $fd_t fd, $off32_t offset);
+             __STDC_INT_AS_UINT_T flags, [[fdarg]] $fd_t fd, $off32_t offset);
 
 @@>> mmap(2), mmap64(2)
 @@@param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
@@ -680,7 +680,7 @@ void *mmap32([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 [[userimpl, requires($has_function(mmap32) || $has_function(mmap64))]]
 [[section(".text.crt{|.dos}.heap.mman")]]
 void *mmap([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
-           __STDC_INT_AS_UINT_T flags, $fd_t fd, __PIO_OFFSET offset) {
+           __STDC_INT_AS_UINT_T flags, [[fdarg]] $fd_t fd, __PIO_OFFSET offset) {
 @@pp_if $has_function(mmap64)@@
 	return mmap64(addr, len, prot, flags, fd, (__PIO_OFFSET64)offset);
 @@pp_else@@
@@ -841,7 +841,7 @@ int mincore([[access(none)]] void *start, size_t len, unsigned char *vec);
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("__mmap")]]
 [[userimpl, requires_function(mmap32), decl_prefix(DEFINE_PIO_OFFSET)]]
 void *mmap64([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
-             __STDC_INT_AS_UINT_T flags, $fd_t fd, __PIO_OFFSET64 offset) {
+             __STDC_INT_AS_UINT_T flags, [[fdarg]] $fd_t fd, __PIO_OFFSET64 offset) {
 	return mmap32(addr, len, prot, flags, fd, (off32_t)(pos32_t)(pos64_t)offset);
 }
 %#endif /* __USE_LARGEFILE64 */
@@ -1028,7 +1028,7 @@ int pkey_mprotect([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T 
 [[impl_include("<asm/os/mman.h>", "<libc/errno.h>")]]
 [[impl_include("<asm/os/stdio.h>", "<hybrid/__overflow.h>")]]
 [[impl_include("<asm/crt/malloc.h>")]]
-int fmapfile([[out]] struct mapfile *__restrict mapping, $fd_t fd,
+int fmapfile([[out]] struct mapfile *__restrict mapping, [[fdarg]] $fd_t fd,
              $pos64_t offset, size_t min_bytes, size_t max_bytes,
              size_t num_trailing_nulbytes, unsigned int flags) {
 	byte_t *buf;
@@ -1393,7 +1393,7 @@ err_buf:
 	                       flags, atflags | libd_AT_DOSPATH);
 }})]]
 int fmapfileat([[out]] struct mapfile *__restrict mapping,
-               $fd_t dirfd, [[in]] char const *filename,
+               [[dirfd]] $fd_t dirfd, [[in]] char const *filename,
                $pos64_t offset, size_t min_bytes, size_t max_bytes,
                size_t num_trailing_nulbytes, unsigned int flags,
                $atflag_t atflags) {

@@ -25,8 +25,8 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_bindresvport,hash:CRC-32=0x21e9ad94]]]*/
-INTERN ATTR_SECTION(".text.crt.net.inet.6.bind_reserved") int
+/*[[[head:libc_bindresvport,hash:CRC-32=0xdfc78833]]]*/
+INTERN ATTR_SECTION(".text.crt.net.inet.6.bind_reserved") ATTR_FDARG(1) int
 NOTHROW_RPC(LIBCCALL libc_bindresvport)(fd_t sockfd,
                                         struct sockaddr_in *sock_in)
 /*[[[body:libc_bindresvport]]]*/
@@ -38,8 +38,8 @@ NOTHROW_RPC(LIBCCALL libc_bindresvport)(fd_t sockfd,
 }
 /*[[[end:libc_bindresvport]]]*/
 
-/*[[[head:libc_bindresvport6,hash:CRC-32=0xb03e537f]]]*/
-INTERN ATTR_SECTION(".text.crt.net.inet.6.bind_reserved") int
+/*[[[head:libc_bindresvport6,hash:CRC-32=0x582cc54c]]]*/
+INTERN ATTR_SECTION(".text.crt.net.inet.6.bind_reserved") ATTR_FDARG(1) int
 NOTHROW_RPC(LIBCCALL libc_bindresvport6)(fd_t sockfd,
                                          struct sockaddr_in6 *sock_in)
 /*[[[body:libc_bindresvport6]]]*/
@@ -349,8 +349,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_getaddr)(void const *bp,
 }
 /*[[[end:libc_inet6_rth_getaddr]]]*/
 
-/*[[[head:libc_getipv4sourcefilter,hash:CRC-32=0x449f467b]]]*/
-INTERN ATTR_SECTION(".text.crt.net.inet.6.ipv4_source_filter") int
+/*[[[head:libc_getipv4sourcefilter,hash:CRC-32=0x36453a32]]]*/
+INTERN ATTR_SECTION(".text.crt.net.inet.6.ipv4_source_filter") ATTR_FDARG(1) int
 NOTHROW_RPC_KOS(LIBCCALL libc_getipv4sourcefilter)(fd_t sockfd,
                                                    struct in_addr interface_addr,
                                                    struct in_addr group,
@@ -370,8 +370,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getipv4sourcefilter)(fd_t sockfd,
 }
 /*[[[end:libc_getipv4sourcefilter]]]*/
 
-/*[[[head:libc_setipv4sourcefilter,hash:CRC-32=0xbf40c253]]]*/
-INTERN ATTR_SECTION(".text.crt.net.inet.6.ipv4_source_filter") int
+/*[[[head:libc_setipv4sourcefilter,hash:CRC-32=0xc16b7955]]]*/
+INTERN ATTR_SECTION(".text.crt.net.inet.6.ipv4_source_filter") ATTR_FDARG(1) int
 NOTHROW_RPC_KOS(LIBCCALL libc_setipv4sourcefilter)(fd_t sockfd,
                                                    struct in_addr interface_addr,
                                                    struct in_addr group,
@@ -391,8 +391,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setipv4sourcefilter)(fd_t sockfd,
 }
 /*[[[end:libc_setipv4sourcefilter]]]*/
 
-/*[[[head:libc_getsourcefilter,hash:CRC-32=0x915eba4c]]]*/
-INTERN ATTR_SECTION(".text.crt.net.inet.6.source_filter") int
+/*[[[head:libc_getsourcefilter,hash:CRC-32=0x66c1145f]]]*/
+INTERN ATTR_SECTION(".text.crt.net.inet.6.source_filter") ATTR_FDARG(1) int
 NOTHROW_RPC_KOS(LIBCCALL libc_getsourcefilter)(fd_t sockfd,
                                                uint32_t interface_addr,
                                                struct sockaddr const *group,
@@ -414,8 +414,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getsourcefilter)(fd_t sockfd,
 }
 /*[[[end:libc_getsourcefilter]]]*/
 
-/*[[[head:libc_setsourcefilter,hash:CRC-32=0x6701c29d]]]*/
-INTERN ATTR_SECTION(".text.crt.net.inet.6.source_filter") int
+/*[[[head:libc_setsourcefilter,hash:CRC-32=0x234bbbec]]]*/
+INTERN ATTR_SECTION(".text.crt.net.inet.6.source_filter") ATTR_FDARG(1) int
 NOTHROW_RPC_KOS(LIBCCALL libc_setsourcefilter)(fd_t sockfd,
                                                uint32_t interface_addr,
                                                struct sockaddr const *group,

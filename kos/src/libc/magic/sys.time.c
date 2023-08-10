@@ -185,7 +185,7 @@ int utimes32([[in]] char const *file,
 
 [[ignore, nocrt, doc_alias("futimesat"), alias("futimesat")]]
 [[decl_include("<bits/os/timeval.h>", "<bits/types.h>")]]
-int futimesat32($fd_t fd, [[in]] char const *file,
+int futimesat32([[fdarg]] $fd_t fd, [[in]] char const *file,
                 [[in_opt]] struct $timeval32 const tvp[2]);
 
 [[ignore, nocrt, doc_alias("settimeofday")]]
@@ -205,7 +205,7 @@ int lutimes32([[in]] char const *file, [[in_opt]] struct $timeval32 const tvp[2]
 
 [[ignore, nocrt, doc_alias("lutimes"), alias("futimes")]]
 [[decl_include("<bits/os/timeval.h>", "<bits/types.h>")]]
-int futimes32($fd_t fd, [[in_opt]] struct $timeval32 const tvp[2]);
+int futimes32([[fdarg]] $fd_t fd, [[in_opt]] struct $timeval32 const tvp[2]);
 
 
 
@@ -371,7 +371,7 @@ int utimes([[in]] char const *file,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futimesat64")]]
 [[requires($has_function(futimesat32) || $has_function(futimesat64))]]
 [[userimpl, section(".text.crt{|.dos}.fs.modify_time")]]
-int futimesat($fd_t fd, [[in]] char const *file,
+int futimesat([[fdarg]] $fd_t fd, [[in]] char const *file,
               [[in_opt]] struct timeval const tvp[2]) {
 @@pp_if $has_function(utimes32)@@
 	struct timeval32 tv32[2];
@@ -499,7 +499,7 @@ int lutimes([[in]] char const *file,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futimes64")]]
 [[requires($has_function(futimes32) || $has_function(futimes64))]]
 [[userimpl, section(".text.crt{|.dos}.fs.modify_time")]]
-int futimes($fd_t fd, [[in_opt]] struct timeval const tvp[2]) {
+int futimes([[fdarg]] $fd_t fd, [[in_opt]] struct timeval const tvp[2]) {
 @@pp_if $has_function(futimes32)@@
 	struct timeval32 tv32[2];
 	if (!tvp)
@@ -668,7 +668,7 @@ int lutimes64([[in]] char const *file,
 [[preferred_time64_variant_of(lutimes), doc_alias("lutimes")]]
 [[requires_function(futimes32)]]
 [[userimpl, section(".text.crt{|.dos}.fs.modify_time")]]
-int futimes64($fd_t fd, [[in_opt]] struct timeval64 const tvp[2]) {
+int futimes64([[fdarg]] $fd_t fd, [[in_opt]] struct timeval64 const tvp[2]) {
 	struct timeval32 tv32[2];
 	if (!tvp)
 		return futimes32(fd, NULL);
@@ -687,7 +687,7 @@ int futimes64($fd_t fd, [[in_opt]] struct timeval64 const tvp[2]) {
 [[preferred_time64_variant_of(futimesat), doc_alias("futimesat")]]
 [[requires_function(futimesat32)]]
 [[userimpl, section(".text.crt{|.dos}.fs.modify_time")]]
-int futimesat64($fd_t fd, [[in]] char const *file,
+int futimesat64([[fdarg]] $fd_t fd, [[in]] char const *file,
                 [[in_opt]] struct timeval64 const tvp[2]) {
 	struct timeval32 tv32[2];
 	if (!tvp)

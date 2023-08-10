@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11e1e2de */
+/* HASH CRC-32:0x9cf09ea6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.tty") WUNUSED char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.tty") WUNUSED ATTR_FDARG(1) char16_t *
 NOTHROW_RPC(LIBDCALL libd_wttyname)(fd_t fd) {
 	static char16_t buf[32];
 	if likely(libd_wttyname_r(fd, buf, COMPILER_LENOF(buf)) == 0)
@@ -48,7 +48,7 @@ NOTHROW_RPC(LIBDCALL libd_wttyname)(fd_t fd) {
 }
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
-INTERN ATTR_SECTION(".text.crt.wchar.io.tty") WUNUSED char32_t *
+INTERN ATTR_SECTION(".text.crt.wchar.io.tty") WUNUSED ATTR_FDARG(1) char32_t *
 NOTHROW_RPC(LIBKCALL libc_wttyname)(fd_t fd) {
 	static char32_t buf[32];
 	if likely(libc_wttyname_r(fd, buf, COMPILER_LENOF(buf)) == 0)
@@ -58,7 +58,7 @@ NOTHROW_RPC(LIBKCALL libc_wttyname)(fd_t fd) {
 #include <libc/errno.h>
 /* >> wttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.tty") ATTR_OUTS(2, 3) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.tty") ATTR_FDARG(1) ATTR_OUTS(2, 3) errno_t
 NOTHROW_RPC(LIBDCALL libd_wttyname_r)(fd_t fd,
                                       char16_t *buf,
                                       size_t buflen) {
@@ -108,7 +108,7 @@ NOTHROW_RPC(LIBDCALL libd_wttyname_r)(fd_t fd,
 #include <libc/errno.h>
 /* >> wttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTERN ATTR_SECTION(".text.crt.wchar.io.tty") ATTR_OUTS(2, 3) errno_t
+INTERN ATTR_SECTION(".text.crt.wchar.io.tty") ATTR_FDARG(1) ATTR_OUTS(2, 3) errno_t
 NOTHROW_RPC(LIBKCALL libc_wttyname_r)(fd_t fd,
                                       char32_t *buf,
                                       size_t buflen) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc989c419 */
+/* HASH CRC-32:0x10613154 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ DECL_BEGIN
  * @param: envp:         Same as the `envp' accepted by `fexecve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
  * @return: * :          Error (errno-code describing the reason of failure) */
-INTDEF ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBDCALL libd_posix_fspawn_np)(pid_t *__restrict pid, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+INTDEF ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBDCALL libd_posix_fspawn_np)(pid_t *__restrict pid, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_fspawn_np(3)
@@ -79,7 +79,7 @@ INTDEF ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t N
  * @param: envp:         Same as the `envp' accepted by `fexecve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
  * @return: * :          Error (errno-code describing the reason of failure) */
-INTDEF ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+INTDEF ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn(3)
@@ -400,42 +400,42 @@ INTDEF ATTR_IN(3) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_fi
  * Enqueue a call `close(fd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addclose)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd);
+INTDEF ATTR_FDARG(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addclose)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawn_file_actions_addclose(3)
  * Enqueue a call `close(fd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addclose)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd);
+INTDEF ATTR_FDARG(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addclose)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn_file_actions_adddup2(3)
  * Enqueue a call `dup2(oldfd, newfd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_adddup2)(posix_spawn_file_actions_t *__restrict file_actions, fd_t oldfd, fd_t newfd);
+INTDEF ATTR_FDARG(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_adddup2)(posix_spawn_file_actions_t *__restrict file_actions, fd_t oldfd, fd_t newfd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawn_file_actions_adddup2(3)
  * Enqueue a call `dup2(oldfd, newfd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_adddup2)(posix_spawn_file_actions_t *__restrict file_actions, fd_t oldfd, fd_t newfd);
+INTDEF ATTR_FDARG(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_adddup2)(posix_spawn_file_actions_t *__restrict file_actions, fd_t oldfd, fd_t newfd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn_file_actions_addtcsetpgrp_np(3)
  * Enqueue a call `tcsetpgrp(fd, getpid())' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addtcsetpgrp_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd);
+INTDEF ATTR_FDARG(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addtcsetpgrp_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawn_file_actions_addtcsetpgrp_np(3)
  * Enqueue a call `tcsetpgrp(fd, getpid())' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addtcsetpgrp_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd);
+INTDEF ATTR_FDARG(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addtcsetpgrp_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn_file_actions_addclosefrom_np(3)
@@ -470,14 +470,14 @@ INTDEF ATTR_IN(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_fi
  * Enqueue a call `fchdir(dfd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addfchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t dfd);
+INTDEF ATTR_FDARG(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addfchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t dfd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawn_file_actions_addfchdir_np(3)
  * Enqueue a call `fchdir(dfd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addfchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t dfd);
+INTDEF ATTR_FDARG(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addfchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t dfd);
 #endif /* !__KERNEL__ */
 
 DECL_END

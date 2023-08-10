@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b5a4be0 */
+/* HASH CRC-32:0x512bd0d6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -315,7 +315,7 @@ NOTHROW_RPC(LIBCCALL libc_cwait)(int *tstat,
 #include <asm/crt/process.h>
 #include <libc/errno.h>
 #include <asm/os/vfork.h>
-INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") ATTR_IN(3) ATTR_IN(4) pid_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") ATTR_FDREAD(2) ATTR_IN(3) ATTR_IN(4) pid_t
 NOTHROW_RPC(LIBCCALL libc_fspawnve)(__STDC_INT_AS_UINT_T mode,
                                     fd_t execfd,
                                     __TARGV,

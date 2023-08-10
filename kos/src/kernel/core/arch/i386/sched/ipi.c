@@ -253,7 +253,7 @@ thiscpu_x86_ipi_alloc[CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER)] = { 0, };
 
 /* Check  if  there   are  any  non-interrupting   software-based  IPIs   pending.
  * If some are present, these must be serviced by calling `cpu_ipi_service_nopr()' */
-PUBLIC NOBLOCK WUNUSED NOPREEMPT bool
+PUBLIC NOBLOCK WUNUSED NOPREEMPT NONNULL((1)) bool
 NOTHROW(FCALL arch_cpu_swipi_pending_nopr)(struct cpu *__restrict me) {
 	unsigned int i;
 	assert(!PREEMPTION_ENABLED());
@@ -348,7 +348,7 @@ NOTHROW(PRPC_EXEC_CALLBACK_CC task_rpc_serve_ipi)(struct rpc_context *__restrict
 
 /* Modify the  scheduler state  of  `thread' to  have  it
  * service IPIs before resuming what it was doing before. */
-INTERN NOBLOCK NONNULL((1)) void
+INTERN NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL x86_task_push_serve_ipi)(struct task *__restrict thread) {
 	struct scpustate *state;
 	state = FORTASK(thread, this_sstate);

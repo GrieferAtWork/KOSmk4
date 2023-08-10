@@ -237,10 +237,10 @@ NOTHROW_NCX(LIBCCALL libc_rewinddir)(DIR *__restrict dirp)
 }
 /*[[[end:libc_rewinddir]]]*/
 
-/*[[[head:libc_fdopendir,hash:CRC-32=0x270011ee]]]*/
+/*[[[head:libc_fdopendir,hash:CRC-32=0xdeb2b048]]]*/
 /* >> fdopendir(3)
  * Create a new directory stream by inheriting the given `fd' as stream handle */
-INTERN ATTR_SECTION(".text.crt.fs.dir") WUNUSED DIR *
+INTERN ATTR_SECTION(".text.crt.fs.dir") WUNUSED ATTR_FDREAD(1) DIR *
 NOTHROW_NCX(LIBCCALL libc_fdopendir)(fd_t fd)
 /*[[[body:libc_fdopendir]]]*/
 {
@@ -318,10 +318,10 @@ err_null:
 }
 /*[[[end:libc_dirfd]]]*/
 
-/*[[[head:libc_getdirentries,hash:CRC-32=0x1b485213]]]*/
+/*[[[head:libc_getdirentries,hash:CRC-32=0xba383c0d]]]*/
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
-INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_INOUT(4) ATTR_OUTS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_FDREAD(1) ATTR_INOUT(4) ATTR_OUTS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_getdirentries)(fd_t fd,
                                          char *__restrict buf,
                                          size_t nbytes,
@@ -349,7 +349,7 @@ DEFINE_INTERN_ALIAS(libc_getdirentries64, libc_getdirentries);
 DEFINE_INTERN_WEAK_ALIAS(libc_kreaddirf64, libc_kreaddirf);
 DEFINE_INTERN_WEAK_ALIAS(libc_kreaddir64, libc_kreaddir);
 
-/*[[[head:libc_kreaddirf,hash:CRC-32=0x32514912]]]*/
+/*[[[head:libc_kreaddirf,hash:CRC-32=0x5bcdadfe]]]*/
 /* >> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)
  * The KOS-specific system call for reading a single directory entry
  * from  a file  descriptor referring  to an  open directory stream.
@@ -359,7 +359,7 @@ DEFINE_INTERN_WEAK_ALIAS(libc_kreaddir64, libc_kreaddir);
  *                    stream will only be advanced when this value is >= 'bufsize'
  * @return: 0 : The end of the directory has been reached.
  * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
-INTERN ATTR_SECTION(".text.crt.fs.dir") WUNUSED ssize_t
+INTERN ATTR_SECTION(".text.crt.fs.dir") WUNUSED ATTR_FDREAD(1) ssize_t
 NOTHROW_RPC(LIBCCALL libc_kreaddirf)(fd_t fd,
                                      struct dirent *buf,
                                      size_t bufsize,
@@ -373,7 +373,7 @@ NOTHROW_RPC(LIBCCALL libc_kreaddirf)(fd_t fd,
 }
 /*[[[end:libc_kreaddirf]]]*/
 
-/*[[[head:libc_kreaddir,hash:CRC-32=0xfc1b6ac9]]]*/
+/*[[[head:libc_kreaddir,hash:CRC-32=0x2e47e624]]]*/
 /* >> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)
  * The KOS-specific system call for reading a single directory entry
  * from  a file  descriptor referring  to an  open directory stream.
@@ -383,7 +383,7 @@ NOTHROW_RPC(LIBCCALL libc_kreaddirf)(fd_t fd,
  *                    stream will only be advanced when this value is >= 'bufsize'
  * @return: 0 : The end of the directory has been reached.
  * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
-INTERN ATTR_SECTION(".text.crt.fs.dir") WUNUSED ssize_t
+INTERN ATTR_SECTION(".text.crt.fs.dir") WUNUSED ATTR_FDREAD(1) ssize_t
 NOTHROW_RPC(LIBCCALL libc_kreaddir)(fd_t fd,
                                     struct dirent *buf,
                                     size_t bufsize,

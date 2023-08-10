@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57acd5c1 */
+/* HASH CRC-32:0x3636ac1d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -298,7 +298,7 @@ __CDECLARE_OPT(,__STDC_INT_AS_UINT_T,__NOTHROW_NCX,sched_getcpu,(void),())
  *                 type of namespace, or one of `CLONE_NEWCGROUP', `CLONE_NEWIPC',
  *                `CLONE_NEWNET', `CLONE_NEWNS', `CLONE_NEWPID', `CLONE_NEWUSER',
  *                `CLONE_NEWUTS') */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,setns,(__fd_t __fd, __STDC_INT_AS_UINT_T __nstype),(__fd,__nstype))
+__CDECLARE_OPT(__ATTR_FDARG(1),int,__NOTHROW_NCX,setns,(__fd_t __fd, __STDC_INT_AS_UINT_T __nstype),(__fd,__nstype))
 
 #ifdef __USE_KOS
 /* Exits  the current  thread by  invoking the  SYS_exit system call,

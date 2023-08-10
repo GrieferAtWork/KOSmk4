@@ -671,7 +671,7 @@ __SYSDECL_BEGIN
 @@@return: -1: All ioctl operations use this to indicate error (s.a. `errno')
 [[cp, guard, vartypes(void *), decl_include("<features.h>", "<bits/types.h>")]]
 [[export_alias("__ioctl", "__libc_ioctl")]]
-__STDC_INT_AS_SSIZE_T ioctl($fd_t fd, $ioctl_t request, ...);
+__STDC_INT_AS_SSIZE_T ioctl([[fdarg]] $fd_t fd, $ioctl_t request, ...);
 
 %{
 

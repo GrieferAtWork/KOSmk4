@@ -25,8 +25,8 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_isastream,hash:CRC-32=0x195903e8]]]*/
-INTERN ATTR_SECTION(".text.crt.io.stropts") int
+/*[[[head:libc_isastream,hash:CRC-32=0x84e79703]]]*/
+INTERN ATTR_SECTION(".text.crt.io.stropts") ATTR_FDARG(1) int
 NOTHROW(LIBCCALL libc_isastream)(fd_t fd)
 /*[[[body:libc_isastream]]]*/
 /*AUTO*/{
@@ -36,11 +36,11 @@ NOTHROW(LIBCCALL libc_isastream)(fd_t fd)
 }
 /*[[[end:libc_isastream]]]*/
 
-/*[[[head:libc_getmsg,hash:CRC-32=0xc7e3994]]]*/
+/*[[[head:libc_getmsg,hash:CRC-32=0x8701fd5a]]]*/
 /* @param: pflags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND'
  * @return: MORECTL:  ???
  * @return: MOREDATA: ??? */
-INTERN ATTR_SECTION(".text.crt.io.stropts") int
+INTERN ATTR_SECTION(".text.crt.io.stropts") ATTR_FDARG(1) int
 NOTHROW_RPC(LIBCCALL libc_getmsg)(fd_t fd,
                                   struct strbuf *__restrict ctlptr,
                                   struct strbuf *__restrict dataptr,
@@ -56,11 +56,11 @@ NOTHROW_RPC(LIBCCALL libc_getmsg)(fd_t fd,
 }
 /*[[[end:libc_getmsg]]]*/
 
-/*[[[head:libc_getpmsg,hash:CRC-32=0xa553be7e]]]*/
+/*[[[head:libc_getpmsg,hash:CRC-32=0x7a8bd110]]]*/
 /* @param: pflags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND'
  * @return: MORECTL:  ???
  * @return: MOREDATA: ??? */
-INTERN ATTR_SECTION(".text.crt.io.stropts") int
+INTERN ATTR_SECTION(".text.crt.io.stropts") ATTR_FDARG(1) int
 NOTHROW_RPC(LIBCCALL libc_getpmsg)(fd_t fd,
                                    struct strbuf *__restrict ctlptr,
                                    struct strbuf *__restrict dataptr,
@@ -78,9 +78,9 @@ NOTHROW_RPC(LIBCCALL libc_getpmsg)(fd_t fd,
 }
 /*[[[end:libc_getpmsg]]]*/
 
-/*[[[head:libc_putmsg,hash:CRC-32=0x3e031ec0]]]*/
+/*[[[head:libc_putmsg,hash:CRC-32=0x1da465e4]]]*/
 /* @param: flags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND' */
-INTERN ATTR_SECTION(".text.crt.io.stropts") int
+INTERN ATTR_SECTION(".text.crt.io.stropts") ATTR_FDARG(1) int
 NOTHROW_RPC(LIBCCALL libc_putmsg)(fd_t fd,
                                   struct strbuf const *ctlptr,
                                   struct strbuf const *dataptr,
@@ -96,9 +96,9 @@ NOTHROW_RPC(LIBCCALL libc_putmsg)(fd_t fd,
 }
 /*[[[end:libc_putmsg]]]*/
 
-/*[[[head:libc_putpmsg,hash:CRC-32=0x5bfcc902]]]*/
+/*[[[head:libc_putpmsg,hash:CRC-32=0x6858db9a]]]*/
 /* @param: flags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND' */
-INTERN ATTR_SECTION(".text.crt.io.stropts") int
+INTERN ATTR_SECTION(".text.crt.io.stropts") ATTR_FDARG(1) int
 NOTHROW_RPC(LIBCCALL libc_putpmsg)(fd_t fd,
                                    struct strbuf const *ctlptr,
                                    struct strbuf const *dataptr,
@@ -116,8 +116,8 @@ NOTHROW_RPC(LIBCCALL libc_putpmsg)(fd_t fd,
 }
 /*[[[end:libc_putpmsg]]]*/
 
-/*[[[head:libc_fattach,hash:CRC-32=0x36f5d8b7]]]*/
-INTERN ATTR_SECTION(".text.crt.io.stropts") ATTR_IN(2) int
+/*[[[head:libc_fattach,hash:CRC-32=0xdb510b46]]]*/
+INTERN ATTR_SECTION(".text.crt.io.stropts") ATTR_FDARG(1) ATTR_IN(2) int
 NOTHROW_RPC_KOS(LIBCCALL libc_fattach)(fd_t fd,
                                        char const *__restrict path)
 /*[[[body:libc_fattach]]]*/

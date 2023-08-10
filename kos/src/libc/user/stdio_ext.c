@@ -147,13 +147,13 @@ NOTHROW_NCX(LIBCCALL stdio_purge_file)(FILE *__restrict stream) {
 }
 
 
-/*[[[head:libc___fpurge,hash:CRC-32=0xddf5a955]]]*/
+/*[[[head:libc___fpurge,hash:CRC-32=0x908150cd]]]*/
 /* >> __fpurge(3)
  * Discard all modified, but unwritten data from `stream', as  well
  * as  all unread data previously buffered, but not yet read. After
  * a call to this function, the next `fread(3)' or `fwrite(3)' will
  * start off from a blank state. */
-INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") void
+INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_INOUT(1) void
 NOTHROW_NCX(LIBCCALL libc___fpurge)(FILE *stream)
 /*[[[body:libc___fpurge]]]*/
 {
@@ -204,13 +204,13 @@ NOTHROW_CB_NCX(LIBCCALL libc__flushlbf)(void)
 }
 /*[[[end:libc__flushlbf]]]*/
 
-/*[[[head:libc___fsetlocking,hash:CRC-32=0xddb6863f]]]*/
+/*[[[head:libc___fsetlocking,hash:CRC-32=0x2a83e814]]]*/
 /* >> __fsetlocking(3)
  * Set the locking type for `stream' to `type'. This affects all stdio functions
  * that aren't already lock-less by nature (iow: everything but `*_unlocked(3)')
  * @param: type: One of `FSETLOCKING_*', as defined in `<stdio_ext.h>'
  * @return: * : The locking type prior to this call (one of `FSETLOCKING_INTERNAL' or `FSETLOCKING_BYCALLER') */
-INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") int
+INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_INOUT(1) int
 NOTHROW_NCX(LIBCCALL libc___fsetlocking)(FILE *stream,
                                          int type)
 /*[[[body:libc___fsetlocking]]]*/
@@ -234,12 +234,12 @@ NOTHROW_NCX(LIBCCALL libc___fsetlocking)(FILE *stream,
 }
 /*[[[end:libc___fsetlocking]]]*/
 
-/*[[[head:libc___fseterr,hash:CRC-32=0x27095700]]]*/
+/*[[[head:libc___fseterr,hash:CRC-32=0xf88a4cd0]]]*/
 /* >> __fseterr(3)
  * Set the error indicator of `stream', the same an error file error would, such
  * that `ferror(stream) != 0', and `clearerr(stream)' must be used if one wishes
  * to clear the error once again. */
-INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") void
+INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_INOUT(1) void
 NOTHROW_NCX(LIBCCALL libc___fseterr)(FILE *stream)
 /*[[[body:libc___fseterr]]]*/
 {

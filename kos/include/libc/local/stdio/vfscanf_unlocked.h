@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfd64cfc */
+/* HASH CRC-32:0x1e7e895f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,12 +82,12 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_SIZE_T__ != __SIZEOF_INT__
 __LOCAL_LIBC(vfscanf_getc_unlocked) __format_word_t
-(__FORMATPRINTER_CC __vfscanf_getc_unlocked)(void *__arg) {
+__NOTHROW_CB_NCX(__FORMATPRINTER_CC __vfscanf_getc_unlocked)(void *__arg) {
 	return (__format_word_t)(__NAMESPACE_LOCAL_SYM __localdep_fgetc_unlocked)((__FILE *)__arg);
 }
 #endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 __LOCAL_LIBC(vfscanf_ungetc_unlocked) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vfscanf_ungetc_unlocked)(void *__arg, __format_word_t __word) {
+__NOTHROW_CB_NCX(__FORMATPRINTER_CC __vfscanf_ungetc_unlocked)(void *__arg, __format_word_t __word) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_ungetc_unlocked)((int)(unsigned char)(unsigned int)__word, (__FILE *)__arg);
 }
 __NAMESPACE_LOCAL_END

@@ -213,7 +213,7 @@ $errno_t crt_posix_spawn([[out]] pid_t *__restrict pid,
               $has_function(read) && $has_function(write) && $has_function(close))) &&
             $has_function(crt_fexecve) && $has_function(waitpid)) ||
            (defined(__OS_HAVE_PROCFS_SELF_FD) && $has_function(crt_posix_spawn)))]]
-$errno_t posix_fspawn_np([[out]] pid_t *__restrict pid, $fd_t execfd,
+$errno_t posix_fspawn_np([[out]] pid_t *__restrict pid, [[fdread]] $fd_t execfd,
                          [[in_opt]] posix_spawn_file_actions_t const *file_actions,
                          [[in_opt]] posix_spawnattr_t const *attrp,
                          [[in]] __TARGV, [[in]] __TENVP) {
@@ -1011,7 +1011,7 @@ struct __spawn_action *posix_spawn_file_actions_alloc([[inout]] posix_spawn_file
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS) && $has_function(strdup) && $has_function(posix_spawn_file_actions_alloc))]]
 $errno_t posix_spawn_file_actions_addopen([[inout]] posix_spawn_file_actions_t *__restrict file_actions,
-                                          $fd_t fd, [[in]] char const *__restrict path,
+                                          [[no_fdarg]] $fd_t fd, [[in]] char const *__restrict path,
                                           $oflag_t oflags, mode_t mode) {
 	struct __spawn_action *action;
 	/* Posix says:
@@ -1052,7 +1052,7 @@ err:
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS) && $has_function(posix_spawn_file_actions_alloc))]]
 $errno_t posix_spawn_file_actions_addclose([[inout]] posix_spawn_file_actions_t *__restrict file_actions,
-                                           $fd_t fd) {
+                                           [[fdarg]] $fd_t fd) {
 	struct __spawn_action *action;
 	action = posix_spawn_file_actions_alloc(file_actions);
 	if unlikely(!action)
@@ -1077,7 +1077,7 @@ err:
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS) && $has_function(posix_spawn_file_actions_alloc))]]
 $errno_t posix_spawn_file_actions_adddup2([[inout]] posix_spawn_file_actions_t *__restrict file_actions,
-                                          $fd_t oldfd, $fd_t newfd) {
+                                          [[fdarg]] $fd_t oldfd, [[no_fdarg]] $fd_t newfd) {
 	struct __spawn_action *action;
 	action = posix_spawn_file_actions_alloc(file_actions);
 	if unlikely(!action)
@@ -1106,7 +1106,7 @@ err:
 [[requires(defined(__POSIX_SPAWN_USE_KOS) && defined(__POSIX_SPAWN_ACTION_TCSETPGRP) &&
            $has_function(posix_spawn_file_actions_alloc))]]
 $errno_t posix_spawn_file_actions_addtcsetpgrp_np([[inout]] posix_spawn_file_actions_t *__restrict file_actions,
-                                                  $fd_t fd) {
+                                                  [[fdarg]] $fd_t fd) {
 	struct __spawn_action *action;
 	action = posix_spawn_file_actions_alloc(file_actions);
 	if unlikely(!action)
@@ -1135,7 +1135,7 @@ err:
 [[requires(defined(__POSIX_SPAWN_USE_KOS) && defined(__POSIX_SPAWN_ACTION_CLOSEFROM) &&
            $has_function(posix_spawn_file_actions_alloc))]]
 $errno_t posix_spawn_file_actions_addclosefrom_np([[inout]] posix_spawn_file_actions_t *__restrict file_actions,
-                                                  $fd_t lowfd) {
+                                                  [[no_fdarg]] $fd_t lowfd) {
 	struct __spawn_action *action;
 	action = posix_spawn_file_actions_alloc(file_actions);
 	if unlikely(!action)
@@ -1195,7 +1195,7 @@ err:
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS) && $has_function(posix_spawn_file_actions_alloc))]]
 $errno_t posix_spawn_file_actions_addfchdir_np([[inout]] posix_spawn_file_actions_t *__restrict file_actions,
-                                               $fd_t dfd) {
+                                               [[fdarg]] $fd_t dfd) {
 	struct __spawn_action *action;
 	action = posix_spawn_file_actions_alloc(file_actions);
 	if unlikely(!action)

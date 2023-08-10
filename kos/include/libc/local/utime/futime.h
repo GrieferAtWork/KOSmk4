@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4805681b */
+/* HASH CRC-32:0xed29d66e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_futime32_defined
 #define __local___localdep_crt_futime32_defined
 #ifdef __CRT_HAVE_futime
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_crt_futime32,(__fd_t __fd, struct __utimbuf32 const *__file_times),futime,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_crt_futime32,(__fd_t __fd, struct __utimbuf32 const *__file_times),futime,(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime)
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_crt_futime32,(__fd_t __fd, struct __utimbuf32 const *__file_times),_futime,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_crt_futime32,(__fd_t __fd, struct __utimbuf32 const *__file_times),_futime,(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime32)
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_crt_futime32,(__fd_t __fd, struct __utimbuf32 const *__file_times),_futime32,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_crt_futime32,(__fd_t __fd, struct __utimbuf32 const *__file_times),_futime32,(__fd,__file_times))
 #else /* ... */
 #undef __local___localdep_crt_futime32_defined
 #endif /* !... */
@@ -40,14 +40,14 @@ __CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_crt_futime32,(__fd_t _
 #ifndef __local___localdep_crt_futime64_defined
 #define __local___localdep_crt_futime64_defined
 #ifdef __CRT_HAVE_futime64
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_crt_futime64,(__fd_t __fd, struct __utimbuf64 const *__file_times),futime64,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_crt_futime64,(__fd_t __fd, struct __utimbuf64 const *__file_times),futime64,(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime64)
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_crt_futime64,(__fd_t __fd, struct __utimbuf64 const *__file_times),_futime64,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_crt_futime64,(__fd_t __fd, struct __utimbuf64 const *__file_times),_futime64,(__fd,__file_times))
 #else /* ... */
 #undef __local___localdep_crt_futime64_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_futime64_defined */
-__LOCAL_LIBC(futime) __ATTR_IN_OPT(2) int
+__LOCAL_LIBC(futime) __ATTR_FDARG(1) __ATTR_IN_OPT(2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futime))(__fd_t __fd, struct utimbuf const *__file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("actime")

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x626752fd */
+/* HASH CRC-32:0xa6799338 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@
 __SYSDECL_BEGIN
 
 /* >> setkey(3), setkey_r(3) */
-__CDECLARE_VOID_OPT(,__NOTHROW_NCX,setkey,(char const *__key),(__key))
+__CDECLARE_VOID_OPT(__ATTR_IN(1),__NOTHROW_NCX,setkey,(char const *__key),(__key))
 #if !defined(__crypt_defined) && defined(__CRT_HAVE_crypt)
 #define __crypt_defined
 /* >> crypt(3), crypt_r(3) */

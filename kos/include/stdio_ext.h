@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e54e6b5 */
+/* HASH CRC-32:0xf283064f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,14 +114,14 @@ __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1),int,__NOTHROW_NCX,__fl
  * as  all unread data previously buffered, but not yet read. After
  * a call to this function, the next `fread(3)' or `fwrite(3)' will
  * start off from a blank state. */
-__CDECLARE_VOID(,__NOTHROW_NCX,__fpurge,(__FILE *__stream),(__stream))
+__CDECLARE_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,__fpurge,(__FILE *__stream),(__stream))
 #elif defined(__CRT_HAVE_fpurge)
 /* >> __fpurge(3)
  * Discard all modified, but unwritten data from `stream', as  well
  * as  all unread data previously buffered, but not yet read. After
  * a call to this function, the next `fread(3)' or `fwrite(3)' will
  * start off from a blank state. */
-__CREDIRECT_VOID(,__NOTHROW_NCX,__fpurge,(__FILE *__stream),fpurge,(__stream))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,__fpurge,(__FILE *__stream),fpurge,(__stream))
 #endif /* ... */
 #include <features.h>
 #if defined(__CRT_HAVE___fpending_unlocked) && defined(__USE_STDIO_UNLOCKED)
@@ -181,12 +181,12 @@ __CREDIRECT_VOID(,__NOTHROW_CB_NCX,_flushlbf,(void),_IO_flush_all_linebuffered,(
  * that aren't already lock-less by nature (iow: everything but `*_unlocked(3)')
  * @param: type: One of `FSETLOCKING_*', as defined in `<stdio_ext.h>'
  * @return: * : The locking type prior to this call (one of `FSETLOCKING_INTERNAL' or `FSETLOCKING_BYCALLER') */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,__fsetlocking,(__FILE *__stream, int __type),(__stream,__type))
+__CDECLARE_OPT(__ATTR_INOUT(1),int,__NOTHROW_NCX,__fsetlocking,(__FILE *__stream, int __type),(__stream,__type))
 /* >> __fseterr(3)
  * Set the error indicator of `stream', the same an error file error would, such
  * that `ferror(stream) != 0', and `clearerr(stream)' must be used if one wishes
  * to clear the error once again. */
-__CDECLARE_VOID_OPT(,__NOTHROW_NCX,__fseterr,(__FILE *__stream),(__stream))
+__CDECLARE_VOID_OPT(__ATTR_INOUT(1),__NOTHROW_NCX,__fseterr,(__FILE *__stream),(__stream))
 #if defined(__CRT_HAVE___freadahead_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* >> __freadahead(3), __freadahead_unlocked(3)
  * Returns  the # of bytes pending to-be read from the given `stream's internal buffer.

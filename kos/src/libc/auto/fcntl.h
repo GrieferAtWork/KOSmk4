@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbeb12179 */
+/* HASH CRC-32:0xc05858c0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,22 +30,22 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_readahead)(fd_t fd, __PIO_OFFSET64 offset, size_t count);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_sync_file_range)(fd_t fd, __PIO_OFFSET64 offset, __PIO_OFFSET64 count, unsigned int flags);
-INTDEF ssize_t NOTHROW_RPC(LIBDCALL libd_vmsplice)(fd_t fdout, struct iovec const *iov, size_t count, unsigned int flags);
-INTDEF ATTR_INOUT(2) ATTR_INOUT(4) ssize_t NOTHROW_RPC(LIBDCALL libd_splice)(fd_t fdin, __PIO_OFFSET64 *offin, fd_t fdout, __PIO_OFFSET64 *offout, size_t length, unsigned int flags);
-INTDEF ssize_t NOTHROW_RPC(LIBDCALL libd_tee)(fd_t fdin, fd_t fdout, size_t length, unsigned int flags);
+INTDEF ATTR_FDREAD(1) ssize_t NOTHROW_NCX(LIBDCALL libd_readahead)(fd_t fd, __PIO_OFFSET64 offset, size_t count);
+INTDEF ATTR_FDWRITE(1) int NOTHROW_NCX(LIBDCALL libd_sync_file_range)(fd_t fd, __PIO_OFFSET64 offset, __PIO_OFFSET64 count, unsigned int flags);
+INTDEF ATTR_FDWRITE(1) ssize_t NOTHROW_RPC(LIBDCALL libd_vmsplice)(fd_t fdout, struct iovec const *iov, size_t count, unsigned int flags);
+INTDEF ATTR_FDREAD(1) ATTR_FDWRITE(3) ATTR_INOUT(2) ATTR_INOUT(4) ssize_t NOTHROW_RPC(LIBDCALL libd_splice)(fd_t fdin, __PIO_OFFSET64 *offin, fd_t fdout, __PIO_OFFSET64 *offout, size_t length, unsigned int flags);
+INTDEF ATTR_FDREAD(1) ATTR_FDWRITE(2) ssize_t NOTHROW_RPC(LIBDCALL libd_tee)(fd_t fdin, fd_t fdout, size_t length, unsigned int flags);
 INTDEF ATTR_OUT(3) int NOTHROW_RPC(LIBDCALL libd_name_to_handle_at)(fd_t dirfd, char const *name, struct file_handle *handle, int *mnt_id, int flags);
-INTDEF ATTR_IN(2) fd_t NOTHROW_RPC(LIBDCALL libd_open_by_handle_at)(fd_t mountdirfd, struct file_handle *handle, int flags);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_fallocate)(fd_t fd, __STDC_INT_AS_UINT_T mode, __PIO_OFFSET offset, __PIO_OFFSET length);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_fallocate64)(fd_t fd, __STDC_INT_AS_UINT_T mode, __PIO_OFFSET64 offset, __PIO_OFFSET64 length);
-INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_fcntl)(fd_t fd, fcntl_t cmd, ...);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_posix_fadvise)(fd_t fd, __PIO_OFFSET offset, __PIO_OFFSET length, __STDC_INT_AS_UINT_T advise);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_posix_fallocate)(fd_t fd, __PIO_OFFSET offset, __PIO_OFFSET length);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_posix_fadvise64)(fd_t fd, __PIO_OFFSET64 offset, __PIO_OFFSET64 length, __STDC_INT_AS_UINT_T advise);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_posix_fallocate64)(fd_t fd, __PIO_OFFSET64 offset, __PIO_OFFSET64 length);
-INTDEF int NOTHROW_RPC(LIBDCALL libd_lockf)(fd_t fd, __STDC_INT_AS_UINT_T cmd, __PIO_OFFSET length);
-INTDEF int NOTHROW_RPC(LIBDCALL libd_lockf64)(fd_t fd, __STDC_INT_AS_UINT_T cmd, __PIO_OFFSET64 length);
+INTDEF ATTR_FDARG(1) ATTR_IN(2) fd_t NOTHROW_RPC(LIBDCALL libd_open_by_handle_at)(fd_t mountdirfd, struct file_handle *handle, int flags);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_fallocate)(fd_t fd, __STDC_INT_AS_UINT_T mode, __PIO_OFFSET offset, __PIO_OFFSET length);
+INTDEF ATTR_FDWRITE(1) int NOTHROW_NCX(LIBDCALL libd_fallocate64)(fd_t fd, __STDC_INT_AS_UINT_T mode, __PIO_OFFSET64 offset, __PIO_OFFSET64 length);
+INTDEF ATTR_FDARG(1) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_fcntl)(fd_t fd, fcntl_t cmd, ...);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_posix_fadvise)(fd_t fd, __PIO_OFFSET offset, __PIO_OFFSET length, __STDC_INT_AS_UINT_T advise);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_posix_fallocate)(fd_t fd, __PIO_OFFSET offset, __PIO_OFFSET length);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_posix_fadvise64)(fd_t fd, __PIO_OFFSET64 offset, __PIO_OFFSET64 length, __STDC_INT_AS_UINT_T advise);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_posix_fallocate64)(fd_t fd, __PIO_OFFSET64 offset, __PIO_OFFSET64 length);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC(LIBDCALL libd_lockf)(fd_t fd, __STDC_INT_AS_UINT_T cmd, __PIO_OFFSET length);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC(LIBDCALL libd_lockf64)(fd_t fd, __STDC_INT_AS_UINT_T cmd, __PIO_OFFSET64 length);
 /* >> directio(3)
  * Enable or disable optional direct-I/O for  `fd'. Optional direct I/O behaves  the
  * same as mandatory direct I/O (s.a. `O_DIRECT'), but those cases where the  buffer
@@ -65,7 +65,7 @@ INTDEF int NOTHROW_RPC(LIBDCALL libd_lockf64)(fd_t fd, __STDC_INT_AS_UINT_T cmd,
  * @param: mode: One of `DIRECTIO_*' from `<sys/fcntl.h>'
  * @return:  0: Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_directio)(fd_t fd, int mode);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_directio)(fd_t fd, int mode);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> directio(3)
@@ -87,7 +87,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_directio)(fd_t fd, int mode);
  * @param: mode: One of `DIRECTIO_*' from `<sys/fcntl.h>'
  * @return:  0: Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_directio)(fd_t fd, int mode);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBCCALL libc_directio)(fd_t fd, int mode);
 #endif /* !__KERNEL__ */
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a282e47 */
+/* HASH CRC-32:0xb3e93039 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_unlock_fhandle) void
+__LOCAL_LIBC(_unlock_fhandle) __ATTR_FDARG(1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_unlock_fhandle))(__fd_t __fd) {
 	__COMPILER_IMPURE();
 	(void)__fd;

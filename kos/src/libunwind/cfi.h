@@ -75,14 +75,14 @@ NOTHROW_NCX(CC libuw_unwind_instruction_succ)(NCX byte_t const *unwind_pc,
 
 /* Return a pointer to a CFI expression that is applicable for `module_relative_pc'
  * If no such expression exists, return `NULL' instead. */
-INTDEF WUNUSED NONNULL((1, 5)) NCX byte_t const *
+INTDEF WUNUSED NONNULL((1)) ATTR_OUT(5) NCX byte_t const *
 NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *__restrict self,
                                                 uintptr_t cu_base,
                                                 uintptr_t module_relative_pc,
                                                 uint8_t addrsize,
-                                                size_t *__restrict pexpr_length);
+                                                size_t *__restrict p_expr_length);
 
-/* Load the effective l-value address of `self' into `*paddr':
+/* Load the effective l-value address of `self' into `*p_addr':
  *   UNWIND_STE_CONSTANT:     Write-back s_uconst or s_sconst
  *   UNWIND_STE_STACKVALUE:   Write-back s_uconst or s_sconst
  *   UNWIND_STE_REGISTER:     Write-back REGISTER[s_register] + s_regoffset
@@ -92,10 +92,10 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
  * @return: UNWIND_SUCCESS:                      Success.
  * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `self'
  * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `self' */
-INTDEF NONNULL((1, 2, 4)) unwind_errno_t
+INTDEF NONNULL((1, 2)) ATTR_OUT(4) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_ste_addr)(unwind_ste_t const *__restrict self,
                                       unwind_getreg_t regget, void const *regget_arg,
-                                      NCX void **__restrict paddr);
+                                      NCX void **__restrict p_addr);
 
 /* Read/write bit-wise data to/from an unwind stack-entry location.
  * @param: self:           The unwind STE-element to/from which to read/write.

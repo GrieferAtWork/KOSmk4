@@ -765,10 +765,10 @@ libda_single_x86(struct disassembler *__restrict self) {
 		chain += ops_0f38_offsets[opcode];
 #endif /* HAVE_OPS_0F38_OFFSETS */
 	} else {
+		chain = ops_0f3a;
 		if unlikely(opcode >= EMU86_OPCODE_BASE0f3a + 0x100)
 			goto unknown_opcode;
 		opcode &= 0xff;
-		chain = ops_0f3a;
 #ifdef HAVE_OPS_0F3A_OFFSETS
 		chain += ops_0f3a_offsets[opcode];
 #endif /* HAVE_OPS_0F3A_OFFSETS */

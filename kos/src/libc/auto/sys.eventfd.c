@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3f2a315 */
+/* HASH CRC-32:0x92f87a9b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 #include <libc/errno.h>
 /* >> eventfd_read(3)
  * Read the event counter, and (if not `O_NONBLOCK'), wait for an event to happen */
-INTERN ATTR_SECTION(".text.crt.sched.eventfd") int
+INTERN ATTR_SECTION(".text.crt.sched.eventfd") ATTR_FDREAD(1) int
 NOTHROW_RPC(LIBCCALL libc_eventfd_read)(fd_t fd,
                                         eventfd_t *value) {
 	ssize_t error;
@@ -49,7 +49,7 @@ NOTHROW_RPC(LIBCCALL libc_eventfd_read)(fd_t fd,
 #include <libc/errno.h>
 /* >> eventfd_write(3)
  * Increment the event counter */
-INTERN ATTR_SECTION(".text.crt.sched.eventfd") int
+INTERN ATTR_SECTION(".text.crt.sched.eventfd") ATTR_FDWRITE(1) int
 NOTHROW_RPC(LIBCCALL libc_eventfd_write)(fd_t fd,
                                          eventfd_t value) {
 	ssize_t error;

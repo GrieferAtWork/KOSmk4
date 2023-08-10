@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8501d204 */
+/* HASH CRC-32:0x5dd329cb */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ptsname_r_defined
 #define __local___localdep_ptsname_r_defined
-__CREDIRECT(__ATTR_OUTS(2, 3),int,__NOTHROW_NCX,__localdep_ptsname_r,(__fd_t __fd, char *__buf, __SIZE_TYPE__ __buflen),ptsname_r,(__fd,__buf,__buflen))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUTS(2, 3),int,__NOTHROW_NCX,__localdep_ptsname_r,(__fd_t __fd, char *__buf, __SIZE_TYPE__ __buflen),ptsname_r,(__fd,__buf,__buflen))
 #endif /* !__local___localdep_ptsname_r_defined */
-__LOCAL_LIBC(ptsname) __ATTR_WUNUSED char *
+__LOCAL_LIBC(ptsname) __ATTR_WUNUSED __ATTR_FDARG(1) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ptsname))(__fd_t __fd) {
 	static char __buf[64];
 	if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_ptsname_r)(__fd, __buf, sizeof(__buf)))

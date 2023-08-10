@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x619c6eb5 */
+/* HASH CRC-32:0x9648e38b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ INTDEF ATTR_INOUT(1) struct dirent *NOTHROW_RPC(LIBDCALL libd_readdirk)(DIR *__r
 INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBDCALL libd_rewinddir)(DIR *__restrict dirp);
 /* >> fdopendir(3)
  * Create a new directory stream by inheriting the given `fd' as stream handle */
-INTDEF WUNUSED DIR *NOTHROW_NCX(LIBDCALL libd_fdopendir)(fd_t fd);
+INTDEF WUNUSED ATTR_FDREAD(1) DIR *NOTHROW_NCX(LIBDCALL libd_fdopendir)(fd_t fd);
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
@@ -79,10 +79,10 @@ INTDEF ATTR_PURE ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_alphasortk)
 INTDEF ATTR_PURE ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_alphasortk64)(struct dirent64 const **e1, struct dirent64 const **e2);
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
-INTDEF ATTR_INOUT(4) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_getdirentries)(fd_t fd, char *__restrict buf, size_t nbytes, off_t *__restrict basep);
+INTDEF ATTR_FDREAD(1) ATTR_INOUT(4) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_getdirentries)(fd_t fd, char *__restrict buf, size_t nbytes, off_t *__restrict basep);
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
-INTDEF ATTR_INOUT(4) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_getdirentries64)(fd_t fd, char *__restrict buf, size_t nbytes, off64_t *__restrict basep);
+INTDEF ATTR_FDREAD(1) ATTR_INOUT(4) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_getdirentries64)(fd_t fd, char *__restrict buf, size_t nbytes, off64_t *__restrict basep);
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
 INTDEF ATTR_PURE ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_versionsortk)(struct dirent const **e1, struct dirent const **e2);
@@ -98,7 +98,7 @@ INTDEF ATTR_PURE ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_versionsort
  *                    stream will only be advanced when this value is >= 'bufsize'
  * @return: 0 : The end of the directory has been reached.
  * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
-INTDEF WUNUSED ssize_t NOTHROW_RPC(LIBDCALL libd_kreaddir)(fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode);
+INTDEF WUNUSED ATTR_FDREAD(1) ssize_t NOTHROW_RPC(LIBDCALL libd_kreaddir)(fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode);
 /* >> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)
  * The KOS-specific system call for reading a single directory entry
  * from  a file  descriptor referring  to an  open directory stream.
@@ -108,7 +108,7 @@ INTDEF WUNUSED ssize_t NOTHROW_RPC(LIBDCALL libd_kreaddir)(fd_t fd, struct diren
  *                    stream will only be advanced when this value is >= 'bufsize'
  * @return: 0 : The end of the directory has been reached.
  * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
-INTDEF WUNUSED ssize_t NOTHROW_RPC(LIBDCALL libd_kreaddirf)(fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode, oflag_t flags);
+INTDEF WUNUSED ATTR_FDREAD(1) ssize_t NOTHROW_RPC(LIBDCALL libd_kreaddirf)(fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode, oflag_t flags);
 /* >> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)
  * The KOS-specific system call for reading a single directory entry
  * from  a file  descriptor referring  to an  open directory stream.
@@ -118,7 +118,7 @@ INTDEF WUNUSED ssize_t NOTHROW_RPC(LIBDCALL libd_kreaddirf)(fd_t fd, struct dire
  *                    stream will only be advanced when this value is >= 'bufsize'
  * @return: 0 : The end of the directory has been reached.
  * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
-INTDEF WUNUSED ssize_t NOTHROW_RPC(LIBDCALL libd_kreaddir64)(fd_t fd, struct dirent64 *buf, size_t bufsize, unsigned int mode);
+INTDEF WUNUSED ATTR_FDREAD(1) ssize_t NOTHROW_RPC(LIBDCALL libd_kreaddir64)(fd_t fd, struct dirent64 *buf, size_t bufsize, unsigned int mode);
 /* >> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)
  * The KOS-specific system call for reading a single directory entry
  * from  a file  descriptor referring  to an  open directory stream.
@@ -128,7 +128,7 @@ INTDEF WUNUSED ssize_t NOTHROW_RPC(LIBDCALL libd_kreaddir64)(fd_t fd, struct dir
  *                    stream will only be advanced when this value is >= 'bufsize'
  * @return: 0 : The end of the directory has been reached.
  * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
-INTDEF WUNUSED ssize_t NOTHROW_RPC(LIBDCALL libd_kreaddirf64)(fd_t fd, struct dirent64 *buf, size_t bufsize, unsigned int mode, oflag_t flags);
+INTDEF WUNUSED ATTR_FDREAD(1) ssize_t NOTHROW_RPC(LIBDCALL libd_kreaddirf64)(fd_t fd, struct dirent64 *buf, size_t bufsize, unsigned int mode, oflag_t flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

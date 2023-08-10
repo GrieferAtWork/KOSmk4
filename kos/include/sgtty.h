@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdede8586 */
+/* HASH CRC-32:0x5fa09642 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,8 +48,8 @@ __SYSDECL_BEGIN
 
 struct sgttyb;
 
-__CDECLARE_OPT(__ATTR_OUT(2),int,__NOTHROW_NCX,gtty,(__fd_t __fd, struct sgttyb *__params),(__fd,__params))
-__CDECLARE_OPT(__ATTR_IN(2),int,__NOTHROW_NCX,stty,(__fd_t __fd, struct sgttyb const *__params),(__fd,__params))
+__CDECLARE_OPT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,gtty,(__fd_t __fd, struct sgttyb *__params),(__fd,__params))
+__CDECLARE_OPT(__ATTR_FDARG(1) __ATTR_IN(2),int,__NOTHROW_NCX,stty,(__fd_t __fd, struct sgttyb const *__params),(__fd,__params))
 
 __SYSDECL_END
 #endif /* __CC__ */

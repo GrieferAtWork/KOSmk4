@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fee4cb0 */
+/* HASH CRC-32:0xa400fc15 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,22 +38,22 @@ DECL_BEGIN
 INTDEF WUNUSED fd_t NOTHROW_NCX(LIBDCALL libd_eventfd)(__STDC_UINT_AS_SIZE_T count, __STDC_INT_AS_UINT_T flags);
 /* >> eventfd_read(3)
  * Read the event counter, and (if not `O_NONBLOCK'), wait for an event to happen */
-INTDEF int NOTHROW_RPC(LIBDCALL libd_eventfd_read)(fd_t fd, eventfd_t *value);
+INTDEF ATTR_FDREAD(1) int NOTHROW_RPC(LIBDCALL libd_eventfd_read)(fd_t fd, eventfd_t *value);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> eventfd_read(3)
  * Read the event counter, and (if not `O_NONBLOCK'), wait for an event to happen */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_eventfd_read)(fd_t fd, eventfd_t *value);
+INTDEF ATTR_FDREAD(1) int NOTHROW_RPC(LIBCCALL libc_eventfd_read)(fd_t fd, eventfd_t *value);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> eventfd_write(3)
  * Increment the event counter */
-INTDEF int NOTHROW_RPC(LIBDCALL libd_eventfd_write)(fd_t fd, eventfd_t value);
+INTDEF ATTR_FDWRITE(1) int NOTHROW_RPC(LIBDCALL libd_eventfd_write)(fd_t fd, eventfd_t value);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> eventfd_write(3)
  * Increment the event counter */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_eventfd_write)(fd_t fd, eventfd_t value);
+INTDEF ATTR_FDWRITE(1) int NOTHROW_RPC(LIBCCALL libc_eventfd_write)(fd_t fd, eventfd_t value);
 #endif /* !__KERNEL__ */
 
 DECL_END

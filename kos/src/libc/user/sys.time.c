@@ -87,9 +87,9 @@ NOTHROW_NCX(LIBCCALL libc_utimes)(char const *file,
 }
 /*[[[end:libc_utimes]]]*/
 
-/*[[[head:libc_futimesat,hash:CRC-32=0xe7ab376c]]]*/
+/*[[[head:libc_futimesat,hash:CRC-32=0x4aad14c1]]]*/
 /* >> futimesat(2), futimesat64(2) */
-INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_IN(2) ATTR_IN_OPT(3) int
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_FDARG(1) ATTR_IN(2) ATTR_IN_OPT(3) int
 NOTHROW_NCX(LIBCCALL libc_futimesat)(fd_t fd,
                                      char const *file,
                                      struct timeval const tvp[2])
@@ -154,9 +154,9 @@ NOTHROW_NCX(LIBCCALL libc_lutimes)(char const *file,
 }
 /*[[[end:libc_lutimes]]]*/
 
-/*[[[head:libc_futimes,hash:CRC-32=0x79ba6ebb]]]*/
+/*[[[head:libc_futimes,hash:CRC-32=0xcafff83f]]]*/
 /* >> futimes(2), futimes64(2) */
-INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_IN_OPT(2) int
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_FDARG(1) ATTR_IN_OPT(2) int
 NOTHROW_NCX(LIBCCALL libc_futimes)(fd_t fd,
                                    struct timeval const tvp[2])
 /*[[[body:libc_futimes]]]*/
@@ -319,12 +319,12 @@ NOTHROW_NCX(LIBCCALL libc_lutimes64)(char const *file,
 #endif /* MAGIC:alias */
 /*[[[end:libc_lutimes64]]]*/
 
-/*[[[head:libc_futimes64,hash:CRC-32=0x6a7056a]]]*/
+/*[[[head:libc_futimes64,hash:CRC-32=0xf6f2677a]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_futimes64, libc_lutimes);
 #else /* MAGIC:alias */
 /* >> lutimes(2), lutimes64(2) */
-INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_IN_OPT(2) int
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_FDARG(1) ATTR_IN_OPT(2) int
 NOTHROW_NCX(LIBCCALL libc_futimes64)(fd_t fd,
                                      struct timeval64 const tvp[2])
 /*[[[body:libc_futimes64]]]*/
@@ -355,12 +355,12 @@ NOTHROW_NCX(LIBCCALL libc_futimes64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_futimes64]]]*/
 
-/*[[[head:libc_futimesat64,hash:CRC-32=0x8a42d4c0]]]*/
+/*[[[head:libc_futimesat64,hash:CRC-32=0x2cdba7fd]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_futimesat64, libc_futimesat);
 #else /* MAGIC:alias */
 /* >> futimesat(2), futimesat64(2) */
-INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_IN(2) ATTR_IN_OPT(3) int
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_FDARG(1) ATTR_IN(2) ATTR_IN_OPT(3) int
 NOTHROW_NCX(LIBCCALL libc_futimesat64)(fd_t fd,
                                        char const *file,
                                        struct timeval64 const tvp[2])

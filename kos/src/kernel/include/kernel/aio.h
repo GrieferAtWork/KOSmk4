@@ -542,7 +542,7 @@ aio_handle_generic_connect_for_poll(struct aio_handle_generic *__restrict self)
 
 LOCAL NONNULL((1)) bool KCALL
 aio_handle_generic_poll(struct aio_handle_generic *__restrict self)
-		THROWS(...) {
+		THROWS(E_BADALLOC) {
 	if (aio_handle_generic_hascompleted(self))
 		return true;
 	aio_handle_generic_connect_for_poll(self);
@@ -786,7 +786,7 @@ aio_multihandle_generic_checkerror(struct aio_multihandle_generic *__restrict se
 
 LOCAL NONNULL((1)) bool KCALL
 aio_multihandle_generic_poll(struct aio_multihandle_generic *__restrict self)
-		THROWS(...) {
+		THROWS(E_BADALLOC) {
 	if (aio_multihandle_generic_hascompleted(self))
 		return true;
 	aio_multihandle_generic_connect(self);

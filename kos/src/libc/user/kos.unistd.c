@@ -103,9 +103,7 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_IN(1) AT
 			if (need_trail)
 				++full_len;
 			if (full_len > fullpath_alloc) {
-				char *new_fullpath;
-				new_fullpath   = (char *)Realloc(fullpath, (full_len + 1) * sizeof(char));
-				fullpath       = new_fullpath;
+				fullpath       = (char *)Realloc(fullpath, (full_len + 1) * sizeof(char));
 				fullpath_alloc = full_len + 1;
 			}
 			/* Construct the full-path string. */
@@ -128,12 +126,12 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_IN(1) AT
 }
 /*[[[end:libc_Execvpe]]]*/
 
-/*[[[head:libc_FExecve,hash:CRC-32=0xcb4d0949]]]*/
+/*[[[head:libc_FExecve,hash:CRC-32=0xd11ca980]]]*/
 /* >> fexecve(2)
  * Replace the calling process with the application image referred
  * to by `execfd'  and execute it's  `main()' method, passing  the
  * given `argv', and setting `environ' to `envp'. */
-INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_IN(2) ATTR_IN(3) void
+INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_FDREAD(1) ATTR_IN(2) ATTR_IN(3) void
 (LIBCCALL libc_FExecve)(fd_t fd,
                         __TARGV,
                         __TENVP) THROWS(...)
@@ -342,14 +340,14 @@ INTERN ATTR_SECTION(".text.crt.except.system.configuration") ATTR_OUTS(1, 2) voi
 }
 /*[[[end:libc_GetDomainName]]]*/
 
-/*[[[head:libc_FPathConf,hash:CRC-32=0x4869bf4e]]]*/
+/*[[[head:libc_FPathConf,hash:CRC-32=0xa715c2aa]]]*/
 /* >> fpathconf(3)
  * @param: name: One   of    `_PC_*'    from    <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `fd'
  * return: * : The configuration limit associated with `name' for `fd'
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `fd'
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
-INTERN ATTR_SECTION(".text.crt.except.fs.property") WUNUSED longptr_t
+INTERN ATTR_SECTION(".text.crt.except.fs.property") WUNUSED ATTR_FDARG(1) longptr_t
 (LIBCCALL libc_FPathConf)(fd_t fd,
                           __STDC_INT_AS_UINT_T name) THROWS(...)
 /*[[[body:libc_FPathConf]]]*/

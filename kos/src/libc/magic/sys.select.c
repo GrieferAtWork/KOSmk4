@@ -110,9 +110,9 @@ typedef __fd_mask fd_mask;
 }
 %#ifdef __INTELLISENSE__
 %{
-__ATTR_NONNULL((2)) void (FD_SET)(__fd_t __fd, fd_set *__fdsetp);
-__ATTR_NONNULL((2)) void (FD_CLR)(__fd_t __fd, fd_set *__fdsetp);
-__ATTR_NONNULL((2)) __BOOL (FD_ISSET)(__fd_t __fd, fd_set const *__fdsetp);
+__ATTR_FDARG(1) __ATTR_NONNULL((2)) void (FD_SET)(__fd_t __fd, fd_set *__fdsetp);
+__ATTR_FDARG(1) __ATTR_NONNULL((2)) void (FD_CLR)(__fd_t __fd, fd_set *__fdsetp);
+__ATTR_FDARG(1) __ATTR_NONNULL((2)) __BOOL (FD_ISSET)(__fd_t __fd, fd_set const *__fdsetp);
 __ATTR_NONNULL((1)) void (FD_ZERO)(fd_set *__fdsetp);
 #define FD_SET   FD_SET
 #define FD_CLR   FD_CLR

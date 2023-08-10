@@ -765,6 +765,16 @@
 #endif /* !__has_attribute(__nonnull__) */
 #endif /* !... */
 
+#if __has_attribute(__fd_arg__)
+#define __ATTR_FDARG(fd_index)   __attribute__((__fd_arg__(fd_index)))
+#define __ATTR_FDREAD(fd_index)  __attribute__((__fd_arg_read__(fd_index)))
+#define __ATTR_FDWRITE(fd_index) __attribute__((__fd_arg_write__(fd_index)))
+#else /* __has_attribute(__fd_arg__) */
+#define __ATTR_FDARG(fd_index)   /* Nothing */
+#define __ATTR_FDREAD(fd_index)  /* Nothing */
+#define __ATTR_FDWRITE(fd_index) /* Nothing */
+#endif /* !__has_attribute(__fd_arg__) */
+
 #if __has_attribute(__transparent_union__)
 #define __ATTR_TRANSPARENT_UNION __attribute__((__transparent_union__))
 #else /* ... */

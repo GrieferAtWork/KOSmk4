@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeaae9bd8 */
+/* HASH CRC-32:0x64f9f44d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_remque_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(remque) void
+__LOCAL_LIBC(remque) __ATTR_INOUT(1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(remque))(void *__restrict __elem) {
 	struct __queue_link {
 		struct __queue_link *__l_forw; /* [0..1] Forward link */

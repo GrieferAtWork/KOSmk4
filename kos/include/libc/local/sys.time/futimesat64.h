@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11cc7d69 */
+/* HASH CRC-32:0x7a40c4f3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_futimesat32_defined
 #define __local___localdep_futimesat32_defined
-__CREDIRECT(__ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,__localdep_futimesat32,(__fd_t __fd, char const *__file, struct __timeval32 const __tvp[2]),futimesat,(__fd,__file,__tvp))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,__localdep_futimesat32,(__fd_t __fd, char const *__file, struct __timeval32 const __tvp[2]),futimesat,(__fd,__file,__tvp))
 #endif /* !__local___localdep_futimesat32_defined */
-__LOCAL_LIBC(futimesat64) __ATTR_IN(2) __ATTR_IN_OPT(3) int
+__LOCAL_LIBC(futimesat64) __ATTR_FDARG(1) __ATTR_IN(2) __ATTR_IN_OPT(3) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimesat64))(__fd_t __fd, char const *__file, struct __timeval64 const __tvp[2]) {
 	struct __timeval32 __tv32[2];
 	if (!__tvp)

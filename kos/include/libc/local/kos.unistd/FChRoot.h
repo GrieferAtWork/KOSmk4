@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1dc2e3b4 */
+/* HASH CRC-32:0x94689ec2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Dup2_defined
 #define __local___localdep_Dup2_defined
-__CREDIRECT(,__fd_t,__THROWING(...),__localdep_Dup2,(__fd_t __oldfd, __fd_t __newfd),Dup2,(__oldfd,__newfd))
+__CREDIRECT(__ATTR_FDARG(1),__fd_t,__THROWING(...),__localdep_Dup2,(__fd_t __oldfd, __fd_t __newfd),Dup2,(__oldfd,__newfd))
 #endif /* !__local___localdep_Dup2_defined */
-__LOCAL_LIBC(FChRoot) void
+__LOCAL_LIBC(FChRoot) __ATTR_FDARG(1) void
 (__LIBCCALL __LIBC_LOCAL_NAME(FChRoot))(__fd_t __fd) __THROWS(...) {
 	(void)(__NAMESPACE_LOCAL_SYM __localdep_Dup2)(__fd, __AT_FDROOT);
 }

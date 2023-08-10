@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69b195d9 */
+/* HASH CRC-32:0x8419ddb8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -237,11 +237,11 @@ __NAMESPACE_STD_USING(localeconv)
 #ifdef __CRT_HAVE_newlocale
 /* >> newlocale(3)
  * @param: category_mask: Set of `LC_*_MASK' */
-__CDECLARE(,__locale_t,__NOTHROW_NCX,newlocale,(int __category_mask, char const *__locale, __locale_t __base),(__category_mask,__locale,__base))
+__CDECLARE(__ATTR_IN_OPT(2),__locale_t,__NOTHROW_NCX,newlocale,(int __category_mask, char const *__locale, __locale_t __base),(__category_mask,__locale,__base))
 #elif defined(__CRT_HAVE___newlocale)
 /* >> newlocale(3)
  * @param: category_mask: Set of `LC_*_MASK' */
-__CREDIRECT(,__locale_t,__NOTHROW_NCX,newlocale,(int __category_mask, char const *__locale, __locale_t __base),__newlocale,(__category_mask,__locale,__base))
+__CREDIRECT(__ATTR_IN_OPT(2),__locale_t,__NOTHROW_NCX,newlocale,(int __category_mask, char const *__locale, __locale_t __base),__newlocale,(__category_mask,__locale,__base))
 #endif /* ... */
 #ifdef __CRT_HAVE_duplocale
 /* >> duplocale(3)
@@ -298,9 +298,9 @@ __CDECLARE(,__locale_t,__NOTHROW_NCX,_get_current_locale,(void),())
 __CREDIRECT(,__locale_t,__NOTHROW_NCX,_get_current_locale,(void),__get_current_locale,())
 #endif /* ... */
 #ifdef __CRT_HAVE__create_locale
-__CDECLARE(,__locale_t,__NOTHROW_NCX,_create_locale,(int __category, char const *__locale),(__category,__locale))
+__CDECLARE(__ATTR_IN_OPT(2),__locale_t,__NOTHROW_NCX,_create_locale,(int __category, char const *__locale),(__category,__locale))
 #elif defined(__CRT_HAVE___create_locale)
-__CREDIRECT(,__locale_t,__NOTHROW_NCX,_create_locale,(int __category, char const *__locale),__create_locale,(__category,__locale))
+__CREDIRECT(__ATTR_IN_OPT(2),__locale_t,__NOTHROW_NCX,_create_locale,(int __category, char const *__locale),__create_locale,(__category,__locale))
 #endif /* ... */
 #ifdef __CRT_HAVE__free_locale
 __CDECLARE_VOID(,__NOTHROW_NCX,_free_locale,(__locale_t __locale),(__locale))

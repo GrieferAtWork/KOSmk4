@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4f48df2 */
+/* HASH CRC-32:0x23eb1689 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,10 +50,10 @@ INTDEF ATTR_NORETURN ATTR_SENTINEL ATTR_IN(1) ATTR_IN_OPT(2) void (VLIBCCALL lib
 INTDEF ATTR_NORETURN ATTR_IN(1) ATTR_IN_OPT(2) ATTR_SENTINEL_O(1) void (VLIBCCALL libc_Execlpe)(char const *__restrict file, char const *args, ...) THROWS(...);
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
-INTDEF WUNUSED pid_t (LIBCCALL libc_TCGetPGrp)(fd_t fd) THROWS(...);
+INTDEF WUNUSED ATTR_FDARG(1) pid_t (LIBCCALL libc_TCGetPGrp)(fd_t fd) THROWS(...);
 /* >> tcsetpgrp(2)
  * Set the foreground process group of a given TTY file descriptor */
-INTDEF void (LIBCCALL libc_TCSetPGrp)(fd_t fd, pid_t pgrp_id) THROWS(...);
+INTDEF ATTR_FDARG(1) void (LIBCCALL libc_TCSetPGrp)(fd_t fd, pid_t pgrp_id) THROWS(...);
 /* >> readall(3)
  * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
@@ -61,12 +61,12 @@ INTDEF void (LIBCCALL libc_TCSetPGrp)(fd_t fd, pid_t pgrp_id) THROWS(...);
  * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
-INTDEF ATTR_OUTS(2, 3) size_t (LIBCCALL libc_ReadAll)(fd_t fd, void *buf, size_t bufsize) THROWS(...);
+INTDEF ATTR_FDREAD(1) ATTR_OUTS(2, 3) size_t (LIBCCALL libc_ReadAll)(fd_t fd, void *buf, size_t bufsize) THROWS(...);
 /* >> writeall(3)
  * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
-INTDEF ATTR_INS(2, 3) size_t (LIBCCALL libc_WriteAll)(fd_t fd, void const *buf, size_t bufsize) THROWS(...);
+INTDEF ATTR_FDWRITE(1) ATTR_INS(2, 3) size_t (LIBCCALL libc_WriteAll)(fd_t fd, void const *buf, size_t bufsize) THROWS(...);
 #endif /* !__KERNEL__ */
 #include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
@@ -84,16 +84,16 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(__FORMATPRINTER_CC libc_WritePrinter)(vo
 #ifndef __KERNEL__
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTDEF ATTR_OUTS(2, 3) size_t (LIBCCALL libc_PReadAll)(fd_t fd, void *buf, size_t bufsize, pos_t offset) THROWS(...);
+INTDEF ATTR_FDREAD(1) ATTR_OUTS(2, 3) size_t (LIBCCALL libc_PReadAll)(fd_t fd, void *buf, size_t bufsize, pos_t offset) THROWS(...);
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTDEF ATTR_INS(2, 3) size_t (LIBCCALL libc_PWriteAll)(fd_t fd, void const *buf, size_t bufsize, pos_t offset) THROWS(...);
+INTDEF ATTR_FDWRITE(1) ATTR_INS(2, 3) size_t (LIBCCALL libc_PWriteAll)(fd_t fd, void const *buf, size_t bufsize, pos_t offset) THROWS(...);
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTDEF ATTR_OUTS(2, 3) size_t (LIBCCALL libc_PReadAll64)(fd_t fd, void *buf, size_t bufsize, pos64_t offset) THROWS(...);
+INTDEF ATTR_FDREAD(1) ATTR_OUTS(2, 3) size_t (LIBCCALL libc_PReadAll64)(fd_t fd, void *buf, size_t bufsize, pos64_t offset) THROWS(...);
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTDEF ATTR_INS(2, 3) size_t (LIBCCALL libc_PWriteAll64)(fd_t fd, void const *buf, size_t bufsize, pos64_t offset) THROWS(...);
+INTDEF ATTR_FDWRITE(1) ATTR_INS(2, 3) size_t (LIBCCALL libc_PWriteAll64)(fd_t fd, void const *buf, size_t bufsize, pos64_t offset) THROWS(...);
 /* >> GetCurrentDirName(3)
  * Alias for `GetCwd(NULL, 0)' */
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *(LIBCCALL libc_GetCurrentDirName)(void) THROWS(...);
@@ -112,13 +112,13 @@ INTDEF void (LIBCCALL libc_SetRGid)(gid_t rgid) THROWS(...);
  * and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.
  * No special permissions  are required to  use this function,  since a malicious  application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
-INTDEF void (LIBCCALL libc_FChRoot)(fd_t fd) THROWS(...);
+INTDEF ATTR_FDARG(1) void (LIBCCALL libc_FChRoot)(fd_t fd) THROWS(...);
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-INTDEF WUNUSED pos_t (LIBCCALL libc_Tell)(fd_t fd) THROWS(...);
+INTDEF WUNUSED ATTR_FDARG(1) pos_t (LIBCCALL libc_Tell)(fd_t fd) THROWS(...);
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-INTDEF WUNUSED pos64_t (LIBCCALL libc_Tell64)(fd_t fd) THROWS(...);
+INTDEF WUNUSED ATTR_FDARG(1) pos64_t (LIBCCALL libc_Tell64)(fd_t fd) THROWS(...);
 #endif /* !__KERNEL__ */
 
 DECL_END

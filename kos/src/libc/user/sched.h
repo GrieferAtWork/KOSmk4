@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe57f883a */
+/* HASH CRC-32:0x775b26b1 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,7 @@ INTDEF __STDC_INT_AS_UINT_T NOTHROW_NCX(LIBCCALL libc_sched_getcpu)(void);
  *                 type of namespace, or one of `CLONE_NEWCGROUP', `CLONE_NEWIPC',
  *                `CLONE_NEWNET', `CLONE_NEWNS', `CLONE_NEWPID', `CLONE_NEWUSER',
  *                `CLONE_NEWUTS') */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_setns)(fd_t fd, __STDC_INT_AS_UINT_T nstype);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBCCALL libc_setns)(fd_t fd, __STDC_INT_AS_UINT_T nstype);
 /* Exits  the current  thread by  invoking the  SYS_exit system call,
  * after performing some additional cleanup  not done by the  kernel.
  * Assuming that  the calling  thread was  constructed by  `clone()',

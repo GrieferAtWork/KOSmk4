@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1421dc0 */
+/* HASH CRC-32:0x5d093304 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -227,7 +227,7 @@ NOTHROW_NCX(LIBCCALL libc_fopen_unlocked)(char const *filename,
 		libc_unlock_stream(result);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.libiberty") FILE *
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_FDARG(1) FILE *
 NOTHROW_NCX(LIBCCALL libc_fdopen_unlocked)(fd_t fd,
                                            char const *mode) {
 	FILE *result = libc_fdopen(fd, mode);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f6c08bb */
+/* HASH CRC-32:0x574e33af */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -784,10 +784,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wfsopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* (__CRT_HAVE__fsopen || (__CRT_HAVE_fopen && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || (__CRT_HAVE__IO_fopen && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_fopen64) && (__CRT_HAVE_convert_wcstombs || __CRT_HAVE_convert_wcstombsn || __CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) */
 #endif /* !__CRT_HAVE__wfsopen */
 #ifdef __CRT_HAVE__wfdopen
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2),FILE *,__NOTHROW_NCX,_wfdopen,(__fd_t __fd, wchar_t const *__mode),(__fd,__mode))
+__CDECLARE(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2),FILE *,__NOTHROW_NCX,_wfdopen,(__fd_t __fd, wchar_t const *__mode),(__fd,__mode))
 #elif (defined(__CRT_HAVE_fdopen) || defined(__CRT_HAVE__fdopen) || defined(__CRT_HAVE__IO_fdopen)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 #include <libc/local/corecrt_wstdio/_wfdopen.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wfdopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) FILE *__NOTHROW_NCX(__LIBCCALL _wfdopen)(__fd_t __fd, wchar_t const *__mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wfdopen))(__fd, __mode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wfdopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2) FILE *__NOTHROW_NCX(__LIBCCALL _wfdopen)(__fd_t __fd, wchar_t const *__mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wfdopen))(__fd, __mode); })
 #endif /* ... */
 #ifdef __CRT_HAVE__wfopen_s
 __CDECLARE(__ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,_wfopen_s,(FILE **__pstream, wchar_t const *__filename, wchar_t const *__mode),(__pstream,__filename,__mode))

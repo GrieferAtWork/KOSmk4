@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60fa881a */
+/* HASH CRC-32:0xbb05edd1 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,11 +43,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fdopen_defined
 #define __local___localdep_fdopen_defined
 #ifdef __CRT_HAVE_fdopen
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__FILE *,__NOTHROW_NCX,__localdep_fdopen,(__fd_t __fd, char const *__restrict __modes),fdopen,(__fd,__modes))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2),__FILE *,__NOTHROW_NCX,__localdep_fdopen,(__fd_t __fd, char const *__restrict __modes),fdopen,(__fd,__modes))
 #elif defined(__CRT_HAVE__fdopen)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__FILE *,__NOTHROW_NCX,__localdep_fdopen,(__fd_t __fd, char const *__restrict __modes),_fdopen,(__fd,__modes))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2),__FILE *,__NOTHROW_NCX,__localdep_fdopen,(__fd_t __fd, char const *__restrict __modes),_fdopen,(__fd,__modes))
 #elif defined(__CRT_HAVE__IO_fdopen)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__FILE *,__NOTHROW_NCX,__localdep_fdopen,(__fd_t __fd, char const *__restrict __modes),_IO_fdopen,(__fd,__modes))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2),__FILE *,__NOTHROW_NCX,__localdep_fdopen,(__fd_t __fd, char const *__restrict __modes),_IO_fdopen,(__fd,__modes))
 #else /* ... */
 #undef __local___localdep_fdopen_defined
 #endif /* !... */
@@ -66,7 +66,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-__LOCAL_LIBC(_wfdopen) __ATTR_WUNUSED __ATTR_IN(2) __FILE *
+__LOCAL_LIBC(_wfdopen) __ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2) __FILE *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wfdopen))(__fd_t __fd, __WCHAR_TYPE__ const *__mode) {
 	__FILE *__result = __NULLPTR;
 	char *__utf8_mode;

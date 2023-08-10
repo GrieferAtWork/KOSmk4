@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe6fbc9c */
+/* HASH CRC-32:0x69a08ee8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_Fcntl)(fd_t fd, int cmd, ...) THROWS(...);
+INTDEF ATTR_FDARG(1) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_Fcntl)(fd_t fd, int cmd, ...) THROWS(...);
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial

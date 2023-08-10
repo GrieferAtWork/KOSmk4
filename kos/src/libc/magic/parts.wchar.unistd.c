@@ -50,7 +50,7 @@ __SYSDECL_BEGIN
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_function(ttyname_r), impl_include("<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.wchar.io.tty")]]
-$errno_t wttyname_r($fd_t fd, [[out(? <= buflen)]] wchar_t *buf, size_t buflen) {
+$errno_t wttyname_r([[fdarg]] $fd_t fd, [[out(? <= buflen)]] wchar_t *buf, size_t buflen) {
 	errno_t result;
 @@pp_if __SIZEOF_WCHAR_T__ == 4@@
 	size_t utf8_buflen = buflen * 7; /* s.a. `UNICODE_32TO8_MAXBUF()' */
@@ -358,7 +358,7 @@ wchar_t *wget_current_dir_name(void) {
 [[wchar, cp, decl_include("<features.h>", "<bits/types.h>")]]
 [[requires_function(faccessat, convert_wcstombs)]]
 [[section(".text.crt{|.dos}.wchar.fs.property")]]
-int wfaccessat($fd_t dfd, [[in]] wchar_t const *file,
+int wfaccessat([[dirfd]] $fd_t dfd, [[in]] wchar_t const *file,
                __STDC_INT_AS_UINT_T type, $atflag_t flags) {
 	int result;
 	char *utf8_file;
@@ -376,7 +376,7 @@ int wfaccessat($fd_t dfd, [[in]] wchar_t const *file,
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_function(fchownat, convert_wcstombs)]]
 [[section(".text.crt{|.dos}.wchar.fs.modify")]]
-int wfchownat($fd_t dfd, [[in]] wchar_t const *file,
+int wfchownat([[dirfd]] $fd_t dfd, [[in]] wchar_t const *file,
               $uid_t owner, $gid_t group, $atflag_t flags) {
 	int result;
 	char *utf8_file;
@@ -394,8 +394,8 @@ int wfchownat($fd_t dfd, [[in]] wchar_t const *file,
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_function(convert_wcstombs, linkat)]]
 [[section(".text.crt{|.dos}.wchar.fs.modify")]]
-int wlinkat($fd_t fromfd, [[in]] wchar_t const *from,
-            $fd_t tofd, [[in]] wchar_t const *to, $atflag_t flags) {
+int wlinkat([[dirfd]] $fd_t fromfd, [[in]] wchar_t const *from,
+            [[dirfd]] $fd_t tofd, [[in]] wchar_t const *to, $atflag_t flags) {
 	int result = -1;
 	char *utf8_from, *utf8_to;
 	utf8_from = convert_wcstombs(from);
@@ -420,7 +420,7 @@ done:
 [[requires($has_function(wfsymlinkat) ||
            $has_function(symlinkat, convert_wcstombs))]]
 [[section(".text.crt{|.dos}.wchar.fs.modify")]]
-int wsymlinkat([[in]] wchar_t const *link_text, $fd_t tofd,
+int wsymlinkat([[in]] wchar_t const *link_text, [[dirfd]] $fd_t tofd,
                [[in]] wchar_t const *target_path) {
 @@pp_if $has_function(wfsymlinkat)@@
 	return wfsymlinkat(link_text, tofd, target_path, 0);
@@ -451,7 +451,7 @@ done:
 [[requires($has_function(wfreadlinkat) ||
            $has_function(malloc, readlinkat, convert_wcstombs))]]
 [[section(".text.crt{|.dos}.wchar.fs.property")]]
-ssize_t wreadlinkat($fd_t dfd, [[in]] wchar_t const *path,
+ssize_t wreadlinkat([[dirfd]] $fd_t dfd, [[in]] wchar_t const *path,
                     [[out(return <= buflen)]] wchar_t *buf,
                     size_t buflen) {
 @@pp_if defined(__AT_FDCWD) && $has_function(wfreadlinkat)@@
@@ -500,7 +500,7 @@ err:
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_function(fsymlinkat, convert_wcstombs)]]
 [[section(".text.crt{|.dos}.wchar.fs.modify")]]
-int wfsymlinkat([[in]] wchar_t const *link_text, $fd_t tofd,
+int wfsymlinkat([[in]] wchar_t const *link_text, [[dirfd]] $fd_t tofd,
                 [[in]] wchar_t const *target_path, $atflag_t flags) {
 	int result = -1;
 	char *utf8_link_text, *utf8_target_path;
@@ -526,7 +526,7 @@ done:
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires_function(malloc, freadlinkat, convert_wcstombs)]]
 [[section(".text.crt{|.dos}.wchar.fs.property")]]
-ssize_t wfreadlinkat($fd_t dfd, [[in]] wchar_t const *path,
+ssize_t wfreadlinkat([[dirfd]] $fd_t dfd, [[in]] wchar_t const *path,
                      [[out(return <= buflen)]] wchar_t *buf, size_t buflen,
                      $atflag_t flags) {
 	char *utf8_path;
@@ -612,7 +612,7 @@ err:
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_function(unlinkat, convert_wcstombs)]]
 [[section(".text.crt{|.dos}.wchar.fs.modify")]]
-int wunlinkat($fd_t dfd, [[in]] wchar_t const *file, $atflag_t flags) {
+int wunlinkat([[dirfd]] $fd_t dfd, [[in]] wchar_t const *file, $atflag_t flags) {
 	int result;
 	char *utf8_file;
 	utf8_file = convert_wcstombs(file);

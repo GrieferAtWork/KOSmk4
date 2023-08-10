@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc74354 */
+/* HASH CRC-32:0x31bdcf1e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,11 +73,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fcntl_defined
 #define __local___localdep_fcntl_defined
 #ifdef __CRT_HAVE_fcntl
-__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, __fcntl_t __cmd),fcntl,(__fd,__cmd),__cmd,1,(void *))
+__CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, __fcntl_t __cmd),fcntl,(__fd,__cmd),__cmd,1,(void *))
 #elif defined(__CRT_HAVE___fcntl)
-__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, __fcntl_t __cmd),__fcntl,(__fd,__cmd),__cmd,1,(void *))
+__CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, __fcntl_t __cmd),__fcntl,(__fd,__cmd),__cmd,1,(void *))
 #elif defined(__CRT_HAVE___libc_fcntl)
-__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, __fcntl_t __cmd),__libc_fcntl,(__fd,__cmd),__cmd,1,(void *))
+__CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, __fcntl_t __cmd),__libc_fcntl,(__fd,__cmd),__cmd,1,(void *))
 #else /* ... */
 #undef __local___localdep_fcntl_defined
 #endif /* !... */

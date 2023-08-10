@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59e393aa */
+/* HASH CRC-32:0x62483013 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,11 +65,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_funlockfile_defined
 #define __local___localdep_funlockfile_defined
 #ifdef __CRT_HAVE_funlockfile
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),funlockfile,(__stream))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),funlockfile,(__stream))
 #elif defined(__CRT_HAVE__unlock_file)
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),_unlock_file,(__stream))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),_unlock_file,(__stream))
 #elif defined(__CRT_HAVE__IO_funlockfile)
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),_IO_funlockfile,(__stream))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),_IO_funlockfile,(__stream))
 #else /* ... */
 #undef __local___localdep_funlockfile_defined
 #endif /* !... */

@@ -439,7 +439,7 @@ err:
 	return error;
 }
 
-/* Load the effective l-value address of `self' into `*paddr':
+/* Load the effective l-value address of `self' into `*p_addr':
  *   UNWIND_STE_CONSTANT:     Write-back s_uconst or s_sconst
  *   UNWIND_STE_STACKVALUE:   Write-back s_uconst or s_sconst
  *   UNWIND_STE_REGISTER:     Write-back REGISTER[s_register] + s_regoffset
@@ -449,10 +449,10 @@ err:
  * @return: UNWIND_SUCCESS:                      Success.
  * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `self'
  * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `self' */
-INTERN NONNULL((1, 2, 4)) unwind_errno_t
+INTERN NONNULL((1, 2)) ATTR_OUT(4) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_ste_addr)(unwind_ste_t const *__restrict self,
                                       unwind_getreg_t regget, void const *regget_arg,
-                                      NCX void **__restrict paddr) {
+                                      NCX void **__restrict p_addr) {
 	unwind_errno_t error;
 	switch (self->s_type) {
 
@@ -467,14 +467,14 @@ NOTHROW_NCX(CC libuw_unwind_ste_addr)(unwind_ste_t const *__restrict self,
 			ERRORF(err, "self->s_register = %u (%u)\n", (unsigned int)self->s_register, error);
 		if (self->s_type == UNWIND_STE_REGISTER)
 			regval.word += self->s_regoffset;
-		*paddr = (void *)regval.word;
+		*p_addr = (void *)regval.word;
 	}	break;
 
 	case UNWIND_STE_CONSTANT:
 	case UNWIND_STE_STACKVALUE:
 	case UNWIND_STE_RW_LVALUE:
 	case UNWIND_STE_RO_LVALUE:
-		*paddr = (void *)self->s_uconst;
+		*p_addr = (void *)self->s_uconst;
 		break;
 
 	default:
@@ -2024,19 +2024,19 @@ skip_1_uleb128:
 
 /* Return a pointer to a CFI expression that is applicable for `module_relative_pc'
  * If no such expression exists, return `NULL' instead. */
-INTERN WUNUSED NONNULL((1, 5)) NCX byte_t const *
+INTERN WUNUSED NONNULL((1)) ATTR_OUT(5) NCX byte_t const *
 NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *__restrict self,
                                                 uintptr_t cu_base,
                                                 uintptr_t module_relative_pc,
                                                 uint8_t addrsize,
-                                                size_t *__restrict pexpr_length) {
+                                                size_t *__restrict p_expr_length) {
 	assert(addrsize_isvalid(addrsize));
 
 	/* Check for simple case: Only a single, universal expression is defined */
 	if (self->l_expr != NULL) {
 		byte_t const *iter;
-		iter          = self->l_expr;
-		*pexpr_length = dwarf_decode_uleb128(&iter);
+		iter           = self->l_expr;
+		*p_expr_length = dwarf_decode_uleb128(&iter);
 		return iter;
 	}
 
@@ -2055,7 +2055,7 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
 
 			case DW_LLE_end_of_list:
 				/* End-of-list without finding a dedicated expression -> use default (if present) */
-				*pexpr_length = default_location_length;
+				*p_expr_length = default_location_length;
 				return default_location;
 
 			case DW_LLE_offset_pair:
@@ -2144,7 +2144,7 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
 			      iter, range_start, range_end, expr_length);
 			if (module_relative_pc >= range_start &&
 			    module_relative_pc < range_end) {
-				*pexpr_length = expr_length;
+				*p_expr_length = expr_length;
 				return iter; /* Found it! */
 			}
 
@@ -2212,7 +2212,7 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
 			      UNALIGNED_GET16(iter));
 			if (module_relative_pc >= range_start &&
 			    module_relative_pc < range_end) {
-				*pexpr_length = (size_t)UNALIGNED_GET16(iter);
+				*p_expr_length = (size_t)UNALIGNED_GET16(iter);
 				iter += 2;
 				return iter; /* Found it! */
 			}
@@ -2228,7 +2228,7 @@ skip_entry_4:
 	}
 
 err:
-	*pexpr_length = 0;
+	*p_expr_length = 0;
 	return NULL;
 }
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4604f9b */
+/* HASH CRC-32:0xded56f89 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,14 +35,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_posix_fadvise32_defined) && defined(__CRT_HAVE_posix_fadvise)
 #define __local___localdep_posix_fadvise32_defined
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fadvise32,(__fd_t __fd, __off32_t __offset, __off32_t __length, __STDC_INT_AS_UINT_T __advise),posix_fadvise,(__fd,__offset,__length,__advise))
+__CREDIRECT(__ATTR_FDARG(1),int,__NOTHROW_NCX,__localdep_posix_fadvise32,(__fd_t __fd, __off32_t __offset, __off32_t __length, __STDC_INT_AS_UINT_T __advise),posix_fadvise,(__fd,__offset,__length,__advise))
 #endif /* !__local___localdep_posix_fadvise32_defined && __CRT_HAVE_posix_fadvise */
 #ifndef __local___localdep_posix_fadvise64_defined
 #define __local___localdep_posix_fadvise64_defined
 #if defined(__CRT_HAVE_posix_fadvise) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fadvise64,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length, __STDC_INT_AS_UINT_T __advise),posix_fadvise,(__fd,__offset,__length,__advise))
+__CREDIRECT(__ATTR_FDARG(1),int,__NOTHROW_NCX,__localdep_posix_fadvise64,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length, __STDC_INT_AS_UINT_T __advise),posix_fadvise,(__fd,__offset,__length,__advise))
 #elif defined(__CRT_HAVE_posix_fadvise64)
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fadvise64,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length, __STDC_INT_AS_UINT_T __advise),posix_fadvise64,(__fd,__offset,__length,__advise))
+__CREDIRECT(__ATTR_FDARG(1),int,__NOTHROW_NCX,__localdep_posix_fadvise64,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length, __STDC_INT_AS_UINT_T __advise),posix_fadvise64,(__fd,__offset,__length,__advise))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/fcntl/posix_fadvise64.h>
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_posix_fadvise64 __LIBC_LOCAL_NAME(posix_fadvise64)
 #endif /* !... */
 #endif /* !__local___localdep_posix_fadvise64_defined */
-__LOCAL_LIBC(posix_fadvise) int
+__LOCAL_LIBC(posix_fadvise) __ATTR_FDARG(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_fadvise))(__fd_t __fd, __PIO_OFFSET __offset, __PIO_OFFSET __length, __STDC_INT_AS_UINT_T __advise) {
 
 	return (__NAMESPACE_LOCAL_SYM __localdep_posix_fadvise64)(__fd, (__PIO_OFFSET64)__offset, (__PIO_OFFSET64)__length, __advise);

@@ -319,7 +319,7 @@ __STDC_INT_AS_UINT_T sched_getcpu();
 @@               `CLONE_NEWNET', `CLONE_NEWNS', `CLONE_NEWPID', `CLONE_NEWUSER',
 @@               `CLONE_NEWUTS')
 [[decl_include("<features.h>", "<bits/types.h>")]]
-int setns($fd_t fd, __STDC_INT_AS_UINT_T nstype);
+int setns([[fdarg]] $fd_t fd, __STDC_INT_AS_UINT_T nstype);
 
 %
 %#ifdef __USE_KOS

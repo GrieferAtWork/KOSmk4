@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b0b87da */
+/* HASH CRC-32:0xd60cc2bb */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -240,9 +240,9 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN_OPT(1) __ATTR_IN_OPT(2) __ATTR_I
 #include <libc/local/libintl/dcngettext.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(dcngettext, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN_OPT(1) __ATTR_IN_OPT(2) __ATTR_IN_OPT(3) __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *__NOTHROW_NCX(__LIBCCALL dcngettext)(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dcngettext))(__domainname, __msgid_singular, __msgid_plural, __n, __category); })
 #endif /* !__CRT_HAVE_dcngettext */
-__CDECLARE_OPT(,char *,__NOTHROW_NCX,textdomain,(char const *__domainname),(__domainname))
-__CDECLARE_OPT(,char *,__NOTHROW_NCX,bindtextdomain,(char const *__domainname, char const *__dirname),(__domainname,__dirname))
-__CDECLARE_OPT(,char *,__NOTHROW_NCX,bind_textdomain_codeset,(char const *__domainname, char const *__codeset),(__domainname,__codeset))
+__CDECLARE_OPT(__ATTR_IN_OPT(1),char *,__NOTHROW_NCX,textdomain,(char const *__domainname),(__domainname))
+__CDECLARE_OPT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),char *,__NOTHROW_NCX,bindtextdomain,(char const *__domainname, char const *__dirname),(__domainname,__dirname))
+__CDECLARE_OPT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),char *,__NOTHROW_NCX,bind_textdomain_codeset,(char const *__domainname, char const *__codeset),(__domainname,__codeset))
 #ifdef __CRT_HAVE_dgettext
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined

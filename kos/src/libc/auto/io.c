@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d944d14 */
+/* HASH CRC-32:0x4a949c0f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ NOTHROW_NCX(LIBCCALL libc__umask_s)(mode_t nmode,
 	*omode = libc_umask(nmode);
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.unsorted") oflag_t
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_FDARG(1) oflag_t
 NOTHROW_NCX(LIBCCALL libc__setmode)(fd_t fd,
                                     oflag_t mode) {
 
@@ -137,7 +137,7 @@ NOTHROW_NCX(LIBCCALL libc__pipe)(fd_t pipedes[2],
 	return libc_pipe2(pipedes, textmode);
 }
 #include <asm/os/stdio.h>
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED int64_t
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED ATTR_FDARG(1) int64_t
 NOTHROW_NCX(LIBCCALL libc__filelengthi64)(fd_t fd) {
 	int64_t oldpos, result;
 	oldpos = libc_lseek64(fd, 0, __SEEK_CUR);
@@ -176,20 +176,20 @@ NOTHROW_NCX(LIBCCALL libc_umask_s)(mode_t newmode,
 	*oldmode = libc_umask(newmode);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") int
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") ATTR_FDARG(1) int
 NOTHROW_RPC(LIBCCALL libc___lock_fhandle)(fd_t fd) {
 	COMPILER_IMPURE();
 	(void)fd;
 	/* No-op */
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") void
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") ATTR_FDARG(1) void
 NOTHROW_NCX(LIBCCALL libc__unlock_fhandle)(fd_t fd) {
 	COMPILER_IMPURE();
 	(void)fd;
 	/* No-op */
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") ATTR_PURE WUNUSED intptr_t
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") ATTR_PURE WUNUSED ATTR_FDARG(1) intptr_t
 NOTHROW_NCX(LIBCCALL libc__get_osfhandle)(fd_t fd) {
 	COMPILER_IMPURE();
 	return (intptr_t)fd;
@@ -227,7 +227,7 @@ NOTHROW_RPC(VLIBCCALL libc_sopen)(char const *filename,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED __LONG32_TYPE__
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED ATTR_FDARG(1) __LONG32_TYPE__
 NOTHROW_NCX(LIBCCALL libc__filelength)(fd_t fd) {
 	__LONG32_TYPE__ oldpos, result;
 	oldpos = libc_lseek(fd, 0, SEEK_CUR);
@@ -239,7 +239,7 @@ NOTHROW_NCX(LIBCCALL libc__filelength)(fd_t fd) {
 	return result;
 }
 #include <asm/os/stdio.h>
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED ATTR_FDARG(1) int
 NOTHROW_NCX(LIBCCALL libc__eof)(fd_t fd) {
 	int64_t oldpos, endpos;
 	oldpos = libc_lseek64(fd, 0, SEEK_CUR);

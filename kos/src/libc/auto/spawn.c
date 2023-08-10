@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65605f0a */
+/* HASH CRC-32:0x5a21d673 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ DECL_BEGIN
  * @param: envp:         Same as the `envp' accepted by `fexecve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
  * @return: * :          Error (errno-code describing the reason of failure) */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid,
                                            fd_t execfd,
                                            posix_spawn_file_actions_t const *file_actions,
@@ -834,7 +834,7 @@ err:
  * Enqueue a call `close(fd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_FDARG(2) ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addclose)(posix_spawn_file_actions_t *__restrict file_actions,
                                                              fd_t fd) {
 	struct __spawn_action *action;
@@ -856,7 +856,7 @@ err:
  * Enqueue a call `dup2(oldfd, newfd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_FDARG(2) ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_adddup2)(posix_spawn_file_actions_t *__restrict file_actions,
                                                             fd_t oldfd,
                                                             fd_t newfd) {
@@ -880,7 +880,7 @@ err:
  * Enqueue a call `tcsetpgrp(fd, getpid())' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_FDARG(2) ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addtcsetpgrp_np)(posix_spawn_file_actions_t *__restrict file_actions,
                                                                     fd_t fd) {
 	struct __spawn_action *action;
@@ -952,7 +952,7 @@ err:
  * Enqueue a call `fchdir(dfd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_FDARG(2) ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addfchdir_np)(posix_spawn_file_actions_t *__restrict file_actions,
                                                                  fd_t dfd) {
 	struct __spawn_action *action;

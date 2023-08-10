@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7afc42db */
+/* HASH CRC-32:0xde660cde */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_PRead_defined
 #define __local___localdep_PRead_defined
 #if defined(__CRT_HAVE_PRead) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
-__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING(...),__localdep_PRead,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_FDREAD(1) __ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING(...),__localdep_PRead,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
-__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING(...),__localdep_PRead,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos_t __offset),PRead64,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_FDREAD(1) __ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING(...),__localdep_PRead,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos_t __offset),PRead64,(__fd,__buf,__bufsize,__offset))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.unistd/PRead.h>
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_PRead __LIBC_LOCAL_NAME(PRead)
 #endif /* !... */
 #endif /* !__local___localdep_PRead_defined */
-__LOCAL_LIBC(PReadAll) __ATTR_OUTS(2, 3) __SIZE_TYPE__
+__LOCAL_LIBC(PReadAll) __ATTR_FDREAD(1) __ATTR_OUTS(2, 3) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(PReadAll))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos_t __offset) __THROWS(...) {
 	__SIZE_TYPE__ __result, __temp;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_PRead)(__fd, __buf, __bufsize, __offset);

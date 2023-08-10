@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50b7f54a */
+/* HASH CRC-32:0x38425486 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,27 +30,27 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_crt_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
+__CREDIRECT(__ATTR_FDARG(1),__off32_t,__NOTHROW_NCX,__localdep_crt_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseek)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_crt_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),_lseek,(__fd,__offset,__whence))
+__CREDIRECT(__ATTR_FDARG(1),__off32_t,__NOTHROW_NCX,__localdep_crt_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),_lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE___lseek)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_crt_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
+__CREDIRECT(__ATTR_FDARG(1),__off32_t,__NOTHROW_NCX,__localdep_crt_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE___libc_lseek)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_crt_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),__libc_lseek,(__fd,__offset,__whence))
+__CREDIRECT(__ATTR_FDARG(1),__off32_t,__NOTHROW_NCX,__localdep_crt_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),__libc_lseek,(__fd,__offset,__whence))
 #else /* ... */
 #undef __local___localdep_crt_lseek32_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_lseek32_defined */
-__LOCAL_LIBC(lseek64) __off64_t
+__LOCAL_LIBC(lseek64) __ATTR_FDARG(1) __off64_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lseek64))(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_lseek32)(__fd, (__off32_t)__offset, __whence);
 }

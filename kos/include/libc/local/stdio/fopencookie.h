@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e592ae8 */
+/* HASH CRC-32:0x86b4ca0c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -130,7 +130,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen_closefn_defined
 __LOCAL_LIBC(__fopencookie_to_funopen_closefn) int
-(__LIBKCALL __fopencookie_to_funopen_closefn)(void *__cookie) {
+__NOTHROW_CB(__LIBKCALL __fopencookie_to_funopen_closefn)(void *__cookie) {
 	int __result = 0;
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
@@ -148,8 +148,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __fopencookie_to_funopen_readfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen_readfn_defined
-__LOCAL_LIBC(__fopencookie_to_funopen_readfn) int
-(__LIBKCALL __fopencookie_to_funopen_readfn)(void *__cookie, char *__buf, int __num_bytes) {
+__LOCAL_LIBC(__fopencookie_to_funopen_readfn) __ATTR_OUTS(2, 3) int
+__NOTHROW_CB_NCX(__LIBKCALL __fopencookie_to_funopen_readfn)(void *__cookie, char *__buf, int __num_bytes) {
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
 	return (int)(*__holder->__foch_funcs.read)(__holder->__foch_cookie, __buf, (__SIZE_TYPE__)(unsigned int)__num_bytes);
@@ -160,8 +160,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __fopencookie_to_funopen_writefn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen_writefn_defined
-__LOCAL_LIBC(__fopencookie_to_funopen_writefn) int
-(__LIBKCALL __fopencookie_to_funopen_writefn)(void *__cookie, char const *__buf, int __num_bytes) {
+__LOCAL_LIBC(__fopencookie_to_funopen_writefn) __ATTR_INS(2, 3) int
+__NOTHROW_CB_NCX(__LIBKCALL __fopencookie_to_funopen_writefn)(void *__cookie, char const *__buf, int __num_bytes) {
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
 	return (int)(*__holder->__foch_funcs.write)(__holder->__foch_cookie, __buf, (__SIZE_TYPE__)(unsigned int)__num_bytes);
@@ -173,7 +173,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen64_seekfn_defined
 __LOCAL_LIBC(__fopencookie_to_funopen64_seekfn) __off64_t
-(__LIBKCALL __fopencookie_to_funopen64_seekfn)(void *__cookie, __off64_t __off, int __whence) {
+__NOTHROW_CB(__LIBKCALL __fopencookie_to_funopen64_seekfn)(void *__cookie, __off64_t __off, int __whence) {
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
 #ifdef __USE_KOS_ALTERATIONS
@@ -192,8 +192,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __fopencookie_to_funopen_readfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen_readfn_defined
-__LOCAL_LIBC(__fopencookie_to_funopen_readfn) int
-(__LIBKCALL __fopencookie_to_funopen_readfn)(void *__cookie, char *__buf, int __num_bytes) {
+__LOCAL_LIBC(__fopencookie_to_funopen_readfn) __ATTR_OUTS(2, 3) int
+__NOTHROW_CB_NCX(__LIBKCALL __fopencookie_to_funopen_readfn)(void *__cookie, char *__buf, int __num_bytes) {
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
 	return (int)(*__holder->__foch_funcs.read)(__holder->__foch_cookie, __buf, (__SIZE_TYPE__)(unsigned int)__num_bytes);
@@ -204,8 +204,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __fopencookie_to_funopen_writefn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen_writefn_defined
-__LOCAL_LIBC(__fopencookie_to_funopen_writefn) int
-(__LIBKCALL __fopencookie_to_funopen_writefn)(void *__cookie, char const *__buf, int __num_bytes) {
+__LOCAL_LIBC(__fopencookie_to_funopen_writefn) __ATTR_INS(2, 3) int
+__NOTHROW_CB_NCX(__LIBKCALL __fopencookie_to_funopen_writefn)(void *__cookie, char const *__buf, int __num_bytes) {
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
 	return (int)(*__holder->__foch_funcs.write)(__holder->__foch_cookie, __buf, (__SIZE_TYPE__)(unsigned int)__num_bytes);
@@ -217,7 +217,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen_seekfn_defined
 __LOCAL_LIBC(__fopencookie_to_funopen_seekfn) __off_t
-(__LIBKCALL __fopencookie_to_funopen_seekfn)(void *__cookie, __off_t __off, int __whence) {
+__NOTHROW_CB(__LIBKCALL __fopencookie_to_funopen_seekfn)(void *__cookie, __off_t __off, int __whence) {
 #if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
@@ -249,8 +249,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __fopencookie_to_funopen2_readfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen2_readfn_defined
-__LOCAL_LIBC(__fopencookie_to_funopen2_readfn) __SSIZE_TYPE__
-(__LIBKCALL __fopencookie_to_funopen2_readfn)(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes) {
+__LOCAL_LIBC(__fopencookie_to_funopen2_readfn) __ATTR_OUTS(2, 3) __SSIZE_TYPE__
+__NOTHROW_CB_NCX(__LIBKCALL __fopencookie_to_funopen2_readfn)(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes) {
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
 	return (*__holder->__foch_funcs.read)(__holder->__foch_cookie, (char *)__buf, __num_bytes);
@@ -261,8 +261,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __fopencookie_to_funopen2_writefn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen2_writefn_defined
-__LOCAL_LIBC(__fopencookie_to_funopen2_writefn) __SSIZE_TYPE__
-(__LIBKCALL __fopencookie_to_funopen2_writefn)(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes) {
+__LOCAL_LIBC(__fopencookie_to_funopen2_writefn) __ATTR_INS(2, 3) __SSIZE_TYPE__
+__NOTHROW_CB_NCX(__LIBKCALL __fopencookie_to_funopen2_writefn)(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes) {
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
 	return (*__holder->__foch_funcs.write)(__holder->__foch_cookie, (char const *)__buf, __num_bytes);
@@ -274,7 +274,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen64_seekfn_defined
 __LOCAL_LIBC(__fopencookie_to_funopen64_seekfn) __off64_t
-(__LIBKCALL __fopencookie_to_funopen64_seekfn)(void *__cookie, __off64_t __off, int __whence) {
+__NOTHROW_CB(__LIBKCALL __fopencookie_to_funopen64_seekfn)(void *__cookie, __off64_t __off, int __whence) {
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
 #ifdef __USE_KOS_ALTERATIONS
@@ -293,8 +293,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __fopencookie_to_funopen2_readfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen2_readfn_defined
-__LOCAL_LIBC(__fopencookie_to_funopen2_readfn) __SSIZE_TYPE__
-(__LIBKCALL __fopencookie_to_funopen2_readfn)(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes) {
+__LOCAL_LIBC(__fopencookie_to_funopen2_readfn) __ATTR_OUTS(2, 3) __SSIZE_TYPE__
+__NOTHROW_CB_NCX(__LIBKCALL __fopencookie_to_funopen2_readfn)(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes) {
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
 	return (*__holder->__foch_funcs.read)(__holder->__foch_cookie, (char *)__buf, __num_bytes);
@@ -305,8 +305,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __fopencookie_to_funopen2_writefn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen2_writefn_defined
-__LOCAL_LIBC(__fopencookie_to_funopen2_writefn) __SSIZE_TYPE__
-(__LIBKCALL __fopencookie_to_funopen2_writefn)(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes) {
+__LOCAL_LIBC(__fopencookie_to_funopen2_writefn) __ATTR_INS(2, 3) __SSIZE_TYPE__
+__NOTHROW_CB_NCX(__LIBKCALL __fopencookie_to_funopen2_writefn)(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes) {
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
 	return (*__holder->__foch_funcs.write)(__holder->__foch_cookie, (char const *)__buf, __num_bytes);
@@ -318,7 +318,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen_seekfn_defined
 __LOCAL_LIBC(__fopencookie_to_funopen_seekfn) __off_t
-(__LIBKCALL __fopencookie_to_funopen_seekfn)(void *__cookie, __off_t __off, int __whence) {
+__NOTHROW_CB(__LIBKCALL __fopencookie_to_funopen_seekfn)(void *__cookie, __off_t __off, int __whence) {
 #if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
@@ -350,8 +350,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __fopencookie_to_funopen_readfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen_readfn_defined
-__LOCAL_LIBC(__fopencookie_to_funopen_readfn) int
-(__LIBKCALL __fopencookie_to_funopen_readfn)(void *__cookie, char *__buf, int __num_bytes) {
+__LOCAL_LIBC(__fopencookie_to_funopen_readfn) __ATTR_OUTS(2, 3) int
+__NOTHROW_CB_NCX(__LIBKCALL __fopencookie_to_funopen_readfn)(void *__cookie, char *__buf, int __num_bytes) {
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
 	return (int)(*__holder->__foch_funcs.read)(__holder->__foch_cookie, __buf, (__SIZE_TYPE__)(unsigned int)__num_bytes);
@@ -362,8 +362,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __fopencookie_to_funopen_writefn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen_writefn_defined
-__LOCAL_LIBC(__fopencookie_to_funopen_writefn) int
-(__LIBKCALL __fopencookie_to_funopen_writefn)(void *__cookie, char const *__buf, int __num_bytes) {
+__LOCAL_LIBC(__fopencookie_to_funopen_writefn) __ATTR_INS(2, 3) int
+__NOTHROW_CB_NCX(__LIBKCALL __fopencookie_to_funopen_writefn)(void *__cookie, char const *__buf, int __num_bytes) {
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
 	return (int)(*__holder->__foch_funcs.write)(__holder->__foch_cookie, __buf, (__SIZE_TYPE__)(unsigned int)__num_bytes);
@@ -375,7 +375,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen64_seekfn_defined
 __LOCAL_LIBC(__fopencookie_to_funopen64_seekfn) __off64_t
-(__LIBKCALL __fopencookie_to_funopen64_seekfn)(void *__cookie, __off64_t __off, int __whence) {
+__NOTHROW_CB(__LIBKCALL __fopencookie_to_funopen64_seekfn)(void *__cookie, __off64_t __off, int __whence) {
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
 #ifdef __USE_KOS_ALTERATIONS
@@ -394,8 +394,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __fopencookie_to_funopen_readfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen_readfn_defined
-__LOCAL_LIBC(__fopencookie_to_funopen_readfn) int
-(__LIBKCALL __fopencookie_to_funopen_readfn)(void *__cookie, char *__buf, int __num_bytes) {
+__LOCAL_LIBC(__fopencookie_to_funopen_readfn) __ATTR_OUTS(2, 3) int
+__NOTHROW_CB_NCX(__LIBKCALL __fopencookie_to_funopen_readfn)(void *__cookie, char *__buf, int __num_bytes) {
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
 	return (int)(*__holder->__foch_funcs.read)(__holder->__foch_cookie, __buf, (__SIZE_TYPE__)(unsigned int)__num_bytes);
@@ -406,8 +406,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __fopencookie_to_funopen_writefn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen_writefn_defined
-__LOCAL_LIBC(__fopencookie_to_funopen_writefn) int
-(__LIBKCALL __fopencookie_to_funopen_writefn)(void *__cookie, char const *__buf, int __num_bytes) {
+__LOCAL_LIBC(__fopencookie_to_funopen_writefn) __ATTR_INS(2, 3) int
+__NOTHROW_CB_NCX(__LIBKCALL __fopencookie_to_funopen_writefn)(void *__cookie, char const *__buf, int __num_bytes) {
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
 	return (int)(*__holder->__foch_funcs.write)(__holder->__foch_cookie, __buf, (__SIZE_TYPE__)(unsigned int)__num_bytes);
@@ -419,7 +419,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen_seekfn_defined
 __LOCAL_LIBC(__fopencookie_to_funopen_seekfn) __off_t
-(__LIBKCALL __fopencookie_to_funopen_seekfn)(void *__cookie, __off_t __off, int __whence) {
+__NOTHROW_CB(__LIBKCALL __fopencookie_to_funopen_seekfn)(void *__cookie, __off_t __off, int __whence) {
 #if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;

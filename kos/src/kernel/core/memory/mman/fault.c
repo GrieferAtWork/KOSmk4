@@ -979,6 +979,7 @@ done_mark_changed:
 				} else if (part->mp_blkst_ptr == NULL) {
 					word = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_CHNG);
 				} else {
+					word = 0;
 					bitmovedown(&word, 0, part->mp_blkst_ptr,
 					            block_offset * MPART_BLOCK_STBITS,
 					            block_count * MPART_BLOCK_STBITS);

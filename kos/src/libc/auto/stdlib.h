@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1374566f */
+/* HASH CRC-32:0x13b9f14f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -686,14 +686,14 @@ INTDEF WUNUSED ATTR_IN(1) char *NOTHROW_RPC(LIBCCALL libc_realpath)(char const *
  * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTDEF WUNUSED ATTR_OUT_OPT(2) char *NOTHROW_RPC(LIBDCALL libd_frealpath)(fd_t fd, char *resolved, size_t buflen);
+INTDEF WUNUSED ATTR_FDARG(1) ATTR_OUT_OPT(2) char *NOTHROW_RPC(LIBDCALL libd_frealpath)(fd_t fd, char *resolved, size_t buflen);
 /* >> frealpath(3)
  * Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTDEF WUNUSED ATTR_OUT_OPT(2) char *NOTHROW_RPC(LIBCCALL libc_frealpath)(fd_t fd, char *resolved, size_t buflen);
+INTDEF WUNUSED ATTR_FDARG(1) ATTR_OUT_OPT(2) char *NOTHROW_RPC(LIBCCALL libc_frealpath)(fd_t fd, char *resolved, size_t buflen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> mktemp(3)
@@ -870,19 +870,19 @@ INTDEF WUNUSED ATTR_INOUT(1) char *NOTHROW_RPC(LIBDCALL libd_mkdtemp)(char *temp
 INTDEF WUNUSED ATTR_INOUT(1) char *NOTHROW_RPC(LIBCCALL libc_mkdtemp)(char *template_);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF int NOTHROW_NCX(LIBDCALL libd_grantpt)(fd_t fd);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_unlockpt)(fd_t fd);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_grantpt)(fd_t fd);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_unlockpt)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF int NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd);
 /* >> ptsname(3)
  * Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
-INTDEF WUNUSED char *NOTHROW_NCX(LIBDCALL libd_ptsname)(fd_t fd);
+INTDEF WUNUSED ATTR_FDARG(1) char *NOTHROW_NCX(LIBDCALL libd_ptsname)(fd_t fd);
 /* >> ptsname(3)
  * Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
-INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd);
+INTDEF WUNUSED ATTR_FDARG(1) char *NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED fd_t NOTHROW_RPC(LIBDCALL libd_posix_openpt)(oflag_t oflags);

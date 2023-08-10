@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e94ce31 */
+/* HASH CRC-32:0xefbc7a25 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,7 +76,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_convert_mbstoc32_defined */
 #ifndef __local___localdep_frealpath4_defined
 #define __local___localdep_frealpath4_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT_OPT(2),char *,__NOTHROW_RPC,__localdep_frealpath4,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),frealpath4,(__fd,__resolved,__buflen,__flags))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_OUT_OPT(2),char *,__NOTHROW_RPC,__localdep_frealpath4,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),frealpath4,(__fd,__resolved,__buflen,__flags))
 #endif /* !__local___localdep_frealpath4_defined */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined
@@ -116,7 +116,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpyl __LIBC_LOCAL_NAME(memcpyl)
 #endif /* !... */
 #endif /* !__local___localdep_memcpyl_defined */
-__LOCAL_LIBC(c32frealpath4) __ATTR_WUNUSED __ATTR_OUTS(2, 3) __CHAR32_TYPE__ *
+__LOCAL_LIBC(c32frealpath4) __ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_OUTS(2, 3) __CHAR32_TYPE__ *
 __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32frealpath4))(__fd_t __fd, __CHAR32_TYPE__ *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags) {
 	char *__utf8_resolved;
 	__CHAR32_TYPE__ *__wcs_resolved;

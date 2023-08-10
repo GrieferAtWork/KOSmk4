@@ -27,7 +27,7 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_ioctl,hash:CRC-32=0xb9c981c8]]]*/
+/*[[[head:libc_ioctl,hash:CRC-32=0x660597ca]]]*/
 /* >> ioctl(2)
  * Perform the  I/O control  operation specified  by `request'  on  `fd'.
  * Many I/O  control operations  except  an additional  argument,  though
@@ -37,7 +37,7 @@ DECL_BEGIN
  * @return: * : The return value depends on the given `request'.
  * @return: 0 : A zero return-value usually indicates success.
  * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.io.utility") __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_FDARG(1) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(VLIBCCALL libc_ioctl)(fd_t fd,
                                   ioctl_t request,
                                   ...)

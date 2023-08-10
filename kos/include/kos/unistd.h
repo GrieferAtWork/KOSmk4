@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x815197db */
+/* HASH CRC-32:0x8f9695ad */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -139,18 +139,18 @@ __CDECLARE_VOID_OPT(__ATTR_OUT(1),__THROWING(...),Pipe,(__fd_t __pipedes[2]),(__
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
  * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
-__CDECLARE_VOID(,__THROWING(...),FSync,(__fd_t __fd),(__fd))
+__CDECLARE_VOID(__ATTR_FDWRITE(1),__THROWING(...),FSync,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE_FDataSync)
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
  * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
-__CREDIRECT_VOID(,__THROWING(...),FSync,(__fd_t __fd),FDataSync,(__fd))
+__CREDIRECT_VOID(__ATTR_FDWRITE(1),__THROWING(...),FSync,(__fd_t __fd),FDataSync,(__fd))
 #else /* ... */
 #include <libc/local/kos.unistd/FSync.h>
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
  * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
-__NAMESPACE_LOCAL_USING_OR_IMPL(FSync, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FSync)(__fd_t __fd) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FSync))(__fd); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(FSync, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDWRITE(1) void (__LIBCCALL FSync)(__fd_t __fd) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FSync))(__fd); })
 #endif /* !... */
 /* >> setpgid(2)
  * Change  the ID of  the process group  associated with `pid's process.
@@ -196,31 +196,31 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING(...),Fork,(void),())
  * return: * : The configuration limit associated with `name' for `fd'
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `fd'
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
-__CDECLARE_OPT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__THROWING(...),FPathConf,(__fd_t __fd, __STDC_INT_AS_UINT_T __name),(__fd,__name))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_FDARG(1),__LONGPTR_TYPE__,__THROWING(...),FPathConf,(__fd_t __fd, __STDC_INT_AS_UINT_T __name),(__fd,__name))
 #ifdef __CRT_HAVE_TCGetPGrp
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
-__CDECLARE(__ATTR_WUNUSED,__pid_t,__THROWING(...),TCGetPGrp,(__fd_t __fd),(__fd))
+__CDECLARE(__ATTR_WUNUSED __ATTR_FDARG(1),__pid_t,__THROWING(...),TCGetPGrp,(__fd_t __fd),(__fd))
 #else /* __CRT_HAVE_TCGetPGrp */
 #include <asm/os/tty.h>
 #if defined(__CRT_HAVE_Ioctl) && defined(__TIOCGPGRP)
 #include <libc/local/kos.unistd/TCGetPGrp.h>
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
-__NAMESPACE_LOCAL_USING_OR_IMPL(TCGetPGrp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __pid_t (__LIBCCALL TCGetPGrp)(__fd_t __fd) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(TCGetPGrp))(__fd); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(TCGetPGrp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_FDARG(1) __pid_t (__LIBCCALL TCGetPGrp)(__fd_t __fd) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(TCGetPGrp))(__fd); })
 #endif /* __CRT_HAVE_Ioctl && __TIOCGPGRP */
 #endif /* !__CRT_HAVE_TCGetPGrp */
 #ifdef __CRT_HAVE_TCSetPGrp
 /* >> tcsetpgrp(2)
  * Set the foreground process group of a given TTY file descriptor */
-__CDECLARE_VOID(,__THROWING(...),TCSetPGrp,(__fd_t __fd, __pid_t __pgrp_id),(__fd,__pgrp_id))
+__CDECLARE_VOID(__ATTR_FDARG(1),__THROWING(...),TCSetPGrp,(__fd_t __fd, __pid_t __pgrp_id),(__fd,__pgrp_id))
 #else /* __CRT_HAVE_TCSetPGrp */
 #include <asm/os/tty.h>
 #if defined(__CRT_HAVE_Ioctl) && defined(__TIOCSPGRP)
 #include <libc/local/kos.unistd/TCSetPGrp.h>
 /* >> tcsetpgrp(2)
  * Set the foreground process group of a given TTY file descriptor */
-__NAMESPACE_LOCAL_USING_OR_IMPL(TCSetPGrp, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL TCSetPGrp)(__fd_t __fd, __pid_t __pgrp_id) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(TCSetPGrp))(__fd, __pgrp_id); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(TCSetPGrp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) void (__LIBCCALL TCSetPGrp)(__fd_t __fd, __pid_t __pgrp_id) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(TCSetPGrp))(__fd, __pgrp_id); })
 #endif /* __CRT_HAVE_Ioctl && __TIOCSPGRP */
 #endif /* !__CRT_HAVE_TCSetPGrp */
 #ifdef __CRT_HAVE_PathConf
@@ -278,7 +278,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Link, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1
  * was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
-__CDECLARE_OPT(__ATTR_OUTS(2, 3),size_t,__THROWING(...),Read,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
+__CDECLARE_OPT(__ATTR_FDREAD(1) __ATTR_OUTS(2, 3),size_t,__THROWING(...),Read,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much  data
@@ -286,7 +286,7 @@ __CDECLARE_OPT(__ATTR_OUTS(2, 3),size_t,__THROWING(...),Read,(__fd_t __fd, void 
  * if no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
-__CDECLARE_OPT(__ATTR_INS(2, 3),size_t,__THROWING(...),Write,(__fd_t __fd, void const *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
+__CDECLARE_OPT(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),size_t,__THROWING(...),Write,(__fd_t __fd, void const *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_ReadAll
 /* >> readall(3)
@@ -296,7 +296,7 @@ __CDECLARE_OPT(__ATTR_INS(2, 3),size_t,__THROWING(...),Write,(__fd_t __fd, void 
  * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
-__CDECLARE(__ATTR_OUTS(2, 3),size_t,__THROWING(...),ReadAll,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
+__CDECLARE(__ATTR_FDREAD(1) __ATTR_OUTS(2, 3),size_t,__THROWING(...),ReadAll,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 #else /* __CRT_HAVE_ReadAll */
 #include <bits/types.h>
 #if defined(__CRT_HAVE_Read) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek))
@@ -308,7 +308,7 @@ __CDECLARE(__ATTR_OUTS(2, 3),size_t,__THROWING(...),ReadAll,(__fd_t __fd, void *
  * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
-__NAMESPACE_LOCAL_USING_OR_IMPL(ReadAll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(2, 3) size_t (__LIBCCALL ReadAll)(__fd_t __fd, void *__buf, size_t __bufsize) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ReadAll))(__fd, __buf, __bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ReadAll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDREAD(1) __ATTR_OUTS(2, 3) size_t (__LIBCCALL ReadAll)(__fd_t __fd, void *__buf, size_t __bufsize) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ReadAll))(__fd, __buf, __bufsize); })
 #endif /* __CRT_HAVE_Read && (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_llseek || __CRT_HAVE___llseek || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE___libc_lseek) */
 #endif /* !__CRT_HAVE_ReadAll */
 #ifdef __CRT_HAVE_WriteAll
@@ -316,7 +316,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ReadAll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_O
  * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
-__CDECLARE(__ATTR_INS(2, 3),size_t,__THROWING(...),WriteAll,(__fd_t __fd, void const *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
+__CDECLARE(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),size_t,__THROWING(...),WriteAll,(__fd_t __fd, void const *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 #else /* __CRT_HAVE_WriteAll */
 #include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
@@ -325,14 +325,14 @@ __CDECLARE(__ATTR_INS(2, 3),size_t,__THROWING(...),WriteAll,(__fd_t __fd, void c
  * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
-__CREDIRECT(__ATTR_INS(2, 3),size_t,__THROWING(...),WriteAll,(__fd_t __fd, void const *__buf, size_t __bufsize),WritePrinter,(__fd,__buf,__bufsize))
+__CREDIRECT(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),size_t,__THROWING(...),WriteAll,(__fd_t __fd, void const *__buf, size_t __bufsize),WritePrinter,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE_Write)
 #include <libc/local/kos.unistd/WriteAll.h>
 /* >> writeall(3)
  * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
-__NAMESPACE_LOCAL_USING_OR_IMPL(WriteAll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(2, 3) size_t (__LIBCCALL WriteAll)(__fd_t __fd, void const *__buf, size_t __bufsize) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(WriteAll))(__fd, __buf, __bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(WriteAll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDWRITE(1) __ATTR_INS(2, 3) size_t (__LIBCCALL WriteAll)(__fd_t __fd, void const *__buf, size_t __bufsize) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(WriteAll))(__fd, __buf, __bufsize); })
 #endif /* ... */
 #endif /* !__CRT_HAVE_WriteAll */
 #include <hybrid/typecore.h>
@@ -359,7 +359,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(WritePrinter, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* ... */
 
 #ifndef WRITE_PRINTER_ARG
-/* >> void *WRITE_PRINTER_ARG(fd_t fd);
+/* >> void *WRITE_PRINTER_ARG([[fdwrite]] fd_t fd);
  * Encode a given `fd' as an argument to `write_printer(3)' */
 #define WRITE_PRINTER_ARG(fd) ((void *)(__UINTPTR_TYPE__)(__CRT_PRIVATE_UINT(__SIZEOF_FD_T__))(fd))
 #endif /* !WRITE_PRINTER_ARG */
@@ -368,25 +368,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(WritePrinter, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #if defined(__CRT_HAVE_LSeek) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CDECLARE(,__pos_t,__THROWING(...),LSeek,(__fd_t __fd, __off_t __offset, int __whence),(__fd,__offset,__whence))
+__CDECLARE(__ATTR_FDARG(1),__pos_t,__THROWING(...),LSeek,(__fd_t __fd, __off_t __offset, int __whence),(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_LSeek64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CREDIRECT(,__pos_t,__THROWING(...),LSeek,(__fd_t __fd, __off_t __offset, int __whence),LSeek64,(__fd,__offset,__whence))
+__CREDIRECT(__ATTR_FDARG(1),__pos_t,__THROWING(...),LSeek,(__fd_t __fd, __off_t __offset, int __whence),LSeek64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_LSeek64) || defined(__CRT_HAVE_LSeek)
 #include <libc/local/kos.unistd/LSeek.h>
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(LSeek, __FORCELOCAL __ATTR_ARTIFICIAL __pos_t (__LIBCCALL LSeek)(__fd_t __fd, __off_t __offset, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LSeek))(__fd, __offset, __whence); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(LSeek, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __pos_t (__LIBCCALL LSeek)(__fd_t __fd, __off_t __offset, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LSeek))(__fd, __offset, __whence); })
 #endif /* ... */
 /* >> dup2(2)
  * @return: newfd: Returns the new handle upon success.
  * Duplicate a file referred to by `oldfd' into `newfd' */
-__CDECLARE_OPT(,__fd_t,__THROWING(...),Dup2,(__fd_t __oldfd, __fd_t __newfd),(__oldfd,__newfd))
+__CDECLARE_OPT(__ATTR_FDARG(1),__fd_t,__THROWING(...),Dup2,(__fd_t __oldfd, __fd_t __newfd),(__oldfd,__newfd))
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
  * Duplicate a file referred to by `fd' and return its duplicated handle number */
-__CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__THROWING(...),Dup,(__fd_t __fd),(__fd))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_FDARG(1),__fd_t,__THROWING(...),Dup,(__fd_t __fd),(__fd))
 /* >> chdir(2)
  * Change the current working directory to `path' */
 __CDECLARE_VOID_OPT(__ATTR_IN(1),__THROWING(...),ChDir,(char const *__path),(__path))
@@ -464,16 +464,16 @@ __CDECLARE_OPT(__ATTR_IN(2) __ATTR_OUTS(3, 4),size_t,__THROWING(...),FReadLinkAt
 #if defined(__CRT_HAVE_LSeek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CREDIRECT(,__pos64_t,__THROWING(...),LSeek64,(__fd_t __fd, __off64_t __offset, int __whence),LSeek,(__fd,__offset,__whence))
+__CREDIRECT(__ATTR_FDARG(1),__pos64_t,__THROWING(...),LSeek64,(__fd_t __fd, __off64_t __offset, int __whence),LSeek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_LSeek64)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CDECLARE(,__pos64_t,__THROWING(...),LSeek64,(__fd_t __fd, __off64_t __offset, int __whence),(__fd,__offset,__whence))
+__CDECLARE(__ATTR_FDARG(1),__pos64_t,__THROWING(...),LSeek64,(__fd_t __fd, __off64_t __offset, int __whence),(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_LSeek)
 #include <libc/local/kos.unistd/LSeek64.h>
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(LSeek64, __FORCELOCAL __ATTR_ARTIFICIAL __pos64_t (__LIBCCALL LSeek64)(__fd_t __fd, __off64_t __offset, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LSeek64))(__fd, __offset, __whence); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(LSeek64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __pos64_t (__LIBCCALL LSeek64)(__fd_t __fd, __off64_t __offset, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LSeek64))(__fd, __offset, __whence); })
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 
@@ -483,64 +483,64 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(LSeek64, __FORCELOCAL __ATTR_ARTIFICIAL __pos64_
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-__CDECLARE(__ATTR_OUTS(2, 3),size_t,__THROWING(...),PRead,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset))
+__CDECLARE(__ATTR_FDREAD(1) __ATTR_OUTS(2, 3),size_t,__THROWING(...),PRead,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-__CREDIRECT(__ATTR_OUTS(2, 3),size_t,__THROWING(...),PRead,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),PRead64,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_FDREAD(1) __ATTR_OUTS(2, 3),size_t,__THROWING(...),PRead,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),PRead64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PRead)
 #include <libc/local/kos.unistd/PRead.h>
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(PRead, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(2, 3) size_t (__LIBCCALL PRead)(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PRead))(__fd, __buf, __bufsize, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(PRead, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDREAD(1) __ATTR_OUTS(2, 3) size_t (__LIBCCALL PRead)(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PRead))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 #if defined(__CRT_HAVE_PWrite) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-__CDECLARE(__ATTR_INS(2, 3),size_t,__THROWING(...),PWrite,(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset))
+__CDECLARE(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),size_t,__THROWING(...),PWrite,(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PWrite64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-__CREDIRECT(__ATTR_INS(2, 3),size_t,__THROWING(...),PWrite,(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset),PWrite64,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),size_t,__THROWING(...),PWrite,(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset),PWrite64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PWrite64) || defined(__CRT_HAVE_PWrite)
 #include <libc/local/kos.unistd/PWrite.h>
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(PWrite, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(2, 3) size_t (__LIBCCALL PWrite)(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PWrite))(__fd, __buf, __bufsize, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(PWrite, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDWRITE(1) __ATTR_INS(2, 3) size_t (__LIBCCALL PWrite)(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PWrite))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 #ifdef __USE_KOS
 #if defined(__CRT_HAVE_PReadAll) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-__CDECLARE(__ATTR_OUTS(2, 3),size_t,__THROWING(...),PReadAll,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset))
+__CDECLARE(__ATTR_FDREAD(1) __ATTR_OUTS(2, 3),size_t,__THROWING(...),PReadAll,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PReadAll64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-__CREDIRECT(__ATTR_OUTS(2, 3),size_t,__THROWING(...),PReadAll,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),PReadAll64,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_FDREAD(1) __ATTR_OUTS(2, 3),size_t,__THROWING(...),PReadAll,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),PReadAll64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PRead)
 #include <libc/local/kos.unistd/PReadAll.h>
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(PReadAll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(2, 3) size_t (__LIBCCALL PReadAll)(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PReadAll))(__fd, __buf, __bufsize, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(PReadAll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDREAD(1) __ATTR_OUTS(2, 3) size_t (__LIBCCALL PReadAll)(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PReadAll))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 #if defined(__CRT_HAVE_PWriteAll) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-__CDECLARE(__ATTR_INS(2, 3),size_t,__THROWING(...),PWriteAll,(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset))
+__CDECLARE(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),size_t,__THROWING(...),PWriteAll,(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PWriteAll64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-__CREDIRECT(__ATTR_INS(2, 3),size_t,__THROWING(...),PWriteAll,(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset),PWriteAll64,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),size_t,__THROWING(...),PWriteAll,(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset),PWriteAll64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PWrite64) || defined(__CRT_HAVE_PWrite)
 #include <libc/local/kos.unistd/PWriteAll.h>
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(PWriteAll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(2, 3) size_t (__LIBCCALL PWriteAll)(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PWriteAll))(__fd, __buf, __bufsize, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(PWriteAll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDWRITE(1) __ATTR_INS(2, 3) size_t (__LIBCCALL PWriteAll)(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PWriteAll))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 #endif /* __USE_KOS */
 #ifdef __USE_LARGEFILE64
@@ -548,64 +548,64 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(PWriteAll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-__CREDIRECT(__ATTR_OUTS(2, 3),size_t,__THROWING(...),PRead64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_FDREAD(1) __ATTR_OUTS(2, 3),size_t,__THROWING(...),PRead64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead64)
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-__CDECLARE(__ATTR_OUTS(2, 3),size_t,__THROWING(...),PRead64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),(__fd,__buf,__bufsize,__offset))
+__CDECLARE(__ATTR_FDREAD(1) __ATTR_OUTS(2, 3),size_t,__THROWING(...),PRead64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead)
 #include <libc/local/kos.unistd/PRead64.h>
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(PRead64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(2, 3) size_t (__LIBCCALL PRead64)(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PRead64))(__fd, __buf, __bufsize, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(PRead64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDREAD(1) __ATTR_OUTS(2, 3) size_t (__LIBCCALL PRead64)(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PRead64))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 #if defined(__CRT_HAVE_PWrite) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-__CREDIRECT(__ATTR_INS(2, 3),size_t,__THROWING(...),PWrite64,(__fd_t __fd, void const *__buf, size_t __bufsize, pos64_t __offset),PWrite,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),size_t,__THROWING(...),PWrite64,(__fd_t __fd, void const *__buf, size_t __bufsize, pos64_t __offset),PWrite,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PWrite64)
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-__CDECLARE(__ATTR_INS(2, 3),size_t,__THROWING(...),PWrite64,(__fd_t __fd, void const *__buf, size_t __bufsize, pos64_t __offset),(__fd,__buf,__bufsize,__offset))
+__CDECLARE(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),size_t,__THROWING(...),PWrite64,(__fd_t __fd, void const *__buf, size_t __bufsize, pos64_t __offset),(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PWrite)
 #include <libc/local/kos.unistd/PWrite64.h>
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(PWrite64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(2, 3) size_t (__LIBCCALL PWrite64)(__fd_t __fd, void const *__buf, size_t __bufsize, pos64_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PWrite64))(__fd, __buf, __bufsize, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(PWrite64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDWRITE(1) __ATTR_INS(2, 3) size_t (__LIBCCALL PWrite64)(__fd_t __fd, void const *__buf, size_t __bufsize, pos64_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PWrite64))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 #ifdef __USE_KOS
 #if defined(__CRT_HAVE_PReadAll) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-__CREDIRECT(__ATTR_OUTS(2, 3),size_t,__THROWING(...),PReadAll64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),PReadAll,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_FDREAD(1) __ATTR_OUTS(2, 3),size_t,__THROWING(...),PReadAll64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),PReadAll,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PReadAll64)
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-__CDECLARE(__ATTR_OUTS(2, 3),size_t,__THROWING(...),PReadAll64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),(__fd,__buf,__bufsize,__offset))
+__CDECLARE(__ATTR_FDREAD(1) __ATTR_OUTS(2, 3),size_t,__THROWING(...),PReadAll64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PRead)
 #include <libc/local/kos.unistd/PReadAll64.h>
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(PReadAll64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(2, 3) size_t (__LIBCCALL PReadAll64)(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PReadAll64))(__fd, __buf, __bufsize, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(PReadAll64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDREAD(1) __ATTR_OUTS(2, 3) size_t (__LIBCCALL PReadAll64)(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PReadAll64))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 #if defined(__CRT_HAVE_PWriteAll) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-__CREDIRECT(__ATTR_INS(2, 3),size_t,__THROWING(...),PWriteAll64,(__fd_t __fd, void const *__buf, size_t __bufsize, pos64_t __offset),PWriteAll,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),size_t,__THROWING(...),PWriteAll64,(__fd_t __fd, void const *__buf, size_t __bufsize, pos64_t __offset),PWriteAll,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PWriteAll64)
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-__CDECLARE(__ATTR_INS(2, 3),size_t,__THROWING(...),PWriteAll64,(__fd_t __fd, void const *__buf, size_t __bufsize, pos64_t __offset),(__fd,__buf,__bufsize,__offset))
+__CDECLARE(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),size_t,__THROWING(...),PWriteAll64,(__fd_t __fd, void const *__buf, size_t __bufsize, pos64_t __offset),(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PWrite64) || defined(__CRT_HAVE_PWrite)
 #include <libc/local/kos.unistd/PWriteAll64.h>
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(PWriteAll64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(2, 3) size_t (__LIBCCALL PWriteAll64)(__fd_t __fd, void const *__buf, size_t __bufsize, pos64_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PWriteAll64))(__fd, __buf, __bufsize, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(PWriteAll64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDWRITE(1) __ATTR_INS(2, 3) size_t (__LIBCCALL PWriteAll64)(__fd_t __fd, void const *__buf, size_t __bufsize, pos64_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PWriteAll64))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 #endif /* __USE_KOS */
 #endif /* __USE_LARGEFILE64 */
@@ -620,7 +620,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(PWriteAll64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE_VOID_OPT(__ATTR_OUT(1),__THROWING(...),Pipe2,(__fd_t __pipedes[2], __oflag_t __flags),(__pipedes,__flags))
-__CDECLARE_OPT(,__fd_t,__THROWING(...),Dup3,(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags),(__oldfd,__newfd,__flags))
+__CDECLARE_OPT(__ATTR_FDARG(1),__fd_t,__THROWING(...),Dup3,(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags),(__oldfd,__newfd,__flags))
 #ifdef __CRT_HAVE_GetCurrentDirName
 /* >> GetCurrentDirName(3)
  * Alias for `GetCwd(NULL, 0)' */
@@ -632,10 +632,10 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WU
 __NAMESPACE_LOCAL_USING_OR_IMPL(GetCurrentDirName, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED char *(__LIBCCALL GetCurrentDirName)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(GetCurrentDirName))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_SyncFS
-__CDECLARE_VOID(,__THROWING(...),SyncFS,(__fd_t __fd),(__fd))
+__CDECLARE_VOID(__ATTR_FDWRITE(1),__THROWING(...),SyncFS,(__fd_t __fd),(__fd))
 #else /* __CRT_HAVE_SyncFS */
 #include <libc/local/kos.unistd/SyncFS.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(SyncFS, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL SyncFS)(__fd_t __fd) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(SyncFS))(__fd); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(SyncFS, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDWRITE(1) void (__LIBCCALL SyncFS)(__fd_t __fd) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(SyncFS))(__fd); })
 #endif /* !__CRT_HAVE_SyncFS */
 /* >> getresuid(2)
  * Get the real, effective, and saved UID of the calling thread.
@@ -689,10 +689,10 @@ __CDECLARE_OPT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__THROWING(...),VFork
 #endif
 /* >> fchown(2)
  * Change the ownership of a given `fd' to `group:owner' */
-__CDECLARE_VOID_OPT(,__THROWING(...),FChOwn,(__fd_t __fd, __uid_t __owner, __gid_t __group),(__fd,__owner,__group))
+__CDECLARE_VOID_OPT(__ATTR_FDARG(1),__THROWING(...),FChOwn,(__fd_t __fd, __uid_t __owner, __gid_t __group),(__fd,__owner,__group))
 /* >> fchdir(2)
  * Change the current working directory to `path' */
-__CDECLARE_VOID_OPT(,__THROWING(...),FChDir,(__fd_t __fd),(__fd))
+__CDECLARE_VOID_OPT(__ATTR_FDARG(1),__THROWING(...),FChDir,(__fd_t __fd),(__fd))
 /* >> getpgid(2)
  * Return  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
@@ -757,7 +757,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Truncate64, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * Replace the calling process with the application image referred
  * to by `execfd'  and execute it's  `main()' method, passing  the
  * given `argv', and setting `environ' to `envp'. */
-__CDECLARE_VOID_OPT(__ATTR_NORETURN __ATTR_IN(2) __ATTR_IN(3),__THROWING(...),FExecve,(__fd_t __fd, __TARGV, __TENVP),(__fd,___argv,___envp))
+__CDECLARE_VOID_OPT(__ATTR_NORETURN __ATTR_FDREAD(1) __ATTR_IN(2) __ATTR_IN(3),__THROWING(...),FExecve,(__fd_t __fd, __TARGV, __TENVP),(__fd,___argv,___envp))
 #endif /* __USE_XOPEN2K8 */
 
 #ifdef __USE_GNU
@@ -906,32 +906,32 @@ __CDECLARE_VOID_OPT(__ATTR_IN(1),__THROWING(...),ChRoot,(char const *__restrict 
 #if defined(__CRT_HAVE_FTruncate) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
-__CDECLARE_VOID(,__THROWING(...),FTruncate,(__fd_t __fd, pos_t __length),(__fd,__length))
+__CDECLARE_VOID(__ATTR_FDWRITE(1),__THROWING(...),FTruncate,(__fd_t __fd, pos_t __length),(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
-__CREDIRECT_VOID(,__THROWING(...),FTruncate,(__fd_t __fd, pos_t __length),FTruncate64,(__fd,__length))
+__CREDIRECT_VOID(__ATTR_FDWRITE(1),__THROWING(...),FTruncate,(__fd_t __fd, pos_t __length),FTruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate64) || defined(__CRT_HAVE_FTruncate)
 #include <libc/local/kos.unistd/FTruncate.h>
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(FTruncate, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FTruncate)(__fd_t __fd, pos_t __length) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FTruncate))(__fd, __length); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(FTruncate, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDWRITE(1) void (__LIBCCALL FTruncate)(__fd_t __fd, pos_t __length) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FTruncate))(__fd, __length); })
 #endif /* ... */
 
 #ifdef __USE_LARGEFILE64
 #if defined(__CRT_HAVE_FTruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
-__CREDIRECT_VOID(,__THROWING(...),FTruncate64,(__fd_t __fd, pos64_t __length),FTruncate,(__fd,__length))
+__CREDIRECT_VOID(__ATTR_FDWRITE(1),__THROWING(...),FTruncate64,(__fd_t __fd, pos64_t __length),FTruncate,(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate64)
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
-__CDECLARE_VOID(,__THROWING(...),FTruncate64,(__fd_t __fd, pos64_t __length),(__fd,__length))
+__CDECLARE_VOID(__ATTR_FDWRITE(1),__THROWING(...),FTruncate64,(__fd_t __fd, pos64_t __length),(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate)
 #include <libc/local/kos.unistd/FTruncate64.h>
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(FTruncate64, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FTruncate64)(__fd_t __fd, pos64_t __length) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FTruncate64))(__fd, __length); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(FTruncate64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDWRITE(1) void (__LIBCCALL FTruncate64)(__fd_t __fd, pos64_t __length) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FTruncate64))(__fd, __length); })
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
@@ -941,18 +941,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(FTruncate64, __FORCELOCAL __ATTR_ARTIFICIAL void
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
  * timestamps,  and its size),  meaning that changes  are written to disk */
-__CDECLARE_VOID(,__THROWING(...),FDataSync,(__fd_t __fd),(__fd))
+__CDECLARE_VOID(__ATTR_FDWRITE(1),__THROWING(...),FDataSync,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE_FSync)
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
  * timestamps,  and its size),  meaning that changes  are written to disk */
-__CREDIRECT_VOID(,__THROWING(...),FDataSync,(__fd_t __fd),FSync,(__fd))
+__CREDIRECT_VOID(__ATTR_FDWRITE(1),__THROWING(...),FDataSync,(__fd_t __fd),FSync,(__fd))
 #else /* ... */
 #include <libc/local/kos.unistd/FDataSync.h>
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
  * timestamps,  and its size),  meaning that changes  are written to disk */
-__NAMESPACE_LOCAL_USING_OR_IMPL(FDataSync, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FDataSync)(__fd_t __fd) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FDataSync))(__fd); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(FDataSync, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDWRITE(1) void (__LIBCCALL FDataSync)(__fd_t __fd) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FDataSync))(__fd); })
 #endif /* !... */
 #endif /* __USE_POSIX199309 || __USE_UNIX98 */
 
@@ -1025,7 +1025,7 @@ __CDECLARE_VOID_OPT(,__THROWING(...),CloseRange,(unsigned int __minfd, unsigned 
  * and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.
  * No special permissions  are required to  use this function,  since a malicious  application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
-__CDECLARE_VOID(,__THROWING(...),FChRoot,(__fd_t __fd),(__fd))
+__CDECLARE_VOID(__ATTR_FDARG(1),__THROWING(...),FChRoot,(__fd_t __fd),(__fd))
 #else /* __CRT_HAVE_FChRoot */
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_Dup2) && defined(__AT_FDROOT)
@@ -1035,7 +1035,7 @@ __CDECLARE_VOID(,__THROWING(...),FChRoot,(__fd_t __fd),(__fd))
  * and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.
  * No special permissions  are required to  use this function,  since a malicious  application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(FChRoot, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FChRoot)(__fd_t __fd) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FChRoot))(__fd); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(FChRoot, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) void (__LIBCCALL FChRoot)(__fd_t __fd) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FChRoot))(__fd); })
 #endif /* __CRT_HAVE_Dup2 && __AT_FDROOT */
 #endif /* !__CRT_HAVE_FChRoot */
 #endif /* __USE_SOLARIS || __USE_NETBSD */
@@ -1044,36 +1044,36 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(FChRoot, __FORCELOCAL __ATTR_ARTIFICIAL void (__
 #if defined(__CRT_HAVE_Tell) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-__CDECLARE(__ATTR_WUNUSED,__pos_t,__THROWING(...),Tell,(__fd_t __fd),(__fd))
+__CDECLARE(__ATTR_WUNUSED __ATTR_FDARG(1),__pos_t,__THROWING(...),Tell,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE_Tell64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-__CREDIRECT(__ATTR_WUNUSED,__pos_t,__THROWING(...),Tell,(__fd_t __fd),Tell64,(__fd))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1),__pos_t,__THROWING(...),Tell,(__fd_t __fd),Tell64,(__fd))
 #else /* ... */
 #include <asm/os/stdio.h>
 #if (defined(__CRT_HAVE_LSeek64) || defined(__CRT_HAVE_LSeek)) && defined(__SEEK_CUR)
 #include <libc/local/kos.unistd/Tell.h>
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(Tell, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __pos_t (__LIBCCALL Tell)(__fd_t __fd) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Tell))(__fd); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(Tell, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_FDARG(1) __pos_t (__LIBCCALL Tell)(__fd_t __fd) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Tell))(__fd); })
 #endif /* (__CRT_HAVE_LSeek64 || __CRT_HAVE_LSeek) && __SEEK_CUR */
 #endif /* !... */
 #ifdef __USE_LARGEFILE64
 #if defined(__CRT_HAVE_Tell) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-__CREDIRECT(__ATTR_WUNUSED,__pos64_t,__THROWING(...),Tell64,(__fd_t __fd),Tell,(__fd))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1),__pos64_t,__THROWING(...),Tell64,(__fd_t __fd),Tell,(__fd))
 #elif defined(__CRT_HAVE_Tell64)
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-__CDECLARE(__ATTR_WUNUSED,__pos64_t,__THROWING(...),Tell64,(__fd_t __fd),(__fd))
+__CDECLARE(__ATTR_WUNUSED __ATTR_FDARG(1),__pos64_t,__THROWING(...),Tell64,(__fd_t __fd),(__fd))
 #else /* ... */
 #include <asm/os/stdio.h>
 #if (defined(__CRT_HAVE_LSeek64) || defined(__CRT_HAVE_LSeek)) && defined(__SEEK_CUR)
 #include <libc/local/kos.unistd/Tell64.h>
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(Tell64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __pos64_t (__LIBCCALL Tell64)(__fd_t __fd) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Tell64))(__fd); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(Tell64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_FDARG(1) __pos64_t (__LIBCCALL Tell64)(__fd_t __fd) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Tell64))(__fd); })
 #endif /* (__CRT_HAVE_LSeek64 || __CRT_HAVE_LSeek) && __SEEK_CUR */
 #endif /* !... */
 #endif /* __USE_LARGEFILE64 */

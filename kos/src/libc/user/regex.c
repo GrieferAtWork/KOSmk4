@@ -395,7 +395,7 @@ NOTHROW_NCX(LIBCCALL libc_re_search)(regex_t __KOS_FIXED_CONST *self,
 }
 /*[[[end:libc_re_search]]]*/
 
-/*[[[head:libc_re_search_2,hash:CRC-32=0xac92fcd5]]]*/
+/*[[[head:libc_re_search_2,hash:CRC-32=0x40912a43]]]*/
 /* >> re_search_2(3)
  * Same as `re_search(3)',  but use the  virtual concatenation of  `string1...+=length1'
  * and  `string2...+=length2' as input  buffer. Also: use `stop'  as the end-offset into
@@ -406,17 +406,17 @@ NOTHROW_NCX(LIBCCALL libc_re_search)(regex_t __KOS_FIXED_CONST *self,
  * an offset of `stop' bytes has been reached)
  *
  * Note that on KOS, the underlying API used is `re_exec_search(3R)' from `libregex.so'
- * and exposed in `<libregex/regexec.h>', which allows for the virtual concatenation of
- * not just 2, but an arbitrary number of buffers which are then used as input.
+ * and exposed in `<libregex/regexec.h>', actually allows for the virtual concatenation
+ * of not just 2, but an arbitrary number of buffers which are then used as input.
  *
  * @param: self:    The compiled regex pattern to use. NOTE: regex `eflags' are set as:
  *                   - `REG_NOTBOL = self->__not_bol'
  *                   - `REG_NOTEOL = self->__not_eol'
- *                  Sadly, this make this interface really badly designed, as this choice
- *                  (which was made by Glibc  btw), prevents multiple threads from  using
- *                  the same `regex_t' buffer simultaneously. Though note that this  same
- *                  restriction doesn't apply to  `regexec(3)', or (when targeting  KOS),
- *                  if  you completely by-pass  the `<regex.h>' API  and directly talk to
+ *                  Sadly, this makes this interface really badly designed, as this choice
+ *                  (which  was made by  Glibc btw), prevents  multiple threads from using
+ *                  the same `regex_t' buffer simultaneously.  Though note that this  same
+ *                  restriction doesn't apply  to `regexec(3)', or  (when targeting  KOS),
+ *                  if you completely  by-pass the  `<regex.h>' API and  directly talk  to
  *                  the public API of `libregex.so' from `<libregex/regexec.h>'.
  * @param: string1: First base pointer for input data.
  * @param: length1: Length of first input data (in bytes)

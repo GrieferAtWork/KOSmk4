@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77f0770b */
+/* HASH CRC-32:0xa2c5c48f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_convert_mbstowcs_defined */
 #ifndef __local___localdep_frealpath4_defined
 #define __local___localdep_frealpath4_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT_OPT(2),char *,__NOTHROW_RPC,__localdep_frealpath4,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),frealpath4,(__fd,__resolved,__buflen,__flags))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_OUT_OPT(2),char *,__NOTHROW_RPC,__localdep_frealpath4,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),frealpath4,(__fd,__resolved,__buflen,__flags))
 #endif /* !__local___localdep_frealpath4_defined */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined
@@ -111,7 +111,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* __SIZEOF_WCHAR_T__ != 4 */
 #endif /* !... */
 #endif /* !__local___localdep_wmemcpy_defined */
-__LOCAL_LIBC(wfrealpath4) __ATTR_WUNUSED __ATTR_OUTS(2, 3) __WCHAR_TYPE__ *
+__LOCAL_LIBC(wfrealpath4) __ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_OUTS(2, 3) __WCHAR_TYPE__ *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wfrealpath4))(__fd_t __fd, __WCHAR_TYPE__ *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags) {
 	char *__utf8_resolved;
 	__WCHAR_TYPE__ *__wcs_resolved;

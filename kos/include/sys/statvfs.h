@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60543412 */
+/* HASH CRC-32:0xe08f1c54 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -106,9 +106,9 @@ __CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statvfs,(char const *__f
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statvfs,(char const *__file, struct statvfs *__buf),statvfs64,(__file,__buf))
 #endif /* ... */
 #if defined(__CRT_HAVE_fstatvfs) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
-__CDECLARE(__ATTR_OUT(2),int,__NOTHROW_NCX,fstatvfs,(__fd_t __filedes, struct statvfs *__buf),(__filedes,__buf))
+__CDECLARE(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,fstatvfs,(__fd_t __filedes, struct statvfs *__buf),(__filedes,__buf))
 #elif defined(__CRT_HAVE_fstatvfs64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,fstatvfs,(__fd_t __filedes, struct statvfs *__buf),fstatvfs64,(__filedes,__buf))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,fstatvfs,(__fd_t __filedes, struct statvfs *__buf),fstatvfs64,(__filedes,__buf))
 #endif /* ... */
 
 #ifdef __USE_LARGEFILE64
@@ -120,9 +120,9 @@ __CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statvfs64,(const char *_
 #endif /* ... */
 #endif /* !statvfs64 */
 #if defined(__CRT_HAVE_fstatvfs) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,fstatvfs64,(__fd_t __filedes, struct statvfs64 *__buf),fstatvfs,(__filedes,__buf))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,fstatvfs64,(__fd_t __filedes, struct statvfs64 *__buf),fstatvfs,(__filedes,__buf))
 #elif defined(__CRT_HAVE_fstatvfs64)
-__CDECLARE(__ATTR_OUT(2),int,__NOTHROW_NCX,fstatvfs64,(__fd_t __filedes, struct statvfs64 *__buf),(__filedes,__buf))
+__CDECLARE(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,fstatvfs64,(__fd_t __filedes, struct statvfs64 *__buf),(__filedes,__buf))
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 

@@ -49,7 +49,12 @@ DECL_BEGIN
  * long functions needing to use the  same objects both before and  after
  * the call) */
 #ifndef __INTELLISENSE__
-#ifdef __NO_XBLOCK
+#ifdef __CHECKER__
+#define task_pause()             (void)0
+#define task_yield_nx()          (__builtin_tag_get("NOPREEMPT") ? !1 : __builtin_rvoid(!0))
+#define task_tryyield()          (__builtin_tag_get("NOPREEMPT") ? TASK_TRYYIELD_PREEMPTION_DISABLED : __builtin_rvoid(0u))
+#define task_tryyield_or_pause() (__builtin_tag_get("NOPREEMPT") ? TASK_TRYYIELD_PREEMPTION_DISABLED : __builtin_rvoid(0u))
+#elif defined(__NO_XBLOCK)
 #define task_pause() __x86_task_pause()
 FORCELOCAL ATTR_ARTIFICIAL void NOTHROW(__x86_task_pause)(void) {
 	__asm__("pause");
@@ -121,7 +126,20 @@ typedef uintptr_t pflag_t;
 #define PREEMPTION_ENABLED_VALUE  0x200
 #define PREEMPTION_DISABLED_VALUE 0
 
-#ifdef __NO_XBLOCK
+#ifdef __CHECKER__
+#define PREEMPTION_ENABLE()              __builtin_tag_set("NOPREEMPT", 0)
+#define PREEMPTION_ENABLE_WAIT()         __builtin_tag_set("NOPREEMPT", 0)
+#define PREEMPTION_ENABLE_WAIT_DISABLE() __builtin_tag_set("NOPREEMPT", 1)
+#define PREEMPTION_WAIT()                (void)0
+#define PREEMPTION_HALT()                (__builtin_tag_set("NOPREEMPT", 1), __builtin_unreachable())
+#define PREEMPTION_ENABLE_P()            __builtin_tag_set("NOPREEMPT", 0)
+#define PREEMPTION_DISABLE()             __builtin_tag_set("NOPREEMPT", 1)
+#define PREEMPTION_ENABLED()             (__builtin_tag_get("NOPREEMPT") ? 0 : PREEMPTION_ENABLED_VALUE)
+#define PREEMPTION_PUSH()                (__builtin_tag_get("NOPREEMPT") ? 0 : PREEMPTION_ENABLED_VALUE)
+#define PREEMPTION_PUSHON()              (__builtin_tag_get("NOPREEMPT") ? (__builtin_tag_set("NOPREEMPT", 0), 0) : PREEMPTION_ENABLED_VALUE)
+#define PREEMPTION_PUSHOFF()             (__builtin_tag_get("NOPREEMPT") ? 0 : (__builtin_tag_set("NOPREEMPT", 0), PREEMPTION_ENABLED_VALUE))
+#define PREEMPTION_POP(flag)             __builtin_tag_set("NOPREEMPT", !(flag))
+#elif defined(__NO_XBLOCK)
 #define PREEMPTION_ENABLE()              __x86_preemption_enable()
 #define PREEMPTION_ENABLE_WAIT()         __x86_preemption_enable_wait()
 #define PREEMPTION_ENABLE_WAIT_DISABLE() __x86_preemption_enable_wait_disable()

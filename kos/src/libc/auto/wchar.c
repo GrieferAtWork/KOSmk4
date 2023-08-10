@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4af4f180 */
+/* HASH CRC-32:0x3445bb68 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5542,7 +5542,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnupr)(char32_t *__restrict str,
 }
 #include <hybrid/typecore.h>
 /* >> wcscasestr(3) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED ATTR_IN(1) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcscasestr)(char16_t const *haystack,
                                       char16_t const *needle) {
 	size_t needle_len = libd_wcslen(needle);
@@ -5554,7 +5554,7 @@ NOTHROW_NCX(LIBDCALL libd_wcscasestr)(char16_t const *haystack,
 }
 #include <hybrid/typecore.h>
 /* >> wcscasestr(3) */
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char32_t *
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED ATTR_IN(1) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcscasestr)(char32_t const *haystack,
                                       char32_t const *needle) {
 	size_t needle_len = libc_wcslen(needle);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad2333af */
+/* HASH CRC-32:0x6c5f5995 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -291,7 +291,7 @@ NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file,
 }
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
-INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED char *
+INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED ATTR_FDARG(1) char *
 NOTHROW_RPC(LIBCCALL libc_ttyname)(fd_t fd) {
 	static char buf[32];
 	if likely(libc_ttyname_r(fd, buf, COMPILER_LENOF(buf)) == 0)
@@ -308,7 +308,7 @@ NOTHROW_RPC(LIBCCALL libc_ttyname)(fd_t fd) {
 #include <asm/os/fcntl.h>
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_OUTS(2, 3) errno_t
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_FDARG(1) ATTR_OUTS(2, 3) errno_t
 NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd,
                                      char *buf,
                                      size_t buflen) {
@@ -455,7 +455,7 @@ NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd,
 }
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
-INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED pid_t
+INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED ATTR_FDARG(1) pid_t
 NOTHROW_NCX(LIBCCALL libc_tcgetpgrp)(fd_t fd) {
 	pid_t result;
 	if (libc_ioctl(fd, __TIOCGPGRP, &result) < 0)
@@ -464,7 +464,7 @@ NOTHROW_NCX(LIBCCALL libc_tcgetpgrp)(fd_t fd) {
 }
 /* >> tcsetpgrp(2)
  * Set the foreground process group of a given TTY file descriptor */
-INTERN ATTR_SECTION(".text.crt.io.tty") int
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_FDARG(1) int
 NOTHROW_NCX(LIBCCALL libc_tcsetpgrp)(fd_t fd,
                                      pid_t pgrp_id) {
 	return libc_ioctl(fd, __TIOCSPGRP, &pgrp_id) < 0 ? -1 : 0;
@@ -493,7 +493,7 @@ NOTHROW_NCX(LIBCCALL libc_getlogin)(void) {
  * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
-INTERN ATTR_SECTION(".text.crt.io.read") ATTR_OUTS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.io.read") ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_readall)(fd_t fd,
                                    void *buf,
                                    size_t bufsize) {
@@ -533,7 +533,7 @@ NOTHROW_RPC(LIBCCALL libc_readall)(fd_t fd,
  * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
-INTERN ATTR_SECTION(".text.crt.io.write") ATTR_INS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.io.write") ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_writeall)(fd_t fd,
                                     void const *buf,
                                     size_t bufsize) {
@@ -579,7 +579,7 @@ NOTHROW_RPC(__FORMATPRINTER_CC libc_write_printer)(void *fd,
  * Check if the given file handle `fd' refers to a TTY
  * @return: 1: Is a tty
  * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
-INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED ATTR_FDARG(1) int
 NOTHROW_NCX(LIBCCALL libc_isatty)(fd_t fd) {
 	struct termios ios;
 
@@ -591,7 +591,7 @@ NOTHROW_NCX(LIBCCALL libc_isatty)(fd_t fd) {
 #include <libc/errno.h>
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTERN ATTR_SECTION(".text.crt.io.read") ATTR_OUTS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.io.read") ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_preadall)(fd_t fd,
                                     void *buf,
                                     size_t bufsize,
@@ -619,7 +619,7 @@ NOTHROW_RPC(LIBCCALL libc_preadall)(fd_t fd,
 #include <libc/errno.h>
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTERN ATTR_SECTION(".text.crt.io.write") ATTR_INS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.io.write") ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_pwriteall)(fd_t fd,
                                      void const *buf,
                                      size_t bufsize,
@@ -651,7 +651,7 @@ DEFINE_INTERN_ALIAS(libc_preadall64, libc_preadall);
 #else /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTERN ATTR_SECTION(".text.crt.io.large.read") ATTR_OUTS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.io.large.read") ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_preadall64)(fd_t fd,
                                       void *buf,
                                       size_t bufsize,
@@ -683,7 +683,7 @@ DEFINE_INTERN_ALIAS(libc_pwriteall64, libc_pwriteall);
 #else /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTERN ATTR_SECTION(".text.crt.io.large.write") ATTR_INS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.io.large.write") ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd,
                                        void const *buf,
                                        size_t bufsize,
@@ -1858,7 +1858,7 @@ NOTHROW_RPC(LIBCCALL libc_getpass_r)(char const *prompt,
 #include <libc/errno.h>
 /* >> getpeereid(3)
  * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
-INTERN ATTR_SECTION(".text.crt.bsd") ATTR_OUT(2) ATTR_OUT(3) int
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_FDARG(1) ATTR_OUT(2) ATTR_OUT(3) int
 NOTHROW_NCX(LIBCCALL libc_getpeereid)(fd_t sockfd,
                                       uid_t *euid,
                                       gid_t *egid) {
@@ -1930,7 +1930,7 @@ NOTHROW_NCX(LIBCCALL libc_issetugid)(void) {
  * and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.
  * No special permissions  are required to  use this function,  since a malicious  application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.bsd") int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.bsd") ATTR_FDARG(1) int
 NOTHROW_NCX(LIBDCALL libd_fchroot)(fd_t fd) {
 	fd_t result;
 	result = libd_dup2(fd, __AT_FDROOT);
@@ -1944,7 +1944,7 @@ NOTHROW_NCX(LIBDCALL libd_fchroot)(fd_t fd) {
  * and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.
  * No special permissions  are required to  use this function,  since a malicious  application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
-INTERN ATTR_SECTION(".text.crt.bsd") int
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_FDARG(1) int
 NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd) {
 	fd_t result;
 	result = libc_dup2(fd, __AT_FDROOT);
@@ -2011,7 +2011,7 @@ NOTHROW_NCX(LIBCCALL libc_resolvepath)(char const *filename,
 #include <asm/os/stdio.h>
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-INTERN ATTR_SECTION(".text.crt.solaris") WUNUSED off_t
+INTERN ATTR_SECTION(".text.crt.solaris") WUNUSED ATTR_FDARG(1) off_t
 NOTHROW_NCX(LIBCCALL libc_tell)(fd_t fd) {
 	return libc_lseek(fd, 0, SEEK_CUR);
 }
@@ -2022,7 +2022,7 @@ DEFINE_INTERN_ALIAS(libc_tell64, libc_tell);
 #include <asm/os/stdio.h>
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-INTERN ATTR_SECTION(".text.crt.solaris") WUNUSED off64_t
+INTERN ATTR_SECTION(".text.crt.solaris") WUNUSED ATTR_FDARG(1) off64_t
 NOTHROW_NCX(LIBCCALL libc_tell64)(fd_t fd) {
 	return libc_lseek64(fd, 0, __SEEK_CUR);
 }

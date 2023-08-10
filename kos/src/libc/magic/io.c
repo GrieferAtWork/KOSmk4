@@ -159,7 +159,7 @@ errno_t _umask_s($mode_t nmode, [[out]] $mode_t *omode) {
 
 [[requires_include("<asm/os/fcntl.h>"), decl_include("<bits/types.h>")]]
 [[requires($has_function(fcntl) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL))))]]
-$oflag_t _setmode($fd_t fd, $oflag_t mode) {
+$oflag_t _setmode([[fdarg]] $fd_t fd, $oflag_t mode) {
 @@pp_ifdef __F_SETFL_XCH@@
 	return fcntl(fd, __F_SETFL_XCH, mode);
 @@pp_else@@
@@ -276,7 +276,7 @@ int _pipe([[out]] $fd_t pipedes[2],
 [[decl_include("<bits/types.h>"), wunused]]
 [[requires_include("<asm/os/stdio.h>")]]
 [[requires($has_function(lseek64) && defined(__SEEK_CUR) && defined(__SEEK_END) && defined(__SEEK_SET))]]
-$int64_t _filelengthi64($fd_t fd) {
+$int64_t _filelengthi64([[fdarg]] $fd_t fd) {
 	int64_t oldpos, result;
 	oldpos = lseek64(fd, 0, __SEEK_CUR);
 	if unlikely(oldpos < 0)
@@ -308,7 +308,7 @@ errno_t umask_s($mode_t newmode, $mode_t *oldmode) {
 %[default:section(".text.crt.dos.fs.utility")];
 
 [[cp, decl_include("<bits/types.h>")]]
-int __lock_fhandle($fd_t fd) {
+int __lock_fhandle([[fdarg]] $fd_t fd) {
 	COMPILER_IMPURE();
 	(void)fd;
 	/* No-op */
@@ -316,7 +316,7 @@ int __lock_fhandle($fd_t fd) {
 }
 
 [[decl_include("<bits/types.h>")]]
-void _unlock_fhandle($fd_t fd) {
+void _unlock_fhandle([[fdarg]] $fd_t fd) {
 	COMPILER_IMPURE();
 	(void)fd;
 	/* No-op */
@@ -325,7 +325,7 @@ void _unlock_fhandle($fd_t fd) {
 
 [[decl_include("<bits/types.h>"), pure, wunused]]
 [[requires(!defined(__CRT_DOS_PRIMARY))]]
-intptr_t _get_osfhandle($fd_t fd) {
+intptr_t _get_osfhandle([[fdarg]] $fd_t fd) {
 	COMPILER_IMPURE();
 	return (intptr_t)fd;
 }
@@ -376,7 +376,7 @@ $fd_t sopen([[in]] char const *filename, $oflag_t oflags, int sflags, ...) {
 [[decl_include("<bits/types.h>")]]
 [[wunused, crt_name("_filelength")]]
 [[requires_function(lseek)]]
-__LONG32_TYPE__ filelength($fd_t fd) {
+__LONG32_TYPE__ filelength([[fdarg]] $fd_t fd) {
 	__LONG32_TYPE__ oldpos, result;
 	oldpos = lseek(fd, 0, SEEK_CUR);
 	if unlikely(oldpos < 0)
@@ -393,7 +393,7 @@ __LONG32_TYPE__ filelength($fd_t fd) {
 [[wunused, crt_name("_eof")]]
 [[requires_function(lseek64)]]
 [[impl_include("<asm/os/stdio.h>")]]
-int eof($fd_t fd) {
+int eof([[fdarg]] $fd_t fd) {
 	$int64_t oldpos, endpos;
 	oldpos = lseek64(fd, 0, SEEK_CUR);
 	if unlikely(oldpos < 0)

@@ -430,7 +430,7 @@ NOTHROW_RPC(LIBCCALL libc_link)(char const *from,
 }
 /*[[[end:libc_link]]]*/
 
-/*[[[head:libc_read,hash:CRC-32=0x254afaf4]]]*/
+/*[[[head:libc_read,hash:CRC-32=0x4e5abb25]]]*/
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the  `O_NONBLOCK' flag set,  only read as  much data as  was
@@ -438,7 +438,7 @@ NOTHROW_RPC(LIBCCALL libc_link)(char const *from,
  * was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
-INTERN ATTR_SECTION(".text.crt.io.read") ATTR_OUTS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.io.read") ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_read)(fd_t fd,
                                 void *buf,
                                 size_t bufsize)
@@ -449,7 +449,7 @@ NOTHROW_RPC(LIBCCALL libc_read)(fd_t fd,
 }
 /*[[[end:libc_read]]]*/
 
-/*[[[head:libc_write,hash:CRC-32=0x5316af72]]]*/
+/*[[[head:libc_write,hash:CRC-32=0xb7ecfe22]]]*/
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much  data
@@ -457,7 +457,7 @@ NOTHROW_RPC(LIBCCALL libc_read)(fd_t fd,
  * if no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
-INTERN ATTR_SECTION(".text.crt.io.write") ATTR_INS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.io.write") ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_write)(fd_t fd,
                                  void const *buf,
                                  size_t bufsize)
@@ -468,11 +468,11 @@ NOTHROW_RPC(LIBCCALL libc_write)(fd_t fd,
 }
 /*[[[end:libc_write]]]*/
 
-/*[[[head:libc_dup,hash:CRC-32=0x9db26688]]]*/
+/*[[[head:libc_dup,hash:CRC-32=0xf90f4300]]]*/
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
  * Duplicate a file referred to by `fd' and return its duplicated handle number */
-INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED fd_t
+INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED ATTR_FDARG(1) fd_t
 NOTHROW_NCX(LIBCCALL libc_dup)(fd_t fd)
 /*[[[body:libc_dup]]]*/
 {
@@ -485,11 +485,11 @@ NOTHROW_NCX(LIBCCALL libc_dup)(fd_t fd)
 INTDEF ATTR_SECTION(".text.crt.dos.fs.environ") void
 NOTHROW(CC libd_dos_fsroot_changed)(void);
 
-/*[[[head:libd_dup2,hash:CRC-32=0x4fa5ebbd]]]*/
+/*[[[head:libd_dup2,hash:CRC-32=0xa755c5c8]]]*/
 /* >> dup2(2)
  * @return: newfd: Returns the new handle upon success.
  * Duplicate a file referred to by `oldfd' into `newfd' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.access") fd_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.access") ATTR_FDARG(1) fd_t
 NOTHROW_NCX(LIBDCALL libd_dup2)(fd_t oldfd,
                                 fd_t newfd)
 /*[[[body:libd_dup2]]]*/
@@ -502,11 +502,11 @@ NOTHROW_NCX(LIBDCALL libd_dup2)(fd_t oldfd,
 }
 /*[[[end:libd_dup2]]]*/
 
-/*[[[head:libc_dup2,hash:CRC-32=0x7ac90214]]]*/
+/*[[[head:libc_dup2,hash:CRC-32=0xc1091db2]]]*/
 /* >> dup2(2)
  * @return: newfd: Returns the new handle upon success.
  * Duplicate a file referred to by `oldfd' into `newfd' */
-INTERN ATTR_SECTION(".text.crt.io.access") fd_t
+INTERN ATTR_SECTION(".text.crt.io.access") ATTR_FDARG(1) fd_t
 NOTHROW_NCX(LIBCCALL libc_dup2)(fd_t oldfd,
                                 fd_t newfd)
 /*[[[body:libc_dup2]]]*/
@@ -516,8 +516,8 @@ NOTHROW_NCX(LIBCCALL libc_dup2)(fd_t oldfd,
 }
 /*[[[end:libc_dup2]]]*/
 
-/*[[[head:libd_dup3,hash:CRC-32=0x24c0295f]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.access") fd_t
+/*[[[head:libd_dup3,hash:CRC-32=0xe1b5a0c7]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.access") ATTR_FDARG(1) fd_t
 NOTHROW_NCX(LIBDCALL libd_dup3)(fd_t oldfd,
                                 fd_t newfd,
                                 oflag_t flags)
@@ -531,8 +531,8 @@ NOTHROW_NCX(LIBDCALL libd_dup3)(fd_t oldfd,
 }
 /*[[[end:libd_dup3]]]*/
 
-/*[[[head:libc_dup3,hash:CRC-32=0x88bdc54a]]]*/
-INTERN ATTR_SECTION(".text.crt.io.access") fd_t
+/*[[[head:libc_dup3,hash:CRC-32=0xdd6e4358]]]*/
+INTERN ATTR_SECTION(".text.crt.io.access") ATTR_FDARG(1) fd_t
 NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd,
                                 fd_t newfd,
                                 oflag_t flags)
@@ -543,10 +543,10 @@ NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd,
 }
 /*[[[end:libc_dup3]]]*/
 
-/*[[[head:libc_close,hash:CRC-32=0x30df5919]]]*/
+/*[[[head:libc_close,hash:CRC-32=0x9922557c]]]*/
 /* >> close(2)
  * Close a given file descriptor/handle `fd' */
-INTERN ATTR_SECTION(".text.crt.io.access") int
+INTERN ATTR_SECTION(".text.crt.io.access") ATTR_FDARG(1) int
 NOTHROW_NCX(LIBCCALL libc_close)(fd_t fd)
 /*[[[body:libc_close]]]*/
 {
@@ -1090,10 +1090,10 @@ NOTHROW_RPC(LIBCCALL libc_unlinkat)(fd_t dfd,
 }
 /*[[[end:libc_unlinkat]]]*/
 
-/*[[[head:libc_lseek,hash:CRC-32=0x7c8c5d75]]]*/
+/*[[[head:libc_lseek,hash:CRC-32=0x1a9edecf]]]*/
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-INTERN ATTR_SECTION(".text.crt.io.seek") off_t
+INTERN ATTR_SECTION(".text.crt.io.seek") ATTR_FDARG(1) off_t
 NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd,
                                  off_t offset,
                                  __STDC_INT_AS_UINT_T whence)
@@ -1109,13 +1109,13 @@ NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd,
 }
 /*[[[end:libc_lseek]]]*/
 
-/*[[[head:libc_lseek64,hash:CRC-32=0x2815d5fb]]]*/
+/*[[[head:libc_lseek64,hash:CRC-32=0xf8cdfe54]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_lseek64, libc_lseek);
 #else /* MAGIC:alias */
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-INTERN ATTR_SECTION(".text.crt.io.large.seek") off64_t
+INTERN ATTR_SECTION(".text.crt.io.large.seek") ATTR_FDARG(1) off64_t
 NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd,
                                    off64_t offset,
                                    __STDC_INT_AS_UINT_T whence)
@@ -1136,11 +1136,11 @@ NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_lseek64]]]*/
 
-/*[[[head:libc_pread,hash:CRC-32=0x714848d8]]]*/
+/*[[[head:libc_pread,hash:CRC-32=0x6fde6e74]]]*/
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-INTERN ATTR_SECTION(".text.crt.io.read") ATTR_OUTS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.io.read") ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_pread)(fd_t fd,
                                  void *buf,
                                  size_t bufsize,
@@ -1153,11 +1153,11 @@ NOTHROW_RPC(LIBCCALL libc_pread)(fd_t fd,
 }
 /*[[[end:libc_pread]]]*/
 
-/*[[[head:libc_pwrite,hash:CRC-32=0x796fb45b]]]*/
+/*[[[head:libc_pwrite,hash:CRC-32=0xb5c2d25e]]]*/
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-INTERN ATTR_SECTION(".text.crt.io.write") ATTR_INS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.io.write") ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_pwrite)(fd_t fd,
                                   void const *buf,
                                   size_t bufsize,
@@ -1169,14 +1169,14 @@ NOTHROW_RPC(LIBCCALL libc_pwrite)(fd_t fd,
 }
 /*[[[end:libc_pwrite]]]*/
 
-/*[[[head:libc_pread64,hash:CRC-32=0xddf5281a]]]*/
+/*[[[head:libc_pread64,hash:CRC-32=0x90a75202]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_pread64, libc_pread);
 #else /* MAGIC:alias */
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-INTERN ATTR_SECTION(".text.crt.io.large.read") ATTR_OUTS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.io.large.read") ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_pread64)(fd_t fd,
                                    void *buf,
                                    size_t bufsize,
@@ -1189,14 +1189,14 @@ NOTHROW_RPC(LIBCCALL libc_pread64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_pread64]]]*/
 
-/*[[[head:libc_pwrite64,hash:CRC-32=0x6a8b1943]]]*/
+/*[[[head:libc_pwrite64,hash:CRC-32=0xb9a4425c]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_pwrite64, libc_pwrite);
 #else /* MAGIC:alias */
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-INTERN ATTR_SECTION(".text.crt.io.large.write") ATTR_INS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.io.large.write") ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_pwrite64)(fd_t fd,
                                     void const *buf,
                                     size_t bufsize,
@@ -1294,10 +1294,10 @@ NOTHROW_NCX(LIBCCALL libc_setresgid)(gid_t rgid,
 }
 /*[[[end:libc_setresgid]]]*/
 
-/*[[[head:libc_fchown,hash:CRC-32=0x91a498d1]]]*/
+/*[[[head:libc_fchown,hash:CRC-32=0x202cfe0c]]]*/
 /* >> fchown(2)
  * Change the ownership of a given `fd' to `group:owner' */
-INTERN ATTR_SECTION(".text.crt.fs.modify") int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_FDARG(1) int
 NOTHROW_RPC(LIBCCALL libc_fchown)(fd_t fd,
                                   uid_t owner,
                                   gid_t group)
@@ -1309,10 +1309,10 @@ NOTHROW_RPC(LIBCCALL libc_fchown)(fd_t fd,
 }
 /*[[[end:libc_fchown]]]*/
 
-/*[[[head:libc_fchdir,hash:CRC-32=0xa4cc825d]]]*/
+/*[[[head:libc_fchdir,hash:CRC-32=0xe6cc7367]]]*/
 /* >> fchdir(2)
  * Change the current working directory to `path' */
-INTERN ATTR_SECTION(".text.crt.fs.basic_property") int
+INTERN ATTR_SECTION(".text.crt.fs.basic_property") ATTR_FDARG(1) int
 NOTHROW_RPC(LIBCCALL libc_fchdir)(fd_t fd)
 /*[[[body:libc_fchdir]]]*/
 {
@@ -1473,12 +1473,12 @@ NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file,
 #endif /* MAGIC:alias */
 /*[[[end:libc_truncate64]]]*/
 
-/*[[[head:libc_fexecve,hash:CRC-32=0x484438e7]]]*/
+/*[[[head:libc_fexecve,hash:CRC-32=0x19d2b80f]]]*/
 /* >> fexecve(2)
  * Replace the calling process with the application image referred
  * to by `execfd'  and execute it's  `main()' method, passing  the
  * given `argv', and setting `environ' to `envp'. */
-INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_IN(2) ATTR_IN(3) int
+INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_FDREAD(1) ATTR_IN(2) ATTR_IN(3) int
 NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t execfd,
                                    __TARGV,
                                    __TENVP)
@@ -1785,10 +1785,10 @@ NOTHROW_RPC(LIBCCALL libc_chroot)(char const *__restrict path)
 /*[[[skip:libc_syscall]]]*/
 /*[[[skip:libc_syscall64]]]*/
 
-/*[[[head:libc_ftruncate,hash:CRC-32=0xcd4e0d6b]]]*/
+/*[[[head:libc_ftruncate,hash:CRC-32=0xa468f529]]]*/
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
-INTERN ATTR_SECTION(".text.crt.io.write") int
+INTERN ATTR_SECTION(".text.crt.io.write") ATTR_FDWRITE(1) int
 NOTHROW_NCX(LIBCCALL libc_ftruncate)(fd_t fd,
                                      __PIO_OFFSET length)
 /*[[[body:libc_ftruncate]]]*/
@@ -1798,13 +1798,13 @@ NOTHROW_NCX(LIBCCALL libc_ftruncate)(fd_t fd,
 }
 /*[[[end:libc_ftruncate]]]*/
 
-/*[[[head:libc_ftruncate64,hash:CRC-32=0x4d1db1cd]]]*/
+/*[[[head:libc_ftruncate64,hash:CRC-32=0x143f21e0]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_ftruncate64, libc_ftruncate);
 #else /* MAGIC:alias */
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
-INTERN ATTR_SECTION(".text.crt.io.large.write") int
+INTERN ATTR_SECTION(".text.crt.io.large.write") ATTR_FDWRITE(1) int
 NOTHROW_NCX(LIBCCALL libc_ftruncate64)(fd_t fd,
                                        __PIO_OFFSET64 length)
 /*[[[body:libc_ftruncate64]]]*/
@@ -2024,14 +2024,14 @@ uint32_t const pathconf_ioctl_codes[] = {
 	[_PC_2_SYMLINKS]         = FILE_IOC_GETFSSYMMAX,
 };
 
-/*[[[head:libc_fpathconf,hash:CRC-32=0x906fd475]]]*/
+/*[[[head:libc_fpathconf,hash:CRC-32=0xbf28e2dc]]]*/
 /* >> fpathconf(3)
  * @param: name: One   of    `_PC_*'    from    <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `fd'
  * return: * : The configuration limit associated with `name' for `fd'
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `fd'
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
-INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED longptr_t
+INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED ATTR_FDARG(1) longptr_t
 NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
                                      __STDC_INT_AS_UINT_T name)
 /*[[[body:libc_fpathconf]]]*/
@@ -3391,8 +3391,8 @@ NOTHROW_RPC(LIBCCALL libc_sync)(void)
 }
 /*[[[end:libc_sync]]]*/
 
-/*[[[head:libc_syncfs,hash:CRC-32=0x95a3c051]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.modify") int
+/*[[[head:libc_syncfs,hash:CRC-32=0xa519daf2]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_FDWRITE(1) int
 NOTHROW_RPC(LIBCCALL libc_syncfs)(fd_t fd)
 /*[[[body:libc_syncfs]]]*/
 {
@@ -3431,11 +3431,11 @@ err:
 }
 /*[[[end:libc_nice]]]*/
 
-/*[[[head:libc_fsync,hash:CRC-32=0x293e6766]]]*/
+/*[[[head:libc_fsync,hash:CRC-32=0x62f85054]]]*/
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
  * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
-INTERN ATTR_SECTION(".text.crt.io.sync") int
+INTERN ATTR_SECTION(".text.crt.io.sync") ATTR_FDWRITE(1) int
 NOTHROW_RPC(LIBCCALL libc_fsync)(fd_t fd)
 /*[[[body:libc_fsync]]]*/
 {
@@ -3444,11 +3444,11 @@ NOTHROW_RPC(LIBCCALL libc_fsync)(fd_t fd)
 }
 /*[[[end:libc_fsync]]]*/
 
-/*[[[head:libc_fdatasync,hash:CRC-32=0x9bc7c550]]]*/
+/*[[[head:libc_fdatasync,hash:CRC-32=0x7b31ad5a]]]*/
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
  * timestamps,  and its size),  meaning that changes  are written to disk */
-INTERN ATTR_SECTION(".text.crt.io.sync") int
+INTERN ATTR_SECTION(".text.crt.io.sync") ATTR_FDWRITE(1) int
 NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd)
 /*[[[body:libc_fdatasync]]]*/
 {

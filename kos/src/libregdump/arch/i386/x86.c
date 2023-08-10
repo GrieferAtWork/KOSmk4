@@ -244,8 +244,8 @@ libregdump_gpregs(struct regdump_printer *__restrict self,
 #endif /* !__x86_64__ */
 }
 
-PRIVATE ATTR_CONST WUNUSED char const *CC
-get_segment_value_name(uint16_t seg) {
+PRIVATE ATTR_CONST WUNUSED char const *
+NOTHROW(CC get_segment_value_name)(uint16_t seg) {
 	char const *result = NULL;
 	switch (seg & ~3) {
 #define CASE(x) \

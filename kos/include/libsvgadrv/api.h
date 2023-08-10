@@ -46,7 +46,7 @@
 #ifdef __KERNEL__
 #define __NOTHROW_KERNEL __NOTHROW
 #else /* __KERNEL__ */
-#define __NOTHROW_KERNEL /*__THROWING*/
+#define __NOTHROW_KERNEL /*__THROWING(...)*/
 #endif /* !__KERNEL__ */
 #endif /* !__NOTHROW_KERNEL */
 

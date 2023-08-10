@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66d33ac1 */
+/* HASH CRC-32:0xce33894c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -235,10 +235,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(advance, __FORCELOCAL __ATTR_ARTIFICIAL int __NO
 /* TODO: Rather   than  what's  above,  NetBSD  defines  another,
  *       deprecated interface here that conflicts with <regex.h>:
  * >> typedef struct regexp { ... } regexp;
- * >> regexp *regcomp(char const *pattern) __ASMNAME("__compat_regcomp");
- * >> int regexec(regexp const *re, char const *input) __ASMNAME("__compat_regexec");
- * >> void regsub(regexp const *re, char const *???, char *???) __ASMNAME("__compat_regsub");
- * >> void regerror(char const *???) __ASMNAME("__compat_regerror");
+ * >> regexp *regcomp(char const *pattern) __COMPILER_ASMNAME("__compat_regcomp");
+ * >> int regexec(regexp const *re, char const *input) __COMPILER_ASMNAME("__compat_regexec");
+ * >> void regsub(regexp const *re, char const *???, char *???) __COMPILER_ASMNAME("__compat_regsub");
+ * >> void regerror(char const *???) __COMPILER_ASMNAME("__compat_regerror");
  *
  * KOS should implement this API for compatibility
  */

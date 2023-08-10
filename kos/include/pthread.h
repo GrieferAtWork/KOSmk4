@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b9bf077 */
+/* HASH CRC-32:0xfe660864 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1346,12 +1346,12 @@ public:
 /* Function called to call the cleanup handler. As an extern inline
  * function the compiler is free to decide inlining the change when
  * needed or fall back on the copy which must exist somewhere else */
-__CEIDECLARE(,void,__NOTHROW_NCX,__pthread_cleanup_routine,(struct __pthread_cleanup_frame *__frame),{ if (__frame->__do_it) (*__frame->__cancel_routine)(__frame->__cancel_arg); })
+__CEIDECLARE(__ATTR_INOUT(1),void,__NOTHROW_NCX,__pthread_cleanup_routine,(struct __pthread_cleanup_frame *__frame),{ if (__frame->__do_it) (*__frame->__cancel_routine)(__frame->__cancel_arg); })
 #else /* __CRT_HAVE___pthread_cleanup_routine */
 /* Function called to call the cleanup handler. As an extern inline
  * function the compiler is free to decide inlining the change when
  * needed or fall back on the copy which must exist somewhere else */
-__LOCAL void __NOTHROW_NCX(__LIBCCALL __pthread_cleanup_routine)(struct __pthread_cleanup_frame *__frame) { if (__frame->__do_it) (*__frame->__cancel_routine)(__frame->__cancel_arg); }
+__LOCAL __ATTR_INOUT(1) void __NOTHROW_NCX(__LIBCCALL __pthread_cleanup_routine)(struct __pthread_cleanup_frame *__frame) { if (__frame->__do_it) (*__frame->__cancel_routine)(__frame->__cancel_arg); }
 #endif /* !__CRT_HAVE___pthread_cleanup_routine */
 /* Install  a cleanup handler: `routine' will be called with arguments `arg'
  * when  the thread is  canceled or calls  pthread_exit. `routine' will also

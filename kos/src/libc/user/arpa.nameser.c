@@ -277,8 +277,8 @@ NOTHROW_NCX(LIBCCALL libc_ns_name_uncompress)(u_char const *a,
 /*[[[end:libc_ns_name_uncompress]]]*/
 
 
-/*[[[head:libc_ns_name_skip,hash:CRC-32=0xf2aba1e4]]]*/
-INTERN ATTR_SECTION(".text.crt.net.nameser") NONNULL((2)) int
+/*[[[head:libc_ns_name_skip,hash:CRC-32=0x324c4dbb]]]*/
+INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_INOUT(1) NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_ns_name_skip)(u_char const **p_msg_ptr,
                                         u_char const *msg_end)
 /*[[[body:libc_ns_name_skip]]]*/

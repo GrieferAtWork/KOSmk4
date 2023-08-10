@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39a8779c */
+/* HASH CRC-32:0xd344f2c9 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -129,7 +129,7 @@ INTDEF ATTR_INOUT(1) ssize_t NOTHROW_NCX(LIBCCALL libc_aio_return)(struct aiocb 
  *                           (or canceled) before the call was made.
  * @return: -1: [errno=EBADF]  `fd' is not a valid file descriptor
  * @return: -1: [errno=EINVAL] `self != NULL' and the given `fd' differs from `self->aio_fildes' */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_aio_cancel)(fd_t fd, struct aiocb *self);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBCCALL libc_aio_cancel)(fd_t fd, struct aiocb *self);
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
@@ -237,7 +237,7 @@ INTDEF ATTR_INOUT(1) ssize_t NOTHROW_NCX(LIBCCALL libc_aio_return64)(struct aioc
  *                           (or canceled) before the call was made.
  * @return: -1: [errno=EBADF]  `fd' is not a valid file descriptor
  * @return: -1: [errno=EINVAL] `self != NULL' and the given `fd' differs from `self->aio_fildes' */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_aio_cancel64)(fd_t fildes, struct aiocb64 *self);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBCCALL libc_aio_cancel64)(fd_t fildes, struct aiocb64 *self);
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given

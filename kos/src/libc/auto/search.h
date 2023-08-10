@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc506ee85 */
+/* HASH CRC-32:0x50cfa7c2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,22 +32,22 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> insque(3)
  * Insert ELEM into a doubly-linked list, after PREV */
-INTDEF void NOTHROW_NCX(LIBDCALL libd_insque)(void *__restrict elem, void *prev);
+INTDEF ATTR_INOUT_OPT(2) ATTR_OUT(1) void NOTHROW_NCX(LIBDCALL libd_insque)(void *__restrict elem, void *prev);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> insque(3)
  * Insert ELEM into a doubly-linked list, after PREV */
-INTDEF void NOTHROW_NCX(LIBCCALL libc_insque)(void *__restrict elem, void *prev);
+INTDEF ATTR_INOUT_OPT(2) ATTR_OUT(1) void NOTHROW_NCX(LIBCCALL libc_insque)(void *__restrict elem, void *prev);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> remque(3)
  * Unlink ELEM from the doubly-linked list that it is in */
-INTDEF void NOTHROW_NCX(LIBDCALL libd_remque)(void *__restrict elem);
+INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBDCALL libd_remque)(void *__restrict elem);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> remque(3)
  * Unlink ELEM from the doubly-linked list that it is in */
-INTDEF void NOTHROW_NCX(LIBCCALL libc_remque)(void *__restrict elem);
+INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc_remque)(void *__restrict elem);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> hsearch(3)

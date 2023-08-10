@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48313062 */
+/* HASH CRC-32:0x944c4110 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __SYSDECL_BEGIN
  * @return: * : The return value depends on the given `request'.
  * @return: 0 : A zero return-value usually indicates success.
  * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
-__LIBC __SSIZE_TYPE__ (__VLIBCCALL Ioctl)(__fd_t __fd, unsigned long int __request, ...) __THROWS(...) __CASMNAME_SAME("Ioctl");
+__LIBC __ATTR_FDARG(1) __SSIZE_TYPE__ (__VLIBCCALL Ioctl)(__fd_t __fd, unsigned long int __request, ...) __THROWS(...) __CASMNAME_SAME("Ioctl");
 #endif /* !__Ioctl_defined && __CRT_HAVE_Ioctl */
 
 __SYSDECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x798e1978 */
+/* HASH CRC-32:0xe6c23842 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -273,22 +273,22 @@ typedef __uid_t uid_t;
 typedef __t_scalar_t  t_scalar_t;
 typedef __t_uscalar_t t_uscalar_t;
 
-__CDECLARE_OPT(,int,__NOTHROW,isastream,(__fd_t __fd),(__fd))
+__CDECLARE_OPT(__ATTR_FDARG(1),int,__NOTHROW,isastream,(__fd_t __fd),(__fd))
 /* @param: pflags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND'
  * @return: MORECTL:  ???
  * @return: MOREDATA: ??? */
-__CDECLARE_OPT(,int,__NOTHROW_RPC,getmsg,(__fd_t __fd, struct strbuf *__restrict __ctlptr, struct strbuf *__restrict __dataptr, __STDC_INT_AS_UINT_T *__restrict __pflags),(__fd,__ctlptr,__dataptr,__pflags))
+__CDECLARE_OPT(__ATTR_FDARG(1),int,__NOTHROW_RPC,getmsg,(__fd_t __fd, struct strbuf *__restrict __ctlptr, struct strbuf *__restrict __dataptr, __STDC_INT_AS_UINT_T *__restrict __pflags),(__fd,__ctlptr,__dataptr,__pflags))
 /* @param: pflags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND'
  * @return: MORECTL:  ???
  * @return: MOREDATA: ??? */
-__CDECLARE_OPT(,int,__NOTHROW_RPC,getpmsg,(__fd_t __fd, struct strbuf *__restrict __ctlptr, struct strbuf *__restrict __dataptr, int *__restrict __bandp, __STDC_INT_AS_UINT_T *__restrict __pflags),(__fd,__ctlptr,__dataptr,__bandp,__pflags))
+__CDECLARE_OPT(__ATTR_FDARG(1),int,__NOTHROW_RPC,getpmsg,(__fd_t __fd, struct strbuf *__restrict __ctlptr, struct strbuf *__restrict __dataptr, int *__restrict __bandp, __STDC_INT_AS_UINT_T *__restrict __pflags),(__fd,__ctlptr,__dataptr,__bandp,__pflags))
 /* @param: flags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND' */
-__CDECLARE_OPT(,int,__NOTHROW_RPC,putmsg,(__fd_t __fd, struct strbuf const *__ctlptr, struct strbuf const *__dataptr, __STDC_INT_AS_UINT_T __flags),(__fd,__ctlptr,__dataptr,__flags))
+__CDECLARE_OPT(__ATTR_FDARG(1),int,__NOTHROW_RPC,putmsg,(__fd_t __fd, struct strbuf const *__ctlptr, struct strbuf const *__dataptr, __STDC_INT_AS_UINT_T __flags),(__fd,__ctlptr,__dataptr,__flags))
 /* @param: flags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND' */
-__CDECLARE_OPT(,int,__NOTHROW_RPC,putpmsg,(__fd_t __fd, struct strbuf const *__ctlptr, struct strbuf const *__dataptr, __STDC_INT_AS_UINT_T __band, __STDC_INT_AS_UINT_T __flags),(__fd,__ctlptr,__dataptr,__band,__flags))
+__CDECLARE_OPT(__ATTR_FDARG(1),int,__NOTHROW_RPC,putpmsg,(__fd_t __fd, struct strbuf const *__ctlptr, struct strbuf const *__dataptr, __STDC_INT_AS_UINT_T __band, __STDC_INT_AS_UINT_T __flags),(__fd,__ctlptr,__dataptr,__band,__flags))
 #if !defined(__fattach_defined) && defined(__CRT_HAVE_fattach)
 #define __fattach_defined
-__CDECLARE(__ATTR_IN(2),int,__NOTHROW_RPC_KOS,fattach,(__fd_t __fd, char const *__restrict __path),(__fd,__path))
+__CDECLARE(__ATTR_FDARG(1) __ATTR_IN(2),int,__NOTHROW_RPC_KOS,fattach,(__fd_t __fd, char const *__restrict __path),(__fd,__path))
 #endif /* !__fattach_defined && __CRT_HAVE_fattach */
 #if !defined(__fdetach_defined) && defined(__CRT_HAVE_fdetach)
 #define __fdetach_defined
@@ -306,7 +306,7 @@ __CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC_KOS,fdetach,(char const *__restrict __
  * @return: * : The return value depends on the given `request'.
  * @return: 0 : A zero return-value usually indicates success.
  * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
-__LIBC __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL ioctl)(__fd_t __fd, __ioctl_t __request, ...) __CASMNAME_SAME("ioctl");
+__LIBC __ATTR_FDARG(1) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL ioctl)(__fd_t __fd, __ioctl_t __request, ...) __CASMNAME_SAME("ioctl");
 #elif defined(__CRT_HAVE___ioctl)
 /* >> ioctl(2)
  * Perform the  I/O control  operation specified  by `request'  on  `fd'.
@@ -317,7 +317,7 @@ __LIBC __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL ioctl)(__fd_t __fd, __ioc
  * @return: * : The return value depends on the given `request'.
  * @return: 0 : A zero return-value usually indicates success.
  * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
-__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t __fd, __ioctl_t __request),__ioctl,(__fd,__request),__request,1,(void *))
+__CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t __fd, __ioctl_t __request),__ioctl,(__fd,__request),__request,1,(void *))
 #elif defined(__CRT_HAVE___libc_ioctl)
 /* >> ioctl(2)
  * Perform the  I/O control  operation specified  by `request'  on  `fd'.
@@ -328,7 +328,7 @@ __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t __fd, __ioctl_t 
  * @return: * : The return value depends on the given `request'.
  * @return: 0 : A zero return-value usually indicates success.
  * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
-__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t __fd, __ioctl_t __request),__libc_ioctl,(__fd,__request),__request,1,(void *))
+__CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t __fd, __ioctl_t __request),__libc_ioctl,(__fd,__request),__request,1,(void *))
 #else /* ... */
 #undef __ioctl_defined
 #endif /* !... */

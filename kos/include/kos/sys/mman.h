@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x525996d5 */
+/* HASH CRC-32:0xc6759fa0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __SYSDECL_BEGIN
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__THROWING(...),MMap,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos_t __offset),(__addr,__len,__prot,__flags,__fd,__offset))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1) __ATTR_FDARG(5),void *,__THROWING(...),MMap,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos_t __offset),(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE_MMap64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> mmap(2), mmap64(2)
  * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
@@ -51,7 +51,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__THROWING(...),MMap,(voi
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__THROWING(...),MMap,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos_t __offset),MMap64,(__addr,__len,__prot,__flags,__fd,__offset))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1) __ATTR_FDARG(5),void *,__THROWING(...),MMap,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos_t __offset),MMap64,(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE_MMap64) || defined(__CRT_HAVE_MMap)
 #include <libc/local/kos.sys.mman/MMap.h>
 /* >> mmap(2), mmap64(2)
@@ -60,7 +60,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__THROWING(...),MMap,(vo
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(MMap, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_NONE(1) void *(__LIBCCALL MMap)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(MMap))(__addr, __len, __prot, __flags, __fd, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(MMap, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_NONE(1) __ATTR_FDARG(5) void *(__LIBCCALL MMap)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(MMap))(__addr, __len, __prot, __flags, __fd, __offset); })
 #endif /* ... */
 /* >> munmap(2)
  * Unmap memory from `addr...+=len' */
@@ -119,7 +119,7 @@ __CDECLARE_VOID_OPT(__ATTR_ACCESS_NONE(1),__THROWING(...),MInCore,(void *__start
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__THROWING(...),MMap64,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos64_t __offset),MMap,(__addr,__len,__prot,__flags,__fd,__offset))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1) __ATTR_FDARG(5),void *,__THROWING(...),MMap64,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos64_t __offset),MMap,(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE_MMap64)
 /* >> mmap(2), mmap64(2)
  * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
@@ -127,7 +127,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__THROWING(...),MMap64,(
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__THROWING(...),MMap64,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos64_t __offset),(__addr,__len,__prot,__flags,__fd,__offset))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1) __ATTR_FDARG(5),void *,__THROWING(...),MMap64,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos64_t __offset),(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE_MMap)
 #include <libc/local/kos.sys.mman/MMap64.h>
 /* >> mmap(2), mmap64(2)
@@ -136,7 +136,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__THROWING(...),MMap64,(v
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(MMap64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_NONE(1) void *(__LIBCCALL MMap64)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos64_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(MMap64))(__addr, __len, __prot, __flags, __fd, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(MMap64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_NONE(1) __ATTR_FDARG(5) void *(__LIBCCALL MMap64)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos64_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(MMap64))(__addr, __len, __prot, __flags, __fd, __offset); })
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 
@@ -167,24 +167,24 @@ __CDECLARE_VOID_OPT(__ATTR_ACCESS_NONE(1),__THROWING(...),MLock2,(void const *__
 __CDECLARE_OPT(,int,__THROWING(...),PKeyAlloc,(unsigned int __flags, unsigned int __access_rights),(__flags,__access_rights))
 #ifdef __CRT_HAVE_PKeySet
 /* >> pkey_set(3) */
-__CDECLARE_VOID(,__THROWING(...),PKeySet,(int __pkey, unsigned int __access_rights),(__pkey,__access_rights))
+__CDECLARE_VOID(,__THROWING(E_INVALID_ARGUMENT_BAD_VALUE),PKeySet,(int __pkey, unsigned int __access_rights),(__pkey,__access_rights))
 #else /* __CRT_HAVE_PKeySet */
 #include <asm/pkey.h>
 #if defined(__ARCH_HAVE_PKEY) && defined(__CRT_HAVE_except_thrown)
 #include <libc/local/kos.sys.mman/PKeySet.h>
 /* >> pkey_set(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(PKeySet, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL PKeySet)(int __pkey, unsigned int __access_rights) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PKeySet))(__pkey, __access_rights); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(PKeySet, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL PKeySet)(int __pkey, unsigned int __access_rights) __THROWS(E_INVALID_ARGUMENT_BAD_VALUE) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PKeySet))(__pkey, __access_rights); })
 #endif /* __ARCH_HAVE_PKEY && __CRT_HAVE_except_thrown */
 #endif /* !__CRT_HAVE_PKeySet */
 #ifdef __CRT_HAVE_PKeyGet
 /* >> pkey_get(3) */
-__CDECLARE(,unsigned int,__THROWING(...),PKeyGet,(int __pkey),(__pkey))
+__CDECLARE(,unsigned int,__THROWING(E_INVALID_ARGUMENT_BAD_VALUE),PKeyGet,(int __pkey),(__pkey))
 #else /* __CRT_HAVE_PKeyGet */
 #include <asm/pkey.h>
 #if defined(__ARCH_HAVE_PKEY) && defined(__CRT_HAVE_except_thrown)
 #include <libc/local/kos.sys.mman/PKeyGet.h>
 /* >> pkey_get(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(PKeyGet, __FORCELOCAL __ATTR_ARTIFICIAL unsigned int (__LIBCCALL PKeyGet)(int __pkey) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PKeyGet))(__pkey); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(PKeyGet, __FORCELOCAL __ATTR_ARTIFICIAL unsigned int (__LIBCCALL PKeyGet)(int __pkey) __THROWS(E_INVALID_ARGUMENT_BAD_VALUE) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PKeyGet))(__pkey); })
 #endif /* __ARCH_HAVE_PKEY && __CRT_HAVE_except_thrown */
 #endif /* !__CRT_HAVE_PKeyGet */
 /* >> pkey_free(2) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd076dfb4 */
+/* HASH CRC-32:0x41092346 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -504,7 +504,7 @@ NOTHROW_NCX(LIBCCALL libc_atof)(char const *__restrict nptr) {
 #define ____vsscanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsscanf_getc) __format_word_t
-__NOTHROW_NCX(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
+NOTHROW_NCX(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
 	unsigned char const *reader = *(unsigned char const **)arg;
 	unsigned char result        = *reader++;
 	if (!result)
@@ -513,7 +513,7 @@ __NOTHROW_NCX(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
 	return (__format_word_t)result;
 }
 __LOCAL_LIBC(vsscanf_ungetc) ssize_t
-__NOTHROW(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+NOTHROW(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
 	--(*(unsigned char const **)arg);
 	return 0;
 }
@@ -594,7 +594,7 @@ NOTHROW_NCX(LIBCCALL libc_strtod)(char const *__restrict nptr,
 #define ____vsscanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsscanf_getc) __format_word_t
-__NOTHROW_NCX(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
+NOTHROW_NCX(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
 	unsigned char const *reader = *(unsigned char const **)arg;
 	unsigned char result        = *reader++;
 	if (!result)
@@ -603,7 +603,7 @@ __NOTHROW_NCX(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
 	return (__format_word_t)result;
 }
 __LOCAL_LIBC(vsscanf_ungetc) ssize_t
-__NOTHROW(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+NOTHROW(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
 	--(*(unsigned char const **)arg);
 	return 0;
 }
@@ -688,7 +688,7 @@ DEFINE_INTERN_ALIAS(libc_strtold, libc_strtod);
 #define ____vsscanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsscanf_getc) __format_word_t
-__NOTHROW_NCX(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
+NOTHROW_NCX(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
 	unsigned char const *reader = *(unsigned char const **)arg;
 	unsigned char result        = *reader++;
 	if (!result)
@@ -697,7 +697,7 @@ __NOTHROW_NCX(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
 	return (__format_word_t)result;
 }
 __LOCAL_LIBC(vsscanf_ungetc) ssize_t
-__NOTHROW(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+NOTHROW(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
 	--(*(unsigned char const **)arg);
 	return 0;
 }
@@ -2371,7 +2371,7 @@ NOTHROW_RPC(LIBCCALL libc_realpath)(char const *filename,
  * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED ATTR_OUT_OPT(2) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED ATTR_FDARG(1) ATTR_OUT_OPT(2) char *
 NOTHROW_RPC(LIBDCALL libd_frealpath)(fd_t fd,
                                      char *resolved,
                                      size_t buflen) {
@@ -2383,7 +2383,7 @@ NOTHROW_RPC(LIBDCALL libd_frealpath)(fd_t fd,
  * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED ATTR_OUT_OPT(2) char *
+INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED ATTR_FDARG(1) ATTR_OUT_OPT(2) char *
 NOTHROW_RPC(LIBCCALL libc_frealpath)(fd_t fd,
                                      char *resolved,
                                      size_t buflen) {
@@ -2575,7 +2575,7 @@ NOTHROW_RPC(LIBCCALL libc_mkdtemp)(char *template_) {
 		template_ = NULL;
 	return template_;
 }
-INTERN ATTR_SECTION(".text.crt.io.tty") int
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_FDARG(1) int
 NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd) {
 	int action = 0;
 	if (libc_ioctl(fd, __TIOCSPTLCK, &action))
@@ -2585,7 +2585,7 @@ NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd) {
 /* >> ptsname(3)
  * Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.tty") WUNUSED char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.tty") WUNUSED ATTR_FDARG(1) char *
 NOTHROW_NCX(LIBDCALL libd_ptsname)(fd_t fd) {
 	static char buf[64];
 	if unlikely(libd_ptsname_r(fd, buf, sizeof(buf)))
@@ -2595,7 +2595,7 @@ NOTHROW_NCX(LIBDCALL libd_ptsname)(fd_t fd) {
 /* >> ptsname(3)
  * Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
-INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED char *
+INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED ATTR_FDARG(1) char *
 NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd) {
 	static char buf[64];
 	if unlikely(libc_ptsname_r(fd, buf, sizeof(buf)))
@@ -2974,7 +2974,7 @@ struct _dwrap_cookie_struct_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1 {
 	int (LIBDCALL *walk)(void *arg, fd_t fd);
 	void *arg;
 };
-PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") int
+PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") ATTR_FDARG(2) int
 (LIBCCALL _dwrap_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1)(struct _dwrap_cookie_struct_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1 *c,
                                                       fd_t fd) THROWS(...) {
 	return (*c->walk)(c->arg, fd);

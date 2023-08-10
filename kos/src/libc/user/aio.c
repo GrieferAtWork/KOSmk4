@@ -1196,7 +1196,7 @@ err_inval:
 }
 /*[[[end:libc_aio_return]]]*/
 
-/*[[[head:libc_aio_cancel,hash:CRC-32=0xcb597930]]]*/
+/*[[[head:libc_aio_cancel,hash:CRC-32=0x85abbb9e]]]*/
 /* >> aio_cancel(3), aio_cancel64(3)
  * Cancel  a specific AIO  operation (self != NULL),  or all operations currently
  * operating on a given `fd' (self !=  NULL && fd == self->aio_fildes). For  this
@@ -1219,7 +1219,7 @@ err_inval:
  *                           (or canceled) before the call was made.
  * @return: -1: [errno=EBADF]  `fd' is not a valid file descriptor
  * @return: -1: [errno=EINVAL] `self != NULL' and the given `fd' differs from `self->aio_fildes' */
-INTERN ATTR_SECTION(".text.crt.utility.aio") int
+INTERN ATTR_SECTION(".text.crt.utility.aio") ATTR_FDARG(1) int
 NOTHROW_NCX(LIBCCALL libc_aio_cancel)(fd_t fd,
                                       struct aiocb *self)
 /*[[[body:libc_aio_cancel]]]*/

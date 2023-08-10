@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb955d680 */
+/* HASH CRC-32:0xa247b970 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ DECL_BEGIN
  * stdout,   and  stderr.  Afterwards,  `fd'  is  closed.
  * @return: 0 : Success
  * @return: * : Error */
-INTERN ATTR_SECTION(".text.crt.io.tty") int
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_FDARG(1) int
 NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd) {
 	if unlikely(libc_setsid() < 0)
 		goto err;

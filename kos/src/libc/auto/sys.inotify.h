@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85580a0f */
+/* HASH CRC-32:0x75abe9df */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ DECL_BEGIN
 INTDEF fd_t NOTHROW_NCX(LIBDCALL libd_inotify_init1)(__STDC_INT_AS_UINT_T flags);
 /* >> inotify_rm_watch(2)
  * @param: wd: Watch fd (as returned by `inotify_add_watch{_at}') */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_inotify_rm_watch)(fd_t notify_fd, __watchfd_t wd);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_inotify_rm_watch)(fd_t notify_fd, __watchfd_t wd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

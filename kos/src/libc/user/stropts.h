@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8be1c5d */
+/* HASH CRC-32:0x438f56eb */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,20 +31,20 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF int NOTHROW(LIBCCALL libc_isastream)(fd_t fd);
+INTDEF ATTR_FDARG(1) int NOTHROW(LIBCCALL libc_isastream)(fd_t fd);
 /* @param: pflags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND'
  * @return: MORECTL:  ???
  * @return: MOREDATA: ??? */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_getmsg)(fd_t fd, struct strbuf *__restrict ctlptr, struct strbuf *__restrict dataptr, __STDC_INT_AS_UINT_T *__restrict pflags);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC(LIBCCALL libc_getmsg)(fd_t fd, struct strbuf *__restrict ctlptr, struct strbuf *__restrict dataptr, __STDC_INT_AS_UINT_T *__restrict pflags);
 /* @param: pflags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND'
  * @return: MORECTL:  ???
  * @return: MOREDATA: ??? */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_getpmsg)(fd_t fd, struct strbuf *__restrict ctlptr, struct strbuf *__restrict dataptr, int *__restrict bandp, __STDC_INT_AS_UINT_T *__restrict pflags);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC(LIBCCALL libc_getpmsg)(fd_t fd, struct strbuf *__restrict ctlptr, struct strbuf *__restrict dataptr, int *__restrict bandp, __STDC_INT_AS_UINT_T *__restrict pflags);
 /* @param: flags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND' */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_putmsg)(fd_t fd, struct strbuf const *ctlptr, struct strbuf const *dataptr, __STDC_INT_AS_UINT_T flags);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC(LIBCCALL libc_putmsg)(fd_t fd, struct strbuf const *ctlptr, struct strbuf const *dataptr, __STDC_INT_AS_UINT_T flags);
 /* @param: flags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND' */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_putpmsg)(fd_t fd, struct strbuf const *ctlptr, struct strbuf const *dataptr, __STDC_INT_AS_UINT_T band, __STDC_INT_AS_UINT_T flags);
-INTDEF ATTR_IN(2) int NOTHROW_RPC_KOS(LIBCCALL libc_fattach)(fd_t fd, char const *__restrict path);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC(LIBCCALL libc_putpmsg)(fd_t fd, struct strbuf const *ctlptr, struct strbuf const *dataptr, __STDC_INT_AS_UINT_T band, __STDC_INT_AS_UINT_T flags);
+INTDEF ATTR_FDARG(1) ATTR_IN(2) int NOTHROW_RPC_KOS(LIBCCALL libc_fattach)(fd_t fd, char const *__restrict path);
 INTDEF ATTR_IN(1) int NOTHROW_RPC_KOS(LIBCCALL libc_fdetach)(char const *__restrict path);
 #endif /* !__KERNEL__ */
 

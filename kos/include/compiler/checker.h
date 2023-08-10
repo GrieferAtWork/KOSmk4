@@ -370,10 +370,21 @@
  *       explicitly be annotated as THROWS(E_INTERRUPT) (if appropriate). Later on,
  *       this annotation should then become some  special tag that warns if  called
  *       from a `__ATTR_NOBLOCK' or `__ATTR_NOPREEMPT' function. */
-#define __ATTR_BLOCKING         __checker_attribute__(__throws__(E_INTERRUPT))
-#define __ATTR_BLOCKING_IF(...) __checker_attribute__(__throws__(E_INTERRUPT)) /* XXX: Condition */
+#define __ATTR_BLOCKING         /* nothing */
+#define __ATTR_BLOCKING_IF(...) /* nothing */
 
 #define __ATTR_THROWS(...)      __checker_attribute__(__throws__(__VA_ARGS__))
+/* TODO: __attribute__((__throws__(code if condition)))
+ *
+ * Here,  `condition' is saved as a code-block  and is evaluated at the call-site
+ * of  the function in question. It can already make use of function arguments by
+ * their name, as well as `__builtin_tag_get()' in order to indicate that certain
+ * exceptions are only thrown in specific contexts. When the expression cannot be
+ * determined  at compile-time, the behavior is the  same as when it evaluates to
+ * true.
+ * >> void task_yield(void) THROWS(E_WOULDBLOCK_PREEMPTED if !PREEMPTION_ENABLED());
+ */
+
 
 #define __ATTR_NOBLOCK          __checker_attribute__(__tag__("NOBLOCK"))
 #define __ATTR_NOBLOCK_IF(...)  __checker_attribute__(__tag__("NOBLOCK")) /* XXX: Condition */
@@ -430,6 +441,9 @@
 #define __ATTR_IN(ptr_index)                 __checker_attribute__(__nonnull__(ptr_index))
 #define __ATTR_OUT(ptr_index)                __checker_attribute__(__nonnull__(ptr_index))
 #define __ATTR_INOUT(ptr_index)              __checker_attribute__(__nonnull__(ptr_index))
+#define __ATTR_FDARG(fd_index)               /* Nothing */
+#define __ATTR_FDREAD(fd_index)              /* Nothing */
+#define __ATTR_FDWRITE(fd_index)             /* Nothing */
 #define __ATTR_WARNING(text)                 /* Nothing */
 #define __ATTR_ERROR(text)                   /* Nothing */
 #define __ATTR_SECTION(name)                 /* Nothing */

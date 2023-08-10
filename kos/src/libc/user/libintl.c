@@ -1323,8 +1323,8 @@ fail:
 }
 /*[[[end:libc_dcngettext]]]*/
 
-/*[[[head:libc_textdomain,hash:CRC-32=0x1c4888fb]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") char *
+/*[[[head:libc_textdomain,hash:CRC-32=0xc20c9958]]]*/
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_IN_OPT(1) char *
 NOTHROW_NCX(LIBCCALL libc_textdomain)(char const *domainname)
 /*[[[body:libc_textdomain]]]*/
 {
@@ -1355,8 +1355,8 @@ NOTHROW_NCX(LIBCCALL libc_textdomain)(char const *domainname)
 }
 /*[[[end:libc_textdomain]]]*/
 
-/*[[[head:libc_bindtextdomain,hash:CRC-32=0x7725190e]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") char *
+/*[[[head:libc_bindtextdomain,hash:CRC-32=0x117d265b]]]*/
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_IN_OPT(1) ATTR_IN_OPT(2) char *
 NOTHROW_NCX(LIBCCALL libc_bindtextdomain)(char const *domainname,
                                           char const *dirname)
 /*[[[body:libc_bindtextdomain]]]*/
@@ -1487,8 +1487,8 @@ done:
 }
 /*[[[end:libc_bindtextdomain]]]*/
 
-/*[[[head:libc_bind_textdomain_codeset,hash:CRC-32=0x96f3a897]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") char *
+/*[[[head:libc_bind_textdomain_codeset,hash:CRC-32=0xc2d9bb60]]]*/
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_IN_OPT(1) ATTR_IN_OPT(2) char *
 NOTHROW_NCX(LIBCCALL libc_bind_textdomain_codeset)(char const *domainname,
                                                    char const *codeset)
 /*[[[body:libc_bind_textdomain_codeset]]]*/

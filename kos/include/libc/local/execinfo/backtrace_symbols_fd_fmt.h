@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8598f16d */
+/* HASH CRC-32:0xb1302fdf */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_write_printer_defined
 #endif /* !... */
 #endif /* !__local___localdep_write_printer_defined */
-__LOCAL_LIBC(backtrace_symbols_fd_fmt) __ATTR_INS(1, 2) __ATTR_IN_OPT(4) int
+__LOCAL_LIBC(backtrace_symbols_fd_fmt) __ATTR_FDWRITE(3) __ATTR_INS(1, 2) __ATTR_IN_OPT(4) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(backtrace_symbols_fd_fmt))(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd, char const *__format) {
 	__SIZE_TYPE__ __i;
 	void *__fdarg;

@@ -62,7 +62,8 @@ DECL_BEGIN
 PRIVATE errno_t KCALL
 sys_prlimit64_impl(pid_t pid, syscall_ulong_t resource,
                    struct rlimit64 const *new_rlim,
-                   struct rlimit64 *old_rlim) {
+                   struct rlimit64 *old_rlim)
+		THROWS(E_WOULDBLOCK, E_PROCESS_EXITED, E_INVALID_ARGUMENT_BAD_VALUE) {
 	REF struct task *thread;
 	if (pid == 0) {
 		/* Special case: calling thread. */

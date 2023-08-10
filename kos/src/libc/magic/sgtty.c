@@ -47,10 +47,10 @@ struct sgttyb;
 }
 
 [[decl_prefix(struct sgttyb;), decl_include("<bits/types.h>")]]
-int gtty($fd_t fd, [[out]] struct sgttyb *params);
+int gtty([[fdarg]] $fd_t fd, [[out]] struct sgttyb *params);
 
 [[decl_prefix(struct sgttyb;), decl_include("<bits/types.h>")]]
-int stty($fd_t fd, [[in]] struct sgttyb const *params);
+int stty([[fdarg]] $fd_t fd, [[in]] struct sgttyb const *params);
 
 %{
 

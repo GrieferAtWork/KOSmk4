@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1678fa08 */
+/* HASH CRC-32:0x71ba9af9 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -118,7 +118,7 @@ INTERN ATTR_SECTION(".text.crt.except.system.mman") ATTR_IN(1) void
 /* >> pkey_set(3) */
 INTERN ATTR_SECTION(".text.crt.except.system.mman") void
 (LIBCCALL libc_PKeySet)(int pkey,
-                        unsigned int access_rights) THROWS(...) {
+                        unsigned int access_rights) THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
 	if unlikely(!__arch_pkey_verify_key(pkey))
 		libc_except_thrown(EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE), 2, E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_PKEY, pkey);
 	if unlikely(!__arch_pkey_verify_rights(access_rights))
@@ -129,7 +129,7 @@ INTERN ATTR_SECTION(".text.crt.except.system.mman") void
 #include <kos/except/reason/inval.h>
 /* >> pkey_get(3) */
 INTERN ATTR_SECTION(".text.crt.except.system.mman") unsigned int
-(LIBCCALL libc_PKeyGet)(int pkey) THROWS(...) {
+(LIBCCALL libc_PKeyGet)(int pkey) THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
 	if unlikely(!__arch_pkey_verify_key(pkey))
 		libc_except_thrown(EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE), 2, E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY, pkey);
 	return __arch_pkey_get(pkey);

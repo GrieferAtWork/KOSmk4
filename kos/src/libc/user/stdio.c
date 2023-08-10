@@ -1899,10 +1899,10 @@ NOTHROW_RPC(LIBCCALL libc_flockfile)(FILE *__restrict stream)
 }
 /*[[[end:libc_flockfile]]]*/
 
-/*[[[head:libc_funlockfile,hash:CRC-32=0xb5574c14]]]*/
+/*[[[head:libc_funlockfile,hash:CRC-32=0x8d5dfae8]]]*/
 /* >> funlockfile(3)
  * Release a previously acquired lock from `stream' */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") void
+INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") ATTR_INOUT(1) void
 NOTHROW_NCX(LIBCCALL libc_funlockfile)(FILE *__restrict stream)
 /*[[[body:libc_funlockfile]]]*/
 {
@@ -3242,12 +3242,12 @@ NOTHROW_RPC(LIBCCALL libc_fopen)(char const *__restrict filename,
 /* fdopen(3)                                                            */
 /************************************************************************/
 
-/*[[[head:libc_fdopen,hash:CRC-32=0xb20003ef]]]*/
+/*[[[head:libc_fdopen,hash:CRC-32=0x290391f8]]]*/
 /* >> fdopen(3)
  * Open a new file stream by inheriting a given file descriptor `fd'
  * Note that upon success (`return != NULL'), the given `fd' will be
  * `close(2)'d once `fclose(return)' is called. */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED ATTR_IN(2) FILE *
+INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED ATTR_FDARG(1) ATTR_IN(2) FILE *
 NOTHROW_NCX(LIBCCALL libc_fdopen)(fd_t fd,
                                   char const *__restrict modes)
 /*[[[body:libc_fdopen]]]*/
@@ -3732,10 +3732,10 @@ NOTHROW_RPC(LIBCCALL libc_popenve)(char const *path,
 }
 /*[[[end:libc_popenve]]]*/
 
-/*[[[head:libc_pclose,hash:CRC-32=0x2319830f]]]*/
+/*[[[head:libc_pclose,hash:CRC-32=0xb5ce1d74]]]*/
 /* >> pclose(3)
  * Close a process I/O file `stream' (s.a. `popen(3)') */
-INTERN ATTR_SECTION(".text.crt.FILE.utility.popen") int
+INTERN ATTR_SECTION(".text.crt.FILE.utility.popen") ATTR_INOUT(1) int
 NOTHROW_NCX(LIBCCALL libc_pclose)(FILE *stream)
 /*[[[body:libc_pclose]]]*/
 {
@@ -4029,10 +4029,10 @@ NOTHROW_NCX(LIBCCALL libc__set_printf_count_output)(int val)
 }
 /*[[[end:libc__set_printf_count_output]]]*/
 
-/*[[[head:libc_fdreopen,hash:CRC-32=0xbf34162d]]]*/
+/*[[[head:libc_fdreopen,hash:CRC-32=0x170561a9]]]*/
 /* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.access") ATTR_IN(2) ATTR_INOUT(3) FILE *
+INTERN ATTR_SECTION(".text.crt.FILE.locked.access") ATTR_FDARG(1) ATTR_IN(2) ATTR_INOUT(3) FILE *
 NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd,
                                     char const *__restrict modes,
                                     FILE *__restrict stream)
@@ -4066,10 +4066,10 @@ done:
 }
 /*[[[end:libc_fdreopen]]]*/
 
-/*[[[head:libc_fdreopen_unlocked,hash:CRC-32=0xcfcc2964]]]*/
+/*[[[head:libc_fdreopen_unlocked,hash:CRC-32=0xf87d7dd9]]]*/
 /* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
-INTERN ATTR_SECTION(".text.crt.FILE.unlocked.access") ATTR_IN(2) ATTR_INOUT(3) FILE *
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.access") ATTR_FDARG(1) ATTR_IN(2) ATTR_INOUT(3) FILE *
 NOTHROW_RPC(LIBCCALL libc_fdreopen_unlocked)(fd_t fd,
                                              char const *__restrict modes,
                                              FILE *__restrict stream)

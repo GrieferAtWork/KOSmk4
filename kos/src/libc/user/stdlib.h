@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc472c4f */
+/* HASH CRC-32:0xd32e0609 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,7 +99,7 @@ INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf);
  * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTDEF WUNUSED ATTR_OUT_OPT(2) char *NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd, char *resolved, size_t buflen, atflag_t flags);
+INTDEF WUNUSED ATTR_FDARG(1) ATTR_OUT_OPT(2) char *NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd, char *resolved, size_t buflen, atflag_t flags);
 /* >> frealpath4(2)
  * Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
@@ -111,7 +111,7 @@ INTDEF WUNUSED ATTR_OUT_OPT(2) char *NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t 
  * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTDEF WUNUSED ATTR_OUT_OPT(2) char *NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd, char *resolved, size_t buflen, atflag_t flags);
+INTDEF WUNUSED ATTR_FDARG(1) ATTR_OUT_OPT(2) char *NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd, char *resolved, size_t buflen, atflag_t flags);
 /* >> frealpathat(2)
  * Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
@@ -142,14 +142,14 @@ INTDEF WUNUSED ATTR_IN(2) ATTR_OUT_OPT(3) char *NOTHROW_RPC(LIBDCALL libd_frealp
  * @param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
  * @return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path */
 INTDEF WUNUSED ATTR_IN(2) ATTR_OUT_OPT(3) char *NOTHROW_RPC(LIBCCALL libc_frealpathat)(fd_t dirfd, char const *filename, char *resolved, size_t buflen, atflag_t flags);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_grantpt)(fd_t fd);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBCCALL libc_grantpt)(fd_t fd);
 INTDEF WUNUSED fd_t NOTHROW_RPC(LIBCCALL libc_posix_openpt)(oflag_t oflags);
 /* Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
-INTDEF ATTR_OUTS(2, 3) int NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd, char *buf, size_t buflen);
+INTDEF ATTR_FDARG(1) ATTR_OUTS(2, 3) int NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd, char *buf, size_t buflen);
 /* Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
-INTDEF ATTR_OUTS(2, 3) int NOTHROW_NCX(LIBCCALL libc_ptsname_r)(fd_t fd, char *buf, size_t buflen);
+INTDEF ATTR_FDARG(1) ATTR_OUTS(2, 3) int NOTHROW_NCX(LIBCCALL libc_ptsname_r)(fd_t fd, char *buf, size_t buflen);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_getpt)(void);
 /* >> canonicalize_file_name(3)
  * Return the result of `realpath(filename)' as a `malloc()'-

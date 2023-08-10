@@ -36,13 +36,16 @@ local final GCC_SYSTEM_LIBRARY_UNRELATED_FLAGS = {
 	"-feliminate-unused-debug-symbols",
 	"-feliminate-unused-debug-types",
 	"-fdelete-null-pointer-checks",
-	"-fpermissive", "-fexceptions"
+	"-fpermissive", "-fexceptions",
+	"-fanalyzer"
 };
 
 final function isUnrelatedGCCFlag(flag: string): bool {
 	if (flag.startswith("-O"))
 		return true;
 	if (flag.startswith("-g"))
+		return true;
+	if (flag.startswith("-W"))
 		return true;
 	if (flag in GCC_SYSTEM_LIBRARY_UNRELATED_FLAGS)
 		return true;

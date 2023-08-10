@@ -40,10 +40,10 @@ NOTHROW(LIBCCALL libc_timerfd_create)(clockid_t clock_id,
 }
 /*[[[end:libc_timerfd_create]]]*/
 
-/*[[[head:libc_timerfd_settime,hash:CRC-32=0xa8081320]]]*/
+/*[[[head:libc_timerfd_settime,hash:CRC-32=0xe5c6c4a9]]]*/
 /* >> timerfd_settime(2), timerfd_settime64(2)
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-INTERN ATTR_SECTION(".text.crt.timer") ATTR_IN(3) ATTR_OUT_OPT(4) int
+INTERN ATTR_SECTION(".text.crt.timer") ATTR_FDARG(1) ATTR_IN(3) ATTR_OUT_OPT(4) int
 NOTHROW_NCX(LIBCCALL libc_timerfd_settime)(fd_t ufd,
                                            __STDC_INT_AS_UINT_T flags,
                                            struct itimerspec const *utmr,
@@ -56,9 +56,9 @@ NOTHROW_NCX(LIBCCALL libc_timerfd_settime)(fd_t ufd,
 }
 /*[[[end:libc_timerfd_settime]]]*/
 
-/*[[[head:libc_timerfd_gettime,hash:CRC-32=0xbd5eccd7]]]*/
+/*[[[head:libc_timerfd_gettime,hash:CRC-32=0x673d7632]]]*/
 /* >> timerfd_gettime(2), timerfd_gettime64(2) */
-INTERN ATTR_SECTION(".text.crt.timer") ATTR_OUT(2) int
+INTERN ATTR_SECTION(".text.crt.timer") ATTR_FDARG(1) ATTR_OUT(2) int
 NOTHROW_NCX(LIBCCALL libc_timerfd_gettime)(fd_t ufd,
                                            struct itimerspec *__restrict otmr)
 /*[[[body:libc_timerfd_gettime]]]*/
@@ -69,13 +69,13 @@ NOTHROW_NCX(LIBCCALL libc_timerfd_gettime)(fd_t ufd,
 }
 /*[[[end:libc_timerfd_gettime]]]*/
 
-/*[[[head:libc_timerfd_settime64,hash:CRC-32=0x44eab1ff]]]*/
+/*[[[head:libc_timerfd_settime64,hash:CRC-32=0x707ececc]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_timerfd_settime64, libc_timerfd_settime);
 #else /* MAGIC:alias */
 /* >> timerfd_settime(2), timerfd_settime64(2)
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-INTERN ATTR_SECTION(".text.crt.timer") ATTR_IN(3) ATTR_OUT_OPT(4) int
+INTERN ATTR_SECTION(".text.crt.timer") ATTR_FDARG(1) ATTR_IN(3) ATTR_OUT_OPT(4) int
 NOTHROW_NCX(LIBCCALL libc_timerfd_settime64)(fd_t ufd,
                                              __STDC_INT_AS_UINT_T flags,
                                              struct itimerspec64 const *utmr,
@@ -89,12 +89,12 @@ NOTHROW_NCX(LIBCCALL libc_timerfd_settime64)(fd_t ufd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_timerfd_settime64]]]*/
 
-/*[[[head:libc_timerfd_gettime64,hash:CRC-32=0xc341e1a1]]]*/
+/*[[[head:libc_timerfd_gettime64,hash:CRC-32=0x95dc9f2c]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_timerfd_gettime64, libc_timerfd_gettime);
 #else /* MAGIC:alias */
 /* >> timerfd_gettime(2), timerfd_gettime64(2) */
-INTERN ATTR_SECTION(".text.crt.timer") ATTR_OUT(2) int
+INTERN ATTR_SECTION(".text.crt.timer") ATTR_FDARG(1) ATTR_OUT(2) int
 NOTHROW_NCX(LIBCCALL libc_timerfd_gettime64)(fd_t ufd,
                                              struct itimerspec64 *__restrict otmr)
 /*[[[body:libc_timerfd_gettime64]]]*/

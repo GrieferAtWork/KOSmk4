@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60e7bc7e */
+/* HASH CRC-32:0xce9d3971 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -181,7 +181,7 @@ NOTHROW_RPC(LIBKCALL libc_wrealpath)(char32_t const *filename,
 
 
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") WUNUSED ATTR_OUTS(2, 3) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") WUNUSED ATTR_FDARG(1) ATTR_OUTS(2, 3) char16_t *
 NOTHROW_RPC(LIBDCALL libd_wfrealpath)(fd_t fd,
                                       char16_t *resolved,
                                       size_t buflen) {
@@ -221,7 +221,7 @@ NOTHROW_RPC(LIBDCALL libd_wfrealpath)(fd_t fd,
 
 
 }
-INTERN ATTR_SECTION(".text.crt.wchar.fs.property") WUNUSED ATTR_OUTS(2, 3) char32_t *
+INTERN ATTR_SECTION(".text.crt.wchar.fs.property") WUNUSED ATTR_FDARG(1) ATTR_OUTS(2, 3) char32_t *
 NOTHROW_RPC(LIBKCALL libc_wfrealpath)(fd_t fd,
                                       char32_t *resolved,
                                       size_t buflen) {
@@ -261,7 +261,7 @@ NOTHROW_RPC(LIBKCALL libc_wfrealpath)(fd_t fd,
 
 
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") WUNUSED ATTR_OUTS(2, 3) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") WUNUSED ATTR_FDARG(1) ATTR_OUTS(2, 3) char16_t *
 NOTHROW_RPC(LIBDCALL libd_wfrealpath4)(fd_t fd,
                                        char16_t *resolved,
                                        size_t buflen,
@@ -298,7 +298,7 @@ NOTHROW_RPC(LIBDCALL libd_wfrealpath4)(fd_t fd,
 
 	return resolved;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.fs.property") WUNUSED ATTR_OUTS(2, 3) char32_t *
+INTERN ATTR_SECTION(".text.crt.wchar.fs.property") WUNUSED ATTR_FDARG(1) ATTR_OUTS(2, 3) char32_t *
 NOTHROW_RPC(LIBKCALL libc_wfrealpath4)(fd_t fd,
                                        char32_t *resolved,
                                        size_t buflen,

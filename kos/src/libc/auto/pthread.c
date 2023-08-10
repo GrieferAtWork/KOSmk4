@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc11a0f3 */
+/* HASH CRC-32:0x1c284c60 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -179,7 +179,7 @@ again:
 /* Function called to call the cleanup handler. As an extern inline
  * function the compiler is free to decide inlining the change when
  * needed or fall back on the copy which must exist somewhere else */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") void
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) void
 NOTHROW_NCX(LIBCCALL libc___pthread_cleanup_routine)(struct __pthread_cleanup_frame *frame) {
 	if (frame->__do_it)
 		(*frame->__cancel_routine)(frame->__cancel_arg);

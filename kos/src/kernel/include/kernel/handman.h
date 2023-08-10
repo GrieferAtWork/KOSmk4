@@ -80,6 +80,9 @@ struct refcountable;
  * Causes a compiler error if "T" doesn't have a handle type code.
  * NOTE: Sub-classes of types with codes are handled correctly. */
 #ifdef __cplusplus
+#ifdef __CHECKER__
+#define _handleidof(expr) 0
+#else /* __CHECKER__ */
 extern "C++" {
 struct __PRIVATE_handleidof_tag { };
 template<class T> struct __PRIVATE_handleidof { };
@@ -92,6 +95,7 @@ HANDLE_FOREACH_TYPE(_HANDLE_FOREACH_DEFINE_HANDLEIDOF)
 #undef _HANDLE_FOREACH_DEFINE_HANDLEIDOF
 #define _handleidof(expr) (::__PRIVATE_handleidof<decltype((*(expr), ::__PRIVATE_handleidof_tag()))>::value)
 } /* extern "C++" */
+#endif /* !__CHECKER__ */
 #endif /* __cplusplus */
 
 

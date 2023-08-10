@@ -1044,7 +1044,7 @@ PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL sigmask_unblockmask)(sigset_t const *__restrict these)
 #endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 {
-	bool result;
+	bool result = false;
 #ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		signo_t sigbase;
@@ -1058,7 +1058,6 @@ NOTHROW(FCALL sigmask_unblockmask)(sigset_t const *__restrict these)
 		validate_readwrite(umask, umasksize);
 		if (umasksize > sizeof(sigset_t))
 			umasksize = sizeof(sigset_t);
-		result  = false;
 		sigbase = 0;
 		while (umasksize >= sizeof(ulongptr_t)) {
 			ulongptr_t word, blck, nwrd;

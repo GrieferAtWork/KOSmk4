@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x711476b5 */
+/* HASH CRC-32:0xc831af1b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -128,14 +128,14 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/__overflow.h>
 __NAMESPACE_LOCAL_BEGIN
 struct __memstream_file {
-	__BYTE_TYPE__ **__mf_pbase; /* Pointer to the user-defined base field. */
-	__SIZE_TYPE__  *__mf_psize; /* Pointer to the user-defined size field. */
+	__BYTE_TYPE__ **__mf_pbase; /* [1..1] Pointer to the user-defined base field. */
+	__SIZE_TYPE__  *__mf_psize; /* [1..1] Pointer to the user-defined size field. */
 	__BYTE_TYPE__  *__mf_base;  /* [0..1][owned] Allocated base pointer. */
 	__BYTE_TYPE__  *__mf_ptr;   /* [0..1] Current read/write pointer (May be located beyond `mf_end'; allocated lazily during writes). */
 	__BYTE_TYPE__  *__mf_end;   /* [0..1] Allocated buffer end pointer. */
 };
 
-__LOCAL_LIBC(memstream_read) __SSIZE_TYPE__
+__LOCAL_LIBC(memstream_read) __ATTR_OUTS(2, 3) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __memstream_read)(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes) {
 	struct __memstream_file *__me;
 	__SIZE_TYPE__ __maxread;
@@ -148,7 +148,7 @@ __NOTHROW_NCX(__LIBCCALL __memstream_read)(void *__cookie, void *__buf, __SIZE_T
 	return (__SSIZE_TYPE__)__maxread;
 }
 
-__LOCAL_LIBC(memstream_write) __SSIZE_TYPE__
+__LOCAL_LIBC(memstream_write) __ATTR_INS(2, 3) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __memstream_write)(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes) {
 	struct __memstream_file *__me;
 	__SIZE_TYPE__ __new_alloc, __result = 0;
@@ -270,7 +270,7 @@ __NOTHROW(__LIBCCALL __memstream_close)(void *__cookie) {
 
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(open_memstream) __ATTR_WUNUSED __FILE *
+__LOCAL_LIBC(open_memstream) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __FILE *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(open_memstream))(char **__bufloc, __SIZE_TYPE__ *__sizeloc) {
 	__FILE *__result;
 	struct __NAMESPACE_LOCAL_SYM __memstream_file *__magic;

@@ -127,7 +127,9 @@ mman_memset(struct mman *__restrict self,
 			error = memcpy_nopf(addr, buf, num_bytes);
 #elif defined(LOCAL_IS_WRITING)
 			memcpy(addr, buf, num_bytes);
-#endif /* ... */
+#else /* ... */
+#error "Invalid configuration"
+#endif /* !... */
 		} else {
 			REF struct mman *oldmm;
 			oldmm = task_xchmman(self);
@@ -138,6 +140,8 @@ mman_memset(struct mman *__restrict self,
 			error = memcpy_nopf(buf, addr, num_bytes);
 #elif defined(LOCAL_IS_WRITING) && defined(LOCAL_IS_NOPF)
 			error = memcpy_nopf(addr, buf, num_bytes);
+#else /* ... */
+#error "Invalid configuration"
 #endif /* ... */
 			task_setmman_inherit(oldmm);
 #else /* LOCAL_IS_NOPF */
@@ -148,11 +152,18 @@ mman_memset(struct mman *__restrict self,
 			memcpy(buf, addr, num_bytes);
 #elif defined(LOCAL_IS_WRITING)
 			memcpy(addr, buf, num_bytes);
+#else /* ... */
+#error "Invalid configuration"
 #endif /* ... */
 #endif /* !LOCAL_IS_NOPF */
 		}
 	}
 #ifndef LOCAL_IS_MEMSET
+#ifdef LOCAL_IS_NOPF
+	else if unlikely(!num_bytes) {
+		error = 0;
+	}
+#endif /* LOCAL_IS_NOPF */
 	else {
 		size_t tempbuf_size;
 		byte_t *tempbuf;
@@ -164,7 +175,7 @@ mman_memset(struct mman *__restrict self,
 		if (tempbuf_size < 64)
 			tempbuf_size = 64;
 		tempbuf = (byte_t *)alloca(tempbuf_size);
-		while (num_bytes) {
+		do {
 			size_t transfer;
 			transfer = tempbuf_size;
 			if (transfer > num_bytes)
@@ -193,7 +204,7 @@ mman_memset(struct mman *__restrict self,
 				break;
 			}
 #endif /* LOCAL_IS_NOPF */
-		}
+		} while (num_bytes);
 	}
 #endif /* !LOCAL_IS_MEMSET */
 

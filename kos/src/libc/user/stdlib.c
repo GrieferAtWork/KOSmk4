@@ -2295,7 +2295,7 @@ NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf)
 }
 /*[[[end:libc_setstate]]]*/
 
-/*[[[head:libd_frealpath4,hash:CRC-32=0x713636f8]]]*/
+/*[[[head:libd_frealpath4,hash:CRC-32=0x4f81f8d5]]]*/
 /* >> frealpath4(2)
  * Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
@@ -2307,7 +2307,7 @@ NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf)
  * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED ATTR_OUT_OPT(2) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED ATTR_FDARG(1) ATTR_OUT_OPT(2) char *
 NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd,
                                       char *resolved,
                                       size_t buflen,
@@ -2318,7 +2318,7 @@ NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd,
 }
 /*[[[end:libd_frealpath4]]]*/
 
-/*[[[head:libc_frealpath4,hash:CRC-32=0x71966a38]]]*/
+/*[[[head:libc_frealpath4,hash:CRC-32=0x29cef56]]]*/
 /* >> frealpath4(2)
  * Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
@@ -2330,7 +2330,7 @@ NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd,
  * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED ATTR_OUT_OPT(2) char *
+INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED ATTR_FDARG(1) ATTR_OUT_OPT(2) char *
 NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd,
                                       char *resolved,
                                       size_t buflen,
@@ -2515,8 +2515,8 @@ done:
 }
 /*[[[end:libc_frealpathat]]]*/
 
-/*[[[head:libc_grantpt,hash:CRC-32=0xd1e26f46]]]*/
-INTERN ATTR_SECTION(".text.crt.io.tty") int
+/*[[[head:libc_grantpt,hash:CRC-32=0xb6ffa2a4]]]*/
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_FDARG(1) int
 NOTHROW_NCX(LIBCCALL libc_grantpt)(fd_t fd)
 /*[[[body:libc_grantpt]]]*/
 /*AUTO*/{
@@ -2539,10 +2539,10 @@ NOTHROW_RPC(LIBCCALL libc_posix_openpt)(oflag_t oflags)
 }
 /*[[[end:libc_posix_openpt]]]*/
 
-/*[[[head:libd_ptsname_r,hash:CRC-32=0xc7db2736]]]*/
+/*[[[head:libd_ptsname_r,hash:CRC-32=0x294bb2a9]]]*/
 /* Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.tty") ATTR_OUTS(2, 3) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.tty") ATTR_FDARG(1) ATTR_OUTS(2, 3) int
 NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd,
                                      char *buf,
                                      size_t buflen)
@@ -2556,10 +2556,10 @@ NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd,
 }
 /*[[[end:libd_ptsname_r]]]*/
 
-/*[[[head:libc_ptsname_r,hash:CRC-32=0x42bbeda1]]]*/
+/*[[[head:libc_ptsname_r,hash:CRC-32=0xe5d395c8]]]*/
 /* Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
-INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_OUTS(2, 3) int
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_FDARG(1) ATTR_OUTS(2, 3) int
 NOTHROW_NCX(LIBCCALL libc_ptsname_r)(fd_t fd,
                                      char *buf,
                                      size_t buflen)

@@ -421,8 +421,8 @@ $fd_t epoll_create1(__STDC_INT_AS_UINT_T flags);
 @@                                  forms a loop with `epfd', or has too many nested.
 @@@throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...]
 [[decl_include("<bits/os/epoll.h>")]]
-int epoll_ctl($fd_t epfd, __epoll_ctl_t op,
-              $fd_t fd, struct epoll_event *event);
+int epoll_ctl([[fdarg]] $fd_t epfd, __epoll_ctl_t op,
+              [[fdarg]] $fd_t fd, struct epoll_event *event);
 
 
 @@>> epoll_wait(2)
@@ -439,7 +439,7 @@ int epoll_ctl($fd_t epfd, __epoll_ctl_t op,
 @@@return: 0:        No events happened before `timeout' expired.
 @@@return: -1:       Error (s.a. `errno')
 [[cp, decl_include("<features.h>", "<bits/os/epoll.h>")]]
-__STDC_INT_AS_SSIZE_T epoll_wait($fd_t epfd, [[out(return <= maxevents)]] struct epoll_event *events,
+__STDC_INT_AS_SSIZE_T epoll_wait([[fdarg]] $fd_t epfd, [[out(return <= maxevents)]] struct epoll_event *events,
                                  __STDC_INT_AS_SIZE_T maxevents, int timeout);
 
 @@>> epoll_pwait(2)
@@ -458,7 +458,7 @@ __STDC_INT_AS_SSIZE_T epoll_wait($fd_t epfd, [[out(return <= maxevents)]] struct
 @@@return: 0:        No events happened before `timeout' expired.
 @@@return: -1:       Error (s.a. `errno')
 [[cp, decl_include("<features.h>", "<bits/os/epoll.h>")]]
-__STDC_INT_AS_SSIZE_T epoll_pwait($fd_t epfd, [[out(return <= maxevents)]] struct epoll_event *events,
+__STDC_INT_AS_SSIZE_T epoll_pwait([[fdarg]] $fd_t epfd, [[out(return <= maxevents)]] struct epoll_event *events,
                                   __STDC_INT_AS_SIZE_T maxevents, int timeout,
                                   sigset_t const *ss);
 
@@ -512,7 +512,7 @@ typedef __ATTR_NONNULL_T((1)) void
 @@                            as an attempt to send it is made, or the monitor
 @@                            is manually deleted via `EPOLL_CTL_DEL'
 [[decl_include("<bits/os/epoll.h>")]]
-int epoll_rpc_exec($fd_t epfd, $fd_t fd,
+int epoll_rpc_exec([[fdarg]] $fd_t epfd, [[fdarg]] $fd_t fd,
                    [[in]] struct epoll_event const *event,
                    $pid_t target_tid, unsigned int mode,
                    [[nonnull]] prpc_exec_callback_t func);

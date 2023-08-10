@@ -38,12 +38,12 @@ extern "C++" {
 __NAMESPACE_INT_BEGIN
 template<class __F> struct __FinallyAction {
 	__F __c;
-	__CXX_CLASSMEMBER __FinallyAction(__F __f) __CXX_NOEXCEPT: __c(__f) {}
-	__CXX_CLASSMEMBER ~__FinallyAction() __CXX_NOEXCEPT { __c(); }
+	__ATTR_ARTIFICIAL __CXX_INLINE_CLASSMEMBER __FinallyAction(__F __f) __CXX_NOEXCEPT: __c(__f) {}
+	__ATTR_ARTIFICIAL __CXX_INLINE_CLASSMEMBER ~__FinallyAction() __CXX_NOEXCEPT { __c(); }
 };
 struct __FinallyBase {
-	template<class __F> __CXX_CLASSMEMBER __FinallyAction<__F>
-	operator ->* (__F __f) __CXX_NOEXCEPT { return __FinallyAction<__F>(__f); }
+	template<class __F> __ATTR_ARTIFICIAL __CXX_INLINE_CLASSMEMBER __FinallyAction<__F>
+	operator->*(__F __f) __CXX_NOEXCEPT { return __FinallyAction<__F>(__f); }
 };
 __NAMESPACE_INT_END
 } /* extern "C++" */

@@ -107,28 +107,28 @@ __ATTR_NONNULL((1)) void (bit_flip)(bitstr_t *__restrict self, int bitno);
 #endif /* !__INTELLISENSE__ */
 #endif /* __USE_KOS */
 
-#define __bit_nclear_impl(self, minbyte, maxbyte, minbyte_bitno, maxbyte_bitno) \
-	((minbyte >= maxbyte)                                                       \
-	 ? (self[maxbyte] &= ((0xff >> (8 - minbyte_bitno)) |                       \
-	                      (0xff << (maxbyte_bitno + 1))))                       \
-	 : (self[minbyte] &= 0xff >> (8 - minbyte_bitno),                           \
-	    __libc_bzero(&self[minbyte + 1], maxbyte - (minbyte + 1)),              \
+#define __PRIVATE_bit_nclear_impl(self, minbyte, maxbyte, minbyte_bitno, maxbyte_bitno) \
+	((minbyte >= maxbyte)                                                               \
+	 ? (self[maxbyte] &= ((0xff >> (8 - minbyte_bitno)) |                               \
+	                      (0xff << (maxbyte_bitno + 1))))                               \
+	 : (self[minbyte] &= 0xff >> (8 - minbyte_bitno),                                   \
+	    __libc_bzero(&self[minbyte + 1], maxbyte - (minbyte + 1)),                      \
 	    self[maxbyte] &= 0xff << (maxbyte_bitno + 1)))
-#define __bit_nset_impl(self, minbyte, maxbyte, minbyte_bitno, maxbyte_bitno) \
-	((minbyte >= maxbyte)                                                     \
-	 ? (self[maxbyte] |= ((0xff << minbyte_bitno) |                           \
-	                      (0xff >> (7 - maxbyte_bitno))))                     \
-	 : (self[minbyte] |= 0xff << minbyte_bitno,                               \
-	    __libc_memset(&self[minbyte + 1], 0xff, maxbyte - (minbyte + 1)),     \
+#define __PRIVATE_bit_nset_impl(self, minbyte, maxbyte, minbyte_bitno, maxbyte_bitno) \
+	((minbyte >= maxbyte)                                                             \
+	 ? (self[maxbyte] |= ((0xff << minbyte_bitno) |                                   \
+	                      (0xff >> (7 - maxbyte_bitno))))                             \
+	 : (self[minbyte] |= 0xff << minbyte_bitno,                                       \
+	    __libc_memset(&self[minbyte + 1], 0xff, maxbyte - (minbyte + 1)),             \
 	    self[maxbyte] |= 0xff >> (7 - maxbyte_bitno)))
-#define __bit_nclear(self, minbitno, maxbitno)                     \
+#define __PRIVATE_bit_nclear(self, minbitno, maxbitno)             \
 	__register __size_t __minbyte = (__size_t)_bit_byte(minbitno); \
 	__register __size_t __maxbyte = (__size_t)_bit_byte(maxbitno); \
-	__bit_nclear_impl(self, __minbyte, __maxbyte, (minbitno & 7), (maxbitno & 7))
-#define __bit_nset(self, minbitno, maxbitno)                       \
+	__PRIVATE_bit_nclear_impl(self, __minbyte, __maxbyte, (minbitno & 7), (maxbitno & 7))
+#define __PRIVATE_bit_nset(self, minbitno, maxbitno)               \
 	__register __size_t __minbyte = (__size_t)_bit_byte(minbitno); \
 	__register __size_t __maxbyte = (__size_t)_bit_byte(maxbitno); \
-	__bit_nset_impl(self, __minbyte, __maxbyte, (minbitno & 7), (maxbitno & 7))
+	__PRIVATE_bit_nset_impl(self, __minbyte, __maxbyte, (minbitno & 7), (maxbitno & 7))
 
 
 #ifdef __INTELLISENSE__
@@ -144,110 +144,112 @@ __ATTR_NONNULL((1)) void (bit_nclear)(bitstr_t *__restrict self, int minbitno, i
  *       function still guaranties that nothing but `self' gets modified. */
 __ATTR_NONNULL((1)) void (bit_nset)(bitstr_t *__restrict self, int minbitno, int maxbitno);
 #elif !defined(__NO_XBLOCK)
-#define bit_nclear(self, minbitno, maxbitno)          \
-	__XBLOCK({                                        \
-		__register bitstr_t *__self = (self);         \
-		__register int __minbitno   = (minbitno);     \
-		__register int __maxbitno   = (maxbitno);     \
-		__bit_nclear(__self, __minbitno, __maxbitno); \
-		(void)0;                                      \
+#define bit_nclear(self, minbitno, maxbitno)                              \
+	__XBLOCK({                                                            \
+		__register bitstr_t *__bcn_self = (self);                         \
+		__register int __bnc_minbitno   = (minbitno);                     \
+		__register int __bnc_maxbitno   = (maxbitno);                     \
+		__PRIVATE_bit_nclear(__bcn_self, __bnc_minbitno, __bnc_maxbitno); \
+		(void)0;                                                          \
 	})
-#define bit_nset(self, minbitno, maxbitno)          \
-	__XBLOCK({                                      \
-		__register bitstr_t *__self = (self);       \
-		__register int __minbitno   = (minbitno);   \
-		__register int __maxbitno   = (maxbitno);   \
-		__bit_nset(__self, __minbitno, __maxbitno); \
-		(void)0;                                    \
+#define bit_nset(self, minbitno, maxbitno)                              \
+	__XBLOCK({                                                          \
+		__register bitstr_t *__bns_self = (self);                       \
+		__register int __bns_minbitno   = (minbitno);                   \
+		__register int __bns_maxbitno   = (maxbitno);                   \
+		__PRIVATE_bit_nset(__bns_self, __bns_minbitno, __bns_maxbitno); \
+		(void)0;                                                        \
 	})
 #else /* ... */
 __LOCAL __ATTR_NONNULL((1)) void
 (bit_nclear)(bitstr_t *__restrict __self, int __minbitno, int __maxbitno) {
-	__bit_nclear(__self, __minbitno, __maxbitno);
+	__PRIVATE_bit_nclear(__self, __minbitno, __maxbitno);
 }
 __LOCAL __ATTR_NONNULL((1)) void
 (bit_nset)(bitstr_t *__restrict __self, int __minbitno, int __maxbitno) {
-	__bit_nset(__self, __minbitno, __maxbitno);
+	__PRIVATE_bit_nset(__self, __minbitno, __maxbitno);
 }
 #endif /* !... */
 
 
 
-#define __bit_ffc_impl(self, nbits, result)                 \
-	__register int __bindex, __maxbyte;                     \
-	__maxbyte = _bit_byte(nbits - 1);                       \
-	result    = -1;                                         \
-	for (__bindex = 0; __bindex <= __maxbyte; ++__bindex) { \
-		bitstr_t __byte = self[__bindex];                   \
-		if (__byte == 0xff)                                 \
-			continue;                                       \
-		result = __bindex << 3;                             \
-		while (__byte & 1) {                                \
-			++result;                                       \
-			__byte >>= 1;                                   \
-		}                                                   \
-		break;                                              \
-	}                                                       \
-	if __unlikely(result >= nbits)                          \
+#define __PRIVATE_bit_ffc_impl(self, nbits, result)                             \
+	__register int __bffc_bindex, __bffc_maxbyte;                               \
+	__bffc_maxbyte = _bit_byte(nbits - 1);                                      \
+	result         = -1;                                                        \
+	for (__bffc_bindex = 0; __bffc_bindex <= __bffc_maxbyte; ++__bffc_bindex) { \
+		bitstr_t __byte = self[__bffc_bindex];                                  \
+		if (__byte == 0xff)                                                     \
+			continue;                                                           \
+		result = __bffc_bindex << 3;                                            \
+		while (__byte & 1) {                                                    \
+			++result;                                                           \
+			__byte >>= 1;                                                       \
+		}                                                                       \
+		break;                                                                  \
+	}                                                                           \
+	if __unlikely(result >= nbits)                                              \
 		result = -1;
 
-#define __bit_ffs_impl(self, nbits, result)                 \
-	__register int __bindex, __maxbyte;                     \
-	__maxbyte = _bit_byte(nbits - 1);                       \
-	result    = -1;                                         \
-	for (__bindex = 0; __bindex <= __maxbyte; ++__bindex) { \
-		bitstr_t __byte = self[__bindex];                   \
-		if (__byte == 0)                                    \
-			continue;                                       \
-		result = (__bindex << 3) + __hybrid_ctz8(__byte);   \
-		break;                                              \
-	}                                                       \
-	if __unlikely(result >= nbits)                          \
+#define __PRIVATE_bit_ffs_impl(self, nbits, result)                             \
+	__register int __bffs_bindex, __bffs_maxbyte;                               \
+	__bffs_maxbyte = _bit_byte(nbits - 1);                                      \
+	result         = -1;                                                        \
+	for (__bffs_bindex = 0; __bffs_bindex <= __bffs_maxbyte; ++__bffs_bindex) { \
+		bitstr_t __byte = self[__bffs_bindex];                                  \
+		if (__byte == 0)                                                        \
+			continue;                                                           \
+		result = (__bffs_bindex << 3) + __hybrid_ctz8(__byte);                  \
+		break;                                                                  \
+	}                                                                           \
+	if __unlikely(result >= nbits)                                              \
 		result = -1
 
 #ifdef __INTELLISENSE__
 /* Find the first bitno  within [0, nbits) that  is off and store  its
  * index in `*value'. If no such bit exists, write `-1' into `*value'. */
-__ATTR_NONNULL((1, 3)) void (bit_ffc)(bitstr_t *__restrict self, int nbits, int *value);
+__ATTR_NONNULL((1, 3)) void (bit_ffc)(bitstr_t const *__restrict self, int nbits, int *value);
 /* Find the first  bitno within [0,  nbits) that is  on and store  its
  * index in `*value'. If no such bit exists, write `-1' into `*value'. */
-__ATTR_NONNULL((1, 3)) void (bit_ffs)(bitstr_t *__restrict self, int nbits, int *value);
+__ATTR_NONNULL((1, 3)) void (bit_ffs)(bitstr_t const *__restrict self, int nbits, int *value);
 #elif !defined(__NO_XBLOCK)
-#define bit_ffc(self, nbits, value)                 \
-	__XBLOCK({                                      \
-		__register bitstr_t *__self = (self);       \
-		__register int __result, __nbits = (nbits); \
-		__bit_ffc_impl(__self, __nbits, __result);  \
-		*(value) = __result;                        \
-		(void)0;                                    \
+#define bit_ffc(self, nbits, value)                                       \
+	__XBLOCK({                                                            \
+		__register bitstr_t const *__bffc_self = (self);                  \
+		__register int __bffc_result, __bffc_nbits = (nbits);             \
+		__PRIVATE_bit_ffc_impl(__bffc_self, __bffc_nbits, __bffc_result); \
+		*(value) = __bffc_result;                                         \
+		(void)0;                                                          \
 	})
-#define bit_ffs(self, nbits, value)                 \
-	__XBLOCK({                                      \
-		__register bitstr_t *__self = (self);       \
-		__register int __result, __nbits = (nbits); \
-		__bit_ffs_impl(__self, __nbits, __result);  \
-		*(value) = __result;                        \
-		(void)0;                                    \
+#define bit_ffs(self, nbits, value)                                       \
+	__XBLOCK({                                                            \
+		__register bitstr_t const *__bffs_self = (self);                  \
+		__register int __bffs_result, __bffs_nbits = (nbits);             \
+		__PRIVATE_bit_ffs_impl(__bffs_self, __bffs_nbits, __bffs_result); \
+		*(value) = __bffs_result;                                         \
+		(void)0;                                                          \
 	})
 #else /* ... */
-__LOCAL __ATTR_NONNULL((1, 3)) void
-(bit_ffc)(bitstr_t *__restrict __self, int __nbits, int *__value) {
+#define bit_ffc(self, nbits, value) (void)(*(value) = __PRIVATE_bit_ffc(self, nbits))
+#define bit_ffs(self, nbits, value) (void)(*(value) = __PRIVATE_bit_ffs(self, nbits))
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) int
+__NOTHROW_NCX(__PRIVATE_bit_ffc)(bitstr_t const *__restrict __self, int __nbits) {
 	__register int __result;
-	__bit_ffc_impl(__self, __nbits, __result);
-	*(__value) = __result;
+	__PRIVATE_bit_ffc_impl(__self, __nbits, __result);
+	return __result;
 }
-__LOCAL __ATTR_NONNULL((1, 3)) void
-(bit_ffs)(bitstr_t *__restrict __self, int __nbits, int *__value) {
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) int
+__NOTHROW_NCX(__PRIVATE_bit_ffs)(bitstr_t const *__restrict __self, int __nbits) {
 	__register int __result;
-	__bit_ffs_impl(__self, __nbits, __result);
-	*(__value) = __result;
+	__PRIVATE_bit_ffs_impl(__self, __nbits, __result);
+	return __result;
 }
 #endif /* !... */
 
 #ifdef __USE_KOS
 #define bit_noneset(self, nbits) (!bit_anyset(self, nbits))
-__LOCAL __ATTR_NONNULL((1)) __BOOL
-(bit_anyset)(bitstr_t *__restrict __self, unsigned int __nbits) {
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+__NOTHROW_NCX(bit_anyset)(bitstr_t const *__restrict __self, unsigned int __nbits) {
 	unsigned int __i;
 	for (__i = 0; __i < (__nbits >> 3); ++__i) {
 		if (__self[__i] != 0)
@@ -259,8 +261,8 @@ __LOCAL __ATTR_NONNULL((1)) __BOOL
 	}
 	return 0;
 }
-__LOCAL __ATTR_NONNULL((1)) __BOOL
-(bit_allset)(bitstr_t *__restrict __self, unsigned int __nbits) {
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+__NOTHROW_NCX(bit_allset)(bitstr_t const *__restrict __self, unsigned int __nbits) {
 	unsigned int __i;
 	for (__i = 0; __i < (__nbits >> 3); ++__i) {
 		if (__self[__i] != 0xff)
@@ -273,8 +275,8 @@ __LOCAL __ATTR_NONNULL((1)) __BOOL
 	}
 	return 1;
 }
-__LOCAL __ATTR_NONNULL((1)) __BOOL
-(bit_nanyset)(bitstr_t *__restrict __self, unsigned int __minbitno, unsigned int __maxbitno) {
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+__NOTHROW_NCX(bit_nanyset)(bitstr_t const *__restrict __self, unsigned int __minbitno, unsigned int __maxbitno) {
 	__register __size_t __minbyte = (__size_t)_bit_byte(__minbitno);
 	__register __size_t __maxbyte = (__size_t)_bit_byte(__maxbitno);
 	if (__minbyte >= __maxbyte) {
@@ -294,8 +296,8 @@ __LOCAL __ATTR_NONNULL((1)) __BOOL
 	}
 	return 0;
 }
-__LOCAL __ATTR_NONNULL((1)) unsigned int
-(bit_popcount)(bitstr_t *__restrict __self, unsigned int __nbits) {
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned int
+__NOTHROW_NCX(bit_popcount)(bitstr_t const *__restrict __self, unsigned int __nbits) {
 	unsigned int __result = 0;
 	unsigned int __i;
 	for (__i = 0; __i < (__nbits >> 3); ++__i) {
@@ -309,8 +311,8 @@ __LOCAL __ATTR_NONNULL((1)) unsigned int
 }
 
 /* Count-leading-zeroes (undefined when `self' doesn't contain any set bits) */
-__LOCAL __ATTR_NONNULL((1)) unsigned int
-(bit_clz)(bitstr_t *__restrict __self) {
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned int
+__NOTHROW_NCX(bit_clz)(bitstr_t const *__restrict __self) {
 	bitstr_t __word;
 	unsigned int __result = 0;
 	for (; *__self == 0; ++__self)
@@ -324,8 +326,8 @@ __LOCAL __ATTR_NONNULL((1)) unsigned int
 }
 
 /* Count-trailing-zeroes (undefined when `self' doesn't contain any set bits) */
-__LOCAL __ATTR_NONNULL((1)) unsigned int
-(bit_ctz)(bitstr_t *__restrict __self, unsigned int __nbits) {
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned int
+__NOTHROW_NCX(bit_ctz)(bitstr_t const *__restrict __self, unsigned int __nbits) {
 	bitstr_t __word;
 	unsigned int __result  = 0;
 	unsigned int __byteoff = __nbits >> 3;

@@ -3318,7 +3318,8 @@ DEFINE_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
                 NCX UNCHECKED struct timespec32 const *, times,
                 atflag_t, atflags) {
 	struct timespec atm, mtm, btm;
-	struct timespec *patm, *pmtm;
+	struct timespec *patm = &atm;
+	struct timespec *pmtm = &mtm;
 	struct timespec *pbtm = NULL;
 	REF struct fnode *node;
 	node = lookup_inode_for_utimensat(dirfd, filename, atflags);
@@ -3366,8 +3367,6 @@ DEFINE_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
 do_touch:
 		fnode_request_current_timestamps(node);
 		atm = mtm = realtime();
-		patm = &atm;
-		pmtm = &mtm;
 	}
 	mfile_chtime(node, patm, pmtm, pbtm);
 	return -EOK;
@@ -3380,7 +3379,8 @@ DEFINE_COMPAT_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
                        NCX UNCHECKED struct compat_timespec32 const *, times,
                        atflag_t, atflags) {
 	struct timespec atm, mtm, btm;
-	struct timespec *patm, *pmtm;
+	struct timespec *patm = &atm;
+	struct timespec *pmtm = &mtm;
 	struct timespec *pbtm = NULL;
 	REF struct fnode *node;
 	node = lookup_inode_for_utimensat(dirfd, filename, atflags);
@@ -3451,7 +3451,8 @@ DEFINE_SYSCALL4(errno_t, utimensat_time64, fd_t, dirfd,
 #endif /* !__ARCH_WANT_SYSCALL_UTIMENSAT64 */
 {
 	struct timespec atm, mtm, btm;
-	struct timespec *patm, *pmtm;
+	struct timespec *patm = &atm;
+	struct timespec *pmtm = &mtm;
 	struct timespec *pbtm = NULL;
 	REF struct fnode *node;
 	node = lookup_inode_for_utimensat(dirfd, filename, atflags);
@@ -3522,7 +3523,8 @@ DEFINE_COMPAT_SYSCALL4(errno_t, utimensat_time64, fd_t, dirfd,
 #endif /* !__ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT64 */
 {
 	struct timespec atm, mtm, btm;
-	struct timespec *patm, *pmtm;
+	struct timespec *patm = &atm;
+	struct timespec *pmtm = &mtm;
 	struct timespec *pbtm = NULL;
 	REF struct fnode *node;
 	node = lookup_inode_for_utimensat(dirfd, filename, atflags);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e5a4f7e */
+/* HASH CRC-32:0x89114a4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -259,7 +259,7 @@ NOTHROW_NCX(LIBCCALL libc_bufsplit)(char *string,
 	return count;
 }
 #include <asm/crt/malloc.h>
-INTERN ATTR_SECTION(".text.crt.solaris") ATTR_OUT(2) char *
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_FDREAD(1) ATTR_OUT(2) char *
 NOTHROW_NCX(LIBCCALL libc_fcopylist_sz)(fd_t fd,
                                         size_t *p_filesize) {
 	size_t reslen  = 0;

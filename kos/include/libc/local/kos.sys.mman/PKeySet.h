@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20ce86bd */
+/* HASH CRC-32:0xc57b192d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_END
 #include <kos/except/reason/inval.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(PKeySet) void
-(__LIBCCALL __LIBC_LOCAL_NAME(PKeySet))(int __pkey, unsigned int __access_rights) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(PKeySet))(int __pkey, unsigned int __access_rights) __THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
 	if __unlikely(!__arch_pkey_verify_key(__pkey))
 		(__NAMESPACE_LOCAL_SYM __localdep_except_thrown)(EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE), 2, E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_PKEY, __pkey);
 	if __unlikely(!__arch_pkey_verify_rights(__access_rights))

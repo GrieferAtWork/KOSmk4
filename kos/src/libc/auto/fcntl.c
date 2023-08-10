@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd74a0f3 */
+/* HASH CRC-32:0xd23b271a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ DECL_BEGIN
  * @param: mode: One of `DIRECTIO_*' from `<sys/fcntl.h>'
  * @return:  0: Success
  * @return: -1: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.solaris.io") int
+INTERN ATTR_SECTION(".text.crt.solaris.io") ATTR_FDARG(1) int
 NOTHROW_NCX(LIBCCALL libc_directio)(fd_t fd,
                                     int mode) {
 	return libc_ioctl(fd, __FIODIRECTIO, mode);

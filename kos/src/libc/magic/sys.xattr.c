@@ -86,7 +86,7 @@ int lsetxattr([[in]] char const *path,
 @@>> fsetxattr(2)
 @@@param: flags: One of `XATTR_*', or `0'
 [[cp, decl_include("<features.h>", "<bits/types.h>")]]
-int fsetxattr($fd_t fd,
+int fsetxattr([[fdarg]] $fd_t fd,
               [[in]] char const *name,
               [[in(bufsize)]] void const *buf,
               size_t bufsize,
@@ -108,7 +108,7 @@ ssize_t lgetxattr([[in]] char const *path,
 
 @@>> fgetxattr(2)
 [[cp, decl_include("<bits/types.h>")]]
-ssize_t fgetxattr($fd_t fd,
+ssize_t fgetxattr([[fdarg]] $fd_t fd,
                   [[in]] char const *name,
                   [[out(return <= bufsize)]] void *buf,
                   size_t bufsize);
@@ -127,7 +127,7 @@ ssize_t llistxattr([[in]] char const *path,
 
 @@>> flistxattr(2)
 [[cp, decl_include("<bits/types.h>")]]
-ssize_t flistxattr($fd_t fd,
+ssize_t flistxattr([[fdarg]] $fd_t fd,
                    [[out(return <= listbufsize)]] char *listbuf,
                    size_t listbufsize);
 
@@ -143,7 +143,7 @@ int lremovexattr([[in]] char const *path,
 
 @@>> fremovexattr(2)
 [[cp, decl_include("<bits/types.h>")]]
-int fremovexattr($fd_t fd,
+int fremovexattr([[fdarg]] $fd_t fd,
                  [[in]] char const *name);
 
 

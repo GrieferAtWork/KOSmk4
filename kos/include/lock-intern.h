@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x291c8f39 */
+/* HASH CRC-32:0x9b2c282e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,9 +42,9 @@ typedef unsigned int __spin_lock_t;
 #define __SPIN_LOCK_INITIALIZER 0
 
 #ifdef __CRT_HAVE___spin_lock_init
-__CEIDECLARE(,void,__NOTHROW_NCX,__spin_lock_init,(__spin_lock_t *__lock),{ *__lock = 0; })
+__CEIDECLARE(__ATTR_OUT(1),void,__NOTHROW_NCX,__spin_lock_init,(__spin_lock_t *__lock),{ *__lock = 0; })
 #else /* __CRT_HAVE___spin_lock_init */
-__LOCAL void __NOTHROW_NCX(__LIBCCALL __spin_lock_init)(__spin_lock_t *__lock) { *__lock = 0; }
+__LOCAL __ATTR_OUT(1) void __NOTHROW_NCX(__LIBCCALL __spin_lock_init)(__spin_lock_t *__lock) { *__lock = 0; }
 #endif /* !__CRT_HAVE___spin_lock_init */
 #ifdef __CRT_HAVE___spin_lock_solid
 __CDECLARE_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,__spin_lock_solid,(__spin_lock_t *__lock),(__lock))

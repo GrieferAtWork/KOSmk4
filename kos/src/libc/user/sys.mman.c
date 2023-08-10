@@ -43,14 +43,14 @@ __pragma_GCC_diagnostic_push_ignored(Wmaybe_uninitialized)
 
 DECL_BEGIN
 
-/*[[[head:libc_mmap,hash:CRC-32=0x186b608d]]]*/
+/*[[[head:libc_mmap,hash:CRC-32=0xa645e58d]]]*/
 /* >> mmap(2), mmap64(2)
  * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param flags: One of `MAP_SHARED', 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-INTERN ATTR_SECTION(".text.crt.heap.mman") WUNUSED ATTR_ACCESS_NONE(1) void *
+INTERN ATTR_SECTION(".text.crt.heap.mman") WUNUSED ATTR_ACCESS_NONE(1) ATTR_FDARG(5) void *
 NOTHROW_NCX(LIBCCALL libc_mmap)(void *addr,
                                 size_t len,
                                 __STDC_INT_AS_UINT_T prot,
@@ -200,7 +200,7 @@ NOTHROW_NCX(LIBCCALL libc_mincore)(void *start,
 }
 /*[[[end:libc_mincore]]]*/
 
-/*[[[head:libc_mmap64,hash:CRC-32=0xba06cc64]]]*/
+/*[[[head:libc_mmap64,hash:CRC-32=0xc49f8dce]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_mmap64, libc_mmap);
 #else /* MAGIC:alias */
@@ -210,7 +210,7 @@ DEFINE_INTERN_ALIAS(libc_mmap64, libc_mmap);
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-INTERN ATTR_SECTION(".text.crt.heap.mman") WUNUSED ATTR_ACCESS_NONE(1) void *
+INTERN ATTR_SECTION(".text.crt.heap.mman") WUNUSED ATTR_ACCESS_NONE(1) ATTR_FDARG(5) void *
 NOTHROW_NCX(LIBCCALL libc_mmap64)(void *addr,
                                   size_t len,
                                   __STDC_INT_AS_UINT_T prot,

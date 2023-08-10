@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x369e7e0 */
+/* HASH CRC-32:0x1ea38f7f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -991,7 +991,7 @@ __CDECLARE_OPT(__ATTR_OUT(4),int,__NOTHROW_NCX,socketpair,(__STDC_INT_AS_UINT_T 
  * @return: -1: [errno=EINVAL]        E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND
  * @return: -1: [errno=EADDRNOTAVAIL] E_NET_ADDRESS_NOT_AVAILABLE
  * @return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (`addr_len' is incorrect) */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,bind,(__fd_t __sockfd, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),(__sockfd,__addr,__addr_len))
+__CDECLARE_OPT(__ATTR_FDARG(1),int,__NOTHROW_NCX,bind,(__fd_t __sockfd, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),(__sockfd,__addr,__addr_len))
 /* >> getsockname(2)
  * Determine the local address (aka. name) for the given socket `sockfd'.
  * This  is usually the  same address as was  previously set by `bind(2)'
@@ -1005,7 +1005,7 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,bind,(__fd_t __sockfd, __CONST_SOCKADDR_ARG __
  *                         the  address was truncated and may be invalid.
  * return: 0 : Success
  * return: -1: Error (s.a. `errno') */
-__CDECLARE_OPT(__ATTR_INOUT(3),int,__NOTHROW_NCX,getsockname,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
+__CDECLARE_OPT(__ATTR_FDARG(1) __ATTR_INOUT(3),int,__NOTHROW_NCX,getsockname,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
 #ifdef __CRT_HAVE_connect
 /* >> connect(2)
  * Connect to the specified address.
@@ -1018,7 +1018,7 @@ __CDECLARE_OPT(__ATTR_INOUT(3),int,__NOTHROW_NCX,getsockname,(__fd_t __sockfd, _
  * @return: -1: [errno=EADDRNOTAVAIL] E_NET_ADDRESS_NOT_AVAILABLE
  * @return: -1: [errno=ECONNREFUSED]  E_NET_CONNECTION_REFUSED
  * @return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (addr_len is incorrect) */
-__CDECLARE(,int,__NOTHROW_RPC,connect,(__fd_t __sockfd, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),(__sockfd,__addr,__addr_len))
+__CDECLARE(__ATTR_FDARG(1),int,__NOTHROW_RPC,connect,(__fd_t __sockfd, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),(__sockfd,__addr,__addr_len))
 #elif defined(__CRT_HAVE___connect)
 /* >> connect(2)
  * Connect to the specified address.
@@ -1031,7 +1031,7 @@ __CDECLARE(,int,__NOTHROW_RPC,connect,(__fd_t __sockfd, __CONST_SOCKADDR_ARG __a
  * @return: -1: [errno=EADDRNOTAVAIL] E_NET_ADDRESS_NOT_AVAILABLE
  * @return: -1: [errno=ECONNREFUSED]  E_NET_CONNECTION_REFUSED
  * @return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (addr_len is incorrect) */
-__CREDIRECT(,int,__NOTHROW_RPC,connect,(__fd_t __sockfd, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),__connect,(__sockfd,__addr,__addr_len))
+__CREDIRECT(__ATTR_FDARG(1),int,__NOTHROW_RPC,connect,(__fd_t __sockfd, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),__connect,(__sockfd,__addr,__addr_len))
 #endif /* ... */
 /* >> getpeername(2)
  * Lookup the peer (remote) address of `sockfd' and store it in `*addr...+=*addr_len'
@@ -1043,7 +1043,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,connect,(__fd_t __sockfd, __CONST_SOCKADDR_ARG __
  * @return: 0 : Success
  * @return: -1: [errno=ENOTCONN] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE_OPT(__ATTR_INOUT(3),int,__NOTHROW_NCX,getpeername,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
+__CDECLARE_OPT(__ATTR_FDARG(1) __ATTR_INOUT(3),int,__NOTHROW_NCX,getpeername,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
 #ifdef __CRT_HAVE_send
 /* >> send(2)
  * Send the contents of a given buffer over the given socket `sockfd'.
@@ -1054,7 +1054,7 @@ __CDECLARE_OPT(__ATTR_INOUT(3),int,__NOTHROW_NCX,getpeername,(__fd_t __sockfd, _
  * @return: -1: [errno=EMSGSIZE]     E_NET_MESSAGE_TOO_LONG
  * @return: -1: [errno=ECONNRESET]   E_NET_CONNECTION_RESET
  * @return: -1: [errno=EPIPE]        E_NET_SHUTDOWN */
-__CDECLARE(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,send,(__fd_t __sockfd, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__buf,__bufsize,__msg_flags))
+__CDECLARE(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,send,(__fd_t __sockfd, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__buf,__bufsize,__msg_flags))
 #elif defined(__CRT_HAVE___send)
 /* >> send(2)
  * Send the contents of a given buffer over the given socket `sockfd'.
@@ -1065,7 +1065,7 @@ __CDECLARE(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,send,(__fd_t __sockfd, void co
  * @return: -1: [errno=EMSGSIZE]     E_NET_MESSAGE_TOO_LONG
  * @return: -1: [errno=ECONNRESET]   E_NET_CONNECTION_RESET
  * @return: -1: [errno=EPIPE]        E_NET_SHUTDOWN */
-__CREDIRECT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,send,(__fd_t __sockfd, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags),__send,(__sockfd,__buf,__bufsize,__msg_flags))
+__CREDIRECT(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,send,(__fd_t __sockfd, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags),__send,(__sockfd,__buf,__bufsize,__msg_flags))
 #endif /* ... */
 #ifdef __CRT_HAVE_recv
 /* >> recv(2)
@@ -1075,7 +1075,7 @@ __CREDIRECT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,send,(__fd_t __sockfd, void c
  * @return: * : [<= bufsize] The actual # of received bytes
  * @return: -1: [errno=ENOTCONN]     E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
  * @return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED */
-__CDECLARE(__ATTR_WUNUSED __ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,recv,(__fd_t __sockfd, void *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__buf,__bufsize,__msg_flags))
+__CDECLARE(__ATTR_WUNUSED __ATTR_FDREAD(1) __ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,recv,(__fd_t __sockfd, void *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__buf,__bufsize,__msg_flags))
 #elif defined(__CRT_HAVE___recv)
 /* >> recv(2)
  * Receive data over the given socket `sockfd', and store the contents within the given buffer.
@@ -1084,7 +1084,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,recv,(__fd_t _
  * @return: * : [<= bufsize] The actual # of received bytes
  * @return: -1: [errno=ENOTCONN]     E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
  * @return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,recv,(__fd_t __sockfd, void *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags),__recv,(__sockfd,__buf,__bufsize,__msg_flags))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDREAD(1) __ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,recv,(__fd_t __sockfd, void *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags),__recv,(__sockfd,__buf,__bufsize,__msg_flags))
 #endif /* ... */
 /* >> sendto(2)
  * Send the contents of a given buffer over this socket to the specified address
@@ -1102,7 +1102,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,recv,(__fd_t 
  * @return: -1: [errno=ECONNRESET]   E_NET_CONNECTION_RESET
  * @return: -1: [errno=EPIPE]        E_NET_SHUTDOWN
  * @return: -1: [errno=ERANGE]       E_BUFFER_TOO_SMALL  (`addr_len' is incorrect) */
-__CDECLARE_OPT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,sendto,(__fd_t __sockfd, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),(__sockfd,__buf,__bufsize,__msg_flags,__addr,__addr_len))
+__CDECLARE_OPT(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,sendto,(__fd_t __sockfd, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),(__sockfd,__buf,__bufsize,__msg_flags,__addr,__addr_len))
 /* >> recvfrom(2)
  * Receive data over this socket, and store the contents within the given buffer.
  * @param: buf:       Buffer to-be filled with up to `bufsize' bytes of received data
@@ -1119,7 +1119,7 @@ __CDECLARE_OPT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,sendto,(__fd_t __sockfd, v
  * @return: -1: [errno=ENOTCONN]     E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
  * @return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED
  * @return: -1: [errno=EAGAIN]       E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked) */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_INOUT_OPT(6) __ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,recvfrom,(__fd_t __sockfd, void *__restrict __buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__buf,__bufsize,__msg_flags,__addr,__addr_len))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_FDREAD(1) __ATTR_INOUT_OPT(6) __ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,recvfrom,(__fd_t __sockfd, void *__restrict __buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__buf,__bufsize,__msg_flags,__addr,__addr_len))
 /* >> sendmsg(2)
  * Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
  * data as well as  for data buffers  to be represented  by an IOV  vector.
@@ -1127,7 +1127,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_INOUT_OPT(6) __ATTR_OUTS(2, 3),ssize_t,__NO
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @return: * : [<= bufsize] The actual # of send payload bytes
  * @return: -1: ... Same as for `send(2)' and `sendto(2)' */
-__CDECLARE_OPT(__ATTR_IN(2),ssize_t,__NOTHROW_RPC,sendmsg,(__fd_t __sockfd, struct msghdr const *__message, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__message,__msg_flags))
+__CDECLARE_OPT(__ATTR_FDWRITE(1) __ATTR_IN(2),ssize_t,__NOTHROW_RPC,sendmsg,(__fd_t __sockfd, struct msghdr const *__message, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__message,__msg_flags))
 /* >> recvmsg(2)
  * Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
  * data as  well as  for  data buffers  to be  represented  by an  IOV  vector.
@@ -1136,7 +1136,7 @@ __CDECLARE_OPT(__ATTR_IN(2),ssize_t,__NOTHROW_RPC,sendmsg,(__fd_t __sockfd, stru
  *                            MSG_PEEK  |  MSG_TRUNC  |  MSG_WAITALL'
  * @return: * : [<= bufsize] The actual # of received payload bytes
  * @return: -1: ... Same as for `recv(2)' and `recvfrom(2)' */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_INOUT(2),ssize_t,__NOTHROW_RPC,recvmsg,(__fd_t __sockfd, struct msghdr *__message, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__message,__msg_flags))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_FDREAD(1) __ATTR_INOUT(2),ssize_t,__NOTHROW_RPC,recvmsg,(__fd_t __sockfd, struct msghdr *__message, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__message,__msg_flags))
 /* >> getsockopt(2)
  * Get the value of the named socket option `level:optname' and store it in `optval'
  * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
@@ -1148,7 +1148,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_INOUT(2),ssize_t,__NOTHROW_RPC,recvmsg,(__f
  *                        the  contents  of   `optval'  are   undefined.
  * @return: 0 : Success
  * @return: -1: [errno=ENOPROTOOPT] E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT */
-__CDECLARE_OPT(__ATTR_INOUT(5) __ATTR_OUT(4),int,__NOTHROW_NCX,getsockopt,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __level, __STDC_INT_AS_UINT_T __optname, void *__restrict __optval, socklen_t *__restrict __optlen),(__sockfd,__level,__optname,__optval,__optlen))
+__CDECLARE_OPT(__ATTR_FDARG(1) __ATTR_INOUT(5) __ATTR_OUT(4),int,__NOTHROW_NCX,getsockopt,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __level, __STDC_INT_AS_UINT_T __optname, void *__restrict __optval, socklen_t *__restrict __optlen),(__sockfd,__level,__optname,__optval,__optlen))
 /* >> setsockopt(2)
  * Set the value of the named socket option `level:optname' from what is given in `optval'
  * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
@@ -1158,7 +1158,7 @@ __CDECLARE_OPT(__ATTR_INOUT(5) __ATTR_OUT(4),int,__NOTHROW_NCX,getsockopt,(__fd_
  * @return: 0 : Success
  * @return: -1: [errno=ENOPROTOOPT] E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT
  * @return: -1: [errno=ERANGE]      E_BUFFER_TOO_SMALL  (The specified `optlen' is invalid for the given option) */
-__CDECLARE_OPT(__ATTR_INS(4, 5),int,__NOTHROW_NCX,setsockopt,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __level, __STDC_INT_AS_UINT_T __optname, void const *__optval, socklen_t __optlen),(__sockfd,__level,__optname,__optval,__optlen))
+__CDECLARE_OPT(__ATTR_FDARG(1) __ATTR_INS(4, 5),int,__NOTHROW_NCX,setsockopt,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __level, __STDC_INT_AS_UINT_T __optname, void const *__optval, socklen_t __optlen),(__sockfd,__level,__optname,__optval,__optlen))
 /* >> listen(2)
  * Begin to listen for incoming client (aka. peer) connection requests.
  * @param: max_backlog: The max number of clients  pending to be accept(2)-ed,  before
@@ -1168,7 +1168,7 @@ __CDECLARE_OPT(__ATTR_INS(4, 5),int,__NOTHROW_NCX,setsockopt,(__fd_t __sockfd, _
  * @return: 0 : Success
  * @return: -1: [errno=EADDRINUSE]  E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN
  * @return: -1: [errno=EOPNOTSUPP]  E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_LISTEN */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,listen,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __max_backlog),(__sockfd,__max_backlog))
+__CDECLARE_OPT(__ATTR_FDARG(1),int,__NOTHROW_NCX,listen,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __max_backlog),(__sockfd,__max_backlog))
 /* >> accept(2)
  * Accept incoming client (aka. peer) connection requests.
  * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
@@ -1183,7 +1183,7 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,listen,(__fd_t __sockfd, __STDC_INT_AS_UINT_T 
  * @return: -1: [errno=EINVAL]       E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING
  * @return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT */
-__CDECLARE_OPT(__ATTR_INOUT_OPT(3),__fd_t,__NOTHROW_RPC,accept,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
+__CDECLARE_OPT(__ATTR_FDARG(1) __ATTR_INOUT_OPT(3),__fd_t,__NOTHROW_RPC,accept,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
 /* >> shutdown(2)
  * Disallow further reception of data (causing `recv(2)' to return `0' as soon
  * as  all currently queued  data has been  read), and/or further transmission
@@ -1191,7 +1191,7 @@ __CDECLARE_OPT(__ATTR_INOUT_OPT(3),__fd_t,__NOTHROW_RPC,accept,(__fd_t __sockfd,
  * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
  * @return: 0 : Success
  * @return: -1: [errno=ENOTCONN] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,shutdown,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __how),(__sockfd,__how))
+__CDECLARE_OPT(__ATTR_FDARG(1),int,__NOTHROW_NCX,shutdown,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __how),(__sockfd,__how))
 
 #if defined(__USE_GNU) || defined(__USE_BSD)
 /* >> accept4(2)
@@ -1209,7 +1209,7 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,shutdown,(__fd_t __sockfd, __STDC_INT_AS_UINT_
  * @return: -1: [errno=EINVAL]       E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING
  * @return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT */
-__CDECLARE_OPT(__ATTR_INOUT_OPT(3),__fd_t,__NOTHROW_RPC,accept4,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len, __STDC_INT_AS_UINT_T __sock_flags),(__sockfd,__addr,__addr_len,__sock_flags))
+__CDECLARE_OPT(__ATTR_FDARG(1) __ATTR_INOUT_OPT(3),__fd_t,__NOTHROW_RPC,accept4,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len, __STDC_INT_AS_UINT_T __sock_flags),(__sockfd,__addr,__addr_len,__sock_flags))
 #endif /* __USE_GNU || __USE_BSD */
 
 #ifdef __USE_GNU
@@ -1221,7 +1221,7 @@ __CDECLARE_OPT(__ATTR_INOUT_OPT(3),__fd_t,__NOTHROW_RPC,accept4,(__fd_t __sockfd
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @return: * : The # of datagrams successfully sent.
  * @return: -1: ... Same as `sendmsg(2)' */
-__CDECLARE(__ATTR_INOUT(2),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__vmessages,__vlen,__msg_flags))
+__CDECLARE(__ATTR_FDWRITE(1) __ATTR_INOUT(2),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__vmessages,__vlen,__msg_flags))
 #elif defined(__CRT_HAVE___sendmmsg)
 /* >> sendmmsg(2)
  * Same as `sendmsg(2)', but may be used to send many
@@ -1230,7 +1230,7 @@ __CDECLARE(__ATTR_INOUT(2),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,sendmmsg,(__fd_t 
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @return: * : The # of datagrams successfully sent.
  * @return: -1: ... Same as `sendmsg(2)' */
-__CREDIRECT(__ATTR_INOUT(2),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags),__sendmmsg,(__sockfd,__vmessages,__vlen,__msg_flags))
+__CREDIRECT(__ATTR_FDWRITE(1) __ATTR_INOUT(2),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags),__sendmmsg,(__sockfd,__vmessages,__vlen,__msg_flags))
 #endif /* ... */
 #if defined(__CRT_HAVE_recvmmsg) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> recvmmsg(2)
@@ -1242,7 +1242,7 @@ __CREDIRECT(__ATTR_INOUT(2),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,sendmmsg,(__fd_t
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-__CDECLARE(__ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+__CDECLARE(__ATTR_FDREAD(1) __ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #elif defined(__CRT_HAVE_recvmmsg64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> recvmmsg(2)
  * Same as `recvmsg(2)', but may be used to receive many
@@ -1253,7 +1253,7 @@ __CDECLARE(__ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-__CREDIRECT(__ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec *__tmo),recvmmsg64,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+__CREDIRECT(__ATTR_FDREAD(1) __ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec *__tmo),recvmmsg64,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #elif defined(__CRT_HAVE_recvmmsg64) || defined(__CRT_HAVE_recvmmsg)
 #include <libc/local/sys.socket/recvmmsg.h>
 /* >> recvmmsg(2)
@@ -1265,7 +1265,7 @@ __CREDIRECT(__ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(recvmmsg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL recvmmsg)(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec *__tmo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recvmmsg))(__sockfd, __vmessages, __vlen, __msg_flags, __tmo); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(recvmmsg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDREAD(1) __ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL recvmmsg)(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec *__tmo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recvmmsg))(__sockfd, __vmessages, __vlen, __msg_flags, __tmo); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_recvmmsg) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -1278,7 +1278,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(recvmmsg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-__CREDIRECT(__ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec64 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+__CREDIRECT(__ATTR_FDREAD(1) __ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec64 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #elif defined(__CRT_HAVE_recvmmsg64)
 /* >> recvmmsg(2)
  * Same as `recvmsg(2)', but may be used to receive many
@@ -1289,7 +1289,7 @@ __CREDIRECT(__ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-__CDECLARE(__ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec64 *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+__CDECLARE(__ATTR_FDREAD(1) __ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec64 *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #elif defined(__CRT_HAVE_recvmmsg)
 #include <libc/local/sys.socket/recvmmsg64.h>
 /* >> recvmmsg(2)
@@ -1301,7 +1301,7 @@ __CDECLARE(__ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(recvmmsg64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL recvmmsg64)(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec64 *__tmo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recvmmsg64))(__sockfd, __vmessages, __vlen, __msg_flags, __tmo); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(recvmmsg64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDREAD(1) __ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL recvmmsg64)(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec64 *__tmo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recvmmsg64))(__sockfd, __vmessages, __vlen, __msg_flags, __tmo); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_GNU */
@@ -1312,7 +1312,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(recvmmsg64, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * @return: > 0 : The read-pointer is pointing at out-of-band data
  * @return: == 0: The read-pointer is not pointing at out-of-band data
  * @return: < 0 : Error (s.a. `errno') */
-__CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,sockatmark,(__fd_t __sockfd),(__sockfd))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_FDARG(1),int,__NOTHROW_NCX,sockatmark,(__fd_t __sockfd),(__sockfd))
 #endif /* __USE_XOPEN2K */
 
 #ifdef __USE_MISC
@@ -1322,7 +1322,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,sockatmark,(__fd_t __sockfd),(__
  * @return: 1 : `fd' matches the given type
  * @return: 0 : `fd' doesn't match the given type
  * @return: -1: error (s.a. `errno') */
-__CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,isfdtype,(__fd_t __fd, __STDC_INT_AS_UINT_T __fdtype),(__fd,__fdtype))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_FDARG(1),int,__NOTHROW_NCX,isfdtype,(__fd_t __fd, __STDC_INT_AS_UINT_T __fdtype),(__fd,__fdtype))
 #endif /* __USE_MISC */
 
 #ifdef __USE_BSD
@@ -1331,12 +1331,12 @@ __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,isfdtype,(__fd_t __fd, __STDC_IN
 #ifdef __CRT_HAVE_getpeereid
 /* >> getpeereid(3)
  * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
-__CDECLARE(__ATTR_OUT(2) __ATTR_OUT(3),int,__NOTHROW_NCX,getpeereid,(__fd_t __sockfd, uid_t *__euid, gid_t *__egid),(__sockfd,__euid,__egid))
+__CDECLARE(__ATTR_FDARG(1) __ATTR_OUT(2) __ATTR_OUT(3),int,__NOTHROW_NCX,getpeereid,(__fd_t __sockfd, uid_t *__euid, gid_t *__egid),(__sockfd,__euid,__egid))
 #elif defined(__CRT_HAVE_getsockopt) && defined(__SOL_SOCKET) && defined(__SO_PEERCRED)
 #include <libc/local/unistd/getpeereid.h>
 /* >> getpeereid(3)
  * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getpeereid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(2) __ATTR_OUT(3) int __NOTHROW_NCX(__LIBCCALL getpeereid)(__fd_t __sockfd, uid_t *__euid, gid_t *__egid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpeereid))(__sockfd, __euid, __egid); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getpeereid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __ATTR_OUT(2) __ATTR_OUT(3) int __NOTHROW_NCX(__LIBCCALL getpeereid)(__fd_t __sockfd, uid_t *__euid, gid_t *__egid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpeereid))(__sockfd, __euid, __egid); })
 #else /* ... */
 #undef __getpeereid_defined
 #endif /* !... */

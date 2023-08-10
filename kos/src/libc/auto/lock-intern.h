@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a7c5030 */
+/* HASH CRC-32:0x7427dcd6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF void NOTHROW_NCX(LIBCCALL libc___spin_lock_init)(__spin_lock_t *lock);
+INTDEF ATTR_OUT(1) void NOTHROW_NCX(LIBCCALL libc___spin_lock_init)(__spin_lock_t *lock);
 INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc___spin_lock_solid)(__spin_lock_t *lock);
 INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc___spin_unlock)(__spin_lock_t *lock);
 INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc___spin_try_lock)(__spin_lock_t *lock);

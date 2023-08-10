@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8c836f9 */
+/* HASH CRC-32:0x104182c6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,13 +58,13 @@ __CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statfs,(char const *__f
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statfs,(char const *__file, struct statfs *__buf),statfs64,(__file,__buf))
 #endif /* ... */
 #if defined(__CRT_HAVE_fstatfs) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
-__CDECLARE(__ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs,(__fd_t __filedes, struct statfs *__buf),(__filedes,__buf))
+__CDECLARE(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs,(__fd_t __filedes, struct statfs *__buf),(__filedes,__buf))
 #elif defined(__CRT_HAVE___fstatfs) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs,(__fd_t __filedes, struct statfs *__buf),__fstatfs,(__filedes,__buf))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs,(__fd_t __filedes, struct statfs *__buf),__fstatfs,(__filedes,__buf))
 #elif defined(__CRT_HAVE___libc_fstatfs) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs,(__fd_t __filedes, struct statfs *__buf),__libc_fstatfs,(__filedes,__buf))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs,(__fd_t __filedes, struct statfs *__buf),__libc_fstatfs,(__filedes,__buf))
 #elif defined(__CRT_HAVE_fstatfs64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs,(__fd_t __filedes, struct statfs *__buf),fstatfs64,(__filedes,__buf))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs,(__fd_t __filedes, struct statfs *__buf),fstatfs64,(__filedes,__buf))
 #endif /* ... */
 
 #ifdef __USE_LARGEFILE64
@@ -82,15 +82,15 @@ __CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,statfs64,(const char *__
 #endif /* ... */
 #endif /* !statfs64 */
 #if defined(__CRT_HAVE_fstatfs) && defined(_STATFS_MATCHES_STATFS64)
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs64,(__fd_t __filedes, struct statfs64 *__buf),fstatfs,(__filedes,__buf))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs64,(__fd_t __filedes, struct statfs64 *__buf),fstatfs,(__filedes,__buf))
 #elif defined(__CRT_HAVE_fstatfs) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs64,(__fd_t __filedes, struct statfs64 *__buf),fstatfs,(__filedes,__buf))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs64,(__fd_t __filedes, struct statfs64 *__buf),fstatfs,(__filedes,__buf))
 #elif defined(__CRT_HAVE___fstatfs) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs64,(__fd_t __filedes, struct statfs64 *__buf),__fstatfs,(__filedes,__buf))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs64,(__fd_t __filedes, struct statfs64 *__buf),__fstatfs,(__filedes,__buf))
 #elif defined(__CRT_HAVE___libc_fstatfs) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs64,(__fd_t __filedes, struct statfs64 *__buf),__libc_fstatfs,(__filedes,__buf))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs64,(__fd_t __filedes, struct statfs64 *__buf),__libc_fstatfs,(__filedes,__buf))
 #elif defined(__CRT_HAVE_fstatfs64)
-__CDECLARE(__ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs64,(__fd_t __filedes, struct statfs64 *__buf),(__filedes,__buf))
+__CDECLARE(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,fstatfs64,(__fd_t __filedes, struct statfs64 *__buf),(__filedes,__buf))
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 

@@ -753,7 +753,7 @@ unwind_emulator_exec_autostack(unwind_emulator_t *__restrict __self,
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
-/* Load the effective l-value address of `self' into `*paddr':
+/* Load the effective l-value address of `self' into `*p_addr':
  *   UNWIND_STE_CONSTANT:     Write-back s_uconst or s_sconst
  *   UNWIND_STE_STACKVALUE:   Write-back s_uconst or s_sconst
  *   UNWIND_STE_REGISTER:     Write-back REGISTER[s_register] + s_regoffset
@@ -763,15 +763,15 @@ unwind_emulator_exec_autostack(unwind_emulator_t *__restrict __self,
  * @return: UNWIND_SUCCESS:                      Success.
  * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `self'
  * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `self' */
-typedef __ATTR_NONNULL_T((1, 2, 4)) unwind_errno_t
+typedef __ATTR_NONNULL_T((1, 2)) __ATTR_OUT_T(4) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_STE_ADDR)(unwind_ste_t const *__restrict __self,
                                                 unwind_getreg_t __regget, void const *__regget_arg,
-                                                __NCX void **__restrict __paddr);
+                                                __NCX void **__restrict __p_addr);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4)) unwind_errno_t
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) __ATTR_OUT(4) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_ste_addr)(unwind_ste_t const *__restrict __self,
                                             unwind_getreg_t __regget, void const *__regget_arg,
-                                            __NCX void **__restrict __paddr);
+                                            __NCX void **__restrict __p_addr);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
@@ -834,19 +834,19 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_instruction_succ)(__NCX __byte_t const *__unwi
 
 /* Return a pointer to a CFI expression that is applicable for `module_relative_pc'
  * If no such expression exists, return `NULL' instead. */
-typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 5)) __NCX __byte_t *
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __ATTR_OUT_T(5) __NCX __byte_t *
 __NOTHROW_NCX_T(LIBUNWIND_CC *PDEBUGINFO_LOCATION_SELECT)(di_debuginfo_location_t const *__restrict __self,
                                                           __uintptr_t __cu_base,
                                                           __uintptr_t __module_relative_pc,
                                                           __uint8_t __addrsize,
-                                                          __size_t *__restrict __pexpr_length);
+                                                          __size_t *__restrict __p_expr_length);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 5)) __byte_t *
+LIBUNWIND_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_OUT(5) __byte_t *
 __NOTHROW_NCX(LIBUNWIND_CC debuginfo_location_select)(di_debuginfo_location_t const *__restrict __self,
                                                       __uintptr_t __cu_base,
                                                       __uintptr_t __module_relative_pc,
                                                       __uint8_t __addrsize,
-                                                      __size_t *__restrict __pexpr_length);
+                                                      __size_t *__restrict __p_expr_length);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 

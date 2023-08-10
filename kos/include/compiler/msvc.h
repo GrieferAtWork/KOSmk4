@@ -277,6 +277,9 @@
 #define __ATTR_IN(ptr_index)                 /* Nothing */
 #define __ATTR_OUT(ptr_index)                /* Nothing */
 #define __ATTR_INOUT(ptr_index)              /* Nothing */
+#define __ATTR_FDARG(fd_index)               /* Nothing */
+#define __ATTR_FDREAD(fd_index)              /* Nothing */
+#define __ATTR_FDWRITE(fd_index)             /* Nothing */
 
 #define __IF0    __pragma(warning(suppress: 4127)) if(0)
 #define __IF1    __pragma(warning(suppress: 4127)) if(1)

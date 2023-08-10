@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8853b4a */
+/* HASH CRC-32:0xa29f5012 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ DECL_BEGIN
  * @return: * : The return value depends on the given `request'.
  * @return: 0 : A zero return-value usually indicates success.
  * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
-INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_RPC(VLIBCCALL libc_ioctl)(fd_t fd, ioctl_t request, ...);
+INTDEF ATTR_FDARG(1) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(VLIBCCALL libc_ioctl)(fd_t fd, ioctl_t request, ...);
 #endif /* !__KERNEL__ */
 
 DECL_END

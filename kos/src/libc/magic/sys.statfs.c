@@ -63,7 +63,7 @@ int statfs([[in]] char const *file, [[out]] struct statfs *buf);
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("fstatfs", "__fstatfs", "__libc_fstatfs")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("fstatfs64")]]
 [[export_as("__fstatfs", "__libc_fstatfs")]]
-int fstatfs($fd_t filedes, [[out]] struct statfs *buf);
+int fstatfs([[fdarg]] $fd_t filedes, [[out]] struct statfs *buf);
 
 %
 %#ifdef __USE_LARGEFILE64
@@ -77,7 +77,7 @@ int statfs64([[in]] const char *file, [[out]] struct statfs64 *buf);
 [[decl_include("<bits/os/statfs.h>")]]
 [[preferred_statfs64_variant_of(fstatfs), doc_alias("fstatfs")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("fstatfs", "__fstatfs", "__libc_fstatfs")]]
-int fstatfs64($fd_t filedes, [[out]] struct statfs64 *buf);
+int fstatfs64([[fdarg]] $fd_t filedes, [[out]] struct statfs64 *buf);
 %#endif /* __USE_LARGEFILE64 */
 
 

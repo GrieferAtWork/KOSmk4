@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7655f3b6 */
+/* HASH CRC-32:0x3533b448 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -106,7 +106,7 @@ INTDEF unsigned int NOTHROW_RPC(LIBDCALL libd_sleep)(unsigned int seconds);
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
  * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
-INTDEF int NOTHROW_RPC(LIBDCALL libd_fsync)(fd_t fd);
+INTDEF ATTR_FDWRITE(1) int NOTHROW_RPC(LIBDCALL libd_fsync)(fd_t fd);
 /* >> setpgid(2)
  * Change  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
@@ -143,45 +143,45 @@ INTDEF unsigned int NOTHROW_NCX(LIBDCALL libd_alarm)(unsigned int seconds);
  * return: * : The configuration limit associated with `name' for `fd'
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `fd'
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
-INTDEF WUNUSED longptr_t NOTHROW_RPC(LIBDCALL libd_fpathconf)(fd_t fd, __STDC_INT_AS_UINT_T name);
+INTDEF WUNUSED ATTR_FDARG(1) longptr_t NOTHROW_RPC(LIBDCALL libd_fpathconf)(fd_t fd, __STDC_INT_AS_UINT_T name);
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
-INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_ttyname)(fd_t fd);
+INTDEF WUNUSED ATTR_FDARG(1) char *NOTHROW_RPC(LIBDCALL libd_ttyname)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
-INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_ttyname)(fd_t fd);
+INTDEF WUNUSED ATTR_FDARG(1) char *NOTHROW_RPC(LIBCCALL libc_ttyname)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTDEF ATTR_OUTS(2, 3) errno_t NOTHROW_RPC(LIBDCALL libd_ttyname_r)(fd_t fd, char *buf, size_t buflen);
+INTDEF ATTR_FDARG(1) ATTR_OUTS(2, 3) errno_t NOTHROW_RPC(LIBDCALL libd_ttyname_r)(fd_t fd, char *buf, size_t buflen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTDEF ATTR_OUTS(2, 3) errno_t NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd, char *buf, size_t buflen);
+INTDEF ATTR_FDARG(1) ATTR_OUTS(2, 3) errno_t NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd, char *buf, size_t buflen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
-INTDEF WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_tcgetpgrp)(fd_t fd);
+INTDEF WUNUSED ATTR_FDARG(1) pid_t NOTHROW_NCX(LIBDCALL libd_tcgetpgrp)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
-INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_tcgetpgrp)(fd_t fd);
+INTDEF WUNUSED ATTR_FDARG(1) pid_t NOTHROW_NCX(LIBCCALL libc_tcgetpgrp)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tcsetpgrp(2)
  * Set the foreground process group of a given TTY file descriptor */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_tcsetpgrp)(fd_t fd, pid_t pgrp_id);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_tcsetpgrp)(fd_t fd, pid_t pgrp_id);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tcsetpgrp(2)
  * Set the foreground process group of a given TTY file descriptor */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_tcsetpgrp)(fd_t fd, pid_t pgrp_id);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBCCALL libc_tcsetpgrp)(fd_t fd, pid_t pgrp_id);
 /* >> getlogin(3)
  * Return the login name for the current user, or `NULL' on error.
  * s.a. `getlogin_r()' and `cuserid()' */
@@ -195,7 +195,7 @@ INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_getlogin)(void);
  * was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
-INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_read)(fd_t fd, void *buf, size_t bufsize);
+INTDEF ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_read)(fd_t fd, void *buf, size_t bufsize);
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much  data
@@ -203,7 +203,7 @@ INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_read)(fd_t fd, void *bu
  * if no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
-INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_write)(fd_t fd, void const *buf, size_t bufsize);
+INTDEF ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_write)(fd_t fd, void const *buf, size_t bufsize);
 /* >> readall(3)
  * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
@@ -211,7 +211,7 @@ INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_write)(fd_t fd, void con
  * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
-INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_readall)(fd_t fd, void *buf, size_t bufsize);
+INTDEF ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_readall)(fd_t fd, void *buf, size_t bufsize);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> readall(3)
@@ -221,21 +221,21 @@ INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_readall)(fd_t fd, void 
  * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
-INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_readall)(fd_t fd, void *buf, size_t bufsize);
+INTDEF ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_readall)(fd_t fd, void *buf, size_t bufsize);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> writeall(3)
  * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
-INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_writeall)(fd_t fd, void const *buf, size_t bufsize);
+INTDEF ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_writeall)(fd_t fd, void const *buf, size_t bufsize);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> writeall(3)
  * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
-INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_writeall)(fd_t fd, void const *buf, size_t bufsize);
+INTDEF ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_writeall)(fd_t fd, void const *buf, size_t bufsize);
 #endif /* !__KERNEL__ */
 #include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
@@ -253,85 +253,85 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(__FORMATPRINTER_CC libc_write_printer)(v
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-INTDEF off_t NOTHROW_NCX(LIBDCALL libd_lseek)(fd_t fd, off_t offset, __STDC_INT_AS_UINT_T whence);
+INTDEF ATTR_FDARG(1) off_t NOTHROW_NCX(LIBDCALL libd_lseek)(fd_t fd, off_t offset, __STDC_INT_AS_UINT_T whence);
 /* >> isatty(2)
  * Check if the given file handle `fd' refers to a TTY
  * @return: 1: Is a tty
  * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
-INTDEF WUNUSED int NOTHROW_NCX(LIBDCALL libd_isatty)(fd_t fd);
+INTDEF WUNUSED ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_isatty)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> isatty(2)
  * Check if the given file handle `fd' refers to a TTY
  * @return: 1: Is a tty
  * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
-INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_isatty)(fd_t fd);
+INTDEF WUNUSED ATTR_FDARG(1) int NOTHROW_NCX(LIBCCALL libc_isatty)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
  * Duplicate a file referred to by `fd' and return its duplicated handle number */
-INTDEF WUNUSED fd_t NOTHROW_NCX(LIBDCALL libd_dup)(fd_t fd);
+INTDEF WUNUSED ATTR_FDARG(1) fd_t NOTHROW_NCX(LIBDCALL libd_dup)(fd_t fd);
 /* >> close(2)
  * Close a given file descriptor/handle `fd' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_close)(fd_t fd);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_close)(fd_t fd);
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-INTDEF off64_t NOTHROW_NCX(LIBDCALL libd_lseek64)(fd_t fd, off64_t offset, __STDC_INT_AS_UINT_T whence);
+INTDEF ATTR_FDARG(1) off64_t NOTHROW_NCX(LIBDCALL libd_lseek64)(fd_t fd, off64_t offset, __STDC_INT_AS_UINT_T whence);
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pread)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
+INTDEF ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pread)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pwrite)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
+INTDEF ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pwrite)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_preadall)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
+INTDEF ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_preadall)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_preadall)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
+INTDEF ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_preadall)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pwriteall)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
+INTDEF ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pwriteall)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
+INTDEF ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pread64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pread64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pwrite64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pwrite64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_preadall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_preadall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_preadall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_preadall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pwriteall64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pwriteall64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pipe2(2)
@@ -363,7 +363,7 @@ INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_RPC(LIBDCALL libd_get_current_dir_name)
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_RPC(LIBCCALL libc_get_current_dir_name)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF int NOTHROW_RPC(LIBDCALL libd_syncfs)(fd_t fd);
+INTDEF ATTR_FDWRITE(1) int NOTHROW_RPC(LIBDCALL libd_syncfs)(fd_t fd);
 /* >> group_member(3)
  * Check if `gid' is an element of `getgroups(2)'
  * @return:  1: Yes, it's a member
@@ -430,10 +430,10 @@ INTDEF useconds_t NOTHROW_NCX(LIBCCALL libc_ualarm)(useconds_t value, useconds_t
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fchown(2)
  * Change the ownership of a given `fd' to `group:owner' */
-INTDEF int NOTHROW_RPC(LIBDCALL libd_fchown)(fd_t fd, uid_t owner, gid_t group);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC(LIBDCALL libd_fchown)(fd_t fd, uid_t owner, gid_t group);
 /* >> fchdir(2)
  * Change the current working directory to `path' */
-INTDEF int NOTHROW_RPC(LIBDCALL libd_fchdir)(fd_t fd);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC(LIBDCALL libd_fchdir)(fd_t fd);
 /* >> getpgid(2)
  * Return  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
@@ -448,7 +448,7 @@ INTDEF WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_getsid)(pid_t pid);
  * Replace the calling process with the application image referred
  * to by `execfd'  and execute it's  `main()' method, passing  the
  * given `argv', and setting `environ' to `envp'. */
-INTDEF ATTR_IN(2) ATTR_IN(3) int NOTHROW_RPC(LIBDCALL libd_fexecve)(fd_t execfd, __TARGV, __TENVP);
+INTDEF ATTR_FDREAD(1) ATTR_IN(2) ATTR_IN(3) int NOTHROW_RPC(LIBDCALL libd_fexecve)(fd_t execfd, __TARGV, __TENVP);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_nice)(int inc);
 /* >> confstr(3)
  * Retrieve a system configuration string specified by `name'
@@ -616,10 +616,10 @@ INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_getpass)(char const *__restrict p
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_ftruncate)(fd_t fd, __PIO_OFFSET length);
+INTDEF ATTR_FDWRITE(1) int NOTHROW_NCX(LIBDCALL libd_ftruncate)(fd_t fd, __PIO_OFFSET length);
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_ftruncate64)(fd_t fd, __PIO_OFFSET64 length);
+INTDEF ATTR_FDWRITE(1) int NOTHROW_NCX(LIBDCALL libd_ftruncate64)(fd_t fd, __PIO_OFFSET64 length);
 /* >> brk(2), sbrk(2)
  * Change the  program  break,  allowing  for a  rudimentary  implementation  of  a  heap.
  * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
@@ -631,7 +631,7 @@ INTDEF void *NOTHROW_NCX(LIBDCALL libd_sbrk)(intptr_t delta);
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
  * timestamps,  and its size),  meaning that changes  are written to disk */
-INTDEF int NOTHROW_RPC(LIBDCALL libd_fdatasync)(fd_t fd);
+INTDEF ATTR_FDWRITE(1) int NOTHROW_RPC(LIBDCALL libd_fdatasync)(fd_t fd);
 /* >> swab(3)
  * Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
@@ -778,12 +778,12 @@ INTDEF WUNUSED ATTR_IN(1) void *NOTHROW_NCX(LIBDCALL libd_setmode)(char const *m
 INTDEF WUNUSED ATTR_IN(1) mode_t NOTHROW_NCX(LIBDCALL libd_getmode)(void const *bbox, mode_t mode);
 /* >> getpeereid(3)
  * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
-INTDEF ATTR_OUT(2) ATTR_OUT(3) int NOTHROW_NCX(LIBDCALL libd_getpeereid)(fd_t sockfd, uid_t *euid, gid_t *egid);
+INTDEF ATTR_FDARG(1) ATTR_OUT(2) ATTR_OUT(3) int NOTHROW_NCX(LIBDCALL libd_getpeereid)(fd_t sockfd, uid_t *euid, gid_t *egid);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> getpeereid(3)
  * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
-INTDEF ATTR_OUT(2) ATTR_OUT(3) int NOTHROW_NCX(LIBCCALL libc_getpeereid)(fd_t sockfd, uid_t *euid, gid_t *egid);
+INTDEF ATTR_FDARG(1) ATTR_OUT(2) ATTR_OUT(3) int NOTHROW_NCX(LIBCCALL libc_getpeereid)(fd_t sockfd, uid_t *euid, gid_t *egid);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> setruid(3)
@@ -859,13 +859,13 @@ INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_issetugid)(void);
  * and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.
  * No special permissions  are required to  use this function,  since a malicious  application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_fchroot)(fd_t fd);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_fchroot)(fd_t fd);
 /* >> fchroot(2)
  * Change the root directory to  `fd'. If `fd' was opened  before a prior call to  `chroot()',
  * and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.
  * No special permissions  are required to  use this function,  since a malicious  application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd);
 /* >> resolvepath(3)
  * Similar  to  `frealpathat(2)'  (though  use  the  later  for  more   options)
  * Also note that this function appears to  have a weird rule (which KOS  simply
@@ -894,22 +894,22 @@ INTDEF ATTR_IN(1) ATTR_OUTS(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL lib
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-INTDEF WUNUSED off_t NOTHROW_NCX(LIBDCALL libd_tell)(fd_t fd);
+INTDEF WUNUSED ATTR_FDARG(1) off_t NOTHROW_NCX(LIBDCALL libd_tell)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-INTDEF WUNUSED off_t NOTHROW_NCX(LIBCCALL libc_tell)(fd_t fd);
+INTDEF WUNUSED ATTR_FDARG(1) off_t NOTHROW_NCX(LIBCCALL libc_tell)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-INTDEF WUNUSED off64_t NOTHROW_NCX(LIBDCALL libd_tell64)(fd_t fd);
+INTDEF WUNUSED ATTR_FDARG(1) off64_t NOTHROW_NCX(LIBDCALL libd_tell64)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-INTDEF WUNUSED off64_t NOTHROW_NCX(LIBCCALL libc_tell64)(fd_t fd);
+INTDEF WUNUSED ATTR_FDARG(1) off64_t NOTHROW_NCX(LIBCCALL libc_tell64)(fd_t fd);
 #endif /* !__KERNEL__ */
 
 DECL_END

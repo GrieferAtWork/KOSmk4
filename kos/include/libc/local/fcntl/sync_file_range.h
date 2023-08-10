@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbeead775 */
+/* HASH CRC-32:0x2d7abe83 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(sync_file_range) int
+__LOCAL_LIBC(sync_file_range) __ATTR_FDWRITE(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sync_file_range))(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __count, unsigned int __flags) {
 	(void)__fd;
 	(void)__offset;

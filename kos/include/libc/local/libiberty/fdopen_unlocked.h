@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7815f52 */
+/* HASH CRC-32:0x9f048565 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,11 +27,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fdopen_defined
 #define __local___localdep_fdopen_defined
 #ifdef __CRT_HAVE_fdopen
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__FILE *,__NOTHROW_NCX,__localdep_fdopen,(__fd_t __fd, char const *__restrict __modes),fdopen,(__fd,__modes))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2),__FILE *,__NOTHROW_NCX,__localdep_fdopen,(__fd_t __fd, char const *__restrict __modes),fdopen,(__fd,__modes))
 #elif defined(__CRT_HAVE__fdopen)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__FILE *,__NOTHROW_NCX,__localdep_fdopen,(__fd_t __fd, char const *__restrict __modes),_fdopen,(__fd,__modes))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2),__FILE *,__NOTHROW_NCX,__localdep_fdopen,(__fd_t __fd, char const *__restrict __modes),_fdopen,(__fd,__modes))
 #elif defined(__CRT_HAVE__IO_fdopen)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__FILE *,__NOTHROW_NCX,__localdep_fdopen,(__fd_t __fd, char const *__restrict __modes),_IO_fdopen,(__fd,__modes))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2),__FILE *,__NOTHROW_NCX,__localdep_fdopen,(__fd_t __fd, char const *__restrict __modes),_IO_fdopen,(__fd,__modes))
 #else /* ... */
 #undef __local___localdep_fdopen_defined
 #endif /* !... */
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_unlock_stream __LIBC_LOCAL_NAME(unlock_stream)
 #endif /* !__CRT_HAVE_unlock_stream */
 #endif /* !__local___localdep_unlock_stream_defined */
-__LOCAL_LIBC(fdopen_unlocked) __FILE *
+__LOCAL_LIBC(fdopen_unlocked) __ATTR_FDARG(1) __FILE *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fdopen_unlocked))(__fd_t __fd, char const *__mode) {
 	__FILE *__result = (__NAMESPACE_LOCAL_SYM __localdep_fdopen)(__fd, __mode);
 	if (__result)

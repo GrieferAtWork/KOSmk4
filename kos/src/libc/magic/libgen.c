@@ -343,7 +343,7 @@ size_t bufsplit([[inout_opt]] char *string, size_t result_c,
 [[static, requires_function(read, malloc, realloc)]]
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<asm/crt/malloc.h>")]] /* __REALLOC_ZERO_IS_NONNULL */
-char *fcopylist_sz(fd_t fd, [[out]] size_t *p_filesize) {
+char *fcopylist_sz([[fdread]] fd_t fd, [[out]] size_t *p_filesize) {
 	size_t reslen  = 0;
 	size_t buflen  = 1024;
 	byte_t *result = (byte_t *)malloc(buflen);

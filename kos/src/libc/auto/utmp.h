@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7a796da */
+/* HASH CRC-32:0x7edb4d1e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ DECL_BEGIN
  * stdout,   and  stderr.  Afterwards,  `fd'  is  closed.
  * @return: 0 : Success
  * @return: * : Error */
-INTDEF int NOTHROW_RPC_KOS(LIBDCALL libd_login_tty)(fd_t fd);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC_KOS(LIBDCALL libd_login_tty)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> login_tty(3)
@@ -43,7 +43,7 @@ INTDEF int NOTHROW_RPC_KOS(LIBDCALL libd_login_tty)(fd_t fd);
  * stdout,   and  stderr.  Afterwards,  `fd'  is  closed.
  * @return: 0 : Success
  * @return: * : Error */
-INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> login(3) */

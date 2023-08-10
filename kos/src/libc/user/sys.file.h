@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cb5f785 */
+/* HASH CRC-32:0x99eb0766 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* >> flock(2)
  * Apply or remove an advisory lock, according to `operation', on the file `fd' refers to */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_flock)(fd_t fd, __STDC_INT_AS_UINT_T operation);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC(LIBCCALL libc_flock)(fd_t fd, __STDC_INT_AS_UINT_T operation);
 #endif /* !__KERNEL__ */
 
 DECL_END

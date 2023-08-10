@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6633e1d */
+/* HASH CRC-32:0x2991d790 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -346,19 +346,19 @@ INTDEF ATTR_IN(3) ATTR_LIBC_PRINTF(3, 4) ATTR_OUTS(1, 2) __STDC_INT_AS_SIZE_T NO
 INTDEF ATTR_IN(3) ATTR_LIBC_PRINTF(3, 4) ATTR_OUTS(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_snprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, ...);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> dprintf(3), vdprintf(3) */
-INTDEF ATTR_IN(2) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_vdprintf)(fd_t fd, char const *__restrict format, va_list args);
+INTDEF ATTR_FDWRITE(1) ATTR_IN(2) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_vdprintf)(fd_t fd, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> dprintf(3), vdprintf(3) */
-INTDEF ATTR_IN(2) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_vdprintf)(fd_t fd, char const *__restrict format, va_list args);
+INTDEF ATTR_FDWRITE(1) ATTR_IN(2) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_vdprintf)(fd_t fd, char const *__restrict format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> dprintf(3), vdprintf(3) */
-INTDEF ATTR_IN(2) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(VLIBDCALL libd_dprintf)(fd_t fd, char const *__restrict format, ...);
+INTDEF ATTR_FDWRITE(1) ATTR_IN(2) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(VLIBDCALL libd_dprintf)(fd_t fd, char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> dprintf(3), vdprintf(3) */
-INTDEF ATTR_IN(2) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(VLIBCCALL libc_dprintf)(fd_t fd, char const *__restrict format, ...);
+INTDEF ATTR_FDWRITE(1) ATTR_IN(2) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(VLIBCCALL libc_dprintf)(fd_t fd, char const *__restrict format, ...);
 /* >> removeat(3)
  * Remove a file or directory `filename' relative to a given base directory `dirfd' */
 INTDEF ATTR_IN(2) int NOTHROW_RPC(LIBDCALL libd_removeat)(fd_t dirfd, char const *filename);
@@ -480,7 +480,7 @@ INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_NCX(LIBDCALL libd_tempnam)(char const *
  * Open a new file stream by inheriting a given file descriptor `fd'
  * Note that upon success (`return != NULL'), the given `fd' will be
  * `close(2)'d once `fclose(return)' is called. */
-INTDEF WUNUSED ATTR_IN(2) FILE *NOTHROW_NCX(LIBDCALL libd_fdopen)(fd_t fd, char const *__restrict modes);
+INTDEF WUNUSED ATTR_FDARG(1) ATTR_IN(2) FILE *NOTHROW_NCX(LIBDCALL libd_fdopen)(fd_t fd, char const *__restrict modes);
 /* >> fileno(3)
  * Return the underlying file descriptor number used by `stream' */
 INTDEF WUNUSED ATTR_INOUT(1) fd_t NOTHROW_NCX(LIBDCALL libd_fileno)(FILE *__restrict stream);
@@ -493,11 +493,11 @@ INTDEF WUNUSED ATTR_IN(3) ATTR_INOUTS(1, 2) FILE *NOTHROW_NCX(LIBCCALL libc_fmem
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> open_memstream(3) */
-INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_open_memstream)(char **bufloc, size_t *sizeloc);
+INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBDCALL libd_open_memstream)(char **bufloc, size_t *sizeloc);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> open_memstream(3) */
-INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_open_memstream)(char **bufloc, size_t *sizeloc);
+INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBCCALL libc_open_memstream)(char **bufloc, size_t *sizeloc);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getdelim(3) */
@@ -534,7 +534,7 @@ INTDEF int NOTHROW_CB_NCX(LIBCCALL libc_putchar_unlocked)(int ch);
 INTDEF ATTR_INOUT(1) void NOTHROW_RPC(LIBDCALL libd_flockfile)(FILE *__restrict stream);
 /* >> funlockfile(3)
  * Release a previously acquired lock from `stream' */
-INTDEF void NOTHROW_NCX(LIBDCALL libd_funlockfile)(FILE *__restrict stream);
+INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBDCALL libd_funlockfile)(FILE *__restrict stream);
 /* >> ftrylockfile(3)
  * Try to acquire a lock to `stream'
  * @return: == 0 : Lock successfully acquired
@@ -559,7 +559,7 @@ INTDEF ATTR_INOUT(1) int NOTHROW_CB_NCX(LIBCCALL libc___overflow)(FILE *stream, 
 INTDEF WUNUSED ATTR_IN(2) ATTR_IN_OPT(1) FILE *NOTHROW_RPC(LIBDCALL libd_popen)(char const *command, char const *modes);
 /* >> pclose(3)
  * Close a process I/O file `stream' (s.a. `popen(3)') */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_pclose)(FILE *stream);
+INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd_pclose)(FILE *stream);
 /* >> popenve(3)
  * Similar to `popen(3)', but rather than running `shexec(command)', this
  * function will `execve(path, argv, envp)'. The returned FILE must still
@@ -696,10 +696,10 @@ INTDEF ATTR_IN(2) ATTR_LIBC_PRINTF(2, 3) ATTR_OUT(1) __STDC_INT_AS_SSIZE_T NOTHR
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
-INTDEF ATTR_IN(2) ATTR_INOUT(3) FILE *NOTHROW_RPC(LIBDCALL libd_fdreopen)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
+INTDEF ATTR_FDARG(1) ATTR_IN(2) ATTR_INOUT(3) FILE *NOTHROW_RPC(LIBDCALL libd_fdreopen)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
 /* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
-INTDEF ATTR_IN(2) ATTR_INOUT(3) FILE *NOTHROW_RPC(LIBDCALL libd_fdreopen_unlocked)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
+INTDEF ATTR_FDARG(1) ATTR_IN(2) ATTR_INOUT(3) FILE *NOTHROW_RPC(LIBDCALL libd_fdreopen_unlocked)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
 INTDEF ATTR_INOUT(1) int NOTHROW_CB_NCX(LIBDCALL libd_fseek_unlocked)(FILE *__restrict stream, long int off, int whence);
 INTDEF WUNUSED ATTR_INOUT(1) long int NOTHROW_CB_NCX(LIBDCALL libd_ftell_unlocked)(FILE *__restrict stream);
 INTDEF ATTR_INOUT(1) int NOTHROW_CB_NCX(LIBDCALL libd_fseeko_unlocked)(FILE *__restrict stream, off_t off, int whence);

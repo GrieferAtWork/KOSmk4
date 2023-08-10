@@ -291,7 +291,7 @@ DIR *opendir([[in]] char const *name) {
 [[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 [[crt_dos_variant, userimpl, requires_function(fdopendir, openat)]]
 [[decl_include("<bits/types.h>"), impl_include("<asm/os/oflags.h>")]]
-DIR *fopendirat($fd_t dirfd, [[in]] char const *name, $oflag_t oflags) {
+DIR *fopendirat([[dirfd]] $fd_t dirfd, [[in]] char const *name, $oflag_t oflags) {
 	DIR *result;
 @@pp_ifdef __O_RDONLY@@
 	oflags |= __O_RDONLY;
@@ -315,7 +315,7 @@ DIR *fopendirat($fd_t dirfd, [[in]] char const *name, $oflag_t oflags) {
 [[decl_include("<bits/types.h>")]]
 [[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 [[crt_dos_variant, userimpl, requires_function(fopendirat)]]
-DIR *opendirat($fd_t dirfd, [[in]] char const *name) {
+DIR *opendirat([[dirfd]] $fd_t dirfd, [[in]] char const *name) {
 	return fopendirat(dirfd, name, 0);
 }
 %#endif /* __USE_KOS && __USE_ATFILE */
@@ -365,7 +365,7 @@ void rewinddir([[inout]] DIR *__restrict dirp);
 @@>> fdopendir(3)
 @@Create a new directory stream by inheriting the given `fd' as stream handle
 [[wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM), decl_include("<bits/types.h>")]]
-DIR *fdopendir($fd_t fd);
+DIR *fdopendir([[fdread]] $fd_t fd);
 %#endif /* __USE_XOPEN2K8 */
 
 %
@@ -493,7 +493,7 @@ int alphasort64([[in]] struct dirent64 const **e1,
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>") defined(__CRT_KOS) && ( defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("scandiratk64")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("scandirat")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__CRT_KOS) && ( defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("scandirat64")]]
-__STDC_INT_AS_SSIZE_T scandirat($fd_t dirfd, [[in]] char const *__restrict dir,
+__STDC_INT_AS_SSIZE_T scandirat([[dirfd]] $fd_t dirfd, [[in]] char const *__restrict dir,
                                 [[out]] struct dirent ***__restrict namelist,
                                 int (LIBKCALL *selector)(struct dirent const *entry),
                                 int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b));
@@ -524,7 +524,7 @@ __STDC_INT_AS_SSIZE_T scandir64([[in]] char const *__restrict dir,
 [[if($extended_include_prefix("<bits/os/dirent.h>")!defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)), alias("scandirat")]]
 [[if(                                              !defined(__CRT_KOS)                                     ), alias("scandirat64")]]
 [[if($extended_include_prefix("<bits/os/dirent.h>")defined(_DIRENT_MATCHES_DIRENT64)), crt_intern_kos_alias(libc_scandiratk)]]
-__STDC_INT_AS_SSIZE_T scandirat64($fd_t dirfd, [[in]] char const *__restrict dir,
+__STDC_INT_AS_SSIZE_T scandirat64([[dirfd]] $fd_t dirfd, [[in]] char const *__restrict dir,
                                   [[out]] struct dirent64 ***__restrict namelist,
                                   int (LIBKCALL *selector)(struct dirent64 const *entry),
                                   int (LIBKCALL *cmp)(struct dirent64 const **a, struct dirent64 const **b));
@@ -540,14 +540,14 @@ __STDC_INT_AS_SSIZE_T scandirat64($fd_t dirfd, [[in]] char const *__restrict dir
 [[cp, decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import, export_as("__getdirentries", "__libc_getdirentries")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)), alias("getdirentries", "__getdirentries", "__libc_getdirentries")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>") defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)), alias("getdirentries64")]]
-$ssize_t getdirentries($fd_t fd, [[out(return <= nbytes)]] char *__restrict buf,
+$ssize_t getdirentries([[fdread]] $fd_t fd, [[out(return <= nbytes)]] char *__restrict buf,
                        size_t nbytes, [[inout]] $off_t *__restrict basep);
 
 %#ifdef __USE_LARGEFILE64
 [[cp, decl_include("<bits/types.h>")]]
 [[preferred_dirent64_variant_of(getdirentries), doc_alias("getdirentries")]]
 [[if($extended_include_prefix("<bits/os/dirent.h>")defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("__getdirentries", "__libc_getdirentries")]]
-$ssize_t getdirentries64($fd_t fd, [[out(return <= nbytes)]] char *__restrict buf, size_t nbytes,
+$ssize_t getdirentries64([[fdread]] $fd_t fd, [[out(return <= nbytes)]] char *__restrict buf, size_t nbytes,
                          [[inout]] $off64_t *__restrict basep);
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_MISC */
@@ -596,14 +596,14 @@ int versionsort64([[in]] struct dirent64 const **e1,
 [[decl_include("<bits/os/dirent.h>", "<bits/types.h>")]]
 [[if($extended_include_prefix("<bits/os/dirent.h>")defined(_DIRENT_MATCHES_DIRENT64)), alias("kreaddir64")]]
 [[cp, wunused, userimpl, requires_function(kreaddirf)]]
-$ssize_t kreaddir($fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode) {
+$ssize_t kreaddir([[fdread]] $fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode) {
 	return kreaddirf(fd, buf, bufsize, mode, 0);
 }
 
 [[cp, wunused, doc_alias("kreaddir"), decl_include("<bits/os/dirent.h>", "<bits/types.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), alias("kreaddirf")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>") defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), alias("kreaddirf64")]]
-$ssize_t kreaddirf($fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode, $oflag_t flags);
+$ssize_t kreaddirf([[fdread]] $fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode, $oflag_t flags);
 
 %#ifdef __USE_LARGEFILE64
 
@@ -611,13 +611,13 @@ $ssize_t kreaddirf($fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mo
 [[preferred_dirent64_variant_of(kreaddir), doc_alias("kreaddir")]]
 [[if($extended_include_prefix("<bits/os/dirent.h>")defined(_DIRENT_MATCHES_DIRENT64)), alias("kreaddir")]]
 [[userimpl, requires_function(kreaddirf64)]]
-$ssize_t kreaddir64($fd_t fd, struct dirent64 *buf, size_t bufsize, unsigned int mode) {
+$ssize_t kreaddir64([[fdread]] $fd_t fd, struct dirent64 *buf, size_t bufsize, unsigned int mode) {
 	return kreaddirf64(fd, buf, bufsize, mode, 0);
 }
 
 [[cp, wunused, decl_include("<bits/os/dirent.h>", "<bits/types.h>")]]
 [[preferred_dirent64_variant_of(kreaddirf), doc_alias("kreaddirf")]]
-$ssize_t kreaddirf64($fd_t fd, struct dirent64 *buf, size_t bufsize,
+$ssize_t kreaddirf64([[fdread]] $fd_t fd, struct dirent64 *buf, size_t bufsize,
                      unsigned int mode, $oflag_t flags);
 
 %#endif /* __USE_LARGEFILE64 */

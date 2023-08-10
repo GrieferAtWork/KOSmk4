@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6c03443 */
+/* HASH CRC-32:0xa30d510d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,7 +99,7 @@ NOTHROW_NCX(LIBCCALL libc_attr_multi)(char const *path,
  * @param: flags: Set of `0 | ATTR_DONTFOLLOW'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.libattr") ATTR_INOUTS(2, 3) int
+INTERN ATTR_SECTION(".text.crt.libattr") ATTR_FDARG(1) ATTR_INOUTS(2, 3) int
 NOTHROW_NCX(LIBCCALL libc_attr_multif)(fd_t fd,
                                        struct attr_multiop *oplist,
                                        int count,

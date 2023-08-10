@@ -27,10 +27,10 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_flock,hash:CRC-32=0x20089f7a]]]*/
+/*[[[head:libc_flock,hash:CRC-32=0x89b9df9f]]]*/
 /* >> flock(2)
  * Apply or remove an advisory lock, according to `operation', on the file `fd' refers to */
-INTERN ATTR_SECTION(".text.crt.unsorted") int
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_FDARG(1) int
 NOTHROW_RPC(LIBCCALL libc_flock)(fd_t fd,
                                  __STDC_INT_AS_UINT_T operation)
 /*[[[body:libc_flock]]]*/

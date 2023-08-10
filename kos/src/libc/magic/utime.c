@@ -103,11 +103,11 @@ int crt_utime64([[in]] char const *filename, [[in_opt]] struct $utimbuf64 const 
 
 [[decl_include("<bits/os/utimbuf.h>", "<bits/types.h>")]]
 [[cp, ignore, nocrt, alias("futime", "_futime", "_futime32")]]
-int crt_futime32($fd_t fd, [[in_opt]] struct $utimbuf32 const *file_times);
+int crt_futime32([[fdarg]] $fd_t fd, [[in_opt]] struct $utimbuf32 const *file_times);
 
 [[decl_include("<bits/os/utimbuf.h>", "<bits/types.h>")]]
 [[cp, ignore, nocrt, alias("futime64", "_futime64")]]
-int crt_futime64($fd_t fd, [[in_opt]] struct $utimbuf64 const *file_times);
+int crt_futime64([[fdarg]] $fd_t fd, [[in_opt]] struct $utimbuf64 const *file_times);
 
 
 @@>> utime(2), utime64(2)
@@ -180,7 +180,7 @@ int utime64([[in]] char const *filename, [[in_opt]] struct utimbuf64 const *file
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futime64", "_futime64")]]
 [[userimpl, requires($has_function(crt_futime32) || $has_function(crt_futime64))]]
 [[dos_only_export_as("_futime", "_futime32")]]
-int futime($fd_t fd, [[in_opt]] struct utimbuf const *file_times) {
+int futime([[fdarg]] $fd_t fd, [[in_opt]] struct utimbuf const *file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma @push_macro@("actime")
 #pragma @push_macro@("modtime")
@@ -214,7 +214,7 @@ int futime($fd_t fd, [[in_opt]] struct utimbuf const *file_times) {
 [[preferred_time64_variant_of(futime), doc_alias("futime")]]
 [[userimpl, requires_function(crt_futime32)]]
 [[dos_only_export_alias("_futime64")]]
-int futime64($fd_t fd, [[in_opt]] struct utimbuf64 const *file_times) {
+int futime64([[fdarg]] $fd_t fd, [[in_opt]] struct utimbuf64 const *file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma @push_macro@("actime")
 #pragma @push_macro@("modtime")
@@ -279,7 +279,7 @@ int _utime32([[in]] char const *filename,
 
 [[decl_include("<features.h>", "<bits/os/utimbuf.h>", "<bits/types.h>")]]
 [[cp, alias("futime", "_futime"), no_crt_impl, requires_function(crt_futime64)]]
-int _futime32($fd_t fd, [[in_opt]] struct $utimbuf32 __KOS_FIXED_CONST *file_times) {
+int _futime32([[fdarg]] $fd_t fd, [[in_opt]] struct $utimbuf32 __KOS_FIXED_CONST *file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma @push_macro@("actime")
 #pragma @push_macro@("modtime")

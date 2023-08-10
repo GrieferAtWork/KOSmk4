@@ -116,10 +116,10 @@ NOTHROW_NCX(LIBCCALL libc_localeconv)(void)
 }
 /*[[[end:libc_localeconv]]]*/
 
-/*[[[head:libc_newlocale,hash:CRC-32=0xdcd02f3f]]]*/
+/*[[[head:libc_newlocale,hash:CRC-32=0x112f2f1a]]]*/
 /* >> newlocale(3)
  * @param: category_mask: Set of `LC_*_MASK' */
-INTERN ATTR_SECTION(".text.crt.i18n") locale_t
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_IN_OPT(2) locale_t
 NOTHROW_NCX(LIBCCALL libc_newlocale)(int category_mask,
                                      char const *locale,
                                      locale_t base)
@@ -222,8 +222,8 @@ NOTHROW_NCX(LIBCCALL libc__get_current_locale)(void)
 }
 /*[[[end:libc__get_current_locale]]]*/
 
-/*[[[head:libc__create_locale,hash:CRC-32=0xb7dc98df]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.i18n") locale_t
+/*[[[head:libc__create_locale,hash:CRC-32=0x7b4cbd94]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") ATTR_IN_OPT(2) locale_t
 NOTHROW_NCX(LIBCCALL libc__create_locale)(int category,
                                           char const *locale)
 /*[[[body:libc__create_locale]]]*/

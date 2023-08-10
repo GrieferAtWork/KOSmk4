@@ -513,6 +513,7 @@ again_skip_annotation_rbracket:
 	tok = self.skip("(");
 	local extraAttributes: {Callable...} = [];
 	local nonNullArguments: {int...} = none;
+	local gotFdArgAnnotation: bool = false;
 	@@Pair of (format-method, format-string-argument-index)
 	local formatArgument: (string, int)  = none;
 	result.argv = [];
@@ -570,6 +571,8 @@ again_parse_arg_annotations:
 					if (attrib is none)
 						self.err(f"Invalid access-mode: {repr mode}");
 					self.skip(")");
+					if (result.attributes === defaultAttributes)
+						result.attributes = List(defaultAttributes);
 					result.attributes.append(f"{attrib}({#result.argv + 1})");
 				}	break;
 
@@ -638,6 +641,39 @@ again_parse_arg_annotations:
 					}
 					formatArgument = (method, #result.argv + 1);
 				}	break;
+
+				case "dirfd": /* Can't be annotated because of AT_FDCWD */
+				case "fdarg_opt":
+				case "fdarg_read_opt":
+				case "fdarg_write_opt":
+				case "fd_arg_opt":
+				case "fd_arg_read_opt":
+				case "fd_arg_write_opt":
+				case "no_fdarg":
+				case "no_fd_arg":
+					gotFdArgAnnotation = true;
+					tok = self.next();
+					break;
+
+				case "fd_arg":
+				case "fd_arg_read":
+				case "fd_arg_write":
+				case "fdarg":
+				case "fdread":
+				case "fdwrite":
+					if (result.attributes === defaultAttributes)
+						result.attributes = List(defaultAttributes);
+					result.attributes.append(f"ATTR_FD{({
+						"fd_arg"       : "ARG",
+						"fd_arg_read"  : "READ",
+						"fd_arg_write" : "WRITE",
+						"fdarg"        : "ARG",
+						"fdread"       : "READ",
+						"fdwrite"      : "WRITE",
+					})[tok]}({#result.argv + 1})");
+					tok = self.next();
+					gotFdArgAnnotation = true;
+					break;
 
 					/* Access attributes:
 					 * [[in]]               -->   __attribute__((access(read_only, <I>), nonnull(<I>)))
@@ -801,6 +837,8 @@ access_annotation_parse_multiply_rhs:
 						}
 					} else {
 annotate_generic_access:
+						if (result.attributes === defaultAttributes)
+							result.attributes = List(defaultAttributes);
 						if (shouldMarkAsNonNull) {
 							result.attributes.append(f"{mode}({argIndex})");
 						} else {
@@ -828,6 +866,11 @@ again_skip_arg_annotation_rbracket:
 			}
 		}
 		local typ, name = parseCTypeAndName(self)...;
+		if (!typ.afterName && typ.beforeName in ["$fd_t", "fd_t", "__fd_t"]) {
+			/* Warn about fd-like arguments without any FD annotations. */
+			if (!gotFdArgAnnotation)
+				self.warn(f"FD-like argument {repr str name} has no ATTR_FD* annotations");
+		}
 		local arg = Argument(name: name, protoTypeName: name, ctype: typ);
 		if (functionArgumentNamesOverride !is none) {
 			local argi = #result.argv;

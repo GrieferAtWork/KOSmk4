@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45298d4f */
+/* HASH CRC-32:0x95a71309 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -368,7 +368,7 @@ __CREDIRECT(__ATTR_INOUT(1),__SSIZE_TYPE__,__NOTHROW_NCX,aio_return,(struct aioc
  *                           (or canceled) before the call was made.
  * @return: -1: [errno=EBADF]  `fd' is not a valid file descriptor
  * @return: -1: [errno=EINVAL] `self != NULL' and the given `fd' differs from `self->aio_fildes' */
-__CDECLARE(,int,__NOTHROW_NCX,aio_cancel,(__fd_t __fd, struct aiocb *__self),(__fd,__self))
+__CDECLARE(__ATTR_FDARG(1),int,__NOTHROW_NCX,aio_cancel,(__fd_t __fd, struct aiocb *__self),(__fd,__self))
 #elif defined(__CRT_HAVE_aio_cancel64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> aio_cancel(3), aio_cancel64(3)
  * Cancel  a specific AIO  operation (self != NULL),  or all operations currently
@@ -392,7 +392,7 @@ __CDECLARE(,int,__NOTHROW_NCX,aio_cancel,(__fd_t __fd, struct aiocb *__self),(__
  *                           (or canceled) before the call was made.
  * @return: -1: [errno=EBADF]  `fd' is not a valid file descriptor
  * @return: -1: [errno=EINVAL] `self != NULL' and the given `fd' differs from `self->aio_fildes' */
-__CREDIRECT(,int,__NOTHROW_NCX,aio_cancel,(__fd_t __fd, struct aiocb *__self),aio_cancel64,(__fd,__self))
+__CREDIRECT(__ATTR_FDARG(1),int,__NOTHROW_NCX,aio_cancel,(__fd_t __fd, struct aiocb *__self),aio_cancel64,(__fd,__self))
 #endif /* ... */
 #if defined(__CRT_HAVE_aio_suspend) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
@@ -641,7 +641,7 @@ __CDECLARE(__ATTR_INOUT(1),__SSIZE_TYPE__,__NOTHROW_NCX,aio_return64,(struct aio
  *                           (or canceled) before the call was made.
  * @return: -1: [errno=EBADF]  `fd' is not a valid file descriptor
  * @return: -1: [errno=EINVAL] `self != NULL' and the given `fd' differs from `self->aio_fildes' */
-__CREDIRECT(,int,__NOTHROW_NCX,aio_cancel64,(__fd_t __fildes, struct aiocb64 *__self),aio_cancel,(__fildes,__self))
+__CREDIRECT(__ATTR_FDARG(1),int,__NOTHROW_NCX,aio_cancel64,(__fd_t __fildes, struct aiocb64 *__self),aio_cancel,(__fildes,__self))
 #elif defined(__CRT_HAVE_aio_cancel64)
 /* >> aio_cancel(3), aio_cancel64(3)
  * Cancel  a specific AIO  operation (self != NULL),  or all operations currently
@@ -665,7 +665,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,aio_cancel64,(__fd_t __fildes, struct aiocb64 *__
  *                           (or canceled) before the call was made.
  * @return: -1: [errno=EBADF]  `fd' is not a valid file descriptor
  * @return: -1: [errno=EINVAL] `self != NULL' and the given `fd' differs from `self->aio_fildes' */
-__CDECLARE(,int,__NOTHROW_NCX,aio_cancel64,(__fd_t __fildes, struct aiocb64 *__self),(__fildes,__self))
+__CDECLARE(__ATTR_FDARG(1),int,__NOTHROW_NCX,aio_cancel64,(__fd_t __fildes, struct aiocb64 *__self),(__fildes,__self))
 #endif /* ... */
 #if defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)

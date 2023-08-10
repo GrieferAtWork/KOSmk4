@@ -58,10 +58,10 @@ NOTHROW_NCX(LIBCCALL libc_inotify_init1)(__STDC_INT_AS_UINT_T flags)
 }
 /*[[[end:libc_inotify_init1]]]*/
 
-/*[[[head:libd_inotify_add_watch,hash:CRC-32=0xa55e5035]]]*/
+/*[[[head:libd_inotify_add_watch,hash:CRC-32=0x12216e3b]]]*/
 /* >> inotify_add_watch(2)
  * @param: mask: Set of `IN_ALL_EVENTS | ...' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") ATTR_IN(2) __watchfd_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") ATTR_FDARG(1) ATTR_IN(2) __watchfd_t
 NOTHROW_NCX(LIBDCALL libd_inotify_add_watch)(fd_t notify_fd,
                                              char const *pathname,
                                              uint32_t mask)
@@ -76,10 +76,10 @@ NOTHROW_NCX(LIBDCALL libd_inotify_add_watch)(fd_t notify_fd,
 }
 /*[[[end:libd_inotify_add_watch]]]*/
 
-/*[[[head:libc_inotify_add_watch,hash:CRC-32=0x466f14e8]]]*/
+/*[[[head:libc_inotify_add_watch,hash:CRC-32=0x947b04a]]]*/
 /* >> inotify_add_watch(2)
  * @param: mask: Set of `IN_ALL_EVENTS | ...' */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_IN(2) __watchfd_t
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_FDARG(1) ATTR_IN(2) __watchfd_t
 NOTHROW_NCX(LIBCCALL libc_inotify_add_watch)(fd_t notify_fd,
                                              char const *pathname,
                                              uint32_t mask)
@@ -100,10 +100,10 @@ NOTHROW_NCX(LIBCCALL libc_inotify_add_watch)(fd_t notify_fd,
 }
 /*[[[end:libc_inotify_add_watch]]]*/
 
-/*[[[head:libc_inotify_rm_watch,hash:CRC-32=0xe654c470]]]*/
+/*[[[head:libc_inotify_rm_watch,hash:CRC-32=0xf66b1000]]]*/
 /* >> inotify_rm_watch(2)
  * @param: wd: Watch fd (as returned by `inotify_add_watch{_at}') */
-INTERN ATTR_SECTION(".text.crt.unsorted") int
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_FDARG(1) int
 NOTHROW_NCX(LIBCCALL libc_inotify_rm_watch)(fd_t notify_fd,
                                             __watchfd_t wd)
 /*[[[body:libc_inotify_rm_watch]]]*/
@@ -114,11 +114,11 @@ NOTHROW_NCX(LIBCCALL libc_inotify_rm_watch)(fd_t notify_fd,
 }
 /*[[[end:libc_inotify_rm_watch]]]*/
 
-/*[[[head:libd_inotify_add_watch_at,hash:CRC-32=0x8ac98e39]]]*/
+/*[[[head:libd_inotify_add_watch_at,hash:CRC-32=0x25ccab5a]]]*/
 /* >> inotify_add_watch_at(2)
  * @param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH | AT_EMPTY_PATH'
  * @param: mask:    Set of `IN_ALL_EVENTS | ...' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") ATTR_IN(3) __watchfd_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") ATTR_FDARG(1) ATTR_IN(3) __watchfd_t
 NOTHROW_NCX(LIBDCALL libd_inotify_add_watch_at)(fd_t notify_fd,
                                                 fd_t dirfd,
                                                 char const *pathname,
@@ -132,11 +132,11 @@ NOTHROW_NCX(LIBDCALL libd_inotify_add_watch_at)(fd_t notify_fd,
 }
 /*[[[end:libd_inotify_add_watch_at]]]*/
 
-/*[[[head:libc_inotify_add_watch_at,hash:CRC-32=0x414425ee]]]*/
+/*[[[head:libc_inotify_add_watch_at,hash:CRC-32=0x741ad018]]]*/
 /* >> inotify_add_watch_at(2)
  * @param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH | AT_EMPTY_PATH'
  * @param: mask:    Set of `IN_ALL_EVENTS | ...' */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_IN(3) __watchfd_t
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_FDARG(1) ATTR_IN(3) __watchfd_t
 NOTHROW_NCX(LIBCCALL libc_inotify_add_watch_at)(fd_t notify_fd,
                                                 fd_t dirfd,
                                                 char const *pathname,

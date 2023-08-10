@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7091f62 */
+/* HASH CRC-32:0xd1e04141 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,14 +28,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_FUTimens32_defined) && defined(__CRT_HAVE_FUTimens)
 #define __local___localdep_FUTimens32_defined
-__CREDIRECT_VOID(,__THROWING(...),__localdep_FUTimens32,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),FUTimens,(__fd,__times))
+__CREDIRECT_VOID(__ATTR_FDARG(1),__THROWING(...),__localdep_FUTimens32,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),FUTimens,(__fd,__times))
 #endif /* !__local___localdep_FUTimens32_defined && __CRT_HAVE_FUTimens */
 #ifndef __local___localdep_FUTimens64_defined
 #define __local___localdep_FUTimens64_defined
 #if defined(__CRT_HAVE_FUTimens) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT_VOID(__ATTR_IN_OPT(2),__THROWING(...),__localdep_FUTimens64,(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]),FUTimens,(__fd,__times))
+__CREDIRECT_VOID(__ATTR_FDARG(1) __ATTR_IN_OPT(2),__THROWING(...),__localdep_FUTimens64,(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]),FUTimens,(__fd,__times))
 #elif defined(__CRT_HAVE_FUTimens64)
-__CREDIRECT_VOID(__ATTR_IN_OPT(2),__THROWING(...),__localdep_FUTimens64,(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]),FUTimens64,(__fd,__times))
+__CREDIRECT_VOID(__ATTR_FDARG(1) __ATTR_IN_OPT(2),__THROWING(...),__localdep_FUTimens64,(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]),FUTimens64,(__fd,__times))
 #elif defined(__CRT_HAVE_FUTimens)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sys.stat/FUTimens64.h>
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_FUTimens64_defined
 #endif /* !... */
 #endif /* !__local___localdep_FUTimens64_defined */
-__LOCAL_LIBC(FUTimens) __ATTR_IN_OPT(2) void
+__LOCAL_LIBC(FUTimens) __ATTR_FDARG(1) __ATTR_IN_OPT(2) void
 (__LIBCCALL __LIBC_LOCAL_NAME(FUTimens))(__fd_t __fd, struct timespec const __times[2 /*or:3*/]) __THROWS(...) {
 #if defined(__CRT_HAVE_UTimensAt64) || defined(__CRT_HAVE_UTimensAt)
 	struct __timespec64 __tms[2];

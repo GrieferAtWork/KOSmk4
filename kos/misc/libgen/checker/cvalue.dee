@@ -313,7 +313,8 @@ final class CValue {
 					local oldPointerBaseTypeRef: CTypeRef = oldTyp.base;
 					local newPointerBaseTypeRef: CTypeRef = newTyp.base;
 					if (oldPointerBaseTypeRef.typ.isConvertibleTo(newPointerBaseTypeRef.typ, explicit) ||
-					    newPointerBaseTypeRef.typ === C_void) {
+					    newPointerBaseTypeRef.typ === C_void ||
+					    (oldPointerBaseTypeRef.typ === C_void && !checker.cxx)) {
 						/* Pointer-cast where the the base-types are identical is OK,
 						 * but warn if the  cast causes const/volatile to  disappear. */
 						local oldCV = oldPointerBaseTypeRef.flags & CTYPEREF_FLAG_CV;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7a58b37 */
+/* HASH CRC-32:0x458cfd15 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ static_assert(sizeof(__spin_lock_t) == sizeof(struct shared_lock));
 static_assert(alignof(__spin_lock_t) == alignof(struct shared_lock));
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.compat.hurd.futex") void
+INTERN ATTR_SECTION(".text.crt.compat.hurd.futex") ATTR_OUT(1) void
 NOTHROW_NCX(LIBCCALL libc___spin_lock_init)(__spin_lock_t *lock) {
 	*lock = 0;
 }

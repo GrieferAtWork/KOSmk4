@@ -76,7 +76,7 @@ __SYSDECL_BEGIN
            $has_function(close))]]
 [[impl_include("<asm/os/tty.h>", "<asm/os/stdio.h>")]]
 [[section(".text.crt{|.dos}.io.tty")]]
-int login_tty($fd_t fd) {
+int login_tty([[fdarg]] $fd_t fd) {
 	if unlikely(setsid() < 0)
 		goto err;
 	if unlikely(ioctl(fd, @__TIOCSCTTY@, 1) < 0)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7128ed3c */
+/* HASH CRC-32:0x138d7d21 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -141,7 +141,7 @@ done_filename:
 done:
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED ATTR_IN(2) FILE *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED ATTR_FDARG(1) ATTR_IN(2) FILE *
 NOTHROW_NCX(LIBDCALL libd__wfdopen)(fd_t fd,
                                     char16_t const *mode) {
 	FILE *result = NULL;
@@ -156,7 +156,7 @@ NOTHROW_NCX(LIBDCALL libd__wfdopen)(fd_t fd,
 done:
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED ATTR_IN(2) FILE *
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED ATTR_FDARG(1) ATTR_IN(2) FILE *
 NOTHROW_NCX(LIBKCALL libc__wfdopen)(fd_t fd,
                                     char32_t const *mode) {
 	FILE *result = NULL;

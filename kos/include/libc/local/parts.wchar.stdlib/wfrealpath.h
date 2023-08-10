@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c0c7fd6 */
+/* HASH CRC-32:0xcea1b017 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_frealpath_defined
 #define __local___localdep_frealpath_defined
 #ifdef __CRT_HAVE_frealpath
-__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT_OPT(2),char *,__NOTHROW_RPC,__localdep_frealpath,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen),frealpath,(__fd,__resolved,__buflen))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_OUT_OPT(2),char *,__NOTHROW_RPC,__localdep_frealpath,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen),frealpath,(__fd,__resolved,__buflen))
 #elif defined(__CRT_HAVE_frealpath4)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/frealpath.h>
@@ -84,7 +84,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wfrealpath4_defined
 #define __local___localdep_wfrealpath4_defined
 #ifdef __CRT_HAVE_wfrealpath4
-__CREDIRECT(__ATTR_WUNUSED __ATTR_OUTS(2, 3),__WCHAR_TYPE__ *,__NOTHROW_RPC,__localdep_wfrealpath4,(__fd_t __fd, __WCHAR_TYPE__ *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),wfrealpath4,(__fd,__resolved,__buflen,__flags))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_OUTS(2, 3),__WCHAR_TYPE__ *,__NOTHROW_RPC,__localdep_wfrealpath4,(__fd_t __fd, __WCHAR_TYPE__ *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),wfrealpath4,(__fd,__resolved,__buflen,__flags))
 #elif defined(__CRT_HAVE_frealpath4) && (defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.stdlib/wfrealpath4.h>
@@ -133,7 +133,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* __SIZEOF_WCHAR_T__ != 4 */
 #endif /* !... */
 #endif /* !__local___localdep_wmemcpy_defined */
-__LOCAL_LIBC(wfrealpath) __ATTR_WUNUSED __ATTR_OUTS(2, 3) __WCHAR_TYPE__ *
+__LOCAL_LIBC(wfrealpath) __ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_OUTS(2, 3) __WCHAR_TYPE__ *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wfrealpath))(__fd_t __fd, __WCHAR_TYPE__ *__resolved, __SIZE_TYPE__ __buflen) {
 #if defined(__CRT_HAVE_wfrealpath4) || (defined(__CRT_HAVE_frealpath4) && (defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))))
 	return (__NAMESPACE_LOCAL_SYM __localdep_wfrealpath4)(__fd, __resolved, __buflen, 0);

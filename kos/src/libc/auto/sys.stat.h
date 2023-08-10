@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5c82594 */
+/* HASH CRC-32:0x37f24589 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,11 +45,11 @@ INTDEF ATTR_IN(2) int NOTHROW_RPC(LIBCCALL libc_mkfifoat)(fd_t dirfd, char const
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fchmod(2) */
-INTDEF int NOTHROW_RPC(LIBDCALL libd_fchmod)(fd_t fd, mode_t mode);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC(LIBDCALL libd_fchmod)(fd_t fd, mode_t mode);
 /* >> futimens(2), futimens64(2) */
-INTDEF ATTR_IN_OPT(2) int NOTHROW_RPC(LIBDCALL libd_futimens)(fd_t fd, struct timespec const times[2 /*or:3*/]);
+INTDEF ATTR_FDARG(1) ATTR_IN_OPT(2) int NOTHROW_RPC(LIBDCALL libd_futimens)(fd_t fd, struct timespec const times[2 /*or:3*/]);
 /* >> futimens(2), futimens64(2) */
-INTDEF ATTR_IN_OPT(2) int NOTHROW_RPC(LIBDCALL libd_futimens64)(fd_t fd, struct timespec64 const times[2 /*or:3*/]);
+INTDEF ATTR_FDARG(1) ATTR_IN_OPT(2) int NOTHROW_RPC(LIBDCALL libd_futimens64)(fd_t fd, struct timespec64 const times[2 /*or:3*/]);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

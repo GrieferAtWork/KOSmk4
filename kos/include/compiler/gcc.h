@@ -156,6 +156,9 @@
 #endif
 #if __GCC_VERSION_NUM >= 130000
 #define __GCC_HAS_ATTRIBUTE___assume__
+#define __GCC_HAS_ATTRIBUTE___fd_arg__
+#define __GCC_HAS_ATTRIBUTE___fd_arg_read__
+#define __GCC_HAS_ATTRIBUTE___fd_arg_write__
 #endif
 #if defined(__GNUC_GNU_INLINE__) || defined(__GNUC_STDC_INLINE__)
 #define __GCC_HAS_ATTRIBUTE___gnu_inline__
@@ -669,6 +672,17 @@
 #define __ATTR_INOUT(ptr_index) /* Nothing */
 #endif /* !__has_attribute(__nonnull__) */
 #endif /* !... */
+
+
+#if __has_attribute(__fd_arg__)
+#define __ATTR_FDARG(fd_index)   __attribute__((__fd_arg__(fd_index)))
+#define __ATTR_FDREAD(fd_index)  __attribute__((__fd_arg_read__(fd_index)))
+#define __ATTR_FDWRITE(fd_index) __attribute__((__fd_arg_write__(fd_index)))
+#else /* __has_attribute(__fd_arg__) */
+#define __ATTR_FDARG(fd_index)   /* Nothing */
+#define __ATTR_FDREAD(fd_index)  /* Nothing */
+#define __ATTR_FDWRITE(fd_index) /* Nothing */
+#endif /* !__has_attribute(__fd_arg__) */
 
 #define __ATTR_WARNING(text)      __attribute__((__warning__(text)))
 #define __ATTR_ERROR(text)        __attribute__((__error__(text)))

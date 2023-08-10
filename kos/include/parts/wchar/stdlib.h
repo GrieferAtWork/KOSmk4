@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccfc11db */
+/* HASH CRC-32:0x475d58df */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,19 +70,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wrealpath, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS)
 #ifdef __CRT_HAVE_wfrealpath
-__CDECLARE(__ATTR_WUNUSED __ATTR_OUTS(2, 3),wchar_t *,__NOTHROW_RPC,wfrealpath,(__fd_t __fd, wchar_t *__resolved, __SIZE_TYPE__ __buflen),(__fd,__resolved,__buflen))
+__CDECLARE(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_OUTS(2, 3),wchar_t *,__NOTHROW_RPC,wfrealpath,(__fd_t __fd, wchar_t *__resolved, __SIZE_TYPE__ __buflen),(__fd,__resolved,__buflen))
 #elif defined(__CRT_HAVE_wfrealpath4) || (defined(__CRT_HAVE_frealpath4) && (defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || ((defined(__CRT_HAVE_frealpath) || defined(__CRT_HAVE_frealpath4)) && (defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))))
 #include <libc/local/parts.wchar.stdlib/wfrealpath.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(wfrealpath, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_OUTS(2, 3) wchar_t *__NOTHROW_RPC(__LIBCCALL wfrealpath)(__fd_t __fd, wchar_t *__resolved, __SIZE_TYPE__ __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wfrealpath))(__fd, __resolved, __buflen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wfrealpath, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_OUTS(2, 3) wchar_t *__NOTHROW_RPC(__LIBCCALL wfrealpath)(__fd_t __fd, wchar_t *__resolved, __SIZE_TYPE__ __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wfrealpath))(__fd, __resolved, __buflen); })
 #endif /* ... */
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED || __USE_KOS */
 
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_wfrealpath4
-__CDECLARE(__ATTR_WUNUSED __ATTR_OUTS(2, 3),wchar_t *,__NOTHROW_RPC,wfrealpath4,(__fd_t __fd, wchar_t *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),(__fd,__resolved,__buflen,__flags))
+__CDECLARE(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_OUTS(2, 3),wchar_t *,__NOTHROW_RPC,wfrealpath4,(__fd_t __fd, wchar_t *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),(__fd,__resolved,__buflen,__flags))
 #elif defined(__CRT_HAVE_frealpath4) && (defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))
 #include <libc/local/parts.wchar.stdlib/wfrealpath4.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(wfrealpath4, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_OUTS(2, 3) wchar_t *__NOTHROW_RPC(__LIBCCALL wfrealpath4)(__fd_t __fd, wchar_t *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wfrealpath4))(__fd, __resolved, __buflen, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wfrealpath4, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_OUTS(2, 3) wchar_t *__NOTHROW_RPC(__LIBCCALL wfrealpath4)(__fd_t __fd, wchar_t *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wfrealpath4))(__fd, __resolved, __buflen, __flags); })
 #endif /* ... */
 #ifdef __CRT_HAVE_wfrealpathat
 __CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_OUTS(3, 4),wchar_t *,__NOTHROW_RPC,wfrealpathat,(__fd_t __dirfd, wchar_t const *__filename, wchar_t *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),(__dirfd,__filename,__resolved,__buflen,__flags))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x900e121 */
+/* HASH CRC-32:0x936f298b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_timerfd_gettime32_defined
 #define __local___localdep_timerfd_gettime32_defined
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_timerfd_gettime32,(__fd_t __ufd, struct __itimerspec32 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_timerfd_gettime32,(__fd_t __ufd, struct __itimerspec32 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
 #endif /* !__local___localdep_timerfd_gettime32_defined */
-__LOCAL_LIBC(timerfd_gettime64) __ATTR_OUT(2) int
+__LOCAL_LIBC(timerfd_gettime64) __ATTR_FDARG(1) __ATTR_OUT(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timerfd_gettime64))(__fd_t __ufd, struct __itimerspec64 *__restrict __otmr) {
 	int __result;
 	struct __itimerspec32 __otmr32;

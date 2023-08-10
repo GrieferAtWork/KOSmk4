@@ -42,9 +42,9 @@ NOTHROW_NCX(LIBCCALL libc_crypt)(char const *key,
 }
 /*[[[end:libc_crypt]]]*/
 
-/*[[[head:libc_setkey,hash:CRC-32=0x4264ab5f]]]*/
+/*[[[head:libc_setkey,hash:CRC-32=0xefeea0da]]]*/
 /* >> setkey(3), setkey_r(3) */
-INTERN ATTR_SECTION(".text.crt.string.encrypt") void
+INTERN ATTR_SECTION(".text.crt.string.encrypt") ATTR_IN(1) void
 NOTHROW_NCX(LIBCCALL libc_setkey)(char const *key)
 /*[[[body:libc_setkey]]]*/
 /*AUTO*/{

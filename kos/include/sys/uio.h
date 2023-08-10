@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b9777e9 */
+/* HASH CRC-32:0xc02a738a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,7 +91,7 @@ __CDECLARE_OPT(__ATTR_INS(2, 3) __ATTR_INS(4, 5),ssize_t,__NOTHROW_RPC,process_v
  * was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
-__CDECLARE(__ATTR_WUNUSED __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,readv,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),(__fd,__iov,__count))
+__CDECLARE(__ATTR_WUNUSED __ATTR_FDREAD(1) __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,readv,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),(__fd,__iov,__count))
 #elif defined(__CRT_HAVE___readv)
 /* >> readv(2)
  * Same as `read(2)', but rather than specifying a single, continuous buffer,
@@ -102,7 +102,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,readv,(__fd_t _
  * was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,readv,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),__readv,(__fd,__iov,__count))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDREAD(1) __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,readv,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),__readv,(__fd,__iov,__count))
 #endif /* ... */
 #ifdef __CRT_HAVE_writev
 /* >> writev(2)
@@ -114,7 +114,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,readv,(__fd_t 
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */
-__CDECLARE(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,writev,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),(__fd,__iov,__count))
+__CDECLARE(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,writev,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),(__fd,__iov,__count))
 #elif defined(__CRT_HAVE___writev)
 /* >> writev(2)
  * Same as `write(2)', but rather than specifying a single, continuous buffer,
@@ -125,7 +125,7 @@ __CDECLARE(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,writev,(__fd_t __fd, struct io
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */
-__CREDIRECT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,writev,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),__writev,(__fd,__iov,__count))
+__CREDIRECT(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,writev,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),__writev,(__fd,__iov,__count))
 #endif /* ... */
 
 #ifdef __USE_MISC
@@ -134,40 +134,40 @@ __CREDIRECT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,writev,(__fd_t __fd, struct i
  * Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
-__CDECLARE(__ATTR_WUNUSED __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,preadv,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off_t __offset),(__fd,__iov,__count,__offset))
+__CDECLARE(__ATTR_WUNUSED __ATTR_FDREAD(1) __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,preadv,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off_t __offset),(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_preadv64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> preadv(2), preadv64(2)
  * Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,preadv,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off_t __offset),preadv64,(__fd,__iov,__count,__offset))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDREAD(1) __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,preadv,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off_t __offset),preadv64,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_preadv64) || defined(__CRT_HAVE_preadv)
 #include <libc/local/sys.uio/preadv.h>
 /* >> preadv(2), preadv64(2)
  * Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(preadv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL preadv)(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off_t __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(preadv))(__fd, __iov, __count, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(preadv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_FDREAD(1) __ATTR_INS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL preadv)(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off_t __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(preadv))(__fd, __iov, __count, __offset); })
 #endif /* ... */
 #if defined(__CRT_HAVE_pwritev) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> pwritev(2), pwritev64(2)
  * Same as  `writev(2)', but  write data  to a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
-__CDECLARE(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwritev,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off_t __offset),(__fd,__iov,__count,__offset))
+__CDECLARE(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwritev,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off_t __offset),(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_pwritev64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> pwritev(2), pwritev64(2)
  * Same as  `writev(2)', but  write data  to a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
-__CREDIRECT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwritev,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off_t __offset),pwritev64,(__fd,__iov,__count,__offset))
+__CREDIRECT(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwritev,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off_t __offset),pwritev64,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_pwritev64) || defined(__CRT_HAVE_pwritev)
 #include <libc/local/sys.uio/pwritev.h>
 /* >> pwritev(2), pwritev64(2)
  * Same as  `writev(2)', but  write data  to a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pwritev, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL pwritev)(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off_t __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwritev))(__fd, __iov, __count, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pwritev, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDWRITE(1) __ATTR_INS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL pwritev)(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off_t __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwritev))(__fd, __iov, __count, __offset); })
 #endif /* ... */
 
 #ifdef __USE_LARGEFILE64
@@ -176,40 +176,40 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pwritev, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_I
  * Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,preadv64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),preadv,(__fd,__iov,__count,__offset))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDREAD(1) __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,preadv64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),preadv,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_preadv64)
 /* >> preadv(2), preadv64(2)
  * Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
-__CDECLARE(__ATTR_WUNUSED __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,preadv64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),(__fd,__iov,__count,__offset))
+__CDECLARE(__ATTR_WUNUSED __ATTR_FDREAD(1) __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,preadv64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_preadv)
 #include <libc/local/sys.uio/preadv64.h>
 /* >> preadv(2), preadv64(2)
  * Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(preadv64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL preadv64)(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(preadv64))(__fd, __iov, __count, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(preadv64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_FDREAD(1) __ATTR_INS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL preadv64)(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(preadv64))(__fd, __iov, __count, __offset); })
 #endif /* ... */
 #if defined(__CRT_HAVE_pwritev) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> pwritev(2), pwritev64(2)
  * Same as  `writev(2)', but  write data  to a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
-__CREDIRECT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwritev64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),pwritev,(__fd,__iov,__count,__offset))
+__CREDIRECT(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwritev64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),pwritev,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_pwritev64)
 /* >> pwritev(2), pwritev64(2)
  * Same as  `writev(2)', but  write data  to a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
-__CDECLARE(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwritev64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),(__fd,__iov,__count,__offset))
+__CDECLARE(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwritev64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_pwritev)
 #include <libc/local/sys.uio/pwritev64.h>
 /* >> pwritev(2), pwritev64(2)
  * Same as  `writev(2)', but  write data  to a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pwritev64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL pwritev64)(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwritev64))(__fd, __iov, __count, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pwritev64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDWRITE(1) __ATTR_INS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL pwritev64)(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwritev64))(__fd, __iov, __count, __offset); })
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* !__USE_MISC */

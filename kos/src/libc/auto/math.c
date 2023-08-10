@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe246adfc */
+/* HASH CRC-32:0xc769cf9f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4423,7 +4423,7 @@ NOTHROW(LIBCCALL libc_fminmag)(double x,
  * @param: cx: Store the canonicalized value of `*x' here.
  * @return: 0: Success
  * @return: 1: Error (`!iscanonical(*x)') */
-INTERN ATTR_SECTION(".text.crt.math.math") int
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_IN(2) ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_canonicalize)(double *cx,
                                         double const *x) {
 	double value = *x;
@@ -4531,7 +4531,7 @@ NOTHROW(LIBCCALL libc_fminmagf)(float x,
  * @param: cx: Store the canonicalized value of `*x' here.
  * @return: 0: Success
  * @return: 1: Error (`!iscanonical(*x)') */
-INTERN ATTR_SECTION(".text.crt.math.math") int
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_IN(2) ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_canonicalizef)(float *cx,
                                          float const *x) {
 	float value = *x;
@@ -4682,7 +4682,7 @@ DEFINE_INTERN_ALIAS(libc_canonicalizel, libc_canonicalize);
  * @param: cx: Store the canonicalized value of `*x' here.
  * @return: 0: Success
  * @return: 1: Error (`!iscanonical(*x)') */
-INTERN ATTR_SECTION(".text.crt.math.math") int
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_IN(2) ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_canonicalizel)(__LONGDOUBLE *cx,
                                          __LONGDOUBLE const *x) {
 	__LONGDOUBLE value = *x;

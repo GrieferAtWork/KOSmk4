@@ -393,7 +393,7 @@ FILE *fopen_unlocked(char const *filename, char const *mode) {
 
 [[decl_include("<bits/types.h>")]]
 [[requires_function(fdopen, unlock_stream)]]
-FILE *fdopen_unlocked($fd_t fd, char const *mode) {
+FILE *fdopen_unlocked([[fdarg]] $fd_t fd, char const *mode) {
 	FILE *result = fdopen(fd, mode);
 	if (result)
 		unlock_stream(result);
@@ -642,7 +642,7 @@ __STDC_INT_AS_SIZE_T countargv([[in_opt]] char *const *argv) {
 [[wunused, userimpl]] /* `userimpl' because we want to use `kcmp()' (if available) */
 [[requires_function(fstat), decl_include("<bits/types.h>")]]
 [[impl_include("<bits/os/stat.h>")]]
-int fdmatch($fd_t fd1, $fd_t fd2) {
+int fdmatch([[fdarg]] $fd_t fd1, [[fdarg]] $fd_t fd2) {
 	@struct stat@ st1, st2;
 	if (fstat(fd1, &st1) == 0 && fstat(fd2, &st2) == 0) {
 		return st1.@st_dev@ == st2.@st_dev@ &&

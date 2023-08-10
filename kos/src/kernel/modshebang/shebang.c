@@ -57,8 +57,8 @@ DECL_BEGIN
 /* Find the end of the given line (that is: a pointer to the first \r or \n)
  * If no such character exists before `len' bytes have been scanned,  return
  * NULL instead. */
-LOCAL ATTR_PURE NONNULL((1)) char *KCALL
-find_eol(char *line, size_t len) {
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(KCALL find_eol)(char *line, size_t len) {
 	while (len) {
 		char ch = *line;
 		if (ch == '\n' || ch == '\r')
@@ -76,7 +76,8 @@ struct path_aprinter_data {
 };
 
 PRIVATE WUNUSED ssize_t FORMATPRINTER_CC
-path_aprinter(void *arg, char const *__restrict data, size_t datalen) {
+path_aprinter(void *arg, char const *__restrict data, size_t datalen)
+		THROWS(E_BADALLOC) {
 	struct path_aprinter_data *cookie = (struct path_aprinter_data *)arg;
 	size_t usable = kmalloc_usable_size(cookie->pap_buf);
 	size_t used   = (size_t)(cookie->pap_ptr - cookie->pap_buf);
@@ -102,7 +103,7 @@ PRIVATE WUNUSED NONNULL((1)) char *KCALL
 path_aprintent_ex(struct path *__restrict self,
                   NCX char const *dentry_name,
                   u16 dentry_namelen, struct path *root)
-		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
+		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_BADALLOC) {
 	size_t reqlen;
 	char *result;
 	struct path_aprinter_data printer;
@@ -126,7 +127,7 @@ PRIVATE WUNUSED NONNULL((1)) char *KCALL
 path_aprintent(struct path *__restrict self,
                NCX char const *dentry_name,
                u16 dentry_namelen)
-		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
+		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_BADALLOC) {
 	REF struct path *root = fs_getroot(THIS_FS);
 	FINALLY_DECREF_UNLIKELY(root);
 	return path_aprintent_ex(self, dentry_name, dentry_namelen, root);

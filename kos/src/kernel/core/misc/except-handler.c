@@ -201,7 +201,7 @@ abort_SIGINT_program_without_exception_handler(struct icpustate *__restrict stat
  * user-space exception handler with an E_INTERRUPT exception.
  *
  * This function also implements handling of `SA_RESETHAND' */
-PRIVATE WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
+PRIVATE WUNUSED ATTR_INOUT(1) ATTR_IN(2) ATTR_IN(3) ATTR_IN_OPT(4) struct icpustate *FCALL
 userexcept_callsignal_and_maybe_restart_syscall(struct icpustate *__restrict state,
                                                 struct kernel_sigaction const *__restrict action,
                                                 siginfo_t const *__restrict siginfo,

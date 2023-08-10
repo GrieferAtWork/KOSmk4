@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5435222a */
+/* HASH CRC-32:0x71fcb21e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -104,13 +104,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(backtrace_symbols, __FORCELOCAL __ATTR_ARTIFICIA
  * Same as `backtrace_symbols_fd_fmt(array, size, fd, NULL)'
  * @return: 0 : Success
  * @return: -1: Error */
-__CDECLARE(__ATTR_INS(1, 2),int,__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd),(__array,__size,__fd))
+__CDECLARE(__ATTR_FDWRITE(3) __ATTR_INS(1, 2),int,__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd),(__array,__size,__fd))
 #elif defined(__CRT_HAVE___backtrace_symbols_fd)
 /* >> backtrace_symbols_fd(3)
  * Same as `backtrace_symbols_fd_fmt(array, size, fd, NULL)'
  * @return: 0 : Success
  * @return: -1: Error */
-__CREDIRECT(__ATTR_INS(1, 2),int,__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd),__backtrace_symbols_fd,(__array,__size,__fd))
+__CREDIRECT(__ATTR_FDWRITE(3) __ATTR_INS(1, 2),int,__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd),__backtrace_symbols_fd,(__array,__size,__fd))
 #else /* ... */
 #include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
@@ -120,7 +120,7 @@ __CREDIRECT(__ATTR_INS(1, 2),int,__NOTHROW_NCX,backtrace_symbols_fd,(void *const
  * Same as `backtrace_symbols_fd_fmt(array, size, fd, NULL)'
  * @return: 0 : Success
  * @return: -1: Error */
-__NAMESPACE_LOCAL_USING_OR_IMPL(backtrace_symbols_fd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(1, 2) int __NOTHROW_NCX(__LIBCCALL backtrace_symbols_fd)(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(backtrace_symbols_fd))(__array, __size, __fd); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(backtrace_symbols_fd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDWRITE(3) __ATTR_INS(1, 2) int __NOTHROW_NCX(__LIBCCALL backtrace_symbols_fd)(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(backtrace_symbols_fd))(__array, __size, __fd); })
 #endif /* __CRT_HAVE_backtrace_symbols_fd_fmt || ((__CRT_HAVE_write_printer || __CRT_HAVE_writeall || __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write) && __CRT_HAVE_backtrace_symbol_printf) */
 #endif /* !... */
 #ifdef __CRT_HAVE_backtrace_symbols_fmt
@@ -193,7 +193,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(backtrace_symbols_fmt, __FORCELOCAL __ATTR_ARTIF
  * written in total.
  * @return: 0 : Success
  * @return: -1: Error */
-__CDECLARE(__ATTR_INS(1, 2) __ATTR_IN_OPT(4),int,__NOTHROW_NCX,backtrace_symbols_fd_fmt,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd, char const *__format),(__array,__size,__fd,__format))
+__CDECLARE(__ATTR_FDWRITE(3) __ATTR_INS(1, 2) __ATTR_IN_OPT(4),int,__NOTHROW_NCX,backtrace_symbols_fd_fmt,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd, char const *__format),(__array,__size,__fd,__format))
 #elif defined(__CRT_HAVE___backtrace_symbols_fd)
 /* >> backtrace_symbols_fd_fmt(3)
  * Same as `backtrace_symbols_fmt()', but rather than return a vector
@@ -202,7 +202,7 @@ __CDECLARE(__ATTR_INS(1, 2) __ATTR_IN_OPT(4),int,__NOTHROW_NCX,backtrace_symbols
  * written in total.
  * @return: 0 : Success
  * @return: -1: Error */
-__CREDIRECT(__ATTR_INS(1, 2) __ATTR_IN_OPT(4),int,__NOTHROW_NCX,backtrace_symbols_fd_fmt,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd, char const *__format),__backtrace_symbols_fd,(__array,__size,__fd,__format))
+__CREDIRECT(__ATTR_FDWRITE(3) __ATTR_INS(1, 2) __ATTR_IN_OPT(4),int,__NOTHROW_NCX,backtrace_symbols_fd_fmt,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd, char const *__format),__backtrace_symbols_fd,(__array,__size,__fd,__format))
 #else /* ... */
 #include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
@@ -215,7 +215,7 @@ __CREDIRECT(__ATTR_INS(1, 2) __ATTR_IN_OPT(4),int,__NOTHROW_NCX,backtrace_symbol
  * written in total.
  * @return: 0 : Success
  * @return: -1: Error */
-__NAMESPACE_LOCAL_USING_OR_IMPL(backtrace_symbols_fd_fmt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(1, 2) __ATTR_IN_OPT(4) int __NOTHROW_NCX(__LIBCCALL backtrace_symbols_fd_fmt)(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd, char const *__format) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(backtrace_symbols_fd_fmt))(__array, __size, __fd, __format); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(backtrace_symbols_fd_fmt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDWRITE(3) __ATTR_INS(1, 2) __ATTR_IN_OPT(4) int __NOTHROW_NCX(__LIBCCALL backtrace_symbols_fd_fmt)(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd, char const *__format) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(backtrace_symbols_fd_fmt))(__array, __size, __fd, __format); })
 #endif /* (__CRT_HAVE_write_printer || __CRT_HAVE_writeall || __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write) && __CRT_HAVE_backtrace_symbol_printf */
 #endif /* !... */
 

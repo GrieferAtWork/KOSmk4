@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4e5a62d */
+/* HASH CRC-32:0xe646130e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(FSync) void
+__LOCAL_LIBC(FSync) __ATTR_FDWRITE(1) void
 (__LIBCCALL __LIBC_LOCAL_NAME(FSync))(__fd_t __fd) __THROWS(...) {
 	__COMPILER_IMPURE();
 	(void)__fd;

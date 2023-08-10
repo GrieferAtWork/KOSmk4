@@ -125,6 +125,12 @@
 #define ATTR_OUT_T              __ATTR_OUT_T
 #define ATTR_INOUT              __ATTR_INOUT
 #define ATTR_INOUT_T            __ATTR_INOUT_T
+#define ATTR_FDARG              __ATTR_FDARG
+#define ATTR_FDARG_T            __ATTR_FDARG_T
+#define ATTR_FDREAD             __ATTR_FDREAD
+#define ATTR_FDREAD_T           __ATTR_FDREAD_T
+#define ATTR_FDWRITE            __ATTR_FDWRITE
+#define ATTR_FDWRITE_T          __ATTR_FDWRITE_T
 
 
 #define COMPILER_LENOF                __COMPILER_LENOF

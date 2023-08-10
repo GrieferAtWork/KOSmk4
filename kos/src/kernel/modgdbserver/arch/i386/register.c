@@ -265,6 +265,7 @@ NOTHROW(FCALL GDB_GetArchRegisterName)(uintptr_t arch_regno) {
 #endif /* ARCH_REGISTER_KERNEL_FS_BASE */
 
 	default:
+		result = NULL;
 		break;
 	}
 	return result;

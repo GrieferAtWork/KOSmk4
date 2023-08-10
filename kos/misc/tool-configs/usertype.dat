@@ -50,3 +50,4 @@ __unsigned__
 __restrict__
 __complex
 __complex__
+__builtin_assume

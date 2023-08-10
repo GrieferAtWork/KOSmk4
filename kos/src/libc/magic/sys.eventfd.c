@@ -121,7 +121,7 @@ $fd_t eventfd(__STDC_UINT_AS_SIZE_T count,
 @@Read the event counter, and (if not `O_NONBLOCK'), wait for an event to happen
 [[cp, requires_function(read)]]
 [[decl_include("<bits/types.h>"), impl_include("<libc/errno.h>")]]
-int eventfd_read($fd_t fd, eventfd_t *value) {
+int eventfd_read([[fdread]] $fd_t fd, eventfd_t *value) {
 	ssize_t error;
 	error = read(fd, value, sizeof(eventfd_t));
 	if (error == sizeof(eventfd_t))
@@ -137,7 +137,7 @@ int eventfd_read($fd_t fd, eventfd_t *value) {
 @@Increment the event counter
 [[cp, requires_function(write)]]
 [[decl_include("<bits/types.h>"), impl_include("<libc/errno.h>")]]
-int eventfd_write($fd_t fd, eventfd_t value) {
+int eventfd_write([[fdwrite]] $fd_t fd, eventfd_t value) {
 	ssize_t error;
 	error = write(fd, &value, sizeof(eventfd_t));
 	if (error == sizeof(eventfd_t))

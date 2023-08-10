@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1a19ed6 */
+/* HASH CRC-32:0x32404801 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,9 +35,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_posix_fallocate32_defined) && defined(__CRT_HAVE_posix_fallocate)
 #define __local___localdep_posix_fallocate32_defined
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fallocate32,(__fd_t __fd, __pos32_t __offset, __pos32_t __length),posix_fallocate,(__fd,__offset,__length))
+__CREDIRECT(__ATTR_FDARG(1),int,__NOTHROW_NCX,__localdep_posix_fallocate32,(__fd_t __fd, __pos32_t __offset, __pos32_t __length),posix_fallocate,(__fd,__offset,__length))
 #endif /* !__local___localdep_posix_fallocate32_defined && __CRT_HAVE_posix_fallocate */
-__LOCAL_LIBC(posix_fallocate64) int
+__LOCAL_LIBC(posix_fallocate64) __ATTR_FDARG(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_fallocate64))(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length) {
 #ifdef __CRT_HAVE_posix_fallocate
 	return (__NAMESPACE_LOCAL_SYM __localdep_posix_fallocate32)(__fd, (__pos32_t)__offset, (__pos32_t)__length);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f84673f */
+/* HASH CRC-32:0x3f00069e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,10 +76,10 @@ INTDEF FILE *NOTHROW_NCX(LIBDCALL libd_fopen_unlocked)(char const *filename, cha
 INTDEF FILE *NOTHROW_NCX(LIBCCALL libc_fopen_unlocked)(char const *filename, char const *mode);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF FILE *NOTHROW_NCX(LIBDCALL libd_fdopen_unlocked)(fd_t fd, char const *mode);
+INTDEF ATTR_FDARG(1) FILE *NOTHROW_NCX(LIBDCALL libd_fdopen_unlocked)(fd_t fd, char const *mode);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF FILE *NOTHROW_NCX(LIBCCALL libc_fdopen_unlocked)(fd_t fd, char const *mode);
+INTDEF ATTR_FDARG(1) FILE *NOTHROW_NCX(LIBCCALL libc_fdopen_unlocked)(fd_t fd, char const *mode);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED char const *NOTHROW_NCX(LIBDCALL libd_spaces)(__STDC_INT_AS_SIZE_T count);
@@ -160,7 +160,7 @@ INTDEF ATTR_PURE WUNUSED ATTR_IN_OPT(1) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCAL
 INTDEF ATTR_PURE WUNUSED ATTR_IN_OPT(1) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_countargv)(char *const *argv);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED int NOTHROW_NCX(LIBDCALL libd_fdmatch)(fd_t fd1, fd_t fd2);
+INTDEF WUNUSED ATTR_FDARG(1) ATTR_FDARG(2) int NOTHROW_NCX(LIBDCALL libd_fdmatch)(fd_t fd1, fd_t fd2);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_IN_OPT(1) char **NOTHROW_NCX(LIBDCALL libd_buildargv)(char const *cmdline);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__

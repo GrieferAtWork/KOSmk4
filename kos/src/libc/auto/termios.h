@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c0a7601 */
+/* HASH CRC-32:0xdbfa4609 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,76 +64,76 @@ INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc_cfsetispeed)(struct termios *
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tcgetattr(3)
  * Get terminal attributes */
-INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_tcgetattr)(fd_t fd, struct termios *__restrict termios_p);
+INTDEF ATTR_FDARG(1) ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_tcgetattr)(fd_t fd, struct termios *__restrict termios_p);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tcgetattr(3)
  * Get terminal attributes */
-INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_tcgetattr)(fd_t fd, struct termios *__restrict termios_p);
+INTDEF ATTR_FDARG(1) ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_tcgetattr)(fd_t fd, struct termios *__restrict termios_p);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tcsetattr(3)
  * Set terminal attributes
  * @param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH' */
-INTDEF ATTR_IN(3) int NOTHROW_NCX(LIBDCALL libd_tcsetattr)(fd_t fd, __STDC_INT_AS_UINT_T optional_actions, struct termios const *__restrict termios_p);
+INTDEF ATTR_FDARG(1) ATTR_IN(3) int NOTHROW_NCX(LIBDCALL libd_tcsetattr)(fd_t fd, __STDC_INT_AS_UINT_T optional_actions, struct termios const *__restrict termios_p);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tcsetattr(3)
  * Set terminal attributes
  * @param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH' */
-INTDEF ATTR_IN(3) int NOTHROW_NCX(LIBCCALL libc_tcsetattr)(fd_t fd, __STDC_INT_AS_UINT_T optional_actions, struct termios const *__restrict termios_p);
+INTDEF ATTR_FDARG(1) ATTR_IN(3) int NOTHROW_NCX(LIBCCALL libc_tcsetattr)(fd_t fd, __STDC_INT_AS_UINT_T optional_actions, struct termios const *__restrict termios_p);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tcsendbreak(3) */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_tcsendbreak)(fd_t fd, int duration);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_tcsendbreak)(fd_t fd, int duration);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tcsendbreak(3) */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_tcsendbreak)(fd_t fd, int duration);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBCCALL libc_tcsendbreak)(fd_t fd, int duration);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tcdrain(3) */
-INTDEF int NOTHROW_RPC(LIBDCALL libd_tcdrain)(fd_t fd);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC(LIBDCALL libd_tcdrain)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tcdrain(3) */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_tcdrain)(fd_t fd);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC(LIBCCALL libc_tcdrain)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tcflush(3)
  * @param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_tcflush)(fd_t fd, __STDC_INT_AS_UINT_T queue_selector);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_tcflush)(fd_t fd, __STDC_INT_AS_UINT_T queue_selector);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tcflush(3)
  * @param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH' */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_tcflush)(fd_t fd, __STDC_INT_AS_UINT_T queue_selector);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBCCALL libc_tcflush)(fd_t fd, __STDC_INT_AS_UINT_T queue_selector);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tcflow(3)
  * @param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_tcflow)(fd_t fd, __STDC_INT_AS_UINT_T action);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_tcflow)(fd_t fd, __STDC_INT_AS_UINT_T action);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tcflow(3)
  * @param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION' */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_tcflow)(fd_t fd, __STDC_INT_AS_UINT_T action);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBCCALL libc_tcflow)(fd_t fd, __STDC_INT_AS_UINT_T action);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tcgetsid(3) */
-INTDEF pid_t NOTHROW_NCX(LIBDCALL libd_tcgetsid)(fd_t fd);
+INTDEF ATTR_FDARG(1) pid_t NOTHROW_NCX(LIBDCALL libd_tcgetsid)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tcgetsid(3) */
-INTDEF pid_t NOTHROW_NCX(LIBCCALL libc_tcgetsid)(fd_t fd);
+INTDEF ATTR_FDARG(1) pid_t NOTHROW_NCX(LIBCCALL libc_tcgetsid)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tcsetsid(3) */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_tcsetsid)(fd_t fd, pid_t pid);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_tcsetsid)(fd_t fd, pid_t pid);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tcsetsid(3) */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_tcsetsid)(fd_t fd, pid_t pid);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBCCALL libc_tcsetsid)(fd_t fd, pid_t pid);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> cfsetspeed(3) */
@@ -169,19 +169,19 @@ INTDEF ATTR_OUT(1) void NOTHROW_NCX(LIBDCALL libd_cfmakesane)(struct termios *__
 INTDEF ATTR_OUT(1) void NOTHROW_NCX(LIBCCALL libc_cfmakesane)(struct termios *__restrict termios_p);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tcgetwinsize(3) */
-INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_tcgetwinsize)(fd_t fd, struct winsize *winsize_p);
+INTDEF ATTR_FDARG(1) ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_tcgetwinsize)(fd_t fd, struct winsize *winsize_p);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tcgetwinsize(3) */
-INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_tcgetwinsize)(fd_t fd, struct winsize *winsize_p);
+INTDEF ATTR_FDARG(1) ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_tcgetwinsize)(fd_t fd, struct winsize *winsize_p);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tcsetwinsize(3) */
-INTDEF ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_tcsetwinsize)(fd_t fd, struct winsize const *winsize_p);
+INTDEF ATTR_FDARG(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_tcsetwinsize)(fd_t fd, struct winsize const *winsize_p);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tcsetwinsize(3) */
-INTDEF ATTR_IN(2) int NOTHROW_NCX(LIBCCALL libc_tcsetwinsize)(fd_t fd, struct winsize const *winsize_p);
+INTDEF ATTR_FDARG(1) ATTR_IN(2) int NOTHROW_NCX(LIBCCALL libc_tcsetwinsize)(fd_t fd, struct winsize const *winsize_p);
 #endif /* !__KERNEL__ */
 
 DECL_END

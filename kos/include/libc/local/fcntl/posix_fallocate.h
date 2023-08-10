@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0ddf1a */
+/* HASH CRC-32:0xc556ea7f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,14 +35,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_posix_fallocate32_defined) && defined(__CRT_HAVE_posix_fallocate)
 #define __local___localdep_posix_fallocate32_defined
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fallocate32,(__fd_t __fd, __pos32_t __offset, __pos32_t __length),posix_fallocate,(__fd,__offset,__length))
+__CREDIRECT(__ATTR_FDARG(1),int,__NOTHROW_NCX,__localdep_posix_fallocate32,(__fd_t __fd, __pos32_t __offset, __pos32_t __length),posix_fallocate,(__fd,__offset,__length))
 #endif /* !__local___localdep_posix_fallocate32_defined && __CRT_HAVE_posix_fallocate */
 #ifndef __local___localdep_posix_fallocate64_defined
 #define __local___localdep_posix_fallocate64_defined
 #if defined(__CRT_HAVE_posix_fallocate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fallocate64,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length),posix_fallocate,(__fd,__offset,__length))
+__CREDIRECT(__ATTR_FDARG(1),int,__NOTHROW_NCX,__localdep_posix_fallocate64,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length),posix_fallocate,(__fd,__offset,__length))
 #elif defined(__CRT_HAVE_posix_fallocate64)
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fallocate64,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length),posix_fallocate64,(__fd,__offset,__length))
+__CREDIRECT(__ATTR_FDARG(1),int,__NOTHROW_NCX,__localdep_posix_fallocate64,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length),posix_fallocate64,(__fd,__offset,__length))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/fcntl/posix_fallocate64.h>
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_posix_fallocate64 __LIBC_LOCAL_NAME(posix_fallocate64)
 #endif /* !... */
 #endif /* !__local___localdep_posix_fallocate64_defined */
-__LOCAL_LIBC(posix_fallocate) int
+__LOCAL_LIBC(posix_fallocate) __ATTR_FDARG(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_fallocate))(__fd_t __fd, __PIO_OFFSET __offset, __PIO_OFFSET __length) {
 
 	return (__NAMESPACE_LOCAL_SYM __localdep_posix_fallocate64)(__fd, (__PIO_OFFSET64)__offset, (__PIO_OFFSET64)__length);

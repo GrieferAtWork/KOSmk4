@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1ec2c3d */
+/* HASH CRC-32:0xa9a7aa80 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,14 +28,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_pwritev32_defined) && defined(__CRT_HAVE_pwritev)
 #define __local___localdep_pwritev32_defined
-__CREDIRECT(__ATTR_INS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev32,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),pwritev,(__fd,__iov,__count,__offset))
+__CREDIRECT(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev32,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),pwritev,(__fd,__iov,__count,__offset))
 #endif /* !__local___localdep_pwritev32_defined && __CRT_HAVE_pwritev */
 #ifndef __local___localdep_pwritev64_defined
 #define __local___localdep_pwritev64_defined
 #if defined(__CRT_HAVE_pwritev) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_INS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),pwritev,(__fd,__iov,__count,__offset))
+__CREDIRECT(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),pwritev,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_pwritev64)
-__CREDIRECT(__ATTR_INS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),pwritev64,(__fd,__iov,__count,__offset))
+__CREDIRECT(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),pwritev64,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_pwritev)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.uio/pwritev64.h>
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_pwritev64_defined
 #endif /* !... */
 #endif /* !__local___localdep_pwritev64_defined */
-__LOCAL_LIBC(pwritev) __ATTR_INS(2, 3) __SSIZE_TYPE__
+__LOCAL_LIBC(pwritev) __ATTR_FDWRITE(1) __ATTR_INS(2, 3) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwritev))(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off_t __offset) {
 
 	return (__NAMESPACE_LOCAL_SYM __localdep_pwritev64)(__fd, __iov, __count, (__off64_t)__offset);

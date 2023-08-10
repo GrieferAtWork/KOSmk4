@@ -171,10 +171,10 @@ typedef __ATTR_NONNULL_T((1)) __uint64_t (LIBVIO_CC *PVIO_READQ_ALIGNED)(struct 
 typedef __ATTR_NONNULL_T((1)) void (LIBVIO_CC *PVIO_WRITEQ_ALIGNED)(struct vioargs *__restrict args, vio_addr_t addr, __uint64_t value) __THROWS(...);
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 #ifdef LIBVIO_WANT_PROTOTYPES
-__COMPILER_REDIRECT(LIBVIO_DECL,__ATTR_NONNULL((1)),__uint8_t,__THROWING,LIBVIO_CC,vio_readb_aligned,(struct vioargs *__restrict args, vio_addr_t addr),vio_readb,(args,addr))
+__COMPILER_REDIRECT(LIBVIO_DECL,__ATTR_NONNULL((1)),__uint8_t,,LIBVIO_CC,vio_readb_aligned,(struct vioargs *__restrict args, vio_addr_t addr),vio_readb,(args,addr))
 LIBVIO_DECL __ATTR_NONNULL((1)) __uint16_t LIBVIO_CC vio_readw_aligned(struct vioargs *__restrict args, vio_addr_t addr) __THROWS(...);
 LIBVIO_DECL __ATTR_NONNULL((1)) __uint32_t LIBVIO_CC vio_readl_aligned(struct vioargs *__restrict args, vio_addr_t addr) __THROWS(...);
-__COMPILER_REDIRECT_VOID(LIBVIO_DECL,__ATTR_NONNULL((1)),__THROWING,LIBVIO_CC,vio_writeb_aligned,(struct vioargs *__restrict args, vio_addr_t addr, __uint8_t value),vio_writeb,(args,addr,value))
+__COMPILER_REDIRECT_VOID(LIBVIO_DECL,__ATTR_NONNULL((1)),,LIBVIO_CC,vio_writeb_aligned,(struct vioargs *__restrict args, vio_addr_t addr, __uint8_t value),vio_writeb,(args,addr,value))
 LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_writew_aligned(struct vioargs *__restrict args, vio_addr_t addr, __uint16_t value) __THROWS(...);
 LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_writel_aligned(struct vioargs *__restrict args, vio_addr_t addr, __uint32_t value) __THROWS(...);
 #ifdef LIBVIO_CONFIG_HAVE_QWORD

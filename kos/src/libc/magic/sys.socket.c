@@ -988,7 +988,7 @@ int socketpair(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type,
 @@@return: -1: [errno=EADDRNOTAVAIL] E_NET_ADDRESS_NOT_AVAILABLE
 @@@return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (`addr_len' is incorrect)
 [[decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
-int bind($fd_t sockfd, /*[[in(addr_len)]]*/ __CONST_SOCKADDR_ARG addr,
+int bind([[fdarg]] $fd_t sockfd, /*[[in(addr_len)]]*/ __CONST_SOCKADDR_ARG addr,
          socklen_t addr_len);
 
 @@>> getsockname(2)
@@ -1005,7 +1005,7 @@ int bind($fd_t sockfd, /*[[in(addr_len)]]*/ __CONST_SOCKADDR_ARG addr,
 @@return: 0 : Success
 @@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
-int getsockname($fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
+int getsockname([[fdarg]] $fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
                 [[inout]] socklen_t *__restrict addr_len);
 
 @@>> connect(2)
@@ -1020,7 +1020,7 @@ int getsockname($fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKAD
 @@@return: -1: [errno=ECONNREFUSED]  E_NET_CONNECTION_REFUSED
 @@@return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (addr_len is incorrect)
 [[cp, export_alias("__connect"), decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
-int connect($fd_t sockfd, /*[[in(addr_len)]]*/ __CONST_SOCKADDR_ARG addr,
+int connect([[fdarg]] $fd_t sockfd, /*[[in(addr_len)]]*/ __CONST_SOCKADDR_ARG addr,
             socklen_t addr_len);
 
 @@>> getpeername(2)
@@ -1034,7 +1034,7 @@ int connect($fd_t sockfd, /*[[in(addr_len)]]*/ __CONST_SOCKADDR_ARG addr,
 @@@return: -1: [errno=ENOTCONN] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED
 @@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
-int getpeername($fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
+int getpeername([[fdarg]] $fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
                 [[inout]] socklen_t *__restrict addr_len);
 
 @@>> send(2)
@@ -1047,7 +1047,7 @@ int getpeername($fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKAD
 @@@return: -1: [errno=ECONNRESET]   E_NET_CONNECTION_RESET
 @@@return: -1: [errno=EPIPE]        E_NET_SHUTDOWN
 [[cp, export_alias("__send"), decl_include("<features.h>", "<bits/types.h>")]]
-ssize_t send($fd_t sockfd, [[in(return <= bufsize)]] void const *buf,
+ssize_t send([[fdwrite]] $fd_t sockfd, [[in(return <= bufsize)]] void const *buf,
              size_t bufsize, __STDC_INT_AS_UINT_T msg_flags);
 
 @@>> recv(2)
@@ -1058,7 +1058,7 @@ ssize_t send($fd_t sockfd, [[in(return <= bufsize)]] void const *buf,
 @@@return: -1: [errno=ENOTCONN]     E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
 @@@return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED
 [[cp, wunused, export_alias("__recv"), decl_include("<features.h>", "<bits/types.h>")]]
-ssize_t recv($fd_t sockfd, [[out(return <= bufsize)]] void *buf,
+ssize_t recv([[fdread]] $fd_t sockfd, [[out(return <= bufsize)]] void *buf,
              size_t bufsize, __STDC_INT_AS_UINT_T msg_flags);
 
 @@>> sendto(2)
@@ -1078,7 +1078,7 @@ ssize_t recv($fd_t sockfd, [[out(return <= bufsize)]] void *buf,
 @@@return: -1: [errno=EPIPE]        E_NET_SHUTDOWN
 @@@return: -1: [errno=ERANGE]       E_BUFFER_TOO_SMALL  (`addr_len' is incorrect)
 [[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/os/sockaddr.h>")]]
-ssize_t sendto($fd_t sockfd, [[in(return <= bufsize)]] void const *buf,
+ssize_t sendto([[fdwrite]] $fd_t sockfd, [[in(return <= bufsize)]] void const *buf,
                size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
                /*[[in(addr_len)]]*/ __CONST_SOCKADDR_ARG addr,
                socklen_t addr_len);
@@ -1100,7 +1100,7 @@ ssize_t sendto($fd_t sockfd, [[in(return <= bufsize)]] void const *buf,
 @@@return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED
 @@@return: -1: [errno=EAGAIN]       E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
 [[cp, wunused, decl_include("<features.h>", "<bits/types.h>", "<bits/os/sockaddr.h>")]]
-ssize_t recvfrom($fd_t sockfd, [[out(return <= bufsize)]] void *__restrict buf,
+ssize_t recvfrom([[fdread]] $fd_t sockfd, [[out(return <= bufsize)]] void *__restrict buf,
                  size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
                  /*[[out_opt/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
                  [[inout_opt]] socklen_t *__restrict addr_len);
@@ -1113,7 +1113,7 @@ ssize_t recvfrom($fd_t sockfd, [[out(return <= bufsize)]] void *__restrict buf,
 @@@return: * : [<= bufsize] The actual # of send payload bytes
 @@@return: -1: ... Same as for `send(2)' and `sendto(2)'
 [[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/os/msghdr.h>")]]
-ssize_t sendmsg($fd_t sockfd, [[in]] struct msghdr const *message,
+ssize_t sendmsg([[fdwrite]] $fd_t sockfd, [[in]] struct msghdr const *message,
                 __STDC_INT_AS_UINT_T msg_flags);
 
 @@>> recvmsg(2)
@@ -1125,7 +1125,7 @@ ssize_t sendmsg($fd_t sockfd, [[in]] struct msghdr const *message,
 @@@return: * : [<= bufsize] The actual # of received payload bytes
 @@@return: -1: ... Same as for `recv(2)' and `recvfrom(2)'
 [[cp, wunused, decl_include("<features.h>", "<bits/types.h>", "<bits/os/msghdr.h>")]]
-ssize_t recvmsg($fd_t sockfd, [[inout]] struct msghdr *message,
+ssize_t recvmsg([[fdread]] $fd_t sockfd, [[inout]] struct msghdr *message,
                 __STDC_INT_AS_UINT_T msg_flags);
 
 @@>> getsockopt(2)
@@ -1140,7 +1140,7 @@ ssize_t recvmsg($fd_t sockfd, [[inout]] struct msghdr *message,
 @@@return: 0 : Success
 @@@return: -1: [errno=ENOPROTOOPT] E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT
 [[decl_include("<features.h>", "<bits/types.h>")]]
-int getsockopt($fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname,
+int getsockopt([[fdarg]] $fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname,
                [[out/*(*optlen <= *optlen)*/]] void *__restrict optval, [[inout]] socklen_t *__restrict optlen);
 
 @@>> setsockopt(2)
@@ -1153,7 +1153,7 @@ int getsockopt($fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T op
 @@@return: -1: [errno=ENOPROTOOPT] E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT
 @@@return: -1: [errno=ERANGE]      E_BUFFER_TOO_SMALL  (The specified `optlen' is invalid for the given option)
 [[decl_include("<features.h>", "<bits/types.h>")]]
-int setsockopt($fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname,
+int setsockopt([[fdarg]] $fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname,
                [[in(optlen)]] void const *optval, socklen_t optlen);
 
 @@>> listen(2)
@@ -1166,7 +1166,7 @@ int setsockopt($fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T op
 @@@return: -1: [errno=EADDRINUSE]  E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN
 @@@return: -1: [errno=EOPNOTSUPP]  E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_LISTEN
 [[decl_include("<features.h>", "<bits/types.h>")]]
-int listen($fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog);
+int listen([[fdarg]] $fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog);
 
 @@>> accept(2)
 @@Accept incoming client (aka. peer) connection requests.
@@ -1183,7 +1183,7 @@ int listen($fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog);
 @@@return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
 @@@return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT
 [[cp, decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
-$fd_t accept($fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
+$fd_t accept([[fdarg]] $fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
              [[inout_opt]] socklen_t *__restrict addr_len);
 
 @@>> shutdown(2)
@@ -1194,7 +1194,7 @@ $fd_t accept($fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_
 @@@return: 0 : Success
 @@@return: -1: [errno=ENOTCONN] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED
 [[decl_include("<features.h>", "<bits/types.h>")]]
-int shutdown($fd_t sockfd, __STDC_INT_AS_UINT_T how);
+int shutdown([[fdarg]] $fd_t sockfd, __STDC_INT_AS_UINT_T how);
 
 %
 %#if defined(__USE_GNU) || defined(__USE_BSD)
@@ -1214,7 +1214,7 @@ int shutdown($fd_t sockfd, __STDC_INT_AS_UINT_T how);
 @@@return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
 @@@return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT
 [[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/os/sockaddr.h>")]]
-$fd_t accept4($fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
+$fd_t accept4([[fdarg]] $fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
               [[inout_opt]] socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T sock_flags);
 %#endif /* __USE_GNU || __USE_BSD */
 
@@ -1230,12 +1230,12 @@ $fd_t accept4($fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR
 @@@return: -1: ... Same as `sendmsg(2)'
 [[cp, export_alias("__sendmmsg")]]
 [[decl_include("<features.h>", "<bits/types.h>", "<bits/os/mmsghdr.h>")]]
-__STDC_INT_AS_SSIZE_T sendmmsg($fd_t sockfd, [[inout]] struct mmsghdr *vmessages,
+__STDC_INT_AS_SSIZE_T sendmmsg([[fdwrite]] $fd_t sockfd, [[inout]] struct mmsghdr *vmessages,
                                __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags);
 
 [[cp, doc_alias("recvmmsg"), ignore, nocrt, alias("recvmmsg")]]
 [[decl_include("<features.h>", "<bits/types.h>", "<bits/os/mmsghdr.h>", "<bits/os/timespec.h>")]]
-__STDC_INT_AS_SSIZE_T recvmmsg32($fd_t sockfd, [[inout(vlen)]] struct mmsghdr *vmessages,
+__STDC_INT_AS_SSIZE_T recvmmsg32([[fdread]] $fd_t sockfd, [[inout(vlen)]] struct mmsghdr *vmessages,
                                  __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
                                  [[in_opt]] struct $timespec32 *tmo);
 
@@ -1252,7 +1252,7 @@ __STDC_INT_AS_SSIZE_T recvmmsg32($fd_t sockfd, [[inout(vlen)]] struct mmsghdr *v
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("recvmmsg")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("recvmmsg64")]]
 [[userimpl, requires($has_function(recvmmsg32) || $has_function(recvmmsg64))]]
-__STDC_INT_AS_SSIZE_T recvmmsg($fd_t sockfd, [[inout(vlen)]] struct mmsghdr *vmessages,
+__STDC_INT_AS_SSIZE_T recvmmsg([[fdread]] $fd_t sockfd, [[inout(vlen)]] struct mmsghdr *vmessages,
                                __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
                                [[in_opt]] struct timespec *tmo) {
 @@pp_if $has_function(recvmmsg64)@@
@@ -1276,7 +1276,7 @@ __STDC_INT_AS_SSIZE_T recvmmsg($fd_t sockfd, [[inout(vlen)]] struct mmsghdr *vme
 [[cp, preferred_time64_variant_of(recvmmsg), doc_alias("recvmmsg")]]
 [[userimpl, requires_function(recvmmsg32)]]
 [[decl_include("<features.h>", "<bits/types.h>", "<bits/os/mmsghdr.h>", "<bits/os/timespec.h>")]]
-__STDC_INT_AS_SSIZE_T recvmmsg64($fd_t sockfd, [[inout(vlen)]] struct mmsghdr *vmessages,
+__STDC_INT_AS_SSIZE_T recvmmsg64([[fdread]] $fd_t sockfd, [[inout(vlen)]] struct mmsghdr *vmessages,
                                  __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
                                  [[in_opt]] struct timespec64 *tmo) {
 	struct timespec32 tmo32;
@@ -1297,7 +1297,7 @@ __STDC_INT_AS_SSIZE_T recvmmsg64($fd_t sockfd, [[inout(vlen)]] struct mmsghdr *v
 @@@return: == 0: The read-pointer is not pointing at out-of-band data
 @@@return: < 0 : Error (s.a. `errno')
 [[wunused, decl_include("<bits/types.h>")]]
-int sockatmark($fd_t sockfd);
+int sockatmark([[fdarg]] $fd_t sockfd);
 %#endif /* __USE_XOPEN2K */
 
 %
@@ -1309,7 +1309,7 @@ int sockatmark($fd_t sockfd);
 @@@return: 0 : `fd' doesn't match the given type
 @@@return: -1: error (s.a. `errno')
 [[wunused, decl_include("<features.h>", "<bits/types.h>")]]
-int isfdtype($fd_t fd, __STDC_INT_AS_UINT_T fdtype);
+int isfdtype([[fdarg]] $fd_t fd, __STDC_INT_AS_UINT_T fdtype);
 %#endif /* __USE_MISC */
 
 %

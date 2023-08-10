@@ -478,6 +478,18 @@
 #define ATTR_INOUT_T(x)
 #define __ATTR_INOUT(x)
 #define __ATTR_INOUT_T(x)
+#define ATTR_FDARG(x)
+#define ATTR_FDARG_T(x)
+#define __ATTR_FDARG(x)
+#define __ATTR_FDARG_T(x)
+#define ATTR_FDREAD(x)
+#define ATTR_FDREAD_T(x)
+#define __ATTR_FDREAD(x)
+#define __ATTR_FDREAD_T(x)
+#define ATTR_FDWRITE(x)
+#define ATTR_FDWRITE_T(x)
+#define __ATTR_FDWRITE(x)
+#define __ATTR_FDWRITE_T(x)
 
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8a7e3fa */
+/* HASH CRC-32:0xe4a7e86e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(readahead) __SSIZE_TYPE__
+__LOCAL_LIBC(readahead) __ATTR_FDREAD(1) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(readahead))(__fd_t __fd, __PIO_OFFSET64 __offset, __SIZE_TYPE__ __count) {
 	(void)__fd;
 	(void)__offset;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3204d5aa */
+/* HASH CRC-32:0x1416c833 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_futimes32_defined) && defined(__CRT_HAVE_futimes)
 #define __local___localdep_futimes32_defined
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_futimes32,(__fd_t __fd, struct __timeval32 const __tvp[2]),futimes,(__fd,__tvp))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_futimes32,(__fd_t __fd, struct __timeval32 const __tvp[2]),futimes,(__fd,__tvp))
 #endif /* !__local___localdep_futimes32_defined && __CRT_HAVE_futimes */
 #ifndef __local___localdep_futimes64_defined
 #define __local___localdep_futimes64_defined
 #if defined(__CRT_HAVE_lutimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_futimes64,(__fd_t __fd, struct __timeval64 const __tvp[2]),lutimes,(__fd,__tvp))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_futimes64,(__fd_t __fd, struct __timeval64 const __tvp[2]),lutimes,(__fd,__tvp))
 #elif defined(__CRT_HAVE_futimes64)
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_futimes64,(__fd_t __fd, struct __timeval64 const __tvp[2]),futimes64,(__fd,__tvp))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_futimes64,(__fd_t __fd, struct __timeval64 const __tvp[2]),futimes64,(__fd,__tvp))
 #elif defined(__CRT_HAVE_futimes)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/futimes64.h>
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_futimes64_defined
 #endif /* !... */
 #endif /* !__local___localdep_futimes64_defined */
-__LOCAL_LIBC(futimes) __ATTR_IN_OPT(2) int
+__LOCAL_LIBC(futimes) __ATTR_FDARG(1) __ATTR_IN_OPT(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimes))(__fd_t __fd, struct timeval const __tvp[2]) {
 #ifdef __CRT_HAVE_futimes
 	struct __timeval32 __tv32[2];

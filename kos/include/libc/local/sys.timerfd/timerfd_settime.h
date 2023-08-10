@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca23fb97 */
+/* HASH CRC-32:0xa477522 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,14 +28,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_timerfd_settime32_defined) && defined(__CRT_HAVE_timerfd_settime)
 #define __local___localdep_timerfd_settime32_defined
-__CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,__localdep_timerfd_settime32,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct __itimerspec32 const *__utmr, struct __itimerspec32 *__otmr),timerfd_settime,(__ufd,__flags,__utmr,__otmr))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,__localdep_timerfd_settime32,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct __itimerspec32 const *__utmr, struct __itimerspec32 *__otmr),timerfd_settime,(__ufd,__flags,__utmr,__otmr))
 #endif /* !__local___localdep_timerfd_settime32_defined && __CRT_HAVE_timerfd_settime */
 #ifndef __local___localdep_timerfd_settime64_defined
 #define __local___localdep_timerfd_settime64_defined
 #if defined(__CRT_HAVE_timerfd_settime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,__localdep_timerfd_settime64,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__utmr, struct __itimerspec64 *__otmr),timerfd_settime,(__ufd,__flags,__utmr,__otmr))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,__localdep_timerfd_settime64,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__utmr, struct __itimerspec64 *__otmr),timerfd_settime,(__ufd,__flags,__utmr,__otmr))
 #elif defined(__CRT_HAVE_timerfd_settime64)
-__CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,__localdep_timerfd_settime64,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__utmr, struct __itimerspec64 *__otmr),timerfd_settime64,(__ufd,__flags,__utmr,__otmr))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,__localdep_timerfd_settime64,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__utmr, struct __itimerspec64 *__otmr),timerfd_settime64,(__ufd,__flags,__utmr,__otmr))
 #elif defined(__CRT_HAVE_timerfd_settime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.timerfd/timerfd_settime64.h>
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_timerfd_settime64_defined
 #endif /* !... */
 #endif /* !__local___localdep_timerfd_settime64_defined */
-__LOCAL_LIBC(timerfd_settime) __ATTR_IN(3) __ATTR_OUT_OPT(4) int
+__LOCAL_LIBC(timerfd_settime) __ATTR_FDARG(1) __ATTR_IN(3) __ATTR_OUT_OPT(4) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timerfd_settime))(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec const *__utmr, struct itimerspec *__otmr) {
 #ifdef __CRT_HAVE_timerfd_settime
 	int __result;

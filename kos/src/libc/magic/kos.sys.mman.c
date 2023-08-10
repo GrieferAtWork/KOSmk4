@@ -48,7 +48,7 @@ __SYSDECL_BEGIN
 [[throws, decl_include("<features.h>", "<bits/types.h>")]]
 [[doc_alias("mmap"), ignore, nocrt, alias("MMap")]]
 void *MMap32([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
-             __STDC_INT_AS_UINT_T flags, $fd_t fd, $pos32_t offset);
+             __STDC_INT_AS_UINT_T flags, [[fdarg]] $fd_t fd, $pos32_t offset);
 
 [[throws, wunused, doc_alias("mmap"), decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("MMap")]]
@@ -56,7 +56,7 @@ void *MMap32([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 [[userimpl, requires($has_function(MMap32) || $has_function(MMap64))]]
 [[section(".text.crt.except.heap.mman")]]
 void *MMap([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
-           __STDC_INT_AS_UINT_T flags, $fd_t fd, $pos_t offset) {
+           __STDC_INT_AS_UINT_T flags, [[fdarg]] $fd_t fd, $pos_t offset) {
 @@pp_if $has_function(MMap64)@@
 	return MMap64(addr, len, prot, flags, fd, (pos64_t)offset);
 @@pp_else@@
@@ -191,7 +191,7 @@ void MInCore([[access(none)]] void *start, size_t len, unsigned char *vec);
 [[doc_alias("mmap"), preferred_off64_variant_of(MMap)]]
 [[userimpl, requires_function(MMap32)]]
 void *MMap64([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
-             __STDC_INT_AS_UINT_T flags, $fd_t fd, $pos64_t offset) {
+             __STDC_INT_AS_UINT_T flags, [[fdarg]] $fd_t fd, $pos64_t offset) {
 	return MMap32(addr, len, prot, flags, fd, (pos32_t)offset);
 }
 %#endif /* __USE_LARGEFILE64 */
@@ -239,7 +239,7 @@ void MLock2([[access(none)]] void const *addr, size_t length, unsigned int flags
 [[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
 int PKeyAlloc(unsigned int flags, unsigned int access_rights);
 
-[[throws, doc_alias("pkey_set")]]
+[[throws(E_INVALID_ARGUMENT_BAD_VALUE), doc_alias("pkey_set")]]
 [[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
 [[impl_include("<asm/pkey.h>", "<kos/except/codes.h>", "<kos/except/reason/inval.h>")]]
 [[requires_include("<asm/pkey.h>")]]
@@ -252,7 +252,7 @@ void PKeySet(int pkey, unsigned int access_rights) {
 	__arch_pkey_set(pkey, access_rights);
 }
 
-[[throws, doc_alias("pkey_get")]]
+[[throws(E_INVALID_ARGUMENT_BAD_VALUE), doc_alias("pkey_get")]]
 [[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
 [[impl_include("<asm/pkey.h>", "<kos/except/codes.h>", "<kos/except/reason/inval.h>")]]
 [[requires_include("<asm/pkey.h>")]]

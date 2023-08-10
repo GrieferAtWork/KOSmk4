@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0ff3968 */
+/* HASH CRC-32:0xf4a6bfdc */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,9 +35,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_posix_fadvise32_defined) && defined(__CRT_HAVE_posix_fadvise)
 #define __local___localdep_posix_fadvise32_defined
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fadvise32,(__fd_t __fd, __off32_t __offset, __off32_t __length, __STDC_INT_AS_UINT_T __advise),posix_fadvise,(__fd,__offset,__length,__advise))
+__CREDIRECT(__ATTR_FDARG(1),int,__NOTHROW_NCX,__localdep_posix_fadvise32,(__fd_t __fd, __off32_t __offset, __off32_t __length, __STDC_INT_AS_UINT_T __advise),posix_fadvise,(__fd,__offset,__length,__advise))
 #endif /* !__local___localdep_posix_fadvise32_defined && __CRT_HAVE_posix_fadvise */
-__LOCAL_LIBC(posix_fadvise64) int
+__LOCAL_LIBC(posix_fadvise64) __ATTR_FDARG(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_fadvise64))(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length, __STDC_INT_AS_UINT_T __advise) {
 #ifdef __CRT_HAVE_posix_fadvise
 	return (__NAMESPACE_LOCAL_SYM __localdep_posix_fadvise32)(__fd, (__pos32_t)__offset, (__pos32_t)__length, __advise);

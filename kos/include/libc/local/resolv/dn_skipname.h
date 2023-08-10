@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87912729 */
+/* HASH CRC-32:0xcbf1296d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ns_name_skip_defined
 #define __local___localdep_ns_name_skip_defined
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ns_name_skip,(unsigned char const **__p_msg_ptr, unsigned char const *__msg_end),ns_name_skip,(__p_msg_ptr,__msg_end))
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ns_name_skip,(unsigned char const **__p_msg_ptr, unsigned char const *__msg_end),ns_name_skip,(__p_msg_ptr,__msg_end))
 #endif /* !__local___localdep_ns_name_skip_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>

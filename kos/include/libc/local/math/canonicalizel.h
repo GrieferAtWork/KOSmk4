@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77b5a490 */
+/* HASH CRC-32:0xfcb489c5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !... */
 #endif /* !__local___localdep___issignalingl_defined */
-__LOCAL_LIBC(canonicalizel) int
+__LOCAL_LIBC(canonicalizel) __ATTR_IN(2) __ATTR_OUT(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(canonicalizel))(__LONGDOUBLE *__cx, __LONGDOUBLE const *__x) {
 	__LONGDOUBLE ___value = *__x;
 

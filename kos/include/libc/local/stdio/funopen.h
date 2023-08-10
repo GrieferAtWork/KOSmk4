@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6ca334a */
+/* HASH CRC-32:0x172dcbe */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -113,7 +113,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen2_closefn_defined
 __LOCAL_LIBC(__funopen_to_funopen2_closefn) int
-(__LIBKCALL __funopen_to_funopen2_closefn)(void *__cookie) {
+__NOTHROW_CB(__LIBKCALL __funopen_to_funopen2_closefn)(void *__cookie) {
 	int __result = 0;
 	struct __funopen_holder *__holder;
 	__holder = (struct __funopen_holder *)__cookie;
@@ -131,8 +131,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __funopen_to_funopen2_readfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen2_readfn_defined
-__LOCAL_LIBC(__funopen_to_funopen2_readfn) __SSIZE_TYPE__
-(__LIBKCALL __funopen_to_funopen2_readfn)(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes) {
+__LOCAL_LIBC(__funopen_to_funopen2_readfn) __ATTR_OUTS(2, 3) __SSIZE_TYPE__
+__NOTHROW_CB_NCX(__LIBKCALL __funopen_to_funopen2_readfn)(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes) {
 	struct __funopen_holder *__holder;
 	__holder = (struct __funopen_holder *)__cookie;
 	return (__SSIZE_TYPE__)(*__holder->__fh_readfn)(__holder->__fh_cookie, (char *)__buf,
@@ -144,8 +144,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __funopen_to_funopen2_writefn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen2_writefn_defined
-__LOCAL_LIBC(__funopen_to_funopen2_writefn) __SSIZE_TYPE__
-(__LIBKCALL __funopen_to_funopen2_writefn)(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes) {
+__LOCAL_LIBC(__funopen_to_funopen2_writefn) __ATTR_INS(2, 3) __SSIZE_TYPE__
+__NOTHROW_CB_NCX(__LIBKCALL __funopen_to_funopen2_writefn)(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes) {
 	struct __funopen_holder *__holder;
 	__holder = (struct __funopen_holder *)__cookie;
 	return (__SSIZE_TYPE__)(*__holder->__fh_writefn)(__holder->__fh_cookie, (char const *)__buf,
@@ -158,7 +158,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen2_seekfn_defined
 __LOCAL_LIBC(__funopen_to_funopen2_seekfn) __off_t
-(__LIBKCALL __funopen_to_funopen2_seekfn)(void *__cookie, __off_t __off, int __whence) {
+__NOTHROW_CB(__LIBKCALL __funopen_to_funopen2_seekfn)(void *__cookie, __off_t __off, int __whence) {
 	struct __funopen_holder *__holder;
 	__holder = (struct __funopen_holder *)__cookie;
 	return (*__holder->__fh_seekfn)(__holder->__fh_cookie, __off, __whence);
@@ -170,8 +170,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __funopen_to_funopen2_readfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen2_readfn_defined
-__LOCAL_LIBC(__funopen_to_funopen2_readfn) __SSIZE_TYPE__
-(__LIBKCALL __funopen_to_funopen2_readfn)(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes) {
+__LOCAL_LIBC(__funopen_to_funopen2_readfn) __ATTR_OUTS(2, 3) __SSIZE_TYPE__
+__NOTHROW_CB_NCX(__LIBKCALL __funopen_to_funopen2_readfn)(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes) {
 	struct __funopen_holder *__holder;
 	__holder = (struct __funopen_holder *)__cookie;
 	return (__SSIZE_TYPE__)(*__holder->__fh_readfn)(__holder->__fh_cookie, (char *)__buf,
@@ -183,8 +183,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __funopen_to_funopen2_writefn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen2_writefn_defined
-__LOCAL_LIBC(__funopen_to_funopen2_writefn) __SSIZE_TYPE__
-(__LIBKCALL __funopen_to_funopen2_writefn)(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes) {
+__LOCAL_LIBC(__funopen_to_funopen2_writefn) __ATTR_INS(2, 3) __SSIZE_TYPE__
+__NOTHROW_CB_NCX(__LIBKCALL __funopen_to_funopen2_writefn)(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes) {
 	struct __funopen_holder *__holder;
 	__holder = (struct __funopen_holder *)__cookie;
 	return (__SSIZE_TYPE__)(*__holder->__fh_writefn)(__holder->__fh_cookie, (char const *)__buf,
@@ -198,10 +198,10 @@ __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_fopencookie_seekfn_defined
 #ifdef __USE_KOS_ALTERATIONS
 __LOCAL_LIBC(__funopen_to_fopencookie_seekfn) __ATTR_NONNULL((2)) int
-(__LIBKCALL __funopen_to_fopencookie_seekfn)(void *__cookie, __pos64_t *__pos, int __whence)
+__NOTHROW_CB(__LIBKCALL __funopen_to_fopencookie_seekfn)(void *__cookie, __pos64_t *__pos, int __whence)
 #else /* __USE_KOS_ALTERATIONS */
 __LOCAL_LIBC(__funopen_to_fopencookie_seekfn) __ATTR_NONNULL((2)) int
-(__LIBKCALL __funopen_to_fopencookie_seekfn)(void *__cookie, __off64_t *__pos, int __whence)
+__NOTHROW_CB(__LIBKCALL __funopen_to_fopencookie_seekfn)(void *__cookie, __off64_t *__pos, int __whence)
 #endif /* !__USE_KOS_ALTERATIONS */
 {
 	__off_t __newpos;
@@ -226,8 +226,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __funopen_to_funopen2_readfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen2_readfn_defined
-__LOCAL_LIBC(__funopen_to_funopen2_readfn) __SSIZE_TYPE__
-(__LIBKCALL __funopen_to_funopen2_readfn)(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes) {
+__LOCAL_LIBC(__funopen_to_funopen2_readfn) __ATTR_OUTS(2, 3) __SSIZE_TYPE__
+__NOTHROW_CB_NCX(__LIBKCALL __funopen_to_funopen2_readfn)(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes) {
 	struct __funopen_holder *__holder;
 	__holder = (struct __funopen_holder *)__cookie;
 	return (__SSIZE_TYPE__)(*__holder->__fh_readfn)(__holder->__fh_cookie, (char *)__buf,
@@ -239,8 +239,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __funopen_to_funopen2_writefn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen2_writefn_defined
-__LOCAL_LIBC(__funopen_to_funopen2_writefn) __SSIZE_TYPE__
-(__LIBKCALL __funopen_to_funopen2_writefn)(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes) {
+__LOCAL_LIBC(__funopen_to_funopen2_writefn) __ATTR_INS(2, 3) __SSIZE_TYPE__
+__NOTHROW_CB_NCX(__LIBKCALL __funopen_to_funopen2_writefn)(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes) {
 	struct __funopen_holder *__holder;
 	__holder = (struct __funopen_holder *)__cookie;
 	return (__SSIZE_TYPE__)(*__holder->__fh_writefn)(__holder->__fh_cookie, (char const *)__buf,
@@ -253,8 +253,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __funopen_to_funopen64_readfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen64_readfn_defined
-__LOCAL_LIBC(__funopen_to_funopen64_readfn) int
-(__LIBKCALL __funopen_to_funopen64_readfn)(void *__cookie, char *__buf, int __num_bytes) {
+__LOCAL_LIBC(__funopen_to_funopen64_readfn) __ATTR_OUTS(2, 3) int
+__NOTHROW_CB_NCX(__LIBKCALL __funopen_to_funopen64_readfn)(void *__cookie, char *__buf, int __num_bytes) {
 	struct __funopen_holder *__holder;
 	__holder = (struct __funopen_holder *)__cookie;
 	return (*__holder->__fh_readfn)(__holder->__fh_cookie, __buf, __num_bytes);
@@ -265,8 +265,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __funopen_to_funopen64_writefn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen64_writefn_defined
-__LOCAL_LIBC(__funopen_to_funopen64_writefn) int
-(__LIBKCALL __funopen_to_funopen64_writefn)(void *__cookie, char const *__buf, int __num_bytes) {
+__LOCAL_LIBC(__funopen_to_funopen64_writefn) __ATTR_INS(2, 3) int
+__NOTHROW_CB_NCX(__LIBKCALL __funopen_to_funopen64_writefn)(void *__cookie, char const *__buf, int __num_bytes) {
 	struct __funopen_holder *__holder;
 	__holder = (struct __funopen_holder *)__cookie;
 	return (*__holder->__fh_writefn)(__holder->__fh_cookie, __buf, __num_bytes);
@@ -279,7 +279,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen64_seekfn_defined
 __LOCAL_LIBC(__funopen_to_funopen64_seekfn) __off64_t
-(__LIBKCALL __funopen_to_funopen64_seekfn)(void *__cookie, __off64_t __off, int __whence) {
+__NOTHROW_CB(__LIBKCALL __funopen_to_funopen64_seekfn)(void *__cookie, __off64_t __off, int __whence) {
 	struct __funopen_holder *__holder;
 	__holder = (struct __funopen_holder *)__cookie;
 	return (*__holder->__fh_seekfn)(__holder->__fh_cookie, (__off_t)__off, __whence);

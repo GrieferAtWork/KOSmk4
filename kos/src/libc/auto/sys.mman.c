@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4aa9cd57 */
+/* HASH CRC-32:0x70848ccc */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -214,7 +214,7 @@ badkey:
  *                              in its entirety), or because  `max_bytes == (size_t)-1', and the effective  area
  *                              that you are trying to map is larger than the entirety of your address space.
  * @return: -1: [errno=*]       Read error */
-INTERN ATTR_SECTION(".text.crt.system.mman") WUNUSED ATTR_OUT(1) int
+INTERN ATTR_SECTION(".text.crt.system.mman") WUNUSED ATTR_FDARG(2) ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping,
                                     fd_t fd,
                                     pos64_t offset,

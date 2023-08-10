@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc277a880 */
+/* HASH CRC-32:0xc9f92f7a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,26 +60,26 @@ __CREDIRECT(__ATTR_PURE __ATTR_IN(1),__fd_t,__NOTHROW_NCX,__localdep_dirfd,(stru
 #endif /* !__local___localdep_dirfd_defined && __CRT_HAVE_dirfd */
 #if !defined(__local___localdep_frealpath4_defined) && defined(__CRT_HAVE_frealpath4)
 #define __local___localdep_frealpath4_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT_OPT(2),char *,__NOTHROW_RPC,__localdep_frealpath4,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),frealpath4,(__fd,__resolved,__buflen,__flags))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_OUT_OPT(2),char *,__NOTHROW_RPC,__localdep_frealpath4,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),frealpath4,(__fd,__resolved,__buflen,__flags))
 #endif /* !__local___localdep_frealpath4_defined && __CRT_HAVE_frealpath4 */
 #ifndef __local___localdep_fstat64_defined
 #define __local___localdep_fstat64_defined
 #if defined(__CRT_HAVE_kfstat) && defined(__CRT_KOS_PRIMARY)
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),kfstat,(__fd,__buf))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),kfstat,(__fd,__buf))
 #elif defined(__CRT_HAVE_kfstat64) && defined(__CRT_KOS_PRIMARY)
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),kfstat64,(__fd,__buf))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),kfstat64,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),_fstat64,(__fd,__buf))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),_fstat64,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),_fstat64i32,(__fd,__buf))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),_fstat64i32,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),_fstati64,(__fd,__buf))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),_fstati64,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),_fstat32i64,(__fd,__buf))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),_fstat32i64,(__fd,__buf))
 #elif defined(__CRT_HAVE_fstat) && defined(__STAT32_MATCHES_STAT64)
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),fstat,(__fd,__buf))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),fstat,(__fd,__buf))
 #elif defined(__CRT_HAVE_fstat64)
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),fstat64,(__fd,__buf))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),fstat64,(__fd,__buf))
 #else /* ... */
 #undef __local___localdep_fstat64_defined
 #endif /* !... */
@@ -101,11 +101,11 @@ __CREDIRECT(__ATTR_IN(2) __ATTR_OUT(3),int,__NOTHROW_NCX,__localdep_fstatat64,(_
 #ifndef __local___localdep_isatty_defined
 #define __local___localdep_isatty_defined
 #ifdef __CRT_HAVE_isatty
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isatty,(__fd_t __fd),isatty,(__fd))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1),int,__NOTHROW_NCX,__localdep_isatty,(__fd_t __fd),isatty,(__fd))
 #elif defined(__CRT_HAVE__isatty)
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isatty,(__fd_t __fd),_isatty,(__fd))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1),int,__NOTHROW_NCX,__localdep_isatty,(__fd_t __fd),_isatty,(__fd))
 #elif defined(__CRT_HAVE___isatty)
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isatty,(__fd_t __fd),__isatty,(__fd))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1),int,__NOTHROW_NCX,__localdep_isatty,(__fd_t __fd),__isatty,(__fd))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <asm/os/tty.h>
@@ -245,7 +245,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/os/dirent.h>
 #include <asm/os/stat.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ttyname_r) __ATTR_OUTS(2, 3) __errno_t
+__LOCAL_LIBC(ttyname_r) __ATTR_FDARG(1) __ATTR_OUTS(2, 3) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(ttyname_r))(__fd_t __fd, char *__buf, __SIZE_TYPE__ __buflen) {
 
 	/* Ensure that it's actually a TTY */

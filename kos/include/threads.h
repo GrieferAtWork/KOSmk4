@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d36b35f */
+/* HASH CRC-32:0x2ad7e8a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -596,11 +596,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_timedwait64, __FORCELOCAL __ATTR_ARTIFICIAL 
 #ifdef __CRT_HAVE_pthread_cond_destroy
 /* Destroy condition variable pointed by cond and free all of its resources
  * s.a. `pthread_cond_destroy()' */
-__CREDIRECT_VOID(,__NOTHROW_NCX,cnd_destroy,(cnd_t *__cond),pthread_cond_destroy,(__cond))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,cnd_destroy,(cnd_t *__cond),pthread_cond_destroy,(__cond))
 #elif defined(__CRT_HAVE_cnd_destroy)
 /* Destroy condition variable pointed by cond and free all of its resources
  * s.a. `pthread_cond_destroy()' */
-__CDECLARE_VOID(,__NOTHROW_NCX,cnd_destroy,(cnd_t *__cond),(__cond))
+__CDECLARE_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,cnd_destroy,(cnd_t *__cond),(__cond))
 #endif /* ... */
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab24c863 */
+/* HASH CRC-32:0x210b9bfa */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,9 +40,9 @@ INTDEF ATTR_IN(1) ATTR_IN_OPT(2) int NOTHROW_RPC(LIBDCALL libd_utime64)(char con
 /* >> utime(2), utime64(2) */
 INTDEF ATTR_IN(1) ATTR_IN_OPT(2) int NOTHROW_RPC(LIBCCALL libc_utime64)(char const *filename, struct utimbuf64 const *file_times);
 /* >> futime(3), futime64(3) */
-INTDEF ATTR_IN_OPT(2) int NOTHROW_RPC(LIBCCALL libc_futime)(fd_t fd, struct utimbuf const *file_times);
+INTDEF ATTR_FDARG(1) ATTR_IN_OPT(2) int NOTHROW_RPC(LIBCCALL libc_futime)(fd_t fd, struct utimbuf const *file_times);
 /* >> futime(3), futime64(3) */
-INTDEF ATTR_IN_OPT(2) int NOTHROW_RPC(LIBCCALL libc_futime64)(fd_t fd, struct utimbuf64 const *file_times);
+INTDEF ATTR_FDARG(1) ATTR_IN_OPT(2) int NOTHROW_RPC(LIBCCALL libc_futime64)(fd_t fd, struct utimbuf64 const *file_times);
 #endif /* !__KERNEL__ */
 
 DECL_END

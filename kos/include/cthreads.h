@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x448f51aa */
+/* HASH CRC-32:0x2b04e5a4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -193,41 +193,41 @@ struct mutex {
 #endif
 
 #ifdef __CRT_HAVE___mutex_trylock
-__CREDIRECT(,int,__NOTHROW_NCX,mutex_try_lock,(mutex_t __m),__mutex_trylock,(__m))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,mutex_try_lock,(mutex_t __m),__mutex_trylock,(__m))
 #elif defined(__CRT_HAVE___spin_try_lock)
-__CREDIRECT(,int,__NOTHROW_NCX,mutex_try_lock,(mutex_t __m),__spin_try_lock,(__m))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,mutex_try_lock,(mutex_t __m),__spin_try_lock,(__m))
 #else /* ... */
 #include <libc/local/lock-intern/__spin_try_lock.h>
-__FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL mutex_try_lock)(mutex_t __m) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__spin_try_lock))((unsigned int *)__m); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) int __NOTHROW_NCX(__LIBCCALL mutex_try_lock)(mutex_t __m) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__spin_try_lock))((unsigned int *)__m); }
 #endif /* !... */
 #ifdef __CRT_HAVE___mutex_lock
-__CREDIRECT_VOID(,__NOTHROW_NCX,mutex_wait_lock,(mutex_t __m),__mutex_lock,(__m))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,mutex_wait_lock,(mutex_t __m),__mutex_lock,(__m))
 #elif defined(__CRT_HAVE___mutex_lock_solid)
-__CREDIRECT_VOID(,__NOTHROW_NCX,mutex_wait_lock,(mutex_t __m),__mutex_lock_solid,(__m))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,mutex_wait_lock,(mutex_t __m),__mutex_lock_solid,(__m))
 #elif defined(__CRT_HAVE_mutex_wait_lock)
-__CDECLARE_VOID(,__NOTHROW_NCX,mutex_wait_lock,(mutex_t __m),(__m))
+__CDECLARE_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,mutex_wait_lock,(mutex_t __m),(__m))
 #elif defined(__CRT_HAVE___spin_lock)
-__CREDIRECT_VOID(,__NOTHROW_NCX,mutex_wait_lock,(mutex_t __m),__spin_lock,(__m))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,mutex_wait_lock,(mutex_t __m),__spin_lock,(__m))
 #elif defined(__CRT_HAVE___spin_lock_solid)
-__CREDIRECT_VOID(,__NOTHROW_NCX,mutex_wait_lock,(mutex_t __m),__spin_lock_solid,(__m))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,mutex_wait_lock,(mutex_t __m),__spin_lock_solid,(__m))
 #else /* ... */
 #include <kos/bits/shared-lock.h>
 #if defined(__CRT_HAVE_shared_lock_acquire) || defined(__KERNEL__) || defined(__shared_lock_wait_impl)
 #include <libc/local/lock-intern/__spin_lock_solid.h>
-__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL mutex_wait_lock)(mutex_t __m) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__spin_lock_solid))((unsigned int *)__m); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) void __NOTHROW_NCX(__LIBCCALL mutex_wait_lock)(mutex_t __m) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__spin_lock_solid))((unsigned int *)__m); }
 #endif /* __CRT_HAVE_shared_lock_acquire || __KERNEL__ || __shared_lock_wait_impl */
 #endif /* !... */
 #ifdef __CRT_HAVE___mutex_unlock
-__CREDIRECT_VOID(,__NOTHROW_NCX,mutex_unlock,(mutex_t __m),__mutex_unlock,(__m))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,mutex_unlock,(mutex_t __m),__mutex_unlock,(__m))
 #elif defined(__CRT_HAVE_mutex_unlock)
-__CDECLARE_VOID(,__NOTHROW_NCX,mutex_unlock,(mutex_t __m),(__m))
+__CDECLARE_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,mutex_unlock,(mutex_t __m),(__m))
 #elif defined(__CRT_HAVE___spin_unlock)
-__CREDIRECT_VOID(,__NOTHROW_NCX,mutex_unlock,(mutex_t __m),__spin_unlock,(__m))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,mutex_unlock,(mutex_t __m),__spin_unlock,(__m))
 #else /* ... */
 #include <kos/bits/shared-lock.h>
 #if defined(__CRT_HAVE_shared_lock_release_ex) || defined(__shared_lock_release_ex) || (defined(__shared_lock_sendone) && defined(__shared_lock_sendall))
 #include <libc/local/lock-intern/__spin_unlock.h>
-__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL mutex_unlock)(mutex_t __m) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__spin_unlock))((unsigned int *)__m); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) void __NOTHROW_NCX(__LIBCCALL mutex_unlock)(mutex_t __m) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__spin_unlock))((unsigned int *)__m); }
 #endif /* __CRT_HAVE_shared_lock_release_ex || __shared_lock_release_ex || (__shared_lock_sendone && __shared_lock_sendall) */
 #endif /* !... */
 

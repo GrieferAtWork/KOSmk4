@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee1c6c45 */
+/* HASH CRC-32:0xff6d4f17 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,7 +99,7 @@ __CDECLARE_OPT(__ATTR_DEPRECATED("Use `getxattr(2)\' or `lgetxattr(2)\' instead"
  * @param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_SECURE | ATTR_ROOT'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE_OPT(__ATTR_DEPRECATED("Use `fgetxattr(2)\' instead") __ATTR_IN(2) __ATTR_INOUT(4),int,__NOTHROW_NCX,attr_getf,(__fd_t __fd, char const *__attrname, char *__attrvalue, int *__valuelength, int __flags),(__fd,__attrname,__attrvalue,__valuelength,__flags))
+__CDECLARE_OPT(__ATTR_DEPRECATED("Use `fgetxattr(2)\' instead") __ATTR_FDARG(1) __ATTR_IN(2) __ATTR_INOUT(4),int,__NOTHROW_NCX,attr_getf,(__fd_t __fd, char const *__attrname, char *__attrvalue, int *__valuelength, int __flags),(__fd,__attrname,__attrvalue,__valuelength,__flags))
 /* >> attr_set(3), attr_setf(3)
  * @param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_CREATE | ATTR_REPLACE | ATTR_SECURE | ATTR_ROOT'
  * @return: 0 : Success
@@ -109,7 +109,7 @@ __CDECLARE_OPT(__ATTR_DEPRECATED("Use `setxattr(2)\' or `lsetxattr(2)\' instead"
  * @param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_CREATE | ATTR_REPLACE | ATTR_SECURE | ATTR_ROOT'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE_OPT(__ATTR_DEPRECATED("Use `fsetxattr(2)\' instead") __ATTR_IN(2) __ATTR_INS(3, 4),int,__NOTHROW_NCX,attr_setf,(__fd_t __fd, char const *__attrname, char const *__attrvalue, int __valuelength, int __flags),(__fd,__attrname,__attrvalue,__valuelength,__flags))
+__CDECLARE_OPT(__ATTR_DEPRECATED("Use `fsetxattr(2)\' instead") __ATTR_FDARG(1) __ATTR_IN(2) __ATTR_INS(3, 4),int,__NOTHROW_NCX,attr_setf,(__fd_t __fd, char const *__attrname, char const *__attrvalue, int __valuelength, int __flags),(__fd,__attrname,__attrvalue,__valuelength,__flags))
 /* >> attr_remove(3), attr_removef(3)
  * @param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_SECURE | ATTR_ROOT'
  * @return: 0 : Success
@@ -119,7 +119,7 @@ __CDECLARE_OPT(__ATTR_DEPRECATED("Use `removexattr(2)\' or `lremovexattr(2)\' in
  * @param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_SECURE | ATTR_ROOT'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE_OPT(__ATTR_DEPRECATED("Use `fremovexattr(2)\' instead") __ATTR_IN(2),int,__NOTHROW_NCX,attr_removef,(__fd_t __fd, char const *__attrname, int __flags),(__fd,__attrname,__flags))
+__CDECLARE_OPT(__ATTR_DEPRECATED("Use `fremovexattr(2)\' instead") __ATTR_FDARG(1) __ATTR_IN(2),int,__NOTHROW_NCX,attr_removef,(__fd_t __fd, char const *__attrname, int __flags),(__fd,__attrname,__flags))
 /* >> attr_list(3), attr_listf(3)
  * @param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_SECURE | ATTR_ROOT'
  * @return: 0 : Success
@@ -129,7 +129,7 @@ __CDECLARE_OPT(__ATTR_DEPRECATED("Use `listxattr(2)\' or `llistxattr(2)\' instea
  * @param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_SECURE | ATTR_ROOT'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE_OPT(__ATTR_DEPRECATED("Use `flistxattr(2)\' instead") __ATTR_INOUT(5) __ATTR_OUTS(2, 3),int,__NOTHROW_NCX,attr_listf,(__fd_t __fd, char *__buffer, int __buffersize, int __flags, struct attrlist_cursor *__cursor),(__fd,__buffer,__buffersize,__flags,__cursor))
+__CDECLARE_OPT(__ATTR_DEPRECATED("Use `flistxattr(2)\' instead") __ATTR_FDARG(1) __ATTR_INOUT(5) __ATTR_OUTS(2, 3),int,__NOTHROW_NCX,attr_listf,(__fd_t __fd, char *__buffer, int __buffersize, int __flags, struct attrlist_cursor *__cursor),(__fd,__buffer,__buffersize,__flags,__cursor))
 #ifdef __CRT_HAVE_attr_multi
 /* >> attr_multi(3), attr_multif(3)
  * @param: flags: Set of `0 | ATTR_DONTFOLLOW'
@@ -149,14 +149,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(attr_multi, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * @param: flags: Set of `0 | ATTR_DONTFOLLOW'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE(__ATTR_DEPRECATED("Use `fgetxattr(2)\', `fsetxattr(2)\' and `fremovexattr(2)\' instead") __ATTR_INOUTS(2, 3),int,__NOTHROW_NCX,attr_multif,(__fd_t __fd, struct attr_multiop *__oplist, int __count, int __flags),(__fd,__oplist,__count,__flags))
+__CDECLARE(__ATTR_DEPRECATED("Use `fgetxattr(2)\', `fsetxattr(2)\' and `fremovexattr(2)\' instead") __ATTR_FDARG(1) __ATTR_INOUTS(2, 3),int,__NOTHROW_NCX,attr_multif,(__fd_t __fd, struct attr_multiop *__oplist, int __count, int __flags),(__fd,__oplist,__count,__flags))
 #elif defined(__ATTR_DONTFOLLOW) && defined(__ATTR_OP_GET) && defined(__ATTR_OP_SET) && defined(__ATTR_OP_REMOVE) && defined(__CRT_HAVE_attr_getf) && defined(__CRT_HAVE_attr_setf) && defined(__CRT_HAVE_attr_removef)
 #include <libc/local/attr.attributes/attr_multif.h>
 /* >> attr_multi(3), attr_multif(3)
  * @param: flags: Set of `0 | ATTR_DONTFOLLOW'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(attr_multif, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use `fgetxattr(2)\', `fsetxattr(2)\' and `fremovexattr(2)\' instead") __ATTR_INOUTS(2, 3) int __NOTHROW_NCX(__LIBCCALL attr_multif)(__fd_t __fd, struct attr_multiop *__oplist, int __count, int __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(attr_multif))(__fd, __oplist, __count, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(attr_multif, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use `fgetxattr(2)\', `fsetxattr(2)\' and `fremovexattr(2)\' instead") __ATTR_FDARG(1) __ATTR_INOUTS(2, 3) int __NOTHROW_NCX(__LIBCCALL attr_multif)(__fd_t __fd, struct attr_multiop *__oplist, int __count, int __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(attr_multif))(__fd, __oplist, __count, __flags); })
 #endif /* ... */
 
 __SYSDECL_END

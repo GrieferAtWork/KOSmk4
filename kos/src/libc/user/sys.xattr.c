@@ -63,10 +63,10 @@ NOTHROW_RPC(LIBCCALL libc_lsetxattr)(char const *path,
 }
 /*[[[end:libc_lsetxattr]]]*/
 
-/*[[[head:libc_fsetxattr,hash:CRC-32=0x2f3db100]]]*/
+/*[[[head:libc_fsetxattr,hash:CRC-32=0xc8c0521]]]*/
 /* >> fsetxattr(2)
  * @param: flags: One of `XATTR_*', or `0' */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_IN(2) ATTR_INS(3, 4) int
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_FDARG(1) ATTR_IN(2) ATTR_INS(3, 4) int
 NOTHROW_RPC(LIBCCALL libc_fsetxattr)(fd_t fd,
                                      char const *name,
                                      void const *buf,
@@ -110,9 +110,9 @@ NOTHROW_RPC(LIBCCALL libc_lgetxattr)(char const *path,
 }
 /*[[[end:libc_lgetxattr]]]*/
 
-/*[[[head:libc_fgetxattr,hash:CRC-32=0x6123bade]]]*/
+/*[[[head:libc_fgetxattr,hash:CRC-32=0x489244f1]]]*/
 /* >> fgetxattr(2) */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_FDARG(1) ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t
 NOTHROW_RPC(LIBCCALL libc_fgetxattr)(fd_t fd,
                                      char const *name,
                                      void *buf,
@@ -153,9 +153,9 @@ NOTHROW_RPC(LIBCCALL libc_llistxattr)(char const *path,
 }
 /*[[[end:libc_llistxattr]]]*/
 
-/*[[[head:libc_flistxattr,hash:CRC-32=0xf7ee98a9]]]*/
+/*[[[head:libc_flistxattr,hash:CRC-32=0xb95b8f19]]]*/
 /* >> flistxattr(2) */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_OUTS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_FDARG(1) ATTR_OUTS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_flistxattr)(fd_t fd,
                                       char *listbuf,
                                       size_t listbufsize)
@@ -193,9 +193,9 @@ NOTHROW_RPC(LIBCCALL libc_lremovexattr)(char const *path,
 }
 /*[[[end:libc_lremovexattr]]]*/
 
-/*[[[head:libc_fremovexattr,hash:CRC-32=0xf982dbf9]]]*/
+/*[[[head:libc_fremovexattr,hash:CRC-32=0x650a48fe]]]*/
 /* >> fremovexattr(2) */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_IN(2) int
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_FDARG(1) ATTR_IN(2) int
 NOTHROW_RPC(LIBCCALL libc_fremovexattr)(fd_t fd,
                                         char const *name)
 /*[[[body:libc_fremovexattr]]]*/

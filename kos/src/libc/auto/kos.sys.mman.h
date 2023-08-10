@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x192ec118 */
+/* HASH CRC-32:0xdc390292 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,9 +36,9 @@ INTDEF ATTR_IN(1) void (LIBCCALL libc_ShmUnlink)(char const *name) THROWS(...);
 #include <asm/pkey.h>
 #if !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
 /* >> pkey_set(3) */
-INTDEF void (LIBCCALL libc_PKeySet)(int pkey, unsigned int access_rights) THROWS(...);
+INTDEF void (LIBCCALL libc_PKeySet)(int pkey, unsigned int access_rights) THROWS(E_INVALID_ARGUMENT_BAD_VALUE);
 /* >> pkey_get(3) */
-INTDEF unsigned int (LIBCCALL libc_PKeyGet)(int pkey) THROWS(...);
+INTDEF unsigned int (LIBCCALL libc_PKeyGet)(int pkey) THROWS(E_INVALID_ARGUMENT_BAD_VALUE);
 #endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */
 
 DECL_END

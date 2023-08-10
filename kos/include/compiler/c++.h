@@ -115,11 +115,14 @@
 #endif /* !__KOS__ || !__KERNEL__ */
 
 #ifndef __ELF__
-#define __CXX_CLASSMEMBER inline
+#define __CXX_CLASSMEMBER        inline
+#define __CXX_INLINE_CLASSMEMBER __ATTR_FORCEINLINE
 #elif defined(__NO_ATTR_VISIBILITY)
-#define __CXX_CLASSMEMBER __ATTR_FORCEINLINE
+#define __CXX_CLASSMEMBER        __ATTR_FORCEINLINE
+#define __CXX_INLINE_CLASSMEMBER __ATTR_FORCEINLINE
 #else /* ... */
-#define __CXX_CLASSMEMBER inline __ATTR_VISIBILITY("hidden")
+#define __CXX_CLASSMEMBER        inline __ATTR_VISIBILITY("hidden")
+#define __CXX_INLINE_CLASSMEMBER __ATTR_FORCEINLINE __ATTR_VISIBILITY("hidden")
 #endif /* !... */
 
 

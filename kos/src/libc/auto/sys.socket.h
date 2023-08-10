@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd195785 */
+/* HASH CRC-32:0x449417e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ INTDEF ATTR_OUT(4) int NOTHROW_NCX(LIBDCALL libd_socketpair)(__STDC_INT_AS_UINT_
  * @return: -1: [errno=EINVAL]        E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND
  * @return: -1: [errno=EADDRNOTAVAIL] E_NET_ADDRESS_NOT_AVAILABLE
  * @return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (`addr_len' is incorrect) */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_bind)(fd_t sockfd, __CONST_SOCKADDR_ARG addr, socklen_t addr_len);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_bind)(fd_t sockfd, __CONST_SOCKADDR_ARG addr, socklen_t addr_len);
 /* >> getsockname(2)
  * Determine the local address (aka. name) for the given socket `sockfd'.
  * This  is usually the  same address as was  previously set by `bind(2)'
@@ -86,7 +86,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_bind)(fd_t sockfd, __CONST_SOCKADDR_ARG add
  *                         the  address was truncated and may be invalid.
  * return: 0 : Success
  * return: -1: Error (s.a. `errno') */
-INTDEF ATTR_INOUT(3) int NOTHROW_NCX(LIBDCALL libd_getsockname)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len);
+INTDEF ATTR_FDARG(1) ATTR_INOUT(3) int NOTHROW_NCX(LIBDCALL libd_getsockname)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len);
 /* >> connect(2)
  * Connect to the specified address.
  * If the given `sockfd' isn't connection-oriented, this will set the address
@@ -98,7 +98,7 @@ INTDEF ATTR_INOUT(3) int NOTHROW_NCX(LIBDCALL libd_getsockname)(fd_t sockfd, __S
  * @return: -1: [errno=EADDRNOTAVAIL] E_NET_ADDRESS_NOT_AVAILABLE
  * @return: -1: [errno=ECONNREFUSED]  E_NET_CONNECTION_REFUSED
  * @return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (addr_len is incorrect) */
-INTDEF int NOTHROW_RPC(LIBDCALL libd_connect)(fd_t sockfd, __CONST_SOCKADDR_ARG addr, socklen_t addr_len);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC(LIBDCALL libd_connect)(fd_t sockfd, __CONST_SOCKADDR_ARG addr, socklen_t addr_len);
 /* >> getpeername(2)
  * Lookup the peer (remote) address of `sockfd' and store it in `*addr...+=*addr_len'
  * @param: addr:     [out] Buffer where to store the sock address.
@@ -109,7 +109,7 @@ INTDEF int NOTHROW_RPC(LIBDCALL libd_connect)(fd_t sockfd, __CONST_SOCKADDR_ARG 
  * @return: 0 : Success
  * @return: -1: [errno=ENOTCONN] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED
  * @return: -1: Error (s.a. `errno') */
-INTDEF ATTR_INOUT(3) int NOTHROW_NCX(LIBDCALL libd_getpeername)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len);
+INTDEF ATTR_FDARG(1) ATTR_INOUT(3) int NOTHROW_NCX(LIBDCALL libd_getpeername)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len);
 /* >> send(2)
  * Send the contents of a given buffer over the given socket `sockfd'.
  * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
@@ -119,7 +119,7 @@ INTDEF ATTR_INOUT(3) int NOTHROW_NCX(LIBDCALL libd_getpeername)(fd_t sockfd, __S
  * @return: -1: [errno=EMSGSIZE]     E_NET_MESSAGE_TOO_LONG
  * @return: -1: [errno=ECONNRESET]   E_NET_CONNECTION_RESET
  * @return: -1: [errno=EPIPE]        E_NET_SHUTDOWN */
-INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_send)(fd_t sockfd, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags);
+INTDEF ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_send)(fd_t sockfd, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags);
 /* >> recv(2)
  * Receive data over the given socket `sockfd', and store the contents within the given buffer.
  * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
@@ -127,7 +127,7 @@ INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_send)(fd_t sockfd, void 
  * @return: * : [<= bufsize] The actual # of received bytes
  * @return: -1: [errno=ENOTCONN]     E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
  * @return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED */
-INTDEF WUNUSED ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_recv)(fd_t sockfd, void *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags);
+INTDEF WUNUSED ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_recv)(fd_t sockfd, void *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags);
 /* >> sendto(2)
  * Send the contents of a given buffer over this socket to the specified address
  * @param: buf:       Buffer of data to send (with a length of `bufsize' bytes)
@@ -144,7 +144,7 @@ INTDEF WUNUSED ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_recv)(fd_t sock
  * @return: -1: [errno=ECONNRESET]   E_NET_CONNECTION_RESET
  * @return: -1: [errno=EPIPE]        E_NET_SHUTDOWN
  * @return: -1: [errno=ERANGE]       E_BUFFER_TOO_SMALL  (`addr_len' is incorrect) */
-INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_sendto)(fd_t sockfd, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags, __CONST_SOCKADDR_ARG addr, socklen_t addr_len);
+INTDEF ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_sendto)(fd_t sockfd, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags, __CONST_SOCKADDR_ARG addr, socklen_t addr_len);
 /* >> recvfrom(2)
  * Receive data over this socket, and store the contents within the given buffer.
  * @param: buf:       Buffer to-be filled with up to `bufsize' bytes of received data
@@ -161,7 +161,7 @@ INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_sendto)(fd_t sockfd, voi
  * @return: -1: [errno=ENOTCONN]     E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
  * @return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED
  * @return: -1: [errno=EAGAIN]       E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked) */
-INTDEF WUNUSED ATTR_INOUT_OPT(6) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_recvfrom)(fd_t sockfd, void *__restrict buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len);
+INTDEF WUNUSED ATTR_FDREAD(1) ATTR_INOUT_OPT(6) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_recvfrom)(fd_t sockfd, void *__restrict buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len);
 /* >> sendmsg(2)
  * Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
  * data as well as  for data buffers  to be represented  by an IOV  vector.
@@ -169,7 +169,7 @@ INTDEF WUNUSED ATTR_INOUT_OPT(6) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL li
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @return: * : [<= bufsize] The actual # of send payload bytes
  * @return: -1: ... Same as for `send(2)' and `sendto(2)' */
-INTDEF ATTR_IN(2) ssize_t NOTHROW_RPC(LIBDCALL libd_sendmsg)(fd_t sockfd, struct msghdr const *message, __STDC_INT_AS_UINT_T msg_flags);
+INTDEF ATTR_FDWRITE(1) ATTR_IN(2) ssize_t NOTHROW_RPC(LIBDCALL libd_sendmsg)(fd_t sockfd, struct msghdr const *message, __STDC_INT_AS_UINT_T msg_flags);
 /* >> recvmsg(2)
  * Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
  * data as  well as  for  data buffers  to be  represented  by an  IOV  vector.
@@ -178,7 +178,7 @@ INTDEF ATTR_IN(2) ssize_t NOTHROW_RPC(LIBDCALL libd_sendmsg)(fd_t sockfd, struct
  *                            MSG_PEEK  |  MSG_TRUNC  |  MSG_WAITALL'
  * @return: * : [<= bufsize] The actual # of received payload bytes
  * @return: -1: ... Same as for `recv(2)' and `recvfrom(2)' */
-INTDEF WUNUSED ATTR_INOUT(2) ssize_t NOTHROW_RPC(LIBDCALL libd_recvmsg)(fd_t sockfd, struct msghdr *message, __STDC_INT_AS_UINT_T msg_flags);
+INTDEF WUNUSED ATTR_FDREAD(1) ATTR_INOUT(2) ssize_t NOTHROW_RPC(LIBDCALL libd_recvmsg)(fd_t sockfd, struct msghdr *message, __STDC_INT_AS_UINT_T msg_flags);
 /* >> getsockopt(2)
  * Get the value of the named socket option `level:optname' and store it in `optval'
  * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
@@ -190,7 +190,7 @@ INTDEF WUNUSED ATTR_INOUT(2) ssize_t NOTHROW_RPC(LIBDCALL libd_recvmsg)(fd_t soc
  *                        the  contents  of   `optval'  are   undefined.
  * @return: 0 : Success
  * @return: -1: [errno=ENOPROTOOPT] E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT */
-INTDEF ATTR_INOUT(5) ATTR_OUT(4) int NOTHROW_NCX(LIBDCALL libd_getsockopt)(fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname, void *__restrict optval, socklen_t *__restrict optlen);
+INTDEF ATTR_FDARG(1) ATTR_INOUT(5) ATTR_OUT(4) int NOTHROW_NCX(LIBDCALL libd_getsockopt)(fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname, void *__restrict optval, socklen_t *__restrict optlen);
 /* >> setsockopt(2)
  * Set the value of the named socket option `level:optname' from what is given in `optval'
  * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
@@ -200,7 +200,7 @@ INTDEF ATTR_INOUT(5) ATTR_OUT(4) int NOTHROW_NCX(LIBDCALL libd_getsockopt)(fd_t 
  * @return: 0 : Success
  * @return: -1: [errno=ENOPROTOOPT] E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT
  * @return: -1: [errno=ERANGE]      E_BUFFER_TOO_SMALL  (The specified `optlen' is invalid for the given option) */
-INTDEF ATTR_INS(4, 5) int NOTHROW_NCX(LIBDCALL libd_setsockopt)(fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname, void const *optval, socklen_t optlen);
+INTDEF ATTR_FDARG(1) ATTR_INS(4, 5) int NOTHROW_NCX(LIBDCALL libd_setsockopt)(fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname, void const *optval, socklen_t optlen);
 /* >> listen(2)
  * Begin to listen for incoming client (aka. peer) connection requests.
  * @param: max_backlog: The max number of clients  pending to be accept(2)-ed,  before
@@ -210,7 +210,7 @@ INTDEF ATTR_INS(4, 5) int NOTHROW_NCX(LIBDCALL libd_setsockopt)(fd_t sockfd, __S
  * @return: 0 : Success
  * @return: -1: [errno=EADDRINUSE]  E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN
  * @return: -1: [errno=EOPNOTSUPP]  E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_LISTEN */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_listen)(fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_listen)(fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog);
 /* >> accept(2)
  * Accept incoming client (aka. peer) connection requests.
  * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
@@ -225,7 +225,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_listen)(fd_t sockfd, __STDC_INT_AS_UINT_T m
  * @return: -1: [errno=EINVAL]       E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING
  * @return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT */
-INTDEF ATTR_INOUT_OPT(3) fd_t NOTHROW_RPC(LIBDCALL libd_accept)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len);
+INTDEF ATTR_FDARG(1) ATTR_INOUT_OPT(3) fd_t NOTHROW_RPC(LIBDCALL libd_accept)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len);
 /* >> shutdown(2)
  * Disallow further reception of data (causing `recv(2)' to return `0' as soon
  * as  all currently queued  data has been  read), and/or further transmission
@@ -233,7 +233,7 @@ INTDEF ATTR_INOUT_OPT(3) fd_t NOTHROW_RPC(LIBDCALL libd_accept)(fd_t sockfd, __S
  * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
  * @return: 0 : Success
  * @return: -1: [errno=ENOTCONN] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_shutdown)(fd_t sockfd, __STDC_INT_AS_UINT_T how);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_shutdown)(fd_t sockfd, __STDC_INT_AS_UINT_T how);
 /* >> accept4(2)
  * Accept incoming client (aka. peer) connection requests.
  * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
@@ -249,7 +249,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_shutdown)(fd_t sockfd, __STDC_INT_AS_UINT_T
  * @return: -1: [errno=EINVAL]       E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING
  * @return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT */
-INTDEF ATTR_INOUT_OPT(3) fd_t NOTHROW_RPC(LIBDCALL libd_accept4)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T sock_flags);
+INTDEF ATTR_FDARG(1) ATTR_INOUT_OPT(3) fd_t NOTHROW_RPC(LIBDCALL libd_accept4)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T sock_flags);
 /* >> sendmmsg(2)
  * Same as `sendmsg(2)', but may be used to send many
  * messages (datagrams)  with a  single system  call.
@@ -257,7 +257,7 @@ INTDEF ATTR_INOUT_OPT(3) fd_t NOTHROW_RPC(LIBDCALL libd_accept4)(fd_t sockfd, __
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @return: * : The # of datagrams successfully sent.
  * @return: -1: ... Same as `sendmsg(2)' */
-INTDEF ATTR_INOUT(2) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_sendmmsg)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags);
+INTDEF ATTR_FDWRITE(1) ATTR_INOUT(2) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_sendmmsg)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags);
 /* >> recvmmsg(2)
  * Same as `recvmsg(2)', but may be used to receive many
  * messages  (datagrams)  with  a  single  system  call.
@@ -267,7 +267,7 @@ INTDEF ATTR_INOUT(2) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_sendmmsg)(f
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-INTDEF ATTR_INOUTS(2, 3) ATTR_IN_OPT(5) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_recvmmsg)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags, struct timespec *tmo);
+INTDEF ATTR_FDREAD(1) ATTR_INOUTS(2, 3) ATTR_IN_OPT(5) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_recvmmsg)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags, struct timespec *tmo);
 /* >> recvmmsg(2)
  * Same as `recvmsg(2)', but may be used to receive many
  * messages  (datagrams)  with  a  single  system  call.
@@ -277,20 +277,20 @@ INTDEF ATTR_INOUTS(2, 3) ATTR_IN_OPT(5) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCA
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-INTDEF ATTR_INOUTS(2, 3) ATTR_IN_OPT(5) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_recvmmsg64)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags, struct timespec64 *tmo);
+INTDEF ATTR_FDREAD(1) ATTR_INOUTS(2, 3) ATTR_IN_OPT(5) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_recvmmsg64)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags, struct timespec64 *tmo);
 /* >> sockatmark(3)
  * Check if `sockfd' is at a out-of-band mark
  * @return: > 0 : The read-pointer is pointing at out-of-band data
  * @return: == 0: The read-pointer is not pointing at out-of-band data
  * @return: < 0 : Error (s.a. `errno') */
-INTDEF WUNUSED int NOTHROW_NCX(LIBDCALL libd_sockatmark)(fd_t sockfd);
+INTDEF WUNUSED ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_sockatmark)(fd_t sockfd);
 /* >> isfdtype(3)
  * Check if `fd' matches the given `fdtype'
  * @param: fdtype: One of `S_IF*' from `<sys/stat.h>'
  * @return: 1 : `fd' matches the given type
  * @return: 0 : `fd' doesn't match the given type
  * @return: -1: error (s.a. `errno') */
-INTDEF WUNUSED int NOTHROW_NCX(LIBDCALL libd_isfdtype)(fd_t fd, __STDC_INT_AS_UINT_T fdtype);
+INTDEF WUNUSED ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_isfdtype)(fd_t fd, __STDC_INT_AS_UINT_T fdtype);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

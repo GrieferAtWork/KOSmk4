@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x715e7541 */
+/* HASH CRC-32:0xa624d0bf */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> setkey(3), setkey_r(3) */
-INTDEF void NOTHROW_NCX(LIBDCALL libd_setkey)(char const *key);
+INTDEF ATTR_IN(1) void NOTHROW_NCX(LIBDCALL libd_setkey)(char const *key);
 /* >> crypt(3), crypt_r(3) */
 INTDEF ATTR_IN(1) ATTR_IN(2) char *NOTHROW_NCX(LIBDCALL libd_crypt)(char const *key, char const *salt);
 /* >> encrypt(3), encrypt_r(3) */

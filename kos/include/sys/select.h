@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb4c4343 */
+/* HASH CRC-32:0x76d6488b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,9 +85,9 @@ typedef __fd_mask fd_mask;
 #endif /* __USE_MISC */
 
 #ifdef __INTELLISENSE__
-__ATTR_NONNULL((2)) void (FD_SET)(__fd_t __fd, fd_set *__fdsetp);
-__ATTR_NONNULL((2)) void (FD_CLR)(__fd_t __fd, fd_set *__fdsetp);
-__ATTR_NONNULL((2)) __BOOL (FD_ISSET)(__fd_t __fd, fd_set const *__fdsetp);
+__ATTR_FDARG(1) __ATTR_NONNULL((2)) void (FD_SET)(__fd_t __fd, fd_set *__fdsetp);
+__ATTR_FDARG(1) __ATTR_NONNULL((2)) void (FD_CLR)(__fd_t __fd, fd_set *__fdsetp);
+__ATTR_FDARG(1) __ATTR_NONNULL((2)) __BOOL (FD_ISSET)(__fd_t __fd, fd_set const *__fdsetp);
 __ATTR_NONNULL((1)) void (FD_ZERO)(fd_set *__fdsetp);
 #define FD_SET   FD_SET
 #define FD_CLR   FD_CLR

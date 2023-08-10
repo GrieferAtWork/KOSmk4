@@ -668,7 +668,7 @@ unsigned int sleep(unsigned int seconds) {
 [[export_alias("__fsync", "__libc_fsync")]]
 [[alias("fdatasync", "__fdatasync")]]
 [[userimpl, section(".text.crt{|.dos}.io.sync")]]
-int fsync($fd_t fd) {
+int fsync([[fdwrite]] $fd_t fd) {
 	COMPILER_IMPURE();
 	(void)fd;
 	/* NO-OP */
@@ -855,14 +855,14 @@ int pause();
 [[cp, wunused, decl_include("<features.h>", "<bits/types.h>")]]
 [[export_alias("__fpathconf")]]
 [[section(".text.crt{|.dos}.fs.property")]]
-$longptr_t fpathconf($fd_t fd, __STDC_INT_AS_UINT_T name);
+$longptr_t fpathconf([[fdarg]] $fd_t fd, __STDC_INT_AS_UINT_T name);
 
 @@>> ttyname(3)
 @@Return the name of a TTY given its file descriptor
 [[guard, cp, wunused, decl_include("<bits/types.h>")]]
 [[export_alias("__ttyname"), requires_function(ttyname_r)]]
 [[section(".text.crt{|.dos}.io.tty")]]
-char *ttyname($fd_t fd) {
+char *ttyname([[fdarg]] $fd_t fd) {
 	static char buf[32];
 	if likely(ttyname_r(fd, buf, COMPILER_LENOF(buf)) == 0)
 		return buf;
@@ -878,7 +878,7 @@ char *ttyname($fd_t fd) {
 [[impl_include("<bits/types.h>", "<libc/errno.h>", "<asm/os/dirent.h>", "<asm/os/stat.h>")]]
 [[impl_include("<paths.h>", "<bits/os/dirent.h>", "<bits/os/stat.h>", "<asm/os/fcntl.h>")]]
 [[section(".text.crt{|.dos}.io.tty")]]
-$errno_t ttyname_r($fd_t fd, [[out(? <= buflen)]] char *buf, size_t buflen) {
+$errno_t ttyname_r([[fdarg]] $fd_t fd, [[out(? <= buflen)]] char *buf, size_t buflen) {
 
 	/* Ensure that it's actually a TTY */
 @@pp_if $has_function(isatty)@@
@@ -1028,7 +1028,7 @@ $errno_t ttyname_r($fd_t fd, [[out(? <= buflen)]] char *buf, size_t buflen) {
 [[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TIOCGPGRP))]]
 [[section(".text.crt{|.dos}.io.tty")]]
-$pid_t tcgetpgrp($fd_t fd) {
+$pid_t tcgetpgrp([[fdarg]] $fd_t fd) {
 	pid_t result;
 	if (ioctl(fd, __TIOCGPGRP, &result) < 0)
 		result = -1;
@@ -1041,7 +1041,7 @@ $pid_t tcgetpgrp($fd_t fd) {
 [[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TIOCSPGRP))]]
 [[section(".text.crt{|.dos}.io.tty")]]
-int tcsetpgrp($fd_t fd, $pid_t pgrp_id) {
+int tcsetpgrp([[fdarg]] $fd_t fd, $pid_t pgrp_id) {
 	return ioctl(fd, __TIOCSPGRP, &pgrp_id) < 0 ? -1 : 0;
 }
 
@@ -1121,7 +1121,7 @@ int link([[in]] char const *from, [[in]] char const *to) {
 [[dos_only_export_alias("_read")]]
 [[export_alias("__read", "__libc_read")]]
 [[section(".text.crt{|.dos}.io.read")]]
-ssize_t read($fd_t fd, [[out(return <= bufsize)]] void *buf, size_t bufsize);
+ssize_t read([[fdread]] $fd_t fd, [[out(return <= bufsize)]] void *buf, size_t bufsize);
 
 @@>> write(2)
 @@Write up to `bufsize' bytes from `buf' into `fd'
@@ -1134,7 +1134,7 @@ ssize_t read($fd_t fd, [[out(return <= bufsize)]] void *buf, size_t bufsize);
 [[dos_only_export_alias("_write")]]
 [[export_alias("__write", "__libc_write")]]
 [[section(".text.crt{|.dos}.io.write")]]
-ssize_t write($fd_t fd, [[in(return <= bufsize)]] void const *buf, size_t bufsize);
+ssize_t write([[fdwrite]] $fd_t fd, [[in(return <= bufsize)]] void const *buf, size_t bufsize);
 
 %#ifdef __USE_KOS
 @@>> readall(3)
@@ -1149,7 +1149,7 @@ ssize_t write($fd_t fd, [[in(return <= bufsize)]] void const *buf, size_t bufsiz
 [[requires($has_function(read, lseek) && defined(__SEEK_CUR))]]
 [[impl_include("<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.io.read")]]
-ssize_t readall($fd_t fd, [[out(bufsize)]] void *buf, size_t bufsize) {
+ssize_t readall([[fdread]] $fd_t fd, [[out(bufsize)]] void *buf, size_t bufsize) {
 	ssize_t result, temp;
 	result = read(fd, buf, bufsize);
 	if (result > 0 && (size_t)result < bufsize) {
@@ -1191,7 +1191,7 @@ ssize_t readall($fd_t fd, [[out(bufsize)]] void *buf, size_t bufsize) {
 [[requires_function(write)]]
 [[impl_include("<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.io.write")]]
-ssize_t writeall($fd_t fd, [[in(bufsize)]] void const *buf, size_t bufsize) {
+ssize_t writeall([[fdwrite]] $fd_t fd, [[in(bufsize)]] void const *buf, size_t bufsize) {
 	ssize_t result, temp;
 	result = write(fd, buf, bufsize);
 	if (result > 0 && (size_t)result < bufsize) {
@@ -1224,7 +1224,7 @@ ssize_t writeall($fd_t fd, [[in(bufsize)]] void const *buf, size_t bufsize) {
 [[requires_function(writeall)]]
 [[impl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.io.write")]]
-ssize_t write_printer(/*fd_t*/ void *fd,
+ssize_t write_printer(/*[[fdwrite]] fd_t*/ void *fd,
                       [[in(bufsize)]] char const *__restrict buf,
                       size_t bufsize) {
 	return writeall((fd_t)(__CRT_PRIVATE_UINT(__SIZEOF_FD_T__))(uintptr_t)fd, buf, bufsize);
@@ -1239,7 +1239,7 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(__FORMATPRINTER_CC libc_write_printer)(v
 
 %{
 
-/* >> void *WRITE_PRINTER_ARG(fd_t fd);
+/* >> void *WRITE_PRINTER_ARG([[fdwrite]] fd_t fd);
  * Encode a given `fd' as an argument to `write_printer(3)' */
 #define WRITE_PRINTER_ARG(fd) ((void *)(__UINTPTR_TYPE__)(__CRT_PRIVATE_UINT(__SIZEOF_FD_T__))(fd))
 }
@@ -1249,7 +1249,7 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(__FORMATPRINTER_CC libc_write_printer)(v
 
 [[doc_alias("lseek"), ignore, nocrt, alias("lseek", "_lseek", "__lseek", "__libc_lseek")]]
 [[decl_include("<bits/types.h>", "<features.h>")]]
-$off32_t crt_lseek32($fd_t fd, $off32_t offset, __STDC_INT_AS_UINT_T whence);
+$off32_t crt_lseek32([[fdarg]] $fd_t fd, $off32_t offset, __STDC_INT_AS_UINT_T whence);
 
 @@>> lseek(2), lseek64(2)
 @@Change the position of the file read/write pointer within a file referred to by `fd'
@@ -1259,7 +1259,7 @@ $off32_t crt_lseek32($fd_t fd, $off32_t offset, __STDC_INT_AS_UINT_T whence);
 [[dos_only_export_as("_lseek"), export_as("__lseek", "__libc_lseek")]]
 [[requires($has_function(crt_lseek32) || $has_function(lseek64))]]
 [[userimpl, section(".text.crt{|.dos}.io.seek")]]
-$off_t lseek($fd_t fd, $off_t offset, __STDC_INT_AS_UINT_T whence) {
+$off_t lseek([[fdarg]] $fd_t fd, $off_t offset, __STDC_INT_AS_UINT_T whence) {
 @@pp_if $has_function(crt_lseek32)@@
 	return crt_lseek32(fd, ($off32_t)offset, whence);
 @@pp_else@@
@@ -1277,7 +1277,7 @@ $off_t lseek($fd_t fd, $off_t offset, __STDC_INT_AS_UINT_T whence) {
 [[requires($has_function(tcgetattr) || ($has_function(ioctl) && defined(__TCGETA)))]]
 [[impl_include("<bits/os/termios.h>")]]
 [[section(".text.crt{|.dos}.io.tty")]]
-int isatty($fd_t fd) {
+int isatty([[fdarg]] $fd_t fd) {
 	struct termios ios;
 @@pp_if $has_function(ioctl) && defined(__TCGETA)@@
 	return ioctl(fd, __TCGETA, &ios) < 0 ? 0 : 1;
@@ -1293,7 +1293,7 @@ int isatty($fd_t fd) {
 [[dos_only_export_alias("_dup2")]]
 [[export_alias("__dup2", "__libc_dup2")]]
 [[section(".text.crt{|.dos}.io.access")]]
-$fd_t dup2($fd_t oldfd, $fd_t newfd);
+$fd_t dup2([[fdarg]] $fd_t oldfd, [[no_fdarg]] $fd_t newfd);
 
 @@>> dup(2)
 @@@return: * : Returns the new handle upon success.
@@ -1302,7 +1302,7 @@ $fd_t dup2($fd_t oldfd, $fd_t newfd);
 [[dos_only_export_alias("_dup")]]
 [[export_alias("__dup", "__libc_dup")]]
 [[section(".text.crt{|.dos}.io.access")]]
-$fd_t dup($fd_t fd);
+$fd_t dup([[fdarg]] $fd_t fd);
 
 @@>> close(2)
 @@Close a given file descriptor/handle `fd'
@@ -1310,7 +1310,7 @@ $fd_t dup($fd_t fd);
 [[dos_only_export_alias("_close")]]
 [[export_alias("__close", "__libc_close")]]
 [[section(".text.crt{|.dos}.io.access")]]
-int close($fd_t fd);
+int close([[fdarg]] $fd_t fd);
 
 @@>> access(2)
 @@@param: type: Set of `X_OK | W_OK | R_OK'
@@ -1429,7 +1429,7 @@ eaccess(*) = euidaccess;
 [[cp, decl_include("<features.h>", "<bits/types.h>")]]
 [[crt_dos_variant]]
 [[section(".text.crt{|.dos}.fs.property")]]
-int faccessat($fd_t dfd, [[in]] char const *file,
+int faccessat([[dirfd]] $fd_t dfd, [[in]] char const *file,
               __STDC_INT_AS_UINT_T type, $atflag_t flags);
 
 
@@ -1438,7 +1438,7 @@ int faccessat($fd_t dfd, [[in]] char const *file,
 [[cp, decl_include("<bits/types.h>")]]
 [[crt_dos_variant]]
 [[section(".text.crt{|.dos}.fs.modify")]]
-int fchownat($fd_t dfd, [[in]] char const *file,
+int fchownat([[dirfd]] $fd_t dfd, [[in]] char const *file,
              $uid_t owner, $gid_t group, $atflag_t flags);
 
 @@>> linkat(2)
@@ -1446,8 +1446,8 @@ int fchownat($fd_t dfd, [[in]] char const *file,
 [[cp, decl_include("<bits/types.h>")]]
 [[crt_dos_variant]]
 [[section(".text.crt{|.dos}.fs.modify")]]
-int linkat($fd_t fromfd, [[in]] char const *from,
-           $fd_t tofd, [[in]] char const *to, $atflag_t flags);
+int linkat([[dirfd]] $fd_t fromfd, [[in]] char const *from,
+           [[dirfd]] $fd_t tofd, [[in]] char const *to, $atflag_t flags);
 
 @@>> symlinkat(3)
 @@Create  a  new  symbolic  link  loaded  with  `link_text'  as link
@@ -1456,7 +1456,7 @@ int linkat($fd_t fromfd, [[in]] char const *from,
 [[userimpl, crt_dos_variant]]
 [[requires_function(fsymlinkat)]]
 [[section(".text.crt{|.dos}.fs.modify")]]
-int symlinkat([[in]] char const *link_text, $fd_t tofd,
+int symlinkat([[in]] char const *link_text, [[dirfd]] $fd_t tofd,
               [[in]] char const *target_path) {
 	return fsymlinkat(link_text, tofd, target_path, 0);
 }
@@ -1473,7 +1473,7 @@ int symlinkat([[in]] char const *link_text, $fd_t tofd,
 [[crt_dos_variant]]
 [[userimpl, requires_function(freadlinkat)]]
 [[section(".text.crt{|.dos}.fs.property")]]
-ssize_t readlinkat($fd_t dfd, [[in]] char const *path,
+ssize_t readlinkat([[dirfd]] $fd_t dfd, [[in]] char const *path,
                    [[out(return <= buflen)]] char *buf, size_t buflen) {
 	return freadlinkat(dfd, path, buf, buflen, 0);
 }
@@ -1484,7 +1484,7 @@ ssize_t readlinkat($fd_t dfd, [[in]] char const *path,
 [[cp, decl_include("<bits/types.h>")]]
 [[crt_dos_variant]]
 [[section(".text.crt{|.dos}.fs.modify")]]
-int unlinkat($fd_t dfd, [[in]] char const *name, $atflag_t flags);
+int unlinkat([[dirfd]] $fd_t dfd, [[in]] char const *name, $atflag_t flags);
 
 
 %#ifdef __USE_KOS
@@ -1494,7 +1494,7 @@ int unlinkat($fd_t dfd, [[in]] char const *name, $atflag_t flags);
 [[cp, decl_include("<bits/types.h>")]]
 [[crt_dos_variant]]
 [[section(".text.crt{|.dos}.fs.property")]]
-int fchdirat($fd_t dfd, [[in]] char const *path, $atflag_t flags);
+int fchdirat([[dirfd]] $fd_t dfd, [[in]] char const *path, $atflag_t flags);
 
 @@>> fsymlinkat(3)
 @@Create  a  new  symbolic  link  loaded  with  `link_text'  as link
@@ -1503,7 +1503,7 @@ int fchdirat($fd_t dfd, [[in]] char const *path, $atflag_t flags);
 [[cp, decl_include("<bits/types.h>")]]
 [[crt_dos_variant]]
 [[section(".text.crt{|.dos}.fs.property")]]
-int fsymlinkat([[in]] char const *link_text, $fd_t tofd,
+int fsymlinkat([[in]] char const *link_text, [[dirfd]] $fd_t tofd,
                [[in]] char const *target_path, $atflag_t flags);
 
 @@>> freadlinkat(2)
@@ -1512,7 +1512,7 @@ int fsymlinkat([[in]] char const *link_text, $fd_t tofd,
 [[cp, decl_include("<bits/types.h>")]]
 [[crt_dos_variant]]
 [[section(".text.crt{|.dos}.fs.property")]]
-ssize_t freadlinkat($fd_t dfd, [[in]] char const *path,
+ssize_t freadlinkat([[dirfd]] $fd_t dfd, [[in]] char const *path,
                     [[out(return <= buflen)]] char *buf, size_t buflen,
                     $atflag_t flags);
 %#endif /* __USE_KOS */
@@ -1527,7 +1527,7 @@ ssize_t freadlinkat($fd_t dfd, [[in]] char const *path,
 [[export_alias("llseek", "__llseek")]]
 [[userimpl, requires_function(crt_lseek32)]]
 [[section(".text.crt{|.dos}.io.large.seek")]]
-$off64_t lseek64($fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
+$off64_t lseek64([[fdarg]] $fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
 	return crt_lseek32(fd, (__off32_t)offset, whence);
 }
 %#endif /* __USE_LARGEFILE64 */
@@ -1559,7 +1559,7 @@ $off64_t lseek64($fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
 [[requires($has_function(pread64) ||
            ($has_function(lseek, read) && defined(__SEEK_SET) && defined(__SEEK_CUR)))]]
 [[userimpl, section(".text.crt{|.dos}.io.read")]]
-ssize_t pread($fd_t fd, [[out(return <= bufsize)]] void *buf,
+ssize_t pread([[fdread]] $fd_t fd, [[out(return <= bufsize)]] void *buf,
               size_t bufsize, __PIO_OFFSET offset) {
 @@pp_if $has_function(pread64)@@
 	return pread64(fd, buf, bufsize, (__PIO_OFFSET64)offset);
@@ -1589,7 +1589,7 @@ ssize_t pread($fd_t fd, [[out(return <= bufsize)]] void *buf,
 [[requires($has_function(pwrite64) ||
            ($has_function(lseek, write) && defined(__SEEK_SET) && defined(__SEEK_CUR)))]]
 [[userimpl, section(".text.crt{|.dos}.io.write")]]
-ssize_t pwrite($fd_t fd, [[in(return <= bufsize)]] void const *buf,
+ssize_t pwrite([[fdwrite]] $fd_t fd, [[in(return <= bufsize)]] void const *buf,
                size_t bufsize, __PIO_OFFSET offset) {
 @@pp_if $has_function(pwrite64)@@
 	return pwrite64(fd, buf, bufsize, (__PIO_OFFSET64)offset);
@@ -1619,7 +1619,7 @@ ssize_t pwrite($fd_t fd, [[in(return <= bufsize)]] void const *buf,
 [[requires_function(pread)]]
 [[impl_include("<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.io.read")]]
-ssize_t preadall($fd_t fd, [[out(bufsize)]] void *buf,
+ssize_t preadall([[fdread]] $fd_t fd, [[out(bufsize)]] void *buf,
                  size_t bufsize, __PIO_OFFSET offset) {
 	ssize_t result, temp;
 	result = pread(fd, buf, bufsize, offset);
@@ -1650,7 +1650,7 @@ ssize_t preadall($fd_t fd, [[out(bufsize)]] void *buf,
 [[requires_function(pwrite)]]
 [[impl_include("<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.io.write")]]
-ssize_t pwriteall($fd_t fd, [[in(bufsize)]] void const *buf,
+ssize_t pwriteall([[fdwrite]] $fd_t fd, [[in(bufsize)]] void const *buf,
                   size_t bufsize, __PIO_OFFSET offset) {
 	ssize_t result, temp;
 	result = pwrite(fd, buf, bufsize, offset);
@@ -1682,12 +1682,12 @@ ssize_t pwriteall($fd_t fd, [[in(bufsize)]] void const *buf,
 
 [[cp, ignore, nocrt, alias("pread"), doc_alias("pread")]]
 [[decl_include("<bits/types.h>")]]
-ssize_t crt_pread32($fd_t fd, [[out(return <= bufsize)]] void *buf,
+ssize_t crt_pread32([[fdread]] $fd_t fd, [[out(return <= bufsize)]] void *buf,
                     size_t bufsize, $pos32_t offset);
 
 [[cp, ignore, nocrt, alias("pwrite"), doc_alias("pwrite")]]
 [[decl_include("<bits/types.h>")]]
-ssize_t crt_pwrite32($fd_t fd, [[in(return <= bufsize)]] void const *buf,
+ssize_t crt_pwrite32([[fdwrite]] $fd_t fd, [[in(return <= bufsize)]] void const *buf,
                      size_t bufsize, $pos32_t offset);
 
 [[cp, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
@@ -1697,7 +1697,7 @@ ssize_t crt_pwrite32($fd_t fd, [[in(return <= bufsize)]] void const *buf,
 [[requires($has_function(crt_pread32) ||
            ($has_function(lseek, read) && defined(__SEEK_CUR) && defined(__SEEK_SET)))]]
 [[userimpl, section(".text.crt{|.dos}.io.large.read")]]
-ssize_t pread64($fd_t fd, [[out(return <= bufsize)]] void *buf,
+ssize_t pread64([[fdread]] $fd_t fd, [[out(return <= bufsize)]] void *buf,
                 size_t bufsize, __PIO_OFFSET64 offset) {
 @@pp_if $has_function(crt_pread32)@@
 	return crt_pread32(fd, buf, bufsize, (pos32_t)offset);
@@ -1735,7 +1735,7 @@ ssize_t pread64($fd_t fd, [[out(return <= bufsize)]] void *buf,
 [[requires($has_function(crt_pwrite32) ||
            ($has_function(lseek, write) && defined(__SEEK_CUR) && defined(__SEEK_SET)))]]
 [[userimpl, section(".text.crt{|.dos}.io.large.write")]]
-ssize_t pwrite64($fd_t fd, [[in(return <= bufsize)]] void const *buf,
+ssize_t pwrite64([[fdwrite]] $fd_t fd, [[in(return <= bufsize)]] void const *buf,
                  size_t bufsize, __PIO_OFFSET64 offset) {
 @@pp_if $has_function(crt_pwrite32)@@
 	return crt_pwrite32(fd, buf, bufsize, (pos32_t)offset);
@@ -1772,7 +1772,7 @@ ssize_t pwrite64($fd_t fd, [[in(return <= bufsize)]] void const *buf,
 [[decl_include("<bits/types.h>"), doc_alias("preadall")]]
 [[requires_function(pread64)]]
 [[section(".text.crt{|.dos}.io.large.read")]]
-ssize_t preadall64($fd_t fd, [[out(bufsize)]] void *buf,
+ssize_t preadall64([[fdread]] $fd_t fd, [[out(bufsize)]] void *buf,
                    size_t bufsize, __PIO_OFFSET64 offset) {
 	ssize_t result, temp;
 	result = pread64(fd, buf, bufsize, offset);
@@ -1799,7 +1799,7 @@ ssize_t preadall64($fd_t fd, [[out(bufsize)]] void *buf,
 [[decl_include("<bits/types.h>"), doc_alias("pwriteall")]]
 [[requires_function(pwrite64)]]
 [[section(".text.crt{|.dos}.io.large.write")]]
-ssize_t pwriteall64($fd_t fd, [[in(bufsize)]] void const *buf,
+ssize_t pwriteall64([[fdwrite]] $fd_t fd, [[in(bufsize)]] void const *buf,
                     size_t bufsize, __PIO_OFFSET64 offset) {
 	ssize_t result, temp;
 	result = pwrite64(fd, buf, bufsize, offset);
@@ -1832,7 +1832,7 @@ ssize_t pwriteall64($fd_t fd, [[in(bufsize)]] void const *buf,
 [[crt_dos_variant]]
 [[requires_function(dup2)]]
 [[userimpl, section(".text.crt{|.dos}.io.access")]]
-$fd_t dup3($fd_t oldfd, $fd_t newfd, $oflag_t flags) {
+$fd_t dup3([[fdarg]] $fd_t oldfd, [[no_fdarg]] $fd_t newfd, $oflag_t flags) {
 	/* TODO: Document which `flags' actually do anything */
 	/* TODO: Emulate using dup2()+fcntl() */
 	(void)flags;
@@ -1949,7 +1949,7 @@ char *get_current_dir_name() {
 
 [[cp, decl_include("<bits/types.h>")]]
 [[userimpl, section(".text.crt{|.dos}.fs.modify")]]
-int syncfs($fd_t fd) {
+int syncfs([[fdwrite]] $fd_t fd) {
 	COMPILER_IMPURE();
 	(void)fd;
 	/* NO-OP */
@@ -2136,14 +2136,14 @@ $pid_t vfork();
 [[cp, decl_include("<bits/types.h>")]]
 [[export_alias("__fchown", "__libc_fchown")]]
 [[section(".text.crt{|.dos}.fs.modify")]]
-int fchown($fd_t fd, $uid_t owner, $gid_t group);
+int fchown([[fdarg]] $fd_t fd, $uid_t owner, $gid_t group);
 
 @@>> fchdir(2)
 @@Change the current working directory to `path'
 [[cp, decl_include("<bits/types.h>")]]
 [[export_alias("__fchdir", "__libc_fchdir")]]
 [[section(".text.crt{|.dos}.fs.basic_property")]]
-int fchdir($fd_t fd);
+int fchdir([[fdarg]] $fd_t fd);
 
 @@>> getpgid(2)
 @@Return  the ID of  the process group  associated with `pid's process.
@@ -2238,7 +2238,7 @@ int truncate64([[in]] char const *file, __PIO_OFFSET64 length) {
 	return crt_truncate32(file, (__PIO_OFFSET)length);
 @@pp_else@@
 	int result;
-	$fd_t fd;
+	fd_t fd;
 	fd = open64(file, 1); /* O_WRONLY */
 	if unlikely(fd < 0)
 		return -1;
@@ -2264,7 +2264,7 @@ int truncate64([[in]] char const *file, __PIO_OFFSET64 length) {
 [[requires(defined(__OS_HAVE_PROCFS_SELF_FD) && $has_function(execve))]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[userimpl, section(".text.crt{|.dos}.fs.exec.exec")]]
-int fexecve($fd_t execfd, [[in]] __TARGV, [[in]] __TENVP) {
+int fexecve([[fdread]] $fd_t execfd, [[in]] __TARGV, [[in]] __TENVP) {
 @@pp_if __SIZEOF_INT__ == 4@@
 	char buf[COMPILER_LNEOF("/proc/self/fd/-2147483648")];
 @@pp_elif __SIZEOF_INT__ == 8@@
@@ -2280,7 +2280,7 @@ int fexecve($fd_t execfd, [[in]] __TARGV, [[in]] __TENVP) {
 
 [[cp, hidden, nocrt, argument_names(fd, ___argv, ___envp), alias("fexecve")]]
 [[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
-int crt_fexecve($fd_t fd, [[in]] __TARGV, [[in]] __TENVP);
+int crt_fexecve([[fdread]] $fd_t fd, [[in]] __TARGV, [[in]] __TENVP);
 
 %#endif /* __USE_XOPEN2K8 */
 
@@ -2977,7 +2977,7 @@ char *getpass([[nullable]] char const *__restrict prompt) {
 
 [[ignore, nocrt, doc_alias("ftruncate"), decl_include("<bits/types.h>")]]
 [[alias("ftruncate", "__ftruncate", "__libc_ftruncate", "_chsize", "chsize")]]
-int crt_ftruncate32($fd_t fd, $pos32_t length);
+int crt_ftruncate32([[fdwrite]] $fd_t fd, $pos32_t length);
 
 @@>> ftruncate(2), ftruncate64(2)
 @@Truncate the given file `fd' to a length of `length'
@@ -2987,7 +2987,7 @@ int crt_ftruncate32($fd_t fd, $pos32_t length);
 [[dos_only_export_as("_chsize"), export_as("__ftruncate", "__libc_ftruncate", "chsize")]]
 [[requires($has_function(crt_ftruncate32) || $has_function(ftruncate64))]]
 [[userimpl, section(".text.crt{|.dos}.io.write")]]
-int ftruncate($fd_t fd, __PIO_OFFSET length) {
+int ftruncate([[fdwrite]] $fd_t fd, __PIO_OFFSET length) {
 @@pp_if $has_function(crt_ftruncate32)@@
 	return crt_ftruncate32(fd, (pos32_t)length);
 @@pp_else@@
@@ -3003,7 +3003,7 @@ int ftruncate($fd_t fd, __PIO_OFFSET length) {
 [[dos_only_export_alias("_chsize_s")]]
 [[requires_function(crt_ftruncate32)]]
 [[userimpl, section(".text.crt{|.dos}.io.large.write")]]
-int ftruncate64($fd_t fd, __PIO_OFFSET64 length) {
+int ftruncate64([[fdwrite]] $fd_t fd, __PIO_OFFSET64 length) {
 	return crt_ftruncate32(fd, (pos32_t)length);
 }
 %#endif /* __USE_LARGEFILE64 */
@@ -3033,7 +3033,7 @@ void *sbrk(intptr_t delta);
 [[export_alias("__fdatasync", "__libc_fdatasync")]]
 [[alias("fsync", "__fsync", "_commit")]]
 [[userimpl, section(".text.crt{|.dos}.io.sync")]]
-int fdatasync($fd_t fd) {
+int fdatasync([[fdwrite]] $fd_t fd) {
 	COMPILER_IMPURE();
 	(void)fd;
 	/* NO-OP */
@@ -3836,7 +3836,7 @@ $mode_t getmode([[in]] void const *bbox, $mode_t mode); /* TODO: Implement here!
            (defined(__SOL_SOCKET) && defined(__SO_PEERCRED)))]]
 [[impl_include("<bits/os/ucred.h>", "<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.bsd")]]
-int getpeereid($fd_t sockfd,
+int getpeereid([[fdarg]] $fd_t sockfd,
                [[out]] uid_t *euid,
                [[out]] gid_t *egid) {
 	int result;
@@ -4035,7 +4035,7 @@ $longptr_t sysconf(__STDC_INT_AS_UINT_T name);
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires(($has_function(fcntl) && defined(__F_CLOSEM)) || $has_function(close_range))]]
 [[section(".text.crt{|.dos}.bsd.io.access")]]
-void closefrom($fd_t lowfd) {
+void closefrom([[no_fdarg]] $fd_t lowfd) {
 @@pp_if $has_function(fcntl) && defined(__F_CLOSEM)@@
 	fcntl(lowfd, __F_CLOSEM);
 @@pp_else@@
@@ -4081,7 +4081,7 @@ int issetugid(void) {
 [[requires($has_function(dup2) && defined(__AT_FDROOT))]]
 [[impl_include("<asm/os/fcntl.h>")]]
 [[section(".text.crt{|.dos}.bsd")]]
-int fchroot($fd_t fd) {
+int fchroot([[fdarg]] $fd_t fd) {
 	fd_t result;
 	result = dup2(fd, __AT_FDROOT);
 	if likely(result >= 0)
@@ -4107,7 +4107,7 @@ int fchroot($fd_t fd) {
 
 // TODO: char *gettxt(char const *, char const *);
 // TODO: int isaexec(char const *, char *const *, char *const *);
-// TODO: offset_t llseek($fd_t fd, offset_t offset, __STDC_INT_AS_UINT_T whence);
+// TODO: offset_t llseek([[fdarg]] $fd_t fd, offset_t offset, __STDC_INT_AS_UINT_T whence);
 
 
 @@>> resolvepath(3)
@@ -4152,7 +4152,7 @@ __STDC_INT_AS_SSIZE_T resolvepath([[in]] char const *filename,
 [[requires($has_function(lseek) && defined(__SEEK_CUR))]]
 [[impl_include("<asm/os/stdio.h>"), dos_only_export_as("_tell")]]
 [[section(".text.crt{|.dos}.solaris")]]
-$off_t tell($fd_t fd) {
+$off_t tell([[fdarg]] $fd_t fd) {
 	return lseek(fd, 0, SEEK_CUR);
 }
 
@@ -4163,7 +4163,7 @@ $off_t tell($fd_t fd) {
 [[requires($has_function(lseek64) && defined(__SEEK_CUR))]]
 [[impl_include("<asm/os/stdio.h>"), dos_only_export_alias("_telli64")]]
 [[section(".text.crt{|.dos}.solaris")]]
-$off64_t tell64($fd_t fd) {
+$off64_t tell64([[fdarg]] $fd_t fd) {
 	return lseek64(fd, 0, __SEEK_CUR);
 }
 %#endif /* __USE_LARGEFILE64 */

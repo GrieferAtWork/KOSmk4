@@ -396,7 +396,7 @@ $pid_t cwait([[out_opt]] int *tstat, $pid_t pid, __STDC_INT_AS_UINT_T action) {
            $has_function(fexecve) && $has_function(waitpid)
 )]]
 $pid_t fspawnve(__STDC_INT_AS_UINT_T mode,
-                $fd_t execfd,
+                [[fdread]] $fd_t execfd,
                 [[in]] __TARGV,
                 [[in]] __TENVP) {
 	int status;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe89d5c44 */
+/* HASH CRC-32:0xf5290c0e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -138,39 +138,39 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(utime64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_I
 #ifdef __USE_KOS
 #if defined(__CRT_HAVE_futime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futime(3), futime64(3) */
-__CDECLARE(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,futime,(__fd_t __fd, struct utimbuf const *__file_times),(__fd,__file_times))
+__CDECLARE(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,futime,(__fd_t __fd, struct utimbuf const *__file_times),(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futime(3), futime64(3) */
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,futime,(__fd_t __fd, struct utimbuf const *__file_times),_futime,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,futime,(__fd_t __fd, struct utimbuf const *__file_times),_futime,(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime32) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futime(3), futime64(3) */
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,futime,(__fd_t __fd, struct utimbuf const *__file_times),_futime32,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,futime,(__fd_t __fd, struct utimbuf const *__file_times),_futime32,(__fd,__file_times))
 #elif defined(__CRT_HAVE_futime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futime(3), futime64(3) */
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,futime,(__fd_t __fd, struct utimbuf const *__file_times),futime64,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,futime,(__fd_t __fd, struct utimbuf const *__file_times),futime64,(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futime(3), futime64(3) */
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,futime,(__fd_t __fd, struct utimbuf const *__file_times),_futime64,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,futime,(__fd_t __fd, struct utimbuf const *__file_times),_futime64,(__fd,__file_times))
 #elif defined(__CRT_HAVE_futime) || defined(__CRT_HAVE__futime) || defined(__CRT_HAVE__futime32) || defined(__CRT_HAVE_futime64) || defined(__CRT_HAVE__futime64)
 #include <libc/local/utime/futime.h>
 /* >> futime(3), futime64(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(futime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(2) int __NOTHROW_RPC(__LIBCCALL futime)(__fd_t __fd, struct utimbuf const *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futime))(__fd, __file_times); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(futime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __ATTR_IN_OPT(2) int __NOTHROW_RPC(__LIBCCALL futime)(__fd_t __fd, struct utimbuf const *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futime))(__fd, __file_times); })
 #endif /* ... */
 
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_futime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> futime(3), futime64(3) */
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,futime64,(__fd_t __fd, struct utimbuf64 const *__file_times),futime,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,futime64,(__fd_t __fd, struct utimbuf64 const *__file_times),futime,(__fd,__file_times))
 #elif defined(__CRT_HAVE_futime64)
 /* >> futime(3), futime64(3) */
-__CDECLARE(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,futime64,(__fd_t __fd, struct utimbuf64 const *__file_times),(__fd,__file_times))
+__CDECLARE(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,futime64,(__fd_t __fd, struct utimbuf64 const *__file_times),(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime64)
 /* >> futime(3), futime64(3) */
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,futime64,(__fd_t __fd, struct utimbuf64 const *__file_times),_futime64,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,futime64,(__fd_t __fd, struct utimbuf64 const *__file_times),_futime64,(__fd,__file_times))
 #elif defined(__CRT_HAVE_futime) || defined(__CRT_HAVE__futime) || defined(__CRT_HAVE__futime32)
 #include <libc/local/utime/futime64.h>
 /* >> futime(3), futime64(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(futime64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(2) int __NOTHROW_RPC(__LIBCCALL futime64)(__fd_t __fd, struct utimbuf64 const *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futime64))(__fd, __file_times); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(futime64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __ATTR_IN_OPT(2) int __NOTHROW_RPC(__LIBCCALL futime64)(__fd_t __fd, struct utimbuf64 const *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futime64))(__fd, __file_times); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_KOS */
@@ -210,23 +210,23 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN_OPT(2) int __NOTHROW_RPC(_
 #endif /* ... */
 #if defined(__CRT_HAVE_futime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futime(3), futime64(3) */
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime,(__fd_t __fd, struct utimbuf const *__file_times),futime,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime,(__fd_t __fd, struct utimbuf const *__file_times),futime,(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futime(3), futime64(3) */
-__CDECLARE(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime,(__fd_t __fd, struct utimbuf const *__file_times),(__fd,__file_times))
+__CDECLARE(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime,(__fd_t __fd, struct utimbuf const *__file_times),(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime32) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futime(3), futime64(3) */
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime,(__fd_t __fd, struct utimbuf const *__file_times),_futime32,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime,(__fd_t __fd, struct utimbuf const *__file_times),_futime32,(__fd,__file_times))
 #elif defined(__CRT_HAVE_futime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futime(3), futime64(3) */
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime,(__fd_t __fd, struct utimbuf const *__file_times),futime64,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime,(__fd_t __fd, struct utimbuf const *__file_times),futime64,(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futime(3), futime64(3) */
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime,(__fd_t __fd, struct utimbuf const *__file_times),_futime64,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime,(__fd_t __fd, struct utimbuf const *__file_times),_futime64,(__fd,__file_times))
 #elif defined(__CRT_HAVE_futime) || defined(__CRT_HAVE__futime) || defined(__CRT_HAVE__futime32) || defined(__CRT_HAVE_futime64) || defined(__CRT_HAVE__futime64)
 #include <libc/local/utime/futime.h>
 /* >> futime(3), futime64(3) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(2) int __NOTHROW_RPC(__LIBCCALL _futime)(__fd_t __fd, struct utimbuf const *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futime))(__fd, __file_times); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __ATTR_IN_OPT(2) int __NOTHROW_RPC(__LIBCCALL _futime)(__fd_t __fd, struct utimbuf const *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futime))(__fd, __file_times); }
 #endif /* ... */
 #ifdef __CRT_HAVE__utime32
 __CDECLARE(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,_utime32,(char const *__filename, struct __utimbuf32 __KOS_FIXED_CONST *__file_times),(__filename,__file_times))
@@ -269,28 +269,28 @@ __CDECLARE(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,_utime64,(char const 
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN_OPT(2) int __NOTHROW_RPC(__LIBCCALL _utime64)(char const *__filename, struct utimbuf64 const *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(utime64))(__filename, __file_times); }
 #endif /* ... */
 #ifdef __CRT_HAVE__futime32
-__CDECLARE(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime32,(__fd_t __fd, struct __utimbuf32 __KOS_FIXED_CONST *__file_times),(__fd,__file_times))
+__CDECLARE(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime32,(__fd_t __fd, struct __utimbuf32 __KOS_FIXED_CONST *__file_times),(__fd,__file_times))
 #elif defined(__CRT_HAVE_futime)
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime32,(__fd_t __fd, struct __utimbuf32 __KOS_FIXED_CONST *__file_times),futime,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime32,(__fd_t __fd, struct __utimbuf32 __KOS_FIXED_CONST *__file_times),futime,(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime)
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime32,(__fd_t __fd, struct __utimbuf32 __KOS_FIXED_CONST *__file_times),_futime,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime32,(__fd_t __fd, struct __utimbuf32 __KOS_FIXED_CONST *__file_times),_futime,(__fd,__file_times))
 #elif defined(__CRT_HAVE_futime64) || defined(__CRT_HAVE__futime64)
 #include <libc/local/utime/_futime32.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_futime32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(2) int __NOTHROW_RPC(__LIBCCALL _futime32)(__fd_t __fd, struct __utimbuf32 __KOS_FIXED_CONST *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_futime32))(__fd, __file_times); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_futime32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __ATTR_IN_OPT(2) int __NOTHROW_RPC(__LIBCCALL _futime32)(__fd_t __fd, struct __utimbuf32 __KOS_FIXED_CONST *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_futime32))(__fd, __file_times); })
 #endif /* ... */
 #if defined(__CRT_HAVE_futime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> futime(3), futime64(3) */
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime64,(__fd_t __fd, struct utimbuf64 const *__file_times),futime,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime64,(__fd_t __fd, struct utimbuf64 const *__file_times),futime,(__fd,__file_times))
 #elif defined(__CRT_HAVE_futime64)
 /* >> futime(3), futime64(3) */
-__CREDIRECT(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime64,(__fd_t __fd, struct utimbuf64 const *__file_times),futime64,(__fd,__file_times))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime64,(__fd_t __fd, struct utimbuf64 const *__file_times),futime64,(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime64)
 /* >> futime(3), futime64(3) */
-__CDECLARE(__ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime64,(__fd_t __fd, struct utimbuf64 const *__file_times),(__fd,__file_times))
+__CDECLARE(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,_futime64,(__fd_t __fd, struct utimbuf64 const *__file_times),(__fd,__file_times))
 #elif defined(__CRT_HAVE_futime) || defined(__CRT_HAVE__futime) || defined(__CRT_HAVE__futime32)
 #include <libc/local/utime/futime64.h>
 /* >> futime(3), futime64(3) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(2) int __NOTHROW_RPC(__LIBCCALL _futime64)(__fd_t __fd, struct utimbuf64 const *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futime64))(__fd, __file_times); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __ATTR_IN_OPT(2) int __NOTHROW_RPC(__LIBCCALL _futime64)(__fd_t __fd, struct utimbuf64 const *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futime64))(__fd, __file_times); }
 #endif /* ... */
 #ifdef __CRT_HAVE__wutime
 __CDECLARE(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,_wutime,(wchar_t const *__file, struct utimbuf const *__file_times),(__file,__file_times))

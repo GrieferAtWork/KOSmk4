@@ -32,9 +32,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_FUTimens,hash:CRC-32=0xc479388b]]]*/
+/*[[[head:libc_FUTimens,hash:CRC-32=0xa2c44efa]]]*/
 /* >> futimens(2), futimens64(2) */
-INTERN ATTR_SECTION(".text.crt.except.fs.modify_time") ATTR_IN_OPT(2) void
+INTERN ATTR_SECTION(".text.crt.except.fs.modify_time") ATTR_FDARG(1) ATTR_IN_OPT(2) void
 (LIBCCALL libc_FUTimens)(fd_t fd,
                          struct timespec const times[2 /*or:3*/]) THROWS(...)
 /*[[[body:libc_FUTimens]]]*/
@@ -43,12 +43,12 @@ INTERN ATTR_SECTION(".text.crt.except.fs.modify_time") ATTR_IN_OPT(2) void
 }
 /*[[[end:libc_FUTimens]]]*/
 
-/*[[[head:libc_FUTimens64,hash:CRC-32=0xed8b6c19]]]*/
+/*[[[head:libc_FUTimens64,hash:CRC-32=0xd868a1a6]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_FUTimens64, libc_FUTimens);
 #else /* MAGIC:alias */
 /* >> futimens(2), futimens64(2) */
-INTERN ATTR_SECTION(".text.crt.except.fs.modify_time") ATTR_IN_OPT(2) void
+INTERN ATTR_SECTION(".text.crt.except.fs.modify_time") ATTR_FDARG(1) ATTR_IN_OPT(2) void
 (LIBCCALL libc_FUTimens64)(fd_t fd,
                            struct timespec64 const times[2 /*or:3*/]) THROWS(...)
 /*[[[body:libc_FUTimens64]]]*/

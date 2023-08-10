@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb394b3c8 */
+/* HASH CRC-32:0xeb7c0655 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,12 +27,12 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_inotify_add_watch_at_defined
 #define __local___localdep_inotify_add_watch_at_defined
-__CREDIRECT(__ATTR_IN(3),int,__NOTHROW_NCX,__localdep_inotify_add_watch_at,(__fd_t __notify_fd, __fd_t __dirfd, char const *__pathname, __atflag_t __atflags, __UINT32_TYPE__ __mask),inotify_add_watch_at,(__notify_fd,__dirfd,__pathname,__atflags,__mask))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(3),int,__NOTHROW_NCX,__localdep_inotify_add_watch_at,(__fd_t __notify_fd, __fd_t __dirfd, char const *__pathname, __atflag_t __atflags, __UINT32_TYPE__ __mask),inotify_add_watch_at,(__notify_fd,__dirfd,__pathname,__atflags,__mask))
 #endif /* !__local___localdep_inotify_add_watch_at_defined */
 __NAMESPACE_LOCAL_END
 #include <linux/inotify.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(inotify_add_watch) __ATTR_IN(2) int
+__LOCAL_LIBC(inotify_add_watch) __ATTR_FDARG(1) __ATTR_IN(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inotify_add_watch))(__fd_t __notify_fd, char const *__pathname, __UINT32_TYPE__ __mask) {
 	__atflag_t __atflags = 0;
 #if defined(IN_DONT_FOLLOW) && defined(__AT_SYMLINK_NOFOLLOW)

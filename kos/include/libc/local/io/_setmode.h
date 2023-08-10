@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x545f891a */
+/* HASH CRC-32:0xc7a05f6a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,22 +31,22 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, __fcntl_t __cmd),fcntl,(__fd,__cmd),__cmd,1,(void *))
+__CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, __fcntl_t __cmd),fcntl,(__fd,__cmd),__cmd,1,(void *))
 #elif defined(__CRT_HAVE___fcntl)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, __fcntl_t __cmd),__fcntl,(__fd,__cmd),__cmd,1,(void *))
+__CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, __fcntl_t __cmd),__fcntl,(__fd,__cmd),__cmd,1,(void *))
 #elif defined(__CRT_HAVE___libc_fcntl)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, __fcntl_t __cmd),__libc_fcntl,(__fd,__cmd),__cmd,1,(void *))
+__CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, __fcntl_t __cmd),__libc_fcntl,(__fd,__cmd),__cmd,1,(void *))
 #else /* ... */
 #undef __local___localdep_fcntl_defined
 #endif /* !... */
 #endif /* !__local___localdep_fcntl_defined */
-__LOCAL_LIBC(_setmode) __oflag_t
+__LOCAL_LIBC(_setmode) __ATTR_FDARG(1) __oflag_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_setmode))(__fd_t __fd, __oflag_t __mode) {
 #ifdef __F_SETFL_XCH
 	return (__NAMESPACE_LOCAL_SYM __localdep_fcntl)(__fd, __F_SETFL_XCH, __mode);

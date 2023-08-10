@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa51a09e4 */
+/* HASH CRC-32:0x5de29947 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,10 +64,10 @@ INTDEF ATTR_OUT_OPT(1) pid_t NOTHROW_RPC(LIBDCALL libd_cwait)(int *tstat, pid_t 
 INTDEF ATTR_OUT_OPT(1) pid_t NOTHROW_RPC(LIBCCALL libc_cwait)(int *tstat, pid_t pid, __STDC_INT_AS_UINT_T action);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_IN(3) ATTR_IN(4) pid_t NOTHROW_RPC(LIBDCALL libd_fspawnve)(__STDC_INT_AS_UINT_T mode, fd_t execfd, __TARGV, __TENVP);
+INTDEF ATTR_FDREAD(2) ATTR_IN(3) ATTR_IN(4) pid_t NOTHROW_RPC(LIBDCALL libd_fspawnve)(__STDC_INT_AS_UINT_T mode, fd_t execfd, __TARGV, __TENVP);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_IN(3) ATTR_IN(4) pid_t NOTHROW_RPC(LIBCCALL libc_fspawnve)(__STDC_INT_AS_UINT_T mode, fd_t execfd, __TARGV, __TENVP);
+INTDEF ATTR_FDREAD(2) ATTR_IN(3) ATTR_IN(4) pid_t NOTHROW_RPC(LIBCCALL libc_fspawnve)(__STDC_INT_AS_UINT_T mode, fd_t execfd, __TARGV, __TENVP);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF uintptr_t NOTHROW_NCX(LIBDCALL libd__beginthread)(void (LIBDCALL *entry)(void *arg), u32 stacksz, void *arg);

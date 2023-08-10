@@ -28,8 +28,8 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_sendfile,hash:CRC-32=0xf2cb5b70]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") ATTR_INOUT_OPT(3) ssize_t
+/*[[[head:libc_sendfile,hash:CRC-32=0x49952265]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") ATTR_FDREAD(2) ATTR_FDWRITE(1) ATTR_INOUT_OPT(3) ssize_t
 NOTHROW_NCX(LIBCCALL libc_sendfile)(fd_t out_fd,
                                     fd_t in_fd,
                                     off_t *offset,
@@ -42,11 +42,11 @@ NOTHROW_NCX(LIBCCALL libc_sendfile)(fd_t out_fd,
 }
 /*[[[end:libc_sendfile]]]*/
 
-/*[[[head:libc_sendfile64,hash:CRC-32=0xfd733f51]]]*/
+/*[[[head:libc_sendfile64,hash:CRC-32=0x1524c0cf]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_sendfile64, libc_sendfile);
 #else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") ATTR_INOUT_OPT(3) ssize_t
+INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") ATTR_FDREAD(2) ATTR_FDWRITE(1) ATTR_INOUT_OPT(3) ssize_t
 NOTHROW_NCX(LIBCCALL libc_sendfile64)(fd_t out_fd,
                                       fd_t in_fd,
                                       off64_t *offset,

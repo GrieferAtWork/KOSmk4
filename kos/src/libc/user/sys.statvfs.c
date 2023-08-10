@@ -93,8 +93,8 @@ NOTHROW_NCX(LIBCCALL libc_statvfs)(char const *file,
 }
 /*[[[end:libc_statvfs]]]*/
 
-/*[[[head:libc_fstatvfs,hash:CRC-32=0x310d6bac]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.statfs.statvfs") ATTR_OUT(2) int
+/*[[[head:libc_fstatvfs,hash:CRC-32=0x7163b932]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.statfs.statvfs") ATTR_FDARG(1) ATTR_OUT(2) int
 NOTHROW_NCX(LIBCCALL libc_fstatvfs)(fd_t filedes,
                                     struct statvfs *buf)
 /*[[[body:libc_fstatvfs]]]*/
@@ -127,11 +127,11 @@ NOTHROW_NCX(LIBCCALL libc_statvfs64)(const char *file,
 #endif /* MAGIC:alias */
 /*[[[end:libc_statvfs64]]]*/
 
-/*[[[head:libc_fstatvfs64,hash:CRC-32=0x67caddf5]]]*/
+/*[[[head:libc_fstatvfs64,hash:CRC-32=0x1543aa85]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_fstatvfs64, libc_fstatvfs);
 #else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.fs.statfs.statvfs") ATTR_OUT(2) int
+INTERN ATTR_SECTION(".text.crt.fs.statfs.statvfs") ATTR_FDARG(1) ATTR_OUT(2) int
 NOTHROW_NCX(LIBCCALL libc_fstatvfs64)(fd_t filedes,
                                       struct statvfs64 *buf)
 /*[[[body:libc_fstatvfs64]]]*/

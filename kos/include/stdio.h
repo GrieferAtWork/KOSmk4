@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c3886d4 */
+/* HASH CRC-32:0x49b40c89 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2587,19 +2587,19 @@ __NAMESPACE_STD_USING(snprintf)
 #ifdef __USE_XOPEN2K8
 #ifdef __CRT_HAVE_vdprintf
 /* >> dprintf(3), vdprintf(3) */
-__CDECLARE(__ATTR_IN(2) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,vdprintf,(__fd_t __fd, char const *__restrict __format, __builtin_va_list __args),(__fd,__format,__args))
+__CDECLARE(__ATTR_FDWRITE(1) __ATTR_IN(2) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,vdprintf,(__fd_t __fd, char const *__restrict __format, __builtin_va_list __args),(__fd,__format,__args))
 #else /* __CRT_HAVE_vdprintf */
 #include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
 #if defined(__CRT_HAVE_write_printer) || defined(__CRT_HAVE_writeall) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
 #include <libc/local/stdio/vdprintf.h>
 /* >> dprintf(3), vdprintf(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(vdprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL vdprintf)(__fd_t __fd, char const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vdprintf))(__fd, __format, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(vdprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDWRITE(1) __ATTR_IN(2) __ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL vdprintf)(__fd_t __fd, char const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vdprintf))(__fd, __format, __args); })
 #endif /* __CRT_HAVE_write_printer || __CRT_HAVE_writeall || __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write */
 #endif /* !__CRT_HAVE_vdprintf */
 #ifdef __CRT_HAVE_dprintf
 /* >> dprintf(3), vdprintf(3) */
-__LIBC __ATTR_IN(2) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL dprintf)(__fd_t __fd, char const *__restrict __format, ...) __CASMNAME_SAME("dprintf");
+__LIBC __ATTR_FDWRITE(1) __ATTR_IN(2) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL dprintf)(__fd_t __fd, char const *__restrict __format, ...) __CASMNAME_SAME("dprintf");
 #else /* __CRT_HAVE_dprintf */
 #include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
@@ -2607,7 +2607,7 @@ __LIBC __ATTR_IN(2) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC
 #include <libc/local/stdio/dprintf.h>
 /* >> dprintf(3), vdprintf(3) */
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(dprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL dprintf)(__fd_t __fd, char const *__restrict __format, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dprintf))(__fd, __format, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDWRITE(1) __ATTR_IN(2) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL dprintf)(__fd_t __fd, char const *__restrict __format, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dprintf))(__fd, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define dprintf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dprintf))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
@@ -2978,19 +2978,19 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,tempnam,(char cons
  * Open a new file stream by inheriting a given file descriptor `fd'
  * Note that upon success (`return != NULL'), the given `fd' will be
  * `close(2)'d once `fclose(return)' is called. */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2),__FILE *,__NOTHROW_NCX,fdopen,(__fd_t __fd, char const *__restrict __modes),(__fd,__modes))
+__CDECLARE(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2),__FILE *,__NOTHROW_NCX,fdopen,(__fd_t __fd, char const *__restrict __modes),(__fd,__modes))
 #elif defined(__CRT_HAVE__fdopen)
 /* >> fdopen(3)
  * Open a new file stream by inheriting a given file descriptor `fd'
  * Note that upon success (`return != NULL'), the given `fd' will be
  * `close(2)'d once `fclose(return)' is called. */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__FILE *,__NOTHROW_NCX,fdopen,(__fd_t __fd, char const *__restrict __modes),_fdopen,(__fd,__modes))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2),__FILE *,__NOTHROW_NCX,fdopen,(__fd_t __fd, char const *__restrict __modes),_fdopen,(__fd,__modes))
 #elif defined(__CRT_HAVE__IO_fdopen)
 /* >> fdopen(3)
  * Open a new file stream by inheriting a given file descriptor `fd'
  * Note that upon success (`return != NULL'), the given `fd' will be
  * `close(2)'d once `fclose(return)' is called. */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__FILE *,__NOTHROW_NCX,fdopen,(__fd_t __fd, char const *__restrict __modes),_IO_fdopen,(__fd,__modes))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2),__FILE *,__NOTHROW_NCX,fdopen,(__fd_t __fd, char const *__restrict __modes),_IO_fdopen,(__fd,__modes))
 #endif /* ... */
 #if defined(__CRT_HAVE_fileno_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* >> fileno(3)
@@ -3022,11 +3022,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fmemopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* ... */
 #ifdef __CRT_HAVE_open_memstream
 /* >> open_memstream(3) */
-__CDECLARE(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,open_memstream,(char **__bufloc, __SIZE_TYPE__ *__sizeloc),(__bufloc,__sizeloc))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,open_memstream,(char **__bufloc, __SIZE_TYPE__ *__sizeloc),(__bufloc,__sizeloc))
 #elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && ((defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2)) && (defined(__CRT_HAVE_recalloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 #include <libc/local/stdio/open_memstream.h>
 /* >> open_memstream(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(open_memstream, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __FILE *__NOTHROW_NCX(__LIBCCALL open_memstream)(char **__bufloc, __SIZE_TYPE__ *__sizeloc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open_memstream))(__bufloc, __sizeloc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(open_memstream, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __FILE *__NOTHROW_NCX(__LIBCCALL open_memstream)(char **__bufloc, __SIZE_TYPE__ *__sizeloc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open_memstream))(__bufloc, __sizeloc); })
 #endif /* ... */
 #if defined(__CRT_HAVE_getdelim_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* >> getdelim(3) */
@@ -3203,15 +3203,15 @@ __CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_RPC,flockfile,(__FILE *__restrict __s
 #ifdef __CRT_HAVE_funlockfile
 /* >> funlockfile(3)
  * Release a previously acquired lock from `stream' */
-__CDECLARE_VOID(,__NOTHROW_NCX,funlockfile,(__FILE *__restrict __stream),(__stream))
+__CDECLARE_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,funlockfile,(__FILE *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE__unlock_file)
 /* >> funlockfile(3)
  * Release a previously acquired lock from `stream' */
-__CREDIRECT_VOID(,__NOTHROW_NCX,funlockfile,(__FILE *__restrict __stream),_unlock_file,(__stream))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,funlockfile,(__FILE *__restrict __stream),_unlock_file,(__stream))
 #elif defined(__CRT_HAVE__IO_funlockfile)
 /* >> funlockfile(3)
  * Release a previously acquired lock from `stream' */
-__CREDIRECT_VOID(,__NOTHROW_NCX,funlockfile,(__FILE *__restrict __stream),_IO_funlockfile,(__stream))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,funlockfile,(__FILE *__restrict __stream),_IO_funlockfile,(__stream))
 #endif /* ... */
 #ifdef __CRT_HAVE_ftrylockfile
 /* >> ftrylockfile(3)
@@ -3349,11 +3349,11 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_IN_OPT(1),__FILE *,__NOTHROW_RPC,
 #ifdef __CRT_HAVE_pclose
 /* >> pclose(3)
  * Close a process I/O file `stream' (s.a. `popen(3)') */
-__CDECLARE(,int,__NOTHROW_NCX,pclose,(__FILE *__stream),(__stream))
+__CDECLARE(__ATTR_INOUT(1),int,__NOTHROW_NCX,pclose,(__FILE *__stream),(__stream))
 #elif defined(__CRT_HAVE__pclose)
 /* >> pclose(3)
  * Close a process I/O file `stream' (s.a. `popen(3)') */
-__CREDIRECT(,int,__NOTHROW_NCX,pclose,(__FILE *__stream),_pclose,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,pclose,(__FILE *__stream),_pclose,(__stream))
 #endif /* ... */
 #endif /* __USE_POSIX2 */
 
@@ -4076,20 +4076,20 @@ __LIBC __ATTR_IN(2) __ATTR_LIBC_PRINTF(2, 3) __ATTR_OUT(1) __STDC_INT_AS_SSIZE_T
 #if defined(__CRT_HAVE_fdreopen_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
-__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(3),__FILE *,__NOTHROW_RPC,fdreopen,(__fd_t __fd, char const *__restrict __modes, __FILE *__restrict __stream),fdreopen_unlocked,(__fd,__modes,__stream))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(2) __ATTR_INOUT(3),__FILE *,__NOTHROW_RPC,fdreopen,(__fd_t __fd, char const *__restrict __modes, __FILE *__restrict __stream),fdreopen_unlocked,(__fd,__modes,__stream))
 #elif defined(__CRT_HAVE_fdreopen)
 /* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
-__CDECLARE(__ATTR_IN(2) __ATTR_INOUT(3),__FILE *,__NOTHROW_RPC,fdreopen,(__fd_t __fd, char const *__restrict __modes, __FILE *__restrict __stream),(__fd,__modes,__stream))
+__CDECLARE(__ATTR_FDARG(1) __ATTR_IN(2) __ATTR_INOUT(3),__FILE *,__NOTHROW_RPC,fdreopen,(__fd_t __fd, char const *__restrict __modes, __FILE *__restrict __stream),(__fd,__modes,__stream))
 #endif /* ... */
 #ifdef __CRT_HAVE_fdreopen_unlocked
 /* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
-__CDECLARE(__ATTR_IN(2) __ATTR_INOUT(3),__FILE *,__NOTHROW_RPC,fdreopen_unlocked,(__fd_t __fd, char const *__restrict __modes, __FILE *__restrict __stream),(__fd,__modes,__stream))
+__CDECLARE(__ATTR_FDARG(1) __ATTR_IN(2) __ATTR_INOUT(3),__FILE *,__NOTHROW_RPC,fdreopen_unlocked,(__fd_t __fd, char const *__restrict __modes, __FILE *__restrict __stream),(__fd,__modes,__stream))
 #elif defined(__CRT_HAVE_fdreopen)
 /* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
-__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(3),__FILE *,__NOTHROW_RPC,fdreopen_unlocked,(__fd_t __fd, char const *__restrict __modes, __FILE *__restrict __stream),fdreopen,(__fd,__modes,__stream))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(2) __ATTR_INOUT(3),__FILE *,__NOTHROW_RPC,fdreopen_unlocked,(__fd_t __fd, char const *__restrict __modes, __FILE *__restrict __stream),fdreopen,(__fd,__modes,__stream))
 #endif /* ... */
 #ifndef __freopen_unlocked_defined
 #define __freopen_unlocked_defined
@@ -5049,14 +5049,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fmtcheck, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  * as  all unread data previously buffered, but not yet read. After
  * a call to this function, the next `fread(3)' or `fwrite(3)' will
  * start off from a blank state. */
-__CREDIRECT_VOID(,__NOTHROW_NCX,fpurge,(__FILE *__stream),__fpurge,(__stream))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,fpurge,(__FILE *__stream),__fpurge,(__stream))
 #elif defined(__CRT_HAVE_fpurge)
 /* >> __fpurge(3)
  * Discard all modified, but unwritten data from `stream', as  well
  * as  all unread data previously buffered, but not yet read. After
  * a call to this function, the next `fread(3)' or `fwrite(3)' will
  * start off from a blank state. */
-__CDECLARE_VOID(,__NOTHROW_NCX,fpurge,(__FILE *__stream),(__stream))
+__CDECLARE_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,fpurge,(__FILE *__stream),(__stream))
 #else /* ... */
 #undef __fpurge_defined
 #endif /* !... */
@@ -5322,11 +5322,11 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_IN_OPT(1),__FILE *,__NOTHROW_RPC,
 #ifdef __CRT_HAVE_pclose
 /* >> pclose(3)
  * Close a process I/O file `stream' (s.a. `popen(3)') */
-__CREDIRECT(,int,__NOTHROW_NCX,_pclose,(__FILE *__stream),pclose,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,_pclose,(__FILE *__stream),pclose,(__stream))
 #elif defined(__CRT_HAVE__pclose)
 /* >> pclose(3)
  * Close a process I/O file `stream' (s.a. `popen(3)') */
-__CDECLARE(,int,__NOTHROW_NCX,_pclose,(__FILE *__stream),(__stream))
+__CDECLARE(__ATTR_INOUT(1),int,__NOTHROW_NCX,_pclose,(__FILE *__stream),(__stream))
 #endif /* ... */
 #ifdef __CRT_HAVE__fsopen
 __CDECLARE(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),__FILE *,__NOTHROW_RPC,_fsopen,(char const *__filename, char const *__modes, __STDC_INT_AS_UINT_T __sflag),(__filename,__modes,__sflag))
@@ -5339,19 +5339,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_fsopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
  * Open a new file stream by inheriting a given file descriptor `fd'
  * Note that upon success (`return != NULL'), the given `fd' will be
  * `close(2)'d once `fclose(return)' is called. */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__FILE *,__NOTHROW_NCX,_fdopen,(__fd_t __fd, char const *__restrict __modes),fdopen,(__fd,__modes))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2),__FILE *,__NOTHROW_NCX,_fdopen,(__fd_t __fd, char const *__restrict __modes),fdopen,(__fd,__modes))
 #elif defined(__CRT_HAVE__fdopen)
 /* >> fdopen(3)
  * Open a new file stream by inheriting a given file descriptor `fd'
  * Note that upon success (`return != NULL'), the given `fd' will be
  * `close(2)'d once `fclose(return)' is called. */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2),__FILE *,__NOTHROW_NCX,_fdopen,(__fd_t __fd, char const *__restrict __modes),(__fd,__modes))
+__CDECLARE(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2),__FILE *,__NOTHROW_NCX,_fdopen,(__fd_t __fd, char const *__restrict __modes),(__fd,__modes))
 #elif defined(__CRT_HAVE__IO_fdopen)
 /* >> fdopen(3)
  * Open a new file stream by inheriting a given file descriptor `fd'
  * Note that upon success (`return != NULL'), the given `fd' will be
  * `close(2)'d once `fclose(return)' is called. */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__FILE *,__NOTHROW_NCX,_fdopen,(__fd_t __fd, char const *__restrict __modes),_IO_fdopen,(__fd,__modes))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2),__FILE *,__NOTHROW_NCX,_fdopen,(__fd_t __fd, char const *__restrict __modes),_IO_fdopen,(__fd,__modes))
 #endif /* ... */
 #if defined(__CRT_HAVE_flushall_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(,int,__NOTHROW_CB_NCX,_flushall,(void),flushall_unlocked,())
@@ -5918,15 +5918,15 @@ __CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_RPC,_lock_file,(__FILE *__restrict __
 #ifdef __CRT_HAVE_funlockfile
 /* >> funlockfile(3)
  * Release a previously acquired lock from `stream' */
-__CREDIRECT_VOID(,__NOTHROW_NCX,_unlock_file,(__FILE *__restrict __stream),funlockfile,(__stream))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,_unlock_file,(__FILE *__restrict __stream),funlockfile,(__stream))
 #elif defined(__CRT_HAVE__unlock_file)
 /* >> funlockfile(3)
  * Release a previously acquired lock from `stream' */
-__CDECLARE_VOID(,__NOTHROW_NCX,_unlock_file,(__FILE *__restrict __stream),(__stream))
+__CDECLARE_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,_unlock_file,(__FILE *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE__IO_funlockfile)
 /* >> funlockfile(3)
  * Release a previously acquired lock from `stream' */
-__CREDIRECT_VOID(,__NOTHROW_NCX,_unlock_file,(__FILE *__restrict __stream),_IO_funlockfile,(__stream))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,_unlock_file,(__FILE *__restrict __stream),_IO_funlockfile,(__stream))
 #endif /* ... */
 #ifdef __CRT_HAVE_fclose
 /* >> fclose(3)

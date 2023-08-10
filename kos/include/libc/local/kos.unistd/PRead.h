@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbc293aa */
+/* HASH CRC-32:0x733561e4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_PRead32_defined) && defined(__CRT_HAVE_PRead)
 #define __local___localdep_PRead32_defined
-__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING(...),__localdep_PRead32,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_FDREAD(1) __ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING(...),__localdep_PRead32,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
 #endif /* !__local___localdep_PRead32_defined && __CRT_HAVE_PRead */
 #ifndef __local___localdep_PRead64_defined
 #define __local___localdep_PRead64_defined
 #if defined(__CRT_HAVE_PRead) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING(...),__localdep_PRead64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_FDREAD(1) __ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING(...),__localdep_PRead64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead64)
-__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING(...),__localdep_PRead64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PRead64,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_FDREAD(1) __ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING(...),__localdep_PRead64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PRead64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.unistd/PRead64.h>
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_PRead64_defined
 #endif /* !... */
 #endif /* !__local___localdep_PRead64_defined */
-__LOCAL_LIBC(PRead) __ATTR_OUTS(2, 3) __SIZE_TYPE__
+__LOCAL_LIBC(PRead) __ATTR_FDREAD(1) __ATTR_OUTS(2, 3) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(PRead))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos_t __offset) __THROWS(...) {
 #ifdef __CRT_HAVE_PRead
 	return (__NAMESPACE_LOCAL_SYM __localdep_PRead32)(__fd, __buf, __bufsize, (__pos32_t)__offset);

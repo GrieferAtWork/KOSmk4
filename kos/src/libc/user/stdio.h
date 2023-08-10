@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdfacef2c */
+/* HASH CRC-32:0xdb8a0895 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -151,7 +151,7 @@ INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_NCX(LIBCCALL libc_tempnam)(char const *
  * Open a new file stream by inheriting a given file descriptor `fd'
  * Note that upon success (`return != NULL'), the given `fd' will be
  * `close(2)'d once `fclose(return)' is called. */
-INTDEF WUNUSED ATTR_IN(2) FILE *NOTHROW_NCX(LIBCCALL libc_fdopen)(fd_t fd, char const *__restrict modes);
+INTDEF WUNUSED ATTR_FDARG(1) ATTR_IN(2) FILE *NOTHROW_NCX(LIBCCALL libc_fdopen)(fd_t fd, char const *__restrict modes);
 /* >> fileno(3)
  * Return the underlying file descriptor number used by `stream' */
 INTDEF WUNUSED ATTR_INOUT(1) fd_t NOTHROW_NCX(LIBCCALL libc_fileno)(FILE *__restrict stream);
@@ -160,7 +160,7 @@ INTDEF WUNUSED ATTR_INOUT(1) fd_t NOTHROW_NCX(LIBCCALL libc_fileno)(FILE *__rest
 INTDEF ATTR_INOUT(1) void NOTHROW_RPC(LIBCCALL libc_flockfile)(FILE *__restrict stream);
 /* >> funlockfile(3)
  * Release a previously acquired lock from `stream' */
-INTDEF void NOTHROW_NCX(LIBCCALL libc_funlockfile)(FILE *__restrict stream);
+INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc_funlockfile)(FILE *__restrict stream);
 /* >> ftrylockfile(3)
  * Try to acquire a lock to `stream'
  * @return: == 0 : Lock successfully acquired
@@ -175,7 +175,7 @@ INTDEF WUNUSED ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc_ftrylockfile)(FILE *_
 INTDEF WUNUSED ATTR_IN(2) ATTR_IN_OPT(1) FILE *NOTHROW_RPC(LIBCCALL libc_popen)(char const *command, char const *modes);
 /* >> pclose(3)
  * Close a process I/O file `stream' (s.a. `popen(3)') */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_pclose)(FILE *stream);
+INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc_pclose)(FILE *stream);
 /* >> popenve(3)
  * Similar to `popen(3)', but rather than running `shexec(command)', this
  * function will `execve(path, argv, envp)'. The returned FILE must still
@@ -226,10 +226,10 @@ INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t NOTHROW_CB_NCX(__FORMATPRINTER_CC lib
 INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t NOTHROW_CB_NCX(__FORMATPRINTER_CC libc_file_printer_unlocked)(void *arg, char const *__restrict data, size_t datalen);
 /* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
-INTDEF ATTR_IN(2) ATTR_INOUT(3) FILE *NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
+INTDEF ATTR_FDARG(1) ATTR_IN(2) ATTR_INOUT(3) FILE *NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
 /* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
-INTDEF ATTR_IN(2) ATTR_INOUT(3) FILE *NOTHROW_RPC(LIBCCALL libc_fdreopen_unlocked)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
+INTDEF ATTR_FDARG(1) ATTR_IN(2) ATTR_INOUT(3) FILE *NOTHROW_RPC(LIBCCALL libc_fdreopen_unlocked)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_INOUT(3) FILE *NOTHROW_RPC(LIBDCALL libd_freopen_unlocked)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);

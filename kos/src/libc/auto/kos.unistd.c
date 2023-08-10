@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37002fe2 */
+/* HASH CRC-32:0xef4c85e8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,7 +75,7 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_IN(1) AT
 }
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
-INTERN ATTR_SECTION(".text.crt.except.io.tty") WUNUSED pid_t
+INTERN ATTR_SECTION(".text.crt.except.io.tty") WUNUSED ATTR_FDARG(1) pid_t
 (LIBCCALL libc_TCGetPGrp)(fd_t fd) THROWS(...) {
 	pid_t result;
 	libc_Ioctl(fd, __TIOCGPGRP, &result);
@@ -83,7 +83,7 @@ INTERN ATTR_SECTION(".text.crt.except.io.tty") WUNUSED pid_t
 }
 /* >> tcsetpgrp(2)
  * Set the foreground process group of a given TTY file descriptor */
-INTERN ATTR_SECTION(".text.crt.except.io.tty") void
+INTERN ATTR_SECTION(".text.crt.except.io.tty") ATTR_FDARG(1) void
 (LIBCCALL libc_TCSetPGrp)(fd_t fd,
                           pid_t pgrp_id) THROWS(...) {
 	libc_Ioctl(fd, __TIOCSPGRP, &pgrp_id);
@@ -97,7 +97,7 @@ INTERN ATTR_SECTION(".text.crt.except.io.tty") void
  * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
-INTERN ATTR_SECTION(".text.crt.except.io.read") ATTR_OUTS(2, 3) size_t
+INTERN ATTR_SECTION(".text.crt.except.io.read") ATTR_FDREAD(1) ATTR_OUTS(2, 3) size_t
 (LIBCCALL libc_ReadAll)(fd_t fd,
                         void *buf,
                         size_t bufsize) THROWS(...) {
@@ -151,7 +151,7 @@ INTERN ATTR_SECTION(".text.crt.except.io.read") ATTR_OUTS(2, 3) size_t
  * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
-INTERN ATTR_SECTION(".text.crt.except.io.write") ATTR_INS(2, 3) size_t
+INTERN ATTR_SECTION(".text.crt.except.io.write") ATTR_FDWRITE(1) ATTR_INS(2, 3) size_t
 (LIBCCALL libc_WriteAll)(fd_t fd,
                          void const *buf,
                          size_t bufsize) THROWS(...) {
@@ -193,7 +193,7 @@ INTERN ATTR_SECTION(".text.crt.except.io.write") ATTR_INS(2, 3) ssize_t
 #ifndef __KERNEL__
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTERN ATTR_SECTION(".text.crt.except.io.read") ATTR_OUTS(2, 3) size_t
+INTERN ATTR_SECTION(".text.crt.except.io.read") ATTR_FDREAD(1) ATTR_OUTS(2, 3) size_t
 (LIBCCALL libc_PReadAll)(fd_t fd,
                          void *buf,
                          size_t bufsize,
@@ -220,7 +220,7 @@ INTERN ATTR_SECTION(".text.crt.except.io.read") ATTR_OUTS(2, 3) size_t
 }
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTERN ATTR_SECTION(".text.crt.except.io.write") ATTR_INS(2, 3) size_t
+INTERN ATTR_SECTION(".text.crt.except.io.write") ATTR_FDWRITE(1) ATTR_INS(2, 3) size_t
 (LIBCCALL libc_PWriteAll)(fd_t fd,
                           void const *buf,
                           size_t bufsize,
@@ -249,7 +249,7 @@ DEFINE_INTERN_ALIAS(libc_PReadAll64, libc_PReadAll);
 #else /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTERN ATTR_SECTION(".text.crt.except.io.large.read") ATTR_OUTS(2, 3) size_t
+INTERN ATTR_SECTION(".text.crt.except.io.large.read") ATTR_FDREAD(1) ATTR_OUTS(2, 3) size_t
 (LIBCCALL libc_PReadAll64)(fd_t fd,
                            void *buf,
                            size_t bufsize,
@@ -281,7 +281,7 @@ DEFINE_INTERN_ALIAS(libc_PWriteAll64, libc_PWriteAll);
 #else /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTERN ATTR_SECTION(".text.crt.except.io.large.write") ATTR_INS(2, 3) size_t
+INTERN ATTR_SECTION(".text.crt.except.io.large.write") ATTR_FDWRITE(1) ATTR_INS(2, 3) size_t
 (LIBCCALL libc_PWriteAll64)(fd_t fd,
                             void const *buf,
                             size_t bufsize,
@@ -333,14 +333,14 @@ INTERN ATTR_SECTION(".text.crt.except.bsd.user") void
  * and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.
  * No special permissions  are required to  use this function,  since a malicious  application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
-INTERN ATTR_SECTION(".text.crt.except.bsd") void
+INTERN ATTR_SECTION(".text.crt.except.bsd") ATTR_FDARG(1) void
 (LIBCCALL libc_FChRoot)(fd_t fd) THROWS(...) {
 	(void)libc_Dup2(fd, __AT_FDROOT);
 }
 #include <asm/os/stdio.h>
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-INTERN ATTR_SECTION(".text.crt.except.solaris") WUNUSED pos_t
+INTERN ATTR_SECTION(".text.crt.except.solaris") WUNUSED ATTR_FDARG(1) pos_t
 (LIBCCALL libc_Tell)(fd_t fd) THROWS(...) {
 	return libc_LSeek(fd, 0, SEEK_CUR);
 }
@@ -351,7 +351,7 @@ DEFINE_INTERN_ALIAS(libc_Tell64, libc_Tell);
 #include <asm/os/stdio.h>
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-INTERN ATTR_SECTION(".text.crt.except.solaris") WUNUSED pos64_t
+INTERN ATTR_SECTION(".text.crt.except.solaris") WUNUSED ATTR_FDARG(1) pos64_t
 (LIBCCALL libc_Tell64)(fd_t fd) THROWS(...) {
 	return libc_LSeek64(fd, 0, __SEEK_CUR);
 }

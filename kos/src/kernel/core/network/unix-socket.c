@@ -665,8 +665,9 @@ UnixSocket_WaitForAccept_Connect(struct async *__restrict self) {
 	/* XXX: We could easily implement a timeout for connect()-attempt */
 	return KTIME_INFINITE;
 }
-PRIVATE NONNULL((1)) bool FCALL
-UnixSocket_WaitForAccept_Test(struct async *__restrict self) {
+
+PRIVATE NONNULL((1)) bool
+NOTHROW(FCALL UnixSocket_WaitForAccept_Test)(struct async *__restrict self) {
 	struct async_accept_wait *me = (struct async_accept_wait *)self;
 	struct unix_client *client   = me->aw_client;
 	return atomic_read(&client->uc_status) != UNIX_CLIENT_STATUS_PENDING;
@@ -719,8 +720,8 @@ UnixSocket_WaitForAccept_Work(struct async *__restrict self) {
 	return ASYNC_FINISHED;
 }
 
-PRIVATE NONNULL((1)) void FCALL
-UnixSocket_WaitForAccept_Cancel(struct async *__restrict self) {
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL UnixSocket_WaitForAccept_Cancel)(struct async *__restrict self) {
 	struct unix_client *client;
 	struct async_accept_wait *me;
 	me     = (struct async_accept_wait *)self;
@@ -1814,8 +1815,8 @@ UnixSocket_GetSockOpt(struct socket *__restrict self,
 }
 
 
-PRIVATE size_t KCALL
-UnixSocket_GetRcvBuf(struct socket *__restrict self) {
+PRIVATE size_t
+NOTHROW(KCALL UnixSocket_GetRcvBuf)(struct socket *__restrict self) {
 	struct unix_socket *me;
 	size_t result;
 	me     = (struct unix_socket *)self;
@@ -1829,8 +1830,8 @@ UnixSocket_GetRcvBuf(struct socket *__restrict self) {
 	return result;
 }
 
-PRIVATE void KCALL
-UnixSocket_SetRcvBuf(struct socket *__restrict self, size_t bufsiz) {
+PRIVATE void
+NOTHROW(KCALL UnixSocket_SetRcvBuf)(struct socket *__restrict self, size_t bufsiz) {
 	struct unix_socket *me;
 	size_t old_rcv_bufsiz;
 	me = (struct unix_socket *)self;
@@ -1846,8 +1847,8 @@ UnixSocket_SetRcvBuf(struct socket *__restrict self, size_t bufsiz) {
 	} while (!atomic_cmpxch_weak(&me->us_rcvbufsiz, old_rcv_bufsiz, bufsiz));
 }
 
-PRIVATE size_t KCALL
-UnixSocket_GetSndBuf(struct socket *__restrict self) {
+PRIVATE size_t
+NOTHROW(KCALL UnixSocket_GetSndBuf)(struct socket *__restrict self) {
 	struct unix_socket *me;
 	size_t result;
 	me     = (struct unix_socket *)self;
@@ -1861,8 +1862,8 @@ UnixSocket_GetSndBuf(struct socket *__restrict self) {
 	return result;
 }
 
-PRIVATE void KCALL
-UnixSocket_SetSndBuf(struct socket *__restrict self, size_t bufsiz) {
+PRIVATE void
+NOTHROW(KCALL UnixSocket_SetSndBuf)(struct socket *__restrict self, size_t bufsiz) {
 	struct unix_socket *me;
 	size_t old_snd_bufsiz;
 	me = (struct unix_socket *)self;

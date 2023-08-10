@@ -77,8 +77,8 @@ int attr_copy_file([[in]] char const *src_path, [[in]] char const *dst_path,
 @@@return: -1: Error (s.a. `errno' and `ctx')
 [[decl_include("<attr/error_context.h>", "<bits/types.h>")]]
 [[requires_function(attr_copy_impl)]]
-int attr_copy_fd([[in_opt]] char const *src_path, $fd_t src_fd,
-                 [[in_opt]] char const *dst_path, $fd_t dst_fd,
+int attr_copy_fd([[in_opt]] char const *src_path, [[dirfd]] $fd_t src_fd,
+                 [[in_opt]] char const *dst_path, [[dirfd]] $fd_t dst_fd,
                  [[nullable]] int (LIBKCALL *check)(char const *attr_name, struct error_context *ctx),
                  [[inout_opt]] struct error_context *ctx) {
 	return attr_copy_impl(src_path, src_fd, dst_path, dst_fd, check, ctx);
@@ -97,8 +97,8 @@ int attr_copy_fd([[in_opt]] char const *src_path, $fd_t src_fd,
 [[impl_include("<libc/errno.h>", "<bits/types.h>")]]
 [[impl_include("<attr/error_context.h>")]]
 [[impl_include("<bits/crt/inttypes.h>")]]
-int attr_copy_impl([[in_opt]] char const *src_path, $fd_t src_fd,
-                   [[in_opt]] char const *dst_path, $fd_t dst_fd,
+int attr_copy_impl([[in_opt]] char const *src_path, [[dirfd]] $fd_t src_fd,
+                   [[in_opt]] char const *dst_path, [[dirfd]] $fd_t dst_fd,
                    [[nullable]] int (LIBKCALL *check)(char const *attr_name, struct error_context *ctx),
                    [[inout_opt]] struct error_context *ctx) {
 	int result = 0;

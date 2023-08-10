@@ -253,10 +253,10 @@ int advance(char const *string, char const *expbuf) {
 /* TODO: Rather   than  what's  above,  NetBSD  defines  another,
  *       deprecated interface here that conflicts with <regex.h>:
  * >> typedef struct regexp { ... } regexp;
- * >> regexp *regcomp(char const *pattern) __ASMNAME("__compat_regcomp");
- * >> int regexec(regexp const *re, char const *input) __ASMNAME("__compat_regexec");
- * >> void regsub(regexp const *re, char const *???, char *???) __ASMNAME("__compat_regsub");
- * >> void regerror(char const *???) __ASMNAME("__compat_regerror");
+ * >> regexp *regcomp(char const *pattern) __COMPILER_ASMNAME("__compat_regcomp");
+ * >> int regexec(regexp const *re, char const *input) __COMPILER_ASMNAME("__compat_regexec");
+ * >> void regsub(regexp const *re, char const *???, char *???) __COMPILER_ASMNAME("__compat_regsub");
+ * >> void regerror(char const *???) __COMPILER_ASMNAME("__compat_regerror");
  *
  * KOS should implement this API for compatibility
  */

@@ -96,6 +96,10 @@ GCC_FLAGS({
 
 
 CC_FLAGS({
+	//"-fanalyzer",
+	//"-Wno-analyzer-malloc-leak",    // Way too many false positives
+	//"-Wno-analyzer-write-to-const", // We do this a bunch for self-modifying code
+
 	"-Wall",
 	"-Wextra",
 	"-Wduplicated-cond",

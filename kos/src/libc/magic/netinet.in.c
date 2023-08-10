@@ -414,8 +414,8 @@ $uint64_t ntohq($uint64_t netquad) {
 
 %
 %#ifdef __USE_MISC
-[[cp, decl_include("<bits/types.h>")]] int bindresvport($fd_t sockfd, struct sockaddr_in *sock_in);
-[[cp, decl_include("<bits/types.h>")]] int bindresvport6($fd_t sockfd, struct sockaddr_in6 *sock_in);
+[[cp, decl_include("<bits/types.h>")]] int bindresvport([[fdarg]] $fd_t sockfd, struct sockaddr_in *sock_in);
+[[cp, decl_include("<bits/types.h>")]] int bindresvport6([[fdarg]] $fd_t sockfd, struct sockaddr_in6 *sock_in);
 %#endif /* __USE_MISC */
 
 %
@@ -520,25 +520,25 @@ struct in6_addr *inet6_rth_getaddr(void const *bp, int index);
 %[default:section(".text.crt{|.dos}.net.inet.6.ipv4_source_filter")]
 
 [[cp_kos, decl_include("<bits/types.h>")]]
-int getipv4sourcefilter($fd_t sockfd, struct in_addr interface_addr,
+int getipv4sourcefilter([[fdarg]] $fd_t sockfd, struct in_addr interface_addr,
                         struct in_addr group, $uint32_t *fmode,
                         $uint32_t *numsrc, struct in_addr *slist);
 
 [[cp_kos, decl_include("<bits/types.h>")]]
-int setipv4sourcefilter($fd_t sockfd, struct in_addr interface_addr,
+int setipv4sourcefilter([[fdarg]] $fd_t sockfd, struct in_addr interface_addr,
                         struct in_addr group, $uint32_t fmode,
                         $uint32_t numsrc, struct in_addr const *slist);
 
 %[default:section(".text.crt{|.dos}.net.inet.6.source_filter")]
 
 [[cp_kos, decl_include("<bits/types.h>")]]
-int getsourcefilter($fd_t sockfd, $uint32_t interface_addr,
+int getsourcefilter([[fdarg]] $fd_t sockfd, $uint32_t interface_addr,
                     struct sockaddr const *group, socklen_t grouplen,
                     $uint32_t *fmode, $uint32_t *numsrc,
                     struct sockaddr_storage *slist);
 
 [[cp_kos, decl_include("<bits/types.h>")]]
-int setsourcefilter($fd_t sockfd, $uint32_t interface_addr,
+int setsourcefilter([[fdarg]] $fd_t sockfd, $uint32_t interface_addr,
                     struct sockaddr const *group, socklen_t grouplen,
                     $uint32_t fmode, $uint32_t numsrc,
                     struct sockaddr_storage const *slist);

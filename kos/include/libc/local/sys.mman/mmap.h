@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3114460f */
+/* HASH CRC-32:0xe462aa25 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,9 +37,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mmap32_defined
 #define __local___localdep_mmap32_defined
 #ifdef __CRT_HAVE_mmap
-__CREDIRECT(__ATTR_ACCESS_NONE(1),void *,__NOTHROW_NCX,__localdep_mmap32,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __off32_t __offset),mmap,(__addr,__len,__prot,__flags,__fd,__offset))
+__CREDIRECT(__ATTR_ACCESS_NONE(1) __ATTR_FDARG(5),void *,__NOTHROW_NCX,__localdep_mmap32,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __off32_t __offset),mmap,(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE___mmap)
-__CREDIRECT(__ATTR_ACCESS_NONE(1),void *,__NOTHROW_NCX,__localdep_mmap32,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __off32_t __offset),__mmap,(__addr,__len,__prot,__flags,__fd,__offset))
+__CREDIRECT(__ATTR_ACCESS_NONE(1) __ATTR_FDARG(5),void *,__NOTHROW_NCX,__localdep_mmap32,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __off32_t __offset),__mmap,(__addr,__len,__prot,__flags,__fd,__offset))
 #else /* ... */
 #undef __local___localdep_mmap32_defined
 #endif /* !... */
@@ -47,11 +47,11 @@ __CREDIRECT(__ATTR_ACCESS_NONE(1),void *,__NOTHROW_NCX,__localdep_mmap32,(void *
 #ifndef __local___localdep_mmap64_defined
 #define __local___localdep_mmap64_defined
 #if defined(__CRT_HAVE_mmap) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__NOTHROW_NCX,__localdep_mmap64,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __PIO_OFFSET64 __offset),mmap,(__addr,__len,__prot,__flags,__fd,__offset))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1) __ATTR_FDARG(5),void *,__NOTHROW_NCX,__localdep_mmap64,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __PIO_OFFSET64 __offset),mmap,(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE___mmap) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__NOTHROW_NCX,__localdep_mmap64,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __PIO_OFFSET64 __offset),__mmap,(__addr,__len,__prot,__flags,__fd,__offset))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1) __ATTR_FDARG(5),void *,__NOTHROW_NCX,__localdep_mmap64,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __PIO_OFFSET64 __offset),__mmap,(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE_mmap64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__NOTHROW_NCX,__localdep_mmap64,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __PIO_OFFSET64 __offset),mmap64,(__addr,__len,__prot,__flags,__fd,__offset))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1) __ATTR_FDARG(5),void *,__NOTHROW_NCX,__localdep_mmap64,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __PIO_OFFSET64 __offset),mmap64,(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE_mmap) || defined(__CRT_HAVE___mmap)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.mman/mmap64.h>
@@ -61,7 +61,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_mmap64_defined
 #endif /* !... */
 #endif /* !__local___localdep_mmap64_defined */
-__LOCAL_LIBC(mmap) __ATTR_WUNUSED __ATTR_ACCESS_NONE(1) void *
+__LOCAL_LIBC(mmap) __ATTR_WUNUSED __ATTR_ACCESS_NONE(1) __ATTR_FDARG(5) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mmap))(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __PIO_OFFSET __offset) {
 
 	return (__NAMESPACE_LOCAL_SYM __localdep_mmap64)(__addr, __len, __prot, __flags, __fd, (__PIO_OFFSET64)__offset);

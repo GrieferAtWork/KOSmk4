@@ -84,7 +84,7 @@ char **backtrace_symbols([[in(size)]] void *const *array,
 [[requires_function(backtrace_symbols_fd_fmt)]]
 int backtrace_symbols_fd([[in(size)]] void *const *array,
                          __STDC_INT_AS_SIZE_T size,
-                         $fd_t fd) {
+                         [[fdwrite]] $fd_t fd) {
 	return backtrace_symbols_fd_fmt(array, size, fd, NULL);
 }
 
@@ -178,7 +178,7 @@ err:
 [[impl_include("<bits/types.h>")]]
 [[requires_function(write_printer, backtrace_symbol_printf)]]
 int backtrace_symbols_fd_fmt([[in(size)]] void *const *array,
-                             __STDC_INT_AS_SIZE_T size, $fd_t fd,
+                             __STDC_INT_AS_SIZE_T size, [[fdwrite]] $fd_t fd,
                              [[in_opt]] char const *format) {
 	size_t i;
 	void *fdarg;

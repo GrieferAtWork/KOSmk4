@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x308e10ba */
+/* HASH CRC-32:0xf3841f07 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,22 +114,22 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,eventfd,(__STDC_UINT_AS_SIZE_
 #ifdef __CRT_HAVE_eventfd_read
 /* >> eventfd_read(3)
  * Read the event counter, and (if not `O_NONBLOCK'), wait for an event to happen */
-__CDECLARE(,int,__NOTHROW_RPC,eventfd_read,(__fd_t __fd, eventfd_t *___value),(__fd,___value))
+__CDECLARE(__ATTR_FDREAD(1),int,__NOTHROW_RPC,eventfd_read,(__fd_t __fd, eventfd_t *___value),(__fd,___value))
 #elif defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)
 #include <libc/local/sys.eventfd/eventfd_read.h>
 /* >> eventfd_read(3)
  * Read the event counter, and (if not `O_NONBLOCK'), wait for an event to happen */
-__NAMESPACE_LOCAL_USING_OR_IMPL(eventfd_read, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL eventfd_read)(__fd_t __fd, eventfd_t *___value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(eventfd_read))(__fd, ___value); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(eventfd_read, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDREAD(1) int __NOTHROW_RPC(__LIBCCALL eventfd_read)(__fd_t __fd, eventfd_t *___value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(eventfd_read))(__fd, ___value); })
 #endif /* ... */
 #ifdef __CRT_HAVE_eventfd_write
 /* >> eventfd_write(3)
  * Increment the event counter */
-__CDECLARE(,int,__NOTHROW_RPC,eventfd_write,(__fd_t __fd, eventfd_t ___value),(__fd,___value))
+__CDECLARE(__ATTR_FDWRITE(1),int,__NOTHROW_RPC,eventfd_write,(__fd_t __fd, eventfd_t ___value),(__fd,___value))
 #elif defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
 #include <libc/local/sys.eventfd/eventfd_write.h>
 /* >> eventfd_write(3)
  * Increment the event counter */
-__NAMESPACE_LOCAL_USING_OR_IMPL(eventfd_write, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL eventfd_write)(__fd_t __fd, eventfd_t ___value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(eventfd_write))(__fd, ___value); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(eventfd_write, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDWRITE(1) int __NOTHROW_RPC(__LIBCCALL eventfd_write)(__fd_t __fd, eventfd_t ___value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(eventfd_write))(__fd, ___value); })
 #endif /* ... */
 #endif /* __CC__ */
 

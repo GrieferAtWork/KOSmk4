@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88e9dd1f */
+/* HASH CRC-32:0x7cee9c29 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1018,10 +1018,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fopen_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL F
 #endif /* (__CRT_HAVE_fopen && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || (__CRT_HAVE__IO_fopen && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_fopen64 */
 #endif /* !__CRT_HAVE_fopen_unlocked */
 #ifdef __CRT_HAVE_fdopen_unlocked
-__CDECLARE(,FILE *,__NOTHROW_NCX,fdopen_unlocked,(__fd_t __fd, char const *__mode),(__fd,__mode))
+__CDECLARE(__ATTR_FDARG(1),FILE *,__NOTHROW_NCX,fdopen_unlocked,(__fd_t __fd, char const *__mode),(__fd,__mode))
 #elif defined(__CRT_HAVE_fdopen) || defined(__CRT_HAVE__fdopen) || defined(__CRT_HAVE__IO_fdopen)
 #include <libc/local/libiberty/fdopen_unlocked.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(fdopen_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL FILE *__NOTHROW_NCX(__LIBCCALL fdopen_unlocked)(__fd_t __fd, char const *__mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdopen_unlocked))(__fd, __mode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fdopen_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) FILE *__NOTHROW_NCX(__LIBCCALL fdopen_unlocked)(__fd_t __fd, char const *__mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdopen_unlocked))(__fd, __mode); })
 #endif /* ... */
 #ifndef __freopen_unlocked_defined
 #define __freopen_unlocked_defined
@@ -1165,12 +1165,12 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN_OPT(1),__STDC_INT_AS_SIZE_T,__NO
 __NAMESPACE_LOCAL_USING_OR_IMPL(countargv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN_OPT(1) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL countargv)(char *const *___argv) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(countargv))(___argv); })
 #endif /* !__CRT_HAVE_countargv */
 #ifdef __CRT_HAVE_fdmatch
-__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,fdmatch,(__fd_t __fd1, __fd_t __fd2),(__fd1,__fd2))
+__CDECLARE(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_FDARG(2),int,__NOTHROW_NCX,fdmatch,(__fd_t __fd1, __fd_t __fd2),(__fd1,__fd2))
 #else /* __CRT_HAVE_fdmatch */
 #include <bits/os/stat.h>
 #if (defined(__CRT_HAVE_kfstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kfstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__fstat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__fstat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__fstati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__fstat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__fstat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__fstat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_fstat) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))) || (defined(__CRT_HAVE_fstat64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)))
 #include <libc/local/libiberty/fdmatch.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(fdmatch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL fdmatch)(__fd_t __fd1, __fd_t __fd2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdmatch))(__fd1, __fd2); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fdmatch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_FDARG(2) int __NOTHROW_NCX(__LIBCCALL fdmatch)(__fd_t __fd1, __fd_t __fd2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdmatch))(__fd1, __fd2); })
 #endif /* (__CRT_HAVE_kfstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kfstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__fstat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__fstat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__fstati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__fstat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__fstat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__fstat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_fstat && (!__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) || (__CRT_HAVE_fstat64 && (__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) */
 #endif /* !__CRT_HAVE_fdmatch */
 #ifdef __CRT_HAVE_buildargv

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa38ec054 */
+/* HASH CRC-32:0xf2e73682 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,11 +39,11 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_attr_copy_check_permissions_defined */
 #ifndef __local___localdep_fgetxattr_defined
 #define __local___localdep_fgetxattr_defined
-__CREDIRECT(__ATTR_IN(2) __ATTR_OUTS(3, 4),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_fgetxattr,(__fd_t __fd, char const *__name, void *__buf, __SIZE_TYPE__ __bufsize),fgetxattr,(__fd,__name,__buf,__bufsize))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(2) __ATTR_OUTS(3, 4),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_fgetxattr,(__fd_t __fd, char const *__name, void *__buf, __SIZE_TYPE__ __bufsize),fgetxattr,(__fd,__name,__buf,__bufsize))
 #endif /* !__local___localdep_fgetxattr_defined */
 #ifndef __local___localdep_flistxattr_defined
 #define __local___localdep_flistxattr_defined
-__CREDIRECT(__ATTR_OUTS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_flistxattr,(__fd_t __fd, char *__listbuf, __SIZE_TYPE__ __listbufsize),flistxattr,(__fd,__listbuf,__listbufsize))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUTS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_flistxattr,(__fd_t __fd, char *__listbuf, __SIZE_TYPE__ __listbufsize),flistxattr,(__fd,__listbuf,__listbufsize))
 #endif /* !__local___localdep_flistxattr_defined */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined
@@ -64,7 +64,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_IN(2) __ATTR_INS(3, 4),int,__NOTHROW_RPC,__localdep_fsetxattr,(__fd_t __fd, char const *__name, void const *__buf, __SIZE_TYPE__ __bufsize, __STDC_INT_AS_UINT_T __flags),fsetxattr,(__fd,__name,__buf,__bufsize,__flags))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(2) __ATTR_INS(3, 4),int,__NOTHROW_RPC,__localdep_fsetxattr,(__fd_t __fd, char const *__name, void const *__buf, __SIZE_TYPE__ __bufsize, __STDC_INT_AS_UINT_T __flags),fsetxattr,(__fd,__name,__buf,__bufsize,__flags))
 #endif /* !__local___localdep_fsetxattr_defined */
 #ifndef __local___localdep_lgetxattr_defined
 #define __local___localdep_lgetxattr_defined

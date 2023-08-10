@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x549471a3 */
+/* HASH CRC-32:0xcbabc80d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* >> insque(3)
  * Insert ELEM into a doubly-linked list, after PREV */
-INTERN ATTR_SECTION(".text.crt.utility.search") void
+INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_INOUT_OPT(2) ATTR_OUT(1) void
 NOTHROW_NCX(LIBCCALL libc_insque)(void *__restrict elem,
                                   void *prev) {
 	struct __queue_link {
@@ -55,7 +55,7 @@ NOTHROW_NCX(LIBCCALL libc_insque)(void *__restrict elem,
 }
 /* >> remque(3)
  * Unlink ELEM from the doubly-linked list that it is in */
-INTERN ATTR_SECTION(".text.crt.utility.search") void
+INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_INOUT(1) void
 NOTHROW_NCX(LIBCCALL libc_remque)(void *__restrict elem) {
 	struct __queue_link {
 		struct __queue_link *l_forw; /* [0..1] Forward link */

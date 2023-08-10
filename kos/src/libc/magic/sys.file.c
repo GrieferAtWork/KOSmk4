@@ -121,7 +121,7 @@ __SYSDECL_BEGIN
  * These won't try to emulate the system call if -ENOSYS is  returned.
  * As such, only export with these aliases, but don't import! */
 [[export_as("syscall_flock", "__syscall_flock", "__libc_syscall_flock")]]
-int flock($fd_t fd, __STDC_INT_AS_UINT_T operation);
+int flock([[fdarg]] $fd_t fd, __STDC_INT_AS_UINT_T operation);
 
 %{
 

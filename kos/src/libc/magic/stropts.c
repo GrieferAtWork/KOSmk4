@@ -272,13 +272,13 @@ typedef __t_uscalar_t t_uscalar_t;
 }
 
 [[nothrow, decl_include("<bits/types.h>")]]
-int isastream($fd_t fd);
+int isastream([[fdarg]] $fd_t fd);
 
 @@@param: pflags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND'
 @@@return: MORECTL:  ???
 @@@return: MOREDATA: ???
 [[cp, decl_include("<bits/types.h>", "<bits/stropts.h>")]]
-int getmsg($fd_t fd,
+int getmsg([[fdarg]] $fd_t fd,
            struct strbuf *__restrict ctlptr,
            struct strbuf *__restrict dataptr,
            __STDC_INT_AS_UINT_T *__restrict pflags);
@@ -287,7 +287,7 @@ int getmsg($fd_t fd,
 @@@return: MORECTL:  ???
 @@@return: MOREDATA: ???
 [[cp, decl_include("<bits/types.h>", "<bits/stropts.h>")]]
-int getpmsg($fd_t fd,
+int getpmsg([[fdarg]] $fd_t fd,
             struct strbuf *__restrict ctlptr,
             struct strbuf *__restrict dataptr,
             int *__restrict bandp,
@@ -295,21 +295,21 @@ int getpmsg($fd_t fd,
 
 @@@param: flags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND'
 [[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/stropts.h>")]]
-int putmsg($fd_t fd,
+int putmsg([[fdarg]] $fd_t fd,
            struct strbuf const *ctlptr,
            struct strbuf const *dataptr,
            __STDC_INT_AS_UINT_T flags);
 
 @@@param: flags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND'
 [[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/stropts.h>")]]
-int putpmsg($fd_t fd,
+int putpmsg([[fdarg]] $fd_t fd,
             struct strbuf const *ctlptr,
             struct strbuf const *dataptr,
             __STDC_INT_AS_UINT_T band,
             __STDC_INT_AS_UINT_T flags);
 
 [[guard, cp_kos, decl_include("<bits/types.h>")]]
-int fattach($fd_t fd, [[in]] char const *__restrict path);
+int fattach([[fdarg]] $fd_t fd, [[in]] char const *__restrict path);
 
 [[guard, cp_kos]]
 int fdetach([[in]] char const *__restrict path);

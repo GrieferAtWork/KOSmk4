@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2788acc0 */
+/* HASH CRC-32:0x49cc9f70 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !... */
 #endif /* !__local___localdep___issignaling_defined */
-__LOCAL_LIBC(canonicalize) int
+__LOCAL_LIBC(canonicalize) __ATTR_IN(2) __ATTR_OUT(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(canonicalize))(double *__cx, double const *__x) {
 	double ___value = *__x;
 

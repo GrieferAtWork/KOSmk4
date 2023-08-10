@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16d0550b */
+/* HASH CRC-32:0x95e0e6ed */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -148,22 +148,22 @@ struct qelem {
 #ifdef __CRT_HAVE_insque
 /* >> insque(3)
  * Insert ELEM into a doubly-linked list, after PREV */
-__CDECLARE_VOID(,__NOTHROW_NCX,insque,(void *__restrict __elem, void *__prev),(__elem,__prev))
+__CDECLARE_VOID(__ATTR_INOUT_OPT(2) __ATTR_OUT(1),__NOTHROW_NCX,insque,(void *__restrict __elem, void *__prev),(__elem,__prev))
 #else /* __CRT_HAVE_insque */
 #include <libc/local/search/insque.h>
 /* >> insque(3)
  * Insert ELEM into a doubly-linked list, after PREV */
-__NAMESPACE_LOCAL_USING_OR_IMPL(insque, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL insque)(void *__restrict __elem, void *__prev) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(insque))(__elem, __prev); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(insque, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT_OPT(2) __ATTR_OUT(1) void __NOTHROW_NCX(__LIBCCALL insque)(void *__restrict __elem, void *__prev) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(insque))(__elem, __prev); })
 #endif /* !__CRT_HAVE_insque */
 #ifdef __CRT_HAVE_remque
 /* >> remque(3)
  * Unlink ELEM from the doubly-linked list that it is in */
-__CDECLARE_VOID(,__NOTHROW_NCX,remque,(void *__restrict __elem),(__elem))
+__CDECLARE_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,remque,(void *__restrict __elem),(__elem))
 #else /* __CRT_HAVE_remque */
 #include <libc/local/search/remque.h>
 /* >> remque(3)
  * Unlink ELEM from the doubly-linked list that it is in */
-__NAMESPACE_LOCAL_USING_OR_IMPL(remque, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL remque)(void *__restrict __elem) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remque))(__elem); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(remque, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) void __NOTHROW_NCX(__LIBCCALL remque)(void *__restrict __elem) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remque))(__elem); })
 #endif /* !__CRT_HAVE_remque */
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 /* For use with hsearch(3).  */

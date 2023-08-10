@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15405818 */
+/* HASH CRC-32:0x66dbe970 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -813,7 +813,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,ns_name_compress,(char const *__srcbuf, unsigned 
 #include <libc/local/arpa.nameser/ns_name_compress.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(ns_name_compress, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL ns_name_compress)(char const *__srcbuf, unsigned char *__dstbuf, size_t __dstbufsize, unsigned char const **__d, unsigned char const **__e) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ns_name_compress))(__srcbuf, __dstbuf, __dstbufsize, __d, __e); })
 #endif /* !... */
-__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ns_name_skip,(unsigned char const **__p_msg_ptr, unsigned char const *__msg_end),(__p_msg_ptr,__msg_end))
+__CDECLARE_OPT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),int,__NOTHROW_NCX,ns_name_skip,(unsigned char const **__p_msg_ptr, unsigned char const *__msg_end),(__p_msg_ptr,__msg_end))
 __CDECLARE_VOID_OPT(,__NOTHROW_NCX,ns_name_rollback,(unsigned char const *__a, unsigned char const **__b, unsigned char const **__c),(__a,__b,__c))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,ns_sign,(unsigned char *__a, int *__b, int __c, int __d, void *__e, unsigned char const *__f, int __g, unsigned char *__h, int *__i, time_t __j),(__a,__b,__c,__d,__e,__f,__g,__h,__i,__j))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,ns_sign2,(unsigned char *__a, int *__b, int __c, int __d, void *__e, unsigned char const *__f, int __g, unsigned char *__h, int *__i, time_t __j, unsigned char **__k, unsigned char **__l),(__a,__b,__c,__d,__e,__f,__g,__h,__i,__j,__k,__l))

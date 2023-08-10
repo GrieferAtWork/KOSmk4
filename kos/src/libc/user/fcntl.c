@@ -264,8 +264,8 @@ DEFINE_INTERN_ALIAS(libd_openat64, libd_openat);
 
 
 
-/*[[[head:libc_readahead,hash:CRC-32=0x8181d1ce]]]*/
-INTERN ATTR_SECTION(".text.crt.io.utility") ssize_t
+/*[[[head:libc_readahead,hash:CRC-32=0x10139077]]]*/
+INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_FDREAD(1) ssize_t
 NOTHROW_NCX(LIBCCALL libc_readahead)(fd_t fd,
                                      __PIO_OFFSET64 offset,
                                      size_t count)
@@ -277,8 +277,8 @@ NOTHROW_NCX(LIBCCALL libc_readahead)(fd_t fd,
 }
 /*[[[end:libc_readahead]]]*/
 
-/*[[[head:libc_sync_file_range,hash:CRC-32=0xc18c119a]]]*/
-INTERN ATTR_SECTION(".text.crt.io.utility") int
+/*[[[head:libc_sync_file_range,hash:CRC-32=0xfd59442]]]*/
+INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_FDWRITE(1) int
 NOTHROW_NCX(LIBCCALL libc_sync_file_range)(fd_t fd,
                                            __PIO_OFFSET64 offset,
                                            __PIO_OFFSET64 count,
@@ -294,8 +294,8 @@ NOTHROW_NCX(LIBCCALL libc_sync_file_range)(fd_t fd,
 }
 /*[[[end:libc_sync_file_range]]]*/
 
-/*[[[head:libc_vmsplice,hash:CRC-32=0x2d137f1e]]]*/
-INTERN ATTR_SECTION(".text.crt.io.utility") ssize_t
+/*[[[head:libc_vmsplice,hash:CRC-32=0xd66dc921]]]*/
+INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_FDWRITE(1) ssize_t
 NOTHROW_RPC(LIBCCALL libc_vmsplice)(fd_t fdout,
                                     struct iovec const *iov,
                                     size_t count,
@@ -308,8 +308,8 @@ NOTHROW_RPC(LIBCCALL libc_vmsplice)(fd_t fdout,
 }
 /*[[[end:libc_vmsplice]]]*/
 
-/*[[[head:libc_splice,hash:CRC-32=0xcaa48d6e]]]*/
-INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_INOUT(2) ATTR_INOUT(4) ssize_t
+/*[[[head:libc_splice,hash:CRC-32=0xe969bc22]]]*/
+INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_FDREAD(1) ATTR_FDWRITE(3) ATTR_INOUT(2) ATTR_INOUT(4) ssize_t
 NOTHROW_RPC(LIBCCALL libc_splice)(fd_t fdin,
                                   __PIO_OFFSET64 *offin,
                                   fd_t fdout,
@@ -329,8 +329,8 @@ NOTHROW_RPC(LIBCCALL libc_splice)(fd_t fdin,
 }
 /*[[[end:libc_splice]]]*/
 
-/*[[[head:libc_tee,hash:CRC-32=0x92f24953]]]*/
-INTERN ATTR_SECTION(".text.crt.io.utility") ssize_t
+/*[[[head:libc_tee,hash:CRC-32=0x50283e7c]]]*/
+INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_FDREAD(1) ATTR_FDWRITE(2) ssize_t
 NOTHROW_RPC(LIBCCALL libc_tee)(fd_t fdin,
                                fd_t fdout,
                                size_t length,
@@ -359,8 +359,8 @@ NOTHROW_RPC(LIBCCALL libc_name_to_handle_at)(fd_t dirfd,
 }
 /*[[[end:libc_name_to_handle_at]]]*/
 
-/*[[[head:libc_open_by_handle_at,hash:CRC-32=0xfae3ffd2]]]*/
-INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_IN(2) fd_t
+/*[[[head:libc_open_by_handle_at,hash:CRC-32=0x19c4a7d6]]]*/
+INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_FDARG(1) ATTR_IN(2) fd_t
 NOTHROW_RPC(LIBCCALL libc_open_by_handle_at)(fd_t mountdirfd,
                                              struct file_handle *handle,
                                              int flags)
@@ -373,8 +373,8 @@ NOTHROW_RPC(LIBCCALL libc_open_by_handle_at)(fd_t mountdirfd,
 }
 /*[[[end:libc_open_by_handle_at]]]*/
 
-/*[[[head:libc_fallocate,hash:CRC-32=0x126a7d9c]]]*/
-INTERN ATTR_SECTION(".text.crt.io.utility") int
+/*[[[head:libc_fallocate,hash:CRC-32=0xddbfcdf2]]]*/
+INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_FDARG(1) int
 NOTHROW_NCX(LIBCCALL libc_fallocate)(fd_t fd,
                                      __STDC_INT_AS_UINT_T mode,
                                      __PIO_OFFSET offset,
@@ -390,11 +390,11 @@ NOTHROW_NCX(LIBCCALL libc_fallocate)(fd_t fd,
 }
 /*[[[end:libc_fallocate]]]*/
 
-/*[[[head:libc_fallocate64,hash:CRC-32=0xa250b385]]]*/
+/*[[[head:libc_fallocate64,hash:CRC-32=0x546d6f24]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_fallocate64, libc_fallocate);
 #else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.io.utility") int
+INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_FDWRITE(1) int
 NOTHROW_NCX(LIBCCALL libc_fallocate64)(fd_t fd,
                                        __STDC_INT_AS_UINT_T mode,
                                        __PIO_OFFSET64 offset,
@@ -412,8 +412,8 @@ NOTHROW_NCX(LIBCCALL libc_fallocate64)(fd_t fd,
 /*[[[end:libc_fallocate64]]]*/
 
 
-/*[[[head:libc_fcntl,hash:CRC-32=0x57021137]]]*/
-INTERN ATTR_SECTION(".text.crt.io.utility") __STDC_INT_AS_SSIZE_T
+/*[[[head:libc_fcntl,hash:CRC-32=0xeca6e4fc]]]*/
+INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_FDARG(1) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBCCALL libc_fcntl)(fd_t fd,
                                   fcntl_t cmd,
                                   ...)
@@ -428,8 +428,8 @@ NOTHROW_NCX(VLIBCCALL libc_fcntl)(fd_t fd,
 }
 /*[[[end:libc_fcntl]]]*/
 
-/*[[[head:libc_posix_fadvise,hash:CRC-32=0x5865caf1]]]*/
-INTERN ATTR_SECTION(".text.crt.io.utility") int
+/*[[[head:libc_posix_fadvise,hash:CRC-32=0x1bf4c09a]]]*/
+INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_FDARG(1) int
 NOTHROW_NCX(LIBCCALL libc_posix_fadvise)(fd_t fd,
                                          __PIO_OFFSET offset,
                                          __PIO_OFFSET length,
@@ -440,8 +440,8 @@ NOTHROW_NCX(LIBCCALL libc_posix_fadvise)(fd_t fd,
 }
 /*[[[end:libc_posix_fadvise]]]*/
 
-/*[[[head:libc_posix_fallocate,hash:CRC-32=0x698a865b]]]*/
-INTERN ATTR_SECTION(".text.crt.io.utility") int
+/*[[[head:libc_posix_fallocate,hash:CRC-32=0x310d8b73]]]*/
+INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_FDARG(1) int
 NOTHROW_NCX(LIBCCALL libc_posix_fallocate)(fd_t fd,
                                            __PIO_OFFSET offset,
                                            __PIO_OFFSET length)
@@ -451,11 +451,11 @@ NOTHROW_NCX(LIBCCALL libc_posix_fallocate)(fd_t fd,
 }
 /*[[[end:libc_posix_fallocate]]]*/
 
-/*[[[head:libc_posix_fadvise64,hash:CRC-32=0x7405081a]]]*/
+/*[[[head:libc_posix_fadvise64,hash:CRC-32=0x6fe417cc]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_posix_fadvise64, libc_posix_fadvise);
 #else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.io.large.utility") int
+INTERN ATTR_SECTION(".text.crt.io.large.utility") ATTR_FDARG(1) int
 NOTHROW_NCX(LIBCCALL libc_posix_fadvise64)(fd_t fd,
                                            __PIO_OFFSET64 offset,
                                            __PIO_OFFSET64 length,
@@ -473,11 +473,11 @@ NOTHROW_NCX(LIBCCALL libc_posix_fadvise64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_posix_fadvise64]]]*/
 
-/*[[[head:libc_posix_fallocate64,hash:CRC-32=0xdb734687]]]*/
+/*[[[head:libc_posix_fallocate64,hash:CRC-32=0x9b47bc34]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_posix_fallocate64, libc_posix_fallocate);
 #else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.io.large.utility") int
+INTERN ATTR_SECTION(".text.crt.io.large.utility") ATTR_FDARG(1) int
 NOTHROW_NCX(LIBCCALL libc_posix_fallocate64)(fd_t fd,
                                              __PIO_OFFSET64 offset,
                                              __PIO_OFFSET64 length)
@@ -493,8 +493,8 @@ NOTHROW_NCX(LIBCCALL libc_posix_fallocate64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_posix_fallocate64]]]*/
 
-/*[[[head:libc_lockf,hash:CRC-32=0x3f461c5c]]]*/
-INTERN ATTR_SECTION(".text.crt.io.lock") int
+/*[[[head:libc_lockf,hash:CRC-32=0xc3b090cd]]]*/
+INTERN ATTR_SECTION(".text.crt.io.lock") ATTR_FDARG(1) int
 NOTHROW_RPC(LIBCCALL libc_lockf)(fd_t fd,
                                  __STDC_INT_AS_UINT_T cmd,
                                  __PIO_OFFSET length)
@@ -504,11 +504,11 @@ NOTHROW_RPC(LIBCCALL libc_lockf)(fd_t fd,
 }
 /*[[[end:libc_lockf]]]*/
 
-/*[[[head:libc_lockf64,hash:CRC-32=0x9b6406bb]]]*/
+/*[[[head:libc_lockf64,hash:CRC-32=0x3214e4c0]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_lockf64, libc_lockf);
 #else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.io.large.lock") int
+INTERN ATTR_SECTION(".text.crt.io.large.lock") ATTR_FDARG(1) int
 NOTHROW_RPC(LIBCCALL libc_lockf64)(fd_t fd,
                                    __STDC_INT_AS_UINT_T cmd,
                                    __PIO_OFFSET64 length)

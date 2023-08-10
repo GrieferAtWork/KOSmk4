@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93659a4b */
+/* HASH CRC-32:0xe79c3a24 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3426,26 +3426,26 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_c32fsopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* ... */
 #endif /* !... */
 #if defined(__CRT_HAVE__wfdopen) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),FILE *,__NOTHROW_NCX,_c16fdopen,(__fd_t __fd, char16_t const *__mode),_wfdopen,(__fd,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2),FILE *,__NOTHROW_NCX,_c16fdopen,(__fd_t __fd, char16_t const *__mode),_wfdopen,(__fd,__mode))
 #elif defined(__CRT_HAVE_DOS$_wfdopen)
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_IN(2),FILE *,__NOTHROW_NCX,_c16fdopen,(__fd_t __fd, char16_t const *__mode),_wfdopen,(__fd,__mode))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2),FILE *,__NOTHROW_NCX,_c16fdopen,(__fd_t __fd, char16_t const *__mode),_wfdopen,(__fd,__mode))
 #elif (defined(__CRT_HAVE_fdopen) || defined(__CRT_HAVE__fdopen) || defined(__CRT_HAVE__IO_fdopen)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/corecrt_wstdio/_wfdopen.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) FILE *__NOTHROW_NCX(__LIBDCALL _c16fdopen)(__fd_t __fd, char16_t const *__mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wfdopen))(__fd, (__WCHAR_TYPE__ const *)__mode); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2) FILE *__NOTHROW_NCX(__LIBDCALL _c16fdopen)(__fd_t __fd, char16_t const *__mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wfdopen))(__fd, (__WCHAR_TYPE__ const *)__mode); }
 #elif (defined(__CRT_HAVE_fdopen) || defined(__CRT_HAVE__fdopen) || defined(__CRT_HAVE__IO_fdopen)) && ((defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$convert_wcstombs) || (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 #include <libc/local/parts.uchar.stdio/_c16fdopen.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_c16fdopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) FILE *__NOTHROW_NCX(__LIBDCALL _c16fdopen)(__fd_t __fd, char16_t const *__mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c16fdopen))(__fd, __mode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_c16fdopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2) FILE *__NOTHROW_NCX(__LIBDCALL _c16fdopen)(__fd_t __fd, char16_t const *__mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c16fdopen))(__fd, __mode); })
 #endif /* ... */
 #if defined(__CRT_HAVE__wfdopen) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),FILE *,__NOTHROW_NCX,_c32fdopen,(__fd_t __fd, char32_t const *__mode),_wfdopen,(__fd,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2),FILE *,__NOTHROW_NCX,_c32fdopen,(__fd_t __fd, char32_t const *__mode),_wfdopen,(__fd,__mode))
 #elif defined(__CRT_HAVE_KOS$_wfdopen)
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_IN(2),FILE *,__NOTHROW_NCX,_c32fdopen,(__fd_t __fd, char32_t const *__mode),_wfdopen,(__fd,__mode))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2),FILE *,__NOTHROW_NCX,_c32fdopen,(__fd_t __fd, char32_t const *__mode),_wfdopen,(__fd,__mode))
 #elif (defined(__CRT_HAVE_fdopen) || defined(__CRT_HAVE__fdopen) || defined(__CRT_HAVE__IO_fdopen)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/corecrt_wstdio/_wfdopen.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) FILE *__NOTHROW_NCX(__LIBKCALL _c32fdopen)(__fd_t __fd, char32_t const *__mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wfdopen))(__fd, (__WCHAR_TYPE__ const *)__mode); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2) FILE *__NOTHROW_NCX(__LIBKCALL _c32fdopen)(__fd_t __fd, char32_t const *__mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wfdopen))(__fd, (__WCHAR_TYPE__ const *)__mode); }
 #elif (defined(__CRT_HAVE_fdopen) || defined(__CRT_HAVE__fdopen) || defined(__CRT_HAVE__IO_fdopen)) && ((defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$convert_wcstombs) || (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 4) || defined(__CRT_HAVE_KOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 #include <libc/local/parts.uchar.stdio/_c32fdopen.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_c32fdopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) FILE *__NOTHROW_NCX(__LIBKCALL _c32fdopen)(__fd_t __fd, char32_t const *__mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c32fdopen))(__fd, __mode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_c32fdopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_IN(2) FILE *__NOTHROW_NCX(__LIBKCALL _c32fdopen)(__fd_t __fd, char32_t const *__mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c32fdopen))(__fd, __mode); })
 #endif /* ... */
 #if defined(__CRT_HAVE__wfopen_s) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,_c16fopen_s,(FILE **__pstream, char16_t const *__filename, char16_t const *__mode),_wfopen_s,(__pstream,__filename,__mode))

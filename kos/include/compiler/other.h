@@ -269,6 +269,9 @@
 #define __ATTR_IN(ptr_index)                 /* Nothing */
 #define __ATTR_OUT(ptr_index)                /* Nothing */
 #define __ATTR_INOUT(ptr_index)              /* Nothing */
+#define __ATTR_FDARG(fd_index)               /* Nothing */
+#define __ATTR_FDREAD(fd_index)              /* Nothing */
+#define __ATTR_FDWRITE(fd_index)             /* Nothing */
 
 #define __NO_XBLOCK
 #define __builtin_choose_expr(c, tt, ff) ((c) ? (tt) : (ff))

@@ -161,7 +161,7 @@ struct printnode
 	 atomic64_cinit(&(self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_filesize, (uint64_t)-1),                          \
 	 (self)->_printnode_reg_ _fregnode_node_ fn_super = incref(super))
 /* Finalize a partially initialized `struct printnode' (as initialized by `_printnode_init()') */
-#define _printnode_fini(self) decref_nokill((self)->_printnode_reg_ fn_super)
+#define _printnode_fini(self) decref_nokill((self)->_printnode_reg_ _fregnode_node_ fn_super)
 
 
 /* Default operators for `struct printnode_ops' */

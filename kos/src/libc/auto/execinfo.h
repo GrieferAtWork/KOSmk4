@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ab1835 */
+/* HASH CRC-32:0x4ec4a7e7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,14 +68,14 @@ INTDEF ATTR_INS(1, 2) char **NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *
  * Same as `backtrace_symbols_fd_fmt(array, size, fd, NULL)'
  * @return: 0 : Success
  * @return: -1: Error */
-INTDEF ATTR_INS(1, 2) int NOTHROW_NCX(LIBDCALL libd_backtrace_symbols_fd)(void *const *array, __STDC_INT_AS_SIZE_T size, fd_t fd);
+INTDEF ATTR_FDWRITE(3) ATTR_INS(1, 2) int NOTHROW_NCX(LIBDCALL libd_backtrace_symbols_fd)(void *const *array, __STDC_INT_AS_SIZE_T size, fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> backtrace_symbols_fd(3)
  * Same as `backtrace_symbols_fd_fmt(array, size, fd, NULL)'
  * @return: 0 : Success
  * @return: -1: Error */
-INTDEF ATTR_INS(1, 2) int NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array, __STDC_INT_AS_SIZE_T size, fd_t fd);
+INTDEF ATTR_FDWRITE(3) ATTR_INS(1, 2) int NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array, __STDC_INT_AS_SIZE_T size, fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> backtrace_symbols_fmt(3)
@@ -127,7 +127,7 @@ INTDEF ATTR_INS(1, 2) ATTR_IN_OPT(3) char **NOTHROW_NCX(LIBCCALL libc_backtrace_
  * written in total.
  * @return: 0 : Success
  * @return: -1: Error */
-INTDEF ATTR_INS(1, 2) ATTR_IN_OPT(4) int NOTHROW_NCX(LIBDCALL libd_backtrace_symbols_fd_fmt)(void *const *array, __STDC_INT_AS_SIZE_T size, fd_t fd, char const *format);
+INTDEF ATTR_FDWRITE(3) ATTR_INS(1, 2) ATTR_IN_OPT(4) int NOTHROW_NCX(LIBDCALL libd_backtrace_symbols_fd_fmt)(void *const *array, __STDC_INT_AS_SIZE_T size, fd_t fd, char const *format);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> backtrace_symbols_fd_fmt(3)
@@ -137,7 +137,7 @@ INTDEF ATTR_INS(1, 2) ATTR_IN_OPT(4) int NOTHROW_NCX(LIBDCALL libd_backtrace_sym
  * written in total.
  * @return: 0 : Success
  * @return: -1: Error */
-INTDEF ATTR_INS(1, 2) ATTR_IN_OPT(4) int NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd_fmt)(void *const *array, __STDC_INT_AS_SIZE_T size, fd_t fd, char const *format);
+INTDEF ATTR_FDWRITE(3) ATTR_INS(1, 2) ATTR_IN_OPT(4) int NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd_fmt)(void *const *array, __STDC_INT_AS_SIZE_T size, fd_t fd, char const *format);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> backtrace_symbol_printf(3)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa62b824f */
+/* HASH CRC-32:0x93a5f314 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *const *array,
  * Same as `backtrace_symbols_fd_fmt(array, size, fd, NULL)'
  * @return: 0 : Success
  * @return: -1: Error */
-INTERN ATTR_SECTION(".text.crt.debug") ATTR_INS(1, 2) int
+INTERN ATTR_SECTION(".text.crt.debug") ATTR_FDWRITE(3) ATTR_INS(1, 2) int
 NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array,
                                                 __STDC_INT_AS_SIZE_T size,
                                                 fd_t fd) {
@@ -143,7 +143,7 @@ err:
  * written in total.
  * @return: 0 : Success
  * @return: -1: Error */
-INTERN ATTR_SECTION(".text.crt.debug") ATTR_INS(1, 2) ATTR_IN_OPT(4) int
+INTERN ATTR_SECTION(".text.crt.debug") ATTR_FDWRITE(3) ATTR_INS(1, 2) ATTR_IN_OPT(4) int
 NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd_fmt)(void *const *array,
                                                     __STDC_INT_AS_SIZE_T size,
                                                     fd_t fd,

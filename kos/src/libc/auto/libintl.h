@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50fea0db */
+/* HASH CRC-32:0x3a10669e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,9 +61,9 @@ INTDEF ATTR_PURE WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) ATTR_IN_OPT(3) __ATTR_FOR
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) ATTR_IN_OPT(3) __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *NOTHROW_NCX(LIBDCALL libd_dcngettext)(char const *domainname, char const *msgid_singular, char const *msgid_plural, ulongptr_t n, int category);
-INTDEF char *NOTHROW_NCX(LIBDCALL libd_textdomain)(char const *domainname);
-INTDEF char *NOTHROW_NCX(LIBDCALL libd_bindtextdomain)(char const *domainname, char const *dirname);
-INTDEF char *NOTHROW_NCX(LIBDCALL libd_bind_textdomain_codeset)(char const *domainname, char const *codeset);
+INTDEF ATTR_IN_OPT(1) char *NOTHROW_NCX(LIBDCALL libd_textdomain)(char const *domainname);
+INTDEF ATTR_IN_OPT(1) ATTR_IN_OPT(2) char *NOTHROW_NCX(LIBDCALL libd_bindtextdomain)(char const *domainname, char const *dirname);
+INTDEF ATTR_IN_OPT(1) ATTR_IN_OPT(2) char *NOTHROW_NCX(LIBDCALL libd_bind_textdomain_codeset)(char const *domainname, char const *codeset);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

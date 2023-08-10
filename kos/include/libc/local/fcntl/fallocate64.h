@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x982f38e */
+/* HASH CRC-32:0x7439c7c5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,9 +35,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_fallocate32_defined) && defined(__CRT_HAVE_fallocate)
 #define __local___localdep_fallocate32_defined
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_fallocate32,(__fd_t __fd, __STDC_INT_AS_UINT_T __mode, __pos32_t __offset, __pos32_t __length),fallocate,(__fd,__mode,__offset,__length))
+__CREDIRECT(__ATTR_FDARG(1),int,__NOTHROW_NCX,__localdep_fallocate32,(__fd_t __fd, __STDC_INT_AS_UINT_T __mode, __pos32_t __offset, __pos32_t __length),fallocate,(__fd,__mode,__offset,__length))
 #endif /* !__local___localdep_fallocate32_defined && __CRT_HAVE_fallocate */
-__LOCAL_LIBC(fallocate64) int
+__LOCAL_LIBC(fallocate64) __ATTR_FDWRITE(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fallocate64))(__fd_t __fd, __STDC_INT_AS_UINT_T __mode, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length) {
 #ifdef __CRT_HAVE_fallocate
 	return (__NAMESPACE_LOCAL_SYM __localdep_fallocate32)(__fd, __mode, (__pos32_t)__offset, (__pos32_t)__length);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x619de574 */
+/* HASH CRC-32:0x4134041d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ DECL_BEGIN
 INTDEF ATTR_IN_OPT(2) char *NOTHROW_NCX(LIBDCALL libd_setlocale)(int category, char const *locale);
 /* >> newlocale(3)
  * @param: category_mask: Set of `LC_*_MASK' */
-INTDEF locale_t NOTHROW_NCX(LIBDCALL libd_newlocale)(int category_mask, char const *locale, locale_t base);
+INTDEF ATTR_IN_OPT(2) locale_t NOTHROW_NCX(LIBDCALL libd_newlocale)(int category_mask, char const *locale, locale_t base);
 /* >> duplocale(3)
  * Duplicate the given locale `dataset' */
 INTDEF locale_t NOTHROW_NCX(LIBDCALL libd_duplocale)(locale_t dataset);
@@ -56,7 +56,7 @@ INTDEF void NOTHROW_NCX(LIBDCALL libd_freelocale)(locale_t dataset);
  * @return: * :               The currently used locale */
 INTDEF locale_t NOTHROW_NCX(LIBDCALL libd_uselocale)(locale_t dataset);
 INTDEF int NOTHROW_NCX(LIBDCALL libd__configthreadlocale)(int flag);
-INTDEF locale_t NOTHROW_NCX(LIBDCALL libd__create_locale)(int category, char const *locale);
+INTDEF ATTR_IN_OPT(2) locale_t NOTHROW_NCX(LIBDCALL libd__create_locale)(int category, char const *locale);
 INTDEF void NOTHROW_NCX(LIBDCALL libd__free_locale)(locale_t locale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__

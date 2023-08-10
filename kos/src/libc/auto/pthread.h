@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76a56d72 */
+/* HASH CRC-32:0xf9c27795 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -305,13 +305,13 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_cancel)(pthread_t self);
 /* Function called to call the cleanup handler. As an extern inline
  * function the compiler is free to decide inlining the change when
  * needed or fall back on the copy which must exist somewhere else */
-INTDEF void NOTHROW_NCX(LIBDCALL libd___pthread_cleanup_routine)(struct __pthread_cleanup_frame *frame);
+INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBDCALL libd___pthread_cleanup_routine)(struct __pthread_cleanup_frame *frame);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Function called to call the cleanup handler. As an extern inline
  * function the compiler is free to decide inlining the change when
  * needed or fall back on the copy which must exist somewhere else */
-INTDEF void NOTHROW_NCX(LIBCCALL libc___pthread_cleanup_routine)(struct __pthread_cleanup_frame *frame);
+INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc___pthread_cleanup_routine)(struct __pthread_cleanup_frame *frame);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF __cleanup_fct_attribute void NOTHROW_NCX(LIBDCALL libd___pthread_register_cancel)(__pthread_unwind_buf_t *buf);

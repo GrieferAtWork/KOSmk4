@@ -99,8 +99,8 @@ int wrename([[in]] wchar_t const *oldname,
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires($has_function(wrenameat2) ||
            $has_function(renameat, convert_wcstombs))]]
-int wrenameat($fd_t oldfd, [[in]] wchar_t const *oldname,
-              $fd_t newfd, [[in]] wchar_t const *newname_or_path) {
+int wrenameat([[dirfd]] $fd_t oldfd, [[in]] wchar_t const *oldname,
+              [[dirfd]] $fd_t newfd, [[in]] wchar_t const *newname_or_path) {
 @@pp_if $has_function(wrenameat2)@@
 	return wrenameat2(oldfd, oldname, newfd, newname_or_path, 0);
 @@pp_else@@
@@ -130,7 +130,7 @@ int wrenameat($fd_t oldfd, [[in]] wchar_t const *oldname,
 %#ifdef __USE_KOS
 [[wchar, cp, requires_function(removeat, convert_wcstombs)]]
 [[impl_include("<asm/os/fcntl.h>"), decl_include("<bits/types.h>")]]
-int wremoveat($fd_t dirfd, [[in]] wchar_t const *filename) {
+int wremoveat([[dirfd]] $fd_t dirfd, [[in]] wchar_t const *filename) {
 @@pp_if $has_function(wunlinkat) && defined(__AT_REMOVEREG) && defined(__AT_REMOVEDIR)@@
 	return wunlinkat(dirfd, filename, __AT_REMOVEREG | __AT_REMOVEDIR);
 @@pp_else@@
@@ -153,8 +153,8 @@ int wremoveat($fd_t dirfd, [[in]] wchar_t const *filename) {
 %#ifdef __USE_GNU
 [[decl_include("<bits/types.h>")]]
 [[wchar, cp, requires_function(renameat2, convert_wcstombs)]]
-int wrenameat2($fd_t oldfd, [[in]] wchar_t const *oldname,
-               $fd_t newfd, [[in]] wchar_t const *newname_or_path,
+int wrenameat2([[dirfd]] $fd_t oldfd, [[in]] wchar_t const *oldname,
+               [[dirfd]] $fd_t newfd, [[in]] wchar_t const *newname_or_path,
                $atflag_t flags) {
 	char *utf8_oldname;
 	char *utf8_newname_or_path;

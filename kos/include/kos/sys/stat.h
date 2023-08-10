@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71627103 */
+/* HASH CRC-32:0x4a2b9464 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,10 +46,10 @@ __CREDIRECT_VOID(__ATTR_IN(1) __ATTR_OUT(2),__THROWING(...),Stat,(char const *__
 
 #if defined(__CRT_HAVE_KFStat) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
 /* >> fstat(2), fstat64(2) */
-__CREDIRECT_VOID(__ATTR_OUT(2),__THROWING(...),FStat,(__fd_t __fd, struct stat *__restrict __buf),KFStat,(__fd,__buf))
+__CREDIRECT_VOID(__ATTR_FDARG(1) __ATTR_OUT(2),__THROWING(...),FStat,(__fd_t __fd, struct stat *__restrict __buf),KFStat,(__fd,__buf))
 #elif defined(__CRT_HAVE_KFStat64) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
 /* >> fstat(2), fstat64(2) */
-__CREDIRECT_VOID(__ATTR_OUT(2),__THROWING(...),FStat,(__fd_t __fd, struct stat *__restrict __buf),KFStat64,(__fd,__buf))
+__CREDIRECT_VOID(__ATTR_FDARG(1) __ATTR_OUT(2),__THROWING(...),FStat,(__fd_t __fd, struct stat *__restrict __buf),KFStat64,(__fd,__buf))
 #endif /* ... */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
@@ -72,10 +72,10 @@ __CREDIRECT_VOID(__ATTR_IN(1) __ATTR_OUT(2),__THROWING(...),Stat64,(char const *
 #endif /* ... */
 #if defined(__CRT_HAVE_KFStatAt) && defined(__STAT32_MATCHES_STAT64)
 /* >> fstat(2), fstat64(2) */
-__CREDIRECT_VOID(__ATTR_OUT(2),__THROWING(...),FStat64,(__fd_t __fd, struct stat64 *__restrict __buf),KFStatAt,(__fd,__buf))
+__CREDIRECT_VOID(__ATTR_FDARG(1) __ATTR_OUT(2),__THROWING(...),FStat64,(__fd_t __fd, struct stat64 *__restrict __buf),KFStatAt,(__fd,__buf))
 #elif defined(__CRT_HAVE_KFStat64)
 /* >> fstat(2), fstat64(2) */
-__CREDIRECT_VOID(__ATTR_OUT(2),__THROWING(...),FStat64,(__fd_t __fd, struct stat64 *__restrict __buf),KFStat64,(__fd,__buf))
+__CREDIRECT_VOID(__ATTR_FDARG(1) __ATTR_OUT(2),__THROWING(...),FStat64,(__fd_t __fd, struct stat64 *__restrict __buf),KFStat64,(__fd,__buf))
 #endif /* ... */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
@@ -146,7 +146,7 @@ __CDECLARE_VOID_OPT(__ATTR_IN(2),__THROWING(...),MkFiFoAt,(__fd_t __dirfd, char 
 
 #ifdef __USE_POSIX
 /* >> fchmod(2) */
-__CDECLARE_VOID_OPT(,__THROWING(...),FChMod,(__fd_t __fd, __mode_t __mode),(__fd,__mode))
+__CDECLARE_VOID_OPT(__ATTR_FDARG(1),__THROWING(...),FChMod,(__fd_t __fd, __mode_t __mode),(__fd,__mode))
 #endif /* __USE_POSIX */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
@@ -195,26 +195,26 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(UTimensAt64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #ifdef __USE_XOPEN2K8
 #if defined(__CRT_HAVE_FUTimens) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futimens(2), futimens64(2) */
-__CDECLARE_VOID(__ATTR_IN_OPT(2),__THROWING(...),FUTimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),(__fd,__times))
+__CDECLARE_VOID(__ATTR_FDARG(1) __ATTR_IN_OPT(2),__THROWING(...),FUTimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),(__fd,__times))
 #elif defined(__CRT_HAVE_FUTimens64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futimens(2), futimens64(2) */
-__CREDIRECT_VOID(__ATTR_IN_OPT(2),__THROWING(...),FUTimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),FUTimens64,(__fd,__times))
+__CREDIRECT_VOID(__ATTR_FDARG(1) __ATTR_IN_OPT(2),__THROWING(...),FUTimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),FUTimens64,(__fd,__times))
 #elif defined(__CRT_HAVE_FUTimens64) || defined(__CRT_HAVE_FUTimens)
 #include <libc/local/kos.sys.stat/FUTimens.h>
 /* >> futimens(2), futimens64(2) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(FUTimens, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(2) void (__LIBCCALL FUTimens)(__fd_t __fd, struct timespec const __times[2 /*or:3*/]) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FUTimens))(__fd, __times); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(FUTimens, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __ATTR_IN_OPT(2) void (__LIBCCALL FUTimens)(__fd_t __fd, struct timespec const __times[2 /*or:3*/]) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FUTimens))(__fd, __times); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_FUTimens) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> futimens(2), futimens64(2) */
-__CREDIRECT_VOID(__ATTR_IN_OPT(2),__THROWING(...),FUTimens64,(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]),FUTimens,(__fd,__times))
+__CREDIRECT_VOID(__ATTR_FDARG(1) __ATTR_IN_OPT(2),__THROWING(...),FUTimens64,(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]),FUTimens,(__fd,__times))
 #elif defined(__CRT_HAVE_FUTimens64)
 /* >> futimens(2), futimens64(2) */
-__CDECLARE_VOID(__ATTR_IN_OPT(2),__THROWING(...),FUTimens64,(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]),(__fd,__times))
+__CDECLARE_VOID(__ATTR_FDARG(1) __ATTR_IN_OPT(2),__THROWING(...),FUTimens64,(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]),(__fd,__times))
 #elif defined(__CRT_HAVE_FUTimens)
 #include <libc/local/kos.sys.stat/FUTimens64.h>
 /* >> futimens(2), futimens64(2) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(FUTimens64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(2) void (__LIBCCALL FUTimens64)(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FUTimens64))(__fd, __times); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(FUTimens64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __ATTR_IN_OPT(2) void (__LIBCCALL FUTimens64)(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FUTimens64))(__fd, __times); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K8 */

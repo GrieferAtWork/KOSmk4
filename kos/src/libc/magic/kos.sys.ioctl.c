@@ -33,7 +33,7 @@ __SYSDECL_BEGIN
 
 [[decl_include("<bits/types.h>")]]
 [[cp, throws, guard, doc_alias("ioctl"), vartypes(void *)]]
-$ssize_t Ioctl($fd_t fd, unsigned long int request, ...);
+$ssize_t Ioctl([[fdarg]] $fd_t fd, unsigned long int request, ...);
 
 %{
 

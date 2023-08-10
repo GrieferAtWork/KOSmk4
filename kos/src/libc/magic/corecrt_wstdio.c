@@ -200,7 +200,7 @@ done:
 
 [[wchar, wunused, decl_include("<bits/types.h>")]]
 [[requires_function(fdopen, convert_wcstombs)]]
-FILE *_wfdopen($fd_t fd, [[in]] wchar_t const *mode) {
+FILE *_wfdopen([[fdarg]] $fd_t fd, [[in]] wchar_t const *mode) {
 	FILE *result = NULL;
 	char *utf8_mode;
 	utf8_mode = convert_wcstombs(mode);

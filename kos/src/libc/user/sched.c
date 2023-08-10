@@ -110,7 +110,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_getcpu)(void)
 }
 /*[[[end:libc_sched_getcpu]]]*/
 
-/*[[[head:libc_setns,hash:CRC-32=0xf86d6261]]]*/
+/*[[[head:libc_setns,hash:CRC-32=0xc5f0cc7]]]*/
 /* >> setns(2)
  * With `fd' referring to a namespace, reassociate the calling thread with that namespace.
  * For  this  purpose,  `fd'  was  opened  for  one  of  the  files  in  `/proc/[pid]/ns/'
@@ -118,7 +118,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_getcpu)(void)
  *                 type of namespace, or one of `CLONE_NEWCGROUP', `CLONE_NEWIPC',
  *                `CLONE_NEWNET', `CLONE_NEWNS', `CLONE_NEWPID', `CLONE_NEWUSER',
  *                `CLONE_NEWUTS') */
-INTERN ATTR_SECTION(".text.crt.sched.utility") int
+INTERN ATTR_SECTION(".text.crt.sched.utility") ATTR_FDARG(1) int
 NOTHROW_NCX(LIBCCALL libc_setns)(fd_t fd,
                                  __STDC_INT_AS_UINT_T nstype)
 /*[[[body:libc_setns]]]*/

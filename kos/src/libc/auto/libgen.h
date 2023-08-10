@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38196826 */
+/* HASH CRC-32:0x72f8cd8f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -214,7 +214,7 @@ INTDEF ATTR_INOUT_OPT(1) ATTR_OUT_OPT(3) size_t NOTHROW_NCX(LIBDCALL libd_bufspl
  *              beyond `return' (and  before `result_c')  are filled  with
  *              the empty string found at `strend(IN:string)'. */
 INTDEF ATTR_INOUT_OPT(1) ATTR_OUT_OPT(3) size_t NOTHROW_NCX(LIBCCALL libc_bufsplit)(char *string, size_t result_c, char **result_v);
-INTDEF ATTR_OUT(2) char *NOTHROW_NCX(LIBCCALL libc_fcopylist_sz)(fd_t fd, size_t *p_filesize);
+INTDEF ATTR_FDREAD(1) ATTR_OUT(2) char *NOTHROW_NCX(LIBCCALL libc_fcopylist_sz)(fd_t fd, size_t *p_filesize);
 INTDEF ATTR_IN(1) ATTR_OUT(2) char *NOTHROW_NCX(LIBDCALL libd_copylist_sz)(char const *filename, size_t *p_filesize);
 INTDEF ATTR_IN(1) ATTR_OUT(2) char *NOTHROW_NCX(LIBCCALL libc_copylist_sz)(char const *filename, size_t *p_filesize);
 /* >> copylist(3), copylist64(3)

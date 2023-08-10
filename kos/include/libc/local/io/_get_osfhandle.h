@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xead6d746 */
+/* HASH CRC-32:0x43f77917 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #ifndef __CRT_DOS_PRIMARY
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_get_osfhandle) __ATTR_PURE __ATTR_WUNUSED __INTPTR_TYPE__
+__LOCAL_LIBC(_get_osfhandle) __ATTR_PURE __ATTR_WUNUSED __ATTR_FDARG(1) __INTPTR_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_get_osfhandle))(__fd_t __fd) {
 	__COMPILER_IMPURE();
 	return (__INTPTR_TYPE__)__fd;

@@ -312,6 +312,9 @@
 #define __ATTR_IN_T             __ATTR_IN
 #define __ATTR_OUT_T            __ATTR_OUT
 #define __ATTR_INOUT_T          __ATTR_INOUT
+#define __ATTR_FDARG_T          __ATTR_FDARG
+#define __ATTR_FDREAD_T         __ATTR_FDREAD
+#define __ATTR_FDWRITE_T        __ATTR_FDWRITE
 #else
 #define __ATTR_LEAF_T           /* nothing */
 #define __ATTR_CONST_T          /* nothing */
@@ -343,6 +346,9 @@
 #define __ATTR_IN_T             /* nothing */
 #define __ATTR_OUT_T            /* nothing */
 #define __ATTR_INOUT_T          /* nothing */
+#define __ATTR_FDARG_T          /* nothing */
+#define __ATTR_FDREAD_T         /* nothing */
+#define __ATTR_FDWRITE_T        /* nothing */
 #endif
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca6d148c */
+/* HASH CRC-32:0xfef44989 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ INTDEF unsigned int NOTHROW_RPC(LIBCCALL libc_sleep)(unsigned int seconds);
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
  * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_fsync)(fd_t fd);
+INTDEF ATTR_FDWRITE(1) int NOTHROW_RPC(LIBCCALL libc_fsync)(fd_t fd);
 /* >> getppid(2)
  * Return the PID of the calling process's parent.
  * (That is the TID of the leader of the parent of the calling thread's leader)
@@ -145,7 +145,7 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_pause)(void);
  * return: * : The configuration limit associated with `name' for `fd'
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `fd'
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
-INTDEF WUNUSED longptr_t NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd, __STDC_INT_AS_UINT_T name);
+INTDEF WUNUSED ATTR_FDARG(1) longptr_t NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd, __STDC_INT_AS_UINT_T name);
 /* >> chown(2)
  * Change the ownership of a given `file' to `group:owner' */
 INTDEF ATTR_IN(1) int NOTHROW_RPC(LIBDCALL libd_chown)(char const *file, uid_t owner, gid_t group);
@@ -179,7 +179,7 @@ INTDEF ATTR_IN(1) ATTR_IN(2) int NOTHROW_RPC(LIBCCALL libc_link)(char const *fro
  * was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
-INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_read)(fd_t fd, void *buf, size_t bufsize);
+INTDEF ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_read)(fd_t fd, void *buf, size_t bufsize);
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much  data
@@ -187,25 +187,25 @@ INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_read)(fd_t fd, void *bu
  * if no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
-INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_write)(fd_t fd, void const *buf, size_t bufsize);
+INTDEF ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_write)(fd_t fd, void const *buf, size_t bufsize);
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-INTDEF off_t NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd, off_t offset, __STDC_INT_AS_UINT_T whence);
+INTDEF ATTR_FDARG(1) off_t NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd, off_t offset, __STDC_INT_AS_UINT_T whence);
 /* >> dup2(2)
  * @return: newfd: Returns the new handle upon success.
  * Duplicate a file referred to by `oldfd' into `newfd' */
-INTDEF fd_t NOTHROW_NCX(LIBDCALL libd_dup2)(fd_t oldfd, fd_t newfd);
+INTDEF ATTR_FDARG(1) fd_t NOTHROW_NCX(LIBDCALL libd_dup2)(fd_t oldfd, fd_t newfd);
 /* >> dup2(2)
  * @return: newfd: Returns the new handle upon success.
  * Duplicate a file referred to by `oldfd' into `newfd' */
-INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_dup2)(fd_t oldfd, fd_t newfd);
+INTDEF ATTR_FDARG(1) fd_t NOTHROW_NCX(LIBCCALL libc_dup2)(fd_t oldfd, fd_t newfd);
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
  * Duplicate a file referred to by `fd' and return its duplicated handle number */
-INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_dup)(fd_t fd);
+INTDEF WUNUSED ATTR_FDARG(1) fd_t NOTHROW_NCX(LIBCCALL libc_dup)(fd_t fd);
 /* >> close(2)
  * Close a given file descriptor/handle `fd' */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_close)(fd_t fd);
+INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBCCALL libc_close)(fd_t fd);
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type'
@@ -330,25 +330,25 @@ INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t NOTHROW_RPC(LIBDCALL libd_freadlinkat)
 INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t NOTHROW_RPC(LIBCCALL libc_freadlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen, atflag_t flags);
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-INTDEF off64_t NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd, off64_t offset, __STDC_INT_AS_UINT_T whence);
+INTDEF ATTR_FDARG(1) off64_t NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd, off64_t offset, __STDC_INT_AS_UINT_T whence);
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pread)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
+INTDEF ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pread)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pwrite)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
+INTDEF ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pwrite)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pread64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pread64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pwrite64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
-INTDEF fd_t NOTHROW_NCX(LIBDCALL libd_dup3)(fd_t oldfd, fd_t newfd, oflag_t flags);
-INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd, fd_t newfd, oflag_t flags);
+INTDEF ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pwrite64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF ATTR_FDARG(1) fd_t NOTHROW_NCX(LIBDCALL libd_dup3)(fd_t oldfd, fd_t newfd, oflag_t flags);
+INTDEF ATTR_FDARG(1) fd_t NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd, fd_t newfd, oflag_t flags);
 /* >> pipe2(2)
  * Construct a [reader,writer]-pair of pipes
  * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
@@ -356,7 +356,7 @@ INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd, fd_t newfd, oflag_t flag
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_pipe2)(fd_t pipedes[2], oflag_t flags);
-INTDEF int NOTHROW_RPC(LIBCCALL libc_syncfs)(fd_t fd);
+INTDEF ATTR_FDWRITE(1) int NOTHROW_RPC(LIBCCALL libc_syncfs)(fd_t fd);
 /* >> getresuid(2)
  * Get the real, effective, and saved UID of the calling thread.
  * @return: 0 : Success
@@ -406,10 +406,10 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_setresgid)(gid_t rgid, gid_t egid, gid_t sg
 INTDEF ATTR_RETURNS_TWICE WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_vfork)(void);
 /* >> fchown(2)
  * Change the ownership of a given `fd' to `group:owner' */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_fchown)(fd_t fd, uid_t owner, gid_t group);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC(LIBCCALL libc_fchown)(fd_t fd, uid_t owner, gid_t group);
 /* >> fchdir(2)
  * Change the current working directory to `path' */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_fchdir)(fd_t fd);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC(LIBCCALL libc_fchdir)(fd_t fd);
 /* >> getpgid(2)
  * Return  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
@@ -444,7 +444,7 @@ INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file, __
  * Replace the calling process with the application image referred
  * to by `execfd'  and execute it's  `main()' method, passing  the
  * given `argv', and setting `environ' to `envp'. */
-INTDEF ATTR_IN(2) ATTR_IN(3) int NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t execfd, __TARGV, __TENVP);
+INTDEF ATTR_FDREAD(1) ATTR_IN(2) ATTR_IN(3) int NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t execfd, __TARGV, __TENVP);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_nice)(int inc);
 /* >> confstr(3)
  * Retrieve a system configuration string specified by `name'
@@ -534,10 +534,10 @@ INTDEF ATTR_IN(1) int NOTHROW_RPC(LIBDCALL libd_chroot)(char const *__restrict p
 INTDEF ATTR_IN(1) int NOTHROW_RPC(LIBCCALL libc_chroot)(char const *__restrict path);
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_ftruncate)(fd_t fd, __PIO_OFFSET length);
+INTDEF ATTR_FDWRITE(1) int NOTHROW_NCX(LIBCCALL libc_ftruncate)(fd_t fd, __PIO_OFFSET length);
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_ftruncate64)(fd_t fd, __PIO_OFFSET64 length);
+INTDEF ATTR_FDWRITE(1) int NOTHROW_NCX(LIBCCALL libc_ftruncate64)(fd_t fd, __PIO_OFFSET64 length);
 /* >> brk(2), sbrk(2)
  * Change the  program  break,  allowing  for a  rudimentary  implementation  of  a  heap.
  * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
@@ -549,7 +549,7 @@ INTDEF void *NOTHROW_NCX(LIBCCALL libc_sbrk)(intptr_t delta);
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
  * timestamps,  and its size),  meaning that changes  are written to disk */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd);
+INTDEF ATTR_FDWRITE(1) int NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd);
 /* >> setmode(3), getmode(3) */
 INTDEF WUNUSED ATTR_IN(1) void *NOTHROW_NCX(LIBCCALL libc_setmode)(char const *mode_str);
 /* >> setmode(3), getmode(3) */

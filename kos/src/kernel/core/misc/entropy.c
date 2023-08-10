@@ -141,7 +141,7 @@ entropy_connect(size_t num_bits)
  * NOTE: The given `buf' must _NOT_ point into user-space and should
  *       preferably point to locked memory (hint: kernel stacks  are
  *       composed of locked memory) */
-PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
+PUBLIC NOBLOCK WUNUSED ATTR_OUTS(1, 2) bool
 NOTHROW(FCALL entropy_take)(void *buf, size_t num_bits) {
 	bool result;
 	preemption_flag_t was;
@@ -151,7 +151,7 @@ NOTHROW(FCALL entropy_take)(void *buf, size_t num_bits) {
 	return result;
 }
 
-PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) bool
+PUBLIC NOBLOCK NOPREEMPT WUNUSED ATTR_OUTS(1, 2) bool
 NOTHROW(FCALL entropy_take_nopr)(void *buf, size_t num_bits) {
 	bool result = false;
 	entropy_lock_acquire_nopr();
@@ -174,7 +174,7 @@ NOTHROW(FCALL entropy_take_nopr)(void *buf, size_t num_bits) {
  * Also: Don't feed security-critical data (such as which buttons a
  *       user is pressing)  to this function,  as this  information
  *       may otherwise be reverse-engineered by a malicious entity! */
-PUBLIC NOBLOCK NONNULL((1)) void
+PUBLIC NOBLOCK ATTR_INS(1, 2) void
 NOTHROW(FCALL entropy_give)(void const *buf, size_t num_bits) {
 	preemption_flag_t was;
 	preemption_pushoff(&was);
@@ -215,7 +215,7 @@ NOTHROW(KCALL bitxor)(void *__restrict dst_base, size_t dst_bit_offset,
 }
 
 
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) void
+PUBLIC NOBLOCK NOPREEMPT ATTR_INS(1, 2) void
 NOTHROW(FCALL entropy_give_nopr)(void const *buf, size_t num_bits) {
 	size_t new_entropy_bits;
 	entropy_lock_acquire_nopr();
@@ -267,7 +267,7 @@ NOTHROW(FCALL entropy_give_nopr)(void const *buf, size_t num_bits) {
  * to be read, and nothing can  be read at the moment,  then
  * either wait for data to become available, throw an  error
  * `E_WOULDBLOCK', or return `0' (under `IO_NODATAZERO') */
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) size_t FCALL
+FUNDEF NOBLOCK WUNUSED ATTR_OUTS(1, 2) size_t FCALL
 entropy_read(NCX void *buf, size_t num_bytes, iomode_t mode)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
 	size_t result = 0;
@@ -312,7 +312,7 @@ entropy_read(NCX void *buf, size_t num_bytes, iomode_t mode)
 /* Same as `entropy_read()', but always fill the entire buffer,
  * potentially  waiting until enough entropy has been generated
  * before returning. */
-PUBLIC NOBLOCK NONNULL((1)) void FCALL
+PUBLIC NOBLOCK ATTR_OUTS(1, 2) void FCALL
 entropy_readall(NCX void *buf, size_t num_bytes)
 		THROWS(E_WOULDBLOCK, E_INTERRUPT, E_SEGFAULT) {
 	while (num_bytes) {
@@ -329,7 +329,7 @@ entropy_readall(NCX void *buf, size_t num_bytes)
 /* Similar to `entropy_read()', but implements reads from /dev/urandom.
  * This function uses a  PRNG which may be  seeded at random points  in
  * time (but at least once during boot) to generate numbers. */
-PUBLIC NOBLOCK NONNULL((1)) void FCALL
+PUBLIC NOBLOCK ATTR_OUTS(1, 2) void FCALL
 urandom_read(NCX void *buf, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
 	while (num_bytes >= 4) {

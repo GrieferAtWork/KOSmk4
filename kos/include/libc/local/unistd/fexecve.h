@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf188a732 */
+/* HASH CRC-32:0x1a5217d7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fexecve) __ATTR_IN(2) __ATTR_IN(3) int
+__LOCAL_LIBC(fexecve) __ATTR_FDREAD(1) __ATTR_IN(2) __ATTR_IN(3) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fexecve))(__fd_t __execfd, __TARGV, __TENVP) {
 #if __SIZEOF_INT__ == 4
 	char __buf[__COMPILER_LNEOF("/proc/self/fd/-2147483648")];

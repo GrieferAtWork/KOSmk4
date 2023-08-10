@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50913109 */
+/* HASH CRC-32:0x81c46e4c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,10 +34,10 @@ INTDEF int NOTHROW_RPC(LIBDCALL libd_wsystem)(char16_t const *cmd);
 INTDEF int NOTHROW_RPC(LIBKCALL libc_wsystem)(char32_t const *cmd);
 INTDEF WUNUSED ATTR_IN(1) ATTR_OUT_OPT(2) char16_t *NOTHROW_RPC(LIBDCALL libd_wrealpath)(char16_t const *filename, char16_t *resolved);
 INTDEF WUNUSED ATTR_IN(1) ATTR_OUT_OPT(2) char32_t *NOTHROW_RPC(LIBKCALL libc_wrealpath)(char32_t const *filename, char32_t *resolved);
-INTDEF WUNUSED ATTR_OUTS(2, 3) char16_t *NOTHROW_RPC(LIBDCALL libd_wfrealpath)(fd_t fd, char16_t *resolved, size_t buflen);
-INTDEF WUNUSED ATTR_OUTS(2, 3) char32_t *NOTHROW_RPC(LIBKCALL libc_wfrealpath)(fd_t fd, char32_t *resolved, size_t buflen);
-INTDEF WUNUSED ATTR_OUTS(2, 3) char16_t *NOTHROW_RPC(LIBDCALL libd_wfrealpath4)(fd_t fd, char16_t *resolved, size_t buflen, atflag_t flags);
-INTDEF WUNUSED ATTR_OUTS(2, 3) char32_t *NOTHROW_RPC(LIBKCALL libc_wfrealpath4)(fd_t fd, char32_t *resolved, size_t buflen, atflag_t flags);
+INTDEF WUNUSED ATTR_FDARG(1) ATTR_OUTS(2, 3) char16_t *NOTHROW_RPC(LIBDCALL libd_wfrealpath)(fd_t fd, char16_t *resolved, size_t buflen);
+INTDEF WUNUSED ATTR_FDARG(1) ATTR_OUTS(2, 3) char32_t *NOTHROW_RPC(LIBKCALL libc_wfrealpath)(fd_t fd, char32_t *resolved, size_t buflen);
+INTDEF WUNUSED ATTR_FDARG(1) ATTR_OUTS(2, 3) char16_t *NOTHROW_RPC(LIBDCALL libd_wfrealpath4)(fd_t fd, char16_t *resolved, size_t buflen, atflag_t flags);
+INTDEF WUNUSED ATTR_FDARG(1) ATTR_OUTS(2, 3) char32_t *NOTHROW_RPC(LIBKCALL libc_wfrealpath4)(fd_t fd, char32_t *resolved, size_t buflen, atflag_t flags);
 INTDEF WUNUSED ATTR_IN(2) ATTR_OUTS(3, 4) char16_t *NOTHROW_RPC(LIBDCALL libd_wfrealpathat)(fd_t dirfd, char16_t const *filename, char16_t *resolved, size_t buflen, atflag_t flags);
 INTDEF WUNUSED ATTR_IN(2) ATTR_OUTS(3, 4) char32_t *NOTHROW_RPC(LIBKCALL libc_wfrealpathat)(fd_t dirfd, char32_t const *filename, char32_t *resolved, size_t buflen, atflag_t flags);
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd_wtoi)(char16_t const *nptr);

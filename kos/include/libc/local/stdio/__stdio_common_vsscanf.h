@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf007e775 */
+/* HASH CRC-32:0x8204dc48 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,7 +89,7 @@ struct __vsnscanf_data {
 	unsigned char const *__end;
 };
 __LOCAL_LIBC(vsnscanf_getc) __format_word_t
-(__FORMATPRINTER_CC __vsnscanf_getc)(void *__arg) {
+__NOTHROW_NCX(__FORMATPRINTER_CC __vsnscanf_getc)(void *__arg) {
 	struct __vsnscanf_data *__cookie;
 	__cookie = (struct __vsnscanf_data *)__arg;
 	if (__cookie->__ptr >= __cookie->__end)
@@ -97,7 +97,7 @@ __LOCAL_LIBC(vsnscanf_getc) __format_word_t
 	return (__format_word_t)*__cookie->__ptr++;
 }
 __LOCAL_LIBC(vsnscanf_ungetc) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vsnscanf_ungetc)(void *__arg, __format_word_t __UNUSED(__word)) {
+__NOTHROW_NCX(__FORMATPRINTER_CC __vsnscanf_ungetc)(void *__arg, __format_word_t __UNUSED(__word)) {
 	struct __vsnscanf_data *__cookie;
 	__cookie = (struct __vsnscanf_data *)__arg;
 	--__cookie->__ptr;

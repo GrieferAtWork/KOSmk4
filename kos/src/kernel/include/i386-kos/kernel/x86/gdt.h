@@ -48,11 +48,11 @@ DATDEF struct segment bootcpu_x86_gdt[SEGMENT_COUNT];
 
 #ifndef CONFIG_NO_KERNEL_USERKERN_SEGMENT
 #ifdef __x86_64__
-FUNDEF u32 NOTHROW(KCALL x86_get_random_userkern_address32)(void);
-FUNDEF uintptr_t NOTHROW(KCALL x86_get_random_userkern_address)(void);
+FUNDEF NOBLOCK u32 NOTHROW(KCALL x86_get_random_userkern_address32)(void);
+FUNDEF NOBLOCK uintptr_t NOTHROW(KCALL x86_get_random_userkern_address)(void);
 #define x86_get_random_userkern_address64 x86_get_random_userkern_address
 #else /* __x86_64__ */
-FUNDEF uintptr_t NOTHROW(KCALL x86_get_random_userkern_address)(void);
+FUNDEF NOBLOCK uintptr_t NOTHROW(KCALL x86_get_random_userkern_address)(void);
 #define x86_get_random_userkern_address32 x86_get_random_userkern_address
 #endif /* !__x86_64__ */
 #endif /* !CONFIG_NO_KERNEL_USERKERN_SEGMENT */

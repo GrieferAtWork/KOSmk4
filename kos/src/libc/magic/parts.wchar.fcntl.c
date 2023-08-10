@@ -110,7 +110,7 @@ $fd_t wcreat([[in]] wchar_t const *filename, $mode_t mode) {
 [[decl_include("<bits/types.h>"), impl_include("<asm/os/oflags.h>")]]
 [[cp, wunused, requires($has_function(wopen32) || $has_function(open64, convert_wcstombs))]]
 $fd_t wopen64([[in]] wchar_t const *filename, $oflag_t oflags, ...) {
-	$fd_t result;
+	fd_t result;
 	va_list args;
 	mode_t mode;
 	va_start(args, oflags);
@@ -167,7 +167,7 @@ $fd_t wcreat64([[in]] wchar_t const *filename, $mode_t mode) {
 
 [[wchar, cp, ignore, nocrt, alias("wopenat"), doc_alias("wopenat")]]
 [[wunused, vartypes($mode_t), decl_include("<bits/types.h>")]]
-$fd_t wopenat32($fd_t dirfd, [[in]] wchar_t const *filename, $oflag_t oflags, ...);
+$fd_t wopenat32([[dirfd]] $fd_t dirfd, [[in]] wchar_t const *filename, $oflag_t oflags, ...);
 
 [[ignore]] c16openat32(*) %{uchar16("wopenat32")}
 [[ignore]] c32openat32(*) %{uchar32("wopenat32")}
@@ -178,7 +178,7 @@ $fd_t wopenat32($fd_t dirfd, [[in]] wchar_t const *filename, $oflag_t oflags, ..
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("wopenat")]]
 [[                                                                                                                                                     alias("wopenat64")]]
 [[requires($has_function(wopenat64) || $has_function(openat, convert_wcstombs))]]
-$fd_t wopenat($fd_t dirfd, [[in]] wchar_t const *filename, $oflag_t oflags, ...) {
+$fd_t wopenat([[dirfd]] $fd_t dirfd, [[in]] wchar_t const *filename, $oflag_t oflags, ...) {
 	fd_t result;
 	va_list args;
 	mode_t mode;
@@ -206,8 +206,8 @@ $fd_t wopenat($fd_t dirfd, [[in]] wchar_t const *filename, $oflag_t oflags, ...)
 [[wchar, cp, guard, wunused, vartypes($mode_t), doc_alias("wopenat")]]
 [[decl_include("<bits/types.h>"), preferred_largefile64_variant_of(wopenat)]]
 [[cp, wunused, requires($has_function(wopenat32) || $has_function(openat64, convert_wcstombs))]]
-$fd_t wopenat64($fd_t dirfd, [[in]] wchar_t const *filename, $oflag_t oflags, ...) {
-	$fd_t result;
+$fd_t wopenat64([[dirfd]] $fd_t dirfd, [[in]] wchar_t const *filename, $oflag_t oflags, ...) {
+	fd_t result;
 	va_list args;
 	mode_t mode;
 	va_start(args, oflags);

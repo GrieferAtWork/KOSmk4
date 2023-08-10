@@ -1442,12 +1442,12 @@ __STDC_INT_AS_SSIZE_T printf([[in, format]] char const *__restrict format, ...)
 @@push_namespace(local)@@
 @@pp_if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__@@
 __LOCAL_LIBC(@vfscanf_getc@) __format_word_t
-(__FORMATPRINTER_CC vfscanf_getc)(void *arg) {
+NOTHROW_CB_NCX(__FORMATPRINTER_CC vfscanf_getc)(void *arg) {
 	return (__format_word_t)fgetc((FILE *)arg);
 }
 @@pp_endif@@
 __LOCAL_LIBC(@vfscanf_ungetc@) ssize_t
-(__FORMATPRINTER_CC vfscanf_ungetc)(void *arg, __format_word_t word) {
+NOTHROW_CB_NCX(__FORMATPRINTER_CC vfscanf_ungetc)(void *arg, __format_word_t word) {
 	return ungetc((int)(unsigned char)(unsigned int)word, (FILE *)arg);
 }
 @@pop_namespace@@
@@ -1536,7 +1536,7 @@ char *gets([[out]] char *__restrict buf) {
 #define ____vsscanf_getc_defined
 @@push_namespace(local)@@
 __LOCAL_LIBC(@vsscanf_getc@) __format_word_t
-__NOTHROW_NCX(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
+NOTHROW_NCX(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
 	unsigned char const *reader = *(unsigned char const **)arg;
 	unsigned char result        = *reader++;
 	if (!result)
@@ -1545,7 +1545,7 @@ __NOTHROW_NCX(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
 	return (__format_word_t)result;
 }
 __LOCAL_LIBC(@vsscanf_ungetc@) ssize_t
-__NOTHROW(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+NOTHROW(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
 	--(*(unsigned char const **)arg);
 	return 0;
 }
@@ -1695,7 +1695,7 @@ __STDC_INT_AS_SIZE_T snprintf([[out(? <= buflen)]] char *__restrict buf, size_t 
 [[requires_dependent_function(write_printer)]]
 [[impl_include("<hybrid/typecore.h>", "<hybrid/host.h>", "<bits/crt/format-printer.h>")]]
 [[section(".text.crt{|.dos}.io.write")]]
-__STDC_INT_AS_SSIZE_T vdprintf($fd_t fd, [[in, format]] char const *__restrict format, $va_list args) {
+__STDC_INT_AS_SSIZE_T vdprintf([[fdwrite]] $fd_t fd, [[in, format]] char const *__restrict format, $va_list args) {
 	return format_vprintf(&write_printer,
 	                      (void *)(__UINTPTR_TYPE__)(__CRT_PRIVATE_UINT(__SIZEOF_FD_T__))fd,
 	                      format, args);
@@ -1704,7 +1704,7 @@ __STDC_INT_AS_SSIZE_T vdprintf($fd_t fd, [[in, format]] char const *__restrict f
 @@>> dprintf(3), vdprintf(3)
 [[cp, decl_include("<features.h>", "<bits/types.h>")]]
 [[section(".text.crt{|.dos}.io.write")]]
-__STDC_INT_AS_SSIZE_T dprintf($fd_t fd, [[in, format]] char const *__restrict format, ...)
+__STDC_INT_AS_SSIZE_T dprintf([[fdwrite]] $fd_t fd, [[in, format]] char const *__restrict format, ...)
 	%{printf("vdprintf")}
 %#endif /* __USE_XOPEN2K8 */
 
@@ -1714,8 +1714,8 @@ __STDC_INT_AS_SSIZE_T dprintf($fd_t fd, [[in, format]] char const *__restrict fo
 [[cp, decl_include("<bits/types.h>")]]
 [[crt_dos_variant, userimpl, requires_function(renameat2)]]
 [[section(".text.crt{|.dos}.fs.modify")]]
-int renameat($fd_t oldfd, [[in]] char const *oldname,
-             $fd_t newfd, [[in]] char const *newname_or_path) {
+int renameat([[dirfd]] $fd_t oldfd, [[in]] char const *oldname,
+             [[dirfd]] $fd_t newfd, [[in]] char const *newname_or_path) {
 	return renameat2(oldfd, oldname, newfd, newname_or_path, 0);
 }
 
@@ -1729,7 +1729,7 @@ int renameat($fd_t oldfd, [[in]] char const *oldname,
            (defined(__AT_REMOVEREG) || (defined(__EISDIR) && defined(__ENOTDIR))))]]
 [[impl_include("<asm/os/fcntl.h>", "<libc/errno.h>")]]
 [[crt_dos_variant, section(".text.crt{|.dos}.fs.modify")]]
-int removeat($fd_t dirfd, [[in]] char const *filename) {
+int removeat([[dirfd]] $fd_t dirfd, [[in]] char const *filename) {
 @@pp_ifdef __AT_REMOVEREG@@
 	return unlinkat(dirfd, filename, __AT_REMOVEREG | __AT_REMOVEDIR);
 @@pp_else@@
@@ -1759,8 +1759,8 @@ int removeat($fd_t dirfd, [[in]] char const *filename) {
 @@  - `AT_RENAME_WHITEOUT'  --> `RENAME_WHITEOUT'
 [[cp, decl_include("<bits/types.h>")]]
 [[crt_dos_variant, section(".text.crt{|.dos}.fs.modify")]]
-int renameat2($fd_t oldfd, [[in]] char const *oldname,
-              $fd_t newfd, [[in]] char const *newname_or_path,
+int renameat2([[dirfd]] $fd_t oldfd, [[in]] char const *oldname,
+              [[dirfd]] $fd_t newfd, [[in]] char const *newname_or_path,
               $atflag_t flags);
 %#endif /* __USE_GNU */
 
@@ -1942,8 +1942,8 @@ struct __vasnprintf_data {
 	char  *vapd_ptr; /* [0..vapd_cnt] Pointer into `vapd_buf' for where to continue writing */
 	size_t vapd_cnt; /* # of remaining, available bytes in `vapd_ptr' (excluding space for trailing NUL) */
 };
-__LOCAL_LIBC(@vasnprintf_printer@) ssize_t FORMATPRINTER_CC
-vasnprintf_printer(void *arg, char const *__restrict data, size_t datalen) {
+__LOCAL_LIBC(@vasnprintf_printer@) ssize_t
+NOTHROW_NCX(FORMATPRINTER_CC vasnprintf_printer)(void *arg, char const *__restrict data, size_t datalen) {
 	struct __vasnprintf_data *cookie;
 	cookie = (struct __vasnprintf_data *)arg;
 
@@ -2124,7 +2124,7 @@ char *asnprintf([[inout]] char *__restrict heapbuf,
 
 //TODO: __STDC_INT_AS_SSIZE_T vasiprintf([[out]] char **pstr, [[in, format]] char const *format, $va_list args);
 //TODO: [[wunused]] char *vasniprintf([[inout]] char *heapbuf, [[inout]] size_t *p_buflen, [[in, format]] char const *format, $va_list args);
-//TODO: __STDC_INT_AS_SIZE_T vdiprintf($fd_t fd, [[in, format]] char const *format, $va_list args);
+//TODO: __STDC_INT_AS_SIZE_T vdiprintf([[fdwrite]] $fd_t fd, [[in, format]] char const *format, $va_list args);
 //TODO: __STDC_INT_AS_SIZE_T vfiprintf([[inout]] $FILE *, [[in, format]] char const *format, $va_list args);
 //TODO: __STDC_INT_AS_SIZE_T vfiscanf([[inout]] $FILE *, [[in, format]] char const *format, $va_list args);
 //TODO: __STDC_INT_AS_SIZE_T viprintf([[in, format]] char const *format, $va_list args);
@@ -2135,7 +2135,7 @@ char *asnprintf([[inout]] char *__restrict heapbuf,
 
 //TODO: __STDC_INT_AS_SSIZE_T asiprintf([[out]] char **pstr, [[in, format]] char const *format, ...);
 //TODO: [[wunused]] char *asniprintf([[inout]] char *heapbuf, [[inout]] size_t *p_buflen, [[in, format]] char const *format, ...);
-//TODO: [[guard("diprintf")]] __STDC_INT_AS_SIZE_T diprintf($fd_t fd, [[in, format]] char const *format, ...);
+//TODO: [[guard("diprintf")]] __STDC_INT_AS_SIZE_T diprintf([[fdwrite]] $fd_t fd, [[in, format]] char const *format, ...);
 //TODO: __STDC_INT_AS_SIZE_T fiprintf([[inout]] $FILE *stream, [[in, format]] char const *format, ...);
 //TODO: __STDC_INT_AS_SIZE_T fiscanf([[inout]] $FILE *stream, [[in, format]] char const *format, ...);
 //TODO: __STDC_INT_AS_SIZE_T iprintf([[in, format]] char const *format, ...);
@@ -2166,7 +2166,7 @@ char *tempnam(char const *dir, char const *pfx);
 @@`close(2)'d once `fclose(return)' is called.
 [[wunused, decl_include("<bits/types.h>")]]
 [[dos_only_export_alias("_fdopen"), export_alias("_IO_fdopen")]]
-$FILE *fdopen($fd_t fd, [[in]] char const *__restrict modes);
+$FILE *fdopen([[fdarg]] $fd_t fd, [[in]] char const *__restrict modes);
 
 @@>> fileno(3)
 @@Return the underlying file descriptor number used by `stream'
@@ -2309,14 +2309,14 @@ $FILE *fmemopen([[/*async*/inout(len)]] void *mem, $size_t len,
 [[impl_prefix(
 @@push_namespace(local)@@
 struct __memstream_file {
-	byte_t **mf_pbase; /* Pointer to the user-defined base field. */
-	size_t  *mf_psize; /* Pointer to the user-defined size field. */
+	byte_t **mf_pbase; /* [1..1] Pointer to the user-defined base field. */
+	size_t  *mf_psize; /* [1..1] Pointer to the user-defined size field. */
 	byte_t  *mf_base;  /* [0..1][owned] Allocated base pointer. */
 	byte_t  *mf_ptr;   /* [0..1] Current read/write pointer (May be located beyond `mf_end'; allocated lazily during writes). */
 	byte_t  *mf_end;   /* [0..1] Allocated buffer end pointer. */
 };
 
-__LOCAL_LIBC(@memstream_read@) ssize_t
+__LOCAL_LIBC(@memstream_read@) ATTR_OUTS(2, 3) ssize_t
 NOTHROW_NCX(LIBCCALL memstream_read)(void *cookie, void *buf, size_t num_bytes) {
 	struct __memstream_file *me;
 	size_t maxread;
@@ -2329,7 +2329,7 @@ NOTHROW_NCX(LIBCCALL memstream_read)(void *cookie, void *buf, size_t num_bytes) 
 	return (ssize_t)maxread;
 }
 
-__LOCAL_LIBC(@memstream_write@) ssize_t
+__LOCAL_LIBC(@memstream_write@) ATTR_INS(2, 3) ssize_t
 NOTHROW_NCX(LIBCCALL memstream_write)(void *cookie, void const *buf, size_t num_bytes) {
 	struct __memstream_file *me;
 	size_t new_alloc, result = 0;
@@ -2451,7 +2451,7 @@ NOTHROW(LIBCCALL memstream_close)(void *cookie) {
 
 @@pop_namespace@@
 )]]
-$FILE *open_memstream(char **bufloc, $size_t *sizeloc) {
+$FILE *open_memstream([[nonnull]] char **bufloc, [[nonnull]] $size_t *sizeloc) {
 	FILE *result;
 	struct __NAMESPACE_LOCAL_SYM __memstream_file *magic;
 	magic = (struct __NAMESPACE_LOCAL_SYM __memstream_file *)malloc(sizeof(struct __NAMESPACE_LOCAL_SYM __memstream_file));
@@ -2753,7 +2753,7 @@ struct __fopencookie_holder {
 @@push_namespace(local)@@
 #define __fopencookie_to_funopen_closefn_defined
 __LOCAL_LIBC(fopencookie_to_funopen_closefn) int
-(__LIBKCALL fopencookie_to_funopen_closefn)(void *cookie) {
+NOTHROW_CB(__LIBKCALL fopencookie_to_funopen_closefn)(void *cookie) {
 	int result = 0;
 	struct __fopencookie_holder *holder;
 	holder = (struct __fopencookie_holder *)cookie;
@@ -2772,8 +2772,8 @@ __LOCAL_LIBC(fopencookie_to_funopen_closefn) int
 @@pp_ifndef __fopencookie_to_funopen_readfn_defined@@
 @@push_namespace(local)@@
 #define __fopencookie_to_funopen_readfn_defined
-__LOCAL_LIBC(fopencookie_to_funopen_readfn) int
-(__LIBKCALL fopencookie_to_funopen_readfn)(void *cookie, char *buf, int num_bytes) {
+__LOCAL_LIBC(fopencookie_to_funopen_readfn) ATTR_OUTS(2, 3) int
+NOTHROW_CB_NCX(__LIBKCALL fopencookie_to_funopen_readfn)(void *cookie, char *buf, int num_bytes) {
 	struct __fopencookie_holder *holder;
 	holder = (struct __fopencookie_holder *)cookie;
 	return (int)(*holder->foch_funcs.@read@)(holder->foch_cookie, buf, (size_t)(unsigned int)num_bytes);
@@ -2786,8 +2786,8 @@ __LOCAL_LIBC(fopencookie_to_funopen_readfn) int
 @@pp_ifndef __fopencookie_to_funopen2_readfn_defined@@
 @@push_namespace(local)@@
 #define __fopencookie_to_funopen2_readfn_defined
-__LOCAL_LIBC(fopencookie_to_funopen2_readfn) ssize_t
-(__LIBKCALL fopencookie_to_funopen2_readfn)(void *cookie, void *buf, size_t num_bytes) {
+__LOCAL_LIBC(fopencookie_to_funopen2_readfn) ATTR_OUTS(2, 3) ssize_t
+NOTHROW_CB_NCX(__LIBKCALL fopencookie_to_funopen2_readfn)(void *cookie, void *buf, size_t num_bytes) {
 	struct __fopencookie_holder *holder;
 	holder = (struct __fopencookie_holder *)cookie;
 	return (*holder->foch_funcs.@read@)(holder->foch_cookie, (char *)buf, num_bytes);
@@ -2800,8 +2800,8 @@ __LOCAL_LIBC(fopencookie_to_funopen2_readfn) ssize_t
 @@pp_ifndef __fopencookie_to_funopen_writefn_defined@@
 @@push_namespace(local)@@
 #define __fopencookie_to_funopen_writefn_defined
-__LOCAL_LIBC(fopencookie_to_funopen_writefn) int
-(__LIBKCALL fopencookie_to_funopen_writefn)(void *cookie, char const *buf, int num_bytes) {
+__LOCAL_LIBC(fopencookie_to_funopen_writefn) ATTR_INS(2, 3) int
+NOTHROW_CB_NCX(__LIBKCALL fopencookie_to_funopen_writefn)(void *cookie, char const *buf, int num_bytes) {
 	struct __fopencookie_holder *holder;
 	holder = (struct __fopencookie_holder *)cookie;
 	return (int)(*holder->foch_funcs.@write@)(holder->foch_cookie, buf, (size_t)(unsigned int)num_bytes);
@@ -2814,8 +2814,8 @@ __LOCAL_LIBC(fopencookie_to_funopen_writefn) int
 @@pp_ifndef __fopencookie_to_funopen2_writefn_defined@@
 @@push_namespace(local)@@
 #define __fopencookie_to_funopen2_writefn_defined
-__LOCAL_LIBC(fopencookie_to_funopen2_writefn) ssize_t
-(__LIBKCALL fopencookie_to_funopen2_writefn)(void *cookie, void const *buf, size_t num_bytes) {
+__LOCAL_LIBC(fopencookie_to_funopen2_writefn) ATTR_INS(2, 3) ssize_t
+NOTHROW_CB_NCX(__LIBKCALL fopencookie_to_funopen2_writefn)(void *cookie, void const *buf, size_t num_bytes) {
 	struct __fopencookie_holder *holder;
 	holder = (struct __fopencookie_holder *)cookie;
 	return (*holder->foch_funcs.@write@)(holder->foch_cookie, (char const *)buf, num_bytes);
@@ -2829,7 +2829,7 @@ __LOCAL_LIBC(fopencookie_to_funopen2_writefn) ssize_t
 @@push_namespace(local)@@
 #define __fopencookie_to_funopen_seekfn_defined
 __LOCAL_LIBC(fopencookie_to_funopen_seekfn) __off_t
-(__LIBKCALL fopencookie_to_funopen_seekfn)(void *cookie, __off_t off, int whence) {
+NOTHROW_CB(__LIBKCALL fopencookie_to_funopen_seekfn)(void *cookie, __off_t off, int whence) {
 @@pp_if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__@@
 	struct __fopencookie_holder *holder;
 	holder = (struct __fopencookie_holder *)cookie;
@@ -2863,7 +2863,7 @@ __LOCAL_LIBC(fopencookie_to_funopen_seekfn) __off_t
 @@push_namespace(local)@@
 #define __fopencookie_to_funopen64_seekfn_defined
 __LOCAL_LIBC(fopencookie_to_funopen64_seekfn) off64_t
-(__LIBKCALL fopencookie_to_funopen64_seekfn)(void *cookie, off64_t off, int whence) {
+NOTHROW_CB(__LIBKCALL fopencookie_to_funopen64_seekfn)(void *cookie, off64_t off, int whence) {
 	struct __fopencookie_holder *holder;
 	holder = (struct __fopencookie_holder *)cookie;
 @@pp_ifdef __USE_KOS_ALTERATIONS@@
@@ -3406,14 +3406,14 @@ __STDC_INT_AS_SSIZE_T asprintf([[out]] char **__restrict pstr,
 [[cp, decl_include("<bits/types.h>")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("fdreopen_unlocked")]]
 [[section(".text.crt{|.dos}.FILE.locked.access")]]
-$FILE *fdreopen($fd_t fd, [[in]] char const *__restrict modes,
+$FILE *fdreopen([[fdarg]] $fd_t fd, [[in]] char const *__restrict modes,
                 [[inout]] $FILE *__restrict stream);
 
 
 %[default:section(".text.crt{|.dos}.FILE.unlocked.access")]
 
 [[cp, doc_alias("fdreopen"), decl_include("<bits/types.h>"), alias("fdreopen")]]
-$FILE *fdreopen_unlocked($fd_t fd, [[in]] char const *__restrict modes,
+$FILE *fdreopen_unlocked([[fdarg]] $fd_t fd, [[in]] char const *__restrict modes,
                          [[inout]] $FILE *__restrict stream);
 
 [[crt_dos_variant, cp, doc_alias("freopen"), no_crt_self_import, guard]]
@@ -3881,12 +3881,12 @@ __STDC_INT_AS_SSIZE_T printf_unlocked([[in, format]] char const *__restrict form
 @@push_namespace(local)@@
 @@pp_if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_SIZE_T__ != __SIZEOF_INT__@@
 __LOCAL_LIBC(@vfscanf_getc_unlocked@) __format_word_t
-(__FORMATPRINTER_CC vfscanf_getc_unlocked)(void *arg) {
+NOTHROW_CB_NCX(__FORMATPRINTER_CC vfscanf_getc_unlocked)(void *arg) {
 	return (__format_word_t)fgetc_unlocked((FILE *)arg);
 }
 @@pp_endif@@
 __LOCAL_LIBC(@vfscanf_ungetc_unlocked@) ssize_t
-(__FORMATPRINTER_CC vfscanf_ungetc_unlocked)(void *arg, __format_word_t word) {
+NOTHROW_CB_NCX(__FORMATPRINTER_CC vfscanf_ungetc_unlocked)(void *arg, __format_word_t word) {
 	return ungetc_unlocked((int)(unsigned char)(unsigned int)word, (FILE *)arg);
 }
 @@pop_namespace@@
@@ -4039,19 +4039,19 @@ typedef __off_t off_t;
 [[decl_include("<bits/types.h>")]]
 [[ignore, guard, wunused, doc_alias("funopen"), nocrt, alias("funopen")]]
 $FILE *crt_funopen32(void const *cookie,
-                     int (LIBKCALL *readfn)(void *cookie, char *buf, int num_bytes),
-                     int (LIBKCALL *writefn)(void *cookie, char const *buf, int num_bytes),
-                     off32_t (LIBKCALL *seekfn)(void *cookie, off32_t off, int whence),
-                     int (LIBKCALL *closefn)(void *cookie));
+                     [[nullable]] int (LIBKCALL *readfn)(void *cookie, char *buf, int num_bytes),
+                     [[nullable]] int (LIBKCALL *writefn)(void *cookie, char const *buf, int num_bytes),
+                     [[nullable]] off32_t (LIBKCALL *seekfn)(void *cookie, off32_t off, int whence),
+                     [[nullable]] int (LIBKCALL *closefn)(void *cookie));
 
 [[decl_include("<bits/types.h>")]]
 [[ignore, guard, wunused, doc_alias("funopen2"), nocrt, alias("funopen2")]]
 $FILE *crt_funopen2_32(void const *cookie,
-                       ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes),
-                       ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes),
-                       off32_t (LIBKCALL *seekfn)(void *cookie, off32_t off, int whence),
-                       int (LIBKCALL *flushfn)(void *cookie),
-                       int (LIBKCALL *closefn)(void *cookie));
+                       [[nullable]] ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes),
+                       [[nullable]] ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes),
+                       [[nullable]] off32_t (LIBKCALL *seekfn)(void *cookie, off32_t off, int whence),
+                       [[nullable]] int (LIBKCALL *flushfn)(void *cookie),
+                       [[nullable]] int (LIBKCALL *closefn)(void *cookie));
 
 
 
@@ -4077,8 +4077,8 @@ struct __funopen_holder {
 @@pp_ifndef __funopen_to_funopen2_readfn_defined@@
 @@push_namespace(local)@@
 #define __funopen_to_funopen2_readfn_defined
-__LOCAL_LIBC(funopen_to_funopen2_readfn) ssize_t
-(__LIBKCALL funopen_to_funopen2_readfn)(void *cookie, void *buf, size_t num_bytes) {
+__LOCAL_LIBC(funopen_to_funopen2_readfn) ATTR_OUTS(2, 3) ssize_t
+NOTHROW_CB_NCX(__LIBKCALL funopen_to_funopen2_readfn)(void *cookie, void *buf, size_t num_bytes) {
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
 	return (ssize_t)(*holder->fh_readfn)(holder->fh_cookie, (char *)buf,
@@ -4092,8 +4092,8 @@ __LOCAL_LIBC(funopen_to_funopen2_readfn) ssize_t
 @@pp_ifndef __funopen_to_funopen2_writefn_defined@@
 @@push_namespace(local)@@
 #define __funopen_to_funopen2_writefn_defined
-__LOCAL_LIBC(funopen_to_funopen2_writefn) ssize_t
-(__LIBKCALL funopen_to_funopen2_writefn)(void *cookie, void const *buf, size_t num_bytes) {
+__LOCAL_LIBC(funopen_to_funopen2_writefn) ATTR_INS(2, 3) ssize_t
+NOTHROW_CB_NCX(__LIBKCALL funopen_to_funopen2_writefn)(void *cookie, void const *buf, size_t num_bytes) {
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
 	return (ssize_t)(*holder->fh_writefn)(holder->fh_cookie, (char const *)buf,
@@ -4108,7 +4108,7 @@ __LOCAL_LIBC(funopen_to_funopen2_writefn) ssize_t
 @@push_namespace(local)@@
 #define __funopen_to_funopen2_seekfn_defined
 __LOCAL_LIBC(funopen_to_funopen2_seekfn) __off_t
-(__LIBKCALL funopen_to_funopen2_seekfn)(void *cookie, __off_t off, int whence) {
+NOTHROW_CB(__LIBKCALL funopen_to_funopen2_seekfn)(void *cookie, __off_t off, int whence) {
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
 	return (*holder->fh_seekfn)(holder->fh_cookie, off, whence);
@@ -4122,7 +4122,7 @@ __LOCAL_LIBC(funopen_to_funopen2_seekfn) __off_t
 @@push_namespace(local)@@
 #define __funopen_to_funopen2_closefn_defined
 __LOCAL_LIBC(funopen_to_funopen2_closefn) int
-(__LIBKCALL funopen_to_funopen2_closefn)(void *cookie) {
+NOTHROW_CB(__LIBKCALL funopen_to_funopen2_closefn)(void *cookie) {
 	int result = 0;
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
@@ -4152,10 +4152,10 @@ __LOCAL_LIBC(funopen_to_funopen2_closefn) int
 #define __funopen_to_fopencookie_seekfn_defined
 @@pp_ifdef __USE_KOS_ALTERATIONS@@
 __LOCAL_LIBC(funopen_to_fopencookie_seekfn) NONNULL((2)) int
-(__LIBKCALL funopen_to_fopencookie_seekfn)(void *cookie, pos64_t *pos, int whence)
+NOTHROW_CB(__LIBKCALL funopen_to_fopencookie_seekfn)(void *cookie, pos64_t *pos, int whence)
 @@pp_else@@
 __LOCAL_LIBC(funopen_to_fopencookie_seekfn) NONNULL((2)) int
-(__LIBKCALL funopen_to_fopencookie_seekfn)(void *cookie, off64_t *pos, int whence)
+NOTHROW_CB(__LIBKCALL funopen_to_fopencookie_seekfn)(void *cookie, off64_t *pos, int whence)
 @@pp_endif@@
 {
 	__off_t newpos;
@@ -4187,8 +4187,8 @@ __LOCAL_LIBC(funopen_to_fopencookie_seekfn) NONNULL((2)) int
 @@pp_ifndef __funopen_to_funopen64_readfn_defined@@
 @@push_namespace(local)@@
 #define __funopen_to_funopen64_readfn_defined
-__LOCAL_LIBC(funopen_to_funopen64_readfn) int
-(__LIBKCALL funopen_to_funopen64_readfn)(void *cookie, char *buf, int num_bytes) {
+__LOCAL_LIBC(funopen_to_funopen64_readfn) ATTR_OUTS(2, 3) int
+NOTHROW_CB_NCX(__LIBKCALL funopen_to_funopen64_readfn)(void *cookie, char *buf, int num_bytes) {
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
 	return (*holder->fh_readfn)(holder->fh_cookie, buf, num_bytes);
@@ -4201,8 +4201,8 @@ __LOCAL_LIBC(funopen_to_funopen64_readfn) int
 @@pp_ifndef __funopen_to_funopen64_writefn_defined@@
 @@push_namespace(local)@@
 #define __funopen_to_funopen64_writefn_defined
-__LOCAL_LIBC(funopen_to_funopen64_writefn) int
-(__LIBKCALL funopen_to_funopen64_writefn)(void *cookie, char const *buf, int num_bytes) {
+__LOCAL_LIBC(funopen_to_funopen64_writefn) ATTR_INS(2, 3) int
+NOTHROW_CB_NCX(__LIBKCALL funopen_to_funopen64_writefn)(void *cookie, char const *buf, int num_bytes) {
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
 	return (*holder->fh_writefn)(holder->fh_cookie, buf, num_bytes);
@@ -4218,7 +4218,7 @@ __LOCAL_LIBC(funopen_to_funopen64_writefn) int
 @@push_namespace(local)@@
 #define __funopen_to_funopen64_seekfn_defined
 __LOCAL_LIBC(funopen_to_funopen64_seekfn) off64_t
-(__LIBKCALL funopen_to_funopen64_seekfn)(void *cookie, off64_t off, int whence) {
+NOTHROW_CB(__LIBKCALL funopen_to_funopen64_seekfn)(void *cookie, off64_t off, int whence) {
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
 	return (*holder->fh_seekfn)(holder->fh_cookie, (__off_t)off, whence);
@@ -4267,10 +4267,10 @@ DEFINE_FUNOPEN_TO_FUNOPEN64_SEEKFN
 )]]
 [[section(".text.crt{|.dos}.FILE.locked.utility")]]
 $FILE *funopen(void const *cookie,
-               int (LIBKCALL *readfn)(void *cookie, char *buf, int num_bytes),
-               int (LIBKCALL *writefn)(void *cookie, char const *buf, int num_bytes),
-               off_t (LIBKCALL *seekfn)(void *cookie, off_t off, int whence),
-               int (LIBKCALL *closefn)(void *cookie)) {
+               [[nullable]] int (LIBKCALL *readfn)(void *cookie, char *buf, int num_bytes),
+               [[nullable]] int (LIBKCALL *writefn)(void *cookie, char const *buf, int num_bytes),
+               [[nullable]] off_t (LIBKCALL *seekfn)(void *cookie, off_t off, int whence),
+               [[nullable]] int (LIBKCALL *closefn)(void *cookie)) {
 @@pp_if __SIZEOF_INT__ == __SIZEOF_SIZE_T__ && $has_function(funopen2)@@
 	return funopen2(cookie,
 	                (ssize_t (LIBKCALL *)(void *, void *, size_t))readfn,
@@ -4357,8 +4357,8 @@ struct __funopen2_holder {
 @@pp_ifndef __funopen2_to_funopen2_64_readfn_defined@@
 @@push_namespace(local)@@
 #define __funopen2_to_funopen2_64_readfn_defined
-__LOCAL_LIBC(funopen2_to_funopen2_64_readfn) ssize_t
-(__LIBKCALL funopen2_to_funopen2_64_readfn)(void *cookie, void *buf, size_t num_bytes) {
+__LOCAL_LIBC(funopen2_to_funopen2_64_readfn) ATTR_OUTS(2, 3) ssize_t
+NOTHROW_CB_NCX(__LIBKCALL funopen2_to_funopen2_64_readfn)(void *cookie, void *buf, size_t num_bytes) {
 	struct __funopen2_holder *holder;
 	holder = (struct __funopen2_holder *)cookie;
 	return (*holder->f2h_readfn)(holder->f2h_cookie, buf, num_bytes);
@@ -4372,8 +4372,8 @@ __LOCAL_LIBC(funopen2_to_funopen2_64_readfn) ssize_t
 @@pp_ifndef __funopen2_to_funopen2_64_writefn_defined@@
 @@push_namespace(local)@@
 #define __funopen2_to_funopen2_64_writefn_defined
-__LOCAL_LIBC(funopen2_to_funopen2_64_writefn) ssize_t
-(__LIBKCALL funopen2_to_funopen2_64_writefn)(void *cookie, void const *buf, size_t num_bytes) {
+__LOCAL_LIBC(funopen2_to_funopen2_64_writefn) ATTR_INS(2, 3) ssize_t
+NOTHROW_CB_NCX(__LIBKCALL funopen2_to_funopen2_64_writefn)(void *cookie, void const *buf, size_t num_bytes) {
 	struct __funopen2_holder *holder;
 	holder = (struct __funopen2_holder *)cookie;
 	return (*holder->f2h_writefn)(holder->f2h_cookie, buf, num_bytes);
@@ -4387,7 +4387,7 @@ __LOCAL_LIBC(funopen2_to_funopen2_64_writefn) ssize_t
 @@push_namespace(local)@@
 #define __funopen2_to_funopen2_64_flushfn_defined
 __LOCAL_LIBC(funopen2_to_funopen2_64_flushfn) int
-(__LIBKCALL funopen2_to_funopen2_64_flushfn)(void *cookie) {
+NOTHROW_CB(__LIBKCALL funopen2_to_funopen2_64_flushfn)(void *cookie) {
 	struct __funopen2_holder *holder;
 	holder = (struct __funopen2_holder *)cookie;
 	return (*holder->f2h_flushfn)(holder->f2h_cookie);
@@ -4423,11 +4423,11 @@ DEFINE_FUNOPEN2_TO_FUNOPEN2_64_WRITEFN
 )]]
 [[section(".text.crt{|.dos}.FILE.locked.utility")]]
 $FILE *funopen2(void const *cookie,
-                ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes),
-                ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes),
-                off_t (LIBKCALL *seekfn)(void *cookie, off_t off, int whence),
-                int (LIBKCALL *flushfn)(void *cookie),
-                int (LIBKCALL *closefn)(void *cookie)) {
+                [[nullable]] ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes),
+                [[nullable]] ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes),
+                [[nullable]] off_t (LIBKCALL *seekfn)(void *cookie, off_t off, int whence),
+                [[nullable]] int (LIBKCALL *flushfn)(void *cookie),
+                [[nullable]] int (LIBKCALL *closefn)(void *cookie)) {
 	FILE *result;
 	struct __NAMESPACE_LOCAL_SYM __funopen2_holder *holder;
 	if (!seekfn)
@@ -4495,7 +4495,7 @@ struct __funopen64_holder {
 @@push_namespace(local)@@
 #define __funopen64_to_funopen2_64_seekfn_defined
 __LOCAL_LIBC(funopen64_to_funopen2_64_seekfn) off64_t
-(__LIBKCALL funopen64_to_funopen2_64_seekfn)(void *cookie, off64_t off, int whence) {
+NOTHROW_CB(__LIBKCALL funopen64_to_funopen2_64_seekfn)(void *cookie, off64_t off, int whence) {
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
 	return (*holder->fh_seekfn)(holder->fh_cookie, off, whence);
@@ -4510,10 +4510,10 @@ __LOCAL_LIBC(funopen64_to_funopen2_64_seekfn) off64_t
 #define __funopen64_to_fopencookie_seekfn_defined
 @@pp_ifdef __USE_KOS_ALTERATIONS@@
 __LOCAL_LIBC(funopen64_to_fopencookie_seekfn) int
-(__LIBKCALL funopen64_to_fopencookie_seekfn)(void *cookie, pos64_t *pos, int whence)
+NOTHROW_CB(__LIBKCALL funopen64_to_fopencookie_seekfn)(void *cookie, pos64_t *pos, int whence)
 @@pp_else@@
 __LOCAL_LIBC(funopen64_to_fopencookie_seekfn) int
-(__LIBKCALL funopen64_to_fopencookie_seekfn)(void *cookie, off64_t *pos, int whence)
+NOTHROW_CB(__LIBKCALL funopen64_to_fopencookie_seekfn)(void *cookie, off64_t *pos, int whence)
 @@pp_endif@@
 {
 	off64_t newpos;
@@ -4539,7 +4539,7 @@ __LOCAL_LIBC(funopen64_to_fopencookie_seekfn) int
 @@push_namespace(local)@@
 #define __funopen64_to_funopen_seekfn_defined
 __LOCAL_LIBC(funopen64_to_funopen_seekfn) off_t
-(__LIBKCALL funopen64_to_funopen_seekfn)(void *cookie, off_t off, int whence) {
+NOTHROW_CB(__LIBKCALL funopen64_to_funopen_seekfn)(void *cookie, off_t off, int whence) {
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
 	return (off_t)(*holder->fh_seekfn)(holder->fh_cookie, (off64_t)off, whence);
@@ -4726,7 +4726,7 @@ struct __funopen2_64_holder {
 @@push_namespace(local)@@
 #define __funopen2_64_to_funopen2_seekfn_defined
 __LOCAL_LIBC(funopen2_64_to_funopen2_seekfn) __off32_t
-(__LIBKCALL funopen2_64_to_funopen2_seekfn)(void *cookie, __off32_t off, int whence) {
+NOTHROW_CB(__LIBKCALL funopen2_64_to_funopen2_seekfn)(void *cookie, __off32_t off, int whence) {
 	struct __funopen2_64_holder *holder;
 	holder = (struct __funopen2_64_holder *)cookie;
 	return (__off32_t)(*holder->f2h64_seekfn)(holder->f2h64_cookie, off, whence);
@@ -5311,7 +5311,7 @@ struct __vsnscanf_data {
 	unsigned char const *__end;
 };
 __LOCAL_LIBC(@vsnscanf_getc@) __format_word_t
-(__FORMATPRINTER_CC vsnscanf_getc)(void *arg) {
+NOTHROW_NCX(__FORMATPRINTER_CC vsnscanf_getc)(void *arg) {
 	struct __vsnscanf_data *cookie;
 	cookie = (struct __vsnscanf_data *)arg;
 	if (cookie->__ptr >= cookie->__end)
@@ -5319,7 +5319,7 @@ __LOCAL_LIBC(@vsnscanf_getc@) __format_word_t
 	return (__format_word_t)*cookie->__ptr++;
 }
 __LOCAL_LIBC(@vsnscanf_ungetc@) __SSIZE_TYPE__
-(__FORMATPRINTER_CC vsnscanf_ungetc)(void *arg, __format_word_t __UNUSED(word)) {
+NOTHROW_NCX(__FORMATPRINTER_CC vsnscanf_ungetc)(void *arg, __format_word_t __UNUSED(word)) {
 	struct __vsnscanf_data *cookie;
 	cookie = (struct __vsnscanf_data *)arg;
 	--cookie->__ptr;

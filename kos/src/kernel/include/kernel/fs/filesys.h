@@ -249,7 +249,7 @@ NOTHROW(FCALL ffilesys_open_done)(struct mfile *__restrict dev);
 /* Lookup a filesystem type, given its name.
  * @return: * :   The named filesystem type.
  * @return: NULL: No such filesystem. */
-FUNDEF WUNUSED NONNULL((1)) REF struct ffilesys *FCALL
+FUNDEF WUNUSED ATTR_INS(1, 2) REF struct ffilesys *FCALL
 ffilesys_byname(NCX char const *name, size_t namelen)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 

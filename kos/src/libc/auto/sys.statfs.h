@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd37a66ca */
+/* HASH CRC-32:0xfbde9716 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,9 +31,9 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_statfs)(char const *file, struct statfs *buf);
-INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_fstatfs)(fd_t filedes, struct statfs *buf);
+INTDEF ATTR_FDARG(1) ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_fstatfs)(fd_t filedes, struct statfs *buf);
 INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_statfs64)(const char *file, struct statfs64 *buf);
-INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_fstatfs64)(fd_t filedes, struct statfs64 *buf);
+INTDEF ATTR_FDARG(1) ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_fstatfs64)(fd_t filedes, struct statfs64 *buf);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

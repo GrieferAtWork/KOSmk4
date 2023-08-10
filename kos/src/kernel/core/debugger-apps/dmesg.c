@@ -194,6 +194,7 @@ dbg_dmesg_render_enum(void *arg, struct syslog_packet *__restrict packet,
 					sender = pidns_lookuptask(&pidns_root,
 					                              packet->sp_tid);
 				} EXCEPT {
+					sender = NULL;
 				}
 				if (sender) {
 					struct mexecinfo *ei;

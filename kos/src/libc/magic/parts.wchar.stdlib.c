@@ -133,7 +133,7 @@ wchar_t *wrealpath([[in]] wchar_t const *filename, [[out_opt]] wchar_t *resolved
 [[decl_include("<bits/types.h>")]]
 [[requires($has_function(wfrealpath4) ||
            $has_function(frealpath, convert_mbstowcs))]]
-wchar_t *wfrealpath($fd_t fd, [[out(? <= buflen)]] wchar_t *resolved, $size_t buflen) {
+wchar_t *wfrealpath([[fdarg]] $fd_t fd, [[out(? <= buflen)]] wchar_t *resolved, $size_t buflen) {
 @@pp_if $has_function(wfrealpath4)@@
 	return wfrealpath4(fd, resolved, buflen, 0);
 @@pp_else@@
@@ -178,7 +178,7 @@ wchar_t *wfrealpath($fd_t fd, [[out(? <= buflen)]] wchar_t *resolved, $size_t bu
 
 [[wchar, cp, wunused, section(".text.crt{|.dos}.wchar.fs.property")]]
 [[decl_include("<bits/types.h>"), requires_function(frealpath4, convert_mbstowcs)]]
-wchar_t *wfrealpath4($fd_t fd, [[out(? <= buflen)]] wchar_t *resolved,
+wchar_t *wfrealpath4([[fdarg]] $fd_t fd, [[out(? <= buflen)]] wchar_t *resolved,
                      $size_t buflen, $atflag_t flags) {
 	char *utf8_resolved;
 	wchar_t *wcs_resolved;
@@ -217,7 +217,7 @@ wchar_t *wfrealpath4($fd_t fd, [[out(? <= buflen)]] wchar_t *resolved,
 
 [[wchar, cp, wunused, section(".text.crt{|.dos}.wchar.fs.property")]]
 [[decl_include("<bits/types.h>"), requires_function(frealpathat, convert_wcstombs, convert_mbstowcs)]]
-wchar_t *wfrealpathat($fd_t dirfd, [[in]] wchar_t const *filename,
+wchar_t *wfrealpathat([[dirfd]] $fd_t dirfd, [[in]] wchar_t const *filename,
                       [[out(? <= buflen)]] wchar_t *resolved,
                       $size_t buflen, $atflag_t flags) {
 	char *utf8_filename, *utf8_resolved;

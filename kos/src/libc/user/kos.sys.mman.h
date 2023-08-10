@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc68e39d0 */
+/* HASH CRC-32:0x77d808a3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ DECL_BEGIN
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-INTDEF WUNUSED ATTR_ACCESS_NONE(1) void *(LIBCCALL libc_MMap)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, __STDC_INT_AS_UINT_T flags, fd_t fd, pos_t offset) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_NONE(1) ATTR_FDARG(5) void *(LIBCCALL libc_MMap)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, __STDC_INT_AS_UINT_T flags, fd_t fd, pos_t offset) THROWS(...);
 /* >> munmap(2)
  * Unmap memory from `addr...+=len' */
 INTDEF ATTR_ACCESS_NONE(1) void (LIBCCALL libc_MUnmap)(void *addr, size_t len) THROWS(...);
@@ -65,7 +65,7 @@ INTDEF ATTR_ACCESS_NONE(1) void (LIBCCALL libc_MInCore)(void *start, size_t len,
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-INTDEF WUNUSED ATTR_ACCESS_NONE(1) void *(LIBCCALL libc_MMap64)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, __STDC_INT_AS_UINT_T flags, fd_t fd, pos64_t offset) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_NONE(1) ATTR_FDARG(5) void *(LIBCCALL libc_MMap64)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, __STDC_INT_AS_UINT_T flags, fd_t fd, pos64_t offset) THROWS(...);
 INTDEF ATTR_ACCESS_NONE(1) void (LIBCCALL libc_PosixMAdvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice) THROWS(...);
 /* >> mremap(2)
  * @param flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */

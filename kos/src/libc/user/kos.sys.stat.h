@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbcd5582 */
+/* HASH CRC-32:0x394763ea */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ INTDEF ATTR_IN(2) void (LIBCCALL libc_MkDirAt)(fd_t dirfd, char const *pathname,
 /* >> mkfifoat(2) */
 INTDEF ATTR_IN(2) void (LIBCCALL libc_MkFiFoAt)(fd_t dirfd, char const *fifoname, mode_t mode) THROWS(...);
 /* >> fchmod(2) */
-INTDEF void (LIBCCALL libc_FChMod)(fd_t fd, mode_t mode) THROWS(...);
+INTDEF ATTR_FDARG(1) void (LIBCCALL libc_FChMod)(fd_t fd, mode_t mode) THROWS(...);
 /* >> mknod(2) */
 INTDEF ATTR_IN(1) void (LIBCCALL libc_MkNod)(char const *nodename, mode_t mode, dev_t dev) THROWS(...);
 /* >> mknodat(2) */
@@ -64,9 +64,9 @@ INTDEF ATTR_IN(2) ATTR_IN_OPT(3) void (LIBCCALL libc_UTimensAt)(fd_t dirfd, char
  * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 INTDEF ATTR_IN(2) ATTR_IN_OPT(3) void (LIBCCALL libc_UTimensAt64)(fd_t dirfd, char const *filename, struct timespec64 const times[2 /*or:3*/], atflag_t flags) THROWS(...);
 /* >> futimens(2), futimens64(2) */
-INTDEF ATTR_IN_OPT(2) void (LIBCCALL libc_FUTimens)(fd_t fd, struct timespec const times[2 /*or:3*/]) THROWS(...);
+INTDEF ATTR_FDARG(1) ATTR_IN_OPT(2) void (LIBCCALL libc_FUTimens)(fd_t fd, struct timespec const times[2 /*or:3*/]) THROWS(...);
 /* >> futimens(2), futimens64(2) */
-INTDEF ATTR_IN_OPT(2) void (LIBCCALL libc_FUTimens64)(fd_t fd, struct timespec64 const times[2 /*or:3*/]) THROWS(...);
+INTDEF ATTR_FDARG(1) ATTR_IN_OPT(2) void (LIBCCALL libc_FUTimens64)(fd_t fd, struct timespec64 const times[2 /*or:3*/]) THROWS(...);
 #endif /* !__KERNEL__ */
 
 DECL_END

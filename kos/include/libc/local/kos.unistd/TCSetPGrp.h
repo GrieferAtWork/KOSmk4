@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc525a92e */
+/* HASH CRC-32:0xe45133cd */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Ioctl_defined
 #define __local___localdep_Ioctl_defined
-__CVREDIRECT(,__SSIZE_TYPE__,__THROWING(...),__localdep_Ioctl,(__fd_t __fd, unsigned long int __request),Ioctl,(__fd,__request),__request,1,(void *))
+__CVREDIRECT(__ATTR_FDARG(1),__SSIZE_TYPE__,__THROWING(...),__localdep_Ioctl,(__fd_t __fd, unsigned long int __request),Ioctl,(__fd,__request),__request,1,(void *))
 #endif /* !__local___localdep_Ioctl_defined */
-__LOCAL_LIBC(TCSetPGrp) void
+__LOCAL_LIBC(TCSetPGrp) __ATTR_FDARG(1) void
 (__LIBCCALL __LIBC_LOCAL_NAME(TCSetPGrp))(__fd_t __fd, __pid_t __pgrp_id) __THROWS(...) {
 	(__NAMESPACE_LOCAL_SYM __localdep_Ioctl)(__fd, __TIOCSPGRP, &__pgrp_id);
 }

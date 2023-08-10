@@ -1094,9 +1094,9 @@ NOTHROW_RPC(LIBCCALL libc_mkdirat)(fd_t dirfd,
 }
 /*[[[end:libc_mkdirat]]]*/
 
-/*[[[head:libc_fchmod,hash:CRC-32=0x704729c3]]]*/
+/*[[[head:libc_fchmod,hash:CRC-32=0xa85ccdae]]]*/
 /* >> fchmod(2) */
-INTERN ATTR_SECTION(".text.crt.fs.modify") int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_FDARG(1) int
 NOTHROW_RPC(LIBCCALL libc_fchmod)(fd_t fd,
                                   mode_t mode)
 /*[[[body:libc_fchmod]]]*/
@@ -1241,9 +1241,9 @@ NOTHROW_RPC(LIBCCALL libc_utimensat64)(fd_t dirfd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_utimensat64]]]*/
 
-/*[[[head:libc_futimens,hash:CRC-32=0x2a18d4b1]]]*/
+/*[[[head:libc_futimens,hash:CRC-32=0x885efe87]]]*/
 /* >> futimens(2), futimens64(2) */
-INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_IN_OPT(2) int
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_FDARG(1) ATTR_IN_OPT(2) int
 NOTHROW_RPC(LIBCCALL libc_futimens)(fd_t fd,
                                     struct timespec const times[2 /*or:3*/])
 /*[[[body:libc_futimens]]]*/
@@ -1254,12 +1254,12 @@ NOTHROW_RPC(LIBCCALL libc_futimens)(fd_t fd,
 }
 /*[[[end:libc_futimens]]]*/
 
-/*[[[head:libc_futimens64,hash:CRC-32=0xbece5ab4]]]*/
+/*[[[head:libc_futimens64,hash:CRC-32=0x11c32f5]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_futimens64, libc_futimens);
 #else /* MAGIC:alias */
 /* >> futimens(2), futimens64(2) */
-INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_IN_OPT(2) int
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_FDARG(1) ATTR_IN_OPT(2) int
 NOTHROW_RPC(LIBCCALL libc_futimens64)(fd_t fd,
                                       struct timespec64 const times[2 /*or:3*/])
 /*[[[body:libc_futimens64]]]*/

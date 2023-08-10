@@ -126,7 +126,7 @@ int attr_get([[in]] char const *path, [[in]] char const *attrname,
 [[doc_alias("attr_get")]]
 [[deprecated("Use `fgetxattr(2)' instead")]]
 [[decl_include("<bits/types.h>")]]
-int attr_getf($fd_t fd, [[in]] char const *attrname,
+int attr_getf([[fdarg]] $fd_t fd, [[in]] char const *attrname,
               [[out(*valuelength <= *valuelength)]] char *attrvalue,
               [[inout]] int *valuelength, int flags);
 
@@ -146,7 +146,7 @@ int attr_set([[in]] char const *path, [[in]] char const *attrname,
 [[doc_alias("attr_set")]]
 [[deprecated("Use `fsetxattr(2)' instead")]]
 [[decl_include("<bits/types.h>")]]
-int attr_setf($fd_t fd, [[in]] char const *attrname,
+int attr_setf([[fdarg]] $fd_t fd, [[in]] char const *attrname,
               [[in(valuelength)]] char const *attrvalue, int valuelength,
               int flags);
 
@@ -164,7 +164,7 @@ int attr_remove([[in]] char const *path, [[in]] char const *attrname, int flags)
 [[doc_alias("attr_remove")]]
 [[deprecated("Use `fremovexattr(2)' instead")]]
 [[decl_include("<bits/types.h>")]]
-int attr_removef($fd_t fd, [[in]] char const *attrname, int flags);
+int attr_removef([[fdarg]] $fd_t fd, [[in]] char const *attrname, int flags);
 
 
 
@@ -183,7 +183,7 @@ int attr_list([[in]] char const *path,
 [[doc_alias("attr_list")]]
 [[deprecated("Use `flistxattr(2)' instead")]]
 [[decl_include("<bits/types.h>", "<attr/bits/attributes.h>")]]
-int attr_listf($fd_t fd,
+int attr_listf([[fdarg]] $fd_t fd,
                [[out(? <= buffersize)]] char *buffer, int buffersize,
                int flags, [[inout]] struct attrlist_cursor *cursor);
 
@@ -266,7 +266,7 @@ int attr_multi([[in]] char const *path, [[inout(count)]] struct attr_multiop *op
 [[requires(defined(__ATTR_DONTFOLLOW) && defined(__ATTR_OP_GET) &&
            defined(__ATTR_OP_SET) && defined(__ATTR_OP_REMOVE) &&
            $has_function(attr_getf, attr_setf, attr_removef))]]
-int attr_multif($fd_t fd, [[inout(count)]] struct attr_multiop *oplist, int count, int flags) {
+int attr_multif([[fdarg]] $fd_t fd, [[inout(count)]] struct attr_multiop *oplist, int count, int flags) {
 	int i, result = 0;
 	if (unlikely(flags & ~ATTR_DONTFOLLOW) ||
 	    unlikely(count < 0)

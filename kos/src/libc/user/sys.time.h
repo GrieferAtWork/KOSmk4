@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc4417cd */
+/* HASH CRC-32:0xa62dff14 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ INTDEF ATTR_IN_OPT(2) ATTR_OUT_OPT(3) int NOTHROW_NCX(LIBCCALL libc_setitimer)(_
 /* >> utimes(2), utimes64(2) */
 INTDEF ATTR_IN(1) ATTR_IN_OPT(2) int NOTHROW_NCX(LIBCCALL libc_utimes)(char const *file, struct timeval const tvp[2]);
 /* >> futimesat(2), futimesat64(2) */
-INTDEF ATTR_IN(2) ATTR_IN_OPT(3) int NOTHROW_NCX(LIBCCALL libc_futimesat)(fd_t fd, char const *file, struct timeval const tvp[2]);
+INTDEF ATTR_FDARG(1) ATTR_IN(2) ATTR_IN_OPT(3) int NOTHROW_NCX(LIBCCALL libc_futimesat)(fd_t fd, char const *file, struct timeval const tvp[2]);
 /* >> settimeofday(2), settimeofday64(2) */
 INTDEF ATTR_IN_OPT(1) ATTR_IN_OPT(2) int NOTHROW_NCX(LIBCCALL libc_settimeofday)(struct timeval const *tv, struct timezone const *tz);
 /* >> adjtime(3), adjtime64(3) */
@@ -48,7 +48,7 @@ INTDEF ATTR_IN_OPT(1) ATTR_OUT_OPT(2) int NOTHROW_NCX(LIBCCALL libc_adjtime)(str
 /* >> lutimes(2), lutimes64(2) */
 INTDEF ATTR_IN(1) ATTR_IN_OPT(2) int NOTHROW_NCX(LIBCCALL libc_lutimes)(char const *file, struct timeval const tvp[2]);
 /* >> futimes(2), futimes64(2) */
-INTDEF ATTR_IN_OPT(2) int NOTHROW_NCX(LIBCCALL libc_futimes)(fd_t fd, struct timeval const tvp[2]);
+INTDEF ATTR_FDARG(1) ATTR_IN_OPT(2) int NOTHROW_NCX(LIBCCALL libc_futimes)(fd_t fd, struct timeval const tvp[2]);
 /* >> gettimeofday(2), gettimeofday64(2) */
 INTDEF ATTR_OUT_OPT(1) ATTR_OUT_OPT(2) int NOTHROW_NCX(LIBCCALL libc_gettimeofday64)(struct timeval64 *__restrict tv, __timezone_ptr_t tz);
 /* >> getitimer(2), getitimer64(2) */
@@ -64,9 +64,9 @@ INTDEF ATTR_IN_OPT(1) ATTR_OUT_OPT(2) int NOTHROW_NCX(LIBCCALL libc_adjtime64)(s
 /* >> lutimes(2), lutimes64(2) */
 INTDEF ATTR_IN(1) ATTR_IN_OPT(2) int NOTHROW_NCX(LIBCCALL libc_lutimes64)(char const *file, struct timeval64 const tvp[2]);
 /* >> lutimes(2), lutimes64(2) */
-INTDEF ATTR_IN_OPT(2) int NOTHROW_NCX(LIBCCALL libc_futimes64)(fd_t fd, struct timeval64 const tvp[2]);
+INTDEF ATTR_FDARG(1) ATTR_IN_OPT(2) int NOTHROW_NCX(LIBCCALL libc_futimes64)(fd_t fd, struct timeval64 const tvp[2]);
 /* >> futimesat(2), futimesat64(2) */
-INTDEF ATTR_IN(2) ATTR_IN_OPT(3) int NOTHROW_NCX(LIBCCALL libc_futimesat64)(fd_t fd, char const *file, struct timeval64 const tvp[2]);
+INTDEF ATTR_FDARG(1) ATTR_IN(2) ATTR_IN_OPT(3) int NOTHROW_NCX(LIBCCALL libc_futimesat64)(fd_t fd, char const *file, struct timeval64 const tvp[2]);
 #endif /* !__KERNEL__ */
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc07c7c7a */
+/* HASH CRC-32:0x3c7888f0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,8 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF int NOTHROW_RPC(LIBCCALL libc_bindresvport)(fd_t sockfd, struct sockaddr_in *sock_in);
-INTDEF int NOTHROW_RPC(LIBCCALL libc_bindresvport6)(fd_t sockfd, struct sockaddr_in6 *sock_in);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC(LIBCCALL libc_bindresvport)(fd_t sockfd, struct sockaddr_in *sock_in);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC(LIBCCALL libc_bindresvport6)(fd_t sockfd, struct sockaddr_in6 *sock_in);
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_space)(int nbytes);
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_init)(void *bp, struct cmsghdr **cmsgp, int type);
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_append)(struct cmsghdr *cmsg, uint8_t const *typep, int multx, int plusy);
@@ -52,10 +52,10 @@ INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_add)(void *bp, struct in6_add
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_reverse)(void const *in, void *out);
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_segments)(void const *bp);
 INTDEF struct in6_addr *NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_getaddr)(void const *bp, int index);
-INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_getipv4sourcefilter)(fd_t sockfd, struct in_addr interface_addr, struct in_addr group, uint32_t *fmode, uint32_t *numsrc, struct in_addr *slist);
-INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_setipv4sourcefilter)(fd_t sockfd, struct in_addr interface_addr, struct in_addr group, uint32_t fmode, uint32_t numsrc, struct in_addr const *slist);
-INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_getsourcefilter)(fd_t sockfd, uint32_t interface_addr, struct sockaddr const *group, socklen_t grouplen, uint32_t *fmode, uint32_t *numsrc, struct sockaddr_storage *slist);
-INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_setsourcefilter)(fd_t sockfd, uint32_t interface_addr, struct sockaddr const *group, socklen_t grouplen, uint32_t fmode, uint32_t numsrc, struct sockaddr_storage const *slist);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC_KOS(LIBCCALL libc_getipv4sourcefilter)(fd_t sockfd, struct in_addr interface_addr, struct in_addr group, uint32_t *fmode, uint32_t *numsrc, struct in_addr *slist);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC_KOS(LIBCCALL libc_setipv4sourcefilter)(fd_t sockfd, struct in_addr interface_addr, struct in_addr group, uint32_t fmode, uint32_t numsrc, struct in_addr const *slist);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC_KOS(LIBCCALL libc_getsourcefilter)(fd_t sockfd, uint32_t interface_addr, struct sockaddr const *group, socklen_t grouplen, uint32_t *fmode, uint32_t *numsrc, struct sockaddr_storage *slist);
+INTDEF ATTR_FDARG(1) int NOTHROW_RPC_KOS(LIBCCALL libc_setsourcefilter)(fd_t sockfd, uint32_t interface_addr, struct sockaddr const *group, socklen_t grouplen, uint32_t fmode, uint32_t numsrc, struct sockaddr_storage const *slist);
 #endif /* !__KERNEL__ */
 
 DECL_END

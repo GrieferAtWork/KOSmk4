@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c326586 */
+/* HASH CRC-32:0xe810dd63 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ INTDEF ATTR_PURE WUNUSED ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd___flbf)(FIL
  * as  all unread data previously buffered, but not yet read. After
  * a call to this function, the next `fread(3)' or `fwrite(3)' will
  * start off from a blank state. */
-INTDEF void NOTHROW_NCX(LIBDCALL libd___fpurge)(FILE *stream);
+INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBDCALL libd___fpurge)(FILE *stream);
 /* >> __fpending(3), __fpending_unlocked(3)
  * Returns the number of pending, but not-yet-written bytes of modified
  * file  data (s.a. `__fwriting(3)'). A call to `fflush(3)' can be used
@@ -88,12 +88,12 @@ INTDEF ATTR_PURE WUNUSED ATTR_IN(1) size_t NOTHROW_NCX(LIBDCALL libd___fpending_
  * that aren't already lock-less by nature (iow: everything but `*_unlocked(3)')
  * @param: type: One of `FSETLOCKING_*', as defined in `<stdio_ext.h>'
  * @return: * : The locking type prior to this call (one of `FSETLOCKING_INTERNAL' or `FSETLOCKING_BYCALLER') */
-INTDEF int NOTHROW_NCX(LIBDCALL libd___fsetlocking)(FILE *stream, int type);
+INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd___fsetlocking)(FILE *stream, int type);
 /* >> __fseterr(3)
  * Set the error indicator of `stream', the same an error file error would, such
  * that `ferror(stream) != 0', and `clearerr(stream)' must be used if one wishes
  * to clear the error once again. */
-INTDEF void NOTHROW_NCX(LIBDCALL libd___fseterr)(FILE *stream);
+INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBDCALL libd___fseterr)(FILE *stream);
 /* >> __freadahead(3), __freadahead_unlocked(3)
  * Returns  the # of bytes pending to-be read from the given `stream's internal buffer.
  * Once this many bytes have been read (or `__fpurge(3)' is called), the next read will

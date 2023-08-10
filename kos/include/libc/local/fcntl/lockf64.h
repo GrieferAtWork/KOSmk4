@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93b01db4 */
+/* HASH CRC-32:0x57a9c7de */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,18 +37,18 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_locking_defined
 #define __local___localdep_crt_locking_defined
 #ifdef __CRT_HAVE_locking
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_locking,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __pos32_t __length),locking,(__fd,__cmd,__length))
+__CREDIRECT(__ATTR_FDARG(1),int,__NOTHROW_RPC,__localdep_crt_locking,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __pos32_t __length),locking,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE__locking)
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_locking,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __pos32_t __length),_locking,(__fd,__cmd,__length))
+__CREDIRECT(__ATTR_FDARG(1),int,__NOTHROW_RPC,__localdep_crt_locking,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __pos32_t __length),_locking,(__fd,__cmd,__length))
 #else /* ... */
 #undef __local___localdep_crt_locking_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_locking_defined */
 #if !defined(__local___localdep_lockf32_defined) && defined(__CRT_HAVE_lockf)
 #define __local___localdep_lockf32_defined
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_lockf32,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __pos32_t __length),lockf,(__fd,__cmd,__length))
+__CREDIRECT(__ATTR_FDARG(1),int,__NOTHROW_RPC,__localdep_lockf32,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __pos32_t __length),lockf,(__fd,__cmd,__length))
 #endif /* !__local___localdep_lockf32_defined && __CRT_HAVE_lockf */
-__LOCAL_LIBC(lockf64) int
+__LOCAL_LIBC(lockf64) __ATTR_FDARG(1) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lockf64))(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET64 __length) {
 #ifdef __CRT_HAVE_lockf
 	return (__NAMESPACE_LOCAL_SYM __localdep_lockf32)(__fd, __cmd, (__pos32_t)__length);

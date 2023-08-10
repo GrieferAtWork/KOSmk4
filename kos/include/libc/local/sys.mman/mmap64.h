@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3db571a0 */
+/* HASH CRC-32:0xf867fba1 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,14 +37,14 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mmap32_defined
 #define __local___localdep_mmap32_defined
 #ifdef __CRT_HAVE_mmap
-__CREDIRECT(__ATTR_ACCESS_NONE(1),void *,__NOTHROW_NCX,__localdep_mmap32,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __off32_t __offset),mmap,(__addr,__len,__prot,__flags,__fd,__offset))
+__CREDIRECT(__ATTR_ACCESS_NONE(1) __ATTR_FDARG(5),void *,__NOTHROW_NCX,__localdep_mmap32,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __off32_t __offset),mmap,(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE___mmap)
-__CREDIRECT(__ATTR_ACCESS_NONE(1),void *,__NOTHROW_NCX,__localdep_mmap32,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __off32_t __offset),__mmap,(__addr,__len,__prot,__flags,__fd,__offset))
+__CREDIRECT(__ATTR_ACCESS_NONE(1) __ATTR_FDARG(5),void *,__NOTHROW_NCX,__localdep_mmap32,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __off32_t __offset),__mmap,(__addr,__len,__prot,__flags,__fd,__offset))
 #else /* ... */
 #undef __local___localdep_mmap32_defined
 #endif /* !... */
 #endif /* !__local___localdep_mmap32_defined */
-__LOCAL_LIBC(mmap64) __ATTR_WUNUSED __ATTR_ACCESS_NONE(1) void *
+__LOCAL_LIBC(mmap64) __ATTR_WUNUSED __ATTR_ACCESS_NONE(1) __ATTR_FDARG(5) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mmap64))(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __PIO_OFFSET64 __offset) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_mmap32)(__addr, __len, __prot, __flags, __fd, (__off32_t)(__pos32_t)(__pos64_t)__offset);
 }

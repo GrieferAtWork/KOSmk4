@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe4a3386 */
+/* HASH CRC-32:0xbbe517d5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -134,8 +134,8 @@ struct __vasnprintf_data {
 	char  *__vapd_ptr; /* [0..vapd_cnt] Pointer into `vapd_buf' for where to continue writing */
 	__SIZE_TYPE__ __vapd_cnt; /* # of remaining, available bytes in `vapd_ptr' (excluding space for trailing NUL) */
 };
-__LOCAL_LIBC(vasnprintf_printer) __SSIZE_TYPE__ __FORMATPRINTER_CC
-__vasnprintf_printer(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
+__LOCAL_LIBC(vasnprintf_printer) __SSIZE_TYPE__
+__NOTHROW_NCX(__FORMATPRINTER_CC __vasnprintf_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	struct __vasnprintf_data *__cookie;
 	__cookie = (struct __vasnprintf_data *)__arg;
 

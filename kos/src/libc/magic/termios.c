@@ -761,7 +761,7 @@ int cfsetispeed([[inout]] struct termios *__restrict termios_p, speed_t speed) {
 [[decl_include("<bits/os/termios.h>", "<bits/types.h>"), export_alias("__tcgetattr")]]
 [[requires_include("<asm/os/tty.h>")]] /* __TCGETA */
 [[requires($has_function(ioctl) && defined(__TCGETA))]]
-int tcgetattr($fd_t fd, [[out]] struct termios *__restrict termios_p) {
+int tcgetattr([[fdarg]] $fd_t fd, [[out]] struct termios *__restrict termios_p) {
 	return (int)ioctl(fd, __TCGETA, termios_p);
 }
 
@@ -771,7 +771,7 @@ int tcgetattr($fd_t fd, [[out]] struct termios *__restrict termios_p) {
 [[impl_include("<asm/os/tty.h>", "<asm/os/termios.h>", "<libc/errno.h>")]]
 [[decl_include("<features.h>", "<bits/os/termios.h>", "<bits/types.h>")]]
 [[requires_function(ioctl)]]
-int tcsetattr($fd_t fd, __STDC_INT_AS_UINT_T optional_actions,
+int tcsetattr([[fdarg]] $fd_t fd, __STDC_INT_AS_UINT_T optional_actions,
               [[in]] struct termios const *__restrict termios_p) {
 	int cmd;
 	switch (optional_actions) {
@@ -809,7 +809,7 @@ int tcsetattr($fd_t fd, __STDC_INT_AS_UINT_T optional_actions,
 [[decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TCSBRKP))]]
-int tcsendbreak($fd_t fd, int duration) {
+int tcsendbreak([[fdarg]] $fd_t fd, int duration) {
 	return (int)ioctl(fd, __TCSBRKP, duration);
 }
 
@@ -817,7 +817,7 @@ int tcsendbreak($fd_t fd, int duration) {
 [[cp, decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TCSBRK))]]
-int tcdrain($fd_t fd) {
+int tcdrain([[fdarg]] $fd_t fd) {
 	return (int)ioctl(fd, __TCSBRK, 1);
 }
 
@@ -830,7 +830,7 @@ int tcdrain($fd_t fd) {
 [[decl_include("<features.h>", "<bits/types.h>")]]
 [[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TCFLSH))]]
-int tcflush($fd_t fd, __STDC_INT_AS_UINT_T queue_selector) {
+int tcflush([[fdarg]] $fd_t fd, __STDC_INT_AS_UINT_T queue_selector) {
 	return (int)ioctl(fd, __TCFLSH, queue_selector);
 }
 
@@ -839,7 +839,7 @@ int tcflush($fd_t fd, __STDC_INT_AS_UINT_T queue_selector) {
 [[decl_include("<features.h>", "<bits/types.h>")]]
 [[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TCXONC))]]
-int tcflow($fd_t fd, __STDC_INT_AS_UINT_T action) {
+int tcflow([[fdarg]] $fd_t fd, __STDC_INT_AS_UINT_T action) {
 	return (int)ioctl(fd, __TCXONC, action);
 }
 
@@ -851,7 +851,7 @@ int tcflow($fd_t fd, __STDC_INT_AS_UINT_T action) {
 [[decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TIOCGSID))]]
-$pid_t tcgetsid($fd_t fd) {
+$pid_t tcgetsid([[fdarg]] $fd_t fd) {
 	pid_t result;
 	if unlikely(ioctl(fd, __TIOCGSID, &result) < 0)
 		result = -1;
@@ -868,7 +868,7 @@ $pid_t tcgetsid($fd_t fd) {
 [[impl_include("<libc/errno.h>")]]
 [[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TIOCSCTTY))]]
-int tcsetsid($fd_t fd, $pid_t pid) {
+int tcsetsid([[fdarg]] $fd_t fd, $pid_t pid) {
 	int result;
 	if unlikely(pid != getsid(0)) {
 @@pp_ifdef EINVAL@@
@@ -1249,7 +1249,7 @@ void cfmakesane([[out]] struct termios *__restrict termios_p) {
 [[decl_include("<bits/os/termio.h>", "<bits/types.h>")]]
 [[requires_include("<asm/os/tty.h>")]] /* __TIOCGWINSZ */
 [[requires($has_function(ioctl) && defined(__TIOCGWINSZ))]]
-int tcgetwinsize($fd_t fd, [[out]] struct winsize *winsize_p) {
+int tcgetwinsize([[fdarg]] $fd_t fd, [[out]] struct winsize *winsize_p) {
 	return ioctl(fd, __TIOCGWINSZ, winsize_p);
 }
 
@@ -1257,7 +1257,7 @@ int tcgetwinsize($fd_t fd, [[out]] struct winsize *winsize_p) {
 [[decl_include("<bits/os/termio.h>", "<bits/types.h>")]]
 [[requires_include("<asm/os/tty.h>")]] /* __TIOCSWINSZ */
 [[requires($has_function(ioctl) && defined(__TIOCSWINSZ))]]
-int tcsetwinsize($fd_t fd, [[in]] struct winsize const *winsize_p) {
+int tcsetwinsize([[fdarg]] $fd_t fd, [[in]] struct winsize const *winsize_p) {
 	return ioctl(fd, __TIOCSWINSZ, winsize_p);
 }
 %#endif /* __USE_NETBSD */
