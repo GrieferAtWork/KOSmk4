@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xedbc8c8a */
+/* HASH CRC-32:0x450692ff */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,9 +72,9 @@ INTDEF ATTR_INOUT(2) wint16_t NOTHROW_NCX(LIBDCALL libd_ungetwc_unlocked)(wint16
 /* >> ungetwc(3), ungetwc_unlocked(3) */
 INTDEF ATTR_INOUT(2) wint32_t NOTHROW_NCX(LIBKCALL libc_ungetwc_unlocked)(wint32_t ch, FILE *__restrict stream);
 /* >> fgetwln(3) */
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_OUT_OPT(2) char16_t *NOTHROW_NCX(LIBDCALL libd_fgetwln)(FILE *__restrict fp, size_t *__restrict lenp);
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_OUT_OPT(2) char16_t *NOTHROW_NCX(LIBDCALL libd_fgetwln)(FILE *__restrict stream, size_t *__restrict lenp);
 /* >> fgetwln(3) */
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_OUT_OPT(2) char32_t *NOTHROW_NCX(LIBKCALL libc_fgetwln)(FILE *__restrict fp, size_t *__restrict lenp);
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_OUT_OPT(2) char32_t *NOTHROW_NCX(LIBKCALL libc_fgetwln)(FILE *__restrict stream, size_t *__restrict lenp);
 #endif /* !__KERNEL__ */
 
 DECL_END

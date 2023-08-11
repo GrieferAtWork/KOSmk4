@@ -3355,18 +3355,18 @@ NOTHROW_NCX(LIBCCALL libc_fgetln)(FILE *__restrict stream,
 			assert(bufsiz >= new_bufsiz);
 			stream->if_exdata->io_getln = result;
 		}
-		ch = libc_fgetc(stream);
+		ch = libc_fgetc_unlocked(stream);
 		if (ch == EOF)
 			break; /* End-of-file */
 		if (ch == '\r') {
 			/* Special handling to convert both `\r' and `\r\n' into `\n' */
 			result[i++] = '\n';
-			ch = libc_fgetc(stream);
+			ch = libc_fgetc_unlocked(stream);
 			if (ch == EOF)
 				break;
 			if (ch == '\r')
 				continue;
-			libc_ungetc(ch, stream);
+			libc_ungetc_unlocked(ch, stream);
 			break;
 		}
 		result[i] = (char)ch;

@@ -457,33 +457,163 @@ NOTHROW_NCX(LIBDCALL libd_open_wmemstream)(char16_t **bufloc,
 
 
 
-/*[[[head:libd_fgetwln,hash:CRC-32=0xe125bc5b]]]*/
+/*[[[head:libd_fgetwln,hash:CRC-32=0x5f428ce3]]]*/
 /* >> fgetwln(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") WUNUSED ATTR_INOUT(1) ATTR_OUT_OPT(2) char16_t *
-NOTHROW_NCX(LIBDCALL libd_fgetwln)(FILE *__restrict fp,
+NOTHROW_NCX(LIBDCALL libd_fgetwln)(FILE *__restrict stream,
                                    size_t *__restrict lenp)
 /*[[[body:libd_fgetwln]]]*/
-/*AUTO*/{
-	(void)fp;
-	(void)lenp;
-	CRT_UNIMPLEMENTEDF("DOS$fgetwln(fp: %p, lenp: %p)", fp, lenp); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+{
+	size_t i, bufsiz;
+	char16_t *result;
+	if unlikely(!stream) {
+		(void)libc_seterrno(EINVAL);
+		return NULL;
+	}
+	stream = file_fromuser(stream);
+	if (FEOF(stream)) /* XXX: Also do this on FERROR()? */
+		return NULL;  /* Must return `NULL' after EOF */
+	result = (char16_t *)stream->if_exdata->io_getln;
+	if (!result) {
+		result = (char16_t *)malloc(IOBUF_MIN, sizeof(char16_t));
+		if unlikely(!result)
+			return NULL;
+		stream->if_exdata->io_getln = (char *)result;
+	}
+	bufsiz = malloc_usable_size(result) / sizeof(char16_t);
+	assert(bufsiz != 0);
+	for (i = 0;; ++i) {
+		wint16_t ch;
+		if (i >= bufsiz - 1) {
+			/* Allocate larger buffer. */
+			size_t new_bufsiz = bufsiz * 2;
+			char16_t *new_result;
+			new_result = (char16_t *)realloc(result, new_bufsiz, sizeof(char16_t));
+			if unlikely(!new_result) {
+				new_bufsiz = i + 2;
+				new_result = (char16_t *)realloc(result, new_bufsiz, sizeof(char16_t));
+				if unlikely(!new_result)
+					return NULL;
+			}
+			result = new_result;
+			bufsiz = malloc_usable_size(result) / sizeof(char16_t);
+			assert(bufsiz >= new_bufsiz);
+			stream->if_exdata->io_getln = (char *)result;
+		}
+		ch = libd_fgetwc_unlocked(stream);
+		if (ch == WEOF32)
+			break; /* End-of-file */
+		if (ch == (wint16_t)'\r') {
+			/* Special handling to convert both `\r' and `\r\n' into `\n' */
+			result[i++] = (char16_t)'\n';
+			ch = libd_fgetwc_unlocked(stream);
+			if (ch == (wint16_t)WEOF32)
+				break;
+			if (ch == (wint16_t)'\r')
+				continue;
+			libd_ungetwc_unlocked(ch, stream);
+			break;
+		}
+		result[i] = (char16_t)ch;
+		if (ch == (wint16_t)'\n') {
+			++i; /* Must keep the trailing '\n' at the end of lines! */
+			break;
+		}
+	}
+
+	/* Special case: absolutely _must_ return `NULL' on EOF */
+	if (i == 0)
+		return NULL;
+
+	/* NUL-terminate line.
+	 * NOTE: This is actually a KOS extension, as BSD's fgetln()
+	 *       documents that it  doesn't NUL-terminate the  line! */
+	result[i] = '\0';
+
+	/* KOS extension: we make the `lenp' argument optional. */
+	if (lenp != NULL)
+		*lenp = i;
+	return result;
 }
 /*[[[end:libd_fgetwln]]]*/
 
-/*[[[head:libc_fgetwln,hash:CRC-32=0xc6608efc]]]*/
+/*[[[head:libc_fgetwln,hash:CRC-32=0x8015928a]]]*/
 /* >> fgetwln(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") WUNUSED ATTR_INOUT(1) ATTR_OUT_OPT(2) char32_t *
-NOTHROW_NCX(LIBKCALL libc_fgetwln)(FILE *__restrict fp,
+NOTHROW_NCX(LIBKCALL libc_fgetwln)(FILE *__restrict stream,
                                    size_t *__restrict lenp)
 /*[[[body:libc_fgetwln]]]*/
-/*AUTO*/{
-	(void)fp;
-	(void)lenp;
-	CRT_UNIMPLEMENTEDF("fgetwln(fp: %p, lenp: %p)", fp, lenp); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+{
+	size_t i, bufsiz;
+	char32_t *result;
+	if unlikely(!stream) {
+		(void)libc_seterrno(EINVAL);
+		return NULL;
+	}
+	stream = file_fromuser(stream);
+	if (FEOF(stream)) /* XXX: Also do this on FERROR()? */
+		return NULL;  /* Must return `NULL' after EOF */
+	result = (char32_t *)stream->if_exdata->io_getln;
+	if (!result) {
+		result = (char32_t *)malloc(IOBUF_MIN, sizeof(char32_t));
+		if unlikely(!result)
+			return NULL;
+		stream->if_exdata->io_getln = (char *)result;
+	}
+	bufsiz = malloc_usable_size(result) / sizeof(char32_t);
+	assert(bufsiz != 0);
+	for (i = 0;; ++i) {
+		wint32_t ch;
+		if (i >= bufsiz - 1) {
+			/* Allocate larger buffer. */
+			size_t new_bufsiz = bufsiz * 2;
+			char32_t *new_result;
+			new_result = (char32_t *)realloc(result, new_bufsiz, sizeof(char32_t));
+			if unlikely(!new_result) {
+				new_bufsiz = i + 2;
+				new_result = (char32_t *)realloc(result, new_bufsiz, sizeof(char32_t));
+				if unlikely(!new_result)
+					return NULL;
+			}
+			result = new_result;
+			bufsiz = malloc_usable_size(result) / sizeof(char32_t);
+			assert(bufsiz >= new_bufsiz);
+			stream->if_exdata->io_getln = (char *)result;
+		}
+		ch = libc_fgetwc_unlocked(stream);
+		if (ch == WEOF32)
+			break; /* End-of-file */
+		if (ch == (wint32_t)'\r') {
+			/* Special handling to convert both `\r' and `\r\n' into `\n' */
+			result[i++] = (char32_t)'\n';
+			ch = libc_fgetwc_unlocked(stream);
+			if (ch == (wint32_t)WEOF32)
+				break;
+			if (ch == (wint32_t)'\r')
+				continue;
+			libc_ungetwc_unlocked(ch, stream);
+			break;
+		}
+		result[i] = (char32_t)ch;
+		if (ch == (wint32_t)'\n') {
+			++i; /* Must keep the trailing '\n' at the end of lines! */
+			break;
+		}
+	}
+
+	/* Special case: absolutely _must_ return `NULL' on EOF */
+	if (i == 0)
+		return NULL;
+
+	/* NUL-terminate line.
+	 * NOTE: This is actually a KOS extension, as BSD's fgetln()
+	 *       documents that it  doesn't NUL-terminate the  line! */
+	result[i] = '\0';
+
+	/* KOS extension: we make the `lenp' argument optional. */
+	if (lenp != NULL)
+		*lenp = i;
+	return result;
 }
 /*[[[end:libc_fgetwln]]]*/
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4369587 */
+/* HASH CRC-32:0x6852e426 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -156,7 +156,6 @@
 #define __stub_fesetexcept
 #define __stub_fesetmode
 #define __stub_fetestexceptflag
-#define __stub_fgetwln
 #define __stub___fp_nquery
 #define __stub_fp_nquery
 #define __stub___fp_query
@@ -559,7 +558,6 @@
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #endif /* !__LIBCCALL_IS_LIBDCALL */
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
-#define __stub_DOS$fgetwln
 #define __stub_DOS$open_wmemstream
 #define __stub_DOS$ptsname_r
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */

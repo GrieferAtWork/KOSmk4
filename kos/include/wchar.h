@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c50e5a7 */
+/* HASH CRC-32:0x98befe2d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4198,7 +4198,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wildwcscasecmp_l, __FORCELOCAL __ATTR_ARTIFICIAL
 #if !defined(__fgetwln_defined) && defined(__CRT_HAVE_fgetwln)
 #define __fgetwln_defined
 /* >> fgetwln(3) */
-__CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT_OPT(2),wchar_t *,__NOTHROW_NCX,fgetwln,(FILE *__restrict __fp, __SIZE_TYPE__ *__restrict __lenp),(__fp,__lenp))
+__CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT_OPT(2),wchar_t *,__NOTHROW_NCX,fgetwln,(FILE *__restrict __stream, __SIZE_TYPE__ *__restrict __lenp),(__stream,__lenp))
 #endif /* !__fgetwln_defined && __CRT_HAVE_fgetwln */
 #ifndef __wcslcat_defined
 #define __wcslcat_defined

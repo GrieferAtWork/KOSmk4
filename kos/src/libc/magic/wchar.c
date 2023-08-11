@@ -2516,7 +2516,7 @@ wildwcscasecmp_l(*) %{generate(str2wcs("wildstrcasecmp_l"))}
 %#ifdef __USE_BSD
 @@>> fgetwln(3)
 [[wchar, guard, wunused, decl_include("<hybrid/typecore.h>")]]
-wchar_t *fgetwln([[inout]] FILE *__restrict fp,
+wchar_t *fgetwln([[inout]] FILE *__restrict stream,
                  [[out_opt]] $size_t *__restrict lenp);
 
 @@>> wcslcat(3)
