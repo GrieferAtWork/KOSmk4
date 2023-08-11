@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25906426 */
+/* HASH CRC-32:0xa35eb0d6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1723,8 +1723,9 @@ DFUN(".text.crt.dos.net.ether", libd_ether_ntoa, libc_ether_ntoa, TP, 1, TP)
 DFUN(".text.crt.dos.net.ether", libd_ether_ntoa_r, libc_ether_ntoa_r, TP, 2, TP, TP)
 DFUN(".text.crt.dos.net.ether", libd_ether_aton, libc_ether_aton, TP, 1, TP)
 DFUN(".text.crt.dos.net.ether", libd_ether_aton_r, libc_ether_aton_r, TP, 2, TP, TP)
-DFUN(".text.crt.dos.net.ether", libd_ether_paton_r, libc_ether_paton_r, TP, 2, TP, TP)
+DFUN(".text.crt.dos.net.ether", libd_ether_aton_np, libc_ether_aton_np, TP, 2, TP, TP)
 DFUN(".text.crt.dos.net.ether", libd_ether_line, libc_ether_line, TD, 3, TP, TP, TP)
+DFUN(".text.crt.dos.net.ether", libd_ether_line_np, libc_ether_line_np, TP, 2, TP, TP)
 DFUN(".text.crt.dos.net.ether", libd_ether_ntohost, libc_ether_ntohost, TD, 2, TP, TP)
 DFUN(".text.crt.dos.net.ether", libd_ether_hostton, libc_ether_hostton, TD, 2, TP, TP)
 

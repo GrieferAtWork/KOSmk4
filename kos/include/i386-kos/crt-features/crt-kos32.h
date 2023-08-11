@@ -2854,13 +2854,14 @@
 #define __CRT_HAVE_error_print_progname
 #define __CRT_HAVE_errx
 #define __CRT_HAVE_ether_aton
+#define __CRT_HAVE_ether_aton_np
 #define __CRT_HAVE_ether_aton_r
 #define __CRT_HAVE_ether_hostton
 #define __CRT_HAVE_ether_line
+#define __CRT_HAVE_ether_line_np
 #define __CRT_HAVE_ether_ntoa
 #define __CRT_HAVE_ether_ntoa_r
 #define __CRT_HAVE_ether_ntohost
-#define __CRT_HAVE_ether_paton_r
 #define __CRT_HAVE_euidaccess
 #define __CRT_HAVE_eventfd
 #define __CRT_HAVE_eventfd_read

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2d6881d */
+/* HASH CRC-32:0xd49d8c3f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,22 +18,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_ether_line_defined
-#define __local_ether_line_defined
+#ifndef __local_ether_line_r_defined
+#define __local_ether_line_r_defined
 #include <__crt.h>
 struct ether_addr;
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_ether_aton_np_defined
-#define __local___localdep_ether_aton_np_defined
-#ifdef __CRT_HAVE_ether_aton_np
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2),char *,__NOTHROW_NCX,__localdep_ether_aton_np,(char const *__restrict __asc, struct ether_addr *__restrict __addr),ether_aton_np,(__asc,__addr))
-#else /* __CRT_HAVE_ether_aton_np */
+#ifndef __local___localdep_ether_aton_p_defined
+#define __local___localdep_ether_aton_p_defined
+#ifdef __CRT_HAVE_ether_aton_p
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT(2),char *,__NOTHROW_NCX,__localdep_ether_aton_p,(char const *__restrict __asc, struct ether_addr *__restrict __addr),ether_aton_p,(__asc,__addr))
+#else /* __CRT_HAVE_ether_aton_p */
 __NAMESPACE_LOCAL_END
-#include <libc/local/netinet.ether/ether_aton_np.h>
+#include <libc/local/netinet.ether/ether_aton_p.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_ether_aton_np __LIBC_LOCAL_NAME(ether_aton_np)
-#endif /* !__CRT_HAVE_ether_aton_np */
-#endif /* !__local___localdep_ether_aton_np_defined */
+#define __localdep_ether_aton_p __LIBC_LOCAL_NAME(ether_aton_p)
+#endif /* !__CRT_HAVE_ether_aton_p */
+#endif /* !__local___localdep_ether_aton_p_defined */
 #ifndef __local___localdep_isspace_defined
 #define __local___localdep_isspace_defined
 __NAMESPACE_LOCAL_END
@@ -54,38 +54,20 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_isspace __LIBC_LOCAL_NAME(isspace)
 #endif /* !... */
 #endif /* !__local___localdep_isspace_defined */
-#ifndef __local___localdep_mempcpy_defined
-#define __local___localdep_mempcpy_defined
-#ifdef __CRT_HAVE_mempcpy
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
-#elif defined(__CRT_HAVE___mempcpy)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/string/mempcpy.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_mempcpy __LIBC_LOCAL_NAME(mempcpy)
-#endif /* !... */
-#endif /* !__local___localdep_mempcpy_defined */
 __NAMESPACE_LOCAL_END
 #include <net/ethernet.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ether_line) __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(3) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_line))(char const *__line, struct ether_addr *__addr, char *__hostname) {
+__LOCAL_LIBC(ether_line_r) __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) char *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_line_r))(char *__line, struct ether_addr *__addr) {
 	__SIZE_TYPE__ __hnlen;
 	while ((__NAMESPACE_LOCAL_SYM __localdep_isspace)(*__line) && *__line != '\r' && *__line != '\n')
 		++__line;
-	__line = (__NAMESPACE_LOCAL_SYM __localdep_ether_aton_np)(__line, __addr);
+	__line = (__NAMESPACE_LOCAL_SYM __localdep_ether_aton_p)(&__line, __addr);
 	if (!__line)
-		return -1; /* This also handles comment lines! */
+		return __NULLPTR; /* This also handles comment lines! */
 	while ((__NAMESPACE_LOCAL_SYM __localdep_isspace)(*__line) && *__line != '\r' && *__line != '\n')
 		++__line;
+
 	/* The remainder of the line is the hostname. */
 	for (__hnlen = 0;
 	     __line[__hnlen] &&
@@ -96,14 +78,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_line))(char const *__line, stru
 	while (__hnlen && (__NAMESPACE_LOCAL_SYM __localdep_isspace)(__line[__hnlen - 1]))
 		--__hnlen;
 	if (!__hnlen)
-		return -1; /* No hostname */
-	__hostname = (char *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpy)(__hostname, __line, __hnlen);
-	*__hostname = '\0'; /* NUL-terminate */
-	return 0;
+		return __NULLPTR; /* No hostname */
+	__line[__hnlen] = '\0'; /* NUL-terminate */
+	return __line;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_ether_line_defined
-#define __local___localdep_ether_line_defined
-#define __localdep_ether_line __LIBC_LOCAL_NAME(ether_line)
-#endif /* !__local___localdep_ether_line_defined */
-#endif /* !__local_ether_line_defined */
+#ifndef __local___localdep_ether_line_r_defined
+#define __local___localdep_ether_line_r_defined
+#define __localdep_ether_line_r __LIBC_LOCAL_NAME(ether_line_r)
+#endif /* !__local___localdep_ether_line_r_defined */
+#endif /* !__local_ether_line_r_defined */

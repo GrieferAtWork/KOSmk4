@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9489dd9 */
+/* HASH CRC-32:0x118f6760 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,23 +23,23 @@
 #include <__crt.h>
 struct ether_addr;
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_ether_paton_r_defined
-#define __local___localdep_ether_paton_r_defined
-#ifdef __CRT_HAVE_ether_paton_r
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT(2),struct ether_addr *,__NOTHROW_NCX,__localdep_ether_paton_r,(char const **__restrict __pasc, struct ether_addr *__restrict __addr),ether_paton_r,(__pasc,__addr))
-#else /* __CRT_HAVE_ether_paton_r */
+#ifndef __local___localdep_ether_aton_np_defined
+#define __local___localdep_ether_aton_np_defined
+#ifdef __CRT_HAVE_ether_aton_np
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2),char *,__NOTHROW_NCX,__localdep_ether_aton_np,(char const *__restrict __asc, struct ether_addr *__restrict __addr),ether_aton_np,(__asc,__addr))
+#else /* __CRT_HAVE_ether_aton_np */
 __NAMESPACE_LOCAL_END
-#include <libc/local/netinet.ether/ether_paton_r.h>
+#include <libc/local/netinet.ether/ether_aton_np.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_ether_paton_r __LIBC_LOCAL_NAME(ether_paton_r)
-#endif /* !__CRT_HAVE_ether_paton_r */
-#endif /* !__local___localdep_ether_paton_r_defined */
+#define __localdep_ether_aton_np __LIBC_LOCAL_NAME(ether_aton_np)
+#endif /* !__CRT_HAVE_ether_aton_np */
+#endif /* !__local___localdep_ether_aton_np_defined */
 __NAMESPACE_LOCAL_END
 #include <net/ethernet.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ether_aton_r) __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) struct ether_addr *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_aton_r))(char const *__restrict __asc, struct ether_addr *__restrict __addr) {
-	return (__NAMESPACE_LOCAL_SYM __localdep_ether_paton_r)((char const **)&__asc, __addr);
+	return (__NAMESPACE_LOCAL_SYM __localdep_ether_aton_np)(__asc, __addr) ? __addr : __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ether_aton_r_defined

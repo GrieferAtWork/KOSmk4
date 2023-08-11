@@ -136,7 +136,7 @@ $fd_t opendev([[in]] char const *path, $oflag_t oflags,
 [[section(".text.crt{|.dos}.FILE.locked.read.read")]]
 char *fparseln([[inout]] $FILE *stream,
                [[out_opt]] size_t *plen,
-               [[out_opt]] size_t *plineno,
+               [[inout_opt]] size_t *plineno,
                [[in_opt]] char const delim[3],
                __STDC_INT_AS_UINT_T flags) {
 	char *result;

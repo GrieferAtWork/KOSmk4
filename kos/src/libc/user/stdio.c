@@ -3389,9 +3389,6 @@ NOTHROW_NCX(LIBCCALL libc_fgetln)(FILE *__restrict stream,
 	if (lenp != NULL)
 		*lenp = i;
 	return result;
-
-
-
 }
 /*[[[end:libc_fgetln]]]*/
 

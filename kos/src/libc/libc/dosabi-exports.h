@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa31836ae */
+/* HASH CRC-32:0x33d488a5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1562,8 +1562,9 @@ DEFINE_PUBLIC_ALIAS(DOS$ether_ntoa, libd_ether_ntoa);
 DEFINE_PUBLIC_ALIAS(DOS$ether_ntoa_r, libd_ether_ntoa_r);
 DEFINE_PUBLIC_ALIAS(DOS$ether_aton, libd_ether_aton);
 DEFINE_PUBLIC_ALIAS(DOS$ether_aton_r, libd_ether_aton_r);
-DEFINE_PUBLIC_ALIAS(DOS$ether_paton_r, libd_ether_paton_r);
+DEFINE_PUBLIC_ALIAS(DOS$ether_aton_np, libd_ether_aton_np);
 DEFINE_PUBLIC_ALIAS(DOS$ether_line, libd_ether_line);
+DEFINE_PUBLIC_ALIAS(DOS$ether_line_np, libd_ether_line_np);
 DEFINE_PUBLIC_ALIAS(DOS$ether_ntohost, libd_ether_ntohost);
 DEFINE_PUBLIC_ALIAS(DOS$ether_hostton, libd_ether_hostton);
 

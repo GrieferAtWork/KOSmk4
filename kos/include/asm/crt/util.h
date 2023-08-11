@@ -22,8 +22,6 @@
 
 #include <__crt.h>
 
-#if defined(__CRT_KOS) || 1
-
 /* Options for the `dflags' argument to `opendev(3)' */
 #define __OPENDEV_PART 0x01 /* Attempt to open a raw partition during expansion. */
 #define __OPENDEV_BLCK 0x02 /* Open a block device (rather than a character device). */
@@ -35,31 +33,6 @@
 #define __FPARSELN_UNESCREST 0x08 /* Remove escape before some other character.*/
 #define __FPARSELN_UNESCALL \
 	(__FPARSELN_UNESCESC | __FPARSELN_UNESCCONT | __FPARSELN_UNESCCOMM | __FPARSELN_UNESCREST)
-
-#endif /* __CRT_KOS */
-
-
-/* If not supported by the CRT, then it's emulated by local headers,
- * meaning that we can unconditionally  support _all_ of the  flags! */
-#ifndef __CRT_HAVE_fparseln
-#if (!defined(__FPARSELN_UNESCESC) ||  \
-     !defined(__FPARSELN_UNESCCONT) || \
-     !defined(__FPARSELN_UNESCCOMM) || \
-     !defined(__FPARSELN_UNESCREST) || \
-     !defined(__FPARSELN_UNESCALL))
-#undef __FPARSELN_UNESCESC
-#undef __FPARSELN_UNESCCONT
-#undef __FPARSELN_UNESCCOMM
-#undef __FPARSELN_UNESCREST
-#undef __FPARSELN_UNESCALL
-#define __FPARSELN_UNESCESC  0x01 /* Remove escape before an escaped escape. */
-#define __FPARSELN_UNESCCONT 0x02 /* Remove escape before an escaped continuation. */
-#define __FPARSELN_UNESCCOMM 0x04 /* Remove escape before an escaped comment. */
-#define __FPARSELN_UNESCREST 0x08 /* Remove escape before some other character.*/
-#define __FPARSELN_UNESCALL \
-	(__FPARSELN_UNESCESC | __FPARSELN_UNESCCONT | __FPARSELN_UNESCCOMM | __FPARSELN_UNESCREST)
-#endif /* !defined(__FPARSELN_UNESC...) */
-#endif /* !__CRT_HAVE_fparseln */
 
 
 #endif /* !_ASM_CRT_UTIL_H */

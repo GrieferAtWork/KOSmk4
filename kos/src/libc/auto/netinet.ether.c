@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x740a8d86 */
+/* HASH CRC-32:0x5b760115 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,16 +24,19 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "../user/netinet.ether.h"
+#include "netinet.ether.h"
 #include "../user/ctype.h"
 #include "../user/stdio.h"
+#include "../user/stdlib.h"
 #include "string.h"
+#include "../user/util.h"
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <net/ethernet.h>
-/* Convert `addr' into a 20-character-long string that
+/* >> ether_ntoa(3), ether_ntoa_r(3)
+ * Convert `addr' into a 20-character-long string that
  * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
 INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *
 NOTHROW_NCX(LIBCCALL libc_ether_ntoa)(struct ether_addr const *__restrict addr) {
@@ -41,7 +44,8 @@ NOTHROW_NCX(LIBCCALL libc_ether_ntoa)(struct ether_addr const *__restrict addr) 
 	return libc_ether_ntoa_r(addr, buf);
 }
 #include <net/ethernet.h>
-/* Convert `addr' into a 20-character-long string that
+/* >> ether_ntoa(3), ether_ntoa_r(3)
+ * Convert `addr' into a 20-character-long string that
  * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
 INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL ATTR_IN(1) ATTR_OUT(2) char *
 NOTHROW_NCX(LIBCCALL libc_ether_ntoa_r)(struct ether_addr const *__restrict addr,
@@ -53,7 +57,8 @@ NOTHROW_NCX(LIBCCALL libc_ether_ntoa_r)(struct ether_addr const *__restrict addr
 	return buf;
 }
 #include <net/ethernet.h>
-/* To   the   reverse  of   `ether_ntoa()'   and  convert
+/* >> ether_aton(3), ether_aton_r(3), ether_aton_np(3)
+ * To   the   reverse  of   `ether_ntoa()'   and  convert
  * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL WUNUSED ATTR_IN(1) struct ether_addr *
 NOTHROW_NCX(LIBCCALL libc_ether_aton)(char const *__restrict asc) {
@@ -61,22 +66,23 @@ NOTHROW_NCX(LIBCCALL libc_ether_aton)(char const *__restrict asc) {
 	return libc_ether_aton_r(asc, &addr);
 }
 #include <net/ethernet.h>
-/* To   the   reverse  of   `ether_ntoa()'   and  convert
+/* >> ether_aton(3), ether_aton_r(3), ether_aton_np(3)
+ * To   the   reverse  of   `ether_ntoa()'   and  convert
  * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED ATTR_IN(1) ATTR_OUT(2) struct ether_addr *
 NOTHROW_NCX(LIBCCALL libc_ether_aton_r)(char const *__restrict asc,
                                         struct ether_addr *__restrict addr) {
-	return libc_ether_paton_r((char const **)&asc, addr);
+	return libc_ether_aton_np(asc, addr) ? addr : NULL;
 }
 #include <net/ethernet.h>
 #include <libc/template/hex.h>
-/* To   the   reverse  of   `ether_ntoa()'   and  convert
+/* >> ether_aton(3), ether_aton_r(3), ether_aton_np(3)
+ * To   the   reverse  of   `ether_ntoa()'   and  convert
  * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
-INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED ATTR_INOUT(1) ATTR_OUT(2) struct ether_addr *
-NOTHROW_NCX(LIBCCALL libc_ether_paton_r)(char const **__restrict pasc,
+INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED ATTR_IN(1) ATTR_OUT(2) char *
+NOTHROW_NCX(LIBCCALL libc_ether_aton_np)(char const *__restrict asc,
                                          struct ether_addr *__restrict addr) {
 	unsigned int i;
-	char const *asc = *pasc;
 	for (i = 0; i < 6; ++i) {
 		u8 octet, lo_octet;
 		char c;
@@ -100,16 +106,15 @@ NOTHROW_NCX(LIBCCALL libc_ether_paton_r)(char const **__restrict pasc,
 		}
 		addr->ether_addr_octet[i] = octet;
 	}
-	*pasc = asc;
-	return addr;
+	return (char *)asc;
 }
 #include <net/ethernet.h>
-/* Scan  a  given  `line',   as  read  from  `/etc/ethers'   for
+/* >> ether_line(3), ether_line_np(3)
+ * Scan  a  given  `line',   as  read  from  `/etc/ethers'   for
  * its `addr' and `hostname' parts. For this purpose, the  given
  * `line' must be formatted as `AA:BB:CC:DD:EE:FF  hostname  \n'
  * @return: 0 : Success
- * @return: -1: Failed to parse the  `addr'-portion
- *              (`ether_paton_r()' returned `NULL') */
+ * @return: -1: Failed to parse the  `addr'-portion (`ether_aton_np()' returned `NULL') */
 INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(3) int
 NOTHROW_NCX(LIBCCALL libc_ether_line)(char const *line,
                                       struct ether_addr *addr,
@@ -117,7 +122,8 @@ NOTHROW_NCX(LIBCCALL libc_ether_line)(char const *line,
 	size_t hnlen;
 	while (libc_isspace(*line) && *line != '\r' && *line != '\n')
 		++line;
-	if (!libc_ether_paton_r(&line, addr))
+	line = libc_ether_aton_np(line, addr);
+	if (!line)
 		return -1; /* This also handles comment lines! */
 	while (libc_isspace(*line) && *line != '\r' && *line != '\n')
 		++line;
@@ -136,6 +142,119 @@ NOTHROW_NCX(LIBCCALL libc_ether_line)(char const *line,
 	*hostname = '\0'; /* NUL-terminate */
 	return 0;
 }
+#include <net/ethernet.h>
+/* >> ether_line(3), ether_line_np(3)
+ * Scan  a  given  `line',   as  read  from  `/etc/ethers'   for
+ * its `addr' and `hostname' parts. For this purpose, the  given
+ * `line' must be formatted as `AA:BB:CC:DD:EE:FF  hostname  \n'
+ * @return: 0 : Success
+ * @return: -1: Failed to parse the  `addr'-portion (`ether_aton_np()' returned `NULL') */
+INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED ATTR_IN(1) ATTR_OUT(2) char *
+NOTHROW_NCX(LIBCCALL libc_ether_line_np)(char *line,
+                                         struct ether_addr *addr) {
+	size_t hnlen;
+	while (libc_isspace(*line) && *line != '\r' && *line != '\n')
+		++line;
+	line = libc_ether_aton_np(line, addr);
+	if (!line)
+		return NULL; /* This also handles comment lines! */
+	while (libc_isspace(*line) && *line != '\r' && *line != '\n')
+		++line;
+
+	/* The remainder of the line is the hostname. */
+	for (hnlen = 0;
+	     line[hnlen] &&
+	     line[hnlen] != '\r' &&
+	     line[hnlen] != '\n';
+	     ++hnlen)
+		;
+	while (hnlen && libc_isspace(line[hnlen - 1]))
+		--hnlen;
+	if (!hnlen)
+		return NULL; /* No hostname */
+	line[hnlen] = '\0'; /* NUL-terminate */
+	return line;
+}
+/* >> ether_ntohost(3)
+ * Map a given `addr' to its corresponding hostname from `/etc/ethers'
+ * @return: 0 : Success
+ * @return: * : No entry for `addr' found, or `/etc/ethers' doesn't exist. */
+INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_IN(2) ATTR_OUT(1) int
+NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntohost)(char *hostname,
+                                             struct ether_addr const *addr) {
+	char *line;
+	FILE *fp = libc_fopen("/etc/ethers", "rb");
+	if unlikely(!fp)
+		goto err;
+	while ((line = libc_fparseln(fp, NULL, NULL, "\0\0#", 0)) != NULL) {
+		struct ether_addr laddr;
+		char *lhost;
+		if (!*line) {
+
+			libc_free(line);
+
+			break;
+		}
+		lhost = libc_ether_line_np(line, &laddr);
+		if (lhost && libc_memcmp(&laddr, addr, sizeof(laddr)) == 0) {
+			libc_strcpy(hostname, lhost); /* Yes: no way to prevent overflow here :( */
+
+			libc_free(line);
+
+
+			(void)libc_fclose(fp);
+
+			return 0;
+		}
+
+		libc_free(line);
+
+	}
+
+	(void)libc_fclose(fp);
+
+err:
+	return -1;
+}
+/* >> ether_hostton(3)
+ * Map a given `hostname' into its corresponding address from `/etc/ethers'
+ * @return: 0 : Success
+ * @return: * : No entry for `hostname' found, or `/etc/ethers' doesn't exist. */
+INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_IN(1) ATTR_OUT(2) int
+NOTHROW_RPC_KOS(LIBCCALL libc_ether_hostton)(char const *hostname,
+                                             struct ether_addr *addr) {
+	char *line;
+	FILE *fp = libc_fopen("/etc/ethers", "rb");
+	if unlikely(!fp)
+		goto err;
+	while ((line = libc_fparseln(fp, NULL, NULL, "\0\0#", 0)) != NULL) {
+		char *lhost;
+		if (!*line) {
+
+			libc_free(line);
+
+			break;
+		}
+		lhost = libc_ether_line_np(line, addr);
+		if (lhost && libc_strcmp(hostname, lhost) == 0) {
+
+			libc_free(line);
+
+
+			(void)libc_fclose(fp);
+
+			return 0;
+		}
+
+		libc_free(line);
+
+	}
+
+	(void)libc_fclose(fp);
+
+err:
+	return -1;
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -145,8 +264,11 @@ DEFINE_PUBLIC_ALIAS(ether_ntoa, libc_ether_ntoa);
 DEFINE_PUBLIC_ALIAS(ether_ntoa_r, libc_ether_ntoa_r);
 DEFINE_PUBLIC_ALIAS(ether_aton, libc_ether_aton);
 DEFINE_PUBLIC_ALIAS(ether_aton_r, libc_ether_aton_r);
-DEFINE_PUBLIC_ALIAS(ether_paton_r, libc_ether_paton_r);
+DEFINE_PUBLIC_ALIAS(ether_aton_np, libc_ether_aton_np);
 DEFINE_PUBLIC_ALIAS(ether_line, libc_ether_line);
+DEFINE_PUBLIC_ALIAS(ether_line_np, libc_ether_line_np);
+DEFINE_PUBLIC_ALIAS(ether_ntohost, libc_ether_ntohost);
+DEFINE_PUBLIC_ALIAS(ether_hostton, libc_ether_hostton);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_NETINET_ETHER_C */

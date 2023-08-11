@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6bbd06f */
+/* HASH CRC-32:0x701be446 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1420,13 +1420,14 @@
 #define __CRT_HAVE_DOS$error_at_line
 #define __CRT_HAVE_DOS$errx
 #define __CRT_HAVE_DOS$ether_aton
+#define __CRT_HAVE_DOS$ether_aton_np
 #define __CRT_HAVE_DOS$ether_aton_r
 #define __CRT_HAVE_DOS$ether_hostton
 #define __CRT_HAVE_DOS$ether_line
+#define __CRT_HAVE_DOS$ether_line_np
 #define __CRT_HAVE_DOS$ether_ntoa
 #define __CRT_HAVE_DOS$ether_ntoa_r
 #define __CRT_HAVE_DOS$ether_ntohost
-#define __CRT_HAVE_DOS$ether_paton_r
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$euidaccess
@@ -5814,13 +5815,14 @@
 #define __CRT_HAVE_error_at_line
 #define __CRT_HAVE_errx
 #define __CRT_HAVE_ether_aton
+#define __CRT_HAVE_ether_aton_np
 #define __CRT_HAVE_ether_aton_r
 #define __CRT_HAVE_ether_hostton
 #define __CRT_HAVE_ether_line
+#define __CRT_HAVE_ether_line_np
 #define __CRT_HAVE_ether_ntoa
 #define __CRT_HAVE_ether_ntoa_r
 #define __CRT_HAVE_ether_ntohost
-#define __CRT_HAVE_ether_paton_r
 #define __CRT_HAVE_euidaccess
 #define __CRT_HAVE_eventfd
 #define __CRT_HAVE_eventfd_read

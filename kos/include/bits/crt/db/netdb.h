@@ -40,10 +40,26 @@ __DECL_BEGIN
 #undef n_addrtype
 #undef n_net
 
+/*
+ * C structure for describing a netword database entry from /etc/networks
+ *
+ * Every line from /etc/networks that isn't empty, or a comment will match
+ * exactly one of the following formats:
+ *
+ *    n_name n_net
+ *    n_name n_net n_aliases[0][ n_aliases[1][ ...[ n_aliases[N]]]]
+ *
+ * Where `n_net' is written in dot-notation (e.g. `127.0.0.0')
+ *
+ * For processing, libc uses `fparseln()' with default with `delim = "\0\0#"'
+ *
+ * FILES:
+ *   - /etc/networks
+ */
 struct netent {
-	char           *n_name;     /* Official name of network. */
-	char          **n_aliases;  /* Alias list. */
-	int             n_addrtype; /* Net address type. */
+	char           *n_name;     /* [1..1] Official name of network. */
+	char          **n_aliases;  /* [0..1][0..N] Alias list (terminated by NULL-entry). */
+	int             n_addrtype; /* Net address type (always `AF_INET'). */
 	__UINT32_TYPE__ n_net;      /* Network number. */
 };
 
