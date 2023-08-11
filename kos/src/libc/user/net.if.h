@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc849c0e8 */
+/* HASH CRC-32:0xe8d48195 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,14 +31,14 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Convert an interface name to an index, and vice versa */
-INTDEF unsigned int NOTHROW_RPC_KOS(LIBCCALL libc_if_nametoindex)(char const *ifname);
-/* Convert an interface name to an index, and vice versa */
-INTDEF char *NOTHROW_RPC_KOS(LIBCCALL libc_if_indextoname)(unsigned int ifindex, char *ifname);
-/* Return a list of all interfaces and their indices */
-INTDEF struct if_nameindex *NOTHROW_RPC_KOS(LIBCCALL libc_if_nameindex)(void);
-/* Free the data returned from if_nameindex */
-INTDEF void NOTHROW_NCX(LIBCCALL libc_if_freenameindex)(struct if_nameindex *ptr);
+/* >> if_indextoname(3)
+ * Allocate and return a listing of all interface names. The list is
+ * allocated dynamically and is terminated by a NULL-if_name  entry.
+ *
+ * Once done, the caller must dispose the list using `if_freenameindex(3)'
+ * @return: *   : Success (base-pointer of the allocated interface-list)
+ * @return: NULL: Error (s.a. `errno') */
+INTDEF WUNUSED struct if_nameindex *NOTHROW_RPC_KOS(LIBCCALL libc_if_nameindex)(void);
 #endif /* !__KERNEL__ */
 
 DECL_END

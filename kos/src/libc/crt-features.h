@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36b0515b */
+/* HASH CRC-32:0xc6bbd06f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7059,6 +7059,7 @@
 #define __CRT_HAVE_opendirat
 #define __CRT_HAVE_openlog
 #define __CRT_HAVE_openpty
+#define __CRT_HAVE_opensock
 #define __CRT_HAVE_p_cdname
 #define __CRT_HAVE_p_cdnname
 #define __CRT_HAVE_p_class

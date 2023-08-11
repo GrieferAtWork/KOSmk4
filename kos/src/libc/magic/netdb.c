@@ -39,6 +39,7 @@
 %[default:section(".text.crt{|.dos}.net.db")]
 
 %[define_decl_include("<bits/os/sigevent.h>": ["struct sigevent"])]
+%[define_decl_include("<bits/os/sockaddr.h>": ["struct sockaddr"])]
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(sa_family_t = __UINT16_TYPE__)]
@@ -682,7 +683,7 @@ void freeaddrinfo(struct addrinfo *ai);
 char const *gai_strerror(int ecode);
 
 @@Translate a socket address to a location and service name
-[[cp, decl_include("<bits/types.h>")]]
+[[cp, decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
 int getnameinfo(struct sockaddr const *__restrict sa, socklen_t salen,
                 char *__restrict host, socklen_t hostlen,
                 char *__restrict serv, socklen_t servlen,

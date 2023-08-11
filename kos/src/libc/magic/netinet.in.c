@@ -39,6 +39,9 @@
 
 %[define_replacement(fd_t = __fd_t)]
 
+%[define_decl_include("<bits/os/sockaddr.h>": ["struct sockaddr"])]
+%[define_decl_include("<bits/os/sockaddr_storage.h>": ["struct sockaddr_storage"])]
+
 %[insert:prefix(
 #include <features.h>
 )]%{
@@ -531,13 +534,13 @@ int setipv4sourcefilter([[fdarg]] $fd_t sockfd, struct in_addr interface_addr,
 
 %[default:section(".text.crt{|.dos}.net.inet.6.source_filter")]
 
-[[cp_kos, decl_include("<bits/types.h>")]]
+[[cp_kos, decl_include("<bits/types.h>", "<bits/os/sockaddr.h>", "<bits/os/sockaddr_storage.h>")]]
 int getsourcefilter([[fdarg]] $fd_t sockfd, $uint32_t interface_addr,
                     struct sockaddr const *group, socklen_t grouplen,
                     $uint32_t *fmode, $uint32_t *numsrc,
                     struct sockaddr_storage *slist);
 
-[[cp_kos, decl_include("<bits/types.h>")]]
+[[cp_kos, decl_include("<bits/types.h>", "<bits/os/sockaddr.h>", "<bits/os/sockaddr_storage.h>")]]
 int setsourcefilter([[fdarg]] $fd_t sockfd, $uint32_t interface_addr,
                     struct sockaddr const *group, socklen_t grouplen,
                     $uint32_t fmode, $uint32_t numsrc,

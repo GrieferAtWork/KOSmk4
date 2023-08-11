@@ -17,53 +17,41 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_CRT_IFADDRS_H
-#define _BITS_CRT_IFADDRS_H 1
+#ifndef _BITS_OS_KOS_IFCONF_H
+#define _BITS_OS_KOS_IFCONF_H 1
 
 #include <__stdinc.h>
-
-#include <hybrid/typecore.h>
-
-#include <bits/types.h>
+#include <features.h>
 
 #ifdef __CC__
 __DECL_BEGIN
 
-struct ifaddrs;
-struct sockaddr;
-
-struct ifaddrs {
-	struct ifaddrs  *ifa_next;    /* ??? */
-	char            *ifa_name;    /* ??? */
-	unsigned int     ifa_flags;   /* ??? */
-#if __SIZEOF_POINTER__ > 4
-	__BYTE_TYPE__ __ifa_pad[__SIZEOF_POINTER__ - 4];
-#endif /* __SIZEOF_POINTER__ > 4 */
-	struct sockaddr *ifa_addr;    /* ??? */
-	struct sockaddr *ifa_netmask; /* ??? */
-#undef ifa_broadaddr
-#undef ifa_dstaddr
+#undef ifc_buf
+#undef ifc_req
+struct ifconf {
+	__STDC_INT_AS_SIZE_T ifc_len; /* ??? */
 #ifdef __COMPILER_HAVE_TRANSPARENT_UNION
 	union {
+		char         *ifc_buf; /* Buffer address */
+		struct ifreq *ifc_req; /* Buffer address */
+#ifndef __USE_KOS_PURE
 		union {
-			struct sockaddr *ifu_broadaddr; /* ??? */
-			struct sockaddr *ifu_dstaddr;   /* ??? */
-		} ifa_ifu;
-		struct sockaddr *ifa_broadaddr; /* ??? */
-		struct sockaddr *ifa_dstaddr;   /* ??? */
+			char         *ifcu_buf; /* Buffer address */
+			struct ifreq *ifcu_req; /* Buffer address */
+		} ifc_ifcu;
+#endif /* !__USE_KOS_PURE */
 	};
 #else /* __COMPILER_HAVE_TRANSPARENT_UNION */
 	union {
-		struct sockaddr *ifu_broadaddr; /* ??? */
-		struct sockaddr *ifu_dstaddr;   /* ??? */
-	} ifa_ifu;
-#define ifa_broadaddr ifa_ifu.ifu_broadaddr
-#define ifa_dstaddr   ifa_ifu.ifu_dstaddr
+		char         *ifcu_buf; /* Buffer address */
+		struct ifreq *ifcu_req; /* Buffer address */
+	} ifc_ifcu;
+#define ifc_buf ifc_ifcu.ifcu_buf /* Buffer address */
+#define ifc_req ifc_ifcu.ifcu_req /* Buffer address */
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
-	void *ifa_data; /* ??? */
 };
 
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_BITS_CRT_IFADDRS_H */
+#endif /* !_BITS_OS_KOS_IFCONF_H */

@@ -25,36 +25,15 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_if_nametoindex,hash:CRC-32=0x52994efd]]]*/
-/* Convert an interface name to an index, and vice versa */
-INTERN ATTR_SECTION(".text.crt.net.interface") unsigned int
-NOTHROW_RPC_KOS(LIBCCALL libc_if_nametoindex)(char const *ifname)
-/*[[[body:libc_if_nametoindex]]]*/
-/*AUTO*/{
-	(void)ifname;
-	CRT_UNIMPLEMENTEDF("if_nametoindex(ifname: %q)", ifname); /* TODO */
-	return (unsigned int)libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_if_nametoindex]]]*/
-
-/*[[[head:libc_if_indextoname,hash:CRC-32=0xb3011369]]]*/
-/* Convert an interface name to an index, and vice versa */
-INTERN ATTR_SECTION(".text.crt.net.interface") char *
-NOTHROW_RPC_KOS(LIBCCALL libc_if_indextoname)(unsigned int ifindex,
-                                              char *ifname)
-/*[[[body:libc_if_indextoname]]]*/
-/*AUTO*/{
-	(void)ifindex;
-	(void)ifname;
-	CRT_UNIMPLEMENTEDF("if_indextoname(ifindex: %x, ifname: %q)", ifindex, ifname); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_if_indextoname]]]*/
-
-/*[[[head:libc_if_nameindex,hash:CRC-32=0x7cb3a615]]]*/
-/* Return a list of all interfaces and their indices */
-INTERN ATTR_SECTION(".text.crt.net.interface") struct if_nameindex *
+/*[[[head:libc_if_nameindex,hash:CRC-32=0xf293adab]]]*/
+/* >> if_indextoname(3)
+ * Allocate and return a listing of all interface names. The list is
+ * allocated dynamically and is terminated by a NULL-if_name  entry.
+ *
+ * Once done, the caller must dispose the list using `if_freenameindex(3)'
+ * @return: *   : Success (base-pointer of the allocated interface-list)
+ * @return: NULL: Error (s.a. `errno') */
+INTERN ATTR_SECTION(".text.crt.net.interface") WUNUSED struct if_nameindex *
 NOTHROW_RPC_KOS(LIBCCALL libc_if_nameindex)(void)
 /*[[[body:libc_if_nameindex]]]*/
 /*AUTO*/{
@@ -64,27 +43,11 @@ NOTHROW_RPC_KOS(LIBCCALL libc_if_nameindex)(void)
 }
 /*[[[end:libc_if_nameindex]]]*/
 
-/*[[[head:libc_if_freenameindex,hash:CRC-32=0xf1c5dd39]]]*/
-/* Free the data returned from if_nameindex */
-INTERN ATTR_SECTION(".text.crt.net.interface") void
-NOTHROW_NCX(LIBCCALL libc_if_freenameindex)(struct if_nameindex *ptr)
-/*[[[body:libc_if_freenameindex]]]*/
-/*AUTO*/{
-	(void)ptr;
-	CRT_UNIMPLEMENTEDF("if_freenameindex(ptr: %p)", ptr); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_if_freenameindex]]]*/
 
 
 
-
-
-/*[[[start:exports,hash:CRC-32=0x1795a706]]]*/
-DEFINE_PUBLIC_ALIAS(if_nametoindex, libc_if_nametoindex);
-DEFINE_PUBLIC_ALIAS(if_indextoname, libc_if_indextoname);
+/*[[[start:exports,hash:CRC-32=0xda14f0da]]]*/
 DEFINE_PUBLIC_ALIAS(if_nameindex, libc_if_nameindex);
-DEFINE_PUBLIC_ALIAS(if_freenameindex, libc_if_freenameindex);
 /*[[[end:exports]]]*/
 
 DECL_END

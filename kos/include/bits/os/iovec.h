@@ -20,6 +20,16 @@
 #ifndef _BITS_OS_IOVEC_H
 #define _BITS_OS_IOVEC_H 1
 
+/* File:
+ *    <bits/os/iovec.h>
+ *
+ * Definitions:
+ *    - struct iovec {
+ *          void *iov_base; // Pointer to data.
+ *          size_t iov_len;  // Length of data.
+ *      };
+ */
+
 #include <__stdinc.h>
 
 /**/

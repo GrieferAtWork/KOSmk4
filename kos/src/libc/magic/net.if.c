@@ -38,321 +38,297 @@
 
 %[default:section(".text.crt{|.dos}.net.interface")]
 
+%[define_decl_include("<bits/crt/if_nameindex.h>": ["struct if_nameindex"])]
+%[define_decl_include("<bits/crt/ifaddr.h>": ["struct ifaddr"])]
+%[define_decl_include("<bits/os/ifconf.h>": ["struct ifconf"])]
+%[define_decl_include("<bits/os/ifmap.h>": ["struct ifmap"])]
+%[define_decl_include("<bits/os/ifreq.h>": ["struct ifreq"])]
+%[define_decl_include("<bits/os/sockaddr.h>": ["struct sockaddr"])]
+
 %[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
+#include <asm/os/net-if.h>
 )]%{
 
 #ifdef __USE_MISC
+#include <bits/crt/if_nameindex.h>
+#include <bits/crt/ifaddr.h>
+#include <bits/os/ifconf.h>
+#include <bits/os/ifmap.h>
+#include <bits/os/ifreq.h>
+#include <bits/os/sockaddr.h>
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
 #include <sys/socket.h>
+#endif /* __USE_GLIBC_BLOAT */
 #endif /* __USE_MISC */
 
-__SYSDECL_BEGIN
-
-/* net/if.h -- declarations for inquiring about network interfaces
-   Copyright (C) 1997-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-/* Length of interface name. */
-#ifndef IF_NAMESIZE
-#ifdef IFNAMSIZ
-#define IF_NAMESIZE IFNAMSIZ
-#else /* IFNAMSIZ */
-#define IF_NAMESIZE 16
-#endif /* !IFNAMSIZ */
-#endif /* !IF_NAMESIZE */
-
-#ifdef __CC__
-/* TODO: This structure should go into <bits/crt/if_nameindex-struct.h> */
-struct if_nameindex {
-	__STDC_UINT32_AS_SIZE_T if_index; /* 1, 2, ... */
-	char                   *if_name;  /* null terminated name: "eth0", ... */
-};
-#endif /* __CC__ */
+/* Max length of an interface name. */
+#if !defined(IF_NAMESIZE) && defined(__IF_NAMESIZE)
+#define IF_NAMESIZE __IF_NAMESIZE
+#endif /* !IF_NAMESIZE && __IF_NAMESIZE */
 
 #ifdef __USE_MISC
-#ifndef IFF_UP
 /* Standard interface flags. */
-/* TODO: These constants should go into <asm/os/if.h> */
-#define IFF_UP          0x0001  /* Interface is up. */
-#define IFF_BROADCAST   0x0002  /* Broadcast address valid. */
-#define IFF_DEBUG       0x0004  /* Turn on debugging. */
-#define IFF_LOOPBACK    0x0008  /* Is a loopback net. */
-#define IFF_POINTOPOINT 0x0010  /* Interface is point-to-point link. */
-#define IFF_NOTRAILERS  0x0020  /* Avoid use of trailers. */
-#define IFF_RUNNING     0x0040  /* Resources allocated. */
-#define IFF_NOARP       0x0080  /* No address resolution protocol. */
-#define IFF_PROMISC     0x0100  /* Receive all packets. */
-/* Not supported */
-#define IFF_ALLMULTI    0x0200  /* Receive all multicast packets. */
-#define IFF_MASTER      0x0400  /* Master of a load balancer. */
-#define IFF_SLAVE       0x0800  /* Slave of a load balancer. */
-#define IFF_MULTICAST   0x1000  /* Supports multicast. */
-#define IFF_PORTSEL     0x2000  /* Can set media type. */
-#define IFF_AUTOMEDIA   0x4000  /* Auto media select active. */
-#define IFF_DYNAMIC     0x8000  /* Dialup device with changing addresses. */
-#endif /* !IFF_UP */
-
-
-/* The ifaddr structure contains information about one address of an
- * interface. They are maintained by the different address families,
- * are allocated and attached when an address is set, and are linked
- * together so all addresses for an interface can be located. */
-#ifdef __CC__
-#undef ifa_broadaddr
-#undef ifa_dstaddr
-/* TODO: This structure should go into <bits/ifaddr-struct.h> */
-struct ifaddr {
-	struct sockaddr     ifa_addr; /* Address of interface. */
-#ifdef __COMPILER_HAVE_TRANSPARENT_UNION
-	union {
-		/* TODO: Get rid of the member redundancy where when `__USE_KOS_PURE' is defined */
-		struct sockaddr ifa_broadaddr; /* broadcast address. */
-		struct sockaddr ifa_dstaddr;   /* other end of link. */
-		union {
-			struct sockaddr ifu_broadaddr; /* broadcast address. */
-			struct sockaddr ifu_dstaddr;   /* other end of link. */
-		}                   ifa_ifu;
-	};
-#else /* __COMPILER_HAVE_TRANSPARENT_UNION */
-	union {
-		struct sockaddr ifu_broadaddr;
-		struct sockaddr ifu_dstaddr;
-	}                   ifa_ifu;
-#define ifa_broadaddr ifa_ifu.ifu_broadaddr /* broadcast address. */
-#define ifa_dstaddr   ifa_ifu.ifu_dstaddr   /* other end of link. */
-#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
-	struct iface       *ifa_ifp;  /* Back-pointer to interface. */
-	struct ifaddr      *ifa_next; /* Next address for interface. */
-};
-#endif /* __CC__ */
-
-/* Device mapping structure. I'd just gone off and designed  a
- * beautiful scheme using only loadable modules with arguments
- * for driver options and along come the PCMCIA people 8)
- *
- * Ah  well. The get() side of this is good for WDSETUP, and it'll be
- * handy for debugging things. The set side is fine for now and being
- * very small might be worth keeping for clean configuration. */
-
-#ifdef __CC__
-}%[push_macro @undef { mem_start mem_end base_addr irq dma port }]%{
-/* TODO: This structure should go into <bits/ifmap-struct.h> */
-struct ifmap {
-	__ULONGPTR_TYPE__ mem_start;
-	__ULONGPTR_TYPE__ mem_end;
-	__UINT16_TYPE__   base_addr;
-	__UINT8_TYPE__    irq;
-	__UINT8_TYPE__    dma;
-	__UINT8_TYPE__    port;
-	__UINT8_TYPE__    __pad[3]; /* 3 bytes spare */
-};
-}%[pop_macro]%{
-#endif /* __CC__ */
-
-/* Interface request structure used for socket ioctl's. All interface
- * ioctl's must have parameter definitions which begin with ifr_name.
- * The remainder may be interface specific. */
+#if !defined(IFF_UP) && defined(__IFF_UP)
+#define IFF_UP          __IFF_UP          /* ??? */
+#endif /* !IFF_UP && __IFF_UP */
+#if !defined(IFF_BROADCAST) && defined(__IFF_BROADCAST)
+#define IFF_BROADCAST   __IFF_BROADCAST   /* ??? */
+#endif /* !IFF_BROADCAST && __IFF_BROADCAST */
+#if !defined(IFF_DEBUG) && defined(__IFF_DEBUG)
+#define IFF_DEBUG       __IFF_DEBUG       /* ??? */
+#endif /* !IFF_DEBUG && __IFF_DEBUG */
+#if !defined(IFF_LOOPBACK) && defined(__IFF_LOOPBACK)
+#define IFF_LOOPBACK    __IFF_LOOPBACK    /* ??? */
+#endif /* !IFF_LOOPBACK && __IFF_LOOPBACK */
+#if !defined(IFF_POINTOPOINT) && defined(__IFF_POINTOPOINT)
+#define IFF_POINTOPOINT __IFF_POINTOPOINT /* ??? */
+#endif /* !IFF_POINTOPOINT && __IFF_POINTOPOINT */
+#if !defined(IFF_NOTRAILERS) && defined(__IFF_NOTRAILERS)
+#define IFF_NOTRAILERS  __IFF_NOTRAILERS  /* ??? */
+#endif /* !IFF_NOTRAILERS && __IFF_NOTRAILERS */
+#if !defined(IFF_RUNNING) && defined(__IFF_RUNNING)
+#define IFF_RUNNING     __IFF_RUNNING     /* ??? */
+#endif /* !IFF_RUNNING && __IFF_RUNNING */
+#if !defined(IFF_NOARP) && defined(__IFF_NOARP)
+#define IFF_NOARP       __IFF_NOARP       /* ??? */
+#endif /* !IFF_NOARP && __IFF_NOARP */
+#if !defined(IFF_PROMISC) && defined(__IFF_PROMISC)
+#define IFF_PROMISC     __IFF_PROMISC     /* ??? */
+#endif /* !IFF_PROMISC && __IFF_PROMISC */
+#if !defined(IFF_ALLMULTI) && defined(__IFF_ALLMULTI)
+#define IFF_ALLMULTI    __IFF_ALLMULTI    /* ??? */
+#endif /* !IFF_ALLMULTI && __IFF_ALLMULTI */
+#if !defined(IFF_MASTER) && defined(__IFF_MASTER)
+#define IFF_MASTER      __IFF_MASTER      /* ??? */
+#endif /* !IFF_MASTER && __IFF_MASTER */
+#if !defined(IFF_SLAVE) && defined(__IFF_SLAVE)
+#define IFF_SLAVE       __IFF_SLAVE       /* ??? */
+#endif /* !IFF_SLAVE && __IFF_SLAVE */
+#if !defined(IFF_MULTICAST) && defined(__IFF_MULTICAST)
+#define IFF_MULTICAST   __IFF_MULTICAST   /* ??? */
+#endif /* !IFF_MULTICAST && __IFF_MULTICAST */
+#if !defined(IFF_PORTSEL) && defined(__IFF_PORTSEL)
+#define IFF_PORTSEL     __IFF_PORTSEL     /* ??? */
+#endif /* !IFF_PORTSEL && __IFF_PORTSEL */
+#if !defined(IFF_AUTOMEDIA) && defined(__IFF_AUTOMEDIA)
+#define IFF_AUTOMEDIA   __IFF_AUTOMEDIA   /* ??? */
+#endif /* !IFF_AUTOMEDIA && __IFF_AUTOMEDIA */
+#if !defined(IFF_DYNAMIC) && defined(__IFF_DYNAMIC)
+#define IFF_DYNAMIC     __IFF_DYNAMIC     /* ??? */
+#endif /* !IFF_DYNAMIC && __IFF_DYNAMIC */
 
 #ifndef IFHWADDRLEN
-#define IFHWADDRLEN     6
+#define IFHWADDRLEN 6 /* == ETH_ALEN */
 #endif /* !IFHWADDRLEN */
-#ifndef IFNAMSIZ
-#define IFNAMSIZ        IF_NAMESIZE
-#endif /* !IFNAMSIZ */
-#ifndef __ifreq_defined
-#define __ifreq_defined
-#ifdef __CC__
-/* TODO: This structure should go into <bits/ifreq-struct.h> */
-struct ifreq {
-#ifdef __COMPILER_HAVE_TRANSPARENT_UNION
-	union {
-		/* TODO: Get rid of the member redundancy where when `__USE_KOS_PURE' is defined */
-		char ifr_name[IFNAMSIZ]; /* if name, e.g. "en0" */
-		union {
-			char ifrn_name[IFNAMSIZ]; /* if name, e.g. "en0" */
-		} ifr_ifrn;
-	};
-#else /* __COMPILER_HAVE_TRANSPARENT_UNION */
-#define ifr_name ifr_ifrn.ifrn_name /* interface name  */
-	union {
-		char ifrn_name[IFNAMSIZ]; /* if name, e.g. "en0" */
-	} ifr_ifrn;
-#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
-#if defined(__COMPILER_HAVE_TRANSPARENT_UNION) && defined(__COMPILER_HAVE_TRANSPARENT_STRUCT)
-	union {
-		struct {
-			/* TODO: Get rid of the member redundancy where when `__USE_KOS_PURE' is defined */
-			struct sockaddr     ifr_addr;
-			struct sockaddr     ifr_dstaddr;
-			struct sockaddr     ifr_broadaddr;
-			struct sockaddr     ifr_netmask;
-			struct sockaddr     ifr_hwaddr;
-#ifdef __USE_KOS_ALTERATIONS
-			__UINT16_TYPE__     ifr_flags;
-#else /* __USE_KOS_ALTERATIONS */
-			__INT16_TYPE__      ifr_flags;
-#endif /* !__USE_KOS_ALTERATIONS */
-			union {
-#ifdef __USE_KOS_ALTERATIONS
-				__UINT32_TYPE__ ifr_metric;    /* metric */
-				__UINT32_TYPE__ ifr_ifindex;   /* interface index */
-				__UINT32_TYPE__ ifr_bandwidth; /* link bandwidth */
-				__UINT32_TYPE__ ifr_qlen;      /* Queue length  */
-#else /* __USE_KOS_ALTERATIONS */
-				__INT32_TYPE__  ifr_metric;    /* metric */
-				__INT32_TYPE__  ifr_ifindex;   /* interface index */
-				__INT32_TYPE__  ifr_bandwidth; /* link bandwidth */
-				__INT32_TYPE__  ifr_qlen;      /* Queue length  */
-#endif /* !__USE_KOS_ALTERATIONS */
-			};
-#ifdef __USE_KOS_ALTERATIONS
-			__UINT32_TYPE__     ifr_mtu;
-#else /* __USE_KOS_ALTERATIONS */
-			__INT32_TYPE__      ifr_mtu;
-#endif /* !__USE_KOS_ALTERATIONS */
-			struct ifmap        ifr_map;
-			char                ifr_slave[IFNAMSIZ]; /* Just fits the size */
-			char                ifr_newname[IFNAMSIZ];
-			__caddr_t           ifr_data;
-		};
-		union {
-			struct sockaddr    ifru_addr;
-			struct sockaddr    ifru_dstaddr;
-			struct sockaddr    ifru_broadaddr;
-			struct sockaddr    ifru_netmask;
-			struct sockaddr    ifru_hwaddr;
-#ifdef __USE_KOS_ALTERATIONS
-			__UINT16_TYPE__    ifru_flags;
-			__UINT32_TYPE__    ifru_ivalue;
-			__UINT32_TYPE__    ifru_mtu;
-#else /* __USE_KOS_ALTERATIONS */
-			__INT16_TYPE__     ifru_flags;
-			__INT32_TYPE__     ifru_ivalue;
-			__INT32_TYPE__     ifru_mtu;
-#endif /* !__USE_KOS_ALTERATIONS */
-			struct ifmap       ifru_map;
-			char               ifru_slave[IFNAMSIZ]; /* Just fits the size */
-			char               ifru_newname[IFNAMSIZ];
-			__caddr_t          ifru_data;
-		} ifr_ifru;
-	};
-#else /* __COMPILER_HAVE_TRANSPARENT_UNION && __COMPILER_HAVE_TRANSPARENT_STRUCT */
-	union {
-		struct sockaddr    ifru_addr;
-		struct sockaddr    ifru_dstaddr;
-		struct sockaddr    ifru_broadaddr;
-		struct sockaddr    ifru_netmask;
-		struct sockaddr    ifru_hwaddr;
-#ifdef __USE_KOS_ALTERATIONS
-		__UINT16_TYPE__    ifru_flags;
-		__UINT32_TYPE__    ifru_ivalue;
-		__UINT32_TYPE__    ifru_mtu;
-#else /* __USE_KOS_ALTERATIONS */
-		__INT16_TYPE__     ifru_flags;
-		__INT32_TYPE__     ifru_ivalue;
-		__INT32_TYPE__     ifru_mtu;
-#endif /* !__USE_KOS_ALTERATIONS */
-		struct ifmap       ifru_map;
-		char               ifru_slave[IFNAMSIZ]; /* Just fits the size */
-		char               ifru_newname[IFNAMSIZ];
-		__caddr_t          ifru_data;
-	} ifr_ifru;
-#define ifr_addr      ifr_ifru.ifru_addr      /* address */
-#define ifr_dstaddr   ifr_ifru.ifru_dstaddr   /* other end of p-p lnk */
-#define ifr_broadaddr ifr_ifru.ifru_broadaddr /* broadcast address */
-#define ifr_netmask   ifr_ifru.ifru_netmask   /* interface net mask */
-#define ifr_hwaddr    ifr_ifru.ifru_hwaddr    /* MAC address  */
-#define ifr_flags     ifr_ifru.ifru_flags     /* flags */
-#define ifr_metric    ifr_ifru.ifru_ivalue    /* metric */
-#define ifr_ifindex   ifr_ifru.ifru_ivalue    /* interface index */
-#define ifr_bandwidth ifr_ifru.ifru_ivalue    /* link bandwidth */
-#define ifr_qlen      ifr_ifru.ifru_ivalue    /* Queue length  */
-#define ifr_mtu       ifr_ifru.ifru_mtu       /* mtu */
-#define ifr_map       ifr_ifru.ifru_map       /* device map */
-#define ifr_slave     ifr_ifru.ifru_slave     /* slave device */
-#define ifr_newname   ifr_ifru.ifru_newname   /* New name */
-#define ifr_data      ifr_ifru.ifru_data      /* for use by interface */
-#define ifr_settings  ifr_ifru.ifru_settings  /* Device/proto settings*/
-#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION || !__COMPILER_HAVE_TRANSPARENT_STRUCT */
-};
-#endif /* __CC__ */
-#endif /* !__ifreq_defined */
 
-#define _IOT_ifreq        _IOT(_IOTS(char), IFNAMSIZ, _IOTS(char), 16, 0, 0)
-#define _IOT_ifreq_short  _IOT(_IOTS(char), IFNAMSIZ, _IOTS(short), 1, 0, 0)
-#define _IOT_ifreq_int    _IOT(_IOTS(char), IFNAMSIZ, _IOTS(int), 1, 0, 0)
+/* Max length of an interface name. */
+#if !defined(IFNAMSIZ) && defined(__IF_NAMESIZE)
+#define IFNAMSIZ __IF_NAMESIZE
+#endif /* !IFNAMSIZ && __IF_NAMESIZE */
 
-
-/* Structure  used  in   SIOCGIFCONF  request.  Used   to
- * retrieve interface configuration  for machine  (useful
- * for programs which must know all networks accessible). */
-#ifdef __CC__
-#ifndef __ifconf_defined
-#define __ifconf_defined
-/* TODO: This structure should go into <bits/ifconf-struct.h> */
-struct ifconf {
-	__INT32_TYPE__    ifc_len; /* size of buffer */
-#ifdef __COMPILER_HAVE_TRANSPARENT_UNION
-	union {
-		/* TODO: Get rid of the member redundancy where when `__USE_KOS_PURE' is defined */
-		char         *ifc_buf; /* buffer address */
-		struct ifreq *ifc_req; /* array of structures */
-		union {
-			char         *ifcu_buf; /* buffer address */
-			struct ifreq *ifcu_req; /* array of structures */
-		} ifc_ifcu;
-	};
-#else /* __COMPILER_HAVE_TRANSPARENT_UNION */
-	union {
-		char         *ifcu_buf; /* buffer address */
-		struct ifreq *ifcu_req; /* array of structures */
-	} ifc_ifcu;
-#define ifc_buf ifc_ifcu.ifcu_buf /* buffer address */
-#define ifc_req ifc_ifcu.ifcu_req /* array of structures */
-#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
-};
-#endif /* !__ifconf_defined */
-#endif /* __CC__ */
-#define _IOT_ifconf _IOT(_IOTS(struct ifconf), 1, 0, 0, 0, 0) /* not right */
+/* ??? */
+#define _IOT_ifreq        _IOT(_IOTS(char), __IF_NAMESIZE, _IOTS(char), 16, 0, 0)
+#define _IOT_ifreq_short  _IOT(_IOTS(char), __IF_NAMESIZE, _IOTS(short), 1, 0, 0)
+#define _IOT_ifreq_int    _IOT(_IOTS(char), __IF_NAMESIZE, _IOTS(int), 1, 0, 0)
+#define _IOT_ifconf       _IOT(_IOTS(struct ifconf), 1, 0, 0, 0, 0)
 #endif /* __USE_MISC */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
-@@Convert an interface name to an index, and vice versa
-[[cp_kos]]
-unsigned int if_nametoindex(char const *ifname);
 
-[[cp_kos, doc_alias("if_nametoindex")]]
-char *if_indextoname(unsigned int ifindex, char *ifname);
+@@>> if_nametoindex(3)
+@@Lookup the index of the interface with the given `ifname'
+@@@return: * : Index of the interface
+@@@return: 0 : [errno=ENODEV] No interface matching `ifname'
+@@@return: 0 : [errno=*] Error
+[[cp_kos, decl_include("<features.h>")]]
+[[requires_include("<asm/os/socket-ioctls.h>")]]
+[[requires(($has_function(opensock, ioctl) && defined(__SIOCGIFINDEX)) ||
+           $has_function(if_nameindex))]]
+[[impl_include("<asm/os/net-if.h>", "<bits/crt/if_nameindex.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<bits/os/ifreq.h>", "<libc/errno.h>")]]
+__STDC_UINT_AS_SIZE_T if_nametoindex([[in]] char const *ifname) {
+@@pp_if $has_function(opensock, ioctl) && defined(__SIOCGIFINDEX)@@
+	int ok;
+	fd_t sockfd;
+	@struct ifreq@ req;
+	if unlikely(strlen(ifname) >= __IF_NAMESIZE) {
+@@pp_ifdef ENODEV@@
+		(void)__libc_seterrno(ENODEV);
+@@pp_else@@
+		(void)__libc_seterrno(1);
+@@pp_endif@@
+		goto err;
+	}
+	sockfd = opensock();
+	if unlikely(sockfd < 0)
+		goto err;
+	strncpy(req.@ifr_name@, ifname, __IF_NAMESIZE);
+	ok = ioctl(sockfd, __SIOCGIFINDEX, &req);
+@@pp_if $has_function(close)@@
+	(void)close(sockfd);
+@@pp_endif@@
+	if unlikely(ok < 0)
+		goto err;
+	return req.@ifr_ifindex@;
+@@pp_else@@
+	size_t i;
+	@struct if_nameindex@ *index = if_nameindex();
+	if unlikely(!index)
+		goto err;
+	for (i = 0; index[i].@if_name@; ++i) {
+		if (strcmp(index[i].@if_name@, ifname) == 0) {
+			__STDC_UINT_AS_SIZE_T result = index[i].@if_index@;
+@@pp_if $has_function(if_freenameindex)@@
+			if_freenameindex(index);
+@@pp_endif@@
+			return result;
+		}
+	}
+@@pp_ifdef ENODEV@@
+	(void)__libc_seterrno(ENODEV);
+@@pp_else@@
+	(void)__libc_seterrno(1);
+@@pp_endif@@
+err_index:
+@@pp_if $has_function(if_freenameindex)@@
+	if_freenameindex(index);
+@@pp_endif@@
+@@pp_endif@@
+err:
+	return 0;
+}
 
-@@Return a list of all interfaces and their indices
-[[cp_kos]]
+@@>> if_indextoname(3)
+@@Lookup the name of the interface with the given `ifindex'
+@@@return: ifname : Success (up to `IF_NAMESIZE' characters were written to `ifname')
+@@@return: NULL   : [errno=ENXIO] No interface with index `ifindex'
+@@@return: NULL   : [errno=*] Error
+[[cp_kos, decl_include("<features.h>")]]
+[[requires_include("<asm/os/socket-ioctls.h>")]]
+[[requires(($has_function(opensock, ioctl) && defined(__SIOCGIFNAME)) ||
+           $has_function(if_nameindex))]]
+[[impl_include("<asm/os/net-if.h>", "<bits/crt/if_nameindex.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<bits/os/ifreq.h>", "<libc/errno.h>")]]
+char *if_indextoname(__STDC_UINT_AS_SIZE_T ifindex, [[out]] char *ifname/*[IF_NAMESIZE]*/) {
+@@pp_if $has_function(opensock, ioctl) && defined(__SIOCGIFNAME)@@
+	int ok;
+	fd_t sockfd;
+	@struct ifreq@ req;
+	sockfd = opensock();
+	if unlikely(sockfd < 0)
+		goto err;
+	req.@ifr_ifindex@ = ifindex;
+	ok = ioctl(sockfd, __SIOCGIFNAME, &req);
+@@pp_if $has_function(close)@@
+	(void)close(sockfd);
+@@pp_endif@@
+	if unlikely(ok < 0) {
+@@pp_if defined(__libc_geterrno) && defined(ENODEV) && defined(ENXIO)@@
+		if (__libc_geterrno() == ENODEV)
+			__libc_seterrno(ENXIO);
+@@pp_endif@@
+		goto err;
+	}
+	return strncpy(ifname, req.@ifr_name@, __IF_NAMESIZE);
+@@pp_else@@
+	size_t i;
+	@struct if_nameindex@ *index = if_nameindex();
+	if unlikely(!index)
+		goto err;
+	for (i = 0; index[i].@if_name@; ++i) {
+		if (index[i].@if_index@ == ifindex) {
+			strncpy(ifname, index[i].@if_name@, __IF_NAMESIZE);
+@@pp_if $has_function(if_freenameindex)@@
+			if_freenameindex(index);
+@@pp_endif@@
+			return ifname;
+		}
+	}
+@@pp_ifdef ENXIO@@
+	(void)__libc_seterrno(ENXIO);
+@@pp_else@@
+	(void)__libc_seterrno(1);
+@@pp_endif@@
+err_index:
+@@pp_if $has_function(if_freenameindex)@@
+	if_freenameindex(index);
+@@pp_endif@@
+@@pp_endif@@
+err:
+	return 0;
+}
+
+@@>> if_indextoname(3)
+@@Allocate and return a listing of all interface names. The list is
+@@allocated dynamically and is terminated by a NULL-if_name  entry.
+@@
+@@Once done, the caller must dispose the list using `if_freenameindex(3)'
+@@@return: *   : Success (base-pointer of the allocated interface-list)
+@@@return: NULL: Error (s.a. `errno')
+[[cp_kos, wunused]]
+[[decl_include("<bits/crt/if_nameindex.h>")]]
 struct if_nameindex *if_nameindex();
 
-@@Free the data returned from if_nameindex
-void if_freenameindex(struct if_nameindex *ptr);
+@@>> if_freenameindex(3)
+@@Free an interface-list previously allocated by `if_nameindex(3)'
+[[decl_include("<bits/crt/if_nameindex.h>", "<hybrid/typecore.h>")]]
+[[requires_function(free)]]
+void if_freenameindex([[nonnull]] struct if_nameindex *ptr) {
+	size_t i;
+	for (i = 0; ptr[i].@if_name@; ++i)
+		free(ptr[i].@if_name@);
+	free(ptr);
+}
+
+
+@@Construct  and return a socket of arbitrary
+@@typing (for use with talking to the kernel)
+[[decl_include("<bits/types.h>")]]
+[[requires_include("<asm/os/socket.h>")]]
+[[requires($has_function(socket) && defined(__SOCK_DGRAM) &&
+           (defined(__AF_LOCAL) || defined(__AF_INET) || defined(__AF_INET6)))]]
+[[impl_include("<asm/os/socket.h>", "<hybrid/typecore.h>", "<libc/errno.h>")]]
+[[static, wunused]] $fd_t opensock() {
+	size_t i;
+	static unsigned int const domains[] = {
+@@pp_ifdef __AF_LOCAL@@
+		__AF_LOCAL,
+@@pp_endif@@
+@@pp_ifdef __AF_INET@@
+		__AF_INET,
+@@pp_endif@@
+@@pp_ifdef __AF_INET6@@
+		__AF_INET6,
+@@pp_endif@@
+	};
+	for (i = 0; i < lengthof(domains); ++i) {
+		fd_t result;
+@@pp_ifdef __SOCK_CLOEXEC@@
+		result = socket(domains[i], __SOCK_DGRAM | __SOCK_CLOEXEC, 0);
+@@pp_else@@
+		result = socket(domains[i], __SOCK_DGRAM, 0);
+@@pp_endif@@
+		if likely(result >= 0)
+			return result;
+	}
+@@pp_ifdef ENOENT@@
+	return __libc_seterrno(ENOENT);
+@@pp_else@@
+	return __libc_seterrno(1);
+@@pp_endif@@
+}
+
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

@@ -17,53 +17,49 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_CRT_IFADDRS_H
-#define _BITS_CRT_IFADDRS_H 1
+#ifndef _BITS_OS_KOS_IFMAP_H
+#define _BITS_OS_KOS_IFMAP_H 1
 
 #include <__stdinc.h>
-
-#include <hybrid/typecore.h>
 
 #include <bits/types.h>
 
 #ifdef __CC__
 __DECL_BEGIN
 
-struct ifaddrs;
-struct sockaddr;
-
-struct ifaddrs {
-	struct ifaddrs  *ifa_next;    /* ??? */
-	char            *ifa_name;    /* ??? */
-	unsigned int     ifa_flags;   /* ??? */
-#if __SIZEOF_POINTER__ > 4
-	__BYTE_TYPE__ __ifa_pad[__SIZEOF_POINTER__ - 4];
-#endif /* __SIZEOF_POINTER__ > 4 */
-	struct sockaddr *ifa_addr;    /* ??? */
-	struct sockaddr *ifa_netmask; /* ??? */
-#undef ifa_broadaddr
-#undef ifa_dstaddr
-#ifdef __COMPILER_HAVE_TRANSPARENT_UNION
-	union {
-		union {
-			struct sockaddr *ifu_broadaddr; /* ??? */
-			struct sockaddr *ifu_dstaddr;   /* ??? */
-		} ifa_ifu;
-		struct sockaddr *ifa_broadaddr; /* ??? */
-		struct sockaddr *ifa_dstaddr;   /* ??? */
-	};
-#else /* __COMPILER_HAVE_TRANSPARENT_UNION */
-	union {
-		struct sockaddr *ifu_broadaddr; /* ??? */
-		struct sockaddr *ifu_dstaddr;   /* ??? */
-	} ifa_ifu;
-#define ifa_broadaddr ifa_ifu.ifu_broadaddr
-#define ifa_dstaddr   ifa_ifu.ifu_dstaddr
-#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
-	void *ifa_data; /* ??? */
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("mem_start")
+#pragma push_macro("mem_end")
+#pragma push_macro("base_addr")
+#pragma push_macro("irq")
+#pragma push_macro("dma")
+#pragma push_macro("port")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef mem_start
+#undef mem_end
+#undef base_addr
+#undef irq
+#undef dma
+#undef port
+struct ifmap {
+	__ULONGPTR_TYPE__ mem_start;
+	__ULONGPTR_TYPE__ mem_end;
+	__UINT16_TYPE__   base_addr;
+	__UINT8_TYPE__    irq;
+	__UINT8_TYPE__    dma;
+	__UINT8_TYPE__    port;
+	__UINT8_TYPE__    __ifm_pad[3]; /* 3 bytes spare */
 };
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("port")
+#pragma pop_macro("dma")
+#pragma pop_macro("irq")
+#pragma pop_macro("base_addr")
+#pragma pop_macro("mem_end")
+#pragma pop_macro("mem_start")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_BITS_CRT_IFADDRS_H */
+#endif /* !_BITS_OS_KOS_IFMAP_H */

@@ -17,53 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_CRT_IFADDRS_H
-#define _BITS_CRT_IFADDRS_H 1
+#ifndef _ASM_OS_NET_IF_H
+#define _ASM_OS_NET_IF_H 1
 
 #include <__stdinc.h>
 
-#include <hybrid/typecore.h>
+#if defined(__KOS__) || defined(__linux__)
+#include <asm/os/kos/net-if.h>
+#endif /* ... */
 
-#include <bits/types.h>
-
-#ifdef __CC__
-__DECL_BEGIN
-
-struct ifaddrs;
-struct sockaddr;
-
-struct ifaddrs {
-	struct ifaddrs  *ifa_next;    /* ??? */
-	char            *ifa_name;    /* ??? */
-	unsigned int     ifa_flags;   /* ??? */
-#if __SIZEOF_POINTER__ > 4
-	__BYTE_TYPE__ __ifa_pad[__SIZEOF_POINTER__ - 4];
-#endif /* __SIZEOF_POINTER__ > 4 */
-	struct sockaddr *ifa_addr;    /* ??? */
-	struct sockaddr *ifa_netmask; /* ??? */
-#undef ifa_broadaddr
-#undef ifa_dstaddr
-#ifdef __COMPILER_HAVE_TRANSPARENT_UNION
-	union {
-		union {
-			struct sockaddr *ifu_broadaddr; /* ??? */
-			struct sockaddr *ifu_dstaddr;   /* ??? */
-		} ifa_ifu;
-		struct sockaddr *ifa_broadaddr; /* ??? */
-		struct sockaddr *ifa_dstaddr;   /* ??? */
-	};
-#else /* __COMPILER_HAVE_TRANSPARENT_UNION */
-	union {
-		struct sockaddr *ifu_broadaddr; /* ??? */
-		struct sockaddr *ifu_dstaddr;   /* ??? */
-	} ifa_ifu;
-#define ifa_broadaddr ifa_ifu.ifu_broadaddr
-#define ifa_dstaddr   ifa_ifu.ifu_dstaddr
-#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
-	void *ifa_data; /* ??? */
-};
-
-__DECL_END
-#endif /* __CC__ */
-
-#endif /* !_BITS_CRT_IFADDRS_H */
+#endif /* !_ASM_OS_NET_IF_H */
