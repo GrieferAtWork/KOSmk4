@@ -48,7 +48,7 @@
 %[define_ccompat_header("ctime")]
 %[default:section(".text.crt{|.dos}.time")]
 
-%[define_decl_include("<bits/crt/tm.h>": ["struct tm"])]
+%[define_decl_include("<bits/crt/tm.h>": ["struct tm", "struct __NAMESPACE_STD_SYM tm"])]
 %[define_decl_include("<bits/os/sigevent.h>": ["struct sigevent"])]
 %[define_decl_include("<bits/os/timex.h>": ["struct timex", "struct timex64"])]
 
@@ -877,6 +877,7 @@ __LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
 @@Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
 @@that is  the  representation  of  `tp'  in  this  format
 [[std, wunused, impl_prefix(DEFINE_CTIME_BUFFER)]]
+[[decl_include("<bits/crt/tm.h>")]]
 [[nonnull]] char *asctime([[in]] struct $tm const *tp) {
 	return asctime_r(tp, __NAMESPACE_LOCAL_SYM __ctime_buf);
 }
@@ -1235,7 +1236,7 @@ $time_t timegm([[inout]] struct $tm *tp) {
 
 @@>> timelocal(3), timelocal64(3)
 @@Another   name   for   `mktime'
-[[pure, wunused, decl_include("<bits/types.h>", "<features.h>")]]
+[[pure, wunused, decl_include("<bits/types.h>", "<features.h>", "<bits/crt/tm.h>")]]
 $time_t timelocal([[inout]] struct $tm *tp) = mktime;
 
 

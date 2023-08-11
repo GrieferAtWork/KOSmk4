@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3c18a8 */
+/* HASH CRC-32:0xa31836ae */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1505,31 +1505,31 @@ DEFINE_PUBLIC_ALIAS(DOS$if_indextoname, libd_if_indextoname);
 DEFINE_PUBLIC_ALIAS(DOS$if_freenameindex, libd_if_freenameindex);
 
 /* netdb */
-DEFINE_PUBLIC_ALIAS(DOS$herror, libd_herror);
-DEFINE_PUBLIC_ALIAS(DOS$hstrerror, libd_hstrerror);
 DEFINE_PUBLIC_ALIAS(DOS$sethostent, libd_sethostent);
 DEFINE_PUBLIC_ALIAS(DOS$gethostbyaddr, libd_gethostbyaddr);
 DEFINE_PUBLIC_ALIAS(DOS$gethostbyname, libd_gethostbyname);
+DEFINE_PUBLIC_ALIAS(DOS$setnetent, libd_setnetent);
+DEFINE_PUBLIC_ALIAS(DOS$getnetbyaddr, libd_getnetbyaddr);
+DEFINE_PUBLIC_ALIAS(DOS$getnetbyname, libd_getnetbyname);
+DEFINE_PUBLIC_ALIAS(DOS$setservent, libd_setservent);
+DEFINE_PUBLIC_ALIAS(DOS$getservbyname, libd_getservbyname);
+DEFINE_PUBLIC_ALIAS(DOS$getservbyport, libd_getservbyport);
+DEFINE_PUBLIC_ALIAS(DOS$setprotoent, libd_setprotoent);
+DEFINE_PUBLIC_ALIAS(DOS$getprotobyname, libd_getprotobyname);
+DEFINE_PUBLIC_ALIAS(DOS$getprotobynumber, libd_getprotobynumber);
+DEFINE_PUBLIC_ALIAS(DOS$herror, libd_herror);
+DEFINE_PUBLIC_ALIAS(DOS$hstrerror, libd_hstrerror);
 DEFINE_PUBLIC_ALIAS(DOS$gethostbyname2, libd_gethostbyname2);
 DEFINE_PUBLIC_ALIAS(DOS$gethostent_r, libd_gethostent_r);
 DEFINE_PUBLIC_ALIAS(DOS$gethostbyaddr_r, libd_gethostbyaddr_r);
 DEFINE_PUBLIC_ALIAS(DOS$gethostbyname_r, libd_gethostbyname_r);
 DEFINE_PUBLIC_ALIAS(DOS$gethostbyname2_r, libd_gethostbyname2_r);
-DEFINE_PUBLIC_ALIAS(DOS$setnetent, libd_setnetent);
-DEFINE_PUBLIC_ALIAS(DOS$getnetbyaddr, libd_getnetbyaddr);
-DEFINE_PUBLIC_ALIAS(DOS$getnetbyname, libd_getnetbyname);
 DEFINE_PUBLIC_ALIAS(DOS$getnetent_r, libd_getnetent_r);
 DEFINE_PUBLIC_ALIAS(DOS$getnetbyaddr_r, libd_getnetbyaddr_r);
 DEFINE_PUBLIC_ALIAS(DOS$getnetbyname_r, libd_getnetbyname_r);
-DEFINE_PUBLIC_ALIAS(DOS$setservent, libd_setservent);
-DEFINE_PUBLIC_ALIAS(DOS$getservbyname, libd_getservbyname);
-DEFINE_PUBLIC_ALIAS(DOS$getservbyport, libd_getservbyport);
 DEFINE_PUBLIC_ALIAS(DOS$getservent_r, libd_getservent_r);
 DEFINE_PUBLIC_ALIAS(DOS$getservbyname_r, libd_getservbyname_r);
 DEFINE_PUBLIC_ALIAS(DOS$getservbyport_r, libd_getservbyport_r);
-DEFINE_PUBLIC_ALIAS(DOS$setprotoent, libd_setprotoent);
-DEFINE_PUBLIC_ALIAS(DOS$getprotobyname, libd_getprotobyname);
-DEFINE_PUBLIC_ALIAS(DOS$getprotobynumber, libd_getprotobynumber);
 DEFINE_PUBLIC_ALIAS(DOS$getprotoent_r, libd_getprotoent_r);
 DEFINE_PUBLIC_ALIAS(DOS$getprotobyname_r, libd_getprotobyname_r);
 DEFINE_PUBLIC_ALIAS(DOS$getprotobynumber_r, libd_getprotobynumber_r);
@@ -1552,10 +1552,10 @@ DEFINE_PUBLIC_ALIAS(DOS$freeaddrinfo, libd_freeaddrinfo);
 DEFINE_PUBLIC_ALIAS(DOS$gai_strerror, libd_gai_strerror);
 DEFINE_PUBLIC_ALIAS(DOS$getnameinfo, libd_getnameinfo);
 DEFINE_PUBLIC_ALIAS(DOS$getaddrinfo_a, libd_getaddrinfo_a);
-DEFINE_PUBLIC_ALIAS(DOS$gai_suspend, libd_gai_suspend);
-DEFINE_PUBLIC_ALIAS(DOS$gai_suspend64, libd_gai_suspend64);
 DEFINE_PUBLIC_ALIAS(DOS$gai_error, libd_gai_error);
 DEFINE_PUBLIC_ALIAS(DOS$gai_cancel, libd_gai_cancel);
+DEFINE_PUBLIC_ALIAS(DOS$gai_suspend, libd_gai_suspend);
+DEFINE_PUBLIC_ALIAS(DOS$gai_suspend64, libd_gai_suspend64);
 
 /* netinet.ether */
 DEFINE_PUBLIC_ALIAS(DOS$ether_ntoa, libd_ether_ntoa);

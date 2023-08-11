@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaed86bc1 */
+/* HASH CRC-32:0x76129b51 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_gai_suspend64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_gai_suspend
+#include <bits/crt/gaicb.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_gai_suspend32_defined

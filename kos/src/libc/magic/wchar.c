@@ -44,7 +44,7 @@
 
 %[define_ccompat_header("cwchar")]
 
-%[define_decl_include("<bits/crt/tm.h>": ["struct tm"])]
+%[define_decl_include("<bits/crt/tm.h>": ["struct tm", "struct __NAMESPACE_STD_SYM tm"])]
 %[define_decl_include("<bits/crt/mbstate.h>": ["struct __mbstate"])]
 
 %[define_replacement(mbstate_t = "struct __mbstate")]

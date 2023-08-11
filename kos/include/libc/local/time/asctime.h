@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15253d86 */
+/* HASH CRC-32:0x65b301b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,11 @@
 #ifndef __local_asctime_defined
 #define __local_asctime_defined
 #include <__crt.h>
+#include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_asctime_r_defined
 #define __local___localdep_asctime_r_defined
 #ifdef __CRT_HAVE_asctime_r
-__NAMESPACE_LOCAL_END
-#include <bits/crt/tm.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),char *,__NOTHROW_NCX,__localdep_asctime_r,(struct __NAMESPACE_STD_SYM tm const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
 #else /* __CRT_HAVE_asctime_r */
 __NAMESPACE_LOCAL_END

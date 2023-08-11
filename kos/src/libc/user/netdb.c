@@ -25,8 +25,7 @@
 
 DECL_BEGIN
 
-/*[[[head:libc___h_errno_location,hash:CRC-32=0x62884194]]]*/
-/* Function to get address of global `h_errno' variable */
+/*[[[head:libc___h_errno_location,hash:CRC-32=0x2937b5c1]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") ATTR_CONST ATTR_RETNONNULL WUNUSED int *
 NOTHROW(LIBCCALL libc___h_errno_location)(void)
 /*[[[body:libc___h_errno_location]]]*/
@@ -37,35 +36,35 @@ NOTHROW(LIBCCALL libc___h_errno_location)(void)
 }
 /*[[[end:libc___h_errno_location]]]*/
 
-/*[[[head:libc_herror,hash:CRC-32=0x3df28dff]]]*/
-/* Print error indicated by `h_errno' variable on standard error.
- * if non-`NULL',  `str'  is  printed before  the  error  string. */
+/*[[[head:libc_herror,hash:CRC-32=0xfeb51337]]]*/
+/* >> herror(3)
+ * Same as `perror(3)' for `errno(3)', print `message' (if non-null),
+ * alongside   the  value  of  `hstrerror(h_errno)'  to  `stderr(3)'. */
 INTERN ATTR_SECTION(".text.crt.net.db") void
-NOTHROW_RPC(LIBCCALL libc_herror)(char const *str)
+NOTHROW_CB_NCX(LIBCCALL libc_herror)(char const *message)
 /*[[[body:libc_herror]]]*/
 /*AUTO*/{
-	(void)str;
-	CRT_UNIMPLEMENTEDF("herror(str: %q)", str); /* TODO */
+	(void)message;
+	CRT_UNIMPLEMENTEDF("herror(message: %q)", message); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_herror]]]*/
 
-/*[[[head:libc_hstrerror,hash:CRC-32=0xf839192c]]]*/
-/* Return string associated with error `err_num' */
+/*[[[head:libc_hstrerror,hash:CRC-32=0xf210b408]]]*/
+/* >> hstrerror(3)
+ * Return error message for `h_error' */
 INTERN ATTR_SECTION(".text.crt.net.db") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBCCALL libc_hstrerror)(int err_num)
+NOTHROW(LIBCCALL libc_hstrerror)(int h_error)
 /*[[[body:libc_hstrerror]]]*/
 /*AUTO*/{
-	(void)err_num;
-	CRT_UNIMPLEMENTEDF("hstrerror(err_num: %x)", err_num); /* TODO */
+	(void)h_error;
+	CRT_UNIMPLEMENTEDF("hstrerror(h_error: %x)", h_error); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
 /*[[[end:libc_hstrerror]]]*/
 
-/*[[[head:libc_sethostent,hash:CRC-32=0x31a66e0]]]*/
-/* Open host  data  base  files and  mark  them  as  staying
- * open even after a later search if `stay_open' is non-zero */
+/*[[[head:libc_sethostent,hash:CRC-32=0x23a4f1f2]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") void
 NOTHROW_RPC(LIBCCALL libc_sethostent)(int stay_open)
 /*[[[body:libc_sethostent]]]*/
@@ -76,8 +75,7 @@ NOTHROW_RPC(LIBCCALL libc_sethostent)(int stay_open)
 }
 /*[[[end:libc_sethostent]]]*/
 
-/*[[[head:libc_endhostent,hash:CRC-32=0x7a91955f]]]*/
-/* Close host data base files and clear `stay open' flag */
+/*[[[head:libc_endhostent,hash:CRC-32=0xe3736f34]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") void
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endhostent)(void)
 /*[[[body:libc_endhostent]]]*/
@@ -87,8 +85,7 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endhostent)(void)
 }
 /*[[[end:libc_endhostent]]]*/
 
-/*[[[head:libc_gethostent,hash:CRC-32=0xc2def0f7]]]*/
-/* Get next entry from host data base file. Open data base if necessary */
+/*[[[head:libc_gethostent,hash:CRC-32=0x9de52062]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") struct hostent *
 NOTHROW_RPC(LIBCCALL libc_gethostent)(void)
 /*[[[body:libc_gethostent]]]*/
@@ -99,8 +96,7 @@ NOTHROW_RPC(LIBCCALL libc_gethostent)(void)
 }
 /*[[[end:libc_gethostent]]]*/
 
-/*[[[head:libc_gethostbyaddr,hash:CRC-32=0x6869383e]]]*/
-/* Return entry from host data base which address match `addr' with length `len' and type `type' */
+/*[[[head:libc_gethostbyaddr,hash:CRC-32=0xfd8977d6]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") struct hostent *
 NOTHROW_RPC(LIBCCALL libc_gethostbyaddr)(void const *addr,
                                          socklen_t len,
@@ -116,8 +112,7 @@ NOTHROW_RPC(LIBCCALL libc_gethostbyaddr)(void const *addr,
 }
 /*[[[end:libc_gethostbyaddr]]]*/
 
-/*[[[head:libc_gethostbyname,hash:CRC-32=0xf01477c1]]]*/
-/* Return entry from host data base for host with `name' */
+/*[[[head:libc_gethostbyname,hash:CRC-32=0x533d010e]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") struct hostent *
 NOTHROW_RPC(LIBCCALL libc_gethostbyname)(char const *name)
 /*[[[body:libc_gethostbyname]]]*/
@@ -129,12 +124,7 @@ NOTHROW_RPC(LIBCCALL libc_gethostbyname)(char const *name)
 }
 /*[[[end:libc_gethostbyname]]]*/
 
-/*[[[head:libc_gethostbyname2,hash:CRC-32=0xc1529cfe]]]*/
-/* Return entry from host data base for host with `name'. `af' must be
- * set to the address type which  is `AF_INET' for IPv4 or  `AF_INET6'
- * for IPv6.
- * This function is not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_gethostbyname2,hash:CRC-32=0x42431e14]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") struct hostent *
 NOTHROW_RPC(LIBCCALL libc_gethostbyname2)(char const *name,
                                           int af)
@@ -148,12 +138,7 @@ NOTHROW_RPC(LIBCCALL libc_gethostbyname2)(char const *name,
 }
 /*[[[end:libc_gethostbyname2]]]*/
 
-/*[[[head:libc_gethostent_r,hash:CRC-32=0xdb0f55e1]]]*/
-/* Reentrant versions of  the functions above.  The additional  arguments
- * specify a buffer of `buflen' starting at `buf'. The last argument is a
- * pointer to a variable  which gets the value  which would be stored  in
- * the global variable `herrno' by the non-reentrant functions.
- * These functions are not part of POSIX and therefore no official cancellation point */
+/*[[[head:libc_gethostent_r,hash:CRC-32=0x8d84f175]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_gethostent_r)(struct hostent *__restrict result_buf,
                                         char *__restrict buf,
@@ -172,12 +157,7 @@ NOTHROW_RPC(LIBCCALL libc_gethostent_r)(struct hostent *__restrict result_buf,
 }
 /*[[[end:libc_gethostent_r]]]*/
 
-/*[[[head:libc_gethostbyaddr_r,hash:CRC-32=0xe59fe690]]]*/
-/* Reentrant versions of  the functions above.  The additional  arguments
- * specify a buffer of `buflen' starting at `buf'. The last argument is a
- * pointer to a variable  which gets the value  which would be stored  in
- * the global variable `herrno' by the non-reentrant functions.
- * These functions are not part of POSIX and therefore no official cancellation point */
+/*[[[head:libc_gethostbyaddr_r,hash:CRC-32=0xf1b08b28]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_gethostbyaddr_r)(void const *__restrict addr,
                                            socklen_t len,
@@ -202,12 +182,7 @@ NOTHROW_RPC(LIBCCALL libc_gethostbyaddr_r)(void const *__restrict addr,
 }
 /*[[[end:libc_gethostbyaddr_r]]]*/
 
-/*[[[head:libc_gethostbyname_r,hash:CRC-32=0x434685b4]]]*/
-/* Reentrant versions of  the functions above.  The additional  arguments
- * specify a buffer of `buflen' starting at `buf'. The last argument is a
- * pointer to a variable  which gets the value  which would be stored  in
- * the global variable `herrno' by the non-reentrant functions.
- * These functions are not part of POSIX and therefore no official cancellation point */
+/*[[[head:libc_gethostbyname_r,hash:CRC-32=0x15244d08]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_gethostbyname_r)(char const *__restrict name,
                                            struct hostent *__restrict result_buf,
@@ -228,12 +203,7 @@ NOTHROW_RPC(LIBCCALL libc_gethostbyname_r)(char const *__restrict name,
 }
 /*[[[end:libc_gethostbyname_r]]]*/
 
-/*[[[head:libc_gethostbyname2_r,hash:CRC-32=0x49dd1e2a]]]*/
-/* Reentrant versions of  the functions above.  The additional  arguments
- * specify a buffer of `buflen' starting at `buf'. The last argument is a
- * pointer to a variable  which gets the value  which would be stored  in
- * the global variable `herrno' by the non-reentrant functions.
- * These functions are not part of POSIX and therefore no official cancellation point */
+/*[[[head:libc_gethostbyname2_r,hash:CRC-32=0xf60ad6dc]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_gethostbyname2_r)(char const *__restrict name,
                                             int af,
@@ -256,9 +226,7 @@ NOTHROW_RPC(LIBCCALL libc_gethostbyname2_r)(char const *__restrict name,
 }
 /*[[[end:libc_gethostbyname2_r]]]*/
 
-/*[[[head:libc_setnetent,hash:CRC-32=0x14999eb9]]]*/
-/* Open  network data  base files  and mark  them as staying
- * open even after a later search if `stay_open' is non-zero */
+/*[[[head:libc_setnetent,hash:CRC-32=0x5578b729]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") void
 NOTHROW_RPC(LIBCCALL libc_setnetent)(int stay_open)
 /*[[[body:libc_setnetent]]]*/
@@ -269,8 +237,7 @@ NOTHROW_RPC(LIBCCALL libc_setnetent)(int stay_open)
 }
 /*[[[end:libc_setnetent]]]*/
 
-/*[[[head:libc_endnetent,hash:CRC-32=0xa7bef8a8]]]*/
-/* Close network data base files and clear `stay open' flag */
+/*[[[head:libc_endnetent,hash:CRC-32=0xfe5e47ca]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") void
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endnetent)(void)
 /*[[[body:libc_endnetent]]]*/
@@ -280,8 +247,7 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endnetent)(void)
 }
 /*[[[end:libc_endnetent]]]*/
 
-/*[[[head:libc_getnetent,hash:CRC-32=0x66c5cdc2]]]*/
-/* Get next entry from network data base file. Open data base if necessary */
+/*[[[head:libc_getnetent,hash:CRC-32=0xc5c94396]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") struct netent *
 NOTHROW_RPC(LIBCCALL libc_getnetent)(void)
 /*[[[body:libc_getnetent]]]*/
@@ -292,8 +258,7 @@ NOTHROW_RPC(LIBCCALL libc_getnetent)(void)
 }
 /*[[[end:libc_getnetent]]]*/
 
-/*[[[head:libc_getnetbyaddr,hash:CRC-32=0x7734dae4]]]*/
-/* Return entry from network data base which address match `net' and type `type' */
+/*[[[head:libc_getnetbyaddr,hash:CRC-32=0x2346f298]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") struct netent *
 NOTHROW_RPC(LIBCCALL libc_getnetbyaddr)(uint32_t net,
                                         int type)
@@ -307,8 +272,7 @@ NOTHROW_RPC(LIBCCALL libc_getnetbyaddr)(uint32_t net,
 }
 /*[[[end:libc_getnetbyaddr]]]*/
 
-/*[[[head:libc_getnetbyname,hash:CRC-32=0xbb6c66ba]]]*/
-/* Return entry from network data base for network with `name' */
+/*[[[head:libc_getnetbyname,hash:CRC-32=0x72953a74]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") struct netent *
 NOTHROW_RPC(LIBCCALL libc_getnetbyname)(char const *name)
 /*[[[body:libc_getnetbyname]]]*/
@@ -320,14 +284,7 @@ NOTHROW_RPC(LIBCCALL libc_getnetbyname)(char const *name)
 }
 /*[[[end:libc_getnetbyname]]]*/
 
-/*[[[head:libc_getnetent_r,hash:CRC-32=0x8a1d44a5]]]*/
-/* Reentrant   versions  of  the   functions  above.  The  additional
- * arguments specify a buffer of `buflen' starting at `buf'. The last
- * argument  is a  pointer to a  variable which gets  the value which
- * would  be  stored   in  the  global   variable  `herrno'  by   the
- * non-reentrant functions.
- * These functions are not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_getnetent_r,hash:CRC-32=0x2d2fd254]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_getnetent_r)(struct netent *__restrict result_buf,
                                        char *__restrict buf,
@@ -346,14 +303,7 @@ NOTHROW_RPC(LIBCCALL libc_getnetent_r)(struct netent *__restrict result_buf,
 }
 /*[[[end:libc_getnetent_r]]]*/
 
-/*[[[head:libc_getnetbyaddr_r,hash:CRC-32=0xbcfe9d11]]]*/
-/* Reentrant   versions  of  the   functions  above.  The  additional
- * arguments specify a buffer of `buflen' starting at `buf'. The last
- * argument  is a  pointer to a  variable which gets  the value which
- * would  be  stored   in  the  global   variable  `herrno'  by   the
- * non-reentrant functions.
- * These functions are not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_getnetbyaddr_r,hash:CRC-32=0x28c4db0e]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_getnetbyaddr_r)(uint32_t net,
                                           int type,
@@ -376,14 +326,7 @@ NOTHROW_RPC(LIBCCALL libc_getnetbyaddr_r)(uint32_t net,
 }
 /*[[[end:libc_getnetbyaddr_r]]]*/
 
-/*[[[head:libc_getnetbyname_r,hash:CRC-32=0x1bebb1cf]]]*/
-/* Reentrant   versions  of  the   functions  above.  The  additional
- * arguments specify a buffer of `buflen' starting at `buf'. The last
- * argument  is a  pointer to a  variable which gets  the value which
- * would  be  stored   in  the  global   variable  `herrno'  by   the
- * non-reentrant functions.
- * These functions are not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_getnetbyname_r,hash:CRC-32=0xa1e63aee]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_getnetbyname_r)(char const *__restrict name,
                                           struct netent *__restrict result_buf,
@@ -404,9 +347,7 @@ NOTHROW_RPC(LIBCCALL libc_getnetbyname_r)(char const *__restrict name,
 }
 /*[[[end:libc_getnetbyname_r]]]*/
 
-/*[[[head:libc_setservent,hash:CRC-32=0x15672938]]]*/
-/* Open service data base files and mark them as staying open even
- * after a later search if `stay_open' is non-zero */
+/*[[[head:libc_setservent,hash:CRC-32=0xc81fee2b]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") void
 NOTHROW_RPC(LIBCCALL libc_setservent)(int stay_open)
 /*[[[body:libc_setservent]]]*/
@@ -417,8 +358,7 @@ NOTHROW_RPC(LIBCCALL libc_setservent)(int stay_open)
 }
 /*[[[end:libc_setservent]]]*/
 
-/*[[[head:libc_endservent,hash:CRC-32=0x9d96b3ef]]]*/
-/* Close service data base files and clear `stay open' flag */
+/*[[[head:libc_endservent,hash:CRC-32=0x9a7fcb04]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") void
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endservent)(void)
 /*[[[body:libc_endservent]]]*/
@@ -428,8 +368,7 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endservent)(void)
 }
 /*[[[end:libc_endservent]]]*/
 
-/*[[[head:libc_getservent,hash:CRC-32=0x878000a0]]]*/
-/* Get next entry from service data base file. Open data base if necessary */
+/*[[[head:libc_getservent,hash:CRC-32=0x6a265b3a]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") struct servent *
 NOTHROW_RPC(LIBCCALL libc_getservent)(void)
 /*[[[body:libc_getservent]]]*/
@@ -440,8 +379,7 @@ NOTHROW_RPC(LIBCCALL libc_getservent)(void)
 }
 /*[[[end:libc_getservent]]]*/
 
-/*[[[head:libc_getservbyname,hash:CRC-32=0x26948be3]]]*/
-/* Return entry from network data base for network with `name' and protocol `proto' */
+/*[[[head:libc_getservbyname,hash:CRC-32=0x3fbf69d1]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") struct servent *
 NOTHROW_RPC(LIBCCALL libc_getservbyname)(char const *name,
                                          char const *proto)
@@ -455,8 +393,7 @@ NOTHROW_RPC(LIBCCALL libc_getservbyname)(char const *name,
 }
 /*[[[end:libc_getservbyname]]]*/
 
-/*[[[head:libc_getservbyport,hash:CRC-32=0x17147e03]]]*/
-/* Return entry from service data base which matches port `port' and protocol `proto' */
+/*[[[head:libc_getservbyport,hash:CRC-32=0x6cb7cee7]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") struct servent *
 NOTHROW_RPC(LIBCCALL libc_getservbyport)(int port,
                                          char const *proto)
@@ -470,11 +407,7 @@ NOTHROW_RPC(LIBCCALL libc_getservbyport)(int port,
 }
 /*[[[end:libc_getservbyport]]]*/
 
-/*[[[head:libc_getservent_r,hash:CRC-32=0xfa14dd36]]]*/
-/* Reentrant  versions  of  the  functions  above.  The additional
- * arguments specify  a  buffer  of `buflen'  starting  at  `buf'.
- * These functions are not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_getservent_r,hash:CRC-32=0x7ac60c7d]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_getservent_r)(struct servent *__restrict result_buf,
                                         char *__restrict buf,
@@ -491,11 +424,7 @@ NOTHROW_RPC(LIBCCALL libc_getservent_r)(struct servent *__restrict result_buf,
 }
 /*[[[end:libc_getservent_r]]]*/
 
-/*[[[head:libc_getservbyname_r,hash:CRC-32=0x6576fa59]]]*/
-/* Reentrant  versions  of  the  functions  above.  The additional
- * arguments specify  a  buffer  of `buflen'  starting  at  `buf'.
- * These functions are not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_getservbyname_r,hash:CRC-32=0x5b7661ff]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_getservbyname_r)(char const *__restrict name,
                                            char const *__restrict proto,
@@ -516,11 +445,7 @@ NOTHROW_RPC(LIBCCALL libc_getservbyname_r)(char const *__restrict name,
 }
 /*[[[end:libc_getservbyname_r]]]*/
 
-/*[[[head:libc_getservbyport_r,hash:CRC-32=0x3982d271]]]*/
-/* Reentrant  versions  of  the  functions  above.  The additional
- * arguments specify  a  buffer  of `buflen'  starting  at  `buf'.
- * These functions are not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_getservbyport_r,hash:CRC-32=0x1ee96906]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_getservbyport_r)(int port,
                                            char const *__restrict proto,
@@ -541,9 +466,7 @@ NOTHROW_RPC(LIBCCALL libc_getservbyport_r)(int port,
 }
 /*[[[end:libc_getservbyport_r]]]*/
 
-/*[[[head:libc_setprotoent,hash:CRC-32=0xc55cd63e]]]*/
-/* Open protocol data base files and mark them as staying open even
- * after a later search if `stay_open' is non-zero */
+/*[[[head:libc_setprotoent,hash:CRC-32=0x2fde2b95]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") void
 NOTHROW_RPC(LIBCCALL libc_setprotoent)(int stay_open)
 /*[[[body:libc_setprotoent]]]*/
@@ -554,8 +477,7 @@ NOTHROW_RPC(LIBCCALL libc_setprotoent)(int stay_open)
 }
 /*[[[end:libc_setprotoent]]]*/
 
-/*[[[head:libc_endprotoent,hash:CRC-32=0x4b42dd2f]]]*/
-/* Close protocol data base files and clear `stay open' flag */
+/*[[[head:libc_endprotoent,hash:CRC-32=0x28403d17]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") void
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endprotoent)(void)
 /*[[[body:libc_endprotoent]]]*/
@@ -565,8 +487,7 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endprotoent)(void)
 }
 /*[[[end:libc_endprotoent]]]*/
 
-/*[[[head:libc_getprotoent,hash:CRC-32=0x3046364a]]]*/
-/* Get next entry from protocol data base file. Open data base if necessary */
+/*[[[head:libc_getprotoent,hash:CRC-32=0x150a0851]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") struct protoent *
 NOTHROW_RPC(LIBCCALL libc_getprotoent)(void)
 /*[[[body:libc_getprotoent]]]*/
@@ -577,8 +498,7 @@ NOTHROW_RPC(LIBCCALL libc_getprotoent)(void)
 }
 /*[[[end:libc_getprotoent]]]*/
 
-/*[[[head:libc_getprotobyname,hash:CRC-32=0xa428c732]]]*/
-/* Return entry from protocol data base for network with `name' */
+/*[[[head:libc_getprotobyname,hash:CRC-32=0x9ff89f2a]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") struct protoent *
 NOTHROW_RPC(LIBCCALL libc_getprotobyname)(char const *name)
 /*[[[body:libc_getprotobyname]]]*/
@@ -590,8 +510,7 @@ NOTHROW_RPC(LIBCCALL libc_getprotobyname)(char const *name)
 }
 /*[[[end:libc_getprotobyname]]]*/
 
-/*[[[head:libc_getprotobynumber,hash:CRC-32=0xd087333c]]]*/
-/* Return entry from protocol data base which number is `proto' */
+/*[[[head:libc_getprotobynumber,hash:CRC-32=0x70bc2f3c]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") struct protoent *
 NOTHROW_RPC(LIBCCALL libc_getprotobynumber)(int proto)
 /*[[[body:libc_getprotobynumber]]]*/
@@ -603,11 +522,7 @@ NOTHROW_RPC(LIBCCALL libc_getprotobynumber)(int proto)
 }
 /*[[[end:libc_getprotobynumber]]]*/
 
-/*[[[head:libc_getprotoent_r,hash:CRC-32=0xaca04390]]]*/
-/* Reentrant  versions  of  the  functions  above.  The additional
- * arguments specify  a  buffer  of `buflen'  starting  at  `buf'.
- * These functions are not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_getprotoent_r,hash:CRC-32=0x10c28544]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_getprotoent_r)(struct protoent *__restrict result_buf,
                                          char *__restrict buf,
@@ -624,11 +539,7 @@ NOTHROW_RPC(LIBCCALL libc_getprotoent_r)(struct protoent *__restrict result_buf,
 }
 /*[[[end:libc_getprotoent_r]]]*/
 
-/*[[[head:libc_getprotobyname_r,hash:CRC-32=0xc424c84a]]]*/
-/* Reentrant  versions  of  the  functions  above.  The additional
- * arguments specify  a  buffer  of `buflen'  starting  at  `buf'.
- * These functions are not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_getprotobyname_r,hash:CRC-32=0xa50ad72b]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_getprotobyname_r)(char const *__restrict name,
                                             struct protoent *__restrict result_buf,
@@ -647,11 +558,7 @@ NOTHROW_RPC(LIBCCALL libc_getprotobyname_r)(char const *__restrict name,
 }
 /*[[[end:libc_getprotobyname_r]]]*/
 
-/*[[[head:libc_getprotobynumber_r,hash:CRC-32=0x73229542]]]*/
-/* Reentrant  versions  of  the  functions  above.  The additional
- * arguments specify  a  buffer  of `buflen'  starting  at  `buf'.
- * These functions are not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_getprotobynumber_r,hash:CRC-32=0x57e015fe]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_getprotobynumber_r)(int proto,
                                               struct protoent *__restrict result_buf,
@@ -670,10 +577,7 @@ NOTHROW_RPC(LIBCCALL libc_getprotobynumber_r)(int proto,
 }
 /*[[[end:libc_getprotobynumber_r]]]*/
 
-/*[[[head:libc_setnetgrent,hash:CRC-32=0xf0acc3da]]]*/
-/* Establish  network   group   `netgroup'   for   enumeration.
- * This function is not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_setnetgrent,hash:CRC-32=0x1ec56114]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_setnetgrent)(char const *netgroup)
 /*[[[body:libc_setnetgrent]]]*/
@@ -684,10 +588,7 @@ NOTHROW_RPC(LIBCCALL libc_setnetgrent)(char const *netgroup)
 }
 /*[[[end:libc_setnetgrent]]]*/
 
-/*[[[head:libc_endnetgrent,hash:CRC-32=0x70dffff3]]]*/
-/* Free  all  space allocated  by previous  `setnetgrent' call.
- * This function is not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_endnetgrent,hash:CRC-32=0x837644f0]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") void
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endnetgrent)(void)
 /*[[[body:libc_endnetgrent]]]*/
@@ -697,11 +598,7 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endnetgrent)(void)
 }
 /*[[[end:libc_endnetgrent]]]*/
 
-/*[[[head:libc_getnetgrent,hash:CRC-32=0x76d83556]]]*/
-/* Get next member of netgroup established by last `setnetgrent'  call
- * and return pointers to elements in `hostp', `userp', and `domainp'.
- * This  function  is  not part  of  POSIX and  therefore  no official
- * cancellation point */
+/*[[[head:libc_getnetgrent,hash:CRC-32=0x70f78394]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_getnetgrent)(char **__restrict hostp,
                                        char **__restrict userp,
@@ -716,10 +613,7 @@ NOTHROW_RPC(LIBCCALL libc_getnetgrent)(char **__restrict hostp,
 }
 /*[[[end:libc_getnetgrent]]]*/
 
-/*[[[head:libc_innetgr,hash:CRC-32=0xdaac761b]]]*/
-/* Test whether `netgroup' contains the triple `(host, user, domain)'.
- * This  function  is  not part  of  POSIX and  therefore  no official
- * cancellation point */
+/*[[[head:libc_innetgr,hash:CRC-32=0x161ee05d]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_innetgr)(char const *netgroup,
                                    char const *host,
@@ -736,10 +630,7 @@ NOTHROW_RPC(LIBCCALL libc_innetgr)(char const *netgroup,
 }
 /*[[[end:libc_innetgr]]]*/
 
-/*[[[head:libc_getnetgrent_r,hash:CRC-32=0xfb5b8253]]]*/
-/* Reentrant version of `getnetgrent' where result is placed in `buf'.
- * This  function  is  not part  of  POSIX and  therefore  no official
- * cancellation point */
+/*[[[head:libc_getnetgrent_r,hash:CRC-32=0x62fafe75]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_getnetgrent_r)(char **__restrict hostp,
                                          char **__restrict userp,
@@ -758,15 +649,7 @@ NOTHROW_RPC(LIBCCALL libc_getnetgrent_r)(char **__restrict hostp,
 }
 /*[[[end:libc_getnetgrent_r]]]*/
 
-/*[[[head:libc_rcmd,hash:CRC-32=0xdadd635c]]]*/
-/* Call `rshd' at port `rport' on remote machine `*ahost' to execute `cmd'.
- * The  local  user is  `locuser',  on the  remote  machine the  command is
- * executed as `remuser'. In `*fd2p' the  descriptor to the socket for  the
- * connection is  returned.  The  caller  must have  the  right  to  use  a
- * reserved  port.  When  the   function  returns  `*ahost'  contains   the
- * official host name.
- * This function is not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_rcmd,hash:CRC-32=0xa65ca190]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_rcmd)(char **__restrict ahost,
                                 uint16_t rport,
@@ -787,11 +670,7 @@ NOTHROW_RPC(LIBCCALL libc_rcmd)(char **__restrict ahost,
 }
 /*[[[end:libc_rcmd]]]*/
 
-/*[[[head:libc_rcmd_af,hash:CRC-32=0x1a90e0c3]]]*/
-/* This is the equivalent function where the protocol can be selected
- * and which therefore can be used for IPv6.
- * This function is not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_rcmd_af,hash:CRC-32=0xd263b4a0]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_rcmd_af)(char **__restrict ahost,
                                    uint16_t rport,
@@ -814,14 +693,7 @@ NOTHROW_RPC(LIBCCALL libc_rcmd_af)(char **__restrict ahost,
 }
 /*[[[end:libc_rcmd_af]]]*/
 
-/*[[[head:libc_rexec,hash:CRC-32=0x2d1e7e06]]]*/
-/* Call  `rexecd' at port  `rport' on remote  machine `*ahost' to execute
- * `cmd'. The process  runs at the  remote machine using  the ID of  user
- * `name' whose cleartext password is `passwd'. In `*fd2p' the descriptor
- * to  the  socket  for the  connection  is returned.  When  the function
- * returns    `*ahost'     contains    the     official    host     name.
- * This  function  is  not  part  of  POSIX  and  therefore  no  official
- * cancellation point */
+/*[[[head:libc_rexec,hash:CRC-32=0x55c08094]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_rexec)(char **__restrict ahost,
                                  int rport,
@@ -842,11 +714,7 @@ NOTHROW_RPC(LIBCCALL libc_rexec)(char **__restrict ahost,
 }
 /*[[[end:libc_rexec]]]*/
 
-/*[[[head:libc_rexec_af,hash:CRC-32=0xbc991207]]]*/
-/* This is the equivalent function where the protocol can be selected
- * and which therefore can be used for IPv6.
- * This function is not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_rexec_af,hash:CRC-32=0xc59a6e22]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_rexec_af)(char **__restrict ahost,
                                     int rport,
@@ -869,12 +737,7 @@ NOTHROW_RPC(LIBCCALL libc_rexec_af)(char **__restrict ahost,
 }
 /*[[[end:libc_rexec_af]]]*/
 
-/*[[[head:libc_ruserok,hash:CRC-32=0x68cc012a]]]*/
-/* Check whether user `remuser' on system `rhost' is allowed to login
- * as `locuser'. If  `suser' is  not zero  the user  tries to  become
- * superuser. Return 0 if it is possible.
- * This function is not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_ruserok,hash:CRC-32=0x3bb85afa]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_ruserok)(char const *rhost,
                                    int suser,
@@ -891,11 +754,7 @@ NOTHROW_RPC(LIBCCALL libc_ruserok)(char const *rhost,
 }
 /*[[[end:libc_ruserok]]]*/
 
-/*[[[head:libc_ruserok_af,hash:CRC-32=0xb4d26d2]]]*/
-/* This is the equivalent function where the protocol can be selected
- * and which therefore can be used for IPv6.
- * This function is not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_ruserok_af,hash:CRC-32=0x2ef33b0]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_ruserok_af)(char const *rhost,
                                       int suser,
@@ -914,13 +773,7 @@ NOTHROW_RPC(LIBCCALL libc_ruserok_af)(char const *rhost,
 }
 /*[[[end:libc_ruserok_af]]]*/
 
-/*[[[head:libc_iruserok,hash:CRC-32=0x40a476fd]]]*/
-/* Check whether user  `remuser' on system  indicated by IPv4  address
- * `raddr' is allowed to login as `locuser'. Non-IPv4 (e.g., IPv6) are
- * not supported. If  `suser' is  not zero  the user  tries to  become
- * superuser. Return 0 if it is possible.
- * This function is not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_iruserok,hash:CRC-32=0xa6d93f06]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_iruserok)(uint32_t raddr,
                                     int suser,
@@ -937,12 +790,7 @@ NOTHROW_RPC(LIBCCALL libc_iruserok)(uint32_t raddr,
 }
 /*[[[end:libc_iruserok]]]*/
 
-/*[[[head:libc_iruserok_af,hash:CRC-32=0x51e62658]]]*/
-/* This is the equivalent function where the family is the address
- * pointed  to by `raddr'  is determined by the  value of `af'. It
- * therefore can be used for IPv6
- * This function is not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_iruserok_af,hash:CRC-32=0x7ed0a242]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_iruserok_af)(void const *raddr,
                                        int suser,
@@ -961,12 +809,7 @@ NOTHROW_RPC(LIBCCALL libc_iruserok_af)(void const *raddr,
 }
 /*[[[end:libc_iruserok_af]]]*/
 
-/*[[[head:libc_rresvport,hash:CRC-32=0x62cfe673]]]*/
-/* Try to allocate reserved port, returning a descriptor for a socket opened
- * at this port  or -1  if unsuccessful. The  search for  an available  port
- * will   start   at   `alport'   and   continues   with   lower    numbers.
- * This   function  is  not   part  of  POSIX   and  therefore  no  official
- * cancellation point */
+/*[[[head:libc_rresvport,hash:CRC-32=0xbdaf278f]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_rresvport)(int *alport)
 /*[[[body:libc_rresvport]]]*/
@@ -977,11 +820,7 @@ NOTHROW_RPC(LIBCCALL libc_rresvport)(int *alport)
 }
 /*[[[end:libc_rresvport]]]*/
 
-/*[[[head:libc_rresvport_af,hash:CRC-32=0x4f55d766]]]*/
-/* This is the equivalent function where the protocol can be selected
- * and which therefore can be used for IPv6.
- * This function is not part of POSIX and therefore no official
- * cancellation point */
+/*[[[head:libc_rresvport_af,hash:CRC-32=0x3c3b5435]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_rresvport_af)(int *alport,
                                         sa_family_t af)
@@ -994,8 +833,7 @@ NOTHROW_RPC(LIBCCALL libc_rresvport_af)(int *alport,
 }
 /*[[[end:libc_rresvport_af]]]*/
 
-/*[[[head:libc_getaddrinfo,hash:CRC-32=0xdb36816d]]]*/
-/* Translate name of a service location and/or a service name to set of socket addresses */
+/*[[[head:libc_getaddrinfo,hash:CRC-32=0x70cf056]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_getaddrinfo)(char const *__restrict name,
                                        char const *__restrict service,
@@ -1012,8 +850,7 @@ NOTHROW_RPC(LIBCCALL libc_getaddrinfo)(char const *__restrict name,
 }
 /*[[[end:libc_getaddrinfo]]]*/
 
-/*[[[head:libc_freeaddrinfo,hash:CRC-32=0xb1c21254]]]*/
-/* Free `addrinfo' structure `ai' including associated storage */
+/*[[[head:libc_freeaddrinfo,hash:CRC-32=0x5c28a0b1]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") void
 NOTHROW_NCX(LIBCCALL libc_freeaddrinfo)(struct addrinfo *ai)
 /*[[[body:libc_freeaddrinfo]]]*/
@@ -1024,8 +861,7 @@ NOTHROW_NCX(LIBCCALL libc_freeaddrinfo)(struct addrinfo *ai)
 }
 /*[[[end:libc_freeaddrinfo]]]*/
 
-/*[[[head:libc_gai_strerror,hash:CRC-32=0x3a60935a]]]*/
-/* Convert error return from getaddrinfo() to a string */
+/*[[[head:libc_gai_strerror,hash:CRC-32=0x554a0b04]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") ATTR_CONST WUNUSED char const *
 NOTHROW(LIBCCALL libc_gai_strerror)(int ecode)
 /*[[[body:libc_gai_strerror]]]*/
@@ -1037,8 +873,7 @@ NOTHROW(LIBCCALL libc_gai_strerror)(int ecode)
 }
 /*[[[end:libc_gai_strerror]]]*/
 
-/*[[[head:libc_getnameinfo,hash:CRC-32=0x68769ce0]]]*/
-/* Translate a socket address to a location and service name */
+/*[[[head:libc_getnameinfo,hash:CRC-32=0xc2233bbd]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_getnameinfo)(struct sockaddr const *__restrict sa,
                                        socklen_t salen,
@@ -1061,12 +896,7 @@ NOTHROW_RPC(LIBCCALL libc_getnameinfo)(struct sockaddr const *__restrict sa,
 }
 /*[[[end:libc_getnameinfo]]]*/
 
-/*[[[head:libc_getaddrinfo_a,hash:CRC-32=0x2b0df8a3]]]*/
-/* Enqueue `ent' requests from the `list'. If `mode' is GAI_WAIT wait until all
- * requests  are  handled. If  `wait'  is GAI_NOWAIT  return  immediately after
- * queueing  the   requests  and   signal   completion  according   to   `sig'.
- * This   function   is  not   part  of   POSIX   and  therefore   no  official
- * cancellation point */
+/*[[[head:libc_getaddrinfo_a,hash:CRC-32=0x58a5b7a]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_getaddrinfo_a)(int mode,
                                          struct gaicb *list[__restrict_arr],
@@ -1083,12 +913,7 @@ NOTHROW_RPC(LIBCCALL libc_getaddrinfo_a)(int mode,
 }
 /*[[[end:libc_getaddrinfo_a]]]*/
 
-/*[[[head:libc_gai_suspend,hash:CRC-32=0xf2ccc6c6]]]*/
-/* Suspend execution of the thread until at least one of the `ent'  requests
- * in `list' is handled. If `timeout' is not a null pointer it specifies the
- * longest time the function keeps  waiting before returning with an  error.
- * This   function  is  not   part  of  POSIX   and  therefore  no  official
- * cancellation point */
+/*[[[head:libc_gai_suspend,hash:CRC-32=0x166e4979]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_gai_suspend)(struct gaicb const *const list[],
                                        int ent,
@@ -1104,8 +929,7 @@ NOTHROW_RPC(LIBCCALL libc_gai_suspend)(struct gaicb const *const list[],
 }
 /*[[[end:libc_gai_suspend]]]*/
 
-/*[[[head:libc_gai_error,hash:CRC-32=0x71c62eb5]]]*/
-/* Get the error status of the request `req' */
+/*[[[head:libc_gai_error,hash:CRC-32=0xb0937d1e]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_NCX(LIBCCALL libc_gai_error)(struct gaicb *req)
 /*[[[body:libc_gai_error]]]*/
@@ -1116,8 +940,7 @@ NOTHROW_NCX(LIBCCALL libc_gai_error)(struct gaicb *req)
 }
 /*[[[end:libc_gai_error]]]*/
 
-/*[[[head:libc_gai_cancel,hash:CRC-32=0x1e325ba9]]]*/
-/* Cancel the requests associated with `gaicbp' */
+/*[[[head:libc_gai_cancel,hash:CRC-32=0xc7b9eb5d]]]*/
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_NCX(LIBCCALL libc_gai_cancel)(struct gaicb *gaicbp)
 /*[[[body:libc_gai_cancel]]]*/
@@ -1128,15 +951,10 @@ NOTHROW_NCX(LIBCCALL libc_gai_cancel)(struct gaicb *gaicbp)
 }
 /*[[[end:libc_gai_cancel]]]*/
 
-/*[[[head:libc_gai_suspend64,hash:CRC-32=0x3c70468d]]]*/
+/*[[[head:libc_gai_suspend64,hash:CRC-32=0x600a2365]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_gai_suspend64, libc_gai_suspend);
 #else /* MAGIC:alias */
-/* Suspend execution of the thread until at least one of the `ent'  requests
- * in `list' is handled. If `timeout' is not a null pointer it specifies the
- * longest time the function keeps  waiting before returning with an  error.
- * This   function  is  not   part  of  POSIX   and  therefore  no  official
- * cancellation point */
 INTERN ATTR_SECTION(".text.crt.net.db") int
 NOTHROW_RPC(LIBCCALL libc_gai_suspend64)(struct gaicb const *const list[],
                                          int ent,
@@ -1157,41 +975,41 @@ NOTHROW_RPC(LIBCCALL libc_gai_suspend64)(struct gaicb const *const list[],
 
 
 
-/*[[[start:exports,hash:CRC-32=0x3ad723b5]]]*/
-DEFINE_PUBLIC_ALIAS(__h_errno_location, libc___h_errno_location);
-DEFINE_PUBLIC_ALIAS(herror, libc_herror);
-DEFINE_PUBLIC_ALIAS(hstrerror, libc_hstrerror);
+/*[[[start:exports,hash:CRC-32=0x17e37c1b]]]*/
 DEFINE_PUBLIC_ALIAS(sethostent, libc_sethostent);
 DEFINE_PUBLIC_ALIAS(endhostent, libc_endhostent);
 DEFINE_PUBLIC_ALIAS(gethostent, libc_gethostent);
 DEFINE_PUBLIC_ALIAS(gethostbyaddr, libc_gethostbyaddr);
 DEFINE_PUBLIC_ALIAS(gethostbyname, libc_gethostbyname);
-DEFINE_PUBLIC_ALIAS(gethostbyname2, libc_gethostbyname2);
-DEFINE_PUBLIC_ALIAS(gethostent_r, libc_gethostent_r);
-DEFINE_PUBLIC_ALIAS(gethostbyaddr_r, libc_gethostbyaddr_r);
-DEFINE_PUBLIC_ALIAS(gethostbyname_r, libc_gethostbyname_r);
-DEFINE_PUBLIC_ALIAS(gethostbyname2_r, libc_gethostbyname2_r);
 DEFINE_PUBLIC_ALIAS(setnetent, libc_setnetent);
 DEFINE_PUBLIC_ALIAS(endnetent, libc_endnetent);
 DEFINE_PUBLIC_ALIAS(getnetent, libc_getnetent);
 DEFINE_PUBLIC_ALIAS(getnetbyaddr, libc_getnetbyaddr);
 DEFINE_PUBLIC_ALIAS(getnetbyname, libc_getnetbyname);
-DEFINE_PUBLIC_ALIAS(getnetent_r, libc_getnetent_r);
-DEFINE_PUBLIC_ALIAS(getnetbyaddr_r, libc_getnetbyaddr_r);
-DEFINE_PUBLIC_ALIAS(getnetbyname_r, libc_getnetbyname_r);
 DEFINE_PUBLIC_ALIAS(setservent, libc_setservent);
 DEFINE_PUBLIC_ALIAS(endservent, libc_endservent);
 DEFINE_PUBLIC_ALIAS(getservent, libc_getservent);
 DEFINE_PUBLIC_ALIAS(getservbyname, libc_getservbyname);
 DEFINE_PUBLIC_ALIAS(getservbyport, libc_getservbyport);
-DEFINE_PUBLIC_ALIAS(getservent_r, libc_getservent_r);
-DEFINE_PUBLIC_ALIAS(getservbyname_r, libc_getservbyname_r);
-DEFINE_PUBLIC_ALIAS(getservbyport_r, libc_getservbyport_r);
 DEFINE_PUBLIC_ALIAS(setprotoent, libc_setprotoent);
 DEFINE_PUBLIC_ALIAS(endprotoent, libc_endprotoent);
 DEFINE_PUBLIC_ALIAS(getprotoent, libc_getprotoent);
 DEFINE_PUBLIC_ALIAS(getprotobyname, libc_getprotobyname);
 DEFINE_PUBLIC_ALIAS(getprotobynumber, libc_getprotobynumber);
+DEFINE_PUBLIC_ALIAS(__h_errno_location, libc___h_errno_location);
+DEFINE_PUBLIC_ALIAS(herror, libc_herror);
+DEFINE_PUBLIC_ALIAS(hstrerror, libc_hstrerror);
+DEFINE_PUBLIC_ALIAS(gethostbyname2, libc_gethostbyname2);
+DEFINE_PUBLIC_ALIAS(gethostent_r, libc_gethostent_r);
+DEFINE_PUBLIC_ALIAS(gethostbyaddr_r, libc_gethostbyaddr_r);
+DEFINE_PUBLIC_ALIAS(gethostbyname_r, libc_gethostbyname_r);
+DEFINE_PUBLIC_ALIAS(gethostbyname2_r, libc_gethostbyname2_r);
+DEFINE_PUBLIC_ALIAS(getnetent_r, libc_getnetent_r);
+DEFINE_PUBLIC_ALIAS(getnetbyaddr_r, libc_getnetbyaddr_r);
+DEFINE_PUBLIC_ALIAS(getnetbyname_r, libc_getnetbyname_r);
+DEFINE_PUBLIC_ALIAS(getservent_r, libc_getservent_r);
+DEFINE_PUBLIC_ALIAS(getservbyname_r, libc_getservbyname_r);
+DEFINE_PUBLIC_ALIAS(getservbyport_r, libc_getservbyport_r);
 DEFINE_PUBLIC_ALIAS(getprotoent_r, libc_getprotoent_r);
 DEFINE_PUBLIC_ALIAS(getprotobyname_r, libc_getprotobyname_r);
 DEFINE_PUBLIC_ALIAS(getprotobynumber_r, libc_getprotobynumber_r);
@@ -1215,10 +1033,10 @@ DEFINE_PUBLIC_ALIAS(freeaddrinfo, libc_freeaddrinfo);
 DEFINE_PUBLIC_ALIAS(gai_strerror, libc_gai_strerror);
 DEFINE_PUBLIC_ALIAS(getnameinfo, libc_getnameinfo);
 DEFINE_PUBLIC_ALIAS(getaddrinfo_a, libc_getaddrinfo_a);
-DEFINE_PUBLIC_ALIAS(gai_suspend, libc_gai_suspend);
-DEFINE_PUBLIC_ALIAS(gai_suspend64, libc_gai_suspend64);
 DEFINE_PUBLIC_ALIAS(gai_error, libc_gai_error);
 DEFINE_PUBLIC_ALIAS(gai_cancel, libc_gai_cancel);
+DEFINE_PUBLIC_ALIAS(gai_suspend, libc_gai_suspend);
+DEFINE_PUBLIC_ALIAS(gai_suspend64, libc_gai_suspend64);
 /*[[[end:exports]]]*/
 
 DECL_END
