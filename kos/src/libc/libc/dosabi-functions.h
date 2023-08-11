@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5fe2aa39 */
+/* HASH CRC-32:0xdea1d604 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -166,6 +166,10 @@ DFUN(".text.crt.dos.libattr", libd_attr_list, libc_attr_list, TD, 5, TP, TP, TD,
 DFUN(".text.crt.dos.libattr", libd_attr_listf, libc_attr_listf, TD, 5, TIn(__SIZEOF_FD_T__), TP, TD, TD, TP)
 DFUN(".text.crt.dos.libattr", libd_attr_multi, libc_attr_multi, TD, 4, TP, TP, TD, TD)
 DFUN(".text.crt.dos.libattr", libd_attr_multif, libc_attr_multif, TD, 4, TIn(__SIZEOF_FD_T__), TP, TD, TD)
+
+/* bsd.libutil */
+DFUN(".text.crt.dos.unsorted", libd_flopen, libc_flopen, TIn(__SIZEOF_FD_T__), 3, TP, TIn(__SIZEOF_OFLAG_T__), TIn(__SIZEOF_MODE_T__))
+DFUN(".text.crt.dos.unsorted", libd_flopenat, libc_flopenat, TIn(__SIZEOF_FD_T__), 4, TIn(__SIZEOF_FD_T__), TP, TIn(__SIZEOF_OFLAG_T__), TIn(__SIZEOF_MODE_T__))
 
 /* complex */
 DFUN(".text.crt.dos.math.complex", libd_cabsf, libc_cabsf, TF, 1, TCF)

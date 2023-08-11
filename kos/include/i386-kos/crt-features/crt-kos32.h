@@ -3017,6 +3017,8 @@
 #define __CRT_HAVE_floor
 #define __CRT_HAVE_floorf
 #define __CRT_HAVE_floorl
+#define __CRT_HAVE_flopen
+#define __CRT_HAVE_flopenat
 #define __CRT_HAVE_flushall_unlocked
 #define __CRT_HAVE_fma
 #define __CRT_HAVE_fmaf

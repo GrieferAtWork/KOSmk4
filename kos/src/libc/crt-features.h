@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58745c94 */
+/* HASH CRC-32:0x36b0515b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1584,6 +1584,8 @@
 #define __CRT_HAVE_DOS$floor
 #define __CRT_HAVE_DOS$floorf
 #define __CRT_HAVE_DOS$floorl
+#define __CRT_HAVE_DOS$flopen
+#define __CRT_HAVE_DOS$flopenat
 #define __CRT_HAVE_DOS$fma
 #define __CRT_HAVE_DOS$fmaf
 #define __CRT_HAVE_DOS$fmal
@@ -5977,6 +5979,8 @@
 #define __CRT_HAVE_floor
 #define __CRT_HAVE_floorf
 #define __CRT_HAVE_floorl
+#define __CRT_HAVE_flopen
+#define __CRT_HAVE_flopenat
 #define __CRT_HAVE_flushall_unlocked
 #define __CRT_HAVE_fma
 #define __CRT_HAVE_fmaf

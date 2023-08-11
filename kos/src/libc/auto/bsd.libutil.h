@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x4dffda32 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,44 +18,30 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_MISC_UNLOCKINFO_H
-#define GUARD_KERNEL_INCLUDE_MISC_UNLOCKINFO_H 1
+#ifndef GUARD_LIBC_AUTO_BSD_LIBUTIL_H
+#define GUARD_LIBC_AUTO_BSD_LIBUTIL_H 1
 
-#include <kernel/compiler.h>
+#include "../api.h"
 
-#ifdef __CC__
+#include <hybrid/typecore.h>
+#include <kos/types.h>
+#include <bsd/libutil.h>
+
 DECL_BEGIN
 
-struct unlockinfo;
-struct unlockinfo {
-	/* [1..1] Callback that is invoked in order to release
-	 *        additional locks when  a blocking  operation
-	 *        is performed by an `*_or_unlock()' function.
-	 * This callback may then be used to release additional atomic
-	 * locks which the caller may be holding, and it guarantied to
-	 * be called on all `return == false' and `EXCEPT' braches  of
-	 * the called `*_or_unlock()' function. */
-#ifdef __INTELLISENSE__
-	/*   */ NONNULL_T((1)) void NOTHROW_T(FCALL *ui_unlock)(struct unlockinfo *__restrict self);
-#else /* __INTELLISENSE__ */
-	NOBLOCK NONNULL_T((1)) void NOTHROW_T(FCALL *ui_unlock)(struct unlockinfo *__restrict self);
-#endif /* !__INTELLISENSE__ */
-};
-
-/* NOTE: *_or_unlock() functions that use `struct unlockinfo' usually follow
- *       the following locking logic:
- *  - return == true:   REQUESTED_CONDITION_MET && UNLOCK_NOT_INVOKED;
- *  - return == false:  UNLOCK_INVOKED;
- *  - EXCEPT:           UNLOCK_INVOKED; */
-
-
-/* When `self' is non-NULL, invoke it's `ui_unlock'-callback. */
-#define unlockinfo_xunlock(self) \
-	(void)(!(self) || ((*(self)->ui_unlock)(self), 0))
-#define unlockinfo_unlock(self) \
-	(void)((*(self)->ui_unlock)(self))
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF fd_t NOTHROW_RPC(VLIBDCALL libd_flopen)(const char *path, oflag_t flags, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF fd_t NOTHROW_RPC(VLIBCCALL libc_flopen)(const char *path, oflag_t flags, ...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF fd_t NOTHROW_RPC(VLIBDCALL libd_flopenat)(fd_t dirfd, const char *path, oflag_t flags, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF fd_t NOTHROW_RPC(VLIBCCALL libc_flopenat)(fd_t dirfd, const char *path, oflag_t flags, ...);
+#endif /* !__KERNEL__ */
 
 DECL_END
-#endif /* __CC__ */
 
-#endif /* !GUARD_KERNEL_INCLUDE_MISC_UNLOCKINFO_H */
+#endif /* !GUARD_LIBC_AUTO_BSD_LIBUTIL_H */

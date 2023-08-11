@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7b4056f */
+/* HASH CRC-32:0xf3c18a8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -145,6 +145,10 @@ DEFINE_PUBLIC_ALIAS(DOS$attr_list, libd_attr_list);
 DEFINE_PUBLIC_ALIAS(DOS$attr_listf, libd_attr_listf);
 DEFINE_PUBLIC_ALIAS(DOS$attr_multi, libd_attr_multi);
 DEFINE_PUBLIC_ALIAS(DOS$attr_multif, libd_attr_multif);
+
+/* bsd.libutil */
+DEFINE_PUBLIC_ALIAS(DOS$flopen, libd_flopen);
+DEFINE_PUBLIC_ALIAS(DOS$flopenat, libd_flopenat);
 
 /* complex */
 DEFINE_PUBLIC_ALIAS(DOS$cabsf, libd_cabsf);

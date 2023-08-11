@@ -381,6 +381,7 @@
 #define __CRT_HAVE___argz_count
 #define __CRT_HAVE___argz_create
 #define __CRT_HAVE___argz_create_sep
+#define __CRT_HAVE___argz_delete
 #define __CRT_HAVE___argz_extract
 #define __CRT_HAVE___argz_insert
 #define __CRT_HAVE___argz_next
@@ -2864,6 +2865,8 @@
 #define __CRT_HAVE_floor
 #define __CRT_HAVE_floorf
 #define __CRT_HAVE_floorl
+#define __CRT_HAVE_flopen
+#define __CRT_HAVE_flopenat
 #define __CRT_HAVE_flushall_unlocked
 #define __CRT_HAVE_fma
 #define __CRT_HAVE_fmaf
@@ -6742,6 +6745,7 @@
 #define __CRT_HAVE_KOS$__argz_count
 #define __CRT_HAVE_KOS$__argz_create
 #define __CRT_HAVE_KOS$__argz_create_sep
+#define __CRT_HAVE_KOS$__argz_delete
 #define __CRT_HAVE_KOS$__argz_extract
 #define __CRT_HAVE_KOS$__argz_insert
 #define __CRT_HAVE_KOS$__argz_next
@@ -8766,6 +8770,8 @@
 #define __CRT_HAVE_KOS$floor
 #define __CRT_HAVE_KOS$floorf
 #define __CRT_HAVE_KOS$floorl
+#define __CRT_HAVE_KOS$flopen
+#define __CRT_HAVE_KOS$flopenat
 #define __CRT_HAVE_KOS$fma
 #define __CRT_HAVE_KOS$fmaf
 #define __CRT_HAVE_KOS$fmal
@@ -11115,6 +11121,7 @@
 #define __CRT_HAVE_DOS$__argz_count
 #define __CRT_HAVE_DOS$__argz_create
 #define __CRT_HAVE_DOS$__argz_create_sep
+#define __CRT_HAVE_DOS$__argz_delete
 #define __CRT_HAVE_DOS$__argz_extract
 #define __CRT_HAVE_DOS$__argz_insert
 #define __CRT_HAVE_DOS$__argz_next
@@ -13447,6 +13454,8 @@
 #define __CRT_HAVE_DOS$floor
 #define __CRT_HAVE_DOS$floorf
 #define __CRT_HAVE_DOS$floorl
+#define __CRT_HAVE_DOS$flopen
+#define __CRT_HAVE_DOS$flopenat
 #define __CRT_HAVE_DOS$fma
 #define __CRT_HAVE_DOS$fmaf
 #define __CRT_HAVE_DOS$fmal

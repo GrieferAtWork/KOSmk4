@@ -969,7 +969,7 @@ struct mfile {
 #endif /* __WANT_MFILE__mf_delsup */
 
 #ifdef __WANT_MFILE__mf_lopX
-		byte_t _mf_lopX[3 * sizeof(struct timespec)]; /* ... */
+		byte_t _mf_lopX[4 * sizeof(struct timespec)]; /* ... */
 #endif /* __WANT_MFILE__mf_lopX */
 	};
 #else /* __WANT_MFILE__mf_... */

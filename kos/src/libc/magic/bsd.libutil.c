@@ -74,13 +74,149 @@ __SYSDECL_BEGIN
 
 %[insert:extern(humanize_number)]
 
-//TODO:int expand_number(const char *_buf, uint64_t *_num);
+//TODO:int expand_number(const char *buf, uint64_t *num);
 
-//TODO:int flopen(const char *_path, int _flags, ...);
-//TODO:int flopenat(int dirfd, const char *path, int flags, ...);
+[[cp, vartypes($mode_t)]]
+[[decl_include("<bits/types.h>")]]
+[[requires_include("<asm/os/fcntl.h>", "<asm/os/oflags.h>")]]
+[[requires((defined(__AT_FDCWD) && $has_function(flopenat)) ||
+           (defined(__LOCK_EX) && (defined(__LOCK_NB) || !defined(__O_NONBLOCK)) &&
+            $has_function(openat, flock, fstat, stat) &&
+            ($has_function(ftruncate) || !defined(__O_TRUNC))))]]
+[[impl_include("<asm/os/fcntl.h>", "<libc/errno.h>", "<bits/types.h>", "<bits/os/stat.h>")]]
+$fd_t flopen(const char *path, $oflag_t flags, ...) {
+@@pp_if defined(__AT_FDCWD) && $has_function(flopenat)@@
+	mode_t mode;
+	va_list args;
+	va_start(args, flags);
+	mode = va_arg(args, mode_t);
+	va_end(args);
+	return flopenat(__AT_FDCWD, path, flags, mode);
+@@pp_else@@
+@@pp_ifdef __O_TRUNC@@
+	int should_trunc;
+@@pp_endif@@
+	int flock_op;
+	fd_t result;
+	mode_t mode;
+	va_list args;
+	va_start(args, flags);
+	mode = va_arg(args, mode_t);
+	va_end(args);
+	flock_op = __LOCK_EX;
+@@pp_ifdef __O_EXLOCK@@
+	flags &= ~__O_EXLOCK;
+@@pp_endif@@
+@@pp_if defined(__O_NONBLOCK) && defined(__LOCK_NB)@@
+	if (flags & __O_NONBLOCK)
+		flock_op |= __LOCK_NB;
+@@pp_endif@@
+@@pp_ifdef __O_TRUNC@@
+	should_trunc = flags & __O_TRUNC;
+	flags &= ~__O_TRUNC;
+@@pp_endif@@
+
+again:
+	result = open(path, flags, mode);
+	if likely(result != -1) {
+		@struct stat@ st_path, st_fd;
+		if unlikely(flock(result, flock_op))
+			goto err_r;
+		if unlikely(stat(path, &st_path))
+			goto restart; /* Race condition: file was deleted */
+		if unlikely(fstat(result, &st_fd))
+			goto restart; /* Shouldn't happen */
+		if unlikely(st_path.@st_dev@ != st_fd.@st_dev@ ||
+		            st_path.@st_ino@ != st_fd.@st_ino@)
+			goto restart; /* File changed in the mean-time. */
+@@pp_ifdef __O_TRUNC@@
+		if (should_trunc && st_fd.@st_size@ != 0) {
+			if unlikely(ftruncate(result, 0))
+				goto err_r; /* Shouldn't happen */
+		}
+@@pp_endif@@
+	}
+	return result;
+err_r:
+@@pp_if $has_function(close)@@
+	(void)close(result);
+@@pp_endif@@
+	return -1;
+restart:
+@@pp_if $has_function(close)@@
+	(void)close(result);
+@@pp_endif@@
+	goto again;
+@@pp_endif@@
+}
+
+
+[[cp, vartypes($mode_t)]]
+[[decl_include("<bits/types.h>")]]
+[[requires_include("<asm/os/fcntl.h>", "<asm/os/oflags.h>")]]
+[[requires(defined(__LOCK_EX) && (defined(__LOCK_NB) || !defined(__O_NONBLOCK)) &&
+           $has_function(openat, flock, fstat, fstatat) &&
+           ($has_function(ftruncate) || !defined(__O_TRUNC)))]]
+[[impl_include("<asm/os/fcntl.h>", "<libc/errno.h>", "<bits/types.h>", "<bits/os/stat.h>")]]
+$fd_t flopenat([[dirfd]] $fd_t dirfd, const char *path, $oflag_t flags, ...) {
+@@pp_ifdef __O_TRUNC@@
+	int should_trunc;
+@@pp_endif@@
+	int flock_op;
+	fd_t result;
+	mode_t mode;
+	va_list args;
+	va_start(args, flags);
+	mode = va_arg(args, mode_t);
+	va_end(args);
+	flock_op = __LOCK_EX;
+@@pp_ifdef __O_EXLOCK@@
+	flags &= ~__O_EXLOCK;
+@@pp_endif@@
+@@pp_if defined(__O_NONBLOCK) && defined(__LOCK_NB)@@
+	if (flags & __O_NONBLOCK)
+		flock_op |= __LOCK_NB;
+@@pp_endif@@
+@@pp_ifdef __O_TRUNC@@
+	should_trunc = flags & __O_TRUNC;
+	flags &= ~__O_TRUNC;
+@@pp_endif@@
+
+again:
+	result = openat(dirfd, path, flags, mode);
+	if likely(result != -1) {
+		@struct stat@ st_path, st_fd;
+		if unlikely(flock(result, flock_op))
+			goto err_r;
+		if unlikely(fstatat(dirfd, path, &st_path, 0))
+			goto restart; /* Race condition: file was deleted */
+		if unlikely(fstat(result, &st_fd))
+			goto restart; /* Shouldn't happen */
+		if unlikely(st_path.@st_dev@ != st_fd.@st_dev@ ||
+		            st_path.@st_ino@ != st_fd.@st_ino@)
+			goto restart; /* File changed in the mean-time. */
+@@pp_ifdef __O_TRUNC@@
+		if (should_trunc && st_fd.@st_size@ != 0) {
+			if unlikely(ftruncate(result, 0))
+				goto err_r; /* Shouldn't happen */
+		}
+@@pp_endif@@
+	}
+	return result;
+err_r:
+@@pp_if $has_function(close)@@
+	(void)close(result);
+@@pp_endif@@
+	return -1;
+restart:
+@@pp_if $has_function(close)@@
+	(void)close(result);
+@@pp_endif@@
+	goto again;
+}
 
 //TODO:struct pidfh *pidfile_open(const char *path, mode_t mode, pid_t *pidptr);
-//TODO:int pidfile_fileno(const struct pidfh *pfh);
+//TODO:$fd_t pidfile_fileno(const struct pidfh *pfh);
 //TODO:int pidfile_write(struct pidfh *pfh);
 //TODO:int pidfile_close(struct pidfh *pfh);
 //TODO:int pidfile_remove(struct pidfh *pfh);
