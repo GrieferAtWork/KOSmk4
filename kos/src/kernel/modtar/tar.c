@@ -475,6 +475,7 @@ again:
 							hi2 = i2;
 						} else {
 							/* Found a variant without a trailing '/' */
+							--filename_len;
 							goto incref_and_return_tf;
 						}
 					}
