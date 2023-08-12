@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0d831d4 */
+/* HASH CRC-32:0x628e003d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __LOCAL_LIBC(reallocarr) __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(reallocarr))(void *__ptr_p, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) {
 	void **__p_ptr = (void **)__ptr_p;
 	void *__result;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_reallocarray)(__ptr_p, __elem_count, __elem_size);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_reallocarray)(*__p_ptr, __elem_count, __elem_size);
 	if __unlikely(!__result)
 		return -1;
 	*__p_ptr = __result;

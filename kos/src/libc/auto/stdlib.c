@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41092346 */
+/* HASH CRC-32:0xa986ffd9 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3494,7 +3494,7 @@ NOTHROW_NCX(LIBCCALL libc_reallocarr)(void *ptr_p,
                                       size_t elem_size) {
 	void **p_ptr = (void **)ptr_p;
 	void *result;
-	result = libc_reallocarray(ptr_p, elem_count, elem_size);
+	result = libc_reallocarray(*p_ptr, elem_count, elem_size);
 	if unlikely(!result)
 		return -1;
 	*p_ptr = result;

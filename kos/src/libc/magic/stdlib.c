@@ -3938,7 +3938,7 @@ void setproctitle([[in, format("printf")]] char const *format, ...)
 int reallocarr(void *ptr_p, $size_t elem_count, $size_t elem_size) {
 	void **p_ptr = (void **)ptr_p;
 	void *result;
-	result = reallocarray(ptr_p, elem_count, elem_size);
+	result = reallocarray(*p_ptr, elem_count, elem_size);
 	if unlikely(!result)
 		return -1;
 	*p_ptr = result;
