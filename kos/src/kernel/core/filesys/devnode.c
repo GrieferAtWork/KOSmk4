@@ -60,6 +60,7 @@ fdevnode_v_open(struct mfile *__restrict self,
 
 	/* Lookup the device file within devfs */
 	fsuper_nodes_read(&devfs);
+	assert(devfs.fs_nodes != FSUPER_NODES_DELETED);
 	node = fnode_asdevice(fsuper_nodes_locate(&devfs, devfs_ino));
 	if (node && !tryincref(node))
 		node = NULL;

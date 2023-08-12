@@ -50,6 +50,7 @@
 #include <hybrid/wordbits.h>
 
 #include <kos/except.h>
+#include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
 #include <linux/magic.h>
 #include <sys/mkdev.h>
@@ -101,14 +102,24 @@ tardirent_v_opennode(struct fdirent *__restrict self,
 	/* Check if this file is already open. */
 again:
 	fsuper_nodes_read(&super->ts_super);
+	if unlikely(super->ts_super.fs_nodes == FSUPER_NODES_DELETED) {
+		fsuper_nodes_endread(&super->ts_super);
+		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_UNMOUNTED);
+	}
+
 	result = fsuper_nodes_locate(&super->ts_super, me->td_ent.fd_ino);
 	if (result) {
 		if likely(tryincref(result)) {
 			fsuper_nodes_endread(&super->ts_super);
 			return result;
 		}
-		if (!fsuper_nodes_upgrade(&super->ts_super))
+		if (!fsuper_nodes_upgrade(&super->ts_super)) {
+			if unlikely(super->ts_super.fs_nodes == FSUPER_NODES_DELETED) {
+				fsuper_nodes_endwrite(&super->ts_super);
+				THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_UNMOUNTED);
+			}
 			result = fsuper_nodes_locate(&super->ts_super, me->td_ent.fd_ino);
+		}
 
 		/* Remove already-deleted files from the superblock's file tree. */
 		if (result) {
@@ -264,6 +275,12 @@ again_acquire_locks:
 	} EXCEPT {
 		destroy(result);
 		RETHROW();
+	}
+
+	if unlikely(super->ts_super.fs_nodes == FSUPER_NODES_DELETED) {
+		fsuper_nodes_endwrite(&super->ts_super);
+		destroy(result);
+		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_UNMOUNTED);
 	}
 
 	/* Insert the new file into the superblock's file-node tree. */

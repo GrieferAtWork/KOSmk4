@@ -36,6 +36,7 @@
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
+#include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
 
 #include <assert.h>
@@ -89,6 +90,13 @@ again:
 		flatdirnode_endread(dir);
 		fsuper_nodes_waitread(&super->ffs_super);
 		goto again;
+	}
+
+	/* Check for special case: the nodes tree of the superblock has been deleted. */
+	if unlikely(super->ffs_super.fs_nodes == FSUPER_NODES_DELETED) {
+		fsuper_nodes_endread(&super->ffs_super);
+		flatdirnode_endread(dir);
+		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_UNMOUNTED);
 	}
 
 	result = fsuper_nodes_locate(&super->ffs_super, me->fde_ent.fd_ino);
@@ -184,6 +192,18 @@ waitfor_super_nodes_lock:
 #endif /* NEED_waitfor_super_nodes_lock */
 		fsuper_nodes_waitwrite(&super->ffs_super);
 		goto again;
+	}
+
+	/* Re-check that the superblock hasn't been deleted in the mean-time. */
+	if unlikely(super->ffs_super.fs_nodes == FSUPER_NODES_DELETED) {
+		fsuper_nodes_endwrite(&super->ffs_super);
+		flatdirnode_endread(dir);
+		DBG_memset(&result->fn_supent, 0xcc, sizeof(result->fn_supent));
+		result->fn_supent.rb_rhs = FSUPER_NODES_DELETED;
+		LIST_ENTRY_UNBOUND_INIT(&result->fn_allnodes);
+		result->mf_refcnt = 0;
+		destroy(result);
+		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_UNMOUNTED);
 	}
 
 	/* Re-check that no node with this INode number already exists in-cache. */
@@ -1683,6 +1703,10 @@ again:
 			flatdirnode_endread(me);
 			fsuper_nodes_waitread(&super->ffs_super);
 			goto again;
+		}
+		if unlikely(super->ffs_super.fs_nodes == FSUPER_NODES_DELETED) {
+			fsuper_nodes_endread(&super->ffs_super);
+			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_UNMOUNTED);
 		}
 		node = fsuper_nodes_locate(&super->ffs_super, iter->fde_ent.fd_ino);
 		if (node && !tryincref(node))

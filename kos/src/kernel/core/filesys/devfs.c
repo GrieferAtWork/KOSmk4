@@ -1950,6 +1950,7 @@ PUBLIC WUNUSED REF struct device *FCALL
 device_lookup_byino(ino_t ino) THROWS(E_WOULDBLOCK) {
 	REF struct device *result;
 	fsuper_nodes_read(&devfs);
+	assert(devfs.fs_nodes != FSUPER_NODES_DELETED);
 	result = (REF struct device *)fsuper_nodes_locate(&devfs, ino);
 	if (result && !tryincref(result))
 		result = NULL; /* Device already destroyed */
@@ -1961,6 +1962,7 @@ NOTHROW(FCALL device_lookup_byino_nx)(ino_t ino) {
 	REF struct device *result;
 	if (!fsuper_nodes_read_nx(&devfs))
 		return NULL;
+	assert(devfs.fs_nodes != FSUPER_NODES_DELETED);
 	result = (REF struct device *)fsuper_nodes_locate(&devfs, ino);
 	if (result && !tryincref(result))
 		result = NULL; /* Device already destroyed */
