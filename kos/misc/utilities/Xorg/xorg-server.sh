@@ -42,7 +42,7 @@ require_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xproto.pc"
 #equire_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xf86dgaproto.pc"
 
 # Libraries
-require_utility libpciaccess      "$PKG_CONFIG_PATH/pciaccess.pc"
+#require_utility libpciaccess     "$PKG_CONFIG_PATH/pciaccess.pc"
 require_utility libdrm            "$PKG_CONFIG_PATH/libdrm.pc"
 require_utility openssl           "$PKG_CONFIG_PATH/openssl.pc"
 require_utility libpixman         "$PKG_CONFIG_PATH/pixman-1.pc"

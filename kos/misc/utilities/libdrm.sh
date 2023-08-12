@@ -18,7 +18,7 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-require_utility libpciaccess "$PKG_CONFIG_PATH/pciaccess.pc"
+#require_utility libpciaccess "$PKG_CONFIG_PATH/pciaccess.pc"
 # XXX: Versions startings at 2.4.101 don't use ./configure for building,
 #      but some weird build system no-one else uses, and that no-one's
 #      ever heard of. (So upgrading any further might be a problem...)

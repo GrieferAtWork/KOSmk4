@@ -96,5 +96,8 @@ _libxcb_path_optpath_config() {
 	fi
 }
 
+# This one needs python modules installed by `Xorg/xcb-proto`
+export PYTHONPATH="$PYTHONPATH $(echo $SYSROOT_BINUTILS_TARGET/usr/local/lib/python*/site-packages)"
+
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"
