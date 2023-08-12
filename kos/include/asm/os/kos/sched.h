@@ -64,8 +64,11 @@
 #define __CLONE_NEWTIME       __UINT64_C(0x0000000000000080) /* New time namespace */
 
 #ifdef __KOS__
-/* Set if credentials (user/group ids and special permissions) are unshared.
- * Note that during an  `exec(2)' credentials are unshared  unconditionally. */
+/* Set if credentials (user/group ids and special permissions) are  shared.
+ * Note that during an `exec(2)', credentials are unshared unconditionally,
+ * so it is impossible for 2 different programs to share credentials,  that
+ * is unless you re-implement the kernel ELF loader in user-space and  roll
+ * your own `execve(2)'... */
 #define __CLONE_CRED          __UINT64_C(0x8000000000000000)
 #endif /* __KOS__ */
 
@@ -86,6 +89,23 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+#if __ALIGNOF_INT64__ < 8
+__ATTR_ALIGNED(8)
+#endif /* __ALIGNOF_INT64__ < 8 */
+struct clone_args {
+#if defined(__USE_KOS_ALTERATIONS) && defined(__COMPILER_HAVE_TRANSPARENT_UNION)
+	union { __uint64_t     ca_flags; /*       */ __uint64_t __ca_al_flags; /*       */ }; /* Set of `CLONE_*' */
+	union { __fd_t        *ca_pidfd; /*       */ __uint64_t __ca_al_pidfd; /*       */ }; /* [valid_if(CLONE_PIDFD)][type(fd_t *)] Where to store pidfd */
+	union { __pid_t       *ca_child_tid; /*   */ __uint64_t __ca_al_child_tid; /*   */ }; /* [valid_if(CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID)][type(pid_t *)] Store child TID here in child memory */
+	union { __pid_t       *ca_parent_tid; /*  */ __uint64_t __ca_al_parent_tid; /*  */ }; /* [valid_if(CLONE_PARENT_SETTID)][type(pid_t *)] Store child TID here in parent memory */
+	union { __signo_t      ca_exit_signal; /* */ __uint64_t __ca_al_exit_signal; /* */ }; /* [type(signo_t)] Signal to send to parent on child exit */
+	union { void          *ca_stack; /*       */ __uint64_t __ca_al_stack; /*       */ }; /* [valid_if(ca_stack_size != 0), type(void *)] Child stack base address */
+	union { __size_t       ca_stack_size; /*  */ __uint64_t __ca_al_stack_size; /*  */ }; /* [if(CLONE_VM, [!= 0])] Child stack size (must be non-zero unless `CLONE_VM' is given) */
+	union { void          *ca_tls; /*         */ __uint64_t __ca_al_tls; /*         */ }; /* [valid_if(CLONE_SETTLS)] Child TLS address */
+	union { __pid_t const *ca_set_tid; /*     */ __uint64_t __ca_al_set_tid; /*     */ }; /* [valid_if(ca_set_tid_size != 0)][type(pid_t const *)] set-tid array base */
+	union { __size_t       ca_set_tid_size; /**/ __uint64_t __ca_al_set_tid_size; /**/ }; /* [type(size_t)] set-tid array length */
+	union { __fd_t         ca_cgroup; /*      */ __uint64_t __ca_al_cgroup; /*      */ }; /* [valid_if(CLONE_INTO_CGROUP)][type(fd_t)] cgroup file descriptor */
+#else /* __USE_KOS_ALTERATIONS && __COMPILER_HAVE_TRANSPARENT_UNION */
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("flags")
 #pragma push_macro("pidfd")
@@ -110,24 +130,7 @@ __DECL_BEGIN
 #undef set_tid
 #undef set_tid_size
 #undef cgroup
-
-#if __ALIGNOF_INT64__ < 8
-__ATTR_ALIGNED(8)
-#endif /* __ALIGNOF_INT64__ < 8 */
-struct clone_args {
-#if defined(__USE_KOS_ALTERATIONS) && defined(__COMPILER_HAVE_TRANSPARENT_UNION)
-	union { __uint64_t     ca_flags; /*       */ __uint64_t __ca_al_flags; /*       */ }; /* Set of `CLONE_*' */
-	union { __fd_t        *ca_pidfd; /*       */ __uint64_t __ca_al_pidfd; /*       */ }; /* [valid_if(CLONE_PIDFD)][type(fd_t *)] Where to store pidfd */
-	union { __pid_t       *ca_child_tid; /*   */ __uint64_t __ca_al_child_tid; /*   */ }; /* [valid_if(CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID)][type(pid_t *)] Store child TID here in child memory */
-	union { __pid_t       *ca_parent_tid; /*  */ __uint64_t __ca_al_parent_tid; /*  */ }; /* [valid_if(CLONE_PARENT_SETTID)][type(pid_t *)] Store child TID here in parent memory */
-	union { __signo_t      ca_exit_signal; /* */ __uint64_t __ca_al_exit_signal; /* */ }; /* [type(signo_t)] Signal to send to parent on child exit */
-	union { void          *ca_stack; /*       */ __uint64_t __ca_al_stack; /*       */ }; /* [valid_if(ca_stack_size != 0), type(void *)] Child stack base address */
-	union { __size_t       ca_stack_size; /*  */ __uint64_t __ca_al_stack_size; /*  */ }; /* [if(CLONE_VM, [!= 0])] Child stack size (must be non-zero unless `CLONE_VM' is given) */
-	union { void          *ca_tls; /*         */ __uint64_t __ca_al_tls; /*         */ }; /* [valid_if(CLONE_SETTLS)] Child TLS address */
-	union { __pid_t const *ca_set_tid; /*     */ __uint64_t __ca_al_set_tid; /*     */ }; /* [valid_if(ca_set_tid_size != 0)][type(pid_t const *)] set-tid array base */
-	union { __size_t       ca_set_tid_size; /**/ __uint64_t __ca_al_set_tid_size; /**/ }; /* [type(size_t)] set-tid array length */
-	union { __fd_t         ca_cgroup; /*      */ __uint64_t __ca_al_cgroup; /*      */ }; /* [valid_if(CLONE_INTO_CGROUP)][type(fd_t)] cgroup file descriptor */
-#elif defined(__USE_KOS) && defined(__COMPILER_HAVE_TRANSPARENT_UNION)
+#if defined(__USE_KOS) && defined(__COMPILER_HAVE_TRANSPARENT_UNION)
 	union { __uint64_t     ca_flags; /*       */ __uint64_t flags; /*       */ }; /* Set of `CLONE_*' */
 	union { __fd_t        *ca_pidfd; /*       */ __uint64_t pidfd; /*       */ }; /* [valid_if(CLONE_PIDFD)][type(fd_t *)] Where to store pidfd */
 	union { __pid_t       *ca_child_tid; /*   */ __uint64_t child_tid; /*   */ }; /* [valid_if(CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID)][type(pid_t *)] Store child TID here in child memory */
@@ -139,7 +142,7 @@ struct clone_args {
 	union { __pid_t const *ca_set_tid; /*     */ __uint64_t set_tid; /*     */ }; /* [valid_if(ca_set_tid_size != 0)][type(pid_t const *)] set-tid array base */
 	union { __size_t       ca_set_tid_size; /**/ __uint64_t set_tid_size; /**/ }; /* [type(size_t)] set-tid array length */
 	union { __fd_t         ca_cgroup; /*      */ __uint64_t cgroup; /*      */ }; /* [valid_if(CLONE_INTO_CGROUP)][type(fd_t)] cgroup file descriptor */
-#else /* ... */
+#else /* __USE_KOS && __COMPILER_HAVE_TRANSPARENT_UNION */
 	__uint64_t flags;        /* Set of `CLONE_*' */
 	__uint64_t pidfd;        /* [valid_if(CLONE_PIDFD)][type(fd_t *)] Where to store pidfd */
 	__uint64_t child_tid;    /* [valid_if(CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID)][type(pid_t *)] Store child TID here in child memory */
@@ -164,9 +167,7 @@ struct clone_args {
 #define ca_set_tid_size set_tid_size
 #define ca_cgroup       cgroup
 #endif /* __USE_KOS */
-#endif /* !... */
-};
-
+#endif /* !__USE_KOS && !__COMPILER_HAVE_TRANSPARENT_UNION */
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("cgroup")
 #pragma pop_macro("set_tid_size")
@@ -180,11 +181,13 @@ struct clone_args {
 #pragma pop_macro("pidfd")
 #pragma pop_macro("flags")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#endif /* !__USE_KOS_ALTERATIONS || !__COMPILER_HAVE_TRANSPARENT_UNION */
+};
 
 __DECL_END
 #endif /* __CC__ */
 
-
+/* Scheduler policies (for `sched_setscheduler(2)') */
 #define __SCHED_OTHER         0x00000000 /* ... */
 #define __SCHED_FIFO          0x00000001 /* ... */
 #define __SCHED_RR            0x00000002 /* ... */

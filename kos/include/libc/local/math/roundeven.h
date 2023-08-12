@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3e81fe4 */
+/* HASH CRC-32:0xa4cc317e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_roundeven_defined
 #define __local_roundeven_defined
 #include <__crt.h>
+#include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libm/roundeven.h>
 __NAMESPACE_LOCAL_BEGIN

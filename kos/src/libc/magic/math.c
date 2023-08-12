@@ -1379,7 +1379,7 @@ double scalbn(double x, int n) {
 
 [[doc_alias("scalbn")]]
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__scalbln")]]
-[[alt_variant_of(__SIZEOF_INT__ == __SIZEOF_LONG__, scalbn)]]
+[[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__, scalbn)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("__scalbn")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/scalbn.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -1533,7 +1533,7 @@ double fma(double x, double y, double z) {
 @@Round `x' to nearest integral value according to current rounding direction
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__llrint")]]
 [[impl_include("<hybrid/typecore.h>", "<libm/lrint.h>")]]
-[[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lrint)]]
+[[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lrint)]]
 __LONGLONG llrint(double x) {
 @@pp_ifdef __LIBM_MATHFUNI@@
 	return __LIBM_MATHFUNI(@llrint@, x);
@@ -1546,7 +1546,7 @@ __LONGLONG llrint(double x) {
 @@Round `x' to nearest integral value, rounding halfway cases away from zero
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__llround")]]
 [[impl_include("<hybrid/typecore.h>", "<libm/lround.h>")]]
-[[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lround)]]
+[[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lround)]]
 __LONGLONG llround(double x) {
 @@pp_ifdef __LIBM_MATHFUNI@@
 	return __LIBM_MATHFUNI(@llround@, x);
@@ -1583,7 +1583,7 @@ float nexttowardf(float x, __LONGDOUBLE y) {
 float scalbnf(float x, int n) %{generate(double2float("scalbn"))}
 
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__scalblnf")]]
-[[alt_variant_of(__SIZEOF_INT__ == __SIZEOF_LONG__, scalbnf)]]
+[[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__, scalbnf)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("__scalbnf")]]
 float scalblnf(float x, long int n) %{generate(double2float("scalbln"))}
 
@@ -1616,12 +1616,12 @@ long int lroundf(float x) %{generate(double2float("lround"))}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__llrintf")]]
-[[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lrintf)]]
+[[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lrintf)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("__lrintf")]]
 __LONGLONG llrintf(float x) %{generate(double2float("llrint"))}
 
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__llroundf")]]
-[[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lroundf)]]
+[[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lroundf)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("__lroundf")]]
 __LONGLONG llroundf(float x) %{generate(double2float("llround"))}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
@@ -1636,8 +1636,8 @@ __LONGLONG llroundf(float x) %{generate(double2float("llround"))}
 __LONGDOUBLE scalbnl(__LONGDOUBLE x, int n) %{generate(double2ldouble("scalbn"))}
 
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__scalblnl")]]
-[[alt_variant_of(__SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE), scalbn)]]
-[[alt_variant_of(__SIZEOF_INT__ == __SIZEOF_LONG__, scalbnl)]]
+[[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE), scalbn)]]
+[[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__, scalbnl)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("__scalbn")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("__scalbnl")]]
 [[ldouble_variant_of("scalbln", ...)]]
@@ -1674,16 +1674,16 @@ long int lroundl(__LONGDOUBLE x) %{generate(double2ldouble("lround"))}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__llrintl")]]
-[[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE), lrint)]]
-[[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lrintl)]]
+[[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE), lrint)]]
+[[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lrintl)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("__lrint")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("__lrintl")]]
 [[ldouble_variant_of("llrint", ...)]]
 __LONGLONG llrintl(__LONGDOUBLE x) %{generate(double2ldouble("llrint"))}
 
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__llroundl")]]
-[[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE), lround)]]
-[[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lroundl)]]
+[[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE), lround)]]
+[[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lroundl)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("__lround")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("__lroundl")]]
 [[ldouble_variant_of("llround", ...)]]
@@ -2096,7 +2096,7 @@ isnanl(*) %{generate(double2ldouble("isnan"))}
 
 %
 %/* Bessel functions. */
-%#if defined(__USE_MISC) || (defined(__USE_XOPEN) && __MATH_DECLARING_DOUBLE)
+%#if defined(__USE_MISC) || defined(__USE_XOPEN)
 @@>> j0f(3), j0(3), j0l(3)
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, dos_only_export_alias("_j0"), export_alias("__j0")]]
 [[impl_include("<libm/j0.h>", "<libm/fcomp.h>", "<libm/fabs.h>", "<libm/matherr.h>")]]
@@ -2213,7 +2213,9 @@ double yn(int n, double x) {
 	}
 	return __LIBM_MATHFUNIM(@yn@, n, x);
 }
+%#endif /* __USE_MISC || __USE_XOPEN */
 
+%#ifdef __USE_MISC
 [[crtbuiltin, export_alias("__j0f")]] j0f(*) %{generate(double2float("j0"))}
 [[crtbuiltin, export_alias("__j1f")]] j1f(*) %{generate(double2float("j1"))}
 [[crtbuiltin, export_alias("__jnf")]] jnf(*) %{generate(double2float("jn"))}
@@ -2229,7 +2231,7 @@ double yn(int n, double x) {
 [[crtbuiltin, export_alias("__y1l"), ldouble_variant_of("y1", ...)]] y1l(*) %{generate(double2ldouble("y1"))}
 [[crtbuiltin, export_alias("__ynl"), ldouble_variant_of("yn", ...)]] ynl(*) %{generate(double2ldouble("yn"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* __USE_MISC || (__USE_XOPEN && __MATH_DECLARING_DOUBLE) */
+%#endif /* __USE_MISC */
 
 
 %
@@ -2350,11 +2352,12 @@ scalbl(*) %{generate(double2ldouble("scalb"))}
 
 
 
-
 %
 %
-%
-%#if 1 /* GLIBc aliases */
+%/************************************************************************/
+%/* Glibc __aliases                                                      */
+%/************************************************************************/
+%#ifdef __USE_GLIBC_BLOAT
 %[insert:function(__acos = acos)]
 %[insert:function(__asin = asin)]
 %[insert:function(__atan = atan)]
@@ -2365,6 +2368,22 @@ scalbl(*) %{generate(double2ldouble("scalb"))}
 %[insert:function(__cosh = cosh)]
 %[insert:function(__sinh = sinh)]
 %[insert:function(__tanh = tanh)]
+%[insert:function(__exp = exp)]
+%[insert:function(__frexp = frexp)]
+%[insert:function(__ldexp = ldexp)]
+%[insert:function(__log = log)]
+%[insert:function(__log10 = log10)]
+%[insert:function(__pow = pow)]
+%[insert:function(__sqrt = sqrt)]
+%[insert:function(__ceil = ceil)]
+%[insert:function(__fabs = fabs)]
+%[insert:function(__floor = floor)]
+%[insert:function(__fmod = fmod)]
+
+%[insert:function(__isinf = isinf)]
+%[insert:function(__finite = finite)]
+%[insert:function(__isnan = isnan)]
+%[insert:function(__modf = modf)]
 %[insert:function(__acosf = acosf)]
 %[insert:function(__asinf = asinf)]
 %[insert:function(__atanf = atanf)]
@@ -2375,6 +2394,22 @@ scalbl(*) %{generate(double2ldouble("scalb"))}
 %[insert:function(__coshf = coshf)]
 %[insert:function(__sinhf = sinhf)]
 %[insert:function(__tanhf = tanhf)]
+%[insert:function(__expf = expf)]
+%[insert:function(__frexpf = frexpf)]
+%[insert:function(__ldexpf = ldexpf)]
+%[insert:function(__logf = logf)]
+%[insert:function(__log10f = log10f)]
+%[insert:function(__modff = modff)]
+%[insert:function(__powf = powf)]
+%[insert:function(__sqrtf = sqrtf)]
+%[insert:function(__ceilf = ceilf)]
+%[insert:function(__fabsf = fabsf)]
+%[insert:function(__floorf = floorf)]
+%[insert:function(__fmodf = fmodf)]
+%[insert:function(__isinff = isinff)]
+%[insert:function(__finitef = finitef)]
+%[insert:function(__isnanf = isnanf)]
+
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 %[insert:function(__acosl = acosl)]
 %[insert:function(__asinl = asinl)]
@@ -2386,247 +2421,76 @@ scalbl(*) %{generate(double2ldouble("scalb"))}
 %[insert:function(__coshl = coshl)]
 %[insert:function(__sinhl = sinhl)]
 %[insert:function(__tanhl = tanhl)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#ifdef __USE_GNU
-%[insert:function(__sincos = sincos)]
-%[insert:function(__sincosf = sincosf)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-%[insert:function(__sincosl = sincosl)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* __USE_GNU */
-
-%#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-%[insert:function(__acosh = acosh)]
-%[insert:function(__asinh = asinh)]
-%[insert:function(__atanh = atanh)]
-%[insert:function(__acoshf = acoshf)]
-%[insert:function(__asinhf = asinhf)]
-%[insert:function(__atanhf = atanhf)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-%[insert:function(__acoshl = acoshl)]
-%[insert:function(__asinhl = asinhl)]
-%[insert:function(__atanhl = atanhl)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
-
-%[insert:function(__exp = exp)]
-%[insert:function(__frexp = frexp)]
-%[insert:function(__ldexp = ldexp)]
-%[insert:function(__log = log)]
-%[insert:function(__log10 = log10)]
-%[insert:function(__modf = modf)]
-%[insert:function(__expf = expf)]
-%[insert:function(__frexpf = frexpf)]
-%[insert:function(__ldexpf = ldexpf)]
-%[insert:function(__logf = logf)]
-%[insert:function(__log10f = log10f)]
-%[insert:function(__modff = modff)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
 %[insert:function(__expl = expl)]
 %[insert:function(__frexpl = frexpl)]
 %[insert:function(__ldexpl = ldexpl)]
 %[insert:function(__logl = logl)]
 %[insert:function(__log10l = log10l)]
 %[insert:function(__modfl = modfl)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-
-%
-%#ifdef __USE_GNU
-%[insert:function(__exp10 = exp10)]
-%[insert:function(__pow10 = pow10)]
-%[insert:function(__exp10f = exp10f)]
-%[insert:function(__pow10f = pow10f)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-%[insert:function(__exp10l = exp10l)]
-%[insert:function(__pow10l = pow10l)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* __USE_GNU */
-
-%
-%#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-%[insert:function(__expm1 = expm1)]
-%[insert:function(__log1p = log1p)]
-%[insert:function(__logb = logb)]
-%[insert:function(__expm1f = expm1f)]
-%[insert:function(__log1pf = log1pf)]
-%[insert:function(__logbf = logbf)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-%[insert:function(__expm1l = expm1l)]
-%[insert:function(__log1pl = log1pl)]
-%[insert:function(__logbl = logbl)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
-
-%
-%#ifdef __USE_ISOC99
-%[insert:function(__exp2 = exp2)]
-%[insert:function(__log2 = log2)]
-%[insert:function(__exp2f = exp2f)]
-%[insert:function(__log2f = log2f)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-%[insert:function(__exp2l = exp2l)]
-%[insert:function(__log2l = log2l)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* __USE_ISOC99 */
-
-%[insert:function(__pow = pow)]
-%[insert:function(__sqrt = sqrt)]
-%[insert:function(__powf = powf)]
-%[insert:function(__sqrtf = sqrtf)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
 %[insert:function(__powl = powl)]
 %[insert:function(__sqrtl = sqrtl)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-
-%
-%#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
-%[insert:function(__hypot = hypot)]
-%[insert:function(__hypotf = hypotf)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-%[insert:function(__hypotl = hypotl)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* __USE_XOPEN || __USE_ISOC99 */
-
-%
-%#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-%[insert:function(__cbrt = cbrt)]
-%[insert:function(__cbrtf = cbrtf)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-%[insert:function(__cbrtl = cbrtl)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
-
-%[insert:function(__ceil = ceil)]
-%[insert:function(__fabs = fabs)]
-%[insert:function(__floor = floor)]
-%[insert:function(__fmod = fmod)]
-%[insert:function(__isinf = isinf)]
-%[insert:function(__finite = finite)]
-%[insert:function(__ceilf = ceilf)]
-%[insert:function(__fabsf = fabsf)]
-%[insert:function(__floorf = floorf)]
-%[insert:function(__fmodf = fmodf)]
-%[insert:function(__isinff = isinff)]
-%[insert:function(__finitef = finitef)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
 %[insert:function(__ceill = ceill)]
 %[insert:function(__fabsl = fabsl)]
 %[insert:function(__floorl = floorl)]
 %[insert:function(__fmodl = fmodl)]
 %[insert:function(__isinfl = isinfl)]
 %[insert:function(__finitel = finitel)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-
-%#ifdef __USE_MISC
-%[insert:function(__drem = remainder)]
-%[insert:function(__significand = significand)]
-%[insert:function(__dremf = remainderf)]
-%[insert:function(__significandf = significandf)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-%[insert:function(__dreml = remainderl)]
-%[insert:function(__significandl = significandl)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* __USE_MISC */
-
-%
-%#ifdef __USE_ISOC99
-%[insert:function(__copysign = copysign)]
-%[insert:function(__nan = nan)]
-%[insert:function(__copysignf = copysignf)]
-%[insert:function(__nanf = nanf)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-%[insert:function(__copysignl = copysignl)]
-%[insert:function(__nanl = nanl)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* __USE_ISOC99 */
-
-%
-%[insert:function(__isnan = isnan)]
-%[insert:function(__isnanf = isnanf)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
 %[insert:function(__isnanl = isnanl)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
-%
-%/* Bessel functions. */
-%#if defined(__USE_MISC) || defined(__USE_XOPEN)
-%[insert:function(__j0 = j0)]
-%[insert:function(__j1 = j1)]
-%[insert:function(__jn = jn)]
-%[insert:function(__y0 = y0)]
-%[insert:function(__y1 = y1)]
-%[insert:function(__yn = yn)]
-%#endif /* __USE_MISC || __USE_XOPEN */
-%#ifdef __USE_MISC
-%[insert:function(__j0f = j0f)]
-%[insert:function(__j1f = j1f)]
-%[insert:function(__jnf = jnf)]
-%[insert:function(__y0f = y0f)]
-%[insert:function(__y1f = y1f)]
-%[insert:function(__ynf = ynf)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-%[insert:function(__j0l = j0l)]
-%[insert:function(__j1l = j1l)]
-%[insert:function(__jnl = jnl)]
-%[insert:function(__y0l = y0l)]
-%[insert:function(__y1l = y1l)]
-%[insert:function(__ynl = ynl)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* __USE_MISC */
 
-%
-%#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
-%[insert:function(__erf = erf)]
-%[insert:function(__erfc = erfc)]
-%[insert:function(__lgamma = lgamma)]
-%[insert:function(__erff = erff)]
-%[insert:function(__erfcf = erfcf)]
-%[insert:function(__lgammaf = lgammaf)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-%[insert:function(__erfl = erfl)]
-%[insert:function(__erfcl = erfcl)]
-%[insert:function(__lgammal = lgammal)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* __USE_XOPEN || __USE_ISOC99 */
 
-%
-%#ifdef __USE_ISOC99
-%[insert:function(__tgamma = tgamma)]
-%[insert:function(__tgammaf = tgammaf)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-%[insert:function(__tgammal = tgammal)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* __USE_ISOC99 */
+%#ifdef __USE_GNU
+%[insert:function(__sincos = sincos)]
+%[insert:function(__exp10 = exp10)]
+%[insert:function(__pow10 = pow10)]
 
-%
-%#if defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
-%[insert:function(__gamma = lgamma)]
-%[insert:function(__gammaf = lgammaf)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-%[insert:function(__gammal = lgammal)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
+%[insert:function(__sincosf = sincosf)]
+%[insert:function(__exp10f = exp10f)]
+%[insert:function(__pow10f = pow10f)]
 
-%#ifdef __USE_MISC
-%[insert:function(__lgamma_r = lgamma_r)]
-%[insert:function(__lgammaf_r = lgammaf_r)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-%[insert:function(__lgammal_r = lgammal_r)]
+%[insert:function(__sincosl = sincosl)]
+%[insert:function(__exp10l = exp10l)]
+%[insert:function(__pow10l = pow10l)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* __USE_MISC */
+%#endif /* __USE_GNU */
 
-%
+
+
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
+%[insert:function(__acosh = acosh)]
+%[insert:function(__asinh = asinh)]
+%[insert:function(__atanh = atanh)]
+%[insert:function(__expm1 = expm1)]
+%[insert:function(__log1p = log1p)]
+%[insert:function(__logb = logb)]
+%[insert:function(__cbrt = cbrt)]
 %[insert:function(__rint = rint)]
 %[insert:function(__nextafter = nextafter)]
 %[insert:function(__remainder = remainder)]
 %[insert:function(__ilogb = ilogb)]
+
+%[insert:function(__acoshf = acoshf)]
+%[insert:function(__asinhf = asinhf)]
+%[insert:function(__atanhf = atanhf)]
+%[insert:function(__expm1f = expm1f)]
+%[insert:function(__log1pf = log1pf)]
+%[insert:function(__logbf = logbf)]
+%[insert:function(__cbrtf = cbrtf)]
 %[insert:function(__rintf = rintf)]
 %[insert:function(__nextafterf = nextafterf)]
 %[insert:function(__remainderf = remainderf)]
 %[insert:function(__ilogbf = ilogbf)]
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
+%[insert:function(__acoshl = acoshl)]
+%[insert:function(__asinhl = asinhl)]
+%[insert:function(__atanhl = atanhl)]
+%[insert:function(__expm1l = expm1l)]
+%[insert:function(__log1pl = log1pl)]
+%[insert:function(__logbl = logbl)]
+%[insert:function(__cbrtl = cbrtl)]
 %[insert:function(__rintl = rintl)]
 %[insert:function(__nextafterl = nextafterl)]
 %[insert:function(__remainderl = remainderl)]
@@ -2635,8 +2499,9 @@ scalbl(*) %{generate(double2ldouble("scalb"))}
 %#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
 
-%
+
 %#ifdef __USE_ISOC99
+%[insert:function(__tgamma = tgamma)]
 %[insert:function(__nexttoward = nexttoward)]
 %[insert:function(__scalbn = scalbn)]
 %[insert:function(__scalbln = scalbln)]
@@ -2650,7 +2515,12 @@ scalbl(*) %{generate(double2ldouble("scalb"))}
 %[insert:function(__fmax = fmax)]
 %[insert:function(__fmin = fmin)]
 %[insert:function(__fma = fma)]
+%[insert:function(__exp2 = exp2)]
+%[insert:function(__log2 = log2)]
+%[insert:function(__copysign = copysign)]
+%[insert:function(__nan = nan)]
 
+%[insert:function(__tgammaf = tgammaf)]
 %[insert:function(__nexttowardf = nexttowardf)]
 %[insert:function(__scalbnf = scalbnf)]
 %[insert:function(__scalblnf = scalblnf)]
@@ -2664,6 +2534,10 @@ scalbl(*) %{generate(double2ldouble("scalb"))}
 %[insert:function(__fmaxf = fmaxf)]
 %[insert:function(__fminf = fminf)]
 %[insert:function(__fmaf = fmaf)]
+%[insert:function(__exp2f = exp2f)]
+%[insert:function(__log2f = log2f)]
+%[insert:function(__copysignf = copysignf)]
+%[insert:function(__nanf = nanf)]
 
 %#ifdef __COMPILER_HAVE_LONGLONG
 %[insert:function(__llrint = llrint)]
@@ -2686,6 +2560,11 @@ scalbl(*) %{generate(double2ldouble("scalb"))}
 %[insert:function(__fmaxl = fmaxl)]
 %[insert:function(__fminl = fminl)]
 %[insert:function(__fmal = fmal)]
+%[insert:function(__tgammal = tgammal)]
+%[insert:function(__exp2l = exp2l)]
+%[insert:function(__log2l = log2l)]
+%[insert:function(__copysignl = copysignl)]
+%[insert:function(__nanl = nanl)]
 %#ifdef __COMPILER_HAVE_LONGLONG
 %[insert:function(__llrintl = llrintl)]
 %[insert:function(__llroundl = llroundl)]
@@ -2693,17 +2572,95 @@ scalbl(*) %{generate(double2ldouble("scalb"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_ISOC99 */
 
-%
+
+
+%#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
+%[insert:function(__hypot = hypot)]
+%[insert:function(__erf = erf)]
+%[insert:function(__erfc = erfc)]
+%[insert:function(__lgamma = lgamma)]
+%[insert:function(__hypotf = hypotf)]
+%[insert:function(__erff = erff)]
+%[insert:function(__erfcf = erfcf)]
+%[insert:function(__lgammaf = lgammaf)]
+%#ifdef __COMPILER_HAVE_LONGDOUBLE
+%[insert:function(__hypotl = hypotl)]
+%[insert:function(__erfl = erfl)]
+%[insert:function(__erfcl = erfcl)]
+%[insert:function(__lgammal = lgammal)]
+%#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%#endif /* __USE_XOPEN || __USE_ISOC99 */
+
+
+
+%#if defined(__USE_MISC) || defined(__USE_XOPEN)
+%[insert:function(__j0 = j0)]
+%[insert:function(__j1 = j1)]
+%[insert:function(__jn = jn)]
+%[insert:function(__y0 = y0)]
+%[insert:function(__y1 = y1)]
+%[insert:function(__yn = yn)]
+%#endif /* __USE_MISC || __USE_XOPEN */
+
+
+
+%#ifdef __USE_MISC
+%[insert:function(__drem = remainder)]
+%[insert:function(__significand = significand)]
+%[insert:function(__lgamma_r = lgamma_r)]
+
+%[insert:function(__dremf = remainderf)]
+%[insert:function(__significandf = significandf)]
+%[insert:function(__lgammaf_r = lgammaf_r)]
+%[insert:function(__j0f = j0f)]
+%[insert:function(__j1f = j1f)]
+%[insert:function(__jnf = jnf)]
+%[insert:function(__y0f = y0f)]
+%[insert:function(__y1f = y1f)]
+%[insert:function(__ynf = ynf)]
+
+%#ifdef __COMPILER_HAVE_LONGDOUBLE
+%[insert:function(__dreml = remainderl)]
+%[insert:function(__significandl = significandl)]
+%[insert:function(__lgammal_r = lgammal_r)]
+%[insert:function(__j0l = j0l)]
+%[insert:function(__j1l = j1l)]
+%[insert:function(__jnl = jnl)]
+%[insert:function(__y0l = y0l)]
+%[insert:function(__y1l = y1l)]
+%[insert:function(__ynl = ynl)]
+%#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%#endif /* __USE_MISC */
+
+
+
+%#if defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
+%[insert:function(__gamma = lgamma)]
+
+%[insert:function(__gammaf = lgammaf)]
+
+%#ifdef __COMPILER_HAVE_LONGDOUBLE
+%[insert:function(__gammal = lgammal)]
+%#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%#endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
+
+
+
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
 %[insert:function(__scalb = scalb)]
-%#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) */
-%#ifdef __USE_MISC
+
 %[insert:function(__scalbf = scalbf)]
+
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 %[insert:function(__scalbl = scalbl)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* __USE_MISC */
-%#endif /* GLIBc aliases */
+%#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) */
+
+
+
+%#endif /* __USE_GLIBC_BLOAT */
+
+
 
 
 
@@ -2801,7 +2758,8 @@ double nextdown(double x) {
 }
 
 @@>> nextupf(3), nextup(3), nextupl(3)
-[[const, wunused, nothrow, impl_include("<libm/nextup.h>")]]
+[[const, wunused, nothrow]]
+[[requires_include("<ieee754.h>"), impl_include("<libm/nextup.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
@@ -2824,7 +2782,8 @@ long int llogb(double x) {
 	return (long int)ilogb(x); /* TODO: support for sizeof(long) > sizeof(int) */
 }
 
-[[const, wunused, nothrow, impl_include("<libm/roundeven.h>")]]
+[[const, wunused, nothrow]]
+[[requires_include("<ieee754.h>"), impl_include("<libm/roundeven.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
@@ -2934,9 +2893,12 @@ llogbl(*) %{generate(double2ldouble("llogb"))}
 [[ldouble_variant_of("canonicalize", ...)]] canonicalizel(*) %{generate(double2ldouble("canonicalize"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
-
-
 %#endif /* __USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__ */
+
+
+
+
+
 
 @@>> _fdpcomp(3), _dpcomp(3), _ldpcomp(3)
 [[ignore, const, wunused, nothrow]]

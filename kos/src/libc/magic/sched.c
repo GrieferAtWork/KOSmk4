@@ -62,8 +62,7 @@
 #include <asm/os/signal.h> /* __SIGCHLD */
 #endif /* __USE_KOS */
 
-__SYSDECL_BEGIN
-
+/* Scheduler policies (for `sched_setscheduler(2)') */
 #if !defined(SCHED_OTHER) && defined(__SCHED_OTHER)
 #define SCHED_OTHER         __SCHED_OTHER         /* ... */
 #endif /* !SCHED_OTHER && __SCHED_OTHER */
@@ -255,10 +254,15 @@ __SYSDECL_BEGIN
 #ifdef __USE_KOS
 /* For `clone3(2)' */
 #if !defined(CLONE_CRED) && defined(__CLONE_CRED)
-#define CLONE_CRED           __CLONE_CRED           /* Set if credentials (user/group ids and special permissions) are shared. \
-                                                     * Note that during  an exec() credentials  are unshared  unconditionally. */
+#define CLONE_CRED           __CLONE_CRED           /* Set if credentials (user/group ids and special permissions) are  shared.
+                                                     * Note that during an `exec(2)', credentials are unshared unconditionally,
+                                                     * so it is impossible for 2 different programs to share credentials,  that
+                                                     * is unless you re-implement the kernel ELF loader in user-space and  roll
+                                                     * your own `execve(2)'... */
 #endif /* !CLONE_CRED && __CLONE_CRED */
 #endif /* __USE_KOS */
+
+__SYSDECL_BEGIN
 
 }
 %#ifdef __CC__

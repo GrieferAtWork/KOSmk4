@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc00901bf */
+/* HASH CRC-32:0x5eae2f90 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_nextup_defined
 #define __local_nextup_defined
 #include <__crt.h>
+#include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libm/nextup.h>
 __NAMESPACE_LOCAL_BEGIN

@@ -714,7 +714,7 @@ struct mfile_ops {
 #define _MFILE_DEVFS_BYNAME_RED 0x20000000 /* [lock(devfs_byname_lock)] Internal flag: This file is a red node in the devfs by-name tree. */
 #define _MFILE_FN__RBRED        0x40000000 /* [lock(:fn_super->fs_nodeslock)] Internal flag: This file-node is a red node. */
 #ifndef CONFIG_NO_SMP
-#define _MFILE_F_SMP_TSLOCK     0x80000000 /* [lock(ATOMIC)] SMP-lock for TimeStamps (`mf_atime', `mf_mtime'). */
+#define _MFILE_F_SMP_TSLOCK     0x80000000 /* [lock(ATOMIC)] SMP-lock for TimeStamps (`mf_atime', `mf_mtime', ...). */
 #endif /* !CONFIG_NO_SMP */
 
 #if defined(__WANT_MFILE__mf_fsuperlop) || defined(__WANT_MFILE__mf_fsuperplop)

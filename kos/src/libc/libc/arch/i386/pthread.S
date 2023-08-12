@@ -61,6 +61,7 @@ INTERN_FUNCTION(libc_handle)
 	/* The `current@tlsgd' symbol points to a `tls_index' structure,
 	 * which consists of 8 bytes total, where the first 4 are filled
 	 * with a module handle pointer by libdl.
+
 	 * Note that this is a KOS-specific implementation detail. As far
 	 * as the standard is concerned, libdl is allowed to make up some
 	 * arbitrary module index for those 4 bytes, however KOS's  libdl
@@ -131,7 +132,7 @@ END(libc_pthread_clone)
 
 
 /* >> INTDEF ATTR_NORETURN void FCALL
- * >> libc_pthread_unmap_stack_and_exit(void *stackaddr,
+ * >> libc_pthread_unmap_stack_and_exit(void  *stackaddr,
  * >>                                   size_t stacksize,
  * >>                                   int    exitcode); */
 .section .text.crt.sched.pthread
@@ -159,12 +160,13 @@ INTERN_FUNCTION(libc_pthread_unmap_stack_and_exit)
 
 	/* WARNING: No more accessing stack memory from here on! */
 
-	movP   %Psp,        %R_syscall0P /* int exitcode */
+1:	movP   %Psp,        %R_syscall0P /* int exitcode */
 	movP   $(SYS_exit), %Pax
 	syscall
 
 	/* -unreachable- */
 	hlt
+	jmp    1b
 END(libc_pthread_unmap_stack_and_exit)
 
 #endif /* !GUARD_LIBC_LIBC_ARCH_I386_PTHREAD_S */

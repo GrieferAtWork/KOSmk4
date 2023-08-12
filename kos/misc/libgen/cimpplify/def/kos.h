@@ -33,6 +33,9 @@
 #define __KOS_SYSTEM_HEADERS__
 
 #define __LIBCCALL_IS_LIBKCALL
+#define __VLIBCCALL_IS_VLIBKCALL
+#define __LIBCCALL __LIBKCALL
+#define __VLIBCCALL __VLIBKCALL
 
 #define __KOS_VERSION__ 400
 #undef __PE__

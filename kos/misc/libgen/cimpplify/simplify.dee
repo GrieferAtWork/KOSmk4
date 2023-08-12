@@ -1313,10 +1313,12 @@ function simpParseCFile(input: CParser, config: SimpConfig): {SimpPPElem...} {
 }
 
 function needSpaceBetween(tok1: string, tok2: string): bool {
-	local tok1_issym = tok1.issymbol() || tok1.isalnum();
-	local tok2_issym = tok2.issymbol() || tok2.isalnum();
+	local tok1_issym = tok1.last.issymcont();
+	local tok2_issym = tok2.issymcont(0);
 	if (tok1_issym) {
-		if (!tok2_issym && tok2.first !in "\"\'")
+		/* TODO: "(" is only needed after `#define foo' so-as to prevent
+		 *       `#define foo (x)'   from   becoming    `#define foo(x)' */
+		if (!tok2_issym && tok2.first !in "\"\'(")
 			return false;
 	} else {
 		if (tok2_issym) {

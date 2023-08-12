@@ -897,6 +897,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Look into what `-mtls-dialect=gnu2' does and maybe turn it on */
 
+	/* FIXME: Because kernel threads are linked to /bin/init, `$ kill -9 1'
+	 *        will try to send a signal to those kernel threads, which will
+	 *        eventually crash in `userexcept_sysret_inject_nopr()' becase:
+	 *        >> assert(!(thread->t_flags & TASK_FKERNTHREAD)); */
+
 	return state;
 }
 

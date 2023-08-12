@@ -90,7 +90,7 @@ PRIVATE ATTR_SECTION(SECTION_DEBUG_BSS) PDEBUG_ADDR2LINE pdyn_debug_addr2line   
 #define debug_addr2line                 (*pdyn_debug_addr2line)
 
 PRIVATE ATTR_NOINLINE WUNUSED ATTR_SECTION(SECTION_DEBUG_TEXT) void *
-NOTHROW(LIBCCALL get_libdebuginfo)(void) {
+NOTHROW(LIBCCALL open_libdebuginfo)(void) {
 	void *result;
 again:
 	result = atomic_read(&pdyn_libdebuginfo);
@@ -102,7 +102,7 @@ again:
 			result = (void *)-1;
 		if (!atomic_cmpxch(&pdyn_libdebuginfo, NULL, result)) {
 			if (result != (void *)-1)
-				dlclose(result);
+				(void)dlclose(result);
 			goto again;
 		}
 	}
@@ -114,7 +114,7 @@ NOTHROW(LIBCCALL init_libdebuginfo)(void) {
 	void *lib;
 	if (pdyn_debug_addr2line_sections_lock)
 		return true;
-	lib = get_libdebuginfo();
+	lib = open_libdebuginfo();
 	if (!lib)
 		return false;
 	*(void **)&pdyn_unwind_for_debug = dlsym(lib, "unwind_for_debug");
@@ -278,16 +278,11 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbol_printf)(pformatprinter printer,
 			temp = (*printer)(arg, info.dli_sname, strlen(info.dli_sname));
 			break;
 
-		case 'd':
-			temp = format_printf(printer, arg, "%#" PRIxSIZ,
-			                     (size_t)((uintptr_t)address -
-			                              (uintptr_t)info.dli_saddr));
-			break;
-
 		case 'D':
+		case 'd':
 			temp = (ssize_t)(size_t)((uintptr_t)address -
 			                         (uintptr_t)info.dli_saddr);
-			if (temp != 0)
+			if (temp != 0 || ch == 'd')
 				temp = format_printf(printer, arg, "+%#" PRIxSIZ, (size_t)temp);
 			break;
 
@@ -319,8 +314,8 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbol_printf)(pformatprinter printer,
 	}
 out:
 	if (mod) {
-		debug_addr2line_sections_unlock(&dl_sections);
-		dlclose(mod);
+		(void)debug_addr2line_sections_unlock(&dl_sections);
+		(void)dlclose(mod);
 	}
 	return result;
 err:

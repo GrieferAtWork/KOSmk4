@@ -36,6 +36,8 @@
 #define __PREPROCESSOR_HAVE_INCLUDE_NEXT
 #define __PREPROCESSOR_HAVE_WARNING
 
+#undef __COMPILER_NO_DOLLAR_IN_SYMBOL
+
 #define __STDC__ 1
 #define __P(x) x
 #undef __NO_PROTOTYPES
@@ -43,7 +45,7 @@
 #undef _OPENACC
 #undef _OPENMP
 #undef __cpp_transactional_memory
-#define __GNUC__ 9
+#define __GNUC__ 12
 #define __GNUC_MINOR__ 1
 #define __GNUC_PATCH__ 0
 #define __GNUC_PATCHLEVEL__ 0
@@ -192,6 +194,27 @@
 #define __ATTR_NONNULL_CXX(ppars) __attribute__((__nonnull__ ppars))
 #define   ATTR_NONNULL_CXX(ppars) __attribute__((__nonnull__ ppars))
 #undef __NO_ATTR_NONNULL
+
+#define __ATTR_ACCESS_NONE(ptr_index)        __attribute__((__access__(__none__, ptr_index)))
+#define   ATTR_ACCESS_NONE(ptr_index)        __attribute__((__access__(__none__, ptr_index)))
+#define __ATTR_INS(ptr_index, size_index)    __attribute__((__access__(__read_only__, ptr_index, size_index)))
+#define   ATTR_INS(ptr_index, size_index)    __attribute__((__access__(__read_only__, ptr_index, size_index)))
+#define __ATTR_OUTS(ptr_index, size_index)   __attribute__((__access__(__write_only__, ptr_index, size_index)))
+#define   ATTR_OUTS(ptr_index, size_index)   __attribute__((__access__(__write_only__, ptr_index, size_index)))
+#define __ATTR_INOUTS(ptr_index, size_index) __attribute__((__access__(__read_write__, ptr_index, size_index)))
+#define   ATTR_INOUTS(ptr_index, size_index) __attribute__((__access__(__read_write__, ptr_index, size_index)))
+#define __ATTR_IN_OPT(ptr_index)             __attribute__((__access__(__read_only__, ptr_index)))
+#define   ATTR_IN_OPT(ptr_index)             __attribute__((__access__(__read_only__, ptr_index)))
+#define __ATTR_OUT_OPT(ptr_index)            __attribute__((__access__(__write_only__, ptr_index)))
+#define   ATTR_OUT_OPT(ptr_index)            __attribute__((__access__(__write_only__, ptr_index)))
+#define __ATTR_INOUT_OPT(ptr_index)          __attribute__((__access__(__read_write__, ptr_index)))
+#define   ATTR_INOUT_OPT(ptr_index)          __attribute__((__access__(__read_write__, ptr_index)))
+#define __ATTR_IN(ptr_index)                 __attribute__((__access__(__read_only__, ptr_index), __nonnull__(ptr_index)))
+#define   ATTR_IN(ptr_index)                 __attribute__((__access__(__read_only__, ptr_index), __nonnull__(ptr_index)))
+#define __ATTR_OUT(ptr_index)                __attribute__((__access__(__write_only__, ptr_index), __nonnull__(ptr_index)))
+#define   ATTR_OUT(ptr_index)                __attribute__((__access__(__write_only__, ptr_index), __nonnull__(ptr_index)))
+#define __ATTR_INOUT(ptr_index)              __attribute__((__access__(__read_write__, ptr_index), __nonnull__(ptr_index)))
+#define   ATTR_INOUT(ptr_index)              __attribute__((__access__(__read_write__, ptr_index), __nonnull__(ptr_index)))
 
 #define __ATTR_WUNUSED __attribute__((__warn_unused_result__))
 #define   ATTR_WUNUSED __attribute__((__warn_unused_result__))

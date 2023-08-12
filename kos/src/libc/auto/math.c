@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc769cf9f */
+/* HASH CRC-32:0x10f39ab0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2551,6 +2551,7 @@ NOTHROW(LIBCCALL libc_scalbn)(double x,
                               int n) {
 	return __LIBM_MATHFUN2I(scalbn, x, n);
 }
+#include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_scalbln, libc_scalbn);
 #else /* __SIZEOF_INT__ == __SIZEOF_LONG__ */
@@ -2689,10 +2690,10 @@ NOTHROW(LIBCCALL libc_fma)(double x,
 	/* TODO: ieee754-specific function */
 	return (x * y) + z;
 }
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 DEFINE_INTERN_ALIAS(libc_llrint, libc_lrint);
 #else /* __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ */
-#include <hybrid/typecore.h>
 #include <libm/lrint.h>
 /* >> llrintf(3), llrint(3), llrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
@@ -2705,10 +2706,10 @@ NOTHROW(LIBCCALL libc_llrint)(double x) {
 
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_LONG_LONG__ */
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 DEFINE_INTERN_ALIAS(libc_llround, libc_lround);
 #else /* __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ */
-#include <hybrid/typecore.h>
 #include <libm/lround.h>
 /* >> llroundf(3), llround(3), llroundl(3)
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
@@ -2752,6 +2753,7 @@ NOTHROW(LIBCCALL libc_scalbnf)(float x,
 
 
 }
+#include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_scalblnf, libc_scalbnf);
 #else /* __SIZEOF_INT__ == __SIZEOF_LONG__ */
@@ -2902,10 +2904,10 @@ NOTHROW(LIBCCALL libc_fmaf)(float x,
 	/* TODO: ieee754-specific function */
 	return (x * y) + z;
 }
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 DEFINE_INTERN_ALIAS(libc_llrintf, libc_lrintf);
 #else /* __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ */
-#include <hybrid/typecore.h>
 #include <libm/lrint.h>
 /* >> llrintf(3), llrint(3), llrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
@@ -2918,10 +2920,10 @@ NOTHROW(LIBCCALL libc_llrintf)(float x) {
 
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_LONG_LONG__ */
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 DEFINE_INTERN_ALIAS(libc_llroundf, libc_lroundf);
 #else /* __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ */
-#include <hybrid/typecore.h>
 #include <libm/lround.h>
 /* >> llroundf(3), llround(3), llroundl(3)
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
@@ -2953,15 +2955,14 @@ NOTHROW(LIBCCALL libc_scalbnl)(__LONGDOUBLE x,
 
 }
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 DEFINE_INTERN_ALIAS(libc_scalblnl, libc_scalbn);
 #elif __SIZEOF_INT__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_scalblnl, libc_scalbnl);
-#else /* ... */
-#include <hybrid/typecore.h>
-#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+#elif defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 DEFINE_INTERN_ALIAS(libc_scalblnl, libc_scalbln);
-#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
+#else /* ... */
 #include <libm/scalbn.h>
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
@@ -2976,7 +2977,6 @@ NOTHROW(LIBCCALL libc_scalblnl)(__LONGDOUBLE x,
 
 
 }
-#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #endif /* !... */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
@@ -3147,15 +3147,14 @@ NOTHROW(LIBCCALL libc_fmal)(__LONGDOUBLE x,
 	return (x * y) + z;
 }
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 DEFINE_INTERN_ALIAS(libc_llrintl, libc_lrint);
 #elif __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 DEFINE_INTERN_ALIAS(libc_llrintl, libc_lrintl);
-#else /* ... */
-#include <hybrid/typecore.h>
-#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+#elif defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 DEFINE_INTERN_ALIAS(libc_llrintl, libc_llrint);
-#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
+#else /* ... */
 #include <libm/lrint.h>
 /* >> llrintf(3), llrint(3), llrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
@@ -3167,17 +3166,15 @@ NOTHROW(LIBCCALL libc_llrintl)(__LONGDOUBLE x) {
 
 
 }
-#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #endif /* !... */
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 DEFINE_INTERN_ALIAS(libc_llroundl, libc_lround);
 #elif __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 DEFINE_INTERN_ALIAS(libc_llroundl, libc_lroundl);
-#else /* ... */
-#include <hybrid/typecore.h>
-#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+#elif defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 DEFINE_INTERN_ALIAS(libc_llroundl, libc_llround);
-#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
+#else /* ... */
 #include <libm/lround.h>
 /* >> llroundf(3), llround(3), llroundl(3)
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
@@ -3189,7 +3186,6 @@ NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBLE x) {
 
 
 }
-#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #endif /* !... */
 #include <libm/sincos.h>
 /* >> sincosf(3), sincos(3), sincosl(3)

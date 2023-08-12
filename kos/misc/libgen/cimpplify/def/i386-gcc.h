@@ -188,10 +188,7 @@
 #define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_8 1
 #define __GCC_IEC_559 2
 #define __GCC_IEC_559_COMPLEX 2
-#define __GNUC_MINOR__ 1
-#define __GNUC_PATCHLEVEL__ 0
 #define __GNUC_STDC_INLINE__ 1
-#define __GNUC__ 12
 #define __GXX_ABI_VERSION 1013
 #define __HAVE_SPECULATION_SAFE_VALUE 1
 #define __INT16_C(c) c
