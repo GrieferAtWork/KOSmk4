@@ -37,10 +37,27 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+/* >> optreset(3)
+ * When set to non-zero, the next call to `getopt(3)' will reset the internal
+ * parser. The resulting behavior is the same as when `optind' is set to `0'.
+ * Once the reset is done, this variable is set to `0' again.
+ *
+ * Pre-initialized to `0' */
+#ifndef optreset
+#ifdef __LOCAL_optreset
+#define optreset __LOCAL_optreset
+#elif defined(__CRT_HAVE_optreset)
+__CSDECLARE(,int,optreset)
+#define optreset optreset
+#endif /* ... */
+#endif /* !optreset */
+
 }
 
-//TODO:optreset
-//TODO:%[insert:extern(bsd_getopt)]
+/* Like normal `getopt(3)', except guarantied to support `optreset(3)'
+ * Since our `getopt(3)' already supports this by default, we can just
+ * link in `bsd_getopt(3)' as an alias to it. */
+%[insert:function(bsd_getopt = getopt)]
 
 %[insert:extern(getmode)]
 %[insert:extern(setmode)]

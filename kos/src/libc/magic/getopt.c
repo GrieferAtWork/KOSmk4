@@ -254,7 +254,7 @@ int getopt_impl(unsigned int argc,
 @@pp_ifdef __LOCAL_optreset@@
 	    || __LOCAL_optreset
 @@pp_endif@@
-		) {
+	    ) {
 @@pp_ifdef __LOCAL_optreset@@
 		__LOCAL_optreset = 0;
 @@pp_endif@@
@@ -663,7 +663,7 @@ err_return_col_or_qmark:
 @@ - "-xyz":      Returns "x", "y", and then "z"   (assuming `optstring' contains "x", "y" and "z")
 @@ - "-ofoo":     Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
 @@ - "-o", "foo": Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
-@@Long options (`getopt_long(3)'-only)appear in the following formats:
+@@Long options (`getopt_long(3)'-only) appear in the following formats:
 @@ - "--out":        Returns `longopts["out"].val'                      (assuming `longopts["out"].has_arg != required_argument')
 @@ - "--out=foo":    Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
 @@ - "--out", "foo": Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
@@ -724,6 +724,7 @@ err_return_col_or_qmark:
 @@@return: -1: Argument processing is done. Non-option arguments are in `argv[optind...argc-1]'
 [[guard, wunused]]
 [[requires_function(getopt_long)]]
+[[export_alias("bsd_getopt")]] /* getopt with support for `optreset' (which ours already has) */
 int getopt(int argc,
            [[nonnull]] char *const argv[],
            [[nonnull]] char const *optstring) {

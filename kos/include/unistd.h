@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc98ad61 */
+/* HASH CRC-32:0x2ced5343 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2685,7 +2685,7 @@ __CSDECLARE(,int,optopt)
  *  - "-xyz":      Returns "x", "y", and then "z"   (assuming `optstring' contains "x", "y" and "z")
  *  - "-ofoo":     Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
  *  - "-o", "foo": Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
- * Long options (`getopt_long(3)'-only)appear in the following formats:
+ * Long options (`getopt_long(3)'-only) appear in the following formats:
  *  - "--out":        Returns `longopts["out"].val'                      (assuming `longopts["out"].has_arg != required_argument')
  *  - "--out=foo":    Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
  *  - "--out", "foo": Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
@@ -2754,7 +2754,7 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt,(int ___argc, char *const __
  *  - "-xyz":      Returns "x", "y", and then "z"   (assuming `optstring' contains "x", "y" and "z")
  *  - "-ofoo":     Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
  *  - "-o", "foo": Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
- * Long options (`getopt_long(3)'-only)appear in the following formats:
+ * Long options (`getopt_long(3)'-only) appear in the following formats:
  *  - "--out":        Returns `longopts["out"].val'                      (assuming `longopts["out"].has_arg != required_argument')
  *  - "--out=foo":    Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
  *  - "--out", "foo": Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
@@ -4050,6 +4050,21 @@ __CDECLARE(,int,__NOTHROW_NCX,setrgid,(gid_t __rgid),(__rgid))
  * @return: -1: Error (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(setrgid, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL setrgid)(gid_t __rgid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setrgid))(__rgid); })
 #endif /* ... */
+
+/* >> optreset(3)
+ * When set to non-zero, the next call to `getopt(3)' will reset the internal
+ * parser. The resulting behavior is the same as when `optind' is set to `0'.
+ * Once the reset is done, this variable is set to `0' again.
+ *
+ * Pre-initialized to `0' */
+#ifndef optreset
+#ifdef __LOCAL_optreset
+#define optreset __LOCAL_optreset
+#elif defined(__CRT_HAVE_optreset)
+__CSDECLARE(,int,optreset)
+#define optreset optreset
+#endif /* ... */
+#endif /* !optreset */
 
 /* >> suboptarg(3)
  * Global variable that gets assigned by `getsubopt(3)' from <stdlib.h>

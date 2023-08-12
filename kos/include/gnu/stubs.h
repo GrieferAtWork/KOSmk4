@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6852e426 */
+/* HASH CRC-32:0x121e6df1 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -526,7 +526,6 @@
 #define __stub__tempnam
 #endif /* __LIBCCALL_IS_LIBDCALL */
 #define __stub_tempnam
-#define __stub_tmpfile
 #define __stub_tmpnam
 #define __stub__tzset
 #define __stub_tzset

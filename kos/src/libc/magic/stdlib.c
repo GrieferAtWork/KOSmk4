@@ -3520,8 +3520,22 @@ int daemonfd([[fdarg_opt]] $fd_t chdirfd, [[fdarg_opt]] $fd_t nullfd) {
 //TODO:char *fdevname([[fdarg]] $fd_t fd);
 //TODO:char *fdevname_r([[fdarg]] $fd_t fd, char *buf, __STDC_INT_AS_SIZE_T buflenint);
 //TODO:$fd_t mkostempsat([[dirfd]] $fd_t dirfd, char *template_, __STDC_INT_AS_SIZE_T suffixlen, $oflag_t flags);
-//TODO:extern char *suboptarg;
 //TODO:void srandomdev(void);
+
+%{
+
+/* >> suboptarg(3)
+ * Global variable that gets assigned by `getsubopt(3)' */
+#ifndef suboptarg
+#ifdef __LOCAL_suboptarg
+#define suboptarg __LOCAL_suboptarg
+#elif defined(__CRT_HAVE_suboptarg)
+__CSDECLARE(,char *,suboptarg)
+#define suboptarg suboptarg
+#endif /* ... */
+#endif /* !suboptarg */
+
+}
 
 @@>> l64a_r(3)
 @@Reentrant variant of `l64a(3)'. Note that the max required buffer size

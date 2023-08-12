@@ -3942,22 +3942,6 @@ NOTHROW_NCX(LIBCCALL libc_tempnam)(char const *dir,
 }
 /*[[[end:libc_tempnam]]]*/
 
-/*[[[head:libc_tmpfile,hash:CRC-32=0xe9ec4ee6]]]*/
-/* >> tmpfile(3), tmpfile64(3)
- * Create and return a new file-stream for accessing a temporary file for reading/writing */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED FILE *
-NOTHROW_RPC(LIBCCALL libc_tmpfile)(void)
-/*[[[body:libc_tmpfile]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("tmpfile"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_tmpfile]]]*/
-
-/*[[[impl:libc_tmpfile64]]]*/
-DEFINE_INTERN_ALIAS(libc_tmpfile64, libc_tmpfile);
-
 /*[[[head:libc__rmtmp,hash:CRC-32=0xbda88955]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") int
 NOTHROW_RPC(LIBCCALL libc__rmtmp)(void)
@@ -4244,7 +4228,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1d8f4611]]]*/
+/*[[[start:exports,hash:CRC-32=0x54be5b76]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$rename, libd_rename);
@@ -4290,7 +4274,6 @@ DEFINE_PUBLIC_ALIAS(feof, libc_feof);
 DEFINE_PUBLIC_ALIAS(_IO_ferror, libc_ferror);
 DEFINE_PUBLIC_ALIAS(ferror_unlocked, libc_ferror);
 DEFINE_PUBLIC_ALIAS(ferror, libc_ferror);
-DEFINE_PUBLIC_ALIAS(tmpfile, libc_tmpfile);
 DEFINE_PUBLIC_ALIAS(DOS$_IO_fopen, libd_fopen);
 DEFINE_PUBLIC_ALIAS(DOS$setmntent, libd_fopen);
 DEFINE_PUBLIC_ALIAS(DOS$__setmntent, libd_fopen);
@@ -4365,7 +4348,6 @@ DEFINE_PUBLIC_ALIAS(_fcloseall, libc_fcloseall);
 DEFINE_PUBLIC_ALIAS(fcloseall, libc_fcloseall);
 DEFINE_PUBLIC_ALIAS(fseeko, libc_fseeko);
 DEFINE_PUBLIC_ALIAS(ftello, libc_ftello);
-DEFINE_PUBLIC_ALIAS(tmpfile64, libc_tmpfile64);
 DEFINE_PUBLIC_ALIAS(fseeko64, libc_fseeko64);
 DEFINE_PUBLIC_ALIAS(__fseeko64, libc_fseeko64);
 DEFINE_PUBLIC_ALIAS(fseek64, libc_fseeko64);

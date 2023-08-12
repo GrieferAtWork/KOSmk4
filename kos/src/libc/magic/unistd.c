@@ -3917,13 +3917,26 @@ int setrgid(gid_t rgid) {
 //TODO:int undelete(char const *);
 //TODO:int rresvport_af_addr(int *, int, void *);
 //TODO:int iruserok_sa(const void *, int, int, char const *, char const *);
-//TODO:extern int optreset;
-//TODO:extern char *suboptarg;
 
 // >> int reboot(int, char *); // Incompatible w/ linux: int reboot(int)
 // >> int swapon(char const *); // Incompatible w/ linux: int swapon(char const *, int)
 
 %{
+
+/* >> optreset(3)
+ * When set to non-zero, the next call to `getopt(3)' will reset the internal
+ * parser. The resulting behavior is the same as when `optind' is set to `0'.
+ * Once the reset is done, this variable is set to `0' again.
+ *
+ * Pre-initialized to `0' */
+#ifndef optreset
+#ifdef __LOCAL_optreset
+#define optreset __LOCAL_optreset
+#elif defined(__CRT_HAVE_optreset)
+__CSDECLARE(,int,optreset)
+#define optreset optreset
+#endif /* ... */
+#endif /* !optreset */
 
 /* >> suboptarg(3)
  * Global variable that gets assigned by `getsubopt(3)' from <stdlib.h>

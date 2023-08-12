@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe9d7795 */
+/* HASH CRC-32:0x1c1017dc */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,8 +28,10 @@
 #include "format-printer.h"
 #include "../user/malloc.h"
 #include "obstack.h"
+#include "../user/signal.h"
 #include "../user/stdlib.h"
 #include "string.h"
+#include "../user/sys.mman.h"
 #include "../user/sys.resource.h"
 #include "../user/unicode.h"
 #include "../user/unistd.h"
@@ -215,6 +217,53 @@ NOTHROW_RPC(LIBCCALL libc_perror)(char const *message) {
 		libc_fprintf(stderr, "%m\n");
 	}
 
+}
+#include <paths.h>
+/* >> tmpfile(3), tmpfile64(3)
+ * Create and return a new file-stream for accessing a temporary file for reading/writing
+ * The file uses an  operating-system provided file descriptor,  however does not have  a
+ * proper name anywhere  on the filesystem  (meaning the file's  contents are deleted  as
+ * soon as the returned file stream is closed) */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED FILE *
+NOTHROW_RPC(LIBCCALL libc_tmpfile)(void) {
+	FILE *result;
+	fd_t tmpfd;
+
+	tmpfd = libc_memfd_create(NULL, __MFD_CLOEXEC);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	if unlikely(tmpfd < 0)
+		return NULL;
+	result = libc_fdopen(tmpfd, "w+");
+
+	if unlikely(!result)
+		(void)libc_close(tmpfd);
+
+	return result;
 }
 /* >> fprintf(3), vfprintf(3)
  * Print  data  to  `stream',  following  `format'
@@ -1821,6 +1870,53 @@ NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict self,
 	va_end(args);
 	return result;
 }
+#include <asm/os/oflags.h>
+#if !__O_LARGEFILE
+DEFINE_INTERN_ALIAS(libc_tmpfile64, libc_tmpfile);
+#else /* !__O_LARGEFILE */
+#include <paths.h>
+/* >> tmpfile(3), tmpfile64(3)
+ * Create and return a new file-stream for accessing a temporary file for reading/writing
+ * The file uses an  operating-system provided file descriptor,  however does not have  a
+ * proper name anywhere  on the filesystem  (meaning the file's  contents are deleted  as
+ * soon as the returned file stream is closed) */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED FILE *
+NOTHROW_RPC(LIBCCALL libc_tmpfile64)(void) {
+	FILE *result;
+	fd_t tmpfd;
+#ifndef _PATH_TMP
+#define _PATH_TMP "/tmp/"
+#endif /* !_PATH_TMP */
+	char tmpfd_name_buf[COMPILER_STRLEN(_PATH_TMP "tmp.XXXXXX") + 1];
+	(void)libc_memcpy(tmpfd_name_buf, _PATH_TMP "tmp.XXXXXX", sizeof(tmpfd_name_buf));
+	{
+
+		sigset_t *oset;
+		oset  = libc_setsigmaskfullptr();
+		tmpfd = libc_mkstemp64(tmpfd_name_buf);
+		if likely(tmpfd >= 0)
+			(void)libc_unlink(tmpfd_name_buf);
+		(void)libc_setsigmaskptr(oset);
+
+
+
+
+
+
+
+
+
+	}
+	if unlikely(tmpfd < 0)
+		return NULL;
+	result = libc_fdopen(tmpfd, "w+");
+
+	if unlikely(!result)
+		(void)libc_close(tmpfd);
+
+	return result;
+}
+#endif /* __O_LARGEFILE */
 /* >> fopen_printer(3)
  * Create and return a new write-only file-stream that will write to the given printer.
  * Note  that by default, the buffering is enabled for the file-stream, meaning you may
@@ -4257,6 +4353,7 @@ DEFINE_PUBLIC_ALIAS(_IO_puts, libc_puts);
 DEFINE_PUBLIC_ALIAS(puts, libc_puts);
 DEFINE_PUBLIC_ALIAS(_IO_perror, libc_perror);
 DEFINE_PUBLIC_ALIAS(perror, libc_perror);
+DEFINE_PUBLIC_ALIAS(tmpfile, libc_tmpfile);
 DEFINE_PUBLIC_ALIAS(_IO_vfprintf, libc_vfprintf);
 DEFINE_PUBLIC_ALIAS(vfprintf, libc_vfprintf);
 #endif /* !__KERNEL__ */
@@ -4388,6 +4485,7 @@ DEFINE_PUBLIC_ALIAS(DOS$obstack_printf, libd_obstack_printf);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(obstack_printf, libc_obstack_printf);
+DEFINE_PUBLIC_ALIAS(tmpfile64, libc_tmpfile64);
 DEFINE_PUBLIC_ALIAS(fopen_printer, libc_fopen_printer);
 DEFINE_PUBLIC_ALIAS(vasprintf, libc_vasprintf);
 #endif /* !__KERNEL__ */

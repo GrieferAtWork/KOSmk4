@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd95061b */
+/* HASH CRC-32:0x7ca8768a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -145,9 +145,12 @@ __NAMESPACE_STD_USING(ferror)
 __NAMESPACE_STD_USING(perror)
 #endif /* !__perror_defined && __std_perror_defined */
 #include <asm/os/oflags.h>
-#if (defined(__CRT_HAVE_tmpfile) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_tmpfile64)
+#include <asm/os/mman.h>
+#include <asm/os/signal.h>
+#include <asm/os/fcntl.h>
+#if (defined(__CRT_HAVE_tmpfile) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_tmpfile64) || ((defined(__CRT_HAVE_fdopen) || defined(__CRT_HAVE__fdopen) || defined(__CRT_HAVE__IO_fdopen)) && ((defined(__CRT_HAVE_memfd_create) && defined(__MFD_CLOEXEC)) || (((defined(__CRT_HAVE_mkstemp) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkstemp64) || (defined(__CRT_HAVE_mkstemps) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkstemps64) || (defined(__CRT_HAVE_mkostemps) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask)) && (defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || defined(__CRT_HAVE___unlink) || defined(__CRT_HAVE___libc_unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))) && defined(__SIG_SETMASK))))
 __NAMESPACE_STD_USING(tmpfile)
-#endif /* (__CRT_HAVE_tmpfile && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_tmpfile64 */
+#endif /* (__CRT_HAVE_tmpfile && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_tmpfile64 || ((__CRT_HAVE_fdopen || __CRT_HAVE__fdopen || __CRT_HAVE__IO_fdopen) && ((__CRT_HAVE_memfd_create && __MFD_CLOEXEC) || (((__CRT_HAVE_mkstemp && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_mkstemp64 || (__CRT_HAVE_mkstemps && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_mkstemps64 || (__CRT_HAVE_mkostemps && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_sigprocmask || __CRT_HAVE___sigprocmask || __CRT_HAVE___libc_sigprocmask || __CRT_HAVE_pthread_sigmask || __CRT_HAVE_thr_sigsetmask) && (__CRT_HAVE_unlink || __CRT_HAVE__unlink || __CRT_HAVE___unlink || __CRT_HAVE___libc_unlink || (__AT_FDCWD && __CRT_HAVE_unlinkat)) && __SIG_SETMASK))) */
 #if (defined(__CRT_HAVE_fopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || (defined(__CRT_HAVE__IO_fopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_fopen64)
 __NAMESPACE_STD_USING(fopen)
 #endif /* (__CRT_HAVE_fopen && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || (__CRT_HAVE__IO_fopen && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_fopen64 */
@@ -1594,13 +1597,36 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(perror, __FORCELOCAL __ATTR_ARTIFICIAL void __NO
 #endif /* !__std_perror_defined */
 #if defined(__CRT_HAVE_tmpfile) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> tmpfile(3), tmpfile64(3)
- * Create and return a new file-stream for accessing a temporary file for reading/writing */
+ * Create and return a new file-stream for accessing a temporary file for reading/writing
+ * The file uses an  operating-system provided file descriptor,  however does not have  a
+ * proper name anywhere  on the filesystem  (meaning the file's  contents are deleted  as
+ * soon as the returned file stream is closed) */
 __CDECLARE(__ATTR_WUNUSED,FILE *,__NOTHROW_RPC,tmpfile,(void),())
 #elif defined(__CRT_HAVE_tmpfile64)
 /* >> tmpfile(3), tmpfile64(3)
- * Create and return a new file-stream for accessing a temporary file for reading/writing */
+ * Create and return a new file-stream for accessing a temporary file for reading/writing
+ * The file uses an  operating-system provided file descriptor,  however does not have  a
+ * proper name anywhere  on the filesystem  (meaning the file's  contents are deleted  as
+ * soon as the returned file stream is closed) */
 __CREDIRECT(__ATTR_WUNUSED,FILE *,__NOTHROW_RPC,tmpfile,(void),tmpfile64,())
-#endif /* ... */
+#else /* ... */
+__NAMESPACE_STD_END
+#include <asm/os/mman.h>
+#include <asm/os/signal.h>
+#include <asm/os/fcntl.h>
+__NAMESPACE_STD_BEGIN
+#if (defined(__CRT_HAVE_fdopen) || defined(__CRT_HAVE__fdopen) || defined(__CRT_HAVE__IO_fdopen)) && ((defined(__CRT_HAVE_memfd_create) && defined(__MFD_CLOEXEC)) || (((defined(__CRT_HAVE_mkstemp) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkstemp64) || (defined(__CRT_HAVE_mkstemps) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkstemps64) || (defined(__CRT_HAVE_mkostemps) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask)) && (defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || defined(__CRT_HAVE___unlink) || defined(__CRT_HAVE___libc_unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))) && defined(__SIG_SETMASK)))
+__NAMESPACE_STD_END
+#include <libc/local/stdio/tmpfile.h>
+__NAMESPACE_STD_BEGIN
+/* >> tmpfile(3), tmpfile64(3)
+ * Create and return a new file-stream for accessing a temporary file for reading/writing
+ * The file uses an  operating-system provided file descriptor,  however does not have  a
+ * proper name anywhere  on the filesystem  (meaning the file's  contents are deleted  as
+ * soon as the returned file stream is closed) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(tmpfile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED FILE *__NOTHROW_RPC(__LIBCCALL tmpfile)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tmpfile))(); })
+#endif /* (__CRT_HAVE_fdopen || __CRT_HAVE__fdopen || __CRT_HAVE__IO_fdopen) && ((__CRT_HAVE_memfd_create && __MFD_CLOEXEC) || (((__CRT_HAVE_mkstemp && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_mkstemp64 || (__CRT_HAVE_mkstemps && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_mkstemps64 || (__CRT_HAVE_mkostemps && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_sigprocmask || __CRT_HAVE___sigprocmask || __CRT_HAVE___libc_sigprocmask || __CRT_HAVE_pthread_sigmask || __CRT_HAVE_thr_sigsetmask) && (__CRT_HAVE_unlink || __CRT_HAVE__unlink || __CRT_HAVE___unlink || __CRT_HAVE___libc_unlink || (__AT_FDCWD && __CRT_HAVE_unlinkat)) && __SIG_SETMASK)) */
+#endif /* !... */
 #if defined(__CRT_HAVE_fopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> fopen(3), fopen64(3)
  * Create and return a new file-stream for accessing `filename' */
@@ -2494,9 +2520,12 @@ __NAMESPACE_STD_USING(ferror)
 #define __perror_defined
 __NAMESPACE_STD_USING(perror)
 #endif /* !__perror_defined && __std_perror_defined */
-#if (defined(__CRT_HAVE_tmpfile) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_tmpfile64)
+#include <asm/os/mman.h>
+#include <asm/os/signal.h>
+#include <asm/os/fcntl.h>
+#if (defined(__CRT_HAVE_tmpfile) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_tmpfile64) || ((defined(__CRT_HAVE_fdopen) || defined(__CRT_HAVE__fdopen) || defined(__CRT_HAVE__IO_fdopen)) && ((defined(__CRT_HAVE_memfd_create) && defined(__MFD_CLOEXEC)) || (((defined(__CRT_HAVE_mkstemp) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkstemp64) || (defined(__CRT_HAVE_mkstemps) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkstemps64) || (defined(__CRT_HAVE_mkostemps) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask)) && (defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || defined(__CRT_HAVE___unlink) || defined(__CRT_HAVE___libc_unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))) && defined(__SIG_SETMASK))))
 __NAMESPACE_STD_USING(tmpfile)
-#endif /* (__CRT_HAVE_tmpfile && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_tmpfile64 */
+#endif /* (__CRT_HAVE_tmpfile && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_tmpfile64 || ((__CRT_HAVE_fdopen || __CRT_HAVE__fdopen || __CRT_HAVE__IO_fdopen) && ((__CRT_HAVE_memfd_create && __MFD_CLOEXEC) || (((__CRT_HAVE_mkstemp && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_mkstemp64 || (__CRT_HAVE_mkstemps && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_mkstemps64 || (__CRT_HAVE_mkostemps && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_sigprocmask || __CRT_HAVE___sigprocmask || __CRT_HAVE___libc_sigprocmask || __CRT_HAVE_pthread_sigmask || __CRT_HAVE_thr_sigsetmask) && (__CRT_HAVE_unlink || __CRT_HAVE__unlink || __CRT_HAVE___unlink || __CRT_HAVE___libc_unlink || (__AT_FDCWD && __CRT_HAVE_unlinkat)) && __SIG_SETMASK))) */
 #if (defined(__CRT_HAVE_fopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || (defined(__CRT_HAVE__IO_fopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_fopen64)
 __NAMESPACE_STD_USING(fopen)
 #endif /* (__CRT_HAVE_fopen && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || (__CRT_HAVE__IO_fopen && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_fopen64 */
@@ -2631,7 +2660,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(renameat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  * Remove a file or directory `filename' relative to a given base directory `dirfd' */
 __CDECLARE(__ATTR_IN(2),int,__NOTHROW_RPC,removeat,(__fd_t __dirfd, char const *__filename),(__dirfd,__filename))
 #else /* __CRT_HAVE_removeat */
-#include <asm/os/fcntl.h>
 #include <asm/os/errno.h>
 #if defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat) && (defined(__AT_REMOVEREG) || (defined(__EISDIR) && defined(__ENOTDIR)))
 #include <libc/local/stdio/removeat.h>
@@ -3669,12 +3697,34 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ftello, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #ifdef __USE_LARGEFILE64
 #if defined(__CRT_HAVE_tmpfile) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> tmpfile(3), tmpfile64(3)
- * Create and return a new file-stream for accessing a temporary file for reading/writing */
+ * Create and return a new file-stream for accessing a temporary file for reading/writing
+ * The file uses an  operating-system provided file descriptor,  however does not have  a
+ * proper name anywhere  on the filesystem  (meaning the file's  contents are deleted  as
+ * soon as the returned file stream is closed) */
 __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_RPC,tmpfile64,(void),tmpfile,())
 #elif defined(__CRT_HAVE_tmpfile64)
 /* >> tmpfile(3), tmpfile64(3)
- * Create and return a new file-stream for accessing a temporary file for reading/writing */
+ * Create and return a new file-stream for accessing a temporary file for reading/writing
+ * The file uses an  operating-system provided file descriptor,  however does not have  a
+ * proper name anywhere  on the filesystem  (meaning the file's  contents are deleted  as
+ * soon as the returned file stream is closed) */
 __CDECLARE(__ATTR_WUNUSED,__FILE *,__NOTHROW_RPC,tmpfile64,(void),())
+#elif (defined(__CRT_HAVE_fdopen) || defined(__CRT_HAVE__fdopen) || defined(__CRT_HAVE__IO_fdopen)) && ((defined(__CRT_HAVE_memfd_create) && defined(__MFD_CLOEXEC)) || ((defined(__CRT_HAVE_mkstemp) || defined(__CRT_HAVE_mkstemp64) || defined(__CRT_HAVE_mkstemps) || defined(__CRT_HAVE_mkstemps64) || defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask)) && (defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || defined(__CRT_HAVE___unlink) || defined(__CRT_HAVE___libc_unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))) && defined(__SIG_SETMASK) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)))
+#include <libc/local/stdio/tmpfile.h>
+/* >> tmpfile(3), tmpfile64(3)
+ * Create and return a new file-stream for accessing a temporary file for reading/writing
+ * The file uses an  operating-system provided file descriptor,  however does not have  a
+ * proper name anywhere  on the filesystem  (meaning the file's  contents are deleted  as
+ * soon as the returned file stream is closed) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __FILE *__NOTHROW_RPC(__LIBCCALL tmpfile64)(void) { return (__FILE *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tmpfile))(); }
+#elif (defined(__CRT_HAVE_fdopen) || defined(__CRT_HAVE__fdopen) || defined(__CRT_HAVE__IO_fdopen)) && ((defined(__CRT_HAVE_mkstemp) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkstemp64) || (defined(__CRT_HAVE_mkstemps) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkstemps64) || (defined(__CRT_HAVE_mkostemps) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask)) && (defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || defined(__CRT_HAVE___unlink) || defined(__CRT_HAVE___libc_unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))) && defined(__SIG_SETMASK)
+#include <libc/local/stdio/tmpfile64.h>
+/* >> tmpfile(3), tmpfile64(3)
+ * Create and return a new file-stream for accessing a temporary file for reading/writing
+ * The file uses an  operating-system provided file descriptor,  however does not have  a
+ * proper name anywhere  on the filesystem  (meaning the file's  contents are deleted  as
+ * soon as the returned file stream is closed) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(tmpfile64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __FILE *__NOTHROW_RPC(__LIBCCALL tmpfile64)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tmpfile64))(); })
 #endif /* ... */
 #if defined(__CRT_HAVE_fseek_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
 /* >> fseeko(3), fseeko64(3)
@@ -5248,16 +5298,13 @@ __CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,unlink,(char const *__file),__unlink,
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
 __CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,unlink,(char const *__file),__libc_unlink,(__file))
-#else /* ... */
-#include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#elif defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <libc/local/unistd/unlink.h>
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); })
-#else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
+#else /* ... */
 #undef __unlink_defined
-#endif /* !__AT_FDCWD || !__CRT_HAVE_unlinkat */
 #endif /* !... */
 #endif /* !__unlink_defined */
 #ifndef ___unlink_defined
@@ -5278,16 +5325,13 @@ __CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,_unlink,(char const *__file),__unlink
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
 __CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,_unlink,(char const *__file),__libc_unlink,(__file))
-#else /* ... */
-#include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#elif defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <libc/local/unistd/unlink.h>
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL _unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); }
-#else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
+#else /* ... */
 #undef ___unlink_defined
-#endif /* !__AT_FDCWD || !__CRT_HAVE_unlinkat */
 #endif /* !... */
 #endif /* !___unlink_defined */
 #endif /* !_CRT_DIRECTORY_DEFINED */
@@ -5716,7 +5760,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(clearerr_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* ... */
 #ifdef __CRT_HAVE_tmpfile_s
 __CDECLARE(__ATTR_OUT(1),errno_t,__NOTHROW_RPC,tmpfile_s,(__FILE **__pstream),(__pstream))
-#elif (defined(__CRT_HAVE_tmpfile) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_tmpfile64)
+#elif (defined(__CRT_HAVE_tmpfile) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_tmpfile64) || ((defined(__CRT_HAVE_fdopen) || defined(__CRT_HAVE__fdopen) || defined(__CRT_HAVE__IO_fdopen)) && ((defined(__CRT_HAVE_memfd_create) && defined(__MFD_CLOEXEC)) || ((defined(__CRT_HAVE_mkstemp) || defined(__CRT_HAVE_mkstemp64) || defined(__CRT_HAVE_mkstemps) || defined(__CRT_HAVE_mkstemps64) || defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask)) && (defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || defined(__CRT_HAVE___unlink) || defined(__CRT_HAVE___libc_unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))) && defined(__SIG_SETMASK) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)))) || ((defined(__CRT_HAVE_fdopen) || defined(__CRT_HAVE__fdopen) || defined(__CRT_HAVE__IO_fdopen)) && ((defined(__CRT_HAVE_mkstemp) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkstemp64) || (defined(__CRT_HAVE_mkstemps) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkstemps64) || (defined(__CRT_HAVE_mkostemps) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask)) && (defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || defined(__CRT_HAVE___unlink) || defined(__CRT_HAVE___libc_unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))) && defined(__SIG_SETMASK))
 #include <libc/local/stdio/tmpfile_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(tmpfile_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) errno_t __NOTHROW_RPC(__LIBCCALL tmpfile_s)(__FILE **__pstream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tmpfile_s))(__pstream); })
 #endif /* ... */

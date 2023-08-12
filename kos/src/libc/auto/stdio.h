@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2991d790 */
+/* HASH CRC-32:0x2ff6f67d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -170,6 +170,12 @@ INTDEF void NOTHROW_RPC(LIBDCALL libd_perror)(char const *message);
  * >>     fprintf(stderr, "%s\n", strerror(errno));
  * >> } */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_perror)(char const *message);
+/* >> tmpfile(3), tmpfile64(3)
+ * Create and return a new file-stream for accessing a temporary file for reading/writing
+ * The file uses an  operating-system provided file descriptor,  however does not have  a
+ * proper name anywhere  on the filesystem  (meaning the file's  contents are deleted  as
+ * soon as the returned file stream is closed) */
+INTDEF WUNUSED FILE *NOTHROW_RPC(LIBCCALL libc_tmpfile)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fgetpos(3), fgetpos64(3)
@@ -639,6 +645,16 @@ INTDEF ATTR_INOUT(1) int NOTHROW_CB_NCX(LIBDCALL libd_fseeko)(FILE *__restrict s
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
 INTDEF WUNUSED ATTR_INOUT(1) off_t NOTHROW_CB_NCX(LIBDCALL libd_ftello)(FILE *__restrict stream);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> tmpfile(3), tmpfile64(3)
+ * Create and return a new file-stream for accessing a temporary file for reading/writing
+ * The file uses an  operating-system provided file descriptor,  however does not have  a
+ * proper name anywhere  on the filesystem  (meaning the file's  contents are deleted  as
+ * soon as the returned file stream is closed) */
+INTDEF WUNUSED FILE *NOTHROW_RPC(LIBCCALL libc_tmpfile64)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
 INTDEF ATTR_INOUT(1) int NOTHROW_CB_NCX(LIBDCALL libd_fseeko64)(FILE *__restrict stream, off64_t off, int whence);

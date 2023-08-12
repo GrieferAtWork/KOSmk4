@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd074d7d2 */
+/* HASH CRC-32:0xefd8f7a8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,7 +119,7 @@ NOTHROW_NCX(LIBCCALL libc_getopt_impl)(unsigned int argc,
 #ifdef __LOCAL_optreset
 	    || __LOCAL_optreset
 #endif /* __LOCAL_optreset */
-		) {
+	    ) {
 #ifdef __LOCAL_optreset
 		__LOCAL_optreset = 0;
 #endif /* __LOCAL_optreset */
@@ -525,7 +525,7 @@ err_return_col_or_qmark:
  *  - "-xyz":      Returns "x", "y", and then "z"   (assuming `optstring' contains "x", "y" and "z")
  *  - "-ofoo":     Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
  *  - "-o", "foo": Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
- * Long options (`getopt_long(3)'-only)appear in the following formats:
+ * Long options (`getopt_long(3)'-only) appear in the following formats:
  *  - "--out":        Returns `longopts["out"].val'                      (assuming `longopts["out"].has_arg != required_argument')
  *  - "--out=foo":    Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
  *  - "--out", "foo": Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
@@ -604,7 +604,7 @@ NOTHROW_NCX(LIBCCALL libc___posix_getopt)(int argc,
  *  - "-xyz":      Returns "x", "y", and then "z"   (assuming `optstring' contains "x", "y" and "z")
  *  - "-ofoo":     Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
  *  - "-o", "foo": Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
- * Long options (`getopt_long(3)'-only)appear in the following formats:
+ * Long options (`getopt_long(3)'-only) appear in the following formats:
  *  - "--out":        Returns `longopts["out"].val'                      (assuming `longopts["out"].has_arg != required_argument')
  *  - "--out=foo":    Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
  *  - "--out", "foo": Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
@@ -680,7 +680,7 @@ NOTHROW_NCX(LIBCCALL libc_getopt_long)(int argc,
  *  - "-xyz":      Returns "x", "y", and then "z"   (assuming `optstring' contains "x", "y" and "z")
  *  - "-ofoo":     Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
  *  - "-o", "foo": Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
- * Long options (`getopt_long(3)'-only)appear in the following formats:
+ * Long options (`getopt_long(3)'-only) appear in the following formats:
  *  - "--out":        Returns `longopts["out"].val'                      (assuming `longopts["out"].has_arg != required_argument')
  *  - "--out=foo":    Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
  *  - "--out", "foo": Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
@@ -753,6 +753,7 @@ NOTHROW_NCX(LIBCCALL libc_getopt_long_only)(int argc,
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(bsd_getopt, libc_getopt);
 DEFINE_PUBLIC_ALIAS(getopt, libc_getopt);
 DEFINE_PUBLIC_ALIAS(__posix_getopt, libc___posix_getopt);
 DEFINE_PUBLIC_ALIAS(getopt_long, libc_getopt_long);

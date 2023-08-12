@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8b74cbd */
+/* HASH CRC-32:0xfd00fddc */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ INTDEF WUNUSED NONNULL((2, 3)) int NOTHROW_NCX(LIBCCALL libc_getopt_impl)(unsign
  *  - "-xyz":      Returns "x", "y", and then "z"   (assuming `optstring' contains "x", "y" and "z")
  *  - "-ofoo":     Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
  *  - "-o", "foo": Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
- * Long options (`getopt_long(3)'-only)appear in the following formats:
+ * Long options (`getopt_long(3)'-only) appear in the following formats:
  *  - "--out":        Returns `longopts["out"].val'                      (assuming `longopts["out"].has_arg != required_argument')
  *  - "--out=foo":    Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
  *  - "--out", "foo": Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
@@ -115,7 +115,7 @@ INTDEF WUNUSED NONNULL((2, 3)) int NOTHROW_NCX(LIBDCALL libd_getopt)(int argc, c
  *  - "-xyz":      Returns "x", "y", and then "z"   (assuming `optstring' contains "x", "y" and "z")
  *  - "-ofoo":     Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
  *  - "-o", "foo": Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
- * Long options (`getopt_long(3)'-only)appear in the following formats:
+ * Long options (`getopt_long(3)'-only) appear in the following formats:
  *  - "--out":        Returns `longopts["out"].val'                      (assuming `longopts["out"].has_arg != required_argument')
  *  - "--out=foo":    Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
  *  - "--out", "foo": Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
@@ -191,7 +191,7 @@ INTDEF WUNUSED NONNULL((2, 3)) int NOTHROW_NCX(LIBCCALL libc___posix_getopt)(int
  *  - "-xyz":      Returns "x", "y", and then "z"   (assuming `optstring' contains "x", "y" and "z")
  *  - "-ofoo":     Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
  *  - "-o", "foo": Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
- * Long options (`getopt_long(3)'-only)appear in the following formats:
+ * Long options (`getopt_long(3)'-only) appear in the following formats:
  *  - "--out":        Returns `longopts["out"].val'                      (assuming `longopts["out"].has_arg != required_argument')
  *  - "--out=foo":    Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
  *  - "--out", "foo": Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
@@ -261,7 +261,7 @@ INTDEF WUNUSED NONNULL((2, 3)) int NOTHROW_NCX(LIBDCALL libd_getopt_long)(int ar
  *  - "-xyz":      Returns "x", "y", and then "z"   (assuming `optstring' contains "x", "y" and "z")
  *  - "-ofoo":     Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
  *  - "-o", "foo": Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
- * Long options (`getopt_long(3)'-only)appear in the following formats:
+ * Long options (`getopt_long(3)'-only) appear in the following formats:
  *  - "--out":        Returns `longopts["out"].val'                      (assuming `longopts["out"].has_arg != required_argument')
  *  - "--out=foo":    Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
  *  - "--out", "foo": Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
@@ -331,7 +331,7 @@ INTDEF WUNUSED NONNULL((2, 3)) int NOTHROW_NCX(LIBCCALL libc_getopt_long)(int ar
  *  - "-xyz":      Returns "x", "y", and then "z"   (assuming `optstring' contains "x", "y" and "z")
  *  - "-ofoo":     Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
  *  - "-o", "foo": Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
- * Long options (`getopt_long(3)'-only)appear in the following formats:
+ * Long options (`getopt_long(3)'-only) appear in the following formats:
  *  - "--out":        Returns `longopts["out"].val'                      (assuming `longopts["out"].has_arg != required_argument')
  *  - "--out=foo":    Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
  *  - "--out", "foo": Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
@@ -401,7 +401,7 @@ INTDEF WUNUSED NONNULL((2, 3)) int NOTHROW_NCX(LIBDCALL libd_getopt_long_only)(i
  *  - "-xyz":      Returns "x", "y", and then "z"   (assuming `optstring' contains "x", "y" and "z")
  *  - "-ofoo":     Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
  *  - "-o", "foo": Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
- * Long options (`getopt_long(3)'-only)appear in the following formats:
+ * Long options (`getopt_long(3)'-only) appear in the following formats:
  *  - "--out":        Returns `longopts["out"].val'                      (assuming `longopts["out"].has_arg != required_argument')
  *  - "--out=foo":    Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
  *  - "--out", "foo": Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')

@@ -2516,6 +2516,7 @@
 #define __CRT_HAVE_bindtextdomain
 #define __CRT_HAVE_bitcpy
 #define __CRT_HAVE_brk
+#define __CRT_HAVE_bsd_getopt
 #define __CRT_HAVE_bsd_signal
 #define __CRT_HAVE_bsearch
 #define __CRT_HAVE_bsearch_r

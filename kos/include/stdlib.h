@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe9e202c */
+/* HASH CRC-32:0x531a6eb7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3912,6 +3912,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(daemonfd, __FORCELOCAL __ATTR_ARTIFICIAL int __N
 #undef __daemonfd_defined
 #endif /* !... */
 #endif /* !__daemonfd_defined */
+
+/* >> suboptarg(3)
+ * Global variable that gets assigned by `getsubopt(3)' */
+#ifndef suboptarg
+#ifdef __LOCAL_suboptarg
+#define suboptarg __LOCAL_suboptarg
+#elif defined(__CRT_HAVE_suboptarg)
+__CSDECLARE(,char *,suboptarg)
+#define suboptarg suboptarg
+#endif /* ... */
+#endif /* !suboptarg */
+
 #ifdef __CRT_HAVE_l64a_r
 /* >> l64a_r(3)
  * Reentrant variant of `l64a(3)'. Note that the max required buffer size

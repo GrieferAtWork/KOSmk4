@@ -1280,11 +1280,58 @@ void perror([[nullable]] char const *message) {
 
 @@>> tmpfile(3), tmpfile64(3)
 @@Create and return a new file-stream for accessing a temporary file for reading/writing
+@@The file uses an  operating-system provided file descriptor,  however does not have  a
+@@proper name anywhere  on the filesystem  (meaning the file's  contents are deleted  as
+@@soon as the returned file stream is closed)
 [[cp, std, wunused, no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("tmpfile")]]
 [[                                                                                                                                                     alias("tmpfile64")]]
 [[section(".text.crt{|.dos}.FILE.locked.access")]]
-FILE *tmpfile();
+[[requires_include("<asm/os/mman.h>", "<asm/os/signal.h>")]]
+[[requires($has_function(fdopen) &&
+           (($has_function(memfd_create) && defined(__MFD_CLOEXEC)) ||
+            ($has_function(mkstemp, sigprocmask, unlink) && defined(__SIG_SETMASK))))]]
+[[impl_include("<paths.h>")]]
+FILE *tmpfile() {
+	FILE *result;
+	fd_t tmpfd;
+@@pp_if $has_function(memfd_create) && defined(__MFD_CLOEXEC)@@
+	tmpfd = memfd_create(NULL, __MFD_CLOEXEC);
+@@pp_else@@
+	/* OS doesn't have memory file -> create a temp file and delete it immediately. */
+#ifndef _PATH_TMP
+#define _PATH_TMP "/tmp/"
+#endif /* !_PATH_TMP */
+	char tmpfd_name_buf[COMPILER_STRLEN(_PATH_TMP "tmp.XXXXXX") + 1];
+	(void)memcpy(tmpfd_name_buf, _PATH_TMP "tmp.XXXXXX", sizeof(tmpfd_name_buf));
+	{
+@@pp_if $has_function(setsigmaskfullptr, setsigmaskptr)@@
+		sigset_t *oset;
+		oset  = setsigmaskfullptr();
+		tmpfd = mkstemp(tmpfd_name_buf);
+		if likely(tmpfd >= 0)
+			(void)unlink(tmpfd_name_buf);
+		(void)setsigmaskptr(oset);
+@@pp_else@@
+		sigset_t nset, oset;
+		(void)sigfillset(&nset);
+		(void)sigprocmask(__SIG_SETMASK, &nset, &oset);
+		tmpfd = mkstemp(tmpfd_name_buf);
+		if likely(tmpfd >= 0)
+			(void)unlink(tmpfd_name_buf);
+		(void)sigprocmask(__SIG_SETMASK, &oset, NULL);
+@@pp_endif@@
+	}
+@@pp_endif@@
+	if unlikely(tmpfd < 0)
+		return NULL;
+	result = fdopen(tmpfd, "w+");
+@@pp_if $has_function(close)@@
+	if unlikely(!result)
+		(void)close(tmpfd);
+@@pp_endif@@
+	return result;
+}
 
 @@>> fopen(3), fopen64(3)
 @@Create and return a new file-stream for accessing `filename'
@@ -3151,9 +3198,53 @@ $off_t ftello([[inout]] $FILE *__restrict stream) {
 %#ifdef __USE_LARGEFILE64
 %[default:section(".text.crt{|.dos}.FILE.locked.access")]
 
-[[cp, wunused]]
-[[preferred_largefile64_variant_of(tmpfile), doc_alias("tmpfile")]]
-$FILE *tmpfile64();
+[[cp, wunused, doc_alias("tmpfile")]]
+[[preferred_largefile64_variant_of(tmpfile)]]
+[[if($has_function(fdopen) &&
+     (($has_function(memfd_create) && defined(__MFD_CLOEXEC)) ||
+      ($has_function(mkstemp, sigprocmask, unlink) && defined(__SIG_SETMASK) &&
+       (!$has_function(mkstemp64) || !defined(__O_LARGEFILE) || !(__O_LARGEFILE + 0))))),
+  bind_local_function(tmpfile)]]
+[[section(".text.crt{|.dos}.FILE.locked.access")]]
+[[requires_include("<asm/os/mman.h>", "<asm/os/signal.h>")]]
+[[requires($has_function(fdopen) &&
+           ($has_function(mkstemp64, sigprocmask, unlink) && defined(__SIG_SETMASK)))]]
+[[impl_include("<paths.h>")]]
+$FILE *tmpfile64() {
+	FILE *result;
+	fd_t tmpfd;
+#ifndef _PATH_TMP
+#define _PATH_TMP "/tmp/"
+#endif /* !_PATH_TMP */
+	char tmpfd_name_buf[COMPILER_STRLEN(_PATH_TMP "tmp.XXXXXX") + 1];
+	(void)memcpy(tmpfd_name_buf, _PATH_TMP "tmp.XXXXXX", sizeof(tmpfd_name_buf));
+	{
+@@pp_if $has_function(setsigmaskfullptr, setsigmaskptr)@@
+		sigset_t *oset;
+		oset  = setsigmaskfullptr();
+		tmpfd = mkstemp64(tmpfd_name_buf);
+		if likely(tmpfd >= 0)
+			(void)unlink(tmpfd_name_buf);
+		(void)setsigmaskptr(oset);
+@@pp_else@@
+		sigset_t nset, oset;
+		(void)sigfillset(&nset);
+		(void)sigprocmask(__SIG_SETMASK, &nset, &oset);
+		tmpfd = mkstemp64(tmpfd_name_buf);
+		if likely(tmpfd >= 0)
+			(void)unlink(tmpfd_name_buf);
+		(void)sigprocmask(__SIG_SETMASK, &oset, NULL);
+@@pp_endif@@
+	}
+	if unlikely(tmpfd < 0)
+		return NULL;
+	result = fdopen(tmpfd, "w+");
+@@pp_if $has_function(close)@@
+	if unlikely(!result)
+		(void)close(tmpfd);
+@@pp_endif@@
+	return result;
+}
 
 %[default:section(".text.crt{|.dos}.FILE.locked.seek.seek")]
 

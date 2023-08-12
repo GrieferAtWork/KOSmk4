@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb8a0895 */
+/* HASH CRC-32:0x413daabc */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,9 +88,6 @@ INTDEF ATTR_PURE WUNUSED ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc_feof)(FILE __K
 /* >> ferror(3)
  * Check if an I/O error occurred in `stream' */
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc_ferror)(FILE __KOS_FIXED_CONST *__restrict stream);
-/* >> tmpfile(3), tmpfile64(3)
- * Create and return a new file-stream for accessing a temporary file for reading/writing */
-INTDEF WUNUSED FILE *NOTHROW_RPC(LIBCCALL libc_tmpfile)(void);
 /* >> fopen(3), fopen64(3)
  * Create and return a new file-stream for accessing `filename' */
 INTDEF WUNUSED ATTR_IN(1) ATTR_IN(2) FILE *NOTHROW_RPC(LIBDCALL libd_fopen)(char const *__restrict filename, char const *__restrict modes);
@@ -190,9 +187,6 @@ INTDEF ATTR_INOUT(1) int NOTHROW_CB_NCX(LIBCCALL libc_fseeko)(FILE *__restrict s
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
 INTDEF WUNUSED ATTR_INOUT(1) off_t NOTHROW_CB_NCX(LIBCCALL libc_ftello)(FILE *__restrict stream);
-/* >> tmpfile(3), tmpfile64(3)
- * Create and return a new file-stream for accessing a temporary file for reading/writing */
-INTDEF WUNUSED FILE *NOTHROW_RPC(LIBCCALL libc_tmpfile64)(void);
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
 INTDEF ATTR_INOUT(1) int NOTHROW_CB_NCX(LIBCCALL libc_fseeko64)(FILE *__restrict stream, off64_t off, int whence);

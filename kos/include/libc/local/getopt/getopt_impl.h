@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e4410e2 */
+/* HASH CRC-32:0xcf165b56 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -262,7 +262,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getopt_impl))(unsigned int ___argc, c
 #ifdef __LOCAL_optreset
 	    || __LOCAL_optreset
 #endif /* __LOCAL_optreset */
-		) {
+	    ) {
 #ifdef __LOCAL_optreset
 		__LOCAL_optreset = 0;
 #endif /* __LOCAL_optreset */
