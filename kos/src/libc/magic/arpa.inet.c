@@ -134,7 +134,7 @@ struct in_addr inet_makeaddr($uint32_t net, $uint32_t host) {
 in_addr_t inet_addr([[in]] char const *__restrict cp) {
 	struct @in_addr@ addr;
 	if (!inet_paton((char const **)&cp, &addr, 0) || *cp)
-		return @INADDR_NONE@;
+		return (in_addr_t)@INADDR_NONE@;
 	return addr.@s_addr@;
 }
 
@@ -145,8 +145,8 @@ in_addr_t inet_addr([[in]] char const *__restrict cp) {
 @@calls. For a re-entrant version of this function, see `inet_ntoa_r(3)'
 [[wunused, nonnull]]
 char *inet_ntoa(struct in_addr inaddr) {
-	static char buf[16];
-	return inet_ntoa_r(inaddr, buf);
+	@@static char inet_ntoa_buf[16] = {0}@@
+	return inet_ntoa_r(inaddr, inet_ntoa_buf);
 }
 
 %#ifdef __USE_KOS

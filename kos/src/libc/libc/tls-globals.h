@@ -51,6 +51,7 @@ struct libc_tlsglobals {
 	void     *ltg_ttyname_buf;
 	struct tm ltg_tmbuf;
 	char      ltg_l64a_buf[(((sizeof(long) * __CHAR_BIT__) + 5) / 6) + 1];
+	char      ltg_inet_ntoa_buf[16];
 	char      ltg_ctime_buf[26];
 	char      ltg_qcvt_buf[32];
 	char      ltg_ctermid_buf[9];

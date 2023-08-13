@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3bfbd34 */
+/* HASH CRC-32:0x65631a88 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __LOCAL_LIBC(inet_addr) __ATTR_PURE __ATTR_IN(1) __u_net32_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_addr))(char const *__restrict __cp) {
 	struct in_addr __addr;
 	if (!(__NAMESPACE_LOCAL_SYM __localdep_inet_paton)((char const **)&__cp, &__addr, 0) || *__cp)
-		return INADDR_NONE;
+		return (__u_net32_t)INADDR_NONE;
 	return __addr.s_addr;
 }
 __NAMESPACE_LOCAL_END

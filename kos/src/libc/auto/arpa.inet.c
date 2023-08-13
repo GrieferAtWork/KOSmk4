@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa71a43a8 */
+/* HASH CRC-32:0x1482b606 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,9 +102,10 @@ INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_PURE ATTR_IN(1) in_addr_t
 NOTHROW_NCX(LIBCCALL libc_inet_addr)(char const *__restrict cp) {
 	struct in_addr addr;
 	if (!libc_inet_paton((char const **)&cp, &addr, 0) || *cp)
-		return INADDR_NONE;
+		return (in_addr_t)INADDR_NONE;
 	return addr.s_addr;
 }
+#include "../libc/tls-globals.h"
 /* >> inet_ntoa(3)
  * Return   the   conventional  numbers-and-dots   representation   of  a
  * given  Internet  host  address  `inaddr'.  The  returned  pointer   is
@@ -112,9 +113,11 @@ NOTHROW_NCX(LIBCCALL libc_inet_addr)(char const *__restrict cp) {
  * calls. For a re-entrant version of this function, see `inet_ntoa_r(3)' */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_inet_ntoa)(struct in_addr inaddr) {
-	static char buf[16];
-	return libc_inet_ntoa_r(inaddr, buf);
+	char (*const _p_inet_ntoa_buf)[16] = &libc_get_tlsglobals()->ltg_inet_ntoa_buf;
+#define inet_ntoa_buf (*_p_inet_ntoa_buf)
+	return libc_inet_ntoa_r(inaddr, inet_ntoa_buf);
 }
+#undef inet_ntoa_buf
 #include <netinet/in.h>
 #include <hybrid/__byteswap.h>
 /* >> inet_ntoa_r(3)
