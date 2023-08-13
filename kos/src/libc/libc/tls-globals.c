@@ -108,11 +108,15 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) void
 NOTHROW(LIBCCALL libc_fini_tlsglobals)(struct libc_tlsglobals *__restrict self) {
 	free(self->ltg_re_comp_buffer);
 /*[[[begin:libc_fini_tlsglobals]]]*/
+	free(self->ltg_ether_ntoa_buf);
 	free(self->ltg_getpass_buf);
+	free(self->ltg__strerror_buf);
 	free(self->ltg_cuserid_buf);
 	free(self->ltg_devname_buf);
+	free(self->ltg_getmntent_buf);
 	free(self->ltg_ptsname_buf);
 	free(self->ltg_ttyname_buf);
+	free(self->ltg_wctime_buf);
 /*[[[end:libc_fini_tlsglobals]]]*/
 }
 

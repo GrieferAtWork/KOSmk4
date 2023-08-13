@@ -115,6 +115,7 @@ global final ppAssumeHeaderFiles: PPAssume = createPPAssume({
 
 @@Macro definition assumptions that may be made inside of libc
 global final ppAssumeSourceFiles: PPAssume = createAutoFilePPAssume({
+	"__pic__"         : 1,
 	"__BUILDING_LIBC" : 1,
 	"__SIZEOF_CHAR__" : 1,
 	"__KOS__"         : 1,
@@ -124,6 +125,7 @@ global final ppAssumeSourceFiles: PPAssume = createAutoFilePPAssume({
 @@Macro definition assumptions that may be made inside of libc
 global final ppAssumeUserSourceFiles: PPAssume = createPPAssume({
 	"__KERNEL__"      : false, /* not defined */
+	"__pic__"         : 1,
 	"__BUILDING_LIBC" : 1,
 	"__SIZEOF_CHAR__" : 1,
 	"__KOS__"         : 1,
@@ -135,6 +137,7 @@ global final ppAssumeDosAbiSourceFiles: PPAssume = createPPAssume({
 	"__LIBCCALL_IS_LIBDCALL" : false, /* not defined */
 	"__LIBDCALL_IS_LIBKCALL" : false, /* not defined */
 	"__KERNEL__"             : false, /* not defined */
+	"__pic__"                : 1,
 	"__BUILDING_LIBC"        : 1,
 	"__SIZEOF_CHAR__"        : 1,
 	"__KOS__"                : 1,

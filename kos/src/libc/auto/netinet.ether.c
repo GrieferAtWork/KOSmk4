@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b760115 */
+/* HASH CRC-32:0xe72f523a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 #include <kos/types.h>
 #include "netinet.ether.h"
 #include "../user/ctype.h"
+#include "../user/libiberty.h"
 #include "../user/stdio.h"
 #include "../user/stdlib.h"
 #include "string.h"
@@ -35,14 +36,24 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <net/ethernet.h>
+#include "../libc/tls-globals.h"
 /* >> ether_ntoa(3), ether_ntoa_r(3)
  * Convert `addr' into a 20-character-long string that
  * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
 INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *
 NOTHROW_NCX(LIBCCALL libc_ether_ntoa)(struct ether_addr const *__restrict addr) {
-	static char buf[21];
-	return libc_ether_ntoa_r(addr, buf);
+
+	char **const _p_ether_ntoa_buf = &libc_get_tlsglobals()->ltg_ether_ntoa_buf;
+#define ether_ntoa_buf (*_p_ether_ntoa_buf)
+	if (ether_ntoa_buf == NULL)
+		ether_ntoa_buf = (char *)libc_xmalloc(21 * sizeof(char));
+	return libc_ether_ntoa_r(addr, ether_ntoa_buf);
+
+
+
+
 }
+#undef ether_ntoa_buf
 #include <net/ethernet.h>
 /* >> ether_ntoa(3), ether_ntoa_r(3)
  * Convert `addr' into a 20-character-long string that
@@ -57,14 +68,17 @@ NOTHROW_NCX(LIBCCALL libc_ether_ntoa_r)(struct ether_addr const *__restrict addr
 	return buf;
 }
 #include <net/ethernet.h>
+#include "../libc/tls-globals.h"
 /* >> ether_aton(3), ether_aton_r(3), ether_aton_np(3)
  * To   the   reverse  of   `ether_ntoa()'   and  convert
  * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL WUNUSED ATTR_IN(1) struct ether_addr *
 NOTHROW_NCX(LIBCCALL libc_ether_aton)(char const *__restrict asc) {
-	static struct ether_addr addr;
-	return libc_ether_aton_r(asc, &addr);
+	byte_t (*const _p_ether_aton_addr)[6] = &libc_get_tlsglobals()->ltg_ether_aton_addr;
+#define ether_aton_addr (*_p_ether_aton_addr)
+	return libc_ether_aton_r(asc, (struct ether_addr *)ether_aton_addr);
 }
+#undef ether_aton_addr
 #include <net/ethernet.h>
 /* >> ether_aton(3), ether_aton_r(3), ether_aton_np(3)
  * To   the   reverse  of   `ether_ntoa()'   and  convert

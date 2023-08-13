@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ca4c6c5 */
+/* HASH CRC-32:0x7939121a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,8 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_wcserror) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcserror))(__errno_t __errno_value) {
-	static __WCHAR_TYPE__ *__saved = __NULLPTR;
+	static void *___strerror_buf = __NULLPTR;
+	__WCHAR_TYPE__ *__result;
 	char const *__newmsg;
 #ifdef __libc_geterrno
 	__errno_t __saved_errno;
@@ -85,14 +86,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcserror))(__errno_t __errno_value) 
 #ifdef __libc_geterrno
 	__saved_errno = __libc_geterrno();
 #endif /* __libc_geterrno */
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_convert_mbstowcs)(__newmsg);
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
-	(__NAMESPACE_LOCAL_SYM __localdep_free)(__saved);
+	(__NAMESPACE_LOCAL_SYM __localdep_free)(___strerror_buf);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
-	__saved = (__NAMESPACE_LOCAL_SYM __localdep_convert_mbstowcs)(__newmsg);
+	___strerror_buf = __result;
 #ifdef __libc_geterrno
 	__libc_seterrno(__saved_errno);
 #endif /* __libc_geterrno */
-	return __saved;
+	return __result;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__wcserror_defined

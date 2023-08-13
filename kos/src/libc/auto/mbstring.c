@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba25d790 */
+/* HASH CRC-32:0x86495e56 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1196,13 +1196,16 @@ NOTHROW_NCX(LIBCCALL libc__mbsstr_l)(unsigned char const *haystack,
 	}
 	return (unsigned char *)haystack;
 }
+#include "../libc/tls-globals.h"
 INTERN ATTR_SECTION(".text.crt.dos.mbstring") WUNUSED ATTR_IN(2) ATTR_INOUT_OPT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbstok_l)(unsigned char *str,
                                      unsigned char const *delim,
                                      locale_t locale) {
-	static unsigned char *save_ptr = NULL;
-	return libc__mbstok_s_l(str, delim, &save_ptr, locale);
+	char **const _p_strtok_save_ptr = &libc_get_tlsglobals()->ltg_strtok_save_ptr;
+#define strtok_save_ptr (*_p_strtok_save_ptr)
+	return libc__mbstok_s_l(str, delim, (unsigned char **)&strtok_save_ptr, locale);
 }
+#undef strtok_save_ptr
 INTERN ATTR_SECTION(".text.crt.dos.mbstring") WUNUSED ATTR_IN(2) ATTR_INOUT(3) ATTR_INOUT_OPT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbstok_s_l)(unsigned char *str,
                                        unsigned char const *delim,

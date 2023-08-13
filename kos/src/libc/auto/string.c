@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc241ae9 */
+/* HASH CRC-32:0xa89d4064 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,7 @@
 #include "string.h"
 #include "../user/ctype.h"
 #include "../user/kos.except.h"
+#include "../user/malloc.h"
 #include "../user/signal.h"
 #include "../user/stdio.h"
 #include "../user/stdlib.h"
@@ -467,9 +468,11 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.errno") ATTR_COLD ATTR_RET
 NOTHROW_NCX(LIBDCALL libd_strerror)(errno_t errnum) { return libc_strerror(libd_errno_dos2kos(errnum)); }
 #include <bits/types.h>
 #include <libc/template/itoa_digits.h>
+#include "../libc/tls-globals.h"
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_strerror)(errno_t errnum) {
-	static char strerror_buf[64];
+	char (*const _p_strerror_buf)[64] = &libc_get_tlsglobals()->ltg_strerror_buf;
+#define strerror_buf (*_p_strerror_buf)
 	char *result;
 	char const *string;
 	result = strerror_buf;
@@ -501,6 +504,7 @@ NOTHROW_NCX(LIBCCALL libc_strerror)(errno_t errnum) {
 	}
 	return result;
 }
+#undef strerror_buf
 #endif /* !__KERNEL__ */
 #ifndef LIBC_ARCH_HAVE_STRNLEN
 /* >> strnlen(3)
@@ -564,9 +568,11 @@ NOTHROW_NCX(LIBCCALL libc_strerror_l)(errno_t errnum,
 }
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.string.memory.strsignal") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBDCALL libd_strsignal)(signo_t signo) { return libc_strerror(libd_signo_dos2kos(signo)); }
+#include "../libc/tls-globals.h"
 INTERN ATTR_SECTION(".text.crt.string.memory.strsignal") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_strsignal)(signo_t signo) {
-	static char strsignal_buf[64];
+	char (*const _p_strsignal_buf)[64] = &libc_get_tlsglobals()->ltg_strsignal_buf;
+#define strsignal_buf (*_p_strsignal_buf)
 	char *result = strsignal_buf;
 	char const *string;
 	string = libc_sigdescr_np(signo);
@@ -579,6 +585,7 @@ NOTHROW_NCX(LIBCCALL libc_strsignal)(signo_t signo) {
 	}
 	return result;
 }
+#undef strsignal_buf
 #include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_INS(1, 2) char *
 NOTHROW_NCX(LIBCCALL libc_strndup)(char const *__restrict str,
@@ -6421,15 +6428,68 @@ NOTHROW_NCX(LIBCCALL libc_strncpy_s)(char *dst,
 	__libc_memsetc(iter, 0, remaining, __SIZEOF_CHAR__);
 	return 0;
 }
+#include "../libc/tls-globals.h"
 INTERN ATTR_SECTION(".text.crt.dos.errno") WUNUSED ATTR_IN_OPT(1) char *
 NOTHROW_RPC(LIBCCALL libc__strerror)(char const *message) {
-	static char strerror_buf[64];
-	if (libc__strerror_s(strerror_buf,
-	                COMPILER_LENOF(strerror_buf),
-	                message))
-		return NULL;
-	return strerror_buf;
+
+	/* Buffer is typed as `void *' so it can be re-used for `_wcserror(3)' */
+	void **const _p__strerror_buf = &libc_get_tlsglobals()->ltg__strerror_buf;
+#define _strerror_buf (*_p__strerror_buf)
+	errno_t error;
+
+	size_t bufsize = libc_malloc_usable_size(_strerror_buf) / sizeof(char);
+
+
+
+	if (bufsize < 64) {
+		void *newbuf;
+		bufsize = 64;
+		newbuf  = libc_realloc(_strerror_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		_strerror_buf = newbuf;
+	}
+
+again:
+
+	error = libc__strerror_s((char *)_strerror_buf, bufsize, message);
+	if likely(error == 0) {
+		/* Trim unused memory (if a certain threshold is exceeded) */
+		size_t retlen = libc_strlen((char *)_strerror_buf) + 1;
+		if (retlen < 64)
+			retlen = 64; /* Retain minimal buffer size */
+		if likely((retlen + 32) < bufsize) {
+			void *retbuf = libc_realloc(_strerror_buf, retlen * sizeof(char));
+			if likely(retbuf)
+				_strerror_buf = retbuf;
+		}
+		return (char *)_strerror_buf;
+	}
+
+	if (error == ERANGE && bufsize < 1024) {
+		void *newbuf;
+		bufsize *= 2;
+		newbuf = libc_realloc(_strerror_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		_strerror_buf = newbuf;
+		goto again;
+	}
+
+
+	libc_free(_strerror_buf);
+	_strerror_buf = NULL;
+
+err:
+	return NULL;
+
+
+
+
+
+
 }
+#undef _strerror_buf
 #include <bits/types.h>
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_IN_OPT(3) ATTR_OUTS(1, 2) errno_t

@@ -43,18 +43,26 @@ struct re_code;
 struct libc_tlsglobals {
 	struct re_code *ltg_re_comp_buffer; /* [0..1] The static buffer used by `re_comp(3)' and `re_exec(3)' */
 /*[[[begin:libc_tlsglobals]]]*/
-	char     *ltg_getpass_buf;
-	char     *ltg_strtok_save_ptr;
-	void     *ltg_cuserid_buf;
-	void     *ltg_devname_buf;
-	void     *ltg_ptsname_buf;
-	void     *ltg_ttyname_buf;
-	struct tm ltg_tmbuf;
-	char      ltg_l64a_buf[(((sizeof(long) * __CHAR_BIT__) + 5) / 6) + 1];
-	char      ltg_inet_ntoa_buf[16];
-	char      ltg_ctime_buf[26];
-	char      ltg_qcvt_buf[32];
-	char      ltg_ctermid_buf[9];
+	char       *ltg_ether_ntoa_buf;
+	char       *ltg_getpass_buf;
+	char       *ltg_strtok_save_ptr;
+	char const *ltg_bufsplit_saved_splitchar;
+	void       *ltg__strerror_buf;
+	void       *ltg_cuserid_buf;
+	void       *ltg_devname_buf;
+	void       *ltg_getmntent_buf;
+	void       *ltg_ptsname_buf;
+	void       *ltg_ttyname_buf;
+	void       *ltg_wctime_buf;
+	struct tm   ltg_tmbuf;
+	byte_t      ltg_ether_aton_addr[6];
+	char        ltg_l64a_buf[(((sizeof(long) * __CHAR_BIT__) + 5) / 6) + 1];
+	char        ltg_inet_ntoa_buf[16];
+	char        ltg_ctime_buf[26];
+	char        ltg_qcvt_buf[32];
+	char        ltg_strerror_buf[64];
+	char        ltg_strsignal_buf[64];
+	char        ltg_ctermid_buf[9];
 /*[[[end:libc_tlsglobals]]]*/
 };
 /* clang-format on */

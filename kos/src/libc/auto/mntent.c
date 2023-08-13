@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5f34ecc */
+/* HASH CRC-32:0x7b7a8104 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,22 +40,26 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream) {
 	return 1;
 }
 #include <bits/crt/db/mntent.h>
+#include "../libc/tls-globals.h"
 /* >> getmntent(3), getmntent_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.mntent") ATTR_INOUT(1) struct mntent *
 NOTHROW_CB_NCX(LIBCCALL libc_getmntent)(FILE *stream) {
 
-	static struct mntent *ent = NULL;
-	static char *buf          = NULL;
-	if (!ent && (ent = (struct mntent *)libc_malloc(sizeof(struct mntent))) == NULL)
+	void **const _p_getmntent_buf = &libc_get_tlsglobals()->ltg_getmntent_buf;
+#define getmntent_buf (*_p_getmntent_buf)
+	if (!getmntent_buf &&
+	    (getmntent_buf = libc_malloc(sizeof(struct mntent) +
+	                            512 * sizeof(char))) == NULL)
 		return NULL;
-	if (!buf && (buf = (char *)libc_malloc(512 * sizeof(char))) == NULL)
-		return NULL;
+	return libc_getmntent_r(stream, (struct mntent *)getmntent_buf,
+	                   (char *)((struct mntent *)getmntent_buf + 1), 512);
 
 
 
 
-	return libc_getmntent_r(stream, ent, buf, 512);
+
 }
+#undef getmntent_buf
 /* >> getmntent(3), getmntent_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.mntent") ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUTS(3, 4) struct mntent *
 NOTHROW_CB_NCX(LIBCCALL libc_getmntent_r)(FILE *__restrict stream,

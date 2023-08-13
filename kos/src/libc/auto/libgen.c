@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89114a4 */
+/* HASH CRC-32:0xad412d4c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -188,6 +188,7 @@ NOTHROW_NCX(LIBCCALL libc_bgets)(char *buf,
 	return iter;
 }
 #include <hybrid/host.h>
+#include "../libc/tls-globals.h"
 /* >> bufsplit(3)
  * Split `string' on field-separator characters (by default "\t" or  "\n"),
  * replacing  those characters with  '\0'. The produced  list of strings is
@@ -215,24 +216,25 @@ NOTHROW_NCX(LIBCCALL libc_bufsplit)(char *string,
 	size_t count;
 	char const *splitchar;
 	static char const default_splitchar[] = "\t\n";
-#ifdef __pic__
-	static char const *saved_splitchar = NULL;
-	if (saved_splitchar == NULL)
-		saved_splitchar = default_splitchar;
-#else /* __pic__ */
-	static char const *saved_splitchar = default_splitchar;
-#endif /* !__pic__ */
+
+	char const **const _p_bufsplit_saved_splitchar = &libc_get_tlsglobals()->ltg_bufsplit_saved_splitchar;
+#define bufsplit_saved_splitchar (*_p_bufsplit_saved_splitchar)
+	if (bufsplit_saved_splitchar == NULL)
+		bufsplit_saved_splitchar = default_splitchar;
+
+
+
 	if unlikely(!string)
 		return 0;
 	if (result_c == 0 && result_v == NULL) {
-		saved_splitchar = (char const *)string;
+		bufsplit_saved_splitchar = (char const *)string;
 		return 1;
 	} else {
 		if unlikely((result_c != 0 && result_v == NULL) ||
 		            (result_c == 0 && result_v != NULL))
 			return 0;
 	}
-	splitchar = saved_splitchar;
+	splitchar = bufsplit_saved_splitchar;
 	for (count = 0; count < result_c; ) {
 		result_v[count++] = string;
 		/* Find end of field. */
@@ -258,6 +260,7 @@ NOTHROW_NCX(LIBCCALL libc_bufsplit)(char *string,
 	}
 	return count;
 }
+#undef bufsplit_saved_splitchar
 #include <asm/crt/malloc.h>
 INTERN ATTR_SECTION(".text.crt.solaris") ATTR_FDREAD(1) ATTR_OUT(2) char *
 NOTHROW_NCX(LIBCCALL libc_fcopylist_sz)(fd_t fd,

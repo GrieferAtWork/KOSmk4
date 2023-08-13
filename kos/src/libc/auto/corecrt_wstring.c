@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6e1033b */
+/* HASH CRC-32:0x262f24b0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,9 +36,12 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <libc/errno.h>
 #include <bits/types.h>
+#include "../libc/tls-globals.h"
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno") char16_t *
 NOTHROW_NCX(LIBDCALL libd__wcserror)(errno_t errno_value) {
-	static char16_t *saved = NULL;
+	void **const _p__strerror_buf = &libc_get_tlsglobals()->ltg__strerror_buf;
+#define _strerror_buf (*_p__strerror_buf)
+	char16_t *result;
 	char const *newmsg;
 
 	errno_t saved_errno;
@@ -51,20 +54,25 @@ NOTHROW_NCX(LIBDCALL libd__wcserror)(errno_t errno_value) {
 
 	saved_errno = __libc_geterrno();
 
+	result = libd_convert_mbstowcs(newmsg);
 
-	libc_free(saved);
+	libc_free(_strerror_buf);
 
-	saved = libd_convert_mbstowcs(newmsg);
+	_strerror_buf = result;
 
 	__libc_seterrno(saved_errno);
 
-	return saved;
+	return result;
 }
+#undef _strerror_buf
 #include <libc/errno.h>
 #include <bits/types.h>
+#include "../libc/tls-globals.h"
 INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") char32_t *
 NOTHROW_NCX(LIBKCALL libc__wcserror)(errno_t errno_value) {
-	static char32_t *saved = NULL;
+	void **const _p__strerror_buf = &libc_get_tlsglobals()->ltg__strerror_buf;
+#define _strerror_buf (*_p__strerror_buf)
+	char32_t *result;
 	char const *newmsg;
 
 	errno_t saved_errno;
@@ -77,15 +85,17 @@ NOTHROW_NCX(LIBKCALL libc__wcserror)(errno_t errno_value) {
 
 	saved_errno = __libc_geterrno();
 
+	result = libc_convert_mbstowcs(newmsg);
 
-	libc_free(saved);
+	libc_free(_strerror_buf);
 
-	saved = libc_convert_mbstowcs(newmsg);
+	_strerror_buf = result;
 
 	__libc_seterrno(saved_errno);
 
-	return saved;
+	return result;
 }
+#undef _strerror_buf
 #include <libc/errno.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_OUTS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd__wcserror_s)(char16_t *buf,
@@ -122,9 +132,12 @@ NOTHROW_NCX(LIBKCALL libc__wcserror_s)(char32_t *buf,
 }
 #include <libc/errno.h>
 #include <bits/types.h>
+#include "../libc/tls-globals.h"
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_IN_OPT(1) char16_t *
 NOTHROW_NCX(LIBDCALL libd___wcserror)(char16_t const *message) {
-	static char16_t *saved = NULL;
+	void **const _p__strerror_buf = &libc_get_tlsglobals()->ltg__strerror_buf;
+#define _strerror_buf (*_p__strerror_buf)
+	char16_t *result;
 	char const *newmsg;
 	char *utf8_message;
 
@@ -148,20 +161,25 @@ NOTHROW_NCX(LIBDCALL libd___wcserror)(char16_t const *message) {
 
 	saved_errno = __libc_geterrno();
 
+	result = libd_convert_mbstowcs(newmsg);
 
-	libc_free(saved);
+	libc_free(_strerror_buf);
 
-	saved = libd_convert_mbstowcs(newmsg);
+	_strerror_buf = result;
 
 	__libc_seterrno(saved_errno);
 
-	return saved;
+	return result;
 }
+#undef _strerror_buf
 #include <libc/errno.h>
 #include <bits/types.h>
+#include "../libc/tls-globals.h"
 INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_IN_OPT(1) char32_t *
 NOTHROW_NCX(LIBKCALL libc___wcserror)(char32_t const *message) {
-	static char32_t *saved = NULL;
+	void **const _p__strerror_buf = &libc_get_tlsglobals()->ltg__strerror_buf;
+#define _strerror_buf (*_p__strerror_buf)
+	char32_t *result;
 	char const *newmsg;
 	char *utf8_message;
 
@@ -185,15 +203,17 @@ NOTHROW_NCX(LIBKCALL libc___wcserror)(char32_t const *message) {
 
 	saved_errno = __libc_geterrno();
 
+	result = libc_convert_mbstowcs(newmsg);
 
-	libc_free(saved);
+	libc_free(_strerror_buf);
 
-	saved = libc_convert_mbstowcs(newmsg);
+	_strerror_buf = result;
 
 	__libc_seterrno(saved_errno);
 
-	return saved;
+	return result;
 }
+#undef _strerror_buf
 #include <libc/errno.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_IN_OPT(3) ATTR_OUTS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd___wcserror_s)(char16_t *buf,

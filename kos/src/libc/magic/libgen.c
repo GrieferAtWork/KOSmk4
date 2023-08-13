@@ -297,23 +297,23 @@ size_t bufsplit([[inout_opt]] char *string, size_t result_c,
 	char const *splitchar;
 	static char const default_splitchar[] = "\t\n";
 @@pp_ifdef __pic__@@
-	static char const *saved_splitchar = NULL;
-	if (saved_splitchar == NULL)
-		saved_splitchar = default_splitchar;
+	@@static char const *bufsplit_saved_splitchar = NULL;@@
+	if (bufsplit_saved_splitchar == NULL)
+		bufsplit_saved_splitchar = default_splitchar;
 @@pp_else@@
-	static char const *saved_splitchar = default_splitchar;
+	static char const *bufsplit_saved_splitchar = default_splitchar;
 @@pp_endif@@
 	if unlikely(!string)
 		return 0;
 	if (result_c == 0 && result_v == NULL) {
-		saved_splitchar = (char const *)string;
+		bufsplit_saved_splitchar = (char const *)string;
 		return 1;
 	} else {
 		if unlikely((result_c != 0 && result_v == NULL) ||
 		            (result_c == 0 && result_v != NULL))
 			return 0;
 	}
-	splitchar = saved_splitchar;
+	splitchar = bufsplit_saved_splitchar;
 	for (count = 0; count < result_c; ) {
 		result_v[count++] = string;
 		/* Find end of field. */

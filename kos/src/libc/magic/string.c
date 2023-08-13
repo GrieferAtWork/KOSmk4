@@ -1020,7 +1020,7 @@ size_t strxfrm([[out(buflen)]] char *dst,
 [[section(".text.crt{|.dos}.errno")]]
 [[impl_include("<bits/types.h>", "<libc/template/itoa_digits.h>")]]
 [[nonnull]] char *strerror($errno_t errnum) {
-	static char strerror_buf[64];
+	@@static char strerror_buf[64] = {0}@@
 	char *result;
 	char const *string;
 	result = strerror_buf;
@@ -1149,7 +1149,7 @@ char *strerror_l($errno_t errnum, $locale_t locale) {
 [[crt_dos_variant({ impl:{ return libc_strerror(libd_signo_dos2kos(signo)); }})]]
 [[section(".text.crt{|.dos}.string.memory.strsignal")]]
 [[nonnull]] char *strsignal($signo_t signo) {
-	static char strsignal_buf[64];
+	@@static char strsignal_buf[64] = {0}@@
 	char *result = strsignal_buf;
 	char const *string;
 	string = sigdescr_np(signo);
@@ -8221,12 +8221,62 @@ $size_t strnlen_s([[in_opt(strnlen(., maxlen))]] char const *str, $size_t maxlen
 [[cp, wunused, section(".text.crt.dos.errno")]]
 [[requires_function(_strerror_s)]]
 char *_strerror([[in_opt]] char const *message) {
-	static char strerror_buf[64];
-	if (_strerror_s(strerror_buf,
-	                COMPILER_LENOF(strerror_buf),
-	                message))
-		return NULL;
-	return strerror_buf;
+@@pp_if $has_function(realloc)@@
+	/* Buffer is typed as `void *' so it can be re-used for `_wcserror(3)' */
+	@@static void *_strerror_buf = NULL; [fini: free(_strerror_buf)]@@
+	errno_t error;
+@@pp_if $has_function(malloc_usable_size)@@
+	size_t bufsize = malloc_usable_size(_strerror_buf) / sizeof(char);
+@@pp_else@@
+	size_t bufsize = _strerror_buf ? 64 : 0;
+@@pp_endif@@
+	if (bufsize < 64) {
+		void *newbuf;
+		bufsize = 64;
+		newbuf  = realloc(_strerror_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		_strerror_buf = newbuf;
+	}
+@@pp_ifdef ERANGE@@
+again:
+@@pp_endif@@
+	error = _strerror_s((char *)_strerror_buf, bufsize, message);
+	if likely(error == 0) {
+		/* Trim unused memory (if a certain threshold is exceeded) */
+		size_t retlen = strlen((char *)_strerror_buf) + 1;
+		if (retlen < 64)
+			retlen = 64; /* Retain minimal buffer size */
+		if likely((retlen + 32) < bufsize) {
+			void *retbuf = realloc(_strerror_buf, retlen * sizeof(char));
+			if likely(retbuf)
+				_strerror_buf = retbuf;
+		}
+		return (char *)_strerror_buf;
+	}
+@@pp_ifdef ERANGE@@
+	if (error == ERANGE && bufsize < 1024) {
+		void *newbuf;
+		bufsize *= 2;
+		newbuf = realloc(_strerror_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		_strerror_buf = newbuf;
+		goto again;
+	}
+@@pp_endif@@
+@@pp_if $has_function(free)@@
+	free(_strerror_buf);
+	_strerror_buf = NULL;
+@@pp_endif@@
+err:
+	return NULL;
+@@pp_else@@
+	static char _strerror_buf[64];
+	if likely(_strerror_s(_strerror_buf, COMPILER_LENOF(_strerror_buf), message) == 0)
+		return _strerror_buf;
+	return NULL;
+@@pp_endif@@
 }
 
 [[cp]]

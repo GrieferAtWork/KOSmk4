@@ -49,8 +49,15 @@ __SYSDECL_BEGIN
 [[decl_prefix(struct ether_addr;)]]
 [[nonnull, wunused, impl_include("<net/ethernet.h>")]]
 char *ether_ntoa([[in]] struct ether_addr const *__restrict addr) {
-	static char buf[21];
-	return ether_ntoa_r(addr, buf);
+@@pp_if defined(__BUILDING_LIBC) && $has_function(xmalloc)@@
+	@@static char *ether_ntoa_buf = NULL; [fini: free(ether_ntoa_buf)]@@
+	if (ether_ntoa_buf == NULL)
+		ether_ntoa_buf = (char *)xmalloc(21 * sizeof(char));
+	return ether_ntoa_r(addr, ether_ntoa_buf);
+@@pp_else@@
+	static char ether_ntoa_buf[21] = {0};
+	return ether_ntoa_r(addr, ether_ntoa_buf);
+@@pp_endif@@
 }
 
 [[decl_prefix(struct ether_addr;)]]
@@ -70,8 +77,8 @@ char *ether_ntoa([[in]] struct ether_addr const *__restrict addr) {
 [[decl_prefix(struct ether_addr;)]]
 [[wunused, nonnull, impl_include("<net/ethernet.h>")]]
 struct ether_addr *ether_aton([[in]] char const *__restrict asc) {
-	static struct @ether_addr@ addr;
-	return ether_aton_r(asc, &addr);
+	@@static byte_t ether_aton_addr[6] = {0}@@
+	return ether_aton_r(asc, (struct ether_addr *)ether_aton_addr);
 }
 
 [[decl_prefix(struct ether_addr;)]]

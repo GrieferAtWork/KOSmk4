@@ -66,8 +66,28 @@ typedef __WCHAR_TYPE__ wchar_t;
 [[wchar, wunused, requires_function(_wasctime_s)]]
 [[decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
 wchar_t *_wasctime([[in]] struct $tm const *tp) {
-	static wchar_t wasctime_retbuf[26] = { 0 };
-	return _wasctime_s(wasctime_retbuf, 26, tp) ? NULL : wasctime_retbuf;
+@@pp_if $has_function(malloc) && defined(__BUILDING_LIBC)@@
+	@@static void *wctime_buf = NULL; [fini: free(wctime_buf)]@@
+	if (wctime_buf == NULL) {
+		wctime_buf = malloc(26 * 4); /* Always use 4 for char32_t */
+		if unlikely(wctime_buf == NULL)
+			return NULL;
+	}
+@@pp_ifdef __BUILDING_LIBC@@
+	(void)_wasctime_s((wchar_t *)wctime_buf, 26, tp);
+	return (wchar_t *)wctime_buf;
+@@pp_else@@
+	return _wasctime_s((wchar_t *)wctime_buf, 26, tp) ? NULL : (wchar_t *)wctime_buf;
+@@pp_endif@@
+@@pp_else@@
+	static wchar_t wctime_buf[26] = {0};
+@@pp_ifdef __BUILDING_LIBC@@
+	(void)_wasctime_s(wctime_buf, 26, tp);
+	return wctime_buf;
+@@pp_else@@
+	return _wasctime_s(wctime_buf, 26, tp) ? NULL : wctime_buf;
+@@pp_endif@@
+@@pp_endif@@
 }
 
 [[wchar, requires_function(asctime_r)]]
@@ -102,12 +122,27 @@ wchar_t *_wctime32([[in]] $time32_t const *timer) {
 [[wchar, wunused, requires_function(_wctime64_s)]]
 [[decl_include("<bits/types.h>")]]
 wchar_t *_wctime64([[in]] $time64_t const *timer) {
-	static wchar_t wctime64_retbuf[26];
+@@pp_if $has_function(malloc) && defined(__BUILDING_LIBC)@@
+	@@static void *wctime_buf = NULL; [fini: free(wctime_buf)]@@
+	if (wctime_buf == NULL) {
+		wctime_buf = malloc(26 * 4); /* Always use 4 for char32_t */
+		if unlikely(wctime_buf == NULL)
+			return NULL;
+	}
 @@pp_ifdef __BUILDING_LIBC@@
-	_wctime64_s(wctime64_retbuf, 26, timer);
-	return wctime64_retbuf;
+	(void)_wctime64_s((wchar_t *)wctime_buf, 26, timer);
+	return (wchar_t *)wctime_buf;
 @@pp_else@@
-	return _wctime64_s(wctime64_retbuf, 26, timer) ? NULL : wctime64_retbuf;
+	return _wctime64_s((wchar_t *)wctime_buf, 26, timer) ? NULL : (wchar_t *)wctime_buf;
+@@pp_endif@@
+@@pp_else@@
+	static wchar_t wctime_buf[26];
+@@pp_ifdef __BUILDING_LIBC@@
+	(void)_wctime64_s(wctime_buf, 26, timer);
+	return wctime_buf;
+@@pp_else@@
+	return _wctime64_s(wctime_buf, 26, timer) ? NULL : wctime_buf;
+@@pp_endif@@
 @@pp_endif@@
 }
 

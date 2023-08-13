@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe64f1426 */
+/* HASH CRC-32:0x7ed2583c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,23 +56,23 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bufsplit))(char *__string, __SIZE_TYP
 	char const *__splitchar;
 	static char const __default_splitchar[] = "\t\n";
 #ifdef __pic__
-	static char const *__saved_splitchar = __NULLPTR;
-	if (__saved_splitchar == __NULLPTR)
-		__saved_splitchar = __default_splitchar;
+	static char const *__bufsplit_saved_splitchar = __NULLPTR;
+	if (__bufsplit_saved_splitchar == __NULLPTR)
+		__bufsplit_saved_splitchar = __default_splitchar;
 #else /* __pic__ */
-	static char const *__saved_splitchar = __default_splitchar;
+	static char const *__bufsplit_saved_splitchar = __default_splitchar;
 #endif /* !__pic__ */
 	if __unlikely(!__string)
 		return 0;
 	if (__result_c == 0 && __result_v == __NULLPTR) {
-		__saved_splitchar = (char const *)__string;
+		__bufsplit_saved_splitchar = (char const *)__string;
 		return 1;
 	} else {
 		if __unlikely((__result_c != 0 && __result_v == __NULLPTR) ||
 		            (__result_c == 0 && __result_v != __NULLPTR))
 			return 0;
 	}
-	__splitchar = __saved_splitchar;
+	__splitchar = __bufsplit_saved_splitchar;
 	for (__count = 0; __count < __result_c; ) {
 		__result_v[__count++] = __string;
 		/* Find end of field. */

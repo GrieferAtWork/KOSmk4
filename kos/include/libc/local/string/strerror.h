@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4fb2d */
+/* HASH CRC-32:0x6f80c9c6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strerror) __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror))(__errno_t __errnum) {
-	static char __strerror_buf[64];
+	static char __strerror_buf[64] = {0};
 	char *__result;
 	char const *__string;
 	__result = __strerror_buf;

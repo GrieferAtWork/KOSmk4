@@ -95,17 +95,18 @@ int endmntent([[inout]] $FILE *stream) {
 [[requires_function(getmntent_r)]]
 struct mntent *getmntent([[inout]] $FILE *stream) {
 @@pp_if $has_function(malloc)@@
-	static struct mntent *ent = NULL;
-	static char *buf          = NULL;
-	if (!ent && (ent = (struct mntent *)malloc(sizeof(struct mntent))) == NULL)
+	@@static void *getmntent_buf = NULL; [fini: free(getmntent_buf)]@@
+	if (!getmntent_buf &&
+	    (getmntent_buf = malloc(sizeof(struct mntent) +
+	                            512 * sizeof(char))) == NULL)
 		return NULL;
-	if (!buf && (buf = (char *)malloc(512 * sizeof(char))) == NULL)
-		return NULL;
+	return getmntent_r(stream, (struct mntent *)getmntent_buf,
+	                   (char *)((struct mntent *)getmntent_buf + 1), 512);
 @@pp_else@@
 	static struct mntent ent[1];
 	static char buf[512];
-@@pp_endif@@
 	return getmntent_r(stream, ent, buf, 512);
+@@pp_endif@@
 }
 
 %

@@ -1033,8 +1033,10 @@ again_handle_tok:
 						}
 						continue;
 					}
-					if (tok.issymbol() && tok !in cLanguageKeywords)
-						break;
+					if (tok.issymbol() && tok !in cLanguageKeywords) {
+						if (typeBeforeStart < typeBeforeEnd)
+							break;
+					}
 					typeBeforeEnd = self.tokEnd;
 					tok = self.next();
 				}

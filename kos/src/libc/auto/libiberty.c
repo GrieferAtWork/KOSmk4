@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d093304 */
+/* HASH CRC-32:0xe8a5e7a3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 #include <kos/types.h>
 #include "../user/libiberty.h"
 #include "../user/ctype.h"
+#include "../user/malloc.h"
 #include "../user/stdio.h"
 #include "../user/stdio_ext.h"
 #include "../user/stdlib.h"
@@ -237,17 +238,34 @@ NOTHROW_NCX(LIBCCALL libc_fdopen_unlocked)(fd_t fd,
 }
 INTERN ATTR_SECTION(".text.crt.libiberty") WUNUSED char const *
 NOTHROW_NCX(LIBCCALL libc_spaces)(__STDC_INT_AS_SIZE_T count) {
-	static char *buf = NULL;
-	static size_t buflen = 0; /* # of space characters in `buf' (followed by NUL) */
-	if (buflen < count) {
-		char *newbuf = (char *)libc_realloc(buf, (count + 1) * sizeof(char));
+	/* XXX: Race condition when one thread realloc-s while another is using the string */
+	static char *spaces_buf = NULL;
+
+	size_t buflen = libc_malloc_usable_size(spaces_buf) / sizeof(char);
+	if (count >= buflen) {
+		size_t newlen;
+		char *newbuf = (char *)libc_realloc(spaces_buf, (count + 1) * sizeof(char));
 		if (!newbuf)
 			return NULL;
-		libc_memset(newbuf + buflen, ' ', count - buflen);
-		buf    = newbuf;
-		buflen = count;
+		newlen = libc_malloc_usable_size(newbuf) - 1; /* Exclude trailing NUL */
+		*(char *)libc_mempset(newbuf + buflen, ' ', newlen - buflen) = '\0';
+		spaces_buf = newbuf;
+		buflen     = newlen;
+	} else {
+		--buflen; /* Exclude trailing NUL */
 	}
-	return buf + buflen - count;
+
+
+
+
+
+
+
+
+
+
+
+	return spaces_buf + buflen - count;
 }
 #include <asm/crt/malloc.h>
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1)) void *

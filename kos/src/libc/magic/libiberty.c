@@ -415,17 +415,34 @@ FILE *freopen_unlocked(char const *filename, char const *mode, FILE *fp) {
 [[decl_include("<features.h>")]]
 [[wunused, requires_function(realloc)]]
 char const *spaces(__STDC_INT_AS_SIZE_T count) {
-	static char *buf = NULL;
-	static size_t buflen = 0; /* # of space characters in `buf' (followed by NUL) */
-	if (buflen < count) {
-		char *newbuf = (char *)realloc(buf, (count + 1) * sizeof(char));
+	/* XXX: Race condition when one thread realloc-s while another is using the string */
+	static char *spaces_buf = NULL;
+@@pp_if $has_function(malloc_usable_size)@@
+	size_t buflen = malloc_usable_size(spaces_buf) / sizeof(char);
+	if (count >= buflen) {
+		size_t newlen;
+		char *newbuf = (char *)realloc(spaces_buf, (count + 1) * sizeof(char));
 		if (!newbuf)
 			return NULL;
-		memset(newbuf + buflen, ' ', count - buflen);
-		buf    = newbuf;
-		buflen = count;
+		newlen = malloc_usable_size(newbuf) - 1; /* Exclude trailing NUL */
+		*(char *)mempset(newbuf + buflen, ' ', newlen - buflen) = '\0';
+		spaces_buf = newbuf;
+		buflen     = newlen;
+	} else {
+		--buflen; /* Exclude trailing NUL */
 	}
-	return buf + buflen - count;
+@@pp_else@@
+	static size_t buflen = 0; /* # of space characters in `spaces_buf' (followed by NUL) */
+	if (count >= buflen) {
+		char *newbuf = (char *)realloc(spaces_buf, (count + 1) * sizeof(char));
+		if (!newbuf)
+			return NULL;
+		*(char *)mempset(newbuf + buflen, ' ', count - buflen) = '\0';
+		spaces_buf = newbuf;
+		buflen     = count;
+	}
+@@pp_endif@@
+	return spaces_buf + buflen - count;
 }
 
 

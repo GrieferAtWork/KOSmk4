@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc5cacb */
+/* HASH CRC-32:0xcc7687c6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,21 +25,68 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "corecrt_wtime.h"
+#include "../user/stdlib.h"
 #include "../user/time.h"
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
+#include "../libc/tls-globals.h"
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") WUNUSED ATTR_IN(1) char16_t *
 NOTHROW_NCX(LIBDCALL libd__wasctime)(struct tm const *tp) {
-	static char16_t wasctime_retbuf[26] = { 0 };
-	return libd__wasctime_s(wasctime_retbuf, 26, tp) ? NULL : wasctime_retbuf;
+
+	void **const _p_wctime_buf = &libc_get_tlsglobals()->ltg_wctime_buf;
+#define wctime_buf (*_p_wctime_buf)
+	if (wctime_buf == NULL) {
+		wctime_buf = libc_malloc(26 * 4); /* Always use 4 for char32_t */
+		if unlikely(wctime_buf == NULL)
+			return NULL;
+	}
+
+	(void)libd__wasctime_s((char16_t *)wctime_buf, 26, tp);
+	return (char16_t *)wctime_buf;
+
+
+
+
+
+
+
+
+
+
+
+
 }
+#undef wctime_buf
+#include "../libc/tls-globals.h"
 INTERN ATTR_SECTION(".text.crt.dos.wchar.time") WUNUSED ATTR_IN(1) char32_t *
 NOTHROW_NCX(LIBKCALL libc__wasctime)(struct tm const *tp) {
-	static char32_t wasctime_retbuf[26] = { 0 };
-	return libc__wasctime_s(wasctime_retbuf, 26, tp) ? NULL : wasctime_retbuf;
+
+	void **const _p_wctime_buf = &libc_get_tlsglobals()->ltg_wctime_buf;
+#define wctime_buf (*_p_wctime_buf)
+	if (wctime_buf == NULL) {
+		wctime_buf = libc_malloc(26 * 4); /* Always use 4 for char32_t */
+		if unlikely(wctime_buf == NULL)
+			return NULL;
+	}
+
+	(void)libc__wasctime_s((char32_t *)wctime_buf, 26, tp);
+	return (char32_t *)wctime_buf;
+
+
+
+
+
+
+
+
+
+
+
+
 }
+#undef wctime_buf
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") ATTR_IN(3) ATTR_OUTS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd__wasctime_s)(char16_t *buf,
                                        size_t buflen,
@@ -90,26 +137,62 @@ NOTHROW_NCX(LIBKCALL libc__wctime32)(time32_t const *timer) {
 	return libc__wctime64(&timer64);
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include "../libc/tls-globals.h"
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") WUNUSED ATTR_IN(1) char16_t *
 NOTHROW_NCX(LIBDCALL libd__wctime64)(time64_t const *timer) {
-	static char16_t wctime64_retbuf[26];
 
-	libd__wctime64_s(wctime64_retbuf, 26, timer);
-	return wctime64_retbuf;
+	void **const _p_wctime_buf = &libc_get_tlsglobals()->ltg_wctime_buf;
+#define wctime_buf (*_p_wctime_buf)
+	if (wctime_buf == NULL) {
+		wctime_buf = libc_malloc(26 * 4); /* Always use 4 for char32_t */
+		if unlikely(wctime_buf == NULL)
+			return NULL;
+	}
+
+	(void)libd__wctime64_s((char16_t *)wctime_buf, 26, timer);
+	return (char16_t *)wctime_buf;
+
+
+
+
+
+
+
+
+
 
 
 
 }
+#undef wctime_buf
+#include "../libc/tls-globals.h"
 INTERN ATTR_SECTION(".text.crt.dos.wchar.time") WUNUSED ATTR_IN(1) char32_t *
 NOTHROW_NCX(LIBKCALL libc__wctime64)(time64_t const *timer) {
-	static char32_t wctime64_retbuf[26];
 
-	libc__wctime64_s(wctime64_retbuf, 26, timer);
-	return wctime64_retbuf;
+	void **const _p_wctime_buf = &libc_get_tlsglobals()->ltg_wctime_buf;
+#define wctime_buf (*_p_wctime_buf)
+	if (wctime_buf == NULL) {
+		wctime_buf = libc_malloc(26 * 4); /* Always use 4 for char32_t */
+		if unlikely(wctime_buf == NULL)
+			return NULL;
+	}
+
+	(void)libc__wctime64_s((char32_t *)wctime_buf, 26, timer);
+	return (char32_t *)wctime_buf;
+
+
+
+
+
+
+
+
+
 
 
 
 }
+#undef wctime_buf
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libd__wctime32_s, libd__wctime64_s);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */

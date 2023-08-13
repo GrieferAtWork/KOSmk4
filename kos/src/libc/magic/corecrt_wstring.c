@@ -125,7 +125,8 @@ typedef __SIZE_TYPE__ rsize_t;
 [[requires_function(strerror, convert_mbstowcs)]]
 [[impl_include("<libc/errno.h>", "<bits/types.h>")]]
 wchar_t *_wcserror($errno_t errno_value) {
-	static wchar_t *saved = NULL;
+	@@static void *_strerror_buf = NULL; [fini: free(_strerror_buf)]@@
+	wchar_t *result;
 	char const *newmsg;
 @@pp_ifdef __libc_geterrno@@
 	errno_t saved_errno;
@@ -138,14 +139,15 @@ wchar_t *_wcserror($errno_t errno_value) {
 @@pp_ifdef __libc_geterrno@@
 	saved_errno = __libc_geterrno();
 @@pp_endif@@
+	result = convert_mbstowcs(newmsg);
 @@pp_if $has_function(free)@@
-	free(saved);
+	free(_strerror_buf);
 @@pp_endif@@
-	saved = convert_mbstowcs(newmsg);
+	_strerror_buf = result;
 @@pp_ifdef __libc_geterrno@@
 	__libc_seterrno(saved_errno);
 @@pp_endif@@
-	return saved;
+	return result;
 }
 
 [[wchar, decl_include("<bits/types.h>")]]
@@ -170,7 +172,8 @@ $errno_t _wcserror_s([[out(? <= buflen)]] wchar_t *buf,
 [[requires_function(_strerror, convert_mbstowcs, convert_wcstombs)]]
 [[impl_include("<libc/errno.h>", "<bits/types.h>")]]
 wchar_t *__wcserror([[in_opt]] wchar_t const *message) {
-	static wchar_t *saved = NULL;
+	@@static void *_strerror_buf = NULL; [fini: free(_strerror_buf)]@@
+	wchar_t *result;
 	char const *newmsg;
 	char *utf8_message;
 @@pp_ifdef __libc_geterrno@@
@@ -194,14 +197,15 @@ wchar_t *__wcserror([[in_opt]] wchar_t const *message) {
 @@pp_ifdef __libc_geterrno@@
 	saved_errno = __libc_geterrno();
 @@pp_endif@@
+	result = convert_mbstowcs(newmsg);
 @@pp_if $has_function(free)@@
-	free(saved);
+	free(_strerror_buf);
 @@pp_endif@@
-	saved = convert_mbstowcs(newmsg);
+	_strerror_buf = result;
 @@pp_ifdef __libc_geterrno@@
 	__libc_seterrno(saved_errno);
 @@pp_endif@@
-	return saved;
+	return result;
 }
 
 [[wchar, decl_include("<bits/types.h>")]]

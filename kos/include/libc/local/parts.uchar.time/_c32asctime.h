@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f63f4e1 */
+/* HASH CRC-32:0xef1ba0ca */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,10 +42,56 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__c32asctime_s __LIBC_LOCAL_NAME(_c32asctime_s)
 #endif /* !... */
 #endif /* !__local___localdep__c32asctime_s_defined */
+#ifndef __local___localdep_malloc_defined
+#define __local___localdep_malloc_defined
+#if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,{ return __builtin_malloc(__num_bytes); })
+#elif defined(__CRT_HAVE_malloc)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,(__num_bytes))
+#elif defined(__CRT_HAVE___libc_malloc)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),__libc_malloc,(__num_bytes))
+#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
+__NAMESPACE_LOCAL_END
+#include <libc/local/stdlib/malloc.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_malloc __LIBC_LOCAL_NAME(malloc)
+#else /* ... */
+#undef __local___localdep_malloc_defined
+#endif /* !... */
+#endif /* !__local___localdep_malloc_defined */
 __LOCAL_LIBC(_c32asctime) __ATTR_WUNUSED __ATTR_IN(1) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(_c32asctime))(struct __NAMESPACE_STD_SYM tm const *__tp) {
-	static __CHAR32_TYPE__ __wasctime_retbuf[26] = { 0 };
-	return (__NAMESPACE_LOCAL_SYM __localdep__c32asctime_s)(__wasctime_retbuf, 26, __tp) ? __NULLPTR : __wasctime_retbuf;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	static __CHAR32_TYPE__ __wctime_buf[26] = {0};
+
+
+
+
+	return (__NAMESPACE_LOCAL_SYM __localdep__c32asctime_s)(__wctime_buf, 26, __tp) ? __NULLPTR : __wctime_buf;
+
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__c32asctime_defined

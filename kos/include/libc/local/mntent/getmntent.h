@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11e9b67d */
+/* HASH CRC-32:0x4576052b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,17 +69,18 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getmntent) __ATTR_INOUT(1) struct mntent *
 __NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getmntent))(__FILE *__stream) {
 #if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
-	static struct mntent *__ent = __NULLPTR;
-	static char *__buf          = __NULLPTR;
-	if (!__ent && (__ent = (struct mntent *)(__NAMESPACE_LOCAL_SYM __localdep_malloc)(sizeof(struct mntent))) == __NULLPTR)
+	static void *__getmntent_buf = __NULLPTR;
+	if (!__getmntent_buf &&
+	    (__getmntent_buf = (__NAMESPACE_LOCAL_SYM __localdep_malloc)(sizeof(struct mntent) +
+	                            512 * sizeof(char))) == __NULLPTR)
 		return __NULLPTR;
-	if (!__buf && (__buf = (char *)(__NAMESPACE_LOCAL_SYM __localdep_malloc)(512 * sizeof(char))) == __NULLPTR)
-		return __NULLPTR;
+	return (__NAMESPACE_LOCAL_SYM __localdep_getmntent_r)(__stream, (struct mntent *)__getmntent_buf,
+	                   (char *)((struct mntent *)__getmntent_buf + 1), 512);
 #else /* __CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign */
 	static struct mntent __ent[1];
 	static char __buf[512];
-#endif /* !__CRT_HAVE_malloc && !__CRT_HAVE___libc_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE___libc_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE___libc_memalign && !__CRT_HAVE_posix_memalign */
 	return (__NAMESPACE_LOCAL_SYM __localdep_getmntent_r)(__stream, __ent, __buf, 512);
+#endif /* !__CRT_HAVE_malloc && !__CRT_HAVE___libc_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE___libc_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE___libc_memalign && !__CRT_HAVE_posix_memalign */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getmntent_defined

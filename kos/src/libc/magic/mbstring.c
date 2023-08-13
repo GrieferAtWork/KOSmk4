@@ -1382,8 +1382,8 @@ unsigned char *_mbsstr_l([[in]] unsigned char const *haystack, [[in]] unsigned c
 unsigned char *_mbstok_l([[inout_opt]] unsigned char *str,
                          [[in]] unsigned char const *delim,
                          $locale_t locale) {
-	static unsigned char *save_ptr = NULL;
-	return _mbstok_s_l(str, delim, &save_ptr, locale);
+	@@static char *strtok_save_ptr = NULL@@
+	return _mbstok_s_l(str, delim, (unsigned char **)&strtok_save_ptr, locale);
 }
 
 [[wunused, requires_function(_mbsspn_l, _mbscspn_l)]]
