@@ -76,10 +76,6 @@ NOTHROW_NCX(VLIBCCALL libc_ulimit)(__STDC_INT_AS_UINT_T cmd,
 }
 /*[[[end:libc_ulimit]]]*/
 
-
-
-
-
 /*[[[start:exports,hash:CRC-32=0x2e8d7197]]]*/
 DEFINE_PUBLIC_ALIAS(ulimit, libc_ulimit);
 /*[[[end:exports]]]*/

@@ -25,6 +25,9 @@
 
 DECL_BEGIN
 
+/* Use a macro here so magic doesn't see `CRT_UNIMPLEMENTED', which would
+ * otherwise cause these functions to be placed in `<gnu/stubs.h>', which
+ * we don't want (as they *are* implemented in assembly) */
 #define CRT_NOT_REALLY_UNIMPLEMENTED \
 	CRT_UNIMPLEMENTED
 
@@ -153,10 +156,6 @@ NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
 }
 #endif /* MAGIC:impl_if */
 /*[[[end:libc_makecontext]]]*/
-
-
-
-
 
 /*[[[start:exports,hash:CRC-32=0xede21b1d]]]*/
 #ifndef LIBC_ARCH_HAVE_GETCONTEXT

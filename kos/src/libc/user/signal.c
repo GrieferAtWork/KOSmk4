@@ -46,8 +46,8 @@
 
 DECL_BEGIN
 
-LOCAL int LIBCCALL
-libc_sigms_dos2kos(int dos_sigms) {
+LOCAL ATTR_CONST WUNUSED int
+NOTHROW(LIBCCALL libc_sigms_dos2kos)(int dos_sigms) {
 	if ((unsigned int)dos_sigms & (1 << (DOS_SIGABRT - 1))) {
 		dos_sigms &= ~(1 << (DOS_SIGABRT - 1));
 		dos_sigms |= ~(1 << (SIGABRT - 1));
