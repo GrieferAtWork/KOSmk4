@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a98008b */
+/* HASH CRC-32:0x6af82c7a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -294,13 +294,19 @@ INTERN ATTR_SECTION(".text.crt.sched.signal") void
 NOTHROW_CB_NCX(LIBCCALL libc_psignal)(signo_t signo,
                                       char const *s) {
 	char const *signam = libc_sigabbrev_np(signo);
+
+	libc_flockfile(stderr);
+
 	if (s && *s)
-		libc_fprintf(stderr, "%s: ", s);
+		libc_fprintf_unlocked(stderr, "%s: ", s);
 	if (signam) {
-		libc_fprintf(stderr, "SIG%s\n", signam);
+		libc_fprintf_unlocked(stderr, "SIG%s\n", signam);
 	} else {
-		libc_fprintf(stderr, "Unknown signal %d\n", signo);
+		libc_fprintf_unlocked(stderr, "Unknown signal %d\n", signo);
 	}
+
+	libc_funlockfile(stderr);
+
 }
 #include <bits/crt/inttypes.h>
 #include <bits/types.h>
@@ -311,29 +317,32 @@ NOTHROW_CB_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
                                        char const *s) {
 	char const *text;
 	text = libc_sigabbrev_np(pinfo->si_signo);
+
+	libc_flockfile(stderr);
+
 	if (s && *s)
-		libc_fprintf(stderr, "%s: ", s);
+		libc_fprintf_unlocked(stderr, "%s: ", s);
 	if (text) {
-		libc_fprintf(stderr, "SIG%s (", text);
+		libc_fprintf_unlocked(stderr, "SIG%s (", text);
 
 	} else if (pinfo->si_signo >= __SIGRTMIN &&
 	           pinfo->si_signo <= __SIGRTMAX) {
 		unsigned int offset;
 		offset = (unsigned int)(pinfo->si_signo - __SIGRTMIN);
 		if (offset != 0) {
-			libc_fprintf(stderr, "SIGRTMIN+%u (", offset);
+			libc_fprintf_unlocked(stderr, "SIGRTMIN+%u (", offset);
 		} else {
-			libc_fprintf(stderr, "SIGRTMIN (");
+			libc_fprintf_unlocked(stderr, "SIGRTMIN (");
 		}
 
 	} else {
-		libc_fprintf(stderr, "Unknown signal %d (", pinfo->si_signo);
+		libc_fprintf_unlocked(stderr, "Unknown signal %d (", pinfo->si_signo);
 	}
 	text = libc_sigcodedesc_np(pinfo->si_signo, pinfo->si_code);
 	if (text) {
-		libc_fprintf(stderr, "%s ", text);
+		libc_fprintf_unlocked(stderr, "%s ", text);
 	} else {
-		libc_fprintf(stderr, "%u ", (unsigned int)pinfo->si_code);
+		libc_fprintf_unlocked(stderr, "%u ", (unsigned int)pinfo->si_code);
 	}
 
 	if (0
@@ -350,32 +359,35 @@ NOTHROW_CB_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
 	    || pinfo->si_signo == __SIGBUS
 
 	    ) {
-		libc_fprintf(stderr, "[%p])\n", pinfo->si_addr);
+		libc_fprintf_unlocked(stderr, "[%p])\n", pinfo->si_addr);
 	} else
 
 
 	if (pinfo->si_signo == __SIGCHLD) {
-		libc_fprintf(stderr,
-		        "%" __PRIN_PREFIX(__SIZEOF_PID_T__) "d %d "
-		        "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "d)\n",
-		        (pid_t)pinfo->si_pid,
-		        (int)pinfo->si_status,
-		        (uid_t)pinfo->si_uid);
+		libc_fprintf_unlocked(stderr,
+		                 "%" __PRIN_PREFIX(__SIZEOF_PID_T__) "d %d "
+		                 "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "d)\n",
+		                 (pid_t)pinfo->si_pid,
+		                 (int)pinfo->si_status,
+		                 (uid_t)pinfo->si_uid);
 	} else
 
 
 	if (pinfo->si_signo == __SIGPOLL) {
-		libc_fprintf(stderr, "%" __PRIN_PREFIX(__SIZEOF_POINTER__) "d)\n",
-		        (longptr_t)pinfo->si_band);
+		libc_fprintf_unlocked(stderr, "%" __PRIN_PREFIX(__SIZEOF_POINTER__) "d)\n",
+		                 (longptr_t)pinfo->si_band);
 	} else
 
 	{
-		libc_fprintf(stderr,
-		        "%" __PRIN_PREFIX(__SIZEOF_PID_T__) "d "
-		        "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "d)\n",
-		        (pid_t)pinfo->si_pid,
-		        (uid_t)pinfo->si_uid);
+		libc_fprintf_unlocked(stderr,
+		                 "%" __PRIN_PREFIX(__SIZEOF_PID_T__) "d "
+		                 "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "d)\n",
+		                 (pid_t)pinfo->si_pid,
+		                 (uid_t)pinfo->si_uid);
 	}
+
+	libc_funlockfile(stderr);
+
 }
 #endif /* !__KERNEL__ */
 #include <asm/os/siginfo.h>

@@ -126,7 +126,7 @@ __CSDECLARE(,int,@error_one_per_line@)
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_stdout) && $has_function(exit) &&
-           $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc) &&
+           $has_function(fprintf, vfprintf, fputc) &&
            defined(__LOCAL_program_invocation_short_name) &&
            $has_function(strerror))]]
 void verror(int status, $errno_t errnum,
@@ -161,8 +161,8 @@ void verror(int status, $errno_t errnum,
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_stderr) && $has_function(exit) &&
-           $has_function(fprintf) && $has_function(vfprintf) &&
-           $has_function(fputc) && defined(__LOCAL_program_invocation_short_name) &&
+           $has_function(fprintf, vfprintf, fputc) &&
+           defined(__LOCAL_program_invocation_short_name) &&
            $has_function(strerror))]]
 [[impl_prefix(DEFINE_LOCAL_error_print_progname)]]
 [[impl_prefix(DEFINE_LOCAL_error_one_per_line)]]

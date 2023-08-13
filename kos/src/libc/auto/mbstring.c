@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86495e56 */
+/* HASH CRC-32:0xa341c660 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -508,9 +508,10 @@ NOTHROW_NCX(LIBCCALL libc__mbsncpy_l)(unsigned char *buf,
 			}
 		}
 	}
+
 	/* Really weird  quirk: until  this point,  `max_chars' were  counted
 	 * in chars, but this zero-padding (which is also done by DOS), would
-	 * mean that it's suddenly counted in characters... */
+	 * mean that it's suddenly counted in bytes... */
 	libc_bzero(dst, max_chars);
 	return buf;
 }
@@ -701,8 +702,7 @@ NOTHROW_NCX(LIBCCALL libc__mbscspn_l)(unsigned char const *haystack,
                                       locale_t locale) {
 	unsigned char const *iter = haystack;
 	for (;;) {
-		uint16_t ch;
-		ch = *iter++;
+		uint16_t ch = *iter++;
 		if (libc__ismbblead_l(ch, locale))
 			ch = *iter ? (ch << 8) | *iter++ : 0;
 		if (ch == 0)
@@ -1261,7 +1261,7 @@ INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_INOUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbslwr_s_l)(unsigned char *buf,
                                        size_t true_bufsize,
                                        locale_t locale) {
-	if (!buf || libc_strlen((char const *)buf) >= true_bufsize)
+	if (!buf || libc_strnlen((char const *)buf, true_bufsize) >= true_bufsize)
 		return 22;
 	libc__mbslwr_l(buf, locale);
 	return 0;
@@ -1270,7 +1270,7 @@ INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_INOUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbsupr_s_l)(unsigned char *buf,
                                        size_t true_bufsize,
                                        locale_t locale) {
-	if (!buf || libc_strlen((char const *)buf) >= true_bufsize)
+	if (!buf || libc_strnlen((char const *)buf, true_bufsize) >= true_bufsize)
 		return 22;
 	libc__mbsupr_l(buf, locale);
 	return 0;
@@ -1317,7 +1317,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsncat_s_l)(unsigned char *buf,
                                         size_t max_chars,
                                         locale_t locale) {
 	if (max_chars && (!buf || !src ||
-	                  true_bufsize <= (libc_strlen((char const *)buf) +
+	                  true_bufsize <= (libc_strnlen((char const *)buf, true_bufsize) +
 	                                   libc__mbsnbcnt_l(src, max_chars, locale))))
 		return 22;
 	libc__mbsncat_l(buf, src, max_chars, locale);
@@ -1352,6 +1352,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsncpy_s_l)(unsigned char *buf,
 	}
 	if (true_bufsize < max_chars)
 		return 22;
+
 	/* Really weird  quirk: until  this point,  `max_chars' were  counted
 	 * in chars, but this zero-padding (which is also done by DOS), would
 	 * mean that it's suddenly counted in characters... */

@@ -160,11 +160,14 @@ __STDC_INT_AS_UINT_T partition_union([[inout]] struct partition_def *self,
 @@Example: "[(0 1 2 4 8)(3 6)(5 7)]"
 [[cp_stdio, decl_include("<bits/crt/partition.h>")]]
 [[impl_include("<bits/crt/partition.h>")]]
-[[requires_function(fprintf, fputc)]]
+[[requires_function(fprintf_unlocked, fputc_unlocked)]]
 void partition_print([[in]] struct partition_def __KOS_FIXED_CONST *self,
                      [[inout]] FILE *fp) {
 	unsigned int i;
-	fputc('[', fp);
+@@pp_if $has_function(flockfile, funlockfile)@@
+	flockfile(fp);
+@@pp_endif@@
+	fputc_unlocked('[', fp);
 	for (i = 0; i < (unsigned int)self->@num_elements@; ++i) {
 		struct partition_elem const *elem = &self->@elements@[i];
 		struct partition_elem const *iter;
@@ -182,7 +185,7 @@ void partition_print([[in]] struct partition_def __KOS_FIXED_CONST *self,
 		/* At this point we know that `i' is the smallest
 		 * member  of whatever class it belongs to. Since
 		 * we need to print sorted, we can start with `i' */
-		fprintf(fp, "(%u", i);
+		fprintf_unlocked(fp, "(%u", i);
 		prev_index = i;
 		for (;;) {
 			unsigned int winner_index;
@@ -204,14 +207,17 @@ void partition_print([[in]] struct partition_def __KOS_FIXED_CONST *self,
 			}
 			if (!winner)
 				break; /* Last element was printed. */
-			fprintf(fp, " %u", winner_index);
+			fprintf_unlocked(fp, " %u", winner_index);
 			prev_index = winner_index;
 		}
-		fputc(')', fp);
+		fputc_unlocked(')', fp);
 already_printed:
 		;
 	}
-	fputc(']', fp);
+	fputc_unlocked(']', fp);
+@@pp_if $has_function(flockfile, funlockfile)@@
+	funlockfile(fp);
+@@pp_endif@@
 }
 
 

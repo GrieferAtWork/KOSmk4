@@ -656,9 +656,10 @@ unsigned char *_mbsncpy_l([[out]] unsigned char *buf,
 			}
 		}
 	}
+
 	/* Really weird  quirk: until  this point,  `max_chars' were  counted
 	 * in chars, but this zero-padding (which is also done by DOS), would
-	 * mean that it's suddenly counted in characters... */
+	 * mean that it's suddenly counted in bytes... */
 	bzero(dst, max_chars);
 	return buf;
 }
@@ -861,8 +862,7 @@ size_t _mbscspn_l([[in]] unsigned char const *haystack,
                   [[in]] unsigned char const *reject, $locale_t locale) {
 	unsigned char const *iter = haystack;
 	for (;;) {
-		uint16_t ch;
-		ch = *iter++;
+		uint16_t ch = *iter++;
 		if (_ismbblead_l(ch, locale))
 			ch = *iter ? (ch << 8) | *iter++ : 0;
 		if (ch == 0)
@@ -1445,27 +1445,27 @@ size_t _mbclen_l([[in]] unsigned char const *str, $locale_t locale) {
 }
 
 [[decl_include("<hybrid/typecore.h>", "<bits/types.h>")]]
-[[requires_function(_mbslwr_l)]]
+[[requires_function(strnlen, _mbslwr_l)]]
 /*dos*/ errno_t _mbslwr_s_l([[inout(? <= true_bufsize)]] unsigned char *buf,
                             size_t true_bufsize, $locale_t locale) {
-	if (!buf || strlen((char const *)buf) >= true_bufsize)
+	if (!buf || strnlen((char const *)buf, true_bufsize) >= true_bufsize)
 		return DOS_EINVAL;
 	_mbslwr_l(buf, locale);
 	return 0;
 }
 
 [[decl_include("<hybrid/typecore.h>", "<bits/types.h>")]]
-[[requires_function(_mbsupr_l)]]
+[[requires_function(strnlen, _mbsupr_l)]]
 /*dos*/ errno_t _mbsupr_s_l([[inout(? <= true_bufsize)]] unsigned char *buf,
                             size_t true_bufsize, $locale_t locale) {
-	if (!buf || strlen((char const *)buf) >= true_bufsize)
+	if (!buf || strnlen((char const *)buf, true_bufsize) >= true_bufsize)
 		return DOS_EINVAL;
 	_mbsupr_l(buf, locale);
 	return 0;
 }
 
 [[decl_include("<hybrid/typecore.h>", "<bits/types.h>")]]
-[[requires_function(_mbsnbcat_l)]]
+[[requires_function(strnlen, _mbsnbcat_l)]]
 /*dos*/ errno_t _mbsnbcat_s_l([[inout(? <= true_bufsize)]] unsigned char *buf, size_t true_bufsize,
                               [[in(? <= max_bytes)]] unsigned char const *src, size_t max_bytes,
                               $locale_t locale) {
@@ -1488,7 +1488,7 @@ size_t _mbclen_l([[in]] unsigned char const *str, $locale_t locale) {
 }
 
 [[decl_include("<bits/types.h>"), impl_include("<hybrid/__minmax.h>")]]
-[[requires_function(_mbsnbset_l)]]
+[[requires_function(strnlen, _mbsnbset_l)]]
 /*dos*/ errno_t _mbsnbset_s_l([[inout(? <= true_bufsize)]] unsigned char *buf, size_t true_bufsize,
                               unsigned int ch, size_t max_bytes, $locale_t locale) {
 	if (max_bytes && (!buf || true_bufsize <= strnlen((char const *)buf, __hybrid_min2(true_bufsize, max_bytes))))
@@ -1498,12 +1498,12 @@ size_t _mbclen_l([[in]] unsigned char const *str, $locale_t locale) {
 }
 
 [[decl_include("<hybrid/typecore.h>", "<bits/types.h>")]]
-[[requires_function(_mbsncat_l, _mbsnbcnt_l)]]
+[[requires_function(strnlen, _mbsncat_l, _mbsnbcnt_l)]]
 /*dos*/ errno_t _mbsncat_s_l([[inout(? <= true_bufsize)]] unsigned char *buf, size_t true_bufsize,
                              [[in]] unsigned char const *src, size_t max_chars,
                              $locale_t locale) {
 	if (max_chars && (!buf || !src ||
-	                  true_bufsize <= (strlen((char const *)buf) +
+	                  true_bufsize <= (strnlen((char const *)buf, true_bufsize) +
 	                                   _mbsnbcnt_l(src, max_chars, locale))))
 		return DOS_EINVAL;
 	_mbsncat_l(buf, src, max_chars, locale);
@@ -1538,6 +1538,7 @@ size_t _mbclen_l([[in]] unsigned char const *str, $locale_t locale) {
 	}
 	if (true_bufsize < max_chars)
 		return DOS_EINVAL;
+
 	/* Really weird  quirk: until  this point,  `max_chars' were  counted
 	 * in chars, but this zero-padding (which is also done by DOS), would
 	 * mean that it's suddenly counted in characters... */

@@ -2133,6 +2133,59 @@ NOTHROW_CB_NCX(__FORMATPRINTER_CC libc_file_printer_unlocked)(void *arg,
 }
 /*[[[end:libc_file_printer_unlocked]]]*/
 
+#ifdef __LIBCCALL_IS_FORMATPRINTER_CC
+#define file_printdata (*(pformatprinter)&file_writedata)
+#else /* __LIBCCALL_IS_FORMATPRINTER_CC */
+PRIVATE ATTR_SECTION(".text.crt.FILE.unlocked.write.write") ATTR_INS(2, 3) NONNULL((1)) ssize_t
+NOTHROW_CB_NCX(__FORMATPRINTER_CC file_printdata)(void *arg,
+                                                  char const *__restrict data,
+                                                  size_t datalen) {
+	return (ssize_t)file_writedata((FILE *)arg, data, datalen);
+}
+#endif /* !__LIBCCALL_IS_FORMATPRINTER_CC */
+
+/*[[[head:libc_vfprintf,hash:CRC-32=0xb1a3d7eb]]]*/
+/* >> fprintf(3), vfprintf(3)
+ * Print  data  to  `stream',  following  `format'
+ * Return the number of successfully printed bytes */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T
+NOTHROW_CB_NCX(LIBCCALL libc_vfprintf)(FILE *__restrict stream,
+                                       char const *__restrict format,
+                                       va_list args)
+/*[[[body:libc_vfprintf]]]*/
+{
+	ssize_t result;
+	FILE *me = file_fromuser(stream);
+	if (FMUSTLOCK(me)) {
+		file_lock_write(me);
+		result = format_vprintf(&file_printdata, me, format, args);
+		if unlikely(FERROR(me))
+			result = -1;
+		file_lock_endwrite(me);
+	} else {
+		result = format_vprintf(&file_printdata, me, format, args);
+		if unlikely(FERROR(me))
+			result = -1;
+	}
+	return (__STDC_INT_AS_SSIZE_T)result;
+}
+/*[[[end:libc_vfprintf]]]*/
+
+/*[[[head:libc__vfprintf_p,hash:CRC-32=0x186dae35]]]*/
+#if 1
+DEFINE_INTERN_ALIAS(libc__vfprintf_p, libc_vfprintf);
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_PRINTF_P(2, 0) __STDC_INT_AS_SSIZE_T
+NOTHROW_CB_NCX(LIBCCALL libc__vfprintf_p)(FILE *stream,
+                                          char const *format,
+                                          va_list args)
+/*[[[body:libc__vfprintf_p]]]*/
+/*AUTO*/{
+	return _vfprintf_p_l(stream, format, NULL, args);
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc__vfprintf_p]]]*/
+
 
 
 
@@ -4228,7 +4281,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x54be5b76]]]*/
+/*[[[start:exports,hash:CRC-32=0x41c53218]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$rename, libd_rename);
@@ -4288,6 +4341,9 @@ DEFINE_PUBLIC_ALIAS(fgetpos, libc_fgetpos);
 DEFINE_PUBLIC_ALIAS(_IO_fgetpos, libc_fgetpos);
 DEFINE_PUBLIC_ALIAS(fsetpos, libc_fsetpos);
 DEFINE_PUBLIC_ALIAS(_IO_fsetpos, libc_fsetpos);
+DEFINE_PUBLIC_ALIAS(_IO_vfprintf, libc_vfprintf);
+DEFINE_PUBLIC_ALIAS(_vfprintf_p, libc_vfprintf);
+DEFINE_PUBLIC_ALIAS(vfprintf, libc_vfprintf);
 DEFINE_PUBLIC_ALIAS(DOS$renameat, libd_renameat);
 DEFINE_PUBLIC_ALIAS(renameat, libc_renameat);
 DEFINE_PUBLIC_ALIAS(DOS$renameat2, libd_renameat2);
@@ -4415,6 +4471,7 @@ DEFINE_PUBLIC_ALIAS(_get_printf_count_output, libc__get_printf_count_output);
 DEFINE_PUBLIC_ALIAS(_set_printf_count_output, libc__set_printf_count_output);
 DEFINE_PUBLIC_ALIAS(_get_output_format, libc__get_output_format);
 DEFINE_PUBLIC_ALIAS(_set_output_format, libc__set_output_format);
+DEFINE_PUBLIC_ALIAS(_vfprintf_p, libc__vfprintf_p);
 /*[[[end:exports]]]*/
 
 DECL_END

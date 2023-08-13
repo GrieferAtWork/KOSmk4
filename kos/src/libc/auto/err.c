@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b988d8d */
+/* HASH CRC-32:0x31c793de */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -100,12 +100,12 @@ NOTHROW_CB_NCX(LIBCCALL libc_vwarnc)(errno_t used_errno,
 
 	libc_flockfile(stderr);
 
-	libc_fprintf(stderr, "%s: ", program_invocation_short_name);
+	libc_fprintf_unlocked(stderr, "%s: ", program_invocation_short_name);
 	if (format) {
-		libc_vfprintf(stderr, format, args);
-		libc_fprintf(stderr, ": %s\n", libc_strerror(used_errno));
+		libc_vfprintf_unlocked(stderr, format, args);
+		libc_fprintf_unlocked(stderr, ": %s\n", libc_strerror(used_errno));
 	} else {
-		libc_fprintf(stderr, "%s\n", libc_strerror(used_errno));
+		libc_fprintf_unlocked(stderr, "%s\n", libc_strerror(used_errno));
 	}
 
 	libc_funlockfile(stderr);
@@ -145,10 +145,10 @@ NOTHROW_CB_NCX(LIBCCALL libc_vwarnx)(char const *format,
 
 	libc_flockfile(stderr);
 
-	libc_fprintf(stderr, "%s: ", program_invocation_short_name);
+	libc_fprintf_unlocked(stderr, "%s: ", program_invocation_short_name);
 	if (format)
-		libc_vfprintf(stderr, format, args);
-	libc_fputc('\n', stderr);
+		libc_vfprintf_unlocked(stderr, format, args);
+	libc_fputc_unlocked('\n', stderr);
 
 	libc_funlockfile(stderr);
 

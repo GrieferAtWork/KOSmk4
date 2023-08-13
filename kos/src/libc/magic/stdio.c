@@ -1436,11 +1436,20 @@ int fsetpos([[inout]] FILE *__restrict stream,
 [[std, cp_stdio, decl_include("<features.h>"), doc_alias("fprintf")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("vfprintf_unlocked")]]
 [[crtbuiltin, export_alias("_IO_vfprintf"), alias("vfprintf_s", "vfprintf_unlocked")]]
-[[requires_dependent_function(file_printer)]]
+[[export_as("_vfprintf_p"), userimpl]] /* userimpl so we can make the `flockfile'-part dependent on `FMUSTLOCK()' */
+[[requires_dependent_function(file_printer_unlocked)]]
 [[section(".text.crt{|.dos}.FILE.locked.write.printf")]]
 __STDC_INT_AS_SSIZE_T vfprintf([[inout]] FILE *__restrict stream,
                                [[in, format]] char const *__restrict format, $va_list args) {
-	return (__STDC_INT_AS_SSIZE_T)format_vprintf(&file_printer, stream, format, args);
+	__STDC_INT_AS_SSIZE_T result;
+@@pp_if $has_function(flockfile, funlockfile)@@
+	flockfile(stream);
+@@pp_endif@@
+	result = (__STDC_INT_AS_SSIZE_T)format_vprintf(&file_printer_unlocked, stream, format, args);
+@@pp_if $has_function(flockfile, funlockfile)@@
+	funlockfile(stream);
+@@pp_endif@@
+	return result;
 }
 
 @@>> fprintf(3), vfprintf(3)
@@ -5534,6 +5543,7 @@ __STDC_INT_AS_SSIZE_T _vsprintf_l([[out]] char *buf, [[in, format]] char const *
 /************************************************************************/
 %[default:section(".text.crt.dos.unicode.static.format.printf")];
 [[cp_stdio, decl_include("<features.h>"), requires_function(_vfprintf_p_l)]]
+[[userimpl]] /* Also needs userimpl since `vfprintf' has that attribute, too. */
 [[crt_intern_alias("vfprintf")]] /* Normal printf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vfprintf_p([[inout]] $FILE *stream, [[in, format]] char const *format, $va_list args) {
 	return _vfprintf_p_l(stream, format, NULL, args);

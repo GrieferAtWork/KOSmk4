@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ff6f67d */
+/* HASH CRC-32:0x5c086f13 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -189,14 +189,6 @@ INTDEF ATTR_IN(2) ATTR_INOUT(1) int NOTHROW_CB_NCX(LIBDCALL libd_fsetpos)(FILE *
  * Print  data  to  `stream',  following  `format'
  * Return the number of successfully printed bytes */
 INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_CB_NCX(LIBDCALL libd_vfprintf)(FILE *__restrict stream, char const *__restrict format, va_list args);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-/* >> fprintf(3), vfprintf(3)
- * Print  data  to  `stream',  following  `format'
- * Return the number of successfully printed bytes */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_CB_NCX(LIBCCALL libc_vfprintf)(FILE *__restrict stream, char const *__restrict format, va_list args);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fprintf(3), vfprintf(3)
  * Print  data  to  `stream',  following  `format'
  * Return the number of successfully printed bytes */
@@ -1124,11 +1116,6 @@ INTDEF ATTR_IN(2) ATTR_LIBC_PRINTF(2, 0) ATTR_OUT(1) __STDC_INT_AS_SSIZE_T NOTHR
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_PRINTF_P(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_CB_NCX(LIBDCALL libd__vfprintf_p)(FILE *stream, char const *format, va_list args);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_PRINTF_P(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_CB_NCX(LIBCCALL libc__vfprintf_p)(FILE *stream, char const *format, va_list args);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_IN(1) ATTR_LIBC_PRINTF_P(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_CB_NCX(LIBDCALL libd__vprintf_p)(char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77026f5c */
+/* HASH CRC-32:0x99a436fb */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -126,7 +126,10 @@ INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_IN(1) ATTR_INOUT(2) void
 NOTHROW_CB_NCX(LIBCCALL libc_partition_print)(struct partition_def __KOS_FIXED_CONST *self,
                                               FILE *fp) {
 	unsigned int i;
-	libc_fputc('[', fp);
+
+	libc_flockfile(fp);
+
+	libc_fputc_unlocked('[', fp);
 	for (i = 0; i < (unsigned int)self->num_elements; ++i) {
 		struct partition_elem const *elem = &self->elements[i];
 		struct partition_elem const *iter;
@@ -144,7 +147,7 @@ NOTHROW_CB_NCX(LIBCCALL libc_partition_print)(struct partition_def __KOS_FIXED_C
 		/* At this point we know that `i' is the smallest
 		 * member  of whatever class it belongs to. Since
 		 * we need to print sorted, we can start with `i' */
-		libc_fprintf(fp, "(%u", i);
+		libc_fprintf_unlocked(fp, "(%u", i);
 		prev_index = i;
 		for (;;) {
 			unsigned int winner_index;
@@ -166,14 +169,17 @@ NOTHROW_CB_NCX(LIBCCALL libc_partition_print)(struct partition_def __KOS_FIXED_C
 			}
 			if (!winner)
 				break; /* Last element was printed. */
-			libc_fprintf(fp, " %u", winner_index);
+			libc_fprintf_unlocked(fp, " %u", winner_index);
 			prev_index = winner_index;
 		}
-		libc_fputc(')', fp);
+		libc_fputc_unlocked(')', fp);
 already_printed:
 		;
 	}
-	libc_fputc(']', fp);
+	libc_fputc_unlocked(']', fp);
+
+	libc_funlockfile(fp);
+
 }
 #endif /* !__KERNEL__ */
 

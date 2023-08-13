@@ -1497,7 +1497,7 @@ int raise($signo_t signo) {
 [[impl_include("<asm/os/signal.h>")]]
 [[impl_include("<bits/os/sigaction.h>")]]
 $sighandler_t sysv_signal($signo_t signo, $sighandler_t handler) {
-	struct @sigaction@ act, oact
+	@struct sigaction@ act, oact
 	act.@sa_handler@ = handler;
 	act.@sa_flags@   = @__SA_RESETHAND@ | @__SA_NODEFER@;
 	sigemptyset(&act.@sa_mask@);
@@ -2225,51 +2225,60 @@ int killpg($pid_t pgrp, $signo_t signo) {
 @@When `s' is `NULL' or an empty string, omit the leading "%s: " from the format.
 [[cp_stdio, guard, decl_include("<bits/types.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
-[[requires(defined(__LOCAL_stderr) && $has_function(fprintf))]]
+[[requires(defined(__LOCAL_stderr) && $has_function(fprintf_unlocked))]]
 void psignal($signo_t signo, [[nullable]] char const *s) {
 	char const *signam = sigabbrev_np(signo);
+@@pp_if $has_function(flockfile, funlockfile)@@
+	flockfile(stderr);
+@@pp_endif@@
 	if (s && *s)
-		fprintf(stderr, "%s: ", s);
+		fprintf_unlocked(stderr, "%s: ", s);
 	if (signam) {
-		fprintf(stderr, "SIG%s\n", signam);
+		fprintf_unlocked(stderr, "SIG%s\n", signam);
 	} else {
-		fprintf(stderr, "Unknown signal %d\n", signo);
+		fprintf_unlocked(stderr, "Unknown signal %d\n", signo);
 	}
+@@pp_if $has_function(flockfile, funlockfile)@@
+	funlockfile(stderr);
+@@pp_endif@@
 }
 
 @@>> psiginfo(3)
 @@Similar to `psignal(3)', but instead print extended signal information from `*pinfo'
 [[cp_stdio, guard, decl_include("<bits/os/siginfo.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
-[[requires(defined(__LOCAL_stderr) && $has_function(fprintf))]]
+[[requires(defined(__LOCAL_stderr) && $has_function(fprintf_unlocked))]]
 [[impl_include("<asm/os/signal.h>", "<bits/crt/inttypes.h>", "<bits/types.h>")]]
 void psiginfo([[in]] siginfo_t const *pinfo,
               [[in_opt]] char const *s) {
 	char const *text;
 	text = sigabbrev_np(pinfo->@si_signo@);
+@@pp_if $has_function(flockfile, funlockfile)@@
+	flockfile(stderr);
+@@pp_endif@@
 	if (s && *s)
-		fprintf(stderr, "%s: ", s);
+		fprintf_unlocked(stderr, "%s: ", s);
 	if (text) {
-		fprintf(stderr, "SIG%s (", text);
+		fprintf_unlocked(stderr, "SIG%s (", text);
 @@pp_if defined(__SIGRTMIN) && defined(__SIGRTMAX)@@
 	} else if (pinfo->@si_signo@ >= __SIGRTMIN &&
 	           pinfo->@si_signo@ <= __SIGRTMAX) {
 		unsigned int offset;
 		offset = (unsigned int)(pinfo->@si_signo@ - __SIGRTMIN);
 		if (offset != 0) {
-			fprintf(stderr, "SIGRTMIN+%u (", offset);
+			fprintf_unlocked(stderr, "SIGRTMIN+%u (", offset);
 		} else {
-			fprintf(stderr, "SIGRTMIN (");
+			fprintf_unlocked(stderr, "SIGRTMIN (");
 		}
 @@pp_endif@@
 	} else {
-		fprintf(stderr, "Unknown signal %d (", pinfo->@si_signo@);
+		fprintf_unlocked(stderr, "Unknown signal %d (", pinfo->@si_signo@);
 	}
 	text = sigcodedesc_np(pinfo->@si_signo@, pinfo->@si_code@);
 	if (text) {
-		fprintf(stderr, "%s ", text);
+		fprintf_unlocked(stderr, "%s ", text);
 	} else {
-		fprintf(stderr, "%u ", (unsigned int)pinfo->@si_code@);
+		fprintf_unlocked(stderr, "%u ", (unsigned int)pinfo->@si_code@);
 	}
 @@pp_if defined(__SIGILL) || defined(__SIGFPE) || defined(__SIGSEGV) || defined(__SIGBUS)@@
 	if (0
@@ -2286,32 +2295,35 @@ void psiginfo([[in]] siginfo_t const *pinfo,
 	    || pinfo->@si_signo@ == __SIGBUS
 @@pp_endif@@
 	    ) {
-		fprintf(stderr, "[%p])\n", pinfo->@si_addr@);
+		fprintf_unlocked(stderr, "[%p])\n", pinfo->@si_addr@);
 	} else
 @@pp_endif@@
 @@pp_ifdef __SIGCHLD@@
 	if (pinfo->@si_signo@ == __SIGCHLD) {
-		fprintf(stderr,
-		        "%" __PRIN_PREFIX(__SIZEOF_PID_T__) "d %d "
-		        "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "d)\n",
-		        (pid_t)pinfo->@si_pid@,
-		        (int)pinfo->@si_status@,
-		        (uid_t)pinfo->@si_uid@);
+		fprintf_unlocked(stderr,
+		                 "%" __PRIN_PREFIX(__SIZEOF_PID_T__) "d %d "
+		                 "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "d)\n",
+		                 (pid_t)pinfo->@si_pid@,
+		                 (int)pinfo->@si_status@,
+		                 (uid_t)pinfo->@si_uid@);
 	} else
 @@pp_endif@@
 @@pp_ifdef __SIGPOLL@@
 	if (pinfo->@si_signo@ == __SIGPOLL) {
-		fprintf(stderr, "%" __PRIN_PREFIX(__SIZEOF_POINTER__) "d)\n",
-		        (longptr_t)pinfo->@si_band@);
+		fprintf_unlocked(stderr, "%" __PRIN_PREFIX(__SIZEOF_POINTER__) "d)\n",
+		                 (longptr_t)pinfo->@si_band@);
 	} else
 @@pp_endif@@
 	{
-		fprintf(stderr,
-		        "%" __PRIN_PREFIX(__SIZEOF_PID_T__) "d "
-		        "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "d)\n",
-		        (pid_t)pinfo->@si_pid@,
-		        (uid_t)pinfo->@si_uid@);
+		fprintf_unlocked(stderr,
+		                 "%" __PRIN_PREFIX(__SIZEOF_PID_T__) "d "
+		                 "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "d)\n",
+		                 (pid_t)pinfo->@si_pid@,
+		                 (uid_t)pinfo->@si_uid@);
 	}
+@@pp_if $has_function(flockfile, funlockfile)@@
+	funlockfile(stderr);
+@@pp_endif@@
 }
 
 %#ifdef __USE_KOS
@@ -2870,7 +2882,7 @@ int siginterrupt($signo_t signo, __STDC_INT_AS_UINT_T interrupt);
 [[impl_include("<asm/os/signal.h>", "<bits/os/sigstack.h>")]]
 int sigstack([[in_opt]] struct sigstack const *ss,
              [[out_opt]] struct sigstack *oss) {
-	struct @sigaltstack@ ass, aoss;
+	@struct sigaltstack@ ass, aoss;
 	int result;
 	if (ss) {
 		ass.@ss_flags@ = ss->@ss_onstack@
@@ -2964,7 +2976,7 @@ int sigignore($signo_t signo) {
            $has_function(sigaction))]]
 [[impl_include("<libc/errno.h>", "<asm/os/signal.h>", "<bits/os/sigaction.h>")]]
 $sighandler_t sigset($signo_t signo, $sighandler_t disp) {
-	struct @sigaction@ act, oact;
+	@struct sigaction@ act, oact;
 	sigset_t set, oset;
 	if unlikely(disp == (sighandler_t)@__SIG_ERR@)
 		goto err_inval;

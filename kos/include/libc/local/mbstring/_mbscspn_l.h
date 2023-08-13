@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b781835 */
+/* HASH CRC-32:0x21adfbbf */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,8 +52,7 @@ __LOCAL_LIBC(_mbscspn_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbscspn_l))(unsigned char const *__haystack, unsigned char const *__reject, __locale_t __locale) {
 	unsigned char const *__iter = __haystack;
 	for (;;) {
-		__UINT16_TYPE__ __ch;
-		__ch = *__iter++;
+		__UINT16_TYPE__ __ch = *__iter++;
 		if ((__NAMESPACE_LOCAL_SYM __localdep__ismbblead_l)(__ch, __locale))
 			__ch = *__iter ? (__ch << 8) | *__iter++ : 0;
 		if (__ch == 0)

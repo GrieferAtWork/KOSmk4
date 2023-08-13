@@ -87,19 +87,19 @@ void warnc($errno_t used_errno, [[in_opt, format("printf")]] char const *format,
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_stderr) && defined(__LOCAL_program_invocation_short_name) &&
-           $has_function(fprintf) && $has_function(vfprintf) && $has_function(strerror))]]
+           $has_function(fprintf_unlocked, vfprintf_unlocked, strerror))]]
 void vwarnc($errno_t used_errno, [[in_opt, format("printf")]] char const *format, $va_list args) {
-@@pp_if $has_function(flockfile) && $has_function(funlockfile)@@
+@@pp_if $has_function(flockfile, funlockfile)@@
 	flockfile(stderr);
 @@pp_endif@@
-	fprintf(stderr, "%s: ", program_invocation_short_name);
+	fprintf_unlocked(stderr, "%s: ", program_invocation_short_name);
 	if (format) {
-		vfprintf(stderr, format, args);
-		fprintf(stderr, ": %s\n", strerror(used_errno));
+		vfprintf_unlocked(stderr, format, args);
+		fprintf_unlocked(stderr, ": %s\n", strerror(used_errno));
 	} else {
-		fprintf(stderr, "%s\n", strerror(used_errno));
+		fprintf_unlocked(stderr, "%s\n", strerror(used_errno));
 	}
-@@pp_if $has_function(flockfile) && $has_function(funlockfile)@@
+@@pp_if $has_function(flockfile, funlockfile)@@
 	funlockfile(stderr);
 @@pp_endif@@
 }
@@ -119,16 +119,16 @@ void warnx([[in_opt, format("printf")]] char const *format, ...)
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_stderr) && defined(__LOCAL_program_invocation_short_name) &&
-           $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc))]]
+           $has_function(fprintf_unlocked, vfprintf_unlocked, fputc_unlocked))]]
 void vwarnx([[in_opt, format("printf")]] char const *format, $va_list args) {
-@@pp_if $has_function(flockfile) && $has_function(funlockfile)@@
+@@pp_if $has_function(flockfile, funlockfile)@@
 	flockfile(stderr);
 @@pp_endif@@
-	fprintf(stderr, "%s: ", program_invocation_short_name);
+	fprintf_unlocked(stderr, "%s: ", program_invocation_short_name);
 	if (format)
-		vfprintf(stderr, format, args);
-	fputc('\n', stderr);
-@@pp_if $has_function(flockfile) && $has_function(funlockfile)@@
+		vfprintf_unlocked(stderr, format, args);
+	fputc_unlocked('\n', stderr);
+@@pp_if $has_function(flockfile, funlockfile)@@
 	funlockfile(stderr);
 @@pp_endif@@
 }

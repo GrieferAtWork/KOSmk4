@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e7e41e7 */
+/* HASH CRC-32:0xabb10fc2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,21 +51,25 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__mbsncat_l_defined
 #endif /* !... */
 #endif /* !__local___localdep__mbsncat_l_defined */
-#ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined
-#ifdef __CRT_HAVE_strlen
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
-#else /* __CRT_HAVE_strlen */
+#ifndef __local___localdep_strnlen_defined
+#define __local___localdep_strnlen_defined
+#if __has_builtin(__builtin_strnlen) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strnlen)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen),strnlen,{ return __builtin_strnlen(__str, __maxlen); })
+#elif defined(__CRT_HAVE_strnlen)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen),strnlen,(__str,__maxlen))
+#elif defined(__CRT_HAVE___strncnt)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen),__strncnt,(__str,__maxlen))
+#else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/string/strlen.h>
+#include <libc/local/string/strnlen.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
-#endif /* !__CRT_HAVE_strlen */
-#endif /* !__local___localdep_strlen_defined */
+#define __localdep_strnlen __LIBC_LOCAL_NAME(strnlen)
+#endif /* !... */
+#endif /* !__local___localdep_strnlen_defined */
 __LOCAL_LIBC(_mbsncat_s_l) __ATTR_IN(3) __ATTR_INOUTS(1, 2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsncat_s_l))(unsigned char *__buf, __SIZE_TYPE__ __true_bufsize, unsigned char const *__src, __SIZE_TYPE__ __max_chars, __locale_t __locale) {
 	if (__max_chars && (!__buf || !__src ||
-	                  __true_bufsize <= ((__NAMESPACE_LOCAL_SYM __localdep_strlen)((char const *)__buf) +
+	                  __true_bufsize <= ((__NAMESPACE_LOCAL_SYM __localdep_strnlen)((char const *)__buf, __true_bufsize) +
 	                                   (__NAMESPACE_LOCAL_SYM __localdep__mbsnbcnt_l)(__src, __max_chars, __locale))))
 		return 22;
 	(__NAMESPACE_LOCAL_SYM __localdep__mbsncat_l)(__buf, __src, __max_chars, __locale);

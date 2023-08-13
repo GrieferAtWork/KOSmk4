@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c1017dc */
+/* HASH CRC-32:0x92bb78c1 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -264,15 +264,6 @@ NOTHROW_RPC(LIBCCALL libc_tmpfile)(void) {
 		(void)libc_close(tmpfd);
 
 	return result;
-}
-/* >> fprintf(3), vfprintf(3)
- * Print  data  to  `stream',  following  `format'
- * Return the number of successfully printed bytes */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T
-NOTHROW_CB_NCX(LIBCCALL libc_vfprintf)(FILE *__restrict stream,
-                                       char const *__restrict format,
-                                       va_list args) {
-	return (__STDC_INT_AS_SSIZE_T)libc_format_vprintf(&libc_file_printer, stream, format, args);
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -3340,7 +3331,6 @@ NOTHROW_NCX(LIBCCALL libc__vsprintf_l)(char *buf,
 	(void)locale;
 	return libc_vsprintf(buf, format, args);
 }
-DEFINE_INTERN_ALIAS(libc__vfprintf_p, libc_vfprintf);
 DEFINE_INTERN_ALIAS(libc__vprintf_p, libc_vprintf);
 /* WARNING: This function returns the number of written character. - Not the required buffer size! */
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_IN(3) ATTR_LIBC_PRINTF(3, 0) ATTR_OUTS(1, 2) __STDC_INT_AS_SSIZE_T
@@ -4354,8 +4344,6 @@ DEFINE_PUBLIC_ALIAS(puts, libc_puts);
 DEFINE_PUBLIC_ALIAS(_IO_perror, libc_perror);
 DEFINE_PUBLIC_ALIAS(perror, libc_perror);
 DEFINE_PUBLIC_ALIAS(tmpfile, libc_tmpfile);
-DEFINE_PUBLIC_ALIAS(_IO_vfprintf, libc_vfprintf);
-DEFINE_PUBLIC_ALIAS(vfprintf, libc_vfprintf);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(DOS$_IO_fprintf, libd_fprintf);
@@ -4583,7 +4571,6 @@ DEFINE_PUBLIC_ALIAS(_vprintf_l, libc__vprintf_l);
 DEFINE_PUBLIC_ALIAS(_vfprintf_l, libc__vfprintf_l);
 DEFINE_PUBLIC_ALIAS(_vscanf_l, libc__vscanf_l);
 DEFINE_PUBLIC_ALIAS(_vsprintf_l, libc__vsprintf_l);
-DEFINE_PUBLIC_ALIAS(_vfprintf_p, libc__vfprintf_p);
 DEFINE_PUBLIC_ALIAS(_vprintf_p, libc__vprintf_p);
 DEFINE_PUBLIC_ALIAS(_vsnprintf, libc__vsnprintf);
 DEFINE_PUBLIC_ALIAS(_vsprintf_p, libc__vsprintf_p);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x413daabc */
+/* HASH CRC-32:0x3be940c4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -107,6 +107,10 @@ INTDEF ATTR_INOUT(1) ATTR_OUT(2) int NOTHROW_CB_NCX(LIBCCALL libc_fgetpos)(FILE 
 /* >> fsetpos(3), fsetpos64(3)
  * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
 INTDEF ATTR_IN(2) ATTR_INOUT(1) int NOTHROW_CB_NCX(LIBCCALL libc_fsetpos)(FILE *__restrict stream, fpos_t const *__restrict pos);
+/* >> fprintf(3), vfprintf(3)
+ * Print  data  to  `stream',  following  `format'
+ * Return the number of successfully printed bytes */
+INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_CB_NCX(LIBCCALL libc_vfprintf)(FILE *__restrict stream, char const *__restrict format, va_list args);
 /* >> renameat(2) */
 INTDEF ATTR_IN(2) ATTR_IN(4) int NOTHROW_RPC(LIBDCALL libd_renameat)(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path);
 /* >> renameat(2) */
@@ -295,6 +299,7 @@ INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc__get_printf_count_output)
 INTDEF int NOTHROW_NCX(LIBCCALL libc__set_printf_count_output)(int val);
 INTDEF WUNUSED uint32_t NOTHROW_NCX(LIBCCALL libc__get_output_format)(void);
 INTDEF uint32_t NOTHROW_NCX(LIBCCALL libc__set_output_format)(uint32_t format);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_PRINTF_P(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_CB_NCX(LIBCCALL libc__vfprintf_p)(FILE *stream, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 
 DECL_END
