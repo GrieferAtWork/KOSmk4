@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf39c551a */
+/* HASH CRC-32:0x35cc406b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2214,42 +2214,39 @@ NOTHROW_NCX(LIBCCALL libc_qfcvt_r)(__LONGDOUBLE val,
 #endif
 }
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
-#endif /* !__KERNEL__ */
-#ifndef __KERNEL__
-static char qcvt_buffer[32];
-#endif /* !__KERNEL__ */
-#ifndef __KERNEL__
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
 DEFINE_INTERN_ALIAS(libc_qecvt, libc_ecvt);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include "../libc/tls-globals.h"
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED ATTR_OUT(3) ATTR_OUT(4) char *
 NOTHROW_NCX(LIBCCALL libc_qecvt)(__LONGDOUBLE val,
                                  int ndigit,
                                  int *__restrict decptr,
                                  int *__restrict sign) {
-
-
-
-	if (libc_qecvt_r(val, ndigit, decptr, sign,  qcvt_buffer, sizeof(qcvt_buffer)))
+	char (*const _p_qcvt_buf)[32] = &libc_get_tlsglobals()->ltg_qcvt_buf;
+#define qcvt_buf (*_p_qcvt_buf)
+	if (libc_qecvt_r(val, ndigit, decptr, sign,  qcvt_buf, sizeof(qcvt_buf)))
 		return NULL;
-	return qcvt_buffer;
+	return qcvt_buf;
 }
+#undef qcvt_buf
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
 DEFINE_INTERN_ALIAS(libc_qfcvt, libc_fcvt);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include "../libc/tls-globals.h"
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED ATTR_OUT(3) ATTR_OUT(4) char *
 NOTHROW_NCX(LIBCCALL libc_qfcvt)(__LONGDOUBLE val,
                                  int ndigit,
                                  int *__restrict decptr,
                                  int *__restrict sign) {
-
-
-
-	if (libc_qfcvt_r(val, ndigit, decptr, sign, qcvt_buffer, sizeof(qcvt_buffer)))
+	char (*const _p_qcvt_buf)[32] = &libc_get_tlsglobals()->ltg_qcvt_buf;
+#define qcvt_buf (*_p_qcvt_buf)
+	if (libc_qfcvt_r(val, ndigit, decptr, sign, qcvt_buf, sizeof(qcvt_buf)))
 		return NULL;
-	return qcvt_buffer;
+	return qcvt_buf;
 }
+#undef qcvt_buf
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* >> mkstemps(3), mkstemps64(3)
  * Replace the last 6 characters of `template_' (which are followed by exactly
@@ -2293,6 +2290,7 @@ NOTHROW_RPC(LIBCCALL libc_mkstemps64)(char *template_,
 	return libc_mkostemps64(template_, suffixlen, 0);
 }
 #endif /* __O_LARGEFILE */
+#include "../libc/tls-globals.h"
 /* >> l64a(3), a64l(3)
  * Convert between `long' and base-64 encoded integer strings. */
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_RETNONNULL WUNUSED char *
@@ -2300,10 +2298,12 @@ NOTHROW_NCX(LIBCCALL libc_l64a)(long n) {
 	/* l64a_r() encodes 6 bytes from `n' into 1 character, followed
 	 * by 1 trailing NUL-character. So we can can calculate the max
 	 * required buffer size here, based on `sizeof(long)'! */
-	static char buf[(((sizeof(long) * __CHAR_BIT__) + 5) / 6) + 1];
-	libc_l64a_r(n, buf, sizeof(buf));
-	return buf;
+	char (*const _p_l64a_buf)[(((sizeof(long) * __CHAR_BIT__) + 5) / 6) + 1] = &libc_get_tlsglobals()->ltg_l64a_buf;
+#define l64a_buf (*_p_l64a_buf)
+	libc_l64a_r(n, l64a_buf, sizeof(l64a_buf));
+	return l64a_buf;
 }
+#undef l64a_buf
 /* >> l64a(3), a64l(3)
  * Convert between `long' and base-64 encoded integer strings. */
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_PURE WUNUSED ATTR_IN(1) long
@@ -2404,30 +2404,32 @@ NOTHROW_NCX(LIBCCALL libc_mktemp)(char *template_) {
 		*template_ = 0;
 	return template_;
 }
+#include "../libc/tls-globals.h"
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED ATTR_OUT(3) ATTR_OUT(4) char *
 NOTHROW_NCX(LIBCCALL libc_ecvt)(double val,
                                 int ndigit,
                                 int *__restrict decptr,
                                 int *__restrict sign) {
-
-
-
-	if (libc_ecvt_r(val, ndigit, decptr, sign, qcvt_buffer, sizeof(qcvt_buffer)))
+	char (*const _p_qcvt_buf)[32] = &libc_get_tlsglobals()->ltg_qcvt_buf;
+#define qcvt_buf (*_p_qcvt_buf)
+	if (libc_ecvt_r(val, ndigit, decptr, sign, qcvt_buf, sizeof(qcvt_buf)))
 		return NULL;
-	return qcvt_buffer;
+	return qcvt_buf;
 }
+#undef qcvt_buf
+#include "../libc/tls-globals.h"
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED ATTR_OUT(3) ATTR_OUT(4) char *
 NOTHROW_NCX(LIBCCALL libc_fcvt)(double val,
                                 int ndigit,
                                 int *__restrict decptr,
                                 int *__restrict sign) {
-
-
-
-	if (libc_fcvt_r(val, ndigit, decptr, sign, qcvt_buffer, sizeof(qcvt_buffer)))
+	char (*const _p_qcvt_buf)[32] = &libc_get_tlsglobals()->ltg_qcvt_buf;
+#define qcvt_buf (*_p_qcvt_buf)
+	if (libc_fcvt_r(val, ndigit, decptr, sign, qcvt_buf, sizeof(qcvt_buf)))
 		return NULL;
-	return qcvt_buffer;
+	return qcvt_buf;
 }
+#undef qcvt_buf
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 #undef suboptarg
@@ -2582,26 +2584,136 @@ NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd) {
 		return -1;
 	return 0;
 }
+#include "../libc/tls-globals.h"
 /* >> ptsname(3)
  * Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.tty") WUNUSED ATTR_FDARG(1) char *
 NOTHROW_NCX(LIBDCALL libd_ptsname)(fd_t fd) {
-	static char buf[64];
-	if unlikely(libd_ptsname_r(fd, buf, sizeof(buf)))
-		return NULL;
-	return buf;
+
+	/* Buffer is typed as `void *' so it can be re-used for `wptsname(3)' */
+	void **const _p_ptsname_buf = &libc_get_tlsglobals()->ltg_ptsname_buf;
+#define ptsname_buf (*_p_ptsname_buf)
+	errno_t error;
+
+	size_t bufsize = libc_malloc_usable_size(ptsname_buf) / sizeof(char);
+
+
+
+	if (bufsize < 64) {
+		void *newbuf;
+		bufsize = 64;
+		newbuf  = libc_realloc(ptsname_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		ptsname_buf = newbuf;
+	}
+
+again:
+
+	error = libd_ptsname_r(fd, (char *)ptsname_buf, bufsize);
+	if likely(error == 0) {
+		/* Trim unused memory (if a certain threshold is exceeded) */
+		size_t retlen = libc_strlen((char *)ptsname_buf) + 1;
+		if (retlen < 64)
+			retlen = 64; /* Retain minimal buffer size */
+		if likely((retlen + 32) < bufsize) {
+			void *retbuf = libc_realloc(ptsname_buf, retlen * sizeof(char));
+			if likely(retbuf)
+				ptsname_buf = retbuf;
+		}
+		return (char *)ptsname_buf;
+	}
+
+	if (error == ERANGE && bufsize < 1024) {
+		void *newbuf;
+		bufsize *= 2;
+		newbuf = libc_realloc(ptsname_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		ptsname_buf = newbuf;
+		goto again;
+	}
+
+
+	libc_free(ptsname_buf);
+	ptsname_buf = NULL;
+
+err:
+	return NULL;
+
+
+
+
+
+
 }
+#undef ptsname_buf
+#include "../libc/tls-globals.h"
 /* >> ptsname(3)
  * Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
 INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED ATTR_FDARG(1) char *
 NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd) {
-	static char buf[64];
-	if unlikely(libc_ptsname_r(fd, buf, sizeof(buf)))
-		return NULL;
-	return buf;
+
+	/* Buffer is typed as `void *' so it can be re-used for `wptsname(3)' */
+	void **const _p_ptsname_buf = &libc_get_tlsglobals()->ltg_ptsname_buf;
+#define ptsname_buf (*_p_ptsname_buf)
+	errno_t error;
+
+	size_t bufsize = libc_malloc_usable_size(ptsname_buf) / sizeof(char);
+
+
+
+	if (bufsize < 64) {
+		void *newbuf;
+		bufsize = 64;
+		newbuf  = libc_realloc(ptsname_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		ptsname_buf = newbuf;
+	}
+
+again:
+
+	error = libc_ptsname_r(fd, (char *)ptsname_buf, bufsize);
+	if likely(error == 0) {
+		/* Trim unused memory (if a certain threshold is exceeded) */
+		size_t retlen = libc_strlen((char *)ptsname_buf) + 1;
+		if (retlen < 64)
+			retlen = 64; /* Retain minimal buffer size */
+		if likely((retlen + 32) < bufsize) {
+			void *retbuf = libc_realloc(ptsname_buf, retlen * sizeof(char));
+			if likely(retbuf)
+				ptsname_buf = retbuf;
+		}
+		return (char *)ptsname_buf;
+	}
+
+	if (error == ERANGE && bufsize < 1024) {
+		void *newbuf;
+		bufsize *= 2;
+		newbuf = libc_realloc(ptsname_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		ptsname_buf = newbuf;
+		goto again;
+	}
+
+
+	libc_free(ptsname_buf);
+	ptsname_buf = NULL;
+
+err:
+	return NULL;
+
+
+
+
+
+
 }
+#undef ptsname_buf
 #if __SIZEOF_LONG__ == 4
 DEFINE_INTERN_ALIAS(libc_strtol_l, libc_strto32_l);
 #elif __SIZEOF_LONG__ == 8
@@ -3415,13 +3527,70 @@ NOTHROW_NCX(LIBCCALL libc_mkostemps64)(char *template_,
 
 }
 #endif /* __O_LARGEFILE */
+#include "../libc/tls-globals.h"
 /* >> devname(3), devname_r(3) */
 INTERN ATTR_SECTION(".text.crt.bsd") char *
 NOTHROW_NCX(LIBCCALL libc_devname)(dev_t dev,
                                    mode_t type) {
-	static char buf[64];
-	return libc_devname_r(dev, type, buf, sizeof(buf)) ? NULL : buf;
+
+	/* Buffer is typed as `void *' so it can be re-used for `wdevname(3)' */
+	void **const _p_devname_buf = &libc_get_tlsglobals()->ltg_devname_buf;
+#define devname_buf (*_p_devname_buf)
+	errno_t error;
+
+	size_t bufsize = libc_malloc_usable_size(devname_buf) / sizeof(char);
+
+
+
+	if (bufsize < 64) {
+		void *newbuf;
+		bufsize = 64;
+		newbuf  = libc_realloc(devname_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		devname_buf = newbuf;
+	}
+
+again:
+
+	error = libc_devname_r(dev, type, (char *)devname_buf, bufsize);
+	if likely(error == 0) {
+		/* Trim unused memory (if a certain threshold is exceeded) */
+		size_t retlen = libc_strlen((char *)devname_buf) + 1;
+		if (retlen < 64)
+			retlen = 64; /* Retain minimal buffer size */
+		if likely((retlen + 32) < bufsize) {
+			void *retbuf = libc_realloc(devname_buf, retlen * sizeof(char));
+			if likely(retbuf)
+				devname_buf = retbuf;
+		}
+		return (char *)devname_buf;
+	}
+
+	if (error == ERANGE && bufsize < 1024) {
+		void *newbuf;
+		bufsize *= 2;
+		newbuf = libc_realloc(devname_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		devname_buf = newbuf;
+		goto again;
+	}
+
+
+	libc_free(devname_buf);
+	devname_buf = NULL;
+
+err:
+	return NULL;
+
+
+
+
+
+
 }
+#undef devname_buf
 #include <linux/prctl.h>
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_IN(1) ATTR_LIBC_PRINTF(1, 0) void
 NOTHROW_NCX(LIBCCALL libc_vsetproctitle)(char const *format,

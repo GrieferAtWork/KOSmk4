@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd99aa078 */
+/* HASH CRC-32:0xf11339bf */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,8 +44,9 @@ DECL_BEGIN
  * Return the name of a TTY given its file descriptor */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.tty") WUNUSED ATTR_FDARG(1) char16_t *
 NOTHROW_RPC(LIBDCALL libd_wttyname)(fd_t fd) {
-	/* Buffer is typed as `void *' because it's re-used for `wttyname()' */
-	void **_p_ttyname_buf = &libc_get_tlsglobals()->ltg_ttyname_buf;
+
+	/* Buffer is typed as `void *' so it can be re-used for `wttyname(3)' */
+	void **const _p_ttyname_buf = &libc_get_tlsglobals()->ltg_ttyname_buf;
 #define ttyname_buf (*_p_ttyname_buf)
 	errno_t error;
 
@@ -68,6 +69,8 @@ again:
 	if likely(error == 0) {
 		/* Trim unused memory (if a certain threshold is exceeded) */
 		size_t retlen = libd_wcslen((char16_t *)ttyname_buf) + 1;
+		if (retlen < 32)
+			retlen = 32; /* Retain minimal buffer size */
 		if likely((retlen + 32) < bufsize) {
 			void *retbuf = libc_realloc(ttyname_buf, retlen * sizeof(char16_t));
 			if likely(retbuf)
@@ -86,8 +89,18 @@ again:
 		goto again;
 	}
 
+
+	libc_free(ttyname_buf);
+	ttyname_buf = NULL;
+
 err:
 	return NULL;
+
+
+
+
+
+
 }
 #undef ttyname_buf
 #include <asm/os/errno.h>
@@ -96,8 +109,9 @@ err:
  * Return the name of a TTY given its file descriptor */
 INTERN ATTR_SECTION(".text.crt.wchar.io.tty") WUNUSED ATTR_FDARG(1) char32_t *
 NOTHROW_RPC(LIBKCALL libc_wttyname)(fd_t fd) {
-	/* Buffer is typed as `void *' because it's re-used for `wttyname()' */
-	void **_p_ttyname_buf = &libc_get_tlsglobals()->ltg_ttyname_buf;
+
+	/* Buffer is typed as `void *' so it can be re-used for `wttyname(3)' */
+	void **const _p_ttyname_buf = &libc_get_tlsglobals()->ltg_ttyname_buf;
 #define ttyname_buf (*_p_ttyname_buf)
 	errno_t error;
 
@@ -120,6 +134,8 @@ again:
 	if likely(error == 0) {
 		/* Trim unused memory (if a certain threshold is exceeded) */
 		size_t retlen = libc_wcslen((char32_t *)ttyname_buf) + 1;
+		if (retlen < 32)
+			retlen = 32; /* Retain minimal buffer size */
 		if likely((retlen + 32) < bufsize) {
 			void *retbuf = libc_realloc(ttyname_buf, retlen * sizeof(char32_t));
 			if likely(retbuf)
@@ -138,8 +154,18 @@ again:
 		goto again;
 	}
 
+
+	libc_free(ttyname_buf);
+	ttyname_buf = NULL;
+
 err:
 	return NULL;
+
+
+
+
+
+
 }
 #undef ttyname_buf
 #include <libc/errno.h>

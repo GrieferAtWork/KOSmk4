@@ -1084,26 +1084,26 @@ again_handle_tok:
 				}
 
 				numLines = fp.ppIf("defined(__BUILDING_LIBC)&&!defined(__KERNEL__)");
-				escapeTextIntoFile(fp, typeBefore, mode, keyEscape, evalEnviron, forceKeyEscape);
-				if (typeBefore && typeBefore.last.issymcont())
-					fp << " ";
-				if (typeAfter)
-					fp << "(";
-				fp << "*";
-				local p_staticVarName = f"_p_{staticVarName}";
-				escapeTextIntoFile(fp, p_staticVarName, mode, keyEscape, evalEnviron, forceKeyEscape);
-				if (typeAfter) {
-					fp << ")";
-					escapeTextIntoFile(fp, typeAfter, mode, keyEscape, evalEnviron, forceKeyEscape);
-				}
-				fp << " = &" << TLS_GLOBALS_GETTER << "()->"
-					<< TLS_GLOBALS_PREFIX << staticVarName << ";\n";
-				fp << "#define ";
-				escapeTextIntoFile(fp, staticVarName, mode, keyEscape, evalEnviron, forceKeyEscape);
-				fp << " (*";
-				escapeTextIntoFile(fp, p_staticVarName, mode, keyEscape, evalEnviron, forceKeyEscape);
-				fp << ")\n";
 				if (!fp.isDeadCode) {
+					escapeTextIntoFile(fp, typeBefore, mode, keyEscape, evalEnviron, forceKeyEscape);
+					if (typeBefore && typeBefore.last.issymcont())
+						fp << " ";
+					if (typeAfter)
+						fp << "(";
+					fp << "*const ";
+					local p_staticVarName = f"_p_{staticVarName}";
+					escapeTextIntoFile(fp, p_staticVarName, mode, keyEscape, evalEnviron, forceKeyEscape);
+					if (typeAfter) {
+						fp << ")";
+						escapeTextIntoFile(fp, typeAfter, mode, keyEscape, evalEnviron, forceKeyEscape);
+					}
+					fp << " = &" << TLS_GLOBALS_GETTER << "()->"
+						<< TLS_GLOBALS_PREFIX << staticVarName << ";\n";
+					fp << "#define ";
+					escapeTextIntoFile(fp, staticVarName, mode, keyEscape, evalEnviron, forceKeyEscape);
+					fp << " (*";
+					escapeTextIntoFile(fp, p_staticVarName, mode, keyEscape, evalEnviron, forceKeyEscape);
+					fp << ")\n";
 					if (extendedPrefixes !is none)
 						extendedPrefixes.append('#include "../libc/tls-globals.h"');
 					numLines += 2;
@@ -1112,21 +1112,22 @@ again_handle_tok:
 					trailingText = f"{trailingText}\n#undef {trailingTextFp.string}";
 				}
 				numLines += fp.ppElse();
-				fp << "static ";
-				escapeTextIntoFile(fp, typeBefore, mode, keyEscape, evalEnviron, forceKeyEscape);
-				if (typeBefore && typeBefore.last.issymcont())
-					fp << " ";
-				escapeTextIntoFile(fp, staticVarName, mode, keyEscape, evalEnviron, forceKeyEscape);
-				if (typeAfter && typeAfter.issymcont(0))
-					fp << " ";
-				escapeTextIntoFile(fp, typeAfter, mode, keyEscape, evalEnviron, forceKeyEscape);
-				if (initExpr) {
-					fp << " = ";
-					escapeTextIntoFile(fp, initExpr, mode, keyEscape, evalEnviron, forceKeyEscape);
-				}
-				fp << ";\n";
-				if (!fp.isDeadCode)
+				if (!fp.isDeadCode) {
+					fp << "static ";
+					escapeTextIntoFile(fp, typeBefore, mode, keyEscape, evalEnviron, forceKeyEscape);
+					if (typeBefore && typeBefore.last.issymcont())
+						fp << " ";
+					escapeTextIntoFile(fp, staticVarName, mode, keyEscape, evalEnviron, forceKeyEscape);
+					if (typeAfter && typeAfter.issymcont(0))
+						fp << " ";
+					escapeTextIntoFile(fp, typeAfter, mode, keyEscape, evalEnviron, forceKeyEscape);
+					if (initExpr) {
+						fp << " = ";
+						escapeTextIntoFile(fp, initExpr, mode, keyEscape, evalEnviron, forceKeyEscape);
+					}
+					fp << ";\n";
 					numLines += 1;
+				}
 				numLines += fp.ppEndif();
 				goto handle_numLines_after_pp_directive;
 			}	break;

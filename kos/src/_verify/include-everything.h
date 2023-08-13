@@ -83,6 +83,7 @@ local badFiles = List({
 	"compiler",
 	"crt-features",
 	"libdl/module.h",
+	"kos/except/checker.h",
 	"system-test/ctest.h",
 	"nt/pshpack1.h",
 	"nt/pshpack2.h",
@@ -168,6 +169,7 @@ incdir("");
 #include <asm/crt/malloc.h>
 #include <asm/crt/math-exception.h>
 #include <asm/crt/math-libc_version.h>
+#include <asm/crt/netdb.h>
 #include <asm/crt/posix_spawn.h>
 #include <asm/crt/process.h>
 #include <asm/crt/pthreadvalues.h>
@@ -217,6 +219,7 @@ incdir("");
 #include <asm/os/mman.h>
 #include <asm/os/mount.h>
 #include <asm/os/msq.h>
+#include <asm/os/net-if.h>
 #include <asm/os/oflags.h>
 #include <asm/os/paths.h>
 #include <asm/os/poll.h>
@@ -317,6 +320,7 @@ incdir("");
 #include <attr/libattr.h>
 #include <attr/xattr.h>
 #include <bits/crt/_diskfree_t.h>
+#include <bits/crt/addrinfo.h>
 #include <bits/crt/aiocb.h>
 #include <bits/crt/aioinit.h>
 #include <bits/crt/complex.h>
@@ -325,10 +329,13 @@ incdir("");
 #include <bits/crt/db/aliases.h>
 #include <bits/crt/db/fstab.h>
 #include <bits/crt/db/group.h>
+#include <bits/crt/db/hostent.h>
 #include <bits/crt/db/mntent.h>
 #include <bits/crt/db/netdb.h>
 #include <bits/crt/db/passwd.h>
+#include <bits/crt/db/protoent.h>
 #include <bits/crt/db/rpcent.h>
+#include <bits/crt/db/servent.h>
 #include <bits/crt/db/spwd.h>
 #include <bits/crt/db/ttyent.h>
 #include <bits/crt/db/utmp.h>
@@ -344,8 +351,11 @@ incdir("");
 #include <bits/crt/format-printer.h>
 #include <bits/crt/fts.h>
 #include <bits/crt/ftw.h>
+#include <bits/crt/gaicb.h>
 #include <bits/crt/getopt.h>
 #include <bits/crt/glob.h>
+#include <bits/crt/if_nameindex.h>
+#include <bits/crt/ifaddr.h>
 #include <bits/crt/ifaddrs.h>
 #include <bits/crt/inttypes.h>
 #include <bits/crt/io-file.h>
@@ -391,6 +401,9 @@ incdir("");
 #include <bits/os/fd_set.h>
 #include <bits/os/file_handle.h>
 #include <bits/os/flock.h>
+#include <bits/os/ifconf.h>
+#include <bits/os/ifmap.h>
+#include <bits/os/ifreq.h>
 #include <bits/os/iovec.h>
 #include <bits/os/ipc.h>
 #include <bits/os/itimerspec.h>
@@ -750,6 +763,7 @@ incdir("");
 #include <kos/asm/syscall.h>
 #include <kos/bits/coredump.h>
 #include <kos/bits/debugtrap.h>
+#include <kos/bits/except-compiler.h>
 #include <kos/bits/except-handler.h>
 #include <kos/bits/except.h>
 #include <kos/bits/exception_data.h>

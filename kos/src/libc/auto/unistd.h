@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3533b448 */
+/* HASH CRC-32:0x79f83891 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -659,21 +659,23 @@ INTDEF ATTR_RETNONNULL char *NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> cuserid(3)
- * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
- * that  name  in  `s'.  When  `s'  is   NULL,  a  static  buffer  is  used   instead
- * When  given,   `s'   must  be   a   buffer   of  at   least   `L_cuserid'   bytes.
- * If the actual  username is longer  than this,  it may be  truncated, and  programs
- * that wish to support longer usernames  should make use of `getlogin_r()'  instead.
+ * Return the name of the current user (`$LOGNAME' or  `getpwuid(geteuid())'),
+ * storing that name in `s'. When `s' is NULL, a static buffer is used instead
+ * When given, `s' must be a buffer of at least `L_cuserid' bytes.
+ *
+ * If the actual username is  longer than this, it  may be truncated, and  programs
+ * that wish to support longer usernames should make use of `getlogin_r()' instead.
  * s.a. `getlogin()' and `getlogin_r()' */
 INTDEF ATTR_OUT_OPT(1) char *NOTHROW_NCX(LIBDCALL libd_cuserid)(char *s);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> cuserid(3)
- * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
- * that  name  in  `s'.  When  `s'  is   NULL,  a  static  buffer  is  used   instead
- * When  given,   `s'   must  be   a   buffer   of  at   least   `L_cuserid'   bytes.
- * If the actual  username is longer  than this,  it may be  truncated, and  programs
- * that wish to support longer usernames  should make use of `getlogin_r()'  instead.
+ * Return the name of the current user (`$LOGNAME' or  `getpwuid(geteuid())'),
+ * storing that name in `s'. When `s' is NULL, a static buffer is used instead
+ * When given, `s' must be a buffer of at least `L_cuserid' bytes.
+ *
+ * If the actual username is  longer than this, it  may be truncated, and  programs
+ * that wish to support longer usernames should make use of `getlogin_r()' instead.
  * s.a. `getlogin()' and `getlogin_r()' */
 INTDEF ATTR_OUT_OPT(1) char *NOTHROW_NCX(LIBCCALL libc_cuserid)(char *s);
 #endif /* !__KERNEL__ */

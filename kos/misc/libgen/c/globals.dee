@@ -59,6 +59,24 @@ class TlsGlobal {
 	@@in here should be replaced based on context)
 	public member finiExpr: UserString | string = "";
 
+	public property sortKey = {
+		get() {
+			local order;
+			/* We want an order like this:
+			 * >> char *a;
+			 * >> char *c[42];
+			 * >> char  b;
+			 * >> char  d[42];
+			 */
+			if (typeBefore.endswith("*")) {
+				order = typeAfter ? 1 : 0;
+			} else {
+				order = typeAfter ? 3 : 2;
+			}
+			return (order, typeBefore, typeAfter, name);
+		}
+	}
+
 	operator str(fp: File) {
 		fp << typeBefore;
 		if (typeBefore && typeBefore.last.issymcont())

@@ -2040,12 +2040,6 @@ int qfcvt_r(__LONGDOUBLE val, int ndigit,
 #endif
 }
 
-%(auto_source){
-#ifndef __KERNEL__
-static char qcvt_buffer[32];
-#endif /* !__KERNEL__ */
-}
-
 
 [[wunused]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
@@ -2053,12 +2047,10 @@ static char qcvt_buffer[32];
 char *qecvt(__LONGDOUBLE val, int ndigit,
             [[out]] int *__restrict decptr,
             [[out]] int *__restrict sign) {
-@@pp_ifndef __BUILDING_LIBC@@
-	static char qcvt_buffer[32];
-@@pp_endif@@
-	if (qecvt_r(val, ndigit, decptr, sign,  qcvt_buffer, sizeof(qcvt_buffer)))
+	@@static char qcvt_buf[32] = {0}@@
+	if (qecvt_r(val, ndigit, decptr, sign,  qcvt_buf, sizeof(qcvt_buf)))
 		return NULL;
-	return qcvt_buffer;
+	return qcvt_buf;
 }
 
 [[wunused]]
@@ -2067,12 +2059,10 @@ char *qecvt(__LONGDOUBLE val, int ndigit,
 char *qfcvt(__LONGDOUBLE val, int ndigit,
             [[out]] int *__restrict decptr,
             [[out]] int *__restrict sign) {
-@@pp_ifndef __BUILDING_LIBC@@
-	static char qcvt_buffer[32];
-@@pp_endif@@
-	if (qfcvt_r(val, ndigit, decptr, sign, qcvt_buffer, sizeof(qcvt_buffer)))
+	@@static char qcvt_buf[32] = {0}@@
+	if (qfcvt_r(val, ndigit, decptr, sign, qcvt_buf, sizeof(qcvt_buf)))
 		return NULL;
-	return qcvt_buffer;
+	return qcvt_buf;
 }
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
@@ -2381,9 +2371,9 @@ char *l64a(long n) {
 	/* l64a_r() encodes 6 bytes from `n' into 1 character, followed
 	 * by 1 trailing NUL-character. So we can can calculate the max
 	 * required buffer size here, based on `sizeof(long)'! */
-	static char buf[(((sizeof(long) * __CHAR_BIT__) + 5) / 6) + 1];
-	l64a_r(n, buf, sizeof(buf));
-	return buf;
+	@@static char l64a_buf[(((sizeof(long) * __CHAR_BIT__) + 5) / 6) + 1] = {0}@@
+	l64a_r(n, l64a_buf, sizeof(l64a_buf));
+	return l64a_buf;
 }
 
 [[pure, wunused, doc_alias("l64a")]]
@@ -2532,12 +2522,10 @@ char *mktemp([[inout]] char *template_) {
 char *ecvt(double val, int ndigit,
            [[out]] int *__restrict decptr,
            [[out]] int *__restrict sign) {
-@@pp_ifndef __BUILDING_LIBC@@
-	static char qcvt_buffer[32];
-@@pp_endif@@
-	if (ecvt_r(val, ndigit, decptr, sign, qcvt_buffer, sizeof(qcvt_buffer)))
+	@@static char qcvt_buf[32] = {0}@@
+	if (ecvt_r(val, ndigit, decptr, sign, qcvt_buf, sizeof(qcvt_buf)))
 		return NULL;
-	return qcvt_buffer;
+	return qcvt_buf;
 }
 
 [[wunused, dos_only_export_alias("_fcvt")]]
@@ -2545,12 +2533,10 @@ char *ecvt(double val, int ndigit,
 char *fcvt(double val, int ndigit,
            [[out]] int *__restrict decptr,
            [[out]] int *__restrict sign) {
-@@pp_ifndef __BUILDING_LIBC@@
-	static char qcvt_buffer[32];
-@@pp_endif@@
-	if (fcvt_r(val, ndigit, decptr, sign, qcvt_buffer, sizeof(qcvt_buffer)))
+	@@static char qcvt_buf[32] = {0}@@
+	if (fcvt_r(val, ndigit, decptr, sign, qcvt_buf, sizeof(qcvt_buf)))
 		return NULL;
-	return qcvt_buffer;
+	return qcvt_buf;
 }
 %#endif /* !__NO_FPU */
 
@@ -2744,10 +2730,62 @@ int unlockpt([[fdarg]] $fd_t fd) {
 [[crt_dos_variant, requires_function(ptsname_r)]]
 [[section(".text.crt{|.dos}.io.tty")]]
 char *ptsname([[fdarg]] $fd_t fd) {
+@@pp_if $has_function(realloc)@@
+	/* Buffer is typed as `void *' so it can be re-used for `wptsname(3)' */
+	@@static void *ptsname_buf; [fini: free(ptsname_buf)]@@
+	errno_t error;
+@@pp_if $has_function(malloc_usable_size)@@
+	size_t bufsize = malloc_usable_size(ptsname_buf) / sizeof(char);
+@@pp_else@@
+	size_t bufsize = ptsname_buf ? 64 : 0;
+@@pp_endif@@
+	if (bufsize < 64) {
+		void *newbuf;
+		bufsize = 64;
+		newbuf  = realloc(ptsname_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		ptsname_buf = newbuf;
+	}
+@@pp_ifdef ERANGE@@
+again:
+@@pp_endif@@
+	error = ptsname_r(fd, (char *)ptsname_buf, bufsize);
+	if likely(error == 0) {
+		/* Trim unused memory (if a certain threshold is exceeded) */
+		size_t retlen = strlen((char *)ptsname_buf) + 1;
+		if (retlen < 64)
+			retlen = 64; /* Retain minimal buffer size */
+		if likely((retlen + 32) < bufsize) {
+			void *retbuf = realloc(ptsname_buf, retlen * sizeof(char));
+			if likely(retbuf)
+				ptsname_buf = retbuf;
+		}
+		return (char *)ptsname_buf;
+	}
+@@pp_ifdef ERANGE@@
+	if (error == ERANGE && bufsize < 1024) {
+		void *newbuf;
+		bufsize *= 2;
+		newbuf = realloc(ptsname_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		ptsname_buf = newbuf;
+		goto again;
+	}
+@@pp_endif@@
+@@pp_if $has_function(free)@@
+	free(ptsname_buf);
+	ptsname_buf = NULL;
+@@pp_endif@@
+err:
+	return NULL;
+@@pp_else@@
 	static char buf[64];
-	if unlikely(ptsname_r(fd, buf, sizeof(buf)))
-		return NULL;
-	return buf;
+	if likely(ptsname_r(fd, buf, sizeof(buf)) == 0)
+		return buf;
+	return NULL;
+@@pp_endif@@
 }
 %#endif /* __USE_XOPEN */
 
@@ -3832,8 +3870,62 @@ typedef __mode_t mode_t;
 [[alias("__devname50")]]
 [[requires_function(devname_r)]]
 char *devname(dev_t dev, mode_t type) {
-	static char buf[64];
-	return devname_r(dev, type, buf, sizeof(buf)) ? NULL : buf;
+@@pp_if $has_function(realloc)@@
+	/* Buffer is typed as `void *' so it can be re-used for `wdevname(3)' */
+	@@static void *devname_buf; [fini: free(devname_buf)]@@
+	errno_t error;
+@@pp_if $has_function(malloc_usable_size)@@
+	size_t bufsize = malloc_usable_size(devname_buf) / sizeof(char);
+@@pp_else@@
+	size_t bufsize = devname_buf ? 64 : 0;
+@@pp_endif@@
+	if (bufsize < 64) {
+		void *newbuf;
+		bufsize = 64;
+		newbuf  = realloc(devname_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		devname_buf = newbuf;
+	}
+@@pp_ifdef ERANGE@@
+again:
+@@pp_endif@@
+	error = devname_r(dev, type, (char *)devname_buf, bufsize);
+	if likely(error == 0) {
+		/* Trim unused memory (if a certain threshold is exceeded) */
+		size_t retlen = strlen((char *)devname_buf) + 1;
+		if (retlen < 64)
+			retlen = 64; /* Retain minimal buffer size */
+		if likely((retlen + 32) < bufsize) {
+			void *retbuf = realloc(devname_buf, retlen * sizeof(char));
+			if likely(retbuf)
+				devname_buf = retbuf;
+		}
+		return (char *)devname_buf;
+	}
+@@pp_ifdef ERANGE@@
+	if (error == ERANGE && bufsize < 1024) {
+		void *newbuf;
+		bufsize *= 2;
+		newbuf = realloc(devname_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		devname_buf = newbuf;
+		goto again;
+	}
+@@pp_endif@@
+@@pp_if $has_function(free)@@
+	free(devname_buf);
+	devname_buf = NULL;
+@@pp_endif@@
+err:
+	return NULL;
+@@pp_else@@
+	static char devname_buf[64];
+	if likely(devname_r(dev, type, devname_buf, COMPILER_LENOF(devname_buf)) == 0)
+		return devname_buf;
+	return NULL;
+@@pp_endif@@
 }
 
 [[doc_alias("devname")]]

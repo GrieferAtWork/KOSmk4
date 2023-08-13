@@ -25,14 +25,32 @@
 /**/
 
 #ifndef __KERNEL__
+#include <hybrid/typecore.h>
+
+#include <bits/crt/tm.h>
+
 #ifdef __CC__
 DECL_BEGIN
+
+#ifndef __tm_defined
+#define __tm_defined
+__NAMESPACE_STD_USING(tm)
+#endif /* !__tm_defined */
 
 /* clang-format off */
 struct libc_tlsglobals {
 /*[[[begin:libc_tlsglobals]]]*/
-	char *ltg_strtok_save_ptr;
-	void *ltg_ttyname_buf;
+	char     *ltg_getpass_buf;
+	char     *ltg_strtok_save_ptr;
+	void     *ltg_cuserid_buf;
+	void     *ltg_devname_buf;
+	void     *ltg_ptsname_buf;
+	void     *ltg_ttyname_buf;
+	struct tm ltg_tmbuf;
+	char      ltg_l64a_buf[(((sizeof(long) * __CHAR_BIT__) + 5) / 6) + 1];
+	char      ltg_ctime_buf[26];
+	char      ltg_qcvt_buf[32];
+	char      ltg_ctermid_buf[9];
 /*[[[end:libc_tlsglobals]]]*/
 };
 /* clang-format on */
@@ -44,24 +62,6 @@ NOTHROW(LIBCCALL libc_get_tlsglobals)(void);
 /* Finalize `self' (called when a pthread exits, but not called for the main thread) */
 INTDEF NONNULL((1)) void
 NOTHROW(LIBCCALL libc_fini_tlsglobals)(struct libc_tlsglobals *__restrict self);
-
-/* TODO: change the following functions to use tls-globals:
- * - char[]: getpass
- * - char[]: ptsname
- * - char[]: l64a
- * - char[]: ctime, ctime64
- * - char[]: asctime
- * - char[]: ctermid
- * - char[]: cuserid
- * - char[]: qecvt
- * - char[]: qfcvt
- * - char[]: ecvt
- * - char[]: fcvt
- * - char[]: devname
- * - struct tm: gmtime, gmtime64
- * - struct tm: localtime, localtime64
- * - struct tm: getdate
- */
 
 DECL_END
 #endif /* __CC__ */

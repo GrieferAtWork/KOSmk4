@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x302823ce */
+/* HASH CRC-32:0x6bbe40a3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,22 +70,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_ctime_r __LIBC_LOCAL_NAME(ctime_r)
 #endif /* !... */
 #endif /* !__local___localdep_ctime_r_defined */
-__NAMESPACE_LOCAL_END
-#ifdef __BUILDING_LIBC
-#ifndef __LIBC_CTIME_BUFFER_DEFINED
-#define __LIBC_CTIME_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__LIBC_CTIME_BUFFER_DEFINED */
-
-#endif /* __BUILDING_LIBC */
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ctime) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctime))(__time_t const *__timer) {
 
 	__time64_t __tm64 = (__time64_t)*__timer;
 	return (__NAMESPACE_LOCAL_SYM __localdep_ctime64)(&__tm64);
+
 
 
 

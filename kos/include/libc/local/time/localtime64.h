@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde08a3fa */
+/* HASH CRC-32:0x6730e157 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,23 +47,14 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_localtime64_r __LIBC_LOCAL_NAME(localtime64_r)
 #endif /* !... */
 #endif /* !__local___localdep_localtime64_r_defined */
-__NAMESPACE_LOCAL_END
-#if defined(__BUILDING_LIBC) || (!defined(__CRT_HAVE_localtime) && !defined(__CRT_HAVE__localtime32))
-#ifndef __LIBC_GMTIME_BUFFER_DEFINED
-#define __LIBC_GMTIME_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__gmtime_buf) struct __NAMESPACE_STD_SYM tm __gmtime_buf = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
-#endif /* __BUILDING_LIBC || (!__CRT_HAVE_localtime && !__CRT_HAVE__localtime32) */
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(localtime64) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) struct __NAMESPACE_STD_SYM tm *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(localtime64))(__time64_t const *__timer) {
 #if defined(__CRT_HAVE_localtime) || defined(__CRT_HAVE__localtime32)
 	__time32_t __tm32 = (__time32_t)*__timer;
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_localtime32)(&__tm32);
 #else /* __CRT_HAVE_localtime || __CRT_HAVE__localtime32 */
-	return (__NAMESPACE_LOCAL_SYM __localdep_localtime64_r)(__timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
+	static struct __NAMESPACE_STD_SYM tm __tmbuf = {0};
+	return (__NAMESPACE_LOCAL_SYM __localdep_localtime64_r)(__timer, &__tmbuf);
 #endif /* !__CRT_HAVE_localtime && !__CRT_HAVE__localtime32 */
 }
 __NAMESPACE_LOCAL_END

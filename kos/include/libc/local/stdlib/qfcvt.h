@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4158093 */
+/* HASH CRC-32:0x780181d3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,12 +43,10 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_qfcvt_r_defined */
 __LOCAL_LIBC(qfcvt) __ATTR_WUNUSED __ATTR_OUT(3) __ATTR_OUT(4) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qfcvt))(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) {
-
-	static char __qcvt_buffer[32];
-
-	if ((__NAMESPACE_LOCAL_SYM __localdep_qfcvt_r)(__val, __ndigit, __decptr, __sign, __qcvt_buffer, sizeof(__qcvt_buffer)))
+	static char __qcvt_buf[32] = {0};
+	if ((__NAMESPACE_LOCAL_SYM __localdep_qfcvt_r)(__val, __ndigit, __decptr, __sign, __qcvt_buf, sizeof(__qcvt_buf)))
 		return __NULLPTR;
-	return __qcvt_buffer;
+	return __qcvt_buf;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_qfcvt_defined

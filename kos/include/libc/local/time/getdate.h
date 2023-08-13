@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d296434 */
+/* HASH CRC-32:0x54c914bd */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,10 +38,11 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_getdate_r_defined */
 __LOCAL_LIBC(getdate) __ATTR_IN(1) struct __NAMESPACE_STD_SYM tm *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getdate))(const char *__string) {
-	static struct __NAMESPACE_STD_SYM tm __result;
-	int __error = (__NAMESPACE_LOCAL_SYM __localdep_getdate_r)(__string, &__result);
+	static struct __NAMESPACE_STD_SYM tm __tmbuf = {0};
+	int __error = (__NAMESPACE_LOCAL_SYM __localdep_getdate_r)(__string, &__tmbuf);
 	if (__error == 0)
-		return &__result;
+		return &__tmbuf;
+	/* Caution: this part here is still thread-unsafe! */
 	__LOCAL_getdate_err = __error;
 	return __NULLPTR;
 }

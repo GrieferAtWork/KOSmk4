@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf357f54e */
+/* HASH CRC-32:0xb978fbe8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -242,15 +242,7 @@ NOTHROW_NCX(LIBCCALL libc_mktime)(struct tm *tp) {
 	/* TODO: Support for localtime? */
 	return libc_timegm(tp);
 }
-#ifdef __BUILDING_LIBC
-#ifndef __LIBC_CTIME_BUFFER_DEFINED
-#define __LIBC_CTIME_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__LIBC_CTIME_BUFFER_DEFINED */
-
-#endif /* __BUILDING_LIBC */
+#include "../libc/tls-globals.h"
 /* >> ctime(3), ctime64(3)
  * Equivalent to `asctime(localtime(timer))' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *
@@ -262,17 +254,13 @@ NOTHROW_NCX(LIBCCALL libc_ctime)(time_t const *timer) {
 
 
 
-	return libc_ctime_r(timer, __NAMESPACE_LOCAL_SYM __ctime_buf);
+	char (*const _p_ctime_buf)[26] = &libc_get_tlsglobals()->ltg_ctime_buf;
+#define ctime_buf (*_p_ctime_buf)
+	return libc_ctime_r(timer, ctime_buf);
 
 }
-#ifdef __BUILDING_LIBC
-#ifndef __LIBC_GMTIME_BUFFER_DEFINED
-#define __LIBC_GMTIME_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__gmtime_buf) struct tm __gmtime_buf = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
-#endif /* __BUILDING_LIBC */
+#undef ctime_buf
+#include "../libc/tls-globals.h"
 /* >> gmtime(3), gmtime64(3)
  * Return  the  `struct tm'  representation  of   `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
@@ -285,17 +273,13 @@ NOTHROW_NCX(LIBCCALL libc_gmtime)(time_t const *timer) {
 
 
 
-	return libc_gmtime_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
+	struct tm *const _p_tmbuf = &libc_get_tlsglobals()->ltg_tmbuf;
+#define tmbuf (*_p_tmbuf)
+	return libc_gmtime_r(timer, &tmbuf);
 
 }
-#ifdef __BUILDING_LIBC
-#ifndef __LIBC_GMTIME_BUFFER_DEFINED
-#define __LIBC_GMTIME_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__gmtime_buf) struct tm __gmtime_buf = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
-#endif /* __BUILDING_LIBC */
+#undef tmbuf
+#include "../libc/tls-globals.h"
 /* >> localtime(3), localtime64(3)
  * Return the `struct tm' representation of `*timer' in the local timezone */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED ATTR_IN(1) struct tm *
@@ -307,9 +291,12 @@ NOTHROW_NCX(LIBCCALL libc_localtime)(time_t const *timer) {
 
 
 
-	return libc_localtime_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
+	struct tm *const _p_tmbuf = &libc_get_tlsglobals()->ltg_tmbuf;
+#define tmbuf (*_p_tmbuf)
+	return libc_localtime_r(timer, &tmbuf);
 
 }
+#undef tmbuf
 /* >> strftime(3)
  * Format `tp' into `s' according to `format'.
  * Write no more than `maxsize' characters and return the number
@@ -331,19 +318,17 @@ NOTHROW_NCX(LIBCCALL libc_strftime)(char *__restrict buf,
 	return 0;
 
 }
-#ifndef __LIBC_CTIME_BUFFER_DEFINED
-#define __LIBC_CTIME_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__LIBC_CTIME_BUFFER_DEFINED */
+#include "../libc/tls-globals.h"
 /* >> asctime(3)
  * Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is  the  representation  of  `tp'  in  this  format */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *
 NOTHROW_NCX(LIBCCALL libc_asctime)(struct tm const *tp) {
-	return libc_asctime_r(tp, __NAMESPACE_LOCAL_SYM __ctime_buf);
+	char (*const _p_ctime_buf)[26] = &libc_get_tlsglobals()->ltg_ctime_buf;
+#define ctime_buf (*_p_ctime_buf)
+	return libc_asctime_r(tp, ctime_buf);
 }
+#undef ctime_buf
 #include <libc/errno.h>
 /* >> asctime_s(3) */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_IN(3) ATTR_OUTS(1, 2) errno_t
@@ -387,15 +372,7 @@ NOTHROW_NCX(LIBCCALL libc_mktime64)(struct tm *tp) {
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_ctime64, libc_ctime);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-#if defined(__BUILDING_LIBC) || (!defined(__CRT_HAVE_ctime) && !defined(__CRT_HAVE__ctime32))
-#ifndef __LIBC_CTIME_BUFFER_DEFINED
-#define __LIBC_CTIME_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__LIBC_CTIME_BUFFER_DEFINED */
-
-#endif /* __BUILDING_LIBC || (!__CRT_HAVE_ctime && !__CRT_HAVE__ctime32) */
+#include "../libc/tls-globals.h"
 /* >> ctime(3), ctime64(3)
  * Equivalent to `asctime(localtime(timer))' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *
@@ -404,22 +381,18 @@ NOTHROW_NCX(LIBCCALL libc_ctime64)(time64_t const *timer) {
 
 
 
-	return libc_ctime64_r(timer, __NAMESPACE_LOCAL_SYM __ctime_buf);
+	char (*const _p_ctime_buf)[26] = &libc_get_tlsglobals()->ltg_ctime_buf;
+#define ctime_buf (*_p_ctime_buf)
+	return libc_ctime64_r(timer, ctime_buf);
 
 }
+#undef ctime_buf
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_gmtime64, libc_gmtime);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-#if defined(__BUILDING_LIBC) || (!defined(__CRT_HAVE_gmtime) && !defined(__CRT_HAVE__gmtime32))
-#ifndef __LIBC_GMTIME_BUFFER_DEFINED
-#define __LIBC_GMTIME_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__gmtime_buf) struct tm __gmtime_buf = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
-#endif /* __BUILDING_LIBC || (!__CRT_HAVE_gmtime && !__CRT_HAVE__gmtime32) */
+#include "../libc/tls-globals.h"
 /* >> gmtime(3), gmtime64(3)
  * Return  the  `struct tm'  representation  of   `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
@@ -429,22 +402,18 @@ NOTHROW_NCX(LIBCCALL libc_gmtime64)(time64_t const *timer) {
 
 
 
-	return libc_gmtime64_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
+	struct tm *const _p_tmbuf = &libc_get_tlsglobals()->ltg_tmbuf;
+#define tmbuf (*_p_tmbuf)
+	return libc_gmtime64_r(timer, &tmbuf);
 
 }
+#undef tmbuf
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_localtime64, libc_localtime);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-#if defined(__BUILDING_LIBC) || (!defined(__CRT_HAVE_localtime) && !defined(__CRT_HAVE__localtime32))
-#ifndef __LIBC_GMTIME_BUFFER_DEFINED
-#define __LIBC_GMTIME_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__gmtime_buf) struct tm __gmtime_buf = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
-#endif /* __BUILDING_LIBC || (!__CRT_HAVE_localtime && !__CRT_HAVE__localtime32) */
+#include "../libc/tls-globals.h"
 /* >> localtime(3), localtime64(3)
  * Return the `struct tm' representation of `*timer' in the local timezone */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED ATTR_IN(1) struct tm *
@@ -453,9 +422,12 @@ NOTHROW_NCX(LIBCCALL libc_localtime64)(time64_t const *timer) {
 
 
 
-	return libc_localtime64_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
+	struct tm *const _p_tmbuf = &libc_get_tlsglobals()->ltg_tmbuf;
+#define tmbuf (*_p_tmbuf)
+	return libc_localtime64_r(timer, &tmbuf);
 
 }
+#undef tmbuf
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #ifndef __yearstodays
 #define __yearstodays(n_years) (((146097 * (n_years)) / 400) /*-1*/) /* rounding error? */
@@ -597,6 +569,7 @@ DEFINE_PUBLIC_ALIAS(getdate_err, libc_getdate_err);
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 #include <bits/crt/tm.h>
+#include "../libc/tls-globals.h"
 /* >> getdate(3)
  * Parse the given string as a date specification and return a value
  * representing the value. The templates from the file identified by
@@ -604,13 +577,16 @@ DEFINE_PUBLIC_ALIAS(getdate_err, libc_getdate_err);
  * `getdate_err' is set */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_IN(1) struct tm *
 NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string) {
-	static struct tm result;
-	int error = libc_getdate_r(string, &result);
+	struct tm *const _p_tmbuf = &libc_get_tlsglobals()->ltg_tmbuf;
+#define tmbuf (*_p_tmbuf)
+	int error = libc_getdate_r(string, &tmbuf);
 	if (error == 0)
-		return &result;
+		return &tmbuf;
+	/* Caution: this part here is still thread-unsafe! */
 	__LOCAL_getdate_err = error;
 	return NULL;
 }
+#undef tmbuf
 /* >> strftime_l(3)
  * Similar to `strftime(3)' but take the information from
  * the   provided  locale  and   not  the  global  locale */

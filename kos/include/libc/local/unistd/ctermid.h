@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d0a0694 */
+/* HASH CRC-32:0x334da056 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,14 +40,14 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ctermid) __ATTR_RETNONNULL char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctermid))(char *__s) {
 #ifdef _WIN32
-	static char __buf[4];
+	static char __ctermid_buf[4] = {0};
 	if (__s == __NULLPTR)
-		__s = __buf;
+		__s = __ctermid_buf;
 	return (__NAMESPACE_LOCAL_SYM __localdep_strcpy)(__s, "CON");
 #else /* _WIN32 */
-	static char __buf[9];
+	static char __ctermid_buf[9] = {0};
 	if (__s == __NULLPTR)
-		__s = __buf;
+		__s = __ctermid_buf;
 	return (__NAMESPACE_LOCAL_SYM __localdep_strcpy)(__s, "/dev/tty");
 #endif /* !_WIN32 */
 }

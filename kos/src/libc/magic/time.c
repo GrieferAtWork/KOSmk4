@@ -760,11 +760,6 @@ time_t mktime([[inout]] struct $tm *tp) {
 [[std, wunused, decl_include("<bits/types.h>"), no_crt_self_import, dos_only_export_as("_ctime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("ctime", "_ctime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("ctime64", "_ctime64")]]
-[[impl_prefix(
-@@pp_if defined(__BUILDING_LIBC) || (!$has_function(crt_ctime32) && !$has_function(ctime64))@@
-DEFINE_CTIME_BUFFER
-@@pp_endif@@
-)]]
 [[nonnull]] char *ctime([[in]] time_t const *timer) {
 @@pp_if $has_function(ctime64) && !defined(__BUILDING_LIBC)@@
 	time64_t tm64 = (time64_t)*timer;
@@ -773,19 +768,10 @@ DEFINE_CTIME_BUFFER
 	time32_t tm32 = (time32_t)*timer;
 	return crt_ctime32(&tm32);
 @@pp_else@@
-	return ctime_r(timer, __NAMESPACE_LOCAL_SYM __ctime_buf);
+	@@static char ctime_buf[26] = {0}@@
+	return ctime_r(timer, ctime_buf);
 @@pp_endif@@
 }
-
-
-%[define(DEFINE_GMTIME_BUFFER =
-#ifndef __LIBC_GMTIME_BUFFER_DEFINED
-#define __LIBC_GMTIME_BUFFER_DEFINED 1
-@@push_namespace(local)@@
-__LOCAL_LIBC_DATA(__gmtime_buf) struct tm __gmtime_buf = { 0 };
-@@pop_namespace@@
-#endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
-)]
 
 
 @@>> gmtime(3), gmtime64(3)
@@ -794,11 +780,6 @@ __LOCAL_LIBC_DATA(__gmtime_buf) struct tm __gmtime_buf = { 0 };
 [[std, wunused, decl_include("<bits/types.h>", "<bits/crt/tm.h>"), no_crt_self_import, dos_only_export_as("_gmtime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("gmtime", "_gmtime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("gmtime64", "_gmtime64")]]
-[[impl_prefix(
-@@pp_if defined(__BUILDING_LIBC) || (!$has_function(crt_gmtime32) && !$has_function(gmtime64))@@
-DEFINE_GMTIME_BUFFER
-@@pp_endif@@
-)]]
 [[nonnull]] struct $tm *gmtime([[in]] time_t const *timer) {
 @@pp_if $has_function(gmtime64) && !defined(__BUILDING_LIBC)@@
 	time64_t tm64 = (time64_t)*timer;
@@ -807,7 +788,8 @@ DEFINE_GMTIME_BUFFER
 	time32_t tm32 = (time32_t)*timer;
 	return crt_gmtime32(&tm32);
 @@pp_else@@
-	return gmtime_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
+	@@static struct tm tmbuf = {0}@@
+	return gmtime_r(timer, &tmbuf);
 @@pp_endif@@
 }
 
@@ -817,11 +799,6 @@ DEFINE_GMTIME_BUFFER
 [[std, wunused, decl_include("<bits/types.h>", "<bits/crt/tm.h>"), no_crt_self_import, dos_only_export_as("_localtime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("localtime", "_localtime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("localtime64", "_localtime64")]]
-[[impl_prefix(
-@@pp_if defined(__BUILDING_LIBC) || (!$has_function(crt_localtime32) && !$has_function(localtime64))@@
-DEFINE_GMTIME_BUFFER
-@@pp_endif@@
-)]]
 [[nonnull]] struct $tm *localtime([[in]] time_t const *timer) {
 @@pp_if $has_function(localtime64) && !defined(__BUILDING_LIBC)@@
 	time64_t tm64 = (time64_t)*timer;
@@ -830,7 +807,8 @@ DEFINE_GMTIME_BUFFER
 	time32_t tm32 = (time32_t)*timer;
 	return crt_localtime32(&tm32);
 @@pp_else@@
-	return localtime_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
+	@@static struct tm tmbuf = {0}@@
+	return localtime_r(timer, &tmbuf);
 @@pp_endif@@
 }
 
@@ -864,22 +842,13 @@ size_t strftime([[out(? <= bufsize)]] char *__restrict buf, size_t bufsize,
 @@pp_endif@@
 }
 
-%[define(DEFINE_CTIME_BUFFER =
-@@pp_ifndef __LIBC_CTIME_BUFFER_DEFINED@@
-#define __LIBC_CTIME_BUFFER_DEFINED 1
-@@push_namespace(local)@@
-__LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
-@@pop_namespace@@
-@@pp_endif@@
-)]
-
 @@>> asctime(3)
 @@Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
 @@that is  the  representation  of  `tp'  in  this  format
-[[std, wunused, impl_prefix(DEFINE_CTIME_BUFFER)]]
-[[decl_include("<bits/crt/tm.h>")]]
+[[std, wunused, decl_include("<bits/crt/tm.h>")]]
 [[nonnull]] char *asctime([[in]] struct $tm const *tp) {
-	return asctime_r(tp, __NAMESPACE_LOCAL_SYM __ctime_buf);
+	@@static char ctime_buf[26] = {0}@@
+	return asctime_r(tp, ctime_buf);
 }
 
 %(std)#ifdef __USE_ISOC11
@@ -938,50 +907,41 @@ $time64_t mktime64([[inout]] struct $tm *tp) {
 
 [[decl_include("<bits/types.h>")]]
 [[preferred_time64_variant_of(ctime), doc_alias("ctime")]]
-[[impl_prefix(
-@@pp_if defined(__BUILDING_LIBC) || !$has_function(crt_ctime32)@@
-DEFINE_CTIME_BUFFER
-@@pp_endif@@
-), wunused, dos_only_export_alias("_ctime64")]]
+[[wunused, dos_only_export_alias("_ctime64")]]
 [[nonnull]] char *ctime64([[in]] $time64_t const *timer) {
 @@pp_if $has_function(crt_ctime32) && !defined(__BUILDING_LIBC)@@
 	time32_t tm32 = (time32_t)*timer;
 	return crt_ctime32(&tm32);
 @@pp_else@@
-	return ctime64_r(timer, __NAMESPACE_LOCAL_SYM __ctime_buf);
+	@@static char ctime_buf[26] = {0}@@
+	return ctime64_r(timer, ctime_buf);
 @@pp_endif@@
 }
 
 [[decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
 [[preferred_time64_variant_of(gmtime), doc_alias("gmtime")]]
-[[impl_prefix(
-@@pp_if defined(__BUILDING_LIBC) || !$has_function(crt_gmtime32)@@
-DEFINE_GMTIME_BUFFER
-@@pp_endif@@
-), wunused, dos_only_export_alias("_gmtime64")]]
+[[wunused, dos_only_export_alias("_gmtime64")]]
 [[nonnull]] struct $tm *gmtime64([[in]] $time64_t const *timer) {
 @@pp_if $has_function(crt_gmtime32) && !defined(__BUILDING_LIBC)@@
 	time32_t tm32 = (time32_t)*timer;
 	return crt_gmtime32(&tm32);
 @@pp_else@@
-	return gmtime64_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
+	@@static struct tm tmbuf = {0}@@
+	return gmtime64_r(timer, &tmbuf);
 @@pp_endif@@
 }
 
 
 [[decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
 [[preferred_time64_variant_of(localtime), doc_alias("localtime")]]
-[[impl_prefix(
-@@pp_if defined(__BUILDING_LIBC) || !$has_function(crt_localtime32)@@
-DEFINE_GMTIME_BUFFER
-@@pp_endif@@
-), wunused, dos_only_export_alias("_localtime64")]]
+[[wunused, dos_only_export_alias("_localtime64")]]
 [[nonnull]] struct $tm *localtime64([[in]] $time64_t const *timer) {
 @@pp_if $has_function(crt_localtime32) && !defined(__BUILDING_LIBC)@@
 	time32_t tm32 = (time32_t)*timer;
 	return crt_localtime32(&tm32);
 @@pp_else@@
-	return localtime64_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
+	@@static struct tm tmbuf = {0}@@
+	return localtime64_r(timer, &tmbuf);
 @@pp_endif@@
 }
 
@@ -1869,10 +1829,11 @@ DEFINE_PUBLIC_ALIAS(getdate_err, libc_getdate_err);
 [[requires($has_function(getdate_r) && defined(__LOCAL_getdate_err))]]
 [[impl_include("<bits/crt/tm.h>")]]
 struct $tm *getdate([[in]] const char *string) {
-	static struct tm result;
-	int error = getdate_r(string, &result);
+	@@static struct tm tmbuf = {0}@@
+	int error = getdate_r(string, &tmbuf);
 	if (error == 0)
-		return &result;
+		return &tmbuf;
+	/* Caution: this part here is still thread-unsafe! */
 	__LOCAL_getdate_err = error;
 	return NULL;
 }

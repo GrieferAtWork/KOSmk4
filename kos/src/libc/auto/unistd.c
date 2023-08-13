@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59caefba */
+/* HASH CRC-32:0x4859fbe5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -296,8 +296,9 @@ NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file,
  * Return the name of a TTY given its file descriptor */
 INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED ATTR_FDARG(1) char *
 NOTHROW_RPC(LIBCCALL libc_ttyname)(fd_t fd) {
-	/* Buffer is typed as `void *' because it's re-used for `wttyname()' */
-	void **_p_ttyname_buf = &libc_get_tlsglobals()->ltg_ttyname_buf;
+
+	/* Buffer is typed as `void *' so it can be re-used for `wttyname(3)' */
+	void **const _p_ttyname_buf = &libc_get_tlsglobals()->ltg_ttyname_buf;
 #define ttyname_buf (*_p_ttyname_buf)
 	errno_t error;
 
@@ -320,6 +321,8 @@ again:
 	if likely(error == 0) {
 		/* Trim unused memory (if a certain threshold is exceeded) */
 		size_t retlen = libc_strlen((char *)ttyname_buf) + 1;
+		if (retlen < 32)
+			retlen = 32; /* Retain minimal buffer size */
 		if likely((retlen + 32) < bufsize) {
 			void *retbuf = libc_realloc(ttyname_buf, retlen * sizeof(char));
 			if likely(retbuf)
@@ -338,8 +341,18 @@ again:
 		goto again;
 	}
 
+
+	libc_free(ttyname_buf);
+	ttyname_buf = NULL;
+
 err:
 	return NULL;
+
+
+
+
+
+
 }
 #undef ttyname_buf
 #include <bits/types.h>
@@ -1228,13 +1241,27 @@ NOTHROW_RPC(LIBCCALL libc_daemon)(int nochdir,
 	return error;
 }
 #include <asm/crt/readpassphrase.h>
+#include "../libc/tls-globals.h"
 /* >> getpass(3), getpassphrase(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED char *
 NOTHROW_RPC(LIBCCALL libc_getpass)(char const *__restrict prompt) {
-	static char buf[257]; /* `getpassphrase()' requires passwords at least this long! */
-//	static char buf[129]; /* 129 == _PASSWORD_LEN + 1 */
-	return libc_getpass_r(prompt, buf, sizeof(buf));
+
+	char **const _p_getpass_buf = &libc_get_tlsglobals()->ltg_getpass_buf;
+#define getpass_buf (*_p_getpass_buf)
+	if (!getpass_buf) {
+		/* Lazily allocate buffer. */
+		getpass_buf = (char *)libc_malloc(257 * sizeof(char)); /* `getpassphrase()' requires passwords at least this long! */
+//		getpass_buf = (char *)malloc(129 * sizeof(char)); /* 129 == _PASSWORD_LEN + 1 */
+		if unlikely(!getpass_buf)
+			return NULL;
+	}
+
+
+
+
+	return libc_getpass_r(prompt, getpass_buf, 257);
 }
+#undef getpass_buf
 /* >> swab(3)
  * Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
@@ -1252,6 +1279,7 @@ NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from,
 		((byte_t *)to)[n_bytes+1] = b;
 	}
 }
+#include "../libc/tls-globals.h"
 /* >> ctermid(3)
  * Writes the string "/dev/tty" to `s', or returns a pointer to
  * a writable  data location  that contains  that same  string. */
@@ -1263,34 +1291,102 @@ NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s) {
 
 
 
-	static char buf[9];
+	char (*const _p_ctermid_buf)[9] = &libc_get_tlsglobals()->ltg_ctermid_buf;
+#define ctermid_buf (*_p_ctermid_buf)
 	if (s == NULL)
-		s = buf;
+		s = ctermid_buf;
 	return libc_strcpy(s, "/dev/tty");
 
 }
+#undef ctermid_buf
 #include <asm/crt/stdio.h>
+#include "../libc/tls-globals.h"
 /* >> cuserid(3)
- * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
- * that  name  in  `s'.  When  `s'  is   NULL,  a  static  buffer  is  used   instead
- * When  given,   `s'   must  be   a   buffer   of  at   least   `L_cuserid'   bytes.
- * If the actual  username is longer  than this,  it may be  truncated, and  programs
- * that wish to support longer usernames  should make use of `getlogin_r()'  instead.
+ * Return the name of the current user (`$LOGNAME' or  `getpwuid(geteuid())'),
+ * storing that name in `s'. When `s' is NULL, a static buffer is used instead
+ * When given, `s' must be a buffer of at least `L_cuserid' bytes.
+ *
+ * If the actual username is  longer than this, it  may be truncated, and  programs
+ * that wish to support longer usernames should make use of `getlogin_r()' instead.
  * s.a. `getlogin()' and `getlogin_r()' */
 INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_OUT_OPT(1) char *
 NOTHROW_NCX(LIBCCALL libc_cuserid)(char *s) {
+
 #ifdef __L_cuserid
-	static char cuserid_buffer[__L_cuserid];
-	if (!s)
-		s = cuserid_buffer;
-	return libc_getlogin_r(s, __L_cuserid) ? NULL : s;
+#define LOCAL___L_cuserid __L_cuserid
 #else /* __L_cuserid */
-	static char cuserid_buffer[9];
-	if (!s)
-		s = cuserid_buffer;
-	return libc_getlogin_r(s, 9) ? NULL : s;
+#define LOCAL___L_cuserid 9
 #endif /* !__L_cuserid */
+	/* Buffer is typed as `void *' so it can be re-used for `wcuserid(3)' */
+	void **const _p_cuserid_buf = &libc_get_tlsglobals()->ltg_cuserid_buf;
+#define cuserid_buf (*_p_cuserid_buf)
+	errno_t error;
+	size_t bufsize;
+
+	/* Special case for when the caller is providing the buffer. */
+	if (s != NULL)
+		return libc_getlogin_r(s, LOCAL___L_cuserid) ? NULL : s;
+
+	/* Use the TLS buffer. */
+
+	bufsize = libc_malloc_usable_size(cuserid_buf) / sizeof(char);
+
+
+
+	if (bufsize < LOCAL___L_cuserid) {
+		void *newbuf;
+		bufsize = LOCAL___L_cuserid;
+		newbuf  = libc_realloc(cuserid_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		cuserid_buf = newbuf;
+	}
+
+again:
+
+	error = libc_getlogin_r((char *)cuserid_buf, bufsize);
+	if likely(error == 0) {
+		/* Trim unused memory (if a certain threshold is exceeded) */
+		size_t retlen = libc_strlen((char *)cuserid_buf) + 1;
+		if (retlen < LOCAL___L_cuserid)
+			retlen = LOCAL___L_cuserid; /* Retain minimal buffer size */
+		if likely((retlen + 32) < bufsize) {
+			void *retbuf = libc_realloc(cuserid_buf, retlen * sizeof(char));
+			if likely(retbuf)
+				cuserid_buf = retbuf;
+		}
+		return (char *)cuserid_buf;
+	}
+
+	if (error == ERANGE && bufsize < 1024) {
+		void *newbuf;
+		bufsize *= 2;
+		newbuf = libc_realloc(cuserid_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		cuserid_buf = newbuf;
+		goto again;
+	}
+
+
+	libc_free(cuserid_buf);
+	cuserid_buf = NULL;
+
+err:
+	return NULL;
+#undef LOCAL___L_cuserid
+
+
+
+
+
+
+
+
+
+
 }
+#undef cuserid_buf
 #include <bits/types.h>
 #include <asm/os/stdio.h>
 #include <asm/os/oflags.h>

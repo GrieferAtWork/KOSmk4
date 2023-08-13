@@ -860,11 +860,12 @@ $longptr_t fpathconf([[fdarg]] $fd_t fd, __STDC_INT_AS_UINT_T name);
 @@>> ttyname(3)
 @@Return the name of a TTY given its file descriptor
 [[guard, cp, wunused, decl_include("<bits/types.h>")]]
-[[export_alias("__ttyname"), requires_function(realloc, ttyname_r)]]
+[[export_alias("__ttyname"), requires_function(ttyname_r)]]
 [[impl_include("<asm/os/errno.h>")]]
 [[section(".text.crt{|.dos}.io.tty")]]
 char *ttyname([[fdarg]] $fd_t fd) {
-	/* Buffer is typed as `void *' because it's re-used for `wttyname()' */
+@@pp_if $has_function(realloc)@@
+	/* Buffer is typed as `void *' so it can be re-used for `wttyname(3)' */
 	@@static void *ttyname_buf; [fini: free(ttyname_buf)]@@
 	errno_t error;
 @@pp_if $has_function(malloc_usable_size)@@
@@ -887,6 +888,8 @@ again:
 	if likely(error == 0) {
 		/* Trim unused memory (if a certain threshold is exceeded) */
 		size_t retlen = strlen((char *)ttyname_buf) + 1;
+		if (retlen < 32)
+			retlen = 32; /* Retain minimal buffer size */
 		if likely((retlen + 32) < bufsize) {
 			void *retbuf = realloc(ttyname_buf, retlen * sizeof(char));
 			if likely(retbuf)
@@ -905,8 +908,18 @@ again:
 		goto again;
 	}
 @@pp_endif@@
+@@pp_if $has_function(free)@@
+	free(ttyname_buf);
+	ttyname_buf = NULL;
+@@pp_endif@@
 err:
 	return NULL;
+@@pp_else@@
+	static char ttyname_buf[32];
+	if likely(ttyname_r(fd, ttyname_buf, COMPILER_LENOF(ttyname_buf)) == 0)
+		return ttyname_buf;
+	return NULL;
+@@pp_endif@@
 }
 
 @@>> ttyname_r(3)
@@ -3006,9 +3019,20 @@ int chroot([[in]] char const *__restrict path);
 [[impl_include("<asm/crt/readpassphrase.h>")]]
 [[section(".text.crt{|.dos}.io.tty")]]
 char *getpass([[nullable]] char const *__restrict prompt) {
-	static char buf[257]; /* `getpassphrase()' requires passwords at least this long! */
-//	static char buf[129]; /* 129 == _PASSWORD_LEN + 1 */
-	return getpass_r(prompt, buf, sizeof(buf));
+@@pp_if $has_function(malloc)@@
+	@@static char *getpass_buf = NULL; [fini: free(getpass_buf)]@@
+	if (!getpass_buf) {
+		/* Lazily allocate buffer. */
+		getpass_buf = (char *)malloc(257 * sizeof(char)); /* `getpassphrase()' requires passwords at least this long! */
+//		getpass_buf = (char *)malloc(129 * sizeof(char)); /* 129 == _PASSWORD_LEN + 1 */
+		if unlikely(!getpass_buf)
+			return NULL;
+	}
+@@pp_else@@
+	static char getpass_buf[257]; /* `getpassphrase()' requires passwords at least this long! */
+//	static char getpass_buf[129]; /* 129 == _PASSWORD_LEN + 1 */
+@@pp_endif@@
+	return getpass_r(prompt, getpass_buf, 257);
 }
 %#endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
 
@@ -3118,39 +3142,102 @@ void swab([[in(n_bytes)]] void const *__restrict from,
 [[section(".text.crt{|.dos}.io.tty")]]
 char *ctermid([[nullable]] char *s) {
 @@pp_ifdef _WIN32@@
-	static char buf[4];
+	static char ctermid_buf[4] = {0};
 	if (s == NULL)
-		s = buf;
+		s = ctermid_buf;
 	return strcpy(s, "CON");
 @@pp_else@@
-	static char buf[9];
+	@@static char ctermid_buf[9] = {0}@@
 	if (s == NULL)
-		s = buf;
+		s = ctermid_buf;
 	return strcpy(s, "/dev/tty");
 @@pp_endif@@
 }
 
 @@>> cuserid(3)
-@@Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
-@@that  name  in  `s'.  When  `s'  is   NULL,  a  static  buffer  is  used   instead
-@@When  given,   `s'   must  be   a   buffer   of  at   least   `L_cuserid'   bytes.
-@@If the actual  username is longer  than this,  it may be  truncated, and  programs
-@@that wish to support longer usernames  should make use of `getlogin_r()'  instead.
+@@Return the name of the current user (`$LOGNAME' or  `getpwuid(geteuid())'),
+@@storing that name in `s'. When `s' is NULL, a static buffer is used instead
+@@When given, `s' must be a buffer of at least `L_cuserid' bytes.
+@@
+@@If the actual username is  longer than this, it  may be truncated, and  programs
+@@that wish to support longer usernames should make use of `getlogin_r()' instead.
 @@s.a. `getlogin()' and `getlogin_r()'
 [[guard, requires_function(getlogin_r)]]
 [[impl_include("<asm/crt/stdio.h>")]] /* __L_cuserid */
 [[section(".text.crt{|.dos}.io.tty")]]
 char *cuserid([[out_opt]] char *s) {
+@@pp_if $has_function(realloc)@@
+@@pp_ifdef __L_cuserid@@
+#define LOCAL___L_cuserid __L_cuserid
+@@pp_else@@
+#define LOCAL___L_cuserid 9
+@@pp_endif@@
+	/* Buffer is typed as `void *' so it can be re-used for `wcuserid(3)' */
+	@@static void *cuserid_buf; [fini: free(cuserid_buf)]@@
+	errno_t error;
+	size_t bufsize;
+
+	/* Special case for when the caller is providing the buffer. */
+	if (s != NULL)
+		return getlogin_r(s, LOCAL___L_cuserid) ? NULL : s;
+
+	/* Use the TLS buffer. */
+@@pp_if $has_function(malloc_usable_size)@@
+	bufsize = malloc_usable_size(cuserid_buf) / sizeof(char);
+@@pp_else@@
+	bufsize = cuserid_buf ? LOCAL___L_cuserid : 0;
+@@pp_endif@@
+	if (bufsize < LOCAL___L_cuserid) {
+		void *newbuf;
+		bufsize = LOCAL___L_cuserid;
+		newbuf  = realloc(cuserid_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		cuserid_buf = newbuf;
+	}
+@@pp_ifdef ERANGE@@
+again:
+@@pp_endif@@
+	error = getlogin_r((char *)cuserid_buf, bufsize);
+	if likely(error == 0) {
+		/* Trim unused memory (if a certain threshold is exceeded) */
+		size_t retlen = strlen((char *)cuserid_buf) + 1;
+		if (retlen < LOCAL___L_cuserid)
+			retlen = LOCAL___L_cuserid; /* Retain minimal buffer size */
+		if likely((retlen + 32) < bufsize) {
+			void *retbuf = realloc(cuserid_buf, retlen * sizeof(char));
+			if likely(retbuf)
+				cuserid_buf = retbuf;
+		}
+		return (char *)cuserid_buf;
+	}
+@@pp_ifdef ERANGE@@
+	if (error == ERANGE && bufsize < 1024) {
+		void *newbuf;
+		bufsize *= 2;
+		newbuf = realloc(cuserid_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		cuserid_buf = newbuf;
+		goto again;
+	}
+@@pp_endif@@
+@@pp_if $has_function(free)@@
+	free(cuserid_buf);
+	cuserid_buf = NULL;
+@@pp_endif@@
+err:
+	return NULL;
+#undef LOCAL___L_cuserid
+@@pp_else@@
 @@pp_ifdef __L_cuserid@@
 	static char cuserid_buffer[__L_cuserid];
-	if (!s)
-		s = cuserid_buffer;
-	return getlogin_r(s, __L_cuserid) ? NULL : s;
 @@pp_else@@
 	static char cuserid_buffer[9];
-	if (!s)
+@@pp_endif@@
+	if (s == NULL)
 		s = cuserid_buffer;
-	return getlogin_r(s, 9) ? NULL : s;
+	return getlogin_r(s, sizeof(cuserid_buffer)) ? NULL : s;
 @@pp_endif@@
 }
 %#endif /* _EVERY_SOURCE || __USE_SOLARIS || (__USE_XOPEN && !__USE_XOPEN2K) */

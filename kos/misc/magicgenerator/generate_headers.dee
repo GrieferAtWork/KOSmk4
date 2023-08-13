@@ -702,7 +702,7 @@ function doPrint_src_libc_libc_tlsGlobalsH() {
 	local final END_MARKER   = "/*[[[end:libc_tlsglobals]]]*/";
 	printMessage(f"Updating tls-globals: {repr TLS_GLOBALS_FILENAME} (begin)");
 	local symbols: {TlsGlobal...} = List(tlsGlobals.values);
-	symbols.sort(x -> (x.typeBefore, x.typeAfter, x.name));
+	symbols.sort(TlsGlobal.sortKey);
 	local oldData = File.open(TLS_GLOBALS_FILENAME, "rb").read();
 	local data = oldData.decode("utf-8").unifylines();
 
@@ -761,7 +761,7 @@ function doPrint_src_libc_libc_tlsGlobalsC() {
 	local final END_MARKER   = "/*[[[end:libc_fini_tlsglobals]]]*/";
 	printMessage(f"Updating tls-globals finalizers: {repr TLS_GLOBALS_FILENAME} (begin)");
 	local symbols: {TlsGlobal...} = List(tlsGlobals.values);
-	symbols.sort(x -> (x.typeBefore, x.typeAfter, x.name));
+	symbols.sort(TlsGlobal.sortKey);
 	local oldData = File.open(TLS_GLOBALS_FILENAME, "rb").read();
 	local data = oldData.decode("utf-8").unifylines();
 

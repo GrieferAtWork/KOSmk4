@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa58dc01e */
+/* HASH CRC-32:0xcc241ae9 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -438,7 +438,7 @@ NOTHROW_NCX(LIBCCALL libc_strpbrk)(char const *haystack,
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_IN(2) ATTR_INOUT_OPT(1) char *
 NOTHROW_NCX(LIBCCALL libc_strtok)(char *str,
                                   char const *delim) {
-	char **_p_strtok_save_ptr = &libc_get_tlsglobals()->ltg_strtok_save_ptr;
+	char **const _p_strtok_save_ptr = &libc_get_tlsglobals()->ltg_strtok_save_ptr;
 #define strtok_save_ptr (*_p_strtok_save_ptr)
 	return libc_strtok_r(str, delim, &strtok_save_ptr);
 }
