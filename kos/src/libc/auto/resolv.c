@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x298709bd */
+/* HASH CRC-32:0xe9d0491e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,6 @@
 #include <kos/types.h>
 #include "../user/resolv.h"
 #include "../user/arpa.nameser.h"
-#include "error.h"
 #include "../user/stdio.h"
 #include "string.h"
 

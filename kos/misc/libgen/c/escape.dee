@@ -1679,6 +1679,44 @@ with_next_token:
 					} while (tok !in ["", "@@"]);
 					break;
 
+				case "#":
+					tok = parser.next();
+					switch (tok) {
+
+					case "import":
+					case "include":
+					case "include_next":
+					case "error":
+					case "warning":
+					case "line": {
+						/* Don't treat anything on this line as a dependency! */
+						local eol = parser.text.find("\n", parser.tokEnd);
+						if (eol < 0)
+							eol = parser.end;
+						parser.tokEnd = eol;
+					}	break;
+
+					case "define": {
+						/* Don't check the macro name (or its argument list) for dependencies */
+						tok = parser.next();
+						if (parser.tokEnd < parser.end &&
+						    parser.text[parser.tokEnd] == "(") {
+							local endOfArgs = parser.text.findmatch("(", ")", parser.tokEnd + 1);
+							if (endOfArgs < 0) {
+								endOfArgs = parser.end;
+							} else {
+								++endOfArgs;
+							}
+							parser.tokEnd = endOfArgs;
+						}
+						goto next_token;
+					}	break;
+
+					default:
+						break;
+					}
+					goto next_token;
+
 				default:
 					break;
 				}
