@@ -37,8 +37,11 @@ DECL_BEGIN
 __NAMESPACE_STD_USING(tm)
 #endif /* !__tm_defined */
 
+struct re_code;
+
 /* clang-format off */
 struct libc_tlsglobals {
+	struct re_code *ltg_re_comp_buffer; /* [0..1] The static buffer used by `re_comp(3)' and `re_exec(3)' */
 /*[[[begin:libc_tlsglobals]]]*/
 	char     *ltg_getpass_buf;
 	char     *ltg_strtok_save_ptr;

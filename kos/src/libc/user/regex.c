@@ -43,6 +43,7 @@
 
 #include "../libc/dl.h"
 #include "../libc/globals.h"
+#include "../libc/tls-globals.h"
 #include "regex.h"
 
 DECL_BEGIN
@@ -811,10 +812,6 @@ NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict self,
 /*[[[end:libc_regexec]]]*/
 
 
-/* The static buffer used by `re_comp(3)' and `re_exec(3)' */
-PRIVATE ATTR_SECTION(".bss.crt.compat.glibc.regex")
-struct re_code *libc_re_comp_buffer = NULL;
-
 PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc.regex")
 char const libc_re_comp_no_pattern_errmsg[] = "No previous regular expression";
 
@@ -834,6 +831,8 @@ INTERN ATTR_SECTION(".text.crt.compat.glibc.regex") char __KOS_FIXED_CONST *
 NOTHROW_NCX(LIBCCALL libc_re_comp)(char const *pattern)
 /*[[[body:libc_re_comp]]]*/
 {
+	struct re_code **const _p_libc_re_comp_buffer = &libc_get_tlsglobals()->ltg_re_comp_buffer;
+#define libc_re_comp_buffer (*_p_libc_re_comp_buffer)
 	re_errno_t error;
 	struct re_code *oldpat;
 	struct re_compiler comp;
@@ -863,6 +862,7 @@ NOTHROW_NCX(LIBCCALL libc_re_comp)(char const *pattern)
 
 	/* Indicate no-error. */
 	return NULL;
+#undef libc_re_comp_buffer
 }
 /*[[[end:libc_re_comp]]]*/
 
@@ -888,6 +888,8 @@ INTERN ATTR_SECTION(".text.crt.compat.glibc.regex") ATTR_PURE WUNUSED NONNULL((1
 NOTHROW_NCX(LIBCCALL libc_re_exec)(char const *string)
 /*[[[body:libc_re_exec]]]*/
 {
+	struct re_code **const _p_libc_re_comp_buffer = &libc_get_tlsglobals()->ltg_re_comp_buffer;
+#define libc_re_comp_buffer (*_p_libc_re_comp_buffer)
 	size_t len;
 	struct re_exec exec;
 	struct iovec iov[1];
@@ -921,6 +923,7 @@ NOTHROW_NCX(LIBCCALL libc_re_exec)(char const *string)
 
 	/* Return indicative of a match having happened somewhere */
 	return status >= 0 ? 1 : 0;
+#undef libc_re_comp_buffer
 }
 /*[[[end:libc_re_exec]]]*/
 

@@ -106,6 +106,7 @@ NOTHROW(LIBCCALL libc_get_tlsglobals)(void) {
 /* Finalize `self' (called when a pthread is destroyed, but not called for the main thread) */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) void
 NOTHROW(LIBCCALL libc_fini_tlsglobals)(struct libc_tlsglobals *__restrict self) {
+	free(self->ltg_re_comp_buffer);
 /*[[[begin:libc_fini_tlsglobals]]]*/
 	free(self->ltg_getpass_buf);
 	free(self->ltg_cuserid_buf);
