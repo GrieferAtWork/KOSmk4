@@ -24,13 +24,19 @@
 /**/
 
 #include "dl.h"
+#include "globals.h"
 #include "tls-globals.h"
 #include "tls.h"
 /**/
 
+#include <err.h>
+#include <inttypes.h>
 #include <malloc.h>
 #include <pthread.h>
+#include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 DECL_BEGIN
 
@@ -64,6 +70,13 @@ NOTHROW(LIBCCALL abort_tls_globals_alloc_failed)(void) {
 	*(void **)&handler = dlsym(RTLD_DEFAULT, "__libc_tls_globals_alloc_failed");
 	if (handler != NULL)
 		(*handler)();
+
+	/* Fallback: print an error message and exit. */
+	(void)fprintf(stderr, "%1$s: failed to allocate tls-globals for thread %2$" PRIdN(__SIZEOF_PID_T__) "\n"
+	                      "%1$s: to suppress this error, re-run with `LIBC_TLS_GLOBALS_ALLOW_UNSAFE=1'\n",
+	              program_invocation_short_name, gettid());
+	(void)fflush(stderr);
+	(void)raise(SIGABRT);
 	abort();
 }
 
@@ -90,7 +103,7 @@ NOTHROW(LIBCCALL libc_get_tlsglobals)(void) {
 	return result;
 }
 
-/* Finalize `self' (called when a pthread exits, but not called for the main thread) */
+/* Finalize `self' (called when a pthread is destroyed, but not called for the main thread) */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) void
 NOTHROW(LIBCCALL libc_fini_tlsglobals)(struct libc_tlsglobals *__restrict self) {
 /*[[[begin:libc_fini_tlsglobals]]]*/

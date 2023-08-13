@@ -59,7 +59,7 @@ struct libc_tlsglobals {
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct libc_tlsglobals *
 NOTHROW(LIBCCALL libc_get_tlsglobals)(void);
 
-/* Finalize `self' (called when a pthread exits, but not called for the main thread) */
+/* Finalize `self' (called when a pthread is destroyed, but not called for the main thread) */
 INTDEF NONNULL((1)) void
 NOTHROW(LIBCCALL libc_fini_tlsglobals)(struct libc_tlsglobals *__restrict self);
 
