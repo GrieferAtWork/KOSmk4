@@ -9,6 +9,12 @@ This section documents how KOS's libc can be (re-)configured by hosted programs 
 	- If defined, this callback is invoked when libc fails to allocate memory for TLS globals of a thread other than the main thread, and unsafe fallbacks are not enabled (s.a. `$LIBC_TLS_GLOBALS_ALLOW_UNSAFE`)
 - `extern int __libc_tls_globals_alloc_failed;`
 	- If defined with a non-zero value, and `$LIBC_TLS_GLOBALS_ALLOW_UNSAFE` is not set, still enable unsafe tls globals fallbacks (s.a. environment option: `$LIBC_TLS_GLOBALS_ALLOW_UNSAFE`)
+- `extern int matherr(struct exception *exc);`
+	- If defined, this function is called when errors arise in certain functions from `<math.h>`
+	- The passed `struct exception` is defined in `<math.h>`, and under c++ becomes `struct __exception`
+- `extern _LIB_VERSION_TYPE _LIB_VERSION;`
+	- If defined, this global can be used to select implementation-specific quirks of functions from `<math.h>`
+	- The enum type `_LIB_VERSION_TYPE` is defined in `<math.h>`, as are the possible values it may take, one of which needs to be used to initialize this variable when the main program wishes to override it.
 
 
 
@@ -16,7 +22,7 @@ This section documents how KOS's libc can be (re-)configured by hosted programs 
 
 - `$LIBC_TLS_GLOBALS_ALLOW_UNSAFE` (...)
 	- When define as non-empty, failure to allocate memory for TLS globals (e.g. `strtok(3)`'s internal buffer) in threads other than the main thread is handled fail-safe (but thread-unsafe) by simply re-using the main thread's TLS globals descriptor within the secondary thread.
-	- In the absence of this environment variable (i.e. if not defined, as opposed to define as an empty string), the same behavior is also be enabled when the hosted program exports a global variable `PUBLIC int __libc_tls_globals_allow_unsafe = 1;`
+	- In the absence of this environment variable (i.e. if not defined, as opposed to defined as an empty string), the same behavior is also be enabled when the hosted program exports a global variable `PUBLIC int __libc_tls_globals_allow_unsafe = 1;`
 - `$POSIXLY_CORRECT` (`getopt(3)`)
 	- Force posix-correct behavior for `getopt(3)`. This causes `getopt(3)` to *not* permutate program arguments, which normally allows mixing of options and arguments.
 	- This causes `ls /bin -l` to behave:
@@ -42,10 +48,10 @@ This section documents how KOS's libc can be (re-)configured by hosted programs 
 		- `$LC_*` (if defined, where the name of the environment variable matches the name of `category`)
 		- `$LANG` (if defined)
 		- otherwise: don't perform i18n translations
-	- When setting these variable programmatically, it is recommended to always set `$LANG` and never set `$LANGUAGE`, thus allowing a user to override defaults by simply setting `$LANGUAGE` themselves.
+	- When setting these variables programmatically, it is recommended to always set `$LANG` and never set `$LANGUAGE`, thus allowing a user to override defaults by simply setting `$LANGUAGE` themselves.
 - `$IFS` (`wordexp(3)`)
 	- List of "InputFieldSeparators" that can be used to specify which characters should be capable of separating arguments from each other during word expansion
-	- If not set, this defaults to `" \t\n\r"`, which differs from the unix default where `"\r"` is not part of this set. The reason for this is that KOS's libc is aware of universal line feeds, meaning it supports both `\n`, `\r` and `\r\n` everywhere.
+	- If not set, this defaults to `" \t\n\r"`, which differs from the traditional unix default where `"\r"` is not part of this set. The reason for this is that KOS's libc is aware of universal line feeds, meaning it supports both `\n`, `\r` and `\r\n` everywhere.
 - `$HOME`, `$PWD`, `$OLDPWD` (`wordexp(3)`)
 	- Used for expansion of `~`, `~+` and `~-` in `wordexp(3)`
 

@@ -122,7 +122,7 @@ struct iofile_data_novtab {
 	uintptr_t                      io_zero;   /* Always ZERO(0). - Required for binary compatibility with DOS. */
 	__WEAK refcnt_t                io_refcnt; /* Reference counter. */
 	char                          *io_getln;  /* [0..1] malloc'd buffer for `fgetln(3)' (no lock, because
-	                                           * only  used by `fgetln()' which already is thread-unsafe) */
+	                                           * only used by `fgetln()', which is already thread-unsafe) */
 	struct shared_recursive_rwlock io_lock;   /* Lock for the file. */
 	byte_t                        *io_chng;   /* [>= :if_base][+io_chsz <= :if_base + :if_bufsiz]
 	                                           * [valid_if(io_chsz != 0)][lock(io_lock)]
@@ -152,6 +152,7 @@ struct iofile_data_novtab {
 		.io_mbs    = MBSTATE_INIT                    \
 	}
 
+/* Prototypes for the *actual* low-level callbacks that can be hooked for FILE I/O */
 typedef ssize_t (LIBKCALL *__funopen2_readfn_t)(void *cookie, void *buf, size_t num_bytes);
 typedef ssize_t (LIBKCALL *__funopen2_writefn_t)(void *cookie, void const *buf, size_t num_bytes);
 typedef off_t (LIBKCALL *__funopen2_seekfn_t)(void *cookie, off_t off, int whence);
@@ -175,7 +176,8 @@ struct iofile_data: iofile_data_novtab {
 #define FSETERROR(self) ((self)->if_flag |= IO_ERR)
 #define FCLEARERR(self) ((self)->if_flag &= ~(IO_ERR | IO_EOF))
 #ifdef IO_NOLOCK
-#define FMUSTLOCK(self) (!((self)->if_flag & IO_NOLOCK))
+/* likely since it's the default, and few programs bother to change it */
+#define FMUSTLOCK(self) likely(!((self)->if_flag & IO_NOLOCK))
 #else /* IO_NOLOCK */
 #define FMUSTLOCK(self) 1
 #endif /* !IO_NOLOCK */
