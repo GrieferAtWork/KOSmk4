@@ -69,7 +69,8 @@ INTERN ATTR_THREAD struct pthread current = {
 		.ei_nesting = 0,
 	},
 	.pt_errno_kind  = LIBC_ERRNO_KIND_KOS,
-	.pt_errno_value = EOK
+	.pt_errno_value = EOK,
+	.pt_tglobals    = NULL
 };
 
 

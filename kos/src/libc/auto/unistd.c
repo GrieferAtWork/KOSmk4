@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c5f5995 */
+/* HASH CRC-32:0x59caefba */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 #include "../user/ctype.h"
 #include "../user/dirent.h"
 #include "../user/fcntl.h"
+#include "../user/malloc.h"
 #include "../user/pwd.h"
 #include "readpassphrase.h"
 #include "../user/signal.h"
@@ -289,15 +290,58 @@ NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file,
                                     ...) {
 	__REDIRECT_EXECLE(char, libc_execvpe, file, args)
 }
+#include <asm/os/errno.h>
+#include "../libc/tls-globals.h"
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED ATTR_FDARG(1) char *
 NOTHROW_RPC(LIBCCALL libc_ttyname)(fd_t fd) {
-	static char buf[32];
-	if likely(libc_ttyname_r(fd, buf, COMPILER_LENOF(buf)) == 0)
-		return buf;
+	/* Buffer is typed as `void *' because it's re-used for `wttyname()' */
+	void **_p_ttyname_buf = &libc_get_tlsglobals()->ltg_ttyname_buf;
+#define ttyname_buf (*_p_ttyname_buf)
+	errno_t error;
+
+	size_t bufsize = libc_malloc_usable_size(ttyname_buf) / sizeof(char);
+
+
+
+	if (bufsize < 32) {
+		void *newbuf;
+		bufsize = 32;
+		newbuf  = libc_realloc(ttyname_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		ttyname_buf = newbuf;
+	}
+
+again:
+
+	error = libc_ttyname_r(fd, (char *)ttyname_buf, bufsize);
+	if likely(error == 0) {
+		/* Trim unused memory (if a certain threshold is exceeded) */
+		size_t retlen = libc_strlen((char *)ttyname_buf) + 1;
+		if likely((retlen + 32) < bufsize) {
+			void *retbuf = libc_realloc(ttyname_buf, retlen * sizeof(char));
+			if likely(retbuf)
+				ttyname_buf = retbuf;
+		}
+		return (char *)ttyname_buf;
+	}
+
+	if (error == ERANGE && bufsize < 1024) {
+		void *newbuf;
+		bufsize *= 2;
+		newbuf = libc_realloc(ttyname_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		ttyname_buf = newbuf;
+		goto again;
+	}
+
+err:
 	return NULL;
 }
+#undef ttyname_buf
 #include <bits/types.h>
 #include <libc/errno.h>
 #include <asm/os/dirent.h>

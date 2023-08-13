@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd32e0609 */
+/* HASH CRC-32:0xda83bd38 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -196,13 +196,13 @@ INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char ***NOTHROW(LIBCCALL libc___p___in
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***NOTHROW(LIBDCALL libd___p___winitenv)(void);
 /* Access to the initial environment block */
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***NOTHROW(LIBKCALL libc___p___winitenv)(void);
-INTDEF _purecall_handler NOTHROW_NCX(LIBCCALL libc__set_purecall_handler)(_purecall_handler __handler);
+INTDEF _purecall_handler NOTHROW_NCX(LIBCCALL libc__set_purecall_handler)(_purecall_handler handler);
 INTDEF _purecall_handler NOTHROW_NCX(LIBCCALL libc__get_purecall_handler)(void);
 INTDEF _invalid_parameter_handler NOTHROW_NCX(LIBCCALL libc__set_invalid_parameter_handler)(_invalid_parameter_handler handler);
 INTDEF _invalid_parameter_handler NOTHROW_NCX(LIBCCALL libc__get_invalid_parameter_handler)(void);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED int *NOTHROW(LIBCCALL libc___p__fmode)(void);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__set_fmode)(int mode);
-INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_fmode)(int *pmode);
+INTDEF ATTR_OUT(1) errno_t NOTHROW_NCX(LIBCCALL libc__get_fmode)(int *pmode);
 INTDEF unsigned int NOTHROW_NCX(LIBCCALL libc__set_abort_behavior)(unsigned int flags, unsigned int mask);
 INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_OUTS(3, 4) errno_t NOTHROW_RPC(LIBCCALL libc__searchenv_s)(char const *file, char const *envvar, char *__restrict resultpath, size_t resultpath_len);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__seterrormode)(int mode);

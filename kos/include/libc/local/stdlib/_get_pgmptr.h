@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb18f7eb */
+/* HASH CRC-32:0x6c5b3df5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #ifdef __LOCAL_program_invocation_name
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_get_pgmptr) __errno_t
+__LOCAL_LIBC(_get_pgmptr) __ATTR_OUT(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_get_pgmptr))(char **__pvalue) {
 	*__pvalue = __LOCAL_program_invocation_name;
 	return __EOK;

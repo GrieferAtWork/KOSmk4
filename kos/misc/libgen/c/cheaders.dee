@@ -3582,6 +3582,21 @@ class LibraryFunction {
 							keyEscape: keyEscape,
 							forceKeyEscape: true);
 					}
+
+					/* Include extended include prefixes from the function's body. */
+					local extendedPrefixes = [];
+					escapeTextIntoFile(
+						none, impl.body, escapeMode,
+						keyEscape: keyEscape,
+						forceKeyEscape: true,
+						extendedPrefixes: extendedPrefixes);
+					for (local x: extendedPrefixes) {
+						escapeNonRepeatingTextIntoFile(
+							fp, x, escapeMode,
+							keyEscape: keyEscape,
+							forceKeyEscape: true);
+					}
+
 					if (doc)
 						fp.printComment(doc);
 					local extraAttributes = bind.extraAttributes;

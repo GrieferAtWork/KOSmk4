@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6129ebb */
+/* HASH CRC-32:0xa58dc01e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -434,12 +434,15 @@ NOTHROW_NCX(LIBCCALL libc_strpbrk)(char const *haystack,
 	return NULL;
 }
 #endif /* !LIBC_ARCH_HAVE_STRPBRK */
+#include "../libc/tls-globals.h"
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_IN(2) ATTR_INOUT_OPT(1) char *
 NOTHROW_NCX(LIBCCALL libc_strtok)(char *str,
                                   char const *delim) {
-	static char *save_ptr = NULL;
-	return libc_strtok_r(str, delim, &save_ptr);
+	char **_p_strtok_save_ptr = &libc_get_tlsglobals()->ltg_strtok_save_ptr;
+#define strtok_save_ptr (*_p_strtok_save_ptr)
+	return libc_strtok_r(str, delim, &strtok_save_ptr);
 }
+#undef strtok_save_ptr
 #ifndef LIBC_ARCH_HAVE_STRCOLL
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc_strcoll)(char const *s1,

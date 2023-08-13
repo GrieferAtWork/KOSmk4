@@ -987,8 +987,8 @@ char *strpbrk([[in]] char const *haystack, [[in]] char const *accept)
 
 [[std]]
 char *strtok([[inout_opt]] char *str, [[in]] char const *delim) {
-	static char *save_ptr = NULL;
-	return strtok_r(str, delim, &save_ptr);
+	@@static char *strtok_save_ptr = NULL@@
+	return strtok_r(str, delim, &strtok_save_ptr);
 }
 
 [[std, pure, wunused]]

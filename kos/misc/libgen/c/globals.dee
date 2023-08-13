@@ -49,8 +49,35 @@ global allSystemHeaders: {string: SystemHeader} = Dict();
 @@HashSet of all functions for which the <libc/local/header/function.h> file was ever used
 global neededLocalFunction: {LocalFunction...} = HashSet();
 
+class TlsGlobal {
+	this = default;
+	public member name: string;
+	public member typeBefore: string;
+	public member typeAfter: string;
 
+	@@TLS Destructor  expression (@name  appearing
+	@@in here should be replaced based on context)
+	public member finiExpr: UserString | string = "";
 
+	operator str(fp: File) {
+		fp << typeBefore;
+		if (typeBefore && typeBefore.last.issymcont())
+			fp << " ";
+		fp << name;
+		if (typeAfter && typeAfter.issymcont(0))
+			fp << " ";
+		fp << typeAfter;
+		if (finiExpr)
+			fp << "; [fini: " << finiExpr << "]";
+	}
+}
+
+@@TLS globals by name
+global tlsGlobals: {string: TlsGlobal} = Dict();
+
+@@Prefix for global TLS variables from
+global final TLS_GLOBALS_PREFIX: string = "ltg_";
+global final TLS_GLOBALS_GETTER: string = "libc_get_tlsglobals";
 
 @@Lookup a function, given its name
 function findFunctionByName(name: string | UserString): Function {

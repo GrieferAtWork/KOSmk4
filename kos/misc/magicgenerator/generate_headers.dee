@@ -695,6 +695,104 @@ function resolveLine(line: {string | WildcardRule...}): {string...} {
 }
 
 
+@@Update the file "/src/libc/libc/tls-globals.h"
+function doPrint_src_libc_libc_tlsGlobalsH() {
+	local final TLS_GLOBALS_FILENAME = "src/libc/libc/tls-globals.h";
+	local final START_MARKER = "/*[[[begin:libc_tlsglobals]]]*/";
+	local final END_MARKER   = "/*[[[end:libc_tlsglobals]]]*/";
+	printMessage(f"Updating tls-globals: {repr TLS_GLOBALS_FILENAME} (begin)");
+	local symbols: {TlsGlobal...} = List(tlsGlobals.values);
+	symbols.sort(x -> (x.typeBefore, x.typeAfter, x.name));
+	local oldData = File.open(TLS_GLOBALS_FILENAME, "rb").read();
+	local data = oldData.decode("utf-8").unifylines();
+
+	/* Find markers. */
+	local outputStart = data.index(START_MARKER) + #START_MARKER;
+	local outputEnd   = data.index(END_MARKER, outputStart);
+	if (data.islf(outputStart))
+		++outputStart;
+
+	/* Produce the updated tls-globals struct. */
+	local fp = File.Writer();
+	local longestTypeBeforeLen = 0;
+	for (local tg: symbols) {
+		local typeBeforeLen = #tg.typeBefore;
+		if (typeBeforeLen && tg.typeBefore.last.issymcont())
+			++typeBeforeLen;
+		if (longestTypeBeforeLen < typeBeforeLen)
+			longestTypeBeforeLen = typeBeforeLen;
+	}
+
+	for (local tg: symbols) {
+		local typeBeforeText = tg.typeBefore;
+		if (typeBeforeText && typeBeforeText.last.issymcont())
+			typeBeforeText += " ";
+		if (#typeBeforeText < longestTypeBeforeLen) {
+			local nSpace = longestTypeBeforeLen - #typeBeforeText;
+			local insertEnd = #typeBeforeText;
+			while (insertEnd && !typeBeforeText.issymcont(insertEnd - 1))
+				--insertEnd;
+			typeBeforeText = f"{typeBeforeText[:insertEnd]}"
+			                 f"{" " * nSpace}"
+			                 f"{typeBeforeText[insertEnd:]}";
+		}
+		fp << "\t" << typeBeforeText;
+		fp << TLS_GLOBALS_PREFIX << tg.name;
+		if (tg.typeAfter && tg.typeAfter.issymcont(0))
+			fp << " ";
+		fp << tg.typeAfter << ";\n";
+	}
+
+	/* Pack everything together */
+	data = f"{data[:outputStart]}{fp.string}{data[outputEnd:]}";
+	data = data.encode("utf-8");
+	if (oldData != data) {
+		printMessage(f"Updating tls-globals: {repr TLS_GLOBALS_FILENAME}");
+		with (local fp = File.open(TLS_GLOBALS_FILENAME, "w"))
+			fp.write(data);
+	}
+	printMessage(f"Updating tls-globals: {repr TLS_GLOBALS_FILENAME} (end)");
+}
+
+@@Update the file "/src/libc/libc/tls-globals.c"
+function doPrint_src_libc_libc_tlsGlobalsC() {
+	local final TLS_GLOBALS_FILENAME = "src/libc/libc/tls-globals.c";
+	local final START_MARKER = "/*[[[begin:libc_fini_tlsglobals]]]*/";
+	local final END_MARKER   = "/*[[[end:libc_fini_tlsglobals]]]*/";
+	printMessage(f"Updating tls-globals finalizers: {repr TLS_GLOBALS_FILENAME} (begin)");
+	local symbols: {TlsGlobal...} = List(tlsGlobals.values);
+	symbols.sort(x -> (x.typeBefore, x.typeAfter, x.name));
+	local oldData = File.open(TLS_GLOBALS_FILENAME, "rb").read();
+	local data = oldData.decode("utf-8").unifylines();
+
+	/* Find markers. */
+	local outputStart = data.index(START_MARKER) + #START_MARKER;
+	local outputEnd   = data.index(END_MARKER, outputStart);
+	if (data.islf(outputStart))
+		++outputStart;
+
+	/* Produce the updated tls-globals struct. */
+	local fp = File.Writer();
+	for (local tg: symbols) {
+		if (!tg.finiExpr)
+			continue;
+		local tgName: string = tg.name;
+		local tgSelfName: string = f"self->{TLS_GLOBALS_PREFIX}{tgName}";
+		fp << "\t" << str(tg.finiExpr).rereplace(f"\\b{tgName}\\b", tgSelfName)
+			<< ";\n";
+	}
+
+	/* Pack everything together */
+	data = f"{data[:outputStart]}{fp.string}{data[outputEnd:]}";
+	data = data.encode("utf-8");
+	if (oldData != data) {
+		printMessage(f"Updating tls-globals finalizers: {repr TLS_GLOBALS_FILENAME}");
+		with (local fp = File.open(TLS_GLOBALS_FILENAME, "w"))
+			fp.write(data);
+	}
+	printMessage(f"Updating tls-globals finalizers: {repr TLS_GLOBALS_FILENAME} (end)");
+}
+
 @@Update the file "/src/libc/crt-order.h"
 function doPrint_src_libc_crtOrder() {
 	local final ORDER_FILENAME = "src/libc/crt-order.h";
@@ -1247,15 +1345,13 @@ try {
 			fullPath, fs.fileof(filename)));
 	}
 
-//	waitTasks();
-//	local    f    =   allLibraryFunctionsByName["libc_memeq_nopf"];
-//	local fp = CWriter(File.stdout, ppAssume: ppAssumeHeaderFiles);
-//	for (local b: f.bindings)
-//		print repr b;
-//	print repr f.implementationPpCond;
-//	fp << "\n\n";
-//	fp.flush();
-//	return;
+	/*waitTasks();
+	local f  = allLibraryFunctionsByName["libc_ttyname"];
+	local fp = CWriter(File.stdout, ppAssume: ppAssumeSourceFiles);
+	f.cprintInLibraryAutoImplementation(fp, ESCAPE_MODE_NONE, decl: "INTERN");
+	fp << "\n\n";
+	fp.flush();
+	return;*/
 
 	/* Scan libc source files for additional section names. */
 	startTask(scanFileForSectionNames, ("src/libc/api.h",));
@@ -1377,6 +1473,8 @@ try {
 	messagePrefix = "4/4";
 
 	startTask(updateHashedFile, ("include/gnu/stubs.h", doPrint_include_gnu_stubs));
+	startTask(doPrint_src_libc_libc_tlsGlobalsH);
+	startTask(doPrint_src_libc_libc_tlsGlobalsC);
 
 	/* Generate all of the needed <libc/local/...> headers */
 	local printedLocalFunctions: HashSet with LocalFunction = HashSet();

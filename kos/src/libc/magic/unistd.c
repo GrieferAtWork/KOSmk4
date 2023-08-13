@@ -860,12 +860,52 @@ $longptr_t fpathconf([[fdarg]] $fd_t fd, __STDC_INT_AS_UINT_T name);
 @@>> ttyname(3)
 @@Return the name of a TTY given its file descriptor
 [[guard, cp, wunused, decl_include("<bits/types.h>")]]
-[[export_alias("__ttyname"), requires_function(ttyname_r)]]
+[[export_alias("__ttyname"), requires_function(realloc, ttyname_r)]]
+[[impl_include("<asm/os/errno.h>")]]
 [[section(".text.crt{|.dos}.io.tty")]]
 char *ttyname([[fdarg]] $fd_t fd) {
-	static char buf[32];
-	if likely(ttyname_r(fd, buf, COMPILER_LENOF(buf)) == 0)
-		return buf;
+	/* Buffer is typed as `void *' because it's re-used for `wttyname()' */
+	@@static void *ttyname_buf; [fini: free(ttyname_buf)]@@
+	errno_t error;
+@@pp_if $has_function(malloc_usable_size)@@
+	size_t bufsize = malloc_usable_size(ttyname_buf) / sizeof(char);
+@@pp_else@@
+	size_t bufsize = ttyname_buf ? 32 : 0;
+@@pp_endif@@
+	if (bufsize < 32) {
+		void *newbuf;
+		bufsize = 32;
+		newbuf  = realloc(ttyname_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		ttyname_buf = newbuf;
+	}
+@@pp_ifdef ERANGE@@
+again:
+@@pp_endif@@
+	error = ttyname_r(fd, (char *)ttyname_buf, bufsize);
+	if likely(error == 0) {
+		/* Trim unused memory (if a certain threshold is exceeded) */
+		size_t retlen = strlen((char *)ttyname_buf) + 1;
+		if likely((retlen + 32) < bufsize) {
+			void *retbuf = realloc(ttyname_buf, retlen * sizeof(char));
+			if likely(retbuf)
+				ttyname_buf = retbuf;
+		}
+		return (char *)ttyname_buf;
+	}
+@@pp_ifdef ERANGE@@
+	if (error == ERANGE && bufsize < 1024) {
+		void *newbuf;
+		bufsize *= 2;
+		newbuf = realloc(ttyname_buf, bufsize * sizeof(char));
+		if unlikely(!newbuf)
+			goto err;
+		ttyname_buf = newbuf;
+		goto again;
+	}
+@@pp_endif@@
+err:
 	return NULL;
 }
 

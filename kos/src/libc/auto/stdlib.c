@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa986ffd9 */
+/* HASH CRC-32:0xf39c551a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3547,17 +3547,17 @@ NOTHROW(LIBCCALL libc___p__pgmptr)(void) {
 	return &__LOCAL_program_invocation_name_p;
 }
 #include <libc/template/program_invocation_name.h>
-INTERN ATTR_SECTION(".text.crt.dos.application.init") errno_t
+INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc__get_pgmptr)(char **pvalue) {
 	*pvalue = __LOCAL_program_invocation_name;
 	return EOK;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.application.init") errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.application.init") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBDCALL libd__get_wpgmptr)(char16_t **pvalue) {
 	*pvalue = *libd___p__wpgmptr();
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.application.init") errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.application.init") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBKCALL libc__get_wpgmptr)(char32_t **pvalue) {
 	*pvalue = *libc___p__wpgmptr();
 	return EOK;

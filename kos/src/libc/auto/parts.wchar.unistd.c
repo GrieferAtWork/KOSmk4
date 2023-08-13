@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cf09ea6 */
+/* HASH CRC-32:0xd99aa078 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "parts.wchar.unistd.h"
+#include "../user/malloc.h"
 #include "parts.wchar.format-printer.h"
 #include "../user/stdlib.h"
 #include "string.h"
@@ -37,24 +38,110 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+#include <asm/os/errno.h>
+#include "../libc/tls-globals.h"
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.tty") WUNUSED ATTR_FDARG(1) char16_t *
 NOTHROW_RPC(LIBDCALL libd_wttyname)(fd_t fd) {
-	static char16_t buf[32];
-	if likely(libd_wttyname_r(fd, buf, COMPILER_LENOF(buf)) == 0)
-		return buf;
+	/* Buffer is typed as `void *' because it's re-used for `wttyname()' */
+	void **_p_ttyname_buf = &libc_get_tlsglobals()->ltg_ttyname_buf;
+#define ttyname_buf (*_p_ttyname_buf)
+	errno_t error;
+
+	size_t bufsize = libc_malloc_usable_size(ttyname_buf) / sizeof(char16_t);
+
+
+
+	if (bufsize < 32) {
+		void *newbuf;
+		bufsize = 32;
+		newbuf  = libc_realloc(ttyname_buf, bufsize * sizeof(char16_t));
+		if unlikely(!newbuf)
+			goto err;
+		ttyname_buf = newbuf;
+	}
+
+again:
+
+	error = libd_wttyname_r(fd, (char16_t *)ttyname_buf, bufsize);
+	if likely(error == 0) {
+		/* Trim unused memory (if a certain threshold is exceeded) */
+		size_t retlen = libd_wcslen((char16_t *)ttyname_buf) + 1;
+		if likely((retlen + 32) < bufsize) {
+			void *retbuf = libc_realloc(ttyname_buf, retlen * sizeof(char16_t));
+			if likely(retbuf)
+				ttyname_buf = retbuf;
+		}
+		return (char16_t *)ttyname_buf;
+	}
+
+	if (error == ERANGE && bufsize < 1024) {
+		void *newbuf;
+		bufsize *= 2;
+		newbuf = libc_realloc(ttyname_buf, bufsize * sizeof(char16_t));
+		if unlikely(!newbuf)
+			goto err;
+		ttyname_buf = newbuf;
+		goto again;
+	}
+
+err:
 	return NULL;
 }
+#undef ttyname_buf
+#include <asm/os/errno.h>
+#include "../libc/tls-globals.h"
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 INTERN ATTR_SECTION(".text.crt.wchar.io.tty") WUNUSED ATTR_FDARG(1) char32_t *
 NOTHROW_RPC(LIBKCALL libc_wttyname)(fd_t fd) {
-	static char32_t buf[32];
-	if likely(libc_wttyname_r(fd, buf, COMPILER_LENOF(buf)) == 0)
-		return buf;
+	/* Buffer is typed as `void *' because it's re-used for `wttyname()' */
+	void **_p_ttyname_buf = &libc_get_tlsglobals()->ltg_ttyname_buf;
+#define ttyname_buf (*_p_ttyname_buf)
+	errno_t error;
+
+	size_t bufsize = libc_malloc_usable_size(ttyname_buf) / sizeof(char32_t);
+
+
+
+	if (bufsize < 32) {
+		void *newbuf;
+		bufsize = 32;
+		newbuf  = libc_realloc(ttyname_buf, bufsize * sizeof(char32_t));
+		if unlikely(!newbuf)
+			goto err;
+		ttyname_buf = newbuf;
+	}
+
+again:
+
+	error = libc_wttyname_r(fd, (char32_t *)ttyname_buf, bufsize);
+	if likely(error == 0) {
+		/* Trim unused memory (if a certain threshold is exceeded) */
+		size_t retlen = libc_wcslen((char32_t *)ttyname_buf) + 1;
+		if likely((retlen + 32) < bufsize) {
+			void *retbuf = libc_realloc(ttyname_buf, retlen * sizeof(char32_t));
+			if likely(retbuf)
+				ttyname_buf = retbuf;
+		}
+		return (char32_t *)ttyname_buf;
+	}
+
+	if (error == ERANGE && bufsize < 1024) {
+		void *newbuf;
+		bufsize *= 2;
+		newbuf = libc_realloc(ttyname_buf, bufsize * sizeof(char32_t));
+		if unlikely(!newbuf)
+			goto err;
+		ttyname_buf = newbuf;
+		goto again;
+	}
+
+err:
 	return NULL;
 }
+#undef ttyname_buf
 #include <libc/errno.h>
 /* >> wttyname_r(3)
  * Return the name of a TTY given its file descriptor */

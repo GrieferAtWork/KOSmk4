@@ -60,6 +60,7 @@
 
 #include "../libc/dl.h"
 #include "../libc/globals.h"
+#include "../libc/tls-globals.h"
 #include "../libc/tls.h"
 #include "pthread.h"
 #include "sched.h"
@@ -175,6 +176,12 @@ INTERN ATTR_SECTION(".data.crt.sched.pthread") char libc___libc_single_threaded 
 /* Destroy a given `pthread' `self' */
 LOCAL ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) void
 NOTHROW(LIBCCALL destroy)(struct pthread *__restrict self) {
+	/* Destroy TLS globals (if used) */
+	if (self->pt_tglobals) {
+		libc_fini_tlsglobals(self->pt_tglobals);
+		free(self->pt_tglobals);
+	}
+
 	/* NOTE: This also invokes TLS finalizers! */
 	dltlsfreeseg(self->pt_tls);
 }

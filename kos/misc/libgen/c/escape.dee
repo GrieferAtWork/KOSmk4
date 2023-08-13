@@ -968,6 +968,7 @@ single_got_escapedTok:
 	local namespaceStack: {Namespace...} = none;
 	local oldKeepNewLinesFromDeadCode: bool | none = none;
 	local mustFlushFp: bool = false;
+	local trailingText: string = "";
 	for (;;) {
 		local tok = self.next();
 again_handle_tok:
@@ -1017,6 +1018,118 @@ again_handle_tok:
 			local skipStart = self.tokStart;
 			tok = self.next();
 			switch (tok) {
+
+			case "static": {
+				tok = self.next();
+				local typeBeforeStart = self.tokStart;
+				local typeBeforeEnd   = typeBeforeStart;
+				while (tok !in ["", "@@", "=", ";"]) {
+					if (tok in ["struct", "union", "enum"]) {
+						typeBeforeEnd = self.tokEnd;
+						tok = self.next();
+						if (tok != "@@") {
+							typeBeforeEnd = self.tokEnd;
+							tok = self.next();
+						}
+						continue;
+					}
+					if (tok.issymbol() && tok !in cLanguageKeywords)
+						break;
+					typeBeforeEnd = self.tokEnd;
+					tok = self.next();
+				}
+				if (!tok.issymbol())
+					self.err(f"Expected symbol name after, but got {repr tok}");
+				local staticVarName: string = tok;
+				local typeAfterStart = self.tokEnd;
+				local typeAfterEnd   = typeAfterStart;
+				while (self.tok !in ["", "@@", "=", ";"]) {
+					typeAfterEnd = self.tokEnd;
+					self.next();
+				}
+				local typeBefore: string = self.text[typeBeforeStart:typeBeforeEnd];
+				local typeAfter: string  = self.text[typeAfterStart:typeAfterEnd];
+				local initExpr: string = "";
+				if (self.tok == "=") {
+					self.next();
+					local initStart = self.tokStart;
+					local initEnd   = initStart;
+					while (self.tok !in ["", "@@", ";"]) {
+						initEnd = self.tokEnd;
+						self.next();
+					}
+					initExpr = self.text[initStart:initEnd];
+				}
+				while (self.tok == ";")
+					self.next();
+				local finiExpr: UserString | string = "";
+				if (self.tok == "[") {
+					self.next();
+					self.skip("fini");
+					self.skip(":");
+					finiExpr = self.parseCStringOrFunctionLikeExpression();
+					self.skip("]");
+					while (self.tok == ";")
+						self.next();
+				}
+				local newTlsGlobal: TlsGlobal = TlsGlobal(
+					name: staticVarName,
+					typeBefore: typeBefore,
+					typeAfter: typeAfter,
+					finiExpr: finiExpr);
+				local ok, oldval = tlsGlobals.setnew_ex(staticVarName, newTlsGlobal)...;
+				if (!ok && oldval != newTlsGlobal) {
+					self.err(f"TLS global {repr staticVarName} re-defined as "
+					         f"`{newTlsGlobal}', but was already defined as `{oldval}'");
+				}
+
+				numLines = fp.ppIf("defined(__BUILDING_LIBC)&&!defined(__KERNEL__)");
+				escapeTextIntoFile(fp, typeBefore, mode, keyEscape, evalEnviron, forceKeyEscape);
+				if (typeBefore && typeBefore.last.issymcont())
+					fp << " ";
+				if (typeAfter)
+					fp << "(";
+				fp << "*";
+				local p_staticVarName = f"_p_{staticVarName}";
+				escapeTextIntoFile(fp, p_staticVarName, mode, keyEscape, evalEnviron, forceKeyEscape);
+				if (typeAfter) {
+					fp << ")";
+					escapeTextIntoFile(fp, typeAfter, mode, keyEscape, evalEnviron, forceKeyEscape);
+				}
+				fp << " = &" << TLS_GLOBALS_GETTER << "()->"
+					<< TLS_GLOBALS_PREFIX << staticVarName << ";\n";
+				fp << "#define ";
+				escapeTextIntoFile(fp, staticVarName, mode, keyEscape, evalEnviron, forceKeyEscape);
+				fp << " (*";
+				escapeTextIntoFile(fp, p_staticVarName, mode, keyEscape, evalEnviron, forceKeyEscape);
+				fp << ")\n";
+				if (!fp.isDeadCode) {
+					if (extendedPrefixes !is none)
+						extendedPrefixes.append('#include "../libc/tls-globals.h"');
+					numLines += 2;
+					local trailingTextFp = File.Writer();
+					escapeTextIntoFile(trailingTextFp, staticVarName, mode, keyEscape, evalEnviron, forceKeyEscape);
+					trailingText = f"{trailingText}\n#undef {trailingTextFp.string}";
+				}
+				numLines += fp.ppElse();
+				fp << "static ";
+				escapeTextIntoFile(fp, typeBefore, mode, keyEscape, evalEnviron, forceKeyEscape);
+				if (typeBefore && typeBefore.last.issymcont())
+					fp << " ";
+				escapeTextIntoFile(fp, staticVarName, mode, keyEscape, evalEnviron, forceKeyEscape);
+				if (typeAfter && typeAfter.issymcont(0))
+					fp << " ";
+				escapeTextIntoFile(fp, typeAfter, mode, keyEscape, evalEnviron, forceKeyEscape);
+				if (initExpr) {
+					fp << " = ";
+					escapeTextIntoFile(fp, initExpr, mode, keyEscape, evalEnviron, forceKeyEscape);
+				}
+				fp << ";\n";
+				if (!fp.isDeadCode)
+					numLines += 1;
+				numLines += fp.ppEndif();
+				goto handle_numLines_after_pp_directive;
+			}	break;
 
 			case "exec":
 			case "yield": {
@@ -1464,6 +1577,8 @@ got_escapedTok:
 done:
 	if (flushStart < self.end)
 		fp << self.text[flushStart:self.end];
+	if (trailingText)
+		fp << trailingText;
 	if (oldKeepNewLinesFromDeadCode !is none)
 		fp.keepNewLinesFromDeadCode = oldKeepNewLinesFromDeadCode;
 	if (mustFlushFp)

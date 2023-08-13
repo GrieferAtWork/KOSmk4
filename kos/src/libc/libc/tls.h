@@ -41,41 +41,6 @@ DECL_BEGIN
  *       the   number  of  relocations   within  the  resulting  libc.so! */
 INTDEF ATTR_THREAD struct pthread current;
 
-/* TODO: Add certain static buffer to `current' (making them thread-local):
- * - char *: strtok
- * - char[]: getpass
- * - char[]: ptsname
- * - char[]: ttyname
- * - char[]: l64a
- * - char[]: ctime, ctime64
- * - char[]: asctime
- * - char[]: ctermid
- * - char[]: cuserid
- * - char[]: qecvt
- * - char[]: qfcvt
- * - char[]: ecvt
- * - char[]: fcvt
- * - char[]: devname
- * - struct tm: gmtime, gmtime64
- * - struct tm: localtime, localtime64
- * - struct tm: getdate
- * NOTE: All of these buffers should exist as a lazily-allocated structure
- *       pointed to by `current', with some of the inner buffers (such  as
- *       e.g. `ttyname' then once again allocated (and reallocated) as  is
- *       actually needed)
- * NOTE: In  case  allocation fails,  behavior  depends on  the  function in
- *       question, but at the least there should be a pre-allocated instance
- *       of this global data holder for the main thread (and functions  that
- *       can indicate NOMEM to their caller can do that, and functions  that
- *       can't  will call abort(3) after writing an error message to stderr,
- *       or (if a special environment  variable is set), will simply  re-use
- *       the main thread's global data holder)
- * NOTE: The environment variable is called `$LIBC_TLS_GLOBALS_ALLOW_UNSAFE',
- *       and must be  defined as non-empty  in order to  allow re-use of  the
- *       main thread's global data holder.
- * XXX: I might be missing some functions here...
- */
-
 /* Return a handle for libc.so, as would also be returned by `dlopen("libc.so")'
  * Note however that  this function  doesn't return  a new  reference to  libc's
  * shared library handle, but rather simply returns the raw handle pointer. */

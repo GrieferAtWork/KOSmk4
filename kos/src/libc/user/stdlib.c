@@ -2935,13 +2935,13 @@ NOTHROW_NCX(LIBCCALL libc__beep)(unsigned int freq,
 }
 /*[[[end:libc__beep]]]*/
 
-/*[[[head:libc__set_purecall_handler,hash:CRC-32=0xa0356abb]]]*/
+/*[[[head:libc__set_purecall_handler,hash:CRC-32=0x67fa5e45]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.errno") _purecall_handler
-NOTHROW_NCX(LIBCCALL libc__set_purecall_handler)(_purecall_handler __handler)
+NOTHROW_NCX(LIBCCALL libc__set_purecall_handler)(_purecall_handler handler)
 /*[[[body:libc__set_purecall_handler]]]*/
 /*AUTO*/{
-	(void)__handler;
-	CRT_UNIMPLEMENTEDF("_set_purecall_handler(__handler: %p)", __handler); /* TODO */
+	(void)handler;
+	CRT_UNIMPLEMENTEDF("_set_purecall_handler(handler: %p)", handler); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -2962,13 +2962,14 @@ NOTHROW_NCX(LIBCCALL libc__get_purecall_handler)(void)
 #undef _fmode
 INTERN ATTR_SECTION(".bss.crt.dos.FILE.utility") int libd__fmode = 0;
 DEFINE_PUBLIC_ALIAS(_fmode, libd__fmode);
+#define _fmode libd__fmode
 
 /*[[[head:libc___p__fmode,hash:CRC-32=0x6c97165e]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") ATTR_CONST ATTR_RETNONNULL WUNUSED int *
 NOTHROW(LIBCCALL libc___p__fmode)(void)
 /*[[[body:libc___p__fmode]]]*/
 {
-	return &libd__fmode;
+	return &_fmode;
 }
 /*[[[end:libc___p__fmode]]]*/
 
@@ -2977,17 +2978,17 @@ INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") errno_t
 NOTHROW_NCX(LIBCCALL libc__set_fmode)(int mode)
 /*[[[body:libc__set_fmode]]]*/
 {
-	libd__fmode = mode;
+	_fmode = mode;
 	return EOK;
 }
 /*[[[end:libc__set_fmode]]]*/
 
-/*[[[head:libc__get_fmode,hash:CRC-32=0xce6fa140]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") errno_t
+/*[[[head:libc__get_fmode,hash:CRC-32=0xd3273751]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc__get_fmode)(int *pmode)
 /*[[[body:libc__get_fmode]]]*/
 {
-	*pmode = libd__fmode;
+	*pmode = _fmode;
 	return EOK;
 }
 /*[[[end:libc__get_fmode]]]*/

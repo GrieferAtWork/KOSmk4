@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13b9f14f */
+/* HASH CRC-32:0x6f60b4f3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1293,18 +1293,18 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__set_doserrno)(u32 err);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char **NOTHROW(LIBCCALL libc___p__pgmptr)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF _purecall_handler NOTHROW_NCX(LIBDCALL libd__set_purecall_handler)(_purecall_handler __handler);
+INTDEF _purecall_handler NOTHROW_NCX(LIBDCALL libd__set_purecall_handler)(_purecall_handler handler);
 INTDEF _invalid_parameter_handler NOTHROW_NCX(LIBDCALL libd__set_invalid_parameter_handler)(_invalid_parameter_handler handler);
-INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__get_pgmptr)(char **pvalue);
+INTDEF ATTR_OUT(1) errno_t NOTHROW_NCX(LIBDCALL libd__get_pgmptr)(char **pvalue);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_pgmptr)(char **pvalue);
-INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__get_wpgmptr)(char16_t **pvalue);
-INTDEF errno_t NOTHROW_NCX(LIBKCALL libc__get_wpgmptr)(char32_t **pvalue);
+INTDEF ATTR_OUT(1) errno_t NOTHROW_NCX(LIBCCALL libc__get_pgmptr)(char **pvalue);
+INTDEF ATTR_OUT(1) errno_t NOTHROW_NCX(LIBDCALL libd__get_wpgmptr)(char16_t **pvalue);
+INTDEF ATTR_OUT(1) errno_t NOTHROW_NCX(LIBKCALL libc__get_wpgmptr)(char32_t **pvalue);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__set_fmode)(int mode);
-INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__get_fmode)(int *pmode);
+INTDEF ATTR_OUT(1) errno_t NOTHROW_NCX(LIBDCALL libd__get_fmode)(int *pmode);
 INTDEF unsigned int NOTHROW_NCX(LIBDCALL libd__set_abort_behavior)(unsigned int flags, unsigned int mask);
 INTDEF ATTR_CONST WUNUSED __INT64_TYPE__ NOTHROW(LIBDCALL libd__abs64)(__INT64_TYPE__ x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

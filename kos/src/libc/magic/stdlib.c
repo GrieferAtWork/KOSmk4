@@ -4370,7 +4370,7 @@ typedef void (__LIBDCALL *_purecall_handler)(void);
 
 [[decl_prefix(DEFINE_PURECALL_HANDLER)]]
 [[section(".text.crt.dos.errno")]]
-_purecall_handler _set_purecall_handler(_purecall_handler __handler);
+_purecall_handler _set_purecall_handler(_purecall_handler handler);
 
 [[decl_prefix(DEFINE_PURECALL_HANDLER)]]
 [[section(".text.crt.dos.errno")]]
@@ -4406,7 +4406,7 @@ _invalid_parameter_handler _get_invalid_parameter_handler();
 [[requires(defined(__LOCAL_program_invocation_name))]]
 [[impl_include("<libc/template/program_invocation_name.h>")]]
 [[section(".text.crt.dos.application.init")]]
-errno_t _get_pgmptr(char **pvalue) {
+errno_t _get_pgmptr([[out]] char **pvalue) {
 	*pvalue = __LOCAL_program_invocation_name;
 	return EOK;
 }
@@ -4414,7 +4414,7 @@ errno_t _get_pgmptr(char **pvalue) {
 [[wchar, decl_include("<bits/types.h>")]]
 [[requires_function(__p__wpgmptr)]]
 [[section(".text.crt.dos.wchar.application.init")]]
-errno_t _get_wpgmptr(wchar_t **pvalue) {
+errno_t _get_wpgmptr([[out]] wchar_t **pvalue) {
 	*pvalue = *__p__wpgmptr();
 	return EOK;
 }
@@ -4436,7 +4436,7 @@ errno_t _set_fmode(int mode);
 
 [[decl_include("<bits/types.h>")]]
 [[section(".text.crt.dos.FILE.utility")]]
-errno_t _get_fmode(int *pmode);
+errno_t _get_fmode([[out]] int *pmode);
 
 [[section(".text.crt.dos.errno")]]
 unsigned int _set_abort_behavior(unsigned int flags, unsigned int mask);

@@ -94,6 +94,7 @@ struct libc_userprocmask {
 };
 #endif /* !__LIBC_CONFIG_HAVE_USERPROCMASK */
 
+struct libc_tlsglobals;
 struct pthread {
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
 #define _pthread_tid(self) (self)->pt_pmask.lpm_pmask.pm_mytid
@@ -125,6 +126,7 @@ struct pthread {
 	struct exception_info    pt_except;      /* Exception information */
 	unsigned int             pt_errno_kind;  /* Errno kind (one of `LIBC_ERRNO_KIND_*') */
 	__errno_t                pt_errno_value; /* Errno value */
+	struct libc_tlsglobals  *pt_tglobals;    /* [0..1] TLS globals (stuff like `strtok(3)'s internal buffer) */
 };
 typedef struct pthread *__pthread_t;
 #endif /* __CC__ */

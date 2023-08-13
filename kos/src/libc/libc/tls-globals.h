@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x77f5a1cd */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,30 +17,54 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__get_wpgmptr_defined
-#define __local__get_wpgmptr_defined
-#include <__crt.h>
-#ifdef __CRT_HAVE___p__wpgmptr
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep___p__wpgmptr_defined
-#define __local___localdep___p__wpgmptr_defined
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__WCHAR_TYPE__ **,__NOTHROW,__localdep___p__wpgmptr,(void),__p__wpgmptr,())
-#endif /* !__local___localdep___p__wpgmptr_defined */
-__LOCAL_LIBC(_get_wpgmptr) __ATTR_OUT(1) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_get_wpgmptr))(__WCHAR_TYPE__ **__pvalue) {
-	*__pvalue = *(__NAMESPACE_LOCAL_SYM __localdep___p__wpgmptr)();
-	return __EOK;
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep__get_wpgmptr_defined
-#define __local___localdep__get_wpgmptr_defined
-#define __localdep__get_wpgmptr __LIBC_LOCAL_NAME(_get_wpgmptr)
-#endif /* !__local___localdep__get_wpgmptr_defined */
-#else /* __CRT_HAVE___p__wpgmptr */
-#undef __local__get_wpgmptr_defined
-#endif /* !__CRT_HAVE___p__wpgmptr */
-#endif /* !__local__get_wpgmptr_defined */
+#ifndef GUARD_LIBC_LIBC_TLS_GLOBALS_H
+#define GUARD_LIBC_LIBC_TLS_GLOBALS_H 1
+
+/* Keep this one the first */
+#include "../api.h"
+/**/
+
+#ifndef __KERNEL__
+#ifdef __CC__
+DECL_BEGIN
+
+/* clang-format off */
+struct libc_tlsglobals {
+/*[[[begin:libc_tlsglobals]]]*/
+	char *ltg_strtok_save_ptr;
+	void *ltg_ttyname_buf;
+/*[[[end:libc_tlsglobals]]]*/
+};
+/* clang-format on */
+
+/* Return a pointer to the calling thread's tls-globals controller. */
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct libc_tlsglobals *
+NOTHROW(LIBCCALL libc_get_tlsglobals)(void);
+
+/* Finalize `self' (called when a pthread exits, but not called for the main thread) */
+INTDEF NONNULL((1)) void
+NOTHROW(LIBCCALL libc_fini_tlsglobals)(struct libc_tlsglobals *__restrict self);
+
+/* TODO: change the following functions to use tls-globals:
+ * - char[]: getpass
+ * - char[]: ptsname
+ * - char[]: l64a
+ * - char[]: ctime, ctime64
+ * - char[]: asctime
+ * - char[]: ctermid
+ * - char[]: cuserid
+ * - char[]: qecvt
+ * - char[]: qfcvt
+ * - char[]: ecvt
+ * - char[]: fcvt
+ * - char[]: devname
+ * - struct tm: gmtime, gmtime64
+ * - struct tm: localtime, localtime64
+ * - struct tm: getdate
+ */
+
+DECL_END
+#endif /* __CC__ */
+#endif /* !__KERNEL__ */
+
+#endif /* !GUARD_LIBC_LIBC_TLS_GLOBALS_H */
