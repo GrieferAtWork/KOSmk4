@@ -88,7 +88,7 @@ DECL_BEGIN
 struct wxparser {
 	char const  *wxp_flush;   /* [1..1] Flush start pointer (points before `wxp_input') */
 	char const  *wxp_input;   /* [1..1] Pointer to next input character */
-	char const  *wxp_ifs;     /* [1..1] InputFieldSeparators (defaults to " \t\n") */
+	char const  *wxp_ifs;     /* [1..1] InputFieldSeparators (defaults to " \t\n\r") */
 	unsigned int wxp_flags;   /* Word expansion flags (set of `WRDE_*' from <wordexp.h>) */
 	size_t       wxp_wordc;   /* # of output words */
 	char       **wxp_wordv;   /* [0..1][owned][0..wxp_wordc][owned] Vector of output words */

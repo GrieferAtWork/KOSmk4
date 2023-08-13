@@ -37,6 +37,10 @@
 
 DECL_BEGIN
 
+#ifndef _PATH_GROUP
+#define _PATH_GROUP "/etc/group"
+#endif /* !_PATH_GROUP */
+
 /* [0..1][lock(ATOMIC)]
  * A stream to the group database file. (when non-NULL, opened for reading) */
 PRIVATE ATTR_SECTION(".bss.crt.database.grp") FILE *group_database = NULL;

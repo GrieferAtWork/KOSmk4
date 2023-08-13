@@ -1,4 +1,92 @@
 
+### Runtime configuration options
+
+This section documents how KOS's libc can be (re-)configured by hosted programs and/or the state of environment options at the time of program invocation
+
+#### Program hooks
+
+- `extern void __libc_tls_globals_alloc_failed(void);`
+	- If defined, this callback is invoked when libc fails to allocate memory for TLS globals of a thread other than the main thread, and unsafe fallbacks are not enabled (s.a. `$LIBC_TLS_GLOBALS_ALLOW_UNSAFE`)
+- `extern int __libc_tls_globals_alloc_failed;`
+	- If defined with a non-zero value, and `$LIBC_TLS_GLOBALS_ALLOW_UNSAFE` is not set, still enable unsafe tls globals fallbacks (s.a. environment option: `$LIBC_TLS_GLOBALS_ALLOW_UNSAFE`)
+
+
+
+#### Environment options
+
+- `$LIBC_TLS_GLOBALS_ALLOW_UNSAFE` (...)
+	- When define as non-empty, failure to allocate memory for TLS globals (e.g. `strtok(3)`'s internal buffer) in threads other than the main thread is handled fail-safe (but thread-unsafe) by simply re-using the main thread's TLS globals descriptor within the secondary thread.
+	- In the absence of this environment variable (i.e. if not defined, as opposed to define as an empty string), the same behavior is also be enabled when the hosted program exports a global variable `PUBLIC int __libc_tls_globals_allow_unsafe = 1;`
+- `$POSIXLY_CORRECT` (`getopt(3)`)
+	- Force posix-correct behavior for `getopt(3)`. This causes `getopt(3)` to *not* permutate program arguments, which normally allows mixing of options and arguments.
+	- This causes `ls /bin -l` to behave:
+		- like `ls -l /bin` (When `POSIXLY_CORRECT` is disabled; default)
+		- like `ls -- /bin -l` (When `POSIXLY_CORRECT` is enabled)
+	- The same behavior is also used when a program uses `__posix_getopt(3)` rather than `getopt(3)`, or when the `optstring` argument of `getopt(3)` is prefixed by `+` during the first call to `getopt(3)`
+- `$TMPDIR`, `$TMP`, `$TEMP` (`choose_tmpdir(3)`)
+	- All of these environment variables are considered as potential candidates for the directory returned by `choose_tmpdir(3)`
+- `$PATH` (`execvp(3)`, `execvpe(3)`)
+	- Specifies the list of directories that are searched for programs to execute
+	- Directories are separated by `:`. There is no way to escape `:` if it appears in a directory name
+- `$LOGNAME` (`getlogin(3)`)
+	- When this variable is defined, `getlogin(3)` will return its value rather than forward the call to `cuserid(3)`
+- `$PWD` (`get_current_dir_name(3)`)
+	- When defined and *correct* (`stat(".")` and `stat(getenv("PWD"))` yield the same `st_dev` and `st_ino`), `get_current_dir_name(3)` will return the `strdup(3)`'d value of this environment variable, rather than return the value of `getcwd(NULL, 0)`
+- `$MSGVERB`, `$SEV_LEVEL` (`fmtmsg(3)`)
+	- Affects the behavior of `fmtmsg(3)`. For more details, see the documentation of `fmtmsg(3)`
+- `$LANGUAGE`, `$LC_ALL`, `$LC_CTYPE`, `$LC_NUMERIC`, `$LC_TIME`, `$LC_COLLATE`, `$LC_MONETARY`, `$LC_MESSAGES`, `$LANG` (`gettext(3)`)
+	- Select the name of the language that should be used for i18n translations
+	- The used language can be configured for each message category type individually, or for all categories. Given some message category `category`, the used language is selected as follows:
+		- `$LANGUAGE` (if defined)
+		- `$LC_ALL` (if defined)
+		- `$LC_*` (if defined, where the name of the environment variable matches the name of `category`)
+		- `$LANG` (if defined)
+		- otherwise: don't perform i18n translations
+	- When setting these variable programmatically, it is recommended to always set `$LANG` and never set `$LANGUAGE`, thus allowing a user to override defaults by simply setting `$LANGUAGE` themselves.
+- `$IFS` (`wordexp(3)`)
+	- List of "InputFieldSeparators" that can be used to specify which characters should be capable of separating arguments from each other during word expansion
+	- If not set, this defaults to `" \t\n\r"`, which differs from the unix default where `"\r"` is not part of this set. The reason for this is that KOS's libc is aware of universal line feeds, meaning it supports both `\n`, `\r` and `\r\n` everywhere.
+- `$HOME`, `$PWD`, `$OLDPWD` (`wordexp(3)`)
+	- Used for expansion of `~`, `~+` and `~-` in `wordexp(3)`
+
+##### Arch-specific
+
+- x86:
+	- `$HW_RTM` (`rtm_begin(3)`)
+		- When defined as `0` or `1`, can be used to override the auto-detection of processor support for RTM instructions
+	- `$HW_SSE` (`getcontext(3)`)
+		- When defined as `0` or `1`, can be used to override the auto-detection of processor support for SSE instructions
+
+
+
+
+#### Files
+
+- `/etc/hostid`
+	- Contents returned by `gethostid(3)`
+	- Contents set by `sethostid(3)`
+- `/etc/ethers`
+	- Database file used by:
+		- `ether_ntohost(3)`
+		- `ether_hostton(3)`
+- `/etc/group`
+	- Database file used by:
+		- `getgrent(3)`
+		- `getgrgid(3)`
+		- `getgrnam(3)`
+- `/etc/passwd`
+	- Database file used by:
+		- `getpwent(3)`
+		- `getpwuid(3)`
+		- `getpwnam(3)`
+- `/etc/shadow`
+	- Database file used by:
+		- `getspent(3)`
+		- `getspnam(3)`
+- `/etc/xattr.conf`
+	- Configuration file used by `attr_copy_action(3)`
+
+
 ### Source file inclusion in kernel-/user-space
 
 - `./auto`

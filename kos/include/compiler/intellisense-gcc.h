@@ -165,6 +165,9 @@ static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__, "WTF Intellisense?");
 #ifndef __cplusplus
 #define __builtin_choose_expr(c, tt, ff) ((c) ? (tt) : (ff))
 #define __LONGDOUBLE long double
+#undef __INT128_TYPE__
+#undef __UINT128_TYPE__
+#undef __SIZEOF_INT128__ /* Cannot emulate w/o c++ */
 #else /* !__cplusplus */
 
 #if __cplusplus == 201406L
