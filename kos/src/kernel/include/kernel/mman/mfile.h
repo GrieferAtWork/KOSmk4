@@ -153,6 +153,34 @@ struct ccinfo;
 typedef unsigned int fallocate_mode_t; /* TODO */
 #endif /* !__fallocate_mode_t_defined */
 
+struct mfile_freeblocks_token;
+struct mfile_freeblocks_token {
+	/* [0..1] When defined, a callback that can be used to finalize `self'
+	 *
+	 * Even if set, this callback will NOT be called if `mso_freeblocks_or_unlock()'
+	 * returns  `true' (in which case it is assumed that everything went OK and that
+	 * any other memory pointed-to be below fields has been used/invalidated)
+	 *
+	 * NOTE: When non-NULL, this callback IS invoked when `mso_freeblocks_or_unlock'
+	 *       throws an exception, and MAY be invoked when `mso_freeblocks_or_unlock'
+	 *       returns `false' */
+	NONNULL_T((1)) void (FCALL *mfbt_fini)(struct mfile_freeblocks_token *__restrict self);
+
+	/* [0..1] General purpose data fields.
+	 *
+	 * Initially, all of these are initialized to all NULLs. The intended usage  for
+	 * these is for `mso_freeblocks_or_unlock()' to populate these points with heap-
+	 * allocated data structures that may be needed during future iterations */
+	void *mfbt_data[7];
+};
+
+/* Callback that may ONLY be invoked from `mso_freeblocks_or_unlock', where it MUST
+ * be called if the function  wants to do something that  might block, prior to  it
+ * returning `false' or by throwing an exception. */
+FUNDEF NONNULL((1)) void
+NOTHROW(FCALL mfile_freeblocks_unlock)(struct mfile *__restrict self,
+                                       pos_t aligned_new_size);
+
 /* Extended operators used for implementing stream interface
  * functions and/or overriding the behavior of certain user-
  * exposed functions. */
@@ -345,6 +373,40 @@ struct mfile_stream_ops {
 	NOBLOCK_IF(ccinfo_noblock(info)) NONNULL_T((1)) void
 	NOTHROW_T(KCALL *mso_cc)(struct mfile *__restrict self,
 	                         struct ccinfo *__restrict info);
+
+	/* [0..1] Hook for internal, fs-specific handling for `ftruncate()'.
+	 * This operator behaves kind-of similar to `mso_truncate()', except
+	 * that it gets called *from* `mfile_truncate()' in a context  where
+	 * `aligned_new_size' is  less than  `self->mf_filesize', and  while
+	 * already holding locks and having checked for special cases:
+	 * - mpart_lock_acquired(self->mf_parts[->...]); // Every part of `self' is locked
+	 * - mfile_lock_writing(self);                   // A write-lock to `self' is held
+	 * - self->mf_parts != MFILE_PARTS_ANONYMOUS;    // The file isn't anonymous
+	 * - mfile_partaddr_ceilalign(self, self->mf_filesize) > aligned_new_size;
+	 *                                               // New aligned size is less than old aligned size
+	 *                                               // iow: total number of blocks has been reduced
+	 * - self->mf_trunclock == 0;                    // No "trunc-lock" is currently being held
+	 * - !mpart_hasblocksstate_init(mpart_tree_rlocate(self->mf_parts, aligned_new_size, (pos_t)-1)->[*any*];
+	 *                                               // No part above `aligned_new_size' is currently being initialized
+	 *                                               // The same also goes for `MPART_F_CHANGED'
+	 * - mpart_tree_locate(self->mf_parts, aligned_new_size - 1) !=
+	 *   mpart_tree_locate(self->mf_parts,       aligned_new_size);
+	 *                                               // No part overlaps with the file's new aligned size
+	 *
+	 * When implemented, this operator is required to behave as follows:
+	 * @return: true:  Success (the contents of `token' are undefined, and `token->mfbt_fini' will *NOT* be called)
+	 * @return: false: Try  again (`mfile_freeblocks_unlock()' was  called, and the contents  of `token' will be
+	 *                 preserved until the next time this operator gets invoked. Or if something else goes wrong
+	 *                 before then, `token->mfbt_fini' (if non-NULL), will be invoked in order to free data that
+	 *                 may be stored in `token->mfbt_data')
+	 * @throws:        Error (`mfile_freeblocks_unlock()' was called, and `token->mfbt_fini' (if non-NULL), will
+	 *                 be invoked immediately before the thrown exception is propagated)
+	 */
+	BLOCKING WUNUSED_T NONNULL_T((1, 2)) __BOOL
+	(KCALL *mso_freeblocks_or_unlock)(struct mfile *__restrict self,
+	                                  struct mfile_freeblocks_token *__restrict token,
+	                                  pos_t aligned_new_size)
+			THROWS(E_IOERROR, ...);
 
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	/* [0..1] Operator pair used for creating/destroying additional cookie objects
