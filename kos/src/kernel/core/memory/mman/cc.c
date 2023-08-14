@@ -1439,10 +1439,26 @@ PUBLIC ATTR_READMOSTLY uint16_t system_cc_maxattempts = 64;
  * @return: false: Nothing could be cleared :( */
 PUBLIC NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) bool
 NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
+	struct task *caller = THIS_TASK;
 	uint16_t version;
 	uintptr_t inside;
+
+	/* Set the number of  accounted bytes to `0'  (this
+	 * gets increased as we clear more and more caches) */
 	info->ci_bytes = 0;
 
+	/* Always set these flags when doing system-cache-clear operations:
+	 * - GFP_NOCLRC: Prevent recursive calls to `system_cc'
+	 * - GFP_NOTRIM: We manually trim kernel heaps near the end of cc,
+	 *               so by trying not to do so automatically over  the
+	 *               course of other cc operations, our final count of
+	 *               cleared bytes will be more accurate in the end. */
+	info->ci_gfp |= GFP_NOCLRC | GFP_NOTRIM;
+
+	/* Safety-check: prevent recursion in case a call to `system_cc()'
+	 *               is already in progress within the calling thread. */
+	if (caller->t_flags & _TASK_FSYSTEMCC)
+		return false;
 
 	/* Check if we're supposed to give up */
 	if (info->ci_attempt == (uint16_t)-1) {
@@ -1462,7 +1478,8 @@ NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
 		 * second half of attempts, we try to free as much as we can
 		 * possibly free. */
 		if (info->ci_minbytes == 0) {
-			/* Once we're past half the allowed number of attempts, */
+			/* Once we're past half the allowed number of  attempts,
+			 * be a little more aggressive with how we clear caches. */
 			if (info->ci_attempt >= (maxattempts >> 1)) {
 				info->ci_minbytes = (size_t)-1;
 			} else {
@@ -1473,7 +1490,11 @@ NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
 
 	/* Start out by trying to clear system caches ourself. */
 	atomic_inc(&cc_inside);
+
+	/* Keep the `_TASK_FSYSTEMCC' flag set whilst actually doing cc operations */
+	atomic_or(&caller->t_flags, _TASK_FSYSTEMCC);
 	system_cc_impl(info);
+	atomic_and(&caller->t_flags, ~_TASK_FSYSTEMCC);
 
 	/* Check if we already managed to release some memory */
 	if (info->ci_bytes != 0) {

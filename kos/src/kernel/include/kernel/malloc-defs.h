@@ -218,64 +218,64 @@ typedef unsigned int gfp_t;
 #define __GFP_HEAPMASK  0x0001
 #define __GFP_HEAPCOUNT 2
 
-#define GFP_BARELY  0x0000 /* HINT: The allocated memory will barely ever be used. */
+#define GFP_BARELY 0x0000 /* HINT: The allocated memory will barely ever be used. */
 
 #ifndef GFP_NORMAL
-#define GFP_NORMAL  0x0000 /* Allocate normal memory. */
+#define GFP_NORMAL 0x0000 /* Allocate normal memory. */
 #endif /* !GFP_NORMAL */
-#define GFP_LOCKED  0x0001 /* FLAG: Allocate memory that has been locked in-core.
-                            * WARNING: Do not  mix  locked  allocations  with  unlocked
-                            *          ones  when  allocating   from  the  same   heap!
-                            *          When  used  with  kmalloc(), this  flag  will be
-                            *          used  to  choose  between  `kernel_default_heap'
-                            *          and  `kernel_locked_heap',  though  when  custom
-                            *          heaps are used,  or the  kernel heaps  directly,
-                            *          make  sure  to always  set this  flag correctly,
-                            *          as  failure to  do so  may result  in the locked
-                            *          heap containing pre-allocated pages of  unlocked
-                            *          memory, destroying the expectation of its memory
-                            *          not  being subjugated to  the SWAP machinery, as
-                            *          well as being atomic. */
-#define GFP_PREFLT  0x0002 /* FLAG: Pre-fault newly allocated memory immediately, rather than upon first access.
-                            * NOTE: This flag only affects newly allocated pages, but doesn't affect memory allocated from previous over-allocations! */
-#define GFP_CALLOC  0x0004 /* FLAG: Allocate zero-initialized memory. (for krealloc(): only newly allocated memory is zero-initialized) */
-#define GFP_NOCLRC  0x0008 /* FLAG: Don't clear kernel caches to free up memory. */
-/*      GFP_        0x0010  * s.a. `GFP_MAP_FIXED' */
-#define GFP_NOMMAP  0x0020 /* FLAG: Don't map more memory to serve the allocation. Only serve the request from pre-allocated pools / overallocations. */
-#define GFP_NOTRIM  0x0020 /* FLAG: Don't unmap free memory blocks of sufficient size, but keep them as part of the preallocated cache. */
-/*      GFP_        0x0040  * s.a. `GFP_MAP_32BIT' */
-/*      GFP_        0x0080  * s.a. `GFP_MAP_PREPARED' */
-/*      GFP_        0x0100  * s.a. `GFP_MAP_BELOW' */
-/*      GFP_        0x0200  * s.a. `GFP_MAP_ABOVE' */
-/*efine GFP_        0x0400  * ... */
-#define GFP_ATOMIC  0x0800 /* FLAG: Don't block when waiting to  acquire any sort of  lock.
-                            *       Instead,  failure to acquire  some required lock causes
-                            *       the allocation to fail itself, either returning `NULL',
-                            *       or throwing an error.
-                            * NOTE: This flag is  implicitly set  during free  operations.
-                            *       If a free operation then  fails to acquire some  lock,
-                            *       the data-block that was meant to be freed will instead
-                            *       be tracked as a pending  free, and be released at  the
-                            *       nearest convenient point in time.
-                            * NOTE: This flag is  very strictly enforced,  meaning that  when
-                            *       passing  this flag,  you are  able to  allocate memory in
-                            *       whatever situation you might find yourself in, regardless
-                            *       of what locks may be  held, or whether or not  preemption
-                            *       is enabled. -  If anything happens  that could cause  the
-                            *       calling  thread to block, either through task_yield(), or
-                            *       through `task_waitfor()', the  allocation will only  fail
-                            *       by throwing an E_WOULDBLOCK  error, or returning NULL  in
-                            *       NX mode. */
-#define GFP_NOOVER  0x1000 /* FLAG: Don't   overallocate   memory  when   allocating   new  pages.
-                            *       This  only  affects overallocation  of full  pages. Allocating
-                            *       heap memory in such  a way that less  than 1 page of  overflow
-                            *       remains will still produce some overflow that will be reserved
-                            *       for future allocations. */
-#define GFP_NOSWAP  0x2000 /* FLAG: Don't invoke the swap machinery to free up memory. */
-#define GFP_MCHEAP  0x4000 /* FLAG: Allocate page controllers using the core-heap allocators. (MCoreHEAP) */
-#define GFP_NOMOVE  0x8000 /* FLAG: Only for `heap_realloc()' / `heap_realign()': use `realloc_in_place()' semantics,
-                            *       returning `NULL' (even  in exception-mode) when  the re-allocation is  impossible
-                            *       due to an overlap with some other memory mapping. */
+#define GFP_LOCKED 0x0001 /* FLAG: Allocate memory that has been locked in-core.
+                           * WARNING: Do not  mix  locked  allocations  with  unlocked
+                           *          ones  when  allocating   from  the  same   heap!
+                           *          When  used  with  kmalloc(), this  flag  will be
+                           *          used  to  choose  between  `kernel_default_heap'
+                           *          and  `kernel_locked_heap',  though  when  custom
+                           *          heaps are used,  or the  kernel heaps  directly,
+                           *          make  sure  to always  set this  flag correctly,
+                           *          as  failure to  do so  may result  in the locked
+                           *          heap containing pre-allocated pages of  unlocked
+                           *          memory, destroying the expectation of its memory
+                           *          not  being subjugated to  the SWAP machinery, as
+                           *          well as being atomic. */
+#define GFP_PREFLT 0x0002 /* FLAG: Pre-fault newly allocated memory immediately, rather than upon first access.
+                           * NOTE: This flag only affects newly allocated pages, but doesn't affect memory allocated from previous over-allocations! */
+#define GFP_CALLOC 0x0004 /* FLAG: Allocate zero-initialized memory. (for krealloc(): only newly allocated memory is zero-initialized) */
+#define GFP_NOCLRC 0x0008 /* FLAG: Don't clear kernel caches to free up memory. */
+/*      GFP_       0x0010  * s.a. `GFP_MAP_FIXED' */
+#define GFP_NOMMAP 0x0020 /* FLAG: Don't map more memory to serve the allocation. Only serve the request from pre-allocated pools / overallocations. */
+#define GFP_NOTRIM 0x0020 /* FLAG: Don't unmap free memory blocks of sufficient size, but keep them as part of the preallocated cache. */
+/*      GFP_       0x0040  * s.a. `GFP_MAP_32BIT' */
+/*      GFP_       0x0080  * s.a. `GFP_MAP_PREPARED' */
+/*      GFP_       0x0100  * s.a. `GFP_MAP_BELOW' */
+/*      GFP_       0x0200  * s.a. `GFP_MAP_ABOVE' */
+/*efine GFP_       0x0400  * ... */
+#define GFP_ATOMIC 0x0800 /* FLAG: Don't block when waiting to  acquire any sort of  lock.
+                           *       Instead,  failure to acquire  some required lock causes
+                           *       the allocation to fail itself, either returning `NULL',
+                           *       or throwing an error.
+                           * NOTE: This flag is  implicitly set  during free  operations.
+                           *       If a free operation then  fails to acquire some  lock,
+                           *       the data-block that was meant to be freed will instead
+                           *       be tracked as a pending  free, and be released at  the
+                           *       nearest convenient point in time.
+                           * NOTE: This flag is  very strictly enforced,  meaning that  when
+                           *       passing  this flag,  you are  able to  allocate memory in
+                           *       whatever situation you might find yourself in, regardless
+                           *       of what locks may be  held, or whether or not  preemption
+                           *       is enabled. -  If anything happens  that could cause  the
+                           *       calling  thread to block, either through task_yield(), or
+                           *       through `task_waitfor()', the  allocation will only  fail
+                           *       by throwing an E_WOULDBLOCK  error, or returning NULL  in
+                           *       NX mode. */
+#define GFP_NOOVER 0x1000 /* FLAG: Don't   overallocate   memory  when   allocating   new  pages.
+                           *       This  only  affects overallocation  of full  pages. Allocating
+                           *       heap memory in such  a way that less  than 1 page of  overflow
+                           *       remains will still produce some overflow that will be reserved
+                           *       for future allocations. */
+#define GFP_NOSWAP 0x2000 /* FLAG: Don't invoke the swap machinery to free up memory. */
+#define GFP_MCHEAP 0x4000 /* FLAG: Allocate page controllers using the core-heap allocators. (MCoreHEAP) */
+#define GFP_NOMOVE 0x8000 /* FLAG: Only for `heap_realloc()' / `heap_realign()': use `realloc_in_place()' semantics,
+                           *       returning `NULL' (even  in exception-mode) when  the re-allocation is  impossible
+                           *       due to an overlap with some other memory mapping. */
 
 /* Mask of GFP flags that are inherited by recursive allocations for control structures. */
 #define GFP_INHERIT                                      \

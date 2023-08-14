@@ -562,7 +562,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 #endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 		{
 			/* We  keep the lazy initialization of hinted nodes simple, and let
-			 * the #PF handler to most of the work. As such, all we really have
+			 * the #PF handler do most of the work. As such, all we really have
 			 * to  do is  ensure that every  page from the  tail-range has been
 			 * accessed at least once. */
 			do {
