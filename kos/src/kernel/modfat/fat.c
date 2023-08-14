@@ -550,8 +550,26 @@ NOTHROW(KCALL fat_v_cc)(struct mfile *__restrict self,
 	if (!FatNodeData_TryWrite(dat)) {
 		if (ccinfo_noblock(info))
 			return;
+
+		/* FIXME: When  `Fat_GetFileCluster()'  calls  `preallocate_cluster_vector_entries()'
+		 *        or `krealloc_nx()', it is already holding a lock to `FatNodeData_WriteNx()'
+		 * If those calls  then end  up trying  to clear  system caches,  we'll get  here in  a
+		 * context where we're  normally allowed to  block. However, if  we actually *were*  to
+		 * try to and  blocking-acquire the  FatNodeData-lock, we'd dead-lock,  since the  lock
+		 * is non-recursive and our thread is already holding it (and even if it was recursive,
+		 * 2 different threads would be able to dead-lock with each other when both are holding
+		 * a  lock to 2 different FatNode-s, and both are trying to lock the other's FatNode as
+		 * a result of system-cache-clear attempts)
+		 *
+		 * TODO: Fix this by turning `FatNodeData.fn_lock' into a `struct atomic_rwlock', and
+		 *       use `*_or_unlock' mechanisms in order to not keep ahold of the lock whenever
+		 *       doing something that isn't NOBLOCK. */
+#if 1
+		return;
+#else
 		if (!FatNodeData_WriteNx(dat))
 			return;
+#endif
 	}
 
 	/* Try to truncate the cluster vector. */
