@@ -30,6 +30,7 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/refcountable.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -499,6 +500,93 @@ _mfile_buffered_tailwritev(struct mfile *__restrict self,
 	}
 	return result;
 }
+
+
+struct mfile_trunclock_dec_object: refcountable {
+	REF struct mfile *mtldo_file; /* [1..1][const] File to unlock upon destruction. */
+};
+
+#define mfile_trunclock_dec_object_fini(self) \
+	(mfile_trunclock_dec((self)->mtldo_file), \
+	 decref_unlikely((self)->mtldo_file))
+#define mfile_trunclock_dec_object_fini_without_unlock(self) \
+	(decref_unlikely((self)->mtldo_file))
+
+struct mfile_trunclock_dec_object_ex: mfile_trunclock_dec_object {
+	REF struct refcountable *mtldo_inner; /* [0..1][const] Inner object. */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_trunclock_dec_object_destroy)(struct refcountable *__restrict self) {
+	struct mfile_trunclock_dec_object *me;
+	me = (struct mfile_trunclock_dec_object *)self;
+	mfile_trunclock_dec_object_fini(me);
+	kfree(me);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_trunclock_dec_object_ex_destroy)(struct refcountable *__restrict self) {
+	struct mfile_trunclock_dec_object_ex *me;
+	me = (struct mfile_trunclock_dec_object_ex *)self;
+	decref(me->mtldo_inner);
+	mfile_trunclock_dec_object_fini(me);
+	kfree(me);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_trunclock_dec_object_destroy_without_unlock)(struct refcountable *__restrict self) {
+	struct mfile_trunclock_dec_object_ex *me;
+	me = (struct mfile_trunclock_dec_object_ex *)self;
+	if (me->rca_destroy == &mfile_trunclock_dec_object_ex_destroy)
+		decref(me->mtldo_inner);
+	mfile_trunclock_dec_object_fini_without_unlock(me);
+	kfree(me);
+}
+
+
+/* Try to create a refcountable object to drop a trunc-lock from `self'
+ * once  that object gets destroyed. References to this object are then
+ * stored alongside `aio_handle's constructed to perform async reads or
+ * writes to/from `self' in `mfile_direct_read_async()' & friends.
+ *
+ * This function behaves as follows:
+ * @throws:        Already called `mfile_trunclock_dec(self)'
+ * @return: false: Already called `mfile_trunclock_dec(self)' (try again)
+ * @return: true:  `*p_result' is now non-NULL */
+PRIVATE WUNUSED bool KCALL
+mfile_create_trunclock_dec_or_unlock(struct mfile *__restrict self,
+                                     REF struct refcountable **__restrict p_result,
+                                     struct refcountable *inner)
+		THROWS(E_BADALLOC) {
+	bool locked = true;
+	size_t objsiz;
+	struct mfile_trunclock_dec_object_ex *result;
+	if (*p_result)
+		goto done; /* Already allocated :) */
+	objsiz = inner ? sizeof(struct mfile_trunclock_dec_object_ex)
+	               : sizeof(struct mfile_trunclock_dec_object);
+	result = (struct mfile_trunclock_dec_object_ex *)kmalloc_nx(objsiz, GFP_ATOMIC);
+	if (!result) {
+		/* Must unlock in order to allocate while blocking. */
+		mfile_trunclock_dec(self);
+		result = (struct mfile_trunclock_dec_object_ex *)kmalloc(objsiz, GFP_NORMAL);
+		locked = false;
+	}
+
+	/* Initialize the lock holder. */
+	result->mtldo_file = incref(self);
+	result->rca_refcnt = 1;
+	if (inner != NULL) {
+		result->mtldo_inner = incref(inner);
+		result->rca_destroy = &mfile_trunclock_dec_object_ex_destroy;
+	} else {
+		result->rca_destroy = &mfile_trunclock_dec_object_destroy;
+	}
+	*p_result = result;
+done:
+	return locked;
+}
+
 
 DECL_END
 

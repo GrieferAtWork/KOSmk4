@@ -445,11 +445,13 @@ again_reacquire_after_split:
 	/* Step #7: Update `mf_filesize' from `old_size' to  `new_size'. If it turns out  that
 	 *          the file's size changed since it was read above, re-merge a possibly split
 	 *          part from #6 and start over from scratch. */
-	if (!atomic64_cmpxch(&self->mf_filesize, (uint64_t)old_size, (uint64_t)new_size)) {
+	if (atomic64_read(&self->mf_filesize) != (uint64_t)old_size) {
 		mfile_unlock_and_decref_parts(self);
 		mfile_lock_endwrite(self);
 		goto again;
 	}
+
+	atomic64_write(&self->mf_filesize, (uint64_t)new_size);
 
 after_file_size_changed:
 	/* Step #8: Remove all mem-parts from the part-tree which have a min-address that

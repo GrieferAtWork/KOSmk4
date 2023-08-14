@@ -469,6 +469,8 @@ again:
 	return info.mdi_iob;
 #undef LOCAL_DMA_FLAGS
 #elif defined(LOCAL_DIRECT) && defined(LOCAL_ASYNC) && defined(LOCAL_BUFFER_IS_PHYS)
+	REF struct refcountable *unlock_cookie;
+	REF struct refcountable *saved_aio_obj;
 	size_t result;
 	shift_t blockshift = self->mf_blockshift;
 	size_t io_bytes;
@@ -603,124 +605,135 @@ again:
 #endif /* !LOCAL_WRITING */
 	}
 
-	mfile_lock_read(self);
+	/* Initialize the unlock-cookie, and make sure */
+	unlock_cookie = NULL;
+again_direct_io_lockfile:
+	TRY {
+		mfile_lock_read(self);
 
-	/* Check if the file has been deleted (or is read-only). */
+		/* Check if the file has been deleted (or is read-only). */
 #ifdef LOCAL_WRITING
-	if unlikely(self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY))
+		if unlikely(self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY))
 #else /* LOCAL_WRITING */
-	if unlikely(self->mf_flags & (MFILE_F_DELETED))
+		if unlikely(self->mf_flags & (MFILE_F_DELETED))
 #endif /* !LOCAL_WRITING */
-	{
-		mfile_lock_endread(self);
+		{
+			mfile_lock_endread(self);
 #ifdef LOCAL_WRITING
-		THROW(E_FSERROR_READONLY);
+			THROW(E_FSERROR_READONLY);
 #else /* LOCAL_WRITING */
-		return 0;
+			if (unlock_cookie != NULL)
+				mfile_trunclock_dec_object_destroy_without_unlock(unlock_cookie);
+			return 0;
 #endif /* !LOCAL_WRITING */
-	}
+		}
 
 #ifdef LOCAL_WRITING
-	if (!(self->mf_flags & MFILE_F_FIXEDFILESIZE)) {
-		/* If necessary, increase file size.
-		 * NOTE: Even if the write below fails, we don't decrease the
-		 *       file size (since that would require additional locks
-		 *       and can't be done safely because the new size  would
-		 *       have already been globally visible)
-		 * Also: The only reason anything below might fail is a hardware
-		 *       failure, or an interrupt, both of which are allowed  to
-		 *       leave the file in a state where data has been partially
-		 *       written.
-		 * NOTE: Only increase the file size when `num_bytes != 0' */
-		uintptr_t changes;
-		pos_t old_filesize, new_filesize;
-		pos_t max_file_size = (pos_t)-1;
-		if (mfile_isnode(self))
-			max_file_size = mfile_asnode(self)->fn_super->fs_feat.sf_filesize_max;
-		if (OVERFLOW_USUB(max_file_size, offset, &result)) {
+		if (!(self->mf_flags & MFILE_F_FIXEDFILESIZE)) {
+			/* If necessary, increase file size.
+			 * NOTE: Even if the write below fails, we don't decrease the
+			 *       file size (since that would require additional locks
+			 *       and can't be done safely because the new size  would
+			 *       have already been globally visible)
+			 * Also: The only reason anything below might fail is a hardware
+			 *       failure, or an interrupt, both of which are allowed  to
+			 *       leave the file in a state where data has been partially
+			 *       written.
+			 * NOTE: Only increase the file size when `num_bytes != 0' */
+			uintptr_t changes;
+			pos_t old_filesize, new_filesize;
+			pos_t max_file_size = (pos_t)-1;
+			if (mfile_isnode(self))
+				max_file_size = mfile_asnode(self)->fn_super->fs_feat.sf_filesize_max;
+			if (OVERFLOW_USUB(max_file_size, offset, &result)) {
 #if __SIZEOF_POS_T__ < __SIZEOF_SIZE_T__
-			if (offset < max_file_size) {
-				result = (size_t)-1;
-			} else
+				if (offset < max_file_size) {
+					result = (size_t)-1;
+				} else
 #endif /* __SIZEOF_POS_T__ < __SIZEOF_SIZE_T__ */
-			{
-				mfile_lock_endread(self);
-				THROW(E_FSERROR_FILE_TOO_BIG);
+				{
+					mfile_lock_endread(self);
+					THROW(E_FSERROR_FILE_TOO_BIG);
+				}
 			}
-		}
-		if (result >= num_bytes) {
-			result   = num_bytes;
-			io_bytes = num_bytes;
-		} else {
-			/* Because `sf_filesize_max' may not be block-aligned, but align `result' now. */
-			io_bytes = CEIL_ALIGN(result, (size_t)1 << blockshift);
-			assertf(io_bytes <= num_bytes,
-			        "Because `num_bytes' was asserted to be block-"
-			        "aligned, this should continue to hold true");
-		}
+			if (result >= num_bytes) {
+				result   = num_bytes;
+				io_bytes = num_bytes;
+			} else {
+				/* Because `sf_filesize_max' may not be block-aligned, but align `result' now. */
+				io_bytes = CEIL_ALIGN(result, (size_t)1 << blockshift);
+				assertf(io_bytes <= num_bytes,
+				        "Because `num_bytes' was asserted to be block-"
+				        "aligned, this should continue to hold true");
+			}
 
-		changes      = 0;
-		new_filesize = offset + result;
+			changes      = 0;
+			new_filesize = offset + result;
 again_read_old_filesize:
-		old_filesize = mfile_getsize(self);
-		if (new_filesize > old_filesize) {
-			/* Increase file size. */
-			if (!atomic64_cmpxch_weak(&self->mf_filesize,
-			                          (uint64_t)old_filesize,
-			                          (uint64_t)new_filesize))
-				goto again_read_old_filesize;
-			changes |= MFILE_F_ATTRCHANGED;
-		}
-		mfile_trunclock_inc(self);
-		mfile_lock_endread(self);
-
-		/* Update the last-modified timestamp (if necessary) */
-		if (!(self->mf_flags & MFILE_F_NOMTIME)) {
-			struct timespec now = realtime();
-			mfile_tslock_acquire(self);
-			COMPILER_READ_BARRIER();
-			if (!(self->mf_flags & (MFILE_F_NOMTIME | MFILE_F_DELETED))) {
-				self->mf_mtime = now;
-				self->mf_ctime = now;
+			old_filesize = mfile_getsize(self);
+			if (new_filesize > old_filesize) {
+				/* Increase file size. */
+				if (!atomic64_cmpxch_weak(&self->mf_filesize,
+				                          (uint64_t)old_filesize,
+				                          (uint64_t)new_filesize))
+					goto again_read_old_filesize;
 				changes |= MFILE_F_ATTRCHANGED;
 			}
-			mfile_tslock_release(self);
-		}
+			mfile_trunclock_inc(self);
+			mfile_lock_endread(self);
 
-		/* (possibly) mark file attributes as having changed. */
-		if (changes != 0) {
-			mfile_changed(self, changes);
-			mfile_inotify_modified(self); /* Post `IN_MODIFY' */
-		}
-	} else
-#endif /* LOCAL_WRITING */
-	{
-		/* Do I/O within allocated file bounds. */
-		pos_t filesize = mfile_getsize(self);
-		if (OVERFLOW_USUB(filesize, offset, &result)) {
-			result = 0;
-#if __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__
-			if (filesize > offset) {
-				result = (size_t)-1;
-			} else
-#endif /* __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__ */
-			{
-#ifdef LOCAL_WRITING
-				mfile_lock_endread(self);
-				THROW(E_FSERROR_FILE_TOO_BIG);
-#endif /* LOCAL_WRITING */
+			/* Update the last-modified timestamp (if necessary) */
+			if (!(self->mf_flags & MFILE_F_NOMTIME)) {
+				struct timespec now = realtime();
+				mfile_tslock_acquire(self);
+				COMPILER_READ_BARRIER();
+				if (!(self->mf_flags & (MFILE_F_NOMTIME | MFILE_F_DELETED))) {
+					self->mf_mtime = now;
+					self->mf_ctime = now;
+					changes |= MFILE_F_ATTRCHANGED;
+				}
+				mfile_tslock_release(self);
 			}
+
+			/* (possibly) mark file attributes as having changed. */
+			if (changes != 0) {
+				mfile_changed(self, changes);
+				mfile_inotify_modified(self); /* Post `IN_MODIFY' */
+			}
+		} else
+#endif /* LOCAL_WRITING */
+		{
+			/* Do I/O within allocated file bounds. */
+			pos_t filesize = mfile_getsize(self);
+			if (OVERFLOW_USUB(filesize, offset, &result)) {
+				result = 0;
+#if __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__
+				if (filesize > offset) {
+					result = (size_t)-1;
+				} else
+#endif /* __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__ */
+				{
+#ifdef LOCAL_WRITING
+					mfile_lock_endread(self);
+					THROW(E_FSERROR_FILE_TOO_BIG);
+#endif /* LOCAL_WRITING */
+				}
+			}
+			if (result > num_bytes)
+				result = num_bytes;
+
+			/* Figure out how much I/O we're allowed to perform. */
+			io_bytes = CEIL_ALIGN(result, (size_t)1 << blockshift);
+			assertf(io_bytes <= num_bytes, "Must be the case because `num_bytes' is block-aligned");
+
+			/* Prevent the file's size from being lowered. */
+			mfile_trunclock_inc(self);
+			mfile_lock_endread(self);
 		}
-		if (result > num_bytes)
-			result = num_bytes;
-
-		/* Figure out how much I/O we're allowed to perform. */
-		io_bytes = CEIL_ALIGN(result, (size_t)1 << blockshift);
-		assertf(io_bytes <= num_bytes, "Must be the case because `num_bytes' is block-aligned");
-
-		/* Prevent the file's size from being lowered. */
-		mfile_trunclock_inc(self);
-		mfile_lock_endread(self);
+	} EXCEPT {
+		if (unlock_cookie != NULL)
+			mfile_trunclock_dec_object_destroy_without_unlock(unlock_cookie);
+		RETHROW();
 	}
 
 	/* NOTE: At this point:
@@ -732,8 +745,23 @@ again_read_old_filesize:
 	 * - num_bytes: the block-aligned count for how much I/O the caller
 	 *              wanted us to do. */
 
-	/* Always release the trunc-lock once we're done. */
-	RAII_FINALLY { mfile_trunclock_dec(self); };
+	/* Always release the trunc-lock once we're done, but only do
+	 * so once all AIO has completed! */
+	if (!mfile_create_trunclock_dec_or_unlock(self, &unlock_cookie, aio->am_obj))
+		goto again_direct_io_lockfile;
+
+	/* Store a reference to the unlock-cookie in the AIO-controller.
+	 * When sub-handles are created, those sub-handles will each get
+	 * a reference to `unlock_cookie'
+	 *
+	 * Once we're done here, restore the original AIO-object. */
+	saved_aio_obj = aio->am_obj;   /* Inherit reference */
+	aio->am_obj   = unlock_cookie; /* Inherit reference */
+	RAII_FINALLY {
+		assert(aio->am_obj == unlock_cookie);
+		aio->am_obj = saved_aio_obj;    /* Inherit reference (x2) */
+		decref_unlikely(unlock_cookie); /* Drop reference inherited in previous line */
+	};
 
 	/* Actually do I/O */
 #ifndef LOCAL_BUFFER_IS_IOVEC
