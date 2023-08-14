@@ -44,6 +44,7 @@
 #include <assert.h>
 #include <dlfcn.h>
 #include <elf.h>
+#include <inttypes.h>
 #include <link.h>
 #include <stdarg.h>
 #include <stdint.h>
@@ -748,7 +749,7 @@ INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_badmodule)(NCX void *modptr);
 INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_badsection)(NCX void *sectptr);
 INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_nomem)(void);
 INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_no_mod_at_addr)(NCX void const *static_pointer);
-INTDEF ATTR_COLD NONNULL((1)) int NOTHROW(CC dl_seterror_header_read_error)(char const *__restrict filename);
+INTDEF ATTR_COLD NONNULL((1)) int NOTHROW(CC dl_seterror_header_read_error)(char const *__restrict filename, errno_t error);
 INTDEF ATTR_COLD NONNULL((1)) int NOTHROW(CC dl_seterror_notelf)(char const *__restrict filename);
 INTDEF ATTR_COLD NONNULL((1, 2)) int NOTHROW_NCX(CC dl_seterror_nosect)(NCX DlModule const *self, NCX char const *name) THROWS(E_SEGFAULT);
 INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_seterror_nosect_index)(NCX DlModule const *self, size_t index) THROWS(E_SEGFAULT);
@@ -757,8 +758,8 @@ INTDEF ATTR_COLD NONNULL((1, 2)) int NOTHROW_NCX(CC dl_seterror_nosym_next)(DlMo
 INTDEF ATTR_COLD NONNULL((1, 2)) int NOTHROW_NCX(CC dl_seterror_nosym_in)(NCX DlModule const *mod, NCX char const *symname) THROWS(E_SEGFAULT);
 INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_seterror_nosym_next_badcaller)(NCX char const *symname) THROWS(E_SEGFAULT);
 INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_seterror_dlopen_failed)(NCX char const *libname) THROWS(E_SEGFAULT);
-INTDEF ATTR_COLD NONNULL((1, 2)) int NOTHROW_NCX(CC dl_seterr_section_mmap_failed)(NCX DlModule const *self, NCX char const *section_filename) THROWS(E_SEGFAULT);
-INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_seterr_section_index_mmap_failed)(NCX DlModule const *self, size_t section_index) THROWS(E_SEGFAULT);
+INTDEF ATTR_COLD NONNULL((1, 2)) int NOTHROW_NCX(CC dl_seterr_section_mmap_failed)(NCX DlModule const *self, NCX char const *section_filename, errno_t error) THROWS(E_SEGFAULT);
+INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_seterr_section_index_mmap_failed)(NCX DlModule const *self, size_t section_index, errno_t error) THROWS(E_SEGFAULT);
 INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(VCC dl_seterrorf)(char const *__restrict format, ...);
 INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_vseterrorf)(char const *__restrict format, va_list args);
 
@@ -775,6 +776,19 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW(CC dlsec_builtin_name)(size_t sect
  * application ungracefully. */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) void *
 NOTHROW(FCALL dl_require_global)(char const *__restrict name);
+
+/* Try to lookup `strerrorname_np()' and use it to query the name of `error'
+ * If no such  symbol exists (i.e.  `libc' hasn't been  loaded), or if  that
+ * functions returned `NULL', simply return `NULL', too. */
+INTDEF WUNUSED char const *FCALL dl_strerrorname_np(errno_t error);
+
+/* Same as `dl_strerrorname_np()', but automatically provide a fallback mechanism. */
+#define DL_STRERRORNAME_FALLBACK_LEN sizeof("error " PRIMAXu)
+INTDEF ATTR_RETNONNULL WUNUSED char const *FCALL
+dl_strerrorname_np_s(errno_t error, char fallback_buf[DL_STRERRORNAME_FALLBACK_LEN]);
+
+//			libdl_dlsym((DlModule *)RTLD_DEFAULT, "strerrorname_np");
+
 
 /* Set to true if the sys_debugtrap() system call is disabled. */
 INTDEF bool sys_debugtrap_disabled;

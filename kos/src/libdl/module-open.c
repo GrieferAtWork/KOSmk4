@@ -379,7 +379,7 @@ NOTHROW_RPC(CC preadall)(fd_t fd, void *buf, size_t bufsize, ElfW(Off) offset) {
 	ssize_t result, temp;
 	result = sys_pread64(fd, buf, bufsize, offset);
 	if unlikely(E_ISERR(result))
-		goto err;
+		goto done;
 	if ((size_t)result < bufsize) {
 		/* Keep on reading */
 		for (;;) {
@@ -388,17 +388,16 @@ NOTHROW_RPC(CC preadall)(fd_t fd, void *buf, size_t bufsize, ElfW(Off) offset) {
 			                   bufsize - (size_t)result,
 			                   (pos64_t)offset + (size_t)result);
 			if unlikely(E_ISERR(result))
-				goto err;
+				goto done;
 			if unlikely(!temp)
-				goto err;
+				return -ENXIO;
 			result += temp;
 			if ((size_t)result >= bufsize)
 				break;
 		}
 	}
+done:
 	return result;
-err:
-	return 0;
 }
 
 
@@ -987,13 +986,15 @@ NOTHROW_RPC(CC DlModule_ElfMapProgramHeaders)(ElfW(Ehdr) const *__restrict ehdr,
                                               /*inherit(on_success)*/ fd_t fd) {
 	uint16_t pidx;
 	REF DlModule *result;
+	ssize_t error;
 	if unlikely(DlModule_ElfVerifyEhdr(ehdr, filename, true))
 		goto err;
 	result = (REF DlModule *)calloc(offsetof(DlModule, dm_elf.de_phdr) +
 	                                (ehdr->e_phnum * sizeof(ElfW(Phdr))));
 	if unlikely(!result)
 		goto err_nomem;
-	if (preadall(fd, result->dm_elf.de_phdr, ehdr->e_phnum * sizeof(ElfW(Phdr)), ehdr->e_phoff) <= 0)
+	error = preadall(fd, result->dm_elf.de_phdr, ehdr->e_phnum * sizeof(ElfW(Phdr)), ehdr->e_phoff);
+	if (E_ISERR(error))
 		goto err_r_io;
 	/*result->dm_ops           = NULL;*/   /* Implicitly done by `calloc()' */
 	result->dm_filename        = filename; /* Inherit data */
@@ -1035,10 +1036,13 @@ NOTHROW_RPC(CC DlModule_ElfMapProgramHeaders)(ElfW(Ehdr) const *__restrict ehdr,
 		                         result->dm_elf.de_phdr,
 		                         result->dm_elf.de_phnum);
 		if (E_ISERR(libbase)) {
+			char const *error_name;
+			errno_t error_code;
+			char error_name_fallback[DL_STRERRORNAME_FALLBACK_LEN];
 			free(result);
-			dl_seterrorf("%q: Failed to map library into memory: %u",
-			             filename,
-			             (unsigned int)-(errno_t)(intptr_t)(uintptr_t)libbase);
+			error_code = -(errno_t)(intptr_t)(uintptr_t)libbase;
+			error_name = dl_strerrorname_np_s(error_code, error_name_fallback);
+			dl_seterrorf("%q: Failed to map library into memory: %s", filename, error_name);
 			goto err;
 		}
 		result->dm_loadaddr = (uintptr_t)libbase;
@@ -1049,7 +1053,7 @@ NOTHROW_RPC(CC DlModule_ElfMapProgramHeaders)(ElfW(Ehdr) const *__restrict ehdr,
 err_r_io:
 	free(result);
 /*err_io:*/
-	dl_seterror_header_read_error(filename);
+	dl_seterror_header_read_error(filename, (errno_t)-error);
 	goto err;
 err_nomem:
 	dl_seterror_nomem();
@@ -1064,6 +1068,7 @@ DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/ char *__restrict filenam
 		THROWS(...) {
 	ElfW(Ehdr) ehdr;
 	REF DlModule *result;
+	ssize_t error;
 	result = DlModule_FindFromFilename(filename);
 	if (result) {
 		sys_close(fd);
@@ -1071,7 +1076,8 @@ DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/ char *__restrict filenam
 		DlModule_UpdateFlags(result, mode);
 		goto done;
 	}
-	if unlikely(preadall(fd, &ehdr, sizeof(ehdr), 0) <= 0)
+	error = preadall(fd, &ehdr, sizeof(ehdr), 0);
+	if unlikely(E_ISERR(error))
 		goto err_io;
 
 	/* Support for formats other than ELF. */
@@ -1107,7 +1113,7 @@ DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/ char *__restrict filenam
 done:
 	return result;
 err_io:
-	dl_seterror_header_read_error(filename);
+	dl_seterror_header_read_error(filename, (errno_t)-error);
 	goto err;
 err_r:
 	result->dm_file     = -1;

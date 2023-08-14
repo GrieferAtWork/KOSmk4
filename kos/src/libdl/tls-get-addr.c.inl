@@ -78,15 +78,20 @@ libdl_dltlsaddr2(NCX DlModule *self, NCX struct dltls_segment *seg) THROWS(E_SEG
 	if (!self->dm_tlsinit && self->dm_tlsfsize) {
 		byte_t *init, *new_init;
 		fd_t fd;
+		ssize_t error;
 		init = (byte_t *)malloc(self->dm_tlsfsize);
 		if unlikely(!init)
 			goto err_nomem;
 		fd = DlModule_GetFd(self);
 		if unlikely(fd < 0)
 			goto err_init;
-		if (preadall(fd, init, self->dm_tlsfsize, self->dm_tlsoff) <= 0) {
-			dl_seterrorf("Failed to read %" PRIuSIZ " bytes of TLS template data from %" PRIuN(__SIZEOF_ELFW(OFF__)),
-			             self->dm_tlsfsize, self->dm_tlsoff);
+		error = preadall(fd, init, self->dm_tlsfsize, self->dm_tlsoff);
+		if (E_ISERR(error)) {
+			char error_fallback_buf[DL_STRERRORNAME_FALLBACK_LEN];
+			dl_seterrorf("Failed to read %" PRIuSIZ " bytes of TLS template "
+			             "data from %" PRIuN(__SIZEOF_ELFW(OFF__)) ": %s",
+			             self->dm_tlsfsize, self->dm_tlsoff,
+			             dl_strerrorname_np_s((errno_t)-error, error_fallback_buf));
 err_init:
 			free(init);
 			goto err;

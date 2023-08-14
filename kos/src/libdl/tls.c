@@ -34,6 +34,7 @@
 
 #include <assert.h>
 #include <atomic.h>
+#include <errno.h>
 #include <inttypes.h>
 #include <malloc.h>
 #include <stddef.h>
@@ -164,13 +165,17 @@ NOTHROW_RPC(CC DlModule_InitStaticTLSBindings)(void) {
 		      tls_segment_size_no_segment +
 		      iter->dm_tlsstoff;
 		if (iter->dm_tlsfsize) {
+			ssize_t error;
 			fd_t fd = DlModule_GetFd(iter);
 			if unlikely(fd < 0)
 				goto err;
-			if (preadall(fd, dst, iter->dm_tlsfsize, iter->dm_tlsoff) <= 0) {
+			error = preadall(fd, dst, iter->dm_tlsfsize, iter->dm_tlsoff);
+			if (E_ISERR(error)) {
+				char error_fallback_buf[DL_STRERRORNAME_FALLBACK_LEN];
 				dl_seterrorf("%q: Failed to read %" PRIuSIZ " bytes of TLS "
-				             "template data from %" PRIuN(__SIZEOF_ELFW(OFF__)),
-				             iter->dm_filename, iter->dm_tlsfsize, iter->dm_tlsoff);
+				             "template data from %" PRIuN(__SIZEOF_ELFW(OFF__)) ": %s",
+				             iter->dm_filename, iter->dm_tlsfsize, iter->dm_tlsoff,
+				             dl_strerrorname_np_s((errno_t)-error, error_fallback_buf));
 				goto err;
 			}
 		}

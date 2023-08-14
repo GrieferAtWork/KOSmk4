@@ -299,11 +299,14 @@ INTERN WUNUSED NONNULL((1)) ElfW(Shdr) *
 NOTHROW_NCX(CC DlModule_ElfGetShdrs)(NCX DlModule *self)
 		THROWS(E_SEGFAULT) {
 	fd_t fd;
+	ssize_t error;
+	char error_fallback_buf[DL_STRERRORNAME_FALLBACK_LEN];
 	ElfW(Shdr) *result;
 	assert(!self->dm_ops);
 	result = self->dm_elf.de_shdr;
 	if (result != NULL)
 		return result;
+
 	/* Must load the section headers. */
 	fd = DlModule_GetFd(self);
 	if unlikely(fd < 0)
@@ -312,9 +315,12 @@ NOTHROW_NCX(CC DlModule_ElfGetShdrs)(NCX DlModule *self)
 	    self->dm_elf.de_shoff == 0 ||
 	    self->dm_elf.de_shstrndx == (ElfW(Half))-1) {
 		ElfW(Ehdr) ehdr;
+
 		/* Must initialize information about section headers. */
-		if (preadall(fd, &ehdr, sizeof(ehdr), 0) <= 0)
+		error = preadall(fd, &ehdr, sizeof(ehdr), 0);
+		if (E_ISERR(error))
 			goto err_read_ehdr;
+
 		/* Quickly verify that the ehdr is valid. */
 		if unlikely(DlModule_ElfVerifyEhdr(&ehdr, self->dm_filename, false))
 			goto err;
@@ -332,11 +338,13 @@ NOTHROW_NCX(CC DlModule_ElfGetShdrs)(NCX DlModule *self)
 		atomic_cmpxch(&self->dm_elf.de_shdr, NULL, (ElfW(Shdr) *)empty_shdr);
 		return empty_shdr;
 	}
+
 	/* Allocate the section header vector. */
 	result = (ElfW(Shdr) *)malloc(self->dm_elf.de_shnum * sizeof(ElfW(Shdr)));
 	if unlikely(!result)
 		goto err_nomem;
-	if (preadall(fd, result, self->dm_elf.de_shnum * sizeof(ElfW(Shdr)), self->dm_elf.de_shoff) <= 0)
+	error = preadall(fd, result, self->dm_elf.de_shnum * sizeof(ElfW(Shdr)), self->dm_elf.de_shoff);
+	if (E_ISERR(error))
 		goto err_read_shdr;
 	{
 		ElfW(Shdr) *new_result;
@@ -352,16 +360,18 @@ NOTHROW_NCX(CC DlModule_ElfGetShdrs)(NCX DlModule *self)
 	return result;
 err_read_shdr:
 	free(result);
-	dl_seterrorf("%q: Failed to read section header vector",
-	             self->dm_filename);
+	dl_seterrorf("%q: Failed to read section header vector: %s",
+	             self->dm_filename,
+	             dl_strerrorname_np_s((errno_t)-error, error_fallback_buf));
 	goto err;
 err_nomem:
 	dl_seterrorf("%q: Failed to allocate section header vector",
 	             self->dm_filename);
 	goto err;
 err_read_ehdr:
-	dl_seterrorf("%q: Failed to read ElfW(Ehdr)",
-	             self->dm_filename);
+	dl_seterrorf("%q: Failed to read ElfW(Ehdr): %s",
+	             self->dm_filename,
+	             dl_strerrorname_np_s((errno_t)-error, error_fallback_buf));
 err:
 	return NULL;
 }
@@ -373,6 +383,8 @@ NOTHROW_NCX(CC DlModule_ElfGetShstrtab)(DlModule *self)
 		THROWS(E_SEGFAULT) {
 	char *result;
 	ElfW(Shdr) *shdrs;
+	ssize_t error;
+	char error_fallback_buf[DL_STRERRORNAME_FALLBACK_LEN];
 	assert(!self->dm_ops);
 	result = self->dm_elf.de_shstrtab;
 	if (result)
@@ -391,8 +403,10 @@ NOTHROW_NCX(CC DlModule_ElfGetShstrtab)(DlModule *self)
 	if unlikely(!result)
 		goto err_nomem;
 	result[shdrs->sh_size] = '\0'; /* Ensure NUL-termination */
+
 	/* Read the string table into memory. */
-	if (preadall(self->dm_file, result, shdrs->sh_size, shdrs->sh_offset) <= 0)
+	error = preadall(self->dm_file, result, shdrs->sh_size, shdrs->sh_offset);
+	if (E_ISERR(error))
 		goto err_read_shstrtab;
 	{
 		char *new_result;
@@ -409,10 +423,11 @@ NOTHROW_NCX(CC DlModule_ElfGetShstrtab)(DlModule *self)
 err_read_shstrtab:
 	dl_seterrorf("%q: Failed to read contents of "
 	             "`e_shstrndx=%" PRIuN(__SIZEOF_ELFW(HALF__)) "' ("
-	             "`sh_offset=%" PRIuN(__SIZEOF_ELFW(OFF__)) "')",
+	             "`sh_offset=%" PRIuN(__SIZEOF_ELFW(OFF__)) "'): %s",
 	             self->dm_filename,
 	             self->dm_elf.de_shstrndx,
-	             shdrs->sh_offset);
+	             shdrs->sh_offset,
+	             dl_strerrorname_np_s((errno_t)-error, error_fallback_buf));
 	goto err;
 err_nomem:
 	dl_seterrorf("%q: Failed to allocate section header string table",

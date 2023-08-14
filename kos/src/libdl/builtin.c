@@ -59,6 +59,40 @@
 
 DECL_BEGIN
 
+typedef ATTR_CONST_T WUNUSED_T char const *
+NOTHROW_T(LIBCCALL *LPSTRERRORNAME_NP)(errno_t errnum);
+
+PRIVATE bool inside_dl_strerrorname_np = false;
+
+/* Try to lookup `strerrorname_np()' and use it to query the name of `error'
+ * If no such  symbol exists (i.e.  `libc' hasn't been  loaded), or if  that
+ * functions returned `NULL', simply return `NULL', too. */
+INTERN WUNUSED char const *FCALL
+dl_strerrorname_np(errno_t error) {
+	char const *result = NULL;
+	if (!inside_dl_strerrorname_np) { /* Protect against recursion */
+		LPSTRERRORNAME_NP cb;
+		inside_dl_strerrorname_np = true;
+		*(void **)&cb = libdl_dlsym((DlModule *)RTLD_DEFAULT, "strerrorname_np");
+		if (cb != NULL)
+			result = (*cb)(error);
+		inside_dl_strerrorname_np = false;
+	}
+	return result;
+}
+
+/* Same as `dl_strerrorname_np()', but automatically provide a fallback mechanism. */
+INTERN ATTR_RETNONNULL WUNUSED char const *FCALL
+dl_strerrorname_np_s(errno_t error, char fallback_buf[DL_STRERRORNAME_FALLBACK_LEN]) {
+	char const *result = dl_strerrorname_np(error);
+	if (result == NULL) {
+		sprintf(fallback_buf, "error %u", error);
+		result = fallback_buf;
+	}
+	return result;
+}
+
+
 INTERN NONNULL((2)) ssize_t
 NOTHROW_RPC(FORMATPRINTER_CC syslog_printer)(void *arg,
                                              NCX char const *data,
@@ -185,8 +219,11 @@ INTERN ATTR_COLD int NOTHROW(CC dl_seterror_badsection)(void *sectptr) {
 }
 
 INTERN ATTR_COLD NONNULL((1)) int
-NOTHROW(CC dl_seterror_header_read_error)(char const *__restrict filename) {
-	return dl_seterrorf("%q: Failed to read headers", filename);
+NOTHROW(CC dl_seterror_header_read_error)(char const *__restrict filename, errno_t error) {
+	char buf[DL_STRERRORNAME_FALLBACK_LEN];
+	return dl_seterrorf("%q: Failed to read headers: %s",
+	                    filename,
+	                    dl_strerrorname_np_s(error, buf));
 }
 
 INTERN ATTR_COLD NONNULL((1)) int
@@ -252,18 +289,24 @@ NOTHROW_NCX(CC dl_seterror_dlopen_failed)(NCX char const *libname)
 
 INTERN ATTR_COLD NONNULL((1, 2)) int
 NOTHROW_NCX(CC dl_seterr_section_mmap_failed)(NCX DlModule const *self,
-                                              NCX char const *section_filename)
+                                              NCX char const *section_filename,
+                                              errno_t error)
 		THROWS(E_SEGFAULT) {
-	return dl_seterrorf("%q: Failed to map section %q into memory",
-	                    self->dm_filename, section_filename);
+	char buf[DL_STRERRORNAME_FALLBACK_LEN];
+	return dl_seterrorf("%q: Failed to map section %q into memory: %s",
+	                    self->dm_filename, section_filename,
+	                    dl_strerrorname_np_s(error, buf));
 }
 
 INTERN ATTR_COLD NONNULL((1)) int
 NOTHROW_NCX(CC dl_seterr_section_index_mmap_failed)(NCX DlModule const *self,
-                                                    size_t section_index)
+                                                    size_t section_index,
+                                                    errno_t error)
 		THROWS(E_SEGFAULT) {
-	return dl_seterrorf("%q: Failed to map section #%" PRIuSIZ " into memory",
-	                    self->dm_filename, section_index);
+	char buf[DL_STRERRORNAME_FALLBACK_LEN];
+	return dl_seterrorf("%q: Failed to map section #%" PRIuSIZ " into memory: %s",
+	                    self->dm_filename, section_index,
+	                    dl_strerrorname_np_s(error, buf));
 }
 
 
@@ -1795,10 +1838,11 @@ create_section_from_addr:
 		                MAP_PRIVATE | MAP_FILE,
 		                modfd, section_offset);
 		if unlikely(E_ISERR(base)) {
+			errno_t error = -(errno_t)(uintptr_t)base;
 			if (flags & DLLOCKSECTION_FINDEX) {
-				dl_seterr_section_index_mmap_failed(self, (size_t)self->dm_elf.de_shnum + index);
+				dl_seterr_section_index_mmap_failed(self, (size_t)self->dm_elf.de_shnum + index, error);
 			} else {
-				dl_seterr_section_mmap_failed(self, rules->asd_name);
+				dl_seterr_section_mmap_failed(self, rules->asd_name, error);
 			}
 			goto err_r;
 		}
@@ -2082,11 +2126,12 @@ again_read_section:
 			                MAP_PRIVATE | MAP_FILE,
 			                self->dm_file, info.dsi_offset);
 			if (E_ISERR(base)) {
+				errno_t error = -(errno_t)(uintptr_t)base;
 				DlSection_Decref(result);
 				if (flags & DLLOCKSECTION_FINDEX) {
-					dl_seterr_section_index_mmap_failed(self, (size_t)(uintptr_t)name);
+					dl_seterr_section_index_mmap_failed(self, (size_t)(uintptr_t)name, error);
 				} else {
-					dl_seterr_section_mmap_failed(self, name);
+					dl_seterr_section_mmap_failed(self, name, error);
 				}
 				goto err;
 			}
@@ -2214,11 +2259,12 @@ again_read_elf_section:
 			                MAP_PRIVATE | MAP_FILE,
 			                self->dm_file, sect->sh_offset);
 			if (E_ISERR(base)) {
+				errno_t error = -(errno_t)(uintptr_t)base;
 				DlSection_Decref(result);
 				if (flags & DLLOCKSECTION_FINDEX) {
-					dl_seterr_section_index_mmap_failed(self, (size_t)(uintptr_t)name);
+					dl_seterr_section_index_mmap_failed(self, (size_t)(uintptr_t)name, error);
 				} else {
-					dl_seterr_section_mmap_failed(self, name);
+					dl_seterr_section_mmap_failed(self, name, error);
 				}
 				goto err;
 			}
