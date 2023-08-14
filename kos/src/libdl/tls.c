@@ -582,6 +582,23 @@ libdl_dltlsaddr(NCX DlModule *self) THROWS(E_SEGFAULT, ...) {
 }
 
 
+#if 0
+typedef struct {
+	uintptr_t ti_module;
+	uintptr_t ti_offset;
+} tls_index;
+INTERN void *FCALL libdl___debug_tls_get_addr(tls_index *index) {
+	DlModule *mod = (DlModule *)index->ti_module;
+	void *base, *result;
+	base   = libdl_dltlsbase(mod);
+	result = (void *)((uintptr_t)base + index->ti_offset);
+	syslog(LOG_DEBUG, "[libdl] __tls_get_addr(%p:%p[%q]) -> %p+%p=%p\n",
+	       index, mod, mod->dm_filename, base, index->ti_offset, result);
+	return result;
+}
+#endif
+
+
 DECL_END
 
 

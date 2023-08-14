@@ -70,6 +70,8 @@ struct dl_symbol {
 	size_t           ds_siz; /* [valid_if(ds_mod->dm_ops)] Symbol size */
 };
 
+/* Check if a given `sym' needs to have the module's load-address added to its value. */
+#define Elf_SymNeedsLoadAddr(sym) ((sym)->st_shndx != SHN_ABS && ELFW(ST_TYPE)((sym)->st_info) != STT_TLS)
 
 
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_NOT_FOUND 0
@@ -178,7 +180,7 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 				/* Found the real, actual symbol! */
 				ElfW(Addr) addr;
 				addr = symbol.ds_sym->st_value;
-				if (symbol.ds_sym->st_shndx != SHN_ABS)
+				if (Elf_SymNeedsLoadAddr(symbol.ds_sym))
 					addr += symbol.ds_mod->dm_loadaddr;
 				if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_GNU_IFUNC ||
 				    ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_KOS_IDATA) {
@@ -226,7 +228,7 @@ DlModule_ElfFindSymbol(DlModule *__restrict self, uintptr_t symid,
 		}
 got_local_symbol:
 		addr = symbol->st_value;
-		if (symbol->st_shndx != SHN_ABS)
+		if (Elf_SymNeedsLoadAddr(symbol))
 			addr += self->dm_loadaddr;
 		if (ELFW(ST_TYPE)(symbol->st_info) == STT_GNU_IFUNC ||
 		    ELFW(ST_TYPE)(symbol->st_info) == STT_KOS_IDATA)
@@ -341,7 +343,7 @@ again_search_globals_module:
 						if (weak_symbol.ds_mod)
 							decref(weak_symbol.ds_mod);
 						addr = symbol->st_value;
-						if (symbol->st_shndx != SHN_ABS)
+						if (Elf_SymNeedsLoadAddr(symbol))
 							addr += iter->dm_loadaddr;
 						if (ELFW(ST_TYPE)(symbol->st_info) == STT_GNU_IFUNC ||
 						    ELFW(ST_TYPE)(symbol->st_info) == STT_KOS_IDATA) {
@@ -407,7 +409,7 @@ again_search_globals_module:
 				symbol_size = weak_symbol.ds_siz;
 			} else {
 				addr = weak_symbol.ds_sym->st_value;
-				if (weak_symbol.ds_sym->st_shndx != SHN_ABS)
+				if (Elf_SymNeedsLoadAddr(weak_symbol.ds_sym))
 					addr += weak_symbol.ds_mod->dm_loadaddr;
 				if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC ||
 				    ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_KOS_IDATA) {

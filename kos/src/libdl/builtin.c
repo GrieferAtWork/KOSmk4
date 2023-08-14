@@ -1164,6 +1164,8 @@ NOTHROW_NCX(DLFCN_CC libdl_dladdr)(void const *address,
 			uintptr_t addr, distance;
 			if (iter->st_shndx == SHN_UNDEF)
 				continue;
+			if (ELFW(ST_TYPE)(iter->st_info) == STT_TLS)
+				continue; /* Don't include TLS symbols */
 			addr = iter->st_value;
 			if (iter->st_shndx != SHN_ABS)
 				addr += mod->dm_loadaddr;

@@ -72,9 +72,10 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(NCX byte_t const *symtab_start,
 			Elf32_Section st_shndx; /* Section index */
 			Elf32_Addr st_value;    /* Symbol value */
 			st_shndx = UNALIGNED_GET(&iter->st_shndx);
-			if (st_shndx == SHN_UNDEF ||
-			    st_shndx == SHN_ABS)
+			if (st_shndx == SHN_UNDEF || st_shndx == SHN_ABS)
 				continue;
+			if (ELF32_ST_TYPE(iter->st_info) == STT_TLS)
+				continue; /* Don't include TLS symbols */
 			st_value = UNALIGNED_GET(&iter->st_value);
 			if ((st_value == module_relative_pc) ||
 			    (module_relative_pc >= (uintptr_t)st_value &&
@@ -89,9 +90,10 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(NCX byte_t const *symtab_start,
 			Elf32_Section st_shndx; /* Section index */
 			Elf32_Addr st_value;    /* Symbol value */
 			st_shndx = UNALIGNED_GET(&iter->st_shndx);
-			if (st_shndx == SHN_UNDEF ||
-			    st_shndx == SHN_ABS)
+			if (st_shndx == SHN_UNDEF || st_shndx == SHN_ABS)
 				continue;
+			if (ELF32_ST_TYPE(iter->st_info) == STT_TLS)
+				continue; /* Don't include TLS symbols */
 			st_value = UNALIGNED_GET(&iter->st_value);
 			if (st_value > module_relative_pc)
 				continue; /* Defined above the result */
@@ -109,9 +111,10 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(NCX byte_t const *symtab_start,
 			Elf64_Section st_shndx; /* Section index */
 			Elf64_Addr st_value;    /* Symbol value */
 			st_shndx = UNALIGNED_GET(&iter->st_shndx);
-			if (st_shndx == SHN_UNDEF ||
-			    st_shndx == SHN_ABS)
+			if (st_shndx == SHN_UNDEF || st_shndx == SHN_ABS)
 				continue;
+			if (ELF64_ST_TYPE(iter->st_info) == STT_TLS)
+				continue; /* Don't include TLS symbols */
 			st_value = UNALIGNED_GET(&iter->st_value);
 			if ((st_value == module_relative_pc) ||
 			    (module_relative_pc >= st_value &&
@@ -126,9 +129,10 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(NCX byte_t const *symtab_start,
 			Elf64_Section st_shndx; /* Section index */
 			Elf64_Addr st_value;    /* Symbol value */
 			st_shndx = UNALIGNED_GET(&iter->st_shndx);
-			if (st_shndx == SHN_UNDEF ||
-			    st_shndx == SHN_ABS)
+			if (st_shndx == SHN_UNDEF || st_shndx == SHN_ABS)
 				continue;
+			if (ELF64_ST_TYPE(iter->st_info) == STT_TLS)
+				continue; /* Don't include TLS symbols */
 			st_value = UNALIGNED_GET(&iter->st_value);
 			if (st_value > module_relative_pc)
 				continue; /* Defined above the result */

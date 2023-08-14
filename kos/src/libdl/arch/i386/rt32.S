@@ -68,6 +68,18 @@ BUILTIN_GLOBALS_ENUMERATE(DEFINE_GLOBAL_SYMBOL_IMPORT)
 	 * meaning  that the pointer  to the tls_index  structure is stored at
 	 * 4(%esp) upon entry, rather than within %eax */
 .section .text
+#if 0
+INTERN_FUNCTION(libdl___tls_get_addr)
+	.cfi_startproc
+	movl   4(%esp), %eax
+INTERN_FUNCTION(libdl____tls_get_addr)
+	movl   %eax, %ecx
+	INTERN(libdl___debug_tls_get_addr)
+	jmp    libdl___debug_tls_get_addr
+END(libdl____tls_get_addr)
+	.cfi_endproc
+END(libdl___tls_get_addr)
+#else
 INTERN_FUNCTION(libdl___tls_get_addr)
 	.cfi_startproc
 	/* >> typedef struct {
@@ -96,6 +108,7 @@ INTERN_FUNCTION(libdl____tls_get_addr)
 END(libdl____tls_get_addr)
 	.cfi_endproc
 END(libdl___tls_get_addr)
+#endif
 DEFINE_PUBLIC_ALIAS(__tls_get_addr, libdl___tls_get_addr)
 DEFINE_PUBLIC_ALIAS(___tls_get_addr, libdl____tls_get_addr)
 
