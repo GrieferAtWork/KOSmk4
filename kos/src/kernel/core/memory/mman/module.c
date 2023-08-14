@@ -663,10 +663,19 @@ unwind_userspace_with_section(struct module *__restrict mod, VIRT void const *ab
 	fde.f_tbase = module_get_tbase(mod);
 	fde.f_dbase = module_get_dbase(mod);
 	if (is_debug_frame) {
+		uintptr_t module_relative_addr;
+		module_relative_addr = (uintptr_t)absolute_pc - mod->md_loadaddr;
 		result = unwind_fde_scan_df(eh_frame_data,
 		                            eh_frame_data + eh_frame_size,
-		                            absolute_pc, &fde,
+		                            module_relative_addr, &fde,
 		                            module_sizeof_pointer(mod));
+		if (result == UNWIND_SUCCESS) {
+			/* Must adjust for load address. */
+			fde.f_pcstart = (void *)((uintptr_t)fde.f_pcstart + mod->md_loadaddr);
+			fde.f_pcend   = (void *)((uintptr_t)fde.f_pcend + mod->md_loadaddr);
+			assert(fde.f_persofun == NULL);
+			assert(fde.f_lsdaaddr == NULL);
+		}
 	} else {
 		result = unwind_fde_scan(eh_frame_data,
 		                         eh_frame_data + eh_frame_size,

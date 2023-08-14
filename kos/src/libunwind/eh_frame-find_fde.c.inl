@@ -58,6 +58,20 @@ NOTHROW_NCX(CC libuw_unwind_fde_load)(NCX byte_t const **__restrict peh_frame_re
                                       unwind_fde_t *__restrict result,
                                       uint8_t sizeof_address)
 #else /* !FIND_SPECIFIC_ADDRESS */
+#ifdef DEBUG_FRAME
+/* Same as `unwind_fde_load_df()', but quickly search for and return  the
+ * FDE descriptor containing the given `module_relative_pc' text address.
+ * @assume(!return || result->f_pcstart <= module_relative_pc);
+ * @assume(!return || result->f_pcend > module_relative_pc);
+ * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `module_relative_pc'.
+ * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
+INTERN NONNULL((4)) unwind_errno_t
+NOTHROW_NCX(CC libuw_unwind_fde_scan)(NCX byte_t const *reader,
+                                      NCX byte_t const *eh_frame_end,
+                                      uintptr_t module_relative_pc,
+                                      unwind_fde_t *__restrict result,
+                                      uint8_t sizeof_address)
+#else /* DEBUG_FRAME */
 /* Same as `unwind_fde_load()', but quickly search for and return the
  * FDE descriptor containing  the given  `absolute_pc' text  address.
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `absolute_pc'.
@@ -68,6 +82,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_scan)(NCX byte_t const *reader,
                                       VIRT void const *absolute_pc,
                                       unwind_fde_t *__restrict result,
                                       uint8_t sizeof_address)
+#endif /* !DEBUG_FRAME */
 #endif /* FIND_SPECIFIC_ADDRESS */
 {
 #ifndef FIND_SPECIFIC_ADDRESS
@@ -186,11 +201,16 @@ again:
 			if (*aug_iter == 'L') {
 				enclsda = *cie_reader++; /* uint8_t cie_lsdaenc */
 			} else if (*aug_iter == 'P') {
-				uint8_t encperso   = *cie_reader++; /* uint8_t  cie_persoenc */
-				result->f_persofun = (void *)dwarf_decode_pointer(&cie_reader,
-				                                                  encperso,
+				uint8_t encperso = *cie_reader++; /* uint8_t  cie_persoenc */
+#ifndef DEBUG_FRAME
+				result->f_persofun = (void *)dwarf_decode_pointer(&cie_reader, encperso,
 				                                                  used_sizeof_address,
 				                                                  &result->f_bases);
+#else /* !DEBUG_FRAME */
+				dwarf_decode_pointer(&cie_reader, encperso,
+				                     used_sizeof_address,
+				                     &result->f_bases);
+#endif /* DEBUG_FRAME */
 			} else if (*aug_iter == 'R') {
 				result->f_ptrenc = *cie_reader++;
 			} else {
@@ -219,10 +239,16 @@ again:
 
 	/* Check if the CIE points to the proper bounds. */
 #ifdef FIND_SPECIFIC_ADDRESS
-	if (absolute_pc < result->f_pcstart)
+#ifdef DEBUG_FRAME
+#define LOCAL_search_pc module_relative_pc
+#else /* DEBUG_FRAME */
+#define LOCAL_search_pc (uintptr_t)absolute_pc
+#endif /* !DEBUG_FRAME */
+	if (LOCAL_search_pc < (uintptr_t)result->f_pcstart)
 		goto do_next_chunk;
-	if (absolute_pc >= result->f_pcend)
+	if (LOCAL_search_pc >= (uintptr_t)result->f_pcend)
 		goto do_next_chunk;
+#undef LOCAL_search_pc
 #endif /* FIND_SPECIFIC_ADDRESS */
 
 	/* Found it! - Save the pointer to the initial instruction set. */
@@ -236,8 +262,8 @@ again:
 #if __SIZEOF_POINTER__ > 4
 	if unlikely((uint32_t)length == (uint32_t)-1) {
 		/* Above code already asserted that the length fits into 32 bits of the CIE. */
-		length = (size_t)(*(u64 const *)reader);
-		reader += 8;
+		length = (size_t)UNALIGNED_GET64(cie_reader);
+		cie_reader += 8;
 	}
 #endif /* __SIZEOF_POINTER__ > 4 */
 	cie_reader += length;
@@ -253,9 +279,15 @@ again:
 			if (*cie_augstr == 'L') {
 				if unlikely(fde_reader == aug_end)
 					break;
+#ifndef DEBUG_FRAME
 				result->f_lsdaaddr = dwarf_decode_pointer(&fde_reader, enclsda,
 				                                          used_sizeof_address,
 				                                          &result->f_bases);
+#else /* !DEBUG_FRAME */
+				dwarf_decode_pointer(&fde_reader, enclsda,
+				                     used_sizeof_address,
+				                     &result->f_bases);
+#endif /* DEBUG_FRAME */
 			} else if (*cie_augstr == 'S') {
 				result->f_sigframe = 1;
 			}

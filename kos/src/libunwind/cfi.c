@@ -398,6 +398,8 @@ libuw_unwind_emulator_calculate_cfa(unwind_emulator_t *__restrict self) {
 	                              self->ue_sectinfo->ues_eh_frame_end,
 	                              pc_buf.pc, &fde, self->ue_addrsize);
 	if unlikely(error != UNWIND_SUCCESS) {
+		module_t *module_at_addr;
+		uintptr_t module_loadaddr;
 		if (error != UNWIND_NO_FRAME)
 			goto done;
 		if (self->ue_sectinfo->ues_debug_frame_start >=
@@ -411,13 +413,24 @@ libuw_unwind_emulator_calculate_cfa(unwind_emulator_t *__restrict self) {
 #endif /* !__KERNEL__ */
 
 		/* Also search the `.debug_frame' section, using `unwind_fde_scan_df()' */
+		module_loadaddr = 0;
+		module_at_addr  = module_fromaddr_nx(pc_buf.pc);
+		if likely(module_at_addr != NULL)
+			module_loadaddr = module_getloadaddr(module_at_addr);
+
 		error = unwind_fde_scan_df(self->ue_sectinfo->ues_debug_frame_start,
 		                           self->ue_sectinfo->ues_debug_frame_end,
-		                           pc_buf.pc,
+		                           (uintptr_t)pc_buf.pc - module_loadaddr,
 		                           &fde,
 		                           self->ue_addrsize);
 		if unlikely(error != UNWIND_SUCCESS)
 			goto done;
+
+		/* Must adjust for load address. */
+		fde.f_pcstart = (void *)((uintptr_t)fde.f_pcstart + module_loadaddr);
+		fde.f_pcend   = (void *)((uintptr_t)fde.f_pcend + module_loadaddr);
+		assert(fde.f_persofun == NULL);
+		assert(fde.f_lsdaaddr == NULL);
 	}
 
 	/* Evaluate the FDE program to extract the CFA descriptor. */

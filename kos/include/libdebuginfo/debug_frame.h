@@ -57,23 +57,23 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC unwind_fde_load_df)(__NCX __byte_t const **__restr
                                                   __uint8_t __sizeof_address);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
-/* Same as `unwind_fde_load_df()', but quickly search for and return the
- * FDE  descriptor  containing  the  given  `absolute_pc'  text address.
- * @assume(!return || result->f_pcstart <= absolute_pc);
- * @assume(!return || result->f_pcend > absolute_pc);
- * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `absolute_pc'.
+/* Same as `unwind_fde_load_df()', but quickly search for and return  the
+ * FDE descriptor containing the given `module_relative_pc' text address.
+ * @assume(!return || result->f_pcstart <= module_relative_pc);
+ * @assume(!return || result->f_pcend > module_relative_pc);
+ * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `module_relative_pc'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 typedef __ATTR_NONNULL_T((4)) unwind_errno_t
 __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PUNWIND_FDE_SCAN_DF)(__NCX __byte_t const *__debug_frame_start,
                                                       __NCX __byte_t const *__debug_frame_end,
-                                                      __VIRT void const *__absolute_pc,
+                                                      __uintptr_t __module_relative_pc,
                                                       unwind_fde_t *__restrict __result,
                                                       __uint8_t __sizeof_address);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((4)) unwind_errno_t
 __NOTHROW_NCX(LIBDEBUGINFO_CC unwind_fde_scan_df)(__NCX __byte_t const *__debug_frame_start,
                                                   __NCX __byte_t const *__debug_frame_end,
-                                                  __VIRT void const *__absolute_pc,
+                                                  __uintptr_t __module_relative_pc,
                                                   unwind_fde_t *__restrict __result,
                                                   __uint8_t __sizeof_address);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */

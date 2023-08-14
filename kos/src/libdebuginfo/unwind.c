@@ -45,6 +45,7 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #endif /* !REF */
 
 #ifndef HAVE_UNWIND_FOR_DEBUG_EXTERNALLY
+#include <assert.h>
 #include <dlfcn.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -68,10 +69,12 @@ unwind_through_debug_frame(void const *absolute_pc,
 		/* Check for a `.debug_frame' section */
 		sect = dllocksection(mod, ".debug_frame",
 		                     DLLOCKSECTION_FNORMAL);
-		dlclose(mod);
 		if (sect) {
 			void *debug_frame_data;
 			size_t debug_frame_size;
+			uintptr_t loadaddr;
+			loadaddr = dlmodulebase(mod);
+
 			/* Support for a compressed .debug_frame! */
 			debug_frame_data = dlinflatesection(sect, &debug_frame_size);
 			if (debug_frame_data) {
@@ -79,12 +82,19 @@ unwind_through_debug_frame(void const *absolute_pc,
 				/* Scan the .debug_frame section for an FDE matching `absolute_pc' */
 				result = libdi_unwind_fde_scan_df((byte_t const *)debug_frame_data,
 				                                  (byte_t const *)debug_frame_data + debug_frame_size,
-				                                  absolute_pc,
+				                                  (uintptr_t)absolute_pc - loadaddr,
 				                                  &fde,
 				                                  sizeof(void *));
 				if (result == UNWIND_SUCCESS) {
-					/* Found the FDE. - Now to execute it's program! */
 					unwind_cfa_state_t cfa;
+
+					/* Must adjust for load address. */
+					fde.f_pcstart = (void *)((uintptr_t)fde.f_pcstart + loadaddr);
+					fde.f_pcend   = (void *)((uintptr_t)fde.f_pcend + loadaddr);
+					assert(fde.f_persofun == NULL);
+					assert(fde.f_lsdaaddr == NULL);
+
+					/* Found the FDE. - Now to execute it's program! */
 					result = unwind_fde_exec(&fde, &cfa, absolute_pc);
 					if unlikely(result == UNWIND_SUCCESS) {
 						/* And finally: Apply register modifications. */
@@ -96,6 +106,7 @@ unwind_through_debug_frame(void const *absolute_pc,
 			}
 			dlunlocksection(sect);
 		}
+		dlclose(mod);
 	}
 	return result;
 }
