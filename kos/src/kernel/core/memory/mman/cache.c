@@ -43,10 +43,10 @@ PUBLIC NOBLOCK NONNULL((1)) size_t
 NOTHROW(KCALL syscache_clear_s)(syscache_version_t *__restrict pversion) {
 	struct ccinfo cci;
 	ccinfo_init(&cci, GFP_ATOMIC, 0);
-	cci.ci_version = *pversion;
+	cci._ci_state = *pversion;
 	if (system_cc(&cci) && cci.ci_bytes == 0)
 		cci.ci_bytes = 1;
-	*pversion = cci.ci_version;
+	*pversion = cci._ci_state;
 	return cci.ci_bytes;
 }
 

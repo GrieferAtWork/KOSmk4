@@ -1348,13 +1348,14 @@ procfs_kos_raminfo_printer(pformatprinter printer, void *arg,
 INTERN NONNULL((1)) void KCALL
 procfs_kos_cc_max_attempts_print(pformatprinter printer, void *arg,
                                  pos_t UNUSED(offset_hint)) {
-	ProcFS_PrintUInt(printer, arg, system_cc_maxattempts);
+	uint16_t value = atomic_read(&system_cc_maxattempts);
+	ProcFS_PrintU16(printer, arg, value);
 }
 INTERN void KCALL
 procfs_kos_cc_max_attempts_write(NCX void const *buf,
                                  size_t bufsize) {
-	unsigned int newmax;
-	newmax = ProcFS_ParseUInt(buf, bufsize, 0, UINT_MAX);
+	/* Max value is `0xfffe' since `0xffff' would mean infinite attempts */
+	uint16_t newmax = ProcFS_ParseU16(buf, bufsize, 0, (uint16_t)-2);
 	atomic_write(&system_cc_maxattempts, newmax);
 }
 

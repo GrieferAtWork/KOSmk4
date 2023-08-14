@@ -1421,8 +1421,14 @@ PRIVATE unsigned int cc_version = 0;
 /* [lock(ATOMIC)] # of threads currently clearing caches. */
 PRIVATE uintptr_t cc_inside = 0;
 
-/* Max # of attempts before unconditional give-up. ("/proc/kos/cc-max-attempts") */
-PUBLIC ATTR_READMOSTLY unsigned int system_cc_maxattempts = 64;
+/* Max # of attempts before unconditional give-up. ("/proc/kos/cc-max-attempts")
+ *
+ * This  limit is needed in order to prevent infinite loops due to a piece of code
+ * that  tries (and fails) to allocate a large amount of memory, but before it can
+ * do that, it succeeds in allocating a  small amount of memory that somehow  ends
+ * up in some sort of cache (a great example is the unwind-cache of drivers, which
+ * is used by trace-malloc, which in turn is used every time you do `kmalloc()') */
+PUBLIC ATTR_READMOSTLY uint16_t system_cc_maxattempts = 64;
 
 
 /* Clear global system caches.
@@ -1432,7 +1438,7 @@ PUBLIC ATTR_READMOSTLY unsigned int system_cc_maxattempts = 64;
  * @return: false: Nothing could be cleared :( */
 PUBLIC NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) bool
 NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
-	unsigned int version;
+	uint16_t version;
 	uintptr_t inside;
 	info->ci_bytes = 0;
 
@@ -1442,7 +1448,7 @@ NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
 		info->ci_minbytes = 1;
 
 	/* Check if we're supposed to give up */
-	if (info->ci_attempt == (unsigned int)-1) {
+	if (info->ci_attempt == (uint16_t)-1) {
 		/* Special indicator for infinite attempts. */
 	} else {
 		if (info->ci_attempt >= system_cc_maxattempts)

@@ -24,6 +24,7 @@
 
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/printnode.h>
+#include <hybrid/pp/__va_nargs.h>
 #include <kernel/types.h>
 
 /*
@@ -140,6 +141,15 @@ INTDEF struct fnode_perm_ops const procfs_perproc_v_perm_ops;
 INTDEF NONNULL((1)) ssize_t FCALL ProcFS_PrintBool(pformatprinter printer, void *arg, bool value);
 INTDEF NONNULL((1)) ssize_t FCALL ProcFS_PrintU32(pformatprinter printer, void *arg, u32 value);
 INTDEF NONNULL((1)) ssize_t FCALL ProcFS_PrintU64(pformatprinter printer, void *arg, u64 value);
+#define ProcFS_PrintU8(printer, arg, value)  ProcFS_PrintU32(printer, arg, (u32)(u8)(value))
+#define ProcFS_PrintU16(printer, arg, value) ProcFS_PrintU32(printer, arg, (u32)(u16)(value))
+
+#define _ProcFS_PrintUN_1       ProcFS_PrintU8
+#define _ProcFS_PrintUN_2       ProcFS_PrintU16
+#define _ProcFS_PrintUN_4       ProcFS_PrintU32
+#define _ProcFS_PrintUN_8       ProcFS_PrintU64
+#define _ProcFS_PrintUN(sizeof) _ProcFS_PrintUN_##sizeof
+#define ProcFS_PrintUN(sizeof)  _ProcFS_PrintUN(sizeof)
 
 /* Parse  a given user-space buffer from being  a string `0' or `1', which
  * may optionally be surrounded by space characters that are automatically
@@ -162,30 +172,30 @@ INTDEF NONNULL((1)) NCX UNCHECKED void *FCALL
 ProcFS_ParsePtr(NCX void const *buf, size_t bufsize)
 		THROWS(E_SEGFAULT, E_BUFFER_TOO_SMALL);
 
-#if __SIZEOF_SIZE_T__ >= 8
-#define ProcFS_ParseSize ProcFS_ParseU64
-#define ProcFS_PrintSize ProcFS_PrintU64
-#else /* __SIZEOF_SIZE_T__ >= 8 */
-#define ProcFS_ParseSize ProcFS_ParseU32
-#define ProcFS_PrintSize ProcFS_PrintU32
-#endif /* __SIZEOF_SIZE_T__ < 8 */
+#define _ProcFS_ParseU8_4(buf, bufsize, minval, maxval) (u8)ProcFS_ParseU32(buf, bufsize, (u32)(u8)(minval), (u32)(u8)(maxval))
+#define _ProcFS_ParseU8_3(buf, bufsize, minval)         _ProcFS_ParseU8_4(buf, bufsize, minval, UINT8_C(0xff))
+#define _ProcFS_ParseU8_2(buf, bufsize)                 _ProcFS_ParseU8_4(buf, bufsize, UINT8_C(0x00), UINT8_C(0xff))
+#define _ProcFS_ParseU16_4(buf, bufsize, minval, maxval) (u16)ProcFS_ParseU32(buf, bufsize, (u32)(u16)(minval), (u32)(u16)(maxval))
+#define _ProcFS_ParseU16_3(buf, bufsize, minval)         _ProcFS_ParseU16_4(buf, bufsize, minval, UINT16_C(0xffff))
+#define _ProcFS_ParseU16_2(buf, bufsize)                 _ProcFS_ParseU16_4(buf, bufsize, UINT16_C(0x0000), UINT16_C(0xffff))
 
-#if __SIZEOF_INT__ >= 8
-#define ProcFS_ParseUInt ProcFS_ParseU64
-#define ProcFS_PrintUInt ProcFS_PrintU64
-#else /* __SIZEOF_INT__ >= 8 */
-#define ProcFS_ParseUInt ProcFS_ParseU32
-#define ProcFS_PrintUInt ProcFS_PrintU32
-#endif /* __SIZEOF_INT__ < 8 */
+#define ProcFS_ParseU8(...)  __HYBRID_PP_VA_OVERLOAD(_ProcFS_ParseU8_, (__VA_ARGS__))(__VA_ARGS__)
+#define ProcFS_ParseU16(...) __HYBRID_PP_VA_OVERLOAD(_ProcFS_ParseU16_, (__VA_ARGS__))(__VA_ARGS__)
 
-#if __SIZEOF_PID_T__ >= 8
-#define ProcFS_ParseUPid ProcFS_ParseU64
-#define ProcFS_PrintUPid ProcFS_PrintU64
-#else /* __SIZEOF_PID_T__ >= 8 */
-#define ProcFS_ParseUPid ProcFS_ParseU32
-#define ProcFS_PrintUPid ProcFS_PrintU32
-#endif /* __SIZEOF_PID_T__ < 8 */
+#define _ProcFS_ParseUN_1       ProcFS_ParseU8
+#define _ProcFS_ParseUN_2       ProcFS_ParseU16
+#define _ProcFS_ParseUN_4       ProcFS_ParseU32
+#define _ProcFS_ParseUN_8       ProcFS_ParseU64
+#define _ProcFS_ParseUN(sizeof) _ProcFS_ParseUN_##sizeof
+#define ProcFS_ParseUN(sizeof)  _ProcFS_ParseUN(sizeof)
 
+
+#define ProcFS_ParseSize ProcFS_ParseUN(__SIZEOF_SIZE_T__)
+#define ProcFS_PrintSize ProcFS_PrintUN(__SIZEOF_SIZE_T__)
+#define ProcFS_ParseUInt ProcFS_ParseUN(__SIZEOF_INT__)
+#define ProcFS_PrintUInt ProcFS_PrintUN(__SIZEOF_INT__)
+#define ProcFS_ParseUPid ProcFS_ParseUN(__SIZEOF_PID_T__)
+#define ProcFS_PrintUPid ProcFS_PrintUN(__SIZEOF_PID_T__)
 
 DECL_END
 

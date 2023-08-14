@@ -153,7 +153,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		struct ccinfo cc;
 		cred_require_sysadmin();
 		ccinfo_init(&cc, GFP_NORMAL, (size_t)-1);
-		cc.ci_attempt = (unsigned int)-1; /* Infinite attempts. */
+		cc.ci_attempt = (uint16_t)-1; /* Infinite attempts. */
 
 		/* Invoke the cache-clearing system. */
 		if (system_cc(&cc) && !cc.ci_bytes)

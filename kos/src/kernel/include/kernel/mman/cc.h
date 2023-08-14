@@ -35,13 +35,18 @@ typedef unsigned int gfp_t;
 #endif /* !__gfp_t_defined */
 
 struct ccinfo {
-	gfp_t        ci_gfp;      /* [const] Flags for recursive allocations, possibly or'd with GFP_ATOMIC. */
-	unsigned int ci_version;  /* [in]  Version number from previous cache-clear  attempts.
-	                           *       Set to `0' during the initial call to `system_cc()'
-	                           * [out] New system cache version. */
-	unsigned int ci_attempt;  /* [in|out] Attempt number. */
-	size_t       ci_bytes;    /* [out] Approximation of virtual/physical memory that became available (in bytes). */
-	size_t       ci_minbytes; /* [const] Minimum # of bytes to free before stopping. */
+	gfp_t            ci_gfp;      /* [const] Flags for recursive allocations, possibly or'd with GFP_ATOMIC. */
+	union {
+		struct {
+			uint16_t ci_version;  /* [in]  Version number from previous cache-clear  attempts.
+			                       *       Set to `0' during the initial call to `system_cc()'
+			                       * [out] New system cache version. */
+			uint16_t ci_attempt;  /* [in|out] Attempt number. */
+		};
+		uint32_t    _ci_state;    /* [in|out] Version state. */
+	};
+	size_t           ci_bytes;    /* [out] Approximation of virtual/physical memory that became available (in bytes). */
+	size_t           ci_minbytes; /* [const] Minimum # of bytes to free before stopping. */
 };
 #define ccinfo_init(self, gfp, minbytes_hint) \
 	((self)->ci_gfp      = (gfp),             \
@@ -59,8 +64,14 @@ struct ccinfo {
 	((self)->ci_bytes += (num_bytes))
 
 
-/* Max # of attempts before unconditional give-up. ("/proc/kos/cc-max-attempts") */
-DATDEF unsigned int system_cc_maxattempts;
+/* Max # of attempts before unconditional give-up. ("/proc/kos/cc-max-attempts")
+ *
+ * This  limit is needed in order to prevent infinite loops due to a piece of code
+ * that  tries (and fails) to allocate a large amount of memory, but before it can
+ * do that, it succeeds in allocating a  small amount of memory that somehow  ends
+ * up in some sort of cache (a great example is the unwind-cache of drivers, which
+ * is used by trace-malloc, which in turn is used every time you do `kmalloc()') */
+DATDEF uint16_t system_cc_maxattempts;
 
 
 /* Clear global system caches.

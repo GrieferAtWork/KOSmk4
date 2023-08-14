@@ -28,7 +28,7 @@
 #ifdef __CC__
 DECL_BEGIN
 
-typedef uintptr_t syscache_version_t;
+typedef uint32_t syscache_version_t;
 #define SYSCACHE_VERSION_INIT 0
 
 /* Invoke cache clear callbacks for each and every globally reachable
