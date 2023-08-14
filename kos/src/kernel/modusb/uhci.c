@@ -1721,7 +1721,7 @@ NOTHROW(KCALL uhci_syncheap_alloc)(struct uhci_syncheap *__restrict self,
 		header.shp_count = CEILDIV(num_bytes +
 		                           sizeof(struct uhci_syncheap_page),
 		                           PAGESIZE);
-		pg = page_malloc32(header.shp_count);
+		pg = page_malloc32_noblock(header.shp_count);
 		if (pg == PHYSPAGE_INVALID)
 			return UHCI_SYNCHEAP_ALLOC_FAILED;
 		header.shp_next = self->sh_current;

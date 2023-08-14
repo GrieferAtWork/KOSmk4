@@ -26,6 +26,7 @@
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
+#include <kernel/mman/cc.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart-blkst.h>
@@ -340,9 +341,9 @@ mpart_setcore_makememdat_or_unlock(struct mpart *__restrict self,
 	}
 
 	/* Try to allocate everything in a single page. */
-	data->scd_copy_mem.mc_start = mfile_alloc_physmem(self->mp_file,
-	                                                  total_pages,
-	                                                  &data->scd_copy_mem.mc_size);
+	data->scd_copy_mem.mc_start = mfile_alloc_physmem_nocc(self->mp_file,
+	                                                       total_pages,
+	                                                       &data->scd_copy_mem.mc_size);
 	if unlikely(data->scd_copy_mem.mc_start == PHYSPAGE_INVALID)
 		goto err_badalloc; /* Insufficient physical memory. */
 	assert(data->scd_copy_mem.mc_size != 0);
@@ -395,7 +396,7 @@ do_realloc_in_extend_after_unlock:
 				}
 
 				/* Allocate the new chunk. */
-				chunk.mc_start = mfile_alloc_physmem(self->mp_file, missing_pages, &chunk.mc_size);
+				chunk.mc_start = mfile_alloc_physmem_nocc(self->mp_file, missing_pages, &chunk.mc_size);
 				if unlikely(chunk.mc_start == PHYSPAGE_INVALID)
 					goto err_badalloc_after_unlock; /* Insufficient physical memory. */
 				assert(chunk.mc_size <= missing_pages);
@@ -446,7 +447,7 @@ extend_vector:
 		}
 
 		/* Allocate the new chunk. */
-		chunk.mc_start = mfile_alloc_physmem(self->mp_file, missing_pages, &chunk.mc_size);
+		chunk.mc_start = mfile_alloc_physmem_nocc(self->mp_file, missing_pages, &chunk.mc_size);
 		if unlikely(chunk.mc_start == PHYSPAGE_INVALID)
 			goto err_badalloc; /* Insufficient physical memory. */
 		data->scd_copy_mem_sc.ms_v[data->scd_copy_mem_sc.ms_c] = chunk;
@@ -468,6 +469,8 @@ extend_vector:
 err_badalloc:
 	UNLOCK(self, unlock);
 err_badalloc_after_unlock:
+	if (system_cc_s(&data->scd_ccstate))
+		return false; /* Try again... */
 	THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, total_pages);
 }
 

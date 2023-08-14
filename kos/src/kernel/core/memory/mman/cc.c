@@ -1538,13 +1538,16 @@ system_cc_virtual_memory(struct ccinfo *__restrict info)
  * like this:
  * >>     ccstate_t ccstate = CCSTATE_INIT;
  * >> again:
- * >>     ...
+ * >>     result = try_allocate();
+ * >>     if (!result)
+ * >>         goto nomem;
  * >>     return result;
  * >> nomem:
  * >>     if (system_cc_s(&ccstate))
  * >>         goto again;
- * >>     THROW();
- */
+ * >>     THROW(E_BADALLOC);
+ * Note that nesting within `try_allocate()'  is OK, though should  be
+ * avoided for the sake of performance and more effective cc-handling. */
 PUBLIC NOBLOCK_IF(gfp & GFP_ATOMIC) ATTR_COLD WUNUSED  ATTR_INOUT(1) bool
 NOTHROW(FCALL system_cc_s_ex)(ccstate_t *__restrict p_state, gfp_t gfp) {
 	struct ccinfo cci;

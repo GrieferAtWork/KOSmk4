@@ -380,7 +380,7 @@ NOTHROW(FCALL p64_create_e1_vector_from_e2_word)(struct mptram *__restrict ptram
                                                  unsigned int vec1_prepare_size) {
 	union p64_pdir_e1 e1, *e1_p;
 	physpage_t result;
-	result = page_mallocone_for_paging();
+	result = page_mallocone_noblock_for_paging();
 	if unlikely(result == PHYSPAGE_INVALID)
 		goto done;
 
@@ -442,7 +442,7 @@ NOTHROW(FCALL p64_create_e2_vector_from_e3_word_and_e1_vector)(struct mptram *__
 	union p64_pdir_e2 e2, *e2_p;
 
 	/* Fill in the E2 vector. */
-	result = page_mallocone_for_paging();
+	result = page_mallocone_noblock_for_paging();
 	if unlikely(result == PHYSPAGE_INVALID)
 		goto done;
 	e2_p = (union p64_pdir_e2 *)mptram_mappage(ptram, result);
@@ -564,16 +564,16 @@ again:
 		 * >> P64_PDIR_E4_IDENTITY[vec4] = VEC3; */
 
 		/* Allocate vectors. */
-		e3_vector = page_mallocone_for_paging();
+		e3_vector = page_mallocone_noblock_for_paging();
 		if unlikely(!e3_vector)
 			goto err;
-		e2_vector = page_mallocone_for_paging();
+		e2_vector = page_mallocone_noblock_for_paging();
 		if unlikely(!e2_vector) {
 err_e3_vector:
 			page_freeone_for_paging(e3_vector);
 			goto err;
 		}
-		e1_vector = page_mallocone_for_paging();
+		e1_vector = page_mallocone_noblock_for_paging();
 		if unlikely(!e1_vector) {
 			page_freeone_for_paging(e2_vector);
 			goto err_e3_vector;

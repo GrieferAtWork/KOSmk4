@@ -35,8 +35,12 @@ typedef unsigned int gfp_t;
 #endif /* !__gfp_t_defined */
 
 /* Simplified cache-clear state for `system_cc_s' */
+#ifndef __ccstate_t_defined
+#define __ccstate_t_defined
 typedef uint32_t ccstate_t;
-#define CCSTATE_INIT 0
+#define CCSTATE_INIT       0
+#define ccstate_init(self) (void)(*(self) = CCSTATE_INIT)
+#endif /* !__ccstate_t_defined */
 
 struct ccinfo {
 	gfp_t            ci_gfp;      /* [const] Flags for recursive allocations, possibly or'd with GFP_ATOMIC. */
@@ -105,13 +109,16 @@ system_cc_virtual_memory(struct ccinfo *__restrict info)
  * like this:
  * >>     ccstate_t ccstate = CCSTATE_INIT;
  * >> again:
- * >>     ...
+ * >>     result = try_allocate();
+ * >>     if (!result)
+ * >>         goto nomem;
  * >>     return result;
  * >> nomem:
  * >>     if (system_cc_s(&ccstate))
  * >>         goto again;
- * >>     THROW();
- */
+ * >>     THROW(E_BADALLOC);
+ * Note that nesting within `try_allocate()'  is OK, though should  be
+ * avoided for the sake of performance and more effective cc-handling. */
 FUNDEF ATTR_COLD WUNUSED ATTR_INOUT(1) __BOOL NOTHROW(FCALL system_cc_s)(ccstate_t *__restrict p_state);
 FUNDEF NOBLOCK ATTR_COLD WUNUSED ATTR_INOUT(1) __BOOL NOTHROW(FCALL system_cc_s_noblock)(ccstate_t *__restrict p_state);
 FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) ATTR_COLD WUNUSED  ATTR_INOUT(1) __BOOL

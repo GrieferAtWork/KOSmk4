@@ -1122,9 +1122,9 @@ EIDECLARE(NOBLOCK NONNULL((1)), void, NOTHROW, FCALL,
  * single file-block is <= PAGESIZE,  this function behaves 100%  identical to the above  call
  * to `page_malloc_part()' */
 FUNDEF NOBLOCK WUNUSED NONNULL((1, 3)) physpage_t
-NOTHROW(FCALL mfile_alloc_physmem)(struct mfile *__restrict self,
-                                   physpagecnt_t max_pages,
-                                   physpagecnt_t *__restrict res_pages);
+NOTHROW(FCALL mfile_alloc_physmem_nocc)(struct mfile *__restrict self,
+                                        physpagecnt_t max_pages,
+                                        physpagecnt_t *__restrict res_pages);
 
 
 /* Destroy a given mem-file */

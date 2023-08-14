@@ -162,12 +162,15 @@ DATDEF size_t mcoreheap_freecount;
  *                function  doesn't  actually  need  to  do  any locking.
  *                As such, a NULL-return-value here means that the system
  *                has run out  of memory on  the lowest, possible  level.
- *                That is: `page_malloc()' failed. */
+ *                That is: `page_malloc_nocc()' failed. */
+FUNDEF NOBLOCK ATTR_MALLOC WUNUSED union mcorepart *
+NOTHROW(FCALL mcoreheap_alloc_locked_nx_nocc)(void);
 FUNDEF NOBLOCK ATTR_MALLOC WUNUSED union mcorepart *
 NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void);
 
-/* Do all of the  necessary locking and  throw an exception  if the allocation  failed.
- * Essentially, this is just a convenience wrapper around `mcoreheap_alloc_locked_nx()' */
+/* Do  all  of  the necessary  locking  and throw  an  exception if  the  allocation failed.
+ * Essentially, this is just a convenience wrapper around `mcoreheap_alloc_locked_nx_nocc()'
+ * NOTE: This function also does `system_cc()' */
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED union mcorepart *FCALL
 mcoreheap_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK);
 

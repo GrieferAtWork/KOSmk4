@@ -145,7 +145,7 @@ again:
 	e2.p_word = atomic_read(&e2_p->p_word);
 	if (!e2.p_vec1.v_present) {
 		/* Not present */
-		new_e1_vector = page_mallocone32_for_paging();
+		new_e1_vector = page_mallocone32_noblock_for_paging();
 		if unlikely(new_e1_vector == PHYSPAGE_INVALID)
 			return false;
 
@@ -194,7 +194,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 		 * temporary mapping trampoline to  temporarily map the new  page
 		 * for  initialization  (Because   the  trampoline  always   uses
 		 * `P32_PAGE_FNOFLATTEN'  when  mapping, it  is  always prepared) */
-		new_e1_vector = page_mallocone32_for_paging();
+		new_e1_vector = page_mallocone32_noblock_for_paging();
 		if unlikely(new_e1_vector == PHYSPAGE_INVALID)
 			return false;
 		e1.p_word = e2.p_word & ~(P32_PAGE_F4MIB | P32_PAGE_FPAT_4MIB);

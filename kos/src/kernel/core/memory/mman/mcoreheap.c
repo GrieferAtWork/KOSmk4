@@ -27,6 +27,7 @@
 #include <kernel/malloc-defs.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
+#include <kernel/mman/cc.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
@@ -245,7 +246,7 @@ got_word:
  * The  caller must  ensure that parts  are available, and  that the 2
  * reserved parts aren't used inappropriately. */
 PRIVATE NOBLOCK ATTR_MALLOC ATTR_RETNONNULL WUNUSED union mcorepart *
-NOTHROW(FCALL mcoreheap_alloc_impl)(void) {
+NOTHROW(FCALL mcoreheap_alloc_nocc_impl)(void) {
 	union mcorepart *result;
 	struct mcorepage *page;
 	unsigned int index;
@@ -351,7 +352,7 @@ NOTHROW(FCALL mcoreheap_replicate_extend_below)(struct mnode *__restrict node) {
 	physpage_t ppage;
 	part  = node->mn_part;
 	ppage = part->mp_mem.mc_start - 1;
-	if (page_malloc_at(ppage) != PAGE_MALLOC_AT_SUCCESS)
+	if (page_malloc_at_nocc(ppage) != PAGE_MALLOC_AT_SUCCESS)
 		goto fail;
 
 	/* If necessary, make sure that the new page is prepared! */
@@ -387,7 +388,7 @@ NOTHROW(FCALL mcoreheap_replicate_extend_above)(struct mnode *__restrict node) {
 	physpage_t ppage;
 	part  = node->mn_part;
 	ppage = part->mp_mem.mc_start + part->mp_mem.mc_size;
-	if (page_malloc_at(ppage) != PAGE_MALLOC_AT_SUCCESS)
+	if (page_malloc_at_nocc(ppage) != PAGE_MALLOC_AT_SUCCESS)
 		goto fail;
 
 	/* If necessary, make sure that the new page is prepared! */
@@ -514,15 +515,15 @@ ok:
  * even  if they don't end up being  used for the replication (as is
  * the case when this function is able to extend an older  mem-core-
  * heap page)
- * NOTE: The given `node' and `part' are assumed to be allocated by `mcoreheap_alloc_impl()'!
+ * NOTE: The given `node' and `part' are assumed to be allocated by `mcoreheap_alloc_nocc_impl()'!
  * @return: true:  Successfully replicated the  core heap. In  this case,  the
  *                 caller  may  assume  that  at  least  `MCOREPAGE_PARTCOUNT'
  *                 additional core parts have become available for allocation.
  * @return: false: Insufficient physical memory (`page_malloc()' failed, or
  *                 failed to find a free spot within the kernel-space mman) */
 PRIVATE NOBLOCK NONNULL((1, 2)) bool
-NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict part,
-                                   /*inherit(always)*/ struct mnode *__restrict node) {
+NOTHROW(FCALL mcoreheap_replicate_nocc)(/*inherit(always)*/ struct mpart *__restrict part,
+                                        /*inherit(always)*/ struct mnode *__restrict node) {
 	/* Check if we might be able to extend a pre-existing mcoreheap node/part pair. */
 	if (mcoreheap_replicate_extend()) {
 		/* Noice :) */
@@ -541,7 +542,7 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
 	}
 
 	/* Allocate the physical page that'll be holding the core-page */
-	part->mp_mem.mc_start = page_mallocone();
+	part->mp_mem.mc_start = page_mallocone_nocc();
 	if unlikely(part->mp_mem.mc_start == PHYSPAGE_INVALID) {
 		printk(KERN_CRIT "[mcore] low-level OOM: Unable to allocate physical memory\n");
 		return false;
@@ -618,15 +619,15 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
  *                function  doesn't  actually  need  to  do  any locking.
  *                As such, a NULL-return-value here means that the system
  *                has run out  of memory on  the lowest, possible  level.
- *                That is: `page_malloc()' failed. */
+ *                That is: `page_malloc_nocc()' failed. */
 PUBLIC NOBLOCK ATTR_MALLOC WUNUSED union mcorepart *
-NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void) {
+NOTHROW(FCALL mcoreheap_alloc_locked_nx_nocc)(void) {
 	union mcorepart *result;
 	union mcorepart *replica;
 	assert(mcoreheap_freecount >= 2);
 
 	/* Allocate the part. */
-	result = mcoreheap_alloc_impl();
+	result = mcoreheap_alloc_nocc_impl();
 
 	/* Check if there are still enough parts left for self-replication. */
 	if (mcoreheap_freecount >= 2)
@@ -634,9 +635,9 @@ NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void) {
 
 	/* We're down to the last couple of (for this purpose reserved) nodes.
 	 * As such,  use  the last  2  of  them to  replicate  the  core-heap. */
-	replica = mcoreheap_alloc_impl();
-	if unlikely(!mcoreheap_replicate(&result->mcp_part,
-	                                 &replica->mcp_node)) {
+	replica = mcoreheap_alloc_nocc_impl();
+	if unlikely(!mcoreheap_replicate_nocc(&result->mcp_part,
+	                                      &replica->mcp_node)) {
 		/* Free the already-allocated part. */
 		assert(mcoreheap_freecount < 2);
 		mcoreheap_free_locked(replica);
@@ -649,7 +650,7 @@ NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void) {
 	 * assert that a mem-core-page is capable of holding at least that many
 	 * core-parts. */
 	assert(mcoreheap_freecount >= 3);
-	result = mcoreheap_alloc_impl();
+	result = mcoreheap_alloc_nocc_impl();
 done:
 #ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 	mempatl(result, DEBUGHEAP_FRESH_MEMORY, sizeof(*result));
@@ -657,18 +658,42 @@ done:
 	return result;
 }
 
+PUBLIC NOBLOCK ATTR_MALLOC WUNUSED union mcorepart *
+NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void) {
+	union mcorepart *result;
+	result = mcoreheap_alloc_locked_nx_nocc();
+	if unlikely(!result) {
+		ccstate_t ccstate = CCSTATE_INIT;
+		do {
+			if (!system_cc_s_noblock(&ccstate))
+				THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, sizeof(*result));
+			result = mcoreheap_alloc_locked_nx_nocc();
+		} while (!result);
+	}
+	return result;
+}
 
 
-/* Do all of the  necessary locking and  throw an exception  if the allocation  failed.
- * Essentially, this is just a convenience wrapper around `mcoreheap_alloc_locked_nx()' */
+
+/* Do  all  of  the necessary  locking  and throw  an  exception if  the  allocation failed.
+ * Essentially, this is just a convenience wrapper around `mcoreheap_alloc_locked_nx_nocc()'
+ * NOTE: This function also does `system_cc()' */
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED union mcorepart *FCALL
 mcoreheap_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	union mcorepart *result;
 	mman_lock_acquire(&mman_kernel);
-	result = mcoreheap_alloc_locked_nx();
+	result = mcoreheap_alloc_locked_nx_nocc();
 	mman_lock_release(&mman_kernel);
-	if unlikely(!result)
-		THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, sizeof(*result));
+	if unlikely(!result) {
+		ccstate_t ccstate = CCSTATE_INIT;
+		do {
+			if (!system_cc_s(&ccstate))
+				THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, sizeof(*result));
+			mman_lock_acquire(&mman_kernel);
+			result = mcoreheap_alloc_locked_nx_nocc();
+			mman_lock_release(&mman_kernel);
+		} while (!result);
+	}
 	return result;
 }
 

@@ -136,16 +136,16 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 	                           MHINT_GETMODE(KERNEL_MHINT_LHEAP) | MAP_NOASLR);
 	if unlikely(result == MAP_FAILED)
 		goto err_unlock;
-	cp = mcoreheap_alloc_locked_nx();
+	cp = mcoreheap_alloc_locked_nx_nocc();
 	if unlikely(!cp)
 		goto err_unlock;
 	node = &cp->mcp_node;
-	cp = mcoreheap_alloc_locked_nx();
+	cp = mcoreheap_alloc_locked_nx_nocc();
 	if unlikely(!cp)
 		goto err_unlock_node;
 	part = &cp->mcp_part;
 	part->mp_mem.mc_size  = num_bytes / PAGESIZE;
-	part->mp_mem.mc_start = page_malloc(part->mp_mem.mc_size);
+	part->mp_mem.mc_start = page_malloc_nocc(part->mp_mem.mc_size);
 	if unlikely(part->mp_mem.mc_start == PHYSPAGE_INVALID)
 		goto err_unlock_node_part;
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE

@@ -26,6 +26,7 @@
 #include <kernel/aio.h>
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
+#include <kernel/mman/cc.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 
@@ -51,18 +52,20 @@ DECL_BEGIN
  * the given `self' may point to, meaning it should not be called when `self'
  * was already fully initialized.
  * NOTE: This function assumes that `self->mp_file' has already been initialized,
- *       and will pass that value onto `mfile_alloc_physmem()'! */
+ *       and    will   pass   that   value   onto   `mfile_alloc_physmem_nocc()'! */
 PUBLIC NONNULL((1)) void FCALL
 mpart_ll_allocmem(struct mpart *__restrict self,
                   size_t total_pages)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
+	ccstate_t ccstate = CCSTATE_INIT;
 	physpage_t pp;
 	physpagecnt_t res_pages;
 	struct mchunkvec cv;
 	struct mchunk *vec;
 
 	/* Try to allocate everything in one go. */
-	pp = mfile_alloc_physmem(self->mp_file, total_pages, &res_pages);
+again:
+	pp = mfile_alloc_physmem_nocc(self->mp_file, total_pages, &res_pages);
 	if unlikely(pp == PHYSPAGE_INVALID)
 		goto err_nophys;
 	assert(res_pages <= total_pages);
@@ -93,7 +96,7 @@ mpart_ll_allocmem(struct mpart *__restrict self,
 	cv.ms_v[0].mc_size  = res_pages;
 	for (;;) {
 		total_pages -= res_pages;
-		pp = mfile_alloc_physmem(self->mp_file, total_pages, &res_pages);
+		pp = mfile_alloc_physmem_nocc(self->mp_file, total_pages, &res_pages);
 		if unlikely(pp == PHYSPAGE_INVALID)
 			goto err_nophys_v;
 		assert(res_pages <= total_pages);
@@ -153,6 +156,8 @@ err_nophys_v:
 	}
 	kfree(cv.ms_v);
 err_nophys:
+	if (system_cc_s(&ccstate))
+		goto again;
 	THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, total_pages * PAGESIZE);
 }
 

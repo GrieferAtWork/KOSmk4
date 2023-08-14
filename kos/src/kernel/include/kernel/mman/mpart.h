@@ -764,7 +764,7 @@ FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mpart_tree_minmaxlocate)(struct m
  * the given `self' may point to, meaning it should not be called when `self'
  * was already fully initialized.
  * NOTE: This function assumes that `self->mp_file' has already been initialized,
- *       and will pass that value onto `mfile_alloc_physmem()'! */
+ *       and    will   pass   that   value   onto   `mfile_alloc_physmem_nocc()'! */
 FUNDEF NONNULL((1)) void FCALL
 mpart_ll_allocmem(struct mpart *__restrict self,
                   size_t total_pages)
@@ -900,21 +900,31 @@ mpart_hasmeta_or_unlock(struct mpart *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 
+/* Simplified cache-clear state for `system_cc_s' */
+#ifndef __ccstate_t_defined
+#define __ccstate_t_defined
+typedef uint32_t ccstate_t;
+#define CCSTATE_INIT       0
+#define ccstate_init(self) (void)(*(self) = CCSTATE_INIT)
+#endif /* !__ccstate_t_defined */
+
 struct mpart_setcore_data {
 	uintptr_t           *scd_bitset;      /* [0..1][owned] Block-status bitset. */
 	unsigned int         scd_copy_state;  /* One of `MPART_ST_VOID', `MPART_ST_MEM' or `MPART_ST_MEM_SC' */
+	ccstate_t            scd_ccstate;     /* CC-state for `system_cc_s' */
 	union {
 		struct mchunk    scd_copy_mem;    /* [valid_if(scd_copy_state == MPART_ST_MEM)][owned] */
 		struct mchunkvec scd_copy_mem_sc; /* [valid_if(scd_copy_state == MPART_ST_MEM_SC)][owned] */
 	};
 };
-#define MPART_SETCORE_DATA_INIT       \
-	{                                 \
-		__NULLPTR, MPART_ST_VOID, { } \
+#define MPART_SETCORE_DATA_INIT                     \
+	{                                               \
+		__NULLPTR, MPART_ST_VOID, CCSTATE_INIT, { } \
 	}
-#define mpart_setcore_data_init(self)          \
-	(void)((self)->scd_bitset     = __NULLPTR, \
-	       (self)->scd_copy_state = MPART_ST_VOID)
+#define mpart_setcore_data_init(self)              \
+	(void)((self)->scd_bitset     = __NULLPTR,     \
+	       (self)->scd_copy_state = MPART_ST_VOID, \
+	       ccstate_init(&(self)->scd_ccstate))
 
 /* Finalize data needed for `mpart_setcore_or_unlock()' */
 FUNDEF NOBLOCK NONNULL((1)) void

@@ -205,7 +205,7 @@ NOTHROW(FCALL allocate_physical_memory)(PAGEDIR_PAGEALIGNED void *addr,
 	size_t i;
 	for (i = 0; i < num_bytes; i += PAGESIZE) {
 		physpage_t ppage;
-		ppage = page_mallocone();
+		ppage = page_mallocone_nocc();
 		if (ppage == PHYSPAGE_INVALID)
 			goto fail;
 		pagedir_mapone((byte_t *)addr + i,

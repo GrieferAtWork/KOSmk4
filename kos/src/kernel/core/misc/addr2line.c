@@ -59,6 +59,11 @@ NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
 		                        level,
 		                        DEBUG_ADDR2LINE_FNORMAL);
 	} EXCEPT {
+		memset(result, 0, sizeof(*result));
+		result->al_symstart  = module_relative_pc;
+		result->al_symend    = module_relative_pc;
+		result->al_linestart = module_relative_pc;
+		result->al_lineend   = module_relative_pc;
 		error = DEBUG_INFO_ERROR_CORRUPT;
 	}
 	return error;

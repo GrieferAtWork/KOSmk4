@@ -55,11 +55,11 @@ DECL_BEGIN
  *   - GFP_CALLOC:       Allocate from `mfile_zero' instead of `mfile_ndef'
  *   - GFP_ATOMIC:       Don't block when waiting to acquire any sort of lock.
  *   - GFP_NOMMAP:       Unconditionally throw `E_WOULDBLOCK_PREEMPTED'
- *   - GFP_MCHEAP:       Allocate the mnode and mpart using `mcoreheap_alloc_locked_nx()'.
- *                       This also  causes  the  `MNODE_F_COREPART'  /  `MPART_F_COREPART'
- *                       flags  to  be set  for each  resp. This  flag is  used internally
- *                       to resolve  the dependency  loop  between this  function  needing
- *                       to call kmalloc()  and kmalloc() needing  to call this  function.
+ *   - GFP_MCHEAP:       Allocate the mnode and mpart using `mcoreheap_alloc_locked_nx_nocc()'.
+ *                       This   also   causes  the   `MNODE_F_COREPART'   /  `MPART_F_COREPART'
+ *                       flags  to  be  set  for  each  resp.  This  flag  is  used  internally
+ *                       to  resolve  the  dependency   loop  between  this  function   needing
+ *                       to  call  kmalloc()  and  kmalloc()  needing  to  call  this function.
  *   - GFP_MAP_FIXED:    Map memory at the given address `hint' exactly.
  *                       If memory has already been mapped at that address, then simply
  *                       return `MAP_INUSE' unconditionally.
@@ -264,7 +264,7 @@ again_lock_mman:
 		if (flags & GFP_MCHEAP) {
 			if likely(!node) {
 				union mcorepart *cp;
-				cp = mcoreheap_alloc_locked_nx();
+				cp = mcoreheap_alloc_locked_nx_nocc();
 				if unlikely(!cp)
 					goto err_noheap_for_corepart_and_unprepare;
 				node           = &cp->mcp_node;
@@ -272,7 +272,7 @@ again_lock_mman:
 			}
 			if likely(!part) {
 				union mcorepart *cp;
-				cp = mcoreheap_alloc_locked_nx();
+				cp = mcoreheap_alloc_locked_nx_nocc();
 				if unlikely(!cp)
 					goto err_noheap_for_corepart_and_unprepare;
 				part = &cp->mcp_part;

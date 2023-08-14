@@ -66,9 +66,9 @@ DECL_BEGIN
  * single file-block is <= PAGESIZE,  this function behaves 100%  identical to the above  call
  * to `page_malloc_part()' */
 PUBLIC NOBLOCK WUNUSED NONNULL((1, 3)) physpage_t
-NOTHROW(FCALL mfile_alloc_physmem)(struct mfile *__restrict self,
-                                   physpagecnt_t max_pages,
-                                   physpagecnt_t *__restrict res_pages) {
+NOTHROW(FCALL mfile_alloc_physmem_nocc)(struct mfile *__restrict self,
+                                        physpagecnt_t max_pages,
+                                        physpagecnt_t *__restrict res_pages) {
 	physpage_t result, real_result;
 	size_t page_alignment;
 	assert(self->mf_iobashift <= self->mf_blockshift);
@@ -88,13 +88,13 @@ NOTHROW(FCALL mfile_alloc_physmem)(struct mfile *__restrict self,
 	/* Check   for  the  simple  case  where  natural  page
 	 * alignment is enough to satisfy file-block alignment. */
 	if likely(self->mf_iobashift <= PAGESHIFT)
-		return page_malloc_part(1, max_pages, res_pages);
+		return page_malloc_part_nocc(1, max_pages, res_pages);
 	page_alignment = (size_t)1 << (self->mf_iobashift - PAGESHIFT);
-	result = page_malloc_part(page_alignment + page_alignment - 1,
-	                          max_pages + page_alignment - 1,
-	                          res_pages);
+	result = page_malloc_part_nocc(page_alignment + page_alignment - 1,
+	                               max_pages + page_alignment - 1,
+	                               res_pages);
 	if unlikely(result == PHYSPAGE_INVALID) {
-		result = page_malloc(page_alignment);
+		result = page_malloc_nocc(page_alignment);
 		if (result != PHYSPAGE_INVALID) {
 			*res_pages = page_alignment;
 			if (!IS_ALIGNED(result, page_alignment)) {

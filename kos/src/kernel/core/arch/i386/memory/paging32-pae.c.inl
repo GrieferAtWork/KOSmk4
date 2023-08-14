@@ -164,16 +164,16 @@ NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
 	static_assert(PAE_PDIR_VEC1INDEX(PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 0);
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 
-	e3[0] = (u64)page_mallocone_for_paging();
+	e3[0] = (u64)page_mallocone_noblock_for_paging();
 	if unlikely((physpage_t)e3[0] == PHYSPAGE_INVALID)
 		goto err_0;
-	e3[1] = (u64)page_mallocone_for_paging();
+	e3[1] = (u64)page_mallocone_noblock_for_paging();
 	if unlikely((physpage_t)e3[1] == PHYSPAGE_INVALID)
 		goto err_1;
-	e3[2] = (u64)page_mallocone_for_paging();
+	e3[2] = (u64)page_mallocone_noblock_for_paging();
 	if unlikely((physpage_t)e3[2] == PHYSPAGE_INVALID)
 		goto err_2;
-	e3[3] = (u64)page_mallocone_for_paging();
+	e3[3] = (u64)page_mallocone_noblock_for_paging();
 	if unlikely((physpage_t)e3[3] == PHYSPAGE_INVALID)
 		goto err_3;
 
@@ -329,7 +329,7 @@ again:
 	e2.p_word = atomic_read64(&e2_p->p_word);
 	if (!e2.p_vec1.v_present) {
 		/* Not present */
-		new_e1_vector = page_mallocone_for_paging();
+		new_e1_vector = page_mallocone_noblock_for_paging();
 		if unlikely(new_e1_vector == PHYSPAGE_INVALID)
 			return false;
 
@@ -378,7 +378,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 		 * temporary mapping trampoline to  temporarily map the new  page
 		 * for  initialization  (Because   the  trampoline  always   uses
 		 * `PAE_PAGE_FNOFLATTEN'  when  mapping, it  is  always prepared) */
-		new_e1_vector = page_mallocone_for_paging();
+		new_e1_vector = page_mallocone_noblock_for_paging();
 		if unlikely(new_e1_vector == PHYSPAGE_INVALID)
 			return false;
 		e1.p_word = e2.p_word & ~(PAE_PAGE_F2MIB | PAE_PAGE_FPAT_2MIB);

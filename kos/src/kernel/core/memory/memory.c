@@ -668,8 +668,22 @@ NOTHROW(KCALL zone_malloc_before)(struct pmemzone *__restrict self,
  * WARNING: Physical   memory   cannot   be   dereferenced   prior   to   being   mapped.
  * @return: * :              The starting page number of the newly allocated memory range.
  * @return: PHYSPAGE_INVALID: The allocation failed. */
-PUBLIC NOBLOCK WUNUSED physpage_t
+PUBLIC WUNUSED physpage_t
 NOTHROW(FCALL page_malloc)(physpagecnt_t num_pages) {
+	physpage_t result = page_malloc_nocc(num_pages);
+	if unlikely(result == PHYSPAGE_INVALID) {
+		ccstate_t ccstate = CCSTATE_INIT;
+		while (system_cc_s(&ccstate)) {
+			result = page_malloc_nocc(num_pages);
+			if (result != PHYSPAGE_INVALID)
+				break;
+		}
+	}
+	return result;
+}
+
+PUBLIC NOBLOCK WUNUSED physpage_t
+NOTHROW(FCALL page_malloc_noblock)(physpagecnt_t num_pages) {
 	physpage_t result = page_malloc_nocc(num_pages);
 	if unlikely(result == PHYSPAGE_INVALID) {
 		ccstate_t ccstate = CCSTATE_INIT;
@@ -726,8 +740,22 @@ NOTHROW(FCALL page_malloc_nocc)(physpagecnt_t num_pages) {
  * WARNING: Physical   memory   cannot   be   dereferenced   prior   to   being   mapped.
  * @return: * :               The starting page number of the newly allocated memory range.
  * @return: PHYSPAGE_INVALID: The allocation failed. */
-PUBLIC NOBLOCK WUNUSED physpage_t
+PUBLIC WUNUSED physpage_t
 NOTHROW(FCALL page_mallocone)(void) {
+	physpage_t result = page_mallocone_nocc();
+	if unlikely(result == PHYSPAGE_INVALID) {
+		ccstate_t ccstate = CCSTATE_INIT;
+		while (system_cc_s(&ccstate)) {
+			result = page_mallocone_nocc();
+			if (result != PHYSPAGE_INVALID)
+				break;
+		}
+	}
+	return result;
+}
+
+PUBLIC NOBLOCK WUNUSED physpage_t
+NOTHROW(FCALL page_mallocone_noblock)(void) {
 	physpage_t result = page_mallocone_nocc();
 	if unlikely(result == PHYSPAGE_INVALID) {
 		ccstate_t ccstate = CCSTATE_INIT;
@@ -788,8 +816,23 @@ NOTHROW(FCALL page_mallocone_nocc)(void) {
  *    using  up small memory blocks that might otherwise continue going unused.
  * @return: * :              The starting page number of the newly allocated memory range.
  * @return: PHYSPAGE_INVALID: The allocation failed. */
-FUNDEF NOBLOCK WUNUSED __page_malloc_part_return_t
+FUNDEF WUNUSED __page_malloc_part_return_t
 NOTHROW(FCALL _page_malloc_part)(physpagecnt_t min_pages, physpagecnt_t max_pages) {
+	__page_malloc_part_return_t result;
+	result = _page_malloc_part_nocc(min_pages, max_pages);
+	if unlikely(__page_malloc_part_return_getcount(result) == 0) {
+		ccstate_t ccstate = CCSTATE_INIT;
+		while (system_cc_s(&ccstate)) {
+			result = _page_malloc_part_nocc(min_pages, max_pages);
+			if (__page_malloc_part_return_getcount(result) != 0)
+				break;
+		}
+	}
+	return result;
+}
+
+FUNDEF NOBLOCK WUNUSED __page_malloc_part_return_t
+NOTHROW(FCALL _page_malloc_part_noblock)(physpagecnt_t min_pages, physpagecnt_t max_pages) {
 	__page_malloc_part_return_t result;
 	result = _page_malloc_part_nocc(min_pages, max_pages);
 	if unlikely(__page_malloc_part_return_getcount(result) == 0) {
@@ -875,8 +918,23 @@ NOTHROW(FCALL _page_malloc_part_nocc)(physpagecnt_t min_pages, physpagecnt_t max
 
 /* Try to allocate the given page.
  * @return: * : One of `PAGE_MALLOC_AT_*' */
-PUBLIC NOBLOCK WUNUSED unsigned int
+PUBLIC WUNUSED unsigned int
 NOTHROW(FCALL page_malloc_at)(physpage_t ptr) {
+	unsigned int result;
+	result = page_malloc_at_nocc(ptr);
+	if unlikely(result == PAGE_MALLOC_AT_NOTFREE) {
+		ccstate_t ccstate = CCSTATE_INIT;
+		while (system_cc_s(&ccstate)) {
+			result = page_malloc_at_nocc(ptr);
+			if (result != PAGE_MALLOC_AT_NOTFREE)
+				break;
+		}
+	}
+	return result;
+}
+
+PUBLIC NOBLOCK WUNUSED unsigned int
+NOTHROW(FCALL page_malloc_at_noblock)(physpage_t ptr) {
 	unsigned int result;
 	result = page_malloc_at_nocc(ptr);
 	if unlikely(result == PAGE_MALLOC_AT_NOTFREE) {
@@ -919,9 +977,25 @@ NOTHROW(FCALL page_malloc_at_nocc)(physpage_t ptr) {
 /* Similar to `page_malloc_part()', but only allocate memory from
  * between the two given page addresses, such that all  allocated
  * pages are located within the specified range. */
-PUBLIC NOBLOCK WUNUSED __page_malloc_part_return_t
+PUBLIC WUNUSED __page_malloc_part_return_t
 NOTHROW(FCALL _page_malloc_part_between)(physpage_t min_page, physpage_t max_page,
                                          physpagecnt_t min_pages, physpagecnt_t max_pages) {
+	__page_malloc_part_return_t result;
+	result = _page_malloc_part_between_nocc(min_page, max_page, min_pages, max_pages);
+	if unlikely(__page_malloc_part_return_getcount(result) == 0) {
+		ccstate_t ccstate = CCSTATE_INIT;
+		while (system_cc_s(&ccstate)) {
+			result = _page_malloc_part_between_nocc(min_page, max_page, min_pages, max_pages);
+			if (__page_malloc_part_return_getcount(result) != 0)
+				break;
+		}
+	}
+	return result;
+}
+
+PUBLIC NOBLOCK WUNUSED __page_malloc_part_return_t
+NOTHROW(FCALL _page_malloc_part_between_noblock)(physpage_t min_page, physpage_t max_page,
+                                                 physpagecnt_t min_pages, physpagecnt_t max_pages) {
 	__page_malloc_part_return_t result;
 	result = _page_malloc_part_between_nocc(min_page, max_page, min_pages, max_pages);
 	if unlikely(__page_malloc_part_return_getcount(result) == 0) {
