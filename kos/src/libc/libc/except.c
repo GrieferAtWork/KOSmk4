@@ -40,10 +40,12 @@
 
 #include <assert.h>
 #include <atomic.h>
+#include <format-printer.h>
 #include <malloc.h>
 #include <sched.h>
 #include <signal.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <syscall.h>
@@ -58,6 +60,7 @@
 
 #include "dl.h"
 #include "except.h"
+#include "globals.h"
 #include "sigreturn.h"
 #include "tls.h"
 
@@ -145,8 +148,6 @@ PRIVATE SECTION_EXCEPT_BSS PDWARF_DECODE_ULEB128 /*          */ pdyn_dwarf_decod
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_SIGFRAME_EXEC /*      */ pdyn_unwind_fde_sigframe_exec  = NULL;
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_SIGFRAME_APPLY /*     */ pdyn_unwind_cfa_sigframe_apply = NULL;
 #endif /* !CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS */
-#define ENSURE_LIBUNWIND_LOADED() \
-	(atomic_read(&pdyn_libunwind) != NULL || (initialize_libunwind(), 0))
 
 PRIVATE SECTION_EXCEPT_STRING char const name_libunwind_so[] = LIBUNWIND_LIBRARY_NAME;
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_find[]                     = "unwind_fde_find";
@@ -165,21 +166,34 @@ PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_sigframe_exec[]  = "unw
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_sigframe_apply[] = "unwind_cfa_sigframe_apply";
 #endif /* !CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS */
 
-PRIVATE SECTION_EXCEPT_TEXT ATTR_NORETURN
-void LIBCCALL libunwind_init_failed(void) {
+PRIVATE SECTION_EXCEPT_TEXT ssize_t FORMATPRINTER_CC
+libunwind_error_printer(void *arg, char const *__restrict data, size_t datalen) {
+	(void)syslog_printer(arg, data, datalen);
+	(void)writeall(STDERR_FILENO, data, datalen);
+	return (ssize_t)datalen;
+}
+
+PRIVATE SECTION_EXCEPT_TEXT ATTR_NORETURN void LIBCCALL libunwind_init_failed(void) {
 	PRIVATE SECTION_EXCEPT_STRING char const
-	message_libunwind_init_failed[] = "Failed to initialize libunwind: %s\n";
-	syslog(LOG_ERR, message_libunwind_init_failed, dlerror());
+	message_libunwind_init_failed[] = "%s: failed to initialize libunwind: %s\n";
+	pformatprinter printer = &syslog_printer;
+	if (isatty(STDERR_FILENO))
+		printer = &libunwind_error_printer;
+	format_printf(printer, SYSLOG_PRINTER_CLOSURE(LOG_ERR),
+	              message_libunwind_init_failed,
+	              program_invocation_short_name,
+	              dlerror());
 	exit(EXIT_FAILURE);
 }
 
 /* Initialize libunwind bindings. */
 INTERN SECTION_EXCEPT_TEXT ATTR_NOINLINE
-void LIBCCALL initialize_libunwind(void) {
+bool LIBCCALL try_initialize_libunwind(void) {
 	void *handle;
 	handle = dlopen(name_libunwind_so, RTLD_LAZY | RTLD_LOCAL);
 	if unlikely(!handle)
-		goto err_init_failed;
+		return false;
+
 	/* Dynamically bind functions. */
 #define BIND(func, name)                                         \
 	if unlikely((*(void **)&func = dlsym(handle, name)) == NULL) \
@@ -210,10 +224,22 @@ void LIBCCALL initialize_libunwind(void) {
 	COMPILER_WRITE_BARRIER();
 	pdyn_libunwind = handle;
 	COMPILER_WRITE_BARRIER();
-	return;
+	return true;
 err_init_failed:
 	libunwind_init_failed();
 }
+
+INTERN SECTION_EXCEPT_TEXT ATTR_NOINLINE
+void LIBCCALL initialize_libunwind(void) {
+	if unlikely(!try_initialize_libunwind())
+		libunwind_init_failed();
+}
+
+#define ENSURE_LIBUNWIND_LOADED() \
+	(void)(atomic_read(&pdyn_libunwind) != NULL || (initialize_libunwind(), 0))
+#define TRY_ENSURE_LIBUNWIND_LOADED() \
+	(atomic_read(&pdyn_libunwind) != NULL || try_initialize_libunwind())
+
 
 
 #define unwind_fde_find                     (*pdyn_unwind_fde_find)
@@ -443,6 +469,7 @@ trigger_coredump(except_register_state_t const *curr_state,
                  void const **unwind_tracevector,
                  size_t unwind_tracelength,
                  unwind_errno_t unwind_error) {
+	union coredump_info *cd_info;
 #ifndef __EXCEPT_REGISTER_STATE_TYPE_IS_UCPUSTATE
 	struct ucpustate curr_ust, orig_ust;
 	except_register_state_to_ucpustate(curr_state, &curr_ust);
@@ -454,6 +481,14 @@ trigger_coredump(except_register_state_t const *curr_state,
 #define LOCAL_orig_ust (*orig_state)
 #endif /* __EXCEPT_REGISTER_STATE_TYPE_IS_UCPUSTATE */
 
+	/* Construct coredump info, including the special case of `dlerror' */
+	cd_info = container_of(exc, union coredump_info, ci_except);
+	if (unwind_error == UNWIND_USER_DLERROR) {
+		char *dlerror_msg = dlerror();
+		if (dlerror_msg != NULL)
+			cd_info = container_of(dlerror_msg, union coredump_info, ci_dlerror[0]);
+	}
+
 	/* Try  to trigger a  coredump including all  of the information needed
 	 * to re-construct (up to `EXCEPT_BACKTRACE_SIZE' frames) of the unwind
 	 * path, as well as the remainder of the stack that didn't get unwound. */
@@ -461,7 +496,7 @@ trigger_coredump(except_register_state_t const *curr_state,
 	             &LOCAL_orig_ust,
 	             unwind_tracevector,
 	             unwind_tracelength,
-	             container_of(exc, union coredump_info, ci_except),
+	             cd_info,
 	             unwind_error);
 	/* There really shouldn't be a reason to get here, but just in case... */
 
@@ -527,10 +562,15 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_except_unwind)(except_register_state_t *__re
 			break;
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+	memcpy(&orig_state, state, sizeof(*state));
 
 	/* Make sure that libunwind has been loaded. */
-	ENSURE_LIBUNWIND_LOADED();
-	memcpy(&orig_state, state, sizeof(*state));
+	if unlikely(!TRY_ENSURE_LIBUNWIND_LOADED()) {
+		memcpy(&oldstate, state, sizeof(*state));
+		unwind_error = UNWIND_USER_DLERROR;
+		goto err;
+	}
+
 search_fde:
 	/* unwind `state' until the nearest exception handler,  or until the end of the  stack.
 	 * If the later happens, then we check for an exit-thread exception, but will terminate
@@ -573,8 +613,8 @@ search_fde:
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		goto err;
 
-#if EXCEPT_BACKTRACE_SIZE != 0
 	/* Remember the current state PC as a new entry in the exception's traceback. */
+#if EXCEPT_BACKTRACE_SIZE != 0
 	if (current.pt_except.ei_trace[EXCEPT_BACKTRACE_SIZE - 1] == NULL) {
 #if EXCEPT_BACKTRACE_SIZE > 1
 		size_t i;
@@ -588,6 +628,7 @@ search_fde:
 #endif /* EXCEPT_BACKTRACE_SIZE <= 1 */
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+
 	/* Continue searching for handlers. */
 	goto search_fde;
 err:
@@ -595,10 +636,12 @@ err:
 		struct exception_info *info = &current.pt_except;
 		if (unwind_error == UNWIND_NO_FRAME || unwind_error == UNWIND_USER_NOTHROW) {
 			except_register_state_t *new_state;
+
 			/* Try to handle special exceptions (E_EXIT_THREAD and E_EXIT_PROCESS) */
 			new_state = handle_special_exception(state, &info->ei_data);
 			if (new_state != NULL)
 				return new_state;
+
 			/* Try to convert the exception into a signal. */
 			if (info->ei_flags & EXCEPT_FMAYSIGNAL)
 				try_raise_signal_from_exception(state, &info->ei_data);
@@ -610,6 +653,7 @@ err:
 			       __EXCEPT_REGISTER_STATE_TYPE_RDPC(oldstate),
 			       unwind_error);
 		}
+
 		/* Use the original state that the caller of `libc_except_unwind()' provided
 		 * in order to minimize the stack  portion which can only be  re-constructed
 		 * by walking the stack trace stored in `&current.pt_except->ei_trace' */
@@ -678,17 +722,21 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_raise_phase_2)(except_register_sta
 			if (reason != _URC_CONTINUE_UNWIND)
 				goto err_unwind__URC_FATAL_PHASE2_ERROR;
 		}
+
 		/* Don't let us unwind past the handler context.  */
 		assert(actions == _UA_CLEANUP_PHASE);
+
 		/* Unwind the stack. */
 		unwind_error = unwind_fde(&context.uc_fde, &newstate, &oldstate, pc);
 		if unlikely(unwind_error != UNWIND_SUCCESS)
 			goto err_unwind__URC_FATAL_PHASE2_ERROR;
 	}
+
 	/* Apply landing pad transformations. */
 	unwind_error = unwind_landingpad(&context.uc_fde, &newstate, pc);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		goto err_unwind__URC_FATAL_PHASE2_ERROR;
+
 	/* Write-back the register state. */
 	memcpy(state, &newstate, sizeof(newstate));
 	return state;
@@ -719,6 +767,7 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_forceunwind_phase_2)(except_regist
 		unwind_error = unwind_fde_find(pc, &context.uc_fde);
 		if unlikely(unwind_error != UNWIND_SUCCESS && unwind_error != UNWIND_NO_FRAME)
 			goto err_unwind__URC_FATAL_PHASE2_ERROR;
+
 		/* Unwind successful.  */
 		action = _UA_FORCE_UNWIND | _UA_CLEANUP_PHASE;
 		if (unwind_error == UNWIND_NO_FRAME)
@@ -727,6 +776,7 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_forceunwind_phase_2)(except_regist
 		                 exception_object, &context, stop_argument);
 		if (reason != _URC_NO_REASON)
 			goto err_unwind__URC_FATAL_PHASE2_ERROR;
+
 		/* stop() didn't want to do anything.
 		 * Invoke the personality handler, if applicable, to run cleanups. */
 		if (unwind_error == UNWIND_NO_FRAME)
@@ -740,6 +790,7 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_forceunwind_phase_2)(except_regist
 			if (reason != _URC_CONTINUE_UNWIND)
 				goto err_unwind__URC_FATAL_PHASE2_ERROR;
 		}
+
 		/* Unwind the stack. */
 		unwind_error = unwind_fde(&context.uc_fde, &newstate, &oldstate, pc);
 		if unlikely(unwind_error != UNWIND_SUCCESS) {
@@ -748,10 +799,12 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_forceunwind_phase_2)(except_regist
 			goto err_unwind__URC_FATAL_PHASE2_ERROR;
 		}
 	}
+
 	/* Apply landing pad transformations. */
 	unwind_error = unwind_landingpad(&context.uc_fde, &newstate, pc);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		goto err_unwind__URC_FATAL_PHASE2_ERROR;
+
 	/* Write-back the register state. */
 	memcpy(state, &newstate, sizeof(newstate));
 	return state;
@@ -778,13 +831,16 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_Unwind_RaiseException_impl)(except_register_
 	struct _Unwind_Context context;
 	except_register_state_t oldstate, newstate;
 	void const *pc;
+
 	/* Special case: Raise a KERNKOS exception (with information already stored in `tls.t_except') */
 	if unlikely(!exception_object || exception_object->exception_class == _UEC_KERNKOS)
 		return libc_except_unwind(state);
+
 	/* Make sure that libunwind has been loaded. */
 	ENSURE_LIBUNWIND_LOADED();
 	memcpy(&newstate, state, sizeof(newstate));
 	context.uc_state = &newstate;
+
 	/* Phase #1: Search for a viable exception handler. */
 	for (;;) {
 		memcpy(&oldstate, &newstate, sizeof(newstate));
@@ -803,15 +859,18 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_Unwind_RaiseException_impl)(except_register_
 			if (reason != _URC_CONTINUE_UNWIND)
 				goto err_unwind__URC_FATAL_PHASE1_ERROR;
 		}
+
 		/* Unwind the stack. */
 		unwind_error = unwind_fde(&context.uc_fde, &newstate, &oldstate, pc);
 		if unlikely(unwind_error != UNWIND_SUCCESS)
 			goto err_unwind;
 	}
+
 	/* Phase #2 */
 	exception_object->private_1 = 0;
 	exception_object->private_2 = _Unwind_Context_Identify(&context);
 	return libc_exception_raise_phase_2(state, exception_object);
+
 err_unwind:
 	/* NOTE: This is how we must propagate errors! */
 	if (unwind_error == UNWIND_NO_FRAME) {
@@ -1194,7 +1253,8 @@ libc_except_handler4_impl(except_register_state_t *__restrict state,
 	COMPILER_BARRIER();
 
 	/* Make sure that libunwind has been loaded. */
-	ENSURE_LIBUNWIND_LOADED();
+	if unlikely(!TRY_ENSURE_LIBUNWIND_LOADED())
+		goto do_coredump_with_dlerror;
 	memcpy(&oldstate, state, sizeof(*state));
 	context.uc_state  = &oldstate;
 	got_first_handler = false;

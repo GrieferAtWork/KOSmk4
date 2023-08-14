@@ -199,7 +199,7 @@ LOCAL_sys_coredump_impl(struct icpustate *__restrict return_state,
 		*(char *)mempcpy(dlbuf, reason->ci_dlerror, errlen, sizeof(char)) = '\0';
 		coredump_create(&curr_ustate, utb_vector, traceback_length,
 		                &orig_ustate, NULL, 0, NULL,
-		                (union coredump_info *)dlbuf,
+		                container_of(dlbuf, union coredump_info, ci_dlerror[0]),
 		                unwind_error);
 	} else if (COREDUMP_INFO_ISASSERT(unwind_error)) {
 		struct coredump_assert as;
