@@ -1016,6 +1016,10 @@ again:
 		/* Only unload parts of non-persistent files. */
 		if (iter->mp_file->mf_flags & MFILE_F_PERSISTENT)
 			goto part_not_unloaded;
+
+		/* TODO: Trim unmapped sub-regions of mem-parts, similar to `mpart_trim()', only that we should
+		 *       also  do so for  non-anonymous mem-parts (but only  if `MFILE_F_PERSISTENT' isn't set) */
+
 		if (!(atomic_fetchand(&iter->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)) /* Inherit reference */
 			goto part_not_unloaded;
 		if (!atomic_cmpxch(&iter->mp_refcnt, 1, 0)) {
@@ -1028,6 +1032,7 @@ again:
 			if (atomic_decfetch(&iter->mp_refcnt) != 0)
 				goto part_not_unloaded;
 		}
+
 		/* Part got destroyed! */
 		assert(!(atomic_read(&iter->mp_flags) & MPART_F_GLOBAL_REF));
 		SLIST_INSERT(&deadlist, iter, _mp_dead);
@@ -1382,18 +1387,23 @@ NOTHROW(FCALL system_cc_impl)(struct ccinfo *__restrict info) {
 	DOCC(system_cc_slab_prealloc(info));
 	DOCC(system_cc_heaps(info));
 
-	/* TODO: Clear unused memory from pid namespace (once pid namespace have been re-written) */
-
-	/* TODO: Trim unmapped sub-regions of mem-parts, similar to `mpart_trim()', only that we should
-	 *       also  do so for  non-anonymous mem-parts (but only  if `MFILE_F_PERSISTENT' isn't set) */
-
 	/* TODO: There a couple more things we can do to free up physical memory:
 	 *  - We're  already unloading cached files and file-parts, but we can even
 	 *    unload file parts that are currently in use (so-long as they  haven't
 	 *    been modified). This can be done by changing a loaded, but unmodified
 	 *    mpart back to MPART_ST_VOID
+	 *    -->> This is probably the most important thing that still needs to be
+	 *         implemented here (other than swap-support), since this allows us
+	 *         to  unload parts  of loaded  programs/libraries, as  well as all
+	 *         other  types of file mappings, and have them lazily be re-loaded
+	 *         as soon as they're accessed again.
 	 *  - We can  also do  `pagedir_unmap_userspace()' for  every user-space  mman
 	 *    out there, and let mappings re-populate themselves upon the next access.
+	 *    - However, this should only be done as a last resort, since if the free'd
+	 *      memory then gets  allocated again, *all*  user-space programs are  just
+	 *      going to crash because they'd be unable to restore their mappings.
+	 *    - Also: /bin/init should be exempt from this, since it crashing would
+	 *      just cause the kernel to panic anyways.
 	 */
 
 	if (!(info->ci_gfp & GFP_NOSWAP)) {
