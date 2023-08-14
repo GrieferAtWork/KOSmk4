@@ -94,8 +94,8 @@ DlModule_Destroy(NCX DlModule *self)
 	dlglobals_all_write(&dl_globals);
 	dlglobals_all_del(&dl_globals, self);
 	assertf(!DLIST_EMPTY(&dl_globals.dg_alllist),
-	        "The all-modules list should never become empty (libdl "
-	        "module and main program should never disappear)");
+	        "The all-modules list should never become empty (libdl's "
+	        "own module and main program should never disappear)");
 	dlglobals_all_endwrite(&dl_globals);
 
 	/* Trigger the trap informing a debugger of the change in loaded libraries. */
@@ -460,17 +460,18 @@ NOTHROW_NCX(CC DlModule_ElfGetDynSymCnt)(NCX DlModule *self)
 			 *       causing some kind of I/O or NOMEM error. */
 			ElfW(Shdr) *sh;
 			sh = DlModule_ElfGetShdrs(self);
+
 			/* NOTE: Section headers may not be present, or we may have failed to load them... */
 			if likely(sh) {
 				ElfW(Addr) modrel_dynsym;
 				size_t i, count;
 				modrel_dynsym = ((ElfW(Addr))self->dm_elf.de_dynsym_tab -
 				                 self->dm_loadaddr);
-				/* Find   the   section   header   that   contains   `.dynsym'.
-				 * We  could  look  at  section   names  here,  or  even   just
-				 * search  for  a  section  that  starts  with `modrel_dynsym'.
-				 * However   to  minimize  our  expectations  on  what  section
-				 * headers  are  actually  present,  simply  assume  that we're
+
+				/* Find  the section header that contains `.dynsym'. We could look at
+				 * section names here, or even just search for a section that  starts
+				 * with `modrel_dynsym'. However to minimize our expectations on what
+				 * section headers  are actually  present, simply  assume that  we're
 				 * looking for a `SHF_ALLOC' section containing `modrel_dynsym' */
 				count = self->dm_elf.de_shnum;
 				for (i = 0; i < count; ++i) {
@@ -480,6 +481,7 @@ NOTHROW_NCX(CC DlModule_ElfGetDynSymCnt)(NCX DlModule *self)
 						continue;
 					if (modrel_dynsym >= sh[i].sh_addr + sh[i].sh_size)
 						continue;
+
 					/* Found it! */
 					result = ((sh[i].sh_addr + sh[i].sh_size) - modrel_dynsym) /
 					         sizeof(ElfW(Sym));

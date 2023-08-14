@@ -43,6 +43,7 @@ INTDEF ATTR_MALLOC WUNUSED void *LIBCCALL dlcalloc(size_t n_elements, size_t ele
 INTDEF WUNUSED void *LIBCCALL dlrealloc(void *oldmem, size_t bytes) ASMNAME("realloc");
 INTDEF WUNUSED void *LIBCCALL dlrealloc_in_place(void *oldmem, size_t bytes) ASMNAME("realloc_in_place");
 INTDEF WUNUSED void *LIBCCALL dlmemalign(size_t alignment, size_t bytes) ASMNAME("memalign");
+INTDEF ATTR_PURE WUNUSED size_t LIBCCALL dlmalloc_usable_size(void *mem) ASMNAME("malloc_usable_size");
 
 
 /* Lazily initialize and return the libdl core ops V-table. */

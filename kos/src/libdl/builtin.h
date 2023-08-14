@@ -24,15 +24,17 @@
 #include <__stdinc.h>
 
 /* Addressable sections of the RTLD driver itself.
+ *
  * Of note here are mostly the .eh_frame and  .gcc_except_table
  * sections, which are required for allowing exceptions to work
  * properly when being propagated through the callbacks invoked
  * by the RTLD driver.
- * NOTE: Each  section has  2 symbols  defined by  the linker script:
- *       `__rtld_<name>_start'  and  `__rtld_<name>_end',  that   are
- *       used to  lazily  fill  in  section  information  as-per  the
- *       request of a call to `dllocksection(3D)' when given a handle
- *       for the RTLD core library. */
+ *
+ * NOTE: Each section has 2 symbols defined by the linker script:
+ *       `__rtld_<name>_start' and `__rtld_<name>_end', that  are
+ *       used to lazily  fill in section  information as-per  the
+ *       request of a  call to `dllocksection(3D)'  when given  a
+ *       handle for the RTLD core library. */
 #define BUILTIN_SECTIONS_COUNT 6
 #define BUILTIN_SECTIONS_ENUMERATE(cb)                                                    \
 	cb(0, ".text",             text,             SHT_PROGBITS, SHF_ALLOC | SHF_EXECINSTR) \
@@ -42,24 +44,30 @@
 	cb(4, ".data",             data,             SHT_PROGBITS, SHF_ALLOC | SHF_WRITE)     \
 	cb(5, ".bss",              bss,              SHT_NOBITS,   SHF_ALLOC | SHF_WRITE)
 
-/* For the  purpose of  being able  to  safely handle  exceptions the  same  way
- * loaded  modules  do, a  couple  of global  functions  that aren't  defined by
- * the  RTLD   driver  itself   need  to   be  provided   by  loaded   libraries
- * Note that  these  functions  are  only needed  when  thrown  exceptions  pass
- * through  functions  apart  of the  RTLD  core, meaning  that  when exceptions
- * aren't being  used  by the  hosted  application  or its  libraries,  or  even
- * if no exception is ever thrown from an __attribute__((constructor)) function,
- * these are never loaded. -  However, if they are,  then they must be  provided
- * by one of the loaded libraries (usually that library simply being  `libc.so')
- * If one of these functions  is used, but isn't provided  by any of the  loaded
- * modules, the hosted  application gets terminated  ungracefully, and an  error
- * message is written to the system log.
- * HINT: When  required,  the  functions  are  searched  for  the  same  way
- *       `dlsym(RTLD_DEFAULT, ...)' would search for them, following regular
- *       symbol  lookup  order  throughout all  globally  visible libraries.
- * NOTE: The behavior of these functions is specified and standardized in different
- *       places. - Search around the project and  on the Internet to find out  what
- *       each of these has to do, and how it has to do exactly that. */
+/* For the purpose of being able to safely handle exceptions the same way
+ * loaded modules do, a couple of global functions that aren't defined by
+ * the RTLD driver itself need to be provided by loaded libraries.
+ *
+ * Note  that these functions are only needed when thrown exceptions pass
+ * through functions apart of the RTLD core, meaning that when exceptions
+ * aren't being used by the hosted application or its libraries, or  even
+ * if no exception is ever thrown from an  `__attribute__((constructor))'
+ * function,  these are never  loaded. - However, if  they are, then they
+ * must be provided by one of the loaded libraries (usually that  library
+ * simply being `libc.so')
+ *
+ * If  one of these functions is used, but isn't provided by any of the
+ * loaded modules, the hosted application gets terminated ungracefully,
+ * and an error message is written to the system log.
+ *
+ * HINT: When required, the functions are searched for the same  way
+ *       `dlsym(RTLD_DEFAULT, ...)' would search for them, following
+ *       regular symbol lookup order throughout all globally visible
+ *       libraries.
+ * NOTE: The behavior of these functions is specified and standardized
+ *       in different places. - Search  around the project and on  the
+ *       Internet to find out what each of these has to do, and how it
+ *       has to do exactly that. */
 #define BUILTIN_GLOBALS_ENUMERATE(cb) \
 	cb(__gxx_personality_v0)          \
 	cb(__cxa_begin_catch)             \

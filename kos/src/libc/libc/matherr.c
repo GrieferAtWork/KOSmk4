@@ -122,7 +122,7 @@ LPMATHERR NOTHROW(LIBCCALL libc_get_matherr)(void) {
 		if unlikely(!result)
 			result = &libc_matherr; /* Really shouldn't happen. -- libdl should have found our version... */
 		new_result = atomic_cmpxch_val(&libc_pdyn_matherr, NULL, result);
-		if (new_result != NULL)
+		if unlikely(new_result != NULL)
 			result = new_result;
 	}
 	return result;

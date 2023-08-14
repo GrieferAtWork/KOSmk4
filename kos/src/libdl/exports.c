@@ -30,6 +30,15 @@
 
 DECL_BEGIN
 
+/* None of the stuff below actually ends up in the final  binary.
+ * However, these symbols  *do* appear in  the export table,  and
+ * libdl contains special code to recognize these symbols by-name
+ * when queried using `dlsym(3D)'.
+ *
+ * As such, the definitions below are there for `ld(1)` to find
+ * these symbols and not complain that they would be  undefined
+ * when it links programs against our `libdl.so'. */
+
 #undef environ
 #undef _environ
 #undef __environ

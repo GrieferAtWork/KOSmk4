@@ -20,20 +20,20 @@ git clone --recursive https://github.com/GrieferAtWork/KOSmk4
 ```
 
 
-## Table of contents
+## Table of Contents
 - [Ported Applications](#applications)
 - [KOS Features](#features)
-- [Project rules / Code guidelines](#rules)
+- [Project Rules / Code Guidelines](#rules)
 - [Building KOS](#building)
 	- [Getting a Shell](#shell)
 	- [Recommended Build Environment](#build-env)
-	- [Building 3rd party programs](#building_3rd_party_programs)
+	- [Building 3rd Party Programs](#building_3rd_party_programs)
 	- [`deemon magic.dee`](#magic)
 	- [Configuring KOS](#configuring)
 	- [Installing KOS](#installing)
 - [Programming KOS with an IDE](#programming)
 - [Notes on building KOS](#building-notes)
-- [Using various emulators to run KOS](#emulators)
+- [Using Various Emulators to Run KOS](#emulators)
 - [Automatic System Headers](#headers)
 - [GPL Licensing](#gpl)
 - [Older KOS Revisions](#old-kos)
@@ -450,7 +450,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 
 
 <a name="rules"></a>
-## Project rules / Code guidelines
+## Project Rules / Code Guidelines
 
 - Any libc function exposed by KOS-headers under `/kos/include/*` must check if `__CRT_HAVE_{name}` is defined
 - Any function defined by a library other than libc should be located in a folder `<libmylibrary/...>` and must always contain a file `<libmylibrary/api.h>` that defines the common calling convention, as well as the `dlopen(3)` name for the library, as well as a configuration option `LIBMYLIBRARY_WANT_PROTOTYPES`
@@ -566,7 +566,7 @@ deemon $PROJPATH/magic.dee --target=i386 --config=nOD --build-only
 bash $PROJPATH/kos/misc/make_utility.sh i386 busybox
 ```
 
-That's it. That last command will download, build & install busybox into every i386 KOS disk image that it can find under `$PROJPATH/bin/...`, also meaning that if you choose to clear out `$PROJPATH/bin` (or have just build KOS for a specific configuration for the first time), you will have to ensure that `magic.dee` was run at least once for your intended configuration, followed by re-executing the `make_utility.sh` command
+That's it. That last command will download, build & install busybox into every i386 KOS disk image that it can find under `$PROJPATH/bin/...`, also meaning that if you choose to clear out `$PROJPATH/bin` (or have just build KOS for a specific configuration for the first time), you will have to ensure that `magic.dee` was run at least once for your intended configuration, followed by re-executing the `make_utility.sh` command.
 
 The plan is to add more software to `make_utility.sh` in the future, so that you'll be able to install select third-party software with this easy-to-use method of building them.
 
@@ -576,11 +576,11 @@ If you have any suggestions for software (or even better: code snippets for use 
 
 
 <a name="building_3rd_party_programs"></a>
-## Building 3rd party programs
+## Building 3rd Party Programs
 
 Like already mentioned in [Ported Applications](#applications), building 3rd party programs/libraries for use with KOS is done by invoking the `$PROJPATH/kos/misc/make_utility.sh` script.
 
-I'd also like to recommend that you *dont* run `make_utility.sh` as root. While I'm doing my best to get utilities to behave and not try to copy files into host system paths, given that these aren't my projects, I can't guaranty that some of them might still try to do this in certain situations. As such, running `make_utility.sh` as a normal user, 3rd party configure+make scripts won't be able to modify/write files in host system paths.
+I'd also like to recommend that you *dont* run `make_utility.sh` as root. While I'm doing my best to get utilities to behave and not try to copy files into host system paths, given that these aren't my projects, I can't guaranty that some of them might still try to do this in certain situations. As such, by running `make_utility.sh` as a normal user, 3rd party configure+make scripts won't be able to modify/write files in host system paths.
 
 However, building 3rd party programs sometimes requires additional utilities to be installed. In most cases, these utilities can be read from error messages, however here's a list of some that you'll be needing for quite a few of them:
 
@@ -605,6 +605,7 @@ So with that in mind, I can only recommend you'd use the same one I'm using:
 - Cygwin
 - QEMU
 
+If that's not to your liking, you can also try to mirror the environment used in `.github/workflows/build-i386-kos-nOD.yml`, which essentially just uses linux.
 
 
 
@@ -615,7 +616,7 @@ The `magic.dee` file found in `$PROJROOT` is the primary controller for doing an
 
 If the file extension (and the use of [`deemon`](#building) for starting) wasn't enough, it's a deemon script.
 
-To help you understand how this script works to do what it does, here is a documentation about its options
+To help you understand how this script works to do what it does, here is a documentation about its options:
 
 - `-1`
 	- Compile in single-core mode (don't run more than one build step at the same time)
@@ -702,7 +703,7 @@ To help you understand how this script works to do what it does, here is a docum
 	- `$PROJPATH/kos/src/[...]/$TARGET_XARCH/...`
 	- Note that for the last two, `TARGET_XARCH = $TARGET == "x86_64" ? "i386" : $TARGET`
 
-##### Automatic target/configuration detection
+##### Automatic Target/Configuration Detection
 
 - The intended target/configuration is set automatically when not defined explicitly via the `--target=...` and `--config=...` options
 - This works by parsing the file `$PROJPATH/kos/.vs/ProjectSettings.json` (which is automatically created and updated by Visual Studio to always reflect the currently selected build configuration)
@@ -896,18 +897,18 @@ For this, the KOS system header folder contains crt feature files. These files a
 
 Using this system, KOS system headers will automatically determine the features provided by the linked libc, and fill in the gaps, thus offering a much more complete API experience, regardless of what the underlying libraries actually offer.
 
-Now assuming that some functionality is missing from linked libraries, this manifests itself by the automatic function substitution system kicking in and providing local definitions (aka. static/inline functions) for pretty much everything found in system headers (e.g. memcpy is immediately implemented as an inline/static function in `/kos/include/libc/local/string/memcpy.h`)
+Now assuming that some functionality is missing from linked libraries, this manifests itself by the automatic function substitution system kicking in and providing local definitions (aka. static/inline functions) for pretty much everything found in system headers (e.g. memcpy is immediately implemented as an inline/static function in `/kos/include/libc/local/string/memcpy.h`).
 
 With these substitutions in place, libraries and the kernel can still be built, however will result in below-optimal code being generated, simple due to the rediculous amount of redundancies.
 
-For more information about the header substitution system, and how it makes it possible to use KOS's headers for toolchains other than KOS itself (requiring only minor, to no modifications at all), take a look at the section on [Automatic System Headers](#headers)
+For more information about the header substitution system, and how it makes it possible to use KOS's headers for toolchains other than KOS itself (requiring only minor, to no modifications at all), take a look at the section on [Automatic System Headers](#headers).
 
 
 
 <a name="emulators"></a>
-## Using various emulators to run KOS
+## Using Various Emulators to Run KOS
 
-KOS supports emulated execution via one of the following emulators
+KOS supports emulated execution via one of the following emulators:
 
 - QEMU (default)
 	- Start this emulator with:
@@ -937,13 +938,14 @@ This system is tightly interwoven with the CRT feature files described in the se
 
 This is done via a custom function definition protocol implemented by a deemon program found in `$PROJPATH/kos/misc/magicgenerator/generate_headers.dee`, which when run, will parse and link the definition files from `$PROJPATH/kos/src/libc/magic/*.c` to gain knowledge of what goes where, how everything looks like, what annotations may be applied to functions, how functions are implemented, and so on...
 
-As the end result, KOS is able to provide definitions for many header functions while simultaniously exporting them from both libc (and sometimes the kernel) in such a way that the possibility of mistakes happening due to redundancy falls away (e.g. all function prototypes of memcpy() are annotated with `ATTR_NONNULL((1, 2))`, and despite this specific annotation existing in possibly more than 20 places, any changes to it would only require a single modification of the tags in `/kos/src/libc/magic/string.c`)
+As the end result, KOS is able to provide definitions for many header functions while simultaniously exporting them from both libc (and sometimes the kernel) in such a way that the possibility of mistakes happening due to redundancy falls away (e.g. all function prototypes of memcpy() are annotated with `ATTR_NONNULL((1, 2))`, and despite this specific annotation existing in possibly more than 20 places, any changes to it would only require a single modification of the tags in `/kos/src/libc/magic/string.c`).
 
-Additionally, when using KOS headers with a CRT other than KOS, this makes it possible to substitute KOS-specific extensions such as `strend()` by automatically providing a local implementation of the function though `/kos/include/local/string/strend.h`, where this variant of the function is implemented identically to the variant exported by KOS's libc, meaning that in the event of changes having to be made to its implementation, all that's required is another single alteration in `/kos/src/libc/magic/string.c`
+Additionally, when using KOS headers with a CRT other than KOS, this makes it possible to substitute KOS-specific extensions such as `strend()` by automatically providing a local implementation of the function though `/kos/include/local/string/strend.h`, where this variant of the function is implemented identically to the variant exported by KOS's libc, meaning that in the event of changes having to be made to its implementation, all that's required is another single alteration in `/kos/src/libc/magic/string.c`.
 
 In the end, thanks to the feature definition files (which basically just needs to contain a list of all the symbols exported from the CRT against which the hosted binary is to-be linked), 90% of the usual work of having KOS headers be hosted by some new libc will only require the addition of a new crt-features file, as well as making use of it in `/kos/include/__crt.h`, making the KOS toolchain extremely configurable, as well as versatile and portable. (That is: once you understand how everything fits together)
 
 Another useful feature of this lies in the fact that it allows any source file to force the use of local definitions of certain functions, preventing that source file from becoming dependent on being linked against libc (being able to do this is required to build a dynamic linker, which couldn't very well do its job of linking if it had to link itself first...).
+
 For example, an application could force the headers to provide a local implementation of `sprintf()`:
 
 ```c
@@ -979,7 +981,7 @@ int main() {
 }
 ```
 
-Note however, that some functions can't easily be substituted (e.g. `open(2)`). As such, if a function appears in a header, but isn't provided by libc, nor has a local implementation, the function will simply not be defined. (giving you a compile-time error, rather than having to wait for link-time)
+Note however, that some functions can't easily be substituted (e.g. `open(2)`). As such, if a function appears in a header, but isn't provided by libc, nor has a local implementation, the function will simply not be defined (giving you a compile-time error, rather than having to wait for link-time).
 
 Lastly, if there ever ends up being some gaping flaw in how KOS defines functions in headers, the fix will always be as simple as making a limited number of changes to the code generator scripts, instead of requiring millions of code locations to be updated, only to forget a hand full of them and have them lingering as dormant bugs to re-surface years in the future.
 

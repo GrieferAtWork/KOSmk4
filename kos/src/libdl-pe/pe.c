@@ -33,6 +33,7 @@
 /**/
 
 #include <hybrid/align.h>
+#include <hybrid/unaligned.h>
 #include <hybrid/wordbits.h>
 
 #include <asm/intrin.h>
@@ -144,8 +145,10 @@ libpe_GetProcAddress(DlModule *self, char const *symbol_name) {
 		RAII_FINALLY { freea(dos_symbol_name); };
 
 		/* Construct the DOS$-prefixed symbol name. */
-		*(uint32_t *)dos_symbol_name = ENCODE_INT32('D', 'O', 'S', '$');
+		UNALIGNED_SET32(dos_symbol_name, ENCODE_INT32('D', 'O', 'S', '$'));
 		memcpy(dos_symbol_name + 4, symbol_name, symbol_name_len + 1, sizeof(char));
+
+		/* Lookup the DOS$-prefixed version of the symbol */
 		result = dlsym(self, dos_symbol_name);
 	}
 	if (result)
@@ -428,9 +431,10 @@ DlModule_PeInitializeImportTable(DlModule *__restrict self) {
 			syslog(LOG_DEBUG, "[pe] import: %q\n", filename);
 			dependency = libpe_LoadLibrary(filename, dep_flags);
 			if (!dependency) {
-				if (atomic_read(&dl_globals.dg_errmsg) == NULL)
+				if (atomic_read(&dl_globals.dg_errmsg) == NULL) {
 					dl.dl_seterrorf("Failed to load dependency %q of %q",
 					                filename, self->dm_filename);
+				}
 				goto err;
 			}
 			self->dm_depvec[self->dm_depcnt++] = dependency; /* Inherit reference */

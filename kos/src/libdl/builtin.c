@@ -3499,8 +3499,8 @@ INTDEF struct dlsym_builtin_symbol const dlsym_builtin_table[DLSYM_BUILTIN_COUNT
  *          in moddbx's `cexpr_load_special_libdl_symbol()' function, which
  *          contains special handling for binding against this symbol! */
 PRIVATE char *dl_program_invocation_short_name = NULL;
-PRIVATE WUNUSED char **
-NOTHROW_NCX(FCALL dlget_p_program_invocation_short_name)(void) THROWS(E_SEGFAULT) {
+PRIVATE ATTR_RETNONNULL WUNUSED char **
+NOTHROW_NCX(FCALL dlget_p_program_invocation_short_name)(void) {
 	if (!dl_program_invocation_short_name) {
 		char *progname = dl_globals.dg_peb->pp_argv
 		                 ? dl_globals.dg_peb->pp_argv[0]
@@ -3517,7 +3517,7 @@ NOTHROW_NCX(FCALL dlget_p_program_invocation_short_name)(void) THROWS(E_SEGFAULT
 
 /* Return the address of a builtin function (e.g. `dlopen(3D)') */
 INTERN ATTR_PURE WUNUSED NONNULL((1)) void *
-NOTHROW_NCX(CC dlsym_builtin)(NCX char const *name) THROWS(E_SEGFAULT) {
+NOTHROW_NCX(CC dlsym_builtin)(NCX char const *name) {
 	size_t lo, hi;
 	/* Do a binary search across `dlsym_builtin_table' */
 	lo = 0;
@@ -3632,7 +3632,7 @@ return_program_invocation_short_name:
 
 /* Used internally for some relocations: the "size" of libdl builtin symbols. */
 INTERN ATTR_PURE WUNUSED NONNULL((1)) size_t
-NOTHROW_NCX(CC dlsym_builtin_size)(NCX char const *name) THROWS(E_SEGFAULT) {
+NOTHROW_NCX(CC dlsym_builtin_size)(NCX char const *name) {
 	/* Only a couple of symbols should actually have a non-zero size value. */
 	switch (*name++) {
 
@@ -3782,7 +3782,7 @@ NOTHROW(CC dlsec_builtin_name)(size_t sect_index) {
 
 
 INTERN ATTR_PURE WUNUSED NONNULL((1)) DlSection *
-NOTHROW_NCX(CC dlsec_builtin)(NCX char const *name) THROWS(E_SEGFAULT) {
+NOTHROW_NCX(CC dlsec_builtin)(NCX char const *name) {
 	size_t sect_index;
 	char const *sect_name;
 	for (sect_index = 0;; ++sect_index) {

@@ -52,6 +52,7 @@ DL_COREOP(ATTR_MALLOC_T WUNUSED_T, void *, , __LIBCCALL, dlcalloc, (size_t n_ele
 DL_COREOP(WUNUSED_T, void *, , __LIBCCALL, dlrealloc, (void *oldmem, size_t bytes))
 DL_COREOP(WUNUSED_T, void *, , __LIBCCALL, dlrealloc_in_place, (void *oldmem, size_t bytes))
 DL_COREOP(WUNUSED_T, void *, , __LIBCCALL, dlmemalign, (size_t alignment, size_t bytes))
+DL_COREOP(ATTR_PURE_T WUNUSED_T, size_t, , __LIBCCALL, dlmalloc_usable_size, (void *mem))
 
 #undef DL_COREFIELD
 #undef DL_COREOP

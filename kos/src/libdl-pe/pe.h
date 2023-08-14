@@ -65,7 +65,7 @@ DECL_END
 #include <malloc.h> /* So we can override malloc() and friends */
 #include <string.h> /* So we can override strdup() */
 
-#include <libc/malloc.h> /* So we can override malloc() and friends */
+#include <libc/malloc.h> /* So we can override __libc_malloc() and friends */
 #include <libdl/extension.h>
 #include <libdl/module.h>
 
@@ -75,14 +75,16 @@ DECL_END
 #undef __libc_realloc
 #undef __libc_realloc_in_place
 #undef __libc_memalign
+#undef __libc_malloc_usable_size
 #undef __libc_strdup
-#define __libc_malloc           malloc
-#define __libc_free             free
-#define __libc_calloc           calloc
-#define __libc_realloc          realloc
-#define __libc_realloc_in_place realloc_in_place
-#define __libc_memalign         memalign
-#define __libc_strdup           strdup
+#define __libc_malloc             malloc
+#define __libc_free               free
+#define __libc_calloc             calloc
+#define __libc_realloc            realloc
+#define __libc_realloc_in_place   realloc_in_place
+#define __libc_memalign           memalign
+#define __libc_malloc_usable_size malloc_usable_size
+#define __libc_strdup             strdup
 
 DECL_BEGIN
 
@@ -102,14 +104,16 @@ DECL_BEGIN
 #undef realloc
 #undef realloc_in_place
 #undef memalign
+#undef malloc_usable_size
 #undef strdup
-#define malloc           (*libpe_fmt.df_core->dlmalloc)
-#define free             (*libpe_fmt.df_core->dlfree)
-#define calloc           (*libpe_fmt.df_core->dlcalloc)
-#define realloc          (*libpe_fmt.df_core->dlrealloc)
-#define realloc_in_place (*libpe_fmt.df_core->dlrealloc_in_place)
-#define memalign         (*libpe_fmt.df_core->dlmemalign)
-#define strdup           dlstrdup
+#define malloc             (*libpe_fmt.df_core->dlmalloc)
+#define free               (*libpe_fmt.df_core->dlfree)
+#define calloc             (*libpe_fmt.df_core->dlcalloc)
+#define realloc            (*libpe_fmt.df_core->dlrealloc)
+#define realloc_in_place   (*libpe_fmt.df_core->dlrealloc_in_place)
+#define memalign           (*libpe_fmt.df_core->dlmemalign)
+#define malloc_usable_size (*libpe_fmt.df_core->dlmalloc_usable_size)
+#define strdup             dlstrdup
 INTDEF char *CC dlstrdup(char const *str);
 INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_nomem)(void);
 
