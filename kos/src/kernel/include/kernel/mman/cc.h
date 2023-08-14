@@ -34,8 +34,13 @@ DECL_BEGIN
 typedef unsigned int gfp_t;
 #endif /* !__gfp_t_defined */
 
+/* Simplified cache-clear state for `system_cc_s' */
+typedef uint32_t ccstate_t;
+#define CCSTATE_INIT 0
+
 struct ccinfo {
 	gfp_t            ci_gfp;      /* [const] Flags for recursive allocations, possibly or'd with GFP_ATOMIC. */
+#ifdef __WANT_CCINFO__ci_state
 	union {
 		struct {
 			uint16_t ci_version;  /* [in]  Version number from previous cache-clear  attempts.
@@ -43,8 +48,14 @@ struct ccinfo {
 			                       * [out] New system cache version. */
 			uint16_t ci_attempt;  /* [in|out] Attempt number. */
 		};
-		uint32_t    _ci_state;    /* [in|out] Version state. */
+		ccstate_t   _ci_state;    /* [in|out] Version state. */
 	};
+#else /* __WANT_CCINFO__ci_state */
+	uint16_t         ci_version;  /* [in]  Version number from previous cache-clear  attempts.
+	                               *       Set to `0' during the initial call to `system_cc()'
+	                               * [out] New system cache version. */
+	uint16_t         ci_attempt;  /* [in|out] Attempt number. */
+#endif /* !__WANT_CCINFO__ci_state */
 	size_t           ci_bytes;    /* [out] Approximation of virtual/physical memory that became available (in bytes). */
 	size_t           ci_minbytes; /* [const] Minimum # of bytes to free before stopping. */
 };
@@ -87,6 +98,24 @@ NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info);
 FUNDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void FCALL
 system_cc_virtual_memory(struct ccinfo *__restrict info)
 		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY);
+
+/* Simplified cache-clear functions that always try to free at least 1
+ * byte,  but will get more aggressive as  attempts go on. This is the
+ * preferred way of  doing cache-clear operations  and should be  used
+ * like this:
+ * >>     ccstate_t ccstate = CCSTATE_INIT;
+ * >> again:
+ * >>     ...
+ * >>     return result;
+ * >> nomem:
+ * >>     if (system_cc_s(&ccstate))
+ * >>         goto again;
+ * >>     THROW();
+ */
+FUNDEF ATTR_COLD WUNUSED ATTR_INOUT(1) __BOOL NOTHROW(FCALL system_cc_s)(ccstate_t *__restrict p_state);
+FUNDEF NOBLOCK ATTR_COLD WUNUSED ATTR_INOUT(1) __BOOL NOTHROW(FCALL system_cc_s_noblock)(ccstate_t *__restrict p_state);
+FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) ATTR_COLD WUNUSED  ATTR_INOUT(1) __BOOL
+NOTHROW(FCALL system_cc_s_ex)(ccstate_t *__restrict p_state, gfp_t gfp);
 
 
 /************************************************************************/

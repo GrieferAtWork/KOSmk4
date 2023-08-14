@@ -179,7 +179,7 @@ struct pmem {
 DATDEF struct pmem mzones;
 
 LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED struct pmemzone *
-NOTHROW(KCALL page_getzone)(physpage_t ptr) {
+NOTHROW(FCALL page_getzone)(physpage_t ptr) {
 	struct pmemzone *zone;
 	zone = mzones.pm_last;
 	while (ptr > zone->mz_max) {
@@ -196,18 +196,53 @@ NOTHROW(KCALL page_getzone)(physpage_t ptr) {
  * WARNING:  Physical   memory   cannot   be  dereferenced   prior   to   being   mapped.
  * @return: * :              The starting page number of the newly allocated memory range.
  * @return: PHYSPAGE_INVALID: The allocation failed. */
-FUNDEF NOBLOCK WUNUSED physpage_t NOTHROW(KCALL page_mallocone)(void);
+FUNDEF NOBLOCK WUNUSED physpage_t NOTHROW(FCALL page_mallocone)(void);
+FUNDEF NOBLOCK WUNUSED physpage_t NOTHROW(FCALL page_mallocone_nocc)(void);
 #ifndef __NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS
-FUNDEF NOBLOCK WUNUSED physpage_t NOTHROW(KCALL __os_page_malloc)(physpagecnt_t num_pages) ASMNAME("page_malloc");
+FUNDEF NOBLOCK WUNUSED physpage_t NOTHROW(FCALL __os_page_malloc)(physpagecnt_t num_pages) ASMNAME("page_malloc");
+FUNDEF NOBLOCK WUNUSED physpage_t NOTHROW(FCALL __os_page_malloc_nocc)(physpagecnt_t num_pages) ASMNAME("page_malloc_nocc");
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED physpage_t
-NOTHROW(KCALL page_malloc)(physpagecnt_t num_pages) {
+NOTHROW(FCALL page_malloc)(physpagecnt_t num_pages) {
 	if (__builtin_constant_p(num_pages) && num_pages == 1)
 		return page_mallocone();
 	return __os_page_malloc(num_pages);
 }
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED physpage_t
+NOTHROW(FCALL page_malloc_nocc)(physpagecnt_t num_pages) {
+	if (__builtin_constant_p(num_pages) && num_pages == 1)
+		return page_mallocone_nocc();
+	return __os_page_malloc_nocc(num_pages);
+}
 #else /* !__NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS */
-FUNDEF NOBLOCK WUNUSED physpage_t NOTHROW(KCALL page_malloc)(physpagecnt_t num_pages);
+FUNDEF NOBLOCK WUNUSED physpage_t NOTHROW(FCALL page_malloc)(physpagecnt_t num_pages);
+FUNDEF NOBLOCK WUNUSED physpage_t NOTHROW(FCALL page_malloc_nocc)(physpagecnt_t num_pages);
 #endif /* __NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS */
+
+
+#if (__SIZEOF_PHYSPAGE_T__ * 2) == 8
+#define __page_malloc_part_return_t __UINT64_TYPE__
+#define __page_malloc_part_return_pack(page, count)         \
+	((__page_malloc_part_return_t)(__UINT32_TYPE__)(page) | \
+	 (__page_malloc_part_return_t)(__UINT32_TYPE__)(count) << 32)
+#define __page_malloc_part_return_getpage(v)  (physpage_t)(__UINT32_TYPE__)(v)
+#define __page_malloc_part_return_getcount(v) (physpagecnt_t)(__UINT32_TYPE__)((v) >> 32)
+#elif (__SIZEOF_PHYSPAGE_T__ * 2) == 16 && defined(__UINT128_TYPE__)
+#define __page_malloc_part_return_t __UINT128_TYPE__
+#define __page_malloc_part_return_pack(page, count)         \
+	((__page_malloc_part_return_t)(__UINT64_TYPE__)(page) | \
+	 (__page_malloc_part_return_t)(__UINT64_TYPE__)(count) << 64)
+#define __page_malloc_part_return_getpage(v)  (physpage_t)(__UINT64_TYPE__)(v)
+#define __page_malloc_part_return_getcount(v) (physpagecnt_t)(__UINT64_TYPE__)((v) >> 64)
+#else /* ... */
+typedef struct {
+	physpage_t    _pmpr_page;  /* Page base */
+	physpagecnt_t _pmpr_count; /* Page count */
+} __page_malloc_part_return_t;
+#define __page_malloc_part_return_t_IS_STRUCT
+#define __page_malloc_part_return_pack(page, count) ((__page_malloc_part_return_t){ page, count })
+#define __page_malloc_part_return_getpage(v)        (v)._pmpr_page
+#define __page_malloc_part_return_getcount(v)       (v)._pmpr_count
+#endif /* !... */
 
 
 /* Allocate  at  least  `min_pages', and  at  most `max_pages',
@@ -218,52 +253,119 @@ FUNDEF NOBLOCK WUNUSED physpage_t NOTHROW(KCALL page_malloc)(physpagecnt_t num_p
  *    using  up small memory blocks that might otherwise continue going unused.
  * @return: * :              The starting page number of the newly allocated memory range.
  * @return: PHYSPAGE_INVALID: The allocation failed. */
-FUNDEF NOBLOCK WUNUSED NONNULL((3)) physpage_t
-NOTHROW(KCALL page_malloc_part)(physpagecnt_t min_pages, physpagecnt_t max_pages,
-                                physpagecnt_t *__restrict res_pages);
+FUNDEF NOBLOCK WUNUSED __page_malloc_part_return_t
+NOTHROW(FCALL _page_malloc_part)(physpagecnt_t min_pages, physpagecnt_t max_pages);
+FUNDEF NOBLOCK WUNUSED __page_malloc_part_return_t
+NOTHROW(FCALL _page_malloc_part_nocc)(physpagecnt_t min_pages, physpagecnt_t max_pages);
+FORCELOCAL NOBLOCK WUNUSED NONNULL((3)) physpage_t
+NOTHROW(FCALL page_malloc_part)(physpagecnt_t min_pages, physpagecnt_t max_pages,
+                                physpagecnt_t *__restrict res_pages) {
+	__page_malloc_part_return_t temp;
+	temp = _page_malloc_part(min_pages, max_pages);
+	*res_pages = __page_malloc_part_return_getcount(temp);
+	return __page_malloc_part_return_getpage(temp);
+}
+FORCELOCAL NOBLOCK WUNUSED NONNULL((3)) physpage_t
+NOTHROW(FCALL page_malloc_part_nocc)(physpagecnt_t min_pages, physpagecnt_t max_pages,
+                                     physpagecnt_t *__restrict res_pages) {
+	__page_malloc_part_return_t temp;
+	temp = _page_malloc_part_nocc(min_pages, max_pages);
+	*res_pages = __page_malloc_part_return_getcount(temp);
+	return __page_malloc_part_return_getpage(temp);
+}
 
 /* Try to allocate the given page.
  * @return: * : One of `PAGE_MALLOC_AT_*' */
-FUNDEF NOBLOCK WUNUSED unsigned int
-NOTHROW(KCALL page_malloc_at)(physpage_t ptr);
+FUNDEF NOBLOCK WUNUSED unsigned int NOTHROW(FCALL page_malloc_at)(physpage_t ptr);
+FUNDEF NOBLOCK WUNUSED unsigned int NOTHROW(FCALL page_malloc_at_nocc)(physpage_t ptr);
 #endif /* __CC__ */
 #define PAGE_MALLOC_AT_SUCCESS   0 /* Successfully allocated the page. */
 #define PAGE_MALLOC_AT_NOTMAPPED 1 /* The specified page is not mapped. */
 #define PAGE_MALLOC_AT_NOTFREE   2 /* The specified page has already been allocated. */
 
 #ifdef __CC__
+/* Similar to `page_malloc_part()', but only allocate memory from
+ * between the two given page addresses, such that all  allocated
+ * pages are located within the specified range. */
+FUNDEF NOBLOCK WUNUSED __page_malloc_part_return_t
+NOTHROW(FCALL _page_malloc_part_between)(physpage_t min_page, physpage_t max_page,
+                                         physpagecnt_t min_pages, physpagecnt_t max_pages);
+FUNDEF NOBLOCK WUNUSED __page_malloc_part_return_t
+NOTHROW(FCALL _page_malloc_part_between_nocc)(physpage_t min_page, physpage_t max_page,
+                                              physpagecnt_t min_pages, physpagecnt_t max_pages);
+FORCELOCAL NOBLOCK WUNUSED NONNULL((5)) physpage_t
+NOTHROW(FCALL page_malloc_part_between)(physpage_t min_page, physpage_t max_page,
+                                        physpagecnt_t min_pages, physpagecnt_t max_pages,
+                                        physpagecnt_t *__restrict res_pages) {
+	__page_malloc_part_return_t temp;
+	temp = _page_malloc_part_between(min_page, max_page, min_pages, max_pages);
+	*res_pages = __page_malloc_part_return_getcount(temp);
+	return __page_malloc_part_return_getpage(temp);
+}
+FORCELOCAL NOBLOCK WUNUSED NONNULL((5)) physpage_t
+NOTHROW(FCALL page_malloc_part_between_nocc)(physpage_t min_page, physpage_t max_page,
+                                             physpagecnt_t min_pages, physpagecnt_t max_pages,
+                                             physpagecnt_t *__restrict res_pages) {
+	__page_malloc_part_return_t temp;
+	temp = _page_malloc_part_between_nocc(min_page, max_page, min_pages, max_pages);
+	*res_pages = __page_malloc_part_return_getcount(temp);
+	return __page_malloc_part_return_getpage(temp);
+}
+
 /* Similar to  `page_malloc()'  /  `page_malloc_part()',  but  only
  * allocate memory from between the two given page addresses,  such
  * that all allocated pages are located within the specified range.
  * @assume(return == PHYSPAGE_INVALID ||
  *        (return >= min_page &&
  *         return + num_pages - 1 <= max_page)); */
-FUNDEF NOBLOCK WUNUSED physpage_t
-NOTHROW(KCALL page_malloc_between)(physpage_t min_page, physpage_t max_page,
-                                   physpagecnt_t num_pages);
-FUNDEF NOBLOCK WUNUSED NONNULL((5)) physpage_t
-NOTHROW(KCALL page_malloc_part_between)(physpage_t min_page, physpage_t max_page,
-                                        physpagecnt_t min_pages, physpagecnt_t max_pages,
-                                        physpagecnt_t *__restrict res_pages);
+#ifdef __page_malloc_part_return_t_IS_STRUCT
+FORCELOCAL NOBLOCK WUNUSED physpage_t
+NOTHROW(FCALL page_malloc_between)(physpage_t min_page, physpage_t max_page,
+                                   physpagecnt_t num_pages) {
+	__page_malloc_part_return_t temp;
+	temp = _page_malloc_part_between(min_page, max_page, num_pages, num_pages);
+	return __page_malloc_part_return_getpage(temp);
+}
+FORCELOCAL NOBLOCK WUNUSED physpage_t
+NOTHROW(FCALL page_malloc_between_nocc)(physpage_t min_page, physpage_t max_page,
+                                        physpagecnt_t num_pages) {
+	__page_malloc_part_return_t temp;
+	temp = _page_malloc_part_between_nocc(min_page, max_page, num_pages, num_pages);
+	return __page_malloc_part_return_getpage(temp);
+}
+#else /* __page_malloc_part_return_t_IS_STRUCT */
+#define page_malloc_between(min_page, max_page, num_pages) \
+	__page_malloc_part_return_getpage(_page_malloc_part_between(min_page, max_page, num_pages, num_pages))
+#define page_malloc_between_nocc(min_page, max_page, num_pages) \
+	__page_malloc_part_return_getpage(_page_malloc_part_between_nocc(min_page, max_page, num_pages, num_pages))
+#endif /* !__page_malloc_part_return_t_IS_STRUCT */
+
 
 #if __SIZEOF_PHYSADDR_T__ > 4
 #define page_malloc32(num_pages)                               \
 	page_malloc_between(physaddr2page(__UINT32_C(0x00000000)), \
 	                    physaddr2page(__UINT32_C(0xffffffff)), \
 	                    num_pages)
-#define page_mallocone32() page_malloc32(1)
+#define page_malloc32_nocc(num_pages)                               \
+	page_malloc_between_nocc(physaddr2page(__UINT32_C(0x00000000)), \
+	                         physaddr2page(__UINT32_C(0xffffffff)), \
+	                         num_pages)
+#define page_mallocone32()      page_malloc32(1)
+#define page_mallocone32_nocc() page_malloc32_nocc(1)
 #else /* __SIZEOF_PHYSADDR_T__ > 4 */
-#define page_malloc32(num_pages) page_malloc(num_pages)
-#define page_mallocone32()       page_mallocone()
+#define page_malloc32(num_pages)      page_malloc(num_pages)
+#define page_malloc32_nocc(num_pages) page_malloc_nocc(num_pages)
+#define page_mallocone32()            page_mallocone()
+#define page_mallocone32_nocc()       page_mallocone_nocc()
 #endif /* __SIZEOF_PHYSADDR_T__ <= 4 */
 
 /* Free a given physical address range.
  * The caller is responsible to ensure that the given range has previously been allocated. */
-FUNDEF NOBLOCK void NOTHROW(KCALL page_freeone)(physpage_t base);
+FUNDEF NOBLOCK void NOTHROW(FCALL page_freeone)(physpage_t base);
 #ifndef __NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS
-FUNDEF NOBLOCK void NOTHROW(KCALL __os_page_free)(physpage_t base, physpagecnt_t num_pages) ASMNAME("page_free");
+FUNDEF NOBLOCK void NOTHROW(FCALL __os_page_free)(physpage_t base, physpagecnt_t num_pages) ASMNAME("page_free");
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
-NOTHROW(KCALL page_free)(physpage_t base, physpagecnt_t num_pages) {
+NOTHROW(FCALL page_free)(physpage_t base, physpagecnt_t num_pages) {
 	if (__builtin_constant_p(num_pages) && num_pages == 1) {
 		page_freeone(base);
 	} else {
@@ -271,33 +373,33 @@ NOTHROW(KCALL page_free)(physpage_t base, physpagecnt_t num_pages) {
 	}
 }
 #else /* !__NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS */
-FUNDEF NOBLOCK void NOTHROW(KCALL page_free)(physpage_t base, physpagecnt_t num_pages);
+FUNDEF NOBLOCK void NOTHROW(FCALL page_free)(physpage_t base, physpagecnt_t num_pages);
 #endif /* __NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS */
 
 /* Similar to `page_free()', however set the is-zero-bit for all pages. */
 FUNDEF NOBLOCK void
-NOTHROW(KCALL page_cfree)(physpage_t base, physpagecnt_t num_pages);
+NOTHROW(FCALL page_cfree)(physpage_t base, physpagecnt_t num_pages);
 
 /* Similar to `page_free()', however set the is-zero-bit for pages where `page_iszero()' is true. */
 FUNDEF NOBLOCK void
-NOTHROW(KCALL page_ccfree)(physpage_t base, physpagecnt_t num_pages);
+NOTHROW(FCALL page_ccfree)(physpage_t base, physpagecnt_t num_pages);
 
 /* Combination of `page_free()' and `page_cfree()' */
 FUNDEF NOBLOCK void
-NOTHROW(KCALL page_ffree)(physpage_t base, physpagecnt_t num_pages, bool is_zero);
+NOTHROW(FCALL page_ffree)(physpage_t base, physpagecnt_t num_pages, bool is_zero);
 
 
 /* Collect volatile statistics about the usage of physical memory */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL page_stat)(struct pmemstat *__restrict result);
+NOTHROW(FCALL page_stat)(struct pmemstat *__restrict result);
 FUNDEF NOBLOCK NONNULL((3)) void
-NOTHROW(KCALL page_stat_between)(physpage_t base, physpagecnt_t num_pages,
+NOTHROW(FCALL page_stat_between)(physpage_t base, physpagecnt_t num_pages,
                                  struct pmemstat *__restrict result);
 
 /* Check if a given `page' is current free.
  * NOTE: Returns `false' when `page_ismapped(page, 1)' is false. */
 FUNDEF NOBLOCK WUNUSED bool
-NOTHROW(KCALL page_isfree)(physpage_t page);
+NOTHROW(FCALL page_isfree)(physpage_t page);
 
 /* Following a call to one of the `page_malloc()' functions,
  * check  if  the  given  `page'  contains  only zero-bytes.
@@ -315,18 +417,18 @@ NOTHROW(KCALL page_isfree)(physpage_t page);
  *       allocated pages, in order to determine if the mapped memory
  *       already contains all zeros. */
 FUNDEF NOBLOCK WUNUSED bool
-NOTHROW(KCALL page_iszero)(physpage_t page);
+NOTHROW(FCALL page_iszero)(physpage_t page);
 
 /* Reset the is-zero attribute for all pages in the given range.
  * Pages  that aren't  part of  any zones  are silently ignored. */
 FUNDEF NOBLOCK void
-NOTHROW(KCALL page_resetzero)(physpage_t page, physpagecnt_t num_pages);
+NOTHROW(FCALL page_resetzero)(physpage_t page, physpagecnt_t num_pages);
 FUNDEF NOBLOCK void
-NOTHROW(KCALL page_resetzeroone)(physpage_t page);
+NOTHROW(FCALL page_resetzeroone)(physpage_t page);
 
 /* Check if all pages of a given physical memory range are mapped as available RAM. */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED bool
-NOTHROW(KCALL page_ismapped)(physpage_t page, physpagecnt_t num_pages);
+NOTHROW(FCALL page_ismapped)(physpage_t page, physpagecnt_t num_pages);
 
 
 
@@ -357,12 +459,26 @@ DATDEF struct page_usage_struct page_usage;
 			page_usage_inc(usage_field);          \
 		__XRETURN _pmof_page;                     \
 	})
-#define page_malloc_for(usage_field, num_pages)          \
-	__XBLOCK({                                           \
-		physpage_t _pmf_page   = page_malloc(num_pages); \
-		if likely(_pmf_page != PHYSPAGE_INVALID)         \
-			page_usage_add(usage_field, num_pages);      \
-		__XRETURN _pmf_page;                             \
+#define page_mallocone_nocc_for(usage_field)           \
+	__XBLOCK({                                         \
+		physpage_t _pmof_page = page_mallocone_nocc(); \
+		if likely(_pmof_page != PHYSPAGE_INVALID)      \
+			page_usage_inc(usage_field);               \
+		__XRETURN _pmof_page;                          \
+	})
+#define page_malloc_for(usage_field, num_pages)        \
+	__XBLOCK({                                         \
+		physpage_t _pmf_page = page_malloc(num_pages); \
+		if likely(_pmf_page != PHYSPAGE_INVALID)       \
+			page_usage_add(usage_field, num_pages);    \
+		__XRETURN _pmf_page;                           \
+	})
+#define page_malloc_nocc_for(usage_field, num_pages)        \
+	__XBLOCK({                                              \
+		physpage_t _pmf_page = page_malloc_nocc(num_pages); \
+		if likely(_pmf_page != PHYSPAGE_INVALID)            \
+			page_usage_add(usage_field, num_pages);         \
+		__XRETURN _pmf_page;                                \
 	})
 #define page_malloc_part_for(usage_field, min_pages, max_pages, res_pages)         \
 	__XBLOCK({                                                                     \
@@ -371,12 +487,26 @@ DATDEF struct page_usage_struct page_usage;
 			page_usage_add(usage_field, *(res_pages));                             \
 		__XRETURN _pmpf_page;                                                      \
 	})
-#define page_malloc_at_for(usage_field, ptr)         \
-	__XBLOCK({                                       \
-		physpage_t _pmaf_page = page_malloc_at(ptr); \
-		if likely(_pmaf_page != PHYSPAGE_INVALID)    \
-			page_usage_inc(usage_field);             \
-		__XRETURN _pmaf_page;                        \
+#define page_malloc_part_nocc_for(usage_field, min_pages, max_pages, res_pages)         \
+	__XBLOCK({                                                                          \
+		physpage_t _pmpf_page = page_malloc_part_nocc(min_pages, max_pages, res_pages); \
+		if likely(_pmpf_page != PHYSPAGE_INVALID)                                       \
+			page_usage_add(usage_field, *(res_pages));                                  \
+		__XRETURN _pmpf_page;                                                           \
+	})
+#define page_malloc_at_for(usage_field, ptr)           \
+	__XBLOCK({                                         \
+		unsigned int _pmaf_res = page_malloc_at(ptr);  \
+		if likely(_pmaf_res == PAGE_MALLOC_AT_SUCCESS) \
+			page_usage_inc(usage_field);               \
+		__XRETURN _pmaf_res;                           \
+	})
+#define page_malloc_at_nocc_for(usage_field, ptr)          \
+	__XBLOCK({                                             \
+		unsigned int _pmaf_res = page_malloc_at_nocc(ptr); \
+		if likely(_pmaf_res == PAGE_MALLOC_AT_SUCCESS)     \
+			page_usage_inc(usage_field);                   \
+		__XRETURN _pmaf_res;                               \
 	})
 #define page_malloc_between_for(usage_field, min_page, max_page, num_pages)         \
 	__XBLOCK({                                                                      \
@@ -385,15 +515,32 @@ DATDEF struct page_usage_struct page_usage;
 			page_usage_add(usage_field, num_pages);                                 \
 		__XRETURN _pmbf_page;                                                       \
 	})
-#define page_malloc_part_between_for(usage_field, min_page, max_page,           \
-                                     min_pages, max_pages, res_pages)           \
-	__XBLOCK({                                                                  \
-		physpage_t _pmbf_page = page_malloc_part_between(min_page, max_page,    \
-		                                                  min_pages, max_pages, \
-		                                                  res_pages);           \
-		if likely(_pmbf_page != PHYSPAGE_INVALID)                               \
-			page_usage_add(usage_field, (*res_pages));                          \
-		__XRETURN _pmbf_page;                                                   \
+#define page_malloc_between_nocc_for(usage_field, min_page, max_page, num_pages)         \
+	__XBLOCK({                                                                           \
+		physpage_t _pmbf_page = page_malloc_between_nocc(min_page, max_page, num_pages); \
+		if likely(_pmbf_page != PHYSPAGE_INVALID)                                        \
+			page_usage_add(usage_field, num_pages);                                      \
+		__XRETURN _pmbf_page;                                                            \
+	})
+#define page_malloc_part_between_for(usage_field, min_page, max_page,          \
+                                     min_pages, max_pages, res_pages)          \
+	__XBLOCK({                                                                 \
+		physpage_t _pmbf_page = page_malloc_part_between(min_page, max_page,   \
+		                                                 min_pages, max_pages, \
+		                                                 res_pages);           \
+		if likely(_pmbf_page != PHYSPAGE_INVALID)                              \
+			page_usage_add(usage_field, (*res_pages));                         \
+		__XRETURN _pmbf_page;                                                  \
+	})
+#define page_malloc_part_between_nocc_for(usage_field, min_page, max_page,          \
+                                          min_pages, max_pages, res_pages)          \
+	__XBLOCK({                                                                      \
+		physpage_t _pmbf_page = page_malloc_part_between_nocc(min_page, max_page,   \
+		                                                      min_pages, max_pages, \
+		                                                      res_pages);           \
+		if likely(_pmbf_page != PHYSPAGE_INVALID)                                   \
+			page_usage_add(usage_field, (*res_pages));                              \
+		__XRETURN _pmbf_page;                                                       \
 	})
 #define page_freeone_for(usage_field, base)                   (page_usage_dec(usage_field), page_freeone(base))
 #define page_free_for(usage_field, base, num_pages)           (page_usage_sub(usage_field, num_pages), page_free(base, num_pages))
@@ -401,21 +548,26 @@ DATDEF struct page_usage_struct page_usage;
 #define page_ccfree_for(usage_field, base, num_pages)         (page_usage_sub(usage_field, num_pages), page_ccfree(base, num_pages))
 #define page_ffree_for(usage_field, base, num_pages, is_zero) (page_usage_sub(usage_field, num_pages), page_ffree(base, num_pages, is_zero))
 #else /* !CONFIG_NO_PAGE_USAGE */
-#define page_usage_inc(field)                          (void)0
-#define page_usage_dec(field)                          (void)0
-#define page_usage_add(field, v)                       (void)0
-#define page_usage_sub(field, v)                       (void)0
-#define page_mallocone_for(usage_field)                page_mallocone()
-#define page_malloc_for(usage_field, ...)              page_malloc(__VA_ARGS__)
-#define page_malloc_part_for(usage_field, ...)         page_malloc_part(__VA_ARGS__)
-#define page_malloc_at_for(usage_field, ...)           page_malloc_at(__VA_ARGS__)
-#define page_malloc_between_for(usage_field, ...)      page_malloc_between(__VA_ARGS__)
-#define page_malloc_part_between_for(usage_field, ...) page_malloc_part_between(__VA_ARGS__)
-#define page_freeone_for(usage_field, ...)             page_freeone(__VA_ARGS__)
-#define page_free_for(usage_field, ...)                page_free(__VA_ARGS__)
-#define page_cfree_for(usage_field, ...)               page_cfree(__VA_ARGS__)
-#define page_ccfree_for(usage_field, ...)              page_ccfree(__VA_ARGS__)
-#define page_ffree_for(usage_field, ...)               page_ffree(__VA_ARGS__)
+#define page_usage_inc(field)                               (void)0
+#define page_usage_dec(field)                               (void)0
+#define page_usage_add(field, v)                            (void)0
+#define page_usage_sub(field, v)                            (void)0
+#define page_mallocone_for(usage_field)                     page_mallocone()
+#define page_mallocone_nocc_for(usage_field)                page_mallocone_nocc()
+#define page_malloc_for(usage_field, ...)                   page_malloc(__VA_ARGS__)
+#define page_malloc_nocc_for(usage_field, ...)              page_malloc_nocc(__VA_ARGS__)
+#define page_malloc_part_for(usage_field, ...)              page_malloc_part(__VA_ARGS__)
+#define page_malloc_part_nocc_for(usage_field, ...)         page_malloc_part_nocc(__VA_ARGS__)
+#define page_malloc_at_for(usage_field, ...)                page_malloc_at(__VA_ARGS__)
+#define page_malloc_at_nocc_for(usage_field, ...)           page_malloc_at_nocc(__VA_ARGS__)
+#define page_malloc_between_for(usage_field, ...)           page_malloc_between(__VA_ARGS__)
+#define page_malloc_part_between_for(usage_field, ...)      page_malloc_part_between(__VA_ARGS__)
+#define page_malloc_part_between_nocc_for(usage_field, ...) page_malloc_part_between_nocc(__VA_ARGS__)
+#define page_freeone_for(usage_field, ...)                  page_freeone(__VA_ARGS__)
+#define page_free_for(usage_field, ...)                     page_free(__VA_ARGS__)
+#define page_cfree_for(usage_field, ...)                    page_cfree(__VA_ARGS__)
+#define page_ccfree_for(usage_field, ...)                   page_ccfree(__VA_ARGS__)
+#define page_ffree_for(usage_field, ...)                    page_ffree(__VA_ARGS__)
 #endif /* CONFIG_NO_PAGE_USAGE */
 #if __SIZEOF_PHYSADDR_T__ > 4
 #define page_malloc32_for(usage_field, num_pages)                  \
@@ -423,26 +575,40 @@ DATDEF struct page_usage_struct page_usage;
 	                        physaddr2page(__UINT32_C(0x00000000)), \
 	                        physaddr2page(__UINT32_C(0xffffffff)), \
 	                        num_pages)
-#define page_mallocone32_for(usage_field) page_malloc32_for(usage_field, 1)
+#define page_malloc32_nocc_for(usage_field, num_pages)                  \
+	page_malloc_between_nocc_for(usage_field,                           \
+	                             physaddr2page(__UINT32_C(0x00000000)), \
+	                             physaddr2page(__UINT32_C(0xffffffff)), \
+	                             num_pages)
+#define page_mallocone32_for(usage_field)      page_malloc32_for(usage_field, 1)
+#define page_mallocone32_nocc_for(usage_field) page_malloc32_nocc_for(usage_field, 1)
 #else /* __SIZEOF_PHYSADDR_T__ > 4 */
-#define page_malloc32_for(usage_field, num_pages) page_malloc_for(usage_field, num_pages)
-#define page_mallocone32_for(usage_field)         page_mallocone_for(usage_field)
+#define page_malloc32_for(usage_field, num_pages)      page_malloc_for(usage_field, num_pages)
+#define page_malloc32_nocc_for(usage_field, num_pages) page_malloc_nocc_for(usage_field, num_pages)
+#define page_mallocone32_for(usage_field)              page_mallocone_for(usage_field)
+#define page_mallocone32_nocc_for(usage_field)         page_mallocone_nocc_for(usage_field)
 #endif /* __SIZEOF_PHYSADDR_T__ <= 4 */
 
 /* --- For copy+paste+replace: creating a new reason ---
-#define page_mallocone_for_myreason(...)           page_mallocone_for(page_usage.pu_myreason, ##__VA_ARGS__)
-#define page_malloc_for_myreason(...)              page_malloc_for(page_usage.pu_myreason, ##__VA_ARGS__)
-#define page_malloc_part_for_myreason(...)         page_malloc_part_for(page_usage.pu_myreason, ##__VA_ARGS__)
-#define page_malloc_at_for_myreason(...)           page_malloc_at_for(page_usage.pu_myreason, ##__VA_ARGS__)
-#define page_malloc_between_for_myreason(...)      page_malloc_between_for(page_usage.pu_myreason, ##__VA_ARGS__)
-#define page_malloc_part_between_for_myreason(...) page_malloc_part_between_for(page_usage.pu_myreason, ##__VA_ARGS__)
-#define page_freeone_for_myreason(...)             page_freeone_for(page_usage.pu_myreason, ##__VA_ARGS__)
-#define page_free_for_myreason(...)                page_free_for(page_usage.pu_myreason, ##__VA_ARGS__)
-#define page_cfree_for_myreason(...)               page_cfree_for(page_usage.pu_myreason, ##__VA_ARGS__)
-#define page_ccfree_for_myreason(...)              page_ccfree_for(page_usage.pu_myreason, ##__VA_ARGS__)
-#define page_ffree_for_myreason(...)               page_ffree_for(page_usage.pu_myreason, ##__VA_ARGS__)
-#define page_malloc32_for_myreason(...)            page_malloc32_for(page_usage.pu_myreason, ##__VA_ARGS__)
-#define page_mallocone32_for_myreason(...)         page_mallocone32_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_mallocone_for_myreason(...)                page_mallocone_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_mallocone_nocc_for_myreason(...)           page_mallocone_nocc_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_malloc_for_myreason(...)                   page_malloc_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_malloc_nocc_for_myreason(...)              page_malloc_nocc_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_malloc_part_for_myreason(...)              page_malloc_part_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_malloc_part_nocc_for_myreason(...)         page_malloc_part_nocc_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_malloc_at_for_myreason(...)                page_malloc_at_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_malloc_at_nocc_for_myreason(...)           page_malloc_at_nocc_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_malloc_between_for_myreason(...)           page_malloc_between_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_malloc_between_nocc_for_myreason(...)      page_malloc_between_nocc_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_malloc_part_between_for_myreason(...)      page_malloc_part_between_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_malloc_part_between_nocc_for_myreason(...) page_malloc_part_between_nocc_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_freeone_for_myreason(...)                  page_freeone_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_free_for_myreason(...)                     page_free_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_cfree_for_myreason(...)                    page_cfree_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_ccfree_for_myreason(...)                   page_ccfree_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_ffree_for_myreason(...)                    page_ffree_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_malloc32_for_myreason(...)                 page_malloc32_for(page_usage.pu_myreason, ##__VA_ARGS__)
+#define page_mallocone32_for_myreason(...)              page_mallocone32_for(page_usage.pu_myreason, ##__VA_ARGS__)
 */
 
 #endif /* __CC__ */

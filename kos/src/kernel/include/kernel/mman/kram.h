@@ -92,7 +92,7 @@ typedef unsigned int gfp_t;
  *   - GFP_MAP_NOSPLIT:  Set the `MNODE_F_NOSPLIT' flag for new nodes
  *   - GFP_MAP_NOMERGE:  Set the `MNODE_F_NOMERGE' flag for new nodes, and don't try
  *                       to extend an existing node.
- *   - GFP_NOCLRC:       Don't call `syscache_clear()' to try to free up memory
+ *   - GFP_NOCLRC:       Don't call `system_cc()' to try to free up memory
  *   - GFP_NOSWAP:       Don't move memory to swap to free up memory
  *   - Other flags are silently ignored, but will be forwarded  onto
  *     other calls to kmalloc() that may need to be made internally.

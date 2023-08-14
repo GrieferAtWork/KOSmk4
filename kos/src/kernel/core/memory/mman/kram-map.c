@@ -27,7 +27,7 @@
 #include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
-#include <kernel/mman/cache.h>
+#include <kernel/mman/cc.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
@@ -123,11 +123,11 @@ NOTHROW(FCALL bzero_pages)(PAGEDIR_PAGEALIGNED void *vbase,
 
 
 /* Try some things to reclaim system memory. */
-PRIVATE NOBLOCK bool
-NOTHROW(FCALL kram_reclaim_memory)(syscache_version_t *__restrict p_cache_version,
+PRIVATE bool
+NOTHROW(FCALL kram_reclaim_memory)(ccstate_t *__restrict p_cache_version,
                                    gfp_t flags) {
 	if (!(flags & GFP_NOCLRC)) {
-		if (syscache_clear_s(p_cache_version))
+		if (system_cc_s_ex(p_cache_version, flags))
 			return true;
 	}
 	if (!(flags & GFP_NOSWAP)) {

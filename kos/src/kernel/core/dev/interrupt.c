@@ -27,7 +27,7 @@
 #include <kernel/handle.h>
 #include <kernel/heap.h>
 #include <kernel/isr.h>
-#include <kernel/mman/cache.h>
+#include <kernel/mman/cc.h>
 #include <kernel/mman/driver.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
@@ -454,11 +454,13 @@ isr_register_impl(void *func, void *arg, bool is_greedy)
 	REF struct driver *func_driver;
 	REF struct isr_vector_state *winner;
 	size_t i, winner_index = 0;
-	syscache_version_t cache_version = SYSCACHE_VERSION_INIT;
+	ccstate_t cache_version = CCSTATE_INIT;
 	func_driver = driver_fromaddr(func);
+
 	/* Make sure that a driver exists at the given address. */
 	if unlikely(!func_driver)
 		THROW(E_SEGFAULT_NOTEXECUTABLE, func, E_SEGFAULT_CONTEXT_FAULT);
+
 again_check_finalizing:
 	/* Make sure that the driver is still alive. */
 	if unlikely(driver_isfinalizing(func_driver)) {
@@ -489,16 +491,17 @@ again_determine_winner:
 	}
 	if unlikely(is_greedy && winner->ivs_greedy_drv &&
 	            !hisr_callback_mayoverride(winner->ivs_greedy_drv,
-	                                      winner->ivs_greedy_fun,
-	                                      winner->ivs_greedy_arg,
-	                                      true)) {
+	                                       winner->ivs_greedy_fun,
+	                                       winner->ivs_greedy_arg,
+	                                       true)) {
 		/* Try to reclaim cache resources, which may free up a suitable interrupt vector slot. */
-		if (syscache_clear_s(&cache_version))
+		if (system_cc_s(&cache_version))
 			goto again_check_finalizing;
 		decref_unlikely(func_driver);
 		THROW(E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS, (uintptr_t)-1);
 	}
 got_perfect_winner:
+
 	/* Try to register the function as part of the winning ISR slot. */
 	TRY {
 		success = isr_try_register_at_impl(func_driver,
@@ -526,7 +529,8 @@ isr_register_at_impl(isr_vector_t vector, void *func, void *arg, bool is_greedy)
 	REF struct driver *func_driver;
 	REF struct isr_vector_state *old_state;
 	size_t index;
-	syscache_version_t cache_version = SYSCACHE_VERSION_INIT;
+	ccstate_t cache_version = CCSTATE_INIT;
+
 	/* Make sure that the given vector is valid. - If it  isn't,
 	 * act like it's impossible to allocate further data for it. */
 	if unlikely(!ISR_VECTOR_IS_VALID(vector))
@@ -551,8 +555,9 @@ again_get_old_state:
 	                               true)) {
 		/* The old vector is already in use. */
 		decref(old_state);
+
 		/* Try to reclaim resources. */
-		if (syscache_clear_s(&cache_version))
+		if (system_cc_s(&cache_version))
 			goto again_check_finalizing;
 		decref_unlikely(func_driver);
 		THROW(E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS, vector);

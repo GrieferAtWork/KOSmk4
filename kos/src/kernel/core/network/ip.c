@@ -98,7 +98,7 @@ NOTHROW(KCALL network_ip_datagrams_delete)(struct network_ip_datagrams *__restri
 	            self->nid_size - index,
 	            sizeof(struct ip_datagram));
 	/* Try to truncate the datagram vector to release unused memory. */
-	/* XXX: Also do this as part of `syscache_clear()' */
+	/* XXX: Also do this as part of `system_cc()' */
 	if unlikely(self->nid_size + 128 < self->nid_alloc) {
 		size_t new_alloc;
 		struct ip_datagram *new_vector;

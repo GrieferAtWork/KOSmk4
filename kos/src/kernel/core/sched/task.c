@@ -32,7 +32,7 @@
 #include <kernel/handman.h>
 #include <kernel/heap.h>
 #include <kernel/mman.h>
-#include <kernel/mman/cache.h>
+#include <kernel/mman/cc.h>
 #include <kernel/mman/execinfo.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
@@ -569,7 +569,7 @@ PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct task *
 		TRY {
 			void *stack_addr;
 			void *trampoline_addr;
-			syscache_version_t version = SYSCACHE_VERSION_INIT;
+			ccstate_t version = CCSTATE_INIT;
 again_lock_kernel_mman:
 			mman_lock_acquire(&mman_kernel);
 			stack_addr = mman_findunmapped(&mman_kernel,
@@ -582,7 +582,7 @@ again_lock_kernel_mman:
 			                               MHINT_GETMODE(KERNEL_MHINT_KERNSTACK));
 			if unlikely(stack_addr == MAP_FAILED) {
 				mman_lock_release(&mman_kernel);
-				if (syscache_clear_s(&version))
+				if (system_cc_s(&version))
 					goto again_lock_kernel_mman;
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 				      CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE));
@@ -607,7 +607,7 @@ again_lock_kernel_mman:
 			                                    MHINT_GETMODE(KERNEL_MHINT_TRAMPOLINE));
 			if unlikely(trampoline_addr == MAP_FAILED) {
 				mman_lock_release(&mman_kernel);
-				if (syscache_clear_s(&version))
+				if (system_cc_s(&version))
 					goto again_lock_kernel_mman;
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, PAGESIZE);
 			}

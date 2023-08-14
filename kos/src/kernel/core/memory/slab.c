@@ -32,7 +32,6 @@
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
-#include <kernel/mman/cache.h>
 #include <kernel/mman/cc.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/unmapped.h>
@@ -315,7 +314,7 @@ again_lock_mman_kernel:
 		if (next_slab_addr == MAP_FAILED || next_slab_addr > (byte_t *)slab_end_addr)
 #endif /* !SLAB_CONFIG_GROWS_DOWNWARDS */
 		{
-			syscache_version_t version = SYSCACHE_VERSION_INIT;
+			ccstate_t ccstate = CCSTATE_INIT;
 			mman_lock_release(&mman_kernel);
 again_next_slab_page_tryhard:
 			if (!mman_lock_tryacquire(&mman_kernel)) {
@@ -337,7 +336,7 @@ again_next_slab_page_tryhard:
 			    next_slab_addr <= (byte_t *)slab_end_addr)
 				goto gotaddr;
 #endif /* !SLAB_CONFIG_GROWS_DOWNWARDS */
-			if (syscache_clear_s(&version))
+			if (system_cc_s_ex(&ccstate, flags))
 				goto again_next_slab_page_tryhard;
 			goto err;
 		}

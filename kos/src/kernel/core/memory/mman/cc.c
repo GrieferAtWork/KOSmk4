@@ -28,6 +28,7 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #define __WANT_MPART__mp_dead
 #define __WANT_MFILE__mf_deadnod
 #define __WANT_PATH__p_dead
+#define __WANT_CCINFO__ci_state
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -1442,18 +1443,32 @@ NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
 	uintptr_t inside;
 	info->ci_bytes = 0;
 
-	/* Deal with the special case of a zero-request
-	 * -> In this case, we request that at least 1 byte be freed. */
-	if unlikely(info->ci_minbytes == 0)
-		info->ci_minbytes = 1;
 
 	/* Check if we're supposed to give up */
 	if (info->ci_attempt == (uint16_t)-1) {
 		/* Special indicator for infinite attempts. */
+
+		/* If not specified, try to free as much memory as possible */
+		if (info->ci_minbytes == 0)
+			info->ci_minbytes = (size_t)-1;
 	} else {
-		if (info->ci_attempt >= system_cc_maxattempts)
+		uint16_t maxattempts = system_cc_maxattempts;
+		if (info->ci_attempt >= maxattempts)
 			return false; /* D:  -- Oh no! */
 		++info->ci_attempt;
+
+		/* If  not specified, for the first half of our attempts, we
+		 * try to free at least 1  byte each iteration, but for  the
+		 * second half of attempts, we try to free as much as we can
+		 * possibly free. */
+		if (info->ci_minbytes == 0) {
+			/* Once we're past half the allowed number of attempts, */
+			if (info->ci_attempt >= (maxattempts >> 1)) {
+				info->ci_minbytes = (size_t)-1;
+			} else {
+				info->ci_minbytes = 1;
+			}
+		}
 	}
 
 	/* Start out by trying to clear system caches ourself. */
@@ -1517,6 +1532,39 @@ system_cc_virtual_memory(struct ccinfo *__restrict info)
 	}
 }
 
+/* Simplified cache-clear functions that always try to free at least 1
+ * byte,  but will get more aggressive as  attempts go on. This is the
+ * preferred way of  doing cache-clear operations  and should be  used
+ * like this:
+ * >>     ccstate_t ccstate = CCSTATE_INIT;
+ * >> again:
+ * >>     ...
+ * >>     return result;
+ * >> nomem:
+ * >>     if (system_cc_s(&ccstate))
+ * >>         goto again;
+ * >>     THROW();
+ */
+PUBLIC NOBLOCK_IF(gfp & GFP_ATOMIC) ATTR_COLD WUNUSED  ATTR_INOUT(1) bool
+NOTHROW(FCALL system_cc_s_ex)(ccstate_t *__restrict p_state, gfp_t gfp) {
+	struct ccinfo cci;
+	ccinfo_init(&cci, gfp, 0);
+	cci._ci_state = *p_state;
+	if (system_cc(&cci) && cci.ci_bytes == 0)
+		cci.ci_bytes = 1;
+	*p_state = cci._ci_state;
+	return cci.ci_bytes != 0;
+}
+
+PUBLIC ATTR_COLD WUNUSED ATTR_INOUT(1) bool
+NOTHROW(FCALL system_cc_s)(ccstate_t *__restrict p_state) {
+	return system_cc_s_ex(p_state, 0);
+}
+
+PUBLIC NOBLOCK ATTR_COLD WUNUSED ATTR_INOUT(1) bool
+NOTHROW(FCALL system_cc_s_noblock)(ccstate_t *__restrict p_state) {
+	return system_cc_s_ex(p_state, GFP_ATOMIC);
+}
 
 
 DECL_END

@@ -28,7 +28,7 @@
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <kernel/memory.h>
-#include <kernel/mman/cache.h>
+#include <kernel/mman/cc.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/rand.h>
@@ -437,7 +437,7 @@ NOTHROW(KCALL zone_cfree)(struct pmemzone *__restrict self,
 
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL page_freeone)(physpage_t page) {
+NOTHROW(FCALL page_freeone)(physpage_t page) {
 #ifdef IGNORE_FREE
 	(void)page;
 #else /* IGNORE_FREE */
@@ -480,7 +480,7 @@ NOTHROW(KCALL page_freeone)(physpage_t page) {
 /* Free a given physical address range.
  * The caller is responsible to ensure that the given range has previously been allocated. */
 PUBLIC NOBLOCK void
-NOTHROW(KCALL page_free)(physpage_t base, physpagecnt_t num_pages) {
+NOTHROW(FCALL page_free)(physpage_t base, physpagecnt_t num_pages) {
 #ifdef IGNORE_FREE
 	(void)base;
 	(void)num_pages;
@@ -523,7 +523,7 @@ NOTHROW(KCALL page_free)(physpage_t base, physpagecnt_t num_pages) {
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL page_cfree)(physpage_t base, physpagecnt_t num_pages) {
+NOTHROW(FCALL page_cfree)(physpage_t base, physpagecnt_t num_pages) {
 #ifdef IGNORE_FREE
 	(void)base;
 	(void)num_pages;
@@ -561,8 +561,7 @@ NOTHROW(KCALL page_cfree)(physpage_t base, physpagecnt_t num_pages) {
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL page_ffree)(physpage_t base, physpagecnt_t num_pages,
-                           bool is_zero) {
+NOTHROW(FCALL page_ffree)(physpage_t base, physpagecnt_t num_pages, bool is_zero) {
 #ifdef IGNORE_FREE
 	(void)base;
 	(void)num_pages;
@@ -577,7 +576,7 @@ NOTHROW(KCALL page_ffree)(physpage_t base, physpagecnt_t num_pages,
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL page_ccfree)(physpage_t base, physpagecnt_t num_pages) {
+NOTHROW(FCALL page_ccfree)(physpage_t base, physpagecnt_t num_pages) {
 #ifdef IGNORE_FREE
 	(void)base;
 	(void)num_pages;
@@ -619,48 +618,46 @@ NOTHROW(KCALL page_ccfree)(physpage_t base, physpagecnt_t num_pages) {
 
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) physpage_t
 NOTHROW(KCALL zone_mallocone_between)(struct pmemzone *__restrict self,
-                                       physpage_t zone_relative_min,
-                                       physpage_t zone_relative_max,
-                                       bool out_of_bounds_is_ok);
-PRIVATE NOBLOCK WUNUSED NONNULL((1, 6)) physpage_t
+                                      physpage_t zone_relative_min,
+                                      physpage_t zone_relative_max,
+                                      bool out_of_bounds_is_ok);
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) __page_malloc_part_return_t
 NOTHROW(KCALL zone_malloc_part_between)(struct pmemzone *__restrict self,
-                                         physpage_t zone_relative_min,
-                                         physpage_t zone_relative_max,
-                                         physpagecnt_t min_pages,
-                                         physpagecnt_t max_pages,
-                                         physpagecnt_t *__restrict res_pages,
-                                         bool out_of_bounds_is_ok);
-PRIVATE NOBLOCK WUNUSED NONNULL((1)) physpage_t
-NOTHROW(KCALL zone_malloc_between)(struct pmemzone *__restrict self,
-                                    physpage_t zone_relative_min,
-                                    physpage_t zone_relative_max,
-                                    physpagecnt_t num_pages,
-                                    bool out_of_bounds_is_ok);
-PRIVATE NOBLOCK WUNUSED NONNULL((1)) physpage_t
-NOTHROW(KCALL zone_mallocone_before)(struct pmemzone *__restrict self,
-                                      physpage_t zone_relative_max);
-PRIVATE NOBLOCK WUNUSED NONNULL((1, 5)) physpage_t
-NOTHROW(KCALL zone_malloc_part_before)(struct pmemzone *__restrict self,
+                                        physpage_t zone_relative_min,
                                         physpage_t zone_relative_max,
                                         physpagecnt_t min_pages,
                                         physpagecnt_t max_pages,
-                                        physpagecnt_t *__restrict res_pages);
+                                        bool out_of_bounds_is_ok);
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) physpage_t
+NOTHROW(KCALL zone_malloc_between)(struct pmemzone *__restrict self,
+                                   physpage_t zone_relative_min,
+                                   physpage_t zone_relative_max,
+                                   physpagecnt_t num_pages,
+                                   bool out_of_bounds_is_ok);
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) physpage_t
+NOTHROW(KCALL zone_mallocone_before)(struct pmemzone *__restrict self,
+                                     physpage_t zone_relative_max);
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) __page_malloc_part_return_t
+NOTHROW(KCALL zone_malloc_part_before)(struct pmemzone *__restrict self,
+                                       physpage_t zone_relative_max,
+                                       physpagecnt_t min_pages,
+                                       physpagecnt_t max_pages);
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) physpage_t
 NOTHROW(KCALL zone_malloc_before)(struct pmemzone *__restrict self,
-                                   physpage_t zone_relative_max,
-                                   physpagecnt_t num_pages);
+                                  physpage_t zone_relative_max,
+                                  physpagecnt_t num_pages);
 
 #if !defined(NDEBUG) && 1
-#define assert_allocation(base, num_pages)                                                                             \
-	{                                                                                                                  \
-		physpagecnt_t i;                                                                                                   \
-		for (i = 0; i < (num_pages); ++i) {                                                                            \
-			assertf(!page_isfree((base) + i),                                                                          \
+#define assert_allocation(base, num_pages)                              \
+	{                                                                   \
+		physpagecnt_t i;                                                \
+		for (i = 0; i < (num_pages); ++i) {                             \
+			assertf(!page_isfree((base) + i),                           \
 			        "Page at " PRIpN(__SIZEOF_PHYSADDR_T__) " of " PRIpN(__SIZEOF_PHYSADDR_T__) "..." PRIpN(__SIZEOF_PHYSADDR_T__) " was not allocated\n", \
-			        (physaddr_t)((base) + i) * PAGESIZE,                                                                \
-			        (physaddr_t)(base)*PAGESIZE,                                                                        \
-			        (physaddr_t)((base) + (num_pages)) * PAGESIZE - 1);                                                 \
-		}                                                                                                              \
+			        (physaddr_t)((base) + i) * PAGESIZE,                \
+			        (physaddr_t)(base)*PAGESIZE,                        \
+			        (physaddr_t)((base) + (num_pages)) * PAGESIZE - 1); \
+		}                                                               \
 	}
 #else
 #define assert_allocation(base, num_pages) (void)0
@@ -672,11 +669,23 @@ NOTHROW(KCALL zone_malloc_before)(struct pmemzone *__restrict self,
  * @return: * :              The starting page number of the newly allocated memory range.
  * @return: PHYSPAGE_INVALID: The allocation failed. */
 PUBLIC NOBLOCK WUNUSED physpage_t
-NOTHROW(KCALL page_malloc)(physpagecnt_t num_pages) {
+NOTHROW(FCALL page_malloc)(physpagecnt_t num_pages) {
+	physpage_t result = page_malloc_nocc(num_pages);
+	if unlikely(result == PHYSPAGE_INVALID) {
+		ccstate_t ccstate = CCSTATE_INIT;
+		while (system_cc_s_noblock(&ccstate)) {
+			result = page_malloc_nocc(num_pages);
+			if (result != PHYSPAGE_INVALID)
+				break;
+		}
+	}
+	return result;
+}
+
+PUBLIC NOBLOCK WUNUSED physpage_t
+NOTHROW(FCALL page_malloc_nocc)(physpagecnt_t num_pages) {
 	physpage_t result, free_max;
 	struct pmemzone *zone;
-	syscache_version_t version = SYSCACHE_VERSION_INIT;
-again:
 	zone = mzones.pm_last;
 	do {
 		if (zone->mz_cfree < num_pages)
@@ -710,13 +719,6 @@ again:
 			return result + zone->mz_start;
 		}
 	} while ((zone = zone->mz_prev) != NULL);
-	/* TODO: Don't do  this in  here unconditionally,  but expose  a  secondary
-	 *       interface that does the allocation while possibly clearing caches!
-	 * I totally forgot  that this happens  in here, and  there are many  places
-	 * that aren't designed to efficiently deal with system caches being cleared
-	 * in this manner! */
-	if (syscache_clear_s(&version))
-		goto again;
 	return PHYSPAGE_INVALID;
 }
 
@@ -725,11 +727,23 @@ again:
  * @return: * :               The starting page number of the newly allocated memory range.
  * @return: PHYSPAGE_INVALID: The allocation failed. */
 PUBLIC NOBLOCK WUNUSED physpage_t
-NOTHROW(KCALL page_mallocone)(void) {
+NOTHROW(FCALL page_mallocone)(void) {
+	physpage_t result = page_mallocone_nocc();
+	if unlikely(result == PHYSPAGE_INVALID) {
+		ccstate_t ccstate = CCSTATE_INIT;
+		while (system_cc_s_noblock(&ccstate)) {
+			result = page_mallocone_nocc();
+			if (result != PHYSPAGE_INVALID)
+				break;
+		}
+	}
+	return result;
+}
+
+PUBLIC NOBLOCK WUNUSED physpage_t
+NOTHROW(FCALL page_mallocone_nocc)(void) {
 	physpage_t result, free_max;
 	struct pmemzone *zone;
-	syscache_version_t version = SYSCACHE_VERSION_INIT;
-again:
 	zone = mzones.pm_last;
 	do {
 		if unlikely(!zone->mz_cfree)
@@ -763,13 +777,6 @@ again:
 			return result + zone->mz_start;
 		}
 	} while ((zone = zone->mz_prev) != NULL);
-	/* TODO: Don't do  this in  here unconditionally,  but expose  a  secondary
-	 *       interface that does the allocation while possibly clearing caches!
-	 * I totally forgot  that this happens  in here, and  there are many  places
-	 * that aren't designed to efficiently deal with system caches being cleared
-	 * in this manner! */
-	if (syscache_clear_s(&version))
-		goto again;
 	return PHYSPAGE_INVALID;
 }
 
@@ -781,12 +788,25 @@ again:
  *    using  up small memory blocks that might otherwise continue going unused.
  * @return: * :              The starting page number of the newly allocated memory range.
  * @return: PHYSPAGE_INVALID: The allocation failed. */
-PUBLIC NOBLOCK WUNUSED NONNULL((3)) physpage_t
-NOTHROW(KCALL page_malloc_part)(physpagecnt_t min_pages, physpagecnt_t max_pages,
-                                physpagecnt_t *__restrict res_pages) {
+FUNDEF NOBLOCK WUNUSED __page_malloc_part_return_t
+NOTHROW(FCALL _page_malloc_part)(physpagecnt_t min_pages, physpagecnt_t max_pages) {
+	__page_malloc_part_return_t result;
+	result = _page_malloc_part_nocc(min_pages, max_pages);
+	if unlikely(__page_malloc_part_return_getcount(result) == 0) {
+		ccstate_t ccstate = CCSTATE_INIT;
+		while (system_cc_s_noblock(&ccstate)) {
+			result = _page_malloc_part_nocc(min_pages, max_pages);
+			if (__page_malloc_part_return_getcount(result) != 0)
+				break;
+		}
+	}
+	return result;
+}
+
+FUNDEF NOBLOCK WUNUSED __page_malloc_part_return_t
+NOTHROW(FCALL _page_malloc_part_nocc)(physpagecnt_t min_pages, physpagecnt_t max_pages) {
 	physpage_t result, free_max;
 	struct pmemzone *zone;
-	syscache_version_t version = SYSCACHE_VERSION_INIT;
 #ifdef ALLOCATE_MIN_PARTS
 	max_pages = min_pages;
 #elif defined(ALLOCATE_MIN_PARTS_RANDOMIZE)
@@ -799,88 +819,80 @@ NOTHROW(KCALL page_malloc_part)(physpagecnt_t min_pages, physpagecnt_t max_pages
 		max_pages = new_count;
 	}
 #endif
-again:
 	zone = mzones.pm_last;
 	do {
+		__page_malloc_part_return_t retval;
+		physpagecnt_t count;
 		if unlikely(zone->mz_cfree < min_pages)
 			continue; /* Zone is too small. */
 		/* Search this zone. */
 		free_max = atomic_read(&zone->mz_fmax);
 		if likely((physpagecnt_t)free_max >= min_pages) {
-#ifndef NDEBUG
-			*res_pages = (physpagecnt_t)-1;
-#endif /* !NDEBUG */
-			result = zone_malloc_part_before(zone,
+			retval = zone_malloc_part_before(zone,
 			                                 free_max,
 			                                 min_pages,
-			                                 max_pages,
-			                                 res_pages);
-			if likely(result != PHYSPAGE_INVALID) {
-				assertf(*res_pages >= min_pages && *res_pages <= max_pages,
-				        "Bad *res_pages value: %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
+			                                 max_pages);
+			result = __page_malloc_part_return_getpage(retval);
+			count  = __page_malloc_part_return_getcount(retval);
+			if likely(count != 0) {
+				assertf(count >= min_pages && count <= max_pages,
+				        "Bad count value: %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
 				        "result = %" PRIpN(__SIZEOF_PHYSPAGE_T__),
-				        *res_pages, result);
+				        count, result);
 				TRACE_ALLOC(zone,
 				            result + zone->mz_start,
-				            result + zone->mz_start + *res_pages - 1);
-				assert_allocation(result + zone->mz_start, *res_pages);
+				            result + zone->mz_start + count - 1);
+				assert_allocation(result + zone->mz_start, count);
 				atomic_cmpxch(&zone->mz_fmax, free_max,
 				              result ? result - 1
 				                     : zone->mz_rmax);
-				return result + zone->mz_start;
+				return __page_malloc_part_return_pack(result + zone->mz_start, count);
 			}
-#ifndef NDEBUG
-			*res_pages = (physpagecnt_t)-1;
-#endif /* !NDEBUG */
-			result = zone_malloc_part_between(zone,
-			                                  free_max,
-			                                  zone->mz_rmax,
-			                                  min_pages,
-			                                  max_pages,
-			                                  res_pages,
-			                                  true);
+			retval = zone_malloc_part_between(zone, free_max, zone->mz_rmax, min_pages, max_pages, true);
 		} else {
-#ifndef NDEBUG
-			*res_pages = (physpagecnt_t)-1;
-#endif /* !NDEBUG */
-			result = zone_malloc_part_before(zone,
-			                                 zone->mz_rmax,
-			                                 min_pages,
-			                                 max_pages,
-			                                 res_pages);
+			retval = zone_malloc_part_before(zone, zone->mz_rmax, min_pages, max_pages);
 		}
-		if (result != PHYSPAGE_INVALID) {
-			assertf(*res_pages >= min_pages && *res_pages <= max_pages,
-			        "Bad *res_pages value: %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
+		result = __page_malloc_part_return_getpage(retval);
+		count  = __page_malloc_part_return_getcount(retval);
+		if (count != 0) {
+			assertf(count >= min_pages && count <= max_pages,
+			        "Bad count value: %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
 			        "result = %" PRIpN(__SIZEOF_PHYSPAGE_T__),
-			        *res_pages, result);
+			        count, result);
 			TRACE_ALLOC(zone,
 			            result + zone->mz_start,
-			            result + zone->mz_start + *res_pages - 1);
-			assert_allocation(result + zone->mz_start, *res_pages);
+			            result + zone->mz_start + count - 1);
+			assert_allocation(result + zone->mz_start, count);
 			atomic_cmpxch(&zone->mz_fmax, free_max,
 			              result ? result - 1
 			                     : zone->mz_rmax);
-			return result + zone->mz_start;
+			return __page_malloc_part_return_pack(result + zone->mz_start, count);
 		}
 	} while ((zone = zone->mz_prev) != NULL);
-	/* TODO: Don't do  this in  here unconditionally,  but expose  a  secondary
-	 *       interface that does the allocation while possibly clearing caches!
-	 * I totally forgot  that this happens  in here, and  there are many  places
-	 * that aren't designed to efficiently deal with system caches being cleared
-	 * in this manner! */
-	if (syscache_clear_s(&version))
-		goto again;
-	return PHYSPAGE_INVALID;
+	return __page_malloc_part_return_pack(PHYSPAGE_INVALID, 0);
 }
 
 
 /* Try to allocate the given page.
  * @return: * : One of `PAGE_MALLOC_AT_*' */
 PUBLIC NOBLOCK WUNUSED unsigned int
-NOTHROW(KCALL page_malloc_at)(physpage_t ptr) {
+NOTHROW(FCALL page_malloc_at)(physpage_t ptr) {
+	unsigned int result;
+	result = page_malloc_at_nocc(ptr);
+	if unlikely(result == PAGE_MALLOC_AT_NOTFREE) {
+		ccstate_t ccstate = CCSTATE_INIT;
+		while (system_cc_s_noblock(&ccstate)) {
+			result = page_malloc_at_nocc(ptr);
+			if (result != PAGE_MALLOC_AT_NOTFREE)
+				break;
+		}
+	}
+	return result;
+}
+
+PUBLIC NOBLOCK WUNUSED unsigned int
+NOTHROW(FCALL page_malloc_at_nocc)(physpage_t ptr) {
 	struct pmemzone *zone;
-again:
 	zone = mzones.pm_last;
 	do {
 		if (ptr >= zone->mz_start && ptr <= zone->mz_max) {
@@ -901,42 +913,33 @@ again:
 			return PAGE_MALLOC_AT_SUCCESS;
 		}
 	} while ((zone = zone->mz_prev) != NULL);
-	if (syscache_clear())
-		goto again;
 	return PAGE_MALLOC_AT_NOTMAPPED;
 }
 
-
-/* Similar to  `page_malloc()'  /  `page_malloc_part()',  but  only
- * allocate memory from between the two given page addresses,  such
- * that all allocated pages are located within the specified range.
- * @assume(return == PHYSPAGE_INVALID ||
- *        (return >= min_page &&
- *         return + num_pages - 1 <= max_page)); */
-PUBLIC NOBLOCK WUNUSED physpage_t
-NOTHROW(KCALL page_malloc_between)(physpage_t min_page, physpage_t max_page,
-                                   physpagecnt_t num_pages) {
-	physpagecnt_t num;
-	physpage_t result;
-#ifndef NDEBUG
-	num = (physpagecnt_t)-1;
-#endif /* !NDEBUG */
-	result = page_malloc_part_between(min_page,
-	                                  max_page,
-	                                  num_pages,
-	                                  num_pages,
-	                                  &num);
-	assert(result == PHYSPAGE_INVALID || num == num_pages);
+/* Similar to `page_malloc_part()', but only allocate memory from
+ * between the two given page addresses, such that all  allocated
+ * pages are located within the specified range. */
+PUBLIC NOBLOCK WUNUSED __page_malloc_part_return_t
+NOTHROW(FCALL _page_malloc_part_between)(physpage_t min_page, physpage_t max_page,
+                                         physpagecnt_t min_pages, physpagecnt_t max_pages) {
+	__page_malloc_part_return_t result;
+	result = _page_malloc_part_between_nocc(min_page, max_page, min_pages, max_pages);
+	if unlikely(__page_malloc_part_return_getcount(result) == 0) {
+		ccstate_t ccstate = CCSTATE_INIT;
+		while (system_cc_s_noblock(&ccstate)) {
+			result = _page_malloc_part_between_nocc(min_page, max_page, min_pages, max_pages);
+			if (__page_malloc_part_return_getcount(result) != 0)
+				break;
+		}
+	}
 	return result;
 }
 
-PUBLIC NOBLOCK WUNUSED NONNULL((5)) physpage_t
-NOTHROW(KCALL page_malloc_part_between)(physpage_t min_page, physpage_t max_page,
-                                        physpagecnt_t min_pages, physpagecnt_t max_pages,
-                                        physpagecnt_t *__restrict res_pages) {
+PUBLIC NOBLOCK WUNUSED __page_malloc_part_return_t
+NOTHROW(FCALL _page_malloc_part_between_nocc)(physpage_t min_page, physpage_t max_page,
+                                              physpagecnt_t min_pages, physpagecnt_t max_pages) {
 	physpage_t result, free_max;
 	struct pmemzone *zone;
-	syscache_version_t version = SYSCACHE_VERSION_INIT;
 #ifdef ALLOCATE_MIN_PARTS
 	max_pages = min_pages;
 #elif defined(ALLOCATE_MIN_PARTS_RANDOMIZE)
@@ -949,9 +952,10 @@ NOTHROW(KCALL page_malloc_part_between)(physpage_t min_page, physpage_t max_page
 		max_pages = new_count;
 	}
 #endif
-again:
 	zone = mzones.pm_last;
 	do {
+		__page_malloc_part_return_t retval;
+		physpagecnt_t count;
 		physpage_t relative_min_page;
 		physpage_t relative_max_page;
 
@@ -970,54 +974,50 @@ again:
 			if (free_max > relative_max_page)
 				free_max = relative_max_page;
 			if ((physpagecnt_t)free_max >= min_pages) {
-#ifndef NDEBUG
-				*res_pages = (physpagecnt_t)-1;
-#endif /* !NDEBUG */
-				result = zone_malloc_part_before(zone, free_max, min_pages, max_pages, res_pages);
+				retval = zone_malloc_part_before(zone, free_max, min_pages, max_pages);
+				result = __page_malloc_part_return_getpage(retval);
+				count  = __page_malloc_part_return_getcount(retval);
 				if (result != PHYSPAGE_INVALID) {
-					assertf(*res_pages >= min_pages && *res_pages <= max_pages,
-					        "Bad *res_pages value: %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
+					assertf(count >= min_pages && count <= max_pages,
+					        "Bad count value: %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
 					        "result = %" PRIpN(__SIZEOF_PHYSPAGE_T__),
-					        *res_pages, result);
+					        count, result);
 					TRACE_ALLOC(zone,
 					            result + zone->mz_start,
-					            result + zone->mz_start + *res_pages - 1);
-					assert_allocation(result + zone->mz_start, *res_pages);
+					            result + zone->mz_start + count - 1);
+					assert_allocation(result + zone->mz_start, count);
 					atomic_cmpxch(&zone->mz_fmax, free_max,
 					              result ? result - 1
 					                     : zone->mz_rmax);
-					assert(result + *res_pages - 1 <= free_max);
+					assert(result + count - 1 <= free_max);
 					assert(result + zone->mz_start >= min_page);
-					assert(result + zone->mz_start + *res_pages - 1 <= max_page);
-					return result + zone->mz_start;
+					assert(result + zone->mz_start + count - 1 <= max_page);
+					return __page_malloc_part_return_pack(result + zone->mz_start, count);
 				}
 				if (free_max < relative_max_page) {
-#ifndef NDEBUG
-					*res_pages = (physpagecnt_t)-1;
-#endif /* !NDEBUG */
-					result = zone_malloc_part_between(zone, free_max, relative_max_page, min_pages, max_pages, res_pages, false);
+					retval = zone_malloc_part_between(zone, free_max, relative_max_page,
+					                                  min_pages, max_pages, false);
 				}
 			} else {
-#ifndef NDEBUG
-				*res_pages = (physpagecnt_t)-1;
-#endif /* !NDEBUG */
-				result = zone_malloc_part_before(zone, relative_max_page, min_pages, max_pages, res_pages);
+				retval = zone_malloc_part_before(zone, relative_max_page, min_pages, max_pages);
 			}
+			result = __page_malloc_part_return_getpage(retval);
+			count  = __page_malloc_part_return_getcount(retval);
 			if (result != PHYSPAGE_INVALID) {
-				assertf(*res_pages >= min_pages && *res_pages <= max_pages,
-				        "Bad *res_pages value: %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
+				assertf(count >= min_pages && count <= max_pages,
+				        "Bad count value: %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
 				        "result = %" PRIpN(__SIZEOF_PHYSPAGE_T__),
-				        *res_pages, result);
+				        count, result);
 				TRACE_ALLOC(zone,
 				            result + zone->mz_start,
-				            result + zone->mz_start + *res_pages - 1);
-				assert_allocation(result + zone->mz_start, *res_pages);
+				            result + zone->mz_start + count - 1);
+				assert_allocation(result + zone->mz_start, count);
 				atomic_cmpxch(&zone->mz_fmax, free_max,
 				              result ? result - 1
 				                     : zone->mz_rmax);
 				assert(result + zone->mz_start >= min_page);
-				assert(result + zone->mz_start + *res_pages - 1 <= max_page);
-				return result + zone->mz_start;
+				assert(result + zone->mz_start + count - 1 <= max_page);
+				return __page_malloc_part_return_pack(result + zone->mz_start, count);
 			}
 		} else {
 			/* Search this zone. */
@@ -1025,74 +1025,65 @@ again:
 			if (free_max > relative_max_page)
 				free_max = relative_max_page;
 			if ((physpagecnt_t)free_max >= min_pages) {
-#ifndef NDEBUG
-				*res_pages = (physpagecnt_t)-1;
-#endif /* !NDEBUG */
-				result = zone_malloc_part_between(zone, relative_min_page, free_max, min_pages, max_pages, res_pages, false);
+				retval = zone_malloc_part_between(zone, relative_min_page, free_max,
+				                                  min_pages, max_pages, false);
+				result = __page_malloc_part_return_getpage(retval);
+				count  = __page_malloc_part_return_getcount(retval);
 				if (result != PHYSPAGE_INVALID) {
-					assertf(*res_pages >= min_pages && *res_pages <= max_pages,
-					        "Bad *res_pages value: %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
+					assertf(count >= min_pages && count <= max_pages,
+					        "Bad count value: %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
 					        "result = %" PRIpN(__SIZEOF_PHYSPAGE_T__),
-					        *res_pages, result);
+					        count, result);
 					TRACE_ALLOC(zone,
 					            result + zone->mz_start,
-					            result + zone->mz_start + *res_pages - 1);
-					assert_allocation(result + zone->mz_start, *res_pages);
+					            result + zone->mz_start + count - 1);
+					assert_allocation(result + zone->mz_start, count);
 					atomic_cmpxch(&zone->mz_fmax, free_max,
 					              result ? result - 1
 					                     : zone->mz_rmax);
 					assert(result + zone->mz_start >= min_page);
-					assert(result + zone->mz_start + *res_pages - 1 <= max_page);
-					return result + zone->mz_start;
+					assert(result + zone->mz_start + count - 1 <= max_page);
+					return __page_malloc_part_return_pack(result + zone->mz_start, count);
 				}
 				if (free_max < relative_min_page)
 					free_max = relative_min_page;
 				if (free_max < relative_max_page) {
-#ifndef NDEBUG
-					*res_pages = (physpagecnt_t)-1;
-#endif /* !NDEBUG */
-					result = zone_malloc_part_between(zone, free_max, relative_max_page, min_pages, max_pages, res_pages, false);
+					retval = zone_malloc_part_between(zone, free_max, relative_max_page,
+					                                  min_pages, max_pages, false);
 				}
 			} else {
-#ifndef NDEBUG
-				*res_pages = (physpagecnt_t)-1;
-#endif /* !NDEBUG */
-				result = zone_malloc_part_between(zone, relative_min_page, relative_max_page, min_pages, max_pages, res_pages, false);
+				retval = zone_malloc_part_between(zone, relative_min_page, relative_max_page,
+				                                  min_pages, max_pages, false);
 			}
+			result = __page_malloc_part_return_getpage(retval);
+			count  = __page_malloc_part_return_getcount(retval);
 			if (result != PHYSPAGE_INVALID) {
-				assertf(*res_pages >= min_pages && *res_pages <= max_pages,
-				        "Bad *res_pages value: %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
+				assertf(count >= min_pages && count <= max_pages,
+				        "Bad count value: %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
 				        "result = %" PRIpN(__SIZEOF_PHYSPAGE_T__),
-				        *res_pages, result);
+				        count, result);
 				TRACE_ALLOC(zone,
 				            result + zone->mz_start,
-				            result + zone->mz_start + *res_pages - 1);
-				assert_allocation(result + zone->mz_start, *res_pages);
+				            result + zone->mz_start + count - 1);
+				assert_allocation(result + zone->mz_start, count);
 				assert(result + zone->mz_start >= min_page);
-				assert(result + zone->mz_start + *res_pages - 1 <= max_page);
+				assert(result + zone->mz_start + count - 1 <= max_page);
 				atomic_cmpxch(&zone->mz_fmax, free_max,
 				              result ? result - 1
 				                     : zone->mz_rmax);
-				return result + zone->mz_start;
+				return __page_malloc_part_return_pack(result + zone->mz_start, count);
 			}
 		}
 
 	} while ((zone = zone->mz_prev) != NULL);
-	/* TODO: Don't do  this in  here unconditionally,  but expose  a  secondary
-	 *       interface that does the allocation while possibly clearing caches!
-	 * I totally forgot  that this happens  in here, and  there are many  places
-	 * that aren't designed to efficiently deal with system caches being cleared
-	 * in this manner! */
-	if (syscache_clear_s(&version))
-		goto again;
-	return PHYSPAGE_INVALID;
+	return __page_malloc_part_return_pack(PHYSPAGE_INVALID, 0);
 }
 
 
 /* Check if a given `page' is current free.
  * NOTE: Returns `false' when `page_ismapped(page, 1)' is false. */
 PUBLIC NOBLOCK WUNUSED bool
-NOTHROW(KCALL page_isfree)(physpage_t page) {
+NOTHROW(FCALL page_isfree)(physpage_t page) {
 	struct pmemzone *zone;
 	zone = mzones.pm_last;
 	do {
@@ -1112,7 +1103,7 @@ NOTHROW(KCALL page_isfree)(physpage_t page) {
 
 /* Collect volatile statistics about the usage of physical memory */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL page_stat)(struct pmemstat *__restrict result) {
+NOTHROW(FCALL page_stat)(struct pmemstat *__restrict result) {
 	struct pmemzone *zone;
 	zone = mzones.pm_last;
 	result->ps_free  = 0;
@@ -1129,7 +1120,7 @@ NOTHROW(KCALL page_stat)(struct pmemstat *__restrict result) {
 
 
 PUBLIC NOBLOCK NONNULL((3)) void
-NOTHROW(KCALL page_stat_between)(physpage_t base, physpagecnt_t num_pages,
+NOTHROW(FCALL page_stat_between)(physpage_t base, physpagecnt_t num_pages,
                                  struct pmemstat *__restrict result) {
 	(void)base;
 	(void)num_pages;
@@ -1153,7 +1144,7 @@ NOTHROW(KCALL page_stat_between)(physpage_t base, physpagecnt_t num_pages,
  *       allocated pages, in order to determine if the mapped memory
  *       already contains all zeros. */
 PUBLIC NOBLOCK WUNUSED bool
-NOTHROW(KCALL page_iszero)(physpage_t page) {
+NOTHROW(FCALL page_iszero)(physpage_t page) {
 	struct pmemzone *zone;
 	zone = mzones.pm_last;
 	do {
@@ -1175,14 +1166,14 @@ NOTHROW(KCALL page_iszero)(physpage_t page) {
 /* Reset the is-zero attribute for all pages in the given range.
  * Pages  that aren't  part of  any zones  are silently ignored. */
 PUBLIC NOBLOCK void
-NOTHROW(KCALL page_resetzero)(physpage_t page, physpagecnt_t num_pages) {
+NOTHROW(FCALL page_resetzero)(physpage_t page, physpagecnt_t num_pages) {
 	/* Keep it simple... */
 	while (num_pages--)
 		page_resetzeroone(page++);
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL page_resetzeroone)(physpage_t page) {
+NOTHROW(FCALL page_resetzeroone)(physpage_t page) {
 	struct pmemzone *zone;
 	zone = mzones.pm_last;
 	do {
@@ -1204,7 +1195,7 @@ NOTHROW(KCALL page_resetzeroone)(physpage_t page) {
 
 /* Check if all pages of a given physical memory range are mapped as available RAM. */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED bool
-NOTHROW(KCALL page_ismapped)(physpage_t page, physpagecnt_t num_pages) {
+NOTHROW(FCALL page_ismapped)(physpage_t page, physpagecnt_t num_pages) {
 	struct pmemzone *zone;
 	physpage_t page_max;
 	page_max = page + num_pages - 1;

@@ -45,7 +45,7 @@
 #include <kernel/handle-proto.h>
 #include <kernel/heap.h>
 #include <kernel/mman.h>
-#include <kernel/mman/cache.h>
+#include <kernel/mman/cc.h>
 #include <kernel/mman/driver.h>
 #include <kernel/mman/flags.h>
 #include <kernel/mman/kram.h>
@@ -5255,7 +5255,7 @@ again_get_driver_loadlist:
 				                                               sizeof(WEAK REF struct driver *),
 				                                               GFP_LOCKED | GFP_PREFLT);
 				TRY {
-					syscache_version_t cache_version = SYSCACHE_VERSION_INIT;
+					ccstate_t cache_version = CCSTATE_INIT;
 					size_t i, new_ll_insert_index;
 					uintptr_t loadaddr;
 
@@ -5279,7 +5279,7 @@ again_acquire_mman_lock:
 						                             MHINT_GETMODE(KERNEL_MHINT_DRIVER));
 						if unlikely(loadbase == MAP_FAILED) {
 							mman_lock_release(&mman_kernel);
-							if (syscache_clear_s(&cache_version))
+							if (system_cc_s(&cache_version))
 								goto again_acquire_mman_lock;
 							/*driver_deadnodes_freelist(&nodes);*/
 							/*destroy_partially_initialized_driver(result);*/

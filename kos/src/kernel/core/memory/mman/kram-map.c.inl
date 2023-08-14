@@ -74,7 +74,7 @@ DECL_BEGIN
  *   - GFP_MAP_NOSPLIT:  Set the `MNODE_F_NOSPLIT' flag for new nodes
  *   - GFP_MAP_NOMERGE:  Set the `MNODE_F_NOMERGE' flag for new nodes, and don't try
  *                       to extend an existing node.
- *   - GFP_NOCLRC:       Don't call `syscache_clear()' to try to free up memory
+ *   - GFP_NOCLRC:       Don't call `system_cc()' to try to free up memory
  *   - GFP_NOSWAP:       Don't move memory to swap to free up memory
  *   - Other flags are silently ignored, but will be forwarded  onto
  *     other calls to kmalloc() that may need to be made internally.
@@ -129,7 +129,7 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
 #define LOCAL_IFELSE_NX(without_nx, with_nx) without_nx
 #define LOCAL_THROW                          THROW
 #endif /* !LOCAL_NX */
-	syscache_version_t cache_version = SYSCACHE_VERSION_INIT;
+	ccstate_t cache_version = CCSTATE_INIT;
 	uintptr_t addend = 0;
 	void *result;
 	struct mnode *node = NULL;
@@ -321,16 +321,19 @@ again_lock_mman:
 
 		/* Allocate backing physical memory of `part' */
 		if likely(part->mp_state == MPART_ST_VOID) {
+			/* NOTE: `MY_PAGE_MALLOC()' uses the `*_nocc' versions since we already do our own cc below.
+			 *       Additionally, we're supposed  to respect  our caller's `GFP_NOCLRC',  so we're  not
+			 *       supposed to do cache-clearing if that flag is set! */
 #if __SIZEOF_PHYSADDR_T__ > 4
-#define MY_PAGE_MALLOC(max_pages, res_pages)                                   \
-			((flags & GFP_MAP_32BIT)                                           \
-			 ? page_malloc_part_between(physaddr2page(__UINT32_C(0x00000000)), \
-			                            physaddr2page(__UINT32_C(0xffffffff)), \
-			                            1, max_pages, res_pages)               \
-			 : page_malloc_part(1, max_pages, res_pages))
+#define MY_PAGE_MALLOC(max_pages, res_pages)                                        \
+			((flags & GFP_MAP_32BIT)                                                \
+			 ? page_malloc_part_between_nocc(physaddr2page(__UINT32_C(0x00000000)), \
+			                                 physaddr2page(__UINT32_C(0xffffffff)), \
+			                                 1, max_pages, res_pages)               \
+			 : page_malloc_part_nocc(1, max_pages, res_pages))
 #else /* __SIZEOF_PHYSADDR_T__ > 4 */
 #define MY_PAGE_MALLOC(max_pages, res_pages) \
-			page_malloc_part(1, max_pages, res_pages)
+			page_malloc_part_nocc(1, max_pages, res_pages)
 #endif /* __SIZEOF_PHYSADDR_T__ <= 4 */
 			part->mp_mem.mc_start = MY_PAGE_MALLOC(num_pages, &part->mp_mem.mc_size);
 			if unlikely(part->mp_mem.mc_start == PHYSPAGE_INVALID)

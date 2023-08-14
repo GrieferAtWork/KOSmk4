@@ -36,13 +36,12 @@ NOTHROW(KCALL zone_mallocone_between)(struct pmemzone *__restrict self,
                                       physpage_t zone_relative_max,
                                       bool out_of_bounds_is_ok)
 #elif defined(ALLOC_MINMAX)
-PRIVATE NOBLOCK WUNUSED NONNULL((1, 6)) physpage_t
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) __page_malloc_part_return_t
 NOTHROW(KCALL zone_malloc_part_between)(struct pmemzone *__restrict self,
                                         physpage_t zone_relative_min,
                                         physpage_t zone_relative_max,
                                         physpagecnt_t min_pages,
                                         physpagecnt_t max_pages,
-                                        physpagecnt_t *__restrict res_pages,
                                         bool out_of_bounds_is_ok)
 #else /* ... */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) physpage_t
@@ -58,12 +57,11 @@ PRIVATE NOBLOCK WUNUSED NONNULL((1)) physpage_t
 NOTHROW(KCALL zone_mallocone_before)(struct pmemzone *__restrict self,
                                      physpage_t zone_relative_max)
 #elif defined(ALLOC_MINMAX)
-PRIVATE NOBLOCK WUNUSED NONNULL((1, 5)) physpage_t
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) __page_malloc_part_return_t
 NOTHROW(KCALL zone_malloc_part_before)(struct pmemzone *__restrict self,
                                        physpage_t zone_relative_max,
                                        physpagecnt_t min_pages,
-                                       physpagecnt_t max_pages,
-                                       physpagecnt_t *__restrict res_pages)
+                                       physpagecnt_t max_pages)
 #else /* ... */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) physpage_t
 NOTHROW(KCALL zone_malloc_before)(struct pmemzone *__restrict self,
@@ -123,9 +121,10 @@ again_word_i:
 							atomic_dec(&self->mz_qfree);
 					}
 #ifdef ALLOC_MINMAX
-					*res_pages = 1;
-#endif /* ALLOC_MINMAX */
+					return __page_malloc_part_return_pack(result, 1);
+#else /* ALLOC_MINMAX */
 					return result;
+#endif /* !ALLOC_MINMAX */
 				}
 				if (page_mask <= PMEMZONE_ISFREEMASK)
 					break;
@@ -188,9 +187,10 @@ min_max_allocate_current_alloc_mask:
 						if (qcount)
 							atomic_fetchsub(&self->mz_qfree, qcount);
 #ifdef ALLOC_MINMAX
-						*res_pages = new_alloc_count;
-#endif /* ALLOC_MINMAX */
+						return __page_malloc_part_return_pack(result, new_alloc_count);
+#else /* ALLOC_MINMAX */
 						return result;
+#endif /* !ALLOC_MINMAX */
 					}
 				} else {
 #ifdef ALLOC_MINMAX
@@ -211,8 +211,7 @@ min_max_allocate_current_alloc_mask:
 							assert(qcount <= (new_alloc_count - alloc_count));
 							if (qcount)
 								atomic_fetchsub(&self->mz_qfree, qcount);
-							*res_pages = new_alloc_count;
-							return result;
+							return __page_malloc_part_return_pack(result, new_alloc_count);
 #endif
 						}
 					}
@@ -258,8 +257,7 @@ min_max_allocate_current_alloc_mask:
 				if (alloc_count >= min_pages)
 #endif /* !ALLOC_BETWEEN */
 				{
-					*res_pages = alloc_count;
-					return (physpage_t)(i * PAGES_PER_WORD);
+					return __page_malloc_part_return_pack((physpage_t)(i * PAGES_PER_WORD), alloc_count);
 				}
 #endif /* ALLOC_MINMAX */
 				if (alloc_count)
@@ -272,7 +270,11 @@ min_max_allocate_current_alloc_mask:
 	}
 #endif /* !ALLOC_SINGLE */
 nope:
+#ifdef ALLOC_MINMAX
+	return __page_malloc_part_return_pack(PHYSPAGE_INVALID, 0);
+#else /* ALLOC_MINMAX */
 	return PHYSPAGE_INVALID;
+#endif /* !ALLOC_MINMAX */
 }
 
 DECL_END
