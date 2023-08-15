@@ -708,7 +708,7 @@ invoke_printf_function8(pformatprinter printer, void *arg,
 struct format_file_c16printer: FILE {
 	struct iofile_data       ffp_exdat; /* Extended file data */
 	struct format_8to16_data ffp_out;   /* Output descriptor. */
-	ssize_t                  ffp_error;   /* Format output error code. */
+	ssize_t                  ffp_error; /* Format output error code. */
 };
 
 
@@ -766,7 +766,7 @@ invoke_printf_function16(pc16formatprinter printer, void *arg,
 struct format_file_c32printer: FILE {
 	struct iofile_data       ffp_exdat; /* Extended file data */
 	struct format_8to32_data ffp_out;   /* Output descriptor. */
-	ssize_t                  ffp_error;   /* Format output error code. */
+	ssize_t                  ffp_error; /* Format output error code. */
 };
 
 

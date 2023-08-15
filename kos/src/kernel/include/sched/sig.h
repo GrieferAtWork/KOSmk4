@@ -632,6 +632,11 @@ FUNDEF NONNULL((1)) void FCALL
 task_connect_for_poll(struct sig *__restrict target)
 		THROWS(E_BADALLOC);
 
+/* Helper  for `task_connect()' that allows for the assumption that the calling
+ * thread has less than `CONFIG_TASK_STATIC_CONNECTIONS' connections right now. */
+#define task_connect_nx(target)          NOEXCEPT_DO(task_connect(target))
+#define task_connect_for_poll_nx(target) NOEXCEPT_DO(task_connect_for_poll(target))
+
 
 /* Disconnect from a specific signal `target'
  * WARNING: If `target' was already  send to the calling  thread

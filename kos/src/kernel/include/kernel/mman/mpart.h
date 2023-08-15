@@ -98,22 +98,22 @@
 /*efine MPART_F_               0x8000  * ... */
 
 /* Possible values for `struct mpart::mp_xflags' */
-#define MPART_XF_NORMAL          0x00
-#define MPART_XF_MERGE_AFTER_DMA 0x01 /* [lock(ATOMIC)] Internally used: If set, DMA completion must clear
-                                       * this flag and  call `mpart_merge()' (s.a.  `mpart_dma_dellock()') */
-#define MPART_XF_TRIM_AFTER_DMA  0x02 /* [lock(ATOMIC)] Internally used: If set, DMA completion must clear
-                                       * this flag  and call  `mpart_trim()' (s.a.  `mpart_dma_dellock()') */
-#define MPART_XF_WILLMERGE       0x04 /* [lock(SET(ATOMIC), CLEAR(PART_WORKER))] Async worker must merge this part. */
-#define MPART_XF_WILLTRIM        0x08 /* [lock(SET(ATOMIC), CLEAR(PART_WORKER))] Async worker must trim this part. */
-#define MPART_XF_WILLUNLOAD      0x10 /* [lock(SET(ATOMIC), CLEAR(MPART_F_LOCKBIT))] Async worker must unload this part. */
-/*efine MPART_XF_                0x20  * ... */
-/*efine MPART_XF_                0x40  * ... */
-#define MPART_XF_INJOBLIST       0x80 /* [lock(SET(ATOMIC), CLEAR(PART_WORKER))] Mem-part was added to the
-                                       * async job list. This flag is cleared by an async worker that will
-                                       * perform tasks indicated by `MPART_XF_WILL*' flags.
-                                       * This flag can only be cleared by the async-job-worker for mem-parts,
-                                       * and only after it has  been confirmed that none of  `MPART_XF_WILL*'
-                                       * are still set. */
+#define MPART_XF_NORMAL           0x00
+#define MPART_XF_MERGE_AFTER_DMA  0x01 /* [lock(ATOMIC)] Internally used: If set, DMA completion must clear
+                                        * this flag and  call `mpart_merge()' (s.a.  `mpart_dma_dellock()') */
+#define MPART_XF_TRIM_AFTER_DMA   0x02 /* [lock(ATOMIC)] Internally used: If set, DMA completion must clear
+                                        * this flag  and call  `mpart_trim()' (s.a.  `mpart_dma_dellock()') */
+#define MPART_XF_MERGE_AFTER_INIT 0x04 /* [lock(ATOMIC)] Internally used: If set, changing a block status from `MPART_BLOCK_ST_INIT' must call `mpart_trim()' */
+#define MPART_XF_TRIM_AFTER_INIT  0x08 /* [lock(ATOMIC)] Internally used: If set, changing a block status from `MPART_BLOCK_ST_INIT' must call `mpart_merge()' */
+/*efine MPART_XF_                 0x10  * ... */
+#define MPART_XF_WILLMERGE        0x20 /* [lock(SET(ATOMIC), CLEAR(PART_WORKER))] Async worker must merge this part. */
+#define MPART_XF_WILLTRIM         0x40 /* [lock(SET(ATOMIC), CLEAR(PART_WORKER))] Async worker must trim this part. */
+#define MPART_XF_INJOBLIST        0x80 /* [lock(SET(ATOMIC), CLEAR(PART_WORKER))] Mem-part was added to the
+                                        * async job list. This flag is cleared by an async worker that will
+                                        * perform tasks indicated by `MPART_XF_WILL*' flags.
+                                        * This flag can only be cleared by the async-job-worker for mem-parts,
+                                        * and only after it has  been confirmed that none of  `MPART_XF_WILL*'
+                                        * are still set. */
 
 
 
@@ -881,17 +881,38 @@ NOTHROW(FCALL mpart_page2swap)(struct mpart const *__restrict self,
  *   - EXCEPT:           mpart_lock_release(self);
  ************************************************************************/
 
+
+
+/* Possible return values for:
+ * - mpart_initdone_or_unlock_nx
+ * - mpart_nodma_or_unlock_nx
+ * - mpart_trim_or_unlock_nx
+ */
+#define MPART_NXOP_ST_SUCCESS 0 /* Success (locks are still held) */
+#define MPART_NXOP_ST_RETRY   1 /* Try again (all locks were released) */
+#define MPART_NXOP_ST_ERROR   2 /* Hard error (all locks were released; DON'T try again) */
+
+
+
 /* Ensure that `!mpart_hasblocksstate_init(self)' */
 FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_initdone_or_unlock(struct mpart *__restrict self,
                          struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) unsigned int
+NOTHROW(FCALL mpart_initdone_or_unlock_nx)(struct mpart *__restrict self,
+                                           struct unlockinfo *unlock);
 
 /* Ensure that `self->mp_meta == NULL || self->mp_meta->mpm_dmalocks == 0' */
 FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_nodma_or_unlock(struct mpart *__restrict self,
                       struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) unsigned int
+NOTHROW(FCALL mpart_nodma_or_unlock_nx)(struct mpart *__restrict self,
+                                        struct unlockinfo *unlock);
+#define mpart_is_nodma(self) \
+	(!(self)->mp_meta || __hybrid_atomic_load(&(self)->mp_meta->mpm_dmalocks, __ATOMIC_ACQUIRE) == 0)
 
 /* Ensure that `self->mp_meta != NULL' */
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
@@ -1122,6 +1143,20 @@ NOTHROW(FCALL mpart_setblockstate)(struct mpart *__restrict self,
                                    unsigned int st);
 #define mpart_hasblockstate(self) \
 	((self)->mp_blkst_ptr != __NULLPTR || ((self)->mp_flags & MPART_F_BLKST_INL))
+
+/* Perform extra actions after clearing `MPART_BLOCK_ST_INIT' states in `self'. */
+#define mpart_setblockstate_initdone_extrahooks(self)                                          \
+	(__hybrid_atomic_load(&(self)->mp_xflags, __ATOMIC_ACQUIRE) & (MPART_XF_MERGE_AFTER_INIT | \
+	                                                               MPART_XF_TRIM_AFTER_INIT)   \
+	 ? _mpart_setblockstate_initdone_extrahooks(incref(self))                                  \
+	 : (void)0)
+#define mpart_setblockstate_initdone_extrahooks_and_decref(self)                               \
+	(__hybrid_atomic_load(&(self)->mp_xflags, __ATOMIC_ACQUIRE) & (MPART_XF_MERGE_AFTER_INIT | \
+	                                                               MPART_XF_TRIM_AFTER_INIT)   \
+	 ? _mpart_setblockstate_initdone_extrahooks(self)                                          \
+	 : decref(self))
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL _mpart_setblockstate_initdone_extrahooks)(REF struct mpart *__restrict self);
 
 /* Check if the given mem-part contains blocks with `MPART_BLOCK_ST_INIT'.
  * For this purpose, if the `MPART_F_MAYBE_BLK_INIT' flag isn't set,  then
@@ -1403,52 +1438,76 @@ NOTHROW(FCALL mpart_merge_locked)(REF struct mpart *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self);
 
+struct ccinfo;
+
+/* Possible mpart-trim levels. */
+#define MPART_TRIM_MODE_UNMAPPED      0   /* Trim unmapped blocks (when the part isn't anonymous, don't trim blocks
+                                           * with status `MPART_BLOCK_ST_CHNG') of the given mem-part (this is also
+                                           * what `mpart_trim()' does, except that it *only* trims parts if they're
+                                           * anonymous, meaning it can just ignore `MPART_BLOCK_ST_CHNG') */
+#define MPART_TRIM_MODE_UNINITIALIZED 1   /* Trim uninitialized blocks of the given mem-part (even if mappings exist for  them.
+                                           * Since those blocks aren't initialized, we can assume that they don't appear in any
+                                           * page directory, meaning they can be unloaded safely)
+                                           * NOTE: When `MPART_F_MLOCK' is set or the part is anonymous,
+                                           *       this behaves the  same as  `MPART_TRIM_MODE_UNMAPPED' */
+#define MPART_TRIM_MODE_UNCHANGED     2   /* Trim all blocks that don't have status `MPART_BLOCK_ST_CHNG'
+                                           * Any blocks that are initialized+mapped will be unmapped such
+                                           * that they are loaded once again during the next access.
+                                           * NOTE: When `MPART_F_MLOCK' is set or the part is anonymous,
+                                           *       this behaves the  same as  `MPART_TRIM_MODE_UNMAPPED' */
+#define MPART_TRIM_FLAG_SYNC          0x4 /* FLAG: Blocks that normally couldn't be  unloaded because they are marked  as
+                                           *       `MPART_BLOCK_ST_CHNG' can now also be unloaded. This is done by rather
+                                           *       than skipping such blocks, they are  written back to disk (any  errors
+                                           *       that during this are discarded before returning `MPART_NXOP_ST_ERROR')
+                                           *       and marking the block as `MPART_BLOCK_ST_LOAD' and treating it as such
+                                           * NOTE: When the part is anonymous, or the file doesn't implement the `mo_saveblocks'
+                                           *       operator, this flag is simply ignored.
+                                           * NOTE: When the part has the `MPART_F_MLOCK' flag, this flag is ignored. */
+#define MPART_TRIM_FLAG_SWAP          0x8 /* FLAG: Blocks that normally couldn't be  unloaded because they are marked  as
+                                           *       `MPART_BLOCK_ST_CHNG' can now also be unloaded. This is done by rather
+                                           *       than  skipping such blocks,  they are split  into a separate mem-part,
+                                           *       then written to swap (any errors that during this are discarded before
+                                           *       trying to re-merge the split part and returning `MPART_NXOP_ST_ERROR')
+                                           *       The part is then marked as `MPART_ST_VOID'
+                                           * NOTE: When the part isn't anonymous, and the file implements the `mo_saveblocks'
+                                           *       operator, this flag is simply ignored.
+                                           * NOTE: When the part has the `MPART_F_MLOCK' flag, this flag is ignored. */
+
+struct mpart_trim_data {
+	struct mpart  *mtd_hipart; /* [0..1] High memory part as may be needed when splitting a mem-part. */
+	struct ccinfo *mtd_ccinfo; /* [1..1][const] Cache-clearing information. */
+	unsigned int   mtd_mode;   /* [const] Trim mode (s.a. `MPART_TRIM_MODE_*' and `MPART_TRIM_FLAG_*') */
+};
+#define mpart_trim_data_init(self, info, mode) \
+	(void)((self)->mtd_hipart = __NULLPTR,     \
+	       (self)->mtd_ccinfo = (info),        \
+	       (self)->mtd_mode   = (mode))
+#define mpart_trim_data_fini(self) \
+	__os_free((self)->mtd_hipart)
+
+/* Synchronous version of `mpart_trim()' (that is also able to trim non-anonymous parts)
+ * This function is specifically designed to-be used by `system_cc()' (in case you  were
+ * wondering about the meaning of `data->mtd_ccinfo')
+ * NOTE: The caller must be holding a lock to `self' when calling this function.
+ * NOTE: This  function operates with respect to `ccinfo_noblock(data->mtd_ccinfo)',
+ *       in that it will operate as a  no-op whenever something comes up that  would
+ *       need to block, in which case `MPART_NXOP_ST_SUCCESS' is returned (emulating
+ *       the behavior when  `self' was  trimmed, or  nothing about  `self' could  be
+ *       trimmed)
+ * @param: data: [in|out] Storage  area for dynamically allocated memory. Note that
+ *                        unlike usually, this  data-area does  NOT become  invalid
+ *                        when this function succeeds. Even  more so, it may  still
+ *                        contain dynamically allocated memory that can be used for
+ *                        further trim operations!
+ * @return: MPART_NXOP_ST_SUCCESS: Success (all locks were kept)
+ * @return: MPART_NXOP_ST_RETRY:   Failed (`unlock' and `mpart_lock_release(self)' was released)
+ * @return: MPART_NXOP_ST_ERROR:   Non-recoverable error (OOM or yield-failure). Don't try again. */
+FUNDEF NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2, 3)) unsigned int
+NOTHROW(FCALL mpart_trim_or_unlock_nx)(struct mpart *__restrict self,
+                                       struct mpart_trim_data *__restrict data,
+                                       struct unlockinfo *unlock);
 
 
-
-/* Try to (asynchronously) sync unwritten data of `self' before unload `self' from memory.
- * Note that contrary to its name, this function will never unload memory that is actually
- * still in use, or in a  way by which said memory  cannot be recovered (by re-loading  it
- * from swap). Instead, this function only tries  to unload pre-loaded file data, as  well
- * write-back changed file data to  disk so-as to make  it possible to essentially  change
- * the state of `self' to `MPART_ST_VOID' (or simply destroy `self' all-together).
- * @param: self:  The mem-part which should be unloaded. */
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mpart_unload)(/*inherit(always)*/ REF struct mpart *__restrict self);
-
-/* Synchronous version of `mpart_unload()'. Upon entry, the caller must be holding a lock
- * to `self' and `unlock'. The lock to  `self' is unconditionally released, but the  lock
- * to `unlock' is  only released when  `false' is  returned, or an  exception is  thrown.
- * Locking logic:
- *  - return != MPART_UNLOADNOW_ST_RETRY:
- *    - !mpart_lock_acquired(self);
- *    - decref(self);
- *  - return == MPART_UNLOADNOW_ST_RETRY:
- *    - !mpart_lock_acquired(self);
- *    - unlockinfo_xunlock(unlock);
- *  - EXCEPT:
- *    - !mpart_lock_acquired(self);
- *    - unlockinfo_xunlock(unlock);
- * @param: flags: Set of `MPART_UNLOADNOW_F_*'
- * @param: self:  The mem-part which should be unloaded. */
-FUNDEF BLOCKING NONNULL((1)) unsigned int FCALL
-mpart_unloadnow_or_unlock(/*inherit(on_success)*/ REF struct mpart *__restrict self,
-                          unsigned int flags, struct unlockinfo *unlock)
-		THROWS(E_WOULDBLOCK, ...);
-
-/* Return values for `mpart_unloadnow_or_unlock()' */
-#define MPART_UNLOADNOW_ST_RETRY   0 /* Locks were lost; try again */
-#define MPART_UNLOADNOW_ST_INUSE   1 /* Part couldn't be unloaded because there are unaccounted references
-                                      * to the part and `MPART_UNLOADNOW_F_NOSWAP' was given, or no unused
-                                      * swap space was available. */
-#define MPART_UNLOADNOW_ST_SUCCESS 2 /* Success: the part was unloaded (its state was set to  `MPART_ST_VOID'
-                                      * or `MPART_ST_SWP[_SC]' when `MPART_UNLOADNOW_F_NOSWAP' wasn't given),
-                                      * and in all  likelihood the  part has  been destroyed  (unless it  now
-                                      * resides in swap space). */
-
-/* Flags for `mpart_unloadnow_or_unlock(flags)' */
-#define MPART_UNLOADNOW_F_NORMAL 0x0000     /* Normal flags */
-#define MPART_UNLOADNOW_F_NOSWAP GFP_NOSWAP /* Don't off-load memory into swap */
 
 
 /* Try to allocate a new async job to  do `what', but if that fails use a  fallback
@@ -1461,9 +1520,8 @@ mpart_unloadnow_or_unlock(/*inherit(on_success)*/ REF struct mpart *__restrict s
  * When multiple operations are scheduled at the same time, they will be  performed
  * in the following order:
  *  - MPART_XF_WILLMERGE:  `mpart_merge()'
- *  - MPART_XF_WILLUNLOAD: `mpart_unload()'
  *  - MPART_XF_WILLTRIM:   `mpart_trim()'
- * @param: what: Set of `MPART_XF_WILLMERGE | MPART_XF_WILLTRIM | MPART_XF_WILLUNLOAD' */
+ * @param: what: Set of `MPART_XF_WILLMERGE | MPART_XF_WILLTRIM' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_start_asyncjob)(/*inherit(always)*/ REF struct mpart *__restrict self,
                                     uintptr_quarter_t what);

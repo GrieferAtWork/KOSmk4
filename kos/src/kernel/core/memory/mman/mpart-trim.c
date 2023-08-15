@@ -29,6 +29,7 @@
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
+#include <kernel/mman/cc.h>
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
@@ -143,15 +144,25 @@ NOTHROW(FCALL mchunk_freeswp)(struct mchunk *__restrict self) {
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mchunkvec_freemem)(struct mchunk *__restrict vec, size_t count) {
+NOTHROW(FCALL mchunkvec_freemem)(struct mchunk *__restrict vec, size_t count,
+                                 struct ccinfo *info) {
 	size_t i;
+	if (info) {
+		for (i = 0; i < count; ++i)
+			ccinfo_account_physpages(info, vec[i].mc_size);
+	}
 	for (i = 0; i < count; ++i)
 		mchunk_freemem(&vec[i]);
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mchunkvec_freeswp)(struct mchunk *__restrict vec, size_t count) {
+NOTHROW(FCALL mchunkvec_freeswp)(struct mchunk *__restrict vec, size_t count,
+                                 struct ccinfo *info) {
 	size_t i;
+	if (info) {
+		for (i = 0; i < count; ++i)
+			ccinfo_account_swappages(info, vec[i].mc_size);
+	}
 	for (i = 0; i < count; ++i)
 		mchunk_freeswp(&vec[i]);
 }
@@ -1107,17 +1118,23 @@ err_nomem_lopart:
 
 /* Detach all futex objects reachable from `self' */
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mfutex_tree_detachall)(struct mfutex *__restrict self) {
+NOTHROW(FCALL mfutex_tree_detachall)(struct mfutex *__restrict self,
+                                     struct ccinfo *info) {
 	struct mfutex *lhs, *rhs;
 again:
 	lhs = self->mfu_mtaent.rb_lhs;
 	rhs = self->mfu_mtaent.rb_rhs;
 	DBG_memset(&self->mfu_mtaent, 0xcc, sizeof(self->mfu_mtaent));
 	awref_clear(&self->mfu_part);
-	weakdecref_unlikely(self);
+	assert(atomic_read(&self->mfu_weakrefcnt) != 0);
+	if (atomic_decfetch(&self->mfu_weakrefcnt) == 0) {
+		if (info)
+			ccinfo_account(info, kmalloc_usable_size(self));
+		mfutex_free(self);
+	}
 	if (lhs) {
 		if (rhs)
-			mfutex_tree_detachall(rhs);
+			mfutex_tree_detachall(rhs, info);
 		self = lhs;
 		goto again;
 	}
@@ -1129,7 +1146,8 @@ again:
 
 /* Set the effective size of `self' to `0', and free all backing storage. */
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mpart_clear)(struct mpart *__restrict self) {
+NOTHROW(FCALL mpart_clear)(struct mpart *__restrict self,
+                           struct ccinfo *info) {
 	struct mpartmeta *meta;
 	if ((meta = self->mp_meta) != NULL) {
 		/* Detach all futex objects by clearing their `mfu_part' pointers. */
@@ -1137,7 +1155,7 @@ NOTHROW(FCALL mpart_clear)(struct mpart *__restrict self) {
 			struct mfutex *tree;
 			tree          = meta->mpm_ftx;
 			meta->mpm_ftx = NULL;
-			mfutex_tree_detachall(tree);
+			mfutex_tree_detachall(tree, info); /* TODO: Track ccinfo */
 		}
 	}
 
@@ -1145,24 +1163,34 @@ NOTHROW(FCALL mpart_clear)(struct mpart *__restrict self) {
 	switch (self->mp_state) {
 
 	case MPART_ST_SWP:
-		if (!(self->mp_flags & MPART_F_NOFREE))
+		if (!(self->mp_flags & MPART_F_NOFREE)) {
+			if (info != NULL)
+				ccinfo_account_swappages(info, self->mp_swp.mc_size);
 			mchunk_freeswp(&self->mp_swp);
+		}
 		break;
 
 	case MPART_ST_MEM:
-		if (!(self->mp_flags & MPART_F_NOFREE))
+		if (!(self->mp_flags & MPART_F_NOFREE)) {
+			if (info != NULL)
+				ccinfo_account_physpages(info, self->mp_mem.mc_size);
 			mchunk_freemem(&self->mp_mem);
+		}
 		break;
 
 	case MPART_ST_SWP_SC:
 		if (!(self->mp_flags & MPART_F_NOFREE))
-			mchunkvec_freeswp(self->mp_swp_sc.ms_v, self->mp_swp_sc.ms_c);
+			mchunkvec_freeswp(self->mp_swp_sc.ms_v, self->mp_swp_sc.ms_c, info);
+		if (info)
+			ccinfo_account(info, kmalloc_usable_size(self->mp_swp_sc.ms_v));
 		kfree(self->mp_swp_sc.ms_v);
 		break;
 
 	case MPART_ST_MEM_SC:
 		if (!(self->mp_flags & MPART_F_NOFREE))
-			mchunkvec_freemem(self->mp_mem_sc.ms_v, self->mp_mem_sc.ms_c);
+			mchunkvec_freemem(self->mp_mem_sc.ms_v, self->mp_mem_sc.ms_c, info);
+		if (info)
+			ccinfo_account(info, kmalloc_usable_size(self->mp_mem_sc.ms_v));
 		kfree(self->mp_mem_sc.ms_v);
 		break;
 
@@ -1172,6 +1200,8 @@ NOTHROW(FCALL mpart_clear)(struct mpart *__restrict self) {
 
 	/* Deallocate a dynamically allocated block-status-bitset. */
 	if (self->mp_blkst_ptr != NULL && !(self->mp_flags & MPART_F_BLKST_INL)) {
+		if (info)
+			ccinfo_account(info, kmalloc_usable_size(self->mp_blkst_ptr));
 		kfree(self->mp_blkst_ptr);
 		self->mp_blkst_ptr = NULL;
 	}
@@ -1179,24 +1209,27 @@ NOTHROW(FCALL mpart_clear)(struct mpart *__restrict self) {
 	/* Change the part into a void-state. */
 	self->mp_state = MPART_ST_VOID;
 
-	/* Set mp_minaddr/mp_maxaddr to indicate an empty part. */
-	self->mp_minaddr = (pos_t)PAGESIZE;
-	self->mp_maxaddr = (pos_t)PAGESIZE - 1;
+	/* NOTE: The part is always anonymous, unless we got here from `mpart_trim_or_unlock_nx()' */
+	if (mpart_isanon(self)) {
+		/* Set mp_minaddr/mp_maxaddr to indicate an empty part. */
+		self->mp_minaddr = (pos_t)PAGESIZE;
+		self->mp_maxaddr = (pos_t)PAGESIZE - 1;
 
-	/* If not already referencing one of the generic anon-files,
-	 * change  the part's  associated file  to one  of them now! */
-	if (!(self->mp_file >= mfile_anon &&
-	      self->mp_file < COMPILER_ENDOF(mfile_anon))) {
-		REF struct mfile *newfile, *oldfile;
-		oldfile       = self->mp_file;
-		newfile       = incref(&mfile_anon[oldfile->mf_blockshift]);
-		self->mp_file = newfile;
-		decref_unlikely(oldfile);
+		/* If not already referencing one of the generic anon-files,
+		 * change  the part's  associated file  to one  of them now! */
+		if (!(self->mp_file >= mfile_anon &&
+		      self->mp_file < COMPILER_ENDOF(mfile_anon))) {
+			REF struct mfile *newfile, *oldfile;
+			oldfile       = self->mp_file;
+			newfile       = incref(&mfile_anon[oldfile->mf_blockshift]);
+			self->mp_file = newfile;
+			decref_unlikely(oldfile);
+		}
+
+		/* Clear the `MPART_F_GLOBAL_REF' bit. */
+		if (atomic_fetchand(&self->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
+			decref_nokill(self);
 	}
-
-	/* Clear the `MPART_F_GLOBAL_REF' bit. */
-	if (atomic_fetchand(&self->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
-		decref_nokill(self);
 }
 
 
@@ -1252,7 +1285,7 @@ again_enum_nodes:
 
 	if unlikely(!node) {
 		/* This can happen if _all_ nodes have the UNMAPPED flag set! */
-		mpart_clear(self);
+		mpart_clear(self, NULL);
 		return MPART_TRIM_STATUS_SUCCESS;
 	}
 
@@ -1512,7 +1545,7 @@ NOTHROW(FCALL mpart_trim_locked_ftx)(struct mpart *__restrict self) {
 	 * mapped by mem-nodes of `self' is empty, meaning that we can clear  the
 	 * mem-part in its entirety! */
 	if unlikely(!mpart_foreach_mmans_incref(self)) {
-		mpart_clear(self);
+		mpart_clear(self, NULL);
 		goto trim_completed;
 	}
 
@@ -1596,16 +1629,27 @@ NOTHROW(FCALL mpart_trim_locked)(struct mpart *__restrict self) {
 	if unlikely(!mpart_maytrim(self))
 		return;
 
+	/* If some blocks are currently being initialized, then the
+	 * trim must happen  *after* that  operation has  finished. */
+	if unlikely(mpart_hasblocksstate_init(self)) {
+		/* Wait for INIT-blocks to go away, and _then_ re-attempt the trim! */
+		atomic_or(&self->mp_xflags, MPART_XF_TRIM_AFTER_INIT);
+		if likely(mpart_hasblocksstate_init(self))
+			return;
+		atomic_and(&self->mp_xflags, ~MPART_XF_TRIM_AFTER_INIT);
+	}
+
 	/* If necessary, acquire yet another lock to the meta-data controller of `self' */
 	if likely((meta = self->mp_meta) == NULL) {
 		mpart_trim_locked_ftx(self);
 	} else {
-		if (meta->mpm_dmalocks != 0) {
+		if (atomic_read(&meta->mpm_dmalocks) != 0) {
 			/* Wait for DMA-locks to go away, and _then_ re-attempt the trim! */
 			atomic_or(&self->mp_xflags, MPART_XF_TRIM_AFTER_DMA);
 			COMPILER_READ_BARRIER();
-			if (meta->mpm_dmalocks != 0)
+			if (atomic_read(&meta->mpm_dmalocks) != 0)
 				return;
+			atomic_and(&self->mp_xflags, ~MPART_XF_TRIM_AFTER_DMA);
 		}
 		if (mpartmeta_ftxlock_trywrite(meta)) {
 			mpart_trim_locked_ftx(self);
@@ -1666,6 +1710,7 @@ NOTHROW(FCALL mpart_trim_mmplop)(Tobpostlockop(mman) *__restrict _lop,
 		SLIST_ATOMIC_INSERT(&self->mp_lockops, &self->_mp_trmlop_mp, olo_link);
 		_mpart_lockops_reap(self);
 	}
+
 	/* Drop the reference to the part.
 	 * Note that this may result in the part dying, since
 	 * we get here via an mman-lock, as opposed to a lock
@@ -1708,7 +1753,19 @@ NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self)
 	if (atomic_cmpxch(&self->mp_refcnt, 1, 0))
 		goto do_destroy;
 
-	/* Check for special case: the part isn't anonymous. */
+	/* Check for special case: the part isn't anonymous.
+	 *
+	 * The reason why we can only do this for non-anonymous parts is three-fold:
+	 * 1: The `_mp_trmlop_mp' field overlaps with `mp_filent' (which is needed for non-anonymous parts)
+	 * 2: Unloading file caches because they're not mmap'd is inefficient so-long as we still have enough
+	 *    available  physical memory (so it's better to use that memory to cache data that's already been
+	 *    loaded from disk, than to free such memory as soon as possible).
+	 * 3: `system_cc()' (which gets called when we're low on memory) uses `mpart_trim_or_unlock()', which
+	 *    *is* able to trim non-anonymous parts (using `mpart_trim_or_unlock_nx()'), so it isn't affected
+	 *    by this restriction.
+	 *
+	 * Also: This prevents parts of `MFILE_F_PERSISTENT' files from being deleted (since
+	 *       those kinds  of files  (i.e. ramfs)  aren't anonymous  until  `unlink(2)'d) */
 	if (!mpart_isanon_atomic(self))
 		goto do_normal_decref;
 
@@ -1760,12 +1817,247 @@ do_destroy:
 	mpart_destroy(self);
 }
 
+
+#include <kernel/printk.h>
+
+
+/* Same as `mpart_trim_or_unlock()', but all relevant locks are held by the caller. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(FCALL mpart_trim_locked_with_all_locks_or_unlock)(struct mpart *__restrict self,
+                                                          struct mpart_trim_data *__restrict data,
+                                                          struct unlockinfo *unlock) {
+#define LOCAL_unlock_all()                                                   \
+	(!self->mp_meta || (mpartmeta_ftxlock_endwrite(self->mp_meta, self), 1), \
+	 mpart_isanon(self) || (mfile_lock_endwrite(self->mp_file), 1),          \
+	 mpart_unlock_all_mmans(self),                                           \
+	 _mpart_lock_release(self),                                              \
+	 unlockinfo_xunlock(unlock),                                             \
+	 mpart_lockops_reap(self))
+	unsigned int result = MPART_NXOP_ST_SUCCESS;
+
+	/* Since this isn't normally a  requirement,
+	 * make sure that mem-node lists are sorted. */
+	mnode_list_sort_by_partoff(&self->mp_share);
+	mnode_list_sort_by_partoff(&self->mp_copy);
+
+	printk(KERN_DEBUG "TODO: mpart_trim_locked_with_all_locks_or_unlock(%p: %#I64x - %#I64x)\n",
+	       self->mp_file, self->mp_minaddr, self->mp_maxaddr);
+	/* TODO: enumerate ranges that should be trimmed based on `data->mtd_mode' */
+	(void)self;
+	(void)data;
+	(void)unlock;
+
+#undef LOCAL_unlock_all
+	return result;
+}
+
+/* Same as `mpart_trim_or_unlock()', but the caller is holding a lock
+ * to `self->mp_meta' (if non-NULL) and `self->mp_file' (if not anon) */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(FCALL mpart_trim_locked_ftx_file_or_unlock)(struct mpart *__restrict self,
+                                                    struct mpart_trim_data *__restrict data,
+                                                    struct unlockinfo *unlock) {
+#define LOCAL_unlock_all()                                                   \
+	(!self->mp_meta || (mpartmeta_ftxlock_endwrite(self->mp_meta, self), 1), \
+	 mpart_isanon(self) || (mfile_lock_endwrite(self->mp_file), 1),          \
+	 _mpart_lock_release(self),                                              \
+	 unlockinfo_xunlock(unlock),                                             \
+	 mpart_lockops_reap(self))
+	unsigned int result = MPART_NXOP_ST_SUCCESS;
+
+	/* Try to incref() all alive mmans, thus keeping them alive and allowing
+	 * us  to try to acquire locks to each of them, without some (or all) of
+	 * them suddenly being destroyed while we're still busy.
+	 *
+	 * If we don't find any alive mmans, then we know that the effective area
+	 * mapped by mem-nodes of `self' is empty, meaning that we can clear  the
+	 * mem-part in its entirety! */
+	if unlikely(!mpart_foreach_mmans_incref(self)) {
+		mpart_clear(self, data->mtd_ccinfo);
+		goto done;
+	}
+
+	/* Try to acquire locks to  all of the mmans  that are mapping this  part.
+	 * This is needed so we can get piece together a consistent (non-volatile)
+	 * view of all of the regions of `self' that are actually used. */
+	{
+		struct mman *blocking_mm;
+		blocking_mm = mpart_lock_all_mmans(self);
+		if unlikely(blocking_mm) {
+			incref(blocking_mm);
+			mpart_decref_all_mmans(self);
+			if (ccinfo_noblock(data->mtd_ccinfo)) {
+				decref_unlikely(blocking_mm);
+				goto done;
+			}
+			LOCAL_unlock_all();
+
+			/* Wait for `blocking_mm' to become available. */
+			result = MPART_NXOP_ST_RETRY;
+			if (!mman_lock_waitfor_nx(blocking_mm))
+				result = MPART_NXOP_ST_ERROR;
+			decref_unlikely(blocking_mm);
+			goto done;
+		}
+	}
+
+	/* Continue the trim operation now that we're holding  locks
+	 * to the part itself, as well as all of the relevant mmans. */
+	result = mpart_trim_locked_with_all_locks_or_unlock(self, data, unlock);
+
+	/* Release locks & references acquired above. */
+	if (result == MPART_NXOP_ST_SUCCESS)
+		mpart_unlock_all_mmans(self);
+	mpart_decref_all_mmans(self);
+#undef LOCAL_unlock_all
+done:
+	return result;
+}
+
+/* Same as `mpart_trim_or_unlock()', but the caller is holding a lock to `self->mp_meta' (if non-NULL) */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(FCALL mpart_trim_locked_ftx_or_unlock)(struct mpart *__restrict self,
+                                               struct mpart_trim_data *__restrict data,
+                                               struct unlockinfo *unlock) {
+#define LOCAL_unlock_all()                                                   \
+	(!self->mp_meta || (mpartmeta_ftxlock_endwrite(self->mp_meta, self), 1), \
+	 _mpart_lock_release(self),                                              \
+	 unlockinfo_xunlock(unlock),                                             \
+	 mpart_lockops_reap(self))
+	unsigned int result = MPART_NXOP_ST_SUCCESS;
+
+	/* Lock the part's file (if needed) */
+	if (mpart_isanon(self)) {
+		result = mpart_trim_locked_ftx_file_or_unlock(self, data, unlock);
+	} else {
+		struct mfile *file = self->mp_file;
+		if (!mfile_lock_trywrite(file)) {
+			if (ccinfo_noblock(data->mtd_ccinfo))
+				goto done;
+			incref(file);
+			LOCAL_unlock_all();
+			result = MPART_NXOP_ST_RETRY;
+			if (!mfile_lock_waitwrite_nx(file))
+				result = MPART_NXOP_ST_ERROR;
+			decref(file);
+			return result;
+		}
+		result = mpart_trim_locked_ftx_file_or_unlock(self, data, unlock);
+		if (result == MPART_NXOP_ST_SUCCESS)
+			mfile_lock_endwrite(file);
+	}
+#undef LOCAL_unlock_all
+done:
+	return result;
+}
+
+/* Synchronous version of `mpart_trim()' (that is also able to trim non-anonymous parts)
+ * This function is specifically designed to-be used by `system_cc()' (in case you  were
+ * wondering about the meaning of `data->mtd_ccinfo')
+ * NOTE: The caller must be holding a lock to `self' when calling this function.
+ * NOTE: This  function operates with respect to `ccinfo_noblock(data->mtd_ccinfo)',
+ *       in that it will operate as a  no-op whenever something comes up that  would
+ *       need to block, in which case `MPART_NXOP_ST_SUCCESS' is returned (emulating
+ *       the behavior when  `self' was  trimmed, or  nothing about  `self' could  be
+ *       trimmed)
+ * @param: data: [in|out] Storage  area for dynamically allocated memory. Note that
+ *                        unlike usually, this  data-area does  NOT become  invalid
+ *                        when this function succeeds. Even  more so, it may  still
+ *                        contain dynamically allocated memory that can be used for
+ *                        further trim operations!
+ * @return: MPART_NXOP_ST_SUCCESS: Success (all locks were kept)
+ * @return: MPART_NXOP_ST_RETRY:   Failed (`unlock' and `mpart_lock_release(self)' was released)
+ * @return: MPART_NXOP_ST_ERROR:   Non-recoverable error (OOM or yield-failure). Don't try again. */
+PUBLIC NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2, 3)) unsigned int
+NOTHROW(FCALL mpart_trim_or_unlock_nx)(struct mpart *__restrict self,
+                                       struct mpart_trim_data *__restrict data,
+                                       struct unlockinfo *unlock) {
+	unsigned int result = MPART_NXOP_ST_SUCCESS;
+	struct mpartmeta *meta;
+	assert(mpart_lock_acquired(self));
+
+	/* Quick check: are we allowed to trim this part? */
+	if unlikely(!mpart_maytrim(self))
+		goto done;
+
+	/* Make sure that no blocks of `self' is currently being initialized. */
+	if unlikely(mpart_hasblocksstate_init(self)) {
+		if (ccinfo_noblock(data->mtd_ccinfo))
+			goto done;
+		result = mpart_initdone_or_unlock_nx(self, unlock);
+		if (result != MPART_NXOP_ST_SUCCESS)
+			goto done;
+	}
+
+	/* Make sure that no DMA operations are in progress for `self' */
+	if unlikely(!mpart_is_nodma(self)) {
+		if (ccinfo_noblock(data->mtd_ccinfo))
+			goto done;
+		result = mpart_nodma_or_unlock_nx(self, unlock);
+		if (result != MPART_NXOP_ST_SUCCESS)
+			goto done;
+	}
+
+	/* Lock the meta-controller (if present) */
+	if ((meta = self->mp_meta) == NULL) {
+		result = mpart_trim_locked_ftx_or_unlock(self, data, unlock);
+	} else {
+		if (!mpartmeta_ftxlock_trywrite(meta)) {
+			if (ccinfo_noblock(data->mtd_ccinfo))
+				goto done;
+			_mpart_lock_release(self);
+			unlockinfo_xunlock(unlock);
+			mpart_lockops_reap(self);
+			result = MPART_NXOP_ST_RETRY;
+			if unlikely(!mpartmeta_ftxlock_waitwrite_nx(meta))
+				result = MPART_NXOP_ST_ERROR;
+			goto done;
+		}
+		result = mpart_trim_locked_ftx_or_unlock(self, data, unlock);
+		if (result == MPART_NXOP_ST_SUCCESS)
+			mpartmeta_ftxlock_endwrite(meta, self);
+	}
+done:
+	mpart_assert_integrity(self);
+	return result;
+}
+
+
 #else /* CONFIG_HAVE_KERNEL_MPART_TRIM */
 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self) {
 	/* Trimming is disabled. */
 	decref(self);
+}
+
+/* Synchronous version of `mpart_trim()' (that is also able to trim non-anonymous parts)
+ * This function is specifically designed to-be used by `system_cc()' (in case you  were
+ * wondering about the meaning of `data->mtd_ccinfo')
+ * NOTE: The caller must be holding a lock to `self' when calling this function.
+ * NOTE: This  function operates with respect to `ccinfo_noblock(data->mtd_ccinfo)',
+ *       in that it will operate as a  no-op whenever something comes up that  would
+ *       need to block, in which case `MPART_NXOP_ST_SUCCESS' is returned (emulating
+ *       the behavior when  `self' was  trimmed, or  nothing about  `self' could  be
+ *       trimmed)
+ * @param: data: [in|out] Storage  area for dynamically allocated memory. Note that
+ *                        unlike usually, this  data-area does  NOT become  invalid
+ *                        when this function succeeds. Even  more so, it may  still
+ *                        contain dynamically allocated memory that can be used for
+ *                        further trim operations!
+ * @return: MPART_NXOP_ST_SUCCESS: Success (all locks were kept)
+ * @return: MPART_NXOP_ST_RETRY:   Failed (`unlock' and `mpart_lock_release(self)' was released)
+ * @return: MPART_NXOP_ST_ERROR:   Non-recoverable error (OOM or yield-failure). Don't try again. */
+PUBLIC NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2, 3)) unsigned int
+NOTHROW(FCALL mpart_trim_or_unlock_nx)(struct mpart *__restrict self,
+                                       struct mpart_trim_data *__restrict data,
+                                       struct unlockinfo *unlock) {
+	/* Trimming is disabled. */
+	COMPILER_IMPURE();
+	(void)self;
+	(void)data;
+	(void)unlock;
+	return MPART_TRIM_OR_UNLOCK_ST_SUCCESS;
 }
 
 #endif /* !CONFIG_HAVE_KERNEL_MPART_TRIM */

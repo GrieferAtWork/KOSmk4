@@ -755,6 +755,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 			mpart_setblockstate(self, i, MPART_BLOCK_ST_NDEF);
 		mfile_trunclock_dec_nosignal(file);
 		sig_broadcast(&file->mf_initdone);
+		mpart_setblockstate_initdone_extrahooks(self);
 		decref_unlikely(file);
 		RETHROW();
 	}
@@ -767,6 +768,7 @@ initdone:
 	/* Broadcast that init has finished. */
 	mfile_trunclock_dec_nosignal(file);
 	sig_broadcast(&file->mf_initdone);
+	mpart_setblockstate_initdone_extrahooks(self);
 
 	decref_unlikely(file);
 }

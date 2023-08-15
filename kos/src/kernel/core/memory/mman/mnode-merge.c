@@ -91,9 +91,12 @@ DECL_BEGIN
 
 
 /* Returns `true' if `self' doesn't have any active DMA  locks.
- * Otherwise, return `false' and set `MPART_XF_MERGE_AFTER_DMA' */
+ * Otherwise, return `false' and set `MPART_XF_MERGE_AFTER_DMA'
+ *
+ * The same also goes for `MPART_BLOCK_ST_INIT'. */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) bool
-NOTHROW(FCALL mpart_canmerge_chkdma)(struct mpart *__restrict self) {
+NOTHROW(FCALL mpart_canmerge_chkdma)(struct mpart *__restrict self,
+                                     bool locks_held) {
 	struct mpartmeta *meta;
 	if ((meta = self->mp_meta) != NULL && atomic_read(&meta->mpm_dmalocks) != 0) {
 		atomic_or(&self->mp_xflags, MPART_XF_MERGE_AFTER_DMA);
@@ -101,6 +104,27 @@ NOTHROW(FCALL mpart_canmerge_chkdma)(struct mpart *__restrict self) {
 			return false;
 		atomic_and(&self->mp_xflags, ~MPART_XF_MERGE_AFTER_DMA);
 	}
+	if (atomic_read(&self->mp_flags) & MPART_F_MAYBE_BLK_INIT) {
+		bool hasinit;
+		if (!locks_held) {
+			if (!mpart_lock_tryacquire(self))
+				goto done_maybe_blk_init;
+		}
+		hasinit = mpart_hasblocksstate_init(self);
+		if (hasinit) {
+			/* Set the merge-after-init flag, then check again. */
+			atomic_or(&self->mp_xflags, MPART_XF_MERGE_AFTER_INIT);
+			hasinit = mpart_hasblocksstate_init(self);
+			if (!hasinit)
+				atomic_and(&self->mp_xflags, ~MPART_XF_MERGE_AFTER_INIT);
+		}
+		if (!locks_held)
+			mpart_lock_release(self);
+		if (hasinit)
+			return false;
+	}
+done_maybe_blk_init:
+
 	return true;
 }
 
@@ -192,9 +216,9 @@ NOTHROW(FCALL mnode_canmerge)(struct mnode *lonode,
 			 * has DMA-locks allocated. If this  is the case, then we  must
 			 * set  the MERGE_AFTER_DMA flag  in order to  get the owner of
 			 * the DMA-locks to re-attempt the merge once they're all gone. */
-			if (!mpart_canmerge_chkdma(lopart))
+			if (!mpart_canmerge_chkdma(lopart, false))
 				goto nope;
-			if (!mpart_canmerge_chkdma(hipart))
+			if (!mpart_canmerge_chkdma(hipart, false))
 				goto nope;
 		}
 	}
@@ -204,20 +228,24 @@ nope:
 }
 
 
-/* Check if 2 given (adjacent) parts might potentially be mergeable. */
+/* Check if 2 given (adjacent) parts might potentially be mergeable.
+ * @param: locks_held: True if locks to `lopart' and `hipart' are held.
+ *                     Note  that unless this  argument is `true', this
+ *                     function may give false positives! */
 PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) bool
 NOTHROW(FCALL mpart_canmerge)(struct mpart *lopart,
-                              struct mpart *hipart) {
+                              struct mpart *hipart,
+                              bool locks_held) {
 	/* Check if the 2 parts reference the same file. */
 	if (atomic_read(&lopart->mp_file) != atomic_read(&hipart->mp_file))
 		goto nope;
 
 	/* Check if the 2 parts are continuous. */
-	if (mpart_isanon(lopart)) {
-		if (!mpart_isanon(hipart))
+	if (mpart_isanon_atomic(lopart)) {
+		if (!mpart_isanon_atomic(hipart))
 			goto nope;
 	} else {
-		if (mpart_isanon(hipart))
+		if (mpart_isanon_atomic(hipart))
 			goto nope;
 		/* In-file positions only matter for non-anonymous parts. */
 		if (lopart->mp_maxaddr + 1 != hipart->mp_minaddr)
@@ -245,9 +273,9 @@ NOTHROW(FCALL mpart_canmerge)(struct mpart *lopart,
 	 * has DMA-locks allocated. If this  is the case, then we  must
 	 * set  the MERGE_AFTER_DMA flag  in order to  get the owner of
 	 * the DMA-locks to re-attempt the merge once they're all gone. */
-	if (!mpart_canmerge_chkdma(lopart))
+	if (!mpart_canmerge_chkdma(lopart, locks_held))
 		goto nope;
-	if (!mpart_canmerge_chkdma(hipart))
+	if (!mpart_canmerge_chkdma(hipart, locks_held))
 		goto nope;
 
 	/* The combined size of the 2 parts (as would be the result if
@@ -648,7 +676,7 @@ merge_identical_parts:
 	}
 
 	/* Re-check if it's possible to merge the 2 parts in question. */
-	if (!mpart_canmerge(lonode->mn_part, hinode->mn_part)) {
+	if (!mpart_canmerge(lonode->mn_part, hinode->mn_part, true)) {
 		mpart_lock_release(other_part);
 		return MNODE_MERGE_CANNOT_MERGE;
 	}
@@ -1852,7 +1880,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks_noftx)(/*inherit(on_success)*/ REF st
 	}
 
 	/* With all of the locks now held, check one more time if merging is possible. */
-	if unlikely(!mpart_canmerge(lopart, hipart)) {
+	if unlikely(!mpart_canmerge(lopart, hipart, true)) {
 		result = MPART_MERGE_CANNOT_MERGE;
 	} else {
 		/* Do the actual work of merging the 2 parts. */
@@ -2283,7 +2311,7 @@ NOTHROW(FCALL mpart_merge_locked)(REF struct mpart *__restrict self) {
 
 		/* Search for adjacent mem-parts. */
 		if ((neighbor = mpart_tree_prevnode(self)) != NULL && tryincref(neighbor)) {
-			if (!mpart_canmerge(neighbor, self)) {
+			if (!mpart_canmerge(neighbor, self, false)) {
 				/* Cannot merge... */
 				decref_unlikely(neighbor);
 			} else if (!mpart_lock_tryacquire(neighbor)) {
@@ -2320,7 +2348,7 @@ NOTHROW(FCALL mpart_merge_locked)(REF struct mpart *__restrict self) {
 		}
 
 		if ((neighbor = mpart_tree_nextnode(self)) != NULL && tryincref(neighbor)) {
-			if (!mpart_canmerge(self, neighbor)) {
+			if (!mpart_canmerge(self, neighbor, false)) {
 				/* Cannot merge... */
 				decref_unlikely(neighbor);
 			} else if (!mpart_lock_tryacquire(neighbor)) {

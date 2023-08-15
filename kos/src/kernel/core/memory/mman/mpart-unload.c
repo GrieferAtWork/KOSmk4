@@ -57,159 +57,6 @@ DECL_BEGIN
 #endif /* !BADPOINTER */
 
 
-/* TODO: Mem-parts need to have a mechanism that will
- *       asynchronously write changed blocks to  disk
- * - This would  essentially be  a  slightly modified,  and  async
- *   version of `mpart_lock_acquire_and_setcore_denywrite_nodma').
- * - Following the completion of the sync, check if the part has 1-2 reference
- *   left (+1: current-working-reference, +1: if `MPART_F_GLOBAL_REF' is set).
- *   Note  the check order  here which must interlock  with the invariant that
- *   `MPART_F_GLOBAL_REF' can only ever be cleared once!
- * - If `MPART_F_GLOBAL_REF' is set, check if the associated file is MFILE_F_PERSISTENT for being set.
- * - If so, goto `cleanup'. Else, acquire a lock to the file (if not anon)
- *   and the global parts list.
- * - If afterwards the reference counter is still 2 and no unsynced changes exist,
- *   we know that  nothing else  is using  the part and  we can  proceed to  clear
- *   `MPART_F_GLOBAL_REF', drop the inherited reference,  unlock the file and  the
- *   global list, and finally  drop the working reference  which will then end  up
- *   destroying the part. (The file and global  list locks are needed to keep  the
- *   part invisible while we're check if it's invisible. - Without it, we couldn't
- *   ensure that the part  does not randomly  become used by  some other piece  of
- *   code)
- * - When `MPART_F_GLOBAL_REF' wasn't set, simply drop the working reference  (which
- *   should also cause the part to be destroyed). When the part doesn't end up being
- *   destroyed, it may be a good idea to pass it along to `mpart_merge()'...
- * cleanup:
- * - Check if `MPART_F_NOFREE' is set, and if so: return and do nothing
- * - Check if it's possible to change the part's state to `MPART_ST_VOID', which can
- *   be done if there no unsynced changes (changes may still exist if the associated
- *   file doesn't support `mo_saveblocks').
- * - If the state can be set to `MPART_ST_VOID', make the change before also clearing
- *   `MPART_F_BLKST_INL', and dealloc  `mp_blkst_ptr' (if  appropriate), and  setting
- *   `mp_blkst_ptr = NULL'.
- * - If the state cannot be set to `MPART_ST_VOID', consider offloading the part into
- *   swap  memory (for this purpose there should be  a flag that gets set by the orig
- *   call to `mpart_unload()', which takes a flags argument of actions to perform for
- *   the purpose of unloading)
- *
- * Once implemented, this will form the basis of unloading unused file data
- * as  the result of wanting to free up memory after `system_clearcache()',
- * or as the result of a failed allocation:
- *  - Writing changed file contents to disk
- *  - Swap off-loading changed blocks of anonymous files, or files that don't
- *    support a write-back operator
- *  - Unloading file data that was accessed, but is no longer being used
- *
- * This mechanism is needed for:
- *  - Memory-unload-for-cache-clearing (including the automatic write-back
- *    of any remaining unwritten changes)
- *  - The implementation of `flatdirnode_anon_parts_after()' which needs
- *    a way to get rid of mem-parts which were originally allocated  for
- *    memory beyond the (then-lowered) end of the directory stream.  (In
- *    this case, larger gaps within the directory stream would be gotten
- *    rid of automatically during cache clear operations)
- *    For this case,  there would also  need to  be a version  of the  unload
- *    function: `mfile_unload(struct mfile *self, pos_t start, pos_t count)',
- *    that also exists as a variant where all parts that can result in errors
- *    being  thrown synchronously getting  preallocated beforehand (since the
- *    full unload path may include the creation of an async worker)
- *
- * All  of this functionality needs to be implemented by a new
- * function, which will do all of this via asynchronous means:
- * >> FUNDEF NOBLOCK NONNULL((1)) void
- * >> NOTHROW(FCALL mpart_unload)(struct mpart *__restrict self);
- *
- * When the file backing `self' doesn't have an `mo_saveblocks' operator,
- * then  this function should  also be able to  off-load parts into swap.
- *
- * As far as semantics go, `mpart_unload()' should be called in any case
- * where some mem-part is known to  no longer be needed, representing  a
- * hint to unload  it (and _only_  a hint; this  function will never  do
- * anything that could result in the part's backing data becoming lost).
- *
- * Since this operation needs to be asynchronous, it could be implemented
- * by use of async jobs.
- *
- * NOTE: As far as the implementation goes, it might be suitable to define
- *       a global async worker who's sole purpose is to reap a global list
- *       of mem-parts that are  supposed to be unloaded.  `mpart_unload()'
- *       is then implemented by atomic_fetchor-setting a flag to  indicate
- *       that the part was added to said list, before SLIST_ATOMIC_INSERT-
- *       ing the part into said list  (the list also inherits a  reference
- *       to the part during this process).
- *       To work around the problem that mpart doesn't contain any
- *       free fields in  this scenario, we  can do the  following:
- *        - If the part is apart of `mpart_all_list', simply set a global
- *          flag  that tells the async worker for mpart unloading to scan
- *          the global list  of mem-parts for  any featuring the  should-
- *          unload flag.
- *        - If the part isn't apart of `mpart_all_list', add it to the
- *          list before doing the same  as the previous case (XXX:  is
- *          there any reason why some  part shouldn't be added to  the
- *          global list? I can only imagine that it might be important
- *          to document that  `mpart_unload()' may add  a part to  the
- *          global list if it's not already apart of it)
- *          XXX: Is this really a good  idea? I know that the  mpart_merge
- *               system also does this, but it doing so I also find to  be
- *               a  very bad idea that should probably be revisited in the
- *               future, simply because it doesn't scale at all when there
- *               are thousands of mpart-s in the global list...
- *          See the TODO below, which suggests adding a new pointer to
- *          mpart for the purpose of chaining parts which are supposed
- *          to be unloaded.
- *
- * There  also needs to be a synchronous variant of `mpart_unload()' that
- * can be called from `system_clearcache()' and returns information about
- * how  much memory became free as a result. This version can also be the
- * one that is used to implement the async-job variant! */
-
-
-
-/* Try to (asynchronously) sync unwritten data of `self' before unload `self' from memory.
- * Note that contrary to its name, this function will never unload memory that is actually
- * still in use, or in a  way by which said memory  cannot be recovered (by re-loading  it
- * from swap). Instead, this function only tries  to unload pre-loaded file data, as  well
- * write-back changed file data to  disk so-as to make  it possible to essentially  change
- * the state of `self' to `MPART_ST_VOID' (or simply destroy `self' all-together).
- * @param: self:  The mem-part which should be unloaded. */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mpart_unload)(/*inherit(always)*/ REF struct mpart *__restrict self) {
-	/* TODO: Try to do the unload synchronously before falling back to an async worker! */
-	mpart_start_asyncjob(self, MPART_XF_WILLUNLOAD);
-}
-
-
-/* Synchronous version of `mpart_unload()'. Upon entry, the caller must be holding a lock
- * to `self' and `unlock'. The lock to  `self' is unconditionally released, but the  lock
- * to `unlock' is  only released when  `false' is  returned, or an  exception is  thrown.
- * Locking logic:
- *  - return != MPART_UNLOADNOW_ST_RETRY:
- *    - !mpart_lock_acquired(self);
- *    - decref(self);
- *  - return == MPART_UNLOADNOW_ST_RETRY:
- *    - !mpart_lock_acquired(self);
- *    - unlockinfo_xunlock(unlock);
- *  - EXCEPT:
- *    - !mpart_lock_acquired(self);
- *    - unlockinfo_xunlock(unlock);
- * @param: flags: Set of `MPART_UNLOADNOW_F_*'
- * @param: self:  The mem-part which should be unloaded. */
-PUBLIC BLOCKING NONNULL((1)) unsigned int FCALL
-mpart_unloadnow_or_unlock(/*inherit(on_success)*/ REF struct mpart *__restrict self,
-                          unsigned int flags, struct unlockinfo *unlock)
-		THROWS(E_WOULDBLOCK, ...) {
-	assert(mpart_lock_acquired(self));
-	/* TODO: Do the unload synchronously. - When blocking becomes necessary,  release
-	 *       locks, do the blocking operation, and return `MPART_UNLOADNOW_ST_RETRY'. */
-	(void)flags;
-	(void)unlock;
-
-	mpart_lock_release(self);
-	decref(self);
-	return MPART_UNLOADNOW_ST_INUSE;
-}
-
-
 
 struct mpart_ajob {
 	struct async      mpaj_async; /* Underlying async controller. */
@@ -251,7 +98,7 @@ NOTHROW(FCALL mpart_ajob_v_test)(struct async *__restrict self) {
 
 
 #define MPART_XF_WILLMASK \
-	(MPART_XF_WILLMERGE | MPART_XF_WILLTRIM | MPART_XF_WILLUNLOAD)
+	(MPART_XF_WILLMERGE | MPART_XF_WILLTRIM)
 
 PRIVATE WUNUSED NONNULL((1)) unsigned int
 NOTHROW(FCALL mpart_ajob_v_work)(struct async *__restrict self) {
@@ -286,11 +133,6 @@ again:
 		 * fiddle  with its `MPART_XF_INJOBLIST'  flag (which most likely
 		 * isn't even set, either) */
 		decref(mpart_merge(incref(part)));
-	}
-
-	if (part->mp_xflags & MPART_XF_WILLUNLOAD) {
-		atomic_and(&part->mp_xflags, ~MPART_XF_WILLUNLOAD);
-		/* TODO */
 	}
 
 	if (part->mp_xflags & MPART_XF_WILLTRIM) {
@@ -357,15 +199,14 @@ SLIST_HEAD_INITIALIZER(mpart_ajob_fallback_list);
  * When multiple operations are scheduled at the same time, they will be  performed
  * in the following order:
  *  - MPART_XF_WILLMERGE:  `mpart_merge()'
- *  - MPART_XF_WILLUNLOAD: `mpart_unload()'
  *  - MPART_XF_WILLTRIM:   `mpart_trim()'
- * @param: what: Set of `MPART_XF_WILLMERGE | MPART_XF_WILLTRIM | MPART_XF_WILLUNLOAD' */
+ * @param: what: Set of `MPART_XF_WILLMERGE | MPART_XF_WILLTRIM' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_start_asyncjob)(/*inherit(always)*/ REF struct mpart *__restrict self,
                                     uintptr_quarter_t what) {
 	uintptr_quarter_t old_flags;
-	assert((what & ~(MPART_XF_WILLMERGE | MPART_XF_WILLTRIM | MPART_XF_WILLUNLOAD)) == 0);
-	assert((what & (MPART_XF_WILLMERGE | MPART_XF_WILLTRIM | MPART_XF_WILLUNLOAD)) != 0);
+	assert((what & ~(MPART_XF_WILLMERGE | MPART_XF_WILLTRIM)) == 0);
+	assert((what & (MPART_XF_WILLMERGE | MPART_XF_WILLTRIM)) != 0);
 	old_flags = atomic_fetchor(&self->mp_xflags, what | MPART_XF_INJOBLIST);
 	if (!(old_flags & MPART_XF_INJOBLIST)) {
 		/* It  falls on us to either allocate an async job to do the work,

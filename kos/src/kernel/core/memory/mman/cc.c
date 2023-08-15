@@ -55,6 +55,7 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <kernel/mman/execinfo.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/pipe.h>
+#include <misc/unlockinfo.h>
 #include <sched/enum.h>
 #include <sched/epoll.h>
 #include <sched/pid.h>
@@ -971,9 +972,17 @@ NOTHROW(KCALL system_cc_heaps)(struct ccinfo *__restrict info) {
 /* FILE/FILESYSTEM CACHES (including preloaded file data!)              */
 /************************************************************************/
 
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(FCALL ccinfo_accunt_mpart)(struct ccinfo *__restrict info,
+                                   struct mpart *__restrict part) {
+	/* TODO: Account for physical/swap space owned by `part' */
+	(void)part;
+	ccinfo_account(info, sizeof(struct mpart));
+}
+
 /* Clear unreferenced (cached) mem-parts from the global part list. */
 PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
-NOTHROW(KCALL system_cc_allparts_unload)(struct ccinfo *__restrict info) {
+NOTHROW(KCALL system_cc_allparts_unload_unused)(struct ccinfo *__restrict info) {
 	struct mpart *iter;
 	struct mpart_slist deadlist;
 	SLIST_INIT(&deadlist);
@@ -998,12 +1007,14 @@ again:
 		/* Try to unload this mem-part. */
 		if (!mpart_lock_tryacquire(iter)) {
 			bool waitfor_ok;
+			if (ccinfo_noblock(info))
+				continue;
 			if (!tryincref(iter))
 				continue;
 			mpart_all_release();
 			waitfor_ok = mpart_lock_waitfor_nx(iter);
 			if (atomic_decfetch(&iter->mp_refcnt) == 0) {
-				ccinfo_account(info, sizeof(struct mpart));
+				ccinfo_accunt_mpart(info, iter);
 				SLIST_INSERT(&deadlist, iter, _mp_dead);
 			}
 			if (!waitfor_ok)
@@ -1016,9 +1027,6 @@ again:
 		/* Only unload parts of non-persistent files. */
 		if (iter->mp_file->mf_flags & MFILE_F_PERSISTENT)
 			goto part_not_unloaded;
-
-		/* TODO: Trim unmapped sub-regions of mem-parts, similar to `mpart_trim()', only that we should
-		 *       also  do so for  non-anonymous mem-parts (but only  if `MFILE_F_PERSISTENT' isn't set) */
 
 		if (!(atomic_fetchand(&iter->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)) /* Inherit reference */
 			goto part_not_unloaded;
@@ -1036,7 +1044,7 @@ again:
 		/* Part got destroyed! */
 		assert(!(atomic_read(&iter->mp_flags) & MPART_F_GLOBAL_REF));
 		SLIST_INSERT(&deadlist, iter, _mp_dead);
-		ccinfo_account(info, sizeof(struct mpart));
+		ccinfo_accunt_mpart(info, iter);
 		if (ccinfo_isdone(info))
 			break;
 		continue;
@@ -1055,6 +1063,88 @@ done:
 	}
 }
 
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL unlock_mpart_all)(struct unlockinfo *__restrict self) {
+	(void)self;
+	mpart_all_release();
+}
+
+/* Trim unmapped parts of (cached) mem-parts from the global part list. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+NOTHROW(KCALL system_cc_allparts_trim_unused)(struct ccinfo *__restrict info,
+                                              unsigned int trim_mode) {
+	struct mpart *iter;
+	struct mpart_slist deadlist;
+	struct mpart_trim_data data;
+	struct unlockinfo unlock;
+	SLIST_INIT(&deadlist);
+	mpart_trim_data_init(&data, info, trim_mode);
+	unlock.ui_unlock = &unlock_mpart_all;
+again:
+	if (!mpart_all_tryacquire()) {
+		if (ccinfo_noblock(info))
+			goto done;
+		if (!mpart_all_acquire_nx())
+			goto done;
+	}
+
+	/* Enumerate all mem-parts. */
+	LIST_FOREACH_SAFE (iter, &mpart_all_list, mp_allparts) {
+		unsigned int error;
+
+		/* Try to unload this mem-part. */
+		if (!mpart_lock_tryacquire(iter)) {
+			bool waitfor_ok;
+			if (ccinfo_noblock(info))
+				continue;
+			if (!tryincref(iter))
+				continue;
+			mpart_all_release();
+			waitfor_ok = mpart_lock_waitfor_nx(iter);
+			if (atomic_decfetch(&iter->mp_refcnt) == 0) {
+				ccinfo_accunt_mpart(info, iter);
+				SLIST_INSERT(&deadlist, iter, _mp_dead);
+			}
+			if (!waitfor_ok)
+				goto done;
+			if (ccinfo_isdone(info))
+				goto done;
+			goto again;
+		}
+
+		/* Make sure that the part is still alive. */
+		if (!tryincref(iter)) {
+			mpart_lock_release(iter);
+			continue;
+		}
+
+		/* Do the actual job of trying to trim the mem-part. */
+		error = mpart_trim_or_unlock_nx(iter, &data, &unlock);
+		if (error == MPART_NXOP_ST_RETRY)
+			goto again; /* Locks were released for temporary error -> start over */
+		if (error == MPART_NXOP_ST_ERROR)
+			goto done; /* Locks were released for hard error -> stop trying to do stuff */
+		assert(error == MPART_NXOP_ST_SUCCESS);
+		mpart_lock_release(iter);
+		if (atomic_decfetch(&iter->mp_refcnt) == 0) {
+			ccinfo_accunt_mpart(info, iter);
+			SLIST_INSERT(&deadlist, iter, _mp_dead);
+		}
+		if (ccinfo_isdone(info))
+			break;
+	}
+	mpart_all_release();
+done:
+	mpart_trim_data_fini(&data);
+
+	/* Properly destroy any dead mem-parts. */
+	while (!SLIST_EMPTY(&deadlist)) {
+		iter = SLIST_FIRST(&deadlist);
+		SLIST_REMOVE_HEAD(&deadlist, _mp_dead);
+		mpart_destroy(iter);
+	}
+}
+
 
 #ifndef __fnode_slist_defined
 #define __fnode_slist_defined
@@ -1063,7 +1153,7 @@ SLIST_HEAD(fnode_slist, fnode);
 
 /* Clear unreferenced (cached) files nodes from the global file-node-list. */
 PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
-NOTHROW(KCALL system_cc_allnodes_unload)(struct ccinfo *__restrict info) {
+NOTHROW(KCALL system_cc_allnodes_unload_unused)(struct ccinfo *__restrict info) {
 	struct fnode *iter;
 	struct fnode_slist deadlist;
 	SLIST_INIT(&deadlist);
@@ -1371,32 +1461,41 @@ NOTHROW(KCALL system_cc_allsuper)(struct ccinfo *__restrict info) {
 /* Clear all system caches according to `info'. */
 PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(FCALL system_cc_impl)(struct ccinfo *__restrict info) {
-	DOCC(system_cc_drivers(info));               /* Invoke clear-cache operators from drivers */
-	DOCC(system_cc_threads(info));               /* Clear caches relating to per-thread fields */
-	DOCC(system_cc_async_aio_handles(info));     /* ... */
-	DOCC(system_cc_allparts_unload(info));       /* Unload cached, but unused mem-parts */
-	DOCC(system_cc_allnodes_unload(info));       /* Unload cached, but unused files */
-	DOCC(system_cc_allnodes(info));              /* Invoke the clear-cache operator for all files */
-	DOCC(system_cc_allsuper(info));              /* Invoke the clear-cache operator for all superblocks */
-	DOCC(system_cc_permman(&mman_kernel, info)); /* In case more can be done now... */
-	DOCC(system_cc_perfs(&fs_kernel, info));     /* In case not done already... */
-	DOCC(system_cc_module_section_cache(info));  /* Clear pre-loaded module sections (e.g. .debug_info, etc...) */
+	DOCC(system_cc_drivers(info));                                             /* Invoke clear-cache operators from drivers */
+	DOCC(system_cc_threads(info));                                             /* Clear caches relating to per-thread fields */
+	DOCC(system_cc_async_aio_handles(info));                                   /* ... */
+	DOCC(system_cc_allparts_unload_unused(info));                              /* Unload cached, but unused mem-parts */
+	DOCC(system_cc_allparts_trim_unused(info, MPART_TRIM_MODE_UNMAPPED));      /* Unload cached, but unused blocks of mem-parts */
+	DOCC(system_cc_allparts_trim_unused(info, MPART_TRIM_MODE_UNINITIALIZED)); /* Unload allocated, but uninitialized blocks of mem-parts */
+	DOCC(system_cc_allnodes_unload_unused(info));                              /* Unload cached, but unused files */
+	DOCC(system_cc_allnodes(info));                                            /* Invoke the clear-cache operator for all files */
+	DOCC(system_cc_allsuper(info));                                            /* Invoke the clear-cache operator for all superblocks */
+	DOCC(system_cc_permman(&mman_kernel, info));                               /* In case more can be done now... */
+	DOCC(system_cc_perfs(&fs_kernel, info));                                   /* In case not done already... */
+	DOCC(system_cc_module_section_cache(info));                                /* Clear pre-loaded module sections (e.g. .debug_info, etc...) */
 #ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 	DOCC(system_cc_rtld_fsfile(info));
 #endif /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 	DOCC(system_cc_slab_prealloc(info));
 	DOCC(system_cc_heaps(info));
 
+	/* Unload initialized, but unchanged blocks of non-anonymous mem-parts */
+	DOCC(system_cc_allparts_trim_unused(info, MPART_TRIM_MODE_UNCHANGED));
+
+	/* Only do stuff that causes writes to disk when `GFP_NOSWAP' isn't set. */
+	if (!(info->ci_gfp & GFP_NOSWAP)) {
+		/* Write all modified blocks of non-anonymous mem-parts to disk */
+		DOCC(system_cc_allparts_trim_unused(info, MPART_TRIM_MODE_UNCHANGED |
+		                                          MPART_TRIM_FLAG_SYNC));
+
+		/* Write all modified blocks of non-anonymous mem-parts to disk,
+		 * and all  modified  blocks  of anonymous  mem-parts  to  swap. */
+		DOCC(system_cc_allparts_trim_unused(info, MPART_TRIM_MODE_UNCHANGED |
+		                                          MPART_TRIM_FLAG_SYNC |
+		                                          MPART_TRIM_FLAG_SWAP));
+	}
+
 	/* TODO: There a couple more things we can do to free up physical memory:
-	 *  - We're  already unloading cached files and file-parts, but we can even
-	 *    unload file parts that are currently in use (so-long as they  haven't
-	 *    been modified). This can be done by changing a loaded, but unmodified
-	 *    mpart back to MPART_ST_VOID
-	 *    -->> This is probably the most important thing that still needs to be
-	 *         implemented here (other than swap-support), since this allows us
-	 *         to  unload parts  of loaded  programs/libraries, as  well as all
-	 *         other  types of file mappings, and have them lazily be re-loaded
-	 *         as soon as they're accessed again.
 	 *  - We can  also do  `pagedir_unmap_userspace()' for  every user-space  mman
 	 *    out there, and let mappings re-populate themselves upon the next access.
 	 *    - However, this should only be done as a last resort, since if the free'd
@@ -1406,17 +1505,36 @@ NOTHROW(FCALL system_cc_impl)(struct ccinfo *__restrict info) {
 	 *      just cause the kernel to panic anyways.
 	 */
 
-	if (!(info->ci_gfp & GFP_NOSWAP)) {
-		/* Eh? Eeehhh?? What about it?
-		 * Yes: swap off-loading will go here!
-		 * And no: aside from skipping this part when GFP_ATOMIC is given, there
-		 *         is no way around dealing with swap in a non-blocking context,
-		 *         given that you can get here from: `kmalloc_nx(GFP_ATOMIC)'. */
-	}
+	/* Reap system heaps one more time. */
+	DOCC(system_cc_slab_prealloc(info));
+	DOCC(system_cc_heaps(info));
 }
 
 
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+NOTHROW(FCALL system_cc_impl_wrapper)(struct ccinfo *__restrict info) {
+#if 0
+	if (ccinfo_noblock(info)) {
+		system_cc_impl(info);
+	} else
+#endif
+	{
+		/* Allow for exception nesting inside of `system_cc()' */
+		NESTED_EXCEPTION;
 
+		/* Preserve task connections (technically only necessary when not noblock,
+		 * but  better be safe and always do this, so cc-code is allowed to assume
+		 * that the hosting thread doesn't have any connections) */
+		struct task_connections saved;
+		task_pushconnections(&saved);
+
+		/* Call the actual cc-implementation */
+		system_cc_impl(info);
+
+		/* Context restore... */
+		task_popconnections();
+	}
+}
 
 
 
@@ -1503,7 +1621,7 @@ NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
 
 	/* Keep the `_TASK_FSYSTEMCC' flag set whilst actually doing cc operations */
 	atomic_or(&caller->t_flags, _TASK_FSYSTEMCC);
-	system_cc_impl(info);
+	system_cc_impl_wrapper(info);
 	atomic_and(&caller->t_flags, ~_TASK_FSYSTEMCC);
 
 	/* Check if we already managed to release some memory */
@@ -1548,7 +1666,7 @@ NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
 	/* Looks like there's nothing we can really do: no other thread  is
 	 * clearing caches, and nothing became free since the last time our
 	 * caller tried to clear caches.
-	 * -> Memory just can't be forced to become available... */
+	 * -> Memory just can't be forced to become available :( */
 	return false;
 }
 

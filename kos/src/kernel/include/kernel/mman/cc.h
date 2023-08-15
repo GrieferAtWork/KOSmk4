@@ -24,6 +24,8 @@
 
 #include <kernel/types.h>
 
+#include <asm/pagesize.h>
+
 /* Clear global caches. */
 
 #ifdef __CC__
@@ -77,6 +79,10 @@ struct ccinfo {
 /* Account for memory being freed. */
 #define ccinfo_account(self, num_bytes) \
 	((self)->ci_bytes += (num_bytes))
+#define ccinfo_account_physpages(self, num_pages) \
+	((self)->ci_bytes += (num_pages) << __ARCH_PAGESHIFT)
+#define ccinfo_account_swappages(self, num_pages) \
+	((self)->ci_bytes += (num_pages) << __ARCH_PAGESHIFT)
 
 
 /* Max # of attempts before unconditional give-up. ("/proc/kos/cc-max-attempts")

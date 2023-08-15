@@ -602,6 +602,35 @@ NOTHROW(FCALL mpart_setblockstate)(struct mpart *__restrict self,
 	} while (!atomic_cmpxch_weak(pword, oldval, newval));
 }
 
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL _mpart_setblockstate_initdone_extrahooks)(REF struct mpart *__restrict self) {
+	uintptr_quarter_t actions;
+	actions = atomic_fetchadd(&self->mp_xflags, ~(MPART_XF_MERGE_AFTER_INIT |
+	                                              MPART_XF_TRIM_AFTER_INIT));
+	actions &= (MPART_XF_MERGE_AFTER_INIT | MPART_XF_TRIM_AFTER_INIT);
+	switch (actions) {
+
+	case MPART_XF_MERGE_AFTER_INIT | MPART_XF_TRIM_AFTER_INIT:
+		mpart_trim(incref(self));
+		decref(mpart_merge(self));
+		break;
+
+	case MPART_XF_MERGE_AFTER_INIT:
+		decref(mpart_merge(self));
+		break;
+
+	case MPART_XF_TRIM_AFTER_INIT:
+		mpart_trim(self);
+		break;
+
+	case 0:
+		decref(self);
+		break;
+
+	default: __builtin_unreachable();
+	}
+}
+
 
 /* Check if the given mem-part contains blocks with `MPART_BLOCK_ST_INIT'.
  * For this purpose, if the `MPART_F_MAYBE_BLK_INIT' flag isn't set,  then
@@ -820,6 +849,7 @@ again:
 				mpart_setblockstate(self, i, MPART_BLOCK_ST_CHNG);
 			mfile_trunclock_dec_nosignal(file);
 			sig_broadcast(&file->mf_initdone);
+			mpart_setblockstate_initdone_extrahooks(self);
 			decref_unlikely(file);
 			mpart_lockops_reap(self);
 			RETHROW();
@@ -831,6 +861,7 @@ done_writeback:
 			mpart_setblockstate(self, i, MPART_BLOCK_ST_LOAD);
 		mfile_trunclock_dec_nosignal(file);
 		sig_broadcast(&file->mf_initdone);
+		mpart_setblockstate_initdone_extrahooks(self);
 		decref_unlikely(file);
 
 		/* Scan for more changes. */
@@ -976,7 +1007,7 @@ NOTHROW(FCALL _mpart_issharewritable)(struct mpart const *__restrict self,
 
 
 /* Lock for `mpart_all_list' */
-PUBLIC ATTR_MALL_UNTRACKED struct atomic_lock mpart_all_lock = ATOMIC_LOCK_INIT;
+PUBLIC struct atomic_lock mpart_all_lock = ATOMIC_LOCK_INIT;
 
 /* [0..n][CHAIN(mp_allparts)][lock(mpart_all_lock)]
  * List of all memory parts currently in use. List head indices are `MPART_ALL_LIST_*'
@@ -989,7 +1020,7 @@ PUBLIC struct lockop_slist mpart_all_lops = SLIST_HEAD_INITIALIZER(mpart_all_lop
 
 #ifndef CONFIG_NO_MPART_ALL_SIZE
 /* [lock(mpart_all_lock)] The # of parts stored in `mpart_all_list' */
-PUBLIC ATTR_MALL_UNTRACKED size_t mpart_all_size = 0;
+PUBLIC size_t mpart_all_size = 0;
 #endif /* !CONFIG_NO_MPART_ALL_SIZE */
 
 

@@ -143,6 +143,45 @@ mpart_initdone_or_unlock(struct mpart *__restrict self,
 	return true;
 }
 
+PUBLIC BLOCKING WUNUSED NONNULL((1)) unsigned int
+NOTHROW(FCALL mpart_initdone_or_unlock_nx)(struct mpart *__restrict self,
+                                           struct unlockinfo *unlock) {
+	if unlikely(mpart_hasblocksstate_init(self)) {
+		struct sig *status;
+		REF struct mfile *file;
+		incref(self);
+		file = incref(self->mp_file);
+		UNLOCK_OPTREAP(self, unlock);
+		assert(!task_wasconnected());
+		task_connect_nx(&file->mf_initdone);
+		if (!mpart_lock_acquire_nx(self)) {
+			task_disconnectall();
+			mpart_lockops_reap(self);
+			decref_unlikely(file);
+			decref_unlikely(self);
+			return MPART_NXOP_ST_ERROR;
+		}
+
+		/* Check for init-parts once again. */
+		if unlikely(!mpart_hasblocksstate_init(self)) {
+			task_disconnectall();
+			mpart_lock_release(self);
+			decref_unlikely(file);
+			decref_unlikely(self);
+			return MPART_NXOP_ST_RETRY;
+		}
+		mpart_lock_release(self);
+		status = task_waitfor_nx();
+		decref_unlikely(file);
+		decref_unlikely(self);
+		if unlikely(!status)
+			return MPART_NXOP_ST_ERROR;
+		return MPART_NXOP_ST_RETRY;
+	}
+	return MPART_NXOP_ST_SUCCESS;
+}
+
+
 /* Ensure that `self->mp_meta == NULL || self->mp_meta->mpm_dmalocks == 0' */
 PUBLIC BLOCKING WUNUSED NONNULL((1)) bool FCALL
 mpart_nodma_or_unlock(struct mpart *__restrict self,
@@ -165,6 +204,31 @@ mpart_nodma_or_unlock(struct mpart *__restrict self,
 		return false;
 	}
 	return true;
+}
+
+PUBLIC BLOCKING WUNUSED NONNULL((1)) unsigned int
+NOTHROW(FCALL mpart_nodma_or_unlock_nx)(struct mpart *__restrict self,
+                                        struct unlockinfo *unlock) {
+	struct mpartmeta *meta = self->mp_meta;
+	if (meta != NULL && atomic_read(&meta->mpm_dmalocks) != 0) {
+		struct sig *status;
+		/* Must blocking-wait until all DMA locks have been released. */
+		incref(self);
+		UNLOCK(self, unlock);
+		assert(!task_wasconnected());
+		task_connect_nx(&meta->mpm_dma_done);
+		if unlikely(atomic_read(&meta->mpm_dmalocks) == 0) {
+			task_disconnectall();
+			decref_unlikely(self);
+			return MPART_NXOP_ST_RETRY;
+		}
+		status = task_waitfor_nx();
+		decref_unlikely(self);
+		if unlikely(!status)
+			return MPART_NXOP_ST_ERROR;
+		return MPART_NXOP_ST_RETRY;
+	}
+	return MPART_NXOP_ST_SUCCESS;
 }
 
 /* Ensure that `self->mp_meta != NULL' */
@@ -783,7 +847,7 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 			}
 			sig_broadcast(&file->mf_initdone);
 			decref_unlikely(file);
-			decref_unlikely(self);
+			mpart_setblockstate_initdone_extrahooks_and_decref(self);
 			RETHROW();
 		}
 
@@ -806,6 +870,7 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 		 * the init-done signal of our file to tell other thread
 		 * that INIT blocks may possible be all gone now. */
 		sig_broadcast(&file->mf_initdone);
+		mpart_setblockstate_initdone_extrahooks(self);
 		decref_unlikely(file);
 
 		/* And with that, all required data has been read from swap,
@@ -1005,7 +1070,7 @@ mpart_load_or_unlock(struct mpart *__restrict self,
 			mfile_trunclock_dec_nosignal(file);
 			sig_broadcast(&file->mf_initdone);
 			decref_unlikely(file);
-			decref_unlikely(self);
+			mpart_setblockstate_initdone_extrahooks_and_decref(self);
 			RETHROW();
 		}
 initdone:
@@ -1016,7 +1081,7 @@ initdone:
 		mfile_trunclock_dec_nosignal(file);
 		sig_broadcast(&file->mf_initdone);
 		decref_unlikely(file);
-		decref_unlikely(self);
+		mpart_setblockstate_initdone_extrahooks_and_decref(self);
 		return false;
 	}
 
