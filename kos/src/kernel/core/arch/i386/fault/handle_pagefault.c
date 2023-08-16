@@ -1030,6 +1030,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 			if unlikely(!pagedir_prepare(mf.mfl_addr, mf.mfl_size)) {
 				mpart_lock_release(mf.mfl_part);
 				mman_lock_release(mf.mfl_mman);
+				task_popconnections();
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 			}
 			prot = mpart_mmap_node(mf.mfl_part, mf.mfl_addr,
