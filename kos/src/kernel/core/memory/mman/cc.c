@@ -1075,11 +1075,11 @@ NOTHROW(KCALL system_cc_allparts_trim_unused)(struct ccinfo *__restrict info,
                                               unsigned int trim_mode) {
 	struct mpart *iter;
 	struct mpart_slist deadlist;
-	struct mpart_trim_data data;
 	struct unlockinfo unlock;
+	struct mpart_trim_data data;
 	SLIST_INIT(&deadlist);
-	mpart_trim_data_init(&data, info, trim_mode);
 	unlock.ui_unlock = &unlock_mpart_all;
+	mpart_trim_data_init(&data, info, &unlock, trim_mode);
 again:
 	if (!mpart_all_tryacquire()) {
 		if (ccinfo_noblock(info))
@@ -1119,7 +1119,7 @@ again:
 		}
 
 		/* Do the actual job of trying to trim the mem-part. */
-		error = mpart_trim_or_unlock_nx(iter, &data, &unlock);
+		error = mpart_trim_or_unlock_nx(iter, &data);
 		if (error == MPART_NXOP_ST_RETRY)
 			goto again; /* Locks were released for temporary error -> start over */
 		if (error == MPART_NXOP_ST_ERROR)

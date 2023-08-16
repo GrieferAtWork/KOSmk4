@@ -123,7 +123,7 @@ struct __IO_FILE {
 		/* .if_bufsiz  = */ if_bufsize_,                             \
 		/* .if_exdata  = */ if_exdata_                               \
 	}
-#endif                                 /* __SIZEOF_POINTER__ < 8 */
+#endif /* __SIZEOF_POINTER__ < 8 */
 	__BYTE_TYPE__      *if_ptr;        /* [>= if_base][+if_cnt <= if_base + if_bufsiz][lock(if_exdata->io_lock)]
 	                                    * Pointer to the next character to-be read/written.
 	                                    * The absolute in-file position is then `if_exdata->io_fblk + (if_ptr - if_base)' */

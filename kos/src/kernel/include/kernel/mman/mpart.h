@@ -1445,16 +1445,16 @@ struct ccinfo;
                                            * with status `MPART_BLOCK_ST_CHNG') of the given mem-part (this is also
                                            * what `mpart_trim()' does, except that it *only* trims parts if they're
                                            * anonymous, meaning it can just ignore `MPART_BLOCK_ST_CHNG') */
-#define MPART_TRIM_MODE_UNINITIALIZED 1   /* Trim uninitialized blocks of the given mem-part (even if mappings exist for  them.
-                                           * Since those blocks aren't initialized, we can assume that they don't appear in any
-                                           * page directory, meaning they can be unloaded safely)
-                                           * NOTE: When `MPART_F_MLOCK' is set or the part is anonymous,
-                                           *       this behaves the  same as  `MPART_TRIM_MODE_UNMAPPED' */
+#define MPART_TRIM_MODE_UNINITIALIZED 1   /* Trim  uninitialized blocks of the given mem-part  (even if mappings exist for them.
+                                           * Since  those blocks aren't initialized, we can assume that they don't appear in any
+                                           * page directory, meaning they can be unloaded safely). Parts that are not mapped are
+                                           * unmapped also (just as with `MPART_TRIM_MODE_UNMAPPED')
+                                           * NOTE: When `MPART_F_MLOCK' is set this behaves the same as `MPART_TRIM_MODE_UNMAPPED' */
 #define MPART_TRIM_MODE_UNCHANGED     2   /* Trim all blocks that don't have status `MPART_BLOCK_ST_CHNG'
                                            * Any blocks that are initialized+mapped will be unmapped such
                                            * that they are loaded once again during the next access.
-                                           * NOTE: When `MPART_F_MLOCK' is set or the part is anonymous,
-                                           *       this behaves the  same as  `MPART_TRIM_MODE_UNMAPPED' */
+                                           * NOTE: When `MPART_F_MLOCK' is set this behaves the same as `MPART_TRIM_MODE_UNMAPPED' */
+#define MPART_TRIM_MODEMASK           0x3 /* Mask of mode bits */
 #define MPART_TRIM_FLAG_SYNC          0x4 /* FLAG: Blocks that normally couldn't be  unloaded because they are marked  as
                                            *       `MPART_BLOCK_ST_CHNG' can now also be unloaded. This is done by rather
                                            *       than skipping such blocks, they are  written back to disk (any  errors
@@ -1474,16 +1474,21 @@ struct ccinfo;
                                            * NOTE: When the part has the `MPART_F_MLOCK' flag, this flag is ignored. */
 
 struct mpart_trim_data {
-	struct mpart  *mtd_hipart; /* [0..1] High memory part as may be needed when splitting a mem-part. */
-	struct ccinfo *mtd_ccinfo; /* [1..1][const] Cache-clearing information. */
-	unsigned int   mtd_mode;   /* [const] Trim mode (s.a. `MPART_TRIM_MODE_*' and `MPART_TRIM_FLAG_*') */
+	struct mpart      *mtd_hipart;    /* [0..1] High memory part as may be needed when splitting a mem-part. */
+	uintptr_t         *mtd_blkst_ptr; /* [0..1] Pre-allocated block-state vector. */
+	struct ccinfo     *mtd_ccinfo;    /* [1..1][const] Cache-clearing information. */
+	struct unlockinfo *mtd_unlock;    /* [0..1][const] Extra stuff to unlock */
+	unsigned int       mtd_mode;      /* [const] Trim mode (s.a. `MPART_TRIM_MODE_*' and `MPART_TRIM_FLAG_*') */
 };
-#define mpart_trim_data_init(self, info, mode) \
-	(void)((self)->mtd_hipart = __NULLPTR,     \
-	       (self)->mtd_ccinfo = (info),        \
-	       (self)->mtd_mode   = (mode))
-#define mpart_trim_data_fini(self) \
-	__os_free((self)->mtd_hipart)
+#define mpart_trim_data_init(self, info, unlock, mode) \
+	(void)((self)->mtd_hipart    = __NULLPTR,          \
+	       (self)->mtd_blkst_ptr = __NULLPTR,          \
+	       (self)->mtd_ccinfo    = (info),             \
+	       (self)->mtd_unlock    = (unlock),           \
+	       (self)->mtd_mode      = (mode))
+#define mpart_trim_data_fini(self)        \
+	(void)(__os_free((self)->mtd_hipart), \
+	       __os_free((self)->mtd_blkst_ptr))
 
 /* Synchronous version of `mpart_trim()' (that is also able to trim non-anonymous parts)
  * This function is specifically designed to-be used by `system_cc()' (in case you  were
@@ -1500,12 +1505,11 @@ struct mpart_trim_data {
  *                        contain dynamically allocated memory that can be used for
  *                        further trim operations!
  * @return: MPART_NXOP_ST_SUCCESS: Success (all locks were kept)
- * @return: MPART_NXOP_ST_RETRY:   Failed (`unlock' and `mpart_lock_release(self)' was released)
+ * @return: MPART_NXOP_ST_RETRY:   Failed (`data->mtd_unlock' and `mpart_lock_release(self)' was released)
  * @return: MPART_NXOP_ST_ERROR:   Non-recoverable error (OOM or yield-failure). Don't try again. */
-FUNDEF NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2, 3)) unsigned int
+FUNDEF NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_or_unlock_nx)(struct mpart *__restrict self,
-                                       struct mpart_trim_data *__restrict data,
-                                       struct unlockinfo *unlock);
+                                       struct mpart_trim_data *__restrict data);
 
 
 
