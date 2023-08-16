@@ -537,7 +537,9 @@ struct mpart {
 		                                         *       This is usually only done for parts where write-monitoring
 		                                         *       doesn't  really  make  any  sense,  such  as `mfile_phys'.
 		                                         * NOTE: Changing the state of block that used to be `MPART_BLOCK_ST_INIT' to
-		                                         *       anything else may be done atomically, and without holding any locks. */
+		                                         *       anything else may be done atomically, and without holding any locks.
+		                                         * NOTE: When the part state is `MPART_ST_VOID' and this bitset is `NULL', then
+		                                         *       the intended  meaning is  that all  blocks are  `MPART_BLOCK_ST_NDEF'. */
 		uintptr_t                 mp_blkst_inl; /* [lock(MPART_F_LOCKBIT)]
 		                                         * [valid_if(MPART_F_BLKST_INL)] */
 	};

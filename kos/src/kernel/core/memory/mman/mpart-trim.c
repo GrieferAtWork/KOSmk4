@@ -1149,21 +1149,10 @@ again:
 	}
 }
 
-/* Set the effective size of `self' to `0', and free all backing storage. */
+/* Transform `self' into a void-mempart */
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mpart_clear)(struct mpart *__restrict self,
-                           struct ccinfo *info) {
-	struct mpartmeta *meta;
-	if ((meta = self->mp_meta) != NULL) {
-		/* Detach all futex objects by clearing their `mfu_part' pointers. */
-		if (meta->mpm_ftx) {
-			struct mfutex *tree;
-			tree          = meta->mpm_ftx;
-			meta->mpm_ftx = NULL;
-			mfutex_tree_detachall(tree, info); /* TODO: Track ccinfo */
-		}
-	}
-
+NOTHROW(FCALL mpart_setvoid)(struct mpart *__restrict self,
+                             struct ccinfo *info) {
 	/* Free backing memory/swap. */
 	switch (self->mp_state) {
 
@@ -1213,6 +1202,26 @@ NOTHROW(FCALL mpart_clear)(struct mpart *__restrict self,
 
 	/* Change the part into a void-state. */
 	self->mp_state = MPART_ST_VOID;
+}
+
+
+/* Set the effective size of `self' to `0', and free all backing storage. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_clear)(struct mpart *__restrict self,
+                           struct ccinfo *info) {
+	struct mpartmeta *meta;
+	if ((meta = self->mp_meta) != NULL) {
+		/* Detach all futex objects by clearing their `mfu_part' pointers. */
+		if (meta->mpm_ftx) {
+			struct mfutex *tree;
+			tree          = meta->mpm_ftx;
+			meta->mpm_ftx = NULL;
+			mfutex_tree_detachall(tree, info);
+		}
+	}
+
+	/* Change the part into a void-part. */
+	mpart_setvoid(self, info);
 
 	/* NOTE: The part is always anonymous, unless we got here from `mpart_trim_or_unlock_nx()' */
 	if (mpart_isanon(self)) {
@@ -1823,6 +1832,10 @@ do_destroy:
 }
 
 
+
+#include <kernel/printk.h>
+
+
 struct mpart_trim_range {
 	mpart_reladdr_t mptr_start; /* Trimable range start address. */
 	mpart_reladdr_t mptr_end;   /* Trimable range end address. */
@@ -1933,8 +1946,8 @@ mpart_alloc_blkst_or_unlock(struct mpart *__restrict self,
 			avl_bytes = kmalloc_usable_size(data->mtd_blkst_ptr);
 			if (req_bytes != avl_bytes) {
 				mpart_blkst_word_t *new_bitset;
-				new_bitset = (mpart_blkst_word_t *)krealloc_nx(data->mtd_blkst_ptr,
-				                                               req_bytes, GFP_ATOMIC);
+				new_bitset = (mpart_blkst_word_t *)krealloc_nx(data->mtd_blkst_ptr, req_bytes,
+				                                               ccinfo_gfp(data->mtd_ccinfo) | GFP_ATOMIC);
 				if (new_bitset) {
 					data->mtd_blkst_ptr = new_bitset;
 				} else if (req_bytes > avl_bytes){
@@ -1952,6 +1965,46 @@ mpart_alloc_blkst_or_unlock(struct mpart *__restrict self,
 	}
 	return true;
 }
+
+#if 0
+PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) NONNULL((1, 2)) unsigned int
+NOTHROW(FCALL mpart_alloc_blkst_or_unlock_nx)(struct mpart *__restrict self,
+                                              struct mpart_trim_data *__restrict data) {
+	if (!mpart_hasblockstate(self)) {
+		struct mfile *file = self->mp_file;
+		size_t block_count = mpart_getblockcount(self, file);
+		if (block_count <= MPART_BLKST_BLOCKS_PER_WORD) {
+			atomic_or(&self->mp_flags, MPART_F_BLKST_INL);
+			self->mp_blkst_inl = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_CHNG);
+		} else {
+			size_t req_words, req_bytes, avl_bytes;
+			req_words = CEILDIV(block_count, MPART_BLKST_BLOCKS_PER_WORD);
+			req_bytes = req_words * sizeof(mpart_blkst_word_t);
+			avl_bytes = kmalloc_usable_size(data->mtd_blkst_ptr);
+			if (req_bytes != avl_bytes) {
+				mpart_blkst_word_t *new_bitset;
+				new_bitset = (mpart_blkst_word_t *)krealloc_nx(data->mtd_blkst_ptr, req_bytes,
+				                                               ccinfo_gfp(data->mtd_ccinfo) | GFP_ATOMIC);
+				if (new_bitset) {
+					data->mtd_blkst_ptr = new_bitset;
+				} else if (req_bytes > avl_bytes){
+					LOCAL_unlock_all();
+					new_bitset = (mpart_blkst_word_t *)krealloc_nx(data->mtd_blkst_ptr, req_bytes,
+					                                               ccinfo_gfp(data->mtd_ccinfo));
+					if unlikely(!new_bitset)
+						return MPART_NXOP_ST_ERROR;
+					data->mtd_blkst_ptr = new_bitset;
+					return MPART_NXOP_ST_RETRY;
+				}
+			}
+			memset(data->mtd_blkst_ptr, 0xff, req_bytes);
+			self->mp_blkst_ptr  = data->mtd_blkst_ptr; /* Steal... */
+			data->mtd_blkst_ptr = NULL;
+		}
+	}
+	return MPART_NXOP_ST_SUCCESS;
+}
+#endif
 
 
 PRIVATE NONNULL((1, 2)) void FCALL
@@ -2092,6 +2145,8 @@ NOTHROW(FCALL mpart_unmap_for_void_or_unlock)(struct mpart *__restrict self,
 				unmap_addr = (byte_t *)mnode_getminaddr(node) + (node_unmap_partminaddr - node_partminaddr);
 				unmap_size = (node_unmap_partendaddr - node_unmap_partminaddr);
 				if (pagedir_prepare_p(pd, unmap_addr, unmap_size)) {
+					/*printk(KERN_DEBUG "Delete mapping %p-%p\n",
+					       unmap_addr, (byte_t *)unmap_addr + unmap_size - 1);*/
 					pagedir_unmap_p(pd, unmap_addr, unmap_size);
 					pagedir_sync_smp_p(pd, unmap_addr, unmap_size);
 					pagedir_unprepare_p(pd, unmap_addr, unmap_size);
@@ -2424,8 +2479,6 @@ again:
 	return error;
 }
 
-#include <kernel/printk.h>
-
 /* Same as `mpart_trim_or_unlock()', but all relevant locks are held by the caller. */
 PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_locked_with_all_locks_or_unlock)(struct mpart *__restrict self,
@@ -2445,6 +2498,8 @@ again:
 	assertf(!MPART_FIND_TRIMABLE_RANGE_ST_ISOK(result) || range.mptr_start >= minaddr,
 	        "Produced range %#" PRIxSIZ "-%#" PRIxSIZ " is located before minaddr %#" PRIxSIZ " [action: %u]",
 	        range.mptr_start, range.mptr_end - 1, minaddr, result);
+	assert(!MPART_FIND_TRIMABLE_RANGE_ST_ISOK(result) || range.mptr_start < range.mptr_end);
+	assert(!MPART_FIND_TRIMABLE_RANGE_ST_ISOK(result) || range.mptr_end <= mpart_getsize(self));
 	switch (result) {
 	case MPART_FIND_TRIMABLE_RANGE_ST_RETRY:
 	case MPART_FIND_TRIMABLE_RANGE_ST_ERROR:
@@ -2457,6 +2512,13 @@ again:
 
 	case MPART_FIND_TRIMABLE_RANGE_ST_TRIM: {
 		/* TRIM: Discard an unmapped sub-range of `self' */
+
+		/* Check for simple case: trim the entire part */
+		if (range.mptr_start <= 0 && range.mptr_end >= mpart_getsize(self)) {
+			mpart_clear(self, data->mtd_ccinfo);
+			goto done;
+		}
+
 		printk(KERN_DEBUG "TODO: MPART_FIND_TRIMABLE_RANGE_ST_TRIM(%p: %#I64x-%#I64x, %p: %#Ix-%#Ix@%#I64x-%#I64x)\n",
 		       self->mp_file, self->mp_minaddr + range.mptr_start, self->mp_minaddr +  range.mptr_end - 1,
 		       self, range.mptr_start, range.mptr_end - 1, self->mp_minaddr, self->mp_maxaddr);
@@ -2464,6 +2526,15 @@ again:
 
 	case MPART_FIND_TRIMABLE_RANGE_ST_VOID: {
 		/* VOID: Replace an mapped sub-range of `self' with another mem-part with status `MPART_ST_VOID' */
+
+		/* Check for simple case: void the entire part */
+		if (range.mptr_start <= 0 && range.mptr_end <= mpart_getsize(self)) {
+			mpart_setvoid(self, data->mtd_ccinfo);
+			goto done;
+		}
+
+		/* TODO: Implement me next! */
+
 		printk(KERN_DEBUG "TODO: MPART_FIND_TRIMABLE_RANGE_ST_VOID(%p: %#I64x-%#I64x, %p: %#Ix-%#Ix@%#I64x-%#I64x)\n",
 		       self->mp_file, self->mp_minaddr + range.mptr_start, self->mp_minaddr +  range.mptr_end - 1,
 		       self, range.mptr_start, range.mptr_end - 1, self->mp_minaddr, self->mp_maxaddr);
@@ -2480,8 +2551,12 @@ again:
 
 	default: __builtin_unreachable();
 	}
-	minaddr = range.mptr_end;
-	goto again;
+
+	/* If not done, try to trim more about our current mem-part. */
+	if (!ccinfo_isdone(data->mtd_ccinfo)) {
+		minaddr = range.mptr_end;
+		goto again;
+	}
 
 done:
 	return result;

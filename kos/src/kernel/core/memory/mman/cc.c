@@ -1532,6 +1532,7 @@ NOTHROW(FCALL system_cc_impl_wrapper)(struct ccinfo *__restrict info) {
 		system_cc_impl(info);
 
 		/* Context restore... */
+		assert(!task_wasconnected());
 		task_popconnections();
 	}
 }
