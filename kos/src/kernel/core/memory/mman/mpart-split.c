@@ -1418,10 +1418,11 @@ clear_hipart_changed_bit:
 		block_count = mpart_getblockcount(self, file);
 		if (block_count <= MPART_BLKST_BLOCKS_PER_WORD) {
 			/* Switch over to the inline bitset. */
-			self->mp_blkst_inl = bitset[0];
+			self->mp_blkst_inl = bitset ? bitset[0]
+			                            : MPART_BLOCK_REPEAT(MPART_BLOCK_ST_CHNG);
 			atomic_or(&self->mp_flags, MPART_F_BLKST_INL);
 			kfree(bitset);
-		} else {
+		} else if (bitset != NULL) {
 			/* Truncate the bitset. */
 			size_t reqsize;
 			reqsize = CEILDIV(block_count, MPART_BLKST_BLOCKS_PER_WORD) *
