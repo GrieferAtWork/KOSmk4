@@ -1092,12 +1092,14 @@ again:
 	LIST_FOREACH_SAFE (iter, &mpart_all_list, mp_allparts) {
 		unsigned int error;
 
+		/* Make sure that the part is still alive. */
+		if (!tryincref(iter))
+			continue;
+
 		/* Try to unload this mem-part. */
 		if (!mpart_lock_tryacquire(iter)) {
 			bool waitfor_ok;
 			if (ccinfo_noblock(info))
-				continue;
-			if (!tryincref(iter))
 				continue;
 			mpart_all_release();
 			waitfor_ok = mpart_lock_waitfor_nx(iter);
@@ -1112,24 +1114,19 @@ again:
 			goto again;
 		}
 
-		/* Make sure that the part is still alive. */
-		if (!tryincref(iter)) {
-			mpart_lock_release(iter);
-			continue;
-		}
-
 		/* Do the actual job of trying to trim the mem-part. */
 		error = mpart_trim_or_unlock_nx(iter, &data);
+		if (error == MPART_NXOP_ST_SUCCESS)
+			mpart_lock_release(iter);
+		if (atomic_decfetch(&iter->mp_refcnt) == 0) {
+			ccinfo_accunt_mpart(info, iter);
+			SLIST_INSERT(&deadlist, iter, _mp_dead);
+		}
 		if (error == MPART_NXOP_ST_RETRY)
 			goto again; /* Locks were released for temporary error -> start over */
 		if (error == MPART_NXOP_ST_ERROR)
 			goto done; /* Locks were released for hard error -> stop trying to do stuff */
 		assert(error == MPART_NXOP_ST_SUCCESS);
-		mpart_lock_release(iter);
-		if (atomic_decfetch(&iter->mp_refcnt) == 0) {
-			ccinfo_accunt_mpart(info, iter);
-			SLIST_INSERT(&deadlist, iter, _mp_dead);
-		}
 		if (ccinfo_isdone(info))
 			break;
 	}

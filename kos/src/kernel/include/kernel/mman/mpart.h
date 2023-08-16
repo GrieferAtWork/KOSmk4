@@ -682,6 +682,7 @@ NOTHROW(FCALL mpart_assert_integrity)(struct mpart *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mpart_free)(struct mpart *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mpart_destroy)(struct mpart *__restrict self);
 DEFINE_REFCNT_FUNCTIONS(struct mpart, mp_refcnt, mpart_destroy)
+#define mpart_xfree(self) (void)(!(self) || (mpart_free(self), 1))
 
 
 /* Reap lock operations enqueued for execution when `self' can be locked. */
@@ -1476,21 +1477,24 @@ struct ccinfo;
                                            * NOTE: When the part has the `MPART_F_MLOCK' flag, this flag is ignored. */
 
 struct mpart_trim_data {
-	struct mpart      *mtd_hipart;    /* [0..1] High memory part as may be needed when splitting a mem-part. */
-	uintptr_t         *mtd_blkst_ptr; /* [0..1] Pre-allocated block-state vector. */
+	struct mpart      *mtd_parts[2];  /* [0..1][owned] Extra mem-parts as may be needed. */
+	struct mpartmeta  *mtd_metas[2];  /* [0..1][owned] Extra mem-part-meta controllers as may be needed. */
+	uintptr_t         *mtd_blkst_ptr; /* [0..1][owned] Pre-allocated block-state vector. */
 	struct ccinfo     *mtd_ccinfo;    /* [1..1][const] Cache-clearing information. */
 	struct unlockinfo *mtd_unlock;    /* [0..1][const] Extra stuff to unlock */
 	unsigned int       mtd_mode;      /* [const] Trim mode (s.a. `MPART_TRIM_MODE_*' and `MPART_TRIM_FLAG_*') */
 };
 #define mpart_trim_data_init(self, info, unlock, mode) \
-	(void)((self)->mtd_hipart    = __NULLPTR,          \
+	(void)((self)->mtd_parts[0]  = __NULLPTR,          \
+	       (self)->mtd_parts[1]  = __NULLPTR,          \
+	       (self)->mtd_metas[0]  = __NULLPTR,          \
+	       (self)->mtd_metas[1]  = __NULLPTR,          \
 	       (self)->mtd_blkst_ptr = __NULLPTR,          \
 	       (self)->mtd_ccinfo    = (info),             \
 	       (self)->mtd_unlock    = (unlock),           \
 	       (self)->mtd_mode      = (mode))
-#define mpart_trim_data_fini(self)        \
-	(void)(__os_free((self)->mtd_hipart), \
-	       __os_free((self)->mtd_blkst_ptr))
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_trim_data_fini)(struct mpart_trim_data *__restrict self);
 
 /* Synchronous version of `mpart_trim()' (that is also able to trim non-anonymous parts)
  * This function is specifically designed to-be used by `system_cc()' (in case you  were

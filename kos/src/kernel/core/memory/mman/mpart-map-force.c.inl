@@ -33,6 +33,7 @@
 #include <hybrid/align.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stddef.h>
 
 DECL_BEGIN
@@ -74,7 +75,11 @@ NOTHROW(FCALL mpart_mmap_force)(struct mpart const *__restrict self,
 	case MPART_ST_MEM: {
 		/* Simplest case: we can just directly map the proper sub-range! */
 		physaddr_t baseaddr;
-		assert((offset + size) <= self->mp_mem.mc_size * PAGESIZE);
+		assertf((offset + size) <= self->mp_mem.mc_size * PAGESIZE,
+		        "offset:               %#" PRIxSIZ "\n"
+		        "size:                 %#" PRIxSIZ "\n"
+		        "self->mp_mem.mc_size: %#" PRIxSIZ,
+		        offset, size, self->mp_mem.mc_size);
 		assert(self->mp_mem.mc_start != PHYSPAGE_INVALID);
 		baseaddr = physpage2addr(self->mp_mem.mc_start);
 		LOCAL_pagedir_map(addr, size, baseaddr + offset);
