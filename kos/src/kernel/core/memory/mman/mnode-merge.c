@@ -1748,6 +1748,9 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 		        "part, meaning we would have been unable to decref-to-0!");
 		if (hipart->mp_meta)
 			mpartmeta_destroy(hipart->mp_meta);
+		if (hipart->mp_blkst_ptr != NULL &&
+		    !(hipart->mp_flags & MPART_F_BLKST_INL))
+			kfree(hipart->mp_blkst_ptr);
 		if (LIST_ISBOUND(hipart, mp_allparts)) {
 			/* Must remove from the global list of all known parts. */
 			if (mpart_all_tryacquire()) {
@@ -1765,11 +1768,16 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 		mpart_free(hipart);
 	} else {
 		/* Update to reflect all of the data that's been stolen by `lopart' */
-		hipart->mp_state = MPART_ST_VOID;
-		hipart->mp_maxaddr   = (pos_t)lopart->mp_file->mf_part_amask;
-		hipart->mp_minaddr   = hipart->mp_maxaddr + 1;
-		hipart->mp_blkst_ptr = NULL;
-		atomic_and(&hipart->mp_flags, ~MPART_F_BLKST_INL);
+		hipart->mp_state   = MPART_ST_VOID;
+		hipart->mp_maxaddr = (pos_t)lopart->mp_file->mf_part_amask;
+		hipart->mp_minaddr = hipart->mp_maxaddr + 1;
+		if (hipart->mp_flags & MPART_F_BLKST_INL) {
+			hipart->mp_blkst_ptr = NULL;
+			atomic_and(&hipart->mp_flags, ~MPART_F_BLKST_INL);
+		} else if (hipart->mp_blkst_ptr != NULL) {
+			kfree(hipart->mp_blkst_ptr);
+			hipart->mp_blkst_ptr = NULL;
+		}
 		hipart->mp_file = incref(&mfile_anon[lopart->mp_file->mf_blockshift]);
 
 		/* Important: _ONLY_ re-initialize as anon when the part wasn't anon before!
