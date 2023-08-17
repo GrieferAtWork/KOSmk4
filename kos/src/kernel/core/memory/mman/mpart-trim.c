@@ -28,6 +28,8 @@
 
 #include <kernel/aio.h>
 #include <kernel/except.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/path.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
@@ -487,30 +489,123 @@ NOTHROW(FCALL mpart_lstrip_nodes)(struct mpart *__restrict self,
 	}
 }
 
-/* Strip the first `num_bytes' bytes from the given mem-part. */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mpart_lstrip)(struct mpart *__restrict self,
-                            PAGEDIR_PAGEALIGNED mpart_reladdr_t num_bytes) {
-	physpagecnt_t pages;
-	freefun_t freefun;
-
-	/* Detach or relocate bound objects (futexes) */
-	{
-		struct mpartmeta *meta;
-		if ((meta = self->mp_meta) != NULL && meta->mpm_ftx) {
-			struct mfutex *tree;
-			tree          = meta->mpm_ftx;
-			meta->mpm_ftx = NULL;
-			mfutex_tree_reinsert_or_detach_lstrip(&meta->mpm_ftx, tree, num_bytes);
+/* Subtract  `num_bytes'  from the  `mn_partoff' field  of  every node  from `self'.
+ * Nodes that lie before that offsets are not adjusted but instead moved to `lopart' */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mpart_lstrip_transfer_nodes)(struct mpart *__restrict self,
+                                           struct mpart *__restrict lopart,
+                                           PAGEDIR_PAGEALIGNED mpart_reladdr_t num_bytes) {
+	unsigned int i;
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
+		struct mnode *node;
+		LIST_FOREACH_SAFE (node, &self->_mp_nodlsts[i], mn_link) {
+			if unlikely(wasdestroyed(node->mn_mman))
+				continue;
+			if unlikely(node->mn_flags & MNODE_F_UNMAPPED)
+				continue; /* Skip unmapped nodes... */
+			assert(node->mn_part == self); /* Only assert this when `MNODE_F_UNMAPPED' isn't set! */
+			/* Deal with MHINT'd nodes! */
+			if unlikely(node->mn_flags & MNODE_F_MHINT)
+				mnode_load_mhint(node);
+			if (node->mn_partoff >= num_bytes) {
+				node->mn_partoff -= num_bytes;
+			} else {
+				decref_nokill(self);
+				++lopart->mp_refcnt; /* For `node->mn_part' */
+				node->mn_part = lopart;
+				LIST_REMOVE(node, mn_link);
+				LIST_INSERT_HEAD(&lopart->_mp_nodlsts[i], node, mn_link);
+			}
 		}
 	}
+}
 
-	/* Update the offsets within associated mem-nodes. */
-	mpart_lstrip_nodes(self, num_bytes);
+PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
+NOTHROW(FCALL mpart_lstrip_transfer_futex_tree)(struct mfutex **__restrict p_tree,
+                                                struct mfutex *__restrict self,
+                                                struct mpart *__restrict lopart,
+                                                PAGEDIR_PAGEALIGNED mpart_reladdr_t num_bytes) {
+	struct mfutex *lhs, *rhs;
+again:
+	lhs = self->mfu_mtaent.rb_lhs;
+	rhs = self->mfu_mtaent.rb_rhs;
+	if (tryincref(self)) {
+		if (self->mfu_addr >= num_bytes) {
+			/* Re-insert into the new tree with the new offset. */
+			self->mfu_addr -= num_bytes;
+			mfutex_tree_insert(p_tree, self);
+		} else {
+			DBG_memset(&self->mfu_mtaent, 0xcc, sizeof(self->mfu_mtaent));
+			assert(lopart->mp_meta);
+			awref_set(&self->mfu_part, lopart);
+			mfutex_tree_insert(&lopart->mp_meta->mpm_ftx, self);
+		}
+		decref_unlikely(self);
+	} else {
+		DBG_memset(&self->mfu_mtaent, 0xcc, sizeof(self->mfu_mtaent));
+		awref_clear(&self->mfu_part);
+		weakdecref_unlikely(self);
+	}
+	if (lhs) {
+		if (rhs)
+			mpart_lstrip_transfer_futex_tree(p_tree, rhs, lopart, num_bytes);
+		self = lhs;
+		goto again;
+	}
+	if (rhs) {
+		self = rhs;
+		goto again;
+	}
+}
+
+/* Subtract `num_bytes' from the `mfu_addr' field of every futex from `self'.
+ * Futexes that lie before that offsets are not adjusted but instead moved to
+ * `lopart' (at which point it is asserted that `lopart->mp_meta != NULL') */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mpart_lstrip_transfer_futex)(struct mpartmeta *__restrict self,
+                                           struct mpart *__restrict lopart,
+                                           PAGEDIR_PAGEALIGNED mpart_reladdr_t num_bytes) {
+	struct mfutex *tree;
+	tree = self->mpm_ftx;
+	self->mpm_ftx = NULL;
+	mpart_lstrip_transfer_futex_tree(&self->mpm_ftx, tree, lopart, num_bytes);
+}
+
+/* Transfer nodes/futexes to `lopart' and just offsets in non-moved structures */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_lstrip_transfer)(struct mpart *__restrict self,
+                                     struct mpart *__restrict lopart,
+                                     PAGEDIR_PAGEALIGNED mpart_reladdr_t num_bytes) {
+	mpart_lstrip_transfer_nodes(self, lopart, num_bytes);
+	if (self->mp_meta != NULL)
+		mpart_lstrip_transfer_futex(self->mp_meta, lopart, num_bytes);
+}
+
+/* Strip the first `num_bytes' bytes from the given mem-part. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_lstrip_local)(struct mpart *__restrict self,
+                                  PAGEDIR_PAGEALIGNED mpart_reladdr_t num_bytes,
+                                  struct ccinfo *info) {
+	physpagecnt_t pages;
+	freefun_t freefun;
 
 	/* Update the part's backing data. */
 	pages   = num_bytes >> PAGESHIFT;
 	freefun = mpart_getfreefun(self);
+	if (info) {
+		switch (self->mp_state) {
+		case MPART_ST_SWP:
+		case MPART_ST_SWP_SC:
+			ccinfo_account_swappages(info, pages);
+			break;
+		case MPART_ST_MEM:
+		case MPART_ST_MEM_SC:
+			ccinfo_account_physpages(info, pages);
+			break;
+		default:
+			break;
+		}
+	}
 	switch (self->mp_state) {
 
 	case MPART_ST_SWP:
@@ -542,32 +637,120 @@ NOTHROW(FCALL mpart_lstrip)(struct mpart *__restrict self,
 	self->mp_minaddr += num_bytes;
 }
 
+/* Strip the first `num_bytes' bytes from the given mem-part. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_lstrip)(struct mpart *__restrict self,
+                            PAGEDIR_PAGEALIGNED mpart_reladdr_t num_bytes) {
+	/* Detach or relocate bound objects (futexes) */
+	struct mpartmeta *meta;
+	if ((meta = self->mp_meta) != NULL && meta->mpm_ftx) {
+		struct mfutex *tree;
+		tree          = meta->mpm_ftx;
+		meta->mpm_ftx = NULL;
+		mfutex_tree_reinsert_or_detach_lstrip(&meta->mpm_ftx, tree, num_bytes);
+	}
+
+	/* Update the offsets within associated mem-nodes. */
+	mpart_lstrip_nodes(self, num_bytes);
+
+	/* Do all of the rest that wouldn't need to be moved to a void-part. */
+	mpart_lstrip_local(self, num_bytes, NULL);
+}
+
+
+/* Transfer nodes that lie after `split_bytes' to `hipart' */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mpart_rstrip_transfer_nodes)(struct mpart *__restrict self,
+                                           struct mpart *__restrict hipart,
+                                           PAGEDIR_PAGEALIGNED mpart_reladdr_t split_bytes) {
+	unsigned int i;
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
+		struct mnode *node;
+		LIST_FOREACH_SAFE (node, &self->_mp_nodlsts[i], mn_link) {
+			if unlikely(wasdestroyed(node->mn_mman))
+				continue;
+			if unlikely(node->mn_flags & MNODE_F_UNMAPPED)
+				continue; /* Skip unmapped nodes... */
+			assert(node->mn_part == self); /* Only assert this when `MNODE_F_UNMAPPED' isn't set! */
+			/* Deal with MHINT'd nodes! */
+			if unlikely(node->mn_flags & MNODE_F_MHINT)
+				mnode_load_mhint(node);
+			if (node->mn_partoff >= split_bytes) {
+				decref_nokill(self);
+				++hipart->mp_refcnt; /* For `node->mn_part' */
+				node->mn_part = hipart;
+				node->mn_partoff -= split_bytes;
+				LIST_REMOVE(node, mn_link);
+				LIST_INSERT_HEAD(&hipart->_mp_nodlsts[i], node, mn_link);
+			}
+		}
+	}
+}
+
+/* Futexes that lie after `split_bytes' are moved to `hipart' (at
+ * which  point  it is  asserted  that `hipart->mp_meta != NULL') */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mpart_rstrip_transfer_futex)(struct mpartmeta *__restrict self,
+                                           struct mpart *__restrict hipart,
+                                           PAGEDIR_PAGEALIGNED mpart_reladdr_t split_bytes) {
+	struct mfutex *ftx;
+	while ((ftx = mpartmeta_ftx_rremove(self, split_bytes, (mpart_reladdr_t)-1)) != NULL) {
+		assert(ftx->mfu_addr >= split_bytes);
+		if (tryincref(ftx)) {
+			/* Re-insert into the new tree with the new offset. */
+			ftx->mfu_addr -= split_bytes;
+			awref_set(&ftx->mfu_part, hipart);
+			DBG_memset(&ftx->mfu_mtaent, 0xcc, sizeof(ftx->mfu_mtaent));
+			assert(hipart->mp_meta);
+			awref_set(&ftx->mfu_part, hipart);
+			mfutex_tree_insert(&hipart->mp_meta->mpm_ftx, ftx);
+			decref_unlikely(ftx);
+		} else {
+			DBG_memset(&ftx->mfu_mtaent, 0xcc, sizeof(ftx->mfu_mtaent));
+			awref_clear(&ftx->mfu_part);
+			weakdecref_unlikely(ftx);
+		}
+	}
+}
+
+/* Transfer nodes/futexes to `hipart' and just offsets in moved structures */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_rstrip_transfer)(struct mpart *__restrict self,
+                                     struct mpart *__restrict hipart,
+                                     PAGEDIR_PAGEALIGNED mpart_reladdr_t split_bytes) {
+	mpart_rstrip_transfer_nodes(self, hipart, split_bytes);
+	if (self->mp_meta != NULL)
+		mpart_rstrip_transfer_futex(self->mp_meta, hipart, split_bytes);
+}
 
 /* Strip the last `num_bytes' bytes from the given mem-part. */
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mpart_rstrip)(struct mpart *__restrict self,
-                            PAGEDIR_PAGEALIGNED mpart_reladdr_t num_bytes) {
+NOTHROW(FCALL mpart_rstrip_local)(struct mpart *__restrict self,
+                                 PAGEDIR_PAGEALIGNED mpart_reladdr_t num_bytes,
+                                 struct ccinfo *info) {
 	physpagecnt_t pages;
 	freefun_t freefun;
 	mpart_reladdr_t oldsize, newsize;
 	oldsize = mpart_getsize(self);
 	newsize = oldsize - num_bytes;
 
-	/* Detach bound objects (futexes) */
-	{
-		struct mpartmeta *meta;
-		if ((meta = self->mp_meta) != NULL) {
-			struct mfutex *ftx;
-			while ((ftx = mpartmeta_ftx_rremove(meta, newsize, oldsize - 1)) != NULL) {
-				awref_clear(&ftx->mfu_part);
-				weakdecref_unlikely(ftx);
-			}
-		}
-	}
-
 	/* Update the part's backing data. */
 	pages   = num_bytes >> PAGESHIFT;
 	freefun = mpart_getfreefun(self);
+	if (info) {
+		switch (self->mp_state) {
+		case MPART_ST_SWP:
+		case MPART_ST_SWP_SC:
+			ccinfo_account_swappages(info, pages);
+			break;
+		case MPART_ST_MEM:
+		case MPART_ST_MEM_SC:
+			ccinfo_account_physpages(info, pages);
+			break;
+		default:
+			break;
+		}
+	}
 	switch (self->mp_state) {
 
 	case MPART_ST_SWP:
@@ -587,7 +770,7 @@ NOTHROW(FCALL mpart_rstrip)(struct mpart *__restrict self,
 		ATTR_FALLTHROUGH
 	case MPART_ST_MEM_SC: {
 		struct mchunk *vec;
-		/* Trim leading pages from the scatter vector. */
+		/* Trim trailing pages from the scatter vector. */
 		vec = self->mp_mem_sc.ms_v;
 		for (;;) {
 			physpage_t base;
@@ -649,6 +832,26 @@ NOTHROW(FCALL mpart_rstrip)(struct mpart *__restrict self,
 
 	/* Update the part's actual maxaddr field. */
 	self->mp_maxaddr -= num_bytes;
+}
+
+/* Strip the last `num_bytes' bytes from the given mem-part. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_rstrip)(struct mpart *__restrict self,
+                            PAGEDIR_PAGEALIGNED mpart_reladdr_t num_bytes) {
+	struct mpartmeta *meta;
+	if ((meta = self->mp_meta) != NULL) {
+		struct mfutex *ftx;
+		mpart_reladdr_t oldsize, newsize;
+		oldsize = mpart_getsize(self);
+		newsize = oldsize - num_bytes;
+		while ((ftx = mpartmeta_ftx_rremove(meta, newsize, (mpart_reladdr_t)-1)) != NULL) {
+			awref_clear(&ftx->mfu_part);
+			weakdecref_unlikely(ftx);
+		}
+	}
+
+	/* Do all of the rest that wouldn't need to be moved to a void-part. */
+	mpart_rstrip_local(self, num_bytes, NULL);
 }
 
 
@@ -1039,7 +1242,7 @@ again_enum_hipart_nodlst:
 	if (LIST_ISBOUND(hipart, mp_allparts))
 		mpart_all_list_insert(lopart);
 
-	/* remove locks to mmans in `lopart', and no longer present in `hipart',
+	/* Remove locks to mmans in `lopart', and no longer present in `hipart',
 	 * in addition  to dropping  references  from _all_  transferred  mmans. */
 	{
 		unsigned int i;
@@ -2153,9 +2356,10 @@ NOTHROW(FCALL mpart_unmap_for_void)(struct mpart *__restrict self,
 				size_t unmap_size;
 				unmap_addr = (byte_t *)mnode_getminaddr(node) + (node_unmap_partminaddr - node_partminaddr);
 				unmap_size = (node_unmap_partendaddr - node_unmap_partminaddr);
-				if (pagedir_prepare_p(pd, unmap_addr, unmap_size)) {
-					/*printk(KERN_DEBUG "Delete mapping %p-%p of node %p\n",
-					       unmap_addr, (byte_t *)unmap_addr + unmap_size - 1, node);*/
+				if (node->mn_flags & MNODE_F_MPREPARED) {
+					pagedir_unmap_p(pd, unmap_addr, unmap_size);
+					pagedir_sync_smp_p(pd, unmap_addr, unmap_size);
+				} else if (pagedir_prepare_p(pd, unmap_addr, unmap_size)) {
 					pagedir_unmap_p(pd, unmap_addr, unmap_size);
 					pagedir_sync_smp_p(pd, unmap_addr, unmap_size);
 					pagedir_unprepare_p(pd, unmap_addr, unmap_size);
@@ -2165,6 +2369,8 @@ NOTHROW(FCALL mpart_unmap_for_void)(struct mpart *__restrict self,
 					/* Fallback: kill the entire page directory (so everything is unmapped) */
 					pagedir_unmap_userspace_p(pd);
 				}
+				/*printk(KERN_DEBUG "Delete mapping %p-%p of node %p\n",
+				       unmap_addr, (byte_t *)unmap_addr + unmap_size - 1, node);*/
 			}
 		}
 	}
@@ -2245,8 +2451,10 @@ again_find_uninitialized:
 			/* Special case: the entire part is  mapped, so if there's range  to
 			 * it whose contents are uninitialized, then we can void that range. */
 			if (mpart_find_blockstatus_range(self, result, minaddr,
-			                                 MBLOCK_ST_BITSET(MPART_BLOCK_ST_NDEF)))
+			                                 MBLOCK_ST_BITSET(MPART_BLOCK_ST_NDEF))) {
+
 				return MPART_FIND_TRIMABLE_RANGE_ST_VOID;
+			}
 			/* No uninitialized ranges. */
 			return MPART_FIND_TRIMABLE_RANGE_ST_NONE;
 		}
@@ -2523,7 +2731,7 @@ NOTHROW(FCALL mpart_trim_data_require_part)(struct mpart *__restrict self,
 			LOCAL_unlock_all();
 			newpart = (struct mpart *)kmalloc_nx(sizeof(struct mpart),
 			                                     ccinfo_gfp(data->mtd_ccinfo));
-			if likely(!newpart) {
+			if likely(newpart) {
 				newpart->mp_xflags = MPART_XF_NORMAL;
 				newpart->mp_flags  = MPART_F_NORMAL;
 				data->mtd_parts[index] = newpart;
@@ -2638,6 +2846,59 @@ NOTHROW(FCALL mpart_trim_data_require_blkst)(struct mpart *__restrict self,
 	return MPART_NXOP_ST_SUCCESS;
 }
 
+/* Ensure that `data->mtd_node' has been allocated */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(FCALL mpart_trim_data_require_node)(struct mpart *__restrict self,
+                                            struct mpart_trim_data *__restrict data) {
+	if (!data->mtd_node) {
+		struct mnode *newnode;
+		newnode = (struct mnode *)kmalloc_nx(sizeof(struct mnode),
+		                                     ccinfo_gfp(data->mtd_ccinfo) |
+		                                     GFP_ATOMIC);
+		if (!newnode) {
+			union mcorepart *corepart;
+			/* Try to allocate the part from the core-heap (if possible) */
+			if (mman_lock_tryacquire(&mman_kernel)) {
+				corepart = mcoreheap_alloc_locked_nx_nocc();
+				mman_lock_release(&mman_kernel);
+			} else if (mpart_mappedby_mman_before(self, NULL, &mman_kernel)) {
+				corepart = mcoreheap_alloc_locked_nx_nocc();
+			} else {
+				corepart = NULL;
+			}
+			if (corepart) {
+				corepart->mcp_node.mn_flags = MNODE_F_COREPART;
+				data->mtd_node = &corepart->mcp_node;
+				return MPART_NXOP_ST_SUCCESS;
+			}
+			LOCAL_unlock_all();
+			newnode = (struct mnode *)kmalloc_nx(sizeof(struct mnode),
+			                                     ccinfo_gfp(data->mtd_ccinfo));
+			if likely(newnode) {
+				newnode->mn_flags = MNODE_F_NORMAL;
+				data->mtd_node    = newnode;
+				return MPART_NXOP_ST_RETRY;
+			}
+			if (!ccinfo_noblock(data->mtd_ccinfo)) {
+				/* Try to allocate from the core-part heap whilst blocking */
+				if (mman_lock_acquire_nx(&mman_kernel)) {
+					corepart = mcoreheap_alloc_locked_nx_nocc();
+					mman_lock_release(&mman_kernel);;
+					if (corepart) {
+						corepart->mcp_node.mn_flags = MNODE_F_COREPART;
+						data->mtd_node = &corepart->mcp_node;
+						return MPART_NXOP_ST_RETRY;
+					}
+				}
+			}
+			return MPART_NXOP_ST_ERROR;
+		}
+		newnode->mn_flags = MNODE_F_NORMAL;
+		data->mtd_node    = newnode;
+	}
+	return MPART_NXOP_ST_SUCCESS;
+}
+
 
 /* Replace `range' within `self' with a new mem-part whose state is `MPART_ST_VOID'
  * @return: MPART_NXOP_ST_SUCCESS: Success (all locks were kept)
@@ -2654,7 +2915,7 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 
 	/* Always need at least 1 extra part. */
 	result = mpart_trim_data_require_part0(self, data);
-	if unlikely(result != MPART_NXOP_ST_SUCCESS)
+	if (result != MPART_NXOP_ST_SUCCESS)
 		return result;
 
 	/* Check if the range borders against the start or end of the part.
@@ -2664,6 +2925,8 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 	 *       entirety  is  already being  handled by  our caller! */
 	assert(!mpart_trim_range_is_wholepart(range, self));
 	if (range->mptr_start <= 0 || range->mptr_end >= mpart_getsize(self)) {
+		struct mpart *voidpart;
+		bool need_meta = false;
 
 		/* Allocate a meta-controller if one is needed */
 		if (self->mp_meta &&
@@ -2676,14 +2939,141 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 		     )) {
 			/* Allocate a meta-controller */
 			result = mpart_trim_data_require_meta0(self, data);
-			if unlikely(result != MPART_NXOP_ST_SUCCESS)
+			if (result != MPART_NXOP_ST_SUCCESS)
 				return result;
+			need_meta = true;
 		}
 
-		/* TODO */
-		printk(KERN_DEBUG "TODO: MPART_FIND_TRIMABLE_RANGE_ST_VOID(%p: %#" PRIx64 "-%#" PRIx64 ", %p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 ") [2-part]\n",
+		/* === Point of no return */
+
+		printk(KERN_TRACE "[cc.trim] Void 2-part subrange: %p: %#" PRIx64 "-%#" PRIx64 ", %p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 "\n",
 		       self->mp_file, self->mp_minaddr + range->mptr_start, self->mp_minaddr +  range->mptr_end - 1,
 		       self, range->mptr_start, range->mptr_end - 1, self->mp_minaddr, self->mp_maxaddr);
+		if (!mpart_isanon(self))
+			mpart_tree_removenode(&self->mp_file->mf_parts, self);
+
+		/* Get the void-part and initialize mandatory fields. */
+		voidpart = data->mtd_parts[0];
+		data->mtd_parts[0] = NULL;
+		voidpart->mp_meta = NULL;
+		if (need_meta) {
+			voidpart->mp_meta = data->mtd_metas[0];
+			data->mtd_metas[0] = NULL;
+			mpartmeta_init(voidpart->mp_meta);
+		}
+
+		/* Initialize the first couple of fields. */
+		LIST_INIT(&voidpart->mp_copy);
+		LIST_INIT(&voidpart->mp_share);
+		SLIST_INIT(&voidpart->mp_lockops);
+		voidpart->mp_refcnt = 0;
+
+		/* Must initialize flags now so `voidpart' looks like it's locked. */
+		voidpart->mp_flags |= MPART_F_LOCKBIT;
+		voidpart->mp_flags |= (self->mp_flags & (/*MPART_F_MAYBE_BLK_INIT |*/
+		                                         MPART_F_GLOBAL_REF |
+		                                         MPART_F_NOFREE |
+		                                         /*MPART_F_NOSPLIT |*/ /* Mustn't be set! */
+		                                         MPART_F_NOMERGE |
+		                                         MPART_F_MLOCK_FROZEN |
+		                                         MPART_F_MLOCK));
+
+		if (range->mptr_start <= 0) {
+			/* Void out a leading portion of `self' */
+			voidpart->mp_minaddr = self->mp_minaddr;
+			voidpart->mp_maxaddr = self->mp_minaddr + range->mptr_end - 1;
+
+			/* Transfer nodes/futexes */
+			mpart_lstrip_transfer(self, voidpart, range->mptr_end);
+
+			/* Adjust `self' */
+			mpart_lstrip_local(self, range->mptr_end, data->mtd_ccinfo);
+
+			/* Tell the caller to keep trimming at offset `0' since everything
+			 * before  the old  range's end is  now no longer  part of `self'! */
+			range->mptr_end = 0;
+		} else {
+			/* Void out a trailing portion of `self' */
+			voidpart->mp_minaddr = self->mp_minaddr + range->mptr_start;
+			voidpart->mp_maxaddr = self->mp_maxaddr;
+
+			/* Transfer nodes/futexes */
+			mpart_rstrip_transfer(self, voidpart, range->mptr_start);
+
+			/* Adjust `self' */
+			mpart_rstrip_local(self, mpart_getsize(voidpart), data->mtd_ccinfo);
+		}
+
+		assertf(voidpart->mp_refcnt > 0,
+		        "This would mean that no nodes were transferred to the void part, but "
+		        "if that was the case, then `mpart_find_trimable_pagerange()' should "
+		        "have indicated `MPART_FIND_TRIMABLE_RANGE_ST_TRIM' instead of "
+		        "`MPART_FIND_TRIMABLE_RANGE_ST_VOID'");
+
+		/* Create a reference for ourselves (which we drop later below) */
+		++voidpart->mp_refcnt;
+
+		/* Add yet another reference to `voidpart' if necessary. */
+		if (voidpart->mp_flags & MPART_F_GLOBAL_REF)
+			++voidpart->mp_refcnt;
+
+		/* Finish initialization */
+		voidpart->mp_state = MPART_ST_VOID;
+		DBG_memset(&voidpart->_mp_joblink, 0xcc, sizeof(voidpart->_mp_joblink));
+		voidpart->mp_file = incref(self->mp_file);
+		LIST_ENTRY_UNBOUND_INIT(&voidpart->mp_allparts);
+		DBG_memset(&voidpart->mp_changed, 0xcc, sizeof(voidpart->mp_changed));
+		voidpart->mp_blkst_ptr = NULL;
+		DBG_memset(&voidpart->mp_mem_sc, 0xcc, sizeof(voidpart->mp_mem_sc));
+
+		/* Re-insert parts into the file tree, or mark `voidpart' as ANON if `self' is ANON */
+		if (mpart_isanon(self)) {
+			_mpart_init_asanon(voidpart);
+		} else {
+			mpart_tree_insert(&self->mp_file->mf_parts, self);
+			mpart_tree_insert(&self->mp_file->mf_parts, voidpart);
+		}
+
+		/* Mirror the is-part-of-all-list attribute of `self' within `voidpart'.
+		 * NOTE: Once we do this, `voidpart' becomes visible to the outside world! */
+		COMPILER_BARRIER();
+		if (LIST_ISBOUND(self, mp_allparts))
+			mpart_all_list_insert(voidpart);
+
+		/* Remove locks to mmans in `voidpart', and no longer present in `self',
+		 * in addition  to dropping  references  from _all_  transferred  mmans. */
+		{
+			unsigned int i;
+			for (i = 0; i < lengthof(voidpart->_mp_nodlsts); ++i) {
+				struct mnode *node;
+				LIST_FOREACH (node, &voidpart->_mp_nodlsts[i], mn_link) {
+					struct mman *mm = node->mn_mman;
+					assertf(!wasdestroyed(mm),
+					        "Only non-destroyed mmans should have been transferred!");
+					assertf(!(node->mn_flags & MNODE_F_UNMAPPED),
+					        "Only non-UNMAPPED nodes should have been transferred!");
+					if (!mpart_mappedby_mman_before(voidpart, node, mm) &&
+					    !mpart_mappedby_mman_before(self, NULL, mm))
+						mman_lock_release(mm);
+					decref_unlikely(mm);
+				}
+			}
+		}
+
+		/* Try to merge the newly created `voidpart' if other parts
+		 * that may  have been  created at  other points  in  time. */
+		mpart_assert_integrity(voidpart);
+		voidpart = mpart_merge_locked(voidpart);
+		mpart_assert_integrity(voidpart);
+
+		/* Release the lock with which we've created `voidpart' */
+		mpart_lock_release(voidpart);
+
+		/* Drop our own personal reference from `voidpart' (created above)
+		 * We  had to keep it up until  _after_ all locks were released in
+		 * order  to guaranty  that no other  thread would try  to jump in
+		 * and destroy the part before we could release all locks. */
+		decref_unlikely(voidpart);
 	} else {
 		size_t part0_nblocks;
 
@@ -2694,22 +3084,178 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 		 *
 		 * Additionally, we *might* also need `mtd_blkst_ptr' for `mtd_parts[0]' */
 		result = mpart_trim_data_require_part(self, data, 1);
-		if unlikely(result != MPART_NXOP_ST_SUCCESS)
+		if (result != MPART_NXOP_ST_SUCCESS)
 			return result;
 		part0_nblocks = range->mptr_start >> self->mp_file->mf_blockshift;
 		if (part0_nblocks > MPART_BLKST_BLOCKS_PER_WORD) {
 			result = mpart_trim_data_require_blkst(self, data, part0_nblocks);
-			if unlikely(result != MPART_NXOP_ST_SUCCESS)
+			if (result != MPART_NXOP_ST_SUCCESS)
 				return result;
 		}
-		/* TODO */
-		printk(KERN_DEBUG "TODO: MPART_FIND_TRIMABLE_RANGE_ST_VOID(%p: %#" PRIx64 "-%#" PRIx64 ", %p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 ") [3-part]\n",
+		/* TODO: Allocate mchunkvec for the non-void low area as needed */
+		/* TODO: Allocate meta-controllers as needed */
+
+		/* === Point of no return */
+
+		printk(KERN_TRACE "[cc.trim] Void 3-part subrange: %p: %#" PRIx64 "-%#" PRIx64 ", %p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 " [TODO]\n",
 		       self->mp_file, self->mp_minaddr + range->mptr_start, self->mp_minaddr +  range->mptr_end - 1,
 		       self, range->mptr_start, range->mptr_end - 1, self->mp_minaddr, self->mp_maxaddr);
+		/* TODO */
 	}
 
 	return MPART_NXOP_ST_SUCCESS;
 }
+
+
+/* Special return value for:
+ * - mnode_split_after_or_unlock
+ * - mpart_split_nodes_at_for_void_or_unlock
+ * - mpart_split_nodes_for_void_or_unlock
+ *
+ * Indicates that it's impossible to split nodes because of `MNODE_F_NOSPLIT' */
+#define MPART_SPLIT_NODES_IMPOSSIBLE 3
+
+PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2, 3)) unsigned int
+NOTHROW(FCALL mnode_split_after_or_unlock)(struct mpart *__restrict self,
+                                           struct mpart_trim_data *__restrict data,
+                                           struct mnode *__restrict lonode,
+                                           PAGEDIR_PAGEALIGNED mpart_reladdr_t noderel_offset) {
+	unsigned int result;
+	struct mnode *hinode, *prev;
+	struct mman *mm = lonode->mn_mman;
+	assert(noderel_offset > 0);
+	assert(noderel_offset < mnode_getsize(lonode));
+	assert(IS_ALIGNED(noderel_offset, PAGESIZE));
+	assert(!wasdestroyed(mm));
+	assert(!(lonode->mn_flags & MNODE_F_UNMAPPED));
+
+	/* Check for (unlikely) case: not allowed to split this node. */
+	if unlikely(lonode->mn_flags & MNODE_F_NOSPLIT)
+		return MPART_SPLIT_NODES_IMPOSSIBLE;
+
+	/* Ensure that we have a secondary node to work with. */
+	result = mpart_trim_data_require_node(self, data);
+	if (result != MPART_NXOP_ST_SUCCESS)
+		return result;
+
+	/* Deal with hinted nodes. */
+	if unlikely(lonode->mn_flags & MNODE_F_MHINT)
+		mnode_load_mhint(lonode);
+
+	/* Steal the previously allocated node from `data' */
+	hinode = data->mtd_node;
+	data->mtd_node = NULL;
+	assert(hinode);
+
+	/* Remove the old node from the tree so we can modify it. */
+	mnode_tree_removenode(&mm->mm_mappings, lonode);
+
+	/* Initialize everything. */
+	/*hinode->mn_mement = ...;*/ /* Initialized later */
+	hinode->mn_minaddr = lonode->mn_minaddr + noderel_offset;
+	hinode->mn_maxaddr = lonode->mn_maxaddr;
+	lonode->mn_maxaddr = hinode->mn_minaddr - 1;
+	hinode->mn_flags |= lonode->mn_flags & (MNODE_F_PEXEC |
+	                                        MNODE_F_PWRITE |
+	                                        MNODE_F_PREAD |
+	                                        MNODE_F_PDENYWRITE |
+	                                        MNODE_F_PMASK |
+	                                        MNODE_F_SHARED |
+	                                        /*MNODE_F_UNMAPPED |*/ /* Mustn't be set! */
+	                                        MNODE_F_MPREPARED |
+	                                        MNODE_F_KERNPART |
+	                                        MNODE_F_MLOCK |
+	                                        /*MNODE_F_NOSPLIT |*/ /* Mustn't be set! */
+	                                        MNODE_F_NOMERGE |
+	                                        MNODE_F_NOCORE);
+	hinode->mn_part    = incref(lonode->mn_part);
+	hinode->mn_fspath  = xincref(lonode->mn_fspath);
+	hinode->mn_fsname  = xincref(lonode->mn_fsname);
+	hinode->mn_mman    = mm; /* NOTE: No `weakincref()' here -- As per the documentation, this only becomes a weakincref after the mman got destroyed! */
+	hinode->mn_partoff = lonode->mn_partoff + noderel_offset;
+	if (LIST_ISBOUND(lonode, mn_writable)) {
+		LIST_INSERT_AFTER(lonode, hinode, mn_writable);
+	} else {
+		LIST_ENTRY_UNBOUND_INIT(&hinode->mn_writable);
+	}
+	hinode->mn_module = lonode->mn_module;
+
+	/* Initialize the link of `hinode' such that nodes remain sorted by `mn_partoff' */
+	prev = lonode;
+	while (LIST_NEXT(prev, mn_link) &&
+	       LIST_NEXT(prev, mn_link)->mn_partoff < hinode->mn_partoff)
+		prev = LIST_NEXT(prev, mn_link);
+	LIST_INSERT_AFTER(prev, hinode, mn_link);
+
+	/* An extra reference owned by  our caller who assumes they  are
+	 * holding a reference to every mman for every node of the part. */
+	incref(mm);
+
+	/* Insert both nodes into the mman's tree. */
+	mnode_tree_insert(&mm->mm_mappings, lonode);
+	mnode_tree_insert(&mm->mm_mappings, hinode);
+
+	/* Success! */
+	return MPART_NXOP_ST_SUCCESS;
+}
+
+
+/* Ensure that `mnode's are mapped in such a way that they cross the `addr'. If such
+ * an `mnode' is found, it is split  and replaced with 2 equivalent, smaller  nodes. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(FCALL mpart_split_nodes_at_for_void_or_unlock)(struct mpart *__restrict self,
+                                                       struct mpart_trim_data *__restrict data,
+                                                       PAGEDIR_PAGEALIGNED mpart_reladdr_t addr) {
+	unsigned int i;
+	assert(addr > 0);
+	assert(addr < mpart_getsize(self));
+	assert(IS_ALIGNED(addr, PAGESIZE));
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
+		struct mnode *node;
+		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
+			mpart_reladdr_t node_partminaddr;
+			mpart_reladdr_t node_partendaddr;
+			if unlikely(wasdestroyed(node->mn_mman))
+				continue;
+			if unlikely(node->mn_flags & MNODE_F_UNMAPPED)
+				continue;
+			assert(node->mn_part == self);
+			node_partminaddr = mnode_getpartminaddr(node);
+			if (node_partminaddr >= addr)
+				break; /* List is sorted, so this means we're done searching! */
+			node_partendaddr = mnode_getpartendaddr(node);
+			if (/*node_partminaddr < addr &&*/ addr < node_partendaddr) {
+				/* Found a node that must be split. */
+				unsigned int result;
+				mpart_reladdr_t split_offset;
+				split_offset = addr - node_partminaddr;
+				result = mnode_split_after_or_unlock(self, data, node, split_offset);
+				if (result != MPART_NXOP_ST_SUCCESS)
+					return result;
+			}
+		}
+	}
+	return MPART_NXOP_ST_SUCCESS;
+}
+
+/* Ensure  that `mnode's are mapped in such a way that they cross the start/end of `range'
+ * If such an `mnode' is found, it is split and replaced with 2 equivalent, smaller nodes. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2, 3)) unsigned int
+NOTHROW(FCALL mpart_split_nodes_for_void_or_unlock)(struct mpart *__restrict self,
+                                                    struct mpart_trim_data *__restrict data,
+                                                    struct mpart_trim_range const *__restrict range) {
+	unsigned int result = MPART_NXOP_ST_SUCCESS;
+	if (range->mptr_start > 0) {
+		result = mpart_split_nodes_at_for_void_or_unlock(self, data, range->mptr_start);
+		if (result != MPART_NXOP_ST_SUCCESS)
+			goto done;
+	}
+	if (range->mptr_end < mpart_getsize(self))
+		result = mpart_split_nodes_at_for_void_or_unlock(self, data, range->mptr_end);
+done:
+	return result;
+}
+
 
 /* Same as `mpart_trim_or_unlock()', but all relevant locks are held by the caller. */
 PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
@@ -2753,7 +3299,7 @@ again:
 			printk(KERN_TRACE "[cc.trim] Clear part: %p: %#" PRIx64 "-%#" PRIx64 ", "
 			                  "%p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 " "
 			                  "(%" PRIuSIZ " bytes)\n",
-			       self->mp_file, self->mp_minaddr + range.mptr_start, self->mp_minaddr +  range.mptr_end - 1,
+			       self->mp_file, self->mp_minaddr + range.mptr_start, self->mp_minaddr + range.mptr_end - 1,
 			       self, range.mptr_start, range.mptr_end - 1, self->mp_minaddr, self->mp_maxaddr,
 			       (size_t)(range.mptr_end - range.mptr_start));
 			mpart_clear(self, data->mtd_ccinfo);
@@ -2762,7 +3308,7 @@ again:
 		}
 
 		printk(KERN_DEBUG "TODO: MPART_FIND_TRIMABLE_RANGE_ST_TRIM(%p: %#" PRIx64 "-%#" PRIx64 ", %p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 ")\n",
-		       self->mp_file, self->mp_minaddr + range.mptr_start, self->mp_minaddr +  range.mptr_end - 1,
+		       self->mp_file, self->mp_minaddr + range.mptr_start, self->mp_minaddr + range.mptr_end - 1,
 		       self, range.mptr_start, range.mptr_end - 1, self->mp_minaddr, self->mp_maxaddr);
 	}	break;
 
@@ -2774,7 +3320,7 @@ again:
 			printk(KERN_TRACE "[cc.trim] Set void part: %p: %#" PRIx64 "-%#" PRIx64 ", "
 			                  "%p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 " "
 			                  "(%" PRIuSIZ " bytes)\n",
-			       self->mp_file, self->mp_minaddr + range.mptr_start, self->mp_minaddr +  range.mptr_end - 1,
+			       self->mp_file, self->mp_minaddr + range.mptr_start, self->mp_minaddr + range.mptr_end - 1,
 			       self, range.mptr_start, range.mptr_end - 1, self->mp_minaddr, self->mp_maxaddr,
 			       (size_t)(range.mptr_end - range.mptr_start));
 			mpart_setvoid(self, data->mtd_ccinfo);
@@ -2782,19 +3328,39 @@ again:
 			goto done;
 		}
 
+		/* Make sure that no node is mapping the area across the start/end of the range we intend to void out. */
+		result = mpart_split_nodes_for_void_or_unlock(self, data, &range);
+		if (result != MPART_NXOP_ST_SUCCESS) {
+			if (result == MPART_SPLIT_NODES_IMPOSSIBLE)
+				break; /* Impossible to split one of the nodes -> impossible to void this range */
+			return result;
+		}
+
 		/* Turn the discovered sub-range into void. */
 		result = mpart_void_subrange_or_unlock(self, data, &range);
 		if (result != MPART_NXOP_ST_SUCCESS)
 			return result;
+		decref(mpart_merge_locked(incref(self)));
 	}	break;
 
 	case MPART_FIND_TRIMABLE_RANGE_ST_SWAP: {
 		/* SWAP: Replace a (possibly mapped) sub-range of `self' with another mem-part that is stored in swap
 		 * NOTE: When swap isn't available, the range can simply be skipped by searching for more
 		 *       trimable  ranges beyond the end of the range  that was supposed to go into swap. */
+
+		/* Make sure that no node is mapping the area across the start/end of the range we intend to void out. */
+		//TODO:result = mpart_split_nodes_for_void_or_unlock(self, data, &range);
+		//TODO:if (result != MPART_NXOP_ST_SUCCESS) {
+		//TODO:	if (result == MPART_SPLIT_NODES_IMPOSSIBLE)
+		//TODO:		break; /* Impossible to split one of the nodes -> impossible to void this range */
+		//TODO:	return result;
+		//TODO:}
+
 		printk(KERN_DEBUG "TODO: MPART_FIND_TRIMABLE_RANGE_ST_SWAP(%p: %#" PRIx64 "-%#" PRIx64 ", %p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 ")\n",
-		       self->mp_file, self->mp_minaddr + range.mptr_start, self->mp_minaddr +  range.mptr_end - 1,
+		       self->mp_file, self->mp_minaddr + range.mptr_start, self->mp_minaddr + range.mptr_end - 1,
 		       self, range.mptr_start, range.mptr_end - 1, self->mp_minaddr, self->mp_maxaddr);
+
+		//TODO:decref(mpart_merge_locked(incref(self)));
 	}	break;
 
 	default: __builtin_unreachable();
@@ -3036,6 +3602,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_trim_data_fini)(struct mpart_trim_data *__restrict self) {
 	mpart_xfree(self->mtd_parts[0]);
 	mpart_xfree(self->mtd_parts[1]);
+	mnode_xfree(self->mtd_node);
 	kfree(self->mtd_metas[0]);
 	kfree(self->mtd_metas[1]);
 	kfree(self->mtd_blkst_ptr);

@@ -1480,6 +1480,7 @@ struct mpart_trim_data {
 	struct mpart      *mtd_parts[2];  /* [0..1][owned] Extra mem-parts as may be needed. */
 	struct mpartmeta  *mtd_metas[2];  /* [0..1][owned] Extra mem-part-meta controllers as may be needed. */
 	uintptr_t         *mtd_blkst_ptr; /* [0..1][owned] Pre-allocated block-state vector. */
+	struct mnode      *mtd_node;      /* [0..1][owned] Extra mem-noe as may be needed. */
 	struct ccinfo     *mtd_ccinfo;    /* [1..1][const] Cache-clearing information. */
 	struct unlockinfo *mtd_unlock;    /* [0..1][const] Extra stuff to unlock */
 	unsigned int       mtd_mode;      /* [const] Trim mode (s.a. `MPART_TRIM_MODE_*' and `MPART_TRIM_FLAG_*') */
@@ -1490,6 +1491,7 @@ struct mpart_trim_data {
 	       (self)->mtd_metas[0]  = __NULLPTR,          \
 	       (self)->mtd_metas[1]  = __NULLPTR,          \
 	       (self)->mtd_blkst_ptr = __NULLPTR,          \
+	       (self)->mtd_node      = __NULLPTR,          \
 	       (self)->mtd_ccinfo    = (info),             \
 	       (self)->mtd_unlock    = (unlock),           \
 	       (self)->mtd_mode      = (mode))

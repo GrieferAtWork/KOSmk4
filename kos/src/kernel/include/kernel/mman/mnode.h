@@ -468,6 +468,7 @@ struct mnode {
 /* Free/destroy a given mem-node */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mnode_free)(struct mnode *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self);
+#define mnode_xfree(self) (void)(!(self) || (mnode_free(self), 1))
 
 
 
