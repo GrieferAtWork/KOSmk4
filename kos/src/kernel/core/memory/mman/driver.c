@@ -536,7 +536,7 @@ PRIVATE struct driver_section_awref kernel_sections[KERNEL_SECTIONS_COUNT] = {};
 /* Define the kernel's .shstrtab section */
 struct kernel_shstrtab {
 #define INTERN_SECTION(symbol_name, name, type, flags, start, size, entsize, link, info) \
-	char SECTION_DESCRIPTOR_SHSTRNAME[sizeof(name)];
+	char SECTION_DESCRIPTOR_SHSTRNAME[lengthof(name)];
 #include "driver-kernel_sections.def"
 	char zero;
 };
@@ -4761,7 +4761,7 @@ got_dynsym_size:
 	self->d_eh_frame_end   = NULL;
 	for (i = 0; i < self->d_shnum; ++i) {
 #define EH_FRAME_SECTION_NAME ".eh_frame"
-		char namebuf[sizeof(EH_FRAME_SECTION_NAME)];
+		char namebuf[lengthof(EH_FRAME_SECTION_NAME)];
 		if unlikely(self->d_shdr[i].sh_name >= self->d_shstrsiz)
 			continue;
 		if (memcpy_nopf(namebuf, self->d_shstrtab + self->d_shdr[i].sh_name, sizeof(namebuf)) != 0)
@@ -4811,7 +4811,7 @@ got_dynsym_size:
 	/* Just in case its program-header is missing, also search for a section _named_ ".ARM.exidx" */
 	for (i = 0; i < self->d_shnum; ++i) {
 #define ARM_EXIDX_SECTION_NAME ".ARM.exidx"
-		char namebuf[sizeof(ARM_EXIDX_SECTION_NAME)];
+		char namebuf[lengthof(ARM_EXIDX_SECTION_NAME)];
 		if unlikely(self->d_shdr[i].sh_name >= self->d_shstrsiz)
 			continue;
 		if (memcpy_nopf(namebuf, self->d_shstrtab + self->d_shdr[i].sh_name, sizeof(namebuf)) != 0)

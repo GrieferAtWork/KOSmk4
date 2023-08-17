@@ -215,7 +215,7 @@ DECL_BEGIN
 #define SYSCALL_DB_DECL_ARG(prefix, name, i)     \
 	unsigned int sc_##name##_arg##i##_type : 13; \
 	unsigned int sc_##name##_arg##i##_link : 3;  \
-	char sc_##name##_arg##i##_name[sizeof(PP_STR(prefix##AN##i##_##name))];
+	char sc_##name##_arg##i##_name[lengthof(PP_STR(prefix##AN##i##_##name))];
 
 #define _SYSCALL_DB_DECL_ARGC0(prefix, name)
 #define _SYSCALL_DB_DECL_ARGC1(prefix, name) SYSCALL_DB_DECL_ARG(prefix, name, 0)
@@ -259,7 +259,7 @@ DECL_BEGIN
 /* Declare a system call database entry. */
 #define SYSCALL_DB_DECL(prefix, name)                  \
 	uint8_t sc_##name##_head; /* sc_argc + sc_regdw */ \
-	char    sc_##name##_name[sizeof(#name)];           \
+	char    sc_##name##_name[lengthof(#name)];         \
 	_SYSCALL_DB_DECL_ARGS(prefix, name, prefix##AC_##name)
 
 /* Initialize a system call database entry. */

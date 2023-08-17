@@ -39,6 +39,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -61,7 +62,7 @@ DEFINE_TEST(system_rtld_ro) {
 	 * For this, we use the reopen-via-procfs trick. */
 	{
 		fd_t tempfd;
-		char name[sizeof("/proc/self/fd/" PRIMAXd)];
+		char name[lengthof("/proc/self/fd/" PRIMAXd)];
 		/* Make the FD appear in procfs */
 		ISpos((tempfd = dup(AT_FDSYSRTLD))); /* NOLINT */
 		sprintf(name, "/proc/self/fd/%d", tempfd);

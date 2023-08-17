@@ -64,16 +64,16 @@ struct sockaddr_un {
 #endif /* !__sockaddr_un_defined */
 
 #ifdef __USE_KOS
-#define DEFINE_SOCKADDR_UN(name, path) \
-	struct {                           \
-		__SOCKADDR_COMMON(sun_);       \
-		char sun_path[sizeof(path)];   \
+#define DEFINE_SOCKADDR_UN(name, path)         \
+	struct {                                   \
+		__SOCKADDR_COMMON(sun_);               \
+		char sun_path[__COMPILER_LENOF(path)]; \
 	} name = { __AF_LOCAL, path }
 #endif /* __USE_KOS */
 
 #ifdef __USE_MISC
 #define SUN_LEN(ptr) \
-	((size_t)(((struct sockaddr_un *)0)->sun_path) + __libc_strlen((ptr)->sun_path))
+	(__builtin_offsetof(struct sockaddr_un, sun_path) + __libc_strlen((ptr)->sun_path))
 #endif /* __USE_MISC */
 
 __DECL_END

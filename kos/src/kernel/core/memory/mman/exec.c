@@ -87,11 +87,13 @@ again_loadheader:
 	for (i = 0; i < abis->eas_count; ++i) {
 		unsigned int status;
 		struct execabi *abi = &abis->eas_abis[i];
+
 		/* Check if the magic for this ABI matches. */
 		if (bcmp(args->ea_header, abi->ea_magic, abi->ea_magsiz) != 0)
 			continue;
 		if (!tryincref(abi->ea_driver))
 			continue;
+
 		/* Try to invoke the exec loader of this ABI */
 		TRY {
 			status = (*abi->ea_exec)(args);
@@ -111,6 +113,7 @@ again_loadheader:
 			decref_unlikely(abis);
 			return; /* Got it! */
 		}
+
 		/* If requested to, restart the exec process.
 		 * This is used to implement interpreter redirection, as used by #!-scripts. */
 		if (status == EXECABI_EXEC_RESTART) {
@@ -128,6 +131,7 @@ again_loadheader:
 		/* The available set of ABIs has changed. - Try again. */
 		goto again_getabis;
 	}
+
 	/* Fallback: File isn't a recognized binary. */
 	THROW(E_NOT_EXECUTABLE_NOT_A_BINARY);
 }

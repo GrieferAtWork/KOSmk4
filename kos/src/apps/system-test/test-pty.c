@@ -33,6 +33,7 @@
 #include <fcntl.h>
 #include <inttypes.h>
 #include <pty.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -42,7 +43,7 @@ DECL_BEGIN
 
 DEFINE_TEST(pty_works_correctly) {
 	PRIVATE char const pty_child_data[] = "DATA SEND FROM CHILD";
-	char name[64], buf[sizeof(pty_child_data) + 16];
+	char name[64], buf[lengthof(pty_child_data) + 16];
 	fd_t master, slave;
 	struct stat st;
 	pid_t cpid;

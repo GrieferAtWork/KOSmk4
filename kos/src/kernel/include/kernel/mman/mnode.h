@@ -204,6 +204,7 @@ typedef size_t mpart_reladdr_t;
 //	MNODE_INIT_mn_module(NULL)
 #endif
 
+struct module;
 struct mnode {
 	/* WARNING: Because  mem-nodes  aren't reference  counter, they  are always
 	 *          implicitly owned by the associated  mman, such that you  really
