@@ -1869,6 +1869,9 @@ struct mpart_trim_range {
 	mpart_reladdr_t mptr_end;   /* Trimable range end address. */
 };
 
+#define mpart_trim_range_is_wholepart(self, part) \
+	((self)->mptr_start <= 0 && (self)->mptr_end >= mpart_getsize(part))
+
 
 /* Try to find an unmapped range in `self' whose start address is `>= minaddr' */
 PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) bool
@@ -2089,7 +2092,7 @@ NOTHROW(FCALL mpart_unlock_and_writeback_range_nx)(struct mpart *__restrict self
                                                    struct mpart_trim_data *__restrict data,
                                                    mpart_reladdr_t start,
                                                    mpart_reladdr_t end) {
-	printk(KERN_TRACE "[cc.trim] Sync part: %p: %#I64x-%#I64x, %p: %#Ix-%#Ix@%#I64x-%#I64x\n",
+	printk(KERN_TRACE "[cc.trim] Sync part: %p: %#" PRIx64 "-%#" PRIx64 ", %p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 "\n",
 	       self->mp_file, self->mp_minaddr + start, self->mp_minaddr +  end - 1,
 	       self, start, end - 1, self->mp_minaddr, self->mp_maxaddr);
 	TRY {
@@ -2659,6 +2662,7 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 	 *
 	 * NOTE: The case where the void-range encompasses the part's
 	 *       entirety  is  already being  handled by  our caller! */
+	assert(!mpart_trim_range_is_wholepart(range, self));
 	if (range->mptr_start <= 0 || range->mptr_end >= mpart_getsize(self)) {
 
 		/* Allocate a meta-controller if one is needed */
@@ -2677,7 +2681,7 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 		}
 
 		/* TODO */
-		printk(KERN_DEBUG "TODO: MPART_FIND_TRIMABLE_RANGE_ST_VOID(%p: %#I64x-%#I64x, %p: %#Ix-%#Ix@%#I64x-%#I64x) [2-part]\n",
+		printk(KERN_DEBUG "TODO: MPART_FIND_TRIMABLE_RANGE_ST_VOID(%p: %#" PRIx64 "-%#" PRIx64 ", %p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 ") [2-part]\n",
 		       self->mp_file, self->mp_minaddr + range->mptr_start, self->mp_minaddr +  range->mptr_end - 1,
 		       self, range->mptr_start, range->mptr_end - 1, self->mp_minaddr, self->mp_maxaddr);
 	} else {
@@ -2687,7 +2691,8 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 		 * - data->mtd_parts[0]:  [0, range->mptr_start)
 		 * - data->mtd_parts[1]:  [range->mptr_start, range->mptr_end)
 		 * - self:                [range->mptr_end, mpart_getsize(self) - range->mptr_end)
-		 * Additionally,  we  *might*   also  need   `mtd_blkst_ptr'  for   `mtd_parts[0]' */
+		 *
+		 * Additionally, we *might* also need `mtd_blkst_ptr' for `mtd_parts[0]' */
 		result = mpart_trim_data_require_part(self, data, 1);
 		if unlikely(result != MPART_NXOP_ST_SUCCESS)
 			return result;
@@ -2698,7 +2703,7 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 				return result;
 		}
 		/* TODO */
-		printk(KERN_DEBUG "TODO: MPART_FIND_TRIMABLE_RANGE_ST_VOID(%p: %#I64x-%#I64x, %p: %#Ix-%#Ix@%#I64x-%#I64x) [3-part]\n",
+		printk(KERN_DEBUG "TODO: MPART_FIND_TRIMABLE_RANGE_ST_VOID(%p: %#" PRIx64 "-%#" PRIx64 ", %p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 ") [3-part]\n",
 		       self->mp_file, self->mp_minaddr + range->mptr_start, self->mp_minaddr +  range->mptr_end - 1,
 		       self, range->mptr_start, range->mptr_end - 1, self->mp_minaddr, self->mp_maxaddr);
 	}
@@ -2743,17 +2748,20 @@ again:
 		/* TRIM: Discard an unmapped sub-range of `self' */
 
 		/* Check for simple case: trim the entire part */
-		if (range.mptr_start <= 0 && range.mptr_end >= mpart_getsize(self)) {
+		if (mpart_trim_range_is_wholepart(&range, self)) {
 			/* Clear the mem-part */
-			printk(KERN_TRACE "[cc.trim] Clear part: %p: %#I64x-%#I64x, %p: %#Ix-%#Ix@%#I64x-%#I64x\n",
+			printk(KERN_TRACE "[cc.trim] Clear part: %p: %#" PRIx64 "-%#" PRIx64 ", "
+			                  "%p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 " "
+			                  "(%" PRIuSIZ " bytes)\n",
 			       self->mp_file, self->mp_minaddr + range.mptr_start, self->mp_minaddr +  range.mptr_end - 1,
-			       self, range.mptr_start, range.mptr_end - 1, self->mp_minaddr, self->mp_maxaddr);
+			       self, range.mptr_start, range.mptr_end - 1, self->mp_minaddr, self->mp_maxaddr,
+			       (size_t)(range.mptr_end - range.mptr_start));
 			mpart_clear(self, data->mtd_ccinfo);
 			result = MPART_NXOP_ST_SUCCESS;
 			goto done;
 		}
 
-		printk(KERN_DEBUG "TODO: MPART_FIND_TRIMABLE_RANGE_ST_TRIM(%p: %#I64x-%#I64x, %p: %#Ix-%#Ix@%#I64x-%#I64x)\n",
+		printk(KERN_DEBUG "TODO: MPART_FIND_TRIMABLE_RANGE_ST_TRIM(%p: %#" PRIx64 "-%#" PRIx64 ", %p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 ")\n",
 		       self->mp_file, self->mp_minaddr + range.mptr_start, self->mp_minaddr +  range.mptr_end - 1,
 		       self, range.mptr_start, range.mptr_end - 1, self->mp_minaddr, self->mp_maxaddr);
 	}	break;
@@ -2762,10 +2770,13 @@ again:
 		/* VOID: Replace an mapped sub-range of `self' with another mem-part with status `MPART_ST_VOID' */
 
 		/* Check for simple case: void the entire part */
-		if (range.mptr_start <= 0 && range.mptr_end >= mpart_getsize(self)) {
-			printk(KERN_TRACE "[cc.trim] Set void part: %p: %#I64x-%#I64x, %p: %#Ix-%#Ix@%#I64x-%#I64x\n",
+		if (mpart_trim_range_is_wholepart(&range, self)) {
+			printk(KERN_TRACE "[cc.trim] Set void part: %p: %#" PRIx64 "-%#" PRIx64 ", "
+			                  "%p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 " "
+			                  "(%" PRIuSIZ " bytes)\n",
 			       self->mp_file, self->mp_minaddr + range.mptr_start, self->mp_minaddr +  range.mptr_end - 1,
-			       self, range.mptr_start, range.mptr_end - 1, self->mp_minaddr, self->mp_maxaddr);
+			       self, range.mptr_start, range.mptr_end - 1, self->mp_minaddr, self->mp_maxaddr,
+			       (size_t)(range.mptr_end - range.mptr_start));
 			mpart_setvoid(self, data->mtd_ccinfo);
 			result = MPART_NXOP_ST_SUCCESS;
 			goto done;
@@ -2778,10 +2789,10 @@ again:
 	}	break;
 
 	case MPART_FIND_TRIMABLE_RANGE_ST_SWAP: {
-		/* VOID: Replace a (possibly mapped) sub-range of `self' with another mem-part that is stored in swap
+		/* SWAP: Replace a (possibly mapped) sub-range of `self' with another mem-part that is stored in swap
 		 * NOTE: When swap isn't available, the range can simply be skipped by searching for more
 		 *       trimable  ranges beyond the end of the range  that was supposed to go into swap. */
-		printk(KERN_DEBUG "TODO: MPART_FIND_TRIMABLE_RANGE_ST_SWAP(%p: %#I64x-%#I64x, %p: %#Ix-%#Ix@%#I64x-%#I64x)\n",
+		printk(KERN_DEBUG "TODO: MPART_FIND_TRIMABLE_RANGE_ST_SWAP(%p: %#" PRIx64 "-%#" PRIx64 ", %p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 ")\n",
 		       self->mp_file, self->mp_minaddr + range.mptr_start, self->mp_minaddr +  range.mptr_end - 1,
 		       self, range.mptr_start, range.mptr_end - 1, self->mp_minaddr, self->mp_maxaddr);
 	}	break;
