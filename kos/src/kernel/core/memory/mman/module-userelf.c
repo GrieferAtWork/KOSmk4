@@ -477,12 +477,11 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 				dbg_endupdate();
 				error = zlib_reader_read(&reader, dst_data, dst_size);
 				dbg_setscreendata(0, dbg_screen_height - 1, dbg_screen_width, 1, screen_buffer);
-			} else {
+			} else
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
+			{
 				error = zlib_reader_read(&reader, dst_data, dst_size);
 			}
-#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
-			error = zlib_reader_read(&reader, dst_data, dst_size);
-#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 			zlib_reader_fini(&reader);
 			if unlikely(error < 0)
 				THROW(E_INVALID_ARGUMENT);

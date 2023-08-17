@@ -114,7 +114,7 @@ struct userelf_module: module {
 	pos_t                                      um_shoff;      /* [const] == Elf_Ehdr::e_shoff. */
 	uint16_t                                   um_phnum;      /* [const] == Elf_Ehdr::e_phnum. */
 	uint16_t                                   um_shnum;      /* [const] == Elf_Ehdr::e_shnum. */
-	uint16_t                                   um_shstrndx;   /* [const] == Elf_Ehdr::e_shstrndx. (< ue_shnum) */
+	uint16_t                                   um_shstrndx;   /* [const] == Elf_Ehdr::e_shstrndx. (< um_phnum) */
 	uint16_t                                  _um_pad;        /* ... */
 #if defined(__i386__) || (defined(__x86_64__) && defined(__ARCH_HAVE_COMPAT))
 	uint32_t                                  _um_DT_PLTGOT;
@@ -126,7 +126,7 @@ struct userelf_module: module {
 		char                                  *um_shstrtab;   /* [0..1][lock(WRITE_ONCE)][owned] Section headers string table. */
 		struct module_section_slist           _um_deadsect;   /* [link(_ums_dead)] Used internally for async destruction of dead sections. */
 	};
-	COMPILER_FLEXIBLE_ARRAY(struct uems_awref, um_sections);  /* [0..1][lock(WRITE_ONCE)][ue_shnum] Section cache. */
+	COMPILER_FLEXIBLE_ARRAY(struct uems_awref, um_sections);  /* [0..1][lock(WRITE_ONCE)][um_phnum] Section cache. */
 };
 
 #ifndef _userelf_module_init__um_DT_PLTGOT

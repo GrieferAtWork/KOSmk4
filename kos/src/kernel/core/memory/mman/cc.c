@@ -1114,6 +1114,12 @@ again:
 			goto again;
 		}
 
+		/* TODO: It's not very good practice to keep the all-parts
+		 *       lock  for as long as we do. Even though we always
+		 *       release the lock  when doing something  blocking,
+		 *       this  dependency could still  be considered to be
+		 *       a bottleneck (since the all-parts lock is global) */
+
 		/* Do the actual job of trying to trim the mem-part. */
 		error = mpart_trim_or_unlock_nx(iter, &data);
 		if (error == MPART_NXOP_ST_SUCCESS)
@@ -1475,6 +1481,19 @@ NOTHROW(FCALL system_cc_impl)(struct ccinfo *__restrict info) {
 #endif /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 	DOCC(system_cc_slab_prealloc(info));
 	DOCC(system_cc_heaps(info));
+
+	/* TODO: It'd be better to re-attempt the caller's failing operation
+	 *       after  every step (i.e. from within `ccinfo_isdone()'), and
+	 *       also to gradually do more  and more the more attempts  have
+	 *       already elapsed (rather than  doing almost nothing for  the
+	 *       first half  of  attempts,  and then  *everything*  for  the
+	 *       second half)
+	 * However, re-attempting the caller's operation must be done in a
+	 * context  where the attempt never tries to block, since doing so
+	 * would dead-lock (or there must be 2 ways of doing the  attempt,
+	 * where one is allowed to block, and the other isn't; this  would
+	 * probably be the best way to do it too, since it would make this
+	 * retry system safe based on `info->ci_gfp') */
 
 	/* Unload initialized, but unchanged blocks of non-anonymous mem-parts */
 	DOCC(system_cc_allparts_trim_unused(info, MPART_TRIM_MODE_UNCHANGED));

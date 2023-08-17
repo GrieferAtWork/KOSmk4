@@ -48,13 +48,13 @@
 
 DECL_BEGIN
 
-PRIVATE NONNULL((1, 2)) void
+PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(PRPC_EXEC_CALLBACK_CC task_decref_for_exit_rpc)(struct rpc_context *__restrict UNUSED(ctx),
                                                         void *cookie) {
 	decref((struct task *)cookie);
 }
 
-PRIVATE NONNULL((1, 2)) void
+PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(PRPC_EXEC_CALLBACK_CC taskpid_destroy_rpc)(struct rpc_context *__restrict UNUSED(ctx),
                                                    void *cookie) {
 	taskpid_destroy((struct taskpid *)cookie);
