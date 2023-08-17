@@ -37,6 +37,7 @@
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/module.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
@@ -2946,8 +2947,7 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 		                   MPART_F_NOFREE |
 		                   /*MPART_F_NOSPLIT |*/ /* Mustn't be set! */
 		                   MPART_F_NOMERGE |
-		                   MPART_F_MLOCK_FROZEN |
-		                   MPART_F_MLOCK)
+		                   MPART_F_MLOCK_FROZEN)
 	};
 	unsigned int result;
 
@@ -3391,6 +3391,21 @@ movedown_self__mp_blkst_ptr:
 		DBG_memset(&voidpart->mp_changed, 0xcc, sizeof(voidpart->mp_changed));
 		voidpart->mp_blkst_ptr = NULL;
 		DBG_memset(&voidpart->mp_mem_sc, 0xcc, sizeof(voidpart->mp_mem_sc));
+
+		/* Check how/if MLOCK  should be retained  for `lopart' and  `self'
+		 * Note that we can assume that `voidpart' contains no MLOCK nodes,
+		 * since the presence of those nodes would have prevented the range
+		 * from being considered as voidable! */
+		if (self->mp_flags & MPART_F_MLOCK) {
+			if (self->mp_flags & MPART_F_MLOCK_FROZEN) {
+				lopart->mp_flags |= MPART_F_MLOCK;
+			} else {
+				if (mpart_has_mlock_nodes(lopart))
+					lopart->mp_flags |= MPART_F_MLOCK;
+				if (!mpart_has_mlock_nodes(self))
+					atomic_and(&self->mp_flags, ~MPART_F_MLOCK);
+			}
+		}
 
 		/* Re-insert parts into the file tree, or mark `voidpart' as ANON if `self' is ANON */
 		if (mpart_isanon(self)) {
