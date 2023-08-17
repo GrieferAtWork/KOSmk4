@@ -60,6 +60,7 @@ mpart_ll_allocmem(struct mpart *__restrict self,
 	ccstate_t ccstate = CCSTATE_INIT;
 	physpage_t pp;
 	physpagecnt_t res_pages;
+	size_t missing_pages;
 	struct mchunkvec cv;
 	struct mchunk *vec;
 
@@ -94,12 +95,13 @@ again:
 	}
 	cv.ms_v[0].mc_start = pp;
 	cv.ms_v[0].mc_size  = res_pages;
+	missing_pages = total_pages;
 	for (;;) {
-		total_pages -= res_pages;
-		pp = mfile_alloc_physmem_nocc(self->mp_file, total_pages, &res_pages);
+		missing_pages -= res_pages;
+		pp = mfile_alloc_physmem_nocc(self->mp_file, missing_pages, &res_pages);
 		if unlikely(pp == PHYSPAGE_INVALID)
 			goto err_nophys_v;
-		assert(res_pages <= total_pages);
+		assert(res_pages <= missing_pages);
 
 		/* Check if the vector has to be extended. */
 		if ((cv.ms_c + 1) * sizeof(struct mchunk) > kmalloc_usable_size(cv.ms_v)) {
@@ -131,7 +133,7 @@ again:
 		cv.ms_v[cv.ms_c].mc_start = pp;
 		cv.ms_v[cv.ms_c].mc_size  = res_pages;
 		++cv.ms_c;
-		if (res_pages >= total_pages)
+		if (res_pages >= missing_pages)
 			break;
 	}
 
