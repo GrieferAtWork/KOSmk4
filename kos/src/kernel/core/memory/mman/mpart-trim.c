@@ -3604,6 +3604,8 @@ NOTHROW(FCALL mnode_split_after_or_unlock)(struct mpart *__restrict self,
 		LIST_ENTRY_UNBOUND_INIT(&hinode->mn_writable);
 	}
 	hinode->mn_module = lonode->mn_module;
+	if (hinode->mn_module)
+		module_inc_nodecount(hinode->mn_module);
 
 	/* Initialize the link of `hinode' such that nodes remain sorted by `mn_partoff' */
 	prev = lonode;
