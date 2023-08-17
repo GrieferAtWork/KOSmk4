@@ -2899,6 +2899,35 @@ NOTHROW(FCALL mpart_trim_data_require_node)(struct mpart *__restrict self,
 	return MPART_NXOP_ST_SUCCESS;
 }
 
+/* Ensure that `data->mtd_blkst_ptr' can represent at least `block_count' blocks */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) NONNULL((1, 2)) unsigned int
+NOTHROW(FCALL mpart_trim_data_require_chunkvec)(struct mpart *__restrict self,
+                                                struct mpart_trim_data *__restrict data,
+                                                size_t chunk_count) {
+	size_t req_bytes, avl_bytes;
+	assertf(chunk_count > 1, "This many chunks could be stored in-line");
+	req_bytes = chunk_count * sizeof(struct mchunk);
+	avl_bytes = kmalloc_usable_size(data->mtd_chunkvec);
+	if (req_bytes > avl_bytes) {
+		struct mchunk *new_bitset;
+		new_bitset = (struct mchunk *)krealloc_nx(data->mtd_chunkvec, req_bytes,
+		                                          ccinfo_gfp(data->mtd_ccinfo) | GFP_ATOMIC);
+		if (new_bitset) {
+			data->mtd_chunkvec = new_bitset;
+		} else {
+			LOCAL_unlock_all();
+			new_bitset = (struct mchunk *)krealloc_nx(data->mtd_chunkvec, req_bytes,
+			                                          ccinfo_gfp(data->mtd_ccinfo));
+			if unlikely(!new_bitset)
+				return MPART_NXOP_ST_ERROR;
+			data->mtd_chunkvec = new_bitset;
+			return MPART_NXOP_ST_RETRY;
+		}
+	}
+	return MPART_NXOP_ST_SUCCESS;
+}
+
+
 
 /* Replace `range' within `self' with a new mem-part whose state is `MPART_ST_VOID'
  * @return: MPART_NXOP_ST_SUCCESS: Success (all locks were kept)
@@ -2911,6 +2940,15 @@ PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2, 3)) 
 NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
                                              struct mpart_trim_data *__restrict data,
                                              struct mpart_trim_range *__restrict range) {
+	enum {
+		MPART_F_INHERIT = (/*MPART_F_MAYBE_BLK_INIT |*/
+		                   MPART_F_GLOBAL_REF |
+		                   MPART_F_NOFREE |
+		                   /*MPART_F_NOSPLIT |*/ /* Mustn't be set! */
+		                   MPART_F_NOMERGE |
+		                   MPART_F_MLOCK_FROZEN |
+		                   MPART_F_MLOCK)
+	};
 	unsigned int result;
 
 	/* Always need at least 1 extra part. */
@@ -2945,10 +2983,11 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 		}
 
 		/* === Point of no return */
-
 		printk(KERN_TRACE "[cc.trim] Void 2-part subrange: %p: %#" PRIx64 "-%#" PRIx64 ", %p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 "\n",
 		       self->mp_file, self->mp_minaddr + range->mptr_start, self->mp_minaddr +  range->mptr_end - 1,
 		       self, range->mptr_start, range->mptr_end - 1, self->mp_minaddr, self->mp_maxaddr);
+
+		/* Remove `self' from the file's tree so we can change its range and re-insert it below. */
 		if (!mpart_isanon(self))
 			mpart_tree_removenode(&self->mp_file->mf_parts, self);
 
@@ -2970,13 +3009,7 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 
 		/* Must initialize flags now so `voidpart' looks like it's locked. */
 		voidpart->mp_flags |= MPART_F_LOCKBIT;
-		voidpart->mp_flags |= (self->mp_flags & (/*MPART_F_MAYBE_BLK_INIT |*/
-		                                         MPART_F_GLOBAL_REF |
-		                                         MPART_F_NOFREE |
-		                                         /*MPART_F_NOSPLIT |*/ /* Mustn't be set! */
-		                                         MPART_F_NOMERGE |
-		                                         MPART_F_MLOCK_FROZEN |
-		                                         MPART_F_MLOCK));
+		voidpart->mp_flags |= self->mp_flags & MPART_F_INHERIT;
 
 		if (range->mptr_start <= 0) {
 			/* Void out a leading portion of `self' */
@@ -3004,11 +3037,13 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 			mpart_rstrip_local(self, mpart_getsize(voidpart), data->mtd_ccinfo);
 		}
 
+#if 0 /* Not true for all trim-modes! */
 		assertf(voidpart->mp_refcnt > 0,
 		        "This would mean that no nodes were transferred to the void part, but "
 		        "if that was the case, then `mpart_find_trimable_pagerange()' should "
 		        "have indicated `MPART_FIND_TRIMABLE_RANGE_ST_TRIM' instead of "
 		        "`MPART_FIND_TRIMABLE_RANGE_ST_VOID'");
+#endif
 
 		/* Create a reference for ourselves (which we drop later below) */
 		++voidpart->mp_refcnt;
@@ -3075,32 +3110,407 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 		 * and destroy the part before we could release all locks. */
 		decref_unlikely(voidpart);
 	} else {
+		/* In this case, we're going to create mem-parts as follows:
+		 * - lopart:   [0, range->mptr_start)
+		 * - voidpart: [range->mptr_start, range->mptr_end)
+		 * - self:     [range->mptr_end, mpart_getsize(self) - range->mptr_end) */
+		struct mpart *lopart;   /* == data->mtd_parts[0] */
+		struct mpart *voidpart; /* == data->mtd_parts[1] */
+		bool need_lopart_scatter = false;
+		bool need_lopart_meta    = false;
+		bool need_voidpart_meta  = false;
 		size_t part0_nblocks;
+		size_t range_size;
 
-		/* In this case, we're going to need a total 2 extra mem-parts:
-		 * - data->mtd_parts[0]:  [0, range->mptr_start)
-		 * - data->mtd_parts[1]:  [range->mptr_start, range->mptr_end)
-		 * - self:                [range->mptr_end, mpart_getsize(self) - range->mptr_end)
-		 *
-		 * Additionally, we *might* also need `mtd_blkst_ptr' for `mtd_parts[0]' */
+		/* Calculate constants. */
+		range_size = range->mptr_end - range->mptr_start;
+
+		/* Ensure that both pre-allocated mem-parts are available. */
 		result = mpart_trim_data_require_part(self, data, 1);
 		if (result != MPART_NXOP_ST_SUCCESS)
 			return result;
+
+		/* Allocate space for the block-status bitset that might be needed for the low area. */
 		part0_nblocks = range->mptr_start >> self->mp_file->mf_blockshift;
 		if (part0_nblocks > MPART_BLKST_BLOCKS_PER_WORD) {
-			result = mpart_trim_data_require_blkst(self, data, part0_nblocks);
-			if (result != MPART_NXOP_ST_SUCCESS)
-				return result;
+			assert(!(self->mp_flags & MPART_F_BLKST_INL));
+			if (self->mp_blkst_ptr != NULL) {
+				result = mpart_trim_data_require_blkst(self, data, part0_nblocks);
+				if (result != MPART_NXOP_ST_SUCCESS)
+					return result;
+			}
 		}
-		/* TODO: Allocate mchunkvec for the non-void low area as needed */
-		/* TODO: Allocate meta-controllers as needed */
+
+		/* Allocate meta-controllers as needed */
+		if (self->mp_meta) {
+			if (mpartmeta_ftx_rlocate(self->mp_meta, 0, range->mptr_start - 1) != NULL
+#ifdef ARCH_HAVE_RTM
+			    || self->mp_meta->mpm_rtm_vers != 0
+#endif /* ARCH_HAVE_RTM */
+			    ) {
+				result = mpart_trim_data_require_meta0(self, data);
+				if (result != MPART_NXOP_ST_SUCCESS)
+					return result;
+				need_lopart_meta = true;
+			}
+			if (mpartmeta_ftx_rlocate(self->mp_meta, range->mptr_start, range->mptr_end - 1) != NULL
+#ifdef ARCH_HAVE_RTM
+			    || self->mp_meta->mpm_rtm_vers != 0
+#endif /* ARCH_HAVE_RTM */
+			    ) {
+				result = mpart_trim_data_require_meta(self, data, 1);
+				if (result != MPART_NXOP_ST_SUCCESS)
+					return result;
+				need_voidpart_meta = true;
+			}
+		}
+
+		/* Allocate mchunkvec for the non-void low area as needed */
+		if (MPART_ST_SCATTER(self->mp_state)) {
+			physpagecnt_t got, pages;
+			size_t scatter_count = 1;
+			got   = self->mp_mem_sc.ms_v[0].mc_size;
+			pages = range->mptr_start >> PAGESHIFT;
+			while (pages > got) {
+				assert(scatter_count < self->mp_mem_sc.ms_c);
+				got += self->mp_mem_sc.ms_v[scatter_count].mc_size;
+				++scatter_count;
+			}
+			if (scatter_count > 1) {
+				/* Need more than 1 chunk to represent the retained low area. */
+				result = mpart_trim_data_require_chunkvec(self, data, scatter_count);
+				if (result != MPART_NXOP_ST_SUCCESS)
+					return result;
+				need_lopart_scatter = true;
+			}
+		}
 
 		/* === Point of no return */
-
-		printk(KERN_TRACE "[cc.trim] Void 3-part subrange: %p: %#" PRIx64 "-%#" PRIx64 ", %p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 " [TODO]\n",
+		printk(KERN_TRACE "[cc.trim] Void 3-part subrange: %p: %#" PRIx64 "-%#" PRIx64 ", %p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 "\n",
 		       self->mp_file, self->mp_minaddr + range->mptr_start, self->mp_minaddr +  range->mptr_end - 1,
 		       self, range->mptr_start, range->mptr_end - 1, self->mp_minaddr, self->mp_maxaddr);
-		/* TODO */
+
+		/* Remove `self' from the file's tree so we can change its range and re-insert it below. */
+		if (!mpart_isanon(self))
+			mpart_tree_removenode(&self->mp_file->mf_parts, self);
+
+		/* Get the lo- and void-part and initialize mandatory fields. */
+		lopart   = data->mtd_parts[0];
+		voidpart = data->mtd_parts[1];
+		data->mtd_parts[0] = NULL;
+		data->mtd_parts[1] = NULL;
+		lopart->mp_meta = NULL;
+		if (need_lopart_meta) {
+			lopart->mp_meta = data->mtd_metas[0];
+			data->mtd_metas[0] = NULL;
+			mpartmeta_init(lopart->mp_meta);
+		}
+		voidpart->mp_meta = NULL;
+		if (need_voidpart_meta) {
+			voidpart->mp_meta = data->mtd_metas[1];
+			data->mtd_metas[1] = NULL;
+			mpartmeta_init(voidpart->mp_meta);
+		}
+
+		/* Initialize the first couple of fields. */
+		LIST_INIT(&lopart->mp_copy);
+		LIST_INIT(&lopart->mp_share);
+		SLIST_INIT(&lopart->mp_lockops);
+		lopart->mp_refcnt = 0;
+		lopart->mp_flags |= MPART_F_LOCKBIT;
+		lopart->mp_flags |= self->mp_flags & MPART_F_INHERIT;
+		LIST_INIT(&voidpart->mp_copy);
+		LIST_INIT(&voidpart->mp_share);
+		SLIST_INIT(&voidpart->mp_lockops);
+		voidpart->mp_refcnt = 0;
+		voidpart->mp_flags |= MPART_F_LOCKBIT;
+		voidpart->mp_flags |= self->mp_flags & MPART_F_INHERIT;
+
+		/* Assign new part ranges. */
+		lopart->mp_minaddr = self->mp_minaddr;
+		lopart->mp_maxaddr = self->mp_minaddr + range->mptr_start - 1;
+		voidpart->mp_minaddr = lopart->mp_maxaddr + 1;
+		voidpart->mp_maxaddr = self->mp_minaddr + range->mptr_end - 1;
+
+		/* Transfer nodes/futexes to their correct parts. */
+		mpart_lstrip_transfer(self, lopart, range->mptr_start);
+		mpart_lstrip_transfer(self, voidpart, range_size);
+
+#if 0 /* Not true for all trim-modes! */
+		assertf(lopart->mp_refcnt > 0 && voidpart->mp_refcnt > 0,
+		        "This would mean that no nodes were transferred to the lo/void part, "
+		        "but if that was the case, then `mpart_find_trimable_pagerange()' "
+		        "should have indicated `MPART_FIND_TRIMABLE_RANGE_ST_TRIM' instead "
+		        "of `MPART_FIND_TRIMABLE_RANGE_ST_VOID'");
+#endif
+
+		/* Transfer the non-void area to `lopart' */
+		{
+			size_t lopart_pages = range->mptr_start >> PAGESHIFT;
+			if (self->mp_state == MPART_ST_MEM) {
+				assert(!need_lopart_scatter);
+				assert(self->mp_mem.mc_size > lopart_pages);
+				lopart->mp_state = MPART_ST_MEM;
+				lopart->mp_mem.mc_start = self->mp_mem.mc_start;
+				lopart->mp_mem.mc_size  = lopart_pages;
+				self->mp_mem.mc_start += lopart_pages;
+				self->mp_mem.mc_size -= lopart_pages;
+			} else {
+				struct mchunk *newvec;
+				assert(self->mp_state == MPART_ST_MEM_SC);
+				assert(self->mp_mem_sc.ms_c >= 1);
+				assert(need_lopart_scatter == (lopart_pages > self->mp_mem_sc.ms_v[0].mc_size));
+				if (!need_lopart_scatter) {
+					lopart->mp_state = MPART_ST_MEM;
+					lopart->mp_mem.mc_start = self->mp_mem_sc.ms_v[0].mc_start;
+					lopart->mp_mem.mc_size  = lopart_pages;
+					assert(self->mp_mem_sc.ms_v[0].mc_size >= lopart_pages);
+					self->mp_mem_sc.ms_v[0].mc_start += lopart_pages;
+					self->mp_mem_sc.ms_v[0].mc_size -= lopart_pages;
+				} else {
+					physpagecnt_t got;
+					size_t scatter_count = 1;
+					size_t used_in_last_chunk;
+					size_t unused_in_last_chunk;
+					got = self->mp_mem_sc.ms_v[0].mc_size;
+					assert(lopart_pages > got);
+					do {
+						assert(scatter_count < self->mp_mem_sc.ms_c);
+						got += self->mp_mem_sc.ms_v[scatter_count].mc_size;
+						++scatter_count;
+					} while (lopart_pages > got);
+					assert(scatter_count >= 2);
+					lopart->mp_state = MPART_ST_MEM_SC;
+					lopart->mp_mem_sc.ms_v = data->mtd_chunkvec;
+					lopart->mp_mem_sc.ms_c = scatter_count;
+					assert(kmalloc_usable_size(lopart->mp_mem_sc.ms_v) >=
+					       (scatter_count * sizeof(struct mchunk)));
+					data->mtd_chunkvec = NULL; /* Stolen... */
+					newvec = (struct mchunk *)krealloc_nx(lopart->mp_mem_sc.ms_v,
+					                                      scatter_count * sizeof(struct mchunk),
+					                                      ccinfo_gfp(data->mtd_ccinfo) | GFP_ATOMIC);
+					if likely(newvec)
+						lopart->mp_mem_sc.ms_v = newvec;
+
+					/* Copy chunks. */
+					memcpy(lopart->mp_mem_sc.ms_v, self->mp_mem_sc.ms_v, scatter_count, sizeof(struct mchunk));
+					--scatter_count;
+					unused_in_last_chunk = got - lopart_pages;
+					lopart->mp_mem_sc.ms_v[scatter_count].mc_size -= unused_in_last_chunk;
+					used_in_last_chunk = lopart->mp_mem_sc.ms_v[scatter_count].mc_size;
+
+					/* Remove chunks from `self' */
+					self->mp_mem_sc.ms_c -= scatter_count;
+					memmovedown(&self->mp_mem_sc.ms_v[0],
+					            &self->mp_mem_sc.ms_v[scatter_count],
+					            self->mp_mem_sc.ms_c,
+					            sizeof(struct mchunk));
+					self->mp_mem_sc.ms_v[0].mc_start += used_in_last_chunk;
+					self->mp_mem_sc.ms_v[0].mc_size = unused_in_last_chunk;
+				}
+				if (self->mp_mem_sc.ms_v[0].mc_size == 0) {
+					/* Remove the first chunk from `self->mp_mem_sc.ms_v' if it become emtpy. */
+					--self->mp_mem_sc.ms_c;
+					memmovedown(&self->mp_mem_sc.ms_v[0],
+					            &self->mp_mem_sc.ms_v[1],
+					            self->mp_mem_sc.ms_c,
+					            sizeof(struct mchunk));
+				}
+
+				/* Try to release unused memory from `self->mp_mem_sc.ms_v' */
+				newvec = (struct mchunk *)krealloc_nx(self->mp_mem_sc.ms_v,
+				                                      self->mp_mem_sc.ms_c * sizeof(struct mchunk),
+				                                      ccinfo_gfp(data->mtd_ccinfo) | GFP_ATOMIC);
+				if likely(newvec)
+					self->mp_mem_sc.ms_v = newvec;
+			}
+		}
+
+		/* Transfer block-status words to `lopart' */
+		if (part0_nblocks <= MPART_BLKST_BLOCKS_PER_WORD) {
+			lopart->mp_flags |= MPART_F_BLKST_INL;
+			if (self->mp_flags & MPART_F_BLKST_INL) {
+				lopart->mp_blkst_inl = self->mp_blkst_inl;
+				self->mp_blkst_inl >>= part0_nblocks * MPART_BLOCK_STBITS;
+			} else if (self->mp_blkst_ptr != NULL) {
+				size_t retain_nbytes;
+				size_t retain_nblocks;
+				lopart->mp_blkst_inl = self->mp_blkst_ptr[0];
+movedown_self__mp_blkst_ptr:
+				retain_nbytes  = (size_t)(self->mp_maxaddr - lopart->mp_maxaddr);
+				retain_nblocks = retain_nbytes >> self->mp_file->mf_blockshift;
+				bitmovedown(self->mp_blkst_ptr, 0,
+				            self->mp_blkst_ptr, part0_nblocks * MPART_BLOCK_STBITS,
+				            retain_nblocks * MPART_BLOCK_STBITS);
+			} else {
+				self->mp_blkst_inl = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_CHNG);
+			}
+		} else {
+			assert(!(self->mp_flags & MPART_F_BLKST_INL));
+			if (self->mp_blkst_ptr == NULL) {
+				lopart->mp_blkst_ptr = NULL;
+			} else {
+				size_t move_nwords;
+				lopart->mp_blkst_ptr = data->mtd_blkst_ptr;
+				data->mtd_blkst_ptr  = NULL; /* Steal... */
+				move_nwords = CEILDIV(part0_nblocks, MPART_BLKST_BLOCKS_PER_WORD);
+				assert(kmalloc_usable_size(lopart->mp_blkst_ptr) >=
+				       (move_nwords * sizeof(mpart_blkst_word_t)));
+				memcpy(lopart->mp_blkst_ptr, self->mp_blkst_ptr,
+				       move_nwords, sizeof(mpart_blkst_word_t));
+				goto movedown_self__mp_blkst_ptr;
+			}
+		}
+
+		/* Adjust  `self' to indicate that we've stolen  all of the data for `lopart'.
+		 * This is needed here so that `mpart_lstrip_local()' will do the right thing. */
+		self->mp_minaddr += range->mptr_start;
+
+		/* Discard the void-area from `self' */
+		mpart_lstrip_local(self, range_size, data->mtd_ccinfo);
+
+		/* Create a reference for ourselves (which we drop later below) */
+		++lopart->mp_refcnt;
+		++voidpart->mp_refcnt;
+
+		/* Add yet another reference to `lopart' and `voidpart' if necessary. */
+		if (lopart->mp_flags & MPART_F_GLOBAL_REF)
+			++lopart->mp_refcnt;
+		if (voidpart->mp_flags & MPART_F_GLOBAL_REF)
+			++voidpart->mp_refcnt;
+
+		/* Finish initialization */
+		voidpart->mp_state = MPART_ST_VOID;
+		DBG_memset(&lopart->_mp_joblink, 0xcc, sizeof(lopart->_mp_joblink));
+		DBG_memset(&voidpart->_mp_joblink, 0xcc, sizeof(voidpart->_mp_joblink));
+		lopart->mp_file   = incref(self->mp_file);
+		voidpart->mp_file = incref(self->mp_file);
+		LIST_ENTRY_UNBOUND_INIT(&lopart->mp_allparts);
+		LIST_ENTRY_UNBOUND_INIT(&voidpart->mp_allparts);
+		DBG_memset(&lopart->mp_changed, 0xcc, sizeof(lopart->mp_changed));
+		DBG_memset(&voidpart->mp_changed, 0xcc, sizeof(voidpart->mp_changed));
+		voidpart->mp_blkst_ptr = NULL;
+		DBG_memset(&voidpart->mp_mem_sc, 0xcc, sizeof(voidpart->mp_mem_sc));
+
+		/* Re-insert parts into the file tree, or mark `voidpart' as ANON if `self' is ANON */
+		if (mpart_isanon(self)) {
+			_mpart_init_asanon(lopart);
+			_mpart_init_asanon(voidpart);
+		} else {
+			mpart_tree_insert(&self->mp_file->mf_parts, lopart);
+			mpart_tree_insert(&self->mp_file->mf_parts, voidpart);
+			mpart_tree_insert(&self->mp_file->mf_parts, self);
+
+			/* Check if one of the transferred block-status words indicates CHANGED.
+			 * If so, then mark `lopart' as CHANGED and add it to the backing file's
+			 * list of changed nodes (so-long as `self' isn't anonymous) */
+			if (self->mp_flags & MPART_F_CHANGED) {
+				bool has_changed = false;
+				if (!mpart_hasblockstate(lopart)) {
+					has_changed = true;
+				} else {
+					size_t i;
+					for (i = 0; i < part0_nblocks; ++i) {
+						unsigned int block_st;
+						block_st = mpart_getblockstate(lopart, i);
+						assert(block_st != MPART_BLOCK_ST_INIT);
+						if (block_st == MPART_BLOCK_ST_CHNG) {
+							has_changed = true;
+							break;
+						}
+					}
+				}
+				if (has_changed) {
+					struct mfile *file = lopart->mp_file;
+					lopart->mp_flags |= MPART_F_CHANGED;
+					/* s.a. `mfile_add_changed_part()' */
+					if (file->mf_ops->mo_saveblocks) {
+						struct mpart *next;
+						++lopart->mp_refcnt; /* For the list of changed parts. */
+						do {
+							next = atomic_read(&file->mf_changed.slh_first);
+							if unlikely(next == MFILE_PARTS_ANONYMOUS) {
+								lopart->mp_flags &= ~MPART_F_CHANGED;
+								--lopart->mp_refcnt;
+								break;
+							}
+							lopart->mp_changed.sle_next = next;
+							COMPILER_WRITE_BARRIER();
+						} while (!atomic_cmpxch_weak(&file->mf_changed.slh_first,
+						                             next, lopart));
+					}
+				}
+			}
+		}
+
+		/* Mirror the is-part-of-all-list attribute of `self' within `lopart' and `voidpart'.
+		 * NOTE: Once we do this, `lopart' and `voidpart' becomes visible to the outside world! */
+		COMPILER_BARRIER();
+		if (LIST_ISBOUND(self, mp_allparts)) {
+			mpart_all_list_insert(lopart);
+			mpart_all_list_insert(voidpart);
+		}
+
+		/* Remove  locks to  mmans in `lopart'  and `voidpart', and  no longer present
+		 * in `self', in addition to dropping references from _all_ transferred mmans. */
+		{
+			unsigned int i;
+			for (i = 0; i < lengthof(lopart->_mp_nodlsts); ++i) {
+				struct mnode *node;
+				LIST_FOREACH (node, &lopart->_mp_nodlsts[i], mn_link) {
+					struct mman *mm = node->mn_mman;
+					assertf(!wasdestroyed(mm),
+					        "Only non-destroyed mmans should have been transferred!");
+					assertf(!(node->mn_flags & MNODE_F_UNMAPPED),
+					        "Only non-UNMAPPED nodes should have been transferred!");
+					if (!mpart_mappedby_mman_before(lopart, node, mm) &&
+					    !mpart_mappedby_mman_before(voidpart, NULL, mm) &&
+					    !mpart_mappedby_mman_before(self, NULL, mm))
+						mman_lock_release(mm);
+					decref_unlikely(mm);
+				}
+			}
+			for (i = 0; i < lengthof(voidpart->_mp_nodlsts); ++i) {
+				struct mnode *node;
+				LIST_FOREACH (node, &voidpart->_mp_nodlsts[i], mn_link) {
+					struct mman *mm = node->mn_mman;
+					assertf(!wasdestroyed(mm),
+					        "Only non-destroyed mmans should have been transferred!");
+					assertf(!(node->mn_flags & MNODE_F_UNMAPPED),
+					        "Only non-UNMAPPED nodes should have been transferred!");
+					if (!mpart_mappedby_mman_before(voidpart, node, mm) &&
+					    !mpart_mappedby_mman_before(self, NULL, mm))
+						mman_lock_release(mm);
+					decref_unlikely(mm);
+				}
+			}
+		}
+
+		/* Try to merge the newly created `lopart' and `voidpart' if
+		 * other parts that may have been created at other points in
+		 * time. */
+		mpart_assert_integrity(lopart);
+		lopart = mpart_merge_locked(lopart);
+		mpart_assert_integrity(lopart);
+
+		mpart_assert_integrity(voidpart);
+		voidpart = mpart_merge_locked(voidpart);
+		mpart_assert_integrity(voidpart);
+
+		/* Release the lock with which we've created `lopart' and `voidpart' */
+		mpart_lock_release(lopart);
+		mpart_lock_release(voidpart);
+
+		/* Drop  our own personal  reference from `lopart'  and `voidpart' (created above)
+		 * We had to keep it up until _after_ all locks were released in order to guaranty
+		 * that  no other thread would try to jump in and destroy the part before we could
+		 * release all locks. */
+		decref_unlikely(lopart);
+		decref_unlikely(voidpart);
+
+		/* Tell the caller to keep trimming at offset `0' since everything
+		 * before  the old  range's end is  now no longer  part of `self'! */
+		range->mptr_end = 0;
 	}
 
 	return MPART_NXOP_ST_SUCCESS;
@@ -3606,6 +4016,7 @@ NOTHROW(FCALL mpart_trim_data_fini)(struct mpart_trim_data *__restrict self) {
 	kfree(self->mtd_metas[0]);
 	kfree(self->mtd_metas[1]);
 	kfree(self->mtd_blkst_ptr);
+	kfree(self->mtd_chunkvec);
 	DBG_memset(self, 0xcc, sizeof(*self));
 }
 
