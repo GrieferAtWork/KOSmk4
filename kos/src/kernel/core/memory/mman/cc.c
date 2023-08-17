@@ -1600,6 +1600,11 @@ NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
 	 *               cleared bytes will be more accurate in the end. */
 	info->ci_gfp |= GFP_NOCLRC | GFP_NOTRIM;
 
+	/* Mask invalid bits (and bits that wouldn't make sense, like `GFP_LOCKED' or `GFP_CALLOC') */
+	info->ci_gfp &= GFP_PREFLT | GFP_NOCLRC | GFP_NOMMAP |
+	                GFP_NOTRIM | GFP_ATOMIC | GFP_NOOVER |
+	                GFP_NOSWAP | GFP_MCHEAP;
+
 	/* Safety-check: prevent recursion in case a call to `system_cc()'
 	 *               is already in progress within the calling thread. */
 	if (caller->t_flags & _TASK_FSYSTEMCC)
