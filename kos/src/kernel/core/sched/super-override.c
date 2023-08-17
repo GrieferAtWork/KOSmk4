@@ -151,7 +151,7 @@ sched_super_override_start_impl(bool force)
 
 again:
 	/* Now try to acquire the super-override lock. */
-	while (atomic_xch(&super_override_cpu, me) != NULL) {
+	while (!atomic_cmpxch(&super_override_cpu, NULL, me)) {
 		if (!force) {
 			if (!was_already_override)
 				sched_override_end();
@@ -162,7 +162,7 @@ again:
 		 * When this happens, then we must simply wait
 		 * for the lock to be released. */
 		task_connect(&super_override_release);
-		if (atomic_xch(&super_override_cpu, me) == NULL) {
+		if (atomic_cmpxch(&super_override_cpu, NULL, me)) {
 			task_disconnectall();
 			break;
 		}
