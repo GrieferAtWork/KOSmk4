@@ -738,12 +738,23 @@ NOTHROW(FCALL mcoreheap_free_locked)(union mcorepart *__restrict part) {
 	/* Extract the associated page from `part' */
 	page  = (struct mcorepage *)FLOOR_ALIGN((uintptr_t)part, PAGESIZE);
 	index = (unsigned int)(part - page->mcp_part);
+
+	/* Assert that `page' exists. */
+#ifndef NDEBUG
+	do {
+		SLIST_CONTAINS(&mcoreheap_usedlist, page, mcp_link, goto found_page);
+		SLIST_CONTAINS(&mcoreheap_freelist, page, mcp_link, goto found_page);
+	} while (__assertion_checkf(NULL, "Part %p in page %p not found in coreheap", part, page));
+found_page:
+#endif /* !NDEBUG */
+
 	assertf(part == &page->mcp_part[index],
 	        "Bad part pointer %p doesn't equal part %p at index %u of page %p",
 	        part, &page->mcp_part[index], index, page);
 	assertf(INUSE_BITSET_GET(page, index),
 	        "Part at %p (index %u in page at %p) not marked as allocated",
 	        part, index, page);
+
 #ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 	mempatl(part, DEBUGHEAP_NO_MANS_LAND, sizeof(*part));
 #endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
