@@ -1994,8 +1994,8 @@ NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self)
 	 *    available  physical memory (so it's better to use that memory to cache data that's already been
 	 *    loaded from disk, than to free such memory as soon as possible).
 	 * 3: `system_cc()' (which gets called when we're low on memory) uses `mpart_trim_or_unlock()', which
-	 *    *is* able to trim non-anonymous parts (using `mpart_trim_or_unlock_nx()'), so it isn't affected
-	 *    by this restriction.
+	 *    *is* able to trim non-anonymous parts (using `mpart_trim_locked_or_unlock_nx()'), so it isn't
+	 *    affected by this restriction.
 	 *
 	 * Also: This prevents parts of `MFILE_F_PERSISTENT' files from being deleted (since
 	 *       those kinds  of files  (i.e. ramfs)  aren't anonymous  until  `unlink(2)'d) */
@@ -2387,7 +2387,7 @@ NOTHROW(FCALL mpart_unmap_for_void)(struct mpart *__restrict self,
 #define MPART_FIND_TRIMABLE_RANGE_ST_SWAP  5                     /* Found a range of `MPART_BLOCK_ST_CHNG'-blocks that should be written to swap (locks are still held)
                                                                   * Treat  the same as `MPART_FIND_TRIMABLE_RANGE_ST_VOID' for the  purpose of splitting the range into
                                                                   * its own mem-part, but then write to swap  before starting over from scratch (i.e. returning to  the
-                                                                  * caller of `mpart_trim_or_unlock_nx()' with `MPART_NXOP_ST_RETRY'). */
+                                                                  * caller of `mpart_trim_locked_or_unlock_nx()' with `MPART_NXOP_ST_RETRY'). */
 #define MPART_FIND_TRIMABLE_RANGE_ST_ISOK(x) ((x) >= 3)
 
 /* Find a range that can be trimmed in `self'
@@ -3928,8 +3928,8 @@ done:
  * @return: MPART_NXOP_ST_RETRY:   Failed (`data->mtd_unlock' and `mpart_lock_release(self)' was released)
  * @return: MPART_NXOP_ST_ERROR:   Non-recoverable error (OOM or yield-failure). Don't try again. */
 PUBLIC NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
-NOTHROW(FCALL mpart_trim_or_unlock_nx)(struct mpart *__restrict self,
-                                       struct mpart_trim_data *__restrict data) {
+NOTHROW(FCALL mpart_trim_locked_or_unlock_nx)(struct mpart *__restrict self,
+                                              struct mpart_trim_data *__restrict data) {
 	unsigned int result = MPART_NXOP_ST_SUCCESS;
 	struct mpartmeta *meta;
 	assert(mpart_lock_acquired(self));
@@ -3988,6 +3988,33 @@ done:
 	return result;
 }
 
+/* Same as `mpart_trim_locked_or_unlock_nx()', but automatically acquires `mpart_lock_acquire(self)' */
+PUBLIC NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(FCALL mpart_trim_or_unlock_nx)(struct mpart *__restrict self,
+                                       struct mpart_trim_data *__restrict data) {
+	unsigned int result = MPART_NXOP_ST_SUCCESS;
+
+	/* Try to lock `self'. */
+	if (!mpart_lock_tryacquire(self)) {
+		if (ccinfo_noblock(data->mtd_ccinfo))
+			goto done;
+		unlockinfo_xunlock(data->mtd_unlock);
+		if (!mpart_lock_waitfor_nx(self))
+			return MPART_NXOP_ST_ERROR;
+		return MPART_NXOP_ST_RETRY;
+	}
+
+	/* Do the actual trim operation */
+	result = mpart_trim_locked_or_unlock_nx(self, data);
+
+	/* release lock on success (in all other cases, locks were already released) */
+	if (result == MPART_NXOP_ST_SUCCESS)
+		mpart_lock_release(self);
+done:
+	return result;
+}
+
+
 #else /* CONFIG_HAVE_KERNEL_MPART_TRIM */
 
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -4014,8 +4041,8 @@ NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self)
  * @return: MPART_NXOP_ST_RETRY:   Failed (`data->mtd_unlock' and `mpart_lock_release(self)' was released)
  * @return: MPART_NXOP_ST_ERROR:   Non-recoverable error (OOM or yield-failure). Don't try again. */
 PUBLIC NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
-NOTHROW(FCALL mpart_trim_or_unlock_nx)(struct mpart *__restrict self,
-                                       struct mpart_trim_data *__restrict data) {
+NOTHROW(FCALL mpart_trim_locked_or_unlock_nx)(struct mpart *__restrict self,
+                                              struct mpart_trim_data *__restrict data) {
 	/* Trimming is disabled. */
 	COMPILER_IMPURE();
 	(void)self;
@@ -4023,6 +4050,7 @@ NOTHROW(FCALL mpart_trim_or_unlock_nx)(struct mpart *__restrict self,
 	return MPART_TRIM_OR_UNLOCK_ST_SUCCESS;
 }
 
+DEFINE_PUBLIC_ALIAS(mpart_trim_or_unlock_nx, mpart_trim_locked_or_unlock_nx);
 #endif /* !CONFIG_HAVE_KERNEL_MPART_TRIM */
 
 PUBLIC NOBLOCK NONNULL((1)) void

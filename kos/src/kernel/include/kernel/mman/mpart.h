@@ -95,6 +95,7 @@
                                        * scanned in search  for other  locked mappings. If  any are  found, then  this
                                        * flag will remain set. If none are found, then this flag is cleared. */
 #define MPART_F__RBRED         0x4000 /* [lock(:mfile::mf_lock)] Internal flag: This part is a red node. */
+#define MPART_F__TRIMMED       0x8000 /* [lock(WEAK, ATOMIC)] Internal flag: This part has recently been trimmed (s.a. `system_cc()') */
 /*efine MPART_F_               0x8000  * ... */
 
 /* Possible values for `struct mpart::mp_xflags' */
@@ -889,7 +890,7 @@ NOTHROW(FCALL mpart_page2swap)(struct mpart const *__restrict self,
 /* Possible return values for:
  * - mpart_initdone_or_unlock_nx
  * - mpart_nodma_or_unlock_nx
- * - mpart_trim_or_unlock_nx
+ * - mpart_trim_locked_or_unlock_nx
  */
 #define MPART_NXOP_ST_SUCCESS 0 /* Success (locks are still held) */
 #define MPART_NXOP_ST_RETRY   1 /* Try again (all locks were released) */
@@ -1517,6 +1518,10 @@ NOTHROW(FCALL mpart_trim_data_fini)(struct mpart_trim_data *__restrict self);
  * @return: MPART_NXOP_ST_SUCCESS: Success (all locks were kept)
  * @return: MPART_NXOP_ST_RETRY:   Failed (`data->mtd_unlock' and `mpart_lock_release(self)' was released)
  * @return: MPART_NXOP_ST_ERROR:   Non-recoverable error (OOM or yield-failure). Don't try again. */
+FUNDEF NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(FCALL mpart_trim_locked_or_unlock_nx)(struct mpart *__restrict self,
+                                              struct mpart_trim_data *__restrict data);
+/* Same as `mpart_trim_locked_or_unlock_nx()', but automatically acquires `mpart_lock_acquire(self)' */
 FUNDEF NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_or_unlock_nx)(struct mpart *__restrict self,
                                        struct mpart_trim_data *__restrict data);

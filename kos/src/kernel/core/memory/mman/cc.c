@@ -62,6 +62,7 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <sched/task.h>
 
 #include <hybrid/overflow.h>
+#include <hybrid/sched/preemption.h>
 
 #include <kos/kernel/handle.h>
 #include <network/socket.h>
@@ -973,8 +974,8 @@ NOTHROW(KCALL system_cc_heaps)(struct ccinfo *__restrict info) {
 /************************************************************************/
 
 PRIVATE NONNULL((1, 2)) void
-NOTHROW(FCALL ccinfo_accunt_mpart)(struct ccinfo *__restrict info,
-                                   struct mpart *__restrict part) {
+NOTHROW(FCALL ccinfo_account_mpart)(struct ccinfo *__restrict info,
+                                    struct mpart *__restrict part) {
 	/* TODO: Account for physical/swap space owned by `part' */
 	(void)part;
 	ccinfo_account(info, sizeof(struct mpart));
@@ -1014,7 +1015,7 @@ again:
 			mpart_all_release();
 			waitfor_ok = mpart_lock_waitfor_nx(iter);
 			if (atomic_decfetch(&iter->mp_refcnt) == 0) {
-				ccinfo_accunt_mpart(info, iter);
+				ccinfo_account_mpart(info, iter);
 				SLIST_INSERT(&deadlist, iter, _mp_dead);
 			}
 			if (!waitfor_ok)
@@ -1044,7 +1045,7 @@ again:
 		/* Part got destroyed! */
 		assert(!(atomic_read(&iter->mp_flags) & MPART_F_GLOBAL_REF));
 		SLIST_INSERT(&deadlist, iter, _mp_dead);
-		ccinfo_accunt_mpart(info, iter);
+		ccinfo_account_mpart(info, iter);
 		if (ccinfo_isdone(info))
 			break;
 		continue;
@@ -1073,6 +1074,12 @@ NOTHROW(FCALL unlock_mpart_all)(struct unlockinfo *__restrict self) {
 PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_allparts_trim_unused)(struct ccinfo *__restrict info,
                                               unsigned int trim_mode) {
+#if !defined(NDEBUG) && 0
+#define LOCAL_kmalloc_leaks(...) (ccinfo_noblock(info) ? (void)0 : assertf(!kmalloc_leaks(), __VA_ARGS__))
+#else
+#define LOCAL_kmalloc_leaks(...) (void)0
+#endif
+	bool did_clear_trimmed = false;
 	struct mpart *iter;
 	struct mpart_slist deadlist;
 	struct unlockinfo unlock;
@@ -1080,6 +1087,7 @@ NOTHROW(KCALL system_cc_allparts_trim_unused)(struct ccinfo *__restrict info,
 	SLIST_INIT(&deadlist);
 	unlock.ui_unlock = &unlock_mpart_all;
 	mpart_trim_data_init(&data, info, &unlock, trim_mode);
+	LOCAL_kmalloc_leaks(NULL);
 again:
 	if (!mpart_all_tryacquire()) {
 		if (ccinfo_noblock(info))
@@ -1088,55 +1096,45 @@ again:
 			goto done;
 	}
 
+	if (!did_clear_trimmed) {
+		LIST_FOREACH (iter, &mpart_all_list, mp_allparts)
+			atomic_and(&iter->mp_flags, ~MPART_F__TRIMMED);
+		did_clear_trimmed = true;
+	}
+
 	/* Enumerate all mem-parts. */
 	LIST_FOREACH_SAFE (iter, &mpart_all_list, mp_allparts) {
 		unsigned int error;
+
+		/* Check if we already trimmed this part. */
+		if (atomic_read(&iter->mp_flags) & MPART_F__TRIMMED)
+			continue;
 
 		/* Make sure that the part is still alive. */
 		if (!tryincref(iter))
 			continue;
 
-		/* Try to unload this mem-part. */
-		if (!mpart_lock_tryacquire(iter)) {
-			bool waitfor_ok;
-			if (ccinfo_noblock(info))
-				continue;
-			mpart_all_release();
-			waitfor_ok = mpart_lock_waitfor_nx(iter);
-			if (atomic_decfetch(&iter->mp_refcnt) == 0) {
-				ccinfo_accunt_mpart(info, iter);
-				SLIST_INSERT(&deadlist, iter, _mp_dead);
-			}
-			if (!waitfor_ok)
-				goto done;
-			if (ccinfo_isdone(info))
-				goto done;
-			goto again;
-		}
-
-		/* TODO: It's not very good practice to keep the all-parts
-		 *       lock  for as long as we do. Even though we always
-		 *       release the lock  when doing something  blocking,
-		 *       this  dependency could still  be considered to be
-		 *       a bottleneck (since the all-parts lock is global) */
-
 		/* Do the actual job of trying to trim the mem-part. */
 		error = mpart_trim_or_unlock_nx(iter, &data);
-		if (error == MPART_NXOP_ST_SUCCESS)
-			mpart_lock_release(iter);
 		if (atomic_decfetch(&iter->mp_refcnt) == 0) {
-			ccinfo_accunt_mpart(info, iter);
+			ccinfo_account_mpart(info, iter);
 			SLIST_INSERT(&deadlist, iter, _mp_dead);
 		}
-		if (error == MPART_NXOP_ST_RETRY)
+		if (error == MPART_NXOP_ST_RETRY) {
+			LOCAL_kmalloc_leaks("iter = %p", iter);
 			goto again; /* Locks were released for temporary error -> start over */
-		if (error == MPART_NXOP_ST_ERROR)
+		}
+		if (error == MPART_NXOP_ST_ERROR) {
+			LOCAL_kmalloc_leaks("iter = %p", iter);
 			goto done; /* Locks were released for hard error -> stop trying to do stuff */
+		}
 		assert(error == MPART_NXOP_ST_SUCCESS);
 		if (ccinfo_isdone(info))
 			break;
+		atomic_or(&iter->mp_flags, MPART_F__TRIMMED);
 	}
 	mpart_all_release();
+	LOCAL_kmalloc_leaks(NULL);
 done:
 	mpart_trim_data_fini(&data);
 
@@ -1146,6 +1144,7 @@ done:
 		SLIST_REMOVE_HEAD(&deadlist, _mp_dead);
 		mpart_destroy(iter);
 	}
+#undef LOCAL_kmalloc_leaks
 }
 
 
@@ -1604,6 +1603,11 @@ NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
 	info->ci_gfp &= GFP_PREFLT | GFP_NOCLRC | GFP_NOMMAP |
 	                GFP_NOTRIM | GFP_ATOMIC | GFP_NOOVER |
 	                GFP_NOSWAP | GFP_MCHEAP;
+
+	/* Safety-check: if preemption is disabled right now,
+	 * then  we can *only*  operate in non-blocking mode. */
+	if (!preemption_ison())
+		info->ci_gfp |= GFP_ATOMIC;
 
 	/* Safety-check: prevent recursion in case a call to `system_cc()'
 	 *               is already in progress within the calling thread. */
