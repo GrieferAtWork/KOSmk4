@@ -432,7 +432,7 @@ INTERN void CC dl_trace_loaded_objects(void) {
  *                   at  the time of  the process having been  started, or defaulting to
  *                   a set of paths that include at least "/usr/lib:/lib" in that order.
  *                   When `NULL' is  passed for  this argument,  a handle  for the  main
- *                   executable module (i.e.  the `readlink  /proc/self/exe` binary)  is
+ *                   executable module  (i.e. the  `readlink /proc/self/exe' binary)  is
  *                   returned.
  * @param: mode:     Exactly  one  of  [RTLD_LAZY, RTLD_NOW],  or'd  with
  *                   exactly one of [RTLD_GLOBAL, RTLD_LOCAL], optionally
@@ -660,21 +660,21 @@ dlmodule_search_symbol_in_dependencies(DlModule *__restrict self,
 	return DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_NOT_FOUND;
 }
 
-/* Lookup the load address of a symbol within a shared library  `handle',
- * given its `symbol_name'. If no such symbol exists, `NULL' is returned,
- * and `dlerror()' is modified to return a human-readable error message.
+/* Lookup the load address of a  symbol within a shared library  `handle',
+ * given  its `symbol_name'. If no such symbol exists, `NULL' is returned,
+ * and `dlerror(3D)' is modified to return a human-readable error message.
  * WARNING: If  the actual address of the symbol is `NULL', then this
  *          function will still return `NULL', though will not modify
- *          the return value of `dlerror()'.
+ *          the return value of `dlerror(3D)'.
  *          In normal applications, this would normally never be the case,
  *          as  libdl, as well as `ld', will  take care not to link object
  *          files such that symbols could end up overlapping with  `NULL'.
  *          However, with the existence of `STT_GNU_IFUNC' (as usable  via
  *          `__attribute__((ifunc("resolver")))'), it  is easily  possible
  *          to force some symbol to overlap with NULL.
- *          Also  note that  upon success,  `dlerror()' will  not have been
+ *          Also note that upon success,  `dlerror(3D)' will not have  been
  *          modified, meaning that if a prior error has yet to be consumed,
- *          a NULL return value, and  a non-NULL `dlerror()' may still  not
+ *          a NULL return value, and a non-NULL `dlerror(3D)' may still not
  *          guaranty that the symbol really doesn't exist. To be absolutely
  *          certain  that  NULL  would  be  correct,  use  the   following:
  *          >> void *result;
@@ -694,8 +694,8 @@ dlmodule_search_symbol_in_dependencies(DlModule *__restrict self,
  *                 to make use  of special symbol  lookup resolutions  documented
  *                 more extensively alongside these constants.
  * @return: * :    The address of the symbol in question.
- * @return: NULL:  No  such symbol (dlerror()  != NULL), or  the symbol has been
- *                 linked to be loaded at the address `NULL' (dlerror() == NULL) */
+ * @return: NULL:  No such symbol  (`dlerror() != NULL'), or the  symbol has  been
+ *                 linked to be loaded at the address `NULL' (`dlerror() == NULL') */
 INTERN WUNUSED NONNULL((2)) void *DLFCN_CC
 libdl_dlsym(NCX DlModule *self, NCX char const *symbol_name)
 		THROWS(E_SEGFAULT, ...) {

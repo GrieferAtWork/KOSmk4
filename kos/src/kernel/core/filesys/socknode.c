@@ -31,15 +31,20 @@
 
 DECL_BEGIN
 
-/* Default operator for opening fsocknode files. This will unconditionally
- * throw:  `E_ILLEGAL_IO_OPERATION:E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK' */
+/* Default operator for opening fsocknode files. This will  unconditionally
+ * throw `E_ILLEGAL_IO_OPERATION:E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK' */
 PUBLIC NONNULL((1, 2)) void KCALL
-fsocknode_v_open(struct mfile *__restrict UNUSED(self),
-                 /*in|out*/ REF struct handle *__restrict UNUSED(hand),
-                 struct path *UNUSED(access_path),
-                 struct fdirent *UNUSED(access_dent),
-                 oflag_t UNUSED(oflags))
+fsocknode_v_open(struct mfile *__restrict self,
+                 /*in|out*/ REF struct handle *__restrict hand,
+                 struct path *access_path,
+                 struct fdirent *access_dent,
+                 oflag_t oflags)
 		THROWS(E_ILLEGAL_IO_OPERATION) {
+	(void)self;
+	(void)hand;
+	(void)access_path;
+	(void)access_dent;
+	(void)oflags;
 	THROW(E_ILLEGAL_IO_OPERATION,
 	      E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK);
 }

@@ -3988,10 +3988,21 @@ done:
 	return result;
 }
 
-/* Same as `mpart_trim_locked_or_unlock_nx()', but automatically acquires `mpart_lock_acquire(self)' */
+/* Same as `mpart_trim_locked_or_unlock_nx()', but automatically manages `mpart_lock_acquire(self)' */
 PUBLIC NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_or_unlock_nx)(struct mpart *__restrict self,
                                        struct mpart_trim_data *__restrict data) {
+	/* TODO: This function can be used to implement `madvise(MADV_DONTNEED)'
+	 *       with `MPART_TRIM_MODE_UNCHANGED' */
+	/* TODO: This function can be used to implement `madvise(MADV_FREE)'  with
+	 *       `MPART_TRIM_MODE_UNCHANGED' and a new flag `MPART_TRIM_FLAG_FREE'
+	 *       that  only works for anonymous memory (for file memory doing this
+	 *       would  mean losing  unwritten changes  made to  files). This flag
+	 *       works   by  simply  treating  `MPART_BLOCK_ST_CHNG'  blocks  like
+	 *       `MPART_BLOCK_ST_LOAD',  such  that  they  get  unloaded  even  if
+	 *       changes were made. */
+	/* TODO: This function can be used to implement `madvise(MADV_PAGEOUT)'
+	 *       with `MPART_TRIM_MODE_UNCHANGED | MPART_TRIM_FLAG_SYNC | MPART_TRIM_FLAG_SWAP' */
 	unsigned int result = MPART_NXOP_ST_SUCCESS;
 
 	/* Try to lock `self'. */

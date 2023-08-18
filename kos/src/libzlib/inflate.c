@@ -48,6 +48,48 @@
 #include <atomic.h>
 #endif /* __KERNEL__ */
 
+/* TODO: Re-write this entire implementation to not operate in a
+ *       way to produce 1-byte-at-a-time, but rather chunk-wise:
+ * >> error_code_t zlib_read(void *compressed_data, size_t compressed_size,
+ * >>                        void *decompressed_data, size_t decompressed_size,
+ * >>                        pos_t skipped_bytes);
+ *
+ * There should also be a way to automatically cache decompresser states at
+ * fixed compressed-blob offsets. The final goal of this new implementation
+ * is the ability to write a new filesystem driver that allows mounting  of
+ * zip files, which itself is based on a mechanism that allows lazy init of
+ * memory-mapped compressed streams,  where `mfile_ops::mo_loadblocks'  can
+ * be  used to dynamically  load the compressed  data-blob for the accessed
+ * file range, and then decompress that blob on-demand.
+ *
+ * Q: Why?
+ * A: Because `/usr/libexec/gcc/i686-kos/12.1.0/cc1'  has a  `.debug_info'
+ *    section that is  > 116MiB  large, and while  that's not  compressed,
+ *    I would love to be  able to compress it to  save disk space. But  by
+ *    doing that, the kernel's debugger would currently need to decompress
+ *    that entire section all  at once (which just  fails due to OOM),  as
+ *    the current system  is only  able to  decompress an  entire file  at
+ *    once, rather than do so chunk-wise.
+ *
+ * So the goal is for the builtin debugger (as well as libdl.so's equivalent
+ * function `dlinflatesection()') to use a kernel function to create  memory
+ * mappings of compressed  file data blobs  that can be  used to access  the
+ * decompressed memory  on-the-fly in  a way  that allows  `system_cc()'  to
+ * do  its usual thing of unloading the  parts you're not looking at, making
+ * it possible to map compressed blobs larger than available memory.
+ *
+ *
+ * XXX: Before doing this, implement linux's userfaultfd mechanism. I believe
+ *      that it  can be  used to  essentially implement  `mo_loadblocks'  and
+ *      `mo_saveblocks' in user-space (though I'm  not entirely sure). If  it
+ *      can't be used  for that,  look int  how linux's  FUSE (Filesystem  in
+ *      USErspace works), since that one *has* to be able to implement  these
+ *      operators in user-space. Finally, if all  else fails, add a new  KOS-
+ *      specific file object that *can* be used to do exactly this.
+ * XXX: It might be really cool to support FUSE simply because that would mean
+ *      KOS could be running unmodified versions of linux FUSE-based  drivers!
+ */
+
 DECL_BEGIN
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)

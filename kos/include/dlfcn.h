@@ -159,7 +159,7 @@
                                    * rather  than  running  initializers  of  all  affected  libraries   first.
                                    * HINT: You may  run  initializers  (and finalizers  during  exit())  at  a
                                    *       later time by calling `dlopen(3D)' again without passing this flag.
-                                   * WARNING: Initializers of newly loaded dependencies will not be executed7
+                                   * WARNING: Initializers of newly loaded dependencies will not be executed
                                    *          either! */
 #endif /* __USE_KOS && __RTLD_NOINIT */
 
@@ -170,7 +170,7 @@
 
 #if defined(__USE_NETBSD) || defined(__USE_SOLARIS) || defined(__USE_GNU)
 /* If the first argument of `dlsym(3D)' or `dlvsym(3D)' is set to
- * RTLD_NEXT the run-time address of the symbol called `name'  in
+ * RTLD_NEXT, the run-time address of the symbol called `name' in
  * the  next shared  object is  returned. The  "next" relation is
  * defined  by  the  order   the  shared  objects  were   loaded.
  * Or for the C-savvy:
@@ -239,7 +239,7 @@ typedef __Lmid_t Lmid_t;
  *                   at  the time of  the process having been  started, or defaulting to
  *                   a set of paths that include at least "/usr/lib:/lib" in that order.
  *                   When `NULL' is  passed for  this argument,  a handle  for the  main
- *                   executable module (i.e.  the `readlink  /proc/self/exe` binary)  is
+ *                   executable module  (i.e. the  `readlink /proc/self/exe' binary)  is
  *                   returned.
  * @param: mode:     Exactly  one  of  [RTLD_LAZY, RTLD_NOW],  or'd  with
  *                   exactly one of [RTLD_GLOBAL, RTLD_LOCAL], optionally
@@ -293,10 +293,10 @@ __IMPDEF __ATTR_NONNULL((1)) int
  *          guaranty that the symbol really doesn't exist. To be absolutely
  *          certain  that  NULL  would  be  correct,  use  the   following:
  *          >> void *result;
- *          >> dlerror(3D); // Clear preceding error
+ *          >> dlerror(); // Clear preceding error
  *          >> result = dlsym(handle, symbol_name);
  *          >> if (result == NULL) {
- *          >>     char *message = dlerror(3D);
+ *          >>     char *message = dlerror();
  *          >>     if (message != NULL) // Symbol lookup really failed.
  *          >>         fprintf(stderr, "dlerror: %s\n", message);
  *          >> }
@@ -309,8 +309,8 @@ __IMPDEF __ATTR_NONNULL((1)) int
  *                 to make use  of special symbol  lookup resolutions  documented
  *                 more extensively alongside these constants.
  * @return: * :    The address of the symbol in question.
- * @return: NULL:  No  such symbol (dlerror(3D)  != NULL), or  the symbol has been
- *                 linked to be loaded at the address `NULL' (dlerror(3D) == NULL) */
+ * @return: NULL:  No such symbol  (`dlerror() != NULL'), or the  symbol has  been
+ *                 linked to be loaded at the address `NULL' (`dlerror() == NULL') */
 #ifdef __CRT_HAVE_dlsym
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((2)) void *
 (__DLFCN_CC dlsym)(void *__handle, char const *__restrict __symbol_name) /*__THROWS(...)*/;

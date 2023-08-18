@@ -215,7 +215,7 @@ struct fnode;
 
 struct fnode_perm_ops {
 	/* [0..1] Get the owner of the  file-node. When this operator  is
-	 * implemented, the `fn_uid' and `fn_gid' fields container either
+	 * implemented,  the `fn_uid' and  `fn_gid' fields contain either
 	 * invalid-, or fs-specific data. Furthermore, the file owner can
 	 * not be changed, as though `MFILE_FN_ATTRREADONLY' was set. */
 	BLOCKING NONNULL_T((1, 2, 3)) void

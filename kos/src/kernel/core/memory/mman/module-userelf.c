@@ -1927,7 +1927,7 @@ NOTHROW(KCALL system_cc_rtld_fsfile)(struct ccinfo *__restrict info) {
  * For this purpose, this function  is called while holding a  lock
  * to the mappings-tree of `self',  which this function is  allowed
  * to release/re-acquire, depending on necessity.
- * The locking lock is as follows:
+ * The locking logic is as follows:
  *
  *   IN:  >> mman_lock_acquired(self)
  *
@@ -2403,7 +2403,7 @@ nextnode:
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 DBG_COMMAND(lslib,
             "lslib\n"
-            "\tEnumerate user-space libraries\n") {
+            "\tEnumerate user-space libraries loaded into the current thread's mman\n") {
 	REF struct module *mod;
 	struct mfile *exec_file;
 	struct mman *mm;

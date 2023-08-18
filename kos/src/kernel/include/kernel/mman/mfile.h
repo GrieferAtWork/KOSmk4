@@ -718,7 +718,7 @@ struct mfile_ops {
                                             * as part of a call to `mfile_sync()' */
 #define MFILE_F_NOATIME         0x00000400 /* [lock(ATOMIC)][const_if(MFILE_F_DELETED)] Don't modify the value of `mf_atime' */
 #define MFILE_FN_NODIRATIME     0x00000800 /* [lock(ATOMIC)][const_if(MFILE_F_DELETED)] Don't update `mf_atime' during path traversal */
-#define MFILE_F_NOUSRMMAP       0x00001000 /* [lock(ATOMIC)] Disallow user-space from mmap(2)-ing this file. (doesn't affect `mso_mmap') */
+#define MFILE_F_NOUSRMMAP       0x00001000 /* [lock(ATOMIC)] Disallow user-space from mmap(2)-ing this file. (ignored when `mso_mmap' is defined) */
 #define MFILE_F_NOUSRIO         0x00002000 /* [lock(ATOMIC)] Disallow  user-space  from  pread(2)-ing or  pwrite(2)-ing  this file.
                                             * Doesn't affect `mso_pread' and `mso_pwrite'; only `mfile_read()' and `mfile_write()'. */
 #define MFILE_F_NOMTIME         0x00004000 /* [lock(ATOMIC)][const_if(MFILE_F_DELETED)] Don't modify the value of `mf_mtime' */

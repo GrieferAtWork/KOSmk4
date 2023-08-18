@@ -53,7 +53,7 @@ struct fsocknode
 };
 
 
-/* Return a pointer to sockice-node operators of `self' */
+/* Return a pointer to socket-node operators of `self' */
 #define fsocknode_getops(self) \
 	((struct fsocknode_ops const *)__COMPILER_REQTYPE(struct fsocknode const *, self)->_fsocknode_node_ _fnode_file_ mf_ops)
 #define _fsocknode_assert_ops_(ops) \
@@ -63,8 +63,8 @@ struct path;
 struct fdirent;
 struct handle;
 
-/* Default operator for opening fsocknode files. This will unconditionally
- * throw:  `E_ILLEGAL_IO_OPERATION:E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK' */
+/* Default operator for opening fsocknode files. This will  unconditionally
+ * throw `E_ILLEGAL_IO_OPERATION:E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK' */
 FUNDEF NONNULL((1, 2)) void KCALL
 fsocknode_v_open(struct mfile *__restrict self,
                  struct handle *__restrict hand,
