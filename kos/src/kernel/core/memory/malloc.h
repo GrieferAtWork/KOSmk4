@@ -25,6 +25,8 @@
 #include <kernel/malloc.h>
 #include <kernel/types.h>
 
+#include <stdbool.h>
+
 DECL_BEGIN
 
 /*
@@ -34,7 +36,8 @@ DECL_BEGIN
  * or when the kernel was built with `CONFIG_NO_KERNEL_TRACE_MALLOC' defined.
  */
 
-INTDEF WUNUSED size_t NOTHROW(KCALL untraced_kmalloc_usable_size)(void *ptr);
+INTDEF ATTR_PURE WUNUSED size_t NOTHROW(KCALL untraced_kmalloc_usable_size)(void *ptr);
+INTDEF ATTR_PURE WUNUSED bool NOTHROW(KCALL untraced_kmalloc_islocked)(void *ptr);
 INTDEF void NOTHROW(KCALL untraced_kfree)(void *ptr);
 INTDEF void NOTHROW(KCALL untraced_kffree)(void *ptr, gfp_t flags);
 INTDEF NOBLOCK void NOTHROW(KCALL untraced_kmalloc_validate)(void);

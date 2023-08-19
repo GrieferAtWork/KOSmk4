@@ -78,6 +78,7 @@
 #include <assert.h>
 #include <format-printer.h>
 #include <inttypes.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -2755,7 +2756,7 @@ return_old_size:
 	return old_size;
 }
 
-PUBLIC NOBLOCK ATTR_NOINLINE WUNUSED size_t
+PUBLIC NOBLOCK ATTR_NOINLINE ATTR_PURE WUNUSED size_t
 NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 	struct trace_node *node;
 	size_t result;
@@ -2811,6 +2812,65 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 	/* Calculate the user-payload-size of the trace-node. */
 	result = trace_node_usize(node) - (CONFIG_KERNEL_MALL_HEAD_SIZE +
 	                                   CONFIG_KERNEL_MALL_TAIL_SIZE);
+	tm_lock_release();
+	return result;
+}
+
+PUBLIC NOBLOCK ATTR_NOINLINE ATTR_PURE WUNUSED bool
+NOTHROW(KCALL kmalloc_islocked)(VIRT void *ptr) {
+	struct trace_node *node;
+	bool result;
+	if (!ptr)
+		return true;
+	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
+	if (KERNEL_SLAB_CHECKPTR(ptr))
+		return (SLAB_GET(ptr)->s_flags & SLAB_FLOCKED) != 0;
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
+	tm_lock_acquire();
+	node = tm_nodes_locate(ptr);
+	if unlikely(!node) {
+		tm_lock_break();
+		kernel_panic_n(/* n_skip: */ 1,
+		               "kmalloc_islocked(%p): No node at this address",
+		               ptr);
+		return true;
+	}
+	if unlikely(node->tn_kind != TRACE_NODE_KIND_MALL) {
+		node = trace_node_dupa_tb(node);
+		tm_lock_break();
+		kernel_panic_n(/* n_skip: */ 1,
+		               "kmalloc_islocked(%p): Node at %p...%p wasn't created by kmalloc()\n"
+		               "%[gen:c]",
+		               ptr, trace_node_umin(node), trace_node_umax(node),
+		               &trace_node_print_traceback, node);
+		return true;
+	}
+	if unlikely(ptr != trace_node_uaddr(node) + CONFIG_KERNEL_MALL_HEAD_SIZE) {
+		node = trace_node_dupa_tb(node);
+		tm_lock_break();
+		kernel_panic_n(/* n_skip: */ 1,
+		               "kmalloc_islocked(%p): Passed pointer does not "
+		               "match start of containing node %p...%p (%p...%p)\n"
+		               "%[gen:c]",
+		               ptr,
+		               trace_node_umin(node) + CONFIG_KERNEL_MALL_HEAD_SIZE,
+		               trace_node_umax(node) - CONFIG_KERNEL_MALL_TAIL_SIZE,
+		               trace_node_umin(node), trace_node_umax(node),
+		               &trace_node_print_traceback, node);
+		return true;
+	}
+
+	/* Verify head/tail integrity of `node' */
+#ifdef HAVE_kmalloc_validate_node
+	if (!kmalloc_validate_node(1, node)) {
+		tm_lock_break();
+		return true;
+	}
+#endif /* HAVE_kmalloc_validate_node */
+
+	/* Calculate the user-payload-size of the trace-node. */
+	result = (node->tn_flags & GFP_LOCKED) != 0;
 	tm_lock_release();
 	return result;
 }

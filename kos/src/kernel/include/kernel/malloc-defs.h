@@ -168,7 +168,7 @@ DECL_BEGIN
  *     data block underflows.
  *     Validation of the header and tail is automatically performed for a
  *     heap data  block  whenever  it  is passed  to  one  of  `kfree()',
- *    `krealloc()' (and friends) or `kmalloc_usable_size()'
+ *     `krealloc()' (and friends) or `kmalloc_usable_size()'
  *     Alternatively, `mall_validate_padding()' or the user-space kernel
  *     control command `KERNEL_CONTROL_DBG_CHECK_PADDING' can be used to
  *     verify this ~padding~ for all allocated data blocks.

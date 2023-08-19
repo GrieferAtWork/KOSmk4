@@ -97,7 +97,7 @@ static_assert(sizeof(struct mptr) == HEAP_ALIGNMENT);
 #endif /* NDEBUG */
 
 
-INTERN WUNUSED size_t
+INTERN ATTR_PURE WUNUSED size_t
 NOTHROW(KCALL untraced_kmalloc_usable_size)(VIRT void *ptr) {
 	struct mptr *mblock;
 	if (!ptr)
@@ -110,6 +110,21 @@ NOTHROW(KCALL untraced_kmalloc_usable_size)(VIRT void *ptr) {
 	mblock = mptr_get(ptr);
 	mptr_assert(mblock);
 	return mptr_size(mblock) - sizeof(struct mptr);
+}
+
+INTERN ATTR_PURE WUNUSED bool
+NOTHROW(KCALL untraced_kmalloc_islocked)(VIRT void *ptr) {
+	struct mptr *mblock;
+	if (!ptr)
+		return true;
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
+	if (KERNEL_SLAB_CHECKPTR(ptr))
+		return (SLAB_GET(ptr)->s_flags & SLAB_FLOCKED) != 0;
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
+	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
+	mblock = mptr_get(ptr);
+	mptr_assert(mblock);
+	return (mptr_heap_gfp(mblock) & GFP_LOCKED) != 0;
 }
 
 INTERN void
@@ -255,6 +270,7 @@ DECL_BEGIN
 /* Export the untraced malloc API */
 #define MALLOC_EXPORT_TABLE(cb)                               \
 	cb(kmalloc_usable_size, untraced_kmalloc_usable_size)     \
+	cb(kmalloc_islocked, untraced_kmalloc_islocked)           \
 	cb(kfree, untraced_kfree)                                 \
 	cb(kffree, untraced_kffree)                               \
 	cb(kmalloc_validate, untraced_kmalloc_validate)           \

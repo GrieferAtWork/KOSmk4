@@ -64,6 +64,7 @@ DECL_BEGIN
 #define __os_realign_offset      krealign_offset
 #define __os_realloc_in_place    krealloc_in_place
 #define __os_malloc_usable_size  kmalloc_usable_size
+#define __os_malloc_islocked     kmalloc_islocked
 #define __os_ffree               kffree
 #define __os_malloc_nx           kmalloc_nx
 #define __os_malloc_noslab_nx    kmalloc_nx
@@ -199,7 +200,8 @@ FUNDEF ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_realloc(VIRT void *ptr, siz
 FUNDEF ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_realign(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("krealign");
 FUNDEF ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_realign_offset(VIRT void *ptr, size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("krealign_offset");
 FUNDEF VIRT void *KCALL __os_realloc_in_place(VIRT void *ptr, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("krealloc_in_place");
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL __os_malloc_usable_size)(VIRT void *ptr) ASMNAME("kmalloc_usable_size");
+FUNDEF NOBLOCK ATTR_PURE WUNUSED size_t NOTHROW(KCALL __os_malloc_usable_size)(VIRT void *ptr) ASMNAME("kmalloc_usable_size");
+FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL __os_malloc_islocked)(VIRT void *ptr) ASMNAME("kmalloc_islocked");
 #ifndef ____os_free_defined
 #define ____os_free_defined
 FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
@@ -319,11 +321,18 @@ krealloc_in_place(VIRT void *ptr, size_t n_bytes, gfp_t flags)
 	return __os_realloc_in_place(ptr, n_bytes, flags);
 }
 
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED size_t
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED size_t
 NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 	if (__builtin_constant_p(ptr) && ptr == __NULLPTR)
 		return 0;
 	return __os_malloc_usable_size(ptr);
+}
+
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED __BOOL
+NOTHROW(KCALL kmalloc_islocked)(VIRT void *ptr) {
+	if (__builtin_constant_p(ptr) && ptr == __NULLPTR)
+		return 1;
+	return __os_malloc_islocked(ptr);
 }
 
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void

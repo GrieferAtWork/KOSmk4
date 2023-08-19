@@ -529,6 +529,7 @@ INTDEF ATTR_RETNONNULL void *KCALL ph_krealign_offset(void *ptr, size_t min_alig
 INTDEF void *NOTHROW(KCALL ph_krealign_offset_nx)(void *ptr, size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags);
 INTDEF void *KCALL ph_krealloc_in_place(void *ptr, size_t n_bytes, gfp_t flags);
 INTDEF size_t NOTHROW(KCALL ph_kmalloc_usable_size)(void *ptr);
+INTDEF bool NOTHROW(KCALL ph_kmalloc_islocked)(void *ptr);
 #ifdef POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS
 INTDEF void NOTHROW(KCALL ph_kfree)(void *ptr);
 INTDEF void NOTHROW(KCALL ph_kffree)(void *ptr, gfp_t flags);
@@ -784,6 +785,21 @@ ph_krealloc_in_place(void *ptr, size_t n_bytes, gfp_t UNUSED(flags)) {
 INTERN ATTR_PURE ATTR_COLDTEXT size_t
 NOTHROW(KCALL ph_kmalloc_usable_size)(void *ptr) {
 	return phcore_usable_size(ptr);
+}
+
+INTERN ATTR_PURE ATTR_COLDTEXT bool
+NOTHROW(KCALL ph_kmalloc_islocked)(void *ptr) {
+	if (!ptr)
+		return true;
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
+	NESTED_TRY {
+		if (KERNEL_SLAB_CHECKPTR(ptr))
+			return (SLAB_GET(ptr)->s_flags & SLAB_FLOCKED) != 0;
+	} EXCEPT {
+	}
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
+	COMPILER_IMPURE();
+	return true;
 }
 
 #ifdef POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS

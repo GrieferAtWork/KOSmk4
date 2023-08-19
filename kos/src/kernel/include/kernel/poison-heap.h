@@ -101,6 +101,7 @@
  *   - krealloc_in_place
  *   - krealloc_in_place_nx
  *   - kmalloc_usable_size
+ *   - kmalloc_islocked
  *   - kfree
  *   - kffree
  * #ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
@@ -219,6 +220,7 @@
 	bind_func(krealloc_in_place, /*    */ ph_krealloc_in_place)                              \
 	bind_func(krealloc_in_place_nx, /* */ ph_krealloc_in_place)                              \
 	bind_func(kmalloc_usable_size, /*  */ ph_kmalloc_usable_size)                            \
+	bind_func(kmalloc_islocked, /*     */ ph_kmalloc_islocked)                               \
 	bind_void(kfree, /*                */ ph_kfree, 1)                                       \
 	bind_void(kffree, /*               */ ph_kffree, 2)                                      \
 	__PH_IF_DEBUG_MALLOC(bind_void(kmalloc_validate, /*     */ ph_kmalloc_validate, 0))      \
