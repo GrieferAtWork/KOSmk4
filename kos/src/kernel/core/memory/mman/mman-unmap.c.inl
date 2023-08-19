@@ -218,6 +218,7 @@ again_minmaxlocate:
 			VIRT byte_t *node_minaddr;
 			VIRT byte_t *node_endaddr;
 			size_t node_offset;
+			node = mima.mm_min;
 			assert(node);
 			node_minaddr = (byte_t *)mnode_getminaddr(node);
 			node_endaddr = (byte_t *)mnode_getendaddr(node);
