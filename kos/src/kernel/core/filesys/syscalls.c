@@ -2374,6 +2374,7 @@ kernel_execveat(fd_t dirfd,
                 struct icpustate *__restrict state) {
 	struct task *caller = THIS_TASK;
 	struct execargs args;
+	validate_readable(pathname, 1);
 #ifdef __ARCH_HAVE_COMPAT
 	validate_readable_opt(argv, 1);
 	validate_readable_opt(envp, 1);
@@ -2381,6 +2382,7 @@ kernel_execveat(fd_t dirfd,
 	validate_readable_opt(argv, sizeof(*argv));
 	validate_readable_opt(envp, sizeof(*envp));
 #endif /* !__ARCH_HAVE_COMPAT */
+
 	VALIDATE_FLAGSET(atflags,
 	                 AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
 	                 E_INVALID_ARGUMENT_CONTEXT_EXECVEAT_FLAGS);
