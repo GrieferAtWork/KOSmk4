@@ -262,7 +262,8 @@ NOTHROW(FCALL extend_heap)(size_t min_size) {
 	last_heap->sh_node.mn_minaddr = (byte_t *)new_heap;
 	last_heap->sh_node.mn_maxaddr = (byte_t *)new_heap + min_size - 1;
 	last_heap->sh_node.mn_flags   = (MNODE_F_PREAD | MNODE_F_PWRITE | MNODE_F_MPREPARED |
-	                                 MNODE_F_NOMERGE | MNODE_F_NOSPLIT);
+	                                 MNODE_F_NOMERGE | MNODE_F_NOSPLIT |
+	                                 MNODE_F_STATICPART | MNODE_F_KERNPART);
 	last_heap->sh_node.mn_mman    = &mman_kernel;
 	last_heap->sh_node.mn_part    = NULL;
 	last_heap->sh_node.mn_fspath  = NULL;
