@@ -41,6 +41,7 @@
 #include <kernel/user.h>
 #include <sched/cred.h>
 #include <sched/group.h>
+#include <sched/rpc.h>
 #include <sched/task.h>
 
 #include <kos/except/reason/inval.h>
@@ -152,12 +153,15 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 	case KSYSCTL_SYSTEM_CLEARCACHES: {
 		struct ccinfo cc;
 		cred_require_sysadmin();
-		ccinfo_init(&cc, GFP_NORMAL, (size_t)-1);
+		ccinfo_init(&cc, GFP_BLOCKING, (size_t)-1);
 		cc.ci_attempt = (uint16_t)-1; /* Infinite attempts. */
 
 		/* Invoke the cache-clearing system. */
 		if (system_cc(&cc) && !cc.ci_bytes)
 			cc.ci_bytes = 1;
+
+		/* Handle interrupts in case `system_cc()' stopped after encountering some. */
+		task_serve();
 
 		/* Return how many bytes were cleared. */
 		return (syscall_slong_t)cc.ci_bytes;

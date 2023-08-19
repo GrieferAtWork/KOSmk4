@@ -69,7 +69,7 @@ DECL_BEGIN
  * GFP_MCHEAP       0x00004000                               [MAP_NORESERVE]
  * GFP_NOMOVE       0x00008000    [MBNODE_F_POPULATE,MAP_POPULATE]               *GFP_NOMOVE overlap is not intended
  * -                0x00010000    [MBNODE_F_NONBLOCK,MAP_NONBLOCK]               *GFP_ATOMIC overlap would be nice, but not possible due to O_NONBLOCK
- * -                0x00020000                               [MAP_STACK]
+ * GFP_BLOCKING     0x00020000                               [MAP_STACK]
  * GFP_MAP_NOSPLIT  0x00040000    [MAP_NOSPLIT,MNODE_F_NOSPLIT]
  * GFP_MAP_NOMERGE  0x00080000    [MAP_NOMERGE,MNODE_F_NOMERGE]
  * -                0x00100000                               [MAP_FIXED_NOREPLACE]

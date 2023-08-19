@@ -72,9 +72,10 @@ struct ccinfo {
 	 (self)->ci_minbytes = (minbytes_hint))
 
 /* Check if operation must be non-blocking. */
-#define ccinfo_noblock(self) ((self)->ci_gfp & GFP_ATOMIC)
-#define ccinfo_isdone(self)  ((self)->ci_bytes >= (self)->ci_minbytes)
-#define ccinfo_gfp(self)     (self)->ci_gfp
+#define ccinfo_noblock(self)  ((self)->ci_gfp & GFP_ATOMIC)
+#define ccinfo_blocking(self) ((self)->ci_gfp & GFP_BLOCKING)
+#define ccinfo_isdone(self)   ((self)->ci_bytes >= (self)->ci_minbytes)
+#define ccinfo_gfp(self)      (self)->ci_gfp
 
 /* Account for memory being freed. */
 #define ccinfo_account(self, num_bytes) \
@@ -100,12 +101,12 @@ DATDEF uint16_t system_cc_maxattempts;
  * @return: true:  At least something (may) have become available
  *                 since the last time you tried to clear caches.
  * @return: false: Nothing could be cleared :( */
-FUNDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) __BOOL
+FUNDEF BLOCKING_IF(ccinfo_blocking(info)) NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) __BOOL
 NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info);
 
 /* Helper  wrapper  for  `system_cc()'  that   throws
  * `E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY' on error. */
-FUNDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void FCALL
+FUNDEF BLOCKING_IF(ccinfo_blocking(info)) NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void FCALL
 system_cc_virtual_memory(struct ccinfo *__restrict info)
 		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY);
 
@@ -127,7 +128,7 @@ system_cc_virtual_memory(struct ccinfo *__restrict info)
  * avoided for the sake of performance and more effective cc-handling. */
 FUNDEF ATTR_COLD WUNUSED ATTR_INOUT(1) __BOOL NOTHROW(FCALL system_cc_s)(ccstate_t *__restrict p_state);
 FUNDEF NOBLOCK ATTR_COLD WUNUSED ATTR_INOUT(1) __BOOL NOTHROW(FCALL system_cc_s_noblock)(ccstate_t *__restrict p_state);
-FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) ATTR_COLD WUNUSED  ATTR_INOUT(1) __BOOL
+FUNDEF BLOCKING_IF(info & GFP_BLOCKING) NOBLOCK_IF(gfp & GFP_ATOMIC) ATTR_COLD WUNUSED  ATTR_INOUT(1) __BOOL
 NOTHROW(FCALL system_cc_s_ex)(ccstate_t *__restrict p_state, gfp_t gfp);
 
 
@@ -138,17 +139,17 @@ struct ringbuffer;
 struct linebuffer;
 
 /* Free unused space from `self'. */
-FUNDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+FUNDEF BLOCKING_IF(ccinfo_blocking(info)) NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(KCALL system_cc_ringbuffer)(struct ringbuffer *__restrict self,
                                     struct ccinfo *__restrict info);
 
 /* Free unused space from `self'. */
-FUNDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+FUNDEF BLOCKING_IF(ccinfo_blocking(info)) NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(KCALL system_cc_linebuffer)(struct linebuffer *__restrict self,
                                     struct ccinfo *__restrict info);
 
 /* Clear buffers associated with a given handle object. */
-FUNDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((2, 3)) void
+FUNDEF BLOCKING_IF(ccinfo_blocking(info)) NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((2, 3)) void
 NOTHROW(KCALL system_cc_handle)(uintptr_half_t handle_typ,
                                 void *__restrict handle_ptr,
                                 struct ccinfo *__restrict info);

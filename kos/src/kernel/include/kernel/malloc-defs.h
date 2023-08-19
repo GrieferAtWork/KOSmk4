@@ -240,13 +240,13 @@ typedef unsigned int gfp_t;
                            * NOTE: This flag only affects newly allocated pages, but doesn't affect memory allocated from previous over-allocations! */
 #define GFP_CALLOC 0x0004 /* FLAG: Allocate zero-initialized memory. (for krealloc(): only newly allocated memory is zero-initialized) */
 #define GFP_NOCLRC 0x0008 /* FLAG: Don't clear kernel caches to free up memory. */
-/*      GFP_       0x0010  * s.a. `GFP_MAP_FIXED' */
+/*      GFP_       0x0010  * Reserved for `GFP_MAP_FIXED' */
 #define GFP_NOMMAP 0x0020 /* FLAG: Don't map more memory to serve the allocation. Only serve the request from pre-allocated pools / overallocations. */
 #define GFP_NOTRIM 0x0020 /* FLAG: Don't unmap free memory blocks of sufficient size, but keep them as part of the preallocated cache. */
-/*      GFP_       0x0040  * s.a. `GFP_MAP_32BIT' */
-/*      GFP_       0x0080  * s.a. `GFP_MAP_PREPARED' */
-/*      GFP_       0x0100  * s.a. `GFP_MAP_BELOW' */
-/*      GFP_       0x0200  * s.a. `GFP_MAP_ABOVE' */
+/*      GFP_       0x0040  * Reserved for `GFP_MAP_32BIT' */
+/*      GFP_       0x0080  * Reserved for `GFP_MAP_PREPARED' */
+/*      GFP_       0x0100  * Reserved for `GFP_MAP_BELOW' */
+/*      GFP_       0x0200  * Reserved for `GFP_MAP_ABOVE' */
 /*efine GFP_       0x0400  * ... */
 #define GFP_ATOMIC 0x0800 /* FLAG: Don't block when waiting to  acquire any sort of  lock.
                            *       Instead,  failure to acquire  some required lock causes
@@ -277,16 +277,40 @@ typedef unsigned int gfp_t;
                            *       returning `NULL' (even  in exception-mode) when  the re-allocation is  impossible
                            *       due to an overlap with some other memory mapping. */
 
+/* Extra GFP-flags that affect the behavior of `system_cc()' */
+/*efine GFP_         __UINT32_C(0x00010000)  * ... */
+#define GFP_BLOCKING __UINT32_C(0x00020000) /* Allowed to wait do BLOCKING things.
+                                             * Caution: only set this flag if  you *know* that no  shared-semantic
+                                             *          locks (i.e. locks that use `task_waitfor()') are currently
+                                             *          being held. Note that it  is usually not possible to  know
+                                             *          if such locks are held, and the only place where you can
+                                             *          *truely* know is if your implementing a system call. */
+/*      GFP_         __UINT32_C(0x00040000)  * Reserved for `GFP_MAP_NOSPLIT' */
+/*      GFP_         __UINT32_C(0x00080000)  * Reserved for `GFP_MAP_NOMERGE' */
+/*efine GFP_         __UINT32_C(0x00100000)  * ... */
+/*efine GFP_         __UINT32_C(0x00200000)  * ... */
+/*efine GFP_         __UINT32_C(0x00400000)  * ... */
+/*efine GFP_         __UINT32_C(0x00800000)  * ... */
+/*efine GFP_         __UINT32_C(0x01000000)  * ... */
+/*efine GFP_         __UINT32_C(0x02000000)  * ... */
+/*      GFP_         __UINT32_C(0x04000000)  * Reserved for `GFP_NOLEAK' */
+/*      GFP_         __UINT32_C(0x08000000)  * Reserved for `GFP_NOWALK' */
+/*efine GFP_         __UINT32_C(0x10000000)  * ... */
+/*efine GFP_         __UINT32_C(0x20000000)  * ... */
+/*      GFP_         __UINT32_C(0x40000000)  * Reserved for `GFP_MAP_NOASLR' */
+/*efine GFP_         __UINT32_C(0x80000000)  * ... */
+
+
 /* Mask of GFP flags that are inherited by recursive allocations for control structures. */
 #define GFP_INHERIT                                      \
 	(GFP_ATOMIC | GFP_NOOVER | GFP_NOMMAP | GFP_NOTRIM | \
-	 GFP_NOSWAP | GFP_NOCLRC | GFP_MCHEAP)
+	 GFP_NOSWAP | GFP_NOCLRC | GFP_MCHEAP | GFP_BLOCKING)
 
 
 #ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
-#define GFP_NOLEAK 0x10000 /* Don't consider the data-blob a leak, even if it cannot be reached. */
-#define GFP_NOWALK 0x20000 /* When searching for memory leaks, don't search the data-blob for
-                            * pointers that may point to other heap-blocks. */
+#define GFP_NOLEAK __UINT32_C(0x04000000) /* Don't consider the data-blob a leak, even if it cannot be reached. */
+#define GFP_NOWALK __UINT32_C(0x08000000) /* When searching for memory leaks, don't search the data-blob for
+                                           * pointers that may point to other heap-blocks. */
 #else /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 #define GFP_NOLEAK 0       /* Don't consider the data-blob a leak, even if it cannot be reached. */
 #define GFP_NOWALK 0       /* When searching for memory leaks, don't search the data-blob for

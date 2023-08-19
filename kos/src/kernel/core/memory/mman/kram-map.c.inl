@@ -60,6 +60,7 @@ DECL_BEGIN
  *                       flags  to  be  set  for  each  resp.  This  flag  is  used  internally
  *                       to  resolve  the  dependency   loop  between  this  function   needing
  *                       to  call  kmalloc()  and  kmalloc()  needing  to  call  this function.
+ *   - GFP_BLOCKING:     Allowed to be `BLOCKING' when calling `system_cc()'
  *   - GFP_MAP_FIXED:    Map memory at the given address `hint' exactly.
  *                       If memory has already been mapped at that address, then simply
  *                       return `MAP_INUSE' unconditionally.
@@ -102,14 +103,14 @@ DECL_BEGIN
  *                        than `PAGESIZE' can be used to ensure that the returned pointer
  *                        is aligned by multiple pages. s.a. `mman_findunmapped()'
  * @param: min_alignment_offset: Offset from `return' at which `min_alignment' shall be applied. */
-PUBLIC NOBLOCK_IF(flags & GFP_ATOMIC) void *FCALL
+PUBLIC BLOCKING_IF(flags & GFP_BLOCKING) NOBLOCK_IF(flags & GFP_ATOMIC) void *FCALL
 mman_map_kram(void *hint, size_t num_bytes,
               gfp_t flags, size_t min_alignment,
               ptrdiff_t min_alignment_offset)
 		THROWS(E_BADALLOC, E_WOULDBLOCK)
 #elif defined(DEFINE_mman_map_kram_nx)
 /* Non-throwing version of `mman_map_kram()'. Returns `MAP_FAILED' on error. */
-PUBLIC NOBLOCK_IF(flags & GFP_ATOMIC) void *
+PUBLIC BLOCKING_IF(flags & GFP_BLOCKING) NOBLOCK_IF(flags & GFP_ATOMIC) void *
 NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
                                 gfp_t flags, size_t min_alignment,
                                 ptrdiff_t min_alignment_offset)
@@ -172,7 +173,7 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
 	num_bytes = num_pages << PAGESHIFT; /* This enforces page-alignment for `num_bytes'! */
 	inner_flags = flags;
 	inner_flags |= GFP_LOCKED | GFP_PREFLT | GFP_MCHEAP | GFP_NOOVER;
-	inner_flags &= ~(GFP_CALLOC | GFP_MAP_FLAGS);
+	inner_flags &= ~(GFP_CALLOC | GFP_MAP_FLAGS | GFP_BLOCKING);
 
 again_lock_mman:
 #ifndef LOCAL_NX

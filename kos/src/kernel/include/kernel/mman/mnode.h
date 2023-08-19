@@ -596,7 +596,7 @@ struct mpart_trim_data;
  * @return: true:  Success (locks are still held)
  * @return: false: Error (locks were released)
  * @THROW: Error (locks were released) */
-FUNDEF WUNUSED NONNULL((1, 2)) bool FCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) bool FCALL
 mnode_advise_or_unlock(struct mnode *__restrict self,
                        struct mpart_trim_data *__restrict data,
                        unsigned int advice)

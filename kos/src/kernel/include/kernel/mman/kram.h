@@ -78,6 +78,7 @@ typedef unsigned int gfp_t;
  *                       flags  to  be  set  for  each  resp.  This  flag  is  used  internally
  *                       to  resolve  the  dependency   loop  between  this  function   needing
  *                       to  call  kmalloc()  and  kmalloc()  needing  to  call  this function.
+ *   - GFP_BLOCKING:     Allowed to be `BLOCKING' when calling `system_cc()'
  *   - GFP_MAP_FIXED:    Map memory at the given address `hint' exactly.
  *                       If memory has already been mapped at that address, then simply
  *                       return `MAP_INUSE' unconditionally.
@@ -120,7 +121,7 @@ typedef unsigned int gfp_t;
  *                        than `PAGESIZE' can be used to ensure that the returned pointer
  *                        is aligned by multiple pages. s.a. `mman_findunmapped()'
  * @param: min_alignment_offset: Offset from `return' at which `min_alignment' shall be applied. */
-FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void *FCALL
+FUNDEF BLOCKING_IF(flags & GFP_BLOCKING) NOBLOCK_IF(flags & GFP_ATOMIC) void *FCALL
 mman_map_kram(void *hint, size_t num_bytes,
               gfp_t flags, size_t min_alignment DFL(PAGESIZE),
               ptrdiff_t min_alignment_offset DFL(0))
@@ -128,7 +129,7 @@ mman_map_kram(void *hint, size_t num_bytes,
 
 
 /* Non-throwing version of `mman_map_kram()'. Returns `MAP_FAILED' on error. */
-FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void *
+FUNDEF BLOCKING_IF(flags & GFP_BLOCKING) NOBLOCK_IF(flags & GFP_ATOMIC) void *
 NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes, gfp_t flags,
                                 size_t min_alignment DFL(PAGESIZE),
                                 ptrdiff_t min_alignment_offset DFL(0));

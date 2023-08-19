@@ -3993,7 +3993,7 @@ done:
  * @return: MPART_NXOP_ST_SUCCESS: Success (all locks were kept)
  * @return: MPART_NXOP_ST_RETRY:   Failed (`data->mtd_unlock' and `mpart_lock_release(self)' was released)
  * @return: MPART_NXOP_ST_ERROR:   Non-recoverable error (OOM or yield-failure). Don't try again. */
-PUBLIC NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+PUBLIC BLOCKING_IF(ccinfo_blocking(data->mtd_ccinfo)) NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_locked_or_unlock_nx)(struct mpart *__restrict self,
                                               struct mpart_trim_data *__restrict data) {
 	unsigned int result = MPART_NXOP_ST_SUCCESS;
@@ -4010,7 +4010,17 @@ NOTHROW(FCALL mpart_trim_locked_or_unlock_nx)(struct mpart *__restrict self,
 
 	/* Make sure that no blocks of `self' is currently being initialized. */
 	if unlikely(mpart_hasblocksstate_init(self)) {
-		if (ccinfo_noblock(data->mtd_ccinfo))
+		/* Don't want for INIT or DMA (to prevent dead-locks).
+		 *
+		 * This is needed to prevent a dead-lock when (e.g.):
+		 * - A FAT file is being loaded from disk
+		 * - To do so, the cluster map needs to be loaded first
+		 * - While loading the cluster map, `system_cc()' is triggered
+		 * - `system_cc()' ends up finding the part of the FAT-file and calls us
+		 * - We get here and see that the part has INIT-blocks
+		 * - If we tried to wait for those INIT-blocks to go away, we'd dead-lock!
+		 * Solution: caller must allow us to do BLOCKING-waits */
+		if (!ccinfo_blocking(data->mtd_ccinfo))
 			goto done;
 		result = mpart_initdone_or_unlock_nx(self, data->mtd_unlock);
 		if (result != MPART_NXOP_ST_SUCCESS)
@@ -4019,7 +4029,8 @@ NOTHROW(FCALL mpart_trim_locked_or_unlock_nx)(struct mpart *__restrict self,
 
 	/* Make sure that no DMA operations are in progress for `self' */
 	if unlikely(!mpart_is_nodma(self)) {
-		if (ccinfo_noblock(data->mtd_ccinfo))
+		/* Don't want for INIT or DMA (s.a. above) */
+		if (!ccinfo_blocking(data->mtd_ccinfo))
 			goto done;
 		result = mpart_nodma_or_unlock_nx(self, data->mtd_unlock);
 		if (result != MPART_NXOP_ST_SUCCESS)
@@ -4055,7 +4066,7 @@ done:
 }
 
 /* Same as `mpart_trim_locked_or_unlock_nx()', but automatically manages `mpart_lock_acquire(self)' */
-PUBLIC NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+PUBLIC BLOCKING_IF(ccinfo_blocking(data->mtd_ccinfo)) NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_or_unlock_nx)(struct mpart *__restrict self,
                                        struct mpart_trim_data *__restrict data) {
 	unsigned int result = MPART_NXOP_ST_SUCCESS;

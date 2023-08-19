@@ -96,7 +96,7 @@ mman_protect(struct mman *__restrict self,
  * @param: advice:    The advice to apply (one of `MADV_*', except `MADV_POPULATE_*')
  * @param: flags:     Set of `MMAN_UNMAP_*'
  * @return: * :       The actual # of (possibly) altered bytes of memory. */
-PUBLIC NONNULL((1)) size_t KCALL
+PUBLIC BLOCKING NONNULL((1)) size_t KCALL
 mman_madvise(struct mman *__restrict self,
              UNCHECKED void *addr, size_t num_bytes,
              unsigned int advice, unsigned int flags)
@@ -138,7 +138,7 @@ mman_madvise(struct mman *__restrict self,
 		return 0;
 
 #ifdef DEFINE_mman_madvise
-	ccinfo_init(&info, GFP_NORMAL, (size_t)-1);
+	ccinfo_init(&info, GFP_BLOCKING, (size_t)-1);
 	mpart_trim_data_init(&trim_data, &info, NULL, self, 0); /* The mode-argument is overwritten as needed */
 	RAII_FINALLY { mpart_trim_data_fini(&trim_data); };
 #endif /* DEFINE_mman_madvise */

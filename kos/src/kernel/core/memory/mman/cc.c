@@ -1071,7 +1071,7 @@ NOTHROW(FCALL unlock_mpart_all)(struct unlockinfo *__restrict self) {
 }
 
 /* Trim unmapped parts of (cached) mem-parts from the global part list. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+PRIVATE BLOCKING_IF(ccinfo_blocking(info)) NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_allparts_trim_unused)(struct ccinfo *__restrict info,
                                               unsigned int trim_mode) {
 #if !defined(NDEBUG) && 0
@@ -1461,7 +1461,7 @@ NOTHROW(KCALL system_cc_allsuper)(struct ccinfo *__restrict info) {
 
 
 /* Clear all system caches according to `info'. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+PRIVATE BLOCKING_IF(ccinfo_blocking(info)) NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(FCALL system_cc_impl)(struct ccinfo *__restrict info) {
 	DOCC(system_cc_drivers(info));                                             /* Invoke clear-cache operators from drivers */
 	DOCC(system_cc_threads(info));                                             /* Clear caches relating to per-thread fields */
@@ -1526,7 +1526,7 @@ NOTHROW(FCALL system_cc_impl)(struct ccinfo *__restrict info) {
 }
 
 
-PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+PRIVATE BLOCKING_IF(ccinfo_blocking(info)) NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(FCALL system_cc_impl_wrapper)(struct ccinfo *__restrict info) {
 #if 0
 	if (ccinfo_noblock(info)) {
@@ -1581,7 +1581,7 @@ PUBLIC ATTR_READMOSTLY uint16_t system_cc_maxattempts = 64;
  * @return: true:  At least something (may) have become available
  *                 since the last time you tried to clear caches.
  * @return: false: Nothing could be cleared :( */
-PUBLIC NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) bool
+PUBLIC BLOCKING_IF(ccinfo_blocking(info)) NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) bool
 NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
 	struct task *caller = THIS_TASK;
 	uint16_t version;
@@ -1592,22 +1592,24 @@ NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
 	info->ci_bytes = 0;
 
 	/* Always set these flags when doing system-cache-clear operations:
-	 * - GFP_NOCLRC: Prevent recursive calls to `system_cc'
+	 * - GFP_NOCLRC: Lower the chance of recursive calls to `system_cc'
 	 * - GFP_NOTRIM: We manually trim kernel heaps near the end of cc,
 	 *               so by trying not to do so automatically over  the
 	 *               course of other cc operations, our final count of
-	 *               cleared bytes will be more accurate in the end. */
+	 *               cleared bytes will be more accurate. */
 	info->ci_gfp |= GFP_NOCLRC | GFP_NOTRIM;
 
 	/* Mask invalid bits (and bits that wouldn't make sense, like `GFP_LOCKED' or `GFP_CALLOC') */
 	info->ci_gfp &= GFP_PREFLT | GFP_NOCLRC | GFP_NOMMAP |
 	                GFP_NOTRIM | GFP_ATOMIC | GFP_NOOVER |
-	                GFP_NOSWAP | GFP_MCHEAP;
+	                GFP_NOSWAP | GFP_MCHEAP | GFP_BLOCKING;
 
 	/* Safety-check: if preemption is disabled right now,
 	 * then  we can *only*  operate in non-blocking mode. */
-	if (!preemption_ison())
+	if (!preemption_ison()) {
+		info->ci_gfp &= ~GFP_BLOCKING;
 		info->ci_gfp |= GFP_ATOMIC;
+	}
 
 	/* Safety-check: prevent recursion in case a call to `system_cc()'
 	 *               is already in progress within the calling thread. */
@@ -1698,7 +1700,7 @@ NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
 
 /* Helper  wrapper  for  `system_cc()'  that   throws
  * `E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY' on error. */
-PUBLIC NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void FCALL
+PUBLIC BLOCKING_IF(ccinfo_blocking(info)) NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void FCALL
 system_cc_virtual_memory(struct ccinfo *__restrict info)
 		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY) {
 	if unlikely(!system_cc(info)) {
@@ -1723,7 +1725,7 @@ system_cc_virtual_memory(struct ccinfo *__restrict info)
  * >>     THROW(E_BADALLOC);
  * Note that nesting within `try_allocate()'  is OK, though should  be
  * avoided for the sake of performance and more effective cc-handling. */
-PUBLIC NOBLOCK_IF(gfp & GFP_ATOMIC) ATTR_COLD WUNUSED  ATTR_INOUT(1) bool
+PUBLIC BLOCKING_IF(info & GFP_BLOCKING) NOBLOCK_IF(gfp & GFP_ATOMIC) ATTR_COLD WUNUSED  ATTR_INOUT(1) bool
 NOTHROW(FCALL system_cc_s_ex)(ccstate_t *__restrict p_state, gfp_t gfp) {
 	struct ccinfo cci;
 	ccinfo_init(&cci, gfp, 0);

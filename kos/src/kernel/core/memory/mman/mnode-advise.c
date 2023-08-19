@@ -26,13 +26,14 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
+#include <sched/rpc.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 #include <sys/mman.h>
 
-#include <atomic.h>
 #include <assert.h>
+#include <atomic.h>
 
 DECL_BEGIN
 
@@ -43,7 +44,7 @@ DECL_BEGIN
  * @return: true:  Success (locks are still held)
  * @return: false: Error (locks were released)
  * @THROW: Error (locks were released) */
-PUBLIC WUNUSED NONNULL((1, 2)) bool FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) bool FCALL
 mnode_advise_or_unlock(struct mnode *__restrict self,
                        struct mpart_trim_data *__restrict data,
                        unsigned int advice)
@@ -86,6 +87,9 @@ do_mpart_trim:
 			if (error == MPART_NXOP_ST_RETRY)
 				return false; /* Try again... */
 
+			/* Check for interrupts in case trim failed due to RPCs. */
+			task_serve();
+
 			/* We don't know the exact error (it could have also been I/O-related),
 			 * but we *do* have to throw *something*. So we simply throw bad-alloc. */
 			THROW(E_BADALLOC);
@@ -93,11 +97,14 @@ do_mpart_trim:
 		break;
 
 	case MADV_FREE:
-		data->mtd_mode = MPART_TRIM_MODE_UNCHANGED | MPART_TRIM_FLAG_FREE;
+		data->mtd_mode = MPART_TRIM_MODE_UNCHANGED |
+		                 MPART_TRIM_FLAG_FREE;
 		goto do_mpart_trim;
 
 	case MADV_PAGEOUT:
-		data->mtd_mode = MPART_TRIM_MODE_UNCHANGED | MPART_TRIM_FLAG_SYNC | MPART_TRIM_FLAG_SWAP;
+		data->mtd_mode = MPART_TRIM_MODE_UNCHANGED |
+		                 MPART_TRIM_FLAG_SYNC |
+		                 MPART_TRIM_FLAG_SWAP;
 		goto do_mpart_trim;
 
 	/*case MADV_REMOVE:*/ /* Unsupported... */

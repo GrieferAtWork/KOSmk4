@@ -345,7 +345,7 @@ mman_protect(struct mman *__restrict self,
  * @param: advice:    The advice to apply (one of `MADV_*', except `MADV_POPULATE_*')
  * @param: flags:     Set of `MMAN_UNMAP_*'
  * @return: * :       The actual # of (possibly) altered bytes of memory. */
-FUNDEF NONNULL((1)) size_t KCALL
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL
 mman_madvise(struct mman *__restrict self,
              UNCHECKED void *addr, size_t num_bytes,
              unsigned int advice, unsigned int flags DFL(0))

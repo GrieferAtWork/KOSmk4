@@ -1562,11 +1562,11 @@ NOTHROW(FCALL mpart_trim_data_fini)(struct mpart_trim_data *__restrict self);
  * @return: MPART_NXOP_ST_SUCCESS: Success (all locks were kept)
  * @return: MPART_NXOP_ST_RETRY:   Failed (`data->mtd_unlock' and `mpart_lock_release(self)' was released)
  * @return: MPART_NXOP_ST_ERROR:   Non-recoverable error (OOM or yield-failure). Don't try again. */
-FUNDEF NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+FUNDEF BLOCKING_IF(ccinfo_blocking(data->mtd_ccinfo)) NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_locked_or_unlock_nx)(struct mpart *__restrict self,
                                               struct mpart_trim_data *__restrict data);
 /* Same as `mpart_trim_locked_or_unlock_nx()', but automatically manages `mpart_lock_acquire(self)' */
-FUNDEF NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+FUNDEF BLOCKING_IF(ccinfo_blocking(data->mtd_ccinfo)) NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_or_unlock_nx)(struct mpart *__restrict self,
                                        struct mpart_trim_data *__restrict data);
 
