@@ -206,7 +206,7 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
  * The caller must be holding a lock to `self->mn_mman' (or the mman must be destroyed). */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mnode_assert_integrity)(struct mnode *__restrict self) {
-#if 1
+#if 0
 	(void)self;
 	COMPILER_IMPURE();
 #else
