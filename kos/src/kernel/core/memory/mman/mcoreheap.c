@@ -744,7 +744,10 @@ NOTHROW(FCALL mcoreheap_free_locked)(union mcorepart *__restrict part) {
 	do {
 		SLIST_CONTAINS(&mcoreheap_usedlist, page, mcp_link, goto found_page);
 		SLIST_CONTAINS(&mcoreheap_freelist, page, mcp_link, goto found_page);
-	} while (__assertion_checkf(NULL, "Part %p in page %p not found in coreheap", part, page));
+	} while (__assertion_checkf(NULL,
+	                            "Part %p in page %p not found in coreheap\n"
+	                            "%[gen:c]", /* Try to include a traceback if allocated by kmalloc() */
+	                            part, page, &kmalloc_printtrace, part));
 found_page:
 #endif /* !NDEBUG */
 
