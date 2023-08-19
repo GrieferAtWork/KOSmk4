@@ -1476,6 +1476,7 @@ struct ccinfo;
                                            * NOTE: When the part isn't anonymous, and the file implements the `mo_saveblocks'
                                            *       operator, this flag is simply ignored.
                                            * NOTE: When the part has the `MPART_F_MLOCK' flag, this flag is ignored. */
+#define MPART_TRIM_FLAG_FREE         0x10 /* FLAG: When set, `MPART_TRIM_FLAG_SWAP' is ignored and changes to anonymous memory are simply discarded. */
 
 struct mpart_trim_data {
 	struct mpart      *mtd_parts[2];  /* [0..1][owned] Extra mem-parts as may be needed. */
@@ -1485,21 +1486,41 @@ struct mpart_trim_data {
 	struct mnode      *mtd_node;      /* [0..1][owned] Extra mem-node as may be needed. */
 	struct ccinfo     *mtd_ccinfo;    /* [1..1][const] Cache-clearing information. */
 	struct unlockinfo *mtd_unlock;    /* [0..1][const] Extra stuff to unlock */
+	struct mman       *mtd_mmlocked;  /* [0..1][const] Extra  mman for which the caller is already holding a lock.
+	                                   *               Note that this mman lock is released alongside `mtd_unlock'
+	                                   *               when doing so becomes necessary. */
+	mpart_reladdr_t    mtd_rstart;    /* [const] Part-relative address where trimming starts */
+	mpart_reladdr_t    mtd_rend;      /* [const] Part-relative address where trimming ends */
 	unsigned int       mtd_mode;      /* [const] Trim mode (s.a. `MPART_TRIM_MODE_*' and `MPART_TRIM_FLAG_*') */
 };
-#define mpart_trim_data_init(self, info, unlock, mode) \
-	(void)((self)->mtd_parts[0]  = __NULLPTR,          \
-	       (self)->mtd_parts[1]  = __NULLPTR,          \
-	       (self)->mtd_metas[0]  = __NULLPTR,          \
-	       (self)->mtd_metas[1]  = __NULLPTR,          \
-	       (self)->mtd_blkst_ptr = __NULLPTR,          \
-	       (self)->mtd_chunkvec  = __NULLPTR,          \
-	       (self)->mtd_node      = __NULLPTR,          \
-	       (self)->mtd_ccinfo    = (info),             \
-	       (self)->mtd_unlock    = (unlock),           \
+#define mpart_trim_data_init(self, info, unlock, mmlocked, mode) \
+	(void)((self)->mtd_parts[0]  = __NULLPTR,                    \
+	       (self)->mtd_parts[1]  = __NULLPTR,                    \
+	       (self)->mtd_metas[0]  = __NULLPTR,                    \
+	       (self)->mtd_metas[1]  = __NULLPTR,                    \
+	       (self)->mtd_blkst_ptr = __NULLPTR,                    \
+	       (self)->mtd_chunkvec  = __NULLPTR,                    \
+	       (self)->mtd_node      = __NULLPTR,                    \
+	       (self)->mtd_ccinfo    = (info),                       \
+	       (self)->mtd_unlock    = (unlock),                     \
+	       (self)->mtd_mmlocked  = (mmlocked),                   \
+	       (self)->mtd_rstart    = 0,                            \
+	       (self)->mtd_rend      = (mpart_reladdr_t)-1,          \
 	       (self)->mtd_mode      = (mode))
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_trim_data_fini)(struct mpart_trim_data *__restrict self);
+
+/* Release all caller-held locks described by `self' */
+#define mpart_trim_data_unlock(self)                                        \
+	(!(self)->mtd_mmlocked || (mman_lock_release((self)->mtd_mmlocked), 1), \
+	 unlockinfo_xunlock((self)->mtd_unlock))
+
+/* Check if `self' is holding an intrinsic lock to `mm' */
+#define mpart_trim_data_hasmmlock(self, mm) \
+	((self)->mtd_mmlocked == (mm))
+
+
+
 
 /* Synchronous version of `mpart_trim()' (that is also able to trim non-anonymous parts)
  * This function is specifically designed to-be used by `system_cc()' (in case you  were

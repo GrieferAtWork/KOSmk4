@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa35eb0d6 */
+/* HASH CRC-32:0x71f98267 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3037,7 +3037,7 @@ DFUN(".text.crt.dos.system.mman", libd_shm_unlink, libc_shm_unlink, TD, 1, TP)
 DFUN(".text.crt.dos.system.mman", libd_madvise, libc_madvise, TD, 3, TP, TI, TD)
 DFUN(".text.crt.dos.system.mman", libd_mincore, libc_mincore, TD, 3, TP, TI, TP)
 DFUN(".text.crt.dos.heap.mman", libd_mmap64, libc_mmap64, TP, 6, TP, TI, TD, TD, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_OFF64_T__))
-DFUN(".text.crt.dos.system.mman", libd_posix_madvise, libc_posix_madvise, TD, 3, TP, TI, TD)
+DFUN(".text.crt.dos.system.mman", libd_posix_madvise, libc_posix_madvise, TIn(__SIZEOF_ERRNO_T__), 3, TP, TI, TD)
 DFUN(".text.crt.dos.heap.mman", libd_mremap, libc_mremap, TP, 5, TP, TI, TI, TD, TP)
 DFUN(".text.crt.dos.system.mman", libd_remap_file_pages, libc_remap_file_pages, TD, 5, TP, TI, TD, TI, TD)
 DFUN(".text.crt.dos.system.mman", libd_memfd_create, libc_memfd_create, TIn(__SIZEOF_FD_T__), 2, TP, TD)

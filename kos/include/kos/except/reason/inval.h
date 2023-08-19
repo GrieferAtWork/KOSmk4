@@ -56,6 +56,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_MINCORE_SIZE,             /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `mincore(2)' is too large. */
 	E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_FLAGS,        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid set of `MAP_*' flags passed to `loadlibrary()' */
 	E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_NOMAPPINGS,   /* E_INVALID_ARGUMENT_BAD_VALUE: No non-empty program headers were given. */
+	E_INVALID_ARGUMENT_CONTEXT_MADVISE_BAD_ADVICE,       /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: The `advise' argument passed to `madvice(2)' is invalid. */
 
 	/* System calls: memfd. */
 	E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_NAME_TOO_LONG = 0x0080, /* E_INVALID_ARGUMENT_BAD_VALUE: the `name' given `memfd_create(2)' to longer than `249' bytes (excluding the trailing NUL) */
@@ -368,6 +369,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_MINCORE_SIZE                     E_INVALID_ARGUMENT_CONTEXT_MINCORE_SIZE                     /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `mincore(2)' is too large. */
 #define E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_FLAGS                E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_FLAGS                /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid set of `MAP_*' flags passed to `loadlibrary()' */
 #define E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_NOMAPPINGS           E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_NOMAPPINGS           /* E_INVALID_ARGUMENT_BAD_VALUE: No non-empty program headers were given. */
+#define E_INVALID_ARGUMENT_CONTEXT_MADVISE_BAD_ADVICE               E_INVALID_ARGUMENT_CONTEXT_MADVISE_BAD_ADVICE               /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: The `advise' argument passed to `madvice(2)' is invalid. */
 /* System calls: memfd. */
 #define E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_NAME_TOO_LONG       E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_NAME_TOO_LONG       /* E_INVALID_ARGUMENT_BAD_VALUE: the `name' given `memfd_create(2)' to longer than `249' bytes (excluding the trailing NUL) */
 #define E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_FLAGS               E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_FLAGS               /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `memfd_create(2)'. */
@@ -639,6 +641,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_MINCORE_SIZE                     19    /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `mincore(2)' is too large. */
 #define E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_FLAGS                20    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid set of `MAP_*' flags passed to `loadlibrary()' */
 #define E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_NOMAPPINGS           21    /* E_INVALID_ARGUMENT_BAD_VALUE: No non-empty program headers were given. */
+#define E_INVALID_ARGUMENT_CONTEXT_MADVISE_BAD_ADVICE               22    /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: The `advise' argument passed to `madvice(2)' is invalid. */
 /* System calls: memfd. */
 #define E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_NAME_TOO_LONG       128   /* E_INVALID_ARGUMENT_BAD_VALUE: the `name' given `memfd_create(2)' to longer than `249' bytes (excluding the trailing NUL) */
 #define E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_FLAGS               129   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `memfd_create(2)'. */

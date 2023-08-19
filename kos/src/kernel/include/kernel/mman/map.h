@@ -338,6 +338,19 @@ mman_protect(struct mman *__restrict self,
              unsigned int flags DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 
+
+/* Kernel-level implementation of `madvise(2)'
+ * @param: addr:      The base address at which to start changing protection.
+ * @param: num_bytes: The number of continuous bytes of memory to change, starting at `addr'
+ * @param: advice:    The advice to apply (one of `MADV_*', except `MADV_POPULATE_*')
+ * @param: flags:     Set of `MMAN_UNMAP_*'
+ * @return: * :       The actual # of (possibly) altered bytes of memory. */
+FUNDEF NONNULL((1)) size_t KCALL
+mman_madvise(struct mman *__restrict self,
+             UNCHECKED void *addr, size_t num_bytes,
+             unsigned int advice, unsigned int flags DFL(0))
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+
 DECL_END
 #endif /* __CC__ */
 

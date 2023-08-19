@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xadd0c5c4 */
+/* HASH CRC-32:0x2aabd28b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -357,27 +357,27 @@
 /* Advice to `madvise(2)'                                               */
 /************************************************************************/
 #ifdef __USE_MISC
-/* ??? */
+/* Remove any hints given on how memory will be used */
 #if !defined(MADV_NORMAL) && defined(__MADV_NORMAL)
 #define MADV_NORMAL __MADV_NORMAL
 #endif /* !MADV_NORMAL && __MADV_NORMAL */
 
-/* ??? */
+/* Hint that memory will be accessed randomly */
 #if !defined(MADV_RANDOM) && defined(__MADV_RANDOM)
 #define MADV_RANDOM __MADV_RANDOM
 #endif /* !MADV_RANDOM && __MADV_RANDOM */
 
-/* ??? */
+/* Hint that memory will be accessed sequentially */
 #if !defined(MADV_SEQUENTIAL) && defined(__MADV_SEQUENTIAL)
 #define MADV_SEQUENTIAL __MADV_SEQUENTIAL
 #endif /* !MADV_SEQUENTIAL && __MADV_SEQUENTIAL */
 
-/* ??? */
+/* Hint that memory will be accessed soon */
 #if !defined(MADV_WILLNEED) && defined(__MADV_WILLNEED)
 #define MADV_WILLNEED __MADV_WILLNEED
 #endif /* !MADV_WILLNEED && __MADV_WILLNEED */
 
-/* ??? */
+/* Hint that memory will probably not be used */
 #if !defined(MADV_DONTNEED) && defined(__MADV_DONTNEED)
 #define MADV_DONTNEED __MADV_DONTNEED
 #endif /* !MADV_DONTNEED && __MADV_DONTNEED */
@@ -387,42 +387,42 @@
 #define MADV_REMOVE __MADV_REMOVE
 #endif /* !MADV_REMOVE && __MADV_REMOVE */
 
-/* ??? */
+/* Exclude this mapping during forks */
 #if !defined(MADV_DONTFORK) && defined(__MADV_DONTFORK)
 #define MADV_DONTFORK __MADV_DONTFORK
 #endif /* !MADV_DONTFORK && __MADV_DONTFORK */
 
-/* ??? */
+/* Include this mapping during forks (default) */
 #if !defined(MADV_DOFORK) && defined(__MADV_DOFORK)
 #define MADV_DOFORK __MADV_DOFORK
 #endif /* !MADV_DOFORK && __MADV_DOFORK */
 
-/* ??? */
+/* Enable Kernel Samepage Merging (KSM) for this range */
 #if !defined(MADV_MERGEABLE) && defined(__MADV_MERGEABLE)
 #define MADV_MERGEABLE __MADV_MERGEABLE
 #endif /* !MADV_MERGEABLE && __MADV_MERGEABLE */
 
-/* ??? */
+/* Disable Kernel Samepage Merging (KSM) for this range (default) */
 #if !defined(MADV_UNMERGEABLE) && defined(__MADV_UNMERGEABLE)
 #define MADV_UNMERGEABLE __MADV_UNMERGEABLE
 #endif /* !MADV_UNMERGEABLE && __MADV_UNMERGEABLE */
 
-/* ??? */
+/* Allow huge-page merging for this range (default; on KOS, this cannot be turned off) */
 #if !defined(MADV_HUGEPAGE) && defined(__MADV_HUGEPAGE)
 #define MADV_HUGEPAGE __MADV_HUGEPAGE
 #endif /* !MADV_HUGEPAGE && __MADV_HUGEPAGE */
 
-/* ??? */
+/* Disallow huge-page merging for this range (ignored on KOS) */
 #if !defined(MADV_NOHUGEPAGE) && defined(__MADV_NOHUGEPAGE)
 #define MADV_NOHUGEPAGE __MADV_NOHUGEPAGE
 #endif /* !MADV_NOHUGEPAGE && __MADV_NOHUGEPAGE */
 
-/* ??? */
+/* Exclude mapping in coredumps */
 #if !defined(MADV_DONTDUMP) && defined(__MADV_DONTDUMP)
 #define MADV_DONTDUMP __MADV_DONTDUMP
 #endif /* !MADV_DONTDUMP && __MADV_DONTDUMP */
 
-/* ??? */
+/* Include mapping in coredumps (default) */
 #if !defined(MADV_DODUMP) && defined(__MADV_DODUMP)
 #define MADV_DODUMP __MADV_DODUMP
 #endif /* !MADV_DODUMP && __MADV_DODUMP */
@@ -431,6 +431,48 @@
 #if !defined(MADV_HWPOISON) && defined(__MADV_HWPOISON)
 #define MADV_HWPOISON __MADV_HWPOISON
 #endif /* !MADV_HWPOISON && __MADV_HWPOISON */
+
+#ifdef __USE_KOS
+/* Kernel is allowed to free memory (changes may be lost, but memory is allocated again if accessed) */
+#if !defined(MADV_FREE) && defined(__MADV_FREE)
+#define MADV_FREE __MADV_FREE
+#endif /* !MADV_FREE && __MADV_FREE */
+
+/* Replace with a fresh MAP_PRIVATE|MAP_ANONYMOUS mapping during fork (not supported on KOS, yet) */
+#if !defined(MADV_WIPEONFORK) && defined(__MADV_WIPEONFORK)
+#define MADV_WIPEONFORK __MADV_WIPEONFORK
+#endif /* !MADV_WIPEONFORK && __MADV_WIPEONFORK */
+
+/* Retain mapping during fork (default) */
+#if !defined(MADV_KEEPONFORK) && defined(__MADV_KEEPONFORK)
+#define MADV_KEEPONFORK __MADV_KEEPONFORK
+#endif /* !MADV_KEEPONFORK && __MADV_KEEPONFORK */
+
+/* Hint that mapping can be unloaded as one of the first candidates when memory runs low */
+#if !defined(MADV_COLD) && defined(__MADV_COLD)
+#define MADV_COLD __MADV_COLD
+#endif /* !MADV_COLD && __MADV_COLD */
+
+/* Sync all changes to MAP_FILE|MAP_SHARED to disk, write changes to MAP_ANON to swap, and unload all unmodified file mappings */
+#if !defined(MADV_PAGEOUT) && defined(__MADV_PAGEOUT)
+#define MADV_PAGEOUT __MADV_PAGEOUT
+#endif /* !MADV_PAGEOUT && __MADV_PAGEOUT */
+
+/* Prefault for read access */
+#if !defined(MADV_POPULATE_READ) && defined(__MADV_POPULATE_READ)
+#define MADV_POPULATE_READ __MADV_POPULATE_READ
+#endif /* !MADV_POPULATE_READ && __MADV_POPULATE_READ */
+
+/* Prefault for write access */
+#if !defined(MADV_POPULATE_WRITE) && defined(__MADV_POPULATE_WRITE)
+#define MADV_POPULATE_WRITE __MADV_POPULATE_WRITE
+#endif /* !MADV_POPULATE_WRITE && __MADV_POPULATE_WRITE */
+
+/* ??? */
+#if !defined(MADV_SOFT_OFFLINE) && defined(__MADV_SOFT_OFFLINE)
+#define MADV_SOFT_OFFLINE __MADV_SOFT_OFFLINE
+#endif /* !MADV_SOFT_OFFLINE && __MADV_SOFT_OFFLINE */
+#endif /* __USE_KOS */
 #endif /* __USE_MISC */
 
 
@@ -439,27 +481,27 @@
 /* Advice to `posix_madvise(2)'.                                        */
 /************************************************************************/
 #ifdef __USE_XOPEN2K
-/* ??? */
+/* Remove any hints given on how memory will be used */
 #if !defined(POSIX_MADV_NORMAL) && defined(__POSIX_MADV_NORMAL)
 #define POSIX_MADV_NORMAL __POSIX_MADV_NORMAL
 #endif /* !POSIX_MADV_NORMAL && __POSIX_MADV_NORMAL */
 
-/* ??? */
+/* Hint that memory will be accessed randomly */
 #if !defined(POSIX_MADV_RANDOM) && defined(__POSIX_MADV_RANDOM)
 #define POSIX_MADV_RANDOM __POSIX_MADV_RANDOM
 #endif /* !POSIX_MADV_RANDOM && __POSIX_MADV_RANDOM */
 
-/* ??? */
+/* Hint that memory will be accessed sequentially */
 #if !defined(POSIX_MADV_SEQUENTIAL) && defined(__POSIX_MADV_SEQUENTIAL)
 #define POSIX_MADV_SEQUENTIAL __POSIX_MADV_SEQUENTIAL
 #endif /* !POSIX_MADV_SEQUENTIAL && __POSIX_MADV_SEQUENTIAL */
 
-/* ??? */
+/* Hint that memory will be accessed soon */
 #if !defined(POSIX_MADV_WILLNEED) && defined(__POSIX_MADV_WILLNEED)
 #define POSIX_MADV_WILLNEED __POSIX_MADV_WILLNEED
 #endif /* !POSIX_MADV_WILLNEED && __POSIX_MADV_WILLNEED */
 
-/* ??? */
+/* Hint that memory will probably not be used */
 #if !defined(POSIX_MADV_DONTNEED) && defined(__POSIX_MADV_DONTNEED)
 #define POSIX_MADV_DONTNEED __POSIX_MADV_DONTNEED
 #endif /* !POSIX_MADV_DONTNEED && __POSIX_MADV_DONTNEED */
@@ -715,13 +757,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(shm_unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_madvise
+/* >> posix_madvise(3)
+ * Advice on how memory should be managed by the kernel
+ * @param: advice: One of `MADV_*' */
 __CDECLARE(__ATTR_ACCESS_NONE(1),int,__NOTHROW_NCX,madvise,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __advice),(__addr,__len,__advice))
 #elif defined(__CRT_HAVE___madvise)
+/* >> posix_madvise(3)
+ * Advice on how memory should be managed by the kernel
+ * @param: advice: One of `MADV_*' */
 __CREDIRECT(__ATTR_ACCESS_NONE(1),int,__NOTHROW_NCX,madvise,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __advice),__madvise,(__addr,__len,__advice))
-#else /* ... */
-#include <libc/local/sys.mman/madvise.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(madvise, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_NONE(1) int __NOTHROW_NCX(__LIBCCALL madvise)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __advice) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(madvise))(__addr, __len, __advice); })
-#endif /* !... */
+#endif /* ... */
 __CDECLARE_OPT(__ATTR_ACCESS_NONE(1),int,__NOTHROW_NCX,mincore,(void *__start, size_t __len, unsigned char *__vec),(__start,__len,__vec))
 #endif /* __USE_MISC */
 
@@ -764,10 +809,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mmap64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 
 #ifdef __USE_XOPEN2K
 #ifdef __CRT_HAVE_posix_madvise
-__CDECLARE(__ATTR_ACCESS_NONE(1),int,__NOTHROW_NCX,posix_madvise,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __advice),(__addr,__len,__advice))
+/* >> posix_madvise(3)
+ * Wrapper around `madvise(2)'
+ * @param: advice: One of `POSIX_MADV_*' */
+__CDECLARE(__ATTR_ACCESS_NONE(1),__errno_t,__NOTHROW_NCX,posix_madvise,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __advice),(__addr,__len,__advice))
 #else /* __CRT_HAVE_posix_madvise */
 #include <libc/local/sys.mman/posix_madvise.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(posix_madvise, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_NONE(1) int __NOTHROW_NCX(__LIBCCALL posix_madvise)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __advice) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_madvise))(__addr, __len, __advice); })
+/* >> posix_madvise(3)
+ * Wrapper around `madvise(2)'
+ * @param: advice: One of `POSIX_MADV_*' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_madvise, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_NONE(1) __errno_t __NOTHROW_NCX(__LIBCCALL posix_madvise)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __advice) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_madvise))(__addr, __len, __advice); })
 #endif /* !__CRT_HAVE_posix_madvise */
 #endif /* __USE_XOPEN2K */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6759fa0 */
+/* HASH CRC-32:0x7117761f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,9 +103,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ShmUnlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_MAdvise
+/* >> posix_madvise(3)
+ * Advice on how memory should be managed by the kernel
+ * @param: advice: One of `MADV_*' */
 __CDECLARE_VOID(__ATTR_ACCESS_NONE(1),__THROWING(...),MAdvise,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __advice),(__addr,__len,__advice))
 #else /* __CRT_HAVE_MAdvise */
 #include <libc/local/kos.sys.mman/MAdvise.h>
+/* >> posix_madvise(3)
+ * Advice on how memory should be managed by the kernel
+ * @param: advice: One of `MADV_*' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(MAdvise, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_NONE(1) void (__LIBCCALL MAdvise)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __advice) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(MAdvise))(__addr, __len, __advice); })
 #endif /* !__CRT_HAVE_MAdvise */
 __CDECLARE_VOID_OPT(__ATTR_ACCESS_NONE(1),__THROWING(...),MInCore,(void *__start, size_t __len, unsigned char *__vec),(__start,__len,__vec))
@@ -142,9 +148,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(MMap64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 
 #ifdef __USE_XOPEN2K
 #ifdef __CRT_HAVE_PosixMAdvise
+/* >> posix_madvise(3)
+ * Wrapper around `madvise(2)'
+ * @param: advice: One of `POSIX_MADV_*' */
 __CDECLARE_VOID(__ATTR_ACCESS_NONE(1),__THROWING(...),PosixMAdvise,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __advice),(__addr,__len,__advice))
 #else /* __CRT_HAVE_PosixMAdvise */
 #include <libc/local/kos.sys.mman/PosixMAdvise.h>
+/* >> posix_madvise(3)
+ * Wrapper around `madvise(2)'
+ * @param: advice: One of `POSIX_MADV_*' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(PosixMAdvise, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_NONE(1) void (__LIBCCALL PosixMAdvise)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __advice) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PosixMAdvise))(__addr, __len, __advice); })
 #endif /* !__CRT_HAVE_PosixMAdvise */
 #endif /* __USE_XOPEN2K */

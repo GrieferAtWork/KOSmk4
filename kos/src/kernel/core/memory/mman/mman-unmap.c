@@ -29,6 +29,8 @@
 #include "mman-unmap.c.inl"
 #define DEFINE_mman_protect
 #include "mman-unmap.c.inl"
+#define DEFINE_mman_madvise
+#include "mman-unmap.c.inl"
 #endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_UNMAP_C */

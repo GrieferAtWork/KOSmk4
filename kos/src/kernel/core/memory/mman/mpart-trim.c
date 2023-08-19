@@ -47,6 +47,7 @@
 
 #include <hybrid/align.h>
 #include <hybrid/minmax.h>
+#include <hybrid/overflow.h>
 #include <hybrid/sched/preemption.h>
 
 #include <kos/except.h>
@@ -1706,18 +1707,22 @@ NOTHROW(FCALL mpart_mappedby_mman_before)(struct mpart const *__restrict self,
  * given as `NULL', in which case _all_ locks are released) */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) void
 NOTHROW(FCALL mpart_unlock_all_mmans)(struct mpart const *__restrict self,
-                                      struct mnode const *stop DFL(NULL)) {
+                                      struct mnode const *stop DFL(NULL),
+                                      struct mman *caller_locked_mman DFL(NULL)) {
 	struct mnode *node;
 	unsigned int i;
 	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
+			struct mman *mm = node->mn_mman;
 			if (node == stop)
 				return; /* Stop on this node! */
-			if unlikely(wasdestroyed(node->mn_mman))
+			if unlikely(wasdestroyed(mm))
 				continue; /* Skip destroyed mmans */
-			if (mpart_mappedby_mman_before(self, node, node->mn_mman))
+			if (mpart_mappedby_mman_before(self, node, mm))
 				continue; /* Already unlocked before... */
-			mman_lock_release(node->mn_mman);
+			if (mm == caller_locked_mman)
+				continue; /* Lock belongs to the caller */
+			mman_lock_release(mm);
 		}
 	}
 }
@@ -1727,20 +1732,24 @@ NOTHROW(FCALL mpart_unlock_all_mmans)(struct mpart const *__restrict self,
  * If doing so would block for one  of the mmans, release all locks  already
  * acquired, and return a pointer to the blocking mman. */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct mman *
-NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart const *__restrict self) {
+NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart const *__restrict self,
+                                    struct mman *caller_locked_mman DFL(NULL)) {
 	struct mnode *node;
 	unsigned int i;
 	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
-			if unlikely(wasdestroyed(node->mn_mman))
+			struct mman *mm = node->mn_mman;
+			if unlikely(wasdestroyed(mm))
 				continue; /* Skip destroyed mmans */
-			if (mman_lock_tryacquire(node->mn_mman))
+			if (mman_lock_tryacquire(mm))
 				continue; /* Successfully locked the mman */
-			if (mpart_mappedby_mman_before(self, node, node->mn_mman))
+			if (mpart_mappedby_mman_before(self, node, mm))
 				continue; /* We've already acquired a lock to this mman in the part. */
+			if (mm == caller_locked_mman)
+				continue; /* Caller is already holding a lock to this mman */
 			/* Oops... We've got a blocking one here! */
-			mpart_unlock_all_mmans(self, node);
-			return node->mn_mman;
+			mpart_unlock_all_mmans(self, node, caller_locked_mman);
+			return mm;
 		}
 	}
 	return NULL;
@@ -2081,7 +2090,8 @@ struct mpart_trim_range {
 PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) bool
 NOTHROW(FCALL mpart_find_unmapped_range)(struct mpart *__restrict self,
                                          struct mpart_trim_range *__restrict result,
-                                         mpart_reladdr_t minaddr) {
+                                         mpart_reladdr_t minaddr,
+                                         mpart_reladdr_t endaddr) {
 	struct mnode *node;
 	struct mpart_node_iterator iter;
 	mpart_reladdr_t prev_node_end = 0;
@@ -2093,7 +2103,7 @@ NOTHROW(FCALL mpart_find_unmapped_range)(struct mpart *__restrict self,
 		if (!node) {
 			/* No more nodes past this point. */
 			result->mptr_start = prev_node_end;
-			result->mptr_end   = mpart_getsize(self);
+			result->mptr_end   = endaddr;
 			if (result->mptr_start < minaddr)
 				result->mptr_start = minaddr;
 			return result->mptr_start < result->mptr_end;
@@ -2104,9 +2114,15 @@ NOTHROW(FCALL mpart_find_unmapped_range)(struct mpart *__restrict self,
 			if (result->mptr_start < minaddr)
 				result->mptr_start = minaddr;
 			result->mptr_end = node_start;
-			if (result->mptr_start < result->mptr_end)
-				return true;
+			if (result->mptr_start < result->mptr_end) {
+				if (result->mptr_end > endaddr)
+					result->mptr_end = endaddr;
+				if (result->mptr_start < result->mptr_end)
+					return true;
+			}
 		}
+		if (node_start >= endaddr)
+			break;
 		node_end = mnode_getpartendaddr(node);
 		if (prev_node_end < node_end)
 			prev_node_end = node_end;
@@ -2124,12 +2140,14 @@ PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) bool
 NOTHROW(FCALL mpart_find_blockstatus_range)(struct mpart *__restrict self,
                                             struct mpart_trim_range *__restrict result,
                                             mpart_reladdr_t minaddr,
+                                            mpart_reladdr_t endaddr,
                                             mblock_st_bitset_t ok_states) {
 	struct mfile *file = self->mp_file;
 	shift_t blockshift = file->mf_blockshift;
 	size_t minblock, i, endblock;
 	minblock = (minaddr + ((mpart_reladdr_t)1 << blockshift) - 1) >> blockshift;
-	endblock = mpart_getblockcount(self, file);
+	endblock = (endaddr + ((mpart_reladdr_t)1 << blockshift) - 1) >> blockshift;
+	assert(endblock <= mpart_getblockcount(self, file));
 	if (!mpart_hasblockstate(self)) {
 		if (!MBLOCK_ST_BITSET_CONTAINS(ok_states, MPART_BLOCK_ST_CHNG))
 			return false;
@@ -2155,14 +2173,13 @@ NOTHROW(FCALL mpart_find_blockstatus_range)(struct mpart *__restrict self,
 	return false;
 }
 
-
 #define _LOCAL_unlock_all()                                                  \
 	(!self->mp_meta || (mpartmeta_ftxlock_endwrite(self->mp_meta, self), 1), \
 	 mpart_isanon(self) || (mfile_lock_endwrite(self->mp_file), 1),          \
-	 mpart_unlock_all_mmans(self),                                           \
+	 mpart_unlock_all_mmans(self, NULL, data->mtd_mmlocked),                 \
 	 mpart_assert_integrity(self),                                           \
 	 _mpart_lock_release(self),                                              \
-	 unlockinfo_xunlock(data->mtd_unlock),                                   \
+	 mpart_trim_data_unlock(data),                                           \
 	 mpart_lockops_reap(self))
 
 #if 1 /* Outsource the block of code used to "unlock everything" into its own function... */
@@ -2400,16 +2417,23 @@ NOTHROW(FCALL mpart_find_trimable_range)(struct mpart *__restrict self,
                                          struct mpart_trim_data *__restrict data,
                                          struct mpart_trim_range *__restrict result,
                                          mpart_reladdr_t minaddr) {
+	mpart_reladdr_t endaddr;
+
+	/* Figure out where the range is *required* to end. */
+	endaddr = mpart_getsize(self);
+	if (endaddr > data->mtd_rend)
+		endaddr = data->mtd_rend;
+
 	/* Check for case: just search for unmapped ranges (that aren't marked as changed). */
 	if ((data->mtd_mode & MPART_TRIM_MODEMASK) == MPART_TRIM_MODE_UNMAPPED ||
 	    (self->mp_flags & MPART_F_MLOCK)) {
 again_find_unmapped:
-		if (!mpart_find_unmapped_range(self, result, minaddr))
+		if (!mpart_find_unmapped_range(self, result, minaddr, endaddr))
 			return MPART_FIND_TRIMABLE_RANGE_ST_NONE;
 		if (!mpart_isanon(self)) {
 			struct mpart_trim_range changed_range;
 			/* For non-anonymous nodes, must not unload blocks marked as `MPART_BLOCK_ST_CHNG' */
-			if (mpart_find_blockstatus_range(self, &changed_range, result->mptr_start,
+			if (mpart_find_blockstatus_range(self, &changed_range, result->mptr_start, endaddr,
 			                                 MBLOCK_ST_BITSET(MPART_BLOCK_ST_CHNG)) &&
 			    changed_range.mptr_start < result->mptr_end) {
 				if (result->mptr_start < changed_range.mptr_start) {
@@ -2448,10 +2472,10 @@ again_find_unmapped:
 
 		/* Check if there an area that isn't mapped by anyone. */
 again_find_uninitialized:
-		if (!mpart_find_unmapped_range(self, result, minaddr)) {
+		if (!mpart_find_unmapped_range(self, result, minaddr, endaddr)) {
 			/* Special case: the entire part is  mapped, so if there's range  to
 			 * it whose contents are uninitialized, then we can void that range. */
-			if (mpart_find_blockstatus_range(self, result, minaddr,
+			if (mpart_find_blockstatus_range(self, result, minaddr, endaddr,
 			                                 MBLOCK_ST_BITSET(MPART_BLOCK_ST_NDEF))) {
 
 				return MPART_FIND_TRIMABLE_RANGE_ST_VOID;
@@ -2463,7 +2487,7 @@ again_find_uninitialized:
 		/* Found a range that isn't being mapped. Check if there is another
 		 * uninitialized range that comes before  it (and is thus  actually
 		 * being mapped, but just hasn't been accessed, yet) */
-		if (mpart_find_blockstatus_range(self, &uninitialized_range, minaddr,
+		if (mpart_find_blockstatus_range(self, &uninitialized_range, minaddr, endaddr,
 		                                 MBLOCK_ST_BITSET(MPART_BLOCK_ST_NDEF))) {
 			if (uninitialized_range.mptr_start < result->mptr_start) {
 				/* There is a part that's mapped, but not initialized.
@@ -2487,7 +2511,7 @@ again_find_uninitialized:
 		 * Even if we were to sync it, it would get status `MPART_BLOCK_ST_LOAD',
 		 * but  we're only supposed to unload uninitialized blocks, so we'd still
 		 * not be allowed to unload it! */
-		if (mpart_find_blockstatus_range(self, &changed_range, result->mptr_start,
+		if (mpart_find_blockstatus_range(self, &changed_range, result->mptr_start, endaddr,
 		                                 MBLOCK_ST_BITSET(MPART_BLOCK_ST_CHNG))) {
 			if (changed_range.mptr_start < result->mptr_end) {
 				result->mptr_end = changed_range.mptr_start;
@@ -2508,7 +2532,7 @@ again_find_uninitialized:
 		unsigned int first_block_status;
 		assert((data->mtd_mode & MPART_TRIM_MODEMASK) == MPART_TRIM_MODE_UNCHANGED);
 again_find_unchanged:
-		if (mpart_find_unmapped_range(self, result, minaddr)) {
+		if (mpart_find_unmapped_range(self, result, minaddr, endaddr)) {
 			assert(result->mptr_start >= minaddr);
 			if (result->mptr_start <= minaddr) {
 				/* The part starts with an unmapped range.
@@ -2516,7 +2540,7 @@ again_find_unchanged:
 				 * -> If it's not an anon part, either skip over CHANGED blocks, or sync them. */
 				if (!mpart_isanon(self)) {
 					struct mpart_trim_range changed_range;
-					if (mpart_find_blockstatus_range(self, &changed_range, result->mptr_start,
+					if (mpart_find_blockstatus_range(self, &changed_range, result->mptr_start, endaddr,
 					                                 MBLOCK_ST_BITSET(MPART_BLOCK_ST_CHNG))) {
 						assert(changed_range.mptr_start >= result->mptr_start);
 						if (changed_range.mptr_start < result->mptr_end) {
@@ -2549,10 +2573,10 @@ again_find_unchanged:
 				return MPART_FIND_TRIMABLE_RANGE_ST_TRIM;
 			}
 		} else {
-			result->mptr_end   = mpart_getsize(self);
-			result->mptr_start = result->mptr_end;
-			if unlikely(minaddr >= result->mptr_end)
+			if unlikely(minaddr >= endaddr)
 				return MPART_FIND_TRIMABLE_RANGE_ST_NONE;
+			result->mptr_start = endaddr;
+			result->mptr_end   = endaddr;
 		}
 
 		/* Check the status of blocks between `minaddr' and `result->mptr_start' */
@@ -2570,48 +2594,53 @@ again_find_unchanged:
 		}
 		assert(first_block_status != MPART_BLOCK_ST_INIT);
 		if (first_block_status == MPART_BLOCK_ST_CHNG) {
-			/* Figure out how many blocks are marked as MPART_BLOCK_ST_CHNG */
-			result->mptr_start = minblock << blockshift;
-			if (!mpart_hasblockstate(self)) {
-				minblock = endblock;
+			if (mpart_isanon(self) && (data->mtd_mode & MPART_TRIM_FLAG_FREE)) {
+				/* Treat changed memory the same way as loaded memory when supposed to free anon memory. */
+				first_block_status = MPART_BLOCK_ST_LOAD;
 			} else {
-				for (;;) {
-					unsigned int block_st;
-					++minblock;
-					if (minblock >= endblock)
-						break;
-					block_st = mpart_getblockstate(self, minblock);
-					assert(block_st != MPART_BLOCK_ST_INIT);
-					if (block_st != MPART_BLOCK_ST_CHNG)
-						break;
+				/* Figure out how many blocks are marked as MPART_BLOCK_ST_CHNG */
+				result->mptr_start = minblock << blockshift;
+				if (!mpart_hasblockstate(self)) {
+					minblock = endblock;
+				} else {
+					for (;;) {
+						unsigned int block_st;
+						++minblock;
+						if (minblock >= endblock)
+							break;
+						block_st = mpart_getblockstate(self, minblock);
+						assert(block_st != MPART_BLOCK_ST_INIT);
+						if (block_st != MPART_BLOCK_ST_CHNG)
+							break;
+					}
 				}
-			}
-			result->mptr_end = minblock << blockshift;
-			assert(result->mptr_start < result->mptr_end);
+				result->mptr_end = minblock << blockshift;
+				assert(result->mptr_start < result->mptr_end);
 
-			/* Range begins with a modified blocks */
-			if (!ccinfo_noblock(data->mtd_ccinfo)) {
-				if ((mpart_isanon(self) || (self->mp_file->mf_ops->mo_saveblocks == NULL)) &&
-				    (data->mtd_mode & MPART_TRIM_FLAG_SWAP)) {
-					/* Tell our caller to write modified blocks to swap. */
-					return MPART_FIND_TRIMABLE_RANGE_ST_SWAP;
+				/* Range begins with a modified blocks */
+				if (!ccinfo_noblock(data->mtd_ccinfo)) {
+					if ((mpart_isanon(self) || (self->mp_file->mf_ops->mo_saveblocks == NULL)) &&
+					    (data->mtd_mode & MPART_TRIM_FLAG_SWAP)) {
+						/* Tell our caller to write modified blocks to swap. */
+						return MPART_FIND_TRIMABLE_RANGE_ST_SWAP;
+					}
+					if ((!mpart_isanon(self) && (self->mp_file->mf_ops->mo_saveblocks != NULL)) &&
+					    (data->mtd_mode & MPART_TRIM_FLAG_SYNC)) {
+						unsigned int error;
+						/* Sync modified blocks ourselves. */
+						error = mpart_unlock_and_writeback_range_nx(self, data,
+						                                            result->mptr_start,
+						                                            result->mptr_end);
+						assert(error == MPART_NXOP_ST_RETRY ||
+						       error == MPART_NXOP_ST_ERROR);
+						return error;
+					}
 				}
-				if ((!mpart_isanon(self) && (self->mp_file->mf_ops->mo_saveblocks != NULL)) &&
-				    (data->mtd_mode & MPART_TRIM_FLAG_SYNC)) {
-					unsigned int error;
-					/* Sync modified blocks ourselves. */
-					error = mpart_unlock_and_writeback_range_nx(self, data,
-					                                            result->mptr_start,
-					                                            result->mptr_end);
-					assert(error == MPART_NXOP_ST_RETRY ||
-					       error == MPART_NXOP_ST_ERROR);
-					return error;
-				}
-			}
 
-			/* Not able/allowed to void blocks -> must skip over the modified range. */
-			minaddr = result->mptr_end;
-			goto again_find_unchanged;
+				/* Not able/allowed to void blocks -> must skip over the modified range. */
+				minaddr = result->mptr_end;
+				goto again_find_unchanged;
+			}
 		}
 
 		/* Found  a range that  is mapped, but  isn't changed. See how
@@ -2626,6 +2655,11 @@ again_find_unchanged:
 				break;
 			block_st = mpart_getblockstate(self, minblock);
 			assert(block_st != MPART_BLOCK_ST_INIT);
+
+			/* Treat changed memory the same way as loaded memory when supposed to free anon memory. */
+			if ((block_st == MPART_BLOCK_ST_CHNG) && mpart_isanon(self) &&
+			    (data->mtd_mode & MPART_TRIM_FLAG_FREE))
+				block_st = MPART_BLOCK_ST_LOAD;
 
 			/* Also search for continuous ranges of `MPART_BLOCK_ST_LOAD'-blocks,
 			 * and unmap them in page directories that might be mapping them  (so
@@ -2718,7 +2752,8 @@ NOTHROW(FCALL mpart_trim_data_require_part)(struct mpart *__restrict self,
 			if (mman_lock_tryacquire(&mman_kernel)) {
 				corepart = mcoreheap_alloc_locked_nx_nocc();
 				mman_lock_release(&mman_kernel);
-			} else if (mpart_mappedby_mman_before(self, NULL, &mman_kernel)) {
+			} else if (mpart_mappedby_mman_before(self, NULL, &mman_kernel) ||
+			           mpart_trim_data_hasmmlock(data, &mman_kernel)) {
 				corepart = mcoreheap_alloc_locked_nx_nocc();
 			} else {
 				corepart = NULL;
@@ -2862,7 +2897,8 @@ NOTHROW(FCALL mpart_trim_data_require_node)(struct mpart *__restrict self,
 			if (mman_lock_tryacquire(&mman_kernel)) {
 				corepart = mcoreheap_alloc_locked_nx_nocc();
 				mman_lock_release(&mman_kernel);
-			} else if (mpart_mappedby_mman_before(self, NULL, &mman_kernel)) {
+			} else if (mpart_mappedby_mman_before(self, NULL, &mman_kernel) ||
+			           mpart_trim_data_hasmmlock(data, &mman_kernel)) {
 				corepart = mcoreheap_alloc_locked_nx_nocc();
 			} else {
 				corepart = NULL;
@@ -3022,6 +3058,13 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 			/* Adjust `self' */
 			mpart_lstrip_local(self, range->mptr_end, data->mtd_ccinfo);
 
+			/* Adjust the sub-range which is being trimmed to account from the voided area. */
+			assertf(data->mtd_rend >= range->mptr_end,
+			        "This would mean that we weren't supposed to trim part of the voided area");
+			data->mtd_rend -= range->mptr_end;
+			if (OVERFLOW_USUB(data->mtd_rstart, range->mptr_end, &data->mtd_rstart))
+				data->mtd_rstart = 0;
+
 			/* Tell the caller to keep trimming at offset `0' since everything
 			 * before  the old  range's end is  now no longer  part of `self'! */
 			range->mptr_end = 0;
@@ -3088,7 +3131,8 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 					assertf(!(node->mn_flags & MNODE_F_UNMAPPED),
 					        "Only non-UNMAPPED nodes should have been transferred!");
 					if (!mpart_mappedby_mman_before(voidpart, node, mm) &&
-					    !mpart_mappedby_mman_before(self, NULL, mm))
+					    !mpart_mappedby_mman_before(self, NULL, mm) &&
+					    !mpart_trim_data_hasmmlock(data, mm))
 						mman_lock_release(mm);
 					decref_unlikely(mm);
 				}
@@ -3480,7 +3524,8 @@ movedown_self__mp_blkst_ptr:
 					        "Only non-UNMAPPED nodes should have been transferred!");
 					if (!mpart_mappedby_mman_before(lopart, node, mm) &&
 					    !mpart_mappedby_mman_before(voidpart, NULL, mm) &&
-					    !mpart_mappedby_mman_before(self, NULL, mm))
+					    !mpart_mappedby_mman_before(self, NULL, mm) &&
+					    !mpart_trim_data_hasmmlock(data, mm))
 						mman_lock_release(mm);
 					decref_unlikely(mm);
 				}
@@ -3494,7 +3539,8 @@ movedown_self__mp_blkst_ptr:
 					assertf(!(node->mn_flags & MNODE_F_UNMAPPED),
 					        "Only non-UNMAPPED nodes should have been transferred!");
 					if (!mpart_mappedby_mman_before(voidpart, node, mm) &&
-					    !mpart_mappedby_mman_before(self, NULL, mm))
+					    !mpart_mappedby_mman_before(self, NULL, mm) &&
+					    !mpart_trim_data_hasmmlock(data, mm))
 						mman_lock_release(mm);
 					decref_unlikely(mm);
 				}
@@ -3522,6 +3568,13 @@ movedown_self__mp_blkst_ptr:
 		 * release all locks. */
 		decref_unlikely(lopart);
 		decref_unlikely(voidpart);
+
+		/* Adjust the sub-range which is being trimmed to account from the voided area. */
+		assertf(data->mtd_rend >= range->mptr_end,
+		        "This would mean that we weren't supposed to trim part of the voided area");
+		data->mtd_rend -= range->mptr_end;
+		if (OVERFLOW_USUB(data->mtd_rstart, range->mptr_end, &data->mtd_rstart))
+			data->mtd_rstart = 0;
 
 		/* Tell the caller to keep trimming at offset `0' since everything
 		 * before  the old  range's end is  now no longer  part of `self'! */
@@ -3688,7 +3741,7 @@ done:
 PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_locked_with_all_locks_or_unlock)(struct mpart *__restrict self,
                                                           struct mpart_trim_data *__restrict data) {
-	mpart_reladdr_t minaddr = 0;
+	mpart_reladdr_t minaddr = data->mtd_rstart;
 	struct mpart_trim_range range;
 	unsigned int result;
 
@@ -3699,6 +3752,7 @@ NOTHROW(FCALL mpart_trim_locked_with_all_locks_or_unlock)(struct mpart *__restri
 
 	/* Find a range that can be trimmed based on `data->mtd_mode' */
 again:
+	assert(minaddr >= data->mtd_rstart);
 	result = mpart_find_trimable_pagerange(self, data, &range, minaddr);
 	assertf(!MPART_FIND_TRIMABLE_RANGE_ST_ISOK(result) || range.mptr_start >= minaddr,
 	        "Produced range %#" PRIxSIZ "-%#" PRIxSIZ " is located before minaddr %#" PRIxSIZ " [action: %u]",
@@ -3814,7 +3868,7 @@ NOTHROW(FCALL mpart_trim_locked_ftx_file_or_unlock)(struct mpart *__restrict sel
 	 mpart_isanon(self) || (mfile_lock_endwrite(self->mp_file), 1),          \
 	 mpart_assert_integrity(self),                                           \
 	 _mpart_lock_release(self),                                              \
-	 unlockinfo_xunlock(data->mtd_unlock),                                   \
+	 mpart_trim_data_unlock(data),                                           \
 	 mpart_lockops_reap(self))
 	unsigned int result = MPART_NXOP_ST_SUCCESS;
 
@@ -3841,8 +3895,9 @@ NOTHROW(FCALL mpart_trim_locked_ftx_file_or_unlock)(struct mpart *__restrict sel
 	 * view of all of the regions of `self' that are actually used. */
 	{
 		struct mman *blocking_mm;
-		blocking_mm = mpart_lock_all_mmans(self);
+		blocking_mm = mpart_lock_all_mmans(self, data->mtd_mmlocked);
 		if unlikely(blocking_mm) {
+			assert(blocking_mm != data->mtd_mmlocked);
 			incref(blocking_mm);
 			mpart_decref_all_mmans(self);
 			if (ccinfo_noblock(data->mtd_ccinfo)) {
@@ -3866,7 +3921,7 @@ NOTHROW(FCALL mpart_trim_locked_ftx_file_or_unlock)(struct mpart *__restrict sel
 
 	/* Release locks & references acquired above. */
 	if (result == MPART_NXOP_ST_SUCCESS)
-		mpart_unlock_all_mmans(self);
+		mpart_unlock_all_mmans(self, NULL, data->mtd_mmlocked);
 	mpart_decref_all_mmans(self);
 #undef LOCAL_unlock_all
 done:
@@ -3881,7 +3936,7 @@ NOTHROW(FCALL mpart_trim_locked_ftx_or_unlock)(struct mpart *__restrict self,
 	(!self->mp_meta || (mpartmeta_ftxlock_endwrite(self->mp_meta, self), 1), \
 	 mpart_assert_integrity(self),                                           \
 	 _mpart_lock_release(self),                                              \
-	 unlockinfo_xunlock(data->mtd_unlock),                                   \
+	 mpart_trim_data_unlock(data),                                           \
 	 mpart_lockops_reap(self))
 	unsigned int result = MPART_NXOP_ST_SUCCESS;
 
@@ -3969,7 +4024,7 @@ NOTHROW(FCALL mpart_trim_locked_or_unlock_nx)(struct mpart *__restrict self,
 				goto done;
 			mpart_assert_integrity(self);
 			_mpart_lock_release(self);
-			unlockinfo_xunlock(data->mtd_unlock);
+			mpart_trim_data_unlock(data);
 			mpart_lockops_reap(self);
 			result = MPART_NXOP_ST_RETRY;
 			if unlikely(!mpartmeta_ftxlock_waitwrite_nx(meta))
@@ -3992,24 +4047,13 @@ done:
 PUBLIC NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_or_unlock_nx)(struct mpart *__restrict self,
                                        struct mpart_trim_data *__restrict data) {
-	/* TODO: This function can be used to implement `madvise(MADV_DONTNEED)'
-	 *       with `MPART_TRIM_MODE_UNCHANGED' */
-	/* TODO: This function can be used to implement `madvise(MADV_FREE)'  with
-	 *       `MPART_TRIM_MODE_UNCHANGED' and a new flag `MPART_TRIM_FLAG_FREE'
-	 *       that  only works for anonymous memory (for file memory doing this
-	 *       would  mean losing  unwritten changes  made to  files). This flag
-	 *       works   by  simply  treating  `MPART_BLOCK_ST_CHNG'  blocks  like
-	 *       `MPART_BLOCK_ST_LOAD',  such  that  they  get  unloaded  even  if
-	 *       changes were made. */
-	/* TODO: This function can be used to implement `madvise(MADV_PAGEOUT)'
-	 *       with `MPART_TRIM_MODE_UNCHANGED | MPART_TRIM_FLAG_SYNC | MPART_TRIM_FLAG_SWAP' */
 	unsigned int result = MPART_NXOP_ST_SUCCESS;
 
 	/* Try to lock `self'. */
 	if (!mpart_lock_tryacquire(self)) {
 		if (ccinfo_noblock(data->mtd_ccinfo))
 			goto done;
-		unlockinfo_xunlock(data->mtd_unlock);
+		mpart_trim_data_unlock(data);
 		if (!mpart_lock_waitfor_nx(self))
 			return MPART_NXOP_ST_ERROR;
 		return MPART_NXOP_ST_RETRY;

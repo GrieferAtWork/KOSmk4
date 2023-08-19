@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa71e81e1 */
+/* HASH CRC-32:0xa044202b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,6 +70,9 @@ INTDEF ATTR_IN(1) int NOTHROW_RPC(LIBDCALL libd_shm_unlink)(char const *name);
 INTDEF ATTR_IN(1) int NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> posix_madvise(3)
+ * Advice on how memory should be managed by the kernel
+ * @param: advice: One of `MADV_*' */
 INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBDCALL libd_madvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice);
 INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBDCALL libd_mincore)(void *start, size_t len, unsigned char *vec);
 /* >> mmap(2), mmap64(2)
@@ -79,7 +82,18 @@ INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBDCALL libd_mincore)(void *start, s
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
 INTDEF WUNUSED ATTR_ACCESS_NONE(1) ATTR_FDARG(5) void *NOTHROW_NCX(LIBDCALL libd_mmap64)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, __STDC_INT_AS_UINT_T flags, fd_t fd, __PIO_OFFSET64 offset);
-INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBDCALL libd_posix_madvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice);
+/* >> posix_madvise(3)
+ * Wrapper around `madvise(2)'
+ * @param: advice: One of `POSIX_MADV_*' */
+INTDEF ATTR_ACCESS_NONE(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_madvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> posix_madvise(3)
+ * Wrapper around `madvise(2)'
+ * @param: advice: One of `POSIX_MADV_*' */
+INTDEF ATTR_ACCESS_NONE(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_madvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> mremap(2)
  * @param flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
 INTDEF ATTR_ACCESS_NONE(1) void *NOTHROW_NCX(VLIBDCALL libd_mremap)(void *addr, size_t old_len, size_t new_len, __STDC_INT_AS_UINT_T flags, ...);

@@ -170,7 +170,10 @@ NOTHROW_NCX(LIBCCALL libc_munlockall)(void)
 }
 /*[[[end:libc_munlockall]]]*/
 
-/*[[[head:libc_madvise,hash:CRC-32=0x51fa3378]]]*/
+/*[[[head:libc_madvise,hash:CRC-32=0xb1253307]]]*/
+/* >> posix_madvise(3)
+ * Advice on how memory should be managed by the kernel
+ * @param: advice: One of `MADV_*' */
 INTERN ATTR_SECTION(".text.crt.system.mman") ATTR_ACCESS_NONE(1) int
 NOTHROW_NCX(LIBCCALL libc_madvise)(void *addr,
                                    size_t len,
@@ -243,23 +246,6 @@ NOTHROW_NCX(LIBCCALL libc_mmap64)(void *addr,
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_mmap64]]]*/
-
-/*[[[head:libc_posix_madvise,hash:CRC-32=0x8f3b1cdf]]]*/
-INTERN ATTR_SECTION(".text.crt.system.mman") ATTR_ACCESS_NONE(1) int
-NOTHROW_NCX(LIBCCALL libc_posix_madvise)(void *addr,
-                                         size_t len,
-                                         __STDC_INT_AS_UINT_T advice)
-/*[[[body:libc_posix_madvise]]]*/
-/*AUTO*/{
-	/* Implement as a no-op, since this function is merely meant as a hint */
-	COMPILER_IMPURE();
-	(void)addr;
-	(void)len;
-	(void)advice;
-	return 0;
-}
-/*[[[end:libc_posix_madvise]]]*/
-
 
 /*[[[head:libc_mremap,hash:CRC-32=0xc2629dd1]]]*/
 /* >> mremap(2)
@@ -384,7 +370,7 @@ NOTHROW_NCX(LIBCCALL libc_pkey_mprotect)(void *addr,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x28b0a05a]]]*/
+/*[[[start:exports,hash:CRC-32=0xb4bdac48]]]*/
 DEFINE_PUBLIC_ALIAS(mmap, libc_mmap);
 DEFINE_PUBLIC_ALIAS(__munmap, libc_munmap);
 DEFINE_PUBLIC_ALIAS(__libc_munmap, libc_munmap);
@@ -411,7 +397,6 @@ DEFINE_PUBLIC_ALIAS(__madvise, libc_madvise);
 DEFINE_PUBLIC_ALIAS(madvise, libc_madvise);
 DEFINE_PUBLIC_ALIAS(mincore, libc_mincore);
 DEFINE_PUBLIC_ALIAS(mmap64, libc_mmap64);
-DEFINE_PUBLIC_ALIAS(posix_madvise, libc_posix_madvise);
 DEFINE_PUBLIC_ALIAS(__mremap, libc_mremap);
 DEFINE_PUBLIC_ALIAS(__libc_mremap, libc_mremap);
 DEFINE_PUBLIC_ALIAS(mremap, libc_mremap);

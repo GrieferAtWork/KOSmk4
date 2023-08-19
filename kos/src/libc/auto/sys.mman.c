@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70848ccc */
+/* HASH CRC-32:0xf43890af */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -117,6 +117,123 @@ NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name) {
 	result = libc_unlink(fullname);
 	__freea(fullname);
 	return result;
+}
+#include <asm/os/mman.h>
+#include <libc/errno.h>
+/* >> posix_madvise(3)
+ * Wrapper around `madvise(2)'
+ * @param: advice: One of `POSIX_MADV_*' */
+INTERN ATTR_SECTION(".text.crt.system.mman") ATTR_ACCESS_NONE(1) errno_t
+NOTHROW_NCX(LIBCCALL libc_posix_madvise)(void *addr,
+                                         size_t len,
+                                         __STDC_INT_AS_UINT_T advice) {
+
+	int result;
+	switch (advice) {
+#if __POSIX_MADV_NORMAL == __MADV_NORMAL && __POSIX_MADV_RANDOM == __MADV_RANDOM && __POSIX_MADV_SEQUENTIAL == __MADV_SEQUENTIAL && __POSIX_MADV_WILLNEED == __MADV_WILLNEED && __POSIX_MADV_DONTNEED == __MADV_DONTNEED
+
+
+
+
+
+	case __POSIX_MADV_NORMAL:
+
+
+	case __POSIX_MADV_RANDOM:
+
+
+	case __POSIX_MADV_SEQUENTIAL:
+
+
+	case __POSIX_MADV_WILLNEED:
+
+
+	case __POSIX_MADV_DONTNEED:
+
+		break;
+#else /* __POSIX_MADV_NORMAL == __MADV_NORMAL && __POSIX_MADV_RANDOM == __MADV_RANDOM && __POSIX_MADV_SEQUENTIAL == __MADV_SEQUENTIAL && __POSIX_MADV_WILLNEED == __MADV_WILLNEED && __POSIX_MADV_DONTNEED == __MADV_DONTNEED */
+
+	case __POSIX_MADV_NORMAL:
+		advice = __MADV_NORMAL;
+		break;
+
+
+	case __POSIX_MADV_RANDOM:
+		advice = __MADV_RANDOM;
+		break;
+
+
+	case __POSIX_MADV_SEQUENTIAL:
+		advice = __MADV_SEQUENTIAL;
+		break;
+
+
+	case __POSIX_MADV_WILLNEED:
+		advice = __MADV_WILLNEED;
+		break;
+
+
+	case __POSIX_MADV_DONTNEED:
+		advice = __MADV_DONTNEED;
+		break;
+
+#endif /* __POSIX_MADV_NORMAL != __MADV_NORMAL || __POSIX_MADV_RANDOM != __MADV_RANDOM || __POSIX_MADV_SEQUENTIAL != __MADV_SEQUENTIAL || __POSIX_MADV_WILLNEED != __MADV_WILLNEED || __POSIX_MADV_DONTNEED != __MADV_DONTNEED */
+	default:
+
+		return EINVAL;
+
+
+
+	}
+
+	{
+		errno_t saved_errno;
+		saved_errno = __libc_geterrno();
+		result = libc_madvise(addr, len, advice);
+		if unlikely(result != 0)
+			result = __libc_geterrno();
+		(void)__libc_seterrno(saved_errno);
+	}
+
+
+
+
+
+
+
+	return result;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 #endif /* !__KERNEL__ */
 #include <asm/pkey.h>
@@ -714,6 +831,7 @@ DECL_END
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(shm_open, libc_shm_open);
 DEFINE_PUBLIC_ALIAS(shm_unlink, libc_shm_unlink);
+DEFINE_PUBLIC_ALIAS(posix_madvise, libc_posix_madvise);
 #endif /* !__KERNEL__ */
 #if !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
 DEFINE_PUBLIC_ALIAS(pkey_set, libc_pkey_set);

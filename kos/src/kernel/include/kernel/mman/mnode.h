@@ -575,6 +575,23 @@ NOTHROW(FCALL mman_mergenodes_inrange)(struct mman *__restrict self,
                                        void const *maxaddr);
 
 
+struct mpart_trim_data;
+
+/* Apply a given `advise' to `self' and return `true', or release a
+ * lock to `self->mn_mman' and return `false' (in which case `data'
+ * may have been modified)
+ * @param: advice: The advice to apply (one of `MADV_*', except `MADV_POPULATE_*')
+ *                 Unsupported advices are silently ignored.
+ * @return: true:  Success (locks are still held)
+ * @return: false: Error (locks were released)
+ * @THROW: Error (locks were released) */
+FUNDEF WUNUSED NONNULL((1, 2)) bool FCALL
+mnode_advise_or_unlock(struct mnode *__restrict self,
+                       struct mpart_trim_data *__restrict data,
+                       unsigned int advice)
+		THROWS(E_BADALLOC);
+
+
 
 /* Helper structure for `mnode_tree_minmaxlocate()' */
 struct mnode_tree_minmax {

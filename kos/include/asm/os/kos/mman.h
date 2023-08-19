@@ -146,35 +146,35 @@
 #define __PKEY_DISABLE_WRITE  0x2
 #define __PKEY_ACCESS_MASK    0x3
 
-#define __MADV_NORMAL         0   /* ??? */
-#define __MADV_RANDOM         1   /* ??? */
-#define __MADV_SEQUENTIAL     2   /* ??? */
-#define __MADV_WILLNEED       3   /* ??? */
-#define __MADV_DONTNEED       4   /* ??? */
-#define __MADV_FREE           8   /* ??? */
+#define __MADV_NORMAL         0   /* Remove any hints given on how memory will be used */
+#define __MADV_RANDOM         1   /* Hint that memory will be accessed randomly */
+#define __MADV_SEQUENTIAL     2   /* Hint that memory will be accessed sequentially */
+#define __MADV_WILLNEED       3   /* Hint that memory will be accessed soon */
+#define __MADV_DONTNEED       4   /* Hint that memory will probably not be used */
+#define __MADV_FREE           8   /* Kernel is allowed to free memory (changes may be lost, but memory is allocated again if accessed) */
 #define __MADV_REMOVE         9   /* ??? */
-#define __MADV_DONTFORK       10  /* ??? */
-#define __MADV_DOFORK         11  /* ??? */
-#define __MADV_MERGEABLE      12  /* ??? */
-#define __MADV_UNMERGEABLE    13  /* ??? */
-#define __MADV_HUGEPAGE       14  /* ??? */
-#define __MADV_NOHUGEPAGE     15  /* ??? */
-#define __MADV_DONTDUMP       16  /* ??? */
-#define __MADV_DODUMP         17  /* ??? */
-#define __MADV_WIPEONFORK     18  /* ??? */
-#define __MADV_KEEPONFORK     19  /* ??? */
-#define __MADV_COLD           20  /* ??? */
-#define __MADV_PAGEOUT        21  /* ??? */
-#define __MADV_POPULATE_READ  22  /* ??? */
-#define __MADV_POPULATE_WRITE 23  /* ??? */
+#define __MADV_DONTFORK       10  /* Exclude this mapping during forks */
+#define __MADV_DOFORK         11  /* Include this mapping during forks (default) */
+#define __MADV_MERGEABLE      12  /* Enable Kernel Samepage Merging (KSM) for this range */
+#define __MADV_UNMERGEABLE    13  /* Disable Kernel Samepage Merging (KSM) for this range (default) */
+#define __MADV_HUGEPAGE       14  /* Allow huge-page merging for this range (default; on KOS, this cannot be turned off) */
+#define __MADV_NOHUGEPAGE     15  /* Disallow huge-page merging for this range (ignored on KOS) */
+#define __MADV_DONTDUMP       16  /* Exclude mapping in coredumps */
+#define __MADV_DODUMP         17  /* Include mapping in coredumps (default) */
+#define __MADV_WIPEONFORK     18  /* Replace with a fresh MAP_PRIVATE|MAP_ANONYMOUS mapping during fork (not supported on KOS, yet) */
+#define __MADV_KEEPONFORK     19  /* Retain mapping during fork (default) */
+#define __MADV_COLD           20  /* Hint that mapping can be unloaded as one of the first candidates when memory runs low */
+#define __MADV_PAGEOUT        21  /* Sync all changes to MAP_FILE|MAP_SHARED to disk, write changes to MAP_ANON to swap, and unload all unmodified file mappings */
+#define __MADV_POPULATE_READ  22  /* Prefault for read access */
+#define __MADV_POPULATE_WRITE 23  /* Prefault for write access */
 #define __MADV_HWPOISON       100 /* ??? */
 #define __MADV_SOFT_OFFLINE   101 /* ??? */
 
-#define __POSIX_MADV_NORMAL     0 /* ??? */
-#define __POSIX_MADV_RANDOM     1 /* ??? */
-#define __POSIX_MADV_SEQUENTIAL 2 /* ??? */
-#define __POSIX_MADV_WILLNEED   3 /* ??? */
-#define __POSIX_MADV_DONTNEED   4 /* ??? */
+#define __POSIX_MADV_NORMAL     0 /* Remove any hints given on how memory will be used */
+#define __POSIX_MADV_RANDOM     1 /* Hint that memory will be accessed randomly */
+#define __POSIX_MADV_SEQUENTIAL 2 /* Hint that memory will be accessed sequentially */
+#define __POSIX_MADV_WILLNEED   3 /* Hint that memory will be accessed soon */
+#define __POSIX_MADV_DONTNEED   4 /* Hint that memory will probably not be used */
 
 #define __MCL_CURRENT 1 /* ??? */
 #define __MCL_FUTURE  2 /* ??? */

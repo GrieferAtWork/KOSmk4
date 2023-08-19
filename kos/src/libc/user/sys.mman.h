@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a47f2c3 */
+/* HASH CRC-32:0x4722eb7c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,6 +57,9 @@ INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBCCALL libc_munlock)(void const *ad
 INTDEF int NOTHROW_NCX(LIBCCALL libc_mlockall)(__STDC_INT_AS_UINT_T flags);
 /* >> munlockall(2) */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_munlockall)(void);
+/* >> posix_madvise(3)
+ * Advice on how memory should be managed by the kernel
+ * @param: advice: One of `MADV_*' */
 INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBCCALL libc_madvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice);
 INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBCCALL libc_mincore)(void *start, size_t len, unsigned char *vec);
 /* >> mmap(2), mmap64(2)
@@ -66,7 +69,6 @@ INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBCCALL libc_mincore)(void *start, s
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
 INTDEF WUNUSED ATTR_ACCESS_NONE(1) ATTR_FDARG(5) void *NOTHROW_NCX(LIBCCALL libc_mmap64)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, __STDC_INT_AS_UINT_T flags, fd_t fd, __PIO_OFFSET64 offset);
-INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBCCALL libc_posix_madvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice);
 /* >> mremap(2)
  * @param flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
 INTDEF ATTR_ACCESS_NONE(1) void *NOTHROW_NCX(VLIBCCALL libc_mremap)(void *addr, size_t old_len, size_t new_len, __STDC_INT_AS_UINT_T flags, ...);

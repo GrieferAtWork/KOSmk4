@@ -1086,7 +1086,7 @@ NOTHROW(KCALL system_cc_allparts_trim_unused)(struct ccinfo *__restrict info,
 	struct mpart_trim_data data;
 	SLIST_INIT(&deadlist);
 	unlock.ui_unlock = &unlock_mpart_all;
-	mpart_trim_data_init(&data, info, &unlock, trim_mode);
+	mpart_trim_data_init(&data, info, &unlock, NULL, trim_mode);
 	LOCAL_kmalloc_leaks(NULL);
 again:
 	if (!mpart_all_tryacquire()) {

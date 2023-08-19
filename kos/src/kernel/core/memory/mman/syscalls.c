@@ -30,6 +30,7 @@
 #include <kernel/handle.h>
 #include <kernel/handman.h>
 #include <kernel/mman.h>
+#include <kernel/mman/fault.h>
 #include <kernel/mman/map.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mlock.h>
@@ -567,8 +568,65 @@ copyinfo_and_continue:
 }
 #endif /* __ARCH_WANT_SYSCALL_MINCORE */
 
+
+
+
+/************************************************************************/
+/* madvise()                                                            */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_MADVISE
+DEFINE_SYSCALL3(errno_t, madvise,
+                NCX UNCHECKED void *, addr, size_t, num_bytes,
+                syscall_ulong_t, advice) {
+	switch (advice) {
+
+	case MADV_POPULATE_READ:
+	case MADV_POPULATE_WRITE:
+		/* Special handling for `MADV_POPULATE_READ' and `MADV_POPULATE_WRITE',
+		 * which we implement via `mman_prefault()'  rather than on a  per-node
+		 * basis! */
+		validate_user(addr, num_bytes);
+		mman_prefault(addr, num_bytes,
+		              advice == MADV_POPULATE_READ ? MMAN_FAULT_F_NORMAL
+		                                           : MMAN_FAULT_F_WRITE);
+		break;
+
+	case MADV_NORMAL:
+	case MADV_RANDOM:
+	case MADV_SEQUENTIAL:
+	case MADV_WILLNEED:
+	case MADV_DONTNEED:
+	case MADV_FREE:
+	/*case MADV_REMOVE:*/   /* Unsupported... */
+	/*case MADV_DONTFORK:*/ /* TODO: Support me! */
+	/*case MADV_DOFORK:*/   /* TODO: Support me! */
+	case MADV_MERGEABLE:
+	case MADV_UNMERGEABLE:
+	case MADV_HUGEPAGE:
+	case MADV_NOHUGEPAGE:
+	case MADV_DONTDUMP:
+	case MADV_DODUMP:
+	/*case MADV_WIPEONFORK:*/ /* TODO: Support me! */
+	/*case MADV_KEEPONFORK:*/ /* TODO: Support me! */
+	case MADV_COLD:
+	case MADV_PAGEOUT:
+	case MADV_HWPOISON:
+	case MADV_SOFT_OFFLINE:
+		mman_madvise(THIS_MMAN, addr, num_bytes, advice, MMAN_UNMAP_NOKERNPART);
+		break;
+
+	default:
+		/* Unsupported advice. */
+		THROW(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_MADVISE_BAD_ADVICE,
+		      advice);
+		break;
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_MADVISE */
+
 /* TODO: errno_t sys_remap_file_pages(void *start, size_t size, syscall_ulong_t prot, size_t pgoff, syscall_ulong_t flags) */
-/* TODO: errno_t sys_madvise(void *addr, size_t len, syscall_ulong_t advice); */
 /* TODO: errno_t sys_uselib(char const *library); */
 /* TODO: ssize_t sys_process_vm_readv(pid_t pid, struct iovec const *local_iov, size_t liovcnt, struct iovec const *remote_iov, size_t riovcnt, syscall_ulong_t flags); */
 /* TODO: ssize_t sys_process_vm_writev(pid_t pid, struct iovec const *local_iov, size_t liovcnt, struct iovec const *remote_iov, size_t riovcnt, syscall_ulong_t flags); */

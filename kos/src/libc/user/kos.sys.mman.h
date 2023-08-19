@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77d808a3 */
+/* HASH CRC-32:0xd04fd9fc */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,6 +57,9 @@ INTDEF ATTR_ACCESS_NONE(1) void (LIBCCALL libc_MUnlock)(void const *addr, size_t
 INTDEF void (LIBCCALL libc_MLockAll)(__STDC_INT_AS_UINT_T flags) THROWS(...);
 /* >> munlockall(2) */
 INTDEF void (LIBCCALL libc_MUnlockAll)(void) THROWS(...);
+/* >> posix_madvise(3)
+ * Advice on how memory should be managed by the kernel
+ * @param: advice: One of `MADV_*' */
 INTDEF ATTR_ACCESS_NONE(1) void (LIBCCALL libc_MAdvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice) THROWS(...);
 INTDEF ATTR_ACCESS_NONE(1) void (LIBCCALL libc_MInCore)(void *start, size_t len, unsigned char *vec) THROWS(...);
 /* >> mmap(2), mmap64(2)
@@ -66,6 +69,9 @@ INTDEF ATTR_ACCESS_NONE(1) void (LIBCCALL libc_MInCore)(void *start, size_t len,
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
 INTDEF WUNUSED ATTR_ACCESS_NONE(1) ATTR_FDARG(5) void *(LIBCCALL libc_MMap64)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, __STDC_INT_AS_UINT_T flags, fd_t fd, pos64_t offset) THROWS(...);
+/* >> posix_madvise(3)
+ * Wrapper around `madvise(2)'
+ * @param: advice: One of `POSIX_MADV_*' */
 INTDEF ATTR_ACCESS_NONE(1) void (LIBCCALL libc_PosixMAdvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice) THROWS(...);
 /* >> mremap(2)
  * @param flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
