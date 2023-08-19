@@ -142,18 +142,9 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 
 	/* Exception handler definitions. */
 	EXCEPT_HANDLERS_START
-		EXCEPT_HANDLERS_CATCH(E_SEGFAULT_UNMAPPED,
-		                      .Lsysret64_probe_begin,
-		                      .Lsysret64_probe_end,
-		                      .Lsysret64_probe_error)
-		EXCEPT_HANDLERS_CATCH(E_SEGFAULT_UNMAPPED,
-		                      .Lsysret64_probe_begin2,
-		                      .Lsysret64_probe_end2,
-		                      .Lsysret64_probe_error)
-		EXCEPT_HANDLERS_CATCH(E_WOULDBLOCK,
-		                      .Lsysret64_probe_begin,
-		                      .Lsysret64_probe_end,
-		                      .Lsysret64_probe_wouldblock)
+		EXCEPT_HANDLERS_CATCH(E_WOULDBLOCK, .Lsysret64_probe_begin, .Lsysret64_probe_end, .Lsysret64_probe_wouldblock)
+		EXCEPT_HANDLERS_CATCHALL(.Lsysret64_probe_begin, .Lsysret64_probe_end, .Lsysret64_probe_fallback)
+		EXCEPT_HANDLERS_CATCHALL(.Lsysret64_probe_begin2, .Lsysret64_probe_end2, .Lsysret64_probe_fallback)
 	EXCEPT_HANDLERS_END
 
 .Lsysret64_probe_wouldblock:
@@ -174,18 +165,7 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 .Lsysret64_probe_end2:
 	jmp    __x86_64_syscall_iret
 
-.Lsysret64_probe_error:
-	/* Only handle if the `E_SEGFAULT_CONTEXT_NONCANON' flag was set.
-	 * RETHROW()    the   exception   if   that   flag   isn't   set. */
-	EXTERN(this_exception_args)
-	ttest  mask=E_SEGFAULT_CONTEXT_NONCANON, loc=this_exception_args + 8, seg=%gs
-	jnz    .Ldo_iret_clearexcept
-	/* RETHROW() the exception. */
-	EXTERN(except_rethrow)
-	call   except_rethrow
-	/* UNREACHABLE */
-
-.Ldo_iret_clearexcept:
+.Lsysret64_probe_fallback:
 	/* Clear the exception before returning to user-space (prevents
 	 * problems and potential kernel panics later down the line, as
 	 * the next system call might think that exceptions were  being

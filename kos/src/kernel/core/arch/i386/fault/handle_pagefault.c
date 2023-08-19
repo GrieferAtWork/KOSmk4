@@ -378,6 +378,7 @@ rethrow_exception_from_pf_handler(struct icpustate *__restrict state, void const
 	/* Use the regular `instruction_trysucc()' since we're actually inside
 	 * of a CATCH-block right now, meaning that it will already do all  of
 	 * the necessary work of preserving the old exception for us! */
+	PERTASK_SET(this_exception_faultaddr, pc);
 	pc = instruction_trysucc(pc, icpustate_getisa(state));
 	icpustate_setpc(state, pc);
 	RETHROW();
@@ -387,6 +388,7 @@ rethrow_exception_from_pf_handler(struct icpustate *__restrict state, void const
 INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_pagefault(struct icpustate *__restrict state,
                      uintptr_t ecode, void *addr) {
+	/* TODO: Re-write this function, and do so in a portable manner! */
 	static_assert(!IDT_CONFIG_ISTRAP(0x0e)); /* #PF  Page Fault */
 #if 1
 #define FAULT_IS_USER ((ecode & X86_PAGEFAULT_ECODE_USERSPACE) != 0)
@@ -405,6 +407,11 @@ x86_handle_pagefault(struct icpustate *__restrict state,
 	void const *pc;
 	struct mfault mf;
 	struct task_connections con;
+#ifdef LIBVIO_CONFIG_ENABLED
+	struct vio_emulate_args vio_args;
+	REF struct mpart *vio_part;
+#endif /* LIBVIO_CONFIG_ENABLED */
+
 
 	/* Check for memcpy_nopf() */
 	pc = (void const *)state->ics_irregs.ir_Pip;
@@ -459,8 +466,13 @@ x86_handle_pagefault(struct icpustate *__restrict state,
 	}
 
 	/* Re-enable interrupts if they were enabled before. */
-	if (state->ics_irregs.ir_Pflags & EFLAGS_IF)
+	if (state->ics_irregs.ir_Pflags & EFLAGS_IF) {
 		__sti();
+	} else {
+		assertf(!ADDR_ISUSER(pc),
+		        "user-space #PF at %p with preemption disabled [pc=%p]",
+		        addr, pc);
+	}
 
 	/* Figure out memory manager in charge of the accessed address. */
 	mf.mfl_mman = &mman_kernel;
@@ -793,9 +805,7 @@ do_handle_iob_node_access:
 		/* Deal with VIO memory access */
 #ifdef LIBVIO_CONFIG_ENABLED
 		if (mf.mfl_part->mp_state == MPART_ST_VIO) {
-			struct vio_emulate_args args;
 			uintptr_t node_flags;
-			REF struct mpart *part;
 
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 			/* Don't dispatch VIO while in debugger-mode. */
@@ -807,38 +817,38 @@ do_handle_iob_node_access:
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 			/* Fill in VIO callback arguments. */
-			node_flags                    = mf.mfl_node->mn_flags;
-			args.vea_args.va_acmap_page   = mf.mfl_addr;
-			args.vea_args.va_acmap_offset = (vio_addr_t)(mf.mfl_node->mn_partoff +
-			                                             (size_t)((byte_t *)mf.mfl_addr -
-			                                                      (byte_t *)mnode_getaddr(mf.mfl_node)));
-			args.vea_ptrlo                = mnode_getminaddr(mf.mfl_node);
-			args.vea_ptrhi                = mnode_getmaxaddr(mf.mfl_node);
-			args.vea_addr                 = vioargs_vioaddr(&args.vea_args, args.vea_ptrlo);
-			part                          = incref(mf.mfl_part);
+			node_flags                        = mf.mfl_node->mn_flags;
+			vio_args.vea_args.va_acmap_page   = mf.mfl_addr;
+			vio_args.vea_args.va_acmap_offset = (vio_addr_t)(mf.mfl_node->mn_partoff +
+			                                                 (size_t)((byte_t *)mf.mfl_addr -
+			                                                          (byte_t *)mnode_getaddr(mf.mfl_node)));
+			vio_args.vea_ptrlo                = mnode_getminaddr(mf.mfl_node);
+			vio_args.vea_ptrhi                = mnode_getmaxaddr(mf.mfl_node);
+			vio_args.vea_addr                 = vioargs_vioaddr(&vio_args.vea_args, vio_args.vea_ptrlo);
+			vio_part                          = incref(mf.mfl_part);
 			mman_lock_release(mf.mfl_mman);
 			mfault_fini(&mf);
 			__mfault_init(&mf);
 
 			TRY {
-				mpart_lock_acquire(part);
+				mpart_lock_acquire(vio_part);
 			} EXCEPT {
-				decref(part);
+				decref(vio_part);
 				RETHROW();
 			}
-			args.vea_args.va_file = incref(part->mp_file);
-			args.vea_args.va_ops  = args.vea_args.va_file->mf_ops->mo_vio;
-			mpart_lock_release(part);
+			vio_args.vea_args.va_file = incref(vio_part->mp_file);
+			vio_args.vea_args.va_ops  = vio_args.vea_args.va_file->mf_ops->mo_vio;
+			mpart_lock_release(vio_part);
 
 			/* Ensure that VIO operators are present. */
-			if unlikely(!args.vea_args.va_ops) {
-				decref_unlikely(args.vea_args.va_file);
-				decref_unlikely(part);
+			if unlikely(!vio_args.vea_args.va_ops) {
+				decref_unlikely(vio_args.vea_args.va_file);
+				decref_unlikely(vio_part);
 				goto pop_connections_and_throw_segfault;
 			}
 
 			/* Check for special case: call into VIO memory */
-			if (args.vea_args.va_ops->vo_call && addr == pc) {
+			if (vio_args.vea_args.va_ops->vo_call && addr == pc) {
 				/* Make sure that memory mapping has execute permissions! */
 				if unlikely(!(node_flags & MNODE_F_PEXEC)) {
 					PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
@@ -846,14 +856,13 @@ do_handle_iob_node_access:
 					            E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_EXEC |
 					            E_SEGFAULT_CONTEXT_VIO | GET_PF_CONTEXT_UW_BITS());
 cleanup_vio_and_pop_connections_and_set_exception_pointers2:
-					decref_unlikely(args.vea_args.va_file);
-					decref_unlikely(part);
+					decref_unlikely(vio_args.vea_args.va_file);
+					decref_unlikely(vio_part);
 					goto pop_connections_and_set_exception_pointers2;
 #define NEED_pop_connections_and_set_exception_pointers2
 				}
 				/* Special case: call into VIO memory */
 				TRY {
-					vio_addr_t vio_addr;
 					void const *callsite_pc;
 					byte_t const *sp;
 					IF_X64(bool is_compat;)
@@ -896,13 +905,6 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 						                                      SIZEOF_IRREGS_KERNEL);
 					}
 #endif /* !__x86_64__ */
-					/* Figure out the exact VIO address that got called. */
-					vio_addr = args.vea_args.va_acmap_offset +
-					           ((byte_t *)addr - (byte_t *)args.vea_args.va_acmap_page);
-					/* Invoke the VIO call operator. */
-					args.vea_args.va_state = state;
-					(*args.vea_args.va_ops->vo_call)(&args.vea_args, vio_addr);
-					state = args.vea_args.va_state;
 				} EXCEPT {
 					/* Ensure that a the VIO flag is set if necessary */
 					if (was_thrown(E_SEGFAULT)) {
@@ -918,13 +920,11 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 					/* Directly unwind the exception, since we've got a custom return-pc set-up.
 					 * If we did a normal RETHROW() here, then the (currently correct) return PC
 					 * would get overwritten with the VIO function address. */
-					decref_unlikely(args.vea_args.va_file);
-					decref_unlikely(part);
+					decref_unlikely(vio_args.vea_args.va_file);
+					decref_unlikely(vio_part);
 					RETHROW();
 				}
-				decref_unlikely(args.vea_args.va_file);
-				decref_unlikely(part);
-				goto pop_connections_and_return;
+				goto do_vio_call;
 			}
 do_normal_vio:
 			/* Make sure that the segment was mapped with the proper protection */
@@ -939,45 +939,45 @@ do_normal_vio:
 				            E_SEGFAULT_CONTEXT_VIO | GET_PF_CONTEXT_UW_BITS());
 				goto cleanup_vio_and_pop_connections_and_set_exception_pointers2;
 			}
-			args.vea_args.va_state = state;
+			vio_args.vea_args.va_state = state;
 			TRY {
 				/* Emulate the current instruction. */
-				viocore_emulate(&args);
+				viocore_emulate(&vio_args);
 			} EXCEPT {
-				decref_unlikely(args.vea_args.va_file);
-				decref_unlikely(part);
+				decref_unlikely(vio_args.vea_args.va_file);
+				decref_unlikely(vio_part);
 				/*task_popconnections();*/ /* Handled by outer EXCEPT */
 				RETHROW();
 			}
-			decref_unlikely(args.vea_args.va_file);
-			decref_unlikely(part);
+			decref_unlikely(vio_args.vea_args.va_file);
+			decref_unlikely(vio_part);
 			task_popconnections();
 #ifndef __x86_64__
 			/* Check if the kernel %esp or %ss was modified */
-			if unlikely(args.vea_kernel_override & (VIO_EMULATE_ARGS_386_KERNEL_ESP_VALID |
+			if unlikely(vio_args.vea_kernel_override & (VIO_EMULATE_ARGS_386_KERNEL_ESP_VALID |
 			                                        VIO_EMULATE_ARGS_386_KERNEL_SS_VALID)) {
-				u32 real_esp = args.vea_kernel_esp_override;
-				u16 real_ss  = args.vea_kernel_ss_override;
+				u32 real_esp = vio_args.vea_kernel_esp_override;
+				u16 real_ss  = vio_args.vea_kernel_ss_override;
 				u32 *regload_area;
 				assert(!FAULT_IS_USER);
-				if (!(args.vea_kernel_override & VIO_EMULATE_ARGS_386_KERNEL_SS_VALID))
-					real_ss = icpustate32_getkernelss(args.vea_args.va_state);
-				if (!(args.vea_kernel_override & VIO_EMULATE_ARGS_386_KERNEL_ESP_VALID))
-					real_esp = icpustate32_getkernelesp(args.vea_args.va_state);
+				if (!(vio_args.vea_kernel_override & VIO_EMULATE_ARGS_386_KERNEL_SS_VALID))
+					real_ss = icpustate32_getkernelss(vio_args.vea_args.va_state);
+				if (!(vio_args.vea_kernel_override & VIO_EMULATE_ARGS_386_KERNEL_ESP_VALID))
+					real_esp = icpustate32_getkernelesp(vio_args.vea_args.va_state);
 				regload_area = (u32 *)mnode_getaddr(THIS_KERNEL_STACK);
 				/* Fill in the register save area to match what's going to
 				 * get  loaded  by `x86_vio_kernel_esp_bootstrap_loader()' */
 				regload_area[0] = real_ss;
 				regload_area[1] = real_esp;
-				regload_area[2] = args.vea_args.va_state->ics_irregs_k.ir_eip;
-				regload_area[3] = args.vea_args.va_state->ics_gpregs.gp_eax;
+				regload_area[2] = vio_args.vea_args.va_state->ics_irregs_k.ir_eip;
+				regload_area[3] = vio_args.vea_args.va_state->ics_gpregs.gp_eax;
 				/* Have `%eax' point to the register save area */
-				args.vea_args.va_state->ics_gpregs.gp_eax = (u32)regload_area;
+				vio_args.vea_args.va_state->ics_gpregs.gp_eax = (u32)regload_area;
 				/* Have the icpustate return to the bootstrap function */
-				args.vea_args.va_state->ics_irregs_k.ir_eip = (u32)x86_vio_kernel_esp_bootstrap_loader;
+				vio_args.vea_args.va_state->ics_irregs_k.ir_eip = (u32)x86_vio_kernel_esp_bootstrap_loader;
 			}
 #endif /* !__x86_64__ */
-			return args.vea_args.va_state;
+			return vio_args.vea_args.va_state;
 		}
 #endif /* LIBVIO_CONFIG_ENABLED */
 
@@ -1014,9 +1014,9 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 	} EXCEPT {
 		mfault_fini(&mf);
 		task_popconnections();
-		if (ecode & X86_PAGEFAULT_ECODE_USERSPACE)
-			PERTASK_SET(this_exception_faultaddr, pc);
-		RETHROW();
+
+		/* Always make the state point to the instruction _after_ the one causing the problem. */
+		rethrow_exception_from_pf_handler(state, pc);
 	}
 
 	/* Re-map the freshly faulted memory. */
@@ -1123,11 +1123,8 @@ pop_connections_and_throw_segfault:
 				callsite_pc = *(void const *const *)sp;
 			}
 		} EXCEPT {
-			if (!was_thrown(E_SEGFAULT)) {
-				if (FAULT_IS_USER)
-					PERTASK_SET(this_exception_faultaddr, pc);
+			if (!was_thrown(E_SEGFAULT))
 				rethrow_exception_from_pf_handler(state, pc);
-			}
 			goto not_a_badcall;
 		}
 #ifdef __x86_64__
@@ -1157,11 +1154,8 @@ pop_connections_and_throw_segfault:
 			if likely(call_instr)
 				callsite_pc = call_instr;
 		} EXCEPT {
-			if (!was_thrown(E_SEGFAULT)) {
-				if (FAULT_IS_USER)
-					PERTASK_SET(this_exception_faultaddr, pc);
+			if (!was_thrown(E_SEGFAULT))
 				rethrow_exception_from_pf_handler(state, pc);
-			}
 			/* Discard read-from-callsite_pc exception... */
 		}
 		PERTASK_SET(this_exception_faultaddr, callsite_pc);
@@ -1233,6 +1227,34 @@ do_unwind_state:
 		state = kernel_debugtrap_r(state, SIGSEGV);
 	assert(except_active());
 	except_throw_current_at_icpustate(state);
+
+#ifdef LIBVIO_CONFIG_ENABLED
+	{
+		vio_addr_t vio_addr;
+		/* This has to happen outside the main TRY so the return-pc doesn't break on exception. */
+do_vio_call:
+		/* Figure out the exact VIO address that got called. */
+		vio_addr = vio_args.vea_args.va_acmap_offset +
+		           ((byte_t *)addr - (byte_t *)vio_args.vea_args.va_acmap_page);
+
+		vio_args.vea_args.va_state = state;
+		TRY {
+			/* Invoke the VIO call operator. */
+			(*vio_args.vea_args.va_ops->vo_call)(&vio_args.vea_args, vio_addr);
+		} EXCEPT {
+			mfault_fini(&mf); /* Should always be empty */
+			decref_unlikely(vio_args.vea_args.va_file);
+			decref_unlikely(vio_part);
+			task_popconnections();
+			RETHROW();
+		}
+		mfault_fini(&mf); /* Should always be empty */
+		decref_unlikely(vio_args.vea_args.va_file);
+		decref_unlikely(vio_part);
+		task_popconnections();
+		return vio_args.vea_args.va_state;
+	}
+#endif /* LIBVIO_CONFIG_ENABLED */
 #undef FAULT_IS_USER
 #undef FAULT_IS_WRITE
 #undef GET_PF_CONTEXT_UW_BITS
