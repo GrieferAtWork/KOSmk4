@@ -27,6 +27,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/entry.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/path.h>
 #include <kernel/malloc.h>
@@ -210,7 +211,7 @@ NOTHROW(FCALL mnode_assert_integrity)(struct mnode *__restrict self) {
 	(void)self;
 	COMPILER_IMPURE();
 #else
-	assert(mman_lock_acquired(self->mn_mman) || wasdestroyed(self->mn_mman));
+	assert(mman_lock_acquired(self->mn_mman) || wasdestroyed(self->mn_mman) || dbg_active);
 	assertf((self->mn_flags & MNODE_F_COREPART) || kmalloc_islocked(self),
 	        "Descriptor of mem-node at %p is not locked into memory", self);
 	assertf(self->mn_maxaddr > self->mn_minaddr,
