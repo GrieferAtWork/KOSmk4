@@ -2212,13 +2212,15 @@ mpart_alloc_blkst_or_unlock(struct mpart *__restrict self,
 			if (req_bytes != avl_bytes) {
 				mpart_blkst_word_t *new_bitset;
 				new_bitset = (mpart_blkst_word_t *)krealloc_nx(data->mtd_blkst_ptr, req_bytes,
-				                                               ccinfo_gfp(data->mtd_ccinfo) | GFP_ATOMIC);
+				                                               ccinfo_gfp(data->mtd_ccinfo) |
+				                                               GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
 				if (new_bitset) {
 					data->mtd_blkst_ptr = new_bitset;
 				} else if (req_bytes > avl_bytes){
 					LOCAL_unlock_all();
 					new_bitset = (mpart_blkst_word_t *)krealloc(data->mtd_blkst_ptr, req_bytes,
-					                                            ccinfo_gfp(data->mtd_ccinfo));
+					                                            ccinfo_gfp(data->mtd_ccinfo) |
+					                                            GFP_LOCKED | GFP_PREFLT);
 					data->mtd_blkst_ptr = new_bitset;
 					return false;
 				}
@@ -2745,7 +2747,7 @@ NOTHROW(FCALL mpart_trim_data_require_part)(struct mpart *__restrict self,
 		struct mpart *newpart;
 		newpart = (struct mpart *)kmalloc_nx(sizeof(struct mpart),
 		                                     ccinfo_gfp(data->mtd_ccinfo) |
-		                                     GFP_ATOMIC);
+		                                     GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
 		if (!newpart) {
 			union mcorepart *corepart;
 			/* Try to allocate the part from the core-heap (if possible) */
@@ -2766,7 +2768,8 @@ NOTHROW(FCALL mpart_trim_data_require_part)(struct mpart *__restrict self,
 			}
 			LOCAL_unlock_all();
 			newpart = (struct mpart *)kmalloc_nx(sizeof(struct mpart),
-			                                     ccinfo_gfp(data->mtd_ccinfo));
+			                                     ccinfo_gfp(data->mtd_ccinfo) |
+			                                     GFP_LOCKED | GFP_PREFLT);
 			if likely(newpart) {
 				newpart->mp_xflags = MPART_XF_NORMAL;
 				newpart->mp_flags  = MPART_F_NORMAL;
@@ -2805,11 +2808,12 @@ NOTHROW(FCALL mpart_trim_data_require_meta)(struct mpart *__restrict self,
 		struct mpartmeta *newmeta;
 		newmeta = (struct mpartmeta *)kmalloc_nx(sizeof(struct mpartmeta),
 		                                         ccinfo_gfp(data->mtd_ccinfo) |
-		                                         GFP_ATOMIC);
+		                                         GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
 		if (!newmeta) {
 			LOCAL_unlock_all();
 			newmeta = (struct mpartmeta *)kmalloc_nx(sizeof(struct mpartmeta),
-			                                         ccinfo_gfp(data->mtd_ccinfo));
+			                                         ccinfo_gfp(data->mtd_ccinfo) |
+			                                         GFP_LOCKED | GFP_PREFLT);
 			if (newmeta) {
 				data->mtd_metas[index] = newmeta;
 				return MPART_NXOP_ST_RETRY;
@@ -2866,13 +2870,15 @@ NOTHROW(FCALL mpart_trim_data_require_blkst)(struct mpart *__restrict self,
 	if (req_bytes > avl_bytes) {
 		mpart_blkst_word_t *new_bitset;
 		new_bitset = (mpart_blkst_word_t *)krealloc_nx(data->mtd_blkst_ptr, req_bytes,
-		                                               ccinfo_gfp(data->mtd_ccinfo) | GFP_ATOMIC);
+		                                               ccinfo_gfp(data->mtd_ccinfo) |
+		                                               GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
 		if (new_bitset) {
 			data->mtd_blkst_ptr = new_bitset;
 		} else {
 			LOCAL_unlock_all();
 			new_bitset = (mpart_blkst_word_t *)krealloc_nx(data->mtd_blkst_ptr, req_bytes,
-			                                               ccinfo_gfp(data->mtd_ccinfo));
+			                                               ccinfo_gfp(data->mtd_ccinfo) |
+			                                               GFP_LOCKED | GFP_PREFLT);
 			if unlikely(!new_bitset)
 				return MPART_NXOP_ST_ERROR;
 			data->mtd_blkst_ptr = new_bitset;
@@ -2890,7 +2896,7 @@ NOTHROW(FCALL mpart_trim_data_require_node)(struct mpart *__restrict self,
 		struct mnode *newnode;
 		newnode = (struct mnode *)kmalloc_nx(sizeof(struct mnode),
 		                                     ccinfo_gfp(data->mtd_ccinfo) |
-		                                     GFP_ATOMIC);
+		                                     GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
 		if (!newnode) {
 			union mcorepart *corepart;
 			/* Try to allocate the part from the core-heap (if possible) */
@@ -2904,14 +2910,17 @@ NOTHROW(FCALL mpart_trim_data_require_node)(struct mpart *__restrict self,
 				corepart = NULL;
 			}
 			if (corepart) {
+				printk(KERN_DEBUG "%d: mnode %p: alloc [core]\n", __LINE__, &corepart->mcp_node);
 				corepart->mcp_node.mn_flags = MNODE_F_COREPART;
 				data->mtd_node = &corepart->mcp_node;
 				return MPART_NXOP_ST_SUCCESS;
 			}
 			LOCAL_unlock_all();
 			newnode = (struct mnode *)kmalloc_nx(sizeof(struct mnode),
-			                                     ccinfo_gfp(data->mtd_ccinfo));
+			                                     ccinfo_gfp(data->mtd_ccinfo) |
+			                                     GFP_LOCKED | GFP_PREFLT);
 			if likely(newnode) {
+				printk(KERN_DEBUG "%d: mnode %p: alloc [heap]\n", __LINE__, newnode);
 				newnode->mn_flags = MNODE_F_NORMAL;
 				data->mtd_node    = newnode;
 				return MPART_NXOP_ST_RETRY;
@@ -2922,6 +2931,7 @@ NOTHROW(FCALL mpart_trim_data_require_node)(struct mpart *__restrict self,
 					corepart = mcoreheap_alloc_locked_nx_nocc();
 					mman_lock_release(&mman_kernel);;
 					if (corepart) {
+						printk(KERN_DEBUG "%d: mnode %p: alloc [core]\n", __LINE__, &corepart->mcp_node);
 						corepart->mcp_node.mn_flags = MNODE_F_COREPART;
 						data->mtd_node = &corepart->mcp_node;
 						return MPART_NXOP_ST_RETRY;
@@ -2930,6 +2940,7 @@ NOTHROW(FCALL mpart_trim_data_require_node)(struct mpart *__restrict self,
 			}
 			return MPART_NXOP_ST_ERROR;
 		}
+		printk(KERN_DEBUG "%d: mnode %p: alloc [heap]\n", __LINE__, newnode);
 		newnode->mn_flags = MNODE_F_NORMAL;
 		data->mtd_node    = newnode;
 	}
@@ -2948,13 +2959,15 @@ NOTHROW(FCALL mpart_trim_data_require_chunkvec)(struct mpart *__restrict self,
 	if (req_bytes > avl_bytes) {
 		struct mchunk *new_bitset;
 		new_bitset = (struct mchunk *)krealloc_nx(data->mtd_chunkvec, req_bytes,
-		                                          ccinfo_gfp(data->mtd_ccinfo) | GFP_ATOMIC);
+		                                          ccinfo_gfp(data->mtd_ccinfo) |
+		                                          GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
 		if (new_bitset) {
 			data->mtd_chunkvec = new_bitset;
 		} else {
 			LOCAL_unlock_all();
 			new_bitset = (struct mchunk *)krealloc_nx(data->mtd_chunkvec, req_bytes,
-			                                          ccinfo_gfp(data->mtd_ccinfo));
+			                                          ccinfo_gfp(data->mtd_ccinfo) |
+			                                          GFP_LOCKED | GFP_PREFLT);
 			if unlikely(!new_bitset)
 				return MPART_NXOP_ST_ERROR;
 			data->mtd_chunkvec = new_bitset;
@@ -3332,7 +3345,8 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 					data->mtd_chunkvec = NULL; /* Stolen... */
 					newvec = (struct mchunk *)krealloc_nx(lopart->mp_mem_sc.ms_v,
 					                                      scatter_count * sizeof(struct mchunk),
-					                                      ccinfo_gfp(data->mtd_ccinfo) | GFP_ATOMIC);
+					                                      ccinfo_gfp(data->mtd_ccinfo) |
+					                                      GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
 					if likely(newvec)
 						lopart->mp_mem_sc.ms_v = newvec;
 
@@ -3364,7 +3378,8 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 				/* Try to release unused memory from `self->mp_mem_sc.ms_v' */
 				newvec = (struct mchunk *)krealloc_nx(self->mp_mem_sc.ms_v,
 				                                      self->mp_mem_sc.ms_c * sizeof(struct mchunk),
-				                                      ccinfo_gfp(data->mtd_ccinfo) | GFP_ATOMIC);
+				                                      ccinfo_gfp(data->mtd_ccinfo) |
+				                                      GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
 				if likely(newvec)
 					self->mp_mem_sc.ms_v = newvec;
 			}
