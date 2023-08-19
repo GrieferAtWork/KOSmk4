@@ -527,7 +527,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		COMPILER_WRITE_BARRIER();
 
 		/* Re-insert the (now truncated) node into the kernel mman. */
-		mman_mappings_insert(&mman_kernel, node);
+		mman_mappings_insert_and_verify(&mman_kernel, node);
 		return true;
 	}
 
@@ -612,7 +612,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 
 		/* Trim the node. */
 		node->mn_minaddr += remove_size;
-		mman_mappings_insert(&mman_kernel, node);
+		mman_mappings_insert_and_verify(&mman_kernel, node);
 		return true;
 	}
 
@@ -1100,6 +1100,10 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		} while (!atomic_cmpxch_weak(&file->mf_changed.slh_first,
 		                             next, hipart));
 	}
+
+	/* Verify integrity of the 2 nodes. */
+	mnode_assert_integrity(lonode);
+	mnode_assert_integrity(hinode);
 
 	/* And we're done! */
 	return true;

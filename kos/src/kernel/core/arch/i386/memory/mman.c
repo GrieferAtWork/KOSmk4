@@ -161,7 +161,7 @@ INTDEF struct mnode x86_kernel_mnodes[];
 		MPART_INIT_mp_refcnt(2), /* 2 == 1(myself) + 1(node) */               \
 		MPART_INIT_mp_flags(MPART_F_NOSPLIT | MPART_F_NOMERGE |               \
 		                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK |            \
-		                    MPART_F_NOFREE),                                  \
+		                    MPART_F_NOFREE | MPART_F_STATICPART),             \
 		MPART_INIT_mp_state(MPART_ST_MEM),                                    \
 		MPART_INIT_mp_file(&mfile_ndef),                                      \
 		MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(self.mp_copy)),              \
@@ -205,7 +205,8 @@ INTERN struct mpart x86_kernel_mparts[6] = {
 		MNODE_INIT_mn_minaddr(minaddr),                                 \
 		MNODE_INIT_mn_maxaddr(maxaddr),                                 \
 		MNODE_INIT_mn_flags((prot) | MNODE_F_SHARED | MNODE_F_NOSPLIT | \
-		                    MNODE_F_NOMERGE | MNODE_F_KERNPART |        \
+		                    MNODE_F_NOMERGE | MNODE_F_STATICPART |      \
+		                    MNODE_F_KERNPART |                          \
 		                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK), \
 		MNODE_INIT_mn_part(NULL),                                       \
 		MNODE_INIT_mn_fspath(NULL),                                     \
@@ -222,7 +223,8 @@ INTERN struct mpart x86_kernel_mparts[6] = {
 		MNODE_INIT_mn_minaddr(minaddr),                                 \
 		MNODE_INIT_mn_maxaddr(maxaddr),                                 \
 		MNODE_INIT_mn_flags((prot) | MNODE_F_SHARED | MNODE_F_NOSPLIT | \
-		                    MNODE_F_NOMERGE | MNODE_F_KERNPART |        \
+		                    MNODE_F_NOMERGE | MNODE_F_STATICPART |      \
+		                    MNODE_F_KERNPART |                          \
 		                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK), \
 		MNODE_INIT_mn_part(&(part)),                                    \
 		MNODE_INIT_mn_fspath(NULL),                                     \

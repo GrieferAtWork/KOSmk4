@@ -523,7 +523,7 @@ NOTHROW(FCALL mnode_domerge_without_part)(struct mnode *__restrict lonode,
 	}
 
 	/* Re-insert the now enlarged lonode. */
-	mman_mappings_insert(lonode->mn_mman, lonode);
+	mman_mappings_insert_and_verify(lonode->mn_mman, lonode);
 
 	/* Destroy the no-longer-used hinode. */
 	mnode_free(hinode);
@@ -604,7 +604,7 @@ NOTHROW(FCALL mnode_domerge_samepart_locked)(struct mnode *__restrict lonode,
 	}
 
 	/* Re-insert the now enlarged lonode. */
-	mman_mappings_insert(lonode->mn_mman, lonode);
+	mman_mappings_insert_and_verify(lonode->mn_mman, lonode);
 
 	/* Destroy the no-longer-used hinode. */
 	decref_nokill(hinode->mn_part);

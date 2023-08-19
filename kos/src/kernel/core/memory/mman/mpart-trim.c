@@ -3687,8 +3687,8 @@ NOTHROW(FCALL mnode_split_after_or_unlock)(struct mpart *__restrict self,
 	incref(mm);
 
 	/* Insert both nodes into the mman's tree. */
-	mnode_tree_insert(&mm->mm_mappings, lonode);
-	mnode_tree_insert(&mm->mm_mappings, hinode);
+	mman_mappings_insert_and_verify(mm, lonode);
+	mman_mappings_insert_and_verify(mm, hinode);
 
 	/* Success! */
 	return MPART_NXOP_ST_SUCCESS;

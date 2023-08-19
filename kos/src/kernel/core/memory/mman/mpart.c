@@ -135,6 +135,8 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_assert_integrity)(struct mpart *__restrict self) {
 	size_t size;
 	assert(mpart_lock_acquired(self));
+	assertf((self->mp_flags & MPART_F_COREPART) || kmalloc_islocked(self),
+	        "Descriptor of mem-part at %p is not locked into memory", self);
 	assert(self->mp_refcnt != 0);
 	assertf(self->mp_maxaddr + 1 >= self->mp_minaddr ||
 	        self->mp_maxaddr == (pos_t)-1,

@@ -511,7 +511,7 @@ again_lock_mfile_map:
 			if (map_prot & PAGEDIR_PROT_WRITE)
 				LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
 
-			mman_mappings_insert(self, node);
+			mman_mappings_insert_and_verify(self, node);
 			node = mnode_merge_with_partlock(node);
 			mpart_assert_integrity(node->mn_part);
 			mpart_lock_release(node->mn_part);
@@ -522,7 +522,7 @@ again_lock_mfile_map:
 		res_node->mn_minaddr = (byte_t *)result;
 		res_node->mn_maxaddr = (byte_t *)result + num_bytes - 1;
 		LIST_ENTRY_UNBOUND_INIT(&res_node->mn_writable);
-		mman_mappings_insert(self, res_node);
+		mman_mappings_insert_and_verify(self, res_node);
 		mnode_merge(res_node);
 #endif /* DEFINE_mman_map_res */
 	}
@@ -554,7 +554,7 @@ again_lock_mfile_map:
 		LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
 		if (map_prot & PAGEDIR_PROT_WRITE)
 			LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
-		mman_mappings_insert(self, node);
+		mman_mappings_insert_and_verify(self, node);
 		/* Add the part to the list of all parts. Note that this is
 		 * when  the part becomes  externally visible, meaning that
 		 * up until this point we don't need (or use) any locks  on

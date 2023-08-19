@@ -76,6 +76,7 @@
 /*efine MPART_F_               0x0040  * ... */
 /*efine MPART_F_               0x0080  * ... */
 #define MPART_F_COREPART       0x0100 /* [const] Core part (free this part using `mcoreheap_free()' instead of `kfree()') */
+#define MPART_F_STATICPART     0x0100 /* [const] The part is somehow statically allocated. */
 #define MPART_F_CHANGED        0x0200 /* [lock(SET(MPART_F_LOCKBIT),
                                        *       CLEAR((MPART_F_LOCKBIT && mp_meta->mpm_dmalocks == 0) ||
                                        *             (mp_file->mf_changed == MFILE_PARTS_ANONYMOUS)))]
@@ -282,7 +283,8 @@ struct mchunkvec {
 #if 0 /* Static initializer template: */
 //	MPART_INIT_mp_refcnt(FILLME),
 //	MPART_INIT_mp_flags(MPART_F_NOSPLIT | MPART_F_NOMERGE |
-//	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK),
+//	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK |
+//	                    MPART_F_STATICPART),
 //	MPART_INIT_mp_state(MPART_ST_MEM),
 //	MPART_INIT_mp_file(&mfile_ndef),
 //	MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(FILLME.mp_copy)),
@@ -595,26 +597,47 @@ struct mpart {
 
 
 #ifdef __WANT_MPART_INIT
-#define MPART_INIT_mp_filent_asanon() MPART_INIT_mp_filent({  })
-#define MPART_INIT_PHYS(file, first_page, page_count, num_bytes)   \
-	{                                                              \
-		MPART_INIT_mp_refcnt(1),                                   \
-		MPART_INIT_mp_flags(MPART_F_NOFREE | MPART_F_NOSPLIT |     \
-		                    MPART_F_MLOCK | MPART_F_MLOCK_FROZEN), \
-		MPART_INIT_mp_state(MPART_ST_MEM),                         \
-		MPART_INIT_mp_file(file),                                  \
-		MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(~)),              \
-		MPART_INIT_mp_share(LIST_HEAD_INITIALIZER(~)),             \
-		MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(~)),          \
-		MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),    \
-		MPART_INIT_mp_changed({}),                                 \
-		MPART_INIT_mp_minaddr(0),                                  \
-		MPART_INIT_mp_maxaddr((num_bytes)-1),                      \
-		MPART_INIT_mp_filent_asanon(),                             \
-		MPART_INIT_mp_blkst_ptr(__NULLPTR),                        \
-		MPART_INIT_mp_mem(first_page, page_count),                 \
-		MPART_INIT_mp_meta(__NULLPTR)                              \
+
+/* Initialize as an anonymous mem-part. */
+#if __SIZEOF_POINTER__ == 4
+#define MPART_INIT_mp_filent_asanon() \
+	MPART_INIT_mp_filent({ (struct mpart *)-1, (struct mpart *)__UINT32_C(0xcccccccc), __NULLPTR })
+#elif __SIZEOF_POINTER__ == 8
+#define MPART_INIT_mp_filent_asanon() \
+	MPART_INIT_mp_filent({ (struct mpart *)-1, (struct mpart *)__UINT64_C(0xcccccccccccccccc), __NULLPTR })
+#else /* __SIZEOF_POINTER__ == ... */
+#define MPART_INIT_mp_filent_asanon() \
+	MPART_INIT_mp_filent({ (struct mpart *)-1, (struct mpart *)-1, __NULLPTR })
+#endif /* __SIZEOF_POINTER__ != ... */
+
+/* Initialize as the singular root-part of an associated file */
+#define MPART_INIT_mp_filent_asroot() MPART_INIT_mp_filent({ })
+
+#define _MPART_INIT_PHYS_EX(file, first_page, page_count, num_bytes, \
+                            _MPART_INIT_mp_filent)                   \
+	{                                                                \
+		MPART_INIT_mp_refcnt(1),                                     \
+		MPART_INIT_mp_flags(MPART_F_NOFREE | MPART_F_NOSPLIT |       \
+		                    MPART_F_MLOCK | MPART_F_MLOCK_FROZEN |   \
+		                    MPART_F_STATICPART),                     \
+		MPART_INIT_mp_state(MPART_ST_MEM),                           \
+		MPART_INIT_mp_file(file),                                    \
+		MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(~)),                \
+		MPART_INIT_mp_share(LIST_HEAD_INITIALIZER(~)),               \
+		MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(~)),            \
+		MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),      \
+		MPART_INIT_mp_changed({}),                                   \
+		MPART_INIT_mp_minaddr(0),                                    \
+		MPART_INIT_mp_maxaddr((num_bytes)-1),                        \
+		_MPART_INIT_mp_filent,                                       \
+		MPART_INIT_mp_blkst_ptr(__NULLPTR),                          \
+		MPART_INIT_mp_mem(first_page, page_count),                   \
+		MPART_INIT_mp_meta(__NULLPTR)                                \
 	}
+#define MPART_INIT_PHYS_ANON(file, first_page, page_count, num_bytes) \
+	_MPART_INIT_PHYS_EX(file, first_page, page_count, num_bytes, MPART_INIT_mp_filent_asanon())
+#define MPART_INIT_PHYS(file, first_page, page_count, num_bytes) \
+	_MPART_INIT_PHYS_EX(file, first_page, page_count, num_bytes, MPART_INIT_mp_filent_asroot())
 #endif /* __WANT_MPART_INIT */
 
 
@@ -632,7 +655,7 @@ struct mpart {
 
 
 #ifndef NDEBUG
-/* Assert the integrity of the given mem-part and associated nodes.
+/* Assert the integrity of the given mem-part and (minimally) associated nodes.
  * The caller must be holding a lock to `self'. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_assert_integrity)(struct mpart *__restrict self);

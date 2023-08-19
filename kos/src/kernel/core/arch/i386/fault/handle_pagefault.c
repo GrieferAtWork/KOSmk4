@@ -633,7 +633,7 @@ again_lock_mman:
 								assert(krs->mn_module == NULL);
 								/* Re-insert the node and continue operating as if we'd found
 								 * everything as it  has been changed  into from the  get-go. */
-								mman_mappings_insert(mm, krs);
+								mman_mappings_insert_and_verify(mm, krs);
 #define NEED_got_node_and_lock
 								goto got_node_and_lock;
 							}

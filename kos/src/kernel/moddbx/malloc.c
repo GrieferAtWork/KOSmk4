@@ -275,7 +275,7 @@ NOTHROW(FCALL extend_heap)(size_t min_size) {
 	printk(KERN_DEBUG "[dbx] Adding extension node %p-%p\n",
 	       mnode_getminaddr(&last_heap->sh_node),
 	       mnode_getmaxaddr(&last_heap->sh_node));
-	mman_mappings_insert(&mman_kernel, &last_heap->sh_node);
+	mman_mappings_insert_and_verify(&mman_kernel, &last_heap->sh_node);
 
 	/* Remember the new heap. */
 	memset(new_heap, 0xcc, offsetof(struct sheap, sh_heap));

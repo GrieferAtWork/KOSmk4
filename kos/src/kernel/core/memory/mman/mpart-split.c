@@ -1030,8 +1030,8 @@ relock_with_data:
 					lonode->mn_maxaddr = hinode->mn_minaddr - 1;
 					assert(IS_ALIGNED((uintptr_t)lonode->mn_minaddr, PAGESIZE));
 					assert(IS_ALIGNED((uintptr_t)lonode->mn_maxaddr + 1, PAGESIZE));
-					mman_mappings_insert(lonode->mn_mman, lonode);
-					mman_mappings_insert(hinode->mn_mman, hinode);
+					mman_mappings_insert_and_verify(lonode->mn_mman, lonode);
+					mman_mappings_insert_and_verify(hinode->mn_mman, hinode);
 				}
 			}
 		}

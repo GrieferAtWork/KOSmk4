@@ -376,7 +376,7 @@ NOTHROW(FCALL mcoreheap_replicate_extend_below)(struct mnode *__restrict node) {
 	part->mp_mem.mc_start -= 1;
 	part->mp_mem.mc_size += 1;
 	part->mp_maxaddr += PAGESIZE;
-	mman_mappings_insert(&mman_kernel, node);
+	mman_mappings_insert_and_verify(&mman_kernel, node);
 	return true;
 fail:
 	return false;
@@ -411,7 +411,7 @@ NOTHROW(FCALL mcoreheap_replicate_extend_above)(struct mnode *__restrict node) {
 	part->mp_mem.mc_size += 1;
 	node->mn_maxaddr += PAGESIZE;
 	part->mp_maxaddr += PAGESIZE;
-	mman_mappings_insert(&mman_kernel, node);
+	mman_mappings_insert_and_verify(&mman_kernel, node);
 	return true;
 fail:
 	return false;
@@ -445,7 +445,7 @@ NOTHROW(FCALL mcoreheap_try_merge_nodes)(struct mnode *__restrict lo,
 	assert(!lo->mn_module && !hi->mn_module);
 	lo->mn_maxaddr = hi->mn_maxaddr;
 	lopart->mp_maxaddr += mnode_getsize(hi);
-	mman_mappings_insert(&mman_kernel, lo);
+	mman_mappings_insert_and_verify(&mman_kernel, lo);
 
 	/* `hi' isn't re-inserted, so we must ensure that it  doesn't
 	 * continue to linger within the list of writable nodes. This
@@ -590,7 +590,7 @@ NOTHROW(FCALL mcoreheap_replicate_nocc)(/*inherit(always)*/ struct mpart *__rest
 
 	/* Load the mem-node into the kernel mman. */
 	LIST_INSERT_HEAD(&mman_kernel.mm_writable, node, mn_writable);
-	mman_mappings_insert(&mman_kernel, node);
+	mman_mappings_insert_and_verify(&mman_kernel, node);
 
 	/* And finally: immediately map the new core-page into the kernel mman. */
 	pagedir_mapone(node->mn_minaddr,

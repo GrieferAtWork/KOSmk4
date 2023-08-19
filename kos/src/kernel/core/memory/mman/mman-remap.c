@@ -278,7 +278,7 @@ something_changed:
 		if (map_prot & PAGEDIR_PROT_WRITE)
 			LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
 
-		mman_mappings_insert(self, node);
+		mman_mappings_insert_and_verify(self, node);
 		node = mnode_merge_with_partlock(node);
 		mpart_assert_integrity(node->mn_part);
 		mpart_lock_release(node->mn_part);
@@ -468,6 +468,7 @@ NOTHROW(KCALL insert_and_maybe_map_nodes)(struct mman *__restrict self,
 			 * Note that in this case, `node->mn_flags' already contains `MNODE_F_MLOCK'! */
 			if ((mapinfo->mi_nodeflags & MAP_LOCKED) && !(part->mp_flags & MPART_F_MLOCK_FROZEN))
 				atomic_or(&part->mp_flags, MPART_F_MLOCK);
+			mnode_assert_integrity(node);
 
 			if (did_prepare) {
 				pagedir_prot_t map_prot;
@@ -488,6 +489,7 @@ NOTHROW(KCALL insert_and_maybe_map_nodes)(struct mman *__restrict self,
 			mpart_assert_integrity(node->mn_part);
 			mpart_lock_release(node->mn_part);
 		} else {
+			mnode_assert_integrity(node);
 			mnode_merge(node);
 		}
 	}
@@ -679,10 +681,12 @@ err_cannot_prepare:
 					 * memory manager. */
 					if (map_prot & PAGEDIR_PROT_WRITE)
 						LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
+					mnode_assert_integrity(node);
 					node = mnode_merge_with_partlock(node);
 					mpart_assert_integrity(node->mn_part);
 					mpart_lock_release(node->mn_part);
 				} else {
+					mnode_assert_integrity(node);
 					mnode_merge(node);
 				}
 			}
@@ -870,10 +874,12 @@ again_lock_mman_phase2:
 							 * memory manager. */
 							if (map_prot & PAGEDIR_PROT_WRITE)
 								LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
+							mnode_assert_integrity(node);
 							node = mnode_merge_with_partlock(node);
 							mpart_assert_integrity(node->mn_part);
 							mpart_lock_release(node->mn_part);
 						} else {
+							mnode_assert_integrity(node);
 							mnode_merge(node);
 						}
 					}

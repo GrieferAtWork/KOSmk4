@@ -395,6 +395,9 @@ again:
 		LIST_INSERT_HEAD(&self->mm_writable, (struct mnode *)tree, mn_writable);
 	}
 
+	/* Assert that the newly inserted node is consistent */
+	mnode_assert_integrity((struct mnode *)tree);
+
 	/* Recursively enumerate the entire tree. */
 	if (lhs) {
 		if (rhs)
@@ -571,7 +574,7 @@ NOTHROW(FCALL mman_unmap_mbuilder)(struct mman *__restrict self,
 				struct mnode *restore;
 				restore = SLIST_FIRST(deadnodes);
 				SLIST_REMOVE_HEAD(deadnodes, _mn_dead);
-				mman_mappings_insert(self, restore);
+				mman_mappings_insert_and_verify(self, restore);
 				mnode_merge(restore);
 			}
 		} else {

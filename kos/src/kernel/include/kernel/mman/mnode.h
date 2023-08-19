@@ -67,6 +67,7 @@
                                        * is kept prepared. Note that this flag is _NOT_ inherited during fork()! As a
                                        * matter of fact: userspace isn't allowed to make use of this flag. */
 #define MNODE_F_COREPART   0x00000100 /* [const] Core part (free this node using `mcoreheap_free()' instead of `kfree()') */
+#define MNODE_F_STATICPART 0x00000100 /* [const] The node is somehow statically allocated. */
 #define MNODE_F_KERNPART   0x00000200 /* [const] This node describes part of the static kernel core and must
                                        *         not be modified or removed (by conventional means). Attempting
                                        *         to do so anyways will result in kernel panic. */
@@ -85,6 +86,7 @@
                                        *  - (mn_flags & MNODE_F_SHARED ? mn_part->mp_copy : mn_part->mp_share).lh_first == NULL
                                        *  - !isshared(mn_part) // Not strictly enforced, but assumed. - You are allowed to
                                        *                       // reference the part elsewhere, but you mustn't change it.
+                                       *  - mpart_isanon(mn_part)
                                        *  - NOBLOCK(mn_part->mp_file->mf_ops->mo_loadblocks)
                                        *  - NOTHROW(mn_part->mp_file->mf_ops->mo_loadblocks)
                                        *  - mn_part->mp_file->mf_blockshift == PAGESHIFT
@@ -190,10 +192,9 @@ typedef size_t mpart_reladdr_t;
 //	MNODE_INIT_mn_mement({}),
 //	MNODE_INIT_mn_minaddr(FILL_ME),
 //	MNODE_INIT_mn_maxaddr(FILL_ME - 1),
-//	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD |
-//	                    MNODE_F_SHARED    |    MNODE_F_NOSPLIT    |
-//	                    MNODE_F_NOMERGE   |   MNODE_F_KERNPART    |
-//	                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK),
+//	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD | MNODE_F_SHARED |
+//	                    MNODE_F_NOSPLIT | MNODE_F_NOMERGE | MNODE_F_STATICPART | /////
+//	                    MNODE_F_KERNPART | _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK),
 //	MNODE_INIT_mn_part(FILL_ME),
 //	MNODE_INIT_mn_fspath(NULL),
 //	MNODE_INIT_mn_fsname(NULL),
@@ -472,6 +473,16 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mnode_destroy)(struct mnode *__re
 #define mnode_xfree(self) (void)(!(self) || (mnode_free(self), 1))
 
 
+#ifndef NDEBUG
+/* Assert the integrity of the given mem-node.
+ * The caller must be holding a lock to `self->mn_mman' (or the mman must be destroyed). */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mnode_assert_integrity)(struct mnode *__restrict self);
+#else /* !NDEBUG */
+#define mnode_assert_integrity(self) (void)0
+#endif /* NDEBUG */
+
+
 
 /* Clear page-directory-level write-access to `self'. This function must  be
  * called for all writable memory mappings of a MMAN when the MMAN is cloned
@@ -621,6 +632,8 @@ FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mnode_tree_minmaxlocate)(struct m
 #define mman_mappings_rremove(self, minkey, maxkey)              mnode_tree_rremove(&(self)->mm_mappings, minkey, maxkey)
 #define mman_mappings_removenode(self, node)                     mnode_tree_removenode(&(self)->mm_mappings, node)
 #define mman_mappings_minmaxlocate(self, minkey, maxkey, result) mnode_tree_minmaxlocate((self)->mm_mappings, minkey, maxkey, result)
+#define mman_mappings_insert_and_verify(self, node) \
+	(mman_mappings_insert(self, node), mnode_assert_integrity(node))
 
 
 /* A special per-MMAN node that is  used to cover the kernel  core

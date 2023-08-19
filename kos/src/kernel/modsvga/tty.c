@@ -328,15 +328,16 @@ svga_ttyaccess_initvmem(struct svga_ttyaccess *__restrict self,
 	self->sta_vmem.mn_maxaddr = (byte_t *)mapbase + vmemsize - 1;
 	self->sta_vmem.mn_flags   = MNODE_F_PWRITE | MNODE_F_PREAD | MNODE_F_SHARED |
 	                            MNODE_F_MPREPARED | MNODE_F_KERNPART | MNODE_F_NOSPLIT |
-	                            MNODE_F_NOMERGE;
+	                            MNODE_F_NOMERGE | MNODE_F_STATICPART;
 	self->sta_vmem.mn_part    = NULL; /* Reserved node. */
 	self->sta_vmem.mn_fspath  = NULL;
 	self->sta_vmem.mn_fsname  = NULL;
 	self->sta_vmem.mn_mman    = &mman_kernel;
+	self->sta_vmem.mn_module  = NULL;
 	DBG_memset(&self->sta_vmem.mn_partoff, 0xcc, sizeof(self->sta_vmem.mn_partoff));
 	DBG_memset(&self->sta_vmem.mn_link, 0xcc, sizeof(self->sta_vmem.mn_link));
 	LIST_ENTRY_UNBOUND_INIT(&self->sta_vmem.mn_writable);
-	mman_mappings_insert(&mman_kernel, &self->sta_vmem);
+	mman_mappings_insert_and_verify(&mman_kernel, &self->sta_vmem);
 	mman_lock_endwrite(&mman_kernel);
 
 	/* Bind video memory to our custom buffer mapping. */
@@ -358,8 +359,7 @@ svga_makettyaccess_txt(struct svgadev *__restrict UNUSED(self),
 	/* Allocate the object. */
 	dispsz = mode->smi_resy * mode->smi_scanline * sizeof(uint16_t);
 	result = (REF struct svga_ttyaccess_txt *)kmalloc(offsetof(struct svga_ttyaccess_txt, stt_display) +
-	                                                  dispsz,
-	                                                  GFP_NORMAL);
+	                                                  dispsz, GFP_LOCKED | GFP_PREFLT);
 	/* Initialize common fields. */
 	TRY {
 		svga_ttyaccess_initvmem(result, mode);
@@ -573,8 +573,7 @@ svga_makettyaccess_gfx(struct svgadev *__restrict UNUSED(self),
 	/* Allocate the object. */
 	dispsz = cells_x * cells_y * sizeof(struct svga_gfxcell);
 	result = (REF struct svga_ttyaccess_gfx *)kmalloc(offsetof(struct svga_ttyaccess_gfx, stx_display) +
-	                                                  dispsz,
-	                                                  GFP_NORMAL);
+	                                                  dispsz, GFP_LOCKED | GFP_PREFLT);
 
 	/* Initialize common fields. */
 	TRY {

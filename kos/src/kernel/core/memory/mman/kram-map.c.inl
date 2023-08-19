@@ -596,7 +596,7 @@ do_prefault:
 		part->mp_meta = NULL;
 
 		/* Insert the new node into the kernel mman. */
-		mman_mappings_insert(&mman_kernel, node);
+		mman_mappings_insert_and_verify(&mman_kernel, node);
 		mnode_merge(node);
 
 unlock_and_done:

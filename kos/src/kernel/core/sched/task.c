@@ -122,7 +122,8 @@ DATDEF ATTR_PERTASK struct mnode this_kernel_stackguard_ ASMNAME("this_kernel_st
 PUBLIC ATTR_PERTASK ATTR_ALIGN(struct mpart) this_kernel_stackpart_ = {
 	MPART_INIT_mp_refcnt(1),
 	MPART_INIT_mp_flags(MPART_F_NOSPLIT | MPART_F_NOMERGE |
-	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK),
+	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK |
+	                    MPART_F_STATICPART),
 	MPART_INIT_mp_state(MPART_ST_MEM), /* NOTE: Initialize changed to `MPART_ST_VOID' in `kernel_initialize_scheduler_after_smp()' */
 	MPART_INIT_mp_file(&mfile_zero),
 	MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(this_kernel_stackpart_.mp_copy)),
@@ -144,8 +145,9 @@ PUBLIC ATTR_PERTASK ATTR_ALIGN(struct mnode) this_kernel_stacknode_ = {
 	MNODE_INIT_mn_maxaddr(KERNEL_STACKSIZE - 1),
 	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD |
 	                    MNODE_F_SHARED | MNODE_F_NOSPLIT |
-	                    MNODE_F_NOMERGE | MNODE_F_KERNPART |
-	                    MNODE_F_MLOCK | MNODE_F_MPREPARED),
+	                    MNODE_F_NOMERGE | MNODE_F_STATICPART |
+	                    MNODE_F_KERNPART | MNODE_F_MLOCK |
+	                    MNODE_F_MPREPARED),
 	MNODE_INIT_mn_part(&this_kernel_stackpart_),
 	MNODE_INIT_mn_fspath(NULL),
 	MNODE_INIT_mn_fsname(NULL),
@@ -162,8 +164,8 @@ PUBLIC ATTR_PERTASK ATTR_ALIGN(struct mnode) this_kernel_stackguard_ = {
 	MNODE_INIT_mn_minaddr(MAP_FAILED),
 	MNODE_INIT_mn_maxaddr(PAGESIZE - 1),
 	MNODE_INIT_mn_flags(MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
-	                    MNODE_F_KERNPART | MNODE_F_MLOCK |
-	                    _MNODE_F_MPREPARED_KERNEL),
+	                    MNODE_F_STATICPART | MNODE_F_KERNPART |
+	                    MNODE_F_MLOCK | _MNODE_F_MPREPARED_KERNEL),
 	MNODE_INIT_mn_part(NULL), /* Reserved node! */
 	MNODE_INIT_mn_fspath(NULL),
 	MNODE_INIT_mn_fsname(NULL),
@@ -618,10 +620,10 @@ again_lock_kernel_mman:
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			/* Load nodes into the kernel VM. */
-			mman_mappings_insert(&mman_kernel, &FORTASK(result, this_trampoline_node_));
-			mman_mappings_insert(&mman_kernel, &FORTASK(result, this_kernel_stacknode_));
+			mman_mappings_insert_and_verify(&mman_kernel, &FORTASK(result, this_trampoline_node_));
+			mman_mappings_insert_and_verify(&mman_kernel, &FORTASK(result, this_kernel_stacknode_));
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-			mman_mappings_insert(&mman_kernel, &FORTASK(result, this_kernel_stackguard_));
+			mman_mappings_insert_and_verify(&mman_kernel, &FORTASK(result, this_kernel_stackguard_));
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
 			/* Map the stack into memory */

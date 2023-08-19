@@ -5327,6 +5327,9 @@ again_acquire_mman_lock:
 							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP);
 						}
 
+						/* Assert integrity of the new node. */
+						mnode_assert_integrity(node);
+
 						/* Prepare the kernel page directory for the driver. */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 						if unlikely(!mnode_pagedir_kernelprepare(node)) {

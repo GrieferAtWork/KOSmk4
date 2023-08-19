@@ -108,12 +108,14 @@ PUBLIC ATTR_PERMMAN ATTR_ALIGN(struct mnode) thismman_kernel_reservation = {
 	MNODE_INIT_mn_maxaddr(KS_MAXADDR),
 #ifdef CONFIG_NO_KERNEL_USERKERN_SEGMENT
 	MNODE_INIT_mn_flags(MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
-	                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_KERNPART),
+	                    _MNODE_F_MPREPARED_KERNEL |
+	                    MNODE_F_STATICPART | MNODE_F_KERNPART),
 	MNODE_INIT_mn_part(NULL), /* Reserved node */
 #else /* CONFIG_NO_KERNEL_USERKERN_SEGMENT */
 	MNODE_INIT_mn_flags(MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
 	                    MNODE_F_PREAD | MNODE_F_PWRITE | MNODE_F_PEXEC |
-	                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_KERNPART),
+	                    _MNODE_F_MPREPARED_KERNEL |
+	                    MNODE_F_STATICPART | MNODE_F_KERNPART),
 	MNODE_INIT_mn_part(&userkern_segment_part),
 #endif /* !CONFIG_NO_KERNEL_USERKERN_SEGMENT */
 	MNODE_INIT_mn_fspath(NULL),

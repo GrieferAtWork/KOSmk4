@@ -41,11 +41,14 @@
 #include <kernel/panic.h>
 #include <sched/task.h>
 
+#include <hybrid/align.h>
+
 #include <kos/except.h>
 #include <kos/lockop.h>
 
 #include <assert.h>
 #include <atomic.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -196,6 +199,116 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 	}
 	mnode_free(self);
 }
+
+
+#ifndef NDEBUG
+/* Assert the integrity of the given mem-node.
+ * The caller must be holding a lock to `self->mn_mman' (or the mman must be destroyed). */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mnode_assert_integrity)(struct mnode *__restrict self) {
+#if 1
+	(void)self;
+	COMPILER_IMPURE();
+#else
+	assert(mman_lock_acquired(self->mn_mman) || wasdestroyed(self->mn_mman));
+	assertf((self->mn_flags & MNODE_F_COREPART) || kmalloc_islocked(self),
+	        "Descriptor of mem-node at %p is not locked into memory", self);
+	assertf(self->mn_maxaddr > self->mn_minaddr,
+	        "Invalid min/max addr range:\n"
+	        "self->mn_minaddr = %#" PRIxPTR "\n"
+	        "self->mn_maxaddr = %#" PRIxPTR "",
+	        self->mn_minaddr, self->mn_maxaddr);
+	assertf(IS_ALIGNED((uintptr_t)self->mn_minaddr, PAGESIZE),
+	        "Node %p-%p min address it not page-aligned",
+	        mnode_getminaddr(self),
+	        mnode_getmaxaddr(self));
+	assertf(IS_ALIGNED((uintptr_t)self->mn_maxaddr + 1, PAGESIZE),
+	        "Node %p-%p max address it not page-aligned",
+	        mnode_getminaddr(self),
+	        mnode_getmaxaddr(self));
+
+	/* If there is a part, ensure that the mapped range fits inside. */
+	if (self->mn_part) {
+		mpart_reladdr_t part_size;
+		mpart_reladdr_t node_partend;
+		assertf(IS_ALIGNED(self->mn_partoff, PAGESIZE),
+		        "Node %p-%p part offset %#" PRIxSIZ " is not page-aligned",
+		        mnode_getminaddr(self),
+		        mnode_getmaxaddr(self),
+		        self->mn_partoff);
+
+		node_partend = mnode_getpartendaddr(self);
+		part_size    = mpart_getsize(self->mn_part);
+		assertf(node_partend <= part_size,
+		        "Address range mapped by node %p-%p goes beyond end of part:\n"
+		        "node: %#" PRIxSIZ "-%#" PRIxSIZ "\n"
+		        "part: 0x0-%#" PRIxSIZ "",
+		        mnode_getminaddr(self),
+		        mnode_getmaxaddr(self),
+		        mnode_getpartminaddr(self),
+		        mnode_getpartmaxaddr(self),
+		        part_size - 1);
+
+		/* Kernel parts don't necessarily have to appear in their part's node lists. */
+		if (!(self->mn_flags & MNODE_F_KERNPART)) {
+			do {
+				struct mnode_list *mylist;
+				struct mnode *iter;
+				mylist = mpart_getnodlst_from_mnodeflags(self->mn_part, self->mn_flags);
+				iter   = LIST_FIRST(mylist);
+				while (iter && iter != self)
+					iter = LIST_NEXT(iter, mn_link);
+				if (iter == self)
+					break;
+			} while (__assertion_checkf(NULL, "Node %p-%p does not appear in %s-list of part %p\n",
+			                            mnode_getminaddr(self),
+			                            mnode_getmaxaddr(self),
+			                            self->mn_flags & MNODE_F_SHARED ? "shared" : "copy",
+			                            self->mn_part));
+		}
+
+		/* When the node is mlock'd, then the part has to be, too (unless the part is frozen as munlock'd) */
+		if (self->mn_flags & MNODE_F_MLOCK) {
+			assertf((self->mn_part->mp_flags & MPART_F_MLOCK) ||
+			        (self->mn_part->mp_flags & MPART_F_MLOCK_FROZEN),
+			        "Node %p-%p is mlock'd, but assigned part %p isn't",
+			        mnode_getminaddr(self),
+			        mnode_getmaxaddr(self),
+			        self->mn_part);
+		}
+	}
+
+	if (self->mn_flags & MNODE_F_MHINT) {
+		/* Assert all of the invariants required from hinted nodes. */
+		struct mnode_list *mylist;
+		assert(self->mn_mman == &mman_kernel);
+		assert(self->mn_part != NULL);
+		mylist = mpart_getnodlst_from_mnodeflags(self->mn_part, self->mn_flags);
+		assert(!LIST_EMPTY(mylist));
+		assert(LIST_FIRST(mylist) == self);
+		assert(self->mn_link.le_prev == LIST_PFIRST(mylist));
+		assert(self->mn_link.le_next == NULL);
+		assert(mpart_isanon(self->mn_part));
+		assert(self->mn_part->mp_file->mf_ops->mo_loadblocks != NULL);
+		assert(self->mn_part->mp_file->mf_blockshift == PAGESHIFT);
+		assert(mfile_isanon(self->mn_part->mp_file));
+		assert(MPART_ST_INMEM(self->mn_part->mp_state));
+	}
+
+	if (self->mn_module) {
+		assertf(self->mn_module->md_mman == self->mn_mman,
+		        "Module %p[mman:%p] pointed-to be node %p[mman:%p] "
+		        "at %p-%p belongs to different mman",
+		        self->mn_module, self->mn_module->md_mman, self, self->mn_mman,
+		        mnode_getminaddr(self), mnode_getmaxaddr(self));
+		assertf(self->mn_module->md_nodecount != 0,
+		        "Node-counter of module %p pointed-to be node %p at %p-%p is zero",
+		        self->mn_module, self,
+		        mnode_getminaddr(self), mnode_getmaxaddr(self));
+	}
+#endif
+}
+#endif /* !NDEBUG */
 
 
 
@@ -466,8 +579,8 @@ done_nopart:
 	/* Update the existing node, and re-insert both nodes into the mman. */
 	mman_mappings_removenode(self, lonode);
 	lonode->mn_maxaddr = (byte_t *)addr_where_to_split - 1;
-	mman_mappings_insert(self, lonode);
-	mman_mappings_insert(self, hinode);
+	mman_mappings_insert_and_verify(self, lonode);
+	mman_mappings_insert_and_verify(self, hinode);
 
 	/* If we had  to unlock  stuff above,  release our  lock to  the mman  to
 	 * keep things consistent with the false-result-means-no-locks invariant. */

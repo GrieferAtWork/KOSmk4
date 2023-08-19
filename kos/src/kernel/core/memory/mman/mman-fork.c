@@ -195,7 +195,7 @@ again:
 	}
 
 	/* Insert `root' into the tree. */
-	mnode_tree_insert(&newmm->mm_mappings, root);
+	mman_mappings_insert_and_verify(newmm, root);
 
 	/* Recursively traverse the entire tree. */
 	if (lhs) {
@@ -232,7 +232,7 @@ NOTHROW(FCALL forktree_unlock_newmm)(struct forktree *__restrict self) {
 		                          FORMMAN(newmm, thismman_kernel_reservation).mn_maxaddr);
 		assert(!node || node == &FORMMAN(newmm, thismman_kernel_reservation));
 		if (!node)
-			mnode_tree_insert(&newmm->mm_mappings, &FORMMAN(newmm, thismman_kernel_reservation));
+			mman_mappings_insert_and_verify(newmm, &FORMMAN(newmm, thismman_kernel_reservation));
 	}
 
 	/* Release our lock to the new mman. */

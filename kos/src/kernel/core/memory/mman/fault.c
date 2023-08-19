@@ -896,6 +896,8 @@ done_mark_changed:
 				LIST_ENTRY_UNBOUND_INIT(&lonode->mn_writable);
 				if (LIST_ISBOUND(node, mn_writable))
 					LIST_INSERT_HEAD(&self->mfl_mman->mm_writable, lonode, mn_writable);
+				mnode_assert_integrity(lonode);
+				mnode_assert_integrity(node);
 			}
 
 			if ((uintptr_t)endaddr < (uintptr_t)mnode_getendaddr(node)) {
@@ -933,6 +935,8 @@ done_mark_changed:
 				LIST_ENTRY_UNBOUND_INIT(&hinode->mn_writable);
 				if (LIST_ISBOUND(node, mn_writable))
 					LIST_INSERT_HEAD(&self->mfl_mman->mm_writable, hinode, mn_writable);
+				mnode_assert_integrity(node);
+				mnode_assert_integrity(hinode);
 			}
 
 			/* Free allocated, but unused data. */

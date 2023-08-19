@@ -68,8 +68,9 @@ PUBLIC ATTR_PERCPU struct mnode thiscpu_x86_iobnode_ = {
 	MNODE_INIT_mn_maxaddr(bootcpu_x86_iob_start + PAGESIZE - 1),
 	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD |
 	                    MNODE_F_SHARED | MNODE_F_NOSPLIT |
-	                    MNODE_F_NOMERGE | MNODE_F_KERNPART |
-	                    MNODE_F_MPREPARED | MNODE_F_MLOCK),
+	                    MNODE_F_NOMERGE | MNODE_F_STATICPART |
+	                    MNODE_F_KERNPART | MNODE_F_MPREPARED |
+	                    MNODE_F_MLOCK),
 	MNODE_INIT_mn_part(NULL), /* Reserved node */
 	MNODE_INIT_mn_fspath(NULL),
 	MNODE_INIT_mn_fsname(NULL),
@@ -88,7 +89,7 @@ PUBLIC ATTR_PERCPU struct mpart thiscpu_x86_dfstackpart_ = {
 	MPART_INIT_mp_refcnt(2), /* `thiscpu_x86_dfstackpart', `thiscpu_x86_dfstacknode.mn_part' */
 	MPART_INIT_mp_flags(MPART_F_NOFREE | MPART_F_NOSPLIT |
 	                    MPART_F_NOMERGE | MPART_F_MLOCK_FROZEN |
-	                    MPART_F_MLOCK),
+	                    MPART_F_MLOCK | MPART_F_STATICPART),
 	MPART_INIT_mp_state(MPART_ST_MEM),
 	MPART_INIT_mp_file(&mfile_ndef),
 	MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(thiscpu_x86_dfstackpart_.mp_copy)),
@@ -111,8 +112,9 @@ PUBLIC ATTR_PERCPU struct mnode thiscpu_x86_dfstacknode_ = {
 	MNODE_INIT_mn_maxaddr(bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE - 1),
 	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD |
 	                    MNODE_F_SHARED | MNODE_F_NOSPLIT |
-	                    MNODE_F_NOMERGE | MNODE_F_KERNPART |
-	                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK),
+	                    MNODE_F_NOMERGE | MNODE_F_STATICPART |
+	                    MNODE_F_KERNPART | _MNODE_F_MPREPARED_KERNEL |
+	                    MNODE_F_MLOCK),
 	MNODE_INIT_mn_part(&bootcpu_x86_dfstack_part),
 	MNODE_INIT_mn_fspath(NULL),
 	MNODE_INIT_mn_fsname(NULL),

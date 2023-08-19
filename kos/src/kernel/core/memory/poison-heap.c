@@ -207,7 +207,7 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 	part->mp_meta      = NULL;
 
 	/* Insert the new node into the kernel and release our lock to it. */
-	mman_mappings_insert(&mman_kernel, node);
+	mman_mappings_insert(&mman_kernel, node); /* NOTE: No verify here (prevent fault recursion) */
 
 	/* Technically, we'd have to merge the  node at this point, but  since
 	 * that part's kind-of optional, and since we only get here if there's

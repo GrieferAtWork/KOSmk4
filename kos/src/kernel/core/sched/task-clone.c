@@ -511,8 +511,8 @@ task_clone(struct icpustate const *init_state,
 		}
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		LOCAL_INITIALIZE_STACKGUARD_AFTER(result, mapaddr);
-		mman_mappings_insert(&mman_kernel, &FORTASK(result, this_kernel_stacknode_));
-		IF_HAVE_STACK_GUARD(mman_mappings_insert(&mman_kernel, &FORTASK(result, this_kernel_stackguard_)));
+		mman_mappings_insert_and_verify(&mman_kernel, &FORTASK(result, this_kernel_stacknode_));
+		IF_HAVE_STACK_GUARD(mman_mappings_insert_and_verify(&mman_kernel, &FORTASK(result, this_kernel_stackguard_)));
 
 		/* Map the trampoline node. */
 		mapaddr = (byte_t *)mman_findunmapped(&mman_kernel,
@@ -546,8 +546,8 @@ again_release_kernel_and_cc:
 				}
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 				LOCAL_INITIALIZE_STACKGUARD_AFTER(result, mapaddr);
-				mman_mappings_insert(&mman_kernel, &FORTASK(result, this_kernel_stacknode_));
-				IF_HAVE_STACK_GUARD(mman_mappings_insert(&mman_kernel, &FORTASK(result, this_kernel_stackguard_)));
+				mman_mappings_insert_and_verify(&mman_kernel, &FORTASK(result, this_kernel_stacknode_));
+				IF_HAVE_STACK_GUARD(mman_mappings_insert_and_verify(&mman_kernel, &FORTASK(result, this_kernel_stackguard_)));
 				mapaddr = (byte_t *)mman_findunmapped(&mman_kernel,
 				                                      MHINT_GETADDR(KERNEL_MHINT_TRAMPOLINE), PAGESIZE,
 				                                      MHINT_GETMODE(KERNEL_MHINT_TRAMPOLINE));
@@ -566,7 +566,7 @@ again_release_kernel_and_cc:
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		FORTASK(result, this_trampoline_node_).mn_minaddr = mapaddr;
 		FORTASK(result, this_trampoline_node_).mn_maxaddr = mapaddr + PAGESIZE - 1;
-		mman_mappings_insert(&mman_kernel, &FORTASK(result, this_trampoline_node_));
+		mman_mappings_insert_and_verify(&mman_kernel, &FORTASK(result, this_trampoline_node_));
 
 		/* Map the stack into memory */
 		mpart_mmap_force(&FORTASK(result, this_kernel_stackpart_),
