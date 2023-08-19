@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35cc406b */
+/* HASH CRC-32:0x126c3216 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -239,7 +239,7 @@ NOTHROW(LIBCCALL libc_labs)(long x) {
 	return x < 0 ? -x : x;
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_INT__ */
-INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_PURE WUNUSED struct __div_struct
+INTERN ATTR_SECTION(".text.crt.math.utility") WUNUSED __ATTR_CONST struct __div_struct
 NOTHROW_NCX(LIBCCALL libc_div)(int numer,
                                int denom) {
 	div_t result;
@@ -251,7 +251,7 @@ NOTHROW_NCX(LIBCCALL libc_div)(int numer,
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_ldiv, libc_div);
 #else /* __SIZEOF_LONG__ == __SIZEOF_INT__ */
-INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_PURE WUNUSED ldiv_t
+INTERN ATTR_SECTION(".text.crt.math.utility") WUNUSED __ATTR_CONST ldiv_t
 NOTHROW_NCX(LIBCCALL libc_ldiv)(long numer,
                                 long denom) {
 	ldiv_t result;
@@ -277,7 +277,7 @@ DEFINE_INTERN_ALIAS(libc_lldiv, libc_div);
 #elif __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_lldiv, libc_ldiv);
 #else /* ... */
-INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_PURE WUNUSED lldiv_t
+INTERN ATTR_SECTION(".text.crt.math.utility") WUNUSED __ATTR_CONST lldiv_t
 NOTHROW_NCX(LIBCCALL libc_lldiv)(__LONGLONG numer,
                                  __LONGLONG denom) {
 	lldiv_t result;

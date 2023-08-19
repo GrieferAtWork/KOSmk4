@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55e14a1f */
+/* HASH CRC-32:0xd415c33c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,10 +37,10 @@ INTDEF ATTR_CONST intmax_t NOTHROW(LIBDCALL libd_imaxabs)(intmax_t x);
 INTDEF ATTR_CONST intmax_t NOTHROW(LIBCCALL libc_imaxabs)(intmax_t x);
 #endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8 */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__
-INTDEF ATTR_PURE imaxdiv_t NOTHROW_NCX(LIBDCALL libd_imaxdiv)(intmax_t numer, intmax_t denom);
+INTDEF __ATTR_CONST imaxdiv_t NOTHROW_NCX(LIBDCALL libd_imaxdiv)(intmax_t numer, intmax_t denom);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ */
 #if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__
-INTDEF ATTR_PURE imaxdiv_t NOTHROW_NCX(LIBCCALL libc_imaxdiv)(intmax_t numer, intmax_t denom);
+INTDEF __ATTR_CONST imaxdiv_t NOTHROW_NCX(LIBCCALL libc_imaxdiv)(intmax_t numer, intmax_t denom);
 #endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 INTDEF ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) intmax_t NOTHROW_NCX(LIBDCALL libd_strtoimax)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base);

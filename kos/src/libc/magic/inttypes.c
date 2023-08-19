@@ -777,7 +777,7 @@ $intmax_t imaxabs($intmax_t x) {
 	return x < 0 ? -x : x;
 }
 
-[[std, pure, decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_IMAXDIV_STRUCT)]]
+[[std, attribute("__ATTR_CONST"), decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_IMAXDIV_STRUCT)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == __SIZEOF_INT__),       alias("div")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),      alias("ldiv")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("lldiv")]]

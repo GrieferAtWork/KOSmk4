@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd75598b7 */
+/* HASH CRC-32:0x75e8f8fd */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ struct __imaxdiv_struct {
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* !____imaxdiv_struct_defined */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(imaxdiv) __ATTR_PURE struct __imaxdiv_struct
+__LOCAL_LIBC(imaxdiv) __ATTR_CONST struct __imaxdiv_struct
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(imaxdiv))(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom) {
 	struct __imaxdiv_struct __result;
 	__result.quot = __numer / __denom;

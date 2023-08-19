@@ -824,11 +824,13 @@ NOTHROW(KCALL ph_kmalloc_trace_nx)(void *base, size_t UNUSED(num_bytes),
 
 INTERN ATTR_COLDTEXT void *
 NOTHROW(KCALL ph_kmalloc_untrace)(void *ptr) {
+	COMPILER_IMPURE();
 	return ptr;
 }
 
 INTERN ATTR_COLDTEXT void *
 NOTHROW(KCALL ph_kmalloc_untrace_n)(void *base, size_t UNUSED(num_bytes)) {
+	COMPILER_IMPURE();
 	return base;
 }
 

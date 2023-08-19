@@ -487,7 +487,7 @@ long labs(long x) {
 
 [[if($extended_include_prefix("<hybrid/typecore.h>")
      __SIZEOF_INTMAX_T__ == __SIZEOF_INT__), export_as("imaxdiv")]]
-[[std, pure, wunused, decl_include("<bits/crt/div.h>")]]
+[[std, attribute("__ATTR_CONST"), wunused, decl_include("<bits/crt/div.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("ldiv")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias(CNL_lldiv...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_INTMAX_T__), alias("imaxdiv")]]
@@ -501,7 +501,7 @@ struct __div_struct div(int numer, int denom) {
 
 [[if($extended_include_prefix("<hybrid/typecore.h>")
      __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), export_as("imaxdiv")]]
-[[std, pure, wunused, decl_include("<bits/crt/div.h>")]]
+[[std, attribute("__ATTR_CONST"), wunused, decl_include("<bits/crt/div.h>")]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__, div)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(CNL_lldiv...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias("imaxdiv")]]
@@ -533,7 +533,7 @@ __LONGLONG llabs(__LONGLONG x) {
      __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ &&
      __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__),
   export_as("imaxdiv")]]
-[[std, pure, wunused, decl_include("<bits/crt/div.h>")]]
+[[std, attribute("__ATTR_CONST"), wunused, decl_include("<bits/crt/div.h>")]]
 [[no_crt_self_import, no_crt_self_export, export_alias(CNL_lldiv...)]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, div)]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, ldiv)]]

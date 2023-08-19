@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d85151e */
+/* HASH CRC-32:0x24e53c6c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ NOTHROW(LIBCCALL libc_imaxabs)(intmax_t x) {
 }
 #endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8 */
 #if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__
-INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_PURE imaxdiv_t
+INTERN ATTR_SECTION(".text.crt.math.utility") __ATTR_CONST imaxdiv_t
 NOTHROW_NCX(LIBCCALL libc_imaxdiv)(intmax_t numer,
                                    intmax_t denom) {
 	imaxdiv_t result;
