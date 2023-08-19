@@ -1143,6 +1143,7 @@ file_seek(FILE *__restrict self, off64_t off, int whence) {
 				return old_abspos;
 			}
 			new_abspos = old_abspos + off;
+			off = new_abspos - ex->io_fpos; /* In case we need to do a full seek. */
 		}
 		self->if_flag &= ~IO_EOF;
 		if unlikely(new_abspos >= INT64_MAX) {
