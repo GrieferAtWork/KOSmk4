@@ -2910,7 +2910,6 @@ NOTHROW(FCALL mpart_trim_data_require_node)(struct mpart *__restrict self,
 				corepart = NULL;
 			}
 			if (corepart) {
-				printk(KERN_DEBUG "%d: mnode %p: alloc [core]\n", __LINE__, &corepart->mcp_node);
 				corepart->mcp_node.mn_flags = MNODE_F_COREPART;
 				data->mtd_node = &corepart->mcp_node;
 				return MPART_NXOP_ST_SUCCESS;
@@ -2920,7 +2919,6 @@ NOTHROW(FCALL mpart_trim_data_require_node)(struct mpart *__restrict self,
 			                                     ccinfo_gfp(data->mtd_ccinfo) |
 			                                     GFP_LOCKED | GFP_PREFLT);
 			if likely(newnode) {
-				printk(KERN_DEBUG "%d: mnode %p: alloc [heap]\n", __LINE__, newnode);
 				newnode->mn_flags = MNODE_F_NORMAL;
 				data->mtd_node    = newnode;
 				return MPART_NXOP_ST_RETRY;
@@ -2931,7 +2929,6 @@ NOTHROW(FCALL mpart_trim_data_require_node)(struct mpart *__restrict self,
 					corepart = mcoreheap_alloc_locked_nx_nocc();
 					mman_lock_release(&mman_kernel);;
 					if (corepart) {
-						printk(KERN_DEBUG "%d: mnode %p: alloc [core]\n", __LINE__, &corepart->mcp_node);
 						corepart->mcp_node.mn_flags = MNODE_F_COREPART;
 						data->mtd_node = &corepart->mcp_node;
 						return MPART_NXOP_ST_RETRY;
@@ -2940,7 +2937,6 @@ NOTHROW(FCALL mpart_trim_data_require_node)(struct mpart *__restrict self,
 			}
 			return MPART_NXOP_ST_ERROR;
 		}
-		printk(KERN_DEBUG "%d: mnode %p: alloc [heap]\n", __LINE__, newnode);
 		newnode->mn_flags = MNODE_F_NORMAL;
 		data->mtd_node    = newnode;
 	}
