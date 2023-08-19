@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10f39ab0 */
+/* HASH CRC-32:0x469adef2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4182,17 +4182,17 @@ NOTHROW(LIBCCALL libc_scalbl)(__LONGDOUBLE x,
 
 }
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
-/* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
+/* >> fpclassify(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd___fpclassify)(double x) { return fptype_kos2dos(libc___fpclassify(x)); }
 #include <libm/fpclassify.h>
-/* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
+/* >> fpclassify(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___fpclassify)(double x) {
 	return __LIBM_MATHFUNI(fpclassify, x);
 }
 #include <libm/signbit.h>
-/* >> signbit(3), __signbitf(3), __signbit(3), __signbitl(3) */
+/* >> signbit(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___signbit)(double x) {
 
@@ -4201,11 +4201,11 @@ NOTHROW(LIBCCALL libc___signbit)(double x) {
 
 
 }
-/* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
+/* >> fpclassify(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd___fpclassifyf)(float x) { return fptype_kos2dos(libc___fpclassifyf(x)); }
 #include <libm/fpclassify.h>
-/* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
+/* >> fpclassify(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___fpclassifyf)(float x) {
 
@@ -4217,7 +4217,7 @@ NOTHROW(LIBCCALL libc___fpclassifyf)(float x) {
 
 }
 #include <libm/signbit.h>
-/* >> signbit(3), __signbitf(3), __signbit(3), __signbitl(3) */
+/* >> signbit(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___signbitf)(float x) {
 
@@ -4230,7 +4230,7 @@ NOTHROW(LIBCCALL libc___signbitf)(float x) {
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
 DEFINE_INTERN_ALIAS(libd___fpclassifyl, libd___fpclassify);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
-/* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
+/* >> fpclassify(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd___fpclassifyl)(__LONGDOUBLE x) { return fptype_kos2dos(libc___fpclassifyl(x)); }
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
@@ -4239,7 +4239,7 @@ NOTHROW(LIBDCALL libd___fpclassifyl)(__LONGDOUBLE x) { return fptype_kos2dos(lib
 DEFINE_INTERN_ALIAS(libc___fpclassifyl, libc___fpclassify);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fpclassify.h>
-/* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
+/* >> fpclassify(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___fpclassifyl)(__LONGDOUBLE x) {
 
@@ -4256,7 +4256,7 @@ NOTHROW(LIBCCALL libc___fpclassifyl)(__LONGDOUBLE x) {
 DEFINE_INTERN_ALIAS(libc___signbitl, libc___signbit);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/signbit.h>
-/* >> signbit(3), __signbitf(3), __signbit(3), __signbitl(3) */
+/* >> signbit(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___signbitl)(__LONGDOUBLE x) {
 

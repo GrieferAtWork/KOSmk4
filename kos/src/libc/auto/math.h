@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f85ef6 */
+/* HASH CRC-32:0x3ee9417f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2108,41 +2108,41 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_scalbl)(__LONGDOUBLE x, __LONG
 /* >> scalbf(3), scalb(3), scalbl(3)
  * Return `x' times (2 to the Nth power) */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_scalbl)(__LONGDOUBLE x, __LONGDOUBLE fn);
-/* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
+/* >> fpclassify(3) */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___fpclassify)(double x);
-/* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
+/* >> fpclassify(3) */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___fpclassify)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> signbit(3), __signbitf(3), __signbit(3), __signbitl(3) */
+/* >> signbit(3) */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___signbit)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* >> signbit(3), __signbitf(3), __signbit(3), __signbitl(3) */
+/* >> signbit(3) */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___signbit)(double x);
-/* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
+/* >> fpclassify(3) */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___fpclassifyf)(float x);
-/* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
+/* >> fpclassify(3) */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___fpclassifyf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> signbit(3), __signbitf(3), __signbit(3), __signbitl(3) */
+/* >> signbit(3) */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___signbitf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* >> signbit(3), __signbitf(3), __signbit(3), __signbitl(3) */
+/* >> signbit(3) */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___signbitf)(float x);
-/* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
+/* >> fpclassify(3) */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___fpclassifyl)(__LONGDOUBLE x);
-/* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
+/* >> fpclassify(3) */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___fpclassifyl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> signbit(3), __signbitf(3), __signbit(3), __signbitl(3) */
+/* >> signbit(3) */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___signbitl)(__LONGDOUBLE x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* >> signbit(3), __signbitf(3), __signbit(3), __signbitl(3) */
+/* >> signbit(3) */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___signbitl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
