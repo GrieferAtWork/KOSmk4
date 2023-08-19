@@ -211,3 +211,9 @@ INSTALL_SKIP="
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"
+
+# Also install `libgcc.a` as produced when the toolchain was created
+LIBGCC_A_FILENAME="$KOS_ROOT/bin/$TARGET_NAME-kos-common/$TARGET_LIBPATH/libgcc.a"
+if [ -f "$LIBGCC_A_FILENAME" ]; then
+	install_file /$TARGET_LIBPATH/libgcc.a "$LIBGCC_A_FILENAME"
+fi

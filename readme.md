@@ -53,6 +53,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- [coreutils-9.1](https://ftp.gnu.org/gnu/coreutils)
 	- [bash-5.1.16](https://ftp.gnu.org/gnu/bash)
 - Programming
+	- [gcc-12.1.0](https://ftp.gnu.org/gnu/gcc)
 	- [tcc-0.9.27](https://bellard.org/tcc/)
 	- [nano-4.4](https://www.nano-editor.org/)
 	- [deemon-200](https://github.com/GrieferAtWork/deemon)

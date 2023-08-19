@@ -758,20 +758,32 @@ install_libstdcxx() {
 	if ! [ -f "$1/libstdc++.so.$LIBSTDCXX_VERSION" ]; then
 		echo "	Copying $GCC_VERSION:libstdc++ into $1"
 		cmd mkdir -p "$1"
-		cmd cp \
-			"$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" \
-			"$1/libstdc++.so.$LIBSTDCXX_VERSION"
+		cmd cp "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" "$1/libstdc++.so.$LIBSTDCXX_VERSION"
+		cmd ln -s "libstdc++.so.$LIBSTDCXX_VERSION" "$1/libstdc++.so.$LIBSTDCXX_VERSION_FULL"
+		cmd ln -s "libstdc++.so.$LIBSTDCXX_VERSION" "$1/libstdc++.so"
 	else
 		echo "	$GCC_VERSION:libstdc++ has already installed to $1"
+	fi
+	echo "Check if $GCC_VERSION:libgcc.a was installed into $1"
+	if ! [ -f "$1/libgcc.a" ]; then
+		if [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ]; then
+			echo "	Copying $GCC_VERSION:libgcc_s into $1"
+			cmd mkdir -p "$1"
+			cmd cp "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" "$1/libgcc.a"
+		else
+			echo "	$GCC_VERSION:libgcc.a wasn't built for this architecture"
+		fi
+	else
+		echo "	$GCC_VERSION:libgcc.a has already been installed to $1"
 	fi
 	echo "Check if $GCC_VERSION:libgcc_s was installed into $1"
 	if ! [ -f "$1/libgcc_s.so.$LIBGCC_VERSION" ]; then
 		if [ -f "$PREFIX/$TARGET/lib/libgcc_s.so.$LIBGCC_VERSION_FULL" ]; then
 			echo "	Copying $GCC_VERSION:libgcc_s into $1"
 			cmd mkdir -p "$1"
-			cmd cp \
-				"$PREFIX/$TARGET/lib/libgcc_s.so.$LIBGCC_VERSION_FULL" \
-				"$1/libgcc_s.so.$LIBGCC_VERSION"
+			cmd cp "$PREFIX/$TARGET/lib/libgcc_s.so.$LIBGCC_VERSION_FULL" "$1/libgcc_s.so.$LIBGCC_VERSION"
+#			cmd ln -s "libgcc_s.so.$LIBGCC_VERSION" "$1/libgcc_s.so.$LIBGCC_VERSION_FULL"
+			cmd ln -s "libgcc_s.so.$LIBGCC_VERSION" "$1/libgcc_s.so"
 		else
 			echo "	$GCC_VERSION:libgcc_s wasn't built for this architecture"
 		fi
@@ -785,20 +797,32 @@ install_libstdcxx_symlinks() {
 	if ! [ -f "$1/libstdc++.so.$LIBSTDCXX_VERSION" ]; then
 		echo "	Installing $GCC_VERSION:libstdc++ into $1"
 		cmd mkdir -p "$1"
-		cmd ln -s \
-			"../../${NAME}-common/$BINLIBDIRNAME/libstdc++.so.$LIBSTDCXX_VERSION" \
-			"$1/libstdc++.so.$LIBSTDCXX_VERSION"
+		cmd ln -s "../../${NAME}-common/$BINLIBDIRNAME/libstdc++.so.$LIBSTDCXX_VERSION_FULL" "$1/libstdc++.so.$LIBSTDCXX_VERSION_FULL"
+		cmd ln -s "../../${NAME}-common/$BINLIBDIRNAME/libstdc++.so.$LIBSTDCXX_VERSION" "$1/libstdc++.so.$LIBSTDCXX_VERSION"
+		cmd ln -s "../../${NAME}-common/$BINLIBDIRNAME/libstdc++.so" "$1/libstdc++.so"
 	else
 		echo "	$GCC_VERSION:libstdc++ has already installed to $1"
+	fi
+	echo "Check if $GCC_VERSION:libgcc.a was installed into $1"
+	if ! [ -f "$1/libgcc.a" ]; then
+		if [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ]; then
+			echo "	Installing $GCC_VERSION:libgcc.a into $1"
+			cmd mkdir -p "$1"
+			cmd ln -s "../../${NAME}-common/$BINLIBDIRNAME/libgcc.a" "$1/libgcc.a"
+		else
+			echo "	$GCC_VERSION:libgcc.a wasn't built for this architecture"
+		fi
+	else
+		echo "	$GCC_VERSION:libgcc.a has already been installed to $1"
 	fi
 	echo "Check if $GCC_VERSION:libgcc_s was installed into $1"
 	if ! [ -f "$1/libgcc_s.so.$LIBGCC_VERSION" ]; then
 		if [ -f "$PREFIX/$TARGET/lib/libgcc_s.so.$LIBGCC_VERSION_FULL" ]; then
 			echo "	Installing $GCC_VERSION:libgcc_s into $1"
 			cmd mkdir -p "$1"
-			cmd ln -s \
-				"../../${NAME}-common/$BINLIBDIRNAME/libgcc_s.so.$LIBGCC_VERSION_FULL" \
-				"$1/libgcc_s.so.$LIBGCC_VERSION_FULL"
+			cmd ln -s "../../${NAME}-common/$BINLIBDIRNAME/libgcc_s.so.$LIBGCC_VERSION_FULL" "$1/libgcc_s.so.$LIBGCC_VERSION_FULL"
+#			cmd ln -s "../../${NAME}-common/$BINLIBDIRNAME/libgcc_s.so.$LIBGCC_VERSION" "$1/libgcc_s.so.$LIBGCC_VERSION"
+			cmd ln -s "../../${NAME}-common/$BINLIBDIRNAME/libgcc_s.so" "$1/libgcc_s.so"
 		else
 			echo "	$GCC_VERSION:libgcc_s wasn't built for this architecture"
 		fi
