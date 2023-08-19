@@ -313,13 +313,12 @@ panic_assert_dbg_main(void *arg) {
 	struct assert_args *args;
 	args = (struct assert_args *)arg;
 	TRY {
-		dbg_printf(DBGSTR(AC_WITHCOLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON, "Assertion failure") "\n"
-		                  "expr: "  AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"
-		                  "file: "  AC_WITHFG(ANSITTY_CL_WHITE, "%s")
+		dbg_print(DBGSTR(AC_WITHCOLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON, "Assertion failure") "\n"));
+		if (args->aa_expr)
+			dbg_printf(DBGSTR("expr: "  AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"), args->aa_expr);
+		dbg_printf(DBGSTR("file: "  AC_WITHFG(ANSITTY_CL_WHITE, "%s")
 		                  " (line " AC_WITHFG(ANSITTY_CL_WHITE, "%u") ")\n"),
-		           args->aa_expr,
-		           args->aa_file,
-		           args->aa_line);
+		           args->aa_file, args->aa_line);
 		if (args->aa_func)
 			dbg_printf(DBGSTR("func: " AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"), args->aa_func);
 		if (args->aa_format) {
@@ -393,12 +392,11 @@ panic_assert_chk_print_message(void *arg) {
 	struct assert_args *args;
 	args = (struct assert_args *)arg;
 	TRY {
-		dbg_printf(DBGSTR("expr: " AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"
-		                  "file: " AC_WITHFG(ANSITTY_CL_WHITE, "%s")
+		if (args->aa_expr)
+			dbg_printf(DBGSTR("expr: " AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"), args->aa_expr);
+		dbg_printf(DBGSTR("file: " AC_WITHFG(ANSITTY_CL_WHITE, "%s")
 		                  " (line " AC_WITHFG(ANSITTY_CL_WHITE, "%u") ")\n"),
-		           args->aa_expr,
-		           args->aa_file,
-		           args->aa_line);
+		           args->aa_file, args->aa_line);
 		if (args->aa_func)
 			dbg_printf(DBGSTR("func: " AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"), args->aa_func);
 		if (args->aa_format) {
