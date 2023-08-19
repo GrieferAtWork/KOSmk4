@@ -539,7 +539,7 @@ NOTHROW(FCALL FatNodeData_Fini)(FatNodeData *__restrict self) {
 	kfree(self->fn_clusterv);
 }
 
-PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+PRIVATE ATTR_BLOCKLIKE_CC(info) NONNULL((1)) void
 NOTHROW(KCALL fat_v_cc)(struct mfile *__restrict self,
                         struct ccinfo *__restrict info) {
 	size_t usable, needed;

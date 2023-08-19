@@ -138,7 +138,7 @@ PRIVATE struct awork_vector_arref awork = ARREF_INIT(&empty_awork);
 
 /* Try to delete a worker from `old_workers' and assign atomically
  * update the global set of active async workers. */
-PRIVATE NOBLOCK_IF(gfp_flags & GFP_ATOMIC) NONNULL((1)) unsigned int
+PRIVATE ATTR_BLOCKLIKE_GFP(gfp_flags) NONNULL((1)) unsigned int
 NOTHROW(KCALL try_delete_async_worker)(struct awork_vector *__restrict old_workers,
                                        size_t worker_index, gfp_t gfp_flags) {
 	REF struct awork_vector *new_workers;

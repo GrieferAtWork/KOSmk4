@@ -122,21 +122,6 @@ NOTHROW(FCALL bzero_pages)(PAGEDIR_PAGEALIGNED void *vbase,
 }
 
 
-/* Try some things to reclaim system memory. */
-PRIVATE bool
-NOTHROW(FCALL kram_reclaim_memory)(ccstate_t *__restrict p_cache_version,
-                                   gfp_t flags) {
-	if (!(flags & GFP_NOCLRC)) {
-		if (system_cc_s_ex(p_cache_version, flags))
-			return true;
-	}
-	if (!(flags & GFP_NOSWAP)) {
-		/* TODO: Try to off-load memory to swap. */
-	}
-	return false;
-}
-
-
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL kram_freevec)(struct mchunk *__restrict vec,
                             size_t count) {

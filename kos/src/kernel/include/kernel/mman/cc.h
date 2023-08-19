@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/malloc-defs.h> /* gfp_t */
 #include <kernel/types.h>
 
 #include <asm/pagesize.h>
@@ -30,11 +31,6 @@
 
 #ifdef __CC__
 DECL_BEGIN
-
-#ifndef __gfp_t_defined
-#define __gfp_t_defined
-typedef unsigned int gfp_t;
-#endif /* !__gfp_t_defined */
 
 /* Simplified cache-clear state for `system_cc_s' */
 #ifndef __ccstate_t_defined
@@ -101,12 +97,12 @@ DATDEF uint16_t system_cc_maxattempts;
  * @return: true:  At least something (may) have become available
  *                 since the last time you tried to clear caches.
  * @return: false: Nothing could be cleared :( */
-FUNDEF BLOCKING_IF(ccinfo_blocking(info)) NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) __BOOL
+FUNDEF ATTR_BLOCKLIKE_CC(info) NONNULL((1)) __BOOL
 NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info);
 
 /* Helper  wrapper  for  `system_cc()'  that   throws
  * `E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY' on error. */
-FUNDEF BLOCKING_IF(ccinfo_blocking(info)) NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void FCALL
+FUNDEF ATTR_BLOCKLIKE_CC(info) NONNULL((1)) void FCALL
 system_cc_virtual_memory(struct ccinfo *__restrict info)
 		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY);
 
@@ -128,7 +124,7 @@ system_cc_virtual_memory(struct ccinfo *__restrict info)
  * avoided for the sake of performance and more effective cc-handling. */
 FUNDEF ATTR_COLD WUNUSED ATTR_INOUT(1) __BOOL NOTHROW(FCALL system_cc_s)(ccstate_t *__restrict p_state);
 FUNDEF NOBLOCK ATTR_COLD WUNUSED ATTR_INOUT(1) __BOOL NOTHROW(FCALL system_cc_s_noblock)(ccstate_t *__restrict p_state);
-FUNDEF BLOCKING_IF(info & GFP_BLOCKING) NOBLOCK_IF(gfp & GFP_ATOMIC) ATTR_COLD WUNUSED  ATTR_INOUT(1) __BOOL
+FUNDEF ATTR_BLOCKLIKE_GFP(gfp) ATTR_COLD WUNUSED ATTR_INOUT(1) __BOOL
 NOTHROW(FCALL system_cc_s_ex)(ccstate_t *__restrict p_state, gfp_t gfp);
 
 
@@ -139,17 +135,17 @@ struct ringbuffer;
 struct linebuffer;
 
 /* Free unused space from `self'. */
-FUNDEF BLOCKING_IF(ccinfo_blocking(info)) NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+FUNDEF ATTR_BLOCKLIKE_CC(info) NONNULL((1, 2)) void
 NOTHROW(KCALL system_cc_ringbuffer)(struct ringbuffer *__restrict self,
                                     struct ccinfo *__restrict info);
 
 /* Free unused space from `self'. */
-FUNDEF BLOCKING_IF(ccinfo_blocking(info)) NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+FUNDEF ATTR_BLOCKLIKE_CC(info) NONNULL((1, 2)) void
 NOTHROW(KCALL system_cc_linebuffer)(struct linebuffer *__restrict self,
                                     struct ccinfo *__restrict info);
 
 /* Clear buffers associated with a given handle object. */
-FUNDEF BLOCKING_IF(ccinfo_blocking(info)) NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((2, 3)) void
+FUNDEF ATTR_BLOCKLIKE_CC(info) NONNULL((2, 3)) void
 NOTHROW(KCALL system_cc_handle)(uintptr_half_t handle_typ,
                                 void *__restrict handle_ptr,
                                 struct ccinfo *__restrict info);

@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/malloc-defs.h>
 #include <kernel/paging.h>
 #include <kernel/types.h>
 
@@ -34,12 +35,6 @@
 
 #ifdef __CC__
 DECL_BEGIN
-
-#ifndef __gfp_t_defined
-#define __gfp_t_defined
-typedef unsigned int gfp_t;
-#endif /* !__gfp_t_defined */
-
 
 /************************************************************************/
 /* Additional GFP_* flags for `mman_map_kram()'                         */
@@ -121,7 +116,7 @@ typedef unsigned int gfp_t;
  *                        than `PAGESIZE' can be used to ensure that the returned pointer
  *                        is aligned by multiple pages. s.a. `mman_findunmapped()'
  * @param: min_alignment_offset: Offset from `return' at which `min_alignment' shall be applied. */
-FUNDEF BLOCKING_IF(flags & GFP_BLOCKING) NOBLOCK_IF(flags & GFP_ATOMIC) void *FCALL
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) void *FCALL
 mman_map_kram(void *hint, size_t num_bytes,
               gfp_t flags, size_t min_alignment DFL(PAGESIZE),
               ptrdiff_t min_alignment_offset DFL(0))
@@ -129,7 +124,7 @@ mman_map_kram(void *hint, size_t num_bytes,
 
 
 /* Non-throwing version of `mman_map_kram()'. Returns `MAP_FAILED' on error. */
-FUNDEF BLOCKING_IF(flags & GFP_BLOCKING) NOBLOCK_IF(flags & GFP_ATOMIC) void *
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) void *
 NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes, gfp_t flags,
                                 size_t min_alignment DFL(PAGESIZE),
                                 ptrdiff_t min_alignment_offset DFL(0));

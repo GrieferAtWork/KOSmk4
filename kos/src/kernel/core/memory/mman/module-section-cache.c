@@ -62,7 +62,7 @@ SLIST_HEAD(module_section_slist, module_section);
 /* Clear the global cache of module sections, and return a
  * number representative of an approximation of the amount
  * of memory became available as a result of this. */
-INTERN NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+INTERN ATTR_BLOCKLIKE_CC(info) NONNULL((1)) void
 NOTHROW(KCALL system_cc_module_section_cache)(struct ccinfo *__restrict info) {
 	struct module_section_slist dead;
 	struct module_section *sect;

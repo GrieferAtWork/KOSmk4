@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/malloc-defs.h> /* ATTR_BLOCKLIKE_CC(...) */
 #include <kernel/mman/module.h>
 
 /* This header only defines the bare minimum to get  interactions
@@ -95,7 +96,7 @@ struct ccinfo;
 /* NOTE: This function may be implemented by individual drivers,
  *       and isn't  something that  is exported  by the  kernel!
  * Try to clear global caches. Called by `system_cc()' */
-FUNDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+FUNDEF ATTR_BLOCKLIKE_CC(info) NONNULL((1)) void
 NOTHROW(KCALL drv_cc)(struct ccinfo *__restrict info);
 
 #ifndef DRIVER_INIT

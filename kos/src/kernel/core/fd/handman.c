@@ -2778,7 +2778,7 @@ NOTHROW(FCALL handman_install_rollback)(struct handle_install_data *__restrict s
 
 
 /* Cache clearing hook for handle managers. */
-INTERN NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+INTERN ATTR_BLOCKLIKE_CC(info) NONNULL((1, 2)) void
 NOTHROW(KCALL system_cc_perhman)(struct handman *__restrict self,
                                  struct ccinfo *__restrict info) {
 	unsigned int minfd = 0;

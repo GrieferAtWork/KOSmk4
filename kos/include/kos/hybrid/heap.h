@@ -38,7 +38,7 @@
 #define os_heap_gfpget(var_name)    var_name
 #define os_heap_gfpset(var_name, v) var_name = (v)
 #elif defined(__KERNEL__)
-#include <kernel/malloc.h>
+#include <kernel/malloc-defs.h>
 #define OS_HEAP_HASGFP 1
 #define _os_heap_gfparg(var_name)   , gfp_t var_name
 #define _os_heap_gfppar(var_name)   , var_name

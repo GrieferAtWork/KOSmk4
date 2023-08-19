@@ -528,7 +528,7 @@ nothing_to_restore:
 
 /* Remove all AIO handles that are `aio_handle_completed()'
  * from    `async_aio_handles',    and    kfree()     them. */
-INTERN NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+INTERN ATTR_BLOCKLIKE_CC(info) NONNULL((1)) void
 NOTHROW(KCALL system_cc_async_aio_handles)(struct ccinfo *__restrict info) {
 	/* TODO: A function similar to this one should be called when the CPU goes into
 	 *       IDLE mode in order to finalize  and kfree() unused AIO handles,  since

@@ -34,14 +34,6 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-#ifdef __KERNEL__
-#ifndef __gfp_t_defined
-#define __gfp_t_defined
-typedef unsigned int gfp_t;
-#endif /* !__gfp_t_defined */
-#endif /* __KERNEL__ */
-
-
 /* Similar  to `cmdline_decode()', however return a heap-allocated
  * vector of the individual argument strings, which itself is then
  * terminated by a NULL-entry.

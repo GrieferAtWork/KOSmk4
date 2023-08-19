@@ -73,7 +73,7 @@ DECL_BEGIN
  * @param: num_bytes:      The number of bytes to allocate.
  * @param: min_alignment:  The minimum alignment required from automatic mapping_target
  *                         detection. */
-PRIVATE NONNULL((1)) VIRT void *
+PRIVATE ATTR_BLOCKLIKE_GFP(flags) NONNULL((1)) VIRT void *
 LOCAL_NOTHROW(KCALL LOCAL_core_page_alloc)(struct heap *__restrict self,
                                            PAGEDIR_PAGEALIGNED void *mapping_target,
                                            PAGEDIR_PAGEALIGNED size_t num_bytes,
@@ -114,7 +114,7 @@ LOCAL_NOTHROW(KCALL LOCAL_core_page_alloc)(struct heap *__restrict self,
 
 
 
-PUBLIC WUNUSED NONNULL((1)) heapptr_t
+PUBLIC ATTR_BLOCKLIKE_GFP(flags) WUNUSED NONNULL((1)) heapptr_t
 LOCAL_NOTHROW(KCALL LOCAL_heap_alloc_untraced)(struct heap *__restrict self,
                                                size_t num_bytes, gfp_t flags) {
 	void *result_ptr;
@@ -399,7 +399,7 @@ err:
 
 
 
-PRIVATE WUNUSED NONNULL((1)) size_t
+PRIVATE ATTR_BLOCKLIKE_GFP(flags) WUNUSED NONNULL((1)) size_t
 LOCAL_NOTHROW(KCALL LOCAL_heap_allat_partial)(struct heap *__restrict self,
                                               VIRT void *__restrict ptr,
                                               gfp_t flags) {
@@ -546,7 +546,7 @@ again:
 }
 
 
-PUBLIC WUNUSED NONNULL((1)) size_t
+PUBLIC ATTR_BLOCKLIKE_GFP(flags) WUNUSED NONNULL((1)) size_t
 LOCAL_NOTHROW(KCALL LOCAL_heap_allat_untraced)(struct heap *__restrict self,
                                                VIRT void *__restrict ptr,
                                                size_t num_bytes, gfp_t flags) {
@@ -602,7 +602,7 @@ err:
 }
 
 
-PUBLIC WUNUSED NONNULL((1)) heapptr_t
+PUBLIC ATTR_BLOCKLIKE_GFP(flags) WUNUSED NONNULL((1)) heapptr_t
 LOCAL_NOTHROW(KCALL LOCAL_heap_align_untraced)(struct heap *__restrict self,
                                                size_t min_alignment, ptrdiff_t offset,
                                                size_t num_bytes, gfp_t flags) {
@@ -847,7 +847,7 @@ err:
 }
 
 
-PUBLIC WUNUSED NONNULL((1)) heapptr_t
+PUBLIC ATTR_BLOCKLIKE_GFP(alloc_flags) WUNUSED NONNULL((1)) heapptr_t
 LOCAL_NOTHROW(KCALL LOCAL_heap_realloc_untraced)(struct heap *__restrict self,
                                                  VIRT void *old_ptr, size_t old_bytes,
                                                  size_t new_bytes, gfp_t alloc_flags,
@@ -902,7 +902,7 @@ err:
 	return heapptr_make(NULL, 0);
 }
 
-PUBLIC WUNUSED NONNULL((1)) heapptr_t
+PUBLIC ATTR_BLOCKLIKE_GFP(alloc_flags) WUNUSED NONNULL((1)) heapptr_t
 LOCAL_NOTHROW(KCALL LOCAL_heap_realign_untraced)(struct heap *__restrict self,
                                                  VIRT void *old_ptr, size_t old_bytes,
                                                  size_t min_alignment, ptrdiff_t offset,

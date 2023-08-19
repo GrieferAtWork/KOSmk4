@@ -1124,7 +1124,7 @@ NOTHROW(KCALL tarsuper_v_free)(struct fnode *__restrict self) {
 	kfree(me);
 }
 
-PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+PRIVATE ATTR_BLOCKLIKE_CC(info) NONNULL((1, 2)) void
 NOTHROW(KCALL tarsuper_v_cc)(struct mfile *__restrict self,
                              struct ccinfo *__restrict info) {
 	size_t i;

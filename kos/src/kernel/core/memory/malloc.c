@@ -212,7 +212,7 @@ NOTHROW(KCALL untraced_kmalloc_leaks_release)(kmalloc_leaks_t UNUSED(leaks),
                                               unsigned int UNUSED(now)) {
 }
 
-INTERN ATTR_CONST NOBLOCK_IF(gfp & GFP_ATOMIC) WUNUSED void *
+INTERN ATTR_CONST ATTR_BLOCKLIKE_GFP(gfp) WUNUSED void *
 NOTHROW(KCALL untraced_kmalloc_trace_nx)(void *base, size_t UNUSED(num_bytes),
                                          gfp_t UNUSED(gfp), unsigned int UNUSED(tb_skip)) {
 	return base;

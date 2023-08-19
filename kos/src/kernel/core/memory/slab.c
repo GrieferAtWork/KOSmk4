@@ -175,7 +175,7 @@ NOTHROW(KCALL slab_freepage)(struct slab *__restrict self) {
 /* Cache clearing                                                       */
 /************************************************************************/
 
-PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+PRIVATE ATTR_BLOCKLIKE_CC(info) NONNULL((1, 2)) void
 NOTHROW(KCALL system_cc_perslabpool)(struct slab_pool *__restrict self,
                                      struct ccinfo *__restrict info) {
 	struct slab_slist freelist;
@@ -204,7 +204,7 @@ NOTHROW(KCALL system_cc_perslabpool)(struct slab_pool *__restrict self,
 }
 
 /* Free pre-allocated pages of slab memory. */
-INTERN NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+INTERN ATTR_BLOCKLIKE_CC(info) NONNULL((1)) void
 NOTHROW(KCALL system_cc_slab_prealloc)(struct ccinfo *__restrict info) {
 	unsigned int i;
 	for (i = 0; i < lengthof(slab_freepool); ++i) {
@@ -240,7 +240,7 @@ NOTHROW(KCALL system_cc_slab_prealloc)(struct ccinfo *__restrict info) {
  *       direction. */
 PUBLIC void *kernel_slab_break = SLAB_CONFIG_INITIAL_BREAK;
 
-PRIVATE WUNUSED VIRT struct slab *
+PRIVATE ATTR_BLOCKLIKE_GFP(flags) WUNUSED VIRT struct slab *
 NOTHROW(KCALL slab_alloc_page)(gfp_t flags) {
 	struct slab_pool *pool;
 	struct slab *result;
@@ -714,7 +714,7 @@ NOTHROW(KCALL __os_slab_malloc)(size_t num_bytes, gfp_t flags) {
 	return NULL);
 }
 
-PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
+PUBLIC ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
 __os_slab_kmalloc(size_t num_bytes, gfp_t flags) {
 #ifndef __INTELLISENSE__
 #define CASE_SLAB_MALLOC(sz, _) \
@@ -728,7 +728,7 @@ __os_slab_kmalloc(size_t num_bytes, gfp_t flags) {
 	return NULL);
 }
 
-PUBLIC ATTR_MALLOC WUNUSED VIRT void *
+PUBLIC ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL __os_slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) {
 #ifndef __INTELLISENSE__
 #define CASE_SLAB_MALLOC(sz, _) \

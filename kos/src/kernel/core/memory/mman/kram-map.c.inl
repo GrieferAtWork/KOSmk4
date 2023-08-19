@@ -103,14 +103,14 @@ DECL_BEGIN
  *                        than `PAGESIZE' can be used to ensure that the returned pointer
  *                        is aligned by multiple pages. s.a. `mman_findunmapped()'
  * @param: min_alignment_offset: Offset from `return' at which `min_alignment' shall be applied. */
-PUBLIC BLOCKING_IF(flags & GFP_BLOCKING) NOBLOCK_IF(flags & GFP_ATOMIC) void *FCALL
+PUBLIC ATTR_BLOCKLIKE_GFP(flags) void *FCALL
 mman_map_kram(void *hint, size_t num_bytes,
               gfp_t flags, size_t min_alignment,
               ptrdiff_t min_alignment_offset)
 		THROWS(E_BADALLOC, E_WOULDBLOCK)
 #elif defined(DEFINE_mman_map_kram_nx)
 /* Non-throwing version of `mman_map_kram()'. Returns `MAP_FAILED' on error. */
-PUBLIC BLOCKING_IF(flags & GFP_BLOCKING) NOBLOCK_IF(flags & GFP_ATOMIC) void *
+PUBLIC ATTR_BLOCKLIKE_GFP(flags) void *
 NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
                                 gfp_t flags, size_t min_alignment,
                                 ptrdiff_t min_alignment_offset)
@@ -613,13 +613,13 @@ err_nophys_for_backing:
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		mman_lock_release(&mman_kernel);
 err_nophys_for_backing_unlocked:
-		if (kram_reclaim_memory(&cache_version, flags))
+		if (system_cc_s_ex(&cache_version, flags))
 			goto again_lock_mman;
 		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY,
 		      num_bytes);
 err_nospace_for_mapping:
 		mman_lock_release(&mman_kernel);
-		if (kram_reclaim_memory(&cache_version, flags))
+		if (system_cc_s_ex(&cache_version, flags))
 			goto again_lock_mman;
 		THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		      num_bytes);
@@ -628,7 +628,7 @@ err_noheap_for_corepart_and_unprepare:
 		pagedir_unprepare(result, num_bytes);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		mman_lock_release(&mman_kernel);
-		if (kram_reclaim_memory(&cache_version, flags))
+		if (system_cc_s_ex(&cache_version, flags))
 			goto again_lock_mman;
 		THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
 		      sizeof(union mcorepart));
@@ -649,7 +649,7 @@ err_nophys_for_backing:
 err_nospace_for_mapping:
 		mman_lock_release(&mman_kernel);
 err_nophys_for_backing_unlocked:
-		if (kram_reclaim_memory(&cache_version, flags))
+		if (system_cc_s_ex(&cache_version, flags))
 			goto again_lock_mman;
 err_preempt:
 err:

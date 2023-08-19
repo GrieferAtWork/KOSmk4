@@ -57,7 +57,7 @@
 DECL_BEGIN
 
 #ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
-INTERN ATTR_MALLOC WUNUSED VIRT void *
+INTERN ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *
 LOCAL_NOTHROW(KCALL LOCAL_untraced_kmalloc_noslab)(size_t n_bytes, gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
@@ -80,7 +80,7 @@ LOCAL_IF_NX_ELSE(err:, err_overflow:)
 #define untraced_kmalloc_noslab     untraced_kmalloc
 #endif /* !... */
 
-INTERN ATTR_MALLOC WUNUSED VIRT void *
+INTERN ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *
 LOCAL_NOTHROW(KCALL LOCAL_untraced_kmalloc)(size_t n_bytes, gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
@@ -107,7 +107,7 @@ LOCAL_IF_NX_ELSE(err:, err_overflow:)
 	LOCAL_IF_NX_ELSE(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
 }
 
-INTERN ATTR_MALLOC WUNUSED VIRT void *
+INTERN ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *
 LOCAL_NOTHROW(KCALL LOCAL_untraced_kmemalign)(size_t min_alignment,
                                               size_t n_bytes,
                                               gfp_t flags) {
@@ -129,7 +129,7 @@ LOCAL_IF_NX_ELSE(err:, err_overflow:)
 	LOCAL_IF_NX_ELSE(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
 }
 
-INTERN ATTR_MALLOC WUNUSED VIRT void *
+INTERN ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *
 LOCAL_NOTHROW(KCALL LOCAL_untraced_kmemalign_offset)(size_t min_alignment, ptrdiff_t offset,
                                                      size_t n_bytes, gfp_t flags) {
 	heapptr_t hptr;
@@ -166,7 +166,7 @@ err_overflow:
 	          THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
 }
 
-INTERN VIRT void *
+INTERN ATTR_BLOCKLIKE_GFP(flags) VIRT void *
 LOCAL_NOTHROW(KCALL LOCAL_untraced_krealloc_in_place)(VIRT void *ptr,
                                                       size_t n_bytes,
                                                       gfp_t flags) {
@@ -220,7 +220,7 @@ err:
 	return NULL;
 }
 
-INTERN VIRT void *
+INTERN ATTR_BLOCKLIKE_GFP(flags) VIRT void *
 LOCAL_NOTHROW(KCALL LOCAL_untraced_krealloc)(VIRT void *ptr,
                                              size_t n_bytes,
                                              gfp_t flags) {
@@ -310,7 +310,7 @@ err:
 #endif /* DEFINE_MALLOC_NX */
 }
 
-INTERN VIRT void *
+INTERN ATTR_BLOCKLIKE_GFP(flags) VIRT void *
 LOCAL_NOTHROW(KCALL LOCAL_untraced_krealign)(VIRT void *ptr, size_t min_alignment,
                                              size_t n_bytes, gfp_t flags) {
 	heapptr_t hptr;
@@ -398,7 +398,7 @@ err:
 #endif /* DEFINE_MALLOC_NX */
 }
 
-INTERN VIRT void *
+INTERN ATTR_BLOCKLIKE_GFP(flags) VIRT void *
 LOCAL_NOTHROW(KCALL LOCAL_untraced_krealign_offset)(VIRT void *ptr, size_t min_alignment,
                                                     ptrdiff_t offset, size_t n_bytes,
                                                     gfp_t flags) {

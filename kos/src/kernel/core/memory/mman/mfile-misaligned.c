@@ -172,7 +172,7 @@ err:
 	return temp;
 }
 
-PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+PRIVATE ATTR_BLOCKLIKE_CC(info) NONNULL((1)) void
 NOTHROW(KCALL misaligned_mfile_v_cc)(struct mfile *__restrict self,
                                      struct ccinfo *__restrict info) {
 	struct misaligned_mfile *me;

@@ -125,24 +125,24 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL slab_ffree)(void *__restrict ptr,
  * In the later case, the caller should fall back to using kmalloc(), or
  * simply call the equivalent `slab_kmalloc*' function, with will do  so
  * automatically. */
-#define DEFINE_SLAB_ALLOCATOR_FUNCTIONS(sz, _)                                                 \
-	FUNDEF NOBLOCK ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL slab_malloc##sz)(gfp_t flags); \
-	FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL slab_kmalloc##sz(gfp_t flags); \
-	FUNDEF ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL slab_kmalloc_nx##sz)(gfp_t flags);
+#define DEFINE_SLAB_ALLOCATOR_FUNCTIONS(sz, _)                                                                           \
+	FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL slab_malloc##sz)(gfp_t flags);         \
+	FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL slab_kmalloc##sz(gfp_t flags); \
+	FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL slab_kmalloc_nx##sz)(gfp_t flags);
 SLAB_FOREACH_SIZE(DEFINE_SLAB_ALLOCATOR_FUNCTIONS, _)
 #undef DEFINE_SLAB_ALLOCATOR_FUNCTIONS
 
 
 /* Slab allocators for dynamic sizes.
  * NOTE: The caller is required to ensure that `num_bytes < CONFIG_KERNEL_SLAB_MAXSIZE' */
-FUNDEF NOBLOCK ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_slab_malloc)(size_t num_bytes, gfp_t flags) ASMNAME("slab_malloc");
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_slab_kmalloc(size_t num_bytes, gfp_t flags) ASMNAME("slab_kmalloc");
-FUNDEF ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) ASMNAME("slab_kmalloc_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_slab_malloc)(size_t num_bytes, gfp_t flags) ASMNAME("slab_malloc");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_slab_kmalloc(size_t num_bytes, gfp_t flags) ASMNAME("slab_kmalloc");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) ASMNAME("slab_kmalloc_nx");
 
 #ifndef __OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS
 FUNDEF ATTR_ERROR("Invalid slab size") void __slab_invalid_size(void);
 
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_MALLOC WUNUSED VIRT void *
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL slab_malloc)(size_t num_bytes, gfp_t flags) {
 	if (__builtin_constant_p(num_bytes)) {
 #define _SLAB_CHECK_SELECT(sz, _) \
@@ -155,7 +155,7 @@ NOTHROW(KCALL slab_malloc)(size_t num_bytes, gfp_t flags) {
 	return __os_slab_malloc(num_bytes, flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
 slab_kmalloc(size_t num_bytes, gfp_t flags) {
 	if (__builtin_constant_p(num_bytes)) {
 #define _SLAB_CHECK_SELECT(sz, _) \
@@ -168,7 +168,7 @@ slab_kmalloc(size_t num_bytes, gfp_t flags) {
 	return __os_slab_kmalloc(num_bytes, flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL ATTR_MALLOC WUNUSED VIRT void *
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) {
 	if (__builtin_constant_p(num_bytes)) {
 #define _SLAB_CHECK_SELECT(sz, _) \
@@ -188,18 +188,18 @@ NOTHROW(KCALL slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) {
 /* Allocate/Reallocate/Free virtual kernel memory.
  * @throw: E_BADALLOC:   Not enough available memory.
  * @throw: E_WOULDBLOCK: The operation would have blocked. (implied) */
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_malloc(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("kmalloc");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_malloc(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("kmalloc");
 #ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_malloc_noslab(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("kmalloc_noslab");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_malloc_noslab(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("kmalloc_noslab");
 #else /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_malloc_noslab(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("kmalloc");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_malloc_noslab(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("kmalloc");
 #endif /* !CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_memalign(size_t min_alignment, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("kmemalign");
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_memalign_offset(size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("kmemalign_offset");
-FUNDEF ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_realloc(VIRT void *ptr, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("krealloc");
-FUNDEF ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_realign(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("krealign");
-FUNDEF ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_realign_offset(VIRT void *ptr, size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("krealign_offset");
-FUNDEF VIRT void *KCALL __os_realloc_in_place(VIRT void *ptr, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("krealloc_in_place");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_memalign(size_t min_alignment, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("kmemalign");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_memalign_offset(size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("kmemalign_offset");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_realloc(VIRT void *ptr, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("krealloc");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_realign(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("krealign");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_realign_offset(VIRT void *ptr, size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("krealign_offset");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) VIRT void *KCALL __os_realloc_in_place(VIRT void *ptr, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("krealloc_in_place");
 FUNDEF NOBLOCK ATTR_PURE WUNUSED size_t NOTHROW(KCALL __os_malloc_usable_size)(VIRT void *ptr) ASMNAME("kmalloc_usable_size");
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL __os_malloc_islocked)(VIRT void *ptr) ASMNAME("kmalloc_islocked");
 #ifndef ____os_free_defined
@@ -207,29 +207,29 @@ FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL __os_malloc_islocked)(VIRT
 FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
 #endif /* !____os_free_defined */
 FUNDEF NOBLOCK void NOTHROW(KCALL __os_ffree)(VIRT void *ptr, gfp_t flags) ASMNAME("kffree");
-FUNDEF ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_malloc_nx)(size_t n_bytes, gfp_t flags) ASMNAME("kmalloc_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_malloc_nx)(size_t n_bytes, gfp_t flags) ASMNAME("kmalloc_nx");
 #ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
-FUNDEF ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_malloc_noslab_nx)(size_t n_bytes, gfp_t flags) ASMNAME("kmalloc_noslab_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_malloc_noslab_nx)(size_t n_bytes, gfp_t flags) ASMNAME("kmalloc_noslab_nx");
 #else /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
-FUNDEF ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_malloc_noslab_nx)(size_t n_bytes, gfp_t flags) ASMNAME("kmalloc_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_malloc_noslab_nx)(size_t n_bytes, gfp_t flags) ASMNAME("kmalloc_nx");
 #endif /* !CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
-FUNDEF ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_memalign_nx)(size_t min_alignment, size_t n_bytes, gfp_t flags) ASMNAME("kmemalign_nx");
-FUNDEF ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_memalign_offset_nx)(size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) ASMNAME("kmemalign_offset_nx");
-FUNDEF WUNUSED VIRT void *NOTHROW(KCALL __os_realloc_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags) ASMNAME("krealloc_nx");
-FUNDEF WUNUSED VIRT void *NOTHROW(KCALL __os_realign_nx)(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags) ASMNAME("krealign_nx");
-FUNDEF WUNUSED VIRT void *NOTHROW(KCALL __os_realign_offset_nx)(VIRT void *ptr, size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) ASMNAME("krealign_offset_nx");
-FUNDEF VIRT void *NOTHROW(KCALL __os_realloc_in_place_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags) ASMNAME("krealloc_in_place_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_memalign_nx)(size_t min_alignment, size_t n_bytes, gfp_t flags) ASMNAME("kmemalign_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_memalign_offset_nx)(size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) ASMNAME("kmemalign_offset_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) WUNUSED VIRT void *NOTHROW(KCALL __os_realloc_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags) ASMNAME("krealloc_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) WUNUSED VIRT void *NOTHROW(KCALL __os_realign_nx)(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags) ASMNAME("krealign_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) WUNUSED VIRT void *NOTHROW(KCALL __os_realign_offset_nx)(VIRT void *ptr, size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) ASMNAME("krealign_offset_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) VIRT void *NOTHROW(KCALL __os_realloc_in_place_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags) ASMNAME("krealloc_in_place_nx");
 
 #ifndef __OMIT_KMALLOC_CONSTANT_P_WRAPPERS
 #ifdef __INTELLISENSE__
-ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL kcalloc(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC);
-ATTR_RETNONNULL WUNUSED VIRT void *KCALL krecalign(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC);
-ATTR_RETNONNULL WUNUSED VIRT void *KCALL krecalloc(VIRT void *ptr, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC);
-VIRT void *KCALL krecalloc_in_place(VIRT void *ptr, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC);
-ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL kcalloc_nx)(size_t n_bytes, gfp_t flags);
-WUNUSED VIRT void *NOTHROW(KCALL krecalign_nx)(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags);
-WUNUSED VIRT void *NOTHROW(KCALL krecalloc_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags);
-VIRT void *NOTHROW(KCALL krecalloc_in_place_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags);
+ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL kcalloc(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC);
+ATTR_BLOCKLIKE_GFP(flags) ATTR_RETNONNULL WUNUSED VIRT void *KCALL krecalign(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC);
+ATTR_BLOCKLIKE_GFP(flags) ATTR_RETNONNULL WUNUSED VIRT void *KCALL krecalloc(VIRT void *ptr, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC);
+ATTR_BLOCKLIKE_GFP(flags) VIRT void *KCALL krecalloc_in_place(VIRT void *ptr, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC);
+ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL kcalloc_nx)(size_t n_bytes, gfp_t flags);
+ATTR_BLOCKLIKE_GFP(flags) WUNUSED VIRT void *NOTHROW(KCALL krecalign_nx)(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags);
+ATTR_BLOCKLIKE_GFP(flags) WUNUSED VIRT void *NOTHROW(KCALL krecalloc_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags);
+ATTR_BLOCKLIKE_GFP(flags) VIRT void *NOTHROW(KCALL krecalloc_in_place_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags);
 #else /* __INTELLISENSE__ */
 #define kcalloc(n_bytes, flags)                          kmalloc(n_bytes, (flags) | GFP_CALLOC)
 #define krecalign(ptr, min_alignment, n_bytes, flags)    krealign(ptr, min_alignment, n_bytes, (flags) | GFP_CALLOC)
@@ -241,7 +241,7 @@ VIRT void *NOTHROW(KCALL krecalloc_in_place_nx)(VIRT void *ptr, size_t n_bytes, 
 #define krecalloc_in_place_nx(ptr, n_bytes, flags)       krealloc_in_place_nx(ptr, n_bytes, (flags) | GFP_CALLOC)
 #endif /* !__INTELLISENSE__ */
 
-FORCELOCAL ATTR_ARTIFICIAL ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
 kmalloc(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) {
 	if (__builtin_constant_p(n_bytes)) {
 #ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
@@ -259,7 +259,7 @@ kmalloc(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) {
 	return __os_malloc(n_bytes, flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
 kmemalign(size_t min_alignment, size_t n_bytes, gfp_t flags)
 		THROWS(E_BADALLOC) {
 	if (__builtin_constant_p(min_alignment) && min_alignment <= HEAP_ALIGNMENT)
@@ -267,7 +267,7 @@ kmemalign(size_t min_alignment, size_t n_bytes, gfp_t flags)
 	return __os_memalign(min_alignment, n_bytes, flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
 kmemalign_offset(size_t min_alignment, ptrdiff_t offset,
                  size_t n_bytes, gfp_t flags)
 		THROWS(E_BADALLOC) {
@@ -276,7 +276,7 @@ kmemalign_offset(size_t min_alignment, ptrdiff_t offset,
 	return __os_memalign_offset(min_alignment, offset, n_bytes, flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL ATTR_RETNONNULL WUNUSED VIRT void *KCALL
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL ATTR_RETNONNULL WUNUSED VIRT void *KCALL
 krealloc(VIRT void *ptr, size_t n_bytes, gfp_t flags)
 		THROWS(E_BADALLOC) {
 	if (__builtin_constant_p(ptr) && ptr == __NULLPTR)
@@ -286,7 +286,7 @@ krealloc(VIRT void *ptr, size_t n_bytes, gfp_t flags)
 	return __os_realloc(ptr, n_bytes, flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL ATTR_RETNONNULL WUNUSED VIRT void *KCALL
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL ATTR_RETNONNULL WUNUSED VIRT void *KCALL
 krealign(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags)
 		THROWS(E_BADALLOC) {
 	if (__builtin_constant_p(min_alignment) && min_alignment <= HEAP_ALIGNMENT)
@@ -298,7 +298,7 @@ krealign(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags)
 	return __os_realign(ptr, min_alignment, n_bytes, flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL ATTR_RETNONNULL WUNUSED VIRT void *KCALL
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL ATTR_RETNONNULL WUNUSED VIRT void *KCALL
 krealign_offset(VIRT void *ptr, size_t min_alignment,
                 ptrdiff_t offset, size_t n_bytes, gfp_t flags)
 		THROWS(E_BADALLOC) {
@@ -311,7 +311,7 @@ krealign_offset(VIRT void *ptr, size_t min_alignment,
 	return __os_realign_offset(ptr, min_alignment, offset, n_bytes, flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL VIRT void *KCALL
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL VIRT void *KCALL
 krealloc_in_place(VIRT void *ptr, size_t n_bytes, gfp_t flags)
 		THROWS(E_BADALLOC) {
 	if (__builtin_constant_p(ptr) && ptr == __NULLPTR)
@@ -358,7 +358,7 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 	}
 }
 
-FORCELOCAL ATTR_ARTIFICIAL ATTR_MALLOC WUNUSED VIRT void *
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL kmalloc_nx)(size_t n_bytes, gfp_t flags) {
 	if (__builtin_constant_p(n_bytes)) {
 #ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
@@ -376,7 +376,7 @@ NOTHROW(KCALL kmalloc_nx)(size_t n_bytes, gfp_t flags) {
 	return __os_malloc_nx(n_bytes, flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL ATTR_MALLOC WUNUSED VIRT void *
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL kmemalign_nx)(size_t min_alignment,
                             size_t n_bytes, gfp_t flags) {
 	if (__builtin_constant_p(min_alignment) && min_alignment <= HEAP_ALIGNMENT)
@@ -384,7 +384,7 @@ NOTHROW(KCALL kmemalign_nx)(size_t min_alignment,
 	return __os_memalign_nx(min_alignment, n_bytes, flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL ATTR_MALLOC WUNUSED VIRT void *
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL kmemalign_offset_nx)(size_t min_alignment, ptrdiff_t offset,
                                    size_t n_bytes, gfp_t flags) {
 	if (__builtin_constant_p(offset) && offset == 0)
@@ -392,7 +392,7 @@ NOTHROW(KCALL kmemalign_offset_nx)(size_t min_alignment, ptrdiff_t offset,
 	return __os_memalign_offset_nx(min_alignment, offset, n_bytes, flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED VIRT void *
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL WUNUSED VIRT void *
 NOTHROW(KCALL krealloc_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags) {
 	if (__builtin_constant_p(ptr) && ptr == __NULLPTR)
 		return kmalloc_nx(n_bytes, flags);
@@ -401,7 +401,7 @@ NOTHROW(KCALL krealloc_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags) {
 	return __os_realloc_nx(ptr, n_bytes, flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED VIRT void *
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL WUNUSED VIRT void *
 NOTHROW(KCALL krealign_nx)(VIRT void *ptr, size_t min_alignment,
                            size_t n_bytes, gfp_t flags) {
 	if (__builtin_constant_p(min_alignment) && min_alignment <= HEAP_ALIGNMENT)
@@ -413,7 +413,7 @@ NOTHROW(KCALL krealign_nx)(VIRT void *ptr, size_t min_alignment,
 	return __os_realign_nx(ptr, min_alignment, n_bytes, flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED VIRT void *
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL WUNUSED VIRT void *
 NOTHROW(KCALL krealign_offset_nx)(VIRT void *ptr, size_t min_alignment,
                                   ptrdiff_t offset, size_t n_bytes, gfp_t flags) {
 	if (__builtin_constant_p(offset) && offset == 0)
@@ -425,7 +425,7 @@ NOTHROW(KCALL krealign_offset_nx)(VIRT void *ptr, size_t min_alignment,
 	return __os_realign_offset_nx(ptr, min_alignment, offset, n_bytes, flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL VIRT void *
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL VIRT void *
 NOTHROW(KCALL krealloc_in_place_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags) {
 	if (__builtin_constant_p(ptr) && ptr == __NULLPTR)
 		return kmalloc_nx(n_bytes, flags);
@@ -459,13 +459,13 @@ DECL_BEGIN
  *                     - GFP_INHERIT: Passed along to underlying allocators.
  * @param: tb_skip:   How may traceback entries to skip when creating a traceback.
  * @return: * : Always re-returns `base' */
-FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) ATTR_RETNONNULL void *KCALL
+FUNDEF ATTR_BLOCKLIKE_GFP(gfp) ATTR_RETNONNULL void *KCALL
 kmalloc_trace(void *base, size_t num_bytes, gfp_t gfp, unsigned int tb_skip DFL(0))
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 /* Same as `kmalloc_trace()', but don't throw an exception. If the operation
  * fails, rather than re-returning `base', `NULL' will be returned  instead. */
-FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) WUNUSED void *
+FUNDEF ATTR_BLOCKLIKE_GFP(gfp) WUNUSED void *
 NOTHROW(KCALL kmalloc_trace_nx)(void *base, size_t num_bytes,
                                 gfp_t gfp, unsigned int tb_skip DFL(0));
 

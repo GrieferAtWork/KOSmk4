@@ -22,6 +22,8 @@
 
 #include <kernel/compiler.h>
 
+#include <hybrid/typecore.h>
+
 DECL_BEGIN
 
 //#define CONFIG_NO_KERNEL_DEBUG_HEAP             1
@@ -209,10 +211,7 @@ DECL_BEGIN
 /* Kernel-space dynamic memory management. */
 #define __SIZEOF_GFP_T__ __SIZEOF_INT__
 #ifdef __CC__
-#ifndef __gfp_t_defined
-#define __gfp_t_defined
-typedef unsigned int gfp_t;
-#endif /* !__gfp_t_defined */
+typedef __UINT32_TYPE__ gfp_t;
 #endif /* __CC__ */
 
 #define __GFP_HEAPMASK  0x0001
@@ -318,6 +317,9 @@ typedef unsigned int gfp_t;
 #endif /* !CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 
 
+/* Attribute for functions whose blocking-behavior depends on `arg' */
+#define ATTR_BLOCKLIKE_GFP(arg) BLOCKING_IF((arg) & GFP_BLOCKING) NOBLOCK_IF((arg) & GFP_ATOMIC)
+#define ATTR_BLOCKLIKE_CC(arg)  ATTR_BLOCKLIKE_GFP((arg)->ci_gfp)
 
 
 #ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP

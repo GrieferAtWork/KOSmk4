@@ -1564,6 +1564,9 @@
 #define SECTION_EXCEPT_RODATA
 #define SECTION_EXCEPT_STRING
 
+#define ATTR_BLOCKLIKE_GFP(x)
+#define ATTR_BLOCKLIKE_CC(x)
+
 #define CALLBACK_LIST(p) callback_list< p >
 
 #define DEFINE_SYSCALL0(return_type,name)                                     return_type sys_##name(void)

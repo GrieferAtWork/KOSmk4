@@ -2341,7 +2341,7 @@ NOTHROW(FCALL mpart_unlock_and_writeback_range_nx)(struct mpart *__restrict self
  * accessed.
  * @return: true:  Success
  * @return: false: Failed to unmap memory */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1)) bool
+PRIVATE ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL mpart_unmap_for_void)(struct mpart *__restrict self,
                                     mpart_reladdr_t start,
                                     mpart_reladdr_t end) {
@@ -2414,7 +2414,7 @@ NOTHROW(FCALL mpart_unmap_for_void)(struct mpart *__restrict self,
  *       on the task of syncing changes before setting the block status
  *       to `MPART_BLOCK_ST_LOAD'
  * @return: * : One of `MPART_FIND_TRIMABLE_RANGE_ST_*' */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2, 3)) unsigned int
+PRIVATE ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2, 3)) unsigned int
 NOTHROW(FCALL mpart_find_trimable_range)(struct mpart *__restrict self,
                                          struct mpart_trim_data *__restrict data,
                                          struct mpart_trim_range *__restrict result,
@@ -2715,7 +2715,7 @@ again_find_unchanged:
 
 /* Wrapper for `mpart_find_trimable_range()' that enforces page+block-alignment in
  * `result', whereas `mpart_find_trimable_range()' only enforces  block-alignment. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2, 3)) unsigned int
+PRIVATE ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2, 3)) unsigned int
 NOTHROW(FCALL mpart_find_trimable_pagerange)(struct mpart *__restrict self,
                                              struct mpart_trim_data *__restrict data,
                                              struct mpart_trim_range *__restrict result,
@@ -2738,7 +2738,7 @@ again:
 }
 
 /* Ensure that `data->mtd_parts[index]' has been allocated */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+PRIVATE ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_data_require_part)(struct mpart *__restrict self,
                                             struct mpart_trim_data *__restrict data,
                                             size_t index) {
@@ -2799,7 +2799,7 @@ NOTHROW(FCALL mpart_trim_data_require_part)(struct mpart *__restrict self,
 }
 
 /* Ensure that `data->mtd_metas[index]' has been allocated */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+PRIVATE ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_data_require_meta)(struct mpart *__restrict self,
                                             struct mpart_trim_data *__restrict data,
                                             size_t index) {
@@ -2825,7 +2825,7 @@ NOTHROW(FCALL mpart_trim_data_require_meta)(struct mpart *__restrict self,
 	return MPART_NXOP_ST_SUCCESS;
 }
 
-PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+PRIVATE ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_data_require_part0)(struct mpart *__restrict self,
                                              struct mpart_trim_data *__restrict data) {
 	unsigned int result = MPART_NXOP_ST_SUCCESS;
@@ -2840,7 +2840,7 @@ NOTHROW(FCALL mpart_trim_data_require_part0)(struct mpart *__restrict self,
 	return result;
 }
 
-PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+PRIVATE ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_data_require_meta0)(struct mpart *__restrict self,
                                              struct mpart_trim_data *__restrict data) {
 	unsigned int result = MPART_NXOP_ST_SUCCESS;
@@ -2858,7 +2858,7 @@ NOTHROW(FCALL mpart_trim_data_require_meta0)(struct mpart *__restrict self,
 
 
 /* Ensure that `data->mtd_blkst_ptr' can represent at least `block_count' blocks */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) NONNULL((1, 2)) unsigned int
+PRIVATE ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_data_require_blkst)(struct mpart *__restrict self,
                                              struct mpart_trim_data *__restrict data,
                                              size_t block_count) {
@@ -2889,7 +2889,7 @@ NOTHROW(FCALL mpart_trim_data_require_blkst)(struct mpart *__restrict self,
 }
 
 /* Ensure that `data->mtd_node' has been allocated */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+PRIVATE ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_data_require_node)(struct mpart *__restrict self,
                                             struct mpart_trim_data *__restrict data) {
 	if (!data->mtd_node) {
@@ -2944,7 +2944,7 @@ NOTHROW(FCALL mpart_trim_data_require_node)(struct mpart *__restrict self,
 }
 
 /* Ensure that `data->mtd_blkst_ptr' can represent at least `block_count' blocks */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) NONNULL((1, 2)) unsigned int
+PRIVATE ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_data_require_chunkvec)(struct mpart *__restrict self,
                                                 struct mpart_trim_data *__restrict data,
                                                 size_t chunk_count) {
@@ -2982,7 +2982,7 @@ NOTHROW(FCALL mpart_trim_data_require_chunkvec)(struct mpart *__restrict self,
  *                                 trimable ranges.
  * @return: MPART_NXOP_ST_RETRY:   Failed (locks were released)
  * @return: MPART_NXOP_ST_ERROR:   Non-recoverable error (locks were released) */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2, 3)) unsigned int
+PRIVATE ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2, 3)) unsigned int
 NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
                                              struct mpart_trim_data *__restrict data,
                                              struct mpart_trim_range *__restrict range) {
@@ -3604,7 +3604,7 @@ movedown_self__mp_blkst_ptr:
  * Indicates that it's impossible to split nodes because of `MNODE_F_NOSPLIT' */
 #define MPART_SPLIT_NODES_IMPOSSIBLE 3
 
-PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2, 3)) unsigned int
+PRIVATE ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2, 3)) unsigned int
 NOTHROW(FCALL mnode_split_after_or_unlock)(struct mpart *__restrict self,
                                            struct mpart_trim_data *__restrict data,
                                            struct mnode *__restrict lonode,
@@ -3693,7 +3693,7 @@ NOTHROW(FCALL mnode_split_after_or_unlock)(struct mpart *__restrict self,
 
 /* Ensure that `mnode's are mapped in such a way that they cross the `addr'. If such
  * an `mnode' is found, it is split  and replaced with 2 equivalent, smaller  nodes. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+PRIVATE ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_split_nodes_at_for_void_or_unlock)(struct mpart *__restrict self,
                                                        struct mpart_trim_data *__restrict data,
                                                        PAGEDIR_PAGEALIGNED mpart_reladdr_t addr) {
@@ -3731,7 +3731,7 @@ NOTHROW(FCALL mpart_split_nodes_at_for_void_or_unlock)(struct mpart *__restrict 
 
 /* Ensure  that `mnode's are mapped in such a way that they cross the start/end of `range'
  * If such an `mnode' is found, it is split and replaced with 2 equivalent, smaller nodes. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2, 3)) unsigned int
+PRIVATE ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2, 3)) unsigned int
 NOTHROW(FCALL mpart_split_nodes_for_void_or_unlock)(struct mpart *__restrict self,
                                                     struct mpart_trim_data *__restrict data,
                                                     struct mpart_trim_range const *__restrict range) {
@@ -3749,7 +3749,7 @@ done:
 
 
 /* Same as `mpart_trim_or_unlock()', but all relevant locks are held by the caller. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+PRIVATE ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_locked_with_all_locks_or_unlock)(struct mpart *__restrict self,
                                                           struct mpart_trim_data *__restrict data) {
 	mpart_reladdr_t minaddr = data->mtd_rstart;
@@ -3871,7 +3871,7 @@ done:
 
 /* Same as `mpart_trim_or_unlock()', but the caller is holding a lock
  * to `self->mp_meta' (if non-NULL) and `self->mp_file' (if not anon) */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+PRIVATE ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_locked_ftx_file_or_unlock)(struct mpart *__restrict self,
                                                     struct mpart_trim_data *__restrict data) {
 #define LOCAL_unlock_all()                                                   \
@@ -3940,7 +3940,7 @@ done:
 }
 
 /* Same as `mpart_trim_or_unlock()', but the caller is holding a lock to `self->mp_meta' (if non-NULL) */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+PRIVATE ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_locked_ftx_or_unlock)(struct mpart *__restrict self,
                                                struct mpart_trim_data *__restrict data) {
 #define LOCAL_unlock_all()                                                   \
@@ -3993,7 +3993,7 @@ done:
  * @return: MPART_NXOP_ST_SUCCESS: Success (all locks were kept)
  * @return: MPART_NXOP_ST_RETRY:   Failed (`data->mtd_unlock' and `mpart_lock_release(self)' was released)
  * @return: MPART_NXOP_ST_ERROR:   Non-recoverable error (OOM or yield-failure). Don't try again. */
-PUBLIC BLOCKING_IF(ccinfo_blocking(data->mtd_ccinfo)) NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+PUBLIC ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_locked_or_unlock_nx)(struct mpart *__restrict self,
                                               struct mpart_trim_data *__restrict data) {
 	unsigned int result = MPART_NXOP_ST_SUCCESS;
@@ -4066,7 +4066,7 @@ done:
 }
 
 /* Same as `mpart_trim_locked_or_unlock_nx()', but automatically manages `mpart_lock_acquire(self)' */
-PUBLIC BLOCKING_IF(ccinfo_blocking(data->mtd_ccinfo)) NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+PUBLIC ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_or_unlock_nx)(struct mpart *__restrict self,
                                        struct mpart_trim_data *__restrict data) {
 	unsigned int result = MPART_NXOP_ST_SUCCESS;
@@ -4117,7 +4117,7 @@ NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self)
  * @return: MPART_NXOP_ST_SUCCESS: Success (all locks were kept)
  * @return: MPART_NXOP_ST_RETRY:   Failed (`data->mtd_unlock' and `mpart_lock_release(self)' was released)
  * @return: MPART_NXOP_ST_ERROR:   Non-recoverable error (OOM or yield-failure). Don't try again. */
-PUBLIC NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+PUBLIC ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_locked_or_unlock_nx)(struct mpart *__restrict self,
                                               struct mpart_trim_data *__restrict data) {
 	/* Trimming is disabled. */

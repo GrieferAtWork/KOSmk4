@@ -192,30 +192,30 @@ DATDEF struct mfile mfile_dbgheap;
 
 
 
-FUNDEF WUNUSED NONNULL((1)) heapptr_t KCALL __os_heap_alloc_untraced(struct heap *__restrict self, size_t num_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("heap_alloc_untraced");
-FUNDEF WUNUSED NONNULL((1)) heapptr_t KCALL __os_heap_align_untraced(struct heap *__restrict self, size_t min_alignment, ptrdiff_t offset, size_t num_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("heap_align_untraced");
-FUNDEF WUNUSED NONNULL((1)) size_t KCALL __os_heap_allat_untraced(struct heap *__restrict self, VIRT void *__restrict ptr, size_t num_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("heap_allat_untraced");
-FUNDEF WUNUSED NONNULL((1)) heapptr_t KCALL __os_heap_realloc_untraced(struct heap *__restrict self, VIRT void *old_ptr, size_t old_bytes, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags) THROWS(E_BADALLOC) ASMNAME("heap_realloc_untraced");
-FUNDEF WUNUSED NONNULL((1)) heapptr_t KCALL __os_heap_realign_untraced(struct heap *__restrict self, VIRT void *old_ptr, size_t old_bytes, size_t min_alignment, ptrdiff_t offset, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags) THROWS(E_BADALLOC) ASMNAME("heap_realign_untraced");
-FUNDEF WUNUSED NONNULL((1)) heapptr_t KCALL __os_heap_alloc(struct heap *__restrict self, size_t num_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("heap_alloc");
-FUNDEF WUNUSED NONNULL((1)) heapptr_t KCALL __os_heap_align(struct heap *__restrict self, size_t min_alignment, ptrdiff_t offset, size_t num_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("heap_align");
-FUNDEF WUNUSED NONNULL((1)) size_t KCALL __os_heap_allat(struct heap *__restrict self, VIRT void *__restrict ptr, size_t num_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("heap_allat");
-FUNDEF WUNUSED NONNULL((1)) heapptr_t KCALL __os_heap_realloc(struct heap *__restrict self, VIRT void *old_ptr, size_t old_bytes, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags) THROWS(E_BADALLOC) ASMNAME("heap_realloc");
-FUNDEF WUNUSED NONNULL((1)) heapptr_t KCALL __os_heap_realign(struct heap *__restrict self, VIRT void *old_ptr, size_t old_bytes, size_t min_alignment, ptrdiff_t offset, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags) THROWS(E_BADALLOC) ASMNAME("heap_realign");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) WUNUSED NONNULL((1)) heapptr_t KCALL __os_heap_alloc_untraced(struct heap *__restrict self, size_t num_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("heap_alloc_untraced");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) WUNUSED NONNULL((1)) heapptr_t KCALL __os_heap_align_untraced(struct heap *__restrict self, size_t min_alignment, ptrdiff_t offset, size_t num_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("heap_align_untraced");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) WUNUSED NONNULL((1)) size_t KCALL __os_heap_allat_untraced(struct heap *__restrict self, VIRT void *__restrict ptr, size_t num_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("heap_allat_untraced");
+FUNDEF ATTR_BLOCKLIKE_GFP(alloc_flags) WUNUSED NONNULL((1)) heapptr_t KCALL __os_heap_realloc_untraced(struct heap *__restrict self, VIRT void *old_ptr, size_t old_bytes, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags) THROWS(E_BADALLOC) ASMNAME("heap_realloc_untraced");
+FUNDEF ATTR_BLOCKLIKE_GFP(alloc_flags) WUNUSED NONNULL((1)) heapptr_t KCALL __os_heap_realign_untraced(struct heap *__restrict self, VIRT void *old_ptr, size_t old_bytes, size_t min_alignment, ptrdiff_t offset, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags) THROWS(E_BADALLOC) ASMNAME("heap_realign_untraced");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) WUNUSED NONNULL((1)) heapptr_t KCALL __os_heap_alloc(struct heap *__restrict self, size_t num_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("heap_alloc");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) WUNUSED NONNULL((1)) heapptr_t KCALL __os_heap_align(struct heap *__restrict self, size_t min_alignment, ptrdiff_t offset, size_t num_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("heap_align");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) WUNUSED NONNULL((1)) size_t KCALL __os_heap_allat(struct heap *__restrict self, VIRT void *__restrict ptr, size_t num_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("heap_allat");
+FUNDEF ATTR_BLOCKLIKE_GFP(alloc_flags) WUNUSED NONNULL((1)) heapptr_t KCALL __os_heap_realloc(struct heap *__restrict self, VIRT void *old_ptr, size_t old_bytes, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags) THROWS(E_BADALLOC) ASMNAME("heap_realloc");
+FUNDEF ATTR_BLOCKLIKE_GFP(alloc_flags) WUNUSED NONNULL((1)) heapptr_t KCALL __os_heap_realign(struct heap *__restrict self, VIRT void *old_ptr, size_t old_bytes, size_t min_alignment, ptrdiff_t offset, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags) THROWS(E_BADALLOC) ASMNAME("heap_realign");
 
 /* No-throw variants of regular heap allocation functions.
  * These behave identical  to the  regular function,  however where  those would  have
  * thrown an error, these will instead return ZERO(0) or a heapptr with `hp_siz == 0'. */
-FUNDEF WUNUSED NONNULL((1)) heapptr_t NOTHROW(KCALL __os_heap_alloc_untraced_nx)(struct heap *__restrict self, size_t num_bytes, gfp_t flags) ASMNAME("heap_alloc_untraced_nx");
-FUNDEF WUNUSED NONNULL((1)) heapptr_t NOTHROW(KCALL __os_heap_align_untraced_nx)(struct heap *__restrict self, size_t min_alignment, ptrdiff_t offset, size_t num_bytes, gfp_t flags) ASMNAME("heap_align_untraced_nx");
-FUNDEF WUNUSED NONNULL((1)) size_t NOTHROW(KCALL __os_heap_allat_untraced_nx)(struct heap *__restrict self, VIRT void *__restrict ptr, size_t num_bytes, gfp_t flags) ASMNAME("heap_allat_untraced_nx");
-FUNDEF WUNUSED NONNULL((1)) heapptr_t NOTHROW(KCALL __os_heap_realloc_untraced_nx)(struct heap *__restrict self, VIRT void *old_ptr, size_t old_bytes, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags) ASMNAME("heap_realloc_untraced_nx");
-FUNDEF WUNUSED NONNULL((1)) heapptr_t NOTHROW(KCALL __os_heap_realign_untraced_nx)(struct heap *__restrict self, VIRT void *old_ptr, size_t old_bytes, size_t min_alignment, ptrdiff_t offset, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags) ASMNAME("heap_realign_untraced_nx");
-FUNDEF WUNUSED NONNULL((1)) heapptr_t NOTHROW(KCALL __os_heap_alloc_nx)(struct heap *__restrict self, size_t num_bytes, gfp_t flags) ASMNAME("heap_alloc_nx");
-FUNDEF WUNUSED NONNULL((1)) heapptr_t NOTHROW(KCALL __os_heap_align_nx)(struct heap *__restrict self, size_t min_alignment, ptrdiff_t offset, size_t num_bytes, gfp_t flags) ASMNAME("heap_align_nx");
-FUNDEF WUNUSED NONNULL((1)) size_t NOTHROW(KCALL __os_heap_allat_nx)(struct heap *__restrict self, VIRT void *__restrict ptr, size_t num_bytes, gfp_t flags) ASMNAME("heap_allat_nx");
-FUNDEF WUNUSED NONNULL((1)) heapptr_t NOTHROW(KCALL __os_heap_realloc_nx)(struct heap *__restrict self, VIRT void *old_ptr, size_t old_bytes, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags) ASMNAME("heap_realloc_nx");
-FUNDEF WUNUSED NONNULL((1)) heapptr_t NOTHROW(KCALL __os_heap_realign_nx)(struct heap *__restrict self, VIRT void *old_ptr, size_t old_bytes, size_t min_alignment, ptrdiff_t offset, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags) ASMNAME("heap_realign_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) WUNUSED NONNULL((1)) heapptr_t NOTHROW(KCALL __os_heap_alloc_untraced_nx)(struct heap *__restrict self, size_t num_bytes, gfp_t flags) ASMNAME("heap_alloc_untraced_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) WUNUSED NONNULL((1)) heapptr_t NOTHROW(KCALL __os_heap_align_untraced_nx)(struct heap *__restrict self, size_t min_alignment, ptrdiff_t offset, size_t num_bytes, gfp_t flags) ASMNAME("heap_align_untraced_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) WUNUSED NONNULL((1)) size_t NOTHROW(KCALL __os_heap_allat_untraced_nx)(struct heap *__restrict self, VIRT void *__restrict ptr, size_t num_bytes, gfp_t flags) ASMNAME("heap_allat_untraced_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(alloc_flags) WUNUSED NONNULL((1)) heapptr_t NOTHROW(KCALL __os_heap_realloc_untraced_nx)(struct heap *__restrict self, VIRT void *old_ptr, size_t old_bytes, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags) ASMNAME("heap_realloc_untraced_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(alloc_flags) WUNUSED NONNULL((1)) heapptr_t NOTHROW(KCALL __os_heap_realign_untraced_nx)(struct heap *__restrict self, VIRT void *old_ptr, size_t old_bytes, size_t min_alignment, ptrdiff_t offset, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags) ASMNAME("heap_realign_untraced_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) WUNUSED NONNULL((1)) heapptr_t NOTHROW(KCALL __os_heap_alloc_nx)(struct heap *__restrict self, size_t num_bytes, gfp_t flags) ASMNAME("heap_alloc_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) WUNUSED NONNULL((1)) heapptr_t NOTHROW(KCALL __os_heap_align_nx)(struct heap *__restrict self, size_t min_alignment, ptrdiff_t offset, size_t num_bytes, gfp_t flags) ASMNAME("heap_align_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) WUNUSED NONNULL((1)) size_t NOTHROW(KCALL __os_heap_allat_nx)(struct heap *__restrict self, VIRT void *__restrict ptr, size_t num_bytes, gfp_t flags) ASMNAME("heap_allat_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(alloc_flags) WUNUSED NONNULL((1)) heapptr_t NOTHROW(KCALL __os_heap_realloc_nx)(struct heap *__restrict self, VIRT void *old_ptr, size_t old_bytes, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags) ASMNAME("heap_realloc_nx");
+FUNDEF ATTR_BLOCKLIKE_GFP(alloc_flags) WUNUSED NONNULL((1)) heapptr_t NOTHROW(KCALL __os_heap_realign_nx)(struct heap *__restrict self, VIRT void *old_ptr, size_t old_bytes, size_t min_alignment, ptrdiff_t offset, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags) ASMNAME("heap_realign_nx");
 
 #ifndef __OMIT_HEAP_CONSTANT_P_WRAPPERS
 /* Allocate  at  least   `num_bytes'  of  dynamic   memory,
@@ -260,7 +260,7 @@ FUNDEF WUNUSED NONNULL((1)) heapptr_t NOTHROW(KCALL __os_heap_realign_nx)(struct
  * @throw: E_WOULDBLOCK: `GFP_NOMAP' was specified and new memory would have had to be mapped. (implied)
  * @throw: E_WOULDBLOCK: `GFP_ATOMIC' was specified and a lock could not be acquired immediately. (implied) */
 #ifndef __OMIT_HEAP_TRACED_CONSTANT_P_WRAPPERS
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t KCALL
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t KCALL
 heap_alloc(struct heap *__restrict self, size_t num_bytes, gfp_t flags)
 		THROWS(E_BADALLOC) {
 	if (__builtin_constant_p(num_bytes))
@@ -270,7 +270,7 @@ heap_alloc(struct heap *__restrict self, size_t num_bytes, gfp_t flags)
 	return __os_heap_alloc(self, num_bytes, flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t KCALL
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t KCALL
 heap_align(struct heap *__restrict self, size_t min_alignment,
            ptrdiff_t offset, size_t num_bytes, gfp_t flags)
 		THROWS(E_BADALLOC) {
@@ -285,7 +285,7 @@ heap_align(struct heap *__restrict self, size_t min_alignment,
 }
 
 /* Upon failure, `heapptr_getsiz(return) == 0' */
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t
 NOTHROW(KCALL heap_alloc_nx)(struct heap *__restrict self, size_t num_bytes, gfp_t flags) {
 	if (__builtin_constant_p(num_bytes))
 		return __os_heap_alloc_nx(self,
@@ -295,7 +295,7 @@ NOTHROW(KCALL heap_alloc_nx)(struct heap *__restrict self, size_t num_bytes, gfp
 }
 
 /* Upon failure, `heapptr_getsiz(return) == 0' */
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t
 NOTHROW(KCALL heap_align_nx)(struct heap *__restrict self,
                               size_t min_alignment, ptrdiff_t offset,
                               size_t num_bytes, gfp_t flags) {
@@ -310,7 +310,7 @@ NOTHROW(KCALL heap_align_nx)(struct heap *__restrict self,
 }
 #endif /* !__OMIT_HEAP_TRACED_CONSTANT_P_WRAPPERS */
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t KCALL
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t KCALL
 heap_alloc_untraced(struct heap *__restrict self, size_t num_bytes, gfp_t flags)
 		THROWS(E_BADALLOC) {
 	if (__builtin_constant_p(num_bytes))
@@ -320,7 +320,7 @@ heap_alloc_untraced(struct heap *__restrict self, size_t num_bytes, gfp_t flags)
 	return __os_heap_alloc_untraced(self, num_bytes, flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t KCALL
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t KCALL
 heap_align_untraced(struct heap *__restrict self, size_t min_alignment,
                     ptrdiff_t offset, size_t num_bytes, gfp_t flags)
 		THROWS(E_BADALLOC) {
@@ -335,7 +335,7 @@ heap_align_untraced(struct heap *__restrict self, size_t min_alignment,
 }
 
 /* Upon failure, `heapptr_getsiz(return) == 0' */
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t
 NOTHROW(KCALL heap_alloc_untraced_nx)(struct heap *__restrict self,
                                       size_t num_bytes, gfp_t flags) {
 	if (__builtin_constant_p(num_bytes))
@@ -346,7 +346,7 @@ NOTHROW(KCALL heap_alloc_untraced_nx)(struct heap *__restrict self,
 }
 
 /* Upon failure, `heapptr_getsiz(return) == 0' */
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t
 NOTHROW(KCALL heap_align_untraced_nx)(struct heap *__restrict self,
                                       size_t min_alignment, ptrdiff_t offset,
                                       size_t num_bytes, gfp_t flags) {
@@ -377,7 +377,7 @@ NOTHROW(KCALL heap_align_untraced_nx)(struct heap *__restrict self,
  * @throw: E_WOULDBLOCK: `GFP_NOMAP' was specified and new memory would have had to be mapped. (implied)
  * @throw: E_WOULDBLOCK: `GFP_ATOMIC' was specified and a lock could not be acquired immediately. (implied) */
 #ifndef __OMIT_HEAP_TRACED_CONSTANT_P_WRAPPERS
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) size_t KCALL
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) size_t KCALL
 heap_allat(struct heap *__restrict self,
            VIRT void *__restrict ptr,
            size_t num_bytes, gfp_t flags)
@@ -389,7 +389,7 @@ heap_allat(struct heap *__restrict self,
 	return __os_heap_allat(self, ptr, num_bytes, flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) size_t
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) size_t
 NOTHROW(KCALL heap_allat_nx)(struct heap *__restrict self, VIRT void *__restrict ptr,
                              size_t num_bytes, gfp_t flags) {
 	if (__builtin_constant_p(num_bytes))
@@ -400,7 +400,7 @@ NOTHROW(KCALL heap_allat_nx)(struct heap *__restrict self, VIRT void *__restrict
 }
 #endif /* !__OMIT_HEAP_TRACED_CONSTANT_P_WRAPPERS */
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) size_t KCALL
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) size_t KCALL
 heap_allat_untraced(struct heap *__restrict self,
                     VIRT void *__restrict ptr,
                     size_t num_bytes, gfp_t flags)
@@ -412,7 +412,7 @@ heap_allat_untraced(struct heap *__restrict self,
 	return __os_heap_allat_untraced(self, ptr, num_bytes, flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) size_t
+FORCELOCAL ATTR_BLOCKLIKE_GFP(flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) size_t
 NOTHROW(KCALL heap_allat_untraced_nx)(struct heap *__restrict self,
                                       VIRT void *__restrict ptr,
                                       size_t num_bytes, gfp_t flags) {
@@ -461,7 +461,7 @@ NOTHROW(KCALL heap_allat_untraced_nx)(struct heap *__restrict self,
  * @throw: E_WOULDBLOCK: `GFP_NOMAP' was specified and new memory would have had to be mapped. (implied)
  * @throw: E_WOULDBLOCK: `GFP_ATOMIC' was specified and a lock could not be acquired immediately. (implied) */
 #ifndef __OMIT_HEAP_TRACED_CONSTANT_P_WRAPPERS
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t KCALL
+FORCELOCAL ATTR_BLOCKLIKE_GFP(alloc_flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t KCALL
 heap_realloc(struct heap *__restrict self,
              VIRT void *old_ptr, size_t old_bytes,
              size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags)
@@ -478,7 +478,7 @@ heap_realloc(struct heap *__restrict self,
 	                         alloc_flags, free_flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t KCALL
+FORCELOCAL ATTR_BLOCKLIKE_GFP(alloc_flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t KCALL
 heap_realign(struct heap *__restrict self,
              VIRT void *old_ptr, size_t old_bytes,
              size_t min_alignment, ptrdiff_t offset,
@@ -500,7 +500,7 @@ heap_realign(struct heap *__restrict self,
 }
 
 /* Upon failure, `heapptr_getsiz(return) == 0' */
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t
+FORCELOCAL ATTR_BLOCKLIKE_GFP(alloc_flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t
 NOTHROW(KCALL heap_realloc_nx)(struct heap *__restrict self,
                                VIRT void *old_ptr, size_t old_bytes,
                                size_t new_bytes, gfp_t alloc_flags,
@@ -518,7 +518,7 @@ NOTHROW(KCALL heap_realloc_nx)(struct heap *__restrict self,
 }
 
 /* Upon failure, `heapptr_getsiz(return) == 0' */
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t
+FORCELOCAL ATTR_BLOCKLIKE_GFP(alloc_flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t
 NOTHROW(KCALL heap_realign_nx)(struct heap *__restrict self,
                                VIRT void *old_ptr, size_t old_bytes,
                                size_t min_alignment, ptrdiff_t offset,
@@ -540,7 +540,7 @@ NOTHROW(KCALL heap_realign_nx)(struct heap *__restrict self,
 }
 #endif /* !__OMIT_HEAP_TRACED_CONSTANT_P_WRAPPERS */
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t KCALL
+FORCELOCAL ATTR_BLOCKLIKE_GFP(alloc_flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t KCALL
 heap_realloc_untraced(struct heap *__restrict self,
                       VIRT void *old_ptr, size_t old_bytes,
                       size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags)
@@ -557,7 +557,7 @@ heap_realloc_untraced(struct heap *__restrict self,
 	                                  alloc_flags, free_flags);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t KCALL
+FORCELOCAL ATTR_BLOCKLIKE_GFP(alloc_flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t KCALL
 heap_realign_untraced(struct heap *__restrict self,
                       VIRT void *old_ptr, size_t old_bytes,
                       size_t min_alignment, ptrdiff_t offset,
@@ -579,7 +579,7 @@ heap_realign_untraced(struct heap *__restrict self,
 }
 
 /* Upon failure, `heapptr_getsiz(return) == 0' */
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t
+FORCELOCAL ATTR_BLOCKLIKE_GFP(alloc_flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t
 NOTHROW(KCALL heap_realloc_untraced_nx)(struct heap *__restrict self,
                                         VIRT void *old_ptr, size_t old_bytes,
                                         size_t new_bytes, gfp_t alloc_flags,
@@ -597,7 +597,7 @@ NOTHROW(KCALL heap_realloc_untraced_nx)(struct heap *__restrict self,
 }
 
 /* Upon failure, `heapptr_getsiz(return) == 0' */
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t
+FORCELOCAL ATTR_BLOCKLIKE_GFP(alloc_flags) ATTR_ARTIFICIAL WUNUSED NONNULL((1)) heapptr_t
 NOTHROW(KCALL heap_realign_untraced_nx)(struct heap *__restrict self,
                                         VIRT void *old_ptr, size_t old_bytes,
                                         size_t min_alignment, ptrdiff_t offset,
@@ -645,10 +645,10 @@ NOTHROW(KCALL heap_free_untraced)(struct heap *__restrict self,
  * This function is intended to be used to free unused trailing memory
  * of some data structure, without  running the risk of  re-allocating
  * that structure to another memory location. */
-FUNDEF WUNUSED NONNULL((1)) size_t
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) size_t
 NOTHROW(KCALL heap_truncate)(struct heap *__restrict self, void *base,
                              size_t old_size, size_t new_size, gfp_t free_flags);
-FUNDEF WUNUSED NONNULL((1)) size_t
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) size_t
 NOTHROW(KCALL heap_truncate_untraced)(struct heap *__restrict self, void *base,
                                       size_t old_size, size_t new_size, gfp_t free_flags);
 

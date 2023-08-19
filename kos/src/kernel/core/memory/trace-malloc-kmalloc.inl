@@ -101,14 +101,14 @@ DECL_BEGIN
 	LOCAL_heap_align_untraced(&kernel_heaps[(flags) & __GFP_HEAPMASK], \
 	                          min_alignment,                           \
 	                          offset +                                 \
-	                          CONFIG_KERNEL_MALL_HEAD_SIZE,                   \
+	                          CONFIG_KERNEL_MALL_HEAD_SIZE,            \
 	                          n_bytes,                                 \
 	                          flags)
 #else /* LOCAL_HAVE_offset */
 #define MY_heap_alloc_untraced(n_bytes, flags)                         \
 	LOCAL_heap_align_untraced(&kernel_heaps[(flags) & __GFP_HEAPMASK], \
 	                          min_alignment,                           \
-	                          CONFIG_KERNEL_MALL_HEAD_SIZE,                   \
+	                          CONFIG_KERNEL_MALL_HEAD_SIZE,            \
 	                          n_bytes,                                 \
 	                          flags)
 #endif /* !LOCAL_HAVE_offset */
@@ -139,7 +139,7 @@ DECL_BEGIN
 
 /* kmalloc(...) */
 #ifdef LOCAL_METHOD_malloc
-PUBLIC ATTR_NOINLINE ATTR_MALLOC WUNUSED void *
+PUBLIC ATTR_BLOCKLIKE_GFP(flags) ATTR_NOINLINE ATTR_MALLOC WUNUSED void *
 LOCAL_NOTHROW(KCALL LOCAL_METHOD_malloc)(
 #ifdef LOCAL_HAVE_min_alignment
                                          size_t min_alignment,
@@ -236,7 +236,7 @@ err:
 #define LOCAL_realloc_PRIARG ptr, n_bytes, flags
 #endif /* !... */
 
-PUBLIC ATTR_NOINLINE WUNUSED void *
+PUBLIC ATTR_BLOCKLIKE_GFP(flags) ATTR_NOINLINE WUNUSED void *
 LOCAL_NOTHROW(KCALL LOCAL_METHOD_realloc)(void *ptr,
 #ifdef LOCAL_HAVE_min_alignment
                                           size_t min_alignment,

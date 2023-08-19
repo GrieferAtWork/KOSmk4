@@ -84,7 +84,7 @@ ext2_inoaddr(struct ext2super *__restrict self, ext2_ino_t ino) {
 
 
 /* Allocate physically continuous memory. */
-PRIVATE ATTR_RETNONNULL WUNUSED void *FCALL
+PRIVATE ATTR_BLOCKLIKE_GFP(gfp) ATTR_RETNONNULL WUNUSED void *FCALL
 kmemalign_offset_physcont(size_t min_alignment, ptrdiff_t offset,
                           size_t num_bytes, gfp_t gfp) {
 	/* TODO: Do this via a proper kernel API
@@ -700,7 +700,7 @@ NOTHROW(KCALL ext2idat_fini)(struct ext2idat *__restrict self,
 		ext2iiiblock_delete(self->ei_tiblock_c, es_ind_blocksize);
 }
 
-PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+PRIVATE ATTR_BLOCKLIKE_CC(info) NONNULL((1)) void
 NOTHROW(KCALL ext2_v_cc)(struct mfile *__restrict self,
                          struct ccinfo *__restrict info) {
 	size_t total, es_ind_blocksize;

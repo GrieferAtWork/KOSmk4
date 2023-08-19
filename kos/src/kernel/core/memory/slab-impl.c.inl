@@ -63,7 +63,7 @@ struct LOCAL_segment {
 	byte_t s_data[SEGMENT_SIZE];
 };
 
-LOCAL NONNULL((1, 2)) void
+LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL LOCAL_slab_dofreeptr)(struct slab *__restrict self,
                                     void *__restrict ptr,
                                     gfp_t flags) {
@@ -110,7 +110,7 @@ NOTHROW(KCALL LOCAL_slab_dofreeptr)(struct slab *__restrict self,
 
 
 /* Service pending free operations. */
-LOCAL void
+LOCAL NOBLOCK void
 NOTHROW(KCALL LOCAL_slab_descriptor_service_pending)(void) {
 	struct slab_pending_free *pend, *next;
 again:
@@ -172,7 +172,7 @@ NOTHROW(KCALL LOCAL_slab_freeptr)(struct slab *__restrict self,
 }
 
 
-PUBLIC NOBLOCK ATTR_MALLOC WUNUSED VIRT void *
+PUBLIC ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL LOCAL_slab_malloc)(gfp_t flags) {
 	void *result;
 	struct slab *result_page;
@@ -299,7 +299,7 @@ err:
 }
 
 
-PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
+PUBLIC ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
 LOCAL_slab_kmalloc(gfp_t flags) {
 	void *result;
 #ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
@@ -317,7 +317,7 @@ LOCAL_slab_kmalloc(gfp_t flags) {
 	                          flags);
 }
 
-PUBLIC ATTR_MALLOC WUNUSED VIRT void *
+PUBLIC ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL LOCAL_slab_kmalloc_nx)(gfp_t flags) {
 	void *result;
 #ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC

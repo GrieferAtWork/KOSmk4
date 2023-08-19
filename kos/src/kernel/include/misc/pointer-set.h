@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/malloc-defs.h>
 #include <kernel/malloc.h>
 #include <kernel/types.h>
 
@@ -154,7 +155,7 @@ NOTHROW(KCALL pointer_set_do_insert)(struct pointer_set *__restrict self,
 /* Insert the given `ptr' into the set.
  * @return: true:  `ptr' has been added to the set.
  * @return: false: `ptr' was already apart of the set. */
-LOCAL NOBLOCK NONNULL((1)) bool KCALL
+LOCAL ATTR_BLOCKLIKE_GFP(flags) NONNULL((1)) bool KCALL
 pointer_set_insert(struct pointer_set *__restrict self,
                    void *ptr, gfp_t flags DFL(GFP_NORMAL))
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
@@ -188,7 +189,7 @@ do_rehash_with:
 #define POINTER_SET_INSERT_NX_SUCCESS   1  /* `ptr' has been added to the set. */
 /* Insert the given `ptr' into the set.
  * @return: * : One of `POINTER_SET_INSERT_NX_*' */
-LOCAL NOBLOCK NONNULL((1)) int
+LOCAL ATTR_BLOCKLIKE_GFP(flags) NONNULL((1)) int
 NOTHROW(KCALL pointer_set_insert_nx)(struct pointer_set *__restrict self,
                                      void *ptr, gfp_t flags DFL(GFP_NORMAL)) {
 	if (((self->ps_size + 1) * 3) / 2 >= self->ps_mask) {
@@ -231,7 +232,7 @@ NOTHROW(KCALL pointer_set_contains)(struct pointer_set const *__restrict self,
 
 /* Set the given pointer_set  and re-hash it to  be
  * able to sustain at least `min_allocation' items. */
-LOCAL NONNULL((1)) void KCALL
+LOCAL ATTR_BLOCKLIKE_GFP(flags) NONNULL((1)) void KCALL
 pointer_set_clear_and_rehash(struct pointer_set *__restrict self,
                              size_t min_allocation,
                              gfp_t flags DFL(GFP_NORMAL))
@@ -278,7 +279,7 @@ pointer_set_clear_and_rehash(struct pointer_set *__restrict self,
 	_POINTER_SET_ASSERT_USABLE_MEMORY(self);
 }
 
-LOCAL NONNULL((1)) bool
+LOCAL ATTR_BLOCKLIKE_GFP(flags) NONNULL((1)) bool
 NOTHROW(KCALL pointer_set_clear_and_rehash_nx)(struct pointer_set *__restrict self,
                                                size_t min_allocation,
                                                gfp_t flags DFL(GFP_NORMAL)) {

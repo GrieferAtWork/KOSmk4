@@ -79,7 +79,7 @@ NOTHROW(FCALL ioperm_bitmap_destroy)(struct ioperm_bitmap *__restrict self) {
 	kfree(self);
 }
 
-PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC)
+PUBLIC ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC ATTR_RETNONNULL WUNUSED
 REF struct ioperm_bitmap *KCALL ioperm_bitmap_allocf(gfp_t flags) THROWS(E_BADALLOC) {
 	physpage_t iob;
 	REF struct ioperm_bitmap *result;
@@ -98,7 +98,7 @@ REF struct ioperm_bitmap *KCALL ioperm_bitmap_allocf(gfp_t flags) THROWS(E_BADAL
 	return result;
 }
 
-PUBLIC ATTR_MALLOC WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC)
+PUBLIC ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED
 REF struct ioperm_bitmap *NOTHROW(KCALL ioperm_bitmap_allocf_nx)(gfp_t flags) {
 	physpage_t iob;
 	REF struct ioperm_bitmap *result;
@@ -129,7 +129,7 @@ ioperm_bitmap_alloc(void) THROWS(E_BADALLOC) {
 
 
 /* Create a copy of the given I/O permissions bitmap. */
-PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) NONNULL((1)) REF struct ioperm_bitmap *KCALL
+PUBLIC ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct ioperm_bitmap *KCALL
 ioperm_bitmap_copyf(struct ioperm_bitmap const *__restrict self, gfp_t flags) THROWS(E_BADALLOC) {
 	physpage_t iob;
 	REF struct ioperm_bitmap *result;
@@ -148,7 +148,7 @@ ioperm_bitmap_copyf(struct ioperm_bitmap const *__restrict self, gfp_t flags) TH
 	return result;
 }
 
-PUBLIC ATTR_MALLOC WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) NONNULL((1)) REF struct ioperm_bitmap *
+PUBLIC ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED NONNULL((1)) REF struct ioperm_bitmap *
 NOTHROW(KCALL ioperm_bitmap_copyf_nx)(struct ioperm_bitmap const *__restrict self, gfp_t flags) {
 	physpage_t iob;
 	REF struct ioperm_bitmap *result;

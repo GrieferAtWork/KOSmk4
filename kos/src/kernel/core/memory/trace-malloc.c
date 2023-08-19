@@ -2691,23 +2691,23 @@ NOTHROW(KCALL trace_malloc_generate_traceback)(void const **__restrict buffer, s
 }
 
 /* Begin tracing the given `node' */
-PRIVATE ATTR_NOINLINE NOBLOCK_IF(gfp & GFP_ATOMIC) void FCALL
+PRIVATE ATTR_NOINLINE ATTR_BLOCKLIKE_GFP(gfp) void FCALL
 insert_trace_node(struct trace_node *__restrict node,
                   gfp_t gfp, unsigned int n_skip)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
-PRIVATE ATTR_NOINLINE NOBLOCK_IF(gfp & GFP_ATOMIC) bool
+PRIVATE ATTR_NOINLINE ATTR_BLOCKLIKE_GFP(gfp) bool
 NOTHROW(FCALL insert_trace_node_nx)(struct trace_node *__restrict node,
                                     gfp_t gfp, unsigned int n_skip);
 
 /* Resolve existing (possibly bitset-based) mappings between [umin, umax]
  * These  functions  must  be  called  while  already  holding  the lock.
  * NOTE: If these functions return an exception/false, the lock will have been released! */
-PRIVATE ATTR_NOINLINE NOBLOCK_IF(gfp & GFP_ATOMIC) void FCALL
+PRIVATE ATTR_NOINLINE ATTR_BLOCKLIKE_GFP(gfp) void FCALL
 insert_trace_node_resolve(uintptr_t umin, uintptr_t umax,
                           gfp_t gfp, unsigned int n_skip,
                           LOCK_PARAMS)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
-PRIVATE ATTR_NOINLINE NOBLOCK_IF(gfp & GFP_ATOMIC) bool
+PRIVATE ATTR_NOINLINE ATTR_BLOCKLIKE_GFP(gfp) bool
 NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
                                             gfp_t gfp, unsigned int n_skip,
                                             LOCK_PARAMS);
@@ -2725,7 +2725,7 @@ NOTHROW(KCALL heap_free)(struct heap *__restrict self,
 	heap_free_untraced(self, ptr, num_bytes, flags);
 }
 
-PUBLIC ATTR_NOINLINE WUNUSED NONNULL((1)) size_t
+PUBLIC NOBLOCK ATTR_NOINLINE WUNUSED NONNULL((1)) size_t
 NOTHROW(KCALL heap_truncate)(struct heap *__restrict self, void *base,
                              size_t old_size, size_t new_size, gfp_t free_flags) {
 	size_t free_bytes;

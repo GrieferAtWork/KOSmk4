@@ -886,7 +886,7 @@ NOTHROW(KCALL fini_thismman_uemc)(struct mman *__restrict self) {
  *
  * The mman module cache never has to be cleared, but may be cleared in
  * order to free up system memory during a shortage. */
-INTERN NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+INTERN ATTR_BLOCKLIKE_CC(info) NONNULL((1, 2)) void
 NOTHROW(FCALL system_cc_mman_module_cache)(struct mman *__restrict self,
                                            struct ccinfo *__restrict info) {
 	struct userelf_module_slist dead;
@@ -1902,7 +1902,7 @@ PRIVATE struct fdirent compat_system_rtld_dirent = {
 #endif /* __ARCH_HAVE_COMPAT */
 
 
-INTERN NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+INTERN ATTR_BLOCKLIKE_CC(info) NONNULL((1)) void
 NOTHROW(KCALL system_cc_rtld_fsfile)(struct ccinfo *__restrict info) {
 	REF struct mfile *mf;
 	mf = axref_xch_inherit(&system_rtld_fsfile, NULL);

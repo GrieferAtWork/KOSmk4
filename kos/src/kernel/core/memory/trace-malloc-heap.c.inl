@@ -116,13 +116,13 @@ DECL_BEGIN
  * These  functions  must  be  called  while  already  holding  the lock.
  * NOTE: If these functions return an exception/false, the lock will have been released! */
 #ifdef DEFINE_X_except
-PRIVATE ATTR_NOINLINE NOBLOCK_IF(gfp & GFP_ATOMIC) void FCALL
+PRIVATE ATTR_BLOCKLIKE_GFP(gfp) ATTR_NOINLINE void FCALL
 insert_trace_node_resolve(uintptr_t umin, uintptr_t umax,
                           gfp_t gfp, unsigned int n_skip,
                           LOCK_PARAMS)
 		THROWS(E_BADALLOC, E_WOULDBLOCK)
 #elif defined(DEFINE_X_noexcept)
-PRIVATE ATTR_NOINLINE NOBLOCK_IF(gfp & GFP_ATOMIC) bool
+PRIVATE ATTR_BLOCKLIKE_GFP(gfp) ATTR_NOINLINE bool
 NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
                                             gfp_t gfp, unsigned int n_skip,
                                             LOCK_PARAMS)
@@ -404,12 +404,12 @@ success:;
 
 /* Begin tracing the given `node' */
 #ifdef DEFINE_X_except
-PRIVATE ATTR_NOINLINE NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void FCALL
+PRIVATE ATTR_NOINLINE ATTR_BLOCKLIKE_GFP(gfp) NONNULL((1)) void FCALL
 LOCAL_insert_trace_node(struct trace_node *__restrict node,
                         gfp_t gfp, unsigned int n_skip)
 		THROWS(E_BADALLOC, E_WOULDBLOCK)
 #elif defined(DEFINE_X_noexcept)
-PRIVATE ATTR_NOINLINE NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) bool
+PRIVATE ATTR_NOINLINE ATTR_BLOCKLIKE_GFP(gfp) NONNULL((1)) bool
 NOTHROW(FCALL LOCAL_insert_trace_node)(struct trace_node *__restrict node,
                                        gfp_t gfp, unsigned int n_skip)
 #endif /* ... */
@@ -453,14 +453,14 @@ NOTHROW(FCALL LOCAL_insert_trace_node)(struct trace_node *__restrict node,
  * @param: tb_skip:   How may traceback entries to skip when creating a traceback.
  * @return: * : Always re-returns `base' */
 #ifdef DEFINE_X_except
-PUBLIC ATTR_NOINLINE NOBLOCK_IF(gfp & GFP_ATOMIC) ATTR_RETNONNULL void *KCALL
+PUBLIC ATTR_NOINLINE ATTR_BLOCKLIKE_GFP(gfp) ATTR_RETNONNULL void *KCALL
 kmalloc_trace(void *base, size_t num_bytes,
               gfp_t gfp, unsigned int tb_skip)
 	THROWS(E_BADALLOC, E_WOULDBLOCK)
 #elif defined(DEFINE_X_noexcept)
 /* Same as `kmalloc_trace()', but don't throw an exception. If the operation fails,
  * rather  than   re-returning   `base',   `NULL'   will   be   returned   instead. */
-PUBLIC NOBLOCK_IF(gfp & GFP_ATOMIC) WUNUSED void *
+PUBLIC ATTR_BLOCKLIKE_GFP(gfp) WUNUSED void *
 NOTHROW(KCALL kmalloc_trace_nx)(void *base, size_t num_bytes,
                                 gfp_t gfp, unsigned int tb_skip)
 #endif /* ... */
@@ -533,7 +533,7 @@ done:
 
 
 
-PUBLIC WUNUSED NONNULL((1)) heapptr_t
+PUBLIC ATTR_BLOCKLIKE_GFP(flags) WUNUSED NONNULL((1)) heapptr_t
 LOCAL_NOTHROW(KCALL LOCAL_heap_alloc)(struct heap *__restrict self,
                                       size_t num_bytes, gfp_t flags) {
 	heapptr_t result;
@@ -545,7 +545,7 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_alloc)(struct heap *__restrict self,
 }
 
 
-PUBLIC WUNUSED NONNULL((1)) heapptr_t
+PUBLIC ATTR_BLOCKLIKE_GFP(flags) WUNUSED NONNULL((1)) heapptr_t
 LOCAL_NOTHROW(KCALL LOCAL_heap_align)(struct heap *__restrict self,
                                       size_t min_alignment, ptrdiff_t offset,
                                       size_t num_bytes, gfp_t flags) {
@@ -560,7 +560,7 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_align)(struct heap *__restrict self,
 }
 
 
-PUBLIC WUNUSED NONNULL((1)) heapptr_t
+PUBLIC ATTR_BLOCKLIKE_GFP(alloc_flags) WUNUSED NONNULL((1)) heapptr_t
 LOCAL_NOTHROW(KCALL LOCAL_heap_realloc)(struct heap *__restrict self,
                                         VIRT void *old_ptr, size_t old_bytes,
                                         size_t new_bytes, gfp_t alloc_flags,
@@ -685,7 +685,7 @@ err:
 	return heapptr_make(NULL, 0);
 }
 
-PUBLIC WUNUSED NONNULL((1)) heapptr_t
+PUBLIC ATTR_BLOCKLIKE_GFP(alloc_flags) WUNUSED NONNULL((1)) heapptr_t
 LOCAL_NOTHROW(KCALL LOCAL_heap_realign)(struct heap *__restrict self,
                                         VIRT void *old_ptr, size_t old_bytes,
                                         size_t min_alignment, ptrdiff_t offset,

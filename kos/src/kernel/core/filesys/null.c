@@ -1153,7 +1153,7 @@ PRIVATE struct mfile_stream_ops const devtty_stream_ops = {
 //TODO:	BLOCKING NONNULL_T((1)) void
 //TODO:	(KCALL *mso_sync)(struct mfile *__restrict self)
 //TODO:			THROWS_T(E_WOULDBLOCK, E_IOERROR, ...);
-//TODO:	NOBLOCK_IF(ccinfo_noblock(info)) NONNULL_T((1)) void
+//TODO:	ATTR_BLOCKLIKE_CC(info) NONNULL_T((1)) void
 //TODO:	NOTHROW_T(KCALL *mso_cc)(struct mfile *__restrict self,
 //TODO:	                         struct ccinfo *__restrict info);
 };

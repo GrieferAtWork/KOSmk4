@@ -200,7 +200,7 @@ PRIVATE struct atomic_rwlock kernel_debug_info_inside_malloc = ATOMIC_RWLOCK_INI
 #endif /* CONFIG_NO_KERNEL_DEBUGGER */
 
 
-PRIVATE NOBLOCK ATTR_MALLOC WUNUSED void *
+PRIVATE ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED void *
 NOTHROW(CC my_kmalloc_untraced_nx)(size_t num_bytes, gfp_t flags) {
 	heapptr_t ptr;
 	if (kernel_poisoned())
@@ -216,7 +216,7 @@ NOTHROW(CC my_kmalloc_untraced_nx)(size_t num_bytes, gfp_t flags) {
 	return (size_t *)heapptr_getptr(ptr) + 1;
 }
 
-PRIVATE NOBLOCK WUNUSED void *
+PRIVATE ATTR_BLOCKLIKE_GFP(flags) WUNUSED void *
 NOTHROW(CC my_krealloc_untraced_nx)(void *oldptr, size_t num_bytes, gfp_t flags) {
 	heapptr_t ptr;
 	if (kernel_poisoned())

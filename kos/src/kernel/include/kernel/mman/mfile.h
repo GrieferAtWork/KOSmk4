@@ -23,6 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+#include <kernel/malloc-defs.h>      /* ATTR_BLOCKLIKE_CC(...) */
 #include <kernel/memory.h>
 #include <kernel/types.h>
 #include <misc/unlockinfo.h>
@@ -370,7 +371,7 @@ struct mfile_stream_ops {
 	 * >> }
 	 * >> ...
 	 * >> mylock_release(self); */
-	NOBLOCK_IF(ccinfo_noblock(info)) NONNULL_T((1)) void
+	ATTR_BLOCKLIKE_CC(info) NONNULL_T((1)) void
 	NOTHROW_T(KCALL *mso_cc)(struct mfile *__restrict self,
 	                         struct ccinfo *__restrict info);
 

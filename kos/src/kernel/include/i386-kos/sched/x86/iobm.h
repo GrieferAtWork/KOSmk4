@@ -22,20 +22,14 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/malloc-defs.h>
 #include <kernel/types.h>
 #include <sched/pertask.h>
 
 #include <stdbool.h>
 
-DECL_BEGIN
-
 #ifdef __CC__
-
-#ifndef __gfp_t_defined
-#define __gfp_t_defined
-typedef unsigned int gfp_t;
-#endif /* !__gfp_t_defined */
-
+DECL_BEGIN
 
 struct ioperm_bitmap {
 	WEAK refcnt_t ib_refcnt; /* Reference counter (when > 1, the bitmap becomes read-only/copy-on-write) */
@@ -71,17 +65,17 @@ DEFINE_REFCNT_FUNCTIONS(struct ioperm_bitmap, ib_refcnt, ioperm_bitmap_destroy)
 /* Allocate a new io permissions bitmap with all permission bits set to disallow access. */
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct ioperm_bitmap *KCALL
 ioperm_bitmap_alloc(void) THROWS(E_BADALLOC);
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC)
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC ATTR_RETNONNULL WUNUSED
 REF struct ioperm_bitmap *KCALL ioperm_bitmap_allocf(gfp_t flags) THROWS(E_BADALLOC);
-FUNDEF ATTR_MALLOC WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC)
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED
 REF struct ioperm_bitmap *NOTHROW(KCALL ioperm_bitmap_allocf_nx)(gfp_t flags);
 
 /* Create a copy of the given I/O permissions bitmap. */
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct ioperm_bitmap *KCALL
 ioperm_bitmap_copy(struct ioperm_bitmap const *__restrict self) THROWS(E_BADALLOC);
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) NONNULL((1)) REF struct ioperm_bitmap *KCALL
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct ioperm_bitmap *KCALL
 ioperm_bitmap_copyf(struct ioperm_bitmap const *__restrict self, gfp_t flags) THROWS(E_BADALLOC);
-FUNDEF ATTR_MALLOC WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) NONNULL((1)) REF struct ioperm_bitmap *
+FUNDEF ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED NONNULL((1)) REF struct ioperm_bitmap *
 NOTHROW(KCALL ioperm_bitmap_copyf_nx)(struct ioperm_bitmap const *__restrict self, gfp_t flags);
 
 /* Turn permission bits for a given range on/off. */
@@ -89,9 +83,7 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ioperm_bitmap_setrange)(struct ioperm_bitmap *__restrict self,
                                       u16 minport, u16 maxport, bool turn_on);
 
-
-#endif /* __CC__ */
-
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_X86_IOBM_H */

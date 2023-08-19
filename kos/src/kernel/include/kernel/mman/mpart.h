@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/malloc-defs.h>
 #include <kernel/memory.h>
 #include <kernel/types.h>
 #include <misc/unlockinfo.h>
@@ -30,9 +31,9 @@
 #include <hybrid/__atomic.h>
 #include <hybrid/__minmax.h>
 #include <hybrid/sched/__yield.h>
+#include <hybrid/sched/atomic-lock.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
-#include <hybrid/sched/atomic-lock.h>
 
 #include <kos/lockop.h>
 
@@ -1562,11 +1563,11 @@ NOTHROW(FCALL mpart_trim_data_fini)(struct mpart_trim_data *__restrict self);
  * @return: MPART_NXOP_ST_SUCCESS: Success (all locks were kept)
  * @return: MPART_NXOP_ST_RETRY:   Failed (`data->mtd_unlock' and `mpart_lock_release(self)' was released)
  * @return: MPART_NXOP_ST_ERROR:   Non-recoverable error (OOM or yield-failure). Don't try again. */
-FUNDEF BLOCKING_IF(ccinfo_blocking(data->mtd_ccinfo)) NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+FUNDEF ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_locked_or_unlock_nx)(struct mpart *__restrict self,
                                               struct mpart_trim_data *__restrict data);
 /* Same as `mpart_trim_locked_or_unlock_nx()', but automatically manages `mpart_lock_acquire(self)' */
-FUNDEF BLOCKING_IF(ccinfo_blocking(data->mtd_ccinfo)) NOBLOCK_IF(ccinfo_noblock(data->mtd_ccinfo)) WUNUSED NONNULL((1, 2)) unsigned int
+FUNDEF ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_or_unlock_nx)(struct mpart *__restrict self,
                                        struct mpart_trim_data *__restrict data);
 

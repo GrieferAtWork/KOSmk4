@@ -547,7 +547,7 @@ err_badalloc_after_unlock:
 #define setcore_ex_bitset_getstate(self, partrel_block_index) \
 	bitset_getstate((self)->scd_bitset, partrel_block_index)
 
-PRIVATE WUNUSED NONNULL((1, 3)) bool FCALL
+PRIVATE ATTR_BLOCKLIKE_GFP(gfp_flags) WUNUSED NONNULL((1, 3)) bool FCALL
 setcore_ex_makebitset_or_unlock(struct mpart *__restrict self,
                                 struct unlockinfo *unlock,
                                 struct mpart_setcore_data *__restrict data,

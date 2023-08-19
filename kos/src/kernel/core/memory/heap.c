@@ -487,9 +487,12 @@ NOTHROW(KCALL heap_insert_node_unlocked)(struct heap *__restrict self,
 /* Acquire a lock to the heap, while also serving any pending free operations.
  * @return: true:  Successfully acquired a lock. (Always returned by `heap_acquirelock' when `GFP_ATOMIC' isn't set)
  * @return: false: Failed to acquire a lock (`GFP_ATOMIC' was set, and the operation would have blocked) */
-LOCAL NONNULL((1)) bool KCALL heap_acquirelock(struct heap *__restrict self, gfp_t flags);
-LOCAL WUNUSED NONNULL((1)) bool NOTHROW(KCALL heap_acquirelock_nx)(struct heap *__restrict self, gfp_t flags);
-LOCAL NOBLOCK NONNULL((1)) bool NOTHROW(KCALL heap_acquirelock_atomic)(struct heap *__restrict self);
+LOCAL NOBLOCK_IF(flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
+heap_acquirelock(struct heap *__restrict self, gfp_t flags);
+LOCAL NOBLOCK_IF(flags & GFP_ATOMIC) WUNUSED NONNULL((1)) bool
+NOTHROW(KCALL heap_acquirelock_nx)(struct heap *__restrict self, gfp_t flags);
+LOCAL NOBLOCK NONNULL((1)) bool
+NOTHROW(KCALL heap_acquirelock_atomic)(struct heap *__restrict self);
 
 
 /* Same as `heap_free_raw_lock_and_maybe_unlock_impl()',
@@ -583,7 +586,7 @@ NOTHROW(KCALL heap_serve_pending)(struct heap *__restrict self,
 /* Acquire a lock to the heap, while also serving any pending free operations.
  * @return: true:  Successfully acquired a lock.
  * @return: false: Failed to acquire a lock (`GFP_ATOMIC' was set, and the operation would have blocked) */
-LOCAL WUNUSED NONNULL((1)) bool KCALL
+LOCAL NOBLOCK_IF(flags & GFP_ATOMIC) WUNUSED NONNULL((1)) bool KCALL
 heap_acquirelock(struct heap *__restrict self, gfp_t flags) {
 	struct heap_pending_free *pend;
 	if (!atomic_lock_tryacquire(&self->h_lock)) {
@@ -598,7 +601,7 @@ heap_acquirelock(struct heap *__restrict self, gfp_t flags) {
 	return true;
 }
 
-LOCAL WUNUSED NONNULL((1)) bool
+LOCAL NOBLOCK_IF(flags & GFP_ATOMIC) WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL heap_acquirelock_nx)(struct heap *__restrict self, gfp_t flags) {
 	struct heap_pending_free *pend;
 	if (!atomic_lock_tryacquire(&self->h_lock)) {
