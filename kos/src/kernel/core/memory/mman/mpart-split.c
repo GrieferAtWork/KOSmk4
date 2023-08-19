@@ -1004,8 +1004,9 @@ relock_with_data:
 					assert(!SLIST_EMPTY(&data.msd_hinodes));
 					hinode = SLIST_FIRST(&data.msd_hinodes);
 					SLIST_REMOVE_HEAD(&data.msd_hinodes, _mn_alloc);
+					assertf(hinode->mn_flags == 0, "Must be 0 because we used GFP_CALLOC earlier");
 					noderel_offset     = data.msd_offset - min;
-					hinode->mn_flags   = lonode->mn_flags;
+					hinode->mn_flags   = lonode->mn_flags & ~MNODE_F_COREPART; /* Don't include the `MNODE_F_COREPART' flag! */
 					hinode->mn_minaddr = lonode->mn_minaddr + noderel_offset;
 					hinode->mn_maxaddr = lonode->mn_maxaddr;
 					assert(!wasdestroyed(lonode->mn_mman)); /* We don't weakincref because the mman wasn't destroyed, yet! */
