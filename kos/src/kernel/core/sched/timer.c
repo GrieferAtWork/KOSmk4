@@ -1186,6 +1186,22 @@ DEFINE_SYSCALL2(errno_t, clock_gettime,
 }
 #endif /* __ARCH_WANT_SYSCALL_CLOCK_GETTIME */
 
+#ifdef __ARCH_WANT_SYSCALL_CLOCK_GETTIME64
+DEFINE_SYSCALL2(errno_t, clock_gettime64,
+                clockid_t, clockid,
+                NCX UNCHECKED struct timespec64 *, res) {
+	struct timespec ts;
+	struct clocktype const *ct;
+	validate_writable(res, sizeof(*res));
+	ct = clock_lookup(clockid);
+	ts = (*ct->ct_gettime)(clockid);
+	COMPILER_WRITE_BARRIER();
+	res->tv_sec  = (typeof(res->tv_sec))ts.tv_sec;
+	res->tv_nsec = (typeof(res->tv_nsec))ts.tv_nsec;
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_CLOCK_GETTIME64 */
+
 #ifdef __ARCH_WANT_SYSCALL_CLOCK_GETTIME_TIME64
 DEFINE_SYSCALL2(errno_t, clock_gettime_time64,
                 clockid_t, clockid,
@@ -1217,6 +1233,22 @@ DEFINE_COMPAT_SYSCALL2(errno_t, clock_gettime,
 	return -EOK;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_CLOCK_GETTIME */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_CLOCK_GETTIME64
+DEFINE_COMPAT_SYSCALL2(errno_t, clock_gettime64,
+                       clockid_t, clockid,
+                       NCX UNCHECKED struct compat_timespec64 *, res) {
+	struct timespec ts;
+	struct clocktype const *ct;
+	compat_validate_writable(res, sizeof(*res));
+	ct = clock_lookup(clockid);
+	ts = (*ct->ct_gettime)(clockid);
+	COMPILER_WRITE_BARRIER();
+	res->tv_sec  = (typeof(res->tv_sec))ts.tv_sec;
+	res->tv_nsec = (typeof(res->tv_nsec))ts.tv_nsec;
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_CLOCK_GETTIME64 */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_CLOCK_GETTIME_TIME64
 DEFINE_COMPAT_SYSCALL2(errno_t, clock_gettime_time64,
