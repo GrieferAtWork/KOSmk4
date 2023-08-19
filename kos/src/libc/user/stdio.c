@@ -66,6 +66,13 @@
 
 DECL_BEGIN
 
+#if !defined(NDEBUG) && 0
+#define DBG_trace_file(self) \
+	syslog(LOG_DEBUG, "%d:%s:%p\n", __LINE__, __func__, (self)->if_ptr)
+#else
+#define DBG_trace_file(self) (void)0
+#endif
+
 #undef libc_ferror_unlocked
 #undef libc_feof_unlocked
 #define libc_ferror_unlocked libc_ferror
@@ -339,6 +346,8 @@ file_buffer_realloc_dynscale(FILE *__restrict self,
 /* Change the operations mode of a given buffer. */
 PRIVATE WUNUSED ATTR_SECTION(".text.crt.FILE.core.utility") NONNULL((1)) int LIBCCALL
 file_setmode(FILE *__restrict self, void *buf, unsigned int mode, size_t size) {
+	DBG_trace_file(self);
+
 	/* Convert DOS names. */
 	if unlikely(mode == 0x0040)
 		mode = _IOLBF;
@@ -426,11 +435,13 @@ file_setmode(FILE *__restrict self, void *buf, unsigned int mode, size_t size) {
 	}
 	self->if_exdata->io_chng = self->if_base;
 done:
+	DBG_trace_file(self);
 	return 0;
 err_cannot_resize:
 	/* This can happen if the function is called from a FILE cookie. */
 	(void)libc_seterrno(EWOULDBLOCK);
 err:
+	DBG_trace_file(self);
 	return -1;
 }
 
@@ -442,6 +453,7 @@ file_sync(FILE *__restrict self) {
 	uint32_t old_flags;
 	struct iofile_data *ex;
 	assert(self);
+	DBG_trace_file(self);
 	ex = self->if_exdata;
 	assert(ex);
 again:
@@ -486,14 +498,18 @@ again:
 		if (self->if_flag & IO_FSYNC) {
 			int error;
 			error = file_system_sync(self);
-			if (error != 0)
+			if (error != 0) {
+				DBG_trace_file(self);
 				return error;
+			}
 		}
 	}
 done:
+	DBG_trace_file(self);
 	return 0;
 err:
 	self->if_flag |= IO_ERR;
+	DBG_trace_file(self);
 	return -1;
 }
 
@@ -502,6 +518,7 @@ file_destroy(FILE *__restrict self) {
 	refcnt_t refcnt;
 	struct iofile_data *ex;
 	ex = self->if_exdata;
+	DBG_trace_file(self);
 
 	/* Last reference -> This file has to go away! */
 	assert(!shared_recursive_rwlock_reading(&ex->io_lock));
@@ -720,6 +737,7 @@ file_readdata(FILE *__restrict self, void *buf, size_t num_bytes) {
 	bool did_read_data = false;
 	struct iofile_data *ex;
 	assert(self);
+	DBG_trace_file(self);
 	ex = self->if_exdata;
 	assert(ex);
 again:
@@ -917,9 +935,11 @@ done:
 	if (num_bytes != 0)
 		self->if_flag |= IO_EOF;
 done_noeof:
+	DBG_trace_file(self);
 	return result;
 err:
 	self->if_flag |= IO_ERR;
+	DBG_trace_file(self);
 	return 0;
 }
 
@@ -933,6 +953,7 @@ file_writedata(FILE *__restrict self, void const *buf, size_t num_bytes) {
 	size_t bufavail;
 	uint8_t *new_buffer;
 	struct iofile_data *ex;
+	DBG_trace_file(self);
 	assert(self);
 	ex = self->if_exdata;
 	assert(ex);
@@ -1088,10 +1109,12 @@ done:
 	if (num_bytes != 0)
 		self->if_flag |= IO_EOF;
 done_noeof:
+	DBG_trace_file(self);
 	return result;
 err:
 	self->if_flag |= IO_ERR;
 err0:
+	DBG_trace_file(self);
 	return 0;
 }
 
@@ -1099,6 +1122,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.core.seek") NONNULL((1)) pos64_t LIBCCALL
 file_seek(FILE *__restrict self, off64_t off, int whence) {
 	pos64_t result;
 	struct iofile_data *ex;
+	DBG_trace_file(self);
 	assert(self);
 	ex = self->if_exdata;
 	assert(ex);
@@ -1114,8 +1138,10 @@ file_seek(FILE *__restrict self, off64_t off, int whence) {
 			new_abspos = (pos64_t)off;
 		} else {
 			/* Special case: position-query */
-			if (off == 0)
+			if (off == 0) {
+				DBG_trace_file(self);
 				return old_abspos;
+			}
 			new_abspos = old_abspos + off;
 		}
 		self->if_flag &= ~IO_EOF;
@@ -1148,10 +1174,13 @@ file_seek(FILE *__restrict self, off64_t off, int whence) {
 			if (self->if_cnt >= skipsz) {
 				self->if_cnt -= skipsz;
 			} else {
-				self->if_cnt = 0;
+				/* New position lies beyond the current buffer end.
+				 * -> In this case, we must do a full seek. */
+				goto full_seek;
 			}
 		}
 		self->if_ptr = new_pos;
+		DBG_trace_file(self);
 		return new_abspos;
 	}
 full_seek:
@@ -1183,10 +1212,12 @@ full_seek:
 	self->if_ptr = self->if_base;
 	ex->io_chng  = self->if_base;
 	ex->io_chsz  = 0;
+	DBG_trace_file(self);
 	return result;
 err:
 	self->if_flag |= IO_ERR;
 err0:
+	DBG_trace_file(self);
 	return (pos64_t)-1;
 }
 
@@ -1201,6 +1232,7 @@ file_getc(FILE *__restrict self) {
 	pos64_t next_data;
 	struct iofile_data *ex;
 	assert(self);
+	DBG_trace_file(self);
 again:
 	if (self->if_cnt) {
 read_from_buffer:
@@ -1354,6 +1386,7 @@ read_through:
 		result = (int)(unsigned int)(unsigned char)*self->if_base;
 	}
 done:
+	DBG_trace_file(self);
 	return result;
 err:
 	self->if_flag |= IO_ERR;
@@ -1368,6 +1401,7 @@ file_ungetc(FILE *__restrict self, unsigned char ch) {
 	size_t new_bufsize, inc_size;
 	struct iofile_data *ex;
 	assert(self);
+	DBG_trace_file(self);
 
 	/* Simple case: unget() the character. */
 	if (self->if_ptr > self->if_base)
@@ -1421,18 +1455,22 @@ unget_in_buffer:
 	self->if_flag &= ~IO_EOF;
 	*--self->if_ptr = (uint8_t)(unsigned char)(unsigned int)ch;
 	++self->if_cnt;
+	DBG_trace_file(self);
 	return (int)(unsigned int)ch;
 eof:
 	self->if_flag |= IO_EOF;
+	DBG_trace_file(self);
 	return EOF;
 err:
 	self->if_flag |= IO_ERR;
+	DBG_trace_file(self);
 	return EOF;
 }
 
 INTERN WUNUSED ATTR_SECTION(".text.crt.FILE.core.read") NONNULL((1)) int LIBCCALL
 file_sungetc(FILE *__restrict self) {
 	int result;
+	DBG_trace_file(self);
 	if (self->if_ptr > self->if_base) {
 		self->if_flag &= ~IO_EOF;
 		result = *--self->if_ptr;
@@ -1440,6 +1478,7 @@ file_sungetc(FILE *__restrict self) {
 	} else {
 		result = EOF;
 	}
+	DBG_trace_file(self);
 	return result;
 }
 
@@ -1448,6 +1487,7 @@ file_truncate(FILE *__restrict self, pos64_t new_size) {
 	pos64_t abs_pos, abs_end;
 	struct iofile_data *ex;
 	assert(self);
+	DBG_trace_file(self);
 
 	/* Synchronize the buffer. */
 	if unlikely(file_sync(self))
@@ -1472,10 +1512,12 @@ file_truncate(FILE *__restrict self, pos64_t new_size) {
 	if unlikely(file_system_trunc(self, new_size))
 		goto err;
 	COMPILER_BARRIER();
+	DBG_trace_file(self);
 	return 0;
 err:
 	self->if_flag |= IO_ERR;
 err0:
+	DBG_trace_file(self);
 	return -1;
 }
 
@@ -1697,6 +1739,7 @@ file_reopenfd(FILE *__restrict self, fd_t fd, uint32_t flags) {
 		return NULL;
 	if (LIST_ISBOUND(self, if_exdata->io_lnch))
 		changed_linebuffered_remove(self);
+	DBG_trace_file(self);
 	file_system_close(self);
 	self->if_flag = flags;
 	self->if_fd   = fd;
@@ -1709,6 +1752,7 @@ file_reopenfd(FILE *__restrict self, fd_t fd, uint32_t flags) {
 	ex->io_fblk = 0;
 	ex->io_fpos = 0;
 	mbstate_init(&ex->io_mbs);
+	DBG_trace_file(self);
 	return self;
 }
 
@@ -2754,12 +2798,14 @@ DEFINE_PUBLIC_ALIAS(_IO_nobackup_pbackfail, libc__IO_nobackup_pbackfail);
 INTERN ATTR_SECTION(".text.crt.compat.linux") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc__IO_nobackup_pbackfail)(FILE *__restrict stream, int ch) {
 	stream = file_fromuser(stream);
+	DBG_trace_file(stream);
 	if (stream->if_ptr > stream->if_base) {
 		--stream->if_ptr;
 		++stream->if_cnt;
 	}
 	if (stream->if_cnt && ch != EOF)
 		*stream->if_ptr = (unsigned char)(unsigned int)ch;
+	DBG_trace_file(stream);
 	return (int)(unsigned int)(unsigned char)(unsigned int)ch;
 }
 
@@ -2770,6 +2816,7 @@ NOTHROW_NCX(LIBCCALL libc__IO_setb)(FILE *__restrict stream,
                                     void *bufend,
                                     int set_IO_MALLBUF) {
 	stream = file_fromuser(stream);
+	DBG_trace_file(stream);
 	if (stream->if_flag & IO_MALLBUF)
 		free(stream->if_base);
 	stream->if_flag &= ~(IO_MALLBUF | IO_NODYNSCALE | IO_LNBUF | IO_LNIFTYY);
@@ -2779,6 +2826,7 @@ NOTHROW_NCX(LIBCCALL libc__IO_setb)(FILE *__restrict stream,
 	stream->if_exdata->io_chng = stream->if_base;
 	if (set_IO_MALLBUF)
 		stream->if_flag |= IO_MALLBUF;
+	DBG_trace_file(stream);
 }
 
 DEFINE_PUBLIC_ALIAS(_IO_doallocbuf, libc__IO_doallocbuf);
@@ -2786,6 +2834,7 @@ DEFINE_PUBLIC_ALIAS(_IO_default_doallocate, libc__IO_doallocbuf);
 INTERN ATTR_SECTION(".text.crt.compat.linux") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc__IO_doallocbuf)(FILE *__restrict stream) {
 	stream = file_fromuser(stream);
+	DBG_trace_file(stream);
 	if (stream->if_cnt != 0 || stream->if_ptr > stream->if_base)
 		goto done; /* Already has a buffer. */
 	if (file_setmode(stream, NULL, _IOFBF, IOBUF_MIN) == 0)
@@ -2798,6 +2847,7 @@ NOTHROW_NCX(LIBCCALL libc__IO_doallocbuf)(FILE *__restrict stream) {
 	              stream->if_charbuf + lengthof(stream->if_charbuf),
 	              0);
 done:
+	DBG_trace_file(stream);
 	return 1; /* NOTE: Only `_IO_default_doallocate()' has return value (`_IO_doallocbuf()' returns void) */
 }
 
