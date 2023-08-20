@@ -1052,6 +1052,13 @@ libc_init_malloc_hooks(void) {
 }
 #endif /* __ARCH_REDIRECT_MAXBYTES == 0 */
 
+/* These are never used by libc, but need to be defined for binary compatibility. */
+INTERN ATTR_SECTION(".bss.crt.heap.rare_helpers") void (*libc___after_morecore_hook)(void)  = NULL;
+INTERN ATTR_SECTION(".bss.crt.heap.rare_helpers") void *(*libc___morecore)(ptrdiff_t delta) = NULL;
+DEFINE_PUBLIC_ALIAS(__after_morecore_hook, libc___after_morecore_hook);
+DEFINE_PUBLIC_ALIAS(__morecore, libc___morecore);
+
+
 
 /*[[[head:libc_memcdup,hash:CRC-32=0xe2f0ddeb]]]*/
 INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_INS(1, 3) void *

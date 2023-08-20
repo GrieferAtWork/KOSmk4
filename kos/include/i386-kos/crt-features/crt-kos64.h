@@ -373,6 +373,7 @@
 #define __CRT_HAVE___adjtimex64
 #define __CRT_HAVE___afail
 #define __CRT_HAVE___afailf
+#define __CRT_HAVE___after_morecore_hook
 #define __CRT_HAVE___alarm
 #define __CRT_HAVE___argc
 #define __CRT_HAVE___argv
@@ -994,6 +995,7 @@
 #define __CRT_HAVE___modf
 #define __CRT_HAVE___modff
 #define __CRT_HAVE___modfl
+#define __CRT_HAVE___morecore
 #define __CRT_HAVE___mount
 #define __CRT_HAVE___mprotect
 #define __CRT_HAVE___mremap
