@@ -42,6 +42,14 @@ typedef __EXCEPT_REGISTER_STATE_TYPE except_register_state_t;
 #define __EXCEPT_HANDLER_CC  /* nothing */
 #endif /* !__EXCEPT_HANDLER_CC */
 
+#ifndef __restrict_111080
+#ifdef __COMPILER_HAVE_BUG_GCC_111080
+#define __restrict_111080 /* Nothing */
+#else /* __COMPILER_HAVE_BUG_GCC_111080 */
+#define __restrict_111080 __restrict
+#endif /* !__COMPILER_HAVE_BUG_GCC_111080 */
+#endif /* !__restrict_111080 */
+
 /* Prototype   for   a   low-level   user-space   exception   handler.
  * Note that the exact prototype may differ between architectures,  as
  * well as the calling convention  not always being the same,  either.
@@ -51,8 +59,9 @@ typedef __EXCEPT_REGISTER_STATE_TYPE except_register_state_t;
  * Other  caveats  include  the  fact   that  the  expected  behavior  of   the
  * function may differ based on other flags passed to `set_exception_handler()' */
 typedef /*__ATTR_NORETURN*/ void
-(__EXCEPT_HANDLER_CC *__except_handler_t)(except_register_state_t *__restrict state,
-                                          struct exception_data *__restrict error);
+(__EXCEPT_HANDLER_CC *__except_handler_t)(except_register_state_t *__restrict_111080 state,
+                                          struct exception_data *__restrict_111080 error);
+
 
 __SYSDECL_END
 #endif /* !__CC__ */

@@ -317,7 +317,7 @@ NOTHROW(LIBCCALL pthread_exit_thread)(struct pthread *__restrict me, int exitcod
 #ifndef LIBC_PTHREAD_MAIN_ARGS
 #define LIBC_PTHREAD_MAIN_ARGS     \
 	struct pthread *__restrict me, \
-	void *(LIBCCALL start)(void *arg)
+	void *(LIBCCALL *start)(void *arg)
 #endif /* !LIBC_PTHREAD_MAIN_ARGS */
 
 INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread") void

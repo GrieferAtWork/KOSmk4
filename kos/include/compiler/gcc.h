@@ -1031,5 +1031,10 @@ template<class __T1, class __T2> struct __gcc_types_compatible:
 #endif /* !__COMPILER_HAVE_AUTOTYPE */
 #endif /* ... */
 
+/* https://gcc.gnu.org/bugzilla/show_bug.cgi?id=111080 */
+#if 1 /* && (__GCC_VERSION_NUM <= FIXED_IN_VERSION)*/
+#define __COMPILER_HAVE_BUG_GCC_111080
+#endif /* ... */
+
 /************************************************************************/
 #endif /* !__CHECKER__ */

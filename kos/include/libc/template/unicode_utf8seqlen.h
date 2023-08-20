@@ -35,7 +35,7 @@ __CSREDIRECT2(,__UINT8_TYPE__ const __LOCAL_unicode_utf8seqlen[256],__LOCAL_unic
 __CSDECLARE2(,__UINT8_TYPE__ const unicode_utf8seqlen[256],unicode_utf8seqlen)
 #define __LOCAL_unicode_utf8seqlen unicode_utf8seqlen
 #endif /* __NO_COMPILER_SREDIRECT */
-#elif defined(__cplusplus)
+#elif defined(__cplusplus) || !defined(__NO_ATTR_FORCEINLINE)
 #define __LOCAL_unicode_utf8seqlen (__LOCAL_unicode_utf8seqlen_p())
 __ATTR_FORCEINLINE __ATTR_UNUSED __ATTR_VISIBILITY("hidden")
 __UINT8_TYPE__ const *__NOTHROW(__LOCAL_unicode_utf8seqlen_p)(void) {

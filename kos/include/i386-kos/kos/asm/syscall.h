@@ -136,12 +136,19 @@ __SYSDECL_BEGIN
  * >>    .cfi_escape 26  = DW_OP_and
  * >>    ...
  * >>    .cfi_escape 57  = DW_CFA_KOS_endcapsule */
+#ifdef __GCC_HAVE_DWARF2_CFI_ASM
 #define __X86_XSYSCALL_ASSEMBLY                         \
 	"std\n\t"                                           \
 	".cfi_escape 56,22,49,7,146,49,0,11,255,251,26\n\t" \
 	"syscall\n\t"                                       \
 	"cld\n\t"                                           \
 	".cfi_escape 57"
+#else /* __GCC_HAVE_DWARF2_CFI_ASM */
+#define __X86_XSYSCALL_ASSEMBLY \
+	"std\n\t"                   \
+	"syscall\n\t"               \
+	"cld"
+#endif /* !__GCC_HAVE_DWARF2_CFI_ASM */
 
 __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall0)(__syscall_ulong_t __sysno) { __register __syscall_ulong_t __res; __asm__ __volatile__(__X86_SYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno) : "memory", "cc", "rcx", "r11"); return __res; }
 __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall0)(__syscall_ulong_t __sysno) { __register __syscall_ulong_t __res; __asm__ __volatile__(__X86_XSYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno) : "memory", "cc", "rcx", "r11"); return __res; }
@@ -244,12 +251,19 @@ __asm__(".hidden libc___i386_syscall\n\t.global libc___i386_syscall\n\t"
  * >>    .cfi_escape 26  = DW_OP_and
  * >>    ...
  * >>    .cfi_escape 57  = DW_CFA_KOS_endcapsule */
+#ifdef __GCC_HAVE_DWARF2_CFI_ASM
 #define __X86_XSYSCALL_ASSEMBLY                       \
 	"std\n\t"                                         \
 	".cfi_escape 56,22,9,6,121,0,11,255,251,26\n\t" \
 	"int {$0x80|80h}\n\t"                             \
 	"cld\n\t"                                         \
 	".cfi_escape 57"
+#else /* __GCC_HAVE_DWARF2_CFI_ASM */
+#define __X86_XSYSCALL_ASSEMBLY \
+	"std\n\t"                   \
+	"int {$0x80|80h}\n\t"       \
+	"cld"
+#endif /* !__GCC_HAVE_DWARF2_CFI_ASM */
 #undef __X86_SYSCALL_MAY_CLOBBER_ECX_EDX
 #endif /* !__X86_SYSCALL_ASSEMBLY */
 
@@ -327,7 +341,36 @@ __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__sysc
 #include "syscall-test-ebp.h"
 #endif /* !__GAS_HAVE_IFC_ENDSWITH */
 
-#ifdef __GAS_HAVE_BROKEN_CFI_IN_COMDAT
+#ifndef __GCC_HAVE_DWARF2_CFI_ASM
+#define __X86_DEFINE_SYSCALL6_WRAPPER                                             \
+	".ifndef __x86.syscall6\n"                                                    \
+	".pushsection .text.__x86.syscall6,\"axG\",@progbits,__x86.syscall6,comdat\n" \
+	".globl  __x86.syscall6\n"                                                    \
+	".hidden __x86.syscall6\n"                                                    \
+	".type   __x86.syscall6, @function\n"                                         \
+	"__x86.syscall6:\n"                                                           \
+	"\txchgl %%ebp, 4(%%esp)\n"                                                   \
+	"\t" __X86_SYSCALL_ASSEMBLY "\n"                                              \
+	"\tmovl  4(%%esp), %%ebp\n"                                                   \
+	"\tret   $4\n"                                                                \
+	".size __x86.syscall6, . - __x86.syscall6\n"                                  \
+	".popsection\n"                                                               \
+	".endif\n"
+#define __X86_DEFINE_XSYSCALL6_WRAPPER                                              \
+	".ifndef __x86.Xsyscall6\n"                                                     \
+	".pushsection .text.__x86.Xsyscall6,\"axG\",@progbits,__x86.Xsyscall6,comdat\n" \
+	".globl  __x86.Xsyscall6\n"                                                     \
+	".hidden __x86.Xsyscall6\n"                                                     \
+	".type   __x86.Xsyscall6, @function\n"                                          \
+	"__x86.Xsyscall6:\n"                                                            \
+	"\txchgl %%ebp, 4(%%esp)\n"                                                     \
+	"\t" __X86_XSYSCALL_ASSEMBLY "\n"                                               \
+	"\tmovl  4(%%esp), %%ebp\n"                                                     \
+	"\tret   $4\n"                                                                  \
+	".size __x86.Xsyscall6, . - __x86.Xsyscall6\n"                                  \
+	".popsection\n"                                                                 \
+	".endif\n"
+#elif defined(__GAS_HAVE_BROKEN_CFI_IN_COMDAT)
 /* Sadly, we can't make use of comdat sections.
  * -> If we did, CFI instrumentation would get corrupted */
 #define __X86_DEFINE_SYSCALL6_WRAPPER            \
@@ -370,7 +413,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__sysc
 	".size __x86.Xsyscall6, . - __x86.Xsyscall6\n" \
 	".popsection\n"                                \
 	".endif\n"
-#else /* __GAS_HAVE_BROKEN_CFI_IN_COMDAT */
+#else /* ... */
 #define __X86_DEFINE_SYSCALL6_WRAPPER                                             \
 	".ifndef __x86.syscall6\n"                                                    \
 	".pushsection .text.__x86.syscall6,\"axG\",@progbits,__x86.syscall6,comdat\n" \
@@ -411,7 +454,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__sysc
 	".size __x86.Xsyscall6, . - __x86.Xsyscall6\n"                                  \
 	".popsection\n"                                                                 \
 	".endif\n"
-#endif /* !__GAS_HAVE_BROKEN_CFI_IN_COMDAT */
+#endif /* !... */
 
 #ifdef __X86_SYSCALL_MAY_CLOBBER_ECX_EDX
 #ifdef __GAS_HAVE_IFC_ENDSWITH

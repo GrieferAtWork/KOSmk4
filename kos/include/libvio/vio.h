@@ -349,9 +349,9 @@ __NOTHROW_NCX(LIBVIO_CC vio_create)(struct vio_ops const *ops, void *cookie,
 /* vio_destroy(3):
  * >> int vio_destroy(fd_t fd);
  * Destroy a VIO file descriptor previously created by `vio_create(3)' */
-typedef int __NOTHROW_NCX_T(LIBVIO_CC *PVIO_DESTROY)(__fd_t fd);
+typedef __ATTR_FDARG_T(1) int __NOTHROW_T(LIBVIO_CC *PVIO_DESTROY)(__fd_t fd);
 #ifdef LIBVIO_WANT_PROTOTYPES
-LIBVIO_DECL int __NOTHROW_NCX(LIBVIO_CC vio_destroy)(__fd_t fd);
+LIBVIO_DECL __ATTR_FDARG(1) int __NOTHROW(LIBVIO_CC vio_destroy)(__fd_t fd);
 #endif /* LIBVIO_WANT_PROTOTYPES */
 
 #endif /* !__KERNEL__ */

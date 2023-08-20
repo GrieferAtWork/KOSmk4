@@ -1472,6 +1472,11 @@
 
 
 
+// Misc...
+#define __restrict_111080
+
+
+
 // <kos/[...].h> + <kernel/[...].h>
 #define _os_heap_gfparg(v) ,int v
 #define _os_heap_gfppar(v) ,v

@@ -456,9 +456,9 @@ template<class __S> struct __loc_T { typedef __S __T; };
 #endif /* __NO_ATTR_SECTION */
 
 #ifndef __LOCAL_LIBC_DATA
-#if !defined(__NO_ATTR_SELECTANY) && 1
+#if !defined(__NO_ATTR_SELECTANY) && 0 /* Don't use -- symbols appears in binary even if unused */
 #define __LOCAL_LIBC_DATA(name) __INTERN __ATTR_SELECTANY __ATTR_UNUSED __LOCAL_LIBC_DATA_SECTION(name)
-#elif !defined(__NO_ATTR_WEAK) && 1
+#elif !defined(__NO_ATTR_WEAK) && 0 /* Don't use -- symbols appears in binary even if unused */
 #define __LOCAL_LIBC_DATA(name) __INTERN __ATTR_WEAK __ATTR_UNUSED __LOCAL_LIBC_DATA_SECTION(name)
 #else /* ... */
 #define __LOCAL_LIBC_DATA(name) __PRIVATE __ATTR_UNUSED __LOCAL_LIBC_DATA_SECTION(name)
@@ -467,9 +467,9 @@ template<class __S> struct __loc_T { typedef __S __T; };
 
 #ifndef __LOCAL_LIBC_CONST_DATA
 #ifdef __cplusplus
-#if !defined(__NO_ATTR_SELECTANY) && 1
+#if !defined(__NO_ATTR_SELECTANY) && 0 /* Don't use -- symbols appears in binary even if unused */
 #define __LOCAL_LIBC_CONST_DATA(name) extern __ATTR_SELECTANY __ATTR_UNUSED __LOCAL_LIBC_CONST_DATA_SECTION(name)
-#elif !defined(__NO_ATTR_WEAK) && 1
+#elif !defined(__NO_ATTR_WEAK) && 0 /* Don't use -- symbols appears in binary even if unused */
 #define __LOCAL_LIBC_CONST_DATA(name) extern __INTERN __ATTR_WEAK __ATTR_UNUSED __LOCAL_LIBC_CONST_DATA_SECTION(name)
 #else /* ... */
 #define __LOCAL_LIBC_CONST_DATA(name) __PRIVATE __ATTR_UNUSED __LOCAL_LIBC_CONST_DATA_SECTION(name)

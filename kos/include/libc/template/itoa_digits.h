@@ -44,7 +44,7 @@ __CSDECLARE2(,char const _itoa_digits[101],_itoa_digits)
 #define _itoa_digits        _itoa_digits
 #define __LOCAL_itoa_digits _itoa_digits
 #endif /* __NO_COMPILER_SREDIRECT */
-#elif defined(__cplusplus)
+#elif defined(__cplusplus) || !defined(__NO_ATTR_FORCEINLINE)
 #define __LOCAL_itoa_digits __LOCAL_itoa_digits_fp()
 __ATTR_FORCEINLINE __ATTR_UNUSED __ATTR_VISIBILITY("hidden")
 char const *__NOTHROW(__LOCAL_itoa_digits_fp)(void) {

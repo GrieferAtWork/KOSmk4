@@ -23,6 +23,14 @@
 #include <__stdinc.h>
 
 #ifdef __CC__
+#ifndef __restrict_111080
+#ifdef __COMPILER_HAVE_BUG_GCC_111080
+#define __restrict_111080 /* Nothing */
+#else /* __COMPILER_HAVE_BUG_GCC_111080 */
+#define __restrict_111080 __restrict
+#endif /* !__COMPILER_HAVE_BUG_GCC_111080 */
+#endif /* !__restrict_111080 */
+
 #ifdef __x86_64__
 __SYSDECL_BEGIN
 struct kcpustate;
@@ -31,8 +39,8 @@ struct exception_data;
 #define __EXCEPT_HANDLER_CC   __ATTR_SYSVABI
 #define __EXCEPT_HANDLER64_CC __ATTR_SYSVABI
 typedef /*__ATTR_NORETURN*/ void
-(__ATTR_SYSVABI *__except_handler64_t)(struct kcpustate *__restrict state,
-                                       struct exception_data *__restrict error);
+(__ATTR_SYSVABI *__except_handler64_t)(struct kcpustate *__restrict_111080 state,
+                                       struct exception_data *__restrict_111080 error);
 __SYSDECL_END
 #else /* __x86_64__ */
 #include <hybrid/__pointer.h>
@@ -42,8 +50,8 @@ struct __exception_data64;
 #define __EXCEPT_HANDLER64_CC /*__ATTR_SYSVABI*/
 typedef /*__ATTR_NORETURN*/
 __HYBRID_FUNCPTR64(void, /*__ATTR_SYSVABI*/, __except_handler64_t,
-                   (struct kcpustate64 *__restrict state,
-                    struct __exception_data64 *__restrict error));
+                   (struct kcpustate64 *__restrict_111080 state,
+                    struct __exception_data64 *__restrict_111080 error));
 __SYSDECL_END
 #endif /* !__x86_64__ */
 #endif /* !__CC__ */

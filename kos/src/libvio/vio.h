@@ -59,7 +59,7 @@ NOTHROW_NCX(CC libvio_create)(struct vio_ops const *ops, void *cookie,
 /* vio_destroy(3):
  * >> int vio_destroy(fd_t fd);
  * Destroy a VIO file descriptor previously created by `vio_create(3)' */
-INTDEF int NOTHROW_NCX(CC libvio_destroy)(fd_t fd);
+INTDEF ATTR_FDARG(1) int NOTHROW(CC libvio_destroy)(fd_t fd);
 
 #endif /* !__KERNEL__ */
 #endif /* LIBVIO_CONFIG_ENABLED */

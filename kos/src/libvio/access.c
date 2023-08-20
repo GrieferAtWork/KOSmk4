@@ -102,16 +102,16 @@ libvio_nonatomic_operation64(struct vioargs const *__restrict args,
 		THROW(E_SEGFAULT_UNALIGNED, ptr,
 		      E_SEGFAULT_CONTEXT_VIO, 8);
 	}
-#ifdef __x86_64__
+#if __SIZEOF_POINTER__ >= 8
 	THROW(E_SEGFAULT_NOTATOMIC, ptr,
 	      E_SEGFAULT_CONTEXT_VIO, 8,
 	      oldval, 0, newval);
-#else /* __x86_64__ */
+#else /* __SIZEOF_POINTER__ >= 8 */
 	THROW(E_SEGFAULT_NOTATOMIC, ptr,
 	      E_SEGFAULT_CONTEXT_VIO, 8,
 	      (u32)oldval, (u32)(oldval >> 32),
 	      (u32)newval, (u32)(newval >> 32));
-#endif /* !__x86_64__ */
+#endif /* __SIZEOF_POINTER__ < 8 */
 }
 #endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 

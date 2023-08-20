@@ -35,7 +35,7 @@ __CSDECLARE2(,unsigned char const _hex_value[256],_hex_value)
 #define _hex_value         _hex_value
 #define __LOCAL__hex_value _hex_value
 #endif /* __NO_COMPILER_SREDIRECT */
-#elif defined(__cplusplus)
+#elif defined(__cplusplus) || !defined(__NO_ATTR_FORCEINLINE)
 #define __LOCAL__hex_value (__LOCAL__hex_value_p())
 __ATTR_FORCEINLINE __ATTR_UNUSED __ATTR_VISIBILITY("hidden")
 unsigned char const *(__LOCAL__hex_value_p)(void) {

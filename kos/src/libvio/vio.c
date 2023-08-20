@@ -54,9 +54,9 @@
 DECL_BEGIN
 
 struct uvio_service_startup_args {
-	fd_t                        ssa_fd;     /* UVIO fd */
+	fd_t                  ssa_fd;     /* UVIO fd */
 	struct vio_ops const *ssa_ops;    /* [1..1] UVIO callbacks */
-	void                       *ssa_cookie; /* [?..?] UVIO callback cookie */
+	void                 *ssa_cookie; /* [?..?] UVIO callback cookie */
 };
 
 union qword {
@@ -101,9 +101,12 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 			struct uvio_response_except rx;
 		} resp;
 		size_t resp_size;
+
 		/* Read in a request. */
 		if (sys_read(fd, &req, sizeof(req)) != sizeof(req))
 			break; /* Shouldn't happen... */
+
+		/* Dispatch the request. */
 		TRY {
 			resp.r.ur_opcode     = req.uq_opcode;
 			resp.r.ur_respflags  = UVIO_RESPONSE_FLAG_NORMAL;
@@ -409,9 +412,13 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 			unsigned int i;
 			struct exception_data *data;
 			except_class_t cls = except_class();
+
 			/* Always propagate RTL-priority exceptions. */
-			if (EXCEPTCLASS_ISRTLPRIORITY(cls))
+			if (EXCEPTCLASS_ISRTLPRIORITY(cls)) {
+				(void)sys_close(fd);
 				RETHROW();
+			}
+
 			/* Respond with an exception */
 			data                   = except_data();
 			resp.rx.ur_opcode      = UVIO_OPCODE_EXCEPT;
@@ -423,7 +430,7 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 		sys_write(fd, &resp, resp_size);
 	}
 done:
-	sys_close(fd);
+	(void)sys_close(fd);
 	return NULL;
 }
 
@@ -448,6 +455,7 @@ spawn_uvio_service_thread(fd_t fd,
 	                       args /* inherit */);
 	if (error != EOK)
 		goto err_args;
+
 	/* Let the thread do its thing... */
 	pthread_detach(thread);
 	return 0;
@@ -485,12 +493,14 @@ INTERN WUNUSED NONNULL((1)) fd_t
 NOTHROW_NCX(CC libvio_create)(struct vio_ops const *ops, void *cookie,
                               size_t initial_size, oflag_t flags) {
 	fd_t result;
+
 	/* Validate the given `flags'
 	 * NOTE: The kernel accepts more flags than this, but we don't! */
 	if unlikely(flags & ~(O_CLOEXEC | O_CLOFORK)) {
 		errno = EINVAL;
 		goto err;
 	}
+
 	/* Construct the user-vio FD */
 	result = sys_userviofd(initial_size, flags);
 	if unlikely(E_ISERR(result)) {
@@ -512,8 +522,8 @@ err:
 /* vio_destroy(3):
  * >> int vio_destroy(fd_t fd);
  * Destroy a VIO file descriptor previously created by `vio_create(3)' */
-INTDEF int
-NOTHROW_NCX(CC libvio_destroy)(fd_t fd) {
+INTDEF ATTR_FDARG(1) int
+NOTHROW(CC libvio_destroy)(fd_t fd) {
 	struct uvio_response resp;
 	resp.ur_opcode    = UVIO_OPCODE_PUTUCMD;
 	resp.ur_respflags = UVIO_RESPONSE_FLAG_NORMAL;
