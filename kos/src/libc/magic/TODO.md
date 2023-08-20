@@ -4,9 +4,6 @@
 - Glibc:
 	- Misc:
 		- `__register_atfork()`
-		- `inotify_add_watch()`
-		- `inotify_init()`
-		- `inotify_rm_watch()`
 		- `pmap_getport()`
 		- `pmap_set()`
 		- `pmap_unset()`
@@ -19,11 +16,6 @@
 		- `xdrstdio_create()`
 	- `<glob.h>`:
 		- `glob_pattern_p()`
-	- `<ssp/fcntl.h>`:
-		- `__open64_2()`
-		- `__open_2()`
-		- `__openat64_2()`
-		- `__openat_2()`
 	- `<ssp/unistd.h>`:
 		- `__getcwd_chk()`
 		- `__getgroups_chk()`
@@ -115,8 +107,6 @@
 - Misc
 	- `walkcontext()`
 	- `int ungetchar(int ch)`     (same as `ungetc(ch, stdin)`)
-	- `int optreset`
-	- `bsd_getopt()`
 
 
 

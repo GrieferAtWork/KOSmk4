@@ -1027,6 +1027,10 @@
 #define __CRT_HAVE___ntohs
 #define __CRT_HAVE___open
 #define __CRT_HAVE___open64
+#define __CRT_HAVE___open64_2
+#define __CRT_HAVE___open_2
+#define __CRT_HAVE___openat64_2
+#define __CRT_HAVE___openat_2
 #define __CRT_HAVE___overflow
 #define __CRT_HAVE___p___argc
 #define __CRT_HAVE___p___argv
@@ -6935,6 +6939,10 @@
 #define __CRT_HAVE_KOS$__mkdir
 #define __CRT_HAVE_KOS$__open
 #define __CRT_HAVE_KOS$__open64
+#define __CRT_HAVE_KOS$__open64_2
+#define __CRT_HAVE_KOS$__open_2
+#define __CRT_HAVE_KOS$__openat64_2
+#define __CRT_HAVE_KOS$__openat_2
 #define __CRT_HAVE_KOS$__p___initenv
 #define __CRT_HAVE_KOS$__p___wargv
 #define __CRT_HAVE_KOS$__p___winitenv
@@ -7830,6 +7838,10 @@
 #define __CRT_HAVE_DOS$__mkdir
 #define __CRT_HAVE_DOS$__open
 #define __CRT_HAVE_DOS$__open64
+#define __CRT_HAVE_DOS$__open64_2
+#define __CRT_HAVE_DOS$__open_2
+#define __CRT_HAVE_DOS$__openat64_2
+#define __CRT_HAVE_DOS$__openat_2
 #define __CRT_HAVE_DOS$__p___initenv
 #define __CRT_HAVE_DOS$__p___wargv
 #define __CRT_HAVE_DOS$__p___winitenv
