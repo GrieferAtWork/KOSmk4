@@ -516,7 +516,7 @@ reload_lonode_after_mman_lock:
 	/* Fill in fields of `hinode' from `lonode' */
 	assert(lonode->mn_mman == self);
 	part               = lonode->mn_part;
-	hinode->mn_flags   = lonode->mn_flags;
+	hinode->mn_flags   = lonode->mn_flags & ~MNODE_F_COREPART;
 	hinode->mn_minaddr = (byte_t *)addr_where_to_split;
 	hinode->mn_maxaddr = lonode->mn_maxaddr;
 	hinode->mn_part    = part; /* incref'd later! */
