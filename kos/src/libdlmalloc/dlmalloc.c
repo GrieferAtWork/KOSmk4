@@ -2640,7 +2640,12 @@ struct malloc_params {
 static struct malloc_params mparams;
 
 /* Ensure mparams initialized */
-#define ensure_initialization() (void)(mparams.magic != 0 || init_mparams())
+#define ensure_initialization() (void)(likely(mparams.magic != 0) || init_mparams())
+#define ensure_initialization_for(after_expr) \
+	if unlikely(mparams.magic == 0) { \
+		if (!init_mparams()) \
+			return after_expr; \
+	}
 
 #if !ONLY_MSPACES
 
@@ -3210,7 +3215,11 @@ static int init_mparams(void) {
 #ifndef NO_MALLOPT
 static int change_mparam(int param_number, int value) {
   size_t val;
+#ifdef HOOK_AFTER_INIT_MALLOPT
+  ensure_initialization_for(HOOK_AFTER_INIT_MALLOPT(param_number, value));
+#else /* HOOK_AFTER_INIT_MALLOPT */
   ensure_initialization();
+#endif /* !HOOK_AFTER_INIT_MALLOPT */
   val = (value == -1)? MAX_SIZE_T : (size_t)value;
   switch(param_number) {
   case M_TRIM_THRESHOLD:
@@ -3506,7 +3515,11 @@ static void do_check_malloc_state(mstate m) {
 #if !NO_MALLINFO
 static struct mallinfo internal_mallinfo(mstate m) {
   struct mallinfo nm = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+#ifdef HOOK_AFTER_INIT_MALLINFO
+  ensure_initialization_for(HOOK_AFTER_INIT_MALLINFO());
+#else /* HOOK_AFTER_INIT_MALLINFO */
   ensure_initialization();
+#endif /* !HOOK_AFTER_INIT_MALLINFO */
   if (!PREACTION(m)) {
     check_malloc_state(m);
     if (is_initialized(m)) {
@@ -4060,7 +4073,9 @@ static void* sys_alloc(mstate m, size_t nb) {
   flag_t mmap_flag = 0;
   size_t asize; /* allocation size */
 
+#if !USE_LOCKS || MSPACES
   ensure_initialization();
+#endif
 
   /* Directly map large chunks, but only if already initialized */
   if (use_mmap(m) && nb >= mparams.mmap_threshold && m->topsize != 0) {
@@ -4314,7 +4329,6 @@ static size_t release_unused_segments(mstate m) {
 
 static int sys_trim(mstate m, size_t pad) {
   size_t released = 0;
-  ensure_initialization();
   if (pad < MAX_REQUEST && is_initialized(m)) {
     pad += TOP_FOOT_SIZE; /* ensure enough room for segment overhead */
 
@@ -4586,7 +4600,11 @@ void* dlmalloc(size_t bytes) {
   */
 
 #if USE_LOCKS
+#ifdef HOOK_AFTER_INIT_MALLOC
+  ensure_initialization_for(HOOK_AFTER_INIT_MALLOC(bytes));
+#else /* HOOK_AFTER_INIT_MALLOC */
   ensure_initialization(); /* initialize in sys_alloc if not using locks */
+#endif /* !HOOK_AFTER_INIT_MALLOC */
 #endif
 
   if (!PREACTION(gm)) {
@@ -5210,6 +5228,9 @@ static void internal_inspect_all(mstate m,
 void* dlrealloc(void* oldmem, size_t bytes) {
   void* mem = 0;
   if (oldmem == 0) {
+#ifdef HOOK_AFTER_INIT_REALLOC
+    ensure_initialization_for(HOOK_AFTER_INIT_REALLOC(oldmem, bytes));
+#endif /* HOOK_AFTER_INIT_REALLOC */
     mem = dlmalloc(bytes);
   }
   else if (bytes >= MAX_REQUEST) {
@@ -5284,6 +5305,9 @@ void* dlrealloc_in_place(void* oldmem, size_t bytes) {
 }
 
 void* dlmemalign(size_t alignment, size_t bytes) {
+#ifdef HOOK_AFTER_INIT_MEMALIGN
+  ensure_initialization_for(HOOK_AFTER_INIT_MEMALIGN(alignment, bytes));
+#endif /* HOOK_AFTER_INIT_MEMALIGN */
   if (alignment <= MALLOC_ALIGNMENT) {
     return dlmalloc(bytes);
   }
@@ -5293,6 +5317,9 @@ void* dlmemalign(size_t alignment, size_t bytes) {
 #ifndef NO_POSIX_MEMALIGN
 int dlposix_memalign(void** pp, size_t alignment, size_t bytes) {
   void* mem = 0;
+#ifdef HOOK_AFTER_INIT_POSIX_MEMALIGN
+  ensure_initialization_for(HOOK_AFTER_INIT_POSIX_MEMALIGN(pp, alignment, bytes));
+#endif /* HOOK_AFTER_INIT_POSIX_MEMALIGN */
   if (alignment == MALLOC_ALIGNMENT)
     mem = dlmalloc(bytes);
   else {
@@ -5318,7 +5345,11 @@ int dlposix_memalign(void** pp, size_t alignment, size_t bytes) {
 #ifndef NO_VALLOC
 void* dlvalloc(size_t bytes) {
   size_t pagesz;
+#ifdef HOOK_AFTER_INIT_VALLOC
+  ensure_initialization_for(HOOK_AFTER_INIT_VALLOC(bytes));
+#else /* HOOK_AFTER_INIT_VALLOC */
   ensure_initialization();
+#endif /* !HOOK_AFTER_INIT_VALLOC */
   pagesz = malloc_pagesize;
   return dlmemalign(pagesz, bytes);
 }
@@ -5327,7 +5358,11 @@ void* dlvalloc(size_t bytes) {
 #ifndef NO_PVALLOC
 void* dlpvalloc(size_t bytes) {
   size_t pagesz;
+#ifdef HOOK_AFTER_INIT_PVALLOC
+  ensure_initialization_for(HOOK_AFTER_INIT_PVALLOC(bytes));
+#else /* HOOK_AFTER_INIT_PVALLOC */
   ensure_initialization();
+#endif /* !HOOK_AFTER_INIT_PVALLOC */
   pagesz = malloc_pagesize;
   return dlmemalign(pagesz, (bytes + pagesz - SIZE_T_ONE) & ~(pagesz - SIZE_T_ONE));
 }
@@ -5367,8 +5402,13 @@ void dlmalloc_inspect_all(void(*handler)(void *start,
 #endif /* MALLOC_INSPECT_ALL */
 
 int dlmalloc_trim(size_t pad) {
-  int result = 0;
+  int result;
+#ifdef HOOK_AFTER_INIT_MALLOC_TRIM
+  ensure_initialization_for(HOOK_AFTER_INIT_MALLOC_TRIM(pad));
+#else /* HOOK_AFTER_INIT_MALLOC_TRIM */
   ensure_initialization();
+#endif /* !HOOK_AFTER_INIT_MALLOC_TRIM */
+  result = 0;
   if (!PREACTION(gm)) {
     result = sys_trim(gm, pad);
     POSTACTION(gm);

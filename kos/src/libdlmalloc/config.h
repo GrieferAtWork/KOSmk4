@@ -217,8 +217,21 @@ DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") int dlmalloc_trim(size_t p
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlmalloc_usable_size(void *mem);
 
 #ifdef __BUILDING_LIBC
-INTDEF void NOTHROW_NCX(LIBCCALL libc_init_malloc_hooks)(void);
-#define MALLOC_INIT_EXTRA_HOOK() libc_init_malloc_hooks()
+INTDEF int NOTHROW_NCX(LIBCCALL libc_init_malloc_hooks)(void);
+#define MALLOC_INIT_EXTRA_HOOK() if (libc_init_malloc_hooks()) return 0
+
+/* Special handling needed for the initial call after hooks were installed. */
+#include "../libc/user/malloc.h"
+#include "../libc/user/stdlib.h"
+#define HOOK_AFTER_INIT_MALLOPT(param_number, value)         libc_mallopt(param_number, value)
+#define HOOK_AFTER_INIT_MALLINFO()                           libc_mallinfo2()
+#define HOOK_AFTER_INIT_MALLOC(bytes)                        libc_malloc(bytes)
+#define HOOK_AFTER_INIT_REALLOC(oldmem, bytes)               libc_realloc(oldmem, bytes)
+#define HOOK_AFTER_INIT_MEMALIGN(alignment, bytes)           libc_memalign(alignment, bytes)
+#define HOOK_AFTER_INIT_POSIX_MEMALIGN(pp, alignment, bytes) libc_posix_memalign(pp, alignment, bytes)
+#define HOOK_AFTER_INIT_VALLOC(bytes)                        libc_valloc(bytes)
+#define HOOK_AFTER_INIT_PVALLOC(bytes)                       libc_pvalloc(bytes)
+#define HOOK_AFTER_INIT_MALLOC_TRIM(pad)                     libc_malloc_trim(pad)
 #endif /* __BUILDING_LIBC */
 
 #ifdef DL_REGISTER_CACHE

@@ -495,11 +495,11 @@ user_malloc_abi_install(struct user_malloc_abi *__restrict self) {
 	libc_malloc_redirect_opt(nameof_recallocv, (void *)&libc_recallocv, *(void **)&self->uma_recallocv);
 }
 
-PRIVATE ATTR_NOINLINE ATTR_SECTION(".text.crt.heap.rare_helpers") NONNULL((1)) void LIBCCALL
+PRIVATE ATTR_NOINLINE ATTR_SECTION(".text.crt.heap.rare_helpers") NONNULL((1)) int LIBCCALL
 libc_do_init_malloc_hooks(LPMALLOC user_malloc) {
 	struct user_malloc_abi abi;
 	if unlikely(!user_malloc)
-		return; /* Shouldn't happen, since we should have seen our own version... */
+		return 0; /* Shouldn't happen, since we should have seen our own version... */
 
 	syslog(LOG_INFO, "[libc] Using malloc override at %p\n", user_malloc);
 	bzero(&abi, sizeof(abi));
@@ -510,6 +510,9 @@ libc_do_init_malloc_hooks(LPMALLOC user_malloc) {
 
 	/* Install the ABI. */
 	user_malloc_abi_install(&abi);
+
+	/* Indicate to the malloc implementation that the call must be restarted. */
+	return 1;
 }
 
 
@@ -532,18 +535,19 @@ libc_do_init_malloc_hooks(LPMALLOC user_malloc) {
  *
  * If you don't define malloc, but define any of the other functions,
  * your functions will NOT be used! */
-INTERN ATTR_SECTION(".text.crt.heap.malloc") void LIBCCALL
+INTERN ATTR_SECTION(".text.crt.heap.malloc") int LIBCCALL
 libc_init_malloc_hooks(void) {
 	LPMALLOC user_malloc;
 	*(void **)&user_malloc = dlsym(RTLD_DEFAULT, nameof_malloc);
 	if likely(user_malloc == &libc_malloc)
-		return; /* *highly* likely case: malloc isn't being overwritten */
-	libc_do_init_malloc_hooks(user_malloc);
+		return 0; /* *highly* likely case: malloc isn't being overwritten */
+	return libc_do_init_malloc_hooks(user_malloc);
 }
 #else /* __ARCH_REDIRECT_MAXBYTES != 0 */
-INTERN ATTR_SECTION(".text.crt.heap.malloc") void LIBCCALL
+INTERN ATTR_SECTION(".text.crt.heap.malloc") int LIBCCALL
 libc_init_malloc_hooks(void) {
 	COMPILER_IMPURE();
+	return 0;
 }
 #endif /* __ARCH_REDIRECT_MAXBYTES == 0 */
 
