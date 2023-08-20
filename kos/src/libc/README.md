@@ -15,8 +15,31 @@ This section documents how KOS's libc can be (re-)configured by hosted programs 
 - `extern _LIB_VERSION_TYPE _LIB_VERSION;`
 	- If defined, this global can be used to select implementation-specific quirks of functions from `<math.h>`
 	- The enum type `_LIB_VERSION_TYPE` is defined in `<math.h>`, as are the possible values it may take, one of which needs to be used to initialize this variable when the main program wishes to override it.
-
-
+- `extern void *malloc(size_t num_bytes);`
+	- If defined, the first call to libc's `malloc(3)` will cause libc to re-configure itself in order to have all calls to standard heap functions pass through another user-defined `malloc()` function. When used, it becomes **impossible** to make use of libc's *normal* heap.
+	- **Only** if `malloc` is overwritten with a custom function, will libc **then** also check which (if any) of the following functions are overwritten, and use them, or try to substitute them when they aren't defined:
+	  ```c
+	  extern void free(void *ptr); // or: "cfree"
+	  extern void *calloc(size_t elem_count, size_t elem_size);
+	  extern void *realloc(void *ptr, size_t num_bytes);
+	  extern void *realloc_in_place(void *ptr, size_t num_bytes);
+	  extern void *memalign(size_t alignment, size_t num_bytes); // or: "aligned_alloc"
+	  extern errno_t posix_memalign(void **p_ptr, size_t alignment, size_t num_bytes);
+	  extern void *valloc(size_t num_bytes);
+	  extern void *pvalloc(size_t num_bytes);
+	  extern int mallopt(int param_number, int value);
+	  extern struct mallinfo mallinfo(void);
+	  extern struct mallinfo2 mallinfo2(void);
+	  extern int malloc_trim(size_t pad);
+	  extern size_t malloc_usable_size(void *ptr); // or: "_msize"
+	  extern void *memdup(void const *ptr, size_t n_bytes);
+	  extern void *memcdup(void const *ptr, int needle, size_t n_bytes);
+	  extern void *reallocarray(void *ptr, size_t elem_count, size_t elem_size);
+	  extern void *recalloc(void *mallptr, size_t num_bytes);
+	  extern void *recallocv(void *mallptr, size_t elem_count, size_t elem_size);
+	  ```
+	  Note that for full functionality, at least `malloc` and `malloc_usable_size` need to be defined by your application. Everything else is technically optional and will be implemented by fallback/noop-wrappers that call your `malloc` and `malloc_usable_size`.
+	- IMPORTANT: You CANNOT use this mechanism to inject some extra wrapper around heap functions and then use `dlsym(RTLD_NEXT, "malloc")` to call the *real* malloc! If you try to do this, you'll get a stack-overflow, since what you believe to be the *real* malloc no longer exists, as it has been replaced with a proxy that's just going to call *your* malloc all the time.
 
 #### Environment options
 

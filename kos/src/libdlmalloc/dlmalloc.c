@@ -3197,6 +3197,9 @@ static int init_mparams(void) {
       /* Until memory modes commonly available, use volatile-write */
       (*(volatile size_t *)(&(mparams.magic))) = magic;
     }
+#ifdef MALLOC_INIT_EXTRA_HOOK
+    MALLOC_INIT_EXTRA_HOOK();
+#endif /* MALLOC_INIT_EXTRA_HOOK */
   }
 
   RELEASE_MALLOC_GLOBAL_LOCK();

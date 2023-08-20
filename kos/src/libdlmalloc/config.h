@@ -191,6 +191,11 @@ DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void *dlpvalloc(size_t byt
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") int dlmalloc_trim(size_t pad);
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlmalloc_usable_size(void *mem);
 
+#ifdef __BUILDING_LIBC
+INTDEF void NOTHROW_NCX(LIBCCALL libc_init_malloc_hooks)(void);
+#define MALLOC_INIT_EXTRA_HOOK() libc_init_malloc_hooks()
+#endif /* __BUILDING_LIBC */
+
 #ifdef DL_REGISTER_CACHE
 DL_REGISTER_CACHE(dl_clear_caches) {
 	return dlmalloc_trim(0);
