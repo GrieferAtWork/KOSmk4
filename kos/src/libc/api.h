@@ -101,6 +101,12 @@ __asm__("__cxa_end_catch = libc_cxa_end_catch");
 __asm__("__cxa_begin_catch = libc_cxa_begin_catch");
 __asm__("_Unwind_Resume = libc_Unwind_Resume");
 #endif /* !GUARD_LIBC_HYBRID_EXCEPT_C */
+
+/* Called when you use `throw;' instead of `RETHROW()'
+ * But  note that KOS's  `RETHROW()' also supports c++
+ * exceptions, so we can just link against it! */
+__asm__("__cxa_rethrow = libc_except_rethrow");
+
 /* TODO: Because of how GCC generates code, even if we were to prevent  it
  *       from  generating relocations against  these symbols, we'd instead
  *       end  up with a  `R_386_RELATIVE' relocation, as  gcc places a ref
