@@ -1138,11 +1138,10 @@ NOTHROW_NCX(LIBCCALL libc___p___linux_C_lib_version)(void) {
  * lazily load+resolve-to the symbols from libiconv at runtime. */
 PRIVATE ATTR_SECTION(".bss.crt.compat.glibc") void *libc_libiconv = NULL;
 PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc")
-char const libc_init_libiconv_failed_msg[] = "Failed to load libiconv: %s\n";
+char const libc_init_libiconv_failed_msg[] = "[libc] failed to load libiconv: %s\n";
 PRIVATE ATTR_NORETURN ATTR_SECTION(".text.crt.compat.glibc")
 void LIBCCALL libc_init_libiconv_failed(void) {
-	syslog(LOG_ERR, libc_init_libiconv_failed_msg, dlerror());
-	exit(EXIT_FAILURE);
+	abortf(libc_init_libiconv_failed_msg, dlerror());
 }
 PRIVATE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc")
 void *LIBCCALL libc_get_libiconv(void) {
@@ -1464,10 +1463,8 @@ PRIVATE ATTR_SECTION(".text.crt.dos.compat.dos") void *CC libd_getk32(void) {
 	if (k32)
 		return k32;
 	k32 = dlopen("libkernel32.so", RTLD_LAZY | RTLD_LOCAL);
-	if (!k32) {
-		syslog(LOG_CRIT, "[libc] Failed to load 'libkernel32.so': %s\n", dlerror());
-		sys_exit_group(1);
-	}
+	if unlikely(!k32)
+		abortf("[libc] Failed to load 'libkernel32.so': %s", dlerror());
 	if (!atomic_cmpxch(&libkernel32, NULL, k32)) {
 		dlclose(k32);
 		k32 = atomic_read(&libkernel32);
@@ -1481,12 +1478,8 @@ ATTR_SECTION(".text.crt.dos.compat.dos")
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) void *LIBCCALL
 libd_requirek32(char const *__restrict symbol_name) {
 	void *result = dlsym(libd_getk32(), symbol_name);
-	if (!result) {
-		char *msg = dlerror();
-		syslog(LOG_CRIT, "[libc] Failed to load '%s' from 'libkernel32.so': %s\n",
-		       symbol_name, msg);
-		sys_exit_group(1);
-	}
+	if unlikely(!result)
+		abortf("[libc] Failed to load '%s' from 'libkernel32.so': %s", symbol_name, dlerror());
 	return result;
 }
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85cbb57b */
+/* HASH CRC-32:0xeae8ff2e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3557,6 +3557,43 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(shexec, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN
 #undef __shexec_defined
 #endif /* !... */
 #endif /* !__shexec_defined */
+#ifdef __CRT_HAVE_abortf
+/* >> abortf(3)
+ * Same  as  `abort(3)',  but prior  to  doing what  `abort(3)'  does, this
+ * function will print the specified message `format' to `syslog(LOG_ERR)',
+ * as well as `STDERR_FILENO' (if  that file is opened  and a tty). In  the
+ * message version that is printed  to `STDERR_FILENO', every line that  is
+ * printed  is prefixed by  "{program_invocation_short_name}: ", and in the
+ * syslog, every  line  is  prefixed  "[{program_invocation_short_name}] ".
+ *
+ * Additionally, in the stderr-version, `[foo]'  prefixes at the start  of
+ * lines are replaced with `foo: ' (but are kept as-is in syslog messages) */
+__LIBC __ATTR_NORETURN __ATTR_IN(1) __ATTR_LIBC_PRINTF(1, 2) void (__VLIBCCALL abortf)(char const *__format, ...) __CASMNAME_SAME("abortf");
+#else /* __CRT_HAVE_abortf */
+#include <asm/os/stdio.h>
+#include <asm/os/syslog.h>
+#include <libc/template/program_invocation_name.h>
+#include <asm/os/tty.h>
+#include <bits/crt/format-printer.h>
+#if defined(__STDERR_FILENO) && defined(__LOG_ERR) && defined(__LOCAL_program_invocation_name) && (defined(__CRT_HAVE_isatty) || defined(__CRT_HAVE__isatty) || defined(__CRT_HAVE___isatty) || defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_writeall) || (defined(__CRT_HAVE_write_printer) && defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)) && defined(__CRT_HAVE_syslog_printer) && (defined(__CRT_HAVE_abort) || defined(__CRT_HAVE__ZSt9terminatev) || defined(__CRT_HAVE_terminate) || defined(__CRT_HAVE___chk_fail) || defined(__CRT_HAVE_$Qterminate$A$AYAXXZ) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit))
+#include <libc/local/stdlib/abortf.h>
+/* >> abortf(3)
+ * Same  as  `abort(3)',  but prior  to  doing what  `abort(3)'  does, this
+ * function will print the specified message `format' to `syslog(LOG_ERR)',
+ * as well as `STDERR_FILENO' (if  that file is opened  and a tty). In  the
+ * message version that is printed  to `STDERR_FILENO', every line that  is
+ * printed  is prefixed by  "{program_invocation_short_name}: ", and in the
+ * syslog, every  line  is  prefixed  "[{program_invocation_short_name}] ".
+ *
+ * Additionally, in the stderr-version, `[foo]'  prefixes at the start  of
+ * lines are replaced with `foo: ' (but are kept as-is in syslog messages) */
+#if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
+__NAMESPACE_LOCAL_USING_OR_IMPL(abortf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_IN(1) __ATTR_LIBC_PRINTF(1, 2) void (__VLIBCCALL abortf)(char const *__format, ...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(abortf))(__format, __builtin_va_arg_pack()); })
+#else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
+#define abortf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(abortf))(__VA_ARGS__)
+#endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
+#endif /* __STDERR_FILENO && __LOG_ERR && __LOCAL_program_invocation_name && (__CRT_HAVE_isatty || __CRT_HAVE__isatty || __CRT_HAVE___isatty || __CRT_HAVE_tcgetattr || __CRT_HAVE___tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA)) && (__CRT_HAVE_writeall || (__CRT_HAVE_write_printer && __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_INT__ == __SIZEOF_POINTER__) || __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write) && __CRT_HAVE_syslog_printer && (__CRT_HAVE_abort || __CRT_HAVE__ZSt9terminatev || __CRT_HAVE_terminate || __CRT_HAVE___chk_fail || __CRT_HAVE_$Qterminate$A$AYAXXZ || __CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) */
+#endif /* !__CRT_HAVE_abortf */
 #endif /* __USE_KOS */
 
 #ifdef __USE_SOLARIS

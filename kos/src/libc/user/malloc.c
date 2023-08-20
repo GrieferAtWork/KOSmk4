@@ -60,18 +60,6 @@ DECL_BEGIN
 /*[[[skip:libc_mallinfo2]]]*/
 
 #if __ARCH_REDIRECT_MAXBYTES != 0
-
-#define FATAL(format, ...)                                         \
-	do {                                                           \
-		syslog(LOG_ERR, "[libc] " format "\n", ##__VA_ARGS__);     \
-		if (isatty(STDERR_FILENO)) {                               \
-			dprintf(STDERR_FILENO, "%s: " format "\n",             \
-			        program_invocation_short_name, ##__VA_ARGS__); \
-		}                                                          \
-		abort();                                                   \
-	}	__WHILE0
-
-
 typedef void *(LIBCCALL *LPMALLOC)(size_t num_bytes);
 typedef void (LIBCCALL *LPFREE)(void *ptr);
 typedef void *(LIBCCALL *LPCALLOC)(size_t elem_count, size_t elem_size);
@@ -468,7 +456,7 @@ libc_malloc_redirect(char const *name, void *from_pc, void *to_pc) {
 #endif /* !__arch_redirect_size */
 #ifdef __arch_redirect_possible
 	if (!__arch_redirect_possible(from_pc, to_pc))
-		FATAL("Impossible to redirect `%s' from %p to %p", name, from_pc, to_pc);
+		abortf("[libc][malloc] Impossible to redirect `%s' from %p to %p", name, from_pc, to_pc);
 #endif /* __arch_redirect_possible */
 	(void)name;
 	MProtect(from_pc, size, PROT_EXEC | PROT_WRITE | PROT_READ);
@@ -585,20 +573,16 @@ PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers")
 ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) void *LIBCCALL
 get_dlmalloc_function(void *lib_dlmalloc, char const *__restrict name) {
 	void *result = dlsym(lib_dlmalloc, name);
-	if unlikely(!result) {
-		char *msg = dlerror();
-		FATAL("symbol %s not found in libdlmalloc: %s", name, msg);
-	}
+	if unlikely(!result)
+		abortf("[libc][malloc] symbol %s not found in libdlmalloc: %s", name, dlerror());
 	return result;
 }
 
 PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers") NONNULL((1)) void LIBCCALL
 libdlmalloc_so_abi_load(struct user_malloc_abi *__restrict self) {
 	void *lib_dlmalloc = dlopen("libdlmalloc.so", RTLD_GLOBAL);
-	if (lib_dlmalloc == NULL) {
-		char *msg = dlerror();
-		FATAL("failed to load libdlmalloc: %s", msg);
-	}
+	if (lib_dlmalloc == NULL)
+		abortf("[libc][malloc] failed to load libdlmalloc: %s", dlerror());
 	*(void **)&self->uma_malloc = get_dlmalloc_function(lib_dlmalloc, nameof_malloc);
 	*(void **)&self->uma_free = get_dlmalloc_function(lib_dlmalloc, nameof_free);
 	*(void **)&self->uma_calloc = get_dlmalloc_function(lib_dlmalloc, nameof_calloc);

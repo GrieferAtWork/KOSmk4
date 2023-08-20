@@ -56,6 +56,12 @@ struct assert_args {
 	char const      *aa_format;  /* [0..1] Fault message printf-format */
 };
 
+struct abortf_args {
+	va_list          af_args;    /* Variable arguments for `af_format' */
+	struct kcpustate af_state;   /* CPU state pointing after the call to `abortf()' or `vabortf()' */
+	char const      *af_format;  /* [0..1] Fault message printf-format */
+};
+
 /* Core undefined-behavior handlers. (called from assembly) */
 INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL libc_assertion_failure_core)(struct assert_args *__restrict args);
 INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL libc_stack_failure_core)(struct kcpustate *__restrict state);
@@ -66,6 +72,7 @@ INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_RETNONNULL WUNUSED NONNULL((1)) struct kcp
 INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL libc_assertion_failure_core_c16)(struct assert_args *__restrict args);
 INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL libc_assertion_failure_core_c32)(struct assert_args *__restrict args);
 INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL libc_assertion_failure_perror)(struct assert_args *__restrict args);
+INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL libc_vabortf_failure_core)(struct abortf_args *__restrict args);
 #endif /* !__KERNEL__ */
 
 

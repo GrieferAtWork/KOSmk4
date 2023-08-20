@@ -1194,6 +1194,39 @@ int main_ttys(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+int main_abort(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	abort();
+	return 0;
+}
+/************************************************************************/
+
+
+
+/************************************************************************/
+int main_abortf(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	abortf("Abort with %s", "format string message");
+	return 0;
+}
+/************************************************************************/
+
+
+
+/************************************************************************/
+int main_abortf2(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	abortf("[tag1] Abort with %s\n"
+	       "[tag2] Second %s",
+	       "format string message",
+	       "line");
+	return 0;
+}
+/************************************************************************/
+
+
+
 typedef int (*FUN)(int argc, char *argv[], char *envp[]);
 typedef struct {
 	char const *n;
@@ -1247,6 +1280,9 @@ PRIVATE DEF defs[] = {
 	{ "dosenv", &main_dosenv },
 	{ "stackend", &main_stackend },
 	{ "ttys", &main_ttys },
+	{ "abort", &main_abort },
+	{ "abortf", &main_abortf },
+	{ "abortf2", &main_abortf2 },
 	/* TODO: On x86_64, add a playground that:
 	 *   - mmap(0x00007ffffffff000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_FIXED);
 	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall

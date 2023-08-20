@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c850e09 */
+/* HASH CRC-32:0x24e2b620 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -974,6 +974,32 @@ INTDEF ATTR_IN_OPT(1) int NOTHROW_RPC(LIBDCALL libd_shexec)(char const *command)
  * of them are tested, this function will try to use `secure_getenv("SHELL")',  if
  * and only if that variable is defined and starts with a '/'-character. */
 INTDEF ATTR_IN_OPT(1) int NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> abortf(3)
+ * Same  as  `abort(3)',  but prior  to  doing what  `abort(3)'  does, this
+ * function will print the specified message `format' to `syslog(LOG_ERR)',
+ * as well as `STDERR_FILENO' (if  that file is opened  and a tty). In  the
+ * message version that is printed  to `STDERR_FILENO', every line that  is
+ * printed  is prefixed by  "{program_invocation_short_name}: ", and in the
+ * syslog, every  line  is  prefixed  "[{program_invocation_short_name}] ".
+ *
+ * Additionally, in the stderr-version, `[foo]'  prefixes at the start  of
+ * lines are replaced with `foo: ' (but are kept as-is in syslog messages) */
+INTDEF ATTR_NORETURN ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) void (VLIBDCALL libd_abortf)(char const *format, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> abortf(3)
+ * Same  as  `abort(3)',  but prior  to  doing what  `abort(3)'  does, this
+ * function will print the specified message `format' to `syslog(LOG_ERR)',
+ * as well as `STDERR_FILENO' (if  that file is opened  and a tty). In  the
+ * message version that is printed  to `STDERR_FILENO', every line that  is
+ * printed  is prefixed by  "{program_invocation_short_name}: ", and in the
+ * syslog, every  line  is  prefixed  "[{program_invocation_short_name}] ".
+ *
+ * Additionally, in the stderr-version, `[foo]'  prefixes at the start  of
+ * lines are replaced with `foo: ' (but are kept as-is in syslog messages) */
+INTDEF ATTR_NORETURN ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) void (VLIBCCALL libc_abortf)(char const *format, ...);
 /* >> getexecname(3)
  * Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_getexecname)(void);

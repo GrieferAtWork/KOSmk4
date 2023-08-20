@@ -3292,6 +3292,124 @@ int shexec([[in_opt]] char const *command) {
 	execl("/bin/busybox", arg_sh, arg__c, command, (char *)NULL);
 	return -1;
 }
+
+
+@@>> abortf(3)
+@@Same  as  `abort(3)',  but prior  to  doing what  `abort(3)'  does, this
+@@function will print the specified message `format' to `syslog(LOG_ERR)',
+@@as well as `STDERR_FILENO' (if  that file is opened  and a tty). In  the
+@@message version that is printed  to `STDERR_FILENO', every line that  is
+@@printed  is prefixed by  "{program_invocation_short_name}: ", and in the
+@@syslog, every  line  is  prefixed  "[{program_invocation_short_name}] ".
+@@
+@@Additionally, in the stderr-version, `[foo]'  prefixes at the start  of
+@@lines are replaced with `foo: ' (but are kept as-is in syslog messages)
+[[noreturn, no_nothrow]]
+[[crt_impl_requires(!defined(LIBC_ARCH_HAVE_ABORTF))]]
+[[requires_include("<asm/os/stdio.h>", "<asm/os/syslog.h>", "<libc/template/program_invocation_name.h>")]]
+[[requires(defined(__STDERR_FILENO) && defined(__LOG_ERR) && defined(__LOCAL_program_invocation_name) &&
+           $has_function(isatty, writeall, syslog_printer, abort, format_vprintf))]]
+[[dependency(isatty, writeall, syslog_printer, abort, format_vprintf, strchr)]]
+[[section(".text.crt{|.dos}.assert")]]
+[[impl_prefix(
+@@push_namespace(local)@@
+struct __vabortmsgf_data {
+	char const *vamfd_ptag_str; /* [1..vamfd_ptag_len] Program tag. */
+	size_t      vamfd_ptag_len; /* Length of the program tag. */
+	bool        vamfd_isatty;   /* True if STDERR_FILENO is a tty. */
+	bool        vamfd_at_sol;   /* True if at the start of a line. */
+	bool        vamfd_rp_brk;   /* True if a closing ']' must be replaced with ": " on stderr */
+};
+__LOCAL_LIBC(@vabortmsgf_printer@) ssize_t
+NOTHROW_NCX(FORMATPRINTER_CC abortf_printer)(void *arg, char const *__restrict data, size_t datalen) {
+	ssize_t result = (ssize_t)datalen;
+	struct __vabortmsgf_data *cookie = (struct __vabortmsgf_data *)arg;
+	while (datalen) {
+		char tailchar;
+		size_t block_len;
+		if (cookie->vamfd_at_sol) {
+			cookie->vamfd_at_sol = false;
+			cookie->vamfd_rp_brk = false;
+			(void)syslog_printer((void *)(uintptr_t)__LOG_ERR, "[", 1);
+			(void)syslog_printer((void *)(uintptr_t)__LOG_ERR, cookie->vamfd_ptag_str, cookie->vamfd_ptag_len);
+			(void)syslog_printer((void *)(uintptr_t)__LOG_ERR, "] ", data[0] == '[' ? 1 : 2);
+			if (cookie->vamfd_isatty) {
+				(void)writeall(__STDERR_FILENO, cookie->vamfd_ptag_str, cookie->vamfd_ptag_len);
+				(void)writeall(__STDERR_FILENO, ": ", 2);
+				if (data[0] == '[') {
+					cookie->vamfd_rp_brk = true;
+					(void)syslog_printer((void *)(uintptr_t)__LOG_ERR, "[", 1);
+					++data;
+					--datalen;
+				}
+			}
+		}
+		for (block_len = 0;;) {
+			for (; block_len < datalen; ++block_len) {
+				if (strchr("\r\n]", data[block_len]))
+					break;
+			}
+			if (block_len >= datalen)
+				break;
+			if (data[block_len] != ']')
+				break;
+			if (cookie->vamfd_rp_brk)
+				break;
+		}
+		tailchar = '\0';
+		if (block_len < datalen)
+			tailchar = data[block_len];
+		if (tailchar == '\n') {
+			cookie->vamfd_at_sol = true;
+			++block_len;
+		}
+		(void)syslog_printer((void *)(uintptr_t)__LOG_ERR, data, block_len);
+		if (cookie->vamfd_isatty)
+			(void)writeall(__STDERR_FILENO, data, block_len);
+		data += block_len;
+		datalen -= block_len;
+		if (tailchar == ']') {
+			(void)syslog_printer((void *)(uintptr_t)__LOG_ERR, "]", 1);
+			if (cookie->vamfd_isatty)
+				(void)writeall(__STDERR_FILENO, ":", 1);
+			++data;
+			--datalen;
+			cookie->vamfd_rp_brk = false;
+		} else if (tailchar == '\r') {
+			++data;
+			--datalen;
+			if (datalen && *data == '\n') {
+				++data;
+				--datalen;
+			}
+			(void)syslog_printer((void *)(uintptr_t)__LOG_ERR, "\n", 1);
+			if (cookie->vamfd_isatty)
+				(void)writeall(__STDERR_FILENO, "\n", 1);
+			cookie->vamfd_at_sol = true;
+		}
+	}
+	return result;
+}
+@@pop_namespace@@
+)]]
+void abortf([[in, format("printf")]] char const *format, ...) {
+	struct __NAMESPACE_LOCAL_SYM __vabortmsgf_data data;
+	va_list args;
+	data.vamfd_ptag_str = program_invocation_name;
+	if (data.vamfd_ptag_str == NULL)
+		data.vamfd_ptag_str = "?";
+	data.vamfd_ptag_len = strlen(data.vamfd_ptag_str);
+	data.vamfd_isatty   = isatty(STDERR_FILENO) != 0;
+	data.vamfd_at_sol   = true;
+	data.vamfd_rp_brk   = false;
+	va_start(args, format);
+	(void)format_vprintf(&__NAMESPACE_LOCAL_SYM abortf_printer, &data, format, args);
+	if (!data.vamfd_at_sol)
+		(void)__NAMESPACE_LOCAL_SYM abortf_printer(&data, "\n", 1);
+	va_end(args);
+	abort();
+}
+
 %#endif /* __USE_KOS */
 
 %

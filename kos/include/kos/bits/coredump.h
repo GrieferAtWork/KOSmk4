@@ -47,6 +47,7 @@ union coredump_info {
 	struct exception_data   ci_except;     /* [unwind_error = *]                   Exception data. */
 	struct __siginfo_struct ci_signal;     /* [unwind_error = UNWIND_SUCCESS]      Signal information. */
 	char                    ci_dlerror[1]; /* [unwind_error = UNWIND_USER_DLERROR] dlerror() error message. */
+	char                    ci_abrtmsg[1]; /* [unwind_error = UNWIND_USER_ABORT]   abortf() error message. */
 	struct coredump_assert  ci_assert;     /* [unwind_error = UNWIND_USER_ASSERT]  Assert info.
 	                                        * [unwind_error = UNWIND_USER_ACHECK]  *ditto* */
 };

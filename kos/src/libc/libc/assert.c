@@ -52,29 +52,33 @@
 #include <libunwind/errno.h> /* UNWIND_USER_ABORT */
 
 #include "assert.h"
+#include "globals.h"
 #include "sigreturn.h"
 
 
 DECL_BEGIN
 
 /* 0: Unknown, 1: Yes, 2: No */
-PRIVATE ATTR_SECTION(".bss.crt.assert") int stderr_isatty = 0;
+PRIVATE ATTR_SECTION(".bss.crt.assert") int saved_stderr_isatty = 0;
 
-INTERN ATTR_NOINLINE ATTR_COLD ATTR_SECTION(".text.crt.assert") void
+PRIVATE ATTR_NOINLINE ATTR_COLD ATTR_SECTION(".text.crt.assert") void
 NOTHROW(CC determine_stderr_isatty)(void) {
 	struct termios ios;
-	stderr_isatty = sys_ioctl(STDERR_FILENO, TCGETA, &ios) < 0 ? 2 : 1;
+	saved_stderr_isatty = sys_ioctl(STDERR_FILENO, TCGETA, &ios) < 0 ? 2 : 1;
 }
 
-INTERN ATTR_COLD ATTR_SECTION(".text.crt.assert") ssize_t CC
+PRIVATE ATTR_NOINLINE ATTR_SECTION(".text.crt.assert") bool
+NOTHROW(CC stderr_isatty)(void) {
+	if (saved_stderr_isatty == 0)
+		determine_stderr_isatty();
+	return saved_stderr_isatty == 1;
+}
+
+PRIVATE ATTR_COLD ATTR_SECTION(".text.crt.assert") ssize_t CC
 assert_printer(void *UNUSED(ignored), char const *__restrict data, size_t datalen) {
 	/* Also write assertion error text to stderr, but only if it's a TTY. */
-	if (stderr_isatty != 2) {
-		if (stderr_isatty == 0)
-			determine_stderr_isatty();
-		if (stderr_isatty == 1)
-			sys_write(STDERR_FILENO, data, datalen);
-	}
+	if (stderr_isatty())
+		sys_write(STDERR_FILENO, data, datalen);
 	return syslog_printer(SYSLOG_PRINTER_CLOSURE(LOG_ERR),
 	                      data, datalen);
 }
@@ -296,6 +300,160 @@ NOTHROW(FCALL libc_assertion_failure_core_c32)(struct assert_args *__restrict ar
 		args->aa_format = convert_c32tombs((char32_t *)args->aa_format);
 	libc_assertion_failure_core(args);
 }
+
+
+struct vabortmsgf_data {
+	char const *vamfd_ptag_str; /* [1..vamfd_ptag_len] Program tag. */
+	size_t      vamfd_ptag_len; /* Length of the program tag. */
+	bool        vamfd_at_sol;   /* True if at the start of a line. */
+	bool        vamfd_rp_brk;   /* True if a closing ']' must be replaced with ": " on stderr */
+	bool        vamfd_rp_pst;   /* True if after a closing ']' */
+	char       *vamfd_mptr;     /* [0..1] Pointer into `vamfd_mbuf' for the kernel message. */
+	char        vamfd_mbuf[COREDUMP_ABORTF_MESG_MAXLEN];
+};
+
+PRIVATE ATTR_SECTION(".text.crt.assert") void
+NOTHROW_NCX(FORMATPRINTER_CC abortf_mbuf_print)(struct vabortmsgf_data *arg,
+                                                char const *__restrict data,
+                                                size_t datalen) {
+	size_t avail;
+	avail = (size_t)(COMPILER_ENDOF(arg->vamfd_mbuf) - arg->vamfd_mptr);
+	if (datalen > avail)
+		datalen = avail;
+	arg->vamfd_mptr = (char *)mempcpy(arg->vamfd_mptr, data, datalen);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.assert") ssize_t
+NOTHROW_NCX(FORMATPRINTER_CC abortf_printer)(void *arg, char const *__restrict data, size_t datalen) {
+	static char const crlfbr[] = "\r\n]";
+#define LF (crlfbr + 1)
+#define BR (crlfbr + 2)
+	ssize_t result = (ssize_t)datalen;
+	struct vabortmsgf_data *cookie = (struct vabortmsgf_data *)arg;
+	while (datalen) {
+		char tailchar;
+		size_t block_len;
+		if (cookie->vamfd_at_sol) {
+			cookie->vamfd_at_sol = false;
+			cookie->vamfd_rp_brk = false;
+			(void)sys_syslog(LOG_ERR, "[", 1);
+			(void)sys_syslog(LOG_ERR, cookie->vamfd_ptag_str, cookie->vamfd_ptag_len);
+			(void)sys_syslog(LOG_ERR, "] ", data[0] == '[' ? 1 : 2);
+			if (stderr_isatty()) {
+				(void)sys_write(STDERR_FILENO, cookie->vamfd_ptag_str, cookie->vamfd_ptag_len);
+				(void)sys_write(STDERR_FILENO, ": ", 2);
+				if (data[0] == '[') {
+					cookie->vamfd_rp_brk = true;
+					(void)sys_syslog(LOG_ERR, "[", 1);
+					++data;
+					--datalen;
+				}
+			}
+		}
+		for (block_len = 0;;) {
+			for (; block_len < datalen; ++block_len) {
+				if (strchr(crlfbr, data[block_len]))
+					break;
+			}
+			if (block_len >= datalen)
+				break;
+			if (data[block_len] != ']')
+				break;
+			if (cookie->vamfd_rp_brk)
+				break;
+		}
+		tailchar = '\0';
+		if (block_len < datalen)
+			tailchar = data[block_len];
+		if (tailchar == '\n') {
+			cookie->vamfd_at_sol = true;
+			++block_len;
+		}
+		(void)sys_syslog(LOG_ERR, data, block_len);
+		if (stderr_isatty())
+			(void)sys_write(STDERR_FILENO, data, block_len);
+		if (!cookie->vamfd_rp_brk) {
+			char const *mbuf_data = data;
+			size_t mbuf_len = block_len;
+			if (cookie->vamfd_rp_pst && mbuf_len && *mbuf_data == ' ') {
+				++mbuf_data;
+				--mbuf_len;
+			}
+			abortf_mbuf_print(cookie, mbuf_data, mbuf_len);
+		}
+		cookie->vamfd_rp_pst = false;
+		data += block_len;
+		datalen -= block_len;
+		if (tailchar == ']') {
+			(void)sys_syslog(LOG_ERR, BR, 1);
+			if (stderr_isatty())
+				(void)sys_write(STDERR_FILENO, ":", 1);
+			++data;
+			--datalen;
+			cookie->vamfd_rp_brk = false;
+			cookie->vamfd_rp_pst = true;
+		} else if (tailchar == '\r') {
+			++data;
+			--datalen;
+			if (datalen && *data == '\n') {
+				++data;
+				--datalen;
+			}
+			(void)sys_syslog(LOG_ERR, LF, 1);
+			if (stderr_isatty())
+				(void)sys_write(STDERR_FILENO, LF, 1);
+			if (!cookie->vamfd_rp_brk)
+				abortf_mbuf_print(cookie, LF, 1);
+			cookie->vamfd_at_sol = true;
+		}
+	}
+	return result;
+#undef BR
+#undef LF
+}
+
+
+PRIVATE ABNORMAL_RETURN ATTR_COLD ATTR_NOINLINE ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL libc_vabortf_failure_core_impl)(struct abortf_args *__restrict args) {
+	struct vabortmsgf_data data;
+	data.vamfd_ptag_str = program_invocation_name;
+	if (data.vamfd_ptag_str == NULL)
+		data.vamfd_ptag_str = "?";
+	data.vamfd_ptag_len = strlen(data.vamfd_ptag_str);
+	data.vamfd_at_sol   = true;
+	data.vamfd_rp_brk   = false;
+	data.vamfd_mptr     = data.vamfd_mbuf;
+	(void)format_vprintf(&abortf_printer, &data, args->af_format, args->af_args);
+	if (!data.vamfd_at_sol)
+		(void)abortf_printer(&data, "\n", 1);
+	data.vamfd_mbuf[lengthof(data.vamfd_mbuf) - 1] = '\0';
+	while (data.vamfd_mptr > data.vamfd_mbuf && data.vamfd_mptr[-1] == '\n')
+		--data.vamfd_mptr;
+	if (data.vamfd_mptr < COMPILER_ENDOF(data.vamfd_mbuf))
+		data.vamfd_mptr[0] = '\0';
+	data.vamfd_mptr = data.vamfd_mbuf;
+	while (*data.vamfd_mptr == '\n')
+		++data.vamfd_mptr;
+	trap_application(&args->af_state,
+	                 container_of(data.vamfd_mptr, union coredump_info, ci_abrtmsg[0]),
+	                 UNWIND_USER_ABORT);
+}
+
+INTERN ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL libc_vabortf_failure_core)(struct abortf_args *__restrict args) {
+	/* If no format-message is given, behave the same as regular `abort(3)' */
+	if unlikely(!args->af_format)
+		libc_abort_failure_core(&args->af_state);
+
+	/* If the user has defined a custom sigaction for `SIGABRT',
+	 * then instead of directly  triggering a coredump, we  must
+	 * raise that signal at the given `state'! */
+	maybe_raise_SIGABRT(&args->af_state);
+
+	/* Normal abort handling. */
+	libc_vabortf_failure_core_impl(args);
+}
+
 #endif /* !__KERNEL__ */
 
 DECL_END

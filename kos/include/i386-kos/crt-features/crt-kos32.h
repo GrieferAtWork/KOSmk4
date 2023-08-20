@@ -2410,6 +2410,7 @@
 #define __CRT_HAVE__yn
 #define __CRT_HAVE_a64l
 #define __CRT_HAVE_abort
+#define __CRT_HAVE_abortf
 #define __CRT_HAVE_abs
 #define __CRT_HAVE_accept
 #define __CRT_HAVE_accept4

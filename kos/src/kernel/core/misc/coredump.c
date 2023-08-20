@@ -153,6 +153,8 @@ dbg_coredump(void const *const *traceback_vector,
 			dbg_print_siginfo(&reason->ci_signal);
 		} else if (COREDUMP_INFO_ISDLERROR(unwind_error)) {
 			dbg_printf(DBGSTR("dlerror: " AC_YELLOW("%q") "\n"), reason->ci_dlerror);
+		} else if (COREDUMP_INFO_ISABORT(unwind_error)) {
+			dbg_printf(DBGSTR("abort: " AC_YELLOW("%q") "\n"), reason->ci_abrtmsg);
 		} else if (COREDUMP_INFO_ISASSERT(unwind_error)) {
 			if (reason->ci_assert.ca_expr)
 				dbg_printf(DBGSTR("assert.expr: " AC_YELLOW("%q") "\n"), reason->ci_assert.ca_expr);
@@ -359,6 +361,8 @@ coredump_create(struct ucpustate const *curr_ustate,
 			printk_err_siginfo(&reason->ci_signal);
 		} else if (COREDUMP_INFO_ISDLERROR(unwind_error)) {
 			printk(KERN_RAW "dlerror: %q\n", reason->ci_dlerror);
+		} else if (COREDUMP_INFO_ISABORT(unwind_error)) {
+			printk(KERN_RAW "abort: %q\n", reason->ci_abrtmsg);
 		} else if (COREDUMP_INFO_ISASSERT(unwind_error)) {
 			if (reason->ci_assert.ca_expr)
 				printk(KERN_RAW "assert.expr: %q\n", reason->ci_assert.ca_expr);

@@ -71,13 +71,10 @@ NOTHROW(LIBCCALL abort_tls_globals_alloc_failed)(void) {
 	if (handler != NULL)
 		(*handler)();
 
-	/* Fallback: print an error message and exit. */
-	(void)fprintf(stderr, "%1$s: failed to allocate tls-globals for thread %2$" PRIdN(__SIZEOF_PID_T__) "\n"
-	                      "%1$s: to suppress this error, re-run with `LIBC_TLS_GLOBALS_ALLOW_UNSAFE=1'\n",
-	              program_invocation_short_name, gettid());
-	(void)fflush(stderr);
-	(void)raise(SIGABRT);
-	abort();
+	/* Fallback: abort with an error message. */
+	abortf("[libc][tls-globals] Failed to allocate tls-globals for thread %2$" PRIdN(__SIZEOF_PID_T__) "\n"
+	       "[libc][tls-globals] To suppress this error, re-run with `LIBC_TLS_GLOBALS_ALLOW_UNSAFE=1'\n",
+	       gettid());
 }
 
 /* Return a pointer to the calling thread's tls-globals controller. */

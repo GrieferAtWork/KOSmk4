@@ -35,6 +35,7 @@
 #define COREDUMP_ASSERT_FILE_MAXLEN 512  /* ci_assert.ca_file */
 #define COREDUMP_ASSERT_FUNC_MAXLEN 256  /* ci_assert.ca_func */
 #define COREDUMP_ASSERT_MESG_MAXLEN 2048 /* ci_assert.ca_mesg */
+#define COREDUMP_ABORTF_MESG_MAXLEN 2048 /* ci_abrtmsg */
 #define COREDUMP_DLERROR_MAXLEN     2048 /* ci_dlerror */
 #define COREDUMP_TRACEBACK_LIMIT    128  /* Max # of extended traceback entries. */
 
@@ -43,11 +44,14 @@
 	((unwind_error) != UNWIND_SUCCESS &&      \
 	 (unwind_error) != UNWIND_USER_DLERROR && \
 	 (unwind_error) != UNWIND_USER_ASSERT &&  \
-	 (unwind_error) != UNWIND_USER_ACHECK)
+	 (unwind_error) != UNWIND_USER_ACHECK &&  \
+	 (unwind_error) != UNWIND_USER_ABORT)
 #define COREDUMP_INFO_ISSIGNAL(unwind_error) \
 	((unwind_error) == UNWIND_SUCCESS)
 #define COREDUMP_INFO_ISDLERROR(unwind_error) \
 	((unwind_error) == UNWIND_USER_DLERROR)
+#define COREDUMP_INFO_ISABORT(unwind_error) \
+	((unwind_error) == UNWIND_USER_ABORT)
 #define COREDUMP_INFO_ISASSERT(unwind_error) \
 	((unwind_error) == UNWIND_USER_ASSERT || \
 	 (unwind_error) == UNWIND_USER_ACHECK)

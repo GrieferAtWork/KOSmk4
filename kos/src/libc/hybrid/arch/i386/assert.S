@@ -80,6 +80,80 @@ END(libc_abort)
 
 DEFINE_PUBLIC_ALIAS(abort, libc_abort)
 
+
+#ifndef __KERNEL__
+/* >> PUBLIC ATTR_NORETURN void LIBCCALL abortf(char const *format, ...); */
+.section ASSERTION_SECTION
+INTERN_FUNCTION(libc_abortf)
+	.cfi_startproc
+#ifdef __x86_64__
+	/* %R_sysvabi0P: char const *format
+	 * %R_sysvabi1P: VA(0)
+	 * %R_sysvabi2P: VA(1)
+	 * %R_sysvabi3P: VA(2)
+	 * %R_sysvabi4P: VA(3)
+	 * %R_sysvabi5P: VA(4)
+	 * 8(%Psp):      VA(5)
+	 * 16(%Psp):     VA(6) */
+	pushP_cfi %R_sysvabi0P /* af_format */
+	pushP_cfi Pn(1)(%Psp)  /* af_state.kcs_rip */
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R_EX2(%Pdx, Pn(2)) /* 2 = # of preceding `pushP_cfi' */
+	pushP_cfi %Pdx         /* vl_reg_save_area (filled later) */
+	pushP_cfi %Pdx         /* vl_overflow_arg_area (== af_state.kcs_gpregs.gp_rsp) */
+	pushP_cfi $(Pn(1))     /* vl_gp_offset */
+	movP   %Psp, %R_fcall0P /* libc_vabortf_failure_core:args */
+	movP   (SIZEOF_X86_64_VA_LIST_STRUCT + OFFSET_KCPUSTATE64_GPREGS + OFFSET_GPREGS64_RDX)(%R_fcall0P), %Pdx
+
+#ifndef __NO_FPU
+	/* Check if FPU registers need saving */
+	testb  %al, %al
+	jz     1f
+	.cfi_remember_state
+	subP_imm_cfi (Pn(5) + X86_64_VA_LIST_XMM_COUNT * 16), %Psp
+	leaP   -OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_RSI(%Psp), %Pax
+	movq   %Pax, OFFSET_X86_64_VA_LIST_STRUCT_REG_SAVE_AREA(%R_fcall0P)
+	movl   $(0), OFFSET_X86_64_VA_LIST_STRUCT_FP_OFFSET(%R_fcall0P)
+	movP   %R_sysvabi5P, Pn(4)(%Psp)
+	movP   %R_sysvabi4P, Pn(3)(%Psp)
+	movP   %R_sysvabi3P, Pn(2)(%Psp)
+	movP   %R_sysvabi2P, Pn(1)(%Psp)
+	movP   %R_sysvabi1P, Pn(0)(%Psp)
+	X86_64_VA_LIST_SAVE_XMM(Pn(5)(%Psp))
+	INTERN(libc_vabortf_failure_core)
+	call   libc_vabortf_failure_core
+1:	.cfi_restore_state
+#endif /* !__NO_FPU */
+
+	/* Push normal register-save area */
+	pushP_cfi %R_sysvabi5P
+	pushP_cfi %R_sysvabi4P
+	pushP_cfi %R_sysvabi3P
+	pushP_cfi %R_sysvabi2P
+	pushP_cfi %R_sysvabi1P
+	leaP   -OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_RSI(%Psp), %Pax
+	movP   %Pax, OFFSET_X86_64_VA_LIST_STRUCT_REG_SAVE_AREA(%R_fcall0P)
+	movl   $(SIZEOF_X86_64_VA_LIST_REG_SAVE_AREA), OFFSET_X86_64_VA_LIST_STRUCT_FP_OFFSET(%R_fcall0P)
+	INTERN(libc_vabortf_failure_core)
+	call   libc_vabortf_failure_core
+#else /* __x86_64__ */
+	/* char const *format, ... */
+
+	/* Generate a full `struct kcpustate' */
+	ASM_PUSH_KCPUSTATE_AFTER_PIP_CFI_R
+	leaP   (SIZEOF_KCPUSTATE + Pn(1))(%Psp), %Pax
+	pushP_cfi %Pax                         /* af_args */
+
+	/* Call the high-level handler */
+	movP   %Psp, %R_fcall0P
+	INTERN(libc_vabortf_failure_core)
+	call   libc_vabortf_failure_core
+#endif /* !__x86_64__ */
+	.cfi_endproc
+END(libc_abortf)
+
+DEFINE_PUBLIC_ALIAS(abortf, libc_abortf)
+#endif /* !__KERNEL__ */
+
 /* Provide debugging facilities for __builtin_unreachable() (s.a. <__crt.h>) */
 DEFINE_PUBLIC_ALIAS(__ubsan_handle_builtin_unreachable, libc_abort)
 DEFINE_INTERN_ALIAS(libc___ubsan_handle_builtin_unreachable, libc_abort)

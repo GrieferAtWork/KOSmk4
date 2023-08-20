@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x126c3216 */
+/* HASH CRC-32:0x545f83fa */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,12 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/stdlib.h"
+#ifndef LIBC_ARCH_HAVE_ABORTF
+#include "format-printer.h"
+#include "string.h"
+#include "../user/sys.syslog.h"
+#include "../user/unistd.h"
+#endif /* !LIBC_ARCH_HAVE_ABORTF */
 #include "../user/dirent.h"
 #include "err.h"
 #include "../user/fcntl.h"
@@ -3064,6 +3070,230 @@ NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command) {
 	libc_execl("/bin/busybox", arg_sh, arg__c, command, (char *)NULL);
 	return -1;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#ifndef LIBC_ARCH_HAVE_ABORTF
+__NAMESPACE_LOCAL_BEGIN
+struct __vabortmsgf_data {
+	char const *vamfd_ptag_str; /* [1..vamfd_ptag_len] Program tag. */
+	size_t      vamfd_ptag_len; /* Length of the program tag. */
+	bool        vamfd_isatty;   /* True if STDERR_FILENO is a tty. */
+	bool        vamfd_at_sol;   /* True if at the start of a line. */
+	bool        vamfd_rp_brk;   /* True if a closing ']' must be replaced with ": " on stderr */
+};
+__LOCAL_LIBC(vabortmsgf_printer) ssize_t
+NOTHROW_NCX(FORMATPRINTER_CC abortf_printer)(void *arg, char const *__restrict data, size_t datalen) {
+	ssize_t result = (ssize_t)datalen;
+	struct __vabortmsgf_data *cookie = (struct __vabortmsgf_data *)arg;
+	while (datalen) {
+		char tailchar;
+		size_t block_len;
+		if (cookie->vamfd_at_sol) {
+			cookie->vamfd_at_sol = false;
+			cookie->vamfd_rp_brk = false;
+			(void)libc_syslog_printer((void *)(uintptr_t)__LOG_ERR, "[", 1);
+			(void)libc_syslog_printer((void *)(uintptr_t)__LOG_ERR, cookie->vamfd_ptag_str, cookie->vamfd_ptag_len);
+			(void)libc_syslog_printer((void *)(uintptr_t)__LOG_ERR, "] ", data[0] == '[' ? 1 : 2);
+			if (cookie->vamfd_isatty) {
+				(void)libc_writeall(__STDERR_FILENO, cookie->vamfd_ptag_str, cookie->vamfd_ptag_len);
+				(void)libc_writeall(__STDERR_FILENO, ": ", 2);
+				if (data[0] == '[') {
+					cookie->vamfd_rp_brk = true;
+					(void)libc_syslog_printer((void *)(uintptr_t)__LOG_ERR, "[", 1);
+					++data;
+					--datalen;
+				}
+			}
+		}
+		for (block_len = 0;;) {
+			for (; block_len < datalen; ++block_len) {
+				if (libc_strchr("\r\n]", data[block_len]))
+					break;
+			}
+			if (block_len >= datalen)
+				break;
+			if (data[block_len] != ']')
+				break;
+			if (cookie->vamfd_rp_brk)
+				break;
+		}
+		tailchar = '\0';
+		if (block_len < datalen)
+			tailchar = data[block_len];
+		if (tailchar == '\n') {
+			cookie->vamfd_at_sol = true;
+			++block_len;
+		}
+		(void)libc_syslog_printer((void *)(uintptr_t)__LOG_ERR, data, block_len);
+		if (cookie->vamfd_isatty)
+			(void)libc_writeall(__STDERR_FILENO, data, block_len);
+		data += block_len;
+		datalen -= block_len;
+		if (tailchar == ']') {
+			(void)libc_syslog_printer((void *)(uintptr_t)__LOG_ERR, "]", 1);
+			if (cookie->vamfd_isatty)
+				(void)libc_writeall(__STDERR_FILENO, ":", 1);
+			++data;
+			--datalen;
+			cookie->vamfd_rp_brk = false;
+		} else if (tailchar == '\r') {
+			++data;
+			--datalen;
+			if (datalen && *data == '\n') {
+				++data;
+				--datalen;
+			}
+			(void)libc_syslog_printer((void *)(uintptr_t)__LOG_ERR, "\n", 1);
+			if (cookie->vamfd_isatty)
+				(void)libc_writeall(__STDERR_FILENO, "\n", 1);
+			cookie->vamfd_at_sol = true;
+		}
+	}
+	return result;
+}
+__NAMESPACE_LOCAL_END
+/* >> abortf(3)
+ * Same  as  `abort(3)',  but prior  to  doing what  `abort(3)'  does, this
+ * function will print the specified message `format' to `syslog(LOG_ERR)',
+ * as well as `STDERR_FILENO' (if  that file is opened  and a tty). In  the
+ * message version that is printed  to `STDERR_FILENO', every line that  is
+ * printed  is prefixed by  "{program_invocation_short_name}: ", and in the
+ * syslog, every  line  is  prefixed  "[{program_invocation_short_name}] ".
+ *
+ * Additionally, in the stderr-version, `[foo]'  prefixes at the start  of
+ * lines are replaced with `foo: ' (but are kept as-is in syslog messages) */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.assert") ATTR_NORETURN ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) void
+(VLIBDCALL libd_abortf)(char const *format,
+                        ...) {
+	struct __NAMESPACE_LOCAL_SYM __vabortmsgf_data data;
+	va_list args;
+	data.vamfd_ptag_str = program_invocation_name;
+	if (data.vamfd_ptag_str == NULL)
+		data.vamfd_ptag_str = "?";
+	data.vamfd_ptag_len = libc_strlen(data.vamfd_ptag_str);
+	data.vamfd_isatty   = libc_isatty(STDERR_FILENO) != 0;
+	data.vamfd_at_sol   = true;
+	data.vamfd_rp_brk   = false;
+	va_start(args, format);
+	(void)libc_format_vprintf(&__NAMESPACE_LOCAL_SYM abortf_printer, &data, format, args);
+	if (!data.vamfd_at_sol)
+		(void)__NAMESPACE_LOCAL_SYM abortf_printer(&data, "\n", 1);
+	va_end(args);
+	libc_abort();
+}
+#endif /* !LIBC_ARCH_HAVE_ABORTF */
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#ifndef LIBC_ARCH_HAVE_ABORTF
+__NAMESPACE_LOCAL_BEGIN
+struct __vabortmsgf_data {
+	char const *vamfd_ptag_str; /* [1..vamfd_ptag_len] Program tag. */
+	size_t      vamfd_ptag_len; /* Length of the program tag. */
+	bool        vamfd_isatty;   /* True if STDERR_FILENO is a tty. */
+	bool        vamfd_at_sol;   /* True if at the start of a line. */
+	bool        vamfd_rp_brk;   /* True if a closing ']' must be replaced with ": " on stderr */
+};
+__LOCAL_LIBC(vabortmsgf_printer) ssize_t
+NOTHROW_NCX(FORMATPRINTER_CC abortf_printer)(void *arg, char const *__restrict data, size_t datalen) {
+	ssize_t result = (ssize_t)datalen;
+	struct __vabortmsgf_data *cookie = (struct __vabortmsgf_data *)arg;
+	while (datalen) {
+		char tailchar;
+		size_t block_len;
+		if (cookie->vamfd_at_sol) {
+			cookie->vamfd_at_sol = false;
+			cookie->vamfd_rp_brk = false;
+			(void)libc_syslog_printer((void *)(uintptr_t)__LOG_ERR, "[", 1);
+			(void)libc_syslog_printer((void *)(uintptr_t)__LOG_ERR, cookie->vamfd_ptag_str, cookie->vamfd_ptag_len);
+			(void)libc_syslog_printer((void *)(uintptr_t)__LOG_ERR, "] ", data[0] == '[' ? 1 : 2);
+			if (cookie->vamfd_isatty) {
+				(void)libc_writeall(__STDERR_FILENO, cookie->vamfd_ptag_str, cookie->vamfd_ptag_len);
+				(void)libc_writeall(__STDERR_FILENO, ": ", 2);
+				if (data[0] == '[') {
+					cookie->vamfd_rp_brk = true;
+					(void)libc_syslog_printer((void *)(uintptr_t)__LOG_ERR, "[", 1);
+					++data;
+					--datalen;
+				}
+			}
+		}
+		for (block_len = 0;;) {
+			for (; block_len < datalen; ++block_len) {
+				if (libc_strchr("\r\n]", data[block_len]))
+					break;
+			}
+			if (block_len >= datalen)
+				break;
+			if (data[block_len] != ']')
+				break;
+			if (cookie->vamfd_rp_brk)
+				break;
+		}
+		tailchar = '\0';
+		if (block_len < datalen)
+			tailchar = data[block_len];
+		if (tailchar == '\n') {
+			cookie->vamfd_at_sol = true;
+			++block_len;
+		}
+		(void)libc_syslog_printer((void *)(uintptr_t)__LOG_ERR, data, block_len);
+		if (cookie->vamfd_isatty)
+			(void)libc_writeall(__STDERR_FILENO, data, block_len);
+		data += block_len;
+		datalen -= block_len;
+		if (tailchar == ']') {
+			(void)libc_syslog_printer((void *)(uintptr_t)__LOG_ERR, "]", 1);
+			if (cookie->vamfd_isatty)
+				(void)libc_writeall(__STDERR_FILENO, ":", 1);
+			++data;
+			--datalen;
+			cookie->vamfd_rp_brk = false;
+		} else if (tailchar == '\r') {
+			++data;
+			--datalen;
+			if (datalen && *data == '\n') {
+				++data;
+				--datalen;
+			}
+			(void)libc_syslog_printer((void *)(uintptr_t)__LOG_ERR, "\n", 1);
+			if (cookie->vamfd_isatty)
+				(void)libc_writeall(__STDERR_FILENO, "\n", 1);
+			cookie->vamfd_at_sol = true;
+		}
+	}
+	return result;
+}
+__NAMESPACE_LOCAL_END
+/* >> abortf(3)
+ * Same  as  `abort(3)',  but prior  to  doing what  `abort(3)'  does, this
+ * function will print the specified message `format' to `syslog(LOG_ERR)',
+ * as well as `STDERR_FILENO' (if  that file is opened  and a tty). In  the
+ * message version that is printed  to `STDERR_FILENO', every line that  is
+ * printed  is prefixed by  "{program_invocation_short_name}: ", and in the
+ * syslog, every  line  is  prefixed  "[{program_invocation_short_name}] ".
+ *
+ * Additionally, in the stderr-version, `[foo]'  prefixes at the start  of
+ * lines are replaced with `foo: ' (but are kept as-is in syslog messages) */
+INTERN ATTR_SECTION(".text.crt.assert") ATTR_NORETURN ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) void
+(VLIBCCALL libc_abortf)(char const *format,
+                        ...) {
+	struct __NAMESPACE_LOCAL_SYM __vabortmsgf_data data;
+	va_list args;
+	data.vamfd_ptag_str = program_invocation_name;
+	if (data.vamfd_ptag_str == NULL)
+		data.vamfd_ptag_str = "?";
+	data.vamfd_ptag_len = libc_strlen(data.vamfd_ptag_str);
+	data.vamfd_isatty   = libc_isatty(STDERR_FILENO) != 0;
+	data.vamfd_at_sol   = true;
+	data.vamfd_rp_brk   = false;
+	va_start(args, format);
+	(void)libc_format_vprintf(&__NAMESPACE_LOCAL_SYM abortf_printer, &data, format, args);
+	if (!data.vamfd_at_sol)
+		(void)__NAMESPACE_LOCAL_SYM abortf_printer(&data, "\n", 1);
+	va_end(args);
+	libc_abort();
+}
+#endif /* !LIBC_ARCH_HAVE_ABORTF */
 #include <libc/template/program_invocation_name.h>
 /* >> getexecname(3)
  * Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
@@ -5475,6 +5705,14 @@ DEFINE_PUBLIC_ALIAS(__secure_getenv, libc_secure_getenv);
 DEFINE_PUBLIC_ALIAS(__libc_secure_getenv, libc_secure_getenv);
 DEFINE_PUBLIC_ALIAS(secure_getenv, libc_secure_getenv);
 DEFINE_PUBLIC_ALIAS(shexec, libc_shexec);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_ABORTF)
+DEFINE_PUBLIC_ALIAS(DOS$abortf, libd_abortf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && !LIBC_ARCH_HAVE_ABORTF */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_ABORTF)
+DEFINE_PUBLIC_ALIAS(abortf, libc_abortf);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_ABORTF */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$getexecname, libd_getexecname);
 DEFINE_PUBLIC_ALIAS(getexecname, libc_getexecname);
 #endif /* !__KERNEL__ */

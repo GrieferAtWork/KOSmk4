@@ -28,6 +28,7 @@
 
 /* abort() */
 #define LIBC_ARCH_HAVE_ABORT 1
+#define LIBC_ARCH_HAVE_ABORTF 1
 
 
 #ifndef __KERNEL__

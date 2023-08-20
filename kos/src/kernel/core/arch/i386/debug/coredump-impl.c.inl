@@ -201,6 +201,17 @@ LOCAL_sys_coredump_impl(struct icpustate *__restrict return_state,
 		                &orig_ustate, NULL, 0, NULL,
 		                container_of(dlbuf, union coredump_info, ci_dlerror[0]),
 		                unwind_error);
+	} else if (COREDUMP_INFO_ISABORT(unwind_error)) {
+		char *abtbuf;
+		size_t errlen;
+		validate_readable(reason->ci_abrtmsg, 1);
+		errlen = strnlen(reason->ci_abrtmsg, COREDUMP_ABORTF_MESG_MAXLEN - 1);
+		abtbuf = (char *)alloca((errlen + 1) * sizeof(char));
+		*(char *)mempcpy(abtbuf, reason->ci_abrtmsg, errlen, sizeof(char)) = '\0';
+		coredump_create(&curr_ustate, utb_vector, traceback_length,
+		                &orig_ustate, NULL, 0, NULL,
+		                container_of(abtbuf, union coredump_info, ci_abrtmsg[0]),
+		                unwind_error);
 	} else if (COREDUMP_INFO_ISASSERT(unwind_error)) {
 		struct coredump_assert as;
 		validate_readable(&reason->ci_assert, sizeof(reason->ci_assert));
