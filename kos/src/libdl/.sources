@@ -92,13 +92,8 @@ BEGIN
 		}
 		outfp.write(indat[flushStart:]);
 	}) };
-		DEFINE({
-			/* Configuration macros needed for dlmalloc */
-			"CONFIG_DLMALLOC_EXPORT_AS_INTERN" : "1",
-			"CONFIG_DLMALLOC_FREESTANDING_SYSTEM_CALLS" : "1",
-			"__CRT_HAVE___afail" : "1",
-			"__CRT_HAVE___afailf" : "1",
-		})
+		/* Define this macro so dlmalloc gets configured correctly. */
+		DEFINE({ "__BUILTIN_LIBDL" : "1" })
 
 		SOURCE({
 			f"arch/{XARCH}/*.c",

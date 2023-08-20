@@ -20,7 +20,9 @@
 #ifndef GUARD_LIBDL_API_H
 #define GUARD_LIBDL_API_H 1
 
+#ifndef __BUILDING_LIBDL
 #define __BUILDING_LIBDL 1
+#endif /* !__BUILDING_LIBDL */
 #define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 #define _KOS_KERNEL_SOURCE 1

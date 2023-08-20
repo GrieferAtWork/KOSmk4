@@ -37,6 +37,7 @@
 #include <unistd.h>
 
 #include "../libc/dl.h"
+#include "../libc/globals.h"
 #include "malloc.h"
 #include "stdlib.h"
 

@@ -100,10 +100,32 @@
 #define NOINLINE      ATTR_NOINLINE
 
 
+#define NO_MALLOC_FOOTPRINT 1
+#define NO_INDEPENDENT_ALLOC 1
+#define NO_BULK_FREE 1
+#ifdef __BUILDING_LIBDL
+/* Disable various functions not needed by libdl */
+#undef NO_MALLINFO
+#define NO_MALLINFO 1
+#undef NO_MALLOPT
+#define NO_MALLOPT 1
+#undef NO_POSIX_MEMALIGN
+#define NO_POSIX_MEMALIGN 1
+#undef NO_VALLOC
+#define NO_VALLOC 1
+#undef NO_PVALLOC
+#define NO_PVALLOC 1
+
+/* Indicate to headers that libdl is providing its own, internal __afail */
+#define __CRT_HAVE___afail 1
+#define __CRT_HAVE___afailf 1
+#endif /* __BUILDING_LIBDL */
+
+
 
 /* Configure for a free-standing environment in
  * which system  calls  are  directly  invoked. */
-#ifdef CONFIG_DLMALLOC_FREESTANDING_SYSTEM_CALLS
+#ifdef __BUILTIN_LIBDL
 #undef __CRT_FREESTANDING
 #undef __WANT_INLINE_SYSCALLS
 #define __CRT_FREESTANDING     1
@@ -122,7 +144,7 @@
 #define mmap(hint, size, prot, flags, fd, offset) sys_mmap(hint, size, prot, flags, fd, offset)
 #define munmap(addr, size)                        sys_munmap(addr, size)
 #define mremap(addr, osz, nsz, mv)                sys_mremap(addr, osz, nsz, mv, 0)
-#endif /* CONFIG_DLMALLOC_FREESTANDING_SYSTEM_CALLS */
+#endif /* __BUILTIN_LIBDL */
 
 #include <__crt.h>
 #include <hybrid/compiler.h>
@@ -176,18 +198,21 @@ DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void *dlcalloc(size_t n_el
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void *dlrealloc(void *oldmem, size_t bytes);
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void *dlrealloc_in_place(void *oldmem, size_t bytes);
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void *dlmemalign(size_t alignment, size_t bytes);
+#ifndef NO_POSIX_MEMALIGN
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") int dlposix_memalign(void **pp, size_t alignment, size_t bytes);
+#endif /* !NO_POSIX_MEMALIGN */
+#ifndef NO_VALLOC
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void *dlvalloc(size_t bytes);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") int dlmallopt(int param_number, int value);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlmalloc_footprint(void);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlmalloc_max_footprint(void);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlmalloc_footprint_limit(void);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlmalloc_set_footprint_limit(size_t bytes);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") struct mallinfo2 dlmallinfo(void);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void **dlindependent_calloc(size_t n_elements, size_t elem_size, void *chunks[]);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void **dlindependent_comalloc(size_t n_elements, size_t sizes[], void *chunks[]);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlbulk_free(void *array[], size_t nelem);
+#endif /* !NO_VALLOC */
+#ifndef NO_PVALLOC
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void *dlpvalloc(size_t bytes);
+#endif /* !NO_PVALLOC */
+#ifndef NO_MALLOPT
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") int dlmallopt(int param_number, int value);
+#endif /* !NO_MALLOPT */
+#if !NO_MALLINFO
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") struct mallinfo2 dlmallinfo(void);
+#endif /* !NO_MALLINFO */
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") int dlmalloc_trim(size_t pad);
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlmalloc_usable_size(void *mem);
 
@@ -204,13 +229,38 @@ DL_REGISTER_CACHE(dl_clear_caches) {
 
 /* Create public exports */
 #ifndef DEFINE_DL_EXPORT_ALIAS
-#ifdef CONFIG_DLMALLOC_EXPORT_AS_INTERN
+#ifdef __BUILTIN_LIBDL
 #define DEFINE_DL_EXPORT_ALIAS DEFINE_INTERN_ALIAS
-#else /* CONFIG_DLMALLOC_EXPORT_AS_INTERN */
+#else /* __BUILTIN_LIBDL */
 #define DEFINE_DL_EXPORT_ALIAS DEFINE_PUBLIC_ALIAS
-#endif /* !CONFIG_DLMALLOC_EXPORT_AS_INTERN */
+#endif /* !__BUILTIN_LIBDL */
 #endif /* !DEFINE_DL_EXPORT_ALIAS */
 
+DEFINE_DL_EXPORT_ALIAS(malloc, dlmalloc);
+DEFINE_DL_EXPORT_ALIAS(free, dlfree);
+DEFINE_DL_EXPORT_ALIAS(calloc, dlcalloc);
+DEFINE_DL_EXPORT_ALIAS(realloc, dlrealloc);
+DEFINE_DL_EXPORT_ALIAS(realloc_in_place, dlrealloc_in_place);
+DEFINE_DL_EXPORT_ALIAS(memalign, dlmemalign);
+#ifndef NO_POSIX_MEMALIGN
+DEFINE_DL_EXPORT_ALIAS(posix_memalign, dlposix_memalign);
+#endif /* !NO_POSIX_MEMALIGN */
+#ifndef NO_VALLOC
+DEFINE_DL_EXPORT_ALIAS(valloc, dlvalloc);
+#endif /* !NO_VALLOC */
+#ifndef NO_PVALLOC
+DEFINE_DL_EXPORT_ALIAS(pvalloc, dlpvalloc);
+#endif /* !NO_PVALLOC */
+#ifndef NO_MALLOPT
+DEFINE_DL_EXPORT_ALIAS(mallopt, dlmallopt);
+#endif /* !NO_MALLOPT */
+#if !NO_MALLINFO
+DEFINE_DL_EXPORT_ALIAS(mallinfo2, dlmallinfo);
+#endif /* !NO_MALLINFO */
+DEFINE_DL_EXPORT_ALIAS(malloc_trim, dlmalloc_trim);
+DEFINE_DL_EXPORT_ALIAS(malloc_usable_size, dlmalloc_usable_size);
+
+#ifdef __BUILDING_LIBC
 #undef __libc_malloc
 #undef __libc_calloc
 #undef __builtin_delete
@@ -218,30 +268,20 @@ DL_REGISTER_CACHE(dl_clear_caches) {
 #undef __libc_realloc
 #undef __libc_memalign
 #undef __libc_valloc
+DEFINE_DL_EXPORT_ALIAS(cfree, dlfree);
+DEFINE_DL_EXPORT_ALIAS(aligned_alloc, dlmemalign);
 DEFINE_DL_EXPORT_ALIAS(__libc_malloc, dlmalloc);
-DEFINE_DL_EXPORT_ALIAS(malloc, dlmalloc);
 DEFINE_DL_EXPORT_ALIAS(__builtin_delete, dlfree);
 DEFINE_DL_EXPORT_ALIAS(__libc_free, dlfree);
-DEFINE_DL_EXPORT_ALIAS(free, dlfree);
-DEFINE_DL_EXPORT_ALIAS(cfree, dlfree);
 DEFINE_DL_EXPORT_ALIAS(__libc_calloc, dlcalloc);
-DEFINE_DL_EXPORT_ALIAS(calloc, dlcalloc);
 DEFINE_DL_EXPORT_ALIAS(__libc_realloc, dlrealloc);
-DEFINE_DL_EXPORT_ALIAS(realloc, dlrealloc);
-DEFINE_DL_EXPORT_ALIAS(realloc_in_place, dlrealloc_in_place);
 DEFINE_DL_EXPORT_ALIAS(__libc_memalign, dlmemalign);
-DEFINE_DL_EXPORT_ALIAS(memalign, dlmemalign);
-DEFINE_DL_EXPORT_ALIAS(aligned_alloc, dlmemalign);
-DEFINE_DL_EXPORT_ALIAS(posix_memalign, dlposix_memalign);
 DEFINE_DL_EXPORT_ALIAS(__libc_valloc, dlvalloc);
-DEFINE_DL_EXPORT_ALIAS(valloc, dlvalloc);
 DEFINE_DL_EXPORT_ALIAS(__libc_mallopt, dlmallopt);
-DEFINE_DL_EXPORT_ALIAS(mallopt, dlmallopt);
-DEFINE_DL_EXPORT_ALIAS(malloc_footprint, dlmalloc_footprint);
-DEFINE_DL_EXPORT_ALIAS(malloc_max_footprint, dlmalloc_max_footprint);
-DEFINE_DL_EXPORT_ALIAS(malloc_footprint_limit, dlmalloc_footprint_limit);
-DEFINE_DL_EXPORT_ALIAS(malloc_set_footprint_limit, dlmalloc_set_footprint_limit);
-#ifdef __BUILDING_LIBC
+DEFINE_DL_EXPORT_ALIAS(__libc_pvalloc, dlpvalloc);
+DEFINE_DL_EXPORT_ALIAS(_msize, dlmalloc_usable_size);
+DEFINE_DL_EXPORT_ALIAS(_msize_debug, dlmalloc_usable_size);
+
 #if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
 DEFINE_DL_EXPORT_ALIAS(__libc_mallinfo, dlmallinfo);
 DEFINE_DL_EXPORT_ALIAS(mallinfo, dlmallinfo);
@@ -250,23 +290,15 @@ DEFINE_DL_EXPORT_ALIAS(__libc_mallinfo, libc_mallinfo_int);
 DEFINE_DL_EXPORT_ALIAS(mallinfo, libc_mallinfo_int);
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
 #endif /* __BUILDING_LIBC */
-DEFINE_DL_EXPORT_ALIAS(mallinfo2, dlmallinfo);
-DEFINE_DL_EXPORT_ALIAS(independent_calloc, dlindependent_calloc);
-DEFINE_DL_EXPORT_ALIAS(independent_comalloc, dlindependent_comalloc);
-DEFINE_DL_EXPORT_ALIAS(bulk_free, dlbulk_free);
-DEFINE_DL_EXPORT_ALIAS(__libc_pvalloc, dlpvalloc);
-DEFINE_DL_EXPORT_ALIAS(pvalloc, dlpvalloc);
-DEFINE_DL_EXPORT_ALIAS(malloc_trim, dlmalloc_trim);
-DEFINE_DL_EXPORT_ALIAS(malloc_usable_size, dlmalloc_usable_size);
-DEFINE_DL_EXPORT_ALIAS(_msize, dlmalloc_usable_size);
-DEFINE_DL_EXPORT_ALIAS(_msize_debug, dlmalloc_usable_size);
 #undef DEFINE_DL_EXPORT_ALIAS
+
 
 /* Also create libc-overrides exports
  * -> This allows libc internals to use our malloc functions
  *    if libc happens to be combined with our library within
  *    a static link (such as  is the case when building  the
  *    dynamic linker binary blobs) */
+#ifdef __BUILDING_LIBC
 DEFINE_INTERN_ALIAS(libc_malloc, dlmalloc);
 DEFINE_INTERN_ALIAS(libc_free, dlfree);
 DEFINE_INTERN_ALIAS(libc_cfree, dlfree);
@@ -277,26 +309,16 @@ DEFINE_INTERN_ALIAS(libc_memalign, dlmemalign);
 DEFINE_INTERN_ALIAS(libc_posix_memalign, dlposix_memalign);
 DEFINE_INTERN_ALIAS(libc_valloc, dlvalloc);
 DEFINE_INTERN_ALIAS(libc_mallopt, dlmallopt);
-DEFINE_INTERN_ALIAS(libc_malloc_footprint, dlmalloc_footprint);
-DEFINE_INTERN_ALIAS(libc_malloc_max_footprint, dlmalloc_max_footprint);
-DEFINE_INTERN_ALIAS(libc_malloc_footprint_limit, dlmalloc_footprint_limit);
-DEFINE_INTERN_ALIAS(libc_malloc_set_footprint_limit, dlmalloc_set_footprint_limit);
-#ifdef __BUILDING_LIBC
 #if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
 DEFINE_INTERN_ALIAS(libc_mallinfo, dlmallinfo);
 #else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
 DEFINE_INTERN_ALIAS(libc_mallinfo, libc_mallinfo_int);
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
-#endif /* __BUILDING_LIBC */
 DEFINE_INTERN_ALIAS(libc_mallinfo2, dlmallinfo);
-DEFINE_INTERN_ALIAS(libc_independent_calloc, dlindependent_calloc);
-DEFINE_INTERN_ALIAS(libc_independent_comalloc, dlindependent_comalloc);
-DEFINE_INTERN_ALIAS(libc_bulk_free, dlbulk_free);
 DEFINE_INTERN_ALIAS(libc_pvalloc, dlpvalloc);
 DEFINE_INTERN_ALIAS(libc_malloc_trim, dlmalloc_trim);
 DEFINE_INTERN_ALIAS(libc_malloc_usable_size, dlmalloc_usable_size);
 
-#ifdef __BUILDING_LIBC
 #if __SIZEOF_INT__ != __SIZEOF_SIZE_T__
 INTERN ATTR_SECTION(".text.crt.heap.malloc")
 struct mallinfo libc_mallinfo_int(void) {

@@ -3207,6 +3207,7 @@ static int init_mparams(void) {
 }
 
 /* support for mallopt */
+#ifndef NO_MALLOPT
 static int change_mparam(int param_number, int value) {
   size_t val;
   ensure_initialization();
@@ -3229,6 +3230,7 @@ static int change_mparam(int param_number, int value) {
     return 0;
   }
 }
+#endif /* !NO_MALLOPT */
 
 #if DEBUG
 /* ------------------------- Debugging Support --------------------------- */
@@ -4979,6 +4981,8 @@ static void* internal_memalign(mstate m, size_t alignment, size_t bytes) {
   return mem;
 }
 
+
+#ifndef NO_INDEPENDENT_ALLOC
 /*
   Common support for independent_X routines, handling
     all of the combinations that can result.
@@ -5104,7 +5108,9 @@ static void** ialloc(mstate m,
   POSTACTION(m);
   return marray;
 }
+#endif /* !NO_INDEPENDENT_ALLOC */
 
+#ifndef NO_BULK_FREE
 /* Try to free all pointers in the given array.
    Note: this could be made faster, by delaying consolidation,
    at the price of disabling some user integrity checks, We
@@ -5153,6 +5159,7 @@ static size_t internal_bulk_free(mstate m, void* array[], size_t nelem) {
   }
   return unfreed;
 }
+#endif /* !NO_BULK_FREE */
 
 /* Traversal */
 #if MALLOC_INSPECT_ALL
@@ -5283,6 +5290,7 @@ void* dlmemalign(size_t alignment, size_t bytes) {
   return internal_memalign(gm, alignment, bytes);
 }
 
+#ifndef NO_POSIX_MEMALIGN
 int dlposix_memalign(void** pp, size_t alignment, size_t bytes) {
   void* mem = 0;
   if (alignment == MALLOC_ALIGNMENT)
@@ -5305,21 +5313,27 @@ int dlposix_memalign(void** pp, size_t alignment, size_t bytes) {
     return 0;
   }
 }
+#endif /* !NO_POSIX_MEMALIGN */
 
+#ifndef NO_VALLOC
 void* dlvalloc(size_t bytes) {
   size_t pagesz;
   ensure_initialization();
   pagesz = malloc_pagesize;
   return dlmemalign(pagesz, bytes);
 }
+#endif /* !NO_VALLOC */
 
+#ifndef NO_PVALLOC
 void* dlpvalloc(size_t bytes) {
   size_t pagesz;
   ensure_initialization();
   pagesz = malloc_pagesize;
   return dlmemalign(pagesz, (bytes + pagesz - SIZE_T_ONE) & ~(pagesz - SIZE_T_ONE));
 }
+#endif /* !NO_PVALLOC */
 
+#ifndef NO_INDEPENDENT_ALLOC
 void** dlindependent_calloc(size_t n_elements, size_t elem_size,
                             void* chunks[]) {
   size_t sz = elem_size; /* serves as 1-element array */
@@ -5330,10 +5344,13 @@ void** dlindependent_comalloc(size_t n_elements, size_t sizes[],
                               void* chunks[]) {
   return ialloc(gm, n_elements, sizes, 0, chunks);
 }
+#endif /* !NO_INDEPENDENT_ALLOC */
 
+#ifndef NO_BULK_FREE
 size_t dlbulk_free(void* array[], size_t nelem) {
   return internal_bulk_free(gm, array, nelem);
 }
+#endif /* !NO_BULK_FREE */
 
 #if MALLOC_INSPECT_ALL
 void dlmalloc_inspect_all(void(*handler)(void *start,
@@ -5359,6 +5376,7 @@ int dlmalloc_trim(size_t pad) {
   return result;
 }
 
+#ifndef NO_MALLOC_FOOTPRINT
 size_t dlmalloc_footprint(void) {
   return gm->footprint;
 }
@@ -5382,6 +5400,7 @@ size_t dlmalloc_set_footprint_limit(size_t bytes) {
     result = granularity_align(bytes);
   return gm->footprint_limit = result;
 }
+#endif /* !NO_MALLOC_FOOTPRINT */
 
 #if !NO_MALLINFO
 struct mallinfo dlmallinfo(void) {
@@ -5395,9 +5414,11 @@ void dlmalloc_stats() {
 }
 #endif /* NO_MALLOC_STATS */
 
+#ifndef NO_MALLOPT
 int dlmallopt(int param_number, int value) {
   return change_mparam(param_number, value);
 }
+#endif /* !NO_MALLOPT */
 
 size_t dlmalloc_usable_size(void* mem) {
   if (mem != 0) {

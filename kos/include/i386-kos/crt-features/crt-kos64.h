@@ -2377,7 +2377,6 @@
 #define __CRT_HAVE_btowc
 #define __CRT_HAVE_bufsplit
 #define __CRT_HAVE_buildargv
-#define __CRT_HAVE_bulk_free
 #define __CRT_HAVE_bzero
 #define __CRT_HAVE_bzeroc
 #define __CRT_HAVE_bzerol
@@ -3372,8 +3371,6 @@
 #define __CRT_HAVE_imaxdiv
 #define __CRT_HAVE_in6addr_any
 #define __CRT_HAVE_in6addr_loopback
-#define __CRT_HAVE_independent_calloc
-#define __CRT_HAVE_independent_comalloc
 #define __CRT_HAVE_index
 #define __CRT_HAVE_inet6_opt_append
 #define __CRT_HAVE_inet6_opt_find
@@ -3640,10 +3637,6 @@
 #define __CRT_HAVE_mallinfo
 #define __CRT_HAVE_mallinfo2
 #define __CRT_HAVE_malloc
-#define __CRT_HAVE_malloc_footprint
-#define __CRT_HAVE_malloc_footprint_limit
-#define __CRT_HAVE_malloc_max_footprint
-#define __CRT_HAVE_malloc_set_footprint_limit
 #define __CRT_HAVE_malloc_trim
 #define __CRT_HAVE_malloc_usable_size
 #define __CRT_HAVE_mallopt
