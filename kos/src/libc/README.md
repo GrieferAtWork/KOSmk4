@@ -40,6 +40,25 @@ This section documents how KOS's libc can be (re-)configured by hosted programs 
 	  ```
 	  Note that for full functionality, at least `malloc` and `malloc_usable_size` need to be defined by your application. Everything else is technically optional and will be implemented by fallback/noop-wrappers that call your `malloc` and `malloc_usable_size`.
 	- IMPORTANT: You CANNOT use this mechanism to inject some extra wrapper around heap functions and then use `dlsym(RTLD_NEXT, "malloc")` to call the *real* malloc! If you try to do this, you'll get a stack-overflow, since what you believe to be the *real* malloc no longer exists, as it has been replaced with a proxy that's just going to call *your* malloc all the time.
+- `extern void *(*__malloc_hook)(size_t num_bytes, void const *return_address);`
+	- When this symbol (or any of the following symbols) is accessed by the main program, libc will re-configure its built-in set of malloc functions to invoke malloc hooks (when non-NULL) as a replacement for normal malloc behavior.
+	- In order to do this, libc will load `libdlmalloc.so`, which gets used when hooks are defined to NULL. This must be done because libc has to trash its original heap implementation in order to inject extra hooks.
+	- Note that internally, libc keeps track (using a TLS variable) when a thread is currently inside of a user-defined malloc-hook, and will *not* invoke the hook a second time if this is already the case.
+		- As such, callbacks assigned to these hooks are allowed to simply call heap functions yet again (and are actually expected to do so, since these hooks must still allocate from the *normal* heap, since there is no hook for `malloc_usable_size`, which in turn expects its argument to be a valid heap pointer).
+	- The following hooks are defined, and the linking against any one of these is enough to cause libc to enable support for malloc hooks:
+		- `extern void *(*__malloc_hook)(size_t num_bytes, void const *return_address);`
+			- Called by `malloc(3)`, `calloc(3)`, `memdup(3)` and `memcdup(3)`
+		- `extern void (*__free_hook)(void *ptr, void const *return_address);`
+			- Called by `free(3)`
+		- `extern void *(*__realloc_hook)(void *ptr, size_t num_bytes, void const *return_address);`
+			- Called by `realloc(3)`, `reallocarray(3)`, `recalloc(3)`, `recallocv(3)`
+			- Also causes `realloc_in_place(3)` to always fail when `malloc_usable_size(ptr) < num_bytes`, and be a no-op when the heap-pointer contains sufficient memory
+		- `extern void *(*__memalign_hook)(size_t alignment, size_t num_bytes, void const *return_address);`
+			- Called by `memalign(3)` (and `aligned_alloc(3)`), `posix_memalign(3)`, `valloc(3)`, `pvalloc(3)`
+		- `extern void (*__malloc_initialize_hook)(void);`
+			- Called the first time (and *only* the first time) any heap function is used
+
+
 
 #### Environment options
 

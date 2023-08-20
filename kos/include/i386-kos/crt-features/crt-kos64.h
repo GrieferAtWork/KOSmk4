@@ -592,6 +592,7 @@
 #define __CRT_HAVE___freading
 #define __CRT_HAVE___freadptr
 #define __CRT_HAVE___freadptrinc
+#define __CRT_HAVE___free_hook
 #define __CRT_HAVE___free_locale
 #define __CRT_HAVE___freelocale
 #define __CRT_HAVE___frexp
@@ -927,9 +928,12 @@
 #define __CRT_HAVE___madvise
 #define __CRT_HAVE___major
 #define __CRT_HAVE___makedev
+#define __CRT_HAVE___malloc_hook
+#define __CRT_HAVE___malloc_initialize_hook
 #define __CRT_HAVE___mb_cur_max
 #define __CRT_HAVE___mbrlen
 #define __CRT_HAVE___mbrtowc
+#define __CRT_HAVE___memalign_hook
 #define __CRT_HAVE___memccpy
 #define __CRT_HAVE___memcdup
 #define __CRT_HAVE___memcpy_chk
@@ -1103,6 +1107,7 @@
 #define __CRT_HAVE___read
 #define __CRT_HAVE___readlink
 #define __CRT_HAVE___readv
+#define __CRT_HAVE___realloc_hook
 #define __CRT_HAVE___reboot
 #define __CRT_HAVE___recv
 #define __CRT_HAVE___register_frame

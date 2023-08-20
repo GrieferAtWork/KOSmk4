@@ -27,9 +27,14 @@
 
 #include <asm/redirect.h>
 #include <bits/crt/mallinfo.h>
+#include <kos/except.h>
+#include <kos/exec/idata.h>
 #include <kos/sys/mman.h>
 
+#include <assert.h>
+#include <atomic.h>
 #include <malloc.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -55,6 +60,18 @@ DECL_BEGIN
 /*[[[skip:libc_mallinfo2]]]*/
 
 #if __ARCH_REDIRECT_MAXBYTES != 0
+
+#define FATAL(format, ...)                                         \
+	do {                                                           \
+		syslog(LOG_ERR, "[libc] " format "\n", ##__VA_ARGS__);     \
+		if (isatty(STDERR_FILENO)) {                               \
+			dprintf(STDERR_FILENO, "%s: " format "\n",             \
+			        program_invocation_short_name, ##__VA_ARGS__); \
+		}                                                          \
+		abort();                                                   \
+	}	__WHILE0
+
+
 typedef void *(LIBCCALL *LPMALLOC)(size_t num_bytes);
 typedef void (LIBCCALL *LPFREE)(void *ptr);
 typedef void *(LIBCCALL *LPCALLOC)(size_t elem_count, size_t elem_size);
@@ -227,6 +244,8 @@ fallback_posix_memalign_with_memalign(void **p_ptr, size_t alignment, size_t num
 		return 0;
 	}
 	error = libc_geterrno();
+	if unlikely(!error)
+		error = ENOMEM;
 	(void)libc_seterrno(saved_errno);
 	return error;
 }
@@ -440,7 +459,6 @@ user_malloc_abi_load(struct user_malloc_abi *__restrict self) {
 		self->uma_malloc_usable_size = &fallback_malloc_usable_size_NOOP;
 }
 
-
 PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers") NONNULL((1, 2, 3)) void LIBCCALL
 libc_malloc_redirect(char const *name, void *from_pc, void *to_pc) {
 #ifdef __arch_redirect_size
@@ -449,14 +467,8 @@ libc_malloc_redirect(char const *name, void *from_pc, void *to_pc) {
 	size_t size = __ARCH_REDIRECT_MAXBYTES;
 #endif /* !__arch_redirect_size */
 #ifdef __arch_redirect_possible
-	if (!__arch_redirect_possible(from_pc, to_pc)) {
-		syslog(LOG_ERR, "[libc] Impossible to redirect `%s' from %p to %p\n", name, from_pc, to_pc);
-		if (isatty(STDERR_FILENO)) {
-			dprintf(STDERR_FILENO, "%s: impossible to redirect `%s' from %p to %p\n",
-			        program_invocation_short_name, name, from_pc, to_pc);
-		}
-		abort();
-	}
+	if (!__arch_redirect_possible(from_pc, to_pc))
+		FATAL("Impossible to redirect `%s' from %p to %p", name, from_pc, to_pc);
 #endif /* __arch_redirect_possible */
 	(void)name;
 	MProtect(from_pc, size, PROT_EXEC | PROT_WRITE | PROT_READ);
@@ -543,6 +555,495 @@ libc_init_malloc_hooks(void) {
 		return 0; /* *highly* likely case: malloc isn't being overwritten */
 	return libc_do_init_malloc_hooks(user_malloc);
 }
+
+
+
+/* Support for Glibc malloc hook function pointers.
+ *
+ * In order to support these, we do something similar to `libc_init_malloc_hooks()',
+ * in  that we in-place modify all implementations  of heap functions found in libc.
+ * However,  since Glibc malloc hooks *are* meant as proxy wrappers that can also be
+ * disabled at any time, we run into a problem:
+ * - If we redirect all of our heap functions to invoke optional, user-defined
+ *   overrides for malloc functions, then we aren't able to invoke the  normal
+ *   heap functions anymore in case the user sets hooks to NULL.
+ * - The solution is  to have a  secondary, fully-featured malloc  implementation,
+ *   which we do by simply loading `libdlmalloc.so' and using *its* implementation
+ *   as fallback to replace  our (then broken one),  prior to also invoking  user-
+ *   defined malloc hooks!
+ *
+ * NOTE: Since  this part happens *before* malloc() normally gets called, we don't
+ *       have to worry about `libc_init_malloc_hooks()', since it will *never* get
+ *       called! */
+typedef void (*LP__MALLOC_INITIALIZE_HOOK)(void);
+typedef void (LIBCCALL *LP__FREE_HOOK)(void *ptr, void const *return_address);
+typedef void *(LIBCCALL *LP__MALLOC_HOOK)(size_t num_bytes, void const *return_address);
+typedef void *(LIBCCALL *LP__REALLOC_HOOK)(void *ptr, size_t num_bytes, void const *return_address);
+typedef void *(LIBCCALL *LP__MEMALIGN_HOOK)(size_t alignment, size_t num_bytes, void const *return_address);
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers")
+ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) void *LIBCCALL
+get_dlmalloc_function(void *lib_dlmalloc, char const *__restrict name) {
+	void *result = dlsym(lib_dlmalloc, name);
+	if unlikely(!result) {
+		char *msg = dlerror();
+		FATAL("symbol %s not found in libdlmalloc: %s", name, msg);
+	}
+	return result;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers") NONNULL((1)) void LIBCCALL
+libdlmalloc_so_abi_load(struct user_malloc_abi *__restrict self) {
+	void *lib_dlmalloc = dlopen("libdlmalloc.so", RTLD_GLOBAL);
+	if (lib_dlmalloc == NULL) {
+		char *msg = dlerror();
+		FATAL("failed to load libdlmalloc: %s", msg);
+	}
+	*(void **)&self->uma_malloc = get_dlmalloc_function(lib_dlmalloc, nameof_malloc);
+	*(void **)&self->uma_free = get_dlmalloc_function(lib_dlmalloc, nameof_free);
+	*(void **)&self->uma_calloc = get_dlmalloc_function(lib_dlmalloc, nameof_calloc);
+	*(void **)&self->uma_realloc = get_dlmalloc_function(lib_dlmalloc, nameof_realloc);
+	*(void **)&self->uma_realloc_in_place = get_dlmalloc_function(lib_dlmalloc, nameof_realloc_in_place);
+	*(void **)&self->uma_memalign = get_dlmalloc_function(lib_dlmalloc, nameof_memalign);
+	*(void **)&self->uma_posix_memalign = get_dlmalloc_function(lib_dlmalloc, nameof_posix_memalign);
+	*(void **)&self->uma_valloc = get_dlmalloc_function(lib_dlmalloc, nameof_valloc);
+	*(void **)&self->uma_pvalloc = get_dlmalloc_function(lib_dlmalloc, nameof_pvalloc);
+	*(void **)&self->uma_mallopt = get_dlmalloc_function(lib_dlmalloc, nameof_mallopt);
+#if __SIZEOF_INT__ != __SIZEOF_SIZE_T__
+	*(void **)&self->uma_mallinfo2 = get_dlmalloc_function(lib_dlmalloc, nameof_mallinfo2);
+	self->uma_mallinfo             = &fallback_mallinfo_with_mallinfo2;
+#else /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
+	*(void **)&self->uma_mallinfo = get_dlmalloc_function(lib_dlmalloc, nameof_mallinfo2);
+#endif /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
+	*(void **)&self->uma_malloc_trim = get_dlmalloc_function(lib_dlmalloc, nameof_malloc_trim);
+	*(void **)&self->uma_malloc_usable_size = get_dlmalloc_function(lib_dlmalloc, nameof_malloc_usable_size);
+}
+
+/* User-exported malloc hooks */
+#undef __malloc_initialize_hook
+#undef __free_hook
+#undef __malloc_hook
+#undef __realloc_hook
+#undef __memalign_hook
+DECLARE_NOREL_GLOBAL_META(LP__MALLOC_INITIALIZE_HOOK, __malloc_initialize_hook);
+DECLARE_NOREL_GLOBAL_META(LP__FREE_HOOK, __free_hook);
+DECLARE_NOREL_GLOBAL_META(LP__MALLOC_HOOK, __malloc_hook);
+DECLARE_NOREL_GLOBAL_META(LP__REALLOC_HOOK, __realloc_hook);
+DECLARE_NOREL_GLOBAL_META(LP__MEMALIGN_HOOK, __memalign_hook);
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LP__MALLOC_INITIALIZE_HOOK libc___malloc_initialize_hook = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LP__FREE_HOOK libc___free_hook = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LP__MALLOC_HOOK libc___malloc_hook = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LP__REALLOC_HOOK libc___realloc_hook = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LP__MEMALIGN_HOOK libc___memalign_hook = NULL;
+DEFINE_NOREL_GLOBAL_META(LP__MALLOC_INITIALIZE_HOOK, __malloc_initialize_hook, ".crt.heap.rare_helpers");
+DEFINE_NOREL_GLOBAL_META(LP__FREE_HOOK, __free_hook, ".crt.heap.rare_helpers");
+DEFINE_NOREL_GLOBAL_META(LP__MALLOC_HOOK, __malloc_hook, ".crt.heap.rare_helpers");
+DEFINE_NOREL_GLOBAL_META(LP__REALLOC_HOOK, __realloc_hook, ".crt.heap.rare_helpers");
+DEFINE_NOREL_GLOBAL_META(LP__MEMALIGN_HOOK, __memalign_hook, ".crt.heap.rare_helpers");
+#define __malloc_initialize_hook GET_NOREL_GLOBAL(__malloc_initialize_hook)
+#define __free_hook              GET_NOREL_GLOBAL(__free_hook)
+#define __malloc_hook            GET_NOREL_GLOBAL(__malloc_hook)
+#define __realloc_hook           GET_NOREL_GLOBAL(__realloc_hook)
+#define __memalign_hook          GET_NOREL_GLOBAL(__memalign_hook)
+
+
+/* Internal hook-core functions (called when user-defined malloc hooks aren't defined) */
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LPMALLOC libc_hookcore_malloc = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LPFREE libc_hookcore_free = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LPCALLOC libc_hookcore_calloc = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LPREALLOC libc_hookcore_realloc = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LPREALLOC_IN_PLACE libc_hookcore_realloc_in_place = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LPMEMALIGN libc_hookcore_memalign = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LPPOSIX_MEMALIGN libc_hookcore_posix_memalign = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LPVALLOC libc_hookcore_valloc = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LPPVALLOC libc_hookcore_pvalloc = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LPMEMDUP libc_hookcore_memdup = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LPMEMCDUP libc_hookcore_memcdup = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LPREALLOCARRAY libc_hookcore_reallocarray = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LPRECALLOC libc_hookcore_recalloc = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers") LPRECALLOCV libc_hookcore_recallocv = NULL;
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers") void LIBCCALL
+libc_doinvoke___malloc_initialize_hook(void) {
+	LP__MALLOC_INITIALIZE_HOOK hook = atomic_read(&__malloc_initialize_hook);
+	if (hook != NULL)
+		(*hook)();
+}
+
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers")
+pthread_once_t libc_didinvoke___malloc_initialize_hook = PTHREAD_ONCE_INIT;
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers") void
+libc_invoke___malloc_initialize_hook(void) {
+	pthread_once(&libc_didinvoke___malloc_initialize_hook,
+	             &libc_doinvoke___malloc_initialize_hook);
+}
+
+
+PRIVATE ATTR_SECTION(".data.crt.heap.rare_helpers")
+pthread_key_t libc_in_malloc_hook_key = PTHREAD_ONCE_KEY_NP;
+
+/* Called (and must return true) before a user-defined malloc hook is invoked. */
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers") bool LIBCCALL
+libc_malloc_hook_begin(void) {
+	void **p_tls;
+	if unlikely(pthread_key_create_once_np(&libc_in_malloc_hook_key, NULL) != EOK)
+		return false; /* Failed to initialize TLS */
+	p_tls = pthread_getspecificptr_np(libc_in_malloc_hook_key);
+	if unlikely(p_tls == NULL)
+		return false; /* Failed to allocate TLS */
+	if (*p_tls != (void *)0)
+		return false; /* Already active */
+	*p_tls = (void *)-1;
+	return true;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers") void
+NOTHROW(LIBCCALL libc_malloc_hook_end)(void) {
+	void **p_tls = pthread_getspecificptr_np(libc_in_malloc_hook_key);
+	assertf(p_tls != NULL, "Should have already been allocated by `libc_malloc_hook_begin()'");
+	assertf(*p_tls == (void *)-1, "Then how did `libc_malloc_hook_begin()' return true?");
+	*p_tls = (void *)0;
+}
+
+
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers")
+void *LIBCCALL libc_hooked_malloc(size_t num_bytes) {
+	LP__MALLOC_HOOK hook;
+	libc_invoke___malloc_initialize_hook();
+	hook = atomic_read(&__malloc_hook);
+	if (hook != NULL && libc_malloc_hook_begin()) {
+		RAII_FINALLY { libc_malloc_hook_end(); };
+		return (*hook)(num_bytes, __builtin_return_address(0));
+	}
+	return (*libc_hookcore_malloc)(num_bytes);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers")
+void LIBCCALL libc_hooked_free(void *ptr) {
+	LP__FREE_HOOK hook;
+	libc_invoke___malloc_initialize_hook();
+	hook = atomic_read(&__free_hook);
+	if (hook != NULL && libc_malloc_hook_begin()) {
+		RAII_FINALLY { libc_malloc_hook_end(); };
+		(*hook)(ptr, __builtin_return_address(0));
+	} else {
+		(*libc_hookcore_free)(ptr);
+	}
+}
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers")
+void *LIBCCALL libc_hooked_calloc(size_t elem_count, size_t elem_size) {
+	LP__MALLOC_HOOK hook;
+	libc_invoke___malloc_initialize_hook();
+	hook = atomic_read(&__malloc_hook);
+	if (hook != NULL && libc_malloc_hook_begin()) {
+		void *result;
+		size_t num_bytes;
+		RAII_FINALLY { libc_malloc_hook_end(); };
+		if (OVERFLOW_UMUL(elem_count, elem_size, &num_bytes))
+			num_bytes = (size_t)-1;
+		result = (*hook)(num_bytes, __builtin_return_address(0));
+		if (result)
+			bzero(result, num_bytes);
+		return result;
+	}
+	return (*libc_hookcore_calloc)(elem_count, elem_size);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers")
+void *LIBCCALL libc_hooked_realloc(void *ptr, size_t num_bytes) {
+	LP__REALLOC_HOOK hook;
+	libc_invoke___malloc_initialize_hook();
+	hook = atomic_read(&__realloc_hook);
+	if (hook != NULL && libc_malloc_hook_begin()) {
+		RAII_FINALLY { libc_malloc_hook_end(); };
+		return (*hook)(ptr, num_bytes, __builtin_return_address(0));
+	}
+	return (*libc_hookcore_realloc)(ptr, num_bytes);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers")
+void *LIBCCALL libc_hooked_realloc_in_place(void *ptr, size_t num_bytes) {
+	LP__REALLOC_HOOK hook;
+	libc_invoke___malloc_initialize_hook();
+	hook = atomic_read(&__realloc_hook);
+	if (hook != NULL && libc_malloc_hook_begin()) {
+		size_t usable_size;
+		RAII_FINALLY { libc_malloc_hook_end(); };
+		usable_size = malloc_usable_size(ptr);
+		if (num_bytes <= usable_size)
+			return ptr; /* Can't actually realloc in this case... */
+		return NULL;
+	}
+	return (*libc_hookcore_realloc_in_place)(ptr, num_bytes);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers")
+void *LIBCCALL libc_hooked_memalign(size_t alignment, size_t num_bytes) {
+	LP__MEMALIGN_HOOK hook;
+	libc_invoke___malloc_initialize_hook();
+	hook = atomic_read(&__memalign_hook);
+	if (hook != NULL && libc_malloc_hook_begin()) {
+		RAII_FINALLY { libc_malloc_hook_end(); };
+		return (*hook)(alignment, num_bytes, __builtin_return_address(0));
+	}
+	return (*libc_hookcore_memalign)(alignment, num_bytes);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers")
+errno_t LIBCCALL libc_hooked_posix_memalign(void **p_ptr, size_t alignment, size_t num_bytes) {
+	LP__MEMALIGN_HOOK hook;
+	libc_invoke___malloc_initialize_hook();
+	hook = atomic_read(&__memalign_hook);
+	if (hook != NULL && libc_malloc_hook_begin()) {
+		void *result;
+		errno_t error, saved_error;
+		RAII_FINALLY { libc_malloc_hook_end(); };
+		saved_error = libc_geterrno();
+		result = (*hook)(alignment, num_bytes, __builtin_return_address(0));
+		if (result != NULL) {
+			*p_ptr = result;
+			return 0;
+		}
+		error = libc_geterrno();
+		libc_seterrno(saved_error);
+		if unlikely(!error)
+			error = ENOMEM;
+		return error;
+	}
+	return (*libc_hookcore_posix_memalign)(p_ptr, alignment, num_bytes);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers")
+void *LIBCCALL libc_hooked_valloc(size_t num_bytes) {
+	LP__MEMALIGN_HOOK hook;
+	libc_invoke___malloc_initialize_hook();
+	hook = atomic_read(&__memalign_hook);
+	if (hook != NULL && libc_malloc_hook_begin()) {
+		RAII_FINALLY { libc_malloc_hook_end(); };
+		return (*hook)(getpagesize(), num_bytes, __builtin_return_address(0));
+	}
+	return (*libc_hookcore_valloc)(num_bytes);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers")
+void *LIBCCALL libc_hooked_pvalloc(size_t num_bytes) {
+	LP__MEMALIGN_HOOK hook;
+	libc_invoke___malloc_initialize_hook();
+	hook = atomic_read(&__memalign_hook);
+	if (hook != NULL && libc_malloc_hook_begin()) {
+		size_t ps;
+		RAII_FINALLY { libc_malloc_hook_end(); };
+		ps = getpagesize();
+		if (OVERFLOW_UADD(num_bytes, ps - 1, &num_bytes))
+			num_bytes = (size_t)-1;
+		num_bytes &= ~(ps - 1);
+		return (*hook)(ps, num_bytes, __builtin_return_address(0));
+	}
+	return (*libc_hookcore_pvalloc)(num_bytes);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers")
+void *LIBCCALL libc_hooked_memdup(void const *ptr, size_t n_bytes) {
+	LP__MALLOC_HOOK hook;
+	libc_invoke___malloc_initialize_hook();
+	hook = atomic_read(&__malloc_hook);
+	if (hook != NULL && libc_malloc_hook_begin()) {
+		void *result;
+		RAII_FINALLY { libc_malloc_hook_end(); };
+		result = (*hook)(n_bytes, __builtin_return_address(0));
+		if likely(result)
+			result = memcpy(result, ptr, n_bytes);
+		return result;
+	}
+	return (*libc_hookcore_memdup)(ptr, n_bytes);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers")
+void *LIBCCALL libc_hooked_memcdup(void const *ptr, int needle, size_t n_bytes) {
+	LP__MALLOC_HOOK hook;
+	libc_invoke___malloc_initialize_hook();
+	hook = atomic_read(&__malloc_hook);
+	if (hook != NULL && libc_malloc_hook_begin()) {
+		void *result;
+		RAII_FINALLY { libc_malloc_hook_end(); };
+		if likely(n_bytes) {
+			void const *endaddr;
+			endaddr = memchr(ptr, needle, n_bytes - 1);
+			if (endaddr)
+				n_bytes = ((uintptr_t)endaddr - (uintptr_t)ptr) + 1;
+		}
+		result = (*hook)(n_bytes, __builtin_return_address(0));
+		if likely(result)
+			result = memcpy(result, ptr, n_bytes);
+		return result;
+	}
+	return (*libc_hookcore_memcdup)(ptr, needle, n_bytes);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers")
+void *LIBCCALL libc_hooked_reallocarray(void *ptr, size_t elem_count, size_t elem_size) {
+	LP__REALLOC_HOOK hook;
+	libc_invoke___malloc_initialize_hook();
+	hook = atomic_read(&__realloc_hook);
+	if (hook != NULL && libc_malloc_hook_begin()) {
+		size_t num_bytes;
+		RAII_FINALLY { libc_malloc_hook_end(); };
+		if (OVERFLOW_UMUL(elem_count, elem_size, &num_bytes))
+			num_bytes = (size_t)-1;
+		return (*hook)(ptr, num_bytes, __builtin_return_address(0));
+	}
+	return (*libc_hookcore_reallocarray)(ptr, elem_count, elem_size);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers")
+void *LIBCCALL libc_hooked_recalloc(void *mallptr, size_t num_bytes) {
+	LP__REALLOC_HOOK hook;
+	libc_invoke___malloc_initialize_hook();
+	hook = atomic_read(&__realloc_hook);
+	if (hook != NULL && libc_malloc_hook_begin()) {
+		void *result;
+		size_t old_size;
+		RAII_FINALLY { libc_malloc_hook_end(); };
+		old_size = malloc_usable_size(mallptr);
+		result   = (*hook)(mallptr, num_bytes, __builtin_return_address(0));
+		if likely(result) {
+			size_t new_size = malloc_usable_size(result);
+			if (old_size < new_size)
+				bzero((byte_t *)result + old_size, new_size - old_size);
+		}
+		return result;
+	}
+	return (*libc_hookcore_recalloc)(mallptr, num_bytes);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers")
+void *LIBCCALL libc_hooked_recallocv(void *mallptr, size_t elem_count, size_t elem_size) {
+	LP__REALLOC_HOOK hook;
+	libc_invoke___malloc_initialize_hook();
+	hook = atomic_read(&__realloc_hook);
+	if (hook != NULL && libc_malloc_hook_begin()) {
+		void *result;
+		size_t old_size;
+		size_t num_bytes;
+		RAII_FINALLY { libc_malloc_hook_end(); };
+		if (OVERFLOW_UMUL(elem_count, elem_size, &num_bytes))
+			num_bytes = (size_t)-1;
+		old_size = malloc_usable_size(mallptr);
+		result   = (*hook)(mallptr, num_bytes, __builtin_return_address(0));
+		if likely(result) {
+			size_t new_size = malloc_usable_size(result);
+			if (old_size < new_size)
+				bzero((byte_t *)result + old_size, new_size - old_size);
+		}
+		return result;
+	}
+	return (*libc_hookcore_recallocv)(mallptr, elem_count, elem_size);
+}
+
+
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers") void
+libc_malloc_hooks_doinit(void) {
+	struct user_malloc_abi abi;
+	syslog(LOG_INFO, "[libc] Enable support for `__malloc_hook'\n");
+
+	/* Check if malloc gets defined by the main application. */
+	bzero(&abi, sizeof(abi));
+	*(void **)&abi.uma_malloc = user_malloc_abi_dlsym(nameof_free, (void *)&libc_free);
+	if (abi.uma_malloc != NULL) {
+		user_malloc_abi_load(&abi);
+	} else {
+		/* If not, load our own malloc through use of `libdlmalloc.so' */
+		libdlmalloc_so_abi_load(&abi);
+
+		/* Define "optional" parts of the ABI */
+		abi.uma_memdup       = &libc_hooked_memdup;
+		abi.uma_memcdup      = &libc_hooked_memcdup;
+		abi.uma_reallocarray = &libc_hooked_reallocarray;
+		abi.uma_recalloc     = &libc_hooked_recalloc;
+		abi.uma_recallocv    = &libc_hooked_recallocv;
+	}
+
+	/* Remember abi-pointers and inject wrappers that
+	 * will  invoke  user-defined hooks  (if defined) */
+#define INJECT_HOOK(name) \
+	(libc_hookcore_##name = abi.uma_##name, abi.uma_##name = &libc_hooked_##name)
+	INJECT_HOOK(malloc);
+	INJECT_HOOK(free);
+	INJECT_HOOK(calloc);
+	INJECT_HOOK(realloc);
+	INJECT_HOOK(realloc_in_place);
+	INJECT_HOOK(memalign);
+	INJECT_HOOK(posix_memalign);
+	INJECT_HOOK(valloc);
+	INJECT_HOOK(pvalloc);
+	INJECT_HOOK(memdup);
+	INJECT_HOOK(memcdup);
+	INJECT_HOOK(reallocarray);
+	INJECT_HOOK(recalloc);
+	INJECT_HOOK(recallocv);
+#undef INJECT_HOOK
+
+	/* Install the ABI */
+	user_malloc_abi_install(&abi);
+}
+
+
+PRIVATE ATTR_SECTION(".bss.crt.heap.rare_helpers")
+pthread_once_t libc_malloc_hooks_didinit = PTHREAD_ONCE_INIT;
+
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers") void
+libc_malloc_hooks_init(void) {
+	pthread_once(&libc_malloc_hooks_didinit,
+	             &libc_malloc_hooks_doinit);
+}
+
+/* Define IDATA symbols for Glibc malloc hooks. When an application
+ * resolves  one  of these,  `libc_malloc_hooks_init()'  is called. */
+#undef __malloc_initialize_hook
+#undef __free_hook
+#undef __malloc_hook
+#undef __realloc_hook
+#undef __memalign_hook
+DEFINE_PUBLIC_IDATA(__malloc_initialize_hook, libc_resolve___malloc_initialize_hook, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(__free_hook, libc_resolve___free_hook, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(__malloc_hook, libc_resolve___malloc_hook, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(__realloc_hook, libc_resolve___realloc_hook, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(__memalign_hook, libc_resolve___memalign_hook, __SIZEOF_POINTER__);
+
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers")
+LP__MALLOC_INITIALIZE_HOOK *LIBCCALL libc_resolve___malloc_initialize_hook(void) {
+	libc_malloc_hooks_init();
+	return &libc___malloc_initialize_hook;
+}
+
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers")
+LP__FREE_HOOK *LIBCCALL libc_resolve___free_hook(void) {
+	libc_malloc_hooks_init();
+	return &libc___free_hook;
+}
+
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers")
+LP__MALLOC_HOOK *LIBCCALL libc_resolve___malloc_hook(void) {
+	libc_malloc_hooks_init();
+	return &libc___malloc_hook;
+}
+
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers")
+LP__REALLOC_HOOK *LIBCCALL libc_resolve___realloc_hook(void) {
+	libc_malloc_hooks_init();
+	return &libc___realloc_hook;
+}
+
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers")
+LP__MEMALIGN_HOOK *LIBCCALL libc_resolve___memalign_hook(void) {
+	libc_malloc_hooks_init();
+	return &libc___memalign_hook;
+}
+
 #else /* __ARCH_REDIRECT_MAXBYTES != 0 */
 INTERN ATTR_SECTION(".text.crt.heap.malloc") int LIBCCALL
 libc_init_malloc_hooks(void) {
