@@ -44,6 +44,7 @@ DEFINE_NOREL_GLOBAL_META(char **, __argv, ".crt.dos.application.init");
 DEFINE_NOREL_GLOBAL_META(char *, _pgmptr, ".crt.dos.application.init");
 DEFINE_NOREL_GLOBAL_META(char *, __progname, ".crt.errno.utility");
 DEFINE_NOREL_GLOBAL_META(char **, environ, ".crt.fs.environ");
+DEFINE_PUBLIC_IDATA(_dl_argv, libc_bind___argv, __SIZEOF_POINTER__);                  /* For Glibc-compat */
 DEFINE_PUBLIC_IDATA(__assert_program_name, libc_bind___progname, __SIZEOF_POINTER__); /* For libc4/5-compat */
 
 
