@@ -31,7 +31,7 @@
 #define RPC_SYSCALL_INFO_METHOD_SIGRETURN_32 0x7e /* 32-bit call was restarted as part of `sigreturn()' */
 #define RPC_SYSCALL_INFO_METHOD_OTHER_32     0x7f /* Some other kind of 32-bit system call invocation method */
 #define RPC_SYSCALL_INFO_METHOD_INT80H_64    0x80 /* `int 80h' or `syscall' (on x86_64) */
-#define RPC_SYSCALL_INFO_METHOD_LCALL7_64    0x81 /* `lcall $7' (on x86_64) */
+#define RPC_SYSCALL_INFO_METHOD_LCALL7_64    0x82 /* `lcall $7' (on x86_64) */
 #define RPC_SYSCALL_INFO_METHOD_SYSVABI_64   0x83 /* 64-bit call into the ukern segment */
 #define RPC_SYSCALL_INFO_METHOD_SIGRETURN_64 0xfe /* 64-bit call was restarted as part of `sigreturn()' */
 #define RPC_SYSCALL_INFO_METHOD_OTHER_64     0xff /* Some other kind of 64-bit system call invocation method */

@@ -67,7 +67,7 @@ NOTHROW(CC determine_stderr_isatty)(void) {
 	saved_stderr_isatty = sys_ioctl(STDERR_FILENO, TCGETA, &ios) < 0 ? 2 : 1;
 }
 
-PRIVATE ATTR_NOINLINE ATTR_SECTION(".text.crt.assert") bool
+PRIVATE ATTR_SECTION(".text.crt.assert") bool
 NOTHROW(CC stderr_isatty)(void) {
 	if (saved_stderr_isatty == 0)
 		determine_stderr_isatty();
@@ -78,9 +78,8 @@ PRIVATE ATTR_COLD ATTR_SECTION(".text.crt.assert") ssize_t CC
 assert_printer(void *UNUSED(ignored), char const *__restrict data, size_t datalen) {
 	/* Also write assertion error text to stderr, but only if it's a TTY. */
 	if (stderr_isatty())
-		sys_write(STDERR_FILENO, data, datalen);
-	return syslog_printer(SYSLOG_PRINTER_CLOSURE(LOG_ERR),
-	                      data, datalen);
+		(void)sys_write(STDERR_FILENO, data, datalen);
+	return sys_syslog(LOG_ERR, data, datalen);
 }
 
 
@@ -190,7 +189,7 @@ NOTHROW(FCALL libc_abort_failure_core)(struct kcpustate *__restrict state) {
 	trap_application(state, NULL, UNWIND_USER_ABORT);
 }
 
-INTERN ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN ATTR_SECTION(".text.crt.assert") NONNULL((1)) void
+INTERN ABNORMAL_RETURN ATTR_COLD ATTR_NOINLINE ATTR_NORETURN ATTR_SECTION(".text.crt.assert") NONNULL((1)) void
 NOTHROW(FCALL libc_assertion_failure_core)(struct assert_args *__restrict args) {
 	struct coredump_assert cdinfo;
 	char message_buf[COREDUMP_ASSERT_MESG_MAXLEN];
@@ -307,7 +306,7 @@ struct vabortmsgf_data {
 	size_t      vamfd_ptag_len; /* Length of the program tag. */
 	bool        vamfd_at_sol;   /* True if at the start of a line. */
 	bool        vamfd_rp_brk;   /* True if a closing ']' must be replaced with ": " on stderr */
-	bool        vamfd_rp_pst;   /* True if after a closing ']' */
+	bool        vamfd_ps_brk;   /* True if after a closing ']' */
 	char       *vamfd_mptr;     /* [0..1] Pointer into `vamfd_mbuf' for the kernel message. */
 	char        vamfd_mbuf[COREDUMP_ABORTF_MESG_MAXLEN];
 };
@@ -375,13 +374,13 @@ NOTHROW_NCX(FORMATPRINTER_CC abortf_printer)(void *arg, char const *__restrict d
 		if (!cookie->vamfd_rp_brk) {
 			char const *mbuf_data = data;
 			size_t mbuf_len = block_len;
-			if (cookie->vamfd_rp_pst && mbuf_len && *mbuf_data == ' ') {
+			if (cookie->vamfd_ps_brk && mbuf_len && *mbuf_data == ' ') {
 				++mbuf_data;
 				--mbuf_len;
 			}
 			abortf_mbuf_print(cookie, mbuf_data, mbuf_len);
 		}
-		cookie->vamfd_rp_pst = false;
+		cookie->vamfd_ps_brk = false;
 		data += block_len;
 		datalen -= block_len;
 		if (tailchar == ']') {
@@ -391,7 +390,7 @@ NOTHROW_NCX(FORMATPRINTER_CC abortf_printer)(void *arg, char const *__restrict d
 			++data;
 			--datalen;
 			cookie->vamfd_rp_brk = false;
-			cookie->vamfd_rp_pst = true;
+			cookie->vamfd_ps_brk = true;
 		} else if (tailchar == '\r') {
 			++data;
 			--datalen;
@@ -422,12 +421,13 @@ NOTHROW(FCALL libc_vabortf_failure_core_impl)(struct abortf_args *__restrict arg
 	data.vamfd_ptag_len = strlen(data.vamfd_ptag_str);
 	data.vamfd_at_sol   = true;
 	data.vamfd_rp_brk   = false;
+	data.vamfd_ps_brk   = false;
 	data.vamfd_mptr     = data.vamfd_mbuf;
 	(void)format_vprintf(&abortf_printer, &data, args->af_format, args->af_args);
 	if (!data.vamfd_at_sol)
 		(void)abortf_printer(&data, "\n", 1);
 	data.vamfd_mbuf[lengthof(data.vamfd_mbuf) - 1] = '\0';
-	while (data.vamfd_mptr > data.vamfd_mbuf && data.vamfd_mptr[-1] == '\n')
+	while (data.vamfd_mptr > data.vamfd_mbuf && __ascii_isspace(data.vamfd_mptr[-1]))
 		--data.vamfd_mptr;
 	if (data.vamfd_mptr < COMPILER_ENDOF(data.vamfd_mbuf))
 		data.vamfd_mptr[0] = '\0';
@@ -441,13 +441,13 @@ NOTHROW(FCALL libc_vabortf_failure_core_impl)(struct abortf_args *__restrict arg
 
 INTERN ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL libc_vabortf_failure_core)(struct abortf_args *__restrict args) {
-	/* If no format-message is given, behave the same as regular `abort(3)' */
+	/* If no format-string is given, behave the same as regular `abort(3)' */
 	if unlikely(!args->af_format)
 		libc_abort_failure_core(&args->af_state);
 
 	/* If the user has defined a custom sigaction for `SIGABRT',
 	 * then instead of directly  triggering a coredump, we  must
-	 * raise that signal at the given `state'! */
+	 * raise that signal at the given `&args->af_state'! */
 	maybe_raise_SIGABRT(&args->af_state);
 
 	/* Normal abort handling. */

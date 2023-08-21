@@ -43,40 +43,40 @@ int funcf(char const *format, ...) {
 }
 
 ----------------------------------------  ASM:  ----------------------------------------
-	.globl  funcf
-	.type   funcf, @function
+	.globl funcf
+	.type  funcf, @function
 funcf:
 	.cfi_startproc
-	subq    $216, %rsp
+	subq   $216, %rsp
 	.cfi_def_cfa_offset 224
-	movq    %rsi, 40(%rsp)     // x86_64_va_list_reg_save_area::rsa_rsi
-	movq    %rdx, 48(%rsp)     // x86_64_va_list_reg_save_area::rsa_rdx
-	movq    %rcx, 56(%rsp)     // x86_64_va_list_reg_save_area::rsa_rcx
-	movq    %r8,  64(%rsp)     // x86_64_va_list_reg_save_area::rsa_r8
-	movq    %r9,  72(%rsp)     // x86_64_va_list_reg_save_area::rsa_r9
-	testb   %al, %al           // SysV: When a function taking variable-arguments is called,
-	                           //       %rax must be set to the total number of floating point
-	                           //       parameters passed to the function in vector registers
-	je      1f
-	movaps  %xmm0, 80(%rsp)    //
-	movaps  %xmm1, 96(%rsp)    //
-	movaps  %xmm2, 112(%rsp)   //
-	movaps  %xmm3, 128(%rsp)   //
-	movaps  %xmm4, 144(%rsp)   //
-	movaps  %xmm5, 160(%rsp)   //
-	movaps  %xmm6, 176(%rsp)   //
-	movaps  %xmm7, 192(%rsp)   //
+	movq   %rsi, 40(%rsp)     // x86_64_va_list_reg_save_area::rsa_rsi
+	movq   %rdx, 48(%rsp)     // x86_64_va_list_reg_save_area::rsa_rdx
+	movq   %rcx, 56(%rsp)     // x86_64_va_list_reg_save_area::rsa_rcx
+	movq   %r8,  64(%rsp)     // x86_64_va_list_reg_save_area::rsa_r8
+	movq   %r9,  72(%rsp)     // x86_64_va_list_reg_save_area::rsa_r9
+	testb  %al, %al           // SysV: When a function taking variable-arguments is called,
+	                          //       %rax must be set to the total number of floating point
+	                          //       parameters passed to the function in vector registers
+	je     1f
+	movaps %xmm0, 80(%rsp)    //
+	movaps %xmm1, 96(%rsp)    //
+	movaps %xmm2, 112(%rsp)   //
+	movaps %xmm3, 128(%rsp)   //
+	movaps %xmm4, 144(%rsp)   //
+	movaps %xmm5, 160(%rsp)   //
+	movaps %xmm6, 176(%rsp)   //
+	movaps %xmm7, 192(%rsp)   //
 1:
-	movl    $8, 8(%rsp)        // x86_64_va_list_struct::vl_gp_offset
-	movl    $48, 12(%rsp)      // x86_64_va_list_struct::vl_fp_offset
-	leaq    224(%rsp), %rax
-	movq    %rax, 16(%rsp)     // x86_64_va_list_struct::vl_overflow_arg_area
-	leaq    32(%rsp), %rax
-	movq    %rax, 24(%rsp)     // x86_64_va_list_struct::vl_reg_save_area
+	movl   $8, 8(%rsp)        // x86_64_va_list_struct::vl_gp_offset
+	movl   $48, 12(%rsp)      // x86_64_va_list_struct::vl_fp_offset
+	leaq   224(%rsp), %rax
+	movq   %rax, 16(%rsp)     // x86_64_va_list_struct::vl_overflow_arg_area
+	leaq   32(%rsp), %rax
+	movq   %rax, 24(%rsp)     // x86_64_va_list_struct::vl_reg_save_area
 
-	leaq    8(%rsp), %rsi      // vfuncf:args
-	call    vfuncf
-	addq    $216, %rsp
+	leaq   8(%rsp), %rsi      // vfuncf:args
+	call   vfuncf
+	addq   $216, %rsp
 	.cfi_def_cfa_offset 8
 	ret
 	.cfi_endproc
@@ -102,34 +102,34 @@ funcf:
 #if X86_64_VA_LIST_XMM_COUNT == 8
 #define X86_64_VA_LIST_SAVE_XMM(dst) \
 	__ASM_BEGIN                      \
-	__ASM_L(movaps  %xmm0, 0+dst)    \
-	__ASM_L(movaps  %xmm1, 8+dst)    \
-	__ASM_L(movaps  %xmm2, 16+dst)   \
-	__ASM_L(movaps  %xmm3, 24+dst)   \
-	__ASM_L(movaps  %xmm4, 32+dst)   \
-	__ASM_L(movaps  %xmm5, 40+dst)   \
-	__ASM_L(movaps  %xmm6, 48+dst)   \
-	__ASM_L(movaps  %xmm7, 56+dst)   \
+	__ASM_L(movaps %xmm0, 0+dst)     \
+	__ASM_L(movaps %xmm1, 8+dst)     \
+	__ASM_L(movaps %xmm2, 16+dst)    \
+	__ASM_L(movaps %xmm3, 24+dst)    \
+	__ASM_L(movaps %xmm4, 32+dst)    \
+	__ASM_L(movaps %xmm5, 40+dst)    \
+	__ASM_L(movaps %xmm6, 48+dst)    \
+	__ASM_L(movaps %xmm7, 56+dst)    \
 	__ASM_END
 #elif X86_64_VA_LIST_XMM_COUNT == 16
 #define X86_64_VA_LIST_SAVE_XMM(dst) \
 	__ASM_BEGIN                      \
-	__ASM_L(movaps  %xmm0,  0+dst)   \
-	__ASM_L(movaps  %xmm1,  8+dst)   \
-	__ASM_L(movaps  %xmm2,  16+dst)  \
-	__ASM_L(movaps  %xmm3,  24+dst)  \
-	__ASM_L(movaps  %xmm4,  32+dst)  \
-	__ASM_L(movaps  %xmm5,  40+dst)  \
-	__ASM_L(movaps  %xmm6,  48+dst)  \
-	__ASM_L(movaps  %xmm7,  56+dst)  \
-	__ASM_L(movaps  %xmm8,  64+dst)  \
-	__ASM_L(movaps  %xmm9,  72+dst)  \
-	__ASM_L(movaps  %xmm10, 80+dst)  \
-	__ASM_L(movaps  %xmm11, 88+dst)  \
-	__ASM_L(movaps  %xmm12, 96+dst)  \
-	__ASM_L(movaps  %xmm13, 104+dst) \
-	__ASM_L(movaps  %xmm14, 112+dst) \
-	__ASM_L(movaps  %xmm15, 120+dst) \
+	__ASM_L(movaps %xmm0,  0+dst)    \
+	__ASM_L(movaps %xmm1,  8+dst)    \
+	__ASM_L(movaps %xmm2,  16+dst)   \
+	__ASM_L(movaps %xmm3,  24+dst)   \
+	__ASM_L(movaps %xmm4,  32+dst)   \
+	__ASM_L(movaps %xmm5,  40+dst)   \
+	__ASM_L(movaps %xmm6,  48+dst)   \
+	__ASM_L(movaps %xmm7,  56+dst)   \
+	__ASM_L(movaps %xmm8,  64+dst)   \
+	__ASM_L(movaps %xmm9,  72+dst)   \
+	__ASM_L(movaps %xmm10, 80+dst)   \
+	__ASM_L(movaps %xmm11, 88+dst)   \
+	__ASM_L(movaps %xmm12, 96+dst)   \
+	__ASM_L(movaps %xmm13, 104+dst)  \
+	__ASM_L(movaps %xmm14, 112+dst)  \
+	__ASM_L(movaps %xmm15, 120+dst)  \
 	__ASM_END
 #else /* X86_64_VA_LIST_XMM_COUNT == ... */
 #error "Unsupported `X86_64_VA_LIST_XMM_COUNT'"
