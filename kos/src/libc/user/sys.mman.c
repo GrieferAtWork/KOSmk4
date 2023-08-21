@@ -370,7 +370,8 @@ NOTHROW_NCX(LIBCCALL libc_pkey_mprotect)(void *addr,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xb4bdac48]]]*/
+/*[[[start:exports,hash:CRC-32=0x77b3c868]]]*/
+DEFINE_PUBLIC_ALIAS(__mmap, libc_mmap);
 DEFINE_PUBLIC_ALIAS(mmap, libc_mmap);
 DEFINE_PUBLIC_ALIAS(__munmap, libc_munmap);
 DEFINE_PUBLIC_ALIAS(__libc_munmap, libc_munmap);

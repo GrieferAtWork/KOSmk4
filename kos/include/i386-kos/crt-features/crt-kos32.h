@@ -1009,6 +1009,7 @@
 #define __CRT_HAVE___mktemp
 #define __CRT_HAVE___mlock
 #define __CRT_HAVE___mlockall
+#define __CRT_HAVE___mmap
 #define __CRT_HAVE___modf
 #define __CRT_HAVE___modff
 #define __CRT_HAVE___modfl

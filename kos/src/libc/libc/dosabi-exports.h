@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6384b6b4 */
+/* HASH CRC-32:0x976a8e13 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3288,6 +3288,7 @@ DEFINE_PUBLIC_ALIAS(DOS$__major, libd___major);
 DEFINE_PUBLIC_ALIAS(DOS$__minor, libd___minor);
 
 /* sys.mman */
+DEFINE_PUBLIC_ALIAS(DOS$__mmap, libd_mmap);
 DEFINE_PUBLIC_ALIAS(DOS$mmap, libd_mmap);
 DEFINE_PUBLIC_ALIAS(DOS$__munmap, libd_munmap);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_munmap, libd_munmap);

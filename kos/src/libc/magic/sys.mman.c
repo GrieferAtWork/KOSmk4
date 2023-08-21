@@ -720,7 +720,7 @@ void *mmap32([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("mmap", "__mmap")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("mmap64")]]
 [[userimpl, requires($has_function(mmap32) || $has_function(mmap64))]]
-[[section(".text.crt{|.dos}.heap.mman")]]
+[[section(".text.crt{|.dos}.heap.mman"), export_as("__mmap")]]
 void *mmap([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
            __STDC_INT_AS_UINT_T flags, [[fdarg]] $fd_t fd, __PIO_OFFSET offset) {
 @@pp_if $has_function(mmap64)@@
