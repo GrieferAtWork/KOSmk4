@@ -34,6 +34,7 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include "../api.h"
 /**/
 
+#include <hybrid/host.h>
 #include <hybrid/sched/atomic-once.h>
 
 #include <kos/except.h>
@@ -1179,6 +1180,137 @@ DEFINE_LIBICONV_AUTORESOLVE_SYMBOL(iconv)
 DEFINE_LIBICONV_AUTORESOLVE_SYMBOL(iconv_open)
 DEFINE_LIBICONV_AUTORESOLVE_SYMBOL(iconv_close)
 #undef DEFINE_LIBICONV_AUTORESOLVE_SYMBOL
+
+
+
+
+
+
+/* Glibc "fast" string functions from before Glibc 2.24 */
+#undef GLIBC_MEMCPY_SMALL_USE_UNALIGNED
+#if (defined(__i386__) || defined(__x86_64__) || \
+     defined(__mc68020__) || defined(__s390__))
+#define GLIBC_MEMCPY_SMALL_USE_UNALIGNED
+#endif /* ... */
+
+DEFINE_PUBLIC_ALIAS(__strcpy_small, libc___strcpy_small);
+DEFINE_PUBLIC_ALIAS(__mempcpy_small, libc___mempcpy_small);
+DEFINE_PUBLIC_ALIAS(__stpcpy_small, libc___stpcpy_small);
+#ifdef GLIBC_MEMCPY_SMALL_USE_UNALIGNED
+INTERN ATTR_SECTION(".text.crt.compat.glibc") void *
+NOTHROW_NCX(LIBCCALL libc___strcpy_small)(void *dest,
+                                          uint16_t src0_2, uint16_t src4_2,
+                                          uint32_t src0_4, uint32_t src4_4,
+                                          size_t srclen) {
+#define W(T, off) (*(T *)((byte_t *)dest + off))
+	switch (srclen) {
+	case 1: W(uint8_t, 0) = '\0'; break;
+	case 2: W(uint16_t, 0) = src0_2; break;
+	case 3: W(uint16_t, 0) = src0_2; W(uint8_t, 2) = '\0'; break;
+	case 4: W(uint32_t, 0) = src0_4; break;
+	case 5: W(uint32_t, 0) = src0_4; W(uint8_t, 4) = '\0'; break;
+	case 6: W(uint32_t, 0) = src0_4; W(uint16_t, 4) = src4_2; break;
+	case 7: W(uint32_t, 0) = src0_4; W(uint16_t, 4) = src4_2; W(uint8_t, 6) = '\0'; break;
+	case 8: W(uint32_t, 0) = src0_4; W(uint32_t, 4) = src4_4; break;
+	default: break;
+	}
+	return dest;
+#undef W
+}
+
+INTERN ATTR_SECTION(".text.crt.compat.glibc") void *
+NOTHROW_NCX(LIBCCALL libc___mempcpy_small)(void *dest, uint8_t src0_1, uint8_t src2_1,
+                                           uint8_t src4_1, uint8_t src6_1, uint16_t src0_2,
+                                           uint16_t src4_2, uint32_t src0_4,
+                                           uint32_t src4_4, size_t srclen) {
+#define W(T, off) (*(T *)((byte_t *)dest + off))
+	switch (srclen) {
+	case 1: W(uint8_t, 0) = src0_1; break;
+	case 2: W(uint16_t, 0) = src0_2; break;
+	case 3: W(uint16_t, 0) = src0_2; W(uint8_t, 2) = src2_1; break;
+	case 4: W(uint32_t, 0) = src0_4; break;
+	case 5: W(uint32_t, 0) = src0_4; W(uint8_t, 4) = src4_1; break;
+	case 6: W(uint32_t, 0) = src0_4; W(uint16_t, 4) = src4_2; break;
+	case 7: W(uint32_t, 0) = src0_4; W(uint16_t, 4) = src4_2; W(uint8_t, 6) = src6_1; break;
+	case 8: W(uint32_t, 0) = src0_4; W(uint32_t, 4) = src4_4; break;
+	default: break;
+	}
+	return dest;
+#undef W
+}
+
+INTERN ATTR_SECTION(".text.crt.compat.glibc") void *
+NOTHROW_NCX(LIBCCALL libc___stpcpy_small)(void *dest,
+                                          uint16_t src0_2, uint16_t src4_2,
+                                          uint32_t src0_4, uint32_t src4_4,
+                                          size_t srclen) {
+	return (byte_t *)libc___strcpy_small(dest, src0_2, src4_2, src0_4, src4_4, srclen) + srclen;
+}
+#else /* GLIBC_MEMCPY_SMALL_USE_UNALIGNED */
+#define DEFINE_glibc_memcpy_small_arr(N) \
+	typedef struct __ATTR_PACKED {       \
+		byte_t arr[N];                   \
+	} glibc_memcpy_small_arr##N
+DEFINE_glibc_memcpy_small_arr(2);
+DEFINE_glibc_memcpy_small_arr(3);
+DEFINE_glibc_memcpy_small_arr(4);
+DEFINE_glibc_memcpy_small_arr(5);
+DEFINE_glibc_memcpy_small_arr(6);
+DEFINE_glibc_memcpy_small_arr(7);
+DEFINE_glibc_memcpy_small_arr(8);
+#undef DEFINE_glibc_memcpy_small_arr
+
+INTERN ATTR_SECTION(".text.crt.compat.glibc") void *
+NOTHROW_NCX(LIBCCALL libc___strcpy_small)(void *dest,
+                                          glibc_memcpy_small_arr2 src2, glibc_memcpy_small_arr3 src3,
+                                          glibc_memcpy_small_arr4 src4, glibc_memcpy_small_arr5 src5,
+                                          glibc_memcpy_small_arr6 src6, glibc_memcpy_small_arr7 src7,
+                                          glibc_memcpy_small_arr8 src8, size_t srclen) {
+#define W(T) (*(T *)dest)
+	switch (srclen) {
+	case 1: W(uint8_t) = '\0'; break;
+	case 2: W(glibc_memcpy_small_arr2) = src2; break;
+	case 3: W(glibc_memcpy_small_arr3) = src3; break;
+	case 4: W(glibc_memcpy_small_arr4) = src4; break;
+	case 5: W(glibc_memcpy_small_arr5) = src5; break;
+	case 6: W(glibc_memcpy_small_arr6) = src6; break;
+	case 7: W(glibc_memcpy_small_arr7) = src7; break;
+	case 8: W(glibc_memcpy_small_arr8) = src8; break;
+	}
+	return dest;
+#undef W
+}
+
+INTERN ATTR_SECTION(".text.crt.compat.glibc") void *
+NOTHROW_NCX(LIBCCALL libc___mempcpy_small)(void *dest, uint8_t src1,
+                                           glibc_memcpy_small_arr2 src2, glibc_memcpy_small_arr3 src3,
+                                           glibc_memcpy_small_arr4 src4, glibc_memcpy_small_arr5 src5,
+                                           glibc_memcpy_small_arr6 src6, glibc_memcpy_small_arr7 src7,
+                                           glibc_memcpy_small_arr8 src8, size_t srclen) {
+#define W(T) (*(T *)dest)
+	switch (srclen) {
+	case 1: W(uint8_t) = src1; break;
+	case 2: W(glibc_memcpy_small_arr2) = src2; break;
+	case 3: W(glibc_memcpy_small_arr3) = src3; break;
+	case 4: W(glibc_memcpy_small_arr4) = src4; break;
+	case 5: W(glibc_memcpy_small_arr5) = src5; break;
+	case 6: W(glibc_memcpy_small_arr6) = src6; break;
+	case 7: W(glibc_memcpy_small_arr7) = src7; break;
+	case 8: W(glibc_memcpy_small_arr8) = src8; break;
+	}
+	return (byte_t *)dest + srclen;
+#undef W
+}
+
+INTERN ATTR_SECTION(".text.crt.compat.glibc") void *
+NOTHROW_NCX(LIBCCALL libc___stpcpy_small)(void *dest,
+                                          glibc_memcpy_small_arr2 src2, glibc_memcpy_small_arr3 src3,
+                                          glibc_memcpy_small_arr4 src4, glibc_memcpy_small_arr5 src5,
+                                          glibc_memcpy_small_arr6 src6, glibc_memcpy_small_arr7 src7,
+                                          glibc_memcpy_small_arr8 src8, size_t srclen) {
+	return libc___strcpy_small(dest, src2, src3, src4, src5, src6, src7, src8, srclen) + srclen;
+}
+#endif /* !GLIBC_MEMCPY_SMALL_USE_UNALIGNED */
 
 
 

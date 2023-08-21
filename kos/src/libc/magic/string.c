@@ -658,6 +658,9 @@ typedef __size_t rsize_t;
 [[guard, decl_include("<hybrid/typecore.h>")]]
 [[preferred_fastbind, libc, std, kernel, leaf]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCPY))]]
+/* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+[[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
+  export_as("__memcpy_c", "__memcpy_g", "__memcpy_by4", "__memcpy_by2")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[nonnull]] void *memcpy([[out(n_bytes)]] void *__restrict dst,
                          [[in (n_bytes)]] void const *__restrict src,
@@ -702,6 +705,11 @@ typedef __size_t rsize_t;
 [[decl_include("<hybrid/typecore.h>")]]
 [[preferred_fastbind, libc, std, kernel, leaf]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMSET))]]
+/* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+[[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
+  export_as("__memset_cc",
+            "__memset_cg", "__memset_ccn_by4", "__memset_ccn_by2",
+            "__memset_gg", "__memset_gcn_by4", "__memset_gcn_by2")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[nonnull]] void *memset([[out(n_bytes)]] void *__restrict dst,
                          int byte, size_t n_bytes) {
@@ -773,6 +781,9 @@ void *memchr([[in(n_bytes)]] void const *__restrict haystack, int needle, size_t
 [[decl_include("<hybrid/typecore.h>")]]
 [[libc, std, kernel, pure, wunused]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRLEN))]]
+/* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+[[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
+  export_as("__strlen_g")]]
 [[impl_include("<hybrid/typecore.h>")]]
 size_t strlen([[in]] char const *__restrict str) {
 	return (size_t)(strend(str) - str);
@@ -786,6 +797,9 @@ size_t strlen([[in]] char const *__restrict str) {
 [[if(__has_builtin(__builtin_index) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline(index, { return __builtin_index(haystack, needle); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCHR))]]
+/* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+[[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
+  export_as("__strchr_g", "__strchr_c")]]
 char *strchr([[in]] char const *__restrict haystack, int needle)
 	[([[in]] char *__restrict haystack, int needle): char *]
 	[([[in]] char const *__restrict haystack, int needle): char const *]
@@ -807,6 +821,9 @@ char *strchr([[in]] char const *__restrict haystack, int needle)
 [[if(__has_builtin(__builtin_rindex) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline(rindex, { return __builtin_rindex(haystack, needle); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRRCHR))]]
+/* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+[[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
+  export_as("__strrchr_g", "__strrchr_c")]]
 char *strrchr([[in]] char const *__restrict haystack, int needle)
 	[([[in]] char *__restrict haystack, int needle): char *]
 	[([[in]] char const *__restrict haystack, int needle): char const *]
@@ -826,6 +843,9 @@ char *strrchr([[in]] char const *__restrict haystack, int needle)
 @@Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical
 [[libc, std, kernel, wunused, crtbuiltin, pure]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCMP))]]
+/* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+[[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
+  export_as("__strcmp_gg")]]
 int strcmp([[in]] char const *s1, [[in]] char const *s2) {
 	char c1, c2;
 	do {
@@ -840,6 +860,9 @@ int strcmp([[in]] char const *s1, [[in]] char const *s2) {
 [[decl_include("<hybrid/typecore.h>")]]
 [[std, kernel, wunused, crtbuiltin, pure]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRNCMP))]]
+/* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+[[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
+  export_as("__strncmp_g")]]
 int strncmp([[in(strnlen(., maxlen))]] char const *s1,
             [[in(strnlen(., maxlen))]] char const *s2, size_t maxlen) {
 	char c1, c2;
@@ -857,6 +880,9 @@ int strncmp([[in(strnlen(., maxlen))]] char const *s1,
 @@If no such needle exists, return `NULL'
 [[std, kernel, wunused, crtbuiltin, pure]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRSTR))]]
+/* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+[[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
+  export_as("__strstr_g", "__strstr_cg")]]
 char *strstr([[in]] char const *haystack, [[in]] char const *needle)
 	[([[in]] char *haystack, [[in]] char const *needle): char *]
 	[([[in]] char const *haystack, [[in]] char const *needle): char const *]
@@ -886,6 +912,9 @@ miss:
 @@the trailing NUL-character is also copied)
 [[std, kernel, crtbuiltin, leaf, dos_only_export_alias("_mbscpy"), libc]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCPY))]]
+/* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+[[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
+  export_as("__strcpy_g")]]
 [[nonnull]] char *strcpy([[out]] char *__restrict dst,
                          [[in]] char const *__restrict src) {
 	return (char *)memcpy(dst, src, (strlen(src) + 1) * sizeof(char));
@@ -899,6 +928,9 @@ miss:
 [[std, crtbuiltin, leaf]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRNCPY))]]
+/* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+[[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
+  export_as("__strncpy_byn", "__strncpy_by4", "__strncpy_by2", "__strncpy_gg")]]
 [[nonnull]] char *strncpy([[out(buflen)]] char *__restrict buf,
                           [[in(strnlen(src, buflen))]] char const *__restrict src,
                           size_t buflen) {
@@ -912,6 +944,9 @@ miss:
 @@Always re-returns `dst'
 [[std, kernel, crtbuiltin, leaf, dos_only_export_alias("_mbscat")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCAT))]]
+/* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+[[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
+  export_as("__strcat_g", "__strcat_c")]]
 [[nonnull]] char *strcat([[inout]] char *__restrict dst,
                          [[in]] char const *__restrict src) {
 	memcpy(strend(dst), src, (strlen(src) + 1) * sizeof(char));
@@ -924,6 +959,9 @@ miss:
 [[std, crtbuiltin, leaf]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRNCAT))]]
+/* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+[[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
+  export_as("__strncat_g")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[nonnull]] char *strncat([[inout]] char *__restrict buf,
                           [[in(strnlen(., max_srclen))]] char const *__restrict src,
@@ -941,6 +979,9 @@ miss:
 [[std, wunused, crtbuiltin, pure]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCSPN))]]
+/* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+[[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
+  export_as("__strcspn_g", "__strcspn_cg")]]
 size_t strcspn([[in]] char const *haystack,
                [[in]] char const *reject) {
 	char const *iter = haystack;
@@ -956,6 +997,9 @@ size_t strcspn([[in]] char const *haystack,
 [[std, wunused, crtbuiltin, pure]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRSPN))]]
+/* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+[[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
+  export_as("__strspn_g", "__strspn_cg")]]
 size_t strspn([[in]] char const *haystack,
               [[in]] char const *accept) {
 	char const *iter = haystack;
@@ -969,6 +1013,9 @@ size_t strspn([[in]] char const *haystack,
 @@If no such character exists, return `NULL' instead.
 [[std, wunused, crtbuiltin, pure]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRPBRK))]]
+/* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+[[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
+  export_as("__strpbrk_g", "__strpbrk_cg")]]
 char *strpbrk([[in]] char const *haystack, [[in]] char const *accept)
 	[([[in]] char *haystack, [[in]] char const *accept): char *]
 	[([[in]] char const *haystack, [[in]] char const *accept): char const *]
@@ -1091,6 +1138,8 @@ $size_t strnlen([[in(strnlen(., maxlen))]] char const *__restrict str, $size_t m
 [[crtbuiltin, kernel, leaf, alias("__stpcpy")]]
 [[if(!defined(__KERNEL__)), export_as("__stpcpy")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STPCPY))]]
+/* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+[[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)), export_as("__stpcpy_g")]]
 stpcpy:([[out]] char *__restrict buf,
         [[in]] char const *__restrict src)
 	-> [[== buf + strlen(src)]] char *
@@ -1318,6 +1367,9 @@ void *memrchr([[in(n_bytes)]] void const *__restrict haystack, int needle, $size
 @@Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found.
 [[kernel, pure, wunused]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCHRNUL))]]
+/* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+[[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
+  export_as("__strchrnul_g", "__strchrnul_c")]]
 [[nonnull]] char *strchrnul([[in]] char const *__restrict haystack, int needle)
 	[([[in]] char *__restrict haystack, int needle): [[nonnull]] char *]
 	[([[in]] char const *__restrict haystack, int needle): [[nonnull]] char const *]
@@ -1473,6 +1525,9 @@ int strverscmp([[in]] char const *s1,
 [[if(!defined(__KERNEL__)), kos_export_as("__mempcpy")]]
 [[preferred_fastbind(mempcpy, ["mempcpy", "__mempcpy"])]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPCPY))]]
+/* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+[[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
+  export_as("__mempcpy_byn", "__mempcpy_by4", "__mempcpy_by2")]]
 [[impl_include("<hybrid/typecore.h>")]]
 mempcpy:([[out(n_bytes)]] void *__restrict dst,
          [[in (n_bytes)]] void const *__restrict src,
@@ -9149,4 +9204,151 @@ __SYSDECL_END
 #include <ssp/string.h>
 #endif /* __SSP_FORTIFY_LEVEL */
 
+}
+
+
+%[default:section(".text.crt{|.dos}.compat.glibc")]
+
+/* Not-declared "fast" string functions from old pre-Glibc 2.25 */
+[[hidden, leaf]]
+char *__strtok_r_1c([[inout_opt]] char *str, char delim,
+                    [[inout]] char **__restrict save_ptr) {
+	char *end;
+	if (!str)
+		str = *save_ptr;
+	if (!*str) {
+		*save_ptr = str;
+		return NULL;
+	}
+	str += __strspn_c1(str, delim);
+	if (!*str) {
+		*save_ptr = str;
+		return NULL;
+	}
+	end = str + __strcspn_c1(str, delim);
+	if (!*end) {
+		*save_ptr = end;
+		return str;
+	}
+	*end = '\0';
+	*save_ptr = end + 1;
+	return str;
+}
+
+[[hidden, leaf]]
+char *__strsep_1c([[inout]] char **__restrict stringp, char delim) {
+	char *result, *iter;
+	if ((result = *stringp) == NULL || !*result)
+		return NULL;
+	for (iter = result; *iter && !(delim == *iter); ++iter)
+		;
+	if (*iter)
+		*iter++ = '\0';
+	*stringp = iter;
+	return result;
+}
+
+[[hidden, leaf]]
+char *__strsep_2c([[inout]] char **__restrict stringp,
+                  char delim1, char delim2) {
+	char *result, *iter;
+	if ((result = *stringp) == NULL || !*result)
+		return NULL;
+	for (iter = result; *iter && !(delim1 == *iter || delim2 == *iter); ++iter)
+		;
+	if (*iter)
+		*iter++ = '\0';
+	*stringp = iter;
+	return result;
+}
+
+[[hidden, leaf]]
+char *__strsep_3c([[inout]] char **__restrict stringp,
+                  char delim1, char delim2, char delim3) {
+	char *result, *iter;
+	if ((result = *stringp) == NULL || !*result)
+		return NULL;
+	for (iter = result; *iter && !(delim1 == *iter || delim2 == *iter || delim3 == *iter); ++iter)
+		;
+	if (*iter)
+		*iter++ = '\0';
+	*stringp = iter;
+	return result;
+}
+
+
+
+/* Not-declared "fast" string functions from old pre-Glibc 2.24 */
+[[hidden, leaf]]
+[[decl_include("<hybrid/typecore.h>")]]
+size_t __strcspn_c1([[in]] char const *haystack, int reject) {
+	char const *iter = haystack;
+	while (*iter && !(reject == *iter))
+		++iter;
+	return (size_t)(iter - haystack);
+}
+
+[[hidden, leaf]]
+[[decl_include("<hybrid/typecore.h>")]]
+size_t __strcspn_c2([[in]] char const *haystack, int reject1, int reject2) {
+	char const *iter = haystack;
+	while (*iter && !(reject1 == *iter || reject2 == *iter))
+		++iter;
+	return (size_t)(iter - haystack);
+}
+
+[[hidden, leaf]]
+[[decl_include("<hybrid/typecore.h>")]]
+size_t __strcspn_c3([[in]] char const *haystack, int reject1, int reject2, int reject3) {
+	char const *iter = haystack;
+	while (*iter && !(reject1 == *iter || reject2 == *iter || reject3 == *iter))
+		++iter;
+	return (size_t)(iter - haystack);
+}
+
+[[hidden, leaf]]
+[[decl_include("<hybrid/typecore.h>")]]
+size_t __strspn_c1([[in]] char const *haystack, int accept) {
+	char const *iter = haystack;
+	while (*iter && (accept == *iter))
+		++iter;
+	return (size_t)(iter - haystack);
+}
+
+[[hidden, leaf]]
+[[decl_include("<hybrid/typecore.h>")]]
+size_t __strspn_c2([[in]] char const *haystack, int accept1, int accept2) {
+	char const *iter = haystack;
+	while (*iter && (accept1 == *iter || accept2 == *iter))
+		++iter;
+	return (size_t)(iter - haystack);
+}
+
+[[hidden, leaf]]
+[[decl_include("<hybrid/typecore.h>")]]
+size_t __strspn_c3([[in]] char const *haystack, int accept1, int accept2, int accept3) {
+	char const *iter = haystack;
+	while (*iter && (accept1 == *iter || accept2 == *iter || accept3 == *iter))
+		++iter;
+	return (size_t)(iter - haystack);
+}
+
+[[hidden, leaf]]
+char *__strpbrk_c2([[in]] char const *haystack, int accept1, int accept2) {
+	char haych;
+	while ((haych = *haystack++) != '\0') {
+		if (haych == accept1 || haych == accept2)
+			return (char *)haystack - 1;
+	}
+	return NULL;
+}
+
+[[hidden, leaf]]
+char *__strpbrk_c3([[in]] char const *haystack, int accept1, int accept2, int accept3) {
+	char haych;
+	while ((haych = *haystack++) != '\0') {
+		if (haych == accept1 || haych == accept2 || haych == accept3)
+			return (char *)haystack - 1;
+	}
+	return NULL;
 }

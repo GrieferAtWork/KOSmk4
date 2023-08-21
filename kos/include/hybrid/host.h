@@ -330,7 +330,7 @@
 #if (_ALIGNMENT_REQUIRED + 0) == 0
 #define __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS 1
 #endif /* _ALIGNMENT_REQUIRED */
-#elif defined(__i386__) || defined(__x86_64__)
+#elif defined(__i386__) || defined(__x86_64__) || defined(__mc68020__) || defined(__s390__)
 #define __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS 1
 #elif defined(__arm__) && defined(__ARM_FEATURE_UNALIGNED)
 #define __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS 1

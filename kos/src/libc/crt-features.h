@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13938724 */
+/* HASH CRC-32:0xb3fa97af */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -215,8 +215,20 @@
 #define __CRT_HAVE_DOS$__stpncpy_chk
 #define __CRT_HAVE_DOS$__strcat_chk
 #define __CRT_HAVE_DOS$__strcpy_chk
+#define __CRT_HAVE_DOS$__strcspn_c1
+#define __CRT_HAVE_DOS$__strcspn_c2
+#define __CRT_HAVE_DOS$__strcspn_c3
 #define __CRT_HAVE_DOS$__strncat_chk
 #define __CRT_HAVE_DOS$__strncpy_chk
+#define __CRT_HAVE_DOS$__strpbrk_c2
+#define __CRT_HAVE_DOS$__strpbrk_c3
+#define __CRT_HAVE_DOS$__strsep_1c
+#define __CRT_HAVE_DOS$__strsep_2c
+#define __CRT_HAVE_DOS$__strsep_3c
+#define __CRT_HAVE_DOS$__strspn_c1
+#define __CRT_HAVE_DOS$__strspn_c2
+#define __CRT_HAVE_DOS$__strspn_c3
+#define __CRT_HAVE_DOS$__strtok_r_1c
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$__swprintf_l
@@ -4601,8 +4613,20 @@
 #define __CRT_HAVE___stpncpy_chk
 #define __CRT_HAVE___strcat_chk
 #define __CRT_HAVE___strcpy_chk
+#define __CRT_HAVE___strcspn_c1
+#define __CRT_HAVE___strcspn_c2
+#define __CRT_HAVE___strcspn_c3
 #define __CRT_HAVE___strncat_chk
 #define __CRT_HAVE___strncpy_chk
+#define __CRT_HAVE___strpbrk_c2
+#define __CRT_HAVE___strpbrk_c3
+#define __CRT_HAVE___strsep_1c
+#define __CRT_HAVE___strsep_2c
+#define __CRT_HAVE___strsep_3c
+#define __CRT_HAVE___strspn_c1
+#define __CRT_HAVE___strspn_c2
+#define __CRT_HAVE___strspn_c3
+#define __CRT_HAVE___strtok_r_1c
 #define __CRT_HAVE___swprintf_l
 #define __CRT_HAVE___sys_errlist
 #define __CRT_HAVE___sys_nerr

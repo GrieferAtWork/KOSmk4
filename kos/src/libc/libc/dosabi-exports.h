@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c8c3773 */
+/* HASH CRC-32:0x6384b6b4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2751,28 +2751,92 @@ DEFINE_PUBLIC_ALIAS(DOS$onexit, libd_onexit);
 DEFINE_PUBLIC_ALIAS(DOS$_get_environ, libd__get_environ);
 
 /* string */
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(DOS$__memcpy_c, libd_memcpy);
+DEFINE_PUBLIC_ALIAS(DOS$__memcpy_g, libd_memcpy);
+DEFINE_PUBLIC_ALIAS(DOS$__memcpy_by4, libd_memcpy);
+DEFINE_PUBLIC_ALIAS(DOS$__memcpy_by2, libd_memcpy);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$memcpy, libd_memcpy);
 DEFINE_PUBLIC_ALIAS(DOS$memmove, libd_memmove);
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(DOS$__memset_cc, libd_memset);
+DEFINE_PUBLIC_ALIAS(DOS$__memset_cg, libd_memset);
+DEFINE_PUBLIC_ALIAS(DOS$__memset_ccn_by4, libd_memset);
+DEFINE_PUBLIC_ALIAS(DOS$__memset_ccn_by2, libd_memset);
+DEFINE_PUBLIC_ALIAS(DOS$__memset_gg, libd_memset);
+DEFINE_PUBLIC_ALIAS(DOS$__memset_gcn_by4, libd_memset);
+DEFINE_PUBLIC_ALIAS(DOS$__memset_gcn_by2, libd_memset);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$memset, libd_memset);
 DEFINE_PUBLIC_ALIAS(DOS$__gcc_bcmp, libd_memcmp);
 DEFINE_PUBLIC_ALIAS(DOS$memcmp, libd_memcmp);
 DEFINE_PUBLIC_ALIAS(DOS$memchr, libd_memchr);
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(DOS$__strlen_g, libd_strlen);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$strlen, libd_strlen);
 DEFINE_PUBLIC_ALIAS(DOS$index, libd_strchr);
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(DOS$__strchr_g, libd_strchr);
+DEFINE_PUBLIC_ALIAS(DOS$__strchr_c, libd_strchr);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$strchr, libd_strchr);
 DEFINE_PUBLIC_ALIAS(DOS$rindex, libd_strrchr);
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(DOS$__strrchr_g, libd_strrchr);
+DEFINE_PUBLIC_ALIAS(DOS$__strrchr_c, libd_strrchr);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$strrchr, libd_strrchr);
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(DOS$__strcmp_gg, libd_strcmp);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$strcmp, libd_strcmp);
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(DOS$__strncmp_g, libd_strncmp);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$strncmp, libd_strncmp);
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(DOS$__strstr_g, libd_strstr);
+DEFINE_PUBLIC_ALIAS(DOS$__strstr_cg, libd_strstr);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$strstr, libd_strstr);
 DEFINE_PUBLIC_ALIAS(DOS$_mbscpy, libd_strcpy);
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(DOS$__strcpy_g, libd_strcpy);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$strcpy, libd_strcpy);
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(DOS$__strncpy_byn, libd_strncpy);
+DEFINE_PUBLIC_ALIAS(DOS$__strncpy_by4, libd_strncpy);
+DEFINE_PUBLIC_ALIAS(DOS$__strncpy_by2, libd_strncpy);
+DEFINE_PUBLIC_ALIAS(DOS$__strncpy_gg, libd_strncpy);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$strncpy, libd_strncpy);
 DEFINE_PUBLIC_ALIAS(DOS$_mbscat, libd_strcat);
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(DOS$__strcat_g, libd_strcat);
+DEFINE_PUBLIC_ALIAS(DOS$__strcat_c, libd_strcat);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$strcat, libd_strcat);
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(DOS$__strncat_g, libd_strncat);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$strncat, libd_strncat);
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(DOS$__strcspn_g, libd_strcspn);
+DEFINE_PUBLIC_ALIAS(DOS$__strcspn_cg, libd_strcspn);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$strcspn, libd_strcspn);
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(DOS$__strspn_g, libd_strspn);
+DEFINE_PUBLIC_ALIAS(DOS$__strspn_cg, libd_strspn);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$strspn, libd_strspn);
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(DOS$__strpbrk_g, libd_strpbrk);
+DEFINE_PUBLIC_ALIAS(DOS$__strpbrk_cg, libd_strpbrk);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$strpbrk, libd_strpbrk);
 DEFINE_PUBLIC_ALIAS(DOS$strtok, libd_strtok);
 DEFINE_PUBLIC_ALIAS(DOS$strcoll, libd_strcoll);
@@ -2780,6 +2844,9 @@ DEFINE_PUBLIC_ALIAS(DOS$strxfrm, libd_strxfrm);
 DEFINE_PUBLIC_ALIAS(DOS$__strncnt, libd_strnlen);
 DEFINE_PUBLIC_ALIAS(DOS$strnlen, libd_strnlen);
 DEFINE_PUBLIC_ALIAS(DOS$__stpcpy, libd_stpcpy);
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(DOS$__stpcpy_g, libd_stpcpy);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$stpcpy, libd_stpcpy);
 DEFINE_PUBLIC_ALIAS(DOS$__stpncpy, libd_stpncpy);
 DEFINE_PUBLIC_ALIAS(DOS$stpncpy, libd_stpncpy);
@@ -2802,6 +2869,10 @@ DEFINE_PUBLIC_ALIAS(DOS$memrchr, libd_memrchr);
 DEFINE_PUBLIC_ALIAS(DOS$memmem, libd_memmem);
 DEFINE_PUBLIC_ALIAS(DOS$__strcasestr, libd_strcasestr);
 DEFINE_PUBLIC_ALIAS(DOS$strcasestr, libd_strcasestr);
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(DOS$__strchrnul_g, libd_strchrnul);
+DEFINE_PUBLIC_ALIAS(DOS$__strchrnul_c, libd_strchrnul);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$strchrnul, libd_strchrnul);
 DEFINE_PUBLIC_ALIAS(DOS$rawmemchr, libd_rawmemchr);
 DEFINE_PUBLIC_ALIAS(DOS$__basename, libd_basename);
@@ -2815,6 +2886,11 @@ DEFINE_PUBLIC_ALIAS(DOS$unix_lbasename, libd_basename);
 DEFINE_PUBLIC_ALIAS(DOS$basename, libd_basename);
 DEFINE_PUBLIC_ALIAS(DOS$__strverscmp, libd_strverscmp);
 DEFINE_PUBLIC_ALIAS(DOS$strverscmp, libd_strverscmp);
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(DOS$__mempcpy_byn, libd_mempcpy);
+DEFINE_PUBLIC_ALIAS(DOS$__mempcpy_by4, libd_mempcpy);
+DEFINE_PUBLIC_ALIAS(DOS$__mempcpy_by2, libd_mempcpy);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$mempcpy, libd_mempcpy);
 DEFINE_PUBLIC_ALIAS(DOS$strfry, libd_strfry);
 DEFINE_PUBLIC_ALIAS(DOS$memfrob, libd_memfrob);
@@ -3109,6 +3185,18 @@ DEFINE_PUBLIC_ALIAS(DOS$stresep, libd_stresep);
 DEFINE_PUBLIC_ALIAS(DOS$consttime_memequal, libd_consttime_memequal);
 DEFINE_PUBLIC_ALIAS(DOS$uucopy, libd_uucopy);
 DEFINE_PUBLIC_ALIAS(DOS$uucopystr, libd_uucopystr);
+DEFINE_PUBLIC_ALIAS(DOS$__strtok_r_1c, libd___strtok_r_1c);
+DEFINE_PUBLIC_ALIAS(DOS$__strsep_1c, libd___strsep_1c);
+DEFINE_PUBLIC_ALIAS(DOS$__strsep_2c, libd___strsep_2c);
+DEFINE_PUBLIC_ALIAS(DOS$__strsep_3c, libd___strsep_3c);
+DEFINE_PUBLIC_ALIAS(DOS$__strcspn_c1, libd___strcspn_c1);
+DEFINE_PUBLIC_ALIAS(DOS$__strcspn_c2, libd___strcspn_c2);
+DEFINE_PUBLIC_ALIAS(DOS$__strcspn_c3, libd___strcspn_c3);
+DEFINE_PUBLIC_ALIAS(DOS$__strspn_c1, libd___strspn_c1);
+DEFINE_PUBLIC_ALIAS(DOS$__strspn_c2, libd___strspn_c2);
+DEFINE_PUBLIC_ALIAS(DOS$__strspn_c3, libd___strspn_c3);
+DEFINE_PUBLIC_ALIAS(DOS$__strpbrk_c2, libd___strpbrk_c2);
+DEFINE_PUBLIC_ALIAS(DOS$__strpbrk_c3, libd___strpbrk_c3);
 
 /* stringlist */
 DEFINE_PUBLIC_ALIAS(DOS$sl_add, libd_sl_add);

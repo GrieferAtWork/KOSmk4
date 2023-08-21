@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa89d4064 */
+/* HASH CRC-32:0xb1dd81cf */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6978,17 +6978,176 @@ NOTHROW_NCX(LIBCCALL libc_uucopystr)(void const *__restrict src,
 	}
 	return (__STDC_INT_AS_SSIZE_T)result;
 }
+INTERN ATTR_SECTION(".text.crt.compat.glibc") ATTR_LEAF ATTR_INOUT(3) ATTR_INOUT_OPT(1) char *
+NOTHROW_NCX(LIBCCALL libc___strtok_r_1c)(char *str,
+                                         char delim,
+                                         char **__restrict save_ptr) {
+	char *end;
+	if (!str)
+		str = *save_ptr;
+	if (!*str) {
+		*save_ptr = str;
+		return NULL;
+	}
+	str += libc___strspn_c1(str, delim);
+	if (!*str) {
+		*save_ptr = str;
+		return NULL;
+	}
+	end = str + libc___strcspn_c1(str, delim);
+	if (!*end) {
+		*save_ptr = end;
+		return str;
+	}
+	*end = '\0';
+	*save_ptr = end + 1;
+	return str;
+}
+INTERN ATTR_SECTION(".text.crt.compat.glibc") ATTR_LEAF ATTR_INOUT(1) char *
+NOTHROW_NCX(LIBCCALL libc___strsep_1c)(char **__restrict stringp,
+                                       char delim) {
+	char *result, *iter;
+	if ((result = *stringp) == NULL || !*result)
+		return NULL;
+	for (iter = result; *iter && !(delim == *iter); ++iter)
+		;
+	if (*iter)
+		*iter++ = '\0';
+	*stringp = iter;
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.compat.glibc") ATTR_LEAF ATTR_INOUT(1) char *
+NOTHROW_NCX(LIBCCALL libc___strsep_2c)(char **__restrict stringp,
+                                       char delim1,
+                                       char delim2) {
+	char *result, *iter;
+	if ((result = *stringp) == NULL || !*result)
+		return NULL;
+	for (iter = result; *iter && !(delim1 == *iter || delim2 == *iter); ++iter)
+		;
+	if (*iter)
+		*iter++ = '\0';
+	*stringp = iter;
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.compat.glibc") ATTR_LEAF ATTR_INOUT(1) char *
+NOTHROW_NCX(LIBCCALL libc___strsep_3c)(char **__restrict stringp,
+                                       char delim1,
+                                       char delim2,
+                                       char delim3) {
+	char *result, *iter;
+	if ((result = *stringp) == NULL || !*result)
+		return NULL;
+	for (iter = result; *iter && !(delim1 == *iter || delim2 == *iter || delim3 == *iter); ++iter)
+		;
+	if (*iter)
+		*iter++ = '\0';
+	*stringp = iter;
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.compat.glibc") ATTR_LEAF ATTR_IN(1) size_t
+NOTHROW_NCX(LIBCCALL libc___strcspn_c1)(char const *haystack,
+                                        int reject) {
+	char const *iter = haystack;
+	while (*iter && !(reject == *iter))
+		++iter;
+	return (size_t)(iter - haystack);
+}
+INTERN ATTR_SECTION(".text.crt.compat.glibc") ATTR_LEAF ATTR_IN(1) size_t
+NOTHROW_NCX(LIBCCALL libc___strcspn_c2)(char const *haystack,
+                                        int reject1,
+                                        int reject2) {
+	char const *iter = haystack;
+	while (*iter && !(reject1 == *iter || reject2 == *iter))
+		++iter;
+	return (size_t)(iter - haystack);
+}
+INTERN ATTR_SECTION(".text.crt.compat.glibc") ATTR_LEAF ATTR_IN(1) size_t
+NOTHROW_NCX(LIBCCALL libc___strcspn_c3)(char const *haystack,
+                                        int reject1,
+                                        int reject2,
+                                        int reject3) {
+	char const *iter = haystack;
+	while (*iter && !(reject1 == *iter || reject2 == *iter || reject3 == *iter))
+		++iter;
+	return (size_t)(iter - haystack);
+}
+INTERN ATTR_SECTION(".text.crt.compat.glibc") ATTR_LEAF ATTR_IN(1) size_t
+NOTHROW_NCX(LIBCCALL libc___strspn_c1)(char const *haystack,
+                                       int accept) {
+	char const *iter = haystack;
+	while (*iter && (accept == *iter))
+		++iter;
+	return (size_t)(iter - haystack);
+}
+INTERN ATTR_SECTION(".text.crt.compat.glibc") ATTR_LEAF ATTR_IN(1) size_t
+NOTHROW_NCX(LIBCCALL libc___strspn_c2)(char const *haystack,
+                                       int accept1,
+                                       int accept2) {
+	char const *iter = haystack;
+	while (*iter && (accept1 == *iter || accept2 == *iter))
+		++iter;
+	return (size_t)(iter - haystack);
+}
+INTERN ATTR_SECTION(".text.crt.compat.glibc") ATTR_LEAF ATTR_IN(1) size_t
+NOTHROW_NCX(LIBCCALL libc___strspn_c3)(char const *haystack,
+                                       int accept1,
+                                       int accept2,
+                                       int accept3) {
+	char const *iter = haystack;
+	while (*iter && (accept1 == *iter || accept2 == *iter || accept3 == *iter))
+		++iter;
+	return (size_t)(iter - haystack);
+}
+INTERN ATTR_SECTION(".text.crt.compat.glibc") ATTR_LEAF ATTR_IN(1) char *
+NOTHROW_NCX(LIBCCALL libc___strpbrk_c2)(char const *haystack,
+                                        int accept1,
+                                        int accept2) {
+	char haych;
+	while ((haych = *haystack++) != '\0') {
+		if (haych == accept1 || haych == accept2)
+			return (char *)haystack - 1;
+	}
+	return NULL;
+}
+INTERN ATTR_SECTION(".text.crt.compat.glibc") ATTR_LEAF ATTR_IN(1) char *
+NOTHROW_NCX(LIBCCALL libc___strpbrk_c3)(char const *haystack,
+                                        int accept1,
+                                        int accept2,
+                                        int accept3) {
+	char haych;
+	while ((haych = *haystack++) != '\0') {
+		if (haych == accept1 || haych == accept2 || haych == accept3)
+			return (char *)haystack - 1;
+	}
+	return NULL;
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
 
 #ifndef LIBC_ARCH_HAVE_MEMCPY
+#if defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(__memcpy_c, libc_memcpy);
+DEFINE_PUBLIC_ALIAS(__memcpy_g, libc_memcpy);
+DEFINE_PUBLIC_ALIAS(__memcpy_by4, libc_memcpy);
+DEFINE_PUBLIC_ALIAS(__memcpy_by2, libc_memcpy);
+#endif /* __i386__ && !__x86_64__ && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(memcpy, libc_memcpy);
 #endif /* !LIBC_ARCH_HAVE_MEMCPY */
 #ifndef LIBC_ARCH_HAVE_MEMMOVE
 DEFINE_PUBLIC_ALIAS(memmove, libc_memmove);
 #endif /* !LIBC_ARCH_HAVE_MEMMOVE */
 #ifndef LIBC_ARCH_HAVE_MEMSET
+#if defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(__memset_cc, libc_memset);
+DEFINE_PUBLIC_ALIAS(__memset_cg, libc_memset);
+DEFINE_PUBLIC_ALIAS(__memset_ccn_by4, libc_memset);
+DEFINE_PUBLIC_ALIAS(__memset_ccn_by2, libc_memset);
+DEFINE_PUBLIC_ALIAS(__memset_gg, libc_memset);
+DEFINE_PUBLIC_ALIAS(__memset_gcn_by4, libc_memset);
+DEFINE_PUBLIC_ALIAS(__memset_gcn_by2, libc_memset);
+#endif /* __i386__ && !__x86_64__ && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(memset, libc_memset);
 #endif /* !LIBC_ARCH_HAVE_MEMSET */
 #ifndef LIBC_ARCH_HAVE_MEMCMP
@@ -7001,54 +7160,103 @@ DEFINE_PUBLIC_ALIAS(memcmp, libc_memcmp);
 DEFINE_PUBLIC_ALIAS(memchr, libc_memchr);
 #endif /* !LIBC_ARCH_HAVE_MEMCHR */
 #ifndef LIBC_ARCH_HAVE_STRLEN
+#if defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(__strlen_g, libc_strlen);
+#endif /* __i386__ && !__x86_64__ && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strlen, libc_strlen);
 #endif /* !LIBC_ARCH_HAVE_STRLEN */
 #ifndef LIBC_ARCH_HAVE_STRCHR
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(index, libc_strchr);
 #endif /* !__KERNEL__ */
+#if defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(__strchr_g, libc_strchr);
+DEFINE_PUBLIC_ALIAS(__strchr_c, libc_strchr);
+#endif /* __i386__ && !__x86_64__ && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strchr, libc_strchr);
 #endif /* !LIBC_ARCH_HAVE_STRCHR */
 #ifndef LIBC_ARCH_HAVE_STRRCHR
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(rindex, libc_strrchr);
 #endif /* !__KERNEL__ */
+#if defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(__strrchr_g, libc_strrchr);
+DEFINE_PUBLIC_ALIAS(__strrchr_c, libc_strrchr);
+#endif /* __i386__ && !__x86_64__ && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strrchr, libc_strrchr);
 #endif /* !LIBC_ARCH_HAVE_STRRCHR */
 #ifndef LIBC_ARCH_HAVE_STRCMP
+#if defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(__strcmp_gg, libc_strcmp);
+#endif /* __i386__ && !__x86_64__ && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strcmp, libc_strcmp);
 #endif /* !LIBC_ARCH_HAVE_STRCMP */
 #ifndef LIBC_ARCH_HAVE_STRNCMP
+#if defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(__strncmp_g, libc_strncmp);
+#endif /* __i386__ && !__x86_64__ && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strncmp, libc_strncmp);
 #endif /* !LIBC_ARCH_HAVE_STRNCMP */
 #ifndef LIBC_ARCH_HAVE_STRSTR
+#if defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(__strstr_g, libc_strstr);
+DEFINE_PUBLIC_ALIAS(__strstr_cg, libc_strstr);
+#endif /* __i386__ && !__x86_64__ && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strstr, libc_strstr);
 #endif /* !LIBC_ARCH_HAVE_STRSTR */
 #ifndef LIBC_ARCH_HAVE_STRCPY
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_mbscpy, libc_strcpy);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+#if defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(__strcpy_g, libc_strcpy);
+#endif /* __i386__ && !__x86_64__ && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strcpy, libc_strcpy);
 #endif /* !LIBC_ARCH_HAVE_STRCPY */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRNCPY)
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(__strncpy_byn, libc_strncpy);
+DEFINE_PUBLIC_ALIAS(__strncpy_by4, libc_strncpy);
+DEFINE_PUBLIC_ALIAS(__strncpy_by2, libc_strncpy);
+DEFINE_PUBLIC_ALIAS(__strncpy_gg, libc_strncpy);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(strncpy, libc_strncpy);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRNCPY */
 #ifndef LIBC_ARCH_HAVE_STRCAT
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_mbscat, libc_strcat);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+#if defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(__strcat_g, libc_strcat);
+DEFINE_PUBLIC_ALIAS(__strcat_c, libc_strcat);
+#endif /* __i386__ && !__x86_64__ && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strcat, libc_strcat);
 #endif /* !LIBC_ARCH_HAVE_STRCAT */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRNCAT)
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(__strncat_g, libc_strncat);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(strncat, libc_strncat);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRNCAT */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRCSPN)
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(__strcspn_g, libc_strcspn);
+DEFINE_PUBLIC_ALIAS(__strcspn_cg, libc_strcspn);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(strcspn, libc_strcspn);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRCSPN */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRSPN)
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(__strspn_g, libc_strspn);
+DEFINE_PUBLIC_ALIAS(__strspn_cg, libc_strspn);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(strspn, libc_strspn);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRSPN */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRPBRK)
+#if defined(__i386__) && !defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(__strpbrk_g, libc_strpbrk);
+DEFINE_PUBLIC_ALIAS(__strpbrk_cg, libc_strpbrk);
+#endif /* __i386__ && !__x86_64__ */
 DEFINE_PUBLIC_ALIAS(strpbrk, libc_strpbrk);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRPBRK */
 #ifndef __KERNEL__
@@ -7076,6 +7284,9 @@ DEFINE_PUBLIC_ALIAS(strnlen, libc_strnlen);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__stpcpy, libc_stpcpy);
 #endif /* !__KERNEL__ */
+#if defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(__stpcpy_g, libc_stpcpy);
+#endif /* __i386__ && !__x86_64__ && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(stpcpy, libc_stpcpy);
 #endif /* !LIBC_ARCH_HAVE_STPCPY */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STPNCPY)
@@ -7120,6 +7331,10 @@ DEFINE_PUBLIC_ALIAS(__strcasestr, libc_strcasestr);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strcasestr, libc_strcasestr);
 #ifndef LIBC_ARCH_HAVE_STRCHRNUL
+#if defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(__strchrnul_g, libc_strchrnul);
+DEFINE_PUBLIC_ALIAS(__strchrnul_c, libc_strchrnul);
+#endif /* __i386__ && !__x86_64__ && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strchrnul, libc_strchrnul);
 #endif /* !LIBC_ARCH_HAVE_STRCHRNUL */
 #ifndef LIBC_ARCH_HAVE_RAWMEMCHR
@@ -7140,6 +7355,11 @@ DEFINE_PUBLIC_ALIAS(strverscmp, libc_strverscmp);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__mempcpy, libc_mempcpy);
 #endif /* !__KERNEL__ */
+#if defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(__mempcpy_byn, libc_mempcpy);
+DEFINE_PUBLIC_ALIAS(__mempcpy_by4, libc_mempcpy);
+DEFINE_PUBLIC_ALIAS(__mempcpy_by2, libc_mempcpy);
+#endif /* __i386__ && !__x86_64__ && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(mempcpy, libc_mempcpy);
 #endif /* !LIBC_ARCH_HAVE_MEMPCPY */
 #ifndef __KERNEL__
@@ -7852,6 +8072,18 @@ DEFINE_PUBLIC_ALIAS(stresep, libc_stresep);
 DEFINE_PUBLIC_ALIAS(consttime_memequal, libc_consttime_memequal);
 DEFINE_PUBLIC_ALIAS(uucopy, libc_uucopy);
 DEFINE_PUBLIC_ALIAS(uucopystr, libc_uucopystr);
+DEFINE_PUBLIC_ALIAS(__strtok_r_1c, libc___strtok_r_1c);
+DEFINE_PUBLIC_ALIAS(__strsep_1c, libc___strsep_1c);
+DEFINE_PUBLIC_ALIAS(__strsep_2c, libc___strsep_2c);
+DEFINE_PUBLIC_ALIAS(__strsep_3c, libc___strsep_3c);
+DEFINE_PUBLIC_ALIAS(__strcspn_c1, libc___strcspn_c1);
+DEFINE_PUBLIC_ALIAS(__strcspn_c2, libc___strcspn_c2);
+DEFINE_PUBLIC_ALIAS(__strcspn_c3, libc___strcspn_c3);
+DEFINE_PUBLIC_ALIAS(__strspn_c1, libc___strspn_c1);
+DEFINE_PUBLIC_ALIAS(__strspn_c2, libc___strspn_c2);
+DEFINE_PUBLIC_ALIAS(__strspn_c3, libc___strspn_c3);
+DEFINE_PUBLIC_ALIAS(__strpbrk_c2, libc___strpbrk_c2);
+DEFINE_PUBLIC_ALIAS(__strpbrk_c3, libc___strpbrk_c3);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_STRING_C */

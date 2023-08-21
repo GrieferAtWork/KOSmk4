@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71f98267 */
+/* HASH CRC-32:0x720b6afc */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2950,6 +2950,18 @@ DFUN(".text.crt.dos.string.memory", libd_stresep, libc_stresep, TP, 3, TP, TP, T
 DFUN(".text.crt.dos.bsd", libd_consttime_memequal, libc_consttime_memequal, TD, 3, TP, TP, TI)
 DFUN(".text.crt.dos.solaris", libd_uucopy, libc_uucopy, TD, 3, TP, TP, TI)
 DFUN(".text.crt.dos.solaris", libd_uucopystr, libc_uucopystr, TD, 3, TP, TP, TI)
+DFUN(".text.crt.dos.compat.glibc", libd___strtok_r_1c, libc___strtok_r_1c, TP, 3, TP, THH, TP)
+DFUN(".text.crt.dos.compat.glibc", libd___strsep_1c, libc___strsep_1c, TP, 2, TP, THH)
+DFUN(".text.crt.dos.compat.glibc", libd___strsep_2c, libc___strsep_2c, TP, 3, TP, THH, THH)
+DFUN(".text.crt.dos.compat.glibc", libd___strsep_3c, libc___strsep_3c, TP, 4, TP, THH, THH, THH)
+DFUN(".text.crt.dos.compat.glibc", libd___strcspn_c1, libc___strcspn_c1, TI, 2, TP, TD)
+DFUN(".text.crt.dos.compat.glibc", libd___strcspn_c2, libc___strcspn_c2, TI, 3, TP, TD, TD)
+DFUN(".text.crt.dos.compat.glibc", libd___strcspn_c3, libc___strcspn_c3, TI, 4, TP, TD, TD, TD)
+DFUN(".text.crt.dos.compat.glibc", libd___strspn_c1, libc___strspn_c1, TI, 2, TP, TD)
+DFUN(".text.crt.dos.compat.glibc", libd___strspn_c2, libc___strspn_c2, TI, 3, TP, TD, TD)
+DFUN(".text.crt.dos.compat.glibc", libd___strspn_c3, libc___strspn_c3, TI, 4, TP, TD, TD, TD)
+DFUN(".text.crt.dos.compat.glibc", libd___strpbrk_c2, libc___strpbrk_c2, TP, 3, TP, TD, TD)
+DFUN(".text.crt.dos.compat.glibc", libd___strpbrk_c3, libc___strpbrk_c3, TP, 4, TP, TD, TD, TD)
 
 /* stringlist */
 DFUN(".text.crt.dos.bsd.stringlist", libd_sl_add, libc_sl_add, TD, 2, TP, TP)

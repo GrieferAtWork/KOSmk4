@@ -83,6 +83,28 @@ DEFINE_INTERN_ALIAS(libd_wmemset, libc_memsetw)
 DEFINE_INTERN_ALIAS(libd_wmempcpy, libc_mempcpyw)
 DEFINE_INTERN_ALIAS(libd_wmempmove, libc_mempmovew)
 DEFINE_INTERN_ALIAS(libd_wmempset, libc_mempsetw)
+
+/* Aliases for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
+DEFINE_PUBLIC_ALIAS(__memcpy_c, libc_memcpy);
+DEFINE_PUBLIC_ALIAS(__memcpy_g, libc_memcpy);
+DEFINE_PUBLIC_ALIAS(__memcpy_by4, libc_memcpy);
+DEFINE_PUBLIC_ALIAS(__memcpy_by2, libc_memcpy);
+
+DEFINE_PUBLIC_ALIAS(__memset_cc, libc_memset);
+DEFINE_PUBLIC_ALIAS(__memset_cg, libc_memset);
+DEFINE_PUBLIC_ALIAS(__memset_ccn_by4, libc_memset);
+DEFINE_PUBLIC_ALIAS(__memset_ccn_by2, libc_memset);
+
+DEFINE_PUBLIC_ALIAS(__memset_gg, libc_memset);
+DEFINE_PUBLIC_ALIAS(__memset_gcn_by4, libc_memset);
+DEFINE_PUBLIC_ALIAS(__memset_gcn_by2, libc_memset);
+
+DEFINE_PUBLIC_ALIAS(__strlen_g, libc_strlen);
+
+DEFINE_PUBLIC_ALIAS(__mempcpy_byn, libc_mempcpy);
+DEFINE_PUBLIC_ALIAS(__mempcpy_by4, libc_mempcpy);
+DEFINE_PUBLIC_ALIAS(__mempcpy_by2, libc_mempcpy);
+
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_HYBRID_ARCH_I386_STRING32_S */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0660e4d */
+/* HASH CRC-32:0x4a04791b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2721,6 +2721,78 @@ INTDEF ATTR_IN_OPT(1) ATTR_OUT_OPT(2) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL
  * @return: -1: [errno=EFAULT]       Faulty memory access
  * @return: -1: [errno=ENAMETOOLONG] `strlen(src) >= maxlen' */
 INTDEF ATTR_IN_OPT(1) ATTR_OUT_OPT(2) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_uucopystr)(void const *__restrict src, void *__restrict dst, size_t maxlen);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_LEAF ATTR_INOUT(3) ATTR_INOUT_OPT(1) char *NOTHROW_NCX(LIBDCALL libd___strtok_r_1c)(char *str, char delim, char **__restrict save_ptr);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_LEAF ATTR_INOUT(3) ATTR_INOUT_OPT(1) char *NOTHROW_NCX(LIBCCALL libc___strtok_r_1c)(char *str, char delim, char **__restrict save_ptr);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_LEAF ATTR_INOUT(1) char *NOTHROW_NCX(LIBDCALL libd___strsep_1c)(char **__restrict stringp, char delim);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_LEAF ATTR_INOUT(1) char *NOTHROW_NCX(LIBCCALL libc___strsep_1c)(char **__restrict stringp, char delim);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_LEAF ATTR_INOUT(1) char *NOTHROW_NCX(LIBDCALL libd___strsep_2c)(char **__restrict stringp, char delim1, char delim2);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_LEAF ATTR_INOUT(1) char *NOTHROW_NCX(LIBCCALL libc___strsep_2c)(char **__restrict stringp, char delim1, char delim2);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_LEAF ATTR_INOUT(1) char *NOTHROW_NCX(LIBDCALL libd___strsep_3c)(char **__restrict stringp, char delim1, char delim2, char delim3);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_LEAF ATTR_INOUT(1) char *NOTHROW_NCX(LIBCCALL libc___strsep_3c)(char **__restrict stringp, char delim1, char delim2, char delim3);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_LEAF ATTR_IN(1) size_t NOTHROW_NCX(LIBDCALL libd___strcspn_c1)(char const *haystack, int reject);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_LEAF ATTR_IN(1) size_t NOTHROW_NCX(LIBCCALL libc___strcspn_c1)(char const *haystack, int reject);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_LEAF ATTR_IN(1) size_t NOTHROW_NCX(LIBDCALL libd___strcspn_c2)(char const *haystack, int reject1, int reject2);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_LEAF ATTR_IN(1) size_t NOTHROW_NCX(LIBCCALL libc___strcspn_c2)(char const *haystack, int reject1, int reject2);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_LEAF ATTR_IN(1) size_t NOTHROW_NCX(LIBDCALL libd___strcspn_c3)(char const *haystack, int reject1, int reject2, int reject3);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_LEAF ATTR_IN(1) size_t NOTHROW_NCX(LIBCCALL libc___strcspn_c3)(char const *haystack, int reject1, int reject2, int reject3);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_LEAF ATTR_IN(1) size_t NOTHROW_NCX(LIBDCALL libd___strspn_c1)(char const *haystack, int accept);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_LEAF ATTR_IN(1) size_t NOTHROW_NCX(LIBCCALL libc___strspn_c1)(char const *haystack, int accept);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_LEAF ATTR_IN(1) size_t NOTHROW_NCX(LIBDCALL libd___strspn_c2)(char const *haystack, int accept1, int accept2);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_LEAF ATTR_IN(1) size_t NOTHROW_NCX(LIBCCALL libc___strspn_c2)(char const *haystack, int accept1, int accept2);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_LEAF ATTR_IN(1) size_t NOTHROW_NCX(LIBDCALL libd___strspn_c3)(char const *haystack, int accept1, int accept2, int accept3);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_LEAF ATTR_IN(1) size_t NOTHROW_NCX(LIBCCALL libc___strspn_c3)(char const *haystack, int accept1, int accept2, int accept3);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_LEAF ATTR_IN(1) char *NOTHROW_NCX(LIBDCALL libd___strpbrk_c2)(char const *haystack, int accept1, int accept2);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_LEAF ATTR_IN(1) char *NOTHROW_NCX(LIBCCALL libc___strpbrk_c2)(char const *haystack, int accept1, int accept2);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_LEAF ATTR_IN(1) char *NOTHROW_NCX(LIBDCALL libd___strpbrk_c3)(char const *haystack, int accept1, int accept2, int accept3);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_LEAF ATTR_IN(1) char *NOTHROW_NCX(LIBCCALL libc___strpbrk_c3)(char const *haystack, int accept1, int accept2, int accept3);
 #endif /* !__KERNEL__ */
 
 DECL_END
