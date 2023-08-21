@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x720b6afc */
+/* HASH CRC-32:0xcd1a5ce8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -379,7 +379,7 @@ DFUN(".text.crt.dos.string.encrypt", libd_setkey_r, libc_setkey_r, TV, 2, TP, TP
 DFUN(".text.crt.dos.string.encrypt", libd_encrypt_r, libc_encrypt_r, TV, 3, TP, TD, TP)
 
 /* ctype */
-DFUN(".text.crt.dos.unicode.locale.ctype", libd___locale_ctype_ptr_l, libc___locale_ctype_ptr_l, TP, 1, TP)
+DFUN(".text.crt.dos.compat.glibc.ctype", libd___locale_ctype_ptr_l, libc___locale_ctype_ptr_l, TP, 1, TP)
 DFUN(".text.crt.dos.unicode.static.ctype", libd_iscntrl, libc_iscntrl, TD, 1, TD)
 DFUN(".text.crt.dos.unicode.static.ctype", libd_isspace, libc_isspace, TD, 1, TD)
 DFUN(".text.crt.dos.unicode.static.ctype", libd_isupper, libc_isupper, TD, 1, TD)

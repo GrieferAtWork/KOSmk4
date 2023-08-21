@@ -76,7 +76,7 @@ DECL_BEGIN
 #define ASCII_TOUPPER(ch)  (ASCII_ISLOWER(ch) ? ((ch)-0x20) : (ch))
 
 
-PRIVATE ATTR_SECTION(".rodata.crt.unicode.static.ctype")
+PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc.ctype")
 uint16_t const libc___ctype_b_loc_matrix[384] = {
 /*[[[deemon
 
@@ -493,7 +493,296 @@ for (local x: [-128: 255+1]) {
 };
 
 
-PRIVATE ATTR_SECTION(".rodata.crt.unicode.static.ctype")
+PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc.ctype")
+uint32_t const libc___ctype32_b_loc_matrix[256] = {
+/*[[[deemon
+
+local final known_flags = {
+	("CTB_LOC_ISUPPER",  [](ch) -> ASCII_ISUPPER(ch)),
+	("CTB_LOC_ISLOWER",  [](ch) -> ASCII_ISLOWER(ch)),
+	("CTB_LOC_ISALPHA",  [](ch) -> ASCII_ISALPHA(ch)),
+	("CTB_LOC_ISDIGIT",  [](ch) -> ASCII_ISDIGIT(ch)),
+	("CTB_LOC_ISXDIGIT", [](ch) -> ASCII_ISXDIGIT(ch)),
+	("CTB_LOC_ISSPACE",  [](ch) -> ASCII_ISSPACE(ch)),
+	("CTB_LOC_ISPRINT",  [](ch) -> ASCII_ISPRINT(ch)),
+	("CTB_LOC_ISGRAPH",  [](ch) -> ASCII_ISGRAPH(ch)),
+	("CTB_LOC_ISBLANK",  [](ch) -> ASCII_ISBLANK(ch)),
+	("CTB_LOC_ISCNTRL",  [](ch) -> ASCII_ISCNTRL(ch)),
+	("CTB_LOC_ISPUNCT",  [](ch) -> ASCII_ISPUNCT(ch)),
+	("CTB_LOC_ISALNUM",  [](ch) -> ASCII_ISALNUM(ch))
+};
+
+for (local x: [:255+1]) {
+	local ord = x.unsigned8;
+	local flags = [];
+	for (local f, chk: known_flags) {
+		if (chk(ord))
+			flags.append(f);
+	}
+	print("\t/" "* [", str(x).rjust(4), "] = *" "/ ", flags ? " | ".join(flags) : "0", ",");
+}
+]]]*/
+	/* [   0] = */ CTB_LOC_ISCNTRL,
+	/* [   1] = */ CTB_LOC_ISCNTRL,
+	/* [   2] = */ CTB_LOC_ISCNTRL,
+	/* [   3] = */ CTB_LOC_ISCNTRL,
+	/* [   4] = */ CTB_LOC_ISCNTRL,
+	/* [   5] = */ CTB_LOC_ISCNTRL,
+	/* [   6] = */ CTB_LOC_ISCNTRL,
+	/* [   7] = */ CTB_LOC_ISCNTRL,
+	/* [   8] = */ CTB_LOC_ISCNTRL,
+	/* [   9] = */ CTB_LOC_ISSPACE | CTB_LOC_ISBLANK | CTB_LOC_ISCNTRL,
+	/* [  10] = */ CTB_LOC_ISSPACE | CTB_LOC_ISCNTRL,
+	/* [  11] = */ CTB_LOC_ISSPACE | CTB_LOC_ISCNTRL,
+	/* [  12] = */ CTB_LOC_ISSPACE | CTB_LOC_ISCNTRL,
+	/* [  13] = */ CTB_LOC_ISSPACE | CTB_LOC_ISCNTRL,
+	/* [  14] = */ CTB_LOC_ISCNTRL,
+	/* [  15] = */ CTB_LOC_ISCNTRL,
+	/* [  16] = */ CTB_LOC_ISCNTRL,
+	/* [  17] = */ CTB_LOC_ISCNTRL,
+	/* [  18] = */ CTB_LOC_ISCNTRL,
+	/* [  19] = */ CTB_LOC_ISCNTRL,
+	/* [  20] = */ CTB_LOC_ISCNTRL,
+	/* [  21] = */ CTB_LOC_ISCNTRL,
+	/* [  22] = */ CTB_LOC_ISCNTRL,
+	/* [  23] = */ CTB_LOC_ISCNTRL,
+	/* [  24] = */ CTB_LOC_ISCNTRL,
+	/* [  25] = */ CTB_LOC_ISCNTRL,
+	/* [  26] = */ CTB_LOC_ISCNTRL,
+	/* [  27] = */ CTB_LOC_ISCNTRL,
+	/* [  28] = */ CTB_LOC_ISCNTRL,
+	/* [  29] = */ CTB_LOC_ISCNTRL,
+	/* [  30] = */ CTB_LOC_ISCNTRL,
+	/* [  31] = */ CTB_LOC_ISCNTRL,
+	/* [  32] = */ CTB_LOC_ISSPACE | CTB_LOC_ISPRINT | CTB_LOC_ISBLANK,
+	/* [  33] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  34] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  35] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  36] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  37] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  38] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  39] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  40] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  41] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  42] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  43] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  44] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  45] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  46] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  47] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  48] = */ CTB_LOC_ISDIGIT | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  49] = */ CTB_LOC_ISDIGIT | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  50] = */ CTB_LOC_ISDIGIT | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  51] = */ CTB_LOC_ISDIGIT | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  52] = */ CTB_LOC_ISDIGIT | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  53] = */ CTB_LOC_ISDIGIT | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  54] = */ CTB_LOC_ISDIGIT | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  55] = */ CTB_LOC_ISDIGIT | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  56] = */ CTB_LOC_ISDIGIT | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  57] = */ CTB_LOC_ISDIGIT | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  58] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  59] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  60] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  61] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  62] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  63] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  64] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  65] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  66] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  67] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  68] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  69] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  70] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  71] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  72] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  73] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  74] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  75] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  76] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  77] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  78] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  79] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  80] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  81] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  82] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  83] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  84] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  85] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  86] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  87] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  88] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  89] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  90] = */ CTB_LOC_ISUPPER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  91] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  92] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  93] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  94] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  95] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  96] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [  97] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  98] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [  99] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 100] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 101] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 102] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISXDIGIT | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 103] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 104] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 105] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 106] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 107] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 108] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 109] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 110] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 111] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 112] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 113] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 114] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 115] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 116] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 117] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 118] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 119] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 120] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 121] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 122] = */ CTB_LOC_ISLOWER | CTB_LOC_ISALPHA | CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISALNUM,
+	/* [ 123] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [ 124] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [ 125] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [ 126] = */ CTB_LOC_ISPRINT | CTB_LOC_ISGRAPH | CTB_LOC_ISPUNCT,
+	/* [ 127] = */ CTB_LOC_ISCNTRL,
+	/* [ 128] = */ 0,
+	/* [ 129] = */ 0,
+	/* [ 130] = */ 0,
+	/* [ 131] = */ 0,
+	/* [ 132] = */ 0,
+	/* [ 133] = */ 0,
+	/* [ 134] = */ 0,
+	/* [ 135] = */ 0,
+	/* [ 136] = */ 0,
+	/* [ 137] = */ 0,
+	/* [ 138] = */ 0,
+	/* [ 139] = */ 0,
+	/* [ 140] = */ 0,
+	/* [ 141] = */ 0,
+	/* [ 142] = */ 0,
+	/* [ 143] = */ 0,
+	/* [ 144] = */ 0,
+	/* [ 145] = */ 0,
+	/* [ 146] = */ 0,
+	/* [ 147] = */ 0,
+	/* [ 148] = */ 0,
+	/* [ 149] = */ 0,
+	/* [ 150] = */ 0,
+	/* [ 151] = */ 0,
+	/* [ 152] = */ 0,
+	/* [ 153] = */ 0,
+	/* [ 154] = */ 0,
+	/* [ 155] = */ 0,
+	/* [ 156] = */ 0,
+	/* [ 157] = */ 0,
+	/* [ 158] = */ 0,
+	/* [ 159] = */ 0,
+	/* [ 160] = */ 0,
+	/* [ 161] = */ 0,
+	/* [ 162] = */ 0,
+	/* [ 163] = */ 0,
+	/* [ 164] = */ 0,
+	/* [ 165] = */ 0,
+	/* [ 166] = */ 0,
+	/* [ 167] = */ 0,
+	/* [ 168] = */ 0,
+	/* [ 169] = */ 0,
+	/* [ 170] = */ 0,
+	/* [ 171] = */ 0,
+	/* [ 172] = */ 0,
+	/* [ 173] = */ 0,
+	/* [ 174] = */ 0,
+	/* [ 175] = */ 0,
+	/* [ 176] = */ 0,
+	/* [ 177] = */ 0,
+	/* [ 178] = */ 0,
+	/* [ 179] = */ 0,
+	/* [ 180] = */ 0,
+	/* [ 181] = */ 0,
+	/* [ 182] = */ 0,
+	/* [ 183] = */ 0,
+	/* [ 184] = */ 0,
+	/* [ 185] = */ 0,
+	/* [ 186] = */ 0,
+	/* [ 187] = */ 0,
+	/* [ 188] = */ 0,
+	/* [ 189] = */ 0,
+	/* [ 190] = */ 0,
+	/* [ 191] = */ 0,
+	/* [ 192] = */ 0,
+	/* [ 193] = */ 0,
+	/* [ 194] = */ 0,
+	/* [ 195] = */ 0,
+	/* [ 196] = */ 0,
+	/* [ 197] = */ 0,
+	/* [ 198] = */ 0,
+	/* [ 199] = */ 0,
+	/* [ 200] = */ 0,
+	/* [ 201] = */ 0,
+	/* [ 202] = */ 0,
+	/* [ 203] = */ 0,
+	/* [ 204] = */ 0,
+	/* [ 205] = */ 0,
+	/* [ 206] = */ 0,
+	/* [ 207] = */ 0,
+	/* [ 208] = */ 0,
+	/* [ 209] = */ 0,
+	/* [ 210] = */ 0,
+	/* [ 211] = */ 0,
+	/* [ 212] = */ 0,
+	/* [ 213] = */ 0,
+	/* [ 214] = */ 0,
+	/* [ 215] = */ 0,
+	/* [ 216] = */ 0,
+	/* [ 217] = */ 0,
+	/* [ 218] = */ 0,
+	/* [ 219] = */ 0,
+	/* [ 220] = */ 0,
+	/* [ 221] = */ 0,
+	/* [ 222] = */ 0,
+	/* [ 223] = */ 0,
+	/* [ 224] = */ 0,
+	/* [ 225] = */ 0,
+	/* [ 226] = */ 0,
+	/* [ 227] = */ 0,
+	/* [ 228] = */ 0,
+	/* [ 229] = */ 0,
+	/* [ 230] = */ 0,
+	/* [ 231] = */ 0,
+	/* [ 232] = */ 0,
+	/* [ 233] = */ 0,
+	/* [ 234] = */ 0,
+	/* [ 235] = */ 0,
+	/* [ 236] = */ 0,
+	/* [ 237] = */ 0,
+	/* [ 238] = */ 0,
+	/* [ 239] = */ 0,
+	/* [ 240] = */ 0,
+	/* [ 241] = */ 0,
+	/* [ 242] = */ 0,
+	/* [ 243] = */ 0,
+	/* [ 244] = */ 0,
+	/* [ 245] = */ 0,
+	/* [ 246] = */ 0,
+	/* [ 247] = */ 0,
+	/* [ 248] = */ 0,
+	/* [ 249] = */ 0,
+	/* [ 250] = */ 0,
+	/* [ 251] = */ 0,
+	/* [ 252] = */ 0,
+	/* [ 253] = */ 0,
+	/* [ 254] = */ 0,
+	/* [ 255] = */ 0,
+//[[[end]]]
+};
+
+
+PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc.ctype")
 int32_t const libc___ctype_tolower_loc_matrix[384] = {
 /*[[[deemon
 import * from deemon;
@@ -890,7 +1179,7 @@ for (local x: [-128: 255+1]) {
 //[[[end]]]
 };
 
-PRIVATE ATTR_SECTION(".rodata.crt.unicode.static.ctype")
+PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc.ctype")
 int32_t const libc___ctype_toupper_loc_matrix[384] = {
 /*[[[deemon
 import * from deemon;
@@ -1288,16 +1577,27 @@ for (local x: [-128: 255+1]) {
 };
 
 
-PRIVATE ATTR_SECTION(".bss.crt.unicode.static.ctype") uint16_t const *libc___ctype_b_loc_pointer = NULL;
-PRIVATE ATTR_SECTION(".bss.crt.unicode.static.ctype") int32_t const *libc___ctype_tolower_loc_pointer = NULL;
-PRIVATE ATTR_SECTION(".bss.crt.unicode.static.ctype") int32_t const *libc___ctype_toupper_loc_pointer = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.compat.glibc.ctype") uint16_t const *libc___ctype_b_loc_pointer = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.compat.glibc.ctype") uint32_t const *libc___ctype32_b_loc_pointer = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.compat.glibc.ctype") int32_t const *libc___ctype_tolower_loc_pointer = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.compat.glibc.ctype") int32_t const *libc___ctype_toupper_loc_pointer = NULL;
 
-DEFINE_PUBLIC_IDATA(__ctype_b, libc___ctype_b_loc, __SIZEOF_POINTER__);             /* >> extern uint16_t const *__ctype_b; */
-DEFINE_PUBLIC_IDATA(__ctype_tolower, libc___ctype_tolower_loc, __SIZEOF_POINTER__); /* >> extern int32_t const *__ctype_tolower; */
-DEFINE_PUBLIC_IDATA(__ctype_toupper, libc___ctype_toupper_loc, __SIZEOF_POINTER__); /* >> extern int32_t const *__ctype_toupper; */
+DEFINE_PUBLIC_IDATA(__ctype_b, libc___ctype_b_loc, __SIZEOF_POINTER__);               /* >> extern uint16_t const *__ctype_b; */
+DEFINE_PUBLIC_IDATA(__ctype_tolower, libc___ctype_tolower_loc, __SIZEOF_POINTER__);   /* >> extern int32_t const *__ctype_tolower; */
+DEFINE_PUBLIC_IDATA(__ctype_toupper, libc___ctype_toupper_loc, __SIZEOF_POINTER__);   /* >> extern int32_t const *__ctype_toupper; */
+DEFINE_PUBLIC_IDATA(__ctype32_b, libc___ctype32_b_loc, __SIZEOF_POINTER__);           /* >> extern uint32_t const *__ctype32_b; */
+DEFINE_PUBLIC_IDATA(__ctype32_tolower, libc___ctype_tolower_loc, __SIZEOF_POINTER__); /* >> extern uint32_t const *__ctype32_tolower; */
+DEFINE_PUBLIC_IDATA(__ctype32_toupper, libc___ctype_toupper_loc, __SIZEOF_POINTER__); /* >> extern uint32_t const *__ctype32_toupper; */
 
-/*[[[head:libc___ctype_b_loc,hash:CRC-32=0xde267e1c]]]*/
-INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_PURE WUNUSED uint16_t const **
+INTERN ATTR_SECTION(".text.crt.compat.glibc.ctype") ATTR_PURE WUNUSED uint32_t const **
+NOTHROW(LIBCCALL libc___ctype32_b_loc)(void) {
+	if (!libc___ctype32_b_loc_pointer)
+		libc___ctype32_b_loc_pointer = libc___ctype32_b_loc_matrix;
+	return &libc___ctype32_b_loc_pointer;
+}
+
+/*[[[head:libc___ctype_b_loc,hash:CRC-32=0x5918365]]]*/
+INTERN ATTR_SECTION(".text.crt.compat.glibc.ctype") ATTR_PURE WUNUSED uint16_t const **
 NOTHROW(LIBCCALL libc___ctype_b_loc)(void)
 /*[[[body:libc___ctype_b_loc]]]*/
 {
@@ -1307,8 +1607,8 @@ NOTHROW(LIBCCALL libc___ctype_b_loc)(void)
 }
 /*[[[end:libc___ctype_b_loc]]]*/
 
-/*[[[head:libc___ctype_tolower_loc,hash:CRC-32=0x285bc49d]]]*/
-INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_PURE WUNUSED int32_t const **
+/*[[[head:libc___ctype_tolower_loc,hash:CRC-32=0xa487c18]]]*/
+INTERN ATTR_SECTION(".text.crt.compat.glibc.ctype") ATTR_PURE WUNUSED int32_t const **
 NOTHROW(LIBCCALL libc___ctype_tolower_loc)(void)
 /*[[[body:libc___ctype_tolower_loc]]]*/
 {
@@ -1318,8 +1618,8 @@ NOTHROW(LIBCCALL libc___ctype_tolower_loc)(void)
 }
 /*[[[end:libc___ctype_tolower_loc]]]*/
 
-/*[[[head:libc___ctype_toupper_loc,hash:CRC-32=0xad708f83]]]*/
-INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_PURE WUNUSED int32_t const **
+/*[[[head:libc___ctype_toupper_loc,hash:CRC-32=0x8f633706]]]*/
+INTERN ATTR_SECTION(".text.crt.compat.glibc.ctype") ATTR_PURE WUNUSED int32_t const **
 NOTHROW(LIBCCALL libc___ctype_toupper_loc)(void)
 /*[[[body:libc___ctype_toupper_loc]]]*/
 {
@@ -1330,8 +1630,8 @@ NOTHROW(LIBCCALL libc___ctype_toupper_loc)(void)
 /*[[[end:libc___ctype_toupper_loc]]]*/
 
 
-/*[[[head:libc___locale_ctype_ptr,hash:CRC-32=0xed204c59]]]*/
-INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED char const *
+/*[[[head:libc___locale_ctype_ptr,hash:CRC-32=0xc422323c]]]*/
+INTERN ATTR_SECTION(".text.crt.compat.glibc.ctype") ATTR_CONST WUNUSED char const *
 NOTHROW(LIBCCALL libc___locale_ctype_ptr)(void)
 /*[[[body:libc___locale_ctype_ptr]]]*/
 /*AUTO*/{
@@ -1341,8 +1641,8 @@ NOTHROW(LIBCCALL libc___locale_ctype_ptr)(void)
 }
 /*[[[end:libc___locale_ctype_ptr]]]*/
 
-/*[[[head:libc___locale_ctype_ptr_l,hash:CRC-32=0x90d435e7]]]*/
-INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED char const *
+/*[[[head:libc___locale_ctype_ptr_l,hash:CRC-32=0x8b864cb6]]]*/
+INTERN ATTR_SECTION(".text.crt.compat.glibc.ctype") ATTR_PURE WUNUSED char const *
 NOTHROW_NCX(LIBCCALL libc___locale_ctype_ptr_l)(locale_t locale)
 /*[[[body:libc___locale_ctype_ptr_l]]]*/
 /*AUTO*/{

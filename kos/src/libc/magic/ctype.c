@@ -279,13 +279,13 @@ __SYSDECL_BEGIN
 
 }
 
-%[default:section(".text.crt{|.dos}.unicode.static.ctype")];
+%[default:section(".text.crt{|.dos}.compat.glibc.ctype")];
 
 [[ignore, const, wunused, nothrow]]
 char const *__locale_ctype_ptr();
 
 [[ignore, pure, wunused]]
-[[section(".text.crt{|.dos}.unicode.locale.ctype")]]
+[[section(".text.crt{|.dos}.compat.glibc.ctype")]]
 char const *__locale_ctype_ptr_l($locale_t locale);
 
 [[ignore, pure, wunused, nothrow]]
@@ -300,6 +300,8 @@ $int32_t const **__ctype_tolower_loc();
 [[decl_include("<hybrid/typecore.h>")]]
 $int32_t const **__ctype_toupper_loc();
 
+
+%[default:section(".text.crt{|.dos}.unicode.static.ctype")];
 
 %[insert:std]
 

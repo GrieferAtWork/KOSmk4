@@ -466,6 +466,9 @@
 #define __CRT_HAVE___create_locale
 #define __CRT_HAVE___crtSleep
 #define __CRT_HAVE___crt_unreachable
+#define __CRT_HAVE___ctype32_b
+#define __CRT_HAVE___ctype32_tolower
+#define __CRT_HAVE___ctype32_toupper
 #define __CRT_HAVE___ctype_C_flags
 #define __CRT_HAVE___ctype_C_tolower
 #define __CRT_HAVE___ctype_C_toupper
