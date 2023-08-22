@@ -1186,6 +1186,24 @@ DEFINE_LIBICONV_AUTORESOLVE_SYMBOL(iconv_close)
 
 
 
+/* Glibc's version of `dlgethandle(3D)' */
+DEFINE_PUBLIC_ALIAS(_dl_find_dso_for_object, libc__dl_find_dso_for_object);
+INTERN ATTR_SECTION(".text.crt.compat.glibc") struct link_map *
+NOTHROW(LIBCCALL libc__dl_find_dso_for_object)(ElfW(Addr) addr) {
+	void *handle;
+	struct link_map *result;
+	handle = dlgethandle((void *)addr, DLGETHANDLE_FNORMAL);
+	result = (struct link_map *)handle;
+	if unlikely(dlinfo(handle, RTLD_DI_LINKMAP, &result))
+		result = (struct link_map *)handle;
+	return result;
+}
+
+
+
+
+
+
 /* Glibc "fast" string functions from before Glibc 2.24 */
 #undef GLIBC_MEMCPY_SMALL_USE_UNALIGNED
 #if (defined(__i386__) || defined(__x86_64__) || \

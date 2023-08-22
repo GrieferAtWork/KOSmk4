@@ -1529,6 +1529,7 @@
 #define __CRT_HAVE__cwscanf_s_l
 #define __CRT_HAVE__daylight
 #define __CRT_HAVE__dl_argv
+#define __CRT_HAVE__dl_find_dso_for_object
 #define __CRT_HAVE__dl_find_object
 #define __CRT_HAVE__doprnt
 #define __CRT_HAVE__doscan

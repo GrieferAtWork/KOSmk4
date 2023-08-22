@@ -1588,6 +1588,7 @@
 #define __CRT_HAVE__difftime32
 #define __CRT_HAVE__difftime64
 #define __CRT_HAVE__dl_argv
+#define __CRT_HAVE__dl_find_dso_for_object
 #define __CRT_HAVE__dl_find_object
 #define __CRT_HAVE__doprnt
 #define __CRT_HAVE__doscan
