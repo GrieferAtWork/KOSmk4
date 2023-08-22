@@ -1309,6 +1309,7 @@
 #define __CRT_HAVE___strsep_1c
 #define __CRT_HAVE___strsep_2c
 #define __CRT_HAVE___strsep_3c
+#define __CRT_HAVE___strsep_g
 #define __CRT_HAVE___strspn_c1
 #define __CRT_HAVE___strspn_c2
 #define __CRT_HAVE___strspn_c3
@@ -7487,6 +7488,7 @@
 #define __CRT_HAVE_KOS$__strsep_1c
 #define __CRT_HAVE_KOS$__strsep_2c
 #define __CRT_HAVE_KOS$__strsep_3c
+#define __CRT_HAVE_KOS$__strsep_g
 #define __CRT_HAVE_KOS$__strspn_c1
 #define __CRT_HAVE_KOS$__strspn_c2
 #define __CRT_HAVE_KOS$__strspn_c3
@@ -11894,6 +11896,7 @@
 #define __CRT_HAVE_DOS$__strsep_1c
 #define __CRT_HAVE_DOS$__strsep_2c
 #define __CRT_HAVE_DOS$__strsep_3c
+#define __CRT_HAVE_DOS$__strsep_g
 #define __CRT_HAVE_DOS$__strspn_c1
 #define __CRT_HAVE_DOS$__strspn_c2
 #define __CRT_HAVE_DOS$__strspn_c3

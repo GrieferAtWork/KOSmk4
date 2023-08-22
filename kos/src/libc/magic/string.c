@@ -3454,7 +3454,7 @@ $errno_t __xpg_strerror_r($errno_t errnum, [[out(buflen)]] char *buf, $size_t bu
 %
 %#ifdef __USE_MISC
 
-[[leaf]]
+[[leaf, export_as("__strsep_g")]]
 char *strsep([[inout]] char **__restrict stringp,
              [[in]] char const *__restrict delim) {
 	char *result, *iter;
