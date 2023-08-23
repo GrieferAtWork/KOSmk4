@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd96799c2 */
+/* HASH CRC-32:0xeb4cf3a7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,12 +31,17 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF ATTR_IN(1) ATTR_INS(3, 2) ATTR_OUT(5) error_t NOTHROW_NCX(LIBCCALL libc_argp_parse)(struct argp const *__restrict argp, int argc, char **__restrict argv, unsigned int flags, int *__restrict arg_index, void *__restrict input);
-INTDEF ATTR_IN(1) ATTR_IN(4) ATTR_INOUT(2) void NOTHROW_NCX(LIBCCALL libc_argp_help)(struct argp const *__restrict argp, FILE *__restrict stream, unsigned int flags, char __KOS_FIXED_CONST *__restrict name);
-INTDEF ATTR_IN(1) ATTR_INOUT(2) void NOTHROW_NCX(LIBCCALL libc_argp_state_help)(struct argp_state const *__restrict state, FILE *__restrict stream, unsigned int flags);
-INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_LIBC_PRINTF(2, 0) void NOTHROW_NCX(LIBCCALL libc_argp_verror)(struct argp_state const *__restrict state, char const *__restrict format, va_list args);
-INTDEF ATTR_IN(1) ATTR_IN(4) ATTR_LIBC_PRINTF(4, 0) void NOTHROW_NCX(LIBCCALL libc_argp_vfailure)(struct argp_state const *__restrict state, int status, errno_t errnum, char const *__restrict format, va_list args);
-INTDEF ATTR_IN_OPT(1) ATTR_IN_OPT(2) void *NOTHROW_NCX(LIBCCALL libc__argp_input)(struct argp const *__restrict argp, struct argp_state const *__restrict state);
+/* >> argp_parse(3)
+ * @param: flags: Set  of  `ARGP_PARSE_ARGV0  | ARGP_NO_ERRS  |  ARGP_NO_ARGS |
+ *                ARGP_IN_ORDER | ARGP_NO_HELP | ARGP_NO_EXIT | ARGP_LONG_ONLY' */
+INTDEF ATTR_IN(1) ATTR_INS(3, 2) ATTR_OUT(5) error_t NOTHROW_NCX(LIBCCALL libc_argp_parse)(struct argp const *__restrict ap, int argc, char **__restrict argv, unsigned int flags, int *__restrict arg_index, void *input);
+/* >> argp_parse(3)
+ * @param: flags: Set of `ARGP_HELP_*' */
+INTDEF ATTR_IN(1) ATTR_IN(4) ATTR_INOUT(2) void NOTHROW_NCX(LIBCCALL libc_argp_help)(struct argp const *__restrict ap, FILE *__restrict stream, unsigned int flags, char __KOS_FIXED_CONST *__restrict name);
+/* >> argp_state_help(3)
+ * @param: flags: Set of `ARGP_HELP_*' */
+INTDEF ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) void NOTHROW_NCX(LIBCCALL libc_argp_state_help)(struct argp_state const *__restrict state, FILE *__restrict stream, unsigned int flags);
+INTDEF ATTR_IN_OPT(1) ATTR_IN_OPT(2) void *NOTHROW_NCX(LIBCCALL libc__argp_input)(struct argp const *__restrict ap, struct argp_state const *__restrict state);
 #endif /* !__KERNEL__ */
 
 DECL_END

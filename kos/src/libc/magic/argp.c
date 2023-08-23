@@ -67,10 +67,10 @@
 #define OPTION_ARG_OPTIONAL __OPTION_ARG_OPTIONAL /* ??? */
 #endif /* !OPTION_ARG_OPTIONAL && __OPTION_ARG_OPTIONAL */
 #if !defined(OPTION_HIDDEN) && defined(__OPTION_HIDDEN)
-#define OPTION_HIDDEN __OPTION_HIDDEN /* ??? */
+#define OPTION_HIDDEN __OPTION_HIDDEN /* Hide from `--help' */
 #endif /* !OPTION_HIDDEN && __OPTION_HIDDEN */
 #if !defined(OPTION_ALIAS) && defined(__OPTION_ALIAS)
-#define OPTION_ALIAS __OPTION_ALIAS /* ??? */
+#define OPTION_ALIAS __OPTION_ALIAS /* Alias for the last preceding non-OPTION_ALIAS option. */
 #endif /* !OPTION_ALIAS && __OPTION_ALIAS */
 #if !defined(OPTION_DOC) && defined(__OPTION_DOC)
 #define OPTION_DOC __OPTION_DOC /* ??? */
@@ -130,33 +130,33 @@
 #define ARGP_KEY_HELP_ARGS_DOC __ARGP_KEY_HELP_ARGS_DOC /* ??? */
 #endif /* !ARGP_KEY_HELP_ARGS_DOC && __ARGP_KEY_HELP_ARGS_DOC */
 
-/* ??? */
+/* Possible flags for `argp_parse::flags' */
 #if !defined(ARGP_PARSE_ARGV0) && defined(__ARGP_PARSE_ARGV0)
-#define ARGP_PARSE_ARGV0 __ARGP_PARSE_ARGV0 /* ??? */
+#define ARGP_PARSE_ARGV0 __ARGP_PARSE_ARGV0 /* Don't skip over `argv[0]' */
 #endif /* !ARGP_PARSE_ARGV0 && __ARGP_PARSE_ARGV0 */
 #if !defined(ARGP_NO_ERRS) && defined(__ARGP_NO_ERRS)
-#define ARGP_NO_ERRS __ARGP_NO_ERRS /* ??? */
+#define ARGP_NO_ERRS __ARGP_NO_ERRS /* Don't print error messages about unknown options to stderr. Implies `ARGP_NO_EXIT' */
 #endif /* !ARGP_NO_ERRS && __ARGP_NO_ERRS */
 #if !defined(ARGP_NO_ARGS) && defined(__ARGP_NO_ARGS)
-#define ARGP_NO_ARGS __ARGP_NO_ARGS /* ??? */
+#define ARGP_NO_ARGS __ARGP_NO_ARGS /* Don't parse non-option arguments (iow: ones that don't start with `-'). Else, invoke `argp::parser' with `key=ARGP_KEY_ARG' for non-option arguments. */
 #endif /* !ARGP_NO_ARGS && __ARGP_NO_ARGS */
 #if !defined(ARGP_IN_ORDER) && defined(__ARGP_IN_ORDER)
-#define ARGP_IN_ORDER __ARGP_IN_ORDER /* ??? */
+#define ARGP_IN_ORDER __ARGP_IN_ORDER /* Parse in command-line order, rather than parsing options before arguments. */
 #endif /* !ARGP_IN_ORDER && __ARGP_IN_ORDER */
 #if !defined(ARGP_NO_HELP) && defined(__ARGP_NO_HELP)
-#define ARGP_NO_HELP __ARGP_NO_HELP /* ??? */
+#define ARGP_NO_HELP __ARGP_NO_HELP /* Disable support for a standard `--help' option */
 #endif /* !ARGP_NO_HELP && __ARGP_NO_HELP */
 #if !defined(ARGP_NO_EXIT) && defined(__ARGP_NO_EXIT)
-#define ARGP_NO_EXIT __ARGP_NO_EXIT /* ??? */
+#define ARGP_NO_EXIT __ARGP_NO_EXIT /* Don't exit on error */
 #endif /* !ARGP_NO_EXIT && __ARGP_NO_EXIT */
 #if !defined(ARGP_LONG_ONLY) && defined(__ARGP_LONG_ONLY)
-#define ARGP_LONG_ONLY __ARGP_LONG_ONLY /* ??? */
+#define ARGP_LONG_ONLY __ARGP_LONG_ONLY /* Long options may be written with a single leading "-" */
 #endif /* !ARGP_LONG_ONLY && __ARGP_LONG_ONLY */
 #if !defined(ARGP_SILENT) && defined(__ARGP_SILENT)
-#define ARGP_SILENT __ARGP_SILENT /* ??? */
+#define ARGP_SILENT __ARGP_SILENT /* Disable extras */
 #endif /* !ARGP_SILENT && __ARGP_SILENT */
 
-/* ??? */
+/* Possible flags for `argp_help::flags' */
 #if !defined(ARGP_HELP_USAGE) && defined(__ARGP_HELP_USAGE)
 #define ARGP_HELP_USAGE __ARGP_HELP_USAGE /* ??? */
 #endif /* !ARGP_HELP_USAGE && __ARGP_HELP_USAGE */
@@ -252,6 +252,56 @@ __CSDECLARE(, int, argp_err_exit_status)
 
 %[define_replacement(error_t = __errno_t)]
 
+%[define_replacement(OPTION_ARG_OPTIONAL = __OPTION_ARG_OPTIONAL)]
+%[define_replacement(OPTION_HIDDEN = __OPTION_HIDDEN)]
+%[define_replacement(OPTION_ALIAS = __OPTION_ALIAS)]
+%[define_replacement(OPTION_DOC = __OPTION_DOC)]
+%[define_replacement(OPTION_NO_USAGE = __OPTION_NO_USAGE)]
+
+%[define_replacement(ARGP_ERR_UNKNOWN = __ARGP_ERR_UNKNOWN)]
+
+%[define_replacement(ARGP_KEY_ARG = __ARGP_KEY_ARG)]
+%[define_replacement(ARGP_KEY_END = __ARGP_KEY_END)]
+%[define_replacement(ARGP_KEY_NO_ARGS = __ARGP_KEY_NO_ARGS)]
+%[define_replacement(ARGP_KEY_INIT = __ARGP_KEY_INIT)]
+%[define_replacement(ARGP_KEY_SUCCESS = __ARGP_KEY_SUCCESS)]
+%[define_replacement(ARGP_KEY_ERROR = __ARGP_KEY_ERROR)]
+%[define_replacement(ARGP_KEY_ARGS = __ARGP_KEY_ARGS)]
+%[define_replacement(ARGP_KEY_FINI = __ARGP_KEY_FINI)]
+
+%[define_replacement(ARGP_KEY_HELP_PRE_DOC = __ARGP_KEY_HELP_PRE_DOC)]
+%[define_replacement(ARGP_KEY_HELP_POST_DOC = __ARGP_KEY_HELP_POST_DOC)]
+%[define_replacement(ARGP_KEY_HELP_HEADER = __ARGP_KEY_HELP_HEADER)]
+%[define_replacement(ARGP_KEY_HELP_EXTRA = __ARGP_KEY_HELP_EXTRA)]
+%[define_replacement(ARGP_KEY_HELP_DUP_ARGS_NOTE = __ARGP_KEY_HELP_DUP_ARGS_NOTE)]
+%[define_replacement(ARGP_KEY_HELP_ARGS_DOC = __ARGP_KEY_HELP_ARGS_DOC)]
+
+%[define_replacement(ARGP_PARSE_ARGV0 = __ARGP_PARSE_ARGV0)]
+%[define_replacement(ARGP_NO_ERRS = __ARGP_NO_ERRS)]
+%[define_replacement(ARGP_NO_ARGS = __ARGP_NO_ARGS)]
+%[define_replacement(ARGP_IN_ORDER = __ARGP_IN_ORDER)]
+%[define_replacement(ARGP_NO_HELP = __ARGP_NO_HELP)]
+%[define_replacement(ARGP_NO_EXIT = __ARGP_NO_EXIT)]
+%[define_replacement(ARGP_LONG_ONLY = __ARGP_LONG_ONLY)]
+%[define_replacement(ARGP_SILENT = __ARGP_SILENT)]
+
+%[define_replacement(ARGP_HELP_USAGE = __ARGP_HELP_USAGE)]
+%[define_replacement(ARGP_HELP_SHORT_USAGE = __ARGP_HELP_SHORT_USAGE)]
+%[define_replacement(ARGP_HELP_SEE = __ARGP_HELP_SEE)]
+%[define_replacement(ARGP_HELP_LONG = __ARGP_HELP_LONG)]
+%[define_replacement(ARGP_HELP_PRE_DOC = __ARGP_HELP_PRE_DOC)]
+%[define_replacement(ARGP_HELP_POST_DOC = __ARGP_HELP_POST_DOC)]
+%[define_replacement(ARGP_HELP_DOC = __ARGP_HELP_DOC)]
+%[define_replacement(ARGP_HELP_BUG_ADDR = __ARGP_HELP_BUG_ADDR)]
+%[define_replacement(ARGP_HELP_LONG_ONLY = __ARGP_HELP_LONG_ONLY)]
+%[define_replacement(ARGP_HELP_EXIT_ERR = __ARGP_HELP_EXIT_ERR)]
+%[define_replacement(ARGP_HELP_EXIT_OK = __ARGP_HELP_EXIT_OK)]
+%[define_replacement(ARGP_HELP_STD_ERR = __ARGP_HELP_STD_ERR)]
+%[define_replacement(ARGP_HELP_STD_USAGE = __ARGP_HELP_STD_USAGE)]
+%[define_replacement(ARGP_HELP_STD_HELP = __ARGP_HELP_STD_HELP)]
+
+
+
 %(auto_source){
 #undef argp_program_version
 #undef argp_program_version_hook
@@ -272,56 +322,180 @@ DEFINE_PUBLIC_ALIAS(argp_err_exit_status, libc_argp_err_exit_status);
 }
 
 
+@@>> argp_parse(3)
+@@@param: flags: Set  of  `ARGP_PARSE_ARGV0  | ARGP_NO_ERRS  |  ARGP_NO_ARGS |
+@@               ARGP_IN_ORDER | ARGP_NO_HELP | ARGP_NO_EXIT | ARGP_LONG_ONLY'
 [[export_alias("__argp_parse")]]
 [[decl_include("<bits/crt/argp.h>", "<bits/types.h>")]]
-error_t argp_parse([[in]] struct argp const *__restrict argp,
+error_t argp_parse([[in]] struct argp const *__restrict ap,
                    int argc, [[in(argc)]] char **__restrict argv,
                    unsigned int flags, [[out]] int *__restrict arg_index,
-                   void *__restrict input);
+                   void *input);
 
 
+@@>> argp_parse(3)
+@@@param: flags: Set of `ARGP_HELP_*'
 [[export_alias("__argp_parse")]]
 [[decl_include("<features.h>", "<bits/crt/argp.h>")]]
-void argp_help([[in]] struct argp const *__restrict argp,
+void argp_help([[in]] struct argp const *__restrict ap,
                [[inout]] $FILE *__restrict stream, unsigned int flags,
                [[in]] char __KOS_FIXED_CONST *__restrict name);
 
 
+@@>> argp_state_help(3)
+@@@param: flags: Set of `ARGP_HELP_*'
 [[export_alias("__argp_state_help")]]
 [[decl_include("<features.h>", "<bits/crt/argp.h>")]]
-void argp_state_help([[in]] struct argp_state const *__restrict state,
-                     [[inout]] $FILE *__restrict stream, unsigned int flags);
+void argp_state_help([[in_opt]] struct argp_state const *__restrict state,
+                     [[inout_opt]] $FILE *__restrict stream, unsigned int flags) /*{
+	unsigned int state_flags = 0;
+	if unlikely(!stream)
+		return;
+	if likely(state)
+		state_flags = state->@flags@;
+	if unlikely(state_flags & ARGP_NO_ERRS)
+		return;
+	if (state_flags & ARGP_LONG_ONLY)
+		flags |= ARGP_HELP_LONG_ONLY;
+	// TODO
+}*/;
 
 
 [[export_alias("__argp_usage")]]
 [[decl_include("<bits/crt/argp.h>")]]
 [[requires_include("<bits/crt/argp.h>", "<libc/template/stdstreams.h>")]]
-[[requires($has_function(argp_state_help) && defined(__LOCAL_stderr) && defined(__ARGP_HELP_STD_USAGE))]]
+[[requires($has_function(argp_state_help) && defined(__LOCAL_stderr) &&
+           defined(__ARGP_HELP_STD_USAGE))]]
 void argp_usage([[in]] struct argp_state const *state) {
-	argp_state_help(state, stderr, __ARGP_HELP_STD_USAGE);
+	argp_state_help(state, stderr, ARGP_HELP_STD_USAGE);
 }
 
 [[static, decl_include("<bits/crt/argp.h>")]]
-void argp_verror([[in]] struct argp_state const *__restrict state,
+[[impl_include("<libc/template/stdstreams.h>")]]
+[[impl_include("<libc/template/program_invocation_name.h>")]]
+[[requires($has_function(/*fputc_unlocked, fprintf_unlocked,*/ vfprintf_unlocked, argp_state_help) &&
+           defined(__ARGP_HELP_STD_ERR))]]
+void argp_verror([[in_opt]] struct argp_state const *__restrict state,
                  [[in, format("printf")]] char const *__restrict format,
-                 va_list args);
+                 va_list args) {
+	FILE *out;
+	char const *appname;
+	if unlikely(state && (state->@flags@ & ARGP_NO_ERRS))
+		return;
+	out = NULL;
+	if likely(state)
+		out = state->@err_stream@;
+@@pp_ifdef stderr@@
+	if unlikely(!out)
+		out = stderr;
+@@pp_endif@@
+	if unlikely(!out)
+		return;
+	appname = NULL;
+	if likely(state)
+		appname = state->@name@;
+@@pp_ifdef program_invocation_name@@
+	if unlikely(!appname)
+		appname = program_invocation_name;
+@@pp_endif@@
+	if unlikely(!appname)
+		appname = "?";
+
+	/* Print the message. */
+@@pp_if $has_function(flockfile, funlockfile)@@
+	(void)flockfile(out);
+@@pp_endif@@
+	(void)fprintf_unlocked(out, "%s: ", appname);
+	(void)vfprintf_unlocked(out, format, args);
+@@pp_if $has_function(fputc_unlocked)@@
+	(void)fputc_unlocked('\n', out);
+@@pp_else@@
+	(void)fprintf_unlocked(out, "\n");
+@@pp_endif@@
+	(void)argp_state_help(state, out, ARGP_HELP_STD_ERR);
+@@pp_if $has_function(flockfile, funlockfile)@@
+	(void)funlockfile(out);
+@@pp_endif@@
+}
 
 [[static, decl_include("<bits/types.h>", "<bits/crt/argp.h>")]]
-void argp_vfailure([[in]] struct argp_state const *__restrict state,
-                  int status, $errno_t errnum,
-                  [[in, format("printf")]] char const *__restrict format,
-                  va_list args);
+[[impl_include("<libc/template/stdstreams.h>")]]
+[[impl_include("<libc/template/program_invocation_name.h>")]]
+[[requires_function(/*fprintf_unlocked, fputc_unlocked, fputs_unlocked,*/ vfprintf_unlocked, exit)]]
+void argp_vfailure([[in_opt]] struct argp_state const *__restrict state, int exit_status, $errno_t errnum,
+                   [[in_opt, format("printf")]] char const *__restrict format, va_list args) {
+	FILE *out;
+	char const *appname;
+	if unlikely(state && (state->@flags@ & ARGP_NO_ERRS))
+		return;
+	out = NULL;
+	if likely(state)
+		out = state->@err_stream@;
+@@pp_ifdef stderr@@
+	if unlikely(!out)
+		out = stderr;
+@@pp_endif@@
+	if unlikely(!out)
+		return;
+	appname = NULL;
+	if likely(state)
+		appname = state->@name@;
+@@pp_ifdef program_invocation_name@@
+	if unlikely(!appname)
+		appname = program_invocation_name;
+@@pp_endif@@
+	if unlikely(!appname)
+		appname = "?";
+
+	/* Print the message. */
+@@pp_if $has_function(flockfile, funlockfile)@@
+	(void)flockfile(out);
+@@pp_endif@@
+@@pp_if $has_function(fputs_unlocked)@@
+	(void)fputs_unlocked(appname, out);
+@@pp_else@@
+	(void)fprintf_unlocked(out, "%s", appname);
+@@pp_endif@@
+	if (format) {
+@@pp_if $has_function(fputs_unlocked)@@
+		(void)fputs_unlocked(": ", out);
+@@pp_else@@
+		(void)fprintf_unlocked(out, ": ");
+@@pp_endif@@
+		(void)vfprintf_unlocked(out, format, args);
+	}
+	if (errnum) {
+@@pp_if $has_function(fputs_unlocked)@@
+		(void)fputs_unlocked(": ", out);
+		(void)fputs_unlocked(strerror(errnum), out);
+@@pp_else@@
+		(void)fprintf_unlocked(out, ": %s", strerror(errnum));
+@@pp_endif@@
+	}
+@@pp_if $has_function(fputc_unlocked)@@
+	(void)fputc_unlocked('\n', out);
+@@pp_else@@
+	(void)fprintf_unlocked(out, "\n");
+@@pp_endif@@
+	(void)argp_state_help(state, out, ARGP_HELP_STD_ERR);
+@@pp_if $has_function(flockfile, funlockfile)@@
+	(void)funlockfile(out);
+@@pp_endif@@
+
+	/* Exit the program (if need be) */
+	if (exit_status && (!state || !(state->@flags@ & ARGP_NO_EXIT)))
+		exit(exit_status);
+}
 
 [[export_alias("__argp_error")]]
 [[decl_include("<bits/crt/argp.h>")]]
-void argp_error([[in]] struct argp_state const *__restrict state,
+void argp_error([[in_opt]] struct argp_state const *__restrict state,
                 [[in, format("printf")]] char const *__restrict format, ...)
 	%{printf("argp_verror")}
 
 [[export_alias("__argp_failure")]]
 [[decl_include("<bits/types.h>", "<bits/crt/argp.h>")]]
-void argp_failure([[in]] struct argp_state const *__restrict state,
-                  int status, $errno_t errnum,
+void argp_failure([[in_opt]] struct argp_state const *__restrict state, int status, $errno_t errnum,
                   [[in, format("printf")]] char const *__restrict format, ...)
 	%{printf("argp_vfailure")}
 
@@ -350,7 +524,7 @@ int _option_is_end([[in]] struct argp_option const *opt) {
 
 [[export_alias("__argp_input")]]
 [[decl_include("<bits/crt/argp.h>")]]
-void *_argp_input([[in_opt]] struct argp const *__restrict argp,
+void *_argp_input([[in_opt]] struct argp const *__restrict ap,
                   [[in_opt]] struct argp_state const *__restrict state);
 
 

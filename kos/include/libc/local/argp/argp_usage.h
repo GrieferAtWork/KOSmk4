@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd79f47 */
+/* HASH CRC-32:0x23df5b71 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,12 +31,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_IN(1) __ATTR_INOUT(2),__NOTHROW_NCX,__localdep_argp_state_help,(struct argp_state const *__restrict __state, __FILE *__restrict __stream, unsigned int __flags),argp_state_help,(__state,__stream,__flags))
+__CREDIRECT_VOID(__ATTR_INOUT_OPT(2) __ATTR_IN_OPT(1),__NOTHROW_NCX,__localdep_argp_state_help,(struct argp_state const *__restrict __state, __FILE *__restrict __stream, unsigned int __flags),argp_state_help,(__state,__stream,__flags))
 #elif defined(__CRT_HAVE___argp_state_help)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_IN(1) __ATTR_INOUT(2),__NOTHROW_NCX,__localdep_argp_state_help,(struct argp_state const *__restrict __state, __FILE *__restrict __stream, unsigned int __flags),__argp_state_help,(__state,__stream,__flags))
+__CREDIRECT_VOID(__ATTR_INOUT_OPT(2) __ATTR_IN_OPT(1),__NOTHROW_NCX,__localdep_argp_state_help,(struct argp_state const *__restrict __state, __FILE *__restrict __stream, unsigned int __flags),__argp_state_help,(__state,__stream,__flags))
 #else /* ... */
 #undef __local___localdep_argp_state_help_defined
 #endif /* !... */
