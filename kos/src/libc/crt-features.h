@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3fa97af */
+/* HASH CRC-32:0xd07e3825 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -269,6 +269,7 @@
 #define __CRT_HAVE_DOS$_aligned_offset_recalloc
 #define __CRT_HAVE_DOS$_aligned_realloc
 #define __CRT_HAVE_DOS$_aligned_recalloc
+#define __CRT_HAVE_DOS$_argp_input
 #define __CRT_HAVE_DOS$_atodbl
 #define __CRT_HAVE_DOS$_atodbl_l
 #define __CRT_HAVE_DOS$_atof_l
@@ -708,6 +709,8 @@
 #define __CRT_HAVE_DOS$_obstack_memory_used
 #define __CRT_HAVE_DOS$_obstack_newchunk
 #define __CRT_HAVE_DOS$_open_osfhandle
+#define __CRT_HAVE_DOS$_option_is_end
+#define __CRT_HAVE_DOS$_option_is_short
 #define __CRT_HAVE_DOS$_pipe
 #define __CRT_HAVE_DOS$_printf_l
 #define __CRT_HAVE_DOS$_printf_p
@@ -1075,6 +1078,12 @@
 #define __CRT_HAVE_DOS$alarm
 #define __CRT_HAVE_DOS$alphasortk
 #define __CRT_HAVE_DOS$alphasortk64
+#define __CRT_HAVE_DOS$argp_error
+#define __CRT_HAVE_DOS$argp_failure
+#define __CRT_HAVE_DOS$argp_help
+#define __CRT_HAVE_DOS$argp_parse
+#define __CRT_HAVE_DOS$argp_state_help
+#define __CRT_HAVE_DOS$argp_usage
 #define __CRT_HAVE_DOS$argz_add
 #define __CRT_HAVE_DOS$argz_add_sep
 #define __CRT_HAVE_DOS$argz_append
@@ -4664,6 +4673,7 @@
 #define __CRT_HAVE__aligned_realloc_dbg
 #define __CRT_HAVE__aligned_recalloc
 #define __CRT_HAVE__aligned_recalloc_dbg
+#define __CRT_HAVE__argp_input
 #define __CRT_HAVE__assert
 #define __CRT_HAVE__atodbl
 #define __CRT_HAVE__atodbl_l
@@ -5089,6 +5099,8 @@
 #define __CRT_HAVE__obstack_memory_used
 #define __CRT_HAVE__obstack_newchunk
 #define __CRT_HAVE__open_osfhandle
+#define __CRT_HAVE__option_is_end
+#define __CRT_HAVE__option_is_short
 #define __CRT_HAVE__pgmptr
 #define __CRT_HAVE__pipe
 #define __CRT_HAVE__printf_l
@@ -5428,6 +5440,14 @@
 #define __CRT_HAVE_alarm
 #define __CRT_HAVE_alphasortk
 #define __CRT_HAVE_alphasortk64
+#define __CRT_HAVE_argp_error
+#define __CRT_HAVE_argp_failure
+#define __CRT_HAVE_argp_help
+#define __CRT_HAVE_argp_parse
+#define __CRT_HAVE_argp_state_help
+#define __CRT_HAVE_argp_usage
+#define __CRT_HAVE_argp_verror
+#define __CRT_HAVE_argp_vfailure
 #define __CRT_HAVE_argz_add
 #define __CRT_HAVE_argz_add_sep
 #define __CRT_HAVE_argz_append

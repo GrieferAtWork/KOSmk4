@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5bfaa78c */
+/* HASH CRC-32:0xfad88c52 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,6 +47,22 @@ DEFINE_PUBLIC_ALIAS(DOS$aio_init, libd_aio_init);
 DEFINE_PUBLIC_ALIAS(DOS$getaliasent_r, libd_getaliasent_r);
 DEFINE_PUBLIC_ALIAS(DOS$getaliasbyname, libd_getaliasbyname);
 DEFINE_PUBLIC_ALIAS(DOS$getaliasbyname_r, libd_getaliasbyname_r);
+
+/* argp */
+DEFINE_PUBLIC_ALIAS(DOS$__argp_parse, libd_argp_parse);
+DEFINE_PUBLIC_ALIAS(DOS$argp_parse, libd_argp_parse);
+DEFINE_PUBLIC_ALIAS(DOS$__argp_parse, libd_argp_help);
+DEFINE_PUBLIC_ALIAS(DOS$argp_help, libd_argp_help);
+DEFINE_PUBLIC_ALIAS(DOS$__argp_state_help, libd_argp_state_help);
+DEFINE_PUBLIC_ALIAS(DOS$argp_state_help, libd_argp_state_help);
+DEFINE_PUBLIC_ALIAS(DOS$__argp_usage, libd_argp_usage);
+DEFINE_PUBLIC_ALIAS(DOS$argp_usage, libd_argp_usage);
+DEFINE_PUBLIC_ALIAS(DOS$__option_is_short, libd__option_is_short);
+DEFINE_PUBLIC_ALIAS(DOS$_option_is_short, libd__option_is_short);
+DEFINE_PUBLIC_ALIAS(DOS$__option_is_end, libd__option_is_end);
+DEFINE_PUBLIC_ALIAS(DOS$_option_is_end, libd__option_is_end);
+DEFINE_PUBLIC_ALIAS(DOS$__argp_input, libd__argp_input);
+DEFINE_PUBLIC_ALIAS(DOS$_argp_input, libd__argp_input);
 
 /* argz */
 DEFINE_PUBLIC_ALIAS(DOS$__argz_create, libd_argz_create);

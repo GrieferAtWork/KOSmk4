@@ -147,7 +147,6 @@
 - `<asm/sembuf.h>`              (linux)
 - `<asm/shmbuf.h>`              (linux)
 - `<asm/sigcontext.h>`          (linux)
-- `<argp.h>`                    (Glibc)
 - `<bits/types/res_state.h>`    (Glibc)
 - `<bits/types/struct_statx.h>` (Glibc)
 - `<bits/types/struct_statx_timestamp.h>` (Glibc)

@@ -172,6 +172,17 @@ DEFINE_NOREL_GLOBAL_META(__printf_function **, __printf_function_table, ".crt.co
 DEFINE_NOREL_GLOBAL_META(__printf_arginfo_size_function **, __printf_arginfo_table, ".crt.compat.glibc.printf");
 
 
+/* <argp.h> */
+#undef argp_program_version
+#undef argp_program_version_hook
+#undef argp_program_bug_address
+#undef argp_err_exit_status
+DEFINE_NOREL_GLOBAL_META(char const *, argp_program_version, ".crt.compat.glibc.string.argp");
+DEFINE_NOREL_GLOBAL_META(__argp_program_version_hook_t, argp_program_version_hook, ".crt.compat.glibc.string.argp");
+DEFINE_NOREL_GLOBAL_META(char const *, argp_program_bug_address, ".crt.compat.glibc.string.argp");
+DEFINE_NOREL_GLOBAL_META(int, argp_err_exit_status, ".crt.compat.glibc.string.argp");
+
+
 /* Misc... */
 #undef __libc_enable_secure
 DEFINE_NOREL_GLOBAL_META(int, __libc_enable_secure, ".crt.compat.glibc");

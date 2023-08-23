@@ -372,7 +372,7 @@
 	CB(PREFIX.crt.unsorted) \
 	CB(PREFIX.crt.compat.dos.msabi64.msabi64_RRRR PREFIX.crt.compat.dos.msabi64.msabi64_RRRRR PREFIX.crt.compat.dos.msabi64.msabi64_RRRRRRn) \
 	CB(PREFIX.crt.compat.linux.__register_frame PREFIX.crt.compat.linux.dirent PREFIX.crt.compat.linux.except PREFIX.crt.compat.linux.heap PREFIX.crt.compat.linux.init PREFIX.crt.compat.linux.misc PREFIX.crt.compat.linux.signal PREFIX.crt.compat.linux.stdio PREFIX.crt.compat.linux) \
-	CB(PREFIX.crt.compat.glibc.ctype PREFIX.crt.compat.glibc.printf PREFIX.crt.compat.glibc.regex PREFIX.crt.compat.glibc) \
+	CB(PREFIX.crt.compat.glibc.ctype PREFIX.crt.compat.glibc.printf PREFIX.crt.compat.glibc.regex PREFIX.crt.compat.glibc.string.argp PREFIX.crt.compat.glibc) \
 	CB(PREFIX.crt.compat.hurd.cthreads PREFIX.crt.compat.hurd.futex) \
 	CB(PREFIX.crt.wchar.fs.exec.exec) \
 	CB(PREFIX.crt.wchar.heap.strdup) \
@@ -556,7 +556,7 @@
 	CB(PREFIX.crt.dos.compat.cyg.errno PREFIX.crt.dos.compat.cyg.fs.stat) \
 	CB(PREFIX.crt.dos.compat.dos.errno PREFIX.crt.dos.compat.dos.except PREFIX.crt.dos.compat.dos.fs.stat PREFIX.crt.dos.compat.dos.msabi64 PREFIX.crt.dos.compat.dos) \
 	CB(PREFIX.crt.dos.compat.linux) \
-	CB(PREFIX.crt.dos.compat.glibc.ctype PREFIX.crt.dos.compat.glibc.regex PREFIX.crt.dos.compat.glibc) \
+	CB(PREFIX.crt.dos.compat.glibc.ctype PREFIX.crt.dos.compat.glibc.regex PREFIX.crt.dos.compat.glibc.string.argp PREFIX.crt.dos.compat.glibc) \
 	CB(PREFIX.crt.dos.wchar.application.init) \
 	CB(PREFIX.crt.dos.wchar.fs.exec.exec) \
 	CB(PREFIX.crt.dos.wchar.time) \

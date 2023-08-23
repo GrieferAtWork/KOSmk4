@@ -24,6 +24,7 @@
 #include "../api.h"
 /**/
 
+#include <bits/crt/argp.h>        /* __argp_program_version_hook_t */
 #include <bits/crt/mbstate.h>     /* struct __mbstate */
 #include <bits/crt/printf_info.h> /* __reg_syntax_t */
 #include <bits/crt/regex.h>       /* __reg_syntax_t */
@@ -345,6 +346,21 @@ DECLARE_NOREL_GLOBAL_META(__printf_function **, __printf_function_table);
 DECLARE_NOREL_GLOBAL_META(__printf_arginfo_size_function **, __printf_arginfo_table);
 #define __printf_function_table GET_NOREL_GLOBAL(__printf_function_table)
 #define __printf_arginfo_table  GET_NOREL_GLOBAL(__printf_arginfo_table)
+
+
+/* <argp.h> */
+#undef argp_program_version
+#undef argp_program_version_hook
+#undef argp_program_bug_address
+#undef argp_err_exit_status
+DECLARE_NOREL_GLOBAL_META(char const *, argp_program_version);
+DECLARE_NOREL_GLOBAL_META(__argp_program_version_hook_t, argp_program_version_hook);
+DECLARE_NOREL_GLOBAL_META(char const *, argp_program_bug_address);
+DECLARE_NOREL_GLOBAL_META(int, argp_err_exit_status);
+#define argp_program_version      GET_NOREL_GLOBAL(argp_program_version)
+#define argp_program_version_hook GET_NOREL_GLOBAL(argp_program_version_hook)
+#define argp_program_bug_address  GET_NOREL_GLOBAL(argp_program_bug_address)
+#define argp_err_exit_status      GET_NOREL_GLOBAL(argp_err_exit_status)
 
 
 /* Misc... */

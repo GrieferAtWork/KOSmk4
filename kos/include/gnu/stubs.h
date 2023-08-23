@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x121e6df1 */
+/* HASH CRC-32:0x2a8da099 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,6 +55,8 @@
 #define __stub___pthread_unwind_next
 #define __stub___res_state
 #define __stub___solaris_sysinfo
+#define __stub___argp_input
+#define __stub__argp_input
 #define __stub__beep
 #define __stub__clearfp
 #define __stub__configthreadlocale
@@ -103,6 +105,12 @@
 #define __stub_adjtimex
 #define __stub___adjtimex64
 #define __stub_adjtimex64
+#define __stub___argp_parse
+#define __stub_argp_help
+#define __stub___argp_parse
+#define __stub_argp_parse
+#define __stub___argp_state_help
+#define __stub_argp_state_help
 #define __stub_attr_get
 #define __stub_attr_getf
 #define __stub_attr_list

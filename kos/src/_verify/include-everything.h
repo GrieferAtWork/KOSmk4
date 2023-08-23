@@ -141,6 +141,7 @@ incdir("");
 #include <alloca.h>
 #include <ansidecl.h>
 #include <ar.h>
+#include <argp.h>
 #include <argz.h>
 #include <arpa/ftp.h>
 #include <arpa/inet.h>
@@ -323,6 +324,7 @@ incdir("");
 #include <bits/crt/addrinfo.h>
 #include <bits/crt/aiocb.h>
 #include <bits/crt/aioinit.h>
+#include <bits/crt/argp.h>
 #include <bits/crt/complex.h>
 #include <bits/crt/crypt_data.h>
 #include <bits/crt/ctype.h>

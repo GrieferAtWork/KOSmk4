@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd1a5ce8 */
+/* HASH CRC-32:0xa69c9fde */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,6 +81,15 @@ DFUN(".text.crt.dos.utility.aio", libd_aio_init, libc_aio_init, TV, 1, TP)
 DFUN(".text.crt.dos.database.aliases", libd_getaliasent_r, libc_getaliasent_r, TIn(__SIZEOF_ERRNO_T__), 4, TP, TP, TI, TP)
 DFUN(".text.crt.dos.database.aliases", libd_getaliasbyname, libc_getaliasbyname, TP, 1, TP)
 DFUN(".text.crt.dos.database.aliases", libd_getaliasbyname_r, libc_getaliasbyname_r, TIn(__SIZEOF_ERRNO_T__), 5, TP, TP, TP, TI, TP)
+
+/* argp */
+DFUN(".text.crt.dos.compat.glibc.string.argp", libd_argp_parse, libc_argp_parse, TIn(__SIZEOF_ERRNO_T__), 6, TP, TD, TP, TD, TP, TP)
+DFUN(".text.crt.dos.compat.glibc.string.argp", libd_argp_help, libc_argp_help, TV, 4, TP, TP, TD, TP)
+DFUN(".text.crt.dos.compat.glibc.string.argp", libd_argp_state_help, libc_argp_state_help, TV, 3, TP, TP, TD)
+DFUN(".text.crt.dos.compat.glibc.string.argp", libd_argp_usage, libc_argp_usage, TV, 1, TP)
+DFUN(".text.crt.dos.compat.glibc.string.argp", libd__option_is_short, libc__option_is_short, TD, 1, TP)
+DFUN(".text.crt.dos.compat.glibc.string.argp", libd__option_is_end, libc__option_is_end, TD, 1, TP)
+DFUN(".text.crt.dos.compat.glibc.string.argp", libd__argp_input, libc__argp_input, TP, 2, TP, TP)
 
 /* argz */
 DFUN(".text.crt.dos.string.argz", libd_argz_create, libc_argz_create, TIn(__SIZEOF_ERRNO_T__), 3, TP, TP, TP)

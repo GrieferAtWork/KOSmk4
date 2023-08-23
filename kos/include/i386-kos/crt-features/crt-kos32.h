@@ -374,6 +374,12 @@
 #define __CRT_HAVE___after_morecore_hook
 #define __CRT_HAVE___alarm
 #define __CRT_HAVE___argc
+#define __CRT_HAVE___argp_error
+#define __CRT_HAVE___argp_failure
+#define __CRT_HAVE___argp_input
+#define __CRT_HAVE___argp_parse
+#define __CRT_HAVE___argp_state_help
+#define __CRT_HAVE___argp_usage
 #define __CRT_HAVE___argv
 #define __CRT_HAVE___argz_add
 #define __CRT_HAVE___argz_add_sep
@@ -1056,6 +1062,8 @@
 #define __CRT_HAVE___open_2
 #define __CRT_HAVE___openat64_2
 #define __CRT_HAVE___openat_2
+#define __CRT_HAVE___option_is_end
+#define __CRT_HAVE___option_is_short
 #define __CRT_HAVE___overflow
 #define __CRT_HAVE___p___argc
 #define __CRT_HAVE___p___argv
@@ -1508,6 +1516,7 @@
 #define __CRT_HAVE__aligned_recalloc
 #define __CRT_HAVE__aligned_recalloc_dbg
 #define __CRT_HAVE__alloca
+#define __CRT_HAVE__argp_input
 #define __CRT_HAVE__assert
 #define __CRT_HAVE__atodbl
 #define __CRT_HAVE__atodbl_l
@@ -2065,6 +2074,8 @@
 #define __CRT_HAVE__obstack_newchunk
 #define __CRT_HAVE__onexit
 #define __CRT_HAVE__open_osfhandle
+#define __CRT_HAVE__option_is_end
+#define __CRT_HAVE__option_is_short
 #define __CRT_HAVE__pclose
 #define __CRT_HAVE__pgmptr
 #define __CRT_HAVE__pipe
@@ -2515,6 +2526,16 @@
 #define __CRT_HAVE_alphasort64
 #define __CRT_HAVE_alphasortk
 #define __CRT_HAVE_alphasortk64
+#define __CRT_HAVE_argp_err_exit_status
+#define __CRT_HAVE_argp_error
+#define __CRT_HAVE_argp_failure
+#define __CRT_HAVE_argp_help
+#define __CRT_HAVE_argp_parse
+#define __CRT_HAVE_argp_program_bug_address
+#define __CRT_HAVE_argp_program_version
+#define __CRT_HAVE_argp_program_version_hook
+#define __CRT_HAVE_argp_state_help
+#define __CRT_HAVE_argp_usage
 #define __CRT_HAVE_argz_add
 #define __CRT_HAVE_argz_add_sep
 #define __CRT_HAVE_argz_append
