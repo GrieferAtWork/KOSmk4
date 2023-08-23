@@ -19,23 +19,23 @@
  */
 #ifdef __INTELLISENSE__
 #include "mfile-rw.c"
-//#define       DEFINE_mfile_direct_read
-//#define     DEFINE_mfile_direct_read_p
-//#define      DEFINE_mfile_direct_readv
-//#define    DEFINE_mfile_direct_readv_p
-//#define      DEFINE_mfile_direct_write
-//#define    DEFINE_mfile_direct_write_p
-//#define     DEFINE_mfile_direct_writev
-//#define   DEFINE_mfile_direct_writev_p
-//#define DEFINE_mfile_direct_read_async
-#define   DEFINE_mfile_direct_read_async_p
+//#define           DEFINE_mfile_direct_read
+//#define         DEFINE_mfile_direct_read_p
+//#define          DEFINE_mfile_direct_readv
+//#define        DEFINE_mfile_direct_readv_p
+//#define          DEFINE_mfile_direct_write
+//#define        DEFINE_mfile_direct_write_p
+//#define         DEFINE_mfile_direct_writev
+//#define       DEFINE_mfile_direct_writev_p
+//#define     DEFINE_mfile_direct_read_async
+//#define   DEFINE_mfile_direct_read_async_p
 //#define    DEFINE_mfile_direct_readv_async
 //#define  DEFINE_mfile_direct_readv_async_p
 //#define    DEFINE_mfile_direct_write_async
 //#define  DEFINE_mfile_direct_write_async_p
 //#define   DEFINE_mfile_direct_writev_async
 //#define DEFINE_mfile_direct_writev_async_p
-//#define DEFINE_mfile_read
+#define DEFINE_mfile_read
 //#define       DEFINE_mfile_read_p
 //#define        DEFINE_mfile_readv
 //#define      DEFINE_mfile_readv_p
@@ -886,6 +886,8 @@ dont_handle_vio:
 			io_bytes = (size_t)-1;
 		if (io_bytes > num_bytes)
 			io_bytes = num_bytes;
+
+		/* Lookup an existing mem-part. */
 		part = mpart_tree_locate(self->mf_parts, offset);
 		if (part != NULL && tryincref(part)) {
 			/* Found a pre-existing part which we can do I/O on! */
@@ -897,6 +899,26 @@ do_io_with_part_and_trunclock:
 					decref_unlikely(part);
 					mfile_trunclock_dec(self);
 				};
+#if defined(LOCAL_READING) && !defined(LOCAL_BUFFER_IS_PHYS)
+				/* For *very* large reads (6 pages or more), replace part of the
+				 * target  buffer memory mapping with a new MAP_PRIVATE|MAP_FILE
+				 * mapping of  `self', so  memory can  be loaded  lazily and  be
+				 * unloaded in case of OOM. (TODO: there should be a /proc  file
+				 * to configure this threshold, with PAGESIZE as minimum)
+				 *
+				 * Note however that leading/trailing pages where only parts of
+				 * the page are *actually* being read into must still be loaded
+				 * normally.
+				 *
+				 * Also  note that when the file-offset at  the start of a page isn't
+				 * page-aligned, we have  to use  `mfile_create_misaligned_wrapper()'
+				 * in order to create a wrapper file that can be used to map the file
+				 * at otherwise unsupported offsets. */
+				if (io_bytes >= 6 * PAGESIZE) {
+					/* TODO */
+				}
+#endif /* LOCAL_READING && !LOCAL_BUFFER_IS_PHYS */
+
 #ifdef LOCAL_BUFFER_IS_IOVEC
 				io_bytes = LOCAL_mpart_rw(part, buffer, buf_offset, io_bytes, offset);
 #else /* LOCAL_BUFFER_IS_IOVEC */
@@ -909,6 +931,7 @@ do_io_with_part_and_trunclock:
 			result += io_bytes;
 			goto again;
 		}
+
 		/* Create a new-, or extend an existing part within the bounds of the file */
 		newpart_minaddr = offset;
 		newpart_maxaddr = offset + io_bytes - 1;
@@ -917,6 +940,7 @@ do_io_with_part_and_trunclock:
 		newpart_maxaddr = mfile_partaddr_ceilalign(self, newpart_maxaddr + 1) - 1;
 		assert(newpart_minaddr <= newpart_maxaddr);
 		assert(!mpart_tree_locate(self->mf_parts, newpart_minaddr));
+
 		/* We know that no part exists at `newpart_minaddr', but an existing  part
 		 * may still exist somewhere else within the requested address range. When
 		 * this  is the case, we must limit ourselves  to only do I/O up until the
@@ -958,6 +982,7 @@ again_extend_part:
 					THROW(E_FSERROR_READONLY);
 				}
 #endif /* LOCAL_WRITING */
+
 				/* Make sure that there's still nothing within the accessed range. */
 				part = mpart_tree_rlocate(self->mf_parts,
 				                          newpart_minaddr,
@@ -969,6 +994,7 @@ restart_after_extendpart:
 					mfile_extendpart_data_fini(&extdat);
 					goto again;
 				}
+
 				/* Also make sure that the file hasn't been truncated in the mean time. */
 				if unlikely(mfile_getsize(self) < filesize)
 					goto restart_after_extendpart;
@@ -976,7 +1002,7 @@ restart_after_extendpart:
 			}
 			if (part != MFILE_EXTENDPART_OR_UNLOCK_NOSIB) {
 				/* Successfully managed to extend an existing part!
-				 * As  such,  use  this   part  to  do  more   I/O! */
+				 * -> As such, use this part to do more I/O! */
 				incref(part);
 				mpart_lock_release(part);
 				mfile_trunclock_inc(self); /* Prevent `ftruncate(2)' until we're done */

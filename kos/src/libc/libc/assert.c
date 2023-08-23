@@ -308,6 +308,24 @@ struct vabortmsgf_data {
 	bool        vamfd_rp_brk;   /* True if a closing ']' must be replaced with ": " on stderr */
 	bool        vamfd_ps_brk;   /* True if after a closing ']' */
 	char       *vamfd_mptr;     /* [0..1] Pointer into `vamfd_mbuf' for the kernel message. */
+	/* TODO: Instead of using a stack-allocated  buffer here, dynamically allocate  one
+	 *       through use of `mmap()' (DON'T use malloc, which cannot be trusted). Then,
+	 *       store that string in a global `extern char *__abort_msg' prior to invoking
+	 *       a user-defined SIGABRT handler.
+	 * NOTE: This poses a problem since we (currently) write to stderr and syslog at the
+	 *       same  time as we generate this string,  but if a user-defined abort handler
+	 *       ends  up handling the abort (e.g. via a longjmp()), then nothing may end up
+	 *       written to stderr/syslog
+	 * Solution: evaluate the given format-message  normally like `strdupf()' would,  but
+	 *           use mmap() here, then store that string into `__abort_msg'. Then, invoke
+	 *           the  user's abort handler,  and if that  handler returns, re-process the
+	 *           `__abort_msg' string to print it to  stderr/syslog, as well as a  buffer
+	 *           that will be passed to the kernel.
+	 * NOTE: Only do this different handling when a user-defined SIGABRT-handler has been
+	 *       installed.
+	 * NOTE: It'd also be useful to have this as a global for coredumps to analyze after
+	 *       the fact.
+	 */
 	char        vamfd_mbuf[COREDUMP_ABORTF_MESG_MAXLEN];
 };
 
@@ -448,6 +466,7 @@ NOTHROW(FCALL libc_vabortf_failure_core)(struct abortf_args *__restrict args) {
 	/* If the user has defined a custom sigaction for `SIGABRT',
 	 * then instead of directly  triggering a coredump, we  must
 	 * raise that signal at the given `&args->af_state'! */
+	/* TODO:  */
 	maybe_raise_SIGABRT(&args->af_state);
 
 	/* Normal abort handling. */

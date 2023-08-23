@@ -119,6 +119,7 @@ typedef struct __mbstate mbstate_t;
  */
 
 struct iofile_data_novtab {
+	/* TODO: Add support for using mmap(2) to map files and thereby implement read/write */
 	uintptr_t                      io_zero;   /* Always ZERO(0). - Required for binary compatibility with DOS. */
 	__WEAK refcnt_t                io_refcnt; /* Reference counter. */
 	char                          *io_getln;  /* [0..1] malloc'd buffer for `fgetln(3)' (no lock, because
