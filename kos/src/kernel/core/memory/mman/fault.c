@@ -680,11 +680,11 @@ mfault_or_unlock(struct mfault *__restrict self)
 	 * into a couple of smaller parts, so that the range that needs  to
 	 * be loaded into the core becomes smaller. */
 	if (!MPART_ST_INCORE(part->mp_state) && !(part->mp_flags & MPART_F_NOSPLIT)) {
-		size_t part_size       = mpart_getsize(part);
-		size_t split_threshold = self->mfl_size * 64;
+		PAGEDIR_PAGEALIGNED size_t part_size       = mpart_getsize(part);
+		PAGEDIR_PAGEALIGNED size_t split_threshold = self->mfl_size * 64; /* TODO: Make this configurable */
 		if (part_size > split_threshold) {
-			pos_t split1_filepos;
-			pos_t split2_filepos;
+			PAGEDIR_PAGEALIGNED pos_t split1_filepos;
+			PAGEDIR_PAGEALIGNED pos_t split2_filepos;
 			split1_filepos = part->mp_minaddr + acc_offs;
 			split2_filepos = split1_filepos + acc_size;
 			mpart_lock_release(part);

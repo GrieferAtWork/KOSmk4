@@ -19,8 +19,8 @@
  */
 #ifdef __INTELLISENSE__
 #include "mpart-rw.c"
-//#define DEFINE_mpart_read
-#define DEFINE_mpart_write
+#define DEFINE_mpart_read
+//#define    DEFINE_mpart_write
 //#define   DEFINE_mpart_read_p
 //#define  DEFINE_mpart_write_p
 //#define    DEFINE_mpart_readv
@@ -67,6 +67,7 @@ DECL_BEGIN
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
 	copytophys_nopf(mpart_physaddr, (byte_t const *)buffer + (buffer_offset), num_bytes)
 #elif defined(DEFINE_mpart_read_p)
+#define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_READING
 #define LOCAL_buffer_t           physaddr_t
 #define LOCAL_ubuffer_t          physaddr_t
@@ -77,6 +78,7 @@ DECL_BEGIN
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
 	copyinphys(buffer + (buffer_offset), mpart_physaddr, num_bytes)
 #elif defined(DEFINE_mpart_write_p)
+#define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_WRITING
 #define LOCAL_buffer_t           physaddr_t
 #define LOCAL_ubuffer_t          physaddr_t
@@ -109,6 +111,7 @@ DECL_BEGIN
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
 	iov_buffer_copytophys_nopf(buffer, mpart_physaddr, buf_offset + (buffer_offset), num_bytes)
 #elif defined(DEFINE_mpart_readv_p)
+#define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_READING
 #define LOCAL_BUFFER_IS_AIO
 #define LOCAL_BUFFER_IS_IOV_PHYSBUFFER
@@ -120,6 +123,7 @@ DECL_BEGIN
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
 	iov_physbuffer_copyfromphys(buffer, buf_offset + (buffer_offset), mpart_physaddr, num_bytes)
 #elif defined(DEFINE_mpart_writev_p)
+#define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_WRITING
 #define LOCAL_BUFFER_IS_AIO
 #define LOCAL_BUFFER_IS_IOV_PHYSBUFFER
@@ -243,6 +247,31 @@ LOCAL_mpart_rw(struct mpart *__restrict self,
 	}
 #endif /* LIBVIO_CONFIG_ENABLED */
 	result = 0;
+
+#if defined(LOCAL_READING) && !defined(LOCAL_BUFFER_IS_PHYS)
+	/* For *very* large reads (6 pages or more), replace part of the
+	 * target  buffer memory mapping with a new MAP_PRIVATE|MAP_FILE
+	 * mapping of  `self', so  memory can  be loaded  lazily and  be
+	 * unloaded in case of OOM. (TODO: there should be a /proc  file
+	 * to configure this threshold, with PAGESIZE as minimum)
+	 *
+	 * Note however that leading/trailing pages where only parts of
+	 * the page are *actually* being read into must still be loaded
+	 * normally.
+	 *
+	 * Also  note that when the file-offset at  the start of a page isn't
+	 * page-aligned, we have  to use  `mfile_create_misaligned_wrapper()'
+	 * in order to create a wrapper file that can be used to map the file
+	 * at otherwise unsupported offsets.
+	 *
+	 * NOTE: Only do this for  target buffers located in  user-space,
+	 *       since doing this in kernel-space would turn buffers into
+	 *       NCX memory in places where that wouldn't be expected.
+	 */
+	if (num_bytes >= 6 * PAGESIZE) {
+		/* TODO */
+	}
+#endif /* LOCAL_READING && !LOCAL_BUFFER_IS_PHYS */
 
 	/* Lock+load the part, unsharing the accessed address range if necessary. */
 again:
@@ -524,6 +553,7 @@ again_memaddr:
 
 #undef LOCAL_BUFFER_TRANSFER_NOEXCEPT
 #undef LOCAL_buffer_transfer_nopf
+#undef LOCAL_BUFFER_IS_PHYS
 #undef LOCAL_BUFFER_IS_AIO
 #undef LOCAL_BUFFER_IS_IOV_BUFFER
 #undef LOCAL_BUFFER_IS_IOV_PHYSBUFFER

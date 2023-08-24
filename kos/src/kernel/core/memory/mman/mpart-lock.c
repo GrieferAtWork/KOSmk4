@@ -84,12 +84,12 @@ NOTHROW(FCALL mchunkvec_freeswp)(struct mchunk *__restrict vec, size_t count) {
 
 
 #define UNLOCK(self, unlock)     \
-	(_mpart_lock_release(self), \
+	(_mpart_lock_release(self),  \
 	 unlockinfo_xunlock(unlock), \
 	 mpart_lockops_reap(self))
 #ifdef __OPTIMIZE_SIZE__
 #define UNLOCK_OPTREAP(self, unlock) \
-	(_mpart_lock_release(self),     \
+	(_mpart_lock_release(self),      \
 	 unlockinfo_xunlock(unlock))
 #else /* __OPTIMIZE_SIZE__ */
 #define UNLOCK_OPTREAP(self, unlock) \
@@ -668,7 +668,8 @@ setcore_ex_load_from_swap(struct mchunkvec *__restrict dst_vec,
 }
 
 
-/* Ensure that `MPART_ST_INCORE(self->mp_state)' */
+/* Ensure that `MPART_ST_INCORE(self->mp_state)'
+ * NOTE: Upon success (return == true), `*data' is left in an uninitialized state. */
 PUBLIC BLOCKING WUNUSED NONNULL((1, 3)) bool FCALL
 mpart_setcore_or_unlock(struct mpart *__restrict self,
                         struct unlockinfo *unlock,
@@ -917,14 +918,10 @@ done_swap:
 
 	/* Fill in information on the backing storage. */
 	self->mp_state = data->scd_copy_state;
-	DBG_memset(&data->scd_copy_state, 0xcc,
-	           sizeof(data->scd_copy_state));
 	memcpy(&self->mp_mem, &data->scd_copy_mem,
 	       MAX_C(sizeof(struct mchunk),
 	             sizeof(struct mchunkvec)));
-	DBG_memset(&data->scd_copy_mem, 0xcc,
-	           MAX_C(sizeof(struct mchunk),
-	                 sizeof(struct mchunkvec)));
+	DBG_memset(data, 0xcc, sizeof(*data));
 	return true;
 done_simple:
 	mpart_setcore_data_fini(data);

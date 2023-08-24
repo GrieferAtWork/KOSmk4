@@ -567,14 +567,16 @@ NOTHROW(FCALL mpart_getblockstate)(struct mpart const *__restrict self,
 
 	/* We're called from `mpart_hinted_mmap()', so we can't assert the lock! */
 	/*assert(mpart_lock_acquired(self));*/
-	assert(partrel_block_index < mpart_getblockcount(self, self->mp_file));
+	assertf(partrel_block_index < mpart_getblockcount(self, self->mp_file),
+	        "Block index %" PRIuSIZ " is out-of-bounds of 0-%" PRIuSIZ,
+	        partrel_block_index, mpart_getblockcount(self, self->mp_file) - 1);
 	if (self->mp_flags & MPART_F_BLKST_INL) {
-		word = self->mp_blkst_inl;
+		word = atomic_read(&self->mp_blkst_inl);
 	} else {
 		size_t index;
-		assert(self->mp_blkst_ptr);
+		assertf(self->mp_blkst_ptr, "Caller did not verify that `mpart_hasblockstate(self)'");
 		index = partrel_block_index / MPART_BLKST_BLOCKS_PER_WORD;
-		word  = self->mp_blkst_ptr[index];
+		word  = atomic_read(&self->mp_blkst_ptr[index]);
 	}
 	shift = (shift_t)((partrel_block_index % MPART_BLKST_BLOCKS_PER_WORD) * MPART_BLOCK_STBITS);
 	return (unsigned int)(word >> shift) & (((unsigned int)1 << MPART_BLOCK_STBITS) - 1);
@@ -586,6 +588,9 @@ NOTHROW(FCALL mpart_setblockstate)(struct mpart *__restrict self,
                                    unsigned int st) {
 	mpart_blkst_word_t *pword, mask, val, oldval, newval;
 	shift_t shift;
+	assertf(partrel_block_index < mpart_getblockcount(self, self->mp_file),
+	        "Block index %" PRIuSIZ " is out-of-bounds of 0-%" PRIuSIZ,
+	        partrel_block_index, mpart_getblockcount(self, self->mp_file) - 1);
 	assert(st < ((unsigned int)1 << MPART_BLOCK_STBITS));
 	shift = (shift_t)((partrel_block_index % MPART_BLKST_BLOCKS_PER_WORD) * MPART_BLOCK_STBITS);
 	mask  = (mpart_blkst_word_t)((1 << MPART_BLOCK_STBITS) - 1) << shift;
@@ -594,7 +599,7 @@ NOTHROW(FCALL mpart_setblockstate)(struct mpart *__restrict self,
 		pword = &self->mp_blkst_inl;
 	} else {
 		size_t index;
-		assert(self->mp_blkst_ptr);
+		assertf(self->mp_blkst_ptr, "Caller did not verify that `mpart_hasblockstate(self)'");
 		index = partrel_block_index / MPART_BLKST_BLOCKS_PER_WORD;
 		pword = &self->mp_blkst_ptr[index];
 	}

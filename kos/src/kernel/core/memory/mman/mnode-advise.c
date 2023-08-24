@@ -54,7 +54,7 @@ mnode_advise_or_unlock(struct mnode *__restrict self,
 	assert(self->mn_mman);
 	assert(!(self->mn_flags & MNODE_F_UNMAPPED));
 	assert(!wasdestroyed(self->mn_mman));
-	assert(!mman_lock_acquired(self->mn_mman));
+	assert(mman_lock_acquired(self->mn_mman));
 	assert(data->mtd_mmlocked == self->mn_mman);
 
 	switch (advice) {

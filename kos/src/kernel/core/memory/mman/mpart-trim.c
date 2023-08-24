@@ -214,7 +214,7 @@ NOTHROW(FCALL mnode_list_sort_item_by_partoff)(struct mnode_list *__restrict lis
 /* Sort the given mem-node list by each node's `mn_partoff'.  This
  * isn't the most efficient function, mainly because it's meant to
  * sort a linked list, so it runs in O(n+(n-1)+(n-2)+...+2+1) */
-PRIVATE NOBLOCK NONNULL((1)) void
+INTERN NOBLOCK NONNULL((1)) void /* INTERN because also used in "./mfile-trunc.c" */
 NOTHROW(FCALL mnode_list_sort_by_partoff)(struct mnode_list *__restrict self) {
 	struct mnode *iter, *next;
 	for (iter = LIST_FIRST(self); iter; iter = next) {

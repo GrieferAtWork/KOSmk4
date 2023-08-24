@@ -210,7 +210,7 @@ again:
 	rhs = root->mp_filent.rb_rhs;
 	if (!wasdestroyed(root)) {
 		REF struct mfile *newfile;
-		_mpart_init_asanon(root);
+		_mpart_init_asanon(root); /* TODO: Posix wants access to SHARED nodes of `root' after this point to raise SIGBUS */
 		assert(root->mp_file == file);
 		newfile = incref(&mfile_anon[file->mf_blockshift]);
 		atomic_write(&root->mp_file, newfile);

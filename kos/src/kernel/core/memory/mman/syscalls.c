@@ -498,6 +498,7 @@ again_lock_mman:
 			mman_lock_endread(mm);
 			THROW(E_SEGFAULT_UNMAPPED, iter, E_SEGFAULT_CONTEXT_FAULT);
 		}
+
 		/* For each page, check if it's been loaded from-disk.
 		 * iow: Has a block-state `MPART_BLOCK_ST_LOAD' or `MPART_BLOCK_ST_CHNG' */
 		node_minaddr = (byte_t *)mnode_getminaddr(node);
@@ -515,6 +516,7 @@ again_lock_mman:
 			incore_status = 0x00;
 			goto copyinfo_and_continue;
 		}
+
 		/* Acquire a lock to the part while we're still  holding
 		 * a lock to the mman, thus ensuring that `partrel_addr'
 		 * continues  to be correct, and `partrel_size' is still
@@ -528,11 +530,14 @@ again_lock_mman:
 		}
 		mman_lock_endread(mm);
 		assert(partrel_size >= PAGESIZE);
+
 		/* Calculate the block-status address range that's in control here. */
 		file                = part->mp_file;
 		partrel_block_index = partrel_addr >> file->mf_blockshift;
-		partrel_block_count = (partrel_size + file->mf_part_amask) >> file->mf_blockshift;
-		blocksize           = mfile_getblocksize(file);
+		partrel_block_count = (partrel_addr + partrel_size - 1) >> file->mf_blockshift;
+		partrel_block_count -= partrel_block_index;
+		partrel_block_count += 1;
+		blocksize = mfile_getblocksize(file);
 		assert(partrel_block_count != 0);
 #define mpart_isblockincore(self, partrel_block_index) \
 	(MPART_BLOCK_ST_MINCORE(mpart_getblockstate(self, partrel_block_index)) ? 0x01 : 0x00)
@@ -541,6 +546,7 @@ again_lock_mman:
 		partrel_size    = blocksize;
 		++partrel_block_index;
 		--partrel_block_count;
+
 		/* Scan ahead until we reach the end of the affected block-range, or
 		 * until we encounter a block  with a different in-core status  than
 		 * what we've seen thus far. */

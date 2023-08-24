@@ -899,26 +899,6 @@ do_io_with_part_and_trunclock:
 					decref_unlikely(part);
 					mfile_trunclock_dec(self);
 				};
-#if defined(LOCAL_READING) && !defined(LOCAL_BUFFER_IS_PHYS)
-				/* For *very* large reads (6 pages or more), replace part of the
-				 * target  buffer memory mapping with a new MAP_PRIVATE|MAP_FILE
-				 * mapping of  `self', so  memory can  be loaded  lazily and  be
-				 * unloaded in case of OOM. (TODO: there should be a /proc  file
-				 * to configure this threshold, with PAGESIZE as minimum)
-				 *
-				 * Note however that leading/trailing pages where only parts of
-				 * the page are *actually* being read into must still be loaded
-				 * normally.
-				 *
-				 * Also  note that when the file-offset at  the start of a page isn't
-				 * page-aligned, we have  to use  `mfile_create_misaligned_wrapper()'
-				 * in order to create a wrapper file that can be used to map the file
-				 * at otherwise unsupported offsets. */
-				if (io_bytes >= 6 * PAGESIZE) {
-					/* TODO */
-				}
-#endif /* LOCAL_READING && !LOCAL_BUFFER_IS_PHYS */
-
 #ifdef LOCAL_BUFFER_IS_IOVEC
 				io_bytes = LOCAL_mpart_rw(part, buffer, buf_offset, io_bytes, offset);
 #else /* LOCAL_BUFFER_IS_IOVEC */

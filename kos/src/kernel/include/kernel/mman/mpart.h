@@ -979,7 +979,8 @@ struct mpart_setcore_data {
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_setcore_data_fini)(struct mpart_setcore_data *__restrict self);
 
-/* Ensure that `MPART_ST_INCORE(self->mp_state)' */
+/* Ensure that `MPART_ST_INCORE(self->mp_state)'
+ * NOTE: Upon success (return == true), `*data' is left in an uninitialized state. */
 FUNDEF BLOCKING WUNUSED NONNULL((1, 3)) __BOOL FCALL
 mpart_setcore_or_unlock(struct mpart *__restrict self,
                         struct unlockinfo *unlock,

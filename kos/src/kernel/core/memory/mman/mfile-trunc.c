@@ -26,6 +26,7 @@
 #include <kernel/fs/node.h>
 #include <kernel/fs/super.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
 #include <misc/unlockinfo.h>
@@ -133,6 +134,186 @@ mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(struct mfile *__res
 	}
 	return true;
 }
+
+
+struct mpart_load_private_node_or_unlock_unlockinfo {
+	struct unlockinfo mplpnouu_info; /* Underlying unlockinfo */
+	struct mpart     *mplpnouu_part; /* [1..1] The part in question (caller manages lock for this one) */
+	struct mfile     *mplpnouu_file; /* [1..1] The file in question. */
+};
+
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL mpart_load_private_node_or_unlock_unlockcb)(struct unlockinfo *__restrict self) {
+	struct mpart_load_private_node_or_unlock_unlockinfo *info;
+	info = container_of(self, struct mpart_load_private_node_or_unlock_unlockinfo, mplpnouu_info);
+	/* Unlock+decref all parts except for the one whose lock our caller is managing. */
+	mfile_unlock_and_decref_parts_except(info->mplpnouu_file, info->mplpnouu_part);
+	mfile_lock_endwrite(info->mplpnouu_file);
+	/* Original part reference (caller is still holding another, so *_nokill) */
+	decref_nokill(info->mplpnouu_part);
+}
+
+PRIVATE BLOCKING NONNULL((1, 4)) bool FCALL
+mpart_load_private_node_setcore_or_unlock(struct mpart *__restrict self,
+                                          PAGEDIR_PAGEALIGNED mpart_reladdr_t minaddr,
+                                          PAGEDIR_PAGEALIGNED mpart_reladdr_t endaddr,
+                                          struct unlockinfo *unlock) {
+	bool ok;
+	struct mpart_setcore_data sc_data;
+
+#if 1 /* s.a. `mfault_or_unlock()' */
+	if (/*!MPART_ST_INCORE(self->mp_state) &&*/ !(self->mp_flags & MPART_F_NOSPLIT)) {
+		PAGEDIR_PAGEALIGNED size_t acc_size        = endaddr - minaddr;
+		PAGEDIR_PAGEALIGNED size_t part_size       = mpart_getsize(self);
+		PAGEDIR_PAGEALIGNED size_t split_threshold = acc_size * 64; /* TODO: Make this configurable */
+		if (part_size > split_threshold) {
+			PAGEDIR_PAGEALIGNED pos_t split1_filepos;
+			PAGEDIR_PAGEALIGNED pos_t split2_filepos;
+			split1_filepos = self->mp_minaddr + minaddr;
+			split2_filepos = split1_filepos + acc_size;
+			incref(self);
+			_mpart_lock_release(self);
+			unlockinfo_unlock(unlock);
+			mpart_lockops_reap(self);
+			xdecref(mpart_split(self, split1_filepos));
+			xdecref(mpart_split(self, split2_filepos));
+			decref_unlikely(self);
+			return false;
+		}
+	}
+#endif
+
+	/* Force-allocate this mem-part. */
+	mpart_setcore_data_init(&sc_data);
+	incref(self);
+	FINALLY_DECREF_UNLIKELY(self);
+	TRY {
+		ok = mpart_setcore_or_unlock(self, unlock, &sc_data);
+		if (!ok) {
+			do {
+				mpart_lock_acquire(self);
+			} while (!mpart_setcore_or_unlock(self, NULL, &sc_data));
+			mpart_lock_release(self);
+		}
+	} EXCEPT {
+		mpart_setcore_data_fini(&sc_data);
+		RETHROW();
+	}
+	return ok;
+}
+
+PRIVATE BLOCKING NONNULL((1)) bool FCALL
+mpart_load_private_node_or_unlock(struct mpart *__restrict self,
+                                  PAGEDIR_PAGEALIGNED mpart_reladdr_t minaddr,
+                                  PAGEDIR_PAGEALIGNED mpart_reladdr_t endaddr) {
+	struct mpart_load_private_node_or_unlock_unlockinfo unlock;
+	assert(endaddr > minaddr);
+	unlock.mplpnouu_info.ui_unlock = &mpart_load_private_node_or_unlock_unlockcb;
+	unlock.mplpnouu_file           = self->mp_file;
+	unlock.mplpnouu_part           = self;
+
+	/* Must also assert that the part is allocated. */
+	if (!MPART_ST_INCORE(self->mp_state)) {
+		bool ok;
+		ok = mpart_load_private_node_setcore_or_unlock(self, minaddr, endaddr,
+		                                               &unlock.mplpnouu_info);
+		if (!ok)
+			return false;
+	}
+
+	return mpart_load_or_unlock(self, &unlock.mplpnouu_info,
+	                            minaddr, endaddr - minaddr);
+}
+
+
+INTDEF NOBLOCK NONNULL((1)) void /* From "./mpart-trim.c" */
+NOTHROW(FCALL mnode_list_sort_by_partoff)(struct mnode_list *__restrict self);
+
+/* Ensure that all blocks mapped by MAP_PRIVATE nodes of `self'
+ * that map at least 1 byte above `minaddr' have a block-status
+ * of MPART_BLOCK_ST_LOAD or MPART_BLOCK_ST_CHNG. */
+PRIVATE BLOCKING NONNULL((1)) bool FCALL
+mpart_load_private_nodes_or_unlock(struct mpart *__restrict self,
+                                   PAGEDIR_PAGEALIGNED mpart_reladdr_t minaddr) {
+	struct mnode *node;
+
+	/* Enumerate copy-on-write (iow: MAP_PRIVATE) nodes of `self' */
+	mnode_list_sort_by_partoff(&self->mp_copy);
+	node = LIST_FIRST(&self->mp_copy);
+	while (node) {
+		bool ok;
+		PAGEDIR_PAGEALIGNED mpart_reladdr_t node_minaddr;
+		PAGEDIR_PAGEALIGNED mpart_reladdr_t node_endaddr;
+		assert(node->mn_part == self);
+		node_minaddr = mnode_getpartminaddr(node);
+		node_endaddr = mnode_getpartendaddr(node);
+		if (node_minaddr < minaddr) {
+			node_minaddr = minaddr;
+			if (node_minaddr >= node_endaddr) {
+				node = LIST_NEXT(node, mn_link);
+				continue;
+			}
+		}
+		assert(node_minaddr < node_endaddr);
+		/* Check for adjacent nodes. */
+		while ((node = LIST_NEXT(node, mn_link)) != NULL) {
+			PAGEDIR_PAGEALIGNED mpart_reladdr_t nextnode_minaddr;
+			PAGEDIR_PAGEALIGNED mpart_reladdr_t nextnode_endaddr;
+			assert(node->mn_part == self);
+			nextnode_minaddr = mnode_getpartminaddr(node);
+			nextnode_endaddr = mnode_getpartendaddr(node);
+			if (nextnode_minaddr > node_endaddr)
+				break; /* There's a gap after the end of the relevant range. */
+			if (node_endaddr < nextnode_endaddr) {
+				/* Extend  load-range  to  include  this  node,
+				 * since it overlaps/extends our current range. */
+				node_endaddr = nextnode_endaddr;
+			}
+		}
+
+		/* Ensure that this sub-range is loaded. */
+		ok = mpart_load_private_node_or_unlock(self, node_minaddr, node_endaddr);
+		if (!ok)
+			return false;
+	}
+
+	return true;
+}
+
+/* Ensure  that blocks of all sub-ranges of MAP_PRIVATE-nodes of parts above
+ * `aligned_new_size' have status MPART_BLOCK_ST_LOAD or MPART_BLOCK_ST_CHNG */
+PRIVATE BLOCKING NONNULL((1)) bool FCALL
+mfile_load_private_nodes_above_or_unlock(struct mfile *__restrict self,
+                                         PAGEDIR_PAGEALIGNED pos_t aligned_new_size) {
+	struct mpart *iter;
+	struct mpart_tree_minmax mima;
+	assert(mfile_lock_writing(self));
+	assert(self->mf_parts != NULL);
+	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
+	mpart_tree_minmaxlocate(self->mf_parts, aligned_new_size, (pos_t)-1, &mima);
+	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
+	if (mima.mm_min == NULL)
+		return true;
+	for (iter = mima.mm_min;;) {
+		bool ok;
+		PAGEDIR_PAGEALIGNED mpart_reladdr_t minaddr = 0;
+		if (mpart_getminaddr(iter) < aligned_new_size) {
+			assert(mpart_getmaxaddr(iter) >= aligned_new_size);
+			minaddr = (mpart_reladdr_t)(aligned_new_size - mpart_getminaddr(iter));
+		}
+		assertf(mpart_lock_acquired(iter), "Caller should be holding locks to all parts");
+		assert(iter->mp_file == self);
+		ok = mpart_load_private_nodes_or_unlock(iter, minaddr);
+		if (!ok)
+			return false;
+		if (iter == mima.mm_max)
+			break;
+		iter = mpart_tree_nextnode(iter);
+		assert(iter);
+	}
+	return true;
+}
+
 
 
 
@@ -379,6 +560,15 @@ directly_modify_file_size:
 				goto again;
 		}
 
+		/* Step #5.1: Make sure that all sub-ranges of parts mapped above `aligned_new_size'
+		 *            and using MAP_PRIVATE-semantics are loaded into memory. This is needed
+		 *            to ensure that MAP_PRIVATE captures a snap-shot at the point where the
+		 *            mapping was created, and won't be affected by a subsequent ftruncate.
+		 * This is required to ensure that MAP_PRIVATE mappings retain their original content
+		 * even  after  the  part of  the  file that  they  are mapping  has  been truncated. */
+		if (!mfile_load_private_nodes_above_or_unlock(self, aligned_new_size))
+			goto again;
+
 		/* Step #6: Check if a mem-part exists  that overlaps with `aligned_new_size',  but
 		 *          doesn't border against it. If so, release part-locks & references, then
 		 *          split  said part by use of `mpart_split()'. After the split, re-acquire
@@ -532,6 +722,8 @@ everything_confirmed:
 		/* Mark the part as anonymous */
 		atomic_write(&part->mp_filent.rb_par, (struct mpart *)-1);
 
+		/* TODO: Posix wants access to SHARED nodes of `part' after this point to raise SIGBUS */
+
 		/* Assign the relevant anonymous-memory file for use during any future access. */
 		assert(part->mp_file == self);
 		part->mp_file = incref(&mfile_anon[self->mf_blockshift]);
@@ -557,9 +749,32 @@ everything_confirmed:
 		    (atomic_fetchand(&part->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF))
 			decref_nokill(part);
 
+		/* A blocks of `part' with status LOAD must be set to CHNG.
+		 *
+		 * Since  we changed the  part to be  anonymous, any block that
+		 * is loaded into memory (and isn't all 0-es) no longer matches
+		 * the default initializer  of `mfile_anon', which  initializes
+		 * to all 0-es. As such, we have to mark such blocks as changed */
+		if (MPART_ST_INCORE(part->mp_state) &&
+		    ((part->mp_flags & MPART_F_BLKST_INL) || part->mp_blkst_ptr)) {
+			size_t i, count = mpart_getblockcount(part, self);
+			for (i = 0; i < count; ++i) {
+				unsigned int st = mpart_getblockstate(part, i);
+				if (st == MPART_BLOCK_ST_LOAD) {
+					/* NOTE: Technically only required if the block's
+					 *       backing physical memory  isn't all  0-es */
+					mpart_setblockstate(part, i, MPART_BLOCK_ST_CHNG);
+				}
+			}
+		}
+
 		/* And with that, this part's been marked made anonymous! */
 		mpart_lock_release(part);
-		decref_unlikely(part);
+
+		/* Release our reference by also trimming the part,  thus
+		 * trying to remove any sub-range that's no longer mapped
+		 * into memory. */
+		mpart_trim(part);
 	}
 
 	/* Step #10: Release locks + references from all of the remaining mem-
