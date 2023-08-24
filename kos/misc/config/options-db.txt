@@ -46,6 +46,9 @@ kos/src/kernel/core/memory/mman/mnode-merge.c
 kos/src/kernel/core/memory/mman/module-userelf.h
 	CONFIG_HAVE_KERNEL_USERELF_MODULES:bool=true
 
+kos/src/kernel/core/memory/mman/mpart-rw.c
+	CONFIG_HAVE_AUTO_MMAP:bool=true
+
 kos/src/kernel/core/memory/mman/mpart-trim.c
 	CONFIG_HAVE_KERNEL_MPART_TRIM:bool=true
 

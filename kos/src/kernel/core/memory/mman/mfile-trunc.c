@@ -552,6 +552,8 @@ directly_modify_file_size:
 		 * even  after  the  part of  the  file that  they  are mapping  has  been truncated. */
 		if (!mfile_load_private_nodes_above_or_unlock(self, aligned_new_size))
 			goto again;
+		/* TODO: Must also load uninitialized nodes from all sub-files of `self' that were
+		 *       created using `mfile_create_misaligned_wrapper()'! */
 
 		/* Step #6: Check if a mem-part exists  that overlaps with `aligned_new_size',  but
 		 *          doesn't border against it. If so, release part-locks & references, then

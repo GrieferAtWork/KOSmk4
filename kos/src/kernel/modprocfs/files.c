@@ -863,6 +863,31 @@ procfs_kos_mm_stat_printer(pformatprinter printer, void *arg,
 
 
 /************************************************************************/
+/* /proc/kos/mm/part-automap-threshold                                */
+/************************************************************************/
+INTERN NONNULL((1)) void KCALL
+procfs_r_kos_mm_kernel_part_automap_threshold_print(pformatprinter printer, void *arg,
+                                                    pos_t UNUSED(offset_hint)) {
+	size_t val = atomic_read(&mpart_mmapread_threshold);
+	ProcFS_PrintSize(printer, arg, val);
+}
+INTERN void KCALL
+procfs_r_kos_mm_kernel_part_automap_threshold_write(NCX void const *buf,
+                                                    size_t bufsize) {
+	size_t newval = ProcFS_ParseSize(buf, bufsize);
+	/* Check for special case: `mpart_mmapread_threshold' is set to `0' if the feature is hard-disabled. */
+	if (atomic_read(&mpart_mmapread_threshold) == 0) {
+		if (newval != 0)
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE, E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER, newval);
+	}
+	if (newval < PAGESIZE)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE, E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER, newval);
+	atomic_write(&mpart_mmapread_threshold, newval);
+}
+
+
+
+/************************************************************************/
 /* /proc/kos/mm/part-autosplit-threshold                                */
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL

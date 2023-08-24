@@ -666,7 +666,7 @@ DATDEF WEAK unsigned int mman_kernel_hintinit_inuse;
 #endif /* CONFIG_NO_SMP */
 
 
-/* Helper macros to perform pagedir_* operations on the address range of a given `mnode' */
+/* Helper macros to perform pagedir_* operations on the address range of a given `struct mnode *self' */
 #define mnode_pagedir_kernelprepare(self)              pagedir_kernelprepare(mnode_getaddr(self), mnode_getsize(self))
 #define mnode_pagedir_kernelunprepare(self)            pagedir_kernelunprepare(mnode_getaddr(self), mnode_getsize(self))
 #define mnode_pagedir_prepare(self)                    pagedir_prepare(mnode_getaddr(self), mnode_getsize(self))

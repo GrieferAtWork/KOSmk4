@@ -20,13 +20,15 @@
 #ifdef __INTELLISENSE__
 #include "mpart-rw.c"
 #define DEFINE_mpart_read
-//#define    DEFINE_mpart_write
-//#define   DEFINE_mpart_read_p
-//#define  DEFINE_mpart_write_p
-//#define    DEFINE_mpart_readv
-//#define   DEFINE_mpart_writev
-//#define  DEFINE_mpart_readv_p
-//#define DEFINE_mpart_writev_p
+//#define DEFINE_mpart_read_nommap
+//#define       DEFINE_mpart_write
+//#define      DEFINE_mpart_read_p
+//#define     DEFINE_mpart_write_p
+//#define DEFINE_mpart_readv
+//#define DEFINE_mpart_readv_nommap
+//#define       DEFINE_mpart_writev
+//#define      DEFINE_mpart_readv_p
+//#define     DEFINE_mpart_writev_p
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/iovec.h>
@@ -40,18 +42,26 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <atomic.h>
 #include <string.h>
 
 #include <libvio/access.h>
 
 DECL_BEGIN
 
-#if defined(DEFINE_mpart_read)
+#if defined(DEFINE_mpart_read) || defined(DEFINE_mpart_read_nommap)
+#ifdef DEFINE_mpart_read_nommap
+#define LOCAL_IS_NOMMAP_ALIAS
+#endif /* DEFINE_mpart_read_nommap */
 #define LOCAL_READING
 #define LOCAL_buffer_t           NCX void *
 #define LOCAL_ubuffer_t          uintptr_t
 #define LOCAL_mfile_vio_rw       mfile_vioread
+#ifdef DEFINE_mpart_read_nommap
+#define LOCAL_mpart_rw           mpart_read_nommap
+#else /* DEFINE_mpart_read_nommap */
 #define LOCAL_mpart_rw           mpart_read
+#endif /* DEFINE_mpart_read_nommap */
 #define LOCAL_mpart_rw_or_unlock mpart_read_or_unlock
 #define LOCAL__mpart_buffered_rw _mpart_buffered_read
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
@@ -88,20 +98,27 @@ DECL_BEGIN
 #define LOCAL_BUFFER_TRANSFER_NOEXCEPT
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
 	copyinphys(mpart_physaddr, buffer + (buffer_offset), num_bytes)
-#elif defined(DEFINE_mpart_readv)
+#elif defined(DEFINE_mpart_readv) || defined(DEFINE_mpart_readv_nommap)
+#ifdef DEFINE_mpart_readv_nommap
+#define LOCAL_IS_NOMMAP_ALIAS
+#endif /* DEFINE_mpart_readv_nommap */
 #define LOCAL_READING
-#define LOCAL_BUFFER_IS_AIO
+#define LOCAL_BUFFER_IS_IOVEC
 #define LOCAL_BUFFER_IS_IOV_BUFFER
 #define LOCAL_buffer_t           struct iov_buffer const *__restrict
 #define LOCAL_mfile_vio_rw       mfile_vioreadv
+#ifdef DEFINE_mpart_readv_nommap
+#define LOCAL_mpart_rw           mpart_readv_nommap
+#else /* DEFINE_mpart_readv_nommap */
 #define LOCAL_mpart_rw           mpart_readv
+#endif /* DEFINE_mpart_readv_nommap */
 #define LOCAL_mpart_rw_or_unlock mpart_readv_or_unlock
 #define LOCAL__mpart_buffered_rw _mpart_buffered_readv
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
 	iov_buffer_copyfromphys_nopf(buffer, buf_offset + (buffer_offset), mpart_physaddr, num_bytes)
 #elif defined(DEFINE_mpart_writev)
 #define LOCAL_WRITING
-#define LOCAL_BUFFER_IS_AIO
+#define LOCAL_BUFFER_IS_IOVEC
 #define LOCAL_BUFFER_IS_IOV_BUFFER
 #define LOCAL_buffer_t           struct iov_buffer const *__restrict
 #define LOCAL_mfile_vio_rw       mfile_viowritev
@@ -113,7 +130,7 @@ DECL_BEGIN
 #elif defined(DEFINE_mpart_readv_p)
 #define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_READING
-#define LOCAL_BUFFER_IS_AIO
+#define LOCAL_BUFFER_IS_IOVEC
 #define LOCAL_BUFFER_IS_IOV_PHYSBUFFER
 #define LOCAL_buffer_t           struct iov_physbuffer const *__restrict
 #define LOCAL_mfile_vio_rw       mfile_vioreadv_p
@@ -125,7 +142,7 @@ DECL_BEGIN
 #elif defined(DEFINE_mpart_writev_p)
 #define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_WRITING
-#define LOCAL_BUFFER_IS_AIO
+#define LOCAL_BUFFER_IS_IOVEC
 #define LOCAL_BUFFER_IS_IOV_PHYSBUFFER
 #define LOCAL_buffer_t           struct iov_physbuffer const *__restrict
 #define LOCAL_mfile_vio_rw       mfile_viowritev_p
@@ -138,6 +155,7 @@ DECL_BEGIN
 #error "Bad configuration"
 #endif /* !... */
 
+#ifndef LOCAL_IS_NOMMAP_ALIAS
 #ifdef LOCAL__mpart_buffered_rw
 /* Same as the above, but these use an intermediate (stack) buffer for  transfer.
  * As such, these functions are called by the above when `memcpy_nopf()' produces
@@ -145,9 +163,9 @@ DECL_BEGIN
 PUBLIC BLOCKING ATTR_NOINLINE NONNULL((1)) size_t KCALL
 LOCAL__mpart_buffered_rw(struct mpart *__restrict self,
                          LOCAL_buffer_t buffer,
-#ifdef LOCAL_BUFFER_IS_AIO
+#ifdef LOCAL_BUFFER_IS_IOVEC
                          size_t buf_offset,
-#endif /* LOCAL_BUFFER_IS_AIO */
+#endif /* LOCAL_BUFFER_IS_IOVEC */
                          size_t num_bytes,
                          pos_t filepos)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
@@ -164,11 +182,11 @@ LOCAL__mpart_buffered_rw(struct mpart *__restrict self,
 			part = num_bytes;
 #ifdef LOCAL_WRITING
 		/* Load data into `stk_buf' */
-#ifdef LOCAL_BUFFER_IS_AIO
+#ifdef LOCAL_BUFFER_IS_IOVEC
 		iov_buffer_copytomem(buffer, stk_buf, buf_offset, part);
-#else /* LOCAL_BUFFER_IS_AIO */
+#else /* LOCAL_BUFFER_IS_IOVEC */
 		memcpy(stk_buf, buffer, part);
-#endif /* !LOCAL_BUFFER_IS_AIO */
+#endif /* !LOCAL_BUFFER_IS_IOVEC */
 
 		/* Write `stk_buf' to the file. */
 		ok = mpart_write(self, stk_buf, part, filepos);
@@ -178,28 +196,29 @@ LOCAL__mpart_buffered_rw(struct mpart *__restrict self,
 		ok = mpart_read(self, stk_buf, part, filepos);
 
 		/* Copy data from `stk_buf' */
-#ifdef LOCAL_BUFFER_IS_AIO
+#ifdef LOCAL_BUFFER_IS_IOVEC
 		iov_buffer_copyfrommem(buffer, buf_offset, stk_buf, ok);
-#else /* LOCAL_BUFFER_IS_AIO */
+#else /* LOCAL_BUFFER_IS_IOVEC */
 		memcpy(buffer, stk_buf, ok);
-#endif /* !LOCAL_BUFFER_IS_AIO */
+#endif /* !LOCAL_BUFFER_IS_IOVEC */
 #endif /* !LOCAL_WRITING */
 
 		assert(ok <= part);
 		result += ok;
 		if (ok < part)
 			break;
-#ifdef LOCAL_BUFFER_IS_AIO
+#ifdef LOCAL_BUFFER_IS_IOVEC
 		buf_offset += ok;
-#else /* LOCAL_BUFFER_IS_AIO */
+#else /* LOCAL_BUFFER_IS_IOVEC */
 		buffer = (LOCAL_buffer_t)((LOCAL_ubuffer_t)buffer + result);
-#endif /* !LOCAL_BUFFER_IS_AIO */
+#endif /* !LOCAL_BUFFER_IS_IOVEC */
 		filepos += ok;
 		num_bytes -= ok;
 	}
 	return result;
 }
 #endif /* LOCAL__mpart_buffered_rw */
+#endif /* !LOCAL_IS_NOMMAP_ALIAS */
 
 
 /* Read/write raw data to/from a given mem-part.
@@ -208,9 +227,9 @@ LOCAL__mpart_buffered_rw(struct mpart *__restrict self,
 PUBLIC BLOCKING NONNULL((1)) size_t KCALL
 LOCAL_mpart_rw(struct mpart *__restrict self,
                LOCAL_buffer_t buffer,
-#ifdef LOCAL_BUFFER_IS_AIO
+#ifdef LOCAL_BUFFER_IS_IOVEC
                size_t buf_offset,
-#endif /* LOCAL_BUFFER_IS_AIO */
+#endif /* LOCAL_BUFFER_IS_IOVEC */
                size_t num_bytes,
                pos_t filepos)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
@@ -238,17 +257,18 @@ LOCAL_mpart_rw(struct mpart *__restrict self,
 		 * of our mem-part, but  doing so is kind-of  redundant, which is why  we
 		 * don't actually do that check! */
 		LOCAL_mfile_vio_rw(file, buffer,
-#ifdef LOCAL_BUFFER_IS_AIO
+#ifdef LOCAL_BUFFER_IS_IOVEC
 		                   buf_offset,
-#endif /* LOCAL_BUFFER_IS_AIO */
+#endif /* LOCAL_BUFFER_IS_IOVEC */
 		                   num_bytes,
 		                   filepos);
 		return num_bytes;
 	}
 #endif /* LIBVIO_CONFIG_ENABLED */
-	result = 0;
 
 #if defined(LOCAL_READING) && !defined(LOCAL_BUFFER_IS_PHYS)
+#ifndef LOCAL_IS_NOMMAP_ALIAS
+#ifdef CONFIG_HAVE_AUTO_MMAP
 	/* For *very* large reads (6 pages or more), replace part of the
 	 * target  buffer memory mapping with a new MAP_PRIVATE|MAP_FILE
 	 * mapping of  `self', so  memory can  be loaded  lazily and  be
@@ -268,11 +288,20 @@ LOCAL_mpart_rw(struct mpart *__restrict self,
 	 *       since doing this in kernel-space would turn buffers into
 	 *       NCX memory in places where that wouldn't be expected.
 	 */
-	if (num_bytes >= 6 * PAGESIZE) {
-		/* TODO */
+	if (num_bytes >= atomic_read(&mpart_mmapread_threshold)) {
+#ifdef LOCAL_BUFFER_IS_IOVEC
+		result = mpart_mmapreadv(self, buffer, buf_offset, num_bytes, filepos);
+#else /* LOCAL_BUFFER_IS_IOVEC */
+		result = mpart_mmapread(self, buffer, num_bytes, filepos);
+#endif /* !LOCAL_BUFFER_IS_IOVEC */
+		if (result != 0)
+			return result;
 	}
+#endif /* CONFIG_HAVE_AUTO_MMAP */
+#endif /* !LOCAL_IS_NOMMAP_ALIAS */
 #endif /* LOCAL_READING && !LOCAL_BUFFER_IS_PHYS */
 
+	result = 0;
 	/* Lock+load the part, unsharing the accessed address range if necessary. */
 again:
 #ifdef LOCAL_WRITING
@@ -374,13 +403,13 @@ again_memaddr:
 
 			/* If  pre-faulting memory didn't work, then we
 			 * must use an intermediate buffer for transfer */
-#ifdef LOCAL_BUFFER_IS_AIO
+#ifdef LOCAL_BUFFER_IS_IOVEC
 			result += LOCAL__mpart_buffered_rw(self, buffer, buf_offset + result,
 			                                   num_bytes, filepos);
-#else /* LOCAL_BUFFER_IS_AIO */
+#else /* LOCAL_BUFFER_IS_IOVEC */
 			result += LOCAL__mpart_buffered_rw(self, (LOCAL_buffer_t)((LOCAL_ubuffer_t)buffer + result),
 			                                   num_bytes, filepos);
-#endif /* !LOCAL_BUFFER_IS_AIO */
+#endif /* !LOCAL_BUFFER_IS_IOVEC */
 			return result;
 		} /* if unlikely(copy_error != 0) */
 	}     /* scope... */
@@ -412,6 +441,8 @@ done:
 
 
 
+
+#ifndef LOCAL_IS_NOMMAP_ALIAS
 /* Perform I/O while holding  a lock to `self'.  If this isn't possible,  then
  * unlock all locks,  try to  work towards  that goal,  and return  `0'. If  a
  * virtual buffer is given,  and that buffer cannot  be faulted (e.g.: it  may
@@ -433,9 +464,9 @@ done:
 PUBLIC BLOCKING NONNULL((1)) size_t KCALL
 LOCAL_mpart_rw_or_unlock(struct mpart *__restrict self,
                          LOCAL_buffer_t buffer,
-#ifdef LOCAL_BUFFER_IS_AIO
+#ifdef LOCAL_BUFFER_IS_IOVEC
                          size_t buf_offset,
-#endif /* LOCAL_BUFFER_IS_AIO */
+#endif /* LOCAL_BUFFER_IS_IOVEC */
                          size_t num_bytes,
                          mpart_reladdr_t offset,
                          struct unlockinfo *unlock)
@@ -549,12 +580,13 @@ again_memaddr:
 	}
 	return result;
 }
+#endif /* !LOCAL_IS_NOMMAP_ALIAS */
 
 
 #undef LOCAL_BUFFER_TRANSFER_NOEXCEPT
 #undef LOCAL_buffer_transfer_nopf
 #undef LOCAL_BUFFER_IS_PHYS
-#undef LOCAL_BUFFER_IS_AIO
+#undef LOCAL_BUFFER_IS_IOVEC
 #undef LOCAL_BUFFER_IS_IOV_BUFFER
 #undef LOCAL_BUFFER_IS_IOV_PHYSBUFFER
 #undef LOCAL_ubuffer_t
@@ -565,14 +597,17 @@ again_memaddr:
 #undef LOCAL_mpart_rw
 #undef LOCAL_READING
 #undef LOCAL_WRITING
+#undef LOCAL_IS_NOMMAP_ALIAS
 
 DECL_END
 
 #undef DEFINE_mpart_read
+#undef DEFINE_mpart_read_nommap
 #undef DEFINE_mpart_write
 #undef DEFINE_mpart_read_p
 #undef DEFINE_mpart_write_p
 #undef DEFINE_mpart_readv
+#undef DEFINE_mpart_readv_nommap
 #undef DEFINE_mpart_writev
 #undef DEFINE_mpart_readv_p
 #undef DEFINE_mpart_writev_p

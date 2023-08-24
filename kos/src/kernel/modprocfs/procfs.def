@@ -114,12 +114,16 @@ MKREG_RO(procfs_r_kos_fs_stat, 0444, procfs_kos_fs_stat_printer)
 MKDIR_BEGIN(procfs_r_kos_mm, 0555)
 	MKDIR_ENT("kernel-maps",              DT_REG, &procfs_r_kos_mm_kernel_maps,                     /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xc93e56c9, 0xd698cf90e2790124, 0x8c5a3e04, 0xc69105e191410936)/*[[[end]]]*/)
 	MKDIR_ENT("kernel-stat",              DT_REG, &procfs_r_kos_mm_kernel_stat,                     /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xff3f47dc, 0xc98cf90e279f237, 0x8c5b2f4d, 0xc69105e19141fa7f)/*[[[end]]]*/)
+	MKDIR_ENT("part-automap-threshold",   DT_REG, &procfs_r_kos_mm_kernel_part_automap_threshold,   /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x7a864b8a, 0xded039673b0620bc, 0xd4a8cdd, 0x79ae08206456491b)/*[[[end]]]*/)
 	MKDIR_ENT("part-autosplit-threshold", DT_REG, &procfs_r_kos_mm_kernel_part_autosplit_threshold, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x20982b85, 0xec737a77f7dd03b7, 0x8cd254ef, 0xf50b10314434a88c)/*[[[end]]]*/)
 	MKDIR_ENT("parts",                    DT_REG, &procfs_r_kos_mm_parts,                           /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x18056d63, 0x7374726170, 0xf36d0687, 0x7374726170)/*[[[end]]]*/)
 	MKDIR_ENT("stat",                     DT_REG, &procfs_r_kos_mm_stat,                            /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x176d180b, 0x74617473, 0xf176d14, 0x74617473)/*[[[end]]]*/)
 MKDIR_END
 MKREG_RO(procfs_r_kos_mm_kernel_maps, 0400, procfs_kos_mm_kernel_maps_printer)
 MKREG_RO(procfs_r_kos_mm_kernel_stat, 0400, procfs_kos_mm_kernel_stat_printer)
+MKREG_RW(procfs_r_kos_mm_kernel_part_automap_threshold, 0644,
+         procfs_r_kos_mm_kernel_part_automap_threshold_print,
+         procfs_r_kos_mm_kernel_part_automap_threshold_write)
 MKREG_RW(procfs_r_kos_mm_kernel_part_autosplit_threshold, 0644,
          procfs_r_kos_mm_kernel_part_autosplit_threshold_print,
          procfs_r_kos_mm_kernel_part_autosplit_threshold_write)

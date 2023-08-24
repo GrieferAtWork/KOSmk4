@@ -1695,10 +1695,12 @@ NOTHROW(FCALL mpart_mmap_node_p)(struct mpart const *__restrict self,
  * @return: * : The # of bytes that were transferred. May be less than `num_bytes' if the part
  *              is too small, or  if the given  `filepos' lies outside  of the part's  bounds. */
 FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_read(struct mpart *__restrict self, NCX void *dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_read_nommap(struct mpart *__restrict self, NCX void *dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_write(struct mpart *__restrict self, NCX void const *src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_read_p(struct mpart *__restrict self, physaddr_t dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_write_p(struct mpart *__restrict self, physaddr_t src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mpart_readv(struct mpart *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mpart_readv_nommap(struct mpart *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mpart_writev(struct mpart *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mpart_readv_p(struct mpart *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mpart_writev_p(struct mpart *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
@@ -1739,6 +1741,39 @@ FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mpart_readv_or_unlock_p(struct mpar
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mpart_writev_or_unlock_p(struct mpart *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 
+/* Special mpart functions that *try* to implement large reads from `self' by
+ * creating MAP_PRIVATE memory mappings of `self' in `THIS_MMAN' over-top the
+ * given target buffer, which (when  accessed) will lazily load the  contents
+ * of the file that is backing `self' into memory.
+ *
+ * These functions should never need to  be called explicitly, as they  are
+ * called automatically from `mpart_read()' and `mpart_readv()', which will
+ * invoke  this functions for "large" (s.a. `mpart_mmapread_threshold') I/O
+ * operations.
+ *
+ * @assume(num_bytes >= PAGESIZE);
+ * @return: * : The number of bytes that were "read" by this function.
+ * @return: 0 : Unable to replace target  buffer with an automatic  memory
+ *              mapping. Reasons include the  buffer not being mapped,  or
+ *              being backed by VIO memory. In any case: the caller should
+ *              just do a normal read  operation, behaving as though  this
+ *              function didn't exist. */
+FUNDEF NONNULL((1)) size_t KCALL mpart_mmapread(struct mpart *__restrict self, NCX void *dst, size_t num_bytes, pos_t filepos);
+FUNDEF NONNULL((1, 2)) size_t KCALL mpart_mmapreadv(struct mpart *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos);
+
+
+/* I/O size threshold that must be met or exceeded in order for `mpart_read()'
+ * to try and make use of `mpart_mmapread()' in order to do the I/O operation.
+ *
+ * Notes:
+ * - Must *NOT* be set to a value that is less than PAGESIZE. If you were to
+ *   set to a value lower  than this, `mpart_read()' and  `mpart_mmapread()'
+ *   might call each other and cause a stack overflow.
+ * - Set this value to `(size_t)-1' to soft-disable the auto-mmap feature.
+ * - When set to `0', the kernel was configured to have this feature be hard-disabled.
+ *
+ * The value of this variable is exposed in `/proc/kos/mm/part-automap-threshold' */
+DATDEF size_t mpart_mmapread_threshold;
 
 
 /* Lock for `mpart_all_list' */

@@ -40,6 +40,7 @@
 #include <kos/ksysctl.h>
 #include <kos/malloc.h>
 #include <kos/rtm.h>
+#include <kos/sys/mman.h>
 #include <kos/syscalls.h>
 #include <kos/types.h>
 #include <kos/ukern.h>
@@ -89,6 +90,7 @@
 
 #include <libansitty/ctl.h>
 #include <libdebuginfo/repr.h>
+#include <libiberty.h>
 #include <libvio/vio.h>
 
 DECL_BEGIN
@@ -1227,6 +1229,41 @@ int main_abortf2(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+int main_lread(int argc, char *argv[], char *envp[]) {
+	enum{ SIZE = 64 * 1024 };
+	void *compare;
+	void *buf;
+	fd_t fd;
+	size_t i, r;
+	(void)argc, (void)argv, (void)envp;
+
+	buf     = xmalloc(SIZE);
+	fd      = Open("/bin/system-test", O_RDONLY);
+	compare = MMap(NULL, SIZE, PROT_READ, MAP_PRIVATE, fd, 0);
+	r       = Read(fd, buf, SIZE);
+	close(fd);
+	printf("r = %" PRIuSIZ "\n", r);
+	assert(r == SIZE);
+	for (i = 0; i < r; ++i) {
+		byte_t bb = ((byte_t const *)buf)[i];
+		byte_t cb = ((byte_t const *)compare)[i];
+		assertf(bb == cb,
+		        "Miss-matching bytes at offset %" PRIuSIZ "/%" PRIuSIZ "\n"
+		        "buf:     %p [%#.2" PRIx8 "]\n"
+		        "compare: %p [%#.2" PRIx8 "]",
+		        i, r,
+		        &((byte_t const *)buf)[i], bb,
+		        &((byte_t const *)compare)[i], cb);
+	}
+	(void)munmap(compare, SIZE);
+	(void)free(buf);
+	return 0;
+}
+/************************************************************************/
+
+
+
 typedef int (*FUN)(int argc, char *argv[], char *envp[]);
 typedef struct {
 	char const *n;
@@ -1283,6 +1320,7 @@ PRIVATE DEF defs[] = {
 	{ "abort", &main_abort },
 	{ "abortf", &main_abortf },
 	{ "abortf2", &main_abortf2 },
+	{ "lread", &main_lread },
 	/* TODO: On x86_64, add a playground that:
 	 *   - mmap(0x00007ffffffff000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_FIXED);
 	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall

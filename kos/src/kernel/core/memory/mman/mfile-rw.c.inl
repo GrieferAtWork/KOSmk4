@@ -166,7 +166,7 @@ DECL_BEGIN
 #define LOCAL_mfile_normrw       mfile_read
 #define LOCAL_mfile_tailrw       mfile_tailread
 #define LOCAL_mpart_rw           mpart_read
-#define LOCAL_mpart_rw_or_unlock mpart_read_or_unlock
+#define LOCAL_mpart_rw_or_unlock NOT_NEEDED(mpart_read_or_unlock) /* Shouldn't be needed (and wouldn't be able to do auto-mmap) */
 #elif defined(DEFINE_mfile_write) || defined(DEFINE_mfile_tailwrite)
 #ifdef DEFINE_mfile_tailwrite
 #define LOCAL_TAILIO
@@ -186,7 +186,7 @@ DECL_BEGIN
 #define LOCAL_mfile_normrw       mfile_readv
 #define LOCAL_mfile_tailrw       mfile_tailreadv
 #define LOCAL_mpart_rw           mpart_readv
-#define LOCAL_mpart_rw_or_unlock mpart_readv_or_unlock
+#define LOCAL_mpart_rw_or_unlock NOT_NEEDED(mpart_readv_or_unlock) /* Shouldn't be needed (and wouldn't be able to do auto-mmap) */
 #elif defined(DEFINE_mfile_writev) || defined(DEFINE_mfile_tailwritev)
 #ifdef DEFINE_mfile_tailwritev
 #define LOCAL_TAILIO
