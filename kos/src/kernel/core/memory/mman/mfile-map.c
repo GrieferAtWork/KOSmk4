@@ -61,9 +61,10 @@ PUBLIC NONNULL((1)) void
 NOTHROW(FCALL mfile_map_fini_or_reserved)(struct mfile_map *__restrict self) {
 	struct mnode *iter;
 	SLIST_FOREACH_SAFE (iter, &self->mfm_nodes, _mn_alloc) {
-		xdecref(iter->mn_part);
+		xdecref(iter->mn_part); /* May be NULL if it's a reserved mapping */
 		kfree(iter);
 	}
+
 	/* Free all nodes still apart of the free-list. */
 	SLIST_FOREACH_SAFE (iter, &self->mfm_flist, _mn_alloc) {
 		kfree(iter);
@@ -93,6 +94,7 @@ NOTHROW(FCALL mfile_map_fini)(struct mfile_map *__restrict self) {
 		decref(iter->mn_part);
 		kfree(iter);
 	}
+
 	/* Free all nodes still apart of the free-list. */
 	SLIST_FOREACH_SAFE (iter, &self->mfm_flist, _mn_alloc) {
 		kfree(iter);
@@ -443,6 +445,7 @@ NOTHROW(FCALL mfile_map_unlock_and_remove_non_overlapping_parts)(struct mfile_ma
 		pos_t node_map_minaddr;
 		pos_t node_map_maxaddr;
 		struct mpart *part = node->mn_part;
+
 		/* Calculate the address range that was ~supposed~ to be mapped by this node. */
 		node_map_minaddr = self->mfm_addr + (uintptr_t)node->mn_minaddr;
 		node_map_maxaddr = self->mfm_addr + (uintptr_t)node->mn_maxaddr;
@@ -584,6 +587,7 @@ continue_with_pnode:
 		uintptr_t gap_min_offset;
 		uintptr_t gap_end_offset;
 		next = *p_node;
+
 		/* Figure out the bounds of a (potential) gap. */
 		gap_min_offset = 0;
 		gap_end_offset = self->mfm_size;
@@ -726,8 +730,10 @@ continue_with_pnode:
 					RETHROW();
 				}
 			}
+
 			/* Initialize the new node. (at least as much as we're supposed to) */
 			new_node->mn_part = part; /* Inherit reference */
+
 			/* Have the node fill the gap in its entirety. If we're wrong with
 			 * this assessment, then later calls to
 			 *   - mfile_map_unlock_and_remove_non_overlapping_parts
@@ -778,6 +784,7 @@ mfile_map_acquire_or_unlock(struct mfile_map *__restrict self,
 	block_aligned_addr = mfile_partaddr_flooralign(file, self->mfm_addr);
 	block_aligned_size = self->mfm_size + (size_t)(self->mfm_addr - block_aligned_addr);
 	block_aligned_size = mfile_partsize_ceilalign(file, block_aligned_size);
+
 	/* Acquire locks to all parts already loaded! (For this  purpose,
 	 * we may assume that no part appears more than once, so we don't
 	 * have to take care to track which parts are already locked) */

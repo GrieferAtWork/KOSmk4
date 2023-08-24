@@ -54,7 +54,7 @@ static_assert(sizeof(struct iov_physbuffer) == SIZEOF_IOV_PHYSBUFFER);
 
 
 /* Read/write/set data associated with IOV buffers. */
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC ATTR_IN(1) void KCALL
 iov_buffer_copyfromphys(struct iov_buffer const *__restrict self,
                         uintptr_t dst_offset, physaddr_t src, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
@@ -75,7 +75,7 @@ iov_buffer_copyfromphys(struct iov_buffer const *__restrict self,
 	}
 }
 
-PUBLIC NONNULL((1)) size_t
+PUBLIC ATTR_IN(1) size_t
 NOTHROW(KCALL iov_buffer_copyfromphys_nopf)(struct iov_buffer const *__restrict self,
                                             uintptr_t dst_offset, physaddr_t src, size_t num_bytes) {
 	size_t error;
@@ -99,7 +99,7 @@ NOTHROW(KCALL iov_buffer_copyfromphys_nopf)(struct iov_buffer const *__restrict 
 	return 0;
 }
 
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC ATTR_IN(1) void KCALL
 iov_buffer_copytophys(struct iov_buffer const *__restrict self,
                       physaddr_t dst, uintptr_t src_offset, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
@@ -124,7 +124,7 @@ iov_buffer_copytophys(struct iov_buffer const *__restrict self,
 	}
 }
 
-PUBLIC NONNULL((1)) size_t
+PUBLIC ATTR_IN(1) size_t
 NOTHROW(KCALL iov_buffer_copytophys_nopf)(struct iov_buffer const *__restrict self,
                                           physaddr_t dst, uintptr_t src_offset, size_t num_bytes) {
 	size_t error;
@@ -152,7 +152,7 @@ NOTHROW(KCALL iov_buffer_copytophys_nopf)(struct iov_buffer const *__restrict se
 	return 0;
 }
 
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC ATTR_IN(1) void KCALL
 iov_buffer_memset(struct iov_buffer const *__restrict self,
                   uintptr_t dst_offset,
                   int byte, size_t num_bytes)
@@ -174,7 +174,7 @@ iov_buffer_memset(struct iov_buffer const *__restrict self,
 	}
 }
 
-PUBLIC NOBLOCK NONNULL((1)) void
+PUBLIC NOBLOCK ATTR_IN(1) void
 NOTHROW(KCALL iov_physbuffer_memset)(struct iov_physbuffer const *__restrict self,
                                      uintptr_t dst_offset, int byte, size_t num_bytes) {
 	struct iov_physentry ent;
@@ -193,7 +193,7 @@ NOTHROW(KCALL iov_physbuffer_memset)(struct iov_physbuffer const *__restrict sel
 	}
 }
 
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC ATTR_IN(1) void KCALL
 iov_buffer_copyfrommem(struct iov_buffer const *__restrict self, uintptr_t dst_offset,
                        NCX void const *__restrict src, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
@@ -214,7 +214,7 @@ iov_buffer_copyfrommem(struct iov_buffer const *__restrict self, uintptr_t dst_o
 	}
 }
 
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC ATTR_IN(1) void KCALL
 iov_physbuffer_copyfrommem(struct iov_physbuffer const *__restrict self,
                            uintptr_t dst_offset,
                            NCX void const *src, size_t num_bytes)
@@ -236,7 +236,7 @@ iov_physbuffer_copyfrommem(struct iov_physbuffer const *__restrict self,
 	}
 }
 
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC ATTR_IN(1) void KCALL
 iov_buffer_copytomem(struct iov_buffer const *__restrict self,
                      NCX void *__restrict dst,
                      uintptr_t src_offset, size_t num_bytes)
@@ -262,7 +262,7 @@ iov_buffer_copytomem(struct iov_buffer const *__restrict self,
 	}
 }
 
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC ATTR_IN(1) void KCALL
 iov_physbuffer_copytomem(struct iov_physbuffer const *__restrict self,
                          NCX void *dst,
                          uintptr_t src_offset, size_t num_bytes)
@@ -288,7 +288,7 @@ iov_physbuffer_copytomem(struct iov_physbuffer const *__restrict self,
 	}
 }
 
-PUBLIC NOBLOCK NONNULL((1)) void
+PUBLIC NOBLOCK ATTR_IN(1) void
 NOTHROW(KCALL iov_physbuffer_copyfromphys)(struct iov_physbuffer const *__restrict self,
                                            uintptr_t dst_offset,
                                            physaddr_t src, size_t num_bytes) {
@@ -313,7 +313,7 @@ NOTHROW(KCALL iov_physbuffer_copyfromphys)(struct iov_physbuffer const *__restri
 	}
 }
 
-PUBLIC NOBLOCK NONNULL((1)) void
+PUBLIC NOBLOCK ATTR_IN(1) void
 NOTHROW(KCALL iov_physbuffer_copytophys)(struct iov_physbuffer const *__restrict self,
                                          physaddr_t dst,
                                          uintptr_t src_offset, size_t num_bytes) {
@@ -338,7 +338,7 @@ NOTHROW(KCALL iov_physbuffer_copytophys)(struct iov_physbuffer const *__restrict
 	}
 }
 
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC ATTR_IN(1) void KCALL
 iov_buffer_copytovmem(struct iov_buffer const *__restrict src,
                       struct iov_buffer const *__restrict dst,
                       uintptr_t dst_offset, uintptr_t src_offset,
@@ -372,7 +372,7 @@ iov_buffer_copytovmem(struct iov_buffer const *__restrict src,
 	}
 }
 
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC ATTR_IN(1) void KCALL
 iov_buffer_copytovphys(struct iov_buffer const *__restrict src,
                        struct iov_physbuffer const *__restrict dst,
                        uintptr_t dst_offset, uintptr_t src_offset,
@@ -406,7 +406,7 @@ iov_buffer_copytovphys(struct iov_buffer const *__restrict src,
 	}
 }
 
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC ATTR_IN(1) void KCALL
 iov_physbuffer_copytovmem(struct iov_physbuffer const *__restrict src,
                           struct iov_buffer const *__restrict dst,
                           uintptr_t dst_offset,
@@ -441,7 +441,7 @@ iov_physbuffer_copytovmem(struct iov_physbuffer const *__restrict src,
 	}
 }
 
-PUBLIC NOBLOCK NONNULL((1)) void
+PUBLIC NOBLOCK ATTR_IN(1) void
 NOTHROW(KCALL iov_physbuffer_copytovphys)(struct iov_physbuffer const *__restrict src,
                                           struct iov_physbuffer const *__restrict dst,
                                           uintptr_t dst_offset,

@@ -181,7 +181,8 @@ NOTHROW(KCALL mnode_range_remove_and_unmap)(struct mman *mm,
  *              function didn't exist. */
 PUBLIC NONNULL((1)) size_t KCALL
 mpart_mmapread(struct mpart *__restrict self, NCX void *dst,
-               size_t num_bytes, pos_t filepos) {
+               size_t num_bytes, pos_t filepos)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	struct mnode_slist deleted_nodes;
 	struct mnode_tree_minmax mima;
 	struct mfile *orig_map_file;
@@ -199,7 +200,7 @@ mpart_mmapread(struct mpart *__restrict self, NCX void *dst,
 	size_t map_size;
 
 	/* Do some quick checks to see if mmap is allowed. */
-	if (ADDRRANGE_ISKERN_PARTIAL(dst, (byte_t *)dst + num_bytes))
+	if unlikely(ADDRRANGE_ISKERN_PARTIAL(dst, (byte_t *)dst + num_bytes))
 		goto done; /* Not allowed for kernel-space address ranges. */
 	mm = THIS_MMAN;
 	if unlikely(mm == &mman_kernel)
@@ -220,7 +221,7 @@ mpart_mmapread(struct mpart *__restrict self, NCX void *dst,
 	assert(unaligned_tailbytes < PAGESIZE);
 
 	/* Read head memory the old fashioned way. */
-	if (unaligned_headbytes) {
+	if likely(unaligned_headbytes) {
 		result = mpart_read_nommap(self, dst, unaligned_headbytes, filepos);
 		assert(result <= unaligned_headbytes);
 		if unlikely(result != unaligned_headbytes)
@@ -237,7 +238,7 @@ mpart_mmapread(struct mpart *__restrict self, NCX void *dst,
 		mman_lock_acquire(mm);
 		ok = mpart_mmapread_loadnodes(mm, mmap_minaddr, mmap_endaddr, &mima);
 		mman_lock_release(mm);
-		if (!ok)
+		if unlikely(!ok)
 			goto done;
 	}
 #endif /* !__OPTIMIZE_SIZE__ */
@@ -264,7 +265,7 @@ mpart_mmapread(struct mpart *__restrict self, NCX void *dst,
 		assert((filepos & map_file->mf_part_amask) == 0);
 	}
 
-	/* Create a file mapping  */
+	/* Create a file mapping */
 	TRY {
 		mfile_map_init_and_acquire(&fmap.mmwu_map, map_file,
 		                           filepos, map_size,
@@ -386,7 +387,18 @@ again_lock_fmap_and_mm:
 		node->mn_module = NULL;
 		node->mn_minaddr += (uintptr_t)mmap_minaddr;
 		node->mn_maxaddr += (uintptr_t)mmap_minaddr;
+
+		/* Insert into the mman. */
 		mman_mappings_insert(mm, node);
+
+		/* While we're here, try to merge the node with its neighbors.
+		 * This  is unlikely to  succeed, but we  might as well try... */
+#ifndef __OPTIMIZE_SIZE__
+		if unlikely(!unaligned_headbytes || !unaligned_tailbytes)
+#endif /* !__OPTIMIZE_SIZE__ */
+		{
+			node = mnode_merge_with_partlock(node);
+		}
 		mpart_lock_release(node->mn_part);
 	}
 
@@ -415,13 +427,14 @@ again_lock_fmap_and_mm:
 
 	/* If we were able to map the entirety of the user-requested area, then also
 	 * try  to do one last direct read  for any remaining, unaligned tail bytes. */
-	if (unaligned_tailbytes)
+	if likely(unaligned_tailbytes)
 		result += mpart_read_nommap(self, mmap_endaddr, unaligned_tailbytes, orig_filepos + map_size);
 	return result;
 done_fini_fmap_unlock_mm:
 	mman_lock_release(mm);
 done_fini_fmap:
 	mfile_map_fini(&fmap.mmwu_map);
+done_map_file:
 	decref_likely(map_file);
 done:
 	return result;
@@ -431,7 +444,8 @@ done:
 PUBLIC NONNULL((1, 2)) size_t KCALL
 mpart_mmapreadv(struct mpart *__restrict self,
                 struct iov_buffer const *__restrict buf,
-                size_t buf_offset, size_t num_bytes, pos_t filepos) {
+                size_t buf_offset, size_t num_bytes, pos_t filepos)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	size_t result    = 0;
 	size_t threshold = atomic_read(&mpart_mmapread_threshold);
 	size_t cur_offset = 0;
@@ -517,7 +531,8 @@ DEFINE_PUBLIC_ALIAS(mpart_readv_nommap, mpart_readv);
 
 PUBLIC NONNULL((1)) size_t KCALL
 mpart_mmapread(struct mpart *__restrict self,
-               NCX void *dst, size_t num_bytes, pos_t filepos) {
+               NCX void *dst, size_t num_bytes, pos_t filepos)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	(void)self;
 	(void)dst;
 	(void)num_bytes;
@@ -529,7 +544,8 @@ mpart_mmapread(struct mpart *__restrict self,
 PUBLIC NONNULL((1, 2)) size_t KCALL
 mpart_mmapreadv(struct mpart *__restrict self,
                 struct iov_buffer const *__restrict buf,
-                size_t buf_offset, size_t num_bytes, pos_t filepos) {
+                size_t buf_offset, size_t num_bytes, pos_t filepos)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	(void)self;
 	(void)buf;
 	(void)buf_offset;

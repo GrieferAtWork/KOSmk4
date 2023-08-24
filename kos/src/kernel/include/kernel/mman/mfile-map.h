@@ -222,14 +222,14 @@ NOTHROW(FCALL mfile_map_fini)(struct mfile_map *__restrict self);
  * for creating reserved nodes when `self->mfm_file == NULL'. */
 #define mfile_map_isreserved(self) ((self)->mfm_file == __NULLPTR)
 #ifdef __INTELLISENSE__
-NONNULL((1)) void
+BLOCKING_IF(file && (flags & MAP_POPULATE)) NONNULL((1)) void
 mfile_map_init_and_acquire_or_reserved(struct mfile_map *__restrict self,
                                        struct mfile *file,
                                        PAGEDIR_PAGEALIGNED pos_t addr,
                                        PAGEDIR_PAGEALIGNED size_t num_bytes,
                                        unsigned int prot, unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY);
-FUNDEF NONNULL((1)) void FCALL
+BLOCKING_IF(file && (flags & MAP_POPULATE)) NONNULL((1)) void FCALL
 mfile_map_init_or_reserved(struct mfile_map *__restrict self,
                            struct mfile *file,
                            PAGEDIR_PAGEALIGNED pos_t addr,

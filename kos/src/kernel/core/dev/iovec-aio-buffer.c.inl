@@ -50,7 +50,7 @@ DECL_BEGIN
 
 
 /* Helper functions */
-PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) size_t
+PUBLIC NOBLOCK ATTR_PURE WUNUSED ATTR_IN(1) size_t
 NOTHROW(KCALL LOCAL_iov_buffer_size)(LOCAL_struct_iov_buffer const *__restrict self) {
 	size_t i, result;
 	result = self->iv_last + self->iv_head.ive_size;
@@ -60,7 +60,7 @@ NOTHROW(KCALL LOCAL_iov_buffer_size)(LOCAL_struct_iov_buffer const *__restrict s
 }
 
 
-PUBLIC NOBLOCK NONNULL((1, 2)) void
+PUBLIC NOBLOCK ATTR_IN(2) ATTR_OUT(1) void
 NOTHROW(KCALL LOCAL_iov_buffer_init_view_before)(LOCAL_struct_iov_buffer *__restrict self,
                                                  LOCAL_struct_iov_buffer const *__restrict base,
                                                  uintptr_t end_offset) {
@@ -86,7 +86,7 @@ NOTHROW(KCALL LOCAL_iov_buffer_init_view_before)(LOCAL_struct_iov_buffer *__rest
 	self->iv_last = end_offset - total;
 }
 
-PUBLIC NOBLOCK NONNULL((1, 2)) void
+PUBLIC NOBLOCK ATTR_IN(2) ATTR_OUT(1) void
 NOTHROW(KCALL LOCAL_iov_buffer_init_view_after)(LOCAL_struct_iov_buffer *__restrict self,
                                                 LOCAL_struct_iov_buffer const *__restrict base,
                                                 uintptr_t start_offset) {
@@ -114,7 +114,7 @@ NOTHROW(KCALL LOCAL_iov_buffer_init_view_after)(LOCAL_struct_iov_buffer *__restr
 	}
 }
 
-PUBLIC NOBLOCK NONNULL((1, 2)) void
+PUBLIC NOBLOCK ATTR_IN(2) ATTR_OUT(1) void
 NOTHROW(KCALL LOCAL_iov_buffer_init_view)(LOCAL_struct_iov_buffer *__restrict self,
                                           LOCAL_struct_iov_buffer const *__restrict base,
                                           uintptr_t start_offset, size_t num_bytes) {

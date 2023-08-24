@@ -1758,8 +1758,8 @@ FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mpart_writev_or_unlock_p(struct mpa
  *              being backed by VIO memory. In any case: the caller should
  *              just do a normal read  operation, behaving as though  this
  *              function didn't exist. */
-FUNDEF NONNULL((1)) size_t KCALL mpart_mmapread(struct mpart *__restrict self, NCX void *dst, size_t num_bytes, pos_t filepos);
-FUNDEF NONNULL((1, 2)) size_t KCALL mpart_mmapreadv(struct mpart *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos);
+FUNDEF NONNULL((1)) size_t KCALL mpart_mmapread(struct mpart *__restrict self, NCX void *dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL mpart_mmapreadv(struct mpart *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
 
 /* I/O size threshold that must be met or exceeded in order for `mpart_read()'
