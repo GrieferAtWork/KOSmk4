@@ -4450,7 +4450,7 @@ NOTHROW_NCX(LIBCCALL get_pthread_tls_segment)(void) {
 		/* Remember the handle. */
 		real_handle = atomic_cmpxch_val(&tls_handle, NULL, handle);
 		if unlikely(real_handle != NULL) {
-			dltlsfree(handle);
+			(void)dltlsfree(handle);
 			handle = real_handle;
 		}
 	}
@@ -4496,7 +4496,7 @@ NOTHROW_NCX(LIBCCALL get_pthread_tls_slot)(size_t id) {
 
 		/* If the old base was the static vector, then we must
 		 * manually copy over old TLS values. */
-		if (old_base == self->pts_static) {
+		if (self->pts_values == self->pts_static) {
 			memcpy(new_base, self->pts_static,
 			       self->pts_alloc, sizeof(void *));
 		}
