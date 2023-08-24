@@ -83,7 +83,7 @@
  * >> mmap(0x01234000, PAGESIZE, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_ANON, -1, 0);
  * >> mmap(0x01235000, PAGESIZE, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_ANON, -1, 0); // Automatically merged
  * >> mmap(0x01236000, PAGESIZE, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_ANON, -1, 0); // Automatically merged
- * >> munmap(0x01235000, PAGESIZE); // Automatically cases a split, but only within mem-nodes (mpart would be unaffected)
+ * >> munmap(0x01235000, PAGESIZE); // Automatically causes a split, but only within mem-nodes (mpart would be unaffected)
  *
  * The idea here is that the `munmap()' calls `mpart_trim()', which will
  * (asynchronously, and only in case the part is anonymous) look at  the

@@ -352,7 +352,7 @@ struct mfile_stream_ops {
 			THROWS(...);
 
 	/* [0..1] Print the text which should appear under `readlink("/proc/[pid]/fd/[fdno]")' */
-	BLOCKING WUNUSED_T NONNULL_T((1, 2)) ssize_t
+	BLOCKING NONNULL_T((1, 2)) ssize_t
 	(KCALL *mso_printlink)(struct mfile *__restrict self, __pformatprinter printer, void *arg)
 			THROWS(E_WOULDBLOCK, ...);
 

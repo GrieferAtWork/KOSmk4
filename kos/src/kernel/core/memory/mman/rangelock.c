@@ -97,7 +97,6 @@ NOTHROW(FCALL _mrangelock_tryacquire)(struct mrangelock *__restrict self,
 					 * then we  must release  all locks  and return  a
 					 * pointer to the blocking part! */
 					if (!mrangelock_is_locked_part(self, part)) {
-
 						/* Oops... Blocking part!
 						 * -> Release all locks already acquired. */
 						mrangelock_release(self);
