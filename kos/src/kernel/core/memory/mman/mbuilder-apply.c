@@ -350,7 +350,7 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 			rpc->pr_kern.k_func   = &killthread_for_exec_rpc;
 			*p_rpc_desc = rpc;
 		}
-		p_rpc_desc = &rpc->pr_link.sle_next;
+		p_rpc_desc = SLIST_PNEXT(rpc, pr_link);
 	}
 
 	/* === Pointer of no return:
