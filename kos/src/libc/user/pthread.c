@@ -4383,7 +4383,7 @@ struct pthread_tls_segment {
 	                         * overhead) */
 };
 
-PRIVATE void __LIBCCALL
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") void __LIBCCALL
 pthread_tls_segment_init(void *UNUSED(arg), void *base,
                          void *UNUSED(tls_segment)) {
 	struct pthread_tls_segment *me;
@@ -4392,7 +4392,7 @@ pthread_tls_segment_init(void *UNUSED(arg), void *base,
 	me->pts_alloc  = lengthof(me->pts_static);
 }
 
-PRIVATE void __LIBCCALL
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") void __LIBCCALL
 pthread_tls_segment_fini(void *UNUSED(arg), void *base,
                          void *UNUSED(tls_segment)) {
 	struct pthread_tls_segment *me;
@@ -4430,7 +4430,7 @@ pthread_tls_segment_fini(void *UNUSED(arg), void *base,
 /* Return the pthread TLS-segment for the calling thread,
  * allocating  it, as well  as `tls_handle' if necessary.
  * @return: NULL: Insufficient memory. */
-PRIVATE WUNUSED struct pthread_tls_segment *
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") WUNUSED struct pthread_tls_segment *
 NOTHROW_NCX(LIBCCALL get_pthread_tls_segment)(void) {
 	void *result;
 	void *handle = atomic_read(&tls_handle);
@@ -4472,7 +4472,7 @@ NOTHROW_NCX(LIBCCALL get_pthread_tls_segment)(void) {
  *       if it wasn't a valid id beforehand, it will kind-
  *       of become one (at  least for the calling  thread)
  *       once this function returns! */
-PRIVATE WUNUSED void **
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") WUNUSED void **
 NOTHROW_NCX(LIBCCALL get_pthread_tls_slot)(size_t id) {
 	struct pthread_tls_segment *self;
 	self = get_pthread_tls_segment();
@@ -4511,7 +4511,8 @@ NOTHROW_NCX(LIBCCALL get_pthread_tls_slot)(size_t id) {
 }
 
 /* No-op destructor used to mark TLS-slots without custom destructors as in-use. */
-PRIVATE void LIBKCALL noop_dtor(void *UNUSED(value)) {
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread")
+void LIBKCALL noop_dtor(void *UNUSED(value)) {
 }
 
 /*[[[head:libc_pthread_key_create,hash:CRC-32=0xa6ac1564]]]*/
