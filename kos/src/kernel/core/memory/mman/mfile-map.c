@@ -586,7 +586,7 @@ continue_with_pnode:
 		next = *p_node;
 		/* Figure out the bounds of a (potential) gap. */
 		gap_min_offset = 0;
-		gap_end_offset = self->mfm_size - 1;
+		gap_end_offset = self->mfm_size;
 		if (prev != NULL)
 			gap_min_offset = (uintptr_t)prev->mn_maxaddr + 1;
 		if (next != NULL)
@@ -676,6 +676,8 @@ continue_with_pnode:
 						gap_max_offset = (uintptr_t)removed_nodes_hi->mn_maxaddr;
 					new_node->mn_minaddr = (byte_t *)gap_min_offset;
 					new_node->mn_maxaddr = (byte_t *)gap_max_offset;
+					assert(IS_ALIGNED((uintptr_t)mnode_getminaddr(new_node), PAGESIZE));
+					assert(IS_ALIGNED((uintptr_t)mnode_getendaddr(new_node), PAGESIZE));
 
 					/* Free nodes that we've removed between p_node and the  duplicate.
 					 * However, exclude the duplicate node itself, since we're re-using
@@ -736,6 +738,8 @@ continue_with_pnode:
 			 *       that will be done by `mnode_slist_adjusted_mapped_ranges()' */
 			new_node->mn_minaddr = (byte_t *)gap_min_offset;
 			new_node->mn_maxaddr = (byte_t *)gap_max_offset;
+			assert(IS_ALIGNED((uintptr_t)mnode_getminaddr(new_node), PAGESIZE));
+			assert(IS_ALIGNED((uintptr_t)mnode_getendaddr(new_node), PAGESIZE));
 
 			/* Insert the new node and continue scanning for holes afterwards. */
 			SLIST_P_INSERT_BEFORE(p_node, new_node, _mn_alloc);
