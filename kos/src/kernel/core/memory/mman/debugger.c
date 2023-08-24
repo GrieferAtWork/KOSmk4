@@ -163,6 +163,10 @@ lsmm_enum_callback(void *UNUSED(arg), struct mmapinfo *__restrict info) {
 			if (special_name) {
 				dbg_setcolor(ANSITTY_CL_AQUA, ANSITTY_CL_DARK_GRAY);
 				dbg_print(special_name);
+			} else if (info->mmi_file->mf_ops->mo_stream &&
+			           info->mmi_file->mf_ops->mo_stream->mso_printlink) {
+				dbg_setcolor(ANSITTY_CL_FUCHSIA, ANSITTY_CL_BLACK);
+				(*info->mmi_file->mf_ops->mo_stream->mso_printlink)(info->mmi_file, &dbg_printer, NULL);
 			}
 		}
 	}

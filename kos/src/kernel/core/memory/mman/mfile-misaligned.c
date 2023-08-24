@@ -152,7 +152,7 @@ misaligned_mfile_v_printlink(struct mfile *__restrict self,
 	ssize_t temp, result;
 	struct misaligned_mfile *me;
 	me     = mfile_asmisaligned(self);
-	result = (*printer)(arg, "[", 1);
+	result = (*printer)(arg, "misaligned:[", 12);
 	if unlikely(result < 0)
 		goto done;
 	temp = mfile_uprintlink(me->mam_base, printer, arg);
