@@ -216,6 +216,20 @@ mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
 	shift_t blockshift;
 	assertf(mfile_hasrawio(inner), "The underlying file must support RAW I/O");
 
+	/* TODO: mfile-s need to maintain a list of linked misaligned files,
+	 *       and the misaligned files  themselves must NOT be  anonymous
+	 *       from the get-go.
+	 * This is required so that `ftruncate(2)' can force-load  MAP_PRIVATE
+	 * mappings of misaligned wrappers into memory before they are deleted
+	 * from disk.
+	 *
+	 * Essentially,  misaligned  wrappers need  the extra  requirement that
+	 * their misalignment must  be `<= mam_base->mf_part_amask', and  there
+	 * needs to  be a  singly-linked-list  (sorted by  `mam_offs',  deleted
+	 * when `MFILE_F_DELETED' gets set, and locked by mfile_tslock_acquire)
+	 * that keeps track of all  currently allocated misaligned wrappers  of
+	 * some given mfile. */
+
 	if unlikely(inner->mf_ops->mo_loadblocks == NULL)
 		goto return_inner; /* File offsets don't matter in this case! */
 	if unlikely(inner_fpos == 0)
