@@ -42,6 +42,7 @@
 #include <kernel/mman/cc.h>
 #include <kernel/mman/driver.h>
 #include <kernel/mman/execinfo.h>
+#include <kernel/mman/fault.h>
 #include <kernel/mman/futexfd.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
@@ -858,6 +859,24 @@ procfs_kos_mm_stat_printer(pformatprinter printer, void *arg,
 	       partcount);
 }
 
+
+
+
+/************************************************************************/
+/* /proc/kos/mm/part-autosplit-threshold                                */
+/************************************************************************/
+INTERN NONNULL((1)) void KCALL
+procfs_r_kos_mm_kernel_part_autosplit_threshold_print(pformatprinter printer, void *arg,
+                                                      pos_t UNUSED(offset_hint)) {
+	size_t val = atomic_read(&mfault_autosplit_threshold);
+	ProcFS_PrintSize(printer, arg, val);
+}
+INTERN void KCALL
+procfs_r_kos_mm_kernel_part_autosplit_threshold_write(NCX void const *buf,
+                                                      size_t bufsize) {
+	size_t newval = ProcFS_ParseSize(buf, bufsize);
+	atomic_write(&mfault_autosplit_threshold, newval);
+}
 
 
 

@@ -987,6 +987,22 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
                         struct mpart_setcore_data *__restrict data)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
+/* Based on `mfault_autosplit_threshold', possibly split `self',
+ * in  which case  locks are  released and  `false' is returned.
+ *
+ * This should  be called  before `mpart_setcore_or_unlock()',  so
+ * that if the part hasn't been loaded into the core, and the area
+ * which the caller intends to  access isn't very large, then  try
+ * to  split the part into a couple  of smaller parts, so that the
+ * range that needs to be  loaded into the core (read:  allocated)
+ * becomes smaller. */
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+mpart_maybesplit_or_unlock(struct mpart *__restrict self,
+                           struct unlockinfo *unlock,
+                           mpart_reladdr_t partrel_offset,
+                           size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+
 /* Ensure that all blocks (within the given range of blocks)
  * are either `MPART_BLOCK_ST_LOAD' or `MPART_BLOCK_ST_CHNG'
  * The caller must ensure that...

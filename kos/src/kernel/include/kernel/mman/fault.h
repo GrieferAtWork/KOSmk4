@@ -308,6 +308,26 @@ mfault_or_unlock(struct mfault *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY, ...);
 
 
+/* Threshold (in bytes) that specifies the upper limit on how many bytes
+ * of physical memory  are (technically useless)  allocated in calls  to
+ * `mpart_setcore_or_unlock()',  even  when only  parts of  the mem-part
+ * actually  need to be allocated as a result of `mfault_or_unlock()' or
+ * some other operation that requires parts to loaded into memory.
+ *
+ * Note that this "overallocation" never poses a problem for available
+ * system memory, as such memory  (if truly unused) is always  trimmed
+ * in calls to `system_cc()' (as invoked during OOM), so this hint  is
+ * only meaningful to  differentiate between  fragmentation of  memory
+ * (which  happens more frequently  the lower this  value is), and the
+ * allocation of "unused" memory (which happens more often the  higher
+ * this value is)
+ *
+ * NOTES:
+ * - This value is ignored for parts with the `MPART_F_NOSPLIT' flag
+ * - The default value for this option is "64 * PAGESIZE"
+ *
+ * The value of this variable is exposed in `/proc/kos/mm/part-autosplit-threshold' */
+DATDEF size_t mfault_autosplit_threshold;
 
 DECL_END
 #endif /* __CC__ */

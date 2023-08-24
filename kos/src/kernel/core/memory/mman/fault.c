@@ -45,6 +45,7 @@
 #include <kos/except.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -55,6 +56,27 @@ DECL_BEGIN
 #else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
+
+/* Threshold (in bytes) that specifies the upper limit on how many bytes
+ * of physical memory  are (technically useless)  allocated in calls  to
+ * `mpart_setcore_or_unlock()',  even  when only  parts of  the mem-part
+ * actually  need to be allocated as a result of `mfault_or_unlock()' or
+ * some other operation that requires parts to loaded into memory.
+ *
+ * Note that this "overallocation" never poses a problem for available
+ * system memory, as such memory  (if truly unused) is always  trimmed
+ * in calls to `system_cc()' (as invoked during OOM), so this hint  is
+ * only meaningful to  differentiate between  fragmentation of  memory
+ * (which  happens more frequently  the lower this  value is), and the
+ * allocation of "unused" memory (which happens more often the  higher
+ * this value is)
+ *
+ * NOTES:
+ * - This value is ignored for parts with the `MPART_F_NOSPLIT' flag
+ * - The default value for this option is "64 * PAGESIZE"
+ *
+ * The value of this variable is exposed in `/proc/kos/mm/part-autosplit-threshold' */
+PUBLIC ATTR_READMOSTLY size_t mfault_autosplit_threshold = 64 * PAGESIZE;
 
 
 /* Try to pre-fault access to the given addres range, such that `memcpy_nopf()'
@@ -674,27 +696,12 @@ mfault_or_unlock(struct mfault *__restrict self)
 	assert(acc_offs + acc_size > acc_offs);
 	assert(acc_offs + acc_size <= mpart_getsize(part));
 
-#if 1
-	/* If the part hasn't been loaded into the core, and the area we're
-	 * going  to access is so large enough,  then try to split the part
-	 * into a couple of smaller parts, so that the range that needs  to
-	 * be loaded into the core becomes smaller. */
-	if (!MPART_ST_INCORE(part->mp_state) && !(part->mp_flags & MPART_F_NOSPLIT)) {
-		PAGEDIR_PAGEALIGNED size_t part_size       = mpart_getsize(part);
-		PAGEDIR_PAGEALIGNED size_t split_threshold = self->mfl_size * 64; /* TODO: Make this configurable */
-		if (part_size > split_threshold) {
-			PAGEDIR_PAGEALIGNED pos_t split1_filepos;
-			PAGEDIR_PAGEALIGNED pos_t split2_filepos;
-			split1_filepos = part->mp_minaddr + acc_offs;
-			split2_filepos = split1_filepos + acc_size;
-			mpart_lock_release(part);
-			unlockinfo_unlock(&self->mfl_unlck);
-			xdecref(mpart_split(part, split1_filepos));
-			xdecref(mpart_split(part, split2_filepos));
-			goto nope;
-		}
-	}
-#endif
+	/* If the part hasn't been loaded into the core, and the area  we're
+	 * going to access isn't very large, then try to split the part into
+	 * a couple of  smaller parts, so  that the range  that needs to  be
+	 * loaded into the core (read: allocated) becomes smaller. */
+	if (!mpart_maybesplit_or_unlock(part, &self->mfl_unlck, acc_offs, acc_size))
+		goto nope;
 
 	/* Whatever happens, we always need the part to be re-locked into the core. */
 	if (!mpart_setcore_or_unlock(part, &self->mfl_unlck, &self->mfl_scdat))

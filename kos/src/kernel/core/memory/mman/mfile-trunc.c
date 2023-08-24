@@ -25,6 +25,7 @@
 
 #include <kernel/fs/node.h>
 #include <kernel/fs/super.h>
+#include <kernel/mman/fault.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
@@ -155,33 +156,17 @@ NOTHROW(FCALL mpart_load_private_node_or_unlock_unlockcb)(struct unlockinfo *__r
 
 PRIVATE BLOCKING NONNULL((1, 4)) bool FCALL
 mpart_load_private_node_setcore_or_unlock(struct mpart *__restrict self,
-                                          PAGEDIR_PAGEALIGNED mpart_reladdr_t minaddr,
-                                          PAGEDIR_PAGEALIGNED mpart_reladdr_t endaddr,
+                                          mpart_reladdr_t minaddr, size_t num_bytes,
                                           struct unlockinfo *unlock) {
 	bool ok;
 	struct mpart_setcore_data sc_data;
 
-#if 1 /* s.a. `mfault_or_unlock()' */
-	if (/*!MPART_ST_INCORE(self->mp_state) &&*/ !(self->mp_flags & MPART_F_NOSPLIT)) {
-		PAGEDIR_PAGEALIGNED size_t acc_size        = endaddr - minaddr;
-		PAGEDIR_PAGEALIGNED size_t part_size       = mpart_getsize(self);
-		PAGEDIR_PAGEALIGNED size_t split_threshold = acc_size * 64; /* TODO: Make this configurable */
-		if (part_size > split_threshold) {
-			PAGEDIR_PAGEALIGNED pos_t split1_filepos;
-			PAGEDIR_PAGEALIGNED pos_t split2_filepos;
-			split1_filepos = self->mp_minaddr + minaddr;
-			split2_filepos = split1_filepos + acc_size;
-			incref(self);
-			_mpart_lock_release(self);
-			unlockinfo_unlock(unlock);
-			mpart_lockops_reap(self);
-			xdecref(mpart_split(self, split1_filepos));
-			xdecref(mpart_split(self, split2_filepos));
-			decref_unlikely(self);
-			return false;
-		}
-	}
-#endif
+	/* If the part hasn't been loaded into the core, and the area  we're
+	 * going to access isn't very large, then try to split the part into
+	 * a couple of  smaller parts, so  that the range  that needs to  be
+	 * loaded into the core (read: allocated) becomes smaller. */
+	if (!mpart_maybesplit_or_unlock(self, unlock, minaddr, num_bytes))
+		return false;
 
 	/* Force-allocate this mem-part. */
 	mpart_setcore_data_init(&sc_data);
@@ -204,10 +189,9 @@ mpart_load_private_node_setcore_or_unlock(struct mpart *__restrict self,
 
 PRIVATE BLOCKING NONNULL((1)) bool FCALL
 mpart_load_private_node_or_unlock(struct mpart *__restrict self,
-                                  PAGEDIR_PAGEALIGNED mpart_reladdr_t minaddr,
-                                  PAGEDIR_PAGEALIGNED mpart_reladdr_t endaddr) {
+                                  mpart_reladdr_t minaddr,
+                                  size_t num_bytes) {
 	struct mpart_load_private_node_or_unlock_unlockinfo unlock;
-	assert(endaddr > minaddr);
 	unlock.mplpnouu_info.ui_unlock = &mpart_load_private_node_or_unlock_unlockcb;
 	unlock.mplpnouu_file           = self->mp_file;
 	unlock.mplpnouu_part           = self;
@@ -215,14 +199,13 @@ mpart_load_private_node_or_unlock(struct mpart *__restrict self,
 	/* Must also assert that the part is allocated. */
 	if (!MPART_ST_INCORE(self->mp_state)) {
 		bool ok;
-		ok = mpart_load_private_node_setcore_or_unlock(self, minaddr, endaddr,
+		ok = mpart_load_private_node_setcore_or_unlock(self, minaddr, num_bytes,
 		                                               &unlock.mplpnouu_info);
 		if (!ok)
 			return false;
 	}
 
-	return mpart_load_or_unlock(self, &unlock.mplpnouu_info,
-	                            minaddr, endaddr - minaddr);
+	return mpart_load_or_unlock(self, &unlock.mplpnouu_info, minaddr, num_bytes);
 }
 
 
@@ -272,7 +255,8 @@ mpart_load_private_nodes_or_unlock(struct mpart *__restrict self,
 		}
 
 		/* Ensure that this sub-range is loaded. */
-		ok = mpart_load_private_node_or_unlock(self, node_minaddr, node_endaddr);
+		ok = mpart_load_private_node_or_unlock(self, node_minaddr,
+		                                       node_endaddr - node_minaddr);
 		if (!ok)
 			return false;
 	}

@@ -27,6 +27,7 @@
 #include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/mman/cc.h>
+#include <kernel/mman/fault.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart-blkst.h>
@@ -930,6 +931,61 @@ nope:
 	return false;
 }
 
+
+/* Based on `mfault_autosplit_threshold', possibly split `self',
+ * in  which case  locks are  released and  `false' is returned.
+ *
+ * This should  be called  before `mpart_setcore_or_unlock()',  so
+ * that if the part hasn't been loaded into the core, and the area
+ * which the caller intends to  access isn't very large, then  try
+ * to  split the part into a couple  of smaller parts, so that the
+ * range that needs to be  loaded into the core (read:  allocated)
+ * becomes smaller. */
+PUBLIC WUNUSED NONNULL((1)) bool FCALL
+mpart_maybesplit_or_unlock(struct mpart *__restrict self,
+                           struct unlockinfo *unlock,
+                           mpart_reladdr_t partrel_offset,
+                           size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+	PAGEDIR_PAGEALIGNED pos_t split1_filepos;
+	PAGEDIR_PAGEALIGNED pos_t split2_filepos;
+	mpart_reladdr_t filealigned_min;
+	mpart_reladdr_t filealigned_end;
+	size_t filealigned_siz, split_threshold, part_size;
+	assert(num_bytes != 0);
+	assert((partrel_offset + num_bytes) > partrel_offset);
+	assert((partrel_offset + num_bytes) <= mpart_getsize(self));
+	if (MPART_ST_INCORE(self->mp_state))
+		return true; /* No need to split -> part is already in-core. */
+	if (self->mp_flags & MPART_F_NOSPLIT)
+		return true; /* No allowed to split */
+
+	/* Quick (and imprecise) check if the split is actually necessary */
+	split_threshold = num_bytes + atomic_read(&mfault_autosplit_threshold);
+	part_size       = mpart_getsize(self);
+	if likely(split_threshold >= part_size)
+		return true; /* No reason to split */
+
+	/* Calculat the *actual* positions of the split so we can do this properly. */
+	filealigned_min = mfile_partsize_flooralign(self->mp_file, partrel_offset);
+	filealigned_end = mfile_partsize_ceilalign(self->mp_file, partrel_offset + num_bytes);
+	filealigned_siz = filealigned_end - filealigned_min;
+	split_threshold = filealigned_siz + atomic_read(&mfault_autosplit_threshold);
+	if (split_threshold >= part_size)
+		return true; /* No reason to split */
+
+	/* Go ahead and release locks, then do the split. */
+	split1_filepos = self->mp_minaddr + filealigned_min;
+	split2_filepos = self->mp_minaddr + filealigned_end;
+	incref(self);
+	_mpart_lock_release(self);
+	unlockinfo_xunlock(unlock);
+	mpart_lockops_reap(self);
+	FINALLY_DECREF_UNLIKELY(self);
+	xdecref(mpart_split(self, split1_filepos));
+	xdecref(mpart_split(self, split2_filepos));
+	return false;
+}
 
 
 /* Ensure that all blocks (within the given range of blocks)
@@ -2013,8 +2069,13 @@ again:
 	if (OVERFLOW_USUB(mpart_getmaxaddr(self), filepos, &loadbytes))
 		goto unlock_and_err;
 
-	/* Check: is the part already in the expected state? */
 	if (!MPART_ST_INCORE(self->mp_state)) {
+		/* If the part hasn't been loaded into the core, and the area  we're
+		 * going to access isn't very large, then try to split the part into
+		 * a couple of  smaller parts, so  that the range  that needs to  be
+		 * loaded into the core (read: allocated) becomes smaller. */
+		if (!mpart_maybesplit_or_unlock(self, NULL, reladdr, loadbytes + 1))
+			goto again;
 		mpart_setcore_data_init(&data);
 		TRY {
 			while (!mpart_setcore_or_unlock(self, NULL, &data)) {
@@ -2099,6 +2160,7 @@ mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self,
                                           pos_t filepos, size_t max_load_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	mpart_reladdr_t part_offs, part_size;
+again:
 	mpart_lock_acquire(self);
 
 	/* Check if the given `filepos' is in-bounds of `self' */
@@ -2121,6 +2183,12 @@ ensure_setcore_with_unshare:
 again_ensure_incore_for_write:
 			if (!MPART_ST_INCORE(self->mp_state)) {
 				struct mpart_setcore_data data;
+				/* If the part hasn't been loaded into the core, and the area  we're
+				 * going to access isn't very large, then try to split the part into
+				 * a couple of  smaller parts, so  that the range  that needs to  be
+				 * loaded into the core (read: allocated) becomes smaller. */
+				if (!mpart_maybesplit_or_unlock(self, NULL, part_offs, part_size))
+					goto again;
 				mpart_setcore_data_init(&data);
 				TRY {
 					while (!mpart_setcore_or_unlock(self, NULL, &data)) {
@@ -2171,6 +2239,12 @@ ensure_setcore_without_unshare:
 		/* Make sure that in-core data is available. */
 		if (!MPART_ST_INCORE(self->mp_state)) {
 			struct mpart_setcore_data data;
+			/* If the part hasn't been loaded into the core, and the area  we're
+			 * going to access isn't very large, then try to split the part into
+			 * a couple of  smaller parts, so  that the range  that needs to  be
+			 * loaded into the core (read: allocated) becomes smaller. */
+			if (!mpart_maybesplit_or_unlock(self, NULL, part_offs, part_size))
+				goto again;
 			mpart_setcore_data_init(&data);
 			TRY {
 				while (!mpart_setcore_or_unlock(self, NULL, &data)) {
