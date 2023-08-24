@@ -597,8 +597,8 @@ libdl_dltlsbase(DlModule *__restrict self) THROWS(...);
  * ATTR_THREAD-based TLS memory also works. - However, using these functions, TLS memory  can
  * be allocated dynamically at runtime (behaving the same as a call to `dlopen(3D)' loading a
  * module containing a TLS segment would).
- * @param: num_bytes:      The size of the TLS segment (in bytes)
  * @param: min_alignment:  The minimum alignment requirements for the TLS segment base address.
+ * @param: num_bytes:      The size of the TLS segment (in bytes)
  * @param: template_data:  Base address of an initialization template.
  *                         The first `template_size' bytes  of any per-thread data  segment
  *                         that gets allocated will be initialized to the contents of these
@@ -642,7 +642,7 @@ libdl_dltlsbase(DlModule *__restrict self) THROWS(...);
  *                         passing it to `dltlsfree(3D)'
  * @return: NULL:          Failed to allocate the TLS segment (s.a. `dlerror()') */
 INTDEF WUNUSED DlModule *
-NOTHROW(DLFCN_CC libdl_dltlsalloc)(size_t num_bytes, size_t min_alignment,
+NOTHROW(DLFCN_CC libdl_dltlsalloc)(size_t min_alignment, size_t num_bytes,
                                    NCX void const *template_data, size_t template_size,
                                    void (DLFCN_CC NCX *perthread_init)(void *arg, void *base, void *tls_segment),
                                    void (DLFCN_CC NCX *perthread_fini)(void *arg, void *base, void *tls_segment),

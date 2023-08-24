@@ -124,7 +124,7 @@ typedef WUNUSED_T NONNULL_T((1)) void *NOTHROW_NCX_T(DLFCN_CC *PDLMODULEBASE)(vo
 typedef WUNUSED_T NONNULL_T((1)) int NOTHROW_NCX_T(DLFCN_CC *PDLEXCEPTAWARE)(void *handle);
 typedef WUNUSED_T NONNULL_T((1)) void *(__DLFCN_DLTLSADDR_CC *PDLTLSADDR)(void *tls_handle) /*THROWS(...)*/;
 typedef WUNUSED_T NONNULL_T((1, 2)) void *(__DLFCN_DLTLSADDR2_CC *PDLTLSADDR2)(void *tls_handle, void *tls_segment) /*THROWS(...)*/;
-typedef WUNUSED_T void *NOTHROW_T(DLFCN_CC *PDLTLSALLOC)(size_t num_bytes, size_t min_alignment,
+typedef WUNUSED_T void *NOTHROW_T(DLFCN_CC *PDLTLSALLOC)(size_t min_alignment, size_t num_bytes,
                                                          void const *template_data, size_t template_size,
                                                          void (LIBCCALL *perthread_init)(void *arg, void *base, void *tls_segment),
                                                          void (LIBCCALL *perthread_fini)(void *arg, void *base, void *tls_segment),

@@ -482,8 +482,8 @@ NOTHROW_NCX(LIBCCALL get_cthread_tls_segment)(pthread_t self) {
 	if unlikely(!handle) {
 		void *real_handle;
 		/* Allocate on first access. */
-		handle = dltlsalloc(/* num_bytes:              */ sizeof(struct cthread_tls_segment),
-		                    /* min_alignment:          */ alignof(struct cthread_tls_segment),
+		handle = dltlsalloc(/* min_alignment:          */ alignof(struct cthread_tls_segment),
+		                    /* num_bytes:              */ sizeof(struct cthread_tls_segment),
 		                    /* template_data:          */ NULL,
 		                    /* template_size:          */ 0,
 		                    /* perthread_init:         */ NULL,

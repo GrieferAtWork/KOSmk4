@@ -37,7 +37,7 @@
 
 DECL_BEGIN
 
-LOCAL NONNULL((1, 3, 4)) ssize_t CC
+PRIVATE NONNULL((1, 3, 4)) ssize_t CC
 encode_escape_backslash(pformatprinter printer, void *arg,
                         char const *arg_start,
                         char const *arg_end) {
@@ -68,7 +68,7 @@ err:
 	return temp;
 }
 
-LOCAL NONNULL((1, 3, 4)) ssize_t CC
+PRIVATE NONNULL((1, 3, 4)) ssize_t CC
 encode_escape_spc(pformatprinter printer, void *arg,
                   char const *arg_start,
                   char const *arg_end) {
@@ -99,7 +99,7 @@ err:
 	return temp;
 }
 
-LOCAL NONNULL((1, 3, 4)) ssize_t CC
+PRIVATE NONNULL((1, 3, 4)) ssize_t CC
 encode_escape_all(pformatprinter printer, void *arg,
                   char const *arg_start,
                   char const *arg_end) {
@@ -130,7 +130,7 @@ err:
 	return temp;
 }
 
-LOCAL NONNULL((1, 3, 4)) ssize_t CC
+PRIVATE NONNULL((1, 3, 4)) ssize_t CC
 encode_escape_q(pformatprinter printer, void *arg,
                 char const *arg_start,
                 char const *arg_end, char qchar) {
@@ -161,7 +161,7 @@ err:
 	return temp;
 }
 
-LOCAL NONNULL((1, 3)) ssize_t CC
+PRIVATE NONNULL((1, 3)) ssize_t CC
 encode_quote(pformatprinter printer, void *arg,
              char const *arg_start,
              size_t arg_len, char qchar,
@@ -185,7 +185,7 @@ err:
 	return temp;
 }
 
-LOCAL NONNULL((1, 3, 4)) ssize_t CC
+PRIVATE NONNULL((1, 3, 4)) ssize_t CC
 encode_escape_quote(pformatprinter printer, void *arg,
                     char const *arg_start,
                     char const *arg_end,

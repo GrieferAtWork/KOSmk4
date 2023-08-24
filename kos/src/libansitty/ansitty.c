@@ -767,7 +767,7 @@ resetterminal(struct ansitty *__restrict self,
 	if (self->at_ops.ato_termios) {
 		struct termios oldios, newios;
 		for (;;) {
-			(*self->at_ops.ato_termios)(self, &oldios, NULL);
+			(void)(*self->at_ops.ato_termios)(self, &oldios, NULL);
 			memcpy(&newios, &oldios, sizeof(struct termios));
 			newios.c_oflag |= ONLCR;
 			/* After  a reset (or  power-on), a terminal is  supposed to clear the
@@ -1367,7 +1367,7 @@ ansi_DCS(struct ansitty *__restrict self,
 
 			if (self->at_ops.ato_termios) {
 				struct termios ios;
-				(*self->at_ops.ato_termios)(self, &ios, NULL);
+				(void)(*self->at_ops.ato_termios)(self, &ios, NULL);
 
 				/* \e[?24h   AH1   Autohardcopy before erasing or rolling GIGI screen */
 				/* \e[?24l   AH0   No auto-hardcopy when GIGI screen erased AH0 */
@@ -2272,7 +2272,7 @@ done_insert_ansitty_flag_hedit:
 				if (self->at_ops.ato_termios) {
 					struct termios oldios, newios;
 					for (;;) {
-						(*self->at_ops.ato_termios)(self, &oldios, NULL);
+						(void)(*self->at_ops.ato_termios)(self, &oldios, NULL);
 						memcpy(&newios, &oldios, sizeof(struct termios));
 						if (lastch == 'h') {
 							/* Enable ECHOPRT */
@@ -2366,7 +2366,7 @@ done_insert_ansitty_flag_hedit:
 				if (self->at_ops.ato_termios) {
 					struct termios oldios, newios;
 					for (;;) {
-						(*self->at_ops.ato_termios)(self, &oldios, NULL);
+						(void)(*self->at_ops.ato_termios)(self, &oldios, NULL);
 						memcpy(&newios, &oldios, sizeof(struct termios));
 						if (lastch == 'h') {
 							/* Disable __IIOFF */
@@ -2437,7 +2437,7 @@ done_insert_ansitty_flag_hedit:
 				if (self->at_ops.ato_termios) {
 					struct termios oldios, newios;
 					for (;;) {
-						(*self->at_ops.ato_termios)(self, &oldios, NULL);
+						(void)(*self->at_ops.ato_termios)(self, &oldios, NULL);
 						memcpy(&newios, &oldios, sizeof(struct termios));
 						if (lastch == 'h') {
 							/* Disable ECHO */
@@ -2476,7 +2476,7 @@ done_insert_ansitty_flag_hedit:
 				if (self->at_ops.ato_termios) {
 					struct termios oldios, newios;
 					for (;;) {
-						(*self->at_ops.ato_termios)(self, &oldios, NULL);
+						(void)(*self->at_ops.ato_termios)(self, &oldios, NULL);
 						memcpy(&newios, &oldios, sizeof(struct termios));
 						if (lastch == 'h') {
 							newios.c_oflag |= ONLCR;
@@ -2852,7 +2852,7 @@ done_insert_ansitty_flag_hedit:
 					result = 4;
 					if (self->at_ops.ato_termios) {
 						struct termios ios;
-						(*self->at_ops.ato_termios)(self, &ios, NULL);
+						(void)(*self->at_ops.ato_termios)(self, &ios, NULL);
 						result = ios.c_lflag & __IIOFF ? 1 : 2;
 					}
 					break;
@@ -2888,7 +2888,7 @@ done_insert_ansitty_flag_hedit:
 					result = 4;
 					if (self->at_ops.ato_termios) {
 						struct termios ios;
-						(*self->at_ops.ato_termios)(self, &ios, NULL);
+						(void)(*self->at_ops.ato_termios)(self, &ios, NULL);
 						result = ios.c_lflag & ECHO ? 1 : 2;
 					}
 					break;
@@ -2898,7 +2898,7 @@ done_insert_ansitty_flag_hedit:
 					result = 3;
 					if (self->at_ops.ato_termios) {
 						struct termios ios;
-						(*self->at_ops.ato_termios)(self, &ios, NULL);
+						(void)(*self->at_ops.ato_termios)(self, &ios, NULL);
 						result = ios.c_oflag & ONLCR ? 1 : 2;
 					}
 					break;

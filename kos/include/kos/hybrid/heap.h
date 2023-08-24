@@ -27,7 +27,7 @@
 #ifdef __INTELLISENSE__
 #include <bits/types.h>
 #include <kos/anno.h>
-#define OS_HEAP_HASGFP 1
+#define OS_HEAP_HASGFP
 #define _os_heap_gfparg(var_name)   , int var_name
 #define _os_heap_gfppar(var_name)   , var_name
 #define os_heap_gfparg_(var_name)   int var_name,
@@ -39,7 +39,7 @@
 #define os_heap_gfpset(var_name, v) var_name = (v)
 #elif defined(__KERNEL__)
 #include <kernel/malloc-defs.h>
-#define OS_HEAP_HASGFP 1
+#define OS_HEAP_HASGFP
 #define _os_heap_gfparg(var_name)   , gfp_t var_name
 #define _os_heap_gfppar(var_name)   , var_name
 #define os_heap_gfparg_(var_name)   gfp_t var_name,

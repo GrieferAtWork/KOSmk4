@@ -287,6 +287,7 @@ NOTHROW_NCX(LIBUNWIND_CC after_unwind_getreg)(/*struct cfientry **/ void const *
 	struct cfientry *self;
 	size_t i;
 	self = (struct cfientry *)arg;
+
 	/* Check if the register can be found as part of unwind information. */
 	BSEARCH(i, self->ce_unwind_regv, self->ce_unwind_regc, .ur_regno, dw_regno) {
 		/* Found it! */
@@ -294,6 +295,7 @@ NOTHROW_NCX(LIBUNWIND_CC after_unwind_getreg)(/*struct cfientry **/ void const *
 		       CFI_REGISTER_SIZE(self->ce_emulator->ue_addrsize, dw_regno));
 		return UNWIND_SUCCESS;
 	}
+
 	/* Forward the request to the underlying register accessor function. */
 	return (*self->ce_regget)(self->ce_regget_arg, dw_regno, dst);
 }

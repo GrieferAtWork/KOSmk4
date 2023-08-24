@@ -639,8 +639,8 @@ __IMPDEF __ATTR_NONNULL((1)) int
  * ATTR_THREAD-based TLS memory also works. - However, using these functions, TLS memory  can
  * be allocated dynamically at runtime (behaving the same as a call to `dlopen(3D)' loading a
  * module containing a TLS segment would).
- * @param: num_bytes:      The size of the TLS segment (in bytes)
  * @param: min_alignment:  The minimum alignment requirements for the TLS segment base address.
+ * @param: num_bytes:      The size of the TLS segment (in bytes)
  * @param: template_data:  Base address of an initialization template.
  *                         The first `template_size' bytes  of any per-thread data  segment
  *                         that gets allocated will be initialized to the contents of these
@@ -685,7 +685,7 @@ __IMPDEF __ATTR_NONNULL((1)) int
  * @return: NULL:          Failed to allocate the TLS segment (s.a. `dlerror(3D)') */
 #ifdef __CRT_HAVE_dltlsalloc
 __IMPDEF __ATTR_WUNUSED void *
-__NOTHROW(__DLFCN_CC dltlsalloc)(__size_t __num_bytes, __size_t __min_alignment,
+__NOTHROW(__DLFCN_CC dltlsalloc)(__size_t __min_alignment, __size_t __num_bytes,
                                  void const *__template_data, __size_t __template_size,
                                  void (__DLFCN_CC *__perthread_init)(void *__arg, void *__base, void *__tls_segment),
                                  void (__DLFCN_CC *__perthread_fini)(void *__arg, void *__base, void *__tls_segment),
