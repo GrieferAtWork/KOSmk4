@@ -248,6 +248,10 @@ mpart_mmapread(struct mpart *__restrict self, NCX void *dst,
 	map_file = incref(self->mp_file);
 	mpart_lock_release(self);
 
+	/* Assert that the file supports "raw" I/O (iow: can be mmap'd normally) */
+	if unlikely(!mfile_hasrawio(map_file))
+		goto done_map_file;
+
 	/* Check if the file is unaligned.
 	 * -> If so, then we have to create a misaligned wrapper file
 	 *
