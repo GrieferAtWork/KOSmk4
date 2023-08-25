@@ -1468,7 +1468,7 @@ NOTHROW(FCALL mfile_insert_and_merge_part_and_unlock)(struct mfile *__restrict s
 
 
 /************************************************************************/
-/* Mfile part locking helpers.                                          */
+/* MFile part locking helpers.                                          */
 /************************************************************************/
 
 /* Acquire locks to all of the mem-parts associated with a given mfile.
@@ -1538,6 +1538,53 @@ FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mfile_parts_denywrite_or_unlock(struct mfile *__restrict self,
                                 struct unlockinfo *unlock DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY);
+
+
+/* MFile part locking helpers that also lock misaligned wrappers of `self'
+ * In addition  to what  the  non-*_with_msalign-version do,  these  also:
+ * - tryincref() all files from `self->mf_msalign'
+ * - Remove all dead files from `self->mf_msalign'
+ * - Acquire `mfile_lock_write()'-locks to all files from `self->mf_msalign'
+ * - Recursively incref()+acquire locks to all parts of files from `self->mf_msalign' */
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+mfile_incref_and_lock_parts_with_msalign_or_unlock(struct mfile *__restrict self,
+                                                   struct unlockinfo *unlock DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK);
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_unlock_and_decref_parts_with_msalign)(struct mfile *__restrict self);
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mfile_unlock_and_decref_parts_with_msalign_except)(struct mfile *__restrict self,
+                                                                 struct mpart *__restrict part);
+
+/* Returns either a reference to a blocking part, or to a blocking file. */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF void *
+NOTHROW(FCALL mfile_tryincref_and_lock_parts_with_msalign)(struct mfile *__restrict self);
+#define mfile_tryincref_and_lock_parts_with_msalign__forpart(v) ((REF void *)((uintptr_t)(v)))
+#define mfile_tryincref_and_lock_parts_with_msalign__forfile(v) ((REF void *)((uintptr_t)(v) | 1))
+#define mfile_tryincref_and_lock_parts_with_msalign__ispart(v) (((uintptr_t)(v) & 1) == 0)
+#define mfile_tryincref_and_lock_parts_with_msalign__isfile(v) (((uintptr_t)(v) & 1) != 0)
+#define mfile_tryincref_and_lock_parts_with_msalign__aspart(v) ((REF struct mpart *)(v))
+#define mfile_tryincref_and_lock_parts_with_msalign__asfile(v) ((REF struct mfile *)((uintptr_t)(v) & ~1))
+#define mfile_tryincref_and_lock_parts_with_msalign__decref(v)        \
+	(mfile_tryincref_and_lock_parts_with_msalign__ispart(v)           \
+	 ? decref(mfile_tryincref_and_lock_parts_with_msalign__aspart(v)) \
+	 : decref(mfile_tryincref_and_lock_parts_with_msalign__asfile(v)))
+#define mfile_tryincref_and_lock_parts_with_msalign__waitfor_and_decref(v)        \
+	do {                                                                          \
+		if (mfile_tryincref_and_lock_parts_with_msalign__ispart(v)) {             \
+			REF struct mpart *_wfad_bpart;                                        \
+			_wfad_bpart = mfile_tryincref_and_lock_parts_with_msalign__aspart(v); \
+			FINALLY_DECREF_UNLIKELY(_wfad_bpart);                                 \
+			mpart_lock_waitfor(_wfad_bpart);                                      \
+		} else {                                                                  \
+			REF struct mfile *_wfad_bfile;                                        \
+			_wfad_bfile = mfile_tryincref_and_lock_parts_with_msalign__asfile(v); \
+			FINALLY_DECREF_UNLIKELY(_wfad_bfile);                                 \
+			mfile_lock_waitwrite(_wfad_bfile);                                    \
+		}                                                                         \
+	}	__WHILE0
+
+
 
 
 

@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_TRUNC_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_TRUNC_C 1
+#define __WANT_MPART__mp_nodlsts
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -26,6 +27,7 @@
 #include <kernel/fs/node.h>
 #include <kernel/fs/super.h>
 #include <kernel/mman/fault.h>
+#include <kernel/mman/mfile-misaligned.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
@@ -52,17 +54,44 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
+#define LOCAL_unlock_all()                             \
+	(mfile_unlock_and_decref_parts_with_msalign(self), \
+	 mfile_lock_endwrite(self))
+#define LOCAL_unlock_all_except(part)                               \
+	(mfile_unlock_and_decref_parts_with_msalign_except(self, part), \
+	 mfile_lock_endwrite(self))
+
+
+
+INTDEF NOBLOCK NONNULL((1)) void /* From "./mpart-trim.c" */
+NOTHROW(FCALL mnode_list_sort_by_partoff)(struct mnode_list *__restrict self);
+
+struct mpart_node_iterator {
+	struct mnode *pni_cnext; /* [0..1] Next copy-node */
+	struct mnode *pni_snext; /* [0..1] Next share-node */
+};
+
+#define mpart_node_iterator_init(self, part)           \
+	((self)->pni_cnext = LIST_FIRST(&(part)->mp_copy), \
+	 (self)->pni_snext = LIST_FIRST(&(part)->mp_share))
+
+/* Enumerate the next mem-node (return `NULL' when no more nodes remain) */
+INTERN NOBLOCK WUNUSED NONNULL((1)) struct mnode * /* From "./mpart-trim.c" */
+NOTHROW(FCALL mpart_node_iterator_next)(struct mpart_node_iterator *__restrict self);
+
+
+
 
 /* Ensure that no mem-parts with `mpart_getminaddr() >= minaddr' exists within `self'
  * for  which `mpart_hasblocksstate_init()' is  the case. If any  such part is found,
- * then   `mfile_unlock_and_decref_parts(self), mfile_lock_endwrite(self);'    before
- * waiting for the found  part to no longer  feature INIT-blocks and return  `false'.
+ * then `LOCAL_unlock_all();' before waiting for the found part to no longer  feature
+ * INIT-blocks and return `false'.
  *
  * When no parts with init-blocks above `minaddr' are found, don't release any locks
  * and return `true'. */
 PRIVATE BLOCKING WUNUSED NONNULL((1)) bool FCALL
-mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(struct mfile *__restrict self,
-                                                             pos_t minaddr)
+mfile_do_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(struct mfile *__restrict self,
+                                                                pos_t minaddr)
 		THROWS(...) {
 	struct mpart *iter;
 	struct mpart_tree_minmax mima;
@@ -72,7 +101,7 @@ mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(struct mfile *__res
 			if unlikely(mpart_hasblocksstate_init(iter)) {
 				/* Damn it! - have to wait for this one... */
 				incref(iter);
-				mfile_unlock_and_decref_parts(self);
+				LOCAL_unlock_all();
 				mfile_lock_endwrite(self);
 				FINALLY_DECREF_UNLIKELY(iter);
 				task_connect(&self->mf_initdone);
@@ -113,8 +142,7 @@ mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(struct mfile *__res
 					if (meta != NULL && atomic_read(&meta->mpm_dmalocks) != 0) {
 						/* Have to wait for this one... */
 						incref(iter);
-						mfile_unlock_and_decref_parts(self);
-						mfile_lock_endwrite(self);
+						LOCAL_unlock_all();
 						FINALLY_DECREF_UNLIKELY(iter);
 						task_connect(&meta->mpm_dma_done);
 						if unlikely(atomic_read(&meta->mpm_dmalocks) == 0) {
@@ -136,6 +164,27 @@ mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(struct mfile *__res
 	return true;
 }
 
+PRIVATE BLOCKING WUNUSED NONNULL((1)) bool FCALL
+mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(struct mfile *__restrict self,
+                                                             pos_t minaddr)
+		THROWS(...) {
+	bool result;
+	result = mfile_do_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(self, minaddr);
+	if (unlikely(!LIST_EMPTY(&self->mf_msalign)) && result) {
+		struct misaligned_mfile *msalign;
+		/* Must also ensure that all msalign files are initialized! */
+		LIST_FOREACH (msalign, &self->mf_msalign, mam_link) {
+			pos_t msalign_minaddr;
+			if (OVERFLOW_USUB(minaddr, msalign->mam_offs, &msalign_minaddr))
+				msalign_minaddr = 0;
+			result = mfile_do_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(msalign, msalign_minaddr);
+			if unlikely(!result)
+				break;
+		}
+	}
+	return result;
+}
+
 
 struct mpart_load_private_node_or_unlock_unlockinfo {
 	struct unlockinfo mplpnouu_info; /* Underlying unlockinfo */
@@ -144,12 +193,13 @@ struct mpart_load_private_node_or_unlock_unlockinfo {
 };
 
 PRIVATE NONNULL((1)) void
-NOTHROW(FCALL mpart_load_private_node_or_unlock_unlockcb)(struct unlockinfo *__restrict self) {
+NOTHROW(FCALL mpart_load_private_node_or_unlock_unlockcb)(struct unlockinfo *__restrict unlock) {
+	struct mfile *self;
 	struct mpart_load_private_node_or_unlock_unlockinfo *info;
-	info = container_of(self, struct mpart_load_private_node_or_unlock_unlockinfo, mplpnouu_info);
+	info = container_of(unlock, struct mpart_load_private_node_or_unlock_unlockinfo, mplpnouu_info);
+	self = info->mplpnouu_file;
 	/* Unlock+decref all parts except for the one whose lock our caller is managing. */
-	mfile_unlock_and_decref_parts_except(info->mplpnouu_file, info->mplpnouu_part);
-	mfile_lock_endwrite(info->mplpnouu_file);
+	LOCAL_unlock_all_except(info->mplpnouu_part);
 	/* Original part reference (caller is still holding another, so *_nokill) */
 	decref_nokill(info->mplpnouu_part);
 }
@@ -207,9 +257,6 @@ mpart_load_private_node_or_unlock(struct mpart *__restrict self,
 	return mpart_load_or_unlock(self, &unlock.mplpnouu_info, minaddr, num_bytes);
 }
 
-
-INTDEF NOBLOCK NONNULL((1)) void /* From "./mpart-trim.c" */
-NOTHROW(FCALL mnode_list_sort_by_partoff)(struct mnode_list *__restrict self);
 
 /* Ensure that all blocks mapped by MAP_PRIVATE nodes of `self'
  * that map at least 1 byte above `minaddr' have a block-status
@@ -271,7 +318,6 @@ mfile_do_load_private_nodes_above_or_unlock(struct mfile *__restrict self,
 	struct mpart *iter;
 	struct mpart_tree_minmax mima;
 	assert(mfile_lock_writing(self));
-	assert(self->mf_parts != NULL);
 	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
 	mpart_tree_minmaxlocate(self->mf_parts, new_size, (pos_t)-1, &mima);
 	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
@@ -297,15 +343,133 @@ mfile_do_load_private_nodes_above_or_unlock(struct mfile *__restrict self,
 	return true;
 }
 
+
+PRIVATE BLOCKING NONNULL((1, 2)) bool FCALL
+mpart_load_msalign_node_or_unlock(struct mfile *__restrict base,
+                                  struct mpart *__restrict self,
+                                  mpart_reladdr_t minaddr, size_t num_bytes) {
+	struct mpart_load_private_node_or_unlock_unlockinfo unlock;
+	unlock.mplpnouu_info.ui_unlock = &mpart_load_private_node_or_unlock_unlockcb;
+	unlock.mplpnouu_file           = base;
+	unlock.mplpnouu_part           = self;
+
+	/* Must also assert that the part is allocated. */
+	if (!MPART_ST_INCORE(self->mp_state)) {
+		bool ok;
+		ok = mpart_load_private_node_setcore_or_unlock(self, minaddr, num_bytes,
+		                                               &unlock.mplpnouu_info);
+		if (!ok)
+			return false;
+	}
+
+	return mpart_load_or_unlock(self, &unlock.mplpnouu_info, minaddr, num_bytes);
+}
+
+
+PRIVATE BLOCKING NONNULL((1, 2)) bool FCALL
+mpart_load_msalign_nodes_or_unlock(struct mfile *__restrict base,
+                                   struct mpart *__restrict self,
+                                   mpart_reladdr_t minaddr) {
+	struct mnode *node;
+	struct mpart_node_iterator iter;
+
+	/* Enumerate all nodes of `self' */
+	mnode_list_sort_by_partoff(&self->mp_copy);
+	mnode_list_sort_by_partoff(&self->mp_share);
+	mpart_node_iterator_init(&iter, self);
+
+	node = mpart_node_iterator_next(&iter);
+	while (node) {
+		bool ok;
+		mpart_reladdr_t node_minaddr, node_endaddr;
+		assert(node->mn_part == self);
+		node_minaddr = mnode_getpartminaddr(node);
+		node_endaddr = mnode_getpartendaddr(node);
+		if (node_minaddr < minaddr) {
+			node_minaddr = minaddr;
+			if (node_minaddr >= node_endaddr) {
+				node = mpart_node_iterator_next(&iter);
+				continue;
+			}
+		}
+		assert(node_minaddr < node_endaddr);
+
+		/* Check for adjacent nodes. */
+		while ((node = mpart_node_iterator_next(&iter)) != NULL) {
+			PAGEDIR_PAGEALIGNED mpart_reladdr_t nextnode_minaddr;
+			PAGEDIR_PAGEALIGNED mpart_reladdr_t nextnode_endaddr;
+			assert(node->mn_part == self);
+			nextnode_minaddr = mnode_getpartminaddr(node);
+			nextnode_endaddr = mnode_getpartendaddr(node);
+			if (nextnode_minaddr > node_endaddr)
+				break; /* There's a gap after the end of the relevant range. */
+			if (node_endaddr < nextnode_endaddr) {
+				/* Extend  load-range  to  include  this  node,
+				 * since it overlaps/extends our current range. */
+				node_endaddr = nextnode_endaddr;
+			}
+		}
+
+		/* Ensure that this sub-range is loaded. */
+		ok = mpart_load_msalign_node_or_unlock(base, self, node_minaddr,
+		                                       node_endaddr - node_minaddr);
+		if (!ok)
+			return false;
+	}
+	return true;
+}
+
+PRIVATE BLOCKING NONNULL((1, 2)) bool FCALL
+mfile_do_load_msalign_nodes_above_or_unlock(struct mfile *__restrict base,
+                                            struct mfile *__restrict self,
+                                            pos_t new_size) {
+	struct mpart *iter;
+	struct mpart_tree_minmax mima;
+	assert(mfile_lock_writing(self));
+	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
+	mpart_tree_minmaxlocate(self->mf_parts, new_size, (pos_t)-1, &mima);
+	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
+	if (mima.mm_min == NULL)
+		return true;
+	for (iter = mima.mm_min;;) {
+		bool ok;
+		mpart_reladdr_t minaddr = 0;
+		if (mpart_getminaddr(iter) < new_size) {
+			assert(mpart_getmaxaddr(iter) >= new_size);
+			minaddr = (mpart_reladdr_t)(new_size - mpart_getminaddr(iter));
+		}
+		assertf(mpart_lock_acquired(iter), "Caller should be holding locks to all parts");
+		assert(iter->mp_file == self);
+		ok = mpart_load_msalign_nodes_or_unlock(base, iter, minaddr);
+		if (!ok)
+			return false;
+		if (iter == mima.mm_max)
+			break;
+		iter = mpart_tree_nextnode(iter);
+		assert(iter);
+	}
+	return true;
+}
+
 PRIVATE BLOCKING NONNULL((1)) bool FCALL
 mfile_load_private_nodes_above_or_unlock(struct mfile *__restrict self,
                                          pos_t new_size) {
 	bool result;
 	result = mfile_do_load_private_nodes_above_or_unlock(self, new_size);
-	if (unlikely(atomic_read(&self->mf_msalign.lh_first) != NULL) && result) {
+	if (unlikely(!LIST_EMPTY(&self->mf_msalign)) && result) {
+		struct misaligned_mfile *msalign;
 		/* Must also load uninitialized nodes from all sub-files of `self'
 		 * that were  created  using  `mfile_create_misaligned_wrapper()'! */
-		/* TODO */
+		LIST_FOREACH (msalign, &self->mf_msalign, mam_link) {
+			pos_t msalign_new_size;
+			if (OVERFLOW_USUB(new_size, msalign->mam_offs, &msalign_new_size))
+				msalign_new_size = 0;
+			if unlikely(msalign->mf_parts != MFILE_PARTS_ANONYMOUS) {
+				result = mfile_do_load_msalign_nodes_above_or_unlock(self, msalign, msalign_new_size);
+				if unlikely(!result)
+					break;
+			}
+		}
 	}
 	return result;
 }
@@ -328,8 +492,7 @@ NOTHROW(FCALL mfile_freeblocks_unlock)(struct mfile *__restrict self,
 			overlapping_part = NULL;
 		}
 	}
-	mfile_unlock_and_decref_parts(self);
-	mfile_lock_endwrite(self);
+	LOCAL_unlock_all();
 	if (overlapping_part != NULL)
 		decref_unlikely(mpart_merge(overlapping_part));
 }
@@ -454,10 +617,10 @@ handle_newsize_ge_oldsize:
 		 *  #9:  Make all of the removed mem-parts anonymous and release the
 		 *       lock still held on each  of them before decref()-ing  each.
 		 *  #10: Release locks + references from all of the remaining mem-
-		 *       parts which still remain  apart of the file's  part-tree.
-		 *  #11: Release the write-lock `mfile_lock_endwrite(self);'
-		 *  #12: Broadcast `&self->mf_initdone'
-		 *  #13: Notify `mfile_changed(self, MFILE_F_ATTRCHANGED);'
+		 *       parts which still remain  apart of the file's  part-tree,
+		 *       and release the write-lock `mfile_lock_endwrite(self);'
+		 *  #11: Broadcast `&self->mf_initdone'
+		 *  #12: Notify `mfile_changed(self, MFILE_F_ATTRCHANGED);'
 		 */
 
 		/* Step #1: Acquire a write-lock `mfile_lock_write(self);' */
@@ -544,15 +707,14 @@ directly_modify_file_size:
 		 * the part-tree (we can do this because we're holding a write-lock),  thus
 		 * guarantying that _all_ mem-parts from the part-tree are `!wasdestroyed'. */
 		{
-			REF struct mpart *blocking_part;
-			blocking_part = mfile_tryincref_and_lock_parts(self);
-			if unlikely(blocking_part) {
+			REF void *blocking_obj;
+			blocking_obj = mfile_tryincref_and_lock_parts_with_msalign(self);
+			if unlikely(blocking_obj) {
 				mfile_lock_endwrite(self);
-				FINALLY_DECREF_UNLIKELY(blocking_part);
-				mpart_lock_waitfor(blocking_part);
+				mfile_tryincref_and_lock_parts_with_msalign__waitfor_and_decref(blocking_obj);
 				goto again;
 			}
-			if (!mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(self, aligned_new_size))
+			if (!mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(self, new_size))
 				goto again;
 		}
 
@@ -577,13 +739,12 @@ directly_modify_file_size:
 		overlapping_part = mpart_tree_locate(self->mf_parts, aligned_new_size);
 		if (overlapping_part &&
 		    mpart_getminaddr(overlapping_part) != aligned_new_size) {
-			REF struct mpart *blocking_part;
+			REF void *blocking_obj;
 
 again_handle_overlapping_part:
 			/* Must split this part... */
 			incref(overlapping_part);
-			mfile_unlock_and_decref_parts(self);
-			mfile_lock_endwrite(self);
+			LOCAL_unlock_all();
 			{
 				FINALLY_DECREF_UNLIKELY(overlapping_part);
 				overlapping_part = mpart_split(overlapping_part, aligned_new_size);
@@ -624,11 +785,10 @@ again_reacquire_after_split:
 					task_waitfor();
 					goto again_reacquire_after_split;
 				}
-				blocking_part = mfile_tryincref_and_lock_parts(self);
-				if unlikely(blocking_part) {
+				blocking_obj = mfile_tryincref_and_lock_parts_with_msalign(self);
+				if unlikely(blocking_obj) {
 					mfile_lock_endwrite(self);
-					FINALLY_DECREF_UNLIKELY(blocking_part);
-					mpart_lock_waitfor(blocking_part);
+					mfile_tryincref_and_lock_parts_with_msalign__waitfor_and_decref(blocking_obj);
 					goto again_reacquire_after_split;
 				}
 				if (!mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(self, aligned_new_size))
@@ -652,8 +812,7 @@ again_reacquire_after_split:
 
 			/* Do step #7 while we still know about `overlapping_part' */
 			if (atomic64_read(&self->mf_filesize) != (uint64_t)old_size) {
-				mfile_unlock_and_decref_parts(self);
-				mfile_lock_endwrite(self);
+				LOCAL_unlock_all();
 				decref_unlikely(mpart_merge(overlapping_part));
 				goto again_reacquire_after_split;
 			}
@@ -666,8 +825,7 @@ again_reacquire_after_split:
 		 *          the file's size changed since it was read above, re-merge a possibly split
 		 *          part from #6 and start over from scratch. */
 		if (atomic64_read(&self->mf_filesize) != (uint64_t)old_size) {
-			mfile_unlock_and_decref_parts(self);
-			mfile_lock_endwrite(self);
+			LOCAL_unlock_all();
 			goto again;
 		}
 
@@ -700,8 +858,8 @@ everything_confirmed:
 	 *          there isn't any part that overlaps with `aligned_new_size'. */
 	for (;;) {
 		REF struct mpart *part;
-		/* NOTE: Normally, the mem-part tree doesn't contain references, but right
-		 *       now it  does, as  `mfile_tryincref_and_lock_parts' created  some. */
+		/* NOTE: Normally, the mem-part tree doesn't  contain references, but right  now
+		 *       it does, as `mfile_tryincref_and_lock_parts_with_msalign' created some. */
 		part = mpart_tree_rremove(&self->mf_parts, aligned_new_size, (pos_t)-1);
 		if (!part)
 			break;
@@ -776,16 +934,14 @@ everything_confirmed:
 	}
 
 	/* Step #10: Release locks + references from all of the remaining mem-
-	 *           parts which still remain  apart of the file's  part-tree. */
-	mfile_unlock_and_decref_parts(self);
+	 *           parts which still remain  apart of the file's  part-tree,
+	 *           and release the write-lock `mfile_lock_endwrite(self);' */
+	LOCAL_unlock_all();
 
-	/* Step #11: Release the write-lock `mfile_lock_endwrite(self);' */
-	mfile_lock_endwrite(self);
-
-	/* Step #12: Broadcast `&self->mf_initdone' */
+	/* Step #11: Broadcast `&self->mf_initdone' */
 	sig_broadcast(&self->mf_initdone);
 
-	/* Step #13: Notify `mfile_changed(self, MFILE_F_ATTRCHANGED);' */
+	/* Step #12: Notify `mfile_changed(self, MFILE_F_ATTRCHANGED);' */
 	mfile_changed(self, MFILE_F_ATTRCHANGED);
 }
 
