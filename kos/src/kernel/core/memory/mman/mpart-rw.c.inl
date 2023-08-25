@@ -458,8 +458,9 @@ done:
  * Upon success, return the (non-zero) # of transferred bytes.
  * The caller must ensure that:
  *    >> num_bytes != 0
- *    >> MPART_ST_INCORE(self->mp_state)   // Can be ensured by `mpart_setcore_or_unlock()'
- *    >> mpart_unsharecow_or_unlock(...)   // Only for `mpart_write*', and only within the target address range
+ *    >> MPART_ST_INCORE(self->mp_state)       // Can be ensured by `mpart_setcore_or_unlock()'
+ *    >> mpart_unsharecow_or_unlock(...)       // Only for `mpart_write*', and only within the target address range
+ *    >> mpart_msalign_makeanon_or_unlock(...) // Only for `mpart_write*', and only within the target address range
  */
 PUBLIC BLOCKING NONNULL((1)) size_t KCALL
 LOCAL_mpart_rw_or_unlock(struct mpart *__restrict self,

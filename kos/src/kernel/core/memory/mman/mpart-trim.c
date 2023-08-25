@@ -233,7 +233,7 @@ struct mpart_node_iterator {
 	 (self)->pni_snext = LIST_FIRST(&(part)->mp_share))
 
 /* Enumerate the next mem-node (return `NULL' when no more nodes remain) */
-INTERN NOBLOCK WUNUSED NONNULL((1)) struct mnode * /* INTERN because also used in "./mfile-trunc.c" */
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct mnode *
 NOTHROW(FCALL mpart_node_iterator_next)(struct mpart_node_iterator *__restrict self) {
 	struct mnode *result;
 	do {

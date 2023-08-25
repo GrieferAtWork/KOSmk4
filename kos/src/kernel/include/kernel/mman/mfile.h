@@ -1060,7 +1060,8 @@ struct mfile {
 	                                              * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
 	                                              *      before proceeding to use the data you've just read! */
 #endif /* !__WANT_MFILE__mf_... */
-	struct misaligned_mfile_list  mf_msalign;    /* [lock(mf_lock)][0..n] List of misaligned wrappers (elements may only be added when `MFILE_F_DELETED' isn't set) */
+	struct misaligned_mfile_list  mf_msalign;    /* [lock(mf_lock)][0..n] List of misaligned wrappers.
+	                                              * Elements may only be added when `MFILE_F_DELETED' isn't set and `mf_trunclock == 0'. */
 #ifdef __WANT_FS_INIT
 #define MFILE_INIT_mf_msalign(mf_msalign) { mf_msalign }
 #endif /* __WANT_FS_INIT */
@@ -1539,52 +1540,50 @@ mfile_parts_denywrite_or_unlock(struct mfile *__restrict self,
                                 struct unlockinfo *unlock DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY);
 
-
-/* MFile part locking helpers that also lock misaligned wrappers of `self'
- * In addition  to what  the  non-*_with_msalign-version do,  these  also:
- * - tryincref() all files from `self->mf_msalign'
- * - Remove all dead files from `self->mf_msalign'
- * - Acquire `mfile_lock_write()'-locks to all files from `self->mf_msalign'
- * - Recursively incref()+acquire locks to all parts of files from `self->mf_msalign' */
-FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
-mfile_incref_and_lock_parts_with_msalign_or_unlock(struct mfile *__restrict self,
-                                                   struct unlockinfo *unlock DFL(__NULLPTR))
-		THROWS(E_WOULDBLOCK);
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mfile_unlock_and_decref_parts_with_msalign)(struct mfile *__restrict self);
-FUNDEF NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mfile_unlock_and_decref_parts_with_msalign_except)(struct mfile *__restrict self,
-                                                                 struct mpart *__restrict part);
-
-/* Returns either a reference to a blocking part, or to a blocking file. */
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF void *
-NOTHROW(FCALL mfile_tryincref_and_lock_parts_with_msalign)(struct mfile *__restrict self);
-#define mfile_tryincref_and_lock_parts_with_msalign__forpart(v) ((REF void *)((uintptr_t)(v)))
-#define mfile_tryincref_and_lock_parts_with_msalign__forfile(v) ((REF void *)((uintptr_t)(v) | 1))
-#define mfile_tryincref_and_lock_parts_with_msalign__ispart(v) (((uintptr_t)(v) & 1) == 0)
-#define mfile_tryincref_and_lock_parts_with_msalign__isfile(v) (((uintptr_t)(v) & 1) != 0)
-#define mfile_tryincref_and_lock_parts_with_msalign__aspart(v) ((REF struct mpart *)(v))
-#define mfile_tryincref_and_lock_parts_with_msalign__asfile(v) ((REF struct mfile *)((uintptr_t)(v) & ~1))
-#define mfile_tryincref_and_lock_parts_with_msalign__decref(v)        \
-	(mfile_tryincref_and_lock_parts_with_msalign__ispart(v)           \
-	 ? decref(mfile_tryincref_and_lock_parts_with_msalign__aspart(v)) \
-	 : decref(mfile_tryincref_and_lock_parts_with_msalign__asfile(v)))
-#define mfile_tryincref_and_lock_parts_with_msalign__waitfor_and_decref(v)        \
-	do {                                                                          \
-		if (mfile_tryincref_and_lock_parts_with_msalign__ispart(v)) {             \
-			REF struct mpart *_wfad_bpart;                                        \
-			_wfad_bpart = mfile_tryincref_and_lock_parts_with_msalign__aspart(v); \
-			FINALLY_DECREF_UNLIKELY(_wfad_bpart);                                 \
-			mpart_lock_waitfor(_wfad_bpart);                                      \
-		} else {                                                                  \
-			REF struct mfile *_wfad_bfile;                                        \
-			_wfad_bfile = mfile_tryincref_and_lock_parts_with_msalign__asfile(v); \
-			FINALLY_DECREF_UNLIKELY(_wfad_bfile);                                 \
-			mfile_lock_waitwrite(_wfad_bfile);                                    \
-		}                                                                         \
-	}	__WHILE0
+/* Go through all `mf_msalign' sub-files of `self' and initialize+anonymize
+ * all mem-parts that (at least partially) overlap with  [minaddr,maxaddr].
+ * This must be  done whenever  the contents  of the  named range  changed,
+ * since any  content-changes mean  that future  misaligned files  need  to
+ * create new mem-parts with (then) different memory contents.
+ *
+ * In order to call this function, the caller must be:
+ * - Holding a read-lock to `mfile_lock_read(self)'  (or write)
+ * @return: true:  Success (locks are still held)
+ * @return: false: Try again (locks were lost)
+ * @THROW: Error (locks were lost) */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
+_mfile_msalign_makeanon_locked_or_unlock(struct mfile *__restrict self,
+                                         pos_t minaddr, pos_t maxaddr,
+                                         struct unlockinfo *unlock DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...);
+#ifndef __OPTIMIZE_SIZE__
+#define mfile_msalign_makeanon_locked_or_unlock(self, ...) \
+	(likely(LIST_EMPTY(&(self)->mf_msalign)) ? 1 : likely(_mfile_msalign_makeanon_locked_or_unlock(self, __VA_ARGS__)))
+#else /* !__OPTIMIZE_SIZE__ */
+#define mfile_msalign_makeanon_locked_or_unlock(self, ...) \
+	likely(_mfile_msalign_makeanon_locked_or_unlock(self, __VA_ARGS__))
+#endif /* __OPTIMIZE_SIZE__ */
 
 
+/* Same as `_mfile_msalign_makeanon_locked_or_unlock()', except that
+ * the caller doesn't need to worry about holding a lock to  `self'.
+ * @return: true:  Success (locks are still held)
+ * @return: false: Try again (locks were lost)
+ * @THROW: Error (locks were lost) */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
+_mfile_msalign_makeanon_or_unlock(struct mfile *__restrict self,
+                                  pos_t minaddr, pos_t maxaddr,
+                                  struct unlockinfo *unlock DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...);
+#ifndef __OPTIMIZE_SIZE__
+#define mfile_msalign_makeanon_or_unlock(self, ...)                                            \
+	(likely(__hybrid_atomic_load(&(self)->mf_msalign.lh_first, __ATOMIC_ACQUIRE) == __NULLPTR) \
+	 ? 1                                                                                       \
+	 : likely(_mfile_msalign_makeanon_or_unlock(self, __VA_ARGS__)))
+#else /* !__OPTIMIZE_SIZE__ */
+#define mfile_msalign_makeanon_or_unlock(self, ...) \
+	likely(_mfile_msalign_makeanon_or_unlock(self, __VA_ARGS__))
+#endif /* __OPTIMIZE_SIZE__ */
 
 
 

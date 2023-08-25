@@ -35,19 +35,19 @@
 //#define  DEFINE_mfile_direct_write_async_p
 //#define   DEFINE_mfile_direct_writev_async
 //#define DEFINE_mfile_direct_writev_async_p
-#define DEFINE_mfile_read
-//#define       DEFINE_mfile_read_p
-//#define        DEFINE_mfile_readv
-//#define      DEFINE_mfile_readv_p
-//#define     DEFINE_mfile_tailread
-//#define   DEFINE_mfile_tailread_p
-//#define    DEFINE_mfile_tailreadv
-//#define  DEFINE_mfile_tailreadv_p
-//#define        DEFINE_mfile_write
-//#define      DEFINE_mfile_write_p
-//#define       DEFINE_mfile_writev
-//#define     DEFINE_mfile_writev_p
-//#define    DEFINE_mfile_tailwrite
+//#define DEFINE_mfile_read
+//#define      DEFINE_mfile_read_p
+//#define       DEFINE_mfile_readv
+//#define     DEFINE_mfile_readv_p
+//#define    DEFINE_mfile_tailread
+//#define  DEFINE_mfile_tailread_p
+//#define   DEFINE_mfile_tailreadv
+//#define DEFINE_mfile_tailreadv_p
+//#define       DEFINE_mfile_write
+//#define     DEFINE_mfile_write_p
+//#define      DEFINE_mfile_writev
+//#define    DEFINE_mfile_writev_p
+#define    DEFINE_mfile_tailwrite
 //#define  DEFINE_mfile_tailwrite_p
 //#define   DEFINE_mfile_tailwritev
 //#define DEFINE_mfile_tailwritev_p
@@ -891,6 +891,10 @@ dont_handle_vio:
 		part = mpart_tree_locate(self->mf_parts, offset);
 		if (part != NULL && tryincref(part)) {
 			/* Found a pre-existing part which we can do I/O on! */
+#ifdef LOCAL_WRITING
+			if (!mfile_msalign_makeanon_locked_or_unlock(self, offset, offset + io_bytes - 1))
+				goto again;
+#endif /* LOCAL_WRITING */
 			mfile_trunclock_inc(self);
 			mfile_lock_endread(self);
 do_io_with_part_and_trunclock:
@@ -985,6 +989,10 @@ restart_after_extendpart:
 				 * -> As such, use this part to do more I/O! */
 				incref(part);
 				mpart_lock_release(part);
+#ifdef LOCAL_WRITING
+				if (!mfile_msalign_makeanon_locked_or_unlock(self, offset, offset + io_bytes - 1))
+					goto again;
+#endif /* LOCAL_WRITING */
 				mfile_trunclock_inc(self); /* Prevent `ftruncate(2)' until we're done */
 				mfile_lock_endwrite(self);
 				goto do_io_with_part_and_trunclock;
@@ -1037,6 +1045,10 @@ destroy_new_part_and_try_again:
 		}
 		TRY {
 			REF struct mpart *rpart;
+#ifdef LOCAL_WRITING
+			if (!mfile_msalign_makeanon_locked_or_unlock(self, offset, offset + io_bytes - 1))
+				goto again;
+#endif /* LOCAL_WRITING */
 			/* Try to merge the new part, and release a write-lock to `self'. */
 			rpart = mfile_insert_and_merge_part_and_unlock(self, part);
 			if unlikely(!rpart) {
@@ -1155,6 +1167,17 @@ handle_write_impossible_too_big:
 			goto again;
 		}
 
+		/* Anonymize misaligned file parts that overlap with the area being written. */
+		TRY {
+			if (!mfile_msalign_makeanon_locked_or_unlock(self, offset, offset + io_bytes - 1)) {
+				decref_unlikely(part);
+				goto again;
+			}
+		} EXCEPT {
+			decref_unlikely(part);
+			RETHROW();
+		}
+
 #ifdef LOCAL_TAILIO
 		/* In order to atomically append data at the end of the file,  we
 		 * must ensure that no-one else might possibly be increasing  the
@@ -1231,10 +1254,14 @@ part_setcore:
 						    (self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE)) ||
 						    part != mpart_tree_locate(self->mf_parts, newpart_minaddr)) {
 							mfile_lock_endwrite_f(self);
-							mpart_unsharecow_data_fini(&uc_data);
 							mfile_lockops_reap(self);
+again_decref_part_and_fini_uc_data:
+							mpart_unsharecow_data_fini(&uc_data);
+							decref_unlikely(part);
 							goto again;
 						}
+						if (!mfile_msalign_makeanon_locked_or_unlock(self, offset, offset + io_bytes - 1))
+							goto again_decref_part_and_fini_uc_data;
 						if (!mpart_lock_tryacquire(part)) {
 							mfile_lock_endwrite(self);
 							mpart_unsharecow_data_fini(&uc_data);
@@ -1453,7 +1480,7 @@ restart_after_extendpart_tail:
 					}
 				} EXCEPT {
 					mpart_setcore_data_fini(&sc_data);
-					decref_unlikely(part);
+					/*decref_unlikely(part);*/ /* This reference is dropped by the outer EXCEPT */
 					RETHROW();
 				}
 			}
@@ -1559,6 +1586,7 @@ extend_failed:
 	 * instead using its backing physical memory as a new physical source buffer from which
 	 * to copy data to-be written  to the file. (this way,  we can prevent duplicate  reads
 	 * from VIO memory when this kind of memory was used as origin buffer) */
+
 	{
 		/*
 		 * ```
@@ -1827,14 +1855,29 @@ extend_failed:
 		uintptr_t changes;
 		pos_t newsize, oldsize;
 		REF struct mpart *inserted_part;
+
+		/* Have to make  sure that  all misaligned  sub-files
+		 * are anonymous for the address range being written. */
+		TRY {
+			if (!mfile_msalign_makeanon_locked_or_unlock(self, part->mp_minaddr, part->mp_maxaddr))
+				goto handle_part_insert_failure_without_lock;
+		} EXCEPT {
+			mfile_trunclock_dec(self);
+			TAILQ_ENTRY_UNBOUND_INIT(&part->mp_allparts);
+			mpart_destroy(part);
+			RETHROW();
+		}
+
+		/* Try to insert the new part. */
 		inserted_part = mfile_insert_and_merge_part_and_unlock(self, part);
 		if unlikely(!inserted_part) {
 #ifndef LOCAL_BUFFER_IS_PHYS
 			mpart_reladdr_t partoff;
 #endif /* !LOCAL_BUFFER_IS_PHYS */
 handle_part_insert_failure:
-			mfile_trunclock_dec(self);
 			mfile_lock_endwrite(self);
+handle_part_insert_failure_without_lock:
+			mfile_trunclock_dec(self);
 			RAII_FINALLY {
 				TAILQ_ENTRY_UNBOUND_INIT(&part->mp_allparts);
 				mpart_destroy(part);

@@ -1677,7 +1677,6 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
 	struct unsharecow_bounds bounds;
 	mpart_reladdr_t partrel_minaddr;
 	mpart_reladdr_t partrel_maxaddr;
-
 	assert(MPART_ST_INCORE(self->mp_state));
 
 	/* Quick check: If there aren't any copy-on-write mappings, then
@@ -1939,6 +1938,52 @@ nope:
 	return false;
 }
 
+struct unlock_part_and_extra: unlockinfo {
+	struct mpart      *upae_part;  /* [1..1] The part to unlock. */
+	struct unlockinfo *upae_extra; /* [0..1] Extra, nested unlockinfo to also unlock. */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL unlock_part_and_extra_cb)(struct unlockinfo *__restrict self) {
+	struct unlock_part_and_extra *me = (struct unlock_part_and_extra *)self;
+	mpart_lock_release(me->upae_part);
+	unlockinfo_xunlock(me->upae_extra);
+}
+
+/* Helper wrapper around `mfile_msalign_makeanon_or_unlock()'
+ * NOTE: The caller  must be  holding a  lock to  `self', and  must
+ *       ensure that the given address range is in-bounds of `self' */
+PUBLIC BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
+_mpart_msalign_makeanon_or_unlock(struct mpart *__restrict self,
+                                  struct unlockinfo *unlock,
+                                  mpart_reladdr_t partrel_offset,
+                                  size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...) {
+	struct unlock_part_and_extra full_unlock;
+	struct mfile *file = self->mp_file;
+	pos_t file_minaddr;
+	pos_t file_maxaddr;
+	assert(mpart_lock_acquired(self));
+	if (mpart_isanon(self))
+		return true;
+	file_minaddr = self->mp_minaddr + partrel_offset;
+	file_maxaddr = file_minaddr + num_bytes - 1;
+	assert(file_minaddr <= file_maxaddr);
+	assert(file_minaddr >= mpart_getminaddr(self));
+	assert(file_maxaddr <= mpart_getmaxaddr(self));
+
+	/* Keep a reference to the underlying file. */
+	incref(file);
+	FINALLY_DECREF_UNLIKELY(file);
+	full_unlock.ui_unlock  = &unlock_part_and_extra_cb;
+	full_unlock.upae_part  = self;
+	full_unlock.upae_extra = unlock;
+
+	/* Do the operation. */
+	return _mfile_msalign_makeanon_or_unlock(file, file_minaddr, file_maxaddr, &full_unlock);
+}
+
+
 /* Ensure that:
  * >> LIST_FOREACH (node, &self->mp_share, mn_link)
  * >>     mnode_clear_write(node) == MNODE_CLEAR_WRITE_SUCCESS
@@ -2117,8 +2162,9 @@ err:
 
 /* Acquire a lock until:
  *  - mpart_setcore_or_unlock(self, ...)
- *  - mpart_load_or_unlock(self, ...)        // Based on the given address range
- *  - mpart_unsharecow_or_unlock(self, ...)  // Based on the given address range
+ *  - mpart_load_or_unlock(self, ...)             // Based on the given address range
+ *  - mpart_unsharecow_or_unlock(self, ...)       // Based on the given address range
+ *  - mpart_msalign_makeanon_or_unlock(self, ...) // Based on the given address range
  *
  * If  the given `filepos' isn't contained by  `self', then no lock is acquired,
  * and `false' is returned. (`max_load_bytes' is only used as a hint for the max
@@ -2148,7 +2194,8 @@ again:
 
 /* Acquire a lock until:
  *  - mpart_setcore_or_unlock(self, ...)
- *  - mpart_unsharecow_or_unlock(self, ...)  // Based on the given address range
+ *  - mpart_unsharecow_or_unlock(self, ...)       // Based on the given address range
+ *  - mpart_msalign_makeanon_or_unlock(self, ...) // Based on the given address range
  *
  * If  the given `filepos' isn't contained by  `self', then no lock is acquired,
  * and `false' is returned. (`max_load_bytes' is only used as a hint for the max
@@ -2211,7 +2258,10 @@ again_ensure_incore_for_write:
 					RETHROW();
 				}
 			}
+			if (!mpart_msalign_makeanon_or_unlock(self, NULL, part_offs, part_size))
+				goto reacquire_for_unshare_case;
 			if (!mpart_unsharecow_or_unlock(self, NULL, &uc_data, part_offs, part_size)) {
+reacquire_for_unshare_case:
 				mpart_lock_acquire(self);
 				if unlikely(OVERFLOW_USUB(filepos, mpart_getminaddr(self), &part_offs) ||
 				            OVERFLOW_USUB(mpart_getmaxaddr(self), filepos, &part_size)) {
@@ -2236,6 +2286,8 @@ fini_uc_data_and_done:
 		}
 	} else {
 ensure_setcore_without_unshare:
+		if (!mpart_msalign_makeanon_or_unlock(self, NULL, part_offs, part_size))
+			goto again;
 		/* Make sure that in-core data is available. */
 		if (!MPART_ST_INCORE(self->mp_state)) {
 			struct mpart_setcore_data data;

@@ -748,6 +748,8 @@ mfault_or_unlock(struct mfault *__restrict self)
 				THROW(E_FSERROR_READONLY);
 			}
 
+			if (!mpart_msalign_makeanon_or_unlock(part, &self->mfl_unlck, acc_offs, acc_size))
+				goto nope;
 			if (LIST_EMPTY(&part->mp_copy)) {
 				if (!mpart_load_or_unlock(part, &self->mfl_unlck, acc_offs, acc_size))
 					goto nope_reinit_scmem;

@@ -29,6 +29,8 @@
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile-misaligned.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mpart-blkst.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
@@ -277,28 +279,12 @@ PUBLIC_CONST struct mfile_ops const misaligned_mfile_ops = {
  * - This function doesn't necessarily return a misaligned file (hence  why
  *   its return type is just  `mfile'). When the effective alignment  turns
  *   out to be `0', it will just re-return `inner', and if another matching
- *   misaligned file already exists, that one is simply re-used. */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct mfile *FCALL
+ *   misaligned file already exists, that one is simply re-used.
+ * - This function is `BLOCKING' because it has to wait for `inner->mf_trunclock' */
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct mfile *FCALL
 mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
                                 pos_t *__restrict p_inner_fpos)
 		THROWS(E_BADALLOC) {
-	/* TODO: The following currently breaks:
-	 * >> static char buf[64 * 1024];
-	 * >> int offset = 4 * getpagesize();
-	 * >> pwrite(fd, "BAR", 3, offset);
-	 * >> pread(fd, buf, sizeof(buf), 0);  // This will trigger the mmapread system
-	 * >> pwrite(fd, "FOO", 3, offset);
-	 * >> // Because memory wasn't unshared during the write, the buffer now also contains "FOO"
-	 * >> assert(memcmp(buf + offset, "BAR") == 0);
-	 *
-	 * In order to fix this, we must essentially treat the mpart-s of misaligned files
-	 * the same way we treat copy-on-write nodes (as per `mpart::mp_copy'). This means
-	 * that everywhere we do copy-on-write unsharing, we also have to search for  mem-
-	 * parts  that depend on  the to-be-unshared file-range, and  then proceed to make
-	 * those  parts anonymous (thus  removing them from the  list of misaligned files,
-	 * meaning  that the next time part of  the base file should be misaligned-mapped,
-	 * new mpart-s are created which will then lazily initialize to new memory-content
-	 * of the underlying file) */
 	size_t misalign;
 	struct misaligned_mfile *used_predecessor;
 	REF struct misaligned_mfile *predecessor;
@@ -399,6 +385,20 @@ mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
 	/* Re-acquire a lock to the base file (and make it a write-lock this time) */
 	TRY {
 		mfile_lock_write(inner);
+
+		/* Wait for `mf_trunclock' to become 0.
+		 *
+		 * This is required since new misaligned files must not be added while
+		 * a write operation is in  progress (where write operations will  inc
+		 * the `mf_trunclock' field to also suppress `ftruncate(2)')
+		 *
+		 * The reason for this is to ensure that we don't add+initialize new
+		 * misaligned files during the small frame where `write(2)' is doing
+		 * file I/O, has incremented `mf_trunclock', but has yet to  acquire
+		 * a lock to an associated mpart. */
+		if unlikely(atomic_read(&inner->mf_trunclock) != 0) {
+			/* TODO */
+		}
 	} EXCEPT {
 		destroy(result);
 		xdecref_unlikely(predecessor);
@@ -476,6 +476,278 @@ did_insert:
 return_inner:
 	return incref(inner);
 }
+
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* Misaligned file anonymization helpers                                */
+/************************************************************************/
+
+struct mpart_load_and_makeanon_unlockinfo: unlockinfo {
+	struct misaligned_mfile *mlamaui_msalign; /* [1..1] The mis-aligned file, parts of which are being anonymized. */
+	struct unlockinfo       *mlamaui_unlock;  /* [0..1] Extra user-defined unlock info. */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_load_and_makeanon_unlockinfo_cb)(struct unlockinfo *__restrict self) {
+	struct mpart_load_and_makeanon_unlockinfo *me = (struct mpart_load_and_makeanon_unlockinfo *)self;
+	mfile_lock_endwrite(me->mlamaui_msalign);
+	unlockinfo_xunlock(me->mlamaui_unlock);
+	mfile_lock_end(me->mlamaui_msalign->mam_base); /* !!! Important: must release the file lock *after* caller-given `unlock' */
+}
+
+
+/* NOTE: This function *always* inherits both a lock and a reference to `self' */
+PRIVATE BLOCKING NONNULL((1, 2)) bool FCALL
+mpart_load_and_makeanon_and_decref_and_unlock(struct misaligned_mfile *__restrict msalign,
+                                              REF struct mpart *__restrict self,
+                                              struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...) {
+	struct mpart_load_and_makeanon_unlockinfo unlock_all;
+#define LOCAL_unlock_all()         \
+	(mpart_lock_release(self),     \
+	 mfile_lock_endwrite(msalign), \
+	 unlockinfo_xunlock(unlock),   \
+	 mfile_lock_end(msalign->mam_base)) /* !!! Important: must release the file lock *after* caller-given `unlock' */
+	assert(self->mp_file == msalign);
+
+	unlock_all.ui_unlock       = &mpart_load_and_makeanon_unlockinfo_cb;
+	unlock_all.mlamaui_msalign = msalign;
+	unlock_all.mlamaui_unlock  = unlock;
+	TRY {
+		/* Ensure that `self' has been allocated. */
+		if (!MPART_ST_INCORE(self->mp_state)) {
+			struct mpart_setcore_data sc_data;
+			mpart_setcore_data_init(&sc_data);
+			TRY {
+				if (!mpart_setcore_or_unlock(self, &unlock_all, &sc_data)) {
+					do {
+						mpart_lock_acquire(self);
+					} while (!mpart_setcore_or_unlock(self, NULL, &sc_data));
+					goto decref_self_and_return_false;
+				}
+			} EXCEPT {
+				mpart_setcore_data_fini(&sc_data);
+				RETHROW();
+			}
+		}
+
+		/* Ensure that `self' has been loaded into the core.
+		 * NOTE: This also waits for all INIT-blocks to go away! */
+		if (!mpart_load_or_unlock(self, &unlock_all, 0, mpart_getsize(self))) {
+decref_self_and_return_false:
+			decref_unlikely(self);
+			return false;
+		}
+	} EXCEPT {
+		decref_unlikely(self);
+		RETHROW();
+	}
+
+	/* With the part fully allocated+loaded, anonymize it! */
+	assert(!mpart_isanon(self));
+	mpart_tree_removenode(&msalign->mf_parts, self);
+	DBG_memset(&self->mp_filent.rb_lhs, 0xcc, sizeof(self->mp_filent.rb_lhs));
+	self->mp_filent.rb_rhs = NULL; /* Indicator for `mpart_trim()' */
+	atomic_write(&self->mp_filent.rb_par, (struct mpart *)-1);
+	assertf(!(self->mp_flags & MPART_F_CHANGED),
+	        "Parts of misaligned files can't be changed (because the misaligned "
+	        "file has its changed list marked as MFILE_PARTS_ANONYMOUS)");
+	if (atomic_fetchand(&self->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
+		decref_nokill(self);
+
+	/* A blocks of `part' with status LOAD must be set to CHNG (needed for `system_cc()') */
+	if (self->mp_flags & MPART_F_BLKST_INL) {
+		self->mp_blkst_inl = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_CHNG);
+	} else if (self->mp_blkst_ptr) {
+		kfree(self->mp_blkst_ptr);
+		self->mp_blkst_ptr = NULL;
+	}
+	mpart_lock_release(self);
+
+	/* Try to merge the part with adjacent parts.
+	 *
+	 * This optimizes memory mappings in this situation:
+	 * >> char buf[64 * 1024];
+	 * >> pread(fd, buf, sizeof(buf), 0);
+	 * >> pwrite(fd, DATA1, 4096, 4096 * 0);
+	 * >> pwrite(fd, DATA2, 4096, 4096 * 1);
+	 * >> pwrite(fd, DATA3, 4096, 4096 * 2);
+	 * >> pwrite(fd, DATA4, 4096, 4096 * 3);
+	 * Every one of these writes needs to anonymize
+	 */
+	self = mpart_merge(self);
+	mpart_trim(self); /* This will drop our final reference! */
+	return true;
+#undef LOCAL_unlock_all
+}
+
+PRIVATE BLOCKING NONNULL((1, 2, 3)) bool FCALL
+misaligned_mfile_part_makeanon_or_unlock(struct misaligned_mfile *__restrict msalign,
+                                         struct mpart *__restrict self,
+                                         struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...) {
+#define LOCAL_unlock_all()         \
+	(mfile_lock_endwrite(msalign), \
+	 unlockinfo_xunlock(unlock),   \
+	 mfile_lock_end(msalign->mam_base)) /* !!! Important: must release the file lock *after* caller-given `unlock' */
+
+	if unlikely(!tryincref(self))
+		return true; /* Can ignore this part! */
+
+	/* Acquire a lock to the underlying part. */
+	if (!mpart_lock_tryacquire(self)) {
+		LOCAL_unlock_all();
+		FINALLY_DECREF_UNLIKELY(self);
+		mpart_lock_waitfor(self);
+		return false;
+	}
+
+	/* NOTE: this call *always* inherits the lock and reference we created above! */
+	return mpart_load_and_makeanon_and_decref_and_unlock(msalign, self, unlock);
+#undef LOCAL_unlock_all
+}
+
+
+PRIVATE BLOCKING NONNULL((1)) bool FCALL
+misaligned_mfile_range_makeanon_or_unlock(struct misaligned_mfile *__restrict msalign,
+                                          pos_t msalign_minaddr,
+                                          pos_t msalign_maxaddr,
+                                          struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...) {
+#define LOCAL_unlock_all()         \
+	(mfile_lock_endwrite(msalign), \
+	 unlockinfo_xunlock(unlock),   \
+	 mfile_lock_end(msalign->mam_base)) /* !!! Important: must release the file lock *after* caller-given `unlock' */
+	struct mpart *next;
+	struct mpart_tree_minmax mima;
+	mpart_tree_minmaxlocate(msalign->mf_parts, msalign_minaddr, msalign_maxaddr, &mima);
+	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
+	if (!mima.mm_min)
+		return true;
+
+	/* TODO: Split mem-parts so we don't have to load address ranges unnecessarily. */
+
+	while (mima.mm_min != mima.mm_max) {
+		next = mpart_tree_nextnode(mima.mm_min);
+		if (!misaligned_mfile_part_makeanon_or_unlock(msalign, mima.mm_min, unlock))
+			return false;
+		mima.mm_min = next;
+	}
+	return misaligned_mfile_part_makeanon_or_unlock(msalign, mima.mm_min, unlock);
+#undef LOCAL_unlock_all
+}
+
+
+/* Same as `_mfile_msalign_makeanon_all_locked()', except that the
+ * caller only needs to be holding a lock to `file', and that this
+ * function will manage all of the other locks
+ * @return: true:  Success (locks are still held)
+ * @return: false: Try again (locks were lost)
+ * @THROW: Error (locks were lost) */
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool FCALL
+_mfile_msalign_makeanon_locked_or_unlock(struct mfile *__restrict file,
+                                         pos_t minaddr, pos_t maxaddr,
+                                         struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...) {
+#define LOCAL_unlock_all()       \
+	(unlockinfo_xunlock(unlock), \
+	 mfile_lock_end(file)) /* !!! Important: must release the file lock *after* caller-given `unlock' */
+	struct misaligned_mfile *msalign;
+	LIST_FOREACH (msalign, &file->mf_msalign, mam_link) {
+		bool ok;
+		pos_t msalign_minaddr;
+		pos_t msalign_maxaddr;
+		struct mpart *msalign_parts_root;
+		msalign_parts_root = atomic_read(&msalign->mf_parts);
+		if unlikely(msalign_parts_root == NULL ||
+		            msalign_parts_root == MFILE_PARTS_ANONYMOUS)
+			continue; /* No parts here :) */
+		if unlikely(!tryincref(msalign))
+			continue; /* Dead part (ignore) */
+		FINALLY_DECREF_UNLIKELY(msalign);
+		if (!mfile_lock_trywrite(msalign)) {
+			/* Blocking-wait for the lock to become available. */
+			LOCAL_unlock_all();
+			mfile_lock_waitwrite(msalign);
+			return false;
+		}
+
+		/* Calculate the file-relative, aligned min/max bounds that need to be anonymized. */
+		if (OVERFLOW_USUB(minaddr, msalign->mam_offs, &msalign_minaddr))
+			msalign_minaddr = 0;
+		if unlikely(OVERFLOW_USUB(maxaddr, msalign->mam_offs, &msalign_maxaddr))
+			continue;
+
+		msalign_minaddr = mfile_partaddr_flooralign(msalign, msalign_minaddr);
+		msalign_maxaddr = mfile_partaddr_ceilalign(msalign, msalign_maxaddr + 1) - 1;
+		assert(msalign_minaddr <= msalign_maxaddr);
+		assert(msalign->mam_base == file);
+		ok = misaligned_mfile_range_makeanon_or_unlock(msalign,
+		                                               msalign_minaddr,
+		                                               msalign_maxaddr,
+		                                               unlock);
+		if (!ok)
+			return false;
+	}
+	return true;
+#undef LOCAL_unlock_all
+}
+
+
+/* Same as `_mfile_msalign_makeanon_locked_or_unlock()', except that
+ * the caller doesn't need to worry about holding a lock to  `self'.
+ * @return: true:  Success (locks are still held)
+ * @return: false: Try again (locks were lost)
+ * @THROW: Error (locks were lost) */
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool FCALL
+_mfile_msalign_makeanon_or_unlock(struct mfile *__restrict self,
+                                  pos_t minaddr, pos_t maxaddr,
+                                  struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...) {
+	/* Without this special makeanon handling, the following would break:
+	 * >> static char buf[64 * 1024];
+	 * >> int offset = 4 * getpagesize();
+	 * >> pwrite(fd, "BAR", 3, offset);
+	 * >> pread(fd, buf, sizeof(buf), 0);  // This will trigger the mmapread system
+	 * >> pwrite(fd, "FOO", 3, offset);
+	 * >> // Because memory wasn't unshared during the write, the buffer now also contains "FOO"
+	 * >> assert(memcmp(buf + offset, "BAR") == 0);
+	 *
+	 * In  order to fix this, we essentially treat the mpart-s of misaligned files the
+	 * same way we  treat copy-on-write  nodes (as per  `mpart::mp_copy'). This  means
+	 * that everywhere we do copy-on-write unsharing, we also have to search for  mem-
+	 * parts  that depend on  the to-be-unshared file-range, and  then proceed to make
+	 * those  parts anonymous (thus  removing them from the  list of misaligned files,
+	 * meaning  that the next time part of  the base file should be misaligned-mapped,
+	 * new mpart-s are created which will then lazily initialize to new memory-content
+	 * of the underlying file) */
+	bool result;
+
+	/* Ensure that we've got a read-lock to `self' */
+	if (!mfile_lock_tryread(self)) {
+		unlockinfo_xunlock(unlock);
+		mfile_lock_waitread(self);
+		return false;
+	}
+
+	/* Use `_mfile_msalign_makeanon_locked_or_unlock()' now that we have a lock to the file. */
+	result = _mfile_msalign_makeanon_locked_or_unlock(self, minaddr, maxaddr, unlock);
+
+	/* Upon success, have to release the read-lock to `self'
+	 * In the error-case,  this lock  was already  released. */
+	if (result)
+		mfile_lock_endread(self);
+	return result;
+}
+
+
 
 DECL_END
 

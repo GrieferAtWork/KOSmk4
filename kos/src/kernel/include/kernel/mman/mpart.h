@@ -1052,6 +1052,26 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 
+/* Helper wrapper around `mfile_msalign_makeanon_or_unlock()'
+ * NOTE: The caller  must be  holding a  lock to  `self', and  must
+ *       ensure that the given address range is in-bounds of `self' */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
+_mpart_msalign_makeanon_or_unlock(struct mpart *__restrict self,
+                                  struct unlockinfo *unlock,
+                                  mpart_reladdr_t partrel_offset,
+                                  size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...);
+#ifndef __OPTIMIZE_SIZE__
+#define mpart_msalign_makeanon_or_unlock(self, unlock, partrel_offset, num_bytes)                       \
+	(likely(__hybrid_atomic_load(&(self)->mp_file->mf_msalign.lh_first, __ATOMIC_ACQUIRE) == __NULLPTR) \
+	 ? 1                                                                                                \
+	 : likely(_mpart_msalign_makeanon_or_unlock(self, unlock, partrel_offset, num_bytes)))
+#else /* !__OPTIMIZE_SIZE__ */
+#define mpart_msalign_makeanon_or_unlock(self, unlock, partrel_offset, num_bytes) \
+	likely(_mpart_msalign_makeanon_or_unlock(self, unlock, partrel_offset, num_bytes))
+#endif /* __OPTIMIZE_SIZE__ */
+
+
 /* Ensure that:
  * >> LIST_FOREACH (node, &self->mp_share, mn_link)
  * >>     mnode_clear_write(node) == MNODE_CLEAR_WRITE_SUCCESS
@@ -1102,7 +1122,8 @@ mpart_lock_acquire_and_setcore_load(struct mpart *__restrict self,
 
 /* Acquire a lock until:
  *  - mpart_setcore_or_unlock(self, ...)
- *  - mpart_unsharecow_or_unlock(self, ...)  // Based on the given address range
+ *  - mpart_unsharecow_or_unlock(self, ...)       // Based on the given address range
+ *  - mpart_msalign_makeanon_or_unlock(self, ...) // Based on the given address range
  *
  * If  the given `filepos' isn't contained by  `self', then no lock is acquired,
  * and `false' is returned. (`max_load_bytes' is only used as a hint for the max
@@ -1116,8 +1137,9 @@ mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self,
 
 /* Acquire a lock until:
  *  - mpart_setcore_or_unlock(self, ...)
- *  - mpart_load_or_unlock(self, ...)        // Based on the given address range
- *  - mpart_unsharecow_or_unlock(self, ...)  // Based on the given address range
+ *  - mpart_load_or_unlock(self, ...)             // Based on the given address range
+ *  - mpart_unsharecow_or_unlock(self, ...)       // Based on the given address range
+ *  - mpart_msalign_makeanon_or_unlock(self, ...) // Based on the given address range
  *
  * If  the given `filepos' isn't contained by  `self', then no lock is acquired,
  * and `false' is returned. (`max_load_bytes' is only used as a hint for the max
@@ -1729,8 +1751,10 @@ FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL _mpart_buffered_writev(struct mpart
  * Upon success, return the (non-zero) # of transferred bytes.
  * The caller must ensure that:
  *    >> num_bytes != 0
- *    >> MPART_ST_INCORE(self->mp_state)   // Can be ensured by `mpart_setcore_or_unlock()'
- *    >> mpart_unsharecow_or_unlock(...)   // Only for `mpart_write*', and only within the target address range */
+ *    >> MPART_ST_INCORE(self->mp_state)       // Can be ensured by `mpart_setcore_or_unlock()'
+ *    >> mpart_unsharecow_or_unlock(...)       // Only for `mpart_write*', and only within the target address range
+ *    >> mpart_msalign_makeanon_or_unlock(...) // Only for `mpart_write*', and only within the target address range
+ */
 FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_read_or_unlock(struct mpart *__restrict self, NCX void *dst, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_write_or_unlock(struct mpart *__restrict self, NCX void const *src, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_read_or_unlock_p(struct mpart *__restrict self, physaddr_t dst, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
