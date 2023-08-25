@@ -1137,7 +1137,7 @@ NOTHROW(FCALL mpart_async_split_before)(struct mpart *__restrict self,
 	lopart->mp_minaddr = hipart->mp_minaddr;
 	lopart->mp_maxaddr = hipart->mp_minaddr + addr - 1;
 	DBG_memset(&lopart->mp_changed, 0xcc, sizeof(lopart->mp_changed));
-	LIST_ENTRY_UNBOUND_INIT(&lopart->mp_allparts); /* Overwritten below if necessary... */
+	TAILQ_ENTRY_UNBOUND_INIT(&lopart->mp_allparts); /* Overwritten below if necessary... */
 	_mpart_init_asanon(lopart);
 
 	/* Transfer mem-nodes from `hipart' to `lopart'. */
@@ -1241,7 +1241,7 @@ again_enum_hipart_nodlst:
 	/* Mirror the is-part-of-all-list attribute of `hipart' within `lopart'.
 	 * NOTE: Once we do this, `lopart' becomes visible to the outside world! */
 	COMPILER_BARRIER();
-	if (LIST_ISBOUND(hipart, mp_allparts))
+	if (TAILQ_ISBOUND(hipart, mp_allparts))
 		mpart_all_list_insert(lopart);
 
 	/* Remove locks to mmans in `lopart', and no longer present in `hipart',
@@ -3108,7 +3108,7 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 		voidpart->mp_state = MPART_ST_VOID;
 		DBG_memset(&voidpart->_mp_joblink, 0xcc, sizeof(voidpart->_mp_joblink));
 		voidpart->mp_file = incref(self->mp_file);
-		LIST_ENTRY_UNBOUND_INIT(&voidpart->mp_allparts);
+		TAILQ_ENTRY_UNBOUND_INIT(&voidpart->mp_allparts);
 		DBG_memset(&voidpart->mp_changed, 0xcc, sizeof(voidpart->mp_changed));
 		voidpart->mp_blkst_ptr = NULL;
 		DBG_memset(&voidpart->mp_mem_sc, 0xcc, sizeof(voidpart->mp_mem_sc));
@@ -3124,7 +3124,7 @@ NOTHROW(FCALL mpart_void_subrange_or_unlock)(struct mpart *__restrict self,
 		/* Mirror the is-part-of-all-list attribute of `self' within `voidpart'.
 		 * NOTE: Once we do this, `voidpart' becomes visible to the outside world! */
 		COMPILER_BARRIER();
-		if (LIST_ISBOUND(self, mp_allparts))
+		if (TAILQ_ISBOUND(self, mp_allparts))
 			mpart_all_list_insert(voidpart);
 
 		/* Remove locks to mmans in `voidpart', and no longer present in `self',
@@ -3440,8 +3440,8 @@ movedown_self__mp_blkst_ptr:
 		DBG_memset(&voidpart->_mp_joblink, 0xcc, sizeof(voidpart->_mp_joblink));
 		lopart->mp_file   = incref(self->mp_file);
 		voidpart->mp_file = incref(self->mp_file);
-		LIST_ENTRY_UNBOUND_INIT(&lopart->mp_allparts);
-		LIST_ENTRY_UNBOUND_INIT(&voidpart->mp_allparts);
+		TAILQ_ENTRY_UNBOUND_INIT(&lopart->mp_allparts);
+		TAILQ_ENTRY_UNBOUND_INIT(&voidpart->mp_allparts);
 		DBG_memset(&lopart->mp_changed, 0xcc, sizeof(lopart->mp_changed));
 		DBG_memset(&voidpart->mp_changed, 0xcc, sizeof(voidpart->mp_changed));
 		voidpart->mp_blkst_ptr = NULL;
@@ -3516,7 +3516,7 @@ movedown_self__mp_blkst_ptr:
 		/* Mirror the is-part-of-all-list attribute of `self' within `lopart' and `voidpart'.
 		 * NOTE: Once we do this, `lopart' and `voidpart' becomes visible to the outside world! */
 		COMPILER_BARRIER();
-		if (LIST_ISBOUND(self, mp_allparts)) {
+		if (TAILQ_ISBOUND(self, mp_allparts)) {
 			mpart_all_list_insert(lopart);
 			mpart_all_list_insert(voidpart);
 		}

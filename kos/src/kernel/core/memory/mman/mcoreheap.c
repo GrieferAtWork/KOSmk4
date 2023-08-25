@@ -303,7 +303,7 @@ NOTHROW(FCALL is_coreheap_node)(struct mnode const *__restrict node) {
 		goto nope;
 	if (part->mp_flags != (MPART_F_COREPART | MPART_F_MLOCK_FROZEN | MPART_F_MLOCK))
 		goto nope;
-	if (LIST_ISBOUND(part, mp_allparts))
+	if (TAILQ_ISBOUND(part, mp_allparts))
 		goto nope;
 	if (part->mp_file != &mcore_file)
 		goto nope;
@@ -565,7 +565,7 @@ NOTHROW(FCALL mcoreheap_replicate_nocc)(/*inherit(always)*/ struct mpart *__rest
 	part->mp_file   = incref(&mcore_file);
 	LIST_INIT(&part->mp_copy);
 	SLIST_INIT(&part->mp_lockops);
-	LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
+	TAILQ_ENTRY_UNBOUND_INIT(&part->mp_allparts);
 	DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
 	part->mp_minaddr = (pos_t)(0);
 	part->mp_maxaddr = (pos_t)(PAGESIZE - 1);

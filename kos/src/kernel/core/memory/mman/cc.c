@@ -996,10 +996,7 @@ again:
 	}
 
 	/* Enumerate all mem-parts. */
-	/* TODO: Would be better to enumerate from least-recent to most-recent
-	 *       Though for this, we should probably change the list type from
-	 *       `LIST_*' to `TAILQ_*' (which has a O(1) *_LAST operation). */
-	LIST_FOREACH_SAFE (iter, &mpart_all_list, mp_allparts) {
+	TAILQ_FOREACH_SAFE (iter, &mpart_all_list, mp_allparts) {
 		if (!(iter->mp_flags & MPART_F_GLOBAL_REF))
 			continue; /* Can't be decref'd */
 		if (atomic_read(&iter->mp_refcnt) != 1)
@@ -1097,13 +1094,13 @@ again:
 	}
 
 	if (!did_clear_trimmed) {
-		LIST_FOREACH (iter, &mpart_all_list, mp_allparts)
+		TAILQ_FOREACH (iter, &mpart_all_list, mp_allparts)
 			atomic_and(&iter->mp_flags, ~MPART_F__TRIMMED);
 		did_clear_trimmed = true;
 	}
 
 	/* Enumerate all mem-parts. */
-	LIST_FOREACH_SAFE (iter, &mpart_all_list, mp_allparts) {
+	TAILQ_FOREACH_SAFE (iter, &mpart_all_list, mp_allparts) {
 		unsigned int error;
 
 		/* Check if we already trimmed this part. */

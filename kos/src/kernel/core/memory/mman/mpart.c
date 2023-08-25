@@ -93,8 +93,8 @@ static_assert(offsetof(struct mpart, _mp_anfplop) == OFFSET_MPART__ANFPLOP);
 static_assert(offsetof(struct mpart, _mp_anpplop) == OFFSET_MPART__ANPPLOP);
 static_assert(offsetof(struct mpart, mp_lockops) == OFFSET_MPART_LOCKOPS);
 static_assert(offsetof(struct mpart, mp_allparts) == OFFSET_MPART_ALLPARTS);
-static_assert(offsetof(struct mpart, mp_allparts.le_next) == OFFSET_MPART_ALLPARTS_NEXT);
-static_assert(offsetof(struct mpart, mp_allparts.le_prev) == OFFSET_MPART_ALLPARTS_PREV);
+static_assert(offsetof(struct mpart, mp_allparts.tqe_next) == OFFSET_MPART_ALLPARTS_NEXT);
+static_assert(offsetof(struct mpart, mp_allparts.tqe_prev) == OFFSET_MPART_ALLPARTS_PREV);
 static_assert(offsetof(struct mpart, _mp_lopall) == OFFSET_MPART__LOPALL);
 static_assert(offsetof(struct mpart, _mp_plopall) == OFFSET_MPART__PLOPALL);
 static_assert(offsetof(struct mpart, mp_changed) == OFFSET_MPART_CHANGED);
@@ -348,7 +348,7 @@ NOTHROW(FCALL mpart_destroy_lop_rmall_async)(struct lockop *__restrict self) {
 
 	/* Remove the part from the all-parts list. */
 	COMPILER_READ_BARRIER();
-	if (LIST_ISBOUND(me, mp_allparts))
+	if (TAILQ_ISBOUND(me, mp_allparts))
 		_mpart_all_list_remove(me);
 
 	/* Call mpart_free() once the caller has released their lock to `mpart_all_lock' */
@@ -362,11 +362,11 @@ NOTHROW(FCALL mpart_destroy_lop_rmall)(Tobpostlockop(mfile) *__restrict self,
                                        struct mfile *__restrict UNUSED(file)) {
 	struct mpart *me;
 	me = mpart_destroy_mfilelockop_decode(self);
-	if (LIST_ISBOUND(me, mp_allparts)) {
+	if (TAILQ_ISBOUND(me, mp_allparts)) {
 		/* Must remove from the global list of all known parts. */
 		if (mpart_all_tryacquire()) {
 			COMPILER_READ_BARRIER();
-			if (LIST_ISBOUND(me, mp_allparts))
+			if (TAILQ_ISBOUND(me, mp_allparts))
 				_mpart_all_list_remove(me);
 			mpart_all_release();
 		} else {
@@ -415,11 +415,11 @@ NOTHROW(FCALL mpart_destroy)(struct mpart *__restrict self) {
 	if (mpart_isanon(self)) {
 		/* No need to unlink from the file. - The file's tree was deleted! */
 remove_node_from_globals:
-		if (LIST_ISBOUND(self, mp_allparts)) {
+		if (TAILQ_ISBOUND(self, mp_allparts)) {
 			/* Must remove from the global list of all known parts. */
 			if (mpart_all_tryacquire()) {
 				COMPILER_READ_BARRIER();
-				if (LIST_ISBOUND(self, mp_allparts))
+				if (TAILQ_ISBOUND(self, mp_allparts))
 					_mpart_all_list_remove(self);
 				mpart_all_release();
 			} else {
@@ -1019,8 +1019,11 @@ PUBLIC struct atomic_lock mpart_all_lock = ATOMIC_LOCK_INIT;
 /* [0..n][CHAIN(mp_allparts)][lock(mpart_all_lock)]
  * List of all memory parts currently in use. List head indices are `MPART_ALL_LIST_*'
  * NOTE: This list holds a reference to every contain part that wasn't
- *       already destroyed, and has the `MPART_F_GLOBAL_REF' flag set. */
-PUBLIC ATTR_MALL_UNTRACKED struct mpart_list mpart_all_list = LIST_HEAD_INITIALIZER(mpart_all_list);
+ *       already destroyed. Statically allocated parts aren't in here. */
+PUBLIC struct mpart_tailq mpart_all_list = TAILQ_HEAD_INITIALIZER(mpart_all_list);
+/* NOTE: The `mpart_all_list' list gets skewed during `kmalloc_leaks()',
+ *       so there's no reason to annotate it with `ATTR_MALL_UNTRACKED'! */
+
 
 /* [0..n][lock(ATOMIC)] List of lock-ops for `mpart_all_list' */
 PUBLIC struct lockop_slist mpart_all_lops = SLIST_HEAD_INITIALIZER(mpart_all_lops);
@@ -1035,7 +1038,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL async_add2all_mpart_destroy_postlop_cb)(struct postlockop *__restrict self) {
 	struct mpart *me;
 	me = container_of(self, struct mpart, _mp_plopall);
-	LIST_ENTRY_UNBOUND_INIT(&me->mp_allparts);
+	TAILQ_ENTRY_UNBOUND_INIT(&me->mp_allparts);
 	mpart_destroy(me);
 }
 
@@ -1066,16 +1069,16 @@ NOTHROW(FCALL mpart_all_list_insert)(struct mpart *__restrict self) {
 		_mpart_all_list_insert(self);
 		mpart_all_release();
 	} else {
-		static_assert(offsetof(struct mpart, mp_allparts.le_prev) ==
+		static_assert(offsetof(struct mpart, mp_allparts.tqe_prev) ==
 		              offsetof(struct mpart, _mp_lopall.lo_func),
 		              "This is an implementation detail that is required, such that "
 		              /**/ "a mem-part that's still being added to the all-parts list via "
-		              /**/ "async means can still be tested via `LIST_ISBOUND()' for being "
+		              /**/ "async means can still be tested via `TAILQ_ISBOUND()' for being "
 		              /**/ "apart of the all-parts list:\n"
 		              "While the async `async_add2all_mpart_lop_cb()' is pending, the "
-		              /**/ "lo_func field of the lop will be non-NULL, and `LIST_ISBOUND()' "
-		              /**/ "is implemented to check if `le_prev' is non-NULL.\n"
-		              "So we put the 2 together such that `le_prev' will also appear as "
+		              /**/ "lo_func field of the lop will be non-NULL, and `TAILQ_ISBOUND()' "
+		              /**/ "is implemented to check if `tqe_prev' is non-NULL.\n"
+		              "So we put the 2 together such that `tqe_prev' will also appear as "
 		              /**/ "non-NULL for as long as the async add2all hasn't been serviced "
 		              /**/ "yet, thus keeping everything consistent.");
 

@@ -167,7 +167,7 @@ INTDEF struct mnode x86_kernel_mnodes[];
 		MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(self.mp_copy)),              \
 		MPART_INIT_mp_share(node),                                            \
 		MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(self.mp_lockops)),       \
-		MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),               \
+		MPART_INIT_mp_allparts(TAILQ_ENTRY_UNBOUND_INITIALIZER),              \
 		MPART_INIT_mp_changed({}),                                            \
 		MPART_INIT_mp_minaddr(0),                                             \
 		MPART_INIT_mp_maxaddr((num_bytes)-1),                                 \

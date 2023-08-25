@@ -1062,12 +1062,12 @@ procfs_kos_mm_parts_printer(pformatprinter printer, void *arg,
 	REF struct mpart *prev = NULL;
 	size_t index = 0;
 	mpart_all_acquire();
-	part = LIST_FIRST(&mpart_all_list);
+	part = TAILQ_FIRST(&mpart_all_list);
 	for (;;) {
 		size_t num_destroyed;
 		num_destroyed = 0;
 		while (part && !tryincref(part)) {
-			part = LIST_NEXT(part, mp_allparts);
+			part = TAILQ_NEXT(part, mp_allparts);
 			++num_destroyed;
 		}
 		mpart_all_release();
@@ -1088,15 +1088,15 @@ procfs_kos_mm_parts_printer(pformatprinter printer, void *arg,
 			RETHROW();
 		}
 		prev = part;
-		if (!LIST_ISBOUND(part, mp_allparts)) {
+		if (!TAILQ_ISBOUND(part, mp_allparts)) {
 			/* Find  the `index'th part in the global list.
 			 * This is not failsafe (elements before `part'
 			 * may have been removed, so `index' may not be
 			 * correct), but it's better than nothing. */
 			size_t i;
-			part = LIST_FIRST(&mpart_all_list);
+			part = TAILQ_FIRST(&mpart_all_list);
 			for (i = 0; part && i < index; ++i) {
-				part = LIST_NEXT(part, mp_allparts);
+				part = TAILQ_NEXT(part, mp_allparts);
 			}
 			if (!part) {
 				mpart_all_release();
@@ -1104,7 +1104,7 @@ procfs_kos_mm_parts_printer(pformatprinter printer, void *arg,
 				break;
 			}
 		}
-		part = LIST_NEXT(part, mp_allparts);
+		part = TAILQ_NEXT(part, mp_allparts);
 		++index;
 	}
 	xdecref_unlikely(part);
@@ -1253,7 +1253,7 @@ gather_mpart_ramusage(struct mpart_ram_usage *__restrict info) {
 again:
 	bzero(info, sizeof(*info));
 	mpart_all_acquire();
-	LIST_FOREACH (iter, &mpart_all_list, mp_allparts) {
+	TAILQ_FOREACH (iter, &mpart_all_list, mp_allparts) {
 		if (!tryincref(iter))
 			continue; /* Skip */
 		if (!mpart_lock_tryacquire(iter)) {

@@ -95,7 +95,7 @@ PUBLIC ATTR_PERCPU struct mpart thiscpu_x86_dfstackpart_ = {
 	MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(thiscpu_x86_dfstackpart_.mp_copy)),
 	MPART_INIT_mp_share({ &bootcpu_x86_dfstack_node }),
 	MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(thiscpu_x86_dfstackpart_.mp_lockops)),
-	MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),
+	MPART_INIT_mp_allparts(TAILQ_ENTRY_UNBOUND_INITIALIZER),
 	MPART_INIT_mp_changed({}),
 	MPART_INIT_mp_minaddr(0),
 	MPART_INIT_mp_maxaddr(KERNEL_DF_STACKSIZE - 1),

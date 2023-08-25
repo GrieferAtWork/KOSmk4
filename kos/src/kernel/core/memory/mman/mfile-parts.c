@@ -282,11 +282,13 @@ mfile_makepart(struct mfile *__restrict self,
 	LIST_INIT(&result->mp_copy);
 	LIST_INIT(&result->mp_share);
 	SLIST_INIT(&result->mp_lockops);
-	LIST_ENTRY_UNBOUND_INIT(&result->mp_allparts);
 	result->mp_minaddr = addr;
 	result->mp_maxaddr = addr + num_bytes - 1;
 	DBG_memset(&result->mp_changed, 0xcc, sizeof(result->mp_changed));
 	_mpart_init_asanon(result);
+
+	/* Even if it's an anon part, still add it to the global list, so `system_cc()' sees it. */
+	mpart_all_list_insert(result);
 	return result;
 }
 
@@ -476,7 +478,7 @@ again_extend_part:
 	LIST_INIT(&result->mp_copy);
 	LIST_INIT(&result->mp_share);
 	SLIST_INIT(&result->mp_lockops);
-	/*LIST_ENTRY_UNBOUND_INIT(&result->mp_allparts);*/ /* Initialized later... */
+	/*TAILQ_ENTRY_UNBOUND_INIT(&result->mp_allparts);*/ /* Initialized later... */
 	result->mp_minaddr = addr;
 	result->mp_maxaddr = loadmax;
 	DBG_memset(&result->mp_changed, 0xcc, sizeof(result->mp_changed));
@@ -485,7 +487,7 @@ again_extend_part:
 	TRY {
 		mfile_lock_write(self);
 	} EXCEPT {
-		LIST_ENTRY_UNBOUND_INIT(&result->mp_allparts);
+		TAILQ_ENTRY_UNBOUND_INIT(&result->mp_allparts);
 		result->mp_refcnt = 0;
 		mpart_destroy(result);
 		RETHROW();
@@ -524,7 +526,7 @@ again_extend_part:
 	return result;
 startover:
 	mfile_lock_endwrite(self);
-	LIST_ENTRY_UNBOUND_INIT(&result->mp_allparts);
+	TAILQ_ENTRY_UNBOUND_INIT(&result->mp_allparts);
 	result->mp_refcnt = 0;
 	mpart_destroy(result);
 	goto again;

@@ -1574,43 +1574,93 @@ NOTHROW(KCALL gc_find_reachable_impl)(void) {
 	                   heapptr_getsiz(hptr), \
 	                   TRACE_HEAP_FLAGS);
 
-struct abstract_object {
-	LIST_ENTRY(abstract_object) ao_link;
+union abstract_object {
+	LIST_ENTRY(abstract_object)  ao_list;
+	TAILQ_ENTRY(abstract_object) ao_tailq;
 };
 
+LIST_HEAD(abstract_object_list, abstract_object);
+TAILQ_HEAD(abstract_object_tailq, abstract_object);
+
+
 PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
-NOTHROW(KCALL gc_list_skew)(void **p_list_head, ptrdiff_t offsetof_object_list_entry) {
+NOTHROW(KCALL gc_list_skew)(void *p_list, ptrdiff_t offsetof_object_list_entry) {
+	void **p_list_head = (void **)&((struct abstract_object_list *)p_list)->lh_first;
 	void *object;
 	while ((object = *p_list_head) != NULL) {
-		struct abstract_object *link;
+		union abstract_object *link;
 		assert(!gc_isskewed(object));
-		link = (struct abstract_object *)((byte_t *)object + offsetof_object_list_entry);
-		assert((void **)link->ao_link.le_prev == p_list_head);
-		assert(!gc_isskewed(link->ao_link.le_prev));
-		gc_skew((void **)&link->ao_link.le_prev);
-		gc_skew((void **)p_list_head);
-		p_list_head = (void **)&link->ao_link.le_next;
+		link = (union abstract_object *)((byte_t *)object + offsetof_object_list_entry);
+		assert((void **)link->ao_list.le_prev == p_list_head);
+		assert(!gc_isskewed(link->ao_list.le_prev));
+		gc_skew(&link->ao_list.le_prev);
+		gc_skew(p_list_head);
+		p_list_head = (void **)&link->ao_list.le_next;
 	}
-	gc_skew((void **)p_list_head);
+	gc_skew(p_list_head);
 }
 
 PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
-NOTHROW(KCALL gc_list_unskew)(void **p_list_head, ptrdiff_t offsetof_object_list_entry) {
+NOTHROW(KCALL gc_list_unskew)(void *p_list, ptrdiff_t offsetof_object_list_entry) {
+	void **p_list_head = (void **)&((struct abstract_object_list *)p_list)->lh_first;
 	void *object;
 	for (;;) {
-		struct abstract_object *link;
+		union abstract_object *link;
 		assert(gc_isskewed(*p_list_head));
-		gc_unskew((void **)p_list_head);
+		gc_unskew(p_list_head);
 		object = *p_list_head;
 		if (object == NULL)
 			break;
-		link = (struct abstract_object *)((byte_t *)object + offsetof_object_list_entry);
-		assert(gc_isskewed(link->ao_link.le_prev));
-		gc_unskew((void **)&link->ao_link.le_prev);
-		assert((void **)link->ao_link.le_prev == p_list_head);
-		p_list_head = (void **)&link->ao_link.le_next;
+		link = (union abstract_object *)((byte_t *)object + offsetof_object_list_entry);
+		assert(gc_isskewed(link->ao_list.le_prev));
+		gc_unskew(&link->ao_list.le_prev);
+		assert((void **)link->ao_list.le_prev == p_list_head);
+		p_list_head = (void **)&link->ao_list.le_next;
 	}
 }
+
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
+NOTHROW(KCALL gc_tailq_skew)(void *p_tailq, ptrdiff_t offsetof_object_tailq_entry) {
+	void **p_tailq_next = (void **)&((struct abstract_object_tailq *)p_tailq)->tqh_first;
+	void *object;
+	while ((object = *p_tailq_next) != NULL) {
+		union abstract_object *link;
+		assert(!gc_isskewed(object));
+		link = (union abstract_object *)((byte_t *)object + offsetof_object_tailq_entry);
+		assert((void **)link->ao_tailq.tqe_prev == p_tailq_next);
+		assert(!gc_isskewed(link->ao_tailq.tqe_prev));
+		gc_skew(&link->ao_tailq.tqe_prev);
+		gc_skew(p_tailq_next);
+		p_tailq_next = (void **)&link->ao_tailq.tqe_next;
+	}
+	assert(!gc_isskewed(*p_tailq_next));
+	gc_skew(p_tailq_next);
+	assert((void **)((struct abstract_object_tailq *)p_tailq)->tqh_last == p_tailq_next);
+	gc_skew(&((struct abstract_object_tailq *)p_tailq)->tqh_last);
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
+NOTHROW(KCALL gc_tailq_unskew)(void *p_tailq, ptrdiff_t offsetof_object_tailq_entry) {
+	void **p_tailq_next = (void **)&((struct abstract_object_tailq *)p_tailq)->tqh_first;
+	void *object;
+	for (;;) {
+		union abstract_object *link;
+		assert(gc_isskewed(*p_tailq_next));
+		gc_unskew(p_tailq_next);
+		object = *p_tailq_next;
+		if (object == NULL)
+			break;
+		link = (union abstract_object *)((byte_t *)object + offsetof_object_tailq_entry);
+		assert(gc_isskewed(link->ao_tailq.tqe_prev));
+		gc_unskew(&link->ao_tailq.tqe_prev);
+		assert((void **)link->ao_tailq.tqe_prev == p_tailq_next);
+		p_tailq_next = (void **)&link->ao_tailq.tqe_next;
+	}
+	assert(gc_isskewed(((struct abstract_object_tailq *)p_tailq)->tqh_last));
+	gc_unskew(&((struct abstract_object_tailq *)p_tailq)->tqh_last);
+	assert((void **)((struct abstract_object_tailq *)p_tailq)->tqh_last == p_tailq_next);
+}
+
 
 PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL gc_mnode_skew)(struct mnode *__restrict self) {
@@ -1723,9 +1773,9 @@ PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL gc_globals_skew)(void) {
 	/* Prevent traversal of global object lists during GC leak detection.
 	 * -> s.a. the rationale for why `Phase #3: Scan global objects' is disabled. */
-	gc_list_skew((void **)&mpart_all_list.lh_first, offsetof(struct mpart, mp_allparts));
-	gc_list_skew((void **)&fallnodes_list.lh_first, offsetof(struct fnode, fn_allnodes));
-	gc_list_skew((void **)&fallsuper_list.lh_first, offsetof(struct fsuper, fs_root.fn_allsuper));
+	gc_tailq_skew(&mpart_all_list, offsetof(struct mpart, mp_allparts));
+	gc_list_skew(&fallnodes_list, offsetof(struct fnode, fn_allnodes));
+	gc_list_skew(&fallsuper_list, offsetof(struct fsuper, fs_root.fn_allsuper));
 
 	/* Skew the kernel mman. */
 	gc_mman_skew(&mman_kernel);
@@ -1737,9 +1787,9 @@ NOTHROW(KCALL gc_globals_skew)(void) {
 PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL gc_globals_unskew)(void) {
 	/* Unskew global lists. */
-	gc_list_unskew((void **)&mpart_all_list.lh_first, offsetof(struct mpart, mp_allparts));
-	gc_list_unskew((void **)&fallnodes_list.lh_first, offsetof(struct fnode, fn_allnodes));
-	gc_list_unskew((void **)&fallsuper_list.lh_first, offsetof(struct fsuper, fs_root.fn_allsuper));
+	gc_tailq_unskew(&mpart_all_list, offsetof(struct mpart, mp_allparts));
+	gc_list_unskew(&fallnodes_list, offsetof(struct fnode, fn_allnodes));
+	gc_list_unskew(&fallsuper_list, offsetof(struct fsuper, fs_root.fn_allsuper));
 
 	/* Unskew the kernel mman. */
 	gc_mman_unskew(&mman_kernel);

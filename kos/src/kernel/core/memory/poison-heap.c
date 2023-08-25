@@ -198,7 +198,7 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 	 * and not adding a part to said list reduces its connectivity
 	 * to other kernel sub-systems  (thus reducing the chances  of
 	 * fault recursion) */
-	LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
+	TAILQ_ENTRY_UNBOUND_INIT(&part->mp_allparts);
 	part->mp_minaddr          = (pos_t)(0);
 	part->mp_maxaddr          = (pos_t)(num_bytes - 1);
 	part->mp_changed.sle_next = NULL; /* Technically shouldn't needed... */

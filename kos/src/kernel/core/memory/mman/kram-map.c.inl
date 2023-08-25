@@ -587,7 +587,7 @@ do_prefault:
 		incref(part->mp_file);
 		LIST_INIT(&part->mp_copy);
 		SLIST_INIT(&part->mp_lockops);
-		LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
+		TAILQ_ENTRY_UNBOUND_INIT(&part->mp_allparts);
 		DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
 		part->mp_minaddr = (pos_t)(0);
 		part->mp_maxaddr = (pos_t)(num_bytes - 1);

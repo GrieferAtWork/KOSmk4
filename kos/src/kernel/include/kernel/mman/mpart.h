@@ -233,7 +233,7 @@ LIST_HEAD(mnode_list, mnode);
 
 #ifndef __mpart_list_defined
 #define __mpart_list_defined
-LIST_HEAD(mpart_list, mpart);
+TAILQ_HEAD(mpart_tailq, mpart);
 #endif /* !__mpart_list_defined */
 
 #ifndef __mnode_slist_defined
@@ -291,7 +291,7 @@ struct mchunkvec {
 //	MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(FILLME.mp_copy)),
 //	MPART_INIT_mp_share(LIST_HEAD_INITIALIZER(FILLME.mp_share)),
 //	MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(FILLME.mp_lockops)),
-//	MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),
+//	MPART_INIT_mp_allparts(TAILQ_ENTRY_UNBOUND_INITIALIZER),
 //	MPART_INIT_mp_changed({}),
 //	MPART_INIT_mp_minaddr(0),
 //	MPART_INIT_mp_maxaddr(FILLME - 1),
@@ -406,7 +406,7 @@ struct mpart {
 #define MPART_INIT_mp_allparts(mp_allparts) { mp_allparts }
 #endif /* __WANT_MPART_INIT */
 	union {
-		LIST_ENTRY(mpart)         mp_allparts;  /* [lock(:mpart_all_lock)]
+		TAILQ_ENTRY(mpart)        mp_allparts;  /* [lock(:mpart_all_lock)]
 		                                         * Chain of all mem-parts in existence. (may be unbound for certain parts) */
 		struct lockop            _mp_lopall;    /* Lock-op used for async insertion of the part into the all-parts list. */
 		struct postlockop        _mp_plopall;   /* *ditto* */
@@ -415,7 +415,7 @@ struct mpart {
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_allparts(mp_allparts) mp_allparts
 #endif /* __WANT_MPART_INIT */
-	LIST_ENTRY(mpart)             mp_allparts;  /* [0..1][lock(:mpart_all_lock)]
+	TAILQ_ENTRY(mpart)            mp_allparts;  /* [0..1][lock(:mpart_all_lock)]
 	                                             * Chain of all mem-parts in existence. (may be unbound for certain parts) */
 #endif /* !__WANT_MPART__mp_lopall */
 #ifdef __WANT_MPART__mp_dead
@@ -626,7 +626,7 @@ struct mpart {
 		MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(~)),                \
 		MPART_INIT_mp_share(LIST_HEAD_INITIALIZER(~)),               \
 		MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(~)),            \
-		MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),      \
+		MPART_INIT_mp_allparts(TAILQ_ENTRY_UNBOUND_INITIALIZER),     \
 		MPART_INIT_mp_changed({}),                                   \
 		MPART_INIT_mp_minaddr(0),                                    \
 		MPART_INIT_mp_maxaddr((num_bytes)-1),                        \
@@ -1793,8 +1793,9 @@ DATDEF struct atomic_lock mpart_all_lock;
 /* [0..n][CHAIN(mp_allparts)][lock(mpart_all_lock)]
  * List of all memory parts currently in use. List head indices are `MPART_ALL_LIST_*'
  * NOTE: This list holds a reference to every contain part that wasn't
- *       already destroyed, and has the `MPART_F_GLOBAL_REF' flag set. */
-DATDEF struct mpart_list mpart_all_list;
+ *       already destroyed. Statically allocated parts aren't in here.
+ * NOTE: This list is ordered such that new parts are always added in the back. */
+DATDEF struct mpart_tailq mpart_all_list;
 
 #ifndef CONFIG_NO_MPART_ALL_SIZE
 /* [lock(mpart_all_lock)] The # of parts stored in `mpart_all_list' */
@@ -1808,8 +1809,8 @@ DATDEF size_t mpart_all_size;
 
 /* Direct insert/remove a given part from `mpart_all_list'
  * The caller must be holding a  lock to `mpart_all_lock'! */
-#define _mpart_all_list_insert(part) (LIST_INSERT_HEAD(&mpart_all_list, part, mp_allparts), _mpart_all_size_inc())
-#define _mpart_all_list_remove(part) (_mpart_all_size_dec(), LIST_REMOVE(part, mp_allparts))
+#define _mpart_all_list_insert(part) (TAILQ_INSERT_TAIL(&mpart_all_list, part, mp_allparts), _mpart_all_size_inc())
+#define _mpart_all_list_remove(part) (_mpart_all_size_dec(), TAILQ_REMOVE(&mpart_all_list, part, mp_allparts))
 
 /* Return the # of items stored in `mpart_all_list' */
 #ifdef CONFIG_NO_MPART_ALL_SIZE

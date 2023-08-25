@@ -278,7 +278,6 @@ DEFINE_COMPAT_SYSCALL5(void *, maplibrary,
 				LIST_INIT(&part->mp_copy);
 				LIST_INIT(&part->mp_share);
 				SLIST_INIT(&part->mp_lockops);
-				LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
 				part->mp_minaddr = (pos_t)(0);
 				part->mp_maxaddr = (pos_t)(PAGESIZE - 1);
 				DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
@@ -286,6 +285,9 @@ DEFINE_COMPAT_SYSCALL5(void *, maplibrary,
 				part->mp_blkst_ptr   = NULL;
 				part->mp_mem.mc_size = 1;
 				part->mp_meta        = NULL;
+
+				/* Keep track of our custom part in the global list of all parts. */
+				mpart_all_list_insert(part);
 
 				/* Initialize the node. */
 				node->mbn_minaddr = destaddr;

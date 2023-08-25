@@ -1002,7 +1002,7 @@ restart_after_extendpart:
 		LIST_INIT(&part->mp_copy);
 		LIST_INIT(&part->mp_share);
 		SLIST_INIT(&part->mp_lockops);
-		/*LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);*/ /* Initialized later... */
+		/*TAILQ_ENTRY_UNBOUND_INIT(&part->mp_allparts);*/ /* Initialized later... */
 		part->mp_minaddr = newpart_minaddr;
 		part->mp_maxaddr = newpart_maxaddr;
 		DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
@@ -1011,7 +1011,7 @@ restart_after_extendpart:
 		TRY {
 			mfile_lock_write(self);
 		} EXCEPT {
-			LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
+			TAILQ_ENTRY_UNBOUND_INIT(&part->mp_allparts);
 			mpart_destroy(part);
 			RETHROW();
 		}
@@ -1020,7 +1020,7 @@ restart_after_extendpart:
 		if unlikely(mfile_isanon(self)) {
 destroy_new_part_and_try_again:
 			mfile_lock_endwrite(self);
-			LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
+			TAILQ_ENTRY_UNBOUND_INIT(&part->mp_allparts);
 			mpart_destroy(part);
 			goto again;
 		}
@@ -1642,7 +1642,7 @@ extend_failed:
 			LIST_INIT(&part->mp_copy);
 			LIST_INIT(&part->mp_share);
 			SLIST_INIT(&part->mp_lockops);
-			/*LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);*/ /* Initialized later... */
+			/*TAILQ_ENTRY_UNBOUND_INIT(&part->mp_allparts);*/ /* Initialized later... */
 			part->mp_minaddr = newpart_minaddr;
 			part->mp_maxaddr = newpart_maxaddr;
 			DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
@@ -1763,7 +1763,7 @@ extend_failed:
 				/* Re-acquire a lock to the file, so we can insert the new mem-part. */
 				mfile_lock_write(self);
 			} EXCEPT {
-				LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
+				TAILQ_ENTRY_UNBOUND_INIT(&part->mp_allparts);
 				mpart_destroy(part);
 				RETHROW();
 			}
@@ -1836,7 +1836,7 @@ handle_part_insert_failure:
 			mfile_trunclock_dec(self);
 			mfile_lock_endwrite(self);
 			RAII_FINALLY {
-				LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
+				TAILQ_ENTRY_UNBOUND_INIT(&part->mp_allparts);
 				mpart_destroy(part);
 			};
 #ifdef LOCAL_BUFFER_IS_PHYS

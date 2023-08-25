@@ -1729,7 +1729,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 
 	/* Deal with `hipart' having the GLOBAL_REF bit set. */
 	if (atomic_fetchand(&hipart->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF) {
-		if (LIST_ISBOUND(lopart, mp_allparts) && !(lopart->mp_flags & MPART_F_GLOBAL_REF)) {
+		if (TAILQ_ISBOUND(lopart, mp_allparts) && !(lopart->mp_flags & MPART_F_GLOBAL_REF)) {
 			incref(lopart);
 			if unlikely(atomic_fetchor(&lopart->mp_flags, MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
 				decref_nokill(lopart);
@@ -1751,7 +1751,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 		if (hipart->mp_blkst_ptr != NULL &&
 		    !(hipart->mp_flags & MPART_F_BLKST_INL))
 			kfree(hipart->mp_blkst_ptr);
-		if (LIST_ISBOUND(hipart, mp_allparts)) {
+		if (TAILQ_ISBOUND(hipart, mp_allparts)) {
 			/* Must remove from the global list of all known parts. */
 			if (mpart_all_tryacquire()) {
 				_mpart_all_list_remove(hipart);

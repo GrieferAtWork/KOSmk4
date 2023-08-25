@@ -1066,12 +1066,12 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	hipart->mp_meta = NULL;
 
 	/* Mirror the part-of-global-list status of `lopart' in `hipart' */
-	if (LIST_ISBOUND(lopart, mp_allparts)) {
+	if (TAILQ_ISBOUND(lopart, mp_allparts)) {
 		if (lopart->mp_flags & MPART_F_GLOBAL_REF)
 			hipart->mp_refcnt = 2; /* +1 for the global list. */
 		mpart_all_list_insert(hipart);
 	} else {
-	    LIST_ENTRY_UNBOUND_INIT(&hipart->mp_allparts);
+		TAILQ_ENTRY_UNBOUND_INIT(&hipart->mp_allparts);
 		assertf(!(lopart->mp_flags & MPART_F_GLOBAL_REF),
 		        "How can you have a global ref, but not be part of the global list?");
 	}

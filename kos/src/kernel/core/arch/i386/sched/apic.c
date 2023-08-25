@@ -190,7 +190,7 @@ mpart_create_lockram(size_t num_pages) {
 	LIST_INIT(&result->mp_copy);
 	/*LIST_INIT(&result->mp_share);*/ /* Initialized by our caller. */
 	SLIST_INIT(&result->mp_lockops);
-	LIST_ENTRY_UNBOUND_INIT(&result->mp_allparts);
+	TAILQ_ENTRY_UNBOUND_INIT(&result->mp_allparts);
 	DBG_memset(&result->mp_changed, 0xcc, sizeof(result->mp_changed));
 	result->mp_minaddr = (pos_t)0;
 	result->mp_maxaddr = (pos_t)((num_pages * PAGESIZE) - 1);

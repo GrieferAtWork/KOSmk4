@@ -106,7 +106,6 @@ mnode_create_anon_ram(PAGEDIR_PAGEALIGNED size_t num_bytes,
 			LIST_INIT(&part->mp_copy);
 			LIST_INIT(&part->mp_share);
 			SLIST_INIT(&part->mp_lockops);
-			LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
 			DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
 			part->mp_minaddr = (pos_t)0;
 			part->mp_maxaddr = (pos_t)num_bytes - 1;
@@ -144,6 +143,7 @@ mnode_create_anon_ram(PAGEDIR_PAGEALIGNED size_t num_bytes,
 		RETHROW();
 	}
 	incref(&mfile_zero); /* For `part->mp_file' */
+	mpart_all_list_insert(part);
 	return node;
 }
 
