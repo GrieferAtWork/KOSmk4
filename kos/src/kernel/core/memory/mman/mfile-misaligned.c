@@ -282,6 +282,23 @@ PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct mfile *FCALL
 mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
                                 pos_t *__restrict p_inner_fpos)
 		THROWS(E_BADALLOC) {
+	/* TODO: The following currently breaks:
+	 * >> static char buf[64 * 1024];
+	 * >> int offset = 4 * getpagesize();
+	 * >> pwrite(fd, "BAR", 3, offset);
+	 * >> pread(fd, buf, sizeof(buf), 0);  // This will trigger the mmapread system
+	 * >> pwrite(fd, "FOO", 3, offset);
+	 * >> // Because memory wasn't unshared during the write, the buffer now also contains "FOO"
+	 * >> assert(memcmp(buf + offset, "BAR") == 0);
+	 *
+	 * In order to fix this, we must essentially treat the mpart-s of misaligned files
+	 * the same way we treat copy-on-write nodes (as per `mpart::mp_copy'). This means
+	 * that everywhere we do copy-on-write unsharing, we also have to search for  mem-
+	 * parts  that depend on  the to-be-unshared file-range, and  then proceed to make
+	 * those  parts anonymous (thus  removing them from the  list of misaligned files,
+	 * meaning  that the next time part of  the base file should be misaligned-mapped,
+	 * new mpart-s are created which will then lazily initialize to new memory-content
+	 * of the underlying file) */
 	size_t misalign;
 	struct misaligned_mfile *used_predecessor;
 	REF struct misaligned_mfile *predecessor;

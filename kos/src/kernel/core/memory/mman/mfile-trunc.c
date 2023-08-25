@@ -933,6 +933,10 @@ everything_confirmed:
 		mpart_trim(part);
 	}
 
+	/* TODO: Must remove (make-anon) all mparts from misaligned files
+	 *       that  overlap with [new_size,old_size-1], as these parts
+	 *       have changed their contents to 0-bytes */
+
 	/* Step #10: Release locks + references from all of the remaining mem-
 	 *           parts which still remain  apart of the file's  part-tree,
 	 *           and release the write-lock `mfile_lock_endwrite(self);' */
