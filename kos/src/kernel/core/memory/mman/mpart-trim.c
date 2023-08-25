@@ -567,10 +567,12 @@ PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mpart_lstrip_transfer_futex)(struct mpartmeta *__restrict self,
                                            struct mpart *__restrict lopart,
                                            PAGEDIR_PAGEALIGNED mpart_reladdr_t num_bytes) {
-	struct mfutex *tree;
-	tree = self->mpm_ftx;
-	self->mpm_ftx = NULL;
-	mpart_lstrip_transfer_futex_tree(&self->mpm_ftx, tree, lopart, num_bytes);
+	if (self->mpm_ftx != NULL) {
+		struct mfutex *tree;
+		tree = self->mpm_ftx;
+		self->mpm_ftx = NULL;
+		mpart_lstrip_transfer_futex_tree(&self->mpm_ftx, tree, lopart, num_bytes);
+	}
 }
 
 /* Transfer nodes/futexes to `lopart' and just offsets in non-moved structures */
