@@ -61,6 +61,7 @@ DEFINE_TEST(ftruncate_after_mmap) {
 	fms.fmsa_resfd.of_mode  = OPENFD_MODE_AUTO;
 	fms.fmsa_resfd.of_flags = IO_CLOEXEC;
 	ISpos((msfd = ioctl(fd, FILE_IOC_MSALIGN, &fms)));
+	EQ(0, fms.fmsa_offset & (getpagesize() - 1));
 
 	EQ(4, write(fd, "TEST", 4));
 	EQ(0, fsync(fd));
@@ -88,7 +89,7 @@ DEFINE_TEST(ftruncate_after_mmap) {
 	EQ(0, ftruncate(fd, 0));
 
 	/* Assert that ftruncate caused our MAP_PRIVATE
-	 * mapping  to magically re-appear in the core. */
+	 * mappings to magically re-appear in the core. */
 	EQ(0, mincore(m1, 4, vec));
 	EQ(1, vec[0]);
 	EQ(0, mincore(m2, 2, vec));
@@ -100,7 +101,7 @@ DEFINE_TEST(ftruncate_after_mmap) {
 	EQ(0, close(msfd));
 	EQ(0, close(fd));
 
-	/* Assert the validity of the 2 mappings we created. */
+	/* Assert the validity of the 3 mappings we created (ensuring that they all contain the expected data) */
 	EQmemf("TEST", m1, 4, "A MAP_PRIVATE mapping must retain its contents, even after an ftruncate");
 	EQmemf("ST", m2, 2, "A misaligned sub-file must retain its contents, even after an ftruncate");
 	EQmemf("\0\0\0\0", m3, 4, "This mapping was created after the ftruncate, so it must be all 0-es");
