@@ -56,7 +56,7 @@
 #define FILE_IOC_BLKSHIFT  _IOR_KOS('F', 0x04, struct file_blkshift) /* This ioctl is meant to be used to query buffer requirements for `O_DIRECT',
                                                                       * which requires file offsets be  aligned by `1 << fbs_blck', and I/O  buffer
                                                                       * pointers to be aligned by `1 << fbs_ioba' (IOBaseAddress_SHIFT). */
-#define FILE_IOC_MKUALIGN _IOWR_KOS('F', 0x10, struct file_mkualign) /* Create an unaligned wrapper for this file (see below) */
+#define FILE_IOC_MSALIGN  _IOWR_KOS('F', 0x10, struct file_msalign)  /* Create an misaligned wrapper for this file (see below) */
 #define FILE_IOC_TAILREAD _IOWR_KOS('F', 0x20, struct file_tailread) /* Tail read (see below) */
 
 /* Return `_PC_*' for the superblock associated with the given file.
@@ -88,14 +88,14 @@ struct file_blkshift {
 
 
 
-/* Construct structure for `FILE_IOC_MKUALIGN', which can be used to
- * create an  unaligned wrapper  for the  file. Briefly  stated:  an
- * unaligned file wrapper behaves the same as the original file, but
+/* Construct structure for `FILE_IOC_MSALIGN', which can be used to
+ * create a misaligned wrapper for the file. Briefly stated: a mis-
+ * aligned  file wrapper behaves the same as the original file, but
  * with the addition that:
- *  - All references to file data have sub-part added of `fmua_offset' added
+ *  - All references to file data have sub-part added of `fmsa_offset' added
  *    - This  affects `pread(2)', `read(2)' and `mmap(2)', this
  *      last system call being the most important of these when
- *      it comes to uses of unaligned wrappers.
+ *      it comes to uses of misaligned wrappers.
  *  - The wrapper is read-only, but (may) contain its own I/O buffer
  *    that  is  distinct from  the  original file.  In  other words,
  *    modifications  made to the original file *may* or *may not* be
@@ -103,17 +103,17 @@ struct file_blkshift {
  *
  * Q: Why does this exist?
  * A: Notice how there are no alignment requirements imposed  on
- *    what you can pass for  `fmua_offset', as well as the  fact
+ *    what you can pass for  `fmsa_offset', as well as the  fact
  *    that the  resulting file  can still  be mmap'd.  As  such,
  *    you can use  this mechanism to  create lazily  initialized
  *    file->to->memory mappings at arbitrary file positions then
  *    mapped to arbitrary memory  locations (iow: this makes  it
  *    possible to overcome `ADDR & PAGEMASK == FPOS & PAGEMASK')
  *
- * Q: Why is `fmua_offset' marked as in|out?
+ * Q: Why is `fmsa_offset' marked as in|out?
  * A: On input, this is the file position that you *want* to  mmap.
  *    And on output, it is the (now aligned) addend that you  still
- *    have to pass to `mmap(2)' when mapping `fmua_resfd'. This  is
+ *    have to pass to `mmap(2)' when mapping `fmsa_resfd'. This  is
  *    because the kernel wants to re-use misaligned files, and will
  *    only  create as  many of  these as  are necessary. Currently,
  *    there can be  at most `MAX(PAGESIZE, 1 << fbs_blck) - 1'  for
@@ -121,13 +121,13 @@ struct file_blkshift {
  *
  * Restrictions (and behavior in corner-cases):
  * - The original file must support "Raw I/O" (s.a. `FILE_IOC_HASRAWIO')
- *   If it doesn't, `E_ILLEGAL_OPERATION_CONTEXT_MKUALIGN_NO_RAW_IO'  is
- *   thrown when `ioctl(FILE_IOC_MKUALIGN)' is attempted.
+ *   If it  doesn't, `E_ILLEGAL_OPERATION_CONTEXT_MSALIGN_NO_RAW_IO'  is
+ *   thrown when `ioctl(FILE_IOC_MSALIGN)' is attempted.
  * - When block-reads from the given file  behave the same as reads  from
  *   /dev/zero, or some other file  where file offsets don't matter,  the
  *   kernel is allowed to simply return a dup(2)'d handle of the original
- *   file. The same is guarantied to happen when `fmua_offset == 0',  and
- *   the kernel  ensures that  it is  impossible to  create an  unaligned
+ *   file. The same is guarantied to happen when `fmsa_offset == 0',  and
+ *   the kernel  ensures that  it is  impossible to  create a  misaligned
  *   wrapper file with an offset of zero.
  * - Creating a misalignment  wrapper of another  one causes offsets  to
  *   cascade, and the new wrapper to be created for the underlying file.
@@ -135,9 +135,9 @@ struct file_blkshift {
  *   file read time (and generally: any file reads that are attempted at
  *   out-of-bounds file locations) will behave like reads from /dev/zero
  */
-struct file_mkualign {
-	__uint64_t    fmua_offset; /* [in|out] Unaligned file offset. */
-	struct openfd fmua_resfd;  /* Resulting file descriptor. */
+struct file_msalign {
+	__uint64_t    fmsa_offset; /* [in|out] Unaligned file offset. */
+	struct openfd fmsa_resfd;  /* Resulting file descriptor. */
 };
 
 

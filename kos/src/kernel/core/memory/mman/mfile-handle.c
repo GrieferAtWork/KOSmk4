@@ -151,14 +151,14 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		return 0;
 	}	break;
 
-	case FILE_IOC_MKUALIGN: {
-		NCX struct file_mkualign *info;
+	case FILE_IOC_MSALIGN: {
+		NCX struct file_msalign *info;
 		REF struct mfile *ma_wrapper;
 		REF struct filehandle *ma_handle;
 		struct handle hand;
 		pos_t offset;
-		info   = (NCX struct file_mkualign *)validate_readwrite(arg, sizeof(struct file_mkualign));
-		offset = (pos_t)info->fmua_offset;
+		info   = (NCX struct file_msalign *)validate_readwrite(arg, sizeof(struct file_msalign));
+		offset = (pos_t)info->fmsa_offset;
 		COMPILER_READ_BARRIER();
 
 		/* Ensure that the caller has read-access for `self'.
@@ -173,7 +173,7 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		 * will  cause kernel panic. -- Since we get called from user-space, we need to
 		 * throw an exception in this situation. */
 		if unlikely(!mfile_hasrawio(self))
-			THROW(E_ILLEGAL_OPERATION, E_ILLEGAL_OPERATION_CONTEXT_MKUALIGN_NO_RAW_IO);
+			THROW(E_ILLEGAL_OPERATION, E_ILLEGAL_OPERATION_CONTEXT_MSALIGN_NO_RAW_IO);
 
 		/* Create the misalignment wrapper. */
 		ma_wrapper = mfile_create_misaligned_wrapper(self, &offset);
@@ -193,13 +193,13 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 
 		/* Write-back the adjusted file offset. */
 		COMPILER_WRITE_BARRIER();
-		info->fmua_offset = (uint64_t)offset;
+		info->fmsa_offset = (uint64_t)offset;
 
 		/* Set-up and install the new object as a handle. */
 		hand.h_type = HANDLE_TYPE_FILEHANDLE;
 		hand.h_data = ma_handle;
 		hand.h_mode = IO_RDONLY;
-		return handles_install_openfd(hand, &info->fmua_resfd);
+		return handles_install_openfd(hand, &info->fmsa_resfd);
 	}	break;
 
 	case FILE_IOC_TAILREAD: {
