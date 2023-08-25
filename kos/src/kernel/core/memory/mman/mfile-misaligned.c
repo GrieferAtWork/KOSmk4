@@ -153,7 +153,12 @@ misaligned_mfile_v_loadblocks(struct mfile *__restrict self, pos_t addr,
 		}
 	} else {
 		/* Must use buffered I/O */
-		mfile_readall_p(base, buf, num_bytes, addr);
+		size_t ok;
+		ok = mfile_read_p(base, buf, num_bytes, addr);
+		if (ok < num_bytes) {
+			/* Must zero-initialize trailing data. */
+			bzerophyscc(buf + ok, num_bytes - ok);
+		}
 	}
 }
 
