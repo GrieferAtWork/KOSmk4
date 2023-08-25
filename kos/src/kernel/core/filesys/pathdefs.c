@@ -133,6 +133,7 @@ PUBLIC struct ramfs_super fsuper_unmounted = {
 					MFILE_INIT_mf_mtime(0, 0),
 					MFILE_INIT_mf_ctime(0, 0),
 					MFILE_INIT_mf_btime(0, 0),
+					MFILE_INIT_mf_msalign(NULL),
 				},
 				FNODE_INIT_fn_nlink(1),
 				FNODE_INIT_fn_mode(S_IFDIR | 0755),

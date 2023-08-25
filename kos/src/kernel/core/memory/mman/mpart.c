@@ -694,10 +694,10 @@ again:
 	/* Lock the part, load it into the core, make sure that  anyone
 	 * that might have write-access  right now has this  permission
 	 * revoked, and that there aren't any DMA operation in-process. */
-	/* TODO: It would be nice if we could differentiate between read-
-	 *       and write- DMA operations, and  only wait for write  DMA
-	 *       operations here. - In practice,  we don't have to  worry
-	 *       about anyone reading memory in the mean time... */
+	/* XXX: It would be nice if we could differentiate between read-
+	 *      and write- DMA operations, and  only wait for write  DMA
+	 *      operations here. - In practice,  we don't have to  worry
+	 *      about anyone reading memory in the mean time... */
 	mpart_lock_acquire_and_setcore_denywrite_nodma(self);
 
 	if (!(self->mp_flags & MPART_F_CHANGED))
@@ -1068,7 +1068,7 @@ NOTHROW(FCALL mpart_all_list_insert)(struct mpart *__restrict self) {
 	} else {
 		static_assert(offsetof(struct mpart, mp_allparts.le_prev) ==
 		              offsetof(struct mpart, _mp_lopall.lo_func),
-		              "This is an implementation default that is required, such that "
+		              "This is an implementation detail that is required, such that "
 		              /**/ "a mem-part that's still being added to the all-parts list via "
 		              /**/ "async means can still be tested via `LIST_ISBOUND()' for being "
 		              /**/ "apart of the all-parts list:\n"

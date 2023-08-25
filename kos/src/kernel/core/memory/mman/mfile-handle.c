@@ -37,6 +37,7 @@
 #include <kernel/handle.h>
 #include <kernel/handman.h>
 #include <kernel/iovec.h>
+#include <kernel/mman/mfile-misaligned.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
@@ -175,7 +176,7 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 			THROW(E_ILLEGAL_OPERATION, E_ILLEGAL_OPERATION_CONTEXT_MKUALIGN_NO_RAW_IO);
 
 		/* Create the misalignment wrapper. */
-		ma_wrapper = mfile_create_misaligned_wrapper(self, offset);
+		ma_wrapper = mfile_create_misaligned_wrapper(self, &offset);
 
 		/* Wrap the new mfile in a `struct filehandle'. */
 		{
@@ -189,6 +190,10 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 			ma_handle = filehandle_new(ma_wrapper, fh_path, fh_dent);
 		}
 		FINALLY_DECREF_UNLIKELY(ma_handle);
+
+		/* Write-back the adjusted file offset. */
+		COMPILER_WRITE_BARRIER();
+		info->fmua_offset = (uint64_t)offset;
 
 		/* Set-up and install the new object as a handle. */
 		hand.h_type = HANDLE_TYPE_FILEHANDLE;

@@ -92,7 +92,7 @@ struct file_blkshift {
  * create an  unaligned wrapper  for the  file. Briefly  stated:  an
  * unaligned file wrapper behaves the same as the original file, but
  * with the addition that:
- *  - All references to file data have `fmua_offset' added
+ *  - All references to file data have sub-part added of `fmua_offset' added
  *    - This  affects `pread(2)', `read(2)' and `mmap(2)', this
  *      last system call being the most important of these when
  *      it comes to uses of unaligned wrappers.
@@ -109,6 +109,15 @@ struct file_blkshift {
  *    file->to->memory mappings at arbitrary file positions then
  *    mapped to arbitrary memory  locations (iow: this makes  it
  *    possible to overcome `ADDR & PAGEMASK == FPOS & PAGEMASK')
+ *
+ * Q: Why is `fmua_offset' marked as in|out?
+ * A: On input, this is the file position that you *want* to  mmap.
+ *    And on output, it is the (now aligned) addend that you  still
+ *    have to pass to `mmap(2)' when mapping `fmua_resfd'. This  is
+ *    because the kernel wants to re-use misaligned files, and will
+ *    only  create as  many of  these as  are necessary. Currently,
+ *    there can be  at most `MAX(PAGESIZE, 1 << fbs_blck) - 1'  for
+ *    each regular file.
  *
  * Restrictions (and behavior in corner-cases):
  * - The original file must support "Raw I/O" (s.a. `FILE_IOC_HASRAWIO')
@@ -127,7 +136,7 @@ struct file_blkshift {
  *   out-of-bounds file locations) will behave like reads from /dev/zero
  */
 struct file_mkualign {
-	__uint64_t    fmua_offset; /* Unaligned file offset. */
+	__uint64_t    fmua_offset; /* [in|out] Unaligned file offset. */
 	struct openfd fmua_resfd;  /* Resulting file descriptor. */
 };
 

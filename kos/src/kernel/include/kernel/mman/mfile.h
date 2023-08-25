@@ -803,7 +803,8 @@ SLIST_HEAD(ramfs_dirent_slist, ramfs_dirent);
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 struct inotify_controller;
 #endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
-
+struct misaligned_mfile;
+LIST_HEAD(misaligned_mfile_list, misaligned_mfile);
 
 struct mfile {
 	WEAK refcnt_t                 mf_refcnt;     /* Reference counter. */
@@ -947,8 +948,9 @@ struct mfile {
 #ifdef __WANT_FS_INIT
 #define MFILE_INIT_mf_atime(mf_atime__tv_sec, mf_atime__tv_nsec) {{ { .tv_sec = mf_atime__tv_sec, .tv_nsec = mf_atime__tv_nsec }
 #define MFILE_INIT_mf_mtime(mf_mtime__tv_sec, mf_mtime__tv_nsec)    { .tv_sec = mf_mtime__tv_sec, .tv_nsec = mf_mtime__tv_nsec }
-#define MFILE_INIT_mf_ctime(mf_ctime__tv_sec, mf_ctime__tv_nsec)    { .tv_sec = mf_ctime__tv_sec, .tv_nsec = mf_ctime__tv_nsec } }}
+#define MFILE_INIT_mf_ctime(mf_ctime__tv_sec, mf_ctime__tv_nsec)    { .tv_sec = mf_ctime__tv_sec, .tv_nsec = mf_ctime__tv_nsec }
 #define MFILE_INIT_mf_btime(mf_btime__tv_sec, mf_btime__tv_nsec)    { .tv_sec = mf_btime__tv_sec, .tv_nsec = mf_btime__tv_nsec } }}
+#define MFILE_INIT_mf_msalign(mf_msalign)                           { mf_msalign } }}
 #endif /* __WANT_FS_INIT */
 	union {
 		struct {
@@ -956,6 +958,7 @@ struct mfile {
 			struct timespec       mf_mtime;      /* ... */
 			struct timespec       mf_ctime;      /* ... */
 			struct timespec       mf_btime;      /* ... */
+			struct misaligned_mfile_list mf_msalign; /* ... */
 		};
 
 #ifdef __WANT_MFILE__mf_lop
@@ -1032,7 +1035,7 @@ struct mfile {
 #endif /* __WANT_MFILE__mf_delsup */
 
 #ifdef __WANT_MFILE__mf_lopX
-		byte_t _mf_lopX[4 * sizeof(struct timespec)]; /* ... */
+		byte_t _mf_lopX[4 * sizeof(struct timespec) + sizeof(struct misaligned_mfile_list)]; /* ... */
 #endif /* __WANT_MFILE__mf_lopX */
 	};
 #else /* __WANT_MFILE__mf_... */
@@ -1041,6 +1044,7 @@ struct mfile {
 #define MFILE_INIT_mf_mtime(mf_mtime__tv_sec, mf_mtime__tv_nsec) { .tv_sec = mf_mtime__tv_sec, .tv_nsec = mf_mtime__tv_nsec }
 #define MFILE_INIT_mf_ctime(mf_ctime__tv_sec, mf_ctime__tv_nsec) { .tv_sec = mf_ctime__tv_sec, .tv_nsec = mf_ctime__tv_nsec }
 #define MFILE_INIT_mf_btime(mf_btime__tv_sec, mf_btime__tv_nsec) { .tv_sec = mf_btime__tv_sec, .tv_nsec = mf_btime__tv_nsec }
+#define MFILE_INIT_mf_msalign(mf_msalign)                        { mf_msalign }
 #endif /* __WANT_FS_INIT */
 	struct timespec               mf_atime;      /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_NOATIME)][valid_if(!MFILE_F_DELETED)]
 	                                              * Last-accessed timestamp. NOTE!!!  Becomes invalid when  `MFILE_F_DELETED' is  set!
@@ -1058,6 +1062,7 @@ struct mfile {
 	                                              * Birth timestamp. NOTE!!! Becomes invalid when `MFILE_F_DELETED' is set!
 	                                              * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
 	                                              *      before proceeding to use the data you've just read! */
+	struct misaligned_mfile_list  mf_msalign;    /* [lock(_MFILE_F_SMP_TSLOCK)][valid_if(!MFILE_F_DELETED)][0..n] List of misaligned wrappers. */
 #endif /* !__WANT_MFILE__mf_... */
 };
 
@@ -1149,21 +1154,25 @@ EIDECLARE(NOBLOCK NONNULL((1)), void, NOTHROW, FCALL,
  *  - mf_ops, mf_parts, mf_changed, mf_part_amask, mf_blockshift,
  *    mf_iobashift, mf_flags,  mf_filesize,  mf_atime,  mf_mtime,
  *    mf_ctime, mf_btime */
-#define _mfile_init_common(self)           \
+#define _mfile_init_common(self) \
+	((self)->mf_refcnt = 1, __mfile_init_common_norefcnt(self))
+#define _mfile_cinit_common(self)                       \
+	((self)->mf_refcnt = 1, __mfile_cinit_common_norefcnt(self))
+#define __mfile_init_common_norefcnt(self) \
 	(_mfile_init_wrlockpc_(self)           \
 	 _mfile_init_notify_(self)             \
-	 (self)->mf_refcnt = 1,                \
 	 atomic_rwlock_init(&(self)->mf_lock), \
 	 sig_init(&(self)->mf_initdone),       \
 	 SLIST_INIT(&(self)->mf_lockops),      \
+	 LIST_INIT(&(self)->mf_msalign),       \
 	 (self)->mf_trunclock = 0)
-#define _mfile_cinit_common(self)                       \
+#define __mfile_cinit_common_norefcnt(self)             \
 	(_mfile_cinit_wrlockpc_(self)                       \
 	 _mfile_cinit_notify_(self)                         \
-	 (self)->mf_refcnt = 1,                             \
 	 atomic_rwlock_cinit(&(self)->mf_lock),             \
 	 sig_cinit(&(self)->mf_initdone),                   \
 	 __hybrid_assert(SLIST_EMPTY(&(self)->mf_lockops)), \
+	 __hybrid_assert(LIST_EMPTY(&(self)->mf_msalign)),  \
 	 __hybrid_assert((self)->mf_trunclock == 0))
 
 /* Initialize common+basic fields. The caller must still initialize:
@@ -1263,22 +1272,6 @@ DEFINE_REFCNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 #define mfile_lock_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->mf_lock)
 #define mfile_lock_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->mf_lock)
 #define mfile_lock_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->mf_lock)
-
-
-/* Create a wrapper file whose I/O cache is lazily populated from  `inner',
- * with the given `inner_fpos' addend added to all file offsets. Note  that
- * writes  to the  returned file will  _NEVER_ be passed  along to `inner',
- * and that any modifications made to portions of `inner' that have already
- * been loaded by `return' will _NOT_ be visible.
- *
- * This function is primarily used as a hacky wrapper for loading PE files
- * into memory (as those  sometimes have sub-page alignment  constraints).
- *
- * NOTE: The caller must ensure that `mfile_hasrawio(inner)'! */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfile *FCALL
-mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
-                                pos_t inner_fpos)
-		THROWS(E_BADALLOC);
 
 
 /* Make the given file anonymous+deleted. What this means is that (in order):

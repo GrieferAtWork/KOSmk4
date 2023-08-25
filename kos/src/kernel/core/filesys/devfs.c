@@ -48,6 +48,8 @@
 #include <kernel/fs/super.h>
 #include <kernel/fs/vfs.h>
 #include <kernel/mman/driver.h>
+#include <kernel/mman/mfile-misaligned.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <sched/task.h>
@@ -1902,7 +1904,7 @@ NOTHROW(FCALL device_delete)(struct device *__restrict self) {
 	                           MFILE_F_NOMTIME | MFILE_F_CHANGED | MFILE_F_ATTRCHANGED |
 	                           MFILE_F_FIXEDFILESIZE | MFILE_FN_ATTRREADONLY |
 	                           MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_READONLY);
-	mfile_tslock_release(self);
+	mfile_tslock_release_and_delete_misaligned_wrappers(self);
 
 	/* Delete global reference to the device. */
 	if ((old_flags & MFILE_FN_GLOBAL_REF) &&

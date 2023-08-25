@@ -23,7 +23,10 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/fs/devfs.h>
+#include <kernel/fs/null.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/mfile-misaligned.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/phys.h>
 #include <sched/task.h>
@@ -31,10 +34,13 @@
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sched/__preemption.h>
 
 #include <kos/except.h>
+#include <sys/stat.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <string.h>
@@ -47,20 +53,23 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-struct misaligned_mfile: mfile {
-	REF struct mfile *mam_base; /* [1..1][const] The underlying mem-file. */
-	pos_t             mam_offs; /* [const] Offset addend added to every request. */
-};
-
-#define mfile_asmisaligned(self) ((struct misaligned_mfile *)(self))
-#define mfile_ismisaligned(self) ((self)->mf_ops == &misaligned_mfile_ops)
-
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL misaligned_mfile_v_destroy)(struct mfile *__restrict self) {
+	REF struct mfile *base;
 	struct misaligned_mfile *me;
-	me = mfile_asmisaligned(self);
-	decref_unlikely(me->mam_base);
+	me   = mfile_asmisaligned(self);
+	base = me->mam_base;
+
+	/* Remove from the list of misaligned sub-files of the base file.
+	 * NOTE: The ISBOUND check here is needed because `mfile_delete()'
+	 *       will unconditionally  unlink all  misaligned sub-file  of
+	 *       the associated base-file. */
+	mfile_tslock_acquire(base);
+	if (LIST_ISBOUND(me, mam_link))
+		LIST_REMOVE(me, mam_link);
+	mfile_tslock_release(base);
+	decref_unlikely(base);
 	kfree(me);
 }
 
@@ -89,9 +98,9 @@ misaligned_mfile_v_loadblocks(struct mfile *__restrict self, pos_t addr,
 		pos_t filesize, io_bytes;
 
 		/* Prevent the base file from being truncated. */
-		mfile_lock_write(base);
+		mfile_lock_read(base);
 		mfile_trunclock_inc(base);
-		mfile_lock_endwrite(base);
+		mfile_lock_endread(base);
 		RAII_FINALLY { mfile_trunclock_dec(base); };
 
 		/* Figure out how much data we can load from the base file. */
@@ -122,7 +131,7 @@ misaligned_mfile_v_pread(struct mfile *__restrict self, NCX void *dst,
 	struct misaligned_mfile *me;
 	me = mfile_asmisaligned(self);
 	if (OVERFLOW_UADD(addr, me->mam_offs, &addr))
-		return 0; /* TODO: Read from /dev/zero */
+		return 0;
 	return mfile_upread(me->mam_base, dst, num_bytes, addr, mode);
 }
 
@@ -132,7 +141,7 @@ misaligned_mfile_v_preadv(struct mfile *__restrict self, struct iov_buffer *__re
 	struct misaligned_mfile *me;
 	me = mfile_asmisaligned(self);
 	if (OVERFLOW_UADD(addr, me->mam_offs, &addr))
-		return 0; /* TODO: Read from /dev/zero */
+		return 0;
 	return mfile_upreadv(me->mam_base, dst, num_bytes, addr, mode);
 }
 
@@ -143,6 +152,19 @@ misaligned_mfile_v_tryas(struct mfile *__restrict self,
 	struct misaligned_mfile *me;
 	me = mfile_asmisaligned(self);
 	return mfile_utryas(me->mam_base, wanted_type);
+}
+
+PRIVATE BLOCKING NONNULL_T((1)) void KCALL
+misaligned_mfile_v_stat(struct mfile *__restrict self,
+                        NCX struct stat *result)
+		THROWS(...) {
+	struct misaligned_mfile *me;
+	me = mfile_asmisaligned(self);
+	mfile_ustat(me->mam_base, result);
+
+	/* Adjust the stat size value to account for misaligned leading bytes. */
+	if (OVERFLOW_USUB(result->st_size, me->mam_offs, &result->st_size))
+		result->st_size = 0;
 }
 
 PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) ssize_t KCALL
@@ -160,7 +182,7 @@ misaligned_mfile_v_printlink(struct mfile *__restrict self,
 		goto err;
 	result += temp;
 	temp = format_printf(printer, arg,
-	                     ":+%" PRIuN(__SIZEOF_POS_T__) "]",
+	                     ":+%" PRIuSIZ "]",
 	                     me->mam_offs);
 	if unlikely(temp < 0)
 		goto err;
@@ -186,57 +208,120 @@ NOTHROW(KCALL misaligned_mfile_v_cc)(struct mfile *__restrict self,
 PRIVATE struct mfile_stream_ops const misaligned_mfile_v_stream_ops = {
 	.mso_pread     = &misaligned_mfile_v_pread,
 	.mso_preadv    = &misaligned_mfile_v_preadv,
+	.mso_stat      = &misaligned_mfile_v_stat,
 	.mso_tryas     = &misaligned_mfile_v_tryas,
 	.mso_printlink = &misaligned_mfile_v_printlink,
 	.mso_cc        = &misaligned_mfile_v_cc,
 };
 
-PRIVATE struct mfile_ops const misaligned_mfile_ops = {
+PUBLIC_CONST struct mfile_ops const misaligned_mfile_ops = {
 	.mo_destroy    = &misaligned_mfile_v_destroy,
 	.mo_loadblocks = &misaligned_mfile_v_loadblocks,
 	.mo_stream     = &misaligned_mfile_v_stream_ops,
 };
 
 
-/* Create a wrapper file whose I/O cache is lazily populated from  `inner',
- * with the given `inner_fpos' addend added to all file offsets. Note  that
- * writes  to the  returned file will  _NEVER_ be passed  along to `inner',
- * and that any modifications made to portions of `inner' that have already
- * been loaded by `return' will _NOT_ be visible.
+
+/* Create a wrapper file whose I/O cache is lazily populated from inner,
+ * at offsets based on `*p_inner_fpos'. Note that the returned file will
+ * probably not be writable, and that any modifications made to portions
+ * of  `inner' that have  already been loaded by  `return' will _NOT_ be
+ * visible (meaning that  the returned file  only works for  MAP_PRIVATE
+ * mappings).
  *
  * This function is primarily used as a hacky wrapper for loading PE files
  * into memory (as those  sometimes have sub-page alignment  constraints).
  *
- * NOTE: The caller must ensure that `mfile_hasrawio(inner)'! */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfile *FCALL
+ * NOTES:
+ * - The caller must ensure that `mfile_hasrawio(inner)'!
+ * - This function will adjust `p_inner_fpos' such that (upon return) there
+ *   is an invariant  `mfile_partaddr_aligned(return, OUT(*p_inner_fpos))'.
+ * - This function doesn't necessarily return a misaligned file (hence  why
+ *   its return type is just  `mfile'). When the effective alignment  turns
+ *   out to be `0', it will just re-return `inner', and if another matching
+ *   misaligned file already exists, that one is simply re-used. */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct mfile *FCALL
 mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
-                                pos_t inner_fpos)
+                                pos_t *__restrict p_inner_fpos)
 		THROWS(E_BADALLOC) {
+	size_t misalign;
+	struct misaligned_mfile *used_predecessor;
+	REF struct misaligned_mfile *predecessor;
 	REF struct misaligned_mfile *result;
 	shift_t blockshift;
 	assertf(mfile_hasrawio(inner), "The underlying file must support RAW I/O");
 
-	/* TODO: mfile-s need to maintain a list of linked misaligned files,
-	 *       and the misaligned files  themselves must NOT be  anonymous
-	 *       from the get-go.
+	/* Cascade offsets to merge miss-alignments for readthru */
+	if unlikely(mfile_ismisaligned(inner)) {
+		struct misaligned_mfile *inner_miss = mfile_asmisaligned(inner);
+		if (OVERFLOW_UADD(*p_inner_fpos, inner_miss->mam_offs, p_inner_fpos)) {
+			/* Always out-of-bounds -> map to /dev/null
+			 * XXX: This is technically incorrect, since /dev/null ignored writes,
+			 *      but we'd need a file that doesn't implement write operators... */
+			*p_inner_fpos = 0;
+			return incref(&dev_null);
+		}
+		inner = inner_miss->mam_base;
+		assert(!mfile_ismisaligned(inner));
+	}
+
+	/* Figure out the misalignment factor `misalign'.
+	 * This acts as  the ID of  the misaligned  file. */
+	misalign = (size_t)(*p_inner_fpos & inner->mf_part_amask);
+	*p_inner_fpos -= misalign;
+
+	if unlikely(inner->mf_ops->mo_loadblocks == NULL)
+		goto return_inner; /* File offsets don't matter in this case! */
+	if unlikely(misalign == 0)
+		goto return_inner; /* No misalignment --> no need to create a wrapper! */
+
+	/* mfile-s need to maintain a list of linked misaligned files, and the
+	 * misaligned files themselves must NOT be anonymous from the  get-go.
+	 *
 	 * This is required so that `ftruncate(2)' can force-load  MAP_PRIVATE
 	 * mappings of misaligned wrappers into memory before they are deleted
 	 * from disk.
 	 *
-	 * Essentially,  misaligned  wrappers need  the extra  requirement that
-	 * their misalignment must  be `<= mam_base->mf_part_amask', and  there
-	 * needs to  be a  singly-linked-list  (sorted by  `mam_offs',  deleted
-	 * when `MFILE_F_DELETED' gets set, and locked by mfile_tslock_acquire)
-	 * that keeps track of all  currently allocated misaligned wrappers  of
-	 * some given mfile. */
+	 * Essentially,  misaligned wrappers need  the extra requirement that
+	 * their misalignment must be `<= mam_base->mf_part_amask', and there
+	 * needs to  be a  linked-list (sorted  by `mam_offs',  deleted  when
+	 * `MFILE_F_DELETED' gets  set, and  locked by  mfile_tslock_acquire)
+	 * that keeps track  of all currently  allocated misaligned  wrappers
+	 * of some given mfile. */
 
-	if unlikely(inner->mf_ops->mo_loadblocks == NULL)
-		goto return_inner; /* File offsets don't matter in this case! */
-	if unlikely(inner_fpos == 0)
-		goto return_inner; /* No misalignment --> no need to create a wrapper! */
+	/* Check for an existing misaligned file with our desired offset. */
+	mfile_tslock_acquire(inner);
+	predecessor = LIST_FIRST(&inner->mf_msalign);
+	if (predecessor) {
+		if (predecessor->mam_offs > misalign) {
+			predecessor = NULL;
+		} else {
+			struct misaligned_mfile *next;
+			while ((next = LIST_NEXT(predecessor, mam_link)) != NULL) {
+				if (next->mam_offs > misalign)
+					break;
+				predecessor = next;
+			}
+			assert(predecessor->mam_offs <= misalign);
+			if unlikely(!tryincref(predecessor)) {
+				/* Predecessor just died, but has yet to remove itself */
+				predecessor = NULL;
+			} else if (predecessor->mam_offs == misalign) {
+				/* File already exists! */
+				mfile_tslock_release_br(inner);
+				return predecessor;
+			}
+		}
+	}
+	mfile_tslock_release(inner);
 
 	/* Allocate a new `struct misaligned_mfile' */
-	result = (REF struct misaligned_mfile *)kmalloc(sizeof(struct misaligned_mfile), GFP_NORMAL);
+	TRY {
+		result = (REF struct misaligned_mfile *)kmalloc(sizeof(struct misaligned_mfile), GFP_NORMAL);
+	} EXCEPT {
+		xdecref_unlikely(predecessor);
+		RETHROW();
+	}
 	blockshift = inner->mf_blockshift;
 	if (blockshift < PAGESHIFT) {
 		/* Because  it's the most efficient shift, and  because we're free to pick whatever
@@ -245,49 +330,100 @@ mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
 		blockshift = PAGESHIFT;
 	}
 	_mfile_init(result, &misaligned_mfile_ops, blockshift, inner->mf_iobashift);
-	result->mf_parts             = MFILE_PARTS_ANONYMOUS;
-	result->mf_changed.slh_first = MFILE_PARTS_ANONYMOUS;
-	atomic64_init(&result->mf_filesize, (uint64_t)-1);
+	result->mf_parts             = NULL;                  /* Still want to keep track of parts */
+	result->mf_changed.slh_first = MFILE_PARTS_ANONYMOUS; /* No changes possible */
+	atomic64_init(&result->mf_filesize, (uint64_t)-1);    /* We track file size and such manually. */
 
-	/* Set-up flags */
+	/* Set-up flags and remaining fields. */
 	result->mf_flags = MFILE_F_READONLY | MFILE_F_NOATIME |
-	                   MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE;
+	                   MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+	                   MFILE_F_ROFLAGS;
+	result->mam_base = incref(inner);
+	result->mam_offs = misalign;
 
 	mfile_tslock_acquire(inner);
 	if unlikely(inner->mf_flags & MFILE_F_DELETED) {
-		mfile_tslock_release_br(inner);
 		/* Deleted file --> don't create a misalignment wrapper! */
-		goto kfree_result_and_return_inner;
+		mfile_tslock_release_br(inner);
+		destroy(result);
+		xdecref_unlikely(predecessor);
+		goto return_inner;
 	}
 	result->mf_atime = inner->mf_atime;
 	result->mf_mtime = inner->mf_mtime;
 	result->mf_ctime = inner->mf_ctime;
 	result->mf_btime = inner->mf_btime;
-	mfile_tslock_release(inner);
 
-	/* Fill in remaining fields. */
-	if (mfile_ismisaligned(inner)) {
-		/* Cascade offsets to merge miss-alignments for readthru */
-		struct misaligned_mfile *inner_miss;
-		inner_miss = mfile_asmisaligned(inner);
-		if (OVERFLOW_UADD(inner_fpos, inner_miss->mam_offs, &inner_fpos)) {
-			/* Reading  from out-of-bounds addresses yields ZEROes. In a
-			 * situation where _all_ addresses are out-of-bounds, we can
-			 * simply return /dev/zero instead of creating a new file! */
-			kfree(result);
-			return incref(&mfile_zero);
+	/* Insert the new misaligned file into the base file's list. */
+	if (predecessor) {
+		/* Insert after `predecessor' */
+		struct misaligned_mfile *next;
+		used_predecessor = predecessor;
+		while ((next = LIST_NEXT(used_predecessor, mam_link)) != NULL) {
+			if (next->mam_offs > misalign)
+				break;
+			used_predecessor = next;
 		}
-		result->mam_base = incref(inner_miss->mam_base);
-		result->mam_offs = inner_fpos;
 	} else {
-		result->mam_base = incref(inner);
-		result->mam_offs = inner_fpos;
+		struct misaligned_mfile *next;
+		/* Must re-discover where to insert the new file. */
+		used_predecessor = LIST_FIRST(&inner->mf_msalign);
+		if (likely(used_predecessor == NULL) ||
+		    used_predecessor->mam_offs > misalign) {
+			/* Special case: insert at the front. */
+			LIST_INSERT_HEAD(&inner->mf_msalign, result, mam_link);
+			goto did_insert;
+		}
+		while ((next = LIST_NEXT(used_predecessor, mam_link)) != NULL) {
+			if (next->mam_offs > misalign)
+				break;
+			used_predecessor = next;
+		}
 	}
+
+	/* Highly unlikely case: some other thread created
+	 * the file which  we just created,  too. In  this
+	 * case, re-use the already-created file. */
+	if unlikely(used_predecessor->mam_offs == misalign &&
+	            tryincref(used_predecessor)) {
+		mfile_tslock_release_br(inner);
+		destroy(result);
+		xdecref_unlikely(predecessor);
+		return used_predecessor;
+	}
+
+	/* Insert after `used_predecessor' */
+	LIST_INSERT_AFTER(used_predecessor, result, mam_link);
+did_insert:
+	mfile_tslock_release(inner);
+	xdecref_unlikely(predecessor);
+
 	return result;
-kfree_result_and_return_inner:
-	kfree(result);
 return_inner:
 	return incref(inner);
+}
+
+
+/* Unlink misaligned wrappers of `self' and mark them as  deleted.
+ * This function needs to be called in order to release the TSLOCK
+ * of a file after `MFILE_F_DELETED' was set. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL _mfile_tslock_release_and_delete_misaligned_wrappers)(struct mfile *__restrict self,
+                                                                    __hybrid_preemption_flag_t __hpsmp_pflag) {
+	assert(atomic_read(&self->mf_flags) & MFILE_F_DELETED);
+	while unlikely(!LIST_EMPTY(&self->mf_msalign)) {
+		REF struct misaligned_mfile *file;
+		file = LIST_FIRST(&self->mf_msalign);
+		LIST_UNBIND(file, mam_link); /* UNBIND! (s.a. `misaligned_mfile_v_destroy()') */
+		if (tryincref(file)) {
+			mfile_tslock_release_br(self);
+			/* Recursively delete misaligned sub-files */
+			mfile_delete(file);
+			decref(file);
+			mfile_tslock_acquire_br(self);
+		}
+	}
+	mfile_tslock_release_br(self);
 }
 
 

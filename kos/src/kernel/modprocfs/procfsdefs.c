@@ -87,6 +87,7 @@ INTERN struct fregnode procfs_r_kos_leaks = {{
 		MFILE_INIT_mf_mtime(0, 0),
 		MFILE_INIT_mf_ctime(0, 0),
 		MFILE_INIT_mf_btime(0, 0),
+		MFILE_INIT_mf_msalign(NULL),
 	},
 	FNODE_INIT_fn_nlink(1),
 	FNODE_INIT_fn_mode(S_IFREG | 0400),
@@ -149,6 +150,7 @@ INTERN struct fregnode procfs_r_kos_leaks = {{
 				MFILE_INIT_mf_mtime(0, 0),                                       \
 				MFILE_INIT_mf_ctime(0, 0),                                       \
 				MFILE_INIT_mf_btime(0, 0),                                       \
+				MFILE_INIT_mf_msalign(NULL),                                     \
 			},                                                                   \
 			FNODE_INIT_fn_nlink(1),                                              \
 			FNODE_INIT_fn_mode(S_IFREG | (perm)),                                \
@@ -185,6 +187,7 @@ INTERN struct fregnode procfs_r_kos_leaks = {{
 				MFILE_INIT_mf_mtime(0, 0),                                       \
 				MFILE_INIT_mf_ctime(0, 0),                                       \
 				MFILE_INIT_mf_btime(0, 0),                                       \
+				MFILE_INIT_mf_msalign(NULL),                                     \
 			},                                                                   \
 			FNODE_INIT_fn_nlink(1),                                              \
 			FNODE_INIT_fn_mode(S_IFREG | (perm)),                                \
@@ -229,6 +232,7 @@ INTERN struct fregnode procfs_r_kos_leaks = {{
 			MFILE_INIT_mf_mtime(0, 0),                                               \
 			MFILE_INIT_mf_ctime(0, 0),                                               \
 			MFILE_INIT_mf_btime(0, 0),                                               \
+			MFILE_INIT_mf_msalign(NULL),                                             \
 		},                                                                           \
 		FNODE_INIT_fn_nlink(1),                                                      \
 		FNODE_INIT_fn_mode(S_IFLNK | (perm)),                                        \
@@ -272,6 +276,7 @@ INTERN struct fregnode procfs_r_kos_leaks = {{
 				MFILE_INIT_mf_mtime(0, 0),                                      \
 				MFILE_INIT_mf_ctime(0, 0),                                      \
 				MFILE_INIT_mf_btime(0, 0),                                      \
+				MFILE_INIT_mf_msalign(NULL),                                    \
 			},                                                                  \
 			FNODE_INIT_fn_nlink(1),                                             \
 			FNODE_INIT_fn_mode(S_IFDIR | (perm)),                               \
@@ -350,6 +355,7 @@ INTERN struct fsuper procfs_super = {
 				MFILE_INIT_mf_mtime(0, 0),
 				MFILE_INIT_mf_ctime(0, 0),
 				MFILE_INIT_mf_btime(0, 0),
+				MFILE_INIT_mf_msalign(NULL),
 			},
 			FNODE_INIT_fn_nlink(1),
 			FNODE_INIT_fn_mode(S_IFDIR | 0555),

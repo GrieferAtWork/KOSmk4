@@ -31,6 +31,7 @@
 #include <kernel/mman/execinfo.h>
 #include <kernel/mman/flags.h>
 #include <kernel/mman/mbuilder.h>
+#include <kernel/mman/mfile-misaligned.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/ramfile.h>
 #include <kernel/printk.h>
@@ -305,20 +306,19 @@ done_bss:
 				if (offset & PAGEMASK) {
 					/* Custom mfile to lazily load data from a miss-aligned file offset. */
 					REF struct mfile *wrapper;
-					wrapper = mfile_create_misaligned_wrapper(args->ea_xfile, offset);
+					wrapper = mfile_create_misaligned_wrapper(args->ea_xfile, &offset);
 					FINALLY_DECREF_UNLIKELY(wrapper);
 					mbuilder_map(&builder, (void *)sectaddr,
 					             section->SizeOfRawData, prot,
 					             MAP_FIXED | MAP_FIXED_NOREPLACE,
 					             wrapper, args->ea_xpath,
-					             args->ea_xdentry, (pos_t)0);
+					             args->ea_xdentry, offset);
 				} else {
 					mbuilder_map(&builder, (void *)sectaddr,
 					             section->SizeOfRawData, prot,
 					             MAP_FIXED | MAP_FIXED_NOREPLACE,
 					             args->ea_xfile, args->ea_xpath,
-					             args->ea_xdentry,
-					             (pos_t)offset);
+					             args->ea_xdentry, offset);
 				}
 			}
 		}

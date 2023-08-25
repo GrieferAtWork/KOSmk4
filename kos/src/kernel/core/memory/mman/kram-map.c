@@ -105,6 +105,7 @@ PUBLIC struct mfile mfile_dbgheap = {
 	MFILE_INIT_mf_mtime(0, 0),
 	MFILE_INIT_mf_ctime(0, 0),
 	MFILE_INIT_mf_btime(0, 0),
+	MFILE_INIT_mf_msalign(NULL),
 };
 #endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 

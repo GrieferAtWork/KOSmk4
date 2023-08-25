@@ -31,6 +31,8 @@
 
 #include <compat/config.h>
 
+#include <stddef.h>
+
 DECL_BEGIN
 
 /* Define the RTLD file(s). */
@@ -60,6 +62,7 @@ PUBLIC struct mramfile execabi_system_rtld_file = {
 		MFILE_INIT_mf_mtime(0, 0),
 		MFILE_INIT_mf_ctime(0, 0),
 		MFILE_INIT_mf_btime(0, 0),
+		MFILE_INIT_mf_msalign(NULL),
 	},
 	.mrf_part = MPART_INIT_PHYS(&execabi_system_rtld_file.mrf_file,
 	                            (physpage_t)execabi_system_rtld_startpage_p,
@@ -93,6 +96,7 @@ PUBLIC struct mramfile compat_execabi_system_rtld_file = {
 		MFILE_INIT_mf_mtime(0, 0),
 		MFILE_INIT_mf_ctime(0, 0),
 		MFILE_INIT_mf_btime(0, 0),
+		MFILE_INIT_mf_msalign(NULL),
 	},
 	.mrf_part = MPART_INIT_PHYS(&compat_execabi_system_rtld_file.mrf_file,
 	                            (physpage_t)compat_execabi_system_rtld_startpage_p,

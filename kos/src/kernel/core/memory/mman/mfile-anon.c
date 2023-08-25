@@ -32,6 +32,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/notify.h>
+#include <kernel/mman/mfile-misaligned.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 #include <sched/sig-completion.h>
@@ -575,7 +576,7 @@ NOTHROW(FCALL mfile_delete)(struct mfile *__restrict self) {
 	                           MFILE_F_NOMTIME);
 	if (old_flags & MFILE_F_PERSISTENT)
 		atomic_and(&self->mf_flags, ~MFILE_F_PERSISTENT); /* Also clear the PERSISTENT flag */
-	mfile_tslock_release(self);
+	mfile_tslock_release_and_delete_misaligned_wrappers(self);
 
 	/* Check if the file has already been marked as deleted. */
 	if (old_flags & MFILE_F_DELETED)

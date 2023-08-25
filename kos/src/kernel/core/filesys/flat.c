@@ -161,17 +161,11 @@ again:
 	                               MFILE_FN_ATTRREADONLY | MFILE_F_ROFLAGS)),
 	        "As per documentation, `ffso_makenode()' may only set these flags!");
 	result->mf_flags |= dir->mf_flags & (MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOMTIME);
-	atomic_rwlock_init(&result->mf_lock);
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-	result->mf_notify = NULL;
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
-	sig_init(&result->mf_initdone);
-	SLIST_INIT(&result->mf_lockops);
 	SLIST_INIT(&result->mf_changed);
+	__mfile_init_common_norefcnt(result);
 	result->mf_part_amask = super->ffs_super.fs_root.mf_part_amask;
 	result->mf_blockshift = super->ffs_super.fs_root.mf_blockshift;
 	result->mf_iobashift  = super->ffs_super.fs_root.mf_iobashift;
-	result->mf_trunclock  = 0;
 	result->fn_ino        = me->fde_ent.fd_ino;
 	result->fn_super      = incref(&super->ffs_super);
 	LIST_ENTRY_UNBOUND_INIT(&result->fn_changed);
@@ -952,17 +946,11 @@ handle_existing:
 		node->mf_flags |= MFILE_FN_GLOBAL_REF;
 		node->mf_flags |= me->mf_flags & (MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOMTIME);
 		node->mf_refcnt = 2; /* +1: MFILE_FN_GLOBAL_REF, +1: info->mkf_rnode */
-		atomic_rwlock_init(&node->mf_lock);
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-		node->mf_notify = NULL;
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
-		sig_init(&node->mf_initdone);
-		SLIST_INIT(&node->mf_lockops);
 		SLIST_INIT(&node->mf_changed);
+		__mfile_init_common_norefcnt(node);
 		node->mf_part_amask = me->mf_part_amask;
 		node->mf_blockshift = me->mf_blockshift;
 		node->mf_iobashift  = me->mf_iobashift;
-		node->mf_trunclock  = 0;
 		node->mf_atime      = info->mkf_creat.c_atime;
 		node->mf_mtime      = info->mkf_creat.c_mtime;
 		node->mf_ctime      = info->mkf_creat.c_ctime;

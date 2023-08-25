@@ -160,6 +160,10 @@ NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
 	        "Any remaining part should have kept us alive!\n"
 	        "self->mf_changed.slh_first = %p\n",
 	        self->mf_changed.slh_first);
+	assertf(LIST_EMPTY(&self->mf_msalign) || (self->mf_flags & MFILE_F_DELETED),
+	        "Any remaining unaligned wrapper should have kept us alive!\n"
+	        "self->mf_msalign.lh_first = %p\n",
+	        self->mf_msalign.lh_first);
 
 	/* The  file may still  have a notify controller
 	 * if its containing directory is being watched. */
@@ -333,6 +337,7 @@ PUBLIC struct mfile mfile_ndef = {
 	MFILE_INIT_mf_mtime(0, 0),
 	MFILE_INIT_mf_ctime(0, 0),
 	MFILE_INIT_mf_btime(0, 0),
+	MFILE_INIT_mf_msalign(NULL),
 };
 
 
@@ -369,6 +374,7 @@ PUBLIC struct mfile mfile_anon[BITSOF(void *)] = {
 		MFILE_INIT_mf_mtime(0, 0),                                  \
 		MFILE_INIT_mf_ctime(0, 0),                                  \
 		MFILE_INIT_mf_btime(0, 0),                                  \
+		MFILE_INIT_mf_msalign(NULL),                                \
 	}
 	INIT_ANON_FILE(0),  INIT_ANON_FILE(1),  INIT_ANON_FILE(2),  INIT_ANON_FILE(3),
 	INIT_ANON_FILE(4),  INIT_ANON_FILE(5),  INIT_ANON_FILE(6),  INIT_ANON_FILE(7),

@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_SRC_SCHED_USERKERN_C
 #define GUARD_KERNEL_SRC_SCHED_USERKERN_C 1
 #define __WANT_MPART_INIT
+#define __WANT_FS_INIT
 
 #include <kernel/compiler.h>
 
@@ -213,26 +214,25 @@ PRIVATE struct mfile_ops const userkern_segment_file_ops = {
 	.mo_vio = &userkern_segment_vio
 };
 PUBLIC struct mfile userkern_segment_file = {
-	.mf_refcnt     = 2, /* +1: `userkern_segment_file', +1: `userkern_segment_part.mn_file' */
-	.mf_ops        = &userkern_segment_file_ops,
-	.mf_lock       = ATOMIC_RWLOCK_INIT,
-	.mf_parts      = &userkern_segment_part,
-	.mf_initdone   = SIG_INIT,
-	.mf_lockops    = SLIST_HEAD_INITIALIZER(userkern_segment_file.mf_lockops),
-	.mf_changed    = SLIST_HEAD_INITIALIZER(userkern_segment_file.mf_changed),
-	.mf_part_amask = PAGEMASK,
-	.mf_blockshift = PAGESHIFT,
-	.mf_iobashift  = PAGESHIFT,
+	MFILE_INIT_mf_refcnt(2), /* +1: `userkern_segment_file', +1: `userkern_segment_part.mn_file' */
+	MFILE_INIT_mf_ops(&userkern_segment_file_ops),
+	MFILE_INIT_mf_lock,
+	MFILE_INIT_mf_parts(&userkern_segment_part),
+	MFILE_INIT_mf_initdone,
+	MFILE_INIT_mf_lockops,
+	MFILE_INIT_mf_changed(NULL),
+	MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-	.mf_notify     = NULL,
+	MFILE_INIT_mf_notify,
 #endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
-	.mf_flags      = MFILE_F_FIXEDFILESIZE | MFILE_F_NOMTIME | MFILE_F_NOATIME,
-	.mf_trunclock  = 0,
-	.mf_filesize   = ATOMIC64_INIT(((uint64_t)KS_MAXADDR - (uint64_t)KS_MINADDR) + 1),
-	.mf_atime      = { .tv_sec = 0, .tv_nsec = 0 },
-	.mf_mtime      = { .tv_sec = 0, .tv_nsec = 0 },
-	.mf_ctime      = { .tv_sec = 0, .tv_nsec = 0 },
-	.mf_btime      = { .tv_sec = 0, .tv_nsec = 0 },
+	MFILE_INIT_mf_flags(MFILE_F_FIXEDFILESIZE | MFILE_F_NOMTIME | MFILE_F_NOATIME),
+	MFILE_INIT_mf_trunclock,
+	MFILE_INIT_mf_filesize(((uint64_t)KS_MAXADDR - (uint64_t)KS_MINADDR) + 1),
+	MFILE_INIT_mf_atime(0, 0),
+	MFILE_INIT_mf_mtime(0, 0),
+	MFILE_INIT_mf_ctime(0, 0),
+	MFILE_INIT_mf_btime(0, 0),
+	MFILE_INIT_mf_msalign(NULL),
 };
 
 
@@ -344,26 +344,25 @@ PRIVATE struct mfile_ops const userkern_segment_file_compat_ops = {
 	.mo_vio = &userkern_segment_vio_compat
 };
 PUBLIC struct mfile userkern_segment_file_compat = {
-	.mf_refcnt     = 2, /* +1: `userkern_segment_file_compat', +1: `userkern_segment_part.mn_file' */
-	.mf_ops        = &userkern_segment_file_compat_ops,
-	.mf_lock       = ATOMIC_RWLOCK_INIT,
-	.mf_parts      = &userkern_segment_part,
-	.mf_initdone   = SIG_INIT,
-	.mf_lockops    = SLIST_HEAD_INITIALIZER(userkern_segment_file_compat.mf_lockops),
-	.mf_changed    = SLIST_HEAD_INITIALIZER(userkern_segment_file_compat.mf_changed),
-	.mf_part_amask = PAGEMASK,
-	.mf_blockshift = PAGESHIFT,
-	.mf_iobashift  = PAGESHIFT,
+	MFILE_INIT_mf_refcnt(2), /* +1: `userkern_segment_file_compat', +1: `userkern_segment_part.mn_file' */
+	MFILE_INIT_mf_ops(&userkern_segment_file_compat_ops),
+	MFILE_INIT_mf_lock,
+	MFILE_INIT_mf_parts(&userkern_segment_part),
+	MFILE_INIT_mf_initdone,
+	MFILE_INIT_mf_lockops,
+	MFILE_INIT_mf_changed(NULL),
+	MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-	.mf_notify     = NULL,
+	MFILE_INIT_mf_notify,
 #endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
-	.mf_flags      = MFILE_F_FIXEDFILESIZE | MFILE_F_NOMTIME | MFILE_F_NOATIME,
-	.mf_trunclock  = 0,
-	.mf_filesize   = ATOMIC64_INIT(((uint64_t)KS_MAXADDR - (uint64_t)KS_MINADDR) + 1),
-	.mf_atime      = { .tv_sec = 0, .tv_nsec = 0 },
-	.mf_mtime      = { .tv_sec = 0, .tv_nsec = 0 },
-	.mf_ctime      = { .tv_sec = 0, .tv_nsec = 0 },
-	.mf_btime      = { .tv_sec = 0, .tv_nsec = 0 },
+	MFILE_INIT_mf_flags(MFILE_F_FIXEDFILESIZE | MFILE_F_NOMTIME | MFILE_F_NOATIME),
+	MFILE_INIT_mf_trunclock,
+	MFILE_INIT_mf_filesize(((uint64_t)KS_MAXADDR - (uint64_t)KS_MINADDR) + 1),
+	MFILE_INIT_mf_atime(0, 0),
+	MFILE_INIT_mf_mtime(0, 0),
+	MFILE_INIT_mf_ctime(0, 0),
+	MFILE_INIT_mf_btime(0, 0),
+	MFILE_INIT_mf_msalign(NULL),
 };
 #endif /* __ARCH_HAVE_COMPAT */
 

@@ -30,6 +30,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/flags.h>
 #include <kernel/mman/mfile-map.h>
+#include <kernel/mman/mfile-misaligned.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/module.h>
@@ -261,11 +262,8 @@ mpart_mmapread(struct mpart *__restrict self, NCX void *dst,
 	orig_map_file = map_file;
 	orig_filepos  = filepos;
 	if likely((filepos & map_file->mf_part_amask) != 0) {
-		size_t misalign;
-		misalign = (size_t)(filepos & map_file->mf_part_amask);
 		FINALLY_DECREF_UNLIKELY(map_file);
-		map_file = mfile_create_misaligned_wrapper(map_file, (pos_t)misalign);
-		filepos -= misalign;
+		map_file = mfile_create_misaligned_wrapper(map_file, &filepos);
 		assert((filepos & map_file->mf_part_amask) == 0);
 	}
 

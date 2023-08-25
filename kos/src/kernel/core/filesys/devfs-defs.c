@@ -73,6 +73,7 @@ INTDEF struct fdirnode_ops const devfs_disk_ops;
 				MFILE_INIT_mf_mtime(0, 0),                                          \
 				MFILE_INIT_mf_ctime(0, 0),                                          \
 				MFILE_INIT_mf_btime(0, 0),                                          \
+				MFILE_INIT_mf_msalign(NULL),                                        \
 			},                                                                      \
 			FNODE_INIT_fn_nlink(1),                                                 \
 			FNODE_INIT_fn_mode(S_IFDIR | 0555),                                     \
@@ -127,6 +128,7 @@ INTDEF struct fdirnode_ops const _devdiskruledir_default_ops;
 					MFILE_INIT_mf_mtime(0, 0),                                           \
 					MFILE_INIT_mf_ctime(0, 0),                                           \
 					MFILE_INIT_mf_btime(0, 0),                                           \
+					MFILE_INIT_mf_msalign(NULL),                                         \
 				},                                                                       \
 				FNODE_INIT_fn_nlink(1),                                                  \
 				FNODE_INIT_fn_mode(S_IFDIR | 0555),                                      \
@@ -193,6 +195,7 @@ INTERN_CONST struct flnknode const devicelink_template = {
 			MFILE_INIT_mf_mtime(0, 0),
 			MFILE_INIT_mf_ctime(0, 0),
 			MFILE_INIT_mf_btime(0, 0),
+			MFILE_INIT_mf_msalign(NULL),
 		},
 		FNODE_INIT_fn_nlink(1),
 		FNODE_INIT_fn_mode(S_IFLNK | 0444),
@@ -266,6 +269,7 @@ PUBLIC struct ramfs_super devfs = {
 					MFILE_INIT_mf_mtime(0, 0),
 					MFILE_INIT_mf_ctime(0, 0),
 					MFILE_INIT_mf_btime(0, 0),
+					MFILE_INIT_mf_msalign(NULL),
 				},
 				FNODE_INIT_fn_nlink(1),
 				FNODE_INIT_fn_mode(S_IFDIR | 0755),
