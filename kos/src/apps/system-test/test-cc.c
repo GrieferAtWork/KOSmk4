@@ -50,7 +50,7 @@ DEFINE_TEST(cc) {
 	unlink("/var/testfile.txt");
 	fd = open("/var/testfile.txt", O_CREAT | O_EXCL | O_WRONLY, 0644); /* NOLINT */
 	if (fd < 0) {
-		mkdir("/var/", 755);
+		mkdir("/var/", 0755);
 		ISpos((fd = open("/var/testfile.txt", O_CREAT | O_EXCL | O_WRONLY, 0644))); /* NOLINT */
 	}
 	EQ(DATSZ, pwrite(fd, dat, DATSZ, 512));

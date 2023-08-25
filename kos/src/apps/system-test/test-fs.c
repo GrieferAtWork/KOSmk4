@@ -286,7 +286,7 @@ DEFINE_TEST(fs) {
 
 	testPath("/tmp");
 
-	if (mkdir("/var", 755) == -1)
+	if (mkdir("/var", 0755) == -1)
 		EQerrno(EEXIST);
 	testPath("/var");
 
