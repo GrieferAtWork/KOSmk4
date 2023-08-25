@@ -950,7 +950,6 @@ struct mfile {
 #define MFILE_INIT_mf_mtime(mf_mtime__tv_sec, mf_mtime__tv_nsec)    { .tv_sec = mf_mtime__tv_sec, .tv_nsec = mf_mtime__tv_nsec }
 #define MFILE_INIT_mf_ctime(mf_ctime__tv_sec, mf_ctime__tv_nsec)    { .tv_sec = mf_ctime__tv_sec, .tv_nsec = mf_ctime__tv_nsec }
 #define MFILE_INIT_mf_btime(mf_btime__tv_sec, mf_btime__tv_nsec)    { .tv_sec = mf_btime__tv_sec, .tv_nsec = mf_btime__tv_nsec } }}
-#define MFILE_INIT_mf_msalign(mf_msalign)                           { mf_msalign } }}
 #endif /* __WANT_FS_INIT */
 	union {
 		struct {
@@ -958,7 +957,6 @@ struct mfile {
 			struct timespec       mf_mtime;      /* ... */
 			struct timespec       mf_ctime;      /* ... */
 			struct timespec       mf_btime;      /* ... */
-			struct misaligned_mfile_list mf_msalign; /* ... */
 		};
 
 #ifdef __WANT_MFILE__mf_lop
@@ -1035,7 +1033,7 @@ struct mfile {
 #endif /* __WANT_MFILE__mf_delsup */
 
 #ifdef __WANT_MFILE__mf_lopX
-		byte_t _mf_lopX[4 * sizeof(struct timespec) + sizeof(struct misaligned_mfile_list)]; /* ... */
+		byte_t _mf_lopX[4 * sizeof(struct timespec)]; /* ... */
 #endif /* __WANT_MFILE__mf_lopX */
 	};
 #else /* __WANT_MFILE__mf_... */
@@ -1044,7 +1042,6 @@ struct mfile {
 #define MFILE_INIT_mf_mtime(mf_mtime__tv_sec, mf_mtime__tv_nsec) { .tv_sec = mf_mtime__tv_sec, .tv_nsec = mf_mtime__tv_nsec }
 #define MFILE_INIT_mf_ctime(mf_ctime__tv_sec, mf_ctime__tv_nsec) { .tv_sec = mf_ctime__tv_sec, .tv_nsec = mf_ctime__tv_nsec }
 #define MFILE_INIT_mf_btime(mf_btime__tv_sec, mf_btime__tv_nsec) { .tv_sec = mf_btime__tv_sec, .tv_nsec = mf_btime__tv_nsec }
-#define MFILE_INIT_mf_msalign(mf_msalign)                        { mf_msalign }
 #endif /* __WANT_FS_INIT */
 	struct timespec               mf_atime;      /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_NOATIME)][valid_if(!MFILE_F_DELETED)]
 	                                              * Last-accessed timestamp. NOTE!!!  Becomes invalid when  `MFILE_F_DELETED' is  set!
@@ -1062,8 +1059,11 @@ struct mfile {
 	                                              * Birth timestamp. NOTE!!! Becomes invalid when `MFILE_F_DELETED' is set!
 	                                              * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
 	                                              *      before proceeding to use the data you've just read! */
-	struct misaligned_mfile_list  mf_msalign;    /* [lock(_MFILE_F_SMP_TSLOCK)][valid_if(!MFILE_F_DELETED)][0..n] List of misaligned wrappers. */
 #endif /* !__WANT_MFILE__mf_... */
+	struct misaligned_mfile_list  mf_msalign;    /* [lock(mf_lock)][0..n] List of misaligned wrappers (elements may only be added when `MFILE_F_DELETED' isn't set) */
+#ifdef __WANT_FS_INIT
+#define MFILE_INIT_mf_msalign(mf_msalign) { mf_msalign }
+#endif /* __WANT_FS_INIT */
 };
 
 
@@ -1279,9 +1279,10 @@ DEFINE_REFCNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
  *  - The `MFILE_F_PERSISTENT' flag is cleared for the file.
  *  - The file-fields of all mem-parts are altered to point
  *    at  anonymous  memory   files.  (s.a.   `mfile_anon')
- *  - The `MPART_F_GLOBAL_REF' is cleared for all parts
+ *  - The `MPART_F_GLOBAL_REF' flag is cleared for all parts
  *  - The `mf_parts' and `mf_changed' fields are set to `MFILE_PARTS_ANONYMOUS'
  *  - The `mf_filesize' field is set to `0'.
+ *  - The `mf_msalign' list is cleared and after recursively mfile_delete-ing contained files.
  * The result of all of this is that it is no longer possible to
  * trace  back  mappings  of  parts  of  `self'  to  that  file.
  *
@@ -1295,6 +1296,8 @@ DEFINE_REFCNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
  * become available. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_delete)(struct mfile *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_delete_and_decref)(REF struct mfile *__restrict self);
 
 /* Internal implementation of `mfile_delete()' (don't call this one
  * unless you know that you're doing; otherwise, you may cause race

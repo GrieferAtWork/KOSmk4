@@ -368,6 +368,20 @@ NOTHROW(FCALL mfile_zerotrunc_completion_cb)(struct sig_completion *__restrict s
 	return sizeof(REF struct mfile *);
 }
 
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_do_delete_msalign_files)(struct mfile *__restrict self) {
+	assert(mfile_lock_writing(self));
+	assert(!LIST_EMPTY(&self->mf_msalign));
+	do {
+		struct misaligned_mfile *file;
+		file = LIST_FIRST(&self->mf_msalign);
+		LIST_UNBIND(file, mam_link); /* UNBIND! (s.a. `misaligned_mfile_v_destroy()') */
+
+		/* If the file hasn't been destroyed yet, then try to delete it. */
+		if (tryincref(file))
+			mfile_delete_and_decref(file);
+	} while (!LIST_EMPTY(&self->mf_msalign));
+}
 
 PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(mfile) *
 NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
@@ -375,6 +389,10 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 	Tobpostlockop(mfile) *result;
 	struct mpart_slist changes;
 	struct mpart_delete_postop_builder deadparts;
+
+	/* Start out with something easy: recursively delete misaligned files. */
+	if unlikely(!LIST_EMPTY(&file->mf_msalign))
+		mfile_do_delete_msalign_files(file);
 
 	/* We're currently holding a write-lock to `file'!
 	 * We can start out by clearing out the list of changed parts. */
@@ -527,6 +545,7 @@ NOTHROW(FCALL mfile_delete_impl)(/*inherit(always)*/ REF struct mfile *__restric
  *  - The `MPART_F_GLOBAL_REF' flag is cleared for all parts
  *  - The `mf_parts' and `mf_changed' fields are set to `MFILE_PARTS_ANONYMOUS'
  *  - The `mf_filesize' field is set to `0'.
+ *  - The `mf_msalign' list is cleared and after recursively mfile_delete-ing contained files.
  * The result of all of this is that it is no longer possible to
  * trace  back  mappings  of  parts  of  `self'  to  that  file.
  *
@@ -576,7 +595,7 @@ NOTHROW(FCALL mfile_delete)(struct mfile *__restrict self) {
 	                           MFILE_F_NOMTIME);
 	if (old_flags & MFILE_F_PERSISTENT)
 		atomic_and(&self->mf_flags, ~MFILE_F_PERSISTENT); /* Also clear the PERSISTENT flag */
-	mfile_tslock_release_and_delete_misaligned_wrappers(self);
+	mfile_tslock_release(self);
 
 	/* Check if the file has already been marked as deleted. */
 	if (old_flags & MFILE_F_DELETED)
@@ -595,6 +614,25 @@ NOTHROW(FCALL mfile_delete)(struct mfile *__restrict self) {
 	incref(self);
 
 	/* Do the thing! */
+	mfile_delete_impl(self);
+}
+
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_delete_and_decref)(REF struct mfile *__restrict self) {
+	/* Same as `mfile_delete()', but inherit a reference to `self' */
+	uintptr_t old_flags;
+	mfile_tslock_acquire(self);
+	old_flags = atomic_fetchor(&self->mf_flags,
+	                           MFILE_F_DELETED |
+	                           MFILE_F_NOATIME |
+	                           MFILE_F_NOMTIME);
+	if (old_flags & MFILE_F_PERSISTENT)
+		atomic_and(&self->mf_flags, ~MFILE_F_PERSISTENT);
+	mfile_tslock_release(self);
+	if (old_flags & MFILE_F_DELETED) {
+		decref(self);
+		return;
+	}
 	mfile_delete_impl(self);
 }
 

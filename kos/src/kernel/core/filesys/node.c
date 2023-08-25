@@ -38,7 +38,6 @@
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
 #include <kernel/malloc.h>
-#include <kernel/mman/mfile-misaligned.h>
 #include <kernel/mman/mfile.h>
 #include <sched/cred.h>
 #include <sched/task.h>
@@ -1229,7 +1228,7 @@ NOTHROW(FCALL fnode_delete_strt)(struct fnode *__restrict self) {
 	                           MFILE_F_NOMTIME | MFILE_F_CHANGED | MFILE_F_ATTRCHANGED |
 	                           MFILE_F_FIXEDFILESIZE | MFILE_FN_ATTRREADONLY |
 	                           MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_READONLY);
-	mfile_tslock_release_and_delete_misaligned_wrappers(self);
+	mfile_tslock_release(self);
 
 	/* Delete global reference to the file-node. */
 	if ((old_flags & MFILE_FN_GLOBAL_REF) &&

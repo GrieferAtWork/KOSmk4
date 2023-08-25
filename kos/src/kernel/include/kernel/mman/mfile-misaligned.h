@@ -26,6 +26,10 @@
 
 #include <hybrid/sched/__preemption.h>
 
+#ifdef __WANT_MISALIGNED_MFILE__mam_lop
+#include <kos/lockop.h>
+#endif /* __WANT_MISALIGNED_MFILE__mam_lop */
+
 #ifdef __CC__
 DECL_BEGIN
 
@@ -37,11 +41,22 @@ struct misaligned_mfile
 #ifndef __cplusplus
 	struct mfile                 mam_file; /* The underlying file */
 #endif /* !__cplusplus */
-	REF struct mfile            *mam_base; /* [1..1][const] The file around which this one is a wrapper. */
-	size_t                       mam_offs; /* [const] Offset addend added to every request. */
 	LIST_ENTRY(misaligned_mfile) mam_link; /* [lock(mfile_tslock_acquired(mam_base))][0..1]
 	                                        * Link in list of misaligned sub-files of `mam_base'.
 	                                        * This list is sorted by `mam_offs'. */
+#ifdef __WANT_MISALIGNED_MFILE__mam_lop
+	union {
+		struct {
+			REF struct mfile    *mam_base; /* [1..1][const] The file around which this one is a wrapper. */
+			size_t               mam_offs; /* [const] Offset addend added to every request. */
+		};
+		Toblockop(mfile)        _mam_lop;  /* Used during destruction to unbind `mam_link' */
+		Tobpostlockop(mfile)    _mam_plop; /* Used during destruction to unbind `mam_link' */
+	};
+#else /* __WANT_MISALIGNED_MFILE__mam_lop */
+	REF struct mfile            *mam_base; /* [1..1][const] The file around which this one is a wrapper. */
+	size_t                       mam_offs; /* [const] Offset addend added to every request. */
+#endif /* !__WANT_MISALIGNED_MFILE__mam_lop */
 };
 
 #define mfile_asmisaligned(self) ((struct misaligned_mfile *)(self))
@@ -71,17 +86,6 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct mfile *FCALL
 mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
                                 pos_t *__restrict p_inner_fpos)
 		THROWS(E_BADALLOC);
-
-/* Unlink misaligned wrappers of `self' and mark them as  deleted.
- * This function needs to be called in order to release the TSLOCK
- * of a file after `MFILE_F_DELETED' was set. */
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL _mfile_tslock_release_and_delete_misaligned_wrappers)(struct mfile *__restrict self,
-                                                                    __hybrid_preemption_flag_t __hpsmp_pflag);
-#define mfile_tslock_release_and_delete_misaligned_wrappers_br(self) \
-	_mfile_tslock_release_and_delete_misaligned_wrappers(self, __hpsmp_pflag)
-#define mfile_tslock_release_and_delete_misaligned_wrappers(self) \
-	mfile_tslock_release_and_delete_misaligned_wrappers_br(self); } __WHILE0
 
 DECL_END
 #endif /* __CC__ */

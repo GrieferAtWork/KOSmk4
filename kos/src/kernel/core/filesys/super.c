@@ -37,7 +37,6 @@
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
 #include <kernel/malloc.h>
-#include <kernel/mman/mfile-misaligned.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/printk.h>
 #include <sched/task.h>
@@ -432,7 +431,7 @@ NOTHROW(FCALL mfile_begin_delete)(struct mfile *__restrict self) {
 	                           MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 	                           MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
 	                           MFILE_F_READONLY);
-	mfile_tslock_release_and_delete_misaligned_wrappers(self);
+	mfile_tslock_release(self);
 
 	/* Delete global reference to the superblock. */
 	if ((old_flags & MFILE_FN_GLOBAL_REF) &&

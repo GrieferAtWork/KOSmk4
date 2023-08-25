@@ -189,8 +189,7 @@ mpart_load_private_node_setcore_or_unlock(struct mpart *__restrict self,
 
 PRIVATE BLOCKING NONNULL((1)) bool FCALL
 mpart_load_private_node_or_unlock(struct mpart *__restrict self,
-                                  mpart_reladdr_t minaddr,
-                                  size_t num_bytes) {
+                                  mpart_reladdr_t minaddr, size_t num_bytes) {
 	struct mpart_load_private_node_or_unlock_unlockinfo unlock;
 	unlock.mplpnouu_info.ui_unlock = &mpart_load_private_node_or_unlock_unlockcb;
 	unlock.mplpnouu_file           = self->mp_file;
@@ -217,7 +216,7 @@ NOTHROW(FCALL mnode_list_sort_by_partoff)(struct mnode_list *__restrict self);
  * of MPART_BLOCK_ST_LOAD or MPART_BLOCK_ST_CHNG. */
 PRIVATE BLOCKING NONNULL((1)) bool FCALL
 mpart_load_private_nodes_or_unlock(struct mpart *__restrict self,
-                                   PAGEDIR_PAGEALIGNED mpart_reladdr_t minaddr) {
+                                   mpart_reladdr_t minaddr) {
 	struct mnode *node;
 
 	/* Enumerate copy-on-write (iow: MAP_PRIVATE) nodes of `self' */
@@ -225,8 +224,7 @@ mpart_load_private_nodes_or_unlock(struct mpart *__restrict self,
 	node = LIST_FIRST(&self->mp_copy);
 	while (node) {
 		bool ok;
-		PAGEDIR_PAGEALIGNED mpart_reladdr_t node_minaddr;
-		PAGEDIR_PAGEALIGNED mpart_reladdr_t node_endaddr;
+		mpart_reladdr_t node_minaddr, node_endaddr;
 		assert(node->mn_part == self);
 		node_minaddr = mnode_getpartminaddr(node);
 		node_endaddr = mnode_getpartendaddr(node);
@@ -238,6 +236,7 @@ mpart_load_private_nodes_or_unlock(struct mpart *__restrict self,
 			}
 		}
 		assert(node_minaddr < node_endaddr);
+
 		/* Check for adjacent nodes. */
 		while ((node = LIST_NEXT(node, mn_link)) != NULL) {
 			PAGEDIR_PAGEALIGNED mpart_reladdr_t nextnode_minaddr;
@@ -264,26 +263,26 @@ mpart_load_private_nodes_or_unlock(struct mpart *__restrict self,
 	return true;
 }
 
-/* Ensure  that blocks of all sub-ranges of MAP_PRIVATE-nodes of parts above
- * `aligned_new_size' have status MPART_BLOCK_ST_LOAD or MPART_BLOCK_ST_CHNG */
+/* Ensure that blocks of all sub-ranges of MAP_PRIVATE-nodes of parts above
+ * `new_size' have status  `MPART_BLOCK_ST_LOAD' or  `MPART_BLOCK_ST_CHNG'. */
 PRIVATE BLOCKING NONNULL((1)) bool FCALL
-mfile_load_private_nodes_above_or_unlock(struct mfile *__restrict self,
-                                         PAGEDIR_PAGEALIGNED pos_t aligned_new_size) {
+mfile_do_load_private_nodes_above_or_unlock(struct mfile *__restrict self,
+                                            pos_t new_size) {
 	struct mpart *iter;
 	struct mpart_tree_minmax mima;
 	assert(mfile_lock_writing(self));
 	assert(self->mf_parts != NULL);
 	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
-	mpart_tree_minmaxlocate(self->mf_parts, aligned_new_size, (pos_t)-1, &mima);
+	mpart_tree_minmaxlocate(self->mf_parts, new_size, (pos_t)-1, &mima);
 	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
 	if (mima.mm_min == NULL)
 		return true;
 	for (iter = mima.mm_min;;) {
 		bool ok;
-		PAGEDIR_PAGEALIGNED mpart_reladdr_t minaddr = 0;
-		if (mpart_getminaddr(iter) < aligned_new_size) {
-			assert(mpart_getmaxaddr(iter) >= aligned_new_size);
-			minaddr = (mpart_reladdr_t)(aligned_new_size - mpart_getminaddr(iter));
+		mpart_reladdr_t minaddr = 0;
+		if (mpart_getminaddr(iter) < new_size) {
+			assert(mpart_getmaxaddr(iter) >= new_size);
+			minaddr = (mpart_reladdr_t)(new_size - mpart_getminaddr(iter));
 		}
 		assertf(mpart_lock_acquired(iter), "Caller should be holding locks to all parts");
 		assert(iter->mp_file == self);
@@ -296,6 +295,19 @@ mfile_load_private_nodes_above_or_unlock(struct mfile *__restrict self,
 		assert(iter);
 	}
 	return true;
+}
+
+PRIVATE BLOCKING NONNULL((1)) bool FCALL
+mfile_load_private_nodes_above_or_unlock(struct mfile *__restrict self,
+                                         pos_t new_size) {
+	bool result;
+	result = mfile_do_load_private_nodes_above_or_unlock(self, new_size);
+	if (unlikely(atomic_read(&self->mf_msalign.lh_first) != NULL) && result) {
+		/* Must also load uninitialized nodes from all sub-files of `self'
+		 * that were  created  using  `mfile_create_misaligned_wrapper()'! */
+		/* TODO */
+	}
+	return result;
 }
 
 
@@ -544,16 +556,16 @@ directly_modify_file_size:
 				goto again;
 		}
 
-		/* Step #5.1: Make sure that all sub-ranges of parts mapped above `aligned_new_size'
-		 *            and using MAP_PRIVATE-semantics are loaded into memory. This is needed
-		 *            to ensure that MAP_PRIVATE captures a snap-shot at the point where the
-		 *            mapping was created, and won't be affected by a subsequent ftruncate.
-		 * This is required to ensure that MAP_PRIVATE mappings retain their original content
-		 * even  after  the  part of  the  file that  they  are mapping  has  been truncated. */
-		if (!mfile_load_private_nodes_above_or_unlock(self, aligned_new_size))
+		/* Step #5.1: Make sure that all sub-ranges of parts mapped above `new_size' and
+		 *            using MAP_PRIVATE-semantics are loaded into memory. This is needed
+		 *            to ensure that MAP_PRIVATE captures a snap-shot at the point where
+		 *            the mapping was  created, and  won't be affected  by a  subsequent
+		 *            ftruncate.
+		 * This is required to ensure that MAP_PRIVATE mappings retain their original
+		 * content even after the  part of the  file that they  are mapping has  been
+		 * truncated. */
+		if (!mfile_load_private_nodes_above_or_unlock(self, new_size))
 			goto again;
-		/* TODO: Must also load uninitialized nodes from all sub-files of `self' that were
-		 *       created using `mfile_create_misaligned_wrapper()'! */
 
 		/* Step #6: Check if a mem-part exists  that overlaps with `aligned_new_size',  but
 		 *          doesn't border against it. If so, release part-locks & references, then
