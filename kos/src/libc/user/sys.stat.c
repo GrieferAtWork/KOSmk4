@@ -41,7 +41,6 @@
 
 DECL_BEGIN
 
-
 DEFINE_PUBLIC_ALIAS(kstat, libc_kos_stat);
 DEFINE_PUBLIC_ALIAS(kstat64, libc_kos_stat);
 DEFINE_PUBLIC_ALIAS(klstat, libc_kos_lstat);
@@ -65,8 +64,7 @@ INTERN ATTR_SECTION(".text.crt.fs.stat") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_kos_fstat)(fd_t fd,
                                      struct __kos_stat *__restrict buf) {
 	errno_t error;
-	error = sys_kfstat(fd,
-	                   (struct stat *)buf);
+	error = sys_kfstat(fd, (struct stat *)buf);
 	return libc_seterrno_syserr(error);
 }
 
@@ -84,10 +82,11 @@ INTERN ATTR_SECTION(".text.crt.fs.stat") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_kos_stat)(char const *__restrict filename,
                                     struct __kos_stat *__restrict buf) {
 	errno_t error;
-	error = sys_kfstatat(AT_FDCWD,
-	                     filename,
-	                     (struct stat *)buf,
-	                     0);
+#ifdef SYS_kstat
+	error = sys_kstat(filename, (struct stat *)buf);
+#else /* SYS_kstat */
+	error = sys_kfstatat(AT_FDCWD, filename, (struct stat *)buf, 0);
+#endif /* !SYS_kstat */
 	return libc_seterrno_syserr(error);
 }
 
@@ -95,10 +94,11 @@ INTERN ATTR_SECTION(".text.crt.fs.stat") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_kos_lstat)(char const *__restrict filename,
                                      struct __kos_stat *__restrict buf) {
 	errno_t error;
-	error = sys_kfstatat(AT_FDCWD,
-	                     filename,
-	                     (struct stat *)buf,
-	                     AT_SYMLINK_NOFOLLOW);
+#ifdef SYS_klstat
+	error = sys_klstat(filename, (struct stat *)buf);
+#else /* SYS_klstat */
+	error = sys_kfstatat(AT_FDCWD, filename, (struct stat *)buf, AT_SYMLINK_NOFOLLOW);
+#endif /* !SYS_klstat */
 	return libc_seterrno_syserr(error);
 }
 
@@ -897,7 +897,11 @@ NOTHROW_RPC(LIBCCALL libc_mkdir)(char const *pathname,
 /*[[[body:libc_mkdir]]]*/
 {
 	errno_t result;
+#ifdef SYS_mkdir
+	result = sys_mkdir(pathname, mode);
+#else /* SYS_mkdir */
 	result = sys_mkdirat(AT_FDCWD, pathname, mode);
+#endif /* !SYS_mkdir */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_mkdir]]]*/
@@ -921,7 +925,11 @@ NOTHROW_RPC(LIBCCALL libc_chmod)(char const *filename,
 /*[[[body:libc_chmod]]]*/
 {
 	errno_t result;
+#ifdef SYS_chmod
+	result = sys_chmod(filename, mode);
+#else /* SYS_chmod */
 	result = sys_fchmodat(AT_FDCWD, filename, mode, 0);
+#endif /* !SYS_chmod */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_chmod]]]*/
@@ -946,7 +954,11 @@ NOTHROW_RPC(LIBCCALL libc_lchmod)(char const *filename,
 /*[[[body:libc_lchmod]]]*/
 {
 	errno_t result;
+#ifdef SYS_lchmod
+	result = sys_lchmod(filename, mode);
+#else /* SYS_lchmod */
 	result = sys_fchmodat(AT_FDCWD, filename, mode, AT_SYMLINK_NOFOLLOW);
+#endif /* !SYS_lchmod */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_lchmod]]]*/
