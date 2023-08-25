@@ -393,14 +393,14 @@ driver_section_getaddr(struct driver_section *__restrict self) {
 	return self->ds_addr;
 }
 
-PRIVATE WUNUSED NONNULL((1, 2)) KERNEL byte_t *FCALL
+PRIVATE WUNUSED NONNULL((1, 2)) KERNEL NCX byte_t *FCALL
 driver_section_getaddr_inflate(struct driver_section *__restrict self,
                                size_t *__restrict psize) {
 	size_t dst_size, src_size;
-	KERNEL byte_t *src_data, *dst_data;
+	KERNEL NCX byte_t *src_data, *dst_data;
 	void *src_data_freeme_cookie;
 	REF struct driver *drv;
-	if (self->ds_infladdr != (KERNEL byte_t *)-1) {
+	if (self->ds_infladdr != (KERNEL NCX byte_t *)-1) {
 		*psize = self->ds_inflsize;
 		return self->ds_infladdr;
 	}
@@ -2584,7 +2584,8 @@ NOTHROW(FCALL driver_findfde)(struct driver *__restrict self, void const *absolu
 			} else {
 cannot_cache:
 				heap_free_untraced(&kernel_locked_heap,
-				                   heapptr_getptr(cp), heapptr_getsiz(cp),
+				                   heapptr_getptr(cp),
+				                   heapptr_getsiz(cp),
 				                   GFP_LOCKED);
 			}
 		}

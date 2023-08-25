@@ -193,7 +193,7 @@ module_printpath_or_name(struct module *__restrict self,
 
 
 /* Same as the functions above, but preserve the current exception, and return `NULL' on error. */
-PUBLIC WUNUSED NONNULL((1)) char const *
+PUBLIC BLOCKING WUNUSED NONNULL((1)) char const *
 NOTHROW(FCALL module_section_getname_nx)(struct module_section *__restrict self) {
 	char const *result;
 	NESTED_TRY {
@@ -204,7 +204,7 @@ NOTHROW(FCALL module_section_getname_nx)(struct module_section *__restrict self)
 	return result;
 }
 
-PUBLIC WUNUSED NONNULL((1)) NCX byte_t *
+PUBLIC BLOCKING WUNUSED NONNULL((1)) NCX byte_t *
 NOTHROW(FCALL module_section_getaddr_nx)(struct module_section *__restrict self) {
 	NCX byte_t *result;
 	NESTED_TRY {
@@ -215,9 +215,9 @@ NOTHROW(FCALL module_section_getaddr_nx)(struct module_section *__restrict self)
 	return result;
 }
 
-PUBLIC WUNUSED NONNULL((1)) KERNEL byte_t *
+PUBLIC BLOCKING WUNUSED NONNULL((1)) KERNEL NCX byte_t *
 NOTHROW(FCALL module_section_getaddr_alias_nx)(struct module_section *__restrict self) {
-	KERNEL byte_t *result;
+	KERNEL NCX byte_t *result;
 	NESTED_TRY {
 		result = module_section_getaddr_alias(self);
 	} EXCEPT {
@@ -226,10 +226,10 @@ NOTHROW(FCALL module_section_getaddr_alias_nx)(struct module_section *__restrict
 	return result;
 }
 
-PUBLIC WUNUSED NONNULL((1, 2)) KERNEL byte_t *
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) KERNEL NCX byte_t *
 NOTHROW(FCALL module_section_getaddr_inflate_nx)(struct module_section *__restrict self,
                                                  size_t *__restrict psize) {
-	KERNEL byte_t *result;
+	KERNEL NCX byte_t *result;
 	NESTED_TRY {
 		result = module_section_getaddr_inflate(self, psize);
 	} EXCEPT {

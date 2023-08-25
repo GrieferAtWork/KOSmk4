@@ -88,7 +88,7 @@ struct module_section_ops {
 	 * address of which is then  returned. As such, the  returned
 	 * buffer  can be dereferenced  irregardless of the currently
 	 * active mman, since it will be apart of kernel-space. */
-	BLOCKING WUNUSED_T NONNULL_T((1)) KERNEL byte_t *
+	BLOCKING WUNUSED_T NONNULL_T((1)) KERNEL NCX byte_t *
 	(FCALL *ms_getaddr_alias)(struct module_section *__restrict self);
 
 	/* [1..1] Similar to `ms_getaddr_alias()', but if the section
@@ -98,7 +98,7 @@ struct module_section_ops {
 	 *
 	 * If the section isn't compressed, call `ms_getaddr_alias()'
 	 * and write `self->ms_size' to `*psize' */
-	BLOCKING WUNUSED_T NONNULL_T((1, 2)) KERNEL byte_t *
+	BLOCKING WUNUSED_T NONNULL_T((1, 2)) KERNEL NCX byte_t *
 	(FCALL *ms_getaddr_inflate)(struct module_section *__restrict self,
 	                            size_t *__restrict psize);
 };
@@ -139,8 +139,8 @@ DEFINE_REFCNT_FUNCTIONS(struct module_section, ms_refcnt, module_section_destroy
 #ifdef __INTELLISENSE__
 BLOCKING WUNUSED NONNULL((1)) char const *(module_section_getname)(struct module_section *__restrict self);
 BLOCKING WUNUSED NONNULL((1)) NCX byte_t *(module_section_getaddr)(struct module_section *__restrict self);
-BLOCKING WUNUSED NONNULL((1)) KERNEL byte_t *(module_section_getaddr_alias)(struct module_section *__restrict self);
-BLOCKING WUNUSED NONNULL((1, 2)) KERNEL byte_t *(module_section_getaddr_inflate)(struct module_section *__restrict self, size_t *__restrict psize);
+BLOCKING WUNUSED NONNULL((1)) KERNEL NCX byte_t *(module_section_getaddr_alias)(struct module_section *__restrict self);
+BLOCKING WUNUSED NONNULL((1, 2)) KERNEL NCX byte_t *(module_section_getaddr_inflate)(struct module_section *__restrict self, size_t *__restrict psize);
 #else /* __INTELLISENSE__ */
 #define module_section_getname(self)                (*(self)->ms_ops->ms_getname)(self)
 #define module_section_getaddr(self)                (*(self)->ms_ops->ms_getaddr)(self)
@@ -149,10 +149,10 @@ BLOCKING WUNUSED NONNULL((1, 2)) KERNEL byte_t *(module_section_getaddr_inflate)
 #endif /* !__INTELLISENSE__ */
 
 /* Same as the functions above, but preserve the current exception, and return `NULL' on error. */
-FUNDEF WUNUSED NONNULL((1)) char const *NOTHROW(FCALL module_section_getname_nx)(struct module_section *__restrict self);
-FUNDEF WUNUSED NONNULL((1)) NCX byte_t *NOTHROW(FCALL module_section_getaddr_nx)(struct module_section *__restrict self);
-FUNDEF WUNUSED NONNULL((1)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_alias_nx)(struct module_section *__restrict self);
-FUNDEF WUNUSED NONNULL((1, 2)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_inflate_nx)(struct module_section *__restrict self, size_t *__restrict psize);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) char const *NOTHROW(FCALL module_section_getname_nx)(struct module_section *__restrict self);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) NCX byte_t *NOTHROW(FCALL module_section_getaddr_nx)(struct module_section *__restrict self);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) KERNEL NCX byte_t *NOTHROW(FCALL module_section_getaddr_alias_nx)(struct module_section *__restrict self);
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) KERNEL NCX byte_t *NOTHROW(FCALL module_section_getaddr_inflate_nx)(struct module_section *__restrict self, size_t *__restrict psize);
 
 
 struct module_sectinfo {
