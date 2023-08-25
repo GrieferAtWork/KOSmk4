@@ -400,6 +400,12 @@ mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
 	result->mf_btime = inner->mf_btime;
 	mfile_tslock_release(inner);
 
+	/* Deal  with special  case: when  the inner  file's parts are
+	 * anonymous, then so must be those of the misaligned wrapper. */
+	COMPILER_READ_BARRIER();
+	if (inner->mf_parts == MFILE_PARTS_ANONYMOUS)
+		result->mf_parts = MFILE_PARTS_ANONYMOUS;
+
 	/* Insert the new misaligned file into the base file's list. */
 	if (predecessor) {
 		/* Insert after `predecessor' */
