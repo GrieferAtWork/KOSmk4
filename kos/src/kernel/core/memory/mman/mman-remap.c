@@ -27,6 +27,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/dirent.h>
+#include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
 #include <kernel/mman.h>
 #include <kernel/mman/flags.h>
@@ -51,6 +52,7 @@
 #include <atomic.h>
 #include <stddef.h>
 #include <string.h>
+#include <unistd.h>
 
 DECL_BEGIN
 
@@ -78,6 +80,51 @@ SLIST_HEAD(mnode_slist, mnode);
 	(MNODE_F_PMASK | MNODE_F_SHARED | MNODE_F_MLOCK)
 
 
+/* Verify that the calling thread has access to `self' as per `prot_flags' */
+PRIVATE NONNULL((1)) void KCALL
+verify_mfile_access(struct mfile *__restrict self,
+                    unsigned int prot_flags) {
+	/* Problem:
+	 *     Using mremap(2), user-space is able to circumvent hmi_minaddr/hmi_maxaddr
+	 *     limits originally imposed during mmap(2):
+	 *     >> fd file_with_limits;
+	 *     >> void *p = mmap(NULL, PAGESIZE, MAP_SHARED, PROT_READ | PROT_WRITE, file_with_limits, 0);
+	 *     >> p = mremap(p, 0, 100 * PAGESIZE, MREMAP_MAYMOVE);
+	 *     Even if `file_with_limits' limited the mapable address range, mremap() is
+	 *     able  to exceed those limits, since we have no way of checking what those
+	 *     limits would have originally been...
+	 * Solution:
+	 *     Check  if it's an fnode, and if it is, verify that the calling thread has
+	 *     access to said node as per the new mapping's protection flags. While this
+	 *     doesn't handle special cases where drivers want to hand out extra  access
+	 *     rights, it *does* prevent the case where an unprivileged process tries to
+	 *     resize a physical memory mapping to get access to arbitrary physical mem.
+	 */
+
+	unsigned int access;
+	struct fnode *file;
+	if (self == &mfile_zero) {
+		/* Fast-pass / special case:
+		 * /dev/zero can always be re-sized, even if its mode-bits are wonky. */
+		return;
+	}
+	if likely(!mfile_isnode(self))
+		return;
+	file   = mfile_asnode(self);
+	access = R_OK;
+#if 0 /* Wrong: this would also only require write-access! */
+	if (prot_flags & PROT_EXEC)
+		access |= X_OK;
+#endif
+
+	/* When the caller wants a write-shared mapping,
+	 * assert write-access to  the underlying  file. */
+	if ((prot_flags & (PROT_SHARED | PROT_WRITE)) ==
+	    /*         */ (PROT_SHARED | PROT_WRITE))
+		access |= W_OK;
+	fnode_access(file, access);
+}
+
 /* Create a duplicate of a PROT_SHARED mapping. */
 PRIVATE BLOCKING_IF(flags & MREMAP_POPULATE) NONNULL((1)) PAGEDIR_PAGEALIGNED void *KCALL
 duplicate_shared_mapping(struct mman *__restrict self,
@@ -93,6 +140,7 @@ duplicate_shared_mapping(struct mman *__restrict self,
 	struct mfile_map_with_unlockinfo map;
 	struct mnode_slist old_mappings;
 	uintptr_t mnode_flags;
+	size_t old_size;
 
 	/* Set-up the constant, fixed fields of our file-map descriptor. */
 	map.mmwu_map.mfm_size = new_size;
@@ -127,6 +175,7 @@ err_not_shareable:
 	}
 
 	/* Fill in our mfile mapping descriptor with information from `node' */
+	old_size               = (size_t)((byte_t *)mnode_getendaddr(node) - (byte_t *)old_address);
 	map.mmwu_map.mfm_addr  = mnode_getfileaddrat(node, old_address);
 	map.mmwu_map.mfm_prot  = prot_from_mnodeflags(mnode_flags);
 	map.mmwu_map.mfm_flags = mapflags_from_mnodeflags_usronly(mnode_flags) |
@@ -151,6 +200,12 @@ err_not_shareable:
 		mpart_lock_release(part);
 	}
 	FINALLY_DECREF_UNLIKELY(map.mmwu_map.mfm_file);
+
+	/* If the duplicate mapping's size is greater than the original
+	 * mapping's (iow: when the calling process wants to gain extra
+	 * access to the underlying file), re-check access permissions. */
+	if (map.mmwu_map.mfm_size > old_size)
+		verify_mfile_access(map.mmwu_map.mfm_file, map.mmwu_map.mfm_prot);
 
 	/* Initialize & lock the requested address range. */
 	_mfile_map_init_and_acquire(&map.mmwu_map);
@@ -721,6 +776,13 @@ err_cannot_prepare:
 			                         mapflags_from_remapflags_poponly(flags);
 			SLIST_INIT(&map.mmwu_map.mfm_flist);
 			mman_lock_release(self);
+
+			/* If the duplicate mapping's size is greater than the original
+			 * mapping's (iow: when the calling process wants to gain extra
+			 * access to the underlying file), re-check access permissions. */
+			if (map.mmwu_map.mfm_size > old_size)
+				verify_mfile_access(map.mmwu_map.mfm_file, map.mmwu_map.mfm_prot);
+
 			_mfile_map_init_and_acquire_or_reserved(&map.mmwu_map);
 			TRY {
 				/* Re-acquire a lock to the mman. */
@@ -1040,15 +1102,6 @@ err_bad_old_size:
 		}
 		new_address = (byte_t *)new_address - addend;
 	}
-
-	/* FIXME: Using mremap(2), user-space is able to circumvent hmi_minaddr/hmi_maxaddr
-	 *        limits originally imposed during mmap(2):
-	 *        >> fd file_with_limits;
-	 *        >> void *p = mmap(NULL, PAGESIZE, MAP_SHARED, PROT_READ | PROT_WRITE, file_with_limits, 0);
-	 *        >> p = mremap(p, 0, 100 * PAGESIZE, MREMAP_MAYMOVE);
-	 *        Even if `file_with_limits' limited the mapable address range, mremap() is
-	 *        able  to exceed those limits, since we have no way of checking what those
-	 *        limits would have originally been... */
 
 	if (used_old_size == 0) {
 		/* Special case: Create another mapping of a PROT_SHARED-mapping
