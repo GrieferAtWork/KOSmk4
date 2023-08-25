@@ -589,6 +589,7 @@ done_nopart:
 		mman_lock_release(self);
 	return result;
 err_changed_free_hinode:
+	mman_lock_release(self);
 	kfree(hinode);
 	return false;
 }
