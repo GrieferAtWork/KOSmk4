@@ -33,6 +33,7 @@
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
+#include <kernel/mman/driver.h>
 #include <kernel/mman/fault.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
@@ -54,6 +55,7 @@
 #include <sched/x86/tss.h>
 
 #include <hybrid/align.h>
+#include <hybrid/sched/preemption.h>
 
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
@@ -71,6 +73,8 @@
 #include <string.h>
 
 #include <libinstrlen/instrlen.h>
+#include <libunwind/dwarf.h>
+#include <libunwind/eh_frame.h>
 #include <libvio/access.h>
 #include <libviocore/viocore.h>
 #ifndef __x86_64__
@@ -162,6 +166,12 @@ __asm__(".pushsection .text.cold\n\t"
 #else /* !CONFIG_NO_SMP */
 #define IF_SMP(...) /* nothing */
 #endif /* CONFIG_NO_SMP */
+
+
+#undef CONFIG_HAVE_DEBUG_SEGFAULT_NOTHROW_CHECK
+#ifndef NDEBUG
+#define CONFIG_HAVE_DEBUG_SEGFAULT_NOTHROW_CHECK
+#endif /* !NDEBUG */
 
 
 /* @return: true:  Success
@@ -369,6 +379,88 @@ NOTHROW(KCALL x86_repair_broken_tls_state)(void);
 #endif /* !NDEBUG */
 
 
+#ifdef CONFIG_HAVE_DEBUG_SEGFAULT_NOTHROW_CHECK
+/* Check  if `pc' is  part of a  function marked as `NOTHROW'
+ * If the answer to this question can't be determined without
+ * blocking, this function is allowed to return `false'. */
+PRIVATE ATTR_NOINLINE NOBLOCK WUNUSED bool
+NOTHROW(FCALL is_pc_nothrow)(NCX void const *pc) {
+	extern byte_t __gxx_personality_v0[];
+	unwind_errno_t status;
+	REF struct driver *drv;
+	unwind_fde_t fde;
+	if (!ADDR_ISKERN(pc))
+		goto no; /* User-space does its own exception handling, so don't assume NOTHROW */
+	drv = driver_fromaddr(pc);
+	if unlikely(!drv) {
+		/* Without a driver, there can't be .eh_frame info for unwinding, meaning
+		 * that exception handling becomes impossible the same way it does when a
+		 * function is marked as NOTHROW. */
+		goto yes;
+	}
+
+	/* Lookup unwind information about `pc'
+	 * NOTE: We intentionally don't use `driver_findfde()' here so we don't have to assume
+	 *       that the heap-system isn't broken (since  that function makes use of  heaps). */
+	fde.f_tbase = NULL; /* Lazily loaded (if needed) */
+	fde.f_dbase = NULL; /* Lazily loaded (if needed) */
+	status = unwind_fde_scan(drv->d_eh_frame_start,
+	                         drv->d_eh_frame_end,
+	                         pc, &fde,
+	                         sizeof(void *));
+	if (status != UNWIND_SUCCESS)
+		goto yes_decref_drv; /* No unwind info -> assume nothrow location */
+
+	/* Check for special case: standard gcc exception-handling information. */
+	if (fde.f_persofun == __gxx_personality_v0) {
+		byte_t const *reader = (byte_t const *)fde.f_lsdaaddr;
+		byte_t const *landingpad;
+		byte_t const *callsite_end;
+		u8 temp, callsite_encoding;
+		size_t callsite_size;
+		if unlikely(!reader)
+			goto no_decref_drv;
+		temp = *reader++; /* gl_landing_enc */
+		if (temp != DW_EH_PE_omit) {
+			/* gl_landing_pad */
+			landingpad = dwarf_decode_pointer((byte_t const **)&reader, temp,
+			                                  sizeof(void *), &fde.f_bases);
+		}
+		temp = *reader++; /* gl_typetab_enc */
+		if (temp != DW_EH_PE_omit) {
+			(void)dwarf_decode_uleb128((byte_t const **)&reader); /* gl_typetab_off */
+		}
+		callsite_encoding = *reader++; /* gl_callsite_enc */
+		callsite_size     = dwarf_decode_uleb128((byte_t const **)&reader);
+		callsite_end      = reader + callsite_size;
+		while (reader < callsite_end) {
+			uintptr_t start, size;
+			byte_t const *startpc, *endpc;
+			start = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &fde.f_bases); /* gcs_start */
+			size  = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &fde.f_bases); /* gcs_size */
+			startpc = landingpad + start;
+			endpc   = startpc + size;
+			if ((byte_t *)pc >= startpc && (byte_t *)pc < endpc)
+				goto no_decref_drv;
+			(void)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &fde.f_bases); /* gcs_handler */
+			(void)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &fde.f_bases); /* gcs_action */
+		}
+	} else {
+		/* In the case of any other kind of handler, assume that exceptions *can* be handled. */
+		goto no_decref_drv;
+	}
+
+yes_decref_drv:
+	decref_unlikely(drv);
+yes:
+	return true;
+no_decref_drv:
+	decref_unlikely(drv);
+no:
+	return false;
+}
+#endif /* CONFIG_HAVE_DEBUG_SEGFAULT_NOTHROW_CHECK */
+
 
 
 
@@ -528,12 +620,14 @@ x86_handle_pagefault(struct icpustate *__restrict state,
 
 		/* Acquire a lock to the mman in charge. */
 again_lock_mman:
-#ifdef CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC
+#if (defined(CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC) || \
+     defined(CONFIG_HAVE_DEBUG_SEGFAULT_NOTHROW_CHECK))
 		if unlikely(!mman_lock_tryacquire(mf.mfl_mman)) {
 			/* Access to the phys2virt section is allowed while preemption is disabled.
 			 * However,  when preemption is  disabled, locking the  kernel VM may fail,
 			 * so we need a special-case check for access to the phys2virt section when
 			 * we've previously failed to lock the kernel VM for reading. */
+#ifdef CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC
 			if (mf.mfl_mman == &mman_kernel && !FAULT_IS_USER &&
 			    (uintptr_t)addr >= KERNEL_PHYS2VIRT_MIN &&
 			    (uintptr_t)addr <= KERNEL_PHYS2VIRT_MAX) {
@@ -541,11 +635,38 @@ again_lock_mman:
 				x86_phys2virt64_require(addr);
 				goto pop_connections_and_return;
 			}
+#endif /* CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC */
+
+			/* Debug safety check: if the caller's PC points into kernel-space, and
+			 * is associated with a function that is marked as NOTHROW, then  don't
+			 * keep trying to acquire a lock to a blocking mman, as there is a good
+			 * chance  that this isn't an intended fault  due to NCX memory, but is
+			 * actually  a bug, in which case we want to tell the user (which we're
+			 * not gonna to be able to do if we were to dead-lock here) */
+#ifdef CONFIG_HAVE_DEBUG_SEGFAULT_NOTHROW_CHECK
+			if (preemption_ison()) {
+				unsigned int i;
+				for (i = 0; i < 100000; ++i) {
+					if (mman_lock_tryacquire(mf.mfl_mman))
+						goto got_mman_lock;
+					task_yield();
+				}
+			}
+			if (is_pc_nothrow(pc)) {
+				mfault_fini(&mf);
+				__mfault_init(&mf);
+				goto pop_connections_and_throw_segfault;
+			}
+#endif /* CONFIG_HAVE_DEBUG_SEGFAULT_NOTHROW_CHECK */
+
 			mman_lock_acquire(mf.mfl_mman);
+#ifdef CONFIG_HAVE_DEBUG_SEGFAULT_NOTHROW_CHECK
+got_mman_lock:;
+#endif /* CONFIG_HAVE_DEBUG_SEGFAULT_NOTHROW_CHECK */
 		}
-#else /* CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC */
+#else /* CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC || CONFIG_HAVE_DEBUG_SEGFAULT_NOTHROW_CHECK */
 		mman_lock_acquire(mf.mfl_mman);
-#endif /* !CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC */
+#endif /* !CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC && !CONFIG_HAVE_DEBUG_SEGFAULT_NOTHROW_CHECK */
 
 		/* Lookup the mapping for the accessed address. */
 		mf.mfl_node = mnode_tree_locate(mf.mfl_mman->mm_mappings,

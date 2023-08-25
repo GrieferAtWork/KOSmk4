@@ -1480,7 +1480,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC libc_gxx_personality_v0)(struct unwind_fde_struct 
 	}
 	temp = *reader++; /* gl_typetab_enc */
 	if (temp != DW_EH_PE_omit) {
-		dwarf_decode_uleb128((byte_t const **)&reader); /* gl_typetab_off */
+		(void)dwarf_decode_uleb128((byte_t const **)&reader); /* gl_typetab_off */
 	}
 	callsite_encoding = *reader++; /* gl_callsite_enc */
 	callsite_size     = dwarf_decode_uleb128((byte_t const **)&reader);
