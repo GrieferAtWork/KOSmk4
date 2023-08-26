@@ -511,6 +511,7 @@ mpart_load_and_makeanon_and_decref_and_unlock(struct misaligned_mfile *__restric
                                               struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...) {
 	struct mpart_load_and_makeanon_unlockinfo unlock_all;
+	struct unlockinfo *used_unlock;
 #define LOCAL_unlock_all()         \
 	(mpart_lock_release(self),     \
 	 mfile_lock_endwrite(msalign), \
@@ -521,19 +522,17 @@ mpart_load_and_makeanon_and_decref_and_unlock(struct misaligned_mfile *__restric
 	unlock_all.ui_unlock       = &mpart_load_and_makeanon_unlockinfo_cb;
 	unlock_all.mlamaui_msalign = msalign;
 	unlock_all.mlamaui_unlock  = unlock;
+	used_unlock = &unlock_all;
 	TRY {
 		/* Ensure that `self' has been allocated. */
+again_check_incore:
 		if (!MPART_ST_INCORE(self->mp_state)) {
 			struct mpart_setcore_data sc_data;
 			mpart_setcore_data_init(&sc_data);
 			TRY {
-				if (!mpart_setcore_or_unlock(self, &unlock_all, &sc_data)) {
-					do {
-						mpart_lock_acquire(self);
-					} while (!mpart_setcore_or_unlock(self, NULL, &sc_data));
-					/* TODO: Must try to fully anonymize the part, else there's a chance of an infinite
-					 *       loop in case system_cc()  gets invoked before the  next time we get  here! */
-					goto decref_self_and_return_false;
+				while (!mpart_setcore_or_unlock(self, used_unlock, &sc_data)) {
+					used_unlock = NULL;
+					mpart_lock_acquire(self);
 				}
 			} EXCEPT {
 				mpart_setcore_data_fini(&sc_data);
@@ -544,9 +543,9 @@ mpart_load_and_makeanon_and_decref_and_unlock(struct misaligned_mfile *__restric
 		/* Ensure that `self' has been loaded into the core.
 		 * NOTE: This also waits for all INIT-blocks to go away! */
 		if (!mpart_load_or_unlock(self, &unlock_all, 0, mpart_getsize(self))) {
-decref_self_and_return_false:
-			decref_unlikely(self);
-			return false;
+			used_unlock = NULL;
+			mpart_lock_acquire(self);
+			goto again_check_incore;
 		}
 	} EXCEPT {
 		decref_unlikely(self);
@@ -587,7 +586,7 @@ decref_self_and_return_false:
 	 */
 	self = mpart_merge(self);
 	mpart_trim(self); /* This will drop our final reference! */
-	return true;
+	return used_unlock != NULL;
 #undef LOCAL_unlock_all
 }
 
