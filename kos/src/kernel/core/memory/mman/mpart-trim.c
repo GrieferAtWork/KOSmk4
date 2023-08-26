@@ -43,6 +43,7 @@
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/printk.h>
 #include <kernel/swap.h>
+#include <sched/rpc.h>
 #include <sched/task.h> /* _TASK_FDBGHEAPDMEM */
 
 #include <hybrid/align.h>
@@ -2317,22 +2318,29 @@ NOTHROW(FCALL mpart_unlock_and_writeback_range_nx)(struct mpart *__restrict self
                                                    struct mpart_trim_data *__restrict data,
                                                    mpart_reladdr_t start,
                                                    mpart_reladdr_t end) {
+	REF struct mfile *file = incref(self->mp_file);
+	pos_t part_minaddr = mpart_getminaddr(self);
+	pos_t part_maxaddr = mpart_getmaxaddr(self);
+	FINALLY_DECREF_UNLIKELY(file);
 	printk(KERN_TRACE "[cc.trim] Sync part: %p: %#" PRIx64 "-%#" PRIx64 ", %p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 "\n",
-	       self->mp_file, self->mp_minaddr + start, self->mp_minaddr +  end - 1,
-	       self, start, end - 1, self->mp_minaddr, self->mp_maxaddr);
+	       file, part_minaddr + start, part_minaddr +  end - 1,
+	       self, start, end - 1, part_minaddr, part_maxaddr);
 	TRY {
 		mpart_unlock_and_writeback_range(self, data, start, end);
 	} EXCEPT {
+		/* Invoke a user-defined exception handler (if given) */
+		if (data->mtd_xhand) {
+			if ((*data->mtd_xhand)(data, file, part_minaddr, part_maxaddr))
+				return MPART_NXOP_ST_ERROR;
+		}
+
+		/* Fallback: dump the exception to the system log. */
 		except_printf("syncing modified range %#" PRIx64 "-%#" PRIx64 " of mfile %p "
 		              "(%#" PRIxSIZ "-%#" PRIxSIZ " of mpart %p at %#" PRIx64 "-%#" PRIx64 ")",
-		              (uint64_t)(mpart_getminaddr(self) + start),
-		              (uint64_t)(mpart_getminaddr(self) + end - 1),
-		              self->mp_file,
-		              (size_t)(start),
-		              (size_t)(end - 1),
-		              self,
-		              (uint64_t)(mpart_getminaddr(self)),
-		              (uint64_t)(mpart_getminaddr(self)));
+		              (uint64_t)(part_minaddr + start),
+		              (uint64_t)(part_minaddr + end - 1),
+		              file, (size_t)(start), (size_t)(end - 1),
+		              self, (uint64_t)(part_minaddr), (uint64_t)(part_maxaddr));
 		return MPART_NXOP_ST_ERROR;
 	}
 	return MPART_NXOP_ST_RETRY;
@@ -4093,6 +4101,61 @@ done:
 	return result;
 }
 
+struct mpart_trim_data_with_exception: mpart_trim_data {
+	struct exception_data mtdwe_except; /* Saved exception */
+};
+
+PRIVATE WUNUSED NONNULL((1, 2)) bool
+NOTHROW(FCALL mpart_trim_data_with_exception_handler)(struct mpart_trim_data *__restrict self,
+                                                      struct mfile *__restrict file,
+                                                      pos_t minaddr, pos_t maxaddr) {
+	struct mpart_trim_data_with_exception *me;
+	(void)file;
+	(void)minaddr;
+	(void)maxaddr;
+	me = (struct mpart_trim_data_with_exception *)self;
+	memcpy(&me->mtdwe_except, except_data(), sizeof(struct exception_data));
+	return true;
+}
+
+/* Same as `mpart_trim_or_unlock_nx()', but throws an exception when something goes wrong.
+ * NOTES:
+ * - When an exception is thrown, `*data' is left undefined
+ * - When using this function, `data->mtd_xhand' is simply ignored
+ * @return: true:  Success (s.a. `MPART_NXOP_ST_SUCCESS')
+ * @return: false: Failed (s.a. `MPART_NXOP_ST_RETRY') */
+PUBLIC ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) bool FCALL
+mpart_trim_or_unlock(struct mpart *__restrict self,
+                     struct mpart_trim_data *__restrict data)
+		THROWS(E_BADALLOC, E_IOERROR, ...) {
+	unsigned int state;
+	struct mpart_trim_data_with_exception used_data;
+	memcpy(&used_data, data, sizeof(struct mpart_trim_data));
+	used_data.mtd_xhand           = &mpart_trim_data_with_exception_handler;
+	used_data.mtdwe_except.e_code = EXCEPT_CODEOF(E_OK);
+	state = mpart_trim_or_unlock_nx(self, &used_data);
+	memcpy(data, &used_data, sizeof(struct mpart_trim_data));
+	if (state == MPART_NXOP_ST_ERROR) {
+		mpart_trim_data_fini(data);
+		DBG_memset(data, 0xcc, sizeof(*data));
+
+		/* Check if our exception handler got invoked. */
+		if (used_data.mtdwe_except.e_code != EXCEPT_CODEOF(E_OK)) {
+			memcpy(except_data(), &used_data.mtdwe_except,
+			       sizeof(struct exception_data));
+			except_throw_current();
+		}
+
+		/* Check for interrupts in case trim failed due to RPCs. */
+		if (ccinfo_blocking(used_data.mtd_ccinfo))
+			task_serve();
+
+		/* We don't know the exact error, but we *do* have to
+		 * throw *something*. So  we simply throw  bad-alloc. */
+		THROW(E_BADALLOC);
+	}
+	return state == MPART_NXOP_ST_SUCCESS;
+}
 
 #else /* CONFIG_HAVE_KERNEL_MPART_TRIM */
 
@@ -4130,6 +4193,23 @@ NOTHROW(FCALL mpart_trim_locked_or_unlock_nx)(struct mpart *__restrict self,
 }
 
 DEFINE_PUBLIC_ALIAS(mpart_trim_or_unlock_nx, mpart_trim_locked_or_unlock_nx);
+
+/* Same as `mpart_trim_or_unlock_nx()', but throws an exception when something goes wrong.
+ * NOTES:
+ * - When an exception is thrown, `*data' is left undefined
+ * - When using this function, `data->mtd_xhand' is simply ignored
+ * @return: true:  Success (s.a. `MPART_NXOP_ST_SUCCESS')
+ * @return: false: Failed (s.a. `MPART_NXOP_ST_RETRY') */
+PUBLIC ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) bool FCALL
+mpart_trim_or_unlock(struct mpart *__restrict self,
+                     struct mpart_trim_data *__restrict data)
+		THROWS(E_BADALLOC, E_IOERROR, ...) {
+	/* Trimming is disabled. */
+	COMPILER_IMPURE();
+	(void)self;
+	(void)data;
+	return true;
+}
 #endif /* !CONFIG_HAVE_KERNEL_MPART_TRIM */
 
 PUBLIC NOBLOCK NONNULL((1)) void

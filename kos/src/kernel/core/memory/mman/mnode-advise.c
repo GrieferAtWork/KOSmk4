@@ -70,29 +70,16 @@ mnode_advise_or_unlock(struct mnode *__restrict self,
 		data->mtd_mode = MPART_TRIM_MODE_UNCHANGED;
 do_mpart_trim:
 		if (self->mn_part) {
-			unsigned int error;
 
 			/* Only trim the sub-area that is actually mapped by the node. */
 			data->mtd_rstart = mnode_getpartminaddr(self);
 			data->mtd_rend   = mnode_getpartendaddr(self);
 
-			/* Note  that we tell  `mpart_trim_or_unlock_nx()' about the fact
-			 * that we holding a lock to the mman, and that it should release
-			 * that lock on error! */
-			error = mpart_trim_or_unlock_nx(self->mn_part, data);
-			if (error == MPART_NXOP_ST_SUCCESS)
-				break;
-
-			/* In this case, locks were released! */
-			if (error == MPART_NXOP_ST_RETRY)
+			/* Note that we tell `mpart_trim_or_unlock()' about the fact
+			 * that  we holding a  lock to the mman,  and that it should
+			 * release that lock on error! */
+			if (!mpart_trim_or_unlock(self->mn_part, data))
 				return false; /* Try again... */
-
-			/* Check for interrupts in case trim failed due to RPCs. */
-			task_serve();
-
-			/* We don't know the exact error (it could have also been I/O-related),
-			 * but we *do* have to throw *something*. So we simply throw bad-alloc. */
-			THROW(E_BADALLOC);
 		}
 		break;
 

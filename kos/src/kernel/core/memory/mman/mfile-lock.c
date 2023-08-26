@@ -146,6 +146,7 @@ again:
  * `self' is _NOT_ released during this! */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_unlock_and_decref_parts)(struct mfile *__restrict self) {
+	assert(mfile_lock_reading(self));
 	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
 	if (self->mf_parts)
 		mpart_unlock_and_decref_whole_tree(self->mf_parts);

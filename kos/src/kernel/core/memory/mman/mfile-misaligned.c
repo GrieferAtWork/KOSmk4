@@ -499,7 +499,7 @@ NOTHROW(FCALL mpart_load_and_makeanon_unlockinfo_cb)(struct unlockinfo *__restri
 	struct mpart_load_and_makeanon_unlockinfo *me = (struct mpart_load_and_makeanon_unlockinfo *)self;
 	mfile_lock_endwrite(me->mlamaui_msalign);
 	unlockinfo_xunlock(me->mlamaui_unlock);
-	mfile_lock_end(me->mlamaui_msalign->mam_base); /* !!! Important: must release the file lock *after* caller-given `unlock' */
+	mfile_lock_end(me->mlamaui_msalign->mam_base); /* !!! Important: must release the file lock *after* caller-given `unlock' (s.a. `mfile_unlock_parts_info_cb()') */
 }
 
 
@@ -514,7 +514,7 @@ mpart_load_and_makeanon_and_decref_and_unlock(struct misaligned_mfile *__restric
 	(mpart_lock_release(self),     \
 	 mfile_lock_endwrite(msalign), \
 	 unlockinfo_xunlock(unlock),   \
-	 mfile_lock_end(msalign->mam_base)) /* !!! Important: must release the file lock *after* caller-given `unlock' */
+	 mfile_lock_end(msalign->mam_base)) /* !!! Important: must release the file lock *after* caller-given `unlock' (s.a. `mfile_unlock_parts_info_cb()') */
 	assert(self->mp_file == msalign);
 
 	unlock_all.ui_unlock       = &mpart_load_and_makeanon_unlockinfo_cb;
@@ -530,6 +530,8 @@ mpart_load_and_makeanon_and_decref_and_unlock(struct misaligned_mfile *__restric
 					do {
 						mpart_lock_acquire(self);
 					} while (!mpart_setcore_or_unlock(self, NULL, &sc_data));
+					/* TODO: Must try to fully anonymize the part, else there's a chance of an infinite
+					 *       loop in case system_cc()  gets invoked before the  next time we get  here! */
 					goto decref_self_and_return_false;
 				}
 			} EXCEPT {
@@ -596,7 +598,7 @@ misaligned_mfile_part_makeanon_or_unlock(struct misaligned_mfile *__restrict msa
 #define LOCAL_unlock_all()         \
 	(mfile_lock_endwrite(msalign), \
 	 unlockinfo_xunlock(unlock),   \
-	 mfile_lock_end(msalign->mam_base)) /* !!! Important: must release the file lock *after* caller-given `unlock' */
+	 mfile_lock_end(msalign->mam_base)) /* !!! Important: must release the file lock *after* caller-given `unlock' (s.a. `mfile_unlock_parts_info_cb()') */
 
 	if unlikely(!tryincref(self))
 		return true; /* Can ignore this part! */
@@ -624,7 +626,7 @@ misaligned_mfile_range_makeanon_or_unlock(struct misaligned_mfile *__restrict ms
 #define LOCAL_unlock_all()         \
 	(mfile_lock_endwrite(msalign), \
 	 unlockinfo_xunlock(unlock),   \
-	 mfile_lock_end(msalign->mam_base)) /* !!! Important: must release the file lock *after* caller-given `unlock' */
+	 mfile_lock_end(msalign->mam_base)) /* !!! Important: must release the file lock *after* caller-given `unlock' (s.a. `mfile_unlock_parts_info_cb()') */
 	struct mpart *next;
 	struct mpart_tree_minmax mima;
 	mpart_tree_minmaxlocate(msalign->mf_parts, msalign_minaddr, msalign_maxaddr, &mima);
@@ -658,7 +660,7 @@ _mfile_msalign_makeanon_locked_or_unlock(struct mfile *__restrict file,
 		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...) {
 #define LOCAL_unlock_all()       \
 	(unlockinfo_xunlock(unlock), \
-	 mfile_lock_end(file)) /* !!! Important: must release the file lock *after* caller-given `unlock' */
+	 mfile_lock_end(file)) /* !!! Important: must release the file lock *after* caller-given `unlock' (s.a. `mfile_unlock_parts_info_cb()') */
 	struct misaligned_mfile *msalign;
 	LIST_FOREACH (msalign, &file->mf_msalign, mam_link) {
 		bool ok;

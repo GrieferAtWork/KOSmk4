@@ -1541,20 +1541,29 @@ struct ccinfo;
                                            * NOTE: When the part has the `MPART_F_MLOCK' flag, this flag is ignored. */
 #define MPART_TRIM_FLAG_FREE         0x10 /* FLAG: When set, `MPART_TRIM_FLAG_SWAP' is ignored and changes to anonymous memory are simply discarded. */
 
+/* Exception handler for I/O errors  that might happen during mpart  trimming.
+ * When this function isn't defined, or returns `false', exception are handled
+ * using default handling, meaning dumping to the system log. */
+typedef WUNUSED_T NONNULL_T((1, 2)) __BOOL
+NOTHROW_T(FCALL *mpart_trim_except_handler_t)(struct mpart_trim_data *__restrict self,
+                                              struct mfile *__restrict file,
+                                              pos_t minaddr, pos_t maxaddr);
+
 struct mpart_trim_data {
-	struct mpart      *mtd_parts[2];  /* [0..1][owned] Extra mem-parts as may be needed. */
-	struct mpartmeta  *mtd_metas[2];  /* [0..1][owned] Extra mem-part-meta-controllers as may be needed. */
-	uintptr_t         *mtd_blkst_ptr; /* [0..1][owned] Extra block-state-vector as may be needed. */
-	struct mchunk     *mtd_chunkvec;  /* [0..1][owned] Extra mem-chunk-vector as may be needed. */
-	struct mnode      *mtd_node;      /* [0..1][owned] Extra mem-node as may be needed. */
-	struct ccinfo     *mtd_ccinfo;    /* [1..1][const] Cache-clearing information. */
-	struct unlockinfo *mtd_unlock;    /* [0..1][const] Extra stuff to unlock */
-	struct mman       *mtd_mmlocked;  /* [0..1][const] Extra  mman for which the caller is already holding a lock.
-	                                   *               Note that this mman lock is released alongside `mtd_unlock'
-	                                   *               when doing so becomes necessary. */
-	mpart_reladdr_t    mtd_rstart;    /* [const] Part-relative address where trimming starts */
-	mpart_reladdr_t    mtd_rend;      /* [const] Part-relative address where trimming ends */
-	unsigned int       mtd_mode;      /* [const] Trim mode (s.a. `MPART_TRIM_MODE_*' and `MPART_TRIM_FLAG_*') */
+	struct mpart               *mtd_parts[2];  /* [0..1][owned] Extra mem-parts as may be needed. */
+	struct mpartmeta           *mtd_metas[2];  /* [0..1][owned] Extra mem-part-meta-controllers as may be needed. */
+	uintptr_t                  *mtd_blkst_ptr; /* [0..1][owned] Extra block-state-vector as may be needed. */
+	struct mchunk              *mtd_chunkvec;  /* [0..1][owned] Extra mem-chunk-vector as may be needed. */
+	struct mnode               *mtd_node;      /* [0..1][owned] Extra mem-node as may be needed. */
+	struct ccinfo              *mtd_ccinfo;    /* [1..1][const] Cache-clearing information. */
+	struct unlockinfo          *mtd_unlock;    /* [0..1][const] Extra stuff to unlock */
+	struct mman                *mtd_mmlocked;  /* [0..1][const] Extra  mman for which the caller is already holding a lock.
+	                                            *               Note that this mman lock is released alongside `mtd_unlock'
+	                                            *               when doing so becomes necessary. */
+	mpart_reladdr_t             mtd_rstart;    /* [const] Part-relative address where trimming starts */
+	mpart_reladdr_t             mtd_rend;      /* [const] Part-relative address where trimming ends */
+	unsigned int                mtd_mode;      /* [const] Trim mode (s.a. `MPART_TRIM_MODE_*' and `MPART_TRIM_FLAG_*') */
+	mpart_trim_except_handler_t mtd_xhand;     /* [0..1][const] I/O exception handler (if not defined, dump errors to the system log). */
 };
 #define mpart_trim_data_init(self, info, unlock, mmlocked, mode) \
 	(void)((self)->mtd_parts[0]  = __NULLPTR,                    \
@@ -1569,7 +1578,8 @@ struct mpart_trim_data {
 	       (self)->mtd_mmlocked  = (mmlocked),                   \
 	       (self)->mtd_rstart    = 0,                            \
 	       (self)->mtd_rend      = (mpart_reladdr_t)-1,          \
-	       (self)->mtd_mode      = (mode))
+	       (self)->mtd_mode      = (mode),                       \
+	       (self)->mtd_xhand     = __NULLPTR)
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_trim_data_fini)(struct mpart_trim_data *__restrict self);
 
@@ -1609,6 +1619,16 @@ NOTHROW(FCALL mpart_trim_locked_or_unlock_nx)(struct mpart *__restrict self,
 FUNDEF ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_trim_or_unlock_nx)(struct mpart *__restrict self,
                                        struct mpart_trim_data *__restrict data);
+/* Same as `mpart_trim_or_unlock_nx()', but throws an exception when something goes wrong.
+ * NOTES:
+ * - When an exception is thrown, `*data' is left undefined
+ * - When using this function, `data->mtd_xhand' is simply ignored
+ * @return: true:  Success (s.a. `MPART_NXOP_ST_SUCCESS')
+ * @return: false: Failed (s.a. `MPART_NXOP_ST_RETRY') */
+FUNDEF ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) __BOOL FCALL
+mpart_trim_or_unlock(struct mpart *__restrict self,
+                     struct mpart_trim_data *__restrict data)
+		THROWS(E_BADALLOC, E_IOERROR, ...);
 
 
 
