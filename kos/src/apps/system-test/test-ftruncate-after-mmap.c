@@ -87,6 +87,11 @@ DEFINE_TEST(ftruncate_after_mmap) {
 
 	/* Do the magical truncate on the file. */
 	EQ(0, ftruncate(fd, 0));
+	/* TODO: `unlink("foo")'  must behave the same as `truncate("foo", 0)',
+	 *       in that it needs to ensure that MAP_PRIVATE mappings are fully
+	 *       loaded *before* the file is deleted from disk. (otherwise,  it
+	 *       would become impossible to  still load those mappings  *after*
+	 *       the file has been deleted) */
 
 	/* Assert that ftruncate caused our MAP_PRIVATE
 	 * mappings to magically re-appear in the core. */
