@@ -46,6 +46,7 @@
 #include <atomic.h>
 #include <format-printer.h>
 #include <inttypes.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -653,6 +654,12 @@ misaligned_mfile_range_makeanon_or_unlock(struct misaligned_mfile *__restrict ms
  * @return: true:  Success (locks are still held)
  * @return: false: Try again (locks were lost)
  * @THROW: Error (locks were lost) */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) bool KCALL
+_mfile_msalign_makeanon_locked_or_unlock(struct mfile *__restrict file,
+                                         pos_t minaddr, pos_t maxaddr,
+                                         struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...)
+		ASMNAME("mfile_msalign_makeanon_locked_or_unlock");
 PUBLIC BLOCKING WUNUSED NONNULL((1)) bool KCALL
 _mfile_msalign_makeanon_locked_or_unlock(struct mfile *__restrict file,
                                          pos_t minaddr, pos_t maxaddr,
@@ -708,6 +715,12 @@ _mfile_msalign_makeanon_locked_or_unlock(struct mfile *__restrict file,
  * @return: true:  Success (locks are still held)
  * @return: false: Try again (locks were lost)
  * @THROW: Error (locks were lost) */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) bool KCALL
+_mfile_msalign_makeanon_or_unlock(struct mfile *__restrict self,
+                                  pos_t minaddr, pos_t maxaddr,
+                                  struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...)
+		ASMNAME("mfile_msalign_makeanon_or_unlock");
 PUBLIC BLOCKING WUNUSED NONNULL((1)) bool KCALL
 _mfile_msalign_makeanon_or_unlock(struct mfile *__restrict self,
                                   pos_t minaddr, pos_t maxaddr,

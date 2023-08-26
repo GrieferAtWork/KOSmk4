@@ -1060,7 +1060,8 @@ _mpart_msalign_makeanon_or_unlock(struct mpart *__restrict self,
                                   struct unlockinfo *unlock,
                                   mpart_reladdr_t partrel_offset,
                                   size_t num_bytes)
-		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...);
+		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...)
+		ASMNAME("mpart_msalign_makeanon_or_unlock");
 #ifndef __OPTIMIZE_SIZE__
 #define mpart_msalign_makeanon_or_unlock(self, unlock, partrel_offset, num_bytes)                       \
 	(likely(__hybrid_atomic_load(&(self)->mp_file->mf_msalign.lh_first, __ATOMIC_ACQUIRE) == __NULLPTR) \
@@ -1223,7 +1224,8 @@ NOTHROW(FCALL mpart_setblockstate)(struct mpart *__restrict self,
 	 ? _mpart_setblockstate_initdone_extrahooks(self)                                          \
 	 : decref(self))
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL _mpart_setblockstate_initdone_extrahooks)(REF struct mpart *__restrict self);
+NOTHROW(FCALL _mpart_setblockstate_initdone_extrahooks)(REF struct mpart *__restrict self)
+		ASMNAME("mpart_setblockstate_initdone_extrahooks");
 
 /* Check if the given mem-part contains blocks with `MPART_BLOCK_ST_INIT'.
  * For this purpose, if the `MPART_F_MAYBE_BLK_INIT' flag isn't set,  then
@@ -1686,11 +1688,16 @@ NOTHROW(FCALL _mpart_iscopywritable)(struct mpart const *__restrict self,
  * This must be ensured before shared write-access can be granted to the
  * specified  range, and if this isn't the case, the copy-on-write nodes
  * for said range must be unshared via `mpart_unsharecow_or_unlock()' */
+#ifndef __OPTIMIZE_SIZE__
 #define mpart_issharewritable(self, addr, num_bytes) \
 	(LIST_EMPTY(&(self)->mp_copy) || _mpart_issharewritable(self, addr, num_bytes))
+#else /* !__OPTIMIZE_SIZE__ */
+#define mpart_issharewritable(self, addr, num_bytes) _mpart_issharewritable(self, addr, num_bytes)
+#endif /* __OPTIMIZE_SIZE__ */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL _mpart_issharewritable)(struct mpart const *__restrict self,
-                                      mpart_reladdr_t addr, size_t num_bytes);
+                                      mpart_reladdr_t addr, size_t num_bytes)
+		ASMNAME("mpart_issharewritable");
 
 
 /* Helper wrappers for the above functions. */

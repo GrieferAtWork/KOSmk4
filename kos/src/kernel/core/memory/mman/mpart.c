@@ -50,6 +50,7 @@
 #include <atomic.h>
 #include <inttypes.h>
 #include <stdalign.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -610,6 +611,9 @@ NOTHROW(FCALL mpart_setblockstate)(struct mpart *__restrict self,
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL _mpart_setblockstate_initdone_extrahooks)(REF struct mpart *__restrict self)
+		ASMNAME("mpart_setblockstate_initdone_extrahooks");
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _mpart_setblockstate_initdone_extrahooks)(REF struct mpart *__restrict self) {
 	uintptr_quarter_t actions;
 	actions = atomic_fetchadd(&self->mp_xflags, ~(MPART_XF_MERGE_AFTER_INIT |
@@ -996,6 +1000,10 @@ NOTHROW(FCALL _mpart_iscopywritable)(struct mpart const *__restrict self,
  * This must be ensured before shared write-access can be granted to the
  * specified  range, and if this isn't the case, the copy-on-write nodes
  * for said range must be unshared via `mpart_unsharecow_or_unlock()' */
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL _mpart_issharewritable)(struct mpart const *__restrict self,
+                                      mpart_reladdr_t addr, size_t num_bytes)
+		ASMNAME("mpart_issharewritable");
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL _mpart_issharewritable)(struct mpart const *__restrict self,
                                       mpart_reladdr_t addr, size_t num_bytes) {

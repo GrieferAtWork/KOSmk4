@@ -1555,7 +1555,8 @@ FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL KCALL
 _mfile_msalign_makeanon_locked_or_unlock(struct mfile *__restrict self,
                                          pos_t minaddr, pos_t maxaddr,
                                          struct unlockinfo *unlock DFL(__NULLPTR))
-		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...);
+		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...)
+		ASMNAME("mfile_msalign_makeanon_locked_or_unlock");
 #ifndef __OPTIMIZE_SIZE__
 #define mfile_msalign_makeanon_locked_or_unlock(self, ...) \
 	(likely(LIST_EMPTY(&(self)->mf_msalign)) ? 1 : likely(_mfile_msalign_makeanon_locked_or_unlock(self, __VA_ARGS__)))
@@ -1574,7 +1575,8 @@ FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL KCALL
 _mfile_msalign_makeanon_or_unlock(struct mfile *__restrict self,
                                   pos_t minaddr, pos_t maxaddr,
                                   struct unlockinfo *unlock DFL(__NULLPTR))
-		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...);
+		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...)
+		ASMNAME("mfile_msalign_makeanon_or_unlock");
 #ifndef __OPTIMIZE_SIZE__
 #define mfile_msalign_makeanon_or_unlock(self, ...)                                            \
 	(likely(__hybrid_atomic_load(&(self)->mf_msalign.lh_first, __ATOMIC_ACQUIRE) == __NULLPTR) \

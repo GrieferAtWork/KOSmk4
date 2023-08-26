@@ -49,6 +49,7 @@
 #include <assert.h>
 #include <atomic.h>
 #include <inttypes.h>
+#include <stdbool.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -1953,7 +1954,14 @@ NOTHROW(FCALL unlock_part_and_extra_cb)(struct unlockinfo *__restrict self) {
 /* Helper wrapper around `mfile_msalign_makeanon_or_unlock()'
  * NOTE: The caller  must be  holding a  lock to  `self', and  must
  *       ensure that the given address range is in-bounds of `self' */
-PUBLIC BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1)) bool FCALL
+_mpart_msalign_makeanon_or_unlock(struct mpart *__restrict self,
+                                  struct unlockinfo *unlock,
+                                  mpart_reladdr_t partrel_offset,
+                                  size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_IOERROR, E_BADALLOC, ...)
+		ASMNAME("mpart_msalign_makeanon_or_unlock");
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool FCALL
 _mpart_msalign_makeanon_or_unlock(struct mpart *__restrict self,
                                   struct unlockinfo *unlock,
                                   mpart_reladdr_t partrel_offset,
