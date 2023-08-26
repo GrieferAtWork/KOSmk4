@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3445bb68 */
+/* HASH CRC-32:0x9f060be1 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2305,7 +2305,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsdup)(char16_t const *__restrict string) {
 	size_t resultsize = (libd_wcslen(string) + 1) * sizeof(char16_t);
 	char16_t *result = (char16_t *)libc_malloc(resultsize);
 	if likely(result)
-		libc_memcpy(result, string, resultsize);
+		result = (char16_t *)libc_memcpy(result, string, resultsize);
 	return result;
 }
 #include <hybrid/typecore.h>
@@ -2315,7 +2315,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsdup)(char32_t const *__restrict string) {
 	size_t resultsize = (libc_wcslen(string) + 1) * sizeof(char32_t);
 	char32_t *result = (char32_t *)libc_malloc(resultsize);
 	if likely(result)
-		libc_memcpy(result, string, resultsize);
+		result = (char32_t *)libc_memcpy(result, string, resultsize);
 	return result;
 }
 #include <libc/unicode.h>

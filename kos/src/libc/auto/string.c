@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb09c6fa7 */
+/* HASH CRC-32:0x45295147 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -603,7 +603,7 @@ NOTHROW_NCX(LIBCCALL libc_strdup)(char const *__restrict string) {
 	size_t resultsize = (libc_strlen(string) + 1) * sizeof(char);
 	char *result = (char *)libc_malloc(resultsize);
 	if likely(result)
-		libc_memcpy(result, string, resultsize);
+		result = (char *)libc_memcpy(result, string, resultsize);
 	return result;
 }
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_IN(2) ATTR_INOUT(3) ATTR_INOUT_OPT(1) char *

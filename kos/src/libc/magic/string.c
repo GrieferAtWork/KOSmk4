@@ -1245,7 +1245,7 @@ strdup([[in(strlen(string))]] char const *__restrict string)
 	size_t resultsize = (strlen(string) + 1) * sizeof(char);
 	char *result = (char *)malloc(resultsize);
 	if likely(result)
-		memcpy(result, string, resultsize);
+		result = (char *)memcpy(result, string, resultsize);
 	return result;
 }
 
