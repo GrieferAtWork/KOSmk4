@@ -380,7 +380,6 @@ mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
 	result->mf_flags = MFILE_F_READONLY | MFILE_F_NOATIME |
 	                   MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
 	                   MFILE_F_ROFLAGS;
-	result->mam_base = incref(inner);
 	result->mam_offs = misalign;
 
 	/* Re-acquire a lock to the base file (and make it a write-lock this time) */
@@ -401,7 +400,7 @@ mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
 			/* TODO */
 		}
 	} EXCEPT {
-		destroy(result);
+		kfree(result);
 		xdecref_unlikely(predecessor);
 		RETHROW();
 	}
@@ -413,7 +412,7 @@ mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
 		/* Deleted file --> don't create a misalignment wrapper! */
 		mfile_tslock_release_br(inner);
 		mfile_lock_endwrite(inner);
-		destroy(result);
+		kfree(result);
 		xdecref_unlikely(predecessor);
 		goto return_inner;
 	}
@@ -462,7 +461,7 @@ mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
 	if unlikely(used_predecessor->mam_offs == misalign &&
 	            tryincref(used_predecessor)) {
 		mfile_lock_endwrite(inner);
-		destroy(result);
+		kfree(result);
 		xdecref_unlikely(predecessor);
 		return used_predecessor;
 	}
@@ -470,6 +469,7 @@ mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
 	/* Insert after `used_predecessor' */
 	LIST_INSERT_AFTER(used_predecessor, result, mam_link);
 did_insert:
+	result->mam_base = incref(inner);
 	mfile_lock_endwrite(inner);
 	xdecref_unlikely(predecessor);
 
