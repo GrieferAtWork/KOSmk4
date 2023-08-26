@@ -55,6 +55,7 @@
 #include <kernel/mman/execinfo.h>
 #include <kernel/mman/futexfd.h>
 #include <kernel/mman/memfd.h>
+#include <kernel/mman/mfile-misaligned.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
@@ -306,7 +307,7 @@ PRIVATE PMODULE_OPERATOR_FREE pdyn__userelf_module_free = (PMODULE_OPERATOR_FREE
 PRIVATE NOBLOCK ATTR_PURE WUNUSED PMODULE_OPERATOR_FREE
 NOTHROW(FCALL get__userelf_module_free)(void) {
 	if (pdyn__userelf_module_free == (PMODULE_OPERATOR_FREE)(void *)-1)
-		*(void **)&pdyn__userelf_module_free = driver_dlsym_global("_userelf_module_free");
+		*(void **)&pdyn__userelf_module_free = driver_dlsym_local(&kernel_driver, "_userelf_module_free");
 	return pdyn__userelf_module_free;
 }
 
@@ -1026,7 +1027,25 @@ NOTHROW(KCALL note_mfile)(pformatprinter printer, void *arg,
 					if (!name || !ADDR_ISKERN(name))
 						goto badobj;
 					result = RAWPRINT("memfd:");
+					if unlikely(result < 0)
+						goto done;
 					DO(note_fdirent_ex(printer, arg, name, pstatus, false));
+					goto done;
+				}
+				if (ops == &misaligned_mfile_ops) {
+					struct misaligned_mfile *msm = mfile_asmisaligned(me);
+					struct mfile *base = msm->mam_base;
+					if (!base || !ADDR_ISKERN(base))
+						goto badobj;
+					if (base->mf_ops == &misaligned_mfile_ops)
+						goto badobj; /* Misaligned files can't have misaligned bases! */
+					if (msm->mam_offs == 0)
+						goto badobj; /* Misaligned files can't have offset=0 */
+					result = RAWPRINT("misaligned:[");
+					if unlikely(result < 0)
+						goto done;
+					DO(note_mfile(printer, arg, base, pstatus));
+					PRINTF(":+%" PRIuSIZ "]", msm->mam_offs);
 					goto done;
 				}
 			} EXCEPT {
@@ -1040,6 +1059,8 @@ done:
 	return result;
 do_print_devfs_name:
 	result = RAWPRINT("/dev/");
+	if unlikely(result < 0)
+		goto done;
 	DO(note_fdirent_ex(printer, arg, file_dent, pstatus, false));
 	return result;
 err:
