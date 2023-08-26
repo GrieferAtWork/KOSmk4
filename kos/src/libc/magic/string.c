@@ -910,7 +910,8 @@ miss:
 @@Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
 @@The exact # of characters copied is `strlen(src) + 1' (+1 because
 @@the trailing NUL-character is also copied)
-[[std, kernel, crtbuiltin, leaf, dos_only_export_alias("_mbscpy"), libc]]
+[[std, kernel, crtbuiltin, leaf, libc, alias("_mbscpy")]]
+[[if(!defined(__KERNEL__)), dos_only_export_as("_mbscpy")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCPY))]]
 /* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
 [[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
@@ -942,7 +943,8 @@ miss:
 @@Same as `strcpy(3)',  but rather  than copying `src'  ontop of  `dst',
 @@append it at the end of `dst', or more precisely copy to `strend(dst)'
 @@Always re-returns `dst'
-[[std, kernel, crtbuiltin, leaf, dos_only_export_alias("_mbscat")]]
+[[std, kernel, crtbuiltin, leaf, alias("_mbscat")]]
+[[if(!defined(__KERNEL__)), dos_only_export_as("_mbscat")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCAT))]]
 /* Alias for old pre-Glibc 2.26 functions (only existed on i386 32-bit) */
 [[if(defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)),
@@ -3734,8 +3736,8 @@ int bcmp([[in(n_bytes)]] void const *s1,
 %[insert:guarded_function(index = strchr)]
 %[insert:guarded_function(rindex = strrchr)]
 
-[[guard, dos_only_export_alias("_stricmp", "_strcmpi")]]
-[[kernel, alias("stricmp", "strcmpi", "__strcasecmp")]]
+[[kernel, guard, alias("stricmp", "strcmpi", "__strcasecmp", "_stricmp", "_strcmpi")]]
+[[if(!defined(__KERNEL__)), dos_only_export_as("_stricmp", "_strcmpi")]]
 [[if(!defined(__KERNEL__)), export_as("stricmp", "strcmpi", "__strcasecmp")]]
 [[pure, wunused, section(".text.crt{|.dos}.unicode.static.memory"), crtbuiltin]]
 int strcasecmp([[in]] char const *s1, [[in]] char const *s2) {
@@ -3754,7 +3756,8 @@ int strcasecmp([[in]] char const *s1, [[in]] char const *s2) {
 }
 
 [[guard, kernel, decl_include("<hybrid/typecore.h>")]]
-[[dos_only_export_alias("_strnicmp", "_strncmpi"), alias("strnicmp", "strncmpi")]]
+[[alias("strnicmp", "strncmpi", "_strnicmp", "_strncmpi")]]
+[[if(!defined(__KERNEL__)), dos_only_export_as("_strnicmp", "_strncmpi")]]
 [[if(!defined(__KERNEL__)), export_as("strnicmp", "strncmpi")]]
 [[pure, wunused, section(".text.crt{|.dos}.unicode.static.memory"), crtbuiltin]]
 int strncasecmp([[in(strnlen(., maxlen))]] char const *s1,

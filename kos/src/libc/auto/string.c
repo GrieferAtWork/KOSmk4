@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7eed8faa */
+/* HASH CRC-32:0xb09c6fa7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7205,9 +7205,9 @@ DEFINE_PUBLIC_ALIAS(__strstr_cg, libc_strstr);
 DEFINE_PUBLIC_ALIAS(strstr, libc_strstr);
 #endif /* !LIBC_ARCH_HAVE_STRSTR */
 #ifndef LIBC_ARCH_HAVE_STRCPY
-#ifdef __LIBCCALL_IS_LIBDCALL
+#if defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(_mbscpy, libc_strcpy);
-#endif /* __LIBCCALL_IS_LIBDCALL */
+#endif /* __LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #if defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(__strcpy_g, libc_strcpy);
 #endif /* __i386__ && !__x86_64__ && !__KERNEL__ */
@@ -7223,9 +7223,9 @@ DEFINE_PUBLIC_ALIAS(__strncpy_gg, libc_strncpy);
 DEFINE_PUBLIC_ALIAS(strncpy, libc_strncpy);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRNCPY */
 #ifndef LIBC_ARCH_HAVE_STRCAT
-#ifdef __LIBCCALL_IS_LIBDCALL
+#if defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(_mbscat, libc_strcat);
-#endif /* __LIBCCALL_IS_LIBDCALL */
+#endif /* __LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #if defined(__i386__) && !defined(__x86_64__) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(__strcat_g, libc_strcat);
 DEFINE_PUBLIC_ALIAS(__strcat_c, libc_strcat);
@@ -7440,20 +7440,20 @@ DEFINE_PUBLIC_ALIAS(bcmpc, libc_bcmpc);
 #ifndef LIBC_ARCH_HAVE_BCMP
 DEFINE_PUBLIC_ALIAS(bcmp, libc_bcmp);
 #endif /* !LIBC_ARCH_HAVE_BCMP */
-#ifdef __LIBCCALL_IS_LIBDCALL
+#if defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(_stricmp, libc_strcasecmp);
 DEFINE_PUBLIC_ALIAS(_strcmpi, libc_strcasecmp);
-#endif /* __LIBCCALL_IS_LIBDCALL */
+#endif /* __LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(stricmp, libc_strcasecmp);
 DEFINE_PUBLIC_ALIAS(strcmpi, libc_strcasecmp);
 DEFINE_PUBLIC_ALIAS(__strcasecmp, libc_strcasecmp);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strcasecmp, libc_strcasecmp);
-#ifdef __LIBCCALL_IS_LIBDCALL
+#if defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(_strnicmp, libc_strncasecmp);
 DEFINE_PUBLIC_ALIAS(_strncmpi, libc_strncasecmp);
-#endif /* __LIBCCALL_IS_LIBDCALL */
+#endif /* __LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(strnicmp, libc_strncasecmp);
 DEFINE_PUBLIC_ALIAS(strncmpi, libc_strncasecmp);
