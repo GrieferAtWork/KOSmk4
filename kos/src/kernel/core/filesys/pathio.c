@@ -493,13 +493,8 @@ again_lookup_dent:
 				}
 
 				/* Ask the filesystem to remove the directory. */
-				TRY {
-					status = fdirnode_unlink(self->p_dir, dent, node);
-				} EXCEPT {
-					path_cldlock_endread(self);
-					RETHROW();
-				}
-				path_cldlock_endread(self);
+				RAII_FINALLY { path_cldlock_endread(self);};
+				status = fdirnode_unlink(self->p_dir, dent, node);
 			} else {
 				if (!(atflags & AT_REMOVEREG))
 					THROW(E_FSERROR_NOT_A_DIRECTORY, E_FILESYSTEM_NOT_A_DIRECTORY_RMDIR);

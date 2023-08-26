@@ -1152,6 +1152,37 @@ again_locked:
 		goto again;
 	}
 
+	/* TODO: Acquire a lock to the part-tree of `file' and all associated parts */
+	/* TODO: Ensure that all misaligned files of `file' are anonymized. */
+	/* TODO: Ensure that all blocks with MAP_PRIVATE mappings are loaded (s.a. `mfile_load_private_nodes_above_or_unlock()') */
+	/* TODO: Set a flag `MFILE_F_DELETING' (that can only be set while holding a lock to the file's tree and all parts)
+	 * - `MFILE_F_DELETING' can only be set if it's not already set
+	 * - `MFILE_F_DELETING' can only be set while holding a lock the file's part-tree
+	 * - `MFILE_F_DELETING' can only be set while holding a lock to all parts
+	 * - `MFILE_F_DELETING' can only be set when there are no `MPART_BLOCK_ST_INIT' blocks in any part
+	 * - `MFILE_F_DELETING' can only be set when `mf_trunclock == 0'
+	 * - `MFILE_F_DELETING' must be clear when wanting to set a block to status `MPART_BLOCK_ST_INIT'
+	 *    XXX: I think this restriction isn't necessary, since the only reason you set this status is
+	 *         to  initialize the underlying blocks, but you can only invoke the operators to do that
+	 *         when `mf_trunclock != 0' (XXX: Verify that this requirement is always fulfulled)
+	 * - `MFILE_F_DELETING' must be clear when wanting to increment `mf_trunclock' (s.a. `mfile_read()', `mfile_write()')
+	 * - `MFILE_F_DELETING' must be clear when wanting to fault a MAP_SHARED file mappings (s.a. `mfault_or_unlock()')
+	 * - `MFILE_F_DELETING' must be clear when wanting to lower the `mf_filesize' field of a file
+	 * - After `MFILE_F_DELETING' is cleared, the file's `mf_initdone' signal is broadcast */
+	/* TODO: Deny write access to MAP_SHARED memory mappings */
+	/* TODO: Release locks to parts and the part-tree of `file' */
+
+	/* Extra TODOs: */
+	/* TODO: File deletion can be aborted by simply clearing `MFILE_F_DELETING' */
+	/* TODO: `mfile_delete()' must (at the end) clear `MFILE_F_DELETING' to indicate that deletion is done */
+	/* TODO: The notion of a `MFILE_F_DELETING'-flag should also be applicated to `mfile_truncate()',
+	 *       such  that we can change the `mso_freeblocks_or_unlock' operator to `mso_freeblocks' (as
+	 *       in being able to invoke it without holding any locks) */
+
+	/* TODO: Annotate the mfile `mo_loadblocks' and `mo_saveblocks' operators as allowed to assume that `MFILE_F_DELETING' isn't set */
+	/* TODO: Annotate the mfile `mso_freeblocks' operator as allowed to assume that `MFILE_F_DELETING' *is* set */
+	/* TODO: Annotate the mfile `mso_freeblocks' operator as allowed to assume that `mf_trunclock == 0' */
+
 	/* Ask the FS-specific implementation to delete file entries. */
 	TRY {
 		flatdirnode_delete_entry(me, ent, file, TAILQ_NEXT(ent, fde_bypos) == NULL);
@@ -1511,6 +1542,7 @@ again:
 
 			/* If present, delete the pre-existing file in `nd' */
 			if (existing) {
+				/* TODO: Extra handling, as per `flatdirnode_v_unlink()' to deal with file mappings. */
 				TRY {
 					/* Remove the directory relating to `entry' */
 					flatdirnode_delete_entry(nd, existing, info->frn_repfile, TAILQ_NEXT(existing, fde_bypos) == NULL);
