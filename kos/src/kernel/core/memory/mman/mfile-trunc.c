@@ -630,12 +630,7 @@ again_reacquire_after_split:
 				if (self->mf_trunclock != 0) {
 					mfile_lock_endwrite(self);
 					assert(!task_wasconnected());
-					task_connect(&self->mf_initdone);
-					if unlikely(atomic_read(&self->mf_trunclock) != 0) {
-						task_disconnectall();
-						goto again_reacquire_after_split;
-					}
-					task_waitfor();
+					mfile_trunclock_waitfor(self);
 					goto again_reacquire_after_split;
 				}
 				blocking_part = mfile_tryincref_and_lock_parts(self);

@@ -1187,12 +1187,7 @@ handle_write_impossible_too_big:
 		if (atomic_read(&self->mf_trunclock) != 0) {
 			mfile_lock_endwrite(self);
 			decref_unlikely(part);
-			task_connect(&self->mf_initdone);
-			if unlikely(atomic_read(&self->mf_trunclock) == 0) {
-				task_disconnectall();
-				goto again;
-			}
-			task_waitfor();
+			mfile_trunclock_waitfor(self);
 			goto again;
 		}
 
@@ -1449,12 +1444,7 @@ restart_after_extendpart_tail:
 		 * to become ZERO. */
 		if (atomic_read(&self->mf_trunclock) != 0) {
 			mpart_truncate_undo(self, part, old_part_size);
-			task_connect(&self->mf_initdone);
-			if unlikely(atomic_read(&self->mf_trunclock) == 0) {
-				task_disconnectall();
-				goto again;
-			}
-			task_waitfor();
+			mfile_trunclock_waitfor(self);
 			goto again;
 		}
 #endif /* LOCAL_TAILIO */

@@ -1086,6 +1086,12 @@ struct mfile {
 	(__hybrid_assert((self)->mf_trunclock != 0), \
 	 __hybrid_atomic_dec(&(self)->mf_trunclock, __ATOMIC_RELEASE))
 
+/* Blocking wait until `self->mf_trunclock == 0' */
+FUNDEF BLOCKING NONNULL((1)) void FCALL
+mfile_trunclock_waitfor(struct mfile *__restrict self)
+		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...);
+
+
 #ifdef CONFIG_NO_SMP
 #define mfile_tslock_tryacquire(self)   1
 #define mfile_tslock_acquire_nopr(self) (void)0

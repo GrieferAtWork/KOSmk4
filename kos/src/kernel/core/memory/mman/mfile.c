@@ -129,6 +129,23 @@ NOTHROW(FCALL mfile_alloc_physmem_nocc)(struct mfile *__restrict self,
 }
 
 
+/* Blocking wait until `self->mf_trunclock == 0' */
+PUBLIC BLOCKING NONNULL((1)) void FCALL
+mfile_trunclock_waitfor(struct mfile *__restrict self)
+		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...) {
+	assert(!task_wasconnected());
+	do {
+		task_connect(&self->mf_initdone);
+		if unlikely(atomic_read(&self->mf_trunclock) == 0) {
+			task_disconnectall();
+			return;
+		}
+		task_waitfor();
+	} while (atomic_read(&self->mf_trunclock) != 0);
+}
+
+
+
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 	uintptr_t old_flags, new_flags;
