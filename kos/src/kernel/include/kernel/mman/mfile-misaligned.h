@@ -81,9 +81,8 @@ DATDEF struct mfile_ops const misaligned_mfile_ops;
  * - This function doesn't necessarily return a misaligned file (hence  why
  *   its return type is just  `mfile'). When the effective alignment  turns
  *   out to be `0', it will just re-return `inner', and if another matching
- *   misaligned file already exists, that one is simply re-used.
- * - This function is `BLOCKING' because it has to wait for `inner->mf_trunclock' */
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct mfile *FCALL
+ *   misaligned file already exists, that one is simply re-used. */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct mfile *FCALL
 mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
                                 pos_t *__restrict p_inner_fpos)
 		THROWS(E_BADALLOC);

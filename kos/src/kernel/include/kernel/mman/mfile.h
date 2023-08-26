@@ -1060,8 +1060,8 @@ struct mfile {
 	                                              * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
 	                                              *      before proceeding to use the data you've just read! */
 #endif /* !__WANT_MFILE__mf_... */
-	struct misaligned_mfile_list  mf_msalign;    /* [lock(mf_lock)][0..n] List of misaligned wrappers.
-	                                              * Elements may only be added when `MFILE_F_DELETED' isn't set and `mf_trunclock == 0'. */
+	struct misaligned_mfile_list  mf_msalign;    /* [lock(mf_lock)][0..n]   List    of   misaligned    wrappers.
+	                                              * Elements may only be added when `MFILE_F_DELETED' isn't set. */
 #ifdef __WANT_FS_INIT
 #define MFILE_INIT_mf_msalign(mf_msalign) { mf_msalign }
 #endif /* __WANT_FS_INIT */

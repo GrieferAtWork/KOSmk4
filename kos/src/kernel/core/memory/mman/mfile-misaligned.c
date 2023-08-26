@@ -280,9 +280,8 @@ PUBLIC_CONST struct mfile_ops const misaligned_mfile_ops = {
  * - This function doesn't necessarily return a misaligned file (hence  why
  *   its return type is just  `mfile'). When the effective alignment  turns
  *   out to be `0', it will just re-return `inner', and if another matching
- *   misaligned file already exists, that one is simply re-used.
- * - This function is `BLOCKING' because it has to wait for `inner->mf_trunclock' */
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct mfile *FCALL
+ *   misaligned file already exists, that one is simply re-used. */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct mfile *FCALL
 mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
                                 pos_t *__restrict p_inner_fpos)
 		THROWS(E_BADALLOC) {
@@ -384,8 +383,47 @@ mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
 
 	/* Re-acquire a lock to the base file (and make it a write-lock this time) */
 	TRY {
+#if 0
+again_lock_write_inner:
+#endif
 		mfile_lock_write(inner);
 
+		/* We can't wait for `mf_trunclock' to become 0 because that would pose
+		 * a potential soft-lock scenario when the calling thread is  currently
+		 * holding a trunc-lock (because in that case, we'd be waiting forever)
+		 *
+		 * The reason why we might *want* to wait for `mf_trunclock == 0' is to
+		 * ensure that no other thread is  currently in the process of  writing
+		 * to  the file, in order to ensure that we don't end up mapping memory
+		 * where it is undefined if that memory contains the old file contents,
+		 * or the new file contents.
+		 *
+		 * But if you think about this, this check if completely pointless:
+		 * - When 2 threads run in parallel, and one of them does a write(),
+		 *   while the other does a mmap(MAP_PRIVATE), there *already* is no
+		 *   guaranty as to what exactly the memory mapping will contain.
+		 * - If we *were* to wait  for `mf_trunclock == 0', then only  thing
+		 *   we'd be ensuring is that there's no way for only *part* of  the
+		 *   mapping to be the  old memory, and some  other part to be  new,
+		 *   but there also isn't anything in the specs that says that write
+		 *   operations  of arbitrary size have to be atomic (and then there
+		 *   is also the mpart->block-level locks which will ensure that so-
+		 *   long as you stay within  the same block (usually page),  memory
+		 *   will consistently be either the old, or new contents)
+		 * - As such, there is no  point in this check,  and as a matter  of
+		 *   fact, this check also isn't done by `MAP_PRIVATE' or `read(2)',
+		 *   so it's a mood point if we suddenly did it here.
+		 *
+		 * NOTE: This would all be about syncing with `mfile_msalign_makeanon_or_unlock()',
+		 *       which usually gets called by  `mfile_write()' while holding a  trunc-lock,
+		 *       and the idea *would* have been  to prevent new misaligned mem-files  being
+		 *       created after that function just checked all existing ones.
+		 *
+		 * TLDR: This is unnecessary since  it's absence doesn't break  anything,
+		 *       and read()/write() (CONSUMER/PRODUCER)  already need some  extra
+		 *       locking mechanism if the intend it to sync them with each other.
+		 */
+#if 0
 		/* Wait for `mf_trunclock' to become 0.
 		 *
 		 * This is required since new misaligned files must not be added while
@@ -397,8 +435,11 @@ mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
 		 * file I/O, has incremented `mf_trunclock', but has yet to  acquire
 		 * a lock to an associated mpart. */
 		if unlikely(atomic_read(&inner->mf_trunclock) != 0) {
-			/* TODO */
+			mfile_lock_endwrite(inner);
+			mfile_trunclock_waitfor(inner);
+			goto again_lock_write_inner;
 		}
+#endif
 	} EXCEPT {
 		kfree(result);
 		xdecref_unlikely(predecessor);
