@@ -3805,6 +3805,7 @@ again:
 			       self, range.mptr_start, range.mptr_end - 1, self->mp_minaddr, self->mp_maxaddr,
 			       (size_t)(range.mptr_end - range.mptr_start));
 			mpart_clear(self, data->mtd_ccinfo);
+			data->mtd_bytes += (range.mptr_end - range.mptr_start);
 			result = MPART_NXOP_ST_SUCCESS;
 			goto done;
 		}
@@ -3826,6 +3827,7 @@ again:
 			       self, range.mptr_start, range.mptr_end - 1, self->mp_minaddr, self->mp_maxaddr,
 			       (size_t)(range.mptr_end - range.mptr_start));
 			mpart_setvoid(self, data->mtd_ccinfo);
+			data->mtd_bytes += (range.mptr_end - range.mptr_start);
 			result = MPART_NXOP_ST_SUCCESS;
 			goto done;
 		}
@@ -3842,6 +3844,7 @@ again:
 		result = mpart_void_subrange_or_unlock(self, data, &range);
 		if (result != MPART_NXOP_ST_SUCCESS)
 			return result;
+		data->mtd_bytes += (range.mptr_end - range.mptr_start);
 		decref(mpart_merge_locked(incref(self)));
 	}	break;
 
@@ -4125,15 +4128,15 @@ NOTHROW(FCALL mpart_trim_data_with_exception_handler)(struct mpart_trim_data *__
  * @return: true:  Success (s.a. `MPART_NXOP_ST_SUCCESS')
  * @return: false: Failed (s.a. `MPART_NXOP_ST_RETRY') */
 PUBLIC ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) bool FCALL
-mpart_trim_or_unlock(struct mpart *__restrict self,
-                     struct mpart_trim_data *__restrict data)
+mpart_trim_locked_or_unlock(struct mpart *__restrict self,
+                            struct mpart_trim_data *__restrict data)
 		THROWS(E_BADALLOC, E_IOERROR, ...) {
 	unsigned int state;
 	struct mpart_trim_data_with_exception used_data;
 	memcpy(&used_data, data, sizeof(struct mpart_trim_data));
 	used_data.mtd_xhand           = &mpart_trim_data_with_exception_handler;
 	used_data.mtdwe_except.e_code = EXCEPT_CODEOF(E_OK);
-	state = mpart_trim_or_unlock_nx(self, &used_data);
+	state = mpart_trim_locked_or_unlock_nx(self, &used_data);
 	memcpy(data, &used_data, sizeof(struct mpart_trim_data));
 	if (state == MPART_NXOP_ST_ERROR) {
 		mpart_trim_data_fini(data);
@@ -4155,6 +4158,145 @@ mpart_trim_or_unlock(struct mpart *__restrict self,
 		THROW(E_BADALLOC);
 	}
 	return state == MPART_NXOP_ST_SUCCESS;
+}
+
+PUBLIC ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) bool FCALL
+mpart_trim_or_unlock(struct mpart *__restrict self,
+                     struct mpart_trim_data *__restrict data)
+		THROWS(E_BADALLOC, E_IOERROR, ...) {
+	bool result = true;
+
+	/* Try to lock `self'. */
+	if (!mpart_lock_tryacquire(self)) {
+		if (ccinfo_noblock(data->mtd_ccinfo))
+			goto done;
+		mpart_trim_data_unlock(data);
+		mpart_lock_waitfor(self);
+		return false;
+	}
+
+	/* Do the actual trim operation */
+	result = mpart_trim_locked_or_unlock(self, data);
+
+	/* release lock on success (in all other cases, locks were already released) */
+	if (result)
+		mpart_lock_release(self);
+done:
+	return result;
+}
+
+
+/* Trim parts of `self' in the given address range according to  `mode'.
+ * This function is a simplified wrapper around `mpart_trim_or_unlock()'
+ * that automatically enumerates parts of `self' in relevant ranges, and
+ * does all of the necessary lock management.
+ * This function primarily implements the `FILE_IOC_TRIM' ioctl.
+ *
+ * @param: minaddr: The lowest in-file address where data should be trimmed (will be rounded down)
+ * @param: maxaddr: The greatest in-file address where data should be trimmed (will be rounded up)
+ * @param: mode:    Trimming mode (s.a. `MPART_TRIM_MODE_*' and `MPART_TRIM_FLAG_*')
+ * @return: * :     The total number of trimmed bytes (s.a. `struct mpart_trim_data::mtd_bytes') */
+PUBLIC BLOCKING WUNUSED NONNULL((1)) pos_t KCALL
+mfile_trimparts(struct mfile *__restrict self,
+                pos_t minaddr, pos_t maxaddr,
+                unsigned int mode)
+		THROWS(E_BADALLOC, E_IOERROR, ...) {
+	bool ok;
+	struct mpart_tree_minmax mima;
+	struct ccinfo cci;
+	struct mpart_trim_data td;
+	pos_t result = 0;
+	pos_t part_minaddr;
+	pos_t part_maxaddr;
+	assert(minaddr <= maxaddr);
+	ccinfo_init(&cci, GFP_NORMAL, (size_t)-1);
+	mpart_trim_data_init(&td, &cci, NULL, NULL, mode);
+again:
+	TRY {
+		mfile_lock_read(self);
+	} EXCEPT {
+		mpart_trim_data_fini(&td);
+		RETHROW();
+	}
+
+	/* Find the lowest mem-part that contains, or comes after `minaddr' */
+	if unlikely(self->mf_parts == MFILE_PARTS_ANONYMOUS)
+		goto done_td_unlock;
+	mpart_tree_minmaxlocate(self->mf_parts, minaddr, maxaddr, &mima);
+	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
+	if (!mima.mm_min)
+		goto done_td_unlock; /* No more parts. */
+
+	/* Try to get a reference to the lowest part (if that fails, try the next one) */
+	while (!tryincref(mima.mm_min)) {
+		if (mima.mm_min == mima.mm_max) {
+			/* Stop if we've reached the last part overlapping the caller-given range. */
+			goto done_td_unlock;
+		}
+		mima.mm_min = mpart_tree_nextnode(mima.mm_min);
+		assert(mima.mm_min);
+	}
+
+	/* Acquire a lock to this mem-part. */
+	if (!mpart_lock_tryacquire(mima.mm_min)) {
+		mfile_lock_endread(self);
+		FINALLY_DECREF_UNLIKELY(mima.mm_min);
+		TRY {
+			mpart_lock_waitfor(mima.mm_min);
+		} EXCEPT {
+			mpart_trim_data_fini(&td);
+			RETHROW();
+		}
+		goto again;
+	}
+
+	/* Release the file-lock. */
+	mfile_lock_endread(self);
+
+	/* Figure out the area of the part which we want to trim. */
+	part_minaddr = mpart_getminaddr(mima.mm_min);
+	part_maxaddr = mpart_getmaxaddr(mima.mm_min);
+	if (part_minaddr < minaddr)
+		part_minaddr = minaddr;
+	if (part_maxaddr > maxaddr)
+		part_maxaddr = maxaddr;
+	assertf(part_minaddr <= part_maxaddr,
+	        "If this wasn't the case, then why did "
+	        "`mpart_tree_minmaxlocate()' give us this part?");
+
+	/* Update `td' to indicate the area we want to trim. */
+	td.mtd_rstart = (mpart_reladdr_t)(part_minaddr - mpart_getminaddr(mima.mm_min));
+	td.mtd_rend   = (mpart_reladdr_t)(part_maxaddr - mpart_getminaddr(mima.mm_min)) + 1;
+
+	/* Trim this part. */
+	{
+		FINALLY_DECREF_UNLIKELY(mima.mm_min);
+		/* NOTE: This call finalizes `td' on error. */
+		ok = mpart_trim_locked_or_unlock(mima.mm_min, &td);
+		if (ok)
+			mpart_lock_release(mima.mm_min);
+	}
+
+	/* Keep track of how much bytes we've trimmed. */
+	result += td.mtd_bytes;
+	td.mtd_bytes = 0;
+
+	/* If the trim of the part in question failed, try again. */
+	if (!ok)
+		goto again;
+
+	/* Move on to the next part. */
+	if (OVERFLOW_UADD(part_maxaddr, 1, &minaddr))
+		goto done_td;
+	if (minaddr > maxaddr)
+		goto done_td;
+	goto again;
+
+done_td_unlock:
+	mfile_lock_endread(self);
+done_td:
+	mpart_trim_data_fini(&td);
+	return result;
 }
 
 #else /* CONFIG_HAVE_KERNEL_MPART_TRIM */
@@ -4201,14 +4343,39 @@ DEFINE_PUBLIC_ALIAS(mpart_trim_or_unlock_nx, mpart_trim_locked_or_unlock_nx);
  * @return: true:  Success (s.a. `MPART_NXOP_ST_SUCCESS')
  * @return: false: Failed (s.a. `MPART_NXOP_ST_RETRY') */
 PUBLIC ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) bool FCALL
-mpart_trim_or_unlock(struct mpart *__restrict self,
-                     struct mpart_trim_data *__restrict data)
+mpart_trim_locked_or_unlock(struct mpart *__restrict self,
+                            struct mpart_trim_data *__restrict data)
 		THROWS(E_BADALLOC, E_IOERROR, ...) {
 	/* Trimming is disabled. */
 	COMPILER_IMPURE();
 	(void)self;
 	(void)data;
 	return true;
+}
+DEFINE_PUBLIC_ALIAS(mpart_trim_or_unlock, mpart_trim_locked_or_unlock);
+
+/* Trim parts of `self' in the given address range according to  `mode'.
+ * This function is a simplified wrapper around `mpart_trim_or_unlock()'
+ * that automatically enumerates parts of `self' in relevant ranges, and
+ * does all of the necessary lock management.
+ * This function primarily implements the `FILE_IOC_TRIM' ioctl.
+ *
+ * @param: minaddr: The lowest in-file address where data should be trimmed (will be rounded down)
+ * @param: maxaddr: The greatest in-file address where data should be trimmed (will be rounded up)
+ * @param: mode:    Trimming mode (s.a. `MPART_TRIM_MODE_*' and `MPART_TRIM_FLAG_*')
+ * @return: * :     The total number of trimmed bytes (s.a. `struct mpart_trim_data::mtd_bytes') */
+PUBLIC BLOCKING WUNUSED NONNULL((1)) pos_t KCALL
+mfile_trimparts(struct mfile *__restrict self,
+                pos_t minaddr, pos_t maxaddr,
+                unsigned int mode)
+		THROWS(E_BADALLOC, E_IOERROR, ...) {
+	/* Trimming is disabled. */
+	COMPILER_IMPURE();
+	(void)self;
+	(void)minaddr;
+	(void)maxaddr;
+	(void)mode;
+	return 0;
 }
 #endif /* !CONFIG_HAVE_KERNEL_MPART_TRIM */
 

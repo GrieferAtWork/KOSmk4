@@ -346,7 +346,7 @@ mfile_parts_denywrite_or_unlock(struct mfile *__restrict self,
  *                            flags in the requested manner.
  * @return: * : The old set of file flags.
  * @throw: E_ILLEGAL_OPERATION:E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS: [...] */
-PUBLIC NONNULL((1)) uintptr_t FCALL
+PUBLIC NONNULL((1)) uintptr_t KCALL
 mfile_chflags(struct mfile *__restrict self, uintptr_t mask,
               uintptr_t flags, bool check_permissions)
 		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY,

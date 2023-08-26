@@ -299,6 +299,7 @@ enum {
 
 	/* ioctl() (file) */
 	E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG = 0x1880, /* E_INVALID_ARGUMENT_BAD_VALUE: The name passed to `FS_IOC_SETFSLABEL' is too long. */
+	E_INVALID_ARGUMENT_CONTEXT_FILE_TRIM_MODE,            /* E_INVALID_ARGUMENT_BAD_VALUE: The value of `struct file_trim::ft_mode' is unsupported. */
 
 	/* ioctl(): keyboard */
 	E_INVALID_ARGUMENT_CONTEXT_KBD_IOC_SETRDKEY_BADMODE = 0x1c00,      /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid value passed as argument to `ioctl(fd, KBD_IOC_SETRDKEY, ...)' */
@@ -583,6 +584,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_TCFLSH_COMMAND                   E_INVALID_ARGUMENT_CONTEXT_TCFLSH_COMMAND                   /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `arg' passed to `ioctl(fd,TCFLSH)' isn't one of `TC(I|O|IO)FLUSH' */
 /* ioctl() (file) */
 #define E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG                 E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG                 /* E_INVALID_ARGUMENT_BAD_VALUE: The name passed to `FS_IOC_SETFSLABEL' is too long. */
+#define E_INVALID_ARGUMENT_CONTEXT_FILE_TRIM_MODE                   E_INVALID_ARGUMENT_CONTEXT_FILE_TRIM_MODE                   /* E_INVALID_ARGUMENT_BAD_VALUE: The value of `struct file_trim::ft_mode' is unsupported. */
 /* ioctl(): keyboard */
 #define E_INVALID_ARGUMENT_CONTEXT_KBD_IOC_SETRDKEY_BADMODE         E_INVALID_ARGUMENT_CONTEXT_KBD_IOC_SETRDKEY_BADMODE         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid value passed as argument to `ioctl(fd, KBD_IOC_SETRDKEY, ...)' */
 #define E_INVALID_ARGUMENT_CONTEXT_KBD_IOC_SETDBGF12_BADDMODE       E_INVALID_ARGUMENT_CONTEXT_KBD_IOC_SETDBGF12_BADDMODE       /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid (or unsupported) value passed as argument to `ioctl(fd, KBD_IOC_SETDBGF12, ...)' */
@@ -855,6 +857,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_TCFLSH_COMMAND                   6209  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `arg' passed to `ioctl(fd,TCFLSH)' isn't one of `TC(I|O|IO)FLUSH' */
 /* ioctl() (file) */
 #define E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG                 6272  /* E_INVALID_ARGUMENT_BAD_VALUE: The name passed to `FS_IOC_SETFSLABEL' is too long. */
+#define E_INVALID_ARGUMENT_CONTEXT_FILE_TRIM_MODE                   6273  /* E_INVALID_ARGUMENT_BAD_VALUE: The value of `struct file_trim::ft_mode' is unsupported. */
 /* ioctl(): keyboard */
 #define E_INVALID_ARGUMENT_CONTEXT_KBD_IOC_SETRDKEY_BADMODE         7168  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid value passed as argument to `ioctl(fd, KBD_IOC_SETRDKEY, ...)' */
 #define E_INVALID_ARGUMENT_CONTEXT_KBD_IOC_SETDBGF12_BADDMODE       7169  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid (or unsupported) value passed as argument to `ioctl(fd, KBD_IOC_SETDBGF12, ...)' */

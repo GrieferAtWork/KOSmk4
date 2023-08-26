@@ -1551,7 +1551,7 @@ mfile_parts_denywrite_or_unlock(struct mfile *__restrict self,
  * @return: true:  Success (locks are still held)
  * @return: false: Try again (locks were lost)
  * @THROW: Error (locks were lost) */
-FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL KCALL
 _mfile_msalign_makeanon_locked_or_unlock(struct mfile *__restrict self,
                                          pos_t minaddr, pos_t maxaddr,
                                          struct unlockinfo *unlock DFL(__NULLPTR))
@@ -1570,7 +1570,7 @@ _mfile_msalign_makeanon_locked_or_unlock(struct mfile *__restrict self,
  * @return: true:  Success (locks are still held)
  * @return: false: Try again (locks were lost)
  * @THROW: Error (locks were lost) */
-FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL KCALL
 _mfile_msalign_makeanon_or_unlock(struct mfile *__restrict self,
                                   pos_t minaddr, pos_t maxaddr,
                                   struct unlockinfo *unlock DFL(__NULLPTR))
@@ -1599,11 +1599,31 @@ _mfile_msalign_makeanon_or_unlock(struct mfile *__restrict self,
  *                            flags in the requested manner.
  * @return: * : The old set of file flags.
  * @throw: E_ILLEGAL_OPERATION:E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS: [...] */
-FUNDEF NONNULL((1)) uintptr_t FCALL
+FUNDEF NONNULL((1)) uintptr_t KCALL
 mfile_chflags(struct mfile *__restrict self, uintptr_t mask,
               uintptr_t flags, __BOOL check_permissions DFL(1))
 		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY,
 		       E_INSUFFICIENT_RIGHTS, E_ILLEGAL_OPERATION);
+
+
+
+/* Trim parts of `self' in the given address range according to  `mode'.
+ * This function is a simplified wrapper around `mpart_trim_or_unlock()'
+ * that automatically enumerates parts of `self' in relevant ranges, and
+ * does all of the necessary lock management.
+ * This function primarily implements the `FILE_IOC_TRIM' ioctl.
+ *
+ * @param: minaddr: The lowest in-file address where data should be trimmed (will be rounded down)
+ * @param: maxaddr: The greatest in-file address where data should be trimmed (will be rounded up)
+ * @param: mode:    Trimming mode (s.a. `MPART_TRIM_MODE_*' and `MPART_TRIM_FLAG_*')
+ * @return: * :     The total number of trimmed bytes (s.a. `struct mpart_trim_data::mtd_bytes') */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) pos_t KCALL
+mfile_trimparts(struct mfile *__restrict self,
+                pos_t minaddr, pos_t maxaddr,
+                unsigned int mode)
+		THROWS(E_BADALLOC, E_IOERROR, ...);
+
+
 
 
 /* Check if the file's raw I/O interface should be used by default.
@@ -1616,8 +1636,6 @@ mfile_chflags(struct mfile *__restrict self, uintptr_t mask,
 	((!(self)->mf_ops->mo_stream ||            \
 	  !(self)->mf_ops->mo_stream->mso_mmap) && \
 	 !((self)->mf_flags & MFILE_F_NOUSRMMAP))
-
-
 
 
 /* Read/write raw data to/from a given mem-file.

@@ -1562,8 +1562,9 @@ struct mpart_trim_data {
 	                                            *               when doing so becomes necessary. */
 	mpart_reladdr_t             mtd_rstart;    /* [const] Part-relative address where trimming starts */
 	mpart_reladdr_t             mtd_rend;      /* [const] Part-relative address where trimming ends */
-	unsigned int                mtd_mode;      /* [const] Trim mode (s.a. `MPART_TRIM_MODE_*' and `MPART_TRIM_FLAG_*') */
 	mpart_trim_except_handler_t mtd_xhand;     /* [0..1][const] I/O exception handler (if not defined, dump errors to the system log). */
+	size_t                      mtd_bytes;     /* [in|out] Incremented by the number of bytes trimmed (i.e. somehow removed from the mem-part) */
+	unsigned int                mtd_mode;      /* [const] Trim mode (s.a. `MPART_TRIM_MODE_*' and `MPART_TRIM_FLAG_*') */
 };
 #define mpart_trim_data_init(self, info, unlock, mmlocked, mode) \
 	(void)((self)->mtd_parts[0]  = __NULLPTR,                    \
@@ -1578,8 +1579,9 @@ struct mpart_trim_data {
 	       (self)->mtd_mmlocked  = (mmlocked),                   \
 	       (self)->mtd_rstart    = 0,                            \
 	       (self)->mtd_rend      = (mpart_reladdr_t)-1,          \
-	       (self)->mtd_mode      = (mode),                       \
-	       (self)->mtd_xhand     = __NULLPTR)
+	       (self)->mtd_xhand     = __NULLPTR,                            \
+	       (self)->mtd_bytes     = 0,                       \
+	       (self)->mtd_mode      = (mode))
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_trim_data_fini)(struct mpart_trim_data *__restrict self);
 
@@ -1625,6 +1627,10 @@ NOTHROW(FCALL mpart_trim_or_unlock_nx)(struct mpart *__restrict self,
  * - When using this function, `data->mtd_xhand' is simply ignored
  * @return: true:  Success (s.a. `MPART_NXOP_ST_SUCCESS')
  * @return: false: Failed (s.a. `MPART_NXOP_ST_RETRY') */
+FUNDEF ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) __BOOL FCALL
+mpart_trim_locked_or_unlock(struct mpart *__restrict self,
+                            struct mpart_trim_data *__restrict data)
+		THROWS(E_BADALLOC, E_IOERROR, ...);
 FUNDEF ATTR_BLOCKLIKE_CC(data->mtd_ccinfo) WUNUSED NONNULL((1, 2)) __BOOL FCALL
 mpart_trim_or_unlock(struct mpart *__restrict self,
                      struct mpart_trim_data *__restrict data)

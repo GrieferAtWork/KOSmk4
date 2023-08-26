@@ -653,7 +653,7 @@ misaligned_mfile_range_makeanon_or_unlock(struct misaligned_mfile *__restrict ms
  * @return: true:  Success (locks are still held)
  * @return: false: Try again (locks were lost)
  * @THROW: Error (locks were lost) */
-PUBLIC BLOCKING WUNUSED NONNULL((1)) bool FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool KCALL
 _mfile_msalign_makeanon_locked_or_unlock(struct mfile *__restrict file,
                                          pos_t minaddr, pos_t maxaddr,
                                          struct unlockinfo *unlock)
@@ -708,7 +708,7 @@ _mfile_msalign_makeanon_locked_or_unlock(struct mfile *__restrict file,
  * @return: true:  Success (locks are still held)
  * @return: false: Try again (locks were lost)
  * @THROW: Error (locks were lost) */
-PUBLIC BLOCKING WUNUSED NONNULL((1)) bool FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool KCALL
 _mfile_msalign_makeanon_or_unlock(struct mfile *__restrict self,
                                   pos_t minaddr, pos_t maxaddr,
                                   struct unlockinfo *unlock)

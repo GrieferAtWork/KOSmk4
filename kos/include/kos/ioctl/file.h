@@ -58,6 +58,7 @@
                                                                       * pointers to be aligned by `1 << fbs_ioba' (IOBaseAddress_SHIFT). */
 #define FILE_IOC_MSALIGN  _IOWR_KOS('F', 0x10, struct file_msalign)  /* Create an misaligned wrapper for this file (see below) */
 #define FILE_IOC_TAILREAD _IOWR_KOS('F', 0x20, struct file_tailread) /* Tail read (see below) */
+#define FILE_IOC_TRIM     _IOWR_KOS('F', 0x30, struct file_trim)     /* Trim file caches. */
 
 /* Return `_PC_*' for the superblock associated with the given file.
  * - This ioctl is only support for `fnode'-derived files */
@@ -178,7 +179,27 @@ struct file_tailread {
 	};
 };
 
+
+struct file_trim {
+	/* Argument type for `FILE_IOC_TRIM' */
+	__uint64_t  ft_fpos; /* [in] Absolute file position where to start trimming (may be rounded down) */
+	__uint64_t  ft_size; /* [in] Max number of bytes to trim (may be rounded up)
+	                      * [out] The number of bytes where trimmed. */
+	__uint32_t  ft_mode; /* [in] Trimming mode (one of `FILE_TRIM_MODE_*') */
+	__uint32_t _ft_pad;  /* ... */
+};
+
 __DECL_END
 #endif /* __CC__ */
+
+/* Possible values for `struct file_trim::ft_mode' */
+#define FILE_TRIM_MODE_NONE          0 /* Don't trim anything (no-op) */
+#define FILE_TRIM_MODE_UNMAPPED      1 /* Trim unchanged data that's not mapped into memory anywhere */
+#define FILE_TRIM_MODE_UNINITIALIZED 2 /* Trim unchanged data that's not mapped into memory anywhere, or mapped data's not initialized */
+#define FILE_TRIM_MODE_UNCHANGED     3 /* Trim data that hasn't been modified since it was initialized */
+#define FILE_TRIM_MODE_SYNC          4 /* Write changes to file buffers to disk (marking them unchanged), then do `FILE_IOC_TRIM_MODE_UNCHANGED' */
+#define FILE_TRIM_MODE_ALL           5 /* As per `FILE_IOC_TRIM_MODE_SYNC', but in case of changed, anonymous memory, (try to) write that memory to swap. */
+#define FILE_TRIM_MODE_FREE          6 /* As per `FILE_IOC_TRIM_MODE_SYNC', but in case of changed, anonymous memory, discard memory (when accessed again, 0-es will be read). */
+
 
 #endif /* !_KOS_IOCTL_FILE_H */

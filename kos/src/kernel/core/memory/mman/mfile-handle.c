@@ -39,12 +39,14 @@
 #include <kernel/iovec.h>
 #include <kernel/mman/mfile-misaligned.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
 #include <hybrid/minmax.h>
+#include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 
 #include <asm/ioctl.h>
@@ -235,6 +237,53 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		return 0;
 	}	break;
 
+	case FILE_IOC_TRIM: {
+		NCX struct file_trim *info;
+		uint64_t fpos, size;
+		uint32_t mode;
+		info = (NCX struct file_trim *)validate_readwrite(arg, sizeof(struct file_trim));
+		/* Load arguments. */
+		fpos = info->ft_fpos;
+		size = info->ft_size;
+		mode = info->ft_mode;
+		COMPILER_READ_BARRIER();
+		if likely(size) {
+			pos_t result;
+			/* Special handling for the no-op case */
+			if unlikely(mode == FILE_TRIM_MODE_NONE) {
+				result = 0;
+			} else {
+				static unsigned int const modes[] = {
+					[FILE_TRIM_MODE_UNMAPPED - 1]      = MPART_TRIM_MODE_UNMAPPED,
+					[FILE_TRIM_MODE_UNINITIALIZED - 1] = MPART_TRIM_MODE_UNINITIALIZED,
+					[FILE_TRIM_MODE_UNCHANGED - 1]     = MPART_TRIM_MODE_UNCHANGED,
+					[FILE_TRIM_MODE_SYNC - 1]          = MPART_TRIM_MODE_UNCHANGED | MPART_TRIM_FLAG_SYNC,
+					[FILE_TRIM_MODE_ALL - 1]           = MPART_TRIM_MODE_UNCHANGED | MPART_TRIM_FLAG_SYNC | MPART_TRIM_FLAG_SWAP,
+					[FILE_TRIM_MODE_FREE - 1]          = MPART_TRIM_MODE_UNCHANGED | MPART_TRIM_FLAG_SYNC | MPART_TRIM_FLAG_FREE,
+				};
+				pos_t minaddr = (pos_t)fpos;
+				pos_t maxaddr;
+				--mode;
+				if unlikely(mode >= lengthof(modes)) {
+					THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+					      E_INVALID_ARGUMENT_CONTEXT_FILE_TRIM_MODE,
+					      mode + 1);
+				}
+				mode = modes[mode];
+				if (OVERFLOW_UADD(minaddr, size - 1, &maxaddr))
+					maxaddr = (pos_t)-1;
+
+				/* Do the trim operation. */
+				result = mfile_trimparts(self, minaddr, maxaddr, mode);
+			}
+
+			/* Write-back the # of trimmed bytes. */
+			COMPILER_WRITE_BARRIER();
+			info->ft_size = (uint64_t)result;
+		}
+		return 0;
+	}	break;
+
 		/* All of the following ioctls are used to read attributes from the superblock. */
 #ifndef __OPTIMIZE_SIZE__
 	case _IO_WITHTYPE(FILE_IOC_GETFSLINKMAX, typeof_field(struct fsuper, fs_feat.sf_link_max)):
@@ -324,7 +373,8 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 
 	case _IO_WITHSIZE(FILE_IOC_CHANGED, 0): {
 		uintptr_t flags;
-		flags = atomic_read(&self->mf_flags) & (MFILE_F_DELETED | MFILE_F_CHANGED | MFILE_F_ATTRCHANGED);
+		flags = atomic_read(&self->mf_flags);
+		flags &= (MFILE_F_DELETED | MFILE_F_CHANGED | MFILE_F_ATTRCHANGED);
 		return ioctl_intarg_setbool(cmd, arg, flags != 0 && !(flags & MFILE_F_DELETED));
 	}	break;
 
