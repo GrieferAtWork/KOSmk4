@@ -657,6 +657,38 @@ misaligned_mfile_part_makeanon_or_unlock(struct misaligned_mfile *__restrict msa
 #undef LOCAL_unlock_all
 }
 
+PRIVATE WUNUSED NONNULL((1)) bool FCALL
+mpart_lock_and_maybe_split_or_decref_for_misaligned(struct misaligned_mfile *__restrict msalign,
+                                                    /*inherit(return == false || EXCEPT)*/ REF struct mpart *__restrict part,
+                                                    struct unlockinfo *unlock,
+                                                    mpart_reladdr_t partrel_offset,
+                                                    size_t num_bytes) {
+#define LOCAL_unlock_all()         \
+	(mfile_lock_endwrite(msalign), \
+	 unlockinfo_xunlock(unlock),   \
+	 mfile_lock_end(msalign->mam_base)) /* !!! Important: must release the file lock *after* caller-given `unlock' (s.a. `mfile_unlock_parts_info_cb()') */
+	struct mpart_load_and_makeanon_unlockinfo unlock_all;
+	if (!mpart_lock_tryacquire(part)) {
+		LOCAL_unlock_all();
+		FINALLY_DECREF_UNLIKELY(part);
+		mpart_lock_waitfor(part);
+		return false;
+	}
+	unlock_all.ui_unlock       = &mpart_load_and_makeanon_unlockinfo_cb;
+	unlock_all.mlamaui_msalign = msalign;
+	unlock_all.mlamaui_unlock  = unlock;
+	TRY {
+		if (!mpart_maybesplit_or_unlock(part, &unlock_all, partrel_offset, num_bytes)) {
+			decref_unlikely(part);
+			return false;
+		}
+	} EXCEPT {
+		decref_unlikely(part);
+		RETHROW();
+	}
+	return true;
+#undef LOCAL_unlock_all
+}
 
 PRIVATE BLOCKING NONNULL((1)) bool FCALL
 misaligned_mfile_range_makeanon_or_unlock(struct misaligned_mfile *__restrict msalign,
@@ -675,7 +707,59 @@ misaligned_mfile_range_makeanon_or_unlock(struct misaligned_mfile *__restrict ms
 	if (!mima.mm_min)
 		return true;
 
-	/* TODO: Split mem-parts so we don't have to load address ranges unnecessarily. */
+	/* Split mem-parts so we don't have to load address ranges unnecessarily. */
+	if ((msalign_minaddr > mpart_getminaddr(mima.mm_min)) ||
+	    (msalign_maxaddr < mpart_getmaxaddr(mima.mm_max))) {
+		if (mima.mm_min == mima.mm_max) {
+			/* Special case: trim the same part twice */
+			mpart_reladdr_t retain_minaddr;
+			mpart_reladdr_t retain_maxaddr;
+			if (!tryincref(mima.mm_min))
+				return true;
+			if (OVERFLOW_USUB(msalign_minaddr, mpart_getminaddr(mima.mm_min), &retain_minaddr))
+				retain_minaddr = 0;
+			assert(msalign_maxaddr >= mpart_getminaddr(mima.mm_min));
+			retain_maxaddr = (mpart_reladdr_t)(msalign_maxaddr - mpart_getminaddr(mima.mm_min));
+			assert(retain_minaddr <= retain_maxaddr);
+			if (!mpart_lock_and_maybe_split_or_decref_for_misaligned(msalign, mima.mm_min,
+			                                                         unlock, retain_minaddr,
+			                                                         (retain_maxaddr - retain_minaddr) + 1))
+				return false;
+			return mpart_load_and_makeanon_and_decref_and_unlock(msalign, mima.mm_min, unlock);
+		} else {
+			if (msalign_minaddr > mpart_getminaddr(mima.mm_min)) {
+				mpart_reladdr_t retain_minaddr;
+				mpart_reladdr_t retain_endaddr;
+				if (!tryincref(mima.mm_min))
+					return true;
+				retain_minaddr = (mpart_reladdr_t)(msalign_minaddr - mpart_getminaddr(mima.mm_min));
+				retain_endaddr = mpart_getsize(mima.mm_min);
+				assert(retain_minaddr < retain_endaddr);
+				if (!mpart_lock_and_maybe_split_or_decref_for_misaligned(msalign, mima.mm_min,
+				                                                         unlock, retain_minaddr,
+				                                                         retain_endaddr - retain_minaddr))
+					return false;
+				if (!mpart_load_and_makeanon_and_decref_and_unlock(msalign, mima.mm_min, unlock))
+					return false;
+				mima.mm_min = mpart_tree_nextnode(mima.mm_min);
+			}
+			if (msalign_maxaddr < mpart_getminaddr(mima.mm_max)) {
+				mpart_reladdr_t retain_endaddr;
+				if (!tryincref(mima.mm_max))
+					return true;
+				retain_endaddr = (mpart_reladdr_t)(msalign_maxaddr - mpart_getminaddr(mima.mm_max)) + 1;
+				assert(retain_endaddr > 0);
+				if (!mpart_lock_and_maybe_split_or_decref_for_misaligned(msalign, mima.mm_max,
+				                                                         unlock, 0, retain_endaddr))
+					return false;
+				if (!mpart_load_and_makeanon_and_decref_and_unlock(msalign, mima.mm_max, unlock))
+					return false;
+				if (mima.mm_min == mima.mm_max)
+					return true; /* Special case when there were 2 parts originally. */
+				mima.mm_max = mpart_tree_prevnode(mima.mm_max);
+			}
+		}
+	}
 
 	while (mima.mm_min != mima.mm_max) {
 		next = mpart_tree_nextnode(mima.mm_min);

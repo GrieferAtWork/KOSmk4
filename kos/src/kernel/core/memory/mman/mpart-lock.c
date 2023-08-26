@@ -957,7 +957,7 @@ mpart_maybesplit_or_unlock(struct mpart *__restrict self,
 	assert((partrel_offset + num_bytes) > partrel_offset);
 	assert((partrel_offset + num_bytes) <= mpart_getsize(self));
 	if (MPART_ST_INCORE(self->mp_state))
-		return true; /* No need to split -> part is already in-core. */
+		return true; /* No point in splitting -> part is already in-core. */
 	if (self->mp_flags & MPART_F_NOSPLIT)
 		return true; /* No allowed to split */
 
