@@ -184,6 +184,7 @@ NOTHROW(FCALL mpartmeta_destroy)(struct mpartmeta *__restrict self);
 #define _mpartmeta_init_noftxlock(self) \
 	((self)->mpm_ftx = __NULLPTR,       \
 	 SLIST_INIT(&(self)->mpm_ftxlops),  \
+	 (self)->mpm_dmalocks = 0,          \
 	 sig_init(&(self)->mpm_dma_done)    \
 	 _mpartmeta_init_rtm_(self))
 #define mpartmeta_init(self)                   \
@@ -193,6 +194,7 @@ NOTHROW(FCALL mpartmeta_destroy)(struct mpartmeta *__restrict self);
 	(atomic_rwlock_cinit(&(self)->mpm_ftxlock),          \
 	 __hybrid_assert((self)->mpm_ftx == __NULLPTR),      \
 	 __hybrid_assert(SLIST_EMPTY(&(self)->mpm_ftxlops)), \
+	 __hybrid_assert((self)->mpm_dmalocks == 0),         \
 	 sig_cinit(&(self)->mpm_dma_done)                    \
 	 _mpartmeta_cinit_rtm_(self))
 
