@@ -53,7 +53,7 @@ PRIVATE void ftruncate_after_mmap_impl(bool use_unlink) {
 	(void)unlink("/var/mmaptest.dat");
 	fd = open("/var/mmaptest.dat", O_CREAT | O_TRUNC | O_RDWR, 0644);
 	if unlikely(fd < 0)
-		return; /* Maybe some FS problem??? Whatever the case: not our job to fix */
+		return; /* Maybe some FS problem??? Whatever the case: not our job to diagnose */
 
 	/* Create a misaligned wrapper for `fd' with offset=2 */
 	fms.fmsa_offset         = 2;

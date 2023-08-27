@@ -756,8 +756,20 @@ sys_umount2_impl(fd_t dirfd, NCX UNCHECKED char const *target,
 		/* Require mounting rights. */
 		require(CAP_MOUNT);
 
+		/* TODO: Must call  `mfile_umount_prepare_or_unlock()'  on  all  currently  loaded
+		 *       files  of  the superblock.  This  needs to  be  done so  MAP_PRIVATE file
+		 *       mappings are loaded into memory before the backing filesystem disappears.
+		 * NOTE: `mfile_umount_prepare_or_unlock()' extends `exmfile_unlink_prepare_or_unlock()'
+		 *       by not only  forcing MAP_PRIVATE  mappings into  memory, but  also forcing  any
+		 *       changed blocks down  to disk  (meaning that  the `fsuper_sync()'  below can  be
+		 *       removed also)
+		 * When `MNT_FORCE' is given, any exception in`mfile_umount_prepare_or_unlock()'
+		 * will  be discarded, and  the superblock will be  unmounted without this sync. */
+
 		/* Force a sync before doing the unmount. (Don't unload in inconsistent state) */
 		fsuper_sync(path_getsuper(unmount_me));
+
+		/* TODO: What about changes made to files after `fsuper_sync()'? */
 
 		/* Do the unmount. */
 		path_umount(path_asmount(unmount_me), flags);
