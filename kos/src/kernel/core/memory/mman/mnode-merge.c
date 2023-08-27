@@ -1382,7 +1382,10 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 		meta = (struct mpartmeta *)merge_malloc(sizeof(struct mpartmeta), orig_part);
 		if unlikely(!meta)
 			goto err_async_waitfor;
-		mpartmeta_init(meta);
+		/* Must initialize  the meta-control  lock as  being held  for  writing.
+		 * This is necessary since our caller will eventually inherit this lock! */
+		_mpartmeta_init_noftxlock(meta);
+		atomic_rwlock_init_write(&meta->mpm_ftxlock);
 		lopart->mp_meta = meta;
 	}
 
