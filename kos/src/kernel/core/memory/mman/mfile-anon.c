@@ -299,6 +299,22 @@ NOTHROW(FCALL mfile_delete_withpartlock)(Toblockop(mpart) *__restrict self,
 	return NULL;
 }
 
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_decref_after_delete)(struct mfile *__restrict self) {
+	/* Generate `IN_IGNORED' */
+	mfile_inotify_ignored(self);
+
+	/* TODO: If `self' is being used to mount a super-block, force-delete
+	 *       that superblock (case: you pull out a thumb-drive while it's
+	 *       mounted,  and we want  those mounts to  disappear as soon as
+	 *       possible)
+	 * CAUTION: Considering how often we  get here, optimize this  check
+	 *          for the case where `self' *isn't* used to mount a super-
+	 *          block. Don't make this check be O(fallsuper_getsize()) */
+
+	/* Drop the inherited reference to the original file. */
+	decref_unlikely(self);
+}
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mfile_decref_and_destroy_deadparts_postop)(Tobpostlockop(mfile) *__restrict self,
@@ -317,12 +333,7 @@ NOTHROW(FCALL mfile_decref_and_destroy_deadparts_postop)(Tobpostlockop(mfile) *_
 		DBG_memset(&part->_mp_dead, 0xcc, sizeof(part->_mp_dead));
 		mpart_destroy(part);
 	}
-
-	/* Generate `IN_IGNORED' */
-	mfile_inotify_ignored(me);
-
-	/* Drop the inherited reference to the original file. */
-	decref_unlikely(me);
+	mfile_decref_after_delete(me);
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
@@ -330,8 +341,7 @@ NOTHROW(FCALL mfile_decref_postop)(Tobpostlockop(mfile) *__restrict self,
                                    struct mfile *__restrict UNUSED(_file)) {
 	REF struct mfile *me;
 	me = container_of(self, struct mfile, _mf_mfplop);
-	mfile_inotify_ignored(me); /* Generate `IN_IGNORED' */
-	decref_unlikely(me);
+	mfile_decref_after_delete(me);
 }
 
 PRIVATE NOBLOCK void
