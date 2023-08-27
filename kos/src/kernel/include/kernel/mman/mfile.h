@@ -1111,6 +1111,9 @@ FUNDEF BLOCKING NONNULL((1)) __BOOL FCALL
 mfile_deleting_waitfor(struct mfile *__restrict self)
 		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...);
 
+
+
+/************************************************************************/
 /* Do various things necessary to set `MFILE_F_DELETING' in `self->mf_flags'.
  *
  * NOTES:
@@ -1140,6 +1143,51 @@ mfile_deleting_begin_locked_or_unlock(struct mfile *__restrict self,
 /* Commit a delete-operation previously started with `mfile_deleting_begin()'
  * NOTE: This is only a convenience wrapper to document the connection with `mfile_delete()' */
 #define mfile_deleting_commit(self) mfile_delete(self)
+/************************************************************************/
+
+
+
+
+
+
+/************************************************************************/
+struct mfile_unlink_info {
+	__BOOL mfui_deleted; /* Set to true if the file was already deleted. */
+};
+
+/* Prepare `self' for being unlinked.
+ *
+ * This function uses `mfile_deleting_begin_locked_or_unlock()' to set `MFILE_F_DELETING'
+ * for `self' and all associated misaligned sub-files, as well as forces all  MAP_PRIVATE
+ * file mappings into memory (which obviously includes mmapread mappings).
+ *
+ * This function should be called in order to prepare a file for unlinking. */
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) __BOOL FCALL
+mfile_unlink_prepare_locked_or_unlock(struct mfile *__restrict self,
+                                      /*out*/ struct mfile_unlink_info *__restrict info,
+                                      struct unlockinfo *unlock DFL(__NULLPTR))
+		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) __BOOL FCALL
+mfile_unlink_prepare_or_unlock(struct mfile *__restrict self,
+                               /*out*/ struct mfile_unlink_info *__restrict info,
+                               struct unlockinfo *unlock DFL(__NULLPTR))
+		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...);
+
+/* Roll-back the actions of `mfile_unlink_prepare_or_unlock()' */
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mfile_unlink_rollback)(struct mfile *__restrict self,
+                                     struct mfile_unlink_info const *__restrict info);
+
+/* Must be called prior to `mfile_delete(self)' or whatever other
+ * function has to  be used to  asynchronously anonymize  `self'. */
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL _mfile_unlink_commit_prehook)(struct mfile *__restrict self,
+                                            struct mfile_unlink_info const *__restrict info);
+#define _mfile_unlink_commit(self, info, mfile_delete_fn) (_mfile_unlink_commit_prehook(self, info), mfile_delete_fn(self))
+#define mfile_unlink_commit(self, info)                   _mfile_unlink_commit(self, info, mfile_delete)
+/************************************************************************/
+
+
 
 
 #ifdef CONFIG_NO_SMP

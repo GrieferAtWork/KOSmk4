@@ -43,8 +43,7 @@
 
 DECL_BEGIN
 
-
-DEFINE_TEST(ftruncate_after_mmap) {
+PRIVATE void ftruncate_after_mmap_impl(bool use_unlink) {
 	fd_t fd, msfd;
 	void *m1, *m2, *m3;
 	unsigned char vec[1];
@@ -86,12 +85,11 @@ DEFINE_TEST(ftruncate_after_mmap) {
 	EQ(0, vec[0]);
 
 	/* Do the magical truncate on the file. */
-	EQ(0, ftruncate(fd, 0));
-	/* TODO: `unlink("foo")'  must behave the same as `truncate("foo", 0)',
-	 *       in that it needs to ensure that MAP_PRIVATE mappings are fully
-	 *       loaded *before* the file is deleted from disk. (otherwise,  it
-	 *       would become impossible to  still load those mappings  *after*
-	 *       the file has been deleted) */
+	if (use_unlink) {
+		EQ(0, unlink("/var/mmaptest.dat"));
+	} else {
+		EQ(0, ftruncate(fd, 0));
+	}
 
 	/* Assert that ftruncate caused our MAP_PRIVATE
 	 * mappings to magically re-appear in the core. */
@@ -101,21 +99,34 @@ DEFINE_TEST(ftruncate_after_mmap) {
 	EQ(1, vec[0]);
 
 	/* Create another mapping of the file. */
-	m3 = mmap(NULL, 4, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
-	NE(MAP_FAILED, m3);
+	m3 = MAP_FAILED;
+	if (!use_unlink) { /* TODO: Shouldn't this also work after unlink? */
+		m3 = mmap(NULL, 4, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
+		NE(MAP_FAILED, m3);
+	}
 	EQ(0, close(msfd));
 	EQ(0, close(fd));
 
 	/* Assert the validity of the 3 mappings we created (ensuring that they all contain the expected data) */
 	EQmemf("TEST", m1, 4, "A MAP_PRIVATE mapping must retain its contents, even after an ftruncate");
 	EQmemf("ST", m2, 2, "A misaligned sub-file must retain its contents, even after an ftruncate");
-	EQmemf("\0\0\0\0", m3, 4, "This mapping was created after the ftruncate, so it must be all 0-es");
+	if (m3 != MAP_FAILED)
+		EQmemf("\0\0\0\0", m3, 4, "This mapping was created after the ftruncate, so it must be all 0-es");
 
 	/* Cleanup... */
 	EQ(0, munmap(m1, 4));
 	EQ(0, munmap(m2, 2));
-	EQ(0, munmap(m3, 4));
-	EQ(0, unlink("/var/mmaptest.dat"));
+	if (m3 != MAP_FAILED)
+		EQ(0, munmap(m3, 4));
+	if (!use_unlink)
+		EQ(0, unlink("/var/mmaptest.dat"));
+}
+
+DEFINE_TEST(ftruncate_after_mmap) {
+	ctest_substatf("With ftruncate");
+	ftruncate_after_mmap_impl(false);
+	ctest_substatf("With unlink");
+	ftruncate_after_mmap_impl(true);
 }
 
 DECL_END

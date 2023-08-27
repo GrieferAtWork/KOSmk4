@@ -702,17 +702,28 @@ mfile_deleting_begin_locked_or_unlock(struct mfile *__restrict self,
 	assert(!(self->mf_flags & MFILE_F_DELETING));
 
 	if likely(self->mf_parts != MFILE_PARTS_ANONYMOUS) {
-		/* Acquire references and locks to all parts of `self' */
-		if (!mfile_incref_and_lock_parts_r_or_unlock(self, delete_minaddr, delete_maxaddr, unlock))
-			return false;
+		if (delete_minaddr == 0 && delete_maxaddr == (pos_t)-1) {
+			/* Special-case optimization for when the entire file is being deleted
+			 * This is the case when we get here from `ftruncate(0)' or `unlink()' */
+			if (!mfile_incref_and_lock_parts_or_unlock(self, unlock))
+				return false;
+			if (!mfile_parts_denywrite_or_unlock(self, unlock))
+				return false;
+			if (!mfile_parts_loadprivate_or_unlock(self, unlock))
+				return false;
+		} else {
+			/* Acquire references and locks to all parts of `self' */
+			if (!mfile_incref_and_lock_parts_r_or_unlock(self, delete_minaddr, delete_maxaddr, unlock))
+				return false;
 
-		/* Deny write access to memory mappings. */
-		if (!mfile_parts_denywrite_r_or_unlock(self, delete_minaddr, delete_maxaddr, unlock))
-			return false;
+			/* Deny write access to memory mappings. */
+			if (!mfile_parts_denywrite_r_or_unlock(self, delete_minaddr, delete_maxaddr, unlock))
+				return false;
 
-		/* Load parts linked to MAP_PRIVATE nodes. */
-		if (!mfile_parts_loadprivate_r_or_unlock(self, delete_minaddr, delete_maxaddr, unlock))
-			return false;
+			/* Load parts linked to MAP_PRIVATE nodes. */
+			if (!mfile_parts_loadprivate_r_or_unlock(self, delete_minaddr, delete_maxaddr, unlock))
+				return false;
+		}
 
 		/* Actually set the DELETING flag. */
 		atomic_or(&self->mf_flags, MFILE_F_DELETING);
@@ -726,6 +737,169 @@ mfile_deleting_begin_locked_or_unlock(struct mfile *__restrict self,
 	return true;
 #undef LOCAL_unlock_all
 }
+
+
+struct misaligned_mfile_unlink_prepare_unlockinfo: unlockinfo {
+	struct misaligned_mfile *msmupui_msfile; /* [1..1] The misaligned file currently being prepared. */
+	struct unlockinfo       *msmupui_inner;  /* [0..1] Inner unlock-info */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL misaligned_mfile_unlink_prepare_unlockinfo_cb)(struct unlockinfo *__restrict self) {
+	struct mfile *file;
+	struct misaligned_mfile *ms;
+	struct misaligned_mfile_unlink_prepare_unlockinfo *me;
+	me   = (struct misaligned_mfile_unlink_prepare_unlockinfo *)self;
+	ms   = me->msmupui_msfile;
+	file = ms->mam_base;
+	while (ms != LIST_FIRST(&file->mf_msalign)) {
+		ms = LIST_PREV_UNSAFE(ms, mam_link);
+		decref_unlikely(ms);
+		mfile_deleting_rollback(ms);
+	}
+	assert(file->mf_flags & MFILE_F_DELETING);
+	mfile_lock_endwrite(file);
+	mfile_deleting_rollback(file);
+	unlockinfo_xunlock(me->msmupui_inner);
+}
+
+
+/* Prepare `self' for being unlinked.
+ *
+ * This function uses `mfile_deleting_begin_locked_or_unlock()' to set `MFILE_F_DELETING'
+ * for `self' and all associated misaligned sub-files, as well as forces all  MAP_PRIVATE
+ * file mappings into memory (which obviously includes mmapread mappings).
+ *
+ * This function should be called in order to prepare a file for unlinking. */
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) bool FCALL
+mfile_unlink_prepare_locked_or_unlock(struct mfile *__restrict self,
+                                      struct mfile_unlink_info *__restrict info,
+                                      struct unlockinfo *unlock)
+		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...) {
+#define LOCAL_unlock_all() (mfile_lock_endwrite(self), unlockinfo_xunlock(unlock))
+	assert(mfile_lock_writing(self));
+
+	/* Wait for trunc locks (if present) */
+	if unlikely(atomic_read(&self->mf_trunclock) != 0) {
+		LOCAL_unlock_all();
+		mfile_trunclock_waitfor(self);
+		return false;
+	}
+
+	/* Wait for the DELETING flag to not be set */
+	{
+		uintptr_t file_flags;
+		file_flags = atomic_read(&self->mf_flags);
+		if unlikely(file_flags & (MFILE_F_DELETING | MFILE_F_DELETED)) {
+			if unlikely(file_flags & MFILE_F_DELETED) {
+				info->mfui_deleted = true;
+				return true; /* File was already deleted */
+			}
+			LOCAL_unlock_all();
+			mfile_deleting_waitfor(self);
+			return false;
+		}
+	}
+
+	/* Do all the rest. */
+	if (!mfile_deleting_begin_locked_or_unlock(self, 0, (pos_t)-1, unlock))
+		return false;
+
+	/* If there are misaligned sub-files, recursively mark those as deleted.
+	 * Note that the  presence of the  `MFILE_F_DELETING' flag prevents  new
+	 * misaligned files from being added,  and since we acquire a  reference
+	 * to all of them, this also prevents parts from being removed  (meaning
+	 * that in the  end, we have  the guaranty that  the list of  misaligned
+	 * files will *not* change until we're done) */
+	if unlikely(!LIST_EMPTY(&self->mf_msalign)) {
+		struct misaligned_mfile *ms, *next;
+		assert(!mfile_ismisaligned(self));
+		for (ms = LIST_FIRST(&self->mf_msalign); ms; ms = next) {
+			struct misaligned_mfile_unlink_prepare_unlockinfo ui;
+			struct mfile_unlink_info ms_info;
+			next = LIST_NEXT(ms, mam_link);
+			if unlikely(!tryincref(ms)) {
+				/* Disabled dead files. */
+				LIST_UNBIND(ms, mam_link);
+				continue;
+			}
+			ui.ui_unlock      = &misaligned_mfile_unlink_prepare_unlockinfo_cb;
+			ui.msmupui_msfile = ms;
+			ui.msmupui_inner  = unlock;
+			if (!mfile_unlink_prepare_or_unlock(ms, &ms_info, &ui)) {
+				decref_unlikely(ms);
+				return false;
+			}
+			if (ms_info.mfui_deleted) {
+				/* Misaligned file was already marked as DELETED
+				 * -> just get rid of it... */
+				assert(ms->mf_flags & MFILE_F_DELETED);
+				LIST_UNBIND(ms, mam_link);
+			}
+		}
+	}
+
+	info->mfui_deleted = false;
+	return true;
+#undef LOCAL_unlock_all
+}
+
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) bool FCALL
+mfile_unlink_prepare_or_unlock(struct mfile *__restrict self,
+                               struct mfile_unlink_info *__restrict info,
+                               struct unlockinfo *unlock)
+		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...) {
+#define LOCAL_unlock_all() (unlockinfo_xunlock(unlock))
+	bool result;
+	if (!mfile_lock_trywrite(self)) {
+		LOCAL_unlock_all();
+		mfile_lock_waitwrite(self);
+		return false;
+	}
+	result = mfile_unlink_prepare_locked_or_unlock(self, info, unlock);
+	if (result)
+		mfile_lock_endwrite(self);
+	return result;
+#undef LOCAL_unlock_all
+}
+
+/* Roll-back the actions of `mfile_unlink_prepare_or_unlock()' */
+PUBLIC NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mfile_unlink_rollback)(struct mfile *__restrict self,
+                                     struct mfile_unlink_info const *__restrict info) {
+	struct misaligned_mfile *ms;
+	if (info->mfui_deleted)
+		return;
+	assert(self->mf_flags & MFILE_F_DELETING);
+	LIST_FOREACH_SAFE (ms, &self->mf_msalign, mam_link) {
+		assert(!wasdestroyed(ms));
+		mfile_deleting_rollback(ms);
+		decref_unlikely(ms);
+	}
+	mfile_deleting_rollback(self);
+}
+
+/* Must be called prior to `mfile_delete(self)' or whatever other
+ * function has to  be used to  asynchronously anonymize  `self'. */
+PUBLIC NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL _mfile_unlink_commit_prehook)(struct mfile *__restrict self,
+                                            struct mfile_unlink_info const *__restrict info) {
+	struct misaligned_mfile *ms;
+	if (info->mfui_deleted)
+		return;
+	assert(self->mf_flags & MFILE_F_DELETING);
+	/* Drop references to misaligned files created above. */
+	LIST_FOREACH_SAFE (ms, &self->mf_msalign, mam_link) {
+		assert(!wasdestroyed(ms));
+		assert(ms->mf_flags & MFILE_F_DELETING);
+#if 0 /* Don't need to delete right now; once the base file gets deleted, the misaligned sub-files will, too. */
+		mfile_delete_and_decref(ms);
+#else
+		decref_unlikely(ms);
+#endif
+	}
+}
+
 
 
 

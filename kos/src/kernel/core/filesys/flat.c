@@ -1111,6 +1111,17 @@ handle_existing:
 	return FDIRNODE_MKFILE_SUCCESS;
 }
 
+struct flatdirnode_endwrite_unlockinfo: unlockinfo {
+	struct flatdirnode *fdnewui_dirnode; /* [1..1] The directory node to unlock. */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL flatdirnode_endwrite_unlockinfo_cb)(struct unlockinfo *__restrict self) {
+	struct flatdirnode_endwrite_unlockinfo *me;
+	me = (struct flatdirnode_endwrite_unlockinfo *)self;
+	flatdirnode_endwrite(me->fdnewui_dirnode);
+
+}
 
 PUBLIC BLOCKING WUNUSED NONNULL((1, 2, 3)) unsigned int KCALL
 flatdirnode_v_unlink(struct fdirnode *__restrict self,
@@ -1121,9 +1132,15 @@ flatdirnode_v_unlink(struct fdirnode *__restrict self,
 	struct flatdirnode_ops const *ops;
 	struct flatdirnode *me;
 	struct flatdirent *ent;
+	struct flatdirnode_endwrite_unlockinfo ui;
+	struct mfile_unlink_info unlink_info;
 	me  = fdirnode_asflat(self);
 	ops = flatdirnode_getops(me);
 	ent = fdirent_asflat(entry);
+
+	/* Setup unlockinfo for the call to `mfile_unlink_prepare_or_unlock()' below. */
+	ui.ui_unlock       = &flatdirnode_endwrite_unlockinfo_cb;
+	ui.fdnewui_dirnode = me;
 
 	/* Lock the directory. */
 again:
@@ -1152,16 +1169,16 @@ again_locked:
 		goto again;
 	}
 
-	/* TODO: Make use of `mfile_deleting_begin_locked_or_unlock()' here!
-	 * NOTE: Unlike the ftruncate-case, we want to call `mfile_deleting_begin_locked_or_unlock()'
-	 *       for  misaligned files also, so we don't have to anonymize misaligned file buffers in
-	 *       case the file ends up having some extra hard-links (or in case of an FS-error) */
+	/* Prepare the file for unlinking. */
+	if (!mfile_unlink_prepare_or_unlock(file, &unlink_info, &ui))
+		goto again;
 
 	/* Ask the FS-specific implementation to delete file entries. */
 	TRY {
 		flatdirnode_delete_entry(me, ent, file, TAILQ_NEXT(ent, fde_bypos) == NULL);
 	} EXCEPT {
 		flatdirnode_endwrite(me);
+		mfile_unlink_rollback(file, &unlink_info);
 		RETHROW();
 	}
 
@@ -1186,17 +1203,20 @@ again_locked:
 		mfile_tslock_release(file);
 		mfile_inotify_attrib(file); /* Post `IN_ATTRIB' */
 		if (!deleted) {
+			mfile_unlink_rollback(file, &unlink_info);
 			mfile_changed(file, MFILE_F_ATTRCHANGED);
 		} else {
+			/* TODO: Invoke the free-blocks operator of `file' */
+
 			/* Last link went away -> must delete the file. */
-			fnode_delete(file);
+			_mfile_unlink_commit(file, &unlink_info, fnode_delete);
 
 			/* If defined, also invoke the custom file-deleted operator.
 			 * As  you can see, even if this operator throws, the unlink
 			 * will not become undone. As a matter of fact, there is  no
 			 * way to undo the delete without out-of-scope data races! */
 			if (ops->fdno_flat.fdnx_deletefile != NULL)
-				(*ops->fdno_flat.fdnx_deletefile)(me, ent, file);
+				(*ops->fdno_flat.fdnx_deletefile)(me, ent, file); /* TODO: Get rid of this operator. */
 		}
 	} /* Scope... */
 
